@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.6 2004/05/25 16:16:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.7 2004/09/19 20:01:24 avenger_teambg Exp $
  *
  */
 
@@ -35,6 +35,7 @@ ITMImp::~ITMImp(void)
 	if (str && autoFree) {
 		delete( str );
 	}
+	str = NULL;
 }
 
 bool ITMImp::Open(DataStream* stream, bool autoFree)
@@ -65,7 +66,7 @@ bool ITMImp::Open(DataStream* stream, bool autoFree)
 
 Item* ITMImp::GetItem()
 {
-  unsigned int i;
+	unsigned int i;
 	Item* s = new Item();
 
 	str->Read( &s->ItemName, 4 );
@@ -158,7 +159,7 @@ Item* ITMImp::GetItem()
 
 ITMExtHeader* ITMImp::GetExtHeader(Item* s)
 {
-  unsigned int i;
+	unsigned int i;
 	ITMExtHeader* eh = new ITMExtHeader();
 
 	str->Read( &eh->AttackType, 1 );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.28 2004/05/15 13:08:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.29 2004/09/19 20:01:22 avenger_teambg Exp $
  *
  */
 
@@ -89,7 +89,8 @@ CachedFileStream::CachedFileStream(CachedFileStream* cfs, int startpos,
 	if (str == NULL) {
 		str = _fopen( cfs->originalfile, "rb" );
 		if (str == NULL) {
-			printf( "\nDANGER WILL ROBINSON!!! str == NULL\nI'll wait a second hoping to open the file..." );
+			printf( "Can't open stream (maybe leaking?)\n" );
+			return;
 		}
 	}
 #ifdef _DEBUG
@@ -107,7 +108,8 @@ CachedFileStream::~CachedFileStream(void)
 #endif
 		_fclose( str );
 	}
-	autoFree = false; //File stream destructor hack
+	str = NULL;
+	//autoFree = false; //File stream destructor hack
 }
 
 int CachedFileStream::Read(void* dest, unsigned int length)

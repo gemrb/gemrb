@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.42 2004/09/13 21:40:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.43 2004/09/19 20:01:25 avenger_teambg Exp $
  *
  */
 
@@ -222,8 +222,6 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 			return NULL;
 		}
 		int bifnum = ( ResLocator & 0xFFF00000 ) >> 20;
-		ArchiveImporter* ai = ( ArchiveImporter* )
-			core->GetInterface( IE_BIF_CLASS_ID );
 		FILE* exist = NULL;
 		if (exist == NULL) {
 			strcpy( path, core->GamePath );
@@ -281,7 +279,6 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 				if (!exist) {
 					printStatus( "ERROR", LIGHT_RED );
 					printf( "Cannot find %s\n", path );
-					core->FreeInterface( ai );
 					return NULL;
 				}
 			}
@@ -289,6 +286,8 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 			fclose( exist );
 		} else
 			fclose( exist );
+		ArchiveImporter* ai = ( ArchiveImporter* )
+			core->GetInterface( IE_BIF_CLASS_ID );
 		if (ai->OpenArchive( path ) == GEM_ERROR) {
 			printf("Cannot open archive %s\n", path );
 			core->FreeInterface( ai );

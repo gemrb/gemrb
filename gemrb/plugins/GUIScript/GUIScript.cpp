@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.209 2004/09/12 21:58:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.210 2004/09/19 20:01:23 avenger_teambg Exp $
  *
  */
 
@@ -3381,8 +3381,8 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 
 		btn->SetFlags( IE_GUI_BUTTON_PICTURE, OP_OR );
 		btn->SetPicture( item->ItemIconBAM->GetFrame( Which ) );
-		delete item;
 		core->FreeInterface( im );
+		delete item;
 	} else {
 		btn->SetPicture( NULL );
 	}
