@@ -1,4 +1,4 @@
-#include "../../includes/win32def.h"
+#define INTERFACE
 #include "Interface.h"
 #include "FileStream.h"
 #include "AnimationMgr.h"
@@ -11,18 +11,36 @@
 
 GEM_EXPORT Interface *core;
 
+#ifdef WIN32
+GEM_EXPORT HANDLE hConsole;
+#endif
+
+#include "../../includes/win32def.h"
+
 Interface::Interface(void)
 {
+#ifdef WIN32
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+#endif
+	textcolor(LIGHT_WHITE);
+	printf("GemRB Core Version %d.%d Sub. %d Loading...\n", GEMRB_RELEASE, GEMRB_API_NUM, GEMRB_SDK_REV);
 	video = NULL;
 	key = NULL;
 	strings = NULL;
 	hcanims = NULL;
+	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
-		printf("Cannot Load Config File.\nTermination in Progress...\n");
+		printStatus("ERROR", LIGHT_RED);
+		printMessage("Core", "Cannot Load Config File.\nTermination in Progress...\n", WHITE);
 		exit(-1);
 	}
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Starting Plugin Manager...\n", WHITE);
 	plugin = new PluginMgr(GemRBPath);
+	printMessage("Core", "Plugin Loading Complete!\n", LIGHT_GREEN);
+	printMessage("Core", "Creating Object Factory...", WHITE);
 	factory = new Factory();
+	printStatus("OK", LIGHT_GREEN);
 }
 
 Interface::~Interface(void)
@@ -50,57 +68,80 @@ Interface::~Interface(void)
 
 int Interface::Init()
 {
-  printf("Searching for Video Driver...");
+	printMessage("Core", "GemRB Core Initialization...\n", WHITE);
+	printMessage("Core", "Searching for Video Driver...", WHITE);
 	if(!IsAvailable(IE_VIDEO_CLASS_ID)) {
-		printf("[ERROR]\nNo Video Driver Available.\nTermination in Progress...\n");
+		printStatus("ERROR", LIGHT_RED);
+		printf("No Video Driver Available.\nTermination in Progress...\n");
 		return GEM_ERROR;
 	}
-	printf("[OK]\nGetting Video Plugin Interface...");
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Initializing Video Plugin...", WHITE);
 	video = (Video*)GetInterface(IE_VIDEO_CLASS_ID);
-	video->Init();
-	printf("Searching for KEY Importer...");
-	if(!IsAvailable(IE_KEY_CLASS_ID)) {
-		printf("[ERROR]\nNo KEY Importer Available.\nTermination in Progress...\n");
+	if(video->Init() == GEM_ERROR) {
+		printStatus("ERROR", LIGHT_RED);
+		printf("Cannot Initialize Video Driver.\nTermination in Progress...\n");
 		return GEM_ERROR;
 	}
-	printf("[OK]\n");
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Searching for KEY Importer...", WHITE);
+	if(!IsAvailable(IE_KEY_CLASS_ID)) {
+		printStatus("ERROR", LIGHT_RED);
+		printf("No KEY Importer Available.\nTermination in Progress...\n");
+		return GEM_ERROR;
+	}
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Initializing Resource Manager...", WHITE);
 	key = (ResourceMgr*)GetInterface(IE_KEY_CLASS_ID);
 	char ChitinPath[_MAX_PATH];
 	strcpy(ChitinPath, GamePath);
 	strcat(ChitinPath, "chitin.key");
 	if(!key->LoadResFile(ChitinPath)) {
-		printf("Error Loading Chitin.key\nTermination in Progress...\n");
+		printStatus("ERROR", LIGHT_RED);
+		printf("Cannot Load Chitin.key\nTermination in Progress...\n");
 		return GEM_ERROR;
 	}
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Checking for Hard Coded Animations...", WHITE);
 	if(!IsAvailable(IE_HCANIMS_CLASS_ID)) {
+		printStatus("ERROR", LIGHT_RED);
 		printf("No Hard Coded Animations Available.\nTermination in Progress...\n");
 		return GEM_ERROR;
 	}
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Iniaitlizing Hard Coded Animations...", WHITE);
 	hcanims = (HCAnimationSeq*)GetInterface(IE_HCANIMS_CLASS_ID);
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Checking for Dialogue Manager...", WHITE);
 	if(!IsAvailable(IE_TLK_CLASS_ID)) {
+		printStatus("ERROR", LIGHT_RED);
 		printf("No TLK Importer Available.\nTermination in Progress...\n");
 		return GEM_ERROR;
 	}
+	printStatus("OK", LIGHT_GREEN);
 	strings = (StringMgr*)GetInterface(IE_TLK_CLASS_ID);
+	printMessage("Core", "Loading Dialog.tlk file...", WHITE);
 	char strpath[_MAX_PATH];
 	strcpy(strpath, GamePath);
 	strcat(strpath, "dialog.tlk");
 	FileStream * fs = new FileStream();
 	if(!fs->Open(strpath)) {
+		printStatus("ERROR", LIGHT_RED);
 		printf("Cannot find Dialog.tlk.\nTermination in Progress...\n");
 		delete(fs);
 		return GEM_ERROR;
 	}
+	printStatus("OK", LIGHT_GREEN);
 	strings->Open(fs, true);
-	printf("Loading Palettes...\n");
+	printMessage("Core", "Loading Palettes...\n", WHITE);
 	DataStream * bmppal256 = key->GetResource("MPAL256\0", IE_BMP_CLASS_ID);
 	DataStream * bmppal16 = key->GetResource("MPALETTE", IE_BMP_CLASS_ID);
 	pal256 = (ImageMgr*)this->GetInterface(IE_BMP_CLASS_ID);
 	pal16  = (ImageMgr*)this->GetInterface(IE_BMP_CLASS_ID);
 	pal256->Open(bmppal256, true);
 	pal16->Open(bmppal16, true);
-	printf("Palettes Loaded\n");
-	printf("Loading Fonts...\n");
+	printMessage("Core", "Palettes Loaded\n", LIGHT_GREEN);
+	printMessage("Core", "Loading Fonts...\n", WHITE);
 	AnimationMgr * anim = (AnimationMgr*)GetInterface(IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
 		char ResRef[9];
@@ -132,7 +173,14 @@ int Interface::Init()
 		fonts.push_back(fnt);
 	}
 	FreeInterface(anim);
-	printf("Fonts Loaded\n");
+	printMessage("Core", "Fonts Loaded\n", LIGHT_GREEN);
+	printMessage("Core", "Initializing the Event Manager...", WHITE);
+	evntmgr = new EventMgr();
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "BroadCasting Event Manager...", WHITE);
+	video->SetEventMgr(evntmgr);
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Core Initialization Complete!\n", LIGHT_GREEN);
 	return GEM_OK;
 }
 
@@ -374,3 +422,9 @@ Font * Interface::GetFont(char * ResRef)
 	printf("[NOT FOUND]\n");
 	return NULL;
 }
+/** Returns the Event Manager */
+EventMgr * Interface::GetEventMgr()
+{
+	return evntmgr;
+}
+

@@ -13,8 +13,11 @@
 #include "Factory.h"
 #include "ImageMgr.h"
 #include "Font.h"
+#include "EventMgr.h"
 
 #ifdef WIN32
+
+#include <windows.h>
 
 #ifdef GEM_BUILD_DLL
 #define GEM_EXPORT __declspec(dllexport)
@@ -38,6 +41,7 @@ private:
 	ImageMgr * pal256;
 	ImageMgr * pal16;
 	std::vector<Font*> fonts;
+	EventMgr * evntmgr;
 public:
 	Interface(void);
 	~Interface(void);
@@ -56,6 +60,8 @@ public:
   Color * GetPalette(int index, int colors);
   /** Returns a preloaded Font */
   Font * GetFont(char * ResRef);
+  /** Returns the Event Manager */
+  EventMgr * GetEventMgr();
 private:
 	bool LoadConfig(void);
 public:
@@ -66,6 +72,7 @@ public:
 #ifndef GEM_BUILD_DLL
 #ifdef WIN32
 __declspec(dllimport) Interface * core;
+__declspec(dllimport) HANDLE hConsole;
 #else
 extern Interface *core;
 #endif
