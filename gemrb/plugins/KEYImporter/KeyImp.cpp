@@ -63,12 +63,17 @@ bool KeyImp::LoadResFile(const char * resfile)
 		biffiles.push_back(be);
 	}
 	f->Seek(ResOffset, GEM_STREAM_START);
+        //resources.InitHashSize(ResCount);//maybe
 	for(unsigned int i = 0; i < ResCount; i++) {
 		RESEntry re;
 		f->Read(re.ResRef, 8);
 		f->Read(&re.Type, 2);
 		f->Read(&re.ResLocator, 4);
-		resources.push_back(re);
+		char *key;
+		key=new char[9];
+		for(int j=0;j<8;j++) key[j]=toupper(re.ResRef[j]);
+		key[8]=0;
+		resources.SetAt(key, re.Type, re.ResLocator);
 	}
 	printf("Resources Loaded Succesfully.\n");
 	delete(f);
@@ -93,61 +98,59 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 		return fs;
 	}
 	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
-	for(unsigned int i = 0; i < resources.size(); i++) {
-		if(resources[i].Type == (unsigned short)type) {
-			if(strncmp(resources[i].ResRef, resname, 8) == 0) {
-				if(!core->IsAvailable(IE_BIF_CLASS_ID)) {
-					printf("[ERROR]\nAn Archive Plug-in is not Available\n");
-					return NULL;
-				}
-				int bifnum = (resources[i].ResLocator & 0xFFF00000) >> 20;
-				ArchiveImporter * ai = (ArchiveImporter*)core->GetInterface(IE_BIF_CLASS_ID);
-				FILE * exist = NULL;
-				if(exist == NULL) {
-					strcpy(path, core->GamePath);
-					strcat(path, biffiles[bifnum].name);
-					exist = fopen(path, "rb");
-				}
-				if(exist == NULL) {
-					if((biffiles[bifnum].BIFLocator & (1<<2)) != 0) {
-						strcpy(path, core->CD1);
-					}
-					else if((biffiles[bifnum].BIFLocator & (1<<3)) != 0) {
-						strcpy(path, core->CD2);
-					}
-					else if((biffiles[bifnum].BIFLocator & (1<<4)) != 0) {
-						strcpy(path, core->CD3);
-					}
-					else if((biffiles[bifnum].BIFLocator & (1<<5)) != 0) {
-						strcpy(path, core->CD4);
-					}
-					else if((biffiles[bifnum].BIFLocator & (1<<6)) != 0) {
-						strcpy(path, core->CD5);
-					}
-					else {
-						printf("[KEYImporter]: Error in Bif Locator... Resource unavailable.\n");
-						return NULL;
-					}
-					strcat(path, biffiles[bifnum].name);
-					exist = fopen(path, "rb");
-					if(exist == NULL) {
-						printf("[KEYImporter]: Cannot find %s.", path);
-						core->FreeInterface(ai);
-						return NULL;
-					}
-				}
-				else
-					fclose(exist);
-				ai->OpenArchive(path);
-				DataStream * ret = ai->GetStream(resources[i].ResLocator, resources[i].Type);
-				if(ret == NULL)
-					printf("[NOT_FOUND]\n");
+        unsigned long ResLocator;
+	if(resources.Lookup(resname,type,ResLocator) ) {
+printf("[RESLOCATOR] 0x%x\n",ResLocator);
+		if(!core->IsAvailable(IE_BIF_CLASS_ID)) {
+			printf("[ERROR]\nAn Archive Plug-in is not Available\n");
+			return NULL;
+		}
+		int bifnum = (ResLocator & 0xFFF00000) >> 20;
+		ArchiveImporter * ai = (ArchiveImporter*)core->GetInterface(IE_BIF_CLASS_ID);
+		FILE * exist = NULL;
+		if(exist == NULL) {
+			strcpy(path, core->GamePath);
+			strcat(path, biffiles[bifnum].name);
+			exist = fopen(path, "rb");
+		}
+		if(exist == NULL) {
+			if((biffiles[bifnum].BIFLocator & (1<<2)) != 0) {
+				strcpy(path, core->CD1);
+			}
+			else if((biffiles[bifnum].BIFLocator & (1<<3)) != 0) {
+				strcpy(path, core->CD2);
+			}
+			else if((biffiles[bifnum].BIFLocator & (1<<4)) != 0) {
+				strcpy(path, core->CD3);
+			}
+			else if((biffiles[bifnum].BIFLocator & (1<<5)) != 0) {
+				strcpy(path, core->CD4);
+			}
+			else if((biffiles[bifnum].BIFLocator & (1<<6)) != 0) {
+				strcpy(path, core->CD5);
+			}
+			else {
+				printf("[KEYImporter]: Error in Bif Locator... Resource unavailable.\n");
+				return NULL;
+			}
+			strcat(path, biffiles[bifnum].name);
+			exist = fopen(path, "rb");
+			if(exist == NULL) {
+				printf("[KEYImporter]: Cannot find %s.", path);
 				core->FreeInterface(ai);
-				strcpy(ret->filename, resname);
-				strcat(ret->filename, core->TypeExt(resources[i].Type));
-				return ret;
+				return NULL;
 			}
 		}
+		else
+			fclose(exist);
+		ai->OpenArchive(path);
+		DataStream * ret = ai->GetStream(ResLocator, type);
+		if(ret == NULL)
+			printf("[NOT_FOUND]\n");
+		core->FreeInterface(ai);
+		strcpy(ret->filename, resname);
+		strcat(ret->filename, core->TypeExt(type));
+		return ret;
 	}
 	return NULL;
 }
@@ -178,63 +181,60 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		return fs;
 	}
 	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
-	for(unsigned int i = 0; i < resources.size(); i++) {
-		if(resources[i].Type == (unsigned short)type) {
-			if(strncmp(resources[i].ResRef, resname, 8) == 0) {
-				int bifnum = (resources[i].ResLocator & 0xFFF00000) >> 20;
-				ArchiveImporter * ai = (ArchiveImporter*)core->GetInterface(IE_BIF_CLASS_ID);
-				FILE * exist = NULL;
-				if(exist == NULL) {
-					strcpy(path, core->GamePath);
-					strcat(path, biffiles[bifnum].name);
-					exist = fopen(path, "rb");
-				}
-				if(exist == NULL) {
-					if((biffiles[bifnum].BIFLocator & (1<<2)) != 0) {
-						strcpy(path, core->CD1);
-					}
-					else if((biffiles[bifnum].BIFLocator & (1<<3)) != 0) {
-						strcpy(path, core->CD2);
-					}
-					else if((biffiles[bifnum].BIFLocator & (1<<4)) != 0) {
-						strcpy(path, core->CD3);
-					}
-					else if((biffiles[bifnum].BIFLocator & (1<<5)) != 0) {
-						strcpy(path, core->CD4);
-					}
-					else if((biffiles[bifnum].BIFLocator & (1<<6)) != 0) {
-						strcpy(path, core->CD5);
-					}
-					else {
-						printf("[KEYImporter]: Error in Bif Locator... Resource unavailable.\n");
-						return NULL;
-					}
-					strcat(path, biffiles[bifnum].name);
-					exist = fopen(path, "rb");
-					if(exist == NULL) {
-						printf("[KEYImporter]: Cannot find %s.\n", biffiles[bifnum].name);
-						core->FreeInterface(ai);
-						return NULL;
-					}
-				}
-				else
-					fclose(exist);
-				ai->OpenArchive(path);
-				DataStream * ret = ai->GetStream(resources[i].ResLocator, resources[i].Type);
-				if(ret == NULL)
-					printf("[NOT_FOUND]\n");
+	unsigned long ResLocator;
+	if(resources.Lookup(resname, type, ResLocator) ) {
+		int bifnum = (ResLocator & 0xFFF00000) >> 20;
+		ArchiveImporter * ai = (ArchiveImporter*)core->GetInterface(IE_BIF_CLASS_ID);
+		FILE * exist = NULL;
+		if(exist == NULL) {
+			strcpy(path, core->GamePath);
+			strcat(path, biffiles[bifnum].name);
+			exist = fopen(path, "rb");
+		}
+		if(exist == NULL) {
+			if((biffiles[bifnum].BIFLocator & (1<<2)) != 0) {
+				strcpy(path, core->CD1);
+			}
+			else if((biffiles[bifnum].BIFLocator & (1<<3)) != 0) {
+				strcpy(path, core->CD2);
+			}
+			else if((biffiles[bifnum].BIFLocator & (1<<4)) != 0) {
+				strcpy(path, core->CD3);
+			}
+			else if((biffiles[bifnum].BIFLocator & (1<<5)) != 0) {
+				strcpy(path, core->CD4);
+			}
+			else if((biffiles[bifnum].BIFLocator & (1<<6)) != 0) {
+				strcpy(path, core->CD5);
+			}
+			else {
+				printf("[KEYImporter]: Error in Bif Locator... Resource unavailable.\n");
+				return NULL;
+			}
+			strcat(path, biffiles[bifnum].name);
+			exist = fopen(path, "rb");
+			if(exist == NULL) {
+				printf("[KEYImporter]: Cannot find %s.\n", biffiles[bifnum].name);
 				core->FreeInterface(ai);
-				strncpy(ret->filename, resname, 8);
-				ret->filename[8] = 0;
-				strcat(ret->filename, core->TypeExt(resources[i].Type));
-				AnimationMgr * ani = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
-				ani->Open(ret, true);
-				AnimationFactory * af = ani->GetAnimationFactory(resname, mode);
-				core->FreeInterface(ani);
-				core->GetFactory()->AddFactoryObject(af);
-				return af;
+				return NULL;
 			}
 		}
+		else
+			fclose(exist);
+		ai->OpenArchive(path);
+		DataStream * ret = ai->GetStream(ResLocator, type);
+		if(ret == NULL)
+			printf("[NOT_FOUND]\n");
+		core->FreeInterface(ai);
+		strncpy(ret->filename, resname, 8);
+		ret->filename[8] = 0;
+		strcat(ret->filename, core->TypeExt(type));
+		AnimationMgr * ani = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
+		ani->Open(ret, true);
+		AnimationFactory * af = ani->GetAnimationFactory(resname, mode);
+		core->FreeInterface(ani);
+		core->GetFactory()->AddFactoryObject(af);
+		return af;
 	}
 	return NULL;
 }

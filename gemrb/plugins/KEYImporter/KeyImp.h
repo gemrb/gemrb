@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "../Core/ResourceMgr.h"
+#include "Dictionary.h"
 
 typedef struct RESEntry {
 	char			ResRef[8];
@@ -19,7 +20,8 @@ class KeyImp : public ResourceMgr
 {
 private:
 	std::vector<BIFEntry> biffiles;
-	std::vector<RESEntry> resources;
+//	std::vector<RESEntry> resources;
+	Dictionary resources;
 public:
 	KeyImp(void);
 	~KeyImp(void);
