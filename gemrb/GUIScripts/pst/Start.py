@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/Start.py,v 1.7 2004/08/03 22:58:14 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/Start.py,v 1.8 2004/09/21 18:44:36 avenger_teambg Exp $
 
 
 # Start.py - intro and main menu screens
@@ -88,7 +88,7 @@ def ResumeLifePress():
 	return
 
 def ExitPress():
-	GemRB.SetVisible(StartWindow,0)
+	GemRB.SetVisible(StartWindow,2)
 	GemRB.SetVisible(QuitWindow,1)
 	return
 	

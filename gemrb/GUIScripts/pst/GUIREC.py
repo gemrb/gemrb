@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.21 2004/09/19 20:38:38 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.22 2004/09/21 18:44:36 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -129,8 +129,6 @@ def OpenRecordsWindow ():
 
 	# AC button
 	Button = GemRB.GetControl (Window, 37)
-	#	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	#	GemRB.SetControlSize (Window, Button, 0, 0)
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	GemRB.SetButtonSprites(Window, Button, "", 0, 0, 0, 0, 0)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
@@ -140,8 +138,12 @@ def OpenRecordsWindow ():
 
 	# HP button
 	Button = GemRB.GetControl (Window, 38)
-	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	GemRB.SetControlSize (Window, Button, 0, 0)
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	GemRB.SetButtonSprites (Window, Button, "", 0, 0, 0, 0, 0)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpHitPoints")
+	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
+
 
 	SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
@@ -191,18 +193,32 @@ def UpdateRecordsWindow ():
 	# stats
 
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
+	bstr = GemRB.GetPlayerStat (pc, IE_STR,1)
 	sstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-	if (sstrx > 0):
+	bstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA,1)
+	if (sstrx > 0) and (sstr==18):
 		sstr = "%d/%02d" %(sstr, sstrx % 100)
+	if (bstrx > 0) and (bstr==18):
+		bstr = "%d/%02d" %(bstr, bstrx % 100)
 	sint = GemRB.GetPlayerStat (pc, IE_INT)
+	bint = GemRB.GetPlayerStat (pc, IE_INT,1)
 	swis = GemRB.GetPlayerStat (pc, IE_WIS)
+	bwis = GemRB.GetPlayerStat (pc, IE_WIS,1)
 	sdex = GemRB.GetPlayerStat (pc, IE_DEX)
+	bdex = GemRB.GetPlayerStat (pc, IE_DEX,1)
 	scon = GemRB.GetPlayerStat (pc, IE_CON)
+	bcon = GemRB.GetPlayerStat (pc, IE_CON,1)
 	schr = GemRB.GetPlayerStat (pc, IE_CHR)
+	bchr = GemRB.GetPlayerStat (pc, IE_CHR,1)
 
 	stats = (sstr, sint, swis, sdex, scon, schr)
+	basestats = (bstr, bint, bwis, bdex, bcon, bchr)
 	for i in range (6):
 		Label = GemRB.GetControl (Window, 0x1000000e + i)
+		if stats[i]!=basestats[i]:
+			GemRB.SetLabelTextColor (Window, Label, 255, 0, 0)
+		else:
+			GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
 		GemRB.SetText (Window, Label, str (stats[i]))
 
 	# race
@@ -265,6 +281,7 @@ def UpdateRecordsWindow ():
 	stats_overview = GetStatOverview (pc)
 	Text = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Text, stats_overview)
+	return
 
 # puts default info to textarea (overview of PC's bonuses, saves, etc.
 def OnRecordsButtonLeave ():
@@ -272,6 +289,7 @@ def OnRecordsButtonLeave ():
 	# help, info textarea
 	Text = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Text, stats_overview)
+	return
 
 def OnRecordsHelpFaction ():
 	Window = RecordsWindow
@@ -279,6 +297,7 @@ def OnRecordsHelpFaction ():
 	Help = GemRB.GetString (20106) + "\n\n" + faction_help
 	TextArea = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, TextArea, Help)
+	return
 	
 	# 20106 faction
 
@@ -296,12 +315,21 @@ def OnRecordsHelpArmorClass ():
 	Help = GemRB.GetString (18493)
 	TextArea = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, TextArea, Help)
+	return
+
+def OnRecordsHelpHitPoints ():
+	Window = RecordsWindow
+	Help = GemRB.GetString (18494)
+	TextArea = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, TextArea, Help)
+	return
 
 def OnRecordsHelpAlignment ():
 	Window = RecordsWindow
 	Help = GemRB.GetString (20105) + "\n\n" + alignment_help
 	TextArea = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, TextArea, Help)
+	return
 	
 	# 20105 alignment
 
