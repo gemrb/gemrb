@@ -1,4 +1,29 @@
+# -*-python-*-
+# GemRB - Infinity Engine Emulator
+# Copyright (C) 2003 The GemRB Project
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.14 2004/04/10 21:29:14 edheldil Exp $
+
+# NewLife.py - Character generation screen
+
+###################################################
+
 import GemRB
+from ie_stats import *
 
 NewLifeWindow = 0
 QuitWindow = 0
@@ -26,22 +51,6 @@ AcPoints = 0
 HpPoints = 0
 strings = ("30","60","90","99","00")
 extras = (30,60,90,99,100)
-
-IE_HITPOINTS =		0
-IE_STR =                36
-IE_STREXTRA =           37
-IE_INT =                38
-IE_WIS =                39
-IE_DEX =                40
-IE_CON =                41
-IE_CHR =                42
-IE_METAL_COLOR =	208
-IE_MINOR_COLOR =	209
-IE_MAJOR_COLOR =	210
-IE_SKIN_COLOR = 	211
-IE_LEATHER_COLOR = 	212
-IE_ARMOR_COLOR = 	213
-IE_HAIR_COLOR =		214
 
 def OnLoad():
 	global NewLifeWindow, QuitWindow, StatTable

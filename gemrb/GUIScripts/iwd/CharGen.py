@@ -1,30 +1,6 @@
 #Character Generation
 import GemRB
-
-IE_SEX =                35
-IE_STR =                36
-IE_STREXTRA =           37
-IE_INT =                38
-IE_WIS =                39
-IE_DEX =                40
-IE_CON =                41
-IE_CHR =                42
-IE_XP =                 44
-IE_GOLD =               45
-IE_REPUTATION =         48
-IE_HATEDRACE =          49
-IE_KIT =                152
-IE_EA =                 200
-IE_RACE =               201
-IE_CLASS =              202
-IE_METAL_COLOR =        208
-IE_MINOR_COLOR =        209
-IE_MAJOR_COLOR =        210
-IE_SKIN_COLOR =         211
-IE_LEATHER_COLOR =      212
-IE_ARMOR_COLOR =        213
-IE_HAIR_COLOR =         214
-IE_ALIGNMENT =          217
+from ie_stats import *
 
 CharGenWindow = 0
 CharGenState = 0
