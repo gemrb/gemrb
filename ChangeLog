@@ -4,9 +4,13 @@ GemRB v0.2.2.7 Added Features:
 - Added Features:
   - Added CursorBAM=CARET option for Planescape: Torment
   - Basic In-Game GUI for IWD2, PST, and BG2
+  - Added Dialog Support
+  - Added Switch Triggers Support
 - Added In-Game Script OpCodes:
   - UnhideGUI: Shows the In-Game GUI and Ends the CutScene Mode
   - HideGUI: Hides the In-Game GUI
+  - Dialogue: Starts a Dialogue
+  - AmbientActivate: Enables/Disables an Ambient Animation
 
 GemRB v0.2.2.6 Added Features:
 - New Plugins:
