@@ -71,6 +71,8 @@ GameControl::GameControl(void)
 	TopCount = 0;
 	GUIEnabled = false;
 	Dialogue = false;
+	Destination[0] = 0;
+	EntranceName[0] = 0;
 }
 
 GameControl::~GameControl(void)
@@ -86,7 +88,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 {
 	if(MapIndex == -1)
 		return;
-	if(ChangeArea)
+	if((selected.size() == 1) && (selected[0]->InParty))
 		ChangeMap();
 	Video * video = core->GetVideoDriver();
 	Region viewport = core->GetVideoDriver()->GetViewport();
@@ -947,7 +949,7 @@ printf("%d\n",choose);
 				if(tr->Flags & 8) {
 					speaker->DeleteAction(speaker->CurrentAction);
 					speaker->CurrentAction = NULL;
-					delete(dlg);
+					dlg->Release();
 					ds = NULL;
 					dlg = NULL;
 					core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
@@ -1020,19 +1022,11 @@ void GameControl::DisplayString(Scriptable * target)
 	infoTexts.push_back(scr);
 }
 
-void GameControl::MoveToArea(char *Destination, char *EntranceName, bool fullParty)
-{
-	strcpy(this->Destination, Destination);
-	if(EntranceName[0] != 0)
-		strcpy(this->EntranceName, EntranceName);
-	else
-		this->EntranceName[0] = 0;
-	ChangeArea = true;
-}
-
 void GameControl::ChangeMap()
 {	
-	Actor * pc = core->GetGame()->GetPC(0);
+	Actor * pc = selected.at(0);
+	if(stricmp(pc->Area, core->GetGame()->GetMap(MapIndex)->scriptName) == 0)
+		return;
 	ds = NULL;
 	speaker = NULL;
 	target = NULL;
@@ -1040,18 +1034,17 @@ void GameControl::ChangeMap()
 	overInfoPoint = NULL;
 	overContainer = NULL;
 	overDoor = NULL;
+	for(int i = 0; i < infoTexts.size(); i++) {
+		delete(infoTexts[i]);
+	}
+	infoTexts.clear();
 	selected.clear();
 	core->GetGame()->DelMap(MapIndex, true);
-	strcpy(pc->Area, Destination);
-	int mi = core->GetGame()->LoadMap(Destination);
+	int mi = core->GetGame()->LoadMap(pc->Area);
 	Map * map = core->GetGame()->GetMap(mi);
 	SetCurrentArea(mi);
-	pc->ClearActions();
-	pc->ClearPath();
-	pc->AnimID = IE_ANI_AWAKE;
-	pc->CurrentAction = NULL;
 	selected.push_back(pc);
-	if(EntranceName[0] && pc) {
+	if(EntranceName[0]) {
 		Entrance * ent = map->GetEntrance(EntranceName);
 		unsigned int XPos, YPos;
 		if(!ent) {
@@ -1067,8 +1060,9 @@ void GameControl::ChangeMap()
 		core->GetPathFinder()->AdjustPosition(XPos, YPos);
 		pc->XPos = (unsigned short)(XPos*16)+8;
 		pc->YPos = (unsigned short)(YPos*12)+8;
-		Region vp = core->GetVideoDriver()->GetViewport();
-		core->GetVideoDriver()->SetViewport(pc->XPos-(vp.w/2), pc->YPos-(vp.h/2));
+		EntranceName[0] = 0;
 	}
+	Region vp = core->GetVideoDriver()->GetViewport();
+	core->GetVideoDriver()->SetViewport(pc->XPos-(vp.w/2), pc->YPos-(vp.h/2));
 	ChangeArea = false;
 }
