@@ -74,7 +74,10 @@ static PyObject * GemRB_LoadTable(PyObject *self, PyObject *args)
 	
 	int ind = core->LoadTable(string);
 	if(ind == -1)
+	{
+		printMessage("GUIScript","Can't find resource\n",LIGHT_RED);
 		return NULL;
+	}
 
 	return Py_BuildValue("i", ind);
 }
@@ -318,10 +321,11 @@ static PyObject * GemRB_SetText(PyObject *self, PyObject *args)
 	int ret;
 
 	if(PyArg_UnpackTuple(args, "ref", 3, 3, &wi, &ci, &str)) {
-		if(!PyObject_TypeCheck(wi, &PyInt_Type) && !PyObject_TypeCheck(ci, &PyInt_Type) && !PyObject_TypeCheck(str, &PyString_Type) && !PyObject_TypeCheck(str, &PyInt_Type)) {
-			printMessage("GUIScript", "Syntax Error: SetText(unsigned short WindowIndex, unsigned short ControlIndex, char * string)\n", LIGHT_RED);
+		if(!PyObject_TypeCheck(wi, &PyInt_Type) || !PyObject_TypeCheck(ci, &PyInt_Type) || (!PyObject_TypeCheck(str, &PyString_Type) && !PyObject_TypeCheck(str, &PyInt_Type))) {
+			printMessage("GUIScript", "Syntax Error: SetText(WindowIndex, ControlIndex, String|Strref, [row])\n", LIGHT_RED);
 			return NULL;
 		}
+
 		WindowIndex = PyInt_AsLong(wi);
 		ControlIndex = PyInt_AsLong(ci);
 		if(PyObject_TypeCheck(str, &PyString_Type)) {
@@ -351,46 +355,48 @@ static PyObject * GemRB_SetText(PyObject *self, PyObject *args)
 
 static PyObject * GemRB_TextAreaAppend(PyObject *self, PyObject *args)
 {
-	PyObject *wi, *ci, *str;
-	int WindowIndex, ControlIndex, StrRef;
+	PyObject *wi, *ci, *str, *row=NULL;
+	int WindowIndex, ControlIndex, StrRef, Row;
 	char * string;
 	int ret;
 
-	if(PyArg_UnpackTuple(args, "ref", 3, 3, &wi, &ci, &str)) {
-		if(!PyObject_TypeCheck(wi, &PyInt_Type) && !PyObject_TypeCheck(ci, &PyInt_Type) && !PyObject_TypeCheck(str, &PyString_Type) && !PyObject_TypeCheck(str, &PyInt_Type)) {
-			printMessage("GUIScript", "Syntax Error: SetText(unsigned short WindowIndex, unsigned short ControlIndex, char * string)\n", LIGHT_RED);
+	if(PyArg_UnpackTuple(args, "ref", 3, 4, &wi, &ci, &str, &row)) {
+		if(!PyObject_TypeCheck(wi, &PyInt_Type) || !PyObject_TypeCheck(ci, &PyInt_Type) || (!PyObject_TypeCheck(str, &PyString_Type) && !PyObject_TypeCheck(str, &PyInt_Type))) {
+			printMessage("GUIScript", "Syntax Error: TextAreaAppend(unsigned short WindowIndex, unsigned short ControlIndex, char * string)\n", LIGHT_RED);
 			return NULL;
 		}
 		WindowIndex = PyInt_AsLong(wi);
 		ControlIndex = PyInt_AsLong(ci);
+		Window * win = core->GetWindow(WindowIndex);
+		if(!win)
+			return NULL;
+		Control * ctrl = win->GetControl(ControlIndex);
+		if(!ctrl)
+			return NULL;
+		if(ctrl->ControlType != 5)
+			return NULL;
+		TextArea * ta = (TextArea*)ctrl;
+		if(row) {
+			if(!PyObject_TypeCheck(row,&PyInt_Type) )
+			{
+				printMessage("GUIScript", "Syntax Error: SetText row must be integer\n", LIGHT_RED);
+				return NULL;
+			}
+			Row = PyInt_AsLong(row);
+			if(Row>ta->GetRowCount()-1)
+				Row=-1;
+		}
+		else Row = ta->GetRowCount()-1;
 		if(PyObject_TypeCheck(str, &PyString_Type)) {
 			string = PyString_AsString(str);
 			if(string == NULL)
 				return NULL;
-			Window * win = core->GetWindow(WindowIndex);
-			if(!win)
-				return NULL;
-			Control * ctrl = win->GetControl(ControlIndex);
-			if(!ctrl)
-				return NULL;
-			if(ctrl->ControlType != 5)
-				return NULL;
-			TextArea * ta = (TextArea*)ctrl;
-			ret = ta->AppendText(string);
+			ret = ta->AppendText(string, Row);
 		}
 		else {
 			StrRef = PyInt_AsLong(str);
 			char * str = core->GetString(StrRef);
-			Window * win = core->GetWindow(WindowIndex);
-			if(!win)
-				return NULL;
-			Control * ctrl = win->GetControl(ControlIndex);
-			if(!ctrl)
-				return NULL;
-			if(ctrl->ControlType != 5)
-				return NULL;
-			TextArea * ta = (TextArea*)ctrl;
-			ret = ta->AppendText(str);
+			ret = ta->AppendText(str, Row);
 			free(str);
 		}
 	}
@@ -650,8 +656,10 @@ static PyObject * GemRB_SetButtonPicture(PyObject *self, PyObject *args)
 	if(str == NULL)
 		return NULL;
 	ImageMgr * im = (ImageMgr*)core->GetInterface(IE_BMP_CLASS_ID);
-	if(im == NULL)
+	if(im == NULL) {
+		delete (str);
 		return NULL;
+	}
 
 	if(!im->Open(str, true)) {
 		delete(str);
@@ -660,8 +668,11 @@ static PyObject * GemRB_SetButtonPicture(PyObject *self, PyObject *args)
 	}
 
 	Sprite2D * Picture = im->GetImage();
-	if(Picture == NULL)
+	if(Picture == NULL) {
+		delete(str);
+		core->FreeInterface(im);
 		return NULL;
+	}
 
 	Button * btn = (Button*)ctrl;
 	btn->SetPicture(Picture);
@@ -742,9 +753,9 @@ static PyObject * GemRB_HardEndPL(PyObject *self, PyObject *args)
 static PyObject * GemRB_SetVar(PyObject *self, PyObject *args)
 {	
 	char* Variable;
-	int value;
+	unsigned long value;
 
-	if(!PyArg_ParseTuple(args, "si", &Variable, &value)) {
+	if(!PyArg_ParseTuple(args, "sl", &Variable, &value)) {
 		printMessage("GUIScript", "Syntax Error: SetVar(VariableName, Value)\n", LIGHT_RED);
 		return NULL;
 	}
@@ -761,12 +772,12 @@ static PyObject * GemRB_GetVar(PyObject *self, PyObject *args)
 	unsigned long value;
 
 	if(!PyArg_ParseTuple(args, "s", &Variable)) {
-		printMessage("GUIScript", "Syntax Error: SetVar(VariableName, Value)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: GetVar(VariableName)\n", LIGHT_RED);
 		return NULL;
 	}
 
 	if(!core->GetDictionary()->Lookup(Variable, value))
-		return Py_BuildValue("i", 0);
+		return Py_BuildValue("l", (unsigned long) 0);
 
 	return Py_BuildValue("l", value);
 }
