@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.17 2003/12/21 18:36:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.18 2003/12/23 23:45:31 balrog994 Exp $
  *
  */
 
@@ -25,6 +25,7 @@
 #include "Control.h"
 #include "Sprite2D.h"
 #include "Font.h"
+#include "Animation.h"
 
 #define IE_GUI_BUTTON_UNPRESSED 0
 #define IE_GUI_BUTTON_PRESSED   1
@@ -89,6 +90,7 @@ public: // Public Events
   int SetFlags(int Flags, int Operation);
   /** Refreshes the button from a radio group */
   void RedrawButton(char *VariableName, int Sum);
+  void SetAnimatedButton(bool animated);
 private: // Private attributes
   bool Clear;
   char * Text;
@@ -107,6 +109,8 @@ private: // Private attributes
   Sprite2D * Disabled;
   /** Picture to Apply when the hasPicture flag is set */
   Sprite2D * Picture;
+  /** Animated Button */
+  Animation * anim;
   /** The current state of the Button */
   unsigned char State;
   /** Display Flags, justification */

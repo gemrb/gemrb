@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.47 2003/12/23 19:46:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.48 2003/12/23 23:45:31 balrog994 Exp $
  *
  */
 
@@ -363,4 +363,9 @@ void Button::SetPicture(Sprite2D * Picture)
 	this->Picture = Picture;
 	Changed = true;
 	((Window*)Owner)->Invalidate();
+}
+
+void SetAnimatedButton(bool animated)
+{
+	
 }
