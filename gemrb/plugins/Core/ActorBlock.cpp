@@ -203,10 +203,6 @@ void Scriptable::ProcessActions()
 		printf("Executing Action: %s\n", this->scriptName);
 		GameScript::ExecuteAction(this, CurrentAction);
 		neverExecuted = false;
-if(!GetNextAction())
-{
-	printf("EndofQueue!\n");
-}
 	}
 }
 
