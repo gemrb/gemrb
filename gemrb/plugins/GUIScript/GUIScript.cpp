@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.114 2004/02/08 15:29:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.115 2004/02/10 23:00:55 avenger_teambg Exp $
  *
  */
 
@@ -1425,12 +1425,29 @@ static PyObject * GemRB_Quit(PyObject * /*self*/, PyObject * /*args*/)
 static PyObject * GemRB_LoadMusicPL(PyObject * /*self*/, PyObject *args)
 {
 	char* ResRef;
+	int HardEnd=0;
+
+	if(!PyArg_ParseTuple(args, "s|i", &ResRef, &HardEnd)) {
+		printMessage("GUIScript", "Syntax Error: LoadMusicPL(MusicPlayListResource)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	core->GetMusicMgr()->SwitchPlayList(ResRef,HardEnd);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+#if 0
+static PyObject * GemRB_LoadMusicPL(PyObject * /*self*/, PyObject *args)
+{
+	char* ResRef;
 
 	if(!PyArg_ParseTuple(args, "s", &ResRef)) {
 		printMessage("GUIScript", "Syntax Error: LoadMusicPL(MusicPlayListResource)\n", LIGHT_RED);
 		return NULL;
 	}
 	
+	core->GetMusicMgr()->HardEnd();
 	bool ret = core->GetMusicMgr()->OpenPlaylist(ResRef);
 	if(!ret)
 		return NULL;
@@ -1446,7 +1463,7 @@ static PyObject * GemRB_StartPL(PyObject * /*self*/, PyObject * /*args*/)
 	Py_INCREF(Py_None);
 	return Py_None;
 }
-
+#endif
 static PyObject * GemRB_SoftEndPL(PyObject * /*self*/, PyObject * /*args*/)
 {	
 	core->GetMusicMgr()->End();
@@ -2063,11 +2080,11 @@ static PyMethodDef GemRBMethods[] = {
      "Plays a Sound."},
 
 	{"LoadMusicPL", GemRB_LoadMusicPL, METH_VARARGS,
-     "Loads a Music PlayList."},
-
+     "Loads and starts a Music PlayList."},
+/*
 	{"StartPL", GemRB_StartPL, METH_NOARGS,
      "Starts a Music Playlist."},
-
+*/
 	{"SoftEndPL", GemRB_SoftEndPL, METH_NOARGS,
      "Ends a Music Playlist softly."},
 
