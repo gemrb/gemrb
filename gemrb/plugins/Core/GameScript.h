@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.137 2004/08/26 19:28:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.138 2004/08/27 13:24:38 avenger_teambg Exp $
  *
  */
 
@@ -761,6 +761,7 @@ public: //Script Functions
 	static int Acquired(Scriptable* Sender, Trigger* parameters);
 	static int Alignment(Scriptable* Sender, Trigger* parameters);
 	static int Allegiance(Scriptable* Sender, Trigger* parameters);
+	static int AnimationID(Scriptable* Sender, Trigger* parameters);
 	static int AnimState(Scriptable* Sender, Trigger* parameters);
 	static int AnyPCOnMap(Scriptable* Sender, Trigger* parameters);
 	static int AreaCheck(Scriptable* Sender, Trigger* parameter);
@@ -773,6 +774,7 @@ public: //Script Functions
 	static int BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int BreakingPoint(Scriptable* Sender, Trigger* parameters);
 	static int CalledByName(Scriptable* Sender, Trigger* parameters);
+	static int CharName(Scriptable* Sender, Trigger* parameters);
 	static int CheckStat(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatGT(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatLT(Scriptable* Sender, Trigger* parameters);
@@ -851,11 +853,14 @@ public: //Script Functions
 	static int InternalGT(Scriptable* Sender, Trigger* parameters);
 	static int InternalLT(Scriptable* Sender, Trigger* parameters);
 	static int IsAClown(Scriptable* Sender, Trigger* parameters);
+	static int IsActive(Scriptable* Sender, Trigger* parameters);
+	static int IsGabber(Scriptable* Sender, Trigger* parameters);
 	static int IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsLocked(Scriptable* Sender, Trigger* parameters);
 	static int IsRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters);
 	static int ItemIsIdentified(Scriptable* Sender, Trigger* parameters);
+	static int Kit(Scriptable* Sender, Trigger* parameters);
 	static int Level(Scriptable* Sender, Trigger* parameters);
 	static int LevelGT(Scriptable* Sender, Trigger* parameters);
 	static int LevelLT(Scriptable* Sender, Trigger* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.46 2004/08/26 22:39:59 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.47 2004/08/27 13:24:37 avenger_teambg Exp $
  *
  */
 
@@ -170,6 +170,7 @@ public:
 	void DebugDump();
 	/** sets the actor's position, calculating with the nojump flag*/
 	void SetPosition(Map *map, unsigned int XPos, unsigned int YPos, int jump, int radius=0);
+	/* you better use SetStat, this stuff is only for special cases*/
 	void SetAnimationID(unsigned int AnimID);
 	/** returns the animations */
 	CharAnimations* GetAnims();
