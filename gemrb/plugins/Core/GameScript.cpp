@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.129 2004/04/06 17:55:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.130 2004/04/07 18:49:38 avenger_teambg Exp $
  *
  */
 
@@ -67,10 +67,14 @@ static TriggerLink triggernames[] = {
 	{"bitcheckexact",GameScript::BitCheckExact,TF_MERGESTRINGS},
 	{"bitglobal",GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
 	{"breakingpoint",GameScript::BreakingPoint,0},
+	{"calledbyname", GameScript::CalledByName,0},
 	{"checkstat",GameScript::CheckStat,0},
 	{"checkstatgt",GameScript::CheckStatGT,0},
 	{"checkstatlt",GameScript::CheckStatLT,0},
 	{"class", GameScript::Class,0},
+	{"classlevel", GameScript::ClassLevel,0},
+	{"classlevelgt", GameScript::ClassLevelGT,0},
+	{"classlevellt", GameScript::ClassLevelLT,0},
 	{"clicked", GameScript::Clicked,0},
 	{"dead", GameScript::Dead,0},
 	{"entered", GameScript::Entered,0},
@@ -78,6 +82,7 @@ static TriggerLink triggernames[] = {
 	{"extraproficiency", GameScript::ExtraProficiency,0},
 	{"extraproficiencygt", GameScript::ExtraProficiencyGT,0},
 	{"extraproficiencylt", GameScript::ExtraProficiencyLT,0},
+	{"faction", GameScript::Faction,0},
 	{"false", GameScript::False}, {"gender", GameScript::Gender},
 	{"general", GameScript::General,0},
 	{"global", GameScript::Global,TF_MERGESTRINGS},
@@ -110,6 +115,7 @@ static TriggerLink triggernames[] = {
 	{"inpartyallowdead", GameScript::InPartyAllowDead,0},
 	{"inpartyslot", GameScript::InPartySlot,0},
 	{"isaclown", GameScript::IsAClown,0},
+	{"islocked", GameScript::IsLocked,0},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog,0},
 	{"level", GameScript::Level,0},
 	{"levelgt", GameScript::LevelGT,0},
@@ -121,7 +127,9 @@ static TriggerLink triggernames[] = {
 	{"morale", GameScript::Morale,0},
 	{"moralegt", GameScript::MoraleGT,0},
 	{"moralelt", GameScript::MoraleLT,0},
+	{"nearlocation", GameScript::NearLocation,0},
 	{"notstatecheck", GameScript::NotStateCheck,0},
+	{"nulldialog", GameScript::NullDialog,0},
 	{"numcreature", GameScript::NumCreatures,0},
 	{"numcreatureGT", GameScript::NumCreaturesGT,0},
 	{"numcreatureLT", GameScript::NumCreaturesLT,0},
@@ -145,7 +153,6 @@ static TriggerLink triggernames[] = {
 	{"openstate", GameScript::OpenState,0},
 	{"or", GameScript::Or,0},
 	{"ownsfloatermessage", GameScript::OwnsFloaterMessage,0},
-	{"nearlocation", GameScript::NearLocation,0},
 	{"partycounteq", GameScript::PartyCountEQ,0},
 	{"partycountgt", GameScript::PartyCountGT,0},
 	{"partycountlt", GameScript::PartyCountLT,0},
@@ -169,6 +176,7 @@ static TriggerLink triggernames[] = {
 	{"specific", GameScript::Specific,0},
 	{"statecheck", GameScript::StateCheck,0},
 	{"targetunreachable", GameScript::TargetUnreachable,0},
+	{"team", GameScript::Team,0},
 	{"true", GameScript::True,0},
 	{"unselectablevariable", GameScript::UnselectableVariable,0},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT,0},
@@ -201,6 +209,7 @@ static ActionLink actionnames[] = {
 	{"changealignment",GameScript::ChangeAlignment,0},
 	{"changeallegiance",GameScript::ChangeAllegiance,0},
 	{"changeclass",GameScript::ChangeClass,0},
+	{"changedialog",GameScript::ChangeDialogue,0},
 	{"changedialogue",GameScript::ChangeDialogue,0},
 	{"changegender",GameScript::ChangeGender,0},
 	{"changegeneral",GameScript::ChangeGeneral,0},
@@ -268,6 +277,7 @@ static ActionLink actionnames[] = {
 	{"globalxor",GameScript::GlobalXor,AF_MERGESTRINGS},
 	{"globalxorglobal",GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
 	{"hidegui",GameScript::HideGUI,0},
+	{"incinternal",GameScript::IncInternal,0},
 	{"incmoraleai",GameScript::IncMoraleAI,0},
 	{"incrementchapter",GameScript::IncrementChapter,0},
 	{"incrementglobal",GameScript::IncrementGlobal,AF_MERGESTRINGS},
@@ -285,6 +295,7 @@ static ActionLink actionnames[] = {
 	{"leavearealuapanic",GameScript::LeaveAreaLUAPanic,0},
 	{"leavearealuapanicentry",GameScript::LeaveAreaLUAPanicEntry,0},
 	{"leaveparty",GameScript::LeaveParty,0},
+	{"lock",GameScript::Lock,AF_BLOCKING},//key not checked at this time!
 	{"log",GameScript::Debug,0}, //the same until we know better
 	{"makeglobal",GameScript::MakeGlobal,0},
 	{"makeunselectable",GameScript::MakeUnselectable,0},
@@ -312,8 +323,10 @@ static ActionLink actionnames[] = {
 	{"savelocation", GameScript::SaveLocation,0},
 	{"saveobjectlocation", GameScript::SaveObjectLocation,0},
 	{"setbeeninpartyflags",GameScript::SetBeenInPartyFlags,0},
+	{"setdoorlocked",GameScript::Lock,AF_BLOCKING},//key shouldn't be checked!
 	{"setfaction",GameScript::SetFaction,0},
 	{"sethp",GameScript::SetHP,0},
+	{"setinternal",GameScript::SetInternal,0},
 	{"setmoraleai",GameScript::SetMoraleAI,0},
 	{"setquestdone",GameScript::SetQuestDone,0},
 	{"setteam",GameScript::SetTeam,0},
@@ -2441,6 +2454,26 @@ int GameScript::Class(Scriptable* Sender, Trigger* parameters)
 	return ID_Class( actor, parameters->int0Parameter);
 }
 
+int GameScript::Faction(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr || scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = (Actor*)scr;
+	return ID_Faction( actor, parameters->int0Parameter);
+}
+
+int GameScript::Team(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr || scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = (Actor*)scr;
+	return ID_Team( actor, parameters->int0Parameter);
+}
+
 //atm this checks for InParty and See, it is unsure what is required
 int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 {
@@ -3402,10 +3435,32 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 			Container *cont = (Container *) tar;
 			return cont->Locked == parameters->int0Parameter;
 		}
-		default:
-			printf("[IEScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
-			return 0;
 	}
+	printf("[IEScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
+	return 0;
+}
+
+int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if(!tar) {
+		printf("[IEScript]: couldn't find door/container:%s\n",parameters->objectParameter->objectName);
+		return 0;
+	}
+	switch(tar->Type) {
+		case ST_DOOR:
+		{
+			Door *door =(Door *) tar;
+			return !!(door->Flags&2);
+		}
+		case ST_CONTAINER:
+		{
+			Container *cont = (Container *) tar;
+			return !!cont->Locked;
+		}
+	}
+	printf("[IEScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
+	return 0;
 }
 
 int GameScript::Level(Scriptable* Sender, Trigger* parameters)
@@ -3421,6 +3476,23 @@ int GameScript::Level(Scriptable* Sender, Trigger* parameters)
 	return actor->GetStat(IE_LEVEL) == parameters->int0Parameter;
 }
 
+//this is just a hack, actually multiclass should be available
+int GameScript::ClassLevel(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if(actor->GetStat(IE_CLASS) != parameters->int0Parameter) {
+		return 0;
+	}
+	return actor->GetStat(IE_LEVEL) == parameters->int1Parameter;
+}
+
 int GameScript::LevelGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -3434,6 +3506,23 @@ int GameScript::LevelGT(Scriptable* Sender, Trigger* parameters)
 	return actor->GetStat(IE_LEVEL) > parameters->int0Parameter;
 }
 
+//this is just a hack, actually multiclass should be available
+int GameScript::ClassLevelGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if(actor->GetStat(IE_CLASS) != parameters->int0Parameter) {
+		return 0;
+	}
+	return actor->GetStat(IE_LEVEL) > parameters->int1Parameter;
+}
+
 int GameScript::LevelLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -3445,6 +3534,22 @@ int GameScript::LevelLT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	return actor->GetStat(IE_LEVEL) < parameters->int0Parameter;
+}
+
+int GameScript::ClassLevelLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if(actor->GetStat(IE_CLASS) != parameters->int0Parameter) {
+		return 0;
+	}
+	return actor->GetStat(IE_LEVEL) < parameters->int1Parameter;
 }
 
 int GameScript::UnselectableVariable(Scriptable* Sender, Trigger* parameters)
@@ -3724,6 +3829,104 @@ int GameScript::ExtraProficiencyLT(Scriptable* Sender, Trigger* parameters)
 	Actor* actor = ( Actor* ) tar;
 	return actor->GetStat(IE_EXTRAPROFICIENCY1) < parameters->int0Parameter;
 }
+
+int GameScript::Internal(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned int idx = parameters->int0Parameter;
+	if (idx>15) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_INTERNAL_0+idx) == parameters->int1Parameter;
+}
+
+int GameScript::InternalGT(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned int idx = parameters->int0Parameter;
+	if (idx>15) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_INTERNAL_0+idx) > parameters->int1Parameter;
+}
+
+int GameScript::InternalLT(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned int idx = parameters->int0Parameter;
+	if (idx>15) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_INTERNAL_0+idx) < parameters->int1Parameter;
+}
+
+int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	char *poi=actor->GetDialog();
+	if(!poi[0]) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::CalledByName(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	if(stricmp(actor->GetScriptName(), parameters->string0Parameter) ) {
+		return 0;
+	}
+	return 1;
+}
+
+int GameScript::AnimState(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	return actor->AnimID == parameters->int0Parameter;
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -5696,3 +5899,38 @@ void GameScript::RemoveJournalEntry(Scriptable* Sender, Action* parameters)
 	core->GetGame()->DeleteJournalEntry(parameters->int0Parameter);
 }
 
+void GameScript::SetInternal(Scriptable* Sender, Action* parameters)
+{
+	unsigned int idx = parameters->int0Parameter;
+	if (idx>15) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* target = ( Actor* ) tar;
+	//start of the internal stats
+	target->NewStat(IE_INTERNAL_0+idx, parameters->int1Parameter,MOD_ABSOLUTE);
+}
+
+void GameScript::IncInternal(Scriptable* Sender, Action* parameters)
+{
+	unsigned int idx = parameters->int0Parameter;
+	if (idx>15) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* target = ( Actor* ) tar;
+	//start of the internal stats
+	target->NewStat(IE_INTERNAL_0+idx, parameters->int1Parameter,MOD_ADDITIVE);
+}

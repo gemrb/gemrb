@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.92 2004/04/06 17:55:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.93 2004/04/07 18:49:39 avenger_teambg Exp $
  *
  */
 
@@ -732,6 +732,7 @@ public: //Script Functions
 	static int ActionListEmpty(Scriptable* Sender, Trigger* parameters);
 	static int Alignment(Scriptable* Sender, Trigger* parameters);
 	static int Allegiance(Scriptable* Sender, Trigger* parameters);
+	static int AnimState(Scriptable* Sender, Trigger* parameters);
 	static int AreaCheck(Scriptable* Sender, Trigger* parameter);
 	static int AreaCheckObject(Scriptable* Sender, Trigger* parameter);
 	static int AreaFlag(Scriptable* Sender, Trigger* parameter);
@@ -740,10 +741,14 @@ public: //Script Functions
 	static int BitCheckExact(Scriptable* Sender, Trigger* parameters);
 	static int BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int BreakingPoint(Scriptable* Sender, Trigger* parameters);
+	static int CalledByName(Scriptable* Sender, Trigger* parameters);
 	static int CheckStat(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatGT(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatLT(Scriptable* Sender, Trigger* parameters);
 	static int Class(Scriptable* Sender, Trigger* parameters);
+	static int ClassLevel(Scriptable* Sender, Trigger* parameters);
+	static int ClassLevelGT(Scriptable* Sender, Trigger* parameters);
+	static int ClassLevelLT(Scriptable* Sender, Trigger* parameters);
 	static int Clicked(Scriptable* Sender, Trigger* parameters);
 	static int Contains(Scriptable* Sender, Trigger* parameters);
 	static int Dead(Scriptable* Sender, Trigger* parameters);
@@ -752,6 +757,7 @@ public: //Script Functions
 	static int ExtraProficiency(Scriptable* Sender, Trigger* parameters);
 	static int ExtraProficiencyGT(Scriptable* Sender, Trigger* parameters);
 	static int ExtraProficiencyLT(Scriptable* Sender, Trigger* parameters);
+	static int Faction(Scriptable* Sender, Trigger* parameters);
 	static int False(Scriptable* Sender, Trigger* parameters);
 	static int Gender(Scriptable* Sender, Trigger* parameters);
 	static int General(Scriptable* Sender, Trigger* parameters);
@@ -784,7 +790,11 @@ public: //Script Functions
 	static int InParty(Scriptable* Sender, Trigger* parameters);
 	static int InPartyAllowDead(Scriptable* Sender, Trigger* parameters);
 	static int InPartySlot(Scriptable* Sender, Trigger* parameters);
+	static int Internal(Scriptable* Sender, Trigger* parameters);
+	static int InternalGT(Scriptable* Sender, Trigger* parameters);
+	static int InternalLT(Scriptable* Sender, Trigger* parameters);
 	static int IsAClown(Scriptable* Sender, Trigger* parameters);
+	static int IsLocked(Scriptable* Sender, Trigger* parameters);
 	static int IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters);
 	static int Level(Scriptable* Sender, Trigger* parameters);
 	static int LevelGT(Scriptable* Sender, Trigger* parameters);
@@ -798,6 +808,7 @@ public: //Script Functions
 	static int MoraleLT(Scriptable* Sender, Trigger* parameters);
 	static int NearLocation(Scriptable* Sender, Trigger* parameters);
 	static int NotStateCheck(Scriptable* Sender, Trigger* parameters);
+	static int NullDialog(Scriptable* Sender, Trigger* parameters);
 	static int NumCreatures(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesGT(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesLT(Scriptable* Sender, Trigger* parameters);
@@ -841,6 +852,7 @@ public: //Script Functions
 	static int Specific(Scriptable* Sender, Trigger* parameters);
 	static int StateCheck(Scriptable* Sender, Trigger* parameters);
 	static int TargetUnreachable(Scriptable* Sender, Trigger* parameters);
+	static int Team(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariable(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableGT(Scriptable* Sender, Trigger* parameters);
@@ -931,6 +943,7 @@ public:
 	static void GlobalXor(Scriptable* Sender, Action* parameters);
 	static void GlobalXorGlobal(Scriptable* Sender, Action* parameters);
 	static void HideGUI(Scriptable* Sender, Action* parameters);
+	static void IncInternal(Scriptable* Sender, Action* parameters);
 	static void IncMoraleAI(Scriptable* Sender, Action* parameters);
 	static void IncrementChapter(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobal(Scriptable* Sender, Action* parameters);
@@ -968,6 +981,7 @@ public:
 	static void SaveLocation(Scriptable* Sender, Action* parameters);
 	static void SetFaction(Scriptable* Sender, Action* parameters);
 	static void SetHP(Scriptable* Sender, Action* parameters);
+	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
 	static void SetQuestDone(Scriptable* Sender, Action* parameters);
 	static void SetTeam(Scriptable* Sender, Action* parameters);
