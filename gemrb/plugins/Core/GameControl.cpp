@@ -124,16 +124,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			else {
 				video->DrawPolyline(overDoor->open,cyan,true);
 			}
-			short xs[4] = {overDoor->BBtoOpen.x, overDoor->BBtoOpen.x+overDoor->BBtoOpen.w, overDoor->BBtoOpen.x+overDoor->BBtoOpen.w, overDoor->BBtoOpen.x};
-			short ys[4] = {overDoor->BBtoOpen.y, overDoor->BBtoOpen.y, overDoor->BBtoOpen.y+overDoor->BBtoOpen.h, overDoor->BBtoOpen.y+overDoor->BBtoOpen.h};
-			Point points[4] = {
-				{overDoor->BBtoOpen.x, overDoor->BBtoOpen.y},
-				{overDoor->BBtoOpen.x+overDoor->BBtoOpen.w, overDoor->BBtoOpen.y},
-				{overDoor->BBtoOpen.x+overDoor->BBtoOpen.w, overDoor->BBtoOpen.y+overDoor->BBtoOpen.h},
-				{overDoor->BBtoOpen.x, overDoor->BBtoOpen.y+overDoor->BBtoOpen.h}
-			};
-			Gem_Polygon poly(points, 4);
-			video->DrawPolyline(&poly, green, false);
 		}
 		//draw containers when ALT was pressed
 		if(DebugFlags&4) {
@@ -472,12 +462,26 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 			actor = selected.at(0);
 			Door * door = area->tm->GetDoor(GameX, GameY);
 			if(door) {
-				if(door->BBtoOpen.PointInside(actor->XPos, actor->YPos))
-					area->tm->ToggleDoor(door);
+				if(door->DoorClosed) {
+					actor->ClearActions();
+					char Tmp[256];
+					sprintf(Tmp, "OpenDoor(\"%s\")", door->Name);
+					actor->AddAction(GameScript::CreateAction(Tmp, true));
+				} else {
+					actor->ClearActions();
+					char Tmp[256];
+					sprintf(Tmp, "CloseDoor(\"%s\")", door->Name);
+					actor->AddAction(GameScript::CreateAction(Tmp, true));
+				}
 				return;
 			}
 			if(!overInfoPoint || (overInfoPoint->Type != ST_TRIGGER)) {
-				actor->WalkTo(GameX, GameY);
+				//actor->WalkTo(GameX, GameY);
+				actor->ClearActions();
+				char Tmp[256];
+				sprintf(Tmp, "MoveToPoint([%d.%d])", GameX, GameY);
+				//GameScript::ExecuteString(actor, Tmp);
+				actor->AddAction(GameScript::CreateAction(Tmp, true));
 				unsigned long WinIndex, TAIndex;
 				core->GetDictionary()->Lookup("MessageWindow", WinIndex);
 				if((WinIndex != -1) && (core->GetDictionary()->Lookup("MessageTextArea", TAIndex))) {
@@ -902,7 +906,7 @@ void GameControl::DialogChoose(int choose)
 				if(tr->action) {
 					for(int i = 0; i < tr->action->count; i++) {
 						if(speaker->Scripts[0]) {
-							speaker->Scripts[0]->ExecuteString(tr->action->strings[i]);
+							GameScript::ExecuteString(speaker, tr->action->strings[i]);
 						}
 					}
 				}
@@ -920,7 +924,7 @@ void GameControl::DialogChoose(int choose)
 				if(ds->transitions[x]->Flags & 2) {
 					bool ret = true;
 					for(int t = 0; t < ds->transitions[x]->trigger->count; t++) {
-						ret &= (target->Scripts[0]->EvaluateString(ds->transitions[x]->trigger->strings[t]));
+						ret &= GameScript::EvaluateString(target, ds->transitions[x]->trigger->strings[t]);
 					}
 					if(!ret)
 						continue;
