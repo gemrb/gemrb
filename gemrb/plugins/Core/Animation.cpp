@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.13 2004/01/11 16:15:56 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.14 2004/01/16 22:52:58 balrog994 Exp $
  *
  */
 
@@ -100,7 +100,7 @@ Sprite2D * Animation::NextFrame(void)
 	if(playReversed) {
 		int max = (int)link.size()-1;
 		for(unsigned int i = 0; i < link.size(); i++) {
-			if(link[i] == indices[pos-max]) {
+			if(link[i] == indices[max-pos]) {
 				ret = frames[i];
 				break;
 			}
@@ -113,8 +113,10 @@ Sprite2D * Animation::NextFrame(void)
 			}
 		}
 	}
-	if(pastLastFrame && playOnce)
+	if(pastLastFrame && playOnce) {
+		endReached = true;
 		return ret;
+	}
 #ifdef WIN32
 	unsigned long time = GetTickCount();
 #else
