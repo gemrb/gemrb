@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.24 2004/08/19 21:14:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.25 2004/08/28 19:33:01 avenger_teambg Exp $
  *
  */
 
@@ -117,6 +117,7 @@ Variables::Variables(int nBlockSize, int nHashTableSize)
 	m_pFreeList = NULL;
 	m_pBlocks = NULL;
 	m_nBlockSize = nBlockSize;
+	m_type = GEM_VARIABLES_INT;
 }
 
 void Variables::InitHashTable(unsigned int nHashSize, bool bAllocNow)

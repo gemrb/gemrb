@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.27 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.28 2004/08/28 19:33:01 avenger_teambg Exp $
  *
  */
 
@@ -261,7 +261,7 @@ int Inventory::AddSlotItem(CREItem* item, unsigned int /*slot*/, CREItem **res_i
 	return -1;
 }
 
-int Inventory::AddSlotItem(STOItem* item, unsigned int /*slot*/, CREItem **/*res_item*/, int count)
+int Inventory::AddSlotItem(STOItem* item, unsigned int /*slot*/, CREItem** /*res_item*/, int count)
 {
 	CREItem *temp;
 	CREItem *remains;
