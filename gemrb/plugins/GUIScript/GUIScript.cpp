@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.123 2004/02/16 21:37:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.124 2004/02/17 17:44:28 avenger_teambg Exp $
  *
  */
 
@@ -132,14 +132,7 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 	core->LoadGame(-1);
 	gc->SetCurrentArea(0);
 	core->GetVideoDriver()->MoveViewportTo(startX, startY);
-	Actor *MyActor = core->GetActor(0);
-	if(MyActor) {
-		core->GetGame()->SetPC(MyActor);
-		core->GetGame()->GetMap(0)->AddActor(MyActor);
-		strcpy(MyActor->Area, StartArea);
-		MyActor->FromGame = true;
-		MyActor->MySelf = MyActor;
-	}
+	core->EnterActors(StartArea);
 	core->DelTable(start);
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -1809,16 +1802,18 @@ static PyObject *GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject *args)
 static PyObject *GemRB_CreatePlayer(PyObject * /*self*/, PyObject *args)
 {
 	char *CreResRef;
-	int PlayerSlot;
+	int PlayerSlot, Slot;
 
 	if(!PyArg_ParseTuple(args,"si", &CreResRef, &PlayerSlot) ) {
 		printMessage("GUIScript","Syntax Error: CreatePlayer(ResRef, Slot)\n", LIGHT_RED);
 		return NULL;
 	}
+	//PlayerSlot is zero based, if not, remove the +1
+	Slot=(PlayerSlot&0x7fff)+1; 
 	if(PlayerSlot&0x8000) {
-		PlayerSlot=core->FindPlayer(PlayerSlot&0x7fff);
+		PlayerSlot=core->FindPlayer(Slot);
 		if(PlayerSlot<0) {
-			PlayerSlot=core->LoadCreature(CreResRef,1);
+			PlayerSlot=core->LoadCreature(CreResRef,Slot);
 		}
 	}
 	else {
@@ -1827,7 +1822,7 @@ static PyObject *GemRB_CreatePlayer(PyObject * /*self*/, PyObject *args)
 			printMessage("GUIScript","Slot is already filled!\n",LIGHT_RED);
 			return NULL;
 		}
-		PlayerSlot=core->LoadCreature(CreResRef, 1); //inparty flag
+		PlayerSlot=core->LoadCreature(CreResRef, Slot); //inparty flag
 	}
 	if(PlayerSlot<0) {
 		printMessage("GUIScript","Not found!\n",LIGHT_RED);
@@ -1844,9 +1839,11 @@ static PyObject *GemRB_GetPlayerStat(PyObject * /*self*/, PyObject *args)
 		printMessage("GUIScript","Syntax Error: GetPlayerStat(Slot, ID)\n", LIGHT_RED);
 		return NULL;
 	}
+/*
 	PlayerSlot = core->FindPlayer(PlayerSlot);
 	if(PlayerSlot<0)
 		return NULL;
+*/
 	//returning the modified stat
 	StatValue=core->GetCreatureStat(PlayerSlot, StatID,1);
 	return Py_BuildValue("i",StatValue);
@@ -1860,9 +1857,13 @@ static PyObject *GemRB_SetPlayerStat(PyObject * /*self*/, PyObject *args)
 		printMessage("GUIScript","Syntax Error: SetPlayerStat(Slot, ID, Value)\n", LIGHT_RED);
 		return NULL;
 	}
+/*
 	PlayerSlot = core->FindPlayer(PlayerSlot);
-	if(PlayerSlot<0)
+	if(PlayerSlot<0) {
+		printMessage("GUIScript","SetPlayerStat: Can't find actor\n",LIGHT_RED);
 		return NULL;
+	}
+*/
 	//Setting the creature's base stat, which gets saved (0)
 	if(!core->SetCreatureStat(PlayerSlot, StatID, StatValue,0))
 		return NULL;
@@ -1878,9 +1879,11 @@ static PyObject *GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject *args)
 		printMessage("GUIScript","Syntax Error: FillPlayerInfo(Slot)\n", LIGHT_RED);
 		return NULL;
 	}
+/*
 	PlayerSlot = core->FindPlayer(PlayerSlot);
 	if(PlayerSlot<0)
 		return NULL;
+*/
 	// here comes some code to transfer icon/name to the PC sheet
 	//
 	//
