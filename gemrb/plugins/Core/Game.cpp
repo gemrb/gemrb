@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.56 2004/08/19 21:14:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.57 2004/08/20 15:54:39 avenger_teambg Exp $
  *
  */
 
@@ -322,7 +322,6 @@ Map *Game::GetCurrentMap()
 	return GetMap(MapIndex);
 }
 
-//TODO: master area determination
 bool Game::MasterArea(const char *area)
 {
 	int i=mastarea.size();
@@ -332,6 +331,15 @@ bool Game::MasterArea(const char *area)
 		}
 	}
 	return false;
+}
+
+void Game::SetMasterArea(const char *area)
+{
+	if(MasterArea(area) ) return;
+	char *tmp = (char *) malloc(9);
+	strncpy (tmp,area,8);
+	tmp[8]=0;
+	mastarea.push_back(tmp);
 }
 
 int Game::AddMap(Map* map)

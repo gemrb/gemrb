@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.40 2004/08/19 21:14:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.41 2004/08/20 15:54:39 avenger_teambg Exp $
  *
  */
 
@@ -171,6 +171,8 @@ public:
 	int AddMap(Map* map);
 	/* determine if area is master area*/
 	bool MasterArea(const char *area);
+	/* dynamically adding an area to master areas*/
+	void SetMasterArea(const char *area);
 	/* returns slot of the map, if it was already loaded,
 	 	don't load it again, set changepf == true,
 		if you want to change the pathfinder too. */
