@@ -103,7 +103,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				//Let's check if we have a Control under the Mouse Pointer
 				Control * ctrl = (*m)->GetControl(x,y);
 				if(ctrl != NULL) {
-					if(ctrl->hasFocus)
+					//if(ctrl->hasFocus)
 						ctrl->OnMouseOver(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos);
 				}
 				lastW = *m;
