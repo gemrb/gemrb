@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.106 2004/01/02 00:50:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.107 2004/01/02 12:34:08 avenger_teambg Exp $
  *
  */
 
@@ -93,11 +93,15 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 		unsigned long index;
 		gc->UnhideGUI();
 	}
+	// 0 - single player, 1 - tutorial, 2 - multiplayer
+	unsigned long playmode=0;
+	core->GetDictionary()->Lookup("PlayMode", playmode);
+	playmode*=3;
 	int start = core->LoadTable("STARTARE");
 	TableMgr * tm = core->GetTable(start);
-	char * StartArea = tm->QueryField();
-	int startX = atoi(tm->QueryField(1,0));
-	int startY = atoi(tm->QueryField(2,0));
+	char * StartArea = tm->QueryField(playmode);
+	int startX = atoi(tm->QueryField(playmode+1));
+	int startY = atoi(tm->QueryField(playmode+2));
 	core->LoadGame(-1);
 	gc->SetCurrentArea(0);
 	core->DelTable(start);
@@ -1790,10 +1794,14 @@ static PyObject *GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject *args)
 	if(*poi!='*') MyActor->AnimID=atoi(poi);
 	MyActor->Init();
 	core->DelTable(mastertable);
+	// 0 - single player, 1 - tutorial, 2 - multiplayer
+	unsigned long playmode=0;
+	core->GetDictionary()->Lookup("PlayMode", playmode);
+	playmode*=2;
 	int saindex = core->LoadTable("STARTPOS");
 	TableMgr * strta = core->GetTable(saindex);
-	MyActor->XPos = MyActor->XDes = atoi(strta->QueryField(0));
-	MyActor->YPos = MyActor->YDes = atoi(strta->QueryField(1));
+	MyActor->XPos = MyActor->XDes = atoi(strta->QueryField(playmode,PlayerSlot));
+	MyActor->YPos = MyActor->YDes = atoi(strta->QueryField(playmode+1,PlayerSlot));
 	MyActor->SetOver(false);
 	//core->GetGame()->SetPC(MyActor);
 	core->DelTable(saindex);

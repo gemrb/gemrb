@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.6 2003/12/20 18:29:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.7 2004/01/02 12:34:08 avenger_teambg Exp $
  *
  */
 
@@ -136,9 +136,13 @@ Game * GAMImp::GetGame()
 	Game * newGame = new Game();
 	MapMgr * mM = (MapMgr*)core->GetInterface(IE_ARE_CLASS_ID);
 	if(!CurrentArea[0]) {
+	        // 0 - single player, 1 - tutorial, 2 - multiplayer
+	        unsigned long playmode=0;
+        	core->GetDictionary()->Lookup("PlayMode", playmode);
+	        playmode*=3;
 		int i = core->LoadTable("STARTARE");
 		TableMgr * tm = core->GetTable(i);
-		char * resref = tm->QueryField();
+		char * resref = tm->QueryField(playmode);
 		strncpy(CurrentArea, resref, 8);
 		CurrentArea[8] = 0;
 	}

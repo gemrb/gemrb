@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.55 2004/01/01 15:42:45 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.56 2004/01/02 12:34:08 avenger_teambg Exp $
  *
  */
 
@@ -49,7 +49,6 @@ void InitPathFinder()
 				poi=tm->QueryField(0,i);
 				if(*poi!='*')
 					Passable[i]=atoi(poi);
-				printf("PAssable: %d, %d\n",i,Passable[i]);
 			}
 			poi=tm->QueryField(1,0);
 			if(*poi!='*')
