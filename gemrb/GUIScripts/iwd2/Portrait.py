@@ -40,7 +40,7 @@ def OnLoad():
 	GemRB.SetText(AppearanceWindow, CustomButton, 17545)
 
 	DoneButton = GemRB.GetControl(AppearanceWindow,0)
-	GemRB.SetText(AppearanceWindow,DoneButton,11973)
+	GemRB.SetText(AppearanceWindow,DoneButton,36789)
 	GemRB.SetButtonFlags(AppearanceWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	GemRB.SetEvent(AppearanceWindow,RightButton,IE_GUI_BUTTON_ON_PRESS,"RightPress")

@@ -44,9 +44,9 @@ def OnLoad():
 	CancelButton = GemRB.GetControl(FeedbackWindow, 27)
 	TextAreaControl = GemRB.GetControl(FeedbackWindow, 28)
 
-        GemRB.SetText(FeedbackWindow, TextAreaControl, 18043)
-        GemRB.SetText(FeedbackWindow, OkButton, 11973)
-        GemRB.SetText(FeedbackWindow, CancelButton, 13727)
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18043)
+	GemRB.SetText(FeedbackWindow, OkButton, 11973)
+	GemRB.SetText(FeedbackWindow, CancelButton, 13727)
 	
 	GemRB.SetEvent(FeedbackWindow, MarkerSlider, IE_GUI_BUTTON_ON_PRESS, "MarkerSliderPress")
 	GemRB.SetEvent(FeedbackWindow, MarkerSliderS, IE_GUI_SLIDER_ON_CHANGE, "MarkerSliderPress")
@@ -86,9 +86,9 @@ def OnLoad():
 	GemRB.SetButtonFlags(FeedbackWindow,MiscellaneousB, IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	GemRB.SetVarAssoc(FeedbackWindow,MiscellaneousB, "Miscellaneous Text",1)
 
-        GemRB.SetEvent(FeedbackWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
-        GemRB.SetEvent(FeedbackWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-        GemRB.SetVisible(FeedbackWindow,1)
+	GemRB.SetEvent(FeedbackWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
+	GemRB.SetEvent(FeedbackWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	GemRB.SetVisible(FeedbackWindow,1)
 	return
 
 def MarkerSliderPress():
@@ -124,12 +124,12 @@ def MiscellaneousPress():
 	return
 
 def OkPress():
-        GemRB.UnloadWindow(FeedbackWindow)
-        GemRB.SetNextScript("GamePlay")
-        return
+	GemRB.UnloadWindow(FeedbackWindow)
+	GemRB.SetNextScript("GamePlay")
+	return
 
 def CancelPress():
-        GemRB.UnloadWindow(FeedbackWindow)
-        GemRB.SetNextScript("GamePlay")
-        return
+	GemRB.UnloadWindow(FeedbackWindow)
+	GemRB.SetNextScript("GamePlay")
+	return
 

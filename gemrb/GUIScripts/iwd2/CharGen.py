@@ -96,12 +96,12 @@ def NextPress():
 	return
 
 def CancelPress():
-        GemRB.UnloadWindow(CharGenWindow)
-        GemRB.SetNextScript("SPPartyFormation")
-        return
+	GemRB.UnloadWindow(CharGenWindow)
+	GemRB.SetNextScript("SPPartyFormation")
+	return
 
 def ImportPress():
-        GemRB.UnloadWindow(CharGenWindow)
+	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("GUICG24") #import
 	return
 

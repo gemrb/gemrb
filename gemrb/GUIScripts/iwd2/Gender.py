@@ -33,7 +33,7 @@ def OnLoad():
 	BackButton = GemRB.GetControl(GenderWindow,6)
 	GemRB.SetText(GenderWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(GenderWindow,0)
-	GemRB.SetText(GenderWindow,DoneButton,11973)
+	GemRB.SetText(GenderWindow,DoneButton,36789)
 	GemRB.SetButtonFlags(GenderWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 

@@ -57,11 +57,11 @@ def OnLoad():
 
 	SkillButton = GemRB.GetControl(CharGenWindow,5)
 	GemRB.SetText(CharGenWindow,SkillButton, 11983)
-	GemRB.SetButtonState(CharGenWindow,SkillButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(CharGenWindow,SkillButton,IE_GUI_BUTTON_DISABLED)
 
 	AppearanceButton = GemRB.GetControl(CharGenWindow,6)
 	GemRB.SetText(CharGenWindow,AppearanceButton, 11961)
-	GemRB.SetButtonState(CharGenWindow,AppearanceButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(CharGenWindow,AppearanceButton,IE_GUI_BUTTON_ENABLED)
 
 	NameButton = GemRB.GetControl(CharGenWindow,7)
 	GemRB.SetText(CharGenWindow,NameButton, 11963)
@@ -103,24 +103,24 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,11958,-1) # new line
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(AlignmentTable,GemRB.GetVar("Alignment")-1,0))
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,17088,-1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"",-1) #2 new lines
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,17088,-1)
+
 	for i in range(0,6):
 		v = GemRB.GetTableValue(AbilityTable, i,2)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
 		v = GemRB.GetVar("Ability "+str(i) )
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": %d  (%+d)"%(v,v/2-5))
 
-
 	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "StartOverPress")
 	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
-	GemRB.SetEvent(CharGenWindow, SkillButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+	GemRB.SetEvent(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 	GemRB.SetVisible(CharGenWindow,1)
 	return
 	
 def NextPress():
 	GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("Skills") #skills/feats
+	GemRB.SetNextScript("Abilities") #abilities
 	return
 
 def StartOverPress():
@@ -140,6 +140,6 @@ def CancelPress():
 
 def BackPress():
 	GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("CharGen5") #abilities
+	GemRB.SetNextScript("CharGen7") #abilities
 	return
 

@@ -20,7 +20,6 @@ def OnLoad():
         AlignmentTable = GemRB.LoadTable("aligns")
 	AlignmentWindow = GemRB.LoadWindow(3)
 
-	print "Kitname:",KitName
 	for i in range(0,9):
 		Button = GemRB.GetControl(AlignmentWindow, i+2)
 		GemRB.SetButtonFlags(AlignmentWindow, Button, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
@@ -37,7 +36,7 @@ def OnLoad():
 	BackButton = GemRB.GetControl(AlignmentWindow,13)
 	GemRB.SetText(AlignmentWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(AlignmentWindow,0)
-	GemRB.SetText(AlignmentWindow,DoneButton,11973)
+	GemRB.SetText(AlignmentWindow,DoneButton,36789)
         GemRB.SetButtonFlags(AlignmentWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(AlignmentWindow, 11)

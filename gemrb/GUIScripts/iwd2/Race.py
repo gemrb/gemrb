@@ -33,7 +33,7 @@ def OnLoad():
 	BackButton = GemRB.GetControl(RaceWindow,11) 
 	GemRB.SetText(RaceWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(RaceWindow,0)
-	GemRB.SetText(RaceWindow,DoneButton,11973)
+	GemRB.SetText(RaceWindow,DoneButton,36789)
 	GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 	GemRB.SetButtonFlags(RaceWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 

@@ -89,7 +89,7 @@ def OnLoad():
 	KitIndex = GemRB.GetTableRowIndex(Abclasrq, KitName)
 
 	GemRB.LoadWindowPack("GUICG")
-        AbilityTable = GemRB.LoadTable("ability")
+	AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindow(4)
 
 	RollPress()
@@ -112,9 +112,9 @@ def OnLoad():
 	BackButton = GemRB.GetControl(AbilityWindow,36)
 	GemRB.SetText(AbilityWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(AbilityWindow,0)
-	GemRB.SetText(AbilityWindow,DoneButton,11973)
+	GemRB.SetText(AbilityWindow,DoneButton,36789)
 	GemRB.SetButtonState(AbilityWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
-        GemRB.SetButtonFlags(AbilityWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetButtonFlags(AbilityWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(AbilityWindow, 29)
 	GemRB.SetText(AbilityWindow,TextAreaControl,17247)
@@ -187,11 +187,11 @@ def LeftPress():
 def BackPress():
 	GemRB.UnloadWindow(AbilityWindow)
 	GemRB.SetNextScript("CharGen5")
-	for i in range(-1,6):
+	for i in range(0,6):
 		GemRB.SetVar("Ability "+str(i),0)  #scrapping the abilities
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(AbilityWindow)
-	GemRB.SetNextScript("CharGen6") #
+	GemRB.UnloadWindow(AbilityWindow)
+	GemRB.SetNextScript("CharGen6") #skills
 	return

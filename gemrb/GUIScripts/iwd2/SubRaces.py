@@ -75,7 +75,7 @@ def OnLoad():
 	BackButton = GemRB.GetControl(RaceWindow,8) 
 	GemRB.SetText(RaceWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(RaceWindow,0)
-	GemRB.SetText(RaceWindow,DoneButton,11973)
+	GemRB.SetText(RaceWindow,DoneButton,36789)
 	GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_ENABLED)
 	GemRB.SetButtonFlags(RaceWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
@@ -90,7 +90,6 @@ def OnLoad():
 def SubRacePress():
 	global RaceWindow, RaceTable, TextAreaControl
 	Race = GemRB.GetVar("Race")-1
-	print str(Race)
 	GemRB.SetText(RaceWindow,TextAreaControl, GemRB.GetTableValue(RaceTable, Race, 1))
 	return
 

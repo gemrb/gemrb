@@ -80,7 +80,7 @@ def OnLoad():
 	BackButton = GemRB.GetControl(ClassWindow,17)
 	GemRB.SetText(ClassWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(ClassWindow,0)
-	GemRB.SetText(ClassWindow,DoneButton,11973)
+	GemRB.SetText(ClassWindow,DoneButton,36789)
 	GemRB.SetButtonFlags(ClassWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	ScrollBarControl = GemRB.GetControl(ClassWindow, 15)
