@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.77 2003/12/02 23:09:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.78 2003/12/04 22:12:27 balrog994 Exp $
  *
  */
 
@@ -94,6 +94,9 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 	core->FreeInterface(am);
 	core->DelTable(start);
 	core->GetVideoDriver()->MoveViewportTo(startX, startY);
+	if(core->ConsolePopped) {
+		core->PopupConsole();
+	}
 
 	Py_INCREF(Py_None);
 	return Py_None;
