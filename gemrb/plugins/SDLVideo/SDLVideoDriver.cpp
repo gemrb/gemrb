@@ -457,6 +457,9 @@ void SDLVideoDriver::DrawRect(Region &rgn, Color &color){
 
 	drect.x = rgn.x;
 	drect.y = rgn.y;
+
+	if(color.a != 0)
+		SDL_SetAlpha(rectsurf, SDL_SRCALPHA | SDL_RLEACCEL, 128);
 	
 	SDL_BlitSurface(rectsurf, NULL, disp, &drect);
 
