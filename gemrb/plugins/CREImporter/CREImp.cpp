@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.19 2003/12/15 09:52:54 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.20 2003/12/17 20:19:48 balrog994 Exp $
  *
  */
 
@@ -253,7 +253,7 @@ Actor * CREImp::GetActor()
 			act->Scripts[i] = NULL;
 			continue;
 		}
-		act->Scripts[i] = new GameScript(aScript, 0);
+		act->Scripts[i] = new GameScript(aScript, 0, act->locals);
 		act->Scripts[i]->MySelf = act;
 	}
 	switch(CREVersion) {
