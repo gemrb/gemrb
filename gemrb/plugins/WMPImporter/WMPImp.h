@@ -15,25 +15,42 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/Attic/WMPImpCD.h,v 1.1 2004/02/11 21:39:40 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.h,v 1.1 2004/02/11 21:52:31 edheldil Exp $
  *
  */
 
-#ifndef WMPIMPCD_H
-#define WMPIMPCD_H
+#ifndef WMPIMP_H
+#define WMPIMP_H
 
-#include "../Core/ClassDesc.h"
+#include "../../includes/ie_types.h"
+#include "../Core/WorldMap.h"
+#include "../Core/WorldMapMgr.h"
 
-class WMPImpCD : public ClassDesc
+
+class WMPImp : public WorldMapMgr
 {
+private:
+	DataStream * str;
+	bool autoFree;
+
+	ieDword WorldMapsCount;
+	ieDword WorldMapsOffset;
+
 public:
-	WMPImpCD(void);
-	~WMPImpCD(void);
-	void * Create(void);
-	const char * ClassName(void);
-	SClass_ID SuperClassID(void);
-	Class_ID ClassID(void);
+	WMPImp(void);
+	~WMPImp(void);
+	bool Open(DataStream * stream, bool autoFree = true);
+	WorldMap * GetWorldMap (unsigned int index);
+        unsigned int GetWorldMapsCount ();
+
+	void release(void)
+	{
+		delete this;
+	}
+private:
+	WMPAreaEntry * GetAreaEntry ();
+	WMPAreaLink * GetAreaLink ();
 };
-static WMPImpCD WmpImpCD;
+
 
 #endif

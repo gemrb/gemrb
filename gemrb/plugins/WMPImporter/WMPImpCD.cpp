@@ -15,51 +15,39 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/Attic/WMPImporter.cpp,v 1.1 2004/02/11 21:39:40 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImpCD.cpp,v 1.1 2004/02/11 21:52:31 edheldil Exp $
  *
  */
 
-// WEDImporter.cpp : Defines the entry point for the DLL application.
-//
-
-#include "../../includes/globals.h"
 #include "WMPImpCD.h"
+#include "WMPImp.h"
 
-#ifdef WIN32
-#define GEM_EXPORT_DLL __declspec(dllexport)
-#else
-#define GEM_EXPORT_DLL
-#endif
-
-#ifdef WIN32
-#include <windows.h>
-
-BOOL APIENTRY DllMain( HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved )
+WMPImpCD::WMPImpCD(void)
 {
-    return TRUE;
 }
 
-#endif
-
-GEM_EXPORT_DLL int LibNumberClasses() 
-{ 
-	return 1; 
+WMPImpCD::~WMPImpCD(void)
+{
 }
 
-GEM_EXPORT_DLL ClassDesc *LibClassDesc(int i) {
-	switch(i) {
-		case 0: 
-			return &WmpImpCD;
-		default: 
-			return 0;
-	}
+void * WMPImpCD::Create(void)
+{
+	return new WMPImp();
 }
 
-GEM_EXPORT_DLL const char *LibDescription() {
-	return "WMP File Importer";
+const char * WMPImpCD::ClassName(void)
+{
+	return "WMPImp";
 }
 
-GEM_EXPORT_DLL unsigned long LibVersion() 
-{ 
-	return VERSION_GEMRB; 
+SClass_ID WMPImpCD::SuperClassID(void)
+{
+  // FIXME?????
+	return IE_WMP_CLASS_ID;
+}
+
+Class_ID WMPImpCD::ClassID(void)
+{
+  // FIXME?????
+	return Class_ID(0x088a4123, 0xbfc417de);
 }
