@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.cpp,v 1.5 2003/12/04 23:37:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.cpp,v 1.6 2003/12/05 15:47:58 avenger_teambg Exp $
  *
  */
 
@@ -46,6 +46,7 @@ IEScript::IEScript(void)
 	triggers[0x0036] = OnCreation;
 	triggers[0x4023] = True;
 	actions[7] = CreateCreature;
+	actions[10] = Enemy;
 	actions[23] = MoveToPoint;
 	blocking[23] = true;
 	actions[30] = SetGlobal;
@@ -58,6 +59,13 @@ IEScript::IEScript(void)
 	actions[120] = StartCutScene;
 	actions[121] = StartCutSceneMode;
 	actions[127] = CutSceneId;
+	actions[153] = ChangeAllegiance;
+	actions[154] = ChangeGeneral;
+	actions[155] = ChangeRace;
+	actions[156] = ChangeClass;
+	actions[157] = ChangeSpecifics;
+	actions[158] = ChangeGender;
+	actions[159] = ChangeAlignment;
 	actions[177] = TriggerActivation;
 	actions[202] = FadeToColor;
 	blocking[202] = true;
@@ -484,6 +492,62 @@ void IEScript::SetGlobal(Script * Sender, Action * parameters)
 	globals->SetAt(parameters->string0Parameter, parameters->int0Parameter);
 }
 
+void IEScript::ChangeAllegiance(Script * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objects[1]);
+	if(actor) {
+		actor->actor->SetStat(IE_EA,parameters->int0Parameter);
+	}
+}
+
+void IEScript::ChangeGeneral(Script * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objects[1]);
+	if(actor) {
+		actor->actor->SetStat(IE_GENERAL,parameters->int0Parameter);
+	}
+}
+
+void IEScript::ChangeRace(Script * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objects[1]);
+	if(actor) {
+		actor->actor->SetStat(IE_RACE,parameters->int0Parameter);
+	}
+}
+
+void IEScript::ChangeClass(Script * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objects[1]);
+	if(actor) {
+		actor->actor->SetStat(IE_CLASS,parameters->int0Parameter);
+	}
+}
+
+void IEScript::ChangeSpecifics(Script * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objects[1]);
+	if(actor) {
+		actor->actor->SetStat(IE_SPECIFIC,parameters->int0Parameter);
+	}
+}
+
+void IEScript::ChangeGender(Script * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objects[1]);
+	if(actor) {
+		actor->actor->SetStat(IE_SEX,parameters->int0Parameter);
+	}
+}
+
+void IEScript::ChangeAlignment(Script * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objects[1]);
+	if(actor) {
+		actor->actor->SetStat(IE_ALIGNMENT,parameters->int0Parameter);
+	}
+}
+
 void IEScript::TriggerActivation(Script * Sender, Action * parameters)
 {
 	InfoPoint * ip = core->GetGame()->GetMap(0)->tm->GetInfoPoint(parameters->objects[1]->objectName);
@@ -546,6 +610,14 @@ void IEScript::CutSceneId(Script * Sender, Action * parameters)
 	} else {
 		Map * map = core->GetGame()->GetMap(0);
 		cutSceneActor = map->GetActor(parameters->objects[1]->objectName);
+	}
+}
+
+void IEScript::Enemy(Script * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objects[0]);
+	if(actor) {
+		actor->actor->SetStat(IE_EA,255);
 	}
 }
 
