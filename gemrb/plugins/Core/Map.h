@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.31 2004/03/19 23:03:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.32 2004/03/25 16:58:20 avenger_teambg Exp $
  *
  */
 
@@ -89,7 +89,7 @@ private:
 	std::vector< Entrance*> entrances;
 	Actor** queue[3];
 	int Qcount[3];
-	int lastActorCount[3];
+	unsigned int lastActorCount[3];
 	void GenerateQueue(int priority);
 	Actor* GetRoot(int priority);
 	void DeleteActor(Actor* actor);

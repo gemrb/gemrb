@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.79 2004/03/20 21:01:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.80 2004/03/25 16:58:20 avenger_teambg Exp $
  *
  */
 
@@ -136,7 +136,6 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 	//Check if we need to start some trigger scripts
 	int ipCount = 0;
 	while (true) {
-		int count;
 		//For each InfoPoint in the map
 		InfoPoint* ip = tm->GetInfoPoint( ipCount++ );
 		if (!ip)
@@ -203,9 +202,6 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 								ip->Destination );
 							actor->ClearPath();
 							actor->AddActionInFront( GameScript::CreateAction( Tmp ) );
-							/* gc has already been passed to this function!!!
-																													GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);
-																						*/
 							strcpy( gc->EntranceName, ip->EntranceName );
 						} else {
 							if (ip->Scripts[0]) {
@@ -763,7 +759,7 @@ void PathFinder::AdjustPosition(unsigned int& goalX, unsigned int& goalY)
 }
 
 //run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
-PathNode* PathFinder::RunAway(short sX, short sY, short dX, short dY, int PathLen, bool Backing)
+PathNode* PathFinder::RunAway(short sX, short sY, short dX, short dY, unsigned int PathLen, bool Backing)
 {
 	unsigned int startX = sX / 16, startY = sY / 12;
 	unsigned int goalX = dX / 16, goalY = dY / 12;
@@ -787,8 +783,8 @@ PathNode* PathFinder::RunAway(short sX, short sY, short dX, short dY, int PathLe
 		InternalStack.pop();
 		unsigned int x = pos >> 16;
 		unsigned int y = pos & 0xffff;
-		long tx = ( x - dX );
-		long ty = ( y - dY );
+		long tx = ( x - goalX );
+		long ty = ( y - goalY );
 		unsigned int distance = (unsigned int) sqrt( ( double ) ( tx* tx + ty* ty ) );
 		if(dist<distance) {
 			bestX=x;
