@@ -432,7 +432,6 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 
 	if(lastCursor != nextCursor) {
-		//core->GetVideoDriver()->SetCursor(core->Cursors[nextCursor]->GetFrame(0), core->Cursors[nextCursor+1]->GetFrame(0));
 		((Window*)Owner)->Cursor = nextCursor;
 		lastCursor = nextCursor;
 	}
