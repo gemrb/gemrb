@@ -35,7 +35,7 @@ def OnLoad():
 	
 def SoundPress():
 	global OptionsWindow
-	
+	GemRB.SetNextScript("GUIOPT7")
 	return
 	
 def GamePress():
