@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.29 2004/10/08 19:56:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.30 2004/10/08 20:32:50 edheldil Exp $
  *
  */
 
@@ -235,9 +235,19 @@ void* BAMImp::GetFramePixels(unsigned short findex, unsigned char /*mode*/)
 		while (i < pixelcount) {
 			if (*p == CompressedColorIndex) {
 				p++;
-				memset( &Buffer[i], CompressedColorIndex, ( *p ) + 1 );
+				// FIXME: Czech HOW has apparently broken frame
+				//   #141 in REALMS.BAM. Maybe we should put
+				//   this condition to #ifdef BROKEN_xx ?
+				// Or maybe rather put correct REALMS.BAM
+				//   into override/ dir?
+				if (i + ( *p ) + 1 > pixelcount) {
+					memset( &Buffer[i], CompressedColorIndex, pixelcount - i );
+					printf ("Broken frame %d in %s\n", findex, str->filename);
+				} else {
+					memset( &Buffer[i], CompressedColorIndex, ( *p ) + 1 );
+				}
 				i += *p;
-			} else
+			} else 
 				Buffer[i] = *p;
 			p++;
 			i++;
