@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.148 2004/04/18 19:20:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.149 2004/04/19 22:05:22 avenger_teambg Exp $
  *
  */
 
@@ -57,6 +57,7 @@ static int InDebug = 0;
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
 	{"actionlistempty", GameScript::ActionListEmpty,0},
+	{"acquired", GameScript::Acquired,0},
 	{"alignment", GameScript::Alignment,0},
 	{"allegiance", GameScript::Allegiance,0},
 	{"areacheck", GameScript::AreaCheck,0},
@@ -108,9 +109,10 @@ static TriggerLink triggernames[] = {
 	{"harmlessentered", GameScript::Entered,0}, //this isn't sure the same
 	{"hasitem", GameScript::HasItem,0},
 	{"hasitemslot", GameScript::HasItemSlot,0},
+	{"hasiteminslot", GameScript::HasItemSlot,0},
 	{"haveanyspells", GameScript::HaveAnySpells,0},
-	{"havespell", GameScript::HaveSpell,0},
-	{"havespellres", GameScript::HaveSpell,0},
+	{"havespell", GameScript::HaveSpell,0},    //these must be the same
+	{"havespellres", GameScript::HaveSpell,0}, //they share the same ID
 	{"hotkey", GameScript::HotKey,0},
 	{"hp", GameScript::HP,0},
 	{"hpgt", GameScript::HPGT,0}, {"hplt", GameScript::HPLT,0},
@@ -403,6 +405,7 @@ static ActionLink actionnames[] = {
 	{"textscreen", GameScript::TextScreen,0},
 	{"triggeractivation", GameScript::TriggerActivation,0},
 	{"unhidegui", GameScript::UnhideGUI,0},
+	{"unloadarea", GameScript::UnloadArea,0},
 	{"unlock", GameScript::Unlock,0},
 	{"unmakeglobal", GameScript::UnMakeGlobal,0}, //this is a GemRB extension
 	{"verbalconstant", GameScript::VerbalConstant,0},
@@ -2860,6 +2863,7 @@ int GameScript::NumItemsLT(Scriptable* Sender, Trigger* parameters)
 	return cnt<parameters->int0Parameter;
 }
 
+//the int0 parameter is an addition, normally it is 0
 int GameScript::Contains(Scriptable* Sender, Trigger* parameters)
 {
 //actually this should be a container
@@ -2868,12 +2872,13 @@ int GameScript::Contains(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Container *cnt = (Container *) tar;
-	if (cnt->inventory.HasItem(parameters->string0Parameter,0) ) {
+	if (cnt->inventory.HasItem(parameters->string0Parameter, parameters->int0Parameter) ) {
 		return 1;
 	}
 	return 0;
 }
 
+//the int0 parameter is an addition, normally it is 0
 int GameScript::HasItem(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -2881,7 +2886,7 @@ int GameScript::HasItem(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) scr;
-	if (actor->inventory.HasItem(parameters->string0Parameter, 0) ) {
+	if (actor->inventory.HasItem(parameters->string0Parameter, parameters->int0Parameter) ) {
 		return 1;
 	}
 	return 0;
@@ -2900,7 +2905,6 @@ int GameScript::ItemIsIdentified(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-/** HasItemSlot is extended with an optional argument */
 /** if the string is zero, then it will return true if there is any item in the slot */
 /** if the string is non-zero, it will return true, if the given item was in the slot */
 int GameScript::HasItemSlot(Scriptable* Sender, Trigger* parameters)
@@ -2922,6 +2926,18 @@ int GameScript::HasItemEquipped(Scriptable * Sender, Trigger* parameters)
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	Actor *actor = (Actor *) scr;
 	if (actor->inventory.HasItem(parameters->string0Parameter, IE_ITEM_EQUIPPED) ) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::Acquired(Scriptable * Sender, Trigger* parameters)
+{
+	if( Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) Sender;
+	if (actor->inventory.HasItem(parameters->string0Parameter, IE_ITEM_ACQUIRED) ) {
 		return 1;
 	}
 	return 0;
@@ -2962,8 +2978,8 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* paramet
 	}
 	return 0;
 }
-//                               0      1       2       3    4      5
-static char spellnames[6][5]={"DLPR","SPPR","SPWI","SPIN","SPCL","DLWI"};
+//                               0      1      2      3    4   
+static char spellnames[5][5]={"ITEM","SPPR","SPWI","SPIN","SPCL"};
 
 #define CreateSpellName(spellname, data) sprintf(spellname,"%s%03d",spellnames[data/1000],data%1000)
 
@@ -6314,5 +6330,14 @@ void GameScript::SetRegularName(Scriptable* Sender, Action* parameters)
 	}
 	Actor* target = ( Actor* ) tar;
 	target->SetText(parameters->int0Parameter,2);
+}
+
+/** this is a gemrb extension */
+void GameScript::UnloadArea(Scriptable* Sender, Action* parameters)
+{
+	int map=core->GetGame()->FindMap(parameters->string0Parameter);
+	if(map>=0) {
+		core->GetGame()->DelMap(map, parameters->int0Parameter);
+	}
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.9 2004/04/17 22:23:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.10 2004/04/19 22:05:23 avenger_teambg Exp $
  *
  */
 
@@ -86,7 +86,7 @@ public:
 	/** flags: see ieCREItemFlagBits */
 	bool HasItem(const char *resref, ieDword flags);
 
-	int CalculateWeight(void);
+	void CalculateWeight(void);
 	void SetInventoryType(int arg);
 
 	/** returns number of all slots in the inventory */

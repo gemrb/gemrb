@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.90 2004/04/18 19:20:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.91 2004/04/19 22:05:23 avenger_teambg Exp $
  *
  */
 
@@ -349,6 +349,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 					actor->ExecuteScript( actor->Scripts[i] );
 			}
 			actor->OnCreation = false;
+			actor->inventory.CalculateWeight();
 		}
 	}
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {

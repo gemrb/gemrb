@@ -15,13 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.14 2004/04/18 14:26:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.15 2004/04/19 22:05:23 avenger_teambg Exp $
  *
  */
 
 #include <stdio.h>
 #include "../../includes/win32def.h"
+#include "Interface.h"
 #include "Inventory.h"
+#include "Item.h"
+
+extern Interface* core;
 
 Inventory::Inventory()
 {
@@ -40,14 +44,17 @@ Inventory::~Inventory()
 	}
 }
 
-int Inventory::CalculateWeight()
+void Inventory::CalculateWeight()
 {
 	if(!Changed) {
-		return Weight;
+		return;
 	}
-	
-//returns the weight of stored items
-	return Weight;
+	Weight=0;
+	for(size_t i=0;i<Slots.size(); i++) {
+		Slots[i]->Flags&=~IE_ITEM_ACQUIRED;
+//		Item *itm=core->GetItemManager()->GetItem(Slots[i]->ItemResRef);
+//		Weight+=itm->Weight;
+	}
 }
 
 void Inventory::SetInventoryType(int arg)
