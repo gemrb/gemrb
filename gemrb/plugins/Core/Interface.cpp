@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.232 2004/11/08 19:09:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.233 2004/11/12 22:20:05 avenger_teambg Exp $
  *
  */
 
@@ -74,6 +74,7 @@ Interface::Interface(int iargc, char** iargv)
 	windowmgr = NULL;
 	vars = NULL;
 	tokens = NULL;
+	RtRows = NULL;
 	music = NULL;
 	soundmgr = NULL;
 	sgiterator = NULL;
@@ -246,6 +247,9 @@ Interface::~Interface(void)
 	}
 	if (tokens) {
 		delete( tokens );
+	}
+	if (RtRows) {
+		delete( RtRows );
 	}
 	FreeInterfaceVector( Table, tables, tm );
 	FreeInterfaceVector( Symbol, symbols, sm );
@@ -646,6 +650,7 @@ int Interface::Init()
 	else {
 		printStatus( "ERROR", LIGHT_RED );
 	}
+
 	printMessage( "Core", "Initializing string constants...", WHITE );
 	ret = ReadStrrefs();
 	if(ret) {
@@ -655,6 +660,14 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 	}
 
+	printMessage( "Core", "Initializing random treasure...", WHITE );
+	ret = ReadRandomItems();
+	if(ret) {
+		printStatus( "OK", LIGHT_GREEN );
+	}
+	else {
+		printStatus( "ERROR", LIGHT_RED );
+	}
 	printMessage( "Core", "Core Initialization Complete!\n", WHITE );
 	return GEM_OK;
 }
@@ -2498,6 +2511,124 @@ void Interface::DragItem(CREItem *item)
 	// Avenger: We should drop the dragged item and pick this up
 	// We shouldn't have a valid DraggedItem at this point
 	DraggedItem = item;
+}
+
+bool Interface::ReadItemTable(ieResRef TableName, const char * Prefix)
+{
+	ieResRef ItemName;
+	TableMgr * tab;
+	ieResRef *Items;
+	int i,j;
+
+	int table=LoadTable(TableName);
+	if(table<0) {
+		return false;
+	}
+	tab = GetTable(table);
+	if(!tab) {
+		goto end;
+	}
+	i=tab->GetRowCount();
+	for(j=0;j<i;j++) {
+		if(Prefix) {
+			snprintf(ItemName,sizeof(ItemName),"%s%02d",Prefix, j+1);
+		} else {
+			strncpy(ItemName,tab->GetRowName(j),sizeof(ieResRef) );
+		}
+		printf("Adding random item: %s\n",ItemName);
+		//Variable elements are free'd, so we have to use malloc
+		Items = (ieResRef *) malloc(sizeof(ieResRef) * 20 );
+		for(int k=0;k<20;k++) {
+			strncpy(Items[k],tab->QueryField(j,k),sizeof(ieResRef) );
+		}
+		RtRows->SetAt(ItemName, (const char *) Items);
+	}
+end:
+        DelTable(table);
+	return true;
+}
+
+bool Interface::ReadRandomItems()
+{
+	ieResRef RtResRef;
+	int i;
+	TableMgr * tab;
+
+	int table=LoadTable( "randitem" );
+	int difflev=0; //rt norm or rt fury
+
+	if(RtRows) {
+		RtRows->RemoveAll();
+	}
+	else {
+		RtRows=new Variables(10, 17); //block size, hash table size
+		if(!RtRows) {
+			return false;
+		}
+		RtRows->SetType( GEM_VARIABLES_STRING );
+	}
+	if(table<0) {
+		return false;
+	}
+	tab = GetTable( table );
+	if(!tab) {
+		goto end;
+	}
+	strncpy( GoldResRef, tab->QueryField((unsigned int) 0,(unsigned int) 0), sizeof(ieResRef) ); //gold
+	if( GoldResRef[0]=='*' ) {
+		return false;
+	}
+printf("GoldResRef: %s\n",GoldResRef);
+	strncpy( RtResRef, tab->QueryField( 1, difflev ), sizeof(ieResRef) );
+	i=atoi( RtResRef );
+	if(i<1) {
+		ReadItemTable( RtResRef, 0 ); //reading the table itself
+		goto end;
+	}
+	if(i>5) {
+		i=5;
+	}
+	while(i--) {
+		strncpy( RtResRef,tab->QueryField(2+i,difflev), sizeof(ieResRef) );
+		ReadItemTable( RtResRef,tab->GetRowName(2+i) );
+	}
+end:
+        DelTable( table );
+	return true;
+}
+
+CREItem *Interface::ReadItem(DataStream *str)
+{
+        CREItem *itm = new CREItem();
+
+        str->ReadResRef( itm->ItemResRef );
+        str->ReadWord( &itm->Unknown08 );
+        str->ReadWord( &itm->Usages[0] );
+        str->ReadWord( &itm->Usages[1] );
+        str->ReadWord( &itm->Usages[2] );
+        str->ReadDword( &itm->Flags );
+	ieResRef *Items=NULL;
+	if( RtRows && RtRows->Lookup( itm->ItemResRef, (char *) Items ) ) {
+		int i,j,k;
+		char *endptr;
+		i=Roll(1,20,-1); //0-19
+		ieResRef NewItem;
+		strncpy( NewItem, Items[i], sizeof(ieResRef) );
+		i=(int) (strchr(NewItem,'*')-NewItem);
+		if(i!=-1) NewItem[i]=0;
+		j=strtol(NewItem,&endptr,10);
+		k=strtol(NewItem+i+1,NULL,10);
+		if(i!=-1) itm->Usages[0]=k;
+		else {
+			if(*endptr) strncpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
+			else {
+				strncpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
+				itm->Usages[0]=Roll(j,k,0);
+			}
+		}
+printf("Resolve random item: %s stack:%d\n",itm->ItemResRef, itm->Usages[0]);
+	}
+	return itm;
 }
 
 Item* Interface::GetItem(const char* resname)

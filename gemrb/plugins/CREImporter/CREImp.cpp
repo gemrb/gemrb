@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.51 2004/11/07 19:41:15 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.52 2004/11/12 22:20:07 avenger_teambg Exp $
  *
  */
 
@@ -142,7 +142,7 @@ CRESpellMemorization* CREImp::GetSpellMemorization()
 
 	return spl;
 }
-
+/*
 CREItem* CREImp::GetItem()
 {
 	CREItem *itm = new CREItem();
@@ -155,6 +155,7 @@ CREItem* CREImp::GetItem()
 
 	return itm;
 }
+*/
 
 void CREImp::SetupColor(ieDword &stat)
 {
@@ -456,7 +457,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	items = (CREItem **) calloc (act->ItemsCount, sizeof(CREItem *) );
 
 	for (i = 0; i < act->ItemsCount; i++) {
-		items[i] = GetItem();
+		items[i] = core->ReadItem(str);
 	}
 	act->inventory.SetSlotCount(Inventory_Size);
 

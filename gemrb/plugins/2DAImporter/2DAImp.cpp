@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.cpp,v 1.17 2004/03/22 22:34:59 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.cpp,v 1.18 2004/11/12 22:20:06 avenger_teambg Exp $
  *
  */
 
@@ -49,10 +49,10 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 	}
 	str = stream;
 	this->autoFree = autoFree;
-	char Signature[20];
+	char Signature[256];
 	str->CheckEncrypted();
 
-	str->ReadLine( Signature, 20 );
+	str->ReadLine( Signature, sizeof(Signature) );
 	char* strp = Signature;
 	while (*strp == ' ')
 		strp++;
@@ -60,8 +60,9 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 		printf( "Bad signature!\n" );
 		return false;
 	}
-	defVal[0] = 0;
-	str->ReadLine( defVal, 32 );
+	Signature[0] = 0;
+	str->ReadLine( Signature, sizeof(Signature) );
+	strncpy(defVal, Signature, sizeof(defVal) );
 	bool colHead = true;
 	int row = 0;
 	while (true) {

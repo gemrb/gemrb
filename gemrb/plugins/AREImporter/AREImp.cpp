@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.80 2004/10/17 18:11:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.81 2004/11/12 22:20:07 avenger_teambg Exp $
  *
  */
 
@@ -97,6 +97,7 @@ AREImp::~AREImp(void)
 }
 
 //this is the same as the function in the creature, you might want to rationalize it
+/*
 CREItem* AREImp::GetItem()
 {
 	CREItem *itm = new CREItem();
@@ -107,9 +108,11 @@ CREItem* AREImp::GetItem()
 	str->ReadWord( &itm->Usages[1] );
 	str->ReadWord( &itm->Usages[2] );
 	str->ReadDword( &itm->Flags );
-
+	
+	core->ResolveRandomItem(itm);
 	return itm;
 }
+*/
 
 bool AREImp::Open(DataStream* stream, bool autoFree)
 {
@@ -186,6 +189,10 @@ Map* AREImp::GetMap(const char *ResRef)
 	unsigned int i,x;
 
 	Map* map = new Map();
+	if(!map) {
+		printf("Can't allocate map (out of memory).\n");
+		abort();
+	}
 	map->AreaFlags=AreaFlags;
 	map->AreaType=AreaType;
 
@@ -412,7 +419,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		//reading items into a container
 		str->Seek( ItemsOffset+( ItemIndex * 0x14 ), GEM_STREAM_START);
 		while(ItemCount--) {
-			c->inventory.AddItem( GetItem());
+			c->inventory.AddItem( core->ReadItem(str));
 		}
 		if (Script[0] != 0) {
 			c->Scripts[0] = new GameScript( Script, IE_SCRIPT_TRIGGER );

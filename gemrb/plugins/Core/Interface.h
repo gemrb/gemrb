@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.122 2004/10/31 14:50:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.123 2004/11/12 22:20:06 avenger_teambg Exp $
  *
  */
 
@@ -374,6 +374,7 @@ public:
 	void DragItem(CREItem* item);
 	CREItem* GetDraggedItem() { return DraggedItem; }
 	Item* GetItem(const char* resname);
+	CREItem *ReadItem(DataStream *str);
 
 private:
 	bool LoadConfig(void);
@@ -382,11 +383,15 @@ private:
 	bool LoadINI(const char * filename);
 	bool InitItemTypes();
 	bool ReadStrrefs();
+	bool ReadRandomItems();
+	bool ReadItemTable(ieResRef item, const char *Prefix);
 
 public:
 	char GameData[9];
 	char GameOverride[9];
-	char GameNameResRef[9];
+	ieResRef GameNameResRef;
+	ieResRef GoldResRef;     //MISC07.itm
+	Variables *RtRows;
 	char UserDir[_MAX_PATH];
 	int argc;
 	char **argv;	  
