@@ -46,6 +46,8 @@ public:
 	void SetScrollBar(Control * ptr);
 	/** Sets the Actual Text */
 	int SetText(const char * text);
+	/** Appends a String to the current Text */
+	int AppendText(const char * text);
 	/** Sets the Fonts */
 	void SetFonts(Font * init, Font * text);
 	/** Set Starting Row */

@@ -64,6 +64,14 @@ int TextArea::SetText(const char * text)
 	((Window*)Owner)->Invalidate();
 	return 0;
 }
+/** Appends a String to the current Text */
+int TextArea::AppendText(const char * text)
+{
+	strncat((char*)Buffer, text, BufferLength);
+	CalcRowCount();
+	((Window*)Owner)->Invalidate();
+	return 0;
+}
 /** Sets the Fonts */
 void TextArea::SetFonts(Font * init, Font * text)
 {

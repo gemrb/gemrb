@@ -118,6 +118,57 @@ static PyObject * GemRB_SetText(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ret);
 }
 
+static PyObject * GemRB_TextAreaAppend(PyObject *self, PyObject *args)
+{
+	PyObject *wi, *ci, *str;
+	int WindowIndex, ControlIndex, StrRef;
+	char * string;
+	int ret;
+
+	if(PyArg_UnpackTuple(args, "ref", 3, 3, &wi, &ci, &str)) {
+		if(!PyObject_TypeCheck(wi, &PyInt_Type) && !PyObject_TypeCheck(ci, &PyInt_Type) && !PyObject_TypeCheck(str, &PyString_Type) && !PyObject_TypeCheck(str, &PyInt_Type)) {
+			printMessage("GUIScript", "Syntax Error: SetText(unsigned short WindowIndex, unsigned short ControlIndex, char * string)\n", LIGHT_RED);
+			return NULL;
+		}
+		WindowIndex = PyInt_AsLong(wi);
+		ControlIndex = PyInt_AsLong(ci);
+		if(PyObject_TypeCheck(str, &PyString_Type)) {
+			string = PyString_AsString(str);
+			if(string == NULL)
+				return NULL;
+			Window * win = core->GetWindow(WindowIndex);
+			if(!win)
+				return NULL;
+			Control * ctrl = win->GetControl(ControlIndex);
+			if(!ctrl)
+				return NULL;
+			if(ctrl->ControlType != 5)
+				return NULL;
+			TextArea * ta = (TextArea*)ctrl;
+			ret = ta->AppendText(string);
+		}
+		else {
+			StrRef = PyInt_AsLong(str);
+			char * str = core->GetString(StrRef);
+			Window * win = core->GetWindow(WindowIndex);
+			if(!win)
+				return NULL;
+			Control * ctrl = win->GetControl(ControlIndex);
+			if(!ctrl)
+				return NULL;
+			if(ctrl->ControlType != 5)
+				return NULL;
+			TextArea * ta = (TextArea*)ctrl;
+			ret = ta->AppendText(str);
+			free(str);
+		}
+	}
+	else
+		return NULL;
+	
+	return Py_BuildValue("i", ret);
+}
+
 static PyObject * GemRB_SetVisible(PyObject *self, PyObject *args)
 {
 	int WindowIndex;
@@ -423,6 +474,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"SetText", GemRB_SetText, METH_VARARGS,
      "Sets the Text of a control in a Window."},
+
+	{"TextAreaAppend", GemRB_TextAreaAppend, METH_VARARGS,
+     "Appends the Text to the TextArea Control in the Window."},
 
 	{"SetVisible", GemRB_SetVisible, METH_VARARGS,
      "Sets the Visibility Flag of a Window."},
