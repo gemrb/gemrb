@@ -3,6 +3,7 @@ import GemRB
 
 
 CharGenWindow = 0
+BackButton = 0
 TextArea = 0
 PortraitButton = 0
 
@@ -66,7 +67,8 @@ AppearanceWindow = 0
 
 
 def OnLoad():
-	global CharGenWindow, TextArea, PortraitButton, GenderButton, RaceButton, ClassButton, AlignmentButton, AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
+	global CharGenWindow, TextArea, PortraitButton, GenderButton, RaceButton, ClassButton, AlignmentButton, AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton, BackButton
+
 	GemRB.LoadWindowPack("GUICG")
 	CharGenWindow = GemRB.LoadWindow(0)
 
@@ -133,6 +135,9 @@ def OnLoad():
 	GemRB.SetText(CharGenWindow, CancelButton, 13727)
 	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 
+	BackButton = GemRB.GetControl(CharGenWindow, 11)
+	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+
 	AcceptButton = GemRB.GetControl(CharGenWindow, 8)
 	GemRB.SetButtonState(CharGenWindow, AcceptButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetText(CharGenWindow, AcceptButton, 11962)
@@ -167,6 +172,7 @@ def GenderPress():
 	GemRB.SetButtonState(GenderWindow, GenderDoneButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(GenderWindow, GenderDoneButton, IE_GUI_BUTTON_ON_PRESS, "GenderDonePress")
 	GemRB.SetText(GenderWindow, GenderDoneButton, 11973)
+	GemRB.SetButtonFlags(GenderWindow, GenderDoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	GenderCancelButton = GemRB.GetControl(GenderWindow, 6)
 	GemRB.SetButtonState(GenderWindow, GenderCancelButton, IE_GUI_BUTTON_ENABLED)
@@ -239,6 +245,7 @@ def PortraitSelect():
 	GemRB.SetButtonState(PortraitWindow, PortraitDoneButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(PortraitWindow, PortraitDoneButton, IE_GUI_BUTTON_ON_PRESS, "PortraitDonePress")
 	GemRB.SetText(PortraitWindow, PortraitDoneButton, 11973)
+	GemRB.SetButtonFlags(PortraitWindow, PortraitDoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	PortraitCancelButton = GemRB.GetControl(PortraitWindow, 5)
 	GemRB.SetButtonState(PortraitWindow, PortraitCancelButton, IE_GUI_BUTTON_ENABLED)
@@ -281,6 +288,7 @@ def PortraitDonePress():
 	GemRB.SetButtonPicture(CharGenWindow, PortraitButton, GemRB.GetTableRowName(PortraitTable, Portrait) + "L")
 	GemRB.SetButtonState(CharGenWindow, GenderButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetButtonState(CharGenWindow, RaceButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "OnLoad")
 	GemRB.SetVisible(CharGenWindow, 1)
 	return
 
@@ -317,6 +325,7 @@ def RacePress():
 	GemRB.SetButtonState(RaceWindow, RaceDoneButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(RaceWindow, RaceDoneButton, IE_GUI_BUTTON_ON_PRESS, "RaceDonePress")
 	GemRB.SetText(RaceWindow, RaceDoneButton, 11973)
+	GemRB.SetButtonFlags(GenderWindow, RaceDoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	RaceCancelButton = GemRB.GetControl(RaceWindow, 10)
 	GemRB.SetButtonState(RaceWindow, RaceCancelButton, IE_GUI_BUTTON_ENABLED)
@@ -342,14 +351,22 @@ def RaceDonePress():
 	GemRB.SetButtonState(CharGenWindow, RaceButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetButtonState(CharGenWindow, ClassButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetVisible(CharGenWindow, 1)
+	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackToRacePress")
+	return
+
+def BackToRacePress():
+	GemRB.SetVar("Race", 0)
+	GemRB.SetButtonState(CharGenWindow, RaceButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(CharGenWindow, ClassButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "OnLoad")
 	return
 
 def RaceCancelPress():
 	global CharGenWindow, RaceWindow
+	GemRB.SetVar("Race", 0)
 	GemRB.UnloadWindow(RaceWindow)
 	GemRB.SetVisible(CharGenWindow, 1)
 	return
-
 
 # Class Selection
 
@@ -399,6 +416,7 @@ def ClassPress():
 	GemRB.SetButtonState(ClassWindow, ClassDoneButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(ClassWindow, ClassDoneButton, IE_GUI_BUTTON_ON_PRESS, "ClassDonePress")
 	GemRB.SetText(ClassWindow, ClassDoneButton, 11973)
+	GemRB.SetButtonFlags(GenderWindow, ClassDoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	ClassCancelButton = GemRB.GetControl(ClassWindow, 14)
 	GemRB.SetButtonState(ClassWindow, ClassCancelButton, IE_GUI_BUTTON_ENABLED)
@@ -473,6 +491,7 @@ def AlignmentPress():
 	GemRB.SetButtonState(AlignmentWindow, AlignmentDoneButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(AlignmentWindow, AlignmentDoneButton, IE_GUI_BUTTON_ON_PRESS, "AlignmentDonePress")
 	GemRB.SetText(AlignmentWindow, AlignmentDoneButton, 11973)
+	GemRB.SetButtonFlags(GenderWindow, AlignmentDoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	AlignmentCancelButton = GemRB.GetControl(AlignmentWindow, 13)
 	GemRB.SetButtonState(AlignmentWindow, AlignmentCancelButton, IE_GUI_BUTTON_ENABLED)
@@ -565,6 +584,7 @@ def AbilitiesPress():
 	GemRB.SetButtonState(AbilitiesWindow, AbilitiesDoneButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(AbilitiesWindow, AbilitiesDoneButton, IE_GUI_BUTTON_ON_PRESS, "AbilitiesDonePress")
 	GemRB.SetText(AbilitiesWindow, AbilitiesDoneButton, 11973)
+	GemRB.SetButtonFlags(GenderWindow, AbilitiesDoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	AbilitiesCancelButton = GemRB.GetControl(AbilitiesWindow, 36)
 	GemRB.SetButtonState(AbilitiesWindow, AbilitiesCancelButton, IE_GUI_BUTTON_ENABLED)
@@ -750,6 +770,7 @@ def SkillsPress():
 	GemRB.SetButtonState(ProficiencySlotsWindow, ProficiencySlotsDoneButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(ProficiencySlotsWindow, ProficiencySlotsDoneButton, IE_GUI_BUTTON_ON_PRESS, "ProficiencySlotsDonePress")
 	GemRB.SetText(ProficiencySlotsWindow, ProficiencySlotsDoneButton, 11973)
+	GemRB.SetButtonFlags(GenderWindow, ProficiencySlotsDoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	ProficiencySlotsCancelButton = GemRB.GetControl(ProficiencySlotsWindow, 77)
 	GemRB.SetButtonState(ProficiencySlotsWindow, ProficiencySlotsCancelButton, IE_GUI_BUTTON_ENABLED)
@@ -804,6 +825,7 @@ def SkillsSelect():
 	GemRB.SetButtonState(SkillsWindow, SkillsDoneButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(SkillsWindow, SkillsDoneButton, IE_GUI_BUTTON_ON_PRESS, "SkillsDonePress")
 	GemRB.SetText(SkillsWindow, SkillsDoneButton, 11973)
+	GemRB.SetButtonFlags(GenderWindow, SkillsDoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	SkillsCancelButton = GemRB.GetControl(SkillsWindow, 25)
 	GemRB.SetButtonState(SkillsWindow, SkillsCancelButton, IE_GUI_BUTTON_ENABLED)
