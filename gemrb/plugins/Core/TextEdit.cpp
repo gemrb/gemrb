@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.26 2005/03/04 23:27:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.27 2005/03/07 06:26:00 avenger_teambg Exp $
  *
  */
 
@@ -94,9 +94,11 @@ void TextEdit::SetBackGround(Sprite2D* back)
 /** Key Press Event */
 void TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
-	( ( Window * ) Owner )->Invalidate();
-	Changed = true;
 	if (Key >= 0x20) {
+		if (Value && ( (Key<'0') || (Key>'9') ) )
+			return;
+		( ( Window * ) Owner )->Invalidate();
+		Changed = true;
 		int len = ( int ) strlen( ( char* ) Buffer );
 		if (len + 1 < max) {
 			for (int i = len; i > CurPos; i--) {
@@ -106,8 +108,8 @@ void TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			Buffer[len + 1] = 0;
 			CurPos++;
 		}
+		RunEventHandler( EditOnChange );
 	}
-	RunEventHandler( EditOnChange );
 }
 /** Special Key Press */
 void TextEdit::OnSpecialKeyPress(unsigned char Key)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.12 2004/11/22 21:08:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.13 2005/03/07 06:26:00 avenger_teambg Exp $
  *
  */
 
@@ -28,7 +28,8 @@
 
 // !!! Keep these synchronized with GUIDefines.py
 #define IE_GUI_EDIT_ON_CHANGE      0x03000000
-
+//this is stored in 'Value' of Control class
+#define IE_GUI_EDIT_NUMBER         1
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
