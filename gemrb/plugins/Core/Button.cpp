@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.64 2004/06/27 23:47:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.65 2004/06/29 20:30:06 edheldil Exp $
  *
  */
 
@@ -530,6 +530,8 @@ void Button::SetPicture(Sprite2D* Picture)
 
 bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 {
-	if (Picture) return false;
+	// some buttons have hollow Image frame filled w/ Picture
+	// some buttons in BG2 are text only (if BAM == 'GUICTRL')
+	if (Picture || ! Unpressed) return false;
 	return core->GetVideoDriver()->IsSpritePixelTransparent(Unpressed, x, y);
 }
