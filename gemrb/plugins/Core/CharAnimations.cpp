@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.26 2004/01/05 16:01:40 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.27 2004/01/05 16:23:03 balrog994 Exp $
  *
  */
 
@@ -69,8 +69,6 @@ CharAnimations::~CharAnimations(void)
 								for(int i = 0; i < 16; i+=2) {
 									if(Anims[AnimID][i])
 										delete(Anims[AnimID][i]);
-									if(Anims[AnimID][i+1])
-										delete(Anims[AnimID][i+1]);
 								}
 							}
 						}
@@ -129,8 +127,6 @@ CharAnimations::~CharAnimations(void)
 								for(int i = 0; i < 16; i+=2) {
 									if(Anims[AnimID][i])
 										delete(Anims[AnimID][i]);
-									if(Anims[AnimID][i+1])
-										delete(Anims[AnimID][i+1]);
 								}
 							}
 						}
@@ -164,8 +160,6 @@ CharAnimations::~CharAnimations(void)
 								for(int i = 0; i < 16; i+=2) {
 									if(Anims[AnimID][i])
 										delete(Anims[AnimID][i]);
-									if(Anims[AnimID][i+1])
-										delete(Anims[AnimID][i+1]);
 								}
 							}
 						break;
@@ -177,10 +171,8 @@ CharAnimations::~CharAnimations(void)
 
 		case IE_ANI_PST_GHOST:
 			{
-				for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-					if(Anims[AnimID][0])
-						delete(Anims[AnimID][0]);
-				}
+				if(Anims[0][0])
+					delete(Anims[0][0]);
 			}
 		break;
 	}
