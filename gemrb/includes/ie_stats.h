@@ -1,6 +1,7 @@
 #ifndef IE_STATS_H
 #define IE_STATS_H
 
+#define IE_HITPOINTS 0
 #define IE_MAXHITPOINTS	1
 #define IE_ARMORCLASS	2
 #define IE_ACCRUSHINGMOD	3
@@ -74,7 +75,7 @@
 #define IE_ENCUMBERANCE    71
 #define IE_MISSILETHAC0BONUS      72  
 #define IE_MAGICDAMAGERESISTANCE  73
-#define IE_ RESISTPOISON      74
+#define IE_RESISTPOISON      74
 #define IE_DONOTJUMP          75
 #define IE_AURACLEANSING      76
 #define IE_MENTALSPEED        77
