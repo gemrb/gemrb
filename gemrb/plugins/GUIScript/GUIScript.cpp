@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.125 2004/02/17 18:01:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.126 2004/02/18 20:57:15 avenger_teambg Exp $
  *
  */
 
@@ -760,7 +760,7 @@ PyObject *GemRB_SetMasterScript(PyObject * /*self*/, PyObject * args)
 	char *worldmap;
 
 	if(!PyArg_ParseTuple(args, "ss", &script, &worldmap)) {
-		printMessage("GUIScript", "Syntax Error: Expected 2 ResRefs\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: SetMasterScript expects 2 ResRefs\n", LIGHT_RED);
 		return NULL;
 	}
 	strncpy(core->GlobalScript,script,8);
@@ -810,7 +810,7 @@ static PyObject * GemRB_SetNextScript(PyObject * /*self*/, PyObject *args)
 	char *funcName;
 
 	if(!PyArg_ParseTuple(args, "s", &funcName)) {
-		printMessage("GUIScript", "Syntax Error: Expected a script name\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: SetNextScript expects a script name\n", LIGHT_RED);
 		return NULL;
 	}
 
@@ -893,7 +893,7 @@ static PyObject * GemRB_InvalidateWindow(PyObject * /*self*/, PyObject *args)
 	int WindowIndex;
 
 	if(!PyArg_ParseTuple(args, "i", &WindowIndex)) {
-		printMessage("GUIScript", "Syntax Error: UnloadWindow(WindowIndex)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: InvalidateWindow(WindowIndex)\n", LIGHT_RED);
 		return NULL;
 	}
 	
