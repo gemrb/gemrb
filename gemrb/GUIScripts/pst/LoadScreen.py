@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/LoadScreen.py,v 1.2 2004/08/12 21:14:21 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/LoadScreen.py,v 1.3 2004/09/04 12:10:26 avenger_teambg Exp $
 
 # LoadScreen.py - display Loading screen
 
@@ -40,7 +40,14 @@ def StartLoadScreen ():
 	Progress = 0
 	GemRB.SetVar ("Progress", Progress)
 	GemRB.SetVarAssoc (LoadScreen, Bar, "Progress", Progress)
+	GemRB.SetEvent (LoadScreen, Bar, IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
 	Skull = GemRB.GetControl (LoadScreen, 1)
 	GemRB.SetButtonMOS (LoadScreen, Skull, "GSKULOFF")
 	GemRB.SetVisible (LoadScreen, 1)
+	return
 
+def EndLoadScreen ():
+	Skull = GemRB.GetControl (LoadScreen, 1)
+	GemRB.SetButtonMOS (LoadScreen, Skull, "GSKULON")
+	GemRB.SetVisible (LoadScreen, 1)
+	return

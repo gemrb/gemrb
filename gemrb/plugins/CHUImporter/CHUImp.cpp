@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.34 2004/08/28 14:34:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.35 2004/09/04 12:10:22 avenger_teambg Exp $
  *
  */
 
@@ -206,14 +206,17 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				{
 					char MOSFile[9], MOSFile2[9];
 					char BAMFile[9];
-					ieWord KnobStepsCount;
+					ieWord KnobXPos, KnobYPos, KnobStepsCount;
 					ieWord Cycle;
+					
 
 					str->Read( MOSFile, 8 );
 					str->Read( MOSFile2, 8 );
 					str->Read( BAMFile, 8 );
 					str->Read( &KnobStepsCount, 2 );
 					str->Read( &Cycle, 2 );
+					str->Read( &KnobXPos, 2 );
+					str->Read( &KnobYPos, 2 );
 					Progressbar* pbar = new Progressbar(KnobStepsCount, false); 
 					pbar->ControlID = ControlID;
 					pbar->XPos = XPos;
@@ -221,23 +224,33 @@ Window* CHUImp::GetWindow(unsigned int wid)
 					pbar->ControlType = ControlType;
 					pbar->Width = Width;
 					pbar->Height = Height;
+					pbar->SetSliderPos( KnobXPos, KnobYPos );
 					ImageMgr* mos = ( ImageMgr* )
 						core->GetInterface( IE_MOS_CLASS_ID );
 					DataStream* s = core->GetResourceMgr()->GetResource( MOSFile, IE_MOS_CLASS_ID );
 					mos->Open( s, true );
 					Sprite2D* img = mos->GetImage();
+
 					s = core->GetResourceMgr()->GetResource( MOSFile2, IE_MOS_CLASS_ID );
 					mos->Open( s, true );
 					Sprite2D* img2 = mos->GetImage();
 					
 					pbar->SetImage( img, img2 );
-					core->FreeInterface( mos );
-					/* getting the bam */
-					AnimationFactory* anim = ( AnimationFactory* ) core->GetResourceMgr()->GetFactoryResource( BAMFile, IE_BAM_CLASS_ID );
-					if(anim) {
-						/* Getting the Cycle of the bam */
-						pbar->SetAnimation(anim->GetCycle( ( unsigned char ) Cycle ) );
+					if( KnobStepsCount ) {
+						/* getting the bam */
+						AnimationFactory* anim = ( AnimationFactory* ) core->GetResourceMgr()->GetFactoryResource( BAMFile, IE_BAM_CLASS_ID );
+						if(anim) {
+							/* Getting the Cycle of the bam */
+							pbar->SetAnimation(anim->GetCycle( ( unsigned char ) Cycle ) );
+						}
 					}
+					else {
+						s = core->GetResourceMgr()->GetResource( MOSFile2, IE_MOS_CLASS_ID );
+						mos->Open( s, true );
+						Sprite2D* img3 = mos->GetImage();
+						pbar->SetBarCap( img3 );
+					}
+					core->FreeInterface( mos );
 					win->AddControl( pbar );
 				}
 				break;

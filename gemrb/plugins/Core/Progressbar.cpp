@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.7 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.8 2004/09/04 12:10:23 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,7 @@ Progressbar::Progressbar( unsigned short KnobStepsCount, bool Clear)
 	this->Clear = Clear;
 	this->KnobStepsCount = KnobStepsCount;
 	PBarAnim = NULL;
+	KnobXPos = KnobYPos = 0;
 }
 
 Progressbar::~Progressbar()
@@ -50,7 +51,7 @@ Progressbar::~Progressbar()
 /** Draws the Control on the Output Display */
 void Progressbar::Draw(unsigned short x, unsigned short y)
 {
-
+	//it is unlikely that a floating window is above us, but...
 	if (!Changed && !((Window*)Owner)->Floating) {
 		return;
 	}
@@ -60,31 +61,44 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 	}
 	Sprite2D *bcksprite;
 
-	if(Value >= 100) bcksprite=BackGround2;
-	else bcksprite=BackGround;
+	if((Value >= 100) && KnobStepsCount) {
+		bcksprite=BackGround2; //animated progbar end stage
+	}
+	else {
+		bcksprite=BackGround;
+	}
 	if (bcksprite) {
 		Region r( x + XPos, y + YPos, Width, Height );
 		core->GetVideoDriver()->BlitSprite( bcksprite,
-			x + XPos, y + YPos, true, &r );
+			x + XPos, y + YPos, false, &r );
+		if( bcksprite==BackGround2) {
+			return; //done for animated progbar
+		}
 	}
-	if(!PBarAnim || (Value>=100) )
-		return;
 
 	unsigned int Count;
 
 	if(!KnobStepsCount) {
+		//linear progressbar (pst, iwd)
+		int w = BackGround2->Width;
+		int h = BackGround2->Height;
 		//this is the PST/IWD specific part
-		Count = Value*Width/100;
-		Region r( x + XPos, y + YPos, Count, Height );
+		Count = Value*w/100;
+		Region r( x + XPos + KnobXPos, y + YPos + KnobYPos, Count, h );
 		core->GetVideoDriver()->BlitSprite( BackGround2, 
-			x + XPos, y + YPos, true, &r );
+			r.x, r.y, true, &r );
+		printf("Count: %d Width: %d  Height: %d\n", Count, w, h);
+		printf("x: %d  y: %d\n", r.x, r.y);
+		core->GetVideoDriver()->BlitSprite( PBarCap,
+			r.x+Count, (int) r.y );
 		return;
 	}
-	//blitting all the sprites
+
+	//animated progressbar (bg2)
 	Count=Value*KnobStepsCount/100;
 	for(unsigned int i=0; i<Count ;i++ ) {
 		Sprite2D *Knob = PBarAnim->GetFrame(i);
-		core->GetVideoDriver()->BlitSprite( Knob, x , y , true );
+		core->GetVideoDriver()->BlitSprite( Knob, x , y , false );
 	}
 }
 
@@ -98,16 +112,20 @@ unsigned int Progressbar::GetPosition()
 void Progressbar::SetPosition(unsigned int pos)
 {
 	if(pos>100) pos=100;
+	if (Value == pos)
+		return;
 	Value = pos;
 	Changed = true;
 }
 
 void Progressbar::RedrawProgressbar(char* VariableName, int Sum)
 {
-        if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
-                return;
-        }
+	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
+		return;
+	}
 	SetPosition((unsigned int) Sum);
+	if((Value==100) && Changed)
+		RunEventHandler( EndReached );
 }
 
 /** Sets the selected image */
@@ -122,14 +140,25 @@ void Progressbar::SetImage(Sprite2D* img, Sprite2D* img2)
 	Changed = true;
 }
 
+void Progressbar::SetBarCap(Sprite2D* img3)
+{
+	PBarCap = img3;
+}
+
 void Progressbar::SetAnimation(Animation *arg)
 {
 	PBarAnim = arg;
 }
 
+void Progressbar::SetSliderPos(int x, int y)
+{
+	KnobXPos=x;
+	KnobYPos=y;
+}
+
 /* dummy virtual function */
 int Progressbar::SetText(const char* /*string*/, int /*pos*/)
 {
-        return 0;
+	return 0;
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.212 2004/08/29 09:43:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.213 2004/09/04 12:10:23 avenger_teambg Exp $
  *
  */
 
@@ -1478,6 +1478,16 @@ int Interface::SetEvent(unsigned short WindowIndex,
 			}
 			break;
 
+		case IE_GUI_PROGRESSBAR:
+			//Progressbar
+			 {
+				Progressbar* te = ( Progressbar* ) ctrl;
+				strncpy( te->EndReached, funcName, sizeof(EventHandler) );
+				return 0;
+			}
+			break;
+
+
 		case IE_GUI_TEXTAREA:
 			//TextArea
 			 {
@@ -2134,10 +2144,8 @@ void Interface::LoadGame(int index)
 	game = new_game;
 	worldmap = new_worldmap;
 
-	LoadProgress(50);  //setting it up to 100 (halfway)
+	LoadProgress(100);
 	return;
-
-	LoadProgress(100); //dropping the screen
  cleanup:
 	// Something went wrong, so try to clean after itself
 	if (new_game)
@@ -2307,6 +2315,7 @@ void Interface::LoadProgress(int percent)
 {
 	vars->SetAt("Progress", percent);
 	RedrawControls("Progress", percent);
+	RedrawAll();
 	DrawWindows();
 	core->GetVideoDriver()->SwapBuffers();
 }
