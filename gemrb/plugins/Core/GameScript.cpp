@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.81 2004/02/29 22:39:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.82 2004/03/07 10:55:10 avenger_teambg Exp $
  *
  */
 
@@ -1098,16 +1098,14 @@ Action* GameScript::GenerateAction(char* String)
 
 						case 'p':
 							//Point
-							while(( *str != ',' ) && ( *str != ')' ))
+							while(( *str != '.' ) && ( *str != ')' ))
 								str++;
 							src++; //Skip [
 							newAction->XpointParameter = atoi( src );
-							while( *src!=',' && *src!=']')
+							while( *src!='.' && *src!=']')
 								src++;
 							src++; //Skip .
 							newAction->YpointParameter = atoi( src );
-							while( *src!=',' && *src!=']')
-								src++;
 							src++; //Skip ]
 							break;
 
@@ -3086,7 +3084,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 	} else {
 		Sender->AddActionInFront( Sender->CurrentAction );
 		char Tmp[256];
-		sprintf( Tmp, "MoveToPoint([%d,%d])", p->x, p->y );
+		sprintf( Tmp, "MoveToPoint([%d.%d])", p->x, p->y );
 		actor->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
 	}
 	Sender->CurrentAction = NULL;
@@ -3118,7 +3116,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 	} else {
 		Sender->AddActionInFront( Sender->CurrentAction );
 		char Tmp[256];
-		sprintf( Tmp, "MoveToPoint([%d,%d])", p->x, p->y );
+		sprintf( Tmp, "MoveToPoint([%d.%d])", p->x, p->y );
 		actor->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
 	}
 	Sender->CurrentAction = NULL;

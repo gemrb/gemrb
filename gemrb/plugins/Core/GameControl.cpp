@@ -624,7 +624,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 							actor->ClearPath();
 							actor->ClearActions();
 							char Tmp[256];
-							sprintf( Tmp, "MoveToPoint([%d,%d])",
+							sprintf( Tmp, "MoveToPoint([%d.%d])",
 								overInfoPoint->XPos, overInfoPoint->YPos );
 							actor->AddAction( GameScript::CreateAction( Tmp,
 												true ) );
@@ -640,22 +640,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 				sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
 				//GameScript::ExecuteString(actor, Tmp);
 				actor->AddAction( GameScript::CreateAction( Tmp, true ) );
-				unsigned long WinIndex, TAIndex;
-				core->GetDictionary()->Lookup( "MessageWindow", WinIndex );
-				if (( WinIndex != -1 ) &&
-					( core->GetDictionary()->Lookup( "MessageTextArea",
-												TAIndex ) )) {
-					Window* win = core->GetWindow( WinIndex );
-					if (win) {
-						TextArea* ta = ( TextArea* )
-							win->GetControl( TAIndex );
-						char Text[256];
-						sprintf( Text,
-							"[color=FF0000]%s: [/color]MoveToPoint(%d,%d)",
-							actor->LongName, GameX, GameY );
-						ta->AppendText( Text, -1 );
-					}
-				}
+				DisplayString("EZ AZ");
+				DisplayString(Tmp);
 			}
 		}
 		for (size_t i = 0; i < selected.size(); i++)
