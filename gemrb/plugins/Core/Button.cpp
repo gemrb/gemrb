@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.54 2004/03/20 23:02:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.55 2004/03/21 11:17:56 edheldil Exp $
  *
  */
 
@@ -67,7 +67,7 @@ Button::Button(bool Clear)
 		palette[i].g = ( palette[i].g * 2 ) / 3;
 		palette[i].b = ( palette[i].b * 2 ) / 3;
 	}
-	Flags = 0x4;
+	Flags = IE_GUI_BUTTON_NORMAL;
 	ToggleState = false;
 	Picture = NULL;
 	//MOS Draggable Stuff
@@ -153,73 +153,76 @@ void Button::Draw(unsigned short x, unsigned short y)
 	if (XPos == 65535) {
 		return;
 	}
-	if (!( Flags & 0x1 )) {
-		Color* ppoi = NULL;
-		int align = 0;
 
-		if (Flags & 0x100)
-			align |= IE_FONT_ALIGN_LEFT;
-		else if (Flags & 0x200)
-			align |= IE_FONT_ALIGN_RIGHT;
-		else
-			align |= IE_FONT_ALIGN_CENTER;
-		if (Flags & 0x400)
-			align |= IE_FONT_ALIGN_TOP;
-		else
-			align |= IE_FONT_ALIGN_MIDDLE;
+	// Button image
+	if (!( Flags & IE_GUI_BUTTON_NO_IMAGE )) {
+		Sprite2D* Image = NULL;
+
 		switch (State) {
 			case IE_GUI_BUTTON_UNPRESSED:
-				 {
-					if (Unpressed)
-						core->GetVideoDriver()->BlitSprite( Unpressed,
-													x + XPos, y + YPos, true );
-				}
+				Image = Unpressed;
 				break;
 
 			case IE_GUI_BUTTON_PRESSED:
-				 {
-					if (Pressed)
-						core->GetVideoDriver()->BlitSprite( Pressed, x + XPos,
-													y + YPos, true );
-					//shift the writing a bit
-					x += 2;
-					y += 2;
-				}	
+				Image = Pressed;
 				break;
 
 			case IE_GUI_BUTTON_SELECTED:
-				 {
-					if (Selected)
-						core->GetVideoDriver()->BlitSprite( Selected,
-													x + XPos, y + YPos, true );
-					else if (Unpressed)
-						core->GetVideoDriver()->BlitSprite( Unpressed,
-													x + XPos, y + YPos, true );
-					x += 2;
-					y += 2;
-				}
+				Image = Selected;
+				if (! Image)
+					Image = Unpressed;
 				break;
 
 			case IE_GUI_BUTTON_DISABLED:
-				 {
-					if (Disabled) {
-						core->GetVideoDriver()->BlitSprite( Disabled,
-													x + XPos, y + YPos, true );
-					} else if (Unpressed) {
-						core->GetVideoDriver()->BlitSprite( Unpressed,
-													x + XPos, y + YPos, true );
-					}
-					ppoi = palette;
-				}
+				Image = Disabled;
+				if (! Image)
+					Image = Unpressed;
 				break;
 		}
-		if (hasText)
-			font->Print( Region( x + XPos, y + YPos, Width, Height ),
-					( unsigned char * ) Text, ppoi,
-					align | IE_FONT_SINGLE_LINE, true );
+		if (Image) {
+			// FIXME: maybe it's useless...
+			short xOffs = ( Width / 2 ) - ( Image->Width / 2 );
+			short yOffs = ( Height / 2 ) - ( Image->Height / 2 );
+
+			core->GetVideoDriver()->BlitSprite( Image, x + XPos + xOffs, y + YPos + yOffs, true );
+		}
 	}
-	if (Picture && ( Flags & 0x2 )) {
-		if (Flags & 0x80) {
+
+	// Button label
+	if (hasText && ! ( Flags & IE_GUI_BUTTON_NO_TEXT )) {
+		Color* ppoi = NULL;
+		int align = 0;
+
+		if (State == IE_GUI_BUTTON_DISABLED)
+			ppoi = palette;
+		// FIXME: hopefully there's no button which sunks when selected
+		//   AND has text label
+		//else if (State == IE_GUI_BUTTON_PRESSED || State == IE_GUI_BUTTON_SELECTED) {
+		else if (State == IE_GUI_BUTTON_PRESSED) {
+			//shift the writing a bit
+			x += 2;
+			y += 2;
+		}
+
+		if (Flags & IE_GUI_BUTTON_ALIGN_LEFT)
+			align |= IE_FONT_ALIGN_LEFT;
+		else if (Flags & IE_GUI_BUTTON_ALIGN_RIGHT)
+			align |= IE_FONT_ALIGN_RIGHT;
+		else
+			align |= IE_FONT_ALIGN_CENTER;
+		if (Flags & IE_GUI_BUTTON_ALIGN_TOP)
+			align |= IE_FONT_ALIGN_TOP;
+		else
+			align |= IE_FONT_ALIGN_MIDDLE;
+
+		font->Print( Region( x + XPos, y + YPos, Width, Height ),
+			     ( unsigned char * ) Text, ppoi,
+			     align | IE_FONT_SINGLE_LINE, true );
+	}
+
+	// Button picture
+	if (Picture && ( Flags & IE_GUI_BUTTON_PICTURE )) {
+		if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
 			Region r( XPos, YPos, Width, Height );
 			core->GetVideoDriver()->BlitSprite( Picture, XPos + ScrollX,
 										YPos + ScrollY, true, &r );
@@ -234,7 +237,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 /** Sets the Button State */
 void Button::SetState(unsigned char state)
 {
-	if (state > 3) // If wrong value inserted
+	if (state > IE_GUI_BUTTON_DISABLED) // If wrong value inserted
 	{
 		return;
 	}
@@ -249,7 +252,7 @@ void Button::OnSpecialKeyPress(unsigned char Key)
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
-	if (Flags & 0x40) {
+	if (Flags & IE_GUI_BUTTON_DEFAULT) {
 		if (Key == GEM_RETURN) {
 			if (ButtonOnPress[0] != 0) {
 				core->GetGUIScriptEngine()->RunFunction( ButtonOnPress );
@@ -267,10 +270,10 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		if (State != IE_GUI_BUTTON_DISABLED) {
 			State = IE_GUI_BUTTON_PRESSED;
 			Changed = true;
-			if (Flags & 0x04) {
+			if (Flags & IE_GUI_BUTTON_SOUND) {
 				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_PRESSED] );
 			}
-			if (Flags & 0x80) {
+			if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
 				Dragging = true;
 				DragX = x;
 				DragY = y;
@@ -285,7 +288,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
-	if (Flags & 0x80) {
+	if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
 		Dragging = false;
 	}
 	if (State == IE_GUI_BUTTON_PRESSED) {
@@ -296,7 +299,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 		}
 	}
 	if (( x <= Width ) && ( y <= Height )) {
-		if (Flags & 0x10) {
+		if (Flags & IE_GUI_BUTTON_CHECKBOX) {
 			//checkbox
 			ToggleState = !ToggleState;
 			if (ToggleState)
@@ -308,7 +311,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 				core->GetDictionary()->Lookup( VarName, tmp );
 				core->GetDictionary()->SetAt( VarName, tmp ^ Value );
 			}
-		} else if (Flags & 0x20) {
+		} else if (Flags & IE_GUI_BUTTON_RADIOBUTTON) {
 			//radio button
 			ToggleState = true;
 			SetState( IE_GUI_BUTTON_SELECTED );
@@ -320,8 +323,8 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 			if (VarName[0] != 0)
 				core->GetDictionary()->SetAt( VarName, Value );
 		}
-		if (Flags & 0x04) {
-			if (Flags & 0x08)
+		if (Flags & IE_GUI_BUTTON_SOUND) {
+			if (Flags & IE_GUI_BUTTON_ALT_SOUND)
 				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_RELEASE1] );
 			else
 				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_RELEASE0] );
@@ -352,7 +355,7 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 			ScrollY = 0;
 		Changed = true;
 	}
-	if (Flags & 0x80) {
+	if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
 		( ( Window * ) Owner )->Cursor = 44;
 	} else {
 		( ( Window * ) Owner )->Cursor = 0;
@@ -421,10 +424,10 @@ void Button::RedrawButton(char* VariableName, int Sum)
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
-	if (Flags & 0x20) {
+	if (Flags & IE_GUI_BUTTON_RADIOBUTTON) {
 		ToggleState = ( Sum == Value );
 	}   	//radio button, exact value
-	else if (Flags & 0x10) {
+	else if (Flags & IE_GUI_BUTTON_CHECKBOX) {
 		ToggleState = !!( Sum & Value );
 	} //checkbox, bitvalue
 	else {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.22 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.23 2004/03/21 11:17:56 edheldil Exp $
  *
  */
 
@@ -31,6 +31,25 @@
 #define IE_GUI_BUTTON_PRESSED   1
 #define IE_GUI_BUTTON_SELECTED  2
 #define IE_GUI_BUTTON_DISABLED  3
+
+// NOTE: keep these synchronized with GUIDefines.py!!!
+#define IE_GUI_BUTTON_NO_IMAGE     0x00000001   // don't draw image (BAM)
+#define IE_GUI_BUTTON_PICTURE      0x00000002   // draw picture (BMP, MOS, ...)
+#define IE_GUI_BUTTON_SOUND        0x00000004
+#define IE_GUI_BUTTON_ALT_SOUND    0x00000008
+#define IE_GUI_BUTTON_CHECKBOX     0x00000010   // or radio button
+#define IE_GUI_BUTTON_RADIOBUTTON  0x00000020   // sticks in a state
+#define IE_GUI_BUTTON_DEFAULT      0x00000040   // enter button triggers it
+#define IE_GUI_BUTTON_DRAGGABLE    0x00000080
+#define IE_GUI_BUTTON_ANIMATED     0x00000100
+#define IE_GUI_BUTTON_NO_TEXT      0x00000200   // don't draw button label
+
+#define IE_GUI_BUTTON_ALIGN_LEFT   0x00000400
+#define IE_GUI_BUTTON_ALIGN_RIGHT  0x00000800
+#define IE_GUI_BUTTON_ALIGN_TOP    0x00001000
+
+#define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
+
 
 #define OP_SET  0  //set
 #define OP_OR   1  //turn on
