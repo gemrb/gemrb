@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.36 2004/01/05 15:57:43 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.37 2004/01/05 18:33:39 doc_wagon Exp $
  *
  */
 
@@ -1181,7 +1181,7 @@ int GameScript::Range(Scriptable * Sender, Trigger * parameters)
 	printf("x1 = %d, y1 = %d\nx2 = %d, y2 = %d\n", target->XPos, target->YPos, Sender->XPos, Sender->YPos);
 	long x = (target->XPos - Sender->XPos);
 	long y = (target->YPos - Sender->YPos);
-	double distance = sqrt((x*x)+(y*y));
+	double distance = sqrt((double)(x*x+y*y));
 	printf("Distance = %.3f\n", distance);
 	if(distance <= (parameters->int0Parameter*20)) {
 		return 1;
@@ -1765,10 +1765,10 @@ Point* FindNearPoint(Actor* Sender, Point *p1, Point *p2, double &distance)
 {
 	long x1 = (Sender->XPos - p1->x);
 	long y1 = (Sender->YPos - p1->y);
-	double distance1 = sqrt((x1*x1)+(y1*y1));
+	double distance1 = sqrt((double)(x1*x1+y1*y1));
 	long x2 = (Sender->XPos - p2->x);
 	long y2 = (Sender->YPos - p2->y);
-	double distance2 = sqrt((x2*x2)+(y2*y2));
+	double distance2 = sqrt((double)(x2*x2+y2*y2));
 	if(distance1 < distance2) {
 		distance = distance1;
 		return p1;
