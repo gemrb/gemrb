@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.30 2004/11/21 16:12:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.31 2004/12/09 21:59:39 avenger_teambg Exp $
  *
  */
 
@@ -40,8 +40,10 @@ Control::Control()
 
 Control::~Control()
 {
-	if (Tooltip)
+	core->DisplayTooltip( 0, 0, NULL );
+	if (Tooltip) {
 		free (Tooltip);
+	}
 }
 
 /** Sets the Tooltip text of the current control */
