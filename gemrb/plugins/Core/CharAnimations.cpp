@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.24 2003/12/19 20:20:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.25 2003/12/19 22:47:53 avenger_teambg Exp $
  *
  */
 
@@ -113,6 +113,9 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 	Animation * a = anim->GetAnimation(Cycle, 0, 0, IE_NORMAL);
 	a->pos = 0;
 	core->FreeInterface(anim);
+	if(AnimID==IE_ANI_SLEEP) {
+					a->playOnce = true;
+	}
 	switch(MirrorType) {
 		case IE_ANI_CODE_MIRROR:
 			{

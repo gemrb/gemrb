@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.10 2003/12/15 22:39:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.11 2003/12/19 22:47:53 avenger_teambg Exp $
  *
  */
 
@@ -34,8 +34,6 @@ Animation::Animation(unsigned short * frames, int count)
 {
 	for(int i = 0; i < count; i++)
 		indices.push_back(frames[i]);
-	//pos = 0;
-	//startpos = rand()%count;
 	pos = rand()%count;
 	starttime = 0;
 	x = 0;
@@ -49,6 +47,7 @@ Animation::Animation(unsigned short * frames, int count)
 	nextAnimID = 0;
 	pastLastFrame = false;
 	playReversed = false;
+	playOnce = false;
 }
 
 Animation::~Animation(void)
@@ -106,24 +105,20 @@ Sprite2D * Animation::NextFrame(void)
 			}
 		}
 	}
+	if(pastLastFrame && playOnce)
+		return ret;
 #ifdef WIN32
 	unsigned long time = GetTickCount();
-	//pos = (((GetTickCount() - starttime) % (132*indices.size())) / 132);
 #else
 	struct timeval tv;
 	unsigned long time;
 	gettimeofday(&tv, NULL);
 	time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
-	//pos = (((time - starttime) % (132*indices.size())) / 132);
-	/*pos++;
-	if(pos >= indices.size())
-	pos = 0;*/
 #endif
 	if((time - starttime) >= (unsigned long)(1000/fps)) {
 		pos++;
 		starttime = time;
 	}
-	//pos += startpos;
 	pos %= frames.size();
 	if(pos == (frames.size()-1))
 		pastLastFrame = true;
