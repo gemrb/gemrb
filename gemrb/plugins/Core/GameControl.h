@@ -33,6 +33,7 @@ public:
 	}
 private:
 	Map * area;
+	Actor * lastActor;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

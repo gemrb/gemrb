@@ -8,6 +8,7 @@ GameControl::GameControl(void)
 {
 	area = NULL;
 	Changed = true;
+	lastActor = NULL;
 }
 
 GameControl::~GameControl(void)
@@ -50,9 +51,14 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	unsigned short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	Actor * actor = area->GetActor(GameX, GameY);
-	if(!actor)
+	if(lastActor)
+		lastActor->anims->DrawCircle = false;
+	if(!actor) {
+		lastActor = NULL;
 		return;
-	printf("Mouse Over: %s\n", actor->LongName);
+	}
+	lastActor = actor;
+	lastActor->anims->DrawCircle = true;
 }
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
