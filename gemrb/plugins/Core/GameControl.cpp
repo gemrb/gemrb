@@ -47,7 +47,12 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 /** Mouse Over Event */
 void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 {
-	printf("MouseMove\n");
+	unsigned short GameX = x, GameY = y;
+	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
+	Actor * actor = area->GetActor(GameX, GameY);
+	if(!actor)
+		return;
+	printf("Mouse Over: %s\n", actor->LongName);
 }
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
