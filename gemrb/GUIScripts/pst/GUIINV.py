@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.8 2004/06/27 19:30:07 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.9 2004/07/25 13:37:47 edheldil Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -114,6 +114,7 @@ def OpenInventoryWindow ():
 
 	# encumbrance
 	Button = GemRB.GetControl (Window, 46);
+	GemRB.SetButtonFont (Window, Button, "NUMBER")
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
 	# armor class
@@ -177,7 +178,7 @@ def UpdateInventoryWindow ():
 
 	# encumbrance
 	Button = GemRB.GetControl (Window, 46);
-	GemRB.SetText (Window, Button, "0\n66lb")
+	GemRB.SetText (Window, Button, "\001\n\n\n\n\007\007\007\013")
 
 	# armor class
 	ac = GemRB.GetPlayerStat (pc, ie_stats.IE_ARMORCLASS)
