@@ -69,7 +69,7 @@ def OnLoad():
 	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_DISABLED)
 
 	CancelButton = GemRB.GetControl(CharGenWindow, 15)
-	GemRB.SetText(CharGenWindow, CancelButton, 8159)
+	GemRB.SetText(CharGenWindow, CancelButton, 13727)
 	GemRB.SetButtonState(CharGenWindow,CancelButton,IE_GUI_BUTTON_ENABLED)
 
 	TextAreaControl= GemRB.GetControl(CharGenWindow,9)
