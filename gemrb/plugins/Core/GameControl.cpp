@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.166 2004/08/23 18:02:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.167 2004/08/23 19:39:42 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -619,17 +619,17 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentMap( );
 
-	switch (area->GetBlocked( GameX, GameY ) & 3) {
+	switch (area->GetBlocked( GameX, GameY ) & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL)) {
 		case 0:
 			nextCursor = 6;
 			break;
 
-		case 1:
+		case PATH_MAP_PASSABLE:
 			nextCursor = 4;
 			break;
 
-		case 2:
-		case 3:
+		case PATH_MAP_TRAVEL:
+		case PATH_MAP_PASSABLE|PATH_MAP_TRAVEL:
 			nextCursor = 34;
 			break;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.110 2004/08/22 22:10:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.111 2004/08/23 19:39:42 avenger_teambg Exp $
  *
  */
 
@@ -797,7 +797,7 @@ void Map::SetupNode(unsigned int x, unsigned int y, unsigned int Cost)
 	if (MapSet[pos]) {
 		return;
 	}
-	if (!( Passable[SearchMap->GetPixelIndex( x, y )] & 3 )) {
+	if (!( Passable[SearchMap->GetPixelIndex( x, y )] & PATH_MAP_PASSABLE)) {
 		MapSet[pos] = 65535;
 		return;
 	}
@@ -827,14 +827,14 @@ void Map::AdjustPosition(unsigned int& goalX, unsigned int& goalY, unsigned int 
 
 		for (unsigned int scanx = minx; scanx < maxx; scanx++) {
 			if (goalY >= radius) {
-				if (Passable[SearchMap->GetPixelIndex( scanx, goalY - radius )] & 3) {
+				if (Passable[SearchMap->GetPixelIndex( scanx, goalY - radius )] & PATH_MAP_PASSABLE) {
 					goalX = scanx;
 					goalY -= radius;
 					return;
 				}
 			}
 			if (goalY + radius < Height) {
-				if (Passable[SearchMap->GetPixelIndex( scanx, goalY + radius )] & 3) {
+				if (Passable[SearchMap->GetPixelIndex( scanx, goalY + radius )] & PATH_MAP_PASSABLE) {
 					goalX = scanx;
 					goalY += radius;
 					return;
@@ -849,14 +849,14 @@ void Map::AdjustPosition(unsigned int& goalX, unsigned int& goalY, unsigned int 
 			maxy = Height;
 		for (unsigned int scany = miny; scany < maxy; scany++) {
 			if (goalX >= radius) {
-				if (Passable[SearchMap->GetPixelIndex( goalX - radius, scany )] & 3) {
+				if (Passable[SearchMap->GetPixelIndex( goalX - radius, scany )] & PATH_MAP_PASSABLE) {
 					goalX -= radius;
 					goalY = scany;
 					return;
 				}
 			}
 			if (goalX + radius < Width) {
-				if (Passable[SearchMap->GetPixelIndex( goalX - radius, scany )] & 3) {
+				if (Passable[SearchMap->GetPixelIndex( goalX - radius, scany )] & PATH_MAP_PASSABLE) {
 					goalX += radius;
 					goalY = scany;
 					return;
@@ -877,7 +877,7 @@ PathNode* Map::RunAway(short sX, short sY, short dX, short dY, unsigned int Path
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[SearchMap->GetPixelIndex( startX, startY )] & 3 )) {
+	if (!( Passable[SearchMap->GetPixelIndex( startX, startY )] & PATH_MAP_PASSABLE )) {
 		AdjustPosition( startX, startY );
 	}
 	unsigned int pos = ( startX << 16 ) | startY;
@@ -974,10 +974,10 @@ bool Map::TargetUnreachable(short sX, short sY, short dX, short dY)
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[SearchMap->GetPixelIndex( goalX, goalY )] & 3 )) {
+	if (!( Passable[SearchMap->GetPixelIndex( goalX, goalY )] & PATH_MAP_PASSABLE )) {
 		return true;
 	}
-	if (!( Passable[SearchMap->GetPixelIndex( startX, startY )] & 3 )) {
+	if (!( Passable[SearchMap->GetPixelIndex( startX, startY )] & PATH_MAP_PASSABLE )) {
 		return true;
 	}
 
@@ -1012,7 +1012,7 @@ PathNode* Map::FindPath(short sX, short sY, short dX, short dY)
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[SearchMap->GetPixelIndex( goalX, goalY )] & 3 )) {
+	if (!( Passable[SearchMap->GetPixelIndex( goalX, goalY )] & PATH_MAP_PASSABLE )) {
 		AdjustPosition( goalX, goalY );
 	}
 	unsigned int pos = ( goalX << 16 ) | goalY;
@@ -1128,12 +1128,12 @@ bool Map::IsVisible(short sX, short sY, short dX, short dY)
 		double elevationy = fabs((double)diffx ) / diffy;
 		if (sX > dX) {
 			for (int startx = sX; startx > dX; startx--) {
-				if (Passable[SearchMap->GetPixelIndex( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) )] & 4)
+				if (Passable[SearchMap->GetPixelIndex( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) )] & PATH_MAP_NO_SEE)
 					return false;
 			}
 		} else {
 			for (int startx = sX; startx < dX; sX++) {
-				if (Passable[SearchMap->GetPixelIndex( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) )] & 4)
+				if (Passable[SearchMap->GetPixelIndex( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) )] & PATH_MAP_NO_SEE)
 					return false;
 			}
 		}
@@ -1141,12 +1141,12 @@ bool Map::IsVisible(short sX, short sY, short dX, short dY)
 		double elevationx = fabs((double)diffy ) / diffx;
 		if (sY > dY) {
 			for (int starty = sY; starty > dY; starty--) {
-				if (Passable[SearchMap->GetPixelIndex( sX - ( int ) ( ( sY - starty ) / elevationx ), starty )] & 4)
+				if (Passable[SearchMap->GetPixelIndex( sX - ( int ) ( ( sY - starty ) / elevationx ), starty )] & PATH_MAP_NO_SEE)
 					return false;
 			}
 		} else {
 			for (int starty = sY; starty < dY; starty++) {
-				if (Passable[SearchMap->GetPixelIndex( sX + ( int ) ( ( sY - starty ) / elevationx ), starty )] & 4)
+				if (Passable[SearchMap->GetPixelIndex( sX + ( int ) ( ( sY - starty ) / elevationx ), starty )] & PATH_MAP_NO_SEE)
 					return false;
 			}
 		}

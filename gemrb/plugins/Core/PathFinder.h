@@ -13,6 +13,12 @@
 #define GEM_EXPORT
 #endif
 
+//searchmap conversion bits
+
+#define PATH_MAP_PASSABLE 1   
+#define PATH_MAP_TRAVEL   2
+#define PATH_MAP_NO_SEE   4
+
 struct PathNode {
 	PathNode* Parent;
 	PathNode* Next;
