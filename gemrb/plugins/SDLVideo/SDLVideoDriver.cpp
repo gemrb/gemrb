@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.34 2003/11/30 00:36:55 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.35 2003/11/30 09:44:55 avenger_teambg Exp $
  *
  */
 
@@ -877,6 +877,8 @@ Sprite2D * SDLVideoDriver::PrecalculatePolygon(Point * points, int count, Color 
 
 void SDLVideoDriver::DrawPolyline(Gem_Polygon * poly, Color &color, bool fill)
 {
+	if(!poly->count)
+		return;
 	if(fill) {
 		if(!poly->fill) {
 			poly->fill = PrecalculatePolygon(poly->points, poly->count, color);
