@@ -493,11 +493,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 			Door * door = area->tm->GetDoor(GameX, GameY);
 			if(door) {
 				if(door->DoorClosed) {
+					actor->ClearPath();
 					actor->ClearActions();
 					char Tmp[256];
 					sprintf(Tmp, "OpenDoor(\"%s\")", door->Name);
 					actor->AddAction(GameScript::CreateAction(Tmp, true));
 				} else {
+					actor->ClearPath();
 					actor->ClearActions();
 					char Tmp[256];
 					sprintf(Tmp, "CloseDoor(\"%s\")", door->Name);
@@ -528,6 +530,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 
 					case ST_TRAVEL:
 						{
+							actor->ClearPath();
 							actor->ClearActions();
 							char Tmp[256];
 							sprintf(Tmp, "MoveToPoint([%d,%d])", overInfoPoint->XPos, overInfoPoint->YPos);
@@ -538,6 +541,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 			}
 			if(!overInfoPoint || (overInfoPoint->Type != ST_TRIGGER)) {
 				//actor->WalkTo(GameX, GameY);
+				actor->ClearPath();
 				actor->ClearActions();
 				char Tmp[256];
 				sprintf(Tmp, "MoveToPoint([%d.%d])", GameX, GameY);
@@ -1046,8 +1050,8 @@ void GameControl::ChangeMap()
 			textcolor(YELLOW);
 			printf("WARNING!!! %s EntryPoint does not Exists\n", EntranceName);
 			textcolor(WHITE);
-			XPos = pc->XPos/16;
-			YPos = pc->YPos/12;
+			XPos = map->tm->XCellCount*4;
+			YPos = (map->tm->YCellCount*64)/12;
 		} else {
 			XPos = ent->XPos/16; 
 			YPos = ent->YPos/12;
