@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.12 2003/12/30 17:54:51 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.13 2004/01/11 16:15:56 balrog994 Exp $
  *
  */
 
@@ -32,8 +32,11 @@ extern Interface * core;
 
 Animation::Animation(unsigned short * frames, int count)
 {
-	for(int i = 0; i < count; i++)
-		indices.push_back(frames[i]);
+	indices = new unsigned short[count];
+	indicesCount = count;
+	memcpy(indices, frames, count*sizeof(unsigned short));
+	//for(int i = 0; i < count; i++)
+	//	indices.push_back(frames[i]);
 	pos = rand()%count;
 	starttime = 0;
 	x = 0;
@@ -54,6 +57,7 @@ Animation::Animation(unsigned short * frames, int count)
 
 Animation::~Animation(void)
 {
+	delete(indices);
 	if(!free)
 		return;
 	for(unsigned int i = 0; i < frames.size(); i++) {
