@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.1 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.2 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -65,12 +65,12 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = i386-linux
-build_triplet = i386-pc-linux-gnu
-host_alias = i386-linux
-host_triplet = i386-pc-linux-gnu
-target_alias = i386-linux
-target_triplet = i386-pc-linux-gnu
+build_alias = i686-pc-linux-gnu
+build_triplet = i686-pc-linux-gnu
+host_alias = i686-pc-linux-gnu
+host_triplet = i686-pc-linux-gnu
+target_alias = i686-pc-linux-gnu
+target_triplet = i686-pc-linux-gnu
 ARTSCCONFIG = @ARTSCCONFIG@
 AS = @AS@
 AUTODIRS = 
@@ -160,8 +160,8 @@ MICO_INCLUDES = @MICO_INCLUDES@
 MICO_LDFLAGS = @MICO_LDFLAGS@
 MOC = @MOC@
 MSGFMT = @MSGFMT@
-NOOPT_CFLAGS =  -ansi -W -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -g
-NOOPT_CXXFLAGS =  -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -g3 -Wall -fno-exceptions -fno-check-new
+NOOPT_CFLAGS = 
+NOOPT_CXXFLAGS =  -fno-exceptions -fno-check-new
 NOREPO = -fno-repo
 OBJDUMP = @OBJDUMP@
 OBJEXT = o
@@ -188,7 +188,7 @@ USE_EXCEPTIONS = -fexceptions
 USE_RTTI = 
 USE_THREADS = @USE_THREADS@
 VERSION = 0.1
-WOVERLOADED_VIRTUAL = -Woverloaded-virtual
+WOVERLOADED_VIRTUAL = 
 XGETTEXT = @XGETTEXT@
 XPMINC = @XPMINC@
 XPMLIB = @XPMLIB@
@@ -237,9 +237,9 @@ libcore_la_LDFLAGS = -version-info 0:0:0 -ldl
 
 #>- libcore_la_METASOURCES = AUTO
 
-libcore_la_SOURCES = Slider.cpp Label.cpp WindowMgr.cpp Window.cpp VideoModes.cpp VideoMode.cpp Video.cpp TileSetMgr.cpp TileOverlay.cpp TileMapMgr.cpp TileMap.cpp Tile.cpp SymbolMgr.cpp StringMgr.cpp Sprite2D.cpp ResourceMgr.cpp Region.cpp PluginMgr.cpp Plugin.cpp MoviePlayer.cpp MemoryStream.cpp MapMgr.cpp Map.cpp InterfaceDesc.cpp Interface.cpp ImageMgr.cpp HCAnimationSeq.cpp Font.cpp FileStream.cpp FactoryObject.cpp Factory.cpp DataStream.cpp Core.cpp Control.cpp Compressor.cpp Class_ID.cpp ClassDesc.cpp CharAnimations.cpp CachedFileStream.cpp Button.cpp ArchiveImporter.cpp AnimationMgr.cpp AnimationFactory.cpp Animation.cpp ActorMgr.cpp Actor.cpp 
+libcore_la_SOURCES = ScrollBar.cpp TextArea.cpp Slider.cpp Label.cpp WindowMgr.cpp Window.cpp VideoModes.cpp VideoMode.cpp Video.cpp TileSetMgr.cpp TileOverlay.cpp TileMapMgr.cpp TileMap.cpp Tile.cpp SymbolMgr.cpp StringMgr.cpp Sprite2D.cpp ResourceMgr.cpp Region.cpp PluginMgr.cpp Plugin.cpp MoviePlayer.cpp MemoryStream.cpp MapMgr.cpp Map.cpp InterfaceDesc.cpp Interface.cpp ImageMgr.cpp HCAnimationSeq.cpp Font.cpp FileStream.cpp FactoryObject.cpp Factory.cpp DataStream.cpp Core.cpp Control.cpp Compressor.cpp Class_ID.cpp ClassDesc.cpp CharAnimations.cpp CachedFileStream.cpp Button.cpp ArchiveImporter.cpp AnimationMgr.cpp AnimationFactory.cpp Animation.cpp ActorMgr.cpp Actor.cpp 
 
-EXTRA_DIST = Actor.cpp Actor.h ActorMgr.cpp ActorMgr.h Animation.cpp AnimationFactory.cpp AnimationFactory.h Animation.h AnimationMgr.cpp AnimationMgr.h AnimStructures.h ArchiveImporter.cpp ArchiveImporter.h Button.cpp Button.h CachedFileStream.cpp CachedFileStream.h CharAnimations.cpp CharAnimations.h ClassDesc.cpp ClassDesc.h Class_ID.cpp Class_ID.h Compressor.cpp Compressor.h Control.cpp Control.h Core.cpp DataStream.cpp DataStream.h Factory.cpp Factory.h FactoryObject.cpp FactoryObject.h FileStream.cpp FileStream.h Font.cpp Font.h HCAnimationSeq.cpp HCAnimationSeq.h ImageMgr.cpp ImageMgr.h Interface.cpp InterfaceDesc.cpp InterfaceDesc.h Interface.h Map.cpp Map.h MapMgr.cpp MapMgr.h MemoryStream.cpp MemoryStream.h MoviePlayer.cpp MoviePlayer.h Plugin.cpp Plugin.h PluginMgr.cpp PluginMgr.h Region.cpp Region.h ResourceMgr.cpp ResourceMgr.h Sprite2D.cpp Sprite2D.h StringMgr.cpp StringMgr.h SymbolMgr.cpp SymbolMgr.h Tile.cpp Tile.h TileMap.cpp TileMap.h TileMapMgr.cpp TileMapMgr.h TileOverlay.cpp TileOverlay.h TileSetMgr.cpp TileSetMgr.h Video.cpp Video.h VideoMode.cpp VideoMode.h VideoModes.cpp VideoModes.h Window.cpp Window.h WindowMgr.cpp WindowMgr.h Label.cpp Label.h Slider.cpp Slider.h 
+EXTRA_DIST = Actor.cpp Actor.h ActorMgr.cpp ActorMgr.h Animation.cpp AnimationFactory.cpp AnimationFactory.h Animation.h AnimationMgr.cpp AnimationMgr.h AnimStructures.h ArchiveImporter.cpp ArchiveImporter.h Button.cpp Button.h CachedFileStream.cpp CachedFileStream.h CharAnimations.cpp CharAnimations.h ClassDesc.cpp ClassDesc.h Class_ID.cpp Class_ID.h Compressor.cpp Compressor.h Control.cpp Control.h Core.cpp DataStream.cpp DataStream.h Factory.cpp Factory.h FactoryObject.cpp FactoryObject.h FileStream.cpp FileStream.h Font.cpp Font.h HCAnimationSeq.cpp HCAnimationSeq.h ImageMgr.cpp ImageMgr.h Interface.cpp InterfaceDesc.cpp InterfaceDesc.h Interface.h Map.cpp Map.h MapMgr.cpp MapMgr.h MemoryStream.cpp MemoryStream.h MoviePlayer.cpp MoviePlayer.h Plugin.cpp Plugin.h PluginMgr.cpp PluginMgr.h Region.cpp Region.h ResourceMgr.cpp ResourceMgr.h Sprite2D.cpp Sprite2D.h StringMgr.cpp StringMgr.h SymbolMgr.cpp SymbolMgr.h Tile.cpp Tile.h TileMap.cpp TileMap.h TileMapMgr.cpp TileMapMgr.h TileOverlay.cpp TileOverlay.h TileSetMgr.cpp TileSetMgr.h Video.cpp Video.h VideoMode.cpp VideoMode.h VideoModes.cpp VideoModes.h Window.cpp Window.h WindowMgr.cpp WindowMgr.h Label.cpp Label.h Slider.cpp Slider.h TextArea.cpp TextArea.h ScrollBar.cpp ScrollBar.h 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -250,31 +250,31 @@ DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I../../..
 CPPFLAGS = 
 LIBS = 
 libcore_la_LIBADD = 
-#>- libcore_la_OBJECTS =  Slider.lo Label.lo WindowMgr.lo Window.lo \
-#>- VideoModes.lo VideoMode.lo Video.lo TileSetMgr.lo TileOverlay.lo \
-#>- TileMapMgr.lo TileMap.lo Tile.lo SymbolMgr.lo StringMgr.lo Sprite2D.lo \
-#>- ResourceMgr.lo Region.lo PluginMgr.lo Plugin.lo MoviePlayer.lo \
-#>- MemoryStream.lo MapMgr.lo Map.lo InterfaceDesc.lo Interface.lo \
-#>- ImageMgr.lo HCAnimationSeq.lo Font.lo FileStream.lo FactoryObject.lo \
-#>- Factory.lo DataStream.lo Core.lo Control.lo Compressor.lo Class_ID.lo \
-#>- ClassDesc.lo CharAnimations.lo CachedFileStream.lo Button.lo \
-#>- ArchiveImporter.lo AnimationMgr.lo AnimationFactory.lo Animation.lo \
-#>- ActorMgr.lo Actor.lo
+#>- libcore_la_OBJECTS =  ScrollBar.lo TextArea.lo Slider.lo Label.lo \
+#>- WindowMgr.lo Window.lo VideoModes.lo VideoMode.lo Video.lo \
+#>- TileSetMgr.lo TileOverlay.lo TileMapMgr.lo TileMap.lo Tile.lo \
+#>- SymbolMgr.lo StringMgr.lo Sprite2D.lo ResourceMgr.lo Region.lo \
+#>- PluginMgr.lo Plugin.lo MoviePlayer.lo MemoryStream.lo MapMgr.lo Map.lo \
+#>- InterfaceDesc.lo Interface.lo ImageMgr.lo HCAnimationSeq.lo Font.lo \
+#>- FileStream.lo FactoryObject.lo Factory.lo DataStream.lo Core.lo \
+#>- Control.lo Compressor.lo Class_ID.lo ClassDesc.lo CharAnimations.lo \
+#>- CachedFileStream.lo Button.lo ArchiveImporter.lo AnimationMgr.lo \
+#>- AnimationFactory.lo Animation.lo ActorMgr.lo Actor.lo
 #>+ 13
 libcore_la_final_OBJECTS = libcore_la.all_cpp.lo 
-libcore_la_nofinal_OBJECTS = Slider.lo Label.lo WindowMgr.lo Window.lo \
-	VideoModes.lo VideoMode.lo Video.lo TileSetMgr.lo TileOverlay.lo \
-	TileMapMgr.lo TileMap.lo Tile.lo SymbolMgr.lo StringMgr.lo Sprite2D.lo \
-	ResourceMgr.lo Region.lo PluginMgr.lo Plugin.lo MoviePlayer.lo \
-	MemoryStream.lo MapMgr.lo Map.lo InterfaceDesc.lo Interface.lo \
-	ImageMgr.lo HCAnimationSeq.lo Font.lo FileStream.lo FactoryObject.lo \
-	Factory.lo DataStream.lo Core.lo Control.lo Compressor.lo Class_ID.lo \
-	ClassDesc.lo CharAnimations.lo CachedFileStream.lo Button.lo \
-	ArchiveImporter.lo AnimationMgr.lo AnimationFactory.lo Animation.lo \
-	ActorMgr.lo Actor.lo
+libcore_la_nofinal_OBJECTS = ScrollBar.lo TextArea.lo Slider.lo Label.lo \
+	WindowMgr.lo Window.lo VideoModes.lo VideoMode.lo Video.lo \
+	TileSetMgr.lo TileOverlay.lo TileMapMgr.lo TileMap.lo Tile.lo \
+	SymbolMgr.lo StringMgr.lo Sprite2D.lo ResourceMgr.lo Region.lo \
+	PluginMgr.lo Plugin.lo MoviePlayer.lo MemoryStream.lo MapMgr.lo Map.lo \
+	InterfaceDesc.lo Interface.lo ImageMgr.lo HCAnimationSeq.lo Font.lo \
+	FileStream.lo FactoryObject.lo Factory.lo DataStream.lo Core.lo \
+	Control.lo Compressor.lo Class_ID.lo ClassDesc.lo CharAnimations.lo \
+	CachedFileStream.lo Button.lo ArchiveImporter.lo AnimationMgr.lo \
+	AnimationFactory.lo Animation.lo ActorMgr.lo Actor.lo
 libcore_la_OBJECTS = $(libcore_la_nofinal_OBJECTS)
 #libcore_la_OBJECTS = $(libcore_la_final_OBJECTS)
-CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
+CXXFLAGS = -O2 -fno-exceptions -fno-check-new
 #>- CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 #>+ 1
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) $(KDE_CXXFLAGS)
@@ -300,11 +300,11 @@ GZIP_ENV = --best
 #>- .deps/FileStream.P .deps/Font.P .deps/HCAnimationSeq.P .deps/ImageMgr.P \
 #>- .deps/Interface.P .deps/InterfaceDesc.P .deps/Label.P .deps/Map.P \
 #>- .deps/MapMgr.P .deps/MemoryStream.P .deps/MoviePlayer.P .deps/Plugin.P \
-#>- .deps/PluginMgr.P .deps/Region.P .deps/ResourceMgr.P .deps/Slider.P \
-#>- .deps/Sprite2D.P .deps/StringMgr.P .deps/SymbolMgr.P .deps/Tile.P \
-#>- .deps/TileMap.P .deps/TileMapMgr.P .deps/TileOverlay.P \
-#>- .deps/TileSetMgr.P .deps/Video.P .deps/VideoMode.P .deps/VideoModes.P \
-#>- .deps/Window.P .deps/WindowMgr.P
+#>- .deps/PluginMgr.P .deps/Region.P .deps/ResourceMgr.P .deps/ScrollBar.P \
+#>- .deps/Slider.P .deps/Sprite2D.P .deps/StringMgr.P .deps/SymbolMgr.P \
+#>- .deps/TextArea.P .deps/Tile.P .deps/TileMap.P .deps/TileMapMgr.P \
+#>- .deps/TileOverlay.P .deps/TileSetMgr.P .deps/Video.P .deps/VideoMode.P \
+#>- .deps/VideoModes.P .deps/Window.P .deps/WindowMgr.P
 #>+ 28
 #DEP_FILES =   $(DEPDIR)/libcore_la.all_cpp.P \
 		  .deps/Actor.P .deps/ActorMgr.P .deps/Animation.P \
@@ -315,11 +315,11 @@ GZIP_ENV = --best
 	.deps/FileStream.P .deps/Font.P .deps/HCAnimationSeq.P .deps/ImageMgr.P \
 	.deps/Interface.P .deps/InterfaceDesc.P .deps/Label.P .deps/Map.P \
 	.deps/MapMgr.P .deps/MemoryStream.P .deps/MoviePlayer.P .deps/Plugin.P \
-	.deps/PluginMgr.P .deps/Region.P .deps/ResourceMgr.P .deps/Slider.P \
-	.deps/Sprite2D.P .deps/StringMgr.P .deps/SymbolMgr.P .deps/Tile.P \
-	.deps/TileMap.P .deps/TileMapMgr.P .deps/TileOverlay.P \
-	.deps/TileSetMgr.P .deps/Video.P .deps/VideoMode.P .deps/VideoModes.P \
-	.deps/Window.P .deps/WindowMgr.P
+	.deps/PluginMgr.P .deps/Region.P .deps/ResourceMgr.P .deps/ScrollBar.P \
+	.deps/Slider.P .deps/Sprite2D.P .deps/StringMgr.P .deps/SymbolMgr.P \
+	.deps/TextArea.P .deps/Tile.P .deps/TileMap.P .deps/TileMapMgr.P \
+	.deps/TileOverlay.P .deps/TileSetMgr.P .deps/Video.P .deps/VideoMode.P \
+	.deps/VideoModes.P .deps/Window.P .deps/WindowMgr.P
 DEP_FILES =    .deps/Actor.P .deps/ActorMgr.P .deps/Animation.P \
 	.deps/AnimationFactory.P .deps/AnimationMgr.P .deps/ArchiveImporter.P \
 	.deps/Button.P .deps/CachedFileStream.P .deps/CharAnimations.P \
@@ -328,11 +328,11 @@ DEP_FILES =    .deps/Actor.P .deps/ActorMgr.P .deps/Animation.P \
 	.deps/FileStream.P .deps/Font.P .deps/HCAnimationSeq.P .deps/ImageMgr.P \
 	.deps/Interface.P .deps/InterfaceDesc.P .deps/Label.P .deps/Map.P \
 	.deps/MapMgr.P .deps/MemoryStream.P .deps/MoviePlayer.P .deps/Plugin.P \
-	.deps/PluginMgr.P .deps/Region.P .deps/ResourceMgr.P .deps/Slider.P \
-	.deps/Sprite2D.P .deps/StringMgr.P .deps/SymbolMgr.P .deps/Tile.P \
-	.deps/TileMap.P .deps/TileMapMgr.P .deps/TileOverlay.P \
-	.deps/TileSetMgr.P .deps/Video.P .deps/VideoMode.P .deps/VideoModes.P \
-	.deps/Window.P .deps/WindowMgr.P
+	.deps/PluginMgr.P .deps/Region.P .deps/ResourceMgr.P .deps/ScrollBar.P \
+	.deps/Slider.P .deps/Sprite2D.P .deps/StringMgr.P .deps/SymbolMgr.P \
+	.deps/TextArea.P .deps/Tile.P .deps/TileMap.P .deps/TileMapMgr.P \
+	.deps/TileOverlay.P .deps/TileSetMgr.P .deps/Video.P .deps/VideoMode.P \
+	.deps/VideoModes.P .deps/Window.P .deps/WindowMgr.P
 
 SOURCES = $(libcore_la_SOURCES)
 OBJECTS = $(libcore_la_OBJECTS)
@@ -624,11 +624,11 @@ force-reedit:
 
 
 #>+ 11
-libcore_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/Slider.cpp $(srcdir)/Label.cpp $(srcdir)/WindowMgr.cpp $(srcdir)/Window.cpp $(srcdir)/VideoModes.cpp $(srcdir)/VideoMode.cpp $(srcdir)/Video.cpp $(srcdir)/TileSetMgr.cpp $(srcdir)/TileOverlay.cpp $(srcdir)/TileMapMgr.cpp $(srcdir)/TileMap.cpp $(srcdir)/Tile.cpp $(srcdir)/SymbolMgr.cpp $(srcdir)/StringMgr.cpp $(srcdir)/Sprite2D.cpp $(srcdir)/ResourceMgr.cpp $(srcdir)/Region.cpp $(srcdir)/PluginMgr.cpp $(srcdir)/Plugin.cpp $(srcdir)/MoviePlayer.cpp $(srcdir)/MemoryStream.cpp $(srcdir)/MapMgr.cpp $(srcdir)/Map.cpp $(srcdir)/InterfaceDesc.cpp $(srcdir)/Interface.cpp $(srcdir)/ImageMgr.cpp $(srcdir)/HCAnimationSeq.cpp $(srcdir)/Font.cpp $(srcdir)/FileStream.cpp $(srcdir)/FactoryObject.cpp $(srcdir)/Factory.cpp $(srcdir)/DataStream.cpp $(srcdir)/Core.cpp $(srcdir)/Control.cpp $(srcdir)/Compressor.cpp $(srcdir)/Class_ID.cpp $(srcdir)/ClassDesc.cpp $(srcdir)/CharAnimations.cpp $(srcdir)/CachedFileStream.cpp $(srcdir)/Button.cpp $(srcdir)/ArchiveImporter.cpp $(srcdir)/AnimationMgr.cpp $(srcdir)/AnimationFactory.cpp $(srcdir)/Animation.cpp $(srcdir)/ActorMgr.cpp $(srcdir)/Actor.cpp  
+libcore_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/ScrollBar.cpp $(srcdir)/TextArea.cpp $(srcdir)/Slider.cpp $(srcdir)/Label.cpp $(srcdir)/WindowMgr.cpp $(srcdir)/Window.cpp $(srcdir)/VideoModes.cpp $(srcdir)/VideoMode.cpp $(srcdir)/Video.cpp $(srcdir)/TileSetMgr.cpp $(srcdir)/TileOverlay.cpp $(srcdir)/TileMapMgr.cpp $(srcdir)/TileMap.cpp $(srcdir)/Tile.cpp $(srcdir)/SymbolMgr.cpp $(srcdir)/StringMgr.cpp $(srcdir)/Sprite2D.cpp $(srcdir)/ResourceMgr.cpp $(srcdir)/Region.cpp $(srcdir)/PluginMgr.cpp $(srcdir)/Plugin.cpp $(srcdir)/MoviePlayer.cpp $(srcdir)/MemoryStream.cpp $(srcdir)/MapMgr.cpp $(srcdir)/Map.cpp $(srcdir)/InterfaceDesc.cpp $(srcdir)/Interface.cpp $(srcdir)/ImageMgr.cpp $(srcdir)/HCAnimationSeq.cpp $(srcdir)/Font.cpp $(srcdir)/FileStream.cpp $(srcdir)/FactoryObject.cpp $(srcdir)/Factory.cpp $(srcdir)/DataStream.cpp $(srcdir)/Core.cpp $(srcdir)/Control.cpp $(srcdir)/Compressor.cpp $(srcdir)/Class_ID.cpp $(srcdir)/ClassDesc.cpp $(srcdir)/CharAnimations.cpp $(srcdir)/CachedFileStream.cpp $(srcdir)/Button.cpp $(srcdir)/ArchiveImporter.cpp $(srcdir)/AnimationMgr.cpp $(srcdir)/AnimationFactory.cpp $(srcdir)/Animation.cpp $(srcdir)/ActorMgr.cpp $(srcdir)/Actor.cpp  
 	@echo 'creating libcore_la.all_cpp.cpp ...'; \
 	rm -f libcore_la.all_cpp.files libcore_la.all_cpp.final; \
 	echo "#define KDE_USE_FINAL 1" >> libcore_la.all_cpp.final; \
-	for file in Slider.cpp Label.cpp WindowMgr.cpp Window.cpp VideoModes.cpp VideoMode.cpp Video.cpp TileSetMgr.cpp TileOverlay.cpp TileMapMgr.cpp TileMap.cpp Tile.cpp SymbolMgr.cpp StringMgr.cpp Sprite2D.cpp ResourceMgr.cpp Region.cpp PluginMgr.cpp Plugin.cpp MoviePlayer.cpp MemoryStream.cpp MapMgr.cpp Map.cpp InterfaceDesc.cpp Interface.cpp ImageMgr.cpp HCAnimationSeq.cpp Font.cpp FileStream.cpp FactoryObject.cpp Factory.cpp DataStream.cpp Core.cpp Control.cpp Compressor.cpp Class_ID.cpp ClassDesc.cpp CharAnimations.cpp CachedFileStream.cpp Button.cpp ArchiveImporter.cpp AnimationMgr.cpp AnimationFactory.cpp Animation.cpp ActorMgr.cpp Actor.cpp ; do \
+	for file in ScrollBar.cpp TextArea.cpp Slider.cpp Label.cpp WindowMgr.cpp Window.cpp VideoModes.cpp VideoMode.cpp Video.cpp TileSetMgr.cpp TileOverlay.cpp TileMapMgr.cpp TileMap.cpp Tile.cpp SymbolMgr.cpp StringMgr.cpp Sprite2D.cpp ResourceMgr.cpp Region.cpp PluginMgr.cpp Plugin.cpp MoviePlayer.cpp MemoryStream.cpp MapMgr.cpp Map.cpp InterfaceDesc.cpp Interface.cpp ImageMgr.cpp HCAnimationSeq.cpp Font.cpp FileStream.cpp FactoryObject.cpp Factory.cpp DataStream.cpp Core.cpp Control.cpp Compressor.cpp Class_ID.cpp ClassDesc.cpp CharAnimations.cpp CachedFileStream.cpp Button.cpp ArchiveImporter.cpp AnimationMgr.cpp AnimationFactory.cpp Animation.cpp ActorMgr.cpp Actor.cpp ; do \
 	  echo "#include \"$$file\"" >> libcore_la.all_cpp.files; \
 	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libcore_la.all_cpp.final; \
 	done; \
