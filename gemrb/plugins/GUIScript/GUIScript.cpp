@@ -605,7 +605,7 @@ static PyObject * GemRB_GetVar(PyObject *self, PyObject *args)
 	}
 
 	if(!core->GetDictionary()->Lookup(Variable, value))
-		return NULL;
+		return Py_BuildValue("i", 0);
 
 	return Py_BuildValue("l", value);
 }
