@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.8 2004/04/26 12:59:20 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.9 2004/04/29 19:55:22 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -94,45 +94,59 @@ def CloseCommonWindows ():
 def SetupMenuWindowControls (Window):
 	# Inventory
 	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetTooltip (Window, Button, 41601)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
 
 	# Map
 	Button = GemRB.GetControl (Window, 2)
+	GemRB.SetTooltip (Window, Button, 41625)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 
 	# Mage
 	Button = GemRB.GetControl (Window, 3)
+	GemRB.SetTooltip (Window, Button, 41624)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMageWindow")
 	# Stats
 	Button = GemRB.GetControl (Window, 5)
+	GemRB.SetTooltip (Window, Button, 4707)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
 
 	# Journal
 	Button = GemRB.GetControl (Window, 6)
+	GemRB.SetTooltip (Window, Button, 41623)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	# Priest
 	Button = GemRB.GetControl (Window, 7)
+	GemRB.SetTooltip (Window, Button, 4709)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPriestWindow")
 
 	# Options
 	Button = GemRB.GetControl (Window, 8)
+	GemRB.SetTooltip (Window, Button, 41626)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
 
 	# Rest
 	Button = GemRB.GetControl (Window, 9)
+	GemRB.SetTooltip (Window, Button, 41628)
 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
 
 
 	# AI
 	Button = GemRB.GetControl (Window, 4)
+	GemRB.SetTooltip (Window, Button, 41631) # or 41646 Activate ...
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
 
 	# Can't Reach ???
 	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetTooltip (Window, Button, 41647)  # or 41648 Unlock ...
 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPartyManageWindow")
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenContainerWindow")
+
+	# Message popup
+	Button = GemRB.GetControl (Window, 10)
+	GemRB.SetTooltip (Window, Button, 41660)  # or 41661 Close ...
 
 
 def CntReachPress ():
@@ -146,6 +160,20 @@ def TxtePress ():
 
 def RestPress ():
 	print "RestPress"
+
+def SetupActionsWindowControls (Window):
+	# Select all characters
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetTooltip (Window, Button, 41659)
+
+	# Abort current action
+	Button = GemRB.GetControl (Window, 3)
+	GemRB.SetTooltip (Window, Button, 41655)
+
+	# Formations
+	Button = GemRB.GetControl (Window, 4)
+	GemRB.SetTooltip (Window, Button, 44945)
+	
 
 
 # which=0: inventory; 1: rec screen
