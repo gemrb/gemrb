@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.48 2003/12/21 14:01:51 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.49 2003/12/22 18:58:03 balrog994 Exp $
  *
  */
 
@@ -57,23 +57,35 @@ int SDLVideoDriver::Init(void)
 
 int SDLVideoDriver::CreateDisplay(int width, int height, int bpp, bool fullscreen)
 {
+	printMessage("SDLVideo", "Creating display\n", WHITE);
 	DWORD flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
 	if(fullscreen)
 		flags |= SDL_FULLSCREEN;
+	printMessage("SDLVideo", "SDL_SetVideoMode...", WHITE);
 	disp = SDL_SetVideoMode(width, height, bpp, flags);
-	if(disp == NULL)
+	if(disp == NULL) {
+		printStatus("ERROR", LIGHT_RED);
 		return GEM_ERROR;
+	}
+	printStatus("OK", LIGHT_GREEN);
 	Viewport.x = Viewport.y = 0;
 	Viewport.w = width;
 	Viewport.h = height;
+	printMessage("SDLVideo", "Creating Main Surface...", WHITE);
 	SDL_Surface * tmp = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, bpp, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("SDLVideo", "Creating Back Buffer...", WHITE);
 	backBuf = SDL_DisplayFormat(tmp);
-	
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("SDLVideo", "Creating Extra Buffer...", WHITE);
 	extra = SDL_DisplayFormat(tmp);
+	printStatus("OK", LIGHT_GREEN);
 	SDL_LockSurface(extra);
 	memset(extra->pixels, 0, extra->pitch*extra->h);
 	SDL_UnlockSurface(extra);
 	SDL_FreeSurface(tmp);
+	printMessage("SDLVideo", "CreateDisplay...", WHITE);
+	printStatus("OK", LIGHT_GREEN);
 	return GEM_OK;
 }
 
@@ -786,8 +798,8 @@ void SDLVideoDriver::SetViewport(int x, int y)
 
 void SDLVideoDriver::SetViewport(int x, int y, int w, int h)
 {
-	Viewport.x = x;
-	Viewport.y = y;
+	//Viewport.x = x;
+	//Viewport.y = y;
 	Viewport.w = w;
 	Viewport.h = h;
 	//core->Width = w;
