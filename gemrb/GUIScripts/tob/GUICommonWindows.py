@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2003-2004 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.6 2004/09/19 20:04:52 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.7 2004/10/02 09:55:03 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -206,6 +206,13 @@ def PopulatePortraitWindow (Window):
 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
 		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)
+                GemRB.SetButtonFont (Window, Button, 'FLOATTXT')
+                hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
+                hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
+
+                GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
+                GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
+
 	return
 
 def PortraitButtonOnPress ():

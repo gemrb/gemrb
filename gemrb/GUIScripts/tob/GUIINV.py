@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2003-2004 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,12 +16,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.5 2004/09/03 23:23:35 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.6 2004/10/02 09:55:03 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
 ###################################################
+
+import string
 
 from GUIDefines import *
 from ie_stats import *
@@ -30,6 +32,16 @@ from GUICommonWindows import GetActorClassTitle, GetActorPaperDoll
 from GUICommonWindows import SetSelectionChangeHandler
 
 InventoryWindow = None
+ItemInfoWindow = None
+ItemAmountWindow = None
+ItemIdentifyWindow = None
+
+ItemHash = {}
+
+ControlToSlotMap = [6, 7, 5, 3, 19, 0, 1, 4, 8, 2,   9, 10, 11, 12,   20, 21, 22, 23, 24,   13, 14, 15, 16, 17,   25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
+
+SlotTypeTable = GemRB.LoadTable ('SLOTTYPE')
+AvSlotsTable  = GemRB.LoadTable ('AVSLOTS')
 
 def OpenInventoryWindow ():
 	global InventoryWindow
@@ -279,11 +291,11 @@ def UpdateInventoryWindow ():
 
 	Button = GemRB.GetControl (Window, 62);
 	Color = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
-	GemRB.SetButtonBAM(Window, Button, "COLGRAD", 1, 0, Color)
+	GemRB.SetButtonBAM(Window, Button, "COLGRAD", 0, 0, Color)
 
 	Button = GemRB.GetControl (Window, 63);
 	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
-	GemRB.SetButtonBAM(Window, Button, "COLGRAD", 1, 0, Color)
+	GemRB.SetButtonBAM(Window, Button, "COLGRAD", 0, 0, Color)
 	return
 
 ###################################################
