@@ -185,6 +185,8 @@ void Scriptable::SetWait(unsigned long time)
 
 void Scriptable::DeleteAction(Action * aC)
 {
+	if(!aC->autoFree)
+		return;
 	if(aC->string0Parameter)
 		free(aC->string0Parameter);
 	if(aC->string1Parameter)
@@ -414,10 +416,14 @@ Door::Door(TileOverlay * Overlay) : Highlightable(ST_DOOR)
 
 Door::~Door(void)
 {
-	if(open)
-		delete(open);
-	if(closed)
-		delete(closed);
+	if(DoorClosed) {
+		if(open)
+			delete(open);
+	}
+	else {
+		if(closed)
+			delete(closed);
+	}
 	if(tiles)
 		free(tiles);
 }
