@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.33 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.34 2004/08/01 15:43:00 avenger_teambg Exp $
  *
  */
 
@@ -613,6 +613,18 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient,
 				}
 				break;
 
+				case IE_ANI_DIE:
+				{
+					if (Orient > 8)
+						Cycle = 7 - ( Orient % 9 );
+					else
+						Cycle = ( Orient % 9 );
+					ResRef[0] = this->ResRef[0];
+					ResRef[1] = 0;
+					strcat( ResRef, "DFB" );
+					strcat( ResRef, &this->ResRef[1] );
+				}
+				break;
 				case IE_ANI_WALK:
 				{
 					if (Orient > 8)
