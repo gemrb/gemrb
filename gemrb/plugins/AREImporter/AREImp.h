@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.20 2004/10/07 20:06:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.21 2005/01/09 12:28:28 edheldil Exp $
  *
  */
 
@@ -35,6 +35,7 @@ private:
 	ieDword ActorOffset, AnimOffset, AnimCount;
 	ieDword VerticesOffset;
 	ieDword DoorsCount, DoorsOffset;
+	ieDword ExploredBitmapSize, ExploredBitmapOffset;
 	ieDword EntrancesOffset, EntrancesCount;
 	ieDword SongHeader, RestHeader;
 	ieWord  ActorCount, VerticesCount, AmbiCount;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.85 2004/11/25 21:04:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.86 2005/01/09 12:28:28 edheldil Exp $
  *
  */
 
@@ -167,7 +167,8 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	ieDword tmp;
 	str->ReadDword( &tmp );
 	str->ReadResRef( Script );
-	str->Seek( 0xA4 + bigheader, GEM_STREAM_START );
+	str->ReadDword( &ExploredBitmapSize );
+	str->ReadDword( &ExploredBitmapOffset );
 	str->ReadDword( &DoorsCount );
 	str->ReadDword( &DoorsOffset );
 	str->ReadDword( &AnimCount );
@@ -356,6 +357,11 @@ Map* AREImp::GetMap(const char *ResRef)
 				memcpy( door->CloseSound, Sounds[DEF_CLOSE], 9 );
 		}
 	}
+	printf( "Loading explored bitmap\n" );
+	str->Seek( ExploredBitmapOffset, GEM_STREAM_START );
+	map->ExploredBitmap = new ieByte[ExploredBitmapSize];
+	str->Read( map->ExploredBitmap, ExploredBitmapSize );
+
 	printf( "Loading containers\n" );
 	//Loading Containers
 	for (i = 0; i < ContainersCount; i++) {
