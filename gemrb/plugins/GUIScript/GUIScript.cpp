@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.151 2004/04/14 16:49:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.152 2004/04/14 20:14:17 doc_wagon Exp $
  *
  */
 
@@ -3109,24 +3109,26 @@ bool GUIScript::Init(void)
 	}
 	char path[_MAX_PATH];
 	char path2[_MAX_PATH];
-#ifdef WIN32
-	int len = ( int ) strlen( core->GUIScriptsPath );
-	int p = 0;
-	for (int i = 0; i < len; i++) {
-		if (core->GUIScriptsPath[i] == '\\') {
-			path[p] = '/';
-		} else
-			path[p] = core->GUIScriptsPath[i];
-		p++;
-	}
-	path[p] = 0;
-#else  // ! WIN32
+
 	strcpy (path, core->GUIScriptsPath);
-#endif
 
 	PathAppend( path, "GUIScripts" );
 	strcpy( path2, path );
 	PathAppend( path2, core->GameType );
+
+#ifdef WIN32
+	for (char *p = path; *p != 0; p++)
+	{
+		if (*p == '\\')
+			*p = '/';
+	}
+
+	for (char *p = path2; *p != 0; p++)
+	{
+		if (*p == '\\')
+			*p = '/';
+	}
+#endif
 
 	sprintf( string, "sys.path.append('%s')", path2 );
 	if (PyRun_SimpleString( string ) == -1) {
