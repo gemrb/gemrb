@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.23 2003/12/06 17:29:55 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.24 2003/12/15 09:34:14 balrog994 Exp $
  *
  */
 
@@ -99,7 +99,7 @@ int TLKImp::BuiltinToken(char *Token, char *dest)
 exit_function:
 	if(Decoded)
 	{
-		TokenLength=strlen(Decoded);
+		TokenLength=(int)strlen(Decoded);
 		if(dest) memcpy(dest,Decoded,TokenLength);
 		free(Decoded);
 		return TokenLength;
@@ -153,7 +153,7 @@ bool TLKImp::GetNewStringLength(char *string, unsigned long &Length)
 
   lChange=false;
   NewLength=0;
-  for(int i=0;i<Length;i++) {
+  for(unsigned int i=0;i<Length;i++) {
 	if(string[i]=='<') {   // token
 		lChange=true;
 		i+=mystrncpy(Token, string+i+1, MAX_VARIABLE_LENGTH, '>' )-Token+1;
