@@ -34,6 +34,8 @@ void PathFinder::SetMap(ImageMgr * sMap, int Width, int Height)
 	this->Width = Width;
 	this->Height = Height;
 	//Filling Matrices
+	OpenStack = new PathNode*[Width*Height];
+	OpenStackCount = 0;
 	MapSet = new PathNode**[Width];
 	ClosedSet = new bool*[Width];
 	for(int x = 0; x < Width; x++) {
@@ -74,26 +76,23 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 {
 	short startX = sX/16, startY = sY/12, goalX = dX/16, goalY = dY/12;
 	
-	OpenStack.clear();
+	OpenStackCount=0;
 	FinalStack.clear();
 	for(int x = 0; x < Width; x++) {
 		memset(ClosedSet[x], 0, Height*sizeof(bool));
 	}
 
-	OpenStack.push_back(MapSet[startX][startY]);
+	HeapAdd(MapSet[startX][startY]);
 	MapSet[startX][startY]->Parent = NULL;
 	MapSet[startX][startY]->distance = GetDistance(startX, startY, goalX, goalY);
 	MapSet[startX][startY]->cost = 0;
 	ClosedSet[startX][startY] = true;
 	while(true) {
-		if(OpenStack.size() == 0) {
+		PathNode * topNode = HeapRemove();
+		if(!topNode) {
 			printf("Cannot find a Path\n");
 			return NULL;
 		}
-		PathNode * topNode = OpenStack.front();
-		std::vector<PathNode*>::iterator m = OpenStack.begin();
-		OpenStack.erase(m);
-		//printf("[this=%08X, x=%d, y=%d, Parent=%08X, Next=%08X]\n", topNode, topNode->x, topNode->y, topNode->Parent, topNode->Next);
 		if((topNode->x == goalX) && (topNode->y == goalY)) {//We've found _a_ path
 			printf("GOAL!!!\n");
 			FinalStack.push_back(topNode);
@@ -127,38 +126,11 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 						MapSet[x][y]->Parent = topNode;
 						MapSet[x][y]->orient = GetOrient(topNode->x, topNode->y, x, y);
 						MapSet[x][y]->distance = MapSet[x][y]->cost+GetDistance(x, y, goalX, goalY);
-						OpenStack.push_back(MapSet[x][y]);
+						HeapAdd(MapSet[x][y]);
 						ClosedSet[x][y] = true;
 					}
 				}
 			}
-		}
-		//Sorting the Open Stack
-		std::vector<PathNode*> tmp;
-		for(int i = 0; i < OpenStack.size(); i++) {
-			PathNode * node = OpenStack.at(i);
-			//node->distance = nodeGetDistance(node->x, node->y, goalX, goalY);
-			if(tmp.size() == 0)
-				tmp.push_back(node);
-			else {
-				bool insert = true;
-				std::vector<PathNode*>::iterator m;
-				for(m = tmp.begin(); m != tmp.end(); ++m) {
-					if((*m)->distance > node->distance) {
-						tmp.insert(m, node);
-						insert = false;
-						break;
-					}
-				}
-				if(insert)
-					tmp.push_back(node);
-			}
-		}
-		//Copying tmp to OpenStack
-		OpenStack.clear();
-		int maxsize = min(150, tmp.size());
-		for(int i = 0; i < maxsize; i++) {
-			OpenStack.push_back(tmp.at(i));
 		}
 	}
 	PathNode * ret = FinalStack.back();
@@ -206,6 +178,7 @@ void PathFinder::FreeMatrices()
 	}
 	delete(MapSet);
 	delete(ClosedSet);
+	delete(OpenStack);
 }
 
 unsigned char PathFinder::GetOrient(short sX, short sY, short dX, short dY)
@@ -237,4 +210,56 @@ unsigned char PathFinder::GetOrient(short sX, short sY, short dX, short dY)
 		}
 	}
 	return 0;
+}
+
+PathNode * PathFinder::HeapRemove()
+{
+	if(OpenStackCount==0)
+		return NULL;
+	PathNode * ret = OpenStack[0];
+	PathNode * node = OpenStack[0] = OpenStack[OpenStackCount-1];
+	OpenStackCount--;
+	int lastPos = 1;
+	while(true) {
+		int leftChildPos = (lastPos*2)-1;
+		int rightChildPos = lastPos*2;
+		if(leftChildPos >= OpenStackCount)
+			break;
+		PathNode * child  = OpenStack[leftChildPos];
+		int childPos = leftChildPos;
+		if(rightChildPos < OpenStackCount) { //If both Child Exist
+			PathNode * rightChild = OpenStack[lastPos*2];
+			if(rightChild->distance < child->distance) {
+				childPos = rightChildPos;
+				child = rightChild;
+			}
+			
+		}
+		if(node->distance > child->distance) {
+			OpenStack[lastPos-1] = child;
+			OpenStack[childPos] = node;
+			lastPos = childPos+1;
+		}
+		else
+			break;
+	}
+	return ret;
+}
+
+void PathFinder::HeapAdd(PathNode * node)
+{
+	OpenStackCount++;
+	OpenStack[OpenStackCount-1] = node;
+	int lastPos = OpenStackCount;
+	while(lastPos != 1) {
+		int parentPos = (lastPos/2)-1;
+		PathNode * parent = OpenStack[parentPos];
+		if(node->distance < parent->distance) {
+			OpenStack[parentPos] = node;
+			OpenStack[lastPos-1] = parent;
+			lastPos = parentPos+1;
+		}
+		else
+			break;
+	}
 }

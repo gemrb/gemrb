@@ -32,7 +32,8 @@ private:
 	ImageMgr * sMap;
 	PathNode *** MapSet;
 	bool ** ClosedSet;
-	std::vector<PathNode*> OpenStack;
+	PathNode **OpenStack;
+	int OpenStackCount;
 	std::vector<PathNode*> FinalStack;
 	int Width, Height;
 public:
@@ -44,6 +45,8 @@ private:
 	unsigned long GetDistance(short sX, short sY, short dX, short dY);
 	void FreeMatrices();
 	unsigned char GetOrient(short sX, short sY, short dX, short dY);
+	PathNode * HeapRemove();
+	void HeapAdd(PathNode * node);
 };
 
 #endif
