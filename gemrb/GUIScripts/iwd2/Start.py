@@ -42,6 +42,7 @@ def OnLoad():
 	GemRB.SetText(StartWindow, JoinGameButton, 13964)
 	GemRB.SetText(StartWindow, OptionsButton, 13905)
 	GemRB.SetText(StartWindow, QuitGameButton, 13731)
+	GemRB.SetEvent(StartWindow, NewGameButton, IE_GUI_BUTTON_ON_PRESS, "NewGamePress")
 	GemRB.SetEvent(StartWindow, QuitGameButton, IE_GUI_BUTTON_ON_PRESS, "QuitPress")
 	GemRB.SetEvent(StartWindow, ProtocolButton, IE_GUI_BUTTON_ON_PRESS, "ProtocolPress")
 	GemRB.SetEvent(StartWindow, OptionsButton, IE_GUI_BUTTON_ON_PRESS, "OptionsPress")
@@ -141,6 +142,12 @@ def QuitPress():
 	GemRB.SetVisible(QuitWindow, 1)
 	return
 	
+def NewGamePress():
+	global StartWindow
+	GemRB.UnloadWindow(StartWindow)
+	GemRB.SetNextScript("SPParty")
+	return	
+
 def QuitCancelPress():
 	global StartWindow, QuitWindow
 	GemRB.UnloadWindow(QuitWindow)
