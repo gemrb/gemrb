@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.13 2003/12/07 12:15:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.14 2003/12/07 13:11:54 avenger_teambg Exp $
  *
  */
 
@@ -111,7 +111,7 @@ char * FindInDir(char * Dir, char * Filename)
         if(de == NULL)
                 return NULL;
         do {
-                if(strnicmp(de->d_name, Filename, strlen(Filename)) == 0) {
+                if(stricmp(de->d_name, Filename ) == 0) {
                         fn = (char*)malloc(strlen(de->d_name)+1);
                         strcpy(fn, de->d_name);
                         break;
