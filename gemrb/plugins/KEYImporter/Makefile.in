@@ -1,4 +1,4 @@
-# KDE tags expanded automatically by am_edit - $Revision: 1.1 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.2 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -236,9 +236,9 @@ libKEYImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl
 
 #>- libKEYImporter_la_METASOURCES = AUTO
 
-libKEYImporter_la_SOURCES = KEYImporter.cpp KeyImp.cpp KEYImpCD.cpp 
+libKEYImporter_la_SOURCES = Dictionary.cpp KEYImporter.cpp KeyImp.cpp KEYImpCD.cpp 
 
-EXTRA_DIST = KEYImpCD.cpp KEYImpCD.h KeyImp.cpp KeyImp.h KEYImporter.cpp 
+EXTRA_DIST = KEYImpCD.cpp KEYImpCD.h KeyImp.cpp KeyImp.h KEYImporter.cpp Dictionary.cpp Dictionary.h 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -249,10 +249,12 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../..
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 libKEYImporter_la_LIBADD = 
-#>- libKEYImporter_la_OBJECTS =  KEYImporter.lo KeyImp.lo KEYImpCD.lo
-#>+ 4
+#>- libKEYImporter_la_OBJECTS =  Dictionary.lo KEYImporter.lo KeyImp.lo \
+#>- KEYImpCD.lo
+#>+ 5
 libKEYImporter_la_final_OBJECTS = libKEYImporter_la.all_cpp.lo 
-libKEYImporter_la_nofinal_OBJECTS = KEYImporter.lo KeyImp.lo KEYImpCD.lo
+libKEYImporter_la_nofinal_OBJECTS = Dictionary.lo KEYImporter.lo KeyImp.lo \
+	KEYImpCD.lo
 @KDE_USE_FINAL_FALSE@libKEYImporter_la_OBJECTS = $(libKEYImporter_la_nofinal_OBJECTS)
 @KDE_USE_FINAL_TRUE@libKEYImporter_la_OBJECTS = $(libKEYImporter_la_final_OBJECTS)
 CXXFLAGS = @CXXFLAGS@
@@ -273,11 +275,14 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-#>- DEP_FILES =  .deps/KEYImpCD.P .deps/KEYImporter.P .deps/KeyImp.P
-#>+ 4
+#>- DEP_FILES =  .deps/Dictionary.P .deps/KEYImpCD.P .deps/KEYImporter.P \
+#>- .deps/KeyImp.P
+#>+ 6
 @KDE_USE_FINAL_TRUE@DEP_FILES =   $(DEPDIR)/libKEYImporter_la.all_cpp.P \
-		  .deps/KEYImpCD.P .deps/KEYImporter.P .deps/KeyImp.P
-@KDE_USE_FINAL_FALSE@DEP_FILES =    .deps/KEYImpCD.P .deps/KEYImporter.P .deps/KeyImp.P
+		  .deps/Dictionary.P .deps/KEYImpCD.P .deps/KEYImporter.P \
+	.deps/KeyImp.P
+@KDE_USE_FINAL_FALSE@DEP_FILES =    .deps/Dictionary.P .deps/KEYImpCD.P .deps/KEYImporter.P \
+	.deps/KeyImp.P
 
 SOURCES = $(libKEYImporter_la_SOURCES)
 OBJECTS = $(libKEYImporter_la_OBJECTS)
@@ -569,11 +574,11 @@ force-reedit:
 
 
 #>+ 11
-libKEYImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/KEYImporter.cpp $(srcdir)/KeyImp.cpp $(srcdir)/KEYImpCD.cpp  
+libKEYImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/Dictionary.cpp $(srcdir)/KEYImporter.cpp $(srcdir)/KeyImp.cpp $(srcdir)/KEYImpCD.cpp  
 	@echo 'creating libKEYImporter_la.all_cpp.cpp ...'; \
 	rm -f libKEYImporter_la.all_cpp.files libKEYImporter_la.all_cpp.final; \
 	echo "#define KDE_USE_FINAL 1" >> libKEYImporter_la.all_cpp.final; \
-	for file in KEYImporter.cpp KeyImp.cpp KEYImpCD.cpp ; do \
+	for file in Dictionary.cpp KEYImporter.cpp KeyImp.cpp KEYImpCD.cpp ; do \
 	  echo "#include \"$$file\"" >> libKEYImporter_la.all_cpp.files; \
 	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libKEYImporter_la.all_cpp.final; \
 	done; \

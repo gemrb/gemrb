@@ -3,7 +3,12 @@
 // Acm to Wav conversion
 #include <iostream.h>
 #include <stdio.h>
+#ifdef WIN32
 #include <io.h>
+#else
+#include <fcntl.h>
+#include <unistd.h>
+#endif
 #include <string.h>
 #include "readers.h"
 #include "general.h"
@@ -26,7 +31,15 @@ int ConvertAcmWav(int fhandle,long maxlen, unsigned char *&memory, long &samples
   RIFF_HEADER riff;
   
   memory=0;
+  #ifdef WIN32
   if(maxlen==-1) maxlen=filelength(fhandle);
+  #else
+  if(maxlen==-1) {
+		struct stat st;
+		stat(fhandle, &st);
+		maxlen=st.st_size;
+  }
+  #endif
   try
   {
     //handling normal riff, it is not a standard way, but hopefully able to handle most of the files

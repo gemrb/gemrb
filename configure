@@ -4265,6 +4265,7 @@ gemrb/docs/en/Makefile \
 gemrb/includes/Makefile \
 gemrb/includes/sdl/Makefile \
 gemrb/plugins/Makefile \
+gemrb/plugins/ACMImporter/Makefile \
 gemrb/plugins/AREImporter/Makefile \
 gemrb/plugins/BAMImporter/Makefile \
 gemrb/plugins/BG2HCAnim/Makefile \
@@ -4421,6 +4422,7 @@ gemrb/docs/en/Makefile \
 gemrb/includes/Makefile \
 gemrb/includes/sdl/Makefile \
 gemrb/plugins/Makefile \
+gemrb/plugins/ACMImporter/Makefile \
 gemrb/plugins/AREImporter/Makefile \
 gemrb/plugins/BAMImporter/Makefile \
 gemrb/plugins/BG2HCAnim/Makefile \

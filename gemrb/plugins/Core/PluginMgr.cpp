@@ -102,7 +102,7 @@ PluginMgr::PluginMgr(char * pluginpath)
 		void* hMod = dlopen(path, RTLD_NOW); //Try to load the Module
 		if(hMod == NULL) {
 			printBracket("ERROR", LIGHT_RED);
-			printf("\nCannot Load Module, Skipping...\n");
+			printf("\nCannot Load Module, Skipping...\n%s\n", dlerror());
 			continue;
 		}
 		printStatus("OK", LIGHT_GREEN);

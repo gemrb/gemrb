@@ -6,14 +6,18 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#ifdef WIN32
 #include <io.h>
+#else
+#include <unistd.h>
+#endif
 
 signed char endstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param) 
 {
 	if(stream) {
 		return FSOUND_Stream_Close(stream);
 	}
-	return TRUE;
+	return true;
 }
 
 ACMImp::ACMImp(void)
@@ -26,7 +30,7 @@ ACMImp::~ACMImp(void)
 
 bool ACMImp::Init(void)
 {
-	if(FSOUND_Init(44100, 32, 0) == FALSE)
+	if(FSOUND_Init(44100, 32, 0) == false)
 		return false;
 	return true;
 }
@@ -40,7 +44,11 @@ unsigned long ACMImp::Play(const char * ResRef)
 	FILE * str = fopen(path, "rb");
 	if(str != NULL) {
 		fclose(str);
+#ifndef WIN32
+		FSOUND_STREAM * sound = FSOUND_Stream_Open(path, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
+#else
 		FSOUND_STREAM * sound = FSOUND_Stream_OpenFile(path, FSOUND_LOOP_OFF | FSOUND_2D, 0);
+#endif
 		if(sound) {
 			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
 				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
@@ -57,7 +65,11 @@ unsigned long ACMImp::Play(const char * ResRef)
 	str = fopen(path, "rb");
 	if(str != NULL) {
 		fclose(str);
+#ifndef WIN32
+		FSOUND_STREAM * sound = FSOUND_Stream_Open(path, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
+#else
 		FSOUND_STREAM * sound = FSOUND_Stream_OpenFile(path, FSOUND_LOOP_OFF | FSOUND_2D, 0);
+#endif
 		if(sound) {
 			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
 				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
@@ -94,7 +106,13 @@ bool ACMImp::AcmToWav(const char * ResRef)
 	}
 	fclose(out);
 	free(buf);
-	int fhandle = open(path, O_RDONLY | O_BINARY);
+	int flags = 0;
+	#ifdef WIN32
+	flags = O_RDONLY | O_BINARY;
+	#else
+	flags = O_RDONLY;
+	#endif
+	int fhandle = open(path, flags);
 	if(fhandle == -1)
 		return false;
 	unsigned char *buffer = NULL;
@@ -105,6 +123,8 @@ bool ACMImp::AcmToWav(const char * ResRef)
 			delete buffer;
 		return false;
 	}
+	close(fhandle);
+	remove(path);
 	strcpy(path, core->CachePath);
 	strcat(path, ResRef);
 	strcat(path, core->TypeExt(IE_WAV_CLASS_ID));

@@ -7,7 +7,7 @@ static char *FMOD_ErrorString(int errcode)
 	{
 		case FMOD_ERR_NONE:				return "No errors";
 		case FMOD_ERR_BUSY:				return "Cannot call this command after FSOUND_Init.  Call FSOUND_Close first.";
-		case FMOD_ERR_UNINITIALIZED:	return "This command failed because FSOUND_Init was not called or called properly";
+		case FMOD_ERR_UNINITIALIZED:	return "This command failed because FSOUND_Init was not called";
 		case FMOD_ERR_PLAY:				return "Playing the sound failed.";
 		case FMOD_ERR_INIT:				return "Error initializing output device.";
 		case FMOD_ERR_ALLOCATED:		return "The output device is already in use and cannot be reused.";
@@ -27,6 +27,6 @@ static char *FMOD_ErrorString(int errcode)
 
 		default :						return "Unknown error";
 	};
-};
+}
 
 #endif

@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.6 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.7 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -49,9 +49,9 @@ pkgincludedir = $(includedir)/gemrb
 top_builddir = ../../..
 
 ACLOCAL = aclocal-1.4
-AUTOCONF = /home/mud/bg2/gemrb/admin/missing autoconf
+AUTOCONF = autoconf
 AUTOMAKE = automake-1.4
-AUTOHEADER = /home/mud/bg2/gemrb/admin/missing autoheader
+AUTOHEADER = autoheader
 
 INSTALL = /usr//bin/install -c -p
 INSTALL_PROGRAM = ${INSTALL} $(INSTALL_STRIP_FLAG) $(AM_INSTALL_PROGRAM_FLAGS)
@@ -65,12 +65,12 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = i686-pc-linux-gnu
-build_triplet = i686-pc-linux-gnu
-host_alias = i686-pc-linux-gnu
-host_triplet = i686-pc-linux-gnu
-target_alias = i686-pc-linux-gnu
-target_triplet = i686-pc-linux-gnu
+build_alias = i386-linux
+build_triplet = i386-pc-linux-gnu
+host_alias = i386-linux
+host_triplet = i386-pc-linux-gnu
+target_alias = i386-linux
+target_triplet = i386-pc-linux-gnu
 ARTSCCONFIG = @ARTSCCONFIG@
 AS = @AS@
 AUTODIRS = 
@@ -160,8 +160,8 @@ MICO_INCLUDES = @MICO_INCLUDES@
 MICO_LDFLAGS = @MICO_LDFLAGS@
 MOC = @MOC@
 MSGFMT = @MSGFMT@
-NOOPT_CFLAGS = 
-NOOPT_CXXFLAGS =  -fno-exceptions -fno-check-new
+NOOPT_CFLAGS =  -ansi -W -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -g
+NOOPT_CXXFLAGS =  -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -g3 -Wall -fno-exceptions -fno-check-new
 NOREPO = -fno-repo
 OBJDUMP = @OBJDUMP@
 OBJEXT = o
@@ -188,7 +188,7 @@ USE_EXCEPTIONS = -fexceptions
 USE_RTTI = 
 USE_THREADS = @USE_THREADS@
 VERSION = 0.1
-WOVERLOADED_VIRTUAL = 
+WOVERLOADED_VIRTUAL = -Woverloaded-virtual
 XGETTEXT = @XGETTEXT@
 XPMINC = @XPMINC@
 XPMLIB = @XPMLIB@
@@ -237,9 +237,9 @@ libKEYImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl
 
 #>- libKEYImporter_la_METASOURCES = AUTO
 
-libKEYImporter_la_SOURCES = KEYImporter.cpp KeyImp.cpp KEYImpCD.cpp Dictionary.cpp
+libKEYImporter_la_SOURCES = Dictionary.cpp KEYImporter.cpp KeyImp.cpp KEYImpCD.cpp 
 
-EXTRA_DIST = KEYImpCD.cpp KEYImpCD.h KeyImp.cpp KeyImp.h KEYImporter.cpp Dictionary.cpp
+EXTRA_DIST = KEYImpCD.cpp KEYImpCD.h KeyImp.cpp KeyImp.h KEYImporter.cpp Dictionary.cpp Dictionary.h 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -250,13 +250,15 @@ DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I../../..
 CPPFLAGS = 
 LIBS = 
 libKEYImporter_la_LIBADD = 
-#>- libKEYImporter_la_OBJECTS =  KEYImporter.lo KeyImp.lo KEYImpCD.lo Dictionary.lo
-#>+ 4
+#>- libKEYImporter_la_OBJECTS =  Dictionary.lo KEYImporter.lo KeyImp.lo \
+#>- KEYImpCD.lo
+#>+ 5
 libKEYImporter_la_final_OBJECTS = libKEYImporter_la.all_cpp.lo 
-libKEYImporter_la_nofinal_OBJECTS = KEYImporter.lo KeyImp.lo KEYImpCD.lo Dictionary.lo
+libKEYImporter_la_nofinal_OBJECTS = Dictionary.lo KEYImporter.lo KeyImp.lo \
+	KEYImpCD.lo
 libKEYImporter_la_OBJECTS = $(libKEYImporter_la_nofinal_OBJECTS)
 #libKEYImporter_la_OBJECTS = $(libKEYImporter_la_final_OBJECTS)
-CXXFLAGS = -O2 -fno-exceptions -fno-check-new
+CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
 #>- CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 #>+ 1
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) $(KDE_CXXFLAGS)
@@ -274,7 +276,14 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =    .deps/KEYImpCD.P .deps/KEYImporter.P .deps/KeyImp.P .deps/Dictionary.P
+#>- DEP_FILES =  .deps/Dictionary.P .deps/KEYImpCD.P .deps/KEYImporter.P \
+#>- .deps/KeyImp.P
+#>+ 6
+#DEP_FILES =   $(DEPDIR)/libKEYImporter_la.all_cpp.P \
+		  .deps/Dictionary.P .deps/KEYImpCD.P .deps/KEYImporter.P \
+	.deps/KeyImp.P
+DEP_FILES =    .deps/Dictionary.P .deps/KEYImpCD.P .deps/KEYImporter.P \
+	.deps/KeyImp.P
 
 SOURCES = $(libKEYImporter_la_SOURCES)
 OBJECTS = $(libKEYImporter_la_OBJECTS)
@@ -566,11 +575,11 @@ force-reedit:
 
 
 #>+ 11
-libKEYImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/KEYImporter.cpp $(srcdir)/KeyImp.cpp $(srcdir)/KEYImpCD.cpp  
+libKEYImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/Dictionary.cpp $(srcdir)/KEYImporter.cpp $(srcdir)/KeyImp.cpp $(srcdir)/KEYImpCD.cpp  
 	@echo 'creating libKEYImporter_la.all_cpp.cpp ...'; \
 	rm -f libKEYImporter_la.all_cpp.files libKEYImporter_la.all_cpp.final; \
 	echo "#define KDE_USE_FINAL 1" >> libKEYImporter_la.all_cpp.final; \
-	for file in KEYImporter.cpp KeyImp.cpp KEYImpCD.cpp ; do \
+	for file in Dictionary.cpp KEYImporter.cpp KeyImp.cpp KEYImpCD.cpp ; do \
 	  echo "#include \"$$file\"" >> libKEYImporter_la.all_cpp.files; \
 	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libKEYImporter_la.all_cpp.final; \
 	done; \

@@ -1,3 +1,4 @@
+cp plugins/ACMImporter/.libs/libACMImporter.so plugins/
 cp plugins/AREImporter/.libs/libAREImporter.so plugins/
 cp plugins/BAMImporter/.libs/libBAMImporter.so plugins/
 cp plugins/BG2HCAnim/.libs/libBG2HCAnim.so plugins/
