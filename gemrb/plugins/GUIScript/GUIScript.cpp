@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.162 2004/04/26 20:51:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.163 2004/05/07 16:54:17 avenger_teambg Exp $
  *
  */
 
@@ -2402,6 +2402,26 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+static PyObject* GemRB_IsPlayerSelected(PyObject * /*self*/, PyObject* args)
+{
+	int PlayerSlot;
+
+	if (!PyArg_ParseTuple( args, "i", &PlayerSlot )) {
+		printMessage( "GUIScript", "Syntax Error: IsPlayerSelected(Slot)\n", LIGHT_RED );
+		return NULL;
+	}
+	Game *game = core->GetGame();
+	if(!game) {
+		return NULL;
+	}
+	PlayerSlot = game->FindPlayer( PlayerSlot );
+	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
+	if (!MyActor) {
+		return Py_BuildValue( "s", "");
+	}
+	return Py_BuildValue("d", MyActor->IsSelected() );
+}
+
 static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot, Which;
@@ -3039,6 +3059,8 @@ static PyMethodDef GemRBMethods[] = {
 	"Changes a stat."},
 	{"GetPlayerStat", GemRB_GetPlayerStat, METH_VARARGS,
 	"Queries a stat."},
+	{"IsPlayerSelected", GemRB_IsPlayerSelected, METH_VARARGS,
+	"Returns true if the player was selected."},
 	{"GetPlayerPortrait", GemRB_GetPlayerPortrait, METH_VARARGS,
 	"Queries the player portrait."},
 	{"GetPlayerName", GemRB_GetPlayerName, METH_VARARGS,
