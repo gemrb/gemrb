@@ -95,7 +95,7 @@ char *strlwr(char *string);
 #define GetTime(store) \
 	{ \
 		struct timeval tv; \
-		gettimeofday(&tv, NULL); \ 
+		gettimeofday(&tv, NULL); \
 		store = (tv.tv_usec/1000) + (tv.tv_sec*1000); \
 	}
 #endif
