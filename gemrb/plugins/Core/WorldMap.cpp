@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.7 2004/10/01 19:40:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.8 2005/02/17 17:21:57 avenger_teambg Exp $
  *
  */
 
@@ -55,20 +55,39 @@ WorldMap::~WorldMap(void)
 	}
 }
 
-void WorldMap::SetAreaStatus(char *AreaName, int Bits, int Op)
+WMPAreaEntry* WorldMap::GetArea(const ieResRef AreaName)
 {
-	WMPAreaEntry* ae=NULL;
-
 	int i=area_entries.size();
-	while(i--) {
+	while (i--) {
 		if(!strnicmp(AreaName, area_entries[i]->AreaName,8)) {
-			ae=area_entries[i];
-			break;
+			return area_entries[i];
 		}
 	}
-	if(!ae)
+	return NULL;
+}
+
+void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
+{
+	if (direction<0 || direction>3)
 		return;
-	switch(Op) {
+	WMPAreaEntry* ae=GetArea(AreaName);
+	if (!ae)
+		return;
+	int i=ae->AreaLinksCount[direction];
+	while (i--) {
+		WMPAreaEntry* ae2 = area_entries[ae->AreaLinksIndex[direction]+i];
+		if (ae2->AreaStatus&WMP_ENTRY_ADJACENT) {
+			ae2->AreaStatus|=WMP_ENTRY_VISIBLE;
+		}
+	}
+}
+
+void WorldMap::SetAreaStatus(const ieResRef AreaName, int Bits, int Op)
+{
+	WMPAreaEntry* ae=GetArea(AreaName);
+	if (!ae)
+		return;
+	switch (Op) {
 		case BM_SET:
 			ae->AreaStatus=Bits;
 			break;

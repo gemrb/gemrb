@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.9 2004/10/09 17:38:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.10 2005/02/17 17:21:58 avenger_teambg Exp $
  *
  */
 
@@ -77,7 +77,8 @@ WorldMap* WMPImp::GetWorldMap(unsigned int index)
 	str->ReadDword( &m->AreaLinksOffset );
 	str->ReadDword( &m->AreaLinksCount );
 	str->ReadResRef( m->MapIconResRef );
-	str->Read( m->unknown3, 128 );
+// no problem removing this, because there is a seek after it
+//	str->Read( m->unknown3, 128 );
 
 	str->Seek( m->AreaEntriesOffset, GEM_STREAM_START );
 	for (i = 0; i < m->AreaEntriesCount; i++) {
@@ -137,7 +138,8 @@ WMPAreaEntry* WMPImp::GetAreaEntry()
 		str->ReadDword( &ae->AreaLinksIndex[dir] );
 		str->ReadDword( &ae->AreaLinksCount[dir] );
 	}
-	str->Read( ae->unknown, 128 );
+	str->Seek( 128, GEM_CURRENT_POS );
+//	str->Read( ae->unknown, 128 );
 
 	return ae;
 }
@@ -155,7 +157,8 @@ WMPAreaLink* WMPImp::GetAreaLink()
 		str->ReadResRef( al->EncounterAreaResRef[k] );
 	}
 	str->ReadDword( &al->EncounterChance );
-	str->Read( al->unknown, 128 );
+//	str->Read( al->unknown, 128 );
+	str->Seek( 128, GEM_CURRENT_POS );
 
 	return al;
 }
