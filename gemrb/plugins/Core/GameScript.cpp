@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.26 2003/12/30 21:51:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.27 2004/01/01 15:45:07 balrog994 Exp $
  *
  */
 
@@ -32,6 +32,7 @@ static SymbolMgr* actionsTable;
 static TriggerFunction triggers[MAX_TRIGGERS];
 static ActionFunction actions[MAX_ACTIONS];
 static bool blocking[MAX_ACTIONS];
+static bool instant[MAX_ACTIONS];
 
 GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables * local)
 {
@@ -91,6 +92,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[121] = StartCutSceneMode;
 		actions[122] = EndCutSceneMode;
 		actions[127] = CutSceneId;
+		instant[127] = true;
 		actions[137] = StartDialogue;
 		actions[151] = DisplayString;
 		actions[153] = ChangeAllegiance;
@@ -241,14 +243,13 @@ void GameScript::SetVariable(const char * VarName, const char * Context, int val
 	free(newVarName);
 }
 
-void GameScript::Update(Scriptable * mySelf)
+void GameScript::Update()
 {
-	Scriptable * oldMySelf = MySelf;
-	if(mySelf)
-		MySelf = mySelf;
-	if(MySelf && !MySelf->Active)
+	if(!MySelf || !MySelf->Active)
 		return;
-	while(programmedActions.size()) {
+	//if(MySelf->GetNextAction())
+	//	return;
+	/*while(programmedActions.size()) {
 		//printf("Executing Script Step\n");
 		Action * aC = programmedActions.front();
 		ExecuteAction(this, aC);
@@ -266,8 +267,7 @@ void GameScript::Update(Scriptable * mySelf)
 		}
 		if(blocking[aC->actionID])
 			return;
-	}
-	MySelf = oldMySelf;
+	}*/
 	unsigned long thisTime;
 	GetTime(thisTime);
 	if((thisTime - lastRunTime) < scriptRunDelay)
@@ -278,8 +278,8 @@ void GameScript::Update(Scriptable * mySelf)
 		return;
 	for(int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock * rB = script->responseBlocks[a];
-		if(EvaluateCondition(this, rB->condition)) {
-			ExecuteResponseSet(this, rB->responseSet);
+		if(EvaluateCondition(this->MySelf, rB->condition)) {
+			ExecuteResponseSet(this->MySelf, rB->responseSet);
 			endReached = false;
 			if(!continueExecution)
 				break;
@@ -450,19 +450,19 @@ Object * GameScript::DecodeObject(const char * line)
 	return oB;
 }
 
-bool GameScript::EvaluateCondition(GameScript * sender, Condition * condition)
+bool GameScript::EvaluateCondition(Scriptable * Sender, Condition * condition)
 {
 	bool ret = true;
 	for(int i = 0; i < condition->triggersCount; i++) {
 		Trigger * tR = condition->triggers[i];
-		ret &= EvaluateTrigger(sender, tR);
+		ret &= EvaluateTrigger(Sender, tR);
 		if(!ret)
 			return ret;
 	}
 	return ret;
 }
 
-bool GameScript::EvaluateTrigger(GameScript * sender, Trigger * trigger)
+bool GameScript::EvaluateTrigger(Scriptable * Sender, Trigger * trigger)
 {
 	TriggerFunction func = triggers[trigger->triggerID];
 	if(!func) {
@@ -470,43 +470,48 @@ bool GameScript::EvaluateTrigger(GameScript * sender, Trigger * trigger)
 		//printf("%s: Trigger not supported\n", tT->GetValue(trigger->triggerID));
 		return false;
 	}
-	return func(sender, trigger);
+	return func(Sender, trigger);
 }
 
-void GameScript::ExecuteResponseSet(GameScript * sender, ResponseSet * rS)
+void GameScript::ExecuteResponseSet(Scriptable * Sender, ResponseSet * rS)
 {
 	for(int i = 0; i < rS->responsesCount; i++) {
 		Response * rE = rS->responses[i];
 		int randWeight = (rand()%100)+1;
 		if(rE->weight >= randWeight) {
-			ExecuteResponse(sender, rE);
+			ExecuteResponse(Sender, rE);
 			break;
 		}
 	}
 }
 
-void GameScript::ExecuteResponse(GameScript * sender, Response * rE)
+void GameScript::ExecuteResponse(Scriptable * Sender, Response * rE)
 {
 	for(int i = 0; i < rE->actionsCount; i++) {
 		Action * aC = rE->actions[i];
-		//ExecuteAction(sender, aC);
-		programmedActions.push_back(aC);
-		//sender->MySelf->AddAction(aC);
+		if(instant[aC->actionID])
+			ExecuteAction(Sender, aC);
+		else {
+			if(Sender->CutSceneId)
+				Sender->CutSceneId->AddAction(aC);
+			else
+				Sender->AddAction(aC);
+		}
 	}
 }
 
-void GameScript::ExecuteAction(GameScript * sender, Action * aC)
+void GameScript::ExecuteAction(Scriptable * Sender, Action * aC)
 {
 	ActionFunction func = actions[aC->actionID];
-	if(!func) {
-		//SymbolMgr * aT = core->GetSymbol(actionsTable);
-		//printf("%s: Action not supported\n", aT->GetValue(aC->actionID));
-		return;
+	if(func) {
+		//printf("[%s]: Executing Action: %d\n", Sender->scriptName, aC->actionID);
+		func(Sender, aC);
 	}
-	func(sender, aC);
+	if(!blocking[aC->actionID])
+		Sender->CurrentAction = NULL;
 }
 
-Scriptable * GameScript::GetActorFromObject(GameScript * Sender, Object * oC)
+Scriptable * GameScript::GetActorFromObject(Scriptable * Sender, Object * oC)
 {
 	//TODO: Implement Object Retieval
 
@@ -516,19 +521,19 @@ Scriptable * GameScript::GetActorFromObject(GameScript * Sender, Object * oC)
 		return map->GetActor(oC->objectName);
 	}
 	else {
-		if(oC->eaField != 0) {
-			switch(oC->eaField) {
+		if(oC->genderField != 0) {
+			switch(oC->genderField) {
 				case 21:
 					return core->GetGame()->GetPC(0);
 				break;
-			}
-		} else {
-			if(oC->genderField == 17) {
-				return Sender->MySelf->LastTrigger;
+				
+				case 17:
+					return Sender->LastTrigger;
+				break;
 			}
 		}
 	}
-	return Sender->MySelf;
+	return Sender;
 }
 
 unsigned char GameScript::GetOrient(short sX, short sY, short dX, short dY)
@@ -569,7 +574,7 @@ void GameScript::ExecuteString(char * String)
 	Action * act = GenerateAction(String);
 	if(!act)
 		return;
-	ExecuteAction(this, act);
+	ExecuteAction(this->MySelf, act);
 	if(act->string0Parameter)
 		free(act->string0Parameter);
 	if(act->string1Parameter)
@@ -591,7 +596,7 @@ bool GameScript::EvaluateString(char * String)
 	if(String[0] == 0)
 		return false;
 	Trigger * tri = GenerateTrigger(String);
-	bool ret = EvaluateTrigger(this, tri);
+	bool ret = EvaluateTrigger(this->MySelf, tri);
 	if(tri->flags&1)
 		ret = !ret;
 	if(tri->string0Parameter)
@@ -1000,7 +1005,7 @@ Trigger * GameScript::GenerateTrigger(char * String)
 // Trigger Functions
 //-------------------------------------------------------------
 
-int GameScript::Alignment(GameScript * Sender, Trigger * parameters)
+int GameScript::Alignment(Scriptable * Sender, Trigger * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
 	if(!scr)
@@ -1021,7 +1026,7 @@ int GameScript::Alignment(GameScript * Sender, Trigger * parameters)
 	return 1;
 }
 
-int GameScript::Allegiance(GameScript * Sender, Trigger * parameters)
+int GameScript::Allegiance(Scriptable * Sender, Trigger * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
 	if(!scr)
@@ -1046,7 +1051,7 @@ int GameScript::Allegiance(GameScript * Sender, Trigger * parameters)
 	return parameters->int0Parameter==value;
 }
 
-int GameScript::Class(GameScript * Sender, Trigger * parameters)
+int GameScript::Class(Scriptable * Sender, Trigger * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
 	if(!scr)
@@ -1059,14 +1064,14 @@ int GameScript::Class(GameScript * Sender, Trigger * parameters)
 	return parameters->int0Parameter==value;
 }
 
-int GameScript::Exists(GameScript * Sender, Trigger * parameters)
+int GameScript::Exists(Scriptable * Sender, Trigger * parameters)
 {
 	Scriptable * actor = GetActorFromObject(Sender, parameters->objectParameter);
 	if(actor==NULL) return 0;
 	return 1;
 }
 
-int GameScript::General(GameScript * Sender, Trigger * parameters)
+int GameScript::General(Scriptable * Sender, Trigger * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
 	if(!scr)
@@ -1078,7 +1083,7 @@ int GameScript::General(GameScript * Sender, Trigger * parameters)
 	return parameters->int0Parameter==actor->GetStat(IE_GENERAL);
 }
 
-int GameScript::Globals(GameScript * Sender, Trigger * parameters)
+int GameScript::Globals(Scriptable * Sender, Trigger * parameters)
 {
 	unsigned long value;
 	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
@@ -1103,7 +1108,7 @@ int GameScript::Globals(GameScript * Sender, Trigger * parameters)
 	return eval;
 }
 
-int  GameScript::OnCreation(GameScript * Sender, Trigger * parameters)
+int  GameScript::OnCreation(Scriptable * Sender, Trigger * parameters)
 {
 	Map * area = core->GetGame()->GetMap(0);
 	if(area->justCreated) {
@@ -1113,24 +1118,24 @@ int  GameScript::OnCreation(GameScript * Sender, Trigger * parameters)
 	return 0;
 }
 
-int GameScript::True(GameScript * /* Sender*/, Trigger * /*parameters*/)
+int GameScript::True(Scriptable * /* Sender*/, Trigger * /*parameters*/)
 {
 	return 1;
 }
 
-int GameScript::False(GameScript * /*Sender*/, Trigger * /*parameters*/)
+int GameScript::False(Scriptable * /*Sender*/, Trigger * /*parameters*/)
 {
 	return 0;
 }
 
-int GameScript::Range(GameScript * Sender, Trigger * parameters)
+int GameScript::Range(Scriptable * Sender, Trigger * parameters)
 {
 	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
 	if(!target)
 		return 0;
-	printf("x1 = %d, y1 = %d\nx2 = %d, y2 = %d\n", target->XPos, target->YPos, Sender->MySelf->XPos, Sender->MySelf->YPos);
-	long x = (target->XPos - Sender->MySelf->XPos);
-	long y = (target->YPos - Sender->MySelf->YPos);
+	printf("x1 = %d, y1 = %d\nx2 = %d, y2 = %d\n", target->XPos, target->YPos, Sender->XPos, Sender->YPos);
+	long x = (target->XPos - Sender->XPos);
+	long y = (target->YPos - Sender->YPos);
 	double distance = sqrt((x*x)+(y*y));
 	printf("Distance = %.3f\n", distance);
 	if(distance <= (parameters->int0Parameter*20)) {
@@ -1153,31 +1158,31 @@ int GameScript::Range(GameScript * Sender, Trigger * parameters)
 	}
 }
 
-int GameScript::Clicked(GameScript * Sender, Trigger * parameters)
+int GameScript::Clicked(Scriptable * Sender, Trigger * parameters)
 {
-	if(Sender->MySelf->Type != ST_TRIGGER)
+	if(Sender->Type != ST_TRIGGER)
 		return 0;
 	if(parameters->objectParameter->eaField == 0) {
 		return 1;
 	}
 	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
-	if(Sender->MySelf == target)
+	if(Sender == target)
 		return 1;
 	return 0;
 }
 
-int GameScript::Entered(GameScript * Sender, Trigger * parameters)
+int GameScript::Entered(Scriptable * Sender, Trigger * parameters)
 {
-	if(Sender->MySelf->Type != ST_PROXIMITY)
+	if(Sender->Type != ST_PROXIMITY)
 		return 0;
 	if(parameters->objectParameter->eaField == 0) {
-		if(Sender->MySelf->LastEntered)
+		if(Sender->LastEntered)
 			return 1;
 		else
 			return 0;
 	}
 	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
-	if(Sender->MySelf->LastEntered == target)
+	if(Sender->LastEntered == target)
 		return 1;
 	return 0;
 }
@@ -1186,12 +1191,12 @@ int GameScript::Entered(GameScript * Sender, Trigger * parameters)
 // Action Functions
 //-------------------------------------------------------------
 
-void GameScript::SG(GameScript * Sender, Action * parameters)
+void GameScript::SG(Scriptable * Sender, Action * parameters)
 {
 	globals->SetAt(&parameters->string0Parameter[0], parameters->int0Parameter);
 }
 
-void GameScript::SetGlobal(GameScript * Sender, Action * parameters)
+void GameScript::SetGlobal(Scriptable * Sender, Action * parameters)
 {
 //	printf("SetGlobal(\"%s\", %d)\n", parameters->string0Parameter, parameters->int0Parameter);
 	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
@@ -1203,7 +1208,7 @@ void GameScript::SetGlobal(GameScript * Sender, Action * parameters)
 	}
 }
 
-void GameScript::ChangeAllegiance(GameScript * Sender, Action * parameters)
+void GameScript::ChangeAllegiance(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!scr)
@@ -1214,7 +1219,7 @@ void GameScript::ChangeAllegiance(GameScript * Sender, Action * parameters)
 	actor->SetStat(IE_EA,parameters->int0Parameter);
 }
 
-void GameScript::ChangeGeneral(GameScript * Sender, Action * parameters)
+void GameScript::ChangeGeneral(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!scr)
@@ -1225,7 +1230,7 @@ void GameScript::ChangeGeneral(GameScript * Sender, Action * parameters)
 	actor->SetStat(IE_GENERAL,parameters->int0Parameter);
 }
 
-void GameScript::ChangeRace(GameScript * Sender, Action * parameters)
+void GameScript::ChangeRace(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!scr)
@@ -1236,7 +1241,7 @@ void GameScript::ChangeRace(GameScript * Sender, Action * parameters)
 	actor->SetStat(IE_RACE,parameters->int0Parameter);
 }
 
-void GameScript::ChangeClass(GameScript * Sender, Action * parameters)
+void GameScript::ChangeClass(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!scr)
@@ -1247,7 +1252,7 @@ void GameScript::ChangeClass(GameScript * Sender, Action * parameters)
 	actor->SetStat(IE_CLASS,parameters->int0Parameter);
 }
 
-void GameScript::ChangeSpecifics(GameScript * Sender, Action * parameters)
+void GameScript::ChangeSpecifics(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!scr)
@@ -1258,7 +1263,7 @@ void GameScript::ChangeSpecifics(GameScript * Sender, Action * parameters)
 	actor->SetStat(IE_SPECIFIC,parameters->int0Parameter);
 }
 
-void GameScript::ChangeGender(GameScript * Sender, Action * parameters)
+void GameScript::ChangeGender(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!scr)
@@ -1269,7 +1274,7 @@ void GameScript::ChangeGender(GameScript * Sender, Action * parameters)
 	actor->SetStat(IE_SEX,parameters->int0Parameter);
 }
 
-void GameScript::ChangeAlignment(GameScript * Sender, Action * parameters)
+void GameScript::ChangeAlignment(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!scr)
@@ -1280,7 +1285,7 @@ void GameScript::ChangeAlignment(GameScript * Sender, Action * parameters)
 	actor->SetStat(IE_ALIGNMENT,parameters->int0Parameter);
 }
 
-void GameScript::TriggerActivation(GameScript * Sender, Action * parameters)
+void GameScript::TriggerActivation(Scriptable * Sender, Action * parameters)
 {
 	InfoPoint * ip = core->GetGame()->GetMap(0)->tm->GetInfoPoint(parameters->objects[1]->objectName);
 	if(!ip) {
@@ -1290,17 +1295,17 @@ void GameScript::TriggerActivation(GameScript * Sender, Action * parameters)
 	ip->Active = parameters->int0Parameter;
 }
 
-void GameScript::FadeToColor(GameScript * Sender, Action * parameters)
+void GameScript::FadeToColor(Scriptable * Sender, Action * parameters)
 {
 	core->timer->SetFadeToColor(parameters->XpointParameter);
 }
 
-void GameScript::FadeFromColor(GameScript * Sender, Action * parameters)
+void GameScript::FadeFromColor(Scriptable * Sender, Action * parameters)
 {
 	core->timer->SetFadeFromColor(parameters->XpointParameter);
 }
 
-void GameScript::CreateCreature(GameScript * Sender, Action * parameters)
+void GameScript::CreateCreature(Scriptable * Sender, Action * parameters)
 {
 	ActorMgr * aM = (ActorMgr*)core->GetInterface(IE_CRE_CLASS_ID);
 	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_CRE_CLASS_ID);
@@ -1314,70 +1319,97 @@ void GameScript::CreateCreature(GameScript * Sender, Action * parameters)
 	core->FreeInterface(aM);
 }
 
-void GameScript::StartCutSceneMode(GameScript * Sender, Action * parameters)
+void GameScript::StartCutSceneMode(Scriptable * Sender, Action * parameters)
 {
 	core->SetCutSceneMode(true);
 }
 
-void GameScript::EndCutSceneMode(GameScript * Sender, Action * parameters)
+void GameScript::EndCutSceneMode(Scriptable * Sender, Action * parameters)
 {
 	core->SetCutSceneMode(false);
 }
 
-void GameScript::StartCutScene(GameScript * Sender, Action * parameters)
+void GameScript::StartCutScene(Scriptable * Sender, Action * parameters)
 {
 	GameScript * gs = new GameScript(parameters->string0Parameter, IE_SCRIPT_ALWAYS);
+	gs->MySelf = Sender;
 	core->timer->SetCutScene(gs);
 }
 
-void GameScript::CutSceneId(GameScript * Sender, Action * parameters)
+void GameScript::CutSceneId(Scriptable * Sender, Action * parameters)
 {
 	if(parameters->objects[0]->genderField != 0) {
-		Sender->MySelf = GetActorFromObject(Sender, parameters->objects[0]);
+		Sender->CutSceneId = GetActorFromObject(Sender, parameters->objects[0]);
 	} else {
 		Map * map = core->GetGame()->GetMap(0);
-		Sender->MySelf = map->GetActor(parameters->objects[1]->objectName);
+		Sender->CutSceneId = map->GetActor(parameters->objects[1]->objectName);
 	}
 }
 
-void GameScript::Enemy(GameScript * Sender, Action * parameters)
+void GameScript::Enemy(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Actor * actor = (Actor*)scr;
 	actor->SetStat(IE_EA,255);
 }
 
-void GameScript::Ally(GameScript * Sender, Action * parameters)
+void GameScript::Ally(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Actor * actor = (Actor*)scr;
 	actor->SetStat(IE_EA,4);
 }
 
-void GameScript::Wait(GameScript * Sender, Action * parameters)
+void GameScript::Wait(Scriptable * Sender, Action * parameters)
 {
-	core->timer->SetWait(parameters->int0Parameter*AI_UPDATE_TIME);
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Sender->SetWait(parameters->int0Parameter*AI_UPDATE_TIME);
 }
 
-void GameScript::SmallWait(GameScript * Sender, Action * parameters)
+void GameScript::SmallWait(Scriptable * Sender, Action * parameters)
 {
-	core->timer->SetWait(parameters->int0Parameter);
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Sender->SetWait(parameters->int0Parameter);
 }
 
-void GameScript::MoveViewPoint(GameScript * Sender, Action * parameters)
+void GameScript::MoveViewPoint(Scriptable * Sender, Action * parameters)
 {
 	core->GetVideoDriver()->MoveViewportTo(parameters->XpointParameter, parameters->YpointParameter);
 }
 
-void GameScript::MoveViewObject(GameScript * Sender, Action * parameters)
+void GameScript::MoveViewObject(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
 	if(scr->Type != ST_ACTOR)
@@ -1388,21 +1420,24 @@ void GameScript::MoveViewObject(GameScript * Sender, Action * parameters)
 	}
 }
 
-void GameScript::MoveToPoint(GameScript * Sender, Action * parameters)
+void GameScript::MoveToPoint(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
-	Actor * actor = (Actor*)scr;
-	if(actor) {
-		actor->WalkTo(parameters->XpointParameter, parameters->YpointParameter);
-		core->timer->SetMovingActor(actor);
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
 	}
+	Actor * actor = (Actor*)scr;
+	actor->WalkTo(parameters->XpointParameter, parameters->YpointParameter);
+	core->timer->SetMovingActor(actor);
 }
 
-void GameScript::MoveToObject(GameScript * Sender, Action * parameters)
+void GameScript::MoveToObject(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
@@ -1412,18 +1447,28 @@ void GameScript::MoveToObject(GameScript * Sender, Action * parameters)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Actor * actor = (Actor*)scr;
 	actor->WalkTo(target->XPos, target->YPos);
 	core->timer->SetMovingActor(actor);
 }
 
-void GameScript::DisplayStringHead(GameScript * Sender, Action * parameters)
+void GameScript::DisplayStringHead(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Actor * actor = (Actor*)scr;
 	if(actor) {
 		printf("Displaying string on: %s\n", actor->scriptName);
@@ -1431,24 +1476,35 @@ void GameScript::DisplayStringHead(GameScript * Sender, Action * parameters)
 	}
 }
 
-void GameScript::Face(GameScript * Sender, Action * parameters)
+void GameScript::Face(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Actor * actor = (Actor*)scr;
 	if(actor) {
 		actor->Orientation = parameters->int0Parameter;
+		actor->resetAction = true;
 	}
 }
 
-void GameScript::FaceObject(GameScript * Sender, Action * parameters)
+void GameScript::FaceObject(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Scriptable * target = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!target)
 		return;
@@ -1458,13 +1514,18 @@ void GameScript::FaceObject(GameScript * Sender, Action * parameters)
 	actor->Orientation = GetOrient(target->XPos, target->YPos, actor->XPos, actor->YPos);
 }
 
-void GameScript::DisplayStringWait(GameScript * Sender, Action * parameters)
+void GameScript::DisplayStringWait(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Actor * actor = (Actor*)scr;
 	printf("Displaying string on: %s\n", actor->scriptName);
 	StringBlock sb = core->strings->GetStringBlock(parameters->int0Parameter);
@@ -1473,11 +1534,12 @@ void GameScript::DisplayStringWait(GameScript * Sender, Action * parameters)
 		unsigned long len = core->GetSoundMgr()->Play(sb.Sound);
 		if(len != 0xffffffff)
 			//waitCounter = ((15*len)/1000);
-			core->timer->SetWait((AI_UPDATE_TIME*len)/1000);
+			//core->timer->SetWait((AI_UPDATE_TIME*len)/1000);
+			actor->SetWait((AI_UPDATE_TIME*len)/1000);
 	}
 }
 
-void GameScript::StartSong(GameScript * Sender, Action * parameters)
+void GameScript::StartSong(Scriptable * Sender, Action * parameters)
 {
 	int MusicTable = core->LoadTable("music");
 	if(MusicTable>=0) {
@@ -1492,56 +1554,73 @@ void GameScript::StartSong(GameScript * Sender, Action * parameters)
 	}
 }
 
-void GameScript::Continue(GameScript * Sender, Action * parameters)
+void GameScript::Continue(Scriptable * Sender, Action * parameters)
 {
-	Sender->continueExecution = true;
+	//Sender->continueExecution = true;
 }
 
-void GameScript::PlaySound(GameScript * Sender, Action * parameters)
+void GameScript::PlaySound(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(scr) {
-		core->GetSoundMgr()->Play(parameters->string0Parameter);
+	if(!scr)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
 	}
+	printf("PlaySound(%s)\n", parameters->string0Parameter);
+	core->GetSoundMgr()->Play(parameters->string0Parameter);
 }
 
-void GameScript::CreateVisualEffectObject(GameScript * Sender, Action * parameters)
+void GameScript::CreateVisualEffectObject(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!scr)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Actor * target = (Actor*)scr;
 	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_VVC_CLASS_ID);
 	ScriptedAnimation * vvc = new ScriptedAnimation(ds, true, target->XPos, target->YPos);
 	core->GetGame()->GetMap(0)->AddVVCCell(vvc);
 }
 
-void GameScript::CreateVisualEffect(GameScript * Sender, Action * parameters)
+void GameScript::CreateVisualEffect(Scriptable * Sender, Action * parameters)
 {
 	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_VVC_CLASS_ID);
 	ScriptedAnimation * vvc = new ScriptedAnimation(ds, true, parameters->XpointParameter, parameters->YpointParameter);
 	core->GetGame()->GetMap(0)->AddVVCCell(vvc);
 }
 
-void GameScript::DestroySelf(GameScript * Sender, Action * parameters)
+void GameScript::DestroySelf(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Actor * actor = (Actor*)scr;
 	actor->DeleteMe = true;
 }
 
-void GameScript::ScreenShake(GameScript * Sender, Action * parameters)
+void GameScript::ScreenShake(Scriptable * Sender, Action * parameters)
 {
 	core->timer->SetScreenShake(parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter);
+	Sender->SetWait(parameters->int0Parameter);
 }
 
-void GameScript::UnhideGUI(GameScript * Sender, Action * parameters)
+void GameScript::UnhideGUI(Scriptable * Sender, Action * parameters)
 {
 	GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
 	if(gc->ControlType == IE_GUI_GAMECONTROL)
@@ -1549,18 +1628,23 @@ void GameScript::UnhideGUI(GameScript * Sender, Action * parameters)
 	EndCutSceneMode(Sender, parameters);
 }
 
-void GameScript::HideGUI(GameScript * Sender, Action * parameters)
+void GameScript::HideGUI(Scriptable * Sender, Action * parameters)
 {
 	GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
 	if(gc->ControlType == IE_GUI_GAMECONTROL)
 		gc->HideGUI();
 }
 
-void GameScript::Dialogue(GameScript * Sender, Action * parameters)
+void GameScript::Dialogue(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!tar)
 		return;
@@ -1578,7 +1662,7 @@ void GameScript::Dialogue(GameScript * Sender, Action * parameters)
 	}
 }
 
-void GameScript::DisplayString(GameScript * Sender, Action * parameters)
+void GameScript::DisplayString(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!scr)
@@ -1593,7 +1677,7 @@ void GameScript::DisplayString(GameScript * Sender, Action * parameters)
 		gc->DisplayString(scr);
 }
 
-void GameScript::AmbientActivate(GameScript * Sender, Action * parameters)
+void GameScript::AmbientActivate(Scriptable * Sender, Action * parameters)
 {
 	Animation * anim = core->GetGame()->GetMap(0)->GetAnimation(parameters->objects[1]->objectName);
 	if(!anim) {
@@ -1603,11 +1687,16 @@ void GameScript::AmbientActivate(GameScript * Sender, Action * parameters)
 	anim->Active = parameters->int0Parameter;
 }
 
-void GameScript::StartDialogue(GameScript * Sender, Action * parameters)
+void GameScript::StartDialogue(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
 	if(!tar)
 		return;
