@@ -17,7 +17,7 @@ Map::~Map(void)
 		delete(animations[i]);
 	}
 	for(unsigned int i = 0; i < actors.size(); i++) {
-		delete(actors[i]);
+		delete(actors[i].actor);
 	}
 }
 
@@ -36,10 +36,12 @@ void Map::DrawMap(void)
 		//TODO: Clipping Animations off screen
 		video->BlitSprite(animations[i]->NextFrame(), animations[i]->x, animations[i]->y);
 	}
-	/*for(unsigned int i = 0; i < actors.size(); i++) {
-		if(actors[i]->GetAnims()->Stands.size() != 0)
-			video->BlitSprite(actors[i]->GetAnims()->Stands[0]->NextFrame(), actors[i]->XPos, actors[i]->YPos);
-	}*/
+	for(unsigned int i = 0; i < actors.size(); i++) {
+		CharAnimations * ca = actors[i].actor->GetAnims();
+		Animation * anim = ca->GetAnimation(actors[i].AnimID, actors[i].Orientation);
+		if(anim)
+			video->BlitSprite(anim->NextFrame(), actors[i].XPos, actors[i].YPos);
+	}
 }
 
 void Map::AddAnimation(Animation * anim)
@@ -47,7 +49,7 @@ void Map::AddAnimation(Animation * anim)
 	animations.push_back(anim);
 }
 
-void Map::AddActor(Actor * actor)
+void Map::AddActor(ActorBlock actor)
 {
 	actors.push_back(actor);
 }

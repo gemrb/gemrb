@@ -16,19 +16,27 @@
 #define GEM_EXPORT
 #endif
 
+typedef struct ActorBlock {
+	unsigned short XPos, YPos;
+	unsigned short XDes, YDes;
+	unsigned char Orientation;
+	unsigned char AnimID;
+	Actor * actor;
+} ActorBlock;
+
 class GEM_EXPORT Map
 {
 private:
 	TileMap * tm;
 	std::vector<Animation*> animations;
-	std::vector<Actor*> actors;
+	std::vector<ActorBlock> actors;
 public:
 	Map(void);
 	~Map(void);
 	void AddTileMap(TileMap * tm);
 	void DrawMap(void);
 	void AddAnimation(Animation * anim);
-	void AddActor(Actor * actor);
+	void AddActor(ActorBlock actor);
 };
 
 #endif
