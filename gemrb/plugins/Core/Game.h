@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.43 2004/09/12 21:58:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.44 2005/02/22 23:11:03 avenger_teambg Exp $
  *
  */
 
@@ -151,7 +151,7 @@ public:
 	/* finds an actor in store by scripting name*/
 	Actor* FindNPC(const char *deathvar);
 	/* joins party */
-	int JoinParty(Actor* pc);
+	int JoinParty(Actor* pc, bool join=true);
 	/* return current party size */
 	int GetPartySize(bool onlyalive);
 	/* returns the npcs count */
@@ -168,7 +168,6 @@ public:
 	/* removes actor from party (if in there) */
 	int LeaveParty(Actor* pc);
 	/* returns slot*/
-	int SetPC(Actor* pc);
 	int DelPC(unsigned int slot, bool autoFree = false);
 	int DelNPC(unsigned int slot, bool autoFree = false);
 	/* returns map in index */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.57 2005/02/13 13:39:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.58 2005/02/22 23:10:51 avenger_teambg Exp $
  *
  */
 
@@ -89,6 +89,7 @@ class Map;
 #define GA_NO_DEAD  32
 
 typedef struct PCStatsStruct {
+public:
 	ieStrRef  BestKilledName;
 	ieDword   BestKilledXP;
 	ieDword   AwayTime;
@@ -102,6 +103,8 @@ typedef struct PCStatsStruct {
 	ieWord    FavouriteSpellsCount[4];
 	ieResRef  FavouriteWeapons[4];
 	ieWord    FavouriteWeaponsCount[4];
+public:
+	PCStatsStruct();
 } PCStatsStruct;
 
 
@@ -292,5 +295,7 @@ public:
 	int LearnSpell(ieResRef resref, ieDword flags);
 	/* Returns weapon range */
 	int GetWeaponRange();
+	/* Creates player statistics */
+	void CreateStats();
 };
 #endif

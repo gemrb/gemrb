@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.83 2005/02/19 19:09:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.84 2005/02/22 23:10:49 avenger_teambg Exp $
  *
  */
 
@@ -82,6 +82,23 @@ void InitSpellTables()
 		}
 	}
 	core->DelTable( skilltable );
+}
+
+PCStatsStruct::PCStatsStruct()
+{
+	BestKilledName = 0xffffffff;
+	BestKilledXP = 0;
+	AwayTime = 0;
+	JoinDate = 0;
+	unknown10 = 0;
+	KillsChapterXP = 0;
+	KillsChapterCount = 0;
+	KillsTotalXP = 0;
+	KillsTotalCount = 0;
+	memset( FavouriteSpells, 0, sizeof(FavouriteSpells) );
+	memset( FavouriteSpellsCount, 0, sizeof(FavouriteSpellsCount) );
+	memset( FavouriteWeapons, 0, sizeof(FavouriteWeapons) );
+	memset( FavouriteWeaponsCount, 0, sizeof(FavouriteWeaponsCount) );
 }
 
 Actor::Actor()
@@ -601,3 +618,9 @@ const char *Actor::GetDialog(bool checks)
 	return Dialog;
 }
 
+void Actor::CreateStats()
+{
+	if (!PCStats) {
+		PCStats = new PCStatsStruct();
+	}
+}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.62 2004/09/18 15:22:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.63 2005/02/22 23:10:52 avenger_teambg Exp $
  *
  */
 
@@ -158,24 +158,6 @@ int Game::InParty(Actor* pc)
 	return -1;
 }
 
-int Game::SetPC(Actor* pc)
-{
-	int slot = InParty( pc );
-	if (slot != -1) {
-		return slot;
-	}
-	slot = InStore( pc );
-	if (slot != -1)	   //it is an NPC, we remove it from the NPC vector
-	{
-		DelNPC(slot, false);
-	}
-	if(!PCs.size() ) {
-		Reputation = pc->GetStat(IE_REPUTATION);
-	}
-	PCs.push_back( pc );
-	return ( int ) PCs.size() - 1;
-}
-
 int Game::DelPC(unsigned int slot, bool autoFree)
 {
 	if (slot >= PCs.size()) {
@@ -210,6 +192,7 @@ int Game::DelNPC(unsigned int slot, bool autoFree)
 
 int Game::LeaveParty(Actor* actor)
 {
+	actor->CreateStats(); //create or update stats for leaving
 	int slot = InParty( actor );
 	if (slot < 0) {
 		return slot;
@@ -220,9 +203,20 @@ int Game::LeaveParty(Actor* actor)
 	return ( int ) NPCs.size() - 1;
 }
 
-int Game::JoinParty(Actor* actor)
+int Game::JoinParty(Actor* actor, bool join)
 {
-	int slot = InStore( actor );
+	actor->CreateStats(); //create stats if they didn't exist yet
+	int slot = InParty( actor );
+	if (slot != -1) {
+		return slot;
+	}
+	if (join) {
+		actor->PCStats->JoinDate = GameTime;
+		if(!PCs.size() ) {
+			Reputation = actor->GetStat(IE_REPUTATION);
+		}
+	}
+	slot = InStore( actor );
 	if (slot >= 0) {
 		std::vector< Actor*>::iterator m = NPCs.begin() + slot;
 		NPCs.erase( m );
