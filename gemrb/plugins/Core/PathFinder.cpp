@@ -2,6 +2,10 @@
 #include "PathFinder.h"
 #include <stdlib.h>
 
+
+#define DiagonalCost	14
+#define NormalCost		10
+
 #ifndef WIN32
 
 int min(int value1, int value2)
@@ -79,6 +83,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 	OpenStack.push_back(MapSet[startX][startY]);
 	MapSet[startX][startY]->Parent = NULL;
 	MapSet[startX][startY]->distance = GetDistance(startX, startY, goalX, goalY);
+	MapSet[startX][startY]->cost = 0;
 	ClosedSet[startX][startY] = true;
 	while(true) {
 		if(OpenStack.size() == 0) {
@@ -103,9 +108,25 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 			for(int x = minX; x <= maxX; x++) {
 				if((x != topNode->x) || (y != topNode->y)) {
 					if(MapSet[x][y]->passable && (!ClosedSet[x][y])) {
+						MapSet[x][y]->cost = topNode->cost;
+						if(x == topNode->x) {
+							MapSet[x][y]->cost += NormalCost;
+						}
+						else if(x > topNode->x) {
+							if(y == topNode->y)
+								MapSet[x][y]->cost += NormalCost;
+							else
+								MapSet[x][y]->cost += DiagonalCost;
+						}
+						else {
+							if(y == topNode->y)
+								MapSet[x][y]->cost += NormalCost;
+							else
+								MapSet[x][y]->cost += DiagonalCost;
+						}
 						MapSet[x][y]->Parent = topNode;
 						MapSet[x][y]->orient = GetOrient(topNode->x, topNode->y, x, y);
-						MapSet[x][y]->distance = topNode->distance;
+						MapSet[x][y]->distance = MapSet[x][y]->cost+GetDistance(x, y, goalX, goalY);
 						OpenStack.push_back(MapSet[x][y]);
 						ClosedSet[x][y] = true;
 					}
@@ -116,7 +137,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 		std::vector<PathNode*> tmp;
 		for(int i = 0; i < OpenStack.size(); i++) {
 			PathNode * node = OpenStack.at(i);
-			node->distance += GetDistance(node->x, node->y, goalX, goalY);
+			//node->distance = nodeGetDistance(node->x, node->y, goalX, goalY);
 			if(tmp.size() == 0)
 				tmp.push_back(node);
 			else {
@@ -135,7 +156,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 		}
 		//Copying tmp to OpenStack
 		OpenStack.clear();
-		int maxsize = min(15, tmp.size());
+		int maxsize = min(150, tmp.size());
 		for(int i = 0; i < maxsize; i++) {
 			OpenStack.push_back(tmp.at(i));
 		}
@@ -171,7 +192,7 @@ unsigned long PathFinder::GetDistance(short sX, short sY, short dX, short dY)
 {
 	int hd = min(abs(sX-dX), abs(sY-dY));
 	int hs = (abs(sX-dX) + abs(sY-dY));
-	return (10*hd)+((14*hs)-(2*hd));
+	return (NormalCost*hd)+((DiagonalCost*hs)-(2*hd));
 }
 
 void PathFinder::FreeMatrices()

@@ -21,6 +21,7 @@ typedef struct PathNode {
 	unsigned char orient;
 	unsigned char passable;
 	unsigned long distance;
+	unsigned long cost;
 	PathNode *Next;
 	PathNode *Parent;
 } PathNode;
