@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.7 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.8 2003/11/29 10:33:20 balrog994 Exp $
  *
  */
 
@@ -91,11 +91,11 @@ int MemoryStream::ReadLine(void * buf, int maxlen)
 		if(Encrypted)
 			p[i]^=GEM_ENCRYPTION_KEY[Pos&63];
 		Pos++;
-		if(ch == '\n')
+		if(((char)ch) == '\n')
 			break;
-		if(ch == '\t')
+		if(((char)ch) == '\t')
 			ch = ' ';
-		if(ch != '\r')
+		if(((char)ch) != '\r')
 			p[i++] = ch;
 	}
 	p[i] = 0;
