@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.h,v 1.7 2004/08/01 19:13:03 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.h,v 1.8 2004/08/02 15:52:57 avenger_teambg Exp $
  *
  */
 
@@ -53,6 +53,7 @@ private:
 public:
 	BIFImp(void);
 	~BIFImp(void);
+	int DecompressSaveGame(DataStream *compressed);
 	int OpenArchive(char* filename);
 	DataStream* GetStream(unsigned long Resource, unsigned long Type);
 private:

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.14 2004/08/01 19:13:03 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.15 2004/08/02 15:52:57 avenger_teambg Exp $
  *
  */
 
@@ -44,6 +44,37 @@ BIFImp::~BIFImp(void)
 	if (tentries) {
 		delete[] tentries;
 	}
+}
+
+int BIFImp::DecompressSaveGame(DataStream *compressed)
+{
+	char Signature[8];
+	compressed->Read( Signature, 8 );
+	if (strncmp( Signature, "SAV V1.0", 8 ) ) {
+		return GEM_ERROR;
+	}
+	do {
+		unsigned long fnlen, complen, declen;
+		compressed->Read( &fnlen, 4 );
+		char* fname = ( char* ) malloc( fnlen );
+		compressed->Read( fname, fnlen );
+		compressed->Read( &declen, 4 );
+		compressed->Read( &complen, 4 );
+		strcpy( path, core->CachePath );
+		strcat( path, fname );
+		printf( "Decompressing %s\n",fname );
+		free( fname );
+		if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID ))
+			return GEM_ERROR;
+		FILE *in_cache = fopen( path, "wb" );
+		Compressor* comp = ( Compressor* )
+			core->GetInterface( IE_COMPRESSION_CLASS_ID );
+		comp->Decompress( in_cache, compressed );
+		core->FreeInterface( comp );
+		fclose( in_cache );
+	}
+	while(compressed->Remains());
+	return GEM_OK;
 }
 
 int BIFImp::OpenArchive(char* filename)
@@ -150,7 +181,7 @@ int BIFImp::OpenArchive(char* filename)
 			if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
 				laststep++;
 				printf( "\b\b\b\b\b\b\b\b\b\b\b" );
-        int l;
+			        int l;
 
 				for (l = 0; l < laststep; l++)
 					printf( "|" );
