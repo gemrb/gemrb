@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.59 2004/08/05 17:25:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.60 2004/08/07 00:46:58 avenger_teambg Exp $
  *
  */
 
@@ -130,7 +130,12 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	str->Read( &ItemsOffset, 4 );
 	str->Read( &VerticesOffset, 4 );
 	str->Read( &VerticesCount, 2 );
-	str->Seek( 0x94 + bigheader, GEM_STREAM_START );
+	str->Read( &AmbiCount, 2 );
+	str->Read( &AmbiOffset, 4 );
+	str->Read( &VariablesOffset, 4 );
+	str->Read( &VariablesCount, 4 );
+	ieDword tmp;
+	str->Read( &tmp, 4 );
 	str->Read( Script, 8 );
 	Script[8] = 0;
 	str->Seek( 0xA4 + bigheader, GEM_STREAM_START );
@@ -145,7 +150,7 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 
 Map* AREImp::GetMap(const char *ResRef)
 {
-  unsigned int i,x;
+	unsigned int i,x;
 
 	Map* map = new Map();
 	map->AreaFlags=AreaFlags;
@@ -557,6 +562,22 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Read( &Face, 2 );
 		str->Seek( 66, GEM_CURRENT_POS );
 		map->AddEntrance( Name, XPos, YPos, Face );
+	}
+	printf( "Loading variables\n" );
+	//Loading Variables
+	map->vars=new Variables();
+	map->vars->SetType( GEM_VARIABLES_INT );
+
+	str->Seek( VariablesOffset, GEM_STREAM_START );
+	for (i = 0; i < VariablesCount; i++) {
+		char Name[33];
+		ieDword Value;
+		str->Read( Name, 32 );
+		Name[32] = 0;
+		str->Seek( 8, GEM_CURRENT_POS );
+		str->Read( &Value, 4 );
+		str->Seek( 40, GEM_CURRENT_POS );
+		map->vars->SetAt( Name, Value );
 	}
 	map->AddTileMap( tm, lm, sr );
 	core->FreeInterface( tmm );

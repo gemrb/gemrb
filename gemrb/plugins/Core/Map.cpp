@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.104 2004/08/05 22:55:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.105 2004/08/07 00:46:59 avenger_teambg Exp $
  *
  */
 
@@ -74,6 +74,7 @@ void InitPathFinder()
 Map::Map(void)
 	: Scriptable( ST_AREA )
 {
+	vars = NULL;
 	tm = NULL;
 	MapSet = NULL;
 	queue[0] = NULL;
@@ -93,6 +94,10 @@ Map::Map(void)
 Map::~Map(void)
 {
 	unsigned int i;
+
+	if (vars) {
+		delete vars;
+	}
 
 	if (MapSet) {
 		free(MapSet);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.43 2004/08/05 22:55:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.44 2004/08/07 00:46:59 avenger_teambg Exp $
  *
  */
 
@@ -67,11 +67,11 @@ public:
 	ieDword AreaFlags;
 	ieWord AreaType;
 	bool ChangeArea; //set true if movement is allowed between areas
+	Variables *vars;
 private:
 	unsigned short* MapSet;
 	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
-private:
 	std::vector< Animation*> animations;
 	std::vector< Actor*> actors;
 	std::vector< WallGroup*> wallGroups;

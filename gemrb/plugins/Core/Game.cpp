@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.53 2004/08/06 23:41:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.54 2004/08/07 00:46:59 avenger_teambg Exp $
  *
  */
 
@@ -376,6 +376,10 @@ int Game::LoadMap(const char* ResRef)
 
 	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
 	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef, IE_ARE_CLASS_ID );
+	if(!ds) {
+		core->FreeInterface( mM );
+		return -1;
+	}
 	mM->Open( ds, true );
 	Map* newMap = mM->GetMap(ResRef);
 	core->FreeInterface( mM );
@@ -536,8 +540,8 @@ bool Game::PartyMemberDied()
 void Game::IncrementChapter()
 {
 	//clear statistics
-	int value=0;
-	globals->Lookup("CHAPTER",value);
-	globals->SetAt("CHAPTER",value+1);
+	unsigned long chapter = 0;
+	globals->Lookup("CHAPTER",chapter);
+	globals->SetAt("CHAPTER",chapter+1);
 }
 

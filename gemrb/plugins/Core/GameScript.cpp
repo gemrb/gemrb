@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.174 2004/08/05 22:55:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.175 2004/08/07 00:46:59 avenger_teambg Exp $
  *
  */
 
@@ -793,6 +793,14 @@ Script* GameScript::CacheScript(DataStream* stream, const char* Context)
 void GameScript::ReplaceMyArea(Scriptable* Sender, char* newVarName)
 {
 	switch(Sender->Type) {
+/*
+		case ST_TRIGGER:
+		{
+			InfoPoint *ip = (InfoPoint *) Sender;
+			memcpy(newVarName, ip->Area, 6);
+			break;
+		}
+*/
 		case ST_ACTOR:
 		{
 			Actor *act = (Actor *) Sender;
@@ -808,6 +816,8 @@ void GameScript::ReplaceMyArea(Scriptable* Sender, char* newVarName)
 void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 	const char* Context, int value)
 {
+	char newVarName[8];
+
 	if(InDebug) {
 		printf( "Setting variable(\"%s%s\", %d)\n", Context,
 			VarName, value );
@@ -816,21 +826,30 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		Sender->locals->SetAt( VarName, value );
 		return;
 	}
-	//this is not a temporary storage, SetAt relies on a malloc-ed
-	//string, but heh, apparently it is a temporary storage
-	char* newVarName = ( char* ) malloc( 40 );
 	strncpy( newVarName, Context, 6 );
-	strncat( newVarName, VarName, 40 );
+	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		ReplaceMyArea( Sender, newVarName );
 	}
-	core->GetGame()->globals->SetAt( newVarName, ( unsigned long ) value );
-	free( newVarName);
+	if(!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
+		core->GetGame()->kaputz->SetAt( VarName, value );
+		return;
+	}
+	if(strnicmp(newVarName,"GLOBAL",6) ) {
+		Map *map=core->GetGame()->GetMap(newVarName);
+		if(map) {
+			map->vars->SetAt( VarName, value);
+		}
+	}
+	else {
+		core->GetGame()->globals->SetAt( VarName, ( unsigned long ) value );
+	}
 }
 
-void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
-	int value)
+void GameScript::SetVariable(Scriptable* Sender, const char* VarName, int value)
 {
+	char newVarName[8];
+
 	if(InDebug) {
 		printf( "Setting variable(\"%s\", %d)\n", VarName, value );
 	}
@@ -838,18 +857,29 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		Sender->locals->SetAt( &VarName[6], value );
 		return;
 	}
-	char* newVarName = strndup( VarName, 40 );
+	strncpy( newVarName, VarName, 6 );
+	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		ReplaceMyArea( Sender, newVarName );
 	}
-	core->GetGame()->globals->SetAt( newVarName, ( unsigned long ) value );
-	free(newVarName); //freeing up the temporary area
+	if(!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
+		core->GetGame()->kaputz->SetAt( &VarName[6], value );
+		return;
+	}
+	if(strnicmp(newVarName,"GLOBAL",6) ) {
+		Map *map=core->GetGame()->GetMap(newVarName);
+		if(map) {
+			map->vars->SetAt( &VarName[6], value);
+		}
+	}
+	else {
+		core->GetGame()->globals->SetAt( &VarName[6], ( unsigned long ) value );
+	}
 }
 
-unsigned long GameScript::CheckVariable(Scriptable* Sender,
-	const char* VarName)
+unsigned long GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 {
-	char newVarName[40];
+	char newVarName[8];
 	unsigned long value = 0;
 
 	if (strnicmp( VarName, "LOCALS", 6 ) == 0) {
@@ -859,11 +889,24 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender,
 		}
 		return value;
 	}
-	strncpy( newVarName, VarName, 40 );
+	strncpy( newVarName, VarName, 6 );
+	newVarName[6]=0;
 	if (strnicmp( VarName, "MYAREA", 6 ) == 0) {
 		ReplaceMyArea( Sender, newVarName );
 	}
-	core->GetGame()->globals->Lookup( newVarName, value );
+	if(!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
+		core->GetGame()->kaputz->Lookup( &VarName[6], value );
+		return value;
+	}
+	if(strnicmp(newVarName,"GLOBAL",6) ) {
+		Map *map=core->GetGame()->GetMap(newVarName);
+		if(map) {
+			map->vars->Lookup( &VarName[6], value);
+		}
+	}
+	else {
+		core->GetGame()->globals->Lookup( &VarName[6], value );
+	}
 	if(InDebug) {
 		printf("CheckVariable %s: %ld\n",VarName, value);
 	}
@@ -873,7 +916,7 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender,
 unsigned long GameScript::CheckVariable(Scriptable* Sender,
 	const char* VarName, const char* Context)
 {
-	char newVarName[40];
+	char newVarName[8];
 	unsigned long value = 0;
 
 	if (strnicmp( Context, "LOCALS", 6 ) == 0) {
@@ -883,12 +926,23 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender,
 		}
 		return value;
 	}
-	strncpy( newVarName, Context, 6 );
-	strncat( newVarName, VarName, 40 );
-	if (strnicmp( VarName, "MYAREA", 6 ) == 0) {
+	strncpy(newVarName, Context, 6);
+	newVarName[6]=0;
+	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		ReplaceMyArea( Sender, newVarName );
 	}
-	core->GetGame()->globals->Lookup( VarName, value );
+	if(!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
+		core->GetGame()->kaputz->Lookup( VarName, value );
+		return value;
+	}
+	if(strnicmp(newVarName,"GLOBAL",6) ) {
+		Map *map=core->GetGame()->GetMap(newVarName);
+		if(map) {
+			map->vars->Lookup( VarName, value);
+		}
+	} else {
+		core->GetGame()->globals->Lookup( VarName, value );
+	}
 	if(InDebug) {
 		printf("CheckVariable %s%s: %ld\n",Context, VarName, value);
 	}
@@ -3397,8 +3451,7 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 		}
 		return CheckVariable( Sender, Variable ) > 0 ? 1 : 0;
 	}
-	Scriptable* target = GetActorFromObject( Sender,
-							parameters->objectParameter );
+	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!target) {
 		return 0;
 	}
@@ -4125,10 +4178,8 @@ int GameScript::OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+	unsigned long value1 = CheckVariable( Sender, parameters->string0Parameter );
+	unsigned long value2 = CheckVariable( Sender, parameters->string1Parameter );
 	return (value1 && value2)!=0; //should be 1 or 0!
 }
 
@@ -6704,10 +6755,7 @@ void GameScript::TextScreen(Scriptable* Sender, Action* parameters)
 void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
 {
 	TextScreen(Sender, parameters);
-	unsigned long value=0;
-
-	core->GetGame()->globals->Lookup( "GLOBALCHAPTER", value );
-	core->GetGame()->globals->SetAt( "GLOBALCHAPTER", value+1 );
+	core->GetGame()->IncrementChapter();
 }
 
 void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* parameters)
