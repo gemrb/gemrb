@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.97 2004/05/25 16:16:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.98 2004/05/25 16:37:54 avenger_teambg Exp $
  *
  */
 
@@ -172,7 +172,7 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 
 void Map::DrawMap(Region viewport, GameControl* gc)
 {
-  int i;
+  unsigned int i;
 	//Draw the Map
 	if (tm) {
 		tm->DrawOverlay( 0, viewport );
