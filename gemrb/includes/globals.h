@@ -65,7 +65,7 @@
 #define  GF_HAS_PARTY_INI   			6 //iwd2
 #define  GF_SOUNDFOLDERS			7 //iwd2
 #define  GF_IGNORE_BUTTON_FRAMES		8 // all?
-//#define  GF_HAS_PDIALOG				9 // free slot
+#define  GF_ONE_BYTE_ANIMID			9 // pst
 #define  GF_HAS_DPLAYER				10 // not pst
 #define  GF_HAS_EXPTABLE			11 // iwd, iwd2
 #define  GF_HAS_BEASTS_INI   			12 //pst; also for quests.ini

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.201 2004/08/21 04:53:56 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.202 2004/08/21 15:02:49 avenger_teambg Exp $
  *
  */
 
@@ -1077,6 +1077,7 @@ bool Interface::LoadGemRBINI()
 		strcpy( Palette256, s );
 
 
+	SetFeature( ini->GetKeyAsInt( "resources", "OneByteAnimationID", 1 ), GF_ONE_BYTE_ANIMID );
 	SetFeature( ini->GetKeyAsInt( "resources", "IgnoreButtonFrames", 1 ), GF_IGNORE_BUTTON_FRAMES );
 	SetFeature( ini->GetKeyAsInt( "resources", "AllStringsTagged", 1 ), GF_ALL_STRINGS_TAGGED );
 	SetFeature( ini->GetKeyAsInt( "resources", "HasDPLAYER", 0 ), GF_HAS_DPLAYER );
