@@ -68,6 +68,55 @@ void PathFinder::SetupNode(unsigned int x,unsigned int y, unsigned int Cost)
 	InternalStack.push((x<<16) |y);
 }
 
+void PathFinder::AdjustPosition(unsigned int &goalX, unsigned int &goalY)
+{
+	unsigned int maxr=Width;
+	if(maxr<Height) maxr=Height;
+	for(unsigned int radius=1; radius < maxr; radius++) {
+		unsigned int minx=0;
+		if(goalX>radius) minx=goalX-radius;
+		unsigned int maxx=goalX+radius+1;
+		if(maxx>Width) maxx=Width;
+
+		for(unsigned int scanx=minx;scanx<maxx;scanx++) {
+			if(goalY>=radius) {
+		        	if(Passable[sMap->GetPixelIndex(scanx,goalY-radius)]) {
+					goalX=scanx;
+					goalY-=radius;
+				        return;
+				}
+		        }
+			if(goalY+radius<Height) {
+		        	if(Passable[sMap->GetPixelIndex(scanx,goalY+radius)]) {
+					goalX=scanx;
+					goalY+=radius;
+				        return;
+				}
+			}
+		}
+		unsigned int miny=0;
+		if(goalY>radius) miny=goalY-radius;
+		unsigned int maxy=goalY+radius+1;
+		if(maxy>Height) maxy=Height;
+		for(unsigned int scany=miny;scany<maxy;scany++) {
+		      if(goalX>=radius) {
+		        	if(Passable[sMap->GetPixelIndex(goalX-radius,scany)]) {
+					goalX-=radius;
+					goalY=scany;
+					return;
+				}
+			}
+			if(goalX+radius<Width) {
+		        	if(Passable[sMap->GetPixelIndex(goalX-radius,scany)]) {
+					goalX+=radius;
+					goalY=scany;
+					return;
+				}
+			}
+		}
+	}
+}
+
 PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 {
 	unsigned int startX = sX/16, startY = sY/12, goalX = dX/16, goalY = dY/12;
@@ -78,6 +127,9 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 	unsigned int pos=(goalX<<16)|goalY;
 	unsigned int pos2=(startX<<16)|startY;
 	InternalStack.push(pos);
+        if(!Passable[sMap->GetPixelIndex(goalX,goalY)]) {
+		AdjustPosition(goalX,goalY);
+	}
 	MapSet[goalY*Width+goalX] = 1;
 	
 	while(InternalStack.size()) {

@@ -35,6 +35,8 @@ public:
 	PathFinder(void);
 	~PathFinder(void);
 	void SetMap(ImageMgr * sMap, unsigned int Width, unsigned int Height);
+	/* Finds the nearest passable point */
+	void AdjustPosition(unsigned int &goalX, unsigned int &goalY);
 	PathNode * FindPath(short sX, short sY, short dX, short dY);
 private:
 	void Leveldown(unsigned int px, unsigned int py, unsigned int &level, unsigned int &nx, unsigned int &ny, unsigned int &diff);
