@@ -16,7 +16,7 @@ def OnLoad():
 	CreditsButton = GemRB.GetControl(MovieWindow, 3)
 	DoneButton = GemRB.GetControl(MovieWindow, 4)
 #GemRB.SetupListBoxFrom2DA(MovieWindow,TextAreaControl, "MOVIDESC")
-	GemRB.SetText(MovieWindow, TextAreaControl,"")
+	#GemRB.SetText(MovieWindow, TextAreaControl,"")
 	MoviesTable = GemRB.LoadTable("MOVIDESC")
 	for i in range(0, GemRB.GetTableRowCount(MoviesTable) ):
 		t = GemRB.GetTableRowName(MoviesTable, i)
