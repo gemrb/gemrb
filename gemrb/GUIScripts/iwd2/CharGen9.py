@@ -131,7 +131,8 @@ def OnLoad():
 def NextPress():
 	GemRB.UnloadWindow(CharGenWindow)
 	#set my character up
-	MyChar = GemRB.CreatePlayer("charbase",GemRB.GetVar("Slot") ) 
+	MyChar = GemRB.GetVar("Slot") 
+	GemRB.CreatePlayer("charbase", MyChar)
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("BaseRace") )
 	GemRB.SetPlayerStat(MyChar, IE_SUBRACE, GemRB.GetVar("Race") )
@@ -180,6 +181,7 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_DEX, GemRB.GetVar("Ability 4"))
 	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar("Ability 5"))
 	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability 6"))
+	GemRB.SetPlayerName(MyChar, GemRB.GetToken("CHARNAME"), 0)
 
 	#does all the rest
 	GemRB.FillPlayerInfo(MyChar,PortraitName+"S", PortraitName+"L")

@@ -27,7 +27,7 @@ def OnLoad():
 		#removing this label, it just disturbs us
 		GemRB.SetControlSize(PartyFormationWindow, Label, 0, 0)
 		Button = GemRB.GetControl(PartyFormationWindow, i-12)
-		ResRef = GemRB.GetPlayerPortrait(i-18, 0)
+		ResRef = GemRB.GetPlayerPortrait(i-17, 0)
 		if ResRef == "":
 			GemRB.SetButtonFlags(PartyFormationWindow, Button, IE_GUI_BUTTON_NORMAL,OP_SET)
 		else:
@@ -35,15 +35,15 @@ def OnLoad():
 			GemRB.SetButtonFlags(PartyFormationWindow, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
 			Portraits = Portraits+1
 
-		GemRB.SetVarAssoc(PartyFormationWindow, Button, "Slot",i-18)
+		GemRB.SetVarAssoc(PartyFormationWindow, Button, "Slot",i-17)
 		GemRB.SetEvent(PartyFormationWindow, Button, IE_GUI_BUTTON_ON_PRESS, "GeneratePress")
 
 		Button = GemRB.GetControl(PartyFormationWindow, i)
-		GemRB.SetVarAssoc(PartyFormationWindow, Button, "Slot",i-18)
+		GemRB.SetVarAssoc(PartyFormationWindow, Button, "Slot",i-17)
 		if ResRef == "":
 			GemRB.SetText(PartyFormationWindow, Button, 10264)
 		else:
-			GemRB.SetText(PartyFormationWindow, Button, GemRB.GetPlayerName(i-18,0) )
+			GemRB.SetText(PartyFormationWindow, Button, GemRB.GetPlayerName(i-17,0) )
 
 		GemRB.SetEvent(PartyFormationWindow, Button, IE_GUI_BUTTON_ON_PRESS, "GeneratePress")
 	

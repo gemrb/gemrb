@@ -283,8 +283,8 @@ def AcceptPress():
 	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar("Ability 5"))
 	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability 6"))
 
-	GemRB.SetPlayerName(MyChar, NameField, 0)
-	GemRB.FillPlayerInfo(MyChar,PortraitName+"S", PortraitName+"L")
+	GemRB.SetPlayerName(MyChar, GemRB.GetToken("CHARNAME"), 0)
+	GemRB.FillPlayerInfo(MyChar, PortraitName+"L", PortraitName+"S")
 	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("PartyFormation")
 	return
@@ -1687,7 +1687,6 @@ def ApperanceDrawAvatar():
         AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Class"),0)
         table = GemRB.LoadTable("AVPREFG")
         AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
-        print "AvatarID:",hex(AvatarID)
 
 	AvatarRef = GemRB.GetTableValue(AppearanceAvatarTable, hex(AvatarID), "LEVEL1")
 	GemRB.SetButtonBAM(AppearanceWindow, AppearanceAvatarButton, AvatarRef, 1, 0, 0)

@@ -8,7 +8,6 @@ ExitWindow = 0
 def OnLoad():
 	global PartyFormationWindow
 
-	GemRB.LoadGame(-1);  #loading the base game
 	GemRB.LoadWindowPack("GUISP")
 	PartyFormationWindow = GemRB.LoadWindow(0)
 
@@ -32,7 +31,8 @@ def OnLoad():
 		#removing this label, it just disturbs us
 		GemRB.SetControlSize(PartyFormationWindow, Label, 0, 0)
 		Button = GemRB.GetControl(PartyFormationWindow, i-12)
-		ResRef = GemRB.GetPlayerPortrait(i-17, 0)
+		ResRef = GemRB.GetPlayerPortrait(i-17, 1)
+		print "RESREF: ",ResRef,"****************************"
 		if ResRef == "":
 			GemRB.SetButtonFlags(PartyFormationWindow, Button, IE_GUI_BUTTON_NORMAL,OP_SET)
 		else:
@@ -41,13 +41,13 @@ def OnLoad():
 			Portraits = Portraits+1
 
 		CreateCharButton = GemRB.GetControl(PartyFormationWindow,i)
+		GemRB.SetVarAssoc(PartyFormationWindow, CreateCharButton, "Slot", i-17)
 		GemRB.SetEvent(PartyFormationWindow, CreateCharButton, IE_GUI_BUTTON_ON_PRESS, "CreateCharPress")
 		GemRB.SetControlStatus(PartyFormationWindow, CreateCharButton, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetText(PartyFormationWindow, CreateCharButton, 10264)
 		if ResRef == "":
-			GemRB.SetText(PartyFormationWindow, Button, 10264)
+			GemRB.SetText(PartyFormationWindow, CreateCharButton, 10264)
 		else:
-			GemRB.SetText(PartyFormationWindow, Button, GemRB.GetPlayerName(i-18,0) )
+			GemRB.SetText(PartyFormationWindow, CreateCharButton, GemRB.GetPlayerName(i-17,0) )
 
 	if Portraits == 0:
 		GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_DISABLED)

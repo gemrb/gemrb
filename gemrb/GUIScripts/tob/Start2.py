@@ -131,7 +131,8 @@ def NewSingle():
 	GemRB.UnloadWindow(QuitWindow)
 	GemRB.UnloadWindow(TutorialWindow)
 	GemRB.SetVar("PlayMode",0) 
-	GemRB.SetVar("Slot",0)
+	GemRB.SetVar("Slot",1)
+	GemRB.LoadGame(-1)
         GemRB.SetNextScript("CharGen")
 	return
 

@@ -117,6 +117,7 @@ def ProtocolDonePress():
 def CreatePress():
 	global StartWindow
 	GemRB.UnloadWindow(StartWindow)
+	GemRB.LoadGame(-1)
 	GemRB.SetNextScript("PartyFormation")
 	return
 

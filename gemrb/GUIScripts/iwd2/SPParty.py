@@ -71,6 +71,12 @@ def DonePress():
 	Pos = GemRB.GetVar("PartyIdx")
 	if Pos == 0:
 		GemRB.UnloadWindow(PartySelectWindow)
+		GemRB.LoadGame(-1)
+		GemRB.SetNextScript("SPPartyFormation")
+	else:
+		GemRB.UnloadWindow(PartySelectWindow)
+		GemRB.LoadGame(-1)
+		#here we should load the party characters
 		GemRB.SetNextScript("SPPartyFormation")
 	return	
 	
