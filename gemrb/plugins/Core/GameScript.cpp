@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.119 2004/03/24 21:09:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.120 2004/03/27 09:22:06 avenger_teambg Exp $
  *
  */
 
@@ -40,7 +40,8 @@ static SymbolMgr* actionsTable;
 static SymbolMgr* objectsTable;
 static TriggerFunction triggers[MAX_TRIGGERS];
 static ActionFunction actions[MAX_ACTIONS];
-static int flags[MAX_ACTIONS];
+static short actionflags[MAX_ACTIONS];
+static short triggerflags[MAX_TRIGGERS];
 static ObjectFunction objects[MAX_OBJECTS];
 static IDSFunction idtargets[MAX_OBJECT_FIELDS];
 
@@ -55,14 +56,14 @@ static int InDebug = 0;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
-	{"actionlistempty", GameScript::ActionListEmpty},
-	{"alignment", GameScript::Alignment},
-	{"allegiance", GameScript::Allegiance},
-	{"areacheck", GameScript::AreaCheck},
-	{"areacheckobject", GameScript::AreaCheck},
-	{"areatype", GameScript::AreaType},
-	{"areaflag", GameScript::AreaFlag},
-	{"bitcheck",GameScript::BitCheck},
+	{"actionlistempty", GameScript::ActionListEmpty,0},
+	{"alignment", GameScript::Alignment,0},
+	{"allegiance", GameScript::Allegiance,0},
+	{"areacheck", GameScript::AreaCheck,0},
+	{"areacheckobject", GameScript::AreaCheck,0},
+	{"areatype", GameScript::AreaType,0},
+	{"areaflag", GameScript::AreaFlag,0},
+	{"bitcheck",GameScript::BitCheck,0},
 	{"bitcheckexact",GameScript::BitCheckExact},
 	{"bitglobal",GameScript::BitGlobal_Trigger},
 	{"breakingpoint",GameScript::BreakingPoint},
@@ -126,7 +127,7 @@ static TriggerLink triggernames[] = {
 	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT},
 	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT},
 	{"objectactionlistempty", GameScript::ObjectActionListEmpty}, //same function
-	{"oncreation", GameScript::OnCreation},
+	{"oncreation", GameScript::OnCreation,0},
 	{"openstate", GameScript::OpenState},
 	{"or", GameScript::Or},
 	{"ownsfloatermessage", GameScript::OwnsFloaterMessage},
@@ -562,14 +563,18 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 		for (i = 0; i < MAX_TRIGGERS; i++) {
 			char* triggername = triggersTable->GetValue( i );
 			//maybe we should watch for this bit?
-			if (!triggername)
+			if (!triggername) {
 				triggername = triggersTable->GetValue( i | 0x4000 );
+			}
 			TriggerLink* poi = FindTrigger( triggername );
-			if (poi == NULL)
+			if (poi == NULL) {
 				triggers[i] = NULL;
+				triggerflags[i] = 0;
+			}
 			else {
 				printf("Found trigger:%04x %s\n",i,triggername);
 				triggers[i] = poi->Function;
+				triggerflags[i] = poi->Flags;
 			}
 		}
 
@@ -577,10 +582,10 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 			ActionLink* poi = FindAction( actionsTable->GetValue( i ) );
 			if (poi == NULL) {
 				actions[i] = NULL;
-				flags[i] = 0;
+				actionflags[i] = 0;
 			} else {
 				actions[i] = poi->Function;
-				flags[i] = poi->Flags;
+				actionflags[i] = poi->Flags;
 			}
 		}
 		for (i = 0; i < MAX_OBJECTS; i++) {
@@ -619,15 +624,15 @@ GameScript::~GameScript(void)
 
 Script* GameScript::CacheScript(DataStream* stream, const char* Context)
 {
+	char line[10];
+
 	if (!stream) {
 		return NULL;
 	}
-	char* line = ( char* ) malloc( 10 );
 	stream->ReadLine( line, 10 );
 	if (strncmp( line, "SC", 2 ) != 0) {
 		printf( "[IEScript]: Not a Compiled Script file\n" );
 		delete( stream );
-		free( line );
 		return NULL;
 	}
 	Script* newScript = new Script( Context );
@@ -639,7 +644,6 @@ Script* GameScript::CacheScript(DataStream* stream, const char* Context)
 		rBv.push_back( rB );
 		stream->ReadLine( line, 10 );
 	}
-	free( line );
 	newScript->AllocateBlocks( ( unsigned int ) rBv.size() );
 	for (unsigned int i = 0; i < newScript->responseBlocksCount; i++) {
 		newScript->responseBlocks[i] = rBv.at( i );
@@ -676,6 +680,8 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		Sender->locals->SetAt( VarName, value );
 		return;
 	}
+	//this is not a temporary storage, SetAt relies on a malloc-ed
+	//string
 	char* newVarName = ( char* ) malloc( 40 );
 	strncpy( newVarName, Context, 6 );
 	strncat( newVarName, VarName, 40 );
@@ -803,13 +809,12 @@ void GameScript::EvaluateAllBlocks()
 
 ResponseBlock* GameScript::ReadResponseBlock(DataStream* stream)
 {
-	char* line = ( char* ) malloc( 10 );
+	char line[10];
+
 	stream->ReadLine( line, 10 );
 	if (strncmp( line, "CR", 2 ) != 0) {
-		free( line );
 		return NULL;
 	}
-	free( line );
 	ResponseBlock* rB = new ResponseBlock();
 	rB->condition = ReadCondition( stream );
 	rB->responseSet = ReadResponseSet( stream );
@@ -818,13 +823,12 @@ ResponseBlock* GameScript::ReadResponseBlock(DataStream* stream)
 
 Condition* GameScript::ReadCondition(DataStream* stream)
 {
-	char* line = ( char* ) malloc( 10 );
+	char line[10];
+
 	stream->ReadLine( line, 10 );
 	if (strncmp( line, "CO", 2 ) != 0) {
-		free( line );
 		return NULL;
 	}
-	free( line );
 	Condition* cO = new Condition();
 	std::vector< Trigger*> tRv;
 	while (true) {
@@ -843,13 +847,12 @@ Condition* GameScript::ReadCondition(DataStream* stream)
 
 ResponseSet* GameScript::ReadResponseSet(DataStream* stream)
 {
-	char* line = ( char* ) malloc( 10 );
+	char line[10];
+
 	stream->ReadLine( line, 10 );
 	if (strncmp( line, "RS", 2 ) != 0) {
-		free( line );
 		return NULL;
 	}
-	free( line );
 	ResponseSet* rS = new ResponseSet();
 	std::vector< Response*> rEv;
 	while (true) {
@@ -877,26 +880,13 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	Response* rE = new Response();
 	rE->weight = 0;
 	int count = stream->ReadLine( line, 1024 );
-	for (int i = 0; i < count; i++) {
-		if (( line[i] >= '0' ) && ( line[i] <= '9' )) {
-			rE->weight *= 10;
-			rE->weight += ( line[i] - '0' );
-			continue;
-		}
-		break;
-	}
+	char *poi;
+	rE->weight = strtoul(line,&poi,10);
 	std::vector< Action*> aCv;
-	while (true) {
+	if(strncmp(poi,"AC",2)==0) while (true) {
 		Action* aC = new Action();
 		count = stream->ReadLine( line, 1024 );
-		for (int i = 0; i < count; i++) {
-			if (( line[i] >= '0' ) && ( line[i] <= '9' )) {
-				aC->actionID *= 10;
-				aC->actionID += ( line[i] - '0' );
-				continue;
-			}
-			break;
-		}
+		aC->actionID = strtoul(line, NULL,10);
 		for (int i = 0; i < 3; i++) {
 			stream->ReadLine( line, 1024 );
 			Object* oB = DecodeObject( line );
@@ -955,6 +945,7 @@ Trigger* GameScript::ReadTrigger(DataStream* stream)
 int GameScript::ParseInt(const char*& src)
 {
 	char number[33];
+
 	char* tmp = number;
 	while (isdigit(*src) || *src=='-') {
 		*tmp = *src;
@@ -1108,7 +1099,7 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 	int ret = 0;  // continue or not
 	for (int i = 0; i < rE->actionsCount; i++) {
 		Action* aC = rE->actions[i];
-		switch (flags[aC->actionID] & AF_MASK) {
+		switch (actionflags[aC->actionID] & AF_MASK) {
 			case AF_INSTANT:
 				ExecuteAction( Sender, aC );
 				break;
@@ -1137,7 +1128,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			scr->AddAction( Sender->CurrentAction );
 			Sender->CurrentAction = NULL;
 			//maybe we should always release here???
-			if (!(flags[aC->actionID] & AF_INSTANT) ) {
+			if (!(actionflags[aC->actionID] & AF_INSTANT) ) {
 				aC->Release();
 			}
 			return;
@@ -1156,10 +1147,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		aC->Release();
 		return;
 	}
-	if (!( flags[aC->actionID] & AF_BLOCKING )) {
+	if (!( actionflags[aC->actionID] & AF_BLOCKING )) {
 		Sender->CurrentAction = NULL;
 	}
-	if (flags[aC->actionID] & AF_INSTANT) {
+	if (actionflags[aC->actionID] & AF_INSTANT) {
 		return;
 	}
 	aC->Release();
@@ -1432,16 +1423,12 @@ Action *GameScript::GenerateActionCore(char *src, char *str, int acIndex)
 	newAction->actionID = (unsigned short) actionsTable->GetValueIndex( acIndex );
 	//this flag tells us to merge 2 consecutive strings together to get
 	//a variable (context+variablename)
-	int mergestrings = flags[newAction->actionID]&AF_MERGESTRINGS;
+	int mergestrings = actionflags[newAction->actionID]&AF_MERGESTRINGS;
 	int objectCount = ( newAction->actionID == 1 ) ? 0 : 1;
 	int stringsCount = 0;
 	int intCount = 0;
-	//Here is the Action; Now we need to evaluate the parameters
-/*
-	str++;
-	src++;
-*/
-	while (*str) {
+	//Here is the Action; Now we need to evaluate the parameters, if any
+	if(*str!=')') while (*str) {
 		if(*(str+1)!=':') {
 			printf("Warning, parser was sidetracked: %s\n",str);
 		}
@@ -4219,7 +4206,6 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	if(!tar) {
 		printf("[IEScript]: Target for dialog couldn't be found.\n");
 		Sender->CurrentAction = NULL;
-		abort();
 		return;
 	}
 	//source could be other than Actor, we need to handle this too!

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.86 2004/03/24 20:19:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.87 2004/03/27 09:22:06 avenger_teambg Exp $
  *
  */
 
@@ -583,9 +583,14 @@ typedef void (* ActionFunction)(Scriptable*, Action*);
 typedef Targets* (* ObjectFunction)(Scriptable *, Targets*);
 typedef int (* IDSFunction)(Actor *, int parameter);
 
+#define TF_NONE 	 0
+#define TF_CONDITION     1  //this isn't a trigger, just a condition (0x4000)
+#define TF_MERGESTRINGS  8  //same value as actions' mergestring
+
 struct TriggerLink {
 	const char* Name;
 	TriggerFunction Function;
+	short Flags;
 };
 
 //createcreature flags
@@ -619,7 +624,7 @@ struct TriggerLink {
 struct ActionLink {
 	const char* Name;
 	ActionFunction Function;
-	int Flags;
+	short Flags;
 };
 
 struct ObjectLink {
