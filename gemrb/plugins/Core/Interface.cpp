@@ -279,6 +279,12 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	vars->SetType(GEM_VARIABLES_INT);
+	{
+	char ini_path[_MAX_PATH];
+	strcpy(ini_path,GamePath);
+	strcat(ini_path,"baldur.ini");
+	LoadINI(ini_path);
+	}
 	printStatus("OK", LIGHT_GREEN);
 
 	printMessage("Core", "Initializing Token Dictionary...", WHITE);
@@ -1027,7 +1033,7 @@ bool Interface::LoadINI(const char * filename)
 		fseek(config, -1, SEEK_CUR);
 		fscanf(config, "%[^=]=%[^\r\n]%*[\r\n]", name, value);
 		if((value[0] >= '0') && (value[0] <= '9')) {
-            vars->SetAt(name, value);
+	        vars->SetAt(name, atoi(value));
 		}
 	}
 	fclose(config);
