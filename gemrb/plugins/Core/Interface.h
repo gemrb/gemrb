@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.113 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.114 2004/09/09 16:42:15 edheldil Exp $
  *
  */
 
@@ -139,6 +139,8 @@ private:
 	int tooltip_x;
 	int tooltip_y;
 	char* tooltip_text;
+	// Currently dragged item or NULL
+	CREItem* DraggedItem;
 public:
 	char GlobalScript[9];
 	char WorldMapName[9];
@@ -348,6 +350,9 @@ public:
 	bool SavedExtension(const char *filename);
 	/*handles the load screen*/
 	void LoadProgress(int percent);
+
+	void DragItem(CREItem* item);
+	CREItem* GetDraggedItem() { return DraggedItem; }
 
 private:
 	bool LoadConfig(void);

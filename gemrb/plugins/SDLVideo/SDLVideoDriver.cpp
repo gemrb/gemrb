@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.83 2004/08/23 18:02:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.84 2004/09/09 16:42:13 edheldil Exp $
  *
  */
 
@@ -29,6 +29,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	CursorIndex = 0;
 	Cursor[0] = NULL;
 	Cursor[1] = NULL;
+	Cursor[2] = NULL;
 	moveX = 0;
 	moveY = 0;
 	DisableMouse = false;
@@ -267,7 +268,8 @@ int SDLVideoDriver::SwapBuffers(void)
 					 {
 						if (DisableMouse)
 							break;
-						CursorIndex = 1;
+						if (CursorIndex != 2)
+							CursorIndex = 1;
 						CursorPos.x = event.button.x -
 							mouseAdjustX[CursorIndex];
 						CursorPos.y = event.button.y -
@@ -279,7 +281,8 @@ int SDLVideoDriver::SwapBuffers(void)
 					 {
 						if (DisableMouse)
 							break;
-						CursorIndex = 0;
+						if (CursorIndex != 2)
+							CursorIndex = 0;
 						CursorPos.x = event.button.x -
 							mouseAdjustX[CursorIndex];
 						CursorPos.y = event.button.y -
@@ -427,7 +430,8 @@ int SDLVideoDriver::SwapBuffers(void)
 				 {
 					if (DisableMouse)
 						break;
-					CursorIndex = 1;
+					if (CursorIndex != 2)
+						CursorIndex = 1;
 					CursorPos.x = event.button.x - mouseAdjustX[CursorIndex];
 					CursorPos.y = event.button.y - mouseAdjustY[CursorIndex];
 					if (Evnt)
@@ -440,7 +444,8 @@ int SDLVideoDriver::SwapBuffers(void)
 				 {
 					if (DisableMouse)
 						break;
-					CursorIndex = 0;
+					if (CursorIndex != 2)
+						CursorIndex = 0;
 					CursorPos.x = event.button.x - mouseAdjustX[CursorIndex];
 					CursorPos.y = event.button.y - mouseAdjustY[CursorIndex];
 					if (Evnt)
@@ -876,6 +881,29 @@ void SDLVideoDriver::SetCursor(Sprite2D* up, Sprite2D* down)
 		Cursor[1] = NULL;
 	}
 	return;
+}
+
+// Drag cursor is shown instead of all other cursors
+void SDLVideoDriver::SetDragCursor(Sprite2D* drag)
+{
+	if (drag) {
+		Cursor[2] = ( SDL_Surface * ) drag->vptr;
+		mouseAdjustX[2] = drag->XPos;
+		mouseAdjustY[2] = drag->YPos;
+		CursorPos.x +=  mouseAdjustX[CursorIndex];
+		CursorPos.y +=  mouseAdjustY[CursorIndex];
+		CursorIndex = 2;
+		CursorPos.x -=  mouseAdjustX[CursorIndex];
+		CursorPos.y -=  mouseAdjustY[CursorIndex];
+
+	} else {
+		CursorPos.x +=  mouseAdjustX[CursorIndex];
+		CursorPos.y +=  mouseAdjustY[CursorIndex];
+		CursorIndex = 0;
+		CursorPos.x -=  mouseAdjustX[CursorIndex];
+		CursorPos.y -=  mouseAdjustY[CursorIndex];
+		Cursor[2] = NULL;
+	}
 }
 
 Region SDLVideoDriver::GetViewport()

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.36 2004/08/22 19:24:19 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.37 2004/09/09 16:42:12 edheldil Exp $
  *
  */
 
@@ -34,9 +34,9 @@ private:
 	SDL_Surface* extra;
 	std::vector< Region> upd;	//Regions of the Screen to Update in the next SwapBuffer operation.
 	Region Viewport;
-	SDL_Surface* Cursor[2];
+	SDL_Surface* Cursor[3];
 	SDL_Rect CursorPos;
-	short mouseAdjustX[2], mouseAdjustY[2];
+	short mouseAdjustX[3], mouseAdjustY[3];
 	unsigned short CursorIndex;
 	int fadePercent;
 	unsigned long lastTime;
@@ -66,6 +66,7 @@ public:
 	void BlitSpriteMode(Sprite2D* spr, int x, int y, int blendMode,
 		bool anchor = true, Region* clip = NULL);
 	void SetCursor(Sprite2D* up, Sprite2D* down);
+	void SetDragCursor(Sprite2D* drag);
 	Region GetViewport(void);
 	void SetViewport(int x, int y);
 	void SetViewport(int x, int y, int w, int h);
