@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.12 2003/12/23 18:46:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.13 2004/01/02 15:52:26 balrog994 Exp $
  *
  */
 
@@ -39,6 +39,7 @@
 #include "alu.h"
 #include "alut.h"
 #endif
+#include "readers.h"
 
 #define MAX_STREAMS  30
 
@@ -63,25 +64,20 @@ typedef struct AudioStream {
 	int Duration;
 	bool free;
 	bool playing;
+	CSoundReader *reader;
 } AudioStream;
 
 class ACMImp : public SoundMgr
 {
 private:
 	void clearstreams(bool free);
-	/*
-	static signed char __stdcall endstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param);
-	static signed char __stdcall synchstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param);
-	static void * __stdcall dspcallback(void *originalbuffer, void *newbuffer, int length, int param);
-	*/
 	static int PlayListManager(void * data);
 public:
 	ACMImp(void);
 	~ACMImp(void);
 	bool Init(void);
 	unsigned long Play(const char * ResRef);
-	bool AcmToWav(DataStream *inFile, const char * tmpFile, const char * outFile, int forcestereo);
-	unsigned long LoadFile(const char * filename);
+	unsigned long StreamFile(const char * filename);
 	bool Play(unsigned long index);
 	bool Stop(unsigned long index);
 	void ResetMusics();
