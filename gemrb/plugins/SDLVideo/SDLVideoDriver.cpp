@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.91 2005/03/02 19:27:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.92 2005/03/06 09:28:31 avenger_teambg Exp $
  *
  */
 
@@ -171,309 +171,113 @@ bool SDLVideoDriver::ToggleFullscreenMode()
 
 int SDLVideoDriver::SwapBuffers(void)
 {
-	if (core->ConsolePopped) {
-		int ret = GEM_OK;
+	unsigned char key;
+	bool ConsolePopped = core->ConsolePopped;
+
+	if (ConsolePopped) {
 		core->DrawConsole();
-		SDL_Event event; /* Event structure */
-		while (SDL_PollEvent( &event )) {
-			/* Loop until there are no events left on the queue */
-			switch (event.type) {
-					/* Process the appropiate event type */
-				case SDL_QUIT:
-					/* Handle a KEYDOWN event */		 
-					ret = GEM_ERROR;
-					break;
-
-				case SDL_KEYUP:
-					{
-						unsigned char key = (unsigned char) event.key.keysym.sym;
-						if (Evnt && ( key != 0 ))
-							Evnt->KeyRelease( key, event.key.keysym.mod );
-					}
-					break;
-
-				case SDL_KEYDOWN:
-					 {
-						if (event.key.keysym.sym == SDLK_ESCAPE) {
-							core->PopupConsole();
-							break;
-						}
-						unsigned char key = (unsigned char) event.key.keysym.unicode;
-						if (key < 32 || key == 127) {
-							switch (event.key.keysym.sym) {
-								case SDLK_END:
-									key = GEM_END;
-									break;
-								case SDLK_HOME:
-									key = GEM_HOME;
-									break;
-								case SDLK_LEFT:
-									key = GEM_LEFT;
-									break;
-
-								case SDLK_RIGHT:
-									key = GEM_RIGHT;
-									break;
-
-								case SDLK_BACKSPACE:
-									key = GEM_BACKSP;
-									break;
-
-								case SDLK_DELETE:
-									key = GEM_DELETE;
-									break;
-
-								case SDLK_RETURN:
-									key = GEM_RETURN;
-									break;
-								default:
-									break;
-							}
-							core->console->OnSpecialKeyPress( key );
-						} else if (( key != 0 ))
-							core->console->OnKeyPress( key,
-											event.key.keysym.mod );
-					}
-					break;
-
-				case SDL_MOUSEMOTION:
-					 {
-						if (DisableMouse)
-							break;
-						CursorPos.x = event.motion.x -
-							mouseAdjustX[CursorIndex];
-						CursorPos.y = event.motion.y -
-							mouseAdjustY[CursorIndex];
-						if (DisableScroll) {
-							moveX = 0;
-							moveY = 0;
-						} else {
-							if (event.motion.x <= 0)
-								moveX = -5;
-							else {
-								if (event.motion.x >= ( core->Width - 1 ))
-									moveX = 5;
-								else
-									moveX = 0;
-							}
-							if (event.motion.y <= 0)
-								moveY = -5;
-							else {
-								if (event.motion.y >= ( core->Height - 1 ))
-									moveY = 5;
-								else
-									moveY = 0;
-							}
-						}
-						if (Evnt)
-							Evnt->MouseMove( event.motion.x, event.motion.y );
-					}
-					break;
-
-				case SDL_MOUSEBUTTONDOWN:
-					 {
-						if (DisableMouse)
-							break;
-						if (CursorIndex != 2)
-							CursorIndex = 1;
-						CursorPos.x = event.button.x -
-							mouseAdjustX[CursorIndex];
-						CursorPos.y = event.button.y -
-							mouseAdjustY[CursorIndex];
-					}
-					break;
-
-				case SDL_MOUSEBUTTONUP:
-					 {
-						if (DisableMouse)
-							break;
-						if (CursorIndex != 2)
-							CursorIndex = 0;
-						CursorPos.x = event.button.x -
-							mouseAdjustX[CursorIndex];
-						CursorPos.y = event.button.y -
-							mouseAdjustY[CursorIndex];
-					}
-					break;
-			}
-		}
-		unsigned long time;
-		GetTime( time );
-		if (( time - lastTime ) < 17) {
-			return ret;
-		}
-		lastTime = time;
-		SDL_BlitSurface( backBuf, NULL, disp, NULL );
-		if (fadePercent) {
-			//printf("Fade Percent = %d%%\n", fadePercent);
-			SDL_SetAlpha( extra, SDL_SRCALPHA, ( 255 * fadePercent ) / 100 );
-			SDL_Rect src = {
-				0, 0, Viewport.w, Viewport.h
-			};
-			SDL_Rect dst = {
-				xCorr, yCorr, 0, 0
-			};
-			SDL_BlitSurface( extra, &src, disp, &dst );
-		}
-		if (Cursor[CursorIndex] && !DisableMouse) {
-			short x = CursorPos.x;
-			short y = CursorPos.y;
-			SDL_BlitSurface( Cursor[CursorIndex], NULL, disp, &CursorPos );
-			CursorPos.x = x;
-			CursorPos.y = y;
-		}
-		SDL_Flip( disp );
-		return ret;
 	}
 	int ret = GEM_OK;
-	//TODO: Implement an efficient Rectangle Merge algorithm for faster redraw
-	SDL_Event event; /* Event structure */
 	while (SDL_PollEvent( &event )) {
 		/* Loop until there are no events left on the queue */
 		switch (event.type) {
-				/* Process the appropiate event type */
-			case SDL_QUIT:
-				/* Handle a KEYDOWN event */		 
-				ret = GEM_ERROR;
-				break;
+		/* Process the appropriate event type */
+		case SDL_QUIT:
+			/* Handle a QUIT event */
+			ret = GEM_ERROR;
+			break;
 
-			case SDL_KEYUP:
-				{
-					unsigned int key = event.key.keysym.sym;
-					if (Evnt && ( key != 0 ))
-						Evnt->KeyRelease( key, event.key.keysym.mod );
+		case SDL_KEYUP:
+			key = (unsigned char) event.key.keysym.sym;
+			if (!ConsolePopped && Evnt && ( key != 0 ))
+				Evnt->KeyRelease( key, event.key.keysym.mod );
+			break;
+
+		case SDL_KEYDOWN:
+			if (event.key.keysym.sym == SDLK_ESCAPE) {
+				core->PopupConsole();
+				break;
+			}
+			key = (unsigned char) event.key.keysym.unicode;
+			if (key < 32 || key == 127) {
+				switch (event.key.keysym.sym) {
+				case SDLK_END:
+					key = GEM_END;
+					break;
+				case SDLK_HOME:
+					key = GEM_HOME;
+					break;
+				case SDLK_LEFT:
+					key = GEM_LEFT;
+					break;
+				case SDLK_RIGHT:
+					key = GEM_RIGHT;
+					break;
+				case SDLK_BACKSPACE:
+					key = GEM_BACKSP;
+					break;
+				case SDLK_DELETE:
+					key = GEM_DELETE;
+					break;
+				case SDLK_RETURN:
+					key = GEM_RETURN;
+					break;
+				default:
+					break;
 				}
+				if (ConsolePopped)
+					core->console->OnSpecialKeyPress( key );
+				else if (Evnt)
+					Evnt->OnSpecialKeyPress( key );
+			} else if (( key != 0 )) {
+				if (ConsolePopped)
+					core->console->OnKeyPress( key, event.key.keysym.mod );
+				else if (Evnt)
+					Evnt->KeyPress( key, event.key.keysym.mod );
+			}
+			break;
+		case SDL_MOUSEMOTION:
+			MouseMovement(event.motion.x, event.motion.y);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			if (DisableMouse)
 				break;
+			if (CursorIndex != 2)
+				CursorIndex = 1;
+			CursorPos.x = event.button.x - mouseAdjustX[CursorIndex];
+			CursorPos.y = event.button.y - mouseAdjustY[CursorIndex];
+			if (Evnt && !ConsolePopped)
+				Evnt->MouseDown( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), SDL_GetModState() );
 
-			case SDL_KEYDOWN:
-				 {
-					if (event.key.keysym.sym == SDLK_ESCAPE) {
-						core->PopupConsole();
-						break;
-					}
-					unsigned char key = (unsigned char) event.key.keysym.unicode;
-					if (key < 32 || key == 127) {
-						switch (event.key.keysym.sym) {
-							case SDLK_LEFT:
-								key = GEM_LEFT;
-								break;
+			break;
 
-							case SDLK_RIGHT:
-								key = GEM_RIGHT;
-								break;
-
-							case SDLK_UP:
-								key = GEM_UP;
-								break;
-
-							case SDLK_DOWN:
-								key = GEM_DOWN;
-								break;
-
-							case SDLK_BACKSPACE:
-								key = GEM_BACKSP;
-								break;
-
-							case SDLK_DELETE:
-								key = GEM_DELETE;
-								break;
-
-							case SDLK_RETURN:
-								key = GEM_RETURN;
-								break;
-
-							case SDLK_TAB:
-								key = GEM_TAB;
-								break;
-							case SDLK_LALT:
-							case SDLK_RALT:
-								key = GEM_ALT;
-								break;
-							default:
-								break;
-						}
-						if (Evnt)
-							Evnt->OnSpecialKeyPress( key );
-					} else if (Evnt && ( key != 0 ))
-						Evnt->KeyPress( key, event.key.keysym.mod );
-				}
+		case SDL_MOUSEBUTTONUP:
+			if (DisableMouse)
 				break;
+			if (CursorIndex != 2)
+				CursorIndex = 0;
+			CursorPos.x = event.button.x - mouseAdjustX[CursorIndex];
+			CursorPos.y = event.button.y - mouseAdjustY[CursorIndex];
+			if (Evnt && !ConsolePopped)
+				Evnt->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), SDL_GetModState() );
 
-			case SDL_MOUSEMOTION:
-				 {
-					 GetTime( lastMouseTime );
-					if (DisableMouse)
-						break;
-					CursorPos.x = event.motion.x - mouseAdjustX[CursorIndex];
-					CursorPos.y = event.motion.y - mouseAdjustY[CursorIndex];
-					if (DisableScroll) {
-						moveX = 0;
-						moveY = 0;
-					} else {
-						if (event.motion.x <= 0)
-							moveX = -5;
-						else {
-							if (event.motion.x >= ( core->Width - 1 ))
-								moveX = 5;
-							else
-								moveX = 0;
-						}
-						if (event.motion.y <= 0)
-							moveY = -5;
-						else {
-							if (event.motion.y >= ( core->Height - 1 ))
-								moveY = 5;
-							else
-								moveY = 0;
-						}
-					}
-					if (Evnt)
-						Evnt->MouseMove( event.motion.x, event.motion.y );
-				}
+			break;
+		 case SDL_ACTIVEEVENT:
+			if (ConsolePopped) {
 				break;
+			}
 
-			case SDL_MOUSEBUTTONDOWN:
-				 {
-					if (DisableMouse)
-						break;
-					if (CursorIndex != 2)
-						CursorIndex = 1;
-					CursorPos.x = event.button.x - mouseAdjustX[CursorIndex];
-					CursorPos.y = event.button.y - mouseAdjustY[CursorIndex];
-					if (Evnt)
-						Evnt->MouseDown( event.button.x, event.button.y,
-								1 << ( event.button.button - 1 ), SDL_GetModState() );
-				}
-				break;
+			if (event.active.state == SDL_APPMOUSEFOCUS) {
+				if (Evnt && !event.active.gain)
+					Evnt->OnSpecialKeyPress( GEM_MOUSEOUT );
+			}
+			break;
 
-			case SDL_MOUSEBUTTONUP:
-				 {
-					if (DisableMouse)
-						break;
-					if (CursorIndex != 2)
-						CursorIndex = 0;
-					CursorPos.x = event.button.x - mouseAdjustX[CursorIndex];
-					CursorPos.y = event.button.y - mouseAdjustY[CursorIndex];
-					if (Evnt)
-						Evnt->MouseUp( event.button.x, event.button.y,
-								1 << ( event.button.button - 1 ), SDL_GetModState() );
-				}
-				break;
-
-			case SDL_ACTIVEEVENT:
-				 {
-					if (event.active.state == SDL_APPMOUSEFOCUS)
-						if (Evnt && !event.active.gain)
-							Evnt->OnSpecialKeyPress( GEM_MOUSEOUT );
-				}
-				break;
 		}
 	}
 	unsigned long time;
 	GetTime( time );
-
 	if (( time - lastTime ) < 17) {
-		SDL_Delay(17);
 		return ret;
 	}
 	lastTime = time;
@@ -489,7 +293,6 @@ int SDLVideoDriver::SwapBuffers(void)
 		};
 		SDL_BlitSurface( extra, &src, disp, &dst );
 	}
-
 	if (Cursor[CursorIndex] && !DisableMouse) {
 		short x = CursorPos.x;
 		short y = CursorPos.y;
@@ -498,16 +301,18 @@ int SDLVideoDriver::SwapBuffers(void)
 		CursorPos.y = y;
 	}
 
-	/** Display tooltip if mouse is idle */
-	if (( time - lastMouseTime ) > core->TooltipDelay) {
-		if (Evnt)
-			Evnt->MouseIdle( time - lastMouseTime );
+	if (!ConsolePopped) {
+		/** Display tooltip if mouse is idle */
+		if (( time - lastMouseTime ) > core->TooltipDelay) {
+			if (Evnt)
+				Evnt->MouseIdle( time - lastMouseTime );
 
-		/** This causes the tooltip to be rendered directly to display */
-		SDL_Surface* tmp = backBuf;
-		backBuf = disp;
-		core->DrawTooltip();
-		backBuf = tmp;
+			/** This causes the tooltip to be rendered directly to display */
+			SDL_Surface* tmp = backBuf;
+			backBuf = disp;
+			core->DrawTooltip();
+			backBuf = tmp;
+		}
 	}
 
 	SDL_Flip( disp );
@@ -1561,3 +1366,35 @@ void SDLVideoDriver::SetClipRect(Region* clip)
 		SDL_SetClipRect( backBuf, NULL );
 	}
 }
+
+void SDLVideoDriver::MouseMovement(int x, int y)
+{
+	if (DisableMouse)
+		return;
+	CursorPos.x = x - mouseAdjustX[CursorIndex];
+	CursorPos.y = y - mouseAdjustY[CursorIndex];
+	if (DisableScroll) {
+		moveX = 0;
+		moveY = 0;
+	} else {
+		if (x <= 1)
+			moveX = -5;
+		else {
+			if (event.motion.x >= ( core->Width - 1 ))
+				moveX = 5;
+			else
+				moveX = 0;
+		}
+		if (y <= 1)
+			moveY = -5;
+		else {
+			if (y >= ( core->Height - 1 ))
+				moveY = 5;
+			else
+				moveY = 0;
+		}
+	}
+	if (Evnt)
+		Evnt->MouseMove(x, y);
+}
+

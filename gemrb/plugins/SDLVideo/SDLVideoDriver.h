@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.40 2005/02/25 15:24:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.41 2005/03/06 09:28:34 avenger_teambg Exp $
  *
  */
 
@@ -41,6 +41,7 @@ private:
 	int fadePercent;
 	unsigned long lastTime;
 	unsigned long lastMouseTime;
+	SDL_Event event; /* Event structure */
 public:
 	SDLVideoDriver(void);
 	~SDLVideoDriver(void);
@@ -52,6 +53,7 @@ public:
 	bool ToggleFullscreenMode();
 	int SwapBuffers(void);
 	bool ToggleGrabInput();
+	void MouseMovement(int x, int y);
 	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask, ieDword gMask,
 		ieDword bMask, ieDword aMask, void* pixels, bool cK = false, int index = 0);
 	Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
