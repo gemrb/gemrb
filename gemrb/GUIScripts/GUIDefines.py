@@ -9,7 +9,7 @@ IE_GUI_BUTTON_RADIOBUTTON= 0x00000020   #sticks in a state
 IE_GUI_BUTTON_DEFAULT    = 0x00000040   #enter button triggers it
 IE_GUI_BUTTON_DRAGGABLE  = 0x00000080
 
-//these bits are hardcoded in the .chu structure, don't move them
+#these bits are hardcoded in the .chu structure, don't move them
 IE_GUI_BUTTON_ALIGN_LEFT = 0x00000100
 IE_GUI_BUTTON_ALIGN_RIGHT= 0x00000200
 IE_GUI_BUTTON_ALIGN_TOP  = 0x00000400
