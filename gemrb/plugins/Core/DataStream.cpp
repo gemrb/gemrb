@@ -17,6 +17,7 @@ bool DataStream::CheckEncrypted()
 	Seek(0, GEM_STREAM_START);
 	Read(&two, 2);
 	if(two == 0xFFFF) {
+		Pos=0;
 		Encrypted = true;
 		return true;
 	}
