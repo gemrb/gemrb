@@ -80,6 +80,8 @@ Interface::Interface(void)
 
 Interface::~Interface(void)
 {
+	if(INIparty)
+		delete(INIparty);
 	if(music)
 		delete(music);
 	if(soundmgr)
