@@ -63,6 +63,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream * stream, bool autoFree, long X,
 	anims[1]->autoSwitchOnEnd = true;
 	anims[0]->pos = 0;
 	anims[1]->pos = 0;
+	justCreated = true;
 }
 
 ScriptedAnimation::~ScriptedAnimation(void)

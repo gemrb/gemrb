@@ -13,6 +13,8 @@ GlobalTimer::GlobalTimer(void)
 	fadeFromCounter = 0;
 	fadeFromMax = 1;
 	waitCounter = 0;
+	shakeCounter = 0;
+	shakeX = shakeY = 0;
 }
 
 GlobalTimer::~GlobalTimer(void)
@@ -31,6 +33,9 @@ void GlobalTimer::Update()
 		} else if(fadeFromCounter != (fadeFromMax+1)) {
 			core->GetVideoDriver()->SetFadePercent(((fadeFromMax-fadeFromCounter)*100)/fadeFromMax);
 			fadeFromCounter++;
+		} else if(shakeCounter) {
+			core->GetVideoDriver()->SetViewport((-(shakeX>>1)) + shakeStartVP.x + (rand()%shakeX), (-(shakeY>>1)) + shakeStartVP.y + (rand()%shakeY));
+			shakeCounter--;
 		}
 		if(MovingActor && MovingActor->path)
 			return;
@@ -59,10 +64,10 @@ void GlobalTimer::SetFadeToColor(unsigned long Count)
 {
 	fadeToCounter = Count;
 	fadeToMax = fadeToCounter;
-	if(fadeToMax == 1) {
+	/*if(fadeToMax == 1) {
 		core->GetVideoDriver()->SetFadePercent(100);
 		fadeToCounter--;
-	}
+	}*/
 }
 
 void GlobalTimer::SetFadeFromColor(unsigned long Count)
@@ -84,4 +89,12 @@ void GlobalTimer::SetMovingActor(ActorBlock * actor)
 void GlobalTimer::SetCutScene(GameScript * script)
 {
 	CutScene = script;
+}
+
+void GlobalTimer::SetScreenShake(unsigned long shakeX, unsigned long shakeY, unsigned long Count)
+{
+	this->shakeX = shakeX;
+	this->shakeY = shakeY;
+	shakeCounter = Count;
+	shakeStartVP = core->GetVideoDriver()->GetViewport();
 }

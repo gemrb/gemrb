@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.42 2003/12/13 18:46:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.43 2003/12/14 01:47:12 balrog994 Exp $
  *
  */
 
@@ -280,7 +280,13 @@ void Map::DrawMap(Region viewport)
 			vvcCells[i] = NULL;
 			delete(vvc);
 			continue;
-		}		
+		}
+		if(vvc->justCreated) {
+			vvc->justCreated = false;
+			if(vvc->Sounds[0][0] != 0) {
+				core->GetSoundMgr()->Play(vvc->Sounds[0]);
+			}
+		}
 		Sprite2D * frame = vvc->anims[0]->NextFrame();
 		if(vvc->Transparency & IE_VVC_BRIGHTEST) {
 			video->BlitSpriteMode(frame, vvc->XPos, vvc->YPos, 1, false);

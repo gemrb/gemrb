@@ -36,6 +36,7 @@ public:
 	unsigned long FrameRate;
 	unsigned long FaceTarget;
 	char Sounds[2][9];
+	bool justCreated;
 };
 
 #endif

@@ -28,6 +28,9 @@ private:
 	unsigned long fadeToCounter, fadeToMax;
 	unsigned long fadeFromCounter, fadeFromMax;
 	unsigned long waitCounter;
+	unsigned long shakeCounter;
+	unsigned long shakeX, shakeY;
+	Region		  shakeStartVP;
 public:
 	GlobalTimer(void);
 	~GlobalTimer(void);
@@ -38,6 +41,7 @@ public:
 	void SetWait(unsigned long Count);
 	void SetMovingActor(ActorBlock * actor);
 	void SetCutScene(GameScript * script);
+	void SetScreenShake(unsigned long shakeX, unsigned long shakeY, unsigned long Count);
 };
 
 #endif
