@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ArchiveImporter.h,v 1.4 2004/04/18 14:25:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ArchiveImporter.h,v 1.5 2004/07/25 07:32:49 edheldil Exp $
  *
  */
 
@@ -42,7 +42,7 @@ public:
 	ArchiveImporter(void);
 	virtual ~ArchiveImporter(void);
 	virtual int OpenArchive(char* filename) = 0;
-	virtual DataStream* GetStream(ulong Resource, ulong Type) = 0;
+	virtual DataStream* GetStream(unsigned long Resource, unsigned long Type) = 0;
 };
 
 #endif

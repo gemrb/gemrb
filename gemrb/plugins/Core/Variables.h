@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.16 2004/07/18 08:33:40 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.17 2004/07/25 07:32:49 edheldil Exp $
  *
  */
 
@@ -53,8 +53,10 @@ protected:
 	struct MyAssoc {
 		MyAssoc* pNext;
 		char* key;
-		unsigned long nValue;
-		char* sValue;
+		union Value {
+			unsigned long nValue;
+			char* sValue;
+		} Value;
 		unsigned long nHashValue;
 	};
 	struct MemBlock {
