@@ -95,13 +95,15 @@ def LoadGamePress():
 	return
 
 def DeleteGameConfirm():
+	global GameCount
+
 	TopIndex = GemRB.GetVar("TopIndex")
 	Pos = TopIndex +GemRB.GetVar("LoadIdx")
 	GemRB.DeleteSaveGame(Pos)
 	if TopIndex>0:
 		GemRB.SetVar("TopIndex",TopIndex-1)
-	GemRB.SetVarAssoc(LoadWindow, ScrollBar, "TopIndex", GameCount)
 	GameCount=GemRB.GetSaveGameCount()   #count of games in save folder?
+	GemRB.SetVarAssoc(LoadWindow, ScrollBar, "TopIndex", GameCount)
 	ScrollBarPress()
 	GemRB.UnloadWindow(ConfirmWindow)
 	GemRB.SetVisible(LoadWindow,1)
