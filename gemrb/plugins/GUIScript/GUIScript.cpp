@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.178 2004/08/02 22:22:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.179 2004/08/03 17:54:43 avenger_teambg Exp $
  *
  */
 
@@ -43,6 +43,24 @@
 #include "../Core/SpellMgr.h"
 #include "../Core/ItemMgr.h"
 #include "../Core/StoreMgr.h"
+
+//this stuff is missing from Python 2.2
+#ifndef PyDoc_VAR
+#define PyDoc_VAR(name) static char name[]
+#endif
+
+#ifndef PyDoc_STR
+#  ifdef WITH_DOC_STRINGS
+#  define PyDoc_STR(str) str
+#  else
+#  define PyDoc_STR(str) ""
+#  endif
+#endif
+
+#ifndef PyDoc_STRVAR
+#define PyDoc_STRVAR(name,str) PyDoc_VAR(name) = PyDoc_STR(str)
+#endif
+
 
 inline bool valid_number(const char* string, long& val)
 {
