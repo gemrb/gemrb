@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.92 2003/12/19 23:04:56 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.93 2003/12/20 15:55:58 balrog994 Exp $
  *
  */
 
@@ -2073,7 +2073,7 @@ bool GUIScript::LoadScript(const char * filename)
     return true;
 }
 
-bool GUIScript::RunFunction(const char * fname)
+bool GUIScript::RunFunction(char * fname)
 {
 	if(!Py_IsInitialized())
 		return false;
@@ -2098,7 +2098,7 @@ bool GUIScript::RunFunction(const char * fname)
 }
 
 /** Exec a single String */
-char * GUIScript::ExecString(const char * string)
+char * GUIScript::ExecString(char * string)
 {
 	if(PyRun_SimpleString(string)==-1) {
 		PyErr_Print();
