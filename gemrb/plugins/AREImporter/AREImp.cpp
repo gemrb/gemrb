@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.16 2003/11/30 09:52:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.17 2003/11/30 17:07:18 avenger_teambg Exp $
  *
  */
 
@@ -105,6 +105,10 @@ Map * AREImp::GetMap()
 	lm->Open(lmstr, true);
 	TileMap * tm = tmm->GetTileMap();
 
+	strcpy(ResRef, WEDResRef);
+	strcat(ResRef, "SR");
+	DataStream * srstr = core->GetResourceMgr()->GetResource(ResRef, IE_BMP_CLASS_ID);
+	sr->Open(lmstr, true);
 
 	str->Seek(SongHeader, GEM_STREAM_START);
 	//5 is the number of song indices
@@ -350,7 +354,7 @@ Map * AREImp::GetMap()
 		anim->y = animY;
 		map->AddAnimation(anim);		
 	}
-	map->AddTileMap(tm, lm);
+	map->AddTileMap(tm, lm, sr);
 	core->FreeInterface(tmm);
 	//core->FreeInterface(am);
 	return map;
