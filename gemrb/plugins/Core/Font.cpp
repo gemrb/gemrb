@@ -124,17 +124,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 
 void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned char Alignment, bool anchor, Font * initials, Color *initcolor, Sprite2D * cursor, int curpos)
 {
-	//TODO: Implement Colored Text
 	Color * pal = NULL, *ipal = NULL;
-	/*if(hicolor != NULL) {
-		pal = core->GetVideoDriver()->CreatePalette(*hicolor, *lowcolor);
-	}
-	if(initcolor != NULL) {
-		if((initcolor->r == hicolor->r) && (initcolor->g == hicolor->g) && (initcolor->b == hicolor->b))
-			ipal = pal;
-		else
-			ipal = core->GetVideoDriver()->CreatePalette(*initcolor, *lowcolor);
-	}*/
 	pal = hicolor;
 	if(ipal != NULL) {
 		ipal = initcolor;
@@ -206,119 +196,6 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 		
 	}
 	free(tmp);
-	/*StringList sl = Prepare(rgn, string, initials, curpos);
-	int x = 0, y = 0;
-	if(Alignment & IE_FONT_ALIGN_TOP)
-		y = rgn.y;
-	else if(Alignment & IE_FONT_ALIGN_MIDDLE)
-		y = rgn.y+sl.starty;
-	switch(Alignment & 0x0F) {
-		case IE_FONT_ALIGN_LEFT: 
-		{
-			bool cursorblt = false;
-			int	i = 0;
-			int r = 0;
-			for(r = 0; r < sl.StringCount; r++) {
-				x = rgn.x+sl.strings[r][0]->XPos;
-				y += sl.heights[0];
-				i = 0;
-				while(true) {
-					video->BlitSprite(sl.strings[r][i], x, y, anchor, &rgn);
-					if((cursor != NULL) && (sl.cury == r) && (sl.curx == i)) {
-						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos, y, anchor);
-						cursorblt = true;
-					}
-					if(sl.strings[r][i+1] == NULL)
-						break;
-					x+=(sl.strings[r][i]->Width-sl.strings[r][i]->XPos)+sl.strings[r][i+1]->XPos;
-					i++;
-				}
-			}
-			if(!cursorblt) {
-				if(cursor) {
-					if(r != 0) {
-						r--;
-						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos+sl.strings[r][i]->Width, y, true);
-					}
-					else
-						video->BlitSprite(cursor, x, y, true);
-				}
-			}
-		}
-		break;
-
-		case IE_FONT_ALIGN_CENTER:
-		{
-			bool cursorblt = false;
-			int	i = 0;
-			int r = 0;
-			for(r = 0; r < sl.StringCount; r++) {
-				x = rgn.x+sl.strings[r][0]->XPos+((rgn.w/2)-(sl.lengths[r]/2));
-				y += sl.heights[0];
-				i = 0;
-				while(true) {
-					video->BlitSprite(sl.strings[r][i], x, y, anchor, &rgn);
-					if((cursor != NULL) && (sl.cury == r) && (sl.curx == i))
-						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos, y, anchor);
-					if(sl.strings[r][i+1] == NULL)
-						break;
-					x+=(sl.strings[r][i]->Width-sl.strings[r][i]->XPos)+sl.strings[r][i+1]->XPos;
-					i++;
-				}
-			}
-			if(!cursorblt) {
-				if(cursor) {
-					if(r != 0) {
-						r--;
-						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos+sl.strings[r][i]->Width, y, true);
-					}
-					else
-						video->BlitSprite(cursor, x, y, true);
-				}
-			}
-		}
-		break;
-
-		case IE_FONT_ALIGN_RIGHT:
-		{
-			bool cursorblt = false;
-			int	i = 0;
-			int r = 0;
-			for(r = 0; r < sl.StringCount; r++) {
-				int len = 0;
-				while(sl.strings[r][len] != NULL)
-					len++;
-				len--;
-				x = rgn.x+rgn.w-(sl.strings[0][len]->Width-sl.strings[0][len]->XPos);
-				y += sl.heights[0];
-				i = len;
-				while(i >= 0) {
-					video->BlitSprite(sl.strings[r][i], x, y, anchor, &rgn);
-					if((cursor != NULL) && (sl.cury == r) && (sl.curx == i))
-						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos, y, anchor);
-					if(i == 0)
-						break;
-					x-=sl.strings[r][i]->XPos+(sl.strings[r][i-1]->Width-sl.strings[r][i-1]->XPos);
-					i--;
-				}
-			}
-			if(!cursorblt) {
-				if(cursor) {
-					if(r != 0) {
-						r--;
-						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos, y, true);
-					}
-					else
-						video->BlitSprite(cursor, x, y, true);
-				}
-			}
-		}
-		break;
-	}
-	free(sl.strings[0]);
-	free(sl.strings);
-	free(sl.heights);
-	free(sl.lengths);*/
 }
 /** PreCalculate for Printing */
 StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int curpos)

@@ -38,7 +38,6 @@ class GEM_EXPORT Font
 private:
 	//std::vector<Sprite2D*> chars;
 	int count;
-	int maxHeight;
 	Color * palette;
 public:
 	Font(void);
@@ -49,6 +48,7 @@ public:
 	void * GetPalette();
 	char ResRef[9];
 	Sprite2D * chars[256];
+	int maxHeight;
 private: // Private methods
   /** PreCalculate for Printing */
   StringList Prepare(Region &rgn, unsigned char * string, Font * init, int curpos);
