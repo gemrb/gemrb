@@ -33,11 +33,13 @@ def OnLoad():
 
 		#area previews
 		Button = GemRB.GetControl(LoadWindow, 1+i)
+		GemRB.SetButtonState (LoadWindow, Button, IE_GUI_BUTTON_LOCKED)
 		GemRB.SetButtonFlags(LoadWindow, Button, IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 		#PC portraits
 		for j in range(0,6):
 			Button = GemRB.GetControl(LoadWindow,25+i*6+j)
+			GemRB.SetButtonState (LoadWindow, Button, IE_GUI_BUTTON_LOCKED)
 			GemRB.SetButtonFlags(LoadWindow, Button, IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 			GemRB.SetControlSize(LoadWindow, Button, 21, 21)
 
