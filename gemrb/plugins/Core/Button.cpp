@@ -39,11 +39,11 @@ Button::Button(bool Clear){
 	Unpressed = Pressed = Selected = Disabled = NULL;
 	this->Clear = Clear;
 	State = IE_GUI_BUTTON_UNPRESSED;
-	memset(ButtonOnPress, 0, 64);
+	ButtonOnPress[0] = 0;
 	Text = (char*)malloc(64);
 	hasText = false;
 	font = core->GetFont("STONEBIG");
-	Flags = 0;
+	Flags = 0x04;
 }
 Button::~Button(){
 	Video * video = core->GetVideoDriver();
@@ -167,6 +167,9 @@ void Button::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 	if((Button == 1) && (State != IE_GUI_BUTTON_DISABLED)) {
 		State = IE_GUI_BUTTON_PRESSED;
 		Changed = true;
+		if(Flags & 0x04) {
+			core->GetSoundMgr()->Play("GAM_09");
+		}
 	}
 }
 /** Mouse Button Up */
@@ -177,9 +180,17 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 	Changed = true;
 	State = IE_GUI_BUTTON_UNPRESSED;
 	if((x >= 0) && (x <= Width))
-		if((y >= 0) && (y <= Height))
-			if(strlen(ButtonOnPress) != 0)
+		if((y >= 0) && (y <= Height)) {
+			if(Flags & 0x04) {
+				if(Flags & 0x08)
+					core->GetSoundMgr()->Play("GAM_04");
+				else
+					core->GetSoundMgr()->Play("GAM_03");
+			}
+			if(ButtonOnPress[0] != 0)
 				core->GetGUIScriptEngine()->RunFunction(ButtonOnPress);
+			
+		}
 }
 
 /** Sets the Text of the current control */
@@ -206,13 +217,15 @@ void Button::SetEvent(char * funcName)
 }
 
 /** Sets the Display Flags */
-int Button::SetFlags(bool hideImg, bool hasPicture)
+int Button::SetFlags(bool hideImg, bool hasPicture, bool playSound)
 {
 	Flags = 0;
 	if(hideImg)
 		Flags = 0x01;
 	if(hasPicture)
 		Flags += 0x02;
+	if(playSound)
+		Flags += 0x04;
 	Changed = true;
 	((Window*)Owner)->Invalidate();
 	return 0;

@@ -76,7 +76,7 @@ public: // Public Events
   /** Button Pressed Event Script Function Name */
   char ButtonOnPress[64];
   /** Sets the Display Flags */
-  int SetFlags(bool hideImg, bool hasPicture);
+  int SetFlags(bool hideImg, bool hasPicture, bool playSound = true);
 private: // Private attributes
 	/** Button Unpressed Image */
   Sprite2D * Unpressed;

@@ -84,6 +84,8 @@ public: // Public Events
   void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
   /** Mouse Over Event */
   void OnMouseOver(unsigned short x, unsigned short y);
+  /** OnChange Scripted Event Function Name */
+  char SliderOnChange[64];
 };
 
 #endif

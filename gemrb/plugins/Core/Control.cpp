@@ -32,31 +32,31 @@ Control::~Control(){
 /** Key Press Event */
 void Control::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
-	printf("OnKeyPress: CtrlID = %d, Key = %c (0x%02hX)\n", ControlID, Key, Key);
+	printf("OnKeyPress: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", ControlID, Key, Key);
 }
 /** Key Release Event */
 void Control::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
-	printf("OnKeyRelease: CtrlID = %d, Key = %c (0x%02hX)\n", ControlID, Key, Key);
+	printf("OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", ControlID, Key, Key);
 }
 /** Mouse Over Event */
 void Control::OnMouseOver(unsigned short x, unsigned short y)
 {
-	printf("OnMouseOver: CtrlID = %d, x = %hd, y = %hd\n", ControlID, x, y);
+	printf("OnMouseOver: CtrlID = 0x%08X, x = %hd, y = %hd\n", ControlID, x, y);
 }
 /** Mouse Button Down */
 void Control::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	printf("OnMouseDown: CtrlID = %d, x = %hd, y = %hd, Button = %d, Mos = %hd\n", ControlID, x, y, Button, Mod);
+	printf("OnMouseDown: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", ControlID, x, y, Button, Mod);
 }
 /** Mouse Button Up */
 void Control::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	printf("OnMouseUp: CtrlID = %d, x = %hd, y = %hd, Button = %d, Mos = %hd\n", ControlID, x, y, Button, Mod);
+	printf("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", ControlID, x, y, Button, Mod);
 }
 /** Special Key Press */
 void Control::OnSpecialKeyPress(unsigned char Key)
 {
-	printf("OnSpecialKeyPress: CtrlID = %d, Key = %d\n", ControlID, Key);
+	printf("OnSpecialKeyPress: CtrlID = 0x%08X, Key = %d\n", ControlID, Key);
 }
 
