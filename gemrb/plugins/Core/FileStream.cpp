@@ -5,6 +5,7 @@ FileStream::FileStream(void)
 {
 	opened = false;
 	str = NULL;
+	autoFree = false;
 }
 
 FileStream::~FileStream(void)

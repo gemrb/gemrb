@@ -19,8 +19,9 @@ void Texture::Init (void * pixels, int w, int h, int bpp, void * palette, bool c
 
 	if(pTexture)
 		pTexture->Release();
-
-    ddrval = lpD3DDevice->CreateTexture( w, h, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, NULL );
+	
+	ddrval = lpD3DDevice->CreateTexture( w, h, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, NULL );
+	
 	if(ddrval != D3D_OK)
 		return;
 

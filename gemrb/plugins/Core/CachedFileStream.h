@@ -24,7 +24,7 @@ private:
 	FILE * str;
 public:
 	CachedFileStream(char * stream, bool autoFree = true);
-	CachedFileStream(CachedFileStream * cfs, int startpos, int size, bool autoFree = false);
+	CachedFileStream(CachedFileStream * cfs, int startpos, int size, bool autoFree = true);
 	~CachedFileStream(void);
 	int Read(void * dest, int length);
 	int Seek(int pos, int startpos);

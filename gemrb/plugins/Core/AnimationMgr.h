@@ -24,7 +24,7 @@ class GEM_EXPORT AnimationMgr : public Plugin
 public:
 	AnimationMgr(void);
 	virtual ~AnimationMgr(void);
-	virtual bool Open(DataStream * stream, bool autoFree = false) = 0;
+	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
 	virtual Sprite2D * GetFrameFromCycle(unsigned char Cycle, unsigned short frame) = 0;
 	virtual Animation * GetAnimation(unsigned char Cycle, int x, int y, unsigned char mode = IE_NORMAL) = 0;
 	virtual AnimationFactory * GetAnimationFactory(const char * ResRef, unsigned char mode = IE_NORMAL) = 0;

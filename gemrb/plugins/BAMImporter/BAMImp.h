@@ -26,7 +26,7 @@ private:
 public:
 	BAMImp(void);
 	~BAMImp(void);
-	bool Open(DataStream * stream, bool autoFree = false);
+	bool Open(DataStream * stream, bool autoFree = true);
 	Sprite2D * GetFrameFromCycle(unsigned char Cycle, unsigned short frame);
 	Animation * GetAnimation(unsigned char Cycle, int x, int y, unsigned char mode = IE_NORMAL);
 	AnimationFactory * GetAnimationFactory(const char * ResRef, unsigned char mode = IE_NORMAL);

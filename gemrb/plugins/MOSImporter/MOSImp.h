@@ -13,7 +13,7 @@ private:
 public:
 	MOSImp(void);
 	~MOSImp(void);
-	bool Open(DataStream * stream, bool autoFree = false);
+	bool Open(DataStream * stream, bool autoFree = true);
 	Sprite2D * GetImage();
   /** No descriptions */
   void GetPalette(int index, int colors, Color * pal);

@@ -19,7 +19,7 @@ private:
 public:
 	p2DAImp(void);
 	~p2DAImp(void);
-	bool Open(DataStream * stream, bool autoFree = false);
+	bool Open(DataStream * stream, bool autoFree = true);
 	/** Returns the actual number of Rows in the Table */
 	inline int GetRowCount() { return rows.size(); }
 	/** Returns the actual number of Columns in the Table */

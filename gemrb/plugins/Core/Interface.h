@@ -128,7 +128,7 @@ public:
 	/** Set the Text of a Control */
 	int SetText(unsigned short WindowIndex, unsigned short ControlIndex, const char * string);
 	/** Set a Window Visible Flag */
-	int SetVisible(unsigned short WindowIndex, bool visible);
+	int SetVisible(unsigned short WindowIndex, int visible);
 	/** Show a Window in Modal Mode */
 	int ShowModal(unsigned short WindowIndex);
 	/** Set an Event of a Control */

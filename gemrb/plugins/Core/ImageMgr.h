@@ -22,7 +22,7 @@ class GEM_EXPORT ImageMgr : public Plugin
 public:
 	ImageMgr(void);
 	virtual ~ImageMgr(void);
-	virtual bool Open(DataStream * stream, bool autoFree = false) = 0;
+	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
 	virtual Sprite2D * GetImage() = 0;
   /** No descriptions */
   virtual void GetPalette(int index, int colors, Color * pal) = 0;

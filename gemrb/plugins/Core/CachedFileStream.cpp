@@ -44,16 +44,20 @@ CachedFileStream::CachedFileStream(CachedFileStream * cfs, int startpos, int siz
 	strcpy(cpath, core->CachePath);
 	strcat(cpath, cfs->filename);
 	str = fopen(cpath, "rb");
+	if(str == NULL) {
+		printf("\nDANGER WILL ROBINSON!!! str == NULL\nI'll wait a second hoping to open the file...");
+	}
+
 	fseek(str, startpos, SEEK_SET);
 	Pos = 0;
 }
 
 CachedFileStream::~CachedFileStream(void)
 {
-	/*if(autoFree && str) {
+	if(autoFree && str) {
 		fclose(str);
 	}
-	autoFree = false; //File stream destructor hack*/
+	autoFree = false; //File stream destructor hack
 }
 
 int CachedFileStream::Read(void * dest, int length)

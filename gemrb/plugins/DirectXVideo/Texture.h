@@ -22,6 +22,7 @@ public:
 	void * palette;
 	bool hasCK;
 	int colorKey;
+	int paletteIndex;
 
 };
 

@@ -123,7 +123,7 @@ private:
 public:
 	INIImp(void);
 	~INIImp(void);
-	bool Open(DataStream * stream, bool autoFree = false);
+	bool Open(DataStream * stream, bool autoFree = true);
 	int GetTagsCount()
 	{
 		return tags.size();

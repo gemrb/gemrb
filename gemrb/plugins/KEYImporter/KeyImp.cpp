@@ -205,6 +205,7 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 				core->FreeInterface(ai);
 				return NULL;
 			}
+			fclose(exist);
 		}
 		else
 			fclose(exist);
@@ -323,6 +324,7 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 				core->FreeInterface(ai);
 				return NULL;
 			}
+			fclose(exist);
 		}
 		else
 			fclose(exist);

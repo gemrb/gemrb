@@ -275,8 +275,8 @@ Font * BAMImp::GetFont()
 			h = frames[index].Height;
 	}
 	//printf("[maxW = %d, maxH = %d]\n", w, h);
-	Font * fnt = new Font(w*255, h, Palette, true, 0);
-	for(int i = 0; i < 255; i++) {
+	Font * fnt = new Font(w*cycles.size(), h, Palette, true, 0);
+	for(int i = 0; i < cycles.size(); i++) {
 		if(cycles[i].FirstFrame >= frames.size()) {
 			fnt->AddChar(NULL, 0, 0, 0, 0);
 			continue;

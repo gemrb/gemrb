@@ -1103,7 +1103,6 @@ static PyObject * GemRB_SetButtonBAM(PyObject */*self*/, PyObject *args)
 
 	Sprite2D * Picture = am->GetFrameFromCycle(0, 0);
 	if(Picture == NULL) {
-		delete(str);
 		core->FreeInterface(am);
 		return NULL;
 	}
