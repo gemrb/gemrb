@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.17 2004/01/18 17:23:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.18 2004/02/07 17:10:08 avenger_teambg Exp $
  *
  */
 
@@ -163,6 +163,7 @@ public:
 	unsigned long timeStartStep;
 	Sprite2D * lastFrame;
 	char Area[9];
+	long TalkCount;
 public:
 	void DoStep(ImageMgr * LightMap);
 	void WalkTo(unsigned short XDes, unsigned short YDes);

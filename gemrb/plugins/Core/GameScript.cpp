@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.56 2004/01/31 18:45:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.57 2004/02/07 17:10:08 avenger_teambg Exp $
  *
  */
 
@@ -57,6 +57,9 @@ static TriggerLink triggernames[]={
 {"globallt", GameScript::GlobalLT},
 {"globalsequal", GameScript::GlobalsEqual},
 {"inparty", GameScript::InParty},
+{"numtimestalkedto", GameScript::NumTimesTalkedTo},
+{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT},
+{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT},
 {"oncreation", GameScript::OnCreation},
 {"or", GameScript::Or},
 {"partyhasitem", GameScript::PartyHasItem},
@@ -134,13 +137,17 @@ static ActionLink actionnames[]={
 {"playdead",GameScript::PlayDead},
 {"playsound",GameScript::PlaySound},
 {"screenshake",GameScript::ScreenShake,AF_BLOCKING},
+{"setdialogue",GameScript::SetDialogue,AF_BLOCKING},
 {"setglobal",GameScript::SetGlobal},
+{"setnumtimestalkedto",GameScript::SetNumTimesTalkedTo},
 {"settokenglobal",GameScript::SetTokenGlobal},
 {"sg",GameScript::SG},
 {"smallwait",GameScript::SmallWait,AF_BLOCKING},
 {"startcutscene",GameScript::StartCutScene},
 {"startcutscenemode",GameScript::StartCutSceneMode},
 {"startdialogue",GameScript::StartDialogue,AF_BLOCKING},
+{"startdialoguenoset",GameScript::Dialogue,AF_BLOCKING}, //same?
+{"startmovie",GameScript::StartMovie},
 {"startsong",GameScript::StartSong},
 {"triggeractivation",GameScript::TriggerActivation},
 {"unhidegui",GameScript::UnhideGUI},
@@ -1304,6 +1311,42 @@ int GameScript::True(Scriptable * /* Sender*/, Trigger * /*parameters*/)
 	return 1;
 }
 
+//in fact this could be used only on Sender, but we want to enhance these
+//triggers and actions to accept an object argument whenever possible.
+//0 defaults to Myself (Sender)
+int GameScript::NumTimesTalkedTo(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	return actor->TalkCount==parameters->int0Parameter?1:0;
+}
+
+int GameScript::NumTimesTalkedToGT(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	return actor->TalkCount>parameters->int0Parameter?1:0;
+}
+
+int GameScript::NumTimesTalkedToLT(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	return actor->TalkCount<parameters->int0Parameter?1:0;
+}
+
 int GameScript::ActionListEmpty(Scriptable * Sender, Trigger * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
@@ -1975,6 +2018,10 @@ void GameScript::Dialogue(Scriptable * Sender, Action * parameters)
 	Actor * actor = (Actor*)scr;
 	Actor * target = (Actor*)tar;
 	if(actor->Dialog[0] != 0) {
+		//increasing NumTimesTalkedTo
+	        if(actor)
+        	        actor->TalkCount++;
+
 		DialogMgr * dm = (DialogMgr*)core->GetInterface(IE_DLG_CLASS_ID);
 		dm->Open(core->GetResourceMgr()->GetResource(actor->Dialog, IE_DLG_CLASS_ID), true);
 		GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
@@ -2009,6 +2056,25 @@ void GameScript::AmbientActivate(Scriptable * Sender, Action * parameters)
 	anim->Active = parameters->int0Parameter;
 }
 
+void GameScript::SetDialogue(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		return;
+	}
+	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!tar)
+		return;
+	if(tar->Type != ST_ACTOR)
+		return;
+	Actor * target = (Actor*)tar;
+	strncpy(target->Dialog,parameters->string0Parameter,8);
+	target->Dialog[8]=0;
+}
+
 void GameScript::StartDialogue(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
@@ -2026,6 +2092,10 @@ void GameScript::StartDialogue(Scriptable * Sender, Action * parameters)
 	Actor * actor = (Actor*)scr;
 	Actor * target = (Actor*)tar;
 	if(parameters->string0Parameter[0] != 0) {
+                //increasing NumTimesTalkedTo
+                if(actor)
+                        actor->TalkCount++;
+
 		DialogMgr * dm = (DialogMgr*)core->GetInterface(IE_DLG_CLASS_ID);
 		dm->Open(core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_DLG_CLASS_ID), true);
 		GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
@@ -2932,3 +3002,20 @@ void GameScript::ClearActions(Scriptable *Sender, Action *parameters)
 	if(scr)
 		scr->ClearActions();
 }
+
+void GameScript::SetNumTimesTalkedTo(Scriptable *Sender, Action *parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->TalkCount=parameters->int0Parameter;
+}
+
+void GameScript::StartMovie(Scriptable *Sender, Action *parameters)
+{
+	core->PlayMovie(parameters->string0Parameter);
+}
+

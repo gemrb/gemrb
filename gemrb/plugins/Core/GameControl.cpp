@@ -983,6 +983,10 @@ void GameControl::InitDialog(Actor * speaker, Actor * target, Dialog * dlg)
 			core->GetGUIScriptEngine()->RunFunction("OnIncreaseSize");
 		}
 	}
+	if(speaker)
+		speaker->TalkCount++;
+	if(target && (target!=speaker) )
+		target->TalkCount++;
 	DialogChoose(-1);
 }
 
@@ -1008,7 +1012,6 @@ void GameControl::DialogChoose(int choose)
 		Window * win = core->GetWindow(index);
 		if(core->GetDictionary()->Lookup("MessageTextArea", index)) {
 			TextArea * ta = (TextArea*)win->GetControl(index);
-//printf("%d\n",choose);
 			if(choose == -1)
 				ds = dlg->GetState(0);
 			else {

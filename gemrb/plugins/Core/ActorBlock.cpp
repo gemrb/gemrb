@@ -318,6 +318,7 @@ Moveble::Moveble(ScriptableType type) : Selectable(type)
 	timeStartStep = 0;
 	lastFrame = NULL;
 	Area[0] = 0;
+	TalkCount = 0;
 }
 
 Moveble::~Moveble(void)
@@ -530,6 +531,7 @@ void Door::SetCursor(unsigned char CursorIndex)
 void Door::DebugDump()
 {
 	printf("Debugdump of Door %s:\n",Name);
+	printf("DoorClosed: %d\n",DoorClosed);
 }
 
 /*******************
