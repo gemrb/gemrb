@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.42 2003/12/09 18:58:42 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.43 2003/12/15 09:34:35 balrog994 Exp $
  *
  */
 
@@ -892,14 +892,14 @@ void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r, Color &col
 	if(SDL_MUSTLOCK(disp))
 		SDL_LockSurface(disp);
 	while(x >= y) {
-		SetPixel(cx + x, cy + y, color);
-		SetPixel(cx - x, cy + y, color);
-		SetPixel(cx - x, cy - y, color);
-		SetPixel(cx + x, cy - y, color);
-		SetPixel(cx + y, cy + x, color);
-		SetPixel(cx - y, cy + x, color);
-		SetPixel(cx - y, cy - x, color);
-		SetPixel(cx + y, cy - x, color);
+		SetPixel(cx + (short)x, cy + (short)y, color);
+		SetPixel(cx - (short)x, cy + (short)y, color);
+		SetPixel(cx - (short)x, cy - (short)y, color);
+		SetPixel(cx + (short)x, cy - (short)y, color);
+		SetPixel(cx + (short)y, cy + (short)x, color);
+		SetPixel(cx - (short)y, cy + (short)x, color);
+		SetPixel(cx - (short)y, cy - (short)x, color);
+		SetPixel(cx + (short)y, cy - (short)x, color);
 
 		y++;
 		re+=yc;
@@ -933,10 +933,10 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr, unsigned
 	sy = 0;
 
 	while( sx >= sy ) {
-		SetPixel(cx+x, cy+y, color);
-		SetPixel(cx-x, cy+y, color);
-		SetPixel(cx-x, cy-y, color);
-		SetPixel(cx+x, cy-y, color);
+		SetPixel(cx+(short)x, cy+(short)y, color);
+		SetPixel(cx-(short)x, cy+(short)y, color);
+		SetPixel(cx-(short)x, cy-(short)y, color);
+		SetPixel(cx+(short)x, cy-(short)y, color);
 		y++;
 		sy+=tas;
 		ee+=yc;
@@ -958,10 +958,10 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr, unsigned
 	sy = tas*yr;
 
 	while( sx <= sy) {
-		SetPixel(cx+x, cy+y, color);
-		SetPixel(cx-x, cy+y, color);
-		SetPixel(cx-x, cy-y, color);
-		SetPixel(cx+x, cy-y, color);
+		SetPixel(cx+(short)x, cy+(short)y, color);
+		SetPixel(cx-(short)x, cy+(short)y, color);
+		SetPixel(cx-(short)x, cy-(short)y, color);
+		SetPixel(cx+(short)x, cy-(short)y, color);
 		x++;
 		sx+=tbs;
 		ee+=xc;
