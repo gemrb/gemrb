@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.236 2004/11/14 00:38:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.237 2004/11/14 14:20:48 avenger_teambg Exp $
  *
  */
 
@@ -1232,9 +1232,20 @@ ScriptEngine* Interface::GetGUIScriptEngine()
 	return guiscript;
 }
 
-int Interface::LoadCreature(char* ResRef, int InParty, bool character)
+Actor *Interface::GetCreature(DataStream *stream)
 {
 	ActorMgr* actormgr = ( ActorMgr* ) GetInterface( IE_CRE_CLASS_ID );
+        if (!actormgr->Open( stream, true )) {
+                FreeInterface( actormgr );
+                return NULL;
+        }
+        Actor* actor = actormgr->GetActor();
+        FreeInterface( actormgr );
+	return actor;
+}
+
+int Interface::LoadCreature(char* ResRef, int InParty, bool character)
+{
 	DataStream *stream;
 
 	if (character) {
@@ -1251,23 +1262,26 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	else {
 		stream = key->GetResource( ResRef, IE_CRE_CLASS_ID );
 	}
-	if (!actormgr->Open( stream, true )) {
-		FreeInterface( actormgr );
+	Actor* actor = GetCreature(stream);
+	if( !actor ) {
 		return -1;
 	}
-	Actor* actor = actormgr->GetActor();
-	FreeInterface( actormgr );
 	actor->InParty = InParty;
 	//both fields are of length 9, make this sure!
-	memcpy(actor->Area, GetGame()->CurrentArea, 9);
+	memcpy(actor->Area, GetGame()->CurrentArea, sizeof(actor->Area) );
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		actor->SetStance( IE_ANI_SLEEP );
 	} else {
 		actor->SetStance( IE_ANI_AWAKE );
 	}
-	actor->Orientation = 0;
+	actor->Orientation = rand()&15;
 
-	return game->SetPC( actor );
+	if( InParty ) {
+		return game->SetPC( actor );
+	}
+	else {
+		return game->AddNPC( actor );
+	}
 }
 
 int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)

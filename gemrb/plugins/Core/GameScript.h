@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.149 2004/11/07 19:12:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.150 2004/11/14 14:20:48 avenger_teambg Exp $
  *
  */
 
@@ -898,6 +898,9 @@ public: //Script Functions
 	static int NumCreatures(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesGT(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesLT(Scriptable* Sender, Trigger* parameters);
+	static int NumDead(Scriptable* Sender, Trigger* parameters);
+	static int NumDeadGT(Scriptable* Sender, Trigger* parameters);
+	static int NumDeadLT(Scriptable* Sender, Trigger* parameters);
 	static int NumItems(Scriptable* Sender, Trigger* parameters);
 	static int NumItemsGT(Scriptable* Sender, Trigger* parameters);
 	static int NumItemsLT(Scriptable* Sender, Trigger* parameters);

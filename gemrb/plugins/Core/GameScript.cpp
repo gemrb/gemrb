@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.212 2004/11/07 18:45:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.213 2004/11/14 14:20:47 avenger_teambg Exp $
  *
  */
 
@@ -185,6 +185,9 @@ static TriggerLink triggernames[] = {
 	{"numcreature", GameScript::NumCreatures,0},
 	{"numcreatureGT", GameScript::NumCreaturesGT,0},
 	{"numcreatureLT", GameScript::NumCreaturesLT,0},
+	{"numdead", GameScript::NumDead,0},
+	{"numdeadGT", GameScript::NumDeadGT,0},
+	{"numdeadLT", GameScript::NumDeadLT,0},
 	{"numinparty", GameScript::PartyCountEQ,0},
 	{"numinpartyalive", GameScript::PartyCountAliveEQ,0},
 	{"numinpartyalivegt", GameScript::PartyCountAliveGT,0},
@@ -321,6 +324,7 @@ static ActionLink actionnames[] = {
 	{"displaymessage", GameScript::DisplayStringHead,0},
 	{"displaystring", GameScript::DisplayString,0},
 	{"displaystringhead", GameScript::DisplayStringHead,0},
+	{"displaystringheaddead", GameScript::DisplayStringHead,0}, //same?
 	{"displaystringnonamehead", GameScript::DisplayStringNoNameHead,0},
 	{"displaystringwait", GameScript::DisplayStringWait,AF_BLOCKING},
 	{"dropinventory", GameScript::DropInventory, 0},
@@ -3148,6 +3152,51 @@ int GameScript::Xor(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter );
 	return ( value ^ parameters->int0Parameter ) != 0;
+}
+
+int GameScript::NumDead(Scriptable* Sender, Trigger* parameters)
+{
+	long value;
+
+	if(core->HasFeature(GF_HAS_KAPUTZ) ) {
+		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
+	}
+	else {
+		char VariableName[33];
+		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
+		value = CheckVariable(Sender, VariableName, "GLOBAL" );
+	}
+	return ( value == parameters->int0Parameter );
+}
+
+int GameScript::NumDeadGT(Scriptable* Sender, Trigger* parameters)
+{
+	long value;
+
+	if(core->HasFeature(GF_HAS_KAPUTZ) ) {
+		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
+	}
+	else {
+		char VariableName[33];
+		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
+		value = CheckVariable(Sender, VariableName, "GLOBAL" );
+	}
+	return ( value > parameters->int0Parameter );
+}
+
+int GameScript::NumDeadLT(Scriptable* Sender, Trigger* parameters)
+{
+	long value;
+
+	if(core->HasFeature(GF_HAS_KAPUTZ) ) {
+		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
+	}
+	else {
+		char VariableName[33];
+		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
+		value = CheckVariable(Sender, VariableName, "GLOBAL" );
+	}
+	return ( value < parameters->int0Parameter );
 }
 
 int GameScript::G_Trigger(Scriptable* Sender, Trigger* parameters)

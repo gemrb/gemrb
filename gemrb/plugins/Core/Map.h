@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.52 2004/11/07 19:21:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.53 2004/11/14 14:20:48 avenger_teambg Exp $
  *
  */
 
@@ -148,19 +148,27 @@ public:
 	/* Finds the path which leads to d */
 	PathNode* FindPath(Point &s, Point &d);
 	bool IsVisible(Point &s, Point &d);
-	
+
+	//ambients
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
 	void SetupAmbients();
+
+	//mapnotes
 	void AddMapNote(Point point, int color, char *text);
+	void RemoveMapNote(Point point);
 	MapNote *GetMapNote(int i) { return mapnotes[i]; }
 	MapNote *GetMapNote(Point point);
 	int GetMapNoteCount() { return mapnotes.size(); }
+
+	/* Spawns creature(s), returns true in case of an interrupted rest */
+	bool Rest(Point pos, int hours);
 private:
 	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
 		Point &p, unsigned int& diff);
 	void SetupNode(unsigned int x, unsigned int y, unsigned int Cost);
 	//maybe this is unneeded and orientation could be calculated on the fly
 	void UseExit(Actor *pc, InfoPoint *ip);
+	void SpawnCreature(Point pos, char *CreName, int radius = 0);
 };
 
 #endif

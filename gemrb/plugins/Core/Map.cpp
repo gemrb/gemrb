@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.120 2004/11/07 19:21:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.121 2004/11/14 14:20:48 avenger_teambg Exp $
  *
  */
 
@@ -45,8 +45,51 @@ static int Passable[16] = {
 	4, 1, 1, 1, 1, 1, 1, 1, 4, 1, 0, 0, 0, 0, 2, 1
 };
 static bool PathFinderInited = false;
+static Variables Spawns;
 
 #define STEP_TIME 150
+
+void InitSpawnGroups()
+{
+	ieResRef GroupName;
+	int i;
+	TableMgr * tab;
+
+	int table=core->LoadTable( "spawngrp" );
+
+	Spawns.RemoveAll();
+	Spawns.SetType( GEM_VARIABLES_STRING );
+	
+	if(table<0) {
+		return;
+	}
+	tab = core->GetTable( table );
+	if(!tab) {
+		goto end;
+	}
+	i=tab->GetColNamesCount();
+	while (i--) {
+		int j=tab->GetRowCount();
+		while (j--) {
+			char *crename = tab->QueryField( i,j );
+			if (crename[0] != '*') break;
+		}
+		if (j>0) {
+			ieResRef *creatures = (ieResRef *) malloc( sizeof(ieResRef)*(j+1) );
+			//count of creatures
+			*(int *) creatures = j;
+			//difficulty
+			*(((int *) creatures)+1) = atoi( tab->QueryField(i,0) );			for(;j;j--) {
+				strncpy( creatures[j], tab->QueryField(i,j), sizeof( ieResRef ) );
+			}
+			strncpy( GroupName, tab->GetColumnName( i ), sizeof( ieResRef ) );
+			strupr( GroupName );
+			Spawns.SetAt( GroupName, (const char *) creatures );
+		}
+	}
+end:
+	core->DelTable( table );
+}
 
 void InitPathFinder()
 {
@@ -93,6 +136,7 @@ Map::Map(void)
 	lastActorCount[2] = 0;
 	if (!PathFinderInited) {
 		InitPathFinder();
+		InitSpawnGroups();
 	}
 }
 
@@ -219,10 +263,10 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		if(EveryOne&2) {
 			int i=game->GetPartySize(false);
 			while(i--) {
-	        	        game->GetPC(i)->ClearPath();
-        	        	game->GetPC(i)->ClearActions();
-	                	game->GetPC(i)->AddAction( GameScript::GenerateAction( Tmp ) );
-        		}
+				game->GetPC(i)->ClearPath();
+				game->GetPC(i)->ClearActions();
+				game->GetPC(i)->AddAction( GameScript::GenerateAction( Tmp ) );
+			}
 			return;
 		}
 		actor->ClearPath();
@@ -1134,13 +1178,14 @@ bool Map::IsVisible(Point &s, Point &d)
 	return true;
 }
 
+//--------ambients----------------
 void Map::SetupAmbients()
 {
 	AmbientMgr *ambim = core->GetSoundMgr()->GetAmbientMgr();
 	ambim->reset();
 	ambim->setAmbients( ambients );
 }
-
+//--------mapnotes----------------
 //text must be a pointer we can claim ownership of
 void Map::AddMapNote(Point point, int color, char *text)
 {
@@ -1152,6 +1197,18 @@ void Map::AddMapNote(Point point, int color, char *text)
 	mapnotes.push_back(mn);
 }
 
+void Map::RemoveMapNote(Point point)
+{
+	int i = mapnotes.size();
+	while(i--) {
+		if(point.x==mapnotes[i]->Pos.x && point.y==mapnotes[i]->Pos.y) {
+			delete mapnotes[i];
+			mapnotes.erase(mapnotes.begin()+i);
+		}
+	}
+	
+}
+
 MapNote *Map::GetMapNote(Point point)
 {
 	int i = mapnotes.size();
@@ -1161,5 +1218,47 @@ MapNote *Map::GetMapNote(Point point)
 		}
 	}
 	return NULL;
+}
+//--------spawning------------------
+void Map::SpawnCreature(Point pos, char *CreName, int radius)
+{
+	char *Spawngroup=NULL;
+	Actor *creature;
+	if( !Spawns.Lookup( CreName, Spawngroup) ) {
+		DataStream *stream = core->GetResourceMgr()->GetResource( CreName, IE_CRE_CLASS_ID );
+		creature = core->GetCreature(stream); 
+		if( creature ) {
+			creature->SetPosition( this, pos, true, radius );
+		}
+		return;
+	}
+	//adjust this with difflev too
+	//int difficulty = *(int *) Spawngroup;
+	int count = *(((int *) Spawngroup)+1);
+	while( count-- ) {
+		DataStream *stream = core->GetResourceMgr()->GetResource( ((ieResRef *) Spawngroup)[count+1], IE_CRE_CLASS_ID );
+		creature = core->GetCreature(stream); 
+		if( creature ) {
+			creature->SetPosition( this, pos, true, radius );
+		}
+	}
+}
+
+//--------restheader----------------
+bool Map::Rest(Point pos, int hours)
+{
+	int chance=RestHeader.DayChance; //based on ingame timer
+	if( !RestHeader.CreatureNum) return false;
+	for(int i=0;i<hours;i++) {
+		if( rand()%100<chance ) {
+			int idx = rand()%RestHeader.CreatureNum;
+			char *str=core->GetString( RestHeader.Strref[idx] );
+			core->GetGameControl()->DisplayString( str );
+			free(str);
+			SpawnCreature(pos, RestHeader.CreResRef[idx], 20 );
+			return true;
+		}
+	}
+	return false;
 }
 
