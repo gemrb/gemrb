@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.15 2003/11/26 16:36:38 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.16 2003/11/26 18:16:32 balrog994 Exp $
  *
  */
 
@@ -67,10 +67,14 @@ void Map::AddTileMap(TileMap * tm, ImageMgr * lm)
 	this->tm = tm;
 	LightMap = lm;
 }
-Color green = {0x00, 0xff, 0x00, 0xff};
-Color red   = {0xff, 0x00, 0x00, 0xff};
-Color yellow= {0xff, 0xff, 0x00, 0xff};
-Color cyan  = {0x00, 0xff, 0xff, 0xff};
+Color green			= {0x00, 0xff, 0x00, 0xff};
+Color red			= {0xff, 0x00, 0x00, 0xff};
+Color yellow		= {0xff, 0xff, 0x00, 0xff};
+Color cyan			= {0x00, 0xff, 0xff, 0xff};
+Color green_dark	= {0x00, 0x80, 0x00, 0xff};
+Color red_dark		= {0x80, 0x00, 0x00, 0xff};
+Color yellow_dark	= {0x80, 0x80, 0x00, 0xff};
+Color cyan_dark		= {0x00, 0x80, 0x80, 0xff};
 void Map::DrawMap(Region viewport)
 {	
 	if(tm)
@@ -87,6 +91,8 @@ void Map::DrawMap(Region viewport)
 			continue;
 		Animation * anim = ca->GetAnimation(actors[i].AnimID, actors[i].Orientation);
 		bool DrawCircle=ca->DrawCircle;
+		if(actors[i].Selected)
+			DrawCircle = true;
 		if(DrawCircle && (ca->CircleSize==0) ) DrawCircle=false;
 		else {
 			if(actors[i].actor->Modified[IE_NOCIRCLE]) DrawCircle=false;
@@ -94,7 +100,6 @@ void Map::DrawMap(Region viewport)
 				 if(actors[i].actor->Modified[IE_STATE_ID]&STATE_DEAD) DrawCircle=false;
 			}
 		}
-		
 		if(DrawCircle) {	
 			switch(actors[i].actor->BaseStats[IE_EA])
 			{
@@ -108,21 +113,32 @@ void Map::DrawMap(Region viewport)
 			case CONTROLLED:
 			case CHARMED:
 			case EVILBUTGREEN:
-				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), green);
+				if(actors[i].Selected)
+					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), green);
+				else
+					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), green_dark);
 			break;
 
 			case ENEMY:
 			case GOODBUTRED:
-				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), red);
+				if(actors[i].Selected)
+					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), red);
+				else
+					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), red_dark);
 			break;
 
 			case NEUTRAL:
-				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), yellow);
+				if(actors[i].Selected)
+					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), yellow);
+				else
+					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), yellow_dark);
 			break;
 
 			default:
-				printf("%d\n", actors[i].actor->BaseStats[IE_EA]);
-				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), cyan);
+				if(actors[i].Selected)
+					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), cyan);
+				else
+					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), cyan_dark);
 			break;
 			}
 		}
@@ -173,6 +189,7 @@ void Map::AddActor(ActorBlock actor)
 			actor.lastFrame = nextFrame;
 		}
 	}
+	actor.Selected = false;
 	actors.push_back(actor);
 }
 
