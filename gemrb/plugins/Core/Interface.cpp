@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.89 2003/12/07 08:05:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.90 2003/12/09 18:59:34 balrog994 Exp $
  *
  */
 
@@ -678,11 +678,11 @@ bool Interface::LoadConfig(void)
 /** No descriptions */
 Color * Interface::GetPalette(int index, int colors){
 	Color * pal = NULL;
-	if(colors <= 16) {
+	if(colors <= 32) {
 		pal = (Color*)malloc(colors*sizeof(Color));
 		pal16->GetPalette(index, colors, pal);
 	}
-	else if(colors <= 256) {
+	else if(colors == 256) {
 		pal = (Color*)malloc(colors*sizeof(Color));
 		pal256->GetPalette(index, colors, pal);
 	}
