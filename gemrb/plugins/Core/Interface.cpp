@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.259 2005/02/15 16:33:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.260 2005/02/18 18:43:07 avenger_teambg Exp $
  *
  */
 
@@ -2024,6 +2024,8 @@ int Interface::PlayMovie(char* ResRef)
 	if(music) music->Start();
 	soundmgr->GetAmbientMgr()->activate();
 	FreeInterface( mp );
+	//Setting the movie name to 1
+	vars->SetAt( ResRef, 1 );
 	return 0;
 }
 
@@ -2390,9 +2392,9 @@ void Interface::DisplayString(const char* Text)
 {
 	ieDword WinIndex, TAIndex;
 
-	core->GetDictionary()->Lookup( "MessageWindow", WinIndex );
+	vars->Lookup( "MessageWindow", WinIndex );
 	if (( WinIndex != (ieDword) -1 ) &&
-		( core->GetDictionary()->Lookup( "MessageTextArea", TAIndex ) )) {
+		( vars->Lookup( "MessageTextArea", TAIndex ) )) {
 		Window* win = core->GetWindow( WinIndex );
 		if (win) {
 			TextArea* ta = ( TextArea* ) win->GetControl( TAIndex );

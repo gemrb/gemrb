@@ -1,11 +1,11 @@
 
 Prototype: GemRB.PlayMovie(MOVResRef)
 
-Description: Plays the named movie.
+Description: Plays the named movie. Sets the configuration variable MOVResRef to 1.
 
 Parameters: MOVResRef - a .mve resource reference. 
 
 Return value: N/A
 
-See also: N/A
+See also: SetVar, GetVar
 
