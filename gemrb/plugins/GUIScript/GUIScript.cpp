@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.110 2004/01/16 22:57:26 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.111 2004/01/29 20:38:00 avenger_teambg Exp $
  *
  */
 
@@ -69,7 +69,7 @@ static PyObject * GemRB_HideGUI(PyObject *, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
+GameControl *StartGameControl()
 {
 	int count = core->GetWindowMgr()->GetWindowsCount();
 	for(int i = 0; i < count; i++) {
@@ -93,6 +93,35 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 		unsigned long index;
 		gc->UnhideGUI();
 	}
+	if(core->ConsolePopped) {
+		core->PopupConsole();
+	}
+
+	return gc;
+}
+
+static PyObject * GemRB_LoadGame(PyObject *, PyObject *args)
+{
+	int GameIndex;
+
+	if(!PyArg_ParseTuple(args, "i", &GameIndex)) {	
+		printMessage("GUIScript", "Syntax Error: LoadGame(Index)\n", LIGHT_RED);
+		return NULL;
+	}
+	GameControl *gc=StartGameControl();
+printf("got GameControl\n");
+	core->LoadGame(GameIndex);
+printf("loadGame done\n");
+	gc->SetCurrentArea(0);
+printf("currentarea set\n");
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+
+static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
+{
+	GameControl *gc=StartGameControl();
 	// 0 - single player, 1 - tutorial, 2 - multiplayer
 	unsigned long playmode=0;
 	core->GetDictionary()->Lookup("PlayMode", playmode);
@@ -114,10 +143,6 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 		MyActor->MySelf = MyActor;
 	}
 	core->DelTable(start);
-	if(core->ConsolePopped) {
-		core->PopupConsole();
-	}
-
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -1860,8 +1885,11 @@ static PyMethodDef GemRBMethods[] = {
 	{"EvaluateString", GemRB_EvaluateString, METH_VARARGS,
 	 "Evaluate an In-Game Script Trigger in the current Area Script Context"},
 
+	{"LoadGame", GemRB_LoadGame, METH_VARARGS,
+     "Loads and enters the Game."},
+
 	{"EnterGame", GemRB_EnterGame, METH_NOARGS,
-     "Enters the Game."},
+     "Starts new game and enters it."},
 
 	{"StatComment", GemRB_StatComment, METH_VARARGS,
      "Replaces values into an strref."},
