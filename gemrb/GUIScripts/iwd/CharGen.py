@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.29 2004/12/09 22:25:58 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.30 2004/12/09 22:44:42 avenger_teambg Exp $
 
 
 #Character Generation
@@ -412,7 +412,7 @@ def SetCharacterDescription():
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, str(GemRB.GetVar("Skill" + str(i))) )
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, "%" )
-		elif ClassName == "RANGER":
+		elif ClassName == "RANGER" or ClassName=="CLERIC_RANGER":
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 8442, -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 9461, -1)
@@ -426,7 +426,6 @@ def SetCharacterDescription():
 		elif ClassName == "BARD":
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 8442, -1)
-			n = 2
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 9463, -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, str(GemRB.GetVar("Skill2")) )
@@ -1421,6 +1420,7 @@ def ProficienciesSelect():
 		GemRB.SetButtonState(ProficienciesWindow, ProficienciesLabel, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetEvent(ProficienciesWindow, ProficienciesLabel, IE_GUI_BUTTON_ON_PRESS, "ProficienciesLabelPress")
 		GemRB.SetVarAssoc(ProficienciesWindow, ProficienciesLabel, "ProficienciesIndex", i + 1)
+		GemRB.SetVar("ProficienciesIndex"+str(i+1),0)
 
 		for j in range (0, 5):
 			ProficienciesMark = GemRB.GetControl(ProficienciesWindow, 27 + i * 5 + j)
@@ -1698,6 +1698,8 @@ def MageSpellsMemorize():
 		while (j < len(Learnable)) and (((1 << j) & MageSpellBook) == 0):
 			j = j + 1
 		if j < len(Learnable):
+			Spell = GemRB.GetSpell(Learnable[j])
+			GemRB.SetTooltip(MageMemorizeWindow, SpellButton, Spell['SpellName'])
 			GemRB.SetSpellIcon(MageMemorizeWindow, SpellButton, Learnable[j])
 			GemRB.SetButtonState(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageMemorizeSelectPress")
