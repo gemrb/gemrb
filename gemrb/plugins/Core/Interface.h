@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.130 2005/01/09 14:54:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.131 2005/01/15 14:55:48 avenger_teambg Exp $
  *
  */
 
@@ -269,7 +269,9 @@ public:
 	void DisplayTooltip(int x, int y, Control* ctrl);
 	/** Actually draws tooltip on the screen. Called from SDLVideoDriver */
 	void DrawTooltip();
-	/** displays a string in the textarea */
+	/** displays any string in the textarea */
+	void DisplayString(const char *txt);
+	/** displays a string constant in the textarea */
 	void DisplayConstantString(int stridx, unsigned int color);
 	/** Set a Window Visible Flag */
 	int SetVisible(unsigned short WindowIndex, int visible);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.183 2005/01/09 22:24:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.184 2005/01/15 14:55:47 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1605,7 +1605,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
 }
-
+/*
 void GameControl::DisplayString(const char* Text)
 {
 	ieDword WinIndex, TAIndex;
@@ -1620,7 +1620,7 @@ void GameControl::DisplayString(const char* Text)
 		}
 	}
 }
-
+*/
 void GameControl::SetScreenFlags(int value, int mode)
 {
 	switch(mode) {

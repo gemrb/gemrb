@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.218 2005/01/09 22:33:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.219 2005/01/15 14:55:47 avenger_teambg Exp $
  *
  */
 
@@ -1745,10 +1745,7 @@ void GameScript::DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 		Sender->DisplayHeadText( sb.text );
 	}
 	if (flags & DS_CONSOLE) {
-		GameControl *gc=core->GetGameControl();
-		if (gc) {
-			gc->DisplayString( sb.text );
-		}
+			core->DisplayString( sb.text );
 	}
 	if (sb.Sound[0] ) {
 		ieDword len = core->GetSoundMgr()->Play( sb.Sound );
@@ -7315,11 +7312,11 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 	if (gc) {
 		char *strref = core->GetTable(chapter)->QueryField(0);
 		char *str=core->GetString( strtol(strref,NULL,0) );
-		gc->DisplayString(str);
+		core->DisplayString(str);
 		free(str);
 		strref = core->GetTable(chapter)->QueryField(1);
 		str=core->GetString( strtol(strref,NULL,0) );
-		gc->DisplayString(str);
+		core->DisplayString(str);
 		free(str);
 	}
 }

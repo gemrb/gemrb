@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.247 2005/01/09 14:54:56 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.248 2005/01/15 14:55:48 avenger_teambg Exp $
  *
  */
 
@@ -2357,26 +2357,30 @@ int Interface::CanUseItemType(int itype, int slottype) const
 	return (slotmatrix[itype]&slottype);
 }
 
+void Interface::DisplayString(const char* Text)
+{
+        ieDword WinIndex, TAIndex;
+
+        core->GetDictionary()->Lookup( "MessageWindow", WinIndex );
+        if (( WinIndex != (ieDword) -1 ) &&
+                ( core->GetDictionary()->Lookup( "MessageTextArea", TAIndex ) )) {
+                Window* win = core->GetWindow( WinIndex );
+                if (win) {
+                        TextArea* ta = ( TextArea* ) win->GetControl( TAIndex );                        ta->AppendText( Text, -1 );
+                }
+        }
+}
+
+static const char* DisplayFormat = "[/color][p][color=%lX]%s[/color][/p]";
+
 void Interface::DisplayConstantString(int stridx, unsigned int color)
 {
-	ieDword index;
-
-	if (!vars->Lookup( "MessageWindow", index )) {
-		return;
-	}
-	Window* win = GetWindow( index );
-	if (!vars->Lookup( "MessageTextArea", index )) {
-		return;
-	}
-	TextArea* ta = ( TextArea* ) win->GetControl( index );
-	char* text = GetString(strref_table[stridx]);
-	const char* format = "[/color][p][color=%lX]%s[/color][/p]";
-	int newlen = (int)(strlen( format ) + strlen( text ) + 10);
+	char* text = GetString( strref_table[stridx] );
+	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 10);
 	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, format, color, text );
-	free(text);
-	ta->AppendText( newstr, -1 );
-	ta->AppendText( "", -1 );
+	snprintf( newstr, newlen, DisplayFormat, color, text );
+	free( text );
+	DisplayString( newstr );
 	free( newstr );
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.11 2005/01/15 14:26:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.12 2005/01/15 14:55:47 avenger_teambg Exp $
  *
  */
 
@@ -214,6 +214,12 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 	printf( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
 
 	EffectFunction  fn = effectnames[fx->Opcode].Function;
+	if( efftexts[fx->Opcode]>0 ) {
+		char *text = core->GetString( efftexts[fx->Opcode] );
+		core->DisplayString( text );
+		free( text );
+	}
+
 	if (fn)
 		fn( target, fx );
 	else

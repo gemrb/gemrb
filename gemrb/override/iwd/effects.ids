@@ -3,7 +3,7 @@
 0x02	Cure:Sleep
 0x03	State:Berserking
 0x04	Cure:Berserking
-0x05	Charm:Charm
+0x05	State:Charmed
 0x06	Stat:CharismaModifier
 0x07	Color:SetCharacterColorsByPalette
 0x08	Color:ColorGlowSolid
@@ -36,13 +36,13 @@
 0x24	Stat:SaveVsBreathModifier
 0x25	Stat:SaveVsSpellsModifier
 0x26	State:Silence
-0x27	Unconsciousness
+0x27	State:Sleep
 0x29	Graphics:Sparkle
 0x2A	Spell:WizardSpellSlotsModifier
 0x2B	Cure:StoneToFlesh
 0x2C	Stat:StrengthModifier
 0x2D	State:Stun
-0x2E	Unstun
+0x2E	Cure:Stun
 0x2F	Cure:Invisibility
 0x30	Cure:Silence
 0x31	Stat:WisdomModifier
