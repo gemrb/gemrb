@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.10 2004/02/24 22:20:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.11 2004/03/19 22:37:33 avenger_teambg Exp $
  *
  */
 
@@ -29,9 +29,13 @@ private:
 	DataStream* str;
 	bool autoFree;
 	char WEDResRef[8];
+	unsigned long LastSave;
+	unsigned long AreaFlags;
+	unsigned short AreaType, WRain, WSnow, WFog, WLightning, WUnknown;
 	unsigned long ActorOffset, AnimOffset, AnimCount;
-	unsigned long VerticesOffset, DoorsCount, DoorsOffset, EntrancesOffset,
-		EntrancesCount;
+	unsigned long VerticesOffset;
+	unsigned long DoorsCount, DoorsOffset;
+	unsigned long EntrancesOffset, EntrancesCount;
 	unsigned long SongHeader;
 	unsigned short ActorCount, VerticesCount;
 	unsigned long ContainersOffset, InfoPointsOffset;

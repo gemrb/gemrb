@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.43 2004/03/15 15:25:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.44 2004/03/19 22:37:33 avenger_teambg Exp $
  *
  */
 
@@ -89,7 +89,15 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	}
 	//TEST VERSION: SKIPPING VALUES
 	str->Read( WEDResRef, 8 );
-	str->Seek( 0x54 + bigheader, GEM_STREAM_START );
+	str->Read( &LastSave, 4);
+	str->Read( &AreaFlags, 4);
+	str->Seek( 0x48 + bigheader, GEM_STREAM_START );
+	str->Read( &AreaType, 2);
+	str->Read( &WRain, 2);
+	str->Read( &WSnow, 2);
+	str->Read( &WFog, 2);
+	str->Read( &WLightning, 2);
+	str->Read( &WUnknown, 2);
 	str->Read( &ActorOffset, 4 );
 	str->Read( &ActorCount, 2 );
 	str->Seek( 0x5A + bigheader, GEM_STREAM_START );
@@ -124,6 +132,8 @@ Map* AREImp::GetMap()
 	Map* map = new Map();
 	strncpy( map->scriptName, WEDResRef, 8);
 	map->scriptName[8]=0;
+	map->AreaFlags=AreaFlags;
+	map->AreaType=AreaType;
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
 		printf( "[AREImporter]: No Tile Map Manager Available.\n" );
