@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.38 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.39 2003/11/29 17:11:05 avenger_teambg Exp $
  *
  */
 
@@ -46,23 +46,9 @@ Button::Button(bool Clear){
 	ButtonOnPress[0] = 0;
 	Text = (char*)malloc(64);
 	hasText = false;
-	stdpal = NULL;
-	if(stricmp(core->GameType, "bg2") == 0)
-		font = core->GetFont("STONEBIG");
-	else if(stricmp(core->GameType, "bg1") == 0)
-		font = core->GetFont("STONESML");
-	else if(stricmp(core->GameType, "iwd") == 0)
-		font = core->GetFont("STONESML");
-	else if(stricmp(core->GameType, "iwd2") == 0) {
-		font = core->GetFont("NORMAL");
-		Color fore = {0xff, 0xff, 0xff, 0x00}, back = {0x00, 0x00, 0x00, 0x00};
-		stdpal = core->GetVideoDriver()->CreatePalette(fore, back);
-	}
+	font=core->GetButtonFont();
 	palette = (Color*)malloc(256*sizeof(Color));
-	if(!stdpal)
-		memcpy(palette, font->GetPalette(), 256*sizeof(Color));
-	else
-		memcpy(palette, stdpal, 256*sizeof(Color));
+	memcpy(palette, font->GetPalette(), 256*sizeof(Color));
 	for(int i = 0; i < 256; i++) {
 		palette[i].r = (palette[i].r * 2) / 3;
 		palette[i].g = (palette[i].g * 2) / 3;
@@ -87,8 +73,6 @@ Button::~Button(){
 	if(Picture)
 		video->FreeSprite(Picture);
 	free(palette);
-	if(stdpal)
-		free(stdpal);
 }
 /** Sets the 'type' Image of the Button to 'img'.
 'type' may assume the following values:
@@ -143,17 +127,13 @@ void Button::Draw(unsigned short x, unsigned short y)
 		return;
 	if(!(Flags & 0x1)) {
 		Color *ppoi=NULL;
-//		Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 		int align=0;
 
 		if(Flags&0x100) align|=IE_FONT_ALIGN_LEFT;
 		else if(Flags&0x200) align|=IE_FONT_ALIGN_RIGHT;
 		else align|=IE_FONT_ALIGN_CENTER;
 		if(Flags&0x400) align|=IE_FONT_ALIGN_TOP;
-	//	else if(Flags&0x800) align|=IE_FONT_ALIGN_BOTTOM;
 		else align|=IE_FONT_ALIGN_MIDDLE;
-		if(stdpal)
-			ppoi = stdpal;
 		switch(State) {
 			case IE_GUI_BUTTON_UNPRESSED:
 			{

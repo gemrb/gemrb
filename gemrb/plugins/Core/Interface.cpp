@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.77 2003/11/29 10:30:11 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.78 2003/11/29 17:11:05 avenger_teambg Exp $
  *
  */
 
@@ -63,6 +63,7 @@ Interface::Interface(void)
 	GUIScriptsPath[0]=0;
 	GamePath[0]=0;
 	GemRBPath[0]=0;
+	memcpy(ButtonFont,"STONESML",9);
 	GameFeatures=0;
 	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
@@ -236,45 +237,16 @@ int Interface::Init()
 	AnimationMgr * anim = (AnimationMgr*)GetInterface(IE_BAM_CLASS_ID);
 	int table = LoadTable("fonts");
 	if(table == -1) {
-		for(int i = 0; i < 5; i++) {
-			char ResRef[9];
-			switch(i) {
-				case 0:
-					strcpy(ResRef, "REALMS\0\0\0");
-				break;
-
-				case 1:
-					strcpy(ResRef, "STONEBIG\0");
-				break;
-
-				case 2:
-					strcpy(ResRef, "STONESML\0");
-				break;
-
-				case 3:
-					strcpy(ResRef, "NORMAL\0\0\0");
-				break;
-
-				case 4:
-					strcpy(ResRef, "TOOLFONT");
-				break;
-			}
-			DataStream * fstr = key->GetResource(ResRef, IE_BAM_CLASS_ID);
-			if(!anim->Open(fstr, true)) {
-					printStatus("ERROR", LIGHT_RED);
-					delete(fstr);
-					continue;
-			}
-			Font * fnt = anim->GetFont();
-			strncpy(fnt->ResRef, ResRef, 8);
-			fonts.push_back(fnt);
-		}
+		printStatus("ERROR", LIGHT_RED);
+		printf("Cannot find fonts.2da.\nTermination in Progress...\n");
+		return GEM_ERROR;
 	}
 	else {
 		TableMgr * tab = GetTable(table);
 		int count = tab->GetRowCount();
 		for(int i = 0; i < count; i++) {
 			char * ResRef = tab->QueryField(i, 0);
+			int needpalette = atoi(tab->QueryField(i, 1));
 			DataStream * fstr = key->GetResource(ResRef, IE_BAM_CLASS_ID);
 			if(!anim->Open(fstr, true)) {
 					printStatus("ERROR", LIGHT_RED);
@@ -283,6 +255,10 @@ int Interface::Init()
 			}
 			Font * fnt = anim->GetFont();
 			strncpy(fnt->ResRef, ResRef, 8);
+			if(needpalette) {
+				Color fore = {0xff, 0xff, 0xff, 0x00}, back = {0x00, 0x00, 0x00, 0x00};
+		                memcpy(fnt->GetPalette(),core->GetVideoDriver()->CreatePalette(fore, back), 256*sizeof(Color));
+			}
 			fonts.push_back(fnt);
 		}
 		DelTable(table);
@@ -620,6 +596,9 @@ bool Interface::LoadConfig(void)
 		else if(stricmp(name, "ForceStereo") == 0) {
 			ForceStereo = atoi(value);
 		}
+		else if(stricmp(name, "ButtonFont") ==0) {
+			strncpy(ButtonFont, value, 8);
+		}
 		else if(stricmp(name, "GameType") == 0) {
 			strcpy(GameType, value);
 		}
@@ -688,6 +667,11 @@ Font * Interface::GetFont(char * ResRef)
 	printf("[NOT FOUND]\n");
 	return NULL;
 }
+Font * Interface::GetButtonFont()
+{
+	return GetFont(ButtonFont);
+}
+
 /** Returns the Event Manager */
 EventMgr * Interface::GetEventMgr()
 {
