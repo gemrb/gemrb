@@ -541,7 +541,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 /** Get a Control on a Window */
 int Interface::GetControl(unsigned short WindowIndex, unsigned short ControlID)
 {
-	if(WindowIndex > windows.size())
+	if(WindowIndex >= windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
 	if(win==NULL)
@@ -559,7 +559,7 @@ int Interface::GetControl(unsigned short WindowIndex, unsigned short ControlID)
 /** Set the Text of a Control */
 int Interface::SetText(unsigned short WindowIndex, unsigned short ControlIndex, const char * string)
 {
-	if(WindowIndex > windows.size())
+	if(WindowIndex >= windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
 	if(win == NULL)
@@ -573,7 +573,7 @@ int Interface::SetText(unsigned short WindowIndex, unsigned short ControlIndex, 
 /** Set a Window Visible Flag */
 int Interface::SetVisible(unsigned short WindowIndex, bool visible)
 {
-	if(WindowIndex > windows.size())
+	if(WindowIndex >= windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
 	if(win==NULL)
@@ -591,7 +591,7 @@ int Interface::SetVisible(unsigned short WindowIndex, bool visible)
 /** Set an Event of a Control */
 int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long EventID, char * funcName)
 {
-	if(WindowIndex > windows.size())
+	if(WindowIndex >= windows.size())
 	{
 		printf("Core","Window not found: %0x", WindowIndex);
 		printStatus("ERROR", LIGHT_RED);
@@ -642,7 +642,7 @@ int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex,
 /** Set the Status of a Control in a Window */
 int Interface::SetControlStatus(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long Status)
 {
-	if(WindowIndex > windows.size())
+	if(WindowIndex >= windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
 	if(win==NULL)
@@ -667,7 +667,7 @@ int Interface::SetControlStatus(unsigned short WindowIndex, unsigned short Contr
 /** Show a Window in Modal Mode */
 int Interface::ShowModal(unsigned short WindowIndex)
 {
-	if(WindowIndex > windows.size())
+	if(WindowIndex >= windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
 	if(win==NULL)
