@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.20 2003/12/21 14:01:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.21 2003/12/22 21:06:13 balrog994 Exp $
  *
  */
 
@@ -93,10 +93,14 @@ public:
 	virtual Sprite2D * PrecalculatePolygon(Point * points, int count, Color &color) = 0;
 	/** Sets the Fading to Black Percentage */
 	virtual void SetFadePercent(int percent) = 0;
+	/** Set Clip Rect */
+	virtual void SetClipRect(Region * clip) = 0;
 public:
 	/** Event Manager Pointer */
 	EventMgr * Evnt;
 	short moveX, moveY;
+	bool DisableMouse;
+	short xCorr, yCorr;
 public:
 	virtual void * GetVideoSurface() = 0;
 };

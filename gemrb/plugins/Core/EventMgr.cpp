@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.22 2003/12/21 14:12:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.23 2003/12/22 21:06:13 balrog994 Exp $
  *
  */
 
@@ -198,6 +198,7 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 		if(!ctrl) {
 			if(lastF)
 				lastF->OnSpecialKeyPress(Key);
+			return;
 		}
 		if(ctrl->ControlType != IE_GUI_GAMECONTROL) {
 			if(lastF)

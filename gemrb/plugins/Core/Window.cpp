@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.21 2003/12/21 13:58:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.22 2003/12/22 21:06:13 balrog994 Exp $
  *
  */
 
@@ -83,12 +83,15 @@ void Window::SetBackGround(Sprite2D * img, bool clean)
 void Window::DrawWindow()
 {
 	Video * video = core->GetVideoDriver();
+	Region clip(XPos, YPos, Width, Height);
+	video->SetClipRect(&clip);
 	if(BackGround && Changed)
 		video->BlitSprite(BackGround, XPos, YPos, true);
 	std::vector<Control*>::iterator m;
 	for(m = Controls.begin(); m != Controls.end(); ++m) {
 		(*m)->Draw(XPos, YPos);
 	}
+	video->SetClipRect(NULL);
 	Changed = false;
 }
 

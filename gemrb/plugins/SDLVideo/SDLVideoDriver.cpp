@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.49 2003/12/22 18:58:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.50 2003/12/22 21:06:15 balrog994 Exp $
  *
  */
 
@@ -31,6 +31,9 @@ SDLVideoDriver::SDLVideoDriver(void)
 	Cursor[1] = NULL;
 	moveX = 0;
 	moveY = 0;
+	DisableMouse = false;
+	xCorr = 0;
+	yCorr = 0;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -197,44 +200,54 @@ int SDLVideoDriver::SwapBuffers(void)
 
 			case SDL_MOUSEMOTION:
 				{
-				CursorPos.x = event.motion.x-mouseAdjustX[CursorIndex];
-				CursorPos.y = event.motion.y-mouseAdjustY[CursorIndex];
-				if(event.motion.x <= 0)
-					moveX = -5;
-				else {
-					if(event.motion.x >= (core->Width-1))
-						moveX = 5;
-					else
-						moveX = 0;
-				}
-				if(event.motion.y <= 0)
-					moveY = -5;
-				else {
-					if(event.motion.y >= (core->Height-1))
-						moveY = 5;
-					else
-						moveY = 0;
-				}
-				if(Evnt)
-					Evnt->MouseMove(event.motion.x, event.motion.y);
+					if(DisableMouse)
+						break;
+					CursorPos.x = event.motion.x-mouseAdjustX[CursorIndex];
+					CursorPos.y = event.motion.y-mouseAdjustY[CursorIndex];
+					if(event.motion.x <= 0)
+						moveX = -5;
+					else {
+						if(event.motion.x >= (core->Width-1))
+							moveX = 5;
+						else
+							moveX = 0;
+					}
+					if(event.motion.y <= 0)
+						moveY = -5;
+					else {
+						if(event.motion.y >= (core->Height-1))
+							moveY = 5;
+						else
+							moveY = 0;
+					}
+					if(Evnt)
+						Evnt->MouseMove(event.motion.x, event.motion.y);
 				}
 			break;
 
 			case SDL_MOUSEBUTTONDOWN:
-				CursorIndex = 1;
-				CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
-				CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
+				{
+					if(DisableMouse)
+						break;
+					CursorIndex = 1;
+					CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
+					CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
+				}
 			break;
 
 			case SDL_MOUSEBUTTONUP:
-				CursorIndex = 0;
-				CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
-				CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
+				{
+					if(DisableMouse)
+						break;
+					CursorIndex = 0;
+					CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
+					CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
+				}
 			break;
 			}
 		}
 		SDL_BlitSurface(backBuf, NULL, disp, NULL);
-		if(Cursor[CursorIndex]) {
+		if(Cursor[CursorIndex] && !DisableMouse) {
 			short x = CursorPos.x;
 			short y = CursorPos.y;
 			SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
@@ -336,43 +349,53 @@ int SDLVideoDriver::SwapBuffers(void)
 
 		case SDL_MOUSEMOTION:
 			{
-			CursorPos.x = event.motion.x-mouseAdjustX[CursorIndex];
-			CursorPos.y = event.motion.y-mouseAdjustY[CursorIndex];
-			if(event.motion.x <= 0)
-				moveX = -5;
-			else {
-				if(event.motion.x >= (core->Width-1))
-					moveX = 5;
-				else
-					moveX = 0;
-			}
-			if(event.motion.y <= 0)
-				moveY = -5;
-			else {
-				if(event.motion.y >= (core->Height-1))
-					moveY = 5;
-				else
-					moveY = 0;
-			}
-			if(Evnt)
-				Evnt->MouseMove(event.motion.x, event.motion.y);
+				if(DisableMouse)
+					break;
+				CursorPos.x = event.motion.x-mouseAdjustX[CursorIndex];
+				CursorPos.y = event.motion.y-mouseAdjustY[CursorIndex];
+				if(event.motion.x <= 0)
+					moveX = -5;
+				else {
+					if(event.motion.x >= (core->Width-1))
+						moveX = 5;
+					else
+						moveX = 0;
+				}
+				if(event.motion.y <= 0)
+					moveY = -5;
+				else {
+					if(event.motion.y >= (core->Height-1))
+						moveY = 5;
+					else
+						moveY = 0;
+				}
+				if(Evnt)
+					Evnt->MouseMove(event.motion.x, event.motion.y);
 			}
 		break;
 
 		case SDL_MOUSEBUTTONDOWN:
-			CursorIndex = 1;
-			CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
-			CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
-			if(Evnt)
-				Evnt->MouseDown(event.button.x, event.button.y, event.button.state, 0);
+			{
+				if(DisableMouse)
+					break;
+				CursorIndex = 1;
+				CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
+				CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
+				if(Evnt)
+					Evnt->MouseDown(event.button.x, event.button.y, event.button.state, 0);
+			}
 		break;
 
 		case SDL_MOUSEBUTTONUP:
-			CursorIndex = 0;
-			CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
-			CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
-			if(Evnt)
-				Evnt->MouseUp(event.button.x, event.button.y, event.button.state, 0);
+			{
+				if(DisableMouse)
+					break;
+				CursorIndex = 0;
+				CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
+				CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
+				if(Evnt)
+					Evnt->MouseUp(event.button.x, event.button.y, event.button.state, 0);
+			}
 		break;
 
 		case SDL_ACTIVEEVENT:
@@ -385,7 +408,7 @@ int SDLVideoDriver::SwapBuffers(void)
 		}
 	}
 	SDL_BlitSurface(backBuf, NULL, disp, NULL);
-	if(Cursor[CursorIndex]) {
+	if(Cursor[CursorIndex] && !DisableMouse) {
 		short x = CursorPos.x;
 		short y = CursorPos.y;
 		SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
@@ -478,6 +501,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y
 			if(drect.x < c.x) {
 				t.x = size.x+c.x-drect.x;
 				t.w = size.w-(c.x-drect.x);
+				drect.x = clip->x;
 			}
 			else {
 				if(drect.x+size.w <= c.x+c.w) {
@@ -501,6 +525,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y
 			if(drect.y < c.y) {
 				t.y = size.y+c.y-drect.y;
 				t.h = size.h-(c.y-drect.y);
+				drect.y = clip->y;
 			}
 			else {
 				if(drect.y+size.h <= c.y+c.h) {
@@ -543,6 +568,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Regio
 			if(drect.x < clip->x) {
 				t.x = clip->x-drect.x;
 				t.w = spr->Width-t.x;
+				drect.x = clip->x;
 			}
 			else {
 				if(drect.x+spr->Width <= clip->x+clip->w) {
@@ -566,6 +592,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Regio
 			if(drect.y < clip->y) {
 				t.y = clip->y-drect.y;
 				t.h = spr->Height-t.y;
+				drect.y = clip->y;
 			}
 			else {
 				if(drect.y+spr->Height <= clip->y+clip->h) {
@@ -583,45 +610,9 @@ void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Regio
 				}
 			}
 		}
-		/*if(drect.x < clip->x) {
-			if(clip->x >= (drect.x+spr->Width))
-				return;
-			t.x = clip->x-drect.x;
-			t.w = spr->Width-t.x;
-		}
-		else {
-			if(drect.x >= (clip->x+clip->w))
-				return;
-			t.x = 0;
-			if((drect.x+spr->Width) > (clip->x+clip->w))
-				t.w = (clip->x+clip->w)-drect.x;
-			else
-				t.w = spr->Width;
-		}
-		if(drect.y < clip->y) {
-			if(clip->y >= (drect.y+spr->Height))
-				return;
-			t.y = clip->y-drect.y;
-			if((drect.y+spr->Height) > (clip->y+clip->h))
-				t.h = (clip->y+clip->h)-drect.y;
-			else
-				t.h = spr->Height-t.y;
-		}
-		else {
-			if(drect.y >= (clip->y+clip->h))
-				return;
-			t.y = 0;
-			t.h = spr->Height;
-		}*/
 		srect = &t;
 	}
 	SDL_BlitSurface((SDL_Surface*)spr->vptr, srect, backBuf, &drect);
-	//Debug Addition: Draws a point to the x,y position
-	/*drect.x = x;
-	drect.y = y;
-	drect.w = 1;
-	drect.h = 1;
-	SDL_FillRect(disp, &drect, 0xffffffff);*/
 }
 void SDLVideoDriver::BlitSpriteTinted(Sprite2D * spr, int x, int y, Color tint, Region * clip)
 {
@@ -664,6 +655,7 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode,
 			if(drect.x < clip->x) {
 				t.x = clip->x-drect.x;
 				t.w = spr->Width-t.x;
+				drect.x = clip->x;
 			}
 			else {
 				if(drect.x+spr->Width <= clip->x+clip->w) {
@@ -687,6 +679,7 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode,
 			if(drect.y < clip->y) {
 				t.y = clip->y-drect.y;
 				t.h = spr->Height-t.y;
+				drect.y = clip->y;
 			}
 			else {
 				if(drect.y+spr->Height <= clip->y+clip->h) {
@@ -716,9 +709,9 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode,
 	SDL_Surface * surf = (SDL_Surface*)spr->vptr;
 	int destx = drect.x, desty = drect.y;
 	Region Screen = core->GetVideoDriver()->GetViewport();
-	if((destx > Screen.w) || ((destx+srect->w) < 0))
+	if((destx > (xCorr+Screen.w)) || ((destx+srect->w) < xCorr))
 		return;
-	if((desty > Screen.h) || ((desty+srect->h) < 0))
+	if((desty > (yCorr+Screen.h)) || ((desty+srect->h) < yCorr))
 		return;
 
 	SDL_LockSurface(surf);
@@ -727,7 +720,7 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode,
 	unsigned char * src, *dst;
 
 	for(int y = srect->y; y < srect->h; y++) {
-		if((desty < 0) || (desty >= Screen.h)) {
+		if((desty < yCorr) || (desty >= (yCorr+Screen.h))) {
 			desty++;
 			continue;
 		}
@@ -735,7 +728,7 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode,
 		src = ((unsigned char*)spr->pixels)+(y*surf->pitch);
 		dst = ((unsigned char *)backBuf->pixels)+(desty*backBuf->pitch)+(destx*backBuf->format->BytesPerPixel);
 		for(int x = srect->x; x < srect->w; x++) {
-			if((destx < 0) || (destx >= Screen.w)) {
+			if((destx < xCorr) || (destx >= (xCorr+Screen.w))) {
 				src++;
 				destx++;
 				dst+=4;
@@ -800,6 +793,8 @@ void SDLVideoDriver::SetViewport(int x, int y, int w, int h)
 {
 	//Viewport.x = x;
 	//Viewport.y = y;
+	xCorr = x;
+	yCorr = y;
 	Viewport.w = w;
 	Viewport.h = h;
 	//core->Width = w;
@@ -903,9 +898,11 @@ void SDLVideoDriver::DrawRect(Region &rgn, Color &color){
 }
 void SDLVideoDriver::SetPixel(short x, short y, Color &color)
 {
-	if((x >= Viewport.w) || (y >= Viewport.h))
+	x+=xCorr;
+	y+=yCorr;
+	if((x >= (xCorr+Viewport.w)) || (y >= (yCorr+Viewport.h)))
 		return;
-	if((x < 0) || (y < 0))
+	if((x < xCorr) || (y < yCorr))
 		return;
 	unsigned char *pixels = ((unsigned char *)backBuf->pixels)+((y*disp->w)*disp->format->BytesPerPixel)+(x*disp->format->BytesPerPixel);
 	*pixels++ = color.b;
@@ -1140,7 +1137,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon * poly, Color &color, bool fill)
 		Region Screen = Viewport;
 		Screen.x = 0;
 		Screen.y = 0;
-		BlitSprite(poly->fill, poly->BBox.x, poly->BBox.y, false, &Screen);
+		BlitSprite(poly->fill, poly->BBox.x+xCorr, poly->BBox.y+yCorr, false, &Screen);
 	}
 	short lastX = poly->points[0].x, lastY = poly->points[0].y;
 	int i;
@@ -1246,4 +1243,19 @@ void SDLVideoDriver::MirrorAnimation(Animation * anim)
 void SDLVideoDriver::SetFadePercent(int percent)
 {
 	fadePercent = percent;
+}
+
+void SDLVideoDriver::SetClipRect(Region * clip)
+{
+	if(clip) {
+		SDL_Rect tmp;
+		SDL_Rect * rect = &tmp;
+		rect->x = clip->x;
+		rect->y = clip->y;
+		rect->w = clip->w;
+		rect->h = clip->h;
+		SDL_SetClipRect(backBuf, rect);
+	}
+	else 
+		SDL_SetClipRect(backBuf, NULL);
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.49 2003/12/21 14:07:32 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.50 2003/12/22 21:06:13 balrog994 Exp $
  *
  */
 
@@ -114,12 +114,12 @@ void Map::DrawMap(Region viewport)
 	Video * video = core->GetVideoDriver();
 	for(unsigned int i = 0; i < animations.size(); i++) {
 		//TODO: Clipping Animations off screen
-		video->BlitSpriteMode(animations[i]->NextFrame(), animations[i]->x, animations[i]->y, animations[i]->BlitMode, false);
+		video->BlitSpriteMode(animations[i]->NextFrame(), animations[i]->x+viewport.x, animations[i]->y+viewport.x, animations[i]->BlitMode, false, &viewport);
 	}
 	Region vp = video->GetViewport();
 	Region Screen = vp;
-	Screen.x = 0;
-	Screen.y = 0;
+	Screen.x = viewport.x;
+	Screen.y = viewport.y;
 	GenerateQueue();
 	while(true) {
 		Actor * actor = GetRoot();
@@ -150,7 +150,7 @@ void Map::DrawMap(Region viewport)
 			int cy = ay/12;
 			Color tint = LightMap->GetPixel(cx, cy);
 			tint.a = 0xA0;
-			video->BlitSpriteTinted(nextFrame, ax, ay, tint, &Screen);
+			video->BlitSpriteTinted(nextFrame, ax+viewport.x, ay+viewport.y, tint, &Screen);
 			if(anim->endReached && anim->autoSwitchOnEnd) {
 				actor->AnimID = anim->nextAnimID;
 				anim->autoSwitchOnEnd = false;
@@ -164,7 +164,7 @@ void Map::DrawMap(Region viewport)
 			}
 			if(actor->textDisplaying == 1) {
 				Font * font = core->GetFont(9);
-				Region rgn(actor->XPos-100, actor->YPos-100, 200, 400);
+				Region rgn(actor->XPos-100+viewport.x, actor->YPos-100+viewport.y, 200, 400);
 				font->Print(rgn, (unsigned char*)actor->overHeadText, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false);
 			}
 		}
@@ -192,10 +192,10 @@ void Map::DrawMap(Region viewport)
 		}
 		Sprite2D * frame = vvc->anims[0]->NextFrame();
 		if(vvc->Transparency & IE_VVC_BRIGHTEST) {
-			video->BlitSpriteMode(frame, vvc->XPos, vvc->YPos, 1, false);
+			video->BlitSpriteMode(frame, vvc->XPos+viewport.x, vvc->YPos+viewport.y, 1, false, &viewport);
 		}
 		else {
-			video->BlitSprite(frame, vvc->XPos, vvc->YPos, false);
+			video->BlitSprite(frame, vvc->XPos+viewport.x, vvc->YPos+viewport.y, false, &viewport);
 		}
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.9 2003/12/22 18:57:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.10 2003/12/22 21:06:13 balrog994 Exp $
  *
  */
 
@@ -53,6 +53,8 @@ void TileOverlay::Draw(Region viewport)
 {
 	Video * vid = core->GetVideoDriver();
 	Region vp = vid->GetViewport();
+	vp.x += viewport.x;
+	vp.y += viewport.y;
 	vp.w = viewport.w;
 	vp.h = viewport.h;
 	if((vp.x+vp.w) > w*64)
@@ -63,15 +65,15 @@ void TileOverlay::Draw(Region viewport)
 		vp.y = (h*64 - vp.h);
 	if(vp.y < 0)
 		vp.y=0;
-	vid->SetViewport(vp.x, vp.y);
-	int sx = vp.x / 64;
-	int sy = vp.y / 64;
+	vid->SetViewport(vp.x-viewport.x, vp.y-viewport.y);
+	int sx = (vp.x-viewport.x) / 64;
+	int sy = (vp.y-viewport.y) / 64;
 	int dx = (int)ceil((vp.x+vp.w) / 64.0);
 	int dy = (int)ceil((vp.y+vp.h) / 64.0);
-	vp.x = viewport.x-64;
-	vp.y = viewport.y-64;
-	vp.w = viewport.w+64;
-	vp.h = viewport.h+64;
+	vp.x = viewport.x;
+	vp.y = viewport.y;
+	vp.w = viewport.w;
+	vp.h = viewport.h;
 	for(int y = sy; y < dy && y<h; y++) {
 		for(int x = sx; x < dx && x<w; x++) {
 			Tile * tile = tiles[(y*w)+x];

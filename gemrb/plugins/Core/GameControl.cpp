@@ -543,14 +543,7 @@ void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 void GameControl::SetCutSceneMode(bool active)
 {
 	DisableMouse = active;
-	if(active) {
-		core->GetVideoDriver()->SetCursor(NULL, NULL);
-		moveX = 0;
-		moveY = 0;
-	}
-	else {
-		core->GetVideoDriver()->SetCursor(core->Cursors[lastCursor]->GetFrame(0), core->Cursors[lastCursor+1]->GetFrame(0));
-	}
+	core->GetVideoDriver()->DisableMouse = active;
 }
 
 void GameControl::HideGUI()
@@ -597,7 +590,7 @@ void GameControl::HideGUI()
 			ResizeDel(tw, index);
 		}
 	}
-	core->GetVideoDriver()->SetViewport(0,0, Width, Height);
+	core->GetVideoDriver()->SetViewport(((Window*)Owner)->XPos,((Window*)Owner)->YPos, Width, Height);
 }
 
 void GameControl::UnhideGUI()
@@ -648,7 +641,7 @@ void GameControl::UnhideGUI()
 			ResizeAdd(tw, index);
 		}
 	}
-	core->GetVideoDriver()->SetViewport(0,0, Width, Height);
+	core->GetVideoDriver()->SetViewport(((Window*)Owner)->XPos,((Window*)Owner)->YPos, Width, Height);
 }
 
 void GameControl::ResizeDel(Window * win, unsigned char type)
