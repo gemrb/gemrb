@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.9 2004/04/17 11:28:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.10 2004/08/02 22:14:24 guidoj Exp $
  *
  */
 
@@ -29,7 +29,7 @@ private:
 	DataStream* str;
 	bool autoFree;
 
-	unsigned long Width, Height;
+	ieDword Width, Height;
 	void* pixels;
 	Color* Palettes[8];
 	int palIndexes[8];
@@ -41,7 +41,7 @@ public:
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
 	/** Gets a Pixel Index from the Image */
-	unsigned long GetPixelIndex(unsigned int x, unsigned int y)
+	unsigned int GetPixelIndex(unsigned int x, unsigned int y)
 	{
 		return 0;
 	}

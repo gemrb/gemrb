@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.7 2004/02/24 22:20:40 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.8 2004/08/02 22:14:24 guidoj Exp $
  *
  */
 
@@ -106,7 +106,7 @@ Sprite2D* MOSImp::GetImage()
 	unsigned char * pixels = ( unsigned char * ) malloc( Width * Height * 4 );
 	unsigned char * blockpixels = ( unsigned char * )
 		malloc( BlockSize * BlockSize );
-	unsigned long blockoffset;
+	ieDword blockoffset;
 	for (int y = 0; y < Rows; y++) {
 		int bh = ( y == Rows - 1 ) ?
 			( ( Height % 64 ) == 0 ? 64 : Height % 64 ) :

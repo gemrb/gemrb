@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.13 2004/04/17 11:28:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.14 2004/08/02 22:14:21 guidoj Exp $
  *
  */
 
@@ -30,19 +30,18 @@ private:
 	bool autoFree;
 
 	//BITMAPINFOHEADER
-	unsigned long Size, Width, Height, Compression, ImageSize, ColorsUsed,
-		ColorsImportant;
-	unsigned short Planes, BitCount;
+	ieDword Size, Width, Height, Compression, ImageSize, ColorsUsed, ColorsImportant;
+	ieWord Planes, BitCount;
 
 	//COLORTABLE
-	unsigned long NumColors;
+	ieDword NumColors;
 	Color* Palette;
 
 	//RASTERDATA
 	void* pixels;
 
 	//OTHER
-	unsigned short PaddedRowLength;
+	unsigned int PaddedRowLength;
 public:
 	BMPImp(void);
 	~BMPImp(void);
@@ -50,7 +49,7 @@ public:
 	Sprite2D* GetImage();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
-	unsigned long GetPixelIndex(unsigned int x, unsigned int y)
+	unsigned int GetPixelIndex(unsigned int x, unsigned int y)
 	{
 		if(x>=Width || y>=Height) {
 			return 0;
@@ -62,10 +61,10 @@ public:
 			p += ( PaddedRowLength * y ) + ( x * ( BitCount / 8 ) );
 		}
 		if (BitCount == 24) {
-			int ret = *( unsigned long* ) p;
+			unsigned int ret = *( unsigned int* ) p;
 			return ret | 0xff000000;
 		} else if (BitCount == 8) {
-			return ( unsigned long ) * p;
+			return ( unsigned int ) * p;
 		} else if (BitCount == 4) {
 			unsigned char ret = *p;
 			if (x & 1) {
@@ -101,7 +100,7 @@ public:
 			ret.b = Palette[*p].b;
 			ret.a = 0xff;
 		} else if (BitCount == 4) {
-			int tmp = ( unsigned long ) * p;
+			unsigned int tmp = ( unsigned int ) * p;
 			if (x & 1)
 				tmp &= 15;
 			else

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.14 2004/02/24 22:20:43 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.15 2004/08/02 22:14:21 guidoj Exp $
  *
  */
 
@@ -60,7 +60,7 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 	this->autoFree = autoFree;
 	//BITMAPFILEHEADER
 	char Signature[2];
-	unsigned long FileSize, DataOffset;
+	ieDword FileSize, DataOffset;
 
 	str->Read( Signature, 2 );
 	if (strncmp( Signature, "BM", 2 ) != 0) {
@@ -107,19 +107,19 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 	//RASTERDATA
 	switch (BitCount) {
 		case 24:
-			PaddedRowLength = ( unsigned short ) Width * 3;
+			PaddedRowLength = Width * 3;
 			break;
 
 		case 16:
-			PaddedRowLength = ( unsigned short ) Width * 2;
+			PaddedRowLength = Width * 2;
 			break;
 
 		case 8:
-			PaddedRowLength = ( unsigned short ) Width;
+			PaddedRowLength = Width;
 			break;
 
 		case 4:
-			PaddedRowLength = ( unsigned short ) ( Width >> 1 );
+			PaddedRowLength = ( Width >> 1 );
 			break;
 		default:
 			printf( "[BMPImporter]: BitCount not supported.\n" );
@@ -154,7 +154,7 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 			src += PaddedRowLength;
 		}
 	} else if (BitCount == 4) {
-		int size = PaddedRowLength* Height;
+		int size = PaddedRowLength * Height;
 		pixels = malloc( size );
 		unsigned char * dest = ( unsigned char * ) pixels;
 		dest += size;

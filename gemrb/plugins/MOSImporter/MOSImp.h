@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.h,v 1.8 2004/04/17 11:28:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.h,v 1.9 2004/08/02 22:14:24 guidoj Exp $
  *
  */
 
@@ -28,8 +28,8 @@ class MOSImp : public ImageMgr {
 private:
 	DataStream* str;
 	bool autoFree;
-	unsigned short Width, Height, Cols, Rows;
-	unsigned long BlockSize, PalOffset;
+	ieWord Width, Height, Cols, Rows;
+	ieDword BlockSize, PalOffset;
 public:
 	MOSImp(void);
 	~MOSImp(void);
@@ -38,7 +38,7 @@ public:
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
 	/** Gets a Pixel index, not used in MOS */
-	unsigned long GetPixelIndex(unsigned int x, unsigned int y)
+	unsigned int GetPixelIndex(unsigned int x, unsigned int y)
 	{
 		return 0;
 	}
