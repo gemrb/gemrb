@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.33 2003/12/23 18:15:50 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.34 2003/12/23 23:30:08 balrog994 Exp $
  *
  */
 
@@ -153,6 +153,7 @@ int TextArea::SetText(const char * text, int pos)
 /** Appends a String to the current Text */
 int TextArea::AppendText(const char * text, int pos)
 {
+	int ret = 0;
 	if(pos >= (int)lines.size())
 		return -1;
 	int newlen = (int)strlen(text);
@@ -161,6 +162,7 @@ int TextArea::AppendText(const char * text, int pos)
 		strcpy(str, text);
 		lines.push_back(str);
 		lrows.push_back(0);
+		ret = lines.size()-1;
 	}
 	else
 	{
@@ -168,6 +170,7 @@ int TextArea::AppendText(const char * text, int pos)
 	
 		lines[pos] = (char*)realloc(lines[pos], mylen+newlen+1);
 		strcat(lines[pos], text);
+		ret = pos;
 	}
 	CalcRowCount();
 	Changed = true;
@@ -178,7 +181,7 @@ int TextArea::AppendText(const char * text, int pos)
 		bar->SetPos(pos);
 	}
 	core->RedrawAll();
-	return 0;
+	return ret;
 }
 /** Sets the Fonts */
 void TextArea::SetFonts(Font * init, Font * text)
