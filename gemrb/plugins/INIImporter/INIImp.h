@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImp.h,v 1.9 2004/03/12 01:53:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImp.h,v 1.10 2004/04/11 19:32:57 avenger_teambg Exp $
  *
  */
 
@@ -59,6 +59,10 @@ public:
 	{
 		INIPair p;
 		char* equal = strchr( Line, '=' );
+		if(!equal) {
+			printf("Bad line: %s\n",Line);
+			return;
+		}
 		*equal = 0;
 		char* NameKey = Line;
 		char* ValueKey = equal + 1;
