@@ -1,6 +1,8 @@
 #ifndef SAVEGAMEITERATOR_H
 #define SAVEGAMEITERATOR_H
 
+#include <time.h>
+#include <sys/stat.h>
 #include "FileStream.h"
 
 class SaveGame {
@@ -11,12 +13,18 @@ public:
 		strncpy(Path, path, sizeof(Path) );
 		strncpy(Name, name, sizeof(Name) );
 		PortraitCount = pCount;
+		char nPath[_MAX_PATH];
+		struct stat my_stat;
+		sprintf(nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix);
+		stat(nPath, &my_stat);
+		strftime(Date, _MAX_PATH, "%c",localtime(&my_stat.st_mtime));
 	};
 	~SaveGame() {};
 	int GetPortraitCount() { return PortraitCount; };
 	const char *GetName() { return Name; };
 	const char *GetPrefix() { return Prefix; };
 	const char *GetPath() { return Path; };
+	const char *GetDate() { return Date; };
 
 	DataStream * GetPortrait(int index)
 	{
@@ -38,8 +46,9 @@ public:
 	};
 private:
 	char Path[_MAX_PATH];
-	char Prefix[_MAX_PATH];
+	char Prefix[10];
 	char Name[_MAX_PATH];
+	char Date[_MAX_PATH];
 	int  PortraitCount;
 };
 

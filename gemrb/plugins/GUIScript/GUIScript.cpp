@@ -1145,6 +1145,7 @@ static PyObject *GemRB_GetSaveGameAttrib( PyObject */*self*/, PyObject *args)
 	case 0: tmp=Py_BuildValue("s", sg->GetName()); break;
 	case 1: tmp=Py_BuildValue("s", sg->GetPrefix()); break;
 	case 2: tmp=Py_BuildValue("s", sg->GetPath()); break;
+	case 3: tmp=Py_BuildValue("s", sg->GetDate()); break;
 	default:
 		printMessage("GUIScript","Syntax Error: GetSaveGameAttrib(Type, SlotCount)\n", LIGHT_RED);
 		return NULL;
