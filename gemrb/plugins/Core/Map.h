@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.26 2004/01/05 12:07:10 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.27 2004/01/05 23:44:18 balrog994 Exp $
  *
  */
 
@@ -106,6 +106,7 @@ public:
 	int GetBlocked(int x, int y);
 	Actor * GetActor(int x, int y);
 	Actor * GetActor(const char * Name);
+	void RemoveActor(Actor * actor);
 	int GetActorInRect(Actor ** & actors, Region &rgn);
 	SongHeaderType SongHeader;
 	void AddVVCCell(ScriptedAnimation * vvc);
