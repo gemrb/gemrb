@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.73 2004/09/11 07:43:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.74 2004/10/10 13:37:16 avenger_teambg Exp $
  *
  */
 
@@ -366,7 +366,9 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 			if (VarName[0] != 0) {
 				ieDword tmp = 0;
 				core->GetDictionary()->Lookup( VarName, tmp );
-				core->GetDictionary()->SetAt( VarName, tmp ^ Value );
+				tmp ^= Value;
+				core->GetDictionary()->SetAt( VarName, tmp );
+				( ( Window * ) Owner )->RedrawControls( VarName, tmp );
 			}
 		} else if (Flags & IE_GUI_BUTTON_RADIOBUTTON) {
 			//radio button
@@ -537,7 +539,7 @@ void Button::RedrawButton(char* VariableName, unsigned int Sum)
 	} //checkbox, bitvalue
 	else {
 		ToggleState = false;
-	}						//other buttons, no value
+	}		//other buttons, no value
 	if (ToggleState) {
 		State = IE_GUI_BUTTON_SELECTED;
 	} else {

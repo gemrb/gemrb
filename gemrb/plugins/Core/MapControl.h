@@ -33,6 +33,8 @@ public:
 	Map *MyMap;
 	// map flags
 	Sprite2D *Flag[8];
+	// The MapControl can set the text of this label directly
+	Label *LinkedLabel;
 	// Size of big map (area) in pixels
 	short MapWidth, MapHeight;
 	// Size of area viewport. FIXME: hack!

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.12 2004/10/09 21:51:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.13 2004/10/10 13:37:16 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -32,7 +32,7 @@ typedef enum colorcode {gray=0, violet, green, orange, red, blue, darkblue, dark
 Color colors[8]={
   { 0x60, 0x60, 0x60, 0xff }, //gray
   { 0xa0, 0x00, 0xa0, 0xff }, //violet
-  { 0x00, 0xff, 0xa0, 0xff }, //green
+  { 0x00, 0xff, 0x00, 0xff }, //green
   { 0xff, 0xff, 0x00, 0xff }, //orange
   { 0xff, 0x00, 0x00, 0xff }, //red
   { 0x00, 0x00, 0xff, 0xff }, //blue
@@ -61,6 +61,7 @@ MapControl::MapControl(void)
 		MAP_MULT=32;
 	}
 
+	LinkedLabel = NULL;
 	ScrollX = 0;
 	ScrollY = 0;
 	MouseIsDown = false;
@@ -70,7 +71,6 @@ MapControl::MapControl(void)
 	MyMap = core->GetGame()->GetCurrentMap();
 	MapMOS = MyMap->SmallMap->GetImage();
 }
-
 
 MapControl::~MapControl(void)
 {
@@ -89,8 +89,6 @@ MapControl::~MapControl(void)
 // To be called after changes in control's or screen geometry
 void MapControl::Realize()
 {
-	Video* video = core->GetVideoDriver();
-
 	// FIXME: ugly!! How to get area size in pixels?
 	//Map *map = core->GetGame()->GetCurrentMap();
 	//MapWidth = map->GetWidth();
@@ -100,8 +98,6 @@ void MapControl::Realize()
 	MapHeight = MapMOS->Height;
 
 	// FIXME: ugly hack! What is the actual viewport size?
-	Region vp = video->GetViewport();
-
 	ViewWidth = core->Width * MAP_DIV / MAP_MULT;
 	ViewHeight = core->Height * MAP_DIV / MAP_MULT;
 
@@ -146,29 +142,35 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 
 	video->DrawRect( vp, colors[green], false, false );
 
-	// Draw Map notes, could be turned off in bg2
-	// we use the common control value to handle it, because then we
-	// don't need another interface
 	int i;
-	if (Value&1) {
-		i = MyMap -> GetMapNoteCount();
-		while (i--) {
-			MapNote * mn = MyMap -> GetMapNote(i);
-			Sprite2D *anim = Flag[mn->color&7];
-			if (anim) {
-				video->BlitSprite( anim, MAP_TO_SCREENX(mn->Pos.x), MAP_TO_SCREENY(mn->Pos.y), true, &r );
-			}
-			else {
-				video->DrawEllipse( GAME_TO_SCREENX(mn->Pos.x), GAME_TO_SCREENY(mn->Pos.y), 6, 5, colors[mn->color&7], false );
-			}
-		}
-	}
 	// Draw PCs' ellipses
 	i = core->GetGame()->GetPartySize(false);
 	while (i--) {
 		Actor* actor = core->GetGame()->GetPC( i );
 		if (MyMap->HasActor(actor) ) {
 			video->DrawEllipse( GAME_TO_SCREENX(actor->Pos.x), GAME_TO_SCREENY(actor->Pos.y), 3, 2, actor->Selected ? colors[green] : colors[darkgreen], false );
+		}
+	}
+	// Draw Map notes, could be turned off in bg2
+	// we use the common control value to handle it, because then we
+	// don't need another interface
+	if (Value&1) {
+		i = MyMap -> GetMapNoteCount();
+		while (i--) {
+			MapNote * mn = MyMap -> GetMapNote(i);
+			Sprite2D *anim = Flag[mn->color&7];
+			vp.x = GAME_TO_SCREENX(mn->Pos.x);
+			vp.y = GAME_TO_SCREENY(mn->Pos.y);
+			if (anim) {
+				video->BlitSprite( anim, vp.x, vp.y, true, &r );
+			}
+			else {
+				video->DrawEllipse( vp.x, vp.y, 6, 5, colors[mn->color&7], false );
+			}
+			vp.x = mn->Pos.x;
+			vp.y = mn->Pos.y;
+			Font *font = core->GetFont(9);
+			font->Print(vp, (unsigned char *) mn->text, colors+(mn->color&7), IE_FONT_ALIGN_TOP, true);
 		}
 	}
 }
@@ -224,10 +226,24 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 	lastMouseX = x;
 	lastMouseY = y;
 
+	x = SCREEN_TO_MAPX(x);
+	y = SCREEN_TO_MAPY(y);
 
-	x += ScrollX;
-	y += ScrollY;
-
+	if (Value&1) {
+printf("Checking mouseover for: %d,%d\n",x,y);
+		Point mp = {x,y};
+		int i = MyMap -> GetMapNoteCount();
+		while (i--) {
+			MapNote * mn = MyMap -> GetMapNote(i);
+			if(Distance(mp, mn->Pos)<64) {
+				if(LinkedLabel) {
+					LinkedLabel->SetText( mn->text );
+				}
+				printf("%s\n",mn->text);
+				break;
+			}
+		}
+	}
 }
 
 /** Mouse Button Down */
