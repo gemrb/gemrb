@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.6 2003/11/30 21:05:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.7 2003/12/03 18:27:06 doc_wagon Exp $
  *
  */
 
@@ -37,7 +37,7 @@ TileOverlay::TileOverlay(int Width, int Height)
 
 TileOverlay::~TileOverlay(void)
 {
-	for(unsigned int i = 0; i < count; i++) {
+	for(int i = 0; i < count; i++) {
 		delete(tiles[i]);
 	}
 	free(tiles);

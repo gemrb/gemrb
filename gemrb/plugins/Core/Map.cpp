@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.33 2003/12/02 19:52:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.34 2003/12/03 18:27:06 doc_wagon Exp $
  *
  */
 
@@ -233,7 +233,7 @@ void Map::AddActor(ActorBlock actor)
 
 ActorBlock * Map::GetActor(int x, int y)
 {
-	for(int i = 0; i < actors.size(); i++) {
+	for(size_t i = 0; i < actors.size(); i++) {
 		ActorBlock *actor = &actors.at(i);
 		if((actor->MinX > x) || (actor->MinY > y))
 			continue;
@@ -247,7 +247,7 @@ int Map::GetActorInRect(ActorBlock ** & actors, Region &rgn)
 {
 	actors = (ActorBlock**)malloc(this->actors.size()*sizeof(ActorBlock*));
 	int count = 0;
-	for(int i = 0; i < this->actors.size(); i++) {
+	for(size_t i = 0; i < this->actors.size(); i++) {
 		ActorBlock *actor = &this->actors.at(i);
 		if((actor->MinX > (rgn.x+rgn.w)) || (actor->MinY > (rgn.y+rgn.h)))
 			continue;

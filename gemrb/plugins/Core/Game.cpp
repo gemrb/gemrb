@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.2 2003/11/25 21:35:49 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.3 2003/12/03 18:27:05 doc_wagon Exp $
  *
  */
 
@@ -28,10 +28,10 @@ Game::Game(void)
 
 Game::~Game(void)
 {
-	for(int i = 0; i < PCs.size(); i++) {
+	for(size_t i = 0; i < PCs.size(); i++) {
 		delete(PCs[i].actor);
 	}
-	for(int i = 0; i < Maps.size(); i++) {
+	for(size_t i = 0; i < Maps.size(); i++) {
 		delete(Maps[i]);
 	}
 }
@@ -68,7 +68,7 @@ Map * Game::GetMap(int index)
 }
 int Game::AddMap(Map* map)
 {
-	for(int i = 0; i < Maps.size(); i++) {
+	for(size_t i = 0; i < Maps.size(); i++) {
 		if(!Maps[i]) {
 			Maps[i] = map;
 			return i;

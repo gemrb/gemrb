@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.5 2003/11/29 18:49:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.6 2003/12/03 18:27:05 doc_wagon Exp $
  *
  */
 
@@ -120,7 +120,7 @@ Sprite2D * Animation::GetFrame(unsigned long i)
 
 void Animation::SetPalette(Color * Palette)
 {
-	for(int i = 0; i < frames.size(); i++) {
+	for(size_t i = 0; i < frames.size(); i++) {
 		core->GetVideoDriver()->SetPalette(frames[i], Palette);
 	}
 }

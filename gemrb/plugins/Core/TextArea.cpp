@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.25 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.26 2003/12/03 18:27:06 doc_wagon Exp $
  *
  */
 
@@ -50,7 +50,7 @@ TextArea::~TextArea(void)
 	free(initpalette);
 	free(selected);
 	free(lineselpal);
-	for(int i = 0; i < lines.size(); i++) {
+	for(size_t i = 0; i < lines.size(); i++) {
 		free(lines[i]);
 	}
 }
@@ -68,7 +68,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
   	char * Buffer = (char*)malloc(1);
   	Buffer[0] = 0;
   	int len = 0;
-  	for(int i = 0; i < lines.size(); i++) {
+  	for(size_t i = 0; i < lines.size(); i++) {
   		len += strlen(lines[i])+1;
   		Buffer = (char*)realloc(Buffer, len+1);
   		strcat(Buffer, lines[i]);
@@ -82,7 +82,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
   	int rc = 0;
   	int acc = 0;
   	int sr = startrow;
-  	int i = 0;
+  	unsigned int i = 0;
   	int yl = 0;
   	for(i = 0; i < lines.size(); i++) {
   		if(rc+lrows[i] <= sr) {
@@ -218,7 +218,7 @@ void TextArea::CalcRowCount()
 {
 	if(lines.size() != 0) {
 		rows = -1;
-		for(int i = 0; i < lines.size(); i++) {
+		for(size_t i = 0; i < lines.size(); i++) {
 			rows++;
 			int tr = 0;
 			int len = strlen(lines[i]);
@@ -249,7 +249,7 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	int r = y/height;
 	int row = 0;
 	((Window*)Owner)->Invalidate();
-	for(int i = 0; i < lines.size(); i++) {
+	for(size_t i = 0; i < lines.size(); i++) {
 		row+=lrows[i];
 		if(r < (row-startrow)) {
 			seltext = i;

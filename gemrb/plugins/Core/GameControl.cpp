@@ -108,7 +108,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		if(DebugFlags&1) {
 			//draw traps with blue overlay
 		}
-		for(int i = 0; i < infoPoints.size(); i++) {
+		for(size_t i = 0; i < infoPoints.size(); i++) {
 #ifdef WIN32
 			unsigned long time = GetTickCount();
 #else
@@ -377,7 +377,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 			actor->path = core->GetPathFinder()->FindPath(actor->XPos, actor->YPos, GameX, GameY);
 			actor->step = NULL;
 		}
-		for(int i = 0; i < selected.size(); i++)
+		for(size_t i = 0; i < selected.size(); i++)
 			selected[i]->Selected = false;
 		selected.clear();
 		if(actor) {
@@ -403,10 +403,10 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 	else {
 		ActorBlock ** ab;
 		int count = area->GetActorInRect(ab, SelectionRect);
-		for(int i = 0; i < highlighted.size(); i++)
+		for(size_t i = 0; i < highlighted.size(); i++)
 			highlighted[i]->actor->anims->DrawCircle = false;
 		highlighted.clear();
-		for(int i = 0; i < selected.size(); i++) {
+		for(size_t i = 0; i < selected.size(); i++) {
 			selected[i]->Selected = false;
 			selected[i]->actor->anims->DrawCircle = false;
 		}
@@ -486,7 +486,7 @@ void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 		ActorBlock ** ab;
 		int count = area->GetActorInRect(ab, SelectionRect);
 		if(count != 0) {
-			for(int i = 0; i < highlighted.size(); i++)
+			for(size_t i = 0; i < highlighted.size(); i++)
 				highlighted[i]->actor->anims->DrawCircle = false;
 			highlighted.clear();
 			for(int i = 0; i < count; i++) {

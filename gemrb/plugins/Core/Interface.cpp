@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.84 2003/12/02 23:09:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.85 2003/12/03 18:27:06 doc_wagon Exp $
  *
  */
 
@@ -749,7 +749,7 @@ int Interface::LoadCreature(char *ResRef, int InParty)
 	Actor *actor=actormgr->GetActor();
 	FreeInterface(actormgr);
 	actor->InParty=InParty;
-	int index;
+	size_t index;
 	for(index=0;index<actors.size(); index++) {
 		if(!actors[index]) break;
         }
@@ -1126,7 +1126,7 @@ int Interface::LoadTable(const char * ResRef)
 	strncpy(t.ResRef, ResRef, 8);
 	t.tm = tm;
 	ind = -1;
-	for(int i = 0; i < tables.size(); i++) {
+	for(size_t i = 0; i < tables.size(); i++) {
 		if(tables[i].free) {
 			ind = i;
 			break;
@@ -1142,7 +1142,7 @@ int Interface::LoadTable(const char * ResRef)
 /** Gets the index of a loaded table, returns -1 on error */
 int Interface::GetIndex(const char * ResRef)
 {
-	for(int i = 0; i < tables.size(); i++) {
+	for(size_t i = 0; i < tables.size(); i++) {
 		if(tables[i].free)
 			continue;
 		if(strnicmp(tables[i].ResRef, ResRef, 8) == 0)
@@ -1193,7 +1193,7 @@ int Interface::LoadSymbol(const char * ResRef)
 	strncpy(s.ResRef, ResRef, 8);
 	s.sm = sm;
 	ind = -1;
-	for(int i = 0; i < symbols.size(); i++) {
+	for(size_t i = 0; i < symbols.size(); i++) {
 		if(symbols[i].free) {
 			ind = i;
 			break;
@@ -1209,7 +1209,7 @@ int Interface::LoadSymbol(const char * ResRef)
 /** Gets the index of a loaded Symbol Table, returns -1 on error */
 int Interface::GetSymbolIndex(const char * ResRef)
 {
-	for(int i = 0; i < symbols.size(); i++) {
+	for(size_t i = 0; i < symbols.size(); i++) {
 		if(symbols[i].free)
 			continue;
 		if(strnicmp(symbols[i].ResRef, ResRef, 8) == 0)

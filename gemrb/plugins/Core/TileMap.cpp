@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.10 2003/11/30 09:49:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.11 2003/12/03 18:27:06 doc_wagon Exp $
  *
  */
 
@@ -33,7 +33,7 @@ TileMap::TileMap(void)
 
 TileMap::~TileMap(void)
 {
-	for(int i = 0; i < overlays.size(); i++) {
+	for(size_t i = 0; i < overlays.size(); i++) {
 		delete(overlays[i]);
 	}
 }
@@ -89,7 +89,7 @@ void TileMap::DrawOverlay(unsigned int index, Region viewport)
 
 Door * TileMap::GetDoor(unsigned short x, unsigned short y)
 {
-	for(int i = 0; i < doors.size(); i++) {
+  for(size_t i = 0; i < doors.size(); i++) {
 		Door * door = &doors.at(i);
 		if(door->DoorClosed) {
 			if(door->closed->BBox.x > x)
@@ -129,7 +129,7 @@ Container * TileMap::AddContainer(char * Name, unsigned short Type, Gem_Polygon 
 }
 Container * TileMap::GetContainer(unsigned short x, unsigned short y)
 {
-	for(int i = 0; i < containers.size(); i++) {
+	for(size_t i = 0; i < containers.size(); i++) {
 		Container * c = &containers.at(i);
 		if(c->outline->BBox.x > x)
 			continue;
@@ -155,7 +155,7 @@ InfoPoint * TileMap::AddInfoPoint(char * Name, unsigned short Type, Gem_Polygon 
 }
 InfoPoint * TileMap::GetInfoPoint(unsigned short x, unsigned short y)
 {
-	for(int i = 0; i < infoPoints.size(); i++) {
+	for(size_t i = 0; i < infoPoints.size(); i++) {
 		InfoPoint * ip = &infoPoints.at(i);
 		if(ip->outline->BBox.x > x)
 			continue;

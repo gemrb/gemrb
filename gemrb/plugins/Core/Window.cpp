@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.19 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.20 2003/12/03 18:27:06 doc_wagon Exp $
  *
  */
 
@@ -58,7 +58,7 @@ void Window::AddControl(Control * ctrl)
 {
 	if(ctrl == NULL)
 		return;
-	for(int i = 0; i < Controls.size(); i++) {
+	for(size_t i = 0; i < Controls.size(); i++) {
 		if(Controls[i]->ControlID == ctrl->ControlID) {
 			delete(Controls[i]);
 			Controls[i] = ctrl;
