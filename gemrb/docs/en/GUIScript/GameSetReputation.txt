@@ -7,5 +7,5 @@ Parameters: the reputation amount to be set. (It is divided by ten when displaye
 
 Return value: N/A
 
-See also: GameGetReputation
+See also: GameGetReputation, IncreaseReputation
 
