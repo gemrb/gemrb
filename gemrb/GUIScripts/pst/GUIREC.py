@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.4 2004/04/11 12:42:23 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.5 2004/04/15 16:18:20 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -142,7 +142,7 @@ def UpdateRecordsWindow ():
 		print "SelectionChange handler points to non existing window\n"
 		return
 
-	pc = GemRB.GetActorByPartyID (GemRB.GameGetSelectedPCSingle ())
+	pc = GemRB.GameGetSelectedPCSingle ()
 	
 	# help, info textarea
 	Text = GemRB.GetControl (Window, 0)

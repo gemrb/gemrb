@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.6 2004/04/11 12:42:23 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.7 2004/04/15 16:18:19 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -150,6 +150,8 @@ def RestPress ():
 
 # which=0: inventory; 1: rec screen
 def GetActorPortrait (actor, which):
+	return GemRB.GetPlayerPortrait( actor, which)
+
 	name = GemRB.GetPlayerName (actor, 1)
 	if name == 'Nameless One':
 		#p = 'NOA'

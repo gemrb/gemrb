@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.14 2004/04/10 21:29:14 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.15 2004/04/15 16:18:20 avenger_teambg Exp $
 
 # NewLife.py - Character generation screen
 
@@ -60,6 +60,7 @@ def OnLoad():
 	global StrLabel, DexLabel, ConLabel, WisLabel, IntLabel, ChaLabel
 	global TextArea
 
+	GemRB.LoadGame(-1);  #loading the base game
 	StatTable = GemRB.LoadTable("abcomm")
 	GemRB.LoadWindowPack("GUICG")
 	#setting up confirmation window
@@ -272,25 +273,25 @@ def AcceptPress():
 
 	GemRB.UnloadWindow(NewLifeWindow)
 	#set my character up
-	MyChar = GemRB.CreatePlayer("charbase", 0 ) 
+	MyChar = GemRB.CreatePlayer("charbase", 1 ) 
 
 	if Str<=18:
-		GemRB.SetPlayerStat(MyChar, IE_STR, Str)
-		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,0)
+		GemRB.SetPlayerStat(1, IE_STR, Str)
+		GemRB.SetPlayerStat(1, IE_STREXTRA,0)
 	else:
-		GemRB.SetPlayerStat(MyChar, IE_STR, 18)
-		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,extras[Str-19])
+		GemRB.SetPlayerStat(1, IE_STR, 18)
+		GemRB.SetPlayerStat(1, IE_STREXTRA,extras[Str-19])
 
-	GemRB.SetPlayerStat(MyChar, IE_INT, Int)
-	GemRB.SetPlayerStat(MyChar, IE_WIS, Wis)
-	GemRB.SetPlayerStat(MyChar, IE_DEX, Dex)
-	GemRB.SetPlayerStat(MyChar, IE_CON, Con)
-	GemRB.SetPlayerStat(MyChar, IE_CHR, Cha)
+	GemRB.SetPlayerStat(1, IE_INT, Int)
+	GemRB.SetPlayerStat(1, IE_WIS, Wis)
+	GemRB.SetPlayerStat(1, IE_DEX, Dex)
+	GemRB.SetPlayerStat(1, IE_CON, Con)
+	GemRB.SetPlayerStat(1, IE_CHR, Cha)
 
 	#don't add con bonus, it will be calculated by the game
-	GemRB.SetPlayerStat(MyChar, IE_HITPOINTS, 20 + (Con-10)*2)
+	GemRB.SetPlayerStat(1, IE_HITPOINTS, 20 + (Con-10)*2)
 
-	GemRB.FillPlayerInfo(MyChar) #does all the rest
+	GemRB.FillPlayerInfo(1) #does all the rest
 	#LETS PLAY!!
 	GemRB.EnterGame()
 	return
