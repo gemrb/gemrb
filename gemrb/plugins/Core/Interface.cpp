@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.242 2004/11/24 21:47:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.243 2004/11/27 14:51:02 avenger_teambg Exp $
  *
  */
 
@@ -2537,39 +2537,49 @@ CREItem *Interface::ReadItem(DataStream *str)
 	return NULL;
 }
 
+#define MAX_LOOP 10
+
+//This function generates random items based on the randitem.2da file
+//there could be a loop, but we don't want to freeze, so there is a limit
 bool Interface::ResolveRandomItem(CREItem *itm)
 {
 	if(!RtRows) return true;
-	char *itemlist=NULL;
-	if( (!RtRows->Lookup( itm->ItemResRef, itemlist )) )
+	for(int loop=0;loop<MAX_LOOP;loop++)
 	{
-		return true;
+		int i,j,k;
+		char *endptr;
+		ieResRef NewItem;
+
+		char *itemlist=NULL;
+		if( (!RtRows->Lookup( itm->ItemResRef, itemlist )) )
+		{
+			return true;
+		}
+		i=Roll(1,*(int *) itemlist,0);
+		strncpy( NewItem, ((ieResRef *) itemlist)[i], sizeof(ieResRef) );
+		char *p=(char *) strchr(NewItem,'*');
+		if(p)
+		{
+			*p=0; //doing this so endptr is ok
+			k=strtol(p+1,NULL,10);
+		}
+		else {
+			k=1;
+		}
+		j=strtol(NewItem,&endptr,10);
+		if(*endptr) strncpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
+		else {
+			strncpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
+			itm->Usages[0]=Roll(j,k,0);
+		}
+		if( !memcmp( itm->ItemResRef,"NO_DROP",8 ) ) {
+			itm->ItemResRef[0]=0;
+		}
+		if(!itm->ItemResRef[0]) return false;
 	}
-	int i,j,k;
-	char *endptr;
-	i=Roll(1,*(int *) itemlist,0);
-	ieResRef NewItem;
-	strncpy( NewItem, ((ieResRef *) itemlist)[i], sizeof(ieResRef) );
-	char *p=(char *) strchr(NewItem,'*');
-	if(p)
-	{
-		*p=0; //doing this so endptr is ok
-		k=strtol(p+1,NULL,10);
-	}
-	else {
-		k=1;
-	}
-	j=strtol(NewItem,&endptr,10);
-	if(*endptr) strncpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
-	else {
-		strncpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
-		itm->Usages[0]=Roll(j,k,0);
-	}
-	if( !memcmp( itm->ItemResRef,"NO_DROP",8 ) ) {
-		itm->ItemResRef[0]=0;
-	}
-	if( !itm->ItemResRef[0] ) return false;
-	return true;
+	printf("Loop detected while generating random item:%s",itm->ItemResRef);
+	printStatus("ERROR", LIGHT_RED);
+	return false;
 }
 
 Item* Interface::GetItem(const char* resname)
