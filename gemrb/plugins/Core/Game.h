@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.19 2004/03/13 13:51:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.20 2004/03/17 01:07:25 edheldil Exp $
  *
  */
 
@@ -40,6 +40,7 @@ class Game;
 #include "../../includes/ie_types.h"
 #include "Actor.h"
 #include "Map.h"
+#include "Variables.h"
 
 typedef struct PCStruct {
 	unsigned short Unknown0;
@@ -82,6 +83,7 @@ private:
 	std::vector< Map*> Maps;
 	std::vector< GAMJournalEntry*> Journals;
 public:
+	Variables* globals;
 	ieByte* familiars;
 
 public:

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.17 2004/03/13 15:18:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.18 2004/03/17 01:07:26 edheldil Exp $
  *
  */
 
@@ -26,7 +26,6 @@
 #include "../Core/MapMgr.h"
 #include "../Core/MemoryStream.h"
 
-static Variables* globals;
 
 GAMImp::GAMImp(void)
 {
@@ -139,13 +138,8 @@ Game* GAMImp::GetGame()
 			break;
 	}
 
-
-	if (globals) {
-		globals->RemoveAll();
-	} else {
-		globals = new Variables();
-		globals->SetType( GEM_VARIABLES_INT );
-	}
+	newGame->globals = new Variables();
+	newGame->globals->SetType( GEM_VARIABLES_INT );
 
 	//Game* newGame = new Game();
 	if (!newGame->CurrentArea[0]) {
@@ -195,7 +189,7 @@ Game* GAMImp::GetGame()
 		str->Seek( 8, GEM_CURRENT_POS );
 		str->Read( &Value, 4 );
 		str->Seek( 40, GEM_CURRENT_POS );
-		globals->SetAt( Name, Value );
+		newGame->globals->SetAt( Name, Value );
 	}
 
 	//Loading Journal entries

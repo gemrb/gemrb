@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.98 2004/03/15 15:25:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.99 2004/03/17 01:07:25 edheldil Exp $
  *
  */
 
@@ -30,7 +30,6 @@ extern HANDLE hConsole;
 #endif
 
 static int initialized = 0;
-static Variables* globals;
 static SymbolMgr* triggersTable;
 static SymbolMgr* actionsTable;
 static SymbolMgr* objectsTable;
@@ -441,8 +440,6 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 
 		/* Initializing the Script Engine */
 
-		globals = new Variables();
-		globals->SetType( GEM_VARIABLES_INT );
 		memset( triggers, 0, sizeof( triggers ) );
 		memset( actions, 0, sizeof( actions ) );
 		memset( objects, 0, sizeof( objects ) );
@@ -551,7 +548,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		ReplaceMyArea( Sender, newVarName );
 	}
-	globals->SetAt( newVarName, ( unsigned long ) value );
+	core->GetGame()->globals->SetAt( newVarName, ( unsigned long ) value );
 }
 
 void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
@@ -565,7 +562,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		ReplaceMyArea( Sender, newVarName );
 	}
-	globals->SetAt( newVarName, ( unsigned long ) value );
+	core->GetGame()->globals->SetAt( newVarName, ( unsigned long ) value );
 }
 
 unsigned long GameScript::CheckVariable(Scriptable* Sender,
@@ -582,7 +579,7 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender,
 	if (strnicmp( VarName, "MYAREA", 6 ) == 0) {
 		ReplaceMyArea( Sender, newVarName );
 	}
-	globals->Lookup( newVarName, value );
+	core->GetGame()->globals->Lookup( newVarName, value );
 	return value;
 }
 
@@ -601,7 +598,7 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender,
 	if (strnicmp( VarName, "MYAREA", 6 ) == 0) {
 		ReplaceMyArea( Sender, newVarName );
 	}
-	globals->Lookup( VarName, value );
+	core->GetGame()->globals->Lookup( VarName, value );
 	return value;
 }
 
