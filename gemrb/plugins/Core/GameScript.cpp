@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.113 2004/03/21 20:24:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.114 2004/03/21 20:37:28 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,9 @@ extern HANDLE hConsole;
 
 //this will skip to the next element in the prototype of an action/trigger
 #define SKIP_ARGUMENT() while(*str && ( *str != ',' ) && ( *str != ')' )) str++
+
+//later this could be separated from talking distance
+#define MAX_OPERATING_DISTANCE      40
 
 static int initialized = 0;
 static SymbolMgr* triggersTable;
@@ -4124,7 +4127,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		return;
 	}
 	if(Flags&BD_CHECKDIST) {
-		if(Distance(Sender, tar)>12) {
+		if(Distance(Sender, tar)>40) {
 			Point p={tar->XPos, tar->YPos};
 			GoNearAndRetry(Sender, &p);
 			Sender->CurrentAction = NULL;
@@ -4402,7 +4405,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 	double distance;
 	Point* p = FindNearPoint( Sender, &door->toOpen[0], &door->toOpen[1],
 				distance );
-	if (distance <= 12) {
+	if (distance <= 40) {
 		if(door->Flags&2) {
 			//playsound unsuccessful opening of door
 			core->GetSoundMgr()->Play("AMB_D06");
@@ -4442,7 +4445,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 	double distance;
 	Point* p = FindNearPoint( Sender, &door->toOpen[0], &door->toOpen[1],
 				distance );	
-	if (distance <= 12) {
+	if (distance <= 40) {
 		door->SetDoorClosed( true, true );
 	} else {
 		GoNearAndRetry(Sender, p);
@@ -4806,7 +4809,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	long x = ( Sender->XPos - ent->XPos );
 	long y = ( Sender->YPos - ent->YPos );
 	int distance = (int) sqrt( ( double ) ( x* x + y* y ) );
-	if (distance <= 12) {
+	if (distance <= 40) {
 		LeaveAreaLUA(Sender, parameters);
 		return;
 	}
@@ -4832,7 +4835,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	long x = ( Sender->XPos - ent->XPos );
 	long y = ( Sender->YPos - ent->YPos );
 	double distance = sqrt( ( double ) ( x* x + y* y ) );
-	if (distance <= 12) {
+	if (distance <= 40) {
 		LeaveAreaLUAPanic(Sender, parameters);
 		return;
 	}
