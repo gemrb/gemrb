@@ -43,13 +43,12 @@ bool p2DAImp::Open(DataStream * stream, bool autoFree)
 	while(true) {
 		char * line = (char*)malloc(1024);
 		int len = str->ReadLine(line, 1023);
-		if(len == -1) {
+		if(len <=0) {
 			free(line);
 			break;
 		}
 		if(len < 1024)
 			line = (char*)realloc(line, len+1);
-		line[len]=0;
 		ptrs.push_back(line);
 		if(colHead) {
 			colHead = false;
@@ -66,8 +65,7 @@ bool p2DAImp::Open(DataStream * stream, bool autoFree)
 			rowNames.push_back(str);
 			RowEntry r;
 			rows.push_back(r);
-			while(str != NULL) {
-				str = strtok(NULL, " ");
+			while( (str=strtok(NULL, " ")) != NULL) {
 				rows[row].push_back(str);
 			}
 			row++;
