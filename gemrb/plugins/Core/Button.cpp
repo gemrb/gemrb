@@ -209,6 +209,16 @@ void Button::SetState(unsigned char state)
 		Changed = true;
 	State = state;
 }
+/** Handling The default button (enter) */
+void Button::OnSpecialKeyPress(unsigned char Key)
+{
+	if(State == IE_GUI_BUTTON_DISABLED)
+		return;
+	if(Flags & 0x40) {
+		if(Key == GEM_RETURN)
+			OnMouseUp(0,0,0,0);
+	}
+}
 
 /** Mouse Button Down */
 void Button::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)

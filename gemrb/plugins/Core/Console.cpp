@@ -7,6 +7,7 @@ extern Interface * core;
 Console::Console(void)
 {
 	ta = NULL;
+	Cursor = NULL;
 	max = 128;
 	Buffer = (unsigned char*)malloc(max);
 	Buffer[0] = 0;
@@ -79,10 +80,19 @@ void Console::OnKeyPress(unsigned char Key, unsigned short Mod)
 				Buffer[i] = Buffer[i-1];
 			}
 			Buffer[CurPos++] = Key;
-			Buffer[CurPos] = 0;
+			Buffer[len+1] = 0;
 		}
 	}
-	else if(Key == '\b') {
+}
+/** Special Key Press */
+void Console::OnSpecialKeyPress(unsigned char Key)
+{
+	int len;
+
+	Changed = true;
+	switch(Key)
+	{
+	case GEM_BACKSP:
 		if(CurPos != 0) {
 			int len = strlen((char*)Buffer);
 			for(int i = CurPos; i < len; i++) {
@@ -91,31 +101,26 @@ void Console::OnKeyPress(unsigned char Key, unsigned short Mod)
 			Buffer[len-1] = 0;
 			CurPos--;
 		}
-	}
-}
-/** Special Key Press */
-void Console::OnSpecialKeyPress(unsigned char Key)
-{
-	Changed = true;
-	if(Key == GEM_LEFT) {
+		break;
+	case GEM_LEFT:
 		if(CurPos > 0)
 			CurPos--;
-	}
-	else if(Key == GEM_RIGHT) {
-		int len = strlen((char*)Buffer);
+		break;
+	case GEM_RIGHT:
+		len = strlen((char*)Buffer);
 		if(CurPos < len) {
 			CurPos++;
 		}
-	}
-	else if(Key == GEM_DELETE) {
-		int len = strlen((char*)Buffer);
+		break;
+	case GEM_DELETE:
+		len = strlen((char*)Buffer);
 		if(CurPos < len) {
 			for(int i = CurPos; i < len; i++) {
 				Buffer[i] = Buffer[i+1];
 			}
-		}			
-	}
-	else if(Key == GEM_RETURN) {
+		}
+		break;			
+	case GEM_RETURN:
 		char * msg = core->GetGUIScriptEngine()->ExecString((char*)Buffer);
 		if(ta)
 			ta->SetText(msg);
@@ -123,5 +128,6 @@ void Console::OnSpecialKeyPress(unsigned char Key)
 		Buffer[0] = 0;
 		CurPos = 0;
 		Changed = true;
+		break;
 	}
 }

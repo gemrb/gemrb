@@ -298,7 +298,9 @@ int Interface::Init()
 	console->Width = core->Width;
 	console->Height = 25;
 	console->SetFont(fonts[2]);
-	//console->SetCursor(fonts[2]->chars[2]);
+	AnimationFactory *af=(AnimationFactory*) GetResourceMgr()->GetFactoryResource("CURSOR",IE_BAM_CLASS_ID);
+	if(af)
+		console->SetCursor(af->GetFrame(0));
 	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Starting up the Sound Manager...", WHITE);
 	soundmgr = (SoundMgr*)GetInterface(IE_WAV_CLASS_ID);

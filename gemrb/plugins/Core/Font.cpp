@@ -145,15 +145,15 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 			continue;
 		}
 		unsigned char currChar = (unsigned char)tmp[i]-1;
-		//Sprite2D * spr = chars[(unsigned char)tmp[i]-1];
 		x+=xPos[currChar];//spr->XPos;
-		//video->BlitSprite(spr, x+rgn.x, y+rgn.y, true, &rgn);
 		video->BlitSpriteRegion(sprBuffer, size[currChar], x+rgn.x-xPos[currChar], y+rgn.y-yPos[currChar], true, &rgn);
 		if(cursor &&  (curpos == i))
-			video->BlitSprite(cursor, x-xPos[currChar]+rgn.x, y+rgn.y, true, &rgn);//spr->XPos+rgn.x, y+rgn.y, true, &rgn);
-		x+=size[currChar].w-xPos[currChar];//spr->Width-spr->XPos;
+			video->BlitSprite(cursor, x-xPos[currChar]+rgn.x, y+rgn.y, true, &rgn);
+		x+=size[currChar].w-xPos[currChar];
 		
 	}
+	if(cursor &&  (curpos == len))
+		video->BlitSprite(cursor, x-xPos[tmp[len]-1]+rgn.x, y+rgn.y, true, &rgn);
 	free(tmp);
 }
 
@@ -223,16 +223,16 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 			}
 			continue;
 		}
-		//Sprite2D * spr = chars[(unsigned char)tmp[i]-1];
 		unsigned char currChar = (unsigned char)tmp[i]-1;
 		x+=xPos[currChar];//spr->XPos;
-		//video->BlitSprite(spr, x+rgn.x, y+rgn.y, true, &rgn);
 		video->BlitSpriteRegion(sprBuffer, size[currChar], x+rgn.x-xPos[currChar], y+rgn.y-yPos[currChar], true, &rgn);
 		if(cursor &&  (curpos == i))
-			video->BlitSprite(cursor, x-xPos[currChar]+rgn.x, y+rgn.y, true, &rgn);//spr->XPos+rgn.x, y+rgn.y, true, &rgn);
+			video->BlitSprite(cursor, x-xPos[currChar]+rgn.x, y+rgn.y, true, &rgn);
 		x+=size[currChar].w-xPos[currChar];//spr->Width-spr->XPos;
 		
 	}
+	if(cursor &&  (curpos == len))
+		video->BlitSprite(cursor, x-xPos[tmp[len]-1]+rgn.x, y+rgn.y, true, &rgn);
 	free(tmp);
 }
 

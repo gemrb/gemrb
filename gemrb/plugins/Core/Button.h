@@ -74,6 +74,8 @@ public: // Public Events
   void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
   /** Mouse Button Up */
   void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);	
+  /** A special key has been pressed */
+  void OnSpecialKeyPress(unsigned char Key);
   /** Button Pressed Event Script Function Name */
   char ButtonOnPress[64];
   /** Sets the Display Flags */
