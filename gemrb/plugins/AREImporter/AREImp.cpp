@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.48 2004/04/21 17:41:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.49 2004/04/23 20:26:40 avenger_teambg Exp $
  *
  */
 
@@ -422,11 +422,13 @@ Map* AREImp::GetMap(const char *ResRef)
 	}
 	ActorMgr* actmgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
 	for (int i = 0; i < ActorCount; i++) {
+		char DefaultName[33];
 		char CreResRef[9];
 		unsigned long TalkCount;
 		unsigned long Orientation, Schedule;
 		unsigned short XPos, YPos, XDes, YDes;
-		str->Seek( 32, GEM_CURRENT_POS );
+		str->Read( DefaultName, 32);
+		DefaultName[32]=0;
 		str->Read( &XPos, 2 );
 		str->Read( &YPos, 2 );
 		str->Read( &XDes, 2 );
@@ -453,8 +455,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			fs->Open( str, CreOffset, CreSize, true );
 			crefile = fs;
 		} else {
-			crefile = core->GetResourceMgr()->GetResource( CreResRef,
-												IE_CRE_CLASS_ID );
+			crefile = core->GetResourceMgr()->GetResource( CreResRef, IE_CRE_CLASS_ID );
 		}
 		actmgr->Open( crefile, true );
 		Actor* ab = actmgr->GetActor();
@@ -465,6 +466,11 @@ Map* AREImp::GetMap(const char *ResRef)
 		ab->AnimID = IE_ANI_AWAKE;
 		//copying the area name into the actor
 		strcpy(ab->Area, map->scriptName);
+		//copying the scripting name into the actor
+		//this hack allows iwd starting cutscene to work
+		if(stricmp(ab->scriptName,"none")==0) {
+			ab->SetScriptName(DefaultName);
+		}
 
 		if (ab->BaseStats[IE_STATE_ID] & STATE_DEAD)
 			ab->AnimID = IE_ANI_SLEEP;

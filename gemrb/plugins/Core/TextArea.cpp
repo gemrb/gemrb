@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.51 2004/04/22 20:44:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.52 2004/04/23 20:26:41 avenger_teambg Exp $
  *
  */
 
@@ -317,7 +317,6 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short Mod)
 							if((unsigned int) seltext>=lines.size()) {
 								return;
 							}
-printf("picking %d   seltext:%d\n",i,seltext);
 						}
 						unsigned long idx=0;
 						sscanf( lines[seltext], "[s=%ld,", &idx);

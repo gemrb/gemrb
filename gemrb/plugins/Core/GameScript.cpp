@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.154 2004/04/23 18:41:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.155 2004/04/23 20:26:41 avenger_teambg Exp $
  *
  */
 
@@ -52,7 +52,7 @@ static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
-static int InDebug = 0;
+static int InDebug = 1;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -4682,8 +4682,10 @@ void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 		Map* map = core->GetGame()->GetCurrentMap( );
 		Sender->CutSceneId = map->GetActor( parameters->objects[1]->objectName );
 	} else {
-		Sender->CutSceneId = GetActorFromObject( Sender,
-								parameters->objects[1] );
+		Sender->CutSceneId = GetActorFromObject( Sender, parameters->objects[1] );
+	}
+	if(!Sender->CutSceneId) {
+		printMessage("IEScript","Failed to set CutSceneID!",YELLOW);
 	}
 }
 
@@ -4847,11 +4849,11 @@ void GameScript::AddWayPoint(Scriptable* Sender, Action* parameters)
 void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
-	//core->timer->SetMovingActor(actor);
 }
 
 void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
@@ -4956,6 +4958,7 @@ void GameScript::Face(Scriptable* Sender, Action* parameters)
 void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
@@ -4973,6 +4976,7 @@ void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
