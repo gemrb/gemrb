@@ -464,11 +464,14 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 			actor->WalkTo(GameX, GameY);
 			unsigned long WinIndex, TAIndex;
 			core->GetDictionary()->Lookup("MessageWindow", WinIndex);
-			if(core->GetDictionary()->Lookup("MessageTextArea", TAIndex)) {
-				TextArea * ta = (TextArea*)core->GetWindow(WinIndex)->GetControl(TAIndex);
-				char Text[256];
-				sprintf(Text, "[color=FF0000]Selected[/color]: %s", actor->LongName);
-				ta->AppendText(Text, -1);
+			if((WinIndex != -1) && (core->GetDictionary()->Lookup("MessageTextArea", TAIndex))) {
+				Window * win = core->GetWindow(WinIndex);
+				if(win) {
+					TextArea * ta = (TextArea*)win->GetControl(TAIndex);
+					char Text[256];
+					sprintf(Text, "[color=FF0000]Selected[/color]: %s", actor->LongName);
+					ta->AppendText(Text, -1);
+				}
 			}
 		}
 		for(size_t i = 0; i < selected.size(); i++)
@@ -870,6 +873,10 @@ void GameControl::DialogChoose(int choose)
 					delete(dlg);
 					ds = NULL;
 					dlg = NULL;
+					core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
+					core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
+					DisableMouse = false;
+					Dialogue = false;
 					return;
 				}					
 				if(tr->action) {
@@ -890,6 +897,14 @@ void GameControl::DialogChoose(int choose)
 			ta->AppendText("", -1);
 			free(string);
 			for(int x = 0; x < ds->transitionsCount; x++) {
+				if(ds->transitions[x]->Flags & 2) {
+					bool ret = true;
+					for(int t = 0; t < ds->transitions[x]->trigger->count; t++) {
+						ret &= (target->Scripts[0]->EvaluateString(ds->transitions[x]->trigger->strings[t]));
+					}
+					if(!ret)
+						continue;
+				}
 				if(ds->transitions[x]->textStrRef == 0) {
 					string = (char*)malloc(30);
 					sprintf(string, "[s=%d,ffffff,ff0000]Continue", x);
