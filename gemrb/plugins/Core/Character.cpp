@@ -6,7 +6,7 @@ Character::Character(void)
 	int i;
 
 	for(i = 0; i < MAX_STATS; i++) {
-		Stats[i] = 0;
+		BaseStats[i] = 0;
 		Modified[i] = 0;
 	}
 	for(i = 0; i < MAX_SCRIPTS; i++) {
@@ -14,6 +14,7 @@ Character::Character(void)
 	}
 	Dialog[0] = 0;
 	Name[0] = 0;
+	ScriptName[0] = 0;
 	Icon[0] = 0;
 }
 
@@ -39,30 +40,21 @@ long Character::GetBase(unsigned char StatIndex)
 {
 	if(StatIndex >= MAX_STATS)
 		return 0xffff;
-	return Stats[StatIndex];
+	return BaseStats[StatIndex];
 }
 /** Sets a Stat Base Value */
 bool  Character::SetBase(unsigned char StatIndex, long Value)
 {
 	if(StatIndex >= MAX_STATS)
 		return false;
-	Stats[StatIndex] = Value;
-	return true;
-}
-/** Sets a Stat Modifier Value */
-bool  Character::SetMod(unsigned char StatIndex, long Mod)
-{
-	if(StatIndex >= MAX_STATS)
-		return false;
-	Modified[StatIndex] = Mod;
+	BaseStats[StatIndex] = Value;
 	return true;
 }
 /** call this after load, before applying effects */
-int Character::Init()
+void Character::Init()
 {
-	memcpy(Modified,Stats,sizeof(Modified) );
+	memcpy(Modified,BaseStats,sizeof(Modified) );
 }
-*/
 /** implements a generic opcode function, modify modifier 
     returns the change
 */

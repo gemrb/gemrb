@@ -26,12 +26,15 @@ private:
 	long BaseStats[MAX_STATS];
 	long Modified[MAX_STATS];
 	char  Name[33];
+	char  ScriptName[33]; //death variable
 	char  Scripts[MAX_SCRIPTS][9];
 	char  Dialog[9];
 	char  Icon[9];
 public:
 	Character(void);
 	~Character(void);
+	/** Inits the Modified vector */
+	void Init();
 	/** Returns a Stat value */
 	long  GetStat(unsigned char StatIndex);
 	/** Returns the difference */
@@ -48,6 +51,13 @@ public:
 		if(string == NULL)
 			return;
 		strncpy(Name, string, 32);
+	}
+	/** Sets the Scripting Name (death variable) */
+	void  SetScriptName(const char * string)
+	{
+		if(string == NULL)
+			return;
+		strncpy(ScriptName, string, 32);
 	}
 	/** Sets a Script ResRef */
 	void  SetScript(int ScriptIndex, const char * ResRef)
@@ -76,6 +86,11 @@ public:
 	char *GetName(void)
 	{
 		return Name;
+	}
+	/** Gets the Character Name */
+	char *GetScriptName(void)
+	{
+		return ScriptName;
 	}
 	/** Gets a Script ResRef */
 	char *GetScript(int ScriptIndex)
