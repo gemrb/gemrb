@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.12 2003/11/25 21:57:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.13 2003/11/25 22:27:51 avenger_teambg Exp $
  *
  */
 
@@ -122,36 +122,6 @@ Actor * CREImp::GetActor()
 		act->BaseStats[IE_HAIR_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_HAIR_COLOR]-200));
 	}
 
-	/*Color Pal[256];
-	Pal[0].r = 0x00; Pal[0].g = 0xff; Pal[0].b = 0x00; Pal[0].a = 0x00;
-	Pal[1].r = 0x00; Pal[1].g = 0x00; Pal[1].b = 0x00; Pal[1].a = 0x00;
-	Pal[2].r = 0xff; Pal[2].g = 0x80; Pal[2].b = 0x80; Pal[2].a = 0x00;
-	Pal[3].r = 0xff; Pal[3].g = 0x80; Pal[3].b = 0x80; Pal[3].a = 0x00;
-	Color * MetalPal   = core->GetPalette(act->BaseStats[IE_METAL_COLOR], 12);
-	Color * MinorPal   = core->GetPalette(act->BaseStats[IE_MINOR_COLOR], 12);
-	Color * MajorPal   = core->GetPalette(act->BaseStats[IE_MAJOR_COLOR], 12);
-	Color * SkinPal    = core->GetPalette(act->BaseStats[IE_SKIN_COLOR], 12);
-	Color * LeatherPal = core->GetPalette(act->BaseStats[IE_LEATHER_COLOR], 12);
-	Color * ArmorPal   = core->GetPalette(act->BaseStats[IE_ARMOR_COLOR], 12);
-	Color * HairPal    = core->GetPalette(act->BaseStats[IE_HAIR_COLOR], 12);
-	memcpy(&Pal[0x04], MetalPal,   12*sizeof(Color));
-	memcpy(&Pal[0x10], MinorPal,   12*sizeof(Color));
-	memcpy(&Pal[0x1C], MajorPal,   12*sizeof(Color));
-	memcpy(&Pal[0x28], SkinPal,    12*sizeof(Color));
-	memcpy(&Pal[0x34], LeatherPal, 12*sizeof(Color));
-	memcpy(&Pal[0x40], ArmorPal,   12*sizeof(Color));
-	memcpy(&Pal[0x4C], HairPal,    12*sizeof(Color));
-	free(MetalPal);
-	free(MinorPal);
-	free(MajorPal);
-	free(SkinPal);
-	free(LeatherPal);
-	free(ArmorPal);
-	free(HairPal);
-
-	if(act->anims)
-		act->anims->SetNewPalette(Pal);*/
-
 	unsigned char TotSCEFF;
 	str->Read(&TotSCEFF, 1);
 	str->Read(act->SmallPortrait, 8);
@@ -246,44 +216,44 @@ Actor * CREImp::GetActor()
 			str->Seek(6, GEM_CURRENT_POS);
 			}
 		break;
-		str->Read(&act->BaseStats[IE_TRACKING],1);
-		str->Seek(32,GEM_CURRENT_POS);
-		str->Read(&act->StrRefs[0],100*4);
-		str->Read(&act->BaseStats[IE_LEVEL],4);
-		str->Read(&act->BaseStats[IE_LEVEL2],4);
-		str->Read(&act->BaseStats[IE_LEVEL3],4);
-		str->Seek(1,GEM_CURRENT_POS);
-		str->Read(&act->BaseStats[IE_STR],1);
-		str->Read(&act->BaseStats[IE_STREXTRA],1);
-		str->Read(&act->BaseStats[IE_INT],1);
-		str->Read(&act->BaseStats[IE_WIS],1);
-		str->Read(&act->BaseStats[IE_DEX],1);
-		str->Read(&act->BaseStats[IE_CON],1);
-		str->Read(&act->BaseStats[IE_CHR],1);
-		str->Read(&act->Modified[IE_MORALEBREAK],1);
-		str->Read(&act->BaseStats[IE_MORALEBREAK],1);
-		str->Read(&act->BaseStats[IE_HATEDRACE],1);
-		str->Read(&act->BaseStats[IE_MORALERECOVERYTIME],1);
-		str->Seek(1,GEM_CURRENT_POS);
-		str->Read(&act->BaseStats[IE_KIT],4);
-		for(int i=0;i<5;i++)
-		{
-			str->Read(act->Scripts[i],8);
-			act->Scripts[i][8]=0;
-		}
-		str->Read(&act->BaseStats[IE_EA], 1);
-		str->Read(&act->BaseStats[IE_GENERAL], 1);
-		str->Read(&act->BaseStats[IE_RACE], 1);
-		str->Read(&act->BaseStats[IE_CLASS], 1);
-		str->Read(&act->BaseStats[IE_SPECIFIC], 1);
-		str->Read(&act->BaseStats[IE_SEX], 1);
-		str->Seek(5,GEM_CURRENT_POS);
-		str->Read(&act->BaseStats[IE_ALIGNMENT], 1);
-		str->Seek(4,GEM_CURRENT_POS);
-		str->Read(act->ScriptName, 32);
-		str->Seek(44,GEM_CURRENT_POS);
-		str->Read(act->Dialog, 8);
 	}
+	str->Read(&act->BaseStats[IE_TRACKING],1);
+	str->Seek(32,GEM_CURRENT_POS);
+	str->Read(&act->StrRefs[0],100*4);
+	str->Read(&act->BaseStats[IE_LEVEL],1);
+	str->Read(&act->BaseStats[IE_LEVEL2],1);
+	str->Read(&act->BaseStats[IE_LEVEL3],1);
+	str->Seek(1,GEM_CURRENT_POS);
+	str->Read(&act->BaseStats[IE_STR],1);
+	str->Read(&act->BaseStats[IE_STREXTRA],1);
+	str->Read(&act->BaseStats[IE_INT],1);
+	str->Read(&act->BaseStats[IE_WIS],1);
+	str->Read(&act->BaseStats[IE_DEX],1);
+	str->Read(&act->BaseStats[IE_CON],1);
+	str->Read(&act->BaseStats[IE_CHR],1);
+	str->Read(&act->Modified[IE_MORALEBREAK],1);
+	str->Read(&act->BaseStats[IE_MORALEBREAK],1);
+	str->Read(&act->BaseStats[IE_HATEDRACE],1);
+	str->Read(&act->BaseStats[IE_MORALERECOVERYTIME],1);
+	str->Seek(1,GEM_CURRENT_POS);
+	str->Read(&act->BaseStats[IE_KIT],4);
+	for(int i=0;i<5;i++)
+	{
+		str->Read(act->Scripts[i],8);
+		act->Scripts[i][8]=0;
+	}
+	str->Read(&act->BaseStats[IE_EA], 1);
+	str->Read(&act->BaseStats[IE_GENERAL], 1);
+	str->Read(&act->BaseStats[IE_RACE], 1);
+	str->Read(&act->BaseStats[IE_CLASS], 1);
+	str->Read(&act->BaseStats[IE_SPECIFIC], 1);
+	str->Read(&act->BaseStats[IE_SEX], 1);
+	str->Seek(5,GEM_CURRENT_POS);
+	str->Read(&act->BaseStats[IE_ALIGNMENT], 1);
+	str->Seek(4,GEM_CURRENT_POS);
+	str->Read(act->ScriptName, 32);
+	str->Seek(44,GEM_CURRENT_POS);
+	str->Read(act->Dialog, 8);
 	act->SetAnimationID(act->BaseStats[IE_ANIMATION_ID]);
 	if(act->anims)
 		act->anims->DrawCircle = false;
