@@ -4,6 +4,8 @@
 
 extern Interface * core;
 
+
+
 /***********************
  *	Scriptable Class   *
  ***********************/
@@ -115,19 +117,7 @@ void Scriptable::ClearActions()
 {
 	if(CurrentAction) {
 		if(CurrentAction->autoFree) {
-			if(CurrentAction->string0Parameter)
-				free(CurrentAction->string0Parameter);
-			if(CurrentAction->string1Parameter)
-				free(CurrentAction->string1Parameter);
-			for(int c = 0; c < 3; c++) {
-				Object * oB = CurrentAction->objects[c];
-				if(oB) {
-					if(oB->objectName)
-						free(oB->objectName);
-					delete(oB);
-				}
-			}
-			delete(CurrentAction);
+			DeleteAction(CurrentAction);
 		}
 		CurrentAction = NULL;
 	}
@@ -135,19 +125,7 @@ void Scriptable::ClearActions()
 		Action * aC = actionQueue.front();
 		actionQueue.pop_front();
 		if(aC->autoFree) {
-			if(aC->string0Parameter)
-				free(aC->string0Parameter);
-			if(aC->string1Parameter)
-				free(aC->string1Parameter);
-			for(int c = 0; c < 3; c++) {
-				Object * oB = aC->objects[c];
-				if(oB) {
-					if(oB->objectName)
-						free(oB->objectName);
-					delete(oB);
-				}
-			}
-			delete(aC);
+			DeleteAction(aC);
 		}
 	}
 	actionQueue.clear();
@@ -203,6 +181,23 @@ void Scriptable::ProcessActions()
 void Scriptable::SetWait(unsigned long time)
 {
 	WaitCounter = time;
+}
+
+void Scriptable::DeleteAction(Action * aC)
+{
+	if(aC->string0Parameter)
+		free(aC->string0Parameter);
+	if(aC->string1Parameter)
+		free(aC->string1Parameter);
+	for(int c = 0; c < 3; c++) {
+		Object * oB = aC->objects[c];
+		if(oB) {
+			if(oB->objectName)
+				free(oB->objectName);
+			delete(oB);
+		}
+	}
+	delete(aC);
 }
 
 /********************
@@ -394,6 +389,8 @@ void Moveble::ClearPath()
 	path = NULL;
 	step = NULL;
 	AnimID = IE_ANI_AWAKE;
+	if(CurrentAction)
+		DeleteAction(CurrentAction);
 	CurrentAction = NULL;
 }
 
