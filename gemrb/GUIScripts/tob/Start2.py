@@ -71,8 +71,7 @@ def OnLoad():
 	GemRB.SetVisible(QuitWindow, 0)
 	GemRB.SetVisible(TutorialWindow, 0)
 	GemRB.SetVisible(StartWindow, 1)
-	GemRB.LoadMusicPL("Theme.mus")
-	GemRB.StartPL()
+	GemRB.LoadMusicPL("Theme.mus",1)
 	return
 	
 def SinglePlayerPress():

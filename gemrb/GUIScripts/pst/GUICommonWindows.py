@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.2 2004/01/18 18:12:40 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.3 2004/02/10 22:59:27 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -76,10 +76,6 @@ def OpenCommonWindows ():
 	GemRB.SetVisible (MenuWindow, 1)
 	GemRB.SetVisible (MainWindow, 1)
 	
-	#GemRB.LoadMusicPL("Main.mus")
-	#GemRB.StartPL()
-
-
 def CloseCommonWindows ():
 	global MainWindow
 

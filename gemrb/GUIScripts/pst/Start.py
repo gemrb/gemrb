@@ -33,7 +33,6 @@ def OnLoad():
 	GemRB.SetVisible(StartWindow, 1)
 	
 	GemRB.LoadMusicPL("Main.mus")
-	GemRB.StartPL()
 	return
 	
 def NewLifePress():
