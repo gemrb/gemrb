@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.51 2005/02/24 22:09:03 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.52 2005/03/05 10:13:58 guidoj Exp $
  *
  */
 
@@ -213,7 +213,7 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 		"Found in Override" );
 	SearchIn( core->GamePath, core->GameData, resname, type,
 		"Found in Data" );
-	unsigned long ResLocator;
+	unsigned int ResLocator;
 	if (resources.Lookup( resname, type, ResLocator )) {
 		if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
 			printf( "[ERROR]\nAn Archive Plug-in is not Available\n" );
@@ -354,7 +354,7 @@ found:
 		return af;
 	}
 	/*printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
-	unsigned long ResLocator;
+	unsigned int ResLocator;
 	if(resources.Lookup(resname, type, ResLocator) ) {
 		int bifnum = (ResLocator & 0xFFF00000) >> 20;
 		ArchiveImporter * ai = (ArchiveImporter*)core->GetInterface(IE_BIF_CLASS_ID);

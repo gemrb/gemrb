@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.h,v 1.9 2005/02/09 16:29:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.h,v 1.10 2005/03/05 10:13:58 guidoj Exp $
  *
  */
 
@@ -39,7 +39,7 @@ protected:
 		MyAssoc* pNext;
 		char key[KEYSIZE]; //not ieResRef!
 		SClass_ID type;
-		unsigned long value;
+		unsigned int value;
 	};
 	struct MemBlock {
 		MemBlock* pNext;
@@ -55,10 +55,10 @@ public:
 	bool IsEmpty() const;
 
 	// Lookup
-	bool Lookup(const ieResRef key, unsigned int type, unsigned long& rValue) const;
+	bool Lookup(const ieResRef key, unsigned int type, unsigned int& rValue) const;
 
 	// Operations
-	void SetAt(const ieResRef key, unsigned int type, unsigned long newValue);
+	void SetAt(const ieResRef key, unsigned int type, unsigned int newValue);
 	void RemoveAt(const ieResRef key, unsigned int type);
 	void RemoveAll();
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);

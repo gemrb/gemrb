@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.15 2005/02/10 22:41:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.16 2005/03/05 10:13:58 guidoj Exp $
  *
  */
 
@@ -176,7 +176,7 @@ Dictionary::MyAssoc* Dictionary::GetAssocAt(const ieResRef key,
 }
 
 bool Dictionary::Lookup(const ieResRef key, unsigned int type,
-	unsigned long& rValue) const
+	unsigned int& rValue) const
 {
 	unsigned int nHash;
 
@@ -199,7 +199,7 @@ void Dictionary::RemoveAt(const ieResRef key, unsigned int type)
 	}
 }
 
-void Dictionary::SetAt(const ieResRef key, unsigned int type, unsigned long value)
+void Dictionary::SetAt(const ieResRef key, unsigned int type, unsigned int value)
 {
 	int i;
 	unsigned int nHash;
