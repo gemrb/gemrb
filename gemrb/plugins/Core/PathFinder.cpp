@@ -31,10 +31,10 @@ void PathFinder::SetMap(ImageMgr * sMap, int Width, int Height)
 	this->Height = Height;
 	//Filling Matrices
 	MapSet = new PathNode**[Width];
-	ClosedSet = (bool**)malloc(Width*sizeof(bool*));
+	ClosedSet = new bool*[Width];
 	for(int x = 0; x < Width; x++) {
 		MapSet[x] = new PathNode*[Height];
-		ClosedSet[x] = (bool*)malloc(Height*sizeof(bool));
+		ClosedSet[x] = new bool[Height];
 		memset(ClosedSet[x], 0, Height*sizeof(bool));
 		for(int y = 0; y < Height; y++) {
 			PathNode * node = new PathNode();
@@ -133,7 +133,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 		}
 		//Copying tmp to OpenStack
 		OpenStack.clear();
-		int maxsize = min(120, tmp.size());
+		int maxsize = min(15, tmp.size());
 		for(int i = 0; i < maxsize; i++) {
 			OpenStack.push_back(tmp.at(i));
 		}
@@ -157,13 +157,13 @@ void PathFinder::FreeMatrices()
 {
 	for(int x = 0; x < Width; x++) {
 		for(int y = 0; y < Height; y++) {
-			free(MapSet[x][y]);
+			delete(MapSet[x][y]);
 		}
-		free(MapSet[x]);
-		free(ClosedSet[x]);
+		delete(MapSet[x]);
+		delete(ClosedSet[x]);
 	}
-	free(MapSet);
-	free(ClosedSet);
+	delete(MapSet);
+	delete(ClosedSet);
 }
 
 unsigned char PathFinder::GetOrient(short sX, short sY, short dX, short dY)
