@@ -51,6 +51,8 @@ public:
 	void SetMax(unsigned short Max);
 	/** TextArea Associated Control */
 	Control * ta;
+	/** Associated Variable */
+	char Variable[33];
 public: // Public Events
   /** Mouse Button Down */
   void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);

@@ -10,6 +10,7 @@ ScrollBar::ScrollBar(void)
 	Max = 10;
 	State = 0;
 	ta = NULL;
+	Variable[0] = 0;
 }
 
 ScrollBar::~ScrollBar(void)
@@ -71,6 +72,11 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 		if((x <= upMx) && (y <= upMy)) {
 			if(Pos > 0)
 				Pos--;
+			if(Variable[0] != 0) {
+				char tmp[10];
+				sprintf(tmp, "%d", Pos);
+				core->GetDictionary()->SetAt(Variable, tmp);
+			}
 			if(ta) {
 				TextArea * t = (TextArea*)ta;
 				t->SetRow(Pos);
@@ -88,6 +94,11 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 				TextArea * t = (TextArea*)ta;
 				t->SetRow(Pos);
 			}
+			if(Variable[0] != 0) {
+				char tmp[10];
+				sprintf(tmp, "%d", Pos);
+				core->GetDictionary()->SetAt(Variable, tmp);
+			}
 			return;
 		}
 	}
@@ -103,6 +114,11 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 			TextArea * t = (TextArea*)ta;
 			t->SetRow(Pos);
 		}
+		if(Variable[0] != 0) {
+			char tmp[10];
+			sprintf(tmp, "%d", Pos);
+			core->GetDictionary()->SetAt(Variable, tmp);
+		}
 		return;
 	}
 	if(y >= ymax) {
@@ -110,6 +126,11 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 		if(ta) {
 			TextArea * t = (TextArea*)ta;
 			t->SetRow(Pos);
+		}
+		if(Variable[0] != 0) {
+			char tmp[10];
+			sprintf(tmp, "%d", Pos);
+			core->GetDictionary()->SetAt(Variable, tmp);
 		}
 		return;
 	}
@@ -124,6 +145,11 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 	if(ta) {
 		TextArea * t = (TextArea*)ta;
 		t->SetRow(Pos);
+	}
+	if(Variable[0] != 0) {
+		char tmp[10];
+		sprintf(tmp, "%d", Pos);
+		core->GetDictionary()->SetAt(Variable, tmp);
 	}
 }
 /** Mouse Button Up */
@@ -151,6 +177,11 @@ void ScrollBar::OnMouseOver(unsigned short x, unsigned short y)
 				TextArea * t = (TextArea*)ta;
 				t->SetRow(Pos);
 			}
+			if(Variable[0] != 0) {
+				char tmp[10];
+				sprintf(tmp, "%d", Pos);
+				core->GetDictionary()->SetAt(Variable, tmp);
+			}
 			return;
 		}
 		if(y >= ymax) {
@@ -158,6 +189,11 @@ void ScrollBar::OnMouseOver(unsigned short x, unsigned short y)
 			if(ta) {
 				TextArea * t = (TextArea*)ta;
 				t->SetRow(Pos);
+			}
+			if(Variable[0] != 0) {
+				char tmp[10];
+				sprintf(tmp, "%d", Pos);
+				core->GetDictionary()->SetAt(Variable, tmp);
 			}
 			return;
 		}
@@ -173,6 +209,11 @@ void ScrollBar::OnMouseOver(unsigned short x, unsigned short y)
 		if(ta) {
 			TextArea * t = (TextArea*)ta;
 			t->SetRow(Pos);
+		}
+		if(Variable[0] != 0) {
+			char tmp[10];
+			sprintf(tmp, "%d", Pos);
+			core->GetDictionary()->SetAt(Variable, tmp);
 		}
 	}
 }
@@ -194,6 +235,11 @@ void ScrollBar::SetMax(unsigned short Max)
 	if(ta) {
 		TextArea * t = (TextArea*)ta;
 		t->SetRow(Pos);
+	}
+	if(Variable[0] != 0) {
+		char tmp[10];
+		sprintf(tmp, "%d", Pos);
+		core->GetDictionary()->SetAt(Variable, tmp);
 	}
 	Changed = true;
 }
