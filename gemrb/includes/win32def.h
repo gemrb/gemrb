@@ -26,6 +26,7 @@
 // abstract iteration position
 struct __POSITION { };
 typedef __POSITION* POSITION;
+#define BEFORE_START_POSITION ((POSITION)-1L)
 
 #define ADV_TEXT
 #define textcolor(i) i
