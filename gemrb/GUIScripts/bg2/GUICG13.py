@@ -32,7 +32,7 @@ def RefreshPDoll():
 	ResRef = GemRB.GetTableValue(PDollTable,hex(AnimID), "LEVEL1")
 
 	GemRB.SetButtonPLT(ColorWindow, PDollButton, ResRef,
-		Color2, Color1, Color3, 0,0 ,Color4,0,0)
+		Color2, Color1, 0, 0, 0 ,Color3,Color4,0)
 	return
 
 def OnLoad():
