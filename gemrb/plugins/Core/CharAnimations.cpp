@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.41 2004/08/23 23:37:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.42 2004/08/26 10:26:06 avenger_teambg Exp $
  *
  */
 
@@ -92,7 +92,20 @@ void CharAnimations::SetupColors(ieDword *arg)
                 return;
         }
 
-        if(NoPalette()) {
+	int PType = NoPalette();
+        if( PType) {
+		//handling special palettes like MBER_BL (black bear)
+		if (PType==1) 
+			return;
+		char PaletteResRef[8];
+		sprintf(PaletteResRef, "%4.4s_%2.2s",ResRef, (char *) &PType);
+		ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
+		if (bmp) {
+			DataStream* s = core->GetResourceMgr()->GetResource( PaletteResRef, IE_BMP_CLASS_ID );
+			bmp->Open( s, true);
+			bmp->GetPalette(0, 256, Palette);
+			core->FreeInterface( bmp );
+		}
                 return;
         }
         Color* MetalPal = core->GetPalette( Colors[0], 12 );
@@ -151,7 +164,17 @@ void CharAnimations::InitAvatarsTable()
 		strncpy(AvatarTable[i].Prefixes[3],Avatars->QueryField(i,AV_PREFIX4),8);
 		AvatarTable[i].AnimationType=atoi(Avatars->QueryField(i,AV_ANIMTYPE) );
 		AvatarTable[i].CircleSize=atoi(Avatars->QueryField(i,AV_CIRCLESIZE) );
-		AvatarTable[i].PaletteType=atoi(Avatars->QueryField(i,AV_USE_PALETTE) );
+		char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
+		//QueryField will always return a zero terminated string
+		//so tmp[0] must exist
+		if( isalpha (tmp[0]) ) {
+			//this is a hack, we store 2 letters on an integer
+			//it was allocated with calloc, so don't bother erasing it
+			strncpy( (char *) &AvatarTable[i].PaletteType, tmp, 2);
+		}
+		else {
+			AvatarTable[i].PaletteType=atoi(Avatars->QueryField(i,AV_USE_PALETTE) );
+		}
 	}
 	core->DelTable( tmp );
 }
@@ -218,10 +241,7 @@ CharAnimations::~CharAnimations(void)
 }
 /*This is a simple Idea of how the animation are coded
 
-If the Orientation Count is 9 (i.e. BG2/IWD2 Avatar animations)
-the 1-7 frames are mirrored to create the 9-14 frames.
-
-There are 4 Mirroring modes:
+There are the following animation types:
 
 IE_ANI_CODE_MIRROR: The code automatically mirrors the needed frames 
 			(as in the example above)
@@ -233,33 +253,36 @@ IE_ANI_CODE_MIRROR: The code automatically mirrors the needed frames
 			are created by Horizontally Mirroring the 1-7 Orientations.
 
 IE_ANI_ONE_FILE:	The whole animation is in one file, no mirroring needed.
+			Each animation group is 16 Cycles.
 
 IE_ANI_TWO_FILES:	The whole animation is in 2 files. The East and West part are in 2 BAM Files.
+			Example:
+			ACHKG1
+			ACHKG1E
+
+			Each BAM File contains many animation groups, each animation group
+			stores 5 Orientations, the missing 3 are stored in East BAM Files.
+
 
 IE_ANI_FOUR_FILES:	The Animation is coded in Four Files. Probably it is an old Two File animation with
 			additional frames added in a second time.
 
 IE_ANI_TWO_FILES_2:	This Animation Type stores the Animation in the following format
 			[NAME][ACTIONCODE][/E]
-
-			Example:
-			CMNK1A1		Character Monk AT1 Attack 1
-			CMNK1A1E	Character Monk AT1 Attack 1 East
-			
-			Each BAM File Stores one action and has 5 orientations, the Ease
-			file stores the East part of the Animation. Since these animations
-			have a total of 8 Orientations, these are automatically copied
-			by GemRB to use them as 16 Orientations.
+			ACTIONCODE=A1-9, CA, SX, SA, W2 (sling is A1)
+			The G1 file contains several animation states. See MHR
 
 IE_ANI_TWO_FILES_3:	Animations using this type was stored using the following template:
 			[NAME][ACTIONTYPE][/E]
 
 			Example:
-			ACHKG1
-			ACHKG1E
+			MBFI*
+			MBFI*E
 
-			Each BAM File contains many animation groups, each animation group
-			stores 5 Orientments, the missing 3 are stored in East BAM Files.
+			Each BAM File contains one animation group, each animation group
+			stores 5 Orientations though the files contain all 8 Cycles, the missing 3 are stored in East BAM Files in Cycle: Stance*8+ (5,6,7).
+			This is the standard IWD animation, but BG2 also has it.
+			See MMR
 
 IE_ANI_PST_ANIMATION_1:
 IE_ANI_PST_ANIMATION_2: Planescape: Torment Animations are stored in a different
@@ -316,6 +339,13 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 		case IE_ANI_PST_ANIMATION_2: //std->stc
 			if (StanceID==IE_ANI_AWAKE) {
 				StanceID=IE_ANI_READY;
+				break;
+			}
+			//fallthrough
+		case IE_ANI_PST_ANIMATION_1:
+			//pst animations don't twitch on death
+			if (StanceID==IE_ANI_DIE) {
+				StanceID=IE_ANI_SLEEP;
 			}
 			break;
 	}
@@ -354,8 +384,12 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 	//setting up the sequencing of animation cycles
 	switch (StanceID) {
 		case IE_ANI_SLEEP:
-		case IE_ANI_DIE:
+		case IE_ANI_TWITCH:
 			a->playOnce = true;
+			break;
+		case IE_ANI_DIE:
+			a->nextStanceID = IE_ANI_TWITCH;
+			a->autoSwitchOnEnd = true;
 			break;
 		case IE_ANI_WALK:
 		case IE_ANI_RUN:
@@ -370,6 +404,13 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			break;
 	}
 	switch (GetAnimType()) {
+		case IE_ANI_CODE_MIRROR_3: //bird animations
+			if (Orient > 8) {
+				core->GetVideoDriver()->MirrorAnimation( a );
+			}
+			Anims[StanceID][Orient] = a;
+			break;
+
 		case IE_ANI_CODE_MIRROR:
 			if (Orient > 8) {
 				core->GetVideoDriver()->MirrorAnimation( a );
@@ -452,6 +493,10 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 			AddVHRSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
+		case IE_ANI_CODE_MIRROR_3:
+			Cycle = StanceID * 9 + SixteenToNine[Orient];
+			break;
+
 		case IE_ANI_ONE_FILE:
 			Cycle = StanceID * 16 + Orient;
 			break;
@@ -460,13 +505,13 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 			AddMHRSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
-		case IE_ANI_TWO_FILES_3:
+		case IE_ANI_TWO_FILES_3: //IWD style anims
 			AddMMRSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
-		case IE_ANI_TWO_FILES: //5 orientations
+		case IE_ANI_TWO_FILES: 
 			//we have to fix this
-			Cycle = StanceID * 5 + Orient/2;
+			Cycle = StanceID * 8 + Orient / 2;
 			strcat( ResRef, "G1" );
 			if (Orient > 9) {
 				strcat( ResRef, "E" );
@@ -474,25 +519,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 			break;
 
 		case IE_ANI_FOUR_FILES:
-			Cycle = StanceID * 5 + Orient/2;
-			switch (StanceID) {
-				case IE_ANI_ATTACK:
-				case IE_ANI_ATTACK_BACKSLASH:
-				case IE_ANI_ATTACK_SLASH:
-				case IE_ANI_ATTACK_JAB:
-				case IE_ANI_CAST:
-				case IE_ANI_CONJURE:
-				case IE_ANI_SHOOT:
-					strcat( ResRef, "G2" );
-					break;
-
-				default:
-					strcat( ResRef, "G1" );
-					break;
-			}
-			if (Orient > 9) {
-				strcat( ResRef, "E" );
-			}
+			AddLRSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
@@ -542,6 +569,7 @@ void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 			Prefix="STC"; break;
 		case IE_ANI_DIE:
 		case IE_ANI_SLEEP:
+		case IE_ANI_TWITCH:
 			Prefix="DFB"; break;
 		case IE_ANI_RUN:
 			Prefix="RUN"; break;
@@ -558,7 +586,8 @@ void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)
 {
-	Cycle=SixteenToNine[Orient]+9*StanceID;
+	Cycle=SixteenToNine[Orient];
+
 	switch (StanceID) {
 		case IE_ANI_ATTACK_BACKSLASH:
 			strcat( ResRef, "G21" );
@@ -569,20 +598,33 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_ATTACK_JAB:
-			strcat( ResRef, "G22" );
+			strcat( ResRef, "G26" );
+			Cycle+=45;
 			break;
 
 		case IE_ANI_AWAKE:
 			strcat( ResRef, "G12" );
+			Cycle+=18;
+			break;
+
+		case IE_ANI_TWITCH:
+			strcat( ResRef, "G14" );
+			Cycle+=45;
 			break;
 
 		case IE_ANI_DIE:
+			strcat( ResRef, "G14" );
+			Cycle+=36;
+			break;
+
 		case IE_ANI_DAMAGE:
 			strcat( ResRef, "G14" );
+			Cycle+=27;
 			break;
 
 		case IE_ANI_READY:
 			strcat( ResRef, "G1" );
+			Cycle+=9;
 			break;
 
 		case IE_ANI_WALK:
@@ -877,6 +919,60 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 	}
 }
 
+void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	switch (StanceID) {
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_BACKSLASH:
+			strcat( ResRef, "G2" );
+			Cycle = Orient / 2;
+			break;
+		case IE_ANI_ATTACK_SLASH:
+			strcat( ResRef, "G2" );
+			Cycle = 8 + Orient / 2;
+			break;
+		case IE_ANI_ATTACK_JAB:
+			strcat( ResRef, "G2" );
+			Cycle = 16 + Orient / 2;
+			break;
+		case IE_ANI_CAST:
+		case IE_ANI_CONJURE:
+		case IE_ANI_SHOOT:
+			//these animations are missing
+			strcat( ResRef, "G2" );
+			Cycle = Orient / 2;
+			break;
+		case IE_ANI_WALK:
+			strcat( ResRef, "G1" );
+			Cycle = Orient / 2;
+			break;
+		case IE_ANI_READY:
+			strcat( ResRef, "G1" );
+			Cycle = 8 + Orient / 2;
+			break;
+		case IE_ANI_AWAKE:
+			strcat( ResRef, "G1" );
+			Cycle = 16 + Orient / 2;
+			break;
+		case IE_ANI_DAMAGE:
+			strcat( ResRef, "G1" );
+			Cycle = 24 + Orient / 2;
+			break;
+		case IE_ANI_DIE:
+			strcat( ResRef, "G1" );
+			Cycle = 32 + Orient / 2;
+			break;
+		case IE_ANI_TWITCH:
+			strcat( ResRef, "G1" );
+			Cycle = 40 + Orient / 2;
+			break;
+	}
+	if (Orient > 9) {
+		strcat( ResRef, "E" );
+	}
+}
+
 void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)
 {
@@ -935,7 +1031,7 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_SLEEP:
-			strcat( ResRef, "TW" );
+			strcat( ResRef, "SL" );
 			Cycle = ( Orient / 2 );
 			break;
 
