@@ -77,6 +77,7 @@ def OnLoad():
 	DoneButton = GemRB.GetControl(RaceWindow,0)
 	GemRB.SetText(RaceWindow,DoneButton,11973)
 	GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(RaceWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(RaceWindow, 6)
 	GemRB.SetText(RaceWindow,TextAreaControl, GemRB.GetTableValue(RaceTable, RaceName, "DESC_REF"))

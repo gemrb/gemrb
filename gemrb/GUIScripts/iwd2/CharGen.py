@@ -56,7 +56,7 @@ def OnLoad():
 	GemRB.SetButtonState(CharGenWindow,BackButton,IE_GUI_BUTTON_DISABLED)
 	
 	AcceptButton = GemRB.GetControl(CharGenWindow, 8)
-	GemRB.SetText(CharGenWindow, AcceptButton, 11962)
+	GemRB.SetText(CharGenWindow, AcceptButton, 28210)
 	GemRB.SetButtonState(CharGenWindow,AcceptButton,IE_GUI_BUTTON_DISABLED)
 	
 	ImportButton = GemRB.GetControl(CharGenWindow, 13)

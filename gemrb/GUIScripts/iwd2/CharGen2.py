@@ -2,14 +2,27 @@
 import GemRB
 
 CharGenWindow = 0
+StartOverWindow = 0
 TextAreaControl = 0
 
 def OnLoad():
-	global CharGenWindow, TextAreaControl
+	global CharGenWindow, StartOverWindow, TextAreaControl
 
 	GemRB.SetVar("Race",0) #race
 
 	GemRB.LoadWindowPack("GUICG")
+	StartOverWindow  = GemRB.LoadWindow(53)
+	YesButton = GemRB.GetControl(StartOverWindow,0)
+	GemRB.SetText(StartOverWindow, YesButton, 13912)
+	GemRB.SetEvent(StartOverWindow, YesButton, IE_GUI_BUTTON_ON_PRESS,"CancelPress")
+
+	NoButton = GemRB.GetControl(StartOverWindow,1)
+	GemRB.SetText(StartOverWindow, NoButton, 13913)
+	GemRB.SetEvent(StartOverWindow, NoButton, IE_GUI_BUTTON_ON_PRESS,"NoExitPress")
+
+	TextAreaControl = GemRB.GetControl(StartOverWindow, 2)
+	GemRB.SetText(StartOverWindow, TextAreaControl, 40275)
+
         CharGenWindow = GemRB.LoadWindow(0)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -77,7 +90,7 @@ def OnLoad():
 	else:
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 1051)
 
-        GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+        GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "StartOverPress")
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
         GemRB.SetEvent(CharGenWindow, RaceButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 	GemRB.SetVisible(CharGenWindow,1)
@@ -85,16 +98,28 @@ def OnLoad():
 	
 def NextPress():
         GemRB.UnloadWindow(CharGenWindow)
+        GemRB.UnloadWindow(StartOverWindow)
 	GemRB.SetNextScript("Race") #race
+	return
+
+def StartOverPress():
+	GemRB.SetVisible(StartOverWindow,1)
+	return
+
+def NoExitPress():
+	GemRB.SetVisible(StartOverWindow,0)
+	GemRB.SetVisible(CharGenWindow,1)
 	return
 
 def CancelPress():
         GemRB.UnloadWindow(CharGenWindow)
+        GemRB.UnloadWindow(StartOverWindow)
         GemRB.SetNextScript("CharGen")
         return
 
 def BackPress():
         GemRB.UnloadWindow(CharGenWindow)
+        GemRB.UnloadWindow(StartOverWindow)
 	GemRB.SetNextScript("CharGen") #appearance
 	return
 

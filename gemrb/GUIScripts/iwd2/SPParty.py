@@ -26,6 +26,7 @@ def OnLoad():
 	DoneButton = GemRB.GetControl(PartySelectWindow, 10)
 	GemRB.SetEvent(PartySelectWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	GemRB.SetText(PartySelectWindow, DoneButton, 11973)
+	GemRB.SetButtonFlags(PartySelectWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 	
 	GemRB.SetVar("PartyIdx",0)
 	GemRB.SetVar("TopIndex",0)
