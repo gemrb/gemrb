@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.4 2003/11/27 22:00:43 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.5 2003/11/29 10:28:30 balrog994 Exp $
  *
  */
 
@@ -46,9 +46,9 @@ bool TISImp::Open(DataStream * stream, bool autoFree)
 	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read(Signature, 1);
+	str->Seek(-1, GEM_CURRENT_POS);
 	headerShift = 0;
 	if(Signature[0] == 'T') {
-		str->Seek(-1, GEM_CURRENT_POS);
 		str->Read(Signature, 8);	
 		if(strncmp(Signature, "TIS V1  ", 8) != 0) {
 			printf("[TISImporter]: Not a Valid TIS File.\n");
