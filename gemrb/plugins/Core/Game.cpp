@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.4 2003/12/09 20:54:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.5 2003/12/15 09:20:24 balrog994 Exp $
  *
  */
 
@@ -36,29 +36,29 @@ Game::~Game(void)
 	}
 }
 
-ActorBlock* Game::GetPC(int slot)
+Actor* Game::GetPC(unsigned int slot)
 {
 	if(slot >= PCs.size())
 		return NULL;
 	return PCs[slot];
 }
-int Game::SetPC(ActorBlock *pc)
+int Game::SetPC(Actor *pc)
 {
 	PCs.push_back(pc);
-	return PCs.size()-1;
+	return (int)PCs.size()-1;
 }
-int Game::DelPC(int slot, bool autoFree)
+int Game::DelPC(unsigned int slot, bool autoFree)
 {
 	if(slot >= PCs.size())
 		return -1;
-	if(!PCs[slot]->actor)
+	if(!PCs[slot])
 		return -1;
 	if(autoFree)
-		delete(PCs[slot]->actor);
-	PCs[slot]->actor = NULL;
+		delete(PCs[slot]);
+	PCs[slot] = NULL;
 	return 0;
 }
-Map * Game::GetMap(int index)
+Map * Game::GetMap(unsigned int index)
 {
 	if(index >= Maps.size())
 		return NULL;
@@ -69,13 +69,13 @@ int Game::AddMap(Map* map)
 	for(size_t i = 0; i < Maps.size(); i++) {
 		if(!Maps[i]) {
 			Maps[i] = map;
-			return i;
+			return (int)i;
 		}
 	}
 	Maps.push_back(map);
-	return Maps.size()-1;
+	return (int)Maps.size()-1;
 }
-int Game::DelMap(int index, bool autoFree)
+int Game::DelMap(unsigned int index, bool autoFree)
 {
 	if(index >= Maps.size())
 		return -1;

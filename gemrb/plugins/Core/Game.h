@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.3 2003/12/12 23:10:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.4 2003/12/15 09:20:24 balrog994 Exp $
  *
  */
 
@@ -35,7 +35,7 @@
 #endif
 
 #include <vector>
-#include "ActorBlock.h"
+#include "Actor.h"
 #include "Map.h"
 
 class GEM_EXPORT Game
@@ -44,15 +44,15 @@ public:
 	Game(void);
 	~Game(void);
 private:
-	std::vector<ActorBlock*> PCs;
+	std::vector<Actor*> PCs;
 	std::vector<Map*> Maps;
 public:
-	ActorBlock* GetPC(int slot);
-	int SetPC(ActorBlock *pc);
-	int DelPC(int slot, bool autoFree = false);
-	Map * GetMap(int index);
+	Actor* GetPC(unsigned int slot);
+	int SetPC(Actor *pc);
+	int DelPC(unsigned int slot, bool autoFree = false);
+	Map * GetMap(unsigned int index);
 	int AddMap(Map* map);
-	int DelMap(int index, bool autoFree = false);
+	int DelMap(unsigned int index, bool autoFree = false);
 };
 
 #endif
