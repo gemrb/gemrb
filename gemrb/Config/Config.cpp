@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.10 2004/02/24 22:20:43 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.11 2004/07/21 20:28:50 guidoj Exp $
  *
  */
 
@@ -23,7 +23,6 @@
 
 #ifdef WIN32
 #include "windows.h"
-
 HANDLE hConsole;
 #endif
 
@@ -132,7 +131,7 @@ int main(int argc, char** argv)
 
 void MainMenu()
 {
-	int choice;
+	unsigned int choice;
 	for (int i = 2; i < 20; i++) {
 		gotoxy( 0, i );
 		ClearLine();
@@ -193,12 +192,12 @@ void NewConfig()
 		case 0:
 			//Select Game Type
 			 {
-				int choice;
+				unsigned int choice;
 
 				gotoxy( 0, 4 );
 				printf( "Select a Game Type from the following list:" );
 				gotoxy( 0, 6 );
-				for (int i = 0; i < games.size(); i++) {
+				for (unsigned int i = 0; i < games.size(); i++) {
 					printf( "%d. %s\n", i + 1, games[i].Name );
 				}
 
@@ -207,7 +206,8 @@ void NewConfig()
 				gotoxy( 0, 13 );
 				printf( "Choose: " );
 				choice = getchar();
-				if (( choice <= '0' ) || ( choice > ( 0x30 + games.size() ) )) {
+				if (( choice <= 0x30 ) ||
+				    ( choice > ( 0x30 + games.size() ) )) {
 					goto sgt_ask;
 				}
 				newGame = games[choice - 0x31];
@@ -234,7 +234,7 @@ void NewConfig()
 				printf( "GamePath=" );
 				//if(!scanf("%[^]\n", GamePath))
 				//	goto gp_ask;
-				gets( newGame.GamePath );
+				fgets( newGame.GamePath, _MAX_PATH, stdin );
 				if (newGame.GamePath[0] == 0)
 					goto gp_ask;
 
@@ -267,7 +267,7 @@ void NewConfig()
 
 				//if(!scanf("%[^]\n", GamePath))
 				//	goto gp_ask;
-				gets( Choose );
+				fgets( Choose, _MAX_PATH, stdin );
 				if (Choose[0] == 0)
 					goto gocd_ask;
 
@@ -372,6 +372,7 @@ void InitGames()
 		""}					//CD6
 
 	};
+	games.push_back( bg2 );
 	GameStruct tob = {
 		"Throne of Bhaal",	//Name
 		"tob",				//GameType
@@ -561,7 +562,6 @@ void InitGames()
 
 void AskCDPath(GameStruct* game, int disk)
 {
-	struct stat st;
 	char CDPath[_MAX_PATH], tmp[_MAX_PATH], CDNum[_MAX_PATH];
 	sprintf( CDNum, "CD%d", disk );
 	for (int i = 4; i <= 20; i++) {
@@ -578,7 +578,7 @@ void AskCDPath(GameStruct* game, int disk)
 	printf( "%s=", CDNum );
 	//if(!scanf("%[^]\n", GamePath))
 	//	goto gp_ask;
-	gets( CDPath );
+	fgets( CDPath, _MAX_PATH, stdin );
 	if (CDPath[0] == 0) {
 		goto ad_ask;
 	}
@@ -637,4 +637,5 @@ int WriteConfig(GameStruct* game, char* file)
 		fprintf( c, "CD%d=%s\n", i + 1, game->CDs[i] );
 	}
 	fclose( c );
+	return 0;
 }
