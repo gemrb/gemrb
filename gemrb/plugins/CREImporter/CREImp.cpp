@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.10 2003/11/25 20:56:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.11 2003/11/25 21:48:10 avenger_teambg Exp $
  *
  */
 
@@ -223,7 +223,7 @@ Actor * CREImp::GetActor()
 
 		case IE_CRE_V2_2:
 			{
-			
+				str->Seek(21,GEM_CURRENT_POS);
 			}
 		break;
 
@@ -246,9 +246,43 @@ Actor * CREImp::GetActor()
 			str->Seek(6, GEM_CURRENT_POS);
 			}
 		break;
-
-		str->Seek(0x1ED, GEM_CURRENT_POS);
+		str->Read(&act->BaseStats[IE_TRACKING],1);
+		str->Seek(32,GEM_CURRENT_POS);
+		str->Read(&act->StrRefs[0],100*4);
+		str->Read(&act->BaseStats[IE_LEVEL],4);
+		str->Read(&act->BaseStats[IE_LEVEL2],4);
+		str->Read(&act->BaseStats[IE_LEVEL3],4);
+		str->Seek(1,GEM_CURRENT_POS);
+		str->Read(&act->BaseStats[IE_STR],1);
+		str->Read(&act->BaseStats[IE_STREXTRA],1);
+		str->Read(&act->BaseStats[IE_INT],1);
+		str->Read(&act->BaseStats[IE_WIS],1);
+		str->Read(&act->BaseStats[IE_DEX],1);
+		str->Read(&act->BaseStats[IE_CON],1);
+		str->Read(&act->BaseStats[IE_CHR],1);
+		str->Read(&act->Modified[IE_MORALEBREAK],1);
+		str->Read(&act->BaseStats[IE_MORALEBREAK],1);
+		str->Read(&act->BaseStats[IE_HATEDRACE],1);
+		str->Read(&act->BaseStats[IE_MORALERECOVERYTIME],1);
+		str->Seek(1,GEM_CURRENT_POS);
+		str->Read(&act->BaseStats[IE_KIT],4);
+		str->Read(&act->Scripts[0],8);
+		str->Read(&act->Scripts[1],8);
+		str->Read(&act->Scripts[2],8);
+		str->Read(&act->Scripts[3],8);
+		str->Read(&act->Scripts[4],8);
 		str->Read(&act->BaseStats[IE_EA], 1);
+		str->Read(&act->BaseStats[IE_GENERAL], 1);
+		str->Read(&act->BaseStats[IE_RACE], 1);
+		str->Read(&act->BaseStats[IE_CLASS], 1);
+		str->Read(&act->BaseStats[IE_SPECIFIC], 1);
+		str->Read(&act->BaseStats[IE_SEX], 1);
+		str->Seek(5,GEM_CURRENT_POS);
+		str->Read(&act->BaseStats[IE_ALIGNMENT], 1);
+		str->Seek(4,GEM_CURRENT_POS);
+		str->Read(&act->ScriptName, 32);
+		str->Seek(44,GEM_CURRENT_POS);
+		str->Read(&act->Dialog, 8);
 	}
 	act->SetAnimationID(act->BaseStats[IE_ANIMATION_ID]);
 	if(act->anims)
