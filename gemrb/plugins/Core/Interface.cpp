@@ -282,7 +282,7 @@ int Interface::Init()
 	{
 	char ini_path[_MAX_PATH];
 	strcpy(ini_path,GamePath);
-	strcat(ini_path,"baldur.ini");
+	strcat(ini_path,INIConfig);
 	LoadINI(ini_path);
 	}
 	printStatus("OK", LIGHT_GREEN);
@@ -505,6 +505,9 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "GamePath") == 0) {
 			strcpy(GamePath, value);
+		}
+		else if(stricmp(name, "INIConfig") == 0) {
+			strcpy(INIConfig, value);
 		}
 		else if(stricmp(name, "CD1") == 0) {
 			strcpy(CD1, value);
