@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.13 2003/11/28 21:22:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.14 2003/11/29 17:30:32 avenger_teambg Exp $
  *
  */
 
@@ -44,7 +44,8 @@ bool MUSImp::Init()
 /** Loads a PlayList for playing */
 bool MUSImp::OpenPlaylist(const char * name)
 {
-	if(stricmp(name, PLName) == 0)
+	int len=strlen(PLName);
+	if(strnicmp(name, PLName, len) == 0)
 		return true;
 	if(Playing)
 		return false;
