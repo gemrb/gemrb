@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.26 2003/12/22 23:26:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.27 2003/12/23 19:46:56 avenger_teambg Exp $
  *
  */
 
@@ -28,10 +28,15 @@
 #include "../Core/FileStream.h"
 #include "../Core/ImageMgr.h"
 
-#define DEF_OPEN  0
-#define DEF_CLOSE 1
+#define DEF_OPEN   0
+#define DEF_CLOSE  1
+#define DEF_HOPEN  2
+#define DEF_HCLOSE 3
 
-#define DEF_COUNT 2
+#define DEF_COUNT 4
+
+#define DOOR_HIDDEN 128
+
 static char Sounds[DEF_COUNT][9]={-1};
 
 AREImp::AREImp(void)
@@ -210,9 +215,17 @@ Map * AREImp::GetMap()
 		door->Cursor = cursor;
 		//Leave the default sound untouched
 		if(OpenResRef[0]) memcpy(door->OpenSound, OpenResRef, 9);
-		else memcpy(door->OpenSound,Sounds[DEF_OPEN],9);
+		else
+		{
+			if(Flags&DOOR_HIDDEN) memcpy(door->OpenSound,Sounds[DEF_HOPEN],9);
+			else memcpy(door->OpenSound,Sounds[DEF_OPEN],9);
+		}
 		if(CloseResRef[0]) memcpy(door->CloseSound, CloseResRef, 9);
-		else memcpy(door->CloseSound,Sounds[DEF_CLOSE],9);
+		else
+		{
+			if(Flags&DOOR_HIDDEN) memcpy(door->CloseSound,Sounds[DEF_HCLOSE],9);
+			else memcpy(door->CloseSound,Sounds[DEF_CLOSE],9);
+		}
 	}
 	//Loading Containers
 	for(int i = 0; i < ContainersCount; i++) {

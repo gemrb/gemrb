@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.46 2003/12/21 18:36:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.47 2003/12/23 19:46:57 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,8 @@ extern Interface * core;
 #define SND_BUTTON_RELEASE0 1
 #define SND_BUTTON_RELEASE1 2
 
+#define DEF_BUTTON1 4
+
 static char ButtonSounds[3][9]={"GAM_09\0\0","GAM_03\0\0","GAM_04\0\0"};
 static bool ButtonInited=false;
 
@@ -40,7 +42,7 @@ Button::Button(bool Clear){
 			TableMgr * tm = core->GetTable(soundtable);
 			if(tm) {
 				for(int i=0;i<3;i++) {
-					strncpy(ButtonSounds[i],tm->QueryField(i+2,0), 8 );
+					strncpy(ButtonSounds[i],tm->QueryField(i+DEF_BUTTON1,0), 8 );
 				}
 				core->DelTable(soundtable);
 			}
