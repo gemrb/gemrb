@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.1 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.2 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -237,9 +237,9 @@ libMUSImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl
 
 #>- libMUSImporter_la_METASOURCES = AUTO
 
-libMUSImporter_la_SOURCES = MUSImp.cpp 
+libMUSImporter_la_SOURCES = MUSImporter.cpp MUSImpCD.cpp MUSImp.cpp 
 
-EXTRA_DIST = MUSImp.cpp MUSImp.h 
+EXTRA_DIST = MUSImp.cpp MUSImp.h MUSImpCD.cpp MUSImpCD.h MUSImporter.cpp 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -250,9 +250,12 @@ DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I../../..
 CPPFLAGS = 
 LIBS = 
 libMUSImporter_la_LIBADD = 
-#>- libMUSImporter_la_OBJECTS =  MUSImp.lo
-#>+ 1
-libMUSImporter_la_OBJECTS = MUSImp.lo
+#>- libMUSImporter_la_OBJECTS =  MUSImporter.lo MUSImpCD.lo MUSImp.lo
+#>+ 4
+libMUSImporter_la_final_OBJECTS = libMUSImporter_la.all_cpp.lo 
+libMUSImporter_la_nofinal_OBJECTS = MUSImporter.lo MUSImpCD.lo MUSImp.lo
+libMUSImporter_la_OBJECTS = $(libMUSImporter_la_nofinal_OBJECTS)
+#libMUSImporter_la_OBJECTS = $(libMUSImporter_la_final_OBJECTS)
 CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
 #>- CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 #>+ 1
@@ -271,11 +274,11 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-#>- DEP_FILES =  .deps/MUSImp.P
+#>- DEP_FILES =  .deps/MUSImp.P .deps/MUSImpCD.P .deps/MUSImporter.P
 #>+ 4
 #DEP_FILES =   $(DEPDIR)/libMUSImporter_la.all_cpp.P \
-		  .deps/MUSImp.P
-DEP_FILES =    .deps/MUSImp.P
+		  .deps/MUSImp.P .deps/MUSImpCD.P .deps/MUSImporter.P
+DEP_FILES =    .deps/MUSImp.P .deps/MUSImpCD.P .deps/MUSImporter.P
 
 SOURCES = $(libMUSImporter_la_SOURCES)
 OBJECTS = $(libMUSImporter_la_OBJECTS)
@@ -567,11 +570,11 @@ force-reedit:
 
 
 #>+ 11
-libMUSImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/MUSImp.cpp  
+libMUSImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/MUSImporter.cpp $(srcdir)/MUSImpCD.cpp $(srcdir)/MUSImp.cpp  
 	@echo 'creating libMUSImporter_la.all_cpp.cpp ...'; \
 	rm -f libMUSImporter_la.all_cpp.files libMUSImporter_la.all_cpp.final; \
 	echo "#define KDE_USE_FINAL 1" >> libMUSImporter_la.all_cpp.final; \
-	for file in MUSImp.cpp ; do \
+	for file in MUSImporter.cpp MUSImpCD.cpp MUSImp.cpp ; do \
 	  echo "#include \"$$file\"" >> libMUSImporter_la.all_cpp.files; \
 	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libMUSImporter_la.all_cpp.final; \
 	done; \
@@ -584,16 +587,16 @@ clean-final:
 
 #>+ 2
 final:
-	$(MAKE) all-am
+	$(MAKE) libMUSImporter_la_OBJECTS="$(libMUSImporter_la_final_OBJECTS)" all-am
 #>+ 2
 final-install:
-	$(MAKE) install-am
+	$(MAKE) libMUSImporter_la_OBJECTS="$(libMUSImporter_la_final_OBJECTS)" install-am
 #>+ 2
 no-final:
-	$(MAKE) all-am
+	$(MAKE) libMUSImporter_la_OBJECTS="$(libMUSImporter_la_nofinal_OBJECTS)" all-am
 #>+ 2
 no-final-install:
-	$(MAKE) install-am
+	$(MAKE) libMUSImporter_la_OBJECTS="$(libMUSImporter_la_nofinal_OBJECTS)" install-am
 #>+ 3
 cvs-clean:
 	$(MAKE) -f $(top_srcdir)/admin/Makefile.common cvs-clean

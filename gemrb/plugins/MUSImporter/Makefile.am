@@ -12,9 +12,9 @@ libMUSImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl
 
 libMUSImporter_la_METASOURCES = AUTO
 
-libMUSImporter_la_SOURCES = MUSImp.cpp 
+libMUSImporter_la_SOURCES = MUSImporter.cpp MUSImpCD.cpp MUSImp.cpp 
 
 
-EXTRA_DIST = MUSImp.cpp MUSImp.h 
+EXTRA_DIST = MUSImp.cpp MUSImp.h MUSImpCD.cpp MUSImpCD.h MUSImporter.cpp 
 
 ####### kdevelop will overwrite this part!!! (end)############
