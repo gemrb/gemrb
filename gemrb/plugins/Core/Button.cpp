@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.82 2005/02/24 17:45:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.83 2005/03/18 20:01:19 avenger_teambg Exp $
  *
  */
 
@@ -76,10 +76,6 @@ Button::Button(bool Clear)
 	Picture = NULL;
 	Picture2 = NULL;
 	anim = NULL;
-	//MOS Draggable Stuff
-	Dragging = false;
-	ScrollX = 0;
-	ScrollY = 0;
 	Clipping = 1.0;
 	memset( borders, 0, sizeof( borders ));
 }
@@ -213,21 +209,16 @@ void Button::Draw(unsigned short x, unsigned short y)
 
 	// Button picture
 	if (Picture && ( Flags & IE_GUI_BUTTON_PICTURE )) {
-		if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
-			Region r( XPos, YPos, Width, Height );
-			core->GetVideoDriver()->BlitSprite( Picture, XPos + ScrollX, YPos + ScrollY, true, &r );
-		} else {
-			int h = Picture->Height;
-			if (Picture2) {
-				h += Picture2->Height;
-			}
-			short xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
-			short yOffs = ( Height / 2 ) - ( h / 2 );
-			Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), h );
-			core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
-			if (Picture2) {
-				core->GetVideoDriver()->BlitSprite( Picture2, x + XPos + xOffs, y + YPos + yOffs + Picture->Height, true, &r );
-			}
+		int h = Picture->Height;
+		if (Picture2) {
+			h += Picture2->Height;
+		}
+		short xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
+		short yOffs = ( Height / 2 ) - ( h / 2 );
+		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), h );
+		core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+		if (Picture2) {
+			core->GetVideoDriver()->BlitSprite( Picture2, x + XPos + xOffs, y + YPos + yOffs + Picture->Height, true, &r );
 		}
 	}
 
@@ -327,7 +318,7 @@ void Button::OnSpecialKeyPress(unsigned char Key)
 }
 
 /** Mouse Button Down */
-void Button::OnMouseDown(unsigned short x, unsigned short y,
+void Button::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/,
 	unsigned char Button, unsigned short /*Mod*/)
 {
 	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
@@ -344,11 +335,6 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		if (Flags & IE_GUI_BUTTON_SOUND) {
 			core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_PRESSED] );
 		}
-		if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
-			Dragging = true;
-			DragX = x;
-			DragY = y;
-		}
 	}
 }
 /** Mouse Button Up */
@@ -361,9 +347,6 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	if (core->GetDraggedItem () && !ButtonOnDragDrop[0])
 		return;
 
-	if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
-		Dragging = false;
-	}
 	if (State == IE_GUI_BUTTON_PRESSED) {
 		if (ToggleState) {
 			SetState( IE_GUI_BUTTON_SELECTED );
@@ -418,7 +401,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	}
 }
 
-void Button::OnMouseOver(unsigned short x, unsigned short y)
+void Button::OnMouseOver(unsigned short /*x*/, unsigned short /*y*/)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
@@ -430,24 +413,7 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	}
 
-	if (Dragging) {
-		ScrollX += ( x - DragX );
-		ScrollY += ( y - DragY );
-		if (ScrollX < ( -Picture->Width ))
-			ScrollX = -Picture->Width;
-		if (ScrollY < ( -Picture->Height ))
-			ScrollY = -Picture->Height;
-		if (ScrollX > 0)
-			ScrollX = 0;
-		if (ScrollY > 0)
-			ScrollY = 0;
-		Changed = true;
-	}
-	if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
-		( ( Window * ) Owner )->Cursor = 44;
-	} else {
-		( ( Window * ) Owner )->Cursor = 0;
-	}
+	( ( Window * ) Owner )->Cursor = 0;
 }
 
 void Button::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
@@ -579,6 +545,7 @@ void Button::SetPicture(Sprite2D* newpic)
 	}
 	Picture = newpic;
 	Changed = true;
+	Flags |= IE_GUI_BUTTON_PICTURE;
 	( ( Window * ) Owner )->Invalidate();
 }
 

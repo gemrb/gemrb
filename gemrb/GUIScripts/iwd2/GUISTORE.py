@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUISTORE.py,v 1.7 2005/03/09 20:08:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUISTORE.py,v 1.8 2005/03/18 20:01:18 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -265,7 +265,7 @@ def OpenStoreStealWindow ():
 		Button = GemRB.GetControl (Window, i+4)
 		GemRB.SetVarAssoc (Window, Button, "LeftIndex", j)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateStoreStealWindow")
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RedrawStoreStealWindow")
 
 		Button = GemRB.GetControl (Window, i+11)
 		GemRB.SetVarAssoc (Window, Button, "RightIndex", j)
@@ -683,7 +683,7 @@ def UpdateStoreStealWindow ():
 	inventory_slots = GemRB.GetSlots (pc, -1)
 	RightCount = len(inventory_slots)
 	ScrollBar = GemRB.GetControl (Window, 10)
-	GemRB.SetVarAssoc (Window, ScrollBar, "RightIndex", RightCount-3)
+	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", RightCount-3)
 	RedrawStoreStealWindow ()
 
 
@@ -701,8 +701,8 @@ def RedrawStoreStealWindow ():
 	RightCount = len(inventory_slots)
 	for i in range(4):
 		Slot = GemRB.GetStoreItem (i+LeftTopIndex)
-		Button = GemRB.GetControl (Window, i+8)
-		Label = GemRB.GetControl (Window, 0x1000000c+i)
+		Button = GemRB.GetControl (Window, i+4)
+		Label = GemRB.GetControl (Window, 0x1000000f+i)
 		if Slot != None:
 			Flags = GemRB.IsValidStoreItem (pc, i+LeftTopIndex, 1)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
@@ -710,7 +710,6 @@ def RedrawStoreStealWindow ():
 			GemRB.SetItemIcon (Window,Button, Slot['ItemResRef'],0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
-			Price = Item['Price'] * Store['SellMarkup'] / 100;
 			if Flags & 8:
 				if i==LeftIndex:
 					GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
@@ -720,7 +719,7 @@ def RedrawStoreStealWindow ():
 				GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
 			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
-			GemRB.SetToken ("ITEMCOST", str(Price) )
+			GemRB.SetToken ("ITEMCOST", str(Slot['Price']) )
 			GemRB.SetText (Window, Label, 10162)
 		else:
 			GemRB.SetVarAssoc (Window, Button, "LeftIndex", -1)

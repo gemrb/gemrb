@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.39 2004/12/14 16:20:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.40 2005/03/18 20:01:20 avenger_teambg Exp $
  *
  */
 
@@ -42,7 +42,6 @@
 #define IE_GUI_BUTTON_CHECKBOX     0x00000010   // or radio button
 #define IE_GUI_BUTTON_RADIOBUTTON  0x00000020   // sticks in a state
 #define IE_GUI_BUTTON_DEFAULT      0x00000040   // enter button triggers it
-#define IE_GUI_BUTTON_DRAGGABLE    0x00000080
 
 //these bits are hardcoded in the .chu structure
 #define IE_GUI_BUTTON_ALIGN_LEFT   0x00000100
@@ -191,11 +190,7 @@ private: // Private attributes
 	unsigned char State;
 	/** Display Flags, justification */
 	unsigned long Flags;
-	/** MOS Draggable Variables */
-	unsigned short ScrollX, ScrollY;
-	bool Dragging;
 	double Clipping;
-	unsigned short DragX, DragY; //Starting Dragging Positions
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
 	bool IsPixelTransparent (unsigned short x, unsigned short y);

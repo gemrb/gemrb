@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.30 2005/03/16 01:42:49 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.31 2005/03/18 20:01:02 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -30,7 +30,6 @@ IE_GUI_BUTTON_ALT_SOUND  = 0x00000008
 IE_GUI_BUTTON_CHECKBOX   = 0x00000010   #or radio button
 IE_GUI_BUTTON_RADIOBUTTON= 0x00000020   #sticks in a state
 IE_GUI_BUTTON_DEFAULT    = 0x00000040   #enter button triggers it
-IE_GUI_BUTTON_DRAGGABLE  = 0x00000080
 
 #these bits are hardcoded in the .chu structure, don't move them
 IE_GUI_BUTTON_ALIGN_LEFT = 0x00000100

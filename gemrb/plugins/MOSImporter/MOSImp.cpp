@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.11 2005/02/09 16:36:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.12 2005/03/18 20:01:22 avenger_teambg Exp $
  *
  */
 
@@ -150,7 +150,7 @@ Sprite2D* MOSImp::GetImage()
 	Sprite2D* ret = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
 		0xff000000, 0x00ff0000, 0x0000ff00, 0x00000000,
 		pixels, true, 0x00ff0000 );
-	ret->XPos = ret->YPos = 0;
+	//ret->XPos = ret->YPos = 0;
 	return ret;
 }
 /** No descriptions */

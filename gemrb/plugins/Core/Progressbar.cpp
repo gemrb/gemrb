@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.13 2004/11/18 23:32:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.14 2005/03/18 20:01:20 avenger_teambg Exp $
  *
  */
 
@@ -68,7 +68,7 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 	}
 	Sprite2D *bcksprite;
 
-	if((Value >= 100) && KnobStepsCount) {
+	if((Value >= 100) && KnobStepsCount && BackGround2) {
 		bcksprite=BackGround2; //animated progbar end stage
 	}
 	else {
