@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.27 2004/07/25 11:38:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.28 2004/08/01 15:35:04 avenger_teambg Exp $
  *
  */
 
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 	core->GetVideoDriver()->SetDisplayTitle( core->GameName, core->GameType );
 	Font* fps = core->GetFont( ( unsigned int ) 0 );
 	char fpsstring[_MAX_PATH];
-	Color fpscolor = {0xff,0xff,0xff,0x00}, fpsblack = {0x00,0x00,0x00,0x00};
+	Color fpscolor = {0xff,0xff,0xff,0xff}, fpsblack = {0x00,0x00,0x00,0xff};
 	unsigned long frame = 0, time, timebase;
 	GetTime(timebase);
 	double frames = 0.0;

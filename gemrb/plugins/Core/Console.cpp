@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.14 2004/05/09 17:36:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.15 2004/08/01 15:35:06 avenger_teambg Exp $
  *
  */
 
@@ -53,7 +53,7 @@ void Console::Draw(unsigned short x, unsigned short y)
 		core->GetVideoDriver()->BlitSprite( Back, 0, y, true );
 	}
 	Color black = {
-		0x00, 0x00, 0x00, 0x00
+		0x00, 0x00, 0x00, 0xff
 	};
 	Region r( x + XPos, y + YPos, Width, Height );
 	core->GetVideoDriver()->DrawRect( r, black );

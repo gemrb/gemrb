@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.75 2004/07/26 22:06:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.76 2004/08/01 15:35:07 avenger_teambg Exp $
  *
  */
 
@@ -997,8 +997,24 @@ void SDLVideoDriver::DrawRect(Region& rgn, Color& color, bool fill, bool clipped
 		rgn.x, rgn.y, rgn.w, rgn.h
 	};
 	if (fill) {
-		long val = SDL_MapRGBA( backBuf->format, color.r, color.g, color.b, color.a );
-		SDL_FillRect( backBuf, &drect, val );
+//		long val = SDL_MapRGBA( backBuf->format, color.r, color.g, color.b, color.a );
+//		SDL_FillRect( backBuf, &drect, val );
+		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
+			return;
+		} else if ( SDL_ALPHA_OPAQUE == color.a ) {
+			long val = SDL_MapRGBA( backBuf->format, color.r, color.g, color.b, color.a );
+			SDL_FillRect( backBuf, &drect, val );
+		} else {
+			SDL_Surface * rectsurf = SDL_CreateRGBSurface( SDL_HWSURFACE | SDL_SRCALPHA, rgn.w, rgn.h, 8, 0, 0, 0, 0 );
+			SDL_Color c;
+			c.r = color.r;
+			c.b = color.b;
+			c.g = color.g;
+			SDL_SetPalette( rectsurf, SDL_LOGPAL, &c, 0, 1 );
+			SDL_SetAlpha( rectsurf, SDL_SRCALPHA | SDL_RLEACCEL, color.a );
+			SDL_BlitSurface( rectsurf, NULL, backBuf, &drect );
+			SDL_FreeSurface( rectsurf );
+		}
 	} else {
 		DrawHLine( rgn.x, rgn.y, rgn.x + rgn.w - 1, color, clipped );
 		DrawVLine( rgn.x, rgn.y, rgn.y + rgn.h - 1, color, clipped );
