@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.31 2005/02/24 22:09:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.32 2005/02/24 22:18:59 avenger_teambg Exp $
  *
  */
 
@@ -62,7 +62,7 @@ unsigned char pl_lowercase[256];
 void strnuprcpy(char* dest, const char *source, int count)
 {
 	while(count--) {
-		*dest++ = pl_uppercase[*source];
+		*dest++ = pl_uppercase[(unsigned char) *source];
 		if(!*source++) return;
 	}
 	*dest=0;
