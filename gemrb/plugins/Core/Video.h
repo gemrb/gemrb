@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.14 2003/11/26 13:54:57 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.15 2003/11/26 20:22:23 balrog994 Exp $
  *
  */
 
@@ -69,6 +69,8 @@ public:
 	virtual void DrawCircle(unsigned short cx, unsigned short cy, unsigned short r, Color &color) = 0;
 	/** This functions Draws an Ellipse */
 	virtual void DrawEllipse(unsigned short cx, unsigned short cy, unsigned short xr, unsigned short yr, Color &color) = 0;
+	/** This function Draws a Polygon on the Screen */
+	virtual void DrawPolyline(unsigned short *x, unsigned short *y, int count, Color &color, bool fill = false) = 0;
 	/** Creates a Palette from Color */
 	virtual Color * CreatePalette(Color color, Color back) = 0;
 	/** Blits a Sprite filling the Region */
