@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.17 2004/09/14 22:08:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.18 2004/10/09 11:59:29 avenger_teambg Exp $
  *
  */
 
@@ -181,7 +181,7 @@ Sprite2D* BMPImp::GetImage()
 		memcpy( p, pixels, Width * Height * 3 );
 		spr = core->GetVideoDriver()->CreateSprite( Width, Height, 24,
 										0x00ff0000, 0x0000ff00, 0x000000ff,
-										0x00000000, p, true, 0x00ff0000 );
+										0x00000000, p, true, 0x0000ff00 );
 	} else if (BitCount == 8) {
 		void* p = malloc( Width* Height );
 		memcpy( p, pixels, Width * Height );
