@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.235 2004/11/01 16:06:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.236 2004/11/01 16:28:47 avenger_teambg Exp $
  *
  */
 
@@ -1228,6 +1228,8 @@ static PyObject* GemRB_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 	/** it is possible to set up a default value, if Lookup returns false, use it */
 	Value = 0;
 	core->GetDictionary()->Lookup( VarName, Value );
+	Window* win = core->GetWindow( WindowIndex );
+	win->RedrawControls(VarName, Value);
 
 	Py_INCREF( Py_None );
 	return Py_None;

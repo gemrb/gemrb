@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.35 2004/11/01 16:06:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.36 2004/11/01 16:28:47 avenger_teambg Exp $
  *
  */
 
@@ -65,16 +65,17 @@ void Window::AddControl(Control* ctrl)
 	if (ctrl == NULL) {
 		return;
 	}
+	ctrl->Owner = this;
 	for (size_t i = 0; i < Controls.size(); i++) {
 		if (Controls[i]->ControlID == ctrl->ControlID) {
 			delete( Controls[i] );
 			Controls[i] = ctrl;
+			Invalidate();
 			return;
 		}
 	}
 	Controls.push_back( ctrl );
-	ctrl->Owner = this;
-	Changed = true;
+	Invalidate();
 }
 /** Set the Window's BackGround Image. If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
 void Window::SetBackGround(Sprite2D* img, bool clean)
@@ -83,7 +84,7 @@ void Window::SetBackGround(Sprite2D* img, bool clean)
 		core->GetVideoDriver()->FreeSprite( this->BackGround );
 	}
 	BackGround = img;
-	Changed = true;
+	Invalidate();
 }
 /** This function Draws the Window on the Output Screen */
 void Window::DrawWindow()
@@ -189,9 +190,7 @@ void Window::Invalidate()
 			case IE_GUI_GAMECONTROL:
 				DefaultControl = i;
 				break;
-			default:
-
-				;
+			default: ;
 		}
 	}
 	Changed = true;
@@ -239,7 +238,7 @@ void Window::RedrawControls(char* VarName, unsigned int Sum)
 				break;
 			}
 		}
-		if(Controls[i]->Changed) Changed = true;
+		//if(Controls[i]->Changed) Changed = true;
 	}
 }
 
