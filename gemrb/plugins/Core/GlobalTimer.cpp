@@ -71,6 +71,11 @@ void GlobalTimer::Update()
 			if (gc->DialogueFlags&DF_IN_DIALOG)
 				return;
 		}
+		Game* game = core->GetGame();
+		if (core->FogOfWar && game) {
+			Map* map = game->GetCurrentMap();
+			if (map) map->UpdateFog();
+		}
 		//MovingActor = NULL;
 		if (CutScene) {
 			if (CutScene->endReached) {

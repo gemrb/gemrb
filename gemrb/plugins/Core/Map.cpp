@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.141 2005/03/05 21:07:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.142 2005/03/10 23:48:17 edheldil Exp $
  *
  */
 
@@ -1319,3 +1319,90 @@ void Map::Explore(int setreset)
 	memset (ExploredBitmap, setreset, GetExploredMapSize() );
 }
 
+void Map::SetMapVisibility(int setreset)
+{
+	memset( VisibleBitmap, setreset, GetExploredMapSize() );
+}
+
+// x, y are in tile coordinates
+void Map::ExploreTile(int x, int y)
+{
+	// FIXME: make it into it's own fn
+	int w = (TMap->XCellCount * 2 + (core->HasFeature( GF_SMALL_FOG ) ? 0 : 1));
+	int h = (TMap->YCellCount * 2 + (core->HasFeature( GF_SMALL_FOG ) ? 0 : 1));
+
+	if (x < 0 || x >= w || y < 0 || y >= h)
+		return;
+
+	int b0 = (y * w) + x;
+	int by = b0 / 8;
+	int bi = b0 % 8;
+
+	//printf("B: %d %d\n", x, y);
+	ExploredBitmap[by] |= (1 << bi);
+	VisibleBitmap[by] |= (1 << bi);
+}
+
+void Map::ExploreFromPoint(int x, int y)
+{
+
+	if (!core->HasFeature( GF_SMALL_FOG )) {
+		x += 16;
+		y += 16;
+	}
+	x /= 32;
+	y /= 32;
+
+	//printf("XPL: %d %d\n", x, y);
+	ExploreTile( x, y );
+	ExploreTile( x + 1, y );
+	ExploreTile( x, y + 1 );
+	ExploreTile( x - 1, y );
+	ExploreTile( x, y -1 );
+}
+
+void Map::UpdateFog()
+{
+	SetMapVisibility( 0 );
+	Game* game = core->GetGame();
+	int cnt = game->GetPartySize( false );
+
+	Actor* explorers[255];
+	int explorer_cnt = 0;
+
+
+	// FIXME: remove dead PCs
+	for (int i = 0; i < cnt; i++) {
+		Actor* actor = game->GetPC( i );
+		
+		explorers[explorer_cnt++] = actor;
+		//if (actor->GetStat( IE_EXPLORE )) {
+		//	explorers[explorer_cnt++] = actor;
+		//}
+	}
+
+	// FIXME: make it into it's own fn
+	int w = (TMap->XCellCount * 2 + (core->HasFeature( GF_SMALL_FOG ) ? 0 : 1));
+	int h = (TMap->YCellCount * 2 + (core->HasFeature( GF_SMALL_FOG ) ? 0 : 1));
+
+	int fog_pos = core->HasFeature( GF_SMALL_FOG ) ? 16 : 0;
+
+	for (int y = 0; y < h; y++) {
+		int ym = y * 32 + fog_pos;
+		for (int x = 0; x < w; x++) {
+			int xm = x * 32 + fog_pos;
+
+			for (int e = 0; e < explorer_cnt; e++) {
+				Actor* actor = explorers[e];
+				int vis2 = actor->GetStat( IE_VISUALRANGE ) * actor->GetStat( IE_VISUALRANGE ) * 128; // 128 is an arbitrary number
+				//printf("e: %d, x: %d  y: %d  xm: %d  ym: %d  xp: %d  yp: %d  vr: %d  vis2: %d\n", e, x, y, xm, ym, actor->Pos.x, actor->Pos.y, actor->GetStat( IE_VISUALRANGE ), vis2);
+
+				if ( (((actor->Pos.x - xm) * (actor->Pos.x - xm)))
+				     + (((actor->Pos.y - ym) * (actor->Pos.y - ym))) <= vis2) {
+					ExploreTile( x, y );
+					break;
+				}
+			}
+		}
+	}
+}
