@@ -54,7 +54,7 @@ def OnLoad():
 	GemRB.SetButtonState(CharGenWindow,AbilitiesButton,IE_GUI_BUTTON_DISABLED)
 
 	SkillButton = GemRB.GetControl(CharGenWindow,5)
-	GemRB.SetText(CharGenWindow,SkillButton, 17372)
+	GemRB.SetText(CharGenWindow,SkillButton, 11983)
 	GemRB.SetButtonState(CharGenWindow,SkillButton,IE_GUI_BUTTON_DISABLED)
 
 	AppearanceButton = GemRB.GetControl(CharGenWindow,6)

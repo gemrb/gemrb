@@ -33,6 +33,7 @@ def OnLoad():
 	RaceTable = GemRB.LoadTable("races")
 	ClassTable = GemRB.LoadTable("classes")
 	AlignmentTable = GemRB.LoadTable("aligns")
+	AbilityTable = GemRB.LoadTable("ability")
 
 	GenderButton = GemRB.GetControl(CharGenWindow,0)
 	GemRB.SetText(CharGenWindow,GenderButton,11956)
@@ -55,7 +56,7 @@ def OnLoad():
 	GemRB.SetButtonState(CharGenWindow,AbilitiesButton,IE_GUI_BUTTON_DISABLED)
 
 	SkillButton = GemRB.GetControl(CharGenWindow,5)
-	GemRB.SetText(CharGenWindow,SkillButton, 17372)
+	GemRB.SetText(CharGenWindow,SkillButton, 11983)
 	GemRB.SetButtonState(CharGenWindow,SkillButton,IE_GUI_BUTTON_ENABLED)
 
 	AppearanceButton = GemRB.GetControl(CharGenWindow,6)
@@ -102,6 +103,11 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,11958,-1) # new line
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(AlignmentTable,GemRB.GetVar("Alignment")-1,0))
+	for i in range(0,6):
+		v = GemRB.GetTableValue(AbilityTable, i,2)
+		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
+		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": "+str(GemRB.GetVar("Ability "+str(i))))
+
 
 	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "StartOverPress")
 	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
@@ -131,6 +137,6 @@ def CancelPress():
 
 def BackPress():
 	GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("CharGen4") #alignment
+	GemRB.SetNextScript("CharGen5") #abilities
 	return
 

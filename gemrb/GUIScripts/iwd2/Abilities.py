@@ -113,6 +113,7 @@ def OnLoad():
 	GemRB.SetText(AbilityWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(AbilityWindow,0)
 	GemRB.SetText(AbilityWindow,DoneButton,11973)
+	GemRB.SetButtonState(AbilityWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
         GemRB.SetButtonFlags(AbilityWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(AbilityWindow, 29)
@@ -144,7 +145,7 @@ def RightPress():
 	GemRB.SetText(AbilityWindow, Label, str(Ability-1) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000024+Abidx)
 	GemRB.SetText(AbilityWindow, Label, "%+d"%((Ability-1)/2-5))
-	GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(AbilityWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
 	return
 
 def JustPress():

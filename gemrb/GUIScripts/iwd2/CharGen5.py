@@ -8,7 +8,8 @@ TextAreaControl = 0
 def OnLoad():
 	global CharGenWindow, StartOverWindow, TextAreaControl
 
-	GemRB.SetVar("Abilities",0) #abilities
+	for i in range(0,6):
+		GemRB.SetVar("Ability "+str(i),0) #abilities
 
 	GemRB.LoadWindowPack("GUICG")
 	StartOverWindow  = GemRB.LoadWindow(53)
@@ -55,7 +56,7 @@ def OnLoad():
 	GemRB.SetButtonState(CharGenWindow,AbilitiesButton,IE_GUI_BUTTON_ENABLED)
 
 	SkillButton = GemRB.GetControl(CharGenWindow,5)
-	GemRB.SetText(CharGenWindow,SkillButton, 17372)
+	GemRB.SetText(CharGenWindow,SkillButton, 11983)
 	GemRB.SetButtonState(CharGenWindow,SkillButton,IE_GUI_BUTTON_DISABLED)
 
 	AppearanceButton = GemRB.GetControl(CharGenWindow,6)
