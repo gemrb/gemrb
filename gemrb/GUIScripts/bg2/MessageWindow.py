@@ -13,6 +13,7 @@ def OnLoad():
 	OptionsWindow = GemRB.LoadWindow(0)
 	MessageWindow = GemRB.LoadWindow(4)
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
+	GemRB.SetTAAutoScroll(MessageWindow, MessageTA, 1)
 	GemRB.SetVar("PortraitWindow", PortraitWindow)
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
 	GemRB.SetVar("OptionsWindow", OptionsWindow)
@@ -39,23 +40,36 @@ def OnLoad():
 	
 def OnIncreaseSize():
 	global MessageWindow, ExpandButton
+	
+	TMessageWindow = 0
+	TMessageTA = 0
+	
 	GemRB.ExecuteString('HideGUI()')
-	GemRB.UnloadWindow(MessageWindow)
+	MessageTA = GemRB.GetVar("MessageTextArea")
 	Expand = GemRB.GetVar("MessageWindowSize")
+	
 	if Expand == 0:
 		GemRB.LoadWindowPack("GUIW")
-		MessageWindow = GemRB.LoadWindow(12)
-		MessageTA = GemRB.GetControl(MessageWindow, 1)
-		GemRB.SetVar("MessageWindow", MessageWindow)
-		GemRB.SetVar("MessageTextArea", MessageTA)
+		TMessageWindow = GemRB.LoadWindow(12)
+		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
+		GemRB.SetVar("MessageWindow", TMessageWindow)
+		GemRB.SetVar("MessageTextArea", TMessageTA)
+		GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
 	else :
 		if Expand == 1:
 			GemRB.LoadWindowPack("GUIW")
-			MessageWindow = GemRB.LoadWindow(7)
-			MessageTA = GemRB.GetControl(MessageWindow, 1)
-			GemRB.SetVar("MessageWindow", MessageWindow)
-			GemRB.SetVar("MessageTextArea", MessageTA)
+			TMessageWindow = GemRB.LoadWindow(7)
+			TMessageTA = GemRB.GetControl(TMessageWindow, 1)
+			GemRB.SetVar("MessageWindow", TMessageWindow)
+			GemRB.SetVar("MessageTextArea", TMessageTA)
+			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+			
+	GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
+	GemRB.UnloadWindow(MessageWindow)
+	
 	Expand = Expand+1
+	MessageWindow = TMessageWindow
+	
 	GemRB.SetVar("MessageWindowSize", Expand)
 	UpdateResizeButtons()
 	GemRB.ExecuteString('UnhideGUI()')
@@ -63,23 +77,36 @@ def OnIncreaseSize():
 	
 def OnDecreaseSize():
 	global MessageWindow, ContractButton
+	
+	TMessageWindow = 0
+	TMessageTA = 0
+	
 	GemRB.ExecuteString('HideGUI()')
-	GemRB.UnloadWindow(MessageWindow)
+	MessageTA = GemRB.GetVar("MessageTextArea")
 	Expand = GemRB.GetVar("MessageWindowSize")
+	
 	if Expand == 2:
 		GemRB.LoadWindowPack("GUIW")
-		MessageWindow = GemRB.LoadWindow(12)
-		MessageTA = GemRB.GetControl(MessageWindow, 1)
-		GemRB.SetVar("MessageWindow", MessageWindow)
-		GemRB.SetVar("MessageTextArea", MessageTA)
+		TMessageWindow = GemRB.LoadWindow(12)
+		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
+		GemRB.SetVar("MessageWindow", TMessageWindow)
+		GemRB.SetVar("MessageTextArea", TMessageTA)
+		GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
 	else:
 		if Expand == 1:
 			GemRB.LoadWindowPack("GUIW")
-			MessageWindow = GemRB.LoadWindow(4)
-			MessageTA = GemRB.GetControl(MessageWindow, 3)
-			GemRB.SetVar("MessageWindow", MessageWindow)
-			GemRB.SetVar("MessageTextArea", MessageTA)
+			TMessageWindow = GemRB.LoadWindow(4)
+			TMessageTA = GemRB.GetControl(TMessageWindow, 3)
+			GemRB.SetVar("MessageWindow", TMessageWindow)
+			GemRB.SetVar("MessageTextArea", TMessageTA)
+			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+			
+	GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
+	GemRB.UnloadWindow(MessageWindow)
+	
 	Expand = Expand-1
+	MessageWindow = TMessageWindow
+	
 	GemRB.SetVar("MessageWindowSize", Expand)
 	UpdateResizeButtons()
 	GemRB.ExecuteString('UnhideGUI()')
