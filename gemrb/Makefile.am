@@ -15,4 +15,4 @@ INCLUDES= \
 gemrb_LDFLAGS = $(all_libraries) 
 
 install-data-local:
-	$(INSTALL_DATA) GemRB.cfg $(bindir)
+	$(INSTALL_DATA) GemRB.cfg* $(bindir)
