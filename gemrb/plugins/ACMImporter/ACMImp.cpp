@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.22 2003/12/06 17:33:19 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.23 2003/12/15 09:38:46 balrog994 Exp $
  *
  */
 
@@ -63,7 +63,7 @@ int ACMImp::PlayListManager(void * data)
 				core->GetDictionary()->SetAt("Volume Music", 100);
 				volume = 100;
 			}
-			alSourcef(musics[musicIndex].Source, AL_GAIN, volume/100.0);
+			alSourcef(musics[musicIndex].Source, AL_GAIN, (volume/100.0f));
 #ifdef WIN32
 			unsigned long time = GetTickCount();
 #else
@@ -71,7 +71,7 @@ int ACMImp::PlayListManager(void * data)
 			gettimeofday(&tv, NULL);
 			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
 #endif
-			if((time - BufferStartPlayTime) > (BufferDuration-50)) {
+			if((time - BufferStartPlayTime) > ((unsigned long)BufferDuration-50)) {
 				musics[musicIndex].playing = false;
 				core->GetMusicMgr()->PlayNext();
 			}
@@ -336,7 +336,7 @@ unsigned long ACMImp::LoadFile(const char * filename)
 				if(musics[i].free) {
 					musics[i].Buffer = Buffer;
 					musics[i].Source = Source;
-					musics[i].Duration = (size/(double)(freq*4))*1000;
+					musics[i].Duration = (int)(size/(double)(freq*4))*1000;
 					musics[i].free = false;
 					musics[i].playing = false;
 					return i;
@@ -413,7 +413,7 @@ unsigned long ACMImp::LoadFile(const char * filename)
 				if(musics[i].free) {
 					musics[i].Buffer = Buffer;
 					musics[i].Source = Source;
-					musics[i].Duration = (size/(double)(freq*4))*1000;
+					musics[i].Duration = (int)(size/(double)(freq*4))*1000;
 					musics[i].free = false;
 					musics[i].playing = false;
 					return i;
@@ -512,7 +512,7 @@ bool ACMImp::Play(unsigned long index)
 		core->GetDictionary()->SetAt("Volume Music", 100);
 		volume = 100;
 	}
-	alSourcef(musics[musicIndex].Source, AL_GAIN, volume/100.0);
+	alSourcef(musics[musicIndex].Source, AL_GAIN, volume/100.0f);
 	alSourceRewind(musics[index].Source);
 	alSourcePlay(musics[index].Source);
 #ifdef WIN32
