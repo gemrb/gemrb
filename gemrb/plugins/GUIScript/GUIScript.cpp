@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.220 2004/10/11 19:33:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.221 2004/10/14 17:31:27 avenger_teambg Exp $
  *
  */
 
@@ -1710,14 +1710,14 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 		CtrlIndex = core->GetControl( WindowIndex, LabelID );
 		Control *lc = win->GetControl( CtrlIndex );
 		map->LinkedLabel = lc;
-		AnimationMgr *anim = ( AnimationMgr* ) core->GetInterface(IE_BMP_CLASS_ID );
+		ImageMgr *anim = ( ImageMgr* ) core->GetInterface(IE_BMP_CLASS_ID );
 		DataStream* str = core->GetResourceMgr()->GetResource( Flag, IE_BMP_CLASS_ID );
 		if(anim -> Open(str, true) ) {
-				map->Flag[0] = anim->GetFrame(0);
+				map->Flag[0] = anim->GetImage();
 			}
 		str = core->GetResourceMgr()->GetResource( Flag2, IE_BMP_CLASS_ID );
 		if(anim -> Open(str, true) ) {
-				map->Flag[1] = anim->GetFrame(0);
+				map->Flag[1] = anim->GetImage();
 		}
 		core->FreeInterface( anim );
 		goto setup_done;
