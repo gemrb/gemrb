@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.122 2004/02/15 23:04:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.123 2004/02/16 21:37:00 avenger_teambg Exp $
  *
  */
 
@@ -1780,7 +1780,14 @@ static PyObject *GemRB_GetCharSounds(PyObject * /*self*/, PyObject *args)
 	return Py_BuildValue("i",core->GetCharSounds(ta) );
 }
 
-static PyObject *GemRB_GetINIPartyCount(PyObject * /*self*/, PyObject *args)
+static PyObject *GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
+{
+	if(!core->GetGame())
+		return Py_BuildValue("i",0);
+	return Py_BuildValue("i",core->GetGame()->GetPartySize());
+}
+
+static PyObject *GemRB_GetINIPartyCount(PyObject * /*self*/, PyObject * /*args*/)
 {
 	if(!core->GetPartyINI())
 		return NULL;
@@ -2131,7 +2138,7 @@ static PyMethodDef GemRBMethods[] = {
 	{"HideGUI", GemRB_HideGUI, METH_NOARGS,
      "Hides the Game GUI."},
 
-	 {"UnhideGUI", GemRB_UnhideGUI, METH_NOARGS,
+	{"UnhideGUI", GemRB_UnhideGUI, METH_NOARGS,
      "Shows the Game GUI."},
 
 	{"SetTAAutoScroll", GemRB_SetTAAutoScroll, METH_VARARGS,
@@ -2157,21 +2164,24 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"EndCutSceneMode", GemRB_EndCutSceneMode, METH_NOARGS,
      "Exits the CutScene Mode."},
+  
+	{"GetPartySize", GemRB_GetPartySize, METH_NOARGS,
+     "Returns the number of PCs."},
 
-    {"GetINIPartyCount", GemRB_GetINIPartyCount, METH_NOARGS,
+	{"GetINIPartyCount", GemRB_GetINIPartyCount, METH_NOARGS,
      "Returns the Number of Party defined in Party.ini (works only on IWD2)."},
 
-    {"GetINIPartyKey", GemRB_GetINIPartyKey, METH_VARARGS,
+	{"GetINIPartyKey", GemRB_GetINIPartyKey, METH_VARARGS,
      "Returns a Value from the Party.ini File (works only on IWD2)."},
 
-    {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
+	{"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
 
 	{"LoadWindow", GemRB_LoadWindow, METH_VARARGS,
      "Returns a Window."},
 
 	{"SetWindowSize", GemRB_SetWindowSize, METH_VARARGS,
-	 "Resizes a Window."},
+     "Resizes a Window."},
 
  	{"SetWindowPos", GemRB_SetWindowPos, METH_VARARGS,
 	 "Moves a Window."},
