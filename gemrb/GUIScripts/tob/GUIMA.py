@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.2 2004/08/27 13:25:32 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.3 2004/08/27 13:36:34 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -113,8 +113,6 @@ def WorldMapWindowCommon(Travel):
 	WorldMapWindow = Window = GemRB.LoadWindow (0)
 	GemRB.SetVar ("OtherWindow", WorldMapWindow)
 
-	GemRB.SetControlSize (Window, Button, 0, 0)
-	GemRB.SetControlPos (Window, Button, 65535, 0)
 	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel)
 	Button = GemRB.GetControl (Window, 4)
 	

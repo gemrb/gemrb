@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.1 2004/08/26 19:05:40 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.2 2004/08/27 13:36:31 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -67,11 +67,9 @@ def OpenMapWindow ():
 	GemRB.SetControlPos (Window, Label, 65535, 0) #remove this crap
 
 	# Map Control
-	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetControlSize (Window, Button, 0, 0)
-	GemRB.SetControlPos (Window, Button, 65535, 0) #remove this too
+	GemRB.CreateMapControl (Window, 2, 24, 23, 480, 360)
+	Map = GemRB.GetControl (Window, 2)
 
-	Map = GemRB.CreateMapControl (Window, 6, 24, 23, 480, 360)
 	#GemRB.SetEvent (Window, Map, IE_GUI_MAPWINDOW_ON_PRESS, "LeftPressMap")
 	#GemRB.SetEvent (Window, Map, IE_GUI_MAPWINDOW_ON_DOUBLEPRESS, "LeftPressMap")
 	#GemRB.SetEvent (Window, Map, IE_GUI_MAPWINDOW_ON_RIGHTPRESS, "AddNoteWindow")
@@ -115,13 +113,8 @@ def WorldMapWindowCommon(Travel):
 	WorldMapWindow = Window = GemRB.LoadWindow (0)
 	GemRB.SetVar ("OtherWindow", WorldMapWindow)
 
+	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel)
 	Button = GemRB.GetControl (Window, 4)
-	GemRB.SetControlSize (Window, Button, 0, 0)
-	GemRB.SetControlPos (Window, Button, 65535, 0)
-	#print "WMAP win is %d , button is %d" %(Window, Button)
-	#GemRB.SetWorldMapImage (Window, Button)
-
-	Map = GemRB.CreateWorldMapControl (Window, 5, 0, 62, 640, 418, Travel)
 	
 	# Done
 	Button = GemRB.GetControl (Window, 0)
