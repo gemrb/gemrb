@@ -39,10 +39,17 @@ def OnLoad():
 def NewLifePress():
 	GemRB.UnloadWindow(QuitWindow)
 	GemRB.UnloadWindow(StartWindow)
+	#to make difference between ingame change and new life
+	GemRB.SetVar("PlayMode",0)
 	GemRB.SetNextScript("NewLife")
 	return
 
 def ResumeLifePress():
+	GemRB.UnloadWindow(QuitWindow)
+	GemRB.UnloadWindow(StartWindow)
+	#to make difference between ingame load and initial load
+	GemRB.SetVar("PlayMode",0)
+	GemRB.SetNextScript("GUILOAD")
 	return
 
 def ExitPress():
