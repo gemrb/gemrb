@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.23 2003/11/25 13:48:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.24 2003/11/29 10:29:23 balrog994 Exp $
  *
  */
 
@@ -190,7 +190,7 @@ bool KeyImp::LoadResFile(const char * resfile)
 
 DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 {
-	char path[_MAX_PATH], filename[_MAX_PATH] = {0};
+	char path[_MAX_PATH], BasePath[_MAX_PATH], filename[_MAX_PATH] = {0};
 	//Search it in the GemRB override Directory
 	strcpy(path, "override");
 	strcat(path, SPathDelimiter);
@@ -212,34 +212,49 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 			strcpy(path, core->GamePath);
 			strcat(path, biffiles[bifnum].name);
 			exist = fopen(path, "rb");
+			if(!exist) {
+				strcpy(path, core->GamePath);
+				strncat(path, biffiles[bifnum].name, strlen(biffiles[bifnum].name)-4);
+				strcat(path, ".cbf");
+				exist = fopen(path, "rb");
+			}
 		}
 		if(exist == NULL) {
 			if((biffiles[bifnum].BIFLocator & (1<<2)) != 0) {
-				strcpy(path, core->CD1);
+				strcpy(BasePath, core->CD1);
 			}
 			else if((biffiles[bifnum].BIFLocator & (1<<3)) != 0) {
-				strcpy(path, core->CD2);
+				strcpy(BasePath, core->CD2);
 			}
 			else if((biffiles[bifnum].BIFLocator & (1<<4)) != 0) {
-				strcpy(path, core->CD3);
+				strcpy(BasePath, core->CD3);
 			}
 			else if((biffiles[bifnum].BIFLocator & (1<<5)) != 0) {
-				strcpy(path, core->CD4);
+				strcpy(BasePath, core->CD4);
 			}
 			else if((biffiles[bifnum].BIFLocator & (1<<6)) != 0) {
-				strcpy(path, core->CD5);
+				strcpy(BasePath, core->CD5);
 			}
 			else {
 				printf("[KEYImporter]: Error: Cannot find %s... Resource unavailable.\n", biffiles[bifnum].name);
 				return NULL;
 			}
+			strcpy(path, BasePath);
 			strcat(path, biffiles[bifnum].name);
 			exist = fopen(path, "rb");
 			if(exist == NULL) {
-				printf("[KEYImporter]: Cannot find %s.", path);
-				core->FreeInterface(ai);
-				return NULL;
+				//Trying CBF Extension
+				strcpy(path, BasePath);
+				strncat(path, biffiles[bifnum].name, strlen(biffiles[bifnum].name)-4);
+				strcat(path, ".cbf");
+				exist = fopen(path, "rb");
+				if(!exist) {
+					printf("[KEYImporter]: Cannot find %s.", path);
+					core->FreeInterface(ai);
+					return NULL;
+				}
 			}
+			
 			fclose(exist);
 		}
 		else
@@ -321,7 +336,7 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		return fs;
 */
 	}
-	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
+	/*printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
 	unsigned long ResLocator;
 	if(resources.Lookup(resname, type, ResLocator) ) {
 		int bifnum = (ResLocator & 0xFFF00000) >> 20;
@@ -370,7 +385,9 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		core->FreeInterface(ai);
 		strncpy(ret->filename, resname, 8);
 		ret->filename[8] = 0;
-		strcat(ret->filename, core->TypeExt(type));
+		strcat(ret->filename, core->TypeExt(type));*/
+	DataStream * ret = GetResource(resname, type);
+	if(ret) {
 		AnimationMgr * ani = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
 		if(!ani)
 			return NULL;
