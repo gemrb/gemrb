@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.285 2005/03/08 19:58:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.286 2005/03/09 18:08:41 avenger_teambg Exp $
  *
  */
 
@@ -3192,7 +3192,7 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 	Actor* actor;
 	if (PartyID > 0) {
 		actor = game->FindPC( PartyID );
-		if (! actor) {
+		if (!actor) {
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
@@ -3623,8 +3623,8 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	Store *store = core->GetCurrentStore();
@@ -3900,8 +3900,8 @@ static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 	}
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	//this isn't in the actor's spellbook, handles Wisdom
@@ -3921,8 +3921,8 @@ static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 	}
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	//this isn't in the actor's spellbook, handles Wisdom
@@ -3945,8 +3945,8 @@ static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	return PyInt_FromLong(actor->spellbook.GetKnownSpellsCount( SpellType, Level ) );
@@ -3965,8 +3965,8 @@ static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
@@ -3997,8 +3997,8 @@ static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* ar
 	}
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	return PyInt_FromLong( actor->spellbook.GetMemorizedSpellsCount( SpellType, Level ) );
@@ -4017,8 +4017,8 @@ static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	CREMemorizedSpell* ms = actor->spellbook.GetMemorizedSpell( SpellType, Level, Index );
@@ -4077,8 +4077,8 @@ static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 	return PyInt_FromLong( actor->LearnSpell(Spell, Flags) );
 }
@@ -4097,8 +4097,8 @@ static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
@@ -4123,8 +4123,8 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	CREMemorizedSpell* ms = actor->spellbook.GetMemorizedSpell( SpellType, Level, Index );
@@ -4148,8 +4148,8 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	CREItem* si = actor->inventory.GetSlotItem( Slot );
@@ -4182,8 +4182,8 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	MaxCount = core->SlotTypes;
@@ -4206,7 +4206,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 			continue;
 		}
 		CREItem *slot = actor->inventory.GetSlotItem( i );
-		if (!slot) {
+		if (slot) {
 			PyTuple_SetItem( tuple, Count++, PyInt_FromLong( i ) );
 		}
 	}
@@ -4296,8 +4296,8 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	CREItem* si = actor->inventory.RemoveItem( Slot, Count );
@@ -4338,8 +4338,8 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 
 	Game *game = core->GetGame();
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
-		return NULL;
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
 	}
 
 	int res = actor->inventory.AddSlotItem( core->GetDraggedItem(), Slot );
