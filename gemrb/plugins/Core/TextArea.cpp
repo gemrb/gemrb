@@ -137,8 +137,6 @@ int TextArea::SetText(const char * text, int pos)
 		lrows.push_back(0);
 	}
 	else {
-		int mylen = strlen(lines[pos]);
-
 		lines[pos] = (char*)realloc(lines[pos], newlen+1);
 		strcpy(lines[pos], text);
 	}

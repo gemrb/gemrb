@@ -365,11 +365,15 @@ void Font::SetupString(char * string, int width)
 			string[lastpos] = 0;
 			x = 0;
 		}
+		if(string[pos] == -1) {
+			continue;
+		}
 		if(string[pos] == '\n') {
-			string[pos++] = 0;
+			string[pos] = 0;
 			x = 0;
 			wx = 0;
 			lastpos = pos;
+			continue;
 		}
 		wx += chars[((unsigned char)string[pos])-1]->Width;
 		if((string[pos] == ' ') || (string[pos] == '-')) {
@@ -378,30 +382,6 @@ void Font::SetupString(char * string, int width)
 			lastpos = pos;
 		}
 	}
-	/*char * s = strtok(str, " \n");
-	int pos = -1;
-	int x = 0;//chars[s[0]-1]->XPos;
-	bool forceNewLine = false;
-	while(s != NULL) {
-		int ln = strlen(s);
-		int nx = CalcStringWidth(s);
-		if(string[pos+ln+1] == '\n')
-			forceNewLine = true;
-		if((len > pos+ln+1) && (string[pos+ln+1] != '\n'))
-			nx+=chars[' '-1]->Width;
-		if(x+nx >= width) {
-			string[pos] = 0;		
-			x = 0;//chars[s[0]-1]->XPos;
-		}
-		x+=nx;	
-		pos += ln+1;
-		if(forceNewLine) {
-			string[pos] = 0;
-			x = 0;
-			forceNewLine = false;
-		}
-		s = strtok(NULL, " \n");
-	}*/
 }
 
 void * Font::GetPalette()
