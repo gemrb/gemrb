@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.123 2004/04/03 10:14:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.124 2004/04/03 11:29:39 avenger_teambg Exp $
  *
  */
 
@@ -1522,7 +1522,7 @@ Action *GameScript::GenerateActionCore(const char *src, const char *str, int acI
 			break;
 
 			case 'o': //Object
-				if(objectCount==2) {
+				if(objectCount==3) {
 					printf("Invalid object count!\n");
 					abort();
 				}
