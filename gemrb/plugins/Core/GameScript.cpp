@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.111 2004/03/21 19:00:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.112 2004/03/21 19:43:12 avenger_teambg Exp $
  *
  */
 
@@ -134,8 +134,8 @@ static TriggerLink triggernames[] = {
 //Make this an ordered list, so we could use bsearch!
 static ActionLink actionnames[] = {
 	{"actionoverride",NULL,0}, {"activate",GameScript::Activate,0},
-	{"addareatype", GameScript::AddAreaType,0},
 	{"addareaflag", GameScript::AddAreaFlag,0},
+	{"addareatype", GameScript::AddAreaType,0},
 	{"addexperienceparty",GameScript::AddExperienceParty,0},
 	{"addexperiencepartyglobal",GameScript::AddExperiencePartyGlobal,AF_MERGESTRINGS},
 	{"addglobals",GameScript::AddGlobals,0},
@@ -152,6 +152,7 @@ static ActionLink actionnames[] = {
 	{"changealignment",GameScript::ChangeAlignment,0},
 	{"changeallegiance",GameScript::ChangeAllegiance,0},
 	{"changeclass",GameScript::ChangeClass,0},
+	{"changedialogue",GameScript::ChangeDialogue,0},
 	{"changegender",GameScript::ChangeGender,0},
 	{"changegeneral",GameScript::ChangeGeneral,0},
 	{"changeenemyally",GameScript::ChangeAllegiance,0}, //this is the same
@@ -165,6 +166,7 @@ static ActionLink actionnames[] = {
 	{"createcreature",GameScript::CreateCreature,0},
 	{"createcreatureatfeet",GameScript::CreateCreatureOffset,0}, //this is the same
 	{"createcreatureoffset",GameScript::CreateCreatureOffset,0},
+	{"createpartygold",GameScript::CreatePartyGold,0},
 	{"createvisualeffect",GameScript::CreateVisualEffect,0},
 	{"createvisualeffectobject",GameScript::CreateVisualEffectObject,0},
 	{"cutsceneid",GameScript::CutSceneID,AF_INSTANT},
@@ -186,6 +188,7 @@ static ActionLink actionnames[] = {
 	{"fadetocolor",GameScript::FadeToColor,0},
 	{"floatmessage",GameScript::DisplayStringHead,0}, //probably the same
 	{"forceaiscript",GameScript::ForceAIScript,0},
+	{"forcefacing",GameScript::ForceFacing,0},
 	{"forcespell",GameScript::ForceSpell,0},
 	{"giveexperience", GameScript::AddXPObject,0},
 	{"givepartygold",GameScript::GivePartyGold,0},
@@ -235,6 +238,8 @@ static ActionLink actionnames[] = {
 	{"permanentstatchange",GameScript::ChangeStat,0}, //probably the same
 	{"picklock",GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
 	{"playdead",GameScript::PlayDead,0},
+	{"playerdialog",GameScript::PlayerDialogue,AF_BLOCKING},
+	{"playerdialogue",GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playsound",GameScript::PlaySound,0},
 	{"recoil",GameScript::Recoil,0},
 	{"removeareatype", GameScript::RemoveAreaType,0},
@@ -3931,6 +3936,17 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 	}
 }
 
+void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if(!tar) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor *actor = (Actor *) tar;
+	actor->Orientation = parameters->int0Parameter;
+}
+
 void GameScript::Face(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -3938,20 +3954,9 @@ void GameScript::Face(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	if (actor) {
-		actor->Orientation = parameters->int0Parameter;
-		actor->resetAction = true;
-		actor->SetWait( 1 );
-	} else {
-		/*
-									This action is a fast Ending OpCode. This means that this OpCode
-									is executed and finished immediately, but since we need to
-									redraw the Screen to see the change, we consider it as a Blocking
-									Action. We need to NULL the CurrentAction to prevent an infinite loop
-									waiting for this 'blocking' action to terminate.
-								*/
-		Sender->CurrentAction = NULL;
-	}
+	actor->Orientation = parameters->int0Parameter;
+	actor->resetAction = true;
+	actor->SetWait( 1 );
 }
 
 void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
@@ -3965,14 +3970,10 @@ void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	if (actor) {
-		actor->Orientation = GetOrient( target->XPos, target->YPos,
-						actor->XPos, actor->YPos );
-		actor->resetAction = true;
-		actor->SetWait( 1 );
-	} else {
-		Sender->CurrentAction = NULL;
-	}
+	actor->Orientation = GetOrient( target->XPos, target->YPos,
+					actor->XPos, actor->YPos );
+	actor->resetAction = true;
+	actor->SetWait( 1 );
 }
 
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
@@ -4183,7 +4184,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 //no string, increase talkcount, no interrupt
 void GameScript::Dialogue(Scriptable* Sender, Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_TARGET | BD_TALKCOUNT | BD_CHECKDIST );
+	BeginDialog( Sender, parameters, BD_SOURCE | BD_TALKCOUNT | BD_CHECKDIST );
 }
 
 void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
@@ -4236,6 +4237,15 @@ void GameScript::SetAnimState(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetDialogue(Scriptable* Sender, Action* parameters)
 {
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* target = ( Actor* ) Sender;
+	target->SetDialog( parameters->string0Parameter );
+}
+
+void GameScript::ChangeDialogue(Scriptable* Sender, Action* parameters)
+{
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
@@ -4271,7 +4281,9 @@ void GameScript::PlayerDialogue(Scriptable* Sender, Action* parameters)
 {
 	//i think playerdialog is when a player initiates dialog with the
 	//target, in this case, the dialog is the target's dialog
-	BeginDialog( Sender, parameters, BD_RESERVED | BD_OWN );
+	BeginDialog( Sender, parameters, BD_TARGET | BD_TALKCOUNT | BD_CHECKDIST );
+	//others said something else, i'm undecided
+	//BeginDialog( Sender, parameters, BD_RESERVED | BD_OWN );
 }
 
 void GameScript::StartDialogueInterrupt(Scriptable* Sender, Action* parameters)

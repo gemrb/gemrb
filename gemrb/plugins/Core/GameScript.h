@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.80 2004/03/21 19:00:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.81 2004/03/21 19:43:12 avenger_teambg Exp $
  *
  */
 
@@ -817,17 +817,11 @@ public:
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
 	static void BitClear(Scriptable* Sender, Action* parameters);
-	static void CloseDoor(Scriptable* Sender, Action* parameters);
-	static void CreateCreature(Scriptable* Sender, Action* parameters);
-	static void CreateCreatureAtLocation(Scriptable* Sender, Action* parameters);
-	static void CreateCreatureObject(Scriptable* Sender, Action* parameters);
-	static void CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters);
-	static void CreateCreatureOffset(Scriptable* Sender, Action* parameters);
-	static void CreatePartyGold(Scriptable *Sender, Action *parameters);
 	static void ChangeAIScript(Scriptable* Sender, Action* parameters);
 	static void ChangeAlignment(Scriptable* Sender, Action* parameters);
 	static void ChangeAllegiance(Scriptable* Sender, Action* parameters);
 	static void ChangeClass(Scriptable* Sender, Action* parameters);
+	static void ChangeDialogue(Scriptable* Sender, Action* parameters);
 	static void ChangeGender(Scriptable* Sender, Action* parameters);
 	static void ChangeGeneral(Scriptable* Sender, Action* parameters);
 	static void ChangeRace(Scriptable* Sender, Action* parameters);
@@ -835,7 +829,14 @@ public:
 	static void ChangeStat(Scriptable* Sender, Action* parameters);
 	static void ClearActions(Scriptable* Sender, Action* parameters);
 	static void ClearAllActions(Scriptable* Sender, Action* parameters);
+	static void CloseDoor(Scriptable* Sender, Action* parameters);
 	static void Continue(Scriptable* Sender, Action* parameters);
+	static void CreateCreature(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureAtLocation(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureObject(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureOffset(Scriptable* Sender, Action* parameters);
+	static void CreatePartyGold(Scriptable *Sender, Action *parameters);
 	static void CreateVisualEffect(Scriptable* Sender, Action* parameters);
 	static void CreateVisualEffectObject(Scriptable* Sender,
 		Action* parameters);
@@ -856,6 +857,7 @@ public:
 	static void FadeFromColor(Scriptable* Sender, Action* parameters);
 	static void FadeToColor(Scriptable* Sender, Action* parameters);
 	static void ForceAIScript(Scriptable* Sender, Action* parameters);
+	static void ForceFacing(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
 	static void GivePartyGold(Scriptable* Sender, Action* parameters);
 	static void GivePartyGoldGlobal(Scriptable* Sender, Action* parameters);

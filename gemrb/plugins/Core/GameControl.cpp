@@ -579,7 +579,7 @@ void GameControl::TryToTalk(Actor *source, Actor *target)
 	}
 	char Tmp[256];
 
-	sprintf( Tmp, "Dialogue(\"%s\")", target->scriptName );
+	sprintf( Tmp, "PlayerDialogue(\"%s\")", target->scriptName );
 	source->AddAction( GameScript::CreateAction( Tmp, true ) );
 }
 
