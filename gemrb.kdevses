@@ -3,60 +3,12 @@
 <KDevPrjSession>
  <LastCompileConfig>(Default)</LastCompileConfig>
  <Mainframe MaximizeMode="1" />
- <DocsAndViews NumberOfDocuments="18" >
-  <Doc0 CursorPosLine="221" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="20" FileName="/cond/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp" >
-   <View0 Top="0" Width="1041" Attach="1" Height="587" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
+ <DocsAndViews NumberOfDocuments="2" >
+  <Doc0 CursorPosLine="0" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/home/daniele/gemrb/gemrb/GemRB.cpp" >
+   <View0 Top="0" Width="1025" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
   </Doc0>
-  <Doc1 CursorPosLine="59" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="7" FileName="/cond/gemrb/gemrb/plugins/Core/Font.cpp" >
-   <View0 Top="0" Width="1041" Attach="1" Height="587" Left="0" Focus="1" Type="KWriteView" MinMaxMode="0" />
+  <Doc1 CursorPosLine="0" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/home/daniele/gemrb/gemrb/plugins/Core/TextArea.cpp" >
+   <View0 Top="0" Width="1025" Attach="1" Height="589" Left="0" Focus="1" Type="KWriteView" MinMaxMode="0" />
   </Doc1>
-  <Doc2 CursorPosLine="171" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="122" FileName="/cond/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp" >
-   <View0 Top="0" Width="1039" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc2>
-  <Doc3 CursorPosLine="360" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="25" FileName="/cond/gemrb/gemrb/plugins/Core/Interface.cpp" >
-   <View0 Top="0" Width="1041" Attach="1" Height="587" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc3>
-  <Doc4 CursorPosLine="101" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/cond/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp" >
-   <View0 Top="0" Width="1039" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc4>
-  <Doc5 CursorPosLine="14" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="17" FileName="/cond/gemrb/gemrb/plugins/Core/Interface.h" >
-   <View0 Top="0" Width="1039" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc5>
-  <Doc6 CursorPosLine="17" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/cond/gemrb/gemrb/plugins/Core/Font.h" >
-   <View0 Top="0" Width="1041" Attach="1" Height="587" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc6>
-  <Doc7 CursorPosLine="28" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/cond/gemrb/gemrb/plugins/Core/Label.h" >
-   <View0 Top="0" Width="1041" Attach="1" Height="587" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc7>
-  <Doc8 CursorPosLine="37" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="37" FileName="/cond/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h" >
-   <View0 Top="0" Width="1039" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc8>
-  <Doc9 CursorPosLine="1" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="17" FileName="/cond/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp" >
-   <View0 Top="0" Width="1039" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc9>
-  <Doc10 CursorPosLine="51" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/cond/gemrb/gemrb/plugins/Core/Slider.cpp" >
-   <View0 Top="0" Width="1039" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc10>
-  <Doc11 CursorPosLine="26" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="35" FileName="/cond/gemrb/gemrb/plugins/Core/Slider.h" >
-   <View0 Top="0" Width="1039" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc11>
-  <Doc12 CursorPosLine="27" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/cond/gemrb/gemrb/plugins/CHUImporter/CHUImp.h" >
-   <View0 Top="0" Width="1039" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc12>
-  <Doc13 CursorPosLine="83" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="24" FileName="/cond/gemrb/gemrb/GemRB.cpp" >
-   <View0 Top="0" Width="1041" Attach="1" Height="587" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc13>
-  <Doc14 CursorPosLine="33" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="45" FileName="/cond/gemrb/gemrb/plugins/Core/Video.h" >
-   <View0 Top="0" Width="1039" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc14>
-  <Doc15 CursorPosLine="8" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="1" FileName="/cond/gemrb/gemrb/plugins/Core/Video.cpp" >
-   <View0 Top="0" Width="1039" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc15>
-  <Doc16 CursorPosLine="33" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="2" FileName="/cond/gemrb/gemrb/plugins/Core/Label.cpp" >
-   <View0 Top="0" Width="1041" Attach="1" Height="587" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc16>
-  <Doc17 CursorPosLine="62" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/cond/gemrb/gemrb/plugins/Core/Window.cpp" >
-   <View0 Top="0" Width="1041" Attach="1" Height="587" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
-  </Doc17>
  </DocsAndViews>
 </KDevPrjSession>
