@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.18 2003/11/30 18:13:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.19 2003/11/30 19:13:34 avenger_teambg Exp $
  *
  */
 
@@ -96,6 +96,7 @@ Map * AREImp::GetMap()
 	TileMapMgr * tmm = (TileMapMgr*)core->GetInterface(IE_WED_CLASS_ID);
 	DataStream * wedfile = core->GetResourceMgr()->GetResource(WEDResRef, IE_WED_CLASS_ID);
 	tmm->Open(wedfile);
+	TileMap * tm = tmm->GetTileMap();
 
 	char ResRef[9];
 	strcpy(ResRef, WEDResRef);
@@ -104,13 +105,13 @@ Map * AREImp::GetMap()
 	ImageMgr * lm = (ImageMgr*)core->GetInterface(IE_BMP_CLASS_ID);
 	DataStream * lmstr = core->GetResourceMgr()->GetResource(ResRef, IE_BMP_CLASS_ID);
 	lm->Open(lmstr, true);
-	TileMap * tm = tmm->GetTileMap();
 
 	strcpy(ResRef, WEDResRef);
 	strcat(ResRef, "SR");
+	printf("Loading %s\n",ResRef);
 	ImageMgr * sr = (ImageMgr*)core->GetInterface(IE_BMP_CLASS_ID);
 	DataStream * srstr = core->GetResourceMgr()->GetResource(ResRef, IE_BMP_CLASS_ID);
-	sr->Open(lmstr, true);
+	sr->Open(srstr, true);
 
 	str->Seek(SongHeader, GEM_STREAM_START);
 	//5 is the number of song indices
