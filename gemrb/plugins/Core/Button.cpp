@@ -179,14 +179,17 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 {
 	if(State == IE_GUI_BUTTON_DISABLED)
 		return;
+	if(State == IE_GUI_BUTTON_PRESSED)
+	{
+		SetState(IE_GUI_BUTTON_UNPRESSED);
+	}
 	if((x <= Width) && (y <= Height)) {
-		Changed = true;
 		if(Flags & 0x10) {  //checkbox
 			ToggleState = !ToggleState;
 			if(ToggleState)
-				State = IE_GUI_BUTTON_SELECTED;
+				SetState(IE_GUI_BUTTON_SELECTED);
 			else
-				State = IE_GUI_BUTTON_UNPRESSED;
+				SetState(IE_GUI_BUTTON_UNPRESSED);
 			if(VarName[0] != 0) {
 				unsigned long tmp=0;
 				core->GetDictionary()->Lookup( VarName, tmp);
@@ -195,14 +198,12 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 		}
 		else if(Flags & 0x20) {  //radio button
 			ToggleState = true;
-			State = IE_GUI_BUTTON_SELECTED;
+			SetState(IE_GUI_BUTTON_SELECTED);
 			if(VarName[0] != 0) {
 				core->GetDictionary()->SetAt(VarName, Value);
 				((Window*)Owner)->RedrawButtons(VarName, Value);
 			}
 		}
-		else
-			State = IE_GUI_BUTTON_UNPRESSED;
 		if(Flags & 0x04) {
 			if(Flags & 0x08)
 				core->GetSoundMgr()->Play("GAM_04");

@@ -1,14 +1,12 @@
 #include "Variables.h"
 
-#define min(a,b) ((a)<(b) ? (a):(b))
-
 /////////////////////////////////////////////////////////////////////////////
 // inlines
 inline bool Variables::MyCopyKey(char *&dest, const char * key) const
 {
 	int i,j;
 
-	for(i=0;key[i] && i<MAX_VARIABLE_LENGTH;i++) if(key[i]!=' ') j++;
+	for(i=0,j=0;key[i] && i<MAX_VARIABLE_LENGTH;i++) if(key[i]!=' ') j++;
 	dest = new char[j];
 	if(!dest)
 		return false;
@@ -156,7 +154,7 @@ Variables::NewAssoc(const char *key)
 	if(m_lParseKey) MyCopyKey(pAssoc->key,key);
 	else
 	{
-		pAssoc->key=new char[min(strlen(key),MAX_VARIABLE_LENGTH)];
+		pAssoc->key=new char[strnlen(key,MAX_VARIABLE_LENGTH)];
 		if(pAssoc->key) strncpy(pAssoc->key,key,MAX_VARIABLE_LENGTH);
 	}
 	pAssoc->value=0xcccccccc;  //invalid value

@@ -212,26 +212,21 @@ static PyObject * GemRB_SetVarAssoc(PyObject *self, PyObject *args)
 	int WindowIndex, ControlIndex, Value;
 	char* VarName;
 
-printf("aa\n");
 	if(!PyArg_ParseTuple(args, "iisi", &WindowIndex, &ControlIndex, &VarName, &Value)) {
 		printMessage("GUIScript", "Syntax Error: SetVarAssoc(WindowIndex, ControlIndex, VariableName)\n", LIGHT_RED);
 		return NULL;
 	}
 
-printf("bb\n");
 	Window * win = core->GetWindow(WindowIndex);
 	if(win == NULL)
 		return NULL;
 
-printf("cc\n");
 	Control * ctrl = win->GetControl(ControlIndex);
 	if(ctrl == NULL)
 		return NULL;
 
-printf("dd\n");
 	strncpy(ctrl->VarName, VarName, MAX_VARIABLE_LENGTH);
 	ctrl->Value=Value;
-printf("SetVarAssoc: %.32s %d\n",ctrl->VarName, ctrl->Value);
 
 	Py_INCREF(Py_None);
 	return Py_None;
