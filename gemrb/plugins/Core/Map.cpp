@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.108 2004/08/19 21:14:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.109 2004/08/22 19:24:26 edheldil Exp $
  *
  */
 
@@ -140,11 +140,12 @@ Map::~Map(void)
 	}
 }
 
-void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr)
+void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm)
 {
 	this->tm = tm;
 	LightMap = lm;
 	SearchMap = sr;
+	SmallMap = sm;
 	Width=tm->XCellCount * 4;
 	Height=( tm->YCellCount * 64 ) / 12;
 	//Filling Matrices

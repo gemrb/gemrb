@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.46 2004/08/18 20:57:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.47 2004/08/22 19:24:26 edheldil Exp $
  *
  */
 
@@ -74,6 +74,7 @@ public:
 	TileMap* tm;
 	ImageMgr* LightMap;
 	ImageMgr* SearchMap;
+	ImageMgr* SmallMap;
 	ieDword AreaFlags;
 	ieWord AreaType;
 	bool ChangeArea; //set true if movement is allowed between areas
@@ -99,7 +100,7 @@ public:
 	~Map(void);
 	/** prints useful information on console */
 	void DebugDump();
-	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr);
+	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm);
 	void CreateMovement(char *command, const char *area, const char *entrance);
 	void DrawMap(Region viewport, GameControl* gc);
 	void PlayAreaSong(int);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.81 2004/08/07 19:32:46 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.82 2004/08/22 19:24:19 edheldil Exp $
  *
  */
 
@@ -1225,7 +1225,7 @@ void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r,
 }
 /** This functions Draws an Ellipse */
 void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
-	unsigned short yr, Color& color)
+	unsigned short yr, Color& color, bool clipped)
 {
 	//Uses the Breshenham's Ellipse Algorithm
 	long x, y, xc, yc, ee, tas, tbs, sx, sy;
@@ -1244,10 +1244,10 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 	sy = 0;
 
 	while (sx >= sy) {
-		SetPixel( cx + ( short ) x, cy + ( short ) y, color );
-		SetPixel( cx - ( short ) x, cy + ( short ) y, color );
-		SetPixel( cx - ( short ) x, cy - ( short ) y, color );
-		SetPixel( cx + ( short ) x, cy - ( short ) y, color );
+		SetPixel( cx + ( short ) x, cy + ( short ) y, color, clipped );
+		SetPixel( cx - ( short ) x, cy + ( short ) y, color, clipped );
+		SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
+		SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );
 		y++;
 		sy += tas;
 		ee += yc;
@@ -1269,10 +1269,10 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 	sy = tas * yr;
 
 	while (sx <= sy) {
-		SetPixel( cx + ( short ) x, cy + ( short ) y, color );
-		SetPixel( cx - ( short ) x, cy + ( short ) y, color );
-		SetPixel( cx - ( short ) x, cy - ( short ) y, color );
-		SetPixel( cx + ( short ) x, cy - ( short ) y, color );
+		SetPixel( cx + ( short ) x, cy + ( short ) y, color, clipped );
+		SetPixel( cx - ( short ) x, cy + ( short ) y, color, clipped );
+		SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
+		SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );
 		x++;
 		sx += tbs;
 		ee += xc;

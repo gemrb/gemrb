@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.35 2004/08/05 17:25:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.36 2004/08/22 19:24:19 edheldil Exp $
  *
  */
 
@@ -80,7 +80,7 @@ public:
 	void DrawCircle(short cx, short cy, unsigned short r, Color& color);
 	/** This functions Draws an Ellipse */
 	void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr,
-		Color& color);
+		Color& color, bool clipped = true);
 	/** This function Draws a Polygon on the Screen */
 	void DrawPolyline(Gem_Polygon* poly, Color& color, bool fill = false);
 	inline void DrawHLine(short x1, short y, short x2, Color& color, bool clipped = false);

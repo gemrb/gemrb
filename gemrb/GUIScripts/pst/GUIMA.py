@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.4 2004/08/20 12:48:25 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.5 2004/08/22 19:24:29 edheldil Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -61,10 +61,22 @@ def OpenMapWindow ():
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetText (Window, Button, 4182)
 
+	# Map Control
+	Button = GemRB.GetControl (Window, 3)
+	GemRB.SetControlPos (Window, Button, 65535, 0)
+
+	Map = GemRB.CreateMapControl (Window, 6, 24, 23, 480, 360)
+
+	Text = GemRB.GetControl (Window, 4)
+	GemRB.SetText (Window, Text, "Note text ...")
+
+	Label = GemRB.GetControl (Window, 0x10000005)
+	GemRB.SetText (Window, Label, "POKUS jashkdjhakslsdjlkajskdj jhdkajshdkasjhdkjash")
+	#GemRB.SetLabelTextColor (Window, Label, 255, 0, 0)
 	# 2 - map name?
 	# 3 - map bitmap?
 	# 4 - ???
-	
+		       
 	# Done
 	Button = GemRB.GetControl (Window, 5)
 	GemRB.SetText (Window, Button, 1403)

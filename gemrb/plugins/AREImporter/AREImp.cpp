@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.65 2004/08/18 20:57:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.66 2004/08/22 19:24:27 edheldil Exp $
  *
  */
 
@@ -192,6 +192,12 @@ Map* AREImp::GetMap(const char *ResRef)
 	ImageMgr* sr = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
 	DataStream* srstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
 	sr->Open( srstr, true );
+
+	// Small map for MapControl
+	ImageMgr* sm = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
+	DataStream* smstr = core->GetResourceMgr()->GetResource( WEDResRef, IE_MOS_CLASS_ID );
+	sm->Open( smstr, true );
+
 
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
@@ -627,7 +633,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		map->AddAmbient(ambi);
 	}
 
-	map->AddTileMap( tm, lm, sr );
+	map->AddTileMap( tm, lm, sr, sm );
 	core->FreeInterface( tmm );
 	return map;
 }

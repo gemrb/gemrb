@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.193 2004/08/21 04:53:58 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.194 2004/08/22 19:24:24 edheldil Exp $
  *
  */
 
@@ -32,6 +32,7 @@
 #include "../Core/ItemMgr.h"
 #include "../Core/StoreMgr.h"
 #include "../Core/WorldMapControl.h"
+#include "../Core/MapControl.h"
 #include "../Core/SoundMgr.h"
 
 //this stuff is missing from Python 2.2
@@ -1598,6 +1599,38 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 	lbl->SetAlignment( align );
 #endif
 	win->AddControl( wmap );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+
+PyDoc_STRVAR( GemRB_CreateMapControl__doc,
+"CreateMapControl(WindowIndex, ControlID, x, y, w, h) => ControlIndex\n\n"
+"Creates and adds a new Area Map control to a Window." );
+
+static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlID, x, y, w, h;
+
+	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &x,
+			&y, &w, &h )) {
+		return AttributeError( GemRB_CreateMapControl__doc );
+	}
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (win == NULL) {
+		return NULL;
+	}
+	MapControl* map = new MapControl( );
+	map->XPos = x;
+	map->YPos = y;
+	map->Width = w;
+	map->Height = h;
+	map->ControlID = ControlID;
+	map->ControlType = IE_GUI_MAP;
+	map->Owner = win;
+	win->AddControl( map );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3423,6 +3456,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(EnableButtonBorder, METH_VARARGS),
 	METHOD(SetButtonFont, METH_VARARGS),
 	METHOD(CreateWorldMapControl, METH_VARARGS),
+	METHOD(CreateMapControl, METH_VARARGS),
 	METHOD(SetControlPos, METH_VARARGS),
 	METHOD(SetControlSize, METH_VARARGS),
 	METHOD(SetTextAreaSelectable, METH_VARARGS),

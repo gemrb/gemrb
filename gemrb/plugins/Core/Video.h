@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.31 2004/08/05 17:25:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.32 2004/08/22 19:24:26 edheldil Exp $
  *
  */
 
@@ -81,7 +81,7 @@ public:
 	virtual void DrawCircle(short cx, short cy, unsigned short r, Color& color) = 0;
 	/** This functions Draws an Ellipse */
 	virtual void DrawEllipse(short cx, short cy, unsigned short xr,
-		unsigned short yr, Color& color) = 0;
+		unsigned short yr, Color& color, bool clipped = true) = 0;
 	/** This function Draws a Polygon on the Screen */
 	virtual void DrawPolyline(Gem_Polygon* poly, Color& color,
 		bool fill = false) = 0;
