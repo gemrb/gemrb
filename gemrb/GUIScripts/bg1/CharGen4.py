@@ -19,7 +19,7 @@ def OnLoad():
 
 	RaceTable = GemRB.LoadTable("races")
 	ClassTable = GemRB.LoadTable("classes")
-	#KitTable = GemRB.LoadTable("kitlist")
+	KitTable = GemRB.LoadTable("kitlist")
 
 	GenderButton = GemRB.GetControl(CharGenWindow,0)
 	GemRB.SetText(CharGenWindow,GenderButton,11956)

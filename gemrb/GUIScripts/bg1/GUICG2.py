@@ -89,17 +89,13 @@ def MultiClassPress():
 def SpecialistPress():
 	GemRB.SetVar("Class Kit", 0)
 	GemRB.SetVar("Class", 6)
-	GemRB.SetNextScript("GUICG7")
+	GemRB.SetNextScript("GUICG22")
 	return
 	
 def ClassPress():
 	Class = GemRB.GetVar("Class")-1
 	GemRB.SetText(ClassWindow,TextAreaControl, GemRB.GetTableValue(ClassTable,Class,1) )
 	GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
-	#if no kit selection for this class, don't go to guicg22
-	#GemRB.DrawWindows()
-	#GemRB.UnloadWindow(ClassWindow)
-	#GemRB.SetNextScript("GUICG22")
 	return
 
 def BackPress():
