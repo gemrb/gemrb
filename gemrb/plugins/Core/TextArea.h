@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.16 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.17 2004/03/15 15:50:19 avenger_teambg Exp $
  *
  */
 
@@ -103,6 +103,8 @@ public: //Events
 	/** Mouse Button Up */
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 		unsigned short Mod);
+  /** OnChange Scripted Event Function Name */
+  char TextAreaOnChange[64];
 };
 
 #endif

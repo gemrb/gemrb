@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.136 2004/03/15 14:18:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.137 2004/03/15 15:50:18 avenger_teambg Exp $
  *
  */
 
@@ -1296,6 +1296,15 @@ int Interface::SetEvent(unsigned short WindowIndex,
 			 {
 				Button* btn = ( Button* ) ctrl;
 				btn->SetEvent( funcName, EventID & 255 );
+				return 0;
+			}
+			break;
+
+		case IE_GUI_TEXTAREA:
+			//TextArea
+			 {
+				TextArea* te = ( TextArea* ) ctrl;
+				strncpy( te->TextAreaOnChange, funcName, 64 );
 				return 0;
 			}
 			break;
