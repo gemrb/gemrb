@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.173 2004/10/08 22:52:09 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.174 2004/11/07 19:48:44 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -562,6 +562,26 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					strncpy(Tmp,"Kill(Myself)",sizeof(Tmp) );
 					lastActor->AddAction( GameScript::GenerateAction(Tmp) );
 				}
+				break;
+			case 'z': 
+				if (! lastActor)
+					break;
+
+				for (int slot = 0; slot < 10; slot++) {
+					CREItem* ci = lastActor->inventory.GetSlotItem (slot);
+					if (! ci)
+						continue;
+
+					Item* item = core->GetItem(ci->ItemResRef);
+					if (item) {
+						for (std::vector< ITMFeature* >::iterator f = item->equipping_features.begin(); f != item->equipping_features.end(); f++) {
+							//printf("Slot: %d\n", slot);
+							lastActor->fxqueue.AddEffect( *f );
+						}
+						delete item;
+					}
+				}
+				lastActor->fxqueue.ApplyAllEffects( lastActor );
 				break;
 			case '4':
 				//show all traps and infopoints

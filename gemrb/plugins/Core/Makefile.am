@@ -85,6 +85,7 @@ libgemrb_core_la_SOURCES = \
 	Ambient.cpp \
 	WorldMapControl.cpp \
 	MapControl.cpp \
-	AmbientMgr.cpp
+	AmbientMgr.cpp \
+	EffectQueue.cpp
 
 noinst_HEADERS = *.h
