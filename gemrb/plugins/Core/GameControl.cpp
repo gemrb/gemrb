@@ -11,6 +11,7 @@ GameControl::GameControl(void)
 	lastActor = NULL;
 	MouseIsDown = false;
 	DrawSelectionRect = false;
+	overDoor = NULL;
 }
 
 GameControl::~GameControl(void)
@@ -22,6 +23,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 {
 	if(MapIndex == -1)
 		return;
+	Video * video = core->GetVideoDriver();
 	Region vp(x+XPos, y+YPos, Width, Height);
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
@@ -29,10 +31,24 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		area->DrawMap(vp);
 		if(DrawSelectionRect) {
 			Color green = {0x00, 0xff, 0x00, 0xff};
-			Video * video = core->GetVideoDriver();
-			unsigned short xs[4] = {SelectionRect.x, SelectionRect.x+SelectionRect.w, SelectionRect.x+SelectionRect.w, SelectionRect.x};
-			unsigned short ys[4] = {SelectionRect.y, SelectionRect.y, SelectionRect.y+SelectionRect.h, SelectionRect.y+SelectionRect.h};
-			video->DrawPolyline(xs, ys, 4, green);
+			
+			short xs[4] = {SelectionRect.x, SelectionRect.x+SelectionRect.w, SelectionRect.x+SelectionRect.w, SelectionRect.x};
+			short ys[4] = {SelectionRect.y, SelectionRect.y, SelectionRect.y+SelectionRect.h, SelectionRect.y+SelectionRect.h};
+			Point points[4] = {
+				{SelectionRect.x, SelectionRect.y},
+				{SelectionRect.x+SelectionRect.w, SelectionRect.y},
+				{SelectionRect.x+SelectionRect.w, SelectionRect.y+SelectionRect.h},
+				{SelectionRect.x, SelectionRect.y+SelectionRect.h}
+			};
+			Gem_Polygon poly(points, 4);
+			video->DrawPolyline(&poly, green, false);
+		}
+		if(overDoor) {
+			Color cyan = {0x00, 0xff, 0xff, 0xff};
+			if(overDoor->DoorClosed)
+				video->DrawPolyline(overDoor->closed, cyan, false);	
+			else 
+				video->DrawPolyline(overDoor->open, cyan, false);	
 		}
 	}
 	else {
@@ -62,7 +78,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 /** Mouse Over Event */
 void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 {
-	unsigned short GameX = x, GameY = y;
+	short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	if(MouseIsDown && (!DrawSelectionRect)) {
 	if((abs(GameX-StartX) > 5) || (abs(GameY-StartY) > 5))
@@ -99,7 +115,6 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 		}
 		free(ab);
-		//TODO: Check if an actor is inside the rect
 	}
 	else {
 		ActorBlock * actor = area->GetActor(GameX, GameY);
@@ -107,16 +122,22 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			lastActor->actor->anims->DrawCircle = false;
 		if(!actor) {
 			lastActor = NULL;
-			return;
 		}
-		lastActor = actor;
-		lastActor->actor->anims->DrawCircle = true;
+		else {
+			lastActor = actor;
+			lastActor->actor->anims->DrawCircle = true;
+		}
 	}
+	Door * door = area->tm->GetDoor(GameX, GameY);
+	if(door)
+		overDoor = door;
+	else
+		overDoor = NULL;
 }
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	unsigned short GameX = x, GameY = y;
+	short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	MouseIsDown = true;
 	SelectionRect.x = GameX;
@@ -130,7 +151,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char 
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
 	MouseIsDown = false;
-	unsigned short GameX = x, GameY = y;
+	short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);

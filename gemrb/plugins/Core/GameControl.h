@@ -36,7 +36,8 @@ private:
 	bool DrawSelectionRect;
 	bool MouseIsDown;
 	Region SelectionRect;
-	unsigned short StartX, StartY;
+	short StartX, StartY;
+	Door * overDoor;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
