@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.50 2003/12/22 21:06:15 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.51 2003/12/22 21:27:25 balrog994 Exp $
  *
  */
 
@@ -325,6 +325,10 @@ int SDLVideoDriver::SwapBuffers(void)
 
 					case SDLK_RETURN:
 						key = GEM_RETURN;
+					break;
+
+					case SDLK_TAB:
+						key = GEM_TAB;
 					break;
 				}
 				if(Evnt)
