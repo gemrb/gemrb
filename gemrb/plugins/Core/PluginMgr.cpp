@@ -3,6 +3,7 @@
 #include "stdlib.h"
 #include "PluginMgr.h"
 #include "Plugin.h"
+#include "Interface.h"
 
 #ifdef WIN32
 #include <io.h>
@@ -19,9 +20,12 @@ typedef char * (* charvoid)(void);
 typedef int (* intvoid)(void);
 typedef ClassDesc *(* cdint)(int);
 
+extern Interface * core;
+extern HANDLE hConsole;
+
 PluginMgr::PluginMgr(char * pluginpath)
 {
-	printf("Loading Plugins...\n");
+	printMessage("PluginMgr", "Loading Plugins...\n", WHITE);
 	char path[_MAX_PATH];
 	strcpy(path, pluginpath);
 	/*
@@ -39,11 +43,13 @@ PluginMgr::PluginMgr(char * pluginpath)
 	struct _finddata_t c_file;
 	long hFile;
 	strcat(path, "plugins\\*.dll");
-	printf("Searching for plugins in: %s\n", path);
+	printMessage("PluginMgr", "Searching for plugins in: ", WHITE);
+	printf("%s\n", path);
 	if((hFile = _findfirst(path, &c_file)) == -1L) //If there is no file matching our search
 #else
 	strcat(path, "plugins");
-	printf("Searching for plugins in: %s\n", path);
+	printMessage("PluginMgr", "Searching for plugins in: ", WHITE);
+	printf("%s\n", path);
 	DIR * dir = opendir(path);
 	if(dir == NULL) //If we cannot open the Directory
 #endif
@@ -62,13 +68,19 @@ PluginMgr::PluginMgr(char * pluginpath)
 		strcpy(path, pluginpath);
 		strcat(path, "plugins\\");
 		strcat(path, c_file.name);
-		printf("Loading: %s...", c_file.name);
+		printBracket("PluginMgr", LIGHT_WHITE);
+		printf(": Loading: ");
+		textcolor(LIGHT_WHITE);
+		printf("%s", c_file.name);
+		textcolor(WHITE);
+		printf("...");
 		HMODULE hMod = LoadLibrary(path); //Try to load the Module
 		if(hMod == NULL) {
-			printf("[ERROR]\nCannot Load Module, Skipping...\n");
+			printBracket("ERROR", LIGHT_RED);
+			printf("\nCannot Load Module, Skipping...\n");
 			continue;
 		}
-		printf("[OK]\n");
+		printStatus("OK", LIGHT_GREEN);
 		LibVersion = (ulongvoid)GetProcAddress(hMod, "LibVersion");
 		LibDescription = (charvoid)GetProcAddress(hMod, "LibDescription");
 		LibNumberClasses = (intvoid)GetProcAddress(hMod, "LibNumberClasses");
@@ -79,13 +91,19 @@ PluginMgr::PluginMgr(char * pluginpath)
 		strcpy(path, pluginpath);
 		strcat(path, "plugins/");
 		strcat(path, de->d_name);
-		printf("Loading: %s...", path);
+		printBracket("PluginMgr", LIGHT_WHITE);
+		printf(": Loading: ");
+		textcolor(LIGHT_WHITE);
+		printf("%s", path);
+		textcolor(WHITE);
+		printf("...");
 		void* hMod = dlopen(path, RTLD_NOW); //Try to load the Module
 		if(hMod == NULL) {
-			printf("[ERROR]\nCannot Load Module (%s), Skipping...\n", dlerror());
+			printBracket("ERROR", LIGHT_RED);
+			printf("\nCannot Load Module, Skipping...\n");
 			continue;
 		}
-		printf("[OK]\n");
+		printStatus("OK", LIGHT_GREEN);
 		/*
 		GCC Version 3.2.x has changed the Export Names of the DLLs this statement is a simple
 		hack to make GemRB run on every version.
@@ -102,28 +120,37 @@ PluginMgr::PluginMgr(char * pluginpath)
 		LibClassDesc = (cdint)dlsym(hMod, "_Z12LibClassDesci");
 #endif
 #endif
-		printf("Checking Plugin Version...");
+		printMessage("PluginMgr", "Checking Plugin Version...", WHITE);
 		if(LibVersion() != VERSION_GEMRB) {
+			printStatus("ERROR", LIGHT_RED);
 			printf("Plug-in Version not valid, Skipping...\n");
 			continue;
 		}
-		printf("[OK]\nLoading Exports for %s...", LibDescription());
+		printStatus("OK", LIGHT_GREEN);
+		printMessage("PluginMgr", "Loading Exports for ", WHITE);
+		textcolor(LIGHT_WHITE);
+		printf("%s", LibDescription());
+		textcolor(WHITE);
+		printf("...");
 		int count = LibNumberClasses();
-		printf("[%d Classes Exported]\n", count);
+		printStatus("OK", LIGHT_GREEN);
 		bool error = false;
 		for(int i = 0; i < count; i++) {
 			ClassDesc *plug = LibClassDesc(i);
 			if(plug == NULL) {
+				printStatus("ERROR", LIGHT_RED);
 				printf("Plug-in Exports Error\n");			
 				continue;
 			}
 			for(unsigned int x = 0; x < plugins.size(); x++) {
 				if(plugins[x]->ClassID() == plug->ClassID()) {
+					printStatus("SKIPPING", YELLOW);
 					printf("Plug-in Already Loaded\n");
 					error = true;
 					break;
 				}
 				if(plugins[x]->SuperClassID() == plug->SuperClassID()) {
+					printStatus("SKIPPING", YELLOW);
 					printf("Duplicate Plug-in\n");
 					error = true;
 					break;
