@@ -24,6 +24,7 @@ def OnLoad():
 	GemRB.SetEvent(PartySelectWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetText(PartySelectWindow, CancelButton, 13727)
 	DoneButton = GemRB.GetControl(PartySelectWindow, 10)
+	GemRB.SetEvent(PartySelectWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	GemRB.SetText(PartySelectWindow, DoneButton, 11973)
 	
 	GemRB.SetVar("PartyIdx",0)
@@ -58,6 +59,14 @@ def ScrollBarPress():
 			GemRB.SetButtonState(PartySelectWindow, Button, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetText(PartySelectWindow, Button, "")
 	return
+
+def DonePress():
+	global PartySelectWindow
+	Pos = GemRB.GetVar("TopIndex") + GemRB.GetVar("PartyIdx")
+	if Pos == 0:
+		GemRB.UnloadWindow(PartySelectWindow)
+		GemRB.SetNextScript("SPPartyFormation")
+	return	
 	
 def CancelPress():
 	global PartySelectWindow
