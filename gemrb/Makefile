@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.1 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.2 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -65,12 +65,12 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = i386-linux
-build_triplet = i386-pc-linux-gnu
-host_alias = i386-linux
-host_triplet = i386-pc-linux-gnu
-target_alias = i386-linux
-target_triplet = i386-pc-linux-gnu
+build_alias = i686-pc-linux-gnu
+build_triplet = i686-pc-linux-gnu
+host_alias = i686-pc-linux-gnu
+host_triplet = i686-pc-linux-gnu
+target_alias = i686-pc-linux-gnu
+target_triplet = i686-pc-linux-gnu
 ARTSCCONFIG = @ARTSCCONFIG@
 AS = @AS@
 AUTODIRS = 
@@ -160,8 +160,8 @@ MICO_INCLUDES = @MICO_INCLUDES@
 MICO_LDFLAGS = @MICO_LDFLAGS@
 MOC = @MOC@
 MSGFMT = @MSGFMT@
-NOOPT_CFLAGS =  -ansi -W -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -g
-NOOPT_CXXFLAGS =  -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -g3 -Wall -fno-exceptions -fno-check-new
+NOOPT_CFLAGS = 
+NOOPT_CXXFLAGS =  -fno-exceptions -fno-check-new
 NOREPO = -fno-repo
 OBJDUMP = @OBJDUMP@
 OBJEXT = o
@@ -188,7 +188,7 @@ USE_EXCEPTIONS = -fexceptions
 USE_RTTI = 
 USE_THREADS = @USE_THREADS@
 VERSION = 0.1
-WOVERLOADED_VIRTUAL = -Woverloaded-virtual
+WOVERLOADED_VIRTUAL = 
 XGETTEXT = @XGETTEXT@
 XPMINC = @XPMINC@
 XPMLIB = @XPMLIB@
@@ -270,7 +270,7 @@ gemrb_DEPENDENCIES =  ./plugins/AREImporter/libAREImporter.la \
 	./plugins/TISImporter/libTISImporter.la \
 	./plugins/TLKImporter/libTLKImporter.la \
 	./plugins/WEDImporter/libWEDImporter.la ./plugins/ZLibMgr/libZLibMgr.la
-CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
+CXXFLAGS = -O2 -fno-exceptions -fno-check-new
 #>- CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 #>+ 1
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) $(KDE_CXXFLAGS)
@@ -284,12 +284,7 @@ CXXLINK = $(LIBTOOL) --mode=link --tag=CXX $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $
 DIST_COMMON =  Makefile.am Makefile.in
 
 
-#>- DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
-#>+ 4
-KDE_DIST=gemrb 
-
-DISTFILES= $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST) $(KDE_DIST)
-
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
