@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.30 2004/04/14 23:53:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.31 2004/04/15 21:44:19 avenger_teambg Exp $
  *
  */
 
@@ -331,14 +331,16 @@ void CREImp::GetActorPST(Actor *act)
 void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 {
 	std::vector<CREItem*> items;
+	unsigned int i;
+
 	str->Seek( act->ItemsOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < act->ItemsCount; i++) {
+	for (i = 0; i < act->ItemsCount; i++) {
 		items.push_back( GetItem() );
 	}
 	act->inventory.SetSlotCount(Inventory_Size);
 
 	str->Seek( act->ItemSlotsOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < Inventory_Size; i++) {
+	for (i = 0; i < Inventory_Size; i++) {
 		ieWord index;
 		str->Read( &index, 2 );
 
@@ -353,7 +355,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		}
 	}
 
-	unsigned int i=items.size();
+	i=items.size();
 	while(i--) {
 		if(items[i]) {
 			printf("[CREImp]: Dangling item in creature: %s!\n", items[i]->ItemResRef);
@@ -368,17 +370,17 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	std::vector<CREMemorizedSpell*> memorized_spells;
 
 	str->Seek( act->KnownSpellsOffset, GEM_STREAM_START );
-	for (size_t i = 0; i < act->KnownSpellsCount; i++) {
+	for (i = 0; i < act->KnownSpellsCount; i++) {
 		known_spells.push_back( GetKnownSpell() );
 	}
 
 	str->Seek( act->MemorizedSpellsOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < act->MemorizedSpellsCount; i++) {
+	for (i = 0; i < act->MemorizedSpellsCount; i++) {
 		memorized_spells.push_back( GetMemorizedSpell() );
 	}
 
 	str->Seek( act->SpellMemorizationOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < act->SpellMemorizationCount; i++) {
+	for (i = 0; i < act->SpellMemorizationCount; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization();
 
 		for (unsigned int j = 0; j < known_spells.size(); j++) {
