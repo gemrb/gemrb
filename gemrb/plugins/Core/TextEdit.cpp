@@ -62,6 +62,7 @@ void TextEdit::SetBackGround(Sprite2D * back)
 /** Key Press Event */
 void TextEdit::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
+	((Window*)Owner)->Invalidate();
 	Changed = true;
 	if(Key >= 0x20) {
 		int len = strlen((char*)Buffer);
@@ -88,6 +89,7 @@ void TextEdit::OnKeyPress(unsigned char Key, unsigned short Mod)
 /** Special Key Press */
 void TextEdit::OnSpecialKeyPress(unsigned char Key)
 {
+	((Window*)Owner)->Invalidate();
 	Changed = true;
 	if(Key == GEM_LEFT) {
 		if(CurPos > 0)
