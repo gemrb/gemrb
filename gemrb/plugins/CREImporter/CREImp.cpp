@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.64 2005/03/31 13:54:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.65 2005/04/05 19:21:42 avenger_teambg Exp $
  *
  */
 
@@ -275,7 +275,7 @@ printf("STATE: %d\n",act->BaseStats[IE_STATE_ID]);
 	// Setting up derived stats
 	act->SetAnimationID( ( ieWord ) act->BaseStats[IE_ANIMATION_ID] );
 	if (act->BaseStats[IE_STATE_ID] & STATE_DEAD)
-		act->SetStance( IE_ANI_DIE );
+		act->SetStance( IE_ANI_TWITCH );
 	else
 		act->SetStance( IE_ANI_AWAKE );
 	return act;

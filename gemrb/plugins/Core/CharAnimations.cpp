@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.50 2005/04/01 18:48:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.51 2005/04/05 19:21:44 avenger_teambg Exp $
  *
  */
 
@@ -396,7 +396,6 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			a->Flags |= A_ANI_PLAYONCE;
 			break;
 		case IE_ANI_DIE:
-printf("Die switch to twitch\n");
 			nextStanceID = IE_ANI_TWITCH;
 			a->autoSwitchOnEnd = true;
 			break;
@@ -642,6 +641,14 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 	}
 }
 
+//Attack
+//h1, h2, w2
+static char *SlashPrefix[]={"A1","A4","A7"};
+static char *BackPrefix[]={"A2","A5","A8"};
+static char *JabPrefix[]={"A3","A6","A9"};
+static char *RangedPrefix[]={"SA","SX","SS"};
+static char *RangedPrefixOld[]={"SA","SX","A1"};
+
 void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)
 {
@@ -651,56 +658,20 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 		//based on the weapon type (TODO)
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
-			switch (WeaponType) {
-				case IE_ANI_WEAPON_1H:
-					strcat( ResRef, "A1" );
-					break;
-
-				case IE_ANI_WEAPON_2H:
-					strcat( ResRef, "A4" );
-					break;
-
-				case IE_ANI_WEAPON_2W:
-					strcat( ResRef, "A7" );
-					break;
-			}
+			strcat (ResRef, SlashPrefix[WeaponType]);
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
-			switch (WeaponType) {
-				case IE_ANI_WEAPON_1H:
-					strcat( ResRef, "A2" );
-					break;
-
-				case IE_ANI_WEAPON_2H:
-					strcat( ResRef, "A5" );
-					break;
-
-				case IE_ANI_WEAPON_2W:
-					strcat( ResRef, "A8" );
-					break;
-			}
+			strcat (ResRef, BackPrefix[WeaponType]);
 			break;
 
 		case IE_ANI_ATTACK_JAB:
-			switch (WeaponType) {
-				case IE_ANI_WEAPON_1H:
-					strcat( ResRef, "A3" );
-					break;
-
-				case IE_ANI_WEAPON_2H:
-					strcat( ResRef, "A6" );
-					break;
-
-				case IE_ANI_WEAPON_2W:
-					strcat( ResRef, "A9" );
-					break;
-			}
+			strcat (ResRef, JabPrefix[WeaponType]);
 			break;
 
 		case IE_ANI_AWAKE:
-			strcat( ResRef, "G1" );
-			Cycle += 9;
+			strcat( ResRef, "G17" );
+			Cycle += 63;
 			break;
 
 		case IE_ANI_CAST:
@@ -721,7 +692,6 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			strcat( ResRef, "G15" );
 			Cycle += 45;
 			break;
-
 			//I cannot find an emerge animation...
 			//Maybe is Die reversed
 		case IE_ANI_GET_UP:
@@ -740,25 +710,12 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_READY:
-			strcat( ResRef, "G13" );
+			strcat( ResRef, "G13" ); //two handed
 			Cycle += 27;
 			break;
-
 			//This depends on the ranged weapon equipped
 		case IE_ANI_SHOOT:
-			switch (RangedType) {
-				case IE_ANI_RANGED_BOW:
-					strcat( ResRef, "SA" );
-					break;
-
-				case IE_ANI_RANGED_XBOW:
-					strcat( ResRef, "SX" );
-					break;
-
-				case IE_ANI_RANGED_THROW:
-					strcat( ResRef, "SS" );
-					break;
-			}
+			strcat (ResRef, RangedPrefix[RangedType]);
 			break;
 
 		case IE_ANI_SLEEP:
@@ -767,8 +724,8 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_TWITCH:
-			strcat( ResRef, "G17" );
-			Cycle += 72;
+			strcat( ResRef, "G16" );
+			Cycle += 54;
 			break;
 
 		case IE_ANI_WALK:
@@ -846,53 +803,17 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			//which animation return randomly
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
-			switch (WeaponType) {
-				case IE_ANI_WEAPON_1H:
-					strcat( ResRef, "A1" );
-					break;
-
-				case IE_ANI_WEAPON_2H:
-					strcat( ResRef, "A4" );
-					break;
-
-				case IE_ANI_WEAPON_2W:
-					strcat( ResRef, "A7" );
-					break;
-			}
+			strcat (ResRef, SlashPrefix[WeaponType]);
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
-			switch (WeaponType) {
-				case IE_ANI_WEAPON_1H:
-					strcat( ResRef, "A2" );
-					break;
-
-				case IE_ANI_WEAPON_2H:
-					strcat( ResRef, "A5" );
-					break;
-
-				case IE_ANI_WEAPON_2W:
-					strcat( ResRef, "A8" );
-					break;
-			}
+			strcat (ResRef, BackPrefix[WeaponType]);
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_JAB:
-			switch (WeaponType) {
-				case IE_ANI_WEAPON_1H:
-					strcat( ResRef, "A3" );
-					break;
-
-				case IE_ANI_WEAPON_2H:
-					strcat( ResRef, "A6" );
-					break;
-
-				case IE_ANI_WEAPON_2W:
-					strcat( ResRef, "A9" );
-					break;
-			}
+			strcat (ResRef, JabPrefix[WeaponType]);
 			Cycle = Orient;
 			break;
 
@@ -945,22 +866,8 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 
 			//This depends on the ranged weapon equipped
 		case IE_ANI_SHOOT:
-			switch (RangedType) {
-				case IE_ANI_RANGED_BOW:
-					strcat( ResRef, "SA" );
-					Cycle = Orient;
-					break;
-
-				case IE_ANI_RANGED_XBOW:
-					strcat( ResRef, "SX" );
-					Cycle = Orient;
-					break;
-
-				case IE_ANI_RANGED_THROW:
-					strcat( ResRef, "A1" );
-					Cycle = Orient;
-					break;
-			}
+			strcat (ResRef, RangedPrefixOld[RangedType]);
+			Cycle = Orient;
 			break;
 
 		case IE_ANI_SLEEP:
