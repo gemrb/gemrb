@@ -532,6 +532,8 @@ void GameControl::SetCutSceneMode(bool active)
 	DisableMouse = active;
 	if(active) {
 		core->GetVideoDriver()->SetCursor(NULL, NULL);
+		moveX = 0;
+		moveY = 0;
 	}
 	else {
 		core->GetVideoDriver()->SetCursor(core->Cursors[lastCursor]->GetFrame(0), core->Cursors[lastCursor+1]->GetFrame(0));
