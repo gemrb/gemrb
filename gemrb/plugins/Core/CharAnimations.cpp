@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.27 2004/01/05 16:23:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.28 2004/01/16 22:54:41 balrog994 Exp $
  *
  */
 
@@ -51,6 +51,8 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 		UsePalette = false;
 	CircleSize = atoi(Avatars->QueryField(RowIndex, 6));
 	Animation * anim = GetAnimation(IE_ANI_AWAKE, 0);
+	if(!anim)
+		return;
 	Color * pal = core->GetVideoDriver()->GetPalette(anim->GetFrame(0));
 	memcpy(Palette, pal, 256*sizeof(Color));
 	free(pal);
@@ -185,14 +187,55 @@ the 1-7 frames are mirrored to create the 9-14 frames.
 There are 4 Mirroring modes:
 
 IE_ANI_CODE_MIRROR: The code automatically mirrors the needed frames 
-(as in the example above)
+					(as in the example above)
 
-IE_ANI_ONE_FILE: The whole animation is in one file, no mirroring needed.
+					These Animations are stores using the following template:
+					[NAME][ARMORTYPE][ACTIONCODE]
 
-IE_ANI_TWO_FILES: The whole animation is in 2 files. The East and West part are in 2 BAM Files.
+					Each BAM File contains only 9 Orientations, the missing 7 Animations
+					are created by Horizontally Mirroring the 1-7 Orientations.
 
-IE_ANI_FOUR_FILES: The Animation is coded in Four Files. Probably it is an old Two File animation with
-additional frames added in a second time.
+IE_ANI_ONE_FILE:	The whole animation is in one file, no mirroring needed.
+
+IE_ANI_TWO_FILES:	The whole animation is in 2 files. The East and West part are in 2 BAM Files.
+
+IE_ANI_FOUR_FILES:	The Animation is coded in Four Files. Probably it is an old Two File animation with
+					additional frames added in a second time.
+
+IE_ANI_TWO_FILES_2: This Animation Type stores the Animation in the following format
+					[NAME][ACTIONCODE][/E]
+
+					Example:
+					CMNK1A1		Character Monk AT1 Attack 1
+					CMNK1A1E	Character Monk AT1 Attack 1 East
+					
+					Each BAM File Stores one action and has 5 orientations, the Ease
+					file stores the East part of the Animation. Since these animations
+					have a total of 8 Orientations, these are automatically copied
+					by GemRB to use them as 16 Orientations.
+
+IE_ANI_TWO_FILES_3:	Animations using this type was stored using the following template:
+					[NAME][ACTIONTYPE][/E]
+
+					Example:
+					ACHKG1
+					ACHKG1E
+
+					Each BAM File contains many animation groups, each animation group
+					stores 5 Orientments, the missing 3 are stored in East BAM Files.
+
+IE_ANI_PST_ANIMATION_1: Planescape: Torment Animations are stored in a different
+					way than the other games. This format uses the following template:
+					[C/D][ACTIONTYPE][NAME][B]
+
+					Example:
+					CAT1MRTB
+
+					Each Animation stores 5 Orientments, which are automatically mirrored
+					to form an 8 Orientments Animation. PST Animations have a different Palette
+					format. This Animation Type handles the PST Palette format too.
+
+					NOTE: Walking/Running animations stores 9 Orientations.
 
 
  WEST PART       |       EAST PART
@@ -230,8 +273,15 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 	Animation * a = anim->GetAnimation(Cycle, 0, 0, IE_NORMAL);
 	a->pos = 0;
 	core->FreeInterface(anim);
-	if(AnimID==IE_ANI_SLEEP) {
+	a->pos = 0;
+	a->endReached = false;
+	if((AnimID==IE_ANI_SLEEP) || (AnimID==IE_ANI_DIE) || (AnimID==IE_ANI_GET_UP)) {
 		a->playOnce = true;
+		if(AnimID == IE_ANI_GET_UP) {
+			a->playReversed = true;
+			a->autoSwitchOnEnd = true;
+			a->nextAnimID = IE_ANI_AWAKE;
+		}
 	}
 	switch(MirrorType) {
 		case IE_ANI_CODE_MIRROR:
@@ -340,7 +390,7 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 			{
 			for(int i = 0; i < 18; i++) {
 				for(int j = 0; j < 16; j++) {
-					Anims[i][j] = a;
+					Anims[i][j] = NULL;
 				}
 			}
 			}
@@ -663,6 +713,7 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 
 			//I cannot find an emerge animation...
 			//Maybe is Die reversed
+			case IE_ANI_GET_UP:
 			case IE_ANI_EMERGE:
 				{
 				strcat(ResRef, "G19");
@@ -864,6 +915,7 @@ void CharAnimations::AddMHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 			break;
 
 			case IE_ANI_DIE:
+			case IE_ANI_GET_UP:
 				{
 				strcat(ResRef, "G1");
 				Cycle = 48 + (Orient/2);
@@ -1009,6 +1061,7 @@ void CharAnimations::AddMMRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 			break;
 
 			case IE_ANI_DIE:
+			case IE_ANI_GET_UP:
 				{
 				strcat(ResRef, "DE");
 				Cycle = (Orient/2);
