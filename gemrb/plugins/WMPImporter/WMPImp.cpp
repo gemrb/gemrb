@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.6 2004/08/20 12:48:23 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.7 2004/09/12 15:54:02 avenger_teambg Exp $
  *
  */
 
@@ -52,30 +52,30 @@ bool WMPImp::Open(DataStream* stream, bool autoFree)
 		printf( "[WMPImporter]: This file is not a valid WMP File\n" );
 		return false;
 	}
-	str->Read( &WorldMapsCount, 4 );
-	str->Read( &WorldMapsOffset, 4 );
+	str->ReadDword( &WorldMapsCount );
+	str->ReadDword( &WorldMapsOffset );
 
 	return true;
 }
 
 WorldMap* WMPImp::GetWorldMap(unsigned int index)
 {
-  unsigned int i;
+	unsigned int i;
 	WorldMap* m = new WorldMap();
 
 	str->Seek( WorldMapsOffset + index * 184, GEM_STREAM_START );
 
 	str->Read( m->MapResRef, 8 );
-	str->Read( &m->Width, 4 );
-	str->Read( &m->Height, 4 );
-	str->Read( &m->MapNumber, 4 );
-	str->Read( &m->AreaName, 4 );
-	str->Read( &m->unknown1, 4 );
-	str->Read( &m->unknown2, 4 );
-	str->Read( &m->AreaEntriesCount, 4 );
-	str->Read( &m->AreaEntriesOffset, 4 );
-	str->Read( &m->AreaLinksOffset, 4 );
-	str->Read( &m->AreaLinksCount, 4 );
+	str->ReadDword( &m->Width );
+	str->ReadDword( &m->Height );
+	str->ReadDword( &m->MapNumber );
+	str->ReadDword( &m->AreaName );
+	str->ReadDword( &m->unknown1 );
+	str->ReadDword( &m->unknown2 );
+	str->ReadDword( &m->AreaEntriesCount );
+	str->ReadDword( &m->AreaEntriesOffset );
+	str->ReadDword( &m->AreaLinksOffset );
+	str->ReadDword( &m->AreaLinksCount );
 	str->Read( m->MapIconResRef, 8 );
 	str->Read( m->unknown3, 128 );
 
@@ -128,17 +128,17 @@ WMPAreaEntry* WMPImp::GetAreaEntry()
 	str->Read( ae->AreaName, 8 );
 	str->Read( ae->AreaResRef, 8 );
 	str->Read( ae->AreaLongName, 32 );
-	str->Read( &ae->AreaStatus, 4 );
-	str->Read( &ae->IconSeq, 4 );
-	str->Read( &ae->X, 4 );
-	str->Read( &ae->Y, 4 );
-	str->Read( &ae->LocCaptionName, 4 );
-	str->Read( &ae->LocTooltipName, 4 );
+	str->ReadDword( &ae->AreaStatus );
+	str->ReadDword( &ae->IconSeq );
+	str->ReadDword( &ae->X );
+	str->ReadDword( &ae->Y );
+	str->ReadDword( &ae->LocCaptionName );
+	str->ReadDword( &ae->LocTooltipName );
 	str->Read( ae->LoadScreenResRef, 8 );
 
 	for (unsigned int dir = 0; dir < 4; dir++) {
-		str->Read( &ae->AreaLinksIndex[dir], 4 );
-		str->Read( &ae->AreaLinksCount[dir], 4 );
+		str->ReadDword( &ae->AreaLinksIndex[dir] );
+		str->ReadDword( &ae->AreaLinksCount[dir] );
 	}
 	str->Read( ae->unknown, 128 );
 
@@ -150,14 +150,14 @@ WMPAreaLink* WMPImp::GetAreaLink()
 {
 	WMPAreaLink* al = new WMPAreaLink();
 
-	str->Read( &al->AreaIndex, 4 );
+	str->ReadDword( &al->AreaIndex );
 	str->Read( al->DestEntryPoint, 32 );
-	str->Read( &al->DistanceScale, 4 );
-	str->Read( &al->Flags, 4 );
+	str->ReadDword( &al->DistanceScale );
+	str->ReadDword( &al->Flags );
 	for (unsigned k = 0; k < 5; k++) {
 		str->Read( al->EncounterAreaResRef[k], 8 );
 	}
-	str->Read( &al->EncounterChance, 4 );
+	str->ReadDword( &al->EncounterChance );
 	str->Read( al->unknown, 128 );
 
 	return al;
