@@ -108,14 +108,17 @@ def OnLoad():
 	KitIndex = GemRB.GetTableRowIndex(Abclasrq, KitName)
 
 	GemRB.LoadWindowPack("GUICG")
-        AbilityTable = GemRB.LoadTable("ability")
+	AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindow(4)
 
 	RollPress()
 	StorePress()
 	for i in range(0,6):
+		Label = GemRB.GetControl(AbilityWindow, i+0x10000009)
+		GemRB.SetEvent(AbilityWindow, Label, IE_GUI_LABEL_ON_PRESS, "OverPress"+str(i) )
 		Button = GemRB.GetControl(AbilityWindow, i+30)
 		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
+		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "EmptyPress")
 		GemRB.SetVarAssoc(AbilityWindow, Button, "Ability", i)
 
 		Button = GemRB.GetControl(AbilityWindow, i*2+16)
@@ -137,7 +140,7 @@ def OnLoad():
 	GemRB.SetText(AbilityWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(AbilityWindow,0)
 	GemRB.SetText(AbilityWindow,DoneButton,11973)
-        GemRB.SetButtonFlags(AbilityWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetButtonFlags(AbilityWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(AbilityWindow, 29)
 	GemRB.SetText(AbilityWindow,TextAreaControl,17247)
@@ -217,6 +220,11 @@ def LeftPress():
 		GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_ENABLED)
 	return
 
+def EmptyPress():
+	TextAreaControl = GemRB.GetControl(AbilityWindow, 29)
+	GemRB.SetText(AbilityWindow,TextAreaControl,17247)
+	return
+
 def StorePress():
 	GemRB.SetVar("StoredStrExtra",GemRB.GetVar("StrExtra") )
 	for i in range(-1,6):
@@ -246,6 +254,54 @@ def BackPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(AbilityWindow)
+	GemRB.UnloadWindow(AbilityWindow)
 	GemRB.SetNextScript("CharGen6") #
+	return
+
+def OverPress0():
+	Ability = GemRB.GetVar("Ability 0")
+	CalcLimits(0)
+	GemRB.SetToken("MINIMUM",str(Minimum) )
+	GemRB.SetToken("MAXIMUM",str(Maximum) )
+	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, 0, 1) )
+	return
+
+def OverPress1():
+	Ability = GemRB.GetVar("Ability 1")
+	CalcLimits(1)
+	GemRB.SetToken("MINIMUM",str(Minimum) )
+	GemRB.SetToken("MAXIMUM",str(Maximum) )
+	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, 1, 1) )
+	return
+
+def OverPress2():
+	Ability = GemRB.GetVar("Ability 2")
+	CalcLimits(2)
+	GemRB.SetToken("MINIMUM",str(Minimum) )
+	GemRB.SetToken("MAXIMUM",str(Maximum) )
+	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, 2, 1) )
+	return
+
+def OverPress3():
+	Ability = GemRB.GetVar("Ability 3")
+	CalcLimits(3)
+	GemRB.SetToken("MINIMUM",str(Minimum) )
+	GemRB.SetToken("MAXIMUM",str(Maximum) )
+	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, 3, 1) )
+	return
+
+def OverPress4():
+	Ability = GemRB.GetVar("Ability 4")
+	CalcLimits(4)
+	GemRB.SetToken("MINIMUM",str(Minimum) )
+	GemRB.SetToken("MAXIMUM",str(Maximum) )
+	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, 4, 1) )
+	return
+
+def OverPress5():
+	Ability = GemRB.GetVar("Ability 5")
+	CalcLimits(5)
+	GemRB.SetToken("MINIMUM",str(Minimum) )
+	GemRB.SetToken("MAXIMUM",str(Maximum) )
+	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, 5, 1) )
 	return
