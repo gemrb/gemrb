@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.150 2004/04/13 22:24:59 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.151 2004/04/14 16:49:51 avenger_teambg Exp $
  *
  */
 
@@ -2047,11 +2047,13 @@ static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 	if (sg->GetPortraitCount() <= PCSlotCount) {
 		Button* btn = ( Button* ) ctrl;
 		btn->SetPicture( NULL );
+		delete sg;
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
 
 	DataStream* str = sg->GetPortrait( PCSlotCount );
+	delete sg;
 	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
 	if (im == NULL) {
 		delete ( str );
@@ -2108,6 +2110,7 @@ static PyObject* GemRB_SetSaveGamePreview(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	DataStream* str = sg->GetScreen();
+	delete sg;
 	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
 	if (im == NULL) {
 		delete ( str );
@@ -2392,6 +2395,7 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
+	PlayerSlot = core->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetActor( PlayerSlot );
 	if (!MyActor) {
 		return Py_BuildValue( "s", "");
@@ -2409,6 +2413,7 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
+	PlayerSlot = core->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetActor( PlayerSlot );
 	if (!MyActor) {
 		return Py_BuildValue( "s", "");
@@ -2426,6 +2431,7 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	//returning the modified stat
+	PlayerSlot = core->FindPlayer( PlayerSlot );
 	StatValue = core->GetCreatureStat( PlayerSlot, StatID, 1 );
 	return Py_BuildValue( "i", StatValue );
 }
@@ -2440,6 +2446,7 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	//Setting the creature's base stat, which gets saved (0)
+	PlayerSlot = core->FindPlayer( PlayerSlot );
 	if (!core->SetCreatureStat( PlayerSlot, StatID, StatValue, 0 )) {
 		return NULL;
 	}
@@ -2460,6 +2467,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	// here comes some code to transfer icon/name to the PC sheet
 	//
 	//
+	PlayerSlot = core->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetActor( PlayerSlot );
 	if (!MyActor) {
 		return NULL;
