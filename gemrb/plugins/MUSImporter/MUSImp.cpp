@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.23 2004/01/02 15:51:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.24 2004/01/02 16:18:05 balrog994 Exp $
  *
  */
 
@@ -150,40 +150,6 @@ bool MUSImp::OpenPlaylist(const char * name)
 				break;
 		}
 		pls.PLEnd[p]=0;
-		/*bool found = false;
-		for(unsigned int i = 0; i < playlist.size(); i++) {
-			if(stricmp(pls.PLFile, playlist[i].PLFile) == 0) {
-				pls.soundID = playlist[i].soundID;
-				found = true;
-				break;
-			}
-		}
-		if(!found) {
-			char FName[_MAX_PATH];
-			strcpy(FName, core->GamePath);
-			strcat(FName, musicsubfolder);
-			strcat(FName, SPathDelimiter);
-			//this is in IWD2
-			if(strnicmp(pls.PLFile, "mx0000",6)==0) {
-				strcat(FName, "mx0000");
-				strcat(FName, SPathDelimiter);
-			}
-			else if(strnicmp(pls.PLFile, "SPC",3) != 0) {
-				strcat(FName, PLName);
-				strcat(FName, SPathDelimiter);
-				strcat(FName, PLName);
-			}
-			strcat(FName, pls.PLFile);
-			strcat(FName, ".acm");
-			pls.soundID = core->GetSoundMgr()->StreamFile(FName);
-#ifndef WIN32
-			if((pls.soundID==-1) && core->CaseSensitive) {
-					ResolveFilePath(FName);
-					pls.soundID = core->GetSoundMgr()->StreamFile(FName);
-			}
-#endif
-			printf("Loading: %s / %d\n",FName,pls.soundID);
-		}*/
 		playlist.push_back(pls);
 		count--;
 	}
@@ -208,8 +174,7 @@ void MUSImp::Start()
 			PLnext=PLpos+1;
 		}
 		PlayMusic(PLpos);
-		core->GetSoundMgr()->Play((int)0);
-		//core->GetSoundMgr()->Play(playlist[PLpos].soundID);
+		core->GetSoundMgr()->Play();
 		lastSound = playlist[PLpos].soundID;
 		Playing = true;
 	}
@@ -229,7 +194,7 @@ void MUSImp::End()
 
 void MUSImp::HardEnd()
 {
-	core->GetSoundMgr()->Stop(0);
+	core->GetSoundMgr()->Stop();
 	Playing = false;
 	PLpos = 0;
 }
@@ -266,7 +231,7 @@ void MUSImp::PlayNext()
 	}
 	else {
 		Playing = false;
-		core->GetSoundMgr()->Stop(0);
+		core->GetSoundMgr()->Stop();
 	}
 }
 

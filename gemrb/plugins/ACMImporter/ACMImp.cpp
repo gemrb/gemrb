@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.28 2004/01/02 16:00:40 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.29 2004/01/02 16:18:06 balrog994 Exp $
  *
  */
 
@@ -314,10 +314,8 @@ unsigned long ACMImp::StreamFile(const char * filename)
 	return 0;
 }
 
-bool ACMImp::Stop(unsigned long index)
+bool ACMImp::Stop()
 {
-	if(index >= MAX_STREAMS)
-		return false;
 	if(!alIsSource(MusicSource))
 		return false;
 	SDL_mutexP(musicMutex);
@@ -329,10 +327,8 @@ bool ACMImp::Stop(unsigned long index)
 	return true;
 }
 
-bool ACMImp::Play(unsigned long index)
+bool ACMImp::Play()
 {
-	if(index >= MAX_STREAMS)
-		return false;
 	SDL_mutexP(musicMutex);
 	if(!musicPlaying) {
 		musicPlaying = true;
