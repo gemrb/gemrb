@@ -23,9 +23,9 @@ bool p2DAImp::Open(DataStream * stream, bool autoFree)
 		return false;
 	DataStream * olds = str;
 	str = stream;
-	char Signature[10];
+	char Signature[20];
 	str->CheckEncrypted();
-	str->ReadLine(Signature,10);
+	str->ReadLine(Signature,20);
 	char * strp = Signature;
 	while(*strp == ' ')
 		strp++;
