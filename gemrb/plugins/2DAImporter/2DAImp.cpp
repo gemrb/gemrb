@@ -40,8 +40,10 @@ bool p2DAImp::Open(DataStream * stream, bool autoFree)
 	while(true) {
 		char * line = (char*)malloc(1024);
 		int len = str->ReadLine(line, 1024);
-		if(len == -1)
+		if(len == -1) {
+			free(line);
 			break;
+		}
 		if(len < 1024)
 			line = (char*)realloc(line, len+1);
 		ptrs.push_back(line);
