@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.23 2004/01/04 18:54:16 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.24 2004/01/04 21:16:50 balrog994 Exp $
  *
  */
 
@@ -87,8 +87,8 @@ public:
 	
 	void ConvertToGame(short &x, short &y)
 	{
-		x += Viewport.x-xCorr;
-		y += Viewport.y-yCorr;
+		x += Viewport.x;
+		y += Viewport.y;
 	}
 	/** */
 	Sprite2D * PrecalculatePolygon(Point * points, int count, Color &color);
