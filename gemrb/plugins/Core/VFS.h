@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.2 2004/02/18 13:01:33 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.3 2004/02/18 14:04:04 edheldil Exp $
  *
  */
 
@@ -37,7 +37,11 @@
 #include <dlfcn.h>
 #endif
 
+#ifdef WIN32
 #define _MAX_PATH 260
+#else
+#define _MAX_PATH FILENAME_MAX
+#endif
 
 #ifndef S_ISDIR
 #define S_ISDIR(x) (x & S_IFDIR)
