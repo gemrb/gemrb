@@ -26,6 +26,8 @@ public:
 	virtual int Read(void * dest, int len) = 0;
 	virtual int Seek(int pos, int startpos) = 0;
 	virtual unsigned long Size() = 0;
+  /** Returns true if the stream is encrypted */
+  bool CheckEncrypted();
 	char filename[_MAX_PATH];
 };
 
