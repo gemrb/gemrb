@@ -1,1 +1,51 @@
+G E M R B
+*********
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/README,v 1.2 2005/02/02 00:13:40 edheldil Exp $
+
+
+GemRB (Game Engine with preRendered Background) is a port of the
+original Infinity Engine (the one of Baldur's Gate, Icewind Dale,
+Planescape: Torment, etc...) to Linux/Unix, MacOs X and Windows with
+some enhancements. Do you like creating a game like Baldur's Gate?
+
+What little is there of documentation is mostly in gemrb/docs/en/ and
+subdirectories, gemrb.1 man page and this file.
+
+Supported (i.e. semi-working) systems:
+
+Linux x86
+FreeBSD x86
+MS Windows
+Linux amd64 ? - used to work ...
+
+
+Contacts
+--------
+
+Our homepage:
+http://gemrb.sourceforge.net
+
+Our project at sourceforge.net:
+http://sourceforge.net/projects/gemrb
+
+GemRB forums:
+http://gemrb.sourceforge.net/modules.php?op=modload&name=phpBB2&file=index
+
+IRC channel:
+The best way to talk with us is by joining #GemRB channel
+at FreeNode IRC network. There's somebody to talk with most of
+the time.
+
+
+Useful links
+------------
+
+IESDP, documentation for the Infinity Engine file formats and more:
+http://iesdp.gibberlings3.net/
+
+Near Infinity, Java viewer and editor for data files of the original games:
+http://www.idi.ntnu.no/~joh/ni/index.html
+
+DLTCEP, MS Windows viewer and editor for data files of the original games:
+http://www.dragonlancetc.com/forums/index.php?board=9
 
