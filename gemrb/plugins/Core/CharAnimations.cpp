@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.25 2003/12/19 22:47:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.26 2004/01/05 16:01:40 balrog994 Exp $
  *
  */
 
@@ -59,6 +59,131 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 CharAnimations::~CharAnimations(void)
 {
 	free(ResRef);
+	switch(MirrorType) {
+		case IE_ANI_CODE_MIRROR:
+			{
+				switch(OrientCount) {
+					case 5:
+						{
+							for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
+								for(int i = 0; i < 16; i+=2) {
+									if(Anims[AnimID][i])
+										delete(Anims[AnimID][i]);
+									if(Anims[AnimID][i+1])
+										delete(Anims[AnimID][i+1]);
+								}
+							}
+						}
+					break;
+
+					case 9:
+						{
+							for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
+								for(int i = 0; i < 16; i++) {
+									if(Anims[AnimID][i])
+										delete(Anims[AnimID][i]);
+								}
+							}
+						}
+					break;
+				}
+			}
+		break;
+
+		case IE_ANI_ONE_FILE:
+			{
+				for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
+					for(int i = 0; i < 16; i++) {
+						if(Anims[AnimID][i])
+							delete(Anims[AnimID][i]);
+					}
+				}
+			}
+		break;
+
+		case IE_ANI_CODE_MIRROR_2:
+			{
+				switch(OrientCount) {
+					case 9:
+						{
+							for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
+								for(int i = 0; i < 16; i++) {
+									if(Anims[AnimID][i])
+										delete(Anims[AnimID][i]);
+								}
+							}
+						}
+					break;
+				}
+			}
+		break;
+
+		case IE_ANI_TWO_FILES:
+		case IE_ANI_TWO_FILES_2:
+		case IE_ANI_TWO_FILES_3:
+			{
+				switch(OrientCount) {
+					case 5:
+						{
+							for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
+								for(int i = 0; i < 16; i+=2) {
+									if(Anims[AnimID][i])
+										delete(Anims[AnimID][i]);
+									if(Anims[AnimID][i+1])
+										delete(Anims[AnimID][i+1]);
+								}
+							}
+						}
+					break;
+				}
+			}
+		break;
+
+		case IE_ANI_PST_ANIMATION_1:
+			{
+				for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
+					switch(AnimID) {
+						case IE_ANI_WALK:
+							{
+								for(int i = 0; i < 16; i++) {
+									if(Anims[AnimID][i])
+										delete(Anims[AnimID][i]);
+								}
+							}
+						break;
+						
+						case IE_ANI_PST_START:
+							{
+								if(Anims[AnimID][0])
+									delete(Anims[AnimID][0]);
+							}
+						break;
+
+						default:
+							{
+								for(int i = 0; i < 16; i+=2) {
+									if(Anims[AnimID][i])
+										delete(Anims[AnimID][i]);
+									if(Anims[AnimID][i+1])
+										delete(Anims[AnimID][i+1]);
+								}
+							}
+						break;
+					}
+					
+				}
+			}
+		break;
+
+		case IE_ANI_PST_GHOST:
+			{
+				for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
+					if(Anims[AnimID][0])
+						delete(Anims[AnimID][0]);
+				}
+			}
+		break;
+	}
 }
 /*This is a simple Idea of how the animation are coded
 
@@ -114,7 +239,7 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 	a->pos = 0;
 	core->FreeInterface(anim);
 	if(AnimID==IE_ANI_SLEEP) {
-					a->playOnce = true;
+		a->playOnce = true;
 	}
 	switch(MirrorType) {
 		case IE_ANI_CODE_MIRROR:
