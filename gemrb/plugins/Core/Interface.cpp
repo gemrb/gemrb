@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.229 2004/10/27 20:06:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.230 2004/10/30 12:45:16 avenger_teambg Exp $
  *
  */
 
@@ -86,9 +86,11 @@ Interface::Interface(int iargc, char** iargv)
 	evntmgr = NULL;
 	console = NULL;
 	slottypes = NULL;
+/*
 	slotids = NULL;
 	slottips = NULL;
 	slotresrefs = NULL;
+*/
 	slotmatrix = NULL;
 	ModalWindow = NULL;
 	tooltip_x = 0;
@@ -174,6 +176,7 @@ Interface::~Interface(void)
 	if (slottypes) {
 		free( slottypes );
 	}
+/*
 	if (slotids) {
 		free( slotids );
 	}
@@ -183,6 +186,7 @@ Interface::~Interface(void)
 	if (slotresrefs) {
 		free( slotresrefs );
 	}
+*/
 	if (slotmatrix) {
 		free( slotmatrix );
 	}
@@ -2343,6 +2347,7 @@ bool Interface::InitItemTypes()
 	if (slottypes) {
 		free(slottypes);
 	}
+/*
 	if (slottips) {
 		free(slottips);
 	}
@@ -2352,22 +2357,25 @@ bool Interface::InitItemTypes()
 	if (slotresrefs) {
 		free(slotresrefs);
 	}
+*/
 	SlotTypes = 0;
 	if(st) {
 		SlotTypes = st->GetRowCount();
 		//make sure unsigned int is 32 bits
-		slottypes = (ieDword *) malloc(SlotTypes * sizeof(ieDword) );
+		slottypes = (SlotType *) malloc(SlotTypes * sizeof(SlotType) );
+/*
 		slotids = (ieDword *) malloc(SlotTypes * sizeof(ieDword) );
 		slottips = (ieDword *) malloc(SlotTypes * sizeof(ieDword) );
 		slotresrefs = (ieResRef *) malloc(SlotTypes * sizeof(ieResRef) );
+*/
 		for (int i=0;i<SlotTypes;i++) {
-			slottypes[i] = (ieDword) strtol(st->QueryField(i,0),NULL,0 );
-			slotids[i] = (ieDword) strtol(st->QueryField(i,1),NULL,0 );
-			slottips[i] = (ieDword) strtol(st->QueryField(i,3),NULL,0 );
+			slottypes[i].slottype = (ieDword) strtol(st->QueryField(i,0),NULL,0 );
+			slottypes[i].slotid = (ieDword) strtol(st->QueryField(i,1),NULL,0 );
+			slottypes[i].slottip = (ieDword) strtol(st->QueryField(i,3),NULL,0 );
 			//make a macro for this?
-			strncpy(slotresrefs[i], st->QueryField(i,2), 8 );
-			slotresrefs[i][8]=0;
-			strupr(slotresrefs[i]);
+			strncpy(slottypes[i].slotresref, st->QueryField(i,2), 8 );
+			slottypes[i].slotresref[8]=0;
+			strupr(slottypes[i].slotresref);
 		}
 		DelTable(SlotTypeTable);
 	}
@@ -2379,7 +2387,7 @@ int Interface::QuerySlotType(int idx) const
 	if(idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx];
+	return slottypes[idx].slottype;
 }
 
 int Interface::QuerySlotID(int idx) const
@@ -2387,7 +2395,7 @@ int Interface::QuerySlotID(int idx) const
         if(idx>=SlotTypes) {
                 return 0;
         }
-        return slotids[idx];
+        return slottypes[idx].slotid;
 }
 
 int Interface::QuerySlottip(int idx) const
@@ -2395,7 +2403,7 @@ int Interface::QuerySlottip(int idx) const
         if(idx>=SlotTypes) {
                 return 0;
         }
-        return slottips[idx];
+        return slottypes[idx].slottip;
 }
 
 const char *Interface::QuerySlotResRef(int idx) const
@@ -2403,7 +2411,7 @@ const char *Interface::QuerySlotResRef(int idx) const
 	if(idx>=SlotTypes) {
 		return "";
 	}
-	return slotresrefs[idx];
+	return slottypes[idx].slotresref;
 }
 
 int Interface::CanUseItemType(int itype, int slottype) const
