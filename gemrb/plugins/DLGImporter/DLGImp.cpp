@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.14 2004/09/13 21:04:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.15 2004/09/13 21:18:38 avenger_teambg Exp $
  *
  */
 
@@ -99,10 +99,10 @@ DialogState* DLGImp::GetDialogState(unsigned int index)
         ieDword  FirstTransitionIndex;
         ieDword  TriggerIndex;
 	str->ReadDword( &ds->StrRef );
-	str->ReadDword( &TriggerIndex );
 	str->ReadDword( &FirstTransitionIndex );
-	ds->trigger = GetStateTrigger( TriggerIndex );
 	str->ReadDword( &ds->transitionsCount );
+	str->ReadDword( &TriggerIndex );
+	ds->trigger = GetStateTrigger( TriggerIndex );
 	ds->transitions = GetTransitions( FirstTransitionIndex, ds->transitionsCount );
 	return ds;
 }
@@ -129,13 +129,13 @@ DialogTransition* DLGImp::GetTransition(unsigned int index)
 	str->ReadDword( &dt->textStrRef );
 	str->ReadDword( &dt->journalStrRef );
 	ieDword TriggerIndex;
-	str->ReadDword( &TriggerIndex );
-	dt->trigger = GetTransitionTrigger( TriggerIndex );
 	ieDword ActionIndex;
+	str->ReadDword( &TriggerIndex );
 	str->ReadDword( &ActionIndex );
-	dt->action = GetAction( ActionIndex );
 	str->ReadResRef( dt->Dialog );
 	str->ReadDword( &dt->stateIndex );
+	dt->trigger = GetTransitionTrigger( TriggerIndex );
+	dt->action = GetAction( ActionIndex );
 	return dt;
 }
 
