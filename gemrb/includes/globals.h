@@ -70,6 +70,8 @@ typedef unsigned long DWORD;
 #define  GF_HAS_DPLAYER				10 // not pst
 #define  GF_HAS_EXPTABLE			11 // iwd, iwd2
 #define  GF_HAS_BEASTS_INI   			12 //pst; also for quests.ini
+#define  GF_HAS_DESC_ICON   			13 //bg
+#define  GF_HAS_PICK_SOUND   			14 //pst
 
 /////AI global defines
 #define AI_UPDATE_TIME	30
