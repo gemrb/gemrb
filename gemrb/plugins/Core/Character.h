@@ -1,6 +1,9 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
+#include <stdlib.h>
+#include <string.h>
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
