@@ -56,5 +56,4 @@ typedef unsigned long DWORD;
 #define  GF_SCROLLBAR_PATCH	0  //bg1, pst
 #define  GF_ALL_STRINGS_TAGGED	1  //bg1, pst, iwd1
 #define  GF_HAS_SONGLIST	2  //bg2
-#define  GF_FORCESTEREO		3  //bg1, pst, iwd1
 #endif
