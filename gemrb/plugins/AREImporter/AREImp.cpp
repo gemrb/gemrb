@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.25 2003/12/18 15:05:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.26 2003/12/22 23:26:07 avenger_teambg Exp $
  *
  */
 
@@ -266,7 +266,9 @@ Map * AREImp::GetMap()
 		str->Seek(InfoPointsOffset + (i*0xC4), GEM_STREAM_START);
 		unsigned short Type, VertexCount;
 		unsigned long FirstVertex, Cursor;
-		char Name[33], Script[9];
+		unsigned short TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
+		unsigned short LaunchX, LaunchY;
+		char Name[33], Script[9], Key[9];
 		str->Read(Name, 32);
 		Name[32] = 0;
 		str->Read(&Type, 2);
@@ -284,7 +286,14 @@ Map * AREImp::GetMap()
 		str->Seek(44, GEM_CURRENT_POS);
 		unsigned long StrRef;
 		str->Read(&StrRef, 4);
-		str->Seek(20, GEM_CURRENT_POS);
+		str->Read(&TrapDetDiff,2);
+		str->Read(&TrapRemDiff,2);
+		str->Read(&Trapped,2);
+		str->Read(&TrapDetected,2);
+		str->Read(&LaunchX,2);
+		str->Read(&LaunchY,2);
+		str->Read(Key, 8);
+		Key[8] = 0;
 		str->Read(Script, 8);
 		Script[8] = 0;
 		char * string = core->GetString(StrRef);
@@ -298,6 +307,12 @@ Map * AREImp::GetMap()
 		free(points);
 		poly->BBox = bbox;
 		InfoPoint * ip = tm->AddInfoPoint(Name, Type, poly);
+		ip->TrapDetectionDiff = TrapDetDiff;
+		ip->TrapRemovalDiff = TrapRemDiff;
+		ip->Trapped = Trapped;
+		ip->TrapDetected = TrapDetected;
+		ip->LaunchX = LaunchX;
+		ip->LaunchY = LaunchY;
 		ip->Cursor = Cursor;
 		ip->String = string;
 		ip->textDisplaying = 0;
