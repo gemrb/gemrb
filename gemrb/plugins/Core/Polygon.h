@@ -31,6 +31,7 @@ public:
 	int count;
 	Sprite2D* fill;
 	bool PointIn(unsigned short x, unsigned short y);
+	void RecalcBBox();
 };
 
 #endif

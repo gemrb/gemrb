@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.29 2004/04/25 22:41:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.30 2004/05/01 00:07:48 avenger_teambg Exp $
  *
  */
 
@@ -75,25 +75,6 @@ Door* TileMap::AddDoor(char* Name, unsigned long Flags, int ClosedIndex,
 	door->SetName( Name );
 	doors.push_back( door );
 	return doors.at( doors.size() - 1 );
-}
-
-void TileMap::ToggleDoor(Door* door)
-{
-	int state;
-	door->Flags ^= 1;
-	if (door->Flags&1) {
-		state = door->closedIndex;
-		if (door->CloseSound[0] != '\0')
-			core->GetSoundMgr()->Play( door->CloseSound );
-	} else {
-		state = !door->closedIndex;
-		if (door->OpenSound[0] != '\0') {
-			core->GetSoundMgr()->Play( door->OpenSound );
-		}
-	}
-	for (int i = 0; i < door->count; i++) {
-		overlays[0]->tiles[door->tiles[i]]->tileIndex = state;
-	}
 }
 
 void TileMap::DrawOverlay(unsigned int index, Region viewport)

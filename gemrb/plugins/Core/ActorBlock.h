@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.34 2004/04/30 15:15:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.35 2004/05/01 00:07:48 avenger_teambg Exp $
  *
  */
 
@@ -66,13 +66,6 @@ class Door;
 
 typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
 ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
-
-/*
-typedef struct ActionStep {
-	Action * action;
-	bool EndReached;
-} ActionStep;
-*/
 
 #define SEA_RESET		0x00000002
 #define SEA_PARTY_REQUIRED	0x00000004
@@ -183,14 +176,6 @@ public:
 	void ClearPath();
 };
 
-/*class ActorBlock : public Moveble {
-public:
-	ActorBlock(void) : Moveble(ST_ACTOR) { actor = NULL; DeleteMe = false };
-	~ActorBlock(void) { if(actor) delete(actor) };
-	Actor * actor;
-	bool DeleteMe;
-} ActorBlock;*/
-
 class GEM_EXPORT Door : public Highlightable {
 public:
 	Door(TileOverlay* Overlay);
@@ -208,13 +193,12 @@ public:
 	char OpenSound[9];
 	char CloseSound[9];
 private:
-	void ToggleTiles(bool playsound = false);
+	void ToggleTiles(bool State, bool playsound = false);
 public:
 	void SetName(char* Name);
 	void SetTiles(unsigned short* Tiles, int count);
 	void SetDoorLocked(bool Locked, bool playsound = false);
 	void SetDoorClosed(bool Closed, bool playsound = false);
-	void ToggleDoorState();
 	void SetPolygon(bool Open, Gem_Polygon* poly);
 	void SetCursor(unsigned char CursorIndex);
 	void DebugDump();

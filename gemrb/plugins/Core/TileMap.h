@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.23 2004/04/25 22:41:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.24 2004/05/01 00:07:48 avenger_teambg Exp $
  *
  */
 
@@ -104,7 +104,6 @@ public:
 	Door* GetDoor(unsigned short x, unsigned short y);
 	Door* GetDoor(unsigned int idx);
 	Door* GetDoor(const char* Name);
-	void ToggleDoor(Door* door);
 
 	Container* AddContainer(char* Name, unsigned short Type,
 		Gem_Polygon* outline);

@@ -522,11 +522,11 @@ Door::~Door(void)
 	}
 }
 
-void Door::ToggleTiles(bool playsound)
+void Door::ToggleTiles(bool State, bool playsound)
 {
 	int state;
 
-	if (Flags&1) {
+	if (State) {
 		state = closedIndex;
 		if (playsound && ( OpenSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( OpenSound );
@@ -542,7 +542,7 @@ void Door::ToggleTiles(bool playsound)
 	for (int i = 0; i < count; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = state;
 	}
-	Flags ^=1;
+	Flags = (Flags & ~1) | State;
 }
 
 void Door::SetName(char* Name)
@@ -578,9 +578,7 @@ void Door::SetDoorLocked(bool Locked, bool playsound)
 
 void Door::SetDoorClosed(bool Closed, bool playsound)
 {
-	if((Flags&1)!=Closed) {
-		ToggleTiles( playsound );
-	}
+	ToggleTiles(Closed, playsound );
 	if (Closed) {
 		outline = closed;
 	} else {
@@ -592,16 +590,6 @@ void Door::SetDoorClosed(bool Closed, bool playsound)
 	} else {
 		XPos = open->BBox.x + ( open->BBox.w / 2 );
 		YPos = open->BBox.y + ( open->BBox.h / 2 );
-	}
-}
-
-void Door::ToggleDoorState()
-{
-	ToggleTiles( true );
-	if (Flags&1) {
-		outline = closed;
-	} else {
-		outline = open;
 	}
 }
 

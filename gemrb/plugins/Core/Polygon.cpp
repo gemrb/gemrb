@@ -4,19 +4,17 @@
 
 extern Interface* core;
 
-Gem_Polygon::Gem_Polygon(Point* points, int count, bool precalculate,
-	Color* color)
+Gem_Polygon::Gem_Polygon(Point* points, int cnt, bool precalculate, Color* color)
 {
-	if (count) {
-		this->points = ( Point * ) malloc( count * sizeof( Point ) );
+	if (cnt) {
+		this->points = ( Point * ) malloc( cnt * sizeof( Point ) );
 	} else {
 		this->points = NULL;
 	}
-	memcpy( this->points, points, count * sizeof( Point ) );
-	this->count = count;
+	memcpy( this->points, points, cnt * sizeof( Point ) );
+	count = cnt;
 	if (precalculate) {
-		fill = core->GetVideoDriver()->PrecalculatePolygon( points, count,
-										*color );
+		fill = core->GetVideoDriver()->PrecalculatePolygon( points, cnt, *color );
 	} else {
 		fill = NULL;
 	}
@@ -29,6 +27,28 @@ Gem_Polygon::~Gem_Polygon(void)
 	}
 	if (fill) {
 		core->GetVideoDriver()->FreeSprite( fill );
+	}
+}
+
+void Gem_Polygon::RecalcBBox()
+{
+	if(!count) {
+		BBox.x=BBox.y=BBox.w=BBox.h=0;
+		return;
+	}
+	BBox.x=points[0].x;
+	BBox.y=points[0].y;
+	BBox.w=0;
+	BBox.h=0;
+	for(unsigned int i=1; i<count; i++) {
+		if(points[i].x<BBox.x) {
+			BBox.w+=BBox.x-points[i].x;
+			BBox.x=points[i].x;
+		}
+		if(points[i].y<BBox.y) {
+			BBox.h+=BBox.y-points[i].y;
+			BBox.y=points[i].y;
+		}
 	}
 }
 
@@ -58,8 +78,7 @@ bool Gem_Polygon::PointIn(unsigned short x, unsigned short y)
 			} else {
 				if (( vtx1->x -
 					( vtx1->y - ty ) * ( vtx0->x - vtx1->x ) /
-					( vtx0->y - vtx1->y ) ) >=
-					tx) {
+					( vtx0->y - vtx1->y ) ) >= tx) {
 					inside_flag = !inside_flag;
 				}
 			}
