@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.56 2005/02/20 20:50:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.57 2005/02/25 15:12:13 avenger_teambg Exp $
  *
  */
 
@@ -161,7 +161,7 @@ public:
 	void RemoveMapNote(Point point);
 	MapNote *GetMapNote(int i) { return mapnotes[i]; }
 	MapNote *GetMapNote(Point point);
-	int GetMapNoteCount() { return mapnotes.size(); }
+	unsigned int GetMapNoteCount() { return (unsigned int) mapnotes.size(); }
 
 	/* May spawn creature(s), returns true in case of an interrupted rest */
 	bool Rest(Point pos, int hours);

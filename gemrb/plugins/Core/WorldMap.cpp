@@ -8,22 +8,21 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.12 2005/02/22 21:30:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.13 2005/02/25 15:12:13 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "WorldMap.h"
 #include "Interface.h"
-
-extern Interface *core;
+#include <list>
 
 WMPAreaEntry::WMPAreaEntry()
 {
@@ -140,6 +139,7 @@ WMPAreaEntry* WorldMap::GetArea(const ieResRef AreaName, int &i)
 
 //this is a pathfinding algorithm
 //you have to find the optimal path
+/*
 void WorldMap::CalculateDistance(int i, int direction)
 {
 	WMPAreaEntry* ae=area_entries[i];
@@ -161,7 +161,7 @@ void WorldMap::CalculateDistance(int i, int direction)
 		}
 	}
 }
-
+*/
 int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 {
 	if (direction<0 || direction>3)
@@ -176,6 +176,7 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 	if (GotHereFrom) {
 		free(GotHereFrom);
 	}
+	UpdateAreaVisibility(AreaName, direction);
 
 	int memsize =sizeof(int) * area_entries.size();
 	Distances = (int *) malloc( memsize );
@@ -184,7 +185,32 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 	memset( GotHereFrom, -1, memsize );
 	Distances[i] = 0; //setting our own distance
 	GotHereFrom[i] = -1; //we didn't move
-	CalculateDistance( i, direction );
+
+	std::list<int> pending;
+	pending.push_back(i);
+	while(pending.size())
+	{
+		i=pending.front();
+		pending.pop_front();
+		WMPAreaEntry* ae=area_entries[i];
+		int j=ae->AreaLinksIndex[direction];
+		int k=j+ae->AreaLinksCount[direction];
+		for(;j<k;j++) {
+			WMPAreaLink* al = area_links[j];
+			WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
+			int mydistance = Distances[i];
+			if ( ( (ae->AreaStatus & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
+			( (ae2->AreaStatus & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
+			) {
+				mydistance += al->DistanceScale * al->Flags;
+				if (Distances[al->AreaIndex] > mydistance) {
+					Distances[al->AreaIndex] = mydistance;
+					GotHereFrom[al->AreaIndex] = j;
+					pending.push_back(al->AreaIndex);
+				}
+			}
+		}
+	}
 	return 0;
 }
 
@@ -250,22 +276,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 	while(p!=walkpath.end() );
 	return lastpath;
 }
-/*
-WMPAreaLink *WorldMap::GetLink(const ieResRef AreaName)
-{
-	if (!GotHereFrom) {
-		return NULL;
-	}
-	int i;
-	if (GetArea( AreaName, i )) {
-		if (GotHereFrom[i]<0) {
-			return NULL;
-		}
-		return area_links[GotHereFrom[i]];
-	}
-	return NULL;
-}
-*/
+
 int WorldMap::GetDistance(const ieResRef AreaName)
 {
 	if (!Distances) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.35 2005/02/19 16:22:03 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.36 2005/02/25 15:12:13 avenger_teambg Exp $
  *
  */
 
@@ -70,7 +70,7 @@ public:
 	virtual void SetDragCursor(Sprite2D* drag) = 0;
 	virtual Region GetViewport(void) = 0;
 	virtual void SetViewport(int x, int y) = 0;
-	virtual void SetViewport(int x, int y, int w, int h) = 0;
+	virtual void SetViewport(int x, int y, unsigned int w, unsigned int h) = 0;
 	virtual void MoveViewportTo(int x, int y) = 0;
 	virtual void ConvertToVideoFormat(Sprite2D* sprite) = 0;
 	virtual void CalculateAlpha(Sprite2D* sprite) = 0;

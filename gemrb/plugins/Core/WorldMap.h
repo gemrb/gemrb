@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.10 2005/02/20 13:00:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.11 2005/02/25 15:12:13 avenger_teambg Exp $
  *
  */
 
@@ -116,11 +116,11 @@ public:
 	/* returns the area link we will fall into if we head in B direction */
 	/* if the area name differs it means we are in a random encounter */
 	WMPAreaLink *GetEncounterLink(const ieResRef B, bool &encounter);
-	/* updates visibility of adjacent areas */
-	void UpdateAreaVisibility(const ieResRef AreaName, int direction);
 	/* sets area status */
 	void SetAreaStatus(const ieResRef, int Bits, int Op);
 private:
+	// updates visibility of adjacent areas, called from CalculateDistances
+	void UpdateAreaVisibility(const ieResRef AreaName, int direction);
 	//internal function to get area pointer and index from area name
 	WMPAreaEntry* GetArea(const ieResRef AreaName, int &i);
 	//internal function to calculate the distances from areaindex

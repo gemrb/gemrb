@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.271 2005/02/23 20:45:26 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.272 2005/02/25 15:12:15 avenger_teambg Exp $
  *
  */
 
@@ -1661,7 +1661,7 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 		y = ctrl->YPos;
 		w = ctrl->Width;
 		h = ctrl->Height;
-		flags = ctrl->Value;
+		//flags = ctrl->Value;
 		win->DelControl( CtrlIndex );
 	}
 	WorldMapControl* wmap = new WorldMapControl( );
@@ -4470,7 +4470,7 @@ bool GUIScript::RunFunction(const char* fname)
 /** Exec a single String */
 char* GUIScript::ExecString(const char* string)
 {
-	if (PyRun_SimpleString( string ) == -1) {
+	if (PyRun_SimpleString( (char *) string ) == -1) {
 		PyErr_Print();
 		// try with GemRB. prefix
 		char * newstr = (char *) malloc( strlen(string) + 7 );

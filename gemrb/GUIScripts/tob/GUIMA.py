@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.19 2004/12/04 17:35:12 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.20 2005/02/25 15:12:20 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -82,18 +82,18 @@ def CloseNoteWindow ():
 	return
 
 def RemoveMapNote ():
-	PosX = GemRB.GetVar("MapControlX")
-	PosY = GemRB.GetVar("MapControlY")
+	PosX = GemRB.GetVar ("MapControlX")
+	PosY = GemRB.GetVar ("MapControlY")
 	GemRB.SetMapnote (PosX, PosY, 0, "")
 	CloseNoteWindow ()
 	return
 
 def SetMapNote ():
-	PosX = GemRB.GetVar("MapControlX")
-	PosY = GemRB.GetVar("MapControlY")
+	PosX = GemRB.GetVar ("MapControlX")
+	PosY = GemRB.GetVar ("MapControlY")
 	Label = GemRB.GetControl (NoteWindow, 1)
 	Text = GemRB.QueryText (NoteWindow, Label)
-	Color = GemRB.GetVar("Color")
+	Color = GemRB.GetVar ("Color")
 	GemRB.SetMapnote (PosX, PosY, Color, Text)
 	CloseNoteWindow ()
 	return
@@ -135,11 +135,11 @@ def AddNoteWindow ():
 	return
 
 def OpenWorldMapWindowInside ():
-	WorldMapWindowCommon(0)
+	WorldMapWindowCommon (-1)
 	return
 
 def OpenWorldMapWindow ():
-	WorldMapWindowCommon(1)
+	WorldMapWindowCommon (GemRB.GetVar ("Travel"))
 	return
 
 def WorldMapWindowCommon(Travel):
@@ -200,7 +200,7 @@ def WorldMapWindowCommon(Travel):
 
 	# Done
 	Button = GemRB.GetControl (Window, 0)
-	if Travel:
+	if Travel>=0:
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
 	else:
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
