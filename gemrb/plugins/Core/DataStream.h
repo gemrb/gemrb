@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.10 2004/04/18 14:25:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.11 2004/09/12 15:52:21 avenger_teambg Exp $
  *
  */
 
@@ -46,6 +46,8 @@ public:
 	DataStream(void);
 	virtual ~DataStream(void);
 	virtual int Read(void* dest, unsigned int len) = 0;
+	int ReadWord(ieWord* dest);
+	int ReadDword(ieDword* dest);
 	virtual int Seek(int pos, int startpos) = 0;
 	virtual unsigned long Size() = 0;
 	unsigned long Remains();
@@ -55,6 +57,9 @@ public:
 	void ReadDecrypted(void* buf, unsigned int size);
 	/** No descriptions */
 	virtual int ReadLine(void* buf, unsigned int maxlen) = 0;
+	/** Endian Switch setup*/
+	static void SetEndianSwitch(int par);
+	static bool IsEndianSwitch();
 	char filename[_MAX_PATH];
 };
 

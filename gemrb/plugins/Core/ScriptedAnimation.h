@@ -30,11 +30,11 @@ public:
 		long Y = 0);
 	~ScriptedAnimation(void);
 	Animation* anims[2];
-	unsigned long Transparency;
-	unsigned long SequenceFlags;
-	long XPos, YPos, ZPos;
-	unsigned long FrameRate;
-	unsigned long FaceTarget;
+	ieDword Transparency;
+	ieDword SequenceFlags;
+	ieDword XPos, YPos, ZPos;
+	ieDword FrameRate;
+	ieDword FaceTarget;
 	char Sounds[2][9];
 	bool justCreated;
 };

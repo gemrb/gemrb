@@ -15,12 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.11 2004/04/18 14:25:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.12 2004/09/12 15:52:21 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "DataStream.h"
+
+static bool EndianSwitch = false;
 
 DataStream::DataStream(void)
 {
@@ -31,10 +33,21 @@ DataStream::DataStream(void)
 DataStream::~DataStream(void)
 {
 }
+
+void DataStream::SetEndianSwitch(int tmp)
+{
+	EndianSwitch = !! tmp;
+}
+
+bool DataStream::IsEndianSwitch()
+{
+	return EndianSwitch;
+}
+
 /** Returns true if the stream is encrypted */
 bool DataStream::CheckEncrypted()
 {
-	unsigned short two;
+	ieWord two;
 	Seek( 0, GEM_STREAM_START );
 	Read( &two, 2 );
 	if (two == 0xFFFF) {
@@ -55,4 +68,31 @@ void DataStream::ReadDecrypted(void* buf, unsigned int size)
 unsigned long DataStream::Remains()
 {
 	return Size()-Pos;
+}
+
+int DataStream::ReadWord(ieWord *dest)
+{
+	int len = Read(dest, 2);
+	if (EndianSwitch) {
+		unsigned char tmp;
+		tmp=((unsigned char *) dest)[0];
+		((unsigned char *) dest)[0]=((unsigned char *) dest)[1];
+		((unsigned char *) dest)[1]=tmp;
+	}
+	return len;
+}
+
+int DataStream::ReadDword(ieDword *dest)
+{
+	int len = Read(dest, 4);
+	if (EndianSwitch) {
+		unsigned char tmp;
+		tmp=((unsigned char *) dest)[0];
+		((unsigned char *) dest)[0]=((unsigned char *) dest)[3];
+		((unsigned char *) dest)[3]=tmp;
+		tmp=((unsigned char *) dest)[1];
+		((unsigned char *) dest)[1]=((unsigned char *) dest)[2];
+		((unsigned char *) dest)[2]=tmp;
+	}
+	return len;
 }
