@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.11 2003/12/15 09:13:59 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.12 2004/01/29 20:37:27 avenger_teambg Exp $
  *
  */
 
@@ -102,8 +102,10 @@ static const char *PlayMode()
 
 int SaveGameIterator::GetSaveGameCount()
 {
+/*
 	char Prefix[10] = {0};
 	for(int i=0;i<8 && core->INIConfig[i] && core->INIConfig[i]!='.';i++) Prefix[i]=core->INIConfig[i];
+*/
 #ifdef WIN32
 	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
 	struct _finddata_t c_file;
@@ -143,7 +145,7 @@ int SaveGameIterator::GetSaveGameCount()
 				continue;
 #endif
 			char ftmp[_MAX_PATH];
-			sprintf(ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter, Prefix);
+			sprintf(ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter, core->GameNameResRef);
 			FILE * exist = fopen(ftmp, "rb");
 			if(!exist)
 				continue;
@@ -176,10 +178,12 @@ int SaveGameIterator::GetSaveGameCount()
 
 SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 {
+/*
 	char Prefix[10];
 	int i;
 	for(i=0;i<8 && core->INIConfig[i] && core->INIConfig[i]!='.';i++) Prefix[i]=core->INIConfig[i];
 	Prefix[i]=0;
+*/
 #ifdef WIN32
 	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
 	struct _finddata_t c_file;
@@ -223,7 +227,7 @@ SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 				continue;
 #endif
 			char ftmp[_MAX_PATH];
-			sprintf(ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter, Prefix);
+			sprintf(ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter, core->GameNameResRef);
 			FILE * exist = fopen(ftmp, "rb");
 			if(!exist)
 				continue;
@@ -305,6 +309,6 @@ SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 	if(Remove || (de == NULL) )
 		return NULL;
 #endif
-	SaveGame * sg = new SaveGame(dtmp, Name, Prefix, prtrt);
+	SaveGame * sg = new SaveGame(dtmp, Name, core->GameNameResRef, prtrt);
 	return sg;
 }

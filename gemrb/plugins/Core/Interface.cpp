@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.116 2004/01/28 22:16:24 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.117 2004/01/29 20:37:27 avenger_teambg Exp $
  *
  */
 
@@ -41,6 +41,9 @@ GEM_EXPORT HANDLE hConsole;
 #endif
 
 #include "../../includes/win32def.h"
+
+//use DialogF.tlk if the protagonist is female, that's why we leave space
+static char dialogtlk[]="dialog.tlk\0";
 
 Interface::Interface(int iargc, char **iargv)
 {
@@ -225,8 +228,13 @@ int Interface::Init()
 	printMessage("Core", "Loading Dialog.tlk file...", WHITE);
 	char strpath[_MAX_PATH];
 	strcpy(strpath, GamePath);
-	strcat(strpath, "dialog.tlk");
+	strcat(strpath, dialogtlk);
 	FileStream * fs = new FileStream();
+	if(!fs->Open(strpath)) {
+		dialogtlk[0]='D';
+		strcpy(strpath, GamePath);
+		strcat(strpath, dialogtlk);
+	}
 	if(!fs->Open(strpath)) {
 		printStatus("ERROR", LIGHT_RED);
 		printf("Cannot find Dialog.tlk.\nTermination in Progress...\n");
@@ -353,6 +361,13 @@ int Interface::Init()
 	strcpy(ini_path,GamePath);
 	strcat(ini_path,INIConfig);
 	LoadINI(ini_path);
+	int i;
+	for(i = 0; i < 8; i++) {
+		if(INIConfig[i] == '.')
+			break;
+		GameNameResRef[i] = INIConfig[i];
+	}
+	GameNameResRef[i] = 0;
 	}
 	printStatus("OK", LIGHT_GREEN);
 
@@ -1523,22 +1538,31 @@ void Interface::SetCutSceneMode(bool active)
 }
 
 void Interface::LoadGame(int index) {
+	DataStream *ds;
+
 	if(index == -1) {
 		//Load the Default Game
-		char ResRef[9];
-		int i = 0;
-		for(i = 0; i < 8; i++) {
-			if(INIConfig[i] == '.')
-				break;
-			ResRef[i] = INIConfig[i];
-		}
-		ResRef[i] = 0;
-		DataStream * ds = GetResourceMgr()->GetResource(ResRef, IE_GAM_CLASS_ID);
-		SaveGameMgr * sgm = (SaveGameMgr*)GetInterface(IE_GAM_CLASS_ID);
-		sgm->Open(ds);
-		if(game)
-			delete(game);
-		game = sgm->GetGame();
-		FreeInterface(sgm);
+		ds = GetResourceMgr()->GetResource(GameNameResRef, IE_GAM_CLASS_ID);
 	}
+	else
+	{
+		SaveGame *sg=core->GetSaveGameIterator()->GetSaveGame(index);
+		if(!sg)
+			return;
+		ds = sg->GetGame();
+	}
+	if(!ds)
+		return;
+	SaveGameMgr * sgm = (SaveGameMgr*)GetInterface(IE_GAM_CLASS_ID);
+	if(!sgm) {
+		delete ds;
+		return;
+	}
+	sgm->Open(ds);
+
+	if(game)
+		delete(game);
+	game = sgm->GetGame();
+printf("game loaded and set\n");
+	FreeInterface(sgm);
 }

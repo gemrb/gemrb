@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.7 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.8 2004/01/29 20:37:27 avenger_teambg Exp $
  *
  */
 
@@ -73,6 +73,22 @@ public:
 	{
 		char nPath[_MAX_PATH];
 		sprintf(nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix);
+		FileStream * fs = new FileStream();
+		fs->Open(nPath, true);
+		return fs;
+	};
+	DataStream * GetGame()
+	{
+		char nPath[_MAX_PATH];
+		sprintf(nPath, "%s%s%s.gam", Path, SPathDelimiter, Prefix);
+		FileStream * fs = new FileStream();
+		fs->Open(nPath, true);
+		return fs;
+	};
+	DataStream * GetSave()
+	{
+		char nPath[_MAX_PATH];
+		sprintf(nPath, "%s%s%s.sav", Path, SPathDelimiter, Prefix);
 		FileStream * fs = new FileStream();
 		fs->Open(nPath, true);
 		return fs;

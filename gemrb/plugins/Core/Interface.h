@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.67 2004/01/28 22:16:24 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.68 2004/01/29 20:37:27 avenger_teambg Exp $
  *
  */
 
@@ -282,6 +282,7 @@ private:
 public:
 	char GameData[9];
 	char GameOverride[9];
+	char GameNameResRef[9];
 	char UserDir[_MAX_PATH];
 	int argc;
 	char **argv;	  
@@ -320,12 +321,14 @@ public:
 #endif
 };
 
-#ifndef GEM_BUILD_DLL
+#ifdef GEM_BUILD_DLL
+extern Interface * core;
+#else
 #ifdef WIN32
 __declspec(dllimport) Interface * core;
 __declspec(dllimport) HANDLE hConsole;
 #else
-extern Interface *core;
+extern Interface * core;
 #endif
 #endif
 
