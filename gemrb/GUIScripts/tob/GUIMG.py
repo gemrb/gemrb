@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMG.py,v 1.1 2004/08/26 19:05:41 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMG.py,v 1.2 2004/08/28 20:36:39 avenger_teambg Exp $
 
 
 # GUIMG.py - scripts to control mage spells windows from GUIMG winpack
@@ -26,7 +26,6 @@
 import GemRB
 from GUIDefines import *
 
-#from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
 #import GUICommonWindows
 
 MageWindow = None

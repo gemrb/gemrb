@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.3 2004/08/28 15:31:30 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.4 2004/08/28 20:36:39 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -44,8 +44,6 @@
 # 0 - main textarea
 # 1 - its scrollbar
 # 2 - WMCHRP character portrait
-# 5 - STALIGN alignment
-# 6 - STFCTION faction
 # 7,8,9 - STCSTM (info, reform party, level up)
 # 0x1000000a - name
 #0x1000000b - ac
@@ -69,7 +67,7 @@ import string
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, RunSelectionChangeHandler
+from GUICommonWindows import SetSelectionChangeHandler, RunSelectionChangeHandler
 from GUIWORLD import OpenReformPartyWindow
 
 ###################################################
@@ -81,9 +79,6 @@ statevents =("OnRecordsHelpStrength","OnRecordsHelpIntelligence","OnRecordsHelpW
 ###################################################
 def OpenRecordsWindow ():
 	global RecordsWindow
-
-	print "Open Records"
-	return
 
 	GemRB.HideGUI ()
 	
@@ -99,62 +94,32 @@ def OpenRecordsWindow ():
 		return	
 
 	GemRB.LoadWindowPack ("GUIREC")
-	RecordsWindow = Window = GemRB.LoadWindow (3)
+	RecordsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", RecordsWindow)
 
-
 	# Information
-	Button = GemRB.GetControl (Window, 7)
-	GemRB.SetText (Window, Button, 4245)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
+	#Button = GemRB.GetControl (Window, 7)
+	#GemRB.SetText (Window, Button, 4245)
+	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 	
 	# Reform Party
-	Button = GemRB.GetControl (Window, 8)
-	GemRB.SetText (Window, Button, 4244)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
+	#Button = GemRB.GetControl (Window, 8)
+	#GemRB.SetText (Window, Button, 4244)
+	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
 
 	# Level Up
-	Button = GemRB.GetControl (Window, 9)
-	GemRB.SetText (Window, Button, 4246)
-
-	# stat buttons
-	for i in range (6):
-		Button = GemRB.GetControl (Window, 31 + i)
-		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		GemRB.SetButtonSprites(Window, Button, "", 0, 0, 0, 0, 0)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
-		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_OVER_BUTTON, statevents[i])
-		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
-
-	# AC button
-	Button = GemRB.GetControl (Window, 37)
-	#	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	#	GemRB.SetControlSize (Window, Button, 0, 0)
-	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	GemRB.SetButtonSprites(Window, Button, "", 0, 0, 0, 0, 0)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
-	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpArmorClass")
-	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
-
-
-	# HP button
-	Button = GemRB.GetControl (Window, 38)
-	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	GemRB.SetControlSize (Window, Button, 0, 0)
+	#Button = GemRB.GetControl (Window, 9)
+	#GemRB.SetText (Window, Button, 4246)
 
 	SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
 
 	#GemRB.SetVisible (Window, 1)
 	GemRB.UnhideGUI ()
-
-
-stats_overview = None
-faction_help = ''
-alignment_help = ''
+	return
 
 def UpdateRecordsWindow ():
-	global stats_overview, faction_help, alignment_help
+	global stats_overview, alignment_help
 	
 	Window = RecordsWindow
 	if not RecordsWindow:
@@ -164,27 +129,27 @@ def UpdateRecordsWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	
 	# name
-	Label = GemRB.GetControl (Window, 0x1000000a)
+	Label = GemRB.GetControl (Window, 0x10000030)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
 
 	# portrait
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
-	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	GemRB.SetButtonPicture (Window, Button, GetActorPortrait (pc, 'STATS'))
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
+	GemRB.SetButtonPicture (Window, Button, GemRB.GetPlayerPortrait (pc,1))
 
 	# armorclass
-	Label = GemRB.GetControl (Window, 0x1000000b)
+	Label = GemRB.GetControl (Window, 0x10000028)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
 	GemRB.SetTooltip (Window, Label, 4197)
 
 	# hp now
-	Label = GemRB.GetControl (Window, 0x1000000c)
+	Label = GemRB.GetControl (Window, 0x10000029)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
 	GemRB.SetTooltip (Window, Label, 4198)
 
 	# hp max
-	Label = GemRB.GetControl (Window, 0x1000000d)
+	Label = GemRB.GetControl (Window, 0x1000002a)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
 	GemRB.SetTooltip (Window, Label, 4199)
 
@@ -192,7 +157,8 @@ def UpdateRecordsWindow ():
 
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	sstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-	if (sstrx > 0):
+
+	if sstrx > 0 and sstr==18 and HasExtra:
 		sstr = "%d/%02d" %(sstr, sstrx % 100)
 	sint = GemRB.GetPlayerStat (pc, IE_INT)
 	swis = GemRB.GetPlayerStat (pc, IE_WIS)
@@ -200,78 +166,63 @@ def UpdateRecordsWindow ():
 	scon = GemRB.GetPlayerStat (pc, IE_CON)
 	schr = GemRB.GetPlayerStat (pc, IE_CHR)
 
-	stats = (sstr, sint, swis, sdex, scon, schr)
-	for i in range (6):
-		Label = GemRB.GetControl (Window, 0x1000000e + i)
-		GemRB.SetText (Window, Label, str (stats[i]))
+	Label = GemRB.GetControl (Window, 0x1000002f)
+	GemRB.SetText (Window, Label, sstr)
+
+	Label = GemRB.GetControl (Window, 0x10000009)
+	GemRB.SetText (Window, Label, sdex)
+
+	Label = GemRB.GetControl (Window, 0x1000000a)
+	GemRB.SetText (Window, Label, scon)
+
+	Label = GemRB.GetControl (Window, 0x1000000b)
+	GemRB.SetText (Window, Label, sint)
+
+	Label = GemRB.GetControl (Window, 0x1000000c)
+	GemRB.SetText (Window, Label, swis)
+
+	Label = GemRB.GetControl (Window, 0x1000000d)
+	GemRB.SetText (Window, Label, schr)
+
+	level = GemRB.GetPlayerStat (pc, IE_LEVEL)
+	Label = GemRB.GetControl (Window, 0x10000011)
+	GemRB.SetText (Window, Label, str(level) )
 
 	# race
 	RaceTable = GemRB.LoadTable ("RACES")
 	text = GemRB.GetTableValue (RaceTable, GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
 	GemRB.UnloadTable (RaceTable)
 	
-	Label = GemRB.GetControl (Window, 0x10000014)
+	Label = GemRB.GetControl (Window, 0x10000010)
 	GemRB.SetText (Window, Label, text)
-
-
-	# sex
-	GenderTable = GemRB.LoadTable ("GENDERS")
-	text = GemRB.GetTableValue (GenderTable, GemRB.GetPlayerStat (pc, IE_SEX) - 1, 0)
-	GemRB.UnloadTable (GenderTable)
-	
-	Label = GemRB.GetControl (Window, 0x10000015)
-	GemRB.SetText (Window, Label, text)
-	print "SEX:", GemRB.GetPlayerStat (pc, IE_SEX)
-
 
 	# class
-	ClassTable = GemRB.LoadTable ("CLASS")
-	text = GemRB.GetTableValue (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
+	ClassTitle = GemRB.GetPlayerStat (pc, IE_TITLE1)
+	print "TITLE:", ClassTitle
+	KitIndex = GemRB.GetPlayerStat (pc, IE_KIT)
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	KitTable = GemRB.LoadTable ("kitlist")
+
+	if ClassTitle==0:
+		if KitIndex == 0:
+			ClassTitle=GemRB.GetTableValue(ClassTable,Class,2)
+		else:
+			ClassTitle=GemRB.GetTableValue(KitTable, KitIndex,2)
+
 	GemRB.UnloadTable (ClassTable)
+	GemRB.UnloadTable (KitTable)
 
-	Label = GemRB.GetControl (Window, 0x10000016)
-	GemRB.SetText (Window, Label, text)
-	print "CLASS:", GemRB.GetPlayerStat (pc, IE_CLASS)
+	Label = GemRB.GetControl (Window, 0x1000000f)
+	GemRB.SetText (Window, Label, ClassTitle)
+	print "CLASS:", Class
+	print "KIT:", KitIndex
 
-	# alignment
-	align = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
-	print 'ALIGN:', align
-	ss = GemRB.LoadSymbol ("ALIGN")
-	sym = GemRB.GetSymbolValue (ss, align)
-	print "ALIGN SYM:", sym
-
-	AlignmentTable = GemRB.LoadTable ("ALIGNS")
-	#print "ALIGN DESC:", GemRB.GetTableValue (AlignmentTable, align + 1, 0)
-	#print "ALIGN DESC2:", GemRB.GetTableValue (AlignmentTable, sym, 'DESC_REF')
-	alignment_help = GemRB.GetString (GemRB.GetTableValue (AlignmentTable, sym, 'DESC_REF'))
-	frame = (3 * int (align / 16) + align % 16) - 4
-	
-	Button = GemRB.GetControl (Window, 5)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
-	GemRB.SetButtonSprites (Window, Button, 'STALIGN', 0, frame, 0, 0, 0)
-	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpAlignment")
-	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
-
-
-	# faction
-	faction = GemRB.GetPlayerStat (pc, IE_FACTION)
-	print 'FACTION:', faction
-
-	FactionTable = GemRB.LoadTable ("FACTIONS")
-	faction_help = GemRB.GetString (GemRB.GetTableValue (FactionTable, faction, 0))
-	frame = GemRB.GetTableValue (FactionTable, faction, 1)
-	GemRB.UnloadTable (FactionTable)
-	
-	Button = GemRB.GetControl (Window, 6)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
-	GemRB.SetButtonSprites (Window, Button, 'STFCTION', 0, frame, 0, 0, 0)
-	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpFaction")
-	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
-	
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)
 	Text = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Text, stats_overview)
+	return
 
 # puts default info to textarea (overview of PC's bonuses, saves, etc.
 def OnRecordsButtonLeave ():
@@ -280,165 +231,11 @@ def OnRecordsButtonLeave ():
 	Text = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Text, stats_overview)
 
-def OnRecordsHelpFaction ():
-	Window = RecordsWindow
-	#Help = GemRB.GetVar ("ControlHelp")
-	Help = GemRB.GetString (20106) + "\n\n" + faction_help
-	TextArea = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, TextArea, Help)
-	
-	# 20106 faction
-
-	# 34584 no align 1/8
-	# 34588 Dustmen 4/8 
-	# 34585 godsmen 8/8
-	# 34587 Sensates 3/8
-	# 34589 Anarchists 5/8
-	# 34590 Xaositects 6/8
-	# 3789 indeps 7/8
-	# 34586 Mercykillers 2/8
-
 def OnRecordsHelpArmorClass ():
 	Window = RecordsWindow
 	Help = GemRB.GetString (18493)
 	TextArea = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, TextArea, Help)
-
-def OnRecordsHelpAlignment ():
-	Window = RecordsWindow
-	Help = GemRB.GetString (20105) + "\n\n" + alignment_help
-	TextArea = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, TextArea, Help)
-	
-	# 20105 alignment
-
-	# 33657 LG desc
-	# 33927 NG
-	# 33928 CG
-	# 33929 LN
-	# 33948 TN
-	# 33949 CN
-	# 33950 LE
-	# 33951 NE
-	# 33952 CE
-
-	# 33930 - attr comments
-
-#Bio:
-# 38787 no
-# 39423 morte
-# 39424 annah
-# 39425 dakkon
-# 39426 ffg
-# 39427 ignus
-# 39428 nordom
-# 39429 vhailor
-
-def OnRecordsHelpStrength ():
-	Window = RecordsWindow
-	TextArea = GemRB.GetControl (Window, 0)
-
-	# Loading tables of modifications
-	Table = GemRB.LoadTable("strmod")
-	TableEx = GemRB.LoadTable("strmodex")
-
-	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	# Getting the character's strength
-	s = GemRB.GetPlayerStat (pc, IE_STR)
-	e = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-
-	x = GemRB.GetTableValue(Table, s, 0) + GemRB.GetTableValue(TableEx, e, 0)
-	y = GemRB.GetTableValue(Table, s, 1) + GemRB.GetTableValue(TableEx, e, 1)
-	if x==0:
-	        x=y
-	        y=0
-	if e>60:
-	        s=19
-	GemRB.SetText(Window, TextArea, 18489)
-
-	# Unloading tables
-	#GemRB.UnloadTable (Table)
-	#GemRB.UnloadTable (TableEx)
-	return
-
-def OnRecordsHelpDexterity ():
-	Window = RecordsWindow
-	TextArea = GemRB.GetControl (Window, 0)
-
-	# Loading table of modifications
-	Table = GemRB.LoadTable("dexmod")
-
-	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	# Getting the character's dexterity
-	Dex = GemRB.GetPlayerStat (pc, IE_DEX)
-
-	# Getting the dexterity description
-	x = -GemRB.GetTableValue(Table,Dex,2)
-
-	GemRB.SetText(Window, TextArea, 18487)
-	return
-
-def OnRecordsHelpIntelligence ():
-	Window = RecordsWindow
-	TextArea = GemRB.GetControl (Window, 0)
-
-	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	# Getting the character's intelligence
-	Int = GemRB.GetPlayerStat (pc, IE_INT)
-
-	GemRB.SetText(Window, TextArea, 18488)
-	return
-
-def OnRecordsHelpWisdom ():
-	Window = RecordsWindow
-	TextArea = GemRB.GetControl (Window, 0)
-
-	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	# Getting the character's wisdom
-	Wis = GemRB.GetPlayerStat (pc, IE_WIS)
-
-	GemRB.SetText(Window, TextArea, 18490)
-	return
-
-def OnRecordsHelpConstitution ():
-	Window = RecordsWindow
-	TextArea = GemRB.GetControl (Window, 0)
-
-	# Loading table of modifications
-	Table = GemRB.LoadTable("hpconbon")
-
-	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	# Getting the character's constitution
-	Con = GemRB.GetPlayerStat (pc, IE_CON)
-
-	# Getting the constitution description
-	x = GemRB.GetTableValue(Table,Con-1,1)
-
-	GemRB.SetText(Window, TextArea, 18491)
-	return
-
-def OnRecordsHelpCharisma ():
-	Window = RecordsWindow
-	TextArea = GemRB.GetControl (Window, 0)
-
-	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	# Getting the character's charisma
-	Cha = GemRB.GetPlayerStat (pc, IE_CHR)
-
-	GemRB.SetText(Window, TextArea, 1903)
-	return
 
 def GetStatOverview (pc):
 	won = "[color=FFFFFF]"
@@ -636,11 +433,9 @@ def OpenInformationWindow ():
 	GemRB.SetText (Window, Button, 1403)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 
-
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
-
-
+	return
 
 def OpenBiographyWindow ():
 	global BiographyWindow

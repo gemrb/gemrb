@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.2 2004/08/27 13:36:31 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.3 2004/08/28 20:36:38 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -36,15 +36,18 @@ WorldMapWindow = None
 def OpenMapWindow ():
 	global MapWindow
 
+	print "OpenMapWindow"
 	GemRB.HideGUI()
 
+	#closing the worldmap window
+	if WorldMapWindow:
+		OpenWorldMapWindowInside ()
+
+	#toggling the mapwindow
 	if MapWindow:
-		if WorldMapWindow: OpenWorldMapWindow ()
-		
 		GemRB.UnloadWindow (MapWindow)
 		MapWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		
 		GemRB.UnhideGUI ()
 		return
 
@@ -69,10 +72,6 @@ def OpenMapWindow ():
 	# Map Control
 	GemRB.CreateMapControl (Window, 2, 24, 23, 480, 360)
 	Map = GemRB.GetControl (Window, 2)
-
-	#GemRB.SetEvent (Window, Map, IE_GUI_MAPWINDOW_ON_PRESS, "LeftPressMap")
-	#GemRB.SetEvent (Window, Map, IE_GUI_MAPWINDOW_ON_DOUBLEPRESS, "LeftPressMap")
-	#GemRB.SetEvent (Window, Map, IE_GUI_MAPWINDOW_ON_RIGHTPRESS, "AddNoteWindow")
 
 	GemRB.UnhideGUI ()
 
@@ -104,13 +103,13 @@ def WorldMapWindowCommon(Travel):
 	if WorldMapWindow:
 		GemRB.UnloadWindow (WorldMapWindow)
 		WorldMapWindow = None
-		GemRB.SetVar ("OtherWindow", MapWindow)
-
+		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.UnhideGUI ()
 		return
 
 	GemRB.LoadWindowPack ("GUIWMAP")
 	WorldMapWindow = Window = GemRB.LoadWindow (0)
+	MapWindow = None
 	GemRB.SetVar ("OtherWindow", WorldMapWindow)
 
 	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel)

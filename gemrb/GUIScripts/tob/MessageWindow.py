@@ -1,7 +1,6 @@
 import GemRB
 
 from GUICommonWindows import *
-
 from GUIJRNL import *
 from GUIMA import *
 from GUIMG import *
@@ -25,7 +24,6 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUIW")
 	ActionsWindow = GemRB.LoadWindow(3)
 	PortraitWindow = GemRB.LoadWindow(1)
-	PopulatePortraitWindow()
 	OptionsWindow = GemRB.LoadWindow(0)
 	MessageWindow = GemRB.LoadWindow(4)
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
@@ -55,6 +53,7 @@ def OnLoad():
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)
 
+	PopulatePortraitWindow(PortraitWindow)
 	SetupActionsWindowControls (ActionsWindow)
 	SetupMenuWindowControls (OptionsWindow)
 
@@ -187,16 +186,3 @@ def UpdateResizeButtons():
 			ContractButton = GemRB.GetControl(MessageWindow, 0)
 			GemRB.SetEvent(MessageWindow, ContractButton, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 	return
-
-def PopulatePortraitWindow ():
-	Window = PortraitWindow
-
-	for i in range (0,5):
-		Button = GemRB.GetControl (Window, i)
-		GemRB.SetVarAssoc (Window, Button, "SelectedSingle", i)
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
-
-		pic = GemRB.GetPlayerPortrait (i+1,1)
-		GemRB.SetButtonPicture(Window, Button, pic)
-		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE, OP_SET)
-

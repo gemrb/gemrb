@@ -94,9 +94,10 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	KitIndex = GemRB.GetVar("Class Kit")
 	if KitIndex == 0:
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,2))
+		ClassTitle=GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,2)
 	else:
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, GemRB.GetTableValue(KitTable, KitIndex,2) )
+		ClassTitle=GemRB.GetTableValue(KitTable, KitIndex,2)
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, ClassTitle)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1049, -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	v = GemRB.FindTableValue(AlignmentTable,3,GemRB.GetVar("Alignment"))
@@ -121,6 +122,8 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
 	Class=GemRB.GetVar("Class")
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
+	KitIndex = GemRB.GetVar("Class Kit")
+	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
 	t=GemRB.GetVar("Alignment")
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
 	TmpTable=GemRB.LoadTable("repstart")

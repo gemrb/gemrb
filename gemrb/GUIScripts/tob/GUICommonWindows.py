@@ -16,22 +16,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.1 2004/08/26 19:05:41 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.2 2004/08/28 20:36:39 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
 
 import GemRB
+import ie_stats
 from GUIDefines import *
-from ie_stats import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
-
-TimeWindow = None
-PortWindow = None
-MenuWindow = None
-MainWindow = None
 
 # Buttons:
 # 0 CNTREACH
@@ -46,146 +41,80 @@ MainWindow = None
 # 9 REST
 # 10 TXTE
 
-def OpenCommonWindows ():
-	global TimeWindow, PortWindow, MenuWindow, MainWindow
-
-	TimeWindow = GemRB.LoadWindow (0)
-	PortWindow = GemRB.LoadWindow (1)
-	MenuWindow = GemRB.LoadWindow (2)
-	MainWindow = GemRB.LoadWindow (3)
-
-	Window = MenuWindow
-
-	# Can't Reach ???
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CntReachPress")
-
-	# AI
-	Button = GemRB.GetControl (Window, 4)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
-
-	# Message popup
-	Button = GemRB.GetControl (Window, 10)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "TxtePress")
-
-
-	SetupMenuWindowControls (Window)
-
-
-	GemRB.SetVisible (TimeWindow, 1)
-	GemRB.SetVisible (PortWindow, 1)
-	GemRB.SetVisible (MenuWindow, 1)
-	GemRB.SetVisible (MainWindow, 1)
-	
-def CloseCommonWindows ():
-	global MainWindow
-
-	if MainWindow == None:
-		return
-	#if TimeWindow == None:
-	#	return
-	
-	GemRB.UnloadWindow (MainWindow)
-	GemRB.UnloadWindow (TimeWindow)
-	GemRB.UnloadWindow (PortWindow)
-	GemRB.UnloadWindow (MenuWindow)
-
-	MainWindow = None
-
 def SetupMenuWindowControls (Window):
 
-	# Inventory
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetTooltip (Window, Button, 41601)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+	# Return to Game
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetTooltip (Window, Button, 16313)
+	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 0)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "ReturnToGame")
 
 	# Map
-	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetTooltip (Window, Button, 41625)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
-
-	# Mage
-	Button = GemRB.GetControl (Window, 3)
-	GemRB.SetTooltip (Window, Button, 41624)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMageWindow")
-	# Stats
-	Button = GemRB.GetControl (Window, 5)
-	GemRB.SetTooltip (Window, Button, 4707)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetTooltip (Window, Button, 16310)
+	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 1)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 
 	# Journal
-	Button = GemRB.GetControl (Window, 6)
-	GemRB.SetTooltip (Window, Button, 41623)
+	Button = GemRB.GetControl (Window, 2)
+	GemRB.SetTooltip (Window, Button, 16308)
+	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 2)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	# Inventory
+	Button = GemRB.GetControl (Window, 3)
+	GemRB.SetTooltip (Window, Button, 16307)
+	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 3)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
 
+	# Records
+	Button = GemRB.GetControl (Window, 4)
+	GemRB.SetTooltip (Window, Button, 16306)
+	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 4)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
+
+	# Mage
+	Button = GemRB.GetControl (Window, 5)
+	GemRB.SetTooltip (Window, Button, 16309)
+	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 5)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMageWindow")
 	# Priest
-	Button = GemRB.GetControl (Window, 7)
-	GemRB.SetTooltip (Window, Button, 4709)
+	Button = GemRB.GetControl (Window, 6)
+	GemRB.SetTooltip (Window, Button, 16310)
+	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 6)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPriestWindow")
 
 	# Options
-	Button = GemRB.GetControl (Window, 8)
-	GemRB.SetTooltip (Window, Button, 41626)
+	Button = GemRB.GetControl (Window, 7)
+	GemRB.SetTooltip (Window, Button, 16311)
+	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 7)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
 
 	# Rest
-	Button = GemRB.GetControl (Window, 9)
-	GemRB.SetTooltip (Window, Button, 41628)
+	Button = GemRB.GetControl (Window, 8)
+	GemRB.SetTooltip (Window, Button, 11942)
 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
 
-
 	# AI
-	Button = GemRB.GetControl (Window, 4)
-	GemRB.SetTooltip (Window, Button, 41631) # or 41646 Activate ...
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
-
-	# Can't Reach ???
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetTooltip (Window, Button, 41647)  # or 41648 Unlock ...
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPartyManageWindow")
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenContainerWindow")
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CntReachPress")
-
-	# Message popup
-	Button = GemRB.GetControl (Window, 10)
-	GemRB.SetTooltip (Window, Button, 41660)  # or 41661 Close ...
-
-
-PokWindow = None
-def CntReachPress ():
-	print "CntReachPress"
-	global PokWindow
-	
-	GemRB.HideGUI()
-	
-	if PokWindow != None:
-		
-		GemRB.UnloadWindow(PokWindow)
-		PokWindow = None
-		GemRB.SetVar("OtherWindow", -1)
-		#SetSelectionChangeHandler (None)
-		GemRB.UnhideGUI()
-		return
-		
-	GemRB.LoadWindowPack ("GUIW")
-	PokWindow = Window = GemRB.CreateWindow (100, 0, 0, 640, 480, "GUILS05")
-        GemRB.SetVar("OtherWindow", PokWindow)
-
-	GemRB.UnhideGUI ()
-
+	#Button = GemRB.GetControl (Window, 9)
+	#GemRB.SetTooltip (Window, Button, 41631) # or 41646 Activate ...
+	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
+	return
 
 def AIPress ():
 	print "AIPress"
-
-def TxtePress ():
-	print "TxtePress"
+	return
 
 def RestPress ():
 	print "RestPress"
+	return
 
 def SetupActionsWindowControls (Window):
 	# 41627 - Return to the Game World
@@ -202,23 +131,105 @@ def SetupActionsWindowControls (Window):
 	Button = GemRB.GetControl (Window, 4)
 	GemRB.SetTooltip (Window, Button, 44945)
 
-# which=INVENTORY|STATS|FMENU
-def GetActorPortrait (actor, which):
-
+def GetActorPaperDoll (actor):
 	PortraitTable = GemRB.LoadTable ("PDOLLS")
-	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
+	anim_id = GemRB.GetPlayerStat (actor, ie_stats.IE_ANIMATION_ID)
+	level = GemRB.GetPlayerStat (actor, ie_stats.IE_ARMOR_TYPE)
 	row = "0x%04X" %anim_id
-
+	which = "LEVEL%d" %(level+1)
+	print row, which
 	return GemRB.GetTableValue (PortraitTable, row, which)
-	
-
 
 SelectionChangeHandler = None
 
 def SetSelectionChangeHandler (handler):
 	global SelectionChangeHandler
+
+	# Switching from walking to non-walking environment:
+	#   set the first selected PC in walking env as a selected
+	#   in nonwalking env
+	if (not SelectionChangeHandler) and handler:
+		sel = GemRB.GameGetFirstSelectedPC ()
+		if not sel:
+			sel = 1
+		GemRB.GameSelectPCSingle (sel)
+
 	SelectionChangeHandler = handler
+
+	# redraw selection on change main selection | single selection
+	SelectionChanged ()
 
 def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
+
+def PopulatePortraitWindow (Window):
+	PortraitWindow = Window
+	# AI
+	Button = GemRB.GetControl (Window, 6)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
+
+	#Select All
+	Button = GemRB.GetControl (Window, 7)
+	GemRB.SetTooltip (Window, Button, 10485)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+	for i in range (0,5):
+		Button = GemRB.GetControl (Window, i)
+		GemRB.SetVarAssoc (Window, Button, "SelectedSingle", i)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
+
+		pic = GemRB.GetPlayerPortrait (i+1,1)
+		GemRB.SetButtonPicture(Window, Button, pic)
+		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE, OP_SET)
+
+		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1,
+2, 2, 0, 255, 0, 255)
+		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
+		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)
+	return
+
+def PortraitButtonOnPress ():
+	i = GemRB.GetVar ("PressedPortrait")
+
+	if (not SelectionChangeHandler):
+		GemRB.GameSelectPC (i + 1, True, SELECT_REPLACE)
+	else:
+		GemRB.GameSelectPCSingle (i + 1)
+		SelectionChanged ()
+		RunSelectionChangeHandler ()
+	return
+
+def PortraitButtonOnShiftPress ():
+	i = GemRB.GetVar ('PressedPortrait')
+
+	if (not SelectionChangeHandler):
+		sel = GemRB.GameIsPCSelected (i + 1)
+		sel = not sel
+		GemRB.GameSelectPC (i + 1, sel)
+	else:
+		GemRB.GameSelectPCSingle (i + 1)
+		SelectionChanged ()
+		RunSelectionChangeHandler ()
+	return
+
+def SelectAllOnPress ():
+	GemRB.GameSelectPC (0, 1)
+	return
+
+# Run by Game class when selection was changed
+def SelectionChanged ():
+	# FIXME: hack. If defined, display single selection
+	if (not SelectionChangeHandler):
+		for i in range (0, 6):
+			Button = GemRB.GetControl (PortraitWindow, i)
+			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
+	else:
+		sel = GemRB.GameGetSelectedPCSingle ()
+		for i in range (0, 6):
+			Button = GemRB.GetControl (PortraitWindow, i)
+
+		for i in range (0, 6):
+			Button = GemRB.GetControl (PortraitWindow, i)
+			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, i + 1 == sel)
+

@@ -210,7 +210,7 @@ def LeftPress():
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
 	StrExtra = GemRB.GetVar("StrExtra")
 	if Abidx==0 and Ability==17 and HasStrExtra==1:
-		GemRB.SetText(AbilityWindow, Label, "18/"+str(StrExtra) )
+		GemRB.SetText(AbilityWindow, Label, "18/%02d"%(StrExtra) )
 	else:
 		GemRB.SetText(AbilityWindow, Label, str(Ability+1) )
 	if PointsLeft == 0:
