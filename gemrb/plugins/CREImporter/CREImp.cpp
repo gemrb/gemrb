@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.22 2003/12/20 00:06:32 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.23 2004/01/05 16:00:57 balrog994 Exp $
  *
  */
 
@@ -73,6 +73,7 @@ Actor * CREImp::GetActor()
 	int RandColor = core->LoadTable("RANDCOLR");
 	TableMgr * rndcol = core->GetTable(RandColor);
 	Actor * act = new Actor();
+	act->InParty = false;
 	unsigned long strref;
 	str->Read(&strref, 4);
 	char * poi = core->GetString(strref);
