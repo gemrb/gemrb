@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.7 2004/01/05 15:59:08 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.8 2004/01/05 23:52:11 balrog994 Exp $
  *
  */
 
@@ -38,6 +38,9 @@ Game::~Game(void)
 	}
 	for(size_t i = 0; i < PCs.size(); i++) {
 		delete(PCs[i]);
+	}
+	for(size_t i = 0; i < NPCs.size(); i++) {
+		delete(NPCs[i]);
 	}
 }
 
@@ -101,5 +104,22 @@ int Game::LoadMap(char *ResRef)
 	core->FreeInterface(mM);
 	if(!newMap)
 		return -1;
+	for(int i = 0; i < NPCs.size(); i++) {
+		if(stricmp(NPCs[i]->Area, ResRef) == 0)
+			newMap->AddActor(NPCs[i]);
+	}
 	return AddMap(newMap);
+}
+
+int Game::AddNPC(Actor *npc)
+{
+	NPCs.push_back(npc);
+	return NPCs.size()-1;
+}
+
+Actor* Game::GetNPC(unsigned int Index)
+{
+	if(Index >= NPCs.size())
+		return NULL;
+	return NPCs[Index];
 }
