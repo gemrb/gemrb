@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/LoadScreen.py,v 1.4 2004/08/11 22:13:41 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/LoadScreen.py,v 1.5 2004/09/11 14:22:41 avenger_teambg Exp $
 
 # LoadScreen.py - display Loading screen
 
@@ -35,7 +35,7 @@ def StartLoadScreen ():
 	Middle = GemRB.GetControl (LoadScreen, 3)
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	if LoadPic == "":
-		LoadPic = "GTRSK00"+str(GemRB.Roll(1,6,0) )
+		LoadPic = "GTRSK00"+str(GemRB.Roll(1,5,1) )
 	GemRB.SetButtonMOS (LoadScreen, Middle, LoadPic)
 	Label = GemRB.GetControl (LoadScreen, 1)
 	Progress = 0
