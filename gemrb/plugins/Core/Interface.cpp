@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.160 2004/04/25 22:41:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.161 2004/04/26 11:14:06 edheldil Exp $
  *
  */
 
@@ -274,6 +274,9 @@ int Interface::Init()
 		printf( "Cannot Load Chitin.key\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
+
+	LoadGemRBINI();
+
 	//printStatus("OK", LIGHT_GREEN);
 	printMessage( "Core", "Checking for Dialogue Manager...", WHITE );
 	if (!IsAvailable( IE_TLK_CLASS_ID )) {
@@ -834,6 +837,7 @@ bool Interface::LoadConfig(const char* filename)
 			SetFeature( atoi( value ), GF_HAS_EXPTABLE );
 		} else if (stricmp( name, "SoundFolders" ) == 0) {
 			SetFeature( atoi( value ), GF_SOUNDFOLDERS );
+			/*
 		} else if (stricmp( name, "HasSonglist" ) == 0) {
 			SetFeature( atoi( value ), GF_HAS_SONGLIST );
 		} else if (stricmp( name, "UpperButtonText" ) == 0) {
@@ -844,18 +848,23 @@ bool Interface::LoadConfig(const char* filename)
 			SetFeature( atoi( value ), GF_HAS_PARTY_INI );
 		} else if (stricmp( name, "HasBeastsIni" ) == 0) {
 			SetFeature( atoi( value ), GF_HAS_BEASTS_INI );
+			*/
 		} else if (stricmp( name, "IgnoreButtonFrames" ) == 0) {
 			SetFeature( atoi( value ), GF_IGNORE_BUTTON_FRAMES );
 		} else if (stricmp( name, "ForceStereo" ) == 0) {
 			ForceStereo = atoi( value );
+			/*
 		} else if (stricmp( name, "CursorBam" ) == 0) {
 			strncpy( CursorBam, value, 8 );
+			*/
 		} else if (stricmp( name, "GameDataPath" ) == 0) {
 			strncpy( GameData, value, 8 );
 		} else if (stricmp( name, "GameOverridePath" ) == 0) {
 			strncpy( GameOverride, value, 8 );
+			/*
 		} else if (stricmp( name, "ButtonFont" ) == 0) {
 			strncpy( ButtonFont, value, 8 );
+			*/
 		} else if (stricmp( name, "GameName" ) == 0) {
 			strcpy( GameName, value );
 		} else if (stricmp( name, "GameType" ) == 0) {
@@ -891,8 +900,10 @@ bool Interface::LoadConfig(const char* filename)
 #ifndef WIN32
 			ResolveFilePath( SavePath );
 #endif
+			/*
 		} else if (stricmp( name, "INIConfig" ) == 0) {
 			strcpy( INIConfig, value );
+			*/
 		} else if (stricmp( name, "CD1" ) == 0) {
 			strcpy( CD1, value );
 #ifndef WIN32
@@ -957,6 +968,44 @@ bool Interface::LoadConfig(const char* filename)
 	printf( "Loaded config file %s\n", filename );
 	return true;
 }
+
+/** Loads gemrb.ini */
+bool Interface::LoadGemRBINI()
+{
+	printMessage( "Core", "Loading game type-specific GemRB setup...",
+		      WHITE );
+
+	DataStream* inifile = core->GetResourceMgr()->GetResource( "gemrb", IE_INI_CLASS_ID );
+	if (! inifile) {
+		printStatus( "ERROR", LIGHT_RED );
+		return false;
+	}
+	if (!core->IsAvailable( IE_INI_CLASS_ID )) {
+		printStatus( "ERROR", LIGHT_RED );
+		printf( "[Core]: No INI Importer Available.\n" );
+		return false;
+	}
+	DataFileMgr* ini = ( DataFileMgr* ) GetInterface( IE_INI_CLASS_ID );
+	ini->Open( inifile, true ); //autofree
+
+	printStatus( "OK", LIGHT_GREEN );
+
+
+	strcpy( CursorBam, ini->GetKeyAsString( "resources", "CursorBAM", "CAROT" ));
+	strcpy( ButtonFont, ini->GetKeyAsString( "resources", "ButtonFont", "STONESML" ));
+	strcpy( INIConfig, ini->GetKeyAsString( "resources", "INIConfig", "baldur.ini" ));
+
+
+	SetFeature( ini->GetKeyAsInt( "resources", "HasSongList", 0 ), GF_HAS_SONGLIST );
+	SetFeature( ini->GetKeyAsInt( "resources", "UpperButtonText", 0 ), GF_UPPER_BUTTON_TEXT );
+	SetFeature( ini->GetKeyAsInt( "resources", "LowerLabelText", 0 ), GF_LOWER_LABEL_TEXT );
+	SetFeature( ini->GetKeyAsInt( "resources", "HasPartyIni", 0 ), GF_HAS_PARTY_INI );
+	SetFeature( ini->GetKeyAsInt( "resources", "HasBeastsIni", 0 ), GF_HAS_BEASTS_INI );	
+
+	core->FreeInterface( ini );
+	return true;
+}
+
 /** No descriptions */
 Color* Interface::GetPalette(int index, int colors)
 {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.91 2004/04/21 17:41:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.92 2004/04/26 11:14:06 edheldil Exp $
  *
  */
 
@@ -309,6 +309,7 @@ public:
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);
+	bool LoadGemRBINI();
 	bool LoadINI(const char * filename);
 	bool InitItemTypes();
 public:
