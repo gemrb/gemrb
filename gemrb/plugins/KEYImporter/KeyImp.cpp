@@ -151,6 +151,7 @@ printf("[RESLOCATOR] 0x%x\n",ResLocator);
 		strcat(ret->filename, core->TypeExt(type));
 		return ret;
 	}
+printf("Notfound %.8s\n",resname);
 	return NULL;
 }
 void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned char mode)
@@ -235,5 +236,6 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		core->GetFactory()->AddFactoryObject(af);
 		return af;
 	}
+printf("[NOTFOUND: %.8s",resname);
 	return NULL;
 }

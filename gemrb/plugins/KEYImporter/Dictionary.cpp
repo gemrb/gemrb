@@ -15,10 +15,8 @@
 // inlines
 inline unsigned int Dictionary::MyHashKey(const char * key, unsigned int type) const
 {
-   int i;
    unsigned int nHash = type;
-
-   for(i=0;i<8 && key[i];i++)
+   for(int i=0;i<8 && key[i];i++)
    {
 	nHash = (nHash<<5) + nHash + toupper(key[i]);
    }
@@ -151,7 +149,7 @@ Dictionary::GetAssocAt(const char *key, unsigned int type, unsigned int& nHash) 
 	MyAssoc* pAssoc;
 	for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL; pAssoc = pAssoc->pNext)
 	{
-		if(!stricmp(pAssoc->key, key) )
+		if(!strnicmp(pAssoc->key, key,8) )
 			return pAssoc;
 	}
 	return NULL;

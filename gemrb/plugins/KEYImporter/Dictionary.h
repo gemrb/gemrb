@@ -30,6 +30,7 @@
 //this should be a global define
 #ifndef WIN32
 #define stricmp strcasecmp
+#define strnicmp strncasecmp
 #endif
 
 #define MYASSERT(f) \
