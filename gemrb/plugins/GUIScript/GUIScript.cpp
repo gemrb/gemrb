@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.130 2004/02/29 19:32:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.131 2004/03/01 00:04:18 edheldil Exp $
  *
  */
 
@@ -2103,6 +2103,54 @@ static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 	return Py_BuildValue( "i", core->GetPartySize() );
 }
 
+static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
+{
+	int section;
+	if (!PyArg_ParseTuple( args, "i", &section )) {
+		printMessage( "GUIScript",
+			"Syntax Error: GetJournalSize(section)\n", LIGHT_RED );
+	}
+
+	int count = 0;
+	for (int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
+		GAMJournalEntry* je = core->GetGame()->GetJournalEntry( i );
+		//printf ("JE: sec: %d;   text: %d, time: %d, chapter: %d, un09: %d, un0b: %d\n", je->Section, je->Text, je->Time, je->Chapter, je->unknown09, je->unknown0B);
+		if (section == je->Section)
+			count++;
+	}
+
+	return Py_BuildValue( "i", count );
+}
+
+static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
+{
+	int section, index;
+	if (!PyArg_ParseTuple( args, "ii", &section, &index )) {
+		printMessage( "GUIScript",
+			"Syntax Error: GetJournalEntry(section, index)\n", LIGHT_RED );
+	}
+
+	int count = 0;
+	for (int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
+		GAMJournalEntry* je = core->GetGame()->GetJournalEntry( i );
+		if (section == je->Section) {
+			if (index == count) {
+				PyObject* dict = PyDict_New();
+				PyDict_SetItemString(dict, "Text", PyInt_FromLong (je->Text));
+				PyDict_SetItemString(dict, "Time", PyInt_FromLong (je->Time));
+				PyDict_SetItemString(dict, "Section", PyInt_FromLong (je->Section));
+				PyDict_SetItemString(dict, "Chapter", PyInt_FromLong (je->Chapter));
+
+				return dict;
+			}
+			count++;
+		}
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 static PyObject* GemRB_GetINIPartyCount(PyObject * /*self*/,
 	PyObject * /*args*/)
 {
@@ -2605,6 +2653,10 @@ static PyMethodDef GemRBMethods[] = {
 	"Exits the CutScene Mode."},
 	{"GetPartySize", GemRB_GetPartySize, METH_NOARGS,
 	"Returns the number of PCs."},
+	{"GetJournalSize", GemRB_GetJournalSize, METH_VARARGS,
+	"Returns the number of entries in the given section of journal."},
+	{"GetJournalEntry", GemRB_GetJournalEntry, METH_VARARGS,
+	"Returns dictionary representing journal entry w/ given section and index."},
 	{"GetINIPartyCount", GemRB_GetINIPartyCount, METH_NOARGS,
 	"Returns the Number of Party defined in Party.ini (works only on IWD2)."},
 	{"GetINIPartyKey", GemRB_GetINIPartyKey, METH_VARARGS,

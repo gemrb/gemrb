@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.14 2004/02/29 19:32:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.15 2004/03/01 00:04:18 edheldil Exp $
  *
  */
 
@@ -263,12 +263,12 @@ GAMJournalEntry* GAMImp::GetJournalEntry()
 {
 	GAMJournalEntry* j = new GAMJournalEntry();
 
-	str->Read( &j->JournalText, 4 );
+	str->Read( &j->Text, 4 );
 	str->Read( &j->Time, 4 );
-	str->Read( &j->ChapterNumber, 4 );
-	str->Read( &j->Unknown0C, 1 );
+	str->Read( &j->Chapter, 1 );
+	str->Read( &j->unknown09, 1 );
 	str->Read( &j->Section, 1 );
-	str->Read( &j->ChapterNumber2, 1 );
+	str->Read( &j->unknown0B, 1 );
 
 	return j;
 }

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.3 2004/01/18 18:12:40 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.4 2004/03/01 00:04:18 edheldil Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -42,7 +42,7 @@ QuestsWindow = None
 ###################################################
 def OpenJournalWindow ():
 	global JournalWindow
-	
+
 	GemRB.HideGUI()
 
 	if JournalWindow:
@@ -192,20 +192,34 @@ def OpenLogWindow ():
 		GemRB.UnhideGUI()
 		return
 	
-	LogWindow = GemRB.LoadWindow (3)
-	GemRB.SetVar("OtherWindow", LogWindow)
+	LogWindow = Window = GemRB.LoadWindow (3)
+	GemRB.SetVar("OtherWindow", Window)
 
 	# Back
-	Button = GemRB.GetControl (LogWindow, 1)
-	GemRB.SetText (LogWindow, Button, 46677)
-	GemRB.SetEvent (LogWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLogWindow")
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetText (Window, Button, 46677)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLogWindow")
 
 	# Done
-	Button = GemRB.GetControl (LogWindow, 0)
-	GemRB.SetText (LogWindow, Button, 20636)
-	GemRB.SetEvent (LogWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Button, 20636)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
-	GemRB.SetVisible (LogWindow, 1)
+	# text area
+	Text = GemRB.GetControl (Window, 2)
+
+	for i in range (GemRB.GetJournalSize (0)):
+		je = GemRB.GetJournalEntry (0, i)
+
+		if je == None:
+			continue
+		
+		GemRB.TextAreaAppend (Window, Text, "[color=FFFF00]Time: " + str (je['Time']) + ":[/color]", 3*i)
+		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i + 1)
+		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
+			
+
+	GemRB.SetVisible (Window, 1)
 	
 	GemRB.UnhideGUI()
 
