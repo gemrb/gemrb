@@ -53,8 +53,8 @@ bool MUSImp::OpenPlaylist(const char * name)
 	if(!str->Open(path, true))
 		return false;
 	str->ReadLine(PLName, 32);
-	char counts[3];
-	str->ReadLine(counts, 3);
+	char counts[5];
+	str->ReadLine(counts, 5);
 	int count = atoi(counts);
 	while(count != 0) {
 		char line[64], var1[10], var2[10], var3[10], var4[10];
@@ -69,16 +69,17 @@ bool MUSImp::OpenPlaylist(const char * name)
 					strcpy(pls.PLTag, "");
 					strcpy(pls.PLEnd, "");
 					char FName[_MAX_PATH];
-      		strcpy(FName, core->GamePath);
-      		strcat(FName, "music");
-      		strcat(FName, SPathDelimiter);
-      		strcat(FName, PLName);
-      		strcat(FName, SPathDelimiter);
-      		strcat(FName, PLName);
-      		strcat(FName, pls.PLFile);
-      		strcat(FName, ".acm");
+      				strcpy(FName, core->GamePath);
+					strcat(FName, "music");
+					strcat(FName, SPathDelimiter);
+					strcat(FName, PLName);
+					strcat(FName, SPathDelimiter);
+					strcat(FName, PLName);
+					strcat(FName, pls.PLFile);
+					strcat(FName, ".acm");
 					pls.soundID = core->GetSoundMgr()->LoadFile(FName);
 					playlist.push_back(pls);
+					printf("%s.acm Added in position %d\n", pls.PLFile, pls.soundID);
 				}
 			break;
 			
@@ -90,16 +91,17 @@ bool MUSImp::OpenPlaylist(const char * name)
 					strcpy(pls.PLTag, var2);
 					strcpy(pls.PLEnd, var3);
 					char FName[_MAX_PATH];
-      		strcpy(FName, core->GamePath);
-      		strcat(FName, "music");
-      		strcat(FName, SPathDelimiter);
-      		strcat(FName, PLName);
-      		strcat(FName, SPathDelimiter);
-      		strcat(FName, PLName);
-      		strcat(FName, pls.PLFile);
-      		strcat(FName, ".acm");
+					strcpy(FName, core->GamePath);
+					strcat(FName, "music");
+					strcat(FName, SPathDelimiter);
+					strcat(FName, PLName);
+					strcat(FName, SPathDelimiter);
+					strcat(FName, PLName);
+					strcat(FName, pls.PLFile);
+					strcat(FName, ".acm");
 					pls.soundID = core->GetSoundMgr()->LoadFile(FName);
 					playlist.push_back(pls);
+					printf("%s.acm Added in position %d\n", pls.PLFile, pls.soundID);
 				}
 			break;
 
@@ -111,16 +113,17 @@ bool MUSImp::OpenPlaylist(const char * name)
 					strcpy(pls.PLTag, var3);
 					strcpy(pls.PLEnd, var4);
 					char FName[_MAX_PATH];
-      		strcpy(FName, core->GamePath);
-      		strcat(FName, "music");
-      		strcat(FName, SPathDelimiter);
-      		strcat(FName, PLName);
-      		strcat(FName, SPathDelimiter);
-      		strcat(FName, PLName);
-      		strcat(FName, pls.PLFile);
-      		strcat(FName, ".acm");
+      				strcpy(FName, core->GamePath);
+      				strcat(FName, "music");
+      				strcat(FName, SPathDelimiter);
+      				strcat(FName, PLName);
+      				strcat(FName, SPathDelimiter);
+      				strcat(FName, PLName);
+      				strcat(FName, pls.PLFile);
+      				strcat(FName, ".acm");
 					pls.soundID = core->GetSoundMgr()->LoadFile(FName);
 					playlist.push_back(pls);
+					printf("%s.acm Added in position %d\n", pls.PLFile, pls.soundID);
 				}
 			break;
 
@@ -132,6 +135,7 @@ bool MUSImp::OpenPlaylist(const char * name)
 		}
 		count--;
 	}
+	return true;
 }
 /** Start the PlayList Music Execution */
 void MUSImp::Start()

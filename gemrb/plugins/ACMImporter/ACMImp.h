@@ -3,11 +3,11 @@
 
 #include "../Core/SoundMgr.h"
 #include "../Core/FileStream.h"
-#ifndef WIN32
+//#ifndef WIN32
 #include "../../includes/fmod/fmod.h"
-#else
-#include "../../includes/fmodwin32/fmod.h"
-#endif
+//#else
+//#include "../../includes/fmodwin32/fmod.h"
+//#endif
 
 typedef struct AudioStream {
 	FSOUND_STREAM * stream;

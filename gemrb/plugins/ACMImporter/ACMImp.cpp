@@ -19,11 +19,10 @@ signed char synchstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int 
 	if(stream) {
 		for(int i = 0; i < streams.size(); i++) {
 			if(streams[i].stream == stream) {
+				printf("Stream found on index %d\n", i);
 				streams[i].playing = false;
-				streams[i].end = false;
+				streams[i].end = true;
 				streams[i].free = false;
-				//FSOUND_Stream_SetTime(streams[i].stream, 0);
-				FSOUND_Stream_Stop(streams[i].stream);
 				//FSOUND_Stream_SetTime(streams[i].stream, 0);
 				//streams[i].channel = FSOUND_Stream_Play(FSOUND_FREE, streams[i].stream);
 				//FSOUND_SetPaused(streams[i].channel, true);
@@ -70,34 +69,8 @@ unsigned long ACMImp::Play(const char * ResRef)
 	FILE * str = fopen(path, "rb");
 	if(str != NULL) {
 		fclose(str);
-#ifndef WIN32
 		FSOUND_STREAM * sound = FSOUND_Stream_Open(path, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
-#else
-		FSOUND_STREAM * sound = FSOUND_Stream_OpenFile(path, FSOUND_LOOP_OFF | FSOUND_2D, 0);
-#endif
 		if(sound) {
-			/*if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
-				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
-			}
-			AudioStream as;
-			as.stream = sound;
-			as.playing = true;
-			as.end = false;
-			as.free = false;
-			int ret = -1;
-			bool found = false;
-			for(int i = 0; i < streams.size(); i++) {
-				if(streams[i].free) {
-					streams[i] = as;
-					found = true;
-					ret = i;
-					break;
-				}
-			}
-			if(!found) {
-				streams.push_back(as);
-				ret = streams.size()-1;
-			}*/
 			FSOUND_Stream_Play(FSOUND_FREE, sound);
 			return 0;
 		}
@@ -116,34 +89,8 @@ unsigned long ACMImp::Play(const char * ResRef)
 	str = fopen(path, "rb");
 	if(str != NULL) {
 		fclose(str);
-#ifndef WIN32
 		FSOUND_STREAM * sound = FSOUND_Stream_Open(path, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
-#else
-		FSOUND_STREAM * sound = FSOUND_Stream_OpenFile(path, FSOUND_LOOP_OFF | FSOUND_2D, 0);
-#endif
 		if(sound) {
-			/*if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
-				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
-			}
-			AudioStream as;
-			as.stream = sound;
-			as.playing = true;
-			as.end = false;
-			as.free = false;
-			int ret = -1;
-			bool found = false;
-			for(int i = 0; i < streams.size(); i++) {
-				if(streams[i].free) {
-					streams[i] = as;
-					found = true;
-					ret = i;
-					break;
-				}
-			}
-			if(!found) {
-				streams.push_back(as);
-				ret = streams.size()-1;
-			}*/
 			FSOUND_Stream_Play(FSOUND_FREE, sound);
 			return 0;
 		}
@@ -165,13 +112,9 @@ unsigned long ACMImp::LoadFile(const char * filename)
 	FILE * str = fopen(outFile, "rb");
 	if(str != NULL) {
 		fclose(str);
-#ifndef WIN32
 		FSOUND_STREAM * sound = FSOUND_Stream_Open(outFile, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
-#else
-		FSOUND_STREAM * sound = FSOUND_Stream_OpenFile(outFile, FSOUND_LOOP_OFF | FSOUND_2D, 0);
-#endif
 		if(sound) {
-			if(!FSOUND_Stream_SetSyncCallback(sound, synchstreamcallback, 0)) {
+			if(!FSOUND_Stream_SetSyncCallback(sound, (FSOUND_STREAMCALLBACK)synchstreamcallback, 0)) {
 				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
 			}
 			AudioStream as;
@@ -185,8 +128,6 @@ unsigned long ACMImp::LoadFile(const char * filename)
 			unsigned int strFlags = FSOUND_Stream_GetMode(sound);
 			int lastsample = (FSOUND_Stream_GetLength(sound) / (strFlags & FSOUND_16BITS ? 2 : 1)) / (strFlags & FSOUND_STEREO ? 2 : 1);
 			FSOUND_Stream_AddSyncPoint(sound, lastsample-1000, "End");
-			//as.channel = FSOUND_Stream_Play(FSOUND_FREE, sound);
-			//FSOUND_SetPaused(as.channel, true);
 			for(int i = 0; i < streams.size(); i++) {
 				if(streams[i].free) {
 					streams[i] = as;
@@ -221,13 +162,9 @@ unsigned long ACMImp::LoadFile(const char * filename)
 	str = fopen(outFile, "rb");
 	if(str != NULL) {
 		fclose(str);
-#ifndef WIN32
 		FSOUND_STREAM * sound = FSOUND_Stream_Open(outFile, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
-#else
-		FSOUND_STREAM * sound = FSOUND_Stream_OpenFile(outFile, FSOUND_LOOP_OFF | FSOUND_2D, 0);
-#endif
 		if(sound) {
-			if(!FSOUND_Stream_SetSyncCallback(sound, synchstreamcallback, 0)) {
+			if(!FSOUND_Stream_SetSyncCallback(sound, (FSOUND_STREAMCALLBACK)synchstreamcallback, 0)) {
 				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
 			}
 			
@@ -242,8 +179,6 @@ unsigned long ACMImp::LoadFile(const char * filename)
 			unsigned int strFlags = FSOUND_Stream_GetMode(sound);
 			int lastsample = FSOUND_Stream_GetLength(sound) * (strFlags & FSOUND_16BITS ? 2 : 1) * (strFlags & FSOUND_STEREO ? 2 : 1);
 			FSOUND_Stream_AddSyncPoint(sound, lastsample-1000, "End");
-			//as.channel = FSOUND_Stream_Play(FSOUND_FREE, sound);
-			//FSOUND_SetPaused(as.channel, true);
 			for(int i = 0; i < streams.size(); i++) {
 				if(streams[i].free) {
 					streams[i] = as;
@@ -339,7 +274,7 @@ bool ACMImp::Play(unsigned long index)
 		return false;
 	if(streams[index].playing)
 		return true;
-	streams[index].channel = FSOUND_Stream_Play(0, streams[index].stream);
+	streams[index].channel = FSOUND_Stream_Play(FSOUND_FREE, streams[index].stream);
 	streams[index].playing = true;
 	return true;
 }

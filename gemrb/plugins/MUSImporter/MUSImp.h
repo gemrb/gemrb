@@ -18,14 +18,9 @@
 #ifndef MUSIMP_H
 #define MUSIMP_H
 
-#include "../Core/MusicMgr.h
-
-#include "../Core/FileStream.h
-
+#include "../Core/MusicMgr.h"
+#include "../Core/FileStream.h"
 #include <stdio.h>
-
-
-
 
 /**MUS PlayList Importer
   *@author GemRB Developement Team

@@ -112,5 +112,5 @@ int FileStream::ReadLine(void * buf, int maxlen)
 			p[i++] = ch;
 	}
 	p[i] = 0;
-	return i-1;
+	return i;
 }
