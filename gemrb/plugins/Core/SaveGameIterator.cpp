@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.16 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.17 2004/02/29 15:24:59 hrk Exp $
  *
  */
 
@@ -106,15 +106,15 @@ int SaveGameIterator::GetSaveGameCount()
 			if (!exist)
 				continue;
 			fclose( exist );
-			char Name[_MAX_PATH], Text[_MAX_PATH];
-			int cnt = sscanf( de->d_name, "%*d-%s - %s", Name, Text );
-			if (cnt == 2) {
-				printf( "[Name = %s, Text = %s]\n", Name, Text );
+			char savegameName[_MAX_PATH];
+			int savegameNumber = 0;
+			int cnt = sscanf( de->d_name, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
+			if (cnt == 2) { //The matcher got matched correctly.
+				printf( "[Number = %d, Name = %s]\n", savegameNumber, savegameName );
 				count++;
 			}
-			if (cnt == 1) {
-				printf( "[Name = %s, No Description]\n", Name );
-				count++;
+			else { //The matcher didn't match: either this is not a valid directory or the SAVEGAME_DIRECTORY_MATCHER needs updating.
+				printf( "[Invalid savegame directory '%s' in %s.\n", de->d_name, Path);
 			}
 		}
 	} while (( de = readdir( dir ) ) != NULL);
@@ -139,7 +139,8 @@ SaveGame* SaveGameIterator::GetSaveGame(int index, bool Remove)
 	{
 		return NULL;
 	}
-	char Name[_MAX_PATH], Text[_MAX_PATH];
+	char savegameName[_MAX_PATH];
+	int savegameNumber = 0;
 	do {
 		//Iterate through all the available modules to load
 		struct stat fst;
@@ -158,15 +159,13 @@ SaveGame* SaveGameIterator::GetSaveGame(int index, bool Remove)
 			if (!exist)
 				continue;
 			fclose( exist );
-			int cnt = sscanf( de->d_name, "%*d-%s - %s", Name, Text );
+			int cnt = sscanf( de->d_name, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
 			if (cnt == 2) {
-				printf( "[Name = %s, Text = %s]\n", Name, Text );
+				printf( "[Number = %d, Name = %s]\n", savegameNumber, savegameName );
 				count++;
 			}
-			if (cnt == 1) {
-				Text[0] = 0;
-				printf( "[Name = %s, No Description]\n", Name );
-				count++;
+			else {
+				printf( "[Invalid savegame directory '%s' in %s.\n", de->d_name, Path);
 			}
 			if (count == index) {
 				if (Remove) {
@@ -204,6 +203,6 @@ SaveGame* SaveGameIterator::GetSaveGame(int index, bool Remove)
 	if (Remove || ( de == NULL )) {
 		return NULL;
 	}
-	SaveGame* sg = new SaveGame( dtmp, Name, core->GameNameResRef, prtrt );
+	SaveGame* sg = new SaveGame( dtmp, savegameName, core->GameNameResRef, prtrt );
 	return sg;
 }
