@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.34 2004/05/09 17:36:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.35 2004/05/09 17:57:47 avenger_teambg Exp $
  *
  */
 
@@ -33,18 +33,8 @@ MUSImp::MUSImp()
 	PLpos = 0;
 	PLName[0] = '\0';
 	lastSound = 0xffffffff;
-#ifndef WIN32
-	if (core->CaseSensitive) {
-		//TODO: a better, less hackish function 
-		char path[_MAX_PATH];
-		strncpy( path, core->GamePath, _MAX_PATH-sizeof(musicsubfolder) );
-		int pos = strlen(path);
-		memcpy( path+pos, musicsubfolder, sizeof(musicsubfolder) );
-		ResolveFilePath( path );
-		memcpy(musicsubfolder, path+pos, sizeof(musicsubfolder) );
-	}
-#endif
 }
+
 MUSImp::~MUSImp()
 {
 	if (str) {
@@ -79,6 +69,9 @@ bool MUSImp::OpenPlaylist(const char* name)
 	strcat( path, musicsubfolder );
 	strcat( path, SPathDelimiter );
 	strcat( path, name );
+#ifndef WIN32
+	ResolveFilePath( path );
+#endif
 	if (!str->Open( path, true )) {
 		printf( "%s [NOT FOUND]\n", path );
 		return false;
