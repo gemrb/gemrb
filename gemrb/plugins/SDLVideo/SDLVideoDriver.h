@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.25 2004/01/09 11:40:58 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.26 2004/01/11 16:58:18 edheldil Exp $
  *
  */
 
@@ -44,6 +44,7 @@ public:
 	~SDLVideoDriver(void);
 	int Init(void);
 	int CreateDisplay(int width, int height, int bpp, bool fullscreen);
+	void SetDisplayTitle (char *title, char *icon);
 	VideoModes GetVideoModes(bool fullscreen = false);
 	bool TestVideoMode(VideoMode & vm);
 	int SwapBuffers(void);

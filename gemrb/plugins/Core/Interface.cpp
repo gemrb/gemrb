@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.112 2004/01/05 17:53:43 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.113 2004/01/11 16:58:18 edheldil Exp $
  *
  */
 
@@ -636,6 +636,9 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "ButtonFont") ==0) {
 			strncpy(ButtonFont, value, 8);
+		}
+		else if(stricmp(name, "GameName") == 0) {
+			strcpy(GameName, value);
 		}
 		else if(stricmp(name, "GameType") == 0) {
 			strcpy(GameType, value);

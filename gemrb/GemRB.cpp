@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.18 2003/12/24 00:52:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.19 2004/01/11 16:58:19 edheldil Exp $
  *
  */
 
@@ -50,6 +50,7 @@ int main(int argc, char ** argv)
 		return -1;
 	}
 	core->GetVideoDriver()->CreateDisplay(core->Width,core->Height,core->Bpp,core->FullScreen);
+	core->GetVideoDriver()->SetDisplayTitle(core->GameName, core->GameType);
 	Font * fps = core->GetFont((unsigned int)0);
 	char fpsstring[_MAX_PATH];
 	Color fpscolor = {0xff,0xff,0xff,0x00}, fpsblack = {0x00,0x00,0x00,0x00};
@@ -62,7 +63,7 @@ int main(int argc, char ** argv)
 #endif
 	do {
 		if(core->ChangeScript) {
-			core->GetGUIScriptEngine()->LoadScript(core->NextScript);
+		        core->GetGUIScriptEngine()->LoadScript(core->NextScript);
 			core->ChangeScript = false;
 			core->GetGUIScriptEngine()->RunFunction("OnLoad");
 		}
