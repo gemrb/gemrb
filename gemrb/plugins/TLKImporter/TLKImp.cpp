@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.31 2004/08/19 21:14:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.32 2004/09/12 15:52:55 avenger_teambg Exp $
  *
  */
 
@@ -53,8 +53,8 @@ bool TLKImp::Open(DataStream* stream, bool autoFree)
 		return false;
 	}
 	str->Seek( 2, GEM_CURRENT_POS );
-	str->Read( &StrRefCount, 4 );
-	str->Read( &Offset, 4 );
+	str->ReadDword( &StrRefCount );
+	str->ReadDword( &Offset );
 	return true;
 }
 
@@ -172,7 +172,6 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 	}
 
 	if (!strcmp( Token, "MAGESCHOOL" )) {
-		//this should be character dependent, we don't have a character sheet yet
 		ieDword row = 0; //default value is 0 (generalist)
 		//this is subject to change, the row number in magesch.2da
 		core->GetDictionary()->Lookup( "MAGESCHOOL", row ); 
@@ -210,8 +209,7 @@ bool TLKImp::ResolveTags(char* dest, char* source, int Length)
 	for (int i = 0; source[i]; i++) {
 		if (source[i] == '<') {
 			i += mystrncpy( Token, source + i + 1, MAX_VARIABLE_LENGTH, '>' ) -
-				Token +
-				1;
+				Token + 1;
 			int TokenLength = BuiltinToken( Token, dest + NewLength );
 			if (TokenLength == -1) {
 				TokenLength = core->GetTokenDictionary()->GetValueLength( Token );
@@ -284,19 +282,19 @@ char* TLKImp::GetString(ieStrRef strref, unsigned long flags)
 		return ret;
 	}
 	ieDword Volume, Pitch, StrOffset;
-	int Length;
+	ieDword Length;
 	ieWord type;
 	char SoundResRef[9];
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
-	str->Read( &type, 2 );
+	str->ReadWord( &type );
 	str->Read( SoundResRef, 8 );
 	SoundResRef[8] = 0;
-	str->Read( &Volume, 4 );
-	str->Read( &Pitch, 4 );
-	str->Read( &StrOffset, 4 );
-	str->Read( &Length, 4 );
+	str->ReadDword( &Volume );
+	str->ReadDword( &Pitch );
+	str->ReadDword( &StrOffset );
+	str->ReadDword( &Length );
 	if (Length > 65535) {
-		Length = 65535;
+		Length = 65535; //safety limit, it could be a dword actually
 	} 
 	char* string;
 
@@ -314,7 +312,7 @@ char* TLKImp::GetString(ieStrRef strref, unsigned long flags)
 		//GetNewStringLength will look in string and return true
 		//if the new Length will change due to tokens
 		//if there is no new length, we are done
-		while (GetNewStringLength( string, Length )) {
+		while (GetNewStringLength( string, (int) Length )) {
 			char* string2 = ( char* ) malloc( Length + 1 );
 			//ResolveTags will copy string to string2
 			ResolveTags( string2, string, Length );
@@ -354,7 +352,7 @@ StringBlock TLKImp::GetStringBlock(ieStrRef strref, unsigned long flags)
 	sb.text = GetString( strref, flags );
 	ieWord type;
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
-	str->Read( &type, 2 );
+	str->ReadWord( &type );
 	str->Read( sb.Sound, 8 );
 	sb.Sound[8] = 0;
 	return sb;
