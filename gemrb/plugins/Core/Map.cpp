@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.76 2004/03/12 17:11:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.77 2004/03/13 15:18:50 avenger_teambg Exp $
  *
  */
 
@@ -76,7 +76,7 @@ Map::Map(void)
 	lastActorCount[0] = 0;
 	lastActorCount[1] = 0;
 	lastActorCount[2] = 0;
-	justCreated = true;
+//	justCreated = true;
 	if (!PathFinderInited) {
 		InitPathFinder();
 	}
@@ -125,10 +125,12 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 	//Run the Global Script
 	Game* game = core->GetGame();
 	game->ExecuteScript( game->Scripts[0] );
+	game->OnCreation = false;
 	//Run the Map Script
 	if (Scripts[0]) {
 		ExecuteScript( Scripts[0] );
 	}
+	OnCreation = false;
 	//Execute Pending Actions
 	ProcessActions();
 	//Check if we need to start some trigger scripts
@@ -151,8 +153,8 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			//Check if this InfoPoint was activated
 			if (ip->Clicker)
 				//Run the InfoPoint script
-				//ip->Scripts[0]->Update();
 				ip->ExecuteScript( ip->Scripts[0] );
+				ip->OnCreation = false;
 			continue;
 		}
 		Region BBox = ip->outline->BBox;
@@ -184,8 +186,8 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 							ip->LastTrigger = actor;
 						}
 					}
-					//ip->Scripts[0]->Update();
 					ip->ExecuteScript( ip->Scripts[0] );
+					ip->OnCreation = false;
 				} else {
 					//ST_TRAVEL
 					if (ip->outline->PointIn( actor->XPos, actor->YPos )) {
@@ -212,6 +214,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 								//ip->Scripts[0]->Update();
 								ip->ExecuteScript( ip->Scripts[0] );
 								ip->ProcessActions();
+								ip->OnCreation = false;
 							}
 						}
 					}
@@ -316,6 +319,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 				if (actor->Scripts[i])
 					actor->ExecuteScript( actor->Scripts[i] );
 			}
+			actor->OnCreation = false;
 		}
 	}
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {

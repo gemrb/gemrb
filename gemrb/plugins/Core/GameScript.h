@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.64 2004/03/13 14:25:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.65 2004/03/13 15:18:50 avenger_teambg Exp $
  *
  */
 
@@ -665,6 +665,7 @@ private:
 	static int GetObjectCount(Scriptable* Sender, Object* oC);
 	static Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
 	static int GetHappiness(Scriptable* Sender, int reputation);
+	static int GetHPPercent(Scriptable* Sender);
 	static int SeeCore(Scriptable* Sender, Trigger* parameters, int flags);
 	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
@@ -737,6 +738,9 @@ public: //Script Functions
 	static int HP(Scriptable* Sender, Trigger* parameters);
 	static int HPGT(Scriptable* Sender, Trigger* parameters);
 	static int HPLT(Scriptable* Sender, Trigger* parameters);
+	static int HPPercent(Scriptable* Sender, Trigger* parameters);
+	static int HPPercentGT(Scriptable* Sender, Trigger* parameters);
+	static int HPPercentLT(Scriptable* Sender, Trigger* parameters);
 	static int InParty(Scriptable* Sender, Trigger* parameters);
 	static int IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters);
 	static int LOS(Scriptable* Sender, Trigger* parameters);
@@ -754,6 +758,9 @@ public: //Script Functions
 	static int PartyHasItem(Scriptable* Sender, Trigger* parameters);
 	static int Race(Scriptable* Sender, Trigger* parameters);
 	static int Range(Scriptable* Sender, Trigger* parameters);
+	static int Reputation(Scriptable* Sender, Trigger* parameters);
+	static int ReputationGT(Scriptable* Sender, Trigger* parameters);
+	static int ReputationLT(Scriptable* Sender, Trigger* parameters);
 	static int See(Scriptable* Sender, Trigger* parameters);
 	static int Specific(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);

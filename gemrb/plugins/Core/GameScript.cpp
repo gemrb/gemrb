@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.91 2004/03/13 14:25:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.92 2004/03/13 15:18:50 avenger_teambg Exp $
  *
  */
 
@@ -71,6 +71,9 @@ static TriggerLink triggernames[] = {
 	{"harmlessentered", GameScript::Entered}, //this isn't sure the same
 	{"hp", GameScript::HP},
 	{"hpgt", GameScript::HPGT}, {"hplt", GameScript::HPLT},
+	{"hppercent", GameScript::HPPercent},
+	{"hppercentgt", GameScript::HPPercentGT},
+	{"hppercentlt", GameScript::HPPercentLT},
 	{"inparty", GameScript::InParty},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog},
 	{"los", GameScript::LOS},
@@ -1900,6 +1903,24 @@ int GameScript::HappinessLT(Scriptable* Sender, Trigger* parameters)
 	return value < parameters->int0Parameter;
 }
 
+int GameScript::Reputation(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	return core->GetGame()->Reputation == parameters->int0Parameter;
+}
+
+int GameScript::ReputationGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	return core->GetGame()->Reputation > parameters->int0Parameter;
+}
+
+int GameScript::ReputationLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	return core->GetGame()->Reputation < parameters->int0Parameter;
+}
+
 int GameScript::Alignment(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -2102,12 +2123,17 @@ int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::OnCreation(Scriptable* Sender, Trigger* parameters)
 {
+	return Sender->OnCreation;
+/* oncreation is about the script, not the owner area, oncreation is
+   working in ANY script */
+/*
 	Map* area = core->GetGame()->GetMap( 0 );
 	if (area->justCreated) {
 		area->justCreated = false;
 		return 1;
 	}
 	return 0;
+*/
 }
 
 int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger* parameters)
@@ -2341,6 +2367,42 @@ int GameScript::HPLT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	if (actor->GetStat( IE_HITPOINTS ) < parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::HPPercent(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if(!scr) {
+		scr = Sender;
+	}
+	if (GetHPPercent( scr ) == parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::HPPercentGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if(!scr) {
+		scr = Sender;
+	}
+	if (GetHPPercent( scr ) > parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::HPPercentLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if(!scr) {
+		scr = Sender;
+	}
+	if (GetHPPercent( scr ) < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -2749,6 +2811,23 @@ int GameScript::GetHappiness(Scriptable* Sender, int reputation)
 	char * repvalue = core->GetTable( hptable )->QueryField( reputation/10, alignment );
 	core->DelTable( hptable );
 	return atoi(repvalue);
+}
+
+int GameScript::GetHPPercent(Scriptable* Sender)
+{
+	if(Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* ab = ( Actor* ) Sender;
+	int hp1 = ab->GetStat(IE_MAXHITPOINTS);
+	if(hp1<1) {
+		return 0;
+	}
+	int hp2 = ab->GetStat(IE_HITPOINTS);
+	if(hp2<1) {
+		return 0;
+	}
+	return hp2*100/hp1;
 }
 
 void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,

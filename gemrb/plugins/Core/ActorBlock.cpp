@@ -31,7 +31,7 @@ Scriptable::Scriptable(ScriptableType type)
 	playDeadCounter = 0;
 	resetAction = false;
 	neverExecuted = true;
-	Terminate = false;
+	OnCreation = true;
 
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
