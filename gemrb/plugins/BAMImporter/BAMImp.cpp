@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.13 2003/12/19 20:20:15 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.14 2004/01/11 16:14:13 balrog994 Exp $
  *
  */
 
@@ -29,12 +29,18 @@ BAMImp::BAMImp(void)
 {
 	str = NULL;
 	autoFree = false;
+	frames = NULL;
+	cycles = NULL;
 }
 
 BAMImp::~BAMImp(void)
 {
 	if(str && autoFree)
 		delete(str);
+	if(frames)
+		delete(frames);
+	if(cycles)
+		delete(cycles);
 }
 
 bool BAMImp::Open(DataStream * stream, bool autoFree)
@@ -88,10 +94,12 @@ bool BAMImp::Open(DataStream * stream, bool autoFree)
 	if(strncmp(Signature, "BAM V1  ", 8) != 0) {
 		return false;
 	}
-	frames.clear();
-	cycles.clear();
-	unsigned short	FramesCount;
-	unsigned char	CyclesCount;
+	if(frames)
+		delete(frames);
+	if(cycles)
+		delete(cycles);
+	//frames.clear();
+	//cycles.clear();
 	str->Read(&FramesCount, 2);
 	str->Read(&CyclesCount, 1);
 	str->Read(&CompressedColorIndex, 1);
@@ -99,20 +107,22 @@ bool BAMImp::Open(DataStream * stream, bool autoFree)
 	str->Read(&PaletteOffset, 4);
 	str->Read(&FLTOffset, 4);
 	str->Seek(FramesOffset, GEM_STREAM_START);
+	frames = new FrameEntry[FramesCount];
 	for(unsigned int i = 0; i < FramesCount; i++) {
-		FrameEntry fe;
-		str->Read(&fe.Width, 2);
-		str->Read(&fe.Height, 2);
-		str->Read(&fe.XPos, 2);
-		str->Read(&fe.YPos, 2);
-		str->Read(&fe.FrameData, 4);
-		frames.push_back(fe);
+		//FrameEntry fe;
+		str->Read(&frames[i].Width, 2);
+		str->Read(&frames[i].Height, 2);
+		str->Read(&frames[i].XPos, 2);
+		str->Read(&frames[i].YPos, 2);
+		str->Read(&frames[i].FrameData, 4);
+		//frames.push_back(fe);
 	}
+	cycles = new CycleEntry[CyclesCount];
 	for(unsigned int i = 0; i < CyclesCount; i++) {
-		CycleEntry ce;
-		str->Read(&ce.FramesCount, 2);
-		str->Read(&ce.FirstFrame, 2);
-		cycles.push_back(ce);
+		//CycleEntry ce;
+		str->Read(&cycles[i].FramesCount, 2);
+		str->Read(&cycles[i].FirstFrame, 2);
+		//cycles.push_back(ce);
 	}
 	str->Seek(PaletteOffset, GEM_STREAM_START);
 	for(unsigned int i = 0; i < 256; i++) {
@@ -152,7 +162,7 @@ Animation * BAMImp::GetAnimation(unsigned char Cycle, int x, int y, unsigned cha
 
 Sprite2D * BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 {
-	if(findex >= frames.size())
+	if(findex >= FramesCount)
 		findex = 0;
 	str->Seek((frames[findex].FrameData & 0x7FFFFFFF), GEM_STREAM_START);
 	unsigned long pixelcount = frames[findex].Height * frames[findex].Width;
@@ -198,7 +208,7 @@ Sprite2D * BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 
 void * BAMImp::GetFramePixels(unsigned short findex, unsigned char mode)
 {
-	if(findex >= frames.size())
+	if(findex >= FramesCount)
 		findex = cycles[0].FirstFrame;
 	str->Seek((frames[findex].FrameData & 0x7FFFFFFF), GEM_STREAM_START);
 	unsigned long pixelcount = frames[findex].Height * frames[findex].Width;
@@ -239,7 +249,7 @@ AnimationFactory * BAMImp::GetAnimationFactory(const char * ResRef, unsigned cha
 {
 	AnimationFactory * af = new AnimationFactory(ResRef);
 	int count = 0;
-	for(unsigned int i = 0; i < cycles.size(); i++) {
+	for(unsigned int i = 0; i < CyclesCount; i++) {
 		if(cycles[i].FirstFrame + cycles[i].FramesCount > count)
 			count = cycles[i].FirstFrame + cycles[i].FramesCount;
 	}
@@ -247,7 +257,7 @@ AnimationFactory * BAMImp::GetAnimationFactory(const char * ResRef, unsigned cha
 	str->Seek(FLTOffset, GEM_STREAM_START);
 	str->Read(FLT, count*2);
 	std::vector<unsigned short> indices;
-	for(unsigned int i = 0; i < cycles.size(); i++) {
+	for(unsigned int i = 0; i < CyclesCount; i++) {
 		unsigned int ff = cycles[i].FirstFrame, lf = ff + cycles[i].FramesCount;
 		for(unsigned int f = ff; f < lf; f++) {
 			if(FLT[f] == 0xffff)
@@ -277,9 +287,9 @@ Font * BAMImp::GetFont()
 	//printf("Start Getting Font\n");
 	//printf("Calculating Font Buffer Max Size...");
 	int w = 0,h = 0;
-	for(unsigned int i = 0; i < cycles.size(); i++) {
+	for(unsigned int i = 0; i < CyclesCount; i++) {
 		unsigned int index = cycles[i].FirstFrame;
-		if(index >= frames.size())
+		if(index >= FramesCount)
 			continue;
 		//printf("[index = %d, w = %d, h = %d]\n", index, frames[index].Width, frames[index].Height);
 		if(frames[index].Width > w)
@@ -288,9 +298,9 @@ Font * BAMImp::GetFont()
 			h = frames[index].Height;
 	}
 	//printf("[maxW = %d, maxH = %d]\n", w, h);
-	Font * fnt = new Font(w*(int)cycles.size(), h, Palette, true, 0);
-	for(unsigned int i = 0; i < cycles.size(); i++) {
-		if(cycles[i].FirstFrame >= frames.size()) {
+	Font * fnt = new Font(w*(int)CyclesCount, h, Palette, true, 0);
+	for(unsigned int i = 0; i < CyclesCount; i++) {
+		if(cycles[i].FirstFrame >= FramesCount) {
 			fnt->AddChar(NULL, 0, 0, 0, 0);
 			continue;
 		}
