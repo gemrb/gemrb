@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.2 2004/02/18 15:04:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.3 2004/02/18 15:57:35 edheldil Exp $
  *
  */
 
@@ -67,11 +67,9 @@ void closedir (DIR *dirp)
   free (dirp);
 }
 
-#endif  // WIN32
 
 _FILE * _fopen(const char * filename, const char * mode)
 {
-#ifdef WIN32
 	DWORD OpenFlags;
 	DWORD AccessFlags;
 	while(*mode) {
@@ -101,14 +99,10 @@ _FILE * _fopen(const char * filename, const char * mode)
 	_FILE * ret = (_FILE*)malloc(sizeof(_FILE));
 	ret->hFile = hFile;
 	return ret;
-#else
-	return fopen(filename, mode);
-#endif
 }
 
 size_t _fread(void * ptr, size_t size, size_t n, _FILE * stream)
 {
-#ifdef WIN32
 	if(!stream)
 		return (size_t)0;
 	unsigned long read;
@@ -119,14 +113,10 @@ size_t _fread(void * ptr, size_t size, size_t n, _FILE * stream)
 			NULL))
 		return (size_t)0;
 	return (size_t)read;
-#else
-	return fread(ptr, size, n, stream);
-#endif
 }
 
 size_t _fwrite(const void *ptr, size_t size, size_t n, _FILE *stream)
 {
-#ifdef WIN32
 	if(!stream)
 		return (size_t)0;
 	unsigned long wrote;
@@ -137,14 +127,10 @@ size_t _fwrite(const void *ptr, size_t size, size_t n, _FILE *stream)
 			NULL))
 		return (size_t)0;
 	return (size_t)wrote;
-#else
-	return fwrite(ptr, size, n, stream);
-#endif	
 }
 
 size_t _fseek(_FILE * stream, long offset, int whence)
 {
-#ifdef WIN32
 	if(!stream)
 		return (size_t)1;
 	unsigned long method;
@@ -165,14 +151,10 @@ size_t _fseek(_FILE * stream, long offset, int whence)
 			method) == 0xffffffff)
 		return (size_t)1;
 	return (size_t)0;
-#else
-	return fwrite(ptr, size, n, stream);
-#endif
 }
 
 int _fgetc(_FILE * stream)
 {
-#ifdef WIN32
 	if(!stream)
 		return 0;
 	unsigned char tmp;
@@ -185,14 +167,10 @@ int _fgetc(_FILE * stream)
 	if(bResult && read)
 		return (int)tmp; 
 	return EOF;
-#else
-	return fgetc(stream);
-#endif
 }
 
 long int _ftell(_FILE * stream)
 {
-#ifdef WIN32
 	if(!stream)
 		return EOF;
 	unsigned long pos = SetFilePointer(stream->hFile,
@@ -202,14 +180,10 @@ long int _ftell(_FILE * stream)
 	if(pos == 0xffffffff)
 		return -1L;
 	return (long int)pos;
-#else
-	return ftell(stream);
-#endif
 }
 
 int _feof(_FILE * stream)
 {
-#ifdef WIN32
 	if(!stream)
 		return 0;
 	unsigned char tmp;
@@ -226,23 +200,17 @@ int _feof(_FILE * stream)
 			NULL,
 			FILE_CURRENT);
 	return 0;
-#else
-	return feof(stream);
-#endif
 }
 
 int _fclose(_FILE * stream)
 {
-#ifdef WIN32
 	if(!stream)
 		return EOF;
 	if(!CloseHandle(stream->hFile))
 		return EOF;
 	free(stream);
 	return 0;
-#else
-	return fclose(stream);
-#endif
 }
 
+#endif  // WIN32
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.5 2004/02/18 15:04:20 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.6 2004/02/18 15:57:35 edheldil Exp $
  *
  */
 
@@ -27,6 +27,7 @@
 #include <windows.h>
 #include <direct.h>
 #else
+#include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -78,10 +79,6 @@ typedef struct _FILE {
 	HANDLE hFile;
 } _FILE;
 
-#else
-#define _FILE FILE
-#endif
-
 GEM_EXPORT _FILE * _fopen(const char * filename, const char * mode);
 GEM_EXPORT size_t _fread(void * ptr, size_t size, size_t n, _FILE * stream);
 GEM_EXPORT size_t _fwrite(const void *ptr, size_t size, size_t n, _FILE * stream);
@@ -90,5 +87,20 @@ GEM_EXPORT int _fgetc(_FILE * stream);
 GEM_EXPORT long int _ftell(_FILE * stream);
 GEM_EXPORT int _feof(_FILE * stream);
 GEM_EXPORT int _fclose(_FILE * stream);
+
+#else  // ! WIN32
+
+#define _FILE FILE
+#define _fopen fopen
+#define _fread fread
+#define _fwrite fwrite
+#define _fseek fseek
+#define _fgetc fgetc
+#define _ftell ftell
+#define _feof feof
+#define _fclose fclose
+
+#endif  // ! WIN32
+
 
 #endif  // !VFS_H
