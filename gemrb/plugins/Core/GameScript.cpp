@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.249 2005/03/20 23:36:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.250 2005/03/26 12:21:20 avenger_teambg Exp $
  *
  */
 
@@ -264,7 +264,8 @@ static TriggerLink triggernames[] = {
 
 //Make this an ordered list, so we could use bsearch!
 static ActionLink actionnames[] = {
-	{"actionoverride",NULL,0}, {"activate", GameScript::Activate,0},
+	{"actionoverride",NULL,0},
+        {"activate", GameScript::Activate,0},
 	{"addareaflag", GameScript::AddAreaFlag,0},
 	{"addareatype", GameScript::AddAreaType,0},
 	{"addexperienceparty", GameScript::AddExperienceParty,0},
@@ -272,10 +273,13 @@ static ActionLink actionnames[] = {
 	{"addglobals", GameScript::AddGlobals,0},
 	{"addjournalentry", GameScript::AddJournalEntry,0},
 	{"addmapnote", GameScript::AddMapnote,0},
+	{"addspecialability", GameScript::AddSpecialAbility,0},
 	{"addwaypoint", GameScript::AddWayPoint,AF_BLOCKING},
 	{"addxp2da", GameScript::AddXP2DA,0},
 	{"addxpobject", GameScript::AddXPObject,0},
 	{"addxpvar", GameScript::AddXP2DA,0},
+	{"advancetime", GameScript::AdvanceTime,0},
+	{"allowarearesting", GameScript::SetAreaRestFlag,0},
 	{"ally", GameScript::Ally,0},
 	{"ambientactivate", GameScript::AmbientActivate,0},
 	{"applydamage", GameScript::ApplyDamage,0},
@@ -300,6 +304,7 @@ static ActionLink actionnames[] = {
 	{"changerace", GameScript::ChangeRace,0},
 	{"changespecifics", GameScript::ChangeSpecifics,0},
 	{"changestat", GameScript::ChangeStat,0},
+	{"chunkcreature", GameScript::Kill,0}, //should be more graphical
 	{"clearactions", GameScript::ClearActions,0},
 	{"clearallactions", GameScript::ClearAllActions,0},
 	{"closedoor", GameScript::CloseDoor,AF_BLOCKING},
@@ -427,6 +432,7 @@ static ActionLink actionnames[] = {
 	{"leavearealuapanicentry", GameScript::LeaveAreaLUAPanicEntry,0},
 	{"leaveparty", GameScript::LeaveParty,0},
 	{"lock", GameScript::Lock,AF_BLOCKING},//key not checked at this time!
+	{"lockscroll", GameScript::LockScroll,0},
 	{"log", GameScript::Debug,0}, //the same until we know better
 	{"makeglobal", GameScript::MakeGlobal,0},
 	{"makeunselectable", GameScript::MakeUnselectable,0},
@@ -534,6 +540,7 @@ static ActionLink actionnames[] = {
 	{"setrestencounterprobabilitynight", GameScript::SetRestEncounterProbabilityNight,0},
 	{"setsavedlocation", GameScript::SaveObjectLocation, 0},
 	{"setsavedlocationpoint", GameScript::SaveLocation, 0},
+	{"setscriptname", GameScript::SetScriptName,0},
 	{"setsequence", GameScript::PlaySequence,0},
 	{"setteam", GameScript::SetTeam,0},
 	{"settextcolor", GameScript::SetTextColor,0},
@@ -544,6 +551,7 @@ static ActionLink actionnames[] = {
 	{"shout", GameScript::Shout,0},
 	{"sinisterpoof", GameScript::CreateVisualEffect,0},
 	{"smallwait", GameScript::SmallWait,AF_BLOCKING},
+	{"smallwaitrandom", GameScript::SmallWaitRandom,AF_BLOCKING},
 	{"soundactivate", GameScript::SoundActivate,0},
 	{"startcutscene", GameScript::StartCutScene,0},
 	{"startcutscenemode", GameScript::StartCutSceneMode,0},
@@ -586,6 +594,7 @@ static ActionLink actionnames[] = {
 	{"unhidegui", GameScript::UnhideGUI,0},
 	{"unloadarea", GameScript::UnloadArea,0},
 	{"unlock", GameScript::Unlock,0},
+	{"unlockscroll", GameScript::UnlockScroll,0},
 	{"unmakeglobal", GameScript::UnMakeGlobal,0}, //this is a GemRB extension
 	{"verbalconstant", GameScript::VerbalConstant,0},
 	{"verbalconstanthead", GameScript::VerbalConstantHead,0},
@@ -5904,6 +5913,15 @@ void GameScript::SmallWait(Scriptable* Sender, Action* parameters)
 	Sender->SetWait( parameters->int0Parameter );
 }
 
+void GameScript::SmallWaitRandom(Scriptable* Sender, Action* parameters)
+{
+	int random = parameters->int1Parameter - parameters->int0Parameter;
+	if (random<1) {
+		random = 1;
+	}
+	Sender->SetWait( rand()%random + parameters->int0Parameter );
+}
+
 void GameScript::MoveViewPoint(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->MoveViewportTo( parameters->pointParameter.x, parameters->pointParameter.y, true );
@@ -6404,6 +6422,22 @@ void GameScript::HideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
 		gc->HideGUI();
+	}
+}
+
+void GameScript::LockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	GameControl* gc = core->GetGameControl();
+	if (gc) {
+		gc->SetScreenFlags(SF_LOCKSCROLL, OP_OR);
+	}
+}
+
+void GameScript::UnlockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	GameControl* gc = core->GetGameControl();
+	if (gc) {
+		gc->SetScreenFlags(SF_LOCKSCROLL, OP_NAND);
 	}
 }
 
@@ -8704,3 +8738,29 @@ void GameScript::StartStore( Scriptable* Sender, Action* parameters)
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->CurrentAction = NULL;
 }
+
+//The integer parameter is a GemRB extension, if set to 1, the player
+//gains experience for learning the spell
+void GameScript::AddSpecialAbility( Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->LearnSpell (parameters->string0Parameter, parameters->int0Parameter);
+}
+
+void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if(!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	tar->SetScriptName(parameters->string0Parameter);
+}
+
+void GameScript::AdvanceTime( Scriptable* /*Sender*/, Action* parameters)
+{
+	core->GetGame()->GameTime += parameters->int0Parameter;
+}
+

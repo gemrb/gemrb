@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.60 2005/03/22 18:11:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.61 2005/03/26 12:21:20 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -55,6 +55,7 @@ class GameControl;
 #define SF_CENTERONACTOR 2
 #define SF_ALWAYSCENTER  4
 #define SF_GUIENABLED    8
+#define SF_LOCKSCROLL    16
 
 //the distance of operating a trigger, container, etc.
 #define MAX_OPERATING_DISTANCE      40

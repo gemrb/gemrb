@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.164 2005/03/19 17:30:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.165 2005/03/26 12:21:21 avenger_teambg Exp $
  *
  */
 
@@ -917,9 +917,11 @@ public:
 	static void AddGlobals(Scriptable* Sender, Action* parameters);
 	static void AddJournalEntry(Scriptable* Sender, Action* parameters);
 	static void AddMapnote(Scriptable* Sender, Action* parameters);
+	static void AddSpecialAbility(Scriptable* Sender, Action* parameters);
 	static void AddWayPoint(Scriptable* Sender, Action* parameters);
 	static void AddXP2DA(Scriptable *Sender, Action* parameters);
 	static void AddXPObject(Scriptable *Sender, Action* parameters);
+	static void AdvanceTime(Scriptable *Sender, Action* parameters);
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
 	static void ApplyDamage(Scriptable* Sender, Action* parameters);
@@ -1054,6 +1056,7 @@ public:
 	static void LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters);
 	static void LeaveParty(Scriptable* Sender, Action* parameters);
 	static void Lock(Scriptable* Sender, Action* parameters);
+	static void LockScroll(Scriptable* Sender, Action* parameters);
 	static void MakeGlobal(Scriptable* Sender, Action* parameters);
 	static void MakeUnselectable(Scriptable* Sender, Action* parameters);
 	static void MoraleDec(Scriptable* Sender, Action* parameters);
@@ -1139,6 +1142,7 @@ public:
 	static void SetRestEncounterChance(Scriptable* Sender, Action* parameters);
 	static void SetRestEncounterProbabilityDay(Scriptable* Sender, Action* parameters);
 	static void SetRestEncounterProbabilityNight(Scriptable* Sender, Action* parameters);
+	static void SetScriptName(Scriptable* Sender, Action* parameters);
 	static void SetTeam(Scriptable* Sender, Action* parameters);
 	static void SetTextColor(Scriptable* Sender, Action* parameters);
 	static void SetToken(Scriptable* Sender, Action* parameters);
@@ -1147,6 +1151,7 @@ public:
 	static void SG(Scriptable* Sender, Action* parameters);
 	static void Shout(Scriptable* Sender, Action* parameters);
 	static void SmallWait(Scriptable* Sender, Action* parameters);
+	static void SmallWaitRandom(Scriptable* Sender, Action* parameters);
 	static void SoundActivate(Scriptable* Sender, Action* parameters);
 	static void StartCutScene(Scriptable* Sender, Action* parameters);
 	static void StartCutSceneMode(Scriptable* Sender, Action* parameters);
@@ -1181,6 +1186,7 @@ public:
 	static void UndoExplore(Scriptable *Sender, Action *parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Unlock(Scriptable* Sender, Action* parameters);
+	static void UnlockScroll(Scriptable* Sender, Action* parameters);
 	static void VerbalConstant(Scriptable* Sender, Action* parameters);
 	static void VerbalConstantHead(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);

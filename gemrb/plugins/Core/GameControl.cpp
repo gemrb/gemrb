@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.207 2005/03/23 18:20:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.208 2005/03/26 12:21:20 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1003,7 +1003,13 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			moveY = 0;
 			break;
 	}
-	core->MoveViewportTo( Viewport.x, Viewport.y, false );
+	if (ScreenFlags & SF_LOCKSCROLL) {
+		moveX = 0;
+		moveY = 0;
+	}
+	else {
+		core->MoveViewportTo( Viewport.x, Viewport.y, false );
+	}
 }
 
 Map *GameControl::SetCurrentArea(int Index)
