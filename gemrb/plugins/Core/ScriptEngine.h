@@ -19,7 +19,7 @@ class GEM_EXPORT ScriptEngine : public Plugin
 {
 public:
 	ScriptEngine(void);
-	~ScriptEngine(void);
+	virtual ~ScriptEngine(void);
 	/** Initialization Routine */
 	virtual bool Init(void) = 0;
 	/** Load Script */

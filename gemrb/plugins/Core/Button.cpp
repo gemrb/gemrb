@@ -19,6 +19,20 @@
 #include "Button.h"
 #include "Interface.h"
 
+#ifndef WIN32
+#include <ctype.h>
+char *strupr(char *string)
+{
+	char *s;
+	if(string)
+	{
+		for(s = string; *s; ++s)
+			*s = toupper(*s);
+	}
+	return string;
+}
+#endif
+
 extern Interface * core;
 
 Button::Button(bool Clear){
