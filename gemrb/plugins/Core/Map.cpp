@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.34 2003/12/03 18:27:06 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.35 2003/12/03 21:02:39 balrog994 Exp $
  *
  */
 
@@ -33,6 +33,9 @@ extern Interface * core;
 Map::Map(void)
 {
 	tm = NULL;
+	queue = NULL;
+	Qcount = 0;
+	lastActorCount = 0;
 }
 
 Map::~Map(void)
@@ -47,6 +50,8 @@ Map::~Map(void)
 	}
 	core->FreeInterface(LightMap);
 	core->FreeInterface(SearchMap);
+	if(queue)
+		delete(queue);
 }
 
 void Map::AddTileMap(TileMap * tm, ImageMgr * lm, ImageMgr * sr)
@@ -75,8 +80,13 @@ void Map::DrawMap(Region viewport)
 		video->BlitSprite(animations[i]->NextFrame(), animations[i]->x, animations[i]->y);
 	}
 	Region vp = video->GetViewport();
-	for(unsigned int i = 0; i < actors.size(); i++) {
-		ActorBlock * actor = &actors.at(i);
+	//for(unsigned int i = 0; i < actors.size(); i++) {
+	GenerateQueue();
+	while(true) {
+		//ActorBlock * actor = &actors.at(i);
+		ActorBlock * actor = GetRoot();
+		if(!actor)
+			break;
 		if(actor->path) {	
 #ifndef WIN32
 			struct timeval tv;
@@ -147,7 +157,7 @@ void Map::DrawMap(Region viewport)
 			{
 				if(actor->Selected) color=&yellow;
 				else color=&yellow_dark;
-			} else switch(actors[i].actor->BaseStats[IE_EA])
+			} else switch(actor->actor->BaseStats[IE_EA])
 			{
 			case EVILCUTOFF:
 			case GOODCUTOFF:
@@ -309,4 +319,71 @@ int Map::GetBlocked(int cx, int cy) {
 		break;
 	}
 	return 0;
+}
+
+void Map::AddWallGroup(WallGroup * wg)
+{
+	wallGroups.push_back(wg);
+}
+
+void Map::GenerateQueue()
+{
+	if(lastActorCount != actors.size()) {
+		if(queue)
+			delete(queue);
+		queue = new ActorBlock*[actors.size()];
+		lastActorCount = actors.size();
+	}
+	Qcount = 0;
+	for(int i = 0; i < actors.size(); i++) {
+		ActorBlock * actor = &actors.at(i);
+		Qcount++;
+		queue[Qcount-1] = actor;
+		int lastPos = Qcount;
+		while(lastPos != 1) {
+			int parentPos = (lastPos/2)-1;
+			ActorBlock * parent = queue[parentPos];
+			if(actor->YPos < parent->YPos) {
+				queue[parentPos] = actor;
+				queue[lastPos-1] = parent;
+				lastPos = parentPos+1;
+			}
+			else
+				break;
+		}
+	}
+}
+
+ActorBlock * Map::GetRoot()
+{
+	if(Qcount==0)
+		return NULL;
+	ActorBlock * ret = queue[0];
+	ActorBlock * node = queue[0] = queue[Qcount-1];
+	Qcount--;
+	int lastPos = 1;
+	while(true) {
+		int leftChildPos = (lastPos*2)-1;
+		int rightChildPos = lastPos*2;
+		if(leftChildPos >= Qcount)
+			break;
+		ActorBlock * child  = queue[leftChildPos];
+		int childPos = leftChildPos;
+		if(rightChildPos < Qcount) { //If both Child Exist
+			ActorBlock * rightChild = queue[lastPos*2];
+			if(rightChild->YPos < child->YPos) {
+				childPos = rightChildPos;
+				child = rightChild;
+			}
+			
+		}
+		if(node->YPos > child->YPos) {
+			queue[lastPos-1] = child;
+			queue[childPos] = node;
+			lastPos = childPos+1;
+		}
+		else
+			break;
+	}
+	return ret;
 }

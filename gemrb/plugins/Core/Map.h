@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.15 2003/12/02 19:48:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.16 2003/12/03 21:02:39 balrog994 Exp $
  *
  */
 
@@ -75,6 +75,11 @@ typedef struct ActorBlock {
 	unsigned long timeStartStep;
 } ActorBlock;
 
+typedef struct WallGroup {
+	Gem_Polygon ** polys;
+	int polygons;
+} WallGroup;
+
 class GEM_EXPORT Map
 {
 public:
@@ -84,6 +89,12 @@ public:
 private:
 	std::vector<Animation*> animations;
 	std::vector<ActorBlock> actors;
+	std::vector<WallGroup*> wallGroups;
+	ActorBlock ** queue;
+	int Qcount;
+	int lastActorCount;
+	void GenerateQueue();
+	ActorBlock * GetRoot();
 public:
 	Map(void);
 	~Map(void);
@@ -92,6 +103,7 @@ public:
 	void PlayAreaSong(int);
 	void AddAnimation(Animation * anim);
 	void AddActor(ActorBlock actor);
+	void AddWallGroup(WallGroup * wg);
 	int GetBlocked(int x, int y);
 	ActorBlock * GetActor(int x, int y);
 	int GetActorInRect(ActorBlock ** & actors, Region &rgn);
