@@ -35,6 +35,7 @@ Interface::Interface(void)
 	vars = NULL;
 	tokens = NULL;
 	music = NULL;
+	soundmgr = NULL;
 	ConsolePopped = false;
 	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
