@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.1 2004/12/04 12:33:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.2 2005/03/23 22:14:17 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -199,8 +199,8 @@ def OpenPortraitWindow ():
 	global PortraitWindow
 
 	PortraitWindow = Window = GemRB.LoadWindow(1)
-	GemRB.SetVar ("PortraitWindow", PortraitWindow)
-        GemRB.SetVar ("PortraitPosition", 2)    # Right
+	#GemRB.SetVar ("PortraitWindow", PortraitWindow)
+        #GemRB.SetVar ("PortraitPosition", 2)    # Right
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
@@ -215,7 +215,7 @@ def OpenPortraitWindow ():
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
 
 	UpdatePortraitWindow ()
-	return
+	return Window
 
 def UpdatePortraitWindow ():
 	Window = PortraitWindow

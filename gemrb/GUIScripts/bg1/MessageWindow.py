@@ -44,7 +44,7 @@ def OnLoad():
 	ActionsWindow = GemRB.LoadWindow(3)
 	OptionsWindow = GemRB.LoadWindow(0)
 	MessageWindow = GemRB.LoadWindow(4)
-	PortraitWindow = OpenPortraitWindow(1)
+	PortraitWindow = OpenPortraitWindow()
 
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
 	GemRB.SetTextAreaFlags(MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
