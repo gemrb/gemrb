@@ -241,12 +241,20 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
 	switch(Key) {
-/* no way to catch a released ALT ?
-		case GEM_ALT:
-			DebugFlags^=4;
-			printf("ALT released\n");
-			break;
-*/
+		case '1': case '2': case '3':
+		case '4': case '5': case '6':
+		{
+			for(size_t i = 0; i < selected.size(); i++)
+				selected[i]->Select(false);
+			selected.clear();
+			Game * game = core->GetGame();
+			Actor * actor = game->GetPC(Key-'1');
+			if(actor) {
+				selected.push_back(actor);
+				actor->Select(true);
+			}
+		}
+		break;
 		case '\t': //not GEM_TAB
 			DebugFlags&=~8;
 			printf("TAB released\n");
@@ -324,8 +332,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 		case 'j': // j
 			{
-				if(selected.size() == 1) {
-					Actor * actor = selected[0];
+				for(int i=0;i<selected.size();i++) {
+					Actor * actor = selected[i];
 					short cX = lastMouseX; 
 					short cY = lastMouseY;
 					core->GetVideoDriver()->ConvertToGame(cX, cY);
