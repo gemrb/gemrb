@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.25 2004/10/17 22:18:12 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.26 2005/03/13 18:24:53 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -197,6 +197,7 @@ def GetActorPortrait (actor, which):
 
 
 SelectionChangeHandler = None
+SelectionChangeMultiHandler = None
 
 def SetSelectionChangeHandler (handler):
 	global SelectionChangeHandler
@@ -215,10 +216,14 @@ def SetSelectionChangeHandler (handler):
 	# redraw selection on change main selection | single selection
 	SelectionChanged ()
 
+def SetSelectionChangeMultiHandler (handler):
+	global SelectionChangeMultiHandler
+	SelectionChangeMultiHandler = handler
+	#SelectionChanged ()
+
 def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
-
 
 portrait_hp_numeric = [0, 0, 0, 0, 0, 0]
 
@@ -358,6 +363,8 @@ def SelectionChanged ():
 		for i in range (0, PARTY_SIZE):
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
+		if SelectionChangeMultiHandler:
+			SelectionChangeMultiHandler ()
 	else:
 		sel = GemRB.GameGetSelectedPCSingle ()
 		for i in range (0, PARTY_SIZE):
