@@ -216,7 +216,7 @@ void TextArea::CalcRowCount()
 			int tr = 0;
 			int len = strlen(lines[i]);
 			char * tmp = (char*)malloc(len+1);
-			strcpy(tmp, lines[i]);
+			memcpy(tmp, lines[i], len+1);
 			ftext->SetupString(tmp, Width);
 			for(int p = 0; p <= len; p++) {
 				if(tmp[p] == 0) {
