@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.45 2004/03/21 13:47:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.46 2004/04/04 15:49:32 avenger_teambg Exp $
  *
  */
 
@@ -100,11 +100,11 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 					goto notmatched;
 				len += tlen + 23;
 				Buffer = ( char * ) realloc( Buffer, len + 2 );
-				if (seltext == i) {
-					sprintf( Buffer + lastlen, "[color=%06.6X]%.*s[/color]",
+				if (seltext == (int) i) {
+					sprintf( Buffer + lastlen, "[color=%06.6lX]%.*s[/color]",
 						acolor, tlen, rest + 1 );
 				} else {
-					sprintf( Buffer + lastlen, "[color=%06.6X]%.*s[/color]",
+					sprintf( Buffer + lastlen, "[color=%06.6lX]%.*s[/color]",
 						bcolor, tlen, rest + 1 );
 				}
 			} else {
@@ -126,9 +126,8 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		free( Buffer );
 	} else {
 		int rc = 0;
-		int acc = 0;
 		int sr = startrow;
-		unsigned int i = 0;
+		unsigned int i;
 		int yl = 0;
 		for (i = 0; i < lines.size(); i++) {
 			if (rc + lrows[i] <= sr) {
@@ -137,9 +136,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			}
 			sr -= rc;
 			Color* pal = NULL;
-			if (seltext == i)
+			if (seltext == (int) i)
 				pal = selected;
-			else if (selline == i)
+			else if (selline == (int) i)
 				pal = lineselpal;
 			else
 				pal = palette;
@@ -152,9 +151,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		}
 		for (i++; i < lines.size(); i++) {
 			Color* pal = NULL;
-			if (seltext == i)
+			if (seltext == (int) i)
 				pal = selected;
-			else if (selline == i)
+			else if (selline == (int) i)
 				pal = lineselpal;
 			else
 				pal = palette;
@@ -404,12 +403,11 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	int height = ftext->size[1].h;//ftext->chars[1]->Height;
 	int r = y / height;
 	int row = 0;
-	//((Window*)Owner)->Invalidate();
 
 	for (size_t i = 0; i < lines.size(); i++) {
 		row += lrows[i];
 		if (r < ( row - startrow )) {
-			if (seltext != i)
+			if (seltext != (int) i)
 				core->RedrawAll();
 			seltext = ( int ) i;
 			//printf("CtrlId = 0x%08lx, seltext = %d, rows = %d, row = %d, r = %d\n", ControlID, i, rows, row, r);
@@ -432,8 +430,7 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y,
 			if (minrow > seltext)
 				return;
 			unsigned long idx;
-			size_t len = strlen( lines[seltext] );
-			sscanf( lines[seltext], "[s=%d,", &idx );
+			sscanf( lines[seltext], "[s=%ld,", &idx );
 			Window* win = core->GetWindow( 0 );
 			if (win) {
 				GameControl* gc = ( GameControl* ) win->GetControl( 0 );
@@ -457,7 +454,7 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y,
 /** Copies the current TextArea content to another TextArea control */
 void TextArea::CopyTo(TextArea* ta)
 {
-	for (int i = 0; i < lines.size(); i++) {
+	for (size_t i = 0; i < lines.size(); i++) {
 		ta->SetText( lines[i], -1 );
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.19 2004/03/21 13:47:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.20 2004/04/04 15:49:31 avenger_teambg Exp $
  *
  */
 
@@ -170,7 +170,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
 	Changed = true;
-	int oldPos = Pos;
+	unsigned int oldPos = Pos;
 	unsigned short mx = KnobXPos + ( Pos * KnobStep ) - Knob->XPos,
 	my = KnobYPos - Knob->YPos;
 	unsigned short Mx = mx + Knob->Width, My = my + Knob->Height;
@@ -178,8 +178,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 		if (( x <= Mx ) && ( y <= My )) {
 			State = IE_GUI_SLIDER_GRABBEDKNOB;
 		} else {
-			unsigned short mx = KnobXPos,
-			Mx = mx + ( KnobStep * KnobStepsCount );
+			unsigned short mx = KnobXPos;
 			unsigned short xmx = x - mx;
 			if (x < mx) {
 				SetPosition( 0 );
@@ -208,7 +207,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 			}
 		}
 	} else {
-		unsigned short mx = KnobXPos, Mx = mx + ( KnobStep * KnobStepsCount );
+		unsigned short mx = KnobXPos;
 		unsigned short xmx = x - mx;
 		if (x < mx) {
 			SetPosition( 0 );
@@ -249,9 +248,9 @@ void Slider::OnMouseUp(unsigned short x, unsigned short y,
 void Slider::OnMouseOver(unsigned short x, unsigned short y)
 {
 	Changed = true;
-	int oldPos = Pos;
+	unsigned int oldPos = Pos;
 	if (State == IE_GUI_SLIDER_GRABBEDKNOB) {
-		unsigned short mx = KnobXPos; //, Mx = mx + (KnobStep*KnobStepsCount);
+		unsigned short mx = KnobXPos;
 		unsigned short xmx = x - mx;
 		if (x < mx) {
 			SetPosition( 0 );
