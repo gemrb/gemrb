@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.36 2004/07/15 17:32:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.37 2004/10/30 15:02:25 avenger_teambg Exp $
  *
  */
 
@@ -251,6 +251,9 @@ void MUSImp::PlayNext()
 				PLnext = -1;
 			else
 				PLnext = PLpos + 1;
+				if ((unsigned int) PLnext >= playlist.size() ) {
+					PLnext = 0;
+				}
 		}
 	} else {
 		Playing = false;
