@@ -74,6 +74,8 @@ static int g_nMapLength=0;
 
 static int stupefaction=0;
 
+static FSOUND_STREAM * stream = NULL;
+
 class MVEPlay :	public MoviePlayer
 {
 private: //MVELib Functions
@@ -206,8 +208,10 @@ private: //Decoder Functions
 	}
 	static void shutdownMovie(MVESTREAM *mve)
 	{
+		FSOUND_Stream_Stop(stream);
+		FSOUND_Stream_Close(stream);
 		SDL_DestroyMutex(mve_audio_mutex);
-		SDL_CloseAudio();
+		//SDL_CloseAudio();
 	}
 	static short get_short(unsigned char *data)
 	{
@@ -289,17 +293,23 @@ end:
 	*************************/
 	//static void mve_audio_callback(void *userdata, unsigned char *stream, int len); 
 
-	static void mve_audio_callback(void *userdata, unsigned char *stream, int len)
+	//static void mve_audio_callback(void *userdata, unsigned char *stream, int len)
+	static signed char __stdcall mve_audio_callback(FSOUND_STREAM * fsoundstream, void *buffer, int len1, int param)
 	{
+		unsigned char * stream = (unsigned char*)buffer;
+		int len = len1;
 		int total=0;
 		int length;
 		//printf("Audio Callback\n");
-		if (mve_audio_bufhead == mve_audio_buftail)
-			return /* 0 */;
 
+    SDL_mutexP(mve_audio_mutex);
+		
+		if (mve_audio_bufhead == mve_audio_buftail) {
+			SDL_mutexV(mve_audio_mutex);
+			return true;
+		}
+			
 		//fprintf(stderr, "+ <%d (%d), %d, %d>\n", mve_audio_bufhead, mve_audio_curbuf_curpos, mve_audio_buftail, len);
-
-		SDL_mutexP(mve_audio_mutex);
 
 		while (mve_audio_bufhead != mve_audio_buftail                                       /* while we have more buffers  */
 				&&  len > (mve_audio_buflens[mve_audio_bufhead]-mve_audio_curbuf_curpos))   /* and while we need more data */
@@ -349,6 +359,7 @@ end:
 		//fprintf(stderr, "- <%d (%d), %d, %d>\n", mve_audio_bufhead, mve_audio_curbuf_curpos, mve_audio_buftail, len);
 
 		SDL_mutexV(mve_audio_mutex);
+		return true;
 	}
 
 	static int create_audiobuf_handler(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
@@ -357,17 +368,20 @@ end:
 		int desired_buffer;
 
 		//fprintf(stderr, "creating audio buffers\n");
-
+		if(stream)
+			return 1;
 		sample_rate = get_short(data + 4);
 		desired_buffer = get_int(data + 6);
-		mve_audio_spec = (SDL_AudioSpec *)malloc(sizeof(SDL_AudioSpec));
-		mve_audio_spec->freq = sample_rate;
-		mve_audio_spec->format = AUDIO_S16LSB;
-		mve_audio_spec->channels = 2;
-		mve_audio_spec->samples = desired_buffer/4;
-		mve_audio_spec->callback = mve_audio_callback;
-		mve_audio_spec->userdata = NULL;
-		if (SDL_OpenAudio(mve_audio_spec, NULL) >= 0)
+		//mve_audio_spec = (SDL_AudioSpec *)malloc(sizeof(SDL_AudioSpec));
+		//mve_audio_spec->freq = sample_rate;
+		//mve_audio_spec->format = AUDIO_S16LSB;
+		//mve_audio_spec->channels = 2;
+		//mve_audio_spec->samples = desired_buffer/4;
+		//mve_audio_spec->callback = mve_audio_callback;
+		//mve_audio_spec->userdata = NULL;
+		stream = FSOUND_Stream_Create(mve_audio_callback, desired_buffer, FSOUND_LOOP_OFF | FSOUND_16BITS | FSOUND_STEREO | FSOUND_2D | FSOUND_STREAMABLE | FSOUND_SIGNED, sample_rate, 0);
+		if(stream)
+		//if (SDL_OpenAudio(mve_audio_spec, NULL) >= 0)
 			{
 			//fprintf(stderr, "   success\n");
 			mve_audio_canplay = 1;
@@ -384,10 +398,14 @@ end:
 		memset(mve_audio_buflens, 0, sizeof(mve_audio_buflens));
 		if (mve_audio_canplay  &&  !mve_audio_playing)//  &&  mve_audio_bufhead != mve_audio_buftail)
 			{
-			//printf("Starting Audio Playback\n");
-			SDL_PauseAudio(0);
-			mve_audio_playing = 1;
+			FSOUND_Stream_Play(0, stream);
+			FSOUND_SetPaused(0, true);
 			}
+    //play_audio_handler(0, 0, NULL, 0, NULL);
+			//printf("Starting Audio Playback\n");
+		//	SDL_PauseAudio(0);
+		//	mve_audio_playing = 1;
+		//	}
 		return 1;
 	}
 
@@ -396,7 +414,9 @@ end:
 		printf("Play Audio\n");
 		if (mve_audio_canplay  &&  !mve_audio_playing)//  &&  mve_audio_bufhead != mve_audio_buftail)
 			{
-			SDL_PauseAudio(0);
+			//SDL_PauseAudio(0);
+			//FSOUND_Stream_Play(0, stream);
+			FSOUND_SetPaused(0, false);
 			mve_audio_playing = 1;
 			}
 
@@ -411,7 +431,8 @@ end:
 		if (mve_audio_canplay)
 		{
 			if (mve_audio_playing)
-				SDL_LockAudio();
+				FSOUND_SetPaused(0, true);
+				//SDL_LockAudio();
 
 			chan = get_short(data + 2);
 			nsamp = get_short(data + 4);
@@ -436,7 +457,8 @@ end:
 				}
 
 			if (mve_audio_playing)
-				SDL_UnlockAudio();
+				//SDL_UnlockAudio();
+				FSOUND_SetPaused(0, false);
 			}
 
 		return 1;
