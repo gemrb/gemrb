@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.8 2004/10/11 18:08:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.9 2004/10/11 19:33:38 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -131,7 +131,7 @@ void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	{
 	}
 }
-void WorldMapControl::AdjustScrolling(unsigned short x, unsigned short y)
+void WorldMapControl::AdjustScrolling(short x, short y)
 {
 	WorldMap* worldmap = core->GetWorldMap();
 	ScrollX += x;

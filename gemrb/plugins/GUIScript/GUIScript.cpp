@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.219 2004/10/11 17:53:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.220 2004/10/11 19:33:39 avenger_teambg Exp $
  *
  */
 
@@ -1607,8 +1607,24 @@ static PyObject* GemRB_DeleteControl(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_AdjustScrolling__doc,
+"AdjustScrolling(WindowIndex, ControlID, x, y)\n\n");
+
+static PyObject* GemRB_AdjustScrolling(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlID, x, y;
+
+	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlID, &x, &y )) {
+		return AttributeError( GemRB_AdjustScrolling__doc );
+	}
+
+	core->AdjustScrolling( WindowIndex, ControlID, x, y );
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_CreateWorldMapControl__doc,
-"CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, flags) => ControlIndex\n\n"
+"CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, flags)\n\n"
 "Creates and adds a new WorldMap control to a Window." );
 
 static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
@@ -4108,6 +4124,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetButtonBorder, METH_VARARGS),
 	METHOD(EnableButtonBorder, METH_VARARGS),
 	METHOD(SetButtonFont, METH_VARARGS),
+	METHOD(AdjustScrolling, METH_VARARGS),
 	METHOD(CreateWorldMapControl, METH_VARARGS),
 	METHOD(CreateMapControl, METH_VARARGS),
 	METHOD(SetControlPos, METH_VARARGS),

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.223 2004/10/11 17:50:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.224 2004/10/11 19:33:38 avenger_teambg Exp $
  *
  */
 
@@ -1412,6 +1412,32 @@ int Interface::GetControl(unsigned short WindowIndex, unsigned long ControlID)
 		i++;
 	}
 }
+/** Adjust the Scrolling factor of a control (worldmap atm) */
+int Interface::AdjustScrolling(unsigned short WindowIndex,
+	unsigned short ControlIndex, short x, short y)
+{
+	if (WindowIndex >= windows.size()) {
+		return -1;
+	}
+	Window* win = windows[WindowIndex];
+	if (win == NULL) {
+		return -1;
+	}
+	Control* ctrl = win->GetControl( ControlIndex );
+	if (ctrl == NULL) {
+		return -1;
+	}
+	switch(ctrl->ControlType) {
+		case IE_GUI_WORLDMAP:
+			((WorldMapControl *) ctrl)->AdjustScrolling(x,y);
+			break;
+		default: //doesn't work for these
+			return -1;
+	}
+	//	win->Invalidate(); do we need this?
+	return 0;
+}
+
 /** Set the Text of a Control */
 int Interface::SetText(unsigned short WindowIndex,
 	unsigned short ControlIndex, const char* string)

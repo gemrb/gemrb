@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.117 2004/09/22 14:08:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.118 2004/10/11 19:33:38 avenger_teambg Exp $
  *
  */
 
@@ -56,6 +56,7 @@
 #include "Game.h"
 #include "WorldMap.h"
 #include "GameControl.h"
+#include "WorldMapControl.h"
 #include "GlobalTimer.h"
 #include "SaveGameMgr.h"
 
@@ -247,6 +248,8 @@ public:
 	}
 	/** Get a Control on a Window */
 	int GetControl(unsigned short WindowIndex, unsigned long ControlID);
+	/** Adjust the scrolling of the control (if applicable) */
+	int AdjustScrolling(unsigned short WindowIndex, unsigned short ControlIndex, short x, short y);
 	/** Set the Text of a Control */
 	int SetText(unsigned short WindowIndex, unsigned short ControlIndex, const char * string);
 	/** Set the Tooltip text of a Control */

@@ -29,7 +29,7 @@ public:
 	~WorldMapControl(void);
 public:
 	/** Allows modification of the scrolling factor from outside */
-	void AdjustScrolling(unsigned short x, unsigned short y);
+	void AdjustScrolling(short x, short y);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	/** Sets the Text of the current control */

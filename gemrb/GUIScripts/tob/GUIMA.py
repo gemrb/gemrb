@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.11 2004/10/11 17:53:22 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.12 2004/10/11 19:33:41 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -30,6 +30,7 @@ from GUIDefines import *
 
 MapWindow = None
 WorldMapWindow = None
+WorldMapControl = None
 
 ###################################################
 def OpenMapWindow ():
@@ -95,7 +96,7 @@ def OpenWorldMapWindow ():
 	return
 
 def WorldMapWindowCommon(Travel):
-	global WorldMapWindow
+	global WorldMapWindow, WorldMapControl
 
 	GemRB.HideGUI()
 
@@ -112,8 +113,44 @@ def WorldMapWindowCommon(Travel):
 	GemRB.SetVar ("OtherWindow", WorldMapWindow)
 
 	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel)
-	Button = GemRB.GetControl (Window, 4)
-	
+	WorldMapControl = GemRB.GetControl (Window, 4)
+
+	#north
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapN");
+
+	#south
+	Button = GemRB.GetControl (Window, 2)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapS");
+
+	#northwest
+	Button = GemRB.GetControl (Window, 8)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapNW");
+
+	#northeast
+	Button = GemRB.GetControl (Window, 9)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapNE");
+
+	#west
+	Button = GemRB.GetControl (Window, 10)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapW");
+
+	#center
+	Button = GemRB.GetControl (Window, 11)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapC");
+
+	#east
+	Button = GemRB.GetControl (Window, 12)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapE");
+
+	#southwest
+	Button = GemRB.GetControl (Window, 13)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapSW");
+
+	#southeast
+	Button = GemRB.GetControl (Window, 14)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapSE");
+
 	# Done
 	Button = GemRB.GetControl (Window, 0)
 	if Travel:
@@ -121,7 +158,42 @@ def WorldMapWindowCommon(Travel):
 	else:
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 	GemRB.UnhideGUI ()
+	return
 
+def MapN():
+	GemRB.AdjustScrolling (WorldMapWindow, WorldMapControl, 0, -10)
+	return
+
+def MapNE():
+	GemRB.AdjustScrolling (WorldMapWindow, WorldMapControl, 10, -10)
+	return
+
+def MapE():
+	GemRB.AdjustScrolling (WorldMapWindow, WorldMapControl, 10, 0)
+	return
+
+def MapSE():
+	GemRB.AdjustScrolling (WorldMapWindow, WorldMapControl, 10, 10)
+	return
+
+def MapS():
+	GemRB.AdjustScrolling (WorldMapWindow, WorldMapControl, 0, 10)
+	return
+
+def MapSW():
+	GemRB.AdjustScrolling (WorldMapWindow, WorldMapControl, -10, 10)
+	return
+
+def MapW():
+	GemRB.AdjustScrolling (WorldMapWindow, WorldMapControl, -10, 0)
+	return
+
+def MapNW():
+	GemRB.AdjustScrolling (WorldMapWindow, WorldMapControl, -10, -10)
+	return
+
+def MapC():
+	return
 
 ###################################################
 # End of file GUIMA.py

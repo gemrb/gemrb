@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.10 2004/09/28 14:25:24 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.11 2004/10/11 19:33:40 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -39,25 +39,25 @@ BeastsWindow = None
 QuestsWindow = None
 
 # list of all assigned (0) or completed (1) quests
-quests = [ [], [] ]
 global quests
+quests = [ [], [] ]
 
 # whether user has chosen assigned (0) or completed (1) quests
-selected_quest_class = 0
 global selected_quest_class
+selected_quest_class = 0
 
 
 
 # list of all PC (0) or NPC (1) beasts/creatures
-beasts = [ [], [] ]
 global beasts
+beasts = [ [], [] ]
 
 # whether user has chosen PC (0) or NPC (1) beasts
-selected_beast_class = 0
 global selected_beast_class
+selected_beast_class = 0
 
-BeastImage = None
 global BeastImage
+BeastImage = None
 
 
 ###################################################
