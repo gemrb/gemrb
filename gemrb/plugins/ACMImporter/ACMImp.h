@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.9 2003/12/02 14:56:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.10 2003/12/02 17:06:25 balrog994 Exp $
  *
  */
 
@@ -28,10 +28,17 @@
 #include "../../includes/sdl/SDL.h"
 #include "../../includes/sdl/SDL_thread.h"
 
+#ifndef WIN32
+#include "/usr/include/AL/al.h"
+#include "/usr/include/AL/alc.h"
+#include "/usr/include/AL/alu.h"
+#include "/usr/include/AL/alut.h"
+#else
 #include "al.h"
 #include "alc.h"
 #include "alu.h"
 #include "alut.h"
+#endif
 
 #define MAX_STREAMS  30
 

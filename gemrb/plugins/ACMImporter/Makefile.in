@@ -1,4 +1,4 @@
-# KDE tags expanded automatically by am_edit - $Revision: 1.4 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.5 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -232,7 +232,7 @@ INCLUDES = $(all_includes)
 
 LDFLAGS = 
 
-libACMImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lfmod-3.70 -lcore -lpthread -ldl
+libACMImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lopenal -lSDL -lcore -lpthread -ldl
 
 #>- libACMImporter_la_METASOURCES = AUTO
 

@@ -5,10 +5,10 @@ lib_LTLIBRARIES = libACMImporter.la
 INCLUDES = $(all_includes)
 
 
-LDFLAGS =     
+LDFLAGS =          
 
 
-libACMImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lfmod-3.70 -lcore -lpthread -ldl
+libACMImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lopenal -lSDL -lcore -lpthread -ldl
 
 libACMImporter_la_METASOURCES = AUTO
 

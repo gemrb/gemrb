@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.18 2003/12/02 14:56:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.19 2003/12/02 17:06:25 balrog994 Exp $
  *
  */
 
@@ -30,6 +30,7 @@
 #include <io.h>
 #else
 #include <unistd.h>
+#include <sys/time.h>
 #endif
 
 #define DisplayALError(string, error) printf("%s0x%04X", string, error);
@@ -70,7 +71,7 @@ int ACMImp::PlayListManager(void * data)
 			gettimeofday(&tv, NULL);
 			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
 #endif
-			if((time - BufferStartPlayTime) > (BufferDuration-100))
+			if((time - BufferStartPlayTime) > (BufferDuration-50))
 				core->GetMusicMgr()->PlayNext();
 		}
 		SDL_mutexV(musicMutex);
@@ -95,6 +96,7 @@ ACMImp::~ACMImp(void)
 	clearstreams(true);
 	SDL_KillThread(musicThread);
 	SDL_DestroyMutex(musicMutex);
+	alutExit();
 }
 
 bool ACMImp::Init(void)
@@ -309,7 +311,7 @@ unsigned long ACMImp::LoadFile(const char * filename)
 			}
 			alutUnloadWAV(format, data, size, freq);
 			if((error = alGetError()) != AL_NO_ERROR) {
-				DisplayALError("[ACMImp::LoadFile] alutUnloadWAV : ", error);
+				DisplayALError("[ACMImp::Play] alutUnloadWAV : ", error);
 			}
 			alGenSources(1, &Source);
 			if((error = alGetError()) != AL_NO_ERROR) {
@@ -386,7 +388,7 @@ unsigned long ACMImp::LoadFile(const char * filename)
 			}
 			alutUnloadWAV(format, data, size, freq);
 			if((error = alGetError()) != AL_NO_ERROR) {
-				DisplayALError("[ACMImp::LoadFile] alutUnloadWAV : ", error);
+				DisplayALError("[ACMImp::Play] alutUnloadWAV : ", error);
 			}
 			alGenSources(1, &Source);
 			if((error = alGetError()) != AL_NO_ERROR) {
@@ -407,6 +409,7 @@ unsigned long ACMImp::LoadFile(const char * filename)
 				if(musics[i].free) {
 					musics[i].Buffer = Buffer;
 					musics[i].Source = Source;
+					musics[i].Duration = (size/(double)(freq*4))*1000;
 					musics[i].free = false;
 					musics[i].playing = false;
 					return i;
