@@ -76,11 +76,11 @@ def RacePress():
 
 def BackPress():
 	GemRB.UnloadWindow(RaceWindow)
-	GemRB.SetNextScript("CharGen2")
-	GemRB.SetVar("Race",0)  #scrapping the race value
+	GemRB.SetNextScript("CharGen5")
+	GemRB.SetVar("HateRace",0)  #scrapping the race value
 	return
 
 def NextPress():
         GemRB.UnloadWindow(RaceWindow)
-	GemRB.SetNextScript("CharGen3") #class
+	GemRB.SetNextScript("GUICG6")
 	return
