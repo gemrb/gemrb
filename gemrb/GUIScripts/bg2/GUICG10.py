@@ -14,13 +14,12 @@ def OnLoad():
 	ClassTable = GemRB.LoadTable("classes")
 	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
 	ClassWindow = GemRB.LoadWindow(10)
-	RaceColumn = GemRB.GetVar("Race")+3
+	RaceColumn = GemRB.GetVar("Race")+4
 
 	j=0
 	for i in range(1,ClassCount):
-		if GemRB.GetTableValue(ClassTable,i-1,3)==0:
+		if GemRB.GetTableValue(ClassTable,i-1,4)==0:
 			continue
-		print j, GemRB.GetTableValue(ClassTable, i-1,0), GemRB.GetTableRowName(ClassTable,i-1)
 		if j>11:
 			Button = GemRB.GetControl(ClassWindow,j+7)
 		else:
@@ -31,7 +30,7 @@ def OnLoad():
 	j=0
 	for i in range(1,ClassCount):
 		Allowed = GemRB.GetTableValue(ClassTable, i-1, RaceColumn)
-		if GemRB.GetTableValue(ClassTable,i-1,3)==0:
+		if GemRB.GetTableValue(ClassTable,i-1,4)==0:
 			continue
 		if j>11:
 			Button = GemRB.GetControl(ClassWindow,j+7)

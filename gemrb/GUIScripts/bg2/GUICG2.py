@@ -14,12 +14,12 @@ def OnLoad():
 	ClassTable = GemRB.LoadTable("classes")
 	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
 	ClassWindow = GemRB.LoadWindow(2)
-	RaceColumn = GemRB.GetVar("Race")+3
+	RaceColumn = GemRB.GetVar("Race")+4
 
 	j = 0
 	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1,ClassCount):
-		if GemRB.GetTableValue(ClassTable,i-1,3):
+		if GemRB.GetTableValue(ClassTable,i-1,4):
 			continue
 		if j>7:
 			Button = GemRB.GetControl(ClassWindow,j+7)
@@ -34,7 +34,7 @@ def OnLoad():
 	HasMulti = 0
 	for i in range(1,ClassCount):
 		Allowed = GemRB.GetTableValue(ClassTable, i-1, RaceColumn)
-		if GemRB.GetTableValue(ClassTable,i-1,3):
+		if GemRB.GetTableValue(ClassTable,i-1,4):
 			if Allowed!=0:
 				HasMulti = 1
 			continue
