@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.115 2004/02/10 23:00:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.116 2004/02/11 23:07:25 avenger_teambg Exp $
  *
  */
 
@@ -1258,6 +1258,63 @@ static PyObject * GemRB_SetButtonPicture(PyObject * /*self*/, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SetButtonMOS(PyObject * /*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex;
+	char * ResRef;
+
+	if(!PyArg_ParseTuple(args, "iis", &WindowIndex, &ControlIndex, &ResRef)) {
+		printMessage("GUIScript", "Syntax Error: SetButtonMOS(WindowIndex, ControlIndex, MOSResRef)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return NULL;
+
+	if(ctrl->ControlType != IE_GUI_BUTTON)
+		return NULL;
+
+	if(ResRef[0]==0) {
+		Button * btn = (Button*)ctrl;
+		btn->SetPicture(NULL);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
+	DataStream * str = core->GetResourceMgr()->GetResource(ResRef, IE_MOS_CLASS_ID);
+	if(str == NULL)
+		return NULL;
+	ImageMgr * im = (ImageMgr*)core->GetInterface(IE_MOS_CLASS_ID);
+	if(im == NULL) {
+		delete (str);
+		return NULL;
+	}
+
+	if(!im->Open(str, true)) {
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	Sprite2D * Picture = im->GetImage();
+	if(Picture == NULL) {
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	Button * btn = (Button*)ctrl;
+	btn->SetPicture(Picture);
+
+	core->FreeInterface(im);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_SetButtonPLT(PyObject * /*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex, col1, col2, col3, col4, col5, col6, col7, col8;
@@ -2065,7 +2122,10 @@ static PyMethodDef GemRBMethods[] = {
      "Sets the state of a Button Control."},
 
 	{"SetButtonPicture", GemRB_SetButtonPicture, METH_VARARGS,
-     "Sets the Picture of a Button Control."},
+     "Sets the Picture of a Button Control from a BMP file."},
+
+ 	{"SetButtonMOS", GemRB_SetButtonMOS, METH_VARARGS,
+     "Sets the Picture of a Button Control from a MOS file."},
 
  	{"SetButtonPLT", GemRB_SetButtonPLT, METH_VARARGS,
      "Sets the Picture of a Button Control from a PLT file."},
