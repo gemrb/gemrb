@@ -517,6 +517,18 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 {	
 	Region Viewport = core->GetVideoDriver()->GetViewport();
 	switch(Key) {
+		case GEM_LEFT:
+			if(Viewport.x>63) Viewport.x-=64;
+			break;
+		case GEM_UP:
+			if(Viewport.y>63) Viewport.y-=64;
+			break;
+		case GEM_DOWN:
+			if(Viewport.y<32000) Viewport.y+=64;
+			break;
+		case GEM_RIGHT:
+			if(Viewport.x<32000) Viewport.x+=64;
+			break;
 		case GEM_ALT:
 			DebugFlags^=4;
 			printf("ALT pressed\n");
