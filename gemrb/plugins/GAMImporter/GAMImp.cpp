@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.8 2004/01/04 00:23:16 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.9 2004/01/05 23:46:26 balrog994 Exp $
  *
  */
 
@@ -153,8 +153,6 @@ Game * GAMImp::GetGame()
 		str->Seek(PCOffset+(i*PCSize), GEM_STREAM_START);
 		PCStruct pcInfo;
 		str->Read(&pcInfo, 0xC0);
-		if(stricmp(pcInfo.Area, CurrentArea) != 0)
-			continue;
 		Actor * actor;
 		if(pcInfo.OffsetToCRE) {
 			str->Seek(pcInfo.OffsetToCRE, GEM_STREAM_START);
@@ -172,8 +170,11 @@ Game * GAMImp::GetGame()
 		actor->YPos = pcInfo.YPos;
 		actor->Orientation = pcInfo.Orientation;
 		actor->InParty = true;
+		actor->FromGame = true;
 		actor->AnimID = IE_ANI_AWAKE;
-		newMap->AddActor(actor);
+		strcpy(actor->Area, pcInfo.Area);
+		if(stricmp(pcInfo.Area, CurrentArea) == 0)
+			newMap->AddActor(actor);
 		newGame->SetPC(actor);
 	}
 	//Loading NPCs
@@ -200,8 +201,13 @@ Game * GAMImp::GetGame()
 		actor->YPos = pcInfo.YPos;
 		actor->Orientation = pcInfo.Orientation;
 		actor->InParty = false;
+		actor->FromGame = true;
 		actor->AnimID = IE_ANI_AWAKE;
-		newMap->AddActor(actor);
+		strcpy(actor->Area, pcInfo.Area);
+		if(stricmp(pcInfo.Area, CurrentArea) == 0)
+			newMap->AddActor(actor);
+		else
+			newGame->AddNPC(actor);
 	}
 	core->FreeInterface(aM);
 	//Loading GLOBALS
