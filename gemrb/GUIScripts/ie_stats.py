@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.7 2005/02/11 11:17:09 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.8 2005/03/06 10:46:31 avenger_teambg Exp $
 
 # ie_stats.py - definitions of creature stats codes
 
@@ -99,10 +99,8 @@ IE_MORALERECOVERYTIME 		= 47
 IE_REPUTATION 			= 48
 IE_HATEDRACE 			= 49
 IE_DAMAGEBONUS 			= 50
-IE_SPELLFAILUREMAGE 		= 51 # In PST this stores secondary level exp
-IE_SPELLFAILUREPRIEST 		= 52 # In PST this stores tertiary level exp
-IE_XP_MAGE	 		= 51 # In PST this stores secondary level exp
-IE_XP_THIEF	 		= 52 # In PST this stores tertiary level exp
+IE_SPELLFAILUREMAGE 		= 51
+IE_SPELLFAILUREPRIEST 		= 52
 IE_SPELLDURATIONMODMAGE 	= 53
 IE_SPELLDURATIONMODPRIEST 	= 54
 IE_TURNUNDEADLEVEL 		= 55
@@ -227,6 +225,9 @@ IE_TITLE1			= 172
 IE_TITLE2			= 173
 IE_DISABLEOVERLAY		= 174
 IE_DISABLEBACKSTAB		= 175
+IE_XP_MAGE	 		= 176 # In PST this stores secondary level exp
+IE_XP_THIEF	 		= 177 # In PST this stores tertiary level exp
+#178-198 unused
 IE_STONESKINSGOLEM		= 199
 IE_LEVELDRAIN			= 200
 IE_RACE				= 201
