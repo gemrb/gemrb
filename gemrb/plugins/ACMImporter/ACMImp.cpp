@@ -60,10 +60,10 @@ void * __stdcall ACMImp::dspcallback(void *originalbuffer, void *newbuffer, int 
 #endif
 		unsigned long volume;
 		if(!core->GetDictionary()->Lookup("Volume Music", volume)) {
-			core->GetDictionary()->SetAt("Volume Music", 10);
-			volume = 10;
+			core->GetDictionary()->SetAt("Volume Music", 100);
+			volume = 100;
 		}
-		FSOUND_SetVolume(streams[param].channel, (volume/10.0)*255);
+		FSOUND_SetVolume(streams[param].channel, (volume/100.0)*255);
 #ifdef WIN32
 		//printf("curtime = %d, tottime = %d, delta = %d\n", curtime, tottime, tottime-curtime);
 		if(curtime > tottime-125) {
