@@ -407,6 +407,9 @@ bool Interface::LoadConfig(void)
 		else if(stricmp(name, "CachePath") == 0) {
 			strcpy(CachePath, value);
 		}
+		else if(stricmp(name, "GUIScriptsPath") == 0) {
+			strcpy(GUIScriptsPath, value);
+		}
 		else if(stricmp(name, "GamePath") == 0) {
 			strcpy(GamePath, value);
 		}

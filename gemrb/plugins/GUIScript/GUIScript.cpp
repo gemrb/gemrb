@@ -273,16 +273,16 @@ bool GUIScript::Init(void)
 	int p = 0;
 	for(int i = 0; i < len; i++) {
 		if(core->GemRBPath[i] == '\\') {
-			path[p++] = '\\';
-			path[p] = '\\';
+			path[p] = '//';
 		}
 		else
-			path[p] = core->GemRBPath[i];
+			path[p] = core->GUIScriptsPath[i];
 		p++;
 	}
+	path[p] = 0;
 	sprintf(string, "sys.path.append('%sGUIScripts')", path);
 	#else
-	sprintf(string, "sys.path.append('%sGUIScripts')", core->GemRBPath);
+	sprintf(string, "sys.path.append('%sGUIScripts')", core->GUIScriptsPath);
 	#endif
 	if(PyRun_SimpleString(string)==-1){
 		PyRun_SimpleString("pdb.pm()");
