@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.190 2004/08/08 13:21:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.191 2004/08/09 18:20:37 avenger_teambg Exp $
  *
  */
 
@@ -1448,7 +1448,7 @@ int Interface::SetEvent(unsigned short WindowIndex,
 			//TextArea
 			 {
 				TextArea* te = ( TextArea* ) ctrl;
-				strncpy( te->TextAreaOnChange, funcName, 64 );
+				strncpy( te->TextAreaOnChange, funcName, sizeof(EventHandler) );
 				return 0;
 			}
 			break;
@@ -1457,7 +1457,7 @@ int Interface::SetEvent(unsigned short WindowIndex,
 			//Slider
 			 {
 				TextEdit* te = ( TextEdit* ) ctrl;
-				strncpy( te->EditOnChange, funcName, 64 );
+				strncpy( te->EditOnChange, funcName,sizeof(EventHandler) );
 				return 0;
 			}
 			break;
@@ -1466,7 +1466,7 @@ int Interface::SetEvent(unsigned short WindowIndex,
 			//Slider
 			 {
 				Slider* sld = ( Slider* ) ctrl;
-				strncpy( sld->SliderOnChange, funcName, 64 );
+				strncpy( sld->SliderOnChange, funcName, sizeof(EventHandler) );
 				return 0;
 			}
 			break;
@@ -1475,7 +1475,7 @@ int Interface::SetEvent(unsigned short WindowIndex,
 			//Label
 			 {
 				Label* lab = ( Label* ) ctrl;
-				strncpy( lab->LabelOnPress, funcName, 64 );
+				strncpy( lab->LabelOnPress, funcName, sizeof(EventHandler) );
 				return 0;
 			}
 			break;
@@ -1484,7 +1484,7 @@ int Interface::SetEvent(unsigned short WindowIndex,
 			//ScrollBar
 			 {
 				ScrollBar* sb = ( ScrollBar* ) ctrl;
-				strncpy( sb->ScrollBarOnChange, funcName, 64 );
+				strncpy( sb->ScrollBarOnChange, funcName, sizeof(EventHandler) );
 				return 0;
 			}
 			break;
@@ -2257,3 +2257,18 @@ void Interface::DelTree(const char* Pt, bool onlysave)
         } while (( de = readdir( dir ) ) != NULL);
         closedir( dir );
 }
+
+void Interface::LoadProgress(int percent)
+{
+	vars->SetAt("Progress", percent);
+	if(percent<1) {
+		guiscript->RunFunction("StartLoadScreen");
+		return;
+	}
+	if(percent>99) {
+		guiscript->RunFunction("CloseLoadScreen");
+		return;
+	}
+	guiscript->RunFunction("UpdateLoadScreen");
+}
+

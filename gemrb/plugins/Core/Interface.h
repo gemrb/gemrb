@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.106 2004/08/08 20:49:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.107 2004/08/09 18:20:37 avenger_teambg Exp $
  *
  */
 
@@ -346,6 +346,9 @@ public:
 	void DelTree(const char *path, bool onlysaved);
 	/*returns true if the file should be saved */
 	bool SavedExtension(const char *filename);
+	/*handles the load screen*/
+	void LoadProgress(int percent);
+
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);
