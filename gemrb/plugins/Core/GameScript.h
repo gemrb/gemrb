@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.48 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.49 2004/02/26 16:51:04 balrog994 Exp $
  *
  */
 
@@ -30,6 +30,9 @@ class Action;
 #include "SymbolMgr.h"
 #include "Actor.h"
 #include <list>
+
+#define MAX_OBJECT_FIELDS	10
+#define MAX_NESTING			5
 
 #define GSASSERT(f,c) \
   if(!(f))  \
@@ -50,28 +53,59 @@ class Action;
 #define GEM_EXPORT
 #endif
 
+class GEM_EXPORT Targets {
+public:
+	Targets()
+	{
+	};
+	~Targets()
+	{
+	};
+private:
+	std::vector< Scriptable*> objects;
+public:
+	int Count()
+	{
+		return objects.size();
+	};
+	Scriptable* GetTarget(int index)
+	{
+		if (index >= objects.size()) {
+			return NULL;
+		}
+		return objects.at( index );
+	};
+	void AddTarget(Scriptable* Target)
+	{
+		objects.push_back( Target );
+	};
+	void Clear()
+	{
+		objects.clear();
+	};
+	bool Contains(Scriptable* scr)
+	{
+		if (!objects.size()) {
+			return false;
+		}
+		for (unsigned int i = 0; i < objects.size(); i++) {
+			if (objects.at( i ) == scr) {
+				return true;
+			}
+		}
+		return false;
+	};
+};
+
 class GEM_EXPORT Object {
 public:
 	Object()
 	{
 		RefCount = 1;
 		objectName[0] = 0;
-		PositionMask[0] = 0;
 
-		eaField = 0;
-		factionField = 0;
-		teamField = 0;
-		generalField = 0;
-		raceField = 0;
-		classField = 0;
-		specificField = 0;
-		genderField = 0;
-		alignmentField = 0;
-		identifiersField = 0;
-		XobjectPosition = 0;
-		YobjectPosition = 0;
-		WobjectPosition = 0;
-		HobjectPosition = 0;
+		memset( objectFields, 0, MAX_OBJECT_FIELDS * sizeof( int ) );
+		memset( objectRect, 0, 4 * sizeof( int ) );
 
 		canary = 0xdeadbeef;
 	};
@@ -79,21 +113,9 @@ public:
 	{
 	}
 public:
-	int eaField;
-	int factionField;
-	int teamField;
-	int generalField;
-	int raceField;
-	int classField;
-	int specificField;
-	int genderField;
-	int alignmentField;
-	int identifiersField;
-	int XobjectPosition;
-	int YobjectPosition;
-	int WobjectPosition;
-	int HobjectPosition;
-	char PositionMask[65];
+	int objectFields[MAX_OBJECT_FIELDS];
+	int objectIdentifiers[MAX_NESTING];
+	int objectRect[4];
 	char objectName[65];
 private:
 	int RefCount;
@@ -541,7 +563,7 @@ public:
 
 typedef int (* TriggerFunction)(Scriptable*, Trigger*);
 typedef void (* ActionFunction)(Scriptable*, Action*);
-typedef void (* ObjectFunction)(); //not known yet
+typedef Targets*(* ObjectFunction)(Targets*);
 
 struct TriggerLink {
 	const char* Name;
@@ -609,13 +631,18 @@ private: //Internal Functions
 	static bool EvaluateTrigger(Scriptable* Sender, Trigger* trigger);
 	int ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS);
 	int ExecuteResponse(Scriptable* Sender, Response* rE);
+	static Targets* EvaluateObject(Scriptable* Sender, Object* oC,
+		int IDIndex, Targets* parm);
+	static int ParseInt(const char*& src);
+	static void ParseString(const char*& src, char* tmp);
+
 public:
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 	static Action* CreateAction(char* string, bool autoFree = true);
 private:
 	static Action* GenerateAction(char* String);
 	static Trigger* GenerateTrigger(char* String);
-	static Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
+	static Targets* GetActorFromObject(Scriptable* Sender, Object* oC);
 	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
 		int flags);
