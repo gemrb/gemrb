@@ -18,7 +18,6 @@ class DirectXVideoDriver : public Video
 {
 private:	
 	bool sceneBegin;
-	HWND hWnd;
 	char * winClassName;
 	std::vector<Region> upd;	//Regions of the Screen to Update in the next SwapBuffer operation.
 	Region Viewport;

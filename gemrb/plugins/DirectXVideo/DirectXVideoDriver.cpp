@@ -12,6 +12,8 @@ LPDIRECT3DDEVICE9		lpD3DDevice;
 int						ScreenWidth, 
 						ScreenHeight;
 
+HWND					hWnd;
+
 /* The main Win32 event handler
 DJM: This is no longer static as (DX5/DIB)_CreateWindow needs it
 */
@@ -26,6 +28,15 @@ LONG CALLBACK WinMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
+		case WM_ACTIVATEAPP: {
+			bool fActive = (BOOL) wParam;        // activation flag 
+			if(fActive)
+				SetCapture(hWnd);
+			else
+				ReleaseCapture();
+		}
+	    break;
+
 		case WM_CHAR: {
 			unsigned char key = (unsigned char)wParam;
 			core->GetEventMgr()->KeyPress(key, 0);
@@ -39,12 +50,14 @@ LONG CALLBACK WinMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 	    return 0;
 
+		case WM_LBUTTONDOWN:
+		case WM_RBUTTONDOWN:
 		case WM_MBUTTONDOWN: {
 			unsigned long  fwKeys = wParam;        // key flags 
 			unsigned short xPos = LOWORD(lParam);  // horizontal position of cursor 
 			unsigned short yPos = HIWORD(lParam);  // vertical position of cursor
-			unsigned char button;
-			unsigned short Mod;
+			unsigned char button = 0;
+			unsigned short Mod = 0;
 			if(fwKeys & MK_LBUTTON)
 				button |= 0x01;
 			if(fwKeys & MK_MBUTTON)
@@ -59,12 +72,14 @@ LONG CALLBACK WinMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 	    return 0;
 
+		case WM_LBUTTONUP:
+		case WM_RBUTTONUP:
 		case WM_MBUTTONUP: {
 			unsigned long  fwKeys = wParam;        // key flags 
 			unsigned short xPos = LOWORD(lParam);  // horizontal position of cursor 
 			unsigned short yPos = HIWORD(lParam);  // vertical position of cursor
-			unsigned char button;
-			unsigned short Mod;
+			unsigned char button = 0;
+			unsigned short Mod = 0;
 			if(fwKeys & MK_LBUTTON)
 				button |= 0x01;
 			if(fwKeys & MK_MBUTTON)
@@ -174,7 +189,7 @@ int DirectXVideoDriver::Init(void)
 	D3DPRESENT_PARAMETERS d3dpp;
 	memset(&d3dpp, 0, sizeof(d3dpp));
 	d3dpp.Windowed = true;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+	d3dpp.SwapEffect = D3DSWAPEFFECT_COPY;
 	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 	d3dpp.BackBufferCount = 1;
 	d3dpp.BackBufferFormat = d3ddm.Format;
@@ -315,7 +330,7 @@ void DirectXVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, R
 	lpD3DDevice->SetTexture( 0, p->m_Texture->pTexture );
 	lpD3DDevice->SetStreamSource( 0, p->m_VertexBuffer, 0, sizeof(CUSTOMVERTEX) );
 	lpD3DDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2 );
-	p->m_VertexBuffer->Unlock();
+	//p->m_VertexBuffer->Unlock();
 }
 
 void DirectXVideoDriver::SetCursor(Sprite2D * spr, int x, int y)
@@ -345,6 +360,7 @@ void DirectXVideoDriver::SetPalette(Sprite2D * spr, Color * pal)
 {
 	Poly * p = (Poly*)spr->vptr;
 	p->m_Texture->Init(spr->pixels, spr->Width, spr->Height, 8, (void*)pal, p->m_Texture->hasCK, p->m_Texture->colorKey);
+	//lpD3DDevice->SetPaletteEntries(p->m_Texture->paletteIndex, (PALETTEENTRY*)pal);
 }
 
 void DirectXVideoDriver::ConvertToVideoFormat(Sprite2D * sprite)
@@ -363,12 +379,49 @@ void DirectXVideoDriver::CalculateAlpha(Sprite2D * sprite)
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 void DirectXVideoDriver::DrawRect(Region &rgn, Color &color)
 {
-	D3DRECT rect[1];
-	rect[0].x1 = rgn.x;
-	rect[0].y1 = rgn.y;
-	rect[0].x2 = rgn.w;
-	rect[0].y2 = rgn.h;
-	lpD3DDevice->Clear( 1, rect, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(color.r, color.b, color.g, color.a), 0.0f, 0L);
+	CUSTOMVERTEX pVertices[4];
+
+	float left, top, right, bottom, d = 0.0f;
+	left	= ((float)rgn.x / (float)ScreenWidth) * 2.0f - 1.0f;
+	right	= ((float)(rgn.x + rgn.w) / (float)ScreenWidth) * 2.0f - 1.0f;
+	bottom 	= ((float)rgn.y / (float)ScreenHeight) * 2.0f - 1.0f;
+	top 	= ((float)(rgn.y + rgn.h) / (float)ScreenHeight) * 2.0f - 1.0f;
+	top = -top;
+	bottom = -bottom;
+	
+	pVertices[0].x = left;
+	pVertices[0].y = bottom;
+	pVertices[0].z = d;
+	pVertices[0].color=D3DCOLOR_ARGB(255-color.a, color.r, color.b, color.g);
+	pVertices[0].tu=0.0;
+	pVertices[0].tv=0.0;
+	pVertices[1].x = right;
+	pVertices[1].y = bottom;
+	pVertices[1].z = d;
+	pVertices[1].color=D3DCOLOR_ARGB(255-color.a, color.r, color.b, color.g);
+	pVertices[1].tu=1.0;
+	pVertices[1].tv=0.0;
+	pVertices[2].x = left;
+	pVertices[2].y = top;
+	pVertices[2].z = d;
+	pVertices[2].color=D3DCOLOR_ARGB(255-color.a, color.r, color.b, color.g);
+	pVertices[2].tu=0.0;
+	pVertices[2].tv=1.0;
+	pVertices[3].x = right;
+	pVertices[3].y = top;
+	pVertices[3].z = d;
+	pVertices[3].color=D3DCOLOR_ARGB(255-color.a, color.r, color.b, color.g);
+	pVertices[3].tu=1.0;
+	pVertices[3].tv=1.0;
+
+	if(!sceneBegin) {
+		//lpD3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0,0,0), 1.0f, 0L);
+		lpD3DDevice->BeginScene();
+		sceneBegin = true;
+	}
+
+	lpD3DDevice->SetTexture( 0, NULL );
+	lpD3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, (void*)pVertices, sizeof(CUSTOMVERTEX) );
 }
 /** Creates a Palette from Color */
 Color * DirectXVideoDriver::CreatePalette(Color color, Color back)
