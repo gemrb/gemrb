@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.91 2004/04/19 22:05:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.92 2004/04/20 22:34:03 doc_wagon Exp $
  *
  */
 
@@ -29,6 +29,10 @@
 #endif
 
 extern Interface* core;
+#ifdef WIN32
+extern HANDLE hConsole;
+#endif
+
 static int NormalCost = 10;
 static int AdditionalCost = 4;
 static int Passable[16] = {
