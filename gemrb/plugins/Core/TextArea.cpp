@@ -246,12 +246,12 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 		row+=lrows[i];
 		if(r < (row-startrow)) {
 			seltext = i;
-			printf("seltext = %d, rows = %d, row = %d, r = %d\n", i, rows, row, r);
+			printf("CtrlId = 0x%08lx, seltext = %d, rows = %d, row = %d, r = %d\n", ControlID, i, rows, row, r);
 			return;
 		}
 	}
 	seltext = -1;
-	printf("seltext = %d, rows %d, row %d, r = %d\n", seltext, rows, row, r);
+	printf("CtrlId = 0x%08lx, seltext = %d, rows %d, row %d, r = %d\n", ControlID, seltext, rows, row, r);
 }
 /** Mouse Button Up */
 void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
