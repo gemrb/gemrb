@@ -5,7 +5,7 @@ AbilityWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 AbilityTable = 0
-SumLabel = 0
+PointsLeft = 0
 
 def RollPress():
 	GemRB.InvalidateWindow(AbilityWindow)
@@ -29,7 +29,7 @@ def RollPress():
 
 def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
-	global SumLabel
+	global PointsLeft
 	global AbilityTable
 	
 	GemRB.LoadWindowPack("GUICG")
@@ -69,20 +69,24 @@ def OnLoad():
 	GemRB.SetVisible(AbilityWindow,1)
 	return
 
-def LeftPress():
+def RightPress():
 	GemRB.InvalidateWindow(AbilityWindow)
-	Abidx = GemRB.GetVar("AbilityIncrease")
-	print Abidx
+	Abidx = GemRB.GetVar("AbilityDecrease")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	print Ability
 	if Ability<4:  #should be more elaborate
 		return
 	GemRB.SetVar("Ability "+str(Abidx), Ability-1)
-	GemRB.SetVar("PointsLeft",PointsLeft+1)
-	GemRB.SetButtonFlags(AbilityWindow, DoneButton,IE_GUI_BUTTON_DISABLED)
+	PointsLeft = PointsLeft + 1
+	GemRB.SetVar("PointsLeft",PointsLeft)
+	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
+	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft) )
+	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
+	GemRB.SetText(AbilityWindow, Label, str(Ability-1) )
+	GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_DISABLED)
 	return
 
-def RightPress():
+def LeftPress():
 	GemRB.InvalidateWindow(AbilityWindow)
 	PointsLeft=GemRB.GetVar("PointsLeft")
 	if PointsLeft == 0:
@@ -92,9 +96,14 @@ def RightPress():
 	if Ability>17:  #should be more elaborate
 		return
 	GemRB.SetVar("Ability "+str(Abidx), Ability+1)
-	GemRB.SetVar("PointsLeft",PointsLeft-1)
+	PointsLeft = PointsLeft - 1
+	GemRB.SetVar("PointsLeft",PointsLeft)
+	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
+	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft) )
+	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
+	GemRB.SetText(AbilityWindow, Label, str(Ability+1) )
 	if PointsLeft == 1:
-		GemRB.SetButtonFlags(AbilityWindow, DoneButton,IE_GUI_BUTTON_DISABLED)
+		GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_DISABLED)
 	return
 
 def StorePress():
