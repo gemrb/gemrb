@@ -29,6 +29,8 @@ public:
 	int Read(void * dest, int length);
 	int Seek(int pos, int startpos);
 	unsigned long Size();
-};
+  /** No descriptions */
+  int ReadLine(void * buf, int maxlen);
+  };
 
 #endif

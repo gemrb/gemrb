@@ -56,3 +56,22 @@ unsigned long MemoryStream::Size()
 {
 	return length;
 }
+/** No descriptions */
+int MemoryStream::ReadLine(void * buf, int maxlen)
+{
+	unsigned char *p = (unsigned char*)buf;
+	int i = 0;
+	while(i < (maxlen-1)) {
+		Byte ch = *((Byte*)ptr + Pos);
+		if(Encrypted)
+			p[i]^=GEM_ENCRYPTION_KEY[Pos&63];
+		Pos++;
+		if(ch == '\n')
+			break;
+		if(ch == '\t')
+			ch = ' ';
+    if(ch != '\r')
+			p[i++] = ch;
+	}
+	p[i] = 0;
+}

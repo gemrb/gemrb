@@ -94,7 +94,8 @@ int CachedFileStream::Seek(int pos, int startpos)
 unsigned long CachedFileStream::Size()
 {
 	return size;
-}/** No descriptions */
+}
+/** No descriptions */
 int CachedFileStream::ReadLine(void * buf, int maxlen)
 {
 	unsigned char *p = (unsigned char*)buf;
