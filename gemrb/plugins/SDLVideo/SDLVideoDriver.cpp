@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.47 2003/12/20 15:56:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.48 2003/12/21 14:01:51 balrog994 Exp $
  *
  */
 
@@ -29,6 +29,8 @@ SDLVideoDriver::SDLVideoDriver(void)
 	CursorIndex = 0;
 	Cursor[0] = NULL;
 	Cursor[1] = NULL;
+	moveX = 0;
+	moveY = 0;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -182,10 +184,28 @@ int SDLVideoDriver::SwapBuffers(void)
 			break;
 
 			case SDL_MOUSEMOTION:
+				{
 				CursorPos.x = event.motion.x-mouseAdjustX[CursorIndex];
 				CursorPos.y = event.motion.y-mouseAdjustY[CursorIndex];
+				if(event.motion.x <= 0)
+					moveX = -5;
+				else {
+					if(event.motion.x >= (core->Width-1))
+						moveX = 5;
+					else
+						moveX = 0;
+				}
+				if(event.motion.y <= 0)
+					moveY = -5;
+				else {
+					if(event.motion.y >= (core->Height-1))
+						moveY = 5;
+					else
+						moveY = 0;
+				}
 				if(Evnt)
 					Evnt->MouseMove(event.motion.x, event.motion.y);
+				}
 			break;
 
 			case SDL_MOUSEBUTTONDOWN:
@@ -203,7 +223,11 @@ int SDLVideoDriver::SwapBuffers(void)
 		}
 		SDL_BlitSurface(backBuf, NULL, disp, NULL);
 		if(Cursor[CursorIndex]) {
+			short x = CursorPos.x;
+			short y = CursorPos.y;
 			SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
+			CursorPos.x = x;
+			CursorPos.y = y;
 		}
 		if(fadePercent) {
 			//printf("Fade Percent = %d%%\n", fadePercent);
@@ -213,7 +237,7 @@ int SDLVideoDriver::SwapBuffers(void)
 		SDL_Flip(disp);
 		return ret;
 	}
-	SDL_BlitSurface(backBuf, NULL, disp, NULL);
+	/*SDL_BlitSurface(backBuf, NULL, disp, NULL);
 	if(Cursor[CursorIndex])
 		SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
 	if(fadePercent) {
@@ -221,7 +245,7 @@ int SDLVideoDriver::SwapBuffers(void)
 		SDL_SetAlpha(extra, SDL_SRCALPHA, (255*fadePercent)/100);
 		SDL_BlitSurface(extra, NULL, disp, NULL);
 	}
-	SDL_Flip(disp);
+	SDL_Flip(disp);*/
 	int ret = GEM_OK;
 	//TODO: Implement an efficient Rectangle Merge algorithm for faster redraw
 	SDL_Event event; /* Event structure */
@@ -299,10 +323,28 @@ int SDLVideoDriver::SwapBuffers(void)
 		break;
 
 		case SDL_MOUSEMOTION:
+			{
 			CursorPos.x = event.motion.x-mouseAdjustX[CursorIndex];
 			CursorPos.y = event.motion.y-mouseAdjustY[CursorIndex];
+			if(event.motion.x <= 0)
+				moveX = -5;
+			else {
+				if(event.motion.x >= (core->Width-1))
+					moveX = 5;
+				else
+					moveX = 0;
+			}
+			if(event.motion.y <= 0)
+				moveY = -5;
+			else {
+				if(event.motion.y >= (core->Height-1))
+					moveY = 5;
+				else
+					moveY = 0;
+			}
 			if(Evnt)
 				Evnt->MouseMove(event.motion.x, event.motion.y);
+			}
 		break;
 
 		case SDL_MOUSEBUTTONDOWN:
@@ -330,6 +372,20 @@ int SDLVideoDriver::SwapBuffers(void)
 		break;
 		}
 	}
+	SDL_BlitSurface(backBuf, NULL, disp, NULL);
+	if(Cursor[CursorIndex]) {
+		short x = CursorPos.x;
+		short y = CursorPos.y;
+		SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
+		CursorPos.x = x;
+		CursorPos.y = y;
+	}
+	if(fadePercent) {
+		//printf("Fade Percent = %d%%\n", fadePercent);
+		SDL_SetAlpha(extra, SDL_SRCALPHA, (255*fadePercent)/100);
+		SDL_BlitSurface(extra, NULL, disp, NULL);
+	}
+	SDL_Flip(disp);
 	return ret;
 }
 
@@ -555,7 +611,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Regio
 	drect.h = 1;
 	SDL_FillRect(disp, &drect, 0xffffffff);*/
 }
-void SDLVideoDriver::BlitSpriteTinted(Sprite2D * spr, int x, int y, Color tint)
+void SDLVideoDriver::BlitSpriteTinted(Sprite2D * spr, int x, int y, Color tint, Region * clip)
 {
 	SDL_Surface * tmp = (SDL_Surface*)spr->vptr;
 	SDL_Color * pal = tmp->format->palette->colors;
@@ -568,7 +624,7 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D * spr, int x, int y, Color tint)
 		pal[i].b = (tint.b*oldPal[i].b) >> 8;
 	}
 	//SDL_SetPalette(tmp, SDL_LOGPAL, newPal, 0, 256);
-	BlitSprite(spr, x, y);
+	BlitSprite(spr, x, y, false, clip);
 	SDL_SetPalette(tmp, SDL_LOGPAL, oldPal, 0, 256);
 }
 
@@ -647,9 +703,10 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode,
 	}
 	SDL_Surface * surf = (SDL_Surface*)spr->vptr;
 	int destx = drect.x, desty = drect.y;
-	if((destx > core->Width) || ((destx+srect->w) < 0))
+	Region Screen = core->GetVideoDriver()->GetViewport();
+	if((destx > Screen.w) || ((destx+srect->w) < 0))
 		return;
-	if((desty > core->Height) || ((desty+srect->h) < 0))
+	if((desty > Screen.h) || ((desty+srect->h) < 0))
 		return;
 
 	SDL_LockSurface(surf);
@@ -658,7 +715,7 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode,
 	unsigned char * src, *dst;
 
 	for(int y = srect->y; y < srect->h; y++) {
-		if((desty < 0) || (desty >= core->Height)) {
+		if((desty < 0) || (desty >= Screen.h)) {
 			desty++;
 			continue;
 		}
@@ -666,7 +723,7 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode,
 		src = ((unsigned char*)spr->pixels)+(y*surf->pitch);
 		dst = ((unsigned char *)backBuf->pixels)+(desty*backBuf->pitch)+(destx*backBuf->format->BytesPerPixel);
 		for(int x = srect->x; x < srect->w; x++) {
-			if((destx < 0) || (destx >= core->Width)) {
+			if((destx < 0) || (destx >= Screen.w)) {
 				src++;
 				destx++;
 				dst+=4;
@@ -725,6 +782,16 @@ void SDLVideoDriver::SetViewport(int x, int y)
 {
 	Viewport.x = x;
 	Viewport.y = y;
+}
+
+void SDLVideoDriver::SetViewport(int x, int y, int w, int h)
+{
+	Viewport.x = x;
+	Viewport.y = y;
+	Viewport.w = w;
+	Viewport.h = h;
+	//core->Width = w;
+	//core->Height = h;
 }
 
 void SDLVideoDriver::MoveViewportTo(int x, int y)
@@ -824,7 +891,7 @@ void SDLVideoDriver::DrawRect(Region &rgn, Color &color){
 }
 void SDLVideoDriver::SetPixel(short x, short y, Color &color)
 {
-	if((x >= disp->w) || (y >= disp->h))
+	if((x >= Viewport.w) || (y >= Viewport.h))
 		return;
 	if((x < 0) || (y < 0))
 		return;
@@ -1058,7 +1125,10 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon * poly, Color &color, bool fill)
 		if(!poly->fill) {
 			poly->fill = PrecalculatePolygon(poly->points, poly->count, color);
 		}
-		BlitSprite(poly->fill, poly->BBox.x, poly->BBox.y);
+		Region Screen = Viewport;
+		Screen.x = 0;
+		Screen.y = 0;
+		BlitSprite(poly->fill, poly->BBox.x, poly->BBox.y, false, &Screen);
 	}
 	short lastX = poly->points[0].x, lastY = poly->points[0].y;
 	int i;
