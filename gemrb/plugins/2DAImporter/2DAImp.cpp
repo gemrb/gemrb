@@ -32,6 +32,7 @@ bool p2DAImp::Open(DataStream * stream, bool autoFree)
 	while(*strp == ' ')
 		strp++;
 	if(strncmp(strp, "2DA V1.0", 8) != 0) {
+		printf("Bad signature!\n");
 		return false;
 	}
 	defVal[0] = 0;
