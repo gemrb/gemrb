@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.19 2004/09/21 18:44:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.20 2004/09/28 14:25:24 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -130,7 +130,7 @@ def SetupMenuWindowControls (Window):
 	GemRB.SetTooltip (Window, Button, 41626)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
 
-	# Rest
+	# Rest (temporary store window for debug purpose)
 	Button = GemRB.GetControl (Window, 9)
 	GemRB.SetTooltip (Window, Button, 41628)
 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
@@ -139,7 +139,7 @@ def SetupMenuWindowControls (Window):
 	# AI
 	Button = GemRB.GetControl (Window, 4)
 	GemRB.SetTooltip (Window, Button, 41631) # or 41646 Activate ...
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
+	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
 
 	# Can't Reach ???
 	Button = GemRB.GetControl (Window, 0)

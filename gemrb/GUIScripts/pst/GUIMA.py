@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.9 2004/08/27 13:36:33 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.10 2004/09/28 14:25:25 edheldil Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -25,9 +25,7 @@
 
 import GemRB
 from GUIDefines import *
-
-#from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
-#import GUICommonWindows
+from GUICommon import CloseOtherWindow
 
 MapWindow = None
 WorldMapWindow = None
@@ -36,9 +34,8 @@ WorldMapWindow = None
 def OpenMapWindow ():
 	global MapWindow
 
-	GemRB.HideGUI()
-
-	if MapWindow:
+	if CloseOtherWindow (OpenMapWindow):
+		GemRB.HideGUI ()
 		if WorldMapWindow: OpenWorldMapWindow ()
 		
 		GemRB.UnloadWindow (MapWindow)
@@ -48,6 +45,7 @@ def OpenMapWindow ():
 		GemRB.UnhideGUI ()
 		return
 
+	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIMA")
 	MapWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("OtherWindow", MapWindow)

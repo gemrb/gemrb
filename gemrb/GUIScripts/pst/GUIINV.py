@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.14 2004/09/21 18:44:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.15 2004/09/28 14:25:24 edheldil Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -28,9 +28,9 @@ import string
 from GUIDefines import *
 import ie_stats
 import GemRB
-#from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
+from GUICommon import CloseOtherWindow
 from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler
-#import GUICommonWindows
+
 
 InventoryWindow = None
 ItemInfoWindow = None
@@ -70,17 +70,16 @@ AvSlotsTable  = GemRB.LoadTable ('AVSLOTS')
 def OpenInventoryWindow ():
 	global InventoryWindow
 	
-	GemRB.HideGUI()
-	
-	if InventoryWindow != None:
-		
-		GemRB.UnloadWindow(InventoryWindow)
+	if CloseOtherWindow (OpenInventoryWindow):
+		GemRB.HideGUI ()
+		GemRB.UnloadWindow (InventoryWindow)
 		InventoryWindow = None
-		GemRB.SetVar("OtherWindow", -1)
+		GemRB.SetVar ("OtherWindow", -1)
 		SetSelectionChangeHandler (None)
-		GemRB.UnhideGUI()
+		GemRB.UnhideGUI ()
 		return
 		
+	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIINV")
 	InventoryWindow = Window = GemRB.LoadWindow(3)
         GemRB.SetVar("OtherWindow", InventoryWindow)

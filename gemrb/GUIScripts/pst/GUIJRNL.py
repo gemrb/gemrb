@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.9 2004/08/06 01:20:07 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.10 2004/09/28 14:25:24 edheldil Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -30,8 +30,7 @@
 ###################################################
 import GemRB
 from GUIDefines import *
-
-#from GUICommonWindows import CloseCommonWindows
+from GUICommon import CloseOtherWindow
 
 ###################################################
 JournalWindow = None
@@ -65,22 +64,21 @@ global BeastImage
 def OpenJournalWindow ():
 	global JournalWindow
 
-	GemRB.HideGUI()
-
-	if JournalWindow:
+	if CloseOtherWindow (OpenJournalWindow):
 		if LogWindow: OpenLogWindow()
 		if BeastsWindow: OpenBeastsWindow()
 		if QuestsWindow: OpenQuestsWindow()
 		
-		GemRB.HideGUI()
+		GemRB.HideGUI ()
 		
 		GemRB.UnloadWindow(JournalWindow)
 		JournalWindow = None
 		GemRB.SetVar("OtherWindow", -1)
 		
-		GemRB.UnhideGUI()
+		GemRB.UnhideGUI ()
 		return
 		
+	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIJRNL")
 	JournalWindow = GemRB.LoadWindow (0)
 	GemRB.SetVar("OtherWindow", JournalWindow)
