@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.10 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.11 2004/04/18 14:25:58 avenger_teambg Exp $
  *
  */
 
@@ -51,4 +51,8 @@ void DataStream::ReadDecrypted(void* buf, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; i++)
 		( ( unsigned char * ) buf )[i] ^= GEM_ENCRYPTION_KEY[( Pos + i ) & 63];
+}
+unsigned long DataStream::Remains()
+{
+	return Size()-Pos;
 }

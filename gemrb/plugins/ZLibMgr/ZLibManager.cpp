@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibManager.cpp,v 1.6 2004/02/24 22:20:35 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibManager.cpp,v 1.7 2004/04/18 14:26:04 avenger_teambg Exp $
  *
  */
 
@@ -60,8 +60,12 @@ int ZLibManager::Decompress(FILE* dest, DataStream* source)
 		stream.avail_out = OUTPUTSIZE;
 		if (stream.avail_in == 0) {
 			stream.next_in = bufferin;
-			stream.avail_in = source->Read( bufferin, INPUTSIZE );
-			if (stream.avail_in < 0) {
+			//Read doesn't allow partial reads, but provides Remains
+			stream.avail_in = source->Remains();
+			if (stream.avail_in > INPUTSIZE) {
+				stream.avail_in=INPUTSIZE;
+			}
+			if (source->Read( bufferin, stream.avail_in) != (int) stream.avail_in) {
 				return GEM_ERROR;
 			}
 		}
@@ -70,8 +74,7 @@ int ZLibManager::Decompress(FILE* dest, DataStream* source)
 			return GEM_ERROR;
 		}
 		if (fwrite( bufferout, 1, OUTPUTSIZE - stream.avail_out, dest ) <
-			OUTPUTSIZE -
-			stream.avail_out) {
+			OUTPUTSIZE - stream.avail_out) {
 			return GEM_ERROR;
 		}
 		if (result == Z_STREAM_END) {

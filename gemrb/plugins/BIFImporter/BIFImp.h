@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.h,v 1.5 2004/02/24 22:20:43 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.h,v 1.6 2004/04/18 14:25:58 avenger_teambg Exp $
  *
  */
 
@@ -38,7 +38,7 @@ typedef struct TileEntry {
 	unsigned long resLocator;
 	unsigned long dataOffset;
 	unsigned long tilesCount;
-	unsigned long fileSize;
+	unsigned long tileSize; //named tilesize so it isn't confused
 	unsigned short type;
 	unsigned short u1; //Unknown Field
 } TileEntry;
@@ -55,7 +55,7 @@ private:
 public:
 	BIFImp(void);
 	~BIFImp(void);
-	int OpenArchive(char* filename, bool cacheCheck = true);
+	int OpenArchive(char* filename);
 	DataStream* GetStream(unsigned long Resource, unsigned long Type);
 private:
 	void ReadBIF(void);

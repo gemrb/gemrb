@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.h,v 1.11 2004/04/17 12:43:07 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.h,v 1.12 2004/04/18 14:25:58 avenger_teambg Exp $
  *
  */
 
@@ -40,8 +40,8 @@ class GEM_EXPORT CachedFileStream : public DataStream// : public FileStream
 {
 private:
 	bool autoFree;
-	int startpos;
-	int size;
+	unsigned long startpos;
+	unsigned long size;
 	char originalfile[_MAX_PATH];
 	_FILE* str;
 public:
@@ -49,7 +49,7 @@ public:
 	CachedFileStream(CachedFileStream* cfs, int startpos, int size,
 		bool autoFree = true);
 	~CachedFileStream(void);
-	int Read(void* dest, int length);
+	int Read(void* dest, unsigned int length);
 	int Seek(int pos, int startpos);
 	unsigned long Size();
 	/** No descriptions */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.9 2004/04/17 12:28:21 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.10 2004/04/18 14:25:58 avenger_teambg Exp $
  *
  */
 
@@ -41,13 +41,14 @@
 
 class GEM_EXPORT DataStream {
 public:
-	int Pos;
+	unsigned long Pos;
 	bool Encrypted;
 	DataStream(void);
 	virtual ~DataStream(void);
-	virtual int Read(void* dest, int len) = 0;
+	virtual int Read(void* dest, unsigned int len) = 0;
 	virtual int Seek(int pos, int startpos) = 0;
 	virtual unsigned long Size() = 0;
+	unsigned long Remains();
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
 	/** No descriptions */

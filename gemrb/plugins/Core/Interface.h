@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.89 2004/04/17 11:28:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.90 2004/04/18 14:26:03 avenger_teambg Exp $
  *
  */
 
@@ -119,6 +119,10 @@ private:
 	int GameFeatures;
 	char ButtonFont[9];
 	char CursorBam[9];
+	unsigned int* slotmatrix; //itemtype vs slottype
+	unsigned int* slottypes;  //slottype vs slot mapping
+	int ItemTypes;
+	int SlotTypes; //this is the same as the inventory size
 public:
 	char GlobalScript[9];
 	char GlobalMap[9];
@@ -305,11 +309,13 @@ public:
 	void LoadGame(int index);
 	/*reads the filenames of the sounds folder into a list */
 	int GetCharSounds(TextArea *ta);
-
+	/*returns true if an itemtype is acceptable for a slottype */
+	bool CanUseItemType(int itype, int slottype);
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);
 	bool LoadINI(const char * filename);
+	bool InitItemTypes();
 public:
 	char GameData[9];
 	char GameOverride[9];

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.6 2004/04/17 19:37:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.7 2004/04/18 14:25:53 avenger_teambg Exp $
  *
  */
 
@@ -87,9 +87,11 @@ void CValueUnpacker::prepare_bits(int bits)
 {
 	while (bits > avail_bits) {
 		unsigned char one_byte;
-		if (!stream->Read( &one_byte, 1 ))
+		//our stream read returns -1 instead of 0 on failure
+		//comparing with 1 will solve annoying interface changes
+		if (stream->Read( &one_byte, 1 )!=1) {
 			one_byte = 0;
-		//if (!fread (&one_byte, 1, 1, file)) one_byte = 0;
+		}
 		next_bits |= ( ( unsigned long ) one_byte << avail_bits );
 		avail_bits += 8;
 	}
@@ -131,6 +133,7 @@ int CValueUnpacker::get_one_block(long* block)
 	for (int pass = 0; pass < sb_size; pass++) {
 		int ind = get_bits( 5 ) & 0x1F;
 		if (!( ( this->*Fillers[ind] ) ( pass, ind ) )) {
+abort();
 			return 0;
 		}
 	}

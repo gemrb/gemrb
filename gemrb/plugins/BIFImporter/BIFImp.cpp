@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.10 2004/02/24 22:20:43 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.11 2004/04/18 14:25:58 avenger_teambg Exp $
  *
  */
 
@@ -46,97 +46,90 @@ BIFImp::~BIFImp(void)
 	}
 }
 
-int BIFImp::OpenArchive(char* filename, bool cacheCheck)
+int BIFImp::OpenArchive(char* filename)
 {
-	DataStream* stmp;
 	if (stream) {
 		delete( stream );
 		stream = NULL;
 	}
-	FILE* t = fopen( filename, "rb" );
-	char Signature[8];
-	fread( &Signature, 1, 8, t );
-	if (strncmp( Signature, "BIFF", 4 ) == 0) {
-		cacheCheck = true;
-	} else {
-		cacheCheck = false;
+	FILE* in_cache = fopen( filename, "rb" );
+	if( !in_cache) {
+		return GEM_ERROR;
 	}
-	fclose( t );
-	if (cacheCheck) {
-		//printf("Checking Cache\n");
+	char Signature[8];
+	fread( &Signature, 1, 8, in_cache );
+	//normal bif, not in cache
+	if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
+		fclose( in_cache );
 		stream = new CachedFileStream( filename );
 		stream->Read( Signature, 8 );
-	} else {
-		FileStream* s = new FileStream();
-		s->Open( filename, true );
-		stmp = s;
-		stmp->Read( Signature, 8 );
-	}
-	if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
-		//printf("Uncompressed File Found\n");
 		strcpy( path, filename );
 		ReadBIF();
-	} else if (strncmp( Signature, "BIF V1.0", 8 ) == 0) {
-		//printf("'BIF V1.0' File Found\n");
+		return GEM_OK;
+	}
+	//not found as normal bif
+	//checking compression type
+	FileStream* compressed = new FileStream();
+	compressed->Open( filename, true );
+	compressed->Read( Signature, 8 );
+	if (strncmp( Signature, "BIF V1.0", 8 ) == 0) {
 		unsigned long fnlen, complen, declen;
-		stmp->Read( &fnlen, 4 );
+		compressed->Read( &fnlen, 4 );
 		char* fname = ( char* ) malloc( fnlen );
-		stmp->Read( fname, fnlen );
-		stmp->Read( &declen, 4 );
-		stmp->Read( &complen, 4 );
+		compressed->Read( fname, fnlen );
+		compressed->Read( &declen, 4 );
+		compressed->Read( &complen, 4 );
 		strcpy( path, core->CachePath );
 		strcat( path, fname );
 		free( fname );
-		FILE* tmp = fopen( path, "rb" );
-		if (tmp) {
+		in_cache = fopen( path, "rb" );
+		if (in_cache) {
 			//printf("Found in Cache\n");
-			fclose( tmp );
-			delete( stmp );
+			fclose( in_cache );
+			delete( compressed );
 			stream = new CachedFileStream( path );
 			stream->Read( Signature, 8 );
 			if (strncmp( Signature, "BIFFV1  ", 8 ) == 0)
 				ReadBIF();
 			else
 				return GEM_ERROR;
-		} else {
-			printf( "Decompressing\n" );
-			if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID ))
-				return GEM_ERROR;
-			tmp = fopen( path, "wb" );
-			Compressor* comp = ( Compressor* )
-				core->GetInterface( IE_COMPRESSION_CLASS_ID );
-			comp->Decompress( tmp, stmp );
-			core->FreeInterface( comp );
-			fclose( tmp );
-			delete( stmp );
-			if (stream)
-				printf( "DANGER WILL ROBINSON!!! stream != NULL in BIFImp line 96, possible File Pointer Leak..." );
-			stream = new CachedFileStream( path );
-			stream->Read( Signature, 8 );
-			if (strncmp( Signature, "BIFFV1  ", 8 ) == 0)
-				ReadBIF();
-			else
-				return GEM_ERROR;
+			return GEM_OK;
 		}
-	} else if (strncmp( Signature, "BIFCV1.0", 8 ) == 0) {
+		printf( "Decompressing\n" );
+		if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID ))
+			return GEM_ERROR;
+		in_cache = fopen( path, "wb" );
+		Compressor* comp = ( Compressor* )
+			core->GetInterface( IE_COMPRESSION_CLASS_ID );
+		comp->Decompress( in_cache, compressed );
+		core->FreeInterface( comp );
+		fclose( in_cache );
+		delete( compressed );
+		stream = new CachedFileStream( path );
+		stream->Read( Signature, 8 );
+		if (strncmp( Signature, "BIFFV1  ", 8 ) == 0)
+			ReadBIF();
+		else
+			return GEM_ERROR;
+		return GEM_OK;
+	}
+
+	if (strncmp( Signature, "BIFCV1.0", 8 ) == 0) {
 		//printf("'BIFCV1.0' Compressed File Found\n");
-		char cpath[_MAX_PATH];
-		strcpy( cpath, core->CachePath );
-		strcat( cpath, stmp->filename );
-		FILE* exist_in_cache = fopen( cpath, "rb" );
-		if (exist_in_cache) {
+		strcpy( path, core->CachePath );
+		strcat( path, compressed->filename );
+		in_cache = fopen( path, "rb" );
+		if (in_cache) {
 			//printf("Found in Cache\n");
-			fclose( exist_in_cache );
-			delete( stmp );
-			if (stream)
-				printf( "DANGER WILL ROBINSON!!! stream != NULL in BIFImp line 116, possible File Pointer Leak..." );
-			stream = new CachedFileStream( cpath );
+			fclose( in_cache );
+			delete( compressed );
+			stream = new CachedFileStream( path );
 			stream->Read( Signature, 8 );
 			if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
 				ReadBIF();				
-				return GEM_OK;
 			} else
 				return GEM_ERROR;
+			return GEM_OK;
 		}
 		printf( "Decompressing\n" );
 		if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID ))
@@ -144,46 +137,44 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 		Compressor* comp = ( Compressor* )
 			core->GetInterface( IE_COMPRESSION_CLASS_ID );
 		int unCompBifSize;
-		stmp->Read( &unCompBifSize, 4 );
+		compressed->Read( &unCompBifSize, 4 );
 		printf( "\nDecompressing file: [..........]" );
+		fflush(stdout);
 		char fname[_MAX_PATH];
 		ExtractFileFromPath( fname, filename );
 		strcpy( path, core->CachePath );
 		strcat( path, fname );
-		t = fopen( path, "wb" );
+		in_cache = fopen( path, "wb" );
 		int finalsize = 0;
 		int laststep = 0;
 		while (finalsize < unCompBifSize) {
-			stmp->Seek( 8, GEM_CURRENT_POS );
-			comp->Decompress( t, stmp );
-			finalsize = ftell( t );
+			compressed->Seek( 8, GEM_CURRENT_POS );
+			comp->Decompress( in_cache, compressed );
+			finalsize = ftell( in_cache );
 			if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
 				laststep++;
-				printf( "\b\b\b\b\b\b\b\b\b\b\b" );
+				printf( "\r" );
 				for (int l = 0; l < laststep; l++)
 					printf( "|" );
 				for (int l = laststep; l < 10; l++)
 					printf( "." );
 				printf( "]" );
+				fflush(stdout);
 			}
 		}
 		printf( "\n" );
 		core->FreeInterface( comp );
-		fclose( t );
-		delete( stmp );
-		strcpy( filename, path );
-		if (stream)
-			printf( "DANGER WILL ROBINSON!!! stream != NULL in BIFImp line 116, possible File Pointer Leak..." );
-		stream = new CachedFileStream( filename );
+		fclose( in_cache );
+		delete( compressed );
+		stream = new CachedFileStream( path );
 		stream->Read( Signature, 8 );
 		if (strncmp( Signature, "BIFFV1  ", 8 ) == 0)
 			ReadBIF();
 		else
 			return GEM_ERROR;
-	} else {
-		return GEM_ERROR;
 	}
-	return GEM_OK;
+	delete (compressed);
+	return GEM_ERROR;
 }
 
 DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
@@ -194,7 +185,7 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 		for (unsigned long i = 0; i < tentcount; i++) {
 			if (( tentries[i].resLocator & 0xFC000 ) == srcResLoc) {
 				s = new CachedFileStream( stream, tentries[i].dataOffset,
-							tentries[i].fileSize );
+							tentries[i].tileSize * tentries[i].tilesCount );
 				break;
 			}
 		}

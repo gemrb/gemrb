@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.18 2004/04/14 23:53:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.19 2004/04/18 14:25:57 avenger_teambg Exp $
  *
  */
 
@@ -73,8 +73,9 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 		FILE* exist_in_cache = fopen( cpath, "rb" );
 		if (exist_in_cache) {
 			//File was previously cached, using local copy
-			if (autoFree)
+			if (autoFree) {
 				delete( str );
+			}
 			fclose( exist_in_cache );
 			FileStream* s = new FileStream();
 			s->Open( cpath );
@@ -83,7 +84,7 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 		} else {
 			//No file found in Cache, Decompressing and storing for further use
 			str->Seek( 4, GEM_CURRENT_POS );
-			//TODO: Decompress Bam File
+
 			if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID )) {
 				printf( "No Compression Manager Available.\nCannot Load Compressed Bam File.\n" );
 				return false;
@@ -105,8 +106,6 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 	if (strncmp( Signature, "BAM V1  ", 8 ) != 0) {
 		return false;
 	}
-	//frames.clear();
-	//cycles.clear();
 	str->Read( &FramesCount, 2 );
 	str->Read( &CyclesCount, 1 );
 	str->Read( &CompressedColorIndex, 1 );
@@ -116,20 +115,16 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 	str->Seek( FramesOffset, GEM_STREAM_START );
 	frames = new FrameEntry[FramesCount];
 	for (unsigned int i = 0; i < FramesCount; i++) {
-		//FrameEntry fe;
 		str->Read( &frames[i].Width, 2 );
 		str->Read( &frames[i].Height, 2 );
 		str->Read( &frames[i].XPos, 2 );
 		str->Read( &frames[i].YPos, 2 );
 		str->Read( &frames[i].FrameData, 4 );
-		//frames.push_back(fe);
 	}
 	cycles = new CycleEntry[CyclesCount];
 	for (unsigned int i = 0; i < CyclesCount; i++) {
-		//CycleEntry ce;
 		str->Read( &cycles[i].FramesCount, 2 );
 		str->Read( &cycles[i].FirstFrame, 2 );
-		//cycles.push_back(ce);
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < 256; i++) {
@@ -179,44 +174,10 @@ Animation* BAMImp::GetAnimation(unsigned char Cycle, int x, int y,
 
 Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 {
-	if (findex >= FramesCount) {
-		findex = 0;
-	}
-	str->Seek( ( frames[findex].FrameData & 0x7FFFFFFF ), GEM_STREAM_START );
-	unsigned long pixelcount = frames[findex].Height * frames[findex].Width;
-	void* pixels = malloc( pixelcount );
-	bool RLECompressed = ( ( frames[findex].FrameData & 0x80000000 ) == 0 );
-	if (RLECompressed) {
-		//if RLE Compressed
-		unsigned long RLESize;
-		/*if((findex+1) >= frames.size())
-							RLESize = str->Size() - (frames[findex].FrameData & 0x7FFFFFFF);
-						else
-							RLESize = (frames[findex+1].FrameData & 0x7FFFFFFF) - (frames[findex].FrameData & 0x7FFFFFFF);*/
-		RLESize = ( unsigned long )
-			ceil( frames[findex].Width * frames[findex].Height * 1.5 );
-		void* inpix = malloc( RLESize );
-		unsigned char * p = ( unsigned char * ) inpix;
-		unsigned char * Buffer = ( unsigned char * ) pixels;
-		str->Read( inpix, RLESize );
-		unsigned int i = 0;
-		while (i < pixelcount) {
-			if (*p == 0) {
-				p++;
-				memset( &Buffer[i], 0, ( *p ) + 1 );
-				i += *p;
-			} else
-				Buffer[i] = *p;
-			p++;
-			i++;
-		}
-		free( inpix );
-	} else {
-		str->Read( pixels, pixelcount );
-	}
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8( frames[findex].Width,
-												frames[findex].Height, 8,
-												pixels, Palette, true, 0 );
+	void* pixels = GetFramePixels(findex, mode);
+	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(
+		frames[findex].Width, frames[findex].Height, 8,
+		pixels, Palette, true, 0 );
 	spr->XPos = frames[findex].XPos;
 	spr->YPos = frames[findex].YPos;
 	if (mode == IE_SHADED) {
@@ -238,16 +199,27 @@ void* BAMImp::GetFramePixels(unsigned short findex, unsigned char mode)
 	if (RLECompressed) {
 		//if RLE Compressed
 		unsigned long RLESize;
-		/*if((findex+1) >= frames.size())
-							RLESize = str->Size() - (frames[findex].FrameData & 0x7FFFFFFF);
-						else
-							RLESize = (frames[findex+1].FrameData & 0x7FFFFFFF) - (frames[findex].FrameData & 0x7FFFFFFF);*/
 		RLESize = ( unsigned long )
 			ceil( frames[findex].Width * frames[findex].Height * 1.5 );
+		//without partial reads, we should be careful
+		unsigned long remains = str->Remains();
+		if (RLESize > remains) {
+			RLESize = remains;
+		}
 		void* inpix = malloc( RLESize );
 		unsigned char * p = ( unsigned char * ) inpix;
 		unsigned char * Buffer = ( unsigned char * ) pixels;
-		str->Read( inpix, RLESize );
+		if (str->Read( inpix, RLESize ) == GEM_ERROR) {
+			free( inpix );
+printf("rlesize: %d remains: %d\n",RLESize, remains);
+printf("frameindex: %d\n",findex);
+printf("frame sizes: %d  %d\n",frames[findex].Width, frames[findex].Height);
+printf("rle frame size: %d\n",(unsigned long) ceil(frames[findex].Width* frames[findex].Height*1.5) );
+printf("Filesize/remains: %d/%d\n(aborting)\n",str->Size(), str->Remains() );
+
+abort();
+			return NULL;
+		}
 		unsigned int i = 0;
 		while (i < pixelcount) {
 			if (*p == 0) {
@@ -309,8 +281,6 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 /** This function will load the Animation as a Font */
 Font* BAMImp::GetFont()
 {
-	//printf("Start Getting Font\n");
-	//printf("Calculating Font Buffer Max Size...");
 	int w = 0, h = 0;
 	for (unsigned int i = 0; i < CyclesCount; i++) {
 		unsigned int index = cycles[i].FirstFrame;
@@ -322,7 +292,6 @@ Font* BAMImp::GetFont()
 		if (frames[index].Height > h)
 			h = frames[index].Height;
 	}
-	//printf("[maxW = %d, maxH = %d]\n", w, h);
 	Font* fnt = new Font( w*( int ) CyclesCount, h, Palette, true, 0 );
 	for (unsigned int i = 0; i < CyclesCount; i++) {
 		if (cycles[i].FirstFrame >= FramesCount) {
@@ -330,13 +299,18 @@ Font* BAMImp::GetFont()
 			continue;
 		}
 		void* pixels = GetFramePixels( cycles[i].FirstFrame );
+		if( !pixels) {
+printf("Can't get framepixels: firstframe: %d\n",cycles[i].FirstFrame);
+abort();
+			fnt->AddChar( NULL, 0, 0, 0, 0 );
+			continue;
+		}
 		fnt->AddChar( pixels, frames[cycles[i].FirstFrame].Width,
 				frames[cycles[i].FirstFrame].Height,
 				frames[cycles[i].FirstFrame].XPos,
-				frames[cycles[i].FirstFrame].YPos );//GetFrame(cycles[i].FirstFrame, 0));
+				frames[cycles[i].FirstFrame].YPos );
 		free( pixels );
 	}
-	//printf("Font Created\n");
 	return fnt;
 }
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
@@ -348,6 +322,5 @@ Sprite2D* BAMImp::GetPalette()
 	for (int i = 0; i < 256; i++) {
 		*p++ = ( unsigned char ) i;
 	}
-	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, Palette,
-									false );
+	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, Palette, false );
 }

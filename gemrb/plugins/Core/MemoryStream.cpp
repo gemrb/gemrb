@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.14 2004/04/17 11:44:41 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.15 2004/04/18 14:26:03 avenger_teambg Exp $
  *
  */
 
@@ -38,7 +38,7 @@ MemoryStream::~MemoryStream(void)
 	}
 }
 
-int MemoryStream::Read(void* dest, int length)
+int MemoryStream::Read(void* dest, unsigned int length)
 {
 	if (length + Pos > this->length) {
 		return GEM_ERROR;
@@ -52,25 +52,19 @@ int MemoryStream::Read(void* dest, int length)
 	return GEM_OK;
 }
 
-int MemoryStream::Seek(int arg_pos, int startpos)
+int MemoryStream::Seek(int newpos, int type)
 {
-	switch (startpos) {
+	switch (type) {
 		case GEM_CURRENT_POS:
-			 {
-				if (( Pos + arg_pos ) < 0)
-					return GEM_ERROR;
-				if (( Pos + arg_pos ) >= length)
-					return GEM_ERROR;
-				Pos += arg_pos;
-			}
+			if (( Pos + newpos ) >= length)
+				return GEM_ERROR;
+			Pos += newpos;
 			break;
 
 		case GEM_STREAM_START:
-			 {
-				if (arg_pos >= length)
-					return GEM_ERROR;
-				Pos = arg_pos;
-			}
+			if ((unsigned long) newpos >= length)
+				return GEM_ERROR;
+			Pos = newpos;
 			break;
 
 		default:

@@ -15,15 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.13 2004/04/17 22:23:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.14 2004/04/18 14:26:03 avenger_teambg Exp $
  *
  */
 
 #include <stdio.h>
 #include "../../includes/win32def.h"
 #include "Inventory.h"
-
-static int Inited=-1;
 
 Inventory::Inventory()
 {

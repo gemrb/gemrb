@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.25 2004/04/17 12:28:21 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.26 2004/04/18 14:25:58 avenger_teambg Exp $
  *
  */
 
@@ -63,7 +63,7 @@ bool FileStream::Open(const char* filename, bool autoFree)
 	startpos = 0;
 	opened = true;
 	_fseek( str, 0, SEEK_END );
-	size = _ftell( str ) + 1;
+	size = _ftell( str );
 	_fseek( str, 0, SEEK_SET );
 	ExtractFileFromPath( this->filename, filename );
 	Pos = 0;
@@ -95,15 +95,17 @@ bool FileStream::Open(_FILE* stream, int startpos, int size, bool autoFree)
 	return true;
 }
 
-int FileStream::Read(void* dest, int length)
+int FileStream::Read(void* dest, unsigned int length)
 {
 	if (!opened) {
 		return GEM_ERROR;
 	}
+	//we don't allow partial reads anyway, so it isn't a problem that
+	//i don't adjust length here (partial reads are evil)
+	if(Pos+length>size ) {
+		return GEM_ERROR;
+	}
 	size_t c = _fread( dest, 1, length, str );
-	//if(feof(str)) { /* slightly modified by brian  oct 11 2003*/
-	//	return GEM_EOF;
-	//}
 	if (c != length) {
 		return GEM_ERROR;
 	}
@@ -114,24 +116,28 @@ int FileStream::Read(void* dest, int length)
 	return c;
 }
 
-int FileStream::Seek(int pos, int startpos)
+int FileStream::Seek(int newpos, int type)
 {
 	if (!opened) {
 		return GEM_ERROR;
 	}
-	switch (startpos) {
+	switch (type) {
 		case GEM_CURRENT_POS:
-			_fseek( str, pos, SEEK_CUR );
-			Pos += pos;
+			_fseek( str, newpos, SEEK_CUR );
+			Pos += newpos;
 			break;
 
 		case GEM_STREAM_START:
-			_fseek( str, this->startpos + pos, SEEK_SET );
-			Pos = pos;
+			_fseek( str, startpos + newpos, SEEK_SET );
+			Pos = newpos;
 			break;
 
 		default:
 			return GEM_ERROR;
+	}
+	if (Pos>=size) {
+abort();
+		return GEM_ERROR;
 	}
 	return GEM_OK;
 }

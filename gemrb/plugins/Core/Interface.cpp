@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.157 2004/04/17 19:37:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.158 2004/04/18 14:25:58 avenger_teambg Exp $
  *
  */
 
@@ -82,6 +82,8 @@ Interface::Interface(int iargc, char** iargv)
 	pathfinder = NULL;
 	timer = NULL;
 	console = NULL;
+	slotmatrix = NULL;
+	slottypes = NULL;
 
 	pal256 = NULL;
 	pal16 = NULL;
@@ -155,6 +157,9 @@ Interface::Interface(int iargc, char** iargv)
 
 Interface::~Interface(void)
 {
+	if (slotmatrix) {
+		free( slotmatrix );
+	}
 	if (game) {
 		delete( game );
 	}
@@ -328,11 +333,13 @@ int Interface::Init()
 			int needpalette = atoi( tab->QueryField( i, 1 ) );
 			DataStream* fstr = key->GetResource( ResRef, IE_BAM_CLASS_ID );
 			if (!anim->Open( fstr, true )) {
-				printStatus( "ERROR", LIGHT_RED );
 				delete( fstr );
 				continue;
 			}
 			Font* fnt = anim->GetFont();
+			if (!fnt) {
+				continue;
+			}
 			strncpy( fnt->ResRef, ResRef, 8 );
 			if (needpalette) {
 				Color fore = {0xff, 0xff, 0xff, 0x00},
@@ -374,8 +381,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 	strcpy( NextScript, "Start" );
 	AnimationFactory* af = ( AnimationFactory* )
-		GetResourceMgr()->GetFactoryResource( CursorBam,
-							IE_BAM_CLASS_ID );
+		GetResourceMgr()->GetFactoryResource( CursorBam, IE_BAM_CLASS_ID );
 	printMessage( "Core", "Setting up the Console...", WHITE );
 	ChangeScript = true;
 	console = new Console();
@@ -427,8 +433,6 @@ int Interface::Init()
 		}
 		GameNameResRef[i] = 0;
 	}
-	// FIXME: ugly hack
-//	vars->SetAt( strdup( "SkipIntroVideos" ), (unsigned long)SkipIntroVideos );
 	//no need of strdup, variables do copy the key!
 	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
 	printStatus( "OK", LIGHT_GREEN );
@@ -521,6 +525,15 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
+	bool ret = InitItemTypes();
+	printMessage( "Core", "Initializing Inventory Management...", WHITE );
+	if(ret) {
+		printStatus( "OK", LIGHT_GREEN );
+	}
+	else {
+		printStatus( "ERROR", LIGHT_RED );
+	}
+
 	printMessage( "Core", "Core Initialization Complete!\n", WHITE );
 	return GEM_OK;
 }
@@ -969,11 +982,9 @@ Font* Interface::GetFont(char* ResRef)
 	//printf("Searching Font %.8s...", ResRef);
 	for (unsigned int i = 0; i < fonts.size(); i++) {
 		if (strncmp( fonts[i]->ResRef, ResRef, 8 ) == 0) {
-			//printf("[FOUND]\n");
 			return fonts[i];
 		}
 	}
-	//printf("[NOT FOUND]\n");
 	return NULL;
 }
 
@@ -1776,3 +1787,73 @@ GameControl *Interface::GetGameControl()
 	}
 	return (GameControl *) gc;
 }
+
+bool Interface::InitItemTypes()
+{
+	if (slotmatrix) {
+		free(slotmatrix);
+	}
+	int ItemTypeTable = core->LoadTable( "itemtype" );
+	TableMgr *it = core->GetTable(ItemTypeTable);
+
+	ItemTypes = 0;
+	if(it) {
+		ItemTypes = it->GetRowCount(); //number of itemtypes
+		if (ItemTypes<0) {
+			ItemTypes = 0;
+		}
+		int InvSlotTypes = it->GetColumnCount();
+		if (InvSlotTypes > 32) { //bit count limit
+			InvSlotTypes = 32;
+		}
+		//make sure unsigned int is 32 bits
+		slotmatrix = (unsigned int *) malloc(ItemTypes * sizeof(unsigned int) );
+		for (int i=0;i<ItemTypes;i++) {
+			unsigned int value = 0;
+			unsigned int k = 1;
+			for (int j=0;j<InvSlotTypes;j++) {
+				if (strtol(it->QueryField(i,j),NULL,0) ) {
+					value |= k;
+				}
+				k <<= 1;
+			}
+			slotmatrix[i] = value;
+		}
+		core->DelTable(ItemTypeTable);
+	}
+
+	//slottype describes the inventory structure
+	int SlotTypeTable = core->LoadTable( "slottype" );
+	TableMgr *st = core->GetTable(SlotTypeTable);
+	if (slottypes) {
+		free(slottypes);
+	}
+	SlotTypes = 0;
+	if(st) {
+		SlotTypes = st->GetColumnCount();
+		//make sure unsigned int is 32 bits
+		slottypes = (unsigned int *) malloc(SlotTypes * sizeof(unsigned int) );
+		// FIXME: read in slottype info
+		//
+		for (int i=0;i<SlotTypes;i++) {
+			slottypes[i] = strtol(it->QueryField(i),NULL,0 );
+		}
+		core->DelTable(SlotTypeTable);
+	}
+	return (it && st);
+}
+
+bool Interface::CanUseItemType(int itype, int slottype)
+{
+	if( !slottype ) { 
+		//inventory slot, can hold any item, including invalid
+		return true;
+	}
+	if( itype>=ItemTypes ) {
+		//invalid itemtype
+		return false;
+	}
+	//if any bit is true, we return true (int->bool conversion)
+	return slotmatrix[itype]&slottype;
+}
+

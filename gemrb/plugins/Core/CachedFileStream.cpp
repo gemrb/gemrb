@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.25 2004/04/17 12:43:07 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.26 2004/04/18 14:25:58 avenger_teambg Exp $
  *
  */
 
@@ -67,7 +67,7 @@ CachedFileStream::CachedFileStream(char* stream, bool autoFree)
 	core->CachedFileStreamPtrCount++;
 #endif
 	startpos = 0;
-	_fseek( str, 0, SEEK_END );
+	_fseek( str, 0, SEEK_END ); 
 	size = _ftell( str );
 	_fseek( str, 0, SEEK_SET );
 	strcpy( filename, fname );
@@ -110,13 +110,16 @@ CachedFileStream::~CachedFileStream(void)
 	autoFree = false; //File stream destructor hack
 }
 
-int CachedFileStream::Read(void* dest, int length)
+int CachedFileStream::Read(void* dest, unsigned int length)
 {
+	//we don't allow partial reads anyway, so it isn't a problem that
+	//i don't adjust length here (partial reads are evil)
+	if(Pos+length>size ) {
+		return GEM_ERROR;
+	}
+
 	size_t c = _fread( dest, 1, length, str );
 	if (c != length) {
-		if (_feof( str )) {
-			return GEM_EOF;
-		}
 		return GEM_ERROR;
 	}
 	if (Encrypted) {
@@ -126,21 +129,26 @@ int CachedFileStream::Read(void* dest, int length)
 	return c;
 }
 
-int CachedFileStream::Seek(int pos, int startpos)
+int CachedFileStream::Seek(int newpos, int type)
 {
-	switch (startpos) {
+	switch (type) {
 		case GEM_CURRENT_POS:
-			_fseek( str, pos, SEEK_CUR );
-			Pos += pos;
+			_fseek( str, newpos, SEEK_CUR );
+			Pos += newpos;
 			break;
 
 		case GEM_STREAM_START:
-			_fseek( str, this->startpos + pos, SEEK_SET );
-			Pos = pos;
+			_fseek( str, startpos + newpos, SEEK_SET );
+			Pos = newpos;
 			break;
 
 		default:
 			return GEM_ERROR;
+	}
+	//we went past the buffer
+	if(Pos>=size) {
+abort();
+		return GEM_ERROR;
 	}
 	return GEM_OK;
 }
