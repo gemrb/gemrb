@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.28 2004/01/02 19:57:38 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.29 2004/01/02 20:21:52 avenger_teambg Exp $
  *
  */
 
@@ -244,7 +244,7 @@ void MUSImp::PlayNext()
 			}
 		}
 		else {
-			if(playlist[PLnext].PLEnd[0] == 1)
+			if(stricmp(playlist[PLnext].PLEnd,"end")==0)
 				PLnext = -1;
 			else
 				PLnext=PLpos+1;
