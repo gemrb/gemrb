@@ -36,7 +36,6 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	initpalette = core->GetVideoDriver()->CreatePalette(initcolor, lowtextcolor);
 	Color tmp = {hitextcolor.b, hitextcolor.g, hitextcolor.r, 0};
 	selected = core->GetVideoDriver()->CreatePalette(tmp, lowtextcolor);
-	selected = NULL;
 }
 
 TextArea::~TextArea(void)
