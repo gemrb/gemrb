@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.16 2003/12/07 09:38:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.17 2003/12/07 12:16:47 avenger_teambg Exp $
  *
  */
 
@@ -175,6 +175,16 @@ bool MUSImp::OpenPlaylist(const char * name)
 			strcat(FName, ".acm");
 			printf("Loading: %s\n",FName);
 			pls.soundID = core->GetSoundMgr()->LoadFile(FName);
+			if((pls.soundID==-1) && core->CaseSensitive) {
+				strcpy(FName, core->GamePath);
+				strcat(FName, musicsubfolder);
+				strcat(FName, SPathDelimiter);
+				char *NewName = FindInDir(FName, PLName);
+				if(NewName) {
+					strcat(FName, NewName);
+					free(NewName);
+				}
+			}
 		}
 		playlist.push_back(pls);
 		count--;
