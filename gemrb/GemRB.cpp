@@ -1,7 +1,10 @@
 // GemRB.cpp : Defines the entry point for the application.
 //
 
+#define GEM_APP
+
 #include "stdio.h"
+#include "includes/win32def.h"
 #include "plugins/Core/Interface.h"
 #include "plugins/Core/Video.h"
 #include "plugins/Core/ResourceMgr.h"
@@ -11,7 +14,7 @@
 #include "plugins/Core/WindowMgr.h"
 
 #ifndef WIN32
-extern Interface * core;
+//extern Interface * core;
 #include <sys/time.h>
 #else
 #include <windows.h>
@@ -20,7 +23,7 @@ extern Interface * core;
 int main(int argc, char ** argv)
 {
 	core = new Interface();
-	if(core->Init() == GEM_ERROR) {
+ 	if(core->Init() == GEM_ERROR) {
 		delete(core);
 		return -1;
 	}
@@ -57,23 +60,31 @@ int main(int argc, char ** argv)
 	//core->GetVideoDriver()->MoveViewportTo(3741,2801);
 	//Region rgn(0,0,200,200);
 	//Color rcol = {0,0xff,0,0};
+	printMessage("GemRB", "Looking for a Window Manager...", WHITE);
 	WindowMgr * wmgr = (WindowMgr*)core->GetInterface(IE_CHU_CLASS_ID);
 	if(wmgr == NULL) {
-		printf("No WindowMgr present...");
+		printStatus("ERROR", LIGHT_RED);
+		printf("No WindowMgr present...\n");
 		delete(core);
 		return -1;
 	}
-	DataStream * chu = core->GetResourceMgr()->GetResource("GUIOPT\0", IE_CHU_CLASS_ID);
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("GemRB", "Loading GUI File...\n", WHITE);
+	DataStream * chu = core->GetResourceMgr()->GetResource("GUIW\0", IE_CHU_CLASS_ID);
 	if(chu == NULL) {
-		printf("No CHUFile present...");
+		printMessage("GemRB", "Error loading GUI File\n", LIGHT_RED);
+		printf("No CHUFile present...\n");
 		delete(core);
 		return -1;
 	}
+	printMessage("GemRB", "GUI File Loaded!\n", LIGHT_GREEN);
+	textcolor(WHITE);
 	wmgr->Open(chu, true);
-	Window * win[3];
-	win[0] = wmgr->GetWindow(6);
-	win[1] = wmgr->GetWindow(0);
-	win[2] = wmgr->GetWindow(1);
+	Window * win[1];
+	win[0] = wmgr->GetWindow(9);
+	core->GetEventMgr()->AddWindow(win[0]);
+	//win[1] = wmgr->GetWindow(0);
+	//win[2] = wmgr->GetWindow(1);
 	//Window * win2 = wmgr->GetWindow(1);
 	//Window * win3 = wmgr->GetWindow(2);
 	Font * fps = core->GetFont("NORMAL\0");
@@ -91,7 +102,7 @@ int main(int argc, char ** argv)
 		//win->DrawWindow();
 		//win2->DrawWindow();
 		//win3->DrawWindow();
-		for(int i = 0; i < 3; i++) {
+		for(int i = 0; i < 1; i++) {
 			win[i]->DrawWindow();
 		}
 		frame++;
@@ -112,7 +123,7 @@ int main(int argc, char ** argv)
 	//core->GetVideoDriver()->FreeSprite(img);
 	//core->FreeInterface(mm);
 	core->FreeInterface(wmgr);
-	for(int i = 0; i < 3; i++) {
+	for(int i = 0; i < 1; i++) {
 		win[i]->release();
 	}
 	delete(core);
