@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.34 2004/08/09 18:24:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.35 2004/08/10 20:02:07 avenger_teambg Exp $
  *
  */
 
@@ -48,7 +48,6 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 	if (str) {
 		return false;
 	}
-	core->LoadProgress(0);
 	str = stream;
 	this->autoFree = autoFree;
 	char Signature[8];
@@ -85,7 +84,6 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 		return false;
 	}
 
-	core->LoadProgress(5);
 	return true;
 }
 
@@ -157,7 +155,6 @@ Game* GAMImp::GetGame()
 		newGame->CurrentArea[8] = 0;
 	}
 
-	core->LoadProgress(10);
 	//Loading PCs
 	ActorMgr* aM = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
 	for (i = 0; i < newGame->PCCount; i++) {
@@ -174,7 +171,6 @@ Game* GAMImp::GetGame()
 	}
 	core->FreeInterface( aM );
 
-	core->LoadProgress(15);
 	//Loading GLOBALS
 	char Name[33];
 	Name[32] = 0;
@@ -216,7 +212,6 @@ Game* GAMImp::GetGame()
 		str->Read( newGame->familiars, beasts_count );
 	}
 
-	core->LoadProgress(20);
 	return newGame;
 }
 

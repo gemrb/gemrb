@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.3 2004/08/10 17:13:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.4 2004/08/10 20:02:06 avenger_teambg Exp $
  *
  */
 
@@ -27,10 +27,9 @@ extern Interface* core;
 
 Progressbar::Progressbar( unsigned short KnobStepsCount, bool Clear)
 {
-	Value = KnobStepsCount;
 	BackGround = NULL;
 	this->Clear = Clear;
-	Pos = 0;
+	this->KnobStepsCount = KnobStepsCount;
 	PBarAnim = NULL;
 }
 
@@ -63,34 +62,34 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 	}
 	Sprite2D *bcksprite;
 
-	if(Pos >= 100) bcksprite=BackGround2;
+	if(Value >= 100) bcksprite=BackGround2;
 	else bcksprite=BackGround;
 	if (bcksprite) {
 		Region r( x + XPos, y + YPos, Width, Height );
 		core->GetVideoDriver()->BlitSprite( bcksprite,
 			x + XPos, y + YPos, true, &r );
 	}
-	if(!PBarAnim || Pos>=100)
+	if(!PBarAnim || (Value>=100) )
 		return;
 	//blitting all the sprites
-	unsigned int Count=Value*Pos/100;
+	unsigned int Count=Value*KnobStepsCount/100;
 	for(unsigned int i=0; i<Count ;i++ ) {
 		Sprite2D *Knob = PBarAnim->GetFrame(i);
-		core->GetVideoDriver()->BlitSprite( Knob, x + XPos, y + YPos, true );
+		core->GetVideoDriver()->BlitSprite( Knob, x , y , true );
 	}
 }
 
 /** Returns the actual Progressbar Position */
 unsigned int Progressbar::GetPosition()
 {
-	return Pos;
+	return Value;
 }
 
 /** Sets the actual Progressbar Position trimming to the Max and Min Values */
 void Progressbar::SetPosition(unsigned int pos)
 {
 	if(pos>100) pos=100;
-	Pos = pos;
+	Value = pos;
 	Changed = true;
 }
 
@@ -99,7 +98,7 @@ void Progressbar::RedrawProgressbar(char* VariableName, int Sum)
         if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
                 return;
         }
-	SetPosition(Sum);
+	SetPosition((unsigned int) Sum);
 }
 
 /** Sets the selected image */

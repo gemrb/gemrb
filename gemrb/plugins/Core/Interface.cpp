@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.192 2004/08/10 17:13:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.193 2004/08/10 20:02:06 avenger_teambg Exp $
  *
  */
 
@@ -2012,6 +2012,7 @@ void Interface::LoadGame(int index)
 
 	// Yes, it uses goto. Other ways were too awkward for me.
 
+	tokens->RemoveAll(); //clearing the token dictionary
 	DataStream* gam_str = NULL;
 	DataStream* sav_str = NULL;
 	DataStream* wmp_str = NULL;
