@@ -1,6 +1,10 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#ifndef WIN32
+#include <config.h>
+#endif
+
 typedef unsigned long ulong;
 typedef unsigned char Byte;
 typedef unsigned long DWORD;
@@ -11,15 +15,12 @@ typedef unsigned long DWORD;
 
 #define VERSION_GEMRB ((GEMRB_RELEASE<<16)+(GEMRB_API_NUM<<8)+GEMRB_SDK_REV)
 
-#ifndef WIN32
-#define _MAX_PATH FILENAME_MAX
-#endif
-
 #ifndef GLOBALS_ONLY_DEFS
 
 #include "stdlib.h"
 #include "stdio.h"
 #include "errors.h"
+#include "win32def.h"
 #include "SClassID.h"
 #include "../plugins/Core/Class_ID.h"
 #include "../plugins/Core/ClassDesc.h"
