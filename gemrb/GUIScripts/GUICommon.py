@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.1 2004/09/28 14:13:58 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.2 2004/12/05 09:50:06 avenger_teambg Exp $
 
 
 # GUICommon.py - common functions for GUIScripts of all game types
@@ -38,4 +38,23 @@ def CloseOtherWindow (NewWindowFn):
 		OtherWindowFn = NewWindowFn
 		return 0
 
+def GetLearnableMageSpells (Kit, Alignment, Level):
+	Learnable =[]
+	for i in range(99):
+		SpellName = "SPWI%d%02d"%(Level,i)
+		ms = GemRB.GetSpell(SpellName)
+		if ms == None:
+			continue
+		Learnable.append (ms['SpellResRef'])
+	return Learnable
+
+def GetLearnablePriestSpells (Kit, Alignment, Level):
+	Learnable =[]
+	for i in range(99):
+		SpellName = "SPPR%d%02d"%(Level,i)
+		ms = GemRB.GetSpell(SpellName)
+		if ms == None:
+			continue
+		Learnable.append (ms['SpellResRef'])
+	return Learnable
 
