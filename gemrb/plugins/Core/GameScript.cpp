@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.29 2004/01/04 00:24:55 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.30 2004/01/04 15:23:47 balrog994 Exp $
  *
  */
 
@@ -1755,6 +1755,24 @@ void GameScript::StartDialogue(Scriptable * Sender, Action * parameters)
 	}
 }
 
+Point* FindNearPoint(Actor* Sender, Point *p1, Point *p2, double &distance)
+{
+	long x1 = (Sender->XPos - p1->x);
+	long y1 = (Sender->YPos - p1->y);
+	double distance1 = sqrt((x1*x1)+(y1*y1));
+	long x2 = (Sender->XPos - p2->x);
+	long y2 = (Sender->YPos - p2->y);
+	double distance2 = sqrt((x2*x2)+(y2*y2));
+	if(distance1 < distance2) {
+		distance = distance1;
+		return p1;
+	}
+	else {
+		distance = distance2;
+		return p2;
+	}
+}
+
 void GameScript::OpenDoor(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
@@ -1775,25 +1793,15 @@ void GameScript::OpenDoor(Scriptable * Sender, Action * parameters)
 		return;
 	Door * door = (Door*)tar;
 	Actor * actor = (Actor*)scr;
-	long x = (actor->XPos - door->XPos);
-	long y = (actor->YPos - door->YPos);
-	double distance = sqrt((x*x)+(y*y));		
-	if(distance <= 128) {
+	double distance;
+	Point * p = FindNearPoint(actor, &door->toOpen[0], &door->toOpen[1], distance);	
+	if(distance <= 12) {
 		door->SetDoorClosed(false, true);
 		Sender->CurrentAction = NULL;
 	} else {
 		Sender->AddActionInFront(Sender->CurrentAction);
 		Sender->CurrentAction->delayFree = true;
-		long x1 = (actor->XPos - door->toOpen[0].x);
-		long y1 = (actor->YPos - door->toOpen[0].y);
-		double distance1 = sqrt((x1*x1)+(y1*y1));
-		long x2 = (actor->XPos - door->toOpen[1].x);
-		long y2 = (actor->YPos - door->toOpen[1].y);
-		double distance2 = sqrt((x2*x2)+(y2*y2));
-		if(distance1 < distance2)
-			actor->WalkTo(door->toOpen[0].x, door->toOpen[0].y);
-		else
-			actor->WalkTo(door->toOpen[1].x, door->toOpen[1].y);
+		actor->WalkTo(p->x, p->y);
 	}
 }
 
@@ -1817,24 +1825,14 @@ void GameScript::CloseDoor(Scriptable * Sender, Action * parameters)
 		return;
 	Door * door = (Door*)tar;
 	Actor * actor = (Actor*)scr;
-	long x = (actor->XPos - door->XPos);
-	long y = (actor->YPos - door->YPos);
-	double distance = sqrt((x*x)+(y*y));		
-	if(distance <= 100) {
+	double distance;
+	Point * p = FindNearPoint(actor, &door->toOpen[0], &door->toOpen[1], distance);	
+	if(distance <= 12) {
 		door->SetDoorClosed(true, true);
 		Sender->CurrentAction = NULL;
 	} else {
 		Sender->AddActionInFront(Sender->CurrentAction);
 		Sender->CurrentAction->delayFree = true;
-		long x1 = (actor->XPos - door->toOpen[0].x);
-		long y1 = (actor->YPos - door->toOpen[0].y);
-		double distance1 = sqrt((x1*x1)+(y1*y1));
-		long x2 = (actor->XPos - door->toOpen[1].x);
-		long y2 = (actor->YPos - door->toOpen[1].y);
-		double distance2 = sqrt((x2*x2)+(y2*y2));
-		if(distance1 < distance2)
-			actor->WalkTo(door->toOpen[0].x, door->toOpen[0].y);
-		else
-			actor->WalkTo(door->toOpen[1].x, door->toOpen[1].y);
+		actor->WalkTo(p->x, p->y);
 	}
 }
