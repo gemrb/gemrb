@@ -983,10 +983,6 @@ void GameControl::InitDialog(Actor * speaker, Actor * target, Dialog * dlg)
 			core->GetGUIScriptEngine()->RunFunction("OnIncreaseSize");
 		}
 	}
-	if(speaker)
-		speaker->TalkCount++;
-	if(target && (target!=speaker) )
-		target->TalkCount++;
 	DialogChoose(-1);
 }
 
