@@ -3,6 +3,7 @@
 
 #include "../../includes/globals.h"
 #include "Plugin.h"
+#include "EventMgr.h"
 
 #ifdef WIN32
 
@@ -44,6 +45,10 @@ public:
 	virtual Color * CreatePalette(Color color, Color back) = 0;
 	/** Blits a Sprite filling the Region */
 	virtual void BlitTiled(Region rgn, Sprite2D * img, bool anchor = false) = 0;
+	/** Set Event Manager */
+	void SetEventMgr(EventMgr * evnt);
+	/** Event Manager Pointer */
+	EventMgr * Evnt;
 };
 
 #endif
