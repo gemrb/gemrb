@@ -85,8 +85,9 @@ exit_function:
 		TokenLength=strlen(Decoded);
 		if(dest) memcpy(dest,Decoded,TokenLength);
 		free(Decoded);
+		return TokenLength;
 	}
-	return TokenLength;
+	return -1;
 }
 
 bool TLKImp::ResolveTags(char *dest, char *source, int Length)
