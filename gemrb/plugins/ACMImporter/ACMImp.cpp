@@ -25,25 +25,14 @@ void ACMImp::clearstreams(bool free) {
 
 signed char __stdcall ACMImp::endstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param) 
 {
-	printf("End Callback\n");
-	if(stream) {
-		for(int i = 0; i < MAX_STREAMS; i++) {
-			if(streams[i].stream == stream) {
-				streams[i].playing = false;
-				streams[i].end = false;
-				streams[i].free = false;                
-				return 1;
-			}
-		}
-	}
-	else
-		return 1;
+	//printf("End Callback\n");
+	FSOUND_Stream_Close(stream);
 	return 0;
 }
 
 signed char __stdcall ACMImp::synchstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param)
 {
-	printf("Synch Callback\n");
+	//printf("Synch Callback\n");
 	if(stream) {
 		for(int i = 0; i < MAX_STREAMS; i++) {
 			if(streams[i].stream == stream) {
@@ -72,11 +61,12 @@ void * __stdcall ACMImp::dspcallback(void *originalbuffer, void *newbuffer, int 
 		core->GetDictionary()->Lookup("Volume Music", volume);
 		FSOUND_SetVolume(streams[param].channel, (volume/10.0)*255);
 #ifdef WIN32
-		printf("curtime = %d, tottime = %d, delta = %d\n", curtime, tottime, tottime-curtime);
+		//printf("curtime = %d, tottime = %d, delta = %d\n", curtime, tottime, tottime-curtime);
 		if(curtime > tottime-125) {
-			core->GetMusicMgr()->PlayNext();
+			streams[param].playing = false;
 			streams[param].end = true;
-			printf("Playing Next Track\n");
+			core->GetMusicMgr()->PlayNext();
+			//printf("Playing Next Track\n");
 		}
 #endif
 	}
@@ -124,6 +114,9 @@ unsigned long ACMImp::Play(const char * ResRef)
 		fclose(str);
 		FSOUND_STREAM * sound = FSOUND_Stream_Open(path, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
 		if(sound) {
+			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
+				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
+			}
 			FSOUND_Stream_Play(FSOUND_FREE, sound);
 			return 0;
 		}
@@ -144,6 +137,9 @@ unsigned long ACMImp::Play(const char * ResRef)
 		fclose(str);
 		FSOUND_STREAM * sound = FSOUND_Stream_Open(path, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
 		if(sound) {
+			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
+				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
+			}
 			FSOUND_Stream_Play(FSOUND_FREE, sound);
 			return 0;
 		}
@@ -172,9 +168,9 @@ unsigned long ACMImp::LoadFile(const char * filename)
 				printMessage("ACMImporter", "SetSychCallback Failed\n", YELLOW);
 			}
 #endif
-			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
+			/*if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
 				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
-			}
+			}*/
 			int ret = -1;
 			for(int i = 0; i < MAX_STREAMS; i++) {
 				if(streams[i].free) {
@@ -229,9 +225,9 @@ unsigned long ACMImp::LoadFile(const char * filename)
 				printMessage("ACMImporter", "SetSychCallback Failed\n", YELLOW);
 			}
 #endif
-			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
+			/*if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
 				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
-			}
+			}*/
 			int ret = -1;
 			for(int i = 0; i < MAX_STREAMS; i++) {
 				if(streams[i].free) {
@@ -241,7 +237,6 @@ unsigned long ACMImp::LoadFile(const char * filename)
 					streams[i].free = false;
 					streams[i].channel = -1;
 					streams[i].dsp = FSOUND_Stream_CreateDSP(sound, dspcallback, 1, i);
-					FSOUND_DSP_SetActive(streams[i].dsp, true);
 					ret = i;
 					break;
 				}
@@ -340,7 +335,11 @@ bool ACMImp::Play(unsigned long index)
 		return false;
 	if(streams[index].playing)
 		return true;
+#ifdef WIN32
+	FSOUND_DSP_SetActive(streams[index].dsp, true);
+#endif
 	streams[index].channel = FSOUND_Stream_Play(FSOUND_FREE, streams[index].stream);
 	streams[index].playing = true;
+	streams[index].end = false;
 	return true;
 }

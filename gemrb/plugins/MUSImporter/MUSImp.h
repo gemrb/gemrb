@@ -27,10 +27,10 @@
   */
 
 typedef struct PLString {
-	char PLFile[4];
-	char PLLoop[4];
-	char PLTag[4];
-	char PLEnd[4];
+	char PLFile[10];
+	char PLLoop[10];
+	char PLTag[10];
+	char PLEnd[10];
 	unsigned long soundID;
 } PLString;
   

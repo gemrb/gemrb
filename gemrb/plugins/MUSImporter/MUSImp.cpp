@@ -57,82 +57,86 @@ bool MUSImp::OpenPlaylist(const char * name)
 	str->ReadLine(counts, 5);
 	int count = atoi(counts);
 	while(count != 0) {
-		char line[64], var1[10], var2[10], var3[10], var4[10];
+		char line[64];
 		str->ReadLine(line, 64);
-		int c = sscanf(line, "%[^ ]%*[ ]%[^ ]%*[ ]%[^ ]%*[ ]%[^ ]", var1, var2, var3, var4);
-		switch(c) {
-			case 1:
-				{
-					PLString pls;
-					strcpy(pls.PLFile, var1);
-					strcpy(pls.PLLoop, "");
-					strcpy(pls.PLTag, "");
-					strcpy(pls.PLEnd, "");
-					char FName[_MAX_PATH];
-      				strcpy(FName, core->GamePath);
-					strcat(FName, "music");
-					strcat(FName, SPathDelimiter);
-					strcat(FName, PLName);
-					strcat(FName, SPathDelimiter);
-					strcat(FName, PLName);
-					strcat(FName, pls.PLFile);
-					strcat(FName, ".acm");
-					pls.soundID = core->GetSoundMgr()->LoadFile(FName);
-					playlist.push_back(pls);
-					printf("%s.acm Added in position %d\n", pls.PLFile, pls.soundID);
+		int len = strlen(line);
+		int i = 0;
+		int p = 0;
+		PLString pls;
+		while(i < len) {
+			if((line[i]!=' ') && (line[i]!='\t'))
+				pls.PLFile[p++] = line[i++];
+			else {
+				while(i < len) {
+					if((line[i]==' ') || (line[i]=='\t'))
+						i++;
+					else
+						break;
 				}
-			break;
-			
-			case 3:
-				{
-					PLString pls;
-					strcpy(pls.PLFile, var1);
-					strcpy(pls.PLLoop, "");
-					strcpy(pls.PLTag, var2);
-					strcpy(pls.PLEnd, var3);
-					char FName[_MAX_PATH];
-					strcpy(FName, core->GamePath);
-					strcat(FName, "music");
-					strcat(FName, SPathDelimiter);
-					strcat(FName, PLName);
-					strcat(FName, SPathDelimiter);
-					strcat(FName, PLName);
-					strcat(FName, pls.PLFile);
-					strcat(FName, ".acm");
-					pls.soundID = core->GetSoundMgr()->LoadFile(FName);
-					playlist.push_back(pls);
-					printf("%s.acm Added in position %d\n", pls.PLFile, pls.soundID);
-				}
-			break;
-
-			case 4:
-				{
-					PLString pls;
-					strcpy(pls.PLFile, var1);
-					strcpy(pls.PLLoop, var2);
-					strcpy(pls.PLTag, var3);
-					strcpy(pls.PLEnd, var4);
-					char FName[_MAX_PATH];
-      				strcpy(FName, core->GamePath);
-      				strcat(FName, "music");
-      				strcat(FName, SPathDelimiter);
-      				strcat(FName, PLName);
-      				strcat(FName, SPathDelimiter);
-      				strcat(FName, PLName);
-      				strcat(FName, pls.PLFile);
-      				strcat(FName, ".acm");
-					pls.soundID = core->GetSoundMgr()->LoadFile(FName);
-					playlist.push_back(pls);
-					printf("%s.acm Added in position %d\n", pls.PLFile, pls.soundID);
-				}
-			break;
-
-			default:
-				{
-
-				}
-			break;
+				break;
+			}		
 		}
+		pls.PLFile[p]=0;
+		p=0;
+		if(line[i]!='@' && (i < len)) {
+			while(i < len) {
+				if((line[i]!=' ') && (line[i]!='\t'))
+					pls.PLTag[p++] = line[i++];
+				else
+					break;
+			}
+			pls.PLTag[p]=0;
+			p=0;
+			i++;
+			if((line[i]==' ') || (line[i]=='\t'))
+				strcpy(pls.PLLoop, pls.PLTag);
+			else {
+				while(i < len) {
+					if((line[i]!=' ') && (line[i]!='\t'))
+						pls.PLLoop[p++] = line[i++];
+					else
+						break;
+				}
+			pls.PLLoop[p]=0;
+			}
+			while(i < len) {
+				if((line[i]==' ') || (line[i]=='\t'))
+					i++;
+				else
+					break;
+			}
+			p=0;
+		}
+		else {
+			pls.PLTag[0]=0;
+			pls.PLLoop[0]=0;
+		}
+		while(i < len) {
+			if((line[i]!=' ') && (line[i]!='\t'))
+				i++;
+			else
+				break;
+		}
+		i++;
+		while(i < len) {
+			if((line[i]!=' ') && (line[i]!='\t'))
+				pls.PLEnd[p++] = line[i++];
+			else
+				break;
+		}
+		pls.PLEnd[p]=0;
+		char FName[_MAX_PATH];
+      	strcpy(FName, core->GamePath);
+		strcat(FName, "music");
+		strcat(FName, SPathDelimiter);
+		strcat(FName, PLName);
+		strcat(FName, SPathDelimiter);
+		strcat(FName, PLName);
+		strcat(FName, pls.PLFile);
+		strcat(FName, ".acm");
+		pls.soundID = core->GetSoundMgr()->LoadFile(FName);
+		playlist.push_back(pls);
+		printf("%s.acm Added in position %d\n", pls.PLFile, pls.soundID);
 		count--;
 	}
 	return true;
@@ -156,6 +160,7 @@ void MUSImp::End()
 			for(int i = 0; i < playlist.size(); i++) {
 				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLEnd) == 0) {
 					core->GetSoundMgr()->Play(playlist[i].soundID);
+					PLpos = i;
 					return;
 				}
 			}
