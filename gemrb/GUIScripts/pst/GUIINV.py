@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.1 2004/01/11 16:49:09 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.2 2004/01/17 14:51:34 balrog994 Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -24,22 +24,30 @@
 ###################################################
 
 import GemRB
-from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
-import GUICommonWindows
+#from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
+#import GUICommonWindows
+
+InventoryWindow = None
 
 def OpenInventoryWindow ():
-	global MainWindow
-
-	CloseCommonWindows ()
+	global InventoryWindow
 	
+	GemRB.HideGUI()
+	
+	if InventoryWindow != None:
+		
+		GemRB.UnloadWindow(InventoryWindow)
+		InventoryWindow = None
+		GemRB.SetVar("OtherWindow", -1)
+		
+		GemRB.UnhideGUI()
+		return
+		
 	GemRB.LoadWindowPack ("GUIINV")
-        OpenCommonWindows ()
-	MainWindow = Window = GUICommonWindows.MainWindow
+	InventoryWindow = GemRB.LoadWindow(3)
+        GemRB.SetVar("OtherWindow", InventoryWindow)
 	
-	#GemRB.SetVisible (MainWindow, 1)
-
-def CloseInventoryWindow ():
-	CloseCommonWindows ()
+	GemRB.UnhideGUI()
 
 ###################################################
 # End of file GUIINV.py

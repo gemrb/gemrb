@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.1 2004/01/11 16:49:09 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.2 2004/01/17 14:51:34 balrog994 Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -34,150 +34,181 @@ from GUIDefines import *
 from GUICommonWindows import CloseCommonWindows
 
 ###################################################
-MainWindow = 0
-LogWindow = 0
-BeastsWindow = 0
-QuestsWindow = 0
+JournalWindow = None
+LogWindow = None
+BeastsWindow = None
+QuestsWindow = None
 
 ###################################################
 def OpenJournalWindow ():
-	global MainWindow
+	global JournalWindow
 	
-	CloseCommonWindows ()
+	if JournalWindow:
+		if LogWindow: OpenLogWindow()
+		if BeastsWindow: OpenBeastsWindow()
+		if QuestsWindow: OpenQuestsWindow()
+		
+		GemRB.HideGUI()
+		
+		GemRB.UnloadWindow(JournalWindow)
+		JournalWindow = None
+		GemRB.SetVar("OtherWindow", -1)
+		
+		GemRB.UnhideGUI()
+		
+		return
+		
+	GemRB.HideGUI()
+	
 	GemRB.LoadWindowPack ("GUIJRNL")
-
-	MainWindow = Window = GemRB.LoadWindow (0)
+	JournalWindow = GemRB.LoadWindow (0)
+	GemRB.SetVar("OtherWindow", JournalWindow)
 	
 	# Quests
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, Button, 20430)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
+	Button = GemRB.GetControl (JournalWindow, 0)
+	GemRB.SetText (JournalWindow, Button, 20430)
+	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
 
 	# Beasts
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetText (Window, Button, 20634)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBeastsWindow")
+	Button = GemRB.GetControl (JournalWindow, 1)
+	GemRB.SetText (JournalWindow, Button, 20634)
+	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBeastsWindow")
 
 	# Journal
-	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetText (Window, Button, 20635)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLogWindow")
+	Button = GemRB.GetControl (JournalWindow, 2)
+	GemRB.SetText (JournalWindow, Button, 20635)
+	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLogWindow")
 
 	# Done
-	Button = GemRB.GetControl (Window, 3)
-	GemRB.SetText (Window, Button, 20636)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseJournalWindow")
+	Button = GemRB.GetControl (JournalWindow, 3)
+	GemRB.SetText (JournalWindow, Button, 20636)
+	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
-	GemRB.SetVisible (Window, 1)
-
-
-def CloseJournalWindow ():
-	if LogWindow: CloseLogWindow ()
-	if BeastsWindow: CloseBeastsWindow ()
-	if QuestsWindow: CloseQuestsWindow ()
+	GemRB.SetVisible (JournalWindow, 1)
 	
-	GemRB.SetVisible (MainWindow, 0)
-	GemRB.UnloadWindow (MainWindow)
+	GemRB.UnhideGUI()
 
 
 ###################################################
 def OpenQuestsWindow ():
-	global QuestsWindow
-	QuestsWindow = Window = GemRB.LoadWindow (1)
-
+	global JournalWindow, QuestsWindow
+	
+	GemRB.HideGUI()
+	
+	if QuestsWindow:
+		GemRB.UnloadWindow(QuestsWindow)
+		QuestsWindow = None
+		
+		GemRB.SetVar("OtherWindow", JournalWindow)
+		
+		GemRB.UnhideGUI()
+		return
+	
+	QuestsWindow = GemRB.LoadWindow (1)
+	GemRB.SetVar("OtherWindow", QuestsWindow)
+	
 	# 1 - Assigned quests list
 	# 3 - quest description
 
 	# Assigned
-	Button = GemRB.GetControl (Window, 8)
-	GemRB.SetText (Window, Button, 39433)
+	Button = GemRB.GetControl (QuestsWindow, 8)
+	GemRB.SetText (QuestsWindow, Button, 39433)
 
 	# Completed
-	Button = GemRB.GetControl (Window, 9)
-	GemRB.SetText (Window, Button, 39434)
+	Button = GemRB.GetControl (QuestsWindow, 9)
+	GemRB.SetText (QuestsWindow, Button, 39434)
 
 	# Back
-	Button = GemRB.GetControl (Window, 5)
-	GemRB.SetText (Window, Button, 46677)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseQuestsWindow")
+	Button = GemRB.GetControl (QuestsWindow, 5)
+	GemRB.SetText (QuestsWindow, Button, 46677)
+	GemRB.SetEvent (QuestsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
 
 	# Done
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, Button, 20636)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseJournalWindow")
+	Button = GemRB.GetControl (QuestsWindow, 0)
+	GemRB.SetText (QuestsWindow, Button, 20636)
+	GemRB.SetEvent (QuestsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
-	GemRB.SetVisible (Window, 1)
-
-
-def CloseQuestsWindow ():
-	global QuestsWindow
-	GemRB.SetVisible (QuestsWindow, 0)
-	GemRB.UnloadWindow (QuestsWindow)
-	QuestsWindow = 0
-	GemRB.SetVisible (MainWindow, 1)
+	GemRB.SetVisible (QuestsWindow, 1)
+	
+	GemRB.UnhideGUI()
+	
 
 ###################################################
 
 def OpenBeastsWindow ():
-	global BeastsWindow
+	global JournalWindow, BeastsWindow
+	
+	GemRB.HideGUI()
+	
+	if BeastsWindow:
+		GemRB.UnloadWindow(BeastsWindow)
+		BeastsWindow = None
+		
+		GemRB.SetVar("OtherWindow", JournalWindow)
+		
+		GemRB.UnhideGUI()
+		return
+	
 	BeastsWindow = Window = GemRB.LoadWindow (2)
+	GemRB.SetVar("OtherWindow", BeastsWindow)
 
 	# 0 - beasts list
 	# 2 - beast description
 	
 	# PC
-	Button = GemRB.GetControl (Window, 5)
-	GemRB.SetText (Window, Button, 20637)
+	Button = GemRB.GetControl (BeastsWindow, 5)
+	GemRB.SetText (BeastsWindow, Button, 20637)
 
 	# NPC
-	Button = GemRB.GetControl (Window, 6)
-	GemRB.SetText (Window, Button, 20638)
+	Button = GemRB.GetControl (BeastsWindow, 6)
+	GemRB.SetText (BeastsWindow, Button, 20638)
 
 	# Back
-	Button = GemRB.GetControl (Window, 7)
-	GemRB.SetText (Window, Button, 46677)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseBeastsWindow")
+	Button = GemRB.GetControl (BeastsWindow, 7)
+	GemRB.SetText (BeastsWindow, Button, 46677)
+	GemRB.SetEvent (BeastsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBeastsWindow")
 
 	# Done
-	Button = GemRB.GetControl (Window, 4)
-	GemRB.SetText (Window, Button, 20636)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseJournalWindow")
+	Button = GemRB.GetControl (BeastsWindow, 4)
+	GemRB.SetText (BeastsWindow, Button, 20636)
+	GemRB.SetEvent (BeastsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
-	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (BeastsWindow, 1)
+	
+	GemRB.UnhideGUI()
 
-
-def CloseBeastsWindow ():
-	global BeastsWindow
-	GemRB.SetVisible (BeastsWindow, 0)
-	GemRB.UnloadWindow (BeastsWindow)
-	BeastsWindow = 0
-	GemRB.SetVisible (MainWindow, 1)
 	
 ###################################################
 
 def OpenLogWindow ():
-	global LogWindow
-	LogWindow = Window = GemRB.LoadWindow (3)
+	global JournalWindow, LogWindow
+	
+	GemRB.HideGUI()
+	
+	if LogWindow:
+		GemRB.UnloadWindow(LogWindow)
+		LogWindow = None
+		
+		GemRB.SetVar("OtherWindow", JournalWindow)
+		
+		GemRB.UnhideGUI()
+		return
+	
+	LogWindow = GemRB.LoadWindow (3)
 
 	# Back
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetText (Window, Button, 46677)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseLogWindow")
+	Button = GemRB.GetControl (LogWindow, 1)
+	GemRB.SetText (LogWindow, Button, 46677)
+	GemRB.SetEvent (LogWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLogWindow")
 
 	# Done
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, Button, 20636)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseJournalWindow")
+	Button = GemRB.GetControl (LogWindow, 0)
+	GemRB.SetText (LogWindow, Button, 20636)
+	GemRB.SetEvent (LogWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
-	GemRB.SetVisible (Window, 1)
-
-def CloseLogWindow ():
-	global LogWindow
-	GemRB.SetVisible (LogWindow, 0)
-	GemRB.UnloadWindow (LogWindow)
-	LogWindow = 0
-	GemRB.SetVisible (MainWindow, 1)
+	GemRB.SetVisible (LogWindow, 1)
 	
+	GemRB.UnhideGUI()
 
 ###################################################
 # End of file GUIJRNL.py
