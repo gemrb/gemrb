@@ -48,23 +48,36 @@ class GEM_EXPORT Control {
 public: 
 	Control();
 	virtual ~Control();
-  /** Draws the Control on the Output Display */
-  virtual void Draw(unsigned short x, unsigned short y) = 0;
+	/** Draws the Control on the Output Display */
+	virtual void Draw(unsigned short x, unsigned short y) = 0;
 public: // Public attributes
-  /** Defines the Control ID Number used for GUI Scripting */
-  unsigned short ControlID;
-  /** Buffer length of an attached buffer (only significant for some types of text controls) */
-  unsigned short BufferLength;
-  /** X position of control relative to containing window */
-  unsigned short XPos;
-  /** Y position of control relative to containing window */
-  unsigned short YPos;
-  /** Width of control */
-  unsigned short Width;
-  /** Height of control */
-  unsigned short Height;
-  /** Type of control */
-  unsigned char ControlType;
+	/** Defines the Control ID Number used for GUI Scripting */
+	unsigned short ControlID;
+	/** Buffer length of an attached buffer (only significant for some types of text controls) */
+	unsigned short BufferLength;
+	/** X position of control relative to containing window */
+	unsigned short XPos;
+	/** Y position of control relative to containing window */
+	unsigned short YPos;
+	/** Width of control */
+	unsigned short Width;
+	/** Height of control */
+	unsigned short Height;
+	/** Type of control */
+	unsigned char ControlType;
+	/** Focused Control */
+	bool hasFocus;
+public: //Events
+	/** Key Press Event */
+	virtual void OnKeyPress(unsigned char Key, unsigned short Mod);
+	/** Key Release Event */
+	virtual void OnKeyRelease(unsigned char Key, unsigned short Mod);
+	/** Mouse Over Event */
+	virtual void OnMouseOver(unsigned short x, unsigned short y);
+	/** Mouse Button Down */
+	virtual void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+	/** Mouse Button Up */
+	virtual void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
 };
 
 #endif
