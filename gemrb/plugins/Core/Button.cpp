@@ -264,7 +264,6 @@ void Button::RedrawButton(char *VariableName, int Sum)
 {
 	if(strnicmp(VarName, VariableName, MAX_VARIABLE_LENGTH)) return;
 	ToggleState=(Sum==Value);
-printf("Sum: %d  Value: %d  ToggleState: %d\n",Sum,Value,ToggleState);
 	if(ToggleState)
 		State = IE_GUI_BUTTON_SELECTED;
 	else

@@ -18,18 +18,10 @@
 #if !defined(AFX_VARIABLES_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_)
 #define AFX_VARIABLES_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
-
 #include <ctype.h>
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include "../../includes/SClassID.h"
-
-#define THIS_FILE "variables.h"
-
-#define MAX_VARIABLE_LENGTH  32
 
 /////////////////////////////////////////////////////////////////////////////
 // Variables<unsigned long, VALUE>
@@ -60,11 +52,13 @@ public:
 	void SetAt(const char *key, unsigned long newValue);
 	void RemoveAll();
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
+	int ParseKey(int arg);
 
 // Implementation
 protected:
 	MyAssoc** m_pHashTable;
 	unsigned int m_nHashTableSize;
+	bool m_lParseKey;
 	int m_nCount;
 	MyAssoc* m_pFreeList;
 	struct Plex* m_pBlocks;

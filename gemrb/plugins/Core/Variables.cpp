@@ -1,13 +1,6 @@
 #include "Variables.h"
 
-#define THIS_FILE "variables.cpp"
-
-#define MYASSERT(f) \
-  if(!(f))  \
-  {  \
-  printf("Assertion failed: %s %d",THIS_FILE, __LINE__); \
-		abort(); \
-  }
+#define min(a,b) ((a)<(b) ? (a):(b))
 
 /////////////////////////////////////////////////////////////////////////////
 // inlines
@@ -35,6 +28,13 @@ inline unsigned int Variables::MyHashKey(const char * key) const
    }
    return nHash;
 }
+//sets the way we handle keys, no parsing for .ini file entries, parsing for game variables
+//you should set this only on an empty mapping
+inline int Variables::ParseKey(int arg)
+	{
+		MYASSERT(m_nCount==0);
+		m_lParseKey=arg;
+	}
 inline int Variables::GetCount() const
 	{ return m_nCount; }
 inline bool Variables::IsEmpty() const
@@ -68,6 +68,7 @@ Variables::Variables(int nBlockSize, int nHashTableSize)
 	m_pHashTable = NULL;
 	m_nHashTableSize = nHashTableSize;  // default size
 	m_nCount = 0;
+	m_lParseKey = false;
 	m_pFreeList = NULL;
 	m_pBlocks = NULL;
 	m_nBlockSize = nBlockSize;
@@ -107,7 +108,8 @@ void Variables::RemoveAll()
 			for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL;
 			  pAssoc = pAssoc->pNext)
 			{
-          delete [] pAssoc->key;          
+				if(pAssoc->key)
+					delete [] pAssoc->key;          
 			}
 		}
 	}
@@ -151,14 +153,19 @@ Variables::NewAssoc(const char *key)
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
 	MYASSERT(m_nCount > 0);    // make sure we don't overflow
-	MyCopyKey(pAssoc->key,key);
+	if(m_lParseKey) MyCopyKey(pAssoc->key,key);
+	else
+	{
+		pAssoc->key=new char[min(strlen(key),MAX_VARIABLE_LENGTH)];
+		if(pAssoc->key) strncpy(pAssoc->key,key,MAX_VARIABLE_LENGTH);
+	}
 	pAssoc->value=0xcccccccc;  //invalid value
 	return pAssoc;
 }
 
 void Variables::FreeAssoc(Variables::MyAssoc* pAssoc)
 {
-	delete[] pAssoc->key;
+	if(pAssoc->key) delete[] pAssoc->key;
 	pAssoc->pNext = m_pFreeList;
 	m_pFreeList = pAssoc;
 	m_nCount--;
@@ -215,6 +222,7 @@ void Variables::SetAt(const char *key, unsigned long value)
 		pAssoc->pNext = m_pHashTable[nHash];
 		m_pHashTable[nHash] = pAssoc;
 	}
-	pAssoc->value=value;
+//set value only if we have a key
+	if(pAssoc->key) pAssoc->value=value;
 }
 
