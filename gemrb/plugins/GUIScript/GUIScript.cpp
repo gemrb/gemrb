@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.87 2003/12/15 11:06:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.88 2003/12/19 14:35:59 balrog994 Exp $
  *
  */
 
@@ -1700,7 +1700,42 @@ static PyObject *GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_ExecuteString(PyObject * /*self*/, PyObject *args)
+{
+	char* String;
+
+	if(!PyArg_ParseTuple(args,"s", &String) ) {
+		printMessage("GUIScript","Syntax Error: ExecuteString(String)\n", LIGHT_RED);
+		return NULL;
+	}
+	core->GetGame()->GetMap(0)->Script->ExecuteString(String);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_EvaluateString(PyObject * /*self*/, PyObject *args)
+{
+	char* String;
+
+	if(!PyArg_ParseTuple(args,"s", &String) ) {
+		printMessage("GUIScript","Syntax Error: EvaluateString(String)\n", LIGHT_RED);
+		return NULL;
+	}
+	if(core->GetGame()->GetMap(0)->Script->EvaluateString(String))
+		printf("%s returned True\n", String);
+	else
+		printf("%s returned False\n", String);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
+	{"ExecuteString", GemRB_ExecuteString, METH_VARARGS,
+	 "Executes an In-Game Script Action in the current Area Script Context"},
+
+	{"EvaluateString", GemRB_EvaluateString, METH_VARARGS,
+	 "Evaluate an In-Game Script Trigger in the current Area Script Context"},
+
 	{"EnterGame", GemRB_EnterGame, METH_NOARGS,
      "Enters the Game."},
 
