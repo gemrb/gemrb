@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.33 2004/09/12 21:58:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.34 2004/09/13 16:53:16 avenger_teambg Exp $
  *
  */
 
@@ -282,7 +282,7 @@ char* TLKImp::GetString(ieStrRef strref, unsigned long flags)
 		return ret;
 	}
 	ieDword Volume, Pitch, StrOffset;
-	ieDword Length;
+	ieDword l;
 	ieWord type;
 	char SoundResRef[9];
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
@@ -292,10 +292,14 @@ char* TLKImp::GetString(ieStrRef strref, unsigned long flags)
 	str->ReadDword( &Volume );
 	str->ReadDword( &Pitch );
 	str->ReadDword( &StrOffset );
-	str->ReadDword( &Length );
-	if (Length > 65535) {
+	str->ReadDword( &l );
+	int Length;
+	if (l > 65535) {
 		Length = 65535; //safety limit, it could be a dword actually
-	} 
+	}
+	else {
+		Length = l;
+	}
 	char* string;
 
 	if (type & 1) {
@@ -312,7 +316,7 @@ char* TLKImp::GetString(ieStrRef strref, unsigned long flags)
 		//GetNewStringLength will look in string and return true
 		//if the new Length will change due to tokens
 		//if there is no new length, we are done
-		while (GetNewStringLength( string, (int) Length )) {
+		while (GetNewStringLength( string, Length )) {
 			char* string2 = ( char* ) malloc( Length + 1 );
 			//ResolveTags will copy string to string2
 			ResolveTags( string2, string, Length );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.cpp,v 1.1 2004/08/29 01:19:01 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.cpp,v 1.2 2004/09/13 16:53:13 avenger_teambg Exp $
  *
  */
 
@@ -177,7 +177,7 @@ AmbientMgrAL::AmbientSource::AmbientSource(Ambient *a)
 		if (!buffer) {
 			printf("Invalid SoundResRef: %.8s, Dequeueing...\n",a->sounds[i]);
 			free(a->sounds[i]);
-		        a->sounds.erase(a->sounds.begin() + i);
+			a->sounds.erase(a->sounds.begin() + i);
 		} else {
 			buffers.push_back(buffer);
 			buflens.push_back(timelen);
@@ -290,9 +290,9 @@ unsigned int AmbientMgrAL::AmbientSource::enqueue()
 
 bool AmbientMgrAL::AmbientSource::isHeard(const Point &listener) const
 {
-	float xdist = listener.x - ambient->getOrigin().x;
-	float ydist = listener.y - ambient->getOrigin().y;
-	float dist = sqrt(xdist * xdist + ydist * ydist);
+	int xdist =listener.x - ambient->getOrigin().x;
+	int ydist =listener.y - ambient->getOrigin().y;
+	int dist = (int) sqrt( (double) (xdist * xdist + ydist * ydist) );
 	return dist < ambient->getRadius();
 }
 

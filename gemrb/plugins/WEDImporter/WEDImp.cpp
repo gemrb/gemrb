@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.13 2004/09/12 21:58:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.14 2004/09/13 16:53:16 avenger_teambg Exp $
  *
  */
 
@@ -114,7 +114,7 @@ TileMap* WEDImp::GetTileMap()
 			ieWord* indexes = ( ieWord* ) calloc( count, sizeof(ieWord) );
 			str->Read( indexes, count * sizeof(ieWord) );
 			if( DataStream::IsEndianSwitch()) {
-				swab( indexes, indexes, count * sizeof(ieWord) );
+				swab( (char*) indexes, (char*) indexes, count * sizeof(ieWord) );
 			}
 			Tile* tile;
 			if (secondary == 0xffff)
@@ -150,7 +150,7 @@ TileMap* WEDImp::GetTileMap()
 		DoorTiles = (ieWord*)calloc(DoorTileCount,sizeof(ieWord));
 		str->Read(DoorTiles, DoorTileCount*sizeof(ieWord));
 		if( DataStream::IsEndianSwitch()) {
-			swab( DoorTiles, DoorTiles, DoorTileCount * sizeof( ieWord) );
+			swab( (char*) DoorTiles, (char*) DoorTiles, DoorTileCount * sizeof( ieWord) );
 		}
 		//Reading the Open Polygon
 		str->Seek(OpenPolyOffset, GEM_STREAM_START);
@@ -240,7 +240,7 @@ ieWord* WEDImp::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	DoorTiles = ( ieWord* ) calloc( DoorTileCount, sizeof( ieWord) );
 	str->Read( DoorTiles, DoorTileCount * sizeof( ieWord ) );
 	if( DataStream::IsEndianSwitch()) {
-		swab( DoorTiles, DoorTiles, DoorTileCount * sizeof( ieWord) );
+		swab( (char*) DoorTiles, (char*) DoorTiles, DoorTileCount * sizeof( ieWord) );
 	}
 	*count = DoorTileCount;
 	if (DoorClosed) {

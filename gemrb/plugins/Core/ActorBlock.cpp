@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.60 2004/09/12 21:58:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.61 2004/09/13 16:53:15 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -477,6 +477,9 @@ void Moveble::ClearPath()
 	StanceID = IE_ANI_AWAKE;
 	CurrentAction = NULL;
 }
+
+static unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
+
 void Moveble::DrawTargetPoint()
 {
 	if (!path || !Selected || (InternalFlags&IF_NORECTICLE) )
@@ -486,14 +489,14 @@ void Moveble::DrawTargetPoint()
 	//   updated each 1/15 sec
 	unsigned long step;
 	GetTime( step );
-	step = abs (((step >> 6) % 8) - 3);
+	step = tp_steps [(step >> 6) & 7];
 
 	Region vp = core->GetVideoDriver()->GetViewport();
-	core->GetVideoDriver()->DrawEllipse( Destination.x - vp.x, Destination.y - vp.y,
-		 size * 10 - step, ( ( size * 15 ) / 2 ) - step, selectedColor );
+	core->GetVideoDriver()->DrawEllipse( Destination.x - vp.x,
+		Destination.y - vp.y, size * 10 - step,
+		( ( size * 15 ) / 2 ) - step, selectedColor );
 
 }
-
 
 /**************
  * Door Class *

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.195 2004/09/12 21:58:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.196 2004/09/13 16:53:15 avenger_teambg Exp $
  *
  */
 
@@ -1737,9 +1737,9 @@ Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIn
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newAction->pointParameter.x = strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.x = (short) strtol( src, (char **) &src, 10 );
 				src++; //Skip .
-				newAction->pointParameter.y = strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.y = (short) strtol( src, (char **) &src, 10 );
 				src++; //Skip ]
 				break;
 
@@ -1937,9 +1937,9 @@ Trigger *GameScript::GenerateTriggerCore(const char *src, const char *str, int t
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newTrigger->pointParameter.x = strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.x = (short) strtol( src, (char **) &src, 10 );
 				src++; //Skip .
-				newTrigger->pointParameter.y = strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.y = (short) strtol( src, (char **) &src, 10 );
 				src++; //Skip ]
 				break;
 

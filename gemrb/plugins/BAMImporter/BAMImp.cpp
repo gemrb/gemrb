@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.27 2004/09/12 21:58:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.28 2004/09/13 16:53:14 avenger_teambg Exp $
  *
  */
 
@@ -265,7 +265,8 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 	str->Seek( FLTOffset, GEM_STREAM_START );
 	str->Read( FLT, count * sizeof(ieWord) );
 	if( DataStream::IsEndianSwitch() ) {
-		swab( FLT, FLT, count * sizeof(ieWord) );
+		//msvc likes it as char *
+		swab( (char*) FLT, (char*) FLT, count * sizeof(ieWord) );
 	}
 	std::vector< unsigned short> indices;
 	for (i = 0; i < CyclesCount; i++) {
