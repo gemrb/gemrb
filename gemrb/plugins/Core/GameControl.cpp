@@ -171,10 +171,19 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
 	
-	if(area->GetBlocked(GameX, GameY) )
-		nextCursor = 6;
-	else
-		nextCursor = 4;
+	switch(area->GetBlocked(GameX, GameY)) {
+		case 0:
+			nextCursor = 6;
+		break;
+
+		case 1:
+			nextCursor = 4;
+		break;
+
+		case 2:
+			nextCursor = 34;
+		break;
+	}
 
 	overInfoPoint = area->tm->GetInfoPoint(GameX, GameY);
 	if(overInfoPoint)
@@ -202,7 +211,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		else {
 			lastActor = actor;
 			lastActor->actor->anims->DrawCircle = true;
-			if(!lastActor->actor->Modified[IE_STATE_ID]&STATE_DEAD) {
+			if((lastActor->actor->Modified[IE_STATE_ID]&STATE_DEAD) == 0) {
 				switch(lastActor->actor->Modified[IE_EA]) {
 					case EVILCUTOFF:
 					case GOODCUTOFF:
