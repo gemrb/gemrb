@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.55 2004/02/28 18:39:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.56 2004/03/11 20:26:19 avenger_teambg Exp $
  *
  */
 
@@ -783,6 +783,7 @@ public:
 	static void FadeFromColor(Scriptable* Sender, Action* parameters);
 	static void FadeToColor(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
+	static void GivePartyGold(Scriptable* Sender, Action* parameters);
 	static void GlobalAddGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalAndGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalBAnd(Scriptable* Sender, Action* parameters);
@@ -811,9 +812,13 @@ public:
 	static void LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters);
 	static void LeaveParty(Scriptable* Sender, Action* parameters);
 	static void MakeGlobal(Scriptable* Sender, Action* parameters);
+	static void MoraleDec(Scriptable* Sender, Action* parameters);
+	static void MoraleInc(Scriptable* Sender, Action* parameters);
+	static void MoraleSet(Scriptable* Sender, Action* parameters);
 	static void MoveBetweenAreas(Scriptable* Sender, Action* parameters);
 	static void MoveToPoint(Scriptable* Sender, Action* parameters);
 	static void MoveToObject(Scriptable* Sender, Action* parameters);
+	static void MoveToOffset(Scriptable* Sender, Action* parameters);
 	static void MoveViewPoint(Scriptable* Sender, Action* parameters);
 	static void MoveViewObject(Scriptable* Sender, Action* parameters);
 	static void NoAction(Scriptable* Sender, Action* parameters);
@@ -842,6 +847,7 @@ public:
 		Action* parameters);
 	static void StartMovie(Scriptable* Sender, Action* parameters);
 	static void StartSong(Scriptable* Sender, Action* parameters);
+	static void TakePartyGold(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);

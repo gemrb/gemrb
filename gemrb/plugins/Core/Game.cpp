@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.19 2004/02/29 19:32:34 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.20 2004/03/11 20:26:19 avenger_teambg Exp $
  *
  */
 
@@ -31,6 +31,7 @@ Game::Game(void)
 	: Scriptable( ST_GLOBAL )
 {
 	PartySize = 6;    //this could be modified later
+	PartyGold = 0;
 	SetScript( core->GlobalScript, 0 );
 }
 

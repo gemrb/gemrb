@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.31 2004/02/29 17:33:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.32 2004/03/11 20:26:19 avenger_teambg Exp $
  *
  */
 
@@ -333,15 +333,15 @@ int Actor::NewStat(unsigned int StatIndex, long ModifierValue,
 	switch (ModifierType) {
 		case 0:
 			//flat point modifier
-			Modified[StatIndex] += ModifierValue;
+			SetStat(StatIndex, Modified[StatIndex]+ModifierValue);
 			break;
 		case 1:
 			//straight stat change
-			Modified[StatIndex] = ModifierValue;
+			SetStat(StatIndex, ModifierValue);
 			break;
 		case 2:
 			//percentile
-			Modified[StatIndex] = Modified[StatIndex] * 100 / ModifierValue;
+			SetStat(StatIndex, BaseStats[StatIndex] * 100 / ModifierValue);
 			break;
 	}
 	return Modified[StatIndex] - oldmod;

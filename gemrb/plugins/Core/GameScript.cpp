@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.82 2004/03/07 10:55:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.83 2004/03/11 20:26:19 avenger_teambg Exp $
  *
  */
 
@@ -120,6 +120,7 @@ static ActionLink actionnames[] = {
 	{"floatmessage",GameScript::DisplayStringHead}, //probably the same
 	{"forceaiscript",GameScript::ChangeAIScript}, //probably the same
 	{"forcespell",GameScript::ForceSpell},
+	{"givepartygold",GameScript::GivePartyGold},
 	{"globalband",GameScript::GlobalBAnd},
 	{"globalbandglobal",GameScript::GlobalBAndGlobal},
 	{"globalbor",GameScript::GlobalBOr},
@@ -143,9 +144,14 @@ static ActionLink actionnames[] = {
 	{"leavearealua",GameScript::LeaveAreaLUA},
 	{"leavearealuapanic",GameScript::LeaveAreaLUAPanic},
 	{"makeglobal",GameScript::MakeGlobal},
+	{"moraledec",GameScript::MoraleDec},
+	{"moraleinc",GameScript::MoraleInc},
+	{"moraleset",GameScript::MoraleSet},
 	{"movebetweenareas",GameScript::MoveBetweenAreas},
 	{"movetoobject",GameScript::MoveToObject,AF_BLOCKING},
+	{"movetooffset",GameScript::MoveToOffset,AF_BLOCKING},
 	{"movetopoint",GameScript::MoveToPoint,AF_BLOCKING},
+	{"movetopointnorecticle",GameScript::MoveToPoint,AF_BLOCKING},//the same until we know better
 	{"moveviewobject",GameScript::MoveViewPoint},
 	{"moveviewpoint",GameScript::MoveViewPoint},
 	{"noaction",GameScript::NoAction},
@@ -168,6 +174,7 @@ static ActionLink actionnames[] = {
 	{"startdialogueoverrideinterrupt",GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startmovie",GameScript::StartMovie},
 	{"startsong",GameScript::StartSong},
+	{"takepartygold",GameScript::TakePartyGold},
 	{"triggeractivation",GameScript::TriggerActivation},
 	{"unhidegui",GameScript::UnhideGUI},
 	{"unmakeglobal",GameScript::UnMakeGlobal}, //this is a GemRB extension
@@ -2705,6 +2712,16 @@ void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
 	actor->WalkTo( target->XPos, target->YPos );
 }
 
+void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->WalkTo( Sender->XPos+parameters->XpointParameter, Sender->YPos+parameters->YpointParameter );
+}
+
 void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -3228,6 +3245,61 @@ void GameScript::UnMakeGlobal(Scriptable* Sender, Action* parameters)
 	if (slot >= 0) {
 		core->GetGame()->DelNPC( slot );
 	}
+}
+
+void GameScript::GivePartyGold(Scriptable *Sender, Action *parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* act = ( Actor* ) Sender;
+	int gold = act->GetStat(IE_GOLD);
+	if(gold>parameters->int0Parameter) {
+		gold=parameters->int0Parameter;
+	}
+	act->NewStat(IE_GOLD, -gold, 0);
+	core->GetGame()->PartyGold+=gold;
+}
+
+void GameScript::TakePartyGold(Scriptable *Sender, Action *parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* act = ( Actor* ) Sender;
+	int gold = core->GetGame()->PartyGold;
+	if(gold>parameters->int0Parameter) {
+		gold=parameters->int0Parameter;
+	}
+	act->NewStat(IE_GOLD, gold, 0);
+	core->GetGame()->PartyGold-=gold;
+}
+
+void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* act = ( Actor* ) Sender;
+	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, 1);
+}
+
+void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* act = ( Actor* ) Sender;
+	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, 0);
+}
+
+void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* act = ( Actor* ) Sender;
+	act->NewStat(IE_MORALEBREAK, -parameters->int0Parameter, 0);
 }
 
 void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
