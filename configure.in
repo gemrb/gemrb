@@ -118,7 +118,7 @@ AC_C_VOLATILE
 AC_FUNC_CLOSEDIR_VOID
 AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
-#AC_FUNC_REALLOC
+AC_FUNC_REALLOC
 AC_FUNC_STAT
 AC_FUNC_STRFTIME
 AC_FUNC_STRNLEN
@@ -126,13 +126,13 @@ AC_HEADER_DIRENT
 AC_HEADER_STDBOOL
 AC_HEADER_STAT
 AC_HEADER_TIME
-#AC_REPLACE_FNMATCH
+AC_REPLACE_FNMATCH
 AC_STRUCT_TM
 AC_TYPE_SIZE_T
 
 CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATADIR=\\\"\$(moddir)\\\" -DPLUGINDIR=\\\"\$(plugindir)\\\""
-#CFLAGS="$CFLAGS -Werror -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wreturn-type -Wcast-qual -Wwrite-strings -Wswitch -Wshadow -Wcast-align -Wuninitialized -ansi -pedantic -Wbad-function-cast -Wchar-subscripts -Winline -Wnested-externs -Wredundant-decl -Wno-format-y2k"
-CXXFLAGS="$CXXFLAGS -Wall -Wno-format-y2k -Wno-long-long"
+#CFLAGS="$CFLAGS -Werror -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wcast-qual -Wwrite-strings -Wshadow -Wcast-align -ansi -pedantic -Wbad-function-cast -Winline -Wnested-externs -Wredundant-decls -Wno-format-y2k -Wno-long-long"
+CXXFLAGS="$CXXFLAGS -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wcast-qual -Wwrite-strings -Wshadow -Wcast-align -ansi -pedantic -Winline -Wredundant-decls -Wno-format-y2k -Wno-long-long -Wno-unused-parameter"
 #LIBS="$LIBS"
 #LDFLAGS="$LDFLAGS $LIBS"
 
