@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2003-2005 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/Start.py,v 1.9 2004/10/23 15:25:16 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/Start.py,v 1.10 2005/03/20 16:24:20 avenger_teambg Exp $
 
 
 # Start.py - intro and main menu screens
@@ -41,12 +41,20 @@ def OnLoad():
 
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
+	# Find proper window border for higher resolutions
+	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
+	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
+	if screen_width == 800:
+		GemRB.LoadWindowFrame("STON08L", "STON08R", "STON08T", "STON08B")
+	elif screen_width == 1024:
+		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
 
-	GemRB.LoadWindowPack("GUICONN")
+	GemRB.LoadWindowPack("GUICONN", 640, 480)
 
 #main window
 	StartWindow = GemRB.LoadWindow(0)
-	GemRB.SetWindowSize(StartWindow, 800, 600)
+	GemRB.SetWindowFrame(StartWindow)
+	#GemRB.SetWindowSize(StartWindow, 800, 600)
 	ProtocolButton = GemRB.GetControl(StartWindow, 0x00)
 	CreateGameButton = GemRB.GetControl(StartWindow, 0x02)
 	LoadGameButton = GemRB.GetControl(StartWindow, 0x07)

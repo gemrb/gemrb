@@ -1,3 +1,28 @@
+# -*-python-*-
+# GemRB - Infinity Engine Emulator
+# Copyright (C) 2003-2005 The GemRB Project
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/Start.py,v 1.9 2005/03/20 16:24:22 avenger_teambg Exp $
+
+
+# Start.py - intro and main menu screens
+
+###################################################
+
 import GemRB
 
 StartWindow = 0
@@ -8,11 +33,28 @@ QuitWindow = 0
 def OnLoad():
 	global StartWindow, JoinGameButton
 
-	GemRB.LoadWindowPack("GUICONN")
+	skip_videos = GemRB.GetVar ("SkipIntroVideos")
+	if not skip_videos:
+		GemRB.PlayMovie ('BISLOGO')
+		GemRB.PlayMovie ('WOTC')
+		GemRB.PlayMovie ('INTRO')
+
+		GemRB.SetVar ("SkipIntroVideos", 1)
+
+	# Find proper window border for higher resolutions
+	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
+	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
+	if screen_width == 800:
+		GemRB.LoadWindowFrame("STON08L", "STON08R", "STON08T", "STON08B")
+	elif screen_width == 1024:
+		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
+
+	GemRB.LoadWindowPack("GUICONN", 640, 480)
 
 #main window
 	StartWindow = GemRB.LoadWindow(0)
-	GemRB.SetWindowSize(StartWindow, 800, 600)
+	GemRB.SetWindowFrame(StartWindow)
+	#GemRB.SetWindowSize(StartWindow, 800, 600)
 	ProtocolButton = GemRB.GetControl(StartWindow, 0x00)
 	CreateGameButton = GemRB.GetControl(StartWindow, 0x02)
 	LoadGameButton = GemRB.GetControl(StartWindow, 0x07)

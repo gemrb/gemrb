@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIMOVIE.py,v 1.4 2004/10/08 20:44:22 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIMOVIE.py,v 1.5 2005/03/20 16:24:20 avenger_teambg Exp $
 
 
 # GUIMOVIE.py - Play Movies window
@@ -32,8 +32,9 @@ MoviesTable = 0
 def OnLoad():
 	global MovieWindow, TextAreaControl, MoviesTable
 
-	GemRB.LoadWindowPack("GUIMOVIE")
+	GemRB.LoadWindowPack("GUIMOVIE", 640, 480)
 	MovieWindow = GemRB.LoadWindow(0)
+	GemRB.SetWindowFrame(MovieWindow)
 	TextAreaControl = GemRB.GetControl(MovieWindow, 0)
 	GemRB.SetTextAreaSelectable(MovieWindow, TextAreaControl,1)
 	PlayButton = GemRB.GetControl(MovieWindow, 2)

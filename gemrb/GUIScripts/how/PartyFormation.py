@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2003-2005 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/PartyFormation.py,v 1.9 2004/09/26 13:14:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/PartyFormation.py,v 1.10 2005/03/20 16:24:20 avenger_teambg Exp $
 
 
 # PartyFormation.py - Single Player Party Formation
@@ -32,8 +32,9 @@ ExitWindow = 0
 def OnLoad():
 	global PartyFormationWindow
 
-	GemRB.LoadWindowPack("GUISP")
+	GemRB.LoadWindowPack("GUISP", 640, 480)
 	PartyFormationWindow = GemRB.LoadWindow(0)
+	GemRB.SetWindowFrame (PartyFormationWindow)
 
 	ModifyCharsButton = GemRB.GetControl(PartyFormationWindow, 43)
 	GemRB.SetEvent(PartyFormationWindow, ModifyCharsButton, IE_GUI_BUTTON_ON_PRESS, "ModifyPress")

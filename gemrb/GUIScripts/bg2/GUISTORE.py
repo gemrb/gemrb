@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.17 2005/03/18 20:01:16 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.18 2005/03/20 16:24:20 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -101,8 +101,9 @@ def OpenStoreWindow ():
 
 	GemRB.HideGUI ()
 	GemRB.SetVar ("Action", 0)
-	GemRB.LoadWindowPack ("GUISTORE")
+	GemRB.LoadWindowPack ("GUISTORE", 640, 480)
 	StoreWindow = Window = GemRB.LoadWindow (3)
+	GemRB.SetWindowFrame (Window)
 	GemRB.SetVar ("OtherWindow", StoreWindow) #this is the store button row
 
 	Store = GemRB.GetStore()
@@ -149,6 +150,7 @@ def OpenStoreShoppingWindow ():
 		return
 
 	StoreShoppingWindow = Window = GemRB.LoadWindow (2)
+	GemRB.SetWindowFrame (Window)
 	GemRB.SetVar ("TopWindow", Window)
 
 	# buy price ...
@@ -217,6 +219,7 @@ def OpenStoreIdentifyWindow ():
 		return
 	
 	StoreIdentifyWindow = Window = GemRB.LoadWindow (4)
+	GemRB.SetWindowFrame (Window)
 	GemRB.SetVar ("TopWindow", Window)
 
 	# Identify
@@ -258,6 +261,7 @@ def OpenStoreStealWindow ():
 		return
 	
 	StoreStealWindow = Window = GemRB.LoadWindow (6)
+	GemRB.SetWindowFrame (Window)
 	GemRB.SetVar ("TopWindow", Window)
 
 	j = 1
@@ -309,6 +313,7 @@ def OpenStoreDonateWindow ():
 		return
 	
 	StoreDonateWindow = Window = GemRB.LoadWindow (9)
+	GemRB.SetWindowFrame (Window)
 	GemRB.SetVar ("TopWindow", Window)
 
 	# graphics
@@ -354,6 +359,7 @@ def OpenStoreHealWindow ():
 		return
 	
 	StoreHealWindow = Window = GemRB.LoadWindow (5)
+	GemRB.SetWindowFrame (Window)
 	GemRB.SetVar ("TopWindow", Window)
 
 	#spell buttons
@@ -399,6 +405,7 @@ def OpenStoreRumourWindow ():
 		return
 	
 	StoreRumourWindow = Window = GemRB.LoadWindow (8)
+	GemRB.SetWindowFrame (Window)
 	GemRB.SetVar ("TopWindow", Window)
 	
 	#removing those pesky labels
@@ -438,6 +445,7 @@ def OpenStoreRentWindow ():
 		return
 	
 	StoreRentWindow = Window = GemRB.LoadWindow (7)
+	GemRB.SetWindowFrame (Window)
 	GemRB.SetVar ("TopWindow", Window)
 
 	# room types

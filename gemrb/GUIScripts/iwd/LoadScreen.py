@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2003-2005 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/LoadScreen.py,v 1.1 2004/09/04 15:55:01 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/LoadScreen.py,v 1.2 2005/03/20 16:24:22 avenger_teambg Exp $
 
 # LoadScreen.py - display Loading screen
 
@@ -30,8 +30,9 @@ LoadScreen = None
 def StartLoadScreen ():
 	global LoadScreen
 
-	GemRB.LoadWindowPack ("guils")
+	GemRB.LoadWindowPack ("guils", 640, 480)
 	LoadScreen = GemRB.LoadWindow (0)
+	GemRB.SetWindowFrame (LoadScreen)
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	if LoadPic=="":
 		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))

@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2003-2005 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.28 2005/03/20 15:47:12 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.29 2005/03/20 16:24:20 avenger_teambg Exp $
 
 
 #Character Generation
@@ -151,8 +151,9 @@ def OnLoad():
 	global CharGenWindow, CharGenState, TextArea, PortraitButton, AcceptButton
 	global GenderButton, RaceButton, ClassButton, AlignmentButton, AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack ("GUICG", 640, 480)
 	CharGenWindow = GemRB.LoadWindow (0)
+	GemRB.SetWindowFrame (CharGenWindow)
 	CharGenState = 0
 
 	GenderButton = GemRB.GetControl (CharGenWindow, 0)
