@@ -19,6 +19,5 @@ def OnLoad():
 	GemRB.PlaySound("compress")
 	print "6. Enabling cheatkeys"
 	GemRB.EnableCheatKeys(1)
-	#should quit without error :)
-	print "99. quit"
-	GemRB.Quit()
+	print "7. Swapping to another script"
+	GemRB.SetNextScript("LoadScreen")

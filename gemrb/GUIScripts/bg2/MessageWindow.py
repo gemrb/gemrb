@@ -31,6 +31,9 @@ def OnLoad():
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
 	GemRB.SetVar("OptionsWindow", OptionsWindow)
 	GemRB.SetVar("MessageWindow", MessageWindow)
+	GemRB.SetVar("TopWindow", -1)
+	GemRB.SetVar("OtherWindow", -1)
+	GemRB.SetVar("FloatWindow", -1)
 	GemRB.SetVar("PortraitPosition", 2) #Right
 	GemRB.SetVar("ActionsPosition", 4) #BottomAdded
 	GemRB.SetVar("OptionsPosition", 0) #Left
@@ -98,17 +101,14 @@ def OnIncreaseSize():
 			GemRB.SetVar("MessageWindow", TMessageWindow)
 			GemRB.SetVar("MessageTextArea", TMessageTA)
 			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
-		else:
-			 return
-			
-	GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
-	GemRB.UnloadWindow(MessageWindow)
-	
-	Expand = Expand+1
-	MessageWindow = TMessageWindow
-	
-	GemRB.SetVar("MessageWindowSize", Expand)
-	UpdateResizeButtons()
+	if Expand!=2:
+		GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
+		GemRB.UnloadWindow(MessageWindow)	
+		Expand = Expand+1
+		MessageWindow = TMessageWindow	
+		GemRB.SetVar("MessageWindowSize", Expand)
+		UpdateResizeButtons()
+
 	GemRB.UnhideGUI()
 	GemRB.SetControlStatus(TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED);
 	return
@@ -138,17 +138,15 @@ def OnDecreaseSize():
 			GemRB.SetVar("MessageWindow", TMessageWindow)
 			GemRB.SetVar("MessageTextArea", TMessageTA)
 			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
-		else:
-			return
-			
-	GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
-	GemRB.UnloadWindow(MessageWindow)
+	if Expand:
+		GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
+		GemRB.UnloadWindow(MessageWindow)
+		Expand = Expand-1
+		MessageWindow = TMessageWindow
 	
-	Expand = Expand-1
-	MessageWindow = TMessageWindow
-	
-	GemRB.SetVar("MessageWindowSize", Expand)
-	UpdateResizeButtons()
+		GemRB.SetVar("MessageWindowSize", Expand)
+		UpdateResizeButtons()
+
 	GemRB.UnhideGUI()
 	if Expand:
 		GemRB.SetControlStatus(TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED);
