@@ -1,6 +1,8 @@
 2DA V1.0
 *
-	BASE_RES_REF	MIRROR_TYPE	ORIENT	ATTACK	AWAKE	CAST	CONJURE	DAMAGE	DIE	HEAD_TURN	READY	SHOOT	TWITCH	WALK	SLASH	BACKSLASH	JAB	EMERGE	HIDE	SLEEP
+	BASE_RES_REF	MIRROR_TYPE	ORIENT	ATTACK	AWAKE	CAST	CONJURE	DAMAGE	DIE	HEAD_TURN	READY	SHOOT	TWITCH	WALK	SLASH	BACKSLASH	JAB	EMERGE	HIDE	SLEEP	NO_PALETTE
+0x2000	MSIR		2		5	0	8	0	8	24	32	16		*	0	*	0	*	*		*	*	*	*	
+0x2300	MDKN		2		5	0	8	0	8	24	32	16		*	0	*	0	*	*		*	*	*	*	1
 0x4000	SNOMC		1		16	*	0	*	*	32	48	16		*	*	64	*	*	*		*	*	*	*
 0x4002	SNOMM		1		16	*	0	*	*	32	48	16		*	*	64	*	*	*		*	*	*	*
 0x4010	SMOWC		1		16	*	0	*	*	32	48	16		*	*	64	*	*	*		*	*	*	*
@@ -91,6 +93,16 @@
 0x6313	CIFT		0		9
 0x6314	CIFT		0		9
 0x6315	CHFT		0		9
-0x6402	CMNK		2		5	*	8	0	8	40	48	16		24	0	56	0	0	0		0	*	*	64
+0x6402	CMNK		6		5	*	8	0	8	40	48	16		24	0	56	0	0	0		0	*	*	64
+0x6403	MSKL1		6		5	*	8	0	8	40	48	16		24	0	56	0	0	0		0	*	*	64
+0x6405	MDGU1		6		5	*	8	0	8	40	48	16		24	0	56	0	0	0		0	*	*	64	1
 0x6500	CHMM		0		9
 0x6510	CHFM		0		9
+0x7F03	MIMP		4		9	*	18	*	*	27	36	*		9	*	*	0	0	9		18	*	*	*	1
+0x7F05	MDJI		4		9	*	18	*	*	27	36	*		9	*	*	0	0	9		18	*	*	*	1
+0x7F07	MGLC		4		9	*	18	*	*	27	36	*		9	*	*	0	0	9		18	*	*	*	1
+0x7F08	MOTY		4		9	*	18	*	*	27	36	*		9	*	*	0	0	9		18	*	*	*	1
+0xE400	MGO1		9		5	*	*	*	*	*	*	*		*	*	*	*	*	*		*	*	*	*	1
+0xE410	MGO2		9		5	*	*	*	*	*	*	*		*	*	*	*	*	*		*	*	*	*	1
+0xE420	MGO3		9		5	*	*	*	*	*	*	*		*	*	*	*	*	*		*	*	*	*	1
+0xE430	MGO4		9		5	*	*	*	*	*	*	*		*	*	*	*	*	*		*	*	*	*	1
