@@ -13,7 +13,7 @@ def OnLoad():
 	GemRB.SetVar("Race",0) #race
 	GemRB.SetVar("Class",0) #class
 	GemRB.SetVar("Class Kit",0) #class
-	GemRB.SetVar("Alignment",0) #alignment
+	GemRB.SetVar("Alignment",-1) #alignment
 
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)

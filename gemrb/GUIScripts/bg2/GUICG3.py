@@ -62,7 +62,7 @@ def AlignmentPress():
 def BackPress():
 	GemRB.UnloadWindow(AlignmentWindow)
 	GemRB.SetNextScript("CharGen4")
-	GemRB.SetVar("Alignment",0)  #scrapping the alignment value
+	GemRB.SetVar("Alignment",-1)  #scrapping the alignment value
 	return
 
 def NextPress():

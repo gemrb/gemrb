@@ -7,7 +7,7 @@ TextAreaControl = 0
 def OnLoad():
 	global CharGenWindow, TextAreaControl
 
-	GemRB.SetVar("Alignment",0) #alignment
+	GemRB.SetVar("Alignment",-1) #alignment
 
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)
