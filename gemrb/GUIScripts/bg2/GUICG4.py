@@ -8,10 +8,18 @@ AbilityTable = 0
 PointsLeft = 0
 Minimum = 0
 Maximum = 0
+Add = 0
 KitIndex = 0
 
 def CalcLimits(Abidx):
+	global Minimum, Maximum, Add
+
+	RaceTable = GemRB.LoadTable("races")
+	Abracead = GemRB.LoadTable("ABRACEAD")
+	Abclsmod = GemRB.LoadTable("ABCLSMOD")
 	Race = GemRB.GetVar("Race")-1
+	RaceName = GemRB.GetTableRowName(RaceTable, Race)
+
 	Minimum = 3
 	Maximum = 18
 
@@ -20,20 +28,30 @@ def CalcLimits(Abidx):
 	if tmp!=0 and tmp>Minimum:
 		Minimum = tmp
 
-	Abracecq = GemRB.LoadTable("ABRACERQ")
-	tmp = GemRB.GetTableValue(Abracerq, Race, Abidx)
+	Abracerq = GemRB.LoadTable("ABRACERQ")
+	Race = GemRB.GetTableRowIndex(Abracerq, RaceName)
+	tmp = GemRB.GetTableValue(Abracerq, Race, Abidx*2)
+	if tmp!=0 and tmp>Minimum:
+		Minimum = tmp
 
+	tmp = GemRB.GetTableValue(Abracerq, Race, Abidx*2+1)
+	if tmp!=0 and tmp>Maximum:
+		Maximum = tmp
+
+	Race = GemRB.GetTableRowIndex(Abracead, RaceName)
+	Add = GemRB.GetTableValue(Abracead, Race, Abidx) + GemRB.GetTableValue(Abclsmod, KitIndex, Abidx)
+	Maximum = Maximum + Add
+	Minimum = Minimum + Add
 	if Minimum<1:
 		Minimum=1
 	if Maximum>25:
 		Maximum=25
+
+	print Minimum, Maximum
 	return
 
 def RollPress():
-	RaceTable = GemRB.LoadTable("races")
-	Abracead = GemRB.LoadTable("ABRACEAD")
-	Abclsmod = GemRB.LoadTable("ABCLSMOD")
-	Race = GemRB.GetVar("Race")-1
+	global Minimum, Maximum, Add
 
 	GemRB.InvalidateWindow(AbilityWindow)
 	GemRB.SetVar("Ability",0)
@@ -43,11 +61,10 @@ def RollPress():
 	GemRB.SetLabelUseRGB(AbilityWindow, SumLabel, 1)
 
 	for i in range(0,6):
-		add = GemRB.GetTableValue(Abracead, Race, i) + GemRB.GetTableValue(Abclsmod, KitIndex, i)
 		dice = 3
 		size = 6
 		CalcLimits(i)
-		v = GemRB.Roll(dice, size, add)
+		v = GemRB.Roll(dice, size, Add)
 		if v<Minimum:
 			v = Minimum
 		if v>Maximum:
