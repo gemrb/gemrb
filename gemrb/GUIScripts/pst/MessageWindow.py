@@ -23,7 +23,7 @@ MaxExpand = 1
 def OnLoad():
 	global MessageWindow, ActionsWindow, PortraitWindow, OptionsWindow, CloseButton
 	GemRB.LoadWindowPack("GUIWORLD")
-	GemRB.SetInfoTextColor(255,0,0)
+	GemRB.SetInfoTextColor(0,255,0,255)
 	ActionsWindow = GemRB.LoadWindow(0)
 	PortraitWindow = GemRB.LoadWindow(1)
 	PopulatePortraitWindow ()
