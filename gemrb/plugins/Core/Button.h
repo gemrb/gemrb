@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.32 2004/07/25 13:36:39 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.33 2004/08/29 21:22:59 edheldil Exp $
  *
  */
 
@@ -59,6 +59,15 @@
 #define OP_SET  0  //set
 #define OP_OR   1  //turn on
 #define OP_NAND 2  //turn off
+
+// !!! Keep these synchronized with GUIDefines.py !!!
+#define IE_GUI_BUTTON_ON_PRESS       0x00000000
+#define IE_GUI_MOUSE_OVER_BUTTON     0x00000001
+#define IE_GUI_MOUSE_ENTER_BUTTON    0x00000002
+#define IE_GUI_MOUSE_LEAVE_BUTTON    0x00000003
+#define IE_GUI_BUTTON_ON_SHIFT_PRESS 0x00000004
+#define IE_GUI_BUTTON_ON_RIGHT_PRESS 0x00000005
+
 
 /**Button Class. Used also for PixMaps (static images) or for Toggle Buttons.
   *@author GemRB Development Team
@@ -134,6 +143,7 @@ public: // Public Events
 	/** Button Pressed Event Script Function Name */
 	EventHandler ButtonOnPress;
 	EventHandler ButtonOnShiftPress;
+	EventHandler ButtonOnRightPress;
 	EventHandler MouseEnterButton;
 	EventHandler MouseLeaveButton;
 	EventHandler MouseOverButton;

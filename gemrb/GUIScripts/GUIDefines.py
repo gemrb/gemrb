@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.20 2004/08/28 15:00:40 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.21 2004/08/29 21:23:03 edheldil Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -47,6 +47,7 @@ IE_GUI_MOUSE_OVER_BUTTON  = 0x00000001
 IE_GUI_MOUSE_ENTER_BUTTON = 0x00000002
 IE_GUI_MOUSE_LEAVE_BUTTON = 0x00000003
 IE_GUI_BUTTON_ON_SHIFT_PRESS = 0x00000004
+IE_GUI_BUTTON_ON_RIGHT_PRESS = 0x00000005
 IE_GUI_SLIDER_ON_CHANGE   = 0x02000000
 IE_GUI_EDIT_ON_CHANGE     = 0x03000000
 IE_GUI_TEXTAREA_ON_CHANGE = 0x05000000
@@ -81,6 +82,12 @@ MODAL_SHADOW_BLACK = 2
 SELECT_NORMAL  = 0x00
 SELECT_REPLACE = 0x01
 SELECT_QUIET   = 0x02
+
+# Spell types
+# !!! Keep these synchronized with Spellbook.h !!!
+IE_SPELL_TYPE_PRIEST = 0
+IE_SPELL_TYPE_WIZARD = 1
+IE_SPELL_TYPE_INNATE = 2
 
 #game strings
 STR_LOADMOS  = 0

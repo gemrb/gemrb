@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.70 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.71 2004/08/29 21:22:59 edheldil Exp $
  *
  */
 
@@ -55,6 +55,7 @@ Button::Button(bool Clear)
 	State = IE_GUI_BUTTON_UNPRESSED;
 	ButtonOnPress[0] = 0;
 	ButtonOnShiftPress[0] = 0;
+	ButtonOnRightPress[0] = 0;
 	MouseEnterButton[0] = 0;
 	MouseLeaveButton[0] = 0;
 	MouseOverButton[0] = 0;
@@ -326,7 +327,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 }
 /** Mouse Button Up */
 void Button::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char /*Button*/, unsigned short Mod)
+	unsigned char Button, unsigned short Mod)
 {
 	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
 		return;
@@ -374,10 +375,13 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_RELEASE0] );
 		}
 */
-		if ((Mod == 1) && ButtonOnShiftPress[0])
-			RunEventHandler( ButtonOnShiftPress );
-		else
-			RunEventHandler( ButtonOnPress );
+		if (Button == GEM_MB_ACTION) {
+			if ((Mod == 1) && ButtonOnShiftPress[0])
+				RunEventHandler( ButtonOnShiftPress );
+			else 
+				RunEventHandler( ButtonOnPress );
+		} else if (Button == GEM_MB_MENU && ButtonOnRightPress[0]) 
+			RunEventHandler( ButtonOnRightPress );
 		
 	}
 }
@@ -454,20 +458,23 @@ int Button::SetText(const char* string, int /*pos*/)
 void Button::SetEvent(char* funcName, int eventType)
 {
 	switch (eventType) {
-		case 0:
+		case IE_GUI_BUTTON_ON_PRESS:
 			strcpy( ButtonOnPress, funcName );
 			break;
-		case 1:
+		case IE_GUI_MOUSE_OVER_BUTTON:
 			strcpy( MouseOverButton, funcName );
 			break;
-		case 2:
+		case IE_GUI_MOUSE_ENTER_BUTTON:
 			strcpy( MouseEnterButton, funcName );
 			break;
-		case 3:
+		case IE_GUI_MOUSE_LEAVE_BUTTON:
 			strcpy( MouseLeaveButton, funcName );
 			break;
-		case 4:
+		case IE_GUI_BUTTON_ON_SHIFT_PRESS:
 			strcpy( ButtonOnShiftPress, funcName );
+			break;
+		case IE_GUI_BUTTON_ON_RIGHT_PRESS:
+			strcpy( ButtonOnRightPress, funcName );
 			break;
 	}
 
