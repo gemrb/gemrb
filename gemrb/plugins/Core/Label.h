@@ -47,7 +47,7 @@ public:
   /** This function sets the actual Label Text */
   void SetText(char * string);
   /** Sets the Foreground Font Color */
-  void SetColor(Color col);
+  void SetColor(Color col, Color bac);
   /** Sets the Alignment of Text */
   void SetAlignment(unsigned char Alignment);
 private: // Private attributes
@@ -55,8 +55,8 @@ private: // Private attributes
   char * Buffer;
   /** Font for Text Writing */
   Font * font;
-  /** Foregroun Color */
-  Color fore;
+  /** Foreground & Background Colors */
+  Color fore, back;
   /** Use the RGB Color for the Font */
   bool useRGB;
   /** Alignment Variable */

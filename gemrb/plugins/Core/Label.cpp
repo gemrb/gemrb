@@ -35,9 +35,9 @@ void Label::Draw(unsigned short x, unsigned short y)
 {
 	if(font) {
 		if(useRGB)
-			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, &fore, Alignment, true);
+			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, &fore, &back, Alignment | IE_FONT_ALIGN_MIDDLE, true);
 		else
-			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, NULL, Alignment, true);
+			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, NULL, NULL, Alignment | IE_FONT_ALIGN_MIDDLE, true);
 	}
 }
 /** This function sets the actual Label Text */
@@ -47,9 +47,10 @@ void Label::SetText(char * string)
 		strcpy(Buffer, string);
 }
 /** Sets the Foreground Font Color */
-void Label::SetColor(Color col)
+void Label::SetColor(Color col, Color bac)
 {
 	fore = col;
+	back = bac;
 }
 
 void Label::SetAlignment(unsigned char Alignment)
