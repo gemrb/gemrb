@@ -8,7 +8,7 @@
 #include <windows.h>
 
 #if _MSC_VER >= 1000
-#pragma message("Microsoft Compiler Version Grater than 1.00")
+#pragma message("Microsoft Compiler Version Greater than 1.00")
 #pragma warning( disable: 4251 521 )
 #endif
 
@@ -35,7 +35,7 @@ typedef __POSITION* POSITION;
 #define MYASSERT(f) \
   if(!(f))  \
   {  \
-  printf("Assertion failed: %s %d",THIS_FILE, __LINE__); \
+  printf("Assertion failed: %s %d","f", __LINE__); \
                 abort(); \
   }
 struct Plex     // warning variable length structure
