@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.6 2004/03/20 13:24:11 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.7 2004/10/09 09:14:52 avenger_teambg Exp $
  *
  */
 
@@ -213,14 +213,14 @@ int _fclose(_FILE* stream)
 char* PathAppend (char* target, char* dir)
 {
 	if (target[strlen( target ) - 1] != PathDelimiter)
-		strcat( target, SPathDelimiter );
-	strcat( target, dir );
+		strncat( target, SPathDelimiter, _MAX_PATH );
+	strncat( target, dir, _MAX_PATH );
 
 	return target;
 }
 
 /*
- * Joins NULL-terminated list of directories and and copies it to 'target'.
+ * Joins NULL-terminated list of directories and copies it to 'target'.
  * Previous content of 'target' is NOT part of the list, except 'target' can be
  * safely used as a first var arg. Returns pointer to 'target'.
  *
