@@ -262,4 +262,6 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned char Butto
 		selline = seltext;
 		((Window*)Owner)->Invalidate();
 	}
+	if(VarName[0]!=0)
+		core->GetDictionary()->SetAt(VarName,selline);
 }
