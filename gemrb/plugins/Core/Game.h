@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.20 2004/03/17 01:07:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.21 2004/03/19 23:03:40 avenger_teambg Exp $
  *
  */
 
@@ -85,10 +85,9 @@ private:
 public:
 	Variables* globals;
 	ieByte* familiars;
-
-public:
+	int MapIndex;
 	int PartySize;
-
+public:
 	unsigned int GameTime;
 	unsigned short WhichFormation;
 	unsigned short Formations[5];
@@ -136,6 +135,7 @@ public:
 	int DelPC(unsigned int slot, bool autoFree = false);
 	int DelNPC(unsigned int slot, bool autoFree = false);
 	Map* GetMap(unsigned int index);
+        Map * GetCurrentMap();
 	int AddMap(Map* map);
 	int LoadMap(char* ResRef);
 	int DelMap(unsigned int index, bool autoFree = false);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.103 2004/03/19 22:18:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.104 2004/03/19 23:03:40 avenger_teambg Exp $
  *
  */
 
@@ -54,6 +54,8 @@ static TriggerLink triggernames[] = {
 	{"alignment", GameScript::Alignment},
 	{"allegiance", GameScript::Allegiance},
 	{"areacheck", GameScript::AreaCheck},
+	{"areatype", GameScript::AreaType},
+	{"areaflag", GameScript::AreaFlag},
 	{"bitcheck",GameScript::BitCheck},
 	{"breakingpoint",GameScript::BreakingPoint},
 	{"checkstat",GameScript::CheckStat},
@@ -3120,6 +3122,18 @@ int GameScript::InActiveArea(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor2 = ( Actor* ) tar;
 	return strnicmp(core->GetGame()->CurrentArea, actor2->Area, 8) ==0;
+}
+
+int GameScript::AreaType(Scriptable* Sender, Trigger* parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	return (map->AreaType&parameters->int0Parameter)>0;
+}
+
+int GameScript::AreaFlag(Scriptable* Sender, Trigger* parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	return (map->AreaFlags&parameters->int0Parameter)>0;
 }
 
 //-------------------------------------------------------------

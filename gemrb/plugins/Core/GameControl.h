@@ -34,7 +34,7 @@ public:
 	/** Sets the Text of the current control */
 	int SetText(const char* string, int pos = 0);
 	/** Sets the current area to Display */
-	void SetCurrentArea(int Index);
+	Map *SetCurrentArea(int Index);
 	/** Sets the InfoTextColor, used in PST
 	*/
 	void SetInfoTextColor(Color color);

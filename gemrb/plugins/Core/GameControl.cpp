@@ -56,7 +56,6 @@ Animation* effect;
 
 GameControl::GameControl(void)
 {
-	MapIndex = -1;
 	Changed = true;
 	ChangeArea = false;
 	lastActor = NULL;
@@ -105,7 +104,8 @@ void GameControl::SetInfoTextColor(Color color)
 /** Draws the Control on the Output Display */
 void GameControl::Draw(unsigned short x, unsigned short y)
 {
-	if (MapIndex == -1) {
+	Game* game = core->GetGame();
+	if (game->MapIndex == -1) {
 		return;
 	}
 	if (!Width || !Height) {
@@ -120,8 +120,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	viewport.y += video->moveY;
 	video->SetViewport( viewport.x, viewport.y );
 	Region vp( x + XPos, y + YPos, Width, Height );
-	Game* game = core->GetGame();
-	Map* area = game->GetMap( MapIndex );
+	Map* area = game->GetCurrentMap( );
 	if (area) {
 		core->GSUpdate();
 		area->DrawMap( vp, this );
@@ -428,7 +427,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					return;
 				} {
 					Game* game = core->GetGame();
-					Map* area = game->GetMap( MapIndex );
+					Map* area = game->GetCurrentMap( );
 					area->DebugDump();
 				}
 				break;
@@ -436,7 +435,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				// 'x'
 				 {
 					Game* game = core->GetGame();
-					Map* area = game->GetMap( MapIndex );
+					Map* area = game->GetCurrentMap( );
 					short cX = lastMouseX; 
 					short cY = lastMouseY;
 					core->GetVideoDriver()->ConvertToGame( cX, cY );
@@ -481,7 +480,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 	}
 	Game* game = core->GetGame();
-	Map* area = game->GetMap( MapIndex );
+	Map* area = game->GetCurrentMap( );
 
 	switch (area->GetBlocked( GameX, GameY ) & 3) {
 		case 0:
@@ -613,7 +612,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame( GameX, GameY );
 	Game* game = core->GetGame();
-	Map* area = game->GetMap( MapIndex );
+	Map* area = game->GetCurrentMap( );
 	if (!DrawSelectionRect) {
 		Actor* actor = area->GetActor( GameX, GameY );
 
@@ -772,11 +771,11 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 	}
 	core->GetVideoDriver()->SetViewport( Viewport.x, Viewport.y );
 }
-void GameControl::SetCurrentArea(int Index)
+Map *GameControl::SetCurrentArea(int Index)
 {
-	MapIndex = Index;
 	Game* game = core->GetGame();
-	Map* area = game->GetMap( MapIndex );
+	game->MapIndex = Index;
+	Map* area = game->GetCurrentMap( );
 	Actor* ab = game->GetPC( 0 );
 	if (ab) {
 		area->AddActor( ab );
@@ -785,12 +784,13 @@ void GameControl::SetCurrentArea(int Index)
 	area->PlayAreaSong( 0 );
 	core->GetPathFinder()->SetMap( area->SearchMap, area->tm->XCellCount * 4,
 							( area->tm->YCellCount * 64 ) / 12 );
+	return area;
 }
 
 void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 {
 	Game* game = core->GetGame();
-	Map* area = game->GetMap( MapIndex );
+	Map* area = game->GetCurrentMap( );
 	if (DrawSelectionRect) {
 		if (x < StartX) {
 			SelectionRect.w = StartX - x;
@@ -1321,7 +1321,7 @@ void GameControl::ChangeMap()
 {
 	Actor* pc = selected.at( 0 );
 	//setting the current area
-	strncpy(core->GetGame()->CurrentArea, core->GetGame()->GetMap( MapIndex )->scriptName,8);
+	strncpy(core->GetGame()->CurrentArea, core->GetGame()->GetCurrentMap()->scriptName,8);
 	if (stricmp( pc->Area, core->GetGame()->CurrentArea) == 0) {
 		return;
 	}
@@ -1336,8 +1336,8 @@ void GameControl::ChangeMap()
 	selected.clear();
 	core->GetGame()->DelMap( MapIndex, true );
 	int mi = core->GetGame()->LoadMap( pc->Area );
-	Map* map = core->GetGame()->GetMap( mi );
-	SetCurrentArea( mi );
+//	Map* map = core->GetGame()->GetMap( mi );
+	Map* map = SetCurrentArea( mi );
 	selected.push_back( pc );
 	if (EntranceName[0]) {
 		Entrance* ent = map->GetEntrance( EntranceName );

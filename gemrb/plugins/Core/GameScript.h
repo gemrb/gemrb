@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.72 2004/03/19 22:18:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.73 2004/03/19 23:03:41 avenger_teambg Exp $
  *
  */
 
@@ -715,6 +715,8 @@ public: //Script Functions
 	static int Alignment(Scriptable* Sender, Trigger* parameters);
 	static int Allegiance(Scriptable* Sender, Trigger* parameters);
 	static int AreaCheck(Scriptable* Sender, Trigger* parameter);
+	static int AreaFlag(Scriptable* Sender, Trigger* parameter);
+	static int AreaType(Scriptable* Sender, Trigger* parameter);
 	static int BitCheck(Scriptable* Sender, Trigger* parameters);
 	static int BreakingPoint(Scriptable* Sender, Trigger* parameters);
 	static int CheckStat(Scriptable* Sender, Trigger* parameters);

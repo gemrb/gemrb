@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.22 2004/03/15 14:18:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.23 2004/03/19 23:03:40 avenger_teambg Exp $
  *
  */
 
@@ -33,6 +33,7 @@ Game::Game(void)
 	PartySize = 6;    //this could be modified later
 	PartyGold = 0;
 	SetScript( core->GlobalScript, 0 );
+	MapIndex = -1;
 }
 
 Game::~Game(void)
@@ -176,6 +177,11 @@ Map* Game::GetMap(unsigned int index)
 		return NULL;
 	}
 	return Maps[index];
+}
+
+Map *Game::GetCurrentMap()
+{
+	return GetMap(MapIndex);
 }
 
 int Game::AddMap(Map* map)
