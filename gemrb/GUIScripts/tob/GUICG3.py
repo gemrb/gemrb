@@ -19,10 +19,10 @@ def OnLoad():
 		KitList = GemRB.LoadTable("kitlist")
 		KitName = GemRB.GetTableValue(KitList, Kit, 0) #rowname is just a number
 
-        AlignmentOk = GemRB.LoadTable("ALIGNMNT")
+	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
 	GemRB.LoadWindowPack("GUICG")
-        AlignmentTable = GemRB.LoadTable("aligns")
+	AlignmentTable = GemRB.LoadTable("aligns")
 	AlignmentWindow = GemRB.LoadWindow(3)
 
 	for i in range(0,9):
@@ -42,7 +42,7 @@ def OnLoad():
 	GemRB.SetText(AlignmentWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(AlignmentWindow,0)
 	GemRB.SetText(AlignmentWindow,DoneButton,11973)
-        GemRB.SetButtonFlags(AlignmentWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetButtonFlags(AlignmentWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(AlignmentWindow, 11)
 	GemRB.SetText(AlignmentWindow,TextAreaControl,9602)
@@ -57,7 +57,7 @@ def AlignmentPress():
 	Alignment = GemRB.GetVar("Alignment")
 	GemRB.SetText(AlignmentWindow, TextAreaControl, GemRB.GetTableValue(AlignmentTable,Alignment,1) )
 	GemRB.SetButtonState(AlignmentWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
-        GemRB.SetVar("Alignment",GemRB.GetTableValue(AlignmentTable,Alignment,3) )
+	GemRB.SetVar("Alignment",GemRB.GetTableValue(AlignmentTable,Alignment,3) )
 	return
 
 def BackPress():
@@ -67,6 +67,6 @@ def BackPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(AlignmentWindow)
+	GemRB.UnloadWindow(AlignmentWindow)
 	GemRB.SetNextScript("CharGen5") #appearance
 	return

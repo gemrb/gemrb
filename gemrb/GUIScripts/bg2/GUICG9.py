@@ -82,7 +82,7 @@ def OnLoad():
 		PointsLeft=PointsLeft + Level/GemRB.GetTableValue(SkillTable, ClassName, "RATE")
 
 	GemRB.LoadWindowPack("GUICG")
-        SkillTable = GemRB.LoadTable("weapprof")
+	SkillTable = GemRB.LoadTable("weapprof")
 	RowCount = GemRB.GetTableRowCount(SkillTable)-7  #we decrease it with the bg1 skills
 	SkillWindow = GemRB.LoadWindow(9)
 
@@ -107,7 +107,7 @@ def OnLoad():
 	GemRB.SetText(SkillWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(SkillWindow,0)
 	GemRB.SetText(SkillWindow,DoneButton,11973)
-        GemRB.SetButtonFlags(SkillWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetButtonFlags(SkillWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(SkillWindow, 68)
 	GemRB.SetText(SkillWindow,TextAreaControl,9588)
@@ -176,6 +176,6 @@ def BackPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(SkillWindow)
+	GemRB.UnloadWindow(SkillWindow)
 	GemRB.SetNextScript("CharGen7") #appearance
 	return

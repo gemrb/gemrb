@@ -10,14 +10,14 @@ def OnLoad():
 	global MageSpellsWindow, TextAreaControl, DoneButton
 	global MageSpellsTable
 	
-        ClassTable = GemRB.LoadTable("classes")
-        ClassRow = GemRB.GetVar("Class")-1
-        Class = GemRB.GetTableValue(ClassTable, ClassRow, 5)
-        TmpTable = GemRB.LoadTable("clskills")
-        TableName = GemRB.GetTableValue(TmpTable, Class, 2)
-        if TableName == "*":
-                GemRB.SetNextScript("GUICG6")
-                return
+	ClassTable = GemRB.LoadTable("classes")
+	ClassRow = GemRB.GetVar("Class")-1
+	Class = GemRB.GetTableValue(ClassTable, ClassRow, 5)
+	TmpTable = GemRB.LoadTable("clskills")
+	TableName = GemRB.GetTableValue(TmpTable, Class, 2)
+	if TableName == "*":
+		GemRB.SetNextScript("GUICG6")
+		return
 
 	GemRB.LoadWindowPack("GUICG")
 	MageSpellsWindow = GemRB.LoadWindow(7)

@@ -31,7 +31,7 @@ def OnLoad():
 	GemRB.SetText(AppearanceWindow, TextAreaControl,"") # why is this here?
 
 	PortraitButton = GemRB.GetControl(AppearanceWindow, 1)
-        GemRB.SetButtonFlags(AppearanceWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	GemRB.SetButtonFlags(AppearanceWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
 	LeftButton = GemRB.GetControl(AppearanceWindow,2)
 	RightButton = GemRB.GetControl(AppearanceWindow,3)
@@ -91,7 +91,7 @@ def CustomPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(AppearanceWindow)
+	GemRB.UnloadWindow(AppearanceWindow)
 	GemRB.SetVar("PortraitIndex",LastPortrait)
 	GemRB.SetNextScript("CharGen2") #Before race
 #	GemRB.SetNextScript("GUICG13")  #go right into color selection

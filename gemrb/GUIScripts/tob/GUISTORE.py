@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.4 2004/10/23 15:25:17 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.5 2004/12/04 17:35:12 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -76,7 +76,7 @@ def OpenStoreWindow ():
 	
 	GemRB.LoadWindowPack ("GUISTORE")
 	StoreWindow = Window = GemRB.LoadWindow (3)
-        #GemRB.SetVar ("OtherWindow", StoreWindow)
+	#GemRB.SetVar ("OtherWindow", StoreWindow)
 	GemRB.SetVisible (Window, 1)
 
 
@@ -249,7 +249,7 @@ def OpenStoreStealWindow ():
 		return
 	
 	StoreStealWindow = Window = GemRB.LoadWindow (7)
-        GemRB.SetVar ("OtherWindow", Window)
+	GemRB.SetVar ("OtherWindow", Window)
 
 	# title ...
 	Label = GemRB.GetControl (Window, 0x10000000)
@@ -277,7 +277,7 @@ def OpenStoreDonateWindow ():
 		return
 	
 	StoreDonateWindow = Window = GemRB.LoadWindow (10)
-        GemRB.SetVar ("OtherWindow", Window)
+	GemRB.SetVar ("OtherWindow", Window)
 
 	# title ...
 	Label = GemRB.GetControl (Window, 0x10000005)

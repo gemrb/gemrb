@@ -55,7 +55,7 @@ def OnLoad():
 	global SkillWindow, TextAreaControl, DoneButton, TopIndex
 	global SkillTable, PointsLeft, KitName
 	
-        SkillTable = GemRB.LoadTable("skills")
+	SkillTable = GemRB.LoadTable("skills")
 	RowCount = GemRB.GetTableRowCount(SkillTable)-2
 
 	Kit = GemRB.GetVar("Class Kit")
@@ -100,7 +100,7 @@ def OnLoad():
 	GemRB.SetToken("number",str(PointsLeft) )
 
 	GemRB.LoadWindowPack("GUICG")
-        SkillTable = GemRB.LoadTable("skills")
+	SkillTable = GemRB.LoadTable("skills")
 	SkillWindow = GemRB.LoadWindow(6)
 
 	for i in range(0,4):
@@ -120,7 +120,7 @@ def OnLoad():
 	GemRB.SetText(SkillWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(SkillWindow,0)
 	GemRB.SetText(SkillWindow,DoneButton,11973)
-        GemRB.SetButtonFlags(SkillWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetButtonFlags(SkillWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(SkillWindow, 19)
 	GemRB.SetText(SkillWindow,TextAreaControl,17248)
@@ -179,6 +179,6 @@ def BackPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(SkillWindow)
+	GemRB.UnloadWindow(SkillWindow)
 	GemRB.SetNextScript("GUICG9") #weapon proficiencies
 	return

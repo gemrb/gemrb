@@ -8,7 +8,7 @@ def OnLoad():
 	global ImportWindow
 
 	GemRB.LoadWindowPack("GUICG")
-        ImportWindow = GemRB.LoadWindow(20)
+	ImportWindow = GemRB.LoadWindow(20)
 
 	TextAreaControl = GemRB.GetControl(ImportWindow, 4)
 	GemRB.SetText(ImportWindow, TextAreaControl, 10963)
@@ -23,17 +23,17 @@ def OnLoad():
 	CancelButton = GemRB.GetControl(ImportWindow,1)
 	GemRB.SetText(ImportWindow, CancelButton, 15416)
 
-        GemRB.SetEvent(ImportWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
-        GemRB.SetEvent(ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	GemRB.SetEvent(ImportWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	GemRB.SetEvent(ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetVisible(ImportWindow,1)
 	return
 
 def DonePress():
-        GemRB.UnloadWindow(ImportWindow)
-        GemRB.SetNextScript("Start")
-        return
+	GemRB.UnloadWindow(ImportWindow)
+	GemRB.SetNextScript("Start")
+	return
 	
 def CancelPress():
-        GemRB.UnloadWindow(ImportWindow)
-        GemRB.SetNextScript("GUICG24")
-        return
+	GemRB.UnloadWindow(ImportWindow)
+	GemRB.SetNextScript("GUICG24")
+	return

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIJRNL.py,v 1.8 2004/11/28 19:36:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIJRNL.py,v 1.9 2004/12/04 17:35:12 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -28,8 +28,9 @@
 # 3 - log/diary window
 
 ###################################################
-import GemRB
 from GUIDefines import *
+import GemRB
+from GUICommon import CloseOtherWindow
 
 ###################################################
 JournalWindow = None
@@ -54,17 +55,17 @@ def OpenJournalWindow ():
 	StartYear = GemRB.GetTableValue(Table, "STARTYEAR", "VALUE")
 	GemRB.UnloadTable(Table)
 
-	if JournalWindow:
+	if CloseOtherWindow (OpenJournalWindow):
 		if LogWindow: OpenLogWindow()
 		if QuestsWindow: OpenQuestsWindow()
 		
-		GemRB.HideGUI()
+		GemRB.HideGUI ()
 		
 		GemRB.UnloadWindow(JournalWindow)
 		JournalWindow = None
 		GemRB.SetVar("OtherWindow", -1)
 		
-		GemRB.UnhideGUI()
+		GemRB.UnhideGUI ()
 		return
 		
 	GemRB.HideGUI ()

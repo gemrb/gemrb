@@ -79,7 +79,7 @@ def OnLoad():
 	GemRB.SetText(ColorWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(ColorWindow,0)
 	GemRB.SetText(ColorWindow,DoneButton,11973)
-        GemRB.SetButtonFlags(ColorWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetButtonFlags(ColorWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	GemRB.SetEvent(ColorWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(ColorWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
@@ -183,7 +183,7 @@ def BackPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(ColorWindow)
+	GemRB.UnloadWindow(ColorWindow)
 	GemRB.SetVar("Color1",Color1)
 	GemRB.SetVar("Color2",Color2)
 	GemRB.SetVar("Color3",Color3)

@@ -7,7 +7,7 @@ def OnLoad():
 	global ImportWindow
 
 	GemRB.LoadWindowPack("GUICG")
-        ImportWindow = GemRB.LoadWindow(24)
+	ImportWindow = GemRB.LoadWindow(24)
 
 	TextAreaControl = GemRB.GetControl(ImportWindow, 0)
 	GemRB.SetText(ImportWindow, TextAreaControl, 53605)
@@ -21,23 +21,23 @@ def OnLoad():
 	CancelButton = GemRB.GetControl(ImportWindow,3)
 	GemRB.SetText(ImportWindow, CancelButton, 13727)
 
-        GemRB.SetEvent(ImportWindow, FileButton, IE_GUI_BUTTON_ON_PRESS, "FilePress")
-        GemRB.SetEvent(ImportWindow, SavedGameButton, IE_GUI_BUTTON_ON_PRESS, "GamePress")
-        GemRB.SetEvent(ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	GemRB.SetEvent(ImportWindow, FileButton, IE_GUI_BUTTON_ON_PRESS, "FilePress")
+	GemRB.SetEvent(ImportWindow, SavedGameButton, IE_GUI_BUTTON_ON_PRESS, "GamePress")
+	GemRB.SetEvent(ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetVisible(ImportWindow,1)
 	return
 
 def FilePress():
-        GemRB.UnloadWindow(ImportWindow)
-        GemRB.SetNextScript("ImportFile")
-        return
+	GemRB.UnloadWindow(ImportWindow)
+	GemRB.SetNextScript("ImportFile")
+	return
 	
 def GamePress():
-        GemRB.UnloadWindow(ImportWindow)
-        GemRB.SetNextScript("ImportGame")
-        return
+	GemRB.UnloadWindow(ImportWindow)
+	GemRB.SetNextScript("ImportGame")
+	return
 
 def CancelPress():
-        GemRB.UnloadWindow(ImportWindow)
-        GemRB.SetNextScript("CharGen")
-        return
+	GemRB.UnloadWindow(ImportWindow)
+	GemRB.SetNextScript("CharGen")
+	return

@@ -15,7 +15,7 @@ def OnLoad():
 	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
 	ClassWindow = GemRB.LoadWindow(2)
 	TmpTable=GemRB.LoadTable("races")
-        RaceName = GemRB.GetTableRowName(TmpTable, GemRB.GetVar("Race")-1 )
+	RaceName = GemRB.GetTableRowName(TmpTable, GemRB.GetVar("Race")-1 )
 
 	j = 0
 	#radiobutton groups must be set up before doing anything else to them
@@ -105,6 +105,6 @@ def BackPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(ClassWindow)
+	GemRB.UnloadWindow(ClassWindow)
 	GemRB.SetNextScript("CharGen4") #alignment
 	return

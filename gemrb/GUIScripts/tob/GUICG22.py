@@ -19,7 +19,7 @@ def OnLoad():
 	ClassName = GemRB.GetTableRowName(TmpTable, Class)
 	ClassID = GemRB.GetTableValue(TmpTable, Class, 5)
 	ClassList = GemRB.LoadTable("classes")
-        KitTable = GemRB.LoadTable("kittable")
+	KitTable = GemRB.LoadTable("kittable")
 	KitTableName = GemRB.GetTableValue(KitTable, ClassName, RaceName)
 	KitTable = GemRB.LoadTable(KitTableName,1)
 	KitList = GemRB.LoadTable("kitlist")
@@ -71,7 +71,7 @@ def OnLoad():
 	GemRB.SetText(KitWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(KitWindow,7)
 	GemRB.SetText(KitWindow,DoneButton,11973)
-        GemRB.SetButtonFlags(KitWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetButtonFlags(KitWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(KitWindow, 5)
 	GemRB.SetText(KitWindow,TextAreaControl,17247)
@@ -99,6 +99,6 @@ def BackPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(KitWindow)
+	GemRB.UnloadWindow(KitWindow)
 	GemRB.SetNextScript("CharGen4") #abilities
 	return

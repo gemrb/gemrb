@@ -72,6 +72,6 @@ def BackPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(GenderWindow)
+	GemRB.UnloadWindow(GenderWindow)
 	GemRB.SetNextScript("GUICG12") #appearance
 	return

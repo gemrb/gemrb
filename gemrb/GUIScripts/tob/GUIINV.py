@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.16 2004/12/02 21:47:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.17 2004/12/04 17:35:12 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -28,6 +28,7 @@ import string
 from GUIDefines import *
 from ie_stats import *
 import GemRB
+from GUICommon import CloseOtherWindow
 from GUICommonWindows import GetActorClassTitle, GetActorPaperDoll
 from GUICommonWindows import SetSelectionChangeHandler
 
@@ -39,17 +40,16 @@ ItemIdentifyWindow = None
 def OpenInventoryWindow ():
 	global InventoryWindow
 	
-	GemRB.HideGUI()
-	
-	if InventoryWindow != None:
-		
-		GemRB.UnloadWindow(InventoryWindow)
+	if CloseOtherWindow (OpenInventoryWindow):
+		GemRB.HideGUI ()
+		GemRB.UnloadWindow (InventoryWindow)
 		InventoryWindow = None
-		GemRB.SetVar("OtherWindow", -1)
+		GemRB.SetVar ("OtherWindow", -1)
 		SetSelectionChangeHandler (None)
-		GemRB.UnhideGUI()
+		GemRB.UnhideGUI ()
 		return
-		
+
+	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIINV")
 	InventoryWindow = Window = GemRB.LoadWindow(2)
 	GemRB.SetVar("OtherWindow", InventoryWindow)
@@ -310,7 +310,7 @@ def OnDragItem ():
 	slot = GemRB.GetVar ("ItemButton")
 	if not GemRB.IsDraggingItem ():
 		slot_item = GemRB.GetSlotItem (pc, slot)
-	        item = GemRB.GetItem (slot_item["ItemResRef"])
+		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0, 0)
 	else:
 		GemRB.DropDraggedItem (pc, slot)

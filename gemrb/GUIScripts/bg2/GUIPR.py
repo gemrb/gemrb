@@ -16,16 +16,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.12 2004/12/02 21:47:49 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.13 2004/12/04 17:35:09 avenger_teambg Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
 
 ###################################################
 
-import GemRB
 from GUIDefines import *
 from ie_stats import *
+import GemRB
+from GUICommon import CloseOtherWindow
 from GUICommonWindows import SetSelectionChangeHandler
 
 PriestWindow = None
@@ -37,17 +38,16 @@ PriestSpellUnmemorizeWindow = None
 def OpenPriestWindow ():
 	global PriestWindow
 
-	GemRB.HideGUI ()
-	
-	if PriestWindow != None:
+	if CloseOtherWindow (OpenPriestWindow):
+		GemRB.HideGUI ()
 		GemRB.UnloadWindow (PriestWindow)
 		PriestWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		
 		SetSelectionChangeHandler (None)
 		GemRB.UnhideGUI ()
 		return
-		
+
+	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIPR")
 	PriestWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", PriestWindow)

@@ -75,6 +75,6 @@ def BackPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(ClassWindow)
+	GemRB.UnloadWindow(ClassWindow)
 	GemRB.SetNextScript("CharGen4") #alignment
 	return

@@ -16,15 +16,15 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("START")
 #tutorial subwindow
-        TutorialWindow = GemRB.LoadWindow(5)
-        TextAreaControl = GemRB.GetControl(TutorialWindow, 1)
-        CancelButton = GemRB.GetControl(TutorialWindow, 11)
-        PlayButton = GemRB.GetControl(TutorialWindow, 10)
-        GemRB.SetText(TutorialWindow, TextAreaControl, 44200)
-        GemRB.SetText(TutorialWindow, CancelButton, 13727)
-        GemRB.SetText(TutorialWindow, PlayButton, 33093)
-        GemRB.SetEvent(TutorialWindow, PlayButton, IE_GUI_BUTTON_ON_PRESS, "PlayPress")
-        GemRB.SetEvent(TutorialWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelTut")
+	TutorialWindow = GemRB.LoadWindow(5)
+	TextAreaControl = GemRB.GetControl(TutorialWindow, 1)
+	CancelButton = GemRB.GetControl(TutorialWindow, 11)
+	PlayButton = GemRB.GetControl(TutorialWindow, 10)
+	GemRB.SetText(TutorialWindow, TextAreaControl, 44200)
+	GemRB.SetText(TutorialWindow, CancelButton, 13727)
+	GemRB.SetText(TutorialWindow, PlayButton, 33093)
+	GemRB.SetEvent(TutorialWindow, PlayButton, IE_GUI_BUTTON_ON_PRESS, "PlayPress")
+	GemRB.SetEvent(TutorialWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelTut")
 #quit subwindow
 	QuitWindow = GemRB.LoadWindow(3)
 	QuitTextArea = GemRB.GetControl(QuitWindow,0)
@@ -115,7 +115,7 @@ def PregenPress():
 	#do not start game after chargen
 	GemRB.SetVar("PlayMode",-1) #will return to pregen screen
 	GemRB.SetVar("Slot",0)
-        GemRB.SetNextScript("CharGen") #should be pregen screen
+	GemRB.SetNextScript("CharGen") #should be pregen screen
 	return
 
 def LoadSingle():
@@ -123,7 +123,7 @@ def LoadSingle():
 	GemRB.UnloadWindow(QuitWindow)
 	GemRB.UnloadWindow(TutorialWindow)
 	GemRB.SetVar("PlayMode",0)
-        GemRB.SetNextScript("GUILOAD")
+	GemRB.SetNextScript("GUILOAD")
 	return
 
 def NewSingle():
@@ -133,7 +133,7 @@ def NewSingle():
 	GemRB.SetVar("PlayMode",0) 
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(-1)
-        GemRB.SetNextScript("CharGen")
+	GemRB.SetNextScript("CharGen")
 	return
 
 def Tutorial():
@@ -142,18 +142,18 @@ def Tutorial():
 	return
 
 def PlayPress():
-        GemRB.UnloadWindow(StartWindow)
+	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
-        GemRB.UnloadWindow(TutorialWindow)
+	GemRB.UnloadWindow(TutorialWindow)
 	GemRB.SetVar("PlayMode",1) #tutorial
 	GemRB.SetVar("Slot",0)
 	GemRB.SetNextScript("CharGen")
-        return
+	return
 
 def CancelTut():
 	GemRB.SetVisible(TutorialWindow,0)
 	GemRB.SetVisible(StartWindow,1)
-        return
+	return
 
 def ExitPress():
 	GemRB.SetVisible(StartWindow,0)

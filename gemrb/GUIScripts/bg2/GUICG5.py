@@ -38,7 +38,7 @@ def NextPress():
 	#check length?
 	#seems like a good idea to store it here for the time being
 	GemRB.SetToken("CHARNAME",Name) 
-        GemRB.UnloadWindow(NameWindow)
+	GemRB.UnloadWindow(NameWindow)
 	GemRB.SetNextScript("CharGen9")
 	return
 

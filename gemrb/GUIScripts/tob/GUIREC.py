@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.10 2004/10/02 09:55:04 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.11 2004/12/04 17:35:12 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -45,8 +45,8 @@ import string
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+from GUICommon import CloseOtherWindow
 from GUICommonWindows import SetSelectionChangeHandler
-#, RunSelectionChangeHandler
 from GUICommonWindows import GetActorClassTitle
 from GUIWORLD import OpenReformPartyWindow
 
@@ -59,9 +59,8 @@ BiographyWindow = None
 def OpenRecordsWindow ():
 	global RecordsWindow
 
-	GemRB.HideGUI ()
-	
-	if RecordsWindow != None:
+	if CloseOtherWindow (OpenRecordsWindow):
+		GemRB.HideGUI ()
 		if InformationWindow: OpenInformationWindow ()
 		
 		GemRB.UnloadWindow (RecordsWindow)
@@ -69,9 +68,10 @@ def OpenRecordsWindow ():
 		GemRB.SetVar ("OtherWindow", -1)
 		SetSelectionChangeHandler (None)
 		
-		GemRB.UnhideGUI()
+		GemRB.UnhideGUI ()
 		return	
 
+	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIREC")
 	RecordsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", RecordsWindow)
@@ -213,11 +213,11 @@ def UpdateRecordsWindow ():
 		GemRB.SetText (Window, Label, 7199)
 
 	#collecting tokens for stat overview
-        ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
+	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
 
-        GemRB.SetToken("CLASS", ClassTitle)
-        GemRB.SetToken("LEVEL", str (GemRB.GetPlayerStat (pc, IE_LEVEL) ) )
-        GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
+	GemRB.SetToken("CLASS", ClassTitle)
+	GemRB.SetToken("LEVEL", str (GemRB.GetPlayerStat (pc, IE_LEVEL) ) )
+	GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
 
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)

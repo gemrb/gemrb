@@ -17,12 +17,12 @@ def OnLoad():
 	RaceCount = GemRB.GetTableRowCount(RaceTable)
 
 	for i in range(2,RaceCount+2):
-                Button = GemRB.GetControl(RaceWindow,i)
+		Button = GemRB.GetControl(RaceWindow,i)
 		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 	for i in range(2, RaceCount+2):
-                Button = GemRB.GetControl(RaceWindow,i)
+		Button = GemRB.GetControl(RaceWindow,i)
 		GemRB.SetText(RaceWindow,Button, GemRB.GetTableValue(RaceTable,i-2,0) )
-                GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
 		GemRB.SetEvent(RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"RacePress")
 		GemRB.SetVarAssoc(RaceWindow,Button,"Race",i-1)
 
@@ -30,14 +30,14 @@ def OnLoad():
 	GemRB.SetText(RaceWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(RaceWindow,0)
 	GemRB.SetText(RaceWindow,DoneButton,11973)
-        GemRB.SetButtonFlags(RaceWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
-        GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonFlags(RaceWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl = GemRB.GetControl(RaceWindow, 12)
 	GemRB.SetText(RaceWindow,TextAreaControl,17237)
 
-        GemRB.SetEvent(RaceWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
-        GemRB.SetEvent(RaceWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	GemRB.SetEvent(RaceWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	GemRB.SetEvent(RaceWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	GemRB.SetVisible(RaceWindow,1)
 	return
 
@@ -54,6 +54,6 @@ def BackPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(RaceWindow)
+	GemRB.UnloadWindow(RaceWindow)
 	GemRB.SetNextScript("CharGen3") #class
 	return
