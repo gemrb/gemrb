@@ -657,6 +657,15 @@ int Interface::UnloadCreature(int Slot)
 	return 1;
 }
 
+Actor *Interface::GetActor(int Slot)
+{
+	if(Slot>=actors.size())
+		return 0;
+	if(!actors[Slot])
+		return 0;
+	return actors[Slot];
+}
+
 int Interface::LoadCreature(char *ResRef, int InParty)
 {
 	ActorMgr *actormgr=(ActorMgr *) GetInterface(IE_CRE_CLASS_ID);

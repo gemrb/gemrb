@@ -111,6 +111,8 @@ public:
 	int LoadCreature(char *ResRef, int InParty);
 	/** Removes a creature */
 	int UnloadCreature(int Slot);
+	/** Returns the actor pointer for Slot */
+	Actor *GetActor(int Slot);
 	/** Returns actor index for partyslot PartySlotCount */
 	int FindPlayer(int PartySlotCount);
 	/** Sets a stat for the creature in actor index Slot */
