@@ -286,7 +286,7 @@ void SDLVideoDriver::DrawRect(Region &rgn, Color &color){
 	SDL_FreeSurface(rectsurf);
 }
 /** Creates a Palette from Color */
-Color * SDLVideoDriver::CreatePalette(Color color)
+Color * SDLVideoDriver::CreatePalette(Color color, Color back)
 {
 	Color * pal = (Color*)malloc(256*sizeof(Color));
 	pal[0].r = 0;
@@ -294,9 +294,9 @@ Color * SDLVideoDriver::CreatePalette(Color color)
 	pal[0].b = 0;
 	pal[0].a = 0;
 	for(int i = 1; i < 256; i++) {
-		pal[i].r = (unsigned char)((color.r*(i))/255.0);
-		pal[i].g = (unsigned char)((color.g*(i))/255.0);
-		pal[i].b = (unsigned char)((color.b*(i))/255.0);
+		pal[i].r = back.r+(unsigned char)(((color.r-back.r)*(i))/255.0);
+		pal[i].g = back.g+(unsigned char)(((color.g-back.g)*(i))/255.0);
+		pal[i].b = back.b+(unsigned char)(((color.b-back.b)*(i))/255.0);
 		pal[i].a = 0;
 	}
 	return pal;

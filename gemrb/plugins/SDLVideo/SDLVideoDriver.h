@@ -33,7 +33,7 @@ public:
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(Region &rgn, Color &color);
 	/** Creates a Palette from Color */
-	Color * CreatePalette(Color color);
+	Color * CreatePalette(Color color, Color back);
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, Sprite2D * img, bool anchor = false);
 };
