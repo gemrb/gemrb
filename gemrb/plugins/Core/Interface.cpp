@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.133 2004/02/29 19:32:34 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.134 2004/03/11 22:40:55 avenger_teambg Exp $
  *
  */
 
@@ -762,6 +762,8 @@ bool Interface::LoadConfig(const char* filename)
 			SetFeature( atoi( value ), GF_HAS_DPLAYER );
 		} else if (stricmp( name, "HasPDIALOG" ) == 0) {
 			SetFeature( atoi( value ), GF_HAS_PDIALOG );
+		} else if (stricmp( name, "HasEXPTABLE" ) == 0) {
+			SetFeature( atoi( value ), GF_HAS_EXPTABLE );
 		} else if (stricmp( name, "SoundFolders" ) == 0) {
 			SetFeature( atoi( value ), GF_SOUNDFOLDERS );
 		} else if (stricmp( name, "MidResAvatars" ) == 0) {

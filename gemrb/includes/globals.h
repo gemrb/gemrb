@@ -68,6 +68,7 @@ typedef unsigned long DWORD;
 #define  GF_IGNORE_BUTTON_FRAMES		8 // all?
 #define  GF_HAS_PDIALOG				9 // bg1, bg2
 #define  GF_HAS_DPLAYER				10 // not pst
+#define  GF_HAS_EXPTABLE			11 // iwd, iwd2
 
 /////AI global defines
 #define AI_UPDATE_TIME	30

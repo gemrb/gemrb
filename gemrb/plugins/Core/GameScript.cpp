@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.85 2004/03/11 22:08:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.86 2004/03/11 22:40:40 avenger_teambg Exp $
  *
  */
 
@@ -85,7 +85,9 @@ static TriggerLink triggernames[] = {
 static ActionLink actionnames[] = {
 	{"actionoverride",NULL}, {"activate",GameScript::Activate},
 	{"addglobals",GameScript::AddGlobals}, {"ally",GameScript::Ally},
+	{"addxp2da", GameScript::AddXP2DA},
 	{"addxpobject", GameScript::AddXPObject},
+	{"addxpvar", GameScript::AddXP2DA},
 	{"ambientactivate",GameScript::AmbientActivate},
 	{"bitclear",GameScript::BitClear}, {"bitset",GameScript::GlobalBOr}, //probably the same
 	{"changeaiscript",GameScript::ChangeAIScript},
@@ -115,6 +117,7 @@ static ActionLink actionnames[] = {
 	{"dialogueforceinterrupt",GameScript::DialogueForceInterrupt,AF_BLOCKING},
 	{"displaystring",GameScript::DisplayString},
 	{"displaystringhead",GameScript::DisplayStringHead},
+	{"displaystringnonamehead",GameScript::DisplayStringNoNameHead},
 	{"displaystringwait",GameScript::DisplayStringWait,AF_BLOCKING},
 	{"endcutscenemode",GameScript::EndCutSceneMode},
 	{"enemy",GameScript::Enemy}, {"face",GameScript::Face,AF_BLOCKING},
@@ -181,11 +184,18 @@ static ActionLink actionnames[] = {
 	{"smallwait",GameScript::SmallWait,AF_BLOCKING},
 	{"startcutscene",GameScript::StartCutScene},
 	{"startcutscenemode",GameScript::StartCutSceneMode},
+	{"startdialog",GameScript::StartDialogue,AF_BLOCKING},
 	{"startdialogue",GameScript::StartDialogue,AF_BLOCKING},
+	{"startdialoginterrupt",GameScript::StartDialogueInterrupt,AF_BLOCKING},
 	{"startdialogueinterrupt",GameScript::StartDialogueInterrupt,AF_BLOCKING},
+	{"startdialognoname",GameScript::StartDialogue,AF_BLOCKING},
+	{"startdialoguenoname",GameScript::StartDialogue,AF_BLOCKING},
+	{"startdialognoset",GameScript::StartDialogueNoSet,AF_BLOCKING},
 	{"startdialoguenoset",GameScript::StartDialogueNoSet,AF_BLOCKING},
 	{"startdialoguenosetinterrupt",GameScript::StartDialogueNoSetInterrupt,AF_BLOCKING},
+	{"startdialogoverride",GameScript::StartDialogueOverride,AF_BLOCKING},
 	{"startdialogueoverride",GameScript::StartDialogueOverride,AF_BLOCKING},
+	{"startdialogoverrideinterrupt",GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startdialogueoverrideinterrupt",GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startmovie",GameScript::StartMovie},
 	{"startsong",GameScript::StartSong},
@@ -2827,6 +2837,18 @@ void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
 	actor->WalkTo( Sender->XPos+parameters->XpointParameter, Sender->YPos+parameters->YpointParameter );
 }
 
+void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if (actor) {
+		printf( "Displaying string on: %s (without name)\n", actor->scriptName );
+		actor->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
+	}
+}
+
 void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -3438,6 +3460,32 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	actor->NewStat(IE_XP, parameters->int0Parameter, 0);
+}
+
+void GameScript::AddXP2DA(Scriptable* Sender, Action* parameters)
+{
+	int xptable;
+	
+	if(core->HasFeature(GF_HAS_EXPTABLE) ) {
+		xptable = core->LoadTable("exptable");
+	}
+	else {
+		xptable = core->LoadTable( "xplist" );
+	}
+	
+	if(parameters->int0Parameter>0) {
+		//display string
+	}
+	char * xpvalue = core->GetTable( xptable )->QueryField( parameters->string0Parameter, "0" ); //level is unused
+	
+	if( xpvalue[0]=='P' && xpvalue[1]=='_') {
+		core->GetGame()->ShareXP(atoi(xpvalue+2) );
+	}
+	else {
+		Actor* actor = ( Actor* ) core->GetGame()->GetPC(0);
+		actor->NewStat(IE_XP, atoi(xpvalue), 0);
+	}
+	core->DelTable( xptable );
 }
 
 void GameScript::AddExperienceParty(Scriptable* Sender, Action* parameters)
