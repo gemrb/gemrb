@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.40 2003/12/06 17:27:57 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.41 2003/12/09 00:45:21 balrog994 Exp $
  *
  */
 
@@ -651,19 +651,20 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode,
 		if((desty < 0) || (desty > core->Height))
 			continue;
 		destx = drect.x; 
-		unsigned char * src = ((unsigned char*)surf->pixels)+(y*surf->pitch);
+		unsigned char * src = ((unsigned char*)spr->pixels)+(y*surf->pitch);
 		for(int x = srect->x; x < srect->w; x++) {
 			if((destx < 0) || (destx > core->Width)) {
 				src++;
+				destx++;
 				continue;
 			}
-			if(*src == 0) {
-				src++;
+			SDL_Color c1 = surf->format->palette->colors[*src++];
+			if((c1.r == 0) && (c1.g == 0xff) && (c1.b == 0)) {
+				destx++;
 				continue;
 			}
 			Color color;
 			GetPixel(destx,desty, &color);
-			SDL_Color c1 = surf->format->palette->colors[*src++];
 			if(c1.r > color.r)
 				color.r = c1.r;
 			if(c1.g > color.g)
