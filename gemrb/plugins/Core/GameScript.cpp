@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.25 2003/12/30 18:13:33 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.26 2003/12/30 21:51:48 balrog994 Exp $
  *
  */
 
@@ -64,6 +64,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		triggers[0x23] = True;
 		triggers[0x30] = False;
 		triggers[0x36] = OnCreation;
+		triggers[0x4C] = Entered;
 		triggers[0x70] = Clicked;
 
 		actions[7] = CreateCreature;
@@ -245,6 +246,8 @@ void GameScript::Update(Scriptable * mySelf)
 	Scriptable * oldMySelf = MySelf;
 	if(mySelf)
 		MySelf = mySelf;
+	if(MySelf && !MySelf->Active)
+		return;
 	while(programmedActions.size()) {
 		//printf("Executing Script Step\n");
 		Action * aC = programmedActions.front();
@@ -254,6 +257,10 @@ void GameScript::Update(Scriptable * mySelf)
 			endReached = true;
 			if(MySelf) {
 				MySelf->Clicker = NULL;
+				if(!(MySelf->EndAction & SEA_RESET) && (MySelf->Type == ST_PROXIMITY))
+					MySelf->Active = false;
+				else
+					MySelf->Active = true;
 			}
 			return;
 		}
@@ -1159,6 +1166,22 @@ int GameScript::Clicked(GameScript * Sender, Trigger * parameters)
 	return 0;
 }
 
+int GameScript::Entered(GameScript * Sender, Trigger * parameters)
+{
+	if(Sender->MySelf->Type != ST_PROXIMITY)
+		return 0;
+	if(parameters->objectParameter->eaField == 0) {
+		if(Sender->MySelf->LastEntered)
+			return 1;
+		else
+			return 0;
+	}
+	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
+	if(Sender->MySelf->LastEntered == target)
+		return 1;
+	return 0;
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -1564,7 +1587,7 @@ void GameScript::DisplayString(GameScript * Sender, Action * parameters)
 		free(scr->overHeadText);
 	scr->overHeadText = core->GetString(parameters->int0Parameter);
 	GetTime(scr->timeStartDisplaying);
-	scr->textDisplaying = 1;
+	scr->textDisplaying = 0;
 	GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
 	if(gc->ControlType == IE_GUI_GAMECONTROL)
 		gc->DisplayString(scr);
