@@ -184,5 +184,18 @@
 #define IE_GENERAL		203
 #define IE_EA		204
 #define IE_SPECIFIC	205
+//GemRB Specific Defines
+#define IE_ANIMATION_ID 206
+#define IE_STATE_ID 207
+#define IE_METAL_COLOR		208
+#define IE_MINOR_COLOR		209
+#define IE_MAJOR_COLOR		210
+#define IE_SKIN_COLOR		211
+#define IE_LEATHER_COLOR	212
+#define IE_ARMOR_COLOR		213
+#define IE_HAIR_COLOR		214
+#define IE_MC_FLAGS			215
+#define IE_TALKCOUNT		216
+
 
 #endif
