@@ -52,6 +52,11 @@ void GlobalTimer::Update()
 			waitCounter--;
 			return;
 		}
+		GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);
+		if(gc->ControlType == IE_GUI_GAMECONTROL) {
+			if(gc->Dialogue)
+				return;
+		}
 		MovingActor = NULL;
 		if(CutScene) {
 			if(!CutScene->endReached) {
