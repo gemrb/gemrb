@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.121 2004/02/15 14:29:53 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.122 2004/02/15 23:04:25 avenger_teambg Exp $
  *
  */
 
@@ -1498,33 +1498,7 @@ static PyObject * GemRB_LoadMusicPL(PyObject * /*self*/, PyObject *args)
 	Py_INCREF(Py_None);
 	return Py_None;
 }
-#if 0
-static PyObject * GemRB_LoadMusicPL(PyObject * /*self*/, PyObject *args)
-{
-	char* ResRef;
 
-	if(!PyArg_ParseTuple(args, "s", &ResRef)) {
-		printMessage("GUIScript", "Syntax Error: LoadMusicPL(MusicPlayListResource)\n", LIGHT_RED);
-		return NULL;
-	}
-	
-	core->GetMusicMgr()->HardEnd();
-	bool ret = core->GetMusicMgr()->OpenPlaylist(ResRef);
-	if(!ret)
-		return NULL;
-
-	Py_INCREF(Py_None);
-	return Py_None;
-}
-
-static PyObject * GemRB_StartPL(PyObject * /*self*/, PyObject * /*args*/)
-{	
-	core->GetMusicMgr()->Start();
-
-	Py_INCREF(Py_None);
-	return Py_None;
-}
-#endif
 static PyObject * GemRB_SoftEndPL(PyObject * /*self*/, PyObject * /*args*/)
 {	
 	core->GetMusicMgr()->End();
@@ -1788,6 +1762,24 @@ static PyObject *GemRB_Roll(PyObject * /*self*/, PyObject *args)
 	return Py_BuildValue("i",core->Roll(Dice, Size, Add) );
 }
 
+static PyObject *GemRB_GetCharSounds(PyObject * /*self*/, PyObject *args)
+{
+	int wi, ci;
+
+	if(!PyArg_ParseTuple(args, "ii", &wi, &ci) ) {
+		printMessage("GUIScript","Syntax Error: GetCharSounds(WindowID, ControlID)\n", LIGHT_RED);
+	}
+	Window * win = core->GetWindow(wi);
+	if(!win)
+		return NULL;
+	TextArea * ta = (TextArea*)win->GetControl(ci);
+	if(!ta)
+		return NULL;
+	if(ta->ControlType != IE_GUI_TEXTAREA)
+		return NULL;
+	return Py_BuildValue("i",core->GetCharSounds(ta) );
+}
+
 static PyObject *GemRB_GetINIPartyCount(PyObject * /*self*/, PyObject *args)
 {
 	if(!core->GetPartyINI())
@@ -1999,7 +1991,6 @@ static PyObject *GemRB_SetWorldMapImage( PyObject * /*self*/, PyObject *args)
 	return Py_None;
 }
 
-
 static PyObject *GemRB_SetSpellIcon( PyObject * /*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex;
@@ -2100,17 +2091,12 @@ static PyObject *GemRB_SetItemIcon( PyObject * /*self*/, PyObject *args)
 
 	Button * btn = (Button*)ctrl;
 	btn->SetImage(IE_GUI_BUTTON_UNPRESSED, item->ItemIconBAM->GetFrame (0));
-	//btn->SetImage(IE_GUI_BUTTON_PRESSED, item->ItemIconBAM->GetFrame (0));
 	delete item;
 	core->FreeInterface(im);
 
 	Py_INCREF(Py_None);
 	return Py_None;
 }
-
-
-
-
 
 static PyObject * GemRB_ExecuteString(PyObject * /*self*/, PyObject *args)
 {
@@ -2312,10 +2298,7 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"LoadMusicPL", GemRB_LoadMusicPL, METH_VARARGS,
      "Loads and starts a Music PlayList."},
-/*
-	{"StartPL", GemRB_StartPL, METH_NOARGS,
-     "Starts a Music Playlist."},
-*/
+
 	{"SoftEndPL", GemRB_SoftEndPL, METH_NOARGS,
      "Ends a Music Playlist softly."},
 
@@ -2345,6 +2328,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"Roll", GemRB_Roll, METH_VARARGS,
      "Calls traditional dice roll."},
+
+	{"GetCharSounds", GemRB_GetCharSounds, METH_VARARGS,
+     "Reads in the contents of the sounds subfolder."},
 
 	{"GetSaveGameCount", GemRB_GetSaveGameCount, METH_VARARGS,
      "Returns the number of saved games."},
