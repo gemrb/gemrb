@@ -124,7 +124,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus("OK", LIGHT_GREEN);
-	printMessage("Core", "Iniaitlizing Hard Coded Animations...", WHITE);
+	printMessage("Core", "Initializing Hard Coded Animations...", WHITE);
 	hcanims = (HCAnimationSeq*)GetInterface(IE_HCANIMS_CLASS_ID);
 	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Checking for Dialogue Manager...", WHITE);
@@ -392,10 +392,6 @@ Factory * Interface::GetFactory(void)
 	return factory;
 }
 
-#ifndef WIN32
-#define stricmp(x,y) strcasecmp(x,y)
-#endif
-
 bool Interface::LoadConfig(void)
 {
 	FILE * config;
@@ -563,16 +559,28 @@ int Interface::SetVisible(unsigned short WindowIndex, bool visible)
 int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long EventID, char * funcName)
 {
 	if(WindowIndex > windows.size())
+	{
+		printf("Core","Window not found: %0x", WindowIndex);
+		printStatus("ERROR", LIGHT_RED);
 		return -1;
+	}
 	Window * win = windows[WindowIndex];
 	Control * ctrl = win->GetControl(ControlIndex);
 	if(ctrl == NULL)
+	{
+		printf("Core","Control not found: %0x", ControlIndex);
+		printStatus("ERROR", LIGHT_RED);
 		return -1;
-	switch((EventID & 0xff000000) >> 24) {
+	}
+	if(ctrl->ControlType!=(EventID>>24) )
+	{
+		printf("Expected control: %0x, but got: %0x",EventID>>24,ctrl->ControlType);
+		printStatus("ERROR", LIGHT_RED);
+		return -1;
+	}
+	switch(ctrl->ControlType) {
 		case 0: //Button
 			{
-			if(ctrl->ControlType != 0)
-				return -1;
 			Button * btn = (Button*)ctrl;
 			btn->SetEvent(funcName);
 			return 0;
@@ -581,14 +589,14 @@ int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex,
 
 		case 2: //Slider
 			{
-			if(ctrl->ControlType != 2)
-				return -1;
 			Slider * sld = (Slider*)ctrl;
 			strcpy(sld->SliderOnChange, funcName);
 			return 0;
 			}
 		break;
 	}
+	printf("Control has no event implemented: %0x", ctrl->ControlID);
+	printStatus("ERROR", LIGHT_RED);
 	return -1;
 }
 
