@@ -69,13 +69,13 @@ void Actor::SetAnimationID(unsigned short AnimID)
 	char * BaseResRef = at->QueryField(RowIndex, 0);
 	char * Mirror = at->QueryField(RowIndex, 1);
 	char * Orient = at->QueryField(RowIndex, 2);
-	anims = new CharAnimations(BaseResRef, atoi(Orient), atoi(Mirror));
+	anims = new CharAnimations(BaseResRef, atoi(Orient), atoi(Mirror), RowIndex);
 
 	Color Pal[256];
-	Pal[0].r = 0x00; Pal[0].g = 0xff; Pal[0].b = 0x00; Pal[0].a = 0x00;
-	Pal[1].r = 0x00; Pal[1].g = 0x00; Pal[1].b = 0x00; Pal[1].a = 0x00;
-	Pal[2].r = 0xff; Pal[2].g = 0x80; Pal[2].b = 0x80; Pal[2].a = 0x00;
-	Pal[3].r = 0xff; Pal[3].g = 0x80; Pal[3].b = 0x80; Pal[3].a = 0x00;
+	Pal[0].r = 0x00; Pal[0].g = 0xff; Pal[0].b = 0x00; Pal[0].a = 0xff;
+	Pal[1].r = 0x00; Pal[1].g = 0x00; Pal[1].b = 0x00; Pal[1].a = 0xff;
+	Pal[2].r = 0xff; Pal[2].g = 0x80; Pal[2].b = 0x80; Pal[2].a = 0xff;
+	Pal[3].r = 0xff; Pal[3].g = 0x80; Pal[3].b = 0x80; Pal[3].a = 0xff;
 	Color * MetalPal   = core->GetPalette(BaseStats[IE_METAL_COLOR], 12);
 	Color * MinorPal   = core->GetPalette(BaseStats[IE_MINOR_COLOR], 12);
 	Color * MajorPal   = core->GetPalette(BaseStats[IE_MAJOR_COLOR], 12);
