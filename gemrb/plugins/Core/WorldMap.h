@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.8 2005/02/17 17:21:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.9 2005/02/19 16:46:50 avenger_teambg Exp $
  *
  */
 
@@ -46,7 +46,10 @@
 #define WMP_ENTRY_ACCESSIBLE 0x4
 #define WMP_ENTRY_VISITED    0x8
 
-typedef struct WMPAreaEntry {
+class GEM_EXPORT WMPAreaEntry {
+public:
+	WMPAreaEntry();
+	~WMPAreaEntry();
 	ieResRef AreaName;
 	ieResRef AreaResRef;
 	char AreaLongName[32];
@@ -59,9 +62,9 @@ typedef struct WMPAreaEntry {
 	ieResRef LoadScreenResRef;
 	ieDword AreaLinksIndex[4];
 	ieDword AreaLinksCount[4];
-//	char unknown[128];
+
 	Sprite2D* MapIcon;
-} WMPAreaEntry;
+};
 
 
 typedef struct WMPAreaLink {
@@ -90,7 +93,6 @@ public:
 	ieDword AreaLinksOffset;
 	ieDword AreaLinksCount;
 	ieResRef MapIconResRef;
-//	char unknown3[128];
 	Sprite2D* MapMOS;
 public:
 	void AddAreaEntry(WMPAreaEntry *ae);

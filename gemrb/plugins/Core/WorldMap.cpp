@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.8 2005/02/17 17:21:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.9 2005/02/19 16:46:50 avenger_teambg Exp $
  *
  */
 
@@ -25,6 +25,17 @@
 
 extern Interface *core;
 
+WMPAreaEntry::WMPAreaEntry()
+{
+	MapIcon=NULL;
+}
+WMPAreaEntry::~WMPAreaEntry()
+{
+	if (MapIcon) {
+		core->GetVideoDriver()->FreeSprite(MapIcon);
+	}
+}
+ 
 WorldMap::WorldMap(void)
 {
 	MapMOS = NULL;
@@ -32,17 +43,17 @@ WorldMap::WorldMap(void)
 
 void WorldMap::AddAreaEntry(WMPAreaEntry *ae)
 {
-  area_entries.push_back(ae);
+	area_entries.push_back(ae);
 }
 
 void WorldMap::AddAreaLink(WMPAreaLink *al)
 {
-  area_links.push_back(al);
+	area_links.push_back(al);
 }
 
 WorldMap::~WorldMap(void)
 {
-  unsigned int i;
+	unsigned int i;
 
 	for (i = 0; i < area_entries.size(); i++) {
 		delete( area_entries[i] );
