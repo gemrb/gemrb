@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.2 2004/01/18 18:12:40 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.3 2004/03/20 23:10:34 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -68,6 +68,7 @@
 ###################################################
 import GemRB
 from GUIDefines import *
+from GUIWORLD import OpenReformPartyWindow
 
 #from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
 #import GUICommonWindows
@@ -97,8 +98,6 @@ def OpenRecordsWindow ():
 	RecordsWindow = Window = GemRB.LoadWindow (3)
         GemRB.SetVar ("OtherWindow", RecordsWindow)
 
-	GemRB.UnhideGUI ()
-
 
 	# Information
 	Button = GemRB.GetControl (Window, 7)
@@ -108,6 +107,7 @@ def OpenRecordsWindow ():
 	# Reform Party
 	Button = GemRB.GetControl (Window, 8)
 	GemRB.SetText (Window, Button, 4244)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
 
 	# Level Up
 	Button = GemRB.GetControl (Window, 9)
@@ -167,7 +167,14 @@ def OpenRecordsWindow ():
 	Button = GemRB.GetControl (Window, 38)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
+	#portrait = GemRB.ActorGetLargePortrait (0)
+	#print "PORTRAIT:", portrait
+	Image = GemRB.GetControl (Window, 2)
+	GemRB.SetButtonFlags(Window, Image, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
+	GemRB.SetButtonPicture (Window, Image, "STPNOZ")
+
 	#GemRB.SetVisible (Window, 1)
+	GemRB.UnhideGUI ()
 
 
 def OpenInformationWindow ():

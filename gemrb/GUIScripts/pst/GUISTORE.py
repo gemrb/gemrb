@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUISTORE.py,v 1.2 2004/02/19 22:23:10 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUISTORE.py,v 1.3 2004/03/20 23:10:34 edheldil Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -44,11 +44,11 @@ HelpStoreRent = None
 character_name = "Morticia"
 store_name = ''
 store_room_prices = (0, 0, 0, 0)
-party_gold = 1000
+party_gold = 0
 store_buttons = {}
 
 def OpenStoreWindow ():
-	global StoreWindow, store_name, store_room_prices
+	global StoreWindow, store_name, store_room_prices, party_gold
 	
 	GemRB.HideGUI ()
 	
@@ -116,6 +116,7 @@ def OpenStoreWindow ():
 	store_buttons['rent'] = Button
 
 
+	party_gold = GemRB.GameGetPartyGold ()
 	OpenStoreShoppingWindow ()
 	
 	GemRB.UnhideGUI()
@@ -182,6 +183,7 @@ def OpenStoreShoppingWindow ():
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetText (Window, Button, 45304)
 
+	# 45374
 
 	# 7 scrollbar
 	# 8-11, @11 -@14 - slots and their labels
