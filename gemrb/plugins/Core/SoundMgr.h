@@ -22,6 +22,9 @@ public:
 	virtual ~SoundMgr(void);
 	virtual bool Init(void) = 0;
 	virtual unsigned long Play(const char * ResRef) = 0;
+	virtual unsigned long LoadFile(const char * filename) = 0;
+	virtual bool Stop(unsigned long index) = 0;
+	virtual bool Play(unsigned long index) = 0;
 };
 
 #endif

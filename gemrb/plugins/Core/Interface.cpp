@@ -32,6 +32,7 @@ Interface::Interface(void)
 	guiscript = NULL;
 	windowmgr = NULL;
 	vars = NULL;
+	music = NULL;
 	ConsolePopped = false;
 	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
@@ -82,6 +83,8 @@ Interface::~Interface(void)
 		delete(guiscript);
 	if(vars)
 		delete(vars);
+	if(music)
+		delete(music);
 	delete(console);
 	delete(plugin);
 }
@@ -214,6 +217,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	if(!guiscript->Init()) {
+		
 		printStatus("ERROR", LIGHT_RED);
 		return GEM_ERROR;
 	}
@@ -243,6 +247,13 @@ int Interface::Init()
 	printMessage("Core", "Initializing Variables Dictionary...", WHITE);
 	vars = new Variables();
 	if(!vars) {
+		printStatus("ERROR", LIGHT_RED);
+		return GEM_ERROR;
+	}
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Initializing Music Manager...", WHITE);
+	music = (MusicMgr*)GetInterface(IE_MUS_CLASS_ID);
+	if(!music) {
 		printStatus("ERROR", LIGHT_RED);
 		return GEM_ERROR;
 	}
@@ -749,4 +760,9 @@ bool Interface::Quit(void)
 Variables * Interface::GetDictionary()
 {
 	return vars;
+}
+/** Get the Music Manager */
+MusicMgr * Interface::GetMusicMgr()
+{
+	return music;
 }

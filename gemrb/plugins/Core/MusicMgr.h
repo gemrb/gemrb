@@ -51,6 +51,8 @@ public:
   virtual bool OpenPlaylist(const char *name) = 0;
   /** Switches the current PlayList while playing the current one */
   virtual void SwitchPlayList(const char * name) = 0;
+  /** Plays the Next Entry */
+  virtual void PlayNext() = 0;
 };
 
 #endif

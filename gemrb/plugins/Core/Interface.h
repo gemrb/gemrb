@@ -21,6 +21,7 @@
 #include "Console.h"
 #include "SoundMgr.h"
 #include "Variables.h"
+#include "MusicMgr.h"
 
 #ifdef WIN32
 
@@ -55,6 +56,7 @@ private:
 	/** Windows Array */
 	std::vector<Window*> windows;
 	Variables * vars;
+	MusicMgr * music;
 public:
 	Interface(void);
 	~Interface(void);
@@ -107,6 +109,8 @@ public:
 	SoundMgr * GetSoundMgr();
 	/** Get the Variables Dictionary */
 	Variables * GetDictionary();
+	/** Get the Music Manager */
+	MusicMgr * GetMusicMgr();
 private:
 	bool LoadConfig(void);
 public:
