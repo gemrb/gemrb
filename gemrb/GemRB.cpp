@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.11 2003/11/25 13:47:58 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.12 2003/12/07 09:36:21 avenger_teambg Exp $
  *
  */
 
@@ -35,7 +35,7 @@
 #include "plugins/Core/WindowMgr.h"
 
 #ifndef WIN32
-//extern Interface * core;
+#include <ctype.h>
 #include <sys/time.h>
 #else
 #include <windows.h>
@@ -85,3 +85,42 @@ int main(int argc, char ** argv)
 	delete(core);
 	return 0;
 }
+
+//// Globally used functions
+bool dir_exists(const char *path)
+{
+        struct stat buf;
+
+        buf.st_mode=0;
+        stat(path, &buf);
+        return S_ISDIR(buf.st_mode);
+}
+
+//// Compatibility functions
+#ifdef WIN32
+
+#else
+char *strupr(char *string)
+{
+        char *s;
+        if(string)
+        {
+                for(s = string; *s; ++s)
+                        *s = toupper(*s);
+        }
+        return string;
+}
+
+char *strlwr(char *string)
+{
+        char *s;
+        if(string)
+        {
+                for(s = string; *s; ++s)
+                        *s = tolower(*s);
+        }
+        return string;
+}
+
+#endif
+
