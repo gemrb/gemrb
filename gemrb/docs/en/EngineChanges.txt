@@ -1,4 +1,8 @@
-Changes to the original engines.
+Changes to the original engines
+*******************************
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/EngineChanges.txt,v 1.1 2005/02/03 21:10:15 edheldil Exp $
+
+
 Generally the changes were designed to be compatible with the original game files. No additional fields added (so far), only previously unused parts are used.
 
 1. Items entries:
