@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.56 2004/08/02 18:00:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.57 2004/08/03 23:30:33 guidoj Exp $
  *
  */
 
@@ -197,11 +197,11 @@ Map* AREImp::GetMap(const char *ResRef)
 	for (i = 0; i < DoorsCount; i++) {
 		str->Seek( DoorsOffset + ( i * 0xc8 ), GEM_STREAM_START );
 		int count;
-		unsigned long Flags, OpenFirstVertex, ClosedFirstVertex;
-		unsigned short OpenVerticesCount, ClosedVerticesCount;
+		ieDword Flags, OpenFirstVertex, ClosedFirstVertex;
+		ieWord OpenVerticesCount, ClosedVerticesCount;
 		char LongName[33], ShortName[9];
-		short minX, maxX, minY, maxY;
-		unsigned long cursor;
+		ieWord minX, maxX, minY, maxY;
+		ieDword cursor;
 		Region BBClosed, BBOpen;
 		str->Read( LongName, 32 );
 		LongName[32] = 0;
@@ -294,9 +294,9 @@ Map* AREImp::GetMap(const char *ResRef)
 	//Loading Containers
 	for (i = 0; i < ContainersCount; i++) {
 		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
-		unsigned short Type, LockDiff, Locked, Unknown;
-		unsigned short TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
-		unsigned long ItemIndex, ItemCount;
+		ieWord Type, LockDiff, Locked, Unknown;
+		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
+		ieDword ItemIndex, ItemCount;
 		char Name[33];
 		Point p;
 		str->Read( Name, 32 );
@@ -323,12 +323,12 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Read( &ItemCount, 4 );
 		str->Read( Script, 8 );
 		Script[8]=0;
-		unsigned long firstIndex, vertCount;
+		ieDword firstIndex, vertCount;
 		str->Read( &firstIndex, 4 );
 		str->Read( &vertCount, 4 );
 		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( vertCount*sizeof( Point ) );
-		for (unsigned long x = 0; x < vertCount; x++) {
+		for (unsigned int x = 0; x < vertCount; x++) {
 			str->Read( &points[x].x, 2 );
 			str->Read( &points[x].y, 2 );
 		}
@@ -357,10 +357,10 @@ Map* AREImp::GetMap(const char *ResRef)
 	//Loading InfoPoints
 	for (i = 0; i < InfoPointsCount; i++) {
 		str->Seek( InfoPointsOffset + ( i * 0xC4 ), GEM_STREAM_START );
-		unsigned short Type, VertexCount;
-		unsigned long FirstVertex, Cursor, Flags;
-		unsigned short TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
-		unsigned short LaunchX, LaunchY;
+		ieWord Type, VertexCount;
+		ieDword FirstVertex, Cursor, Flags;
+		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
+		ieWord LaunchX, LaunchY;
 		char Name[33], Script[9], Key[9], Destination[9], Entrance[33];
 		str->Read( Name, 32 );
 		Name[32] = 0;
@@ -381,7 +381,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Read( Entrance, 32 );
 		Entrance[32] = 0;
 		str->Read( &Flags, 4 );
-		unsigned long StrRef;
+		ieStrRef StrRef;
 		str->Read( &StrRef, 4 );
 		str->Read( &TrapDetDiff, 2 );
 		str->Read( &TrapRemDiff, 2 );
@@ -447,9 +447,9 @@ Map* AREImp::GetMap(const char *ResRef)
 	for (i = 0; i < ActorCount; i++) {
 		char DefaultName[33];
 		char CreResRef[9];
-		unsigned long TalkCount;
-		unsigned long Orientation, Schedule;
-		unsigned short XPos, YPos, XDes, YDes;
+		ieDword TalkCount;
+		ieDword Orientation, Schedule;
+		ieWord XPos, YPos, XDes, YDes;
 		str->Read( DefaultName, 32);
 		DefaultName[32]=0;
 		str->Read( &XPos, 2 );
@@ -465,7 +465,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Read( CreResRef, 8 );
 		CreResRef[8] = 0;
 		DataStream* crefile;
-		unsigned long CreOffset, CreSize;
+		ieDword CreOffset, CreSize;
 		str->Read( &CreOffset, 4 );
 		str->Read( &CreSize, 4 );
 		str->Seek( 128, GEM_CURRENT_POS );
@@ -516,17 +516,17 @@ Map* AREImp::GetMap(const char *ResRef)
 	for (i = 0; i < AnimCount; i++) {
 		Animation* anim;
 		str->Seek( 32, GEM_CURRENT_POS );
-		unsigned short animX, animY;
+		ieWord animX, animY;
 		str->Read( &animX, 2 );
 		str->Read( &animY, 2 );
 		str->Seek( 4, GEM_CURRENT_POS );
 		char animBam[9];
 		str->Read( animBam, 8 );
 		animBam[8] = 0;
-		unsigned short animCycle, animFrame;
+		ieWord animCycle, animFrame;
 		str->Read( &animCycle, 2 );
 		str->Read( &animFrame, 2 );
-		unsigned long animFlags;
+		ieDword animFlags;
 		str->Read( &animFlags, 4 );
 		str->Seek( 20, GEM_CURRENT_POS );
 		unsigned char mode = ( ( animFlags & 2 ) != 0 ) ?
@@ -549,7 +549,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	str->Seek( EntrancesOffset, GEM_STREAM_START );
 	for (i = 0; i < EntrancesCount; i++) {
 		char Name[33];
-		short XPos, YPos, Face;
+		ieWord XPos, YPos, Face;
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->Read( &XPos, 2 );
@@ -562,3 +562,4 @@ Map* AREImp::GetMap(const char *ResRef)
 	core->FreeInterface( tmm );
 	return map;
 }
+

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.14 2004/04/25 22:41:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.15 2004/08/03 23:30:33 guidoj Exp $
  *
  */
 
@@ -28,18 +28,18 @@ class AREImp : public MapMgr {
 private:
 	DataStream* str;
 	bool autoFree;
-	char WEDResRef[8];
-	unsigned long LastSave;
-	unsigned long AreaFlags;
-	unsigned short AreaType, WRain, WSnow, WFog, WLightning, WUnknown;
-	unsigned long ActorOffset, AnimOffset, AnimCount;
-	unsigned long VerticesOffset;
-	unsigned long DoorsCount, DoorsOffset;
-	unsigned long EntrancesOffset, EntrancesCount;
-	unsigned long SongHeader;
-	unsigned short ActorCount, VerticesCount;
-	unsigned long ContainersOffset, InfoPointsOffset, ItemsOffset;
-	unsigned short ContainersCount, InfoPointsCount, ItemsCount;
+	ieResRef WEDResRef;
+	ieDword LastSave;
+	ieDword AreaFlags;
+	ieWord  AreaType, WRain, WSnow, WFog, WLightning, WUnknown;
+	ieDword ActorOffset, AnimOffset, AnimCount;
+	ieDword VerticesOffset;
+	ieDword DoorsCount, DoorsOffset;
+	ieDword EntrancesOffset, EntrancesCount;
+	ieDword SongHeader;
+	ieWord  ActorCount, VerticesCount;
+	ieDword ContainersOffset, InfoPointsOffset, ItemsOffset;
+	ieWord  ContainersCount, InfoPointsCount, ItemsCount;
 	char Script[9];
 public:
 	AREImp(void);
