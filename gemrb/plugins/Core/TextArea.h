@@ -58,8 +58,8 @@ public:
 	void SetRow(int row);
 	/** Set Selectable */
 	void SetSelectable(bool val);
-	bool Selectable;
 private: // Private attributes
+	bool Selectable;
 	std::vector<char *> lines;
 	std::vector<int> lrows;
 	int seltext;

@@ -407,7 +407,7 @@ static PyObject * GemRB_TextAreaAppend(PyObject */*self*/, PyObject *args)
 		Control * ctrl = win->GetControl(ControlIndex);
 		if(!ctrl)
 			return NULL;
-		if(ctrl->ControlType != 5)
+		if(ctrl->ControlType != IE_GUI_TEXTAREA)
 			return NULL;
 		TextArea * ta = (TextArea*)ctrl;
 		if(row) {
@@ -614,7 +614,7 @@ static PyObject * GemRB_CreateLabel(PyObject */*self*/, PyObject *args)
 	lbl->Width = w;
 	lbl->Height = h;
 	lbl->ControlID = ControlID;
-	lbl->ControlType = 6;
+	lbl->ControlType = IE_GUI_LABEL;
 	lbl->Owner = win;
 	lbl->SetText(text);
 	lbl->SetAlignment(align);
@@ -639,11 +639,38 @@ static PyObject * GemRB_SetLabelUseRGB(PyObject */*self*/, PyObject *args)
 	Control * ctrl = win->GetControl(ControlIndex);
 	if(!ctrl)
 		return NULL;
-	if(ctrl->ControlType != 6)
+	if(ctrl->ControlType != IE_GUI_LABEL)
 		return NULL;
 	Label * lab = (Label*)ctrl;
 	lab->useRGB = status;
 	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_SetTextAreaSelectable(PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex, Flag;
+
+	if(!PyArg_ParseTuple(args, "iii", &WindowIndex, &ControlIndex, &Flag)) {
+		printMessage("GUIScript", "Syntax Error: SetTextAreaSelectable(WindowIndex, ControlIndex, Flag)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return NULL;
+
+	if(ctrl->ControlType != IE_GUI_TEXTAREA) //TextArea
+		return NULL;
+
+	TextArea * ta = (TextArea*)ctrl;
+	ta->SetSelectable(!!Flag);
+
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -670,7 +697,7 @@ static PyObject * GemRB_SetButtonFlags(PyObject */*self*/, PyObject *args)
 	if(ctrl == NULL)
 		return NULL;
 
-	if(ctrl->ControlType != 0)
+	if(ctrl->ControlType != IE_GUI_BUTTON)
 		return NULL;
 
 	Button * btn = (Button*)ctrl;
@@ -697,7 +724,7 @@ static PyObject * GemRB_SetButtonState(PyObject */*self*/, PyObject *args)
 	if(ctrl == NULL)
 		return NULL;
 
-	if(ctrl->ControlType != 0)
+	if(ctrl->ControlType != IE_GUI_BUTTON)
 		return NULL;
 
 	Button * btn = (Button*)ctrl;
@@ -725,7 +752,7 @@ static PyObject * GemRB_SetButtonPicture(PyObject */*self*/, PyObject *args)
 	if(ctrl == NULL)
 		return NULL;
 
-	if(ctrl->ControlType != 0)
+	if(ctrl->ControlType != IE_GUI_BUTTON)
 		return NULL;
 
 	DataStream * str = core->GetResourceMgr()->GetResource(ResRef, IE_BMP_CLASS_ID);
@@ -1004,6 +1031,8 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"CreateLabel", GemRB_CreateLabel, METH_VARARGS,
      "Creates and Add a new Label to a Window."},
+	{"SetTextAreaSelectable",GemRB_SetTextAreaSelectable, METH_VARARGS,
+     "Sets the Selectable Flag of a TextArea."},
 
 	{"SetButtonFlags", GemRB_SetButtonFlags, METH_VARARGS,
      "Sets the Display Flags of a Button."},

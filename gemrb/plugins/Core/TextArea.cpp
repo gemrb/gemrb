@@ -24,15 +24,12 @@ extern Interface * core;
 
 TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {
-	//BufferLength = 4096;
-	//Buffer = (unsigned char*)malloc(BufferLength);
-	//Buffer[0] = 0;
 	rows = 0;
 	startrow = 0;
 	seltext = -1;
 	selline = -1;
 	sb = NULL;
-	Selectable = true;
+	Selectable = false;
 	palette = core->GetVideoDriver()->CreatePalette(hitextcolor, lowtextcolor);
 	initpalette = core->GetVideoDriver()->CreatePalette(initcolor, lowtextcolor);
 	Color tmp = {hitextcolor.b, hitextcolor.g, hitextcolor.r, 0};
@@ -205,6 +202,12 @@ void TextArea::SetRow(int row)
 	if(row < rows)
 		startrow = row;
 	Changed = true;
+}
+
+/** Set Selectable */
+void TextArea::SetSelectable(bool val)
+{
+	Selectable=val;
 }
 
 void TextArea::CalcRowCount()
