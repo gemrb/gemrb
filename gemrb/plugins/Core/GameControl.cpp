@@ -1161,24 +1161,19 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 			core->GetGUIScriptEngine()->RunFunction( "OnIncreaseSize" );
 		}
 	}
-	DialogChoose( (unsigned long) -1 );
+	DialogChoose( (unsigned int) -1 );
 }
 
 static void AddTalk(TextArea* ta, Actor* speaker, char* speaker_color,
 	char* text, char* text_color)
 {
 	char* format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
-	int newlen = strlen( format ) +
-		strlen( speaker->LongName ) +
-		+
-		strlen( speaker_color ) +
-		strlen( text ) +
-		strlen( text_color ) +
-		1;
+	int newlen = strlen( format ) + strlen( speaker->LongName ) +
+		strlen( speaker_color ) + strlen( text ) +
+		strlen( text_color ) + 1;
 	char* newstr = ( char* ) malloc( newlen );
 	sprintf( newstr, format, speaker_color, speaker->LongName, text_color,
 		text );
-
 
 	ta->AppendText( newstr, -1 );
 	ta->AppendText( "", -1 );
@@ -1320,14 +1315,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			int idx = 0;
 			for (unsigned int x = 0; x < ds->transitionsCount; x++) {
 				if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-					bool ret = true;
-					for (unsigned int t = 0;
-						t < ds->transitions[x]->trigger->count;
-						t++) {
-						ret &= GameScript::EvaluateString( target,
-								ds->transitions[x]->trigger->strings[t] );
-					}
-					if (!ret)
+					if(!EvaluateDialogTrigger(speaker, ds->transitions[x]->trigger))
 						continue;
 				}
 				if (ds->transitions[x]->textStrRef == 0) {
