@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.37 2003/12/01 16:33:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.38 2003/12/03 00:04:10 balrog994 Exp $
  *
  */
 
@@ -129,7 +129,8 @@ int SDLVideoDriver::SwapBuffers(void)
 
 			case SDL_KEYUP:
 				{
-				unsigned char key = event.key.keysym.unicode & 0xff;
+				//unsigned char key = Convert(event.key.keysym.sym, event.key.keysym.mod);
+				unsigned char key = event.key.keysym.sym;
 				if(Evnt && (key != 0))
 					Evnt->KeyRelease(key, event.key.keysym.mod);
 				}
@@ -141,6 +142,7 @@ int SDLVideoDriver::SwapBuffers(void)
 					core->PopupConsole();
 					break;
 				}
+				//unsigned char key = Convert(event.key.keysym.sym, event.key.keysym.mod);
 				unsigned char key = event.key.keysym.unicode & 0xff;
 				if(key<32 || key==127 ){
 					switch(event.key.keysym.sym) {
@@ -213,7 +215,8 @@ int SDLVideoDriver::SwapBuffers(void)
 
 		case SDL_KEYUP:
 			{
-			unsigned char key = event.key.keysym.unicode & 0xff;
+			//unsigned char key = Convert(event.key.keysym.sym, event.key.keysym.mod);
+			unsigned char key = event.key.keysym.sym & 0xff;
 			if(Evnt && (key != 0))
 				Evnt->KeyRelease(key, event.key.keysym.mod);
 			}
@@ -225,6 +228,7 @@ int SDLVideoDriver::SwapBuffers(void)
 				core->PopupConsole();
 				break;
 			}
+			//unsigned char key = Convert(event.key.keysym.sym, event.key.keysym.mod);
 			unsigned char key = event.key.keysym.unicode & 0xff;
 			if(key <32 || key==127) {
 				switch(event.key.keysym.sym) {

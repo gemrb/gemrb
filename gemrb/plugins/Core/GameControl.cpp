@@ -175,10 +175,10 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
 	if(!core->CheatEnabled() ) return;
-	if(Mod==64 ) //ctrl
+	if(Mod&64 ) //ctrl
 	{
 	switch(Key) {
-		case 1:  //'a'
+		case 'a':  //'a'
 			{
 				if(overContainer) {
 					if(overContainer->Trapped && !(overContainer->TrapDetected)) {
@@ -190,7 +190,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			}
 		break;
 
-		case 16: //'p'
+		case 'p': //'p'
 			{
 				short GameX = lastMouseX, GameY = lastMouseY;
 				core->GetVideoDriver()->ConvertToGame(GameX, GameY);
@@ -210,14 +210,14 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			}
 		break;
 
-		case 19: // s
+		case 's': // s
 			{
 				pfsX = lastMouseX; 
 				pfsY = lastMouseY;
 				core->GetVideoDriver()->ConvertToGame(pfsX, pfsY);
 			}
 		break;
-		case 24: // 'x'
+		case 'x': // 'x'
 			{
 				Game * game = core->GetGame();
 				Map * area = game->GetMap(MapIndex);
@@ -225,13 +225,13 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				short cX = lastMouseX; 
 				short cY = lastMouseY;
 				core->GetVideoDriver()->ConvertToGame(cX, cY);
-				printf("%d %d",cX, cY);
+				printf("[%d.%d]\n",cX, cY);
 			}
 		break;
-		case 28: // '4'  //show all traps
+		case '4': // '4'  //show all traps
 				DebugFlags^=1;
 		break;
-		case 29: // '5' //show the searchmap
+		case '5': // '5' //show the searchmap
 				DebugFlags^=2;
 		break;
 		default:
