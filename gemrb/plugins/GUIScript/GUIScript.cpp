@@ -22,6 +22,8 @@ extern "C" {
 
 #include "../Core/Label.h"
 #include "../Core/AnimationMgr.h"
+#include "../Core/GameControl.h"
+#include "../Core/MapMgr.h"
 
 inline bool valid_number(const char *string, long &val)
 {
@@ -29,6 +31,42 @@ inline bool valid_number(const char *string, long &val)
 
   val = strtol(string, &endpr, 0);
   return (const char *) endpr!=string;
+}
+
+static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
+{
+	int count = core->GetWindowMgr()->GetWindowsCount();
+	for(int i = 0; i < count; i++) {
+		core->DelWindow(i);
+	}
+	Window * gamewin = new Window(0xffff, 0, 0, core->Width, core->Height);
+	GameControl * gc = new GameControl();
+	gc->XPos = 0;
+	gc->YPos = 0;
+	gc->Width = core->Width;
+	gc->Height = core->Height;
+	gc->Owner = gamewin;
+	gc->ControlID = 0x00000000;
+	gc->ControlType = IE_GUI_GAMECONTROL;
+	gamewin->AddControl(gc);
+	core->AddWindow(gamewin);
+	core->SetVisible(0, 1);
+	int start = core->LoadTable("STARTARE");
+	TableMgr * tm = core->GetTable(start);
+	char * StartArea = tm->QueryField();
+	int startX = atoi(tm->QueryField(1,0));
+	int startY = atoi(tm->QueryField(2,0));
+	DataStream * str = core->GetResourceMgr()->GetResource(StartArea, IE_ARE_CLASS_ID);
+	MapMgr * am = (MapMgr*)core->GetInterface(IE_ARE_CLASS_ID);
+	am->Open(str, true);
+	Map * map = am->GetMap();
+	gc->SetCurrentArea(map);
+	core->FreeInterface(am);
+	core->DelTable(start);
+	core->GetVideoDriver()->MoveViewportTo(startX, startY);
+
+	Py_INCREF(Py_None);
+	return Py_None;
 }
 
 static PyObject * GemRB_LoadWindowPack(PyObject */*self*/, PyObject *args)
@@ -1561,6 +1599,9 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 }
 
 static PyMethodDef GemRBMethods[] = {
+	{"EnterGame", GemRB_EnterGame, METH_NOARGS,
+     "Enters the Game."},
+
     {"GetINIPartyCount", GemRB_GetINIPartyCount, METH_NOARGS,
      "Returns the Number of Party defined in Party.ini (works only on IWD2)."},
 
