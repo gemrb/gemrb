@@ -31,6 +31,7 @@ public:
 	Animation * GetAnimation(unsigned char Cycle, int x, int y, unsigned char mode = IE_NORMAL);
 	AnimationFactory * GetAnimationFactory(const char * ResRef, unsigned char mode = IE_NORMAL);
 	Sprite2D * GetFrame(unsigned short findex, unsigned char mode = IE_NORMAL);
+	void * GetFramePixels(unsigned short findex, unsigned char mode = IE_NORMAL);
 	/** This function will load the Animation as a Font */
 	Font * GetFont();
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.

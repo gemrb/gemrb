@@ -142,7 +142,7 @@ Sprite2D * BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 	if(findex >= frames.size())
 		findex = 0;
 	str->Seek((frames[findex].FrameData & 0x7FFFFFFF), GEM_STREAM_START);
-	unsigned long pixelcount = frames[findex].Width * frames[findex].Height;
+	unsigned long pixelcount = frames[findex].Height * frames[findex].Width;
 	void * pixels = malloc(pixelcount);
 	bool RLECompressed = ((frames[findex].FrameData & 0x80000000) == 0);
 	if(RLECompressed) { //if RLE Compressed
@@ -173,7 +173,7 @@ Sprite2D * BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 	else {
 		str->Read(pixels, pixelcount);
 	}
-	Sprite2D * spr = core->GetVideoDriver()->CreateSprite8(frames[findex].Width, frames[findex].Height, 8, pixels, Palette, 1);
+	Sprite2D * spr = core->GetVideoDriver()->CreateSprite8(frames[findex].Width, frames[findex].Height, 8, pixels, Palette, true, 0);
 	spr->XPos = frames[findex].XPos;
 	spr->YPos = frames[findex].YPos;
 	if(mode == IE_SHADED) {
@@ -183,6 +183,44 @@ Sprite2D * BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 	return spr;
 }
 
+void * BAMImp::GetFramePixels(unsigned short findex, unsigned char mode)
+{
+	if(findex >= frames.size())
+		findex = cycles[0].FirstFrame;
+	str->Seek((frames[findex].FrameData & 0x7FFFFFFF), GEM_STREAM_START);
+	unsigned long pixelcount = frames[findex].Height * frames[findex].Width;
+	void * pixels = malloc(pixelcount);
+	bool RLECompressed = ((frames[findex].FrameData & 0x80000000) == 0);
+	if(RLECompressed) { //if RLE Compressed
+		unsigned long RLESize;
+		/*if((findex+1) >= frames.size())
+			RLESize = str->Size() - (frames[findex].FrameData & 0x7FFFFFFF);
+		else
+			RLESize = (frames[findex+1].FrameData & 0x7FFFFFFF) - (frames[findex].FrameData & 0x7FFFFFFF);*/
+		RLESize = (unsigned long)ceil(frames[findex].Width * frames[findex].Height * 1.5);
+		void * inpix = malloc(RLESize);
+		unsigned char * p = (unsigned char*)inpix;
+		unsigned char * Buffer = (unsigned char*)pixels;
+ 		str->Read(inpix, RLESize);
+		unsigned int i = 0;
+		while(i < pixelcount) {
+			if(*p == 0) {
+				p++;
+				memset(&Buffer[i], 0, (*p)+1);
+				i+=*p;
+			}
+			else
+				Buffer[i] = *p;
+			p++;
+			i++;
+		}
+		free(inpix);
+	}
+	else {
+		str->Read(pixels, pixelcount);
+	}
+	return pixels;
+}
 
 AnimationFactory * BAMImp::GetAnimationFactory(const char * ResRef, unsigned char mode)
 {
@@ -223,13 +261,32 @@ AnimationFactory * BAMImp::GetAnimationFactory(const char * ResRef, unsigned cha
 /** This function will load the Animation as a Font */
 Font * BAMImp::GetFont()
 {
-  printf("Start Getting Font\n");
-  Font * fnt = new Font();
-  for(int i = 0; i < 255; i++) {
-    fnt->AddChar(GetFrame(cycles[i].FirstFrame, 0));
-  }
-  printf("Font Created\n");
-  return fnt;
+	printf("Start Getting Font\n");
+	//printf("Calculating Font Buffer Max Size...");
+	int w = 0,h = 0;
+	for(int i = 0; i < cycles.size(); i++) {
+		int index = cycles[i].FirstFrame;
+		if(index >= frames.size())
+			continue;
+		//printf("[index = %d, w = %d, h = %d]\n", index, frames[index].Width, frames[index].Height);
+		if(frames[index].Width > w)
+			w = frames[index].Width;
+		if(frames[index].Height > h)
+			h = frames[index].Height;
+	}
+	//printf("[maxW = %d, maxH = %d]\n", w, h);
+	Font * fnt = new Font(w*255, h, Palette, true, 0);
+	for(int i = 0; i < 255; i++) {
+		if(cycles[i].FirstFrame >= frames.size()) {
+			fnt->AddChar(NULL, 0, 0, 0, 0);
+			continue;
+		}
+		void * pixels = GetFramePixels(cycles[i].FirstFrame);
+		fnt->AddChar(pixels, frames[cycles[i].FirstFrame].Width, frames[cycles[i].FirstFrame].Height, frames[cycles[i].FirstFrame].XPos, frames[cycles[i].FirstFrame].YPos);//GetFrame(cycles[i].FirstFrame, 0));
+		free(pixels);
+	}
+	printf("Font Created\n");
+	return fnt;
 }
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 If the Global Animation Palette is NULL, returns NULL. */
