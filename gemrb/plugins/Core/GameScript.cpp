@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.8 2003/12/14 17:03:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.9 2003/12/15 09:27:10 balrog994 Exp $
  *
  */
 
@@ -237,14 +237,19 @@ void GameScript::Update()
 	printf("%s: Run Script\n", Name);
 	lastRunTime = thisTime;
 	switch(scriptType) {
-		case IE_SCRIPT_TRIGGER:
+		case IE_SCRIPT_TRIGGER: 
+			{
 			//TODO: Check if a PC is in Visible Range
+
+			}
 		break;
 
 		case IE_SCRIPT_AREA:
 			//TODO: Check if something changed in the Area
 		break;
 	}
+	if(!script)
+		return;
 	for(int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock * rB = script->responseBlocks[a];
 		if(EvaluateCondition(this, rB->condition)) {
@@ -471,7 +476,7 @@ void GameScript::ExecuteAction(GameScript * sender, Action * aC)
 	func(sender, aC);
 }
 
-ActorBlock * GameScript::GetActorFromObject(GameScript * Sender, Object * oC)
+Scriptable * GameScript::GetActorFromObject(GameScript * Sender, Object * oC)
 {
 	//TODO: Implement Object Retieval
 
@@ -529,24 +534,34 @@ unsigned char GameScript::GetOrient(short sX, short sY, short dX, short dY)
 
 int GameScript::Alignment(GameScript * Sender, Trigger * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objectParameter);
-	int value = actor->actor->GetStat(IE_ALIGNMENT);
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	int value = actor->GetStat(IE_ALIGNMENT);
 	int a = parameters->int0Parameter&15;
 	if(a) {
-		if(a!=value&15) return 0;
+		if(a!=(value&15)) return 0;
 	}
 
 	a = parameters->int0Parameter&240;
 	if(a) {
-		if(a!=value&240) return 0;
+		if(a!=(value&240)) return 0;
 	}
 	return 1;
 }
 
 int GameScript::Allegiance(GameScript * Sender, Trigger * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objectParameter);
-	int value = actor->actor->GetStat(IE_EA);
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	int value = actor->GetStat(IE_EA);
 	switch(parameters->int0Parameter)
 	{
 	case 30: //goodcutoff
@@ -565,7 +580,13 @@ int GameScript::Allegiance(GameScript * Sender, Trigger * parameters)
 
 int GameScript::Class(GameScript * Sender, Trigger * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objectParameter);
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	int value = actor->GetStat(IE_CLASS);
 	//TODO: if parameter >=202, it is of *_ALL type
 	int value = actor->actor->GetStat(IE_CLASS);
 	return parameters->int0Parameter==value;
@@ -573,16 +594,21 @@ int GameScript::Class(GameScript * Sender, Trigger * parameters)
 
 int GameScript::Exists(GameScript * Sender, Trigger * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objectParameter);
+	Scriptable * actor = GetActorFromObject(Sender, parameters->objectParameter);
 	if(actor==NULL) return 0;
 	return 1;
 }
 
 int GameScript::General(GameScript * Sender, Trigger * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objectParameter);
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
 	if(actor==NULL) return 0;
-	return parameters->int0Parameter==actor->actor->GetStat(IE_GENERAL);
+	return parameters->int0Parameter==actor->GetStat(IE_GENERAL);
 }
 
 int GameScript::Globals(GameScript * Sender, Trigger * parameters)
@@ -625,7 +651,7 @@ int GameScript::True(GameScript * /* Sender*/, Trigger * /*parameters*/)
 	return 1;
 }
 
-int GameScript::False(GameScript * /*Sender*/, Trigger */*parameters*/)
+int GameScript::False(GameScript * /*Sender*/, Trigger * /*parameters*/)
 {
 	return 0;
 }
@@ -653,58 +679,79 @@ void GameScript::SetGlobal(GameScript * Sender, Action * parameters)
 
 void GameScript::ChangeAllegiance(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[1]);
-	if(actor) {
-		actor->actor->SetStat(IE_EA,parameters->int0Parameter);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->SetStat(IE_EA,parameters->int0Parameter);
 }
 
 void GameScript::ChangeGeneral(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[1]);
-	if(actor) {
-		actor->actor->SetStat(IE_GENERAL,parameters->int0Parameter);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->SetStat(IE_GENERAL,parameters->int0Parameter);
 }
 
 void GameScript::ChangeRace(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[1]);
-	if(actor) {
-		actor->actor->SetStat(IE_RACE,parameters->int0Parameter);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->SetStat(IE_RACE,parameters->int0Parameter);
 }
 
 void GameScript::ChangeClass(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[1]);
-	if(actor) {
-		actor->actor->SetStat(IE_CLASS,parameters->int0Parameter);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->SetStat(IE_CLASS,parameters->int0Parameter);
 }
 
 void GameScript::ChangeSpecifics(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[1]);
-	if(actor) {
-		actor->actor->SetStat(IE_SPECIFIC,parameters->int0Parameter);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->SetStat(IE_SPECIFIC,parameters->int0Parameter);
 }
 
 void GameScript::ChangeGender(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[1]);
-	if(actor) {
-		actor->actor->SetStat(IE_SEX,parameters->int0Parameter);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->SetStat(IE_SEX,parameters->int0Parameter);
 }
 
 void GameScript::ChangeAlignment(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[1]);
-	if(actor) {
-		actor->actor->SetStat(IE_ALIGNMENT,parameters->int0Parameter);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->SetStat(IE_ALIGNMENT,parameters->int0Parameter);
 }
 
 void GameScript::TriggerActivation(GameScript * Sender, Action * parameters)
@@ -719,19 +766,11 @@ void GameScript::TriggerActivation(GameScript * Sender, Action * parameters)
 
 void GameScript::FadeToColor(GameScript * Sender, Action * parameters)
 {
-	//fadeToCounter = parameters->XpointParameter;
-	//fadeToMax = fadeToCounter;
-	//if(fadeToMax == 1) {
-	//	core->GetVideoDriver()->SetFadePercent(100);
-	//	fadeToCounter--;
-	//}
 	core->timer->SetFadeToColor(parameters->XpointParameter);
 }
 
 void GameScript::FadeFromColor(GameScript * Sender, Action * parameters)
 {
-	//fadeFromCounter = 0;
-	//fadeFromMax = parameters->XpointParameter;
 	core->timer->SetFadeFromColor(parameters->XpointParameter);
 }
 
@@ -740,23 +779,11 @@ void GameScript::CreateCreature(GameScript * Sender, Action * parameters)
 	ActorMgr * aM = (ActorMgr*)core->GetInterface(IE_CRE_CLASS_ID);
 	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_CRE_CLASS_ID);
 	aM->Open(ds, true);
-	ActorBlock *ab = new ActorBlock();
-	ab->XPos = parameters->XpointParameter;
-	ab->YPos = parameters->YpointParameter;
-	ab->XDes = parameters->XpointParameter;
-	ab->YDes = parameters->YpointParameter;
-	ab->actor = aM->GetActor();
+	Actor *ab = aM->GetActor();
+	ab->MoveTo(parameters->XpointParameter, parameters->YpointParameter);
 	ab->AnimID = IE_ANI_AWAKE;
 	ab->Orientation = parameters->int0Parameter;
 	Map * map = core->GetGame()->GetMap(0);
-	for(int i = 0; i < MAX_SCRIPTS; i++) {
-		if((stricmp(ab->actor->Scripts[i], "None") == 0) || (ab->actor->Scripts[i][0] == '\0')) {
-			ab->Scripts[i] = NULL;
-			continue;
-		}
-		ab->Scripts[i] = new GameScript(ab->actor->Scripts[i], 0);
-		ab->Scripts[i]->MySelf = ab;
-	}
 	map->AddActor(ab);
 	core->FreeInterface(aM);
 }
@@ -773,8 +800,6 @@ void GameScript::EndCutSceneMode(GameScript * Sender, Action * parameters)
 
 void GameScript::StartCutScene(GameScript * Sender, Action * parameters)
 {
-	//int pos = core->LoadScript(parameters->string0Parameter);
-	//cutSceneIndex = pos;
 	GameScript * gs = new GameScript(parameters->string0Parameter, IE_SCRIPT_ALWAYS);
 	core->timer->SetCutScene(gs);
 }
@@ -791,10 +816,13 @@ void GameScript::CutSceneId(GameScript * Sender, Action * parameters)
 
 void GameScript::Enemy(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
-	if(actor) {
-		actor->actor->SetStat(IE_EA,255);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->SetStat(IE_EA,255);
 }
 
 void GameScript::Ally(GameScript * Sender, Action * parameters)
@@ -807,13 +835,11 @@ void GameScript::Ally(GameScript * Sender, Action * parameters)
 
 void GameScript::Wait(GameScript * Sender, Action * parameters)
 {
-	//waitCounter = parameters->int0Parameter*15;
 	core->timer->SetWait(parameters->int0Parameter*AI_UPDATE_TIME);
 }
 
 void GameScript::SmallWait(GameScript * Sender, Action * parameters)
 {
-	//waitCounter = parameters->int0Parameter;
 	core->timer->SetWait(parameters->int0Parameter);
 }
 
@@ -824,7 +850,10 @@ void GameScript::MoveViewPoint(GameScript * Sender, Action * parameters)
 
 void GameScript::MoveViewObject(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[1]);
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
 	if(actor) {
 		core->GetVideoDriver()->MoveViewportTo(actor->XPos, actor->YPos);
 	}
@@ -832,50 +861,55 @@ void GameScript::MoveViewObject(GameScript * Sender, Action * parameters)
 
 void GameScript::MoveToPoint(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
 	if(actor) {
-		actor->path = core->GetPathFinder()->FindPath(actor->XPos, actor->YPos, parameters->XpointParameter, parameters->YpointParameter);
-		actor->step = NULL;
-		//moveToPointActor = actor;
+		actor->WalkTo(parameters->XpointParameter, parameters->YpointParameter);
 		core->timer->SetMovingActor(actor);
 	}
 }
 
 void GameScript::MoveToObject(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
-	ActorBlock * target = GetActorFromObject(Sender, parameters->objects[1]);
-	if(actor) {
-		actor->path = core->GetPathFinder()->FindPath(actor->XPos, actor->YPos, target->XPos, target->YPos);
-		actor->step = NULL;
-		//moveToPointActor = actor;
-		core->timer->SetMovingActor(actor);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	Scriptable * target = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!target)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->WalkTo(target->XPos, target->YPos);
+	core->timer->SetMovingActor(actor);
 }
 
 void GameScript::DisplayStringHead(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
 	if(actor) {
-		printf("Displaying string on: %s\n", actor->actor->ScriptName);
-		if(actor->overHeadText)
-			free(actor->overHeadText);
-		actor->overHeadText = core->GetString(parameters->int0Parameter,2);
-#ifdef WIN32
-		unsigned long time = GetTickCount();
-#else
-		struct timeval tv;
-		gettimeofday(&tv, NULL);
-		unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
-#endif
-		actor->timeStartDisplaying = time;
-		actor->textDisplaying = 1;
+		printf("Displaying string on: %s\n", actor->scriptName);
+		actor->DisplayHeadText(core->GetString(parameters->int0Parameter,2));
 	}
 }
 
 void GameScript::Face(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
 	if(actor) {
 		actor->Orientation = parameters->int0Parameter;
 	}
@@ -883,38 +917,34 @@ void GameScript::Face(GameScript * Sender, Action * parameters)
 
 void GameScript::FaceObject(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
-	ActorBlock * target = GetActorFromObject(Sender, parameters->objects[1]);
-	if(actor) {
-		actor->Orientation = GetOrient(target->XPos, target->YPos, actor->XPos, actor->YPos);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	Scriptable * target = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!target)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->Orientation = GetOrient(target->XPos, target->YPos, actor->XPos, actor->YPos);
 }
 
 void GameScript::DisplayStringWait(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
-	if(actor) {
-		printf("Displaying string on: %s\n", actor->actor->ScriptName);
-		if(actor->overHeadText)
-			free(actor->overHeadText);
-		StringBlock sb = core->strings->GetStringBlock(parameters->int0Parameter);
-		//actor->overHeadText = core->GetString(parameters->int0Parameter,2);
-		actor->overHeadText = sb.text;
-		if(sb.Sound[0]) {
-			unsigned long len = core->GetSoundMgr()->Play(sb.Sound);
-			if(len != 0xffffffff)
-				//waitCounter = ((15*len)/1000);
-				core->timer->SetWait((AI_UPDATE_TIME*len)/1000);
-		}
-#ifdef WIN32
-		unsigned long time = GetTickCount();
-#else
-		struct timeval tv;
-		gettimeofday(&tv, NULL);
-		unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
-#endif
-		actor->timeStartDisplaying = time;
-		actor->textDisplaying = 1;		
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	printf("Displaying string on: %s\n", actor->scriptName);
+	StringBlock sb = core->strings->GetStringBlock(parameters->int0Parameter);
+	actor->DisplayHeadText(sb.text);
+	if(sb.Sound[0]) {
+		unsigned long len = core->GetSoundMgr()->Play(sb.Sound);
+		if(len != 0xffffffff)
+			//waitCounter = ((15*len)/1000);
+			core->timer->SetWait((AI_UPDATE_TIME*len)/1000);
 	}
 }
 
@@ -940,20 +970,23 @@ void GameScript::Continue(GameScript * Sender, Action * parameters)
 
 void GameScript::PlaySound(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
-	if(actor) {
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(scr) {
 		core->GetSoundMgr()->Play(parameters->string0Parameter);
 	}
 }
 
 void GameScript::CreateVisualEffectObject(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * target = GetActorFromObject(Sender, parameters->objects[1]);
-	if(target) {
-		DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_VVC_CLASS_ID);
-		ScriptedAnimation * vvc = new ScriptedAnimation(ds, true, target->XPos, target->YPos);
-		core->GetGame()->GetMap(0)->AddVVCCell(vvc);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * target = (Actor*)scr;
+	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_VVC_CLASS_ID);
+	ScriptedAnimation * vvc = new ScriptedAnimation(ds, true, target->XPos, target->YPos);
+	core->GetGame()->GetMap(0)->AddVVCCell(vvc);
 }
 
 void GameScript::CreateVisualEffect(GameScript * Sender, Action * parameters)
@@ -965,10 +998,13 @@ void GameScript::CreateVisualEffect(GameScript * Sender, Action * parameters)
 
 void GameScript::DestroySelf(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
-	if(actor) {
-		actor->DeleteMe = true;
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->DeleteMe = true;
 }
 
 void GameScript::ScreenShake(GameScript * Sender, Action * parameters)

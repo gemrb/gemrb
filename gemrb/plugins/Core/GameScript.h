@@ -15,15 +15,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.7 2003/12/14 17:03:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.8 2003/12/15 09:27:10 balrog994 Exp $
  *
  */
+
+class GameScript;
 
 #ifndef GAMESCRIPT_H
 #define GAMESCRIPT_H
 
 #include "DataStream.h"
 #include "Variables.h"
+#include "ActorBlock.h"
 #include <list>
 
 typedef struct Object {
@@ -126,7 +129,7 @@ class GEM_EXPORT GameScript
 public:
 	Variables * locals;
 	Script * script;
-	ActorBlock * MySelf;
+	Scriptable * MySelf;
 	unsigned long scriptRunDelay;
 	bool endReached;
 	void Update();
@@ -144,7 +147,7 @@ private: //Internal Functions
 	void ExecuteResponseSet(GameScript * sender, ResponseSet * rS);
 	void ExecuteResponse(GameScript * sender, Response * rE);
 	void ExecuteAction(GameScript * sender, Action * aC);
-	static ActorBlock * GetActorFromObject(GameScript * Sender, Object * oC);
+	static Scriptable * GetActorFromObject(GameScript * Sender, Object * oC);
 	static unsigned char GetOrient(short sX, short sY, short dX, short dY);
 private: //Internal variables
 	unsigned long lastRunTime;
