@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.4 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.5 2003/11/26 14:01:44 balrog994 Exp $
  *
  */
 
@@ -36,7 +36,7 @@ private:
 
 	//COLORTABLE
 	unsigned long NumColors;
-	Color * Palette;
+	RevColor * Palette;
 
 	//RASTERDATA
 	void * pixels;
@@ -50,6 +50,26 @@ public:
 	Sprite2D * GetImage();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color * pal);
+	/** Gets a Pixel from the Image */
+	Color GetPixel(int x, int y)
+	{
+		Color ret;
+		unsigned char * p = (unsigned char*)pixels;
+		p+=(PaddedRowLength*y)+(x*(BitCount/8));
+		if(BitCount == 24) {
+			ret.b = *p++;
+			ret.g = *p++;
+			ret.r = *p++;
+			ret.a = 0xff;
+		}
+		else if(BitCount == 8) {
+			ret.r = Palette[*p++].r;
+			ret.g = Palette[*p++].g;
+			ret.b = Palette[*p++].b;
+			ret.a = 0xff;
+		}
+		return ret;
+	}
 public:
 	void release(void)
 	{

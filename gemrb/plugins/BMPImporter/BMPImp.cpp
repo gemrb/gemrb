@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.7 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.8 2003/11/26 14:01:44 balrog994 Exp $
  *
  */
 
@@ -83,9 +83,9 @@ bool BMPImp::Open(DataStream * stream, bool autoFree)
 	}
 	//COLORTABLE
 	Palette = NULL;
-	NumColors = BitCount*8;
+	NumColors = 256;
 	if(BitCount <= 8) {
-		Palette = (Color*)malloc(4*NumColors);
+		Palette = (RevColor*)malloc(4*NumColors);
 		for(unsigned int i = 0; i < NumColors; i++) {
 			str->Read(&Palette[i], 4);
 		}
