@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.31 2004/01/04 18:56:08 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.32 2004/01/04 21:25:01 avenger_teambg Exp $
  *
  */
 
@@ -65,6 +65,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		triggers[0x23] = True;
 		triggers[0x30] = False;
 		triggers[0x36] = OnCreation;
+		triggers[0x42] = PartyHasItem;
 		triggers[0x4C] = Entered;
 		triggers[0x70] = Clicked;
 
@@ -1147,6 +1148,12 @@ int  GameScript::OnCreation(Scriptable * Sender, Trigger * parameters)
 		area->justCreated = false;
 		return 1;
 	}
+	return 0;
+}
+
+int GameScript::PartyHasItem(Scriptable */*Sender*/, Trigger */*parameters*/)
+{
+/*hacked to never have the item, this requires inventory!*/
 	return 0;
 }
 
