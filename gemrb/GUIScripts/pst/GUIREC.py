@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.12 2004/08/06 01:20:07 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.13 2004/08/21 04:58:55 divide Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -121,8 +121,11 @@ def OpenRecordsWindow ():
 	# stat buttons
 	for i in range (6):
 		Button = GemRB.GetControl (Window, 31 + i)
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-		GemRB.SetEvent(Window, Button, IE_GUI_MOUSE_OVER_BUTTON, statevents[i])
+		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		GemRB.SetButtonSprites(Window, Button, "", 0, 0, 0, 0, 0)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_OVER_BUTTON, statevents[i])
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
 
 	# AC button
 	Button = GemRB.GetControl (Window, 37)
