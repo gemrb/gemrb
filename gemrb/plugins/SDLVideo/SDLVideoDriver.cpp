@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.89 2005/02/25 15:12:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.90 2005/02/25 15:24:10 avenger_teambg Exp $
  *
  */
 
@@ -924,10 +924,10 @@ void SDLVideoDriver::SetViewport(int x, int y, unsigned int w, unsigned int h)
 {
 	xCorr = x;
 	yCorr = y;
-	if (w>disp->w)
+	if (w>(unsigned int) disp->w)
 		w=0;
 	Viewport.w = w;
-	if (h>disp->h)
+	if (h>(unsigned int) disp->h)
 		h=0;
 	Viewport.h = h;
 }
