@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.36 2005/02/27 19:17:59 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.37 2005/03/27 19:51:47 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -156,6 +156,7 @@ def OpenRecordsWindow ():
 stats_overview = None
 faction_help = ''
 alignment_help = ''
+avatar_header = {'PrimClass': "", 'SecoClass': "", 'PrimLevel': 0, 'SecoLevel': 0, 'XP': 0, 'PrimNextLevXP': 0, 'SecoNextLevXP': 0}
 
 def UpdateRecordsWindow ():
 	global stats_overview, faction_help, alignment_help
@@ -167,6 +168,23 @@ def UpdateRecordsWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	
+	# Setting up the character information
+	GetCharacterHeader (pc)
+
+	# Checking whether character has leveled up.
+	Button = GemRB.GetControl (Window, 9)
+	if avatar_header['SecoLevel'] == 0:
+		if avatar_header['XP'] > avatar_header['PrimNextLevXP']:
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+		else:
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+	else:
+		# Character is Multi-Class
+		if avatar_header['XP'] > avatar_header['PrimNextLevXP'] or avatar_header['XP'] > avatar_header['SecoNextLevXP']:
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+		else:
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+
 	# name
 	Label = GemRB.GetControl (Window, 0x1000000a)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 1))
@@ -472,22 +490,87 @@ def OnRecordsHelpCharisma ():
 	GemRB.TextAreaAppend(Window, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,Cha,5),0,0) )
 	return
 
-def GetClassHeader  (pc, ClassName, Class, Level, Experience):
 
-	# 19674 Next Level
+def GetCharacterHeader (pc):
+	global avatar_header
+
+	ClassTable = GemRB.LoadTable ("classes")
+	AnimIdsTable = GemRB.LoadTable ("avslots")
+
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
+	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
+	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
+	row = "0x%04X" %anim_id
+
+	# Nameless is a special case (dual class)
+	if GemRB.GetTableValue (AnimIdsTable, row, "PC") == "NAMELESS_ONE":
+		avatar_header['PrimClass'] = GemRB.GetTableRowName (ClassTable, Class)
+		avatar_header['SecoClass'] = "*"
+
+		avatar_header['SecoLevel'] = 0
+
+		if avatar_header['PrimClass'] == "FIGHTER":
+			avatar_header['PrimLevel'] = GemRB.GetPlayerStat (pc, IE_LEVEL)
+			avatar_header['XP'] = GemRB.GetPlayerStat (pc, IE_XP)
+		elif avatar_header['PrimClass'] == "MAGE":
+			avatar_header['PrimLevel'] = GemRB.GetPlayerStat (pc, IE_LEVEL2)
+			avatar_header['XP'] = GemRB.GetPlayerStat (pc, IE_XP_MAGE)
+		else:
+			avatar_header['PrimLevel'] = GemRB.GetPlayerStat (pc, IE_LEVEL3)
+			avatar_header['XP'] = GemRB.GetPlayerStat (pc, IE_XP_THIEF)
+
+		avatar_header['PrimNextLevXP'] = GetNextLevelExp (avatar_header['PrimLevel'], avatar_header['PrimClass'])
+		avatar_header['SecoNextLevXP'] = 0
+	else:
+		# PC is not NAMELESS_ONE
+		avatar_header['PrimLevel'] = GemRB.GetPlayerStat (pc, IE_LEVEL)
+		avatar_header['XP'] = GemRB.GetPlayerStat (pc, IE_XP)
+		if Multi:
+			avatar_header['XP'] = avatar_header['XP'] / 2
+			avatar_header['SecoLevel'] = GemRB.GetPlayerStat (pc, IE_LEVEL2)
+
+			avatar_header['PrimClass'] = "FIGHTER"
+			if Multi == 3:
+				#fighter/mage
+				Class = 0
+			else:
+				#fighter/thief
+				Class = 3
+			avatar_header['SecoClass'] = GemRB.GetTableRowName (ClassTable, Class)
+
+			avatar_header['PrimNextLevXP'] = GetNextLevelExp (avatar_header['PrimLevel'], avatar_header['PrimClass'])
+			avatar_header['SecoNextLevXP'] = GetNextLevelExp (avatar_header['SecoLevel'], avatar_header['SecoClass'])
+
+			# Converting to the displayable format
+			avatar_header['SecoClass'] = GemRB.GetString (GemRB.GetTableValue (ClassTable, avatar_header['SecoClass'], "NAME_REF"))
+		else:
+			avatar_header['SecoLevel'] = 0
+			avatar_header['PrimClass'] = GemRB.GetTableRowName (ClassTable, Class)
+			avatar_header['SecoClass'] = "*"
+			avatar_header['PrimNextLevXP'] = GetNextLevelExp (avatar_header['PrimLevel'], avatar_header['PrimClass'])
+			avatar_header['SecoNextLevXP'] = 0
+
+	# Converting to the displayable format
+	avatar_header['PrimClass'] = GemRB.GetString (GemRB.GetTableValue (ClassTable, avatar_header['PrimClass'], "NAME_REF"))
+
+	GemRB.UnloadTable (ClassTable)
+	GemRB.UnloadTable (AnimIdsTable)
+
+
+def GetNextLevelExp (Level, Class):
 	NextLevelTable = GemRB.LoadTable ("XPLEVEL")
+
 	if (Level < 21):
-		NextLevel = GemRB.GetString (19674) + ': ' + str (GemRB.GetTableValue (NextLevelTable, Class, str(Level+1) ) )
+		NextLevel = GemRB.GetTableValue (NextLevelTable, Class, str (Level + 1))
 	else:
 		After21ExpTable = GemRB.LoadTable ("LVL21PLS")
 		ExpGap = GemRB.GetTableValue (After21ExpTable, Class, 'XPGAP')
-		#GemRB.UnloadTable (After21ExpTable)
 		LevDiff = Level - 19
 		Lev20Exp = GemRB.GetTableValue (NextLevelTable, Class, "20")
-		NextLevel = GemRB.GetString (19674) + ': ' + str (Lev20Exp + (LevDiff * ExpGap))
+		NextLevel = Lev20Exp + (LevDiff * ExpGap)
 
-	Level = GemRB.GetString (48156) + ': ' + str (Level)
-	return ClassName + "\n" + Level + "\n" + Experience + "\n" + NextLevel + "\n\n"
+	return NextLevel
+
 
 def GetStatOverview (pc):
 	won = "[color=FFFFFF]"
@@ -497,58 +580,25 @@ def GetStatOverview (pc):
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 
 	stats = []
-	# 19672 Level <LEVEL> Spells
 
-	ClassTable = GemRB.LoadTable ("classes")
-	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
-	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
-	if Multi:
-		RowName1 = "FIGHTER"
-		if Multi == 3:
-			#fighter/mage
-			Class = 0
-		else:
-			#fighter/thief
-			Class = 3
-		RowName2 = GemRB.GetTableRowName (ClassTable, Class)
+	# Displaying Class, Level, Experience and Next Level Experience
+	# FIXME: This looks ugly
+	if (avatar_header['SecoLevel'] == 0):
+		DispLevel = GemRB.GetString (48156) + ': ' + str (avatar_header['PrimLevel']) + "\n"
+		DispXP = GemRB.GetString (19673) + ': ' + str (avatar_header['XP']) + "\n"
+		DispNextLevel = GemRB.GetString (19674) + ': ' + str (avatar_header['PrimNextLevXP']) + "\n"
+		Main = avatar_header['PrimClass'] + "\n" + DispLevel + DispXP + DispNextLevel + "\n"
 	else:
-		RowName1 = GemRB.GetTableRowName (ClassTable, Class)
-		RowName2 = "*"
+		DispPrimClass = avatar_header['PrimClass'] + "\n"
+		DispPrimLevel = GemRB.GetString (48156) + ': ' + str (avatar_header['PrimLevel']) + "\n"
+		DispXP = GemRB.GetString (19673) + ': ' + str (avatar_header['XP']) + "\n"
+		DispPrimNextLevel = GemRB.GetString (19674) + ': ' + str (avatar_header['PrimNextLevXP']) + "\n"
 
-	#Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
-	# Those are used to check which character we are dealing with
-	AnimIdsTable = GemRB.LoadTable ("avslots")
-	anim_id = GS (IE_ANIMATION_ID)
-	row = "0x%04X" %anim_id
-
-	# 19673 Experience
-	# Nameless is a special case (dual class)
-	if GemRB.GetTableValue (AnimIdsTable, row, "PC") == "NAMELESS_ONE":
-		if RowName1 == "FIGHTER":
-			Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
-			XP = GemRB.GetPlayerStat (pc, IE_XP)
-		elif RowName1 == "MAGE":
-			Level = GemRB.GetPlayerStat (pc, IE_LEVEL2)
-			XP = GemRB.GetPlayerStat (pc, IE_XP_MAGE)
-		else:
-			Level = GemRB.GetPlayerStat (pc, IE_LEVEL3)
-			XP = GemRB.GetPlayerStat (pc, IE_XP_THIEF)
-	else:
-		Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
-		XP = GemRB.GetPlayerStat (pc, IE_XP)
-		if Multi:
-			XP = XP/2
-
-	Experience = GemRB.GetString (19673) + ': ' + str (XP)
-
-	ClassName = GemRB.GetString (GemRB.GetTableValue (ClassTable, RowName1, "NAME_REF"))
-	Main = GetClassHeader (pc, ClassName, RowName1, Level, Experience)
-	if Multi:
-		Level = GemRB.GetPlayerStat (pc, IE_LEVEL2)
-		ClassName = GemRB.GetString (GemRB.GetTableValue (ClassTable, RowName2, "NAME_REF"))
-		Main = GemRB.GetString (19414) + "\n\n" + Main + GetClassHeader (pc, ClassName, RowName2, Level, Experience)
-
-	GemRB.UnloadTable (ClassTable)
+		DispSecoClass = avatar_header['SecoClass'] + "\n"
+		DispSecoLevel = GemRB.GetString (48156) + ': ' + str (avatar_header['SecoLevel']) + "\n"
+		DispSecoNextLevel = GemRB.GetString (19674) + ': ' + str (avatar_header['SecoNextLevXP']) + "\n"
+		Main = GemRB.GetString (19414) + "\n\n" + DispPrimClass + DispPrimLevel + DispXP + DispPrimNextLevel + "\n"
+		Main = Main + DispSecoClass + DispSecoLevel + DispXP + DispSecoNextLevel + "\n"
 
 	# 59856 Current State
 	StatesTable = GemRB.LoadTable ("states")
