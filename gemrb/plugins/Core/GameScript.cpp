@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.240 2005/03/08 19:58:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.241 2005/03/10 23:23:48 avenger_teambg Exp $
  *
  */
 
@@ -1854,12 +1854,14 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 	default: //nested object filters
 		int Nesting=0;
 		
-		while(Nesting++<MaxObjectNesting) {
+		while(Nesting<MaxObjectNesting) {
 			memmove(object->objectFilters+1, object->objectFilters, (int) sizeof(int) *(MaxObjectNesting-1) );
 			object->objectFilters[0]=GetIdsValue(src,"object");
 			if(*src!='(') {
 				break;
 			}
+			src++; //skipping (
+			Nesting++;
 		}
 		if(*src=='[') {
 			ParseIdsTarget(src, object);
@@ -2071,7 +2073,7 @@ Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIn
 Action* GameScript::GenerateAction(char* String, bool autoFree)
 {
 	strlwr( String );
-	if(InDebug&1) {
+	if (InDebug&1) {
 		printf("Compiling:%s\n",String);
 	}
 	int len = strlench(String,'(')+1; //including (
@@ -2227,7 +2229,7 @@ Trigger *GameScript::GenerateTriggerCore(const char *src, const char *str, int t
 Trigger* GameScript::GenerateTrigger(char* String)
 {
 	strlwr( String );
-	if(InDebug&1) {
+	if (InDebug&1) {
 		printf("Compiling:%s\n",String);
 	}
 	int negate = 0;
@@ -2237,7 +2239,7 @@ Trigger* GameScript::GenerateTrigger(char* String)
 	}
 	int len = strlench(String,'(')+1; //including (
 	int i = triggersTable->FindString(String, len);
-	if( i<0 ) {
+	if (i<0) {
 		return NULL;
 	}
 	char *src = String+len;
