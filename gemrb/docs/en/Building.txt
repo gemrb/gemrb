@@ -1,0 +1,69 @@
+BUILDING GEMRB FROM CVS SOURCES ON UNIX
+---------------------------------------
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/Building.txt,v 1.1 2004/07/26 09:02:38 edheldil Exp $
+
+
+Tools you will need to build GemRB from CVS:
+
+  - libtool
+  - automake
+  - autoconf
+
+  - GNU make
+  - C++ (g++)
+
+Libraries:
+
+  - ZLib
+  - Python 2.3 or better, compiled with shared libraries (*)
+  - SDL 1.2
+  - OpenAL
+
+
+(*) On some systems it means you have to build and install Python manually.
+    Specify --enable-shared option when running Python's configure.
+
+
+
+Building GemRB the easy way:
+----------------------------
+
+Following commands will try to configure, make and install GemRB.
+
+  ./autogen.sh
+  make
+  make install
+
+By default, GemRB is installed into directory $HOME/GemRB/ . Supporting
+files are mostly installed into the same directory.
+
+If you want to install GemRB into system-wide dir, or if you prefer
+installation into bin/, lib/, man/ ... subdirs under installation directory,
+either edit autogen.sh or run the tools by hand (see following paragraphs).
+
+
+Running all the tools by hand:
+------------------------------
+
+  libtoolize
+  aclocal
+  autoheader
+  automake --add-missing
+  autoconf
+
+
+To install GemRB into the same directory hierarchy as with autogen.sh, 
+use command similar to the one below:
+
+  TGT=$HOME/GemRB/
+  ./configure --prefix=$TGT --bindir=$TGT --sysconfdir=$TGT --datadir=$TGT --libdir=$TGT/plugins/ --disable-subdirs
+
+If you on the other hand want to install GemRB into standard directory 
+structure, run `configure' this way instead:
+
+  ./configure --prefix=$HOME/GemRB/
+
+
+  make
+  make install
+
