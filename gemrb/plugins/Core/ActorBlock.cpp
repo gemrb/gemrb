@@ -90,6 +90,11 @@ void Scriptable::AddAction(Action * aC)
 	actionQueue.push_back(aC);
 }
 
+void Scriptable::AddActionInFront(Action * aC)
+{
+	actionQueue.push_front(aC);
+}
+
 Action * Scriptable::GetNextAction()
 {
 	if(actionQueue.size() == 0)
@@ -380,10 +385,14 @@ void Door::ToggleTiles(bool playsound)
 		state = 1;
 		if(playsound && (CloseSound[0] != '\0'))
 			core->GetSoundMgr()->Play(CloseSound);
+		XPos = closed->BBox.x+(closed->BBox.w/2);
+		YPos = closed->BBox.y+(closed->BBox.h/2);
 	}
 	else {
 		if(playsound && (OpenSound[0] != '\0'))
 			core->GetSoundMgr()->Play(OpenSound);
+		XPos = open->BBox.x+(open->BBox.w/2);
+		YPos = open->BBox.y+(open->BBox.h/2);
 	}
 	for(int i = 0; i < count; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = state;
