@@ -38,8 +38,8 @@ def OnLoad():
 		GemRB.SetButtonFlags(LoadWindow, Button, IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 		#PC portraits
-		for j in range(0,6):
-			Button = GemRB.GetControl(LoadWindow,25+i*6+j)
+		for j in range(PARTY_SIZE):
+			Button = GemRB.GetControl(LoadWindow,25+i*PARTY_SIZE+j)
 			GemRB.SetButtonState (LoadWindow, Button, IE_GUI_BUTTON_LOCKED)
 			GemRB.SetButtonFlags(LoadWindow, Button, IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 			GemRB.SetControlSize(LoadWindow, Button, 21, 21)
@@ -47,6 +47,7 @@ def OnLoad():
 	ScrollBar=GemRB.GetControl(LoadWindow, 23)
 	GemRB.SetEvent(LoadWindow, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
 	GameCount=GemRB.GetSaveGameCount()   #count of games in save folder?
+	TopIndex=GameCount-5
 	GemRB.SetVarAssoc(LoadWindow, ScrollBar, "TopIndex", GameCount)
 	ScrollBarPress()
 	GemRB.SetVisible(LoadWindow,1)
@@ -93,8 +94,8 @@ def ScrollBarPress():
 			GemRB.SetSaveGamePreview(LoadWindow, Button, ActPos)
 		else:
 			GemRB.SetButtonPicture(LoadWindow, Button, "")
-		for j in range(0,6):
-			Button=GemRB.GetControl(LoadWindow, 25 + i*6 + j)
+		for j in range(PARTY_SIZE):
+			Button=GemRB.GetControl(LoadWindow, 25+i*PARTY_SIZE+j)
 			if ActPos<GameCount:
 				GemRB.SetSaveGamePortrait(LoadWindow, Button, ActPos,j)
 			else:
