@@ -1,5 +1,17 @@
 import GemRB
 
+from GUICommonWindows import *
+
+from GUIJRNL import *
+from GUIMA import *
+from GUIMG import *
+from GUIINV import *
+from GUIOPT import *
+from GUIPR import *
+from GUIREC import *
+from GUISTORE import *
+from GUIWORLD import *
+
 MessageWindow = 0
 PortraitWindow = 0
 OptionsWindow = 0
@@ -38,9 +50,13 @@ def OnLoad():
 	GemRB.SetVar("ActionsPosition", 4) #BottomAdded
 	GemRB.SetVar("OptionsPosition", 0) #Left
 	GemRB.SetVar("MessagePosition", 4) #BottomAdded
+	GemRB.SetVar("OtherPosition", 3) #Top
 	
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)
+
+	SetupActionsWindowControls (ActionsWindow)
+	SetupMenuWindowControls (OptionsWindow)
 
 	UpdateResizeButtons()
 	
@@ -101,6 +117,7 @@ def OnIncreaseSize():
 			GemRB.SetVar("MessageWindow", TMessageWindow)
 			GemRB.SetVar("MessageTextArea", TMessageTA)
 			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+
 	if Expand!=2:
 		GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
 		GemRB.UnloadWindow(MessageWindow)	
@@ -143,7 +160,6 @@ def OnDecreaseSize():
 		GemRB.UnloadWindow(MessageWindow)
 		Expand = Expand-1
 		MessageWindow = TMessageWindow
-	
 		GemRB.SetVar("MessageWindowSize", Expand)
 		UpdateResizeButtons()
 

@@ -21,10 +21,14 @@ def OnLoad():
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
 	GemRB.SetVar("OptionsWindow", OptionsWindow)
 	GemRB.SetVar("MessageWindow", MessageWindow)
+	GemRB.SetVar("TopWindow", -1)
+	GemRB.SetVar("OtherWindow", -1)
+	GemRB.SetVar("FloatWindow", -1)
 	GemRB.SetVar("PortraitPosition", 2) #Right
 	GemRB.SetVar("ActionsPosition", 4) #BottomAdded
 	GemRB.SetVar("OptionsPosition", 0) #Left
 	GemRB.SetVar("MessagePosition", 4) #BottomAdded
+	GemRB.SetVar("OtherPosition", 0) #Left
 	
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)
