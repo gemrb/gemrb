@@ -5,29 +5,44 @@ AbilityWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 AbilityTable = 0
+SumLabel = 0
+
+def RollPress():
+
+	GemRB.SetVar("AbilityIncrease",0)
+	GemRB.SetVar("AbilityDecrease",0)
+	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
+	GemRB.SetText(AbilityWindow, SumLabel, "0")
+
+	for i in range(0,6):
+		add = 0
+		dice = 3
+		size = 6
+		v = GemRB.Roll(dice, size, add)
+		GemRB.SetVar("Ability "+str(i), v )
+		Label = GemRB.GetControl(AbilityWindow, 0x10000003+i)
+		GemRB.SetText(AbilityWindow, Label, str(v) )
+	return
 
 def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
+	global SumLabel
 	global AbilityTable
 	
 	GemRB.LoadWindowPack("GUICG")
         AbilityTable = GemRB.LoadTable("weapprof")
 	AbilityWindow = GemRB.LoadWindow(4)
-	GemRB.SetVar("AbilityIncrease",0)
-	GemRB.SetVar("AbilityDecrease",0)
 
+	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
+	GemRB.SetText(AbilityWindow, SumLabel, "0")
+
+	RollPress()
 	for i in range(0,6):
-		Label = GemRB.GetControl(AbilityWindow, 0x10000002+i)
-		v = GemRB.GetVar("Ability "+str(i) )
-		GemRB.SetText(AbilityWindow, Label, str(v) )
-
 		Button = GemRB.GetControl(AbilityWindow, i*2+16)
-		GemRB.SetText(AbilityWindow, Button, GemRB.GetTableValue(AbilityTable,i,0) )
 		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "LeftPress")
 		GemRB.SetVarAssoc(AbilityWindow, Button, "AbilityIncrease", i )
 
 		Button = GemRB.GetControl(AbilityWindow, i*2+16)
-		GemRB.SetText(AbilityWindow, Button, GemRB.GetTableValue(AbilityTable,i,0) )
 		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
 		GemRB.SetVarAssoc(AbilityWindow, Button, "AbilityDecrease", i )
 
@@ -44,10 +59,11 @@ def OnLoad():
 	GemRB.SetText(AbilityWindow,DoneButton,11973)
 
 	TextAreaControl = GemRB.GetControl(AbilityWindow, 29)
-	GemRB.SetText(AbilityWindow,TextAreaControl,9602)
+	GemRB.SetText(AbilityWindow,TextAreaControl,17247)
 
-	GemRB.SetEvent(AbilityWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"StorePress")
-	GemRB.SetEvent(AbilityWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"RecallPress")
+	GemRB.SetEvent(AbilityWindow,StoreButton,IE_GUI_BUTTON_ON_PRESS,"StorePress")
+	GemRB.SetEvent(AbilityWindow,RecallButton,IE_GUI_BUTTON_ON_PRESS,"RecallPress")
+	GemRB.SetEvent(AbilityWindow,RerollButton,IE_GUI_BUTTON_ON_PRESS,"RollPress")
 	GemRB.SetEvent(AbilityWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(AbilityWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	GemRB.SetButtonState(AbilityWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
@@ -58,9 +74,6 @@ def LeftPress():
 	return
 
 def RightPress():
-	return
-
-def RollPress():
 	return
 
 def StorePress():
