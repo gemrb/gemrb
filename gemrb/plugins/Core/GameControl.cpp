@@ -88,6 +88,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 {
 	if(MapIndex == -1)
 		return;
+	if(!Width || !Height)
+		return;
 	if((selected.size() == 1) && (selected[0]->InParty))
 		ChangeMap();
 	Video * video = core->GetVideoDriver();
@@ -743,6 +745,15 @@ void GameControl::HideGUI()
 			}
 		}
 	}
+	if(dict->Lookup("OtherWindow", index)) {
+		if(index != -1) {
+			Window * tw = core->GetWindow(index);
+			core->SetVisible(index, 0);
+			if(dict->Lookup("OtherPosition", index)) {
+				ResizeDel(tw, index);
+			}
+		}
+	}
 	core->GetVideoDriver()->SetViewport(((Window*)Owner)->XPos,((Window*)Owner)->YPos, Width, Height);
 }
 
@@ -794,6 +805,15 @@ void GameControl::UnhideGUI()
 			Window * tw = core->GetWindow(index);
 			core->SetVisible(index, 1);
 			if(dict->Lookup("TopPosition", index)) {
+				ResizeAdd(tw, index);
+			}
+		}
+	}
+	if(dict->Lookup("OtherWindow", index)) {
+		if(index != -1) {
+			Window * tw = core->GetWindow(index);
+			core->SetVisible(index, 1);
+			if(dict->Lookup("OtherPosition", index)) {
 				ResizeAdd(tw, index);
 			}
 		}
