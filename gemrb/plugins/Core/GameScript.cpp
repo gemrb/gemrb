@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.182 2004/08/18 21:18:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.183 2004/08/18 21:55:35 avenger_teambg Exp $
  *
  */
 
@@ -282,6 +282,7 @@ static ActionLink actionnames[] = {
 	{"cutsceneid", GameScript::CutSceneID,AF_INSTANT},
 	{"deactivate", GameScript::Deactivate,0},
 	{"debug", GameScript::Debug,0},
+	{"debugoutput", GameScript::Debug,0},
 	{"destroyalldestructableequipment", GameScript::DestroyAllDestructableEquipment,0},
 	{"destroyallequipment", GameScript::DestroyAllEquipment,0},
 	{"destroyitem", GameScript::DestroyItem,0},
@@ -397,7 +398,9 @@ static ActionLink actionnames[] = {
 	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playsong", GameScript::PlaySong,0},
 	{"playsound", GameScript::PlaySound,0},
+	{"playsoundnotranged", GameScript::PlaySoundNotRanged,0},
 	{"playsoundpoint", GameScript::PlaySoundPoint,0},
+	{"quitgame", GameScript::QuitGame, 0},
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
 	{"recoil", GameScript::Recoil,0},
 	{"regainpaladinhood", GameScript::RegainPaladinHood,0},
@@ -407,6 +410,8 @@ static ActionLink actionnames[] = {
 	{"removejournalentry", GameScript::RemoveJournalEntry,0},
 	{"removepaladinhood", GameScript::RemovePaladinHood,0},
 	{"removerangerhood", GameScript::RemoveRangerHood,0},
+	{"reputationinc", GameScript::ReputationInc,0},
+	{"reputationset", GameScript::ReputationSet,0},
 	{"restorepartylocations", GameScript:: RestorePartyLocation,0},
 	//this is in iwd2, same as movetosavedlocation, with a default variable
 	{"returntosavedlocation", GameScript::MoveToSavedLocation, AF_BLOCKING},
@@ -473,6 +478,7 @@ static ActionLink actionnames[] = {
 	{"startdialogueoverrideinterrupt", GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startmovie", GameScript::StartMovie,AF_BLOCKING},
 	{"startsong", GameScript::StartSong,0},
+	{"stopmoving", GameScript::StopMoving,0},
 	{"storepartylocations", GameScript::StorePartyLocation,0},
 	{"stuffglobalrandom", GameScript::SetGlobalRandom,0},
 	{"swing", GameScript::Swing,0},
@@ -5593,6 +5599,12 @@ void GameScript::PlaySoundPoint(Scriptable* Sender, Action* parameters)
 	core->GetSoundMgr()->Play( parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter );
 }
 
+void GameScript::PlaySoundNotRanged(Scriptable* Sender, Action* parameters)
+{
+	printf( "PlaySound(%s)\n", parameters->string0Parameter );
+	core->GetSoundMgr()->Play( parameters->string0Parameter, 0, 0, 0);
+}
+
 void GameScript::CreateVisualEffectCore(int X, int Y, const char *effect)
 {
 	DataStream* ds = core->GetResourceMgr()->GetResource( effect, IE_VVC_CLASS_ID );
@@ -7118,20 +7130,14 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 
 void GameScript::ReputationSet(Scriptable* Sender, Action* parameters)
 {
-	if(Sender->Type==ST_ACTOR) {
-		Actor *scr = (Actor *) Sender;
-		scr->SetStat(IE_REPUTATION, parameters->int0Parameter);
-	}
 	core->GetGame()->Reputation = (unsigned int) parameters->int0Parameter;
+	core->GetGame()->ReputationAltered();
 }
 
 void GameScript::ReputationInc(Scriptable* Sender, Action* parameters)
 {
-	if(Sender->Type==ST_ACTOR) {
-		Actor *scr = (Actor *) Sender;
-		scr->NewStat(IE_REPUTATION, parameters->int0Parameter, MOD_ADDITIVE);
-	}
 	core->GetGame()->Reputation += (unsigned int) parameters->int0Parameter;
+	core->GetGame()->ReputationAltered();
 }
 
 void GameScript::FullHeal(Scriptable* Sender, Action* parameters)
@@ -7399,8 +7405,8 @@ void GameScript::PickPockets(Scriptable *Sender, Action *parameters)
 	//pickpocket failed trigger sent to the target and sender respectively
 	//slot == -1 here means money
 	if(slot==-1) { 
-		scr->NewStat(IE_GOLD,-money,0);
-		snd->NewStat(IE_GOLD,money,0);
+		scr->NewStat(IE_GOLD,-money,MOD_ADDITIVE);
+		snd->NewStat(IE_GOLD,money,MOD_ADDITIVE);
 		return;
 	}
 	// now this is a kind of giveitem
@@ -7431,3 +7437,18 @@ void GameScript::SetRestEncounterChance(Scriptable *Sender, Action *parameters)
 	map->RestHeader.DayChance = parameters->int0Parameter;
 	map->RestHeader.NightChance = parameters->int1Parameter;
 }
+
+void GameScript::QuitGame(Scriptable *Sender, Action *parameters)
+{
+	core->QuitGame(true);
+}
+
+void GameScript::StopMoving(Scriptable *Sender, Action *parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->ClearPath();
+}
+

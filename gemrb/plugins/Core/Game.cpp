@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.54 2004/08/07 00:46:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.55 2004/08/18 21:55:19 avenger_teambg Exp $
  *
  */
 
@@ -491,7 +491,7 @@ void Game::ShareXP(int xp)
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
 		}
-		PCs[i]->NewStat(IE_XP,xp,0);
+		PCs[i]->NewStat(IE_XP,xp,MOD_ADDITIVE);
 	}
 	//core->DisplayConstantString(); //you have gained ... xp
 }
@@ -545,3 +545,9 @@ void Game::IncrementChapter()
 	globals->SetAt("CHAPTER",chapter+1);
 }
 
+void Game::ReputationAltered()
+{
+	for(unsigned int i=0; i<PCs.size(); i++) {
+		PCs[i]->NewStat(IE_REPUTATION, Reputation, MOD_ABSOLUTE);
+	}
+}

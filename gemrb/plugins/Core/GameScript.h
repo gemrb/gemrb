@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.129 2004/08/18 21:18:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.130 2004/08/18 21:55:35 avenger_teambg Exp $
  *
  */
 
@@ -1074,7 +1074,9 @@ public:
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
 	static void PlaySong(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
+	static void PlaySoundNotRanged(Scriptable* Sender, Action* parameters);
 	static void PlaySoundPoint(Scriptable* Sender, Action* parameters);
+	static void QuitGame(Scriptable* Sender, Action* parameters);
 	static void RealSetGlobalTimer(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
 	static void RegainPaladinHood(Scriptable* Sender, Action* parameters);
@@ -1135,6 +1137,7 @@ public:
 		Action* parameters);
 	static void StartMovie(Scriptable* Sender, Action* parameters);
 	static void StartSong(Scriptable* Sender, Action* parameters);
+	static void StopMoving(Scriptable* Sender, Action* parameters);
 	static void StorePartyLocation(Scriptable *Sender, Action* parameters);
 	static void Swing(Scriptable* Sender, Action* parameters);
 	static void SwingOnce(Scriptable* Sender, Action* parameters);

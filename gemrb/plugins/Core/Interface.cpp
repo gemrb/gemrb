@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.197 2004/08/12 23:26:38 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.198 2004/08/18 21:55:35 avenger_teambg Exp $
  *
  */
 
@@ -2013,12 +2013,16 @@ bool Interface::InCutSceneMode()
        return video->DisableMouse;
 }
 
-void Interface::QuitGame()
+void Interface::QuitGame(bool BackToMain)
 {
 	DelWindow(0xffff);  //delete all windows, including GameControl
 	if(game) {
 		delete game;
 		game=NULL;
+	}
+	if(BackToMain) {
+		strcpy(NextScript, "Start");
+		ChangeScript = true;
 	}
 }
 
