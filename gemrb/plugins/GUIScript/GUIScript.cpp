@@ -15,25 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.183 2004/08/07 11:31:21 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.184 2004/08/07 13:42:29 avenger_teambg Exp $
  *
  */
 
 #include "GUIScript.h"
 #include "../Core/Interface.h"
 #include "../Core/Map.h"
-
-#ifdef WIN32
-#ifdef _DEBUG
-#undef _DEBUG
-#include "Python.h"
-#define _DEBUG
-#else
-#include "Python.h"
-#endif
-#else
-#include "Python.h"
-#endif
 
 #include "../Core/Label.h"
 #include "../Core/AnimationMgr.h"
@@ -2035,12 +2023,27 @@ PyDoc_STRVAR( GemRB_PlaySound__doc,
 static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
 	char* ResRef;
+	int XPos, YPos;
+	bool speech;
 
 	if (!PyArg_ParseTuple( args, "s", &ResRef )) {
 		return AttributeError( GemRB_PlaySound__doc );
 	}
 
-	int ret = core->GetSoundMgr()->Play( ResRef );
+	//this could be less hardcoded, but would do for a test
+	XPos=YPos=0;
+	speech=false;
+	Game *game=core->GetGame();
+	if(game) {
+		Scriptable *pc=game->GetPC(game->GetSelectedPCSingle());
+		if(pc) {
+			XPos=pc->XPos;
+			YPos=pc->YPos;
+			speech=true;
+		}
+	}
+	
+	int ret = core->GetSoundMgr()->Play( ResRef, XPos, YPos, speech );
 	if (!ret) {
 		return NULL;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.175 2004/08/07 00:46:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.176 2004/08/07 13:42:28 avenger_teambg Exp $
  *
  */
 
@@ -390,6 +390,7 @@ static ActionLink actionnames[] = {
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playsound", GameScript::PlaySound,0},
+	{"playsoundpoint", GameScript::PlaySoundPoint,0},
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
 	{"recoil", GameScript::Recoil,0},
 	{"regainpaladinhood", GameScript::RegainPaladinHood,0},
@@ -5494,11 +5495,18 @@ void GameScript::Continue(Scriptable* Sender, Action* parameters)
 {
 }
 
+//optional integer parameter (isSpeech)
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
 	core->GetSoundMgr()->Play( parameters->string0Parameter, Sender->XPos,
-				Sender->YPos );
+				Sender->YPos, parameters->int0Parameter );
+}
+
+void GameScript::PlaySoundPoint(Scriptable* Sender, Action* parameters)
+{
+	printf( "PlaySound(%s)\n", parameters->string0Parameter );
+	core->GetSoundMgr()->Play( parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter );
 }
 
 void GameScript::CreateVisualEffectCore(int X, int Y, const char *effect)

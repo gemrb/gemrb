@@ -49,6 +49,7 @@
 
 #define IE_STR_STRREFON 1
 #define IE_STR_SOUND	2
+#define IE_STR_SPEECH   4
 
 //IDS Importer Defines
 #define IDS_VALUE_NOT_LOCATED -65535 // GetValue returns this if text is not found in arrays ... this needs to be a unique number that does not exist in the value[] array

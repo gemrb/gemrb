@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.28 2004/08/03 22:58:37 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.29 2004/08/07 13:42:30 avenger_teambg Exp $
  *
  */
 
@@ -325,8 +325,14 @@ char* TLKImp::GetString(ieStrRef strref, unsigned long flags)
 	}
 	if (( type & 2 ) && ( flags & IE_STR_SOUND )) {
 		//if flags&IE_STR_SOUND play soundresref
-		if (SoundResRef[0] != 0)
-			core->GetSoundMgr()->Play( SoundResRef );
+		if (SoundResRef[0] != 0) {
+			Scriptable *target=core->GetGameControl()->target;
+			if(!target) {
+				target=core->GetGameControl()->speaker;
+			}
+			//IE_STR_SPEECH will stop the previous sound source
+			core->GetSoundMgr()->Play( SoundResRef, target->XPos, target->YPos, flags & IE_STR_SPEECH);
+		}
 	}
 	if (flags & IE_STR_STRREFON) {
 		char* string2 = ( char* ) malloc( Length + 11 );

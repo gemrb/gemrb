@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.159 2004/08/06 23:26:28 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.160 2004/08/07 13:42:28 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -133,7 +133,7 @@ GameControl::GameControl(void)
 //actually the savegame contains some formation data too, how to use it?
 void GameControl::ReadFormations()
 {
-  int i,j;
+	int i,j;
 	TableMgr * tab;
 	int table=core->LoadTable("formatio");
 	if(table<0) {
@@ -1515,7 +1515,7 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 		ds = dlg->GetState( si );
 	}
-	char* string = core->GetString( ds->StrRef, IE_STR_SOUND );
+	char* string = core->GetString( ds->StrRef, IE_STR_SOUND|IE_STR_SPEECH);
 	AddTalk( ta, speaker, "FF0000", string, "70FF70" );
 	free( string );
 	int i;
