@@ -3,6 +3,7 @@ import GemRB
 
 SkillWindow = 0
 TextAreaControl = 0
+ScrollBarControl = 0
 DoneButton = 0
 SkillTable = 0
 TopIndex = 0
@@ -10,29 +11,31 @@ PointsLeft = 0
 ProfColumn = 0
 
 def RedrawSkills():
+	global TopIndex
+
 	SumLabel = GemRB.GetControl(SkillWindow, 0x10000009)
 	GemRB.SetText(SkillWindow, SumLabel, str(PointsLeft) )  #points to distribute
 
 	for i in range(0,8):
 		Pos=TopIndex+i
-		print "POSITION: ",Pos
 		SkillName = GemRB.GetTableValue(SkillTable, Pos+8, 1) #we add the bg1 skill count offset
 		MaxProf = GemRB.GetTableValue(SkillTable, Pos+8, ProfColumn) #we add the bg1 skill count offset
 
-		if SkillName <=0:
-			MaxProf = 0
+		#invalid entry, adjusting scrollbar
+		if SkillName == 2147483647:
+			GemRB.SetVar("TopIndex",TopIndex)
+			GemRB.SetVarAssoc(SkillWindow, ScrollBarControl,"TopIndex",Pos-7)
+			break
 
 		Label=GemRB.GetControl(SkillWindow, i+69)
 		Button1=GemRB.GetControl(SkillWindow, i*2+11)
 		Button2=GemRB.GetControl(SkillWindow, i*2+12)
 		if MaxProf == 0:
-			GemRB.SetButtonState(SkillWindow, Label, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetButtonState(SkillWindow, Button1, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetButtonState(SkillWindow, Button2, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetButtonFlags(SkillWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 			GemRB.SetButtonFlags(SkillWindow, Button2, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 		else:
-			GemRB.SetButtonState(SkillWindow, Label, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetButtonState(SkillWindow, Button1, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetButtonState(SkillWindow, Button2, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetButtonFlags(SkillWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
@@ -52,7 +55,7 @@ def RedrawSkills():
 
 def OnLoad():
 	global SkillWindow, TextAreaControl, DoneButton, TopIndex
-	global SkillTable, PointsLeft, ProfColumn
+	global SkillTable, PointsLeft, ProfColumn, ScrollBarControl
 	
 	ClassTable = GemRB.LoadTable("classes")
 	Class = GemRB.GetVar("Class")-1
