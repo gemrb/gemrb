@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.62 2004/03/12 20:56:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.63 2004/03/13 13:51:23 avenger_teambg Exp $
  *
  */
 
@@ -663,6 +663,7 @@ private:
 	static Trigger* GenerateTrigger(char* String);
 	static Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
 	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
+	static int GetHappiness(Scriptable* Sender, int reputation);
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
 		int flags);
 
@@ -708,6 +709,7 @@ public: //Script Functions
 	static int Alignment(Scriptable* Sender, Trigger* parameters);
 	static int Allegiance(Scriptable* Sender, Trigger* parameters);
 	static int BitCheck(Scriptable* Sender, Trigger* parameters);
+	static int BreakingPoint(Scriptable* Sender, Trigger* parameters);
 	static int CheckStat(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatGT(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatLT(Scriptable* Sender, Trigger* parameters);
@@ -726,6 +728,9 @@ public: //Script Functions
 	static int GlobalTimerExact(Scriptable* Sender, Trigger* parameters);
 	static int GlobalTimerExpired(Scriptable* Sender, Trigger* parameters);
 	static int GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters);
+	static int Happiness(Scriptable* Sender, Trigger* parameters);
+	static int HappinessGT(Scriptable* Sender, Trigger* parameters);
+	static int HappinessLT(Scriptable* Sender, Trigger* parameters);
 	static int HP(Scriptable* Sender, Trigger* parameters);
 	static int HPGT(Scriptable* Sender, Trigger* parameters);
 	static int HPLT(Scriptable* Sender, Trigger* parameters);
@@ -845,6 +850,7 @@ public:
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
 	static void SaveLocation(Scriptable* Sender, Action* parameters);
+	static void Recoil(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
 	static void SaveObjectLocation(Scriptable* Sender, Action* parameters);
@@ -871,6 +877,7 @@ public:
 		Action* parameters);
 	static void StartMovie(Scriptable* Sender, Action* parameters);
 	static void StartSong(Scriptable* Sender, Action* parameters);
+	static void Swing(Scriptable* Sender, Action* parameters);
 	static void TakePartyGold(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);

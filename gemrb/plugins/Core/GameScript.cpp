@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.89 2004/03/12 20:56:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.90 2004/03/13 13:51:22 avenger_teambg Exp $
  *
  */
 
@@ -52,6 +52,7 @@ static TriggerLink triggernames[] = {
 	{"actionlistempty", GameScript::ActionListEmpty},
 	{"alignment", GameScript::Alignment},
 	{"allegiance", GameScript::Allegiance}, {"bitcheck",GameScript::BitCheck},
+	{"breakingpoint",GameScript::BreakingPoint},
 	{"checkstat",GameScript::CheckStat},
 	{"checkstatgt",GameScript::CheckStatGT},
 	{"checkstatlt",GameScript::CheckStatLT}, {"class", GameScript::Class},
@@ -64,6 +65,9 @@ static TriggerLink triggernames[] = {
 	{"globaltimerexact", GameScript::GlobalTimerExact},
 	{"globaltimerexpired", GameScript::GlobalTimerExpired},
 	{"globaltimernotexpired", GameScript::GlobalTimerNotExpired},
+	{"happiness", GameScript::Happiness},
+	{"happinessgt", GameScript::HappinessGT},
+	{"happinesslt", GameScript::HappinessLT},
 	{"harmlessentered", GameScript::Entered}, //this isn't sure the same
 	{"hp", GameScript::HP},
 	{"hpgt", GameScript::HPGT}, {"hplt", GameScript::HPLT},
@@ -178,6 +182,7 @@ static ActionLink actionnames[] = {
 	{"permanentstatchange",GameScript::ChangeStat}, //probably the same
 	{"picklock",GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
 	{"playdead",GameScript::PlayDead}, {"playsound",GameScript::PlaySound},
+	{"recoil",GameScript::Recoil},
 	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt",GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint",GameScript::RunAwayFromPoint,AF_BLOCKING},
@@ -210,6 +215,7 @@ static ActionLink actionnames[] = {
 	{"startdialogueoverrideinterrupt",GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startmovie",GameScript::StartMovie},
 	{"startsong",GameScript::StartSong},
+	{"swing",GameScript::Swing},
 	{"takepartygold",GameScript::TakePartyGold},
 	{"triggeractivation",GameScript::TriggerActivation},
 	{"unhidegui",GameScript::UnhideGUI},
@@ -1852,6 +1858,32 @@ int GameScript::ID_Specific(Actor *actor, int parameter)
 //-------------------------------------------------------------
 // Trigger Functions
 //-------------------------------------------------------------
+int GameScript::BreakingPoint(Scriptable* Sender, Trigger* parameters)
+{
+	int value=GetHappiness(Sender, core->GetGame()->Reputation );
+	return value < -300;
+}
+
+int GameScript::Happiness(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	int value=GetHappiness(Sender, core->GetGame()->Reputation );
+	return value == parameters->int0Parameter;
+}
+
+int GameScript::HappinessGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	int value=GetHappiness(Sender, core->GetGame()->Reputation );
+	return value > parameters->int0Parameter;
+}
+
+int GameScript::HappinessLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	int value=GetHappiness(Sender, core->GetGame()->Reputation );
+	return value < parameters->int0Parameter;
+}
 
 int GameScript::Alignment(Scriptable* Sender, Trigger* parameters)
 {
@@ -2614,6 +2646,19 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 
 	Actor* ab = ( Actor* ) Sender;
 	ab->SetPosition( tar->XPos, tar->YPos );
+}
+
+int GameScript::GetHappiness(Scriptable* Sender, int reputation)
+{
+	if(Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* ab = ( Actor* ) Sender;
+	int alignment = ab->GetStat(IE_ALIGNMENT)&3; //good, neutral, evil
+	int hptable = core->LoadTable( "happy" );
+	char * repvalue = core->GetTable( hptable )->QueryField( reputation/10, alignment );
+	core->DelTable( hptable );
+	return atoi(repvalue);
 }
 
 void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
@@ -3693,6 +3738,26 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 	actor->AnimID = IE_ANI_DIE;
 	//also set time for playdead!
 	actor->SetWait( parameters->int0Parameter );
+}
+
+void GameScript::Swing(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->AnimID = IE_ANI_ATTACK;
+	actor->SetWait( 1 );
+}
+
+void GameScript::Recoil(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->AnimID = IE_ANI_DAMAGE;
+	actor->SetWait( 1 );
 }
 
 void GameScript::GlobalSetGlobal(Scriptable* Sender, Action* parameters)
