@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.94 2003/12/21 14:09:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.95 2003/12/21 20:18:24 avenger_teambg Exp $
  *
  */
 
@@ -80,20 +80,8 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 	char * StartArea = tm->QueryField();
 	int startX = atoi(tm->QueryField(1,0));
 	int startY = atoi(tm->QueryField(2,0));
-	/*DataStream * str = core->GetResourceMgr()->GetResource(StartArea, IE_ARE_CLASS_ID);
-	MapMgr * am = (MapMgr*)core->GetInterface(IE_ARE_CLASS_ID);
-	if(!am) {
-		return NULL;
-	}
-	if(!am->Open(str, true)) {
-		printMessage("GUIScript", "Can't load area.\n", LIGHT_RED);
-		return NULL;
-	}
-	Map * map = am->GetMap();
-	int areaindex = core->GetGame()->AddMap(map);*/
 	core->LoadGame(-1);
 	gc->SetCurrentArea(0);
-	//core->FreeInterface(am);
 	core->DelTable(start);
 	core->GetVideoDriver()->MoveViewportTo(startX, startY);
 	Actor *MyActor = core->GetActor(0);
@@ -873,6 +861,15 @@ static PyObject * GemRB_SetButtonSprites(PyObject * /*self*/, PyObject *args)
 		return NULL;
 
 	Button * btn = (Button*)ctrl;
+
+	if(ResRef[0]==0) {
+		btn->SetImage(IE_GUI_BUTTON_UNPRESSED, 0);
+		btn->SetImage(IE_GUI_BUTTON_PRESSED, 0);
+		btn->SetImage(IE_GUI_BUTTON_SELECTED, 0);
+		btn->SetImage(IE_GUI_BUTTON_DISABLED, 0);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
 
 	AnimationFactory * bam = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(ResRef, IE_BAM_CLASS_ID);
 	if(!bam) {
