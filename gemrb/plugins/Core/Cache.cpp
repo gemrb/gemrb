@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.1 2005/01/21 18:45:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.2 2005/01/22 14:40:56 avenger_teambg Exp $
  *
  */
 
@@ -61,19 +61,24 @@ Cache::~Cache()
  
 void *Cache::GetResource(ieResRef key)
 {
-	if (hashmap.count(key) == 0) {
+	HashMapType::iterator m;
+
+	m=hashmap.find(key);
+	if (m == hashmap.end()) {
 		return NULL;
 	}
-	ValueType *ret=&hashmap[key];
-	ret->nRefCount++;
-	return ret->data;
+	(*m).second.nRefCount++;
+	return (*m).second.data;
 }
 
 //returns true if it was successful
 bool Cache::SetAt(ieResRef key, void *rValue)
 {
-	if (hashmap.count(key) != 0) {
-		return hashmap[key].data==rValue;
+	HashMapType::iterator m;
+
+	m=hashmap.find(key);
+	if (m!=hashmap.end()) {
+		return (*m).second.data==rValue;
 	}
 	//this creates a new element
 	ValueType *ret=&hashmap[key];
@@ -85,18 +90,19 @@ bool Cache::SetAt(ieResRef key, void *rValue)
 //returns RefCount we still have
 int Cache::DecRef(ieResRef key, bool remove)
 {
-	if (hashmap.count(key) == 0) {
+	HashMapType::iterator m;
+
+	m=hashmap.find(key);
+	if (m == hashmap.end()) {
 		return -1;
 	}
 
 	if (remove) {
-		hashmap.erase(key);
+		hashmap.erase(m);
 		return 0;
 	}
-	ValueType *ret=&hashmap[key];
-	if (ret->nRefCount) {
-		ret->nRefCount--;
-		return ret->nRefCount;
+	if ((*m).second.nRefCount) {
+		return --(*m).second.nRefCount;
 	}
 	return -1;
 }
@@ -111,10 +117,8 @@ int Cache::DecRef(void *data, bool remove)
 				hashmap.erase(m);
 				return 0;
 			}
-			ValueType *ret=&(*m).second;
-			if (ret->nRefCount) {
-				ret->nRefCount--;
-				return ret->nRefCount;
+			if ((*m).second.nRefCount) {
+				return --(*m).second.nRefCount;
 			}
 		}
 	}
