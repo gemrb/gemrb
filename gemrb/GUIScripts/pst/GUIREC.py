@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.15 2004/08/27 14:17:44 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.16 2004/08/28 10:23:18 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -732,8 +732,18 @@ def OpenBiographyWindow ():
 	BiographyWindow = Window = GemRB.LoadWindow (12)
 	GemRB.SetVar ("FloatWindow", BiographyWindow)
 
+	# These are used to get the bio
+	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = pc + 1;
+
+	BioTable = GemRB.LoadTable ("BIOS")
+	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
+	row = "0x%04X" %anim_id
+	BioText = int (GemRB.GetTableValue (BioTable, row, 'BIO'))
+	GemRB.UnloadTable (BioTable)
+
 	TextArea = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, TextArea, 39424)
+	GemRB.SetText (Window, TextArea, BioText)
 
 	
 	# Done
