@@ -56,9 +56,9 @@ int FileStream::Read(void * dest, int length)
 	if(!opened)
 		return GEM_ERROR;
 	size_t c = fread(dest, 1, length, str);
-	if(feof(str)) { /* slightly modified by brian  oct 11 2003*/
-		return GEM_EOF;
-	}
+	//if(feof(str)) { /* slightly modified by brian  oct 11 2003*/
+	//	return GEM_EOF;
+	//}
 	if(c < 0) {
 		return GEM_ERROR;
 	}
