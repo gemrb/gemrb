@@ -71,6 +71,7 @@
 #define  GF_HAS_BEASTS_INI   			12 //pst; also for quests.ini
 #define  GF_HAS_DESC_ICON   			13 //bg
 #define  GF_HAS_PICK_SOUND   			14 //pst
+#define  GF_IWD_MAP_DIMENSIONS			15 //iwd, iwd2
 
 /////AI global defines
 #define AI_UPDATE_TIME	30
