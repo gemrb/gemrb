@@ -121,6 +121,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 		return;
 	if(XPos==65535)
 		return;
+	Changed = false;
 	if(!(Flags & 0x1)) {
 		Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 		int align=0;
@@ -136,9 +137,6 @@ void Button::Draw(unsigned short x, unsigned short y)
 			{
 				if(Unpressed)
 					core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
-				if(hasText)
-					font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, NULL, align | IE_FONT_SINGLE_LINE, true);
-				Changed = false;
 			}
 			break;
 		
@@ -146,9 +144,9 @@ void Button::Draw(unsigned short x, unsigned short y)
 			{
 				if(Pressed)
 					core->GetVideoDriver()->BlitSprite(Pressed, x+XPos, y+YPos, true);
-				if(hasText)
-					font->Print(Region(x+XPos+2, y+YPos+2, Width, Height), (unsigned char*)Text, NULL, align | IE_FONT_SINGLE_LINE, true);
-				Changed = false;
+				//shift the writing a bit
+				x+=3;
+				y+=3;
 			}	
 			break;
 		
@@ -158,7 +156,6 @@ void Button::Draw(unsigned short x, unsigned short y)
 					core->GetVideoDriver()->BlitSprite(Selected, x+XPos, y+YPos, true);
 				else if(Unpressed)
 					core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
-				Changed = false;
 			}
 			break;
 		
@@ -166,18 +163,15 @@ void Button::Draw(unsigned short x, unsigned short y)
 			{
 				if(Disabled) {
 					core->GetVideoDriver()->BlitSprite(Disabled, x+XPos, y+YPos, true);
-					if(hasText)
-						font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, palette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
 				}
 				else if(Unpressed) {
 					core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
-					if(hasText)
-						font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, palette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
 				}
-				Changed = false;
 			}
 			break;
 		}
+		if(hasText)
+			font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, NULL, align | IE_FONT_SINGLE_LINE, true);
 	}
 	if(Picture && (Flags&0x2)) {
 		short xOffs = (Width / 2) - (Picture->Width / 2);

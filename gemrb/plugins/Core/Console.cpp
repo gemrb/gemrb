@@ -7,7 +7,8 @@ extern Interface * core;
 Console::Console(void)
 {
 	ta = NULL;
-	Buffer = (unsigned char*)malloc(1024);
+	max = 128;
+	Buffer = (unsigned char*)malloc(max);
 	Buffer[0] = 0;
 	CurPos = 0;
 	Changed = true;

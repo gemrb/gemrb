@@ -36,15 +36,45 @@ bool TLKImp::Open(DataStream * stream, bool autoFree)
 
 inline char *mystrncpy(char *dest, const char *source, int maxlength, char delim)
 {
-  while(*source && (*source!=delim) && maxlength--)
-  {
+  while(*source && (*source!=delim) && maxlength--) {
     *dest++=*source++;
   }
   *dest=0;
   return dest;
 }
 
-static bool ResolveTags(char *dest, char *source, int Length)
+//if this function returns -1 then it is not a built in token, dest may be NULL
+int TLKImp::BuiltinToken(char *Token, char *dest)
+{
+	char *Decoded=NULL;
+	int TokenLength;   //decoded token length
+
+//this may be hardcoded, all engines are the same or don't use it
+	if(!strcmp(Token,"FIGHTERTYPE") ) {
+		Decoded=GetString(10086,0);
+		goto exit_function;
+	}
+	if(!strcmp(Token,"WEAPONNAME") ) {
+//this should be character dependent, we don't have a character sheet yet
+	}
+
+	if(!strcmp(Token,"MAGESCHOOL") ) {
+//this should be character dependent, we don't have a character sheet yet
+	}
+
+	return -1;  //not decided
+
+exit_function:
+	if(Decoded)
+	{
+		TokenLength=strlen(Decoded);
+		if(dest) memcpy(dest,Decoded,TokenLength);
+		free(Decoded);
+	}
+	return TokenLength;
+}
+
+bool TLKImp::ResolveTags(char *dest, char *source, int Length)
 {
   int NewLength;
   char Token[MAX_VARIABLE_LENGTH+1];
@@ -53,13 +83,16 @@ static bool ResolveTags(char *dest, char *source, int Length)
   for(int i=0; source[i];i++) {
 	if(source[i]=='<') {
 		i+=mystrncpy(Token, source+i+1, MAX_VARIABLE_LENGTH, '>' )-Token+1;
-		int TokenLength=core->GetTokenDictionary()->GetValueLength(Token);
-		if(TokenLength) {
-			if(TokenLength+NewLength>Length)
-				return false;
-			core->GetTokenDictionary()->Lookup(Token, dest+NewLength, TokenLength);
-			NewLength+=TokenLength;
+		int TokenLength=BuiltinToken(Token, dest+NewLength);
+		if(TokenLength==-1) {
+			TokenLength=core->GetTokenDictionary()->GetValueLength(Token);
+			if(TokenLength) {
+				if(TokenLength+NewLength>Length)
+					return false;
+				core->GetTokenDictionary()->Lookup(Token, dest+NewLength, TokenLength);
+			}
 		}
+		NewLength+=TokenLength;
 	}
 	else {
 		if(source[i]=='[') {
@@ -79,19 +112,29 @@ static bool ResolveTags(char *dest, char *source, int Length)
   return true;
 }
 
-static bool GetNewStringLength(char *string, unsigned long &Length)
+bool TLKImp::GetNewStringLength(char *string, unsigned long &Length)
 {
   int NewLength;
+  bool lChange;
   char Token[MAX_VARIABLE_LENGTH+1];
 
+  lChange=false;
   NewLength=0;
   for(int i=0;i<Length;i++) {
-	if(string[i]=='<') {
+	if(string[i]=='<') {   // token
+		lChange=true;
 		i+=mystrncpy(Token, string+i+1, MAX_VARIABLE_LENGTH, '>' )-Token+1;
-		NewLength+=core->GetTokenDictionary()->GetValueLength(Token);
+		int TokenLength=BuiltinToken(Token, NULL);
+		if(TokenLength==-1) {
+			NewLength+=core->GetTokenDictionary()->GetValueLength(Token);
+		}
+		else {
+			NewLength+=TokenLength;
+		}
 	}
 	else {
-		if(string[i]=='[') {
+		if(string[i]=='[') { //voice actor directives
+			lChange=true;
 			char *tmppoi=strchr(string+i+1,']');
 			if(tmppoi)
 				NewLength+=tmppoi-string-i-1;
@@ -101,12 +144,8 @@ static bool GetNewStringLength(char *string, unsigned long &Length)
 		else NewLength++;
 	}
   }
-  if(NewLength!=Length)
-  {
-	Length=NewLength;
-	return true;
-  }
-  return false;
+  Length=NewLength;
+  return lChange;
 }
 
 char * TLKImp::GetString(unsigned long strref, int flags)
