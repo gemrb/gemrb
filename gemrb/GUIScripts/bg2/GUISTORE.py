@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.6 2005/02/28 17:35:11 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.7 2005/02/28 19:01:08 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -79,7 +79,7 @@ def OpenStoreWindow ():
 	OpenStoreDonateWindow,OpenStoreHealWindow,
 	OpenStoreRumourWindow,OpenStoreRentWindow )
 
-	if CloseOtherWindow(StoreWindow):
+	if CloseOtherWindow( StoreWindow ):
 		GemRB.HideGUI ()
 		CloseStoreShoppingWindow ()
 		CloseStoreIdentifyWindow ()
@@ -92,7 +92,7 @@ def OpenStoreWindow ():
 		GemRB.UnloadWindow (StoreWindow)
 		StoreWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		SetSelectionChangeHandler (None)
+		SetSelectionChangeHandler( None )
 		GemRB.UnhideGUI ()
 		return
 
@@ -129,10 +129,10 @@ def OpenStoreWindow ():
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
-	SetSelectionChangeHandler (store_update_funcs[store_buttons[0]])
+	SetSelectionChangeHandler( store_update_funcs[store_buttons[0]] )
+	GemRB.SetVar ("StoreRent",0)
 	GemRB.UnhideGUI()
 	#initializing selected variables
-	GemRB.SetVar("StoreRent",0)
 	store_update_funcs[store_buttons[0]] ()
 
 def OpenStoreShoppingWindow ():
@@ -330,6 +330,7 @@ def OpenStoreRentWindow ():
 	GemRB.SetVar ("TopWindow", Window)
 
 	# room types
+	StoreRent = -1
 	for i in range(4):
 		ok = Store['StoreRoomPrices'][i]
 		Button = GemRB.GetControl (Window, i)
@@ -347,23 +348,24 @@ def OpenStoreRentWindow ():
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectStoreRent")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		GemRB.SetVarAssoc (Window, Button, "StoreRent", i)
+		if ok<0:
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
 	# Rent
 	Button = GemRB.GetControl (Window, 11)
 	GemRB.SetText (Window, Button, 14293)
-	GemRB.SetVar("StoreRent",StoreRent)
-
+	GemRB.SetVar ("StoreRent",StoreRent)
 	GemRB.UnhideGUI ()
 
 
 def SelectStoreRent ():
 	Window = StoreRentWindow
 	
-	room = GemRB.GetVar("StoreRent")
+	room = GemRB.GetVar ("StoreRent")
 	Text = GemRB.GetControl (Window, 12)
 	GemRB.SetText (Window, Text, roomtypes[room] )
 	Label = GemRB.GetControl (Window, 0x1000000d)
-	Rent = GemRB.GetVar("StoreRent")
+	Rent = GemRB.GetVar ("StoreRent")
 	price = Store['StoreRoomPrices'][Rent]
 	GemRB.SetText (Window, Label, str(price) )
 
@@ -404,7 +406,7 @@ def UpdateStoreRumourWindow ():
 def UpdateStoreRentWindow ():
 	UpdateStoreCommon (StoreRentWindow, 0x10000008, 0, 0x10000009)
 	# price ...
-	SelectStoreRent()
+	SelectStoreRent ()
 
 
 def CloseStoreShoppingWindow ():

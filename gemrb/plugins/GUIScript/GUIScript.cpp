@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.274 2005/02/28 17:35:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.275 2005/02/28 19:01:12 avenger_teambg Exp $
  *
  */
 
@@ -1109,8 +1109,8 @@ PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ss", &script, &worldmap )) {
 		return AttributeError( GemRB_SetMasterScript__doc );
 	}
-	strncpy( core->GlobalScript, script, 8 );
-	strncpy( core->WorldMapName, worldmap, 8 );
+	strnuprcpy( core->GlobalScript, script, 8 );
+	strnuprcpy( core->WorldMapName, worldmap, 8 );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -1228,7 +1228,7 @@ static PyObject* GemRB_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	strncpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH );
+	strnuprcpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH );
 	ctrl->Value = Value;
 	/** setting the correct state for this control */
 	/** it is possible to set up a default value, if Lookup returns false, use it */
@@ -4117,7 +4117,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	TmpItem = new CREItem();
-	strncpy(TmpItem->ItemResRef, ItemResRef, 8);
+	strnuprcpy(TmpItem->ItemResRef, ItemResRef, 8);
 	TmpItem->Unknown08=0;
 	TmpItem->Usages[0]=Charge0;
 	TmpItem->Usages[1]=Charge1;

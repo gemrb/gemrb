@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.5 2005/02/28 17:35:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.6 2005/02/28 19:01:12 avenger_teambg Exp $
  *
  */
 
@@ -45,6 +45,16 @@ STT_BG2CONT=4, STT_IWD2CONT=5 } StoreType;
 
 typedef enum StoreActionType { STA_BUYSELL=0, STA_IDENTIFY=1, STA_STEAL=2,
 STA_DONATE=3, STA_CURE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreActionType;
+
+#define IE_STORE_BUY     1
+#define IE_STORE_SELL    2
+#define IE_STORE_ID      4
+#define IE_STORE_STEAL   8
+#define IE_STORE_CURE    16
+#define IE_STORE_DONATE  32
+#define IE_STORE_DRINK   64
+
+#define IE_STORE_FENCE   0x200
 
 typedef struct STOItem {
 	ieResRef ItemResRef;
@@ -116,7 +126,7 @@ public:
 	char unknown3[80];
 
 public: //queries
-	bool AcceptableItemType(int type) const;
+	bool AcceptableItemType(ieDword type, ieDword invflags) const;
 	STOCure *GetCure(int idx) const;
 	STODrink *GetDrink(int idx) const;
 	STOItem *GetItem(int idx) const;

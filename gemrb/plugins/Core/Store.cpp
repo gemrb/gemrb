@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.5 2005/02/28 17:35:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.6 2005/02/28 19:01:11 avenger_teambg Exp $
  *
  */
 
@@ -43,9 +43,20 @@ Store::~Store(void)
 	free( purchased_categories );
 }
 
-bool Store::AcceptableItemType(int type) const
+bool Store::AcceptableItemType(ieDword type, ieDword invflags) const
 {
-	for (int i=0;i<PurchasedCategoriesCount;i++) {
+	if (Type<STT_BG2CONT) {
+		//can't sell undroppable or critical items
+		if ((invflags&(IE_INV_ITEM_DESTRUCTIBLE|IE_INV_ITEM_UNDROPPABLE))==IE_INV_ITEM_DESTRUCTIBLE) {
+			return false;
+		}
+		//check if store buys stolen items
+		if ((invflags&IE_INV_ITEM_STOLEN) && !(Type&IE_STORE_FENCE) ) {
+			return false;
+		}
+	}
+
+	for (ieDword i=0;i<PurchasedCategoriesCount;i++) {
 		if (type==purchased_categories[i]) {
 			return true;
 		}
