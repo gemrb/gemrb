@@ -122,7 +122,7 @@ private:
 								strcat(ResRef, "G1");
 							break;
 						}
-						if(Orient > 5) {
+						if(Orient > 10) {
 							strcat(ResRef, "E");
 						}
 					}
