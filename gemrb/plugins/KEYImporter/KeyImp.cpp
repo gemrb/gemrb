@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.41 2004/08/02 21:53:45 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.42 2004/09/13 21:40:29 avenger_teambg Exp $
  *
  */
 
@@ -101,10 +101,10 @@ bool KeyImp::LoadResFile(const char* resfile)
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "KEYImporter", "Reading Resources...\n", WHITE );
 	ieDword BifCount, ResCount, BifOffset, ResOffset;
-	f->Read( &BifCount, 4 );
-	f->Read( &ResCount, 4 );
-	f->Read( &BifOffset, 4 );
-	f->Read( &ResOffset, 4 );
+	f->ReadDword( &BifCount );
+	f->ReadDword( &ResCount );
+	f->ReadDword( &BifOffset );
+	f->ReadDword( &ResOffset );
 	printMessage( "KEYImporter", "", WHITE );
 	printf( "BIF Files Count: %d (Starting at %d Bytes)\n", BifCount,
 		BifOffset );
@@ -116,10 +116,10 @@ bool KeyImp::LoadResFile(const char* resfile)
 	for (i = 0; i < BifCount; i++) {
 		BIFEntry be;
 		f->Seek( BifOffset + ( 12 * i ), GEM_STREAM_START );
-		f->Read( &BifLen, 4 );
-		f->Read( &ASCIIZOffset, 4 );
-		f->Read( &ASCIIZLen, 2 );
-		f->Read( &be.BIFLocator, 2 );
+		f->ReadDword( &BifLen );
+		f->ReadDword( &ASCIIZOffset );
+		f->ReadWord( &ASCIIZLen );
+		f->ReadWord( &be.BIFLocator );
 		be.name = ( char * ) malloc( ASCIIZLen );
 		f->Seek( ASCIIZOffset, GEM_STREAM_START );
 		f->Read( be.name, ASCIIZLen );
@@ -162,11 +162,10 @@ bool KeyImp::LoadResFile(const char* resfile)
 	resources.InitHashTable( ResCount );
 	for (i = 0; i < ResCount; i++) {
 		RESEntry re;
-		f->Read( re.ResRef, 8 );
-		f->Read( &re.Type, 2 );
-		f->Read( &re.ResLocator, 4 );
-		char* key;
-		key = new char[8];
+		f->ReadResRef( re.ResRef );
+		f->ReadWord( &re.Type );
+		f->ReadDword( &re.ResLocator );
+		char* key = (char *) calloc(8, sizeof(char) );
 		for (int j = 0; j < 8; j++)
 			key[j] = toupper( re.ResRef[j] );
 		resources.SetAt( key, re.Type, re.ResLocator );
