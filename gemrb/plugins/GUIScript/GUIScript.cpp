@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.280 2005/03/05 18:15:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.281 2005/03/06 10:33:44 avenger_teambg Exp $
  *
  */
 
@@ -3545,15 +3545,15 @@ static ieStrRef GetSpellDesc(ieResRef CureResRef)
 
 	if (StoreSpellsCount==-1) {
 		StoreSpellsCount = 0;
-		int table = core->LoadTable("speldesc");
+		int table = core->LoadTable("SPELDESC");
 		if (table>=0) {
 			TableMgr *tab = core->GetTable(table);
 			if(!tab) goto table_loaded;
 			StoreSpellsCount = tab->GetRowCount();
 			StoreSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * StoreSpellsCount);
 			for (i=0;i<StoreSpellsCount;i++) {
-				strnuprcpy(StoreSpells[i].resref, tab->QueryField(i,0),8 );
-				StoreSpells[i].value = atoi(tab->QueryField(i,1) );
+				strnuprcpy(StoreSpells[i].resref, tab->GetRowName(i),8 );
+				StoreSpells[i].value = atoi(tab->QueryField(i,0) );
 			}
 table_loaded:
 			core->DelTable(table);
@@ -3562,7 +3562,7 @@ table_loaded:
 	if (StoreSpellsCount==0) {
 		Spell *spell = core->GetSpell(CureResRef);
 		if (!spell) {
-			return (ieStrRef) -1;
+			return 0;
 		}
 		int ret = spell->SpellDescIdentified;
 		core->FreeSpell(spell, CureResRef, 0);
@@ -3573,7 +3573,7 @@ table_loaded:
 			return StoreSpells[i].value;
 		}
 	}
-	return (ieStrRef) -1;
+	return 0;
 }
 
 PyDoc_STRVAR( GemRB_GetStoreCure__doc,
@@ -3600,8 +3600,7 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "CureResRef", PyString_FromResRef( cure->CureResRef ));
 	PyDict_SetItemString(dict, "Price", PyInt_FromLong( cure->Price ));
 	PyDict_SetItemString(dict, "Description", PyInt_FromLong( GetSpellDesc(cure->CureResRef) ) );
-	Py_INCREF( Py_None );
-	return Py_None;
+	return dict;
 }
 
 PyDoc_STRVAR( GemRB_ExecuteString__doc,
