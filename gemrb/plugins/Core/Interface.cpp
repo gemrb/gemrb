@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.260 2005/02/18 18:43:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.261 2005/02/18 21:59:54 edheldil Exp $
  *
  */
 
@@ -2016,6 +2016,13 @@ int Interface::PlayMovie(char* ResRef)
 	//	delete( str );
 		return -1;
 	}
+	// Disable all the windows, so they do not receive mouse clicks
+	// FIXME: of course, movies played before GameControl is created
+	//    are different story
+	GameControl* gc = GetGameControl();
+	if (gc) gc->HideGUI();
+	else SetVisible (0, 0);
+
 	//shutting down music and ambients before movie
 	if(music) music->HardEnd();
 	soundmgr->GetAmbientMgr()->deactivate();
@@ -2023,6 +2030,9 @@ int Interface::PlayMovie(char* ResRef)
 	//restarting music
 	if(music) music->Start();
 	soundmgr->GetAmbientMgr()->activate();
+	if (gc) gc->UnhideGUI();
+	else SetVisible (0, 1);
+
 	FreeInterface( mp );
 	//Setting the movie name to 1
 	vars->SetAt( ResRef, 1 );
@@ -2276,6 +2286,10 @@ void Interface::LoadGame(int index)
 GameControl *Interface::GetGameControl()
 {
  	Window *window = GetWindow( 0 );
+	// in the beginning, there's no window at all
+	if (! window)
+		return NULL;
+
 	Control* gc = window->GetControl(0);
 	if(gc->ControlType!=IE_GUI_GAMECONTROL) {
 		return NULL;
