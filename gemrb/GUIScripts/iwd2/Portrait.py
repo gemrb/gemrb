@@ -49,7 +49,7 @@ def OnLoad():
 	GemRB.SetEvent(AppearanceWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	
 	while True:
-		if GemRB.GetTableValue(PortraitsTable, LastPortrait, 3) == Gender:
+		if GemRB.GetTableValue(PortraitsTable, LastPortrait, 0) == Gender:
 			SetPicture()
 			break
 		LastPortrait = LastPortrait + 1
@@ -62,7 +62,7 @@ def RightPress():
 		LastPortrait = LastPortrait + 1
 		if LastPortrait >= GemRB.GetTableRowCount(PortraitsTable)-1:
 			LastPortrait = 0
-		if GemRB.GetTableValue(PortraitsTable, LastPortrait, 3) == Gender:
+		if GemRB.GetTableValue(PortraitsTable, LastPortrait, 0) == Gender:
 			SetPicture()
 			return
 
@@ -72,7 +72,7 @@ def LeftPress():
 		LastPortrait = LastPortrait - 1
 		if LastPortrait < 0:
 			LastPortrait = GemRB.GetTableRowCount(PortraitsTable)-2
-		if GemRB.GetTableValue(PortraitsTable, LastPortrait, 3) == Gender:
+		if GemRB.GetTableValue(PortraitsTable, LastPortrait, 0) == Gender:
 			SetPicture()
 			return
 
