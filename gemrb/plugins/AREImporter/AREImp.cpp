@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.50 2004/04/25 22:41:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.51 2004/05/07 16:45:52 avenger_teambg Exp $
  *
  */
 
@@ -52,6 +52,9 @@ AREImp::AREImp(void)
 		if (at) {
 			for (int i = 0; i < DEF_COUNT; i++) {
 				strncpy( Sounds[i], at->QueryField( i, 0 ), 8 );
+				if(Sounds[i][0]=='*') {
+					Sounds[i][0]=0;
+				}
 			}
 		}
 		core->DelTable( SoundTable );
@@ -260,8 +263,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		free( points );
 		//Getting Door Information from the WED File
 		bool BaseClosed;
-		unsigned short * indices = tmm->GetDoorIndices( ShortName, &count,
-											BaseClosed );
+		unsigned short * indices = tmm->GetDoorIndices( ShortName, &count, BaseClosed );
 		Door* door;
 		door = tm->AddDoor( ShortName, Flags, BaseClosed,
 					indices, count, open, closed );
