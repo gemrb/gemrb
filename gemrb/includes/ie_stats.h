@@ -222,5 +222,7 @@
 #define IE_ALIGNMENT		217
 #define IE_UNSELECTABLE		218
 #define IE_ARMOR_TYPE		219
+#define IE_TEAM				220
+#define IE_FACTION			221
 
 #endif
