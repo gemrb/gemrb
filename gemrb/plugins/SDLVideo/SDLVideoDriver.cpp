@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.59 2004/02/24 22:20:39 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.60 2004/02/29 09:43:38 avenger_teambg Exp $
  *
  */
 
@@ -282,8 +282,9 @@ int SDLVideoDriver::SwapBuffers(void)
 		}
 		unsigned long time;
 		GetTime( time );
-		if (( time - lastTime ) < 17)
+		if (( time - lastTime ) < 17) {
 			return ret;
+		}
 		lastTime = time;
 		SDL_BlitSurface( backBuf, NULL, disp, NULL );
 		if (fadePercent) {
@@ -377,18 +378,6 @@ int SDLVideoDriver::SwapBuffers(void)
 							Evnt->OnSpecialKeyPress( key );
 					} else if (Evnt && ( key != 0 ))
 						Evnt->KeyPress( key, event.key.keysym.mod );
-					/*if(event.key.keysym.sym == SDLK_RIGHT) {
-													Viewport.x += 64;
-												}
-												else if(event.key.keysym.sym == SDLK_LEFT) {
-													Viewport.x -= 64;
-												}
-												else if(event.key.keysym.sym == SDLK_UP) {
-													Viewport.y -= 64;
-												}
-												else if(event.key.keysym.sym == SDLK_DOWN) {
-													Viewport.y += 64;
-												}*/
 				}
 				break;
 
@@ -462,6 +451,7 @@ int SDLVideoDriver::SwapBuffers(void)
 	unsigned long time;
 	GetTime( time );
 	if (( time - lastTime ) < 17) {
+		SDL_Delay(17);
 		return ret;
 	}
 	lastTime = time;
