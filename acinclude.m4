@@ -366,3 +366,40 @@ $1],
 [AC_MSG_RESULT(no)
 $2])
 ])
+
+
+dnl Check for the name of Posix threads library.
+dnl Ripped from XMMS by Peter Alm & co and modified to integrate w/ GemRB
+
+AC_DEFUN(AC_CHECK_PTHREADS,
+[
+LIBPTHREAD=error
+AC_MSG_CHECKING(for old style FreeBSD -pthread flag)
+AC_EGREP_CPP(yes,
+        [#if (defined(__FreeBSD_cc_version) && __FreeBSD_cc_version <= 500001) || defined(__OpenBSD__)
+          yes
+        #endif
+        ], AC_MSG_RESULT(yes)
+        CXXFLAGS="$CXXFLAGS -D_THREAD_SAFE"
+        LIBPTHREAD="-pthread",
+        AC_MSG_RESULT(no))
+if test "x$LIBPTHREAD" = xerror; then
+        AC_CHECK_LIB(pthread, pthread_attr_init,
+                LIBPTHREAD="-lpthread")
+fi
+if test "x$LIBPTHREAD" = xerror; then
+        AC_CHECK_LIB(pthreads, pthread_attr_init,
+                LIBPTHREAD="-lpthreads")
+fi
+if test "x$LIBPTHREAD" = xerror; then
+        AC_CHECK_LIB(c_r, pthread_attr_init,
+                LIBPTHREAD="-lc_r")
+fi
+if test "x$LIBPTHREAD" = xerror; then
+        AC_CHECK_FUNC(pthread_attr_init, LIBPTHREAD="")
+fi
+if test "x$LIBPTHREAD" = xerror; then
+        AC_MSG_ERROR(*** Unable to locate working posix thread library)
+fi
+AC_SUBST(LIBPTHREAD)
+])

@@ -9,7 +9,7 @@ if [ "$1" = "" ]; then
 	echo "Example: $0 $HOME/GemRB"
 	exit 1
 else
-	cmd="sh configure --prefix=$1/ --bindir=$1/ --datadir=$1/ --libdir=$1/plugins"
+	cmd="sh configure --prefix=$1/ --bindir=$1/ --sysconfdir=$1/ --datadir=$1/ --libdir=$1/plugins/ --disable-subdirs"
 	$cmd
 	echo
 	echo "Configure was invoked as: $cmd"
