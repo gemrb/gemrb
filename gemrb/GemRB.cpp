@@ -56,10 +56,10 @@ int main(int argc, char ** argv)
 			frames = (frame*1000.0/(time-timebase));
 			timebase = time;
 			frame = 0;
+			sprintf(fpsstring, "%.3f fps", frames);
+			core->GetVideoDriver()->DrawRect(bg, fpsblack);
+			fps->Print(Region(0,0,100,20), (unsigned char *)fpsstring, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE,true);
 		}
-		sprintf(fpsstring, "%.3f fps", frames);
-		core->GetVideoDriver()->DrawRect(bg, fpsblack);
-		fps->Print(Region(0,0,100,20), (unsigned char *)fpsstring, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE,true);
 	} while(core->GetVideoDriver()->SwapBuffers() == GEM_OK);
 	delete(core);
 	return 0;
