@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.86 2004/03/11 22:40:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.87 2004/03/12 16:35:32 avenger_teambg Exp $
  *
  */
 
@@ -84,12 +84,17 @@ static TriggerLink triggernames[] = {
 //Make this an ordered list, so we could use bsearch!
 static ActionLink actionnames[] = {
 	{"actionoverride",NULL}, {"activate",GameScript::Activate},
-	{"addglobals",GameScript::AddGlobals}, {"ally",GameScript::Ally},
+	{"addexperienceparty",GameScript::AddExperienceParty},
+	{"addexperiencepartyglobal",GameScript::AddExperiencePartyGlobal},
+	{"addglobals",GameScript::AddGlobals},
+	{"addwaypoint",GameScript::AddWayPoint,AF_BLOCKING},
+	{"ally",GameScript::Ally},
 	{"addxp2da", GameScript::AddXP2DA},
 	{"addxpobject", GameScript::AddXPObject},
 	{"addxpvar", GameScript::AddXP2DA},
 	{"ambientactivate",GameScript::AmbientActivate},
-	{"bitclear",GameScript::BitClear}, {"bitset",GameScript::GlobalBOr}, //probably the same
+	{"bitclear",GameScript::BitClear},
+	{"bitset",GameScript::GlobalBOr}, //probably the same
 	{"changeaiscript",GameScript::ChangeAIScript},
 	{"changealignment",GameScript::ChangeAlignment},
 	{"changeallegiance",GameScript::ChangeAllegiance},

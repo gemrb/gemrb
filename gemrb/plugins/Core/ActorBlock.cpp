@@ -397,6 +397,21 @@ void Moveble::DoStep(ImageMgr* LightMap)
 				STEP_TIME );
 	}
 }
+
+void Moveble::AddWayPoint(unsigned short XDes, unsigned short YDes)
+{
+	if(!path) {
+		WalkTo(XDes, YDes);
+		return;
+	}
+	PathNode *endNode=path;
+	while(endNode->Next) {
+		endNode=endNode->Next;
+	}
+	PathNode *path2 = core->GetPathFinder()->FindPath( endNode->x, endNode->y, XDes, YDes );
+	endNode->Next=path2;
+}
+
 void Moveble::WalkTo(unsigned short XDes, unsigned short YDes)
 {
 	this->XDes = XDes;
