@@ -17,6 +17,9 @@
 
 #include "../../includes/win32def.h"
 #include "Control.h"
+#ifndef WIN32
+#include <stdio.h>
+#endif
 
 Control::Control(){
 	hasFocus = false;

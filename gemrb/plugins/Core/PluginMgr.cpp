@@ -21,7 +21,9 @@ typedef int (* intvoid)(void);
 typedef ClassDesc *(* cdint)(int);
 
 extern Interface * core;
+#ifdef WIN32
 extern HANDLE hConsole;
+#endif
 
 PluginMgr::PluginMgr(char * pluginpath)
 {
