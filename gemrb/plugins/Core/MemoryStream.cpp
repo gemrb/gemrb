@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.10 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.11 2004/03/26 18:07:51 edheldil Exp $
  *
  */
 
@@ -69,7 +69,7 @@ int MemoryStream::Seek(int arg_pos, int startpos)
 			 {
 				if (arg_pos >= length)
 					return GEM_ERROR;
-				Pos = length;
+				Pos = arg_pos;
 			}
 			break;
 
