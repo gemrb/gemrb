@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.41 2003/12/09 00:45:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.42 2003/12/09 18:58:42 balrog994 Exp $
  *
  */
 
@@ -366,6 +366,10 @@ Sprite2D *SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels, voi
 		SDL_SetColorKey((SDL_Surface*)p, SDL_SRCCOLORKEY | SDL_RLEACCEL, index);
 	spr->Width = w;
 	spr->Height = h;
+	if(bpp == 8) {
+		spr->palette = (Color*)malloc(256*sizeof(Color));
+		memcpy(spr->palette, palette, 256*sizeof(Color));
+	}
 	return spr;
 }
 
@@ -1101,10 +1105,19 @@ Color * SDLVideoDriver::GetPalette(Sprite2D * spr)
 	if(s->format->BitsPerPixel != 8)
 		return NULL;
 	Color * pal = (Color*)malloc(256*sizeof(Color));
-	for(int i = 0; i < s->format->palette->ncolors; i++) {
-		pal[i].r = s->format->palette->colors[i].r;
-		pal[i].g = s->format->palette->colors[i].g;
-		pal[i].b = s->format->palette->colors[i].b;
+	if(spr->palette) {
+		for(int i = 0; i < 256; i++) {
+			pal[i].r = spr->palette[i].r;
+			pal[i].g = spr->palette[i].g;
+			pal[i].b = spr->palette[i].b;
+		}
+	}
+	else {
+		for(int i = 0; i < s->format->palette->ncolors; i++) {
+			pal[i].r = s->format->palette->colors[i].r;
+			pal[i].g = s->format->palette->colors[i].g;
+			pal[i].b = s->format->palette->colors[i].b;
+		}
 	}
 	return pal;
 }
