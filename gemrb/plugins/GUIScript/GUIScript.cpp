@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.98 2003/12/24 14:30:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.99 2003/12/24 21:49:28 avenger_teambg Exp $
  *
  */
 
@@ -2010,10 +2010,10 @@ bool GUIScript::Init(void)
 	}
 	char path[_MAX_PATH];
 	#ifdef WIN32
-	int len = (int)strlen(core->GemRBPath);
+	int len = (int)strlen(core->GUIScriptsPath);
 	int p = 0;
 	for(int i = 0; i < len; i++) {
-		if(core->GemRBPath[i] == '\\') {
+		if(core->GUIScriptsPath[i] == '\\') {
 			path[p] = '/';
 		}
 		else
