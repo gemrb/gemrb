@@ -78,6 +78,7 @@ typedef unsigned long DWORD;
 #endif
 
 GEM_EXPORT bool dir_exists(const char *path);
+GEM_EXPORT int strlench(const char *string, char ch);
 
 #ifdef WIN32
 
