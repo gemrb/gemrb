@@ -8,16 +8,12 @@ def OnLoad():
 	global GamePlayWindow, TextAreaControl
 	GemRB.LoadWindowPack("GUIOPT")
 	GamePlayWindow = GemRB.LoadWindow(9)
-	B1 = GemRB.GetControl(GamePlayWindow, 0x10000000+15)
-	B2 = GemRB.GetControl(GamePlayWindow, 0x10000000+16)
-	B3 = GemRB.GetControl(GamePlayWindow, 0x10000000+17)
-	B4 = GemRB.GetControl(GamePlayWindow, 0x10000000+18)
-	B5 = GemRB.GetControl(GamePlayWindow, 0x10000000+19)
-	B6 = GemRB.GetControl(GamePlayWindow, 0x10000000+20)
-	B7 = GemRB.GetControl(GamePlayWindow, 0x10000000+21)
-	B8 = GemRB.GetControl(GamePlayWindow, 0x10000000+22)
-#	B9 = GemRB.GetControl(GamePlayWindow, 0x10000000+23)
-#	B10 = GemRB.GetControl(GamePlayWindow, 0x10000000+24)
+	B1 = GemRB.GetControl(GamePlayWindow, 10)
+	B2 = GemRB.GetControl(GamePlayWindow, 11)
+	B3 = GemRB.GetControl(GamePlayWindow, 12)
+	B4 = GemRB.GetControl(GamePlayWindow, 13)
+	B5 = GemRB.GetControl(GamePlayWindow, 14)
+	B6 = GemRB.GetControl(GamePlayWindow, 15)
 	OkButton = GemRB.GetControl(GamePlayWindow, 26)
 	CancelButton = GemRB.GetControl(GamePlayWindow, 27)
 	TextAreaControl = GemRB.GetControl(GamePlayWindow, 28)
@@ -38,40 +34,30 @@ def OnLoad():
 
 def B1Press():
         global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18024)
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 18026)
 	return
 
 def B2Press():
         global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18025)
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 18027)
 	return
 
 def B3Press():
         global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18026)
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 18028)
 	return
 
 def B4Press():
         global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18027)
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 18029)
 	return
 
 def B5Press():
         global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18028)
-	return
-
-def B6Press():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18029)
-	return
-
-def B7Press():
-        global GamePlayWindow, TextAreaControl
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18030)
 	return
 
-def B8Press():
+def B6Press():
         global GamePlayWindow, TextAreaControl
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18031)
 	return
