@@ -2,7 +2,7 @@
 #define GLOBALTIMER_H
 
 #include "GameScript.h"
-#include "ActorBlock.h"
+#include "Actor.h"
 
 #ifdef WIN32
 
@@ -23,7 +23,7 @@ private:
 	unsigned long interval;
 
 	GameScript * CutScene;
-	ActorBlock * MovingActor;
+	Actor * MovingActor;
 
 	unsigned long fadeToCounter, fadeToMax;
 	unsigned long fadeFromCounter, fadeFromMax;
@@ -39,7 +39,7 @@ public:
 	void SetFadeToColor(unsigned long Count);
 	void SetFadeFromColor(unsigned long Count);
 	void SetWait(unsigned long Count);
-	void SetMovingActor(ActorBlock * actor);
+	void SetMovingActor(Actor * actor);
 	void SetCutScene(GameScript * script);
 	void SetScreenShake(unsigned long shakeX, unsigned long shakeY, unsigned long Count);
 };

@@ -34,7 +34,10 @@ void GlobalTimer::Update()
 			core->GetVideoDriver()->SetFadePercent(((fadeFromMax-fadeFromCounter)*100)/fadeFromMax);
 			fadeFromCounter++;
 		} else if(shakeCounter) {
-			core->GetVideoDriver()->SetViewport((-(shakeX>>1)) + shakeStartVP.x + (rand()%shakeX), (-(shakeY>>1)) + shakeStartVP.y + (rand()%shakeY));
+			if(shakeCounter != 1)
+				core->GetVideoDriver()->SetViewport((-((short)shakeX>>1)) + shakeStartVP.x + (rand()%shakeX), (-((short)shakeY>>1)) + shakeStartVP.y + (rand()%shakeY));
+			else
+				core->GetVideoDriver()->SetViewport(shakeStartVP.x, shakeStartVP.y);
 			shakeCounter--;
 		}
 		if(MovingActor && MovingActor->path)
@@ -81,7 +84,7 @@ void GlobalTimer::SetWait(unsigned long Count)
 	waitCounter = Count;
 }
 
-void GlobalTimer::SetMovingActor(ActorBlock * actor)
+void GlobalTimer::SetMovingActor(Actor * actor)
 {
 	MovingActor = actor;
 }
