@@ -1,5 +1,5 @@
-#ifndef 2DAIMP_H
-#define 2DAIMP_H
+#ifndef P2DAIMP_H
+#define P2DAIMP_H
 
 #include "../Core/TableMgr.h"
 #include "../../includes/globals.h"
@@ -24,6 +24,12 @@ public:
         	if(rows.size()<=0) return 0;
 		return rows[0].size();
         }
+        inline char *QueryField(int row = 0, int column = 0) const
+	{
+		if(rows.size()<=row) return NULL;
+		if(rows[row].size()<=column) return NULL;
+		return rows[row][column];
+	};
 };
 
 #endif
