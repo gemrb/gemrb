@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.133 2004/03/12 02:11:03 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.134 2004/03/15 11:18:39 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,26 @@ inline bool valid_number(const char* string, long& val)
 
 	val = strtol( string, &endpr, 0 );
 	return ( const char * ) endpr != string;
+}
+
+static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
+{
+	int r,g,b;
+
+	if (!PyArg_ParseTuple( args, "iii", &r, &g, &b)) {
+		printMessage( "GUIScript",
+			"Syntax Error: SetInfoTextColor(r, g, b)\n",
+			LIGHT_RED );
+		return NULL;
+	}
+	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );
+	if (gc->ControlType != IE_GUI_GAMECONTROL) {
+		return NULL;
+	}
+	Color c={r,g,b,0};
+	gc->SetInfoTextColor( c );
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* args)
@@ -2690,6 +2710,8 @@ static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 }
 
 static PyMethodDef GemRBMethods[] = {
+	{"SetInfoTextColor",GemRB_SetInfoTextColor, METH_VARARGS,
+	"Sets the color of Floating Messages in GameControl."},
 	{"HideGUI", GemRB_HideGUI, METH_NOARGS,
 	"Hides the Game GUI."},
 	{"UnhideGUI", GemRB_UnhideGUI, METH_NOARGS,
