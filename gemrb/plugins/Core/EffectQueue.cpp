@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.7 2005/01/09 15:08:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.8 2005/01/09 21:03:32 edheldil Exp $
  *
  */
 
@@ -50,16 +50,18 @@ static int initialized = 0;
 static EffectFunction effect_fns[MAX_EFFECTS];
 
 
-//Make this an ordered list, so we could use bsearch!
+// FIXME: this list should be dynamic (stl::vector). It should be populated
+//   by fx plugins, so it would be easier to add new effects etc.
+// FIXME: Make this an ordered list, so we could use bsearch!
 static EffectLink effectnames[] = {
-	{ "ac_vs_damage_type_modifier", fx_ac_vs_damage_type_modifier },
-	{ "condition_modifier", fx_condition_modifier },
-	{ "maximum_hp_modifier", fx_maximum_hp_modifier },
-	{ "save_vs_death_modifier", fx_save_vs_death_modifier },
-	{ "save_vs_wands_modifier", fx_save_vs_wands_modifier },
-	{ "save_vs_poly_modifier", fx_save_vs_poly_modifier },
-	{ "save_vs_breath_modifier", fx_save_vs_breath_modifier },
-	{ "save_vs_spell_modifier", fx_save_vs_spell_modifier },
+	{ "Stat:ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier },
+	{ "Stat:ConstitutionModifier", fx_condition_modifier },
+	{ "HP:MaximumHPModifier", fx_maximum_hp_modifier },
+	{ "Stat:SaveVsDeathModifier", fx_save_vs_death_modifier },
+	{ "Stat:SaveVsWandsModifier", fx_save_vs_wands_modifier },
+	{ "Stat:SaveVsPolyModifier", fx_save_vs_poly_modifier },
+	{ "Stat:SaveVsBreathModifier", fx_save_vs_breath_modifier },
+	{ "Stat:SaveVsSpellModifier", fx_save_vs_spell_modifier },
 	{ NULL, NULL },
 };
 
@@ -163,24 +165,13 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 // these opcodes are true for PS:T
 void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 {
-	switch (fx->Opcode) {
-	case 0x00: fx_ac_vs_damage_type_modifier ( target, fx ); break;
-	case 0x0A: fx_condition_modifier ( target, fx ); break;
-	case 0x12: fx_maximum_hp_modifier ( target, fx ); break;
-	case 0x21: fx_save_vs_death_modifier ( target, fx ); break;
-	case 0x22: fx_save_vs_wands_modifier ( target, fx ); break;
-	case 0x23: fx_save_vs_poly_modifier ( target, fx ); break;
-	case 0x24: fx_save_vs_breath_modifier ( target, fx ); break;
-	case 0x25: fx_save_vs_spell_modifier ( target, fx ); break;
-	case 0x2A: fx_bonus_wizard_spells ( target, fx ); break;
-	case 0x2C: fx_strength_modifier ( target, fx ); break;
-	case 0x36: fx_to_hit_modifier ( target, fx ); break;
-	case 0x3B: fx_stealth_bonus ( target, fx ); break;
-	case 0x49: fx_damage_bonus ( target, fx ); break;
-	case 0x5A: fx_open_locks_modifier ( target, fx ); break;
-	case 0xA6: fx_resistance_to_magic_damage ( target, fx ); break;
-	default: printf( "fx_???: (%d) %d %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	}
+	printf( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
+
+	EffectFunction  fn = effectnames[fx->Opcode].Function;
+	if (fn)
+		fn( target, fx );
+	else
+		printf( "Not found\n" );
 }
 
 #define CHECK_LEVEL() { \
