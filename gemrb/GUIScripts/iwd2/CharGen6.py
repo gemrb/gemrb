@@ -103,8 +103,9 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,11958,-1) # new line
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(AlignmentTable,GemRB.GetVar("Alignment")-1,0))
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"",-1) #2 new lines
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,17088,-1)
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,17088)
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"[/color]")
 	for i in range(0,6):
 		v = GemRB.GetTableValue(AbilityTable, i,2)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)

@@ -8,7 +8,7 @@ def OnLoad():
 	global PartyFormationWindow
 	GemRB.LoadWindowPack("GUISP")
 	
-	PartySelectWindow = GemRB.LoadWindow(0)
+	PartyFormationWindow = GemRB.LoadWindow(0)
 	
 	ExitButton = GemRB.GetControl(PartyFormationWindow, 30)
 	GemRB.SetText(PartyFormationWindow, ExitButton, 13906)
@@ -16,12 +16,19 @@ def OnLoad():
 	ModifyCharactersButton = GemRB.GetControl(PartyFormationWindow, 43)
 	GemRB.SetText(PartyFormationWindow, ModifyCharactersButton, 18816)
 	GemRB.SetButtonState(PartyFormationWindow, ModifyCharactersButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent(PartyFormationWindow,ModifyCharactersButton, IE_GUI_BUTTON_ON_PRESS,"ModifyCharactersPress")
+
 	DoneButton = GemRB.GetControl(PartyFormationWindow, 28)
 	GemRB.SetText(PartyFormationWindow, DoneButton, 11973)
-	GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	if GemRB.GetPartySize()==0:
+		GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	else:
+		GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(PartyFormationWindow,ModifyCharactersButton, IE_GUI_BUTTON_ON_PRESS,"EnterGamePress")
 	
 	for i in range(18,24):
 		Button = GemRB.GetControl(PartyFormationWindow,i)
+		GemRB.SetVarAssoc(PartyFormationWindow, Button, "Slot",i-18)
 		GemRB.SetText(PartyFormationWindow, Button, 10264)
 		GemRB.SetEvent(PartyFormationWindow, Button, IE_GUI_BUTTON_ON_PRESS, "GeneratePress")
 	
@@ -66,3 +73,8 @@ def GeneratePress():
 	GemRB.UnloadWindow(PartyFormationWindow)
 	GemRB.SetNextScript("CharGen")
 	return
+
+def EnterGamePress():
+	GemRB.EnterGame()
+	return
+

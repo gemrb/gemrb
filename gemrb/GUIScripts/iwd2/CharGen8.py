@@ -61,11 +61,11 @@ def OnLoad():
 
 	AppearanceButton = GemRB.GetControl(CharGenWindow,6)
 	GemRB.SetText(CharGenWindow,AppearanceButton, 11961)
-	GemRB.SetButtonState(CharGenWindow,AppearanceButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(CharGenWindow,AppearanceButton,IE_GUI_BUTTON_DISABLED)
 
 	NameButton = GemRB.GetControl(CharGenWindow,7)
 	GemRB.SetText(CharGenWindow,NameButton, 11963)
-	GemRB.SetButtonState(CharGenWindow,NameButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(CharGenWindow,NameButton,IE_GUI_BUTTON_ENABLED)
 
 	BackButton = GemRB.GetControl(CharGenWindow, 11)
 	GemRB.SetText(CharGenWindow, BackButton, 15416)
@@ -124,13 +124,13 @@ def OnLoad():
 
 	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "StartOverPress")
 	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
-	GemRB.SetEvent(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+	GemRB.SetEvent(CharGenWindow, NameButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 	GemRB.SetVisible(CharGenWindow,1)
 	return
 	
 def NextPress():
 	GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("Abilities") #abilities
+	GemRB.SetNextScript("Name") #name
 	return
 
 def StartOverPress():
