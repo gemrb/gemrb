@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.56 2005/02/09 21:19:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.57 2005/02/13 13:39:50 avenger_teambg Exp $
  *
  */
 
@@ -67,6 +67,7 @@ class Map;
 #define IF_FROMGAME   4     //this is an NPC or PC
 #define IF_REALLYDIED 8     //real death happened, actor will be set to dead
 #define IF_NORECTICLE 16    //draw recticle (target mark)
+#define IF_NOINT      32    //cannot interrupt the actions of this actor (save is not possible!)
 
 /** flags for GetActor */
 //default action
@@ -262,10 +263,7 @@ public:
 	int GetXPLevel(int modified);
 
 	/** Gets the Dialog ResRef */
-	const char* GetDialog(void)
-	{
-		return Dialog;
-	}
+	const char* GetDialog(bool checks=false);
 	/** Gets the Portrait ResRef */
 	char* GetPortrait(int which)
 	{

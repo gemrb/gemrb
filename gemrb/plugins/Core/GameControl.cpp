@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.186 2005/02/06 11:04:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.187 2005/02/13 13:39:50 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -742,10 +742,6 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 
 void GameControl::TryToTalk(Actor *source, Actor *tgt)
 {
-	if(tgt->GetNextAction()) {
-		core->DisplayConstantString(STR_TARGETBUSY, 0xff0000);
-		return;
-	}
 	char Tmp[40];
 
 	//Nidspecial1 is just an unused action existing in all games

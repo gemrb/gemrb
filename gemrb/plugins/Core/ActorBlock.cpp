@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.69 2005/02/11 21:44:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.70 2005/02/13 13:39:50 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -392,7 +392,7 @@ void Moveble::SetStance(unsigned int arg)
 	else
 	{
 		StanceID=IE_ANI_AWAKE; //
-		printMessage("Actor","Tried to set invalid stance id",LIGHT_RED);
+		printf("Tried to set invalid stance id (%u)\n", arg);
 	}
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.81 2005/02/10 22:40:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.82 2005/02/13 13:39:50 avenger_teambg Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include "TableMgr.h"
 #include "Actor.h"
 #include "Interface.h"
+#include "../../includes/strrefs.h"
 
 extern Interface* core;
 #ifdef WIN32
@@ -400,8 +401,8 @@ void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
 }
 
 /* this is returning the level of the character for xp calculations 
-   later it could calculate with dual/multiclass, 
-   also with iwd2's 3rd ed rules, this is why it is a separate function */
+	 later it could calculate with dual/multiclass, 
+	 also with iwd2's 3rd ed rules, this is why it is a separate function */
 int Actor::GetXPLevel(int modified)
 {
 	if (modified) {
@@ -582,5 +583,21 @@ int Actor::LearnSpell(ieResRef spellname, ieDword flags)
 		//add xp
 	}
 	return LSR_OK;
+}
+
+const char *Actor::GetDialog(bool checks)
+{
+	if (!checks) {
+		return Dialog;
+	}
+	if (GetStat(IE_EA)>=EVILCUTOFF) {
+		return NULL;
+	}
+
+	if ( (InternalFlags & IF_NOINT) && CurrentAction) {
+		core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+		return NULL;
+	}
+	return Dialog;
 }
 

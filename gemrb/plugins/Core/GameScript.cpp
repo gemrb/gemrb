@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.228 2005/02/12 22:58:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.229 2005/02/13 13:39:50 avenger_teambg Exp $
  *
  */
 
@@ -1546,6 +1546,11 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		else {
 			if(InDebug&1) {
 				printf( "[IEScript]: Executing action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
+			}
+			//turning off interruptable flag
+			//uninterruptable actions will set it back
+			if (Sender->Type==ST_ACTOR) {
+				((Actor *)Sender)->InternalFlags&=~IF_NOINT;
 			}
 			func( Sender, aC );
 		}
@@ -4741,6 +4746,7 @@ int GameScript::InternalLT(Scriptable* Sender, Trigger* parameters)
 	return (signed) actor->GetStat(IE_INTERNAL_0+idx) < parameters->int1Parameter;
 }
 
+//we check if target is currently in dialog or not
 int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -4751,8 +4757,8 @@ int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) tar;
-	const char *poi=actor->GetDialog();
-	if(!poi[0]) {
+	GameControl *gc = core->GetGameControl();
+	if( (actor != gc->target) && (actor != gc->speaker) ) {
 		return 1;
 	}
 	return 0;
@@ -5081,7 +5087,7 @@ int GameScript::HasWeaponEquipped(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if (actor->inventory.GetEquippedSlot() == 1000) {
+	if (actor->inventory.GetEquippedSlot() == IW_NO_EQUIPPED) {
 		return 0;
 	}
 	return 1;
@@ -5838,7 +5844,7 @@ void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	//actor->SetNoInterrupt(); // TODO
+	actor->InternalFlags|=IF_NOINT;
 	actor->WalkTo( parameters->pointParameter );
 }
 
@@ -5907,7 +5913,7 @@ void GameScript::MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	//actor->SetNoInterrupt(); //something along these lines
+	actor->InternalFlags|=IF_NOINT;
 	actor->WalkTo( target->Pos );
 }
 
@@ -6000,7 +6006,7 @@ void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	//nointerrupt???
+	actor->InternalFlags|=IF_NOINT;
 	actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
 }
 
@@ -6307,7 +6313,7 @@ static const char *GetDialog(Scriptable* scr)
 		case ST_PROXIMITY: case ST_TRAVEL: case ST_TRIGGER:
 			return ((Highlightable *) scr)->GetDialog();
 		case ST_ACTOR:
-			return ((Actor *) scr)->GetDialog();
+			return ((Actor *) scr)->GetDialog(true);
 		case ST_GLOBAL:case ST_AREA:
 			return NULL;
 	}
@@ -6556,7 +6562,7 @@ void GameScript::PlayerDialogue(Scriptable* Sender, Action* parameters)
 //we hijack this action for the player initiated dialogue
 void GameScript::NIDSpecial1(Scriptable* Sender, Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_TARGET | BD_NUMERIC | BD_TALKCOUNT | BD_CHECKDIST );
+	BeginDialog( Sender, parameters, BD_INTERRUPT | BD_TARGET | BD_NUMERIC | BD_TALKCOUNT | BD_CHECKDIST );
 }
 
 void GameScript::StartDialogueInterrupt(Scriptable* Sender, Action* parameters)
@@ -7158,7 +7164,7 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_DIE );
-	//also set time for playdead!
+	actor->InternalFlags|=IF_NOINT;
 	actor->SetWait( parameters->int0Parameter );
 }
 
