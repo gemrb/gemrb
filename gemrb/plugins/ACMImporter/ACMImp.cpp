@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.21 2003/12/02 18:35:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.22 2003/12/06 17:33:19 balrog994 Exp $
  *
  */
 
@@ -138,6 +138,7 @@ unsigned long ACMImp::Play(const char * ResRef)
 			if((error = alGetError()) != AL_NO_ERROR) {
 				DisplayALError("[ACMImp::Play] alutLoadWAVFile : ", error);
 			}
+			int duration = (size*1000)/(freq*2);
 			alBufferData(Buffer, format, data, size, freq);
 			if((error = alGetError()) != AL_NO_ERROR) {
 				DisplayALError("[ACMImp::Play] alBufferData : ", error);
@@ -172,7 +173,7 @@ unsigned long ACMImp::Play(const char * ResRef)
 						streams[i].Source = Source;
 						streams[i].playing = false;
 						alSourcePlay(Source);
-						return 0;
+						return duration;
 					}
 				} else {
 					streams[i].Buffer = Buffer;
@@ -180,7 +181,7 @@ unsigned long ACMImp::Play(const char * ResRef)
 					streams[i].free = false;
 					streams[i].playing = false;
 					alSourcePlay(Source);
-					return 0;
+					return duration;
 				}
 			}
 
@@ -220,6 +221,7 @@ unsigned long ACMImp::Play(const char * ResRef)
 			if((error = alGetError()) != AL_NO_ERROR) {
 				DisplayALError("[ACMImp::Play] alutLoadWAVFile : ", error);
 			}
+			int duration = (size*1000)/(freq*2);
 			alBufferData(Buffer, format, data, size, freq);
 			if((error = alGetError()) != AL_NO_ERROR) {
 				DisplayALError("[ACMImp::Play] alBufferData : ", error);
@@ -255,7 +257,7 @@ unsigned long ACMImp::Play(const char * ResRef)
 						streams[i].Source = Source;
 						streams[i].playing = false;
 						alSourcePlay(Source);
-						return 0;
+						return duration;
 					}
 				} else {
 					streams[i].Buffer = Buffer;
@@ -263,7 +265,7 @@ unsigned long ACMImp::Play(const char * ResRef)
 					streams[i].free = false;
 					streams[i].playing = false;
 					alSourcePlay(Source);
-					return 0;
+					return duration;
 				}
 			}
 
