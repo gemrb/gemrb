@@ -1,6 +1,10 @@
 #ifndef WIN32DEF_H
 #define WIN32DEF_H
 
+#ifndef HAVE_SNPRINTF
+#include "../plugins/Core/snprintf.h"
+#endif
+
 //we need 32+6 bytes at least, because we store 'context' in the variable
 //name too
 #define MAX_VARIABLE_LENGTH  40
