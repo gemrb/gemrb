@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.43 2003/12/15 09:34:35 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.44 2003/12/17 19:53:35 balrog994 Exp $
  *
  */
 
@@ -645,41 +645,52 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode,
 	}
 	SDL_Surface * surf = (SDL_Surface*)spr->vptr;
 	int destx = drect.x, desty = drect.y;
-
 	if((destx > core->Width) || ((destx+srect->w) < 0))
 		return;
 	if((desty > core->Height) || ((desty+srect->h) < 0))
 		return;
 
+	SDL_LockSurface(surf);
+	SDL_LockSurface(backBuf);
+
+	unsigned char * src, *dst;
+
 	for(int y = srect->y; y < srect->h; y++) {
 		if((desty < 0) || (desty > core->Height))
 			continue;
 		destx = drect.x; 
-		unsigned char * src = ((unsigned char*)spr->pixels)+(y*surf->pitch);
+		src = ((unsigned char*)spr->pixels)+(y*surf->pitch);
+		dst = ((unsigned char *)backBuf->pixels)+(desty*backBuf->pitch)+(destx*backBuf->format->BytesPerPixel);
 		for(int x = srect->x; x < srect->w; x++) {
 			if((destx < 0) || (destx > core->Width)) {
 				src++;
 				destx++;
+				dst+=4;
 				continue;
 			}
-			SDL_Color c1 = surf->format->palette->colors[*src++];
-			if((c1.r == 0) && (c1.g == 0xff) && (c1.b == 0)) {
+			if(!(*src)) {
+				src++;
 				destx++;
+				dst+=4;
 				continue;
 			}
-			Color color;
-			GetPixel(destx,desty, &color);
-			if(c1.r > color.r)
-				color.r = c1.r;
-			if(c1.g > color.g)
-				color.g = c1.g;
-			if(c1.b > color.b)
-				color.b = c1.b;
-			SetPixel(destx, desty, color);
+			SDL_Color *c1 = &surf->format->palette->colors[*src++];
+			if(c1->b > *dst)
+				*dst = c1->b;
+			dst++;
+			if(c1->g > *dst)
+				*dst = c1->g;
+			dst++;
+			if(c1->r > *dst)
+				*dst = c1->r;
+			dst+=2;
 			destx++;
 		}
 		desty++;
 	}
+
+	SDL_UnlockSurface(backBuf);
+	SDL_UnlockSurface(surf);
 }
 
 void SDLVideoDriver::SetCursor(Sprite2D * up, Sprite2D * down)
