@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.86 2004/09/18 15:24:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.87 2004/11/08 19:09:57 avenger_teambg Exp $
  *
  */
 
@@ -186,7 +186,7 @@ int SDLVideoDriver::SwapBuffers(void)
 
 				case SDL_KEYUP:
 					{
-						unsigned char key = event.key.keysym.sym;
+						unsigned char key = (unsigned char) event.key.keysym.sym;
 						if (Evnt && ( key != 0 ))
 							Evnt->KeyRelease( key, event.key.keysym.mod );
 					}
@@ -198,7 +198,7 @@ int SDLVideoDriver::SwapBuffers(void)
 							core->PopupConsole();
 							break;
 						}
-						unsigned char key = event.key.keysym.unicode & 0xff;
+						unsigned char key = (unsigned char) event.key.keysym.unicode;
 						if (key < 32 || key == 127) {
 							switch (event.key.keysym.sym) {
 								case SDLK_LEFT:
@@ -345,7 +345,7 @@ int SDLVideoDriver::SwapBuffers(void)
 						core->PopupConsole();
 						break;
 					}
-					unsigned char key = event.key.keysym.unicode;
+					unsigned char key = (unsigned char) event.key.keysym.unicode;
 					if (key < 32 || key == 127) {
 						switch (event.key.keysym.sym) {
 							case SDLK_LEFT:

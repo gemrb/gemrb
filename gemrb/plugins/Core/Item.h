@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.6 2004/11/07 19:19:12 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.7 2004/11/08 19:09:58 avenger_teambg Exp $
  *
  */
 
@@ -78,6 +78,12 @@ typedef struct ITMFeature {
 	ieDword unknown;
 } ITMFeature;
 
+//Extended header recharge flags
+#define IE_ITEM_USESTRENGTH  1
+#define IE_ITEM_RECHARGE     0x800
+#define IE_ITEM_IGNORESHIELD 0x10000
+#define IE_ITEM_KEEN         0x20000
+
 class GEM_EXPORT ITMExtHeader {
 public:
         ITMExtHeader();
@@ -101,9 +107,10 @@ public:
 	ieWord FeatureOffset;
 	ieWord Charges;
 	ieWord ChargeDepletion;
-	ieByte UseStrengthBonus;
-	ieByte Recharge;
-	ieWord unknown2;
+	ieWord RechargeFlags; //this is a bitfield with many bits
+	//ieByte UseStrengthBonus;
+	//ieByte Recharge;
+	//ieWord unknown2;
 	ieWord ProjectileAnimation;
 	ieWord MeleeAnimation[3];
 	ieWord BowArrowQualifier;
@@ -128,14 +135,22 @@ public:
 	ieWord ItemType;
 	ieDword UsabilityBitmask;
 	char InventoryIconType[2];
-	ieWord MinLevel;
-	ieWord MinStrength;
-	ieWord MinStrengthBonus;
-	ieWord MinIntelligence;
-	ieWord MinDexterity;
-	ieWord MinWisdom;
-	ieWord MinConstitution;
-	ieWord MinCharisma;
+	ieWord MinLevel; //minlevel is actually just one byte, but who cares
+	ieByte MinStrength;
+	ieByte unknown2;
+	ieByte MinStrengthBonus;
+	//kit1
+	ieByte MinIntelligence;
+	//kit2
+	ieByte MinDexterity;
+	//kit3
+	ieByte MinWisdom;
+	//kit4
+	ieByte MinConstitution;
+	ieByte WeaProf;
+	ieByte MinCharisma;
+	ieByte unknown3;
+	ieDword KitUsability;
 	ieDword Price;
 	ieWord StackAmount;
 	ieResRef ItemIcon;

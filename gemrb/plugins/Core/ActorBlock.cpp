@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.64 2004/10/17 18:11:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.65 2004/11/08 19:09:58 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -510,8 +510,8 @@ void Moveble::DrawTargetPoint()
 
 	Region vp = core->GetVideoDriver()->GetViewport();
 	core->GetVideoDriver()->DrawEllipse( Destination.x - vp.x,
-		Destination.y - vp.y, size * 10 - step,
-		( ( size * 15 ) / 2 ) - step, selectedColor );
+		Destination.y - vp.y, (unsigned short) (size * 10 - step),
+		(unsigned short) ( size * 15 / 2 - step), selectedColor );
 
 }
 

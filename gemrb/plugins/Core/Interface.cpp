@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.231 2004/10/31 14:50:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.232 2004/11/08 19:09:58 avenger_teambg Exp $
  *
  */
 
@@ -91,6 +91,8 @@ Interface::Interface(int iargc, char** iargv)
 	tooltip_x = 0;
 	tooltip_y = 0;
 	tooltip_ctrl = NULL;
+	plugin = NULL;
+	factory = NULL;
 	
 	pal16 = NULL;
 	pal32 = NULL;
@@ -133,6 +135,8 @@ Interface::Interface(int iargc, char** iargv)
 	TooltipColor.b = 0;
 	TooltipColor.a = 255;
 	TooltipMargin = 10;
+	TooltipBack = NULL;
+	DraggedItem = NULL;
 	GameFeatures = 0;
 }
 
@@ -171,17 +175,6 @@ Interface::~Interface(void)
 	if (slottypes) {
 		free( slottypes );
 	}
-/*
-	if (slotids) {
-		free( slotids );
-	}
-	if (slottips) {
-		free( slottips );
-	}
-	if (slotresrefs) {
-		free( slotresrefs );
-	}
-*/
 	if (slotmatrix) {
 		free( slotmatrix );
 	}
@@ -1118,10 +1111,10 @@ bool Interface::LoadGemRBINI()
 		if (s[0] == '#') {
 			unsigned long c = strtoul (s + 1, NULL, 16);
 			// FIXME: check errno
-			TooltipColor.r = (c >> 24) & 255;
-			TooltipColor.g = (c >> 16) & 255;
-			TooltipColor.b = (c >> 8) & 255;
-			TooltipColor.a = c & 255;
+			TooltipColor.r = (unsigned char) (c >> 24);
+			TooltipColor.g = (unsigned char) (c >> 16);
+			TooltipColor.b = (unsigned char) (c >> 8);
+			TooltipColor.a = (unsigned char) (c);
 		}
 	}
 
