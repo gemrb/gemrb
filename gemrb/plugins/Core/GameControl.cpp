@@ -12,6 +12,7 @@ GameControl::GameControl(void)
 	MouseIsDown = false;
 	DrawSelectionRect = false;
 	overDoor = NULL;
+	lastCursor = 0;
 }
 
 GameControl::~GameControl(void)
@@ -46,9 +47,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		if(overDoor) {
 			Color cyan = {0x00, 0xff, 0xff, 0xff};
 			if(overDoor->DoorClosed)
-				video->DrawPolyline(overDoor->closed, cyan, false);	
+				video->DrawPolyline(overDoor->closed, cyan, true);	
 			else 
-				video->DrawPolyline(overDoor->open, cyan, false);	
+				video->DrawPolyline(overDoor->open, cyan, true);	
 		}
 	}
 	else {
@@ -129,10 +130,20 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 	}
 	Door * door = area->tm->GetDoor(GameX, GameY);
-	if(door)
+	if(door) {
+		if(door->Cursor != lastCursor) {
+			core->GetVideoDriver()->SetCursor(core->Cursors[door->Cursor]->GetFrame(0), core->Cursors[door->Cursor+1]->GetFrame(0));
+			lastCursor = door->Cursor;
+		}
 		overDoor = door;
-	else
+	}
+	else {
+		if(lastCursor != 0) {
+			core->GetVideoDriver()->SetCursor(core->Cursors[0]->GetFrame(0), core->Cursors[1]->GetFrame(0));
+			lastCursor = 0;
+		}
 		overDoor = NULL;
+	}
 }
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
@@ -155,6 +166,10 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
+	Door * door = area->tm->GetDoor(GameX, GameY);
+	if(door) {
+		area->tm->ToogleDoor(door);
+	}
 	if(!DrawSelectionRect) {
 		ActorBlock * actor = area->GetActor(GameX, GameY);
 		for(int i = 0; i < selected.size(); i++)

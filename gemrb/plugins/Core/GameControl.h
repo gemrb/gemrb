@@ -38,6 +38,7 @@ private:
 	Region SelectionRect;
 	short StartX, StartY;
 	Door * overDoor;
+	unsigned char lastCursor;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
