@@ -967,7 +967,7 @@ void GameControl::DialogChoose(int choose)
 					return;
 				DialogTransition * tr = ds->transitions[choose];
 				if(tr->Flags & 8) {
-					speaker->CurrentAction->Release();
+					//speaker->CurrentAction->Release();
 					speaker->CurrentAction = NULL;
 					//dlg->Release();
 					ds = NULL;
