@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.7 2003/11/30 17:44:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.8 2003/11/30 18:10:39 avenger_teambg Exp $
  *
  */
 
@@ -50,7 +50,7 @@ public:
 	Sprite2D * GetImage();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color * pal);
-	long int GetPixelIndex(int x, int y)
+	unsigned long GetPixelIndex(int x, int y)
 	{
 		unsigned char *p=(unsigned char *)pixels;
 		p+=(PaddedRowLength*y)+(x*(BitCount/8));
