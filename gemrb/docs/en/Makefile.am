@@ -1,4 +1,4 @@
-####### kdevelop will overwrite this part!!! (begin)##########
-
-
-####### kdevelop will overwrite this part!!! (end)############
+SUBDIRS = Tables GUIScript
+docs_DATA = *.txt
+docsdir = $(docdir)/en/
+EXTRA_DIST = *.txt
