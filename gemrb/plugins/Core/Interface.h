@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.50 2003/12/02 23:09:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.51 2003/12/03 18:35:55 doc_wagon Exp $
  *
  */
 
@@ -269,7 +269,7 @@ public:
 	/** CheatKey support */
 	void EnableCheatKeys(int Flag)
 	{
-        	CheatFlag=Flag;
+        	CheatFlag=(Flag > 0);
 	}
 
 	bool CheatEnabled()
