@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.29 2004/10/09 16:49:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.30 2004/10/09 16:55:50 avenger_teambg Exp $
  *
  */
 
@@ -30,7 +30,7 @@ ScrollBar::ScrollBar(void)
 	State = 0;
 	ScrollBarOnChange[0] = 0;
 	ta = NULL;
-	for(int i=0;i<IE_GUI_SCROLLBAR_SLIDER;i++)  {
+	for(int i=0;i<6;i++)  {
 		Frames[i]=NULL;
 	}
 }
@@ -38,7 +38,7 @@ ScrollBar::ScrollBar(void)
 ScrollBar::~ScrollBar(void)
 {
 	Video *video=core->GetVideoDriver();
-	for(int i=0;i<IE_GUI_SCROLLBAR_SLIDER;i++)  {
+	for(int i=0;i<6;i++)  {
 		if(Frames[i]) {
 			video->FreeSprite(Frames[i]);
 		}
