@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.45 2004/02/22 17:35:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.46 2004/02/22 18:15:45 avenger_teambg Exp $
  *
  */
 
@@ -679,6 +679,9 @@ public:
 	static void IncrementGlobal(Scriptable * Sender, Action * parameters);
 	static void IncrementGlobalOnce(Scriptable * Sender, Action * parameters);
 	static void JoinParty(Scriptable * Sender, Action * parameters);
+	static void JumpToPoint(Scriptable * Sender, Action * parameters);
+	static void JumpToPointInstant(Scriptable * Sender, Action * parameters);
+	static void JumpToObject(Scriptable *Sender, Action *parameters);
 	static void LeaveAreaLUA(Scriptable * Sender, Action * parameters);
 	static void LeaveAreaLUAPanic(Scriptable * Sender, Action * parameters);
 	static void LeaveParty(Scriptable * Sender, Action * parameters);

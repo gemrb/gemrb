@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.25 2004/02/10 20:48:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.26 2004/02/22 18:15:36 avenger_teambg Exp $
  *
  */
 
@@ -183,7 +183,7 @@ CharAnimations *Actor::GetAnims()
 long Actor::GetStat(unsigned int StatIndex)
 {
     if(StatIndex >= MAX_STATS)
-            return 0xdadadada;
+	    return 0xdadadada;
     return Modified[StatIndex];
 }
 
@@ -226,7 +226,7 @@ void Actor::SetCircleSize()
 bool  Actor::SetStat(unsigned int StatIndex, long Value)
 {
     if(StatIndex >= MAX_STATS)
-            return false;
+	    return false;
     Modified[StatIndex] = Value;
 	switch(StatIndex) {
 		case IE_EA:
@@ -240,14 +240,14 @@ bool  Actor::SetStat(unsigned int StatIndex, long Value)
 long Actor::GetMod(unsigned int StatIndex)
 {
     if(StatIndex >= MAX_STATS)
-            return 0xdadadada;
+	    return 0xdadadada;
     return Modified[StatIndex]-BaseStats[StatIndex];
 }
 /** Returns a Stat Base Value */
 long Actor::GetBase(unsigned int StatIndex)
 {
     if(StatIndex >= MAX_STATS)
-            return 0xffff;
+	    return 0xffff;
     return BaseStats[StatIndex];
 }
 
@@ -255,7 +255,7 @@ long Actor::GetBase(unsigned int StatIndex)
 bool  Actor::SetBase(unsigned int StatIndex, long Value)
 {
     if(StatIndex >= MAX_STATS)
-            return false;
+	    return false;
     BaseStats[StatIndex] = Value;
 	switch(StatIndex) {
 		case IE_EA:
@@ -281,14 +281,14 @@ int Actor::NewStat(unsigned int StatIndex, long ModifierValue, long ModifierType
     switch(ModifierType)
     {
     case 0:  //flat point modifier
-            Modified[StatIndex]+=ModifierValue;
-            break;
+	    Modified[StatIndex]+=ModifierValue;
+	    break;
     case 1:  //straight stat change
-            Modified[StatIndex]=ModifierValue;
-            break;
+	    Modified[StatIndex]=ModifierValue;
+	    break;
     case 2:  //percentile
-            Modified[StatIndex]=Modified[StatIndex]*100/ModifierValue;
-            break;
+	    Modified[StatIndex]=Modified[StatIndex]*100/ModifierValue;
+	    break;
     }
     return Modified[StatIndex]-oldmod;
 }
@@ -307,3 +307,12 @@ void Actor::DebugDump()
 	printf("Scripting name: %s\n",scriptName);
 	printf("TalkCount: %d\n",TalkCount);
 }
+
+void Actor::SetPosition(unsigned int XPos, unsigned int YPos)
+{
+	if(!GetStat(IE_DONOTJUMP))
+		core->GetPathFinder()->AdjustPosition(XPos, YPos);
+	MoveTo((XPos*16)+8, (YPos*12)+6);
+	ClearPath();
+}
+

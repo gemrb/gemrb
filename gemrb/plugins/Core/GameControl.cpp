@@ -331,9 +331,12 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					short cY = lastMouseY;
 					core->GetVideoDriver()->ConvertToGame(cX, cY);
 					unsigned int XPos = cX/16, YPos = cY/12;
+					actor->SetPosition(XPos, YPos);
+/*
 					core->GetPathFinder()->AdjustPosition(XPos, YPos);
 					actor->XPos = (XPos*16)+8;
 					actor->YPos = (YPos*12)+6;
+*/
 					printf("Teleported to %d, %d\n", XPos, YPos);
 				}
 			}

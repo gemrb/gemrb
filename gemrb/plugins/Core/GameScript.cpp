@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.68 2004/02/22 17:35:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.69 2004/02/22 18:15:45 avenger_teambg Exp $
  *
  */
 
@@ -134,6 +134,9 @@ static ActionLink actionnames[]={
 {"incrementglobal",GameScript::IncrementGlobal},
 {"incrementglobalonce",GameScript::IncrementGlobalOnce},
 {"joinparty",GameScript::JoinParty},
+{"jumptoobject",GameScript::JumpToObject},
+{"jumptopoint",GameScript::JumpToPoint},
+{"jumptopointinstant",GameScript::JumpToPointInstant},
 {"leavearealua",GameScript::LeaveAreaLUA},
 {"leavearealuapanic",GameScript::LeaveAreaLUAPanic},
 {"makeglobal",GameScript::MakeGlobal},
@@ -1718,7 +1721,56 @@ void GameScript::FadeFromColor(Scriptable * Sender, Action * parameters)
 		return;
 	}
 	core->timer->SetFadeFromColor(parameters->XpointParameter);
-	//Sender->SetWait(parameters->XpointParameter);
+}
+
+void GameScript::JumpToPoint(Scriptable *Sender, Action *parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		return;
+	}
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor *ab=(Actor *) scr;
+	ab->SetPosition(parameters->XpointParameter, parameters->YpointParameter);
+}
+
+void GameScript::JumpToPointInstant(Scriptable *Sender, Action *parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		return;
+	}
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!tar)
+		return;
+	if(tar->Type != ST_ACTOR)
+		return;
+	Actor * ab=(Actor *) tar;
+	ab->SetPosition(parameters->XpointParameter, parameters->YpointParameter);
+}
+
+void GameScript::JumpToObject(Scriptable *Sender, Action *parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		return;
+	}
+	if(scr->Type != ST_ACTOR)
+		return;
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1]);
+
+	Actor *ab=(Actor *) scr;
+	ab->SetPosition(tar->XPos, tar->YPos);
 }
 
 void GameScript::CreateCreatureCore(Scriptable *Sender, Action *parameters, int flags)
@@ -1733,7 +1785,7 @@ void GameScript::CreateCreatureCore(Scriptable *Sender, Action *parameters, int 
 		x+=Sender->XPos;
 		y+=Sender->YPos;
 	}
-	ab->MoveTo(parameters->XpointParameter, parameters->YpointParameter);
+	ab->SetPosition(parameters->XpointParameter, parameters->YpointParameter);
 	ab->AnimID = IE_ANI_AWAKE;
 	ab->Orientation = parameters->int0Parameter;
 	Map * map = core->GetGame()->GetMap(0);

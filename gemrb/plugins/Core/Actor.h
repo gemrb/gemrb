@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.17 2004/02/07 23:52:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.18 2004/02/22 18:15:45 avenger_teambg Exp $
  *
  */
 
@@ -68,6 +68,8 @@ public:
 	~Actor(void);
 	/** prints useful information on console */
 	void DebugDump();
+	/** sets the actor's position, calculating with the nojump flag*/
+	void SetPosition(unsigned int XPos, unsigned int YPos);
 	void SetAnimationID(unsigned short AnimID);
 	/** returns the animations */
 	CharAnimations *GetAnims();
