@@ -1,6 +1,9 @@
 GemRB v0.2.2.6 Added Features:
 - New Plugins:
   - GAM Importer
+- Optimizations:
+  - Now the Decompression Phase is fast also on Systems with Low Memory (Thanks to |Cable|)
+- Console Output Cleanup
 
 GemRB v0.2.2.5 Added Features:
 - Added some In-Game Script OpCodes:
