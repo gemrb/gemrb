@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.74 2004/02/27 19:47:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.75 2004/02/28 01:36:53 avenger_teambg Exp $
  *
  */
 
@@ -36,8 +36,9 @@ static SymbolMgr* actionsTable;
 static SymbolMgr* objectsTable;
 static TriggerFunction triggers[MAX_TRIGGERS];
 static ActionFunction actions[MAX_ACTIONS];
-static ObjectFunction objects[MAX_ACTIONS];
 static int flags[MAX_ACTIONS];
+static ObjectFunction objects[MAX_OBJECTS];
+static IDSFunction idtargets[MAX_OBJECT_FIELDS];
 
 static int ObjectIDSCount = 7;
 static int MaxObjectNesting = 5;
@@ -59,7 +60,9 @@ static TriggerLink triggernames[] = {
 	{"false", GameScript::False}, {"gender", GameScript::Gender},
 	{"general", GameScript::General}, {"global", GameScript::Global},
 	{"globalgt", GameScript::GlobalGT}, {"globallt", GameScript::GlobalLT},
-	{"globalsequal", GameScript::GlobalsEqual}, {"hp", GameScript::HP},
+	{"globalsequal", GameScript::GlobalsEqual},
+	{"harmlessentered", GameScript::Entered}, //this isn't sure
+	{"hp", GameScript::HP},
 	{"hpgt", GameScript::HPGT}, {"hplt", GameScript::HPLT},
 	{"inparty", GameScript::InParty},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog},
@@ -69,6 +72,7 @@ static TriggerLink triggernames[] = {
 	{"oncreation", GameScript::OnCreation}, {"or", GameScript::Or},
 	{"partyhasitem", GameScript::PartyHasItem}, {"race", GameScript::Race},
 	{"range", GameScript::Range}, {"see", GameScript::See},
+	{"specific", GameScript::Specific},
 	{"true", GameScript::True}, {"xp", GameScript::XP},
 	{"xpgt", GameScript::XPGT}, {"xplt", GameScript::XPLT}, { NULL,NULL}, 
 };
@@ -120,6 +124,7 @@ static ActionLink actionnames[] = {
 	{"globalmaxglobal",GameScript::GlobalMaxGlobal},
 	{"globalmin",GameScript::GlobalMin},
 	{"globalminglobal",GameScript::GlobalMinGlobal},
+	{"globalsetglobal",GameScript::GlobalSetGlobal},
 	{"globalshl",GameScript::GlobalShL},
 	{"globalshlglobal",GameScript::GlobalShLGlobal},
 	{"globalshr",GameScript::GlobalShR},
@@ -169,7 +174,39 @@ static ObjectLink objectnames[] = {
 	{"myself",GameScript::Myself},
 	{"player1",GameScript::Player1},
 	{"player1fill",GameScript::Player1Fill},
+	{"player2",GameScript::Player2},
+	{"player2fill",GameScript::Player2Fill},
+	{"player3",GameScript::Player3},
+	{"player3fill",GameScript::Player3Fill},
+	{"player4",GameScript::Player4},
+	{"player4fill",GameScript::Player4Fill},
+	{"player5",GameScript::Player5},
+	{"player5fill",GameScript::Player5Fill},
+	{"player6",GameScript::Player6},
+	{"player6fill",GameScript::Player6Fill},
+	{"player7",GameScript::Player7},
+	{"player7fill",GameScript::Player7Fill},
+	{"player8",GameScript::Player8},
+	{"player8fill",GameScript::Player8Fill},
+	{"worstac",GameScript::WorstAC},
 	{ NULL,NULL}, 
+};
+
+static IDSLink idsnames[] = {
+	{"align",GameScript::ID_Alignment},
+	{"alignmen",GameScript::ID_Alignment},
+	{"alignmnt",GameScript::ID_Alignment},
+	{"avclass",GameScript::ID_AVClass},
+	{"class",GameScript::ID_Class},
+	{"classmsk",GameScript::ID_ClassMask},
+	{"ea",GameScript::ID_Allegiance},
+	{"faction",GameScript::ID_Faction},
+	{"gender",GameScript::ID_Gender},
+	{"general",GameScript::ID_General},
+	{"race",GameScript::ID_Race},
+	{"specific",GameScript::ID_Specific},
+	{"subrace",GameScript::ID_Subrace},
+	{"team",GameScript::ID_Team},
 };
 
 static TriggerLink* FindTrigger(const char* triggername)
@@ -217,6 +254,21 @@ static ObjectLink* FindObject(const char* objectname)
 	return NULL;
 }
 
+static IDSLink* FindIdentifier(const char* idsname)
+{
+	if (!idsname) {
+		return NULL;
+	}
+	int len = strlen( idsname );
+	for (int i = 0; idsnames[i].Name; i++) {
+		if (!strnicmp( idsnames[i].Name, idsname, len )) {
+			return idsnames + i;
+		}
+	}
+	printf( "Warning: Couldn't assign ids target: %.*s\n", len, idsname );
+	return NULL;
+}
+
 GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 	Variables* local)
 {
@@ -252,8 +304,18 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 		/* Loading Script Configuration Parameters */
 
 		ObjectIDSCount = atoi( objNameTable->QueryField() );
+		
 		for (i = 0; i < ObjectIDSCount; i++) {
-			ObjectIDSTableNames.push_back( objNameTable->QueryField( 0, i + 1 ) );
+			char *idsname;
+			idsname=objNameTable->QueryField( 0, i + 1 );
+			IDSLink *poi=FindIdentifier( idsname );
+			if(poi==NULL) {
+				idtargets[i]=NULL;
+			}
+			else {
+				idtargets[i]=poi->Function;
+			}
+			ObjectIDSTableNames.push_back( idsname );
 		}
 		MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 		HasAdditionalRect = ( bool ) atoi( objNameTable->QueryField( 2 ) );
@@ -302,7 +364,7 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 	}
 	continueExecution = false;
 	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef,
-												IE_BCS_CLASS_ID );
+							IE_BCS_CLASS_ID );
 	script = CacheScript( ds, ResRef );
 	MySelf = NULL;
 	scriptRunDelay = 1000;
@@ -724,6 +786,9 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 		triggers[trigger->triggerID] = False;
 		printf( "[IEScript]: Unhandled trigger code: 0x%04x\n",
 			trigger->triggerID );
+		const char *tmpstr=triggersTable -> GetValue(trigger->triggerID);
+		if(!tmpstr) tmpstr=triggersTable -> GetValue(trigger->triggerID|0x4000);
+		printf("IDS entry: %s\n",tmpstr);
 		return false;
 	}
 	int ret = func( Sender, trigger );
@@ -778,10 +843,25 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	ActionFunction func = actions[aC->actionID];
+	const char *tmpstr=actionsTable -> GetValue(aC->actionID);
+	printf("Executing action: %s\n",tmpstr);
 	if (func) {
-		printf( "[IEScript]: %s\n", actionsTable->GetValue( aC->actionID ) );
-		func( Sender, aC );
-	} else {
+		Scriptable* scr = GetActorFromObject( Sender, aC->objects[0]);
+		if(scr && scr!=Sender) {
+			//this is an Action Override
+			scr->AddAction( Sender->CurrentAction );
+			Sender->CurrentAction = NULL;
+			if (!(flags[aC->actionID] & AF_INSTANT) ) {
+				aC->Release();
+			}
+			return;
+		}
+		else {
+			printf( "[IEScript]: %s\n", actionsTable->GetValue( aC->actionID ) );
+			func( Sender, aC );
+		}
+	}
+	else {
 		actions[aC->actionID] = NoAction;
 		printf( "[IEScript]: Unhandled action code: %d\n", aC->actionID );
 		Sender->CurrentAction = NULL;
@@ -803,66 +883,54 @@ Action* GameScript::CreateAction(char* string, bool autoFree)
 	return aC;
 }
 
-Targets* GameScript::EvaluateObject(Scriptable* Sender, Object* oC,
-	int IDIndex, Targets* parm)
+/* returns actors that match the [x.y.z] expression */
+Targets* GameScript::EvaluateObject(Scriptable* Sender, Object* oC)
 {
-	if (IDIndex < 0) {
-		if (oC->objectName[0]) {
-			//We want the object by its name...
-			Scriptable* aC = core->GetGame()->GetMap( 0 )->GetActor( oC->objectName );
-			if (!aC) {
-				//It was not an actor... maybe it is a door?
-				aC = core->GetGame()->GetMap( 0 )->tm->GetDoor( oC->objectName );
-				if (!aC) {
-					//No... it was not a door... maybe an InfoPoint?
-					aC = core->GetGame()->GetMap( 0 )->tm->GetInfoPoint( oC->objectName );
-					if (!aC) //No... ok probably this object does not exist... just return NULL
-						return NULL;
-				}
-			}
-			//Ok :) we now have our Object. Let's create a Target struct and add the object to it
-			Targets* tgts = new Targets();
-			tgts->AddTarget( aC );
-			return tgts;
-		} else {
-			//Here is the hard part...
-			bool Anything = true;
-			for (int i = 0; i < ObjectFieldsCount; i++) {
-				//Just check the Fields
-				if (oC->objectFields[i]) {
-					//If the field is set we need to evaluate it
-					Anything = false;
-					ObjectFunction func = objects[oC->objectFields[i]];
-					if (func) {
-						//If we support that function, just _use_ it :)
-						/* This function will evaluate the parameter */
-						parm = func(Sender, parm );
-					} else {
-						//ARGH!!!! We cannot handle that function.... it's better to return NULL
-						if (parm)
-							delete( parm );
-						return NULL;
-					}
-				}
-			}
-			if (Anything && !parm) {
-				//If we need to operate on everything we just return an empty Targets struct
-				return new Targets();
-			}
-			//Ok, now we just need to return parm
-			return parm;
+	Targets *tgts=NULL;
+
+	if (oC->objectName[0]) {
+		//We want the object by its name...
+		Actor* aC = core->GetGame()->GetMap( 0 )->GetActor( oC->objectName );
+		//Ok :) we now have our Object. Let's create a Target struct and add the object to it
+		tgts = new Targets();
+		tgts->AddTarget( aC );
+		return tgts;
+	}
+	//else branch
+	for(int j = 0; j < ObjectIDSCount; j++) {
+		if(!oC->objectFields[j]) {
+			continue;
 		}
-	} else {
-		//At this point we only need to call the Object Functions on the actual Targets parameter
-		ObjectFunction func = objects[oC->objectIdentifiers[IDIndex]];
+		IDSFunction func = idtargets[j];
 		if (!func) {
-			//ARGH!!!! We need to implement this object opcode... I think I'll return NULL....
-			if (parm)
-				delete( parm );
-			return NULL;
+			printf("Unimplemented IDS targeting opcode!\n");
+			continue;
 		}
-		//Good! We can now call the function
-		parm = func(Sender, parm );
+		if(tgts) {
+			//we already got a subset of actors
+			int i = tgts->Count();
+			/*premature end, filtered everything*/
+			if(!i) {
+				return tgts;
+			}
+			while(i--) {
+				if(!func(tgts->GetTarget(i), oC->objectFields[j] ) ) {
+					tgts->RemoveTargetAt(i);
+				}
+			}
+		}
+		else {
+			//we need to get a subset of actors from the large array
+			//if this gets slow, we will need some index tables
+			int i = core->GetActorCount();
+			tgts = new Targets();
+			while(i--) {
+				Actor *ac=core->GetActor(i);
+				if(ac && func(ac, oC->objectFields[j]) ) {
+					tgts->AddTarget(ac);
+				}
+			}
+		}
 	}
 }
 
@@ -871,17 +939,50 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 	if (!oC) {
 		return NULL;
 	}
-	Targets* tgts = NULL;
-	for (int i = -1; i < 5; i++) {
-		tgts = EvaluateObject( Sender, oC, i, tgts );
-		if (!tgts) {
-			//ARGH!!!! An Error occourred while processing this object... better return NULL
+	Targets* tgts = EvaluateObject(Sender, oC);
+	if(!tgts) {
+		//It was not an actor... maybe it is a door?
+		Scriptable * aC = core->GetGame()->GetMap( 0 )->tm->GetDoor( oC->objectName );
+		if (!aC) {
+			//No... it was not a door... maybe an InfoPoint?
+			aC = core->GetGame()->GetMap( 0 )->tm->GetInfoPoint( oC->objectName );
+			}
+		if (aC) {
+			return aC;
+		}
+	}
+	if(!tgts) {
+		tgts = new Targets();
+	}
+	for (int i = 0; i < MaxObjectNesting; i++) {
+		int filterid = oC->objectIdentifiers[i];
+		if(!filterid) {
+			break;
+		}
+		ObjectFunction func = objects[filterid];
+		if (func) {
+			tgts = func( Sender, tgts);
+		}
+		else {
+			printf("[IEScript]: Unknown object filter: %d\n",filterid);
+		}
+		if(!tgts->Count()) {
+			delete tgts;
 			return NULL;
 		}
 	}
-	Scriptable *object=tgts->GetTarget(0);
-	delete tgts;
-	return object;
+	if(tgts) {
+		Scriptable *object;
+		if(tgts->Count()) {
+			object=tgts->GetTarget(0);
+		}
+		else {
+			object=NULL;
+		}
+		delete tgts;
+		return object;
+	}
+	return NULL;
 }
 
 unsigned char GameScript::GetOrient(short sX, short sY, short dX, short dY)
@@ -1341,7 +1442,9 @@ Trigger* GameScript::GenerateTrigger(char* String)
 Targets *GameScript::Myself(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(Sender);
+	if(Sender->Type==ST_ACTOR) {
+		parameters->AddTarget((Actor *) Sender);
+	}
 	return parameters;
 }
 
@@ -1355,8 +1458,259 @@ Targets *GameScript::Player1(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::Player1Fill(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(0));
+	parameters->AddTarget(core->GetGame()->FindPC(0));
 	return parameters;
+}
+
+Targets *GameScript::Player2(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(1));
+	return parameters;
+}
+
+Targets *GameScript::Player2Fill(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->FindPC(1));
+	return parameters;
+}
+
+Targets *GameScript::Player3(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(2));
+	return parameters;
+}
+
+Targets *GameScript::Player3Fill(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->FindPC(2));
+	return parameters;
+}
+
+Targets *GameScript::Player4(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(3));
+	return parameters;
+}
+
+Targets *GameScript::Player4Fill(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->FindPC(3));
+	return parameters;
+}
+
+Targets *GameScript::Player5(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(4));
+	return parameters;
+}
+
+Targets *GameScript::Player5Fill(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->FindPC(4));
+	return parameters;
+}
+
+Targets *GameScript::Player6(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(5));
+	return parameters;
+}
+
+Targets *GameScript::Player6Fill(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->FindPC(5));
+	return parameters;
+}
+
+Targets *GameScript::Player7(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(6));
+	return parameters;
+}
+
+Targets *GameScript::Player7Fill(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->FindPC(6));
+	return parameters;
+}
+
+Targets *GameScript::Player8(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(7));
+	return parameters;
+}
+
+Targets *GameScript::Player8Fill(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->FindPC(7));
+	return parameters;
+}
+
+Targets *GameScript::BestAC(Scriptable *Sender, Targets *parameters)
+{
+	int i=parameters->Count();
+	int worstac=parameters->GetTarget(--i)->GetStat(IE_ARMORCLASS);
+	int pos=i;
+	while(i--) {
+		int ac=parameters->GetTarget(pos)->GetStat(IE_ARMORCLASS);
+		if(worstac>ac) {
+			worstac=ac;
+			pos=i;
+		}
+	}
+	Actor *ac=parameters->GetTarget(pos);
+	parameters->Clear();
+	parameters->AddTarget(ac);
+	return parameters;
+}
+
+Targets *GameScript::WorstAC(Scriptable *Sender, Targets *parameters)
+{
+	int i=parameters->Count();
+	int worstac=parameters->GetTarget(--i)->GetStat(IE_ARMORCLASS);
+	int pos=i;
+	while(i--) {
+		int ac=parameters->GetTarget(pos)->GetStat(IE_ARMORCLASS);
+		if(worstac<ac) {
+			worstac=ac;
+			pos=i;
+		}
+	}
+	Actor *ac=parameters->GetTarget(pos);
+	parameters->Clear();
+	parameters->AddTarget(ac);
+	return parameters;
+}
+
+//-------------------------------------------------------------
+// IDS Functions
+//-------------------------------------------------------------
+
+int GameScript::ID_Alignment(Actor *actor, int parameter)
+{
+	int value = actor->GetStat( IE_ALIGNMENT );
+	int a = parameter&15;
+	if (a) {
+		if (a != ( value & 15 )) {
+			return 0;
+		}
+	}
+	a = parameter & 240;
+	if (a) {
+		if (a != ( value & 240 )) {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+int GameScript::ID_Allegiance(Actor *actor, int parameter)
+{
+	int value = actor->GetStat( IE_EA );
+	switch (parameter) {
+		case 30:
+			//goodcutoff
+			return value <= 30;
+
+		case 31:
+			//notgood
+			return value >= 31;
+
+		case 199:
+			//notevil
+			return value <= 199;
+			break;
+
+		case 200:
+			//evilcutoff
+			return value >= 200;
+
+		case 0:
+		case 126:
+			//anything
+			return true;
+			break;
+
+	}
+	//default
+	return parameter == value;
+}
+
+int GameScript::ID_Class(Actor *actor, int parameter)
+{
+	//TODO: if parameter >=202, it is of *_ALL type
+	int value = actor->GetStat(IE_CLASS);
+	return parameter==value;
+}
+
+int GameScript::ID_ClassMask(Actor *actor, int parameter)
+{
+	//TODO: if parameter >=202, it is of *_ALL type
+	int value = actor->GetStat(IE_CLASS);
+	return parameter==value;
+}
+
+int GameScript::ID_AVClass(Actor *actor, int parameter)
+{
+	//TODO: if parameter >=202, it is of *_ALL type
+	int value = actor->GetStat(IE_CLASS);
+	return parameter==value;
+}
+
+int GameScript::ID_Race(Actor *actor, int parameter)
+{
+	int value = actor->GetStat(IE_RACE);
+	return parameter==value;
+}
+
+int GameScript::ID_Subrace(Actor *actor, int parameter)
+{
+	int value = actor->GetStat(IE_SUBRACE);
+	return parameter==value;
+}
+
+int GameScript::ID_Faction(Actor *actor, int parameter)
+{
+	int value = actor->GetStat(IE_FACTION);
+	return parameter==value;
+}
+
+int GameScript::ID_Team(Actor *actor, int parameter)
+{
+	int value = actor->GetStat(IE_TEAM);
+	return parameter==value;
+}
+
+int GameScript::ID_Gender(Actor *actor, int parameter)
+{
+	int value = actor->GetStat(IE_SEX);
+	return parameter==value;
+}
+
+int GameScript::ID_General(Actor *actor, int parameter)
+{
+	int value = actor->GetStat(IE_GENERAL);
+	return parameter==value;
+}
+
+int GameScript::ID_Specific(Actor *actor, int parameter)
+{
+	int value = actor->GetStat(IE_SPECIFIC);
+	return parameter==value;
 }
 
 //-------------------------------------------------------------
@@ -1373,20 +1727,7 @@ int GameScript::Alignment(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	int value = actor->GetStat( IE_ALIGNMENT );
-	int a = parameters->int0Parameter&15;
-	if (a) {
-		if (a != ( value & 15 )) {
-			return 0;
-		}
-	}
-	a = parameters->int0Parameter & 240;
-	if (a) {
-		if (a != ( value & 240 )) {
-			return 0;
-		}
-	}
-	return 1;
+	return ID_Alignment( actor, parameters->int0Parameter);
 }
 
 int GameScript::Allegiance(Scriptable* Sender, Trigger* parameters)
@@ -1400,40 +1741,7 @@ int GameScript::Allegiance(Scriptable* Sender, Trigger* parameters)
 		return false;
 	}
 	Actor* actor = ( Actor* ) scr;
-	int value = actor->GetStat( IE_EA );
-	int ret;
-	switch (parameters->int0Parameter) {
-		case 30:
-			//goodcutoff
-			ret = value <= 30;
-			break;
-
-		case 31:
-			//notgood
-			ret = value >= 31;
-			break;
-
-		case 199:
-			//notevil
-			ret = value <= 199;
-			break;
-
-		case 200:
-			//evilcutoff
-			ret = value >= 200;
-			break;
-
-		case 0:
-		case 126:
-			//anything
-			ret = true;
-			break;
-
-		default:
-			ret = parameters->int0Parameter == value;
-			break;
-	}
-	return ret;
+	return ID_Allegiance( actor, parameters->int0Parameter);
 }
 
 int GameScript::Class(Scriptable* Sender, Trigger* parameters)
@@ -1444,9 +1752,7 @@ int GameScript::Class(Scriptable* Sender, Trigger* parameters)
 	if(scr->Type != ST_ACTOR)
 		return 0;
 	Actor * actor = (Actor*)scr;
-	//TODO: if parameter >=202, it is of *_ALL type
-	int value = actor->GetStat(IE_CLASS);
-	return parameters->int0Parameter==value;
+	return ID_Class( actor, parameters->int0Parameter);
 }
 
 //atm this checks for InParty and See, it is unsure what is required
@@ -1520,7 +1826,23 @@ int GameScript::General(Scriptable* Sender, Trigger* parameters)
 	if (actor == NULL) {
 		return 0;
 	}
-	return parameters->int0Parameter == actor->GetStat( IE_GENERAL );
+	return ID_General(actor, parameters->int0Parameter);
+}
+
+int GameScript::Specific(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		return 0;
+	}
+	if (scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) scr;
+	if (actor == NULL) {
+		return 0;
+	}
+	return ID_Specific(actor, parameters->int0Parameter);
 }
 
 int GameScript::BitCheck(Scriptable* Sender, Trigger* parameters)
@@ -1743,10 +2065,7 @@ int GameScript::Race(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor->GetStat( IE_RACE ) == parameters->int0Parameter) {
-		return 1;
-	}
-	return 0;
+	return ID_Race(actor, parameters->int0Parameter);
 }
 
 int GameScript::Gender(Scriptable* Sender, Trigger* parameters)
@@ -1759,10 +2078,7 @@ int GameScript::Gender(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor->GetStat( IE_SEX ) == parameters->int0Parameter) {
-		return 1;
-	}
-	return 0;
+	return ID_Gender(actor, parameters->int0Parameter);
 }
 
 int GameScript::HP(Scriptable* Sender, Trigger* parameters)
@@ -2016,54 +2332,38 @@ void GameScript::ChangeClass(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	actor->SetStat( IE_SPECIFIC, parameters->int0Parameter );
 }
 
 void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	actor->NewStat( parameters->int0Parameter, parameters->int1Parameter,
 			parameters->int2Parameter );
 }
 
 void GameScript::ChangeGender(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	actor->SetStat( IE_SEX, parameters->int0Parameter );
 }
 
 void GameScript::ChangeAlignment(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	actor->SetStat( IE_ALIGNMENT, parameters->int0Parameter );
 }
 
@@ -2085,62 +2385,25 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 
 void GameScript::FadeToColor(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	core->timer->SetFadeToColor( parameters->XpointParameter );
-	//Sender->SetWait(parameters->XpointParameter);
 }
 
 void GameScript::FadeFromColor(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	core->timer->SetFadeFromColor( parameters->XpointParameter );
 }
 
 void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* ab = ( Actor* ) scr;
+	Actor* ab = ( Actor* ) Sender;
 	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter );
 }
 
 void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
@@ -2154,21 +2417,12 @@ void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
 
 void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
-	if (scr->Type != ST_ACTOR) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 
-	Actor* ab = ( Actor* ) scr;
+	Actor* ab = ( Actor* ) Sender;
 	ab->SetPosition( tar->XPos, tar->YPos );
 }
 
@@ -2196,29 +2450,11 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 
 void GameScript::CreateCreature(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	CreateCreatureCore( Sender, parameters, 0 );
 }
 
 void GameScript::CreateCreatureObject(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	CreateCreatureCore( Sender, parameters, CC_OFFSET );
 }
 
@@ -2254,51 +2490,28 @@ void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 
 void GameScript::Enemy(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		//Sender->CurrentAction = NULL;
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	actor->SetStat( IE_EA, 255 );
 }
 
 void GameScript::Ally(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	actor->SetStat( IE_EA, 4 );
 }
 
 void GameScript::ChangeAIScript(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	//changeaiscript clears the queue, i believe
 	//	actor->ClearActions();
 	actor->SetScript( parameters->string0Parameter, parameters->int0Parameter );
@@ -2306,135 +2519,59 @@ void GameScript::ChangeAIScript(Scriptable* Sender, Action* parameters)
 
 void GameScript::Wait(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		/* 
-								We need to NULL the CurrentAction because this is a blocking
-								OpCode.
-							*/
-		Sender->CurrentAction = NULL;
-		return;
-	}
 	Sender->SetWait( parameters->int0Parameter * AI_UPDATE_TIME );
 }
 
 void GameScript::SmallWait(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		/* 
-								We need to NULL the CurrentAction because this is a blocking
-								OpCode.
-							*/
-		Sender->CurrentAction = NULL;
-		return;
-	}
 	Sender->SetWait( parameters->int0Parameter );
 }
 
 void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	core->GetVideoDriver()->MoveViewportTo( parameters->XpointParameter,
 								parameters->YpointParameter );
 }
 
 void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!scr) {
-		return;
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
 	core->GetVideoDriver()->MoveViewportTo( scr->XPos, scr->YPos );
 }
 
 void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		/* 
-								We need to NULL the CurrentAction because this is a blocking
-								OpCode.
-							*/
-		Sender->CurrentAction = NULL;
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
 	//core->timer->SetMovingActor(actor);
 }
 
 void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
+printf("MovetoTarget is: %x\n", target);
 	if (!target) {
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		Sender->CurrentAction = NULL;
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		/* 
-								We need to NULL the CurrentAction because this is a blocking
-								OpCode.
-							*/
-		Sender->CurrentAction = NULL;
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
+printf("walkto...\n");
 	actor->WalkTo( target->XPos, target->YPos );
 }
 
 void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	if (actor) {
 		printf( "Displaying string on: %s\n", actor->scriptName );
 		actor->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
@@ -2443,26 +2580,11 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 
 void GameScript::Face(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		Sender->CurrentAction = NULL;
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		/* 
-								We need to NULL the CurrentAction because this is a blocking
-								OpCode.
-							*/
-		Sender->CurrentAction = NULL;
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	if (actor) {
 		actor->Orientation = parameters->int0Parameter;
 		actor->resetAction = true;
@@ -2481,28 +2603,18 @@ void GameScript::Face(Scriptable* Sender, Action* parameters)
 
 void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		Sender->CurrentAction = NULL;
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		Sender->CurrentAction = NULL;
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!target) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	if (actor) {
 		actor->Orientation = GetOrient( target->XPos, target->YPos,
-								actor->XPos, actor->YPos );
+						actor->XPos, actor->YPos );
 		actor->resetAction = true;
 		actor->SetWait( 1 );
 	} else {
@@ -2512,24 +2624,10 @@ void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		/* 
-								We need to NULL the CurrentAction because this is a blocking
-								OpCode.
-							*/
-		Sender->CurrentAction = NULL;
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	printf( "Displaying string on: %s\n", actor->scriptName );
 	StringBlock sb = core->strings->GetStringBlock( parameters->int0Parameter );
 	actor->DisplayHeadText( sb.text );
@@ -2560,32 +2658,14 @@ void GameScript::Continue(Scriptable* Sender, Action* parameters)
 
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
-	core->GetSoundMgr()->Play( parameters->string0Parameter, scr->XPos,
-							scr->YPos );
+	core->GetSoundMgr()->Play( parameters->string0Parameter, Sender->XPos,
+							Sender->YPos );
 }
 
 void GameScript::CreateVisualEffectObject(Scriptable* Sender,
 	Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
@@ -2599,15 +2679,6 @@ void GameScript::CreateVisualEffectObject(Scriptable* Sender,
 
 void GameScript::CreateVisualEffect(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	DataStream* ds = core->GetResourceMgr()->GetResource( parameters->string0Parameter,
 												IE_VVC_CLASS_ID );
 	ScriptedAnimation* vvc = new ScriptedAnimation( ds, true,
@@ -2618,19 +2689,10 @@ void GameScript::CreateVisualEffect(Scriptable* Sender, Action* parameters)
 
 void GameScript::DestroySelf(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	actor->DeleteMe = true;
 }
 
@@ -2643,15 +2705,6 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 
 void GameScript::UnhideGUI(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );	
 	if (gc->ControlType == IE_GUI_GAMECONTROL) {
 		gc->UnhideGUI();
@@ -2661,15 +2714,6 @@ void GameScript::UnhideGUI(Scriptable* Sender, Action* parameters)
 
 void GameScript::HideGUI(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );	
 	if (gc->ControlType == IE_GUI_GAMECONTROL) {
 		gc->HideGUI();
@@ -2685,15 +2729,6 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	if (Flags & BD_OWN) {
 		scr = tar = GetActorFromObject( Sender, parameters->objects[1] );
 	} else {
-		scr = GetActorFromObject( Sender, parameters->objects[0] );
-		if (!scr)
-			return;
-		if (scr != Sender) {
-			//this is an Action Override
-			scr->AddAction( Sender->CurrentAction );
-			Sender->CurrentAction = NULL;
-			return;
-		}
 		tar = GetActorFromObject( Sender, parameters->objects[1] );
 	}
 	//source could be other than Actor, we need to handle this too!
@@ -2786,19 +2821,15 @@ void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
 
 void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!scr) {
-		return;
+	if (Sender->overHeadText) {
+		free( Sender->overHeadText );
 	}
-	if (scr->overHeadText) {
-		free( scr->overHeadText );
-	}
-	scr->overHeadText = core->GetString( parameters->int0Parameter );
-	GetTime( scr->timeStartDisplaying );
-	scr->textDisplaying = 0;
+	Sender->overHeadText = core->GetString( parameters->int0Parameter );
+	GetTime( Sender->timeStartDisplaying );
+	Sender->textDisplaying = 0;
 	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );	
 	if (gc->ControlType == IE_GUI_GAMECONTROL) {
-		gc->DisplayString( scr );
+		gc->DisplayString( Sender );
 	}
 }
 
@@ -2815,15 +2846,6 @@ void GameScript::AmbientActivate(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetDialogue(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
@@ -2899,16 +2921,6 @@ Point* FindNearPoint(Actor* Sender, Point* p1, Point* p2, double& distance)
 
 void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		Sender->CurrentAction = NULL;
-		return;
-	}
 	Scriptable* tar = core->GetGame()->GetMap( 0 )->tm->GetDoor( parameters->objects[1]->objectName );
 	if (!tar) {
 		Sender->CurrentAction = NULL;
@@ -2919,12 +2931,12 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	if (scr->Type != ST_ACTOR) {
+	if (Sender->Type != ST_ACTOR) {
 		door->SetDoorClosed( false, true );		
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	double distance;
 	Point* p = FindNearPoint( actor, &door->toOpen[0], &door->toOpen[1],
 				distance );	
@@ -2941,16 +2953,6 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 
 void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		Sender->CurrentAction = NULL;
-		return;
-	}
 	Scriptable* tar = core->GetGame()->GetMap( 0 )->tm->GetDoor( parameters->objects[1]->objectName );
 	if (!tar) {
 		Sender->CurrentAction = NULL;
@@ -2961,12 +2963,12 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	if (scr->Type != ST_ACTOR) {
+	if (Sender->Type != ST_ACTOR) {
 		door->SetDoorClosed( true, true );
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	double distance;
 	Point* p = FindNearPoint( actor, &door->toOpen[0], &door->toOpen[1],
 				distance );	
@@ -2983,16 +2985,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 
 void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
@@ -3052,36 +3045,18 @@ void GetPositionFromScriptable(Scriptable* scr, unsigned short& X,
 
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
 	}
 	unsigned short sX,sY, dX,dY;
-	GetPositionFromScriptable( scr, sX, sY );
+	GetPositionFromScriptable( Sender, sX, sY );
 	GetPositionFromScriptable( tar, dX, dY );
 	printf( "ForceSpell from [%d,%d] to [%d,%d]\n", sX, sY, dX, dY );
 }
 
 void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
@@ -3094,16 +3069,10 @@ void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
 
 void GameScript::MakeGlobal(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (scr->Type != ST_ACTOR) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
-	Actor* act = ( Actor* ) scr;
+	Actor* act = ( Actor* ) Sender;
 	if (!core->GetGame()->InParty( act )) {
 		core->GetGame()->AddNPC( act );
 	}
@@ -3111,16 +3080,10 @@ void GameScript::MakeGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::UnMakeGlobal(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (scr->Type != ST_ACTOR) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
-	Actor* act = ( Actor* ) scr;
+	Actor* act = ( Actor* ) Sender;
 	int slot;
 	slot = core->GetGame()->InStore( act );
 	if (slot >= 0) {
@@ -3130,46 +3093,25 @@ void GameScript::UnMakeGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (scr->Type != ST_ACTOR) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
-	Actor* act = ( Actor* ) scr;
+	Actor* act = ( Actor* ) Sender;
 	core->GetGame()->JoinParty( act );
 	act->SetScript( "DPLAYER2", SCR_DEFAULT );
 }
 
 void GameScript::LeaveParty(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (scr->Type != ST_ACTOR) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
-	Actor* act = ( Actor* ) scr;
+	Actor* act = ( Actor* ) Sender;
 	core->GetGame()->LeaveParty( act );
 }
 
 void GameScript::Activate(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
-		return;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
@@ -3182,16 +3124,7 @@ void GameScript::Activate(Scriptable* Sender, Action* parameters)
 
 void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
@@ -3217,16 +3150,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 
 void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	if (scr != Sender) {
-		//this is an Action Override
-		scr->AddAction( Sender->CurrentAction );
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
 	LeaveAreaLUA( Sender, parameters );
@@ -3248,14 +3172,10 @@ void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	actor->AnimID = IE_ANI_DIE;
 	//also set time for playdead!
 	actor->SetWait( parameters->int0Parameter );

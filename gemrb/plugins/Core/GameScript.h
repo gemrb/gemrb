@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.51 2004/02/27 19:47:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.52 2004/02/28 01:36:53 avenger_teambg Exp $
  *
  */
 
@@ -63,20 +63,28 @@ public:
 		Clear();
 	};
 private:
-	std::vector< Scriptable*> objects;
+	std::vector< Actor*> objects;
 public:
 	int Count()
 	{
 		return objects.size();
 	};
-	Scriptable* GetTarget(int index)
+	Actor* GetTarget(int index)
 	{
 		if (index >= objects.size()) {
 			return NULL;
 		}
 		return objects.at( index );
 	};
-	void AddTarget(Scriptable* Target)
+	void RemoveTargetAt(int index)
+	{
+		if(index>objects.size() ) {
+			return;
+		}
+		std::vector< Actor*>::iterator m=objects.begin()+index;
+		objects.erase(m);
+	};
+	void AddTarget(Actor* Target)
 	{
 		objects.push_back( Target );
 	};
@@ -84,7 +92,7 @@ public:
 	{
 		objects.clear();
 	};
-	bool Contains(Scriptable* scr)
+	bool Contains(Actor* scr)
 	{
 		if (!objects.size()) {
 			return false;
@@ -565,7 +573,8 @@ public:
 
 typedef int (* TriggerFunction)(Scriptable*, Trigger*);
 typedef void (* ActionFunction)(Scriptable*, Action*);
-typedef Targets*(* ObjectFunction)(Scriptable *, Targets*);
+typedef Targets* (* ObjectFunction)(Scriptable *, Targets*);
+typedef int (* IDSFunction)(Actor *, int parameter);
 
 struct TriggerLink {
 	const char* Name;
@@ -604,6 +613,11 @@ struct ObjectLink {
 	ObjectFunction Function;
 };
 
+struct IDSLink {
+	const char* Name;
+	IDSFunction Function;
+};
+
 #define IE_SCRIPT_ALWAYS		0
 #define IE_SCRIPT_AREA			1
 #define IE_SCRIPT_TRIGGER		2
@@ -633,8 +647,7 @@ private: //Internal Functions
 	static bool EvaluateTrigger(Scriptable* Sender, Trigger* trigger);
 	int ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS);
 	int ExecuteResponse(Scriptable* Sender, Response* rE);
-	static Targets* EvaluateObject(Scriptable* Sender, Object* oC,
-		int IDIndex, Targets* parm);
+	static Targets* EvaluateObject(Scriptable* Sender, Object* oC);
 	static int ParseInt(const char*& src);
 	static void ParseString(const char*& src, char* tmp);
 
@@ -673,6 +686,19 @@ public:
 	static void ExecuteString(Scriptable* Sender, char* String);
 	static bool EvaluateString(Scriptable* Sender, char* String);
 public: //Script Functions
+	static int ID_Alignment(Actor *actor, int parameter);
+	static int ID_Allegiance(Actor *actor, int parameter);
+	static int ID_AVClass(Actor *actor, int parameter);
+	static int ID_Class(Actor *actor, int parameter);
+	static int ID_ClassMask(Actor *actor, int parameter);
+	static int ID_Faction(Actor *actor, int parameter);
+	static int ID_Gender(Actor *actor, int parameter);
+	static int ID_General(Actor *actor, int parameter);
+	static int ID_Race(Actor *actor, int parameter);
+	static int ID_Specific(Actor *actor, int parameter);
+	static int ID_Subrace(Actor *actor, int parameter);
+	static int ID_Team(Actor *actor, int parameter);
+
 	//Triggers
 	static int ActionListEmpty(Scriptable* Sender, Trigger* parameters);
 	static int Alignment(Scriptable* Sender, Trigger* parameters);
@@ -707,6 +733,7 @@ public: //Script Functions
 	static int Race(Scriptable* Sender, Trigger* parameters);
 	static int Range(Scriptable* Sender, Trigger* parameters);
 	static int See(Scriptable* Sender, Trigger* parameters);
+	static int Specific(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);
 	static int XP(Scriptable* Sender, Trigger* parameters);
 	static int XPGT(Scriptable* Sender, Trigger* parameters);
@@ -827,6 +854,8 @@ public:
 	static Targets *Player5Fill(Scriptable *Sender, Targets *parameters);
 	static Targets *Player6(Scriptable *Sender, Targets *parameters);
 	static Targets *Player6Fill(Scriptable *Sender, Targets *parameters);
+	static Targets *WorstAC(Scriptable *Sender, Targets *parameters);
+	static Targets *BestAC(Scriptable *Sender, Targets *parameters);
 
 public:
 	/*GemRB extensions/actions*/
