@@ -96,45 +96,38 @@ bool KeyImp::LoadResFile(const char * resfile)
 	return true;
 }
 
+#define SearchIn(BasePath, Path, ResRef, Type, foundMessage) \
+{ \
+	char p[_MAX_PATH], f[_MAX_PATH] = {0}; \
+	strcpy(p, BasePath); \
+	strcat(p, Path); \
+	strcat(p, SPathDelimiter); \
+	strncpy(f, ResRef, 8); \
+	f[8] = 0; \
+	strcat(f, core->TypeExt(Type)); \
+	strlwr(f); \
+	strcat(p, f); \
+	FILE * exist = fopen(p, "rb"); \
+	if(exist) { \
+		printf(foundMessage); \
+		fclose(exist); \
+		FileStream * fs = new FileStream(); \
+		if(!fs) return NULL; \
+		fs->Open(p, true); \
+		return fs; \
+	} \
+} 
+
 DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 {
 	char path[_MAX_PATH], filename[_MAX_PATH] = {0};
 	//Search it in the GemRB override Directory
-	strcpy(path, core->GemRBPath);
-	strcat(path, "override");
+	strcpy(path, "override");
 	strcat(path, SPathDelimiter);
 	strcat(path, core->GameType);
-	strcat(path, SPathDelimiter);
-	strncpy(filename, resname, 8);
-	filename[8]=0;
-	strcat(filename, core->TypeExt(type));
-	strlwr(filename);
-	strcat(path, filename);
-	FILE * exist = fopen(path, "rb");
-	if(exist) {
-		printf("[KEYImporter]: Found in GemRB Override...\n");
-		fclose(exist);
-		FileStream * fs = new FileStream();
-		if(!fs)
-			return NULL;
-		fs->Open(path, true);
-		return fs;
-	}
-	strcpy(path, core->GamePath);
-	strcat(path, "override");
-	strcat(path, SPathDelimiter);
-	strncat(path, resname, 8);
-	strcat(path, core->TypeExt(type));
-	exist = fopen(path, "rb");
-	if(exist) {
-		printf("[KEYImporter]: Found in Override...\n");
-		fclose(exist);
-		FileStream * fs = new FileStream();
-		if(!fs)
-			return NULL;
-		fs->Open(path, true);
-		return fs;
-	}
+	SearchIn(core->GemRBPath, path, resname, type, "[KEYImporter]: Found in GemRB Override...\n");
+	SearchIn(core->GamePath, "override", resname, type, "[KEYImporter]: Found in Override...\n");
+	SearchIn(core->CD1, "Data", resname, type, "[KEYImporter]: Found in Local CD1 Folder...\n");
 	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
 	unsigned long ResLocator;
 	if(resources.Lookup(resname,type,ResLocator) ) {
