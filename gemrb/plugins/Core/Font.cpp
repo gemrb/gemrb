@@ -54,7 +54,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 	if(!pal) {
 		pal = palette;
 	}
-	for(int i = 0; i < 256; i++) {
+	for(int i = 0; i < 255; i++) {
 		core->GetVideoDriver()->SetPalette(chars[i], pal);
 	}
 	Video * video = core->GetVideoDriver();
@@ -144,7 +144,7 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	if(!pal) {
 		pal = palette;
 	}
-	for(int i = 0; i < 256; i++) {
+	for(int i = 0; i < 255; i++) {
 		core->GetVideoDriver()->SetPalette(chars[i], pal);
 	}
 	Video * video = core->GetVideoDriver();

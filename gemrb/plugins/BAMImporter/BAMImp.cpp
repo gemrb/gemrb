@@ -222,7 +222,7 @@ Font * BAMImp::GetFont()
 {
   printf("Start Getting Font\n");
   Font * fnt = new Font();
-  for(int i = 0; i < 256; i++) {
+  for(int i = 0; i < 255; i++) {
     fnt->AddChar(GetFrame(i, 0));
   }
   printf("Font Created\n");

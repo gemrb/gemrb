@@ -206,7 +206,11 @@ int Interface::Init()
 			break;
 		}
 		DataStream * fstr = key->GetResource(ResRef, IE_BAM_CLASS_ID);
-		anim->Open(fstr, true);
+		if(!anim->Open(fstr, true)) {
+				printStatus("ERROR", LIGHT_RED);
+				delete(fstr);
+				continue;
+		}
 		Font * fnt = anim->GetFont();
 		strncpy(fnt->ResRef, ResRef, 8);
 		fonts.push_back(fnt);
