@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.38 2004/04/16 18:39:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.39 2004/04/16 21:30:37 avenger_teambg Exp $
  *
  */
 
@@ -283,7 +283,7 @@ int Game::LoadMap(const char* ResRef)
 	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
 	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef, IE_ARE_CLASS_ID );
 	mM->Open( ds, true );
-	Map* newMap = mM->GetMap();
+	Map* newMap = mM->GetMap(ResRef);
 	core->FreeInterface( mM );
 	if (!newMap) {
 		return -1;
@@ -298,8 +298,6 @@ int Game::LoadMap(const char* ResRef)
 			newMap->AddActor( NPCs[i] );
 		}
 	}
-	strncpy(newMap->scriptName, ResRef, 9);
-	newMap->scriptName[8]=0;
 	return AddMap( newMap );
 }
 

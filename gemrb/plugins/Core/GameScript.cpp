@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.144 2004/04/16 18:39:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.145 2004/04/16 21:30:38 avenger_teambg Exp $
  *
  */
 
@@ -1869,7 +1869,7 @@ Targets *GameScript::Myself(Scriptable* Sender, Targets* parameters)
 Targets *GameScript::Protagonist(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(0));
+	parameters->AddTarget(core->GetGame()->FindPC(0));
 	return parameters;
 }
 
@@ -1927,112 +1927,112 @@ Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::Player1(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(0));
+	parameters->AddTarget(core->GetGame()->FindPC(0));
 	return parameters;
 }
 
 Targets *GameScript::Player1Fill(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(0));
+	parameters->AddTarget(core->GetGame()->GetPC(0));
 	return parameters;
 }
 
 Targets *GameScript::Player2(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(1));
+	parameters->AddTarget(core->GetGame()->FindPC(1));
 	return parameters;
 }
 
 Targets *GameScript::Player2Fill(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(1));
+	parameters->AddTarget(core->GetGame()->GetPC(1));
 	return parameters;
 }
 
 Targets *GameScript::Player3(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(2));
+	parameters->AddTarget(core->GetGame()->FindPC(2));
 	return parameters;
 }
 
 Targets *GameScript::Player3Fill(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(2));
+	parameters->AddTarget(core->GetGame()->GetPC(2));
 	return parameters;
 }
 
 Targets *GameScript::Player4(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(3));
+	parameters->AddTarget(core->GetGame()->FindPC(3));
 	return parameters;
 }
 
 Targets *GameScript::Player4Fill(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(3));
+	parameters->AddTarget(core->GetGame()->GetPC(3));
 	return parameters;
 }
 
 Targets *GameScript::Player5(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(4));
+	parameters->AddTarget(core->GetGame()->FindPC(4));
 	return parameters;
 }
 
 Targets *GameScript::Player5Fill(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(4));
+	parameters->AddTarget(core->GetGame()->GetPC(4));
 	return parameters;
 }
 
 Targets *GameScript::Player6(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(5));
+	parameters->AddTarget(core->GetGame()->FindPC(5));
 	return parameters;
 }
 
 Targets *GameScript::Player6Fill(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(5));
+	parameters->AddTarget(core->GetGame()->GetPC(5));
 	return parameters;
 }
 
 Targets *GameScript::Player7(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(6));
+	parameters->AddTarget(core->GetGame()->FindPC(6));
 	return parameters;
 }
 
 Targets *GameScript::Player7Fill(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(6));
+	parameters->AddTarget(core->GetGame()->GetPC(6));
 	return parameters;
 }
 
 Targets *GameScript::Player8(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(7));
+	parameters->AddTarget(core->GetGame()->FindPC(7));
 	return parameters;
 }
 
 Targets *GameScript::Player8Fill(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(7));
+	parameters->AddTarget(core->GetGame()->GetPC(7));
 	return parameters;
 }
 
@@ -5040,7 +5040,6 @@ void GameScript::PlayerDialogue(Scriptable* Sender, Action* parameters)
 //we hijack this action for the player initiated dialogue
 void GameScript::NIDSpecial1(Scriptable* Sender, Action* parameters)
 {
-printf("NIdspecial\n");
 	BeginDialog( Sender, parameters, BD_TARGET | BD_NUMERIC | BD_TALKCOUNT | BD_CHECKDIST );
 }
 
@@ -5195,14 +5194,12 @@ void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, int X, int
 {
 	if(area[0]) { //do we need to switch area?
 		Game* game = core->GetGame();
-		strncpy( actor->Area, area, 8 );
-		if(!game->InParty(actor) && !game->InStore(actor) ) {
-			game->AddNPC( actor ); //this is required?
-		}
 		Map * map1 = game->GetMap(game->LoadMap( actor->Area ));
 		Map * map2 = game->GetMap(game->LoadMap( area ));
 		if( map1!=map2 ) {
-			map1->RemoveActor( actor );
+			if(map1) {
+				map1->RemoveActor( actor );
+			}
 		        map2->AddActor( actor );
 		}
 	}

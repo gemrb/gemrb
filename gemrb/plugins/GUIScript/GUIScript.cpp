@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.157 2004/04/15 21:28:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.158 2004/04/16 21:30:51 avenger_teambg Exp $
  *
  */
 
@@ -141,7 +141,8 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
 {
 	GameControl* gc = StartGameControl();
-	core->GetGame()->LoadMap(core->GetGame()->CurrentArea);
+	Game* game = core->GetGame();
+	game->LoadMap(game->CurrentArea);
 	gc->SetCurrentArea( 0 );
 	Py_INCREF( Py_None );
 	return Py_None;

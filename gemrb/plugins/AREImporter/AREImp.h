@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.11 2004/03/19 22:37:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.12 2004/04/16 21:30:36 avenger_teambg Exp $
  *
  */
 
@@ -45,7 +45,7 @@ public:
 	AREImp(void);
 	~AREImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	Map* GetMap();
+	Map* GetMap(const char* ResRef);
 public:
 	void release(void)
 	{

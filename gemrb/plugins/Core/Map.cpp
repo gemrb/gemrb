@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.87 2004/04/16 18:39:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.88 2004/04/16 21:30:40 avenger_teambg Exp $
  *
  */
 
@@ -376,6 +376,8 @@ void Map::AddActor(Actor* actor)
 			}
 		}
 	}
+	//setting the current area for the actor as this one
+	memcpy(actor->Area, scriptName, 9);
 	actors.push_back( actor );
 }
 
@@ -416,7 +418,6 @@ Actor* Map::GetActor(const char* Name)
 	for (size_t i = 0; i < actors.size(); i++) {
 		Actor* actor = actors.at( i );
 		if (stricmp( actor->scriptName, Name ) == 0) {
-			printf( "Returning Actor %d: %s\n", i, actor->scriptName );
 			return actor;
 		}
 	}
@@ -615,11 +616,11 @@ Entrance* Map::GetEntrance(char* Name)
 
 void Map::RemoveActor(Actor* actor)
 {
-	for (unsigned int i = 0; i < actors.size(); i++) {
-		Actor* ac = actors.at( i );
-		if (ac == actor) {
-			std::vector< Actor*>::iterator m = actors.begin() + i;
-			actors.erase( m );
+	unsigned int i=actors.size();
+	while(i--) {
+		if (actors[i] == actor) {
+			actors.erase( actors.begin()+i );
+			return;
 		}
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapMgr.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapMgr.h,v 1.4 2004/04/16 21:30:51 avenger_teambg Exp $
  *
  */
 
@@ -43,7 +43,7 @@ public:
 	MapMgr(void);
 	virtual ~MapMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
-	virtual Map* GetMap() = 0;
+	virtual Map* GetMap(const char* ResRef) = 0;
 };
 
 #endif

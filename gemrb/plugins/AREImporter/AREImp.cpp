@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.45 2004/03/28 15:10:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.46 2004/04/16 21:30:35 avenger_teambg Exp $
  *
  */
 
@@ -127,21 +127,23 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Map* AREImp::GetMap()
+Map* AREImp::GetMap(const char *ResRef)
 {
 	Map* map = new Map();
-	strncpy( map->scriptName, WEDResRef, 8);
-	map->scriptName[8]=0;
 	map->AreaFlags=AreaFlags;
 	map->AreaType=AreaType;
+
+	//we have to set this here because the actors will receive their
+	//current area setting here
+	strncpy(map->scriptName, ResRef, 8);
+	map->scriptName[8]=0;
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
 		printf( "[AREImporter]: No Tile Map Manager Available.\n" );
 		return false;
 	}
 	TileMapMgr* tmm = ( TileMapMgr* ) core->GetInterface( IE_WED_CLASS_ID );
-	DataStream* wedfile = core->GetResourceMgr()->GetResource( WEDResRef,
-													IE_WED_CLASS_ID );
+	DataStream* wedfile = core->GetResourceMgr()->GetResource( WEDResRef, IE_WED_CLASS_ID );
 	tmm->Open( wedfile );
 	TileMap* tm = tmm->GetTileMap();
 
@@ -151,21 +153,19 @@ Map* AREImp::GetMap()
 		map->Scripts[0]->MySelf = map;
 	}
 
-	char ResRef[9];
-	strcpy( ResRef, WEDResRef );
-	strcat( ResRef, "LM" );
+	char TmpResRef[9];
+	strcpy( TmpResRef, WEDResRef );
+	strcat( TmpResRef, "LM" );
 
 	ImageMgr* lm = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
-	DataStream* lmstr = core->GetResourceMgr()->GetResource( ResRef,
-													IE_BMP_CLASS_ID );
+	DataStream* lmstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
 	lm->Open( lmstr, true );
 
-	strcpy( ResRef, WEDResRef );
-	strcat( ResRef, "SR" );
-	printf( "Loading %s\n", ResRef );
+	strcpy( TmpResRef, WEDResRef );
+	strcat( TmpResRef, "SR" );
+
 	ImageMgr* sr = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
-	DataStream* srstr = core->GetResourceMgr()->GetResource( ResRef,
-													IE_BMP_CLASS_ID );
+	DataStream* srstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
 	sr->Open( srstr, true );
 
 	str->Seek( SongHeader, GEM_STREAM_START );
@@ -453,14 +453,6 @@ Map* AREImp::GetMap()
 			ab->AnimID = IE_ANI_SLEEP;
 		ab->Orientation = ( unsigned char ) Orientation;
 		ab->TalkCount = TalkCount;
-		/*for(int i = 0; i < MAX_SCRIPTS; i++) {
-							if((stricmp(ab->actor->Scripts[i], "None") == 0) || (ab->actor->Scripts[i][0] == '\0')) {
-								ab->Scripts[i] = NULL;
-								continue;
-							}
-							ab->Scripts[i] = new GameScript(ab->actor->Scripts[i], 0);
-							ab->Scripts[i]->MySelf = ab;
-						}*/
 		map->AddActor( ab );
 	}
 	core->FreeInterface( actmgr );
@@ -469,7 +461,6 @@ Map* AREImp::GetMap()
 		printf( "[AREImporter]: No Animation Manager Available, skipping animations\n" );
 		return map;
 	}
-	//AnimationMgr * am = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
 	for (unsigned int i = 0; i < AnimCount; i++) {
 		Animation* anim;
 		str->Seek( 32, GEM_CURRENT_POS );
@@ -489,11 +480,8 @@ Map* AREImp::GetMap()
 		unsigned char mode = ( ( animFlags & 2 ) != 0 ) ?
 			IE_SHADED :
 			IE_NORMAL;
-		//am->Open(core->GetResourceMgr()->GetResource(animBam, IE_BAM_CLASS_ID), true);
-		//anim = am->GetAnimation(animCycle, animX, animY);
 		AnimationFactory* af = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( animBam,
-										IE_BAM_CLASS_ID );
+			core->GetResourceMgr()->GetFactoryResource( animBam, IE_BAM_CLASS_ID );
 		anim = af->GetCycle( ( unsigned char ) animCycle );
 		if (!anim)
 			anim = af->GetCycle( 0 );

@@ -423,6 +423,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 						short cX = lastMouseX; 
 						short cY = lastMouseY;
 						core->GetVideoDriver()->ConvertToGame( cX, cY );
+						memcpy(actor->Area, core->GetGame()->CurrentArea, 9);
 						actor->SetPosition( cX, cY, true );
 						printf( "Teleported to %d, %d\n", cX, cY );
 					}
@@ -446,11 +447,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				if (overInfoPoint) {
 					overInfoPoint->DebugDump();
 					return;
-				} {
-					Game* game = core->GetGame();
-					Map* area = game->GetCurrentMap( );
-					area->DebugDump();
 				}
+				core->GetGame()->GetCurrentMap()->DebugDump();
 				break;
 			case 'x':
 				// 'x'
@@ -601,10 +599,8 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	char Tmp[40];
 
 	strncpy(Tmp,"NIDSpecial1()",40);
-printf("TryTotalk\n");
 	target=tgt; //this is a hack, a deadly one
 	source->AddAction( GameScript::GenerateAction( Tmp, true ) );
-printf("trytotalk added\n");
 }
 
 /** Mouse Button Down */
@@ -800,14 +796,11 @@ Map *GameControl::SetCurrentArea(int Index)
 	Game* game = core->GetGame();
 	game->MapIndex = Index;
 	Map* area = game->GetCurrentMap( );
-	Actor* ab = game->GetPC( 0 );
-	if (ab) {
-		area->AddActor( ab );
-	}
+	memcpy(game->CurrentArea, area->scriptName, 9);
 	//night or day?
 	area->PlayAreaSong( 0 );
 	core->GetPathFinder()->SetMap( area->SearchMap, area->tm->XCellCount * 4,
-							( area->tm->YCellCount * 64 ) / 12 );
+		( area->tm->YCellCount * 64 ) / 12 );
 	return area;
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.42 2004/04/16 18:39:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.43 2004/04/16 21:30:36 avenger_teambg Exp $
  *
  */
 
@@ -359,6 +359,7 @@ void Actor::DebugDump()
 		}
 		printf( "Script %d: %s\n", i, poi );
 	}
+	printf( "Area:       %s\n", Area );
 	printf( "Dialog:     %s\n", Dialog );
 	printf( "Script name:%s\n", scriptName );
 	printf( "TalkCount:  %ld\n", TalkCount );
