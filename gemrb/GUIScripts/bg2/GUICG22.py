@@ -21,9 +21,11 @@ def OnLoad():
         KitTable = GemRB.LoadTable("kittable")
 	KitTableName = GemRB.GetTableValue(KitTable, ClassName, RaceName)
 	print "Kittable: ",KitTableName
-	KitTable = GemRB.LoadTable(KitTableName)
+	KitTable = GemRB.LoadTable(KitTableName,1)
 	KitList = GemRB.LoadTable("kitlist")
 
+	#there is a specialist mage window, but it is easier to use 
+	#the class kit window for both
 	KitWindow = GemRB.LoadWindow(22)
 	if Class == 0:
 		Label = GemRB.GetControl(KitWindow, 0xfffffff)
@@ -37,13 +39,21 @@ def OnLoad():
 		GemRB.SetButtonState(KitWindow, Button, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonFlags(KitWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
-	for i in range(0,GemRB.GetTableRowCount(KitTable)-1 ):
+	if KitTable == -1:
+		RowCount = 1
+	else:
+		RowCount = GemRB.GetTableRowCount(KitTable)-1
+
+	for i in range(0, RowCount ):
 		if i<4:
 			Button = i+1
 		else:
 			Button = i+5
 		GemRB.SetButtonState(KitWindow, Button, IE_GUI_BUTTON_ENABLED)
-		Kit = GemRB.GetTableValue(KitTable,i,0)
+		if KitTable == -1:
+			Kit = 0
+		else:
+			Kit = GemRB.GetTableValue(KitTable,i,0)
 		if Kit == 0:
 			KitName = GemRB.GetTableValue(ClassList, GemRB.GetVar("Class")-1, 0)
 		else:
