@@ -15,14 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.18 2003/12/15 09:37:08 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.19 2003/12/15 09:52:54 balrog994 Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "CREImp.h"
 #include "../Core/Interface.h"
-#include "../Core/HCAnimationSeq.h"
 #include "../../includes/ie_stats.h"
 
 CREImp::CREImp(void)

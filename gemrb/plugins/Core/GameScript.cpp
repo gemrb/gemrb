@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.9 2003/12/15 09:27:10 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.10 2003/12/15 09:52:53 balrog994 Exp $
  *
  */
 
@@ -586,9 +586,8 @@ int GameScript::Class(GameScript * Sender, Trigger * parameters)
 	if(scr->Type != ST_ACTOR)
 		return 0;
 	Actor * actor = (Actor*)scr;
-	int value = actor->GetStat(IE_CLASS);
 	//TODO: if parameter >=202, it is of *_ALL type
-	int value = actor->actor->GetStat(IE_CLASS);
+	int value = actor->GetStat(IE_CLASS);
 	return parameters->int0Parameter==value;
 }
 
@@ -827,10 +826,13 @@ void GameScript::Enemy(GameScript * Sender, Action * parameters)
 
 void GameScript::Ally(GameScript * Sender, Action * parameters)
 {
-	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
-	if(actor) {
-		actor->actor->SetStat(IE_EA,4);
-	}
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->SetStat(IE_EA,4);
 }
 
 void GameScript::Wait(GameScript * Sender, Action * parameters)
