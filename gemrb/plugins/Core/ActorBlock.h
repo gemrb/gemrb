@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.9 2004/01/04 15:25:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.10 2004/01/05 12:04:43 balrog994 Exp $
  *
  */
 
@@ -57,7 +57,8 @@ typedef enum ScriptableType {
 	ST_TRIGGER = 2,
 	ST_TRAVEL = 3,
 	ST_DOOR = 4,
-	ST_AREA = 5
+	ST_CONTAINER = 5,
+	ST_AREA = 6
 } ScriptableType;
 
 typedef struct ActionStep {
@@ -141,6 +142,7 @@ public:
 	Gem_Polygon * outline;
 	Color outlineColor;
 	unsigned long Cursor;
+	bool Highlight;
 public:
 	bool IsOver(unsigned short XPos, unsigned short YPos);
 	void DrawOutline();
@@ -197,6 +199,23 @@ public:
 	void ToggleDoorState();
 	void SetPolygon(bool Open, Gem_Polygon * poly);
 	void SetCursor(unsigned char CursorIndex);
+};
+
+class GEM_EXPORT Container : public Highlightable {
+public:
+	Container(void);
+	~Container(void);
+public:
+	char Name[33];
+	Point toOpen;
+	unsigned short Type;
+	unsigned short LockDifficulty;
+	unsigned short Locked;
+	unsigned short TrapDetectionDiff;
+	unsigned short TrapRemovalDiff;
+	unsigned short Trapped;
+	unsigned short TrapDetected;
+	Point trapTarget;
 };
 
 class GEM_EXPORT InfoPoint : public Highlightable {

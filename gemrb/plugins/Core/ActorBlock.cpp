@@ -271,12 +271,14 @@ void Selectable::SetCircle(int size, Color color)
 
 Highlightable::Highlightable(ScriptableType type) : Scriptable(type) 
 { 
-	outline = NULL; 
+	outline = NULL;
+	Highlight = false;
 }
 
 Highlightable::~Highlightable(void)
 {
-
+	if(outline)
+		delete(outline);
 }
 
 bool Highlightable::IsOver(unsigned short XPos, unsigned short YPos)
@@ -513,9 +515,9 @@ void Door::SetCursor(unsigned char CursorIndex)
 	Cursor = CursorIndex;
 }
 
-/**************
+/*******************
  * InfoPoint Class *
- **************/
+ *******************/
 
 InfoPoint::InfoPoint(void) : Highlightable(ST_TRIGGER) 
 {
@@ -538,3 +540,23 @@ InfoPoint::~InfoPoint(void)
 	
 }
 
+/*******************
+ * Container Class *
+ *******************/
+
+Container::Container(void) : Highlightable(ST_CONTAINER)
+{
+	Name[0] = 0;
+	Type = 0;
+	LockDifficulty = 0;
+	Locked = 0;
+	TrapDetectionDiff = 0;
+	TrapRemovalDiff = 0;
+	Trapped = 0;
+	TrapDetected = 0;
+}
+
+Container::~Container()
+{
+	
+}
