@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.38 2004/05/09 14:50:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.39 2004/07/25 17:26:38 avenger_teambg Exp $
  *
  */
 
@@ -42,26 +42,6 @@ class Map;
 #define GA_SELECT   16      
 //dead actor may not be selected 
 #define GA_NO_DEAD  32      
-
-/*
-#define INANIMATE		1
-#define PC				2
-#define FAMILIAR		3
-#define ALLY			4
-#define CONTROLLED		5
-#define CHARMED			6
-#define GOODBUTRED		28
-#define GOODBUTBLUE		29
-#define GOODCUTOFF		30
-#define NOTGOOD			31
-#define ANYTHING		126
-#define NEUTRAL			128
-#define NOTEVIL			199
-#define EVILCUTOFF		200
-#define EVILBUTGREEN	201
-#define EVILBUTBLUE		202
-#define ENEMY			255
-*/
 
 #include "TileMap.h"
 #include "ImageMgr.h"

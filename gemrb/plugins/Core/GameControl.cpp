@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.148 2004/07/25 08:50:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.149 2004/07/25 17:26:38 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -125,7 +125,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (!Width || !Height) {
 		return;
 	}
-	if ( selected.size() == 1 ) {
+	if ( selected.size() > 0 ) {
 		ChangeMap();
 	}
 	Video* video = core->GetVideoDriver();
@@ -202,10 +202,11 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			}
 		}
 
-		// Draw spell effect
+		//Draw spell effect, this must be stored in the actors
+		//not like this
 		if (effect) {
-			if (( selected.size() == 1 )) {
-				Actor* actor = selected.at( 0 );
+			if (( selected.size() > 0 )) {
+				Actor* actor = selected[0];
 				video->BlitSpriteMode( effect->NextFrame(), actor->XPos,
 						actor->YPos, 1, false );
 			}
@@ -411,7 +412,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 			case 'b':
 				 {
-					if (selected.size() == 1) {
+					if (selected.size() > 0) {
 						if (!effect) {
 							AnimationMgr* anim = ( AnimationMgr* )
 								core->GetInterface( IE_BAM_CLASS_ID );
@@ -668,6 +669,10 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	}
 	char Tmp[40];
 
+	//Nidspecial1 is just an unused action existing in all games
+	//(non interactive demo)
+	//i found no fitting action which would emulate this kind of
+	//dialog initation
 	strncpy(Tmp,"NIDSpecial1()",sizeof(Tmp) );
 	target=tgt; //this is a hack, a deadly one
 	source->AddAction( GameScript::GenerateAction( Tmp, true ) );
@@ -717,10 +722,11 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	if (!DrawSelectionRect) {
 		Actor* actor = area->GetActor( GameX, GameY, action );
 
-		if (!actor && ( selected.size() == 1 )) {
-			actor = selected.at( 0 );
+		if (!actor && ( selected.size() > 0 )) {
 			Door* door = area->tm->GetDoor( GameX, GameY );
 			if (door) {
+				//we are sure we got one element
+				actor = selected[0];
 				if (door->Flags&1) {
 					actor->ClearPath();
 					actor->ClearActions();
@@ -736,6 +742,43 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 				}
 				return;
 			}
+			if(overInfoPoint && (overInfoPoint->Type==ST_TRIGGER) ) {
+				//the importer shouldn't load the script
+				//if it is unallowed anyway (though 
+				//deactivated scripts could be reactivated)
+				//only the 'trapped' flag should be honoured
+				//there. Here we have to check on the 
+				//reset trap and deactivated flags
+				if (overInfoPoint->Scripts[0]) {
+					if(!(overInfoPoint->Flags&TRAP_DEACTIVATED) ) {
+						overInfoPoint->LastTrigger = selected[0];
+						overInfoPoint->Scripts[0]->Update();
+						//if reset trap flag not set, deactivate it
+						if(!(overInfoPoint->Flags&TRAP_RESET)) {
+							overInfoPoint->Flags|=TRAP_DEACTIVATED;
+						}
+					}
+				} else {
+					if (overInfoPoint->overHeadText) {
+						if (overInfoPoint->textDisplaying != 1) {
+							overInfoPoint->textDisplaying = 1;
+							GetTime( overInfoPoint->timeStartDisplaying );
+							DisplayString( overInfoPoint );
+						}
+					}
+				}
+			} else {
+				for(unsigned int i = 0;i < selected.size(); i++) {
+					actor=selected[i];
+					actor->ClearPath();
+					actor->ClearActions();
+					char Tmp[256];
+					sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
+					actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+
+				}
+			}
+/*
 			if (overInfoPoint) {
 				switch (overInfoPoint->Type) {
 					case ST_TRIGGER:
@@ -772,13 +815,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 				}
 			}
 			if (!overInfoPoint || ( overInfoPoint->Type != ST_TRIGGER )) {
-				//actor->WalkTo(GameX, GameY);
 				actor->ClearPath();
 				actor->ClearActions();
 				char Tmp[256];
 				sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
 				actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 			}
+*/
 		}
 		//determining the type of the clicked actor
 		int type;

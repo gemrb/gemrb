@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.36 2004/05/25 16:16:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.37 2004/07/25 17:26:38 avenger_teambg Exp $
  *
  */
 
@@ -51,6 +51,20 @@ class Door;
 #define SCR_RACE	 5
 #define SCR_GENERAL  6
 #define SCR_DEFAULT  7
+
+//trigger flags
+#define TRAP_INVISIBLE  1
+#define TRAP_RESET      2
+#define TRAVEL_PARTY    4
+#define TRAP_DETECTABLE 8
+//#define TRAP_16         16
+//#define TRAP_32         32
+#define TRAP_NPC        64
+//#define TRAP_128        128
+#define TRAP_DEACTIVATED  256
+#define TRAVEL_NONPC      512
+//#define TRAP_1024       1024 //override?
+#define INFO_DOOR         2048 //info trigger linked to door
 
 #ifdef WIN32
 
