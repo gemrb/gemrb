@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.h,v 1.10 2004/02/24 22:20:42 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.h,v 1.11 2004/07/24 17:20:34 guidoj Exp $
  *
  */
 
@@ -26,13 +26,13 @@
 #ifdef WIN32
 #ifdef _DEBUG
 #undef _DEBUG
-#include "Python.h"
+#include <Python.h>
 #define _DEBUG
 #else
-#include "Python.h"
+#include <Python.h>
 #endif
 #else
-#include "Python.h"
+#include <Python.h>
 #endif
 
 class GUIScript : public ScriptEngine {
@@ -48,9 +48,9 @@ public:
 	/** Load Script */
 	bool LoadScript(const char* filename);
 	/** Run Function */
-	bool RunFunction(char* fname);
+	bool RunFunction(const char* fname);
 	/** Exec a single String */
-	char* ExecString(char* string);
+	char* ExecString(const char* string);
 public:
 	void release(void)
 	{
