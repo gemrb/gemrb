@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.199 2004/08/26 22:39:58 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.200 2004/08/27 13:23:09 avenger_teambg Exp $
  *
  */
 
@@ -1569,6 +1569,32 @@ static PyObject* GemRB_SetButtonFont(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_DeleteControl__doc,
+"DeleteControl(WindowIndex, ControlID)\n\n"
+"Creates and adds a new WorldMap control to a Window." );
+
+static PyObject* GemRB_DeleteControl(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlID;
+
+	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlID)) {
+		return AttributeError( GemRB_DeleteControl__doc );
+	}
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (win == NULL) {
+		return NULL;
+	}
+        int CtrlIndex = core->GetControl( WindowIndex, ControlID );
+        if (CtrlIndex == -1) {
+		return NULL;
+	}
+	win -> DelControl( CtrlIndex );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_CreateWorldMapControl__doc,
 "CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, flags) => ControlIndex\n\n"
 "Creates and adds a new WorldMap control to a Window." );
@@ -1585,6 +1611,16 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
 		return NULL;
+	}
+        int CtrlIndex = core->GetControl( WindowIndex, ControlID );
+        if (CtrlIndex != -1) {
+		Control *ctrl = win->GetControl( CtrlIndex );
+		x = ctrl->XPos;
+		y = ctrl->YPos;
+		w = ctrl->Width;
+		h = ctrl->Height;
+		flags = ctrl->Value;
+		win->DelControl( CtrlIndex );
 	}
 	WorldMapControl* wmap = new WorldMapControl( );
 	wmap->XPos = x;
@@ -1619,6 +1655,16 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return NULL;
 	}
+	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
+	if (CtrlIndex != -1) {
+		Control *ctrl = win->GetControl( CtrlIndex );
+		x = ctrl->XPos;
+		y = ctrl->YPos;
+		w = ctrl->Width;
+		h = ctrl->Height;
+		win->DelControl( CtrlIndex );
+	}
+
 	MapControl* map = new MapControl( );
 	map->XPos = x;
 	map->YPos = y;
@@ -3593,6 +3639,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CreateMapControl, METH_VARARGS),
 	METHOD(SetControlPos, METH_VARARGS),
 	METHOD(SetControlSize, METH_VARARGS),
+	METHOD(DeleteControl, METH_VARARGS),
 	METHOD(SetTextAreaSelectable, METH_VARARGS),
 	METHOD(SetButtonFlags, METH_VARARGS),
 	METHOD(SetButtonState, METH_VARARGS),
