@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.19 2003/12/19 14:54:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.20 2004/02/18 15:07:31 balrog994 Exp $
  *
  */
 
@@ -33,43 +33,43 @@ CachedFileStream::CachedFileStream(char * stream, bool autoFree)
 	char path[_MAX_PATH];
 	strcpy(path, core->CachePath);
 	strcat(path, fname);
-	str = fopen(path, "rb");
+	str = _fopen(path, "rb");
 	if(str == NULL) {
 		if(core->GameOnCD){
-			FILE * src = fopen(stream, "rb");
+			_FILE * src = _fopen(stream, "rb");
 #ifdef _DEBUG
 			core->CachedFileStreamPtrCount++;
 #endif
-			FILE * dest = fopen(path, "wb");
+			_FILE * dest = _fopen(path, "wb");
 #ifdef _DEBUG
 			core->CachedFileStreamPtrCount++;
 #endif
 			void * buff = malloc(1024*1000);
 			do {
-				size_t len = fread(buff, 1, 1024*1000, src);
-				fwrite(buff, 1, len, dest);
-			} while(!feof(src));
+				size_t len = _fread(buff, 1, 1024*1000, src);
+				_fwrite(buff, 1, len, dest);
+			} while(!_feof(src));
 			free(buff);
-			fclose(src);
+			_fclose(src);
 #ifdef _DEBUG
 			core->CachedFileStreamPtrCount--;
 #endif
-			fclose(dest);
+			_fclose(dest);
 #ifdef _DEBUG
 			core->CachedFileStreamPtrCount--;
 #endif
-			str = fopen(path, "rb");
+			str = _fopen(path, "rb");
 		}else{
-			str = fopen(stream, "rb");
+			str = _fopen(stream, "rb");
 		}
 	}
 #ifdef _DEBUG
 	core->CachedFileStreamPtrCount++;
 #endif
 	startpos = 0;
-	fseek(str, 0, SEEK_END);
-	size = ftell(str);
-	fseek(str, 0, SEEK_SET);
+	_fseek(str, 0, SEEK_END);
+	size = _ftell(str);
+	_fseek(str, 0, SEEK_SET);
 	strcpy(filename, fname);
 	strcpy(originalfile, stream);
 	Pos = 0;
@@ -84,9 +84,9 @@ CachedFileStream::CachedFileStream(CachedFileStream * cfs, int startpos, int siz
 	char cpath[_MAX_PATH];
 	strcpy(cpath, core->CachePath);
 	strcat(cpath, cfs->filename);
-	str = fopen(cpath, "rb");
+	str = _fopen(cpath, "rb");
 	if(str == NULL) {
-		str = fopen(cfs->originalfile, "rb");
+		str = _fopen(cfs->originalfile, "rb");
 		if(str == NULL){
 			printf("\nDANGER WILL ROBINSON!!! str == NULL\nI'll wait a second hoping to open the file...");
 		}
@@ -94,7 +94,7 @@ CachedFileStream::CachedFileStream(CachedFileStream * cfs, int startpos, int siz
 #ifdef _DEBUG
 	core->CachedFileStreamPtrCount++;
 #endif
-	fseek(str, startpos, SEEK_SET);
+	_fseek(str, startpos, SEEK_SET);
 	Pos = 0;
 }
 
@@ -104,16 +104,16 @@ CachedFileStream::~CachedFileStream(void)
 #ifdef _DEBUG
 		core->CachedFileStreamPtrCount--;
 #endif
-		fclose(str);
+		_fclose(str);
 	}
 	autoFree = false; //File stream destructor hack
 }
 
 int CachedFileStream::Read(void * dest, int length)
 {
-	size_t c = fread(dest, 1, length, str);
+	size_t c = _fread(dest, 1, length, str);
 	if(c < 0) {
-		if(feof(str)) {
+		if(_feof(str)) {
 			return GEM_EOF;
 		}
 		return GEM_ERROR;
@@ -129,12 +129,12 @@ int CachedFileStream::Seek(int pos, int startpos)
 	switch(startpos) 
 		{
 		case GEM_CURRENT_POS:
-			fseek(str, pos, SEEK_CUR);
+			_fseek(str, pos, SEEK_CUR);
 			Pos+=pos;
 		break;
 
 		case GEM_STREAM_START:
-			fseek(str, this->startpos + pos, SEEK_SET);
+			_fseek(str, this->startpos + pos, SEEK_SET);
 			Pos=pos;
 		break;
 
@@ -151,15 +151,15 @@ unsigned long CachedFileStream::Size()
 /** No descriptions */
 int CachedFileStream::ReadLine(void * buf, int maxlen)
 {
-	if(feof(str))
+	if(_feof(str))
 		return -1;
 	if(Pos >= size)
 		return -1;
 	unsigned char *p = (unsigned char*)buf;
 	int i = 0;
 	while(i < (maxlen-1)) {
-		int ch = fgetc(str);
-		if(feof(str))
+		int ch = _fgetc(str);
+		if(_feof(str))
 			break;
 		if(Pos==size)
 			break;
