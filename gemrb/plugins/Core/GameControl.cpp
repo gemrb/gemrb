@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.179 2004/11/26 18:15:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.180 2004/11/27 14:55:48 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -161,7 +161,7 @@ fallback:
 }
 
 //don't pass p as a reference
-void GameControl::MoveToPointFormation(Actor *actor, Point p)
+void GameControl::MoveToPointFormation(Actor *actor, Point p, int Orient)
 {
 	unsigned int pos;
 	char Tmp[256];
@@ -169,8 +169,25 @@ void GameControl::MoveToPointFormation(Actor *actor, Point p)
 	int formation=core->GetGame()->WhichFormation;
 	pos=actor->InParty-1; //either this or the actual # of selected actor?
 	if(pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
-	p.x+=formations[formation][pos].x*30;
-	p.y+=formations[formation][pos].y*30;
+printf("Orient: %d\n", Orient);
+	switch(Orient) {
+	case 11: case 12: case 13://east
+		p.x-=formations[formation][pos].y*30;
+		p.y+=formations[formation][pos].x*30;
+		break;
+	case 6: case 7: case 8: case 9: case 10: //north
+		p.x+=formations[formation][pos].x*30;
+		p.y+=formations[formation][pos].y*30;
+		break;
+	case 3: case 4: case 5: //west
+		p.x+=formations[formation][pos].y*30;
+		p.y-=formations[formation][pos].x*30;
+		break;
+	case 0: case 1: case 2: case 14: case 15://south
+		p.x-=formations[formation][pos].x*30;
+		p.y-=formations[formation][pos].y*30;
+		break;
+	}
 	sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
 	actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 }
@@ -875,13 +892,14 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			return;
 		}
 		//party formation movement
+		int orient=GetOrient(p, game->selected[0]->Pos);
 		for(unsigned int i = 0; i < game->selected.size(); i++) {
 			actor=game->selected[i];
 			actor->ClearPath();
 			actor->ClearActions();
 			//formations should be rotated based on starting point
 			//of the leader? and destination
-			MoveToPointFormation(actor,p);
+			MoveToPointFormation(actor,p,orient);
 		}
 		return;
 	}
