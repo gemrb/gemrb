@@ -1,6 +1,7 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
+#include "../../includes/RGBAColor.h"
 #include "Sprite2D.h"
 #include "Region.h"
 #include <vector>
@@ -34,8 +35,11 @@ public:
 	void AddFrame(Sprite2D * frame, int index);
 	Sprite2D * NextFrame(void);
 	void release(void);
-  /** Gets the i-th frame */
-  Sprite2D * GetFrame(unsigned long i);
+	/** Gets the i-th frame */
+	Sprite2D * GetFrame(unsigned long i);
+	/** Sets the Animation Palette */
+	void SetPalette(Color * Palette);
+	bool ChangePalette;
 };
 
 #endif

@@ -18,6 +18,7 @@ Animation::Animation(unsigned short * frames, int count)
 	x = 0;
 	y = 0;
 	free = true;
+	ChangePalette = true;
 }
 
 Animation::~Animation(void)
@@ -91,4 +92,11 @@ Sprite2D * Animation::GetFrame(unsigned long i)
 	if(i >= frames.size())
 		return NULL;
 	return frames[i];
+}
+
+void Animation::SetPalette(Color * Palette)
+{
+	for(int i = 0; i < frames.size(); i++) {
+		core->GetVideoDriver()->SetPalette(frames[i], Palette);
+	}
 }
