@@ -392,7 +392,8 @@ static PyObject * GemRB_GetControl(PyObject */*self*/, PyObject *args)
 static PyObject * GemRB_SetText(PyObject */*self*/, PyObject *args)
 {
 	PyObject *wi, *ci, *str;
-	int WindowIndex, ControlIndex, StrRef;
+	int WindowIndex, ControlIndex;
+	long StrRef;
 	char * string;
 	int ret;
 
@@ -414,7 +415,13 @@ static PyObject * GemRB_SetText(PyObject */*self*/, PyObject *args)
 		}
 		else {
 			StrRef = PyInt_AsLong(str);
-			char * str = core->GetString(StrRef);
+			char * str = NULL;
+			if(StrRef == -1) {
+				str = (char*)malloc(20);
+				sprintf(str, "GemRB v%.1f.%d.%d", GEMRB_RELEASE/1000.0, GEMRB_API_NUM, GEMRB_SDK_REV);
+			}
+			else 
+				str = core->GetString(StrRef);
 			ret = core->SetText(WindowIndex, ControlIndex, str);
 			if(ret == -1) {
 				free(str);
