@@ -1244,6 +1244,8 @@ static PyObject *GemRB_SetSaveGamePortrait( PyObject */*self*/, PyObject *args)
 
 	core->FreeInterface(im);
 
+	delete(str);
+
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -1295,6 +1297,8 @@ static PyObject *GemRB_SetSaveGamePreview( PyObject */*self*/, PyObject *args)
 	btn->SetPicture(Picture);
 
 	core->FreeInterface(im);
+
+	delete(str);
 
 	Py_INCREF(Py_None);
 	return Py_None;
