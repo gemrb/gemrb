@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.36 2005/03/04 23:27:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.37 2005/03/27 13:27:00 edheldil Exp $
  *
  */
 
@@ -160,7 +160,7 @@ Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
 		printf("[BAMImp] Invalid Frame %d in Cycle %d\n",(int) frame, (int) Cycle);
 		return NULL;
 	}
-	str->Seek( FLTOffset + ( cycles[Cycle].FirstFrame * 2 ) + ( frame * 2 ),
+	str->Seek( FLTOffset + ( cycles[Cycle].FirstFrame + frame ) * sizeof( ieWord ),
 			GEM_STREAM_START );
 	ieWord findex;
 	str->ReadWord( &findex );
@@ -178,7 +178,7 @@ Animation* BAMImp::GetAnimation(unsigned char Cycle, int x, int y,
 	if(!cycles[Cycle].FramesCount) {
 		return NULL;
 	}
-	str->Seek( FLTOffset + ( cycles[Cycle].FirstFrame * 2 ), GEM_STREAM_START );
+	str->Seek( FLTOffset + cycles[Cycle].FirstFrame * sizeof( ieWord ), GEM_STREAM_START );
 	unsigned short * findex = ( unsigned short * )
 		malloc( cycles[Cycle].FramesCount * sizeof(unsigned short) );
 	for (i = 0; i < cycles[Cycle].FramesCount; i++) {
@@ -294,9 +294,12 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 {
 	unsigned int i;
 	unsigned int count;
+	unsigned int reduced_frame_count = 0;
 
 	AnimationFactory* af = new AnimationFactory( ResRef );
-	ieWord *FLT = CacheFLT(count);
+	ieWord *FLT = CacheFLT( count );
+	ieWord *NewFLT = (ieWord*) malloc( count * sizeof( ieWord ));
+
 	std::vector< unsigned short> indices;
 	for (i = 0; i < CyclesCount; i++) {
 		unsigned int ff = cycles[i].FirstFrame,
@@ -308,6 +311,7 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 			for (unsigned int k = 0; k < indices.size(); k++) {
 				if (indices[k] == FLT[f]) {
 					found = true;
+					NewFLT[f] = k;
 					break;
 				}
 			}
@@ -316,12 +320,16 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 					( frames[FLT[f]].Height != 1 ))
 					af->AddFrame( GetFrame( FLT[f], mode ), FLT[f] );
 				indices.push_back( FLT[f] );
+				NewFLT[f] = reduced_frame_count;
+				reduced_frame_count++;
 			}
 		}
 		af->AddCycle( cycles[i] );
 	}
-	af->LoadFLT( FLT, count );
+	//af->LoadFLT( FLT, count );
+	af->LoadFLT( NewFLT, count );
 	free( FLT );
+	free( NewFLT );
 	return af;
 }
 /** This function will load the Animation as a Font */

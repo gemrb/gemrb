@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.32 2005/03/20 23:36:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.33 2005/03/27 13:27:00 edheldil Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include <string.h>
 #include "../../includes/win32def.h"
 #include "Control.h"
+#include "ControlAnimation.h"
 #include "Window.h"
 #include "Interface.h"
 
@@ -36,6 +37,9 @@ Control::Control()
 	Owner = 0;
 	XPos = 0;
 	YPos = 0;
+
+	animation = NULL;
+	AnimPicture = NULL;
 }
 
 Control::~Control()
@@ -43,6 +47,11 @@ Control::~Control()
 	core->DisplayTooltip( 0, 0, NULL );
 	if (Tooltip) {
 		free (Tooltip);
+	}
+
+	if (animation) {
+		core->timer->RemoveAnimation( animation );
+		delete animation;
 	}
 }
 
@@ -163,3 +172,12 @@ int Control::SetFlags(int arg_flags, int opcode)
 	( ( Window * ) Owner )->Invalidate();
 	return 0;
 }
+
+void Control::SetAnimPicture(Sprite2D* newpic)
+{
+	AnimPicture = newpic;
+	Changed = true;
+	//Flags |= IE_GUI_BUTTON_PICTURE;
+	( ( Window * ) Owner )->Invalidate();
+}
+

@@ -23,6 +23,7 @@ void GlobalTimer::Init()
 	waitCounter = 0;
 	shakeCounter = 0;
 	startTime = 0;  //forcing an update
+	ClearAnimations();
 }
 
 void GlobalTimer::Freeze()
@@ -35,6 +36,9 @@ void GlobalTimer::Freeze()
 void GlobalTimer::Update()
 {
 	unsigned long thisTime;
+
+	UpdateAnimations();
+
 	GetTime( thisTime );
 	if (( thisTime - startTime ) >= interval) {
 		startTime = thisTime;
@@ -112,6 +116,80 @@ void GlobalTimer::SetCutScene(GameScript* script)
 		return;
 	}
 	CutSceneMode = false;
+}
+
+void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, unsigned long time)
+{
+	AnimationRef* anim;
+	unsigned long thisTime;
+
+	GetTime( thisTime );
+	time += thisTime;
+
+	// if there are no free animation reference objects,
+	//   alloc one, else take the first free one
+	if (first_animation == 0)
+		anim = new AnimationRef;
+	else {
+		anim = animations.front ();
+		animations.erase (animations.begin());
+		first_animation--;
+	}
+
+	// fill in data
+	anim->time = time;
+	anim->ctlanim = ctlanim;
+
+	// and insert it into list of other anim refs, sorted by time
+	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); it++) {
+		if ((*it)->time > time) {
+			animations.insert( it, anim );
+			anim = NULL;
+			break;
+		}
+	}
+	if (anim)
+		animations.push_back( anim );
+		
+}
+
+void GlobalTimer::RemoveAnimation(ControlAnimation* ctlanim)
+{
+	// Animation refs for given control are not physically removed, 
+	//   but just marked by erasing ptr to the control. They will be
+	//   collected when the get to the front of the vector
+	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); it++) {
+		if ((*it)->ctlanim == ctlanim) {
+			(*it)->ctlanim = NULL;
+		}
+	}
+	
+}
+
+void GlobalTimer::UpdateAnimations()
+{
+	unsigned long thisTime;
+	GetTime( thisTime );
+	while (animations.begin() + first_animation != animations.end()) {
+		AnimationRef* anim = animations[first_animation];
+		if (anim->ctlanim == NULL) {
+			first_animation++;
+			continue;
+		}
+
+		if (anim->time <= thisTime) {
+			anim->ctlanim->UpdateAnimation();
+			first_animation++;
+			continue;
+		}
+		break;
+	}
+			
+}
+
+void GlobalTimer::ClearAnimations()
+{
+	first_animation = animations.size();
 }
 
 void GlobalTimer::SetScreenShake(unsigned long shakeX, unsigned long shakeY,

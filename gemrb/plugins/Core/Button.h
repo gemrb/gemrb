@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.42 2005/03/21 22:43:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.43 2005/03/27 13:27:00 edheldil Exp $
  *
  */
 
@@ -25,7 +25,6 @@
 #include "Control.h"
 #include "Sprite2D.h"
 #include "Font.h"
-#include "Animation.h"
 
 // NOTE: keep these synchronized with GUIDefines.py!!!
 #define IE_GUI_BUTTON_UNPRESSED 0
@@ -177,8 +176,6 @@ private: // Private attributes
 	/** Pictures to Apply when the hasPicture flag is set */
 	Sprite2D* Picture;
 	Sprite2D* Picture2;
-	/** Animated Button */
-	Animation* anim;
 	/** The current state of the Button */
 	unsigned char State;
 	double Clipping;

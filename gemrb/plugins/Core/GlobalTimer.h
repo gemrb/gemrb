@@ -1,8 +1,11 @@
 #ifndef GLOBALTIMER_H
 #define GLOBALTIMER_H
 
+#include <vector>
+
 #include "GameScript.h"
 #include "Actor.h"
+#include "ControlAnimation.h"
 
 #ifdef WIN32
 
@@ -16,6 +19,13 @@
 #define GEM_EXPORT
 #endif
 
+struct AnimationRef
+{
+	ControlAnimation *ctlanim;
+	unsigned long  time;
+};
+
+
 class GEM_EXPORT GlobalTimer {
 private:
 	unsigned long startTime;
@@ -28,6 +38,8 @@ private:
 	unsigned long waitCounter;
 	unsigned long shakeCounter;
 	unsigned long shakeX, shakeY;
+	int first_animation;
+	std::vector<AnimationRef*>  animations;
 public:
 	GlobalTimer(void);
 	~GlobalTimer(void);
@@ -41,6 +53,10 @@ public:
 	void SetCutScene(GameScript* script);
 	void SetScreenShake(unsigned long shakeX, unsigned long shakeY,
 		unsigned long Count);
+	void AddAnimation(ControlAnimation* ctlanim, unsigned long time);
+	void RemoveAnimation(ControlAnimation* ctlanim);
+	void ClearAnimations();
+	void UpdateAnimations();
 public:
 	bool CutSceneMode;
 	Region shakeStartVP;

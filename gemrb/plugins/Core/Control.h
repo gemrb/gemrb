@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.28 2005/03/20 23:36:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.29 2005/03/27 13:27:00 edheldil Exp $
  *
  */
 
@@ -46,6 +46,8 @@
   */
 #include "../../includes/RGBAColor.h"
 
+#include "AnimationMgr.h"
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -59,6 +61,8 @@
 #endif
 
 typedef char EventHandler[64];
+
+class ControlAnimation;
 
 
 class GEM_EXPORT Control {
@@ -78,6 +82,8 @@ public:
 	ieDword Value;
 	/** various flags based on the control type */
 	ieDword Flags;
+	ControlAnimation* animation;
+	Sprite2D* AnimPicture;
 
 public: // Public attributes
 	/** Defines the Control ID Number used for GUI Scripting */
@@ -131,6 +137,8 @@ public: //Events
 	virtual bool IsPixelTransparent(unsigned short /*x*/, unsigned short /*y*/) {
 		return false;
 	}
+	/** Sets the animation picture ref */
+	void SetAnimPicture(Sprite2D* Picture);
 };
 
 #endif

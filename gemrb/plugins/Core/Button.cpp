@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.86 2005/03/20 23:36:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.87 2005/03/27 13:27:00 edheldil Exp $
  *
  */
 
@@ -51,7 +51,6 @@ Button::Button(bool Clear)
 	ToggleState = false;
 	Picture = NULL;
 	Picture2 = NULL;
-	anim = NULL;
 	Clipping = 1.0;
 	memset( borders, 0, sizeof( borders ));
 }
@@ -197,6 +196,15 @@ void Button::Draw(unsigned short x, unsigned short y)
 			core->GetVideoDriver()->BlitSprite( Picture2, x + XPos + xOffs, y + YPos + yOffs + Picture->Height, true, &r );
 		}
 	}
+
+	// Button picture
+	if (AnimPicture) {
+		short xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
+		short yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
+		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
+		core->GetVideoDriver()->BlitSprite( AnimPicture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+	}
+
 
 
 	// Button label
@@ -533,3 +541,4 @@ void Button::SetTextColor(Color fore, Color back)
 
 	Changed = true;
 }
+

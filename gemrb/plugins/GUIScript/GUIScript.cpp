@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.296 2005/03/21 22:43:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.297 2005/03/27 13:27:01 edheldil Exp $
  *
  */
 
@@ -400,8 +400,9 @@ static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_LoadWindowPack__doc,
-"LoadWindowPack(CHUIResRef, [Width, Height])\n\n"
-"Loads a WindowPack into the Window Manager Module." );
+"LoadWindowPack(CHUIResRef, [Width=0, Height=0])\n\n"
+"Loads a WindowPack into the Window Manager Module. "
+"Width and Height set winpack's natural screen size if nonzero." );
 
 static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 {
@@ -500,8 +501,8 @@ static PyObject* GemRB_SetWindowFrame(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LoadWindowFrame__doc,
-"LoadWindowFrame(MOSResRef)\n\n"
-"Sets the Picture of a xxxxxxxxxxxx from a MOS file." );
+"LoadWindowFrame(MOSResRef_Left, MOSResRef_Right, MOSResRef_Top, MOSResRef_Bottom))\n\n"
+"Load the parts of window frame used to decorate windows on higher resolutions." );
 
 static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 {
@@ -2318,6 +2319,45 @@ static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 	Py_INCREF( Py_None );
 	return Py_None;
 }
+
+PyDoc_STRVAR( GemRB_SetAnimation__doc,
+"SetAnimation(WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)\n\n"
+"Sets the Picture of a Button Control from a BAM file. If col1 is >= 0, changes palette picture's palette to one specified by col1. Since it uses 12 colors palette, it has issues in PST." );
+
+static PyObject* GemRB_SetAnimation(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci;
+	char* ResRef;
+
+	if (!PyArg_ParseTuple( args, "iis", &wi, &ci, &ResRef )) {
+		return AttributeError( GemRB_SetAnimation__doc );
+	}
+
+	Control* ctl = GetControl(wi, ci, -1);
+	if (!ctl) {
+		return NULL;
+	}
+
+	if (ResRef[0] == 0) {
+		ctl->SetAnimPicture( NULL );
+		ctl->animation = NULL;
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
+	ControlAnimation* anim = new ControlAnimation( ctl, ResRef );
+	//if (! anim->bam) {
+	//	delete anim;
+	//	return NULL;
+	//}
+
+
+	anim->UpdateAnimation();
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 
 PyDoc_STRVAR( GemRB_PlaySound__doc,
 "PlaySound(SoundResource)\n\n"
@@ -4812,6 +4852,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetButtonMOS, METH_VARARGS),
 	METHOD(SetButtonPLT, METH_VARARGS),
 	METHOD(SetButtonBAM, METH_VARARGS),
+	METHOD(SetAnimation, METH_VARARGS),
 	METHOD(SetLabelUseRGB, METH_VARARGS),
 	METHOD(PlaySound, METH_VARARGS),
 	METHOD(LoadMusicPL, METH_VARARGS),
