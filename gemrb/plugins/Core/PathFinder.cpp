@@ -145,7 +145,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 
 unsigned char PathFinder::GetOrient(short sX, short sY, short dX, short dY)
 {
-	short deltaX = (sX-dX), deltaY = (sY-dY);
+	short deltaX = (dX-sX), deltaY = (dY-sY);
 	if(deltaX > 0) {
 		if(deltaY > 0) {
 			return 6;
