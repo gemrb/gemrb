@@ -144,7 +144,6 @@ AC_SUBST(LIBS)
 AC_CONFIG_FILES([
 Makefile
 gemrb/Makefile 
-gemrb/GemRB/Makefile
 gemrb/Config/Makefile 
 gemrb/includes/Makefile 
 gemrb/override/Makefile
@@ -166,6 +165,7 @@ gemrb/GUIScripts/pst/Makefile
 gemrb/GUIScripts/tob/Makefile
 gemrb/GUIScripts/test1/Makefile
 gemrb/plugins/Makefile 
+gemrb/plugins/Core/Makefile
 gemrb/plugins/2DAImporter/Makefile 
 gemrb/plugins/ACMImporter/Makefile 
 gemrb/plugins/AREImporter/Makefile 
