@@ -272,7 +272,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y
 		else {
 			if(drect.x < clip->x) {
 				t.x = size.x+clip->x-drect.x;
-				t.w = size.w-t.x;
+				t.w = size.w-(clip->x-drect.x);
 			}
 			else {
 				if(drect.x+size.w <= clip->x+clip->w) {
@@ -295,7 +295,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y
 		else {
 			if(drect.y < clip->y) {
 				t.y = size.y+clip->y-drect.y;
-				t.h = size.h-t.y;
+				t.h = size.h-(clip->y-drect.y);
 			}
 			else {
 				if(drect.y+size.h <= clip->y+clip->h) {
