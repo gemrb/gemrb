@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.9 2005/01/09 22:33:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.10 2005/01/11 17:41:52 avenger_teambg Exp $
  *
  */
 
@@ -30,8 +30,9 @@
 #define FX_APPLIED 1
 
 int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx);
-int fx_condition_modifier (Actor* target, Effect* fx);
+int fx_constitution_modifier (Actor* target, Effect* fx);
 int fx_maximum_hp_modifier (Actor* target, Effect* fx);
+int fx_intelligence_modifier (Actor* target, Effect* fx);
 int fx_save_vs_death_modifier (Actor* target, Effect* fx);
 int fx_save_vs_wands_modifier (Actor* target, Effect* fx);
 int fx_save_vs_poly_modifier (Actor* target, Effect* fx);
@@ -54,14 +55,16 @@ static EffectFunction effect_fns[MAX_EFFECTS];
 //   by fx plugins, so it would be easier to add new effects etc.
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectLink effectnames[] = {
-	{ "Stat:ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier },
-	{ "Stat:ConstitutionModifier", fx_condition_modifier },
 	{ "HP:MaximumHPModifier", fx_maximum_hp_modifier },
-	{ "Stat:SaveVsDeathModifier", fx_save_vs_death_modifier },
-	{ "Stat:SaveVsWandsModifier", fx_save_vs_wands_modifier },
-	{ "Stat:SaveVsPolyModifier", fx_save_vs_poly_modifier },
+	{ "Stat:ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier },
+	{ "Stat:ConstitutionModifier", fx_constitution_modifier },
+	{ "Stat:IntelligenceModifier", fx_intelligence_modifier },
 	{ "Stat:SaveVsBreathModifier", fx_save_vs_breath_modifier },
-	{ "Stat:SaveVsSpellModifier", fx_save_vs_spell_modifier },
+	{ "Stat:SaveVsDeathModifier", fx_save_vs_death_modifier },
+	{ "Stat:SaveVsPolyModifier", fx_save_vs_poly_modifier },
+	{ "Stat:SaveVsSpellsModifier", fx_save_vs_spell_modifier },
+	{ "Stat:SaveVsWandsModifier", fx_save_vs_wands_modifier },
+	{ "Stat:StrengthModifier", fx_strength_modifier },
 	{ NULL, NULL },
 };
 
@@ -228,9 +231,9 @@ int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx)
 }
 
 // 0x0A
-int fx_condition_modifier (Actor* target, Effect* fx)
+int fx_constitution_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_condition_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_constitution_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	target->NewStat( IE_CON, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
@@ -268,6 +271,15 @@ int fx_maximum_hp_modifier (Actor* target, Effect* fx)
 		STAT_MUL( IE_MAXHITPOINTS, fx->Parameter1 );
 		break;
 	}
+	return FX_APPLIED;
+}
+
+// 0x13
+int fx_intelligence_modifier (Actor* target, Effect* fx)
+{
+	printf( "fx_intelligence_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_INT, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
