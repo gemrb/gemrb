@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.81 2004/04/10 17:46:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.82 2004/04/13 18:37:05 doc_wagon Exp $
  *
  */
 
@@ -1015,7 +1015,7 @@ bool PathFinder::IsVisible(short sX, short sY, short dX, short dY)
 	int diffy = sY - dY;
 	if (abs( diffx ) >= abs( diffy )) {
 		//vertical
-		double elevationy = fabs( diffx ) / diffy;
+		double elevationy = fabs((double)diffx ) / diffy;
 		if (sX > dX) {
 			for (int startx = sX; startx > dX; startx--) {
 				if (Passable[sMap->GetPixelIndex( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) )] & 4)
@@ -1028,7 +1028,7 @@ bool PathFinder::IsVisible(short sX, short sY, short dX, short dY)
 			}
 		}
 	} else {
-		double elevationx = fabs( diffy ) / diffx;
+		double elevationx = fabs((double)diffy ) / diffx;
 		if (sY > dY) {
 			for (int starty = sY; starty > dY; starty--) {
 				if (Passable[sMap->GetPixelIndex( sX - ( int ) ( ( sY - starty ) / elevationx ), starty )] & 4)
