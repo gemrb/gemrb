@@ -1,2 +1,2 @@
-bg1override_DATA = avatars.2da fonts.2da music.2da
+bg1override_DATA = *.2da *.bmp
 bg1overridedir = $(datadir)/override/bg1/

@@ -1,2 +1,2 @@
-pstoverride_DATA = fonts.2da mpal256.bmp
+pstoverride_DATA = *.2da *.bmp
 pstoverridedir = $(datadir)/override/pst/
