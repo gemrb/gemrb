@@ -105,7 +105,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			pal = lineselpal;
 		else
   			pal = palette;
-  		ftext->Print(Region(x+XPos, y+YPos+(yl*ftext->chars[1]->Height), Width, Height-(yl*ftext->chars[1]->Height)), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true);
+  		ftext->Print(Region(x+XPos, y+YPos+(yl*ftext->size[1].h/*chars[1]->Height*/), Width, Height-(yl*ftext->size[1].h/*chars[1]->Height*/)), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true);
 		yl+=lrows[i];
   	}
 	}
@@ -241,7 +241,7 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 {
 	if(!Selectable)
 		return;
-	int height = ftext->chars[1]->Height;
+	int height = ftext->size[1].h;//ftext->chars[1]->Height;
 	int r = y/height;
 	int row = 0;
 	((Window*)Owner)->Invalidate();
