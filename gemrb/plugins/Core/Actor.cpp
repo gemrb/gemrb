@@ -16,7 +16,7 @@ Actor::Actor(void)
         ScriptName[0] = 0;
         Icon[0] = 0;
 
-	anims = new CharAnimations();
+	//anims = new CharAnimations();
 	LongName = NULL;
 	ShortName = NULL;
 }
