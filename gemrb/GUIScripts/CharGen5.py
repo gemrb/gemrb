@@ -7,7 +7,7 @@ TextAreaControl = 0
 def OnLoad():
 	global CharGenWindow, TextAreaControl
 
-	GemRB.SetVar("Alignment",0) #alignment
+	GemRB.SetVar("Abilities",0) #abilities
 
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)
@@ -19,6 +19,7 @@ def OnLoad():
 
 	RaceTable = GemRB.LoadTable("races")
 	ClassTable = GemRB.LoadTable("classes")
+	AlignmentTable = GemRB.LoadTable("aligns")
 
 	GenderButton = GemRB.GetControl(CharGenWindow,0)
 	GemRB.SetText(CharGenWindow,GenderButton,11956)
@@ -34,11 +35,11 @@ def OnLoad():
 
 	AlignmentButton = GemRB.GetControl(CharGenWindow,3)
 	GemRB.SetText(CharGenWindow,AlignmentButton, 11958)
-	GemRB.SetButtonState(CharGenWindow,AlignmentButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(CharGenWindow,AlignmentButton,IE_GUI_BUTTON_DISABLED)
 
 	AbilitiesButton = GemRB.GetControl(CharGenWindow,4)
 	GemRB.SetText(CharGenWindow,AbilitiesButton, 11960)
-	GemRB.SetButtonState(CharGenWindow,AbilitiesButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(CharGenWindow,AbilitiesButton,IE_GUI_BUTTON_ENABLED)
 
 	SkillButton = GemRB.GetControl(CharGenWindow,5)
 	GemRB.SetText(CharGenWindow,SkillButton, 17372)
@@ -87,13 +88,13 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,2))
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
-        GemRB.SetEvent(CharGenWindow, AlignmentButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+        GemRB.SetEvent(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 	GemRB.ShowModal(CharGenWindow)
 	return
 	
 def NextPress():
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("GUICG3") #alignment
+	GemRB.SetNextScript("GUICG4") #abilities
 	return
 
 def CancelPress():
@@ -103,6 +104,6 @@ def CancelPress():
 
 def BackPress():
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("CharGen3") #appearance
+	GemRB.SetNextScript("CharGen4") #alignment
 	return
 
