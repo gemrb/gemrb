@@ -81,29 +81,39 @@ static PyObject * GemRB_GetControl(PyObject *self, PyObject *args)
 
 static PyObject * GemRB_SetText(PyObject *self, PyObject *args)
 {
+	PyObject *wi, *ci, *str;
 	int WindowIndex, ControlIndex, StrRef;
 	char * string;
 	int ret;
 
-	if(!PyArg_ParseTuple(args, "iis", &WindowIndex, &ControlIndex, &string)) {
-		if(!PyArg_ParseTuple(args, "iii", &WindowIndex, &ControlIndex, &StrRef)) {
+	if(PyArg_UnpackTuple(args, "ref", 3, 3, &wi, &ci, &str)) {
+		if(!PyObject_TypeCheck(wi, &PyInt_Type) && !PyObject_TypeCheck(ci, &PyInt_Type) && !PyObject_TypeCheck(str, &PyString_Type) && !PyObject_TypeCheck(str, &PyInt_Type)) {
 			printMessage("GUIScript", "Syntax Error: SetText(unsigned short WindowIndex, unsigned short ControlIndex, char * string)\n", LIGHT_RED);
 			return NULL;
 		}
-		char * str = core->GetString(StrRef);
-		ret = core->SetText(WindowIndex, ControlIndex, str);
-		if(ret == -1) {
-			free(str);
-			return NULL;
+		WindowIndex = PyInt_AsLong(wi);
+		ControlIndex = PyInt_AsLong(ci);
+		if(PyObject_TypeCheck(str, &PyString_Type)) {
+			string = PyString_AsString(str);
+			if(string == NULL)
+				return NULL;
+			ret = core->SetText(WindowIndex, ControlIndex, string);
+			if(ret == -1)
+				return NULL;
 		}
-		free(str);
-
+		else {
+			StrRef = PyInt_AsLong(str);
+			char * str = core->GetString(StrRef);
+			ret = core->SetText(WindowIndex, ControlIndex, str);
+			if(ret == -1) {
+				free(str);
+				return NULL;
+			}
+			free(str);
+		}
 	}
-	else {
-		ret = core->SetText(WindowIndex, ControlIndex, string);
-		if(ret == -1)
-			return NULL;
-	}
+	else
+		return NULL;
 	
 	return Py_BuildValue("i", ret);
 }
@@ -270,6 +280,23 @@ static PyObject * GemRB_SetButtonFlags(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_PlaySound(PyObject *self, PyObject *args)
+{
+	char* ResRef;
+
+	if(!PyArg_ParseTuple(args, "s", &ResRef)) {
+		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	int ret = core->GetSoundMgr()->Play(ResRef);
+	if(!ret)
+		return NULL;
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
     {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
@@ -307,6 +334,9 @@ static PyMethodDef GemRBMethods[] = {
 	{"SetButtonFlags", GemRB_SetButtonFlags, METH_VARARGS,
      "Sets the Display Flags of a Button."},
 
+	{"PlaySound", GemRB_PlaySound, METH_VARARGS,
+     "Plays a Sound."},
+
     {NULL, NULL, 0, NULL}
 };
 
@@ -324,12 +354,6 @@ GUIScript::GUIScript(void)
 
 GUIScript::~GUIScript(void)
 {
-	if(pDict != NULL)
-		Py_DECREF(pDict);
-	if(pModule != NULL)
-		Py_DECREF(pModule);
-	if(pName != NULL)
-		Py_DECREF(pName);
 	if(Py_IsInitialized())
 		Py_Finalize();
 }
@@ -378,11 +402,11 @@ bool GUIScript::Init(void)
 		PyErr_Print();
 		return false;
 	}
-	if(PyRun_SimpleString("global IE_BUTTON_ON_PRESS")==-1) {
+	if(PyRun_SimpleString("IE_BUTTON_ON_PRESS=0x00000000") == -1) {
 		PyErr_Print();
 		return false;
 	}
-	if(PyRun_SimpleString("IE_BUTTON_ON_PRESS=0x00000000") == -1) {
+	if(PyRun_SimpleString("global IE_BUTTON_ON_PRESS")==-1) {
 		PyErr_Print();
 		return false;
 	}
@@ -393,18 +417,11 @@ bool GUIScript::LoadScript(const char * filename)
 {  
 	if(!Py_IsInitialized())
 		return false;
-	//if(pDict != NULL)
-	//	Py_DECREF(pDict);
-	//if(pModule != NULL)
-	//	Py_DECREF(pModule);
-	//if(pName != NULL)
-	//	Py_DECREF(pName);
 	printMessage("GUIScript", "Loading Script ", WHITE);
 	printf("%s...", filename);
 	
 	char path[_MAX_PATH];
 	strcpy(path, filename);
-	//strcat(path, filename);
 
     pName = PyString_FromString(filename);
     /* Error checking of pName left out */
