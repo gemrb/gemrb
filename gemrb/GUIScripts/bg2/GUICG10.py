@@ -10,7 +10,7 @@ def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton
 	global ClassTable
 	
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 640, 480)
 	ClassTable = GemRB.LoadTable("classes")
 	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
 	ClassWindow = GemRB.LoadWindow(10)

@@ -13,7 +13,7 @@ def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
 	global KitList, ClassList, SchoolList, ClassID
 	
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 640, 480)
 	TmpTable = GemRB.LoadTable("races")
 	RaceName = GemRB.GetTableRowName(TmpTable, GemRB.GetVar("Race")-1 )
 	TmpTable = GemRB.LoadTable("classes")
