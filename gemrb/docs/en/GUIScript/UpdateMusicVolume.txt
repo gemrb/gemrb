@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.UpdateMusicVolume()
 
-Description:
+Description: Updates music volume on-the-fly.
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: N/A
 
-See also:
+See also: UpdateAmbientsVolume
 

@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.GetPlayerStat(Slot, ID)
 
-Description:
+Description: Queries a stat of the player character. The stats are listed in ie_stats.py.
 
-Parameters:
+Parameters: Slot  - actor index in game structure
+            ID    - Stat index
 
-Return value:
+Return value: numeric
 
-See also:
+See also: SetPlayerStat, GetPlayerName
 

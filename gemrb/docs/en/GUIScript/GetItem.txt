@@ -1,11 +1,19 @@
 
-Prototype:
+Prototype: GemRB.GetItem(ResRef)
 
-Description:
+Description: Returns dictionary with the specified item's data.
 
-Parameters:
+Parameters: ResRef - the resource reference of the item
 
-Return value:
+Return value: dictionary
+The fields of the dictionary are the following:
+"ItemName"           - strref of unidentified name.
+"ItemNameIdentified" - strref of identified name.
+"ItemDesc"           - strref of unidentified description.
+"ItemDescIdentified" - strref of identified description.
+"ItemIcon"           - the item's icon (.bam resref)
+"StackAmount"        - maximum stackable amount
+"Dialog"             - item dialog (.dlg resref)
 
-See also:
+See also: GetSpell, SetItemIcon
 

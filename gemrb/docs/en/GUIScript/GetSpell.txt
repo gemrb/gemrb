@@ -1,11 +1,16 @@
 
-Prototype:
+Prototype: GemRB.GetSpell(ResRef)
 
-Description:
+Description: Returns dictionary with the specified spell's data.
 
-Parameters:
+Parameters: ResRef - the resource reference of the spell.
 
-Return value:
+Return value: dictionary
+The fields of the dictionary are the following:
+"SpellName"           - strref of unidentified name.
+"SpellDesc"           - strref of unidentified description.
+"SpellbookIcon"       - the spell's icon (.bam resref)
 
-See also:
+
+See also: GetItem, SetSpellIcon
 
