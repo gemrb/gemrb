@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.29 2003/11/26 16:38:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.30 2003/11/26 20:23:13 balrog994 Exp $
  *
  */
 
@@ -636,6 +636,56 @@ void SDLVideoDriver::SetPixel(unsigned short x, unsigned short y, Color &color)
 	*pixels++ = color.r;
 	*pixels++ = color.a;
 }
+void SDLVideoDriver::DrawLine(unsigned short x1, unsigned short y1, unsigned short x2, unsigned short y2, Color &color)
+{
+	x1 -= Viewport.x;
+	x2 -= Viewport.x;
+	y1 -= Viewport.y;
+	y2 -= Viewport.y;
+	bool yLonger=false;
+	int shortLen=y2-y1;
+	int longLen=x2-x1;
+	if (abs(shortLen)>abs(longLen)) {
+		int swap=shortLen;
+		shortLen=longLen;
+		longLen=swap;				
+		yLonger=true;
+	}
+	int decInc;
+	if (longLen==0) decInc=0;
+	else decInc = (shortLen << 16) / longLen;
+
+	if (yLonger) {
+		if (longLen>0) {
+			longLen+=y1;
+			for (int j=0x8000+(x1<<16);y1<=longLen;++y1) {
+				SetPixel(j >> 16,y1,color);	
+				j+=decInc;
+			}
+			return;
+		}
+		longLen+=y1;
+		for (int j=0x8000+(x1<<16);y1>=longLen;--y1) {
+			SetPixel(j >> 16,y1,color);	
+			j-=decInc;
+		}
+		return;	
+	}
+
+	if (longLen>0) {
+		longLen+=x1;
+		for (int j=0x8000+(y1<<16);x1<=longLen;++x1) {
+			SetPixel(x1,j >> 16, color);
+			j+=decInc;
+		}
+		return;
+	}
+	longLen+=x1;
+	for (int j=0x8000+(y1<<16);x1>=longLen;--x1) {
+		SetPixel(x1,j >> 16,color);
+		j-=decInc;
+	}
+}
 /** This functions Draws a Circle */
 void SDLVideoDriver::DrawCircle(unsigned short cx, unsigned short cy, unsigned short r, Color &color)
 {
@@ -734,6 +784,16 @@ void SDLVideoDriver::DrawEllipse(unsigned short cx, unsigned short cy, unsigned 
 	}
 	if(SDL_MUSTLOCK(disp))
 		SDL_UnlockSurface(disp);
+}
+void SDLVideoDriver::DrawPolyline(unsigned short *x, unsigned short *y, int count, Color &color, bool fill)
+{
+	unsigned short lastX = x[0], lastY = y[0];
+	for(int i = 1; i < count; i++) {
+		DrawLine(lastX, lastY, x[i], y[i], color);
+		lastX = x[i];
+		lastY = y[i];
+	}
+	DrawLine(lastX, lastY, x[0], y[0], color);
 }
 /** Creates a Palette from Color */
 Color * SDLVideoDriver::CreatePalette(Color color, Color back)
