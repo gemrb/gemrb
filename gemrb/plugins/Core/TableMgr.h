@@ -47,7 +47,7 @@ public:
   virtual int GetColumnCount() = 0;
   /** Returns a pointer to a zero terminated 2da element,
       0,0 returns the default value, it may return NULL */
-  virtual char *QueryField(int row = 0, int column = 0) const = 0;
+  virtual char *QueryField(unsigned int row = 0,unsigned int column = 0) const = 0;
   /** Returns a pointer to a zero terminated 2da element,
       uses column name and row name to search the field,
 	  may return NULL */
@@ -56,7 +56,7 @@ public:
   virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
   /** Returns a Row Name, returns NULL on error */
   virtual inline int GetRowIndex(const char *rowname) const = 0;
-  virtual inline char *GetRowName(int index) const = 0;
+  virtual inline char *GetRowName(unsigned int index) const = 0;
 };
 
 #endif
