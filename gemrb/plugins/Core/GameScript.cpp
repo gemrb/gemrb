@@ -15,12 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.19 2003/12/22 23:33:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.20 2003/12/23 23:32:23 balrog994 Exp $
  *
  */
 
 #include "GameScript.h"
 #include "Interface.h"
+#include "DialogMgr.h"
 
 extern Interface * core;
 int initialized = 0;
@@ -64,6 +65,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		triggers[0x36] = OnCreation;
 
 		actions[7] = CreateCreature;
+		actions[8] = Dialogue;
 		actions[10] = Enemy;
 		actions[22] = MoveToObject;
 		blocking[22] = true;
@@ -507,7 +509,7 @@ Scriptable * GameScript::GetActorFromObject(GameScript * Sender, Object * oC)
 	else {
 		if(oC->eaField != 0) {
 			switch(oC->eaField) {
-				case 2:
+				case 21:
 					return core->GetGame()->GetPC(0);
 				break;
 			}
@@ -1478,4 +1480,26 @@ void GameScript::HideGUI(GameScript * Sender, Action * parameters)
 	GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
 	if(gc->ControlType == IE_GUI_GAMECONTROL)
 		gc->HideGUI();
+}
+
+void GameScript::Dialogue(GameScript * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!tar)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	Actor * target = (Actor*)tar;
+	if(actor->Dialog[0] != 0) {
+		DialogMgr * dm = (DialogMgr*)core->GetInterface(IE_DLG_CLASS_ID);
+		dm->Open(core->GetResourceMgr()->GetResource(actor->Dialog, IE_DLG_CLASS_ID), true);
+		GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
+		if(gc->ControlType == IE_GUI_GAMECONTROL)
+			gc->InitDialog(actor, target, dm->GetDialog());
+		core->FreeInterface(dm);
+	}
 }
