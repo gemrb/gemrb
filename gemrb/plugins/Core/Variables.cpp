@@ -29,10 +29,10 @@ inline unsigned int Variables::MyHashKey(const char * key) const
 //sets the way we handle keys, no parsing for .ini file entries, parsing for game variables
 //you should set this only on an empty mapping
 inline int Variables::ParseKey(int arg)
-	{
-		MYASSERT(m_nCount==0);
-		m_lParseKey=arg;
-	}
+{
+	MYASSERT(m_nCount==0);
+	m_lParseKey=arg;
+}
 inline int Variables::GetCount() const
 	{ return m_nCount; }
 inline bool Variables::IsEmpty() const
@@ -161,7 +161,6 @@ Variables::NewAssoc(const char *key)
 		}
 	}
 	MYASSERT(m_pFreeList != NULL);  // we must have something
-
 	Variables::MyAssoc* pAssoc = m_pFreeList;
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
@@ -169,8 +168,10 @@ Variables::NewAssoc(const char *key)
 	if(m_lParseKey) MyCopyKey(pAssoc->key,key);
 	else
 	{
-		pAssoc->key=new char[strnlen(key,MAX_VARIABLE_LENGTH)];
-		if(pAssoc->key) strncpy(pAssoc->key,key,MAX_VARIABLE_LENGTH);
+		int len;
+		len=strnlen(key,MAX_VARIABLE_LENGTH);
+		pAssoc->key=new char[len+1];
+		if(pAssoc->key) strncpy(pAssoc->key,key,len);
 	}
 	pAssoc->nValue=0xcccccccc;  //invalid value
 	pAssoc->nHashValue=0xcccccccc; //invalid value
@@ -232,7 +233,7 @@ void Variables::SetAt(const char *key, unsigned long value)
 
 		// it doesn't exist, add a new Association
 		pAssoc = NewAssoc(key);
-
+return;
 		// put into hash table
 		pAssoc->pNext = m_pHashTable[nHash];
 		m_pHashTable[nHash] = pAssoc;
