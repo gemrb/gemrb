@@ -1266,6 +1266,19 @@ void GameControl::DialogChoose(unsigned int choose)
 
 				DialogTransition* tr = ds->transitions[choose];
 
+				if(tr->Flags&IE_DLG_TR_JOURNAL) {
+					int Section = 0;
+					if(tr->Flags&IE_DLG_UNSOLVED) {
+						Section |= 1;
+					}
+					if(tr->Flags&IE_DLG_SOLVED) {
+						Section |= 2;
+					}
+					core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16);
+//					your journal has changed...
+//					JournalChanged = true;
+				}
+
 				ta->PopLines( ds->transitionsCount + 1 );
 				AddTalk( ta, target, "A0A0FF",
 					core->GetString( tr->textStrRef ), "8080FF" );

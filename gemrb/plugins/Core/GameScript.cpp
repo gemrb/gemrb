@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.128 2004/04/05 22:20:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.129 2004/04/06 17:55:18 avenger_teambg Exp $
  *
  */
 
@@ -230,7 +230,9 @@ static ActionLink actionnames[] = {
 	{"displaystringnonamehead",GameScript::DisplayStringNoNameHead,0},
 	{"displaystringwait",GameScript::DisplayStringWait,AF_BLOCKING},
 	{"endcutscenemode",GameScript::EndCutSceneMode,0},
-	{"enemy",GameScript::Enemy,0}, {"face",GameScript::Face,AF_BLOCKING},
+	{"enemy",GameScript::Enemy,0},
+	{"erasejournalentry",GameScript::RemoveJournalEntry,0},
+	{"face",GameScript::Face,AF_BLOCKING},
 	{"faceobject",GameScript::FaceObject, AF_BLOCKING},
 	{"fadefromblack",GameScript::FadeFromColor,0}, //probably the same
 	{"fadefromcolor",GameScript::FadeFromColor,0},
@@ -274,6 +276,7 @@ static ActionLink actionnames[] = {
 	{"incrementproficiency",GameScript::IncrementProficiency,0},
 	{"interact",GameScript::Interact,0},
 	{"joinparty",GameScript::JoinParty,0},
+	{"addjournalentry",GameScript::AddJournalEntry,0},
 	{"jumptoobject",GameScript::JumpToObject,0},
 	{"jumptopoint",GameScript::JumpToPoint,0},
 	{"jumptopointinstant",GameScript::JumpToPointInstant,0},
@@ -312,9 +315,11 @@ static ActionLink actionnames[] = {
 	{"setfaction",GameScript::SetFaction,0},
 	{"sethp",GameScript::SetHP,0},
 	{"setmoraleai",GameScript::SetMoraleAI,0},
+	{"setquestdone",GameScript::SetQuestDone,0},
 	{"setteam",GameScript::SetTeam,0},
 	{"settextcolor",GameScript::SetTextColor,0},
 	{"setvisualrange",GameScript::SetVisualRange,0},
+	{"removejournalentry",GameScript::RemoveJournalEntry,0},
 	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt",GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint",GameScript::RunAwayFromPoint,AF_BLOCKING},
@@ -5493,10 +5498,11 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* parameters)
 	//just a hack
 	Game* game = core->GetGame();
 
-	for (int i = 0; i < game->PartySize; i++) {
+	for (int i = 0; i < game->GetPartySize(0); i++) {
 		Actor* act = game->GetPC( i );
-		if (act)
+		if (act) {
 			act->ClearActions();
+		}
 	}
 }
 
@@ -5671,3 +5677,22 @@ void GameScript::IncrementExtraProficiency(Scriptable* Sender, Action* parameter
 	Actor* target = ( Actor* ) tar;
 	target->NewStat(IE_EXTRAPROFICIENCY1, parameters->int0Parameter,MOD_ADDITIVE);
 }
+
+//the third parameter is a GemRB extension
+void GameScript::AddJournalEntry(Scriptable* Sender, Action* parameters)
+{
+	core->GetGame()->AddJournalEntry(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
+}
+
+void GameScript::SetQuestDone(Scriptable* Sender, Action* parameters)
+{
+	core->GetGame()->DeleteJournalEntry(parameters->int0Parameter);
+	core->GetGame()->AddJournalEntry(parameters->int0Parameter, IE_GAM_QUEST_DONE, parameters->int2Parameter);
+
+}
+
+void GameScript::RemoveJournalEntry(Scriptable* Sender, Action* parameters)
+{
+	core->GetGame()->DeleteJournalEntry(parameters->int0Parameter);
+}
+

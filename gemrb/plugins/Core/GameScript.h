@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.91 2004/04/05 22:20:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.92 2004/04/06 17:55:19 avenger_teambg Exp $
  *
  */
 
@@ -857,6 +857,7 @@ public:
 	static void AddExperienceParty(Scriptable *Sender, Action* parameters);
 	static void AddExperiencePartyGlobal(Scriptable *Sender, Action* parameters);
 	static void AddGlobals(Scriptable* Sender, Action* parameters);
+	static void AddJournalEntry(Scriptable* Sender, Action* parameters);
 	static void AddWayPoint(Scriptable* Sender, Action* parameters);
 	static void AddXP2DA(Scriptable *Sender, Action* parameters);
 	static void AddXPObject(Scriptable *Sender, Action* parameters);
@@ -968,12 +969,14 @@ public:
 	static void SetFaction(Scriptable* Sender, Action* parameters);
 	static void SetHP(Scriptable* Sender, Action* parameters);
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
+	static void SetQuestDone(Scriptable* Sender, Action* parameters);
 	static void SetTeam(Scriptable* Sender, Action* parameters);
 	static void SetTextColor(Scriptable* Sender, Action* parameters);
 	static void SetVisualRange(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaFlag(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaType(Scriptable* Sender, Action* parameters);
+	static void RemoveJournalEntry(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
 	static void SaveObjectLocation(Scriptable* Sender, Action* parameters);

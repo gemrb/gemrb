@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.8 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.9 2004/04/06 17:55:17 avenger_teambg Exp $
  *
  */
 
@@ -41,6 +41,9 @@
 #define IE_DLG_TR_ACTION   0x04
 #define IE_DLG_TR_FINAL    0x08
 #define IE_DLG_TR_JOURNAL  0x10
+#define IE_DLG_UNSOLVED    0x40
+#define IE_DLG_SOLVED      0x100
+#define IE_DLG_QUEST_GROUP 0x4000 // this is a GemRB extension
 
 typedef struct DialogString {
 	char** strings;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.22 2004/03/22 18:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.23 2004/04/06 17:55:18 avenger_teambg Exp $
  *
  */
 
@@ -62,14 +62,18 @@ typedef struct PCStruct {
 	unsigned char UnknownBA[6];
 } PCStruct;
 
+#define IE_GAM_JOURNAL 0
+#define IE_GAM_QUEST_UNSOLVED 1
+#define IE_GAM_QUEST_DONE  2
+#define IE_GAM_JOURNAL_USER 3
 
 typedef struct GAMJournalEntry {
 	ieStrRef Text;
-	ieDword Time; // in seconds
+	ieDword GameTime; // in game time seconds
 	ieByte Chapter;
 	ieByte unknown09;
 	ieByte Section;
-	ieByte unknown0B;
+	ieByte Group;   // this is a GemRB extension
 } GAMJournalEntry;
 
 
@@ -86,7 +90,6 @@ public:
 	Variables* globals;
 	ieByte* familiars;
 	int MapIndex;
-	int PartySize;
 public:
 	unsigned int GameTime;
 	unsigned short WhichFormation;
@@ -143,9 +146,16 @@ public:
 	int DelMap(unsigned int index, bool autoFree = false);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index);
+	/** adds a journal entry from dialog data */
+	/** time and chapter are calculated on the fly */
+	void AddJournalEntry(ieStrRef strref, int section, int group);
+	/** adds a journal entry while loading the .gam structure */
 	void AddJournalEntry(GAMJournalEntry* entry);
 	int GetJournalCount();
 	GAMJournalEntry* GetJournalEntry(unsigned int Index);
+	void DeleteJournalGroup(ieByte Group);
+	void DeleteJournalEntry(ieStrRef strref);
+
 	bool IsBeastKnown(unsigned int Index) {
 		return familiars[Index] != 0;
 	}

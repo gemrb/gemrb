@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.26 2004/03/23 19:33:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.27 2004/04/06 17:55:17 avenger_teambg Exp $
  *
  */
 
@@ -30,7 +30,6 @@ extern Interface* core;
 Game::Game(void)
 	: Scriptable( ST_GLOBAL )
 {
-//	PartySize = 6;    //this isn't required anymore
 	PartyGold = 0;
 	SetScript( core->GlobalScript, 0 );
 	MapIndex = -1;
@@ -270,6 +269,37 @@ Actor* Game::GetNPC(unsigned int Index)
 		return NULL;
 	}
 	return NPCs[Index];
+}
+
+void Game::DeleteJournalEntry(ieStrRef strref)
+{
+	for (size_t i=Journals.size();i;i--) {
+		if (Journals[i]->Text==strref) {
+			Journals.erase(Journals.begin()+i);
+		}
+	}
+}
+
+void Game::DeleteJournalGroup(ieByte Group)
+{
+	for (size_t i=Journals.size();i;i--) {
+		if (Journals[i]->Group==Group) {
+			Journals.erase(Journals.begin()+i);
+		}
+	}
+}
+
+void Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
+{
+	GAMJournalEntry *je = new GAMJournalEntry;
+	je->GameTime = GameTime;
+	unsigned long chapter = 0;
+	globals->Lookup("CHAPTER", chapter);
+	je->Chapter = (ieByte) chapter;
+	je->Section = Section;
+	je->Group = Group;
+	je->Text = strref;
+	Journals.push_back( je );
 }
 
 void Game::AddJournalEntry(GAMJournalEntry* entry)
