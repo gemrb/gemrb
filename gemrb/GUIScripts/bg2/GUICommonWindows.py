@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.10 2004/10/10 15:23:26 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.11 2004/10/17 20:15:00 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -141,10 +141,10 @@ def GetActorClassTitle (actor):
 	KitTable = GemRB.LoadTable ("kitlist")
 
 	if ClassTitle==0:
-	        if KitIndex == 0:
-	                ClassTitle=GemRB.GetTableValue(ClassTable, Class, 2)
-	        else:
-	                ClassTitle=GemRB.GetTableValue(KitTable, KitIndex, 2)
+		if KitIndex == 0:
+			ClassTitle=GemRB.GetTableValue(ClassTable, Class, 2)
+		else:
+			ClassTitle=GemRB.GetTableValue(KitTable, KitIndex, 2)
 
 	GemRB.UnloadTable (ClassTable)
 	GemRB.UnloadTable (KitTable)
@@ -181,9 +181,16 @@ def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
 
-def PopulatePortraitWindow (Window):
+def OpenPortraitWindow ():
 	global PortraitWindow
-	PortraitWindow = Window
+
+	PortraitWindow = Window = GemRB.LoadWindow(1)
+	GemRB.SetVar ("PortraitWindow", PortraitWindow)
+	GemRB.SetVar ("PortraitPosition", 2)    # Right
+
+	Button=GemRB.GetControl(PortraitWindow, 8)
+	GemRB.SetEvent(PortraitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
+
 	# AI
 	Button = GemRB.GetControl (Window, 6)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
@@ -193,25 +200,38 @@ def PopulatePortraitWindow (Window):
 	Button = GemRB.GetControl (Window, 7)
 	GemRB.SetTooltip (Window, Button, 10485)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
-	for i in range (0,6):
+	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetVarAssoc (Window, Button, "SelectedSingle", i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 
-		pic = GemRB.GetPlayerPortrait (i+1,1)
-		GemRB.SetButtonPicture(Window, Button, pic)
-		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_PICTURE, OP_SET)
+		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_PICTURE, OP_SET)
 
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1,
 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
 		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)
-                GemRB.SetButtonFont (Window, Button, 'FLOATTXT')
-                hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
-                hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
+		GemRB.SetButtonFont (Window, Button, 'TOOLFONT')
 
-                GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
-                GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
+	UpdatePortraitWindow ()
+	return
+
+def UpdatePortraitWindow ():
+	Window = PortraitWindow
+
+	for i in range (PARTY_SIZE):
+		Button = GemRB.GetControl (Window, i)
+		pic = GemRB.GetPlayerPortrait (i+1,1)
+		if not pic:
+			#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			continue
+
+		GemRB.SetButtonPicture(Window, Button, pic)
+		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
+		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
+
+		GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
+		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
 
 	return
 
@@ -266,37 +286,37 @@ def GetSavingThrow (SaveName, row, level):
 	return tmp
 
 def SetupSavingThrows (pc):
-        level1 = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
-        if level1 > 20:
-                level1 = 20
-        level2 = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
-        if level2 > 20:
-                level2 = 20
-        Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-        ClassTable = GemRB.LoadTable ("classes")
-        Class = GemRB.FindTableValue (ClassTable, 5, Class)
-        Multi = GemRB.GetTableValue (ClassTable, 4, Class)
-        if Multi:
-                if Class == 7:
-                        #fighter/mage
-                        Class = GemRB.FindTableValue (ClassTable, 5, 1)
-                else:
-                        #fighter/thief
-                        Class = GemRB.FindTableValue (ClassTable, 5, 4)
-                SaveName2 = GemRB.GetTableValue (ClassTable, Class, 3)
-                Class = 0  #fighter
-                print "SaveName2", SaveName2
+	level1 = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
+	if level1 > 20:
+		level1 = 20
+	level2 = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
+	if level2 > 20:
+		level2 = 20
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	Class = GemRB.FindTableValue (ClassTable, 5, Class)
+	Multi = GemRB.GetTableValue (ClassTable, 4, Class)
+	if Multi:
+		if Class == 7:
+			#fighter/mage
+			Class = GemRB.FindTableValue (ClassTable, 5, 1)
+		else:
+			#fighter/thief
+			Class = GemRB.FindTableValue (ClassTable, 5, 4)
+		SaveName2 = GemRB.GetTableValue (ClassTable, Class, 3)
+		Class = 0  #fighter
+		print "SaveName2", SaveName2
 
-        SaveName1 = GemRB.GetTableValue (ClassTable, Class, 3)
-        print "SaveName1", SaveName1
+	SaveName1 = GemRB.GetTableValue (ClassTable, Class, 3)
+	print "SaveName1", SaveName1
 
-        for row in range(5):
-                tmp1 = GetSavingThrow (SaveName1, row, level1)
-                if Multi:
-                        tmp2 = GetSavingThrow (SaveName2, row, level2)
-                        if tmp2<tmp1:
-                                tmp1=tmp2
-                GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
-                print "Savingthrow:", tmp1
-        return
+	for row in range(5):
+		tmp1 = GetSavingThrow (SaveName1, row, level1)
+		if Multi:
+			tmp2 = GetSavingThrow (SaveName2, row, level2)
+			if tmp2<tmp1:
+				tmp1=tmp2
+		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
+		print "Savingthrow:", tmp1
+	return
 
