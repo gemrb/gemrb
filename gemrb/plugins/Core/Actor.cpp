@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.13 2003/11/26 01:15:52 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.14 2003/11/27 22:18:52 balrog994 Exp $
  *
  */
 
@@ -149,7 +149,7 @@ CharAnimations *Actor::GetAnims()
 long Actor::GetStat(unsigned int StatIndex)
 {
         if(StatIndex >= MAX_STATS)
-                return 0xdadadadada;
+                return 0xdadadada;
         return Modified[StatIndex];
 }
 bool  Actor::SetStat(unsigned int StatIndex, long Value)
@@ -162,7 +162,7 @@ bool  Actor::SetStat(unsigned int StatIndex, long Value)
 long Actor::GetMod(unsigned int StatIndex)
 {
         if(StatIndex >= MAX_STATS)
-                return 0xdadadadada;
+                return 0xdadadada;
         return Modified[StatIndex]-BaseStats[StatIndex];
 }
 /** Returns a Stat Base Value */
