@@ -15,9 +15,27 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.9 2003/11/25 18:56:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.10 2003/11/25 19:28:27 balrog994 Exp $
  *
  */
+
+#define INANIMATE		1
+#define PC				2
+#define FAMILIAR		3
+#define ALLY			4
+#define CONTROLLED		5
+#define CHARMED			6
+#define GOODBUTRED		28
+#define GOODBUTBLUE		29
+#define GOODCUTOFF		30
+#define NOTGOOD			31
+#define ANYTHING		126
+#define NEUTRAL			128
+#define NOTEVIL			199
+#define EVILCUTOFF		200
+#define EVILBUTGREEN	201
+#define EVILBUTBLUE		202
+#define ENEMY			255
 
 #include "../../includes/win32def.h"
 #include "Map.h"
@@ -49,6 +67,7 @@ void Map::AddTileMap(TileMap *tm)
 Color green = {0x00, 0xff, 0x00, 0xff};
 Color red   = {0xff, 0x00, 0x00, 0xff};
 Color yellow= {0xff, 0xff, 0x00, 0xff};
+Color cyan  = {0x00, 0xff, 0xff, 0xff};
 void Map::DrawMap(Region viewport)
 {	
 	if(tm)
@@ -65,7 +84,35 @@ void Map::DrawMap(Region viewport)
 		Animation * anim = ca->GetAnimation(actors[i].AnimID, actors[i].Orientation);
 		if((ca->CircleSize != 0) && ca->DrawCircle) {
 			Region vp = video->GetViewport();
-			video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ca->CircleSize*5, yellow);
+			switch(actors[i].actor->BaseStats[IE_EA])
+			{
+			case EVILCUTOFF:
+			case GOODCUTOFF:
+			break;
+
+			case PC:
+			case FAMILIAR:
+			case ALLY:
+			case CONTROLLED:
+			case CHARMED:
+			case EVILBUTGREEN:
+				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ca->CircleSize*5, green);
+			break;
+
+			case ENEMY:
+			case GOODBUTRED:
+				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ca->CircleSize*5, red);
+			break;
+
+			case NEUTRAL:
+				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ca->CircleSize*5, yellow);
+			break;
+
+			default:
+				printf("%d\n", actors[i].actor->BaseStats[IE_EA]);
+				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ca->CircleSize*5, cyan);
+			break;
+			}
 		}
 		if(anim) {
 			Sprite2D * nextFrame = anim->NextFrame();
