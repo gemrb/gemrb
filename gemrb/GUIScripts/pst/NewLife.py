@@ -333,7 +333,7 @@ def ConPress():
 
 def ChaPress():
 	GemRB.SetText(NewLifeWindow, TextArea, 1903)
-	GemRB.TextAreaAppend(NewLifeWindow, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(Cha,5),0,0) )
+	GemRB.TextAreaAppend(NewLifeWindow, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,Cha,5),0,0) )
 	return
 
 def PointPress():
