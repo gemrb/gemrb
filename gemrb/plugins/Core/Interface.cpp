@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.162 2004/04/26 20:51:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.163 2004/04/27 06:19:20 edheldil Exp $
  *
  */
 
@@ -271,8 +271,8 @@ int Interface::Init()
 	printMessage( "Core", "Initializing Resource Manager...\n", WHITE );
 	key = ( ResourceMgr * ) GetInterface( IE_KEY_CLASS_ID );
 	char ChitinPath[_MAX_PATH];
-	strcpy( ChitinPath, GamePath );
-	strcat( ChitinPath, "chitin.key" );
+	PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
+	ResolveFilePath( ChitinPath );
 	if (!key->LoadResFile( ChitinPath )) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot Load Chitin.key\nTermination in Progress...\n" );
@@ -295,14 +295,9 @@ int Interface::Init()
 	strings = ( StringMgr * ) GetInterface( IE_TLK_CLASS_ID );
 	printMessage( "Core", "Loading Dialog.tlk file...", WHITE );
 	char strpath[_MAX_PATH];
-	strcpy( strpath, GamePath );
-	strcat( strpath, dialogtlk );
+	PathJoin( strpath, GamePath, dialogtlk, NULL );
+	ResolveFilePath( strpath );
 	FileStream* fs = new FileStream();
-	if (!fs->Open( strpath, true )) { //using AUTOFREE
-		dialogtlk[0] = 'D';
-		strcpy( strpath, GamePath );
-		strcat( strpath, dialogtlk );
-	}
 	if (!fs->Open( strpath, true )) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find Dialog.tlk.\nTermination in Progress...\n" );
@@ -428,8 +423,7 @@ int Interface::Init()
 	}
 	vars->SetType( GEM_VARIABLES_INT ); {
 		char ini_path[_MAX_PATH];
-		strcpy( ini_path, GamePath );
-		strcat( ini_path, INIConfig );
+		PathJoin( ini_path, GamePath, INIConfig, NULL );
 		LoadINI( ini_path );
 		int i;
 		for (i = 0; i < 8; i++) {
@@ -465,8 +459,8 @@ int Interface::Init()
 		INIparty = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
 		FileStream* fs = new FileStream();
 		char tINIparty[_MAX_PATH];
-		strcpy( tINIparty, GamePath );
-		strcat( tINIparty, "Party.ini" );
+		PathJoin( tINIparty, GamePath, "Party.ini", NULL );
+		ResolveFilePath( tINIparty );
 		fs->Open( tINIparty, true );
 		if (!INIparty->Open( fs, true )) {
 			printStatus( "ERROR", LIGHT_RED );
@@ -480,10 +474,9 @@ int Interface::Init()
 		INIbeasts = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
 		FileStream* fs = new FileStream();
 		char tINIbeasts[_MAX_PATH];
-		strcpy( tINIbeasts, GamePath );
-		strcat( tINIbeasts, "beast.ini" );
+		PathJoin( tINIbeasts, GamePath, "beast.ini", NULL );
+		ResolveFilePath( tINIbeasts );
 		// FIXME: crashes if file does not open
-		// FIXME: ResolveFilePath()
 		fs->Open( tINIbeasts, true );
 		if (!INIbeasts->Open( fs, true )) {
 			printStatus( "ERROR", LIGHT_RED );
@@ -496,10 +489,9 @@ int Interface::Init()
 		INIquests = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
 		FileStream* fs2 = new FileStream();
 		char tINIquests[_MAX_PATH];
-		strcpy( tINIquests, GamePath );
-		strcat( tINIquests, "quests.ini" );
+		PathJoin( tINIquests, GamePath, "quests.ini", NULL );
+		ResolveFilePath( tINIquests );
 		// FIXME: crashes if file does not open
-		// FIXME: ResolveFilePath()
 		fs2->Open( tINIquests, true );
 		if (!INIquests->Open( fs2, true )) {
 			printStatus( "ERROR", LIGHT_RED );
@@ -750,8 +742,7 @@ bool Interface::LoadConfig(void)
 		return true;
 	}
 
-	strcpy( path, UserDir );
-	strcat( path, name );
+	PathJoin( path, UserDir, name, NULL );
 	strcat( path, ".cfg" );
 
 	if (LoadConfig( path )) {
@@ -759,9 +750,7 @@ bool Interface::LoadConfig(void)
 	}
 
 #ifdef SYSCONFDIR
-	strcpy( path, SYSCONFDIR );
-	strcat( path, SPathDelimiter );
-	strcat( path, name );
+	PathJoin( path, SYSCONFDIR, name, NULL );
 	strcat( path, ".cfg" );
 
 	if (LoadConfig( path )) {
@@ -774,8 +763,7 @@ bool Interface::LoadConfig(void)
 		return false;
 	}
 
-	strcpy( path, UserDir );
-	strcat( path, PACKAGE );
+	PathJoin( path, UserDir, PACKAGE, NULL );
 	strcat( path, ".cfg" );
 
 	if (LoadConfig( path )) {
@@ -783,9 +771,7 @@ bool Interface::LoadConfig(void)
 	}
 
 #ifdef SYSCONFDIR
-	strcpy( path, SYSCONFDIR );
-	strcat( path, SPathDelimiter );
-	strcat( path, PACKAGE );
+	PathJoin( path, SYSCONFDIR, PACKAGE, NULL );
 	strcat( path, ".cfg" );
 
 	if (LoadConfig( path )) {
@@ -795,6 +781,7 @@ bool Interface::LoadConfig(void)
 
 	return false;
 #else   // WIN32
+	strcpy( UserDir, ".\\" );
 	return LoadConfig( "GemRB.cfg" );
 #endif  // WIN32
 }
@@ -952,9 +939,7 @@ bool Interface::LoadConfig(const char* filename)
 #ifdef PLUGINDIR
 		strcpy( PluginsPath, PLUGINDIR );
 #else
-		memcpy( PluginsPath, GemRBPath, sizeof( PluginsPath ) );
-		strcat( PluginsPath, SPathDelimiter );
-		strcat( PluginsPath, "plugins" );
+		PathJoin( PluginsPath, GemRBPath, "plugins", NULL );
 #endif
 		strcat( PluginsPath, SPathDelimiter );
 	}
@@ -1709,8 +1694,7 @@ int Interface::GetCharSounds(TextArea* ta)
 	int count = 0;
 	char Path[_MAX_PATH];
 
-	memcpy( Path, GamePath, _MAX_PATH );
-	strcat( Path, "sounds" );
+	PathJoin( Path, GamePath, "sounds", NULL );
 	hasfolders = ( HasFeature( GF_SOUNDFOLDERS ) != 0 );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
@@ -1724,10 +1708,10 @@ int Interface::GetCharSounds(TextArea* ta)
 	}
 	printf( "Looking in %s\n", Path );
 	do {
-		char dtmp[_MAX_PATH];
-		sprintf( dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name );
 		if (de->d_name[0] == '.')
 			continue;
+		char dtmp[_MAX_PATH];
+		PathJoin( dtmp, Path, de->d_name, NULL );
 		struct stat fst;
 		stat( dtmp, &fst );
 		if (hasfolders == !S_ISDIR( fst.st_mode ))
