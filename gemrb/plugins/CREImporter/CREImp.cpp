@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.11 2003/11/25 21:48:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.12 2003/11/25 21:57:28 avenger_teambg Exp $
  *
  */
 
@@ -266,11 +266,11 @@ Actor * CREImp::GetActor()
 		str->Read(&act->BaseStats[IE_MORALERECOVERYTIME],1);
 		str->Seek(1,GEM_CURRENT_POS);
 		str->Read(&act->BaseStats[IE_KIT],4);
-		str->Read(&act->Scripts[0],8);
-		str->Read(&act->Scripts[1],8);
-		str->Read(&act->Scripts[2],8);
-		str->Read(&act->Scripts[3],8);
-		str->Read(&act->Scripts[4],8);
+		for(int i=0;i<5;i++)
+		{
+			str->Read(act->Scripts[i],8);
+			act->Scripts[i][8]=0;
+		}
 		str->Read(&act->BaseStats[IE_EA], 1);
 		str->Read(&act->BaseStats[IE_GENERAL], 1);
 		str->Read(&act->BaseStats[IE_RACE], 1);
@@ -280,9 +280,9 @@ Actor * CREImp::GetActor()
 		str->Seek(5,GEM_CURRENT_POS);
 		str->Read(&act->BaseStats[IE_ALIGNMENT], 1);
 		str->Seek(4,GEM_CURRENT_POS);
-		str->Read(&act->ScriptName, 32);
+		str->Read(act->ScriptName, 32);
 		str->Seek(44,GEM_CURRENT_POS);
-		str->Read(&act->Dialog, 8);
+		str->Read(act->Dialog, 8);
 	}
 	act->SetAnimationID(act->BaseStats[IE_ANIMATION_ID]);
 	if(act->anims)
