@@ -1,0 +1,54 @@
+CHEAT AND DEBUG KEYS
+--------------------
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.1 2004/06/30 22:15:24 edheldil Exp $
+
+
+Following is a list of cheats you can use during development of GemRB.
+This list can be incomplete and obsolete - for current status, look into
+gemrb/plugins/Core/GameControl.cpp, functions GameControl::OnKeyRelease() 
+and GameControl::Draw().
+
+Cheat keys are disabled by default. To activate them, either type command
+GemRB.EnableCheatKeys(1) on console (pop-up with ESC key), or put it into
+some GUIScript - e.g. for PS:T in Start.py.
+
+GameControl control must be focused for the keys to be recognized, so it
+might be needed to 'click' the GameControl (i.e. map) first.
+
+
+Ctrl-A - Trap or trapped container pointed w/ mouse is "untrapped"
+
+Ctrl-B - Inserts/Removes spell effect S056ICBL on selected actor. 
+         Exactly one actor must be selected.
+
+Ctrl-P - Draws path from start point marked by Ctrl-S to current mouse 
+         position
+
+Ctrl-S - Marks current mouse position as start point for path drawn
+         with Ctrl-P
+
+Ctrl-J - Teleports selected actors to current mouse position
+
+Ctrl-M - Prints (on terminal or DOS window) useful info on pointed actor, door
+         container or infopoint and current map
+
+Ctrl-X - Prints (on terminal or DOS window) name of current area script
+         and current mouse pocition converted to game coordinates 
+
+Ctrl-Y - Kills pointed actor
+
+Ctrl-Z - Swaps original (not personalized) and current palettes on 
+         pointed actor. Also prints some color-related info on the actor.
+
+Ctrl-4 - Toggles debug flag DEBUG_SHOW_INFOPOINTS (show all
+         traps and infopoints)
+
+Ctrl-5 - Toggles debug flag DEBUG_SHOW_SEARCHMAP (show the searchmap)
+
+Ctrl-6 - Toggles debug flag DEBUG_SHOW_PALETTES (show original and current
+         palettes for pointed actor)
+
+ALT    - Toggles debug flag DEBUG_SHOW_CONTAINERS (show all containers
+          and doors)
+
+TAB    - Sets debug flag DEBUG_XXX while pressed (unused)
