@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.5 2004/09/12 11:15:39 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.6 2004/09/16 19:48:38 avenger_teambg Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -74,7 +74,7 @@ def OpenPriestWindow ():
 	for i in range (12):
 		Button = GemRB.GetControl (Window, 3 + i)
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,0,0,0,160,0,1)
-		GemRB.SetButtonSprites (Window, Button, "SPELFRAM",0,0,0,0,0)
+		GemRB.SetButtonBAM (Window, Button, "SPELFRAM",0,0,0)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_LOCKED, OP_OR)
 
 	# Setup book spells buttons
