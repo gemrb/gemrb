@@ -15,12 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.7 2003/11/28 09:30:11 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.8 2003/11/29 07:47:05 balrog994 Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "TileMap.h"
+#include "Interface.h"
+
+extern Interface * core;
 
 TileMap::TileMap(void)
 {
@@ -64,8 +67,15 @@ void TileMap::ToogleDoor(Door * door)
 {
 	unsigned char state = 0;
 	door->DoorClosed = !door->DoorClosed;
-	if(door->DoorClosed)
+	if(door->DoorClosed) {
 		state = 1;
+		if(door->CloseSound[0] != '\0')
+			core->GetSoundMgr()->Play(door->CloseSound);
+	}
+	else {
+		if(door->OpenSound[0] != '\0')
+			core->GetSoundMgr()->Play(door->OpenSound);
+	}
 	for(int i = 0; i < door->count; i++) {
 		overlays[0]->tiles[door->tiles[i]]->tileIndex = state;
 	}
@@ -108,3 +118,30 @@ Door * TileMap::GetDoor(unsigned short x, unsigned short y)
 	}
 	return NULL;
 }
+Container * TileMap::AddContainer(char * Name, unsigned short Type, Gem_Polygon * outline)
+{
+	Container c;
+	strncpy(c.Name, Name, 32);
+	c.Type = Type;
+	c.outline = outline;
+	containers.push_back(c);
+	return &containers.at(containers.size()-1);
+}
+Container * TileMap::GetContainer(unsigned short x, unsigned short y)
+{
+	for(int i = 0; i < containers.size(); i++) {
+		Container * c = &containers.at(i);
+		if(c->outline->BBox.x > x)
+			continue;
+		if(c->outline->BBox.y > y)
+			continue;
+		if(c->outline->BBox.x+c->outline->BBox.w < x)
+			continue;
+		if(c->outline->BBox.y+c->outline->BBox.h < y)
+			continue;
+		if(c->outline->PointIn(x,y))
+			return c;
+	}
+	return NULL;	
+}
+
