@@ -111,7 +111,7 @@ def OnLoad():
 	
 def NextPress():
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("GUICG6") #skills
+	GemRB.SetNextScript("GUICG15") #skills (haterace)
 	return
 
 def CancelPress():
