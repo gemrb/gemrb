@@ -24,16 +24,25 @@ class MapControl;
 
 class GEM_EXPORT MapControl : public Control {
 public:
+	int ScrollX, ScrollY;
+	unsigned short lastMouseX, lastMouseY;
+	bool MouseIsDown;
+	// Small map bitmap
+	Sprite2D* MapMOS;
+	// Size of big map (area) in pixels
+	short MapWidth, MapHeight;
+	// Size of area viewport. FIXME: hack!
+	short ViewWidth, ViewHeight;
+	short XCenter, YCenter;
+
 	MapControl(void);
 	~MapControl(void);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
+	/** Compute parameters after changes in control's or screen geometry */
+	void Realize();
 	/** Sets the Text of the current control */
 	int SetText(const char* /*string*/, int /*pos*/) { return 0; };
-	int ScrollX, ScrollY;
-	unsigned short lastMouseX, lastMouseY;
-	bool MouseIsDown;
-	Sprite2D* MapMOS;
 
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
