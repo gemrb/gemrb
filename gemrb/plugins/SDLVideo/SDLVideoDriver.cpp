@@ -619,7 +619,7 @@ void SDLVideoDriver::MirrorAnimation(Animation * anim)
 		unsigned char *buffer = (unsigned char*)malloc(frame->Width*frame->Height);
 		unsigned char *dst = buffer;
 		for(int y = 0; y < frame->Height; y++) {
-			unsigned char *src = ((unsigned char*)frame->pixels)+(y*frame->Width)+frame->Width;
+			unsigned char *src = ((unsigned char*)frame->pixels)+(y*frame->Width)+frame->Width-1;
 			for(int x = 0; x < frame->Width; x++) {
 				*dst = *src;
 				dst++;
@@ -628,5 +628,6 @@ void SDLVideoDriver::MirrorAnimation(Animation * anim)
 		}
 		memcpy(frame->pixels, buffer, frame->Width*frame->Height);
 		free(buffer);
+		frame->XPos = frame->Width-frame->XPos;
 	} while(true);
 }
