@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.185 2004/08/20 11:37:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.186 2004/08/20 13:03:42 avenger_teambg Exp $
  *
  */
 
@@ -291,6 +291,7 @@ static ActionLink actionnames[] = {
 	{"debugoutput", GameScript::Debug,0},
 	{"destroyalldestructableequipment", GameScript::DestroyAllDestructableEquipment,0},
 	{"destroyallequipment", GameScript::DestroyAllEquipment,0},
+	{"destroygold", GameScript::DestroyGold,0},
 	{"destroyitem", GameScript::DestroyItem,0},
 	{"destroypartygold", GameScript::DestroyPartyGold,0},
 	{"destroyself", GameScript::DestroySelf,0},
@@ -383,10 +384,13 @@ static ActionLink actionnames[] = {
 	{"moveglobal", GameScript::MoveGlobal,0}, 
 	{"moveglobalobject", GameScript::MoveGlobalObject,0}, 
 	{"moveglobalobjectoffscreen", GameScript::MoveGlobalObjectOffScreen,0},
+	{"movetocenterofscreen", GameScript::MoveToCenterOfScreen,AF_BLOCKING},
 	{"movetoobject", GameScript::MoveToObject,AF_BLOCKING},
+	{"movetoobjectnointerrupt", GameScript::MoveToObjectNoInterrupt,AF_BLOCKING},
 	{"movetooffset", GameScript::MoveToOffset,AF_BLOCKING},
 	{"movetopoint", GameScript::MoveToPoint,AF_BLOCKING},
-	{"movetopointnorecticle", GameScript::MoveToPoint,AF_BLOCKING},//the same until we know better
+	{"movetopointnointerrupt", GameScript::MoveToPointNoInterrupt,AF_BLOCKING},
+	{"movetopointnorecticle", GameScript::MoveToPointNoRecticle,AF_BLOCKING},//the same until we know better
 	{"movetosavedlocation", GameScript::MoveToSavedLocation,AF_BLOCKING},
 	//take care of the typo in the original bg2 action.ids
 	{"movetosavedlocationn", GameScript::MoveToSavedLocation,AF_BLOCKING},
@@ -447,6 +451,7 @@ static ActionLink actionnames[] = {
 	{"setgabber", GameScript::SetGabber,0},
 	{"setglobal", GameScript::SetGlobal,AF_MERGESTRINGS},
 	{"setglobaltimer", GameScript::SetGlobalTimer,AF_MERGESTRINGS},
+	{"sethomelocation", GameScript::SetHomeLocation,0},
 	{"sethp", GameScript::SetHP,0},
 	{"setinternal", GameScript::SetInternal,0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile,0},
@@ -2797,7 +2802,7 @@ int GameScript::Team(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::ValidForDialogCore(Scriptable* Sender, Actor *target)
 {
-	int range;
+	unsigned int range;
 
 	if (Sender->Type != ST_ACTOR) {
 		//non actors got no visual range, needs research
@@ -3362,7 +3367,7 @@ int GameScript::NumTimesTalkedTo(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	return actor->TalkCount == parameters->int0Parameter ? 1 : 0;
+	return actor->TalkCount == (ieDword) parameters->int0Parameter ? 1 : 0;
 }
 
 int GameScript::NumTimesTalkedToGT(Scriptable* Sender, Trigger* parameters)
@@ -3375,7 +3380,7 @@ int GameScript::NumTimesTalkedToGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	return actor->TalkCount > parameters->int0Parameter ? 1 : 0;
+	return actor->TalkCount > (ieDword) parameters->int0Parameter ? 1 : 0;
 }
 
 int GameScript::NumTimesTalkedToLT(Scriptable* Sender, Trigger* parameters)
@@ -3388,7 +3393,7 @@ int GameScript::NumTimesTalkedToLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	return actor->TalkCount < parameters->int0Parameter ? 1 : 0;
+	return actor->TalkCount < (ieDword) parameters->int0Parameter ? 1 : 0;
 }
 
 /* this single function works for ActionListEmpty and ObjectActionListEmpty */
@@ -3597,7 +3602,7 @@ int GameScript::HP(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor->GetStat( IE_HITPOINTS ) == parameters->int0Parameter) {
+	if ((signed) actor->GetStat( IE_HITPOINTS ) == parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3613,7 +3618,7 @@ int GameScript::HPGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor->GetStat( IE_HITPOINTS ) > parameters->int0Parameter) {
+	if ( (signed) actor->GetStat( IE_HITPOINTS ) > parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3629,7 +3634,7 @@ int GameScript::HPLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor->GetStat( IE_HITPOINTS ) < parameters->int0Parameter) {
+	if ( (signed) actor->GetStat( IE_HITPOINTS ) < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3681,7 +3686,7 @@ int GameScript::XP(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor->GetStat( IE_XP ) == parameters->int0Parameter) {
+	if (actor->GetStat( IE_XP ) == (unsigned) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3697,7 +3702,7 @@ int GameScript::XPGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor->GetStat( IE_XP ) > parameters->int0Parameter) {
+	if (actor->GetStat( IE_XP ) > (unsigned) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3713,7 +3718,7 @@ int GameScript::XPLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (actor->GetStat( IE_XP ) < parameters->int0Parameter) {
+	if (actor->GetStat( IE_XP ) < (unsigned) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3730,8 +3735,7 @@ int GameScript::CheckStat(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) target;
-	if (actor->GetStat( parameters->int0Parameter ) ==
-		parameters->int1Parameter) {
+	if ((signed) actor->GetStat( parameters->int0Parameter ) == parameters->int1Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3744,7 +3748,7 @@ int GameScript::CheckStatGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if (actor->GetStat( parameters->int0Parameter ) > parameters->int1Parameter) {
+	if ((signed) actor->GetStat( parameters->int0Parameter ) > parameters->int1Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3757,7 +3761,7 @@ int GameScript::CheckStatLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if (actor->GetStat( parameters->int0Parameter ) < parameters->int1Parameter) {
+	if ((signed) actor->GetStat( parameters->int0Parameter ) < parameters->int1Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3828,7 +3832,7 @@ int GameScript::Morale(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_MORALEBREAK) == parameters->int0Parameter;
+	return (signed) actor->GetStat(IE_MORALEBREAK) == parameters->int0Parameter;
 }
 
 int GameScript::MoraleGT(Scriptable* Sender, Trigger* parameters)
@@ -3838,7 +3842,7 @@ int GameScript::MoraleGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_MORALEBREAK) > parameters->int0Parameter;
+	return (signed) actor->GetStat(IE_MORALEBREAK) > parameters->int0Parameter;
 }
 
 int GameScript::MoraleLT(Scriptable* Sender, Trigger* parameters)
@@ -3848,7 +3852,7 @@ int GameScript::MoraleLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_MORALEBREAK) < parameters->int0Parameter;
+	return (signed) actor->GetStat(IE_MORALEBREAK) < parameters->int0Parameter;
 }
 
 int GameScript::StateCheck(Scriptable* Sender, Trigger* parameters)
@@ -3962,7 +3966,7 @@ int GameScript::Level(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_LEVEL) == parameters->int0Parameter;
+	return actor->GetStat(IE_LEVEL) == (unsigned) parameters->int0Parameter;
 }
 
 //this is just a hack, actually multiclass should be available
@@ -3976,10 +3980,10 @@ int GameScript::ClassLevel(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if(actor->GetStat(IE_CLASS) != parameters->int0Parameter) {
+	if(actor->GetStat(IE_CLASS) != (unsigned) parameters->int0Parameter) {
 		return 0;
 	}
-	return actor->GetStat(IE_LEVEL) == parameters->int1Parameter;
+	return actor->GetStat(IE_LEVEL) == (unsigned) parameters->int1Parameter;
 }
 
 int GameScript::LevelGT(Scriptable* Sender, Trigger* parameters)
@@ -3992,7 +3996,7 @@ int GameScript::LevelGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_LEVEL) > parameters->int0Parameter;
+	return actor->GetStat(IE_LEVEL) > (unsigned) parameters->int0Parameter;
 }
 
 //this is just a hack, actually multiclass should be available
@@ -4006,10 +4010,10 @@ int GameScript::ClassLevelGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if(actor->GetStat(IE_CLASS) != parameters->int0Parameter) {
+	if(actor->GetStat(IE_CLASS) != (unsigned) parameters->int0Parameter) {
 		return 0;
 	}
-	return actor->GetStat(IE_LEVEL) > parameters->int1Parameter;
+	return actor->GetStat(IE_LEVEL) > (unsigned) parameters->int1Parameter;
 }
 
 int GameScript::LevelLT(Scriptable* Sender, Trigger* parameters)
@@ -4022,7 +4026,7 @@ int GameScript::LevelLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_LEVEL) < parameters->int0Parameter;
+	return actor->GetStat(IE_LEVEL) < (unsigned) parameters->int0Parameter;
 }
 
 int GameScript::ClassLevelLT(Scriptable* Sender, Trigger* parameters)
@@ -4035,10 +4039,10 @@ int GameScript::ClassLevelLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if(actor->GetStat(IE_CLASS) != parameters->int0Parameter) {
+	if(actor->GetStat(IE_CLASS) != (unsigned) parameters->int0Parameter) {
 		return 0;
 	}
-	return actor->GetStat(IE_LEVEL) < parameters->int1Parameter;
+	return actor->GetStat(IE_LEVEL) < (unsigned) parameters->int1Parameter;
 }
 
 int GameScript::UnselectableVariable(Scriptable* Sender, Trigger* parameters)
@@ -4051,7 +4055,7 @@ int GameScript::UnselectableVariable(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_UNSELECTABLE) == parameters->int0Parameter;
+	return actor->GetStat(IE_UNSELECTABLE) == (unsigned) parameters->int0Parameter;
 }
 
 int GameScript::UnselectableVariableGT(Scriptable* Sender, Trigger* parameters)
@@ -4064,7 +4068,7 @@ int GameScript::UnselectableVariableGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_UNSELECTABLE) > parameters->int0Parameter;
+	return actor->GetStat(IE_UNSELECTABLE) > (unsigned) parameters->int0Parameter;
 }
 
 int GameScript::UnselectableVariableLT(Scriptable* Sender, Trigger* parameters)
@@ -4074,7 +4078,7 @@ int GameScript::UnselectableVariableLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_UNSELECTABLE) < parameters->int0Parameter;
+	return actor->GetStat(IE_UNSELECTABLE) < (unsigned) parameters->int0Parameter;
 }
 
 int GameScript::AreaCheck(Scriptable* Sender, Trigger* parameters)
@@ -4272,7 +4276,7 @@ int GameScript::Proficiency(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_PROFICIENCYBASTARDSWORD+idx) == parameters->int1Parameter;
+	return (signed) actor->GetStat(IE_PROFICIENCYBASTARDSWORD+idx) == parameters->int1Parameter;
 }
 
 int GameScript::ProficiencyGT(Scriptable* Sender, Trigger* parameters)
@@ -4289,7 +4293,7 @@ int GameScript::ProficiencyGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_PROFICIENCYBASTARDSWORD+idx) > parameters->int1Parameter;
+	return (signed) actor->GetStat(IE_PROFICIENCYBASTARDSWORD+idx) > parameters->int1Parameter;
 }
 
 int GameScript::ProficiencyLT(Scriptable* Sender, Trigger* parameters)
@@ -4306,9 +4310,11 @@ int GameScript::ProficiencyLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_PROFICIENCYBASTARDSWORD+idx) < parameters->int1Parameter;
+	return (signed) actor->GetStat(IE_PROFICIENCYBASTARDSWORD+idx) < parameters->int1Parameter;
 }
 
+//this is a PST specific stat, shows how many free proficiency slots we got
+//we use an unused stat for it
 int GameScript::ExtraProficiency(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -4319,7 +4325,7 @@ int GameScript::ExtraProficiency(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_EXTRAPROFICIENCY1) == parameters->int0Parameter;
+	return (signed) actor->GetStat(IE_EXTRAPROFICIENCY20) == parameters->int0Parameter;
 }
 
 int GameScript::ExtraProficiencyGT(Scriptable* Sender, Trigger* parameters)
@@ -4332,7 +4338,7 @@ int GameScript::ExtraProficiencyGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_EXTRAPROFICIENCY1) > parameters->int0Parameter;
+	return (signed) actor->GetStat(IE_EXTRAPROFICIENCY20) > parameters->int0Parameter;
 }
 
 int GameScript::ExtraProficiencyLT(Scriptable* Sender, Trigger* parameters)
@@ -4345,7 +4351,7 @@ int GameScript::ExtraProficiencyLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_EXTRAPROFICIENCY1) < parameters->int0Parameter;
+	return (signed) actor->GetStat(IE_EXTRAPROFICIENCY20) < parameters->int0Parameter;
 }
 
 int GameScript::Internal(Scriptable* Sender, Trigger* parameters)
@@ -4362,7 +4368,7 @@ int GameScript::Internal(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_INTERNAL_0+idx) == parameters->int1Parameter;
+	return (signed) actor->GetStat(IE_INTERNAL_0+idx) == parameters->int1Parameter;
 }
 
 int GameScript::InternalGT(Scriptable* Sender, Trigger* parameters)
@@ -4379,7 +4385,7 @@ int GameScript::InternalGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_INTERNAL_0+idx) > parameters->int1Parameter;
+	return (signed) actor->GetStat(IE_INTERNAL_0+idx) > parameters->int1Parameter;
 }
 
 int GameScript::InternalLT(Scriptable* Sender, Trigger* parameters)
@@ -4396,7 +4402,7 @@ int GameScript::InternalLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_INTERNAL_0+idx) < parameters->int1Parameter;
+	return (signed) actor->GetStat(IE_INTERNAL_0+idx) < parameters->int1Parameter;
 }
 
 int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
@@ -5084,7 +5090,10 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	radius=0;
 	switch (flags & CC_MASK) {
 		case CC_OFFSCREEN:
-			radius=30; //TODO: offscreen radius
+			{
+			Region vp = core->GetVideoDriver()->GetViewport();
+			radius=vp.w/2; //actually it must be further divided by the tile size, hmm 16?
+			}
 			//falling through
 		case CC_OBJECT://use object + offset
 			{
@@ -5360,6 +5369,28 @@ void GameScript::AddWayPoint(Scriptable* Sender, Action* parameters)
 	actor->AddWayPoint( parameters->XpointParameter, parameters->YpointParameter );
 }
 
+void GameScript::MoveToPointNoRecticle(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->InternalFlags|=IF_NORECTICLE;
+	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
+}
+
+void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	//actor->SetNoInterrupt(); // TODO
+	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
+}
+
 void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -5390,6 +5421,22 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 	parameters->YpointParameter = *(((unsigned short *) &value)+1);
 	Actor* actor = ( Actor* ) tar;
 	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
+}
+
+void GameScript::MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!target) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	//actor->SetNoInterrupt(); //something along these lines
+	actor->WalkTo( target->XPos, target->YPos );
 }
 
 void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
@@ -5437,6 +5484,17 @@ void GameScript::RestorePartyLocation(Scriptable* /*Sender*/, Action* /*paramete
 		}
 	}
 
+}
+
+void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Region vp = core->GetVideoDriver()->GetViewport();
+	Actor* actor = ( Actor* ) Sender;
+	actor->WalkTo( vp.x+vp.w/2, vp.y+vp.h/2 );
 }
 
 void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
@@ -7080,6 +7138,18 @@ void GameScript::DestroyItem(Scriptable* Sender, Action* parameters)
 	}
 }
 
+void GameScript::DestroyGold(Scriptable* Sender, Action* parameters)
+{
+	if(Sender->Type!=ST_ACTOR)
+		return;
+	Actor *act=(Actor *) Sender;
+	int max=act->GetStat(IE_GOLD);
+	if(max>parameters->int0Parameter) {
+		max=parameters->int0Parameter;
+	}
+	act->NewStat(IE_GOLD, -max, MOD_ADDITIVE);
+}
+
 void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* /*parameters*/)
 {
 	Inventory *inv=NULL;
@@ -7542,5 +7612,17 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 		break;
 	}
 	damagee->Damage( damage, type, damager );
+}
+
+void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if(!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Moveble *movable = (Moveble *) tar; //not actor, though it is the only moveable
+	movable->XDes=parameters->XpointParameter;
+	movable->YDes=parameters->YpointParameter;
+	//no movement should be started here, i think
 }
 

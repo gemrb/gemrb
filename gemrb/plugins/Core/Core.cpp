@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.21 2004/08/05 22:55:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.22 2004/08/20 13:03:42 avenger_teambg Exp $
  *
  */
 
@@ -67,18 +67,18 @@ BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD fdwReason,
 
 //// Globally used functions
 
-int Distance(int X, int Y, Scriptable *b)
+unsigned int Distance(int X, int Y, Scriptable *b)
 {
         long x = ( X - b->XPos );
         long y = ( Y - b->YPos );
-        return (int) sqrt( ( double ) ( x* x + y* y ) );
+        return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
 }
 
-int Distance(Scriptable *a, Scriptable *b)
+unsigned int Distance(Scriptable *a, Scriptable *b)
 {
         long x = ( a->XPos - b->XPos );
         long y = ( a->YPos - b->YPos );
-        return (int) sqrt( ( double ) ( x* x + y* y ) );
+        return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
 }
 
 //returns true if path is an existing directory

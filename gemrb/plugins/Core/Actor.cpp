@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.61 2004/08/20 11:37:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.62 2004/08/20 13:03:42 avenger_teambg Exp $
  *
  */
 
@@ -227,6 +227,14 @@ long Actor::GetStat(unsigned int StatIndex)
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
 	}
+	switch(StatIndex) {
+		case IE_GOLD:
+			if(InParty) return core->GetGame()->PartyGold;
+			break;
+		case IE_REPUTATION:
+			if(InParty) return core->GetGame()->Reputation;
+			break;
+	}
 	return Modified[StatIndex];
 }
 
@@ -235,7 +243,9 @@ void Actor::SetCircleSize()
 	Color* color;
 	if (Modified[IE_UNSELECTABLE]) {
 		color = &magenta;
-	} else if (Modified[IE_MORALEBREAK] < 0) {
+	} else if (!Modified[IE_MORALEBREAK]) {
+		color = &yellow;
+	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
 		color = &yellow;
 	} else {
 		switch (Modified[IE_EA]) {
@@ -262,13 +272,19 @@ void Actor::SetCircleSize()
 	SetCircle( anims->CircleSize, *color );
 }
 
-bool Actor::SetStat(unsigned int StatIndex, long Value)
+bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 {
 	if (StatIndex >= MAX_STATS) {
 		return false;
 	}
 	Modified[StatIndex] = Value;
 	switch (StatIndex) {
+		case IE_GOLD:
+			if(InParty) {
+				core->GetGame()->PartyGold+=Modified[IE_GOLD];
+				Modified[IE_GOLD]=0;
+			}
+			break;
 		case IE_ANIMATION_ID:
 			SetAnimationID( Value );
 			break;
@@ -278,10 +294,10 @@ bool Actor::SetStat(unsigned int StatIndex, long Value)
 			SetCircleSize();
 			break;
 		case IE_HITPOINTS:
-			if(Value<=0) {
+			if((signed) Value<=0) {
 				Die(NULL);
 			}
-			if(Value>Modified[IE_MAXHITPOINTS]) {
+			if((signed) Value>(signed) Modified[IE_MAXHITPOINTS]) {
 				Modified[IE_HITPOINTS]=Modified[IE_MAXHITPOINTS];
 			}
 			break;
@@ -383,12 +399,12 @@ void Actor::DebugDump()
 	printf( "Area:       %.8s\n", Area );
 	printf( "Dialog:     %.8s\n", Dialog );
 	printf( "Script name:%.32s\n", scriptName );
-	printf( "TalkCount:  %ld\n", TalkCount );
+	printf( "TalkCount:  %d\n", TalkCount );
 	printf( "PartySlot:  %d\n", InParty );
 	printf( "Allegiance: %d\n",(int) GetStat(IE_EA) );
 	printf( "Visualrange:%d\n", (int) GetStat(IE_VISUALRANGE) );
-	printf( "Mod[IE_EA]: %ld\n", Modified[IE_EA]);
-	printf( "Mod[IE_ANIMATION_ID]: 0x%04lX\n", Modified[IE_ANIMATION_ID]);
+	printf( "Mod[IE_EA]: %d\n", Modified[IE_EA]);
+	printf( "Mod[IE_ANIMATION_ID]: 0x%04X\n", Modified[IE_ANIMATION_ID]);
 	ieDword tmp=0;
 	core->GetGame()->globals->Lookup("APPEARANCE",tmp);
 	printf( "Disguise: %d\n", tmp);

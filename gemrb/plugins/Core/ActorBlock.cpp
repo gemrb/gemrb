@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.57 2004/08/19 21:14:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.58 2004/08/20 13:03:42 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -474,6 +474,7 @@ void Moveble::ClearPath()
 	if (!path) {
 		return;
 	}
+	InternalFlags&=~IF_NORECTICLE;
 	PathNode* nextNode = path->Next;
 	PathNode* thisNode = path;
 	while (true) {
@@ -490,7 +491,7 @@ void Moveble::ClearPath()
 }
 void Moveble::DrawTargetPoint()
 {
-	if (!path || !Selected)
+	if (!path || !Selected || (InternalFlags&IF_NORECTICLE) )
 		return;
 
 	// generates "step" from sequence 3 2 1 0 1 2 3 4

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.43 2004/08/05 22:55:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.44 2004/08/20 13:03:42 avenger_teambg Exp $
  *
  */
 
@@ -61,6 +61,7 @@ class Map;
 #define IF_JUSTDIED   2     //Died() will return true
 #define IF_FROMGAME   4     //this is an NPC or PC
 #define IF_REALLYDIED 8     //real death happened, actor will be set to dead
+#define IF_NORECTICLE 16    //draw recticle (target mark)
 
 /** flags for GetActor */
 //default action
@@ -84,8 +85,8 @@ class Map;
 class GEM_EXPORT Actor : public Moveble {
 public:
 	//CRE DATA FIELDS
-	long BaseStats[MAX_STATS];
-	long Modified[MAX_STATS];
+	ieDword BaseStats[MAX_STATS];
+	ieDword Modified[MAX_STATS];
 	char Dialog[9];
 	char SmallPortrait[9];
 	char LargePortrait[9];
@@ -123,7 +124,6 @@ public:
 public:
 	//this stuff don't get saved
 	CharAnimations* anims;
-	int InternalFlags;
 
 	Actor *LastTalkedTo;
 	Actor *LastAttacker;
@@ -155,17 +155,17 @@ public:
 	/** Returns true if the actor is targetable */
 	bool ValidTarget(int ga_flags);
 	/** Returns a Stat value */
-	long GetStat(unsigned int StatIndex);
+	ieDword GetStat(unsigned int StatIndex);
 	/** Sets a Stat Value (unsaved) */
-	bool SetStat(unsigned int StatIndex, long Value);
+	bool SetStat(unsigned int StatIndex, ieDword Value);
 	/** Returns the difference */
-	long GetMod(unsigned int StatIndex);
+	int GetMod(unsigned int StatIndex);
 	/** Returns a Stat Base Value */
-	long GetBase(unsigned int StatIndex);
+	ieDword GetBase(unsigned int StatIndex);
 	/** Sets a Stat Base Value */
-	bool SetBase(unsigned int StatIndex, long Value);
+	bool SetBase(unsigned int StatIndex, ieDword Value);
 	/** Sets the modified value in different ways, returns difference */
-	int NewStat(unsigned int StatIndex, long ModifierValue, long ModifierType);
+	int NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
 	/** Sets the Scripting Name (death variable) */
 	void SetScriptName(const char* string)
 	{

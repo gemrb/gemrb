@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.43 2004/08/19 21:14:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.44 2004/08/20 13:03:42 avenger_teambg Exp $
  *
  */
 
@@ -183,7 +183,8 @@ public:
 	unsigned long timeStartStep;
 	Sprite2D* lastFrame;
 	char Area[9];
-	long TalkCount;
+	ieDword TalkCount;
+	int InternalFlags;
 public:
 	void DoStep();
 	void AddWayPoint(unsigned short XDes, unsigned short YDes);

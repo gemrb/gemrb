@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.132 2004/08/20 11:37:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.133 2004/08/20 13:03:42 avenger_teambg Exp $
  *
  */
 
@@ -981,6 +981,7 @@ public:
 	static void Debug(Scriptable* Sender, Action* parameters);
 	static void DestroyAllDestructableEquipment(Scriptable* Sender, Action* parameters);
 	static void DestroyAllEquipment(Scriptable* Sender, Action* parameters);
+	static void DestroyGold(Scriptable* Sender, Action* parameters);
 	static void DestroyItem(Scriptable* Sender, Action* parameters);
 	static void DestroyPartyGold(Scriptable* Sender, Action* parameters);
 	static void DestroySelf(Scriptable* Sender, Action* parameters);
@@ -1064,8 +1065,12 @@ public:
 	static void MoveGlobalObject(Scriptable* Sender, Action* parameters);
 	static void MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameters);
 	static void MoveGlobalsTo(Scriptable* Sender, Action* parameters);
+	static void MoveToCenterOfScreen(Scriptable* Sender, Action* parameters);
 	static void MoveToPoint(Scriptable* Sender, Action* parameters);
+	static void MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters);
+	static void MoveToPointNoRecticle(Scriptable* Sender, Action* parameters);
 	static void MoveToObject(Scriptable* Sender, Action* parameters);
+	static void MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters);
 	static void MoveToOffset(Scriptable* Sender, Action* parameters);
 	static void MoveToSavedLocation(Scriptable* Sender, Action* parameters);
 	static void MoveViewPoint(Scriptable* Sender, Action* parameters);
@@ -1112,6 +1117,7 @@ public:
 	static void SetGlobal(Scriptable* Sender, Action* parameters);
 	static void SetGlobalRandom(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTimer(Scriptable* Sender, Action* parameters);
+	static void SetHomeLocation(Scriptable* Sender, Action* parameters);
 	static void SetHP(Scriptable* Sender, Action* parameters);
 	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
