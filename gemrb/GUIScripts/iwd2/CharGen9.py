@@ -184,7 +184,7 @@ def NextPress():
 	GemRB.SetPlayerName(MyChar, GemRB.GetToken("CHARNAME"), 0)
 
 	#does all the rest
-	GemRB.FillPlayerInfo(MyChar,PortraitName+"S", PortraitName+"L")
+	GemRB.FillPlayerInfo(MyChar,PortraitName+"L", PortraitName+"S")
 	GemRB.SetNextScript("SPPartyFormation")
 	return
 
