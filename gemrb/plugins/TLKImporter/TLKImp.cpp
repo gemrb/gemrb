@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.37 2004/09/22 19:37:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.38 2004/10/06 20:37:23 avenger_teambg Exp $
  *
  */
 
@@ -68,16 +68,53 @@ inline char* mystrncpy(char* dest, const char* source, int maxlength,
 	return dest;
 }
 
+inline Actor *GetActorFromSlot(int slot)
+{
+	Actor *act=NULL;
+
+	if(slot==-1) {
+		GameControl *gc = core->GetGameControl();
+		if(gc) {
+			act=gc->speaker;
+		}
+	}
+	else {
+		Game *game = core->GetGame();
+		if(game) {
+			act=game->FindPC(slot);
+		}
+	}
+	return act;
+}
+
+int TLKImp::RaceStrRef(int slot)
+{
+	Actor *act;
+	int race;
+
+	act=GetActorFromSlot(slot);
+	if(act) {
+		race=act->GetStat(IE_RACE);
+	} else {
+		race=0;
+	}
+	int table = core->LoadTable("races");
+	if(table<0) {
+		return -1;
+	}
+	TableMgr *tab=core->GetTable(table);
+	if(!tab) {
+		return -1;
+	}
+	//don't unload table because we'll load it again soon anyway
+	return atoi(tab->QueryField(race,0) );
+}
+
 int TLKImp::GenderStrRef(int slot, int malestrref, int femalestrref)
 {
 	Actor *act;
 
-	if(slot==-1) {
-		act=core->GetGameControl()->speaker;
-	}
-	else {
-		act=core->GetGame()->FindPC(slot);
-	}
+	act = GetActorFromSlot(slot);
 	if(act && act->GetStat(IE_SEX)==2) {
 		return femalestrref;
 	}
@@ -130,11 +167,19 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( GenderStrRef(-1,27487,27486), 0);
 		goto exit_function;
 	}
+	if (!strcmp( Token, "HIMHER" )) {
+		Decoded = GetString( GenderStrRef(-1,27487,27488), 0);
+		goto exit_function;
+	}
 	if (!strcmp( Token, "MANWOMAN" )) {
-		Decoded = GetString( GenderStrRef(-1,27489,27488), 0);
+		Decoded = GetString( GenderStrRef(-1,27490,27489), 0);
 		goto exit_function;
 	}
 
+	if (!strcmp( Token, "PRO_RACE" )) {
+		Decoded = GetString( RaceStrRef(0), 0);
+		goto exit_function;
+	}
 	if (!strcmp( Token, "PRO_SIRMAAM" )) {
 		Decoded = GetString( GenderStrRef(0,27473,27475), 0);
 		goto exit_function;
@@ -163,12 +208,13 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( GenderStrRef(0,27487,27486), 0);
 		goto exit_function;
 	}
-	if (!strcmp( Token, "PRO_MANWOMAN" )) {
-		Decoded = GetString( GenderStrRef(0,27489,27488), 0);
+	if (!strcmp( Token, "PRO_HIMHER" )) {
+		Decoded = GetString( GenderStrRef(0,27487,27488), 0);
 		goto exit_function;
 	}
-	if (!strcmp( Token, "WEAPONNAME" )) {
-		//this should be character dependent, we don't have a character sheet yet
+	if (!strcmp( Token, "PRO_MANWOMAN" )) {
+		Decoded = GetString( GenderStrRef(0,27490,27489), 0);
+		goto exit_function;
 	}
 
 	if (!strcmp( Token, "MAGESCHOOL" )) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.14 2004/08/03 22:58:37 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.15 2004/10/06 20:37:23 avenger_teambg Exp $
  *
  */
 
@@ -47,6 +47,7 @@ private:
 	   if dest is not NULL it also returns the decoded value
 	   */
 	int BuiltinToken(char* Token, char* dest);
+	int RaceStrRef(int slot);
  	int GenderStrRef(int slot, int malestrref, int femalestrref);
 
 public:
