@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.159 2004/05/05 19:13:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.160 2004/05/07 17:41:12 avenger_teambg Exp $
  *
  */
 
@@ -291,6 +291,7 @@ static ActionLink actionnames[] = {
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA,0},
 	{"forcespell", GameScript::ForceSpell,0},
 	{"fullheal", GameScript::FullHeal,0},
+	{"getitem", GameScript::GetItem,0},
 	{"giveexperience", GameScript::AddXPObject,0},
 	{"givegoldforce", GameScript::CreatePartyGold,0}, //this is the same
 	{"givepartygold", GameScript::GivePartyGold,0},
@@ -368,10 +369,15 @@ static ActionLink actionnames[] = {
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playsound", GameScript::PlaySound,0},
+	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
 	{"recoil", GameScript::Recoil,0},
+	{"regainpaladinhood", GameScript::RegainPaladinHood,0},
+	{"regainrangerhood", GameScript::RegainRangerHood,0},
 	{"removeareaflag", GameScript::RemoveAreaFlag,0},
 	{"removeareatype", GameScript::RemoveAreaType,0},
 	{"removejournalentry", GameScript::RemoveJournalEntry,0},
+	{"removepaladinhood", GameScript::RemovePaladinHood,0},
+	{"removerangerhood", GameScript::RemoveRangerHood,0},
 	//this is in iwd2, same as movetosavedlocation, with a default variable
 	{"returntosavedlocation", GameScript::MoveToSavedLocation, AF_BLOCKING},
 	{"returntosavedplace", GameScript::MoveToSavedLocation, AF_BLOCKING},
@@ -434,6 +440,7 @@ static ActionLink actionnames[] = {
 	{"startsong", GameScript::StartSong,0},
 	{"swing", GameScript::Swing,0},
 	{"swingonce", GameScript::SwingOnce,0},
+	{"takeitemreplace", GameScript::TakeItemReplace,0},
 	{"takepartygold", GameScript::TakePartyGold,0},
 	{"textscreen", GameScript::TextScreen,0},
 	{"triggeractivation", GameScript::TriggerActivation,0},
@@ -4345,8 +4352,16 @@ void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
 {
 	unsigned long mytime;
 
-	//GetTime(mytime); //actually, this should be game time, not real time
-	mytime=core->GetGame()->GameTime;
+	mytime=core->GetGame()->GameTime; //gametime (should increase it)
+	SetVariable( Sender, parameters->string0Parameter,
+		parameters->int0Parameter + mytime);
+}
+
+void GameScript::RealSetGlobalTimer(Scriptable* Sender, Action* parameters)
+{
+	unsigned long mytime;
+
+	GetTime(mytime); //this is real time
 	SetVariable( Sender, parameters->string0Parameter,
 		parameters->int0Parameter + mytime);
 }
@@ -6703,5 +6718,126 @@ void GameScript::FullHeal(Scriptable* Sender, Action* parameters)
 	}
 	Actor *scr = (Actor *) tar;
 	scr->SetStat(IE_HITPOINTS, scr->GetStat(IE_MAXHITPOINTS) );
+}
+
+void GameScript::RemovePaladinHood(Scriptable* Sender, Action* parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *act = (Actor *) Sender;
+	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) | MC_FALLEN_PALADIN);
+}
+
+void GameScript::RemoveRangerHood(Scriptable* Sender, Action* parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *act = (Actor *) Sender;
+	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) | MC_FALLEN_RANGER);
+}
+
+void GameScript::RegainPaladinHood(Scriptable* Sender, Action* parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *act = (Actor *) Sender;
+	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) & ~MC_FALLEN_PALADIN);
+}
+
+void GameScript::RegainRangerHood(Scriptable* Sender, Action* parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *act = (Actor *) Sender;
+	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) & ~MC_FALLEN_RANGER);
+}
+
+void GameScript::GetItem(Scriptable* Sender, Action* parameters)
+{
+	Inventory *myinv;
+	Map *map;
+
+	switch(Sender->Type) {
+		case ST_ACTOR:
+			myinv=&((Actor *) Sender)->inventory;
+			map=core->GetGame()->GetMap(((Actor *) Sender)->Area);
+			break;
+		case ST_CONTAINER:
+			myinv=&((Container *) Sender)->inventory;
+			map=core->GetGame()->GetCurrentMap();
+			break;
+		default:
+			return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	
+	Actor *scr = (Actor *) tar;
+	CREItem *item;
+	scr->inventory.RemoveItem(parameters->string0Parameter, false, &item);
+	myinv->AddSlotItem(item, 0, &item);
+	if( item ) {
+		// drop it at my feet
+		int x = Sender->XPos;
+		int y = Sender->YPos;
+		map->tm->AddItemToLocation(x, y, item);
+	}
+}
+
+void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
+{
+	strncpy(item->ItemResRef, resref, 8);
+	if(a==-1) {
+		//get the usages right
+	}
+	else {
+		item->Usages[0]=a;
+		item->Usages[1]=b;
+		item->Usages[2]=c;
+	}
+	item->Flags=IE_ITEM_ACQUIRED; //get the flags right
+}
+
+void GameScript::CreateItem(Scriptable *Sender, Action *parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	
+	Actor *scr = (Actor *) tar;
+	CREItem *item = new CREItem();
+	CreateItemCore(item, parameters->string0Parameter, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
+	//destroys previous item, slot should be inventory
+	scr->inventory.SetSlotItem(item,0);
+}
+
+void GameScript::TakeItemReplace(Scriptable *Sender, Action *parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	
+	Actor *scr = (Actor *) tar;
+	CREItem *item;
+	int slot = scr->inventory.RemoveItem(parameters->string1Parameter, false, &item);
+	if(!item) {
+		item = new CREItem();
+	}
+	CreateItemCore(item, parameters->string0Parameter, -1, 0, 0);
+	scr->inventory.AddSlotItem(item,slot,&item);
+	if(item) {
+		int x = Sender->XPos;
+		int y = Sender->YPos;
+		Map *map=core->GetGame()->GetMap(((Actor *) scr)->Area);
+		map->tm->AddItemToLocation(x, y, item);
+	}
 }
 

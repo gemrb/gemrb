@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.114 2004/05/05 19:13:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.115 2004/05/07 17:41:12 avenger_teambg Exp $
  *
  */
 
@@ -940,6 +940,7 @@ public:
 	static void CreateCreatureObject(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureOffScreen(Scriptable* Sender, Action* parameters);
+	static void CreateItem(Scriptable* Sender, Action* parameters);
 	static void CreatePartyGold(Scriptable *Sender, Action *parameters);
 	static void CreateVisualEffect(Scriptable* Sender, Action* parameters);
 	static void CreateVisualEffectObject(Scriptable* Sender,
@@ -971,6 +972,7 @@ public:
 	static void ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
 	static void FullHeal(Scriptable* Sender, Action* parameters);
+	static void GetItem(Scriptable* Sender, Action* parameters);
 	static void GivePartyGold(Scriptable* Sender, Action* parameters);
 	static void GivePartyGoldGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalAddGlobal(Scriptable* Sender, Action* parameters);
@@ -1040,10 +1042,15 @@ public:
 	static void PlayerDialogue(Scriptable* Sender, Action* parameters);
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
+	static void RealSetGlobalTimer(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
+	static void RegainPaladinHood(Scriptable* Sender, Action* parameters);
+	static void RegainRangerHood(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaFlag(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaType(Scriptable* Sender, Action* parameters);
 	static void RemoveJournalEntry(Scriptable* Sender, Action* parameters);
+	static void RemovePaladinHood(Scriptable* Sender, Action* parameters);
+	static void RemoveRangerHood(Scriptable* Sender, Action* parameters);
 	static void ReputationInc(Scriptable* Sender, Action* parameters);
 	static void ReputationSet(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
@@ -1090,6 +1097,7 @@ public:
 	static void StartSong(Scriptable* Sender, Action* parameters);
 	static void Swing(Scriptable* Sender, Action* parameters);
 	static void SwingOnce(Scriptable* Sender, Action* parameters);
+	static void TakeItemReplace(Scriptable* Sender, Action* parameters);
 	static void TakePartyGold(Scriptable* Sender, Action* parameters);
 	static void TextScreen(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
