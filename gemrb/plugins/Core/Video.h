@@ -4,6 +4,7 @@
 #include "../../includes/globals.h"
 #include "Plugin.h"
 #include "EventMgr.h"
+#include "Animation.h"
 
 #ifdef WIN32
 
@@ -52,8 +53,12 @@ public:
 	virtual bool Quit(void) = 0;
 	/** Get the Palette of a Sprite */
 	virtual Color * GetPalette(Sprite2D * spr) = 0;
+	/** Mirrors an Animation Horizontally */
+	virtual void MirrorAnimation(Animation * anim) = 0;
+public:
 	/** Event Manager Pointer */
 	EventMgr * Evnt;
+public:
 	virtual void * GetVideoSurface() = 0;
 };
 
