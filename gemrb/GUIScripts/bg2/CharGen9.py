@@ -140,10 +140,10 @@ def NextPress():
 		StatID=GemRB.GetTableValue(TmpTable, i, 0)
 		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Prof "+str(i) ) )
 	GemRB.FillPlayerInfo(MyChar) #does all the rest
-	GemRB.SetPlayerStat(MyChar, IE_SKIN_COLOR, GemRB.GetVar("Skin") )
-	GemRB.SetPlayerStat(MyChar, IE_HAIR_COLOR, GemRB.GetVar("Hair") )
-	GemRB.SetPlayerStat(MyChar, IE_MAJOR_COLOR, GemRB.GetVar("Major") )
-	GemRB.SetPlayerStat(MyChar, IE_MINOR_COLOR, GemRB.GetVar("Minor") )
+	GemRB.SetPlayerStat(MyChar, IE_HAIR_COLOR, GemRB.GetVar("Color1") )
+	GemRB.SetPlayerStat(MyChar, IE_SKIN_COLOR, GemRB.GetVar("Color2") )
+	GemRB.SetPlayerStat(MyChar, IE_MAJOR_COLOR, GemRB.GetVar("Color3") )
+	GemRB.SetPlayerStat(MyChar, IE_MINOR_COLOR, GemRB.GetVar("Color4") )
 	#LETS PLAY!!
 	GemRB.EnterGame()
 	return
