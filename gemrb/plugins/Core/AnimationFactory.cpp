@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.4 2003/12/19 20:20:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.5 2004/01/04 21:46:39 balrog994 Exp $
  *
  */
 
@@ -60,7 +60,7 @@ void AnimationFactory::LoadFLT(unsigned short * buffer, int count)
 
 Animation * AnimationFactory::GetCycle(unsigned char cycle)
 {
-	if(cycle > cycles.size())
+	if(cycle >= cycles.size())
 		return NULL;
 	int ff = cycles[cycle].FirstFrame, lf = ff + cycles[cycle].FramesCount;
 	Animation * anim = new Animation(&FLTable[ff], cycles[cycle].FramesCount);
