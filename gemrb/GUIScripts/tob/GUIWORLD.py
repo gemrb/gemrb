@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.1 2004/08/26 19:05:41 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.2 2004/10/02 20:54:43 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -43,7 +43,7 @@ def OpenContainerWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	GemRB.LoadWindowPack ("GUIW")
+	GemRB.LoadWindowPack (GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindow (8)
 	GemRB.SetVar ("OtherWindow", Window)
 
@@ -83,7 +83,7 @@ def OpenReformPartyWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	GemRB.LoadWindowPack ("GUIW")
+	GemRB.LoadWindowPack (GetWindowPack())
 	ReformPartyWindow = Window = GemRB.LoadWindow (24)
 	GemRB.SetVar ("OtherWindow", Window)
 
@@ -115,7 +115,7 @@ def OpenFormationWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	GemRB.LoadWindowPack ("GUIW")
+	GemRB.LoadWindowPack (GetWindowPack())
 	FormationWindow = Window = GemRB.LoadWindow (27)
 	GemRB.SetVar ("OtherWindow", Window)
 
@@ -165,3 +165,11 @@ def SelectFormation ():
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
 
 	last_formation = formation
+	return
+
+def GetWindowPack():
+	width = GemRB.GetSystemVariable (SV_WIDTH)
+	if width == 800:
+		return "GUIW08"
+	return "GUIW"
+

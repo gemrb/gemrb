@@ -21,7 +21,7 @@ def OnLoad():
 	global MessageWindow, ExpandButton, Expand
 	global PortraitWindow, OptionsWindow
 
-	GemRB.LoadWindowPack("GUIW")
+	GemRB.LoadWindowPack(GetWindowPack())
 	ActionsWindow = GemRB.LoadWindow(3)
 	PortraitWindow = GemRB.LoadWindow(1)
 	OptionsWindow = GemRB.LoadWindow(0)
@@ -102,7 +102,7 @@ def OnIncreaseSize():
 	Expand = GemRB.GetVar("MessageWindowSize")
 	
 	if Expand == 0:
-		GemRB.LoadWindowPack("GUIW")
+		GemRB.LoadWindowPack(GetWindowPack())
 		TMessageWindow = GemRB.LoadWindow(12)
 		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 		GemRB.SetVar("MessageWindow", TMessageWindow)
@@ -110,7 +110,7 @@ def OnIncreaseSize():
 		GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
 	else :
 		if Expand == 1:
-			GemRB.LoadWindowPack("GUIW")
+			GemRB.LoadWindowPack(GetWindowPack())
 			TMessageWindow = GemRB.LoadWindow(7)
 			TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 			GemRB.SetVar("MessageWindow", TMessageWindow)
@@ -140,7 +140,7 @@ def OnDecreaseSize():
 	Expand = GemRB.GetVar("MessageWindowSize")
 	
 	if Expand == 2:
-		GemRB.LoadWindowPack("GUIW")
+		GemRB.LoadWindowPack(GetWindowPack())
 		TMessageWindow = GemRB.LoadWindow(12)
 		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 		GemRB.SetVar("MessageWindow", TMessageWindow)
@@ -148,7 +148,7 @@ def OnDecreaseSize():
 		GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
 	else:
 		if Expand == 1:
-			GemRB.LoadWindowPack("GUIW")
+			GemRB.LoadWindowPack(GetWindowPack())
 			TMessageWindow = GemRB.LoadWindow(4)
 			TMessageTA = GemRB.GetControl(TMessageWindow, 3)
 			GemRB.SetVar("MessageWindow", TMessageWindow)

@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2003-2004 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.9 2004/09/19 20:04:51 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.10 2004/10/02 20:54:43 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -239,19 +239,16 @@ def GetStatOverview (pc):
 
 	Main = GemRB.GetString (16480)
 
-	# 59856 Current State
-	CurrentState = won + GemRB.GetString (59856) + woff + "\n\n"
-
 	# 67049 AC Bonuses
 	stats.append (67049)
-	#   67204 AC vs. Slashing
-	stats.append ((67204, GS (IE_ACSLASHINGMOD), ''))
-	#   67205 AC vs. Piercing
-	stats.append ((67205, GS (IE_ACPIERCINGMOD), ''))
-	#   67206 AC vs. Crushing
-	stats.append ((67206, GS (IE_ACCRUSHINGMOD), ''))
-	#   67207 AC vs. Missile
-	stats.append ((67207, GS (IE_ACMISSILEMOD), ''))
+	#   14079 AC vs. Slashing
+	stats.append ((14079, GS (IE_ACSLASHINGMOD), ''))
+	#   14081 AC vs. Piercing
+	stats.append ((14081, GS (IE_ACPIERCINGMOD), ''))
+	#   14080 AC vs. Crushing
+	stats.append ((14080, GS (IE_ACCRUSHINGMOD), ''))
+	#   14082 AC vs. Missile
+	stats.append ((14082, GS (IE_ACMISSILEMOD), ''))
 	stats.append (None)
 
 	
@@ -378,7 +375,7 @@ def GetStatOverview (pc):
 				res.append ("")
 				lines = 0
 
-	return Main + CurrentState + string.join (res, "\n")
+	return Main + string.join (res, "\n")
 	pass
 
 

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.24 2004/10/02 11:05:48 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.25 2004/10/02 20:54:42 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -137,5 +137,9 @@ PARTY_SIZE = 6
 #game strings
 STR_LOADMOS  = 0
 
+#game integers
+SV_BPP = 0
+SV_WIDTH = 1
+SV_HEIGHT = 2
 global GEMRB_VERSION
 GEMRB_VERSION = -1
