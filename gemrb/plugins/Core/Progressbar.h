@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.4 2004/09/04 12:10:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.5 2004/09/11 12:18:12 avenger_teambg Exp $
  *
  */
 
@@ -59,8 +59,8 @@ public:
   void SetAnimation(Animation *arg);
   /** Sets a mos resource for progressbar cap */
   void SetBarCap(Sprite2D *img3);
-  /** Sets the mos coordinates for the progressbar filler mos */
-  void SetSliderPos(int x, int y);
+  /** Sets the mos coordinates for the progressbar filler mos/cap */
+  void SetSliderPos(int x, int y, int x2, int y2);
   /** Dummy function */
   int SetText(const char * string, int pos = 0);
   /** Redraws a progressbar which is associated with VariableName */
@@ -73,6 +73,7 @@ private: // Private attributes
   /** Knob Steps Count */
   unsigned int KnobStepsCount;
   int KnobXPos, KnobYPos; //relative coordinates for Background2
+  int CapXPos, CapYPos; //relative coordinates for PBarCap
   /** If true, on deletion the Progressbar will destroy the associated images */
   bool Clear;
   /** The bam cycle whose frames work as a progressbar (animated progressbar) */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.8 2004/09/04 12:10:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.9 2004/09/11 12:18:12 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,7 @@ Progressbar::Progressbar( unsigned short KnobStepsCount, bool Clear)
 	this->KnobStepsCount = KnobStepsCount;
 	PBarAnim = NULL;
 	KnobXPos = KnobYPos = 0;
+	CapXPos = CapYPos = 0;
 }
 
 Progressbar::~Progressbar()
@@ -87,10 +88,8 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 		Region r( x + XPos + KnobXPos, y + YPos + KnobYPos, Count, h );
 		core->GetVideoDriver()->BlitSprite( BackGround2, 
 			r.x, r.y, true, &r );
-		printf("Count: %d Width: %d  Height: %d\n", Count, w, h);
-		printf("x: %d  y: %d\n", r.x, r.y);
 		core->GetVideoDriver()->BlitSprite( PBarCap,
-			r.x+Count, (int) r.y );
+			x+XPos+CapXPos+Count, y+YPos+CapYPos );
 		return;
 	}
 
@@ -150,10 +149,12 @@ void Progressbar::SetAnimation(Animation *arg)
 	PBarAnim = arg;
 }
 
-void Progressbar::SetSliderPos(int x, int y)
+void Progressbar::SetSliderPos(int x, int y, int x2, int y2)
 {
 	KnobXPos=x;
 	KnobYPos=y;
+	CapXPos=x2;
+	CapYPos=y2;
 }
 
 /* dummy virtual function */
