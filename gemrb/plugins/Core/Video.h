@@ -53,6 +53,7 @@ public:
 	virtual Color * GetPalette(Sprite2D * spr) = 0;
 	/** Event Manager Pointer */
 	EventMgr * Evnt;
+	virtual void * GetVideoSurface() = 0;
 };
 
 #endif

@@ -1,8 +1,11 @@
 #ifndef MOVIEPLAYER_H
 #define MOVIEPLAYER_H
 
+#include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include "Plugin.h"
+#include "DataStream.h"
+
 
 #ifdef WIN32
 
@@ -21,10 +24,7 @@ class GEM_EXPORT MoviePlayer : public Plugin
 public:
 	MoviePlayer(void);
 	virtual ~MoviePlayer(void);
-	virtual int LoadFromFile(char* filename) = 0;
-	virtual int LoadFromStream(FILE * stream, bool autoFree = false) = 0;
-	virtual int LoadFromMemory(Byte * buffer, int length, bool autoFree = false) = 0;
-	virtual int UnloadMovie(void) = 0;
+	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
 	virtual int Play() = 0;
 };
 

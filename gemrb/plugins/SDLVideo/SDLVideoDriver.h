@@ -40,6 +40,10 @@ public:
 	bool Quit();
 	/** Get the Palette of a Sprite */
 	Color * GetPalette(Sprite2D * spr);
+	void * GetVideoSurface()
+	{
+		return disp;
+	}
 };
 
 #endif
