@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.74 2003/11/28 18:57:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.75 2003/11/28 21:54:14 avenger_teambg Exp $
  *
  */
 
@@ -63,6 +63,7 @@ Interface::Interface(void)
 	GUIScriptsPath[0]=0;
 	GamePath[0]=0;
 	GemRBPath[0]=0;
+	GameFeatures=0;
 	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
 		printStatus("ERROR", LIGHT_RED);
@@ -562,6 +563,17 @@ Factory * Interface::GetFactory(void)
 	return factory;
 }
 
+int Interface::SetFeature(int flag, int position)
+{
+	if(flag) GameFeatures|=1<<position;
+	else GameFeatures&=~(1<<position);
+	return GameFeatures;
+}
+int Interface::HasFeature(int position)
+{
+	return GameFeatures&(1<<position);
+}
+
 bool Interface::LoadConfig(void)
 {
 	FILE * config;
@@ -592,6 +604,15 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "CaseSensitive") == 0) {
 			CaseSensitive = (atoi(value) == 0) ? false : true;
+		}
+		else if(stricmp(name, "ScrollBarPatch") == 0) {
+			SetFeature(atoi(value),GF_SCROLLBAR_PATCH);
+		}
+		else if(stricmp(name, "AllStringsTagged") == 0) {
+			SetFeature(atoi(value),GF_ALL_STRINGS_TAGGED);
+		}
+		else if(stricmp(name, "HasSonglist") == 0) {
+			SetFeature(atoi(value),GF_HAS_SONGLIST);
 		}
 		else if(stricmp(name, "ForceStereo") == 0) {
 			ForceStereo = atoi(value);

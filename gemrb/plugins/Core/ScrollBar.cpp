@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.16 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.17 2003/11/28 21:54:14 avenger_teambg Exp $
  *
  */
 
@@ -69,7 +69,9 @@ void ScrollBar::Draw(unsigned short x, unsigned short y)
 		return;
 	unsigned short upmx = 0, upMx = frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Width, upmy = 0, upMy = frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
 	unsigned short domx = 0, doMx = frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Width, domy = Height-frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height, doMy = Height;
-	unsigned short slmx = 0, slMx = frames[IE_GUI_SCROLLBAR_SLIDER]->Width, slmy = upMy+(Pos*((domy-frames[5]->Height-upMy)/(double)(Value == 1 ? Value : Value -1))), slMy = slmy+frames[IE_GUI_SCROLLBAR_SLIDER]->Height;
+	unsigned short slmx = 0, slMx = frames[IE_GUI_SCROLLBAR_SLIDER]->Width;
+	unsigned short slmy = (unsigned short) (upMy+(Pos*((domy-frames[5]->Height-upMy)/(double)(Value == 1 ? Value : Value -1))));
+	unsigned short slMy = slmy+frames[IE_GUI_SCROLLBAR_SLIDER]->Height;
 	unsigned short slx  = (Width/2)-(frames[IE_GUI_SCROLLBAR_SLIDER]->Width/2);
 
 	if((State & UP_PRESS) != 0)

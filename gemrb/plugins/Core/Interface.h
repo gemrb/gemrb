@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.45 2003/11/28 09:33:09 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.46 2003/11/28 21:54:14 avenger_teambg Exp $
  *
  */
 
@@ -106,6 +106,7 @@ private:
 	std::vector<Symbol> symbols;
 	DataFileMgr * INIparty;
 	Game * game;
+	int GameFeatures;
 public:
 	Animation * Cursors[48];
 public:
@@ -113,6 +114,8 @@ public:
 	~Interface(void);
 	int Init(void);
 	//TODO: Core Methods in Interface Class
+	int SetFeature(int value, int position);
+	int HasFeature(int position);
 	bool IsAvailable(SClass_ID filetype);
 	void * GetInterface(SClass_ID filetype);
 	const char * TypeExt(SClass_ID type);

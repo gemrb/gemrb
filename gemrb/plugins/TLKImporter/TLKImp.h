@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.7 2003/11/27 14:47:02 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.8 2003/11/28 21:54:16 avenger_teambg Exp $
  *
  */
 
@@ -35,10 +35,6 @@ private:
 
 	//Data
 	unsigned long StrRefCount, Offset;
-
-	//Baldur's Gate 1 Compatibility Flag
-	bool isBG1;
-  bool isIWD;
 public:
 	TLKImp(void);
 	~TLKImp(void);
