@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.3 2004/02/24 22:20:41 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.4 2004/04/13 23:01:39 doc_wagon Exp $
  *
  */
 
@@ -185,7 +185,7 @@ ITMExtHeader* ITMImp::GetExtHeader(Item* s)
 	str->Read( &eh->Recharge, 1 );
 	str->Read( &eh->unknown2, 2 );
 	str->Read( &eh->ProjectileAnimation, 2 );
-	for (int i; i < 3; i++) {
+	for (int i = 0; i < 3; i++) {
 		str->Read( &eh->MeleeAnimation[i], 2 );
 	}
 	str->Read( &eh->BowArrowQualifier, 2 );
