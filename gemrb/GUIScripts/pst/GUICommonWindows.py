@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.23 2004/10/17 17:25:49 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.24 2004/10/17 19:34:59 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -32,7 +32,8 @@ TimeWindow = None
 PortWindow = None
 MenuWindow = None
 MainWindow = None
-
+global PortraitWindow
+PortraitWindow = None
 # Buttons:
 # 0 CNTREACH
 # 1 INVNT
@@ -219,11 +220,15 @@ def RunSelectionChangeHandler ():
 		SelectionChangeHandler ()
 
 
-def PopulatePortraitWindow (Window):
+def OpenPortraitWindow ():
 	global PortraitWindow
-	PortraitWindow = Window
 
-	for i in range (0,PARTY_SIZE):
+	PortraitWindow = Window = GemRB.LoadWindow (1)
+	GemRB.SetVar ("PortraitWindow", PortraitWindow)
+	GemRB.SetVar ("PortraitPosition", 1)    # Bottom
+
+
+	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
 		ButtonHP = GemRB.GetControl (Window, 6 + i)
 		#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
@@ -236,6 +241,18 @@ def PopulatePortraitWindow (Window):
 
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
+
+	UpdatePortraitWindow ()
+	GemRB.SetVisible (PortraitWindow, 1)
+
+
+def UpdatePortraitWindow ():
+	Window = PortraitWindow
+
+	for i in range (PARTY_SIZE):
+		Button = GemRB.GetControl (Window, i)
+		ButtonHP = GemRB.GetControl (Window, 6 + i)
+
 		pic = GemRB.GetPlayerPortrait (i+1, 0)
 		if not pic:
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.23 2004/09/28 14:25:25 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.24 2004/10/17 19:34:59 edheldil Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -26,6 +26,7 @@
 import GemRB
 
 from GUICommonWindows import *
+import GUICommonWindows
 
 from FloatMenuWindow import *
 
@@ -53,18 +54,18 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUIWORLD")
 	GemRB.SetInfoTextColor(0,255,0,255)
 	ActionsWindow = GemRB.LoadWindow(0)
-	PortraitWindow = GemRB.LoadWindow(1)
-	PopulatePortraitWindow (PortraitWindow)
+	# FIXME: ugly
+	OpenPortraitWindow ()
+	PortraitWindow = GUICommonWindows.PortraitWindow
+
 	OptionsWindow = GemRB.LoadWindow(2)
 	MessageWindow = GemRB.LoadWindow(7)
 	MessageTA = GemRB.GetControl(MessageWindow, 1)
 	GemRB.SetTAAutoScroll(MessageWindow, MessageTA, 1)
-	GemRB.SetVar("PortraitWindow", PortraitWindow)
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
 	GemRB.SetVar("OptionsWindow", OptionsWindow)
 	GemRB.SetVar("MessageWindow", -1)
 	GemRB.SetVar("OtherWindow", -1)
-	GemRB.SetVar("PortraitPosition", 1) #Bottom
 	GemRB.SetVar("ActionsPosition", 1) #Bottom
 	GemRB.SetVar("OptionsPosition", 1) #Bottom
 	GemRB.SetVar("MessagePosition", 1) #Bottom
@@ -93,7 +94,6 @@ def OnLoad():
 	UpdateResizeButtons()
 	
 	GemRB.SetVisible(ActionsWindow, 1)
-	GemRB.SetVisible(PortraitWindow, 1)
 	GemRB.SetVisible(OptionsWindow, 1)
 	GemRB.SetVisible(MessageWindow, 0)
 	return
