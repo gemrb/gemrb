@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.62 2004/01/06 00:54:06 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.63 2004/01/07 20:22:12 balrog994 Exp $
  *
  */
 
@@ -183,8 +183,21 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 								ta->AppendText(Text, -1);
 							}
 						}
-						GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);
-						gc->MoveToArea(ip->Destination, ip->EntranceName);
+						char Tmp[256];
+						if(ip->Destination[0] != 0) {
+							sprintf(Tmp, "LeaveAreaLUA(\"%s\", \"\", [-1.-1], -1)", ip->Destination);
+							actor->ClearPath();
+							actor->AddActionInFront(GameScript::CreateAction(Tmp));
+							GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);
+							strcpy(gc->EntranceName, ip->EntranceName);
+						} else {
+							if(ip->Scripts[0]) {
+								ip->Clicker = actor;
+								ip->LastTrigger = actor;
+								ip->Scripts[0]->Update();
+								ip->ProcessActions();
+							}
+						}
 					}
 				}
 				break;
