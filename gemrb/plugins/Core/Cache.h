@@ -15,16 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.2 2005/01/22 13:42:58 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.3 2005/01/27 17:27:30 avenger_teambg Exp $
  *
  */
 
 #ifndef CACHE_H
 #define CACHE_H
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
 #include <ctype.h>
+#ifdef WIN32
+#include <MAP>
+#else
 #include <ext/hash_map>
+#endif
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include "../../includes/SClassID.h"
@@ -36,6 +42,17 @@
 #define SGI_HASH_NAMESPACE __gnu_cxx
 #endif
 #endif // SGI_HASH_NAMESPACE
+#ifdef WIN32
+
+#ifdef GEM_BUILD_DLL
+#define GEM_EXPORT __declspec(dllexport)
+#else
+#define GEM_EXPORT __declspec(dllimport)
+#endif
+
+#else
+#define GEM_EXPORT
+#endif
 
 class GEM_EXPORT Cache {
 protected:
@@ -44,7 +61,6 @@ protected:
                 void* data; 
         } Value;
 
-        inline bool MyCopyKey(char*& dest, ieResRef key) const;
         struct eqstr
         {
                 bool operator()(const char* s1, const char* s2) const
@@ -52,7 +68,12 @@ protected:
                         return !strnicmp( s1, s2, MAX_VARIABLE_LENGTH );
                 }
         };
+        inline bool MyCopyKey(char*& dest, ieResRef key) const;
+#ifdef WIN32
+        typedef std::map<const char*, ValueType, eqstr> HashMapType;
+#else
         typedef SGI_HASH_NAMESPACE::hash_map<const char*, ValueType, SGI_HASH_NAMESPACE::hash<const char *>, eqstr> HashMapType;
+#endif
         HashMapType hashmap;
 
 public:

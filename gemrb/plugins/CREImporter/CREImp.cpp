@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.55 2005/01/22 20:28:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.56 2005/01/27 17:27:28 avenger_teambg Exp $
  *
  */
 
@@ -24,8 +24,22 @@
 #include "../Core/Interface.h"
 #include "../../includes/ie_stats.h"
 
-static int RandColor;
-static TableMgr *rndcol=NULL;
+#define MAXCOLOR 12
+typedef unsigned char ColorSet[MAXCOLOR];
+static int RandColor=-1;
+static int RandRows;
+static ColorSet* randcolors=NULL;
+
+//static int RandColor;
+//static TableMgr *rndcol=NULL;
+
+void ReleaseMemory()
+{
+        if(randcolors) {
+		delete [] randcolors;
+                randcolors = NULL;
+        }
+}
 
 CREImp::CREImp(void)
 {
@@ -145,17 +159,45 @@ CRESpellMemorization* CREImp::GetSpellMemorization()
 
 void CREImp::SetupColor(ieDword &stat)
 {
-	if(!RandColor) {
-		RandColor = core->LoadTable( "RANDCOLR" );
-		rndcol = core->GetTable( RandColor );
-	}
-
-	if (stat >= 200) {
-		if(rndcol) {
-			stat = atoi( rndcol->QueryField( ( rand() % 10 ) + 1, stat - 200 ) );
+	if (RandColor==-1) {
+		int table = core->LoadTable( "RANDCOLR" );
+		TableMgr *rndcol = core->GetTable( table );
+		RandColor=rndcol->GetColumnCount();
+		RandRows=rndcol->GetRowCount();
+		if (RandRows>MAXCOLOR) RandRows=MAXCOLOR;
+		if (RandRows>1 && RandColor>0) {
+			randcolors = new ColorSet[RandColor];
+			int cols = RandColor;
+			while(cols--)
+			{
+				for (int i=0;i<RandRows;i++) {
+					randcolors[cols][i]=atoi( rndcol->QueryField( i, cols ) );
+				}
+				randcolors[cols][0]-=200;
+			}
 		}
 		else {
-			stat -= 200;
+			RandColor=0;
+		}
+		core->DelTable( table );
+	}
+
+	if (stat<200) return;
+	if (RandColor>0) {
+		stat-=200;
+		//assuming an ordered list, so looking in the middle first
+		int i;
+		for (i=(int) stat;i>=0;i--) {
+			if (randcolors[i][0]==stat) {
+				stat=randcolors[i][ rand()%RandRows + 1];
+				return;
+			}
+		}
+		for(i=(int) stat+1;i<RandColor;i++) {
+			if (randcolors[i][0]==stat) {
+				stat=randcolors[i][ rand()%RandRows + 1];
+				return;
+			}
 		}
 	}
 }
