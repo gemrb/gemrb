@@ -299,7 +299,7 @@ bool ACMImp::AcmToWav(DataStream *inFile, const char * tmpFile, const char * out
 		return false;
 	unsigned char *buffer = NULL;
 	long samples_written;
-	int ret = ConvertAcmWav(fhandle, -1L, buffer, samples_written, 0);
+	int ret = ConvertAcmWav(fhandle, -1L, buffer, samples_written, core->ForceStereo);
 	if(ret != 0) {
 		if(buffer)
 			delete buffer;
