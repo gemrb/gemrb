@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.13 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.14 2004/04/04 20:22:40 avenger_teambg Exp $
  *
  */
 
@@ -66,14 +66,13 @@ public:
 	void AddChar(void* spr, int w, int h, short xPos, short yPos);
 	void Print(Region rgn, unsigned char* string, Color* color,
 		unsigned char Alignment, bool anchor = false, Font* initials = NULL,
-		Color* initcolor = NULL, Sprite2D* cursor = NULL, int curpos = 0);
+		Color* initcolor = NULL, Sprite2D* cursor = NULL, unsigned int curpos = 0);
 	void PrintFromLine(int startrow, Region rgn, unsigned char* string,
 		Color* color, unsigned char Alignment, bool anchor = false,
 		Font* initials = NULL, Color* initcolor = NULL,
-		Sprite2D* cursor = NULL, int curpos = 0);
+		Sprite2D* cursor = NULL, unsigned int curpos = 0);
 	void* GetPalette();
 	char ResRef[9];
-	//Sprite2D * chars[256];
 	Region size[256];
 	short xPos[256];
 	short yPos[256];
@@ -81,7 +80,7 @@ public:
 private: // Private methods
 	int CalcStringWidth(char* string);
 public:
-	void SetupString(char* string, int width);
+	void SetupString(char* string, unsigned int width);
 };
 
 #endif

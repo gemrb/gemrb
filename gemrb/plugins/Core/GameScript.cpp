@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.126 2004/04/04 10:13:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.127 2004/04/04 20:22:40 avenger_teambg Exp $
  *
  */
 
@@ -160,11 +160,12 @@ static TriggerLink triggernames[] = {
 	{"specific", GameScript::Specific,0},
 	{"statecheck", GameScript::StateCheck,0},
 	{"targetunreachable", GameScript::TargetUnreachable,0},
-	{"true", GameScript::True,0}, {"xp", GameScript::XP,0},
+	{"true", GameScript::True,0},
 	{"unselectablevariable", GameScript::UnselectableVariable,0},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT,0},
 	{"unselectablevariablelt", GameScript::UnselectableVariableLT,0},
 	{"xor", GameScript::Xor,TF_MERGESTRINGS},
+	{"xp", GameScript::XP,0},
 	{"xpgt", GameScript::XPGT,0},
 	{"xplt", GameScript::XPLT,0}, { NULL,NULL,0},
 };
@@ -416,6 +417,7 @@ static IDSLink idsnames[] = {
 	{"specific",GameScript::ID_Specific},
 	{"subrace",GameScript::ID_Subrace},
 	{"team",GameScript::ID_Team},
+	{ NULL,NULL},
 };
 
 static TriggerLink* FindTrigger(const char* triggername)
@@ -2694,7 +2696,7 @@ int GameScript::NumItemsParty(Scriptable* Sender, Trigger* parameters)
 
 	//there is an assignment here
 	for(int i=0; (actor = game->GetPC(i)) ; i++) {
-		cnt+=actor->inventory->CountItems(parameters->string0Parameter,1);
+		cnt+=actor->inventory.CountItems(parameters->string0Parameter,1);
 	}
 	return cnt==parameters->int0Parameter;
 }
@@ -2707,7 +2709,7 @@ int GameScript::NumItemsPartyGT(Scriptable* Sender, Trigger* parameters)
 
 	//there is an assignment here
 	for(int i=0; (actor = game->GetPC(i)) ; i++) {
-		cnt+=actor->inventory->CountItems(parameters->string0Parameter,1);
+		cnt+=actor->inventory.CountItems(parameters->string0Parameter,1);
 	}
 	return cnt>parameters->int0Parameter;
 }
@@ -2720,7 +2722,7 @@ int GameScript::NumItemsPartyLT(Scriptable* Sender, Trigger* parameters)
 
 	//there is an assignment here
 	for(int i=0; (actor = game->GetPC(i)) ; i++) {
-		cnt+=actor->inventory->CountItems(parameters->string0Parameter,1);
+		cnt+=actor->inventory.CountItems(parameters->string0Parameter,1);
 	}
 	return cnt<parameters->int0Parameter;
 }
@@ -2732,7 +2734,7 @@ int GameScript::NumItems(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) tar;
-	int cnt = actor->inventory->CountItems(parameters->string0Parameter,1);
+	int cnt = actor->inventory.CountItems(parameters->string0Parameter,1);
 	return cnt==parameters->int0Parameter;
 }
 
@@ -2743,7 +2745,7 @@ int GameScript::NumItemsGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) tar;
-	int cnt = actor->inventory->CountItems(parameters->string0Parameter,1);
+	int cnt = actor->inventory.CountItems(parameters->string0Parameter,1);
 	return cnt>parameters->int0Parameter;
 }
 
@@ -2754,7 +2756,7 @@ int GameScript::NumItemsLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) tar;
-	int cnt = actor->inventory->CountItems(parameters->string0Parameter,1);
+	int cnt = actor->inventory.CountItems(parameters->string0Parameter,1);
 	return cnt<parameters->int0Parameter;
 }
 
@@ -2766,7 +2768,7 @@ int GameScript::Contains(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Container *cnt = (Container *) tar;
-	if (cnt->inventory->HasItem(parameters->string0Parameter,0) ) {
+	if (cnt->inventory.HasItem(parameters->string0Parameter,0) ) {
 		return 1;
 	}
 	return 0;
@@ -2779,7 +2781,7 @@ int GameScript::HasItem(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) scr;
-	if (actor->inventory->HasItem(parameters->string0Parameter, 0) ) {
+	if (actor->inventory.HasItem(parameters->string0Parameter, 0) ) {
 		return 1;
 	}
 	return 0;
@@ -2796,7 +2798,7 @@ int GameScript::HasItemSlot(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) scr;
 	//this might require a conversion of the slots
-	if (actor->inventory->HasItemInSlot(parameters->string0Parameter, parameters->int0Parameter) ) {
+	if (actor->inventory.HasItemInSlot(parameters->string0Parameter, parameters->int0Parameter) ) {
 		return !parameters->string0Parameter;
 	}
 	return !!parameters->string0Parameter;
@@ -2806,7 +2808,7 @@ int GameScript::HasItemEquipped(Scriptable * Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	Actor *actor = (Actor *) scr;
-	if (actor->inventory->HasItem(parameters->string0Parameter, 1) ) {
+	if (actor->inventory.HasItem(parameters->string0Parameter, 1) ) {
 		return 1;
 	}
 	return 0;
@@ -2827,7 +2829,7 @@ int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger* parameters)
 
 	//there is an assignment here
 	for(int i=0; (actor = game->GetPC(i)) ; i++) {
-		if (actor->inventory->HasItem(parameters->string0Parameter,parameters->int0Parameter) ) {
+		if (actor->inventory.HasItem(parameters->string0Parameter,parameters->int0Parameter) ) {
 			return 1;
 		}
 	}
@@ -2841,7 +2843,7 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* paramet
 
 	//there is an assignment here
 	for(int i=0; (actor = game->GetPC(i)) ; i++) {
-		if (actor->inventory->HasItem(parameters->string0Parameter,2) ) {
+		if (actor->inventory.HasItem(parameters->string0Parameter,2) ) {
 			return 1;
 		}
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.28 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.29 2004/04/04 20:22:39 avenger_teambg Exp $
  *
  */
 
@@ -117,7 +117,7 @@ bool written = false;
 
 void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
 	Color* hicolor, unsigned char Alignment, bool anchor, Font* initials,
-	Color* initcolor, Sprite2D* cursor, int curpos)
+	Color* initcolor, Sprite2D* cursor, unsigned int curpos)
 {
 	Color* pal = NULL, * ipal = NULL;
 	unsigned long psx = PARAGRAPH_START_X;
@@ -226,7 +226,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
 		video->BlitSpriteRegion( sprBuffer, size[currChar],
 				x + rgn.x - xPos[currChar], y + rgn.y - yPos[currChar], true,
 				&rgn );
-		if (cursor && ( curpos == i ))
+		if (cursor && ( i == curpos ))
 			video->BlitSprite( cursor, x - xPos[currChar] + rgn.x, y + rgn.y,
 					true, &rgn );
 		x += size[currChar].w - xPos[currChar];
@@ -240,7 +240,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
 
 void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
 	unsigned char Alignment, bool anchor, Font* initials, Color* initcolor,
-	Sprite2D* cursor, int curpos)
+	Sprite2D* cursor, unsigned int curpos)
 {
 	Color* pal = NULL, * ipal = NULL;
 	unsigned long psx = PARAGRAPH_START_X;
@@ -253,9 +253,7 @@ void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
 	if (!pal) {
 		pal = palette;
 	}
-	//for(int i = 0; i < 255; i++) {
-	//	core->GetVideoDriver()->SetPalette(chars[i], pal);
-	//}
+
 	core->GetVideoDriver()->SetPalette( sprBuffer, pal );
 	Video* video = core->GetVideoDriver();
 	size_t len = strlen( ( char* ) string );
@@ -377,12 +375,12 @@ int Font::CalcStringWidth(char* string)
 	return ( int ) ret;
 }
 
-void Font::SetupString(char* string, int width)
+void Font::SetupString(char* string, unsigned int width)
 {
 	size_t len = strlen( string );
-	unsigned long psx = PARAGRAPH_START_X;
+	unsigned int psx = PARAGRAPH_START_X;
 	int lastpos = 0;
-	int x = psx, wx = 0;
+	unsigned int x = psx, wx = 0;
 	bool endword = false;
 	for (size_t pos = 0; pos < len; pos++) {
 		if (x + wx > width) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.23 2004/03/29 23:52:29 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.24 2004/04/04 20:22:39 avenger_teambg Exp $
  *
  */
 
@@ -88,7 +88,7 @@ public:
 	Actor *LastHeard;
 	Actor *LastSummoner;
 
-	Inventory* inventory;
+	Inventory inventory;
 	Spellbook* spellbook;
 
 private:
