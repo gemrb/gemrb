@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.146 2004/03/29 15:53:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.147 2004/03/31 21:31:09 avenger_teambg Exp $
  *
  */
 
@@ -2431,9 +2431,9 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot;
-	char *Portrait1, *Portrait2;
+	char *Portrait1=NULL, *Portrait2=NULL;
 
-	if (!PyArg_ParseTuple( args, "iss", &PlayerSlot, &Portrait1, &Portrait2)) {
+	if (!PyArg_ParseTuple( args, "i|ss", &PlayerSlot, &Portrait1, &Portrait2)) {
 		printMessage( "GUIScript", "Syntax Error: FillPlayerInfo(Slot)\n",
 			LIGHT_RED );
 		return NULL;
@@ -2445,18 +2445,12 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	if (!MyActor) {
 		return NULL;
 	}
-/*
-	char* poi;
-	unsigned long PortraitIndex;
-	if (core->GetDictionary()->Lookup( "PortraitIndex", PortraitIndex )) {
-		int table = core->LoadTable( "pictures" );
-		TableMgr* tm = core->GetTable( table );
-		poi = tm->GetRowName( PortraitIndex );
-		MyActor->SetPortrait( poi );
+	if(Portrait1) {
+		MyActor->SetPortrait( Portrait1, 1);
 	}
-*/
-	MyActor->SetPortrait( Portrait1, 1);
-	MyActor->SetPortrait( Portrait2, 2);
+	if(Portrait2) {
+		MyActor->SetPortrait( Portrait2, 2);
+	}
 	int mastertable = core->LoadTable( "avprefix" );
 	TableMgr* mtm = core->GetTable( mastertable );
 	int count = mtm->GetRowCount();
