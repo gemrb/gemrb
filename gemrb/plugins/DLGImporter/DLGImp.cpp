@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.5 2004/02/10 20:48:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.6 2004/02/11 22:27:09 avenger_teambg Exp $
  *
  */
 
@@ -235,11 +235,12 @@ char **DLGImp::GetStrings(char * string, unsigned long &count)
 		while(isspace(*poi) ) poi++;
 		int len=GetActionLength(poi);
 		strings[i]=(char *) malloc(len+1);
-		memcpy(strings[i],poi,len);
-		poi+=len;
-		if(len && (strings[i][len-1] == '\r'))
-			len--;
-		strings[i][len]=0;
+		int j;
+		for(j=0;len;poi++,len--) {
+			if(isspace(*poi)) continue;
+			strings[i][j++]=*poi;
+		}
+		strings[i][j]=0;
 	}
 	return strings;
 }
