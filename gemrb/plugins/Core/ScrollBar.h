@@ -11,6 +11,10 @@
 #define IE_GUI_SCROLLBAR_TROUGH         4
 #define IE_GUI_SCROLLBAR_SLIDER         5
 
+#define UP_PRESS     0x0001
+#define DOWN_PRESS   0x0010
+#define SLIDER_GRAB  0x0100
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -32,8 +36,21 @@ public:
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
 	Sprite2D * frames[6];
+	/** Cursor Position */
+	unsigned short Pos;
+	/** Cursor Max Position */
+	unsigned short Max;
+	/** Scroll Bar Status */
+	unsigned short State;
 public:
 	void SetImage(unsigned char type, Sprite2D * img);
+public: // Public Events
+  /** Mouse Button Down */
+  void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+  /** Mouse Button Up */
+  void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+  /** Mouse Over Event */
+  void OnMouseOver(unsigned short x, unsigned short y);
 };
 
 #endif
