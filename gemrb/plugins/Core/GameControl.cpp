@@ -76,6 +76,9 @@ GameControl::GameControl(void)
 GameControl::~GameControl(void)
 {
 	free(InfoTextPalette);
+	for(int i = 0; i < infoTexts.size(); i++) {
+		delete(infoTexts[i]);
+	}
 }
 
 /** Draws the Control on the Output Display */
