@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.24 2004/12/05 12:46:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.25 2004/12/06 21:44:52 avenger_teambg Exp $
 
 
 #Character Generation
@@ -305,7 +305,7 @@ def AcceptPress():
 	c = GemRB.GetTableValue(TmpTable, t, 2) #adjustment
 	d = GemRB.GetTableValue(TmpTable, t, 3) #external multiplier
 	e = GemRB.GetTableValue(TmpTable, t, 4) #level bonus rate
-	t = GemRB.GetPlayerStat(IE_LEVEL) #FIXME: calculate multiclass average
+	t = GemRB.GetPlayerStat(MyChar, IE_LEVEL) #FIXME: calculate multiclass average
 	if t>1:
 		e=e*(t-1)
 	else:
@@ -1540,7 +1540,6 @@ def MageSpellsSelect():
 			GemRB.SetEvent(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
 			GemRB.SetVarAssoc(MageSpellsWindow, SpellButton, "SpellMask", 1 << i)
 			GemRB.SetTooltip(MageSpellsWindow, SpellButton, Spell['SpellName'])
-			#GemRB.SetButtonBorder(MageSpellsWindow, SpellButton, 0,1,1,2,2, 128,0,0,0)
 		else:
 			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
 

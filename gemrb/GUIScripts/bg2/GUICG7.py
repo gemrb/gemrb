@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.3 2004/12/05 13:02:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.4 2004/12/06 21:44:42 avenger_teambg Exp $
 # character generation, mage spells (GUICG7)
 
 import GemRB
@@ -50,6 +50,7 @@ def OnLoad():
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
 	GemRB.SetLabelUseRGB(MageSpellsWindow, PointsLeftLabel, 1)
 	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
+
 	for i in range (24):
 		SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
 		GemRB.SetButtonFlags(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
@@ -59,6 +60,7 @@ def OnLoad():
 			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
 			GemRB.SetVarAssoc(MageSpellsWindow, SpellButton, "SpellMask", 1 << i)
+			GemRB.SetTooltip(MageSpellsWindow, SpellButton, Spell['SpellName'])
 		else:
 			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
 
@@ -71,14 +73,16 @@ def OnLoad():
 	GemRB.SetEvent(MageSpellsWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsDonePress")
 	GemRB.SetText(MageSpellsWindow, DoneButton, 11973)
 	GemRB.SetButtonFlags(MageSpellsWindow, DoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+
 	MageSpellsCancelButton = GemRB.GetControl(MageSpellsWindow, 29)
 	GemRB.SetButtonState(MageSpellsWindow, MageSpellsCancelButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(MageSpellsWindow, MageSpellsCancelButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsCancelPress")
 	GemRB.SetText(MageSpellsWindow, MageSpellsCancelButton, 13727)
-	MageSpellsCancelButton = GemRB.GetControl(MageSpellsWindow, 30)
-	GemRB.SetButtonState(MageSpellsWindow, MageSpellsCancelButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(MageSpellsWindow, MageSpellsCancelButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsDonePress")
-	GemRB.SetText(MageSpellsWindow, MageSpellsCancelButton, 9372)
+
+	MageSpellsPickButton = GemRB.GetControl(MageSpellsWindow, 30)
+	GemRB.SetButtonState(MageSpellsWindow, MageSpellsPickButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(MageSpellsWindow, MageSpellsPickButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsPickPress")
+	GemRB.SetText(MageSpellsWindow, MageSpellsPickButton, 9372)
 
 	GemRB.SetVisible(MageSpellsWindow,1)
 	return
@@ -128,3 +132,18 @@ def MageSpellsDonePress():
 	GemRB.UnloadWindow(MageSpellsWindow)
 	GemRB.SetNextScript("GUICG6") #abilities
 	return
+
+def MageSpellsPickPress():
+	Range = len(Learnable)
+	if MageSpellsSelectPointsLeft > Range:
+		MageSpellsSelectPointsLeft = Range
+	#make this less ugly without ruining Learnable
+	for i in range(MageSpellsSelectPointsLeft):
+		j = GemRB.Roll(1,Range,-1)
+		if SpellMask & (1<<j):
+			continue
+		SpellMask = SpellMask | (1<<j)
+
+	MageSpellsDonePress()
+	return
+
