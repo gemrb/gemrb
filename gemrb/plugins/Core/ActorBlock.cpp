@@ -491,12 +491,15 @@ void Moveble::DrawTargetPoint()
 	if (!path || !Selected)
 		return;
 
-	unsigned long t;
-	GetTime(t);
+	// generates "step" from sequence 3 2 1 0 1 2 3 4
+	//   updated each 1/15 sec
+	unsigned long step;
+	GetTime( step );
+	step = abs (((step >> 6) % 8) - 3);
 
 	Region vp = core->GetVideoDriver()->GetViewport();
 	core->GetVideoDriver()->DrawEllipse( XDes - vp.x, YDes - vp.y,
-		 size * 10, ( ( size * 15 ) / 2 ), selectedColor );
+		 size * 10 - step, ( ( size * 15 ) / 2 ) - step, selectedColor );
 
 }
 
