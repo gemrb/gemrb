@@ -51,7 +51,10 @@ GameControl::GameControl(void)
 	drawPath = NULL;
 	pfsX = 0;
 	pfsY = 0;
-	InfoTextPalette = core->GetVideoDriver()->CreatePalette(white, black);
+	if(strcmp(core->GameType, "pst") == 0)
+		InfoTextPalette = core->GetVideoDriver()->CreatePalette(green, black);
+	else
+		InfoTextPalette = core->GetVideoDriver()->CreatePalette(white, black);
 	lastCursor = 0;
 	moveX = moveY = 0;
 	DebugFlags = 0;
