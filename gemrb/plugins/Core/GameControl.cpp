@@ -9,6 +9,7 @@ GameControl::GameControl(void)
 	MapIndex = -1;
 	Changed = true;
 	lastActor = NULL;
+	DrawSelectionRect = false;
 }
 
 GameControl::~GameControl(void)
@@ -23,8 +24,16 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Region vp(x+XPos, y+YPos, Width, Height);
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
-	if(area)
+	if(area) {
 		area->DrawMap(vp);
+		if(DrawSelectionRect) {
+			Color green = {0x00, 0xff, 0x00, 0xff};
+			Video * video = core->GetVideoDriver();
+			unsigned short xs[4] = {SelectionRect.x, SelectionRect.x+SelectionRect.w, SelectionRect.x+SelectionRect.w, SelectionRect.x};
+			unsigned short ys[4] = {SelectionRect.y, SelectionRect.y, SelectionRect.y+SelectionRect.h, SelectionRect.y+SelectionRect.h};
+			video->DrawPolyline(xs, ys, 4, green);
+		}
+	}
 	else {
 		Color Blue;
 		Blue.b = 0xff;
@@ -54,26 +63,56 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 {
 	unsigned short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
-	Game * game = core->GetGame();
-	Map * area = game->GetMap(MapIndex);
-	ActorBlock * actor = area->GetActor(GameX, GameY);
-	if(lastActor)
-		lastActor->actor->anims->DrawCircle = false;
-	if(!actor) {
-		lastActor = NULL;
-		return;
+	if(DrawSelectionRect) {
+		if(GameX < SelectionRect.x) {
+			SelectionRect.w = StartX-GameX;
+			SelectionRect.x = GameX;
+		}
+		else {
+			SelectionRect.x = StartX;
+			SelectionRect.w = GameX-SelectionRect.x;
+		}
+		if(GameY < SelectionRect.y) {
+			SelectionRect.h = StartY-GameY;
+			SelectionRect.y = GameY;
+		}
+		else {
+			SelectionRect.y = StartY;
+			SelectionRect.h = GameY-SelectionRect.y;
+		}
+		//TODO: Check if an actor is inside the rect
 	}
-	lastActor = actor;
-	lastActor->actor->anims->DrawCircle = true;
+	else {
+		Game * game = core->GetGame();
+		Map * area = game->GetMap(MapIndex);
+		ActorBlock * actor = area->GetActor(GameX, GameY);
+		if(lastActor)
+			lastActor->actor->anims->DrawCircle = false;
+		if(!actor) {
+			lastActor = NULL;
+			return;
+		}
+		lastActor = actor;
+		lastActor->actor->anims->DrawCircle = true;
+	}
 }
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	printf("MouseDown\n");
+	unsigned short GameX = x, GameY = y;
+	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
+	DrawSelectionRect = true;
+	SelectionRect.x = GameX;
+	SelectionRect.y = GameY;
+	StartX = GameX;
+	StartY = GameY;
+	SelectionRect.w = 0;
+	SelectionRect.h = 0;
 }
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
+	DrawSelectionRect = false;
 	unsigned short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	Game * game = core->GetGame();

@@ -32,6 +32,9 @@ private:
 	int MapIndex;
 	ActorBlock * lastActor;
 	std::vector<ActorBlock*> selected;
+	bool DrawSelectionRect;
+	Region SelectionRect;
+	unsigned short StartX, StartY;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
