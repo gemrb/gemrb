@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.245 2004/12/07 22:51:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.246 2004/12/09 22:16:42 avenger_teambg Exp $
  *
  */
 
@@ -1858,6 +1858,11 @@ TableMgr* Interface::GetTable(unsigned int index)
 /** Frees a Loaded Table, returns false on error, true on success */
 bool Interface::DelTable(unsigned int index)
 {
+	if(index==0xffffffff) {
+		FreeInterfaceVector( Table, tables, tm );
+		tables.clear();
+		return true;
+	}
 	if (index >= tables.size()) {
 		return false;
 	}

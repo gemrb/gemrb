@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.255 2004/12/07 22:51:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.256 2004/12/09 22:16:41 avenger_teambg Exp $
  *
  */
 
@@ -196,6 +196,7 @@ GameControl* StartGameControl()
 {
 	//making sure that our window is the first one
 	core->DelWindow(~0); //deleting ALL windows
+	core->DelTable(~0);  //dropping ALL tables
 	Window* gamewin = new Window( 0xffff, 0, 0, core->Width, core->Height );
 	GameControl* gc = new GameControl();
 	gc->XPos = 0;
