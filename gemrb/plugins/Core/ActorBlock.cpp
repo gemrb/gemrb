@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.62 2004/10/09 15:27:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.63 2004/10/12 19:55:56 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -757,7 +757,7 @@ Container::Container(void)
 	Name[0] = 0;
 	Type = 0;
 	LockDifficulty = 0;
-	Locked = 0;
+	Flags = 0;
 	TrapDetectionDiff = 0;
 	TrapRemovalDiff = 0;
 	Trapped = 0;
@@ -773,7 +773,7 @@ void Container::DebugDump()
 {
 	printf( "Debugdump of Container %s\n", Name );
 	printf( "Type: %d   LockDifficulty: %d\n", Type, LockDifficulty );
-	printf( "Locked: %d  Trapped: %d\n", Locked, Trapped );
+	printf( "Flags: %d  Trapped: %d\n", Flags, Trapped );
 	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDiff,
 		TrapRemovalDiff );
 }
