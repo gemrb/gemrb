@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.274 2005/03/07 18:26:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.275 2005/03/13 10:43:12 avenger_teambg Exp $
  *
  */
 
@@ -1212,13 +1212,14 @@ static void upperlower(int upper, int lower)
 /** Loads gemrb.ini */
 bool Interface::LoadGemRBINI()
 {
-	printMessage( "Core", "Loading game type-specific GemRB setup...", WHITE );
-
 	DataStream* inifile = key->GetResource( "gemrb", IE_INI_CLASS_ID );
 	if (! inifile) {
 		printStatus( "ERROR", LIGHT_RED );
 		return false;
 	}
+
+	printMessage( "Core", "\nLoading game type-specific GemRB setup...", WHITE );
+
 	if (!IsAvailable( IE_INI_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "[Core]: No INI Importer Available.\n" );
@@ -1279,10 +1280,29 @@ bool Interface::LoadGemRBINI()
 	if (s)
 		strcpy( Palette256, s );
 
-	for(int i=0;i<256;i++) {
+	unsigned int i;
+	for(i=0;i<256;i++) {
 		pl_uppercase[i]=toupper(i);
 		pl_lowercase[i]=tolower(i);
 	}
+
+	i = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
+	if (i>99) i=99;
+	while(i--) {
+		char key[10];
+		snprintf(key,9,"Letter%d", i+1);
+		s = ini->GetKeyAsString( "charset", key, NULL );
+		if (s) {
+			char *s2 = strchr(s,',');
+			if(s2) {
+				upperlower(atoi(s), atoi(s2+1) );
+				printMessage("Core"," ",WHITE);
+				printf("Upperlower %d %d\n",atoi(s), atoi(s2+1) );
+				printStatus( "SET", LIGHT_GREEN );
+			}
+		}
+	}
+/*
 	upperlower(165,185);
 	upperlower(198,230);
 	upperlower(202,234);
@@ -1292,6 +1312,7 @@ bool Interface::LoadGemRBINI()
 	upperlower(140,156);
 	upperlower(175,191);
 	upperlower(143,159);
+*/
 
 	SetFeature( ini->GetKeyAsInt( "resources", "AutomapIni", 0 ), GF_AUTOMAP_INI );
 	SetFeature( ini->GetKeyAsInt( "resources", "IWDMapDimensions", 0 ), GF_IWD_MAP_DIMENSIONS );
@@ -1335,7 +1356,6 @@ Color* Interface::GetPalette(int index, int colors)
 /** Returns a preloaded Font */
 Font* Interface::GetFont(char* ResRef)
 {
-	//printf("Searching Font %.8s...", ResRef);
 	for (unsigned int i = 0; i < fonts.size(); i++) {
 		if (strnicmp( fonts[i]->ResRef, ResRef, 8 ) == 0) {
 			return fonts[i];
