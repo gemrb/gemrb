@@ -28,7 +28,20 @@ class GAMImp : public SaveGameMgr
 private:
 	DataStream * str;
 	bool autoFree;
+	int version;
 
+public:
+	unsigned int GameTime;
+	unsigned short WhichFormation;
+	unsigned short Formations[5];
+	unsigned long PartyGold;
+	unsigned long Unknown1c;
+	unsigned long PCOffset;
+	unsigned long PCCount;
+	unsigned long UnknownOffset;
+	unsigned long UnknownCount;
+	unsigned long NPCOffset;
+	unsigned long NPCCount;
 public:
 	GAMImp(void);
 	~GAMImp(void);
