@@ -24,26 +24,28 @@ void TileOverlay::AddTile(Tile * tile)
 	tiles.push_back(tile);
 }
 
-void TileOverlay::Draw(void)
+void TileOverlay::Draw(Region viewport)
 {
 	Video * vid = core->GetVideoDriver();
-	Region viewport = vid->GetViewport();
-	if(viewport.x < 0)
-		viewport.x = 0;
-	else if((viewport.x+viewport.w) > w*64)
-		viewport.x = (w*64 - viewport.w);
-	if(viewport.y < 0)
-		viewport.y = 0;
-	else if((viewport.y+viewport.h) > h*64)
-		viewport.y = (h*64 - viewport.h);
-	vid->SetViewport(viewport.x, viewport.y);
-	int sx = viewport.x / 64;
-	int sy = viewport.y / 64;
-	int dx = sx+(int)ceil(viewport.w/64.0);
-	int dy = sy+(int)ceil(viewport.h/64.0);
+	Region vp = vid->GetViewport();
+	vp.w = viewport.w;
+	vp.h = viewport.h;
+	if(vp.x < 0)
+		vp.x = 0;
+	else if((vp.x+vp.w) > w*64)
+		vp.x = (w*64 - vp.w);
+	if(vp.y < 0)
+		vp.y = 0;
+	else if((vp.y+vp.h) > h*64)
+		vp.y = (h*64 - vp.h);
+	vid->SetViewport(vp.x, vp.y);
+	int sx = vp.x / 64;
+	int sy = vp.y / 64;
+	int dx = (int)ceil((vp.x+vp.w) / 64.0);
+	int dy = (int)ceil((vp.y+vp.h) / 64.0);
 	for(int y = sy; y < dy; y++) {
 		for(int x = sx; x < dx; x++) {
-			vid->BlitSprite(tiles[(y*w)+x]->anim->NextFrame(),x*64 ,y*64);
+			vid->BlitSprite(tiles[(y*w)+x]->anim->NextFrame(),viewport.x+(x*64) ,viewport.y+(y*64));
 		}
 	}
 }

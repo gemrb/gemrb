@@ -25,7 +25,7 @@ public:
 	TileOverlay(int Width, int Height);
 	~TileOverlay(void);
 	void AddTile(Tile * tile);
-	void Draw(void);
+	void Draw(Region viewport);
 };
 
 #endif
