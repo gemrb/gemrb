@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.83 2003/12/12 23:07:35 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.84 2003/12/13 03:00:23 subvertir Exp $
  *
  */
 
@@ -23,29 +23,7 @@
 #include "GUIScript.h"
 #include "../Core/Interface.h"
 #include "../Core/Map.h"
-
-#ifdef _DEBUG
-#undef _DEBUG
-#ifdef __cplusplus
-extern "C" {
-#endif
-#ifndef WIN32
-#include "/usr/local/include/python2.3/Python.h"
-#else
 #include "Python.h"
-#endif
-#ifdef __cplusplus
-}
-#endif
-#define _DEBUG
-#else
-#ifndef WIN32
-#include "/usr/local/include/python2.3/Python.h"
-#else
-#include "Python.h"
-#endif
-#endif
-
 #include "../Core/Label.h"
 #include "../Core/AnimationMgr.h"
 #include "../Core/GameControl.h"

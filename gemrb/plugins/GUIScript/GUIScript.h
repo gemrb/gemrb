@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.h,v 1.6 2003/11/25 13:48:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.h,v 1.7 2003/12/13 03:00:23 subvertir Exp $
  *
  */
 
@@ -23,18 +23,7 @@
 #define GUISCRIPT_H
 
 #include "../Core/ScriptEngine.h"
-
-#ifdef _DEBUG
-#undef _DEBUG
 #include "Python.h"
-#define _DEBUG
-#else
-#ifndef WIN32
-#include "/usr/local/include/python2.3/Python.h"
-#else
-#include "Python.h"
-#endif
-#endif
 
 class GUIScript : public ScriptEngine
 {
