@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.93 2005/02/24 16:45:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.94 2005/02/25 16:15:34 avenger_teambg Exp $
  *
  */
 
@@ -359,11 +359,6 @@ Map* AREImp::GetMap(const char *ResRef)
 				memcpy( door->CloseSound, Sounds[DEF_CLOSE], 9 );
 		}
 	}
-	printf( "Loading explored bitmap\n" );
-	str->Seek( ExploredBitmapOffset, GEM_STREAM_START );
-	map->ExploredBitmap = (ieByte *) malloc(ExploredBitmapSize);
-	str->Read( map->ExploredBitmap, ExploredBitmapSize );
-
 	printf( "Loading containers\n" );
 	//Loading Containers
 	for (i = 0; i < ContainersCount; i++) {
@@ -780,6 +775,19 @@ Map* AREImp::GetMap(const char *ResRef)
 	}
 	
 	map->AddTileMap( tm, lm, sr, sm );
+
+	printf( "Loading explored bitmap\n" );
+	i = map->GetExploredMapSize();
+	if (ExploredBitmapSize==i) {
+		map->ExploredBitmap = (ieByte *) malloc(ExploredBitmapSize);
+		str->Seek( ExploredBitmapOffset, GEM_STREAM_START );
+		str->Read( map->ExploredBitmap, ExploredBitmapSize );
+	}
+	else {
+		ExploredBitmapSize = i;
+		map->ExploredBitmap = (ieByte *) calloc(i, 1);
+	}
+
 	core->FreeInterface( tmm );
 	return map;
 }

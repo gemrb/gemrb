@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.57 2005/02/25 15:12:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.58 2005/02/25 16:15:35 avenger_teambg Exp $
  *
  */
 
@@ -134,10 +134,11 @@ public:
 	void AddEntrance(char* Name, int XPos, int YPos, short Face);
 	Entrance* GetEntrance(const char* Name);
 	bool CanFree();
-	int GetActorCount() { return (int)actors.size(); }
 	Actor* GetActor(int i) { return actors[i]; }
-	int GetWidth() { return Width; }
-	int GetHeight() { return Height; }
+	int GetActorCount() const { return (int) actors.size(); }
+	int GetWidth() const { return Width; }
+	int GetHeight() const { return Height; }
+	int GetExploredMapSize() const { return (Width*Height+7)/8; }
 
 	//PathFinder
 	/* Finds the nearest passable point */
