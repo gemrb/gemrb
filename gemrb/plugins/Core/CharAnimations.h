@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.23 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.24 2004/08/18 22:43:01 avenger_teambg Exp $
  *
  */
 
@@ -44,23 +44,24 @@
 
 #define IE_ANI_ATTACK			0
 #define IE_ANI_AWAKE			1
-#define IE_ANI_CAST				2
+#define IE_ANI_CAST			2
 #define IE_ANI_CONJURE			3
 #define IE_ANI_DAMAGE			4
-#define IE_ANI_DIE				5
+#define IE_ANI_DIE			5
 #define IE_ANI_HEAD_TURN		6
 #define IE_ANI_READY			7
 #define IE_ANI_SHOOT			8
 #define IE_ANI_TWITCH			9
-#define IE_ANI_WALK				10
+#define IE_ANI_WALK			10
 #define IE_ANI_ATTACK_SLASH		11
-#define IE_ANI_ATTACK_BACKSLASH	12
+#define IE_ANI_ATTACK_BACKSLASH		12
 #define IE_ANI_ATTACK_JAB		13
 #define IE_ANI_EMERGE			14
-#define IE_ANI_HIDE				15
+#define IE_ANI_HIDE			15
 #define IE_ANI_SLEEP			16
 #define IE_ANI_GET_UP			17
 #define IE_ANI_PST_START		18
+#define IE_ANI_PST_RUN			19
 
 #define IE_ANI_CODE_MIRROR		0
 #define IE_ANI_ONE_FILE			1

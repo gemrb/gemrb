@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.35 2004/08/02 22:00:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.36 2004/08/18 22:42:51 avenger_teambg Exp $
  *
  */
 
@@ -80,126 +80,6 @@ CharAnimations::~CharAnimations(void)
 			}
 		}
 	}
-	
-/* this stuff is horrible
-	switch (MirrorType) {
-		case IE_ANI_CODE_MIRROR:
-		{
-			switch (OrientCount) {
-				case 5:
-				{
-					for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-						for (int i = 0; i < MAX_ORIENT; i += 2) {
-							if (Anims[AnimID][i])
-								delete( Anims[AnimID][i] );
-						}
-					}
-				}
-				break;
-
-				case 9:
-				{
-					for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-						for (int i = 0; i < MAX_ORIENT; i++) {
-							if (Anims[AnimID][i])
-								delete( Anims[AnimID][i] );
-						}
-					}
-				}
-				break;
-			}
-		}
-		break;
-
-		case IE_ANI_ONE_FILE:
-		 {
-			for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-				for (int i = 0; i < MAX_ORIENT; i++) {
-					if (Anims[AnimID][i])
-						delete( Anims[AnimID][i] );
-				}
-			}
-		}
-		break;
-
-		case IE_ANI_CODE_MIRROR_2:
-		{
-			switch (OrientCount) {
-				case 9:
-				{
-					for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-						for (int i = 0; i < MAX_ORIENT; i++) {
-							if (Anims[AnimID][i])
-								delete( Anims[AnimID][i] );
-						}
-					}
-				}
-				break;
-			}
-		}
-		break;
-
-		case IE_ANI_FOUR_FILES:
-		case IE_ANI_TWO_FILES:
-		case IE_ANI_TWO_FILES_2:
-		case IE_ANI_TWO_FILES_3:
-		{
-			switch (OrientCount) {
-				case 5:
-				{
-					for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-						for (int i = 0; i < MAX_ORIENT; i += 2) {
-							if (Anims[AnimID][i])
-								delete( Anims[AnimID][i] );
-						}
-					}
-				}
-				break;
-			}
-		}
-		break;
-
-		case IE_ANI_PST_ANIMATION_1:
-		{
-			for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-				switch (AnimID) {
-					case IE_ANI_WALK:
-					{
-						for (int i = 0; i < MAX_ORIENT; i++) {
-							if (Anims[AnimID][i])
-								delete( Anims[AnimID][i] );
-						}
-					}
-					break;
-
-					case IE_ANI_PST_START:
-					{
-						if (Anims[AnimID][0])
-							delete( Anims[AnimID][0] );
-					}
-					break;
-
-					default:
-					{
-						for (int i = 0; i < MAX_ORIENT; i += 2) {
-							if (Anims[AnimID][i])
-								delete( Anims[AnimID][i] );
-						}
-					}
-					break;
-				}
-			}
-		}
-		break;
-
-		case IE_ANI_PST_GHOST:
-		{
-			if (Anims[0][0])
-				delete( Anims[0][0] );
-		}
-		break;
-	}
-*/
 }
 /*This is a simple Idea of how the animation are coded
 
@@ -209,59 +89,59 @@ the 1-7 frames are mirrored to create the 9-14 frames.
 There are 4 Mirroring modes:
 
 IE_ANI_CODE_MIRROR: The code automatically mirrors the needed frames 
-					(as in the example above)
+			(as in the example above)
 
-					These Animations are stores using the following template:
-					[NAME][ARMORTYPE][ACTIONCODE]
+			These Animations are stores using the following template:
+			[NAME][ARMORTYPE][ACTIONCODE]
 
-					Each BAM File contains only 9 Orientations, the missing 7 Animations
-					are created by Horizontally Mirroring the 1-7 Orientations.
+			Each BAM File contains only 9 Orientations, the missing 7 Animations
+			are created by Horizontally Mirroring the 1-7 Orientations.
 
 IE_ANI_ONE_FILE:	The whole animation is in one file, no mirroring needed.
 
 IE_ANI_TWO_FILES:	The whole animation is in 2 files. The East and West part are in 2 BAM Files.
 
 IE_ANI_FOUR_FILES:	The Animation is coded in Four Files. Probably it is an old Two File animation with
-					additional frames added in a second time.
+			additional frames added in a second time.
 
-IE_ANI_TWO_FILES_2: This Animation Type stores the Animation in the following format
-					[NAME][ACTIONCODE][/E]
+IE_ANI_TWO_FILES_2:	This Animation Type stores the Animation in the following format
+			[NAME][ACTIONCODE][/E]
 
-					Example:
-					CMNK1A1		Character Monk AT1 Attack 1
-					CMNK1A1E	Character Monk AT1 Attack 1 East
-					
-					Each BAM File Stores one action and has 5 orientations, the Ease
-					file stores the East part of the Animation. Since these animations
-					have a total of 8 Orientations, these are automatically copied
-					by GemRB to use them as 16 Orientations.
+			Example:
+			CMNK1A1		Character Monk AT1 Attack 1
+			CMNK1A1E	Character Monk AT1 Attack 1 East
+			
+			Each BAM File Stores one action and has 5 orientations, the Ease
+			file stores the East part of the Animation. Since these animations
+			have a total of 8 Orientations, these are automatically copied
+			by GemRB to use them as 16 Orientations.
 
 IE_ANI_TWO_FILES_3:	Animations using this type was stored using the following template:
-					[NAME][ACTIONTYPE][/E]
+			[NAME][ACTIONTYPE][/E]
 
-					Example:
-					ACHKG1
-					ACHKG1E
+			Example:
+			ACHKG1
+			ACHKG1E
 
-					Each BAM File contains many animation groups, each animation group
-					stores 5 Orientments, the missing 3 are stored in East BAM Files.
+			Each BAM File contains many animation groups, each animation group
+			stores 5 Orientments, the missing 3 are stored in East BAM Files.
 
 IE_ANI_PST_ANIMATION_1: Planescape: Torment Animations are stored in a different
-					way than the other games. This format uses the following template:
-					[C/D][ACTIONTYPE][NAME][B]
+			way than the other games. This format uses the following template:
+			[C/D][ACTIONTYPE][NAME][B]
 
-					Example:
-					CAT1MRTB
+			Example:
+			CAT1MRTB
 
-					Each Animation stores 5 Orientments, which are automatically mirrored
-					to form an 8 Orientments Animation. PST Animations have a different Palette
-					format. This Animation Type handles the PST Palette format too.
+			Each Animation stores 5 Orientations, which are automatically mirrored
+			to form an 8 Orientation Animation. PST Animations have a different Palette
+			format. This Animation Type handles the PST Palette format too.
 
-					NOTE: Walking/Running animations stores 9 Orientations.
+			NOTE: Walking/Running animations store 9 Orientations.
 
 
- WEST PART  	 |  	 EAST PART
-				 |
+	 WEST PART  	 |  	 EAST PART
+			 |
 		NW  NNW  N  NNE  NE
 	 NW 006 007 008 009 010 NE
 	WNW 005 	 |  	011 ENE
@@ -269,8 +149,8 @@ IE_ANI_PST_ANIMATION_1: Planescape: Torment Animations are stored in a different
 	WSW 003 	 |  	013 ESE
 	 SW 002 001 000 015 014 SE
 		SW  SSW  S  SSE  SE
-				 |
-				 |
+			 |
+			 |
 
 */
 Animation* CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Orient)
@@ -596,64 +476,46 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient,
 
 		case IE_ANI_PST_ANIMATION_1:
 		{
-			switch (AnimID) {
-				case IE_ANI_AWAKE:
-				{
-					if (Orient > 9)
-						Cycle = 4 - ( ( Orient / 2 ) % 5 );
-					else
-						Cycle = ( ( Orient / 2 ) % 5 );
-					if (Cycle >= 5) {
-						printf( "WARNING!!! Cycle >= 5\n" );
-					}
-					ResRef[0] = this->ResRef[0];
-					ResRef[1] = 0;
-					strcat( ResRef, "STD" );
-					strcat( ResRef, &this->ResRef[1] );
-				}
-				break;
+			char *Prefix;
 
-				case IE_ANI_DIE:
-				{
-					if (Orient > 9)
-						Cycle = 4 - ( ( Orient / 2 ) % 5 );
-					else
-						Cycle = ( ( Orient / 2 ) % 5 );
-/*
-					if (Orient > 8)
-						Cycle = 7 - ( Orient % 9 );
-					else
-						Cycle = ( Orient % 9 );
-*/
-					ResRef[0] = this->ResRef[0];
-					ResRef[1] = 0;
-					strcat( ResRef, "DFB" );
-					strcat( ResRef, &this->ResRef[1] );
-				}
-				break;
-				case IE_ANI_WALK:
-				{
-					if (Orient > 8)
-						Cycle = 7 - ( Orient % 9 );
-					else
-						Cycle = ( Orient % 9 );
-					ResRef[0] = this->ResRef[0];
-					ResRef[1] = 0;
-					strcat( ResRef, "WLK" );
-					strcat( ResRef, &this->ResRef[1] );
-				}
-				break;
-
-				case IE_ANI_PST_START:
-				{
-					Cycle = 0;
-					ResRef[0] = this->ResRef[0];
-					ResRef[1] = 0;
-					strcat( ResRef, "MS1" );
-					strcat( ResRef, &this->ResRef[1] );
-				}
-				break;
+			if((AnimID==IE_ANI_WALK) || (AnimID==IE_ANI_PST_RUN)) {
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
+				else
+					Cycle = ( Orient % 9 );
+			} else if(AnimID==IE_ANI_PST_START) Cycle=0;
+			else {
+				if (Orient > 9)
+					Cycle = 4 - ( ( Orient / 2 ) % 5 );
+				else
+					Cycle = ( ( Orient / 2 ) % 5 );
 			}
+			switch (AnimID) {
+				case IE_ANI_ATTACK:
+					Prefix="AT1"; break;
+				case IE_ANI_DAMAGE:
+					Prefix="HIT"; break;
+				case IE_ANI_GET_UP:
+					Prefix="GUP"; break;
+				case IE_ANI_AWAKE:
+					if(core->GetGame() && core->GetGame()->CombatCounter) Prefix="STC";
+					else Prefix="STD";
+					break;
+				case IE_ANI_DIE:
+					Prefix="DFB"; break;
+				case IE_ANI_PST_RUN:
+					Prefix="RUN"; break;
+				case IE_ANI_WALK:
+					Prefix="WLK"; break;
+				case IE_ANI_PST_START:
+					Prefix="MS1"; break;
+				default: //just in case
+					Prefix="STC"; break;
+			}
+			ResRef[0] = this->ResRef[0];
+			ResRef[1] = 0;
+			strcat( ResRef, Prefix );
+			strcat( ResRef, &this->ResRef[1] );
 		}
 		break;
 
