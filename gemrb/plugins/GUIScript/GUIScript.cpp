@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.182 2004/08/06 01:15:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.183 2004/08/07 11:31:21 divide Exp $
  *
  */
 
@@ -3669,6 +3669,14 @@ char* GUIScript::ExecString(const char* string)
 {
 	if (PyRun_SimpleString( string ) == -1) {
 		PyErr_Print();
+		// try with GemRB. prefix
+		char * newstr = (char *) malloc( strlen(string) + 7 );
+		strncpy(newstr, "GemRB.", 6);
+		strcpy(newstr + 6, string);
+		if (PyRun_SimpleString( newstr ) == -1) {
+			PyErr_Print();
+		}
+		free( newstr );
 	}
 	return NULL;
 }
