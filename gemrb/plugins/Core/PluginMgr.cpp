@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.10 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.11 2004/04/15 14:30:25 avenger_teambg Exp $
  *
  */
 
@@ -201,10 +201,15 @@ closedir(dir);  //No other files in the directory, close it
 
 PluginMgr::~PluginMgr(void)
 {
+/* apparently this isn't good
 	unsigned int i=plugins.size();
 	while(i--) {
-		( ( Plugin * ) plugins[i] )->release();
+		if(plugins[i]) {
+			delete plugins[i];
+			plugins[i] = NULL;
+		}
 	}
+*/
 }
 
 bool PluginMgr::IsAvailable(SClass_ID plugintype)

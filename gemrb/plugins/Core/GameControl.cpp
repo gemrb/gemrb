@@ -592,16 +592,19 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 }
 
-void GameControl::TryToTalk(Actor *source, Actor *target)
+void GameControl::TryToTalk(Actor *source, Actor *tgt)
 {
-	if(target->GetNextAction()) {
+	if(tgt->GetNextAction()) {
 		DisplayString("Target is busy...");
 		return;
 	}
-	char Tmp[256];
+	char Tmp[40];
 
-	sprintf( Tmp, "NIDSpecial1(\"%d\")", target->scriptName );
+	strncpy(Tmp,"NIDSpecial1()",40);
+printf("TryTotalk\n");
+	target=tgt; //this is a hack, a deadly one
 	source->AddAction( GameScript::CreateAction( Tmp, true ) );
+printf("trytotalk added\n");
 }
 
 /** Mouse Button Down */

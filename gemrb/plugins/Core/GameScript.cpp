@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.138 2004/04/15 12:33:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.139 2004/04/15 14:30:25 avenger_teambg Exp $
  *
  */
 
@@ -739,7 +739,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		return;
 	}
 	//this is not a temporary storage, SetAt relies on a malloc-ed
-	//string
+	//string, but heh, apparently it is a temporary storage
 	char* newVarName = ( char* ) malloc( 40 );
 	strncpy( newVarName, Context, 6 );
 	strncat( newVarName, VarName, 40 );
@@ -747,6 +747,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		ReplaceMyArea( Sender, newVarName );
 	}
 	core->GetGame()->globals->SetAt( newVarName, ( unsigned long ) value );
+	free( newVarName);
 }
 
 void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
@@ -4722,8 +4723,9 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	if (Flags & BD_OWN) {
 		scr = tar = GetActorFromObject( Sender, parameters->objects[1] );
 	} else {
-		if(Flags & BD_NUMERIC) { //internal usage
-			tar = core->GetActor( parameters->int0Parameter );
+		if(Flags & BD_NUMERIC) {
+			//the target was already set, this is a crude hack
+			tar = core->GetGameControl()->target;
 		}
 		else {
 			tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -4825,7 +4827,12 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		if (Flags & BD_TALKCOUNT)
 			actor->TalkCount++;
 
-		gc->InitDialog( actor, target, Dialog );
+		if(Flags & BD_TARGET) {
+			gc->InitDialog( target, actor, Dialog );
+		}
+		else {
+			gc->InitDialog( actor, target, Dialog );
+		}
 	}
 }
 
@@ -4933,6 +4940,7 @@ void GameScript::PlayerDialogue(Scriptable* Sender, Action* parameters)
 //we hijack this action for the player initiated dialogue
 void GameScript::NIDSpecial1(Scriptable* Sender, Action* parameters)
 {
+printf("NIdspecial\n");
 	BeginDialog( Sender, parameters, BD_TARGET | BD_NUMERIC | BD_TALKCOUNT | BD_CHECKDIST );
 }
 

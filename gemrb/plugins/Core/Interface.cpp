@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.154 2004/04/15 10:21:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.155 2004/04/15 14:30:25 avenger_teambg Exp $
  *
  */
 
@@ -159,10 +159,10 @@ Interface::~Interface(void)
 		delete( game );
 	}
 	if (music) {
-		delete( music );
+		FreeInterface( music );
 	}
 	if (soundmgr) {
-		delete( soundmgr );
+		FreeInterface( soundmgr );
 	}
 	if (sgiterator) {
 		delete( sgiterator );
@@ -185,26 +185,27 @@ Interface::~Interface(void)
 	FreeResourceVector( Window, windows );
 
 	if (key) {
-		plugin->FreePlugin( key );
+		FreeInterface( key );
 	}	
 	if (video) {
-		plugin->FreePlugin( video );
+		FreeInterface( video );
 	}
 	if (strings) {
-		plugin->FreePlugin( strings );
+		FreeInterface( strings );
 	}
 	if (pal256) {
-		plugin->FreePlugin( pal256 );
+		FreeInterface( pal256 );
 	}
 	if (pal16) {
-		plugin->FreePlugin( pal16 );
-	}
-	if (timer) {
-		delete( timer );
+		FreeInterface( pal16 );
 	}
 
 	if (windowmgr) {
-		delete( windowmgr );
+		FreeInterface( windowmgr );
+	}
+
+	if (timer) {
+		delete( timer );
 	}
 
 	if (evntmgr) {
@@ -224,7 +225,6 @@ Interface::~Interface(void)
 	FreeInterfaceVector( Symbol, symbols, sm );
 	FreeResourceVector(Actor, actors);
 	delete( console );
-	delete( plugin );
 
 	if(INIquests) {
 		FreeInterface(INIquests);
@@ -235,6 +235,7 @@ Interface::~Interface(void)
 	if(INIparty) {
 		FreeInterface(INIparty);
 	}
+	delete( plugin );
 	//TODO: Clean the Cache and leave only .bif files
 }
 
