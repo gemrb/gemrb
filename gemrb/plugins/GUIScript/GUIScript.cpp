@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.134 2004/03/15 11:18:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.135 2004/03/15 12:03:51 avenger_teambg Exp $
  *
  */
 
@@ -52,11 +52,12 @@ inline bool valid_number(const char* string, long& val)
 
 static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 {
-	int r,g,b;
+	int r,g,b,a;
 
-	if (!PyArg_ParseTuple( args, "iii", &r, &g, &b)) {
+	a=255;
+	if (!PyArg_ParseTuple( args, "iii|i", &r, &g, &b, &a)) {
 		printMessage( "GUIScript",
-			"Syntax Error: SetInfoTextColor(r, g, b)\n",
+			"Syntax Error: SetInfoTextColor(r, g, b [,a])\n",
 			LIGHT_RED );
 		return NULL;
 	}
@@ -64,7 +65,7 @@ static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 	if (gc->ControlType != IE_GUI_GAMECONTROL) {
 		return NULL;
 	}
-	Color c={r,g,b,0};
+	Color c={r,g,b,a};
 	gc->SetInfoTextColor( c );
 	Py_INCREF( Py_None );
 	return Py_None;

@@ -96,6 +96,7 @@ GameControl::~GameControl(void)
 /* changes the textcolor */
 void GameControl::SetInfoTextColor(Color color)
 {
+	free( InfoTextPalette ); //it always exists, see constructor
 	InfoTextPalette = core->GetVideoDriver()->CreatePalette( color, black );
 }
 
