@@ -1,0 +1,22 @@
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/Release.txt,v 1.1 2004/02/15 17:31:05 edheldil Exp $
+
+
+How to make a release
+*********************
+
+1) Make sure that version number in configure.in is correct
+     for the upcoming version
+
+2) Update ChangeLog with highlights since the last release 
+
+3) Make sure that GemRB CVS is in compilable and running state
+   i.e. download a clean CVS tree and test it
+
+4) Tag current CVS to version number
+
+5) Update from CVS to the tagged version
+
+6) on Unix/Linux: 
+   aclocal && autoheader && automake && autoconf
+   ./configure
+   make dist
