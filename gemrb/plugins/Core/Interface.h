@@ -23,12 +23,19 @@
 #include "Variables.h"
 #include "MusicMgr.h"
 #include "TableMgr.h"
+#include "SymbolMgr.h"
 
 typedef struct Table {
 	TableMgr * tm;
 	char ResRef[8];
 	bool free;
 } Table;
+
+typedef struct Symbol {
+	SymbolMgr * sm;
+	char ResRef[8];
+	bool free;
+} Symbol;
 
 #ifdef WIN32
 
@@ -65,6 +72,7 @@ private:
 	Variables * vars;
 	MusicMgr * music;
 	std::vector<Table> tables;
+	std::vector<Symbol> symbols;
 public:
 	Interface(void);
 	~Interface(void);
@@ -127,6 +135,14 @@ public:
 	TableMgr * GetTable(int index);
 	/** Frees a Loaded Table, returns false on error, true on success */
 	bool DelTable(int index);
+	/** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
+	int LoadSymbol(const char * ResRef);
+	/** Gets the index of a loaded Symbol Table, returns -1 on error */
+	int GetSymbolIndex(const char * ResRef);
+	/** Gets a Loaded Symbol Table by its index, returns NULL on error */
+	SymbolMgr * GetSymbol(int index);
+	/** Frees a Loaded Symbol Table, returns false on error, true on success */
+	bool DelSymbol(int index);
 private:
 	bool LoadConfig(void);
 public:

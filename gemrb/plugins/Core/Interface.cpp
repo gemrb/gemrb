@@ -94,6 +94,13 @@ Interface::~Interface(void)
 			(*t).free = true;
 		}
 	}
+	std::vector<Symbol>::iterator s;
+	for(s = symbols.begin(); s != symbols.end(); ++s) {
+		if(!(*s).free) {
+			core->FreeInterface((*s).sm);
+			(*s).free = true;
+		}
+	}
 	delete(console);
 	delete(plugin);
 }
@@ -841,5 +848,73 @@ bool Interface::DelTable(int index)
 		return false;
 	core->FreeInterface(tables[index].tm);
 	tables[index].free = true;
+	return true;
+}
+/** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
+int Interface::LoadSymbol(const char * ResRef)
+{
+	int ind = GetSymbolIndex(ResRef);
+	if(ind != -1)
+		return ind;
+	DataStream * str = key->GetResource(ResRef, IE_IDS_CLASS_ID);
+	if(!str)
+		return -1;
+	SymbolMgr * sm = (SymbolMgr*)plugin->GetPlugin(IE_IDS_CLASS_ID);
+	if(!sm) {
+		delete(str);
+		return -1;
+	}
+	if(!sm->Open(str, true)) {
+		delete(str);
+		core->FreeInterface(sm);
+		return -1;
+	}
+	Symbol s;
+	s.free = false;
+	strncpy(s.ResRef, ResRef, 8);
+	s.sm = sm;
+	ind = -1;
+	for(int i = 0; i < symbols.size(); i++) {
+		if(symbols[i].free) {
+			ind = i;
+			break;
+		}
+	}
+	if(ind != -1) {
+		symbols[ind] = s;
+		return ind;
+	}
+	symbols.push_back(s);
+	return symbols.size()-1;	
+}
+/** Gets the index of a loaded Symbol Table, returns -1 on error */
+int Interface::GetSymbolIndex(const char * ResRef)
+{
+	for(int i = 0; i < symbols.size(); i++) {
+		if(symbols[i].free)
+			continue;
+		if(strnicmp(symbols[i].ResRef, ResRef, 8) == 0)
+			return i;
+	}
+	return -1;
+}
+/** Gets a Loaded Symbol Table by its index, returns NULL on error */
+SymbolMgr * Interface::GetSymbol(int index)
+{
+	if(index >= symbols.size())
+		return NULL;
+	if(symbols[index].free)
+		return NULL;
+	return symbols[index].sm;
+}
+/** Frees a Loaded Symbol Table, returns false on error, true on success */
+bool Interface::DelSymbol(int index)
+{
+	if(index >= symbols.size())
+		return false;
+	if(symbols[index].free)
+		return false;
+	core->FreeInterface(symbols[index].sm);
+	symbols[index].free = true;
 	return true;
 }

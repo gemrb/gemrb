@@ -179,6 +179,86 @@ static PyObject * GemRB_GetTableValue(PyObject *self, PyObject *args)
 	return NULL;
 }
 
+static PyObject * GemRB_LoadSymbol(PyObject *self, PyObject *args)
+{
+	char *string;
+
+	if(!PyArg_ParseTuple(args, "s", &string)) {
+		printMessage("GUIScript", "Syntax Error: Expected String\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	int ind = core->LoadSymbol(string);
+	if(ind == -1)
+		return NULL;
+
+	return Py_BuildValue("i", ind);
+}
+
+static PyObject * GemRB_UnLoadSymbol(PyObject *self, PyObject *args)
+{
+	int si;
+
+	if(!PyArg_ParseTuple(args, "i", &si)) {
+		printMessage("GUIScript", "Syntax Error: Expected Integer\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	int ind = core->DelSymbol(si);
+	if(ind == -1)
+		return NULL;
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_GetSymbol(PyObject *self, PyObject *args)
+{
+	char *string;
+
+	if(!PyArg_ParseTuple(args, "s", &string)) {
+		printMessage("GUIScript", "Syntax Error: Expected String\n", LIGHT_RED);
+		return NULL;
+	}
+
+	int ind = core->GetSymbolIndex(string);
+	if(ind == -1)
+		return NULL;
+
+	return Py_BuildValue("i", ind);
+}
+
+static PyObject * GemRB_GetSymbolValue(PyObject *self, PyObject *args)
+{
+	PyObject *si, *sym;
+
+	if(PyArg_UnpackTuple(args, "ref", 2, 2, &si, &sym)) {
+		if(!PyObject_TypeCheck(si, &PyInt_Type)) {
+			printMessage("GUIScript", "Syntax Error: GetTableValue(Table, RowIndex/RowString, ColIndex/ColString)\n", LIGHT_RED);
+			return NULL;
+		}
+		int SymbolIndex = PyInt_AsLong(si);
+		if((PyObject_TypeCheck(sym, &PyInt_Type)) || (PyObject_TypeCheck(sym, &PyString_Type))) {
+			if(PyObject_TypeCheck(sym, &PyString_Type)) {
+				char * syms = PyString_AsString(sym);
+				SymbolMgr * sm = core->GetSymbol(SymbolIndex);
+				long val = sm->GetValue(syms);
+				return Py_BuildValue("l", val);
+			}
+			else {
+				int symi = PyInt_AsLong(sym);
+				SymbolMgr * sm = core->GetSymbol(SymbolIndex);
+				const char * str = sm->GetValue(symi);
+				return Py_BuildValue("s", str);
+			}	
+		}
+		printMessage("GUIScript", "Type Error: GetSymbolValue(SymbolTable, StringVal/IntVal)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	return NULL;
+}
+
 static PyObject * GemRB_GetControl(PyObject *self, PyObject *args)
 {
 	int WindowIndex, ControlID;
@@ -628,6 +708,18 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"GetTableValue", GemRB_GetTableValue, METH_VARARGS,
      "Returns a field of a 2DA Table."},
+
+  	{"LoadSymbol", GemRB_LoadSymbol, METH_VARARGS,
+     "Loads a IDS Symbol Table."},
+
+	{"UnLoadSymbol", GemRB_UnLoadSymbol, METH_VARARGS,
+     "UnLoads a IDS Symbol Table."},
+
+	{"GetSymbol", GemRB_GetSymbol, METH_VARARGS,
+     "Returns a Loaded IDS Symbol Table."},
+
+	{"GetSymbolValue", GemRB_GetSymbolValue, METH_VARARGS,
+     "Returns a field of a IDS Symbol Table."},
 
 	{"GetControl", GemRB_GetControl, METH_VARARGS,
      "Returns a control in a Window."},
