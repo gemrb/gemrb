@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.32 2004/09/04 12:10:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.33 2004/10/09 21:51:01 avenger_teambg Exp $
  *
  */
 
@@ -23,8 +23,9 @@
 #include "Window.h"
 #include "Control.h"
 #include "Interface.h"
+#include "MapControl.h"
 
-extern Interface* core;
+//extern Interface* core;
 
 Window::Window(unsigned short WindowID, unsigned short XPos,
 	unsigned short YPos, unsigned short Width, unsigned short Height)
@@ -198,30 +199,37 @@ void Window::RedrawControls(char* VarName, unsigned int Sum)
 {
 	for (unsigned int i = 0; i < Controls.size(); i++) {
 		switch (Controls[i]->ControlType) {
+			case IE_GUI_MAP:
+			{
+				MapControl *mc = ( MapControl* ) (Controls[i]);
+				mc->RedrawMapControl( VarName, Sum );
+				
+				break;
+			}
 			case IE_GUI_BUTTON:
-				{
-					Button* bt = ( Button* ) ( Controls[i] );
-					bt->RedrawButton( VarName, Sum );
-					break;
-				}
+			{
+				Button* bt = ( Button* ) ( Controls[i] );
+				bt->RedrawButton( VarName, Sum );
+				break;
+			}
 			case IE_GUI_PROGRESSBAR:
-				{
-					Progressbar* pb = ( Progressbar* ) ( Controls[i] );
-					pb->RedrawProgressbar( VarName, Sum );
-					break;
-				}
+			{
+				Progressbar* pb = ( Progressbar* ) ( Controls[i] );
+				pb->RedrawProgressbar( VarName, Sum );
+				break;
+			}
 			case IE_GUI_SLIDER:
-				{
-					Slider* sl = ( Slider* ) ( Controls[i] );
-					sl->RedrawSlider( VarName, Sum );
-					break;
-				}
+			{
+				Slider* sl = ( Slider* ) ( Controls[i] );
+				sl->RedrawSlider( VarName, Sum );
+				break;
+			}
 			case IE_GUI_SCROLLBAR:
-				{
-					ScrollBar* sb = ( ScrollBar* ) ( Controls[i] );
-					sb->RedrawScrollBar( VarName, Sum );
-					break;
-				}
+			{
+				ScrollBar* sb = ( ScrollBar* ) ( Controls[i] );
+				sb->RedrawScrollBar( VarName, Sum );
+				break;
+			}
 		}
 		if(Controls[i]->Changed) Changed = true;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.11 2004/10/09 15:27:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.12 2004/10/09 21:51:01 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -74,7 +74,7 @@ MapControl::MapControl(void)
 
 MapControl::~MapControl(void)
 {
-        Video *video = core->GetVideoDriver();
+	Video *video = core->GetVideoDriver();
 
 	if(MapMOS) {
 		video->FreeSprite(MapMOS);
@@ -109,6 +109,15 @@ void MapControl::Realize()
 	YCenter = (Height - MapMOS->Height ) / 2;
 	if (XCenter < 0) XCenter = 0;
 	if (YCenter < 0) YCenter = 0;
+}
+
+void MapControl::RedrawMapControl(char *VariableName, unsigned int Sum)
+{
+	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
+		return;
+	}
+	Value = Sum;
+	Changed = true;
 }
 
 /** Draws the Control on the Output Display */
@@ -177,7 +186,7 @@ void MapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			//not GEM_TAB
 			printf( "TAB released\n" );
 			return;
-	        case 'f':
+		case 'f':
 			if (Mod & 64)
 				core->GetVideoDriver()->ToggleFullscreenMode();
 			break;

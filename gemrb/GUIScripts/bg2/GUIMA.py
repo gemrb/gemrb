@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.7 2004/10/02 20:54:43 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.8 2004/10/09 21:51:02 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -69,8 +69,9 @@ def OpenMapWindow ():
 	GemRB.SetControlPos (Window, Label, 65535, 0) #remove this crap
 
 	# Map Control
-	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0)
+	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0, "FLAG1")
 	Map = GemRB.GetControl (Window, 2)
+	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", 1)
 
 	GemRB.UnhideGUI ()
 
