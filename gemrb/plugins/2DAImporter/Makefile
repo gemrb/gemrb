@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.1 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.2 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -237,9 +237,9 @@ lib2DAImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl
 
 #>- lib2DAImporter_la_METASOURCES = AUTO
 
-lib2DAImporter_la_SOURCES = 2DAImpCD.cpp 2DAImporter.cpp 
+lib2DAImporter_la_SOURCES = 2DAImp.cpp 2DAImpCD.cpp 2DAImporter.cpp 
 
-EXTRA_DIST = 2DAImporter.cpp 2DAImpCD.h 2DAImpCD.cpp 2DAImp.h 
+EXTRA_DIST = 2DAImporter.cpp 2DAImpCD.h 2DAImpCD.cpp 2DAImp.h 2DAImp.cpp 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -250,10 +250,10 @@ DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I../../..
 CPPFLAGS = 
 LIBS = 
 lib2DAImporter_la_LIBADD = 
-#>- lib2DAImporter_la_OBJECTS =  2DAImpCD.lo 2DAImporter.lo
+#>- lib2DAImporter_la_OBJECTS =  2DAImp.lo 2DAImpCD.lo 2DAImporter.lo
 #>+ 4
 lib2DAImporter_la_final_OBJECTS = lib2DAImporter_la.all_cpp.lo 
-lib2DAImporter_la_nofinal_OBJECTS = 2DAImpCD.lo 2DAImporter.lo
+lib2DAImporter_la_nofinal_OBJECTS = 2DAImp.lo 2DAImpCD.lo 2DAImporter.lo
 lib2DAImporter_la_OBJECTS = $(lib2DAImporter_la_nofinal_OBJECTS)
 #lib2DAImporter_la_OBJECTS = $(lib2DAImporter_la_final_OBJECTS)
 CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
@@ -274,11 +274,11 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-#>- DEP_FILES =  .deps/2DAImpCD.P .deps/2DAImporter.P
+#>- DEP_FILES =  .deps/2DAImp.P .deps/2DAImpCD.P .deps/2DAImporter.P
 #>+ 4
 #DEP_FILES =   $(DEPDIR)/lib2DAImporter_la.all_cpp.P \
-		  .deps/2DAImpCD.P .deps/2DAImporter.P
-DEP_FILES =    .deps/2DAImpCD.P .deps/2DAImporter.P
+		  .deps/2DAImp.P .deps/2DAImpCD.P .deps/2DAImporter.P
+DEP_FILES =    .deps/2DAImp.P .deps/2DAImpCD.P .deps/2DAImporter.P
 
 SOURCES = $(lib2DAImporter_la_SOURCES)
 OBJECTS = $(lib2DAImporter_la_OBJECTS)
@@ -570,11 +570,11 @@ force-reedit:
 
 
 #>+ 11
-lib2DAImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/2DAImpCD.cpp $(srcdir)/2DAImporter.cpp  
+lib2DAImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/2DAImp.cpp $(srcdir)/2DAImpCD.cpp $(srcdir)/2DAImporter.cpp  
 	@echo 'creating lib2DAImporter_la.all_cpp.cpp ...'; \
 	rm -f lib2DAImporter_la.all_cpp.files lib2DAImporter_la.all_cpp.final; \
 	echo "#define KDE_USE_FINAL 1" >> lib2DAImporter_la.all_cpp.final; \
-	for file in 2DAImpCD.cpp 2DAImporter.cpp ; do \
+	for file in 2DAImp.cpp 2DAImpCD.cpp 2DAImporter.cpp ; do \
 	  echo "#include \"$$file\"" >> lib2DAImporter_la.all_cpp.files; \
 	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> lib2DAImporter_la.all_cpp.final; \
 	done; \
