@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.3 2004/02/10 22:59:27 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.4 2004/02/19 01:15:09 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -121,7 +121,7 @@ def SetupMenuWindowControls (Window):
 
 	# Rest
 	Button = GemRB.GetControl (Window, 9)
-	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "RestPress")
+	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
 
 
 

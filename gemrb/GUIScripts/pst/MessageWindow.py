@@ -9,6 +9,7 @@ from GUIINV import *
 from GUIOPT import *
 from GUIPR import *
 from GUIREC import *
+from GUISTORE import *
 
 
 MessageWindow = 0
