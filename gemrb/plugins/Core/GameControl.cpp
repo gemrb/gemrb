@@ -575,8 +575,7 @@ void GameControl::TryToTalk(Actor *source, Actor *target)
 {
 	char Tmp[256];
 
-	sprintf( Tmp, "StartDialogueNoSet([%s])", source->scriptName );
-printf("%s\n",Tmp);
+	sprintf( Tmp, "StartDialogueNoSet(\"%s\")", source->scriptName );
 	if(target->GetNextAction()) {
 		DisplayString("Target is busy...");
 		return;
