@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.62 2005/03/16 17:08:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.63 2005/03/19 16:15:56 avenger_teambg Exp $
  *
  */
 
@@ -190,6 +190,7 @@ public:
 public:
 	bool IsOver(Point &Pos);
 	void DrawOutline();
+	void SetCursor(unsigned char CursorIndex);
 	/** Gets the Dialog ResRef */
 	const char* GetDialog(void) const
 	{
@@ -283,7 +284,6 @@ public:
 	void SetDoorOpen(bool Open, bool playsound = false);
 	void SetPolygon(bool Open, Gem_Polygon* poly);
 	bool IsOpen() const;
-	void SetCursor(unsigned char CursorIndex);
 	void DebugDump();
 };
 

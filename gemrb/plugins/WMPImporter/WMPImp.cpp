@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.11 2005/02/20 13:00:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.12 2005/03/19 16:15:58 avenger_teambg Exp $
  *
  */
 
@@ -147,7 +147,7 @@ WMPAreaLink* WMPImp::GetAreaLink(WMPAreaLink* al)
 	str->ReadDword( &al->AreaIndex );
 	str->Read( al->DestEntryPoint, 32 );
 	str->ReadDword( &al->DistanceScale );
-	str->ReadDword( &al->Flags );
+	str->ReadDword( &al->DirectionFlags );
 	for (unsigned k = 0; k < 5; k++) {
 		str->ReadResRef( al->EncounterAreaResRef[k] );
 	}

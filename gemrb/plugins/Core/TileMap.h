@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.30 2005/03/16 17:08:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.31 2005/03/19 16:15:57 avenger_teambg Exp $
  *
  */
 
@@ -25,9 +25,6 @@
 #include "TileOverlay.h"
 #include "Polygon.h"
 #include "GameScript.h"
-
-//container types
-#define CN_PILE   0
 
 #ifdef WIN32
 
@@ -41,8 +38,8 @@
 #define GEM_EXPORT
 #endif
 
-//heap container type
-#define CN_HEAP   0
+//special container types
+#define IE_CONTAINER_PILE   4
 
 class GEM_EXPORT TileMap {
 private:

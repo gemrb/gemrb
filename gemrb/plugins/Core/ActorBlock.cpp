@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.78 2005/03/16 17:08:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.79 2005/03/19 16:15:56 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -327,6 +327,7 @@ Highlightable::Highlightable(ScriptableType type)
 {
 	outline = NULL;
 	Highlight = false;
+	Cursor = IE_CURSOR_NORMAL;
 }
 
 Highlightable::~Highlightable(void)
@@ -350,6 +351,11 @@ void Highlightable::DrawOutline()
 		return;
 	}
 	core->GetVideoDriver()->DrawPolyline( outline, outlineColor, true );
+}
+
+void Highlightable::SetCursor(unsigned char CursorIndex)
+{
+	Cursor = CursorIndex;
 }
 
 /*****************
@@ -520,7 +526,6 @@ Door::Door(TileOverlay* Overlay)
 	oibcount = 0;
 	closed_ib = NULL;
 	cibcount = 0;
-	Cursor = 0;
 	OpenSound[0] = 0;
 	CloseSound[0] = 0;
 	LockSound[0] = 0;
@@ -668,11 +673,6 @@ void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 			delete( closed );
 		closed = poly;
 	}
-}
-
-void Door::SetCursor(unsigned char CursorIndex)
-{
-	Cursor = CursorIndex;
 }
 
 void Door::DebugDump()

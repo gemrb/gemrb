@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.14 2005/03/15 14:31:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.15 2005/03/19 16:15:58 avenger_teambg Exp $
  *
  */
 
@@ -153,7 +153,9 @@ void WorldMap::CalculateDistance(int i, int direction)
 			( (ae->AreaStatus & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
 			( (ae2->AreaStatus & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
 			) {
-			mydistance += al->DistanceScale * al->Flags;
+			//al->Flags is used for something else (entry direction?)
+			//maybe if the area is not passable (but visible, then you can still check on directions it directly links to)
+			mydistance += al->DistanceScale * 4;
 			if (Distances[al->AreaIndex] !=-1) {
 				Distances[al->AreaIndex] = mydistance;
 				GotHereFrom[al->AreaIndex] = j;
@@ -202,7 +204,8 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 			if ( ( (ae->AreaStatus & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
 			( (ae2->AreaStatus & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
 			) {
-				mydistance += al->DistanceScale * al->Flags;
+				// al->Flags is the entry direction
+				mydistance += al->DistanceScale * 4;
 				//nonexisting distance is the biggest!
 				if ((unsigned) Distances[al->AreaIndex] > mydistance) {
 					Distances[al->AreaIndex] = mydistance;

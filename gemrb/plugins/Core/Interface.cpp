@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.283 2005/03/19 15:44:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.284 2005/03/19 16:15:56 avenger_teambg Exp $
  *
  */
 
@@ -681,7 +681,8 @@ int Interface::Init()
 		}
 	}
 	FreeInterface( anim );
-	if (CursorCount<20) {
+	// this is the last existing cursor type
+	if (CursorCount<IE_CURSOR_WAY) {
 		printStatus("ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.41 2005/03/16 17:08:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.42 2005/03/19 16:15:57 avenger_teambg Exp $
  *
  */
 
@@ -390,7 +390,7 @@ void TileMap::AddItemToLocation(Point &position, CREItem *item)
 	Point tmp[4];
 	char heapname[32];
 	sprintf(heapname,"heap_%hd.%hd",position.x,position.y);
-	Container *container = GetContainer(position,CN_PILE);
+	Container *container = GetContainer(position,IE_CONTAINER_PILE);
 	if(!container) {
 		tmp[0].x=position.x-5;
 		tmp[0].y=position.y-5;
@@ -401,7 +401,7 @@ void TileMap::AddItemToLocation(Point &position, CREItem *item)
 		tmp[3].x=position.x-5;
 		tmp[3].y=position.y+5;
 		Gem_Polygon* outline = new Gem_Polygon( tmp, 4 );
-		container = AddContainer(heapname,CN_HEAP, outline);
+		container = AddContainer(heapname,IE_CONTAINER_PILE, outline);
 		container->Pos=position;
 	}
 	container->inventory.AddItem(item);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.12 2005/02/23 18:59:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.13 2005/03/19 16:15:58 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -145,7 +145,7 @@ void WorldMapControl::AdjustScrolling(short x, short y)
 void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 {
 	WorldMap* worldmap = core->GetWorldMap();
-	int nextCursor = 44; //this is the grabbing hand
+	int nextCursor = IE_CURSOR_GRAB;
 
 	if (MouseIsDown) {
 		AdjustScrolling(lastMouseX-x, lastMouseY-y);
@@ -176,7 +176,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 			if ((*m)->X + w < x) continue;
 			if ((*m)->Y > y) continue;
 			if ((*m)->Y + h < y) continue;
-			nextCursor = 0; //we are over an area!
+			nextCursor = IE_CURSOR_NORMAL;
 			if(Area!=*m) {
 				Area=*m;
 				printf("A: %s, Distance: %d\n", Area->AreaName, worldmap->GetDistance(Area->AreaName) );
@@ -191,7 +191,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 /** Mouse Leave Event */
 void WorldMapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 {
-	( ( Window * ) Owner )->Cursor = 0;
+	( ( Window * ) Owner )->Cursor = IE_CURSOR_NORMAL;
 	Area = NULL;
 }
 

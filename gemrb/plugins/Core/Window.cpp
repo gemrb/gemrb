@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.39 2005/03/16 01:42:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.40 2005/03/19 16:15:58 avenger_teambg Exp $
  *
  */
 
@@ -41,7 +41,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 	Visible = 0;
 	Changed = true;
 	Floating = false;
-	Cursor = 0;
+	Cursor = IE_CURSOR_NORMAL;
 	DefaultControl = -1;
 
 	Frame = false;

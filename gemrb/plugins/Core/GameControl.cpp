@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.201 2005/03/16 17:08:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.202 2005/03/19 16:15:56 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -29,14 +29,12 @@
 #include "../../includes/strrefs.h"
 #include "Effect.h"
 
-#define IE_CHEST_CURSOR	32
-
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02
-#define DEBUG_SHOW_DOORS        DEBUG_SHOW_CONTAINERS
+#define DEBUG_SHOW_DOORS	DEBUG_SHOW_CONTAINERS
 #define DEBUG_SHOW_SEARCHMAP    0x04
 #define DEBUG_SHOW_PALETTES     0x08
-#define DEBUG_XXX               0x10
+#define DEBUG_XXX	       0x10
 
 static Color cyan = {
 	0x00, 0xff, 0xff, 0xff
@@ -101,7 +99,7 @@ GameControl::GameControl(void)
 	pfs.x = 0;
 	pfs.y = 0;
 	InfoTextPalette = core->GetVideoDriver()->CreatePalette( white, black );
-	lastCursor = 0;
+	lastCursor = IE_CURSOR_NORMAL;
 	moveX = moveY = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
@@ -632,7 +630,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
-	int nextCursor = 0;
+	int nextCursor = IE_CURSOR_NORMAL;
 
 	lastMouseX = x;
 	lastMouseY = y;
@@ -648,16 +646,16 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	switch (area->GetBlocked( p ) & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL)) {
 		case 0:
-			nextCursor = 6;
+			nextCursor = IE_CURSOR_BLOCKED;
 			break;
 
 		case PATH_MAP_PASSABLE:
-			nextCursor = 4;
+			nextCursor = IE_CURSOR_WALK;
 			break;
 
 		case PATH_MAP_TRAVEL:
 		case PATH_MAP_PASSABLE|PATH_MAP_TRAVEL:
-			nextCursor = 34;
+			nextCursor = IE_CURSOR_TRAVEL;
 			break;
 	}
 
@@ -674,7 +672,11 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	overDoor = area->TMap->GetDoor( p );
 	if (overDoor) {
 		overDoor->Highlight = true;
-		nextCursor = overDoor->Cursor;
+		if (overDoor->Flags & DOOR_LOCKED) {
+			nextCursor = IE_CURSOR_LOCK;
+		} else {
+			nextCursor = overDoor->Cursor;
+		}
 		overDoor->outlineColor = cyan;
 	}
 
@@ -685,10 +687,16 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (overContainer) {
 		overContainer->Highlight = true;
 		if (overContainer->TrapDetected && overContainer->Trapped) {
-			nextCursor = 38;
+			nextCursor = IE_CURSOR_TRAP;
 			overContainer->outlineColor = red;
 		} else {
-			nextCursor = 2;
+			if (overContainer->Flags & CONT_LOCKED) {
+				nextCursor = IE_CURSOR_LOCK2;
+			} else if (overContainer->Type==IE_CONTAINER_PILE) {
+				nextCursor = IE_CURSOR_TAKE;
+			} else {
+				nextCursor = IE_CURSOR_CHEST;
+			}
 			overContainer->outlineColor = cyan;
 		}
 	}
@@ -713,15 +721,15 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 				case CONTROLLED:
 				case CHARMED:
 				case EVILBUTGREEN:
-					nextCursor = 0;
+					nextCursor = IE_CURSOR_NORMAL;
 					break;
 
 				case ENEMY:
 				case GOODBUTRED:
-					nextCursor = 12;
+					nextCursor = IE_CURSOR_ATTACK;
 					break;
 				default:
-					nextCursor = 18;
+					nextCursor = IE_CURSOR_TALK;
 					break;
 			}
 		}
@@ -894,7 +902,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
 			actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 			//we clicked over a searchmap travel region
-				if( ( ( Window * ) Owner )->Cursor == 34) {
+				if( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
 				sprintf( Tmp, "NIDSpecial2()" );
 				actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 			}
@@ -911,7 +919,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			MoveToPointFormation(actor,p,orient);
 		}
 		//we clicked over a searchmap travel region
-		if( ( ( Window * ) Owner )->Cursor == 34) {
+		if( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
 			sprintf( Tmp, "NIDSpecial2()" );
 			actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 		}
