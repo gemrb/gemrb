@@ -94,7 +94,8 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 			}	
 		}
 	}
-	lastF->hasFocus = false;
+	if(lastF)
+		lastF->hasFocus = false;
 	lastF = NULL;
 }
 /** BroadCast Mouse Move Event */
