@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.75 2004/10/11 17:35:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.76 2004/10/12 16:47:35 avenger_teambg Exp $
  *
  */
 
@@ -691,7 +691,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	str->Seek( NoteOffset, GEM_STREAM_START );
 
 	Point point;
-	int color;
+	ieDword color;
 	char *text;
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 	if (pst) {
@@ -728,9 +728,11 @@ Map* AREImp::GetMap(const char *ResRef)
 			point.x=px;
 			point.y=py;
 			color=0;
-			text = (char *) malloc( 524 );
-			str->Read(text, 524 );
-			text[523] = 0;
+			text = (char *) malloc( 500 );
+			str->Read(text, 500 );
+			text[499] = 0;
+			str->ReadDword(&color); //readonly == 1
+			str->Seek(20, GEM_CURRENT_POS);
 			text = (char *) realloc( text, strlen(text) );
 		}
 		else {

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.11 2004/10/11 17:53:22 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.12 2004/10/12 16:47:36 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -65,7 +65,7 @@ def OpenMapWindow ():
 	# Map Control
 	# ronote and usernote are the pins for the notes
 	# 4 is the Label's control ID
-	GemRB.CreateMapControl (Window, 3, 24, 23, 480, 360, 4, "RONOTE","USERNOTE")
+	GemRB.CreateMapControl (Window, 3, 24, 23, 480, 360, 4, "USERNOTE","RONOTE")
 	Map = GemRB.GetControl (Window, 3)
 
 
