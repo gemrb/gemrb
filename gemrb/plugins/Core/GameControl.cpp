@@ -184,6 +184,18 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 			{
 				short GameX = lastMouseX, GameY = lastMouseY;
 				core->GetVideoDriver()->ConvertToGame(GameX, GameY);
+				if(drawPath) {
+					PathNode * nextNode = drawPath->Next;
+					PathNode * thisNode = drawPath;
+					while(true) {
+						delete(thisNode);
+						thisNode = nextNode;
+						if(!thisNode)
+							break;
+						nextNode = thisNode->Next;
+					}
+
+				}
 				drawPath = core->GetPathFinder()->FindPath(pfsX, pfsY, GameX, GameY);
 			}
 		break;
@@ -333,6 +345,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 	}
 	if(!DrawSelectionRect) {
 		ActorBlock * actor = area->GetActor(GameX, GameY);
+		if(!actor && (selected.size() == 1)) {
+			actor = selected.at(0);
+			actor->XDes = GameX;
+			actor->YDes = GameY;
+			actor->path = core->GetPathFinder()->FindPath(actor->XPos, actor->YPos, GameX, GameY);
+			actor->step = NULL;
+		}
 		for(int i = 0; i < selected.size(); i++)
 			selected[i]->Selected = false;
 		selected.clear();
