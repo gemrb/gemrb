@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.291 2005/03/18 20:01:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.292 2005/03/18 21:53:42 avenger_teambg Exp $
  *
  */
 
@@ -1501,7 +1501,7 @@ static PyObject* GemRB_SetLabelTextColor(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateTextEdit__doc,
-"CreateTextEdit(WindowIndex, ControlID, x, y, w, h, font, text) => ControlIndex\n\n"
+"CreateTextEdit(WindowIndex, ControlID, x, y, w, h, font, text)\n\n"
 "Creates and adds a new TextEdit to a Window." );
 
 static PyObject* GemRB_CreateTextEdit(PyObject * /*self*/, PyObject* args)
@@ -1518,7 +1518,7 @@ static PyObject* GemRB_CreateTextEdit(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return NULL;
 	}
-	TextEdit* edit = new TextEdit( 1000 );
+	TextEdit* edit = new TextEdit( 500 );
 	edit->SetFont( core->GetFont( font ) );
 	edit->XPos = x;
 	edit->YPos = y;
@@ -4267,8 +4267,9 @@ PyDoc_STRVAR( GemRB_LearnSpell__doc,
 
 static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, Flags;
+	int PartyID;
 	char *Spell;
+	int Flags=0;
 
 	if (!PyArg_ParseTuple( args, "is|i", &PartyID, &Spell, &Flags )) {
 		return AttributeError( GemRB_LearnSpell__doc );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.92 2005/03/15 17:53:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.93 2005/03/18 21:53:42 avenger_teambg Exp $
  *
  */
 
@@ -650,7 +650,7 @@ int Actor::LearnSpell(ieResRef spellname, ieDword flags)
 		return LSR_INVALID;
 	}
 	if(flags&LS_ADDXP) {
-		//add xp
+		NewStat(IE_XP,spl->Level*100,MOD_ADDITIVE);
 	}
 	return LSR_OK;
 }
