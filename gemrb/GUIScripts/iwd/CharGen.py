@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.31 2004/12/10 20:31:27 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.32 2004/12/10 23:01:48 avenger_teambg Exp $
 
 
 #Character Generation
@@ -52,6 +52,7 @@ ClassButton = 0
 ClassWindow = 0
 ClassTable = 0
 KitTable = 0
+ClassSkillTable = 0
 ClassTextArea = 0
 ClassDoneButton = 0
 
@@ -141,7 +142,6 @@ NameButton = 0
 NameWindow = 0
 NameField = 0
 NameDoneButton = 0
-
 
 def OnLoad():
 	global CharGenWindow, CharGenState, TextArea, PortraitButton, AcceptButton
@@ -295,7 +295,6 @@ def AcceptPress():
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar("Class Kit")
 	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
-	print "AlignmentTable:",AlignmentTable
 	t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment")-1, 3)
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
 
@@ -309,8 +308,7 @@ def AcceptPress():
 		j=j<<1
 
 	#priest spells
-	TmpTable = GemRB.LoadTable("clskills")
-	TableName = GemRB.GetTableValue(TmpTable, Class, 1)
+	TableName = GemRB.GetTableValue(ClassSkillTable, Class, 1)
 	if TableName != "*":
 		ClassFlag = 0 #set this according to class
 		Learnable = GetLearnablePriestSpells( ClassFlag, t, 1)
@@ -355,11 +353,14 @@ def AcceptPress():
 	GemRB.FillPlayerInfo(MyChar, PortraitName+"L", PortraitName+"S")
 	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("PartyFormation")
-	print "lastcheck:%x"%GemRB.GetPlayerStat(MyChar, IE_ALIGNMENT)
 	return
 
 def SetCharacterDescription():
-	global CharGenWindow, TextArea, CharGenState, ClassTable, KitTable, RaceTable, AlignmentTable, AbilitiesTable, SkillsTable, ProficienciesTable, RacialEnemyTable, MageSpellsTable, PriestSpellsTable
+	global CharGenWindow, TextArea, CharGenState, ClassFlag
+	global ClassTable, KitTable, RaceTable, AlignmentTable, AbilitiesTable
+ 	global SkillsTable, ProficienciesTable, RacialEnemyTable
+	global MageSpellsTable, PriestSpellsTable, ClassSkillTable
+
 	GemRB.TextAreaClear(CharGenWindow, TextArea)
 	if CharGenState > 7:
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 1047)
@@ -377,7 +378,7 @@ def SetCharacterDescription():
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 12136, -1)
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, ": ")
 		#this is only mage school in iwd
-		KitIndex = GemRB.GetVar("Class Kit")
+		KitIndex = GemRB.GetVar("MAGESCHOOL")
 		if KitIndex == 0:
 			Class = GemRB.GetVar("Class")-1
 			ClassTitle=GemRB.GetTableValue(ClassTable, Class, 2)
@@ -400,8 +401,16 @@ def SetCharacterDescription():
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, str(GemRB.GetVar("Ability" + str(i + 1))) )
 	if CharGenState > 5:
-		ClassName = GemRB.GetTableRowName(ClassTable, GemRB.GetVar("Class") - 1)
-		if ClassName == "THIEF" or ClassName == "FIGHTER_THIEF" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF" or ClassName == "CLERIC_THIEF":
+		Class = GemRB.GetVar("Class")-1
+		ClassName = GemRB.GetTableRowName(ClassTable, Class)
+		Class = GemRB.GetTableValue(ClassTable, Class, 5)
+		IsRanger = GemRB.GetTableValue(ClassSkillsTable, Class, 0)
+		IsArcane = GemRB.GetTableValue(ClassSkillsTable, Class, 1)
+		IsMage = GemRB.GetTableValue(ClassSkillsTable, Class, 2)
+		IsBard = GemRB.GetTableValue(ClassSkillsTable, Class, 4)
+		IsThief = GemRB.GetTableValue(ClassSkillsTable, Class, 5)
+
+		if IsThief!="*":
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 8442, -1)
 			for i in range (0, 4):
@@ -409,7 +418,7 @@ def SetCharacterDescription():
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, str(GemRB.GetVar("Skill" + str(i))) )
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, "%" )
-		elif ClassName == "RANGER" or ClassName=="CLERIC_RANGER":
+		elif IsRanger!="*":
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 8442, -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 9461, -1)
@@ -420,7 +429,7 @@ def SetCharacterDescription():
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 15982, -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(RacialEnemyTable, GemRB.GetVar("RacialEnemy") - 1, 2) )
-		elif ClassName == "BARD":
+		elif IsBard!="*":
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 8442, -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 9463, -1)
@@ -430,7 +439,7 @@ def SetCharacterDescription():
 
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 9466, -1)
-		for i in range(0, 15):
+		for i in range(15):
 			ProficiencyValue = GemRB.GetVar("Proficiency" + str(i) )
 			if ProficiencyValue > 0:
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(ProficienciesTable, i, 2), -1)
@@ -440,29 +449,33 @@ def SetCharacterDescription():
 					GemRB.TextAreaAppend(CharGenWindow, TextArea, "+")
 					j = j + 1
 
-		if ClassName == "MAGE" or ClassName == "FIGHTER_MAGE" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF" or ClassName == "CLERIC_MAGE" or ClassName == "FIGHTER_MAGE_CLERIC":
+		if IsMage !="*":
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 11027, -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
-			MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
+			t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment")-1, 3)
+			Learnable = GetLearnableMageSpells(GemRB.GetVar("Class Kit"), t,1)
 			MageSpellBook = GemRB.GetVar("MageSpellBook")
 			MageMemorized = GemRB.GetVar("MageMemorized")
-			for i in range(0, MageSpellsCount):
+			for i in range(len(Learnable)):
 				if (1 << i) & MageSpellBook:
-					GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(MageSpellsTable, i, 2), -1)
-					GemRB.TextAreaAppend(CharGenWindow, TextArea, " ")
+					Spell = GemRB.GetSpell(Learnable[i])
+					GemRB.TextAreaAppend(CharGenWindow, TextArea, Spell["SpellName"], -1)
 					if (1 << i) & MageMemorized:
 						GemRB.TextAreaAppend(CharGenWindow, TextArea, "+")
+					GemRB.TextAreaAppend(CharGenWindow, TextArea, " ")
 
-		if ClassName == "CLERIC" or ClassName == "FIGHTER_CLERIC" or ClassName == "CLERIC_THIEF" or ClassName == "CLERIC_RANGER" or ClassName == "CLERIC_MAGE" or ClassName == "FIGHTER_MAGE_CLERIC":
+		if IsArcane!="*":
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 11028, -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
-			PriestSpellsCount = GemRB.GetTableRowCount(PriestSpellsTable)
-			PriestMemorized = GemRB.GetVar("MageMemorized")
-			for i in range(0, PriestSpellsCount):
+			t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment")-1, 3)
+			Learnable = GetLearnablePriestSpells( ClassFlag, t, 1)
+			PriestMemorized = GemRB.GetVar("PriestMemorized")
+			for i in range(len(Learnable)):
 				if (1 << i) & PriestMemorized:
-					GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(PriestSpellsTable, i, 2), -1)
+					Spell = GemRB.GetSpell(Learnable[i])
+					GemRB.TextAreaAppend(CharGenWindow, TextArea, Spell["SpellName"], -1)
 					GemRB.TextAreaAppend(CharGenWindow, TextArea, " +")
 	return
 
@@ -693,6 +706,8 @@ def ClassPress():
 	ClassCount = GemRB.GetTableRowCount(ClassTable)
 	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race") - 1)
 	GemRB.SetVar("Class", 0)
+	GemRB.SetVar("Class Kit", 0)
+	GemRB.SetVar("MAGESCHOOL", 0)
 
 	for i in range(2, 10):
 		ClassSelectButton = GemRB.GetControl(ClassWindow, i)
@@ -700,7 +715,7 @@ def ClassPress():
 
 	HasMulti = 0
 	j = 2
-	for i in range(0, ClassCount):
+	for i in range(ClassCount):
 		Allowed = GemRB.GetTableValue(ClassTable, GemRB.GetTableRowName(ClassTable, i), RaceName)
 		if GemRB.GetTableValue(ClassTable, i, 4):
 			if Allowed != 0:
@@ -725,7 +740,12 @@ def ClassPress():
 	GemRB.SetText(ClassWindow, ClassMultiButton, 11993)
 	
 	KitButton = GemRB.GetControl(ClassWindow, 11)
-	GemRB.SetButtonState(ClassWindow, KitButton, IE_GUI_BUTTON_ENABLED)
+	#only the mage class has schools 
+	Allowed = GemRB.GetTableValue(ClassTable, "MAGE", RaceName)
+	if Allowed:
+		GemRB.SetButtonState(ClassWindow, KitButton, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState(ClassWindow, KitButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(ClassWindow, KitButton, IE_GUI_BUTTON_ON_PRESS, "KitPress")
 	GemRB.SetText(ClassWindow, KitButton, 11994)
 
@@ -821,14 +841,17 @@ def KitPress():
 	KitWindow = GemRB.LoadWindow(12)
 
 	KitTable = GemRB.LoadTable("magesch")
+	#only mage class has schools
+	GemRB.SetVar("Class",6)
 	GemRB.SetVar("MAGESCHOOL",0)
+	GemRB.SetVar("Class Kit",0)
 
 	for i in range(0,8):
 		Button = GemRB.GetControl(KitWindow, i+2)
 		GemRB.SetButtonFlags(KitWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		GemRB.SetText(KitWindow, Button, GemRB.GetTableValue(KitTable, i+1, 0) )
 		GemRB.SetVarAssoc(KitWindow, Button, "MAGESCHOOL", i+1)
-		GemRB.SetEvent(KitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "KitHelpPress")
+		GemRB.SetEvent(KitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "KitSelectPress")
 
 	KitTextArea = GemRB.GetControl(KitWindow, 11)
 	GemRB.SetText(KitWindow, KitTextArea, 17245)
@@ -847,11 +870,12 @@ def KitPress():
 	GemRB.SetVisible(KitWindow, 1)
 	return
 
-def KitHelpPress():
+def KitSelectPress():
 	global KitWindow, KitTextArea
 
 	Kit = GemRB.GetVar("MAGESCHOOL")
 	GemRB.SetText(KitWindow, KitTextArea, GemRB.GetTableValue(KitTable, Kit, 1))
+	GemRB.SetButtonState(KitWindow, KitDoneButton, IE_GUI_BUTTON_ENABLED)
 	return
 
 def KitDonePress():
@@ -1134,6 +1158,7 @@ def AbilitiesRerollPress():
 
 def AbilitiesDonePress():
 	global CharGenWindow, CharGenState, AbilitiesWindow, AbilitiesButton, SkillsButton, SkillsState
+
 	GemRB.UnloadWindow(AbilitiesWindow)
 	GemRB.SetButtonState(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetButtonFlags(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
@@ -1155,25 +1180,37 @@ def AbilitiesCancelPress():
 # Skills Selection
 
 def SkillsPress():
-	global CharGenWindow, ClassTable, RaceTable, SkillsState, SkillsButton, AppearanceButton, CharGenState, ClassFlag
+	global CharGenWindow, AppearanceButton
+	global SkillsState, SkillsButton, CharGenState, ClassFlag
+	global ClassTable, RaceTable, ClassSkillsTable
 	
-	# For now, readability is preferred over speed. This could be optimized later.
-	ClassName = GemRB.GetTableRowName(ClassTable, GemRB.GetVar("Class") - 1)
+	Level = 1
+	SpellLevel = 1
+	Class = GemRB.GetVar("Class")-1
+	ClassName = GemRB.GetTableRowName(ClassTable, Class)
+	Class = GemRB.GetTableValue(ClassTable, Class, 5)
+	ClassSkillsTable = GemRB.LoadTable("clskills")
+	IsRanger = GemRB.GetTableValue(ClassSkillsTable, Class, 0)
+	IsArcane = GemRB.GetTableValue(ClassSkillsTable, Class, 1)
+	IsMage = GemRB.GetTableValue(ClassSkillsTable, Class, 2)
+	IsBard = GemRB.GetTableValue(ClassSkillsTable, Class, 4)
+	IsThief = GemRB.GetTableValue(ClassSkillsTable, Class, 5)
+
 	if SkillsState == 0:
 		RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race") - 1)
-		if ClassName == "THIEF" or ClassName == "FIGHTER_THIEF" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF" or ClassName == "CLERIC_THIEF":
+		if IsThief!="*":
 			SkillsSelect()
-		elif ClassName == "RANGER" or ClassName == "CLERIC_RANGER":
+		elif IsRanger!="*":
 			SkillRaceTable = GemRB.LoadTable("SKILLRAC")
 			SkillDexterityTable = GemRB.LoadTable("SKILLDEX")
 			Dexterity = str(GemRB.GetVar("Ability2") )
-			GemRB.SetVar("Skill0", GemRB.GetTableValue(SkillRaceTable, RaceName, "STEALTH") + GemRB.GetTableValue(SkillDexterityTable, Dexterity, "STEALTH") + GemRB.GetTableValue(GemRB.LoadTable("SKILLRNG"), "1", "STEALTH"))
+			GemRB.SetVar("Skill0", GemRB.GetTableValue(SkillRaceTable, RaceName, "STEALTH") + GemRB.GetTableValue(SkillDexterityTable, Dexterity, "STEALTH") + GemRB.GetTableValue(GemRB.LoadTable("SKILLRNG"), str(Level), "STEALTH"))
 			RacialEnemySelect()
-		elif ClassName == "BARD":
+		elif IsBard!="*":
 			SkillRaceTable = GemRB.LoadTable("SKILLRAC")
 			SkillDexterityTable = GemRB.LoadTable("SKILLDEX")
 			Dexterity = str(GemRB.GetVar("Ability2") )
-			GemRB.SetVar("Skill2", GemRB.GetTableValue(SkillRaceTable, RaceName, "PICK_POCKETS") + GemRB.GetTableValue(SkillDexterityTable, Dexterity, "PICK_POCKETS") + GemRB.GetTableValue(GemRB.LoadTable("SKILLBRD"), "1", "PICK_POCKETS"))
+			GemRB.SetVar("Skill2", GemRB.GetTableValue(SkillRaceTable, RaceName, "PICK_POCKETS") + GemRB.GetTableValue(SkillDexterityTable, Dexterity, "PICK_POCKETS") + GemRB.GetTableValue(GemRB.LoadTable(IsBard), str(Level), "PICK_POCKETS"))
 			SkillsState = 1
 		else:
 			SkillsState = 1
@@ -1182,28 +1219,31 @@ def SkillsPress():
 		ProficienciesSelect()
 
 	if SkillsState == 2:
-		if ClassName == "MAGE" or ClassName == "FIGHTER_MAGE" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF" or ClassName == "CLERIC_MAGE" or ClassName == "FIGHTER_MAGE_CLERIC":
-			MageSpellsSelect()
+		if IsMage!="*":
+			MageSpellsSelect(IsMage, Level, SpellLevel)
 		else:
 			SkillsState = 3
 
 	if SkillsState == 3:
-		if ClassName == "MAGE" or ClassName == "FIGHTER_MAGE" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF":
-			MageSpellsMemorize()
-		elif ClassName == "CLERIC" or ClassName == "FIGHTER_CLERIC" or ClassName == "CLERIC_THIEF" or ClassName == "CLERIC_RANGER":
-			ClassFlag = 0x4000
-			PriestSpellsMemorize()
-		elif ClassName == "DRUID":
-			ClassFlag = 0x8000
-			PriestSpellsMemorize()
-		elif ClassName == "CLERIC_MAGE" or ClassName == "FIGHTER_MAGE_CLERIC":
-			MageSpellsMemorize()
-			ClassFlag = 0x4000
-			PriestSpellsMemorize()
+		if IsMage!="*":
+			MageSpellsMemorize(IsMage, Level, SpellLevel)
 		else:
 			SkillsState = 4
 
 	if SkillsState == 4:
+		if IsArcane=="MXSPLPRS" or IsArcane =="MXSPLPAL":
+			ClassFlag = 0x4000
+			PriestSpellsMemorize(IsArcane, Level, SpellLevel)
+		elif IsArcane=="MXSPLDRU" or IsArcane =="MXSPLRAN":
+			#no separate spell progression
+			if IsArcane == "MXSPLDRU":
+				IsArcane = "MXSPLPRS"
+			ClassFlag = 0x8000
+			PriestSpellsMemorize(IsArcane, Level, SpellLevel)
+		else:
+			SkillsState = 5
+
+	if SkillsState == 5:
 		GemRB.SetButtonState(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonFlags(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 		GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_ENABLED)
@@ -1406,10 +1446,10 @@ def ProficienciesSelect():
 	GemRB.SetVisible(CharGenWindow, 0)
 	ProficienciesWindow = GemRB.LoadWindow(9)
 	ClassName = GemRB.GetTableRowName(ClassTable, GemRB.GetVar("Class") - 1)
-	ProficienciesTable = GemRB.LoadTable("WEAPPROF")
-	ProfsTable = GemRB.LoadTable("PROFS")
-	ProfsMaxTable = GemRB.LoadTable("PROFSMAX")
-	ClassWeaponsTable = GemRB.LoadTable("CLASWEAP")
+	ProficienciesTable = GemRB.LoadTable("weapprof")
+	ProfsTable = GemRB.LoadTable("profs")
+	ProfsMaxTable = GemRB.LoadTable("profsmax")
+	ClassWeaponsTable = GemRB.LoadTable("clasweap")
 
 	Class = GemRB.GetTableRowIndex(ProfsTable, ClassName)
 	ProficienciesPointsLeft = GemRB.GetTableValue(ProfsTable, Class, 0)
@@ -1417,14 +1457,13 @@ def ProficienciesSelect():
 	GemRB.SetLabelUseRGB(ProficienciesWindow, PointsLeftLabel, 1)
 	GemRB.SetText(ProficienciesWindow, PointsLeftLabel, str(ProficienciesPointsLeft))
 
-	for i in range (0, 8):
+	for i in range (8):
 		ProficienciesLabel = GemRB.GetControl(ProficienciesWindow, 69 + i)
 		GemRB.SetButtonState(ProficienciesWindow, ProficienciesLabel, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetEvent(ProficienciesWindow, ProficienciesLabel, IE_GUI_BUTTON_ON_PRESS, "ProficienciesLabelPress")
 		GemRB.SetVarAssoc(ProficienciesWindow, ProficienciesLabel, "ProficienciesIndex", i + 1)
-		GemRB.SetVar("ProficienciesIndex"+str(i+1),0)
 
-		for j in range (0, 5):
+		for j in range (5):
 			ProficienciesMark = GemRB.GetControl(ProficienciesWindow, 27 + i * 5 + j)
 			GemRB.SetButtonSprites(ProficienciesWindow, ProficienciesMark, "GUIPFC", 0, 0, 0, 0, 0)
 			GemRB.SetButtonState(ProficienciesWindow, ProficienciesMark, IE_GUI_BUTTON_DISABLED)
@@ -1450,13 +1489,13 @@ def ProficienciesSelect():
 		GemRB.SetEvent(ProficienciesWindow, ProficienciesMinusButton, IE_GUI_BUTTON_ON_PRESS, "ProficienciesMinusPress")
 		GemRB.SetVarAssoc(ProficienciesWindow, ProficienciesMinusButton, "ProficienciesIndex", i + 1)
 
-	for i in range (0,7):
+	for i in range (7):
 		ProficienciesLabel = GemRB.GetControl(ProficienciesWindow, 85 + i)
 		GemRB.SetButtonState(ProficienciesWindow, ProficienciesLabel, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetEvent(ProficienciesWindow, ProficienciesLabel, IE_GUI_BUTTON_ON_PRESS, "ProficienciesLabelPress")
 		GemRB.SetVarAssoc(ProficienciesWindow, ProficienciesLabel, "ProficienciesIndex", i + 9)
 
-		for j in range (0, 5):
+		for j in range (5):
 			ProficienciesMark = GemRB.GetControl(ProficienciesWindow, 92 + i * 5 + j)
 			GemRB.SetButtonSprites(ProficienciesWindow, ProficienciesMark, "GUIPFC", 0, 0, 0, 0, 0)
 			GemRB.SetButtonState(ProficienciesWindow, ProficienciesMark, IE_GUI_BUTTON_DISABLED)
@@ -1482,7 +1521,7 @@ def ProficienciesSelect():
 		GemRB.SetEvent(ProficienciesWindow, ProficienciesMinusButton, IE_GUI_BUTTON_ON_PRESS, "ProficienciesMinusPress")
 		GemRB.SetVarAssoc(ProficienciesWindow, ProficienciesMinusButton, "ProficienciesIndex", i + 9)
 
-	for i in range(1, 16):
+	for i in range(15):
 		GemRB.SetVar("Proficiency" + str(i), 0)
 
 	GemRB.SetToken("number", str(ProficienciesPointsLeft) )
@@ -1576,18 +1615,26 @@ def ProficienciesCancelPress():
 
 # Spells Selection
 
-def MageSpellsSelect():
+def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	global CharGenWindow, MageSpellsWindow, MageSpellsTextArea, MageSpellsDoneButton, MageSpellsSelectPointsLeft, Learnable
 
 	GemRB.SetVisible(CharGenWindow, 0)
 	MageSpellsWindow = GemRB.LoadWindow(7)
 	#kit (school), alignment, level
+	k = GemRB.GetVar("Class Kit")
 	t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment")-1, 3)
-	Learnable = GetLearnableMageSpells(GemRB.GetVar("Kit"), t,1)
+	Learnable = GetLearnableMageSpells(k, t, SpellLevel)
 	GemRB.SetVar("MageSpellBook", 0)
 	GemRB.SetVar("SpellMask", 0)
 
-	MageSpellsSelectPointsLeft = 2
+	if len(Learnable)<1:
+		MageSpellsDonePress()
+		return
+
+	if k>0:
+		MageSpellsSelectPointsLeft = 3
+	else:
+		MageSpellsSelectPointsLeft = 2
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
 	GemRB.SetLabelUseRGB(MageSpellsWindow, PointsLeftLabel, 1)
 	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
@@ -1678,17 +1725,21 @@ def MageSpellsCancelPress():
 
 # Mage Spells Memorize
 
-def MageSpellsMemorize():
+def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 	global CharGenWindow, MageMemorizeWindow, MageSpellsTable, MageMemorizeTextArea, MageMemorizeDoneButton, MageMemorizePointsLeft
 
 	GemRB.SetVisible(CharGenWindow, 0)
 	MageMemorizeWindow = GemRB.LoadWindow(16)
-	MaxSpellsMageTable = GemRB.LoadTable("MXSPLWIZ")
+	MaxSpellsMageTable = GemRB.LoadTable(SpellTable)
 	MageSpellBook = GemRB.GetVar("MageSpellBook")
 	GemRB.SetVar("MageMemorized", 0)
 	GemRB.SetVar("SpellMask", 0)
 
-	MageMemorizePointsLeft = GemRB.GetTableValue(MaxSpellsMageTable, "1", "1" )
+	MageMemorizePointsLeft = GemRB.GetTableValue(MaxSpellsMageTable, str(Level), str(SpellLevel) )
+	if MageMemorizePointsLeft<1 or len(Learnable)<1:
+		MageMemorizeDonePress()
+		return
+
 	PointsLeftLabel = GemRB.GetControl(MageMemorizeWindow, 0x1000001b)
 	GemRB.SetLabelUseRGB(MageMemorizeWindow, PointsLeftLabel, 1)
 	GemRB.SetText(MageMemorizeWindow, PointsLeftLabel, str(MageMemorizePointsLeft))
@@ -1792,20 +1843,24 @@ def MageMemorizeCancelPress():
 
 # Priest Spells Memorize
 
-def PriestSpellsMemorize():
+def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 	global CharGenWindow, PriestMemorizeWindow, Learnable, ClassFlag
 	global PriestMemorizeTextArea, PriestMemorizeDoneButton, PriestMemorizePointsLeft
 
 	GemRB.SetVisible(CharGenWindow, 0)
 	PriestMemorizeWindow = GemRB.LoadWindow(17)
 	t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment")-1, 3)
-	Learnable = GetLearnablePriestSpells( ClassFlag, t, 1)
+	Learnable = GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
 	
-	MaxSpellsPriestTable = GemRB.LoadTable("MXSPLPRS")
+	MaxSpellsPriestTable = GemRB.LoadTable(SpellTable)
 	GemRB.SetVar("PriestMemorized", 0)
 	GemRB.SetVar("SpellMask", 0)
 
-	PriestMemorizePointsLeft = GemRB.GetTableValue(MaxSpellsPriestTable, "1", "1" )
+	PriestMemorizePointsLeft = GemRB.GetTableValue(MaxSpellsPriestTable, str(Level), str(SpellLevel) )
+	if PriestMemorizePointsLeft<1 or len(Learnable)<1:
+		PriestMemorizeDonePress()
+		return
+
 	PointsLeftLabel = GemRB.GetControl(PriestMemorizeWindow, 0x1000001b)
 	GemRB.SetLabelUseRGB(PriestMemorizeWindow, PointsLeftLabel, 1)
 	GemRB.SetText(PriestMemorizeWindow, PointsLeftLabel, str(PriestMemorizePointsLeft))
@@ -1879,7 +1934,7 @@ def PriestMemorizeSelectPress():
 def PriestMemorizeDonePress():
 	global CharGenWindow, PriestMemorizeWindow, SkillsState
 	GemRB.UnloadWindow(PriestMemorizeWindow)
-	SkillsState = 4
+	SkillsState = 5
 	GemRB.SetVisible(CharGenWindow, 1)
 	SkillsPress()
 	return
