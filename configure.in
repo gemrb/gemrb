@@ -132,7 +132,7 @@ AC_TYPE_SIZE_T
 
 CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATADIR=\\\"\$(moddir)\\\" -DPLUGINDIR=\\\"\$(plugindir)\\\""
 #CFLAGS="$CFLAGS -Werror -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wcast-qual -Wwrite-strings -Wshadow -Wcast-align -ansi -pedantic -Wbad-function-cast -Winline -Wnested-externs -Wredundant-decls -Wno-format-y2k -Wno-long-long"
-CXXFLAGS="$CXXFLAGS -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wcast-qual -Wwrite-strings -Wshadow -Wcast-align -ansi -pedantic -Winline -Wredundant-decls -Wno-format-y2k -Wno-long-long -Wno-unused-parameter"
+CXXFLAGS="$CXXFLAGS -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wcast-qual -Wwrite-strings -Wshadow -Wcast-align -ansi -pedantic -Wredundant-decls -Wno-format-y2k -Wno-long-long -Wno-unused-parameter"
 #LIBS="$LIBS"
 #LDFLAGS="$LDFLAGS $LIBS"
 
