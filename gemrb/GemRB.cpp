@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.14 2003/12/07 13:11:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.15 2003/12/07 20:09:10 balrog994 Exp $
  *
  */
 
@@ -86,7 +86,10 @@ int main(int argc, char ** argv)
 	delete(core);
 	return 0;
 }
-
+/*
+#ifndef S_ISDIR
+#define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
+#endif
 //// Globally used functions
 bool dir_exists(const char *path)
 {
@@ -144,4 +147,4 @@ char *strlwr(char *string)
 }
 
 #endif
-
+*/
