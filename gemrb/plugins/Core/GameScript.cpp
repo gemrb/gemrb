@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.231 2005/02/20 20:50:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.232 2005/02/21 19:53:11 avenger_teambg Exp $
  *
  */
 
@@ -1326,6 +1326,8 @@ Response* GameScript::ReadResponse(DataStream* stream)
 			&aC->int0Parameter, &aC->pointParameter.x, &aC->pointParameter.y,
 			&aC->int1Parameter, &aC->int2Parameter, aC->string0Parameter,
 			aC->string1Parameter );
+		strupr(aC->string0Parameter);
+		strupr(aC->string1Parameter);
 		aCv.push_back( aC );
 		stream->ReadLine( line, 1024 );
 		if (strncmp( line, "RE", 2 ) == 0)
@@ -2000,7 +2002,7 @@ Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIn
 				while (*src != '"') {
 					//sizeof(context+name) = 40
 					if(i<40) {
-						*dst++ = *src;
+						*dst++ = toupper(*src);
 						i++;
 					}
 					src++;
@@ -2028,7 +2030,7 @@ Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIn
 					i=0;
 					while (*src != '"') {
 						if(i++<6) {
-							*dst++ = *src;
+							*dst++ = toupper(*src);
 						}
 						src++;
 					}

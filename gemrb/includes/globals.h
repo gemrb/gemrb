@@ -91,6 +91,7 @@
 
 class Scriptable;
 
+GEM_EXPORT void strnuprcpy(char* dest, char *source, int count);
 GEM_EXPORT unsigned char GetOrient(Point &s, Point &d);
 GEM_EXPORT unsigned int Distance(Point pos, Point pos2);
 GEM_EXPORT unsigned int Distance(Point pos, Scriptable *b);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.263 2005/02/20 13:00:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.264 2005/02/21 19:54:40 avenger_teambg Exp $
  *
  */
 
@@ -2362,9 +2362,12 @@ bool Interface::InitItemTypes()
 			slottypes[i].slotid = (ieDword) strtol(st->QueryField(i,1),NULL,0 );
 			slottypes[i].slottip = (ieDword) strtol(st->QueryField(i,3),NULL,0 );
 			//make a macro for this?
+			/*
 			strncpy(slottypes[i].slotresref, st->QueryField(i,2), 8 );
 			slottypes[i].slotresref[8]=0;
 			strupr(slottypes[i].slotresref);
+			*/
+			strnuprcpy(slottypes[i].slotresref, st->QueryField(i,2), 8);
 		}
 		DelTable(SlotTypeTable);
 	}

@@ -15,11 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.14 2005/02/10 22:40:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.15 2005/02/21 19:53:10 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
+#include <ctype.h>
 #include "DataStream.h"
 
 static bool EndianSwitch = false;
@@ -103,7 +104,7 @@ int DataStream::ReadResRef(ieResRef dest)
 	int i;
 	//zero filling from the first space or in the end
 	//we got a 9 bytes long buffer
-	for(i=0;(i<8) && (dest[i]!=' ');i++);
+	for(i=0;(i<8) && (dest[i]!=' ');i++) dest[i]=toupper(dest[i]);
 	while(i<9) dest[i++]=0;
 	return len;
 }

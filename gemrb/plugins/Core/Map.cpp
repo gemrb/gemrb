@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.133 2005/02/20 20:50:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.134 2005/02/21 19:54:51 avenger_teambg Exp $
  *
  */
 
@@ -79,11 +79,11 @@ void InitSpawnGroups()
 			//count of creatures
 			*(ieDword *) creatures = (ieDword) j;
 			//difficulty
-			*(((ieDword *) creatures)+1) = (ieDword) atoi( tab->QueryField(i,0) );			for(;j;j--) {
-				strncpy( creatures[j], tab->QueryField(j,i), sizeof( ieResRef ) );
+			*(((ieDword *) creatures)+1) = (ieDword) atoi( tab->QueryField(i,0) );
+			for(;j;j--) {
+				strnuprcpy( creatures[j], tab->QueryField(j,i), sizeof( ieResRef ) );
 			}
-			strncpy( GroupName, tab->GetColumnName( i ), sizeof( ieResRef ) );
-			strupr( GroupName );
+			strnuprcpy( GroupName, tab->GetColumnName( i ), 8);
 			Spawns.SetAt( GroupName, (const char *) creatures );
 		}
 	}

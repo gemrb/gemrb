@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.59 2005/02/19 19:09:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.60 2005/02/21 19:52:13 avenger_teambg Exp $
  *
  */
 
@@ -133,7 +133,6 @@ void CREImp::ReadScript(Actor *act, int ScriptLevel)
 {
 	ieResRef aScript;
 	str->ReadResRef( aScript );
-	strupr( aScript );
 	if (( stricmp( aScript, "NONE" ) == 0 ) || ( aScript[0] == '\0' )) {
 		act->Scripts[ScriptLevel] = NULL;
 		return;

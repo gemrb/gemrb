@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.90 2005/02/19 19:09:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.91 2005/02/21 19:52:09 avenger_teambg Exp $
  *
  */
 
@@ -149,7 +149,6 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	ieDword tmp;
 	str->ReadDword( &tmp );
 	str->ReadResRef( Script );
-	strupr( Script );
 	str->ReadDword( &ExploredBitmapSize );
 	str->ReadDword( &ExploredBitmapOffset );
 	str->ReadDword( &DoorsCount );
@@ -288,9 +287,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadWord( &LaunchX );
 		str->ReadWord( &LaunchY );
 		str->ReadResRef( KeyResRef );
-		strupr( KeyResRef );
 		str->ReadResRef( Script );
-		strupr( Script );
 		str->ReadDword( &Locked );
 		str->ReadDword( &LockRemoval );
 		Point toOpen[2];
@@ -403,7 +400,6 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadDword( &ItemIndex );
 		str->ReadDword( &ItemCount );
 		str->ReadResRef( Script );
-		strupr( Script );
 		ieDword firstIndex, vertCount;
 		str->ReadDword( &firstIndex );
 		str->ReadDword( &vertCount );
@@ -482,11 +478,9 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadWord( &LaunchX );
 		str->ReadWord( &LaunchY );
 		str->ReadResRef( KeyResRef );
-		strupr( KeyResRef );
 		//don't even bother reading the script if it isn't trapped
 		if(Trapped || Type) {
 			str->ReadResRef( Script );
-			strupr( Script );
 		}
 		else {
 			Script[0] = 0;
