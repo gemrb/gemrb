@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.195 2004/08/12 16:00:42 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.196 2004/08/12 22:38:42 edheldil Exp $
  *
  */
 
@@ -496,6 +496,7 @@ int Interface::Init()
 	vars->SetType( GEM_VARIABLES_INT ); {
 		char ini_path[_MAX_PATH];
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
+		ResolveFilePath( ini_path );
 		LoadINI( ini_path );
 		int i;
 		for (i = 0; i < 8; i++) {
