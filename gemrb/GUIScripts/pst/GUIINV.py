@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.5 2004/04/27 06:23:10 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.6 2004/05/04 20:43:55 edheldil Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -71,6 +71,31 @@ def OpenInventoryWindow ():
 	for i in range (10):
 		Button = GemRB.GetControl (Window, i);
 		GemRB.SetText (Window, Button, str (i))
+
+	# Quick Weapon
+	for i in range (10, 14):
+		Button = GemRB.GetControl (Window, i);
+		GemRB.SetTooltip (Window, Button, 4261)
+
+	# Quick Item
+	for i in range (14, 19):
+		Button = GemRB.GetControl (Window, i);
+		GemRB.SetTooltip (Window, Button, 4274)
+
+	# Quiver
+	for i in range (19, 24):
+		Button = GemRB.GetControl (Window, i);
+		GemRB.SetTooltip (Window, Button, 4262)
+
+	# Personal Item
+	for i in range (24, 44):
+		Button = GemRB.GetControl (Window, i);
+		GemRB.SetTooltip (Window, Button, 4275)
+
+	# Ground Item
+	for i in range (47, 57):
+		Button = GemRB.GetControl (Window, i);
+		GemRB.SetTooltip (Window, Button, 4273)
 	
 	for i in range (57, 64):
 		Label = GemRB.GetControl (Window, 0x10000000 + i);
