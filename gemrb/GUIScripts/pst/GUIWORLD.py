@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.2 2004/03/22 22:07:04 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.3 2004/12/04 17:40:00 avenger_teambg Exp $
 
 
 # GUIWORLD.py - scripts to control some windows from GUIWORLD winpack
@@ -26,6 +26,7 @@
 
 import GemRB
 from GUIDefines import *
+from GUICommon import CloseOtherWindow
 
 ContainerWindow = None
 FormationWindow = None
@@ -33,9 +34,9 @@ ReformPartyWindow = None
 
 def OpenContainerWindow ():
 	global ContainerWindow
-        GemRB.HideGUI ()
 
-        if ContainerWindow:
+	if CloseOtherWindow(OpenContainerWindow):
+		GemRB.HideGUI ()
 		GemRB.UnloadWindow (ContainerWindow)
 		ContainerWindow = None
 
@@ -43,6 +44,7 @@ def OpenContainerWindow ():
 		GemRB.UnhideGUI ()
 		return
 
+       	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIWORLD")
 	ContainerWindow = Window = GemRB.LoadWindow (8)
 	GemRB.SetVar ("OtherWindow", Window)
@@ -72,9 +74,9 @@ def OpenContainerWindow ():
 	
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
-        GemRB.HideGUI ()
 
-        if ReformPartyWindow:
+	if CloseOtherWindow(ReformPartyWindow):
+		GemRB.HideGUI ()
 		GemRB.UnloadWindow (ReformPartyWindow)
 		ReformPartyWindow = None
 
@@ -83,6 +85,7 @@ def OpenReformPartyWindow ():
 		GemRB.UnhideGUI ()
 		return
 
+	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIWORLD")
 	ReformPartyWindow = Window = GemRB.LoadWindow (24)
 	GemRB.SetVar ("OtherWindow", Window)
@@ -104,9 +107,9 @@ last_formation = None
 
 def OpenFormationWindow ():
 	global FormationWindow
-        GemRB.HideGUI ()
 
-        if FormationWindow:
+	if CloseOtherWindow(OpenFormationWindow):
+		GemRB.HideGUI ()
 		GemRB.UnloadWindow (FormationWindow)
 		FormationWindow = None
 
@@ -115,6 +118,7 @@ def OpenFormationWindow ():
 		GemRB.UnhideGUI ()
 		return
 
+	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIWORLD")
 	FormationWindow = Window = GemRB.LoadWindow (27)
 	GemRB.SetVar ("OtherWindow", Window)
