@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.93 2004/03/13 16:33:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.94 2004/03/13 16:55:36 avenger_teambg Exp $
  *
  */
 
@@ -76,7 +76,11 @@ static TriggerLink triggernames[] = {
 	{"hppercentgt", GameScript::HPPercentGT},
 	{"hppercentlt", GameScript::HPPercentLT},
 	{"inparty", GameScript::InParty},
+	{"inpartyslot", GameScript::InPartySlot},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog},
+	{"level", GameScript::Level},
+	{"levelgt", GameScript::LevelGT},
+	{"levellt", GameScript::LevelLT},
 	{"los", GameScript::LOS},
 	{"morale", GameScript::Morale},
 	{"moralegt", GameScript::MoraleGT},
@@ -86,7 +90,9 @@ static TriggerLink triggernames[] = {
 	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT},
 	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT},
 	{"objectactionlistempty", GameScript::ObjectActionListEmpty}, //same function
-	{"oncreation", GameScript::OnCreation}, {"or", GameScript::Or},
+	{"oncreation", GameScript::OnCreation},
+	{"openstate", GameScript::OpenState},
+	{"or", GameScript::Or},
 	{"partyhasitem", GameScript::PartyHasItem}, {"race", GameScript::Race},
 	{"randomnum", GameScript::RandomNum},
 	{"randomnumgt", GameScript::RandomNumGT},
@@ -2034,6 +2040,19 @@ int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
 	return core->GetGame()->InParty( ( Actor * ) scr ) >= 0 ? 1 : 0;
 }
 
+int GameScript::InPartySlot(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		scr = Sender;
+	}
+	if (scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) scr;
+	return actor->InParty == parameters->int0Parameter;
+}
+
 int GameScript::Exists(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -2707,6 +2726,64 @@ int GameScript::RandomNumLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	return parameters->int1Parameter-1 == RandomNumValue%parameters->int0Parameter;
+}
+
+int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	switch(tar->Type) {
+		case ST_DOOR:
+		{
+			Door *door =(Door *) tar;
+			return door->DoorClosed == parameters->int0Parameter;
+		}
+		case ST_CONTAINER:
+		{
+			Container *cont = (Container *) tar;
+			return cont->Locked == parameters->int0Parameter;
+		}
+		default:
+			return 0;
+	}
+}
+
+int GameScript::Level(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_LEVEL) == parameters->int0Parameter;
+}
+
+int GameScript::LevelGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_LEVEL) > parameters->int0Parameter;
+}
+
+int GameScript::LevelLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_LEVEL) < parameters->int0Parameter;
 }
 
 //-------------------------------------------------------------
