@@ -92,7 +92,7 @@ Control * Window::GetControl(unsigned short x, unsigned short y)
 {
 	Control * ctrl = NULL;
 	//Check if we are always on the last control
-	if(lastC != NULL) {
+	if((lastC != NULL) && (lastC->ControlType != IE_GUI_LABEL)) {
 		if((XPos+lastC->XPos <= x) && (YPos+lastC->YPos <= y)) { //Maybe we are always there
 			if((XPos+lastC->XPos+lastC->Width >= x) && (YPos+lastC->YPos+lastC->Height >= y)) { //Yes, we are on the last returned Control
 				return lastC;
@@ -101,6 +101,8 @@ Control * Window::GetControl(unsigned short x, unsigned short y)
 	}
 	std::vector<Control*>::iterator m;
 	for(m = Controls.begin(); m != Controls.end(); m++) {
+		if((*m)->ControlType == IE_GUI_LABEL)
+			continue;
 		if((XPos+(*m)->XPos <= x) && (YPos+(*m)->YPos <= y)) { //Maybe we are on this control
 			if((XPos+(*m)->XPos+(*m)->Width >= x) && (YPos+(*m)->YPos+(*m)->Height >= y)) { //Yes, we are here
 				ctrl = *m;

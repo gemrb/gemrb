@@ -212,7 +212,8 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button,
 				ctrl = w->GetControl(c++);
 				if(ctrl == NULL)
 					break;
-				ctrl->OnMouseUp(x-w->XPos-ctrl->XPos,y-w->YPos-ctrl->YPos, Button, Mod);
+				if(ctrl->ControlType != IE_GUI_LABEL)
+					ctrl->OnMouseUp(x-w->XPos-ctrl->XPos,y-w->YPos-ctrl->YPos, Button, Mod);
 			} while(true);
 			break;
 		}
