@@ -24,6 +24,7 @@ Label::Label(unsigned short bLength, Font * font){
 	if(bLength != 0)
 		Buffer = (char*)malloc(bLength);
 	useRGB = false;
+	Alignment = IE_FONT_ALIGN_LEFT;
 }
 Label::~Label(){
 	if(Buffer)
@@ -34,9 +35,9 @@ void Label::Draw(unsigned short x, unsigned short y)
 {
 	if(font) {
 		if(useRGB)
-			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, &fore, 0, true);
+			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, &fore, Alignment, true);
 		else
-			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, NULL, 0, true);
+			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, NULL, Alignment, true);
 	}
 }
 /** This function sets the actual Label Text */
@@ -49,4 +50,11 @@ void Label::SetText(char * string)
 void Label::SetColor(Color col)
 {
 	fore = col;
+}
+
+void Label::SetAlignment(unsigned char Alignment)
+{
+	if(Alignment > IE_FONT_ALIGN_RIGHT)
+		return;
+	this->Alignment = Alignment;
 }

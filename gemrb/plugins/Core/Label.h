@@ -48,6 +48,8 @@ public:
   void SetText(char * string);
   /** Sets the Foreground Font Color */
   void SetColor(Color col);
+  /** Sets the Alignment of Text */
+  void SetAlignment(unsigned char Alignment);
 private: // Private attributes
   /** Text String Buffer */
   char * Buffer;
@@ -57,6 +59,8 @@ private: // Private attributes
   Color fore;
   /** Use the RGB Color for the Font */
   bool useRGB;
+  /** Alignment Variable */
+  unsigned char Alignment;
 };
 
 #endif
