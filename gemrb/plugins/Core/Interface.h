@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.104 2004/08/05 06:42:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.105 2004/08/06 01:15:27 edheldil Exp $
  *
  */
 
@@ -84,6 +84,12 @@ typedef struct Symbol {
 #define GEM_EXPORT
 #endif
 
+// Colors of modal window shadow
+// !!! Keep these synchronized with GUIDefines.py !!!
+#define MODAL_SHADOW_NONE   0
+#define MODAL_SHADOW_GRAY   1
+#define MODAL_SHADOW_BLACK  2
+
 class GEM_EXPORT Interface : public InterfaceDesc
 {
 private:
@@ -101,6 +107,7 @@ private:
 	std::vector<Font*> fonts;
 	EventMgr * evntmgr;
 	WindowMgr * windowmgr;
+	Window* ModalWindow;
 	char WindowPack[10];
 	ScriptEngine * guiscript;
 	SoundMgr * soundmgr;
@@ -246,7 +253,7 @@ public:
 	/** Set a Window Visible Flag */
 	int SetVisible(unsigned short WindowIndex, int visible);
 	/** Show a Window in Modal Mode */
-	int ShowModal(unsigned short WindowIndex);
+	int ShowModal(unsigned short WindowIndex, int Shadow);
 	/** Set an Event of a Control */
 	int SetEvent(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long EventID, char * funcName);
 	/** Set the Status of a Control in a Window */

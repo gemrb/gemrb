@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.17 2004/06/24 17:53:18 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.18 2004/08/06 01:15:26 edheldil Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -69,6 +69,12 @@ global OP_SET, OP_OR, OP_NAND
 OP_SET = 0
 OP_OR = 1
 OP_NAND = 2
+
+# Shadow color for ShowModal()
+# !!! Keep these synchronized with Interface.h !!!
+MODAL_SHADOW_NONE = 0
+MODAL_SHADOW_GRAY = 1
+MODAL_SHADOW_BLACK = 2
 
 global GEMRB_VERSION
 GEMRB_VERSION = -1

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.188 2004/08/05 22:55:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.189 2004/08/06 01:15:27 edheldil Exp $
  *
  */
 
@@ -87,11 +87,11 @@ Interface::Interface(int iargc, char** iargv)
 	game = NULL;
 	worldmap = NULL;
 	timer = NULL;
-  evntmgr = NULL;
+	evntmgr = NULL;
 	console = NULL;
 	slotmatrix = NULL;
 	slottypes = NULL;
-
+	ModalWindow = NULL;
 	tooltip_x = 0;
 	tooltip_y = 0;
 	tooltip_text = NULL;
@@ -1527,7 +1527,7 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 }
 
 /** Show a Window in Modal Mode */
-int Interface::ShowModal(unsigned short WindowIndex)
+int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 {
 	if (WindowIndex >= windows.size()) {
 		printMessage( "Core", "Window not found", LIGHT_RED );
@@ -1543,11 +1543,35 @@ int Interface::ShowModal(unsigned short WindowIndex)
 	SetOnTop( WindowIndex );
 	evntmgr->AddWindow( win );
 	win->Invalidate();
+
+	ModalWindow = NULL;
+	DrawWindows();
+
+	Color gray = {
+		0, 0, 0, 128
+	};
+	Color black = {
+		0, 0, 0, 255
+	};
+
+	Region r( 0, 0, Width, Height );
+
+	if (Shadow == MODAL_SHADOW_GRAY) {
+		video->DrawRect( r, gray );
+	} else if (Shadow == MODAL_SHADOW_BLACK) {
+		video->DrawRect( r, black );
+	}
+
+	ModalWindow = win;
 	return 0;
 }
 
 void Interface::DrawWindows(void)
 {
+	if (ModalWindow) {
+		ModalWindow->DrawWindow();
+		return;
+	}
 	std::vector< int>::reverse_iterator t = topwin.rbegin();
 	for (unsigned int i = 0; i < topwin.size(); i++) {
 		if ( (unsigned int) ( *t ) >=windows.size() )
@@ -1610,6 +1634,7 @@ int Interface::DelWindow(unsigned short WindowIndex)
 		}
 		windows.clear();
 		topwin.clear();
+		ModalWindow = NULL;
 		return 0;
 	}
 	if (WindowIndex >= windows.size()) {
@@ -1620,6 +1645,8 @@ int Interface::DelWindow(unsigned short WindowIndex)
 		printMessage( "Core", "Window deleted again", LIGHT_RED );
 		return -1;
 	}
+	if (win == ModalWindow)
+		ModalWindow = NULL;
 	evntmgr->DelWindow( win->WindowID );
 	delete( win );
 	windows[WindowIndex] = NULL;

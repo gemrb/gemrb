@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.181 2004/08/05 06:42:46 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.182 2004/08/06 01:15:27 edheldil Exp $
  *
  */
 
@@ -1096,18 +1096,20 @@ PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ShowModal__doc,
-"ShowModal(WindowIndex)\n\n"
-"Show a Window on Screen setting the Modal Status." );
+"ShowModal(WindowIndex, [Shadow=MODAL_SHADOW_NONE])\n\n"
+"Show a Window on Screen setting the Modal Status."
+"If Shadow is MODAL_SHADOW_GRAY, other windows are grayed. "
+"If Shadow is MODAL_SHADOW_BLACK, they are blacked out." );
 
 static PyObject* GemRB_ShowModal(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex;
+	int WindowIndex, Shadow = MODAL_SHADOW_NONE;
 
-	if (!PyArg_ParseTuple( args, "i", &WindowIndex )) {
+	if (!PyArg_ParseTuple( args, "i|i", &WindowIndex, &Shadow )) {
 		return AttributeError( GemRB_ShowModal__doc );
 	}
 
-	int ret = core->ShowModal( WindowIndex );
+	int ret = core->ShowModal( WindowIndex, Shadow );
 	if (ret == -1) {
 		return NULL;
 	}
