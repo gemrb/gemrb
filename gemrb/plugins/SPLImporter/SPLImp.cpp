@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.4 2004/05/25 16:16:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.5 2004/09/01 18:32:34 edheldil Exp $
  *
  */
 
@@ -82,7 +82,7 @@ Spell* SPLImp::GetSpell()
 	str->Read( &s->unknown4, 4 );
 	str->Read( &s->SpellLevel, 4 );
 	str->Read( &s->unknown5, 2 );
-	str->Read( &s->SpellBookIcon, 8 );
+	str->Read( &s->SpellbookIcon, 8 );
 	str->Read( &s->unknown6, 2 );
 	str->Read( &s->unknown7, 4 );
 	str->Read( &s->unknown8, 4 );
@@ -117,7 +117,7 @@ Spell* SPLImp::GetSpell()
 		s->casting_features.push_back( f );
 	}
 
-	DataStream* bamfile = core->GetResourceMgr()->GetResource( s->SpellBookIcon,
+	DataStream* bamfile = core->GetResourceMgr()->GetResource( s->SpellbookIcon,
 													IE_BAM_CLASS_ID );
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		printf( "[SPLImporter]: No BAM Importer Available.\n" );

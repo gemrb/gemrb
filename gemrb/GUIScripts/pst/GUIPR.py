@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIPR.py,v 1.3 2004/08/29 21:28:02 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIPR.py,v 1.4 2004/09/01 18:32:32 edheldil Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -172,6 +172,11 @@ def OpenPriestSpellInfoWindow ():
 
 	Text = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Text, spell['SpellDesc'])
+
+	IconResRef = 'SPL' + spell['SpellbookIcon'][2:]
+	
+	Icon = GemRB.GetControl (Window, 5)
+	GemRB.SetButtonSprites (Window, Icon, IconResRef, 0, 0, 0, 0, 0)
 
 
 	GemRB.UnhideGUI ()

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.203 2004/08/29 21:25:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.204 2004/09/01 18:32:33 edheldil Exp $
  *
  */
 
@@ -3705,6 +3705,7 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "SpellName", PyInt_FromLong (spell->SpellName));
 	PyDict_SetItemString(dict, "SpellDesc", PyInt_FromLong (spell->SpellDesc));
+	PyDict_SetItemString(dict, "SpellbookIcon", PyString_FromResRef (spell->SpellbookIcon));
 
 	delete spell;
 	return dict;
