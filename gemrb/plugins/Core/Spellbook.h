@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.6 2004/08/29 21:25:36 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.7 2004/08/30 21:35:45 avenger_teambg Exp $
  *
  */
 
@@ -96,10 +96,10 @@ public:
 	bool AddSpellMemorization(CRESpellMemorization* sm);
 	//int AddMemorizedSpell(CREMemorizedSpell* spell);
 
-	unsigned int GetKnownSpellsCount(int type, int level);
-	CREKnownSpell* GetKnownSpell(int type, int level, int index);
-	unsigned int GetMemorizedSpellsCount(int type, int level);
-	CREMemorizedSpell* GetMemorizedSpell(int type, int level, int index);
+	unsigned int GetKnownSpellsCount(int type, unsigned int level);
+	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index);
+	unsigned int GetMemorizedSpellsCount(int type, unsigned int level);
+	CREMemorizedSpell* GetMemorizedSpell(int type, unsigned int level, unsigned int index);
 
 
 	//int GetKnownSpellsCountOnLevel( int level );
