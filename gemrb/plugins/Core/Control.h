@@ -73,9 +73,6 @@ public: // Public attributes
 	bool Changed;
 	/** Owner Window */
 	void * Owner;
-  /** Associated Variable for the current Control */
-  char VarName[32];
-  int  VarValue;
 public: //Events
 	/** Key Press Event */
 	virtual void OnKeyPress(unsigned char Key, unsigned short Mod);
@@ -89,9 +86,12 @@ public: //Events
 	virtual void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
 	/** Special Key Press */
 	virtual void OnSpecialKeyPress(unsigned char Key);
+	/** Associated Variable for the current Control */
+  char VarName[32];
+  int  VarValue;
 	/** Variable Functions */
 	void SetVariableName(const char * varname);
-	char& GetVariableName();
+	char* GetVariableName();
 	void SetVariableValue(int val);
 	int GetVariableValue();
 };

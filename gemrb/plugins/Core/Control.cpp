@@ -19,11 +19,13 @@
 #include "Control.h"
 #ifndef WIN32
 #include <stdio.h>
+#include <string.h>
 #endif
 
 Control::Control(){
 	hasFocus = false;
 	Changed = true;
+	VarName[0] = 0;
 }
 
 Control::~Control(){
@@ -60,19 +62,19 @@ void Control::OnSpecialKeyPress(unsigned char Key)
 	printf("OnSpecialKeyPress: CtrlID = 0x%08X, Key = %d\n", ControlID, Key);
 }
 /** Variable Functions */
-void SetVariableName(const char * varname)
+void Control::SetVariableName(const char * varname)
 {
 	strncpy(VarName, varname, 32);
 }
-char& GetVariableName()
+char* Control::GetVariableName()
 {
 	return VarName;
 }
-void SetVariableValue(int val)
+void Control::SetVariableValue(int val)
 {
 	VarValue = val;
 }
-int GetVariableValue()
+int Control::GetVariableValue()
 {
 	return VarValue;
 }
