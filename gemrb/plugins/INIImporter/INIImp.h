@@ -69,6 +69,7 @@ public:
 			*endValueKey-- = 0;
 			ValueKeyLen--;
 		}
+		/*
 		//Re-NewLine the string
 		char * VKptr = ValueKey;
 		while(*VKptr != '\0') {
@@ -77,7 +78,7 @@ public:
 				*VKptr = '\n';
 			}
 			VKptr++;
-		}
+		}*/
 		//Allocating Buffers
 		p.Name = (char*)malloc(NameKeyLen+1);
 		p.Value = (char*)malloc(ValueKeyLen+1);
