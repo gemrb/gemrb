@@ -12,6 +12,8 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUILOAD")
 	LoadWindow = GemRB.LoadWindow(0)
+	GemRB.SetWindowPos (LoadWindow, 640, 480, WINDOW_SCALE)
+	GemRB.SetWindowFrame (LoadWindow)
 	CancelButton=GemRB.GetControl(LoadWindow,34)
 	GemRB.SetText(LoadWindow, CancelButton, 13727)
 	GemRB.SetEvent(LoadWindow,CancelButton,IE_GUI_BUTTON_ON_PRESS, "CancelPress")

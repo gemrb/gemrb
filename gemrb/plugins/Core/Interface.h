@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.143 2005/03/07 18:26:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.144 2005/03/16 01:42:57 edheldil Exp $
  *
  */
 
@@ -167,6 +167,7 @@ public:
 	int CursorCount;
 	Sprite2D *FogSprites[32];
 	Sprite2D **TooltipBack;
+	Sprite2D *WindowFrames[4];
 public:
 	Interface(int iargc, char **iargv);
 	~Interface(void);

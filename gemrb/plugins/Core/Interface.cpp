@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.277 2005/03/15 17:53:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.278 2005/03/16 01:42:56 edheldil Exp $
  *
  */
 
@@ -145,6 +145,7 @@ Interface::Interface(int iargc, char** iargv)
 	TooltipBack = NULL;
 	DraggedItem = NULL;
 	GameFeatures = 0;
+	memset( WindowFrames, 0, sizeof( WindowFrames ));
 }
 
 #define FreeInterfaceVector(type, variable, member) \
@@ -288,6 +289,7 @@ Interface::~Interface(void)
 	}
 	delete( plugin );
 	//TODO: Clean the Cache and leave only .bif files
+	// FIXME: delete WindowFrames
 }
 
 bool Interface::ReadStrrefs()

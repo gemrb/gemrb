@@ -10,6 +10,8 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUIMOVIE")
 	MovieWindow = GemRB.LoadWindow(0)
+	GemRB.SetWindowPos (MovieWindow, 640, 480, WINDOW_SCALE)
+	GemRB.SetWindowFrame (MovieWindow)
 	TextAreaControl = GemRB.GetControl(MovieWindow, 0)
 	GemRB.SetTextAreaSelectable(MovieWindow, TextAreaControl,1)
 	PlayButton = GemRB.GetControl(MovieWindow, 2)

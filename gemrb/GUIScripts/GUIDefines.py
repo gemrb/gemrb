@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.29 2005/03/09 20:08:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.30 2005/03/16 01:42:49 edheldil Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -92,6 +92,15 @@ global OP_SET, OP_OR, OP_NAND
 OP_SET = 0
 OP_OR = 1
 OP_NAND = 2
+
+# Window position anchors/alignments
+# !!! Keep these synchronized with Window.h !!!
+WINDOW_TOPLEFT       = 0x00
+WINDOW_CENTER        = 0x01
+WINDOW_ABSCENTER     = 0x02
+WINDOW_RELATIVE      = 0x04
+WINDOW_SCALE         = 0x08
+WINDOW_BOUNDED       = 0x10
 
 # Shadow color for ShowModal()
 # !!! Keep these synchronized with Interface.h !!!

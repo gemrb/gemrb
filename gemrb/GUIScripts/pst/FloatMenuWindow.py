@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/FloatMenuWindow.py,v 1.6 2005/03/13 18:24:53 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/FloatMenuWindow.py,v 1.7 2005/03/16 01:42:55 edheldil Exp $
 
 # FloatMenuWindow.py - display PST's floating menu window from GUIWORLD winpack
 
@@ -69,7 +69,7 @@ def OpenFloatMenuWindow ():
 	x, y = GemRB.GetVar ("MenuX"), GemRB.GetVar ("MenuY")
 
 	# FIXME: keep the menu inside the viewport!!!
-	GemRB.SetWindowPos (Window, x, y, 1)
+	GemRB.SetWindowPos (Window, x, y, WINDOW_CENTER | WINDOW_BOUNDED)
 
 	# portrait button
 	Button = GemRB.GetControl (Window, 0)

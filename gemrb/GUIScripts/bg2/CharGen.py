@@ -17,6 +17,8 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG")
 	CharGenWindow = GemRB.LoadWindow(0)
+	GemRB.SetWindowPos (CharGenWindow, 640, 480, WINDOW_SCALE)
+	GemRB.SetWindowFrame (CharGenWindow)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.288 2005/03/13 13:23:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.289 2005/03/16 01:42:58 edheldil Exp $
  *
  */
 
@@ -482,6 +482,81 @@ static PyObject* GemRB_SetWindowSize(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetWindowFrame__doc,
+"SetWindowFrame(WindowIndex)\n\n"
+"Sets Window frame used to fill screen on higher resolutions.");
+
+static PyObject* GemRB_SetWindowFrame(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex;
+
+	if (!PyArg_ParseTuple( args, "i", &WindowIndex )) {
+		return AttributeError( GemRB_SetWindowFrame__doc );
+	}
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (!win) {
+		return NULL;
+	}
+
+	win->SetFrame();
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_LoadWindowFrame__doc,
+"LoadWindowFrame(MOSResRef)\n\n"
+"Sets the Picture of a xxxxxxxxxxxx from a MOS file." );
+
+static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
+{
+	char* ResRef[4];
+
+	if (!PyArg_ParseTuple( args, "ssss", &ResRef[0], &ResRef[1], &ResRef[2], &ResRef[3] )) {
+		return AttributeError( GemRB_LoadWindowFrame__doc );
+	}
+
+
+	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
+	if (im == NULL) {
+		return NULL;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		if (ResRef[i] == 0) {
+			return AttributeError( GemRB_LoadWindowFrame__doc );
+		}
+
+		DataStream* str = core->GetResourceMgr()->GetResource( ResRef[i], IE_MOS_CLASS_ID );
+		if (str == NULL) {
+			core->FreeInterface( im );
+			return NULL;
+		}
+
+		if (!im->Open( str, true )) {
+			core->FreeInterface( im );
+			return NULL;
+		}
+
+		Sprite2D* Picture = im->GetImage();
+		if (Picture == NULL) {
+			core->FreeInterface( im );
+			return NULL;
+		}
+
+		// FIXME: delete previous WindowFrames
+
+		core->WindowFrames[i] = Picture;
+
+	}
+	core->FreeInterface( im );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+
 PyDoc_STRVAR( GemRB_EnableCheatKeys__doc,
 "EnableCheatKeys(flag)\n\n"
 "Sets CheatFlags." );
@@ -533,17 +608,22 @@ static PyObject* GemRB_SetWindowPicture(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetWindowPos__doc,
-"SetWindowPos(WindowIndex, X, Y, [Center=0, Bounded=1])\n\n"
-"Moves a Window.\n"
-"If Center==0, the X, Y coordinates are those of"
-"upper-left corner, else they are coordinates of window's center."
-"If Bounded==1, the window is kept within screen boundaries." );
+"SetWindowPos(WindowIndex, X, Y, [Flags=WINDOW_TOPLEFT])\n\n"
+"Moves a Window to pos. (X, Y).\n"
+"Flags is a bitmask of WINDOW_(TOPLEFT|CENTER|ABSCENTER|BOUNDED) and "
+"they are used to modify the meaning of X and Y.\n"
+"TOPLEFT: X, Y are coordinates of upper-left corner.\n"
+"CENTER: X, Y are coordinates of window's center.\n"
+"ABSCENTER: window is placed at screen center, moved by X, Y.\n"
+"RELATIVE: window is moved by X, Y.\n"
+"SCALE: window is moved by diff of screen size and X, Y, divided by 2.\n"
+"BOUNDED: the window is kept within screen boundaries." );
 
 static PyObject* GemRB_SetWindowPos(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, X, Y, Center=0, Bounded=1;
+	int WindowIndex, X, Y, Flags = WINDOW_TOPLEFT;
 
-	if (!PyArg_ParseTuple( args, "iii|ii", &WindowIndex, &X, &Y, &Center, &Bounded )) {
+	if (!PyArg_ParseTuple( args, "iii|i", &WindowIndex, &X, &Y, &Flags )) {
 		return AttributeError( GemRB_SetWindowPos__doc );
 	}
 
@@ -552,29 +632,40 @@ static PyObject* GemRB_SetWindowPos(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	win->XPos = X;
-	win->YPos = Y;
-	if (Center) {
-		win->XPos -= win->Width / 2;
-		win->YPos -= win->Height / 2;
+	if (Flags & WINDOW_CENTER) {
+		X -= win->Width / 2;
+		Y -= win->Height / 2;
+	}
+	else if (Flags & WINDOW_ABSCENTER) {
+		X += (core->Width - win->Width) / 2;
+		Y += (core->Height - win->Height) / 2;
+	}
+	else if (Flags & WINDOW_RELATIVE) {
+		X += win->XPos;
+		Y += win->YPos;
+	}
+	else if (Flags & WINDOW_SCALE) {
+		X = win->XPos + (core->Width - X) / 2;
+		Y = win->YPos + (core->Height - Y) / 2;
 	}
 
 	// Keep window within screen
 	// FIXME: keep it within gamecontrol
-
-	if (Bounded) {
+	if (Flags & WINDOW_BOUNDED) {
 		// FIXME: grrrr, should be < 0!!!
-		if (win->XPos > 32767)
-			win->XPos = 0;
-		if (win->YPos > 32767)
-			win->YPos = 0;
+		if (X > 32767)
+			X = 0;
+		if (Y > 32767)
+			Y = 0;
 
-		if (win->XPos + win->Width >= core->Width)
-			win->XPos = core->Width - win->Width;
-		if (win->YPos + win->Height >= core->Height)
-			win->YPos = core->Height - win->Height;
+		if (X + win->Width >= core->Width)
+			X = core->Width - win->Width;
+		if (Y + win->Height >= core->Height)
+			Y = core->Height - win->Height;
 	}
 
+	win->XPos = X;
+	win->YPos = Y;
 	win->Invalidate();
 
 	Py_INCREF( Py_None );
@@ -4663,8 +4754,10 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(LoadWindow, METH_VARARGS),
 	METHOD(CreateWindow, METH_VARARGS),
 	METHOD(SetWindowSize, METH_VARARGS),
+	METHOD(SetWindowFrame, METH_VARARGS),
 	METHOD(SetWindowPos, METH_VARARGS),
 	METHOD(SetWindowPicture, METH_VARARGS),
+	METHOD(LoadWindowFrame, METH_VARARGS),
 	METHOD(LoadTable, METH_VARARGS),
 	METHOD(UnloadTable, METH_VARARGS),
 	METHOD(GetTableValue, METH_VARARGS),

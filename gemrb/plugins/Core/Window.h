@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.17 2004/12/01 21:59:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.18 2005/03/16 01:42:57 edheldil Exp $
  *
  */
 
@@ -44,6 +44,16 @@
 #define GEM_EXPORT
 #endif
 
+// Window position anchors (actually flags for WindowSetPos())
+// !!! Keep these synchronized with GUIDefines.py !!!
+#define WINDOW_TOPLEFT       0x00
+#define WINDOW_CENTER        0x01
+#define WINDOW_ABSCENTER     0x02
+#define WINDOW_RELATIVE      0x04
+#define WINDOW_SCALE         0x08
+#define WINDOW_BOUNDED       0x10
+
+
 class GEM_EXPORT Window {
 public: 
 	Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos,
@@ -55,6 +65,8 @@ public:
 	void AddControl(Control* ctrl);
 	/** This function Draws the Window on the Output Screen */
 	void DrawWindow();
+	/** Set window frame used to fill screen on higher resolutions*/
+	void SetFrame();
 	/** Returns the Control at X,Y Coordinates */
 	Control* GetControl(unsigned short x, unsigned short y);
 	/** Returns the Control by Index */
@@ -90,6 +102,8 @@ public: //Public attributes
 	bool Changed;
 	/** Floating Flag */
 	bool Floating;
+	/** Window is framed */
+	bool Frame;
 	int Cursor;
 	int DefaultControl;
 private: // Private attributes

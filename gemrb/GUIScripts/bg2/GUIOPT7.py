@@ -9,6 +9,7 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUIOPT")
 	SoundWindow = GemRB.LoadWindow(7)
+	GemRB.SetWindowPos (SoundWindow, 640, 480, WINDOW_SCALE)
 	TextAreaControl = GemRB.GetControl(SoundWindow, 14)
 	AmbientButton = GemRB.GetControl(SoundWindow, 16)
 	AmbientSlider = GemRB.GetControl(SoundWindow, 1)
