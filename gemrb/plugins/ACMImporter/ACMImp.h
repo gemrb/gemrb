@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.25 2004/08/21 04:53:52 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.26 2004/08/28 10:33:02 divide Exp $
  *
  */
 
@@ -78,9 +78,10 @@ public:
 		delete this;
 	}
 	
-	class AmbientMgr : public SoundMgr::AmbientMgr {
+	typedef SoundMgr::AmbientMgr AmbientMgrBase;
+	class AmbientMgr : public AmbientMgrBase {
 	public:
-		AmbientMgr() : SoundMgr::AmbientMgr(), mutex(SDL_CreateMutex()), 
+		AmbientMgr() : AmbientMgrBase(), mutex(SDL_CreateMutex()), 
 		               player(NULL), cond(SDL_CreateCond()) { }
 		~AmbientMgr() { reset(); SDL_DestroyMutex(mutex); SDL_DestroyCond(cond); }
 		void reset();
