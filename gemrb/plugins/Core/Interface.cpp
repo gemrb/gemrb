@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.187 2004/08/05 17:40:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.188 2004/08/05 22:55:35 avenger_teambg Exp $
  *
  */
 
@@ -2196,7 +2196,7 @@ bool Interface::SavedExtension(const char *filename)
 	if(!str) return false;
 	int i=0;
 	while(saved_extensions[i]) {
-		if(!strcasecmp(saved_extensions[i], str) ) return true;
+		if(!stricmp(saved_extensions[i], str) ) return true;
 		i++;
 	}
 	return false;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.42 2004/08/03 23:30:34 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.43 2004/08/05 22:55:35 avenger_teambg Exp $
  *
  */
 
@@ -113,7 +113,7 @@ public:
 
 	//PathFinder
 	/* Finds the nearest passable point */
-	void AdjustPosition(unsigned int& goalX, unsigned int& goalY);
+	void AdjustPosition(unsigned int& goalX, unsigned int& goalY, unsigned int radius=0);
 	/* Finds the path which leads the farthest from d */
 	PathNode* RunAway(short sX, short sY, short dX, short dY, unsigned int PathLen, bool Backing);
 	/* Returns true if there is no path to d */

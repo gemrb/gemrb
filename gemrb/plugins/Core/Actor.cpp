@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.57 2004/08/02 22:15:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.58 2004/08/05 22:55:34 avenger_teambg Exp $
  *
  */
 
@@ -87,6 +87,7 @@ Actor::Actor()
 	LastSeen = NULL;
 	LastHeard = NULL;
 	LastSummoner = NULL;
+	LastDamage = 0;
 	LastDamageType = 0;
 
 	InternalFlags = 0;
@@ -384,6 +385,7 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 //recalculate damage based on resistances and difficulty level
 	NewStat(IE_HITPOINTS,-damage, MOD_ADDITIVE);
 	LastDamageType=damagetype;
+	LastDamage=damage;
 	LastHitter=hitter;
 	return damage;
 }
@@ -414,13 +416,13 @@ void Actor::DebugDump()
 	spellbook.dump();
 }
 
-void Actor::SetPosition(Map *map, unsigned int XPos, unsigned int YPos, int jump)
+void Actor::SetPosition(Map *map, unsigned int XPos, unsigned int YPos, int jump, int radius)
 {
 	ClearPath();
 	XPos/=16;
 	YPos/=12;
 	if (jump && !GetStat( IE_DONOTJUMP ) && anims->CircleSize) {
-		map->AdjustPosition( XPos, YPos );
+		map->AdjustPosition( XPos, YPos, radius );
 	}
 	MoveTo( ( XPos * 16 ) + 8, ( YPos * 12 ) + 6 );
 }

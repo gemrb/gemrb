@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.103 2004/08/05 17:40:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.104 2004/08/05 22:55:35 avenger_teambg Exp $
  *
  */
 
@@ -816,7 +816,7 @@ void Map::SetupNode(unsigned int x, unsigned int y, unsigned int Cost)
 	InternalStack.push( ( x << 16 ) | y );
 }
 
-void Map::AdjustPosition(unsigned int& goalX, unsigned int& goalY)
+void Map::AdjustPosition(unsigned int& goalX, unsigned int& goalY, unsigned int radius)
 {
 	unsigned int maxr = Width;
 	if (maxr < Height) {
@@ -828,7 +828,7 @@ void Map::AdjustPosition(unsigned int& goalX, unsigned int& goalY)
 	if (goalY > Height) {
 		goalY = Height;
 	}
-	for (unsigned int radius = 1; radius < maxr; radius++) {
+	for (; radius < maxr; radius++) {
 		unsigned int minx = 0;
 		if (goalX > radius)
 			minx = goalX - radius;

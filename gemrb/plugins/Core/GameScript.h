@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.125 2004/08/03 17:32:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.126 2004/08/05 22:55:35 avenger_teambg Exp $
  *
  */
 
@@ -785,6 +785,9 @@ public: //Script Functions
 	static int CombatCounterGT(Scriptable* Sender, Trigger* parameters);
 	static int CombatCounterLT(Scriptable* Sender, Trigger* parameters);
 	static int Contains(Scriptable* Sender, Trigger* parameters);
+	static int DamageTaken(Scriptable* Sender, Trigger* parameters);
+	static int DamageTakenGT(Scriptable* Sender, Trigger* parameters);
+	static int DamageTakenLT(Scriptable* Sender, Trigger* parameters);
 	static int Dead(Scriptable* Sender, Trigger* parameters);
 	static int Die(Scriptable* Sender, Trigger* parameters);
 	static int Entered(Scriptable* Sender, Trigger* parameters);
@@ -818,6 +821,7 @@ public: //Script Functions
 	static int HaveAnySpells(Scriptable* Sender, Trigger* parameters);
 	static int HaveSpellParty(Scriptable* Sender, Trigger* parameters);
 	static int HaveSpell(Scriptable* Sender, Trigger* parameters);
+	static int HitBy(Scriptable* Sender, Trigger* parameters);
 	static int HotKey(Scriptable* Sender, Trigger* parameters);
 	static int HP(Scriptable* Sender, Trigger* parameters);
 	static int HPGT(Scriptable* Sender, Trigger* parameters);
@@ -908,6 +912,7 @@ public: //Script Functions
 	static int Time(Scriptable* Sender, Trigger* parameters);
 	static int TimeGT(Scriptable* Sender, Trigger* parameters);
 	static int TimeLT(Scriptable* Sender, Trigger* parameters);
+	static int TookDamage(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);
 	static int TrapTriggered(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariable(Scriptable* Sender, Trigger* parameters);
@@ -953,6 +958,7 @@ public:
 	static void CreateCreatureImpassable(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObject(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureObjectOffScreen(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureOffScreen(Scriptable* Sender, Action* parameters);
 	static void CreateItem(Scriptable* Sender, Action* parameters);
 	static void CreatePartyGold(Scriptable *Sender, Action *parameters);

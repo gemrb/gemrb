@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.157 2004/08/05 17:40:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.158 2004/08/05 22:55:34 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -133,6 +133,7 @@ GameControl::GameControl(void)
 //actually the savegame contains some formation data too, how to use it?
 void GameControl::ReadFormations()
 {
+  int i,j;
 	TableMgr * tab;
 	int table=core->LoadTable("formatio");
 	if(table<0) {
@@ -145,8 +146,8 @@ void GameControl::ReadFormations()
 	}
 	formationcount = tab->GetRowCount();
 	formations = (formation_type *) calloc(formationcount, sizeof(formation_type));
-	for(int i=0; i<formationcount; i++) {
-		for(int j=0;j<FORMATIONSIZE;j++) {
+	for(i=0; i<formationcount; i++) {
+		for(j=0;j<FORMATIONSIZE;j++) {
 			int k=atoi(tab->QueryField(i,j*2));
 			formations[i][j].x=k;
 			k=atoi(tab->QueryField(i,j*2+1));

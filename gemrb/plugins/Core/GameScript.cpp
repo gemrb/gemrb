@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.173 2004/08/05 17:40:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.174 2004/08/05 22:55:34 avenger_teambg Exp $
  *
  */
 
@@ -82,6 +82,9 @@ static TriggerLink triggernames[] = {
 	{"combatcounterlt", GameScript::CombatCounterLT,0},
 	{"contains", GameScript::Contains,0},
 	{"creatureinarea", GameScript::AreaCheck,0}, //cannot check others
+	{"damagetaken", GameScript::DamageTaken,0},
+	{"damagetakengt", GameScript::DamageTakenGT,0},
+	{"damagetakenlt", GameScript::DamageTakenLT,0},
 	{"dead", GameScript::Dead,0},
 	{"die", GameScript::Die,0},
 	{"entered", GameScript::Entered,0},
@@ -119,6 +122,7 @@ static TriggerLink triggernames[] = {
 	{"haveanyspells", GameScript::HaveAnySpells,0},
 	{"havespell", GameScript::HaveSpell,0},    //these must be the same
 	{"havespellres", GameScript::HaveSpell,0}, //they share the same ID
+	{"hitby", GameScript::HitBy,0},
 	{"hotkey", GameScript::HotKey,0},
 	{"hp", GameScript::HP,0},
 	{"hpgt", GameScript::HPGT,0}, {"hplt", GameScript::HPLT,0},
@@ -211,6 +215,7 @@ static TriggerLink triggernames[] = {
 	{"time", GameScript::Time,0},
 	{"timegt", GameScript::TimeGT,0},
 	{"timelt", GameScript::TimeLT,0},
+	{"tookdamage", GameScript::TookDamage,0},
 	{"traptriggered", GameScript::TrapTriggered,0},
 	{"true", GameScript::True,0},
 	{"unselectablevariable", GameScript::UnselectableVariable,0},
@@ -262,6 +267,7 @@ static ActionLink actionnames[] = {
 	{"createcreatureatlocation", GameScript::CreateCreatureAtLocation,0},
 	{"createcreatureimpassable", GameScript::CreateCreatureImpassable,0},
 	{"createcreatureobject", GameScript::CreateCreatureObjectOffset,0}, //the same
+	{"createcreatureobjectoffscreen", GameScript::CreateCreatureObjectOffScreen,0}, //same as createcreature object, but starts looking for a place far away from the player
 	{"createcreatureobjectoffset", GameScript::CreateCreatureObjectOffset,0}, //the same
 	{"createcreatureoffscreen", GameScript::CreateCreatureOffScreen,0},
 	{"createitem", GameScript::CreateItem,0},
@@ -4418,6 +4424,73 @@ int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::TookDamage(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if(actor->LastDamage) {
+//mark actor to clear this trigger?
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::DamageTaken(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if(actor->LastDamage==parameters->int0Parameter) {
+//mark actor to clear this trigger?
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::DamageTakenGT(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if(actor->LastDamage>parameters->int0Parameter) {
+//mark actor to clear this trigger?
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::DamageTakenLT(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if(actor->LastDamage<parameters->int0Parameter) {
+//mark actor to clear this trigger?
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::HitBy(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if(parameters->int0Parameter) {
+		if(!(parameters->int0Parameter&actor->LastDamageType) ) {
+			return 0;
+		}
+	}
+	//TODO: match LastHitter with object in parameter
+	return 0;
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -4844,15 +4917,18 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	aM->Open( ds, true );
 	Actor* ab = aM->GetActor();
 	core->FreeInterface( aM );
-	int x,y;
+	int x,y,radius;
 
+	radius=0;
 	switch (flags & CC_MASK) {
 		case CC_OFFSCREEN:
-			x = 0;
-			y = 0;
-			break;
+			radius=30; //TODO: offscreen radius
+			//falling through
 		case CC_OBJECT://use object + offset
-			Sender = GetActorFromObject( Sender, parameters->objects[1] );
+			{
+			Scriptable *tmp = GetActorFromObject( Sender, parameters->objects[1] );
+			if(tmp) Sender=tmp;
+			}
 			//falling through
 		case CC_OFFSET://use sender + offset
 			x = parameters->XpointParameter+Sender->XPos;
@@ -4876,7 +4952,7 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	else {
 		map = game->GetCurrentMap( );
 	}
-	ab->SetPosition(map, x, y, flags&CC_CHECK_IMPASSABLE );
+	ab->SetPosition(map, x, y, flags&CC_CHECK_IMPASSABLE, radius );
 	ab->AnimID = IE_ANI_AWAKE;
 	ab->Orientation = parameters->int0Parameter;
 	map->AddActor( ab );
@@ -4915,6 +4991,11 @@ void GameScript::CreateCreatureOffScreen(Scriptable* Sender, Action* parameters)
 void GameScript::CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters)
 {
 	CreateCreatureCore( Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE );
+}
+
+void GameScript::CreateCreatureObjectOffScreen(Scriptable* Sender, Action* parameters)
+{
+	CreateCreatureCore( Sender, parameters, CC_OFFSCREEN | CC_OBJECT | CC_CHECK_IMPASSABLE );
 }
 
 void GameScript::StartCutSceneMode(Scriptable* Sender, Action* parameters)

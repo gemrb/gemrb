@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.42 2004/08/02 22:13:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.43 2004/08/05 22:55:34 avenger_teambg Exp $
  *
  */
 
@@ -97,6 +97,7 @@ public:
 	ieWord AppearanceFlags1;
 	ieWord AppearanceFlags2;
 
+	char KillVar[32]; //this second field is present in pst and iwd1
 	// for remapping palette
 	ieByte ColorsCount;
 	ieWord Colors[7];
@@ -134,6 +135,7 @@ public:
 	Actor *LastSeen;
 	Actor *LastHeard;
 	Actor *LastSummoner;
+	int LastDamage;
 	int LastDamageType;
 
 private:
@@ -144,7 +146,7 @@ public:
 	/** prints useful information on console */
 	void DebugDump();
 	/** sets the actor's position, calculating with the nojump flag*/
-	void SetPosition(Map *map, unsigned int XPos, unsigned int YPos, int jump);
+	void SetPosition(Map *map, unsigned int XPos, unsigned int YPos, int jump, int radius=0);
 	void SetAnimationID(unsigned short AnimID);
 	/** returns the animations */
 	CharAnimations* GetAnims();
