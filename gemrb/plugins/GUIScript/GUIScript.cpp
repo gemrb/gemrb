@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.227 2004/10/17 16:19:21 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.228 2004/10/17 17:25:50 edheldil Exp $
  *
  */
 
@@ -2025,7 +2025,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_SetButtonBAM__doc,
 "SetButtonBAM(WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)\n\n"
-"Sets the Picture of a Button Control from a BAM file." );
+"Sets the Picture of a Button Control from a BAM file. If col1 is >= 0, changes palette picture's palette to one specified by col1. Since it uses 12 colors palette, it has issues in PST." );
 
 static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 {
@@ -2070,12 +2070,14 @@ static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Color* pal = core->GetPalette( col1, 12 );
-	Color* orgpal = core->GetVideoDriver()->GetPalette( Picture );
-	memcpy( &orgpal[4], pal, 12 * sizeof( Color ) );
-	core->GetVideoDriver()->SetPalette( Picture, orgpal );
-	free( pal );
-	free( orgpal );
+	if (col1 >= 0) {
+		Color* pal = core->GetPalette( col1, 12 );
+		Color* orgpal = core->GetVideoDriver()->GetPalette( Picture );
+		memcpy( &orgpal[4], pal, 12 * sizeof( Color ) );
+		core->GetVideoDriver()->SetPalette( Picture, orgpal );
+		free( pal );
+		free( orgpal );
+	}
 
 	btn->SetPicture( Picture );
 
