@@ -26,51 +26,33 @@ def OnLoad():
 	Race = GemRB.GetVar("Race")-1
 	RaceName = GemRB.GetTableRowName(RaceTable, Race)
 
-	HasSubRace = GemRB.GetTableValue(SubRacesTable, RaceName , "PURE_RACE")
+	PureRace = GemRB.GetTableValue(SubRacesTable, RaceName , "PURE_RACE")
 	Button = GemRB.GetControl(RaceWindow,1)
-	RaceStrRef = GemRB.GetTableValue(RaceTable, HasSubRace, "CAP_REF")
+	RaceStrRef = GemRB.GetTableValue(RaceTable, PureRace, "CAP_REF")
 	GemRB.SetText(RaceWindow,Button, RaceStrRef )
 	GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"SubRacePress")
-	RaceID = GemRB.GetTableValue(RaceTable, HasSubRace, "ID")
+	RaceID = GemRB.GetTableValue(RaceTable, PureRace, "ID")
 	GemRB.SetVarAssoc(RaceWindow,Button,"Race",RaceID)
 	
-	HasSubRace = GemRB.GetTableValue(SubRacesTable, RaceName , "SUBRACE1")
-	Button = GemRB.GetControl(RaceWindow,2)
-	RaceStrRef = GemRB.GetTableValue(RaceTable, HasSubRace, "CAP_REF")
-	GemRB.SetText(RaceWindow,Button, RaceStrRef )
-	GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"SubRacePress")
-	RaceID = GemRB.GetTableValue(RaceTable, HasSubRace, "ID")
-	GemRB.SetVarAssoc(RaceWindow,Button,"Race",RaceID)
-	
-	HasSubRace = GemRB.GetTableValue(SubRacesTable, RaceName , "SUBRACE2")
-	Button = GemRB.GetControl(RaceWindow,3)
-	if HasSubRace != 0:
-		RaceStrRef = GemRB.GetTableValue(RaceTable, HasSubRace, "CAP_REF")
-		GemRB.SetText(RaceWindow,Button, RaceStrRef )
-		GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
-		GemRB.SetEvent(RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"SubRacePress")
-		RaceID = GemRB.GetTableValue(RaceTable, HasSubRace, "ID")
-		GemRB.SetVarAssoc(RaceWindow,Button,"Race",RaceID)
-	else:
-		GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_DISABLED)
-		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-		GemRB.SetText(RaceWindow,Button, "")
-	
-	HasSubRace = GemRB.GetTableValue(SubRacesTable, RaceName , "SUBRACE3")
-	Button = GemRB.GetControl(RaceWindow,4)
-	if HasSubRace != 0:
-		RaceStrRef = GemRB.GetTableValue(RaceTable, HasSubRace, "CAP_REF")
-		GemRB.SetText(RaceWindow,Button, RaceStrRef )
-		GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
-		GemRB.SetEvent(RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"SubRacePress")
-		RaceID = GemRB.GetTableValue(RaceTable, HasSubRace, "ID")
-		GemRB.SetVarAssoc(RaceWindow,Button,"Race",RaceID)
-	else:
-		GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_DISABLED)
-		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-		GemRB.SetText(RaceWindow,Button, "")
+	#if you want a fourth subrace you can safely add a control id #5 to
+	#the appropriate window (guicg#54), and increase 4 to 5
+	for i in range(1,4):
+		Label = "SUBRACE"+str(i)
+		HasSubRace = GemRB.GetTableValue(SubRacesTable, RaceName, Label)
+		Button = GemRB.GetControl(RaceWindow, i+1)
+		if HasSubRace == 0:
+			GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_DISABLED)
+			GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+			GemRB.SetText(RaceWindow,Button, "")
+		else:
+			HasSubRace = PureRace+"_"+HasSubRace
+			RaceStrRef = GemRB.GetTableValue(RaceTable, HasSubRace, "CAP_REF")
+			GemRB.SetText(RaceWindow,Button, RaceStrRef )
+			GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
+			GemRB.SetEvent(RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"SubRacePress")
+			RaceID = GemRB.GetTableValue(RaceTable, HasSubRace, "ID")
+			GemRB.SetVarAssoc(RaceWindow,Button,"Race",RaceID)
 
 	BackButton = GemRB.GetControl(RaceWindow,8) 
 	GemRB.SetText(RaceWindow,BackButton,15416)

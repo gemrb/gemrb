@@ -16,7 +16,6 @@ def CalcLimits(Abidx):
 
 	RaceTable = GemRB.LoadTable("races")
 	Abracead = GemRB.LoadTable("ABRACEAD")
-	Abclsmod = GemRB.LoadTable("ABCLSMOD")
 	Race = GemRB.GetVar("Race")-1
 	RaceName = GemRB.GetTableRowName(RaceTable, Race)
 
@@ -39,7 +38,7 @@ def CalcLimits(Abidx):
 		Maximum = tmp
 
 	Race = GemRB.GetTableRowIndex(Abracead, RaceName)
-	Add = GemRB.GetTableValue(Abracead, Race, Abidx) + GemRB.GetTableValue(Abclsmod, KitIndex, Abidx)
+	Add = GemRB.GetTableValue(Abracead, Race, Abidx)
 	Maximum = Maximum + Add
 	Minimum = Minimum + Add
 	if Minimum<1:
@@ -55,18 +54,28 @@ def RollPress():
 	GemRB.InvalidateWindow(AbilityWindow)
 	GemRB.SetVar("Ability",0)
 	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
+	GemRB.SetLabelTextColor(AbilityWindow,SumLabel, 255, 255, 0)
 	PointsLeft=16
-	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft))
 	GemRB.SetLabelUseRGB(AbilityWindow, SumLabel, 1)
+	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft))
 
 	for i in range(0,6):
+		CalcLimits(i)
 		v = 10+Add
+		b = v/2-5
 		GemRB.SetVar("Ability "+str(i), v )
 		Label = GemRB.GetControl(AbilityWindow, 0x10000003+i)
 		GemRB.SetText(AbilityWindow, Label, str(v) )
-		GemRB.SetLabelUseRGB(AbilityWindow, Label, 1)
+
 		Label = GemRB.GetControl(AbilityWindow, 0x10000024+i)
-		GemRB.SetText(AbilityWindow, Label, "%+d"%(v/2-5))
+		GemRB.SetLabelUseRGB(AbilityWindow, Label, 1)
+		if b<0:
+			GemRB.SetLabelTextColor(AbilityWindow,Label,255,0,0)
+		elif b>0:
+			GemRB.SetLabelTextColor(AbilityWindow,Label,0,255,0)
+		else:
+			GemRB.SetLabelTextColor(AbilityWindow,Label,255,255,255)
+		GemRB.SetText(AbilityWindow, Label, "%+d"%(b))
 	return
 
 def OnLoad():
@@ -94,9 +103,6 @@ def OnLoad():
 
 	RollPress()
 	for i in range(0,6):
-		Label = GemRB.GetControl(AbilityWindow, i+0x10000024)
-		GemRB.SetText(AbilityWindow, Label,"+0")
-
 		Button = GemRB.GetControl(AbilityWindow, i+30)
 		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
 		GemRB.SetVarAssoc(AbilityWindow, Button, "Ability", i)
@@ -144,7 +150,14 @@ def RightPress():
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
 	GemRB.SetText(AbilityWindow, Label, str(Ability-1) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000024+Abidx)
-	GemRB.SetText(AbilityWindow, Label, "%+d"%((Ability-1)/2-5))
+	b = (Ability-1)/2-5
+	if b<0:
+		GemRB.SetLabelTextColor(AbilityWindow,Label,255,0,0)
+	elif b>0:
+		GemRB.SetLabelTextColor(AbilityWindow,Label,0,255,0)
+	else:
+		GemRB.SetLabelTextColor(AbilityWindow,Label,255,255,255)
+	GemRB.SetText(AbilityWindow, Label, "%+d"%(b))
 	GemRB.SetButtonState(AbilityWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
 	return
 
@@ -179,7 +192,14 @@ def LeftPress():
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
 	GemRB.SetText(AbilityWindow, Label, str(Ability+1) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000024+Abidx)
-	GemRB.SetText(AbilityWindow, Label, "%+d"%((Ability+1)/2-5))
+	b = (Ability+1)/2-5
+	if b<0:
+		GemRB.SetLabelTextColor(AbilityWindow,Label,255,0,0)
+	elif b>0:
+		GemRB.SetLabelTextColor(AbilityWindow,Label,0,255,0)
+	else:
+		GemRB.SetLabelTextColor(AbilityWindow,Label,255,255,255)
+	GemRB.SetText(AbilityWindow, Label, "%+d"%(b))
 	if PointsLeft == 0:
 		GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_ENABLED)
 	return

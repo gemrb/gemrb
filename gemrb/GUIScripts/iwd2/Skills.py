@@ -5,6 +5,7 @@ SkillWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 SkillTable = 0
+CostTable = 0
 TopIndex = 0
 PointsLeft = 0
 Level = 0
@@ -80,13 +81,11 @@ def OnLoad():
 	SkillTable = GemRB.LoadTable("skills")
 	RowCount = GemRB.GetTableRowCount(SkillTable)
 
-	print "Kit", KitName
-	print "BaseClass", GemRB.GetTableRowName(ClassTable, ClassColumn)
+	CostTable = GemRB.LoadTable("skilcost")
 
 	SkillRacTable = GemRB.LoadTable("SKILLRAC")
 	RaceTable = GemRB.LoadTable("RACES")
 	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race")-1)
-	print RaceName
 
 	for i in range(0,RowCount):
 		SkillName = GemRB.GetTableRowName(SkillTable,i)

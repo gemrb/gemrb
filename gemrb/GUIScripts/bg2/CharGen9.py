@@ -13,6 +13,7 @@ IE_XP =			44
 IE_GOLD =		45
 IE_HATEDRACE =  	49
 IE_KIT =        	152
+IE_EA =			200
 IE_RACE =       	201
 IE_CLASS =		202
 IE_METAL_COLOR =	208
@@ -159,6 +160,7 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_METAL_COLOR, 0x1B )
 	GemRB.SetPlayerStat(MyChar, IE_LEATHER_COLOR, 0x16 )
 	GemRB.SetPlayerStat(MyChar, IE_ARMOR_COLOR, 0x17 )
+	GemRB.SetPlayerStat(MyChar, IE_EA, 2 )
 	Str=GemRB.GetVar("Ability 1")
 	GemRB.SetPlayerStat(MyChar, IE_STR, Str)
 	if Str==18:
