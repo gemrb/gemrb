@@ -6,7 +6,7 @@ extern Interface * core;
 
 GameControl::GameControl(void)
 {
-	area = NULL;
+	MapIndex = -1;
 	Changed = true;
 	lastActor = NULL;
 }
@@ -18,7 +18,11 @@ GameControl::~GameControl(void)
 /** Draws the Control on the Output Display */
 void GameControl::Draw(unsigned short x, unsigned short y)
 {
+	if(MapIndex == -1)
+		return;
 	Region vp(x+XPos, y+YPos, Width, Height);
+	Game * game = core->GetGame();
+	Map * area = game->GetMap(MapIndex);
 	if(area)
 		area->DrawMap(vp);
 	else {
@@ -50,6 +54,8 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 {
 	unsigned short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
+	Game * game = core->GetGame();
+	Map * area = game->GetMap(MapIndex);
 	Actor * actor = area->GetActor(GameX, GameY);
 	if(lastActor)
 		lastActor->anims->DrawCircle = false;
@@ -74,4 +80,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 void GameControl::OnSpecialKeyPress(unsigned char Key)
 {	
 	printf("SpecialKeyPress\n");
+}
+void GameControl::SetCurrentArea(int Index)
+{
+	MapIndex = Index;
+	Game * game = core->GetGame();
+	Map * area = game->GetMap(MapIndex);
+	ActorBlock ab = game->GetPC(0);
+	if(ab.actor)
+		area->AddActor(ab);
 }

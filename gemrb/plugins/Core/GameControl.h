@@ -27,12 +27,9 @@ public:
 	/** Sets the Text of the current control */
 	int SetText(const char * string, int pos = 0);
 	/** Sets the current area to Display */
-	void SetCurrentArea(Map * map)
-	{
-		area = map;
-	}
+	void SetCurrentArea(int Index);
 private:
-	Map * area;
+	int MapIndex;
 	Actor * lastActor;
 public: //Events
 	/** Key Press Event */
