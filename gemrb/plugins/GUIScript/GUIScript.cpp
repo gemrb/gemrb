@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.232 2004/10/27 20:06:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.233 2004/10/31 21:36:47 avenger_teambg Exp $
  *
  */
 
@@ -1161,7 +1161,7 @@ static PyObject* GemRB_SetNextScript(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetNextScript__doc );
 	}
 
-	strcpy( core->NextScript, funcName );
+	strncpy( core->NextScript, funcName, sizeof(core->NextScript) );
 	core->ChangeScript = true;
 
 	Py_INCREF( Py_None );
@@ -3806,6 +3806,8 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	// FIXME
+	// we should Drop the Dragged item in place of the current item
+	// but only if the current item is draggable, tough!
 	if (core->GetDraggedItem()) {
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -3824,10 +3826,6 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	core->DragItem (si);
-
-
-
-
 
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
 												IE_BAM_CLASS_ID );
@@ -3859,14 +3857,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 // 	free( pal );
 // 	free( orgpal );
 
-
-
 	core->GetVideoDriver()->SetDragCursor (Picture);
-
-
-
-
-
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3970,7 +3961,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetWindowPicture, METH_VARARGS),
 	METHOD(LoadTable, METH_VARARGS),
 	METHOD(UnloadTable, METH_VARARGS),
-	//METHOD(GetTable, METH_VARARGS),
 	METHOD(GetTableValue, METH_VARARGS),
 	METHOD(FindTableValue, METH_VARARGS),
 	METHOD(GetTableRowIndex, METH_VARARGS),
