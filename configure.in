@@ -120,7 +120,8 @@ gemrb/plugins/INIImporter/Makefile
 gemrb/plugins/KEYImporter/Makefile 
 gemrb/plugins/MOSImporter/Makefile 
 gemrb/plugins/MUSImporter/Makefile 
-gemrb/plugins/MVEPlayer/Makefile 
+gemrb/plugins/MVEPlayer/Makefile
+gemrb/plugins/NullSound/Makefile 
 gemrb/plugins/PLTImporter/Makefile 
 gemrb/plugins/SDLVideo/Makefile 
 gemrb/plugins/TISImporter/Makefile 
