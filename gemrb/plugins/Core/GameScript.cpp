@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.38 2004/01/05 23:47:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.39 2004/01/06 00:55:14 balrog994 Exp $
  *
  */
 
@@ -94,6 +94,10 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[120] = StartCutScene;
 		actions[121] = StartCutSceneMode;
 		actions[122] = EndCutSceneMode;
+		actions[125] = Deactivate;
+		//blocking[125] = true;
+		actions[126] = Activate;
+		//blocking[126] = true;
 		actions[127] = CutSceneId;
 		instant[127] = true;
 		actions[137] = StartDialogue;
@@ -1629,14 +1633,13 @@ void GameScript::PlaySound(Scriptable * Sender, Action * parameters)
 	}
 	printf("PlaySound(%s)\n", parameters->string0Parameter);
 	core->GetSoundMgr()->Play(parameters->string0Parameter, scr->XPos, scr->YPos);
+	Sender->CurrentAction = NULL;
 }
 
 void GameScript::CreateVisualEffectObject(Scriptable * Sender, Action * parameters)
 {
-	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
-		return;
-	if(scr->Type != ST_ACTOR)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
@@ -1644,10 +1647,13 @@ void GameScript::CreateVisualEffectObject(Scriptable * Sender, Action * paramete
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	Actor * target = (Actor*)scr;
+	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!tar)
+		return;
 	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_VVC_CLASS_ID);
-	ScriptedAnimation * vvc = new ScriptedAnimation(ds, true, target->XPos, target->YPos);
+	ScriptedAnimation * vvc = new ScriptedAnimation(ds, true, tar->XPos, tar->YPos);
 	core->GetGame()->GetMap(0)->AddVVCCell(vvc);
+	Sender->CurrentAction = NULL;
 }
 
 void GameScript::CreateVisualEffect(Scriptable * Sender, Action * parameters)
@@ -1655,6 +1661,7 @@ void GameScript::CreateVisualEffect(Scriptable * Sender, Action * parameters)
 	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_VVC_CLASS_ID);
 	ScriptedAnimation * vvc = new ScriptedAnimation(ds, true, parameters->XpointParameter, parameters->YpointParameter);
 	core->GetGame()->GetMap(0)->AddVVCCell(vvc);
+	Sender->CurrentAction = NULL;
 }
 
 void GameScript::DestroySelf(Scriptable * Sender, Action * parameters)
@@ -1950,5 +1957,45 @@ void GameScript::ForceSpell(Scriptable * Sender, Action * parameters)
 	GetPositionFromScriptable(scr, sX, sY);
 	GetPositionFromScriptable(tar, dX, dY);
 	printf("ForceSpell from [%d,%d] to [%d,%d]\n", sX, sY, dX, dY);
+	Sender->CurrentAction = NULL;
+}
+
+void GameScript::Deactivate(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!tar)
+		return;
+	if(tar->Type != ST_ACTOR)
+		return;
+	tar->Active = false;
+	Sender->CurrentAction = NULL;
+}
+
+void GameScript::Activate(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!tar)
+		return;
+	if(tar->Type != ST_ACTOR)
+		return;
+	tar->Active = true;
 	Sender->CurrentAction = NULL;
 }
