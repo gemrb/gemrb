@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/TextScreen.py,v 1.2 2005/03/21 23:09:32 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/TextScreen.py,v 1.3 2005/03/28 10:36:19 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -49,12 +49,12 @@ def StartTextScreen ():
 
 	#done
 	Button=GemRB.GetControl (TextScreen, 0)
-	GemRB.SetText (TextScreen, Button, 0)
+	GemRB.SetText (TextScreen, Button, 11973)
 	GemRB.SetEvent (TextScreen, Button, IE_GUI_BUTTON_ON_PRESS, "EndTextScreen")
 
 	#replay
 	Button=GemRB.GetControl (TextScreen, 3)
-	GemRB.SetText (TextScreen, Button, 0)
+	GemRB.SetText (TextScreen, Button, 16510)
 	GemRB.SetEvent (TextScreen, Button, IE_GUI_BUTTON_ON_PRESS, "ReplayTextScreen")
 
 	GemRB.HideGUI ()
