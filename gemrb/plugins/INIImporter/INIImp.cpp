@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImp.cpp,v 1.3 2003/11/25 13:48:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImp.cpp,v 1.4 2003/12/15 09:35:41 balrog994 Exp $
  *
  */
 
@@ -33,7 +33,7 @@ INIImp::~INIImp(void)
 {
 	if(str && autoFree)
 		delete(str);
-	for(int i = 0; i < tags.size(); i++)
+	for(unsigned int i = 0; i < tags.size(); i++)
 		delete(tags[i]);
 }
 
@@ -81,7 +81,7 @@ bool INIImp::Open(DataStream * stream, bool autoFree)
 
 const char * INIImp::GetKeyAsString(const char * Tag, const char * Key, const char * Default)
 {
-	for(int i = 0; i < tags.size(); i++) {
+	for(unsigned int i = 0; i < tags.size(); i++) {
 		const char * TagName = tags[i]->GetTagName();
 		if(stricmp(TagName, Tag) == 0) {
 			return tags[i]->GetKeyAsString(Key, Default);
@@ -92,7 +92,7 @@ const char * INIImp::GetKeyAsString(const char * Tag, const char * Key, const ch
 
 const int INIImp::GetKetAsInt(const char * Tag, const char * Key, const int Default)
 {
-	for(int i = 0; i < tags.size(); i++) {
+	for(unsigned int i = 0; i < tags.size(); i++) {
 		const char * TagName = tags[i]->GetTagName();
 		if(stricmp(TagName, Tag) == 0) {
 			return tags[i]->GetKeyAsInt(Key, Default);

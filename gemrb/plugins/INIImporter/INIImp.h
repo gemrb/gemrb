@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImp.h,v 1.6 2003/11/25 13:48:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImp.h,v 1.7 2003/12/15 09:35:41 balrog994 Exp $
  *
  */
 
@@ -36,7 +36,7 @@ private:
 public:
 	INITag(const char * Name)
 	{
-		int len = strlen(Name)+1;
+		int len = (int)strlen(Name)+1;
 		TagName = (char*)malloc(len);
 		memcpy(TagName, Name, len);
 	}
@@ -44,7 +44,7 @@ public:
 	~INITag()
 	{
 		free(TagName);
-		for(int i = 0; i < pairs.size(); i++) {
+		for(unsigned int i = 0; i < pairs.size(); i++) {
 			free(pairs[i].Name);
 			free(pairs[i].Value);
 		}
@@ -74,8 +74,8 @@ public:
 			ValueKey++;
 		}
 		//Right Trimming
-		int NameKeyLen = strlen(NameKey);
-		int ValueKeyLen = strlen(ValueKey);
+		int NameKeyLen = (int)strlen(NameKey);
+		int ValueKeyLen = (int)strlen(ValueKey);
 		char * endNameKey = NameKey+NameKeyLen-1;
 		char * endValueKey = ValueKey+ValueKeyLen-1;
 		while(endNameKey != NameKey) {
@@ -112,7 +112,7 @@ public:
 
 	const char * GetKeyAsString(const char * Key, const char * Default)
 	{
-		for(int i = 0; i < pairs.size(); i++) {
+		for(unsigned int i = 0; i < pairs.size(); i++) {
 			if(stricmp(Key, pairs[i].Name) == 0)
 				return pairs[i].Value;
 		}
@@ -122,7 +122,7 @@ public:
 	const int GetKeyAsInt(const char * Key, const int Default)
 	{
 		const char * ret = NULL;
-		for(int i = 0; i < pairs.size(); i++) {
+		for(unsigned int i = 0; i < pairs.size(); i++) {
 			if(stricmp(Key, pairs[i].Name) == 0) {
 				ret = pairs[i].Value;
 				break;
@@ -147,7 +147,7 @@ public:
 	bool Open(DataStream * stream, bool autoFree = true);
 	int GetTagsCount()
 	{
-		return tags.size();
+		return (int)tags.size();
 	}
 	const char * GetKeyAsString(const char * Tag, const char * Key, const char * Default);
 	const int GetKetAsInt(const char * Tag, const char * Key, const int Default);
