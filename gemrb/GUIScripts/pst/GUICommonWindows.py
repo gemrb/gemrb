@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.17 2004/09/19 20:04:52 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.18 2004/09/19 20:38:38 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -334,7 +334,7 @@ def SetupSavingThrows (pc):
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassTable = GemRB.LoadTable ("classes")
 	Class = GemRB.FindTableValue (ClassTable, 5, Class)
-	Multi = GemRB.GetTableValue (ClassTable, 4, Class)
+	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
 	if Multi:
 		if Class == 7:
 			#fighter/mage
