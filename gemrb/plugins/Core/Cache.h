@@ -15,23 +15,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.1 2005/01/21 18:45:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.2 2005/01/22 13:42:58 edheldil Exp $
  *
  */
 
 #ifndef CACHE_H
 #define CACHE_H
 
+#include <config.h>
 #include <ctype.h>
+#include <ext/hash_map>
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include "../../includes/SClassID.h"
-#include <ext/hash_map>
 
 #ifndef SGI_HASH_NAMESPACE
 #if defined(__SGI_STL_HASH_MAP) || defined(_STLP_HASH_MAP)
 #define SGI_HASH_NAMESPACE std
-#elif defined(__SGI_STL_INTERNAL_HASH_MAP_H)
+#elif defined(__SGI_STL_INTERNAL_HASH_MAP_H) || defined(_HASH_MAP)
 #define SGI_HASH_NAMESPACE __gnu_cxx
 #endif
 #endif // SGI_HASH_NAMESPACE
