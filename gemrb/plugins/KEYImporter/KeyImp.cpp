@@ -100,7 +100,7 @@ bool KeyImp::LoadResFile(const char * resfile)
 		}
 		if(core->CaseSensitive) {
 			char fullPath[_MAX_PATH], tmpPath[_MAX_PATH] = {0}, fn[_MAX_PATH] = {0};
-			strncpy( tmpPath , be.name, strrchr(be.name, PathDelimiter)-be.name);
+			strncpy( tmpPath , be.name, (strrchr(be.name, PathDelimiter)+1)-be.name);
 			strcpy(fullPath, core->GamePath);
 			strcat(fullPath, tmpPath);
 			ExtractFileFromPath(fn, be.name);
