@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.25 2004/03/13 15:18:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.26 2004/03/14 18:09:37 avenger_teambg Exp $
  *
  */
 
@@ -197,7 +197,7 @@ public:
 	TileOverlay* overlay;
 	unsigned short* tiles;
 	unsigned char count;
-	bool DoorClosed;
+	unsigned int Flags;
 	int closedIndex;
 	Gem_Polygon* open;
 	Gem_Polygon* closed;
@@ -209,6 +209,7 @@ private:
 public:
 	void SetName(char* Name);
 	void SetTiles(unsigned short* Tiles, int count);
+	void SetDoorLocked(bool Locked, bool playsound = false);
 	void SetDoorClosed(bool Closed, bool playsound = false);
 	void ToggleDoorState();
 	void SetPolygon(bool Open, Gem_Polygon* poly);

@@ -478,7 +478,7 @@ Door::Door(TileOverlay* Overlay)
 	Name[0] = 0;
 	tiles = NULL;
 	count = 0;
-	DoorClosed = false;
+	Flags = 0;
 	open = NULL;
 	closed = NULL;
 	Cursor = 0;
@@ -489,7 +489,7 @@ Door::Door(TileOverlay* Overlay)
 
 Door::~Door(void)
 {
-	if (DoorClosed) {
+	if (Flags&1) {
 		if (open) {
 			delete( open );
 		}
@@ -506,7 +506,7 @@ Door::~Door(void)
 void Door::ToggleTiles(bool playsound)
 {
 	unsigned char state = ( closedIndex == 1 ) ? 0 : 1;
-	if (DoorClosed) {
+	if (Flags&1) {
 		state = closedIndex;
 		if (playsound && ( CloseSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( CloseSound );
@@ -538,6 +538,22 @@ void Door::SetTiles(unsigned short* Tiles, int count)
 	this->count = count;
 }
 
+void Door::SetDoorLocked(bool Locked, bool playsound)
+{
+	if(Locked) {
+		if(!(Flags&1) ) {
+			SetDoorClosed(1,playsound); // or just return?
+		}
+		Flags|=2;
+	}
+	else {
+		if(Flags&1) {
+			SetDoorClosed(0,playsound); // or just return?
+		}
+		Flags&=~2;
+	}
+}
+
 void Door::SetDoorClosed(bool Closed, bool playsound)
 {
 	if (Closed) {
@@ -545,7 +561,7 @@ void Door::SetDoorClosed(bool Closed, bool playsound)
 	} else {
 		outline = open;
 	}
-	if (DoorClosed == Closed) {
+	if ((Flags&1) == Closed) {
 		if (Closed) {
 			XPos = closed->BBox.x + ( closed->BBox.w / 2 );
 			YPos = closed->BBox.y + ( closed->BBox.h / 2 );
@@ -555,15 +571,15 @@ void Door::SetDoorClosed(bool Closed, bool playsound)
 		}
 		return;
 	}
-	DoorClosed = Closed;
+	Flags^=1;
 	ToggleTiles( playsound );
 }
 
 void Door::ToggleDoorState()
 {
-	DoorClosed = !DoorClosed;
+	Flags^=1;
 	ToggleTiles( true );
-	if (DoorClosed) {
+	if (Flags&1) {
 		outline = closed;
 	} else {
 		outline = open;
@@ -581,7 +597,7 @@ void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 			delete( closed );
 		closed = poly;
 	}
-	if (DoorClosed) {
+	if (Flags&1) {
 		outline = closed;
 	} else {
 		outline = open;
@@ -595,7 +611,10 @@ void Door::SetCursor(unsigned char CursorIndex)
 void Door::DebugDump()
 {
 	printf( "Debugdump of Door %s:\n", Name );
-	printf( "DoorClosed: %d\n", DoorClosed );
+	printf( "DoorClosed: %s\n", Flags&1 ? "Yes":"No");
+	printf( "DoorLocked: %s\n", Flags&2 ? "Yes":"No");
+	printf( "DoorTrapped: %s\n", Flags&4 ? "Yes":"No");
+	printf( "Trap removable: %s\n", Flags&8 ? "Yes":"No");
 }
 
 /*******************

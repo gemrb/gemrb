@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.68 2004/03/14 15:53:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.69 2004/03/14 18:09:48 avenger_teambg Exp $
  *
  */
 
@@ -777,6 +777,9 @@ public: //Script Functions
 	static int Specific(Scriptable* Sender, Trigger* parameters);
 	static int StateCheck(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);
+	static int UnselectableVariable(Scriptable* Sender, Trigger* parameters);
+	static int UnselectableVariableGT(Scriptable* Sender, Trigger* parameters);
+	static int UnselectableVariableLT(Scriptable* Sender, Trigger* parameters);
 	static int XP(Scriptable* Sender, Trigger* parameters);
 	static int XPGT(Scriptable* Sender, Trigger* parameters);
 	static int XPLT(Scriptable* Sender, Trigger* parameters);
@@ -863,6 +866,7 @@ public:
 	static void LeaveAreaLUA(Scriptable* Sender, Action* parameters);
 	static void LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters);
 	static void LeaveParty(Scriptable* Sender, Action* parameters);
+	static void Lock(Scriptable* Sender, Action* parameters);
 	static void MakeGlobal(Scriptable* Sender, Action* parameters);
 	static void MoraleDec(Scriptable* Sender, Action* parameters);
 	static void MoraleInc(Scriptable* Sender, Action* parameters);
@@ -911,6 +915,7 @@ public:
 	static void TakePartyGold(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
+	static void Unlock(Scriptable* Sender, Action* parameters);
 	static void VerbalConstant(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);
 	static void WaitRandom(Scriptable* Sender, Action* parameters);

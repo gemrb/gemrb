@@ -148,7 +148,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		if (DebugFlags & 4) {
 			Door* d;
 			for (unsigned int idx = 0; d = area->tm->GetDoor( idx ); idx++) {
-				if (d->DoorClosed)
+				if (d->Flags&1)
 					video->DrawPolyline( d->closed, cyan, true );
 				else {
 					video->DrawPolyline( d->open, cyan, true );
@@ -583,7 +583,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			actor = selected.at( 0 );
 			Door* door = area->tm->GetDoor( GameX, GameY );
 			if (door) {
-				if (door->DoorClosed) {
+				if (door->Flags&1) {
 					actor->ClearPath();
 					actor->ClearActions();
 					char Tmp[256];

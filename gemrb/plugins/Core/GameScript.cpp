@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.95 2004/03/14 15:53:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.96 2004/03/14 18:09:38 avenger_teambg Exp $
  *
  */
 
@@ -47,6 +47,8 @@ static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
+
+static int InDebug=0;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -101,6 +103,9 @@ static TriggerLink triggernames[] = {
 	{"specific", GameScript::Specific},
 	{"statecheck", GameScript::StateCheck},
 	{"true", GameScript::True}, {"xp", GameScript::XP},
+	{"unselectablevariable", GameScript::UnselectableVariable},
+	{"unselectablevariablegt", GameScript::UnselectableVariableGT},
+	{"unselectablevariablelt", GameScript::UnselectableVariableLT},
 	{"xpgt", GameScript::XPGT}, {"xplt", GameScript::XPLT}, { NULL,NULL}, 
 };
 
@@ -238,6 +243,7 @@ static ActionLink actionnames[] = {
 	{"takepartygold",GameScript::TakePartyGold},
 	{"triggeractivation",GameScript::TriggerActivation},
 	{"unhidegui",GameScript::UnhideGUI},
+	{"unlock",GameScript::Unlock},
 	{"unmakeglobal",GameScript::UnMakeGlobal}, //this is a GemRB extension
 	{"verbalconstant",GameScript::VerbalConstant},
 	{"wait",GameScript::Wait, AF_BLOCKING},
@@ -611,7 +617,6 @@ void GameScript::Update()
 	if (!script) {
 		return;
 	}
-printf("Executing script: %s.BCS\n",Name);
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (EvaluateCondition( this->MySelf, rB->condition )) {
@@ -975,7 +980,6 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	ActionFunction func = actions[aC->actionID];
-printf( "[IEScript]: action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
 	if (func) {
 		Scriptable* scr = GetActorFromObject( Sender, aC->objects[0]);
 		if(scr && scr!=Sender) {
@@ -1084,6 +1088,10 @@ int GameScript::GetObjectCount(Scriptable* Sender, Object* oC)
 
 Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 {
+if(InDebug)
+{
+printf("Gafo\n");
+}
 	if (!oC) {
 		return NULL;
 	}
@@ -1106,6 +1114,10 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 	//like (Myself, Protagonist etc)
 	if(!tgts) {
 		tgts = new Targets();
+if(InDebug)
+{
+printf("Gafo created targets from scratch\n");
+}
 	}
 	for (int i = 0; i < MaxObjectNesting; i++) {
 		int filterid = oC->objectIdentifiers[i];
@@ -1119,6 +1131,11 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 		else {
 			printf("[IEScript]: Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
 		}
+if(InDebug)
+{
+printf("[IEScript]: Executing object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
+printf("filter %d resulted in %d objects\n", i, tgts->Count());
+}
 		if(!tgts->Count()) {
 			delete tgts;
 			return NULL;
@@ -1635,6 +1652,10 @@ Targets *GameScript::Player1(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->GetPC(0));
+if(parameters->Count()!=1) {
+printf("player1 didn't work!\n");
+abort();
+}
 	return parameters;
 }
 
@@ -2921,14 +2942,13 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if(!tar) {
 		printf("[IEScript]: couldn't find door/container:%s\n",parameters->objectParameter->objectName);
-		abort();
 		return 0;
 	}
 	switch(tar->Type) {
 		case ST_DOOR:
 		{
 			Door *door =(Door *) tar;
-			return door->DoorClosed == parameters->int0Parameter;
+			return (door->Flags&1) == parameters->int0Parameter;
 		}
 		case ST_CONTAINER:
 		{
@@ -2978,6 +2998,45 @@ int GameScript::LevelLT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	return actor->GetStat(IE_LEVEL) < parameters->int0Parameter;
+}
+
+int GameScript::UnselectableVariable(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_UNSELECTABLE) == parameters->int0Parameter;
+}
+
+int GameScript::UnselectableVariableGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_UNSELECTABLE) > parameters->int0Parameter;
+}
+
+int GameScript::UnselectableVariableLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_UNSELECTABLE) < parameters->int0Parameter;
 }
 
 //-------------------------------------------------------------
@@ -3651,6 +3710,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
 	Scriptable* tar, *scr;
 
+InDebug=true;
 	printf("BeginDialog core\n");
 	if (Flags & BD_OWN) {
 		scr = tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -3658,9 +3718,11 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		tar = GetActorFromObject( Sender, parameters->objects[1] );
 		scr = Sender;
 	}
+InDebug=false;
 	if(!tar) {
 		printf("[IEScript]: Target for dialog couldn't be found.\n");
 		Sender->CurrentAction = NULL;
+		abort();
 		return;
 	}
 	//source could be other than Actor, we need to handle this too!
@@ -3668,18 +3730,15 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		Sender->CurrentAction = NULL;
 		return;
 	}
-printf("a\n");
 	Actor* actor = ( Actor* ) scr;
 	Actor* target = ( Actor* ) tar;
 
 	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );	
-printf("b\n");
 	if (gc->ControlType != IE_GUI_GAMECONTROL) {
 		printf( "[IEScript]: Dialog cannot be initiated because there is no GameControl.\n" );
 		Sender->CurrentAction = NULL;
 		return;
 	}
-printf("c\n");
 	//can't initiate dialog, because it is already there
 	if (gc->Dialogue) {
 		if (Flags & BD_INTERRUPT) {
@@ -3694,7 +3753,6 @@ printf("c\n");
 		}
 	}
 
-printf("d\n");
 	const char* Dialog;
 	switch (Flags & BD_LOCMASK) {
 		case BD_STRING0:
@@ -3713,7 +3771,6 @@ printf("d\n");
 			Dialog = ( const char * ) PlayerDialogRes;
 			break;
 	}
-printf("e\n");
 	if (!Dialog) {
 		Sender->CurrentAction = NULL;
 		return;
@@ -3729,7 +3786,6 @@ printf("e\n");
 			return;
 		}
 	}
-printf("f\n");
 
 	actor->Orientation = GetOrient( target->XPos, target->YPos, actor->XPos,
 							actor->YPos );
@@ -3737,7 +3793,6 @@ printf("f\n");
 	target->Orientation = GetOrient( actor->XPos, actor->YPos, target->XPos,
 							target->YPos );
 	target->resetAction = true;//nor this
-printf("g\n");
 
 	if (Dialog[0]) {
 		//increasing NumTimesTalkedTo
@@ -3746,7 +3801,6 @@ printf("g\n");
 
 		gc->InitDialog( actor, target, Dialog );
 	}
-printf("h\n");
 }
 
 //no string, increase talkcount, no interrupt
@@ -3882,6 +3936,36 @@ Point* FindNearPoint(Actor* Sender, Point* p1, Point* p2, double& distance)
 	}
 }
 
+void GameScript::Lock(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = core->GetGame()->GetMap( 0 )->tm->GetDoor( parameters->objects[1]->objectName );
+	if (!tar) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	if (tar->Type != ST_DOOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Door* door = ( Door* ) tar;
+	door->SetDoorLocked( false, false);
+}
+
+void GameScript::Unlock(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = core->GetGame()->GetMap( 0 )->tm->GetDoor( parameters->objects[1]->objectName );
+	if (!tar) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	if (tar->Type != ST_DOOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Door* door = ( Door* ) tar;
+	door->SetDoorLocked( false, true);
+}
+
 void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = core->GetGame()->GetMap( 0 )->tm->GetDoor( parameters->objects[1]->objectName );
@@ -3894,8 +3978,14 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
+	if(!(door->Flags&1) ) {
+		//door is already open
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	if (Sender->Type != ST_ACTOR) {
-		door->SetDoorClosed( false, true );		
+		//if not an actor opens, it don't play sound
+		door->SetDoorClosed( false, false );		
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -3904,7 +3994,12 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 	Point* p = FindNearPoint( actor, &door->toOpen[0], &door->toOpen[1],
 				distance );
 	if (distance <= 12) {
-		door->SetDoorClosed( false, true );
+		if(door->Flags&2) {
+			//playsound unsuccessful opening of door
+		}
+		else {
+			door->SetDoorClosed( false, true );
+		}
 	} else {
 		Sender->AddActionInFront( Sender->CurrentAction );
 		char Tmp[256];
@@ -3926,8 +4021,14 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
+	if(door->Flags&1) {
+		//door is already open
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	if (Sender->Type != ST_ACTOR) {
-		door->SetDoorClosed( true, true );
+		//if not an actor opens, it don't play sound
+		door->SetDoorClosed( true, false );
 		Sender->CurrentAction = NULL;
 		return;
 	}

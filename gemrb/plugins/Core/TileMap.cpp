@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.22 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.23 2004/03/14 18:09:48 avenger_teambg Exp $
  *
  */
 
@@ -58,16 +58,17 @@ void TileMap::AddOverlay(TileOverlay* overlay)
 	overlays.push_back( overlay );
 }
 
-Door* TileMap::AddDoor(char* Name, bool DoorClosed, int ClosedIndex,
+Door* TileMap::AddDoor(char* Name, unsigned int Flags, int ClosedIndex,
 	unsigned short* indexes, int count, Gem_Polygon* open, Gem_Polygon* closed)
 {
 	Door* door = new Door( overlays[0] );
+	door->Flags=Flags;
 	door->closedIndex = ClosedIndex;
 	door->SetTiles( indexes, count );
 	door->SetPolygon( true, open );
 	door->SetPolygon( false, closed );
-	if (( ( ClosedIndex == 1 ) && ( DoorClosed ) ) ||
-		( ( ClosedIndex == 0 ) && ( !DoorClosed ) )) {
+	if (( ( ClosedIndex == 1 ) && ( !(Flags&1) ) ) ||
+		( ( ClosedIndex == 0 ) && ( Flags&1 ) )) {
 		door->SetDoorClosed( true );
 	} else {
 		door->SetDoorClosed( false );
@@ -80,8 +81,8 @@ Door* TileMap::AddDoor(char* Name, bool DoorClosed, int ClosedIndex,
 void TileMap::ToggleDoor(Door* door)
 {
 	unsigned char state = 0;
-	door->DoorClosed = !door->DoorClosed;
-	if (door->DoorClosed) {
+	door->Flags ^= 1;
+	if (door->Flags&1) {
 		state = 1;
 		if (door->CloseSound[0] != '\0')
 			core->GetSoundMgr()->Play( door->CloseSound );
@@ -114,7 +115,7 @@ Door* TileMap::GetDoor(unsigned short x, unsigned short y)
 {
 	for (size_t i = 0; i < doors.size(); i++) {
 		Door* door = doors.at( i );
-		if (door->DoorClosed) {
+		if (door->Flags&1) {
 			if (door->closed->BBox.x > x)
 				continue;
 			if (door->closed->BBox.y > y)
