@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.51 2004/02/11 23:25:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.52 2004/02/14 07:40:04 avenger_teambg Exp $
  *
  */
 
@@ -220,8 +220,6 @@ void Button::OnSpecialKeyPress(unsigned char Key)
 		return;
 	if(Flags & 0x40) {
 		if(Key == GEM_RETURN) {
-//			OnMouseDown(0,0,1,0);
-//			OnMouseUp(0,0,1,0);
 			if(ButtonOnPress[0] != 0)
 				core->GetGUIScriptEngine()->RunFunction(ButtonOnPress);
 		}
@@ -316,6 +314,12 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 		if(ScrollY > 0)
 			ScrollY = 0;
 		Changed = true;
+	}
+	if(Flags&0x80) {
+                ((Window*)Owner)->Cursor = 44;
+	}
+	else {
+               	((Window*)Owner)->Cursor = 0;
 	}
 }
 
