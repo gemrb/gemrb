@@ -1,15 +1,6 @@
 #ifndef WIN32DEF_H
 #define WIN32DEF_H
 
-#ifndef HAVE_SNPRINTF
-#include "../plugins/Core/snprintf.h"
-#endif
-
-//we need 32+6 bytes at least, because we store 'context' in the variable
-//name too
-#define MAX_VARIABLE_LENGTH  40
-#include "../plugins/Core/VFS.h"
-
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -29,11 +20,25 @@
 #define printf cprintf
 
 #else
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define ADV_TEXT
+#define textcolor(i) i
+
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
 #endif
+
+#ifndef HAVE_SNPRINTF
+#include "../plugins/Core/snprintf.h"
+#endif
+
+//we need 32+6 bytes at least, because we store 'context' in the variable
+//name too
+#define MAX_VARIABLE_LENGTH  40
+#include "../plugins/Core/VFS.h"
 
 // abstract iteration position
 struct __POSITION {
@@ -47,12 +52,6 @@ typedef __POSITION* POSITION;
   printf("Assertion failed: %s %d",#f, __LINE__); \
 				abort(); \
   }
-
-#ifndef WIN32
-#define ADV_TEXT
-#define textcolor(i) i
-
-#endif
 
 #ifdef ADV_TEXT
 
