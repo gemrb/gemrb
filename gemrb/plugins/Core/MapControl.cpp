@@ -15,12 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.21 2004/11/20 10:58:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.22 2004/11/21 12:23:36 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
 #include "MapControl.h"
 #include "Interface.h"
+
+#define MAP_NO_NOTES   0
+#define MAP_VIEW_NOTES 1
+#define MAP_SET_NOTE   2
 
 // Ratio between pixel sizes of an Area (Big map) and a Small map
 
@@ -164,7 +168,7 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 	// Draw Map notes, could be turned off in bg2
 	// we use the common control value to handle it, because then we
 	// don't need another interface
-	if (Value&1) {
+	if (Value!=MAP_NO_NOTES) {
 		i = MyMap -> GetMapNoteCount();
 		while (i--) {
 			MapNote * mn = MyMap -> GetMapNote(i);
@@ -244,7 +248,7 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 	lastMouseX = x;
 	lastMouseY = y;
 
-	if (Value&1) {
+	if (Value==MAP_VIEW_NOTES) {
 		Point mp;
 		unsigned int dist;
 
@@ -276,7 +280,12 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (LinkedLabel) {
 		LinkedLabel->SetText( "" );
 		//this will erase the label (no idea why is it needed)
-        	//( ( Window * ) Owner )->Invalidate();
+		//( ( Window * ) Owner )->Invalidate();
+	}
+	if (Value==MAP_SET_NOTE) {
+		( ( Window * ) Owner )->Cursor = 44;
+	} else {
+		( ( Window * ) Owner )->Cursor = 0;
 	}
 }
 
@@ -284,14 +293,22 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 void MapControl::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short /*Mod*/)
 {
-	// FIXME: it would be better if the var names were user-settable
-	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
-	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
-	RunEventHandler( MapControlOnPress );
-
-	if ((Button != GEM_MB_ACTION) ) {
-		return;
+	switch(Value) {
+		case MAP_NO_NOTES:
+			break;
+		case MAP_VIEW_NOTES:
+			//left click allows setting only when in MAP_SET_NOTE mode
+			if ((Button == GEM_MB_ACTION) ) {
+				break;
+			}
+		default:
+			// FIXME: play mapnote pin sound here (if any)
+			core->GetDictionary()->SetAt( "MapControlX", NotePosX );
+			core->GetDictionary()->SetAt( "MapControlY", NotePosY );
+			RunEventHandler( MapControlOnPress );
+			return;
 	}
+
 	MouseIsDown = true;
 	lastMouseX = x;
 	lastMouseY = y;
@@ -305,7 +322,6 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y,
 	if (yp < 0) yp = 0;
 
 	core->GetVideoDriver()->SetViewport( xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV );
-
 	// FIXME: play button sound here
 }
 
