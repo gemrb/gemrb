@@ -25,9 +25,7 @@ def OnLoad():
         GemRB.SetEvent(TutorialWindow, PlayButton, IE_GUI_BUTTON_ON_PRESS, "PlayPress")
         GemRB.SetEvent(TutorialWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelTut")
 #quit subwindow
-#	QuitWindow = GemRB.LoadWindow(1) #or 3, dunno
 	QuitWindow = GemRB.LoadWindow(3)
-#with #3 we can set up the two buttons initially
 	QuitTextArea = GemRB.GetControl(QuitWindow,0)
 	CancelButton = GemRB.GetControl(QuitWindow, 2)
 	ConfirmButton = GemRB.GetControl(QuitWindow, 1)

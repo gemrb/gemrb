@@ -1,13 +1,19 @@
 #autopause
 import GemRB
 
-AutoPauseWindow = 0
-TextAreaControl = 0
-
 def OnLoad():
+	global fuxor, B2BState, B3BState, B4BState
 	global AutoPauseWindow, TextAreaControl
+	global B1B, B2B, B3B,B4B,B5B
+
 	GemRB.LoadWindowPack("GUIOPT")
 	AutoPauseWindow = GemRB.LoadWindow(10)
+
+	fuxor = GemRB.GetControl(AutoPauseWindow,17)
+	B2BState = 1
+	B3BState = 1
+	B4BState = 1
+
 	TextAreaControl = GemRB.GetControl(AutoPauseWindow, 15)
 	B1 = GemRB.GetControl(AutoPauseWindow, 17)
 	B1B = GemRB.GetControl(AutoPauseWindow, 1)
@@ -77,130 +83,110 @@ def OnLoad():
 	return
 
 def B1Press():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18032)
 	return
 
 def B1BPress():
-        global AutoPauseWindow, TextAreaControl
-        GemRB.SetText(AutoPauseWindow, TextAreaControl, 18032)
-#also toggle character hit autopause variable
+	GemRB.SetText(AutoPauseWindow, TextAreaControl, 18032)
+	if fuxor == IE_GUI_BUTTON_UNPRESSED:
+		fuxor = IE_GUI_BUTTON_SELECTED
+	else:
+		fuxor = IE_GUI_BUTTON_UNPRESSED
+	GemRB.SetButtonState(AutoPauseWindow, B1B, fuxor)
 	return
 
 def B2Press():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18033)
 	return
 
 def B2BPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18033)
 #also toggle character injured autopause
 	return
 
 def B3Press():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18034)
 	return
 
 def B3BPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18034)
 #also toggle character dead
 	return
 
 def B4Press():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18035)
 	return
 
 def B4BPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18035)
 #also toggle character attacked
 	return
 
 def B5Press():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18036)
 	return
 
 def B5BPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18036)
 #also toggle weapon unusable
 	return
 
 def B6Press():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18037)
 	return
 
 def B6BPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18037)
 #also toggle target destroyed
 	return
 
 def B7Press():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 10640)
 	return
 
 def B7BPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 10640)
 	return
 
 def B8Press():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 23514)
 	return
 
 def B8BPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 23514)
 	return
 
 def B9Press():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 58171)
 	return
 
 def B9BPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 58171)
 	return
 
 def B10Press():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 31872)
 	return
 
 def B10BPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 31872)
 	return
 
 def B11Press():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 10571)
 	return
 
 def B11BPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 10571)
 	return
 
 def OkPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetVisible(AutoPauseWindow, 0)
         GemRB.UnloadWindow(AutoPauseWindow)
         GemRB.SetNextScript("GUIOPT8")
         return
 
 def CancelPress():
-        global AutoPauseWindow, TextAreaControl
         GemRB.SetVisible(AutoPauseWindow, 0)
         GemRB.UnloadWindow(AutoPauseWindow)
         GemRB.SetNextScript("GUIOPT8")
