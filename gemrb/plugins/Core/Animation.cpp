@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.14 2004/01/16 22:52:58 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.15 2004/01/19 18:27:29 dragonmeat Exp $
  *
  */
 
@@ -57,7 +57,7 @@ Animation::Animation(unsigned short * frames, int count)
 
 Animation::~Animation(void)
 {
-	delete(indices);
+	delete[] indices;
 	if(!free)
 		return;
 	for(unsigned int i = 0; i < frames.size(); i++) {
