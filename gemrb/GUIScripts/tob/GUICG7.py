@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICG7.py,v 1.4 2004/12/06 21:44:52 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICG7.py,v 1.5 2004/12/06 21:51:58 avenger_teambg Exp $
 # character generation, mage spells (GUICG7)
 
 import GemRB
@@ -82,7 +82,7 @@ def OnLoad():
 	MageSpellsPickButton = GemRB.GetControl(MageSpellsWindow, 30)
 	GemRB.SetButtonState(MageSpellsWindow, MageSpellsPickButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(MageSpellsWindow, MageSpellsPickButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsPickPress")
-	GemRB.SetText(MageSpellsWindow, MageSpellsPickButton, 9372)
+	GemRB.SetText(MageSpellsWindow, MageSpellsPickButton, 34210)
 
 	GemRB.SetVisible(MageSpellsWindow,1)
 	return
