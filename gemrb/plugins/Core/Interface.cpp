@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.169 2004/05/09 21:35:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.170 2004/05/11 17:09:12 avenger_teambg Exp $
  *
  */
 
@@ -278,7 +278,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Initializing Resource Manager...\n", WHITE );
+	printMessage( "Core", "Initializing Resource Manager...", WHITE );
 	key = ( ResourceMgr * ) GetInterface( IE_KEY_CLASS_ID );
 	char ChitinPath[_MAX_PATH];
 	PathJoin( ChitinPath, GamePath, "chitin.key", NULL );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.44 2004/04/22 20:44:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.45 2004/05/11 17:09:12 avenger_teambg Exp $
  *
  */
 
@@ -78,6 +78,36 @@ Actor* Game::FindPC(unsigned int partyID)
 {
 	for(unsigned int slot=0; slot<PCs.size(); slot++) {
 		if(PCs[slot]->InParty==partyID) return PCs[slot];
+	}
+	return NULL;
+}
+
+Actor* Game::FindPC(const char *scriptingname)
+{
+	for(unsigned int slot=0; slot<PCs.size(); slot++) {
+		if(strnicmp(PCs[slot]->scriptName,scriptingname,32) )
+		{
+			return PCs[slot];
+		}
+	}
+	return NULL;
+}
+
+Actor* Game::FindNPC(unsigned int partyID)
+{
+	for(unsigned int slot=0; slot<NPCs.size(); slot++) {
+		if(NPCs[slot]->InParty==partyID) return NPCs[slot];
+	}
+	return NULL;
+}
+
+Actor* Game::FindNPC(const char *scriptingname)
+{
+	for(unsigned int slot=0; slot<NPCs.size(); slot++) {
+		if(strnicmp(NPCs[slot]->scriptName,scriptingname,32) )
+		{
+			return NPCs[slot];
+		}
 	}
 	return NULL;
 }

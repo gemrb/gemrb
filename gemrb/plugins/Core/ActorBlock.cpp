@@ -527,13 +527,13 @@ void Door::ToggleTiles(bool State, bool playsound)
 	int state;
 
 	if (State) {
-		state = closedIndex;
+		state = !closedIndex;
 		if (playsound && ( OpenSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( OpenSound );
 		XPos = open->BBox.x + ( open->BBox.w / 2 );
 		YPos = open->BBox.y + ( open->BBox.h / 2 );
 	} else {
-		state = !closedIndex;
+		state = closedIndex;
 		if (playsound && ( CloseSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( CloseSound );
 		XPos = closed->BBox.x + ( closed->BBox.w / 2 );
