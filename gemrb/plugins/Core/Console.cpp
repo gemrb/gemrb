@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.9 2003/11/28 21:54:32 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.10 2003/11/30 17:08:22 balrog994 Exp $
  *
  */
 
@@ -29,6 +29,7 @@ Console::Console(void)
 {
 	ta = NULL;
 	Cursor = NULL;
+	Back = NULL;
 	max = 128;
 	Buffer = (unsigned char*)malloc(max);
 	Buffer[0] = 0;
@@ -53,6 +54,8 @@ void Console::Draw(unsigned short x, unsigned short y)
 {
 	if(ta)
 		ta->Draw(x,y-ta->Height);
+	if(Back)
+		core->GetVideoDriver()->BlitSprite(Back, 0, y, true);
 	Color black = {0x00, 0x00, 0x00, 0x00};
 	Region r(x+XPos, y+YPos, Width, Height);
 	core->GetVideoDriver()->DrawRect(r, black);

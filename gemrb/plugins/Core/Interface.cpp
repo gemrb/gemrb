@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.81 2003/11/30 00:39:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.82 2003/11/30 17:08:22 balrog994 Exp $
  *
  */
 
@@ -301,7 +301,7 @@ int Interface::Init()
 	console->Width = core->Width;
 	console->Height = 25;
 	console->SetFont(fonts[0]);
-	AnimationFactory *af=(AnimationFactory*) GetResourceMgr()->GetFactoryResource("CURSOR",IE_BAM_CLASS_ID);
+	AnimationFactory *af=(AnimationFactory*) GetResourceMgr()->GetFactoryResource("CAROT",IE_BAM_CLASS_ID);
 	if(af)
 		console->SetCursor(af->GetFrame(0));
 	printStatus("OK", LIGHT_GREEN);
