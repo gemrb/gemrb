@@ -3,6 +3,7 @@
 
 #include "Plugin.h"
 #include "DataStream.h"
+#include "Game.h"
 
 #ifdef WIN32
 
@@ -22,6 +23,7 @@ public:
 	SaveGameMgr(void);
 	virtual ~SaveGameMgr(void);
 	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
+	virtual Game * GetGame() = 0;
 };
 
 #endif
