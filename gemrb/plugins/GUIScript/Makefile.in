@@ -108,7 +108,7 @@ libGUIScript_la_METASOURCES = AUTO
 libGUIScript_la_SOURCES = GUIScriptEngine.cpp GUIScriptCD.cpp GUIScript.cpp 
 EXTRA_DIST = GUIScript.cpp GUIScript.h GUIScriptCD.cpp GUIScriptCD.h GUIScriptEngine.cpp 
 subdir = gemrb/plugins/GUIScript
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
@@ -122,7 +122,7 @@ DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-depcomp = $(SHELL) $(top_srcdir)/depcomp
+depcomp = $(SHELL) $(top_srcdir)/admin/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/GUIScript.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/GUIScriptCD.Plo \

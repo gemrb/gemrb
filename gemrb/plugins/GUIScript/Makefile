@@ -38,10 +38,10 @@ pkglibdir = $(libdir)/gemrb
 pkgincludedir = $(includedir)/gemrb
 top_builddir = ../../..
 
-ACLOCAL = ${SHELL} /home/exodus/gemrb/gemrbcvs/gemrb/missing --run aclocal-1.6
-AUTOCONF = ${SHELL} /home/exodus/gemrb/gemrbcvs/gemrb/missing --run autoconf
-AUTOMAKE = ${SHELL} /home/exodus/gemrb/gemrbcvs/gemrb/missing --run automake-1.6
-AUTOHEADER = ${SHELL} /home/exodus/gemrb/gemrbcvs/gemrb/missing --run autoheader
+ACLOCAL = aclocal-1.6
+AUTOCONF = autoconf
+AUTOMAKE = automake-1.6
+AUTOHEADER = autoheader
 
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = /usr/bin/install -c
@@ -69,7 +69,7 @@ target_triplet = i686-pc-linux-gnu
 EXEEXT = 
 OBJEXT = o
 PATH_SEPARATOR = :
-AMTAR = ${SHELL} /home/exodus/gemrb/gemrbcvs/gemrb/missing --run tar
+AMTAR = tar
 AS = @AS@
 AWK = mawk
 CC = gcc
@@ -108,7 +108,7 @@ libGUIScript_la_METASOURCES = AUTO
 libGUIScript_la_SOURCES = GUIScriptEngine.cpp GUIScriptCD.cpp GUIScript.cpp 
 EXTRA_DIST = GUIScript.cpp GUIScript.h GUIScriptCD.cpp GUIScriptCD.h GUIScriptEngine.cpp 
 subdir = gemrb/plugins/GUIScript
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
@@ -122,7 +122,7 @@ DEFS = -DHAVE_CONFIG_H
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
 CPPFLAGS =  -I/usr/include
 LIBS = -lopenal -lz 
-depcomp = $(SHELL) $(top_srcdir)/depcomp
+depcomp = $(SHELL) $(top_srcdir)/admin/depcomp
 am__depfiles_maybe = depfiles
 DEP_FILES = ./$(DEPDIR)/GUIScript.Plo \
 	./$(DEPDIR)/GUIScriptCD.Plo \
