@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.37 2004/01/11 16:15:20 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.38 2004/01/11 16:26:52 avenger_teambg Exp $
  *
  */
 
@@ -153,6 +153,7 @@ Map * AREImp::GetMap()
 	  str->Read(map->SongHeader.SongList+i, 4 );
 	}
 
+	printf("Loading doors\n");
 	//Loading Doors
 	for(unsigned long i = 0; i < DoorsCount; i++) {
 		str->Seek(DoorsOffset + (i*0xc8), GEM_STREAM_START);
@@ -243,6 +244,7 @@ Map * AREImp::GetMap()
 			else memcpy(door->CloseSound,Sounds[DEF_CLOSE],9);
 		}
 	}
+	printf("Loading containers\n");
 	//Loading Containers
 	for(int i = 0; i < ContainersCount; i++) {
 		str->Seek(ContainersOffset + (i*0xC0), GEM_STREAM_START);
@@ -290,6 +292,7 @@ Map * AREImp::GetMap()
 		c->Trapped = Trapped;
 		c->TrapDetected = TrapDetected;
 	}
+	printf("Loading regions\n");
 	//Loading InfoPoints
 	for(int i = 0; i < InfoPointsCount; i++) {
 		str->Seek(InfoPointsOffset + (i*0xC4), GEM_STREAM_START);
@@ -364,6 +367,7 @@ Map * AREImp::GetMap()
 		else
 			ip->Scripts[0] = NULL;
 	}
+	printf("Loading actors\n");
 	//Loading Actors
 	str->Seek(ActorOffset, GEM_STREAM_START);
 	if(!core->IsAvailable(IE_CRE_CLASS_ID)) {
@@ -372,7 +376,7 @@ Map * AREImp::GetMap()
 	}
 	ActorMgr * actmgr = (ActorMgr*)core->GetInterface(IE_CRE_CLASS_ID);
 	for(int i = 0; i < ActorCount; i++) {
-		char		   CreResRef[8];
+		char		   CreResRef[9];
 		unsigned long  Orientation;
 		unsigned short XPos, YPos, XDes, YDes;
 		str->Seek(32, GEM_CURRENT_POS);
@@ -384,6 +388,7 @@ Map * AREImp::GetMap()
 		str->Read(&Orientation, 4);
 		str->Seek(72, GEM_CURRENT_POS);
 		str->Read(CreResRef, 8);
+		CreResRef[8]=0;
 		DataStream * crefile;
 		unsigned long CreOffset, CreSize;
 		str->Read(&CreOffset, 4);
@@ -458,6 +463,7 @@ Map * AREImp::GetMap()
 		strcpy(anim->ResRef, animBam);
 		map->AddAnimation(anim);		
 	}
+	printf("Loading entrances\n");
 	//Loading Entrances
 	str->Seek(EntrancesOffset, GEM_STREAM_START);
 	for(int i = 0; i < EntrancesCount; i++) {
