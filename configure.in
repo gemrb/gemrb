@@ -158,6 +158,7 @@ gemrb/plugins/GAMImporter/Makefile
 gemrb/plugins/GUIScript/Makefile 
 gemrb/plugins/IDSImporter/Makefile 
 gemrb/plugins/INIImporter/Makefile 
+gemrb/plugins/ITMImporter/Makefile 
 gemrb/plugins/KEYImporter/Makefile 
 gemrb/plugins/MOSImporter/Makefile 
 gemrb/plugins/MUSImporter/Makefile 
@@ -165,6 +166,7 @@ gemrb/plugins/MVEPlayer/Makefile
 gemrb/plugins/NullSound/Makefile 
 gemrb/plugins/PLTImporter/Makefile 
 gemrb/plugins/SDLVideo/Makefile 
+gemrb/plugins/SPLImporter/Makefile 
 gemrb/plugins/TISImporter/Makefile 
 gemrb/plugins/TLKImporter/Makefile 
 gemrb/plugins/WEDImporter/Makefile 

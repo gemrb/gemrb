@@ -1,3 +1,33 @@
-SUBDIRS = Core AREImporter BAMImporter BIFImporter BMPImporter CHUImporter CREImporter IDSImporter KEYImporter MOSImporter MVEPlayer SDLVideo TISImporter TLKImporter WEDImporter ZLibMgr GUIScript ACMImporter MUSImporter 2DAImporter INIImporter PLTImporter GAMImporter DLGImporter NullSound WMPImporter
+SUBDIRS = \
+	Core \
+	\
+	GUIScript \
+	NullSound \
+	SDLVideo \
+	ZLibMgr \
+	\
+	2DAImporter \
+	ACMImporter \
+	AREImporter \
+	BAMImporter \
+	BIFImporter \
+	BMPImporter \
+	CHUImporter \
+	CREImporter \
+	DLGImporter \
+	GAMImporter \
+	IDSImporter \
+	INIImporter \
+	ITMImporter \
+	KEYImporter \
+	MOSImporter \
+	MUSImporter \
+	MVEPlayer \
+	PLTImporter \
+	SPLImporter \
+	TISImporter \
+	TLKImporter \
+	WEDImporter \
+	WMPImporter
 
 DISTCLEANFILES = *.so

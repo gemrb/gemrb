@@ -71,6 +71,10 @@ libgemrb_core_la_SOURCES = \
 	ActorBlock.cpp \
 	SaveGameMgr.cpp \
 	DialogMgr.cpp \
-	Dialog.cpp
+	Dialog.cpp \
+	SpellMgr.cpp \
+	Spell.cpp \
+	ItemMgr.cpp \
+	Item.cpp
 
 noinst_HEADERS = *.h
