@@ -510,7 +510,7 @@ ScriptEngine * Interface::GetGUIScriptEngine()
 int Interface::LoadWindow(unsigned short WindowID)
 {
 	for(int i = 0; i < windows.size(); i++) {
-		if(!windows[i])
+		if(windows[i]==NULL)
 			continue;
 		if(windows[i]->WindowID == WindowID) {
 			windows[i]->Invalidate();
@@ -544,6 +544,8 @@ int Interface::GetControl(unsigned short WindowIndex, unsigned short ControlID)
 	if(WindowIndex > windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
+	if(win==NULL)
+		return -1;
 	int i = 0;
 	while(true) {
 		Control * ctrl = win->GetControl(i);
@@ -560,6 +562,8 @@ int Interface::SetText(unsigned short WindowIndex, unsigned short ControlIndex, 
 	if(WindowIndex > windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
+	if(win == NULL)
+		return -1;
 	Control * ctrl = win->GetControl(ControlIndex);
 	if(ctrl == NULL)
 		return -1;
@@ -572,6 +576,8 @@ int Interface::SetVisible(unsigned short WindowIndex, bool visible)
 	if(WindowIndex > windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
+	if(win==NULL)
+		return -1;
 	win->Visible = visible;
 	if(win->Visible) {
 		evntmgr->AddWindow(win);
@@ -592,6 +598,12 @@ int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex,
 		return -1;
 	}
 	Window * win = windows[WindowIndex];
+	if(win==NULL)
+	{
+		printf("Core","Window already freed: %0x", WindowIndex);
+		printStatus("ERROR", LIGHT_RED);
+		return -1;
+	}
 	Control * ctrl = win->GetControl(ControlIndex);
 	if(ctrl == NULL)
 	{
@@ -633,6 +645,8 @@ int Interface::SetControlStatus(unsigned short WindowIndex, unsigned short Contr
 	if(WindowIndex > windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
+	if(win==NULL)
+		return -1;
 	Control * ctrl = win->GetControl(ControlIndex);
 	if(ctrl == NULL)
 		return -1;
@@ -656,6 +670,8 @@ int Interface::ShowModal(unsigned short WindowIndex)
 	if(WindowIndex > windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
+	if(win==NULL)
+		return -1;
 	win->Visible = true;
 	win->Invalidate();
 	evntmgr->Clear();
@@ -682,7 +698,7 @@ int Interface::DelWindow(unsigned short WindowIndex)
 	if(WindowIndex >= windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
-	if(!win)
+	if(win==NULL)
 	{
 		printf("Window deleted again: %0d",WindowIndex);
 		printStatus("ERROR", LIGHT_RED);
