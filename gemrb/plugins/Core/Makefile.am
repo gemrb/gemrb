@@ -75,6 +75,8 @@ libgemrb_core_la_SOURCES = \
 	SpellMgr.cpp \
 	Spell.cpp \
 	ItemMgr.cpp \
-	Item.cpp
+	Item.cpp \
+	StoreMgr.cpp \
+	Store.cpp
 
 noinst_HEADERS = *.h

@@ -25,6 +25,7 @@ SUBDIRS = \
 	MVEPlayer \
 	PLTImporter \
 	SPLImporter \
+	STOImporter \
 	TISImporter \
 	TLKImporter \
 	WEDImporter \
