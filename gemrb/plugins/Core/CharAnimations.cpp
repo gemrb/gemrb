@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.48 2005/03/18 18:10:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.49 2005/03/31 10:06:27 avenger_teambg Exp $
  *
  */
 
@@ -85,25 +85,25 @@ void CharAnimations::SetupColors(ieDword *arg)
 	if(!Colors || !Palette) {
 		return;
 	}
-        if (GetAnimType() >=IE_ANI_PST_ANIMATION_1) {
-                // Avatars in PS:T
-                int size = 32;
-                int dest = 256-Colors[6]*size;
-                for (unsigned int i = 0; i < Colors[6]; i++) {
-                        Color* NewPal = core->GetPalette( Colors[i], size );
-                        memcpy( &Palette[dest], NewPal, size * sizeof( Color ) );
-                        dest +=size;
-                        free( NewPal );
-                }
-                return;
-        }
+	if (GetAnimType() >=IE_ANI_PST_ANIMATION_1) {
+		// Avatars in PS:T
+		int size = 32;
+		int dest = 256-Colors[6]*size;
+		for (unsigned int i = 0; i < Colors[6]; i++) {
+			Color* NewPal = core->GetPalette( Colors[i], size );
+			memcpy( &Palette[dest], NewPal, size * sizeof( Color ) );
+			dest +=size;
+			free( NewPal );
+		}
+		return;
+	}
 
 	int PType = NoPalette();
-        if( PType) {
+	if( PType) {
 		//handling special palettes like MBER_BL (black bear)
 		if (PType==1) 
 			return;
-		char PaletteResRef[8];
+		ieResRef PaletteResRef;
 		sprintf(PaletteResRef, "%.4s_%-.2s",ResRef, (char *) &PType);
 		ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
 		if (bmp) {
@@ -112,44 +112,44 @@ void CharAnimations::SetupColors(ieDword *arg)
 			bmp->GetPalette(0, 256, Palette);
 			core->FreeInterface( bmp );
 		}
-                return;
-        }
-        Color* MetalPal = core->GetPalette( Colors[0], 12 );
-        Color* MinorPal = core->GetPalette( Colors[1], 12 );
-        Color* MajorPal = core->GetPalette( Colors[2], 12 );
-        Color* SkinPal = core->GetPalette( Colors[3], 12 );
-        Color* LeatherPal = core->GetPalette( Colors[4], 12 );
-        Color* ArmorPal = core->GetPalette( Colors[5], 12 );
-        Color* HairPal = core->GetPalette( Colors[6], 12 );
-        memcpy( &Palette[0x04], MetalPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x10], MinorPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x1C], MajorPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x28], SkinPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x34], LeatherPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x40], ArmorPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x4C], HairPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x58], &MinorPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x60], &MajorPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x68], &MinorPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x70], &MetalPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x88], &MinorPal[1], 8 * sizeof( Color ) );
+		return;
+	}
+	Color* MetalPal = core->GetPalette( Colors[0], 12 );
+	Color* MinorPal = core->GetPalette( Colors[1], 12 );
+	Color* MajorPal = core->GetPalette( Colors[2], 12 );
+	Color* SkinPal = core->GetPalette( Colors[3], 12 );
+	Color* LeatherPal = core->GetPalette( Colors[4], 12 );
+	Color* ArmorPal = core->GetPalette( Colors[5], 12 );
+	Color* HairPal = core->GetPalette( Colors[6], 12 );
+	memcpy( &Palette[0x04], MetalPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x10], MinorPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x1C], MajorPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x28], SkinPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x34], LeatherPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x40], ArmorPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x4C], HairPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x58], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x60], &MajorPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x68], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x70], &MetalPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x88], &MinorPal[1], 8 * sizeof( Color ) );
 
-        int i; //moved here to be compatible with msvc6.0
+	int i; //moved here to be compatible with msvc6.0
 
-        for (i = 0x90; i < 0xA8; i += 0x08)
-                memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
-        for (i = 0xB8; i < 0xFF; i += 0x08)
-                memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
-        free( MetalPal );
-        free( MinorPal );
-        free( MajorPal );
-        free( SkinPal );
-        free( LeatherPal );
-        free( ArmorPal );
-        free( HairPal );
+	for (i = 0x90; i < 0xA8; i += 0x08)
+		memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
+	for (i = 0xB8; i < 0xFF; i += 0x08)
+		memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
+	free( MetalPal );
+	free( MinorPal );
+	free( MajorPal );
+	free( SkinPal );
+	free( LeatherPal );
+	free( ArmorPal );
+	free( HairPal );
 }
 
 void CharAnimations::InitAvatarsTable()
@@ -164,10 +164,10 @@ void CharAnimations::InitAvatarsTable()
 	int i=AvatarsCount;
 	while(i--) {
 		AvatarTable[i].AnimID=(unsigned int) strtol(Avatars->GetRowName(i),NULL,0 );
-		strncpy(AvatarTable[i].Prefixes[0],Avatars->QueryField(i,AV_PREFIX1),8);
-		strncpy(AvatarTable[i].Prefixes[1],Avatars->QueryField(i,AV_PREFIX2),8);
-		strncpy(AvatarTable[i].Prefixes[2],Avatars->QueryField(i,AV_PREFIX3),8);
-		strncpy(AvatarTable[i].Prefixes[3],Avatars->QueryField(i,AV_PREFIX4),8);
+		strnuprcpy(AvatarTable[i].Prefixes[0],Avatars->QueryField(i,AV_PREFIX1),8);
+		strnuprcpy(AvatarTable[i].Prefixes[1],Avatars->QueryField(i,AV_PREFIX2),8);
+		strnuprcpy(AvatarTable[i].Prefixes[2],Avatars->QueryField(i,AV_PREFIX3),8);
+		strnuprcpy(AvatarTable[i].Prefixes[3],Avatars->QueryField(i,AV_PREFIX4),8);
 		AvatarTable[i].AnimationType=atoi(Avatars->QueryField(i,AV_ANIMTYPE) );
 		AvatarTable[i].CircleSize=atoi(Avatars->QueryField(i,AV_CIRCLESIZE) );
 		char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
@@ -374,13 +374,12 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 	unsigned char Cycle;
 	GetAnimResRef( StanceID, Orient, NewResRef, Cycle );
 	NewResRef[8]=0; //cutting right to size
-	DataStream* stream = core->GetResourceMgr()->GetResource( NewResRef,
-		IE_BAM_CLASS_ID );
-	AnimationMgr* animgr = ( AnimationMgr* )
-		core->GetInterface( IE_BAM_CLASS_ID );
-	animgr->Open( stream, true );
-	Animation* a = animgr->GetAnimation( Cycle, 0, 0, IE_NORMAL );
-	core->FreeInterface( animgr );
+
+ 	AnimationFactory* af = ( AnimationFactory* )
+	core->GetResourceMgr()->GetFactoryResource( NewResRef, IE_BAM_CLASS_ID, IE_NORMAL );
+
+	Animation* a = af->GetCycle( Cycle );
+
 	if (!a) {
 		return NULL;
 	}

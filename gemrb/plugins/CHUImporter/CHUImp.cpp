@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.44 2005/03/18 19:29:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.45 2005/03/31 10:06:26 avenger_teambg Exp $
  *
  */
 
@@ -244,14 +244,10 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				pbar->SetImage( img, img2 );
 				if( KnobStepsCount ) {
 					/* getting the bam */
-					AnimationMgr* anim = ( AnimationMgr* )
-						core->GetInterface( IE_BAM_CLASS_ID );
-					s = core->GetResourceMgr()->GetResource( BAMFile, IE_BAM_CLASS_ID );
-					if(anim->Open( s, true )) {
+					AnimationFactory *af = (AnimationFactory *)
+						core->GetResourceMgr()->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID );
 					/* Getting the Cycle of the bam */
-						pbar->SetAnimation(anim->GetAnimation( ( unsigned char ) Cycle,0,0,0 ) );
-					}
-					core->FreeInterface( anim );
+						pbar->SetAnimation(af->GetCycle( Cycle & 0xff ) );
 				}
 				else {
 					s = core->GetResourceMgr()->GetResource( BAMFile, IE_MOS_CLASS_ID );

@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.209 2005/03/28 10:34:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.210 2005/03/31 10:06:28 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -34,7 +34,7 @@
 #define DEBUG_SHOW_DOORS	DEBUG_SHOW_CONTAINERS
 #define DEBUG_SHOW_SEARCHMAP    0x04
 #define DEBUG_SHOW_PALETTES     0x08
-#define DEBUG_XXX	       0x10
+#define DEBUG_XXX	        0x10
 
 static Color cyan = {
 	0x00, 0xff, 0xff, 0xff
@@ -239,7 +239,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	area->DrawMap( vp, this, update_scripts );
 	if (ScreenFlags & SF_DISABLEMOUSE)
 		return;
-	Point p = {lastMouseX,  lastMouseY};
+	Point p = {lastMouseX, lastMouseY};
 	video->ConvertToGame( p.x, p.y );
 
 	// Draw selection rect
@@ -475,10 +475,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'b':
 				if (game->selected.size() > 0) {
 					if (!effect) {
-						AnimationMgr* anim = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
-						DataStream* ds = core->GetResourceMgr()->GetResource( "S056ICBL", IE_BAM_CLASS_ID );
-						anim->Open( ds, true );
-						effect = anim->GetAnimation( 1, 0, 0 );
+				AnimationFactory* af = ( AnimationFactory* )
+		 		core->GetResourceMgr()->GetFactoryResource( "S056ICBL", IE_BAM_CLASS_ID );
+
+						effect = af->GetCycle( 1 );
 					} else {
 						delete( effect );
 						effect = NULL;
@@ -623,7 +623,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				printf("Show Fog-Of-War: %s\n", core->FogOfWar & 1 ? "ON" : "OFF");
 				break;
 			default:
-				printf( "KeyRelease:%d  %d\n", Key, Mod );
+				printf( "KeyRelease:%d - %d\n", Key, Mod );
 				break;
 		}
 	}

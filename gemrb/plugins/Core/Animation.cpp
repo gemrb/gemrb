@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.26 2005/03/29 11:01:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.27 2005/03/31 10:06:27 avenger_teambg Exp $
  *
  */
 
@@ -30,11 +30,10 @@
 
 extern Interface* core;
 
-Animation::Animation(unsigned short* frames, int count)
+Animation::Animation(int count)
 {
-	indices = (unsigned short *) malloc(count * sizeof(unsigned short) );
+	frames = (Sprite2D **) calloc(count, sizeof(Sprite2D *));
 	indicesCount = count;
-	memcpy( indices, frames, count * sizeof( unsigned short ) );
 	if(count) {
 		pos = rand() % count;
 	}
@@ -44,37 +43,52 @@ Animation::Animation(unsigned short* frames, int count)
 	starttime = 0;
 	x = 0;
 	y = 0;
-	autofree = true;
+	autofree = false;
 	ChangePalette = true;
 	BlitMode = IE_NORMAL;
 	fps = 15;
-	autoSwitchOnEnd = false;
 	endReached = false;
 	nextStanceID = 0;
 	pastLastFrame = false;
-	playReversed = false;
-	playOnce = false;
 	ResRef[0] = 0;
 	Active = true;
+	//behaviour flags
+	playReversed = false;
+	playOnce = false;
+	autoSwitchOnEnd = false;
 }
 
 Animation::~Animation(void)
 {
-	free(indices);
-	if (!autofree) {
-		return;
+	if (autofree) {
+		Video *video = core->GetVideoDriver();
+		
+		for (unsigned int i = 0; i < indicesCount; i++) {
+			video->FreeSprite( frames[i] );
+		}
 	}
-	Video *video = core->GetVideoDriver();
+	free(frames);
+}
 
-	for (unsigned int i = 0; i < frames.size(); i++) {
-		video->FreeSprite( frames[i] );
+void Animation::SetPos(unsigned int index)
+{
+	if(index<indicesCount) {
+		pos=index;
 	}
 }
 
-void Animation::AddFrame(Sprite2D* frame, int index)
+/* when adding NULL, it means we already added a frame of index */
+void Animation::AddFrame(Sprite2D* frame, unsigned int index)
 {
-	frames.push_back( frame );
-	link.push_back( index );
+	if (index>=indicesCount) {
+		printf("You tried to write past a buffer in animation, BAD!\n");
+		abort();
+	}
+	if(autofree && frames[index]) {
+		core->GetVideoDriver()->FreeSprite(frames[index]);
+	}
+	frames[index]=frame;
+
 	int x = -frame->XPos;
 	int y = -frame->YPos;
 	int w = frame->Width - frame->XPos;
@@ -101,43 +115,31 @@ Sprite2D* Animation::NextFrame(void)
 	if (starttime == 0) {
 		GetTime( starttime );
 	}
-	Sprite2D* ret = NULL;
-	if (playReversed) {
-		int max = ( int ) link.size() - 1;
-		for (unsigned int i = 0; i < link.size(); i++) {
-			if (link[i] == indices[max - pos]) {
-				ret = frames[i];
-				break;
-			}
-		}
-	} else {
-		for (unsigned int i = 0; i < link.size(); i++) {
-			if (link[i] == indices[pos]) {
-				ret = frames[i];
-				break;
-			}
-		}
+	Sprite2D* ret;
+	if(playReversed) {
+		ret = frames[indicesCount-pos-1];
 	}
+	else {
+		ret = frames[pos];
+	}
+
 	if (pastLastFrame && playOnce) {
 		endReached = true;
 		return ret;
 	}
-
 	unsigned long time;
-	GetTime( time );
+	GetTime(time);
+
 	if (( time - starttime ) >= ( unsigned long ) ( 1000 / fps )) {
 		pos++;
 		starttime = time;
-	}
-	//pos %= frames.size();
-	if (pos >= frames.size()) {
-		pos = frames.size()-1;
+	}	
+	if (pos >= indicesCount ) {
+		pos = 0;
 		pastLastFrame = true;
 	}
-	if (autoSwitchOnEnd && ( !endReached )) {
-		if (pastLastFrame && ( pos == 0 )) {
-			endReached = true;
-		}
+	if (autoSwitchOnEnd && !endReached && pastLastFrame) {
+		endReached = true;
 	}
 	return ret;
 }
@@ -148,9 +150,9 @@ void Animation::release(void)
 	delete this;
 }
 /** Gets the i-th frame */
-Sprite2D* Animation::GetFrame(unsigned long i)
+Sprite2D* Animation::GetFrame(unsigned int i)
 {
-	if (i >= frames.size()) {
+	if (i >= indicesCount) {
 		return NULL;
 	}
 	return frames[i];
@@ -160,7 +162,7 @@ void Animation::SetPalette(Color* Palette)
 {
 	Video *video = core->GetVideoDriver();
 
-	for (size_t i = 0; i < frames.size(); i++) {
+	for (size_t i = 0; i < indicesCount; i++) {
 		video->SetPalette( frames[i], Palette );
 	}
 }
@@ -169,7 +171,7 @@ void Animation::MirrorAnimation()
 {
 	Video *video = core->GetVideoDriver();
 
-	for (size_t i = 0; i < frames.size(); i++) {
+	for (size_t i = 0; i < indicesCount; i++) {
 		video->MirrorSpriteHorizontal( frames[i], true );
 	}
 }

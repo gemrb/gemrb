@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.16 2005/03/04 23:27:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.17 2005/03/31 10:06:24 avenger_teambg Exp $
  *
  */
 
@@ -54,8 +54,6 @@ public:
 	bool Open(DataStream* stream, bool autoFree = true);
 	int GetCycleSize(unsigned char Cycle);
 	Sprite2D* GetFrameFromCycle(unsigned char Cycle, unsigned short frame);
-	Animation* GetAnimation(unsigned char Cycle, int x, int y,
-		unsigned char mode = IE_NORMAL);
 	AnimationFactory* GetAnimationFactory(const char* ResRef,
 		unsigned char mode = IE_NORMAL);
 	Sprite2D* GetFrame(unsigned short findex, unsigned char mode = IE_NORMAL);

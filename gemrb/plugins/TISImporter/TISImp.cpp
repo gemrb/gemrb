@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.10 2004/09/12 15:53:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.11 2005/03/31 10:06:31 avenger_teambg Exp $
  *
  */
 
@@ -68,16 +68,16 @@ bool TISImp::Open(DataStream* stream, bool autoFree)
 Tile* TISImp::GetTile(unsigned short* indexes, int count,
 	unsigned short* secondary)
 {
-	Animation* ani = new Animation( indexes, count );
+	Animation* ani = new Animation( count );
 	ani->x = ani->y = 0;
 	for (int i = 0; i < count; i++) {
-		ani->AddFrame( GetTile( indexes[i] ), indexes[i] );
+		ani->AddFrame( GetTile( indexes[i] ), i );
 	}
 	if (secondary) {
-		Animation* sec = new Animation( secondary, count );
+		Animation* sec = new Animation( count );
 		sec->x = sec->y = 0;
 		for (int i = 0; i < count; i++) {
-			sec->AddFrame( GetTile( secondary[i] ), secondary[i] );
+			sec->AddFrame( GetTile( secondary[i] ), i );
 		}
 		return new Tile( ani, sec );
 	}

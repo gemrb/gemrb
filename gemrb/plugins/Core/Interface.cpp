@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.290 2005/03/28 10:34:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.291 2005/03/31 10:06:29 avenger_teambg Exp $
  *
  */
 
@@ -439,6 +439,7 @@ int Interface::Init()
 	DataStream* bmppal32 = NULL;
 	DataStream* bmppal256 = NULL;
 	if (!IsAvailable( IE_BMP_CLASS_ID )) {
+		printStatus( "ERROR", LIGHT_RED );
 		printf( "No BMP Importer Available.\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
@@ -465,40 +466,50 @@ int Interface::Init()
 	}
 	printMessage( "Core", "Palettes Loaded\n", WHITE );
 
+	if (!IsAvailable( IE_BAM_CLASS_ID )) {
+		printStatus( "ERROR", LIGHT_RED );
+		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
+		return GEM_ERROR;
+	}
 	AnimationMgr* anim = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
+	if (!anim) {
+		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
+		return GEM_ERROR;
+		
+	}
+
+	DataStream* str = NULL;
+	int ret = GEM_ERROR;
+	int table = -1;
 	if (!IsAvailable( IE_2DA_CLASS_ID )) {
 		printf( "No 2DA Importer Available.\nTermination in Progress...\n" );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 
 	printMessage( "Core", "Initializing stock sounds...", WHITE );
-	int table = core->LoadTable( "defsound" );
+	table = core->LoadTable( "defsound" );
 	if (table < 0) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find defsound.2da.\nTermination in Progress...\n" );
-		return GEM_ERROR;
+		goto end_of_init;
 	} else {
 		TableMgr* tm = core->GetTable( table );
 		if (tm) {
 			DSCount = tm->GetRowCount();
 			DefSound = (ieResRef *) calloc( DSCount, sizeof(ieResRef) );
 			for (int i = 0; i < DSCount; i++) {
-			        strnuprcpy( DefSound[i], tm->QueryField( i, 0 ), 8 );
+				strnuprcpy( DefSound[i], tm->QueryField( i, 0 ), 8 );
 			}
 			core->DelTable( table );
 		}
 	}
 
 	printMessage( "Core", "Loading Fonts...\n", WHITE );
-	if (!IsAvailable( IE_BAM_CLASS_ID )) {
-		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
-		return GEM_ERROR;
-	}
 	table = LoadTable( "fonts" );
 	if (table < 0) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find fonts.2da.\nTermination in Progress...\n" );
-		return GEM_ERROR;
+		goto end_of_init;
 	} else {
 		TableMgr* tab = GetTable( table );
 		int count = tab->GetRowCount();
@@ -506,8 +517,8 @@ int Interface::Init()
 			char* ResRef = tab->QueryField( i, 0 );
 			int needpalette = atoi( tab->QueryField( i, 1 ) );
 			int first_char = atoi( tab->QueryField( i, 2 ) );
-			DataStream* fstr = key->GetResource( ResRef, IE_BAM_CLASS_ID );
-			if (!anim->Open( fstr, true )) {
+			str = key->GetResource( ResRef, IE_BAM_CLASS_ID );
+			if (!anim->Open( str, true )) {
 // opening with autofree makes this delete unwanted!!!
 //				delete( fstr );
 				continue;
@@ -532,18 +543,15 @@ int Interface::Init()
 		}
 		DelTable( table );
 	}
-	FreeInterface( anim );
 	printMessage( "Core", "Fonts Loaded...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
 
 	if (TooltipBackResRef[0]) {
 		printMessage( "Core", "Initializing Tooltips...", WHITE );
-		DataStream* str = key->GetResource( TooltipBackResRef, IE_BAM_CLASS_ID );
-		anim = ( AnimationMgr * ) GetInterface( IE_BAM_CLASS_ID );
+		str = key->GetResource( TooltipBackResRef, IE_BAM_CLASS_ID );
 		if(!anim->Open( str, true )) {
-			FreeInterface( anim );
 			printStatus( "ERROR", LIGHT_RED );
-			return GEM_ERROR;
+			goto end_of_init;
 		}
 		TooltipBack = new Sprite2D * [3];
 		for (int i = 0; i < 3; i++) {
@@ -551,7 +559,6 @@ int Interface::Init()
 			TooltipBack[i]->XPos = 0;
 			TooltipBack[i]->YPos = 0;
 		}
-		FreeInterface( anim );
 		printStatus( "OK", LIGHT_GREEN );
 	}
 
@@ -565,23 +572,22 @@ int Interface::Init()
 	windowmgr = ( WindowMgr * ) GetInterface( IE_CHU_CLASS_ID );
 	if (windowmgr == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Initializing GUI Script Engine...", WHITE );
 	guiscript = ( ScriptEngine * ) GetInterface( IE_GUI_SCRIPT_CLASS_ID );
 	if (guiscript == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 	if (!guiscript->Init()) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	strcpy( NextScript, "Start" );
-	AnimationFactory* af = ( AnimationFactory* )
-	key->GetFactoryResource( CursorBam, IE_BAM_CLASS_ID );
+
 	printMessage( "Core", "Setting up the Console...", WHITE );
 	ChangeScript = true;
 	console = new Console();
@@ -590,19 +596,23 @@ int Interface::Init()
 	console->Width = Width;
 	console->Height = 25;
 	console->SetFont( fonts[0] );
-	if (af) {
-		console->SetCursor( af->GetFrame( 0 ) );
+	str = key->GetResource( CursorBam, IE_BAM_CLASS_ID );
+	if(anim->Open(str, true) ) {
+		console->SetCursor( anim->GetFrameFromCycle( 0,0 ) );
+		printStatus( "OK", LIGHT_GREEN );
 	}
-	printStatus( "OK", LIGHT_GREEN );
+	else {
+		printStatus( "ERROR", LIGHT_GREEN );
+	}
 	printMessage( "Core", "Starting up the Sound Manager...", WHITE );
 	soundmgr = ( SoundMgr * ) GetInterface( IE_WAV_CLASS_ID );
 	if (soundmgr == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 	if (!soundmgr->Init()) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
@@ -610,12 +620,13 @@ int Interface::Init()
 	sgiterator = new SaveGameIterator();
 	if (sgiterator == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
-	vars->SetType( GEM_VARIABLES_INT ); {
+	vars->SetType( GEM_VARIABLES_INT );
+	{
 		char ini_path[_MAX_PATH];
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
 		ResolveFilePath( ini_path );
@@ -636,7 +647,7 @@ int Interface::Init()
 	tokens = new Variables();
 	if (!tokens) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 	tokens->SetType( GEM_VARIABLES_STRING );
 	printStatus( "OK", LIGHT_GREEN );
@@ -645,7 +656,7 @@ int Interface::Init()
 	music = ( MusicMgr * ) GetInterface( IE_MUS_CLASS_ID );
 	if (!music) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	if (HasFeature( GF_HAS_PARTY_INI )) {
@@ -695,37 +706,34 @@ int Interface::Init()
 		}
 	}
 	game = NULL;//new Game();
-	DataStream* str = key->GetResource( "CURSORS",
-											IE_BAM_CLASS_ID );
 	printMessage( "Core", "Loading Cursors...", WHITE );
-	anim = ( AnimationMgr * ) GetInterface( IE_BAM_CLASS_ID );
+
+	str = key->GetResource( "CURSORS", IE_BAM_CLASS_ID );
 	if(anim->Open( str, true ))
 	{
 		CursorCount = anim->GetCycleCount();
-		Cursors = new Animation * [CursorCount];
+		Cursors = new Sprite2D * [CursorCount];
 		for (int i = 0; i < CursorCount; i++) {
-			Cursors[i] = anim->GetAnimation( i, 0, 0 );
+			Cursors[i] = anim->GetFrameFromCycle( i, 0 );
 		}
 	}
-	FreeInterface( anim );
+
 	// this is the last existing cursor type
 	if (CursorCount<IE_CURSOR_WAY) {
-		printStatus("ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		printStatus( "ERROR", LIGHT_RED );
+		goto end_of_init;
 	}
-	video->SetCursor( Cursors[0]->GetFrame( 0 ), Cursors[1]->GetFrame( 0 ) );
+	video->SetCursor( Cursors[0], Cursors[1] );
 	printStatus( "OK", LIGHT_GREEN );
-
 
 	// Load fog-of-war bitmaps
 	str = key->GetResource( "FOGOWAR", IE_BAM_CLASS_ID );
 	printMessage( "Core", "Loading Fog-Of-War bitmaps...", WHITE );
-	anim = ( AnimationMgr * ) GetInterface( IE_BAM_CLASS_ID );
 	anim->Open( str, true );
 	if (anim->GetCycleSize( 0 ) != 8) {
 		// unknown type of fog anim
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 
 	FogSprites[0] = NULL;
@@ -756,8 +764,6 @@ int Interface::Init()
 	video->MirrorSpriteVertical( FogSprites[12], false );
 	video->MirrorSpriteHorizontal( FogSprites[12], false );
 
-
-
 	FogSprites[16] = anim->GetFrameFromCycle( 0, 3 );
 	FogSprites[17] = anim->GetFrameFromCycle( 0, 4 );
 	FogSprites[18] = anim->GetFrameFromCycle( 0, 5 );
@@ -786,14 +792,15 @@ int Interface::Init()
 	video->MirrorSpriteVertical( FogSprites[28], false );
 	video->MirrorSpriteHorizontal( FogSprites[28], false );
 
-	FreeInterface( anim );
 	printStatus( "OK", LIGHT_GREEN );
 
-	ieDword i = 0;
-	vars->Lookup("Translucent Shadows", i);
-	if (i) {
-		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-			video->CreateAlpha( FogSprites[i] );
+	{
+		ieDword i = 0;
+		vars->Lookup("Translucent Shadows", i);
+		if (i) {
+			for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
+				video->CreateAlpha( FogSprites[i] );
+			}
 		}
 	}
 
@@ -801,19 +808,19 @@ int Interface::Init()
 	timer = new GlobalTimer();
 	if (!timer) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Initializing effects...", WHITE );
 	if (! Init_EffectQueue()) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+		goto end_of_init;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Initializing Inventory Management...", WHITE );
-	bool ret = InitItemTypes();
+	ret = InitItemTypes();
 	if(ret) {
 		printStatus( "OK", LIGHT_GREEN );
 	}
@@ -839,7 +846,10 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 	}
 	printMessage( "Core", "Core Initialization Complete!\n", WHITE );
-	return GEM_OK;
+	ret = GEM_OK;
+end_of_init:
+	FreeInterface( anim );
+	return ret;
 }
 
 bool Interface::IsAvailable(SClass_ID filetype)
@@ -1162,13 +1172,14 @@ bool Interface::LoadConfig(const char* filename)
 			strcpy( GemRBPath, value );
 		} else if (stricmp( name, "CachePath" ) == 0) {
 			strcpy( CachePath, value );
-		FixPath( CachePath, false );
-		mkdir( CachePath, S_IREAD|S_IWRITE );
+			FixPath( CachePath, false );
+			mkdir( CachePath, S_IREAD|S_IWRITE );
 			if (! dir_exists( CachePath )) {
 				printf( "Cache folder %s doesn't exist!", CachePath );
 				fclose( config );
 				return false;
 			}
+			DelTree((const char *) CachePath, false);
 		} else if (stricmp( name, "GUIScriptsPath" ) == 0) {
 			strcpy( GUIScriptsPath, value );
 #ifndef WIN32

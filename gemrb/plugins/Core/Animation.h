@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.15 2005/03/18 18:10:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.16 2005/03/31 10:06:27 avenger_teambg Exp $
  *
  */
 
@@ -42,10 +42,8 @@
 
 class GEM_EXPORT Animation {
 private:
-	std::vector< Sprite2D*> frames;
-	std::vector< int> link;
-	unsigned short* indices;
-	unsigned long indicesCount;
+	Sprite2D **frames;
+	unsigned int indicesCount;
 	unsigned int startpos;
 	unsigned long starttime;
 	bool pastLastFrame;
@@ -62,17 +60,20 @@ public:
 	unsigned char fps;
 	bool playReversed, playOnce;
 	Region animArea;
-	Animation(unsigned short* frames, int count);
+	Animation(int count);
 	~Animation(void);
-	void AddFrame(Sprite2D* frame, int index);
+	void AddFrame(Sprite2D* frame, unsigned int index);
 	Sprite2D* NextFrame(void);
 	void release(void);
 	/** Gets the i-th frame */
-	Sprite2D* GetFrame(unsigned long i);
+	Sprite2D* GetFrame(unsigned int i);
 	/** Sets the Animation Palette */
 	void SetPalette(Color* Palette);
 	/** Mirrors all the frames vertically */
 	void MirrorAnimation();
+	/** sets frame index */
+	void SetPos(unsigned int index);
+	unsigned int GetFrameCount() { return indicesCount; }
 	bool ChangePalette;
 };
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.93 2005/03/18 21:53:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.94 2005/03/31 10:06:26 avenger_teambg Exp $
  *
  */
 
@@ -212,8 +212,9 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if(core->HasFeature(GF_ONE_BYTE_ANIMID) )
 	{
 		if(AnimID&0x8000) {
-if(BaseStats[IE_COLORCOUNT])
-printf("The following anim is supposed to be real colored (no recoloring)\n");
+			if(BaseStats[IE_COLORCOUNT]) {
+				printf("[Actor] Animation ID %x is supposed to be real colored (no recoloring), patched creature\n", AnimID);
+			}
 			BaseStats[IE_COLORCOUNT]=0;
 		}
 	}

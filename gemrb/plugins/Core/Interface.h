@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.147 2005/03/23 18:21:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.148 2005/03/31 10:06:30 avenger_teambg Exp $
  *
  */
 
@@ -166,7 +166,7 @@ public:
 	int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
 	ieResRef WorldMapName;
-	Animation **Cursors;
+	Sprite2D **Cursors;
 	int CursorCount;
 	Sprite2D *FogSprites[32];
 	Sprite2D **TooltipBack;

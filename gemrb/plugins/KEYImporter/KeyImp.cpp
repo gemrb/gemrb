@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.52 2005/03/05 10:13:58 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.53 2005/03/31 10:06:30 avenger_teambg Exp $
  *
  */
 
@@ -321,6 +321,7 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 		//printMessage("KEYImporter", "Factory Object Found!\n", WHITE);
 		return core->GetFactory()->GetFactoryObject( fobjindex );
 	}
+/*
 	//printf("[KEYImporter]: No Factory Object Found, Loading...\n");
 	char path[_MAX_PATH], filename[_MAX_PATH] = {0};
 	//Search it in the GemRB override Directory
@@ -353,56 +354,7 @@ found:
 		core->GetFactory()->AddFactoryObject( af );
 		return af;
 	}
-	/*printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
-	unsigned int ResLocator;
-	if(resources.Lookup(resname, type, ResLocator) ) {
-		int bifnum = (ResLocator & 0xFFF00000) >> 20;
-		ArchiveImporter * ai = (ArchiveImporter*)core->GetInterface(IE_BIF_CLASS_ID);
-		FILE * exist = NULL;
-		if(exist == NULL) {
-			strcpy(path, core->GamePath);
-			strcat(path, biffiles[bifnum].name);
-			exist = fopen(path, "rb");
-		}
-		if(exist == NULL) {
-			if((biffiles[bifnum].BIFLocator & (1<<2)) != 0) {
-				strcpy(path, core->CD1);
-			}
-			else if((biffiles[bifnum].BIFLocator & (1<<3)) != 0) {
-				strcpy(path, core->CD2);
-			}
-			else if((biffiles[bifnum].BIFLocator & (1<<4)) != 0) {
-				strcpy(path, core->CD3);
-			}
-			else if((biffiles[bifnum].BIFLocator & (1<<5)) != 0) {
-				strcpy(path, core->CD4);
-			}
-			else if((biffiles[bifnum].BIFLocator & (1<<6)) != 0) {
-				strcpy(path, core->CD5);
-			}
-			else {
-				printf("[KEYImporter]: Error: Cannot find Bif file... Resource unavailable.\n");
-				return NULL;
-			}
-			strcat(path, biffiles[bifnum].name);
-			exist = fopen(path, "rb");
-			if(exist == NULL) {
-				printf("[KEYImporter]: Cannot find %s.\n", biffiles[bifnum].name);
-				core->FreeInterface(ai);
-				return NULL;
-			}
-			fclose(exist);
-		}
-		else
-			fclose(exist);
-		ai->OpenArchive(path);
-		DataStream * ret = ai->GetStream(ResLocator, type);
-		if(ret == NULL)
-			printf("[NOT FOUND]\n");
-		core->FreeInterface(ai);
-		strncpy(ret->filename, resname, 8);
-		ret->filename[8] = 0;
-		strcat(ret->filename, core->TypeExt(type));*/
+*/
 	DataStream* ret = GetResource( resname, type );
 	if (ret) {
 		AnimationMgr* ani = ( AnimationMgr* )

@@ -3,15 +3,16 @@
 #include "AnimationMgr.h"
 #include "Interface.h"
 
-void ScriptedAnimation::PrepareBAM(DataStream* stream, Point &p)
+void ScriptedAnimation::PrepareBAM(DataStream* /*stream*/, Point &p)
 {
-	AnimationMgr* aM = (AnimationMgr*) core->GetInterface(IE_BAM_CLASS_ID);
-	aM->Open( stream, true );
-	anims[0] = aM->GetAnimation( 0, 0, 0 );
+  /*
+  AnimationFactory* af = ( AnimationFactory* )
+	  core->GetResourceMgr()->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
+	anims[0] = af->GetCycle( 0 );
+  */
 	XPos += p.x;
 	YPos += p.y;
 	justCreated = true;
-	core->FreeInterface( aM );
 }
 
 ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree)
@@ -62,11 +63,10 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 	stream->Seek( 8, GEM_CURRENT_POS );
 	stream->ReadResRef( Sounds[0] );
 	stream->ReadResRef( Sounds[1] );
-	AnimationMgr* aM = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
-	DataStream* dS = core->GetResourceMgr()->GetResource( Anim1ResRef, IE_BAM_CLASS_ID );
-	aM->Open( dS, true );
-	anims[0] = aM->GetAnimation( ( unsigned char ) seq1, 0, 0 );
-	anims[1] = aM->GetAnimation( ( unsigned char ) seq2, 0, 0 );
+	AnimationFactory* af = ( AnimationFactory* )
+		core->GetResourceMgr()->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
+	anims[0] = af->GetCycle( ( unsigned char ) seq1 );
+	anims[1] = af->GetCycle( ( unsigned char ) seq2 );
 	XPos += p.x;
 	YPos += p.y;
 	if (anims[0]) {
@@ -77,7 +77,6 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 	if (autoFree) {
 		delete( stream );
 	}
-	core->FreeInterface( aM );
 }
 
 ScriptedAnimation::~ScriptedAnimation(void)

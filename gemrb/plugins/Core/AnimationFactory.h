@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.h,v 1.4 2004/08/26 20:53:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.h,v 1.5 2005/03/31 10:06:27 avenger_teambg Exp $
  *
  */
 
@@ -40,19 +40,21 @@
 
 class GEM_EXPORT AnimationFactory : public FactoryObject {
 private:
-	std::vector< unsigned short> links;
 	std::vector< Sprite2D*> frames;
 	std::vector< CycleEntry> cycles;
 	unsigned short* FLTable;	// Frame Lookup Table
 public:
 	AnimationFactory(const char* ResRef);
 	~AnimationFactory(void);
-	void AddFrame(Sprite2D* frame, unsigned short index);
+	void AddFrame(Sprite2D* frame);
 	void AddCycle(CycleEntry cycle);
 	void LoadFLT(unsigned short* buffer, int count);
 	Animation* GetCycle(unsigned char cycle);
 	/** No descriptions */
 	Sprite2D* GetFrame(unsigned short index, unsigned char cycle=0);
+	int GetCycleCount() { return cycles.size(); }
+	int GetFrameCount() { return frames.size(); }
+	int GetCycleSize(int idx) { return cycles[idx].FramesCount; }
 };
 
 #endif

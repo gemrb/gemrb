@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.10 2004/08/26 20:53:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.11 2005/03/31 10:06:27 avenger_teambg Exp $
  *
  */
 
@@ -41,10 +41,9 @@ AnimationFactory::~AnimationFactory(void)
 	}
 }
 
-void AnimationFactory::AddFrame(Sprite2D* frame, unsigned short index)
+void AnimationFactory::AddFrame(Sprite2D* frame)
 {
 	frames.push_back( frame );
-	links.push_back( index );
 }
 
 void AnimationFactory::AddCycle(CycleEntry cycle)
@@ -67,18 +66,11 @@ Animation* AnimationFactory::GetCycle(unsigned char cycle)
 		return NULL;
 	}
 	int ff = cycles[cycle]. FirstFrame, lf = ff + cycles[cycle].FramesCount;
-	Animation* anim = new Animation( &FLTable[ff], cycles[cycle].FramesCount );
+	Animation* anim = new Animation( cycles[cycle].FramesCount );
+	int c = 0;
 	for (int i = ff; i < lf; i++) {
-		for (unsigned int l = 0; l < frames.size(); l++) {
-			if (links[l] == FLTable[i]) {
-				anim->AddFrame( frames[l], FLTable[i] );
-				break;
-			}
-		}
+		anim->AddFrame( frames[FLTable[i]], c++ );
 	}
-	anim->x = 0;
-	anim->y = 0;
-	anim->autofree = false;
 	return anim;
 }
 
@@ -94,13 +86,3 @@ Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle)
 	}
 	return frames[FLTable[ff+index]];
 }
-/** No descriptions */
-/*
-Sprite2D* AnimationFactory::GetFrame(unsigned short index)
-{
-	if (index >= frames.size()) {
-		return NULL;
-	}
-	return frames[index];
-}
-*/

@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.37 2005/03/27 13:27:00 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.38 2005/03/31 10:06:24 avenger_teambg Exp $
  *
  */
 
@@ -167,33 +167,6 @@ Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
 	return GetFrame( findex );
 }
 
-Animation* BAMImp::GetAnimation(unsigned char Cycle, int x, int y,
-	unsigned char mode)
-{
-	unsigned int i;
-
-	if(Cycle >=CyclesCount ) {
-		return NULL;
-	}
-	if(!cycles[Cycle].FramesCount) {
-		return NULL;
-	}
-	str->Seek( FLTOffset + cycles[Cycle].FirstFrame * sizeof( ieWord ), GEM_STREAM_START );
-	unsigned short * findex = ( unsigned short * )
-		malloc( cycles[Cycle].FramesCount * sizeof(unsigned short) );
-	for (i = 0; i < cycles[Cycle].FramesCount; i++) {
-		str->ReadWord( &findex[i] );
-	}
-	Animation* anim = new Animation( findex, cycles[Cycle].FramesCount );
-	anim->x = x;
-	anim->y = y;
-	for (i = 0; i < cycles[Cycle].FramesCount; i++) {
-		anim->AddFrame( GetFrame( findex[i], mode ), findex[i] );
-	}
-	free( findex );
-	return anim;
-}
-
 Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 {
 	if (findex >= FramesCount) {
@@ -245,10 +218,10 @@ void* BAMImp::GetFramePixels(unsigned short findex)
 			if (*p == CompressedColorIndex) {
 				p++;
 				// FIXME: Czech HOW has apparently broken frame
-				//   #141 in REALMS.BAM. Maybe we should put
-				//   this condition to #ifdef BROKEN_xx ?
+				// #141 in REALMS.BAM. Maybe we should put
+				// this condition to #ifdef BROKEN_xx ?
 				// Or maybe rather put correct REALMS.BAM
-				//   into override/ dir?
+				// into override/ dir?
 				if (i + ( *p ) + 1 > pixelcount) {
 					memset( &Buffer[i], CompressedColorIndex, pixelcount - i );
 					printf ("Broken frame %d in %s\n", findex, str->filename);
@@ -289,45 +262,49 @@ ieWord * BAMImp::CacheFLT(unsigned int &count)
 	return FLT;
 }
 
-AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
-	unsigned char mode)
+AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef, unsigned char mode)
 {
 	unsigned int i;
 	unsigned int count;
-	unsigned int reduced_frame_count = 0;
+	Point translation; //x = original frame index, y = new frame index
 
+	translation.y = 0;
 	AnimationFactory* af = new AnimationFactory( ResRef );
 	ieWord *FLT = CacheFLT( count );
 	ieWord *NewFLT = (ieWord*) malloc( count * sizeof( ieWord ));
 
-	std::vector< unsigned short> indices;
+	CycleEntry newcycle={0,0};
+	std::vector<Point> indices; //this stores the duplicate frame indices
 	for (i = 0; i < CyclesCount; i++) {
-		unsigned int ff = cycles[i].FirstFrame,
-		lf = ff + cycles[i].FramesCount;
+		unsigned int ff = cycles[i].FirstFrame;
+		unsigned int lf = ff + cycles[i].FramesCount;
+		newcycle.FramesCount=0;
 		for (unsigned int f = ff; f < lf; f++) {
-			if (FLT[f] == 0xffff)
-				continue;
+			translation.x = FLT[f];
+
+			// looking for duplicate frames
 			bool found = false;
 			for (unsigned int k = 0; k < indices.size(); k++) {
-				if (indices[k] == FLT[f]) {
+				if (indices[k].x == translation.x) {
 					found = true;
-					NewFLT[f] = k;
+					NewFLT[newcycle.FirstFrame+newcycle.FramesCount] = indices[k].y;
+					newcycle.FramesCount++;
 					break;
 				}
 			}
-			if (!found) {
-				if (( frames[FLT[f]].Width != 1 ) &&
-					( frames[FLT[f]].Height != 1 ))
-					af->AddFrame( GetFrame( FLT[f], mode ), FLT[f] );
-				indices.push_back( FLT[f] );
-				NewFLT[f] = reduced_frame_count;
-				reduced_frame_count++;
-			}
+			if (found) continue;
+
+			//not found a duplicate, we take the original
+			indices.push_back( translation );
+			af->AddFrame( GetFrame( translation.x, mode ) );
+			NewFLT[newcycle.FirstFrame+newcycle.FramesCount] = translation.y;
+			translation.y++;
+			newcycle.FramesCount++;
 		}
-		af->AddCycle( cycles[i] );
+		af->AddCycle( newcycle );
+		newcycle.FirstFrame+=newcycle.FramesCount;
 	}
-	//af->LoadFLT( FLT, count );
-	af->LoadFLT( NewFLT, count );
+	af->LoadFLT( NewFLT, newcycle.FirstFrame);
 	free( FLT );
 	free( NewFLT );
 	return af;
@@ -359,10 +336,6 @@ Font* BAMImp::GetFont()
 			index = i;
 		}
 
-/* probably it is enough to add up the widths, no need to get the largest and multiply with count
-		if (frames[index].Width > w)
-			w = frames[index].Width;
-*/
 		w = w + frames[index].Width;
 		if (frames[index].Height > h)
 			h = frames[index].Height;
@@ -409,43 +382,43 @@ Sprite2D* BAMImp::GetPalette()
 
 void BAMImp::SetupColors(int *Colors)
 {
-        Color* MetalPal = core->GetPalette( Colors[0], 12 );
-        Color* MinorPal = core->GetPalette( Colors[1], 12 );
-        Color* MajorPal = core->GetPalette( Colors[2], 12 );
-        Color* SkinPal = core->GetPalette( Colors[3], 12 );
-        Color* LeatherPal = core->GetPalette( Colors[4], 12 );
-        Color* ArmorPal = core->GetPalette( Colors[5], 12 );
-        Color* HairPal = core->GetPalette( Colors[6], 12 );
-        memcpy( &Palette[0x04], MetalPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x10], MinorPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x1C], MajorPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x28], SkinPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x34], LeatherPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x40], ArmorPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x4C], HairPal, 12 * sizeof( Color ) );
-        memcpy( &Palette[0x58], &MinorPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x60], &MajorPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x68], &MinorPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x70], &MetalPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0x88], &MinorPal[1], 8 * sizeof( Color ) );
+	Color* MetalPal = core->GetPalette( Colors[0], 12 );
+	Color* MinorPal = core->GetPalette( Colors[1], 12 );
+	Color* MajorPal = core->GetPalette( Colors[2], 12 );
+	Color* SkinPal = core->GetPalette( Colors[3], 12 );
+	Color* LeatherPal = core->GetPalette( Colors[4], 12 );
+	Color* ArmorPal = core->GetPalette( Colors[5], 12 );
+	Color* HairPal = core->GetPalette( Colors[6], 12 );
+	memcpy( &Palette[0x04], MetalPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x10], MinorPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x1C], MajorPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x28], SkinPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x34], LeatherPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x40], ArmorPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x4C], HairPal, 12 * sizeof( Color ) );
+	memcpy( &Palette[0x58], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x60], &MajorPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x68], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x70], &MetalPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0x88], &MinorPal[1], 8 * sizeof( Color ) );
 
-        int i; //moved here to be compatible with msvc6.0
+	int i; //moved here to be compatible with msvc6.0
 
-        for (i = 0x90; i < 0xA8; i += 0x08)
-                memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
-        memcpy( &Palette[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
-        for (i = 0xB8; i < 0xFF; i += 0x08)
-                memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
+	for (i = 0x90; i < 0xA8; i += 0x08)
+		memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &Palette[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
+	for (i = 0xB8; i < 0xFF; i += 0x08)
+		memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
 
-        free( MetalPal );
-        free( MinorPal );
-        free( MajorPal );
-        free( SkinPal );
-        free( LeatherPal );
-        free( ArmorPal );
-        free( HairPal );
+	free( MetalPal );
+	free( MinorPal );
+	free( MajorPal );
+	free( SkinPal );
+	free( LeatherPal );
+	free( ArmorPal );
+	free( HairPal );
 }
 
 Sprite2D* BAMImp::GetPaperdollImage(int *Colors, Sprite2D *&Picture2)
@@ -457,7 +430,7 @@ Sprite2D* BAMImp::GetPaperdollImage(int *Colors, Sprite2D *&Picture2)
 		SetupColors(Colors);
 	}
 
-        void *pixels = GetFramePixels(1);
+	void *pixels = GetFramePixels(1);
 	Picture2 = core->GetVideoDriver()->CreateSprite8(frames[1].Width, frames[1].Height, 8, pixels, Palette, true, 0 );
 	//this is the only value we still need for a hack, the relative position
 	//of the lower half (picture2) to the upper half
@@ -465,7 +438,7 @@ Sprite2D* BAMImp::GetPaperdollImage(int *Colors, Sprite2D *&Picture2)
 	//this gets zeroed out, so why bother
 	//Picture2->YPos = frames[1].YPos;
 
-        pixels = GetFramePixels(0);
+	pixels = GetFramePixels(0);
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(frames[0].Width, frames[0].Height, 8, pixels, Palette, true, 0 );
 	/* actually this gets zeroed out later, so why bother
 	spr->XPos = frames[0].XPos;
