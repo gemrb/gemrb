@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.35 2004/09/04 12:10:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.36 2004/09/04 12:18:52 avenger_teambg Exp $
  *
  */
 
@@ -245,7 +245,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 						}
 					}
 					else {
-						s = core->GetResourceMgr()->GetResource( MOSFile2, IE_MOS_CLASS_ID );
+						s = core->GetResourceMgr()->GetResource( BAMFile, IE_MOS_CLASS_ID );
 						mos->Open( s, true );
 						Sprite2D* img3 = mos->GetImage();
 						pbar->SetBarCap( img3 );
