@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.31 2003/11/27 22:09:06 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.32 2003/11/28 09:31:23 balrog994 Exp $
  *
  */
 
@@ -796,14 +796,8 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr, unsigned
 		SDL_UnlockSurface(disp);
 }
 
-typedef struct AETBlock {
-	Point * point;
-	AETBlock * Next;
-} AETBlock;
-
 Sprite2D * SDLVideoDriver::PrecalculatePolygon(Point * points, int count, Color &color)
 {
-	AETBlock ** AET;
 	short minX = 20000, maxX = 0, minY = 20000, maxY = 0;
 	for(int i = 0; i < count; i++) {
 		if(points[i].x < minX)
@@ -819,168 +813,22 @@ Sprite2D * SDLVideoDriver::PrecalculatePolygon(Point * points, int count, Color 
 	short width = maxX-minX;
 	short height = maxY-minY;
 
-	AET = (AETBlock**)malloc(height*sizeof(AETBlock*));
-	memset(AET, 0, height*sizeof(AETBlock*));
-
-	int lastPoint = 0;
-
-	for(int i = 1; i < count; i++) {
-		int dy, dx, incrE, incrNE, d, x, y;
-
-		dx = points[i].x - points[lastPoint].x;
-		dy = points[i].y - points[lastPoint].y;
-		d  = 2* dy - dx;
-		incrE = 2*dy;
-		incrNE = 2*(dy-dx);
-		x = points[lastPoint].x;
-		y = points[lastPoint].y;
-
-		{
-			int j = y-minY;
-			AETBlock* last = NULL;
-			AETBlock* ptr = AET[j];
-			if(ptr) {
-				do {
-					if(ptr->point->x > x) {
-						if(last) {
-							AETBlock * nb = (AETBlock*)malloc(sizeof(AETBlock));
-							nb->point = (Point*)malloc(sizeof(Point));
-							nb->point->x = x;
-							nb->point->y = y;
-							nb->Next = ptr;
-							last->Next = nb;
-							break;
-						}
-						else {
-							AETBlock * nb = (AETBlock*)malloc(sizeof(AETBlock));
-							nb->point = (Point*)malloc(sizeof(Point));
-							nb->point->x = x;
-							nb->point->y = y;
-							nb->Next = ptr;
-							AET[j] = nb;
-							break;
-						}
-					}
-					last = ptr;
-					ptr = ptr->Next;
-				} while(ptr);
-			}
-			else {
-				AETBlock * nb = (AETBlock*)malloc(sizeof(AETBlock));
-				nb->point = (Point*)malloc(sizeof(Point));
-				nb->point->x = x;
-				nb->point->y = y;
-				nb->Next = NULL;
-				AET[j] = nb;
-			}
-		}
-
-		while(x < points[i].x) {
-			if(d <= 0) {
-				d += incrE;
-				x++;
-			}
-			else {
-				d += incrNE;
-				x++;
-				y++;
-			}
-
-			{
-				int j = y-minY;
-				AETBlock* last = NULL;
-				AETBlock* ptr = AET[j];
-				if(ptr) {
-					bool after = false;
-					do {
-						if(ptr->point->x > x) {
-							if(last) {
-								AETBlock * nb = (AETBlock*)malloc(sizeof(AETBlock));
-								nb->point = (Point*)malloc(sizeof(Point));
-								nb->point->x = x;
-								nb->point->y = y;
-								nb->Next = ptr;
-								last->Next = nb;
-								break;
-							}
-							else {
-								AETBlock * nb = (AETBlock*)malloc(sizeof(AETBlock));
-								nb->point = (Point*)malloc(sizeof(Point));
-								nb->point->x = x;
-								nb->point->y = y;
-								nb->Next = ptr;
-								AET[j] = nb;
-								break;
-							}
-						}
-						last = ptr;
-						ptr = ptr->Next;
-						if(!ptr)
-							after = true;
-					} while(ptr);
-					if(after) {
-						AETBlock * nb = (AETBlock*)malloc(sizeof(AETBlock));
-						nb->point = (Point*)malloc(sizeof(Point));
-						nb->point->x = x;
-						nb->point->y = y;
-						nb->Next = NULL;
-						last->Next = nb;
-					}
-				}
-				else {
-					AETBlock * nb = (AETBlock*)malloc(sizeof(AETBlock));
-					nb->point = (Point*)malloc(sizeof(Point));
-					nb->point->x = x;
-					nb->point->y = y;
-					nb->Next = NULL;
-					AET[j] = nb;
-				}
-			}
-
-		}
-	}
-
 	void * pixels = malloc(width*height);
 	memset(pixels, 0, width*height);
 
+	unsigned char * ptr = (unsigned char*)pixels;
+
+	Gem_Polygon * poly = new Gem_Polygon(points, count);
+
 	for(int y = 0; y < height; y++) {
-		bool inside = true;
-		if(!AET[i])
-			continue;
-		AETBlock * ptr = AET[i];
-		AETBlock * next = ptr->Next;
-		while(true) {
-			int sx = ptr->point->x-minX;
-			unsigned char * dst = (unsigned char*)pixels+(y*width);
-			dst+=sx;
-			*dst = 1;
-			if(!next)
-				break;
-			int nx = next->point->x-minX;
-			dst++;
-			memset(dst, 1, nx-sx-1);
-			ptr = next->Next;
-			if(!ptr)
-				break;
-			next = ptr->Next;
+		for(int x = 0; x < width; x++) {
+			if(poly->PointIn(x+minX, y+minY))
+				*ptr = 1;
+			ptr++;
 		}
 	}
 
-	for(int i = 0; i < height; i++) {
-		if(AET[i]) {
-			AETBlock * ptr = AET[i];
-			AETBlock * next = ptr->Next;
-			while(next) {
-				free(ptr->point);
-				free(ptr);
-				ptr = next;
-				next = ptr->Next;
-			}
-			free(ptr->point);
-			free(ptr);
-		}
-	}
-	free(AET);
+	delete(poly);
 
 	Color palette[2];
 	memset(palette, 0, 2*sizeof(Color));
@@ -999,8 +847,8 @@ Sprite2D * SDLVideoDriver::PrecalculatePolygon(Point * points, int count, Color 
 		spr->vptr = p;
 		spr->pixels = pixels;
 	}
-	//SDL_SetColorKey((SDL_Surface*)p, SDL_SRCCOLORKEY | SDL_RLEACCEL, index);
-	SDL_SetAlpha((SDL_Surface*)p, SDL_SRCALPHA | SDL_RLEACCEL, 255);
+	SDL_SetColorKey((SDL_Surface*)p, SDL_SRCCOLORKEY | SDL_RLEACCEL, 0);
+	SDL_SetAlpha((SDL_Surface*)p, SDL_SRCALPHA | SDL_RLEACCEL, 128);
 	spr->Width = width;
 	spr->Height = height;
 	return spr;
