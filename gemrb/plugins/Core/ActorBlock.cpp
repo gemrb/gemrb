@@ -15,13 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.77 2005/03/15 17:53:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.78 2005/03/16 17:08:21 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
 #include "Interface.h"
 
 extern Interface* core;
+
+#define YESNO(x) ( (x)?"Yes":"No")
 
 /***********************
  *	Scriptable Class   *
@@ -509,7 +511,6 @@ void Moveble::DrawTargetPoint()
 Door::Door(TileOverlay* Overlay)
 	: Highlightable( ST_DOOR )
 {
-	Name[0] = 0;
 	tiles = NULL;
 	count = 0;
 	Flags = 0;
@@ -525,6 +526,8 @@ Door::Door(TileOverlay* Overlay)
 	LockSound[0] = 0;
 	UnLockSound[0] = 0;
 	overlay = Overlay;
+	LinkedInfo[0]=0;
+	OpenStrRef=(ieDword) -1;
 }
 
 Door::~Door(void)
@@ -583,6 +586,11 @@ void Door::UpdateDoor()
 	for(i=0;i<cibcount;i++) {
 		area->SearchMap->SetPixelIndex( closed_ib[i].x, closed_ib[i].y, cidx );
 	}
+	InfoPoint *ip=area->TMap->GetInfoPoint(LinkedInfo);
+	if (ip) {
+		if(Flags&DOOR_OPEN) ip->Flags&=~INFO_DOOR;
+		else ip->Flags|=INFO_DOOR;
+	}
 }
 
 void Door::ToggleTiles(int State, bool playsound)
@@ -594,36 +602,22 @@ void Door::ToggleTiles(int State, bool playsound)
 		state = !closedIndex;
 		if (playsound && ( OpenSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( OpenSound );
-		/* no need to change position, door position is pre-determined
-		Pos.x = open->BBox.x + ( open->BBox.w / 2 );
-		Pos.y = open->BBox.y + ( open->BBox.h / 2 );
-		*/
 	} else {
 		state = closedIndex;
 		if (playsound && ( CloseSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( CloseSound );
-		/* ditto
-		Pos.x = closed->BBox.x + ( closed->BBox.w / 2 );
-		Pos.y = closed->BBox.y + ( closed->BBox.h / 2 );
-		*/
 	}
 	for (i = 0; i < count; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = state;
 	}
-	Flags = (Flags & ~1) | State;
+	//clear the locked flag and set door_open as state
+	Flags = (Flags & ~(DOOR_OPEN|DOOR_LOCKED) ) | State;
 }
 
 //this is the short name (not the scripting name)
 void Door::SetName(const char* name)
 {
-	strncpy( ID, name, 8 );
-	ID[8] = 0;
-}
-
-void Door::SetScriptName(const char* name)
-{
-	strncpy( Name, name, 32 );
-	Name[32] = 0;
+	strnuprcpy( ID, name, 8 );
 }
 
 void Door::SetTiles(unsigned short* Tiles, int count)
@@ -658,7 +652,6 @@ bool Door::IsOpen() const
 
 void Door::SetDoorOpen(bool Open, bool playsound)
 {
-	if (Open) SetDoorLocked (false, playsound);
 	ToggleTiles (Open == !core->HasFeature(GF_REVERSE_DOOR), playsound);
 	UpdateDoor ();
 	area->FixAllPositions();
@@ -675,7 +668,6 @@ void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 			delete( closed );
 		closed = poly;
 	}
-	UpdateDoor();
 }
 
 void Door::SetCursor(unsigned char CursorIndex)
@@ -683,10 +675,9 @@ void Door::SetCursor(unsigned char CursorIndex)
 	Cursor = CursorIndex;
 }
 
-#define YESNO(x) ( (x)?"Yes":"No")
 void Door::DebugDump()
 {
-	printf( "Debugdump of Door %s:\n", Name );
+	printf( "Debugdump of Door %s:\n", GetScriptName() );
 	printf( "Door Open: %s\n", YESNO(IsOpen()));
 	printf( "Door Locked: %s\n", YESNO(Flags&DOOR_LOCKED));
 	printf( "Door Trapped: %s (permanent:%s)\n", YESNO(TrapFlags), YESNO(Flags&DOOR_RESET));
@@ -703,7 +694,6 @@ void Door::DebugDump()
 InfoPoint::InfoPoint(void)
 	: Highlightable( ST_TRIGGER )
 {
-	Name[0] = 0;
 	Destination[0] = 0;
 	EntranceName[0] = 0;
 	Flags = 0;
@@ -786,23 +776,23 @@ void InfoPoint::DebugDump()
 {
 	switch (Type) {
 		case ST_TRIGGER:
-			printf( "Debugdump of InfoPoint Region %s:\n", Name );
+			printf( "Debugdump of InfoPoint Region %s:\n", GetScriptName() );
 			break;
 		case ST_PROXIMITY:
-			printf( "Debugdump of Trap Region %s:\n", Name );
+			printf( "Debugdump of Trap Region %s:\n", GetScriptName() );
 			break;
 		case ST_TRAVEL:
-			printf( "Debugdump of Travel Region %s:\n", Name );
+			printf( "Debugdump of Travel Region %s:\n", GetScriptName() );
 			break;
 		default:
-			printf( "Debugdump of Unsupported Region %s:\n", Name );
+			printf( "Debugdump of Unsupported Region %s:\n", GetScriptName() );
 			break;
 	}
-	printf( "TrapDetected: %d  Trapped: %s\n", TrapDetected, Scripts[0]?"Yes":"No" );
+	printf( "TrapDetected: %d  Trapped: %s\n", TrapDetected, YESNO(Scripts[0]));
 	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDifficulty,
 		TrapRemovalDifficulty );
 	printf( "Key: %s  Dialog: %s\n", KeyResRef, DialogResRef );
-	printf( "Active: %s\n", Active?"Yes":"No");
+	printf( "Active: %s\n", YESNO(Active));
 }
 
 /*******************
@@ -812,7 +802,6 @@ void InfoPoint::DebugDump()
 Container::Container(void)
 	: Highlightable( ST_CONTAINER )
 {
-	Name[0] = 0;
 	Type = 0;
 	LockDifficulty = 0;
 	Flags = 0;
@@ -829,7 +818,7 @@ Container::~Container()
 
 void Container::DebugDump()
 {
-	printf( "Debugdump of Container %s\n", Name );
+	printf( "Debugdump of Container %s\n", GetScriptName() );
 	printf( "Type: %d   LockDifficulty: %d\n", Type, LockDifficulty );
 	printf( "Flags: %d  Trapped: %d\n", Flags, Trapped );
 	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDiff,

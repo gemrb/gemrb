@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.40 2005/03/14 16:42:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.41 2005/03/16 17:08:22 avenger_teambg Exp $
  *
  */
 
@@ -61,8 +61,9 @@ void TileMap::AddOverlay(TileOverlay* overlay)
 	overlays.push_back( overlay );
 }
 
-Door* TileMap::AddDoor(char* Name, unsigned int Flags, int ClosedIndex,
-	unsigned short* indexes, int count, Gem_Polygon* open, Gem_Polygon* closed)
+Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
+	int ClosedIndex, unsigned short* indexes, int count,
+	Gem_Polygon* open, Gem_Polygon* closed)
 {
 	Door* door = new Door( overlays[0] );
 	door->Flags = Flags;
@@ -70,7 +71,8 @@ Door* TileMap::AddDoor(char* Name, unsigned int Flags, int ClosedIndex,
 	door->SetTiles( indexes, count );
 	door->SetPolygon( false, open );
 	door->SetPolygon( true, closed );
-	door->SetName( Name );
+	door->SetName( ID );
+	door->SetScriptName( Name );
 	doors.push_back( door );
 	return doors.at( doors.size() - 1 );
 }
@@ -111,8 +113,8 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 	Video* vid = core->GetVideoDriver();
 	Region vp = vid->GetViewport();
 
-	vp.x += viewport.x;
-	vp.y += viewport.y;
+	vp.x -= viewport.x;
+	vp.y -= viewport.y;
 	vp.w = viewport.w;
 	vp.h = viewport.h;
 	if (( vp.x + vp.w ) > w * CELL_SIZE) {
@@ -164,12 +166,10 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				//   some tiles are made 'on the fly' by 
 				//   drawing two or more tiles
 
-				int e_n = ! IS_EXPLORED( x, y - 1 );
-				int e_e = ! IS_EXPLORED( x + 1, y );
-				int e_s = ! IS_EXPLORED( x, y + 1 );
-				int e_w = ! IS_EXPLORED( x - 1, y );
-
-				int e = 8 * e_e + 4 * e_s + 2 * e_w + e_n;
+				int e = ! IS_EXPLORED( x, y - 1);
+				if(! IS_EXPLORED( x - 1, y )) e |= 2;
+				if(! IS_EXPLORED( x, y + 1 )) e |= 4;
+				if(! IS_EXPLORED( x + 1, y )) e |= 8;
 
 				switch (e) {
 				case 1:
@@ -234,12 +234,10 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				//   some tiles are made 'on the fly' by 
 				//   drawing two or more tiles
 
-				int e_n = ! IS_VISIBLE( x, y - 1 );
-				int e_e = ! IS_VISIBLE( x + 1, y );
-				int e_s = ! IS_VISIBLE( x, y + 1 );
-				int e_w = ! IS_VISIBLE( x - 1, y );
-
-				int e = 8 * e_e + 4 * e_s + 2 * e_w + e_n;
+				int e = ! IS_VISIBLE( x, y - 1);
+				if(! IS_VISIBLE( x - 1, y )) e |= 2;
+				if(! IS_VISIBLE( x, y + 1 )) e |= 4;
+				if(! IS_VISIBLE( x + 1, y )) e |= 8;
 
 				switch (e) {
 				case 1:
@@ -331,17 +329,17 @@ Door* TileMap::GetDoor(const char* Name)
 	}
 	for (size_t i = 0; i < doors.size(); i++) {
 		Door* door = doors[i];
-		if (stricmp( door->Name, Name ) == 0)
+		if (stricmp( door->GetScriptName(), Name ) == 0)
 			return door;
 	}
 	return NULL;
 }
 
-Container* TileMap::AddContainer(char* Name, unsigned short Type,
+Container* TileMap::AddContainer(const char* Name, unsigned short Type,
 	Gem_Polygon* outline)
 {
 	Container* c = new Container();
-	strncpy( c->Name, Name, 32 );
+	c->SetScriptName( Name );
 	c->Type = Type;
 	c->outline = outline;
 	containers.push_back( c );
@@ -359,17 +357,8 @@ Container* TileMap::GetContainer(const char* Name)
 {
 	for (size_t i = 0; i < containers.size(); i++) {
 		Container* cn = containers[i];
-		int len = ( int ) strlen( cn->Name );
-		int p = 0;
-		for (int x = 0; x < len; x++) {
-			if (cn->Name[x] == ' ')
-				continue;
-			if (cn->Name[x] != Name[p])
-				break;
-			if (x == len - 1)
-				return cn;
-			p++;
-		}
+		if (stricmp( cn->GetScriptName(), Name ) == 0)
+			return cn;
 	}
 	return NULL;
 }
@@ -411,18 +400,18 @@ void TileMap::AddItemToLocation(Point &position, CREItem *item)
 		tmp[2].y=position.y+5;
 		tmp[3].x=position.x-5;
 		tmp[3].y=position.y+5;
-                Gem_Polygon* outline = new Gem_Polygon( tmp, 4 );
-	        container = AddContainer(heapname,CN_HEAP, outline);
+		Gem_Polygon* outline = new Gem_Polygon( tmp, 4 );
+		container = AddContainer(heapname,CN_HEAP, outline);
 		container->Pos=position;
 	}
 	container->inventory.AddItem(item);
 }
 
-InfoPoint* TileMap::AddInfoPoint(char* Name, unsigned short Type,
+InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
 	Gem_Polygon* outline)
 {
 	InfoPoint* ip = new InfoPoint();
-	strncpy( ip->Name, Name, 32 );
+	ip->SetScriptName( Name );
 	switch (Type) {
 		case 0:
 			ip->Type = ST_PROXIMITY;
@@ -445,6 +434,11 @@ InfoPoint* TileMap::GetInfoPoint(Point &p)
 {
 	for (size_t i = 0; i < infoPoints.size(); i++) {
 		InfoPoint* ip = infoPoints[i];
+		//these flags disable any kind of user interaction
+		//scripts can still access an infopoint by name
+		if (ip->Flags&(INFO_DOOR|TRAP_DEACTIVATED) )
+			continue;
+
 		if (!ip->Active)
 			continue;
 		if (ip->outline->BBox.x > p.x)
@@ -465,17 +459,8 @@ InfoPoint* TileMap::GetInfoPoint(const char* Name)
 {
 	for (size_t i = 0; i < infoPoints.size(); i++) {
 		InfoPoint* ip = infoPoints[i];
-		int len = ( int ) strlen( ip->Name );
-		int p = 0;
-		for (int x = 0; x < len; x++) {
-			if (ip->Name[x] == ' ')
-				continue;
-			if (ip->Name[x] != Name[p])
-				break;
-			if (x == len - 1)
-				return ip;
-			p++;
-		}
+		if (stricmp( ip->GetScriptName(), Name ) == 0)
+			return ip;
 	}
 	return NULL;
 }

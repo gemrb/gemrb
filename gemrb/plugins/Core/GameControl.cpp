@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.200 2005/03/15 17:53:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.201 2005/03/16 17:08:21 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -523,13 +523,13 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'j':
 				// jump
-					for (i = 0; i < game->selected.size(); i++) {
-						Actor* actor = game->selected[i];
-						Point c = {lastMouseX, lastMouseY};
-						core->GetVideoDriver()->ConvertToGame( c.x, c.y );
-						GameScript::MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, c, -1, true);
-						printf( "Teleported to %d, %d\n", c.x, c.y );
-					}
+				for (i = 0; i < game->selected.size(); i++) {
+					Actor* actor = game->selected[i];
+					Point c = {lastMouseX, lastMouseY};
+					core->GetVideoDriver()->ConvertToGame( c.x, c.y );
+					GameScript::MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, c, -1, true);
+					printf( "Teleported to %d, %d\n", c.x, c.y );
+				}
 				break;
 
 			case 'm':
@@ -555,21 +555,15 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'v':
 				// explore map from point
 				 {
-					Game* game = core->GetGame();
 					Map* area = game->GetCurrentMap( );
-					short cX = lastMouseX; 
-					short cY = lastMouseY;
-					core->GetVideoDriver()->ConvertToGame( cX, cY );
-					Point pos;
-					pos.x=cX;
-					pos.y=cY;
-					area->ExploreMapChunk( pos, 5, true );
+					Point p = {lastMouseX, lastMouseY};
+					core->GetVideoDriver()->ConvertToGame( p.x, p.y );
+					area->ExploreMapChunk( p, rand()%30, true );
 				}
 				break;
 			case 'x':
 				// shows coordinates
 				 {
-					Game* game = core->GetGame();
 					Map* area = game->GetCurrentMap( );
 					short cX = lastMouseX; 
 					short cY = lastMouseY;
@@ -773,12 +767,12 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	if (door->IsOpen()) {
 		actor->ClearPath();
 		actor->ClearActions();
-		sprintf( Tmp, "CloseDoor(\"%s\")", door->Name );
+		sprintf( Tmp, "CloseDoor(\"%s\")", door->GetScriptName() );
 		actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 	} else {
 		actor->ClearPath();
 		actor->ClearActions();
-		sprintf( Tmp, "OpenDoor(\"%s\")", door->Name );
+		sprintf( Tmp, "OpenDoor(\"%s\")", door->GetScriptName() );
 		actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.61 2005/03/15 17:53:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.62 2005/03/16 17:08:21 avenger_teambg Exp $
  *
  */
 
@@ -65,7 +65,7 @@ class Door;
 #define TRAP_DEACTIVATED  256
 #define TRAVEL_NONPC      512
 //#define TRAP_1024       1024 //override?
-#define INFO_DOOR	 2048 //info trigger linked to a door
+#define INFO_DOOR	 2048 //info trigger blocked by door
 
 //door flags
 #define DOOR_OPEN        1
@@ -251,7 +251,7 @@ public:
 	Door(TileOverlay* Overlay);
 	~Door(void);
 public:
-	char Name[33]; //scriptable name
+	char LinkedInfo[25];
 	ieResRef ID;    //WED ID
 	TileOverlay* overlay;
 	unsigned short* tiles;
@@ -272,12 +272,12 @@ public:
         ieWord TrapDetectionDiff;
         ieWord TrapRemovalDiff;
 	ieDword TrapFlags;
+	ieDword OpenStrRef;
 private:
 	void ToggleTiles(int State, bool playsound = false);
 	void UpdateDoor();
 public:
-	void SetName(const char* Name);
-	void SetScriptName(const char* Name);
+	void SetName(const char* Name); // sets door ID
 	void SetTiles(unsigned short* Tiles, int count);
 	void SetDoorLocked(bool Locked, bool playsound = false);
 	void SetDoorOpen(bool Open, bool playsound = false);
@@ -293,7 +293,6 @@ public:
 	~Container(void);
 	void DebugDump();
 public:
-	char Name[33];
 	Point toOpen;
 	unsigned short Type;
 	unsigned short LockDifficulty;
@@ -321,13 +320,11 @@ public:
 	void DebugDump();
 
 public:
-	char Name[33];
 	ieResRef Destination;
 	char EntranceName[33];
 	unsigned int Flags;
 	unsigned short TrapDetectionDifficulty;
 	unsigned short TrapRemovalDifficulty;
-//	unsigned short Trapped;
 	unsigned short TrapDetected;
 };
 

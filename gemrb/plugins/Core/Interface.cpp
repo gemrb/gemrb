@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.280 2005/03/16 16:35:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.281 2005/03/16 17:08:21 avenger_teambg Exp $
  *
  */
 
@@ -144,7 +144,7 @@ Interface::Interface(int iargc, char** iargv)
 	TooltipMargin = 10;
 	TooltipBack = NULL;
 	DraggedItem = NULL;
-	for(int i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) FogSprites[i]=NULL;
+	for(unsigned int i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) FogSprites[i]=NULL;
 	GameFeatures = 0;
 	memset( WindowFrames, 0, sizeof( WindowFrames ));
 }
@@ -190,7 +190,7 @@ Interface::~Interface(void)
 	if (CurrentStore) {
 		delete CurrentStore;
 	}
-	int i;
+	unsigned int i;
 
 	for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
 		//freesprite checks for null pointer

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.104 2005/03/15 17:53:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.105 2005/03/16 17:08:18 avenger_teambg Exp $
  *
  */
 
@@ -253,6 +253,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieWord OpenVerticesCount, ClosedVerticesCount;
 		ieWord OpenImpededCount, ClosedImpededCount;
 		char LongName[33];
+		char LinkedInfo[25];
 		ieResRef ShortName;
 		ieWord minX, maxX, minY, maxY;
 		ieDword cursor;
@@ -261,6 +262,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieWord LaunchX, LaunchY;
 		ieDword TrapFlags, Locked, LockRemoval;
 		Region BBClosed, BBOpen;
+		ieDword OpenStrRef;
+
 		str->Read( LongName, 32 );
 		LongName[32] = 0;
 		str->ReadResRef( ShortName );
@@ -312,6 +315,11 @@ Map* AREImp::GetMap(const char *ResRef)
 		toOpen[1].x = maxX;
 		str->ReadWord( &maxY );
 		toOpen[1].y = maxY;
+		str->ReadDword( &OpenStrRef);
+		//odd field, needs a bit of hacking
+		str->Read( LinkedInfo, 24);
+		LinkedInfo[24] = 0;
+
 		//Reading Open Polygon
 		str->Seek( VerticesOffset + ( OpenFirstVertex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* )
@@ -342,7 +350,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		bool BaseClosed;
 		unsigned short * indices = tmm->GetDoorIndices( ShortName, &count, BaseClosed );
 		Door* door;
-		door = tm->AddDoor( ShortName, Flags, BaseClosed,
+		door = tm->AddDoor( ShortName, LongName, Flags, BaseClosed,
 					indices, count, open, closed );
 
 		//Reading Open Impeded blocks
@@ -379,7 +387,6 @@ Map* AREImp::GetMap(const char *ResRef)
 		door->TrapLaunch.x = LaunchX;
 		door->TrapLaunch.y = LaunchY;
 
-		door->SetScriptName( LongName );
 		door->Cursor = cursor;
 		memcpy( door->KeyResRef, KeyResRef, sizeof(KeyResRef) );
 		if (Script[0] != 0) {
@@ -407,6 +414,9 @@ Map* AREImp::GetMap(const char *ResRef)
 			else
 				memcpy( door->CloseSound, Sounds[DEF_CLOSE], 9 );
 		}
+		door->OpenStrRef=OpenStrRef;
+		//this is an odd field, only 24 chars!
+		strnuprcpy(door->LinkedInfo, LinkedInfo, 24);
 	}
 	printf( "Loading containers\n" );
 	//Loading Containers
