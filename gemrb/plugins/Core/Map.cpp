@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.11 2003/11/25 22:50:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.12 2003/11/26 01:12:43 balrog994 Exp $
  *
  */
 
@@ -36,6 +36,8 @@
 #define EVILBUTGREEN	201
 #define EVILBUTBLUE		202
 #define ENEMY			255
+
+#define STATE_DEAD		0x00000800
 
 #include "../../includes/win32def.h"
 #include "Map.h"
@@ -105,21 +107,21 @@ void Map::DrawMap(Region viewport)
 			case CONTROLLED:
 			case CHARMED:
 			case EVILBUTGREEN:
-				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ca->CircleSize*5, green);
+				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), green);
 			break;
 
 			case ENEMY:
 			case GOODBUTRED:
-				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ca->CircleSize*5, red);
+				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), red);
 			break;
 
 			case NEUTRAL:
-				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ca->CircleSize*5, yellow);
+				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), yellow);
 			break;
 
 			default:
 				printf("%d\n", actors[i].actor->BaseStats[IE_EA]);
-				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ca->CircleSize*5, cyan);
+				video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), cyan);
 			break;
 			}
 		}
