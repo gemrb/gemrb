@@ -1064,7 +1064,7 @@ static PyObject * GemRB_SetButtonBAM(PyObject */*self*/, PyObject *args)
 	char * ResRef;
 
 	if(!PyArg_ParseTuple(args, "iisi", &WindowIndex, &ControlIndex, &ResRef, &col1)) {
-		printMessage("GUIScript", "Syntax Error: SetButtonPLT(WindowIndex, ControlIndex, PLTResRef, col1)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: SetButtonBAM(WindowIndex, ControlIndex, BAMResRef, col1)\n", LIGHT_RED);
 		return NULL;
 	}
 
