@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.25 2004/01/02 19:18:15 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.26 2004/01/02 19:30:48 avenger_teambg Exp $
  *
  */
 
@@ -83,8 +83,7 @@ bool MUSImp::OpenPlaylist(const char * name)
 	int count = atoi(counts);
 	while(count != 0) {
 		char line[64];
-		str->ReadLine(line, 64);
-		int len = (int)strlen(line);
+		int len = str->ReadLine(line, 64);
 		int i = 0;
 		int p = 0;
 		PLString pls;
