@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.143 2004/04/16 15:06:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.144 2004/04/16 18:39:51 avenger_teambg Exp $
  *
  */
 
@@ -63,14 +63,14 @@ static TriggerLink triggernames[] = {
 	{"areacheckobject", GameScript::AreaCheck,0},
 	{"areatype", GameScript::AreaType,0},
 	{"areaflag", GameScript::AreaFlag,0},
-	{"bitcheck",GameScript::BitCheck,TF_MERGESTRINGS},
-	{"bitcheckexact",GameScript::BitCheckExact,TF_MERGESTRINGS},
-	{"bitglobal",GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
-	{"breakingpoint",GameScript::BreakingPoint,0},
+	{"bitcheck", GameScript::BitCheck,TF_MERGESTRINGS},
+	{"bitcheckexact", GameScript::BitCheckExact,TF_MERGESTRINGS},
+	{"bitglobal", GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
+	{"breakingpoint", GameScript::BreakingPoint,0},
 	{"calledbyname", GameScript::CalledByName,0},
-	{"checkstat",GameScript::CheckStat,0},
-	{"checkstatgt",GameScript::CheckStatGT,0},
-	{"checkstatlt",GameScript::CheckStatLT,0},
+	{"checkstat", GameScript::CheckStat,0},
+	{"checkstatgt", GameScript::CheckStatGT,0},
+	{"checkstatlt", GameScript::CheckStatLT,0},
 	{"class", GameScript::Class,0},
 	{"classlevel", GameScript::ClassLevel,0},
 	{"classlevelgt", GameScript::ClassLevelGT,0},
@@ -87,9 +87,9 @@ static TriggerLink triggernames[] = {
 	{"general", GameScript::General,0},
 	{"global", GameScript::Global,TF_MERGESTRINGS},
 	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger,TF_MERGESTRINGS},
-	{"globalband",GameScript::BitCheck,AF_MERGESTRINGS},
-	{"globalbandglobal",GameScript::GlobalBAndGlobal_Trigger,AF_MERGESTRINGS},
-	{"globalbitglobal",GameScript::GlobalBitGlobal_Trigger,TF_MERGESTRINGS},
+	{"globalband", GameScript::BitCheck,AF_MERGESTRINGS},
+	{"globalbandglobal", GameScript::GlobalBAndGlobal_Trigger,AF_MERGESTRINGS},
+	{"globalbitglobal", GameScript::GlobalBitGlobal_Trigger,TF_MERGESTRINGS},
 	{"globalequalsglobal", GameScript::GlobalsEqual,TF_MERGESTRINGS}, //this is the same
 	{"globalgt", GameScript::GlobalGT,TF_MERGESTRINGS},
 	{"globalgtglobal", GameScript::GlobalGTGlobal,TF_MERGESTRINGS},
@@ -196,268 +196,273 @@ static TriggerLink triggernames[] = {
 
 //Make this an ordered list, so we could use bsearch!
 static ActionLink actionnames[] = {
-	{"actionoverride",NULL,0}, {"activate",GameScript::Activate,0},
+	{"actionoverride",NULL,0}, {"activate", GameScript::Activate,0},
 	{"addareaflag", GameScript::AddAreaFlag,0},
 	{"addareatype", GameScript::AddAreaType,0},
-	{"addexperienceparty",GameScript::AddExperienceParty,0},
-	{"addexperiencepartyglobal",GameScript::AddExperiencePartyGlobal,AF_MERGESTRINGS},
-	{"addglobals",GameScript::AddGlobals,0},
-	{"addwaypoint",GameScript::AddWayPoint,AF_BLOCKING},
+	{"addexperienceparty", GameScript::AddExperienceParty,0},
+	{"addexperiencepartyglobal", GameScript::AddExperiencePartyGlobal,AF_MERGESTRINGS},
+	{"addglobals", GameScript::AddGlobals,0},
+	{"addwaypoint", GameScript::AddWayPoint,AF_BLOCKING},
 	{"addxp2da", GameScript::AddXP2DA,0},
 	{"addxpobject", GameScript::AddXPObject,0},
 	{"addxpvar", GameScript::AddXP2DA,0},
-	{"ally",GameScript::Ally,0},
-	{"ambientactivate",GameScript::AmbientActivate,0},
-	{"bashdoor",GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
-	{"bitclear",GameScript::BitClear,AF_MERGESTRINGS},
-	{"bitglobal",GameScript::BitGlobal,AF_MERGESTRINGS},
-	{"bitset",GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
-	{"changeaiscript",GameScript::ChangeAIScript,0},
-	{"changealignment",GameScript::ChangeAlignment,0},
-	{"changeallegiance",GameScript::ChangeAllegiance,0},
-	{"changeclass",GameScript::ChangeClass,0},
-	{"changedialog",GameScript::ChangeDialogue,0},
-	{"changedialogue",GameScript::ChangeDialogue,0},
-	{"changegender",GameScript::ChangeGender,0},
-	{"changegeneral",GameScript::ChangeGeneral,0},
-	{"changeenemyally",GameScript::ChangeAllegiance,0}, //this is the same
-	{"changerace",GameScript::ChangeRace,0},
-	{"changespecifics",GameScript::ChangeSpecifics,0},
-	{"changestat",GameScript::ChangeStat,0},
-	{"clearactions",GameScript::ClearActions,0},
-	{"clearallactions",GameScript::ClearAllActions,0},
-	{"closedoor",GameScript::CloseDoor,AF_BLOCKING},
-	{"continue",GameScript::Continue,AF_INSTANT | AF_CONTINUE},
-	{"createcreature",GameScript::CreateCreature,0},
-	{"createcreatureatfeet",GameScript::CreateCreatureOffset,0}, //this is the same
-	{"createcreatureoffset",GameScript::CreateCreatureOffset,0},
-	{"createpartygold",GameScript::CreatePartyGold,0},
-	{"createvisualeffect",GameScript::CreateVisualEffect,0},
-	{"createvisualeffectobject",GameScript::CreateVisualEffectObject,0},
-	{"cutsceneid",GameScript::CutSceneID,AF_INSTANT},
-	{"deactivate",GameScript::Deactivate,0},
-	{"debug",GameScript::Debug,0},
+	{"ally", GameScript::Ally,0},
+	{"ambientactivate", GameScript::AmbientActivate,0},
+	{"bashdoor", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
+	{"bitclear", GameScript::BitClear,AF_MERGESTRINGS},
+	{"bitglobal", GameScript::BitGlobal,AF_MERGESTRINGS},
+	{"bitset", GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
+	{"changeaiscript", GameScript::ChangeAIScript,0},
+	{"changealignment", GameScript::ChangeAlignment,0},
+	{"changeallegiance", GameScript::ChangeAllegiance,0},
+	{"changeclass", GameScript::ChangeClass,0},
+	{"changedialog", GameScript::ChangeDialogue,0},
+	{"changedialogue", GameScript::ChangeDialogue,0},
+	{"changegender", GameScript::ChangeGender,0},
+	{"changegeneral", GameScript::ChangeGeneral,0},
+	{"changeenemyally", GameScript::ChangeAllegiance,0}, //this is the same
+	{"changerace", GameScript::ChangeRace,0},
+	{"changespecifics", GameScript::ChangeSpecifics,0},
+	{"changestat", GameScript::ChangeStat,0},
+	{"clearactions", GameScript::ClearActions,0},
+	{"clearallactions", GameScript::ClearAllActions,0},
+	{"closedoor", GameScript::CloseDoor,AF_BLOCKING},
+	{"continue", GameScript::Continue,AF_INSTANT | AF_CONTINUE},
+	{"createcreature", GameScript::CreateCreature,0}, //point is relative to Sender
+	{"createcreatureatfeet", GameScript::CreateCreatureAtFeet,0}, 
+	{"createcreatureobject", GameScript::CreateCreatureObjectOffset,0}, //the same
+	{"createcreatureobjectoffset", GameScript::CreateCreatureObjectOffset,0}, //the same
+	{"createpartygold", GameScript::CreatePartyGold,0},
+	{"createvisualeffect", GameScript::CreateVisualEffect,0},
+	{"createvisualeffectobject", GameScript::CreateVisualEffectObject,0},
+	{"cutsceneid", GameScript::CutSceneID,AF_INSTANT},
+	{"deactivate", GameScript::Deactivate,0},
+	{"debug", GameScript::Debug,0},
 	{"destroyalldestructableequipment", GameScript::DestroyAllDestructableEquipment,0},
 	{"destroyallequipment", GameScript::DestroyAllEquipment,0},
 	{"destroyitem", GameScript::DestroyItem,0},
-	{"destroypartygold",GameScript::DestroyPartyGold,0},
-	{"destroyself",GameScript::DestroySelf,0},
-	{"dialogue",GameScript::Dialogue,AF_BLOCKING},
-	{"dialogueforceinterrupt",GameScript::DialogueForceInterrupt,AF_BLOCKING},
-	{"displaystring",GameScript::DisplayString,0},
-	{"displaystringhead",GameScript::DisplayStringHead,0},
-	{"displaystringnonamehead",GameScript::DisplayStringNoNameHead,0},
-	{"displaystringwait",GameScript::DisplayStringWait,AF_BLOCKING},
-	{"endcutscenemode",GameScript::EndCutSceneMode,0},
-	{"enemy",GameScript::Enemy,0},
-	{"erasejournalentry",GameScript::RemoveJournalEntry,0},
-	{"face",GameScript::Face,AF_BLOCKING},
-	{"faceobject",GameScript::FaceObject, AF_BLOCKING},
-	{"fadefromblack",GameScript::FadeFromColor,0}, //probably the same
-	{"fadefromcolor",GameScript::FadeFromColor,0},
-	{"fadetoblack",GameScript::FadeToColor,0}, //probably the same
-	{"fadetocolor",GameScript::FadeToColor,0},
-	{"floatmessage",GameScript::DisplayStringHead,0}, //probably the same
-	{"forceaiscript",GameScript::ForceAIScript,0},
-	{"forcefacing",GameScript::ForceFacing,0},
-	{"forcespell",GameScript::ForceSpell,0},
+	{"destroypartygold", GameScript::DestroyPartyGold,0},
+	{"destroyself", GameScript::DestroySelf,0},
+	{"dialogue", GameScript::Dialogue,AF_BLOCKING},
+	{"dialogueforceinterrupt", GameScript::DialogueForceInterrupt,AF_BLOCKING},
+	{"displaystring", GameScript::DisplayString,0},
+	{"displaystringhead", GameScript::DisplayStringHead,0},
+	{"displaystringnonamehead", GameScript::DisplayStringNoNameHead,0},
+	{"displaystringwait", GameScript::DisplayStringWait,AF_BLOCKING},
+	{"endcutscenemode", GameScript::EndCutSceneMode,0},
+	{"enemy", GameScript::Enemy,0},
+	{"erasejournalentry", GameScript::RemoveJournalEntry,0},
+	{"face", GameScript::Face,AF_BLOCKING},
+	{"faceobject", GameScript::FaceObject, AF_BLOCKING},
+	{"fadefromblack", GameScript::FadeFromColor,0}, //probably the same
+	{"fadefromcolor", GameScript::FadeFromColor,0},
+	{"fadetoblack", GameScript::FadeToColor,0}, //probably the same
+	{"fadetocolor", GameScript::FadeToColor,0},
+	{"floatmessage", GameScript::DisplayStringHead,0}, //probably the same
+	{"forceaiscript", GameScript::ForceAIScript,0},
+	{"forcefacing", GameScript::ForceFacing,0},
+	{"forcespell", GameScript::ForceSpell,0},
 	{"giveexperience", GameScript::AddXPObject,0},
-	{"givegoldforce",GameScript::CreatePartyGold,0}, //this is the same
-	{"givepartygold",GameScript::GivePartyGold,0},
-	{"givepartygoldglobal",GameScript::GivePartyGoldGlobal,AF_MERGESTRINGS},
-	{"globaladdglobal",GameScript::GlobalAddGlobal,AF_MERGESTRINGS},
-	{"globalandglobal",GameScript::GlobalAndGlobal,AF_MERGESTRINGS},
-	{"globalband",GameScript::GlobalBAnd,AF_MERGESTRINGS},
-	{"globalbandglobal",GameScript::GlobalBAndGlobal,AF_MERGESTRINGS},
-	{"globalbitglobal",GameScript::GlobalBitGlobal, AF_MERGESTRINGS},
-	{"globalbor",GameScript::GlobalBOr,AF_MERGESTRINGS},
-	{"globalborglobal",GameScript::GlobalBOrGlobal,AF_MERGESTRINGS},
-	{"globalmax",GameScript::GlobalMax,AF_MERGESTRINGS},
-	{"globalmaxglobal",GameScript::GlobalMaxGlobal,AF_MERGESTRINGS},
-	{"globalmin",GameScript::GlobalMin,AF_MERGESTRINGS},
-	{"globalminglobal",GameScript::GlobalMinGlobal,AF_MERGESTRINGS},
-	{"globalorglobal",GameScript::GlobalOrGlobal,AF_MERGESTRINGS},
-	{"globalset",GameScript::SetGlobal,AF_MERGESTRINGS},
-	{"globalsetglobal",GameScript::GlobalSetGlobal,AF_MERGESTRINGS},
-	{"globalshl",GameScript::GlobalShL,AF_MERGESTRINGS},
-	{"globalshlglobal",GameScript::GlobalShLGlobal,AF_MERGESTRINGS},
-	{"globalshr",GameScript::GlobalShR,AF_MERGESTRINGS},
-	{"globalshrglobal",GameScript::GlobalShRGlobal,AF_MERGESTRINGS},
-	{"globalsubglobal",GameScript::GlobalSubGlobal,AF_MERGESTRINGS},
-	{"globalxor",GameScript::GlobalXor,AF_MERGESTRINGS},
-	{"globalxorglobal",GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
-	{"hidegui",GameScript::HideGUI,0},
-	{"incinternal",GameScript::IncInternal,0},
-	{"incmoraleai",GameScript::IncMoraleAI,0},
-	{"incrementchapter",GameScript::IncrementChapter,0},
-	{"incrementglobal",GameScript::IncrementGlobal,AF_MERGESTRINGS},
-	{"incrementglobalonce",GameScript::IncrementGlobalOnce,AF_MERGESTRINGS},
-	{"incrementextraproficiency",GameScript::IncrementExtraProficiency,0},
-	{"incrementproficiency",GameScript::IncrementProficiency,0},
-	{"interact",GameScript::Interact,0},
-	{"joinparty",GameScript::JoinParty,0},
-	{"addjournalentry",GameScript::AddJournalEntry,0},
-	{"jumptoobject",GameScript::JumpToObject,0},
-	{"jumptopoint",GameScript::JumpToPoint,0},
-	{"jumptopointinstant",GameScript::JumpToPointInstant,0},
-	{"leavearealua",GameScript::LeaveAreaLUA,0},
-	{"leavearealuaentry",GameScript::LeaveAreaLUAEntry,0},
-	{"leavearealuapanic",GameScript::LeaveAreaLUAPanic,0},
-	{"leavearealuapanicentry",GameScript::LeaveAreaLUAPanicEntry,0},
-	{"leaveparty",GameScript::LeaveParty,0},
-	{"lock",GameScript::Lock,AF_BLOCKING},//key not checked at this time!
-	{"log",GameScript::Debug,0}, //the same until we know better
-	{"makeglobal",GameScript::MakeGlobal,0},
-	{"makeunselectable",GameScript::MakeUnselectable,0},
-	{"moraledec",GameScript::MoraleDec,0},
-	{"moraleinc",GameScript::MoraleInc,0},
-	{"moraleset",GameScript::MoraleSet,0},
-	{"movebetweenareas",GameScript::MoveBetweenAreas,0},
-	{"movetoobject",GameScript::MoveToObject,AF_BLOCKING},
-	{"movetooffset",GameScript::MoveToOffset,AF_BLOCKING},
-	{"movetopoint",GameScript::MoveToPoint,AF_BLOCKING},
-	{"movetopointnorecticle",GameScript::MoveToPoint,AF_BLOCKING},//the same until we know better
-	{"moveviewobject",GameScript::MoveViewPoint,0},
-	{"moveviewpoint",GameScript::MoveViewPoint,0},
-	{"nidspecial1",GameScript::NIDSpecial1,AF_BLOCKING},
-	{"noaction",GameScript::NoAction,0},
-	{"opendoor",GameScript::OpenDoor,AF_BLOCKING},
-	{"permanentstatchange",GameScript::ChangeStat,0}, //probably the same
-	{"picklock",GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
-	{"playdead",GameScript::PlayDead,0},
-	{"playerdialog",GameScript::PlayerDialogue,AF_BLOCKING},
-	{"playerdialogue",GameScript::PlayerDialogue,AF_BLOCKING},
-	{"playsound",GameScript::PlaySound,0},
-	{"recoil",GameScript::Recoil,0},
+	{"givegoldforce", GameScript::CreatePartyGold,0}, //this is the same
+	{"givepartygold", GameScript::GivePartyGold,0},
+	{"givepartygoldglobal", GameScript::GivePartyGoldGlobal,AF_MERGESTRINGS},
+	{"globaladdglobal", GameScript::GlobalAddGlobal,AF_MERGESTRINGS},
+	{"globalandglobal", GameScript::GlobalAndGlobal,AF_MERGESTRINGS},
+	{"globalband", GameScript::GlobalBAnd,AF_MERGESTRINGS},
+	{"globalbandglobal", GameScript::GlobalBAndGlobal,AF_MERGESTRINGS},
+	{"globalbitglobal", GameScript::GlobalBitGlobal, AF_MERGESTRINGS},
+	{"globalbor", GameScript::GlobalBOr,AF_MERGESTRINGS},
+	{"globalborglobal", GameScript::GlobalBOrGlobal,AF_MERGESTRINGS},
+	{"globalmax", GameScript::GlobalMax,AF_MERGESTRINGS},
+	{"globalmaxglobal", GameScript::GlobalMaxGlobal,AF_MERGESTRINGS},
+	{"globalmin", GameScript::GlobalMin,AF_MERGESTRINGS},
+	{"globalminglobal", GameScript::GlobalMinGlobal,AF_MERGESTRINGS},
+	{"globalorglobal", GameScript::GlobalOrGlobal,AF_MERGESTRINGS},
+	{"globalset", GameScript::SetGlobal,AF_MERGESTRINGS},
+	{"globalsetglobal", GameScript::GlobalSetGlobal,AF_MERGESTRINGS},
+	{"globalshl", GameScript::GlobalShL,AF_MERGESTRINGS},
+	{"globalshlglobal", GameScript::GlobalShLGlobal,AF_MERGESTRINGS},
+	{"globalshr", GameScript::GlobalShR,AF_MERGESTRINGS},
+	{"globalshrglobal", GameScript::GlobalShRGlobal,AF_MERGESTRINGS},
+	{"globalsubglobal", GameScript::GlobalSubGlobal,AF_MERGESTRINGS},
+	{"globalxor", GameScript::GlobalXor,AF_MERGESTRINGS},
+	{"globalxorglobal", GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
+	{"hidegui", GameScript::HideGUI,0},
+	{"incinternal", GameScript::IncInternal,0},
+	{"incmoraleai", GameScript::IncMoraleAI,0},
+	{"incrementchapter", GameScript::IncrementChapter,0},
+	{"incrementglobal", GameScript::IncrementGlobal,AF_MERGESTRINGS},
+	{"incrementglobalonce", GameScript::IncrementGlobalOnce,AF_MERGESTRINGS},
+	{"incrementextraproficiency", GameScript::IncrementExtraProficiency,0},
+	{"incrementproficiency", GameScript::IncrementProficiency,0},
+	{"interact", GameScript::Interact,0},
+	{"joinparty", GameScript::JoinParty,0},
+	{"addjournalentry", GameScript::AddJournalEntry,0},
+	{"jumptoobject", GameScript::JumpToObject,0},
+	{"jumptopoint", GameScript::JumpToPoint,0},
+	{"jumptopointinstant", GameScript::JumpToPointInstant,0},
+	{"leavearealua", GameScript::LeaveAreaLUA,0},
+	{"leavearealuaentry", GameScript::LeaveAreaLUAEntry,0},
+	{"leavearealuapanic", GameScript::LeaveAreaLUAPanic,0},
+	{"leavearealuapanicentry", GameScript::LeaveAreaLUAPanicEntry,0},
+	{"leaveparty", GameScript::LeaveParty,0},
+	{"lock", GameScript::Lock,AF_BLOCKING},//key not checked at this time!
+	{"log", GameScript::Debug,0}, //the same until we know better
+	{"makeglobal", GameScript::MakeGlobal,0},
+	{"makeunselectable", GameScript::MakeUnselectable,0},
+	{"moraledec", GameScript::MoraleDec,0},
+	{"moraleinc", GameScript::MoraleInc,0},
+	{"moraleset", GameScript::MoraleSet,0},
+	{"movebetweenareas", GameScript::MoveBetweenAreas,0},
+	{"moveglobal", GameScript::MoveGlobal,0}, 
+	{"moveglobalobject", GameScript::MoveGlobalObject,0}, 
+	{"moveglobalobjectoffscreen", GameScript::MoveGlobalObjectOffScreen,0},
+	{"movetoobject", GameScript::MoveToObject,AF_BLOCKING},
+	{"movetooffset", GameScript::MoveToOffset,AF_BLOCKING},
+	{"movetopoint", GameScript::MoveToPoint,AF_BLOCKING},
+	{"movetopointnorecticle", GameScript::MoveToPoint,AF_BLOCKING},//the same until we know better
+	{"moveviewobject", GameScript::MoveViewPoint,0},
+	{"moveviewpoint", GameScript::MoveViewPoint,0},
+	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING},
+	{"noaction", GameScript::NoAction,0},
+	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
+	{"permanentstatchange", GameScript::ChangeStat,0}, //probably the same
+	{"picklock", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
+	{"playdead", GameScript::PlayDead,0},
+	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
+	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
+	{"playsound", GameScript::PlaySound,0},
+	{"recoil", GameScript::Recoil,0},
 	{"removeareatype", GameScript::RemoveAreaType,0},
 	{"removeareaflag", GameScript::RemoveAreaFlag,0},
 	{"savelocation", GameScript::SaveLocation,0},
 	{"saveobjectlocation", GameScript::SaveObjectLocation,0},
-	{"setbeeninpartyflags",GameScript::SetBeenInPartyFlags,0},
-	{"setdoorlocked",GameScript::Lock,AF_BLOCKING},//key shouldn't be checked!
-	{"setfaction",GameScript::SetFaction,0},
-	{"sethp",GameScript::SetHP,0},
-	{"setinternal",GameScript::SetInternal,0},
-	{"setmoraleai",GameScript::SetMoraleAI,0},
-	{"setquestdone",GameScript::SetQuestDone,0},
-	{"setteam",GameScript::SetTeam,0},
-	{"settextcolor",GameScript::SetTextColor,0},
-	{"setvisualrange",GameScript::SetVisualRange,0},
-	{"removejournalentry",GameScript::RemoveJournalEntry,0},
-	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
-	{"runawayfromnointerrupt",GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
-	{"runawayfrompoint",GameScript::RunAwayFromPoint,AF_BLOCKING},
-	{"runtoobject",GameScript::MoveToObject,AF_BLOCKING}, //until we know better
-	{"runtopoint",GameScript::MoveToPoint,AF_BLOCKING}, //until we know better
-	{"runtopointnorecticle",GameScript::MoveToPoint,AF_BLOCKING},//until we know better
-	{"screenshake",GameScript::ScreenShake,AF_BLOCKING},
-	{"setanimstate",GameScript::SetAnimState,AF_BLOCKING},
+	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags,0},
+	{"setdoorlocked", GameScript::Lock,AF_BLOCKING},//key shouldn't be checked!
+	{"setfaction", GameScript::SetFaction,0},
+	{"sethp", GameScript::SetHP,0},
+	{"setinternal", GameScript::SetInternal,0},
+	{"setmoraleai", GameScript::SetMoraleAI,0},
+	{"setquestdone", GameScript::SetQuestDone,0},
+	{"setteam", GameScript::SetTeam,0},
+	{"settextcolor", GameScript::SetTextColor,0},
+	{"setvisualrange", GameScript::SetVisualRange,0},
+	{"removejournalentry", GameScript::RemoveJournalEntry,0},
+	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING},
+	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
+	{"runawayfrompoint", GameScript::RunAwayFromPoint,AF_BLOCKING},
+	{"runtoobject", GameScript::MoveToObject,AF_BLOCKING}, //until we know better
+	{"runtopoint", GameScript::MoveToPoint,AF_BLOCKING}, //until we know better
+	{"runtopointnorecticle", GameScript::MoveToPoint,AF_BLOCKING},//until we know better
+	{"screenshake", GameScript::ScreenShake,AF_BLOCKING},
+	{"setanimstate", GameScript::SetAnimState,AF_BLOCKING},
 	{"setarearestflag", GameScript::SetAreaRestFlag,0},
-	{"setdialog",GameScript::SetDialogue,AF_BLOCKING},
-	{"setdialogue",GameScript::SetDialogue,AF_BLOCKING},
-	{"setglobal",GameScript::SetGlobal,AF_MERGESTRINGS},
-	{"setglobaltimer",GameScript::SetGlobalTimer,AF_MERGESTRINGS},
-	{"setnumtimestalkedto",GameScript::SetNumTimesTalkedTo,0},
-	{"setplayersound",GameScript::SetPlayerSound,0},
-	{"settokenglobal",GameScript::SetTokenGlobal,AF_MERGESTRINGS},
-	{"sg",GameScript::SG,0},
-	{"smallwait",GameScript::SmallWait,AF_BLOCKING},
-	{"startcutscene",GameScript::StartCutScene,0},
-	{"startcutscenemode",GameScript::StartCutSceneMode,0},
-	{"startdialog",GameScript::StartDialogue,AF_BLOCKING},
-	{"startdialogue",GameScript::StartDialogue,AF_BLOCKING},
-	{"startdialoginterrupt",GameScript::StartDialogueInterrupt,AF_BLOCKING},
-	{"startdialogueinterrupt",GameScript::StartDialogueInterrupt,AF_BLOCKING},
-	{"startdialognoname",GameScript::StartDialogue,AF_BLOCKING},
-	{"startdialoguenoname",GameScript::StartDialogue,AF_BLOCKING},
-	{"startdialognoset",GameScript::StartDialogueNoSet,AF_BLOCKING},
-	{"startdialoguenoset",GameScript::StartDialogueNoSet,AF_BLOCKING},
-	{"startdialoguenosetinterrupt",GameScript::StartDialogueNoSetInterrupt,AF_BLOCKING},
-	{"startdialogoverride",GameScript::StartDialogueOverride,AF_BLOCKING},
-	{"startdialogueoverride",GameScript::StartDialogueOverride,AF_BLOCKING},
-	{"startdialogoverrideinterrupt",GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
-	{"startdialogueoverrideinterrupt",GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
-	{"startmovie",GameScript::StartMovie,AF_BLOCKING},
-	{"startsong",GameScript::StartSong,0},
-	{"swing",GameScript::Swing,0},
-	{"swingonce",GameScript::SwingOnce,0},
-	{"takepartygold",GameScript::TakePartyGold,0},
-	{"textscreen",GameScript::TextScreen,0},
-	{"triggeractivation",GameScript::TriggerActivation,0},
-	{"unhidegui",GameScript::UnhideGUI,0},
-	{"unlock",GameScript::Unlock,0},
-	{"unmakeglobal",GameScript::UnMakeGlobal,0}, //this is a GemRB extension
-	{"verbalconstant",GameScript::VerbalConstant,0},
-	{"wait",GameScript::Wait, AF_BLOCKING},
-	{"waitrandom",GameScript::WaitRandom, AF_BLOCKING}, { NULL,NULL,0},
+	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},
+	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
+	{"setglobal", GameScript::SetGlobal,AF_MERGESTRINGS},
+	{"setglobaltimer", GameScript::SetGlobalTimer,AF_MERGESTRINGS},
+	{"setnumtimestalkedto", GameScript::SetNumTimesTalkedTo,0},
+	{"setplayersound", GameScript::SetPlayerSound,0},
+	{"settokenglobal", GameScript::SetTokenGlobal,AF_MERGESTRINGS},
+	{"sg", GameScript::SG,0},
+	{"smallwait", GameScript::SmallWait,AF_BLOCKING},
+	{"startcutscene", GameScript::StartCutScene,0},
+	{"startcutscenemode", GameScript::StartCutSceneMode,0},
+	{"startdialog", GameScript::StartDialogue,AF_BLOCKING},
+	{"startdialogue", GameScript::StartDialogue,AF_BLOCKING},
+	{"startdialoginterrupt", GameScript::StartDialogueInterrupt,AF_BLOCKING},
+	{"startdialogueinterrupt", GameScript::StartDialogueInterrupt,AF_BLOCKING},
+	{"startdialognoname", GameScript::StartDialogue,AF_BLOCKING},
+	{"startdialoguenoname", GameScript::StartDialogue,AF_BLOCKING},
+	{"startdialognoset", GameScript::StartDialogueNoSet,AF_BLOCKING},
+	{"startdialoguenoset", GameScript::StartDialogueNoSet,AF_BLOCKING},
+	{"startdialoguenosetinterrupt", GameScript::StartDialogueNoSetInterrupt,AF_BLOCKING},
+	{"startdialogoverride", GameScript::StartDialogueOverride,AF_BLOCKING},
+	{"startdialogueoverride", GameScript::StartDialogueOverride,AF_BLOCKING},
+	{"startdialogoverrideinterrupt", GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
+	{"startdialogueoverrideinterrupt", GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
+	{"startmovie", GameScript::StartMovie,AF_BLOCKING},
+	{"startsong", GameScript::StartSong,0},
+	{"swing", GameScript::Swing,0},
+	{"swingonce", GameScript::SwingOnce,0},
+	{"takepartygold", GameScript::TakePartyGold,0},
+	{"textscreen", GameScript::TextScreen,0},
+	{"triggeractivation", GameScript::TriggerActivation,0},
+	{"unhidegui", GameScript::UnhideGUI,0},
+	{"unlock", GameScript::Unlock,0},
+	{"unmakeglobal", GameScript::UnMakeGlobal,0}, //this is a GemRB extension
+	{"verbalconstant", GameScript::VerbalConstant,0},
+	{"wait", GameScript::Wait, AF_BLOCKING},
+	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING}, { NULL,NULL,0},
 };
 
 //Make this an ordered list, so we could use bsearch!
 static ObjectLink objectnames[] = {
-	{"bestac",GameScript::BestAC},
-	{"eighthnearest",GameScript::EighthNearest},
-	{"eighthnearestenemyof",GameScript::EighthNearestEnemyOf},
-	{"fifthnearest",GameScript::FifthNearest},
-	{"fifthnearestenemyof",GameScript::FifthNearestEnemyOf},
-	{"fourthnearest",GameScript::FourthNearest},
-	{"fourthnearestenemyof",GameScript::FourthNearestEnemyOf},
-	{"lastseenby",GameScript::LastSeenBy},
-	{"lasttalkedtoby",GameScript::LastTalkedToBy},
-	{"myself",GameScript::Myself},
-	{"nearest",GameScript::Nearest},
-	{"nearestenemyof",GameScript::NearestEnemyOf},
-	{"ninthnearest",GameScript::NinthNearest},
-	{"ninthnearestenemyof",GameScript::NinthNearestEnemyOf},
+	{"bestac", GameScript::BestAC},
+	{"eighthnearest", GameScript::EighthNearest},
+	{"eighthnearestenemyof", GameScript::EighthNearestEnemyOf},
+	{"fifthnearest", GameScript::FifthNearest},
+	{"fifthnearestenemyof", GameScript::FifthNearestEnemyOf},
+	{"fourthnearest", GameScript::FourthNearest},
+	{"fourthnearestenemyof", GameScript::FourthNearestEnemyOf},
+	{"lastseenby", GameScript::LastSeenBy},
+	{"lasttalkedtoby", GameScript::LastTalkedToBy},
+	{"lasttrigger", GameScript::LastTrigger},
+	{"myself", GameScript::Myself},
+	{"nearest", GameScript::Nearest},
+	{"nearestenemyof", GameScript::NearestEnemyOf},
+	{"ninthnearest", GameScript::NinthNearest},
+	{"ninthnearestenemyof", GameScript::NinthNearestEnemyOf},
 	{"nothing", GameScript::Nothing},
-	{"player1",GameScript::Player1},
-	{"player1fill",GameScript::Player1Fill},
-	{"player2",GameScript::Player2},
-	{"player2fill",GameScript::Player2Fill},
-	{"player3",GameScript::Player3},
-	{"player3fill",GameScript::Player3Fill},
-	{"player4",GameScript::Player4},
-	{"player4fill",GameScript::Player4Fill},
-	{"player5",GameScript::Player5},
-	{"player5fill",GameScript::Player5Fill},
-	{"player6",GameScript::Player6},
-	{"player6fill",GameScript::Player6Fill},
-	{"player7",GameScript::Player7},
-	{"player7fill",GameScript::Player7Fill},
-	{"player8",GameScript::Player8},
-	{"player8fill",GameScript::Player8Fill},
-	{"protagonist",GameScript::Protagonist},
-	{"secondnearest",GameScript::SecondNearest},
-	{"secondnearestenemyof",GameScript::SecondNearestEnemyOf},
+	{"player1", GameScript::Player1},
+	{"player1fill", GameScript::Player1Fill},
+	{"player2", GameScript::Player2},
+	{"player2fill", GameScript::Player2Fill},
+	{"player3", GameScript::Player3},
+	{"player3fill", GameScript::Player3Fill},
+	{"player4", GameScript::Player4},
+	{"player4fill", GameScript::Player4Fill},
+	{"player5", GameScript::Player5},
+	{"player5fill", GameScript::Player5Fill},
+	{"player6", GameScript::Player6},
+	{"player6fill", GameScript::Player6Fill},
+	{"player7", GameScript::Player7},
+	{"player7fill", GameScript::Player7Fill},
+	{"player8", GameScript::Player8},
+	{"player8fill", GameScript::Player8Fill},
+	{"protagonist", GameScript::Protagonist},
+	{"secondnearest", GameScript::SecondNearest},
+	{"secondnearestenemyof", GameScript::SecondNearestEnemyOf},
 	{"selectedcharacter", GameScript::SelectedCharacter},
-	{"seventhnearest",GameScript::SeventhNearest},
-	{"seventhnearestenemyof",GameScript::SeventhNearestEnemyOf},
-	{"sixthnearest",GameScript::SixthNearest},
-	{"sixthnearestenemyof",GameScript::SixthNearestEnemyOf},
-	{"strongestof",GameScript::StrongestOf},
-	{"tenthnearest",GameScript::TenthNearest},
-	{"tenthnearestenemyof",GameScript::TenthNearestEnemyOf},
-	{"thirdnearest",GameScript::ThirdNearest},
-	{"thirdnearestenemyof",GameScript::ThirdNearestEnemyOf},
-	{"weakestof",GameScript::WeakestOf},
-	{"worstac",GameScript::WorstAC},
+	{"seventhnearest", GameScript::SeventhNearest},
+	{"seventhnearestenemyof", GameScript::SeventhNearestEnemyOf},
+	{"sixthnearest", GameScript::SixthNearest},
+	{"sixthnearestenemyof", GameScript::SixthNearestEnemyOf},
+	{"strongestof", GameScript::StrongestOf},
+	{"tenthnearest", GameScript::TenthNearest},
+	{"tenthnearestenemyof", GameScript::TenthNearestEnemyOf},
+	{"thirdnearest", GameScript::ThirdNearest},
+	{"thirdnearestenemyof", GameScript::ThirdNearestEnemyOf},
+	{"weakestof", GameScript::WeakestOf},
+	{"worstac", GameScript::WorstAC},
 	{ NULL,NULL},
 };
 
 static IDSLink idsnames[] = {
-	{"align",GameScript::ID_Alignment},
-	{"alignmen",GameScript::ID_Alignment},
-	{"alignmnt",GameScript::ID_Alignment},
-	{"avclass",GameScript::ID_AVClass},
-	{"class",GameScript::ID_Class},
-	{"classmsk",GameScript::ID_ClassMask},
-	{"ea",GameScript::ID_Allegiance},
-	{"faction",GameScript::ID_Faction},
-	{"gender",GameScript::ID_Gender},
-	{"general",GameScript::ID_General},
-	{"race",GameScript::ID_Race},
-	{"specific",GameScript::ID_Specific},
-	{"subrace",GameScript::ID_Subrace},
-	{"team",GameScript::ID_Team},
+	{"align", GameScript::ID_Alignment},
+	{"alignmen", GameScript::ID_Alignment},
+	{"alignmnt", GameScript::ID_Alignment},
+	{"avclass", GameScript::ID_AVClass},
+	{"class", GameScript::ID_Class},
+	{"classmsk", GameScript::ID_ClassMask},
+	{"ea", GameScript::ID_Allegiance},
+	{"faction", GameScript::ID_Faction},
+	{"gender", GameScript::ID_Gender},
+	{"general", GameScript::ID_General},
+	{"race", GameScript::ID_Race},
+	{"specific", GameScript::ID_Specific},
+	{"subrace", GameScript::ID_Subrace},
+	{"team", GameScript::ID_Team},
 	{ NULL,NULL},
 };
 
@@ -1875,6 +1880,16 @@ Targets *GameScript::Gabber(Scriptable *Sender, Targets *parameters)
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
 		parameters->AddTarget(gc->speaker);
+	}
+	return parameters;
+}
+
+Targets *GameScript::LastTrigger(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	Scriptable *lt = Sender->LastTrigger;
+	if (lt && lt->Type == ST_ACTOR) {
+ 		parameters->AddTarget((Actor *) lt);
 	}
 	return parameters;
 }
@@ -4194,7 +4209,7 @@ void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* ab = ( Actor* ) Sender;
-	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter );
+	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter, true );
 }
 
 void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
@@ -4207,7 +4222,7 @@ void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* ab = ( Actor* ) tar;
-	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter );
+	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter, true );
 }
 
 void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
@@ -4217,8 +4232,73 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 
-	Actor* ab = ( Actor* ) Sender;
-	ab->SetPosition( tar->XPos, tar->YPos );
+	if (!tar) {
+		return;
+	}
+	char Area[9];
+
+	if(tar->Type == ST_ACTOR) {
+		Actor *ac = ( Actor* ) tar;
+		memcpy(Area, ac->Area, 9);
+	}
+	else {
+		Area[0]=0;
+	}
+	if(parameters->string0Parameter) {
+		CreateVisualEffectCore(Sender->XPos, Sender->YPos, parameters->string0Parameter);
+	}
+	MoveBetweenAreasCore( (Actor *) Sender, Area, tar->XPos, tar->YPos, -1, true);
+}
+
+void GameScript::MoveGlobalsTo(Scriptable* Sender, Action* parameters)
+{
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(false);
+	while(i--) {
+		Actor *tar = game->GetPC(i);
+		MoveBetweenAreasCore( tar, parameters->string1Parameter, 
+			parameters->XpointParameter,
+			parameters->YpointParameter, -1, true);
+	}
+}
+
+void GameScript::MoveGlobal(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if(!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	MoveBetweenAreasCore( (Actor *) tar, parameters->string0Parameter,
+		parameters->XpointParameter, parameters->YpointParameter, -1, true);
+}
+
+//we also allow moving to door, container
+void GameScript::MoveGlobalObject(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if(!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	Scriptable* to = GetActorFromObject( Sender, parameters->objects[2] );
+	if(!to) {
+		return;
+	}
+	MoveBetweenAreasCore( (Actor *) tar, parameters->string0Parameter,
+		to->XPos, to->YPos, -1, true);
+}
+
+void GameScript::MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if(!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	Scriptable* to = GetActorFromObject( Sender, parameters->objects[2] );
+	if(!to) {
+		return;
+	}
+	MoveBetweenAreasCore( (Actor *) tar, parameters->string0Parameter,
+		to->XPos, to->YPos, -1, false);
 }
 
 int GameScript::GetHappiness(Scriptable* Sender, int reputation)
@@ -4259,18 +4339,26 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 												IE_CRE_CLASS_ID );
 	aM->Open( ds, true );
 	Actor* ab = aM->GetActor();
-	int x = parameters->XpointParameter;
-	int y = parameters->YpointParameter;
+	int x,y;
+
 	switch (flags & CC_MASK) {
-		case CC_OBJECT:
+		case CC_OFFSCREEN:
+			x = 0;
+			y = 0;
+			break;
+		case CC_OBJECT://use object + offset
 			Sender = GetActorFromObject( Sender, parameters->objects[1] );
-			x += Sender->XPos;
-			y += Sender->YPos;
-		case CC_OFFSET:
-			x += Sender->XPos;
-			y += Sender->YPos;
+			//falling through
+		case CC_OFFSET://use sender + offset
+			x = parameters->XpointParameter+Sender->XPos;
+			y = parameters->YpointParameter+Sender->YPos;
+			break;
+		default: //absolute point
+			x = parameters->XpointParameter;
+			y = parameters->YpointParameter;
+			break;
 	}
-	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter );
+	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter, flags&CC_CHECK_IMPASSABLE );
 	ab->AnimID = IE_ANI_AWAKE;
 	ab->Orientation = parameters->int0Parameter;
 	Map* map = core->GetGame()->GetCurrentMap( );
@@ -4283,25 +4371,34 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	core->FreeInterface( aM );
 }
 
+//use offset from Sender
 void GameScript::CreateCreature(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, 0 );
+	CreateCreatureCore( Sender, parameters, CC_OFFSET | CC_CHECK_IMPASSABLE );
 }
 
-void GameScript::CreateCreatureOffset(Scriptable* Sender, Action* parameters)
+//use offset from Sender
+void GameScript::CreateCreatureImpassable(Scriptable* Sender, Action* parameters)
 {
 	CreateCreatureCore( Sender, parameters, CC_OFFSET );
 }
 
-void GameScript::CreateCreatureObject(Scriptable* Sender, Action* parameters)
+//use offset from Sender
+void GameScript::CreateCreatureAtFeet(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, CC_OBJECT );
+	CreateCreatureCore( Sender, parameters, CC_OFFSET | CC_CHECK_IMPASSABLE );
+}
+
+void GameScript::CreateCreatureOffScreen(Scriptable* Sender, Action* parameters)
+{
+	CreateCreatureCore( Sender, parameters, 0 ); //don't check impassable
 }
 
 //this is the same, object + offset
+//using this for simple createcreatureobject, (0 offsets)
 void GameScript::CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, CC_OBJECT );
+	CreateCreatureCore( Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE );
 }
 
 void GameScript::StartCutSceneMode(Scriptable* Sender, Action* parameters)
@@ -4445,7 +4542,7 @@ void GameScript::CreateCreatureAtLocation(Scriptable* Sender, Action* parameters
 	unsigned int value = CheckVariable(Sender, parameters->string0Parameter);
 	parameters->XpointParameter = *(unsigned short *) value;
 	parameters->XpointParameter = *(((unsigned short *) value)+1);
-	CreateCreatureCore(Sender, parameters, CC_OFFSET);
+	CreateCreatureCore(Sender, parameters, CC_CHECK_IMPASSABLE);
 }
 
 void GameScript::WaitRandom(Scriptable* Sender, Action* parameters)
@@ -4655,31 +4752,28 @@ void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
 	core->GetSoundMgr()->Play( parameters->string0Parameter, Sender->XPos,
-							Sender->YPos );
+				Sender->YPos );
 }
 
-void GameScript::CreateVisualEffectObject(Scriptable* Sender,
-	Action* parameters)
+void GameScript::CreateVisualEffectCore(int X, int Y, const char *effect)
+{
+	DataStream* ds = core->GetResourceMgr()->GetResource( effect, IE_VVC_CLASS_ID );
+	ScriptedAnimation* vvc = new ScriptedAnimation( ds, true, X, Y );
+	core->GetGame()->GetCurrentMap( )->AddVVCCell( vvc );
+}
+
+void GameScript::CreateVisualEffectObject(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
 	}
-	DataStream* ds = core->GetResourceMgr()->GetResource( parameters->string0Parameter,
-												IE_VVC_CLASS_ID );
-	ScriptedAnimation* vvc = new ScriptedAnimation( ds, true, tar->XPos,
-									tar->YPos );
-	core->GetGame()->GetCurrentMap( )->AddVVCCell( vvc );
+	CreateVisualEffectCore(tar->XPos, tar->YPos, parameters->string0Parameter);
 }
 
 void GameScript::CreateVisualEffect(Scriptable* Sender, Action* parameters)
 {
-	DataStream* ds = core->GetResourceMgr()->GetResource( parameters->string0Parameter,
-												IE_VVC_CLASS_ID );
-	ScriptedAnimation* vvc = new ScriptedAnimation( ds, true,
-									parameters->XpointParameter,
-									parameters->YpointParameter );
-	core->GetGame()->GetCurrentMap( )->AddVVCCell( vvc );
+	CreateVisualEffectCore(parameters->XpointParameter, parameters->YpointParameter, parameters->string0Parameter);
 }
 
 void GameScript::DestroySelf(Scriptable* Sender, Action* parameters)
@@ -5097,24 +5191,48 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 	Sender->CurrentAction = NULL;
 }
 
+void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, int X, int Y, int face, bool adjust)
+{
+	if(area[0]) { //do we need to switch area?
+		Game* game = core->GetGame();
+		strncpy( actor->Area, area, 8 );
+		if(!game->InParty(actor) && !game->InStore(actor) ) {
+			game->AddNPC( actor ); //this is required?
+		}
+		Map * map1 = game->GetMap(game->LoadMap( actor->Area ));
+		Map * map2 = game->GetMap(game->LoadMap( area ));
+		if( map1!=map2 ) {
+			map1->RemoveActor( actor );
+		        map2->AddActor( actor );
+		}
+	}
+	actor->SetPosition( X, Y, adjust);
+	if (face !=-1) {
+		actor->Orientation = face;
+	}
+}
+
 void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
-	strcpy( actor->Area, parameters->string0Parameter );
-	if (!actor->FromGame) {
-		actor->FromGame = true;
-		if (actor->InParty)
-			core->GetGame()->SetPC( actor );
-		else
-			core->GetGame()->AddNPC( actor );
-		core->GetGame()->GetCurrentMap( )->RemoveActor( actor );
-		actor->XPos = parameters->XpointParameter;
-		actor->YPos = parameters->YpointParameter;
-		actor->Orientation = parameters->int0Parameter;
+	MoveBetweenAreasCore((Actor *) Sender, parameters->string0Parameter,
+		parameters->XpointParameter, parameters->YpointParameter,
+		parameters->int0Parameter, true);
+}
+
+void GameScript::MoveBetweenAreasEffect(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
 	}
+	if(parameters->string1Parameter) {
+		CreateVisualEffectCore(Sender->XPos, Sender->YPos, parameters->string1Parameter);
+	}
+	MoveBetweenAreasCore((Actor *) Sender, parameters->string0Parameter,
+		parameters->XpointParameter, parameters->YpointParameter,
+		parameters->int0Parameter, true);
 }
 
 void GetPositionFromScriptable(Scriptable* scr, unsigned short& X,
@@ -5430,24 +5548,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	strcpy( actor->Area, parameters->string0Parameter );
-	if (!actor->FromGame) {
-		actor->FromGame = true;
-		if (actor->InParty)
-			core->GetGame()->SetPC( actor );
-		else
-			core->GetGame()->AddNPC( actor );
-	}
-	core->GetGame()->GetCurrentMap( )->RemoveActor( actor );
-	if (parameters->XpointParameter >= 0) {
-		actor->XPos = parameters->XpointParameter;
-	}
-	if (parameters->YpointParameter >= 0) {
-		actor->YPos = parameters->YpointParameter;
-	}
-	if (parameters->int0Parameter >= 0) {
-		actor->Orientation = parameters->int0Parameter;
-	}
+	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter, true);
 }
 
 void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
@@ -5455,12 +5556,11 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	Map *map = core->GetGame()->GetCurrentMap();
+	Actor *actor = (Actor *) Sender;
+	Game *game = core->GetGame();
+	Map *map = game->GetMap(game->LoadMap( actor->Area ));
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
-	long x = ( Sender->XPos - ent->XPos );
-	long y = ( Sender->YPos - ent->YPos );
-	int distance = (int) sqrt( ( double ) ( x* x + y* y ) );
-	if (distance <= 40) {
+	if (Distance(ent->XPos, ent->YPos, Sender) <= 40) {
 		LeaveAreaLUA(Sender, parameters);
 		return;
 	}
@@ -5480,13 +5580,11 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	
-	Map *map = core->GetGame()->GetCurrentMap();
+	Actor *actor = (Actor *) Sender;
+	Game *game = core->GetGame();
+	Map *map = game->GetMap(game->LoadMap( actor->Area ));
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
-	long x = ( Sender->XPos - ent->XPos );
-	long y = ( Sender->YPos - ent->YPos );
-	double distance = sqrt( ( double ) ( x* x + y* y ) );
-	if (distance <= 40) {
+	if (Distance(ent->XPos, ent->YPos, Sender) <= 40) {
 		LeaveAreaLUAPanic(Sender, parameters);
 		return;
 	}
@@ -5562,9 +5660,9 @@ void GameScript::GlobalSetGlobal(Scriptable* Sender, Action* parameters)
 void GameScript::AddGlobals(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender, "GLOBAL",
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender, "GLOBAL",
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	SetVariable( Sender, "GLOBAL", parameters->string0Parameter,
 		value1 + value2 );
 }
@@ -5573,9 +5671,9 @@ void GameScript::AddGlobals(Scriptable* Sender, Action* parameters)
 void GameScript::GlobalAddGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 + value2 );
 }
 
@@ -5602,61 +5700,61 @@ void GameScript::IncrementGlobalOnce(Scriptable* Sender, Action* parameters)
 void GameScript::GlobalSubGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 - value2 );
 }
 
 void GameScript::GlobalAndGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 && value2 );
 }
 
 void GameScript::GlobalOrGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 || value2 );
 }
 
 void GameScript::GlobalBOrGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 | value2 );
 }
 
 void GameScript::GlobalBAndGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 & value2 );
 }
 
 void GameScript::GlobalXorGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 ^ value2 );
 }
 
 void GameScript::GlobalBOr(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		value1 | parameters->int0Parameter );
 }
@@ -5664,7 +5762,7 @@ void GameScript::GlobalBOr(Scriptable* Sender, Action* parameters)
 void GameScript::GlobalBAnd(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		value1 & parameters->int0Parameter );
 }
@@ -5672,7 +5770,7 @@ void GameScript::GlobalBAnd(Scriptable* Sender, Action* parameters)
 void GameScript::GlobalXor(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		value1 ^ parameters->int0Parameter );
 }
@@ -5696,7 +5794,7 @@ void GameScript::GlobalMin(Scriptable* Sender, Action* parameters)
 void GameScript::BitClear(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		value1 & ~parameters->int0Parameter );
 }
@@ -5704,7 +5802,7 @@ void GameScript::BitClear(Scriptable* Sender, Action* parameters)
 void GameScript::GlobalShL(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = parameters->int0Parameter;
 	if (value2 > 31) {
 		value1 = 0;
@@ -5717,7 +5815,7 @@ void GameScript::GlobalShL(Scriptable* Sender, Action* parameters)
 void GameScript::GlobalShR(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = parameters->int0Parameter;
 	if (value2 > 31) {
 		value1 = 0;
@@ -5730,9 +5828,9 @@ void GameScript::GlobalShR(Scriptable* Sender, Action* parameters)
 void GameScript::GlobalMaxGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	if (value1 < value2) {
 		SetVariable( Sender, parameters->string0Parameter, value1 );
 	}
@@ -5741,9 +5839,9 @@ void GameScript::GlobalMaxGlobal(Scriptable* Sender, Action* parameters)
 void GameScript::GlobalMinGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	if (value1 < value2) {
 		SetVariable( Sender, parameters->string0Parameter, value1 );
 	}
@@ -5752,9 +5850,9 @@ void GameScript::GlobalMinGlobal(Scriptable* Sender, Action* parameters)
 void GameScript::GlobalShLGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	if (value2 > 31) {
 		value1 = 0;
 	} else {
@@ -5765,9 +5863,9 @@ void GameScript::GlobalShLGlobal(Scriptable* Sender, Action* parameters)
 void GameScript::GlobalShRGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+		parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+		parameters->string1Parameter );
 	if (value2 > 31) {
 		value1 = 0;
 	} else {

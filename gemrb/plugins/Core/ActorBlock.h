@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.30 2004/04/13 19:38:22 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.31 2004/04/16 18:39:51 avenger_teambg Exp $
  *
  */
 
@@ -98,7 +98,6 @@ public:
 	char scriptName[33];
 	bool Active;
 	Scriptable* LastTrigger;
-	Scriptable* Clicker;
 	Scriptable* LastEntered;
 	unsigned long EndAction;
 	std::list< Action*> actionQueue;

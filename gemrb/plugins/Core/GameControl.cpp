@@ -423,7 +423,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 						short cX = lastMouseX; 
 						short cY = lastMouseY;
 						core->GetVideoDriver()->ConvertToGame( cX, cY );
-						actor->SetPosition( cX, cY );
+						actor->SetPosition( cX, cY, true );
 						printf( "Teleported to %d, %d\n", cX, cY );
 					}
 				}
@@ -664,7 +664,6 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 						 {
 							if (overInfoPoint->Scripts[0]) {
 								overInfoPoint->LastTrigger = selected[0];
-								overInfoPoint->Clicker = selected[0];
 								overInfoPoint->Scripts[0]->Update();
 							} else {
 								if (overInfoPoint->overHeadText) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.25 2004/04/15 16:20:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.26 2004/04/16 18:39:51 avenger_teambg Exp $
  *
  */
 
@@ -149,10 +149,15 @@ public:
 	int SetPC(Actor* pc);
 	int DelPC(unsigned int slot, bool autoFree = false);
 	int DelNPC(unsigned int slot, bool autoFree = false);
+	/** returns map in index */
 	Map* GetMap(unsigned int index);
+	/** returns slot of the map if found */
+	int FindMap(const char *ResRef);
         Map * GetCurrentMap();
 	int AddMap(Map* map);
-	int LoadMap(char* ResRef);
+	/** returns slot of the map, if it was already loaded,
+		don't load it again */
+	int LoadMap(const char* ResRef);
 	int DelMap(unsigned int index, bool autoFree = false);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index);

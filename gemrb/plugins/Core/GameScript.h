@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.101 2004/04/16 15:06:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.102 2004/04/16 18:39:51 avenger_teambg Exp $
  *
  */
 
@@ -620,9 +620,12 @@ struct TriggerLink {
 };
 
 //createcreature flags
-#define CC_OFFSET    1  //add the position of Sender to the coordinates
-#define CC_OBJECT    2  //use object instead of sender
+#define CC_OFFSET    1 
+#define CC_OBJECT    2  
+#define CC_OFFSCREEN 3
 #define CC_MASK      3
+#define CC_CHECK_IMPASSABLE  4  //adjust position
+#define CC_PLAY_ANIM 8          //play animation
 
 //begindialog flags
 #define BD_STRING0   0
@@ -710,6 +713,8 @@ private:
 	static Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
 	static int GetHappiness(Scriptable* Sender, int reputation);
 	static int GetHPPercent(Scriptable* Sender);
+	static void CreateVisualEffectCore(int X, int Y, const char *effect);
+	static void MoveBetweenAreasCore(Actor* actor, const char *area, int X, int Y, int face, bool adjust);
 	static int SeeCore(Scriptable* Sender, Trigger* parameters, int flags);
 	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
@@ -925,8 +930,11 @@ public:
 	static void Continue(Scriptable* Sender, Action* parameters);
 	static void CreateCreature(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureAtLocation(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureAtFeet(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureImpassable(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObject(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureOffScreen(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureOffset(Scriptable* Sender, Action* parameters);
 	static void CreatePartyGold(Scriptable *Sender, Action *parameters);
 	static void CreateVisualEffect(Scriptable* Sender, Action* parameters);
@@ -1002,6 +1010,11 @@ public:
 	static void MoraleInc(Scriptable* Sender, Action* parameters);
 	static void MoraleSet(Scriptable* Sender, Action* parameters);
 	static void MoveBetweenAreas(Scriptable* Sender, Action* parameters);
+	static void MoveBetweenAreasEffect(Scriptable* Sender, Action* parameters);
+	static void MoveGlobal(Scriptable* Sender, Action* parameters);
+	static void MoveGlobalObject(Scriptable* Sender, Action* parameters);
+	static void MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameters);
+	static void MoveGlobalsTo(Scriptable* Sender, Action* parameters);
 	static void MoveToPoint(Scriptable* Sender, Action* parameters);
 	static void MoveToObject(Scriptable* Sender, Action* parameters);
 	static void MoveToOffset(Scriptable* Sender, Action* parameters);
@@ -1078,6 +1091,7 @@ public:
 	static Targets *Gabber(Scriptable *Sender, Targets *parameters);
 	static Targets *LastSeenBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastTalkedToBy(Scriptable *Sender, Targets *parameters);
+	static Targets *LastTrigger(Scriptable *Sender, Targets *parameters);
 	static Targets *Myself(Scriptable *Sender, Targets *parameters);
 	static Targets *Nearest(Scriptable *Sender, Targets *parameters);
 	static Targets *NearestEnemyOf(Scriptable *Sender, Targets *parameters);

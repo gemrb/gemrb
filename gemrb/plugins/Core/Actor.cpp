@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.41 2004/04/10 17:46:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.42 2004/04/16 18:39:50 avenger_teambg Exp $
  *
  */
 
@@ -366,11 +366,11 @@ void Actor::DebugDump()
 	printf( "Allegiance: %d\n",(int) GetStat(IE_EA) );
 }
 
-void Actor::SetPosition(unsigned int XPos, unsigned int YPos)
+void Actor::SetPosition(unsigned int XPos, unsigned int YPos, bool jump)
 {
 	XPos/=16;
 	YPos/=12;
-	if (!GetStat( IE_DONOTJUMP ) || !anims->CircleSize) {
+	if (jump && !GetStat( IE_DONOTJUMP ) && anims->CircleSize) {
 		core->GetPathFinder()->AdjustPosition( XPos, YPos );
 	}
 	MoveTo( ( XPos * 16 ) + 8, ( YPos * 12 ) + 6 );

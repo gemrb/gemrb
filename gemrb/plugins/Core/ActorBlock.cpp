@@ -20,7 +20,6 @@ Scriptable::Scriptable(ScriptableType type)
 	timeStartDisplaying = 0;
 	scriptName[0] = 0;
 	LastTrigger = NULL;
-	Clicker = NULL;
 	LastEntered = NULL;
 	Active = true;
 	EndAction = 2;
@@ -32,6 +31,8 @@ Scriptable::Scriptable(ScriptableType type)
 	resetAction = false;
 	neverExecuted = true;
 	OnCreation = true;
+	XPos = 0;
+	YPos = 0;
 
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
@@ -201,7 +202,7 @@ void Scriptable::ProcessActions()
 
 					case ST_TRIGGER:
 						 {
-							Clicker = NULL;
+							LastTrigger = NULL;
 							neverExecuted = true;
 						}
 						break;

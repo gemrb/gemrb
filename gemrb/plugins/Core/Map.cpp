@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.86 2004/04/16 14:53:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.87 2004/04/16 18:39:51 avenger_teambg Exp $
  *
  */
 
@@ -157,7 +157,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 		//If this InfoPoint is a Switch Trigger
 		if (ip->Type == ST_TRIGGER) {
 			//Check if this InfoPoint was activated
-			if (ip->Clicker)
+			if (ip->LastTrigger)
 				//Run the InfoPoint script
 				ip->ExecuteScript( ip->Scripts[0] );
 				ip->OnCreation = false;
@@ -212,7 +212,6 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 							strcpy( gc->EntranceName, ip->EntranceName );
 						} else {
 							if (ip->Scripts[0]) {
-								ip->Clicker = actor;
 								ip->LastTrigger = actor;
 								//ip->Scripts[0]->Update();
 								ip->ExecuteScript( ip->Scripts[0] );
