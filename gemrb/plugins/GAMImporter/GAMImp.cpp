@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.29 2004/08/02 22:17:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.30 2004/08/04 22:47:33 edheldil Exp $
  *
  */
 
@@ -203,7 +203,7 @@ Game* GAMImp::GetGame()
 	}
 
 	// Loading known creatures array (familiars)
-	if (version == 11 && core->GetBeastsINI() != NULL) {
+	if (version == 12 && core->GetBeastsINI() != NULL) {
 		int beasts_count = core->GetBeastsINI()->GetTagsCount();
 		newGame->familiars = (ieByte*)malloc(beasts_count);
 		str->Seek( newGame->FamiliarsOffset, GEM_STREAM_START );
