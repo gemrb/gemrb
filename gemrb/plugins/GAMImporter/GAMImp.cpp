@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.10 2004/01/09 11:41:13 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.11 2004/01/18 16:20:58 balrog994 Exp $
  *
  */
 
@@ -204,8 +204,7 @@ Game * GAMImp::GetGame()
 		strcpy(actor->Area, pcInfo.Area);
 		if(stricmp(pcInfo.Area, CurrentArea) == 0)
 			newMap->AddActor(actor);
-		else
-			newGame->AddNPC(actor);
+		newGame->AddNPC(actor);
 	}
 	core->FreeInterface(aM);
 	//Loading GLOBALS
