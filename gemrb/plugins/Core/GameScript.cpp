@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.186 2004/08/20 13:03:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.187 2004/08/20 15:17:34 avenger_teambg Exp $
  *
  */
 
@@ -406,6 +406,7 @@ static ActionLink actionnames[] = {
 	{"playdeadinterruptable", GameScript::PlayDeadInterruptable,0},
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
+	{"playsequence", GameScript::PlaySequence,0},
 	{"playsong", GameScript::StartSong,0},
 	{"playsound", GameScript::PlaySound,0},
 	{"playsoundnotranged", GameScript::PlaySoundNotRanged,0},

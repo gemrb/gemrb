@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.63 2004/08/20 13:07:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.64 2004/08/20 15:17:34 avenger_teambg Exp $
  *
  */
 
@@ -227,14 +227,6 @@ ieDword Actor::GetStat(unsigned int StatIndex)
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
 	}
-	switch(StatIndex) {
-		case IE_GOLD:
-			if(InParty) return core->GetGame()->PartyGold;
-			break;
-		case IE_REPUTATION:
-			if(InParty) return core->GetGame()->Reputation;
-			break;
-	}
 	return Modified[StatIndex];
 }
 
@@ -279,6 +271,11 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 	}
 	Modified[StatIndex] = Value;
 	switch (StatIndex) {
+		case IE_REPUTATION:
+			if(InParty==1) {
+				core->GetGame()->Reputation=Modified[IE_REPUTATION];
+			}
+			break;
 		case IE_GOLD:
 			if(InParty) {
 				core->GetGame()->PartyGold+=Modified[IE_GOLD];
