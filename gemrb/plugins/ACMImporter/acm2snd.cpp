@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/Attic/acm2snd.cpp,v 1.4 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/Attic/acm2snd.cpp,v 1.5 2003/12/13 07:40:18 edheldil Exp $
  *
  */
 
+#include <config.h>
 //#include "stdafx.h"
 //acm2snd.cpp
 // Acm to Wav conversion
@@ -29,6 +30,9 @@
 #else
 #include <fcntl.h>
 #include <unistd.h>
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
 #endif
 #include <string.h>
 #include "readers.h"
