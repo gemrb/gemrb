@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.12 2003/11/28 09:37:40 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.13 2003/11/29 07:49:24 balrog994 Exp $
  *
  */
 
@@ -64,6 +64,9 @@ bool AREImp::Open(DataStream * stream, bool autoFree)
 	str->Seek(0x54+bigheader, GEM_STREAM_START);
 	str->Read(&ActorOffset, 4);
 	str->Read(&ActorCount, 2);
+	str->Seek(0x70+bigheader, GEM_STREAM_START);
+	str->Read(&ContainersOffset, 4);
+	str->Read(&ContainersCount, 2);
 	str->Seek(0x7c+bigheader, GEM_STREAM_START);
 	str->Read(&VerticesOffset, 4);
 	str->Read(&VerticesCount, 2);
@@ -141,7 +144,12 @@ Map * AREImp::GetMap()
 		BBClosed.y = minY;
 		BBClosed.w = maxX-minX;
 		BBClosed.h = maxY-minY;
-		str->Seek(0x20, GEM_CURRENT_POS);
+		str->Seek(0x10, GEM_CURRENT_POS);
+		char OpenResRef[9], CloseResRef[9];
+		str->Read(OpenResRef, 8);
+		OpenResRef[8] = 0;
+		str->Read(CloseResRef, 8);
+		CloseResRef[8] = 0;
 		str->Read(&cursor, 4);
 		//Reading Open Polygon
 		str->Seek(VerticesOffset + (OpenFirstVertex*4), GEM_STREAM_START);
@@ -167,6 +175,55 @@ Map * AREImp::GetMap()
 		unsigned short * indices = tmm->GetDoorIndices(ShortName, &count);
 		Door * door = tm->AddDoor(ShortName, (Flags&1 ? 0 : 1), indices, count, open, closed);
 		door->Cursor = cursor;
+		memcpy(door->OpenSound, OpenResRef, 9);
+		memcpy(door->CloseSound, CloseResRef, 9);
+	}
+	//Loading Containers
+	for(int i = 0; i < ContainersCount; i++) {
+		str->Seek(ContainersOffset + (i*0xC0), GEM_STREAM_START);
+		unsigned short Type, LockDiff, Locked, Unknown, TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
+		char Name[33];
+		Point p;
+		str->Read(Name, 32);
+		Name[32] = 0;
+		str->Read(&p.x, 2);
+		str->Read(&p.y, 2);
+		str->Read(&Type, 2);
+		str->Read(&LockDiff, 2);
+		str->Read(&Locked, 2);
+		str->Read(&Unknown, 2);
+		str->Read(&TrapDetDiff, 2);
+		str->Read(&TrapRemDiff, 2);
+		str->Read(&Trapped, 2);
+		str->Read(&TrapDetected, 2);
+		str->Seek(4, GEM_CURRENT_POS);
+		Region bbox;
+		str->Read(&bbox.x, 2);
+		str->Read(&bbox.y, 2);
+		str->Read(&bbox.w, 2);
+		str->Read(&bbox.h, 2);
+		bbox.w -= bbox.x;
+		bbox.h -= bbox.y;
+		str->Seek(16, GEM_CURRENT_POS);
+		unsigned long firstIndex, vertCount;
+		str->Read(&firstIndex, 4);
+		str->Read(&vertCount, 4);
+		str->Seek(VerticesOffset + (firstIndex*4), GEM_STREAM_START);
+		Point * points = (Point*)malloc(vertCount*sizeof(Point));
+		for(int x = 0; x < vertCount; x++) {
+			str->Read(&points[x].x, 2);
+			str->Read(&points[x].y, 2);
+		}
+		Gem_Polygon * poly = new Gem_Polygon(points, vertCount);
+		free(points);
+		poly->BBox = bbox;
+		Container * c = tm->AddContainer(Name, Type, poly);
+		c->LockDifficulty = LockDiff;
+		c->Locked = Locked;
+		c->TrapDetectionDiff = TrapDetDiff;
+		c->TrapRemovalDiff = TrapRemDiff;
+		c->Trapped = Trapped;
+		c->TrapDetected = TrapDetected;
 	}
 	//Loading Actors
 	str->Seek(ActorOffset, GEM_STREAM_START);
