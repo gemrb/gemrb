@@ -54,6 +54,8 @@ public:
 	virtual int SetText(const char * string) = 0;
 	/** Variables */
 	char VarName[MAX_VARIABLE_LENGTH];
+	/** the value of the button to add to the variable */
+	unsigned long Value;
 public: // Public attributes
 	/** Defines the Control ID Number used for GUI Scripting */
 	unsigned long ControlID;

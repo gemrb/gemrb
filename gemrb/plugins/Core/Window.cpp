@@ -17,6 +17,7 @@
 
 #include "../../includes/win32def.h"
 #include "Window.h"
+#include "Control.h"
 #include "Interface.h"
 
 extern Interface * core;
@@ -132,6 +133,17 @@ void Window::Invalidate()
 	Changed = true;
 }
 
+void Window::RedrawButtons(char *VarName, unsigned long Sum)
+{
+	for(int i = 0; i < Controls.size(); i++) {
+		if(Controls[i]->ControlType == IE_GUI_BUTTON)
+		{
+			Button *bt = (Button *) (Controls[i]);
+			bt->RedrawButton(VarName, Sum);
+		}
+	}
+}
+
 /** Searches for a ScrollBar and a TextArea to link them */
 void Window::Link(unsigned short SBID, unsigned short TAID)
 {
@@ -139,14 +151,14 @@ void Window::Link(unsigned short SBID, unsigned short TAID)
 	TextArea *ta = NULL;
 	std::vector<Control*>::iterator m;
 	for(m = Controls.begin(); m != Controls.end(); m++) {
-		if((*m)->ControlType == 7) {
+		if((*m)->ControlType == IE_GUI_SCROLLBAR) {
 			if((*m)->ControlID == SBID) {
 				sb = (ScrollBar*)(*m);
 				if(ta != NULL)
 					break;
 			}
 		}
-		else if((*m)->ControlType == 5) {
+		else if((*m)->ControlType == IE_GUI_TEXTAREA) {
 			if((*m)->ControlID == TAID) {
 				ta = (TextArea*)(*m);
 				if(sb != NULL)

@@ -209,10 +209,10 @@ static PyObject * GemRB_SetControlStatus(PyObject *self, PyObject *args)
 
 static PyObject * GemRB_SetVarAssoc(PyObject *self, PyObject *args)
 {
-	int WindowIndex, ControlIndex;
-	char* varname;
+	int WindowIndex, ControlIndex, Value;
+	char* VarName;
 
-	if(!PyArg_ParseTuple(args, "iis", &WindowIndex, &ControlIndex, &varname)) {
+	if(!PyArg_ParseTuple(args, "iisi", &WindowIndex, &ControlIndex, &VarName,Value)) {
 		printMessage("GUIScript", "Syntax Error: SetVarAssoc(WindowIndex, ControlIndex, VariableName)\n", LIGHT_RED);
 		return NULL;
 	}
@@ -225,7 +225,8 @@ static PyObject * GemRB_SetVarAssoc(PyObject *self, PyObject *args)
 	if(ctrl == NULL)
 		return NULL;
 
-	strncpy(ctrl->VarName, varname, MAX_VARIABLE_LENGTH);
+	strncpy(ctrl->VarName, VarName, MAX_VARIABLE_LENGTH);
+	ctrl->Value=Value;
 
 	Py_INCREF(Py_None);
 	return Py_None;

@@ -49,12 +49,6 @@
 
 class GEM_EXPORT Button : public Control
 {
-private:
-	bool Clear;
-	char * Text;
-	bool hasText;
-	Font * font;
-	bool ToggleState;
 public: 
 	Button(bool Clear = false);
 	~Button();
@@ -82,8 +76,15 @@ public: // Public Events
   char ButtonOnPress[64];
   /** Sets the Display Flags */
   int SetFlags(int Flags, int Operation);
+  /** Refreshes the button from a radio group */
+  void RedrawButton(char *VariableName, int Sum);
 private: // Private attributes
-	/** Button Unpressed Image */
+  bool Clear;
+  char * Text;
+  bool hasText;
+  Font * font;
+  bool ToggleState;
+  /** Button Unpressed Image */
   Sprite2D * Unpressed;
   /** Button Pressed Image */
   Sprite2D * Pressed;

@@ -45,6 +45,7 @@ Button::Button(bool Clear){
 	font = core->GetFont("STONEBIG");
 	Flags = 0x04;
 	ToggleState = false;
+	Value = 0;
 }
 Button::~Button(){
 	Video * video = core->GetVideoDriver();
@@ -178,31 +179,39 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 {
 	if(State == IE_GUI_BUTTON_DISABLED)
 		return;
-	Changed = true;
-	if(Flags & 0x10) {
-		ToggleState = !ToggleState;
-		if(ToggleState)
-			State = IE_GUI_BUTTON_UNPRESSED;
-		else
-			State = IE_GUI_BUTTON_SELECTED;
-	}
-	else
-		State = IE_GUI_BUTTON_UNPRESSED;
-	if(VarName[0] != 0) {
-		core->GetDictionary()->SetAt(VarName, ToggleState);
-	}
-	if((x >= 0) && (x <= Width))
-		if((y >= 0) && (y <= Height)) {
-			if(Flags & 0x04) {
-				if(Flags & 0x08)
-					core->GetSoundMgr()->Play("GAM_04");
-				else
-					core->GetSoundMgr()->Play("GAM_03");
+	if((x <= Width) && (y <= Height)) {
+		Changed = true;
+		if(Flags & 0x10) {  //checkbox
+			ToggleState = !ToggleState;
+			if(ToggleState)
+				State = IE_GUI_BUTTON_SELECTED;
+			else
+				State = IE_GUI_BUTTON_UNPRESSED;
+			if(VarName[0] != 0) {
+				unsigned long tmp=0;
+				core->GetDictionary()->Lookup( VarName, tmp);
+				core->GetDictionary()->SetAt(VarName, tmp^=Value);
+				((Window*)Owner)->RedrawButtons(VarName, tmp);
 			}
-			if(ButtonOnPress[0] != 0)
-				core->GetGUIScriptEngine()->RunFunction(ButtonOnPress);
-			
 		}
+		else if(Flags & 0x20) {  //radio button
+			ToggleState = true;
+			State = IE_GUI_BUTTON_SELECTED;
+			if(VarName[0] != 0) {
+				core->GetDictionary()->SetAt(VarName, Value);
+			}
+		}
+		else
+			State = IE_GUI_BUTTON_UNPRESSED;
+		if(Flags & 0x04) {
+			if(Flags & 0x08)
+				core->GetSoundMgr()->Play("GAM_04");
+			else
+				core->GetSoundMgr()->Play("GAM_03");
+		}
+		if(ButtonOnPress[0] != 0)
+			core->GetGUIScriptEngine()->RunFunction(ButtonOnPress);
+	}
 }
 
 /** Sets the Text of the current control */
@@ -248,4 +257,16 @@ int Button::SetFlags(int arg_flags, int opcode)
 	Changed = true;
 	((Window*)Owner)->Invalidate();
 	return 0;
+}
+
+/** Redraws a button from a given radio button group */
+void Button::RedrawButton(char *VariableName, int Sum)
+{
+	if(strnicmp(VarName, VariableName, MAX_VARIABLE_LENGTH)) return;
+	ToggleState=!!(Sum&Value);
+	if(ToggleState)
+		State = IE_GUI_BUTTON_SELECTED;
+	else
+		State = IE_GUI_BUTTON_UNPRESSED;
+	Changed = true;
 }

@@ -26,6 +26,7 @@ Control::Control(){
 	hasFocus = false;
 	Changed = true;
 	VarName[0] = 0;
+	Value = 0;
 }
 
 Control::~Control(){

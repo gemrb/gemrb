@@ -58,6 +58,9 @@ public:
   void SetFocused(Control * ctrl);
   /** Redraw all the Window */
   void Invalidate();
+  /** Redraw buttons of the same group */
+  void RedrawButtons(char *VarName, unsigned long tmp);
+  /** Links a scrollbar to a text area */
   void Link(unsigned short SBID, unsigned short TAID);
 public: //Public attributes
   /** Window ID */
