@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.26 2004/04/18 14:25:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.27 2004/04/18 15:17:46 avenger_teambg Exp $
  *
  */
 
@@ -135,8 +135,8 @@ int FileStream::Seek(int newpos, int type)
 		default:
 			return GEM_ERROR;
 	}
-	if (Pos>=size) {
-abort();
+	if (Pos>size) {
+		printf("[Streams]: Invalid seek\n");
 		return GEM_ERROR;
 	}
 	return GEM_OK;

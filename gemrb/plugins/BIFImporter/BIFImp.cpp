@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.11 2004/04/18 14:25:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.12 2004/04/18 15:17:44 avenger_teambg Exp $
  *
  */
 
@@ -140,10 +140,6 @@ int BIFImp::OpenArchive(char* filename)
 		compressed->Read( &unCompBifSize, 4 );
 		printf( "\nDecompressing file: [..........]" );
 		fflush(stdout);
-		char fname[_MAX_PATH];
-		ExtractFileFromPath( fname, filename );
-		strcpy( path, core->CachePath );
-		strcat( path, fname );
 		in_cache = fopen( path, "wb" );
 		int finalsize = 0;
 		int laststep = 0;
@@ -153,7 +149,7 @@ int BIFImp::OpenArchive(char* filename)
 			finalsize = ftell( in_cache );
 			if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
 				laststep++;
-				printf( "\r" );
+				printf( "\b\b\b\b\b\b\b\b\b\b\b" );
 				for (int l = 0; l < laststep; l++)
 					printf( "|" );
 				for (int l = laststep; l < 10; l++)
@@ -172,6 +168,7 @@ int BIFImp::OpenArchive(char* filename)
 			ReadBIF();
 		else
 			return GEM_ERROR;
+		return GEM_OK;
 	}
 	delete (compressed);
 	return GEM_ERROR;
