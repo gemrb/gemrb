@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.2 2004/04/07 09:54:53 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.3 2004/04/13 18:51:23 doc_wagon Exp $
  *
  */
 
@@ -34,7 +34,7 @@ Spellbook::Spellbook()
 Spellbook::~Spellbook()
 {
 	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
-		for (int j = 0; j < spells[i].size(); j++) {
+		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			delete( spells[i][j] );
 		}
 	}
@@ -80,10 +80,10 @@ bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 void Spellbook::ChargeAllSpells()
 {
 	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
-		for (int j = 0; j < spells[i].size(); j++) {
+		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
 
-			for (int k = 0; k < sm->memorized_spells.size(); k++)
+			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++)
 				ChargeSpell( sm->memorized_spells[k] );
 		}
 	}
@@ -105,7 +105,7 @@ void Spellbook::dump()
 {
 	printf( "SPELLBOOK:\n" );
 	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
-		for (int j = 0; j < spells[i].size(); j++) {
+		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
 			//if (!sm || !sm->Number) continue;
 			if (!sm) continue;
@@ -114,7 +114,7 @@ void Spellbook::dump()
 
 			if (sm->known_spells.size()) 
 				printf( "  Known spells:\n" );
-			for (int k = 0; k < sm->known_spells.size(); k++) {
+			for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
 				CREKnownSpell* spl = sm->known_spells[k];
 				if (!spl) continue;
 
@@ -123,7 +123,7 @@ void Spellbook::dump()
 
 			if (sm->memorized_spells.size()) 
 				printf( "  Memorized spells:\n" );
-			for (int k = 0; k < sm->memorized_spells.size (); k++) {
+			for (unsigned int k = 0; k < sm->memorized_spells.size (); k++) {
 				CREMemorizedSpell* spl = sm->memorized_spells[k];
 				if (!spl) continue;
 

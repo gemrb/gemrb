@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.133 2004/04/08 17:06:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.134 2004/04/13 18:51:22 doc_wagon Exp $
  *
  */
 
@@ -604,7 +604,7 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 			printf("[IEScript]: The Object Nesting Count shouldn't be more than 5!\n");
 			abort();
 		}
-		HasAdditionalRect = ( bool ) atoi( objNameTable->QueryField( 2 ) );
+		HasAdditionalRect = ( atoi( objNameTable->QueryField( 2 ) ) != 0 );
 		ExtraParametersCount = atoi( objNameTable->QueryField( 3 ) );
 		ObjectFieldsCount = ObjectIDSCount - ExtraParametersCount;
 
@@ -828,8 +828,8 @@ void GameScript::Update()
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (EvaluateCondition( this->MySelf, rB->condition )) {
-			continueExecution = ExecuteResponseSet( this->MySelf,
-									rB->responseSet );
+			continueExecution = ( ExecuteResponseSet( this->MySelf,
+									rB->responseSet ) != 0 );
 			endReached = false;
 			if (!continueExecution)
 				break;
@@ -1071,7 +1071,7 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 			continue;
 		}
 		if (ORcount) {
-			subresult |= result;
+			subresult |= ( result != 0 );
 			if (--ORcount) {
 				continue;
 			}
@@ -1112,7 +1112,7 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 	if (trigger->flags & 1) {
 		return !ret;
 	}
-	return ret;
+	return ( ret != 0 );
 }
 
 int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
@@ -4151,7 +4151,7 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 		printf("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
 		return;
 	}
-	ip->Active = parameters->int0Parameter;
+	ip->Active = ( parameters->int0Parameter != 0 );
 }
 
 void GameScript::FadeToColor(Scriptable* Sender, Action* parameters)
@@ -4827,7 +4827,7 @@ void GameScript::AmbientActivate(Scriptable* Sender, Action* parameters)
 			parameters->objects[1]->objectName );
 		return;
 	}
-	anim->Active = parameters->int0Parameter;
+	anim->Active = ( parameters->int0Parameter != 0 );
 }
 
 void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
@@ -5168,7 +5168,7 @@ void GameScript::GivePartyGoldGlobal(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	unsigned long gold = CheckVariable( Sender, parameters->string0Parameter );
+	long gold = (long) CheckVariable( Sender, parameters->string0Parameter );
 	act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
 	core->GetGame()->PartyGold+=gold;
 }
