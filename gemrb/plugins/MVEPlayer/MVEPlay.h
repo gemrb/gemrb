@@ -78,6 +78,7 @@ static int stupefaction=0;
 
 static FSOUND_STREAM * stream = NULL;
 static unsigned short channel = 0;
+static unsigned long  frame = 0;
 
 class MVEPlay :	public MoviePlayer
 {
@@ -215,6 +216,7 @@ private: //Decoder Functions
 		free(mve_audio_buffer);
 		mve_audio_buflen = 0;
 		mve_audio_playing = 0;
+		frame = 0;
 		SDL_mutexV(mve_audio_mutex);
 		FSOUND_Stream_Stop(stream);
 		FSOUND_Stream_Close(stream);
@@ -275,7 +277,7 @@ private: //Decoder Functions
 	static void timer_start(void)
 	{
 		timer_expire = SDL_GetTicks();
-		timer_expire += (micro_frame_delay/1000);
+		timer_expire += (micro_frame_delay/1000)+1;
 		timer_started=1;
 	};
 
@@ -293,7 +295,8 @@ private: //Decoder Functions
 		SDL_Delay(ts);
 
 end:
-		timer_expire += (micro_frame_delay/1000);
+		timer_expire += (micro_frame_delay/1000)+(frame&1);
+		frame++;
 	};
 
 	/*************************
@@ -326,9 +329,11 @@ end:
 		memcpy(stream, mve_audio_buffer, len);
 		if(mve_audio_buflen > len) {
 			unsigned char* ab = (unsigned char*)mve_audio_buffer;
-			memcpy(mve_audio_buffer, &ab[mve_audio_buflen], mve_audio_buflen-len);
+			memcpy(mve_audio_buffer, &ab[len], mve_audio_buflen-len);
 		}
 		mve_audio_buflen -= len;
+
+		printf("%d Bytes remaining\n", mve_audio_buflen);
 
 		SDL_mutexV(mve_audio_mutex);
 		return true;
@@ -347,7 +352,7 @@ end:
 		if(stream)
 			{
 			mve_audio_canplay = 1;
-			mve_audio_buffer = (short*)malloc(desired_buffer*sizeof(short));
+			mve_audio_buffer = (short*)malloc(desired_buffer*4);
 			mve_audio_buflen = 0;
 			}
 		else
