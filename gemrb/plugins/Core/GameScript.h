@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.27 2004/01/11 18:57:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.28 2004/01/16 20:26:27 balrog994 Exp $
  *
  */
 
@@ -51,7 +51,7 @@ public:
 		PositionMask[0] = 0;
 	};
 	~Object() {
-		
+		printf("Freeing Object\n");
 	}
 public:
 	int				eaField;
@@ -95,6 +95,7 @@ public:
 		if(objectParameter) {
 			objectParameter->Release();
 		}
+		printf("Freeing Trigger\n");
 	}
 public:
 	unsigned short	triggerID;
@@ -131,6 +132,7 @@ public:
 				triggers[c]->Release();
 		}
 		delete[] triggers;
+		printf("Freeing Condition\n");
 	}
 public:
 	unsigned short triggersCount;
@@ -163,12 +165,15 @@ public:
 		int1Parameter = 0;
 		int2Parameter = 0;
 		RefCount = 1;
+		autoFree = false;
+		delayFree = false;
 	};
 	~Action() {
 		for(int c = 0; c < 3; c++) {
 			if(objects[c])
 				objects[c]->Release();
 		}
+		printf("Freeing Action\n");
 	}
 public:
 	unsigned short	actionID;
@@ -206,6 +211,7 @@ public:
 				actions[c]->Release();
 		}
 		delete[] actions;
+		printf("Freeing Response\n");
 	}
 public:
 	unsigned char weight;
@@ -235,6 +241,7 @@ public:
 			rP->Release();
 		}
 		delete[] responses;
+		printf("Freeing ResponseSet\n");
 	}
 public:
 	unsigned short responsesCount;
@@ -262,6 +269,7 @@ public:
 			condition->Release();
 		if(responseSet)
 			responseSet->Release();
+		printf("Freeing ResponseBlock\n");
 	}
 public:
 	Condition * condition;
@@ -294,6 +302,7 @@ public:
 	};
 	~Script() {
 		FreeResponseBlocks();
+		printf("Freeing Script\n");
 	}
 	void AllocateBlocks(unsigned int count) {
 		if(!count) {
