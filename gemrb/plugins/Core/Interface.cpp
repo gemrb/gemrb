@@ -1105,7 +1105,6 @@ int Interface::LoadSymbol(const char * ResRef)
 		return -1;
 	}
 	if(!sm->Open(str, true)) {
-		delete(str);
 		core->FreeInterface(sm);
 		return -1;
 	}

@@ -30,9 +30,14 @@ bool IDSImp::Open(DataStream * stream, bool autoFree)
 	str = stream;
 	this->autoFree = autoFree;
 
-	str->CheckEncrypted();
-	char tmp[10];
+	bool Encrypted=str->CheckEncrypted();
+	char tmp[11];
 	str->ReadLine(tmp, 10);
+	tmp[10]=0;
+	if(tmp[0]!='I') {
+		str->Seek(Encrypted?2:0,GEM_STREAM_START);
+		str->Pos=0;
+	}
 	while(true) {
 		char * line = (char*)malloc(256);
 		int len = str->ReadLine(line, 256);
@@ -46,17 +51,18 @@ bool IDSImp::Open(DataStream * stream, bool autoFree)
 		}
 		if(len < 256)
 			line = (char*)realloc(line, len+1);
-		ptrs.push_back(line);
 		char * str = strtok(line, " ");
 		Pair p;
-		if((str[0] == '0') && ((str[1] == 'x') || (str[1] == 'X'))) {
-			sscanf(str, "0x%x", p.val);
-		}
-		else
-			p.val = atoi(str);
+		p.val=strtoul(str,NULL,0);
 		str = strtok(NULL, " ");
 		p.str = str;
-		pairs.push_back(p);
+		if(str!=NULL) {
+			ptrs.push_back(line);
+			pairs.push_back(p);
+		}
+		else {
+			free(line);
+		}
 	}
 
 	return true;
@@ -69,7 +75,7 @@ long IDSImp::GetValue(const char * txt)
 		if(stricmp(pairs[i].str, txt) == 0)
 			return pairs[i].val;
 	}
-	return 0L;
+	return -1;
 }
 
 const char * IDSImp::GetValue(int val)
@@ -78,5 +84,5 @@ const char * IDSImp::GetValue(int val)
 		if(pairs[i].val == val)
 			return pairs[i].str;
 	}
-	return NULL;
+	return "";
 }

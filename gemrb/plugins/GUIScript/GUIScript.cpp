@@ -315,7 +315,7 @@ static PyObject * GemRB_UnLoadSymbol(PyObject */*self*/, PyObject *args)
 	int si;
 
 	if(!PyArg_ParseTuple(args, "i", &si)) {
-		printMessage("GUIScript", "Syntax Error: Expected Integer\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error:UnloadSymbol Expected Integer\n", LIGHT_RED);
 		return NULL;
 	}
 	
@@ -353,24 +353,24 @@ static PyObject * GemRB_GetSymbolValue(PyObject */*self*/, PyObject *args)
 			return NULL;
 		}
 		int SymbolIndex = PyInt_AsLong(si);
-		if((PyObject_TypeCheck(sym, &PyInt_Type)) || (PyObject_TypeCheck(sym, &PyString_Type))) {
-			if(PyObject_TypeCheck(sym, &PyString_Type)) {
-				char * syms = PyString_AsString(sym);
-				SymbolMgr * sm = core->GetSymbol(SymbolIndex);
-				long val = sm->GetValue(syms);
-				return Py_BuildValue("l", val);
-			}
-			else {
-				int symi = PyInt_AsLong(sym);
-				SymbolMgr * sm = core->GetSymbol(SymbolIndex);
-				const char * str = sm->GetValue(symi);
-				return Py_BuildValue("s", str);
-			}	
+		if(PyObject_TypeCheck(sym, &PyString_Type)) {
+			char * syms = PyString_AsString(sym);
+			SymbolMgr * sm = core->GetSymbol(SymbolIndex);
+			if(!sm)
+				return NULL;
+			long val = sm->GetValue(syms);
+			return Py_BuildValue("l", val);
 		}
-		printMessage("GUIScript", "Type Error: GetSymbolValue(SymbolTable, StringVal/IntVal)\n", LIGHT_RED);
-		return NULL;
+		if(PyObject_TypeCheck(sym, &PyInt_Type)) {
+			int symi = PyInt_AsLong(sym);
+			SymbolMgr * sm = core->GetSymbol(SymbolIndex);
+			if(!sm)
+				return NULL;
+			const char * str = sm->GetValue(symi);
+			return Py_BuildValue("s", str);
+		}
 	}
-	
+	printMessage("GUIScript", "Type Error: GetSymbolValue(SymbolTable, StringVal/IntVal)\n", LIGHT_RED);
 	return NULL;
 }
 

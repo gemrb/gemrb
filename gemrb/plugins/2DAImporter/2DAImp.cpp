@@ -27,6 +27,7 @@ bool p2DAImp::Open(DataStream * stream, bool autoFree)
 	this->autoFree = autoFree;
 	char Signature[20];
 	str->CheckEncrypted();
+
 	str->ReadLine(Signature,20);
 	char * strp = Signature;
 	while(*strp == ' ')
