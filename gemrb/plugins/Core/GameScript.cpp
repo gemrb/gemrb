@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.250 2005/03/26 12:21:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.251 2005/03/28 07:50:48 avenger_teambg Exp $
  *
  */
 
@@ -843,11 +843,12 @@ static SrcVector *LoadSrc(ieResRef resname)
 	ieDword size=0;
 	str->ReadDword(&size);
 	src = new SrcVector(size);
+	SrcCache.SetAt( resname, (void *) src );
 	while(size--) {
 		ieDword tmp;
 		str->ReadDword(&tmp);
-		str->ReadDword(&tmp);
 		src->at(size)=tmp;
+		str->ReadDword(&tmp);
 	}
 	delete ( str );
 	return src;
@@ -6206,6 +6207,10 @@ void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 	}
 
 	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
+	if (!rndstr) {
+		printMessage("GameScript","Cannot display resource!",LIGHT_RED);
+		return;
+	}
 	DisplayStringCore(target, rndstr->at(rand()%rndstr->size()), DS_CONSOLE|DS_HEAD);
 	FreeSrc(rndstr, parameters->string0Parameter);
 }
@@ -6219,6 +6224,10 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 	}
 
 	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
+	if (!rndstr) {
+		printMessage("GameScript","Cannot display resource!",LIGHT_RED);
+		return;
+	}
 	DisplayStringCore(target, rndstr->at(rand()%rndstr->size()), DS_CONSOLE|DS_HEAD);
 	FreeSrc(rndstr, parameters->string0Parameter);
 }
@@ -8460,7 +8469,6 @@ void GameScript::SetRestEncounterChance(Scriptable * /*Sender*/, Action* paramet
 
 void GameScript::EndCredits(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-printf("Endcredit");
 	core->PlayMovie("credits");
 }
 
