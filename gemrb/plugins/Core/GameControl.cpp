@@ -606,6 +606,15 @@ void GameControl::UnhideGUI()
 			ResizeAdd(mw, index);
 		}
 	}
+	if(dict->Lookup("ActionsWindow", index)) {
+		Window * aw = core->GetWindow(index);
+		aw->Visible = true;
+		aw->Invalidate();
+		core->SetOnTop(index);
+		if(dict->Lookup("ActionsPosition", index)) {
+			ResizeAdd(aw, index);
+		}
+	}
 	if(dict->Lookup("OptionsWindow", index)) {
 		Window * ow = core->GetWindow(index);
 		ow->Visible = true;
@@ -624,19 +633,11 @@ void GameControl::UnhideGUI()
 			ResizeAdd(pw, index);
 		}
 	}
-	if(dict->Lookup("ActionsWindow", index)) {
-		Window * aw = core->GetWindow(index);
-		aw->Visible = true;
-		aw->Invalidate();
-		core->SetOnTop(index);
-		if(dict->Lookup("ActionsPosition", index)) {
-			ResizeAdd(aw, index);
-		}
-	}
 	if(dict->Lookup("TopWindow", index)) {
 		Window * tw = core->GetWindow(index);
 		tw->Visible = true;
 		tw->Invalidate();
+		core->SetOnTop(index);
 		if(dict->Lookup("TopPosition", index)) {
 			ResizeAdd(tw, index);
 		}
@@ -688,6 +689,14 @@ void GameControl::ResizeDel(Window * win, unsigned char type)
 				}
 			}
 		break;
+
+		case 4: //BottomAdded
+			{
+				BottomCount--;
+				((Window*)Owner)->Height+=win->Height;
+				Height = ((Window*)Owner)->Height;
+			}
+		break;
 	}
 }
 
@@ -733,6 +742,14 @@ void GameControl::ResizeAdd(Window * win, unsigned char type)
 					((Window*)Owner)->Height-=win->Height;
 					Height = ((Window*)Owner)->Height;
 				}
+			}
+		break;
+		
+		case 4: //BottomAdded
+			{
+				BottomCount++;
+				((Window*)Owner)->Height-=win->Height;
+				Height = ((Window*)Owner)->Height;
 			}
 		break;
 	}
