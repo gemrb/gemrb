@@ -133,7 +133,6 @@ Action * Scriptable::PopNextAction()
 void Scriptable::ClearActions()
 {
 	if(CurrentAction) {
-		CurrentAction->Release();
 		CurrentAction = NULL;
 	}
 	for(int i = 0; i < actionQueue.size(); i++) {
@@ -201,6 +200,10 @@ void Scriptable::ProcessActions()
 		printf("Executing Action: %s\n", this->scriptName);
 		GameScript::ExecuteAction(this, CurrentAction);
 		neverExecuted = false;
+if(!GetNextAction())
+{
+	printf("EndofQueue!\n");
+}
 	}
 }
 

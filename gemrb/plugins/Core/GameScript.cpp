@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.47 2004/01/16 23:05:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.48 2004/01/17 15:45:43 avenger_teambg Exp $
  *
  */
 
@@ -31,8 +31,8 @@ static SymbolMgr* triggersTable;
 static SymbolMgr* actionsTable;
 static TriggerFunction triggers[MAX_TRIGGERS];
 static ActionFunction actions[MAX_ACTIONS];
-static bool blocking[MAX_ACTIONS];
-static bool instant[MAX_ACTIONS];
+static char blocking[MAX_ACTIONS];
+static char instant[MAX_ACTIONS];
 
 GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables * local)
 {
@@ -52,9 +52,10 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actionsTable = core->GetSymbol(aT);
 		globals = new Variables();
 		globals->SetType(GEM_VARIABLES_INT);
-		memset(triggers, 0, MAX_TRIGGERS*sizeof(TriggerFunction));
-		memset(actions, 0, MAX_ACTIONS*sizeof(ActionFunction));
-		memset(blocking, 0, MAX_ACTIONS*sizeof(bool));
+		memset(triggers, 0, sizeof(triggers) );
+		memset(actions, 0, sizeof(actions) );
+		memset(blocking, 0, sizeof(blocking) );
+		memset(instant, 0, sizeof(instant) );
 		triggers[0x0a] = Alignment;
 		triggers[0x0b] = Allegiance;
 		triggers[0x0c] = Class;
@@ -77,7 +78,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[8] = Dialogue;
 		blocking[8] = true;
 		actions[10] = Enemy;
-		instant[10] = true;
+		//instant[10] = true;
 		actions[22] = MoveToObject;
 		blocking[22] = true;
 		actions[23] = MoveToPoint;
@@ -86,7 +87,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[30] = SetGlobal;
 		//instant[30] = true;
 		actions[36] = Continue;
-		//instant[36] = true;
+		instant[36] = 2; //this is a special value for Continue()
 		actions[40] = PlayDead;
 		actions[49] = MoveViewPoint;
 		actions[50] = MoveViewObject;
@@ -136,45 +137,45 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		if(strcmp(core->GameType, "pst") == 0) {
 			actions[215] = FaceObject;
 			actions[227] = GlobalBAnd;
-			instant[227] = true;
+			//instant[227] = true;
 			actions[228] = GlobalBOr;
-			instant[228] = true;
+			//instant[228] = true;
 			actions[229] = GlobalShr;
-			instant[229] = true;
+			//instant[229] = true;
 			actions[230] = GlobalShl;
-			instant[230] = true;
+			//instant[230] = true;
 			actions[231] = GlobalMax;
-			instant[231] = true;
+			//instant[231] = true;
 			actions[232] = GlobalMin;
-			instant[232] = true;
+			//instant[232] = true;
 			actions[233] = GlobalSetGlobal;
-			instant[233] = true;
+			//instant[233] = true;
 			actions[234] = GlobalAddGlobal;
-			instant[234] = true;
+			//instant[234] = true;
 			actions[235] = GlobalSubGlobal;
-			instant[235] = true;
+			//instant[235] = true;
 			actions[236] = GlobalAndGlobal;
-			instant[236] = true;
+			//instant[236] = true;
 			actions[237] = GlobalOrGlobal;
-			instant[237] = true;
+			//instant[237] = true;
 			actions[238] = GlobalBAndGlobal;
-			instant[238] = true;
+			//instant[238] = true;
 			actions[239] = GlobalBOrGlobal;
-			instant[239] = true;
+			//instant[239] = true;
 			actions[240] = GlobalShrGlobal;
-			instant[240] = true;
+			//instant[240] = true;
 			actions[241] = GlobalShlGlobal;
-			instant[241] = true;
+			//instant[241] = true;
 			actions[242] = GlobalMaxGlobal;
-			instant[242] = true;
+			//instant[242] = true;
 			actions[243] = GlobalMinGlobal;
-			instant[243] = true;
+			//instant[243] = true;
 			actions[244] = GlobalBOr; //BitSet
-			instant[244] = true;
+			//instant[244] = true;
 			actions[245] = BitClear; 
-			instant[245] = true;
+			//instant[245] = true;
 			actions[267] = StartSong;
-			instant[267] = true;
+			//instant[267] = true;
 		}
 		else
 		{
@@ -232,13 +233,13 @@ GameScript::~GameScript(void)
 			delete(locals);
 	}
 }
-
+/*
 void GameScript::FreeScript(Script * script)
 {
 	printf("Releasing Script [0x%08X] in %s Line: %d\n", script, __FILE__, __LINE__);
 	script->Release();
 }
-
+*/
 Script* GameScript::CacheScript(DataStream * stream, const char * Context)
 {
 	if(!stream)
@@ -292,7 +293,7 @@ void GameScript::Update()
 	for(unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock * rB = script->responseBlocks[a];
 		if(EvaluateCondition(this->MySelf, rB->condition)) {
-			ExecuteResponseSet(this->MySelf, rB->responseSet);
+			continueExecution=ExecuteResponseSet(this->MySelf, rB->responseSet);
 			endReached = false;
 			if(!continueExecution)
 				break;
@@ -474,16 +475,34 @@ Object * GameScript::DecodeObject(const char * line)
 
 bool GameScript::EvaluateCondition(Scriptable * Sender, Condition * condition)
 {
-	bool ORing = false;
 	int ORcount = 0;
-	bool ret = true;
+	int result = 0;
+	bool subresult = true;
+
 	for(int i = 0; i < condition->triggersCount; i++) {
 		Trigger * tR = condition->triggers[i];
-		ret &= EvaluateTrigger(Sender, tR);
-		if(!ret)
-			return ret;
+		//do not evaluate triggers in an Or() block if one of them
+		//was already True()
+		if(!ORcount || !subresult)
+			result = EvaluateTrigger(Sender, tR);
+		if(result>1) { //we started an Or() block
+			if(ORcount)
+				printf("Unfinished OR block encountered!\n");
+			ORcount = result;
+			subresult = false;
+			continue;
+		}
+		if(ORcount) {
+			subresult |= result;
+			if(--ORcount) continue;
+			result = subresult;
+		}
+		if(!result)
+			return 0;
 	}
-	return ret;
+	if(ORcount)
+		printf("Unfinished OR block encountered!\n");
+	return 1;
 }
 
 bool GameScript::EvaluateTrigger(Scriptable * Sender, Trigger * trigger)
@@ -506,29 +525,35 @@ bool GameScript::EvaluateTrigger(Scriptable * Sender, Trigger * trigger)
 	return ret;
 }
 
-void GameScript::ExecuteResponseSet(Scriptable * Sender, ResponseSet * rS)
+int GameScript::ExecuteResponseSet(Scriptable * Sender, ResponseSet * rS)
 {
 	for(int i = 0; i < rS->responsesCount; i++) {
 		Response * rE = rS->responses[i];
 		int randWeight = (rand()%100)+1;
 		if(rE->weight >= randWeight) {
-			ExecuteResponse(Sender, rE);
+			return ExecuteResponse(Sender, rE);
+			/* this break is only symbolic */
 			break;
 		}
 	}
 }
 
-void GameScript::ExecuteResponse(Scriptable * Sender, Response * rE)
+int GameScript::ExecuteResponse(Scriptable * Sender, Response * rE)
 {
 	for(int i = 0; i < rE->actionsCount; i++) {
 		Action * aC = rE->actions[i];
-		if(instant[aC->actionID])
+		switch(instant[aC->actionID]) {
+		case 1:
 			ExecuteAction(Sender, aC);
-		else {
+			break;
+		case 0:
 			if(Sender->CutSceneId)
 				Sender->CutSceneId->AddAction(aC);
 			else
 				Sender->AddAction(aC);
+			break;
+		case 2: //Continue() reached
+			return 1; 
 		}
 	}
 }
@@ -549,7 +574,7 @@ void GameScript::ExecuteAction(Scriptable * Sender, Action * aC)
 	}
 	if(instant[aC->actionID])
 		return;
-	printf("Releasing Action %d [0x%08X] in %s Line: %d\n", aC->actionID, aC, __FILE__, __LINE__);
+	printf("Releasing Action %d [0x%08X] in %s Line: %d Currentaction was set to:%d\n", aC->actionID, aC, __FILE__, __LINE__, Sender->CurrentAction);
 	aC->Release();
 }
 
@@ -1183,6 +1208,11 @@ int GameScript::Range(Scriptable * Sender, Trigger * parameters)
 	return 0;
 }
 
+int GameScript::Or(Scriptable * Sender, Trigger * parameters)
+{
+	return parameters->int0Parameter;
+}
+
 int GameScript::Clicked(Scriptable * Sender, Trigger * parameters)
 {
 	if(parameters->objectParameter->eaField == 0) {
@@ -1670,7 +1700,6 @@ void GameScript::StartSong(Scriptable * Sender, Action * parameters)
 
 void GameScript::Continue(Scriptable * Sender, Action * parameters)
 {
-	//Sender->continueExecution = true;
 }
 
 void GameScript::PlaySound(Scriptable * Sender, Action * parameters)

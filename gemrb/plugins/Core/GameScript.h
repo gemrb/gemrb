@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.30 2004/01/16 23:05:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.31 2004/01/17 15:45:43 avenger_teambg Exp $
  *
  */
 
@@ -84,13 +84,18 @@ public:
 	}
 	void IncRef() {
 		RefCount++;
+		if(RefCount>=4)
+		{
+			printf("Refcount increased to: %d in object\n",RefCount);
+			abort();
+		}
 	}
 };
 
 class GEM_EXPORT Trigger {
 public:
 	Trigger() {
-        objectParameter = NULL;
+	        objectParameter = NULL;
 		RefCount = 1;
 		string0Parameter[0] = 0;
 		string1Parameter[0] = 0;
@@ -121,11 +126,17 @@ public:
 			abort();
 		}
 		RefCount--;
+		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
 	void IncRef() {
 		RefCount++;
+		if(RefCount>=4)
+		{
+			printf("Refcount increased to: %d in trigger\n",RefCount);
+			abort();
+		}
 	}
 };
 
@@ -154,11 +165,17 @@ public:
 			abort();
 		}
 		RefCount--;
+		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
 	void IncRef() {
 		RefCount++;
+		if(RefCount>=4)
+		{
+			printf("Refcount increased to: %d in condition\n",RefCount);
+			abort();
+		}
 	}
 };
 
@@ -204,11 +221,17 @@ public:
 			abort();
 		}
 		RefCount--;
+		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
 	void IncRef() {
 		RefCount++;
+		if(RefCount>=4)
+		{
+			printf("Refcount increased to: %d in action %d\n",RefCount, actionID);
+			abort();
+		}
 	}
 };
 
@@ -238,11 +261,17 @@ public:
 			abort();
 		}
 		RefCount--;
+		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
 	void IncRef() {
 		RefCount++;
+		if(RefCount>=4)
+		{
+			printf("Refcount increased to: %d in response\n",RefCount);
+			abort();
+		}
 	}
 };
 
@@ -271,11 +300,17 @@ public:
 			abort();
 		}
 		RefCount--;
+		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
 	void IncRef() {
 		RefCount++;
+		if(RefCount>=4)
+		{
+			printf("Refcount increased to: %d\n",RefCount);
+			abort();
+		}
 	}
 };
 
@@ -303,11 +338,17 @@ public:
 			abort();
 		}
 		RefCount--;
+		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
 	void IncRef() {
 		RefCount++;
+		if(RefCount>=4)
+		{
+			printf("Refcount increased to: %d\n",RefCount);
+			abort();
+		}
 	}
 };
 
@@ -360,11 +401,17 @@ public:
 			abort();
 		}
 		RefCount--;
+		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
 	void IncRef() {
 		RefCount++;
+		if(RefCount>=4)
+		{
+			printf("Refcount increased to: %d\n",RefCount);
+			abort();
+		}
 	}
 };
 
@@ -376,7 +423,7 @@ typedef void (* ActionFunction)(Scriptable*, Action*);
 #define IE_SCRIPT_TRIGGER		2
 
 #define MAX_TRIGGERS			0xFF
-#define MAX_ACTIONS				325
+#define MAX_ACTIONS				400
 
 class GEM_EXPORT GameScript
 {
@@ -390,7 +437,7 @@ public:
 	void EvaluateAllBlocks();
 private: //Internal Functions
 	Script* CacheScript(DataStream * stream, const char * Context);
-	void FreeScript(Script * script);
+//	void FreeScript(Script * script);
 	ResponseBlock * ReadResponseBlock(DataStream * stream);
 	Condition * ReadCondition(DataStream * stream);
 	ResponseSet * ReadResponseSet(DataStream * stream);
@@ -399,8 +446,8 @@ private: //Internal Functions
 	Object * DecodeObject(const char * line);
 	bool EvaluateCondition(Scriptable * Sender, Condition * condition);
 	static bool EvaluateTrigger(Scriptable * Sender, Trigger * trigger);
-	void ExecuteResponseSet(Scriptable * Sender, ResponseSet * rS);
-	void ExecuteResponse(Scriptable * Sender, Response * rE);
+	int ExecuteResponseSet(Scriptable * Sender, ResponseSet * rS);
+	int ExecuteResponse(Scriptable * Sender, Response * rE);
 public:
 	static void ExecuteAction(Scriptable * Sender, Action * aC);
 	static Action* CreateAction(char *string, bool autoFree = true);
@@ -437,6 +484,7 @@ private: //Script Functions
 	static int  Exists(Scriptable * Sender, Trigger * parameters);
 	static int  General(Scriptable * Sender, Trigger * parameters);
 	static int  Range(Scriptable * Sender, Trigger * parameters);
+	static int  Or(Scriptable * Sender, Trigger * parameters);
 	static int  Clicked(Scriptable * Sender, Trigger * parameters);
 	static int  Entered(Scriptable * Sender, Trigger * parameters);
 	static int  Dead(Scriptable * Sender, Trigger * parameters);
