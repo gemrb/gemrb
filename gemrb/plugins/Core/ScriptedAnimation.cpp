@@ -54,8 +54,8 @@ ScriptedAnimation::ScriptedAnimation(DataStream * stream, bool autoFree, long X,
 	DataStream * str = core->GetResourceMgr()->GetResource(Anim1ResRef, IE_BAM_CLASS_ID);
 	AnimationMgr * am = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
 	am->Open(str, true);
-	anims[0] = am->GetAnimation(seq1, 0, 0);
-	anims[1] = am->GetAnimation(seq2, 0, 0);
+	anims[0] = am->GetAnimation((unsigned char)seq1, 0, 0);
+	anims[1] = am->GetAnimation((unsigned char)seq2, 0, 0);
 	core->FreeInterface(am);
 	XPos += X;
 	YPos += Y;
