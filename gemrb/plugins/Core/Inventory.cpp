@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.30 2004/09/12 21:58:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.31 2004/10/09 18:26:01 avenger_teambg Exp $
  *
  */
 
@@ -151,9 +151,10 @@ bool Inventory::HasItem(const char *resref, ieDword flags)
     this function can look for stolen, equipped, identified, destructible
     etc, items. You just have to specify the flags in the bitmask
     specifying 1 in a bit signifies a requirement */
-void Inventory::DestroyItem(const char *resref, ieDword flags)
+unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword count)
 {
-	int slot = Slots.size();
+	unsigned int destructed = 0;
+	unsigned int slot = Slots.size();
 	while(slot--) {
 		CREItem *item = Slots[slot];
 		if(!item) {
@@ -170,10 +171,28 @@ void Inventory::DestroyItem(const char *resref, ieDword flags)
 		//we need to acknowledge that the item was destroyed
 		//use unequip stuff, decrease encumbrance etc,
 		//until that, we simply erase it
+		ieDword removed;
+
+		if (item->Flags&IE_INV_ITEM_STACKED) {
+			removed=item->Usages[0];
+			if (removed + destructed > count) {
+				removed = count - destructed;
+				item = RemoveItem( slot, removed );
+			}
+			else {
+				Slots[slot] = NULL;
+			}
+		}
+		else {
+			removed=1;
+			Slots[slot] = NULL;
+		}
 		delete item;
-		Slots[slot] = NULL;
 		Changed = true;
+		destructed+=removed;
+		if((count!=(unsigned int) ~0) && (destructed==count) ) break;
 	}
+	return destructed;
 }
 
 CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.21 2004/09/12 21:58:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.22 2004/10/09 18:26:01 avenger_teambg Exp $
  *
  */
 
@@ -116,7 +116,9 @@ public:
 	int AddSlotItem(STOItem* item, unsigned int slot, CREItem** res_item, int count);
 
 	/** flags: see ieCREItemFlagBits */
-	void DestroyItem(const char *resref, ieDword flags);
+        /** count == ~0 means to destroy all */
+	/** returns the number of destroyed items */
+	unsigned int DestroyItem(const char *resref, ieDword flags, ieDword count);
 	/** flags: see ieCREItemFlagBits */
 	void SetItemFlags(CREItem* item, ieDword flags);
 	void SetSlotItem(CREItem* item, unsigned int slot);

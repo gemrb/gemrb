@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.202 2004/10/09 17:38:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.203 2004/10/09 18:26:00 avenger_teambg Exp $
  *
  */
 
@@ -7364,7 +7364,7 @@ void GameScript::DestroyAllEquipment(Scriptable* Sender, Action* /*parameters*/)
 		default:;
 	}
 	if(inv) {
-		inv->DestroyItem("",0);
+		inv->DestroyItem("",0,~0); //destroy any and all
 	}
 }
 
@@ -7381,8 +7381,8 @@ void GameScript::DestroyItem(Scriptable* Sender, Action* parameters)
 			break;
 		default:;
 	}
-	if(inv) {
-		inv->DestroyItem(parameters->string0Parameter,0);
+	if(inv) { 
+		inv->DestroyItem(parameters->string0Parameter,0,1); //destroy one (even indestructible?)
 	}
 }
 
@@ -7402,9 +7402,31 @@ void GameScript::DestroyPartyItem(Scriptable* /*Sender*/, Action* parameters)
 {
 	Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
+	ieDword count;
+	if(parameters->int0Parameter) count=~0;
+	else count=1;
 	while (i--) {
 		Inventory *inv = &(game->GetPC(i)->inventory);
-		inv->DestroyItem(parameters->string0Parameter, 0);
+		int res=inv->DestroyItem(parameters->string0Parameter,0,count);
+		if( (count == 1) && res) {
+			break;
+		}
+	}
+}
+
+/* this is a gemrb extension */
+void GameScript::DestroyPartyItemNum(Scriptable* /*Sender*/, Action* parameters)
+{
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(false);
+	ieDword count;
+	count = parameters->int0Parameter;
+	while (i--) {
+		Inventory *inv = &(game->GetPC(i)->inventory);
+		count -= inv->DestroyItem(parameters->string0Parameter,0,count);
+		if (!count ) {
+			break;
+		}
 	}
 }
 
@@ -7422,7 +7444,7 @@ void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* /*p
 		default:;
 	}
 	if(inv) {
-		inv->DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE);
+		inv->DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, ~0);
 	}
 }
 
