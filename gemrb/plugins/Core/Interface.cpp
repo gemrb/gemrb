@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.179 2004/07/31 13:17:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.180 2004/07/31 22:32:55 avenger_teambg Exp $
  *
  */
 
@@ -2033,13 +2033,11 @@ bool Interface::InitItemTypes()
 	}
 	SlotTypes = 0;
 	if(st) {
-		SlotTypes = st->GetColumnCount();
+		SlotTypes = st->GetRowCount();
 		//make sure unsigned int is 32 bits
 		slottypes = (unsigned int *) malloc(SlotTypes * sizeof(unsigned int) );
-		// FIXME: read in slottype info
-		//
 		for (int i=0;i<SlotTypes;i++) {
-			slottypes[i] = strtol(it->QueryField(i),NULL,0 );
+			slottypes[i] = strtol(st->QueryField(i,0),NULL,0 );
 		}
 		core->DelTable(SlotTypeTable);
 	}
