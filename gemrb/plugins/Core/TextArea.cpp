@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.34 2003/12/23 23:30:08 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.35 2003/12/25 23:58:30 balrog994 Exp $
  *
  */
 
@@ -25,6 +25,23 @@
 #include <stdio.h>
 
 extern Interface * core;
+
+inline size_t mystrlen(const char * string) 
+{
+	if(!string)
+		return (size_t)0;
+	const char * tmp = string;
+	size_t count = 0;
+	while(*tmp != 0) {
+		if(((unsigned char)*tmp) >= 0xf0) {
+			tmp+=3;
+			count+=3;
+		}
+		count++;
+		tmp++;
+	}
+	return count;
+}
 
 TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {
@@ -68,12 +85,17 @@ void TextArea::Draw(unsigned short x, unsigned short y)
   	char * Buffer = (char*)malloc(1);
   	Buffer[0] = 0;
   	int len = 0;
+	int lastlen = 0;
   	for(size_t i = 0; i < lines.size(); i++) {
-  		len += (int)strlen(lines[i])+1;
+  		len += (int)mystrlen(lines[i])+1;
   		Buffer = (char*)realloc(Buffer, len+1);
-  		strcat(Buffer, lines[i]);
-  		if(i != lines.size()-1)
-  			strcat(Buffer, "\n");
+  		memcpy(&Buffer[lastlen], lines[i], len+1-lastlen);
+		lastlen=len;
+		if(i != lines.size()-1) {
+			Buffer[lastlen-1] = '\n';
+			Buffer[lastlen] = 0;
+  			//strcat(Buffer, "\n");
+		}
   	}
   	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height-5), (unsigned char*)Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
   	free(Buffer);
@@ -129,17 +151,17 @@ int TextArea::SetText(const char * text, int pos)
 		pos = -1;
 	if(pos >= (int)lines.size())
 		return -1;
-	int newlen = (int)strlen(text);
+	int newlen = (int)mystrlen(text);
 
 	if(pos == -1) {
 		char * str = (char*)malloc(newlen+1);
-		strcpy(str, text);
+		memcpy(str, text, newlen+1);
 		lines.push_back(str);
 		lrows.push_back(0);
 	}
 	else {
 		lines[pos] = (char*)realloc(lines[pos], newlen+1);
-		strcpy(lines[pos], text);
+		memcpy(lines[pos], text, newlen+1);
 	}
 	CalcRowCount();
 	Changed = true;
@@ -156,20 +178,20 @@ int TextArea::AppendText(const char * text, int pos)
 	int ret = 0;
 	if(pos >= (int)lines.size())
 		return -1;
-	int newlen = (int)strlen(text);
+	int newlen = (int)mystrlen(text);
 	if(pos == -1) {
 		char * str = (char*)malloc(newlen+1);
-		strcpy(str, text);
+		memcpy(str, text, newlen+1);
 		lines.push_back(str);
 		lrows.push_back(0);
 		ret = lines.size()-1;
 	}
 	else
 	{
-		int mylen = (int)strlen(lines[pos]);
+		int mylen = (int)mystrlen(lines[pos]);
 	
 		lines[pos] = (char*)realloc(lines[pos], mylen+newlen+1);
-		strcat(lines[pos], text);
+		memcpy(&lines[pos][mylen], text, newlen+1);
 		ret = pos;
 	}
 	CalcRowCount();
@@ -235,11 +257,14 @@ void TextArea::CalcRowCount()
 		for(size_t i = 0; i < lines.size(); i++) {
 			rows++;
 			int tr = 0;
-			int len = (int)strlen(lines[i]);
+			int len = (int)mystrlen(lines[i]);
 			char * tmp = (char*)malloc(len+1);
 			memcpy(tmp, lines[i], len+1);
 			ftext->SetupString(tmp, Width);
 			for(int p = 0; p <= len; p++) {
+				if(((unsigned char)tmp[p]) >= 0xf0) {
+					p+=3;
+				}
 				if(tmp[p] == 0) {
 					if(p != len)
 						rows++;
