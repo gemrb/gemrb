@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.12 2003/12/10 15:18:50 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.13 2003/12/15 09:37:41 balrog994 Exp $
  *
  */
 
@@ -100,19 +100,19 @@ bool BMPImp::Open(DataStream * stream, bool autoFree)
 	//RASTERDATA
 	switch(BitCount) {
 		case 24:
-			PaddedRowLength = Width*3;
+			PaddedRowLength = (unsigned short)Width*3;
 		break;
 
 		case 16:
-			PaddedRowLength = Width*2;
+			PaddedRowLength = (unsigned short)Width*2;
 		break;
 
 		case 8:
-			PaddedRowLength = Width;
+			PaddedRowLength = (unsigned short)Width;
 		break;
 
 		case 4:
-			PaddedRowLength = (Width>>1);
+			PaddedRowLength = (unsigned short)(Width>>1);
 		break;
 		default:
 			printf("[BMPImporter]: BitCount not supported.\n");
@@ -178,9 +178,9 @@ Sprite2D * BMPImp::GetImage()
 	else if(BitCount == 4) {
 		void *p = malloc(Width*Height);
 		unsigned char *dst = (unsigned char*)p;
-		for(int y = 0; y < Height; y++) {
+		for(unsigned int y = 0; y < Height; y++) {
 			unsigned char *src = (unsigned char*)pixels+(PaddedRowLength*y);
-			for(int x = 0; x < Width; x++) {
+			for(unsigned int x = 0; x < Width; x++) {
 				*dst = (*src>>4);
 				dst++;
 				if(x == (Width-1))

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.9 2003/11/30 23:26:46 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.10 2003/12/15 09:37:40 balrog994 Exp $
  *
  */
 
@@ -73,6 +73,7 @@ public:
 				return (ret>>4)&15;
 			}
 		}
+		return 0;
 	}
 	/** Gets a Pixel from the Image */
 	Color GetPixel(int x, int y)
