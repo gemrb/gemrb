@@ -28,6 +28,7 @@ libgemrb_core_la_SOURCES = \
 	VideoModes.cpp \
 	VideoMode.cpp \
 	Video.cpp \
+	VFS.cpp \
 	TileSetMgr.cpp \
 	TileOverlay.cpp \
 	TileMapMgr.cpp \

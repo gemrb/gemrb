@@ -15,12 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.4 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.5 2004/03/20 12:59:57 edheldil Exp $
  *
  */
 
 // VFS.cpp : functions to access filesystem in os-independent way
 //  		 and POSIX-like compatibility layer for win
+
+#include <stdarg.h>
 
 #include "../../includes/globals.h"
 #include "VFS.h"
@@ -204,3 +206,47 @@ int _fclose(_FILE* stream)
 
 #endif  // WIN32
 
+/*
+ * Appends dir 'dir' to path 'target' and returns 'target'. It takes
+ * care of inserting PathDelimiter ('/' or '\\') if needed
+ */
+char* PathAppend (char* target, char* dir)
+{
+	if (target[strlen( target ) - 1] != PathDelimiter)
+		strcat( target, SPathDelimiter );
+	strcat( target, dir );
+
+	return target;
+}
+
+/*
+ * Joins NULL-terminated list of directories and and copies it to 'target'.
+ * Previous content of 'target' is NOT part of the list. Returns pointer
+ * to 'target'.
+ *
+ * Example:
+ * char filepath[_MAX_PATH];
+ * PathJoin( filepath, core->GUIScriptsPath, core->GameType, 'GUIDefines.py', NULL );
+ */
+char* PathJoin (char* target, ...)
+{
+	va_list ap;
+	char* s;
+
+	target[0] = '\0';
+
+	va_start( ap, target );
+
+	s = va_arg( ap, char* );
+	if (s == NULL)
+		return target;
+
+	strcpy( target, s );
+
+	while ((s = va_arg( ap, char* )) != NULL) {
+		PathAppend( target, s );
+	}
+	va_end( ap );
+
+	return target;
+}
