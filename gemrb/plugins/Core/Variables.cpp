@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.22 2004/07/18 08:33:40 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.23 2004/07/24 23:59:36 avenger_teambg Exp $
  *
  */
 
@@ -102,7 +102,7 @@ void Variables::GetNextAssoc(POSITION& rNextPosition, const char*& rKey,
 
 	// fill in return data
 	rKey = pAssocRet->key;
-	rValue = pAssocRet->nValue;
+	rValue = pAssocRet->Value.nValue;
 }
 
 Variables::Variables(int nBlockSize, int nHashTableSize)
@@ -150,9 +150,9 @@ void Variables::RemoveAll()
 				pAssoc != NULL;
 				pAssoc = pAssoc->pNext) {
 				if (m_type == GEM_VARIABLES_STRING) {
-					if (pAssoc->sValue) {
-						free( pAssoc->sValue );
-						pAssoc->sValue = NULL;
+					if (pAssoc->Value.sValue) {
+						free( pAssoc->Value.sValue );
+						pAssoc->Value.sValue = NULL;
 					}
 				}
 				if (pAssoc->key) {
@@ -217,8 +217,7 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 			pAssoc->key[len] = 0;
 		}
 	}
-	pAssoc->sValue = NULL;
-	pAssoc->nValue = 0xcccccccc;  //invalid value
+	pAssoc->Value.nValue = 0xcccccccc;  //invalid value
 	pAssoc->nHashValue = 0xcccccccc; //invalid value
 	return pAssoc;
 }
@@ -270,7 +269,7 @@ int Variables::GetValueLength(const char* key) const
 		return 0;  // not in map
 	}
 
-	return ( int ) strlen( pAssoc->sValue );
+	return ( int ) strlen( pAssoc->Value.sValue );
 }
 
 bool Variables::Lookup(const char* key, char* dest, int MaxLength) const
@@ -283,7 +282,7 @@ bool Variables::Lookup(const char* key, char* dest, int MaxLength) const
 		return false;  // not in map
 	}
 
-	strncpy( dest, pAssoc->sValue, MaxLength );
+	strncpy( dest, pAssoc->Value.sValue, MaxLength );
 	return true;
 }
 
@@ -296,7 +295,7 @@ bool Variables::Lookup(const char* key, unsigned long& rValue) const
 		return false;
 	}  // not in map
 
-	rValue = pAssoc->nValue;
+	rValue = pAssoc->Value.nValue;
 	return true;
 }
 
@@ -316,15 +315,15 @@ void Variables::SetAt(const char* key, const char* value)
 		pAssoc->pNext = m_pHashTable[nHash];
 		m_pHashTable[nHash] = pAssoc;
 	} else {
-		if (pAssoc->sValue) {
-			free( pAssoc->sValue );
-			pAssoc->sValue = 0;
+		if (pAssoc->Value.sValue) {
+			free( pAssoc->Value.sValue );
+			pAssoc->Value.sValue = 0;
 		}
 	}
 
 	//set value only if we have a key
 	if (pAssoc->key) {
-		pAssoc->sValue = (char *) value;
+		pAssoc->Value.sValue = (char *) value;
 		pAssoc->nHashValue = nHash;
 	}
 }
@@ -347,7 +346,7 @@ void Variables::SetAt(const char* key, unsigned long value)
 	}
 	//set value only if we have a key
 	if (pAssoc->key) {
-		pAssoc->nValue = value;
+		pAssoc->Value.nValue = value;
 		pAssoc->nHashValue = nHash;
 	}
 }
