@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.88 2003/12/19 14:35:59 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.89 2003/12/19 17:27:41 balrog994 Exp $
  *
  */
 
@@ -71,7 +71,7 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 	char * StartArea = tm->QueryField();
 	int startX = atoi(tm->QueryField(1,0));
 	int startY = atoi(tm->QueryField(2,0));
-	DataStream * str = core->GetResourceMgr()->GetResource(StartArea, IE_ARE_CLASS_ID);
+	/*DataStream * str = core->GetResourceMgr()->GetResource(StartArea, IE_ARE_CLASS_ID);
 	MapMgr * am = (MapMgr*)core->GetInterface(IE_ARE_CLASS_ID);
 	if(!am) {
 		return NULL;
@@ -81,9 +81,10 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 		return NULL;
 	}
 	Map * map = am->GetMap();
-	int areaindex = core->GetGame()->AddMap(map);
-	gc->SetCurrentArea(areaindex);
-	core->FreeInterface(am);
+	int areaindex = core->GetGame()->AddMap(map);*/
+	core->LoadGame(-1);
+	gc->SetCurrentArea(0);
+	//core->FreeInterface(am);
 	core->DelTable(start);
 	core->GetVideoDriver()->MoveViewportTo(startX, startY);
 	core->GetActor(0);
