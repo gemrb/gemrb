@@ -12,13 +12,17 @@ def DisplayRaces():
 	global TopIndex
 
 	TopIndex=GemRB.GetVar("TopIndex")
-	print TopIndex
 	for i in range(0, 11):
                 Button = GemRB.GetControl(RaceWindow,i+6)
-		GemRB.SetText(RaceWindow,Button, GemRB.GetTableValue(RaceTable,i+TopIndex,0) )
-                GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
-		GemRB.SetEvent(RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"RacePress")
-		GemRB.SetVarAssoc(RaceWindow,Button,"HateRace",GemRB.GetTableValue(RaceTable,i+TopIndex,1) )
+		Val = GemRB.GetTableValue(RaceTable, i+TopIndex,0)
+		if Val==0:
+			GemRB.SetText(RaceWindow, Button, "")
+			GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_DISABLED)
+		else:
+			GemRB.SetText(RaceWindow,Button, Val)
+        	        GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
+			GemRB.SetEvent(RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"RacePress")
+			GemRB.SetVarAssoc(RaceWindow,Button,"HateRace",GemRB.GetTableValue(RaceTable,i+TopIndex,1) )
 	return
 
 def OnLoad():
@@ -35,7 +39,9 @@ def OnLoad():
 		GemRB.SetNextScript("GUICG6")
 		return
 	RaceTable = GemRB.LoadTable(TableName)
-	RaceCount = GemRB.GetTableRowCount(RaceTable)
+	RaceCount = GemRB.GetTableRowCount(RaceTable)-11
+	if RaceCount<0:
+		RaceCount=0
 
 	for i in range(0,11):
                 Button = GemRB.GetControl(RaceWindow,i+6)
@@ -51,7 +57,7 @@ def OnLoad():
 	GemRB.SetText(RaceWindow,TextAreaControl,17237)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
-	ScrollBarControl = GemRB.GetControl(RaceWindow, 3)
+	ScrollBarControl = GemRB.GetControl(RaceWindow, 1)
 	GemRB.SetVarAssoc(RaceWindow, ScrollBarControl, "TopIndex",RaceCount)
 	GemRB.SetEvent(RaceWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "DisplayRaces")
 
@@ -63,7 +69,7 @@ def OnLoad():
 
 def RacePress():
 	Race = GemRB.GetVar("HateRace")
- 	Row = GemRB.FindTableValue(RaceTable,Race,1)
+ 	Row = GemRB.FindTableValue(RaceTable,1, Race)
 	GemRB.SetText(RaceWindow,TextAreaControl, GemRB.GetTableValue(RaceTable, Row, 2) )
 	GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_ENABLED)
 	return
