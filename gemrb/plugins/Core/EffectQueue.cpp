@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.3 2004/11/07 22:18:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.4 2004/11/07 22:56:26 edheldil Exp $
  *
  */
 
 #include <stdio.h>
 #include "Interface.h"
 #include "Actor.h"
+#include "EffectQueue.h"
 
 #define FX_EXPIRED -1
 #define FX_NOT_APPLIED  0
@@ -156,21 +157,7 @@ int fx_condition_modifier (Actor* target, Effect* fx)
 {
 	printf( "fx_condition_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat(IE_CON, fx->Parameter1, fx->Parameter2);
-/*
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_CON, fx->Parameter1);
-		break;
-	case 1:
-		STAT_SET( IE_CON, fx->Parameter1);
-		break;
-	case 2:
-		STAT_MUL( IE_CON, fx->Parameter1);
-		break;
-	// default: FIXME:should not happen
-	}
-*/
+	target->NewStat( IE_CON, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 

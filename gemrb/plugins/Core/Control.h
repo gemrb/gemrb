@@ -15,13 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.25 2004/08/22 19:24:26 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.26 2004/11/07 22:56:26 edheldil Exp $
  *
  */
 
 #ifndef CONTROL_H
 #define CONTROL_H
 
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #define IE_GUI_BUTTON		0
 #define IE_GUI_PROGRESSBAR	1 //gemrb extension

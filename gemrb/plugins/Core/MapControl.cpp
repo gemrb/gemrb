@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.16 2004/10/17 07:06:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.17 2004/11/07 22:56:26 edheldil Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -162,6 +162,7 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 		i = MyMap -> GetMapNoteCount();
 		while (i--) {
 			MapNote * mn = MyMap -> GetMapNote(i);
+			printf ("NOTE: %d\n", mn->color);
 			Sprite2D *anim = Flag[mn->color&7];
 			if(ConvertToGame) {
 				vp.x = GAME_TO_SCREENX(mn->Pos.x);
