@@ -17,7 +17,7 @@ def OnLoad():
 	OkButton = GemRB.GetControl(GamePlayWindow, 26)
 	CancelButton = GemRB.GetControl(GamePlayWindow, 27)
 	TextAreaControl = GemRB.GetControl(GamePlayWindow, 28)
-
+        GemRB.SetText(GamePlayWindow, TextAreaControl, 18043)
         GemRB.SetText(GamePlayWindow, OkButton, 11973)
         GemRB.SetText(GamePlayWindow, CancelButton, 13727)
 	
