@@ -58,7 +58,10 @@ void * __stdcall ACMImp::dspcallback(void *originalbuffer, void *newbuffer, int 
 		int tottime = FSOUND_Stream_GetLengthMs(streams[param].stream);
 #endif
 		unsigned long volume;
-		core->GetDictionary()->Lookup("Volume Music", volume);
+		if(!core->GetDictionary()->Lookup("Volume Music", volume)) {
+			core->GetDictionary()->SetAt("Volume Music", 10);
+			volume = 10;
+		}
 		FSOUND_SetVolume(streams[param].channel, (volume/10.0)*255);
 #ifdef WIN32
 		//printf("curtime = %d, tottime = %d, delta = %d\n", curtime, tottime, tottime-curtime);
@@ -194,7 +197,7 @@ unsigned long ACMImp::LoadFile(const char * filename)
 			int freq;
 			FSOUND_Sample_GetDefaults(smp, &freq, NULL, NULL, NULL);
 			unsigned int lastsample = FSOUND_Stream_GetLengthMs(sound)*(freq / 1000.0);
-			if(!FSOUND_Stream_AddSyncPoint(sound, lastsample-1, "End"))
+			if(!FSOUND_Stream_AddSyncPoint(sound, lastsample-800, "End"))
 				printf("Error setting the Synch Point: %d\n", FSOUND_GetError());
 			return ret;
 		}
@@ -250,7 +253,7 @@ unsigned long ACMImp::LoadFile(const char * filename)
 			int freq;
 			FSOUND_Sample_GetDefaults(smp, &freq, NULL, NULL, NULL);
 			unsigned int lastsample = FSOUND_Stream_GetLengthMs(sound)*(freq / 1000.0);
-			if(!FSOUND_Stream_AddSyncPoint(sound, lastsample-1, "End"))
+			if(!FSOUND_Stream_AddSyncPoint(sound, lastsample-800, "End"))
 				printf("Error setting the Synch Point\n");
 			return ret;
 		}
