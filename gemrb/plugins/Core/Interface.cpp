@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.217 2004/09/12 15:52:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.218 2004/09/21 00:13:24 edheldil Exp $
  *
  */
 
@@ -41,6 +41,7 @@
 #include "ArchiveImporter.h"
 #include "WorldMapMgr.h"
 #include "AmbientMgr.h"
+#include "ItemMgr.h"
 
 GEM_EXPORT Interface* core;
 
@@ -126,6 +127,12 @@ Interface::Interface(int iargc, char** iargv)
 	strcpy( Palette16, "MPALETTE" );
 	strcpy( Palette32, "PAL32" );
 	strcpy( Palette256, "MPAL256" );
+	strcpy( TooltipBackResRef, "\0" );
+	TooltipColor.r = 0;
+	TooltipColor.g = 255;
+	TooltipColor.b = 0;
+	TooltipColor.a = 255;
+	TooltipMargin = 10;
 	GameFeatures = 0;
 }
 
@@ -437,6 +444,22 @@ int Interface::Init()
 	FreeInterface( anim );
 	printMessage( "Core", "Fonts Loaded...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
+
+	if (TooltipBackResRef[0]) {
+		printMessage( "Core", "Initializing Tooltips...", WHITE );
+		DataStream* str = key->GetResource( TooltipBackResRef, IE_BAM_CLASS_ID );
+		anim = ( AnimationMgr * ) GetInterface( IE_BAM_CLASS_ID );
+		anim->Open( str, true );
+		TooltipBack = new Sprite2D * [3];
+		for (int i = 0; i < 3; i++) {
+			TooltipBack[i] = anim->GetFrameFromCycle( i, 0 );
+			TooltipBack[i]->XPos = 0;
+			TooltipBack[i]->YPos = 0;
+		}
+		FreeInterface( anim );
+		printStatus( "OK", LIGHT_GREEN );
+	}
+
 	printMessage( "Core", "Initializing the Event Manager...", WHITE );
 	evntmgr = new EventMgr();
 	printStatus( "OK", LIGHT_GREEN );
@@ -1066,6 +1089,24 @@ bool Interface::LoadGemRBINI()
 	if (s)
 		strcpy( TooltipFont, s );
 
+	s = ini->GetKeyAsString( "resources", "TooltipBack", NULL );
+	if (s)
+		strcpy( TooltipBackResRef, s );
+
+	s = ini->GetKeyAsString( "resources", "TooltipColor", NULL );
+	if (s) {
+		if (s[0] == '#') {
+			unsigned long c = strtoul (s + 1, NULL, 16);
+			// FIXME: check errno
+			TooltipColor.r = (c >> 24) & 255;
+			TooltipColor.g = (c >> 16) & 255;
+			TooltipColor.b = (c >> 8) & 255;
+			TooltipColor.a = c & 255;
+		}
+	}
+
+	TooltipMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", TooltipMargin );
+
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
 	if (s)
 		strcpy( INIConfig, s );
@@ -1631,13 +1672,23 @@ void Interface::DrawWindows(void)
 
 void Interface::DrawTooltip ()
 {	
-	if (! tooltip_text) 
+	if (! tooltip_text || !tooltip_text[0]) 
 		return;
 
 	Font* fnt = GetFont( TooltipFont );
 
+	int w1;
+	int w2;
 	int w = fnt->CalcStringWidth( tooltip_text );
 	int h = fnt->maxHeight;
+
+	if (TooltipBack) {
+		h = TooltipBack[0]->Height;
+		w1 = TooltipBack[1]->Width;
+		w2 = TooltipBack[2]->Width;
+		w += TooltipMargin + w1 + w2;
+	}
+
 
 	int x = tooltip_x - w / 2;
 	int y = tooltip_y - h / 2;
@@ -1650,13 +1701,22 @@ void Interface::DrawTooltip ()
 	else if (y + h > Height) 
 		y = Height - h;
 
-	Color fore = {0x00, 0xff, 0x00, 0x00};
+
+	// FIXME: add tooltip scroll animation for bg. also, take back[0] from
+	//   center, not from left end
+	if (TooltipBack) {
+		Region r2 = Region( x + w1, y, w - (w1 + w2), h );
+		video->BlitSprite( TooltipBack[0], x + w1, y, true, &r2 );
+		video->BlitSprite( TooltipBack[1], x, y, true );
+		video->BlitSprite( TooltipBack[2], x + w - w2, y, true );
+	}
+
 	Color back = {0x00, 0x00, 0x00, 0x00};
-	Color* palette = video->CreatePalette( fore, back );
+	Color* palette = video->CreatePalette( TooltipColor, back );
 	
 	fnt->Print( Region( x, y, w, h ),
 		    ( unsigned char * ) tooltip_text, palette,
-		    IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE, true );
+		    IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true );
 }
 
 Window* Interface::GetWindow(unsigned short WindowIndex)
@@ -2326,3 +2386,27 @@ void Interface::DragItem(CREItem *item)
 	// FIXME: what if we already drag st.?
 	DraggedItem = item;
 }
+
+Item* Interface::GetItem(const char* resname)
+{
+	DataStream* str = GetResourceMgr()->GetResource( resname, IE_ITM_CLASS_ID );
+	ItemMgr* sm = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
+	if (sm == NULL) {
+		delete ( str );
+		return NULL;
+	}
+	if (!sm->Open( str, true )) {
+		core->FreeInterface( sm );
+		return NULL;
+	}
+
+	Item* item = sm->GetItem();
+	if (item == NULL) {
+		core->FreeInterface( sm );
+		return NULL;
+	}
+
+	core->FreeInterface( sm );
+	return item;
+}
+
