@@ -120,7 +120,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			if(infoPoints[i]->textDisplaying == 1) {
 				Font * font = core->GetFont(9);
 				Region rgn(infoPoints[i]->outline->BBox.x+(infoPoints[i]->outline->BBox.w/2)-100, infoPoints[i]->outline->BBox.y, 200, 400);
-				font->Print(rgn, (unsigned char*)infoPoints[i]->String, InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false);
+				font->Print(rgn, (unsigned char*)infoPoints[i]->String, InfoTextPalette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, false);
 			}
 		}
 	}
@@ -181,6 +181,28 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		else {
 			lastActor = actor;
 			lastActor->actor->anims->DrawCircle = true;
+			switch(lastActor->actor->BaseStats[IE_EA]) {
+				case EVILCUTOFF:
+				case GOODCUTOFF:
+				break;
+
+				case PC:
+				case FAMILIAR:
+				case ALLY:
+				case CONTROLLED:
+				case CHARMED:
+				case EVILBUTGREEN:
+					nextCursor = 0;
+				break;
+
+				case ENEMY:
+				case GOODBUTRED:
+					nextCursor = 12;
+				break;
+				default:
+					nextCursor = 18;
+				break;
+			}
 		}
 	}
 	//CalculateSelection(GameX, GameY);
@@ -191,7 +213,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	overContainer = area->tm->GetContainer(GameX, GameY);
 	if(overContainer) {
 		if(overContainer->TrapDetected && overContainer->Trapped) {
-				nextCursor=39;
+				nextCursor=38;
 		}
 		else {
 				nextCursor=2;
