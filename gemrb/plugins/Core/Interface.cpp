@@ -598,7 +598,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 }
 
 /** Get a Control on a Window */
-int Interface::GetControl(unsigned short WindowIndex, unsigned short ControlID)
+int Interface::GetControl(unsigned short WindowIndex, unsigned long ControlID)
 {
 	if(WindowIndex >= windows.size())
 		return -1;

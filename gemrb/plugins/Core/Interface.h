@@ -117,7 +117,7 @@ public:
 			topwin.push_back(Index);
 	}
 	/** Get a Control on a Window */
-	int GetControl(unsigned short WindowIndex, unsigned short ControlID);
+	int GetControl(unsigned short WindowIndex, unsigned long ControlID);
 	/** Set the Text of a Control */
 	int SetText(unsigned short WindowIndex, unsigned short ControlIndex, const char * string);
 	/** Set a Window Visible Flag */
