@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.237 2004/11/14 14:20:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.238 2004/11/18 21:03:21 edheldil Exp $
  *
  */
 
@@ -42,6 +42,7 @@
 #include "WorldMapMgr.h"
 #include "AmbientMgr.h"
 #include "ItemMgr.h"
+#include "MapControl.h"
 
 GEM_EXPORT Interface* core;
 
@@ -1655,6 +1656,14 @@ int Interface::SetEvent(unsigned short WindowIndex,
 			 {
 				ScrollBar* sb = ( ScrollBar* ) ctrl;
 				strncpy( sb->ScrollBarOnChange, funcName, sizeof(EventHandler) );
+				return 0;
+			}
+			break;
+		case IE_GUI_MAP:
+			//MapControl
+			 {
+				MapControl* mc = ( MapControl* ) ctrl;
+				strncpy( mc->MapControlOnClick, funcName, sizeof(EventHandler) );
 				return 0;
 			}
 			break;

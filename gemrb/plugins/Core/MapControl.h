@@ -41,6 +41,7 @@ public:
 	// Size of area viewport. FIXME: hack!
 	short ViewWidth, ViewHeight;
 	short XCenter, YCenter;
+	EventHandler MapControlOnClick;
 
 	MapControl(void);
 	~MapControl(void);

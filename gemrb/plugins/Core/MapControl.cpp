@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.18 2004/11/16 20:55:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.19 2004/11/18 21:03:21 edheldil Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -71,6 +71,10 @@ MapControl::MapControl(void)
 	Changed = true;
 	ConvertToGame = true;
 	memset(Flag,0,sizeof(Flag) );
+
+	// initialize var and event callback to no-ops
+	VarName[0] = 0;
+	MapControlOnClick[0] = 0;
 
 	MyMap = core->GetGame()->GetCurrentMap();
 	MapMOS = MyMap->SmallMap->GetImage();
@@ -277,6 +281,11 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 void MapControl::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short /*Mod*/)
 {
+	// FIXME: it would be better if the var names were user-settable
+	core->GetDictionary()->SetAt( "MapControlX", SCREEN_TO_MAPX(x) );
+	core->GetDictionary()->SetAt( "MapControlY", SCREEN_TO_MAPX(y) );
+	RunEventHandler( MapControlOnClick );
+
 	if ((Button != GEM_MB_ACTION) ) {
 		return;
 	}
