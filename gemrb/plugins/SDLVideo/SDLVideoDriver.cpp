@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.80 2004/08/07 15:41:53 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.81 2004/08/07 19:32:46 divide Exp $
  *
  */
 
@@ -889,7 +889,7 @@ Region SDLVideoDriver::GetViewport()
 void SDLVideoDriver::SetViewport(int x, int y)
 {
 	if (x != Viewport.x || y != Viewport.y) {
-		core->GetSoundMgr()->UpdateViewportPos( x + Viewport.w / 2, y + Viewport.h / 2 );
+		core->GetSoundMgr()->UpdateViewportPos( (x - xCorr) + disp->w / 2, (y - yCorr) + disp->h / 2 );
 	}
 	Viewport.x = x;
 	Viewport.y = y;
