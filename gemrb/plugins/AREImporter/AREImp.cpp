@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.7 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.8 2003/11/26 14:03:02 balrog994 Exp $
  *
  */
 
@@ -26,6 +26,7 @@
 #include "../Core/Interface.h"
 #include "../Core/ActorMgr.h"
 #include "../Core/FileStream.h"
+#include "../Core/ImageMgr.h"
 
 AREImp::AREImp(void)
 {
@@ -73,7 +74,15 @@ Map * AREImp::GetMap()
 	TileMapMgr * tmm = (TileMapMgr*)core->GetInterface(IE_WED_CLASS_ID);
 	DataStream * wedfile = core->GetResourceMgr()->GetResource(WEDResRef, IE_WED_CLASS_ID);
 	tmm->Open(wedfile);
-	map->AddTileMap(tmm->GetTileMap());
+
+	ImageMgr * lm = (ImageMgr*)core->GetInterface(IE_BMP_CLASS_ID);
+	char ResRef[9];
+	strcpy(ResRef, WEDResRef);
+	strcat(ResRef, "LM");
+	DataStream * lmstr = core->GetResourceMgr()->GetResource(ResRef, IE_BMP_CLASS_ID);
+	lm->Open(lmstr, true);
+
+	map->AddTileMap(tmm->GetTileMap(), lm);
 	core->FreeInterface(tmm);
 	str->Seek(ActorOffset, GEM_STREAM_START);
 	if(!core->IsAvailable(IE_CRE_CLASS_ID)) {
