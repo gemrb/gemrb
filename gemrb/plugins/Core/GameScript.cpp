@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.84 2004/03/11 20:49:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.85 2004/03/11 22:08:30 avenger_teambg Exp $
  *
  */
 
@@ -85,6 +85,7 @@ static TriggerLink triggernames[] = {
 static ActionLink actionnames[] = {
 	{"actionoverride",NULL}, {"activate",GameScript::Activate},
 	{"addglobals",GameScript::AddGlobals}, {"ally",GameScript::Ally},
+	{"addxpobject", GameScript::AddXPObject},
 	{"ambientactivate",GameScript::AmbientActivate},
 	{"bitclear",GameScript::BitClear}, {"bitset",GameScript::GlobalBOr}, //probably the same
 	{"changeaiscript",GameScript::ChangeAIScript},
@@ -102,10 +103,13 @@ static ActionLink actionnames[] = {
 	{"closedoor",GameScript::CloseDoor,AF_BLOCKING},
 	{"continue",GameScript::Continue,AF_INSTANT | AF_CONTINUE},
 	{"createcreature",GameScript::CreateCreature},
+	{"createcreatureatfeet",GameScript::CreateCreatureOffset}, //this is the same
+	{"createcreatureoffset",GameScript::CreateCreatureOffset},
 	{"createvisualeffect",GameScript::CreateVisualEffect},
 	{"createvisualeffectobject",GameScript::CreateVisualEffectObject},
 	{"cutsceneid",GameScript::CutSceneID,AF_INSTANT},
 	{"deactivate",GameScript::Deactivate},
+	{"destroypartygold",GameScript::DestroyPartyGold},
 	{"destroyself",GameScript::DestroySelf},
 	{"dialogue",GameScript::Dialogue,AF_BLOCKING},
 	{"dialogueforceinterrupt",GameScript::DialogueForceInterrupt,AF_BLOCKING},
@@ -115,11 +119,14 @@ static ActionLink actionnames[] = {
 	{"endcutscenemode",GameScript::EndCutSceneMode},
 	{"enemy",GameScript::Enemy}, {"face",GameScript::Face,AF_BLOCKING},
 	{"faceobject",GameScript::FaceObject, AF_BLOCKING},
+	{"fadefromblack",GameScript::FadeFromColor}, //probably the same
 	{"fadefromcolor",GameScript::FadeFromColor},
+	{"fadetoblack",GameScript::FadeToColor}, //probably the same
 	{"fadetocolor",GameScript::FadeToColor},
 	{"floatmessage",GameScript::DisplayStringHead}, //probably the same
-	{"forceaiscript",GameScript::ChangeAIScript}, //probably the same
+	{"forceaiscript",GameScript::ForceAIScript},
 	{"forcespell",GameScript::ForceSpell},
+	{"giveexperience", GameScript::AddXPObject},
 	{"givepartygold",GameScript::GivePartyGold},
 	{"givepartygoldglobal",GameScript::GivePartyGoldGlobal},
 	{"globalband",GameScript::GlobalBAnd},
@@ -135,6 +142,8 @@ static ActionLink actionnames[] = {
 	{"globalshlglobal",GameScript::GlobalShLGlobal},
 	{"globalshr",GameScript::GlobalShR},
 	{"globalshrglobal",GameScript::GlobalShRGlobal},
+	{"globalxor",GameScript::GlobalXor},
+	{"globalxorglobal",GameScript::GlobalXorGlobal},
 	{"hidegui",GameScript::HideGUI},
 	{"incrementglobal",GameScript::IncrementGlobal},
 	{"incrementglobalonce",GameScript::IncrementGlobalOnce},
@@ -157,8 +166,13 @@ static ActionLink actionnames[] = {
 	{"moveviewpoint",GameScript::MoveViewPoint},
 	{"noaction",GameScript::NoAction},
 	{"opendoor",GameScript::OpenDoor,AF_BLOCKING},
+	{"permanentstatchange",GameScript::ChangeStat}, //probably the same
 	{"playdead",GameScript::PlayDead}, {"playsound",GameScript::PlaySound},
+	{"runtoobject",GameScript::MoveToObject,AF_BLOCKING}, //until we know better
+	{"runtopoint",GameScript::MoveToPoint,AF_BLOCKING}, //until we know better
+	{"runtopointnorecticle",GameScript::MoveToPoint,AF_BLOCKING},//until we know better
 	{"screenshake",GameScript::ScreenShake,AF_BLOCKING},
+	{"setanimstate",GameScript::SetAnimState,AF_BLOCKING},
 	{"setdialogue",GameScript::SetDialogue,AF_BLOCKING},
 	{"setglobal",GameScript::SetGlobal},
 	{"setglobaltimer",GameScript::SetGlobalTimer},
@@ -180,7 +194,8 @@ static ActionLink actionnames[] = {
 	{"unhidegui",GameScript::UnhideGUI},
 	{"unmakeglobal",GameScript::UnMakeGlobal}, //this is a GemRB extension
 	{"verbalconstant",GameScript::VerbalConstant},
-	{"wait",GameScript::Wait, AF_BLOCKING}, { NULL,NULL}, 
+	{"wait",GameScript::Wait, AF_BLOCKING},
+	{"waitrandom",GameScript::WaitRandom, AF_BLOCKING}, { NULL,NULL}, 
 };
 
 //Make this an ordered list, so we could use bsearch!
@@ -1456,7 +1471,7 @@ Trigger* GameScript::GenerateTrigger(char* String)
 //in this implementation, Myself will drop the parameter array
 //i think all object filters could be expected to do so
 //they should remove unnecessary elements from the parameters
-Targets *GameScript::Myself(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Myself(Scriptable* Sender, Targets* parameters)
 {
 	parameters->Clear();
 	if(Sender->Type==ST_ACTOR) {
@@ -2491,10 +2506,14 @@ void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
 	actor->NewStat( parameters->int0Parameter, parameters->int1Parameter,
 			parameters->int2Parameter );
 }
@@ -2586,15 +2605,25 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	Actor* ab = aM->GetActor();
 	int x = parameters->XpointParameter;
 	int y = parameters->YpointParameter;
-	if (flags & CC_OFFSET) {
-		x += Sender->XPos;
-		y += Sender->YPos;
+	switch (flags & CC_MASK) {
+		case CC_OBJECT:
+			Sender = GetActorFromObject( Sender, parameters->objects[1] );
+			x += Sender->XPos;
+			y += Sender->YPos;
+		case CC_OFFSET:
+			x += Sender->XPos;
+			y += Sender->YPos;
 	}
 	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter );
 	ab->AnimID = IE_ANI_AWAKE;
 	ab->Orientation = parameters->int0Parameter;
 	Map* map = core->GetGame()->GetMap( 0 );
 	map->AddActor( ab );
+
+	//setting the deathvariable if it exists (iwd2)
+	if(parameters->string1Parameter[0]) {
+		ab->SetScriptName(parameters->string1Parameter);
+	}
 	core->FreeInterface( aM );
 }
 
@@ -2603,9 +2632,20 @@ void GameScript::CreateCreature(Scriptable* Sender, Action* parameters)
 	CreateCreatureCore( Sender, parameters, 0 );
 }
 
-void GameScript::CreateCreatureObject(Scriptable* Sender, Action* parameters)
+void GameScript::CreateCreatureOffset(Scriptable* Sender, Action* parameters)
 {
 	CreateCreatureCore( Sender, parameters, CC_OFFSET );
+}
+
+void GameScript::CreateCreatureObject(Scriptable* Sender, Action* parameters)
+{
+	CreateCreatureCore( Sender, parameters, CC_OBJECT );
+}
+
+//this is the same, object + offset
+void GameScript::CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters)
+{
+	CreateCreatureCore( Sender, parameters, CC_OBJECT );
 }
 
 void GameScript::StartCutSceneMode(Scriptable* Sender, Action* parameters)
@@ -2667,6 +2707,18 @@ void GameScript::ChangeAIScript(Scriptable* Sender, Action* parameters)
 	actor->SetScript( parameters->string0Parameter, parameters->int0Parameter );
 }
 
+void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
+	//changeaiscript clears the queue, i believe
+	//	actor->ClearActions();
+	actor->SetScript( parameters->string0Parameter, parameters->int0Parameter );
+}
+
 void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -2677,6 +2729,45 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 		printf( "Displaying string on: %s\n", actor->scriptName );
 		actor->DisplayHeadText( core->GetString( actor->StrRefs[parameters->int0Parameter], 2 ) );
 	}
+}
+
+void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
+{
+	unsigned int value;
+
+	*((unsigned short *) &value) = parameters->XpointParameter;
+	*(((unsigned short *) &value)+1) = (unsigned short) parameters->YpointParameter;
+	SetVariable(Sender, parameters->string0Parameter, value);
+}
+
+void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
+{
+	unsigned int value;
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	*((unsigned short *) &value) = tar->XPos;
+	*(((unsigned short *) &value)+1) = (unsigned short) tar->YPos;
+	SetVariable(Sender, parameters->string0Parameter, value);
+}
+
+void GameScript::CreateCreatureAtLocation(Scriptable* Sender, Action* parameters)
+{
+	unsigned int value = CheckVariable(Sender, parameters->string0Parameter);
+	parameters->XpointParameter = *(unsigned short *) value;
+	parameters->XpointParameter = *(((unsigned short *) value)+1);
+	CreateCreatureCore(Sender, parameters, CC_OFFSET);
+}
+
+void GameScript::WaitRandom(Scriptable* Sender, Action* parameters)
+{
+	int width = parameters->int1Parameter-parameters->int0Parameter;
+	if(width<2) {
+		width = parameters->int0Parameter;
+	}
+	else {
+		width = rand() % width + parameters->int0Parameter;
+	}
+	Sender->SetWait( width * AI_UPDATE_TIME );
 }
 
 void GameScript::Wait(Scriptable* Sender, Action* parameters)
@@ -3014,6 +3105,28 @@ void GameScript::AmbientActivate(Scriptable* Sender, Action* parameters)
 	anim->Active = parameters->int0Parameter;
 }
 
+void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* target = ( Actor* ) Sender;
+	target->AnimID = parameters->int0Parameter;
+}
+
+void GameScript::SetAnimState(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* target = ( Actor* ) tar;
+	target->AnimID = parameters->int0Parameter;
+}
+
 void GameScript::SetDialogue(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -3261,7 +3374,7 @@ void GameScript::UnMakeGlobal(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::GivePartyGoldGlobal(Scriptable *Sender, Action *parameters)
+void GameScript::GivePartyGoldGlobal(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -3272,7 +3385,12 @@ void GameScript::GivePartyGoldGlobal(Scriptable *Sender, Action *parameters)
 	core->GetGame()->PartyGold+=gold;
 }
 
-void GameScript::GivePartyGold(Scriptable *Sender, Action *parameters)
+void GameScript::CreatePartyGold(Scriptable* Sender, Action* parameters)
+{
+	core->GetGame()->PartyGold+=parameters->int0Parameter;
+}
+
+void GameScript::GivePartyGold(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -3286,7 +3404,16 @@ void GameScript::GivePartyGold(Scriptable *Sender, Action *parameters)
 	core->GetGame()->PartyGold+=gold;
 }
 
-void GameScript::TakePartyGold(Scriptable *Sender, Action *parameters)
+void GameScript::DestroyPartyGold(Scriptable* Sender, Action* parameters)
+{
+	int gold = core->GetGame()->PartyGold;
+	if(gold>parameters->int0Parameter) {
+		gold=parameters->int0Parameter;
+	}
+	core->GetGame()->PartyGold-=gold;
+}
+
+void GameScript::TakePartyGold(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -3300,12 +3427,25 @@ void GameScript::TakePartyGold(Scriptable *Sender, Action *parameters)
 	core->GetGame()->PartyGold-=gold;
 }
 
-void GameScript::AddExperienceParty(Scriptable *Sender, Action* parameters)
+void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
+	actor->NewStat(IE_XP, parameters->int0Parameter, 0);
+}
+
+void GameScript::AddExperienceParty(Scriptable* Sender, Action* parameters)
 {
 	core->GetGame()->ShareXP(parameters->int0Parameter);
 }
 
-void GameScript::AddExperiencePartyGlobal(Scriptable *Sender, Action* parameters)
+void GameScript::AddExperiencePartyGlobal(Scriptable* Sender, Action* parameters)
 {
 	unsigned long xp = CheckVariable( Sender, parameters->string0Parameter );
 	core->GetGame()->ShareXP(xp);
@@ -3537,6 +3677,15 @@ void GameScript::GlobalBAndGlobal(Scriptable* Sender, Action* parameters)
 	SetVariable( Sender, parameters->string0Parameter, value1 & value2 );
 }
 
+void GameScript::GlobalXorGlobal(Scriptable* Sender, Action* parameters)
+{
+	unsigned long value1 = CheckVariable( Sender,
+							parameters->string0Parameter );
+	unsigned long value2 = CheckVariable( Sender,
+							parameters->string1Parameter );
+	SetVariable( Sender, parameters->string0Parameter, value1 ^ value2 );
+}
+
 void GameScript::GlobalBOr(Scriptable* Sender, Action* parameters)
 {
 	unsigned long value1 = CheckVariable( Sender,
@@ -3551,6 +3700,14 @@ void GameScript::GlobalBAnd(Scriptable* Sender, Action* parameters)
 							parameters->string0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		value1 & parameters->int0Parameter );
+}
+
+void GameScript::GlobalXor(Scriptable* Sender, Action* parameters)
+{
+	unsigned long value1 = CheckVariable( Sender,
+							parameters->string0Parameter );
+	SetVariable( Sender, parameters->string0Parameter,
+		value1 ^ parameters->int0Parameter );
 }
 
 void GameScript::GlobalMax(Scriptable* Sender, Action* parameters)

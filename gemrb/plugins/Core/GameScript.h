@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.57 2004/03/11 20:49:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.58 2004/03/11 22:08:31 avenger_teambg Exp $
  *
  */
 
@@ -585,6 +585,8 @@ struct TriggerLink {
 
 //createcreature flags
 #define CC_OFFSET    1  //add the position of Sender to the coordinates
+#define CC_OBJECT    2  //use object instead of sender
+#define CC_MASK      3
 
 //begindialog flags
 #define BD_STRING0   0
@@ -749,12 +751,17 @@ public:
 	static void AddExperienceParty(Scriptable *Sender, Action* parameters);
 	static void AddExperiencePartyGlobal(Scriptable *Sender, Action* parameters);
 	static void AddGlobals(Scriptable* Sender, Action* parameters);
+	static void AddXPObject(Scriptable *Sender, Action* parameters);
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
 	static void BitClear(Scriptable* Sender, Action* parameters);
 	static void CloseDoor(Scriptable* Sender, Action* parameters);
 	static void CreateCreature(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureAtLocation(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObject(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureOffset(Scriptable* Sender, Action* parameters);
+	static void CreatePartyGold(Scriptable *Sender, Action *parameters);
 	static void ChangeAIScript(Scriptable* Sender, Action* parameters);
 	static void ChangeAlignment(Scriptable* Sender, Action* parameters);
 	static void ChangeAllegiance(Scriptable* Sender, Action* parameters);
@@ -772,6 +779,7 @@ public:
 		Action* parameters);
 	static void CutSceneID(Scriptable* Sender, Action* parameters);
 	static void Deactivate(Scriptable* Sender, Action* parameters);
+	static void DestroyPartyGold(Scriptable* Sender, Action* parameters);
 	static void DestroySelf(Scriptable* Sender, Action* parameters);
 	static void Dialogue(Scriptable* Sender, Action* parameters);
 	static void DialogueForceInterrupt(Scriptable* Sender, Action* parameters);
@@ -784,6 +792,7 @@ public:
 	static void FaceObject(Scriptable* Sender, Action* parameters);
 	static void FadeFromColor(Scriptable* Sender, Action* parameters);
 	static void FadeToColor(Scriptable* Sender, Action* parameters);
+	static void ForceAIScript(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
 	static void GivePartyGold(Scriptable* Sender, Action* parameters);
 	static void GivePartyGoldGlobal(Scriptable* Sender, Action* parameters);
@@ -804,6 +813,8 @@ public:
 	static void GlobalShR(Scriptable* Sender, Action* parameters);
 	static void GlobalShRGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalSubGlobal(Scriptable* Sender, Action* parameters);
+	static void GlobalXor(Scriptable* Sender, Action* parameters);
+	static void GlobalXorGlobal(Scriptable* Sender, Action* parameters);
 	static void HideGUI(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobal(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobalOnce(Scriptable* Sender, Action* parameters);
@@ -828,8 +839,12 @@ public:
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
 	static void PlayDead(Scriptable* Sender, Action* parameters);
 	static void PlayerDialogue(Scriptable* Sender, Action* parameters);
+	static void PlaySequence(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
+	static void SaveLocation(Scriptable* Sender, Action* parameters);
+	static void SaveObjectLocation(Scriptable* Sender, Action* parameters);
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
+	static void SetAnimState(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
 	static void SetGlobal(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTimer(Scriptable* Sender, Action* parameters);
@@ -855,6 +870,7 @@ public:
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void VerbalConstant(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);
+	static void WaitRandom(Scriptable* Sender, Action* parameters);
 public:
 	//Objects
 	static Targets *BestAC(Scriptable *Sender, Targets *parameters);
