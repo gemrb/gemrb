@@ -40,7 +40,11 @@ def OnLoad():
 
 		Button = GemRB.GetControl(PartyFormationWindow, i)
 		GemRB.SetVarAssoc(PartyFormationWindow, Button, "Slot",i-18)
-		GemRB.SetText(PartyFormationWindow, Button, 10264)
+		if ResRef == "":
+			GemRB.SetText(PartyFormationWindow, Button, 10264)
+		else:
+			GemRB.SetText(PartyFormationWindow, Button, GemRB.GetPlayerName(i-18,0) )
+
 		GemRB.SetEvent(PartyFormationWindow, Button, IE_GUI_BUTTON_ON_PRESS, "GeneratePress")
 	
 	if Portraits == 0:
