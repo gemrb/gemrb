@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.34 2004/02/05 18:04:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.35 2004/02/11 20:42:22 balrog994 Exp $
  *
  */
 
@@ -224,7 +224,8 @@ bool ACMImp::Init(void)
 			break;
 		}
 		printf("Retrying to open sound, last error:(%d)\n",alGetError());
-		sleep(15);
+		//sleep(15);
+		SDL_Delay(15);
 		alutInit(0,NULL);
 	}
 	if(i==RETRY)
