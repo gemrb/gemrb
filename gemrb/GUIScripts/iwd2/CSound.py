@@ -24,7 +24,7 @@ def OnLoad():
 	GemRB.SetText(SoundWindow,TextAreaControl,17236)
 
 	TextAreaControl = GemRB.GetControl(SoundWindow, 45)
-	GemRB.SetTextAreaSelectable(SoundWindow, TextAreaControl,1)
+	GemRB.SetTextAreaFlags(SoundWindow, TextAreaControl,IE_GUI_TEXTAREA_SELECTABLE)
 	GemRB.SetVarAssoc(SoundWindow, TextAreaControl, "Sound", 0)
 	RowCount=GemRB.GetCharSounds(SoundWindow, TextAreaControl)
 	

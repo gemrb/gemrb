@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUISTORE.py,v 1.9 2005/03/20 16:24:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUISTORE.py,v 1.10 2005/03/20 21:28:24 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -806,7 +806,7 @@ def DonateGold ():
 	Window = StoreDonateWindow
 	
 	TextArea = GemRB.GetControl (Window, 0)	
-	GemRB.SetTAAutoScroll (Window, TextArea, 1)
+	GemRB.SetTextAreaFlags (Window, TextArea, IE_GUI_TEXTAREA_AUTOSCROLL)
 
 	Button = GemRB.GetControl (Window, 10)
 	#GemRB.SetButtonAnimation (Window, Button, 0, 0)
@@ -932,7 +932,7 @@ def GulpDrink ():
 	Window = StoreRumourWindow
 
 	TextArea = GemRB.GetControl (Window, 13)
-	GemRB.SetTAAutoScroll (Window, TextArea, 1)
+	GemRB.SetTextAreaFlags (Window, TextArea, IE_GUI_TEXTAREA_AUTOSCROLL)
 	pc = GemRB.GameGetSelectedPCSingle ()
 	intox = GemRB.GetPlayerStat (pc, IE_INTOXICATION)
 	intox = 0

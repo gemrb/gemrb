@@ -31,6 +31,7 @@ from GUIPR import *
 from GUIREC import *
 from GUISTORE import *
 from GUIWORLD import *
+from TextScreen import *
 
 MessageWindow = 0
 PortraitWindow = 0
@@ -51,7 +52,7 @@ def OnLoad():
 	OpenPortraitWindow()
 	PortraitWindow = GUICommonWindows.PortraitWindow
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
-	GemRB.SetTAAutoScroll(MessageWindow, MessageTA, 1)
+	GemRB.SetTextAreaFlags(MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	Button=GemRB.GetControl(OptionsWindow, 10)
 	GemRB.SetEvent(OptionsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizeOptions")
 	Button=GemRB.GetControl(PortraitWindow, 8)
@@ -131,7 +132,7 @@ def OnIncreaseSize():
 		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 		GemRB.SetVar("MessageWindow", TMessageWindow)
 		GemRB.SetVar("MessageTextArea", TMessageTA)
-		GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+		GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	else :
 		if Expand == 1:
 			GemRB.LoadWindowPack(GetWindowPack())
@@ -139,7 +140,7 @@ def OnIncreaseSize():
 			TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 			GemRB.SetVar("MessageWindow", TMessageWindow)
 			GemRB.SetVar("MessageTextArea", TMessageTA)
-			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+			GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 
 	if Expand!=2:
 		GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
@@ -169,7 +170,7 @@ def OnDecreaseSize():
 		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 		GemRB.SetVar("MessageWindow", TMessageWindow)
 		GemRB.SetVar("MessageTextArea", TMessageTA)
-		GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+		GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	else:
 		if Expand == 1:
 			GemRB.LoadWindowPack(GetWindowPack())
@@ -177,7 +178,7 @@ def OnDecreaseSize():
 			TMessageTA = GemRB.GetControl(TMessageWindow, 3)
 			GemRB.SetVar("MessageWindow", TMessageWindow)
 			GemRB.SetVar("MessageTextArea", TMessageTA)
-			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+			GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	if Expand:
 		GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
 		GemRB.UnloadWindow(MessageWindow)

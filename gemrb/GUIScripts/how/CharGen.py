@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.29 2005/03/20 16:24:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.30 2005/03/20 21:28:24 avenger_teambg Exp $
 
 
 #Character Generation
@@ -2131,7 +2131,7 @@ def CharSoundSelect():
 	CharSoundStrings = GemRB.LoadTable ("CHARSTR")
 
 	CharSoundVoiceList = GemRB.GetControl (CharSoundWindow, 45)
-	GemRB.SetTextAreaSelectable (CharSoundWindow, CharSoundVoiceList, 1)
+	GemRB.SetTextAreaFlags (CharSoundWindow, CharSoundVoiceList, IE_GUI_TEXTAREA_SELECTABLE)
 	
 	VoiceList = []
 	for i in range (GemRB.GetTableRowCount (CharSoundStrings) ):

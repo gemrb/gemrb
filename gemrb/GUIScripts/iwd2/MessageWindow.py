@@ -39,7 +39,7 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUIW08")
 	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
 	MessageTA = GemRB.GetControl(MessageWindow, 1)
-	GemRB.SetTAAutoScroll(MessageWindow, MessageTA, 1)
+	GemRB.SetTextAreaFlags(MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 
 	OpenPortraitWindow()
 	ActionsWindow = PortraitWindow = GUICommonWindows.PortraitWindow

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.12 2004/11/27 00:19:31 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.13 2005/03/20 21:28:26 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -149,7 +149,7 @@ def OpenQuestsWindow ():
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	QuestsList = List = GemRB.GetControl (Window, 1)
-	GemRB.SetTextAreaSelectable (Window, List, 1)
+	GemRB.SetTextAreaFlags (Window, List, IE_GUI_TEXTAREA_SELECTABLE)
 	GemRB.SetVarAssoc (Window, List, 'SelectedQuest', -1)
 	GemRB.SetEvent (Window,List, IE_GUI_TEXTAREA_ON_CHANGE, "OnJournalQuestSelect")
 
@@ -317,7 +317,7 @@ def OpenBeastsWindow ():
 	GemRB.SetEvent (BeastsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	BeastsList = List = GemRB.GetControl (Window, 0)
-	GemRB.SetTextAreaSelectable (Window, List, 1)
+	GemRB.SetTextAreaFlags (Window, List, IE_GUI_TEXTAREA_SELECTABLE)
 	GemRB.SetVarAssoc (Window, List, 'SelectedBeast', -1)
 	GemRB.SetEvent(Window,List, IE_GUI_TEXTAREA_ON_CHANGE, "OnJournalBeastSelect")
 

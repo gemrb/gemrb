@@ -12,7 +12,7 @@ def OnLoad():
 	MovieWindow = GemRB.LoadWindow(0)
 	GemRB.SetWindowFrame (MovieWindow)
 	TextAreaControl = GemRB.GetControl(MovieWindow, 0)
-	GemRB.SetTextAreaSelectable(MovieWindow, TextAreaControl,1)
+	GemRB.SetTextAreaFlags (MovieWindow, TextAreaControl,IE_GUI_TEXTAREA_SELECTABLE)
 	PlayButton = GemRB.GetControl(MovieWindow, 2)
 	CreditsButton = GemRB.GetControl(MovieWindow, 3)
 	DoneButton = GemRB.GetControl(MovieWindow, 4)

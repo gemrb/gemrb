@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIOPT.py,v 1.2 2004/11/07 18:23:49 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIOPT.py,v 1.3 2005/03/20 21:28:24 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -763,7 +763,7 @@ def SaveGame ():
 
 ## 	# movie list
 ## 	List = GemRB.GetControl (Window, 0)
-## 	GemRB.SetTextAreaSelectable (Window, List, 1)
+## 	GemRB.SetTextAreaFlags (Window, List, IE_GUI_TEXTAREA_SELECTABLE)
 ## 	GemRB.SetVarAssoc (Window, List, 'SelectedMovie', -1)
 	
 ## 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMoviesWindow")

@@ -50,7 +50,7 @@ def OnLoad():
 	OpenPortraitWindow()
 	PortraitWindow = GUICommonWindows.PortraitWindow
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
-	GemRB.SetTAAutoScroll(MessageWindow, MessageTA, 1)
+	GemRB.SetTextAreaFlags(MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	GemRB.SetVar("PortraitWindow", PortraitWindow)
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
 	GemRB.SetVar("OptionsWindow", OptionsWindow)
@@ -94,7 +94,7 @@ def OnIncreaseSize():
 		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 		GemRB.SetVar("MessageWindow", TMessageWindow)
 		GemRB.SetVar("MessageTextArea", TMessageTA)
-		GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+		GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	else :
 		if Expand == 1:
 			GemRB.LoadWindowPack(GetWindowPack())
@@ -102,7 +102,7 @@ def OnIncreaseSize():
 			TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 			GemRB.SetVar("MessageWindow", TMessageWindow)
 			GemRB.SetVar("MessageTextArea", TMessageTA)
-			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+			GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 			
 	if Expand!=2:
 		GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
@@ -132,7 +132,7 @@ def OnDecreaseSize():
 		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 		GemRB.SetVar("MessageWindow", TMessageWindow)
 		GemRB.SetVar("MessageTextArea", TMessageTA)
-		GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+		GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	else:
 		if Expand == 1:
 			GemRB.LoadWindowPack(GetWindowPack())
@@ -140,7 +140,7 @@ def OnDecreaseSize():
 			TMessageTA = GemRB.GetControl(TMessageWindow, 3)
 			GemRB.SetVar("MessageWindow", TMessageWindow)
 			GemRB.SetVar("MessageTextArea", TMessageTA)
-			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+			GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	if Expand:
 		GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
 		GemRB.UnloadWindow(MessageWindow)
