@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.15 2004/11/21 17:54:59 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.16 2004/11/22 18:55:41 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -63,8 +63,8 @@ def OpenMapWindow ():
 	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	# Is this an option?
-	GemRB.SetVar ("ShowMapNotes", 1)
-	GemRB.SetVarAssoc (Window, Button, "ShowMapNotes", 1)
+	GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+	GemRB.SetVarAssoc (Window, Button, "ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 
 	Label = GemRB.GetControl (Window, 0x10000003)
 	GemRB.SetText (Window, Label, "")
@@ -72,7 +72,7 @@ def OpenMapWindow ():
 	# Map Control
 	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0, 0x10000003, "FLAG1")
 	Map = GemRB.GetControl (Window, 2)
-	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", 1)
+	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "AddNoteWindow")
 	GemRB.UnhideGUI ()
 
@@ -121,6 +121,7 @@ def AddNoteWindow ():
 	#set
 	Label = GemRB.GetControl (NoteWindow, 0)
 	GemRB.SetEvent (NoteWindow, Label, IE_GUI_BUTTON_ON_PRESS,"SetMapNote")
+	GemRB.SetButtonFlags (NoteWindow, Label, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	#remove
 	Label = GemRB.GetControl (NoteWindow, 2)
 	GemRB.SetEvent (NoteWindow, Label, IE_GUI_BUTTON_ON_PRESS,"RemoveMapNote")

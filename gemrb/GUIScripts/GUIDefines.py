@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.27 2004/11/18 23:32:41 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.28 2004/11/22 18:55:25 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -69,6 +69,11 @@ IE_GUI_BUTTON_SELECTED   = 0x00000002
 IE_GUI_BUTTON_DISABLED   = 0x00000003
 # Like DISABLED, but processes MouseOver events and draws UNPRESSED bitmap
 IE_GUI_BUTTON_LOCKED   = 0x00000004
+
+#mapcontrol states
+IE_GUI_MAP_NO_NOTES   =  0
+IE_GUI_MAP_VIEW_NOTES =  1
+IE_GUI_MAP_SET_NOTE   =  2
 
 # !!! Keep these synchronized with Font.h !!!
 IE_FONT_ALIGN_LEFT       = 0x00
