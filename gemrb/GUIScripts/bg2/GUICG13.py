@@ -6,7 +6,7 @@ DoneButton = 0
 
 def OnLoad():
 	global ColorWindow, DoneButton
-	Global Color1, Color2, Color3, Color4
+	global Color1, Color2, Color3, Color4
 	
 	GemRB.LoadWindowPack("GUICG")
 	ColorWindow=GemRB.LoadWindow(13)
