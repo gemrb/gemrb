@@ -22,11 +22,22 @@ void EventMgr::AddWindow(Window * win)
 			return;
 		}
 	}
-	windows.push_back(win);
-	if(windows.size() == 1)
-		topwin.push_back(0);
-	else
-		SetOnTop(windows.size()-1);
+	bool found = false;
+	for(unsigned int i = 0; i < windows.size(); i++) {
+		if(windows[i] == NULL) {
+			windows[i] = win;
+			SetOnTop(i);
+			found = true;
+			break;
+		}
+	}
+	if(!found) {
+		windows.push_back(win);
+		if(windows.size() == 1)
+			topwin.push_back(0);
+		else
+			SetOnTop(windows.size()-1);
+	}
 	lastW = win;
 	lastF = NULL;
 }
@@ -35,9 +46,8 @@ void EventMgr::Clear()
 {
 	topwin.clear();
 	std::vector<Window*>::iterator m;
-	while(windows.size() != 0) {
-		m = windows.begin();
-		windows.erase(m);
+	for(m = windows.begin(); m != windows.end(); ++m) {
+		(*m) = NULL;
 	}
 	lastW = NULL;
 	lastF = NULL;
@@ -52,10 +62,13 @@ void EventMgr::DelWindow(unsigned short WindowID)
 	std::vector<Window*>::iterator m;
 	for(m = windows.begin(); m != windows.end(); ++m) {
 		pos++;
+		if((*m) == NULL)
+			continue;
 		if((*m)->WindowID == WindowID) {
 			if(lastW == (*m))
 				lastW = NULL;
-			windows.erase(m);
+			//windows.erase(m);
+			(*m) = NULL;
 			lastF = NULL;
 			break;
 		}
@@ -96,6 +109,8 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 	//for(m = windows.begin(); m != windows.end(); ++m) {
 		m = windows.begin();
 		m+=(*t);
+		if((*m) == NULL)
+			continue;
 		if(!(*m)->Visible)
 			continue;
 		if(((*m)->XPos <= x) && ((*m)->YPos <= y)) { //Maybe we are on the window, let's check
@@ -137,6 +152,8 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 	//for(m = windows.begin(); m != windows.end(); ++m) {
 		m = windows.begin();
 		m+=(*t);
+		if((*m) == NULL)
+			continue;
 		if(!(*m)->Visible)
 			continue;
 		if(((*m)->XPos <= x) && ((*m)->YPos <= y)) { //Maybe we are on the window, let's check
@@ -179,17 +196,18 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button,
 	std::vector<int>::iterator t;
 	for(t = topwin.begin(); t != topwin.end(); ++t) {
 		Window * w = windows[(*t)];
-		if(w == NULL) {
-			printf("DANGER WILL ROBINSON!! The Top Most Window is NULL\n");
-			return;
-		}
+		if(w == NULL) //{
+			//printf("DANGER WILL ROBINSON!! The Top Most Window is NULL\n");
+			//return;
+		//}
+		continue;
 		if((x>=w->XPos) && (x <= (w->XPos+w->Width)) && (y>=w->YPos) && (y<=(w->YPos+w->Height))) {
 			printf("Broadcasting MouseUp Event on Window %d of %d\n", i, topwin.size());
 			Control * ctrl = NULL;
 			int c = 0;
-			int lastWinArraySize = topwin.size();
 			do {
-				if(topwin.size() != lastWinArraySize)
+				w = windows[(*t)];
+				if(w == NULL)
 					break;
 				ctrl = w->GetControl(c++);
 				if(ctrl == NULL)
