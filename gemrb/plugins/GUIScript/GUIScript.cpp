@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.270 2005/02/23 18:59:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.271 2005/02/23 20:45:26 guidoj Exp $
  *
  */
 
@@ -2415,7 +2415,7 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	long value =(long) GameScript::CheckVariable(Sender, Variable, Context);
-	printMessage("GUISCript","",YELLOW);
+	printMessage("GUISCript"," ",YELLOW);
 	printf("%s %s=%ld\n",Context, Variable, value);
 	textcolor(WHITE);
 	return Py_BuildValue( "l", value );

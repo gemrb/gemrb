@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.49 2005/02/09 16:29:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.50 2005/02/23 20:45:26 guidoj Exp $
  *
  */
 
@@ -105,10 +105,10 @@ bool KeyImp::LoadResFile(const char* resfile)
 	f->ReadDword( &ResCount );
 	f->ReadDword( &BifOffset );
 	f->ReadDword( &ResOffset );
-	printMessage( "KEYImporter", "", WHITE );
+	printMessage( "KEYImporter", " ", WHITE );
 	printf( "BIF Files Count: %d (Starting at %d Bytes)\n", BifCount,
 		BifOffset );
-	printMessage( "KEYImporter", "", WHITE );
+	printMessage( "KEYImporter", " ", WHITE );
 	printf( "RES Count: %d (Starting at %d Bytes)\n", ResCount, ResOffset );
 	f->Seek( BifOffset, GEM_STREAM_START );
 	ieDword BifLen, ASCIIZOffset;
@@ -315,7 +315,7 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 {
 	if (type != IE_BAM_CLASS_ID) {
 		printf( "\n" );
-		printMessage( "KEYImporter", "", WHITE );
+		printMessage( "KEYImporter", " ", WHITE );
 		printf( "%s files are not supported.\n", core->TypeExt( type ) );
 		return NULL;
 	}
