@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.39 2004/05/25 16:16:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.40 2004/07/01 23:17:51 guidoj Exp $
  *
  */
 
@@ -290,8 +290,8 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 			fclose( exist );
 		} else
 			fclose( exist );
-		if(ai->OpenArchive( path ) ==GEM_ERROR) {
-			printf("Cannot open archive\n");
+		if (ai->OpenArchive( path ) == GEM_ERROR) {
+			printf("Cannot open archive %s\n", path );
 			core->FreeInterface( ai );
 			return NULL;
 		}
