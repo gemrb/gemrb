@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.15 2004/04/15 16:18:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.16 2004/07/31 12:37:15 avenger_teambg Exp $
 
 # NewLife.py - Character generation screen
 
@@ -65,16 +65,6 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG")
 	#setting up confirmation window
 	QuitWindow = GemRB.LoadWindow(1)
-	TextArea = GemRB.GetControl(QuitWindow, 0)
-	GemRB.SetText(QuitWindow, TextArea, 46782)
-	Button = GemRB.GetControl(QuitWindow, 2)
-	GemRB.SetText(QuitWindow, Button, 46783)
-        GemRB.SetButtonFlags(QuitWindow, Button, IE_GUI_BUTTON_DEFAULT,OP_OR)
-	GemRB.SetEvent(QuitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OkButton")
-
-	Button = GemRB.GetControl(QuitWindow,1)
-	GemRB.SetButtonFlags(QuitWindow, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	GemRB.SetButtonState(QuitWindow, Button, IE_GUI_BUTTON_DISABLED)
 
 	#setting up CG window
 	NewLifeWindow = GemRB.LoadWindow(0)
@@ -120,21 +110,21 @@ def OnLoad():
 
 	Button = GemRB.GetControl(NewLifeWindow, 8)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
-	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_SELECTED)
+	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonSprites(NewLifeWindow, Button, "", 0, 0, 0, 0, 0)
 	GemRB.SetText(NewLifeWindow, Button, 5025)
 	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "AcPress")
 
 	Button = GemRB.GetControl(NewLifeWindow, 9)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
-	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_SELECTED)
+	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonSprites(NewLifeWindow, Button, "", 0, 0, 0, 0, 0)
 	GemRB.SetText(NewLifeWindow, Button, 5026)
 	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "HpPress")
 
 	Button = GemRB.GetControl(NewLifeWindow, 10)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
-	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_SELECTED)
+	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonSprites(NewLifeWindow, Button, "", 0, 0, 0, 0, 0)
 	GemRB.SetText(NewLifeWindow, Button, 5027)
 	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "PointPress")
@@ -220,7 +210,7 @@ def OnLoad():
 	AcceptButton = GemRB.GetControl(NewLifeWindow, 0)
 	GemRB.SetText(NewLifeWindow, AcceptButton, 4192)
 	GemRB.SetEvent(NewLifeWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "AcceptPress")
-        GemRB.SetButtonFlags(NewLifeWindow, AcceptButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetButtonFlags(NewLifeWindow, AcceptButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 	
 	CancelButton = GemRB.GetControl(NewLifeWindow, 1)
 	GemRB.SetText(NewLifeWindow, CancelButton, 4196)	
@@ -259,6 +249,7 @@ def UpdateLabels():
 	GemRB.InvalidateWindow(NewLifeWindow)
 	return
 	
+
 def OkButton():
 	GemRB.SetVisible(QuitWindow, 0)
 	GemRB.SetVisible(NewLifeWindow, 1)
@@ -267,6 +258,18 @@ def OkButton():
 
 def AcceptPress():
 	if TotPoints:
+		# Setting up the error window
+		TextArea = GemRB.GetControl(QuitWindow, 0)
+		GemRB.SetText(QuitWindow, TextArea, 46782)
+
+		Button = GemRB.GetControl(QuitWindow,1)
+		GemRB.SetText(QuitWindow, Button, "")
+		GemRB.SetButtonFlags(QuitWindow, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+		GemRB.SetButtonState(QuitWindow, Button, IE_GUI_BUTTON_DISABLED)
+		Button = GemRB.GetControl(QuitWindow, 2)
+		GemRB.SetText(QuitWindow, Button, 46783)
+		GemRB.SetButtonFlags(QuitWindow, Button, IE_GUI_BUTTON_DEFAULT,OP_OR)
+		GemRB.SetEvent(QuitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OkButton")
 		GemRB.SetVisible(NewLifeWindow,2) #go dark
 		GemRB.SetVisible(QuitWindow,1)
 		return
@@ -297,6 +300,26 @@ def AcceptPress():
 	return
 
 def CancelPress():
+	# Setting up the confirmation window
+	TextArea = GemRB.GetControl(QuitWindow, 0)
+	GemRB.SetText(QuitWindow, TextArea, 19406)
+
+	Button = GemRB.GetControl(QuitWindow,1)
+	GemRB.SetText(QuitWindow, Button, 23787)
+	GemRB.SetButtonFlags(QuitWindow, Button, IE_GUI_BUTTON_DEFAULT,OP_SET)
+	GemRB.SetButtonState(QuitWindow, Button, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(QuitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "YesButton")
+
+	Button = GemRB.GetControl(QuitWindow, 2)
+	GemRB.SetText(QuitWindow, Button, 23789)
+	GemRB.SetButtonFlags(QuitWindow, Button, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetEvent(QuitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OkButton")
+
+	GemRB.SetVisible(NewLifeWindow,2) #go dark
+	GemRB.SetVisible(QuitWindow,1)
+	return
+
+def YesButton():
 	GemRB.UnloadWindow(NewLifeWindow)
 	GemRB.SetNextScript("Start")
 	return
