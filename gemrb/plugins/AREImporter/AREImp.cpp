@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.70 2004/09/13 21:04:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.71 2004/09/14 20:41:59 avenger_teambg Exp $
  *
  */
 
@@ -28,6 +28,9 @@
 #include "../Core/FileStream.h"
 #include "../Core/ImageMgr.h"
 #include "../Core/Ambient.h"
+
+//in areas 10 is a magic number for resref counts
+#define MAX_RESCOUNT 10 
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1
@@ -202,10 +205,10 @@ Map* AREImp::GetMap(const char *ResRef)
 	}
 
 	str->Seek( RestHeader, GEM_STREAM_START );
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadDword( map->RestHeader.Strref + i );
 	}
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadResRef( map->RestHeader.CreResRef[i] );
 	}
 	str->ReadWord( &map->RestHeader.CreatureNum );
@@ -616,31 +619,37 @@ Map* AREImp::GetMap(const char *ResRef)
 	printf( "Loading ambients\n" );
 	str->Seek( AmbiOffset, GEM_STREAM_START );
 	for (i = 0; i < AmbiCount; i++) {
-		Ambient *ambi = new Ambient();
-		ieResRef sounds[10];
-		ieWord numsounds;
+		int j;
+		ieResRef sounds[MAX_RESCOUNT];
+		ieWord tmpWord;
 
+		Ambient *ambi = new Ambient();
 		str->Read( &ambi->name, 32 );
-		str->ReadWord( (ieWord *) &ambi->origin.x );
-		str->ReadWord( (ieWord *) &ambi->origin.y );
+		str->ReadWord( &tmpWord );
+		ambi->origin.x = tmpWord;
+		str->ReadWord( &tmpWord );
+		ambi->origin.y = tmpWord;
 		str->ReadWord( &ambi->radius );
 		str->ReadWord( &ambi->height );
 		str->Seek( 6, GEM_CURRENT_POS );
 		str->ReadWord( &ambi->gain );
-		for(i=0;i<10;i++) {
-			str->ReadResRef( sounds[i] );
+		for (j = 0;j < MAX_RESCOUNT; j++) {
+			str->ReadResRef( sounds[j] );
 		}
-		str->ReadWord( &numsounds );
+		str->ReadWord( &tmpWord );
 		str->Seek( 2, GEM_CURRENT_POS );
 		str->ReadDword( &ambi->interval );
 		str->ReadDword( &ambi->perset );
 		str->ReadDword( &ambi->appearance );
 		str->ReadDword( &ambi->flags );
 		str->Seek( 64, GEM_CURRENT_POS );
-		
-		for (int i = 0; i < numsounds; ++i) {
+		//this is a physical limit
+		if (tmpWord>MAX_RESCOUNT) {
+			tmpWord=MAX_RESCOUNT;
+		}
+		for (j = 0; j < tmpWord; j++) {
 			char *sound = (char *) malloc(9);
-			memcpy(sound, sounds[i], 9);
+			memcpy(sound, sounds[j], 9);
 			ambi->sounds.push_back(sound);
 		}
 		map->AddAmbient(ambi);
