@@ -9,7 +9,7 @@ DoneButton = 0
 
 def OnLoad():
 	global CharGenWindow, GenderWindow, TextAreaControl, CharGenPhase, DoneButton
-
+	
 	CharGenPhase = 1
 	GemRB.LoadWindowPack("GUICG")
 	GenderWindow = GemRB.LoadWindow(1)
@@ -119,6 +119,7 @@ def BackPress():
 	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.UnloadWindow(GenderWindow)
 	GemRB.SetNextScript("CharGen")
+	GemRB.SetVar("Gender",0)  #scrapping the gender value
 	return
 
 def NextPress():

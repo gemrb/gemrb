@@ -9,6 +9,9 @@ def OnLoad():
 	global CharGenWindow, TextAreaControl, CharGenPhase
 
 	CharGenPhase=0
+	GemRB.SetVar("Gender",0) #gender
+	GemRB.SetVar("Race",0) #race
+
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
