@@ -1,7 +1,7 @@
 #character generation (GUICG 0)
 import GemRB
 
-IE_SEX =		35
+IE_SEX =        	35
 IE_STR =		36
 IE_STREXTRA = 		37
 IE_INT =		38
@@ -11,9 +11,9 @@ IE_CON =		41
 IE_CHR =		42
 IE_XP =			44
 IE_GOLD =		45
-IE_REPUTATION =         48
+IE_REPUTATION =		48
 IE_HATEDRACE =  	49
-IE_KIT =		152
+IE_KIT =        	152
 IE_EA =			200
 IE_RACE =       	201
 IE_CLASS =		202
@@ -33,7 +33,7 @@ def OnLoad():
 	global CharGenWindow, TextAreaControl
 
 	GemRB.LoadWindowPack("GUICG")
-	CharGenWindow = GemRB.LoadWindow(0)
+        CharGenWindow = GemRB.LoadWindow(0)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	PortraitTable = GemRB.LoadTable("pictures")
@@ -91,8 +91,8 @@ def OnLoad():
 	GemRB.SetText(CharGenWindow, ImportButton, 13955)
 	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_DISABLED)
 
-	CancelButton = GemRB.GetControl(CharGenWindow, 15)
-	GemRB.SetText(CharGenWindow, CancelButton, 8159)
+        CancelButton = GemRB.GetControl(CharGenWindow, 15)
+        GemRB.SetText(CharGenWindow, CancelButton, 8159)
 	GemRB.SetButtonState(CharGenWindow,CancelButton,IE_GUI_BUTTON_ENABLED)
 
 	BiographyButton = GemRB.GetControl(CharGenWindow, 16)
@@ -129,26 +129,27 @@ def OnLoad():
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": "+str(GemRB.GetVar("Ability "+str(i))))
 
-	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
-	GemRB.SetEvent(CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+        GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+        GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
+        GemRB.SetEvent(CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 	GemRB.SetVisible(CharGenWindow,1)
 	return
 	
 def NextPress():
-	GemRB.UnloadWindow(CharGenWindow)
+        GemRB.UnloadWindow(CharGenWindow)
 	#set my character up
 	MyChar = GemRB.CreatePlayer("charbase",GemRB.GetVar("Slot") ) 
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
-	GemRB.SetPlayerStat(MyChar, IE_CLASS, GemRB.GetVar("Class") )
+	Class=GemRB.GetVar("Class")
+	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
 	t=GemRB.GetVar("Alignment")
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
 	TmpTable=GemRB.LoadTable("repstart")
-	t=GemRB.GetTableValue(TmpTable,t)
+	t=GemRB.GetTableValue(TmpTable,t,0)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
         TmpTable=GemRB.LoadTable("strtgold")
-        t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,0),GemRB.GetTableValue(TmpTable,Class,1) )
+        t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,0),GemRB.GetTableValue(TmpTable,Class,1),0 )
         GemRB.SetPlayerStat(MyChar, IE_GOLD, t*2)
 
 	GemRB.SetPlayerStat(MyChar, IE_HATEDRACE, GemRB.GetVar("HatedRace") )
@@ -196,12 +197,12 @@ def NextPress():
 	return
 
 def CancelPress():
-	GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("CharGen")
-	return
+        GemRB.UnloadWindow(CharGenWindow)
+        GemRB.SetNextScript("CharGen")
+        return
 
 def BackPress():
-	GemRB.UnloadWindow(CharGenWindow)
+        GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("CharGen8") #name
 	return
 
