@@ -5,7 +5,7 @@ MemoryStream::MemoryStream(void * buffer, int length)
 {
 	ptr = buffer;
 	this->length = length;
-	pos = 0;
+	Pos = 0;
 	strcpy(filename, "");
 }
 
@@ -15,32 +15,34 @@ MemoryStream::~MemoryStream(void)
 
 int MemoryStream::Read(void * dest, int length)
 {
-	if(length+pos > this->length)
+	if(length+Pos > this->length)
 		return GEM_ERROR;
-	Byte * p = (Byte*)ptr + pos;
+	Byte * p = (Byte*)ptr + Pos;
 	memcpy(dest, p, length);
-	pos+=length;
+	if(Encrypted)
+		ReadDecrypted(dest,length);
+	Pos+=length;
 	return GEM_OK;
 }
 
-int MemoryStream::Seek(int pos, int startpos)
+int MemoryStream::Seek(int arg_pos, int startpos)
 {
 	switch(startpos) {
 		case GEM_CURRENT_POS:
 			{
-			if((this->pos + pos) < 0)
+			if((Pos + arg_pos) < 0)
 				return GEM_ERROR;
-			if((this->pos + pos) >= length)
+			if((Pos + arg_pos) >= length)
 				return GEM_ERROR;
-			this->pos+=pos;
+			Pos+=arg_pos;
 			}
 		break;
 
 		case GEM_STREAM_START:
 			{
-			if(pos >= length)
+			if(arg_pos >= length)
 				return GEM_ERROR;
-			this->pos = length;
+			Pos = length;
 			}
 		break;
 

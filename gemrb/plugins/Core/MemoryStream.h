@@ -20,7 +20,6 @@ class GEM_EXPORT MemoryStream : public DataStream
 private:
 	void * ptr;
 	int length;
-	int pos;
 public:
 	MemoryStream(void * buffer, int length);
 	~MemoryStream(void);

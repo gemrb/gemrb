@@ -64,8 +64,7 @@ int FileStream::Read(void * dest, int length)
 	}
 	if(Encrypted)
 		ReadDecrypted(dest, c);
-	if(c != -1)
-		Pos+=c;
+	Pos+=c;
 	return (int)c;
 }
 
