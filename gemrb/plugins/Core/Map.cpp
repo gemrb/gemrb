@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.57 2004/01/04 00:22:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.58 2004/01/04 22:25:04 avenger_teambg Exp $
  *
  */
 
@@ -570,6 +570,8 @@ void PathFinder::AdjustPosition(unsigned int &goalX, unsigned int &goalY)
 {
 	unsigned int maxr=Width;
 	if(maxr<Height) maxr=Height;
+	if(goalX>Width) goalX=Width;
+	if(goalY>Height) goalY=Height;
 	for(unsigned int radius=1; radius < maxr; radius++) {
 		unsigned int minx=0;
 		if(goalX>radius) minx=goalX-radius;
@@ -577,7 +579,7 @@ void PathFinder::AdjustPosition(unsigned int &goalX, unsigned int &goalY)
 		if(maxx>Width) maxx=Width;
 
 		for(unsigned int scanx=minx;scanx<maxx;scanx++) {
-			if(goalY>=radius) {
+			if(goalY>=radius ) {
 		        	if(Passable[sMap->GetPixelIndex(scanx,goalY-radius)]) {
 					goalX=scanx;
 					goalY-=radius;
