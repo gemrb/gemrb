@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.10 2003/12/21 13:58:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.11 2003/12/26 13:46:52 avenger_teambg Exp $
  *
  */
 
@@ -58,6 +58,8 @@ public:
   Control * GetControl(unsigned short x, unsigned short y);
   /** Returns the Control by Index */
   Control * GetControl(unsigned short i);
+  /** Returns the Default Control which is a button atm */
+  Control * GetDefaultControl();
   /** Sets 'ctrl' as Focused */
   void SetFocused(Control * ctrl);
   /** Redraw all the Window */
@@ -82,6 +84,7 @@ public: //Public attributes
   /** Changed Flag */
   bool Changed;
   int Cursor;
+  int DefaultControl;
 private: // Private attributes
   /** BackGround Image. No BackGround if this variable is NULL. */
   Sprite2D * BackGround;

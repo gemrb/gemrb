@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.22 2003/12/22 21:06:13 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.23 2003/12/26 13:46:52 avenger_teambg Exp $
  *
  */
 
@@ -39,6 +39,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos
 	Visible = false;
 	Changed = true;
 	Cursor = 0;
+	DefaultControl = -1;
 }
 
 Window::~Window()
@@ -138,6 +139,13 @@ Control * Window::GetControl(unsigned short i)
 	return NULL;
 }
 
+Control * Window::GetDefaultControl()
+{
+	if(!Controls.size())
+		return NULL;
+	return GetControl(DefaultControl);
+}
+
 void Window::release(void)
 {
 	delete this;
@@ -146,8 +154,20 @@ void Window::release(void)
 /** Redraw all the Window */
 void Window::Invalidate()
 {
+	DefaultControl=-1;
 	for(unsigned int i = 0; i < Controls.size(); i++) {
 		Controls[i]->Changed = true;
+		switch(Controls[i]->ControlType)
+		{
+		case IE_GUI_BUTTON:
+			if( !(((Button *) Controls[i])->GetFlags()&0x40))
+				break;
+			//falling through
+		case IE_GUI_GAMECONTROL:
+			DefaultControl=i;
+			break;
+		default:;
+		}
 	}
 	Changed = true;
 }
