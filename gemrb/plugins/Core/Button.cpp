@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.41 2003/12/07 09:37:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.42 2003/12/08 15:56:40 balrog994 Exp $
  *
  */
 
@@ -197,7 +197,10 @@ void Button::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 		State = IE_GUI_BUTTON_PRESSED;
 		Changed = true;
 		if(Flags & 0x04) {
-			core->GetSoundMgr()->Play("GAM_09");
+			if(stricmp(core->GameType, "pst") != 0)
+				core->GetSoundMgr()->Play("GAM_09");
+			else
+				core->GetSoundMgr()->Play("INT_09");
 		}
 	}
 }
@@ -240,10 +243,18 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 				core->GetDictionary()->SetAt(VarName, Value);
 		}
 		if(Flags & 0x04) {
-			if(Flags & 0x08)
-				core->GetSoundMgr()->Play("GAM_04");
-			else
-				core->GetSoundMgr()->Play("GAM_03");
+			if(stricmp(core->GameType, "pst") != 0) {
+				if(Flags & 0x08)
+					core->GetSoundMgr()->Play("GAM_04");
+				else
+					core->GetSoundMgr()->Play("GAM_03");
+			}
+			else {
+				if(Flags & 0x08)
+					core->GetSoundMgr()->Play("INT_04");
+				else
+					core->GetSoundMgr()->Play("INT_03");
+			}
 		}
 		if(ButtonOnPress[0] != 0)
 			core->GetGUIScriptEngine()->RunFunction(ButtonOnPress);
