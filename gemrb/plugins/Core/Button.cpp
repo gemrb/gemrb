@@ -265,7 +265,8 @@ int Button::SetText(const char * string, int pos)
 	else {
 		strncpy(Text, string, 63);
 		hasText = true;
-		Text = strupr(Text);
+		if(stricmp(core->GameType, "bg2") == 0)
+			Text = strupr(Text);
 	}
 	Changed = true;
 	return 0;
