@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.6 2004/04/26 12:55:26 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.7 2004/04/26 15:16:57 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -138,9 +138,10 @@ def OpenRecordsWindow ():
 
 
 stats_overview = None
+faction_help = ''
 
 def UpdateRecordsWindow ():
-	global stats_overview
+	global stats_overview, faction_help
 	
 	Window = RecordsWindow
 	if not RecordsWindow:
@@ -236,25 +237,33 @@ def UpdateRecordsWindow ():
 	print 'FACTION:', faction
 
 	FactionTable = GemRB.LoadTable ("FACTIONS")
+	faction_help = GemRB.GetString (GemRB.GetTableValue (FactionTable, faction, 0))
 	frame = GemRB.GetTableValue (FactionTable, faction, 1)
 	GemRB.UnloadTable (FactionTable)
 	
 	Button = GemRB.GetControl (Window, 6)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonSprites (Window, Button, 'STFCTION', 0, frame, 0, 0, 0)
-	GemRB.SetVarAssoc (Window, Button, "ControlHelp", 20106)
-	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsStr")
+	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpFaction")
+	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
 	
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)
 	Text = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Text, stats_overview)
 
-
-
-def OnRecordsStr ():
+# puts default info to textarea (overview of PC's bonuses, saves, etc.
+def OnRecordsButtonLeave ():
 	Window = RecordsWindow
-	Help = GemRB.GetVar ("ControlHelp")
+	# help, info textarea
+	Text = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Text, stats_overview)
+	
+
+def OnRecordsHelpFaction ():
+	Window = RecordsWindow
+	#Help = GemRB.GetVar ("ControlHelp")
+	Help = GemRB.GetString (20106) + "\n\n" + faction_help
 	TextArea = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, TextArea, Help)
 	
@@ -264,10 +273,10 @@ def OnRecordsStr ():
 	# 34588 Dustmen 4/8 
 	# 34585 godsmen 8/8
 	# 34587 Sensates 3/8
-	# 34589 Anarchists
-	# 34590 Xaositects
+	# 34589 Anarchists 5/8
+	# 34590 Xaositects 6/8
 	# 3789 indeps 7/8
-	# 34586 Mercykillers
+	# 34586 Mercykillers 2/8
 
 
 	# 33657 LG desc

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.6 2004/03/28 11:17:16 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.7 2004/04/26 15:16:57 edheldil Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -792,7 +792,9 @@ def OptSlider (name, window, slider_id, label_id, label_strref):
 	label = GemRB.GetControl (window, label_id)
 	GemRB.SetText (window, label, label_strref)
 	GemRB.SetButtonFlags (window, label, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	GemRB.SetEvent (window, label, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
+	GemRB.SetButtonState (window, label, IE_GUI_BUTTON_LOCKED)
+	#GemRB.SetEvent (window, label, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
+	GemRB.SetEvent (window, label, IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + name)
 
 	return slider
 
@@ -808,7 +810,9 @@ def OptCheckbox (name, window, button_id, label_id, label_strref):
 	label = GemRB.GetControl (window, label_id)
 	GemRB.SetText (window, label, label_strref)
 	GemRB.SetButtonFlags (window, label, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	GemRB.SetEvent (window, label, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
+	GemRB.SetButtonState (window, label, IE_GUI_BUTTON_LOCKED)
+	#GemRB.SetEvent (window, label, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
+	GemRB.SetEvent (window, label, IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + name)
 
 	return button
 
@@ -821,7 +825,9 @@ def OptButton (name, window, button_id, label_id, label_strref):
 	label = GemRB.GetControl (window, label_id)
 	GemRB.SetText (window, label, label_strref)
 	GemRB.SetButtonFlags (window, label, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	GemRB.SetEvent (window, label, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
+	GemRB.SetButtonState (window, label, IE_GUI_BUTTON_LOCKED)
+	#GemRB.SetEvent (window, label, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
+	GemRB.SetEvent (window, label, IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + name)
 
 def OptDone (name, window, button_id):
 	"""Standard `Done' button for option windows"""
