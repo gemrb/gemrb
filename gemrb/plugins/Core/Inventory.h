@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.24 2004/11/07 19:41:16 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.25 2004/11/19 23:09:20 avenger_teambg Exp $
  *
  */
 
@@ -64,15 +64,22 @@ typedef enum ieCREItemFlagBits {
 	IE_INV_ITEM_STACKED = 0x80	        //this is a gemrb extension
 } ieCREItemFlagBits;
 
-typedef struct CREItem {
-	ieResRef  ItemResRef;
-	ieWord Unknown08;
-	ieWord Usages[3];
-	ieDword Flags;
-	// 2 cached values from associated item. LEAVE IT SIGNED!
-	int Weight;
-	int StackAmount;
-} CREItem;
+class GEM_EXPORT CREItem {
+public:
+	ieResRef ItemResRef;
+        ieWord Unknown08;
+        ieWord Usages[3];
+        ieDword Flags;
+        // 2 cached values from associated item. LEAVE IT SIGNED!
+        int Weight;
+        int StackAmount;
+
+	CREItem()
+	{
+		Weight=0;
+		StackAmount=0;
+	}
+};
 
 class GEM_EXPORT Inventory {
 private:

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.36 2004/11/13 15:56:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.37 2004/11/19 23:09:20 avenger_teambg Exp $
  *
  */
 
@@ -78,7 +78,8 @@ void Inventory::CalculateWeight()
 					slot->Weight = itm->Weight;
 					slot->StackAmount = itm->StackAmount;
 				}
-				delete itm;
+				//delete itm;
+				core->FreeItem( itm );
 			}
 		}
 		if (slot->Weight > 0) {
@@ -333,7 +334,7 @@ int Inventory::AddSlotItem(STOItem* item, unsigned int /*slot*/, CREItem** /*res
 		}
 
 		//the first part of a STOItem is essentially a CREItem
-		temp = new CREItem;
+		temp = new CREItem();
 		memcpy( temp, item, sizeof( CREItem ) ); 
 
 		ret = AddSlotItem( temp, -1 );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.45 2004/10/18 18:42:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.46 2004/11/19 23:09:26 avenger_teambg Exp $
  *
  */
 
@@ -193,6 +193,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 		FileStream * fs = new FileStream(); \
 		if(!fs) return NULL; \
 		fs->Open(p, true); \
+		printf(foundMessage); \
 		return fs; \
 	} \
 }
@@ -203,20 +204,20 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 	char BasePath[_MAX_PATH] = {
 		0
 	};
+	printMessage( "KEYImporter", "Searching for ", WHITE );
+	printf( "%.8s%s...", resname, core->TypeExt( type ) );
 	//Search it in the GemRB override Directory
 	strcpy( path, "override" ); //this shouldn't change
 	strcat( path, SPathDelimiter );
 	strcat( path, core->GameType );
 	SearchIn( core->CachePath, "", resname, type,
-		"[KEYImporter]: Found in Cache...\n" );
+		"[Found in Cache]\n" );
 	SearchIn( core->GemRBPath, path, resname, type,
-		"[KEYImporter]: Found in GemRB Override...\n" );
+		"[Found in GemRB Override]\n" );
 	SearchIn( core->GamePath, core->GameOverride, resname, type,
-		"[KEYImporter]: Found in Override...\n" );
+		"[Found in Override]\n" );
 	SearchIn( core->GamePath, core->GameData, resname, type,
-		"[KEYImporter]: Found in Local CD1 Folder...\n" );
-	printMessage( "KEYImporter", "Searching for ", WHITE );
-	printf( "%.8s%s...", resname, core->TypeExt( type ) );
+		"[Found in Local Folder]\n" );
 	unsigned long ResLocator;
 	if (resources.Lookup( resname, type, ResLocator )) {
 		if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
@@ -399,7 +400,7 @@ found:
 		ai->OpenArchive(path);
 		DataStream * ret = ai->GetStream(ResLocator, type);
 		if(ret == NULL)
-			printf("[NOT_FOUND]\n");
+			printf("[NOT FOUND]\n");
 		core->FreeInterface(ai);
 		strncpy(ret->filename, resname, 8);
 		ret->filename[8] = 0;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.239 2004/11/18 23:32:40 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.240 2004/11/19 23:09:20 avenger_teambg Exp $
  *
  */
 
@@ -405,7 +405,7 @@ int Interface::Init()
 	}
 	bmppal32 = key->GetResource( Palette32, IE_BMP_CLASS_ID );
 	if (bmppal32) {
-		pal32 = ( ImageMgr * )this->GetInterface( IE_BMP_CLASS_ID );
+		pal32 = ( ImageMgr * ) GetInterface( IE_BMP_CLASS_ID );
 		pal32->Open( bmppal32, true );
 	} else {
 		pal32 = NULL;
@@ -1484,7 +1484,6 @@ int Interface::AdjustScrolling(unsigned short WindowIndex,
 		default: //doesn't work for these
 			return -1;
 	}
-	//	win->Invalidate(); do we need this?
 	return 0;
 }
 
@@ -2582,23 +2581,30 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 Item* Interface::GetItem(const char* resname)
 {
 	DataStream* str = GetResourceMgr()->GetResource( resname, IE_ITM_CLASS_ID );
-	ItemMgr* sm = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
+	ItemMgr* sm = ( ItemMgr* ) GetInterface( IE_ITM_CLASS_ID );
 	if (sm == NULL) {
 		delete ( str );
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
-		core->FreeInterface( sm );
+		FreeInterface( sm );
 		return NULL;
 	}
 
 	Item* item = sm->GetItem();
 	if (item == NULL) {
-		core->FreeInterface( sm );
+		FreeInterface( sm );
 		return NULL;
 	}
 
-	core->FreeInterface( sm );
+	FreeInterface( sm );
 	return item;
+}
+
+void Interface::FreeItem(Item *itm)
+{
+	ItemMgr * sm = (ItemMgr *) GetInterface(IE_ITM_CLASS_ID);
+	sm->ReleaseItem(itm);
+	FreeInterface(sm);
 }
 

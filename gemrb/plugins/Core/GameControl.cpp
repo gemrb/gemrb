@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.176 2004/11/13 22:24:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.177 2004/11/19 23:09:20 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -580,7 +580,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 							AddEffect( *f, lastActor, lastActor );
 							//lastActor->fxqueue.AddEffect( *f );
 						}
-						delete item;
+						core->FreeItem( item );
+						//delete item;
 					}
 				}
 				lastActor->fxqueue.ApplyAllEffects( lastActor );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.127 2004/11/18 23:32:40 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.128 2004/11/19 23:09:20 avenger_teambg Exp $
  *
  */
 
@@ -373,9 +373,10 @@ public:
 
 	void DragItem(CREItem* item);
 	CREItem* GetDraggedItem() { return DraggedItem; }
-	Item* GetItem(const char* resname);
 	CREItem *ReadItem(DataStream *str);
 	bool ResolveRandomItem(CREItem *itm);
+	Item* GetItem(const char* resname);
+	void FreeItem(Item *itm);
 
 private:
 	bool LoadConfig(void);
