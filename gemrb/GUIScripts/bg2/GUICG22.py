@@ -17,6 +17,7 @@ def OnLoad():
 	TmpTable = GemRB.LoadTable("classes")
 	Class = GemRB.GetVar("Class")-1
 	ClassName = GemRB.GetTableRowName(TmpTable, Class)
+	ClassID = GemRB.GetTableValue(TmpTable, Class, 5)
 	ClassList = GemRB.LoadTable("classes")
         KitTable = GemRB.LoadTable("kittable")
 	KitTableName = GemRB.GetTableValue(KitTable, ClassName, RaceName)
@@ -26,7 +27,7 @@ def OnLoad():
 	#there is a specialist mage window, but it is easier to use 
 	#the class kit window for both
 	KitWindow = GemRB.LoadWindow(22)
-	if Class == 0:
+	if ClassID == 0:
 		Label = GemRB.GetControl(KitWindow, 0xfffffff)
 		GemRB.SetText(KitWindow, Label, 595)
 
@@ -49,7 +50,10 @@ def OnLoad():
 		else:
 			Button = i+5
 		if KitTable == -1:
-			Kit = 0
+			if ClassID==0:
+				Kit=GemRB.GetVar("MAGESCHOOL")
+			else:
+				Kit = 0
 		else:
 			Kit = GemRB.GetTableValue(KitTable,i,0)
 		if Kit == 0:

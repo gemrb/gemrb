@@ -14,7 +14,7 @@ def OnLoad():
 	ClassTable = GemRB.LoadTable("classes")
 	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
 	ClassWindow = GemRB.LoadWindow(10)
-	RaceColumn = GemRB.GetVar("Race")+4
+	RaceColumn = GemRB.GetVar("Race")+5
 
 	j=0
 	for i in range(1,ClassCount):

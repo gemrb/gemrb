@@ -14,7 +14,8 @@ def OnLoad():
 	ClassTable = GemRB.LoadTable("classes")
 	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
 	ClassWindow = GemRB.LoadWindow(2)
-	RaceColumn = GemRB.GetVar("Race")+4
+	TmpTable=GemRB.LoadTable("races")
+        RaceName = GemRB.GetTableRowName(TmpTable, GemRB.GetVar("Race")-1 )
 
 	j = 0
 	#radiobutton groups must be set up before doing anything else to them
@@ -33,7 +34,8 @@ def OnLoad():
 	GemRB.SetVar("MAGESCHOOL",0) 
 	HasMulti = 0
 	for i in range(1,ClassCount):
-		Allowed = GemRB.GetTableValue(ClassTable, i-1, RaceColumn)
+		ClassName = GemRB.GetTableRowName(ClassTable, i-1)
+		Allowed = GemRB.GetTableValue(ClassTable, ClassName, RaceName)
 		if GemRB.GetTableValue(ClassTable,i-1,4):
 			if Allowed!=0:
 				HasMulti = 1
@@ -46,7 +48,6 @@ def OnLoad():
 		t = GemRB.GetTableValue(ClassTable, i-1, 0)
 		GemRB.SetText(ClassWindow, Button, t )
 
-		Allowed = GemRB.GetTableValue(ClassTable, i-1, RaceColumn)
 		if Allowed==0:
 			continue
 		if Allowed==2:
