@@ -1,0 +1,11 @@
+
+Prototype: GemRB.GetSlots(PartyID, SlotType)
+
+Description: Returns the tuple of slots of a PC which match the SlotType criteria. FIXME: This function cannot yet handle PST's diverse slottypes.
+
+Parameters: PartyID - a PC
+SlotType            - bitfield, the inventory slot's type (-1 means inventory)
+
+Return value: tuple
+
+See also: GetSlotType
