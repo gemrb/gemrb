@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.4 2003/12/30 17:56:57 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.5 2003/12/30 21:56:23 balrog994 Exp $
  *
  */
 
@@ -57,6 +57,9 @@ typedef enum ScriptableType {
 	ST_DOOR = 3
 } ScriptableType;
 
+#define SEA_RESET			0x00000002
+#define SEA_PARTY_REQUIRED	0x00000004
+
 class GEM_EXPORT Scriptable {
 public:
 	Scriptable(ScriptableType type);
@@ -74,6 +77,7 @@ public:
 	Scriptable * LastTrigger;
 	Scriptable * Clicker;
 	Scriptable * LastEntered;
+	unsigned long EndAction;
 public:
 	void SetPosition(unsigned short XPos, unsigned short YPos);
 	void SetMySelf(Scriptable * MySelf);
@@ -173,7 +177,6 @@ public:
 	~InfoPoint(void);
 public:
 	char Name[33];
-	unsigned short ipType;
 	char Destination[9];
 	char EntranceName[33];
 	unsigned long Flags;

@@ -22,6 +22,7 @@ Scriptable::Scriptable(ScriptableType type)
 	Clicker = NULL;
 	LastEntered = NULL;
 	Active = true;
+	EndAction = 2;
 }
 
 Scriptable::~Scriptable(void)
@@ -366,7 +367,6 @@ void Door::SetCursor(unsigned char CursorIndex)
 InfoPoint::InfoPoint(void) : Highlightable(ST_TRIGGER) 
 {
 	Name[0] = 0;
-	ipType = 0;
 	Destination[0] = 0;
 	EntranceName[0] = 0;
 	Flags = 0;
