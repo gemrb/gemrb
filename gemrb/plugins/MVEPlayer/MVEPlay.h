@@ -739,6 +739,7 @@ private:
 	DataStream * str;
 	bool autoFree;
 	bool stopPlayback;
+	bool validVideo;
 
 public:
 	MVEPlay(void);

@@ -41,6 +41,7 @@ MVEPlay::~MVEPlay(void)
 
 bool MVEPlay::Open(DataStream * stream, bool autoFree)
 {
+	validVideo = false;
 	if(stream == NULL)
 		return false;
 	if(str && this->autoFree)
@@ -49,15 +50,23 @@ bool MVEPlay::Open(DataStream * stream, bool autoFree)
 	this->autoFree = autoFree;
 	char Signature[MVE_SIGNATURE_LEN];
 	str->Read(Signature, MVE_SIGNATURE_LEN);
-	if(memcmp(Signature, MVESignature, MVE_SIGNATURE_LEN) != 0)
+	if(memcmp(Signature, MVESignature, MVE_SIGNATURE_LEN) != 0) {
+		if(memcmp(Signature, "BIK", 3) == 0) {
+			printf("Warning!!! This is a Bink Video File...\nUnfortunately we cannot provide a Bink Video Player\nWe are sorry!\n");
+			return true;
+		}
 		return false;
+	}
 	
 	str->Seek(0, GEM_STREAM_START);
+	validVideo = true;
 	return true;
 }
 
 int MVEPlay::Play()
 {
+	if(!validVideo)
+		return 0;
 	MVESTREAM *mve = mve_open(this->str);
     if (mve == NULL)
     {
