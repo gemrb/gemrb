@@ -1,14 +1,36 @@
-# Configure paths for SDL
-# Edheldil & Subvertir - 12/09/03
-# Sam Lantinga 9/21/99
-# stolen from Manish Singh
-# stolen back from Frank Belew
-# stolen from Manish Singh
-# Shamelessly stolen from Owen Taylor
+# -*-autoconf-*-
+# GemRB - Infinity Engine Emulator
+# Copyright (C) 2003 The GemRB Project
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.7 2005/02/02 00:36:35 edheldil Exp $
+
+###################################################
+dnl Configure paths for SDL
+dnl Edheldil & Subvertir - 12/09/03
+dnl Sam Lantinga 9/21/99
+dnl stolen from Manish Singh
+dnl stolen back from Frank Belew
+dnl stolen from Manish Singh
+dnl Shamelessly stolen from Owen Taylor
 
 dnl AM_PATH_SDL([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl Test for SDL, and define SDL_CFLAGS and SDL_LIBS
 dnl
+
 AC_DEFUN([AM_PATH_SDL],
 [dnl 
 dnl Get the cflags and libraries from the sdl-config script
@@ -177,10 +199,11 @@ int main(int argc, char *argv[])
 ])
 
 
-# Shamelessly ripped from dia 0.92
-# From Andrew Dalke
-# Updated by James Henstridge
- 
+###################################################
+dnl Configure paths for python
+dnl Shamelessly ripped from dia 0.92
+dnl From Andrew Dalke
+dnl Updated by James Henstridge
 
 AC_DEFUN([AM_PATH_PYTHON],
  [
@@ -250,9 +273,11 @@ else:
 
 ])
 
+###################################################
 dnl a macro to check for ability to create python extensions
 dnl  AM_CHECK_PYTHON_HEADERS([ACTION-IF-POSSIBLE], [ACTION-IF-NOT-POSSIBLE])
 dnl function also defines PYTHON_INCLUDES
+
 AC_DEFUN([AM_CHECK_PYTHON_HEADERS],
 [AC_REQUIRE([AM_PATH_PYTHON])
 AC_MSG_CHECKING(for python headers)
@@ -275,9 +300,12 @@ $2])
 CPPFLAGS="$save_CPPFLAGS"
 ])
 
+###################################################
+dnl Check for ZLib (gzip compression) library
 dnl Available from the GNU Autoconf Macro Archive at:
 dnl http://www.gnu.org/software/ac-archive/htmldoc/check_zlib.html
 dnl
+
 AC_DEFUN([CHECK_ZLIB],
 #
 # Handle user hints
@@ -338,9 +366,11 @@ fi
 ])
 
 
+###################################################
 dnl Test whether STL library defines method container::at().
 dnl Older versions (e.g. 2.95.x on Debian) don't and newer (3.x) do
 dnl Syntax: AC_CHECK_STL_CONTAINER_AT([ACTION-IF-YES], [ACTION-IF-NO])
+
 AC_DEFUN([AC_CHECK_STL_CONTAINER_AT],
 [
 AC_MSG_CHECKING(for container::at)
@@ -368,6 +398,7 @@ $2])
 ])
 
 
+###################################################
 dnl Check for the name of Posix threads library.
 dnl Ripped from XMMS by Peter Alm & co and modified to integrate w/ GemRB
 
