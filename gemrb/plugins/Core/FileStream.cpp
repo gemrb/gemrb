@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.27 2004/04/18 15:17:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.28 2004/04/20 21:12:04 avenger_teambg Exp $
  *
  */
 
@@ -154,6 +154,10 @@ int FileStream::ReadLine(void* buf, unsigned int maxlen)
 	}
 	unsigned char * p = ( unsigned char * ) buf;
 	if (_feof( str )) {
+		p[0]=0;
+		return -1;
+	}
+	if (Pos >= size) {
 		p[0]=0;
 		return -1;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.16 2004/04/18 15:17:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.17 2004/04/20 21:12:04 avenger_teambg Exp $
  *
  */
 
@@ -108,5 +108,5 @@ int MemoryStream::ReadLine(void* buf, unsigned int maxlen)
 			p[i++] = ch;
 	}
 	p[i] = 0;
-	return i - 1;
+	return i;
 }
