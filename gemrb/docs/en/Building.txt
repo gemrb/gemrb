@@ -1,6 +1,6 @@
 BUILDING GEMRB FROM CVS SOURCES ON UNIX
 ---------------------------------------
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/Building.txt,v 1.1 2004/07/26 09:02:38 edheldil Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/Building.txt,v 1.2 2004/07/29 18:16:09 edheldil Exp $
 
 
 Tools you will need to build GemRB from CVS:
@@ -47,9 +47,9 @@ Running all the tools by hand:
 
   libtoolize
   aclocal
+  autoconf
   autoheader
   automake --add-missing
-  autoconf
 
 
 To install GemRB into the same directory hierarchy as with autogen.sh, 
@@ -63,6 +63,7 @@ structure, run `configure' this way instead:
 
   ./configure --prefix=$HOME/GemRB/
 
+If the configuring went ok, you can finally run:
 
   make
   make install
