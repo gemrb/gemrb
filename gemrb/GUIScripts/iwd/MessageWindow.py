@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/MessageWindow.py,v 1.10 2004/12/12 18:19:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/MessageWindow.py,v 1.11 2005/03/02 20:04:13 avenger_teambg Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -34,6 +34,7 @@ from GUIMA import *
 from GUIMG import *
 from GUIOPT import *
 from GUIPR import *
+from GUISTORE import *
 from GUIWORLD import *
 
 MessageWindow = 0
