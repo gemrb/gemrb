@@ -1672,13 +1672,17 @@ def AppearancePress():
 
 def ApperanceDrawAvatar():
 	global AppearanceAvatarButton, RaceTable, ClassTable
-	AppearanceAvatarTable = GemRB.LoadTable("AVATARS")
+	AppearanceAvatarTable = GemRB.LoadTable("PDOLLS")
 	AvatarID = 0x5000
-	if GemRB.GetVar("Gender") == 1:
-		AvatarID = AvatarID + 0x10
-	AvatarID = AvatarID + GemRB.GetTableValue(RaceTable, GemRB.GetVar("Race"), 5)
-	AvatarID = AvatarID + GemRB.GetTableValue(ClassTable, GemRB.GetVar("Class"), 6)
-	AvatarRef = GemRB.GetTableValue(AppearanceAvatarTable, hex(AvatarID), "AT_1") + "INV"
+        table = GemRB.LoadTable("AVPREFR")
+        AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Race"),0)
+        table = GemRB.LoadTable("AVPREFC")
+        AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Class"),0)
+        table = GemRB.LoadTable("AVPREFG")
+        AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
+        print "AvatarID:",hex(AvatarID)
+
+	AvatarRef = GemRB.GetTableValue(AppearanceAvatarTable, hex(AvatarID), "LEVEL1")
 	GemRB.SetButtonBAM(AppearanceWindow, AppearanceAvatarButton, AvatarRef, 1, 0, 0)
 	return
 
