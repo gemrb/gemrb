@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.141 2005/03/05 01:07:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.142 2005/03/07 06:31:44 avenger_teambg Exp $
  *
  */
 
@@ -151,7 +151,6 @@ private:
 	ieDword* slotmatrix; //itemtype vs slottype
 	SlotType* slottypes;
 	int ItemTypes;
-	int SlotTypes; //this is the same as the inventory size
 	int tooltip_x;
 	int tooltip_y;
 	// the control owning the tooltip
@@ -161,6 +160,7 @@ private:
 	// Current Store
 	Store* CurrentStore;
 public:
+	int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
 	ieResRef WorldMapName;
 	Animation **Cursors;

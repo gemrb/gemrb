@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.272 2005/03/05 10:31:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.273 2005/03/07 06:31:44 avenger_teambg Exp $
  *
  */
 
@@ -1719,15 +1719,16 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 			evntmgr->SetFocused( win, ctrl);
 	}
 	switch ((Status >> 24) & 0xff) {
-		case 0:
+		case IE_GUI_BUTTON:
 		//Button
 		 {
-			if (ctrl->ControlType != 0)
-				return -1;
 			Button* btn = ( Button* ) ctrl;
 			btn->SetState( ( unsigned char ) ( Status & 0x7f ) );
 		}
 		break;
+		default:
+			ctrl->Value = Status & 0x7f;
+			break;
 	}
 	return 0;
 }

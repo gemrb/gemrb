@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.282 2005/03/06 14:18:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.283 2005/03/07 06:31:46 avenger_teambg Exp $
  *
  */
 
@@ -451,7 +451,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	return Py_BuildValue( "i", ret );
+	return PyInt_FromLong( ret );
 }
 
 PyDoc_STRVAR( GemRB_SetWindowSize__doc,
@@ -572,7 +572,7 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 		printMessage( "GUIScript", "Can't find resource\n", LIGHT_RED );
 		return NULL;
 	}
-	return Py_BuildValue( "i", ind );
+	return PyInt_FromLong( ind );
 }
 
 PyDoc_STRVAR( GemRB_UnloadTable__doc,
@@ -649,7 +649,7 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 
 		long val;
 		if (valid_number( ret, val )) {
-			return Py_BuildValue( "l", val );
+			return PyInt_FromLong( val );
 		}
 		return PyString_FromString( ret );
 	}
@@ -678,9 +678,9 @@ static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 		char* ret = tm->QueryField( row, col );
 		long val;
 		if (valid_number( ret, val ) && (Value == val) )
-			return Py_BuildValue( "i", row );
+			return PyInt_FromLong( row );
 	}
-	return Py_BuildValue( "i", -1 ); //row not found
+	return PyInt_FromLong( -1 ); //row not found
 }
 
 PyDoc_STRVAR( GemRB_GetTableRowIndex__doc,
@@ -702,7 +702,7 @@ static PyObject* GemRB_GetTableRowIndex(PyObject * /*self*/, PyObject* args)
 	}
 	int row = tm->GetRowIndex( rowname );
 	//no error if the row doesn't exist
-	return Py_BuildValue( "i", row );
+	return PyInt_FromLong( row );
 }
 
 PyDoc_STRVAR( GemRB_GetTableRowName__doc,
@@ -746,7 +746,7 @@ static PyObject* GemRB_GetTableRowCount(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	return Py_BuildValue( "i", tm->GetRowCount() );
+	return PyInt_FromLong( tm->GetRowCount() );
 }
 
 PyDoc_STRVAR( GemRB_LoadSymbol__doc,
@@ -766,7 +766,7 @@ static PyObject* GemRB_LoadSymbol(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	return Py_BuildValue( "i", ind );
+	return PyInt_FromLong( ind );
 }
 
 PyDoc_STRVAR( GemRB_UnloadSymbol__doc,
@@ -810,7 +810,7 @@ static PyObject* GemRB_GetSymbolValue(PyObject * /*self*/, PyObject* args)
 			if (!sm)
 				return NULL;
 			long val = sm->GetValue( syms );
-			return Py_BuildValue( "l", val );
+			return PyLong_FromLong( val );
 		}
 		if (PyObject_TypeCheck( sym, &PyInt_Type )) {
 			long symi = PyInt_AsLong( sym );
@@ -841,7 +841,7 @@ static PyObject* GemRB_GetControl(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Control is not found" );
 	}
 
-	return Py_BuildValue( "i", ret );
+	return PyInt_FromLong( ret );
 }
 
 PyDoc_STRVAR( GemRB_QueryText__doc,
@@ -907,11 +907,9 @@ static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 
 	if (PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str )) {
 		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
-			!PyObject_TypeCheck( ci,
-														&PyInt_Type ) ||
+			!PyObject_TypeCheck( ci, &PyInt_Type ) ||
 			( !PyObject_TypeCheck( str, &PyString_Type ) &&
-			!PyObject_TypeCheck( str,
-																&PyInt_Type ) )) {
+			!PyObject_TypeCheck( str, &PyInt_Type ) )) {
 			return AttributeError( GemRB_SetText__doc );
 		}
 
@@ -941,8 +939,7 @@ static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 	} else {
 		return NULL;
 	}
-
-	return Py_BuildValue( "i", ret );
+	return PyInt_FromLong( ret );
 }
 
 PyDoc_STRVAR( GemRB_TextAreaAppend__doc,
@@ -996,7 +993,7 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	return Py_BuildValue( "i", ret );
+	return PyInt_FromLong( ret );
 }
 
 PyDoc_STRVAR( GemRB_TextAreaClear__doc,
@@ -1076,7 +1073,7 @@ static PyObject* GemRB_SetTooltip(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	return Py_BuildValue( "i", ret );
+	return PyInt_FromLong( ret );
 }
 
 PyDoc_STRVAR( GemRB_SetVisible__doc,
@@ -1307,7 +1304,7 @@ static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Can't create window" );
 	}
 
-	return Py_BuildValue( "i", WindowIndex );
+	return PyInt_FromLong( WindowIndex );
 }
 
 PyDoc_STRVAR( GemRB_CreateLabel__doc,
@@ -2382,10 +2379,10 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (!core->GetDictionary()->Lookup( Variable, value )) {
-		return Py_BuildValue( "l", ( unsigned long ) 0 );
+		return PyLong_FromLong( ( unsigned long ) 0 );
 	}
 
-	return Py_BuildValue( "l", value );
+	return PyLong_FromLong( value );
 }
 
 PyDoc_STRVAR( GemRB_CheckVar__doc,
@@ -2417,7 +2414,7 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 	printMessage("GUISCript"," ",YELLOW);
 	printf("%s %s=%ld\n",Context, Variable, value);
 	textcolor(WHITE);
-	return Py_BuildValue( "l", value );
+	return PyLong_FromLong( value );
 }
 
 PyDoc_STRVAR( GemRB_GetGameVar__doc,
@@ -2434,10 +2431,10 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (!core->GetGame()->globals->Lookup( Variable, value )) {
-		return Py_BuildValue( "l", ( unsigned long ) 0 );
+		return PyLong_FromLong( ( unsigned long ) 0 );
 	}
 
-	return Py_BuildValue( "l", value );
+	return PyLong_FromLong( value );
 }
 
 PyDoc_STRVAR( GemRB_PlayMovie__doc,
@@ -2454,7 +2451,7 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 
 	int ind = core->PlayMovie( string );
 	//don't return NULL
-	return Py_BuildValue( "i", ind );
+	return PyInt_FromLong( ind );
 }
 
 PyDoc_STRVAR( GemRB_GetSaveGameCount__doc,
@@ -2464,7 +2461,7 @@ PyDoc_STRVAR( GemRB_GetSaveGameCount__doc,
 static PyObject* GemRB_GetSaveGameCount(PyObject * /*self*/,
 	PyObject * /*args*/)
 {
-	return Py_BuildValue( "i",
+	return PyInt_FromLong(
 			core->GetSaveGameIterator()->GetSaveGameCount() );
 }
 
@@ -2670,7 +2667,7 @@ static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iii", &Dice, &Size, &Add )) {
 		return AttributeError( GemRB_Roll__doc );
 	}
-	return Py_BuildValue( "i", core->Roll( Dice, Size, Add ) );
+	return PyInt_FromLong( core->Roll( Dice, Size, Add ) );
 }
 
 PyDoc_STRVAR( GemRB_GetCharSounds__doc,
@@ -2688,7 +2685,7 @@ static PyObject* GemRB_GetCharSounds(PyObject * /*self*/, PyObject* args)
 	if (!ta) {
 		return NULL;
 	}
-	return Py_BuildValue( "i", core->GetCharSounds( ta ) );
+	return PyInt_FromLong( core->GetCharSounds( ta ) );
 }
 
 PyDoc_STRVAR( GemRB_GetPartySize__doc,
@@ -2701,7 +2698,7 @@ static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 	if (!game) {
 		return NULL;
 	}
-	return Py_BuildValue( "i", game->GetPartySize(0) );
+	return PyInt_FromLong( game->GetPartySize(0) );
 }
 
 PyDoc_STRVAR( GemRB_GetGameTime__doc,
@@ -2711,7 +2708,34 @@ PyDoc_STRVAR( GemRB_GetGameTime__doc,
 static PyObject* GemRB_GetGameTime(PyObject * /*self*/, PyObject* /*args*/)
 {
 	int GameTime = core->GetGame()->GameTime;
-	return Py_BuildValue( "i", GameTime );
+	return PyInt_FromLong( GameTime );
+}
+
+PyDoc_STRVAR( GemRB_GameGetReputation__doc,
+"GameGetReputation() => int\n\n"
+"Returns party reputation." );
+
+static PyObject* GemRB_GameGetReputation(PyObject * /*self*/, PyObject* /*args*/)
+{
+	int Reputation = core->GetGame()->Reputation;
+	return PyInt_FromLong( Reputation );
+}
+
+PyDoc_STRVAR( GemRB_GameSetReputation__doc,
+"GameSetReputation() => int\n\n"
+"Sets current party reputation." );
+
+static PyObject* GemRB_GameSetReputation(PyObject * /*self*/, PyObject* args)
+{
+	int Reputation;
+
+	if (!PyArg_ParseTuple( args, "i", &Reputation )) {
+		return AttributeError( GemRB_GameSetReputation__doc );
+	}
+	core->GetGame()->Reputation=Reputation;
+
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_GameGetPartyGold__doc,
@@ -2721,7 +2745,7 @@ PyDoc_STRVAR( GemRB_GameGetPartyGold__doc,
 static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* /*args*/)
 {
 	int Gold = core->GetGame()->PartyGold;
-	return Py_BuildValue( "i", Gold );
+	return PyInt_FromLong( Gold );
 }
 
 PyDoc_STRVAR( GemRB_GameSetPartyGold__doc,
@@ -2748,7 +2772,7 @@ PyDoc_STRVAR( GemRB_GameGetFormation__doc,
 static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* /*args*/)
 {
 	int Formation = core->GetGame()->WhichFormation;
-	return Py_BuildValue( "i", Formation );
+	return PyInt_FromLong( Formation );
 }
 
 PyDoc_STRVAR( GemRB_GameSetFormation__doc,
@@ -2789,7 +2813,7 @@ static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 			count++;
 	}
 
-	return Py_BuildValue( "i", count );
+	return PyInt_FromLong( count );
 }
 
 PyDoc_STRVAR( GemRB_GetJournalEntry__doc,
@@ -2836,7 +2860,7 @@ static PyObject* GemRB_GameIsBeastKnown(PyObject * /*self*/, PyObject * args)
 		return AttributeError( GemRB_GameIsBeastKnown__doc );
 	}
 
-	return Py_BuildValue( "i", core->GetGame()->IsBeastKnown( index ));
+	return PyInt_FromLong( core->GetGame()->IsBeastKnown( index ));
 }
 
 PyDoc_STRVAR( GemRB_GetINIPartyCount__doc,
@@ -2849,7 +2873,7 @@ static PyObject* GemRB_GetINIPartyCount(PyObject * /*self*/,
 	if (!core->GetPartyINI()) {
 		return NULL;
 	}
-	return Py_BuildValue( "i", core->GetPartyINI()->GetTagsCount() );
+	return PyInt_FromLong( core->GetPartyINI()->GetTagsCount() );
 }
 
 PyDoc_STRVAR( GemRB_GetINIQuestsKey__doc,
@@ -2936,7 +2960,7 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 		printMessage( "GUIScript", "Not found!\n", LIGHT_RED );
 		return NULL;
 	}
-	return Py_BuildValue( "i", PlayerSlot );
+	return PyInt_FromLong( PlayerSlot );
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerName__doc,
@@ -3147,9 +3171,9 @@ static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 	PlayerSlot = game->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
 	if (!MyActor) {
-		return Py_BuildValue( "i", 0 );
+		return PyInt_FromLong( 0 );
 	}
-	return Py_BuildValue("i", MyActor->IsSelected() );
+	return PyInt_FromLong( MyActor->IsSelected() );
 }
 
 
@@ -3178,7 +3202,7 @@ PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
 
 static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* /*args*/)
 {
-	return Py_BuildValue( "i", core->GetGame()->GetSelectedPCSingle() );
+	return PyInt_FromLong( core->GetGame()->GetSelectedPCSingle() );
 }
 
 PyDoc_STRVAR( GemRB_GameGetFirstSelectedPC__doc,
@@ -3191,11 +3215,11 @@ static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*a
 	for (int i = 0; i < game->GetPartySize (false); i++) {
 		Actor* actor = game->GetPC (i);
 		if (actor->IsSelected()) {
-			return Py_BuildValue( "i", actor->InParty);
+			return PyInt_FromLong( actor->InParty);
 		}
 	}
 
-	return Py_BuildValue( "i", 0 );
+	return PyInt_FromLong( 0 );
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerPortrait__doc,
@@ -3236,7 +3260,7 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 	}
 	//returning the modified stat if BaseStat was 0 (default)
 	StatValue = core->GetCreatureStat( PlayerSlot, StatID, !BaseStat );
-	return Py_BuildValue( "i", StatValue );
+	return PyInt_FromLong( StatValue );
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerStat__doc,
@@ -3331,7 +3355,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetSpellIcon__doc,
-"SetSpellIcon(WindowIndex, ControlIndex, SPLResRef, type)\n\n"
+"SetSpellIcon(WindowIndex, ControlIndex, SPLResRef[, type])\n\n"
 "Sets Spell icon image on a button. Type is the icon's type." );
 
 static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
@@ -3383,8 +3407,8 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetItemIcon__doc,
-"SetItemIcon(WindowIndex, ControlIndex, ITMResRef)\n\n"
-"FIXME: temporary Sets Item icon image on a button." );
+"SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, type])\n\n"
+"Sets Item icon image on a button." );
 
 static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 {
@@ -3409,7 +3433,12 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 		}
 
 		btn->SetFlags( IE_GUI_BUTTON_PICTURE, OP_OR );
-		Sprite2D* Picture = GetBAMSprite(item->ItemIcon, -1, Which);
+		Sprite2D* Picture;
+		if (Which==2) {
+			Picture = GetBAMSprite(item->CarriedIcon, -1, 0);
+		} else {
+			Picture = GetBAMSprite(item->ItemIcon, -1, Which);
+		}
 		btn->SetPicture( Picture );
 		core->FreeItem( item, ItemResRef, false );
 	} else {
@@ -3479,7 +3508,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "StoreName", PyInt_FromLong( store->StoreName ));
 	PyDict_SetItemString(dict, "StoreDrinkCount", PyInt_FromLong( store->DrinksCount ));
 	PyDict_SetItemString(dict, "StoreCureCount", PyInt_FromLong( store->CuresCount ));
-	PyDict_SetItemString(dict, "StoreItemCount", PyInt_FromLong( store->ItemsCount ));
+	PyDict_SetItemString(dict, "StoreItemCount", PyInt_FromLong( store->GetRealStockSize() ));
 	PyDict_SetItemString(dict, "StoreCapacity", PyInt_FromLong( store->Capacity ));
 	PyObject* p = PyTuple_New( 4 );
 
@@ -3516,7 +3545,52 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "StoreFlags", PyInt_FromLong( store->Flags ) );
 	PyDict_SetItemString(dict, "TavernRumour", PyString_FromResRef( store->RumoursTavern ));
 	PyDict_SetItemString(dict, "TempleRumour", PyString_FromResRef( store->RumoursTemple ));
+	PyDict_SetItemString(dict, "IDPrice", PyInt_FromLong( store->IDPrice ) );
+	PyDict_SetItemString(dict, "Lore", PyInt_FromLong( store->Lore ) );
+	PyDict_SetItemString(dict, "Depreciation", PyInt_FromLong( store->DepreciationRate ) );
+	PyDict_SetItemString(dict, "SellMarkup", PyInt_FromLong( store->SellMarkup ) );
+	PyDict_SetItemString(dict, "BuyMarkup", PyInt_FromLong( store->BuyMarkup ) );
+	PyDict_SetItemString(dict, "StealFailure", PyInt_FromLong( store->StealFailureChance ) );
+
 	return dict;
+}
+
+
+PyDoc_STRVAR( GemRB_IsValidStoreItem__doc,
+"IsValidStoreItem(pc, idx[, type]) => int\n\n"
+"Returns if a pc's inventory item is valid for buying, selling, identifying or stealing.\n\n" );
+
+static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, Slot, ret;
+	int type = 0;
+
+	if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &Slot, &type)) {
+		return AttributeError( GemRB_IsValidStoreItem__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	Store *store = core->GetCurrentStore();
+	char *ItemResRef;
+	ieDword Flags;
+
+	if (type) {
+		STOItem* si = store->GetItem( Slot );
+		ItemResRef = si->ItemResRef;
+		Flags = si->Flags;
+	} else {
+		CREItem* si = actor->inventory.GetSlotItem( Slot );
+		ItemResRef = si->ItemResRef;
+		Flags = si->Flags;
+	}
+	Item *item = core->GetItem( ItemResRef );
+	ret = store->AcceptableItemType( item->ItemType, Flags );
+	core->FreeItem( item, ItemResRef, false );
+	return PyInt_FromLong(ret);
 }
 
 PyDoc_STRVAR( GemRB_GetStoreItem__doc,
@@ -3534,7 +3608,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	if (!store) {
 		return RuntimeError("No current store!");
 	}
-	if (index>=(int) store->ItemsCount) {
+	if (index>=(int) store->GetRealStockSize()) {
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
@@ -3772,7 +3846,7 @@ static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 	}
 
 	//this isn't in the actor's spellbook, handles Wisdom
-	return Py_BuildValue( "i", actor->spellbook.GetMemorizableSpellsCount( (ieSpellType) SpellType, Level, Bonus ) );
+	return PyInt_FromLong(actor->spellbook.GetMemorizableSpellsCount( (ieSpellType) SpellType, Level, Bonus ) );
 }
 
 PyDoc_STRVAR( GemRB_SetMemorizableSpellsCount__doc,
@@ -3816,7 +3890,7 @@ static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	return Py_BuildValue( "i", actor->spellbook.GetKnownSpellsCount( SpellType, Level ) );
+	return PyInt_FromLong(actor->spellbook.GetKnownSpellsCount( SpellType, Level ) );
 }
 
 PyDoc_STRVAR( GemRB_GetKnownSpell__doc,
@@ -3868,7 +3942,7 @@ static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* ar
 		return NULL;
 	}
 
-	return Py_BuildValue( "i", actor->spellbook.GetMemorizedSpellsCount( SpellType, Level ) );
+	return PyInt_FromLong( actor->spellbook.GetMemorizedSpellsCount( SpellType, Level ) );
 }
 
 PyDoc_STRVAR( GemRB_GetMemorizedSpell__doc,
@@ -3947,7 +4021,7 @@ static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 	if (! actor) {
 		return NULL;
 	}
-	return Py_BuildValue( "i", actor->LearnSpell(Spell, Flags) );
+	return PyInt_FromLong( actor->LearnSpell(Spell, Flags) );
 }
 
 
@@ -3973,7 +4047,7 @@ static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	return Py_BuildValue( "i", actor->spellbook.MemorizeSpell( ks, false ) );
+	return PyInt_FromLong( actor->spellbook.MemorizeSpell( ks, false ) );
 }
 
 
@@ -3999,7 +4073,7 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	return Py_BuildValue( "i", actor->spellbook.UnmemorizeSpell( ms ) );
+	return PyInt_FromLong( actor->spellbook.UnmemorizeSpell( ms ) );
 }
 
 PyDoc_STRVAR( GemRB_GetSlotItem__doc,
@@ -4033,6 +4107,37 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (si->Flags));
 
 	return dict;
+}
+
+PyDoc_STRVAR( GemRB_GetSlots__doc,
+"GetSlots(SlotType)=>dict\n\n"
+"Returns a tuple of slot items matching the slot type criteria." );
+
+static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
+{
+	int SlotType, Count, MaxCount;
+
+	if (!PyArg_ParseTuple( args, "i", &SlotType)) {
+		return AttributeError( GemRB_GetSlots__doc );
+	}
+
+	MaxCount = core->SlotTypes;
+	Count = 0;
+	for (int i=0;i<MaxCount;i++) {
+		if ((core->QuerySlotType(i) & SlotType) == SlotType) {
+			Count++;
+		}
+	}
+
+	PyObject* tuple = PyTuple_New( Count );
+	Count = 0;
+	for (int i=0;i<MaxCount;i++) {
+		if ((core->QuerySlotType( i ) & SlotType) == SlotType) {
+			PyTuple_SetItem( tuple, Count++, PyInt_FromLong( i ) );
+		}
+	}
+
+	return tuple;
 }
 
 PyDoc_STRVAR( GemRB_GetItem__doc,
@@ -4127,28 +4232,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 
 	core->DragItem (si);
 	Sprite2D *Picture = GetBAMSprite( ResRef, CycleIndex, FrameIndex );
-/*
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
-												IE_BAM_CLASS_ID );
-	if (str == NULL) {
-		return NULL;
-	}
-	AnimationMgr* am = ( AnimationMgr* )
-		core->GetInterface( IE_BAM_CLASS_ID );
-	if (am == NULL) {
-		delete ( str );
-		return NULL;
-	}
-
-	if (!am->Open( str, true )) {
-		core->FreeInterface( am );
-		return NULL;
-	}
-
-	Sprite2D* Picture = am->GetFrameFromCycle( CycleIndex, FrameIndex );
-*/
 	if (Picture == NULL) {
-//		core->FreeInterface( am );
 		return NULL;
 	}
 
@@ -4190,7 +4274,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		core->GetVideoDriver()->SetDragCursor (NULL);
 	} 
 
-	return Py_BuildValue( "i", res );
+	return PyInt_FromLong( res );
 }
 
 PyDoc_STRVAR( GemRB_IsDraggingItem__doc,
@@ -4199,7 +4283,7 @@ PyDoc_STRVAR( GemRB_IsDraggingItem__doc,
 
 static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* /*args*/)
 {
-	return Py_BuildValue( "i", core->GetDraggedItem() != NULL );
+	return PyInt_FromLong( core->GetDraggedItem() != NULL );
 }
 
 PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
@@ -4219,7 +4303,7 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 		case SV_HEIGHT: value = core->Height; break;
 		default: value = -1; break;
 	}
-	return Py_BuildValue( "i", value);
+	return PyInt_FromLong( value );
 }
 
 PyDoc_STRVAR( GemRB_CreateItem__doc,
@@ -4393,6 +4477,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(EndCutSceneMode, METH_NOARGS),
 	METHOD(GetPartySize, METH_NOARGS),
 	METHOD(GetGameTime, METH_NOARGS),
+	METHOD(GameGetReputation, METH_NOARGS),
+	METHOD(GameSetReputation, METH_VARARGS),
 	METHOD(GameGetPartyGold, METH_NOARGS),
 	METHOD(GameSetPartyGold, METH_VARARGS),
 	METHOD(GameGetFormation, METH_NOARGS),
@@ -4518,6 +4604,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(MemorizeSpell, METH_VARARGS),
 	METHOD(UnmemorizeSpell, METH_VARARGS),
 	METHOD(GetSlotItem, METH_VARARGS),
+	METHOD(GetSlots, METH_VARARGS),
 	METHOD(GetItem, METH_VARARGS),
 	METHOD(DragItem, METH_VARARGS),
 	METHOD(DropDraggedItem, METH_VARARGS),
@@ -4528,6 +4615,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CreateCreature, METH_VARARGS),
 	METHOD(ExploreArea, METH_VARARGS),
 	METHOD(GetRumour, METH_VARARGS),
+	METHOD(IsValidStoreItem, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };
