@@ -134,6 +134,24 @@ public:
 		else
 			topwin.push_back(Index);
 	}
+	/** Add a window to the Window List */
+	void AddWindow(Window * win)
+	{
+		int slot = -1;
+		for(unsigned int i = 0; i < windows.size(); i++) {
+			if(windows[i]==NULL) {
+				slot = i;
+				break;
+			}
+		}
+		if(slot == -1) {
+			windows.push_back(win);
+			slot=windows.size()-1;
+		}
+		else
+			windows[slot] = win;
+		win->Invalidate();
+	}
 	/** Get a Control on a Window */
 	int GetControl(unsigned short WindowIndex, unsigned long ControlID);
 	/** Set the Text of a Control */
