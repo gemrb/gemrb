@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.71 2003/11/25 21:04:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.72 2003/11/26 01:14:35 balrog994 Exp $
  *
  */
 
 
 #include "GUIScript.h"
 #include "../Core/Interface.h"
+#include "../Core/Map.h"
 
 #ifdef _DEBUG
 #undef _DEBUG
@@ -81,7 +82,8 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 	MapMgr * am = (MapMgr*)core->GetInterface(IE_ARE_CLASS_ID);
 	am->Open(str, true);
 	Map * map = am->GetMap();
-	gc->SetCurrentArea(map);
+	int areaindex = core->GetGame()->AddMap(map);
+	gc->SetCurrentArea(areaindex);
 	core->FreeInterface(am);
 	core->DelTable(start);
 	core->GetVideoDriver()->MoveViewportTo(startX, startY);
@@ -1670,12 +1672,26 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 		printf("Found avatar\n");
 		poi = mtm->GetRowName(i);
 		printf("Rowname: %s\n",poi);
+		//MyActor->BaseStats[IE_LEATHER_COLOR] = 0x1D;
+		//MyActor->BaseStats[IE_ARMOR_COLOR] = 0x4D;
+		//MyActor->BaseStats[IE_METAL_COLOR] = 0x4E;
 		MyActor->SetAnimationID(strtoul(poi,NULL,0) );
 		printf("Set animation complete\n");
 		break;
 	}
 	core->DelTable(mastertable);
 	MyActor->Init();
+	int saindex = core->LoadTable("STARTARE");
+	TableMgr * strta = core->GetTable(saindex);
+	ActorBlock ab;
+	ab.actor = MyActor;
+	ab.AnimID = IE_ANI_AWAKE;
+	ab.Orientation = 0;
+	ab.XPos = ab.XDes = atoi(strta->QueryField(1));
+	ab.YPos = ab.YDes = atoi(strta->QueryField(2));
+	ab.actor->anims->DrawCircle = false;
+	core->GetGame()->SetPC(ab);
+	core->DelTable(saindex);
 	Py_INCREF(Py_None);
 	return Py_None;
 }
