@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIJRNL.py,v 1.2 2004/11/28 19:36:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIJRNL.py,v 1.3 2004/12/04 11:09:11 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -37,12 +37,12 @@ def OpenJournalWindow ():
 	global StartTime, StartYear
 	global JournalWindow
 
-        Table = GemRB.LoadTable("YEARS")
+	Table = GemRB.LoadTable("YEARS")
 	#StartTime is the time offset for ingame time, beginning from the startyear
-        StartTime = GemRB.GetTableValue(Table, "STARTTIME", "VALUE") / 4500
+	StartTime = GemRB.GetTableValue(Table, "STARTTIME", "VALUE") / 4500
 	#StartYear is the year of the lowest ingame date to be printed
-        StartYear = GemRB.GetTableValue(Table, "STARTYEAR", "VALUE")
-        GemRB.UnloadTable(Table)
+	StartYear = GemRB.GetTableValue(Table, "STARTYEAR", "VALUE")
+	GemRB.UnloadTable(Table)
 
 	if CloseOtherWindow (OpenJournalWindow):
 		GemRB.HideGUI ()
@@ -96,7 +96,7 @@ def UpdateJournalWindow ():
 		GemRB.SetVar("DAYANDMONTH",dayandmonth)
 		GemRB.SetToken("YEAR",year)
 		GemRB.TextAreaAppend (Window, Text, "[color=FFFF00]"+GemRB.GetString(15980)+"[/color]", 3*i)
-		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i+1)
+		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i + 1)
 		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
 
 

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIJRNL.py,v 1.2 2004/10/23 13:01:35 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIJRNL.py,v 1.3 2004/12/04 11:09:11 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -28,11 +28,21 @@ from GUICommon import CloseOtherWindow
 
 ###################################################
 JournalWindow = None
-JournalSection = 0
+Chapter = 0
+StartTime = 0
+StartYear = 0
 
 ###################################################
 def OpenJournalWindow ():
+	global StartTime, StartYear
 	global JournalWindow
+
+	Table = GemRB.LoadTable("YEARS")
+	#StartTime is the time offset for ingame time, beginning from the startyear
+	StartTime = GemRB.GetTableValue(Table, "STARTTIME", "VALUE") / 4500
+	#StartYear is the year of the lowest ingame date to be printed
+	StartYear = GemRB.GetTableValue(Table, "STARTYEAR", "VALUE")
+	GemRB.UnloadTable(Table)
 
 	if CloseOtherWindow (OpenJournalWindow):
 		GemRB.HideGUI ()
@@ -65,47 +75,48 @@ def UpdateJournalWindow ():
 
 	# Title
 	Title = GemRB.GetControl (Window, 5)
-	GemRB.SetText (Window, Title, 16202 + JournalSection)
+	GemRB.SetText (Window, Title, 16202 + Chapter)
 
 	# text area
 	Text = GemRB.GetControl (Window, 1)
 	GemRB.TextAreaClear (Window, Text)
 	
-	for i in range (GemRB.GetJournalSize (JournalSection)):
-		je = GemRB.GetJournalEntry (JournalSection, i)
+	for i in range (GemRB.GetJournalSize (Chapter)):
+		je = GemRB.GetJournalEntry (Chapter, i)
 
 		if je == None:
 			continue
 
-		# FIXME: the date computed here is wrong by approx. time
-		#   of the first journal entry compared to journal in
-		#   orig. game. So it's probably computed since "awakening"
-		#   there instead of start of the day.
+		hours = je['GameTime'] / 4500
+		days = int(hours/24)
+		year = str (StartYear + int(days/365))
+		dayandmonth = StartTime + days%365
+		GemRB.SetToken("GAMEDAY", str(days) )
+		GemRB.SetToken("HOUR",str(hours%24 ) )
+		GemRB.SetVar("DAYANDMONTH",dayandmonth)
+		GemRB.SetToken("YEAR",year)
+		GemRB.TextAreaAppend (Window, Text, "[color=FFFF00]"+GemRB.GetString(15980)+"[/color]", 3*i)
 
-		#date = str (1 + int (je['GameTime'] / 86400))
-		#time = str (je['GameTime'])
-		
-		#GemRB.TextAreaAppend (Window, Text, "[color=FFFF00]Day " + date + '  (' + time + "):[/color]", 3*i)
-		GemRB.TextAreaAppend (Window, Text, je['Text'], 2*i)
-		GemRB.TextAreaAppend (Window, Text, "", 2*i + 1)
+		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i + 1)
+		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
 
 
 ###################################################
 def JournalPrevSectionPress ():
-	global JournalSection
+	global Chapter
 
-	if JournalSection > 0:
-		JournalSection = JournalSection - 1
+	if Chapter > 0:
+		Chapter = Chapter - 1
 		UpdateJournalWindow ()
 
 
 ###################################################
 def JournalNextSectionPress ():
-	global JournalSection
+	global Chapter
 
-	#if GemRB.GetJournalSize (JournalSection + 1) > 0:
-	if JournalSection < GemRB.GetVar("chapter"):
-		JournalSection = JournalSection + 1
+	#if GemRB.GetJournalSize (Chapter + 1) > 0:
+	if Chapter < GemRB.GetVar("chapter"):
+		Chapter = Chapter + 1
 		UpdateJournalWindow ()
 
 
