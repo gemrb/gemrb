@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.52 2004/02/28 01:36:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.53 2004/02/28 09:40:06 avenger_teambg Exp $
  *
  */
 
@@ -86,7 +86,9 @@ public:
 	};
 	void AddTarget(Actor* Target)
 	{
-		objects.push_back( Target );
+		if(Target) {
+			objects.push_back( Target );
+		}
 	};
 	void Clear()
 	{
@@ -647,7 +649,7 @@ private: //Internal Functions
 	static bool EvaluateTrigger(Scriptable* Sender, Trigger* trigger);
 	int ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS);
 	int ExecuteResponse(Scriptable* Sender, Response* rE);
-	static Targets* EvaluateObject(Scriptable* Sender, Object* oC);
+	static Targets* EvaluateObject(Object* oC);
 	static int ParseInt(const char*& src);
 	static void ParseString(const char*& src, char* tmp);
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.75 2004/02/28 01:36:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.76 2004/02/28 09:40:06 avenger_teambg Exp $
  *
  */
 
@@ -843,21 +843,20 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	ActionFunction func = actions[aC->actionID];
-	const char *tmpstr=actionsTable -> GetValue(aC->actionID);
-	printf("Executing action: %s\n",tmpstr);
+	printf( "[IEScript]: %s\n", actionsTable->GetValue( aC->actionID ) );
 	if (func) {
 		Scriptable* scr = GetActorFromObject( Sender, aC->objects[0]);
-		if(scr && scr!=Sender) {
+		if(scr!=Sender) {
 			//this is an Action Override
 			scr->AddAction( Sender->CurrentAction );
 			Sender->CurrentAction = NULL;
+			//maybe we should always release here???
 			if (!(flags[aC->actionID] & AF_INSTANT) ) {
 				aC->Release();
 			}
 			return;
 		}
 		else {
-			printf( "[IEScript]: %s\n", actionsTable->GetValue( aC->actionID ) );
 			func( Sender, aC );
 		}
 	}
@@ -884,19 +883,20 @@ Action* GameScript::CreateAction(char* string, bool autoFree)
 }
 
 /* returns actors that match the [x.y.z] expression */
-Targets* GameScript::EvaluateObject(Scriptable* Sender, Object* oC)
+Targets* GameScript::EvaluateObject(Object* oC)
 {
 	Targets *tgts=NULL;
 
 	if (oC->objectName[0]) {
-		//We want the object by its name...
+		//We want the object by its name... (doors/triggers don't play here!)
 		Actor* aC = core->GetGame()->GetMap( 0 )->GetActor( oC->objectName );
 		//Ok :) we now have our Object. Let's create a Target struct and add the object to it
 		tgts = new Targets();
 		tgts->AddTarget( aC );
+		//return here because object name/IDS targeting are mutually exclusive
 		return tgts;
 	}
-	//else branch
+	//else branch, IDS targeting
 	for(int j = 0; j < ObjectIDSCount; j++) {
 		if(!oC->objectFields[j]) {
 			continue;
@@ -911,7 +911,7 @@ Targets* GameScript::EvaluateObject(Scriptable* Sender, Object* oC)
 			int i = tgts->Count();
 			/*premature end, filtered everything*/
 			if(!i) {
-				return tgts;
+				break; //leaving the loop
 			}
 			while(i--) {
 				if(!func(tgts->GetTarget(i), oC->objectFields[j] ) ) {
@@ -928,10 +928,13 @@ Targets* GameScript::EvaluateObject(Scriptable* Sender, Object* oC)
 				Actor *ac=core->GetActor(i);
 				if(ac && func(ac, oC->objectFields[j]) ) {
 					tgts->AddTarget(ac);
+printf("actor: %x\n",ac);
+printf("Adding actor: %s\n",ac->GetName(0));
 				}
 			}
 		}
 	}
+	return tgts;
 }
 
 Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
@@ -939,18 +942,23 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 	if (!oC) {
 		return NULL;
 	}
-	Targets* tgts = EvaluateObject(Sender, oC);
-	if(!tgts) {
+	Targets* tgts = EvaluateObject(oC);
+	if(!tgts && oC->objectName[0]) {
 		//It was not an actor... maybe it is a door?
 		Scriptable * aC = core->GetGame()->GetMap( 0 )->tm->GetDoor( oC->objectName );
-		if (!aC) {
-			//No... it was not a door... maybe an InfoPoint?
-			aC = core->GetGame()->GetMap( 0 )->tm->GetInfoPoint( oC->objectName );
-			}
 		if (aC) {
 			return aC;
 		}
+		//No... it was not a door... maybe an InfoPoint?
+		aC = core->GetGame()->GetMap( 0 )->tm->GetInfoPoint( oC->objectName );
+		if (aC) {
+			return aC;
+		}
+		return NULL;
 	}
+	//now lets do the object filter stuff, we create Targets because
+	//it is possible to start from blank sheets using endpoint filters
+	//like (Myself, Protagonist etc)
 	if(!tgts) {
 		tgts = new Targets();
 	}
@@ -1620,6 +1628,7 @@ int GameScript::ID_Alignment(Actor *actor, int parameter)
 
 int GameScript::ID_Allegiance(Actor *actor, int parameter)
 {
+printf("Running allegiance checker\n");
 	int value = actor->GetStat( IE_EA );
 	switch (parameter) {
 		case 30:
@@ -2732,11 +2741,10 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		tar = GetActorFromObject( Sender, parameters->objects[1] );
 	}
 	//source could be other than Actor, we need to handle this too!
-	if (scr->Type != ST_ACTOR) {
+	if (tar->Type != ST_ACTOR) {
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	//no need to check these for NULL
 	Actor* actor = ( Actor* ) scr;
 	Actor* target = ( Actor* ) tar;
 
