@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.17 2003/12/19 23:27:09 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.18 2003/12/22 19:00:33 balrog994 Exp $
  *
  */
 
@@ -1466,5 +1466,15 @@ void GameScript::ScreenShake(GameScript * Sender, Action * parameters)
 
 void GameScript::UnhideGUI(GameScript * Sender, Action * parameters)
 {
+	GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
+	if(gc->ControlType == IE_GUI_GAMECONTROL)
+		gc->UnhideGUI();
 	EndCutSceneMode(Sender, parameters);
+}
+
+void GameScript::HideGUI(GameScript * Sender, Action * parameters)
+{
+	GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
+	if(gc->ControlType == IE_GUI_GAMECONTROL)
+		gc->HideGUI();
 }
