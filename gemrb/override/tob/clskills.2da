@@ -1,18 +1,19 @@
 2DA V1.0
 *
                     HATERACE   CLERICSPELL MAGESPELL  
-FIGHTER             *          *           *          
-RANGER              HATERACE   MXSPLRAN    *          
-PALADIN             *          MXSPLPAL    *          
-CLERIC              *          MXSPLPRS    *          
-DRUID               *          MXSPLDRU    *          
+UNUSED              *          *           *
 MAGE                *          *           MXSPLWIZ   
+FIGHTER             *          *           *          
+CLERIC              *          MXSPLPRS    *          
 THIEF               *          *           *          
 BARD                *          *           MXSPLBRD   
+PALADIN             *          MXSPLPAL    *          
 FIGHTER_MAGE        *          *           MXSPLWIZ   
 FIGHTER_CLERIC      *          MXSPLPRS    *          
 FIGHTER_THIEF       *          *           *          
 FIGHTER_MAGE_THIEF  *          *           MXSPLWIZ   
+DRUID               *          MXSPLDRU    *          
+RANGER              HATERACE   MXSPLRAN    *          
 MAGE_THIEF          *          *           MXSPLWIZ   
 CLERIC_MAGE         *          MXSPLPRS    MXSPLWIZ   
 CLERIC_THIEF        *          MXSPLPRS    *          
@@ -21,4 +22,3 @@ FIGHTER_MAGE_CLERIC *          MXSPLPRS    MXSPLWIZ
 CLERIC_RANGER       HATERACE   MXSPLPRS    *          
 SORCERER            *          *           MXSPLSRC   
 MONK                *          *           *          
-BARBARIAN           *          *           *          
