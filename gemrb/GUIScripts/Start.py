@@ -12,7 +12,7 @@ def OnLoad():
 	MultiPlayerButton = GemRB.GetControl(StartWindow, 1)
 	MoviesButton = GemRB.GetControl(StartWindow, 2)
 	DisabledButton = GemRB.GetControl(StartWindow, 5)
-	GemRB.CreateLabel(OptionsWindow, 0xffff0000, 0,450,640,30, "REALMS", "GemRB Ver 0.0.1", 1);
+	GemRB.CreateLabel(OptionsWindow, 0x0fff0000, 0,450,640,30, "REALMS", "GemRB Ver 0.0.1", 1);
 	GemRB.SetControlStatus(StartWindow, DisabledButton, IE_GUI_BUTTON_DISABLED);
 	GemRB.SetControlStatus(StartWindow, SinglePlayerButton, IE_GUI_BUTTON_ENABLED);
 	GemRB.SetControlStatus(StartWindow, ExitButton, IE_GUI_BUTTON_ENABLED);
