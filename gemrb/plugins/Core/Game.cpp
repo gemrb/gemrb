@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.25 2004/03/22 18:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.26 2004/03/23 19:33:26 avenger_teambg Exp $
  *
  */
 
@@ -51,9 +51,7 @@ Game::~Game(void)
 
 Actor* Game::FindPC(unsigned int partyID)
 {
-	int slot;
-
-	for(slot=0; slot<PCs.size(); slot++) {
+	for(unsigned int slot=0; slot<PCs.size(); slot++) {
 		if(PCs[slot]->InParty==partyID) return PCs[slot];
 	}
 	return NULL;
@@ -69,7 +67,7 @@ Actor* Game::GetPC(unsigned int slot)
 
 int Game::InStore(Actor* pc)
 {
-	for (int i = 0; i < NPCs.size(); i++) {
+	for (unsigned int i = 0; i < NPCs.size(); i++) {
 		if (NPCs[i] == pc) {
 			return i;
 		}
@@ -79,7 +77,7 @@ int Game::InStore(Actor* pc)
 
 int Game::InParty(Actor* pc)
 {
-	for (int i = 0; i < PCs.size(); i++) {
+	for (unsigned int i = 0; i < PCs.size(); i++) {
 		if (PCs[i] == pc) {
 			return i;
 		}
@@ -94,7 +92,7 @@ int Game::SetPC(Actor* pc)
 		return slot;
 	}
 	slot = InStore( pc );
-	if (slot != -1) 		   //it is an NPC, can't add as PC
+	if (slot != -1)	   //it is an NPC, can't add as PC
 	{
 		return -1;
 	}
@@ -163,7 +161,7 @@ int Game::GetPartySize(bool onlyalive)
 {
 	if (onlyalive) {
 		int count = 0;
-		for (int i = 0; i < PCs.size(); i++) {
+		for (unsigned int i = 0; i < PCs.size(); i++) {
 			if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 				continue;
 			}
@@ -177,7 +175,7 @@ int Game::GetPartySize(bool onlyalive)
 int Game::GetPartyLevel(bool onlyalive)
 {
 	int count = 0;
-	for (int i = 0; i<PCs.size(); i++) {
+	for (unsigned int i = 0; i<PCs.size(); i++) {
 			if (onlyalive) {
 				if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 					continue;
@@ -239,12 +237,12 @@ int Game::LoadMap(char* ResRef)
 	if (!newMap) {
 		return -1;
 	}
-	for (int i = 0; i < PCs.size(); i++) {
+	for (unsigned int i = 0; i < PCs.size(); i++) {
 		if (stricmp( PCs[i]->Area, ResRef ) == 0) {
 			newMap->AddActor( PCs[i] );
 		}
 	}
-	for (int i = 0; i < NPCs.size(); i++) {
+	for (unsigned int i = 0; i < NPCs.size(); i++) {
 		if (stricmp( NPCs[i]->Area, ResRef ) == 0) {
 			newMap->AddActor( NPCs[i] );
 		}

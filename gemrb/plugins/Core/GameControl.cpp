@@ -89,7 +89,7 @@ GameControl::GameControl(void)
 GameControl::~GameControl(void)
 {
 	free( InfoTextPalette );
-	for (int i = 0; i < infoTexts.size(); i++) {
+	for (unsigned int i = 0; i < infoTexts.size(); i++) {
 		delete( infoTexts[i] );
 	}
 }
@@ -130,7 +130,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		video->ConvertToGame( GameX, GameY );
 		if (DrawSelectionRect) {
 			CalculateSelection( GameX, GameY );
-
+/* unused ?
 			short xs[4] = {
 				SelectionRect.x, SelectionRect.x + SelectionRect.w,
 				SelectionRect.x + SelectionRect.w, SelectionRect.x
@@ -140,6 +140,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				SelectionRect.y + SelectionRect.h,
 				SelectionRect.y + SelectionRect.h
 			};
+*/
 			Point points[4] = {
 				{SelectionRect.x, SelectionRect.y},
 				{SelectionRect.x + SelectionRect.w, SelectionRect.y},
@@ -151,9 +152,13 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		}
 		if (DebugFlags & 4) {
 			Door* d;
-			for (unsigned int idx = 0; d = area->tm->GetDoor( idx ); idx++) {
-				if (d->Flags&1)
+			//there is a real assignment in the loop!
+			for (unsigned int idx = 0;
+				(d = area->tm->GetDoor( idx ));
+				idx++) {
+				if (d->Flags & 1) {
 					video->DrawPolyline( d->closed, cyan, true );
+				}
 				else {
 					video->DrawPolyline( d->open, cyan, true );
 				}
@@ -162,8 +167,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		//draw containers when ALT was pressed
 		if (DebugFlags & 4) {
 			Container* c;
+			//there is a real assignment in the loop!
 			for (unsigned int idx = 0;
-				c = area->tm->GetContainer( idx );
+				(c = area->tm->GetContainer( idx ));
 				idx++) {
 				if (c->TrapDetected && c->Trapped) {
 					video->DrawPolyline( c->outline, red, true );
@@ -182,8 +188,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		if (DebugFlags & 5) {
 			//draw infopoints with blue overlay
 			InfoPoint* i;
+			//there is a real assignment in the loop!
 			for (unsigned int idx = 0;
-				i = area->tm->GetInfoPoint( idx );
+				(i = area->tm->GetInfoPoint( idx ));
 				idx++) {
 				if (( i->TrapDetected || ( DebugFlags & 1 ) ) && i->Trapped) {
 					video->DrawPolyline( i->outline, red, true );
@@ -401,7 +408,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'j':
 				// j
 				 {
-					for (int i = 0; i < selected.size(); i++) {
+					for (unsigned int i = 0; i < selected.size(); i++) {
 						Actor* actor = selected[i];
 						short cX = lastMouseX; 
 						short cY = lastMouseY;
@@ -670,6 +677,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 												true ) );
 						}
 						break;
+					default: //all other types are ignored
+						break;
 				}
 			}
 			if (!overInfoPoint || ( overInfoPoint->Type != ST_TRIGGER )) {
@@ -851,7 +860,7 @@ void GameControl::HideGUI()
 	Variables* dict = core->GetDictionary();
 	unsigned long index;
 	if (dict->Lookup( "MessageWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* mw = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "MessagePosition", index )) {
@@ -860,7 +869,7 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "OptionsWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* ow = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "OptionsPosition", index )) {
@@ -869,7 +878,7 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "PortraitWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* pw = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "PortraitPosition", index )) {
@@ -878,7 +887,7 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "ActionsWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* aw = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "ActionsPosition", index )) {
@@ -887,7 +896,7 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "TopWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* tw = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "TopPosition", index )) {
@@ -896,7 +905,7 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "OtherWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* tw = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "OtherPosition", index )) {
@@ -905,13 +914,15 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "FloatWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
+/* this appears to be needless
 			Window* fw = core->GetWindow( index );
+*/
 			core->SetVisible( index, 0 );
 		}
 	}
 	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos,
-								( ( Window * ) Owner )->YPos, Width, Height );
+		( ( Window * ) Owner )->YPos, Width, Height );
 }
 
 void GameControl::UnhideGUI()
@@ -923,7 +934,7 @@ void GameControl::UnhideGUI()
 	Variables* dict = core->GetDictionary();
 	unsigned long index;
 	if (dict->Lookup( "MessageWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* mw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "MessagePosition", index )) {
@@ -932,7 +943,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "ActionsWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* aw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "ActionsPosition", index )) {
@@ -941,7 +952,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "OptionsWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* ow = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "OptionsPosition", index )) {
@@ -950,7 +961,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "PortraitWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* pw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "PortraitPosition", index )) {
@@ -959,7 +970,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "TopWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* tw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "TopPosition", index )) {
@@ -968,7 +979,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "OtherWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* tw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "OtherPosition", index )) {
@@ -977,7 +988,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "FloatWindow", index )) {
-		if (index != -1) {
+		if (index != (unsigned long) -1) {
 			Window* fw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			fw->Floating = true;
@@ -1144,7 +1155,7 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 			core->GetGUIScriptEngine()->RunFunction( "OnIncreaseSize" );
 		}
 	}
-	DialogChoose( -1 );
+	DialogChoose( (unsigned long) -1 );
 }
 
 static void AddTalk(TextArea* ta, Actor* speaker, char* speaker_color,
@@ -1205,7 +1216,7 @@ bool GameControl::EvaluateDialogTrigger(Scriptable* target,
 	if (!trigger) {
 		return false;
 	}
-	for (int t = 0; t < trigger->count; t++) {
+	for (unsigned int t = 0; t < trigger->count; t++) {
 		result = GameScript::EvaluateString( target, trigger->strings[t] );
 		if (result > 1) {
 			if (ORcount)
@@ -1229,7 +1240,7 @@ bool GameControl::EvaluateDialogTrigger(Scriptable* target,
 	return 1;
 }
 
-void GameControl::DialogChoose(int choose)
+void GameControl::DialogChoose(unsigned int choose)
 {
 	unsigned long index;
 	if (core->GetDictionary()->Lookup( "MessageWindow", index )) {
@@ -1237,7 +1248,7 @@ void GameControl::DialogChoose(int choose)
 		if (core->GetDictionary()->Lookup( "MessageTextArea", index )) {
 			TextArea* ta = ( TextArea* ) win->GetControl( index );
 			//get the first state with true triggers!
-			if (choose == -1) {
+			if (choose == (unsigned long) -1) {
 				int si = FindFirstState( target, dlg );
 				if (si < 0) {
 					printf( "[Dialog]: No top level condition evaluated for true.\n" );
@@ -1257,7 +1268,7 @@ void GameControl::DialogChoose(int choose)
 					core->GetString( tr->textStrRef ), "8080FF" );
 
 				if (tr->action) {
-					for (int i = 0; i < tr->action->count; i++) {
+					for (unsigned int i = 0; i < tr->action->count; i++) {
 						Action* action = GameScript::CreateAction( tr->action->strings[i],
 											true );
 						if (action) {
@@ -1288,10 +1299,10 @@ void GameControl::DialogChoose(int choose)
 			int i;
 			ta->SetMinRow( true );
 			int idx = 0;
-			for (int x = 0; x < ds->transitionsCount; x++) {
+			for (unsigned int x = 0; x < ds->transitionsCount; x++) {
 				if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
 					bool ret = true;
-					for (int t = 0;
+					for (unsigned int t = 0;
 						t < ds->transitions[x]->trigger->count;
 						t++) {
 						ret &= GameScript::EvaluateString( target,
@@ -1349,7 +1360,7 @@ void GameControl::ChangeMap()
 	overInfoPoint = NULL;
 	overContainer = NULL;
 	overDoor = NULL;
-	for (int i = 0; i < infoTexts.size(); i++) {
+	for (unsigned int i = 0; i < infoTexts.size(); i++) {
 		delete( infoTexts[i] );
 	}
 	infoTexts.clear();
@@ -1389,7 +1400,7 @@ void GameControl::DisplayString(char* Text)
 	unsigned long WinIndex, TAIndex;
 
 	core->GetDictionary()->Lookup( "MessageWindow", WinIndex );
-	if (( WinIndex != -1 ) &&
+	if (( WinIndex != (unsigned long) -1 ) &&
 		( core->GetDictionary()->Lookup( "MessageTextArea", TAIndex ) )) {
 		Window* win = core->GetWindow( WinIndex );
 		if (win) {

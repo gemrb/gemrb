@@ -99,7 +99,7 @@ public:
 	void TryToTalk(Actor *source, Actor *target);
 	void InitDialog(Actor* speaker, Actor* target, const char* dlgref);
 	void EndDialog();
-	void DialogChoose(int choose);
+	void DialogChoose(unsigned int choose);
 	/** finds the first true condition in a dialog */
 	int FindFirstState(Scriptable* target, Dialog* dlg);
 	void DisplayString(Scriptable* target);
