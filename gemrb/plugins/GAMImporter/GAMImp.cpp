@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.28 2004/08/02 18:00:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.29 2004/08/02 22:17:03 avenger_teambg Exp $
  *
  */
 
@@ -246,7 +246,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		str->Seek( 254, GEM_CURRENT_POS);
 	}
 	str->Read( &pcInfo.Name, 32 );
-	if (version==11) { //iwd
+	if (version==12) { //Torment
 		str->Seek( 8, GEM_CURRENT_POS);
 	}
 	str->Read( &pcInfo.TalkCount, 4 );
@@ -258,6 +258,10 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize );
 		aM->Open( ms );
 		actor = aM->GetActor();
+		if(pcInfo.Name[0]!=-1) { //torment has them as -1
+			actor->SetText(pcInfo.Name,0); //setting both names
+		}
+		actor->TalkCount = pcInfo.TalkCount;
 	} else {
 		DataStream* ds = core->GetResourceMgr()->GetResource( pcInfo.CREResRef,
 								      IE_CRE_CLASS_ID );
@@ -265,8 +269,6 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		actor = aM->GetActor();
 	}
 
-//	actor->Name = pcInfo.Name;
-	actor->TalkCount = pcInfo.TalkCount;
 	actor->XPos = pcInfo.XPos;
 	actor->YPos = pcInfo.YPos;
 	actor->Orientation = pcInfo.Orientation;
