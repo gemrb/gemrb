@@ -270,7 +270,7 @@ void GameControl::SelectActor(int whom)
 	selected.clear();
 	Game* game = core->GetGame();
 	if(whom==-1) {
-		for(int i = 0; i < 12; i++) {
+		for(int i = 0; i < game->GetPartySize(); i++) {
 			Actor* actor = game->GetPC( i );
 			if (actor) {
 				selected.push_back( actor );
@@ -573,14 +573,14 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 void GameControl::TryToTalk(Actor *source, Actor *target)
 {
-	char Tmp[256];
-
-	sprintf( Tmp, "StartDialogueNoSet(\"%s\")", source->scriptName );
 	if(target->GetNextAction()) {
 		DisplayString("Target is busy...");
 		return;
 	}
-	target->AddAction( GameScript::CreateAction( Tmp, true ) );
+	char Tmp[256];
+
+	sprintf( Tmp, "Dialogue(\"%s\")", target->scriptName );
+	source->AddAction( GameScript::CreateAction( Tmp, true ) );
 }
 
 /** Mouse Button Down */
@@ -707,7 +707,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			break;
 		case 1:
 			//talk
-			TryToTalk(actor, selected[0]);
+			TryToTalk(selected[0], actor);
 			break;
 		case 2:
 			//attack

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.110 2004/03/21 15:49:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.111 2004/03/21 19:00:55 avenger_teambg Exp $
  *
  */
 
@@ -68,7 +68,12 @@ static TriggerLink triggernames[] = {
 	{"entered", GameScript::Entered}, {"exists", GameScript::Exists},
 	{"false", GameScript::False}, {"gender", GameScript::Gender},
 	{"general", GameScript::General}, {"global", GameScript::Global},
-	{"globalgt", GameScript::GlobalGT}, {"globallt", GameScript::GlobalLT},
+	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger},
+	{"globalequalsglobal", GameScript::GlobalsEqual}, //this is the same
+	{"globalgt", GameScript::GlobalGT},
+	{"globalgtglobal", GameScript::GlobalGTGlobal},
+	{"globallt", GameScript::GlobalLT},
+	{"globalltglobal", GameScript::GlobalLTGlobal},
 	{"globalsequal", GameScript::GlobalsEqual},
 	{"globaltimerexact", GameScript::GlobalTimerExact},
 	{"globaltimerexpired", GameScript::GlobalTimerExpired},
@@ -103,7 +108,15 @@ static TriggerLink triggernames[] = {
 	{"oncreation", GameScript::OnCreation},
 	{"openstate", GameScript::OpenState},
 	{"or", GameScript::Or},
-	{"partyhasitem", GameScript::PartyHasItem}, {"race", GameScript::Race},
+	{"ownsfloatermessage", GameScript::OwnsFloaterMessage},
+	{"partycounteq", GameScript::PartyCountEQ},
+	{"partycountgt", GameScript::PartyCountGT},
+	{"partycountlt", GameScript::PartyCountLT},
+	{"partygold", GameScript::PartyGold},
+	{"partygoldGT", GameScript::PartyGoldGT},
+	{"partygoldLT", GameScript::PartyGoldLT},
+	{"partyhasitem", GameScript::PartyHasItem},
+	{"race", GameScript::Race},
 	{"randomnum", GameScript::RandomNum},
 	{"randomnumgt", GameScript::RandomNumGT},
 	{"randomnumlt", GameScript::RandomNumLT},
@@ -120,62 +133,62 @@ static TriggerLink triggernames[] = {
 
 //Make this an ordered list, so we could use bsearch!
 static ActionLink actionnames[] = {
-	{"actionoverride",NULL}, {"activate",GameScript::Activate},
-	{"addareatype", GameScript::AddAreaType},
-	{"addareaflag", GameScript::AddAreaFlag},
-	{"addexperienceparty",GameScript::AddExperienceParty},
+	{"actionoverride",NULL,0}, {"activate",GameScript::Activate,0},
+	{"addareatype", GameScript::AddAreaType,0},
+	{"addareaflag", GameScript::AddAreaFlag,0},
+	{"addexperienceparty",GameScript::AddExperienceParty,0},
 	{"addexperiencepartyglobal",GameScript::AddExperiencePartyGlobal,AF_MERGESTRINGS},
-	{"addglobals",GameScript::AddGlobals},
+	{"addglobals",GameScript::AddGlobals,0},
 	{"addwaypoint",GameScript::AddWayPoint,AF_BLOCKING},
-	{"addxp2da", GameScript::AddXP2DA},
-	{"addxpobject", GameScript::AddXPObject},
-	{"addxpvar", GameScript::AddXP2DA},
-	{"ally",GameScript::Ally},
-	{"ambientactivate",GameScript::AmbientActivate},
+	{"addxp2da", GameScript::AddXP2DA,0},
+	{"addxpobject", GameScript::AddXPObject,0},
+	{"addxpvar", GameScript::AddXP2DA,0},
+	{"ally",GameScript::Ally,0},
+	{"ambientactivate",GameScript::AmbientActivate,0},
 	{"bashdoor",GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
-	{"bitclear",GameScript::BitClear},
-	{"bitset",GameScript::GlobalBOr}, //probably the same
-	{"changeaiscript",GameScript::ChangeAIScript},
-	{"changealignment",GameScript::ChangeAlignment},
-	{"changeallegiance",GameScript::ChangeAllegiance},
-	{"changeclass",GameScript::ChangeClass},
-	{"changegender",GameScript::ChangeGender},
-	{"changegeneral",GameScript::ChangeGeneral},
-	{"changeenemyally",GameScript::ChangeAllegiance}, //this is the same
-	{"changerace",GameScript::ChangeRace},
-	{"changespecifics",GameScript::ChangeSpecifics},
-	{"changestat",GameScript::ChangeStat},
-	{"clearactions",GameScript::ClearActions},
-	{"clearallactions",GameScript::ClearAllActions},
+	{"bitclear",GameScript::BitClear,0},
+	{"bitset",GameScript::GlobalBOr,0}, //probably the same
+	{"changeaiscript",GameScript::ChangeAIScript,0},
+	{"changealignment",GameScript::ChangeAlignment,0},
+	{"changeallegiance",GameScript::ChangeAllegiance,0},
+	{"changeclass",GameScript::ChangeClass,0},
+	{"changegender",GameScript::ChangeGender,0},
+	{"changegeneral",GameScript::ChangeGeneral,0},
+	{"changeenemyally",GameScript::ChangeAllegiance,0}, //this is the same
+	{"changerace",GameScript::ChangeRace,0},
+	{"changespecifics",GameScript::ChangeSpecifics,0},
+	{"changestat",GameScript::ChangeStat,0},
+	{"clearactions",GameScript::ClearActions,0},
+	{"clearallactions",GameScript::ClearAllActions,0},
 	{"closedoor",GameScript::CloseDoor,AF_BLOCKING},
 	{"continue",GameScript::Continue,AF_INSTANT | AF_CONTINUE},
-	{"createcreature",GameScript::CreateCreature},
-	{"createcreatureatfeet",GameScript::CreateCreatureOffset}, //this is the same
-	{"createcreatureoffset",GameScript::CreateCreatureOffset},
-	{"createvisualeffect",GameScript::CreateVisualEffect},
-	{"createvisualeffectobject",GameScript::CreateVisualEffectObject},
+	{"createcreature",GameScript::CreateCreature,0},
+	{"createcreatureatfeet",GameScript::CreateCreatureOffset,0}, //this is the same
+	{"createcreatureoffset",GameScript::CreateCreatureOffset,0},
+	{"createvisualeffect",GameScript::CreateVisualEffect,0},
+	{"createvisualeffectobject",GameScript::CreateVisualEffectObject,0},
 	{"cutsceneid",GameScript::CutSceneID,AF_INSTANT},
-	{"deactivate",GameScript::Deactivate},
-	{"destroypartygold",GameScript::DestroyPartyGold},
-	{"destroyself",GameScript::DestroySelf},
+	{"deactivate",GameScript::Deactivate,0},
+	{"destroypartygold",GameScript::DestroyPartyGold,0},
+	{"destroyself",GameScript::DestroySelf,0},
 	{"dialogue",GameScript::Dialogue,AF_BLOCKING},
 	{"dialogueforceinterrupt",GameScript::DialogueForceInterrupt,AF_BLOCKING},
-	{"displaystring",GameScript::DisplayString},
-	{"displaystringhead",GameScript::DisplayStringHead},
-	{"displaystringnonamehead",GameScript::DisplayStringNoNameHead},
+	{"displaystring",GameScript::DisplayString,0},
+	{"displaystringhead",GameScript::DisplayStringHead,0},
+	{"displaystringnonamehead",GameScript::DisplayStringNoNameHead,0},
 	{"displaystringwait",GameScript::DisplayStringWait,AF_BLOCKING},
-	{"endcutscenemode",GameScript::EndCutSceneMode},
-	{"enemy",GameScript::Enemy}, {"face",GameScript::Face,AF_BLOCKING},
+	{"endcutscenemode",GameScript::EndCutSceneMode,0},
+	{"enemy",GameScript::Enemy,0}, {"face",GameScript::Face,AF_BLOCKING},
 	{"faceobject",GameScript::FaceObject, AF_BLOCKING},
-	{"fadefromblack",GameScript::FadeFromColor}, //probably the same
-	{"fadefromcolor",GameScript::FadeFromColor},
-	{"fadetoblack",GameScript::FadeToColor}, //probably the same
-	{"fadetocolor",GameScript::FadeToColor},
-	{"floatmessage",GameScript::DisplayStringHead}, //probably the same
-	{"forceaiscript",GameScript::ForceAIScript},
-	{"forcespell",GameScript::ForceSpell},
-	{"giveexperience", GameScript::AddXPObject},
-	{"givepartygold",GameScript::GivePartyGold},
+	{"fadefromblack",GameScript::FadeFromColor,0}, //probably the same
+	{"fadefromcolor",GameScript::FadeFromColor,0},
+	{"fadetoblack",GameScript::FadeToColor,0}, //probably the same
+	{"fadetocolor",GameScript::FadeToColor,0},
+	{"floatmessage",GameScript::DisplayStringHead,0}, //probably the same
+	{"forceaiscript",GameScript::ForceAIScript,0},
+	{"forcespell",GameScript::ForceSpell,0},
+	{"giveexperience", GameScript::AddXPObject,0},
+	{"givepartygold",GameScript::GivePartyGold,0},
 	{"givepartygoldglobal",GameScript::GivePartyGoldGlobal,AF_MERGESTRINGS},
 	{"globalband",GameScript::GlobalBAnd,AF_MERGESTRINGS},
 	{"globalbandglobal",GameScript::GlobalBAndGlobal,AF_MERGESTRINGS},
@@ -192,42 +205,46 @@ static ActionLink actionnames[] = {
 	{"globalshrglobal",GameScript::GlobalShRGlobal,AF_MERGESTRINGS},
 	{"globalxor",GameScript::GlobalXor,AF_MERGESTRINGS},
 	{"globalxorglobal",GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
-	{"hidegui",GameScript::HideGUI},
-	{"incmoraleai",GameScript::IncMoraleAI},
-	{"incrementchapter",GameScript::IncrementChapter},
+	{"hidegui",GameScript::HideGUI,0},
+	{"incmoraleai",GameScript::IncMoraleAI,0},
+	{"incrementchapter",GameScript::IncrementChapter,0},
 	{"incrementglobal",GameScript::IncrementGlobal,AF_MERGESTRINGS},
 	{"incrementglobalonce",GameScript::IncrementGlobalOnce,AF_MERGESTRINGS},
-	{"joinparty",GameScript::JoinParty},
-	{"jumptoobject",GameScript::JumpToObject},
-	{"jumptopoint",GameScript::JumpToPoint},
-	{"jumptopointinstant",GameScript::JumpToPointInstant},
-	{"leavearealua",GameScript::LeaveAreaLUA},
-	{"leavearealuaentry",GameScript::LeaveAreaLUAEntry},
-	{"leavearealuapanic",GameScript::LeaveAreaLUAPanic},
-	{"leavearealuapanicentry",GameScript::LeaveAreaLUAPanicEntry},
-	{"makeglobal",GameScript::MakeGlobal},
-	{"moraledec",GameScript::MoraleDec},
-	{"moraleinc",GameScript::MoraleInc},
-	{"moraleset",GameScript::MoraleSet},
-	{"movebetweenareas",GameScript::MoveBetweenAreas},
+	{"joinparty",GameScript::JoinParty,0},
+	{"jumptoobject",GameScript::JumpToObject,0},
+	{"jumptopoint",GameScript::JumpToPoint,0},
+	{"jumptopointinstant",GameScript::JumpToPointInstant,0},
+	{"leavearealua",GameScript::LeaveAreaLUA,0},
+	{"leavearealuaentry",GameScript::LeaveAreaLUAEntry,0},
+	{"leavearealuapanic",GameScript::LeaveAreaLUAPanic,0},
+	{"leavearealuapanicentry",GameScript::LeaveAreaLUAPanicEntry,0},
+	{"leaveparty",GameScript::LeaveParty,0},
+	{"makeglobal",GameScript::MakeGlobal,0},
+	{"moraledec",GameScript::MoraleDec,0},
+	{"moraleinc",GameScript::MoraleInc,0},
+	{"moraleset",GameScript::MoraleSet,0},
+	{"movebetweenareas",GameScript::MoveBetweenAreas,0},
 	{"movetoobject",GameScript::MoveToObject,AF_BLOCKING},
 	{"movetooffset",GameScript::MoveToOffset,AF_BLOCKING},
 	{"movetopoint",GameScript::MoveToPoint,AF_BLOCKING},
 	{"movetopointnorecticle",GameScript::MoveToPoint,AF_BLOCKING},//the same until we know better
-	{"moveviewobject",GameScript::MoveViewPoint},
-	{"moveviewpoint",GameScript::MoveViewPoint},
-	{"noaction",GameScript::NoAction},
+	{"moveviewobject",GameScript::MoveViewPoint,0},
+	{"moveviewpoint",GameScript::MoveViewPoint,0},
+	{"noaction",GameScript::NoAction,0},
 	{"opendoor",GameScript::OpenDoor,AF_BLOCKING},
-	{"permanentstatchange",GameScript::ChangeStat}, //probably the same
+	{"permanentstatchange",GameScript::ChangeStat,0}, //probably the same
 	{"picklock",GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
-	{"playdead",GameScript::PlayDead}, {"playsound",GameScript::PlaySound},
-	{"recoil",GameScript::Recoil},
-	{"removeareatype", GameScript::RemoveAreaType},
-	{"removeareaflag", GameScript::RemoveAreaFlag},
-	{"savelocation", GameScript::SaveLocation},
-	{"saveobjectlocation", GameScript::SaveObjectLocation},
-	{"setbeeninpartyflags",GameScript::SetBeenInPartyFlags},
-	{"setmoraleai",GameScript::SetMoraleAI},
+	{"playdead",GameScript::PlayDead,0},
+	{"playsound",GameScript::PlaySound,0},
+	{"recoil",GameScript::Recoil,0},
+	{"removeareatype", GameScript::RemoveAreaType,0},
+	{"removeareaflag", GameScript::RemoveAreaFlag,0},
+	{"savelocation", GameScript::SaveLocation,0},
+	{"saveobjectlocation", GameScript::SaveObjectLocation,0},
+	{"setbeeninpartyflags",GameScript::SetBeenInPartyFlags,0},
+	{"setfaction",GameScript::SetFaction,0},
+	{"setmoraleai",GameScript::SetMoraleAI,0},
+	{"setteam",GameScript::SetTeam,0},
 	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt",GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint",GameScript::RunAwayFromPoint,AF_BLOCKING},
@@ -236,17 +253,17 @@ static ActionLink actionnames[] = {
 	{"runtopointnorecticle",GameScript::MoveToPoint,AF_BLOCKING},//until we know better
 	{"screenshake",GameScript::ScreenShake,AF_BLOCKING},
 	{"setanimstate",GameScript::SetAnimState,AF_BLOCKING},
-	{"setarearestflag", GameScript::SetAreaRestFlag},
+	{"setarearestflag", GameScript::SetAreaRestFlag,0},
 	{"setdialogue",GameScript::SetDialogue,AF_BLOCKING},
 	{"setglobal",GameScript::SetGlobal,AF_MERGESTRINGS},
 	{"setglobaltimer",GameScript::SetGlobalTimer,AF_MERGESTRINGS},
-	{"setnumtimestalkedto",GameScript::SetNumTimesTalkedTo},
-	{"setplayersound",GameScript::SetPlayerSound},
+	{"setnumtimestalkedto",GameScript::SetNumTimesTalkedTo,0},
+	{"setplayersound",GameScript::SetPlayerSound,0},
 	{"settokenglobal",GameScript::SetTokenGlobal,AF_MERGESTRINGS},
-	{"sg",GameScript::SG},
+	{"sg",GameScript::SG,0},
 	{"smallwait",GameScript::SmallWait,AF_BLOCKING},
-	{"startcutscene",GameScript::StartCutScene},
-	{"startcutscenemode",GameScript::StartCutSceneMode},
+	{"startcutscene",GameScript::StartCutScene,0},
+	{"startcutscenemode",GameScript::StartCutSceneMode,0},
 	{"startdialog",GameScript::StartDialogue,AF_BLOCKING},
 	{"startdialogue",GameScript::StartDialogue,AF_BLOCKING},
 	{"startdialoginterrupt",GameScript::StartDialogueInterrupt,AF_BLOCKING},
@@ -260,18 +277,18 @@ static ActionLink actionnames[] = {
 	{"startdialogueoverride",GameScript::StartDialogueOverride,AF_BLOCKING},
 	{"startdialogoverrideinterrupt",GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startdialogueoverrideinterrupt",GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
-	{"startmovie",GameScript::StartMovie},
-	{"startsong",GameScript::StartSong},
-	{"swing",GameScript::Swing},
-	{"swingonce",GameScript::SwingOnce},
-	{"takepartygold",GameScript::TakePartyGold},
-	{"triggeractivation",GameScript::TriggerActivation},
-	{"unhidegui",GameScript::UnhideGUI},
-	{"unlock",GameScript::Unlock},
-	{"unmakeglobal",GameScript::UnMakeGlobal}, //this is a GemRB extension
-	{"verbalconstant",GameScript::VerbalConstant},
+	{"startmovie",GameScript::StartMovie,AF_BLOCKING},
+	{"startsong",GameScript::StartSong,0},
+	{"swing",GameScript::Swing,0},
+	{"swingonce",GameScript::SwingOnce,0},
+	{"takepartygold",GameScript::TakePartyGold,0},
+	{"triggeractivation",GameScript::TriggerActivation,0},
+	{"unhidegui",GameScript::UnhideGUI,0},
+	{"unlock",GameScript::Unlock,0},
+	{"unmakeglobal",GameScript::UnMakeGlobal,0}, //this is a GemRB extension
+	{"verbalconstant",GameScript::VerbalConstant,0},
 	{"wait",GameScript::Wait, AF_BLOCKING},
-	{"waitrandom",GameScript::WaitRandom, AF_BLOCKING}, { NULL,NULL},
+	{"waitrandom",GameScript::WaitRandom, AF_BLOCKING}, { NULL,NULL,0},
 };
 
 //Make this an ordered list, so we could use bsearch!
@@ -290,6 +307,7 @@ static ObjectLink objectnames[] = {
 	{"nearestenemyof",GameScript::NearestEnemyOf},
 	{"ninthnearest",GameScript::NinthNearest},
 	{"ninthnearestenemyof",GameScript::NinthNearestEnemyOf},
+	{"nothing", GameScript::Nothing},
 	{"player1",GameScript::Player1},
 	{"player1fill",GameScript::Player1Fill},
 	{"player2",GameScript::Player2},
@@ -309,6 +327,7 @@ static ObjectLink objectnames[] = {
 	{"protagonist",GameScript::Protagonist},
 	{"secondnearest",GameScript::SecondNearest},
 	{"secondnearestenemyof",GameScript::SecondNearestEnemyOf},
+	{"selectedcharacter", GameScript::SelectedCharacter},
 	{"seventhnearest",GameScript::SeventhNearest},
 	{"seventhnearestenemyof",GameScript::SeventhNearestEnemyOf},
 	{"sixthnearest",GameScript::SixthNearest},
@@ -398,6 +417,21 @@ static IDSLink* FindIdentifier(const char* idsname)
 	}
 	printf( "Warning: Couldn't assign ids target: %.*s\n", len, idsname );
 	return NULL;
+}
+
+static int Distance(Scriptable *a, Scriptable *b)
+{
+	long x = ( a->XPos - b->XPos );
+	long y = ( a->YPos - b->YPos );
+	return (int) sqrt( ( double ) ( x* x + y* y ) );
+}
+
+static void GoNearAndRetry(Scriptable *Sender, Point *p)
+{
+	Sender->AddActionInFront( Sender->CurrentAction );
+	char Tmp[256];
+	sprintf( Tmp, "MoveToPoint([%d.%d])", p->x, p->y );
+	Sender->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
 }
 
 GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
@@ -969,7 +1003,8 @@ int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
 			return ExecuteResponse( Sender, rS->responses[0] );
 	}
 	/*default*/
-	int maxWeight, randWeight;
+	int randWeight;
+	int maxWeight = 0;
 
 	for (int i = 0; i < rS->responsesCount; i++) {
 		maxWeight+=rS->responses[i]->weight;
@@ -1067,7 +1102,7 @@ Targets* GameScript::EvaluateObject(Object* oC)
 
 	if (oC->objectName[0]) {
 		//We want the object by its name... (doors/triggers don't play here!)
-		Actor* aC = core->GetGame()->GetMap( 0 )->GetActor( oC->objectName );
+		Actor* aC = core->GetGame()->GetCurrentMap( )->GetActor( oC->objectName );
 		if(!aC) {
 			return tgts;
 		}
@@ -1135,12 +1170,12 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 	Targets* tgts = EvaluateObject(oC);
 	if(!tgts && oC->objectName[0]) {
 		//It was not an actor... maybe it is a door?
-		Scriptable * aC = core->GetGame()->GetMap( 0 )->tm->GetDoor( oC->objectName );
+		Scriptable * aC = core->GetGame()->GetCurrentMap( )->tm->GetDoor( oC->objectName );
 		if (aC) {
 			return aC;
 		}
 		//No... it was not a door... maybe an InfoPoint?
-		aC = core->GetGame()->GetMap( 0 )->tm->GetInfoPoint( oC->objectName );
+		aC = core->GetGame()->GetCurrentMap( )->tm->GetInfoPoint( oC->objectName );
 		if (aC) {
 			return aC;
 		}
@@ -1519,7 +1554,6 @@ Action* GameScript::GenerateAction(char* String)
 	int i = 0;
 	//this could be significantly optimized if we store them in a mapping
 	//or at least use bsearch
-printf("Compiling: %s\n", String);
 	while (true) {
 		char* src = String;
 		char* str = actionsTable->GetStringIndex( i );
@@ -2121,6 +2155,24 @@ Targets *GameScript::TenthNearest(Scriptable *Sender, Targets *parameters)
 	return XthNearestOf(Sender, parameters, 9);
 }
 
+Targets *GameScript::SelectedCharacter(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	int i = core->GetActorCount();
+	while(i--) {
+		Actor *ac=core->GetActor(i);
+		if(ac->IsSelected()) {
+			parameters->AddTarget(ac);
+		}
+	}
+	return parameters;
+}
+
+Targets *GameScript::Nothing(Scriptable* Sender, Targets* parameters)
+{
+	parameters->Clear();
+	return parameters;
+}
 //-------------------------------------------------------------
 // IDS Functions
 //-------------------------------------------------------------
@@ -2464,6 +2516,13 @@ int GameScript::GlobalLT(Scriptable* Sender, Trigger* parameters)
 	return eval;
 }
 
+int GameScript::GlobalLTGlobal(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
+	return ( value1 < value2 );
+}
+
 int GameScript::GlobalGT(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
@@ -2471,20 +2530,24 @@ int GameScript::GlobalGT(Scriptable* Sender, Trigger* parameters)
 	return eval;
 }
 
+int GameScript::GlobalGTGlobal(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
+	return ( value1 > value2 );
+}
+
 int GameScript::GlobalsEqual(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
-							parameters->string1Parameter );
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
 	int eval = ( value1 == value2 ) ? 1 : 0;
 	return eval;
 }
 
 int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
 	unsigned long value2;
 
 	GetTime(value2); //this should be game time
@@ -2494,8 +2557,7 @@ int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
 	unsigned long value2;
 
 	GetTime(value2);
@@ -2505,8 +2567,7 @@ int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
 	unsigned long value2;
 
 	GetTime(value2);
@@ -2520,7 +2581,7 @@ int GameScript::OnCreation(Scriptable* Sender, Trigger* parameters)
 /* oncreation is about the script, not the owner area, oncreation is
    working in ANY script */
 /*
-	Map* area = core->GetGame()->GetMap( 0 );
+	Map* area = core->GetGame()->GetCurrentMap( );
 	if (area->justCreated) {
 		area->justCreated = false;
 		return 1;
@@ -2623,12 +2684,7 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 	if (!scr) {
 		return 0;
 	}
-	printf( "x1 = %d, y1 = %d\nx2 = %d, y2 = %d\n", scr->XPos,
-		scr->YPos, Sender->XPos, Sender->YPos );
-	long x = ( scr->XPos - Sender->XPos );
-	long y = ( scr->YPos - Sender->YPos );
-	double distance = sqrt( ( double ) ( x* x + y* y ) );
-	printf( "Distance = %.3f\n", distance );
+	int distance = Distance(Sender, scr);
 	if (distance <= ( parameters->int0Parameter * 20 )) {
 		return 1;
 	}
@@ -3245,6 +3301,54 @@ int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* parameters)
 		Sender->XPos, Sender->YPos, tar->XPos, tar->YPos);
 }
 
+int GameScript::PartyCountEQ(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GetPartySize()<parameters->int0Parameter;
+}
+
+int GameScript::PartyCountLT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GetPartySize()<parameters->int0Parameter;
+}
+
+int GameScript::PartyCountGT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GetPartySize()>parameters->int0Parameter;
+}
+
+int GameScript::PartyGold(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->PartyGold==parameters->int0Parameter;
+}
+
+int GameScript::PartyGoldGT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->PartyGold>parameters->int0Parameter;
+}
+
+int GameScript::PartyGoldLT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->PartyGold<parameters->int0Parameter;
+}
+
+int GameScript::OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if(!tar) {
+		return 0;
+	}
+	return tar->textDisplaying;
+}
+
+int GameScript::GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value1 = CheckVariable( Sender,
+							parameters->string0Parameter );
+	unsigned long value2 = CheckVariable( Sender,
+							parameters->string1Parameter );
+	return value1 && value2; //should be 1 or 0!
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -3399,6 +3503,24 @@ void GameScript::ChangeAlignment(Scriptable* Sender, Action* parameters)
 	actor->SetStat( IE_ALIGNMENT, parameters->int0Parameter );
 }
 
+void GameScript::SetFaction(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->SetStat( IE_FACTION, parameters->int0Parameter );
+}
+
+void GameScript::SetTeam(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->SetStat( IE_TEAM, parameters->int0Parameter );
+}
+
 void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* ip;
@@ -3406,7 +3528,7 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 	if(!parameters->objects[1]->objectName[0]) {
 		ip=Sender;
 	} else {
-		ip = core->GetGame()->GetMap(0)->tm->GetInfoPoint(parameters->objects[1]->objectName);
+		ip = core->GetGame()->GetCurrentMap( )->tm->GetInfoPoint(parameters->objects[1]->objectName);
 	}
 	if(!ip) {
 		printf("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
@@ -3510,7 +3632,7 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter );
 	ab->AnimID = IE_ANI_AWAKE;
 	ab->Orientation = parameters->int0Parameter;
-	Map* map = core->GetGame()->GetMap( 0 );
+	Map* map = core->GetGame()->GetCurrentMap( );
 	map->AddActor( ab );
 
 	//setting the deathvariable if it exists (iwd2)
@@ -3563,7 +3685,7 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 {
 	if(parameters->objects[1]->objectName[0]) {
-		Map* map = core->GetGame()->GetMap( 0 );
+		Map* map = core->GetGame()->GetCurrentMap( );
 		Sender->CutSceneId = map->GetActor( parameters->objects[1]->objectName );
 	} else {
 		Sender->CutSceneId = GetActorFromObject( Sender,
@@ -3905,7 +4027,7 @@ void GameScript::CreateVisualEffectObject(Scriptable* Sender,
 												IE_VVC_CLASS_ID );
 	ScriptedAnimation* vvc = new ScriptedAnimation( ds, true, tar->XPos,
 									tar->YPos );
-	core->GetGame()->GetMap( 0 )->AddVVCCell( vvc );
+	core->GetGame()->GetCurrentMap( )->AddVVCCell( vvc );
 }
 
 void GameScript::CreateVisualEffect(Scriptable* Sender, Action* parameters)
@@ -3915,7 +4037,7 @@ void GameScript::CreateVisualEffect(Scriptable* Sender, Action* parameters)
 	ScriptedAnimation* vvc = new ScriptedAnimation( ds, true,
 									parameters->XpointParameter,
 									parameters->YpointParameter );
-	core->GetGame()->GetMap( 0 )->AddVVCCell( vvc );
+	core->GetGame()->GetCurrentMap( )->AddVVCCell( vvc );
 }
 
 void GameScript::DestroySelf(Scriptable* Sender, Action* parameters)
@@ -3975,6 +4097,15 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		Sender->CurrentAction = NULL;
 		return;
 	}
+	if(Flags&BD_CHECKDIST) {
+		if(Distance(Sender, tar)>12) {
+			Point p={tar->XPos, tar->YPos};
+			GoNearAndRetry(Sender, &p);
+			Sender->CurrentAction = NULL;
+			return;
+		}
+	}
+
 	Actor* actor = ( Actor* ) scr;
 	Actor* target = ( Actor* ) tar;
 
@@ -3998,7 +4129,8 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 	}
 
-	const char* Dialog;
+	const char* Dialog = NULL;
+
 	switch (Flags & BD_LOCMASK) {
 		case BD_STRING0:
 			Dialog = parameters->string0Parameter;
@@ -4051,7 +4183,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 //no string, increase talkcount, no interrupt
 void GameScript::Dialogue(Scriptable* Sender, Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_SOURCE | BD_TALKCOUNT | BD_CHECKDIST );
+	BeginDialog( Sender, parameters, BD_TARGET | BD_TALKCOUNT | BD_CHECKDIST );
 }
 
 void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
@@ -4071,7 +4203,7 @@ void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 
 void GameScript::AmbientActivate(Scriptable* Sender, Action* parameters)
 {
-	Animation* anim = core->GetGame()->GetMap( 0 )->GetAnimation( parameters->objects[1]->objectName );
+	Animation* anim = core->GetGame()->GetCurrentMap( )->GetAnimation( parameters->objects[1]->objectName );
 	if (!anim) {
 		printf( "Script error: No Animation Named \"%s\"\n",
 			parameters->objects[1]->objectName );
@@ -4179,7 +4311,7 @@ static Point* FindNearPoint(Scriptable* Sender, Point* p1, Point* p2, double& di
 
 void GameScript::Lock(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = core->GetGame()->GetMap( 0 )->tm->GetDoor( parameters->objects[1]->objectName );
+	Scriptable* tar = core->GetGame()->GetCurrentMap( )->tm->GetDoor( parameters->objects[1]->objectName );
 	if (!tar) {
 		Sender->CurrentAction = NULL;
 		return;
@@ -4194,7 +4326,7 @@ void GameScript::Lock(Scriptable* Sender, Action* parameters)
 
 void GameScript::Unlock(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = core->GetGame()->GetMap( 0 )->tm->GetDoor( parameters->objects[1]->objectName );
+	Scriptable* tar = core->GetGame()->GetCurrentMap( )->tm->GetDoor( parameters->objects[1]->objectName );
 	if (!tar) {
 		Sender->CurrentAction = NULL;
 		return;
@@ -4209,7 +4341,7 @@ void GameScript::Unlock(Scriptable* Sender, Action* parameters)
 
 void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = core->GetGame()->GetMap( 0 )->tm->GetDoor( parameters->objects[1]->objectName );
+	Scriptable* tar = core->GetGame()->GetCurrentMap( )->tm->GetDoor( parameters->objects[1]->objectName );
 	if (!tar) {
 		Sender->CurrentAction = NULL;
 		return;
@@ -4236,22 +4368,20 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 	if (distance <= 12) {
 		if(door->Flags&2) {
 			//playsound unsuccessful opening of door
+			core->GetSoundMgr()->Play("AMB_D06");
 		}
 		else {
 			door->SetDoorClosed( false, true );
 		}
 	} else {
-		Sender->AddActionInFront( Sender->CurrentAction );
-		char Tmp[256];
-		sprintf( Tmp, "MoveToPoint([%d.%d])", p->x, p->y );
-		Sender->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
+		GoNearAndRetry(Sender, p);
 	}
 	Sender->CurrentAction = NULL;
 }
 
 void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = core->GetGame()->GetMap( 0 )->tm->GetDoor( parameters->objects[1]->objectName );
+	Scriptable* tar = core->GetGame()->GetCurrentMap( )->tm->GetDoor( parameters->objects[1]->objectName );
 	if (!tar) {
 		Sender->CurrentAction = NULL;
 		return;
@@ -4278,10 +4408,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 	if (distance <= 12) {
 		door->SetDoorClosed( true, true );
 	} else {
-		Sender->AddActionInFront( Sender->CurrentAction );
-		char Tmp[256];
-		sprintf( Tmp, "MoveToPoint([%d.%d])", p->x, p->y );
-		Sender->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
+		GoNearAndRetry(Sender, p);
 	}
 	Sender->CurrentAction = NULL;
 }
@@ -4299,7 +4426,7 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 			core->GetGame()->SetPC( actor );
 		else
 			core->GetGame()->AddNPC( actor );
-		core->GetGame()->GetMap( 0 )->RemoveActor( actor );
+		core->GetGame()->GetCurrentMap( )->RemoveActor( actor );
 		actor->XPos = parameters->XpointParameter;
 		actor->YPos = parameters->YpointParameter;
 		actor->Orientation = parameters->int0Parameter;
@@ -4620,7 +4747,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 		else
 			core->GetGame()->AddNPC( actor );
 	}
-	core->GetGame()->GetMap( 0 )->RemoveActor( actor );
+	core->GetGame()->GetCurrentMap( )->RemoveActor( actor );
 	if (parameters->XpointParameter >= 0) {
 		actor->XPos = parameters->XpointParameter;
 	}
@@ -4637,11 +4764,11 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	Map *map;
+	Map *map = core->GetGame()->GetCurrentMap();
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
 	long x = ( Sender->XPos - ent->XPos );
 	long y = ( Sender->YPos - ent->YPos );
-	double distance = sqrt( ( double ) ( x* x + y* y ) );
+	int distance = (int) sqrt( ( double ) ( x* x + y* y ) );
 	if (distance <= 12) {
 		LeaveAreaLUA(Sender, parameters);
 		return;
@@ -4663,7 +4790,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	
-	Map *map;
+	Map *map = core->GetGame()->GetCurrentMap();
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
 	long x = ( Sender->XPos - ent->XPos );
 	long y = ( Sender->YPos - ent->YPos );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.79 2004/03/21 15:49:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.80 2004/03/21 19:00:55 avenger_teambg Exp $
  *
  */
 
@@ -734,8 +734,11 @@ public: //Script Functions
 	static int Gender(Scriptable* Sender, Trigger* parameters);
 	static int General(Scriptable* Sender, Trigger* parameters);
 	static int Global(Scriptable* Sender, Trigger* parameters);
-	static int GlobalLT(Scriptable* Sender, Trigger* parameters);
+	static int GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int GlobalGT(Scriptable* Sender, Trigger* parameters);
+	static int GlobalGTGlobal(Scriptable* Sender, Trigger* parameters);
+	static int GlobalLT(Scriptable* Sender, Trigger* parameters);
+	static int GlobalLTGlobal(Scriptable* Sender, Trigger* parameters);
 	static int GlobalsEqual(Scriptable* Sender, Trigger* parameters);
 	static int GlobalTimerExact(Scriptable* Sender, Trigger* parameters);
 	static int GlobalTimerExpired(Scriptable* Sender, Trigger* parameters);
@@ -773,6 +776,13 @@ public: //Script Functions
 	static int OnCreation(Scriptable* Sender, Trigger* parameters);
 	static int OpenState(Scriptable* Sender, Trigger* parameters);
 	static int Or(Scriptable* Sender, Trigger* parameters);
+	static int OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters);
+	static int PartyCountEQ(Scriptable* Sender, Trigger* parameters);
+	static int PartyCountGT(Scriptable* Sender, Trigger* parameters);
+	static int PartyCountLT(Scriptable* Sender, Trigger* parameters);
+	static int PartyGold(Scriptable* Sender, Trigger* parameters);
+	static int PartyGoldGT(Scriptable* Sender, Trigger* parameters);
+	static int PartyGoldLT(Scriptable* Sender, Trigger* parameters);
 	static int PartyHasItem(Scriptable* Sender, Trigger* parameters);
 	static int Race(Scriptable* Sender, Trigger* parameters);
 	static int RandomNum(Scriptable* Sender, Trigger* parameters);
@@ -900,7 +910,9 @@ public:
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
 	static void SaveLocation(Scriptable* Sender, Action* parameters);
+	static void SetFaction(Scriptable* Sender, Action* parameters);
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
+	static void SetTeam(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaFlag(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaType(Scriptable* Sender, Action* parameters);
@@ -959,6 +971,7 @@ public:
 	static Targets *NearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *NinthNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *NinthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
+	static Targets *Nothing(Scriptable *Sender, Targets *parameters);
 	static Targets *Player1(Scriptable *Sender, Targets *parameters);
 	static Targets *Player1Fill(Scriptable *Sender, Targets *parameters);
 	static Targets *Player2(Scriptable *Sender, Targets *parameters);
@@ -974,6 +987,7 @@ public:
 	static Targets *Protagonist(Scriptable *Sender, Targets *parameters);
 	static Targets *SecondNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *SecondNearestEnemyOf(Scriptable *Sender, Targets *parameters);
+	static Targets *SelectedCharacter(Scriptable *Sender, Targets *parameters);
 	static Targets *SeventhNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *SeventhNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *SixthNearest(Scriptable *Sender, Targets *parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.23 2004/03/19 23:03:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.24 2004/03/21 19:00:55 avenger_teambg Exp $
  *
  */
 
@@ -115,7 +115,6 @@ int Game::DelPC(unsigned int slot, bool autoFree)
 	}
 	std::vector< Actor*>::iterator m = PCs.begin() + slot;
 	PCs.erase( m );
-	//	PCs[slot] = NULL;
 	return 0;
 }
 
@@ -162,6 +161,8 @@ int Game::JoinParty(Actor* actor)
 
 int Game::GetPartySize()
 {
+	return PCs.size();
+/* we will remove dropped members immediatelly, so this is unwanted
 	int count = 0;
 	for (int i = 0; i < PCs.size(); i++) {
 		if (PCs[i]) {
@@ -169,6 +170,7 @@ int Game::GetPartySize()
 		}
 	}
 	return count;
+*/
 }
 
 Map* Game::GetMap(unsigned int index)
