@@ -39,6 +39,8 @@ private:
 	short StartX, StartY;
 	Door * overDoor;
 	unsigned char lastCursor;
+	short moveX, moveY;
+	unsigned short lastMouseX, lastMouseY;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
@@ -52,6 +54,8 @@ public: //Events
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
+private:
+	void CalculateSelection(unsigned short x, unsigned short y);
 };
 
 #endif
