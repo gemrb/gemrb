@@ -10,8 +10,6 @@ AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE(gemrb,0.1,no-define)
 
-AC_CONFIG_AUX_DIR(admin)
-
 for top_builddir in . .. ../.. $ac_auxdir $ac_auxdir/..; do
   test -f $top_builddir/configure && break
 done
