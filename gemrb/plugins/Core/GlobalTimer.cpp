@@ -38,6 +38,7 @@ void GlobalTimer::Update()
 			waitCounter--;
 			return;
 		}
+		MovingActor = NULL;
 		if(CutScene) {
 			if(!CutScene->endReached) {
 				printf("Running CutScene\n");
