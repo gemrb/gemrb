@@ -651,6 +651,51 @@ InfoPoint::~InfoPoint(void)
 {
 }
 
+//detect this trap, using a skill, skill could be set to 256 for 'sure'
+//skill is the all around modified trap detection skill 
+//a trapdetectiondifficulty of 100 means impossible detection short of a spell
+void InfoPoint::DetectTrap(int skill)
+{
+	if(Type!=ST_TRIGGER) return;
+	if(!Trapped) return;
+	if(Flags&(TRAP_DEACTIVATED|TRAP_INVISIBLE) ) return;
+	if((skill>=100) && (skill!=256) ) skill=100;
+	if(skill/2+core->Roll(1,skill/2,0)>TrapDetectionDifficulty) {
+		TrapDetected=1; //probably could be set to the player #?
+	}
+}
+
+//trap that is visible on screen (marked by red)
+//if TrapDetected is a bitflag, we could show traps selectively for
+//players, really nice for multiplayer
+bool InfoPoint::VisibleTrap(bool see_all)
+{
+	if(Type!=ST_TRIGGER) return false;
+	if(!Trapped) return false;
+	if(Flags&(TRAP_DEACTIVATED|TRAP_INVISIBLE) ) return false;
+	if(see_all) return true;
+	if(TrapDetected ) return true;
+	return false;
+}
+
+//trap that will fire now
+bool InfoPoint::TriggerTrap(int skill)
+{
+	if(Type!=ST_TRIGGER) return false;
+	//actually this could be script name[0]
+	if(!Trapped) return false;
+	if(Flags&TRAP_DEACTIVATED) return false;
+	TrapDetected=1; //probably too late :)
+	if((skill>=100) && (skill!=256) ) skill=100;
+	if(skill/2+core->Roll(1,skill/2,0)>TrapDetectionDifficulty) {
+		//tumble???
+		return false;
+	}
+	if(Flags&TRAP_RESET) return true;
+	Flags|=TRAP_DEACTIVATED;
+	return true;
+}
+
 void InfoPoint::DebugDump()
 {
 	switch (Type) {

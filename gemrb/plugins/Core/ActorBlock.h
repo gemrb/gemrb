@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.37 2004/07/25 17:26:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.38 2004/07/25 18:19:41 avenger_teambg Exp $
  *
  */
 
@@ -241,6 +241,13 @@ class GEM_EXPORT InfoPoint : public Highlightable {
 public:
 	InfoPoint(void);
 	~InfoPoint(void);
+	//detect trap, set skill to 256 if you want sure fire
+	void DetectTrap(int skill);
+	//returns true if trap is visible, only_detected must be true
+	//if you want to see discovered traps, false is for cheats
+	bool VisibleTrap(bool only_detected);
+	//returns true if trap has been triggered, tumble skill???
+	bool TriggerTrap(int skill);
 	void DebugDump();
 public:
 	char Name[33];

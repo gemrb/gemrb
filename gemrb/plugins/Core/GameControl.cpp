@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.149 2004/07/25 17:26:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.150 2004/07/25 18:19:41 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -212,7 +212,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			}
 		}
 
-		// Show traps and infopoint
+		// Show traps and containers
 		if (DebugFlags & (DEBUG_SHOW_INFOPOINTS | DEBUG_SHOW_CONTAINERS)) {
 			//draw infopoints with blue overlay
 			InfoPoint* i;
@@ -220,7 +220,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			for (unsigned int idx = 0;
 				(i = area->tm->GetInfoPoint( idx ));
 				idx++) {
-				if (( i->TrapDetected || ( DebugFlags & DEBUG_SHOW_INFOPOINTS ) ) && i->Trapped) {
+				if (i->VisibleTrap( DebugFlags & DEBUG_SHOW_INFOPOINTS ) ) {
 					video->DrawPolyline( i->outline, red, true );
 				} else if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
 					video->DrawPolyline( i->outline, blue, true );
