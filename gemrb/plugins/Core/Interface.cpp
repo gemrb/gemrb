@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.161 2004/04/26 11:14:06 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.162 2004/04/26 20:51:51 avenger_teambg Exp $
  *
  */
 
@@ -92,7 +92,11 @@ Interface::Interface(int iargc, char** iargv)
 
 	ConsolePopped = false;
 	CheatFlag = false;
+#ifndef WIN32
+	CaseSensitive = true;  //this is the default value, so CD1/CD2 will be resolved
+#else
 	CaseSensitive = false;
+#endif
 	GameOnCD = false;
 	SkipIntroVideos = false;
 	GUIScriptsPath[0] = 0;
@@ -108,28 +112,6 @@ Interface::Interface(int iargc, char** iargv)
 	memcpy( GlobalScript, "BALDUR\0\0", 9 );
 	memcpy( GlobalMap, "WORLDMAP", 9 );
 	GameFeatures = 0;
-	printMessage( "Core", "Loading Configuration File...", WHITE );
-	if (!LoadConfig()) {
-		printStatus( "ERROR", LIGHT_RED );
-		printMessage( "Core",
-			"Cannot Load Config File.\nTermination in Progress...\n", WHITE );
-		exit( -1 );
-	}
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
-	plugin = new PluginMgr( PluginsPath );
-	printMessage( "Core", "Plugin Loading Complete...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Creating Object Factory...", WHITE );
-	factory = new Factory();
-	printStatus( "OK", LIGHT_GREEN );
-	time_t t;
-	t = time( NULL );
-	srand( ( unsigned int ) t );
-#ifdef _DEBUG
-	FileStreamPtrCount = 0;
-	CachedFileStreamPtrCount = 0;
-#endif
 }
 
 #define FreeInterfaceVector(type, variable, member)   \
@@ -241,6 +223,28 @@ Interface::~Interface(void)
 
 int Interface::Init()
 {
+	printMessage( "Core", "Loading Configuration File...", WHITE );
+	if (!LoadConfig()) {
+		printStatus( "ERROR", LIGHT_RED );
+		printMessage( "Core",
+			"Cannot Load Config File.\nTermination in Progress...\n", WHITE );
+		exit( -1 );
+	}
+	printStatus( "OK", LIGHT_GREEN );
+	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
+	plugin = new PluginMgr( PluginsPath );
+	printMessage( "Core", "Plugin Loading Complete...", WHITE );
+	printStatus( "OK", LIGHT_GREEN );
+	printMessage( "Core", "Creating Object Factory...", WHITE );
+	factory = new Factory();
+	printStatus( "OK", LIGHT_GREEN );
+	time_t t;
+	t = time( NULL );
+	srand( ( unsigned int ) t );
+#ifdef _DEBUG
+	FileStreamPtrCount = 0;
+	CachedFileStreamPtrCount = 0;
+#endif
 	printMessage( "Core", "GemRB Core Initialization...\n", WHITE );
 	printMessage( "Core", "Searching for Video Driver...", WHITE );
 	if (!IsAvailable( IE_VIDEO_CLASS_ID )) {
@@ -274,8 +278,11 @@ int Interface::Init()
 		printf( "Cannot Load Chitin.key\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
-
-	LoadGemRBINI();
+	if(!LoadGemRBINI())
+	{
+		printf( "Cannot Load INI\nTermination in Progress...\n" );
+		return GEM_ERROR;
+	}
 
 	//printStatus("OK", LIGHT_GREEN);
 	printMessage( "Core", "Checking for Dialogue Manager...", WHITE );
@@ -742,8 +749,6 @@ bool Interface::LoadConfig(void)
 	if (LoadConfig( "GemRB.cfg" )) {
 		return true;
 	}
-
-
 
 	strcpy( path, UserDir );
 	strcat( path, name );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.156 2004/04/25 22:41:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.157 2004/04/26 20:51:50 avenger_teambg Exp $
  *
  */
 
@@ -386,6 +386,7 @@ static ActionLink actionnames[] = {
 	{"setdialoguerange", GameScript::SetVisualRange,0}, //same until we know better
 	{"setdoorlocked", GameScript::Lock,AF_BLOCKING},//key shouldn't be checked!
 	{"setfaction", GameScript::SetFaction,0},
+	{"setgabber", GameScript::SetGabber,0},
 	{"setglobal", GameScript::SetGlobal,AF_MERGESTRINGS},
 	{"setglobaltimer", GameScript::SetGlobalTimer,AF_MERGESTRINGS},
 	{"sethp", GameScript::SetHP,0},
@@ -616,7 +617,7 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 		int oT = core->LoadSymbol( "OBJECT" );
 		int iT = core->LoadTable( "SCRIPT" );
 		if (tT < 0 || aT < 0 || oT < 0 || iT < 0) {
-			printf( "[IEScript]: A critical scripting file is missing!\n" );
+			printMessage( "IEScript]","A critical scripting file is missing!\n",LIGHT_RED );
 			abort();
 		}
 		triggersTable = core->GetSymbol( tT );
@@ -624,7 +625,7 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 		objectsTable = core->GetSymbol( oT );
 		TableMgr* objNameTable = core->GetTable( iT );
 		if (!triggersTable || !actionsTable || !objectsTable || !objNameTable) {
-			printf( "[IEScript]: A critical scripting file is damaged!\n" );
+			printMessage( "IEScript","A critical scripting file is damaged!\n",LIGHT_RED );
 			abort();
 		}
 
@@ -634,7 +635,7 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 
 		ObjectIDSCount = atoi( objNameTable->QueryField() );
 		if(ObjectIDSCount<0 || ObjectIDSCount>MAX_OBJECT_FIELDS) {
-			printf("[IEScript]: The IDS Count shouldn't be more than 10!\n");
+			printMessage("IEScript","The IDS Count shouldn't be more than 10!\n",LIGHT_RED);
 			abort();
 		}
 		
@@ -652,7 +653,7 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 		}
 		MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 		if(MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
-			printf("[IEScript]: The Object Nesting Count shouldn't be more than 5!\n");
+			printMessage("IEScript","The Object Nesting Count shouldn't be more than 5!\n", LIGHT_RED);
 			abort();
 		}
 		HasAdditionalRect = ( atoi( objNameTable->QueryField( 2 ) ) != 0 );
@@ -738,7 +739,7 @@ Script* GameScript::CacheScript(DataStream* stream, const char* Context)
 	}
 	stream->ReadLine( line, 10 );
 	if (strncmp( line, "SC", 2 ) != 0) {
-		printf( "[IEScript]: Not a Compiled Script file\n" );
+		printMessage( "IEScript","Not a Compiled Script file\n", YELLOW );
 		delete( stream );
 		return NULL;
 	}
@@ -1119,7 +1120,7 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 		if (result > 1) {
 			//we started an Or() block
 			if (ORcount) {
-				printf( "[IEScript]: Unfinished OR block encountered!\n" );
+				printMessage( "IEScript","Unfinished OR block encountered!\n",YELLOW );
 			}
 			ORcount = result;
 			subresult = false;
@@ -1137,7 +1138,7 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 		}
 	}
 	if (ORcount) {
-		printf( "[IEScript]: Unfinished OR block encountered!\n" );
+		printMessage( "IEScript","Unfinished OR block encountered!\n",YELLOW );
 	}
 	return 1;
 }
@@ -1145,7 +1146,7 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 {
 	if (!trigger) {
-		printf( "[IEScript]: Trigger evaluation fails due to NULL trigger.\n" );
+		printMessage( "IEScript","Trigger evaluation fails due to NULL trigger.\n",YELLOW );
 		return false;
 	}
 	TriggerFunction func = triggers[trigger->triggerID];
@@ -1155,8 +1156,11 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 	}
 	if (!func) {
 		triggers[trigger->triggerID] = False;
-		printf( "[IEScript]: Unhandled trigger code: 0x%04x %s\n",
+		//hope this is enough, snprintf will prevent buffer overflow
+		char Tmp[256]; 
+		snprintf(Tmp,sizeof(Tmp),"Unhandled trigger code: 0x%04x %s\n",
 			trigger->triggerID, tmpstr );
+		printMessage( "IEScript",Tmp,YELLOW);
 		return false;
 	}
 	if(InDebug) {
@@ -1254,7 +1258,9 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	}
 	else {
 		actions[aC->actionID] = NoAction;
-		printf( "[IEScript]: Unhandled action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
+		char Tmp[256]; 
+		snprintf(Tmp, sizeof(Tmp), "Unhandled action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
+		printMessage("IEScript", Tmp, YELLOW);
 		Sender->CurrentAction = NULL;
 		aC->Release();
 		return;
@@ -6597,5 +6603,20 @@ void GameScript::Kill(Scriptable* Sender, Action* parameters)
 	}
 	Actor* target = ( Actor* ) tar;
 	target->Die(false); //die, no XP
+}
+
+void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	GameControl* gc = core->GetGameControl();
+	if(gc->DialogueFlags&DF_IN_DIALOG) {
+		gc->speaker = (Actor *) tar;
+	}
+	else {
+		printMessage("IEScript","Can't set gabber",YELLOW);
+	}
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.14 2004/04/13 19:38:22 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.15 2004/04/26 20:51:50 avenger_teambg Exp $
  *
  */
 
@@ -171,7 +171,6 @@ void ResolveFilePath(char* FilePath)
 	if (!core || !core->CaseSensitive) {
 		return;
 	}
-
 
 	TempFilePath[0] = FilePath[0];
 	for (pos = 1; FilePath[pos] && FilePath[pos] != '/'; pos++)

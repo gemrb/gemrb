@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.161 2004/04/26 12:55:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.162 2004/04/26 20:51:52 avenger_teambg Exp $
  *
  */
 
@@ -3135,13 +3135,13 @@ bool GUIScript::Init(void)
 	}
 #endif
 
-	sprintf( string, "sys.path.append('%s')", path2 );
+	sprintf( string, "sys.path.append(\"%s\")", path2 );
 	if (PyRun_SimpleString( string ) == -1) {
 		PyRun_SimpleString( "pdb.pm()" );
 		PyErr_Print();
 		return false;
 	}
-	sprintf( string, "sys.path.append('%s')", path );
+	sprintf( string, "sys.path.append(\"%s\")", path );
 	if (PyRun_SimpleString( string ) == -1) {
 		PyRun_SimpleString( "pdb.pm()" );
 		PyErr_Print();

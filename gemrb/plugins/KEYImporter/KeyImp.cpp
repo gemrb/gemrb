@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.36 2004/04/18 15:17:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.37 2004/04/26 20:51:52 avenger_teambg Exp $
  *
  */
 
@@ -271,6 +271,9 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 				strncat( path, biffiles[bifnum].name,
 					strlen( biffiles[bifnum].name ) - 4 );
 				strcat( path, ".cbf" );
+#ifndef WIN32
+				ResolveFilePath(path);
+#endif
 				exist = fopen( path, "rb" );
 				if (!exist) {
 					printStatus( "ERROR", LIGHT_RED );
