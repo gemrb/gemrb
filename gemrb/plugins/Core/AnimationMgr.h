@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationMgr.h,v 1.7 2004/12/12 22:27:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationMgr.h,v 1.8 2004/12/14 16:20:30 avenger_teambg Exp $
  *
  */
 
@@ -60,7 +60,7 @@ public:
 	If the Global Animation Palette is NULL, returns NULL. */
 	virtual Sprite2D* GetPalette() = 0;
 	virtual int GetCycleCount() = 0;
-	virtual Sprite2D* GetPaperdollImage(int *Colors) = 0;
+	virtual Sprite2D* GetPaperdollImage(int *Colors, Sprite2D *&Picture2) = 0;
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.33 2004/12/12 22:27:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.34 2004/12/14 16:20:30 avenger_teambg Exp $
  *
  */
 
@@ -426,7 +426,7 @@ void BAMImp::SetupColors(int *Colors)
         free( HairPal );
 }
 
-Sprite2D* BAMImp::GetPaperdollImage(int *Colors)
+Sprite2D* BAMImp::GetPaperdollImage(int *Colors, Sprite2D *&Picture2)
 {
 	if (FramesCount<2) {
 		return NULL;
@@ -435,17 +435,22 @@ Sprite2D* BAMImp::GetPaperdollImage(int *Colors)
 		SetupColors(Colors);
 	}
 
-        void* pixels = GetFramePixels(0);
+        void *pixels = GetFramePixels(1);
+	Picture2 = core->GetVideoDriver()->CreateSprite8(frames[1].Width, frames[1].Height, 8, pixels, Palette, true, 0 );
+	//this is the only value we still need for a hack, the relative position
+	//of the lower half (picture2) to the upper half
+	Picture2->XPos = frames[1].XPos-frames[0].XPos;
+	//this gets zeroed out, so why bother
+	//Picture2->YPos = frames[1].YPos;
+	printf("picture2 retrieved, width: %d, height: %d\n", frames[1].Width, frames[1].Height);
+
+        pixels = GetFramePixels(0);
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(frames[0].Width, frames[0].Height, 8, pixels, Palette, true, 0 );
+	/* actually this gets zeroed out later, so why bother
 	spr->XPos = frames[0].XPos;
 	spr->YPos = frames[0].YPos;
-	//don't free pixels, createsprite stores it
-/*
-        pixels = GetFramePixels(1);
-	spr = core->GetVideoDriver()->CreateSprite8(frames[1].Width, frames[1].Height, 8, pixels, Palette, true, 0 );
+	*/
+	//don't free pixels, createsprite stores it in spr
 
-	spr->XPos = frames[1].XPos;
-	spr->YPos = frames[1].YPos;
-*/
 	return spr;
 }

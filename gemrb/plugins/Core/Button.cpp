@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.79 2004/12/05 11:09:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.80 2004/12/14 16:20:30 avenger_teambg Exp $
  *
  */
 
@@ -74,6 +74,8 @@ Button::Button(bool Clear)
 	Flags = IE_GUI_BUTTON_NORMAL;
 	ToggleState = false;
 	Picture = NULL;
+	Picture2 = NULL;
+	anim = NULL;
 	//MOS Draggable Stuff
 	Dragging = false;
 	ScrollX = 0;
@@ -100,6 +102,9 @@ Button::~Button()
 	}
 	if (Picture) {
 		video->FreeSprite( Picture );
+	}
+	if (Picture2) {
+		video->FreeSprite( Picture2 );
 	}
 	if (Text) {
 		free( Text );
@@ -206,19 +211,23 @@ void Button::Draw(unsigned short x, unsigned short y)
 		y+= 2;
 	}
 
-
 	// Button picture
 	if (Picture && ( Flags & IE_GUI_BUTTON_PICTURE )) {
 		if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
 			Region r( XPos, YPos, Width, Height );
-			core->GetVideoDriver()->BlitSprite( Picture, XPos + ScrollX,
-										YPos + ScrollY, true, &r );
+			core->GetVideoDriver()->BlitSprite( Picture, XPos + ScrollX, YPos + ScrollY, true, &r );
 		} else {
+			int h = Picture->Height;
+			if (Picture2) {
+				h += Picture2->Height;
+			}
 			short xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
-			short yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
-			Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
-			core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs,
-										y + YPos + yOffs, true, &r );
+			short yOffs = ( Height / 2 ) - ( h / 2 );
+			Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), h );
+			core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+			if (Picture2) {
+				core->GetVideoDriver()->BlitSprite( Picture2, x + XPos + xOffs, y + YPos + yOffs + Picture->Height, true, &r );
+			}
 		}
 	}
 
@@ -558,16 +567,33 @@ void Button::RedrawButton(char* VariableName, unsigned int Sum)
 	Changed = true;
 }
 /** Sets the Picture */
-void Button::SetPicture(Sprite2D* Picture)
+void Button::SetPicture(Sprite2D* newpic)
 {
-	if (this->Picture) {
-		core->GetVideoDriver()->FreeSprite( this->Picture );
-	}
 	if (Picture) {
-		Picture->XPos = 0;
-		Picture->YPos = 0;
+		core->GetVideoDriver()->FreeSprite( Picture );
 	}
-	this->Picture = Picture;
+	if (newpic) {
+		newpic->XPos = 0;
+		newpic->YPos = 0;
+	}
+	Picture = newpic;
+	Changed = true;
+	( ( Window * ) Owner )->Invalidate();
+}
+
+/** Sets the secondary Picture (low half of paperdolls) */
+void Button::SetPicture2(Sprite2D* newpic)
+{
+	if (Picture2) {
+		core->GetVideoDriver()->FreeSprite( Picture2 );
+	}
+	if (newpic) {
+	// XPos contains a special adjustment, don't erase it!
+	// Yeah, i know this is the ugliest hack (hacking another hack)
+	//	newpic->XPos = 0;
+		newpic->YPos = 0;
+	}
+	Picture2 = newpic;
 	Changed = true;
 	( ( Window * ) Owner )->Invalidate();
 }

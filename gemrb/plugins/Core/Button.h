@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.38 2004/11/18 23:32:40 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.39 2004/12/14 16:20:30 avenger_teambg Exp $
  *
  */
 
@@ -120,6 +120,8 @@ public:
 	int SetText(const char* string, int pos = 0);
 	/** Sets the Picture */
 	void SetPicture(Sprite2D* Picture);
+	/** Sets the second half Picture of paperdolls */
+	void SetPicture2(Sprite2D* Picture);
 	/** Sets border/frame parameters */
 	void SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled = false, bool filled = false);
 	/** Sets font used for drawing button label */
@@ -180,8 +182,9 @@ private: // Private attributes
 	Sprite2D* Selected;
 	/** Button Disabled Image */
 	Sprite2D* Disabled;
-	/** Picture to Apply when the hasPicture flag is set */
+	/** Pictures to Apply when the hasPicture flag is set */
 	Sprite2D* Picture;
+	Sprite2D* Picture2;
 	/** Animated Button */
 	Animation* anim;
 	/** The current state of the Button */

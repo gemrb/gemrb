@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.257 2004/12/12 22:27:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.258 2004/12/14 16:20:31 avenger_teambg Exp $
  *
  */
 
@@ -2067,6 +2067,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	}
 
 	Sprite2D *Picture;
+	Sprite2D *Picture2=NULL;
 
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
 		IE_PLT_CLASS_ID );
@@ -2089,7 +2090,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 			core->FreeInterface( am );
 			return NULL;
 		}
-		Picture = am->GetPaperdollImage(col[0]==-1?NULL:col);
+		Picture = am->GetPaperdollImage(col[0]==-1?NULL:col, Picture2);
 		core->FreeInterface( am );
 		if (Picture == NULL) {
 			printf ("Picture == NULL\n");
@@ -2121,6 +2122,10 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	}
 
 	btn->SetPicture( Picture );
+	printf("Setpicture2 done?\n");
+	if( Picture2 ) {
+		btn->SetPicture2( Picture2 );
+	}
 
 	Py_INCREF( Py_None );
 	return Py_None;
