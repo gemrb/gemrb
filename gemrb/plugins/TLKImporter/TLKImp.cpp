@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.44 2005/02/23 18:59:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.45 2005/02/23 20:59:38 guidoj Exp $
  *
  */
 
@@ -389,7 +389,7 @@ bool TLKImp::GetNewStringLength(char* string, int& Length)
 	return lChange;
 }
 
-char* TLKImp::GetString(ieStrRef strref, unsigned long flags)
+char* TLKImp::GetString(ieStrRef strref, unsigned int flags)
 {
 	if (strref >= StrRefCount) {
 		char* ret = ( char* ) malloc( 1 );
@@ -460,7 +460,7 @@ char* TLKImp::GetString(ieStrRef strref, unsigned long flags)
 	return string;
 }
 
-StringBlock TLKImp::GetStringBlock(ieStrRef strref, unsigned long flags)
+StringBlock TLKImp::GetStringBlock(ieStrRef strref, unsigned int flags)
 {
 	StringBlock sb;
 	if (strref >= StrRefCount) {
