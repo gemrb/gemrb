@@ -113,21 +113,21 @@ def OnLoad():
 	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_SELECTED)
 	GemRB.SetButtonSprites(NewLifeWindow, Button, "", 0, 0, 0, 0, 0)
 	GemRB.SetText(NewLifeWindow, Button, 5025)
-	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "PointPress")
+	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "AcPress")
 
 	Button = GemRB.GetControl(NewLifeWindow, 9)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_SELECTED)
 	GemRB.SetButtonSprites(NewLifeWindow, Button, "", 0, 0, 0, 0, 0)
 	GemRB.SetText(NewLifeWindow, Button, 5026)
-	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "AcPress")
+	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "HpPress")
 
 	Button = GemRB.GetControl(NewLifeWindow, 10)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_SELECTED)
 	GemRB.SetButtonSprites(NewLifeWindow, Button, "", 0, 0, 0, 0, 0)
 	GemRB.SetText(NewLifeWindow, Button, 5027)
-	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "HpPress")
+	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "PointPress")
 
 	Button = GemRB.GetControl(NewLifeWindow, 11) #str +
 	GemRB.SetEvent(NewLifeWindow, Button, IE_GUI_BUTTON_ON_PRESS, "IncreasePress")
