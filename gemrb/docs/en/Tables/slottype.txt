@@ -1,0 +1,16 @@
+Description: This table must have rows equal to the number of itemslots in a creature. 
+
+Columns: BITS - connects the itemslots to item types (see itemtype.2da). If a bit is set to 1, the slot may carry a specific item type. -1 means all (inventory slot). The core system uses this column to determine slot types.
+       SCRIPT - usually the ControlID of the slot on the inventory screen, but your script may use it differently. (For example PST is a bit different).
+       ICON   - usually a bam ResRef of the background image of the slot in the inventory screen. (Your script may use it differently).
+       STRREF - usually a tooltip StrRef, but your script may use it differently.
+
+Rows: each row represents a creature item slot, even unused or invisible slots must be represented.
+
+Example (BG2):
+           BITS       SCRIPT     ICON       STRREF
+0          1          13         STONHELM   11999
+1          2          11         STONARM    11997
+2          4          26         STONSHIL   12006
+...
+
