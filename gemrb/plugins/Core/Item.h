@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.7 2004/11/08 19:09:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.8 2004/11/11 19:46:37 avenger_teambg Exp $
  *
  */
 
@@ -107,7 +107,7 @@ public:
 	ieWord FeatureOffset;
 	ieWord Charges;
 	ieWord ChargeDepletion;
-	ieWord RechargeFlags; //this is a bitfield with many bits
+	ieDword RechargeFlags; //this is a bitfield with many bits
 	//ieByte UseStrengthBonus;
 	//ieByte Recharge;
 	//ieWord unknown2;
