@@ -83,7 +83,7 @@ typedef unsigned long DWORD;
 GEM_EXPORT bool dir_exists(const char *path);
 GEM_EXPORT int strlench(const char *string, char ch);
 #ifndef HAVE_STRNDUP
-GEM_EXPORT char * strndup(const char * s, int l)
+GEM_EXPORT char * strndup(const char * s, int l);
 #endif
 
 #ifdef WIN32
