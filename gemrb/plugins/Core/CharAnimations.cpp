@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.15 2003/11/29 17:11:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.16 2003/12/02 19:50:14 balrog994 Exp $
  *
  */
 
@@ -35,8 +35,9 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 	this->MirrorType = MirrorType;
 	LoadedFlag = 0;
 	for(int i = 0; i < 18; i++) {
-		for(int j = 0; j < 16; j++)
+		for(int j = 0; j < 16; j++) {
 			Anims[i][j] = NULL;
+		}
 	}
 	ArmorType = 0;
 	RangedType = 0;
