@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.20 2004/03/21 13:47:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.21 2004/03/28 14:29:30 avenger_teambg Exp $
  *
  */
 
@@ -58,25 +58,10 @@ void Label::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 	if (font) {
-		if (useRGB) {
-			font->Print( Region( this->XPos + x, this->YPos + y, this->Width,
-							this->Height ),
-					( unsigned char * )
-					Buffer, palette,
-					Alignment |
-					IE_FONT_ALIGN_MIDDLE |
-					IE_FONT_SINGLE_LINE,
-					true );
-		} else {
-			font->Print( Region( this->XPos + x, this->YPos + y, this->Width,
-							this->Height ),
-					( unsigned char * )
-					Buffer, NULL,
-					Alignment |
-					IE_FONT_ALIGN_MIDDLE |
-					IE_FONT_SINGLE_LINE,
-					true );
-		}
+		font->Print( Region( this->XPos + x, this->YPos + y,
+			this->Width, this->Height ), ( unsigned char * ) Buffer,
+			useRGB?palette:NULL, Alignment | IE_FONT_ALIGN_MIDDLE |
+			IE_FONT_SINGLE_LINE, true );
 	}
 }
 /** This function sets the actual Label Text */
@@ -120,8 +105,11 @@ void Label::OnMouseUp(unsigned short x, unsigned short y,
 {
 	printf( "Label::OnMouseUp\n" );
 	if (( x <= Width ) && ( y <= Height )) {
-		if (VarName[0] != 0)
+		if (VarName[0] != 0) {
 			core->GetDictionary()->SetAt( VarName, Value );
-		RunEventHandler( LabelOnPress );
+		}
+		if(LabelOnPress[0]) {
+			RunEventHandler( LabelOnPress );
+		}
 	}
 }

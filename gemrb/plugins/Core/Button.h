@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.25 2004/03/21 13:47:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.26 2004/03/28 14:29:29 avenger_teambg Exp $
  *
  */
 
@@ -117,7 +117,7 @@ public: // Public Events
 		return Flags;
 	}
 	/** Refreshes the button from a radio group */
-	void RedrawButton(char* VariableName, int Sum);
+	void RedrawButton(char* VariableName, unsigned int Sum);
 private: // Private attributes
 	bool Clear;
 	char* Text;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.145 2004/03/27 17:32:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.146 2004/03/28 14:29:29 avenger_teambg Exp $
  *
  */
 
@@ -1006,12 +1006,7 @@ Actor* Interface::GetActor(unsigned int Slot)
 	}
 	return actors[Slot];
 }
-/*
-int Interface::GetPartySize()
-{
-	return game->GetPartySize(0);
-}
-*/
+
 void Interface::EnterActors(const char* StartArea)
 {
 	int i = actors.size();
@@ -1045,14 +1040,6 @@ int Interface::LoadCreature(char* ResRef, int InParty)
 		actor->AnimID = IE_ANI_SLEEP;
 	}
 	actor->Orientation = 0;
-	/*for(int i = 0; i < MAX_SCRIPTS; i++) {
-		if((stricmp(ab->actor->Scripts[i], "None") == 0) || (ab->actor->Scripts[i][0] == '\0')) {
-			ab->Scripts[i] = NULL;
-			continue;
-		}
-		ab->Scripts[i] = new GameScript(ab->actor->Scripts[i], 0);
-		ab->Scripts[i]->MySelf = ab;
-	}*/
 	size_t index;
 	for (index = 0; index < actors.size(); index++) {
 		if (!actors[index]) {

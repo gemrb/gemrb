@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.21 2004/03/22 18:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.22 2004/03/28 14:29:29 avenger_teambg Exp $
  *
  */
 
@@ -114,21 +114,27 @@ public:
 		strncpy( Dialog, ResRef, 8 );
 	}
 	/** Sets the Icon ResRef */
-	void SetPortrait(const char* ResRef)
+	//Which - 0 both, 1 Large, 2 Small
+	void SetPortrait(const char* ResRef, int Which=0)
 	{
 		int i;
 
 		if (ResRef == NULL) {
 			return;
 		}
-		for (i = 0; i < 8 && ResRef[i]; i++)
-			;
-		memset( SmallPortrait, 0, 8 );
-		memset( LargePortrait, 0, 8 );
-		strncpy( SmallPortrait, ResRef, 8 );
-		strncpy( LargePortrait, ResRef, 8 );
-		SmallPortrait[i] = 'S';
-		LargePortrait[i] = 'M';
+		if(Which!=1) {
+			memset( SmallPortrait, 0, 8 );
+			strncpy( SmallPortrait, ResRef, 8 );
+		}
+		if(Which!=2) {
+			memset( LargePortrait, 0, 8 );
+			strncpy( LargePortrait, ResRef, 8 );
+		}
+		if(!Which) {
+			for (i = 0; i < 8 && ResRef[i]; i++);
+			SmallPortrait[i] = 'S';
+			LargePortrait[i] = 'M';
+		}
 	}
 	/** Gets the Character Long Name/Short Name */
 	char* GetName(int which)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.56 2004/03/21 13:47:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.57 2004/03/28 14:29:29 avenger_teambg Exp $
  *
  */
 
@@ -411,7 +411,7 @@ int Button::SetFlags(int arg_flags, int opcode)
 }
 
 /** Redraws a button from a given radio button group */
-void Button::RedrawButton(char* VariableName, int Sum)
+void Button::RedrawButton(char* VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;
