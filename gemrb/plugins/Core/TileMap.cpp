@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.20 2004/01/04 15:22:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.21 2004/01/05 12:03:59 balrog994 Exp $
  *
  */
 
@@ -38,6 +38,12 @@ TileMap::~TileMap(void)
 	}
 	for(size_t i = 0; i < infoPoints.size(); i++) {
 		delete(infoPoints[i]);
+	}
+	for(size_t i = 0; i < containers.size(); i++) {
+		delete(containers[i]);
+	}
+	for(size_t i = 0; i < doors.size(); i++) {
+		delete(doors[i]);
 	}
 }
 
@@ -142,23 +148,23 @@ Door * TileMap::GetDoor(const char * Name)
 
 Container * TileMap::AddContainer(char * Name, unsigned short Type, Gem_Polygon * outline)
 {
-	Container c;
-	strncpy(c.Name, Name, 32);
-	c.Type = Type;
-	c.outline = outline;
+	Container *c = new Container();
+	strncpy(c->Name, Name, 32);
+	c->Type = Type;
+	c->outline = outline;
 	containers.push_back(c);
-	return &containers.at(containers.size()-1);
+	return c;
 }
 Container *TileMap::GetContainer(unsigned int idx)
 {
 	if(idx>=containers.size()) return NULL;
-	return &containers.at(idx);
+	return containers.at(idx);
 }
 
 Container * TileMap::GetContainer(unsigned short x, unsigned short y)
 {
 	for(size_t i = 0; i < containers.size(); i++) {
-		Container * c = &containers.at(i);
+		Container * c = containers.at(i);
 		if(c->outline->BBox.x > x)
 			continue;
 		if(c->outline->BBox.y > y)

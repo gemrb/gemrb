@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.17 2004/01/04 15:22:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.18 2004/01/05 12:03:59 balrog994 Exp $
  *
  */
 
@@ -38,7 +38,7 @@
 	char CloseSound[9];
 } Door;*/
 
-typedef struct Container {
+/*typedef struct Container {
 	char Name[33];
 	Point toOpen;
 	unsigned short Type;
@@ -51,7 +51,7 @@ typedef struct Container {
 	//Region BBox;
 	Point trapTarget;
 	Gem_Polygon * outline;
-} Container;
+} Container;*/
 
 /*typedef struct InfoPoint {
 	char Name[32];
@@ -88,7 +88,7 @@ class GEM_EXPORT TileMap
 private:
 	std::vector<TileOverlay *> overlays;
 	std::vector<Door*> doors;
-	std::vector<Container> containers;
+	std::vector<Container*> containers;
 	std::vector<InfoPoint*> infoPoints;
 public:
 	TileMap(void);
