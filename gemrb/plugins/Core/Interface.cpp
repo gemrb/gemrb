@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.284 2005/03/19 16:15:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.285 2005/03/20 00:11:20 avenger_teambg Exp $
  *
  */
 
@@ -759,6 +759,10 @@ int Interface::Init()
 	video->MirrorSpriteVertical( FogSprites[28], false );
 	video->MirrorSpriteHorizontal( FogSprites[28], false );
 
+	unsigned int i;
+	for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
+		video->CreateAlpha( FogSprites[i] );
+	}
 	FreeInterface( anim );
 	printStatus( "OK", LIGHT_GREEN );
 

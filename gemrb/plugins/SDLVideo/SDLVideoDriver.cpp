@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.95 2005/03/18 18:10:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.96 2005/03/20 00:11:21 avenger_teambg Exp $
  *
  */
 
@@ -541,16 +541,15 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 		return;
 	}
 	SDL_Color* pal = tmp->format->palette->colors;
-	SDL_Color oldPal[256];//, newPal[256];
+	SDL_Color oldPal[256];
 	memcpy( oldPal, pal, 256 * sizeof( SDL_Color ) );
-	//memcpy(newPal, pal, 2*sizeof(SDL_Color));
 	for (int i = 2; i < 256; i++) {
 		pal[i].r = ( tint.r * oldPal[i].r ) >> 8;
 		pal[i].g = ( tint.g * oldPal[i].g ) >> 8;
 		pal[i].b = ( tint.b * oldPal[i].b ) >> 8;
 	}
 	BlitSprite( spr, x, y, false, clip );
-	SDL_SetPalette( tmp, SDL_LOGPAL, oldPal, 0, 256 );
+	memcpy( pal, oldPal, 256 * sizeof( SDL_Color ) );
 }
 
 void SDLVideoDriver::BlitSpriteMode(Sprite2D* spr, int x, int y,
@@ -907,10 +906,10 @@ void SDLVideoDriver::SetPixel(short x, short y, Color& color, bool clipped)
 
 void SDLVideoDriver::GetPixel(short x, short y, Color* color)
 {
+	SDL_LockSurface( backBuf );
 	unsigned char * pixels = ( ( unsigned char * ) backBuf->pixels ) +
 		( ( y * disp->w + x) * disp->format->BytesPerPixel );
 	long val = 0;
-	SDL_LockSurface( backBuf );
 	memcpy( &val, pixels, disp->format->BytesPerPixel );
 	SDL_UnlockSurface( backBuf );
 
@@ -920,7 +919,6 @@ void SDLVideoDriver::GetPixel(short x, short y, Color* color)
 bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x, unsigned short y)
 {
 	SDL_Surface *surf = (SDL_Surface*)(sprite->vptr);
-	//Color color;
 
 	if (x>=surf->w) {
 		return true;
@@ -929,16 +927,34 @@ bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x
 		return true;
 	}
 
+	SDL_LockSurface( surf );
 	unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
 		( ( y * surf->w + x) * surf->format->BytesPerPixel );
 	long val = 0;
-	SDL_LockSurface( surf );
 	memcpy( &val, pixels, surf->format->BytesPerPixel );
 	SDL_UnlockSurface( surf );
 
-	//SDL_GetRGBA( val, surf->format, &color.r, &color.g, &color.b, &color.a );
-	//return color.a == 0;
 	return val == 0;
+}
+
+static void CountTransparency(SDL_Surface *surf, unsigned short x, unsigned short y, int &sum, int &cnt)
+{
+	if (x>=surf->w) {
+		return;
+	}
+	if (y>=surf->h) {
+		return;
+	}
+	SDL_LockSurface( surf );
+	unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
+		( ( y * surf->w + x) * surf->format->BytesPerPixel );
+	long val = 0;
+	memcpy( &val, pixels, surf->format->BytesPerPixel );
+	SDL_UnlockSurface( surf );
+	if(!val) {
+		sum++;
+	}
+	cnt++;
 }
 
 /*
@@ -1145,7 +1161,6 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 }
 
 Sprite2D* SDLVideoDriver::PrecalculatePolygon(Gem_Polygon *poly, Color &color)
-//Point* points, int count, Color& color, Region& BBox)
 {
 	void* pixels = malloc( poly->BBox.w * poly->BBox.h );
 	memset( pixels, 0, poly->BBox.w * poly->BBox.h );
@@ -1301,17 +1316,17 @@ void SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnchor)
 {
 	if (!sprite)
 		return;
-	unsigned char * buffer = ( unsigned char * )
-		malloc( sprite->Width * sprite->Height );
-	unsigned char * dst = buffer;
-	for (int y = sprite->Height - 1; y >= 0; y--) {
-		unsigned char * src = ( ( unsigned char * ) sprite->pixels ) +
-			( y * sprite->Width );
-		memcpy( dst, src, sprite->Width );
-		dst += sprite->Width;
+	for (int x = 0; x < sprite->Width; x++) {
+		unsigned char * dst = ( unsigned char * ) sprite->pixels + x;
+		unsigned char * src = dst + ( sprite->Height - 1 ) * sprite->Width;
+		for (int y = 0; y < sprite->Height / 2; y++) {
+			unsigned char tmp = *dst;
+			*dst = *src;
+			*src = tmp;
+			dst += sprite->Width;
+			src -= sprite->Width;
+		}
 	}
-	memcpy( sprite->pixels, buffer, sprite->Width * sprite->Height );
-	free( buffer );
 	if (MirrorAnchor)
 		sprite->YPos = sprite->Height - sprite->YPos;
 }
@@ -1322,24 +1337,52 @@ void SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAnchor)
 {
 	if (!sprite)
 		return;
-	unsigned char * buffer = ( unsigned char * )
-		malloc( sprite->Width * sprite->Height );
-	unsigned char * dst = buffer;
 	for (int y = 0; y < sprite->Height; y++) {
-		unsigned char * src = ( ( unsigned char * ) sprite->pixels ) +
-			( y * sprite->Width ) +
-			sprite->Width -
-			1;
-		for (int x = 0; x < sprite->Width; x++) {
-			*dst = *src;
-			dst++;
-			src--;
+		unsigned char * dst = (unsigned char *) sprite->pixels + ( y * sprite->Width );
+		unsigned char * src = dst + sprite->Width - 1;
+		for (int x = 0; x < sprite->Width / 2; x++) {
+			unsigned char tmp=*dst;
+			*dst++ = *src;
+			*src-- = tmp;
 		}
 	}
-	memcpy( sprite->pixels, buffer, sprite->Width * sprite->Height );
-	free( buffer );
 	if (MirrorAnchor)
 		sprite->XPos = sprite->Width - sprite->XPos;
+}
+
+void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
+{
+	if (!sprite)
+		return;
+	SDL_Surface * surf = (SDL_Surface *) sprite->vptr;
+	SDL_LockSurface(surf);
+	unsigned long *pixels = (unsigned long *) malloc (sprite->Width * sprite->Height * 4);
+	int i=0;
+	for (int y = 0; y < sprite->Height; y++) {
+		for (int x = 0; x < sprite->Width; x++) {
+			int sum = 0;
+			int cnt = 0;
+			for (int xx=x-2;xx<x+2;xx++) {
+				for(int yy=y-2;yy<y+2;yy++) {
+					CountTransparency(surf,xx,yy,sum,cnt);
+				}
+			}
+			int tmp=255 - (sum * 255 / cnt);
+			pixels[i++]=tmp;
+		}
+	}
+	if ( sprite->pixels ) {
+		free (sprite->pixels);
+	}
+	sprite->pixels = pixels;
+	if ( sprite->palette) {
+		free (sprite->palette);
+	}
+	sprite->palette = NULL;
+	SDL_UnlockSurface (surf);
+	SDL_FreeSurface (surf);
+	surf = SDL_CreateRGBSurfaceFrom( pixels, sprite->Width, sprite->Height, 32, sprite->Width*4, 0xff00, 0xff00, 0xff00, 255 );
+	sprite->vptr = surf;
 }
 
 void SDLVideoDriver::SetFadePercent(int percent)
