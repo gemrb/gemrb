@@ -1126,6 +1126,33 @@ static PyObject *GemRB_GetSaveGameCount( PyObject */*self*/, PyObject */*args*/)
   return Py_BuildValue("i",core->GetSaveGameIterator()->GetSaveGameCount() );
 }
 
+static PyObject *GemRB_GetSaveGameAttrib( PyObject */*self*/, PyObject *args)
+{
+	int Type, SlotCount;
+
+	if(!PyArg_ParseTuple(args, "ii", &Type, &SlotCount) ) {
+		printMessage("GUIScript","Syntax Error: GetSaveGameName(Type, SlotCount)\n", LIGHT_RED);
+		return NULL;
+	}
+	SaveGame *sg=core->GetSaveGameIterator()->GetSaveGame(SlotCount);
+	if(sg==NULL) {
+		printMessage("GUIScript","Can't find savegame\n", LIGHT_RED);
+		return NULL;
+	}
+	PyObject * tmp;
+	switch(Type)
+	{
+	case 0: tmp=Py_BuildValue("s", sg->GetName()); break;
+	case 1: tmp=Py_BuildValue("s", sg->GetPrefix()); break;
+	case 2: tmp=Py_BuildValue("s", sg->GetPath()); break;
+	default:
+		printMessage("GUIScript","Syntax Error: GetSaveGameName(Type, SlotCount)\n", LIGHT_RED);
+		return NULL;
+	}
+	delete [] sg;
+	return tmp;
+}
+
 static PyObject *GemRB_Roll(PyObject */*self*/, PyObject *args)
 {
 	int Dice, Size, Add;
@@ -1287,6 +1314,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"GetSaveGameCount", GemRB_GetSaveGameCount, METH_VARARGS,
      "Returns the number of saved games."},
+
+        {"GetSaveGameAttrib", GemRB_GetSaveGameAttrib, METH_VARARGS,
+     "Returns the name, path or prefix of the saved game."},
 
 	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
 	 "Invalidated the given Window."},
