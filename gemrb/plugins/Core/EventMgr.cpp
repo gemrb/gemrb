@@ -15,12 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.21 2003/12/18 15:05:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.22 2003/12/21 14:12:23 balrog994 Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "EventMgr.h"
+#include "Interface.h"
+
+extern Interface * core;
 
 EventMgr::EventMgr(void)
 {
@@ -127,6 +130,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 					ctrl->OnMouseOver(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos);
 				}
 				lastW = *m;
+				core->GetVideoDriver()->SetCursor(core->Cursors[(*m)->Cursor]->GetFrame(0), core->Cursors[((*m)->Cursor)+1]->GetFrame(0));
 				return;
 			}	
 		}
