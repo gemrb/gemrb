@@ -1,6 +1,5 @@
 lib_LTLIBRARIES = libIDSImporter.la
 INCLUDES = $(all_includes)
-CXXFLAGS = -O2
 libIDSImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libIDSImporter_la_LIBADD = ../Core/libcore.la
 libIDSImporter_la_METASOURCES = AUTO

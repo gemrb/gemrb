@@ -1,6 +1,5 @@
 lib_LTLIBRARIES = libCHUImporter.la
 INCLUDES = $(all_includes)
-CXXFLAGS = -O2
 libCHUImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libCHUImporter_la_LIBADD = ../Core/libcore.la
 libCHUImporter_la_METASOURCES = AUTO

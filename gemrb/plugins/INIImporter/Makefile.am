@@ -1,6 +1,5 @@
 lib_LTLIBRARIES = libINIImporter.la
 INCLUDES = $(all_includes)
-CXXFLAGS = -O2
 libINIImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libINIImporter_la_LIBADD = ../Core/libcore.la
 libINIImporter_la_METASOURCES = AUTO

@@ -1,6 +1,5 @@
 lib_LTLIBRARIES = libCREImporter.la
 INCLUDES = $(all_includes)
-CXXFLAGS = -O2
 libCREImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libCREImporter_la_LIBADD = ../Core/libcore.la
 libCREImporter_la_METASOURCES = AUTO

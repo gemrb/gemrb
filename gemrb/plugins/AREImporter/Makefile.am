@@ -1,6 +1,5 @@
 lib_LTLIBRARIES = libAREImporter.la
 INCLUDES = $(all_includes)
-CXXFLAGS = -O2
 libAREImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libAREImporter_la_LIBADD = ../Core/libcore.la
 libAREImporter_la_METASOURCES = AUTO

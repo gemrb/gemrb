@@ -1,6 +1,5 @@
 lib_LTLIBRARIES = libDLGImporter.la
 INCLUDES = $(all_includes)
-CXXFLAGS = -O2
 libDLGImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libDLGImporter_la_LIBADD = ../Core/libcore.la
 libDLGImporter_la_METASOURCES = AUTO

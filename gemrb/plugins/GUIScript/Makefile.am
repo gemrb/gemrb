@@ -1,7 +1,6 @@
 lib_LTLIBRARIES = libGUIScript.la
 INCLUDES = $(all_includes) \
 	 $(PYTHON_INCLUDES)
-CXXFLAGS = -O2
 libGUIScript_la_LDFLAGS = -module -version-info 0:0:0 -lpython2.3 @LIBPTHREAD@
 libGUIScript_la_LIBADD = ../Core/libcore.la
 libGUIScript_la_METASOURCES = AUTO

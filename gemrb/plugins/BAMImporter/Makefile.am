@@ -1,6 +1,5 @@
 lib_LTLIBRARIES = libBAMImporter.la
 INCLUDES = $(all_includes)
-CXXFLAGS = -O2
 libBAMImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libBAMImporter_la_LIBADD = ../Core/libcore.la
 libBAMImporter_la_METASOURCES = AUTO

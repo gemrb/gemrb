@@ -1,6 +1,5 @@
 lib_LTLIBRARIES = libKEYImporter.la
 INCLUDES = $(all_includes)
-CXXFLAGS = -O2
 libKEYImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libKEYImporter_la_LIBADD = ../Core/libcore.la
 libKEYImporter_la_METASOURCES = AUTO
