@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.210 2004/10/17 19:09:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.211 2004/10/18 18:43:38 avenger_teambg Exp $
  *
  */
 
@@ -504,6 +504,7 @@ static ActionLink actionnames[] = {
 	{"settokenglobal", GameScript::SetTokenGlobal,AF_MERGESTRINGS},
 	{"setvisualrange", GameScript::SetVisualRange,0},
 	{"sg", GameScript::SG,0},
+	{"sinisterpoof", GameScript::CreateVisualEffect,0},
 	{"smallwait", GameScript::SmallWait,AF_BLOCKING},
 	{"startcutscene", GameScript::StartCutScene,0},
 	{"startcutscenemode", GameScript::StartCutSceneMode,0},
@@ -5915,6 +5916,12 @@ void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
 void GameScript::CreateVisualEffectCore(Point &position, const char *effect)
 {
 	DataStream* ds = core->GetResourceMgr()->GetResource( effect, IE_VVC_CLASS_ID );
+	if(!ds) {
+		ds = core->GetResourceMgr()->GetResource( effect, IE_BAM_CLASS_ID );
+	}
+	if(!ds) {
+		return;
+	}
 	ScriptedAnimation* vvc = new ScriptedAnimation( ds, position, true);
 	core->GetGame()->GetCurrentMap( )->AddVVCCell( vvc );
 }
