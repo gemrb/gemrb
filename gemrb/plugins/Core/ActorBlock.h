@@ -22,6 +22,7 @@ typedef struct ActorBlock {
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
 	GameScript * Scripts[MAX_SCRIPTS];
+	bool DeleteMe;
 } ActorBlock;
 
 #endif
