@@ -8,7 +8,7 @@ def OnLoad():
 	global CharGenWindow, TextAreaControl
 
 	GemRB.LoadWindowPack("GUICG")
-        CharGenWindow = GemRB.LoadWindow(0)
+	CharGenWindow = GemRB.LoadWindow(0)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	PortraitTable = GemRB.LoadTable("pictures")
@@ -52,6 +52,7 @@ def OnLoad():
 	NameButton = GemRB.GetControl(CharGenWindow,7)
 	GemRB.SetText(CharGenWindow,NameButton, 11963)
 	GemRB.SetButtonState(CharGenWindow,NameButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow,NameButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	BackButton = GemRB.GetControl(CharGenWindow, 11)
 	GemRB.SetText(CharGenWindow, BackButton, 15416)
@@ -65,8 +66,8 @@ def OnLoad():
 	GemRB.SetText(CharGenWindow, ImportButton, 13955)
 	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_DISABLED)
 
-        CancelButton = GemRB.GetControl(CharGenWindow, 15)
-        GemRB.SetText(CharGenWindow, CancelButton, 8159)
+	CancelButton = GemRB.GetControl(CharGenWindow, 15)
+	GemRB.SetText(CharGenWindow, CancelButton, 8159)
 	GemRB.SetButtonState(CharGenWindow,CancelButton,IE_GUI_BUTTON_ENABLED)
 
 	BiographyButton = GemRB.GetControl(CharGenWindow, 16)
@@ -98,24 +99,24 @@ def OnLoad():
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": "+str(GemRB.GetVar("Ability "+str(i))))
 
-        GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-        GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
-        GemRB.SetEvent(CharGenWindow, NameButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
+	GemRB.SetEvent(CharGenWindow, NameButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 	GemRB.SetVisible(CharGenWindow,1)
 	return
 	
 def NextPress():
-        GemRB.UnloadWindow(CharGenWindow)
+	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("GUICG5") #name
 	return
 
 def CancelPress():
-        GemRB.UnloadWindow(CharGenWindow)
-        GemRB.SetNextScript("CharGen")
-        return
+	GemRB.UnloadWindow(CharGenWindow)
+	GemRB.SetNextScript("CharGen")
+	return
 
 def BackPress():
-        GemRB.UnloadWindow(CharGenWindow)
+	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("CharGen7") #appearance
 	return
 
