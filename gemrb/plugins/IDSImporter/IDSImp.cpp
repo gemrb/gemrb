@@ -11,9 +11,6 @@ IDSImp::IDSImp(void)
 	value = NULL;
 	arraySize = 0;
 	autoFree = false;
-	encrypted = false;
-	keyPos = 0;
-	strncpy(encryptionKey, GEM_ENCRYPTION_KEY, 64);
 }
 
 IDSImp::~IDSImp(void)
@@ -53,7 +50,7 @@ bool IDSImp::Open(DataStream * stream, bool autoFree)
 	str = stream;
 	this->autoFree = autoFree;
 
-	CheckEncryption();
+	str->CheckEncrypted();
 	ReadLine(lineBuf);
 	lineCount++;
 
@@ -289,21 +286,4 @@ bool IDSImp::IsHex(char * checkString)
     } 
      
     return true; 
-}
-
-bool IDSImp::CheckEncryption(void)
-{
-	char firstTwo[2] = "\0";
-
-	str->Read(firstTwo, 2);
-
-	if ( !strcmp(firstTwo, "\xff\xff") )
-	{
-		return encrypted = true;
-	}
-	else
-	{
-		str->Seek(0, SEEK_SET);
-		return false;
-	}
 }

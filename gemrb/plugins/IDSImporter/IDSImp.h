@@ -14,9 +14,6 @@ private:
 	long * value;
 
 	unsigned long arraySize;
-	bool encrypted;
-	char encryptionKey[64];
-	unsigned long keyPos;
 
 	int ReadLine(char * lineBuf);
 	int CheckHeader(const char *lineBuf);
@@ -24,7 +21,6 @@ private:
 	bool IsHex(char * checkString);
 	void ClearArrays(void);
 	bool ResizeArrays(int x, unsigned long intHeader);
-	bool CheckEncryption(void);
 
 public:
 	IDSImp(void);
