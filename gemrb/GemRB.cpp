@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.15 2003/12/07 20:09:10 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.16 2003/12/08 15:53:48 balrog994 Exp $
  *
  */
 
@@ -50,7 +50,7 @@ int main(int argc, char ** argv)
 		return -1;
 	}
 	core->GetVideoDriver()->CreateDisplay(core->Width,core->Height,core->Bpp,core->FullScreen);
-	Font * fps = core->GetFont("NORMAL\0");
+	Font * fps = core->GetFont((unsigned int)0);
 	char fpsstring[_MAX_PATH];
 	Color fpscolor = {0xff,0xff,0xff,0x00}, fpsblack = {0x00,0x00,0x00,0x00};
 	unsigned long frame = 0, time, timebase = 0;
