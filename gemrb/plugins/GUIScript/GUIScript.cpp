@@ -1101,9 +1101,9 @@ bool GUIScript::Init(void)
 		p++;
 	}
 	path[p] = 0;
-	sprintf(string, "sys.path.append('%sGUIScripts')", path);
+	sprintf(string, "sys.path.append('%sGUIScripts/%s')", path, core->GameType);
 	#else
-	sprintf(string, "sys.path.append('%sGUIScripts')", core->GUIScriptsPath);
+	sprintf(string, "sys.path.append('%sGUIScripts/%s')", core->GUIScriptsPath, core->GameType);
 	#endif
 	if(PyRun_SimpleString(string)==-1){
 		PyRun_SimpleString("pdb.pm()");
@@ -1117,6 +1117,8 @@ bool GUIScript::Init(void)
 	}
 	strcpy(path, core->GUIScriptsPath);
 	strcat(path, "GUIScripts");
+	strcat(path, SPathDelimiter);
+	strcat(path, core->GameType);
 	strcat(path, SPathDelimiter);
 	strcat(path, "GUIDefines.py");
 	FILE * config = fopen(path, "rb");
