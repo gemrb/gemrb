@@ -1,0 +1,33 @@
+Description: This table lists the avatar animations. PST has a slightly different animation scheme, this could be turned on by the OneByteAnimationID option (in gemrb.ini). When it is on, the high byte of the animation ID will control the palette flag thus eliminating the need of the PALETTE column.
+
+Columns: AT_1 - first armour level animation prefix
+	 AT_2 - second armour level animation prefix
+	 AT_3 - third armour level animation prefix
+	 AT_4 - fourth armour level animation prefix
+         TYPE - the animation scheme 
+
+0 - Many files, this is the avatar animation of BG2.
+1 - The whole animation is in one file. Scheme is: [NAME][G1]. There are 16 orientations.
+2 - The whole animation is in four files. Scheme is: [NAME][G1-2][/E].
+3 - The whole animation is in two files. Scheme is: [NAME][G1][/E].
+4 - Many files (simular to 0), but all with G. Scheme is: [NAME][G][1-2][1-6].
+5 - ?
+6 - BG2 style animation. Scheme is:[NAME][ACTIONCODE][/E]. The G1 code contains many sequences. (5 orientations).
+7 - Bird animations, one file, only movement with orientations.
+8 - Six files contain the whole animation. Scheme is:[NAME][G1-3][/E]
+9 - IWD style animation. Scheme is:[NAME][ACTIONTYPE][/E]. The main difference from 6 is that instead of G1, it has separate bams for many actions. (9 orientations).
+10-15 reserved for non pst anims
+16 - full PST style animation. Scheme is:[C/D][ACTIONTYPE][NAME][B]
+17 - stand still animation (no orientations)
+18 - stand still animation with orientations
+19 - full PST animation without different stc/std sequences
+
+        SPACE - the personal space of the creature
+      PALETTE - set it to 1 if the animation has its own palette (0 for fake colored avatars). Not needed if OneByteAnimation was set.
+
+Rows: each row begins with a hexadecimal Animation ID. One or two bytes.
+
+Example: the wyvern animation
+           AT_1       AT_2       AT_3       AT_4       TYPE       SPACE      PALETTE
+0x1000     MWYV       MWYV       MWYV       MWYV       2          5          1
+

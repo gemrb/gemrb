@@ -1,0 +1,25 @@
+Description: The randitem.2da file serves as a compatibility switch between different engine versions. It contains the ResRef for the gold item and it is the root table for random item tables. Two major random item distributions are allowed: multiple tables or single table. To have a single table, the second row (RND) must contain two ResRefs.
+More rows will follow with the table prefixes. The table prefixes must not exceed 6 characters in length. It may also contain two ResRefs for original game engine single treasure tables (no suffix).
+
+Columns: RESREF         - the table names 
+         FURY_MODE      - use these values in the highest difficulty level
+
+Rows:    GOLD - it must be the first row, and contains the gold ResRef. When the system needs the gold item, it will use this ResRef.
+         RND  - if numeric, it contains the number of treasure tables which employ a numerical suffix (like rndequ01). If text, it contains table ResRefs.
+<additional>  - if RND was numeric, there follows x table suffixes
+
+Example (BG2):
+           RESREF     FURY_MODE
+GOLD       MISC07     
+RND        5          5
+RNDEQU     RNDEQUIP   RNDEQUIP
+RNDMAG     RNDMAGIC   RNDMAGIC
+RNDSCR     RNDSCROL   RNDSCROL
+RNDTRE     RNDTREAS   RNDTREAS
+RNDWEP     RNDWEP     RNDWEP
+
+Example (IWD2):
+           RESREF    FURY_MODE
+GOLD       MISC07
+RND        RT_NORM   RT_FURY
+
