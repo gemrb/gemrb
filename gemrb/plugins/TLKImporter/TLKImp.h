@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.8 2003/11/28 21:54:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.9 2003/12/06 17:29:55 balrog994 Exp $
  *
  */
 
@@ -40,6 +40,7 @@ public:
 	~TLKImp(void);
 	bool Open(DataStream * stream, bool autoFree = true);
 	char * GetString(unsigned long strref, int flags=0);
+	StringBlock GetStringBlock(unsigned long strref, int flag=0);
 private:
 	/** replaces tags in dest, don't exceed Length */
 	bool ResolveTags(char *dest, char *source, int Length);

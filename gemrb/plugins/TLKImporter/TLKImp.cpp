@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.22 2003/12/04 23:37:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.23 2003/12/06 17:29:55 balrog994 Exp $
  *
  */
 
@@ -227,7 +227,8 @@ char * TLKImp::GetString(unsigned long strref, int flags)
 	}
 	if((type&2) && (flags&IE_STR_SOUND) ) {
 //if flags&IE_STR_SOUND play soundresref
-		core->GetSoundMgr()->Play(SoundResRef);
+		if(SoundResRef[0] != 0)
+			core->GetSoundMgr()->Play(SoundResRef);
 	}
 	if(flags&IE_STR_STRREFON) {
 		char *string2 = (char *) malloc(Length+11);
@@ -236,4 +237,22 @@ char * TLKImp::GetString(unsigned long strref, int flags)
 		return string2;
 	}
 	return string;
+}
+
+StringBlock TLKImp::GetStringBlock(unsigned long strref, int flags)
+{
+	StringBlock sb;
+	if(strref >= StrRefCount) {
+		sb.text = (char*)malloc(1);
+		sb.text[0] = 0;
+		sb.Sound[0] = 0;
+		return sb;
+	}
+	sb.text = GetString(strref, flags);
+	unsigned short type;
+	str->Seek(18+(strref*0x1A), GEM_STREAM_START);
+	str->Read(&type, 2);
+	str->Read(sb.Sound, 8);
+	sb.Sound[8]=0;
+	return sb;
 }
