@@ -11,6 +11,7 @@ Scriptable::Scriptable(ScriptableType type)
 {
 	Type = type;
 	MySelf = NULL;
+	CutSceneId = NULL;
 	for(int i = 0; i < MAX_SCRIPTS; i++) {
 		Scripts[i] = NULL;
 	}
@@ -23,6 +24,15 @@ Scriptable::Scriptable(ScriptableType type)
 	LastEntered = NULL;
 	Active = true;
 	EndAction = 2;
+	CurrentAction = NULL;
+	startTime = 0;
+	interval = (1000/AI_UPDATE_TIME);
+	WaitCounter = 0;
+	resetAction = false;
+	neverExecuted = true;
+
+	locals = new Variables();
+	locals->SetType(GEM_VARIABLES_INT);
 }
 
 Scriptable::~Scriptable(void)
@@ -33,6 +43,8 @@ Scriptable::~Scriptable(void)
 	}
 	if(overHeadText)
 		free(overHeadText);
+	if(locals)
+		delete(locals);
 }
 
 void Scriptable::SetPosition(unsigned short XPos, unsigned short YPos)
@@ -70,7 +82,85 @@ void Scriptable::SetScriptName(char * text)
 
 void Scriptable::ExecuteScript(GameScript * Script)
 {
-	Script->Update(this);
+	Script->Update();
+}
+
+void Scriptable::AddAction(Action * aC)
+{
+	actionQueue.push_back(aC);
+}
+
+Action * Scriptable::GetNextAction()
+{
+	if(actionQueue.size() == 0)
+		return NULL;
+	return actionQueue.front();
+}
+
+Action * Scriptable::PopNextAction()
+{
+	if(actionQueue.size() == 0)
+		return NULL;
+	Action * aC = actionQueue.front();
+	actionQueue.pop_front();
+	return aC;
+}
+
+void Scriptable::ClearActions()
+{
+	actionQueue.clear();
+}
+
+void Scriptable::ProcessActions()
+{
+	unsigned long thisTime;
+	GetTime(thisTime);
+	if((thisTime-startTime) < interval)
+		return;
+	startTime = thisTime;
+	if(WaitCounter) {
+		WaitCounter--;
+		if(!WaitCounter)
+			CurrentAction = NULL;
+		return;
+	}
+	if(resetAction) {
+		CurrentAction = NULL;
+		resetAction = false;
+	}
+	while(!CurrentAction) {
+		CurrentAction = PopNextAction();
+		if(!CurrentAction) {
+			if(!neverExecuted) {
+				switch(Type) {
+					case ST_PROXIMITY:
+						{
+						if(!(EndAction & SEA_RESET))
+							Active = false;
+						}
+					break;
+
+					case ST_TRIGGER:
+						{
+							Clicker = NULL;
+							neverExecuted = true;
+						}
+					break;
+				}
+			}
+			if(CutSceneId)
+				CutSceneId = NULL;
+			
+			break;
+		}
+		GameScript::ExecuteAction(this, CurrentAction);
+		neverExecuted = false;
+	}
+}
+
+void Scriptable::SetWait(unsigned long time)
+{
+	WaitCounter = time;
 }
 
 /********************
@@ -216,6 +306,7 @@ void Moveble::DoStep(ImageMgr * LightMap)
 		}
 		path = NULL;
 		AnimID = IE_ANI_AWAKE;
+		CurrentAction = NULL;
 	}
 	else {
 		if(step->Next->x > step->x)

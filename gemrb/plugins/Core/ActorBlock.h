@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.5 2003/12/30 21:56:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.6 2004/01/01 15:48:54 balrog994 Exp $
  *
  */
 
@@ -34,6 +34,7 @@ class Door;
 #include "GameScript.h"
 #include "Polygon.h"
 #include "TileOverlay.h"
+#include <list>
 
 #define STEP_TIME		150
 #define MAX_SCRIPTS		8
@@ -54,8 +55,14 @@ typedef enum ScriptableType {
 	ST_ACTOR = 0,
 	ST_PROXIMITY = 1,
 	ST_TRIGGER = 2,
-	ST_DOOR = 3
+	ST_DOOR = 3,
+	ST_AREA = 4
 } ScriptableType;
+
+typedef struct ActionStep {
+	Action * action;
+	bool EndReached;
+} ActionStep;
 
 #define SEA_RESET			0x00000002
 #define SEA_PARTY_REQUIRED	0x00000004
@@ -64,10 +71,17 @@ class GEM_EXPORT Scriptable {
 public:
 	Scriptable(ScriptableType type);
 	virtual ~Scriptable(void);
+private:
+	unsigned long startTime;
+	unsigned long interval;
+	unsigned long WaitCounter;
+	bool neverExecuted;
 public:
+	Variables * locals;
 	ScriptableType Type;
 	unsigned short XPos, YPos;
 	Scriptable * MySelf;
+	Scriptable * CutSceneId;
     GameScript * Scripts[MAX_SCRIPTS];
 	char * overHeadText;
 	unsigned char textDisplaying;
@@ -78,13 +92,22 @@ public:
 	Scriptable * Clicker;
 	Scriptable * LastEntered;
 	unsigned long EndAction;
+	std::list<Action*> actionQueue;
+	Action * CurrentAction;
+	bool resetAction;
 public:
+	void SetWait(unsigned long time);
 	void SetPosition(unsigned short XPos, unsigned short YPos);
 	void SetMySelf(Scriptable * MySelf);
 	void SetScript(int index, GameScript * script);
 	void DisplayHeadText(char * text);
 	void SetScriptName(char * text);
 	void ExecuteScript(GameScript * Script);
+	void AddAction(Action * aC);
+	Action* GetNextAction();
+	Action* PopNextAction();
+	void ClearActions();
+	virtual void ProcessActions();
 };
 
 class GEM_EXPORT Selectable : public Scriptable {
@@ -158,6 +181,7 @@ public:
 	bool DoorClosed;
 	Gem_Polygon * open;
 	Gem_Polygon * closed;
+	Region BBtoOpen;
 	char OpenSound[9];
 	char CloseSound[9];
 private:
