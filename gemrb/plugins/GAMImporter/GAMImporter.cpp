@@ -61,7 +61,7 @@ GEM_EXPORT_DLL const char* LibDescription()
 	return "GAM File Importer";
 }
 
-GEM_EXPORT_DLL unsigned long LibVersion()
+GEM_EXPORT_DLL const char* LibVersion()
 {
 	return VERSION_GEMRB;
 }

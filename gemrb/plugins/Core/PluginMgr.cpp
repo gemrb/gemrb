@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.13 2004/10/09 15:27:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.14 2005/02/14 19:53:39 avenger_teambg Exp $
  *
  */
 
@@ -81,7 +81,7 @@ PluginMgr::PluginMgr(char* pluginpath)
 		return;
 	}
 #endif
-	ulongvoid LibVersion;
+	charvoid LibVersion;
 	charvoid LibDescription;
 	intvoid LibNumberClasses;
 	cdint LibClassDesc;
@@ -104,7 +104,7 @@ PluginMgr::PluginMgr(char* pluginpath)
 			continue;
 		}
 		printStatus( "OK", LIGHT_GREEN );
-		LibVersion = ( ulongvoid ) GetProcAddress( hMod, "LibVersion" );
+		LibVersion = ( charvoid ) GetProcAddress( hMod, "LibVersion" );
 		LibDescription = ( charvoid )
 			GetProcAddress( hMod, "LibDescription" );
 		LibNumberClasses = ( intvoid ) GetProcAddress( hMod,
@@ -134,19 +134,19 @@ PluginMgr::PluginMgr(char* pluginpath)
 						hack to make GemRB run on every version.
 						*/
 #ifdef GCC_OLD
-		LibVersion = ( ulongvoid ) dlsym( hMod, "LibVersion__Fv" );
+		LibVersion = ( charvoid ) dlsym( hMod, "LibVersion__Fv" );
 		LibDescription = ( charvoid ) dlsym( hMod, "LibDescription__Fv" );
 		LibNumberClasses = ( intvoid ) dlsym( hMod, "LibNumberClasses__Fv" );
 		LibClassDesc = ( cdint ) dlsym( hMod, "LibClassDesc__Fi" );
 #else
-		LibVersion = ( ulongvoid ) dlsym( hMod, "_Z10LibVersionv" );
+		LibVersion = ( charvoid ) dlsym( hMod, "_Z10LibVersionv" );
 		LibDescription = ( charvoid ) dlsym( hMod, "_Z14LibDescriptionv" );
 		LibNumberClasses = ( intvoid ) dlsym( hMod, "_Z16LibNumberClassesv" );
 		LibClassDesc = ( cdint ) dlsym( hMod, "_Z12LibClassDesci" );
 #endif
 #endif
 		printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
-		if (LibVersion() != VERSION_GEMRB) {
+		if (strcmp(LibVersion(), VERSION_GEMRB) ) {
 			printStatus( "ERROR", LIGHT_RED );
 			printf( "Plug-in Version not valid, Skipping...\n" );
 			continue;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.257 2005/02/13 19:02:19 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.258 2005/02/14 19:53:38 avenger_teambg Exp $
  *
  */
 
@@ -68,7 +68,7 @@ Interface::Interface(int iargc, char** iargv)
 	hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
 #endif
 	textcolor( LIGHT_WHITE );
-	printf( "GemRB Core Version v%s Loading...\n", VERSION );
+	printf( "GemRB Core Version v%s Loading...\n", VERSION_GEMRB );
 	video = NULL;
 	key = NULL;
 	strings = NULL;

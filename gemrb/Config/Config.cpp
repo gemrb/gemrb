@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.12 2004/08/21 04:53:38 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.13 2005/02/14 19:53:19 avenger_teambg Exp $
  *
  */
 
@@ -112,8 +112,7 @@ int main(int , char** )
 	ClearScreen();
 	gotoxy( 0, 0 );
 	textcolor( LIGHT_WHITE );
-	printf( "GemRB v%.1f.%d.%d Configuration Utility\n\n",
-		GEMRB_RELEASE / 1000.0, GEMRB_API_NUM, GEMRB_SDK_REV );
+	printf( "GemRB v%s Configuration Utility\n\n", VERSION_GEMRB);
 	printMessage( "Configurer", "Opening GemRB.cfg file...", WHITE );
 	config = fopen( "GemRB.cfg", "r+" );
 	if (!config) {
