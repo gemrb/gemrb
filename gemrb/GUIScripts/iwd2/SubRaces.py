@@ -76,7 +76,7 @@ def OnLoad():
 	GemRB.SetText(RaceWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(RaceWindow,0)
 	GemRB.SetText(RaceWindow,DoneButton,11973)
-	GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_ENABLED)
 
 	TextAreaControl = GemRB.GetControl(RaceWindow, 6)
 	GemRB.SetText(RaceWindow,TextAreaControl, GemRB.GetTableValue(RaceTable, RaceName, "DESC_REF"))
@@ -95,7 +95,7 @@ def SubRacePress():
 
 def BackPress():
 	GemRB.UnloadWindow(RaceWindow)
-	GemRB.SetNextScript("CharGen2")
+	GemRB.SetNextScript("Race")
 	GemRB.SetVar("Race",0)  #scrapping the race value
 	return
 
