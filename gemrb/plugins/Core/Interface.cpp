@@ -516,6 +516,7 @@ bool Interface::LoadConfig(void)
 			strcpy(CD5, value);
 		}
 	}
+	fclose(config);
 	return true;
 }
 /** No descriptions */
@@ -999,4 +1000,36 @@ int Interface::Roll(int dice, int size, int add)
 		add+=rand()%size+1;
 	}
 	return add;
+}
+
+bool Interface::LoadINI(const char * filename)
+{
+	FILE * config;
+	config = fopen(filename, "rb");
+	if(config == NULL)
+		return false;
+	char name[65], value[_MAX_PATH+3];
+	while(!feof(config)) {
+		name[0] = 0;
+		value[0] = 0;
+		char rem;
+		fread(&rem, 1, 1, config);
+		if((rem == '#') || (rem == '[') || (rem == '\r') || (rem == '\n')) {
+			if(rem == '\r') {
+				fgetc(config);
+				continue;
+			}
+			else if(rem == '\n')
+				continue;
+			fscanf(config, "%*[^\r\n]%*[\r\n]");
+			continue;
+		}
+		fseek(config, -1, SEEK_CUR);
+		fscanf(config, "%[^=]=%[^\r\n]%*[\r\n]", name, value);
+		if((value[0] >= '0') && (value[0] <= '9')) {
+            vars->SetAt(name, value);
+		}
+	}
+	fclose(config);
+	return true;
 }
