@@ -91,6 +91,7 @@ def ExitCancelPress():
 def GeneratePress():
 	global PartyFormationWindow
 	slot = GemRB.GetVar("Slot")
+	print "Slot: ", slot
 	ResRef = GemRB.GetPlayerPortrait(slot, 0)
 	if ResRef:
 		print "Already existing slot, we should drop it"

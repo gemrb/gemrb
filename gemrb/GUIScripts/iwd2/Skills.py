@@ -80,7 +80,7 @@ def OnLoad():
 	ClassTable = GemRB.LoadTable("classes")
 	KitName = GemRB.GetTableRowName(ClassTable, Class)
 	#classcolumn is base class
-	ClassColumn=GemRB.GetVar("BaseClass")
+	ClassColumn=GemRB.GetVar("BaseClass") - 1
 	SkillPtsTable = GemRB.LoadTable("skillpts")
 	p = GemRB.GetTableValue(SkillPtsTable, 0, ClassColumn)
 	IntBonus = GemRB.GetVar("Ability 3")/2-5  #intelligence bonus

@@ -156,10 +156,10 @@ def BackPress():
 
 def NextPress():
 	#classcolumn is base class
-	Class = GemRB.GetVar("Class") - 1
-	ClassColumn = GemRB.GetTableValue(ClassTable, Class, 3) - 1
-	if ClassColumn < 0:  #it was already a base class
-		ClassColumn = Class
+	Class = GemRB.GetVar("Class")
+	ClassColumn = GemRB.GetTableValue(ClassTable, Class - 1, 3)
+	if ClassColumn <= 0:  #it was already a base class
+		ClassColumn = Class 
 	GemRB.SetVar("BaseClass", ClassColumn)
 	GemRB.UnloadWindow(ClassWindow)
 	GemRB.SetNextScript("CharGen4") #alignment

@@ -93,6 +93,7 @@ def ScrollBarPress():
 def LoadGamePress():
 	Pos = GemRB.GetVar("TopIndex")+GemRB.GetVar("LoadIdx")
 	GemRB.LoadGame(Pos) #loads and enters savegame
+	GemRB.EnterGame()
 	return
 
 def DeleteGameConfirm():
