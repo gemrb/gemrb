@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.298 2005/04/03 21:00:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.299 2005/04/06 17:39:51 avenger_teambg Exp $
  *
  */
 
@@ -2596,18 +2596,24 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_PlayMovie__doc,
-"PlayMovie(MOVResRef) => int\n\n"
-"Starts the Movie Player." );
+"PlayMovie(MOVResRef[, flag]) => int\n\n"
+"Plays the movie named. If flag is set to 1, it won't play it if it was already played once (set in .ini). It returns 0 if it played the movie." );
 
 static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 {
 	char* string;
+	int flag;
 
-	if (!PyArg_ParseTuple( args, "s", &string )) {
+	if (!PyArg_ParseTuple( args, "s|i", &string, &flag )) {
 		return AttributeError( GemRB_PlayMovie__doc );
 	}
 
-	int ind = core->PlayMovie( string );
+	ieDword ind = 0;
+
+	core->GetDictionary()->Lookup(string, ind);
+	if (!ind) {
+		ind = core->PlayMovie( string );
+	}
 	//don't return NULL
 	return PyInt_FromLong( ind );
 }
