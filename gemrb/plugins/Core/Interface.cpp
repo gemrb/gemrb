@@ -349,7 +349,7 @@ int Interface::Init()
 	printStatus("OK", LIGHT_GREEN);
 	if(stricmp(GameType, "iwd2") == 0) {
 		printMessage("Core", "Loading IceWind Dale 2 Extension Files...", YELLOW);
-		INIparty = (DataFileMgr*)plugin->GetPlugin(IE_INI_CLASS_ID);
+		INIparty = (DataFileMgr*)GetInterface(IE_INI_CLASS_ID);
 		FileStream * fs = new FileStream();
 		char tINIparty[_MAX_PATH];
 		strcpy(tINIparty, GamePath);
@@ -948,7 +948,7 @@ int Interface::LoadTable(const char * ResRef)
 	DataStream * str = key->GetResource(ResRef, IE_2DA_CLASS_ID);
 	if(!str)
 		return -1;
-	TableMgr * tm = (TableMgr*)plugin->GetPlugin(IE_2DA_CLASS_ID);
+	TableMgr * tm = (TableMgr*)GetInterface(IE_2DA_CLASS_ID);
 	if(!tm) {
 		delete(str);
 		return -1;
@@ -1016,7 +1016,7 @@ int Interface::LoadSymbol(const char * ResRef)
 	DataStream * str = key->GetResource(ResRef, IE_IDS_CLASS_ID);
 	if(!str)
 		return -1;
-	SymbolMgr * sm = (SymbolMgr*)plugin->GetPlugin(IE_IDS_CLASS_ID);
+	SymbolMgr * sm = (SymbolMgr*)GetInterface(IE_IDS_CLASS_ID);
 	if(!sm) {
 		delete(str);
 		return -1;
@@ -1078,7 +1078,7 @@ bool Interface::DelSymbol(int index)
 /** Plays a Movie */
 int Interface::PlayMovie(char * ResRef)
 {
-	MoviePlayer * mp = (MoviePlayer*)core->GetInterface(IE_MVE_CLASS_ID);
+	MoviePlayer * mp = (MoviePlayer*)GetInterface(IE_MVE_CLASS_ID);
 	if(!mp)
 		return 0;
 	DataStream * str = core->GetResourceMgr()->GetResource(ResRef, IE_MVE_CLASS_ID);
