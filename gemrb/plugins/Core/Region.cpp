@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.cpp,v 1.7 2003/12/15 09:30:19 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.cpp,v 1.8 2004/01/01 15:41:37 balrog994 Exp $
  *
  */
 
@@ -103,4 +103,22 @@ bool Region::InsideRegion(Region &rgn)
 	if((y+h) < rgn.y)
 		return false;
 	return true;
+}
+
+void Region::Normalize()
+{
+	if(x > w) {
+		int tmp = x;
+		x = w;
+		w = tmp-x;
+	} else {
+		w -= x;
+	}
+	if(y > h) {
+		int tmp = y;
+		y = h;
+		h = tmp-y;
+	} else {
+		h -= y;
+	}
 }
