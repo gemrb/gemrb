@@ -316,7 +316,7 @@ end:
 			SDL_mutexV(mve_audio_mutex);
 			return false;
 		}
-		if(mve_audio_buflen == len)
+		if(mve_audio_buflen >= len)
 			break;
 		SDL_mutexV(mve_audio_mutex);
 		SDL_Delay(1);
@@ -324,7 +324,11 @@ end:
 		
 		
 		memcpy(stream, mve_audio_buffer, len);
-		mve_audio_buflen = 0;	
+		if(mve_audio_buflen > len) {
+			unsigned char* ab = (unsigned char*)mve_audio_buffer;
+			memcpy(mve_audio_buffer, &ab[mve_audio_buflen], mve_audio_buflen-len);
+		}
+		mve_audio_buflen -= len;
 
 		SDL_mutexV(mve_audio_mutex);
 		return true;
@@ -382,7 +386,6 @@ end:
 			nsamp = get_short(data + 4);
 			if (chan & selected_chan)
 				{
-				SDL_mutexP(mve_audio_mutex);
 				unsigned char * ab = (unsigned char*)mve_audio_buffer;
 				ab+=mve_audio_buflen;
 
