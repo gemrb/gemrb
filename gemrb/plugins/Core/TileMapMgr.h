@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMapMgr.h,v 1.3 2003/11/28 09:27:34 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMapMgr.h,v 1.4 2004/01/04 15:22:11 balrog994 Exp $
  *
  */
 
@@ -45,7 +45,7 @@ public:
 	virtual ~TileMapMgr(void);
 	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
 	virtual TileMap * GetTileMap() = 0;
-	virtual unsigned short * GetDoorIndices(char * ResRef, int *count) = 0;
+	virtual unsigned short * GetDoorIndices(char * ResRef, int *count, bool &BaseClosed) = 0;
 };
 
 #endif
