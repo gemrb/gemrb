@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.29 2004/01/02 20:21:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.30 2004/01/05 21:36:24 doc_wagon Exp $
  *
  */
 
@@ -31,6 +31,7 @@ MUSImp::MUSImp()
 	Playing = false;
 	str = new FileStream();
 	PLpos = 0;
+	PLName[0]='\0';
 	lastSound = 0xffffffff;
 #ifndef WIN32
 	if(core->CaseSensitive) {
@@ -57,9 +58,12 @@ bool MUSImp::Init()
 /** Loads a PlayList for playing */
 bool MUSImp::OpenPlaylist(const char * name)
 {
-	int len=(int)strlen(PLName);
-	if(strnicmp(name, PLName, len) == 0)
-		return true;
+	if (PLName[0] != '\0')
+	{
+		int len=(int)strlen(PLName);
+		if(strnicmp(name, PLName, len) == 0)
+			return true;
+	}
 	if(Playing)
 		return false;
 	core->GetSoundMgr()->ResetMusics();
