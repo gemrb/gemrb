@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.132 2004/03/05 21:54:58 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.133 2004/03/12 02:11:03 edheldil Exp $
  *
  */
 
@@ -2121,12 +2121,11 @@ static PyObject* GemRB_ActorGetSmallPortrait(PyObject * /*self*/, PyObject* args
 			"Syntax Error: ActorGetSmallPortrait(index)\n", LIGHT_RED );
 	}
 
-	printf ("game: %p\n", core->GetGame ());
+	//printf ("game: %p\n", core->GetGame ());
 	Actor * actor = core->GetGame ()->GetPC (index);
-	printf ("actor: %p\n", actor);
+	//printf ("actor: %p\n", actor);
 	return Py_BuildValue( "s", actor->GetPortrait (0));
 }
-
 
 static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -2181,6 +2180,26 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 	return Py_None;
 }
 
+static PyObject* GemRB_GameIsBeastKnown(PyObject * /*self*/, PyObject * args)
+{
+	int index;
+	if (!PyArg_ParseTuple( args, "i", &index )) {
+		printMessage( "GUIScript",
+			"Syntax Error: GameIsBeastKnown(index)\n", LIGHT_RED );
+	}
+
+	return Py_BuildValue( "i", core->GetGame()->IsBeastKnown( index ));
+}
+
+static PyObject* GemRB_GetINIBeastsCount(PyObject * /*self*/, PyObject * /*args*/)
+{
+	if (!core->GetBeastsINI()) {
+		return NULL;
+	}
+	return Py_BuildValue( "i", core->GetBeastsINI()->GetTagsCount() );
+}
+
+
 static PyObject* GemRB_GetINIPartyCount(PyObject * /*self*/,
 	PyObject * /*args*/)
 {
@@ -2190,6 +2209,20 @@ static PyObject* GemRB_GetINIPartyCount(PyObject * /*self*/,
 	return Py_BuildValue( "i", core->GetPartyINI()->GetTagsCount() );
 }
 
+static PyObject* GemRB_GetINIBeastsKey(PyObject * /*self*/, PyObject* args)
+{
+	char* Tag, * Key, * Default;
+	if (!PyArg_ParseTuple( args, "sss", &Tag, &Key, &Default )) {
+		printMessage( "GUIScript",
+			"Syntax Error: GetINIBeastsKey(Tag, Key, Default)\n", LIGHT_RED );
+		return NULL;
+	}
+	if (!core->GetBeastsINI()) {
+		return NULL;
+	}
+	return Py_BuildValue( "s",
+			core->GetBeastsINI()->GetKeyAsString( Tag, Key, Default ) );
+}
 static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 {
 	char* Tag, * Key, * Default;
@@ -2687,8 +2720,14 @@ static PyMethodDef GemRBMethods[] = {
 	"Returns the number of entries in the given section of journal."},
 	{"GetJournalEntry", GemRB_GetJournalEntry, METH_VARARGS,
 	"Returns dictionary representing journal entry w/ given section and index."},
+	{"GameIsBeastKnown", GemRB_GameIsBeastKnown, METH_VARARGS,
+	"Returns whether beast with given index is known to PCs (works only on PST)."},
+	{"GetINIBeastsCount", GemRB_GetINIBeastsCount, METH_NOARGS,
+	"Returns the number of beasts defined in beast.ini (works only on PST)."},
 	{"GetINIPartyCount", GemRB_GetINIPartyCount, METH_NOARGS,
 	"Returns the Number of Party defined in Party.ini (works only on IWD2)."},
+	{"GetINIBeastsKey", GemRB_GetINIBeastsKey, METH_VARARGS,
+	"Returns a Value from the beasts.ini File (works only on PST)."},
 	{"GetINIPartyKey", GemRB_GetINIPartyKey, METH_VARARGS,
 	"Returns a Value from the Party.ini File (works only on IWD2)."},
 	{"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,

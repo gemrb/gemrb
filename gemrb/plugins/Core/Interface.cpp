@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.134 2004/03/11 22:40:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.135 2004/03/12 02:11:02 edheldil Exp $
  *
  */
 
@@ -73,6 +73,8 @@ Interface::Interface(int iargc, char** iargv)
 	soundmgr = NULL;
 	sgiterator = NULL;
 	INIparty = NULL;
+	INIbeasts = NULL;
+	INIquests = NULL;
 	game = NULL;
 	pathfinder = NULL;
 	timer = NULL;
@@ -445,6 +447,39 @@ int Interface::Init()
 			printStatus( "OK", LIGHT_GREEN );
 		}
 	}
+	if (HasFeature( GF_HAS_BEASTS_INI )) {
+		printMessage( "Core", "Loading beasts definition File...",
+			WHITE );
+		INIbeasts = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		FileStream* fs = new FileStream();
+		char tINIbeasts[_MAX_PATH];
+		strcpy( tINIbeasts, GamePath );
+		strcat( tINIbeasts, "beast.ini" );
+		// FIXME: crashes if file does not open
+		// FIXME: ResolveFilePath()
+		fs->Open( tINIbeasts, true );
+		if (!INIbeasts->Open( fs, true )) {
+			printStatus( "ERROR", LIGHT_RED );
+		} else {
+			printStatus( "OK", LIGHT_GREEN );
+		}
+
+		printMessage( "Core", "Loading quests definition File...",
+			WHITE );
+		INIquests = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		FileStream* fs2 = new FileStream();
+		char tINIquests[_MAX_PATH];
+		strcpy( tINIquests, GamePath );
+		strcat( tINIquests, "quests.ini" );
+		// FIXME: crashes if file does not open
+		// FIXME: ResolveFilePath()
+		fs2->Open( tINIquests, true );
+		if (!INIquests->Open( fs2, true )) {
+			printStatus( "ERROR", LIGHT_RED );
+		} else {
+			printStatus( "OK", LIGHT_GREEN );
+		}
+	}
 	game = NULL;//new Game();
 	DataStream* str = GetResourceMgr()->GetResource( "CURSORS",
 											IE_BAM_CLASS_ID );
@@ -776,6 +811,8 @@ bool Interface::LoadConfig(const char* filename)
 			SetFeature( atoi( value ), GF_LOWER_LABEL_TEXT );
 		} else if (stricmp( name, "HasPartyIni" ) == 0) {
 			SetFeature( atoi( value ), GF_HAS_PARTY_INI );
+		} else if (stricmp( name, "HasBeastsIni" ) == 0) {
+			SetFeature( atoi( value ), GF_HAS_BEASTS_INI );
 		} else if (stricmp( name, "IgnoreButtonFrames" ) == 0) {
 			SetFeature( atoi( value ), GF_IGNORE_BUTTON_FRAMES );
 		} else if (stricmp( name, "ForceStereo" ) == 0) {

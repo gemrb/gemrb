@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.80 2004/02/29 19:32:34 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.81 2004/03/12 02:11:02 edheldil Exp $
  *
  */
 
@@ -113,6 +113,8 @@ private:
 	std::vector<Table> tables;
 	std::vector<Symbol> symbols;
 	DataFileMgr * INIparty;
+	DataFileMgr * INIbeasts;
+	DataFileMgr * INIquests;
 	Game * game;
 	PathFinder * pathfinder;
 	int GameFeatures;
@@ -273,6 +275,14 @@ public:
 	DataFileMgr * GetPartyINI()
 	{
 		return INIparty;
+	}
+	DataFileMgr * GetBeastsINI()
+	{
+		return INIbeasts;
+	}
+	DataFileMgr * GetQuestsINI()
+	{
+		return INIquests;
 	}
 	/** Gets the Game class */
 	Game * GetGame()

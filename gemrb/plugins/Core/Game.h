@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.17 2004/03/11 20:48:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.18 2004/03/12 02:11:02 edheldil Exp $
  *
  */
 
@@ -82,6 +82,9 @@ private:
 	std::vector< Map*> Maps;
 	std::vector< GAMJournalEntry*> Journals;
 public:
+	ieByte* familiars;
+
+public:
 	int PartySize;
 
 	unsigned int GameTime;
@@ -106,7 +109,7 @@ public:
 	unsigned long UnknownCount58;
 	unsigned long KillVarsOffset;
 	unsigned long KillVarsCount;
-	unsigned long SomeBytesArrayOffset;
+	unsigned long FamiliarsOffset;  // offset to known creatures on PST
 	char AnotherArea[9];
 	char CurrentArea[9];
 	unsigned char Unknowns[84];
@@ -139,6 +142,12 @@ public:
 	void AddJournalEntry(GAMJournalEntry* entry);
 	int GetJournalCount();
 	GAMJournalEntry* GetJournalEntry(unsigned int Index);
+	bool IsBeastKnown(unsigned int Index) {
+		return familiars[Index] != 0;
+	}
+	void SetBeastKnown(unsigned int Index) {
+		familiars[Index] = 1;
+	}
 	void ShareXP(int XP);
 };
 

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.4 2004/03/01 00:04:18 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.5 2004/03/12 02:11:04 edheldil Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -103,29 +103,36 @@ def OpenQuestsWindow ():
 		GemRB.UnhideGUI()
 		return
 	
-	QuestsWindow = GemRB.LoadWindow (1)
-	GemRB.SetVar("OtherWindow", QuestsWindow)
+	QuestsWindow = Window = GemRB.LoadWindow (1)
+	GemRB.SetVar("OtherWindow", Window)
 	
 	# 1 - Assigned quests list
 	# 3 - quest description
 
 	# Assigned
-	Button = GemRB.GetControl (QuestsWindow, 8)
-	GemRB.SetText (QuestsWindow, Button, 39433)
+	Button = GemRB.GetControl (Window, 8)
+	GemRB.SetText (Window, Button, 39433)
 
 	# Completed
-	Button = GemRB.GetControl (QuestsWindow, 9)
-	GemRB.SetText (QuestsWindow, Button, 39434)
+	Button = GemRB.GetControl (Window, 9)
+	GemRB.SetText (Window, Button, 39434)
 
 	# Back
-	Button = GemRB.GetControl (QuestsWindow, 5)
-	GemRB.SetText (QuestsWindow, Button, 46677)
-	GemRB.SetEvent (QuestsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
+	Button = GemRB.GetControl (Window, 5)
+	GemRB.SetText (Window, Button, 46677)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
 
 	# Done
-	Button = GemRB.GetControl (QuestsWindow, 0)
-	GemRB.SetText (QuestsWindow, Button, 20636)
-	GemRB.SetEvent (QuestsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Button, 20636)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+
+	list = GemRB.GetControl (Window, 1)
+	for i in range (GemRB.GetINIBeastsCount ()):
+		if GemRB.GameIsBeastKnown (i):
+			name = GemRB.GetINIBeastsKey (str (i), 'name', '0')
+			GemRB.TextAreaAppend (Window, list, int (name), i)
+		
 
 	#GemRB.SetVisible (QuestsWindow, 1)
 	GemRB.UnhideGUI()
@@ -134,8 +141,17 @@ def OpenQuestsWindow ():
 
 ###################################################
 
+selected_beast_class = 0
+global selected_beast_class
+
+beasts_row2index = []
+global beasts_row2index
+
+BeastImage = None
+global BeastImage
+
 def OpenBeastsWindow ():
-	global JournalWindow, BeastsWindow
+	global JournalWindow, BeastsWindow, BeastsList, BeastImage
 	
 	GemRB.HideGUI()
 	
@@ -157,10 +173,12 @@ def OpenBeastsWindow ():
 	# PC
 	Button = GemRB.GetControl (BeastsWindow, 5)
 	GemRB.SetText (BeastsWindow, Button, 20637)
+	GemRB.SetEvent (BeastsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OnJournalPCPress")
 
 	# NPC
 	Button = GemRB.GetControl (BeastsWindow, 6)
 	GemRB.SetText (BeastsWindow, Button, 20638)
+	GemRB.SetEvent (BeastsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OnJournalNPCPress")
 
 	# Back
 	Button = GemRB.GetControl (BeastsWindow, 7)
@@ -172,9 +190,77 @@ def OpenBeastsWindow ():
 	GemRB.SetText (BeastsWindow, Button, 20636)
 	GemRB.SetEvent (BeastsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
+	BeastsList = List = GemRB.GetControl (Window, 0)
+	GemRB.SetTextAreaSelectable (Window, List, 1)
+	GemRB.SetVarAssoc (Window, List, 'SelectedBeast', -1)
+	PopulateBeastsList ()
+
+	GemRB.CreateButton (Window, 8, 20, 20, 281, 441)
+	BeastImage = GemRB.GetControl (Window, 8)
+	GemRB.SetButtonFlags (Window, BeastImage, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+
 	#GemRB.SetVisible (BeastsWindow, 1)
 	GemRB.UnhideGUI()
 
+def OnJournalBeastSelect ():
+	#print "select"
+
+	Window = BeastsWindow
+	List = BeastsList
+	
+	index2 = GemRB.GetVar ('SelectedBeast')
+	index = beasts_row2index[index2]
+	
+	desc = GemRB.GetINIBeastsKey (str (index), 'desc0', '0')
+	image = GemRB.GetINIBeastsKey (str (index), 'imageKnown', '')
+	#GemRB.TextAreaAppend (BeastsWindow, BeastsList, int (name), j)
+
+	DescText = GemRB.GetControl (Window, 2)
+	GemRB.SetText (Window, DescText, int (desc)) 
+
+	print image
+	GemRB.SetButtonPicture (Window, BeastImage, image)
+	
+def OnJournalPCPress ():
+	global selected_beast_class
+	# FIXME: it's a hack, because TextArea can't do select events
+	if selected_beast_class == 0:
+		OnJournalBeastSelect ()
+		return
+
+	selected_beast_class = 0
+	PopulateBeastsList ()
+	
+def OnJournalNPCPress ():
+	global selected_beast_class
+	# FIXME: it's a hack, because TextArea can't do select events
+	if selected_beast_class == 1:
+		OnJournalBeastSelect ()
+		return
+
+	selected_beast_class = 1
+	PopulateBeastsList ()
+
+
+def PopulateBeastsList ():
+	GemRB.TextAreaClear (BeastsWindow, BeastsList)
+	del beasts_row2index[:]
+	
+	j = 0
+	for i in range (GemRB.GetINIBeastsCount ()):
+		if not GemRB.GameIsBeastKnown (i):
+			continue
+		
+		if selected_beast_class != int (GemRB.GetINIBeastsKey (str (i), 'class', '0')):
+			continue
+		
+		name = GemRB.GetINIBeastsKey (str (i), 'name', '0')
+		#klass = GemRB.GetINIBeastsKey (str (i), 'class', '0')
+		#desc = GemRB.GetINIBeastsKey (str (i), 'desc0', '0')
+		#image = GemRB.GetINIBeastsKey (str (i), 'imageKnown', '')
+		GemRB.TextAreaAppend (BeastsWindow, BeastsList, int (name), j)
+		beasts_row2index.append (i)
+		j = j + 1
 	
 ###################################################
 

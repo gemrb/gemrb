@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.15 2004/03/01 00:04:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.16 2004/03/12 02:11:04 edheldil Exp $
  *
  */
 
@@ -113,7 +113,12 @@ Game* GAMImp::GetGame()
 				str->Read( &newGame->Unknown54, 4 );
 				str->Read( &newGame->CurrentArea, 8 ); // FIXME: see above
 				newGame->CurrentArea[8] = 0;
-				str->Read( &newGame->Unknowns, 84 );
+				str->Read( &newGame->KillVarsOffset, 4 );
+				str->Read( &newGame->KillVarsCount, 4 );
+				str->Read( &newGame->FamiliarsOffset, 4 );
+
+				str->Read( &newGame->Unknowns, 72 );
+				// should read 
 			}
 			break;
 
@@ -126,7 +131,7 @@ Game* GAMImp::GetGame()
 				newGame->AnotherArea[8] = 0;
 				str->Read( &newGame->KillVarsOffset, 4 );
 				str->Read( &newGame->KillVarsCount, 4 );
-				str->Read( &newGame->SomeBytesArrayOffset, 4 );
+				str->Read( &newGame->FamiliarsOffset, 4 );
 				str->Read( &newGame->AnotherArea, 8 );
 				newGame->AnotherArea[8] = 0;  // FIXME: see above
 				str->Read( &newGame->Unknowns, 64 );
@@ -200,6 +205,13 @@ Game* GAMImp::GetGame()
 		newGame->AddJournalEntry( je );
 	}
 
+	// Loading known creatures array (familiars)
+	if (version == 11 && core->GetBeastsINI() != NULL) {
+		int beasts_count = core->GetBeastsINI()->GetTagsCount();
+		newGame->familiars = (ieByte*)malloc(beasts_count);
+		str->Seek( newGame->FamiliarsOffset, GEM_STREAM_START );
+		str->Read( newGame->familiars, beasts_count );
+	}
 	//newGame->AddMap(newMap);
 	return newGame;
 }
