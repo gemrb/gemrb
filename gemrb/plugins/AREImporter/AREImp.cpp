@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.64 2004/08/09 18:24:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.65 2004/08/18 20:57:48 avenger_teambg Exp $
  *
  */
 
@@ -146,6 +146,7 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	str->Read( &AnimOffset, 4 );
 	str->Seek( 8, GEM_CURRENT_POS ); //skipping some
 	str->Read( &SongHeader, 4 );
+	str->Read( &RestHeader, 4 );
 	return true;
 }
 
@@ -197,6 +198,18 @@ Map* AREImp::GetMap(const char *ResRef)
 	for (i = 0; i < 5; i++) {
 		str->Read( map->SongHeader.SongList + i, 4 );
 	}
+
+	str->Seek( RestHeader, GEM_STREAM_START );
+	for (i = 0; i < 10; i++) {
+		str->Read( map->RestHeader.Strref + i, 4 );
+	}
+	for (i = 0; i < 10; i++) {
+		str->Read( map->RestHeader.Creature + i, 8 );
+	}
+	str->Read( &map->RestHeader.CreatureNum, 2 );
+	str->Seek( 14, GEM_CURRENT_POS );
+	str->Read( &map->RestHeader.DayChance, 2 );
+	str->Read( &map->RestHeader.NightChance, 2 );
 
 	printf( "Loading doors\n" );
 	//Loading Doors

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.45 2004/08/08 05:11:32 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.46 2004/08/18 20:57:45 avenger_teambg Exp $
  *
  */
 
@@ -49,6 +49,14 @@ class Ambient;
 typedef struct SongHeaderType {
 	ieDword SongList[5];
 } SongHeaderType;
+
+typedef struct RestHeaderType {
+	ieDword Strref[10];
+	ieResRef Creature[10];
+	ieWord CreatureNum;
+	ieWord DayChance;
+	ieWord NightChance;
+} RestHeaderType;
 
 typedef struct WallGroup {
 	Gem_Polygon** polys;
@@ -107,6 +115,7 @@ public:
 	//returns actors in rect (onlyparty could be more sophisticated)
 	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty);
 	SongHeaderType SongHeader;
+	RestHeaderType RestHeader;
 	void AddVVCCell(ScriptedAnimation* vvc);
 	void AddEntrance(char* Name, short XPos, short YPos, short Face);
 	Entrance* GetEntrance(const char* Name);
