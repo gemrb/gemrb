@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.39 2003/12/04 22:05:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.40 2003/12/06 17:27:57 balrog994 Exp $
  *
  */
 
@@ -565,6 +565,118 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D * spr, int x, int y, Color tint)
 	BlitSprite(spr, x, y);
 	SDL_SetPalette(tmp, SDL_LOGPAL, oldPal, 0, 256);
 }
+
+void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode, bool anchor, Region * clip)
+{
+	if(blendMode == IE_NORMAL) {
+		BlitSprite(spr, x, y, anchor, clip);
+		return;
+	}
+	SDL_Rect drect;
+	SDL_Rect t;
+	SDL_Rect *srect = NULL;
+	if(anchor) {
+		drect.x = x-spr->XPos;
+		drect.y = y-spr->YPos;
+	}
+	else {
+		drect.x = x-spr->XPos-Viewport.x;
+		drect.y = y-spr->YPos-Viewport.y;
+	}
+	if(clip) {
+		if(drect.x+spr->Width <= clip->x)
+			return;
+		else {
+			if(drect.x < clip->x) {
+				t.x = clip->x-drect.x;
+				t.w = spr->Width-t.x;
+			}
+			else {
+				if(drect.x+spr->Width <= clip->x+clip->w) {
+					t.x = 0;
+					t.w = spr->Width;
+				}
+				else {
+					if(drect.x >= clip->x+clip->w) {
+						return;
+					}
+					else {
+						t.x = 0;
+						t.w = (clip->x+clip->w)-drect.x;
+					}
+				}
+			}
+		}
+		if(drect.y+spr->Height <= clip->y)
+			return;
+		else {
+			if(drect.y < clip->y) {
+				t.y = clip->y-drect.y;
+				t.h = spr->Height-t.y;
+			}
+			else {
+				if(drect.y+spr->Height <= clip->y+clip->h) {
+					t.y = 0;
+					t.h = spr->Height;
+				}
+				else {
+					if(drect.y >= clip->y+clip->h) {
+						return;
+					}
+					else {
+						t.y = 0;
+						t.h = (clip->y+clip->h)-drect.y;
+					}
+				}
+			}
+		}
+		srect = &t;
+	}
+	if(!srect) {
+		srect = &t;
+		srect->x = 0;
+		srect->y = 0;
+		srect->w = spr->Width;
+		srect->h = spr->Height;
+	}
+	SDL_Surface * surf = (SDL_Surface*)spr->vptr;
+	int destx = drect.x, desty = drect.y;
+
+	if((destx > core->Width) || ((destx+srect->w) < 0))
+		return;
+	if((desty > core->Height) || ((desty+srect->h) < 0))
+		return;
+
+	for(int y = srect->y; y < srect->h; y++) {
+		if((desty < 0) || (desty > core->Height))
+			continue;
+		destx = drect.x; 
+		unsigned char * src = ((unsigned char*)surf->pixels)+(y*surf->pitch);
+		for(int x = srect->x; x < srect->w; x++) {
+			if((destx < 0) || (destx > core->Width)) {
+				src++;
+				continue;
+			}
+			if(*src == 0) {
+				src++;
+				continue;
+			}
+			Color color;
+			GetPixel(destx,desty, &color);
+			SDL_Color c1 = surf->format->palette->colors[*src++];
+			if(c1.r > color.r)
+				color.r = c1.r;
+			if(c1.g > color.g)
+				color.g = c1.g;
+			if(c1.b > color.b)
+				color.b = c1.b;
+			SetPixel(destx, desty, color);
+			destx++;
+		}
+		desty++;
+	}
+}
+
 void SDLVideoDriver::SetCursor(Sprite2D * up, Sprite2D * down)
 {
 	if(up) {

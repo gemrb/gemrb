@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.19 2003/12/04 22:05:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.20 2003/12/06 17:27:57 balrog994 Exp $
  *
  */
 
@@ -52,6 +52,7 @@ public:
 	void BlitSprite(Sprite2D * spr, int x, int y, bool anchor = false, Region * clip = NULL);
 	void BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y, bool anchor = true, Region * clip = NULL);
 	void BlitSpriteTinted(Sprite2D * spr, int x, int y, Color tint);
+	void BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode, bool anchor = true, Region * clip = NULL);
 	void SetCursor(Sprite2D * up, Sprite2D * down);
 	Region GetViewport(void);
 	void SetViewport(int x, int y);
