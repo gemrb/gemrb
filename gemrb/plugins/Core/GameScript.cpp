@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.219 2005/01/15 14:55:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.220 2005/01/24 20:29:21 avenger_teambg Exp $
  *
  */
 
@@ -325,9 +325,10 @@ static ActionLink actionnames[] = {
 	{"destroyself", GameScript::DestroySelf,0},
 	{"dialogue", GameScript::Dialogue,AF_BLOCKING},
 	{"dialogueforceinterrupt", GameScript::DialogueForceInterrupt,AF_BLOCKING},
-	{"displaymessage", GameScript::DisplayStringHead,0},
+	{"displaymessage", GameScript::DisplayMessage,0},
 	{"displaystring", GameScript::DisplayString,0},
 	{"displaystringhead", GameScript::DisplayStringHead,0},
+	{"displaystringheadowner", GameScript::DisplayStringHeadOwner,0},
 	{"displaystringheaddead", GameScript::DisplayStringHead,0}, //same?
 	{"displaystringnonamehead", GameScript::DisplayStringNoNameHead,0},
 	{"displaystringwait", GameScript::DisplayStringWait,AF_BLOCKING},
@@ -344,7 +345,7 @@ static ActionLink actionnames[] = {
 	{"fadefromcolor", GameScript::FadeFromColor,0},
 	{"fadetoblack", GameScript::FadeToColor,0}, //probably the same
 	{"fadetocolor", GameScript::FadeToColor,0},
-	{"floatmessage", GameScript::DisplayStringHead,0}, //probably the same
+	{"floatmessage", GameScript::DisplayStringHead,0},
 	{"floatmessagefixed", GameScript::FloatMessageFixed,0},
 	{"forceaiscript", GameScript::ForceAIScript,0},
 	{"forcefacing", GameScript::ForceFacing,0},
@@ -551,7 +552,7 @@ static ActionLink actionnames[] = {
 	{"takepartyitemnum", GameScript::TakePartyItemNum,0},
 	{"teleportparty", GameScript::TeleportParty,0}, 
 	{"textscreen", GameScript::TextScreen,0},
-	{"tomsstringdisplayer", GameScript::DisplayStringHead,0},
+	{"tomsstringdisplayer", GameScript::DisplayMessage,0},
 	{"triggeractivation", GameScript::TriggerActivation,0},
 	{"unhidegui", GameScript::UnhideGUI,0},
 	{"unloadarea", GameScript::UnloadArea,0},
@@ -3513,11 +3514,6 @@ int GameScript::Acquired(Scriptable * Sender, Trigger* parameters)
 /** this is a GemRB extension */
 int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger* parameters)
 {
-	/*hacked to never have the item, this requires inventory!*/
-	if (stricmp( parameters->string0Parameter, "MISC4G" ) == 0) {
-		return 1;
-	}
-	/** */
 	Actor *actor;
 	Game *game=core->GetGame();
 
@@ -5914,14 +5910,46 @@ void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 	DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD|DS_CONSOLE|DS_NONAME);
 }
 
+//display message over current script owner
+void GameScript::DisplayMessage(Scriptable* Sender, Action* parameters)
+{
+	DisplayStringCore(Sender, parameters->int0Parameter, DS_CONSOLE );
+}
+
+//float message over target
 void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 {
-	DisplayStringCore(Sender, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[0] );
+
+	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
+}
+
+void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* parameters)
+{
+	Actor *actor;
+	Game *game=core->GetGame();
+
+	//there is an assignment here
+	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+		if (actor->inventory.HasItem(parameters->string0Parameter,parameters->int0Parameter) ) {
+			DisplayStringCore(actor, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
+		}
+	}
 }
 
 void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
 {
 	DisplayStringCore(Sender, parameters->int0Parameter, DS_CONSOLE|DS_HEAD);
+}
+
+void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
+{
+	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE);
+}
+
+void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
+{
+	DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD|DS_WAIT);
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
@@ -5986,12 +6014,6 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 	actor->Orientation = GetOrient( p, actor->Pos );
 	actor->resetAction = true;
 	actor->SetWait( 1 );
-}
-
-
-void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
-{
-	DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD|DS_WAIT);
 }
 
 /*pst and bg2 can play a song designated by index*/
@@ -6283,11 +6305,6 @@ void GameScript::Dialogue(Scriptable* Sender, Action* parameters)
 void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
 {
 	BeginDialog( Sender, parameters, BD_SOURCE | BD_TALKCOUNT | BD_INTERRUPT );
-}
-
-void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
-{
-	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE);
 }
 
 void GameScript::AmbientActivate(Scriptable* /*Sender*/, Action* parameters)
