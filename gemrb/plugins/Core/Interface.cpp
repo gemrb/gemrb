@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.100 2003/12/19 17:28:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.101 2003/12/19 18:53:37 avenger_teambg Exp $
  *
  */
 
@@ -61,7 +61,7 @@ Interface::Interface(void)
 	ConsolePopped = false;
 	CheatFlag = false;
 	CaseSensitive = false;
-	GameOnCD = true;
+	GameOnCD = false;
 	GUIScriptsPath[0]=0;
 	GamePath[0]=0;
 	GemRBPath[0]=0;
