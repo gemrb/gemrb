@@ -71,13 +71,16 @@ Sprite2D * PLTImp::GetImage()
 		for(int x = 0; x < Width; x++) {
 			unsigned char intensity = *src++;
 			unsigned char palindex = *src++;
-			*dest++ = 0xff;
+			if(intensity == 0xff)
+				*dest++ = 0x00;
+			else
+				*dest++ = 0xff;
 			*dest++ = Palettes[palindex][intensity].b;
 			*dest++ = Palettes[palindex][intensity].g;
 			*dest++ = Palettes[palindex][intensity].r;
 		}
 	}
-	Sprite2D * spr = core->GetVideoDriver()->CreateSprite(Width, Height, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff, p, true, 0x00ff00FF);
+	Sprite2D * spr = core->GetVideoDriver()->CreateSprite(Width, Height, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff, p, true, 0x00ff0000);
 	spr->XPos = 0;
 	spr->YPos = 0;
 	return spr;
