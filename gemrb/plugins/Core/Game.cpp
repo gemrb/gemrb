@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.68 2005/03/16 16:31:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.69 2005/03/22 18:11:48 avenger_teambg Exp $
  *
  */
 
@@ -640,7 +640,7 @@ bool Game::EveryoneNearPoint(const char *area, Point &p, bool canmove)
 		if(stricmp(PCs[i]->Area,area) ) {
 			return false;
 		}
-		if(Distance(p,PCs[i])>MAX_OPERATING_DISTANCE) {
+		if(Distance(p,PCs[i])>MAX_TRAVELING_DISTANCE) {
 			return false;
 		}
 	}

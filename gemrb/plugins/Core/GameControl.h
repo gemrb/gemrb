@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.59 2005/03/21 22:43:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.60 2005/03/22 18:11:51 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -45,9 +45,10 @@ class GameControl;
 #endif
 
 //dialog flags
-#define DF_IN_DIALOG   1
-#define DF_TALKCOUNT   2
-#define DF_UNBREAKABLE 4
+#define DF_IN_DIALOG      1
+#define DF_TALKCOUNT      2
+#define DF_UNBREAKABLE    4
+#define DF_FREEZE_SCRIPTS 8
 
 //screen flags
 #define SF_DISABLEMOUSE  1
@@ -55,8 +56,10 @@ class GameControl;
 #define SF_ALWAYSCENTER  4
 #define SF_GUIENABLED    8
 
-//later this could be separated from talking distance
+//the distance of operating a trigger, container, etc.
 #define MAX_OPERATING_DISTANCE      40
+//the distance between PC's who are about to enter a new area 
+#define MAX_TRAVELING_DISTANCE      400
 
 class GEM_EXPORT GameControl : public Control {
 public:

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.205 2005/03/21 22:43:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.206 2005/03/22 18:11:50 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -217,6 +217,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (((short) Width) <=0 || ((short) Height) <= 0) {
 		return;
 	}
+	if (DialogueFlags & DF_FREEZE_SCRIPTS) {
+		return;
+	}
 	if ( game->selected.size() > 0 ) {
 		ChangeMap(game->selected[0], false);
 	}
@@ -259,7 +262,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	// Show containers
 	if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
 		Container* c;
-		//there is a real assignment in the loop!
+
+		DialogueFlags |= DF_FREEZE_SCRIPTS;		//there is a real assignment in the loop!
 		for (unsigned int idx = 0;
 			(c = area->TMap->GetContainer( idx ));
 			idx++) {
@@ -1307,6 +1311,10 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 	this->speaker = speaker;
 	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR;
 	DialogueFlags |= DF_IN_DIALOG;
+	//there are 3 bits, if they are all unset, the dialog freezes scripts
+	if (!(dlg->Flags&7) ) {
+		DialogueFlags |= DF_FREEZE_SCRIPTS;
+	}
 	ieDword index;
 	core->GetDictionary()->Lookup( "MessageWindowSize", index );
 	if (index == 0) {
@@ -1464,6 +1472,10 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 	}
 	ta->AppendText( "", -1 );
+	// is this correct?
+	if (DialogueFlags & DF_FREEZE_SCRIPTS) {
+		speaker->ProcessActions();
+	}
 }
 
 void GameControl::DisplayString(Point &p, const char *Text)
