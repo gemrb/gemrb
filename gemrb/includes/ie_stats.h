@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.20 2004/08/03 22:22:56 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.21 2004/08/22 22:10:07 avenger_teambg Exp $
  *
  */
 
@@ -284,14 +284,16 @@
 #define IE_ANIMATION_ID		206
 #define IE_STATE_ID		207
 #define IE_METAL_COLOR		208
+#define IE_COLORS		208 //same
 #define IE_MINOR_COLOR		209
 #define IE_MAJOR_COLOR		210
 #define IE_SKIN_COLOR		211
 #define IE_LEATHER_COLOR	212
 #define IE_ARMOR_COLOR		213
 #define IE_HAIR_COLOR		214
+#define IE_COLORCOUNT		214 //same
 #define IE_MC_FLAGS		215
-#define IE_TALKCOUNT		216
+//#define IE_TALKCOUNT		216, unused slot!
 #define IE_ALIGNMENT		217
 #define IE_UNSELECTABLE		218
 #define IE_ARMOR_TYPE		219

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.64 2004/08/20 15:17:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.65 2004/08/22 22:10:00 avenger_teambg Exp $
  *
  */
 
@@ -134,86 +134,25 @@ void Actor::SetText(int strref, unsigned char type)
 	}
 }
 
-void Actor::SetAnimationID(unsigned short AnimID)
+void Actor::SetAnimationID(unsigned int AnimID)
 {
-	int i;
-	char tmp[7];
-	sprintf( tmp, "0x%04X", AnimID );
-
-	int AvatarTable = core->LoadTable( "avatars" );
-	TableMgr* at = core->GetTable( AvatarTable );
-	int RowIndex = at->GetRowIndex( tmp );
-	if (RowIndex < 0) {
-		char tmp[256];
-		sprintf(tmp, "Invalid or nonexistent avatar entry:%04hX\n", AnimID);
-		printMessage("CharAnimations",tmp, LIGHT_RED);
-
-		anims = NULL;
-		return;
-	}
-	char* BaseResRef = at->QueryField( RowIndex, BaseStats[IE_ARMOR_TYPE] );
-	char* Mirror = at->QueryField( RowIndex, 4 );
-	char* Orient = at->QueryField( RowIndex, 5 );
 	if (anims) {
 		delete( anims );
-	}	
-	anims = new CharAnimations( BaseResRef, atoi( Orient ), atoi( Mirror ),
-					RowIndex );
-
-	int palType = atoi( at->QueryField( RowIndex, 4 ) );
-
-	Color Pal[256];
-	memcpy( Pal, anims->Palette, 256 * sizeof( Color ) );
-	if (palType < 10) {
-		Color* MetalPal = core->GetPalette( BaseStats[IE_METAL_COLOR], 12 );
-		Color* MinorPal = core->GetPalette( BaseStats[IE_MINOR_COLOR], 12 );
-		Color* MajorPal = core->GetPalette( BaseStats[IE_MAJOR_COLOR], 12 );
-		Color* SkinPal = core->GetPalette( BaseStats[IE_SKIN_COLOR], 12 );
-		Color* LeatherPal = core->GetPalette( BaseStats[IE_LEATHER_COLOR], 12 );
-		Color* ArmorPal = core->GetPalette( BaseStats[IE_ARMOR_COLOR], 12 );
-		Color* HairPal = core->GetPalette( BaseStats[IE_HAIR_COLOR], 12 );
-		memcpy( &Pal[0x04], MetalPal, 12 * sizeof( Color ) );
-		memcpy( &Pal[0x10], MinorPal, 12 * sizeof( Color ) );
-		memcpy( &Pal[0x1C], MajorPal, 12 * sizeof( Color ) );
-		memcpy( &Pal[0x28], SkinPal, 12 * sizeof( Color ) );
-		memcpy( &Pal[0x34], LeatherPal, 12 * sizeof( Color ) );
-		memcpy( &Pal[0x40], ArmorPal, 12 * sizeof( Color ) );
-		memcpy( &Pal[0x4C], HairPal, 12 * sizeof( Color ) );
-		memcpy( &Pal[0x58], &MinorPal[1], 8 * sizeof( Color ) );
-		memcpy( &Pal[0x60], &MajorPal[1], 8 * sizeof( Color ) );
-		memcpy( &Pal[0x68], &MinorPal[1], 8 * sizeof( Color ) );
-		memcpy( &Pal[0x70], &MetalPal[1], 8 * sizeof( Color ) );
-		memcpy( &Pal[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
-		memcpy( &Pal[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
-		memcpy( &Pal[0x88], &MinorPal[1], 8 * sizeof( Color ) );
-		for (i = 0x90; i < 0xA8; i += 0x08)
-			memcpy( &Pal[i], &LeatherPal[1], 8 * sizeof( Color ) );
-		memcpy( &Pal[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
-		for (i = 0xB8; i < 0xFF; i += 0x08)
-			memcpy( &Pal[i], &LeatherPal[1], 8 * sizeof( Color ) );
-		free( MetalPal );
-		free( MinorPal );
-		free( MajorPal );
-		free( SkinPal );
-		free( LeatherPal );
-		free( ArmorPal );
-		free( HairPal );
 	}
-	else if (palType == 10) {   // Avatars in PS:T
-		int size = 32;
-		int dest = 256-ColorsCount*size;
-		for (int i = 0; i < ColorsCount; i++) {
-			Color* NewPal = core->GetPalette( Colors[i], size );
-			memcpy( &Pal[dest], NewPal, size * sizeof( Color ) );
-			dest +=size;
-			free( NewPal );
+	//hacking PST no palette
+	if(core->HasFeature(GF_ONE_BYTE_ANIMID) )
+	{
+		if(AnimID&0x8000) {
+if(BaseStats[IE_COLORCOUNT])
+printf("The following anim is supposed to be real colored (no recoloring)\n");
+			BaseStats[IE_COLORCOUNT]=0;
 		}
-	} else {		       
-		printf( "Unknown palType %d\n", palType );
 	}
-
-	SetCircleSize();
-	anims->SetNewPalette( Pal );
+	anims = new CharAnimations( AnimID, BaseStats[IE_ARMOR_TYPE]);
+	if (anims) {
+		SetCircleSize();
+		anims->SetupColors(BaseStats+IE_COLORS);
+	}
 }
 
 CharAnimations* Actor::GetAnims()
@@ -235,7 +174,7 @@ void Actor::SetCircleSize()
 	Color* color;
 	if (Modified[IE_UNSELECTABLE]) {
 		color = &magenta;
-	} else if (!Modified[IE_MORALEBREAK]) {
+	} else if (GetMod(IE_MORALEBREAK)<0) {
 		color = &yellow;
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
 		color = &yellow;
@@ -261,7 +200,7 @@ void Actor::SetCircleSize()
 				break;
 		}
 	}
-	SetCircle( anims->CircleSize, *color );
+	SetCircle( anims->GetCircleSize(), *color );
 }
 
 bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
@@ -283,7 +222,16 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 			}
 			break;
 		case IE_ANIMATION_ID:
-			SetAnimationID( Value );
+			SetAnimationID( (ieWord) Value );
+			break;
+		case IE_METAL_COLOR:
+		case IE_MINOR_COLOR:
+		case IE_MAJOR_COLOR:
+		case IE_SKIN_COLOR:
+		case IE_LEATHER_COLOR:
+		case IE_ARMOR_COLOR:
+		case IE_HAIR_COLOR:
+			anims->SetupColors(Modified+IE_COLORS);
 			break;
 		case IE_EA:
 		case IE_UNSELECTABLE:
@@ -324,21 +272,7 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 		return false;
 	}
 	BaseStats[StatIndex] = Value;
-	switch (StatIndex) {
-		case IE_ANIMATION_ID:
-			SetAnimationID( Value );
-			break;
-		case IE_EA:
-		case IE_UNSELECTABLE:
-		case IE_MORALEBREAK:
-			SetCircleSize();
-			break;
-		case IE_HITPOINTS:
-			if(Value<=0) {
-				Die(NULL);
-			}
-			break;
-	}
+	SetStat (StatIndex, Value);
 	return true;
 }
 /** call this after load, before applying effects */
@@ -384,8 +318,10 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 
 void Actor::DebugDump()
 {
+	unsigned int i;
+
 	printf( "Debugdump of Actor %s:\n", LongName );
-	for (int i = 0; i < MAX_SCRIPTS; i++) {
+	for (i = 0; i < MAX_SCRIPTS; i++) {
 		const char* poi = "<none>";
 		if (Scripts[i] && Scripts[i]->script) {
 			poi = Scripts[i]->script->GetName();
@@ -397,10 +333,20 @@ void Actor::DebugDump()
 	printf( "Script name:%.32s\n", scriptName );
 	printf( "TalkCount:  %d\n", TalkCount );
 	printf( "PartySlot:  %d\n", InParty );
-	printf( "Allegiance: %d\n",(int) GetStat(IE_EA) );
-	printf( "Visualrange:%d\n", (int) GetStat(IE_VISUALRANGE) );
-	printf( "Mod[IE_EA]: %d\n", Modified[IE_EA]);
-	printf( "Mod[IE_ANIMATION_ID]: 0x%04X\n", Modified[IE_ANIMATION_ID]);
+	printf( "Allegiance: %d\n", BaseStats[IE_EA] );
+	printf( "Visualrange:%d\n", Modified[IE_VISUALRANGE] );
+	printf( "Mod[IE_EA]: %d\n", Modified[IE_EA] );
+	printf( "Mod[IE_ANIMATION_ID]: 0x%04X\n", Modified[IE_ANIMATION_ID] );
+	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
+		for(i=0;i<Modified[IE_COLORCOUNT];i++) {
+			printf("Colors #%d:  %d\n",i, Modified[IE_COLORS+i]);
+		}
+	}
+	else {
+		for(i=0;i<7;i++) {
+			printf("Colors #%d:  %d\n",i, Modified[IE_COLORS+i]);
+		}
+	}
 	ieDword tmp=0;
 	core->GetGame()->globals->Lookup("APPEARANCE",tmp);
 	printf( "Disguise: %d\n", tmp);
@@ -413,7 +359,7 @@ void Actor::SetPosition(Map *map, unsigned int XPos, unsigned int YPos, int jump
 	ClearPath();
 	XPos/=16;
 	YPos/=12;
-	if (jump && !GetStat( IE_DONOTJUMP ) && anims->CircleSize) {
+	if (jump && !GetStat( IE_DONOTJUMP ) && anims->GetCircleSize() ) {
 		map->AdjustPosition( XPos, YPos, radius );
 	}
 	MoveTo( ( XPos * 16 ) + 8, ( YPos * 12 ) + 6 );
@@ -439,6 +385,7 @@ int Actor::GetEncumbrance()
 
 void Actor::Die(Scriptable *killer)
 {
+	Selected=false;
 	int minhp=Modified[IE_MINHITPOINTS];
 	if(minhp) { //can't die
 		SetStat(IE_HITPOINTS, minhp);
@@ -462,7 +409,7 @@ void Actor::Die(Scriptable *killer)
 	if(Modified[IE_HITPOINTS]<=0) {
 		InternalFlags|=IF_REALLYDIED;
 	}
-        AnimID = IE_ANI_DIE;
+        StanceID = IE_ANI_DIE;
 }
 
 bool Actor::CheckOnDeath()
@@ -480,7 +427,9 @@ bool Actor::CheckOnDeath()
 		//
 	}
 	DropItem("",0);
-	Active = false; //we its scripts here, do we need it?
+	//remove all effects that are not 'permanent after death' here
+	//permanent after death type is 9
+	Active = false; //we deactivate its scripts here, do we need it?
 	Modified[IE_STATE_ID] |= STATE_DEAD;
 	if(Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
 	if(Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
@@ -526,4 +475,24 @@ bool Actor::Persistent()
 	if(InParty) return true;
 	if(InternalFlags&IF_FROMGAME) return true;
 	return false;
+}
+
+//this is a reimplementation of cheatkey a/s of bg2
+//cycling through animation/stance
+// a - get next animation, s - get next stance
+
+void Actor::GetNextAnimation()
+{
+	int RowNum = anims->AvatarsRowNum - 1;
+	if (RowNum<0)
+		RowNum = CharAnimations::GetAvatarsCount() - 1;
+	SetAnimationID (CharAnimations::GetAvatarStruct(RowNum)->AnimID);
+}
+
+void Actor::GetNextStance()
+{
+	static int Stance = IE_ANI_AWAKE;
+
+	if (--Stance < 0) Stance = MAX_ANIMS-1;
+	StanceID = Stance;
 }

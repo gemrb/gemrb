@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.20 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.21 2004/08/22 22:10:00 avenger_teambg Exp $
  *
  */
 
@@ -50,7 +50,7 @@ Animation::Animation(unsigned short* frames, int count)
 	fps = 15;
 	autoSwitchOnEnd = false;
 	endReached = false;
-	nextAnimID = 0;
+	nextStanceID = 0;
 	pastLastFrame = false;
 	playReversed = false;
 	playOnce = false;

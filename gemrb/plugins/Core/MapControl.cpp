@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.1 2004/08/22 19:24:26 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.2 2004/08/22 22:10:02 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -46,7 +46,7 @@ MapControl::~MapControl(void)
 }
 
 /** Draws the Control on the Output Display */
-void MapControl::Draw(unsigned short x, unsigned short y)
+void MapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 {
 	if (!Width || !Height) {
 		return;
@@ -72,15 +72,13 @@ void MapControl::Draw(unsigned short x, unsigned short y)
 }
 
 /** Key Press Event */
-void MapControl::OnKeyPress(unsigned char Key, unsigned short Mod)
+void MapControl::OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/)
 {
 }
 
 /** Key Release Event */
 void MapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
-	unsigned int i;
-
 	switch (Key) {
 		case '\t':
 			//not GEM_TAB
@@ -107,8 +105,6 @@ void MapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 /** Mouse Over Event */
 void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 {
-	int nextCursor = 0;
-
 	if (MouseIsDown) {
 		ScrollX -= x - lastMouseX;
 		ScrollY -= y - lastMouseY;
@@ -134,7 +130,7 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 
 /** Mouse Button Down */
 void MapControl::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned char Button, unsigned short /*Mod*/)
 {
 	if ((Button != GEM_MB_ACTION) ) {
 		return;
@@ -144,8 +140,8 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y,
 	lastMouseY = y;
 }
 /** Mouse Button Up */
-void MapControl::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+void MapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
+	unsigned char Button, unsigned short /*Mod*/)
 {
 	if (Button != GEM_MB_ACTION) {
 		return;

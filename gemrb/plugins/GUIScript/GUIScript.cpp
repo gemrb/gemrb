@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.194 2004/08/22 19:24:24 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.195 2004/08/22 22:10:05 avenger_teambg Exp $
  *
  */
 
@@ -3059,11 +3059,10 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	}
 	printf( "Set animation complete: 0x%0x\n", AnimID );
 	MyActor->SetBase(IE_ANIMATION_ID, AnimID);
-	//MyActor->SetAnimationID( AnimID );
 	//setting PST's starting stance to 18
 	poi = mtm->QueryField( 0, 1 );
 	if (*poi != '*') {
-		MyActor->AnimID = atoi( poi );
+		MyActor->StanceID = atoi( poi );
 	}
 	core->DelTable( mastertable );
 	// 0 - single player, 1 - tutorial, 2 - multiplayer

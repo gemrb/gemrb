@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.44 2004/08/20 13:03:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.45 2004/08/22 22:10:00 avenger_teambg Exp $
  *
  */
 
@@ -100,14 +100,14 @@ public:
 
 	char KillVar[32]; //this second field is present in pst and iwd1
 	// for remapping palette
-	ieByte ColorsCount;
-	ieWord Colors[7];
-	ieByte ColorPlacements[7];
+//	ieByte ColorsCount;
+//	ieWord Colors[7];
+//	ieByte ColorPlacements[7];
 
-	ieWord unknown2F2;
-	ieByte unknown2F4;
-	ieDword unknown2FC[5];
-	ieByte unknown310;
+//	ieWord unknown2F2;
+//	ieByte unknown2F4;
+//	ieDword unknown2FC[5];
+//	ieByte unknown310;
 
 	ieDword KnownSpellsOffset;
 	ieDword KnownSpellsCount;
@@ -122,8 +122,6 @@ public:
 	Inventory inventory;
 	Spellbook spellbook;
 public:
-	//this stuff don't get saved
-	CharAnimations* anims;
 
 	Actor *LastTalkedTo;
 	Actor *LastAttacker;
@@ -139,7 +137,13 @@ public:
 	int LastDamageType;
 
 private:
+	//this stuff don't get saved
+	CharAnimations* anims;
+
+	/* fixes the feet circle */
 	void SetCircleSize();
+	/* fixes the palette */
+	void SetupColors();
 public:
 	Actor(void);
 	~Actor(void);
@@ -147,7 +151,7 @@ public:
 	void DebugDump();
 	/** sets the actor's position, calculating with the nojump flag*/
 	void SetPosition(Map *map, unsigned int XPos, unsigned int YPos, int jump, int radius=0);
-	void SetAnimationID(unsigned short AnimID);
+	void SetAnimationID(unsigned int AnimID);
 	/** returns the animations */
 	CharAnimations* GetAnims();
 	/** Inits the Modified vector */
@@ -253,5 +257,9 @@ public:
 	bool Persistent();
 	/* schedules actor to die*/
 	void Die(Scriptable *killer);
+	/* debug function */
+	void GetNextAnimation();
+	/* debug function */
+	void GetNextStance();
 };
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.58 2004/08/20 13:03:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.59 2004/08/22 22:10:00 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -199,7 +199,7 @@ void Scriptable::ProcessActions()
 		playDeadCounter--;
 		if (!playDeadCounter) {
 			Moveble* mov = ( Moveble* ) MySelf;
-			mov->AnimID = IE_ANI_GET_UP;
+			mov->StanceID = IE_ANI_GET_UP;
 		}
 	}
 	if (WaitCounter) {
@@ -242,8 +242,8 @@ void Scriptable::ProcessActions()
 		}
 		if (Type == ST_ACTOR) {
 			Moveble* actor = ( Moveble* )this;
-			if (actor->AnimID == IE_ANI_DIE)
-				actor->AnimID = IE_ANI_GET_UP;
+			if (actor->StanceID == IE_ANI_DIE)
+				actor->StanceID = IE_ANI_GET_UP;
 		}
 		GameScript::ExecuteAction( this, CurrentAction );
 		neverExecuted = false;
@@ -367,7 +367,7 @@ Moveble::Moveble(ScriptableType type)
 	XDes = XPos;
 	YDes = YPos;
 	Orientation = 0;
-	AnimID = 0;
+	StanceID = 0;
 	path = NULL;
 	step = NULL;
 	timeStartStep = 0;
@@ -397,7 +397,7 @@ void Moveble::DoStep()
 		timeStartStep = time;
 	}
 	Orientation = step->orient;
-	AnimID = IE_ANI_WALK;
+	StanceID = IE_ANI_WALK;
 	XPos = ( step->x * 16 ) + 8;
 	YPos = ( step->y * 12 ) + 6;
 	if (!step->Next) {
@@ -486,7 +486,7 @@ void Moveble::ClearPath()
 	}
 	path = NULL;
 	step = NULL;
-	AnimID = IE_ANI_AWAKE;
+	StanceID = IE_ANI_AWAKE;
 	CurrentAction = NULL;
 }
 void Moveble::DrawTargetPoint()

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.109 2004/08/22 19:24:26 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.110 2004/08/22 22:10:01 avenger_teambg Exp $
  *
  */
 
@@ -77,6 +77,9 @@ Map::Map(void)
 {
 	vars = NULL;
 	tm = NULL;
+	LightMap = NULL;
+	SearchMap = NULL;
+	SmallMap = NULL;
 	MapSet = NULL;
 	queue[0] = NULL;
 	queue[1] = NULL;
@@ -121,8 +124,12 @@ Map::~Map(void)
 	for (i = 0; i < entrances.size(); i++) {
 		delete( entrances[i] );
 	}
-	core->FreeInterface( LightMap );
-	core->FreeInterface( SearchMap );
+	if (LightMap)
+		core->FreeInterface( LightMap );
+	if (SearchMap)
+		core->FreeInterface( SearchMap );
+	if (SmallMap)
+		core->FreeInterface( SmallMap );
 	for (i = 0; i < 3; i++) {
 		if (queue[i]) {
 			delete[] queue[i];
@@ -348,13 +355,13 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			CharAnimations* ca = actor->GetAnims();
 			if (!ca)
 				continue;
-			Animation* anim = ca->GetAnimation( actor->AnimID, actor->Orientation );
+			Animation* anim = ca->GetAnimation( actor->StanceID, actor->Orientation );
 			if (anim &&
 				anim->autoSwitchOnEnd &&
 				anim->endReached &&
-				anim->nextAnimID) {
-				actor->AnimID = anim->nextAnimID;
-				anim = ca->GetAnimation( actor->AnimID, actor->Orientation );
+				anim->nextStanceID) {
+				actor->StanceID =anim->nextStanceID;
+				anim = ca->GetAnimation( actor->StanceID, actor->Orientation );
 			}
 			if (( !actor->Modified[IE_NOCIRCLE] ) &&
 			    ( !( actor->Modified[IE_STATE_ID] & STATE_DEAD ) )) {
@@ -383,7 +390,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 					video->BlitSpriteTinted( nextFrame, ax + viewport.x,
 							ay + viewport.y, tint, &Screen );
 					if (anim->endReached && anim->autoSwitchOnEnd) {
-						actor->AnimID = anim->nextAnimID;
+						actor->StanceID = anim->nextStanceID;
 						anim->autoSwitchOnEnd = false;
 					}
 				}
@@ -442,9 +449,10 @@ void Map::AddAnimation(Animation* anim)
 
 void Map::AddActor(Actor* actor)
 {
+/*
 	CharAnimations* ca = actor->GetAnims();
 	if (ca) {
-		Animation* anim = ca->GetAnimation( actor->AnimID, actor->Orientation );
+		Animation* anim = ca->GetAnimation( actor->StanceID, actor->Orientation );
 		if (anim) {
 			Sprite2D* nextFrame = anim->NextFrame();
 			if (actor->lastFrame != nextFrame) {
@@ -458,6 +466,7 @@ void Map::AddActor(Actor* actor)
 			}
 		}
 	}
+*/
 	//setting the current area for the actor as this one
 	memcpy(actor->Area, scriptName, 9);
 	actors.push_back( actor );
@@ -606,7 +615,7 @@ void Map::GenerateQueue(int priority)
 			case 0:
 				//Top Priority
 				 {
-					if (actor->AnimID != IE_ANI_SLEEP)
+					if (actor->StanceID != IE_ANI_SLEEP)
 						continue;
 				}
 				break;
@@ -614,7 +623,7 @@ void Map::GenerateQueue(int priority)
 			case 1:
 				//Normal Priority
 				 {
-					if (actor->AnimID == IE_ANI_SLEEP)
+					if (actor->StanceID == IE_ANI_SLEEP)
 						continue;
 				}
 				break;
@@ -665,7 +674,7 @@ Actor* Map::GetRoot(int priority)
 				child = rightChild;
 			}
 		}
-		//if((node->YPos > child->YPos) || (child->AnimID == IE_ANI_SLEEP)) {
+		//if((node->YPos > child->YPos) || (child->StanceID == IE_ANI_SLEEP)) {
 		if (node->YPos > child->YPos) {
 			queue[priority][lastPos - 1] = child;
 			queue[priority][childPos] = node;
@@ -748,37 +757,7 @@ void Map::DebugDump()
 	printf( "DebugDump of Area %s:\n", scriptName );
 }
 
-/********************************************************************************/
-/*
-Map::PathFinder(void)
-{
-	MapSet = NULL;
-	area = NULL;
-	if (!PathFinderInited) {
-		InitPathFinder();
-	}
-}
-
-
-Map::~PathFinder(void)
-{
-	if (MapSet) {
-		free(MapSet);
-	}
-}
-
-void Map::SetMap()
-{
-	if(area==newarea) {
-		return;
-	}
-	if (MapSet) {
-		free(MapSet);
-	}
-	area=newarea;
-	sMap=area->SearchMap;
-}
-*/
+/******************************************************************************/
 
 void Map::Leveldown(unsigned int px, unsigned int py,
 	unsigned int& level, unsigned int& nx, unsigned int& ny,

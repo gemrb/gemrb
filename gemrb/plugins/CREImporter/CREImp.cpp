@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.42 2004/08/20 13:14:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.43 2004/08/22 22:09:59 avenger_teambg Exp $
  *
  */
 
@@ -169,8 +169,7 @@ Actor* CREImp::GetActor()
 	act->SetText( poi, 1 );
 	free( poi );
 	act->BaseStats[IE_VISUALRANGE] = 30; //this is just a hack
-	str->Read( &act->BaseStats[IE_MC_FLAGS], 2 );
-	str->Seek( 2, GEM_CURRENT_POS );
+	str->Read( &act->BaseStats[IE_MC_FLAGS], 4 );
 	str->Read( &act->BaseStats[IE_XPVALUE], 4 );
 	str->Read( &act->BaseStats[IE_XP], 4 );
 	str->Read( &act->BaseStats[IE_GOLD], 4 );
@@ -224,9 +223,9 @@ Actor* CREImp::GetActor()
 			Inventory_Size=0;
 			printf("Unknown creature signature!\n");
 	}
-	act->SetAnimationID( ( unsigned short ) act->BaseStats[IE_ANIMATION_ID] );
 	// Reading inventory, spellbook, etc
 	ReadInventory(act, Inventory_Size);
+	act->SetAnimationID( ( ieWord ) act->BaseStats[IE_ANIMATION_ID] );
 	return act;
 }
 
@@ -311,13 +310,22 @@ void CREImp::GetActorPST(Actor *act)
 	str->Read(KillVar,32);
 	str->Read(&tmp,3); // dialog radius, feet circle size???
 
-	str->Read( &act->ColorsCount, 1 );
+	ieByte ColorsCount;
+
+	str->Read( &ColorsCount, 1 );
+
 	str->Read( &act->AppearanceFlags1, 2 );
 	str->Read( &act->AppearanceFlags2, 2 );
 
-	for (i = 0; i < 7; i++)
-		str->Read( &act->Colors[i], 2 );
+	for (i = 0; i < 7; i++) {
+		ieWord tmp;
+		str->Read( &tmp, 2 );
+		act->BaseStats[IE_COLORS+i] = tmp;
+	}
+	act->BaseStats[IE_COLORCOUNT] = ColorsCount; //hack
 
+	str->Seek(31, GEM_CURRENT_POS);
+/*
 	str->Read( &act->unknown2F2, 2 );
 	str->Read( &act->unknown2F4, 1 );
 
@@ -328,8 +336,7 @@ void CREImp::GetActorPST(Actor *act)
 		str->Read( &act->unknown2FC[i], 4 );
 	}
 	str->Read( &act->unknown310, 1 );
-
-
+*/
 	str->Read( &act->BaseStats[IE_SPECIES], 1 ); // offset: 0x311
 	str->Read( &act->BaseStats[IE_TEAM], 1 );
 	str->Read( &act->BaseStats[IE_FACTION], 1 );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.202 2004/08/21 15:02:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.203 2004/08/22 22:10:01 avenger_teambg Exp $
  *
  */
 
@@ -1077,7 +1077,7 @@ bool Interface::LoadGemRBINI()
 		strcpy( Palette256, s );
 
 
-	SetFeature( ini->GetKeyAsInt( "resources", "OneByteAnimationID", 1 ), GF_ONE_BYTE_ANIMID );
+	SetFeature( ini->GetKeyAsInt( "resources", "OneByteAnimationID", 0 ), GF_ONE_BYTE_ANIMID );
 	SetFeature( ini->GetKeyAsInt( "resources", "IgnoreButtonFrames", 1 ), GF_IGNORE_BUTTON_FRAMES );
 	SetFeature( ini->GetKeyAsInt( "resources", "AllStringsTagged", 1 ), GF_ALL_STRINGS_TAGGED );
 	SetFeature( ini->GetKeyAsInt( "resources", "HasDPLAYER", 0 ), GF_HAS_DPLAYER );
@@ -1159,8 +1159,7 @@ ScriptEngine* Interface::GetGUIScriptEngine()
 int Interface::LoadCreature(char* ResRef, int InParty)
 {
 	ActorMgr* actormgr = ( ActorMgr* ) GetInterface( IE_CRE_CLASS_ID );
-	DataStream* stream = GetResourceMgr()->GetResource( ResRef,
-											IE_CRE_CLASS_ID );
+	DataStream* stream = GetResourceMgr()->GetResource( ResRef, IE_CRE_CLASS_ID );
 	if (!actormgr->Open( stream, true )) {
 		FreeInterface( actormgr );
 		return 0;
@@ -1171,9 +1170,9 @@ int Interface::LoadCreature(char* ResRef, int InParty)
 	//both fields are of length 9, make this sure!
 	memcpy(actor->Area, GetGame()->CurrentArea, 9);
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
-		actor->AnimID = IE_ANI_SLEEP;
+		actor->StanceID = IE_ANI_SLEEP;
 	} else {
-		actor->AnimID = IE_ANI_AWAKE;
+		actor->StanceID = IE_ANI_AWAKE;
 	}
 	actor->Orientation = 0;
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.24 2004/08/18 22:43:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.25 2004/08/22 22:10:01 avenger_teambg Exp $
  *
  */
 
@@ -39,6 +39,14 @@
 #define GEM_EXPORT
 #endif
 
+#define AV_PREFIX1      0
+#define AV_PREFIX2      1
+#define AV_PREFIX3      2
+#define AV_PREFIX4      3
+#define AV_ANIMTYPE     4
+#define AV_CIRCLESIZE   5
+#define AV_USE_PALETTE  6
+
 #define MAX_ORIENT				16
 #define MAX_ANIMS				19
 
@@ -58,11 +66,12 @@
 #define IE_ANI_ATTACK_JAB		13
 #define IE_ANI_EMERGE			14
 #define IE_ANI_HIDE			15
+#define IE_ANI_RUN			15 //pst has no hide, i hope 
 #define IE_ANI_SLEEP			16
 #define IE_ANI_GET_UP			17
 #define IE_ANI_PST_START		18
-#define IE_ANI_PST_RUN			19
 
+//BG2, IWD animation types
 #define IE_ANI_CODE_MIRROR		0
 #define IE_ANI_ONE_FILE			1
 #define IE_ANI_FOUR_FILES		2
@@ -73,9 +82,13 @@
 #define IE_ANI_CODE_MIRROR_3	7
 #define IE_ANI_ONE_FILE_3		8
 #define IE_ANI_TWO_FILES_3		9
-#define IE_ANI_PST_ANIMATION_1	10
-#define IE_ANI_PST_GHOST		11
 
+//PST animation types
+#define IE_ANI_PST_ANIMATION_1		16   //full animation
+#define IE_ANI_PST_GHOST		17   //no orientations
+#define IE_ANI_PST_STAND		18   //has orientations
+
+//armour levels
 #define IE_ANI_NO_ARMOR			0
 #define IE_ANI_LIGHT_ARMOR		1
 #define IE_ANI_MEDIUM_ARMOR		2
@@ -89,57 +102,43 @@
 #define IE_ANI_RANGED_XBOW		1
 #define IE_ANI_RANGED_THROW		2
 
+typedef struct AvatarStruct {
+	unsigned int AnimID;
+	ieResRef Prefixes[4];
+	unsigned short AnimationType;
+	unsigned char CircleSize;
+	unsigned char PaletteType;
+} AvatarStruct;
 
 class GEM_EXPORT CharAnimations {
 private:
 	Animation* Anims[MAX_ANIMS][MAX_ORIENT];
 public:
-	// DEBUG: palette before replacing personalized/random colors
-	Color OrigPalette[256];
-	// palette with replaced colors 
-	Color Palette[256];
-	unsigned long LoadedFlag, RowIndex;
-	unsigned char OrientCount, MirrorType;
+	Color *Palette;   //this is the palette
+	ieDword *Colors;  //these are the custom color indices
+	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
-	unsigned char CircleSize;
-	bool DrawCircle;
 	char ResRef[9];
-	TableMgr* Avatars;
-	bool UsePalette;
 public:
-	CharAnimations(char* BaseResRef, unsigned char OrientCount,
-		unsigned char MirrorType, int RowIndex);
+	CharAnimations(unsigned int AnimID, ieDword ArmourLevel);
 	~CharAnimations(void);
-	Animation* GetAnimation(unsigned char AnimID, unsigned char Orient);
-	void SetNewPalette(Color* Pal)
-	{
-		memcpy( OrigPalette, Palette, 256 * sizeof( Color ) );
-		memcpy( Palette, Pal, 256 * sizeof( Color ) );
-		for (int i = 0; i < MAX_ANIMS; i++) {
-			for (int j = 0; j < 16; j++) {
-				if (Anims[i][j]) {
-					Anims[i][j]->ChangePalette = true;
-				}
-			}
-		}
-	}
-	// DEBUG: swap original (before color replace) and current palettes
-	void SwapPalettes()
-	{
-		Color TmpPal[256];
-		memcpy( TmpPal, Palette, 256 * sizeof( Color ) );
-		memcpy( Palette, OrigPalette, 256 * sizeof( Color ) );
-		memcpy( OrigPalette, TmpPal, 256 * sizeof( Color ) );
 
-		for (int i = 0; i < MAX_ANIMS; i++) {
-			for (int j = 0; j < 16; j++) {
-				if (Anims[i][j]) {
-					Anims[i][j]->ChangePalette = true;
-				}
-			}
-		}
-	}
+	Animation* GetAnimation(unsigned char Stance, unsigned char Orient);
+	void SetArmourLevel(int ArmourLevel);
+	void SetupColors(ieDword *Colors);
+public: //attribute functions
+	static int GetAvatarsCount();
+	static AvatarStruct *GetAvatarStruct(int RowNum);
+	int GetCircleSize() const;
+	int NoPalette() const;
+	int GetAnimType() const;
+
 private:
+	void InitAvatarsTable();
+	void AddPSTSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void AddVHR2Suffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
 	void AddVHRSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddMHRSuffix(char* ResRef, unsigned char AnimID,

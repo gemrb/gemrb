@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.57 2004/08/20 15:54:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.58 2004/08/22 22:10:01 avenger_teambg Exp $
  *
  */
 
@@ -29,10 +29,10 @@ extern Interface* core;
 
 Game::Game(void) : Scriptable( ST_GLOBAL )
 {
+	SelectedSingle = 0; //the PC we are looking at (inventory, shop)
 	PartyGold = 0;
 	SetScript( core->GlobalScript, 0 );
 	MapIndex = -1;
-	SelectedSingle = 0;
 	Reputation = 0;
 	CombatCounter = 0; //stored here until we know better
 	globals = NULL;

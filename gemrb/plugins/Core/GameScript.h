@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.134 2004/08/20 15:55:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.135 2004/08/22 22:10:01 avenger_teambg Exp $
  *
  */
 
@@ -946,6 +946,7 @@ public:
 	static void ApplyDamage(Scriptable* Sender, Action* parameters);
 	static void ApplyDamagePercent(Scriptable* Sender, Action* parameters);
 	static void BattleSong(Scriptable* Sender, Action* parameters);
+	static void Berserk(Scriptable* Sender, Action* parameters);
 	static void BitClear(Scriptable* Sender, Action* parameters);
 	static void BitGlobal(Scriptable* Sender, Action* parameters);
 	static void ChangeAIScript(Scriptable* Sender, Action* parameters);
@@ -1078,6 +1079,7 @@ public:
 	static void NIDSpecial1(Scriptable* Sender, Action* parameters);
 	static void NoAction(Scriptable* Sender, Action* parameters);
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
+	static void Panic(Scriptable* Sender, Action* parameters);
 	static void PickPockets(Scriptable* Sender, Action* parameters);
 	static void PlayDead(Scriptable* Sender, Action* parameters);
 	static void PlayDeadInterruptable(Scriptable* Sender, Action* parameters);
@@ -1170,6 +1172,7 @@ public:
 	static void VerbalConstant(Scriptable* Sender, Action* parameters);
 	static void VerbalConstantHead(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);
+	static void WaitAnimation(Scriptable* Sender, Action* parameters);
 	static void WaitRandom(Scriptable* Sender, Action* parameters);
 	static void XEquipItem(Scriptable *Sender, Action *parameters);
 public:
@@ -1217,6 +1220,7 @@ public:
 	static Targets *SixthNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *SixthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *StrongestOf(Scriptable *Sender, Targets *parameters);
+	static Targets *StrongestOfMale(Scriptable *Sender, Targets *parameters);
 	static Targets *TenthNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *TenthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *ThirdNearest(Scriptable *Sender, Targets *parameters);

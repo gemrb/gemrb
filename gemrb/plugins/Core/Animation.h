@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.12 2004/05/25 16:16:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.13 2004/08/22 22:10:00 avenger_teambg Exp $
  *
  */
 
@@ -51,7 +51,7 @@ private:
 public:
 	bool Active;
 	char ResRef[9];
-	unsigned char nextAnimID;
+	unsigned char nextStanceID;
 	bool autoSwitchOnEnd;
 	bool endReached;
 	unsigned int pos;

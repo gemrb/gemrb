@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.66 2004/08/22 19:24:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.67 2004/08/22 22:09:54 avenger_teambg Exp $
  *
  */
 
@@ -512,7 +512,6 @@ Map* AREImp::GetMap(const char *ResRef)
 			ab->YPos = YPos;
 			ab->XDes = XDes;
 			ab->YDes = YDes;
-			ab->AnimID = IE_ANI_AWAKE;
 			//copying the area name into the actor
 			strcpy(ab->Area, map->scriptName);
 			//copying the scripting name into the actor
@@ -522,7 +521,10 @@ Map* AREImp::GetMap(const char *ResRef)
 			}
 	
 			if (ab->BaseStats[IE_STATE_ID] & STATE_DEAD)
-				ab->AnimID = IE_ANI_SLEEP;
+				ab->StanceID = IE_ANI_SLEEP;
+			else
+				ab->StanceID = IE_ANI_AWAKE;
+			
 			ab->Orientation = ( unsigned char ) Orientation;
 			ab->TalkCount = TalkCount;
 			//hack to not load global actors to area

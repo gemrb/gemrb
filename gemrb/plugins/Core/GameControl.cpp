@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.164 2004/08/20 13:03:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.165 2004/08/22 22:10:01 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -349,6 +349,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		video->DrawRect( point, red );
 	}
 
+/*
 	// Draw actor's palettes
 	if ((DebugFlags & DEBUG_SHOW_PALETTES) && lastActor) {
 		int i;
@@ -364,6 +365,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			video->DrawRect( rgn, Pal2[i], true, false);
 		}
 	}
+*/
 }
 /** Sets the Text of the current control, unused here */
 int GameControl::SetText(const char* /*string*/, int /*pos*/)
@@ -495,7 +497,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 
 			case 'p':
-				//'p'
+				//path
 				 {
 					short GameX = lastMouseX, GameY = lastMouseY;
 					core->GetVideoDriver()->ConvertToGame( GameX, GameY );
@@ -515,17 +517,28 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				}
 				break;
 
-			case 's':
-				// s
+			case 'o': 
+				// origin
 				 {
 					pfsX = lastMouseX; 
 					pfsY = lastMouseY;
 					core->GetVideoDriver()->ConvertToGame( pfsX, pfsY );
 				}
 				break;
-
+/*
+			case 'a':
+				//animation
+				if (lastActor)
+					lastActor->GetNextAnimation();
+				break;
+*/
+			case 's':
+				//stance
+				if (lastActor)
+					lastActor->GetNextStance();
+				break;
 			case 'j':
-				// j
+				// jump
 					for (i = 0; i < selected.size(); i++) {
 						Actor* actor = selected[i];
 						short cX = lastMouseX; 
@@ -537,7 +550,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 
 			case 'm':
-				// 'm'
+				// 'm' ? debugdump
 				if (lastActor) {
 					lastActor->DebugDump();
 					return;
@@ -557,7 +570,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				core->GetGame()->GetCurrentMap()->DebugDump();
 				break;
 			case 'x':
-				// 'x'
+				// shows coordinates
 				 {
 					Game* game = core->GetGame();
 					Map* area = game->GetCurrentMap( );
@@ -567,7 +580,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					printf( "%s [%d.%d]\n", area->scriptName, cX, cY );
 				}
 				break;
-			case 'y':
+			case 'y': //kills actor
 				if (lastActor) {
 					//using action so the actor is killed
 					//correctly (synchronisation)
@@ -575,31 +588,6 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					char Tmp[40];
 					strncpy(Tmp,"Kill(Myself)",sizeof(Tmp) );
 					lastActor->AddAction( GameScript::GenerateAction(Tmp) );
-				}
-				break;
-			case 'z':
-				if (lastActor) {
-					int i;
-
-					printf( "Appearance flags: 0x%04x : 0x%04x\n", lastActor->AppearanceFlags1, lastActor->AppearanceFlags2 );
-					printf( "Unknowns: %04x %02x %02x", lastActor->unknown2F2, lastActor->unknown2F4, lastActor->unknown310 );
-					for (i=0; i < 5; i++) {
-						printf(" %04x", lastActor->unknown2FC[i]);
-					}
-					printf("\n");
-					printf( "Num of colors: %d\n", lastActor->ColorsCount );
-					for (i=0; i < lastActor->ColorsCount; i++) {
-						printf( "  Color: %3d  Place: %3d\n", lastActor->Colors[i], lastActor->ColorPlacements[i] );
-					}
-					printf("Skin    : %d/%d\n", lastActor->BaseStats[IE_SKIN_COLOR], lastActor->Modified[IE_SKIN_COLOR]);
-					printf("Hair    : %d/%d\n", lastActor->BaseStats[IE_HAIR_COLOR], lastActor->Modified[IE_HAIR_COLOR]);
-					printf("Mj Cloth: %d/%d\n", lastActor->BaseStats[IE_MAJOR_COLOR], lastActor->Modified[IE_MAJOR_COLOR]);
-					printf("Mi Cloth: %d/%d\n", lastActor->BaseStats[IE_MINOR_COLOR], lastActor->Modified[IE_MINOR_COLOR]);
-					printf("Armor   : %d/%d\n", lastActor->BaseStats[IE_ARMOR_COLOR], lastActor->Modified[IE_ARMOR_COLOR]);
-					printf("Metal   : %d/%d\n", lastActor->BaseStats[IE_METAL_COLOR], lastActor->Modified[IE_METAL_COLOR]);
-					printf("Leather : %d/%d\n", lastActor->BaseStats[IE_LEATHER_COLOR], lastActor->Modified[IE_LEATHER_COLOR]);
-					printf( "\n" );
-					lastActor->anims->SwapPalettes();
 				}
 				break;
 			case '4':

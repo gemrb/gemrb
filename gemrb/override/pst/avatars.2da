@@ -1,59 +1,101 @@
 2DA V1.0
 *
-           AT_1       AT_2       AT_3       AR_4       MIRROR_TYPE ORIENT     SPACE      ATTACK     AWAKE      CAST       CONJURE    DAMAGE     DIE        HEAD_TURN  READY      SHOOT      TWITCH     WALK       SLASH      BACKSLASH  JAB        EMERGE     HIDE       SLEEP      NO_PALETTE 
-0x6002     DANNB      DANNB      DANNB      DANNB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0x6006     DCTHB      DCTHB      DCTHB      DCTHB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x600A     DCTFB      DCTFB      DCTFB      DCTFB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x600B     DCTMB      DCTMB      DCTMB      DCTMB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x600D     DDKKB      DDKKB      DDKKB      DDKKB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0x6013     DDTFB      DDTFB      DDTFB      DDTFB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0          
-0x6014     DDTMB      DDTMB      DDTMB      DDTMB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0          
-0x6015     CEBBB      CEBBB      CEBBB      CEBBB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0x601D     DGYTB      DGYTB      DGYTB      DGYTB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0          
-0x602A     DMHTB      DMHTB      DMHTB      DMHTB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x6032     CNOFB      CNOFB      CNOFB      CNOFB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0x603C     DSKWB      DSKWB      DSKWB      DSKWB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x603D     DHLFB      DHLFB      DHLFB      DHLFB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0          
-0x603E     DHLMB      DHLMB      DHLMB      DHLMB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x603F     DHUFB      DHUFB      DHUFB      DHUFB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x6040     DHUMB      DHUMB      DHUMB      DHUMB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x6047     DVHAB      DVHAB      DVHAB      DVHAB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0x6048     DWREB      DWREB      DWREB      DWREB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x604B     DZMFB      DZMFB      DZMFB      DZMFB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x604C     DZMMB      DZMMB      DZMMB      DZMMB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x6054     DTLRB      DTLRB      DTLRB      DTLRB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0x6058     DMIDB      DMIDB      DMIDB      DMIDB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0xE000     CABSB      CABSB      CABSB      CABSB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE001     CADVB      CADVB      CADVB      CADVB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE002     DANNB      DANNB      DANNB      DANNB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE003     CBAUB      CBAUB      CBAUB      CBAUB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE004     CCAMB      CCAMB      CCAMB      CCAMB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE005     CCOLB      CCOLB      CCOLB      CCOLB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE006     DCTHB      DCTHB      DCTHB      DCTHB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE007     CCORB      CCORB      CCORB      CCORB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE008     CCRNB      CCRNB      CCRNB      CCRNB      10	   5          1          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE009     CCGDB      CCGDB      CCGDB      CCGDB      10	   5          3          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE00A     DCTFB      DCTFB      DCTFB      DCTFB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE00B     DCTMB      DCTMB      DCTMB      DCTMB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE00C     CDABB      CDABB      CDABB      CDABB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE00D     DDKKB      DDKKB      DDKKB      DDKKB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE00E     CDEIB      CDEIB      CDEIB      CDEIB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE00F     CDHLB      CDHLB      CDHLB      CDHLB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE010     DHKMB      DHKMB      DHKMB      DHKMB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE011     CLKMB      CLKMB      CLKMB      CLKMB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE012     CWIZB      CWIZB      CWIZB      CWIZB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE013     DDTFB      DDTFB      DDTFB      DDTFB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE014     DDTMB      DDTMB      DDTMB      DDTMB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE015     CEBBB      CEBBB      CEBBB      CEBBB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE016     CFFGB      CFFGB      CFFGB      CFFGB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE017     CFHJB      CFHJB      CFHJB      CFHJB      10	   5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE021     CGRIB      CGRIB      CGRIB      CGRIB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE022     CGRKB      CGRKB      CGRKB      CGRKB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE024     CIGYB      CIGYB      CIGYB      CIGYB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE02D     CMDRB      CMDRB      CMDRB      CMDRB      10          5          3          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE02E     CMRTB      CMRTB      CMRTB      CMRTB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE034     CNDMB      CNDMB      CNDMB      CNDMB      10          5          3          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE03A     CARMB      CARMB      CARMB      CARMB      10          5          3          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1          
-0xE043     CTREB      CTREB      CTREB      CTREB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          1
-0xE046     CVGYB      CVGYB      CVGYB      CVGYB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
-0xE04C     DZMMB      DZMMB      DZMMB      DZMMB      10          5          2          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          *          0
+           AT_1       AT_2       AT_3       AR_4       MIRROR_TYPE SPACE      
+0x00       CABSB      CABSB      CABSB      CABSB      16          2          
+0x01       CADVB      CADVB      CADVB      CADVB      16          2          
+0x02       DANNB      DANNB      DANNB      DANNB      16          2          
+0x03       CBAUB      CBAUB      CBAUB      CBAUB      16          2          
+0x04       CCAMB      CCAMB      CCAMB      CCAMB      16          2          
+0x05       CCOLB      CCOLB      CCOLB      CCOLB      16          2          
+0x06       DCTHB      DCTHB      DCTHB      DCTHB      16          2          
+0x07       CCORB      CCORB      CCORB      CCORB      16          2          
+0x08       CCRNB      CCRNB      CCRNB      CCRNB      16          1          
+0x09       CCGDB      CCGDB      CCGDB      CCGDB      16          3          
+0x0A       DCTFB      DCTFB      DCTFB      DCTFB      16          2          
+0x0B       DCTMB      DCTMB      DCTMB      DCTMB      16          2          
+0x0C       CDABB      CDABB      CDABB      CDABB      16          2          
+0x0D       DDKKB      DDKKB      DDKKB      DDKKB      16          2          
+0x0E       CDEIB      CDEIB      CDEIB      CDEIB      16          2          
+0x0F       CDHLB      CDHLB      CDHLB      CDHLB      16          2          
+0x10       DHKMB      DHKMB      DHKMB      DHKMB      16          2          
+0x11       CLKMB      CLKMB      CLKMB      CLKMB      16          2          
+0x12       CWIZB      CWIZB      CWIZB      CWIZB      16          2          
+0x13       DDTFB      DDTFB      DDTFB      DDTFB      16          2          
+0x14       DDTMB      DDTMB      DDTMB      DDTMB      16          2          
+0x15       CEBBB      CEBBB      CEBBB      CEBBB      16          2          
+0x16       CFFGB      CFFGB      CFFGB      CFFGB      16          2          
+0x17       CFHJB      CFHJB      CFHJB      CFHJB      16          2          
+0x18       CGARB      CGARB      CGARB      CGARB      16          2          
+0x19       DGHFB      DGHFB      DGHFB      DGHFB      16          2          
+0x1A       DGHMB      DGHMB      DGHMB      DGHMB      16          2          
+0x1B       CGSTB      CGSTB      CGSTB      CGSTB      16          2          
+0x1C       CACAB      CACAB      CACAB      CACAB      16          2          
+0x1D       DGYTB      DGYTB      DGYTB      DGYTB      16          2          
+0x1E       CGLAB      CGLAB      CGLAB      CGLAB      16          2          
+0x1F       DGODB      DGODB      DGODB      DGODB      16          2          
+0x20       CGDGB      CGDGB      CGDGB      CGDGB      16          2          
+0x21       CGRIB      CGRIB      CGRIB      CGRIB      16          2          
+0x22       CGRKB      CGRKB      CGRKB      CGRKB      16          2          
+0x24       CIGYB      CIGYB      CIGYB      CIGYB      16          2          
+0x25       CJBRB      CJBRB      CJBRB      CJBRB      16          2          
+0x26       CJFTB      CJFTB      CJFTB      CJFTB      16          2          
+0x27       CLOPB      CLOPB      CLOPB      CLOPB      16          2          
+0x28       CLEMB      CLEMB      CLEMB      CLEMB      16          2          
+0x29       CLTHB      CLTHB      CLTHB      CLTHB      16          2          
+0x2A       DMHTB      DMHTB      DMHTB      DMHTB      16          2          
+0x2B       CMKLB      CMKLB      CMKLB      CMKLB      16          2          
+0x2C       DMIDB      DMIDB      DMIDB      DMIDB      16          3          
+0x2D       CMDRB      CMDRB      CMDRB      CMDRB      16          3          
+0x2E       CMRTB      CMRTB      CMRTB      CMRTB      16          2          
+0x2F       DNOAB      DNOAB      DNOAB      DNOAB      16          2          
+0x30       DNOCB      DNOCB      DNOCB      DNOCB      16          2          
+0x31       DNODB      DNODB      DNODB      DNODB      16          2          
+0x32       DNOFB      DNOFB      DNOFB      DNOFB      16          2          
+0x33       DNOHB      DNOHB      DNOHB      DNOHB      16          2          
+0x34       CNDMB      CNDMB      CNDMB      CNDMB      16          2          
+0x35       CNPRB      CNPRB      CNPRB      CNPRB      16          2          
+0x36       CPHDB      CPHDB      CPHDB      CPHDB      16          2          
+0x37       DPROB      DPROB      DPROB      DPROB      16          2          
+0x38       DPUZB      DPUZB      DPUZB      DPUZB      16          2          
+0x39       CSM1B      CSM1B      CSM1B      CSM1B      16          2          
+0x3A       CARMB      CARMB      CARMB      CARMB      16          2          
+0x3B       DSPTB      DSPTB      DSPTB      DSPTB      16          2          
+0x3C       DSKWB      DSKWB      DSKWB      DSKWB      16          2          
+0x3D       DHLFB      DHLFB      DHLFB      DHLFB      16          2          
+0x3E       DHLMB      DHLMB      DHLMB      DHLMB      16          2          
+0x3F       DHUFB      DHUFB      DHUFB      DHUFB      16          2          
+0x40       DHUMB      DHUMB      DHUMB      DHUMB      16          2          
+0x41       CTRZB      CTRZB      CTRZB      CTRZB      16          2          
+0x42       CTGTB      CTGTB      CTGTB      CTGTB      16          2          
+0x43       CTREB      CTREB      CTREB      CTREB      16          2          
+0x44       CTRSB      CTRSB      CTRSB      CTRSB      16          2          
+0x45       CTRCB      CTRCB      CTRCB      CTRCB      16          2          
+0x46       CVGYB      CVGYB      CVGYB      CVGYB      16          2          
+0x47       DVHAB      DVHAB      DVHAB      DVHAB      16          2          
+0x48       DWREB      DWREB      DWREB      DWREB      16          2          
+0x49       DWRMB      DWRMB      DWRMB      DWRMB      16          2          
+0x4A       CWURB      CWURB      CWURB      CWURB      16          2          
+0x4B       DZMFB      DZMFB      DZMFB      DZMFB      16          2          
+0x4C       DZMMB      DZMMB      DZMMB      DZMMB      16          2          
+0x4D       CFELB      CFELB      CFELB      CFELB      16          2          
+0x4E       CSM2B      CSM2B      CSM2B      CSM2B      16          2          
+0x4F       CSM3B      CSM3B      CSM3B      CSM3B      16          2          
+0x50       DTHKB      DTHKB      DTHKB      DTHKB      16          2          
+0x51       DNOSB      DNOSB      DNOSB      DNOSB      16          2          
+0x52       DNOZB      DNOZB      DNOZB      DNOZB      16          2          
+0x53       DTFFB      DTFFB      DTFFB      DTFFB      16          2          
+0x54       DTLRB      DTLRB      DTLRB      DTLRB      16          2          
+0x55       DTFMB      DTFMB      DTFMB      DTFMB      16          2          
+0x56       DBAUB      DBAUB      DBAUB      DBAUB      16          2          
+0x57       CHARB      CHARB      CHARB      CHARB      16          2          
+0x58       DMIDB      DMIDB      DMIDB      DMIDB      16          2          
+0x59       DAAFB      DAAFB      DAAFB      DAAFB      16          2          
+0x5A       CGABB      CGABB      CGABB      CGABB      16          2          
+0x5B       CRABB      CRABB      CRABB      CRABB      16          2          
+0x5C       DTWZB      DTWZB      DTWZB      DTWZB      16          2          
+0x5D       DNOMB      DNOMB      DNOMB      DNOMB      16          2          
+0x5E       CUHDB      CUHDB      CUHDB      CUHDB      18          2          
+0x5F       DQUIB      DQUIB      DQUIB      DQUIB      18          2          
+0x60       CTRDB      CTRDB      CTRDB      CTRDB      18          2          
+0x61       DNOFB      DNOFB      DNOFB      DNOFB      16          2          
+0x62       DVHSTD     DVHSTD     DVHSTD     DVHSTD     17          2          
