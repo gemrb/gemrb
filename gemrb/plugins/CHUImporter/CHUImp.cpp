@@ -22,6 +22,7 @@
 #include "../Core/Slider.h"
 #include "../Core/ScrollBar.h"
 #include "../Core/AnimationMgr.h"
+#include "../Core/TextArea.h"
 #include "../../includes/RGBAColor.h"
 
 CHUImp::CHUImp(){
@@ -189,6 +190,40 @@ Window * CHUImp::GetWindow(unsigned long i)
 				sldr->SetImage(IE_GUI_SLIDER_GRABBEDKNOB, img);
 				win->AddControl(sldr);
 			}
+			break;
+
+			case 5: { //Text Area
+				char FontResRef[8], InitResRef[8];
+				RevColor fore, init, back;
+				str->Read(FontResRef, 8);
+				str->Read(InitResRef, 8);
+				Font * fnt = core->GetFont(FontResRef);
+				Font * ini = core->GetFont(InitResRef);
+				str->Read(&fore, 4);
+				str->Read(&init, 4);
+				str->Read(&back, 4);
+				Color f,i,b;
+				f.r = fore.r;
+				f.g = fore.g;
+				f.b = fore.b;
+				i.r = init.r;
+				i.g = init.g;
+				i.b = init.b;
+				b.r = back.r;
+				b.g = back.g;
+				b.b = back.b;
+				TextArea * ta = new TextArea(f, i, b);
+				ta->ControlID = ControlID;
+				ta->XPos = XPos;
+				ta->YPos = YPos;
+				ta->Width = Width;
+				ta->Height = Height;
+				ta->ControlType = ControlType;
+				ta->SetFonts(ini, fnt);
+				ta->SetText((unsigned char*)("Text Area (Temp Value)"));				
+				win->AddControl(ta);
+			}
+			break;
 
 			case 6: { //Label
 				char FontResRef[8];
@@ -210,11 +245,14 @@ Window * CHUImp::GetWindow(unsigned long i)
 				lab->ControlType = ControlType;
 				char * str = core->GetString(StrRef);
 				lab->SetText(str);
-				Color f;
+				Color f,b;
 				f.r = fore.r;
 				f.g = fore.g;
 				f.b = fore.b;
-				lab->SetColor(f);
+				b.r = back.r;
+				b.g = back.g;
+				b.b = back.b;
+				lab->SetColor(f, b);
 				if((alignment & (1<<4)) != 0)
 					lab->SetAlignment(IE_FONT_ALIGN_RIGHT);
 				else if((alignment & (1<<2)) != 0)
