@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.24 2004/01/02 16:18:05 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.25 2004/01/02 19:18:15 balrog994 Exp $
  *
  */
 
@@ -112,8 +112,14 @@ bool MUSImp::OpenPlaylist(const char * name)
 			}
 			pls.PLTag[p]=0;
 			p=0;
-			i++;
-			if((line[i]==' ') || (line[i]=='\t'))
+			while(i < len) {
+				if((line[i]==' ') || (line[i]=='\t'))
+					i++;
+				else {
+					break;
+				}
+			}
+			if(line[i]=='@')
 				strcpy(pls.PLLoop, pls.PLTag);
 			else {
 				while(i < len) {
@@ -139,10 +145,16 @@ bool MUSImp::OpenPlaylist(const char * name)
 		while(i < len) {
 			if((line[i]!=' ') && (line[i]!='\t'))
 				i++;
-			else
+			else {
+				while(i < len) {
+					if((line[i]==' ') || (line[i]=='\t'))
+						i++;
+					else
+						break;
+				}
 				break;
+			}
 		}
-		i++;
 		while(i < len) {
 			if((line[i]!=' ') && (line[i]!='\t'))
 				pls.PLEnd[p++] = line[i++];
@@ -172,6 +184,8 @@ void MUSImp::Start()
 		}
 		else {
 			PLnext=PLpos+1;
+			if(PLnext >= playlist.size())
+				PLnext = -1;
 		}
 		PlayMusic(PLpos);
 		core->GetSoundMgr()->Play();
@@ -186,7 +200,8 @@ void MUSImp::End()
 		if(playlist.size()==0)
 			return;
 		if(playlist[PLpos].PLEnd[0] != 0) {
-			PlayMusic(playlist[PLpos].PLEnd);
+			if(stricmp(playlist[PLpos].PLEnd, "end") != 0)
+				PlayMusic(playlist[PLpos].PLEnd);
 		}
 		PLnext = -1;
 	}
@@ -237,12 +252,16 @@ void MUSImp::PlayNext()
 
 void MUSImp::PlayMusic(int pos)
 {
-	PlayMusic(playlist[pos].PLFile);
+	if(stricmp(playlist[pos].PLFile, "LOOP") != 0) {
+		PlayMusic(playlist[pos].PLFile);
+	} else {
+		PlayMusic(playlist[pos].PLLoop);
+	}	
 }
 
 void MUSImp::PlayMusic(char *name)
 {
-	char FName[_MAX_PATH];
+	char FName[_MAX_PATH], tmp[32];
 	strcpy(FName, core->GamePath);
 	strcat(FName, musicsubfolder);
 	strcat(FName, SPathDelimiter);
@@ -250,8 +269,7 @@ void MUSImp::PlayMusic(char *name)
 	if(strnicmp(name, "mx0000",6)==0) {
 		strcat(FName, "mx0000");
 		strcat(FName, SPathDelimiter);
-	}
-	else if(strnicmp(name, "SPC",3) != 0) {
+	} else if(strnicmp(name, "SPC",3) != 0) {
 		strcat(FName, PLName);
 		strcat(FName, SPathDelimiter);
 		strcat(FName, PLName);
