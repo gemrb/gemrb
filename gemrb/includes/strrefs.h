@@ -1,3 +1,5 @@
+// these symbols should match strings.2da
+
 #define STR_WHOLEPARTY     0
 #define STR_DOORLOCKED     1
 #define STR_MAGICTRAP      2
