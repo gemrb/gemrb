@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.30 2004/05/09 17:36:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.31 2004/07/25 13:34:30 edheldil Exp $
  *
  */
 
@@ -51,6 +51,8 @@ Font::Font(int w, int h, void* palette, bool cK, int index)
 	lastX = 0;
 	count = 0;
 	void* pixels = malloc( w* h );
+	memset( xPos, 0, sizeof( xPos) );
+	memset( yPos, 0, sizeof( yPos) );
 	sprBuffer = core->GetVideoDriver()->CreateSprite8( w, h, 8, pixels, palette, cK, index );
 	this->palette = core->GetVideoDriver()->GetPalette( sprBuffer );
 	maxHeight = h;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.22 2004/05/25 16:16:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.23 2004/07/25 13:34:29 edheldil Exp $
  *
  */
 
@@ -291,31 +291,54 @@ Font* BAMImp::GetFont()
   unsigned int i;
 
 	int w = 0, h = 0;
-	for (i = 0; i < CyclesCount; i++) {
-		unsigned int index = cycles[i].FirstFrame;
-		if (index >= FramesCount)
-			continue;
+	unsigned int Count;
+
+	// Numeric fonts have all frames in single cycle
+	if (CyclesCount > 1) {
+		Count = CyclesCount;
+	} else {
+		Count = FramesCount;
+	}
+
+	for (i = 0; i < Count; i++) {
+		unsigned int index;
+		if (CyclesCount > 1) {
+			index = cycles[i].FirstFrame;
+			if (index >= FramesCount)
+				continue;
+		} else {
+			index = i;
+		}
+
 		//printf("[index = %d, w = %d, h = %d]\n", index, frames[index].Width, frames[index].Height);
 		if (frames[index].Width > w)
 			w = frames[index].Width;
 		if (frames[index].Height > h)
 			h = frames[index].Height;
 	}
-	Font* fnt = new Font( w*( int ) CyclesCount, h, Palette, true, 0 );
-	for (i = 0; i < CyclesCount; i++) {
-		if (cycles[i].FirstFrame >= FramesCount) {
-			fnt->AddChar( NULL, 0, 0, 0, 0 );
-			continue;
+
+	Font* fnt = new Font( w*( int ) Count, h, Palette, true, 0 );
+	for (i = 0; i < Count; i++) {
+		unsigned int index;
+		if (CyclesCount > 1) {
+			index = cycles[i].FirstFrame;
+			if (index >= FramesCount) {
+				fnt->AddChar( NULL, 0, 0, 0, 0 );
+				continue;
+			}
+		} else {
+			index = i;
 		}
-		void* pixels = GetFramePixels( cycles[i].FirstFrame );
+
+		void* pixels = GetFramePixels( index );
 		if( !pixels) {
 			fnt->AddChar( NULL, 0, 0, 0, 0 );
 			continue;
 		}
-		fnt->AddChar( pixels, frames[cycles[i].FirstFrame].Width,
-				frames[cycles[i].FirstFrame].Height,
-				frames[cycles[i].FirstFrame].XPos,
-				frames[cycles[i].FirstFrame].YPos );
+		fnt->AddChar( pixels, frames[index].Width,
+				frames[index].Height,
+				frames[index].XPos,
+				frames[index].YPos );
 		free( pixels );
 	}
 	return fnt;
