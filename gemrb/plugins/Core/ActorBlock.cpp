@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.67 2004/11/25 21:04:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.68 2005/01/30 16:23:08 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -116,8 +116,14 @@ void Scriptable::DisplayHeadText(const char* text)
 		free( overHeadText );
 	}
 	overHeadText = (char *) text;
-	GetTime( timeStartDisplaying );
-	textDisplaying = 1;
+	if (text) {
+		GetTime( timeStartDisplaying );
+		textDisplaying = 1;
+	}
+	else {
+		timeStartDisplaying = 0;
+		textDisplaying = 0;
+	}
 }
 
 void Scriptable::SetScriptName(const char* text)

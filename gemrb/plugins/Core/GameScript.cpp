@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.221 2005/01/30 15:55:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.222 2005/01/30 16:23:08 avenger_teambg Exp $
  *
  */
 
@@ -400,6 +400,7 @@ static ActionLink actionnames[] = {
 	{"jumptopointinstant", GameScript::JumpToPointInstant,0},
 	{"jumptosavedlocation", GameScript::JumpToSavedLocation,0},
 	{"kill", GameScript::Kill,0},
+	{"killfloatmessage", GameScript::KillFloatMessage,0},
 	{"leavearea", GameScript::LeaveAreaLUA,0}, //so far the same
 	{"leavearealua", GameScript::LeaveAreaLUA,0},
 	{"leavearealuaentry", GameScript::LeaveAreaLUAEntry,0},
@@ -5926,6 +5927,15 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 	}
 
 	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
+}
+
+void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[0] );
+	if(!target) {
+		target=Sender;
+	}
+	target->DisplayHeadText(NULL);
 }
 
 void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* parameters)
