@@ -15,18 +15,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.1 2003/12/18 20:20:52 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.2 2003/12/23 23:34:51 balrog994 Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "DLGImp.h"
 #include "../Core/FileStream.h"
+#include "../Core/Interface.h"
 
 DLGImp::DLGImp(void)
 {
 	str = NULL;
 	autoFree = false;
+	Version = 0;
 }
 
 DLGImp::~DLGImp(void)
@@ -43,11 +45,132 @@ bool DLGImp::Open(DataStream * stream, bool autoFree)
 		delete(str);
 	str = stream;
 	this->autoFree = autoFree;
-	
+	char Signature[8];
+	str->Read(Signature, 8);
+	if(strnicmp(Signature, "DLG V1.0", 8) != 0) {
+		if(strnicmp(Signature, "DLGV1.09", 8) != 0) {
+			printMessage("DLGImporter", "Not a valid DLG File...", WHITE);
+			printStatus("ERROR", LIGHT_RED);
+			return false;
+		}
+		else {
+			Version = 109;
+		}
+	}
+	else {
+		Version = 10;
+	}
+	str->Read(&StatesCount, 4);
+	str->Read(&StatesOffset, 4);
+	str->Read(&TransitionsCount, 4);
+	str->Read(&TransitionsOffset, 4);
+	str->Read(&StateTriggersOffset, 4);
+	str->Read(&StateTriggersCount, 4);
+	str->Read(&TransitionTriggersOffset, 4);
+	str->Read(&TransitionTriggersCount, 4);
+	str->Read(&ActionsOffset, 4);
+	str->Read(&ActionsCount, 4);
+	if(Version == 109)
+		str->Seek(4, GEM_CURRENT_POS);
 	return true;
 }
 
 Dialog * DLGImp::GetDialog()
 {
-	return NULL;
+	Dialog * d = new Dialog();
+	for(int i = 0; i < StatesCount; i++) {
+		DialogState * ds = GetDialogState(i);
+		d->AddState(ds);
+	}
+	return d;
+}
+
+DialogState * DLGImp::GetDialogState(int index)
+{
+	DialogState * ds = new DialogState();
+	str->Seek(StatesOffset+(index*sizeof(State)), GEM_STREAM_START);
+	State state;
+	str->Read(&state, sizeof(State));
+	ds->StrRef = state.StrRef;
+	ds->trigger = GetTrigger(state.TriggerIndex);
+	ds->transitions = GetTransitions(state.FirstTransitionIndex, state.TransitionsCount);
+	ds->transitionsCount = state.TransitionsCount;
+	return ds;
+}
+
+DialogTransition ** DLGImp::GetTransitions(unsigned long firstIndex, unsigned long count)
+{
+	DialogTransition ** trans = (DialogTransition**)malloc(count*sizeof(DialogTransition*));
+	for(int i = 0; i < count; i++) {
+		trans[i] = GetTransition(firstIndex+i);
+	}
+	return trans;
+}
+
+DialogTransition * DLGImp::GetTransition(int index)
+{
+	if(index >= TransitionsCount)
+		return NULL;
+	str->Seek(TransitionsOffset+(index*sizeof(Transition)), GEM_STREAM_START);
+	Transition trans;
+	str->Read(&trans, sizeof(Transition));
+	DialogTransition * dt = new DialogTransition();
+	dt->Flags = trans.Flags;
+	dt->textStrRef = trans.AnswerStrRef;
+	dt->journalStrRef = trans.JournalStrRef;
+	dt->trigger = GetTrigger(trans.TriggerIndex);
+	dt->action = GetAction(trans.ActionIndex);
+	strncpy(dt->Dialog, trans.DLGResRef, 8);
+	dt->Dialog[8] = 0;
+	dt->stateIndex = trans.NextStateIndex;
+	return dt;
+}
+
+DialogString * DLGImp::GetTrigger(int index)
+{
+	if(index >= StateTriggersCount)
+		return NULL;
+	str->Seek(StateTriggersOffset+(index*sizeof(VarOffset)), GEM_STREAM_START);
+	VarOffset offset;
+	str->Read(&offset, sizeof(VarOffset));
+	DialogString * ds = new DialogString();
+	str->Seek(offset.Offset, GEM_STREAM_START);
+	char * string = (char*)malloc(offset.Length+1);
+	str->Read(string, offset.Length);
+	string[offset.Length] = 0;
+	ds->strings = GetStrings(string, ds->count);
+	return ds;
+}
+
+DialogString * DLGImp::GetAction(int index)
+{
+	if(index >= ActionsCount)
+		return NULL;
+	str->Seek(ActionsOffset+(index*sizeof(VarOffset)), GEM_STREAM_START);
+	VarOffset offset;
+	str->Read(&offset, sizeof(VarOffset));
+	DialogString * ds = new DialogString();
+	str->Seek(offset.Offset, GEM_STREAM_START);
+	char * string = (char*)malloc(offset.Length+1);
+	str->Read(string, offset.Length);
+	string[offset.Length] = 0;
+	ds->strings = GetStrings(string, ds->count);
+	return ds;
+}
+
+char ** DLGImp::GetStrings(char * string, unsigned long &count)
+{
+	char ** strings = NULL;
+	count = 0;
+	char * tmp = strtok(string, "\n");
+	while(tmp) {
+		count++;
+		int len = strlen(tmp)-1;
+		strings = (char**)realloc(strings, count*sizeof(char*));
+		strings[count-1] = (char*)malloc(len+1);
+		memcpy(strings[count-1], tmp, len);
+		strings[count-1][len] = 0;
+		tmp = strtok(NULL, "\n");
+	}
+	return strings;
 }
