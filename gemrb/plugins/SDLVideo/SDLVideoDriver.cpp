@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.96 2005/03/20 00:11:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.97 2005/03/20 15:07:21 avenger_teambg Exp $
  *
  */
 
@@ -729,15 +729,6 @@ Region SDLVideoDriver::GetViewport()
 	return Viewport;
 }
 
-void SDLVideoDriver::SetViewport(int x, int y)
-{
-	if (x != Viewport.x || y != Viewport.y) {
-		core->GetSoundMgr()->UpdateViewportPos( (x - xCorr) + disp->w / 2, (y - yCorr) + disp->h / 2 );
-	}
-	Viewport.x = x;
-	Viewport.y = y;
-}
-
 void SDLVideoDriver::SetViewport(int x, int y, unsigned int w, unsigned int h)
 {
 	if (x>disp->w)
@@ -754,9 +745,18 @@ void SDLVideoDriver::SetViewport(int x, int y, unsigned int w, unsigned int h)
 	Viewport.h = h;
 }
 
-void SDLVideoDriver::MoveViewportTo(int x, int y)
+void SDLVideoDriver::MoveViewportTo(int x, int y, bool center)
 {
-	SetViewport( x - ( Viewport.w / 2 ), y - ( Viewport.h / 2 ) );
+	if (center) {
+		x -= ( Viewport.w / 2 );
+		y -= ( Viewport.h / 2 );
+	}
+
+	if (x != Viewport.x || y != Viewport.y) {
+		core->GetSoundMgr()->UpdateViewportPos( (x - xCorr) + disp->w / 2, (y - yCorr) + disp->h / 2 );
+		Viewport.x = x;
+		Viewport.y = y;
+	}
 }
 /** No descriptions */
 void SDLVideoDriver::SetPalette(Sprite2D* spr, Color* pal)

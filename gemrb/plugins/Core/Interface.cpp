@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003-2004 The GemRB Project
+ * Copyright (C) 2003-2005 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.285 2005/03/20 00:11:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.286 2005/03/20 15:07:11 avenger_teambg Exp $
  *
  */
 
@@ -110,6 +110,7 @@ Interface::Interface(int iargc, char** iargv)
 	ConsolePopped = false;
 	CheatFlag = false;
 	FogOfWar = 0;
+	quitflag = -1;
 #ifndef WIN32
 	CaseSensitive = true; //this is the default value, so CD1/CD2 will be resolved
 #else
@@ -144,6 +145,8 @@ Interface::Interface(int iargc, char** iargv)
 	TooltipMargin = 10;
 	TooltipBack = NULL;
 	DraggedItem = NULL;
+	DefSound = NULL;
+	DSCount = -1;
 	for(unsigned int i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) FogSprites[i]=NULL;
 	GameFeatures = 0;
 	memset( WindowFrames, 0, sizeof( WindowFrames ));
@@ -207,6 +210,11 @@ Interface::~Interface(void)
 		video->FreeSprite(WindowFrames[i]);
 	}
 
+	if (DefSound) {
+		free( DefSound );
+		DSCount = -1;
+	}
+
 	if (TooltipBack) {
 		for(i=0;i<3;i++) {
 			//freesprite checks for null pointer
@@ -262,16 +270,16 @@ Interface::~Interface(void)
 		FreeInterface( pal16 );
 	}
 
+	if (timer) {
+		delete( timer );
+	}
+
 	if (windowmgr) {
 		FreeInterface( windowmgr );
 	}
 
 	if (video) {
 		FreeInterface( video );
-	}
-
-	if (timer) {
-		delete( timer );
 	}
 
 	if (evntmgr) {
@@ -457,17 +465,36 @@ int Interface::Init()
 	}
 	printMessage( "Core", "Palettes Loaded\n", WHITE );
 
-	printMessage( "Core", "Loading Fonts...\n", WHITE );
-	if (!IsAvailable( IE_BAM_CLASS_ID )) {
-		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
-		return GEM_ERROR;
-	}
 	AnimationMgr* anim = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
 	if (!IsAvailable( IE_2DA_CLASS_ID )) {
 		printf( "No 2DA Importer Available.\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
-	int table = LoadTable( "fonts" );
+
+	printMessage( "Core", "Initializing stock sounds...", WHITE );
+	int table = core->LoadTable( "defsound" );
+	if (table < 0) {
+		printStatus( "ERROR", LIGHT_RED );
+		printf( "Cannot find defsound.2da.\nTermination in Progress...\n" );
+		return GEM_ERROR;
+	} else {
+		TableMgr* tm = core->GetTable( table );
+		if (tm) {
+			DSCount = tm->GetRowCount();
+			DefSound = (ieResRef *) calloc( DSCount, sizeof(ieResRef) );
+			for (int i = 0; i < DSCount; i++) {
+			        strnuprcpy( DefSound[i], tm->QueryField( i, 0 ), 8 );
+			}
+			core->DelTable( table );
+		}
+	}
+
+	printMessage( "Core", "Loading Fonts...\n", WHITE );
+	if (!IsAvailable( IE_BAM_CLASS_ID )) {
+		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
+		return GEM_ERROR;
+	}
+	table = LoadTable( "fonts" );
 	if (table < 0) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find fonts.2da.\nTermination in Progress...\n" );
@@ -1831,7 +1858,10 @@ void Interface::DrawWindows(void)
 			windows[( *t )]->DrawWindow();
 		++t;
 	}
-
+	if (quitflag!=-1) {
+		QuitGame (quitflag);
+		quitflag = -1;
+	}
 }
 
 void Interface::DrawTooltip ()
@@ -2271,29 +2301,51 @@ bool Interface::LoadINI(const char* filename)
 /** Enables/Disables the Cut Scene Mode */
 void Interface::SetCutSceneMode(bool active)
 {
+	if (!active) {
+		timer->SetCutScene( NULL );
+	}
 	GameControl *gc=GetGameControl();
 	if(gc) {
 		gc->SetCutSceneMode( active );
 	}
+	video->DisableMouse = active;
+	video->moveX = 0;
+	video->moveY = 0;
 }
 
 bool Interface::InCutSceneMode()
 {
-	return video->DisableMouse;
+	return timer->CutSceneMode;
 }
 
 void Interface::QuitGame(bool BackToMain)
 {
+	//clear cutscenes
+	SetCutSceneMode(false);
+	//clear fade/screenshake effects
+	timer->Init();
+	timer->SetFadeFromColor(0);
+
 	DelWindow(0xffff); //delete all windows, including GameControl
+
+	//delete game, worldmap
 	if(game) {
 		delete game;
 		game=NULL;
-		soundmgr->GetAmbientMgr()->deactivate(); // stop any ambients which are still enqueued
 	}
+	if(worldmap) {
+		delete worldmap;
+		worldmap=NULL;
+	}
+	//shutting down ingame music
+	if(music) music->HardEnd();
+	// stop any ambients which are still enqueued
+	soundmgr->GetAmbientMgr()->deactivate(); 
 	if(BackToMain) {
 		strcpy(NextScript, "Start");
 		ChangeScript = true;
 	}
+	GSUpdate();
 }
 
 void Interface::LoadGame(int index)
@@ -2992,5 +3044,19 @@ void Interface::DoTheStoreHack(Store *s)
 
 	for(size=0;size<s->ItemsCount;size++)
 		s->items.push_back( new STOItem() );
+}
+
+void Interface::MoveViewportTo(int x, int y, bool center)
+{
+	video->MoveViewportTo( x, y, center );
+	timer->shakeStartVP = video->GetViewport();
+}
+
+//plays stock sound listed in defsound.2da
+void Interface::PlaySound(int index)
+{
+	if (index<=DSCount) {
+		soundmgr->Play(DefSound[index]);
+	}
 }
 

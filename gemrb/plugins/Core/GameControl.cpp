@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.202 2005/03/19 16:15:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.203 2005/03/20 15:07:09 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -224,7 +224,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Region viewport = core->GetVideoDriver()->GetViewport();
 	viewport.x += video->moveX;
 	viewport.y += video->moveY;
-	video->SetViewport( viewport.x, viewport.y );
+	core->MoveViewportTo( viewport.x, viewport.y, false );
 	Region vp( x + XPos, y + YPos, Width, Height );
 	Map* area = game->GetCurrentMap( );
 	if (!area) {
@@ -233,7 +233,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	}
 	core->GSUpdate();
 	area->DrawMap( vp, this );
-	HotKey = 0;
 	if (ScreenFlags & SF_DISABLEMOUSE)
 		return;
 	Point p = {lastMouseX,  lastMouseY};
@@ -381,7 +380,7 @@ int GameControl::SetText(const char* /*string*/, int /*pos*/)
 /** Key Press Event */
 void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
-	HotKey=tolower(Key);
+	HotKey=toupper(Key);
 }
 
 void GameControl::DeselectAll()
@@ -999,7 +998,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			moveY = 0;
 			break;
 	}
-	core->GetVideoDriver()->SetViewport( Viewport.x, Viewport.y );
+	core->MoveViewportTo( Viewport.x, Viewport.y, false );
 }
 
 Map *GameControl::SetCurrentArea(int Index)
@@ -1069,9 +1068,6 @@ void GameControl::SetCutSceneMode(bool active)
 	else {
 		ScreenFlags &= ~SF_DISABLEMOUSE;
 	}
-	core->GetVideoDriver()->DisableMouse = active;
-	core->GetVideoDriver()->moveX = 0;
-	core->GetVideoDriver()->moveY = 0;
 }
 
 void GameControl::HideGUI()
@@ -1141,8 +1137,7 @@ void GameControl::HideGUI()
 			core->SetVisible( index, 0 );
 		}
 	}
-	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos,
-		( ( Window * ) Owner )->YPos, Width, Height );
+	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos, ( ( Window * ) Owner )->YPos, Width, Height );
 }
 
 void GameControl::UnhideGUI()
@@ -1218,8 +1213,7 @@ void GameControl::UnhideGUI()
 			core->SetOnTop( index );
 		}
 	}
-	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos,
-		( ( Window * ) Owner )->YPos, Width, Height );
+	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos, ( ( Window * ) Owner )->YPos, Width, Height );
 }
 
 void GameControl::ResizeDel(Window* win, unsigned char type)
@@ -1566,8 +1560,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	//center on first selected actor
 	Region vp = core->GetVideoDriver()->GetViewport();
 	if(ScreenFlags&SF_CENTERONACTOR) {
-		core->GetVideoDriver()->SetViewport( pc->Pos.x - ( vp.w / 2 ),
-			pc->Pos.y - ( vp.h / 2 ) );
+		core->MoveViewportTo( pc->Pos.x, pc->Pos.y, true );
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.57 2005/03/05 01:07:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.58 2005/03/20 15:07:09 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -96,7 +96,6 @@ private:
 	PathNode* drawPath;
 	unsigned long AIUpdateCounter;
 	int ScreenFlags;
-//	bool GUIEnabled;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

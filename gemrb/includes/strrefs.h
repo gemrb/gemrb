@@ -1,5 +1,8 @@
 // these symbols should match strings.2da
 
+#ifndef IE_STRINGS_H
+#define IE_STRINGS_H
+
 #define STR_WHOLEPARTY     0
 #define STR_DOORLOCKED     1
 #define STR_MAGICTRAP      2
@@ -24,3 +27,5 @@
 #define STR_TARGETBUSY      21
 #define STR_CANTTALKTRANS   22
 #define STR_GOTXP           23
+
+#endif //IE_STRINGS_H

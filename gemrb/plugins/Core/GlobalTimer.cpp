@@ -5,20 +5,24 @@ extern Interface* core;
 
 GlobalTimer::GlobalTimer(void)
 {
-	startTime = 0;
 	interval = ( 1000 / AI_UPDATE_TIME );
+	CutSceneMode = false;
+	Init();
+}
+
+GlobalTimer::~GlobalTimer(void)
+{
+}
+
+void GlobalTimer::Init()
+{
 	CutScene = NULL;
-	MovingActor = NULL;
 	fadeToCounter = 0;
 	fadeFromCounter = 1;
 	fadeFromMax = 0;
 	waitCounter = 0;
 	shakeCounter = 0;
-	shakeX = shakeY = 0;
-}
-
-GlobalTimer::~GlobalTimer(void)
-{
+	startTime = 0;  //forcing an update
 }
 
 void GlobalTimer::Update()
@@ -27,47 +31,28 @@ void GlobalTimer::Update()
 	GetTime( thisTime );
 	if (( thisTime - startTime ) >= interval) {
 		startTime = thisTime;
+		if (shakeCounter) {
+			int x = shakeStartVP.x;
+			int y = shakeStartVP.y;
+			if (shakeCounter != 1) {
+				x += rand()%shakeX - shakeX>>1;
+				y += rand()%shakeY - shakeY>>1;
+			}
+			core->GetVideoDriver()->MoveViewportTo(x,y,false);
+			shakeCounter--;
+		}
 		if (fadeToCounter) {
-			core->GetVideoDriver()->SetFadePercent( ( ( fadeToMax -
-				fadeToCounter ) * 100 ) /
-										fadeToMax );
+			core->GetVideoDriver()->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax );
 			fadeToCounter--;
 			return;
-		} else {
-			if (fadeFromCounter != ( fadeFromMax + 1 )) {
-				core->GetVideoDriver()->SetFadePercent( ( ( fadeFromMax -
-					fadeFromCounter ) * 100 ) /
-											fadeFromMax );
-				fadeFromCounter++;
-				return;
-			} else {
-				if (shakeCounter) {
-					if (shakeCounter != 1)
-						core->GetVideoDriver()->SetViewport( ( -( ( short )
-							shakeX >>
-							1 ) ) +
-													shakeStartVP.x +
-													( rand() % shakeX ),
-													( -( ( short ) shakeY >>
-							1 ) ) +
-													shakeStartVP.y +
-													( rand() % shakeY ) );
-					else
-						core->GetVideoDriver()->SetViewport( shakeStartVP.x,
-													shakeStartVP.y );
-					shakeCounter--;
-				}
-			}
 		}
-		//if(MovingActor && MovingActor->path)
-		//	return;
-		//if(waitCounter) {
-		//	waitCounter--;
-		//	return;
-		//}
-		GameControl* gc = ( GameControl* )
-			core->GetWindow( 0 )->GetControl( 0 );
-		if (gc->ControlType == IE_GUI_GAMECONTROL) {
+		if (fadeFromCounter != ( fadeFromMax + 1 )) {
+			core->GetVideoDriver()->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
+			fadeFromCounter++;
+			return;
+		}
+		GameControl* gc = core->GetGameControl();
+		if (gc) {
 			if (gc->DialogueFlags&DF_IN_DIALOG)
 				return;
 		}
@@ -76,10 +61,8 @@ void GlobalTimer::Update()
 			Map* map = game->GetCurrentMap();
 			if (map) map->UpdateFog();
 		}
-		//MovingActor = NULL;
 		if (CutScene) {
 			if (CutScene->endReached) {
-				printf( "CutScene End\n" );
 				delete( CutScene );
 				CutScene = NULL;
 				CutSceneMode = false;
@@ -94,9 +77,8 @@ void GlobalTimer::SetFadeToColor(unsigned long Count)
 {
 	fadeToCounter = Count;
 	fadeToMax = fadeToCounter;
-	if (fadeToMax == 1) {
+	if (fadeToMax == 0) {
 		core->GetVideoDriver()->SetFadePercent( 100 );
-		fadeToCounter--;
 	}
 }
 
@@ -104,16 +86,14 @@ void GlobalTimer::SetFadeFromColor(unsigned long Count)
 {
 	fadeFromCounter = 1;
 	fadeFromMax = Count;
+	if (fadeFromMax == 0) {
+		core->GetVideoDriver()->SetFadePercent( 0 );
+	}
 }
 
 void GlobalTimer::SetWait(unsigned long Count)
 {
 	waitCounter = Count;
-}
-
-void GlobalTimer::SetMovingActor(Actor* actor)
-{
-	MovingActor = actor;
 }
 
 void GlobalTimer::SetCutScene(GameScript* script)
@@ -124,6 +104,7 @@ void GlobalTimer::SetCutScene(GameScript* script)
 		CutSceneMode = true;
 		return;
 	}
+	CutSceneMode = false;
 }
 
 void GlobalTimer::SetScreenShake(unsigned long shakeX, unsigned long shakeY,
@@ -132,5 +113,4 @@ void GlobalTimer::SetScreenShake(unsigned long shakeX, unsigned long shakeY,
 	this->shakeX = shakeX;
 	this->shakeY = shakeY;
 	shakeCounter = Count;
-	shakeStartVP = core->GetVideoDriver()->GetViewport();
 }

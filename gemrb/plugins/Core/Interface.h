@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.145 2005/03/18 18:10:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.146 2005/03/20 15:07:12 avenger_teambg Exp $
  *
  */
 
@@ -143,6 +143,8 @@ private:
 	ieResRef CursorBam;
 	ieResRef TooltipFont;
 	ieResRef TooltipBackResRef;
+	ieResRef *DefSound; //default sounds 
+	int DSCount;
 	Color TooltipColor;
 	int TooltipMargin;
 	ieResRef Palette16;
@@ -160,6 +162,7 @@ private:
 	// Current Store
 	Store* CurrentStore;
 public:
+	int quitflag; // Quit Signal, set it to 0 or 1
 	int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
 	ieResRef WorldMapName;
@@ -200,22 +203,6 @@ public:
 	Actor *GetCreature(DataStream *stream);
 	/** Returns a PC index, by loading a creature */
 	int LoadCreature(char *ResRef, int InParty, bool character=false);
-	/** Removes a creature by slot */
-//	int UnloadCreature(unsigned int Slot);
-	/** Removes a creature by pointer */
-//	int UnloadCreature(Actor *actor);
-	/** Returns the actor count */
-//	int GetActorCount() { return actors.size(); };
-	/** Add the actor to the list of actors and returns its index */
-//	int AddActor(Actor* actor);
-	/** Returns the actor pointer for Slot */
-//	Actor *GetActor(unsigned int Slot);
-	/** Enters the premade actors (chargen PC's) into the game */
-//	void EnterActors(const char *StartArea);
-	/** Returns the starting party size (chargen PC's) count */
-//	int GetPartySize();
-	/** Returns actor index for partyslot PartySlotCount */
-//	int FindPlayer(int PartySlotCount);
 	/** Sets a stat for the creature in actor index Slot */
 	int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue, int Mod);
 	/** returns the stat of a creature (mod:1-modified, 0-base) */
@@ -404,7 +391,9 @@ public:
 	void FreeSPLExt(SPLExtHeader *p, Effect *e);
 	WorldMap *NewWorldMap();
 	void DoTheStoreHack(Store *s);
-
+	void MoveViewportTo(int x, int y, bool center);
+	/** plays stock gui sound referenced by index */
+	void PlaySound(int idx);
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

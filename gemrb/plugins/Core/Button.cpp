@@ -15,41 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.84 2005/03/19 16:15:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.85 2005/03/20 15:07:09 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "Button.h"
 #include "Interface.h"
-
-#define SND_BUTTON_PRESSED 0
-#define SND_BUTTON_RELEASE0 1
-#define SND_BUTTON_RELEASE1 2
-
-#define DEF_BUTTON1 4
-
-static ieResRef ButtonSounds[3] = {
-	"GAM_09\0\0", "GAM_03\0\0", "GAM_04\0\0"
-};
-static bool ButtonInited = false;
+#include "../../includes/defsounds.h"
 
 Button::Button(bool Clear)
 {
-	if (!ButtonInited) {
-		ButtonInited = true;
-		int soundtable = core->LoadTable( "defsound" );
-		if (soundtable >= 0) {
-			TableMgr* tm = core->GetTable( soundtable );
-			if (tm) {
-				for (int i = 0; i < 3; i++) {
-					strncpy( ButtonSounds[i],
-						tm->QueryField( i + DEF_BUTTON1, 0 ), 8 );
-				}
-				core->DelTable( soundtable );
-			}
-		}
-	}
 	Unpressed = Pressed = Selected = Disabled = NULL;
 	this->Clear = Clear;
 	State = IE_GUI_BUTTON_UNPRESSED;
@@ -333,7 +309,7 @@ void Button::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/,
 		State = IE_GUI_BUTTON_PRESSED;
 		Changed = true;
 		if (Flags & IE_GUI_BUTTON_SOUND) {
-			core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_PRESSED] );
+			core->PlaySound( DS_BUTTON_PRESSED );
 		}
 	}
 }
@@ -380,14 +356,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 				( ( Window * ) Owner )->RedrawControls( VarName, Value );
 			}
 		}
-/* divide says these sounds are tied to the window, not the released button
-		if (Flags & IE_GUI_BUTTON_SOUND) {
-			if (Flags & IE_GUI_BUTTON_ALT_SOUND)
-				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_RELEASE1] );
-			else
-				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_RELEASE0] );
-		}
-*/
+
 		if (core->GetDraggedItem()) {
 			RunEventHandler( ButtonOnDragDrop );
 		} else if (Button == GEM_MB_ACTION) {

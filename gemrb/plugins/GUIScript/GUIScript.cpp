@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.293 2005/03/19 21:43:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.294 2005/03/20 15:07:15 avenger_teambg Exp $
  *
  */
 
@@ -309,7 +309,7 @@ PyDoc_STRVAR( GemRB_QuitGame__doc,
 "Stops the current game.");
 static PyObject* GemRB_QuitGame(PyObject*, PyObject* /*args*/)
 {
-	core->QuitGame(false);
+	core->quitflag=0;
 	Py_INCREF( Py_None );
 	return Py_None;
 }

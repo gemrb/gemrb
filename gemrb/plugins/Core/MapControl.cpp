@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.26 2005/03/19 16:15:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.27 2005/03/20 15:07:12 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -328,8 +328,8 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y,
 	if (xp < 0) xp = 0;
 	if (yp < 0) yp = 0;
 
-	core->GetVideoDriver()->SetViewport( xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV );
-	// FIXME: play button sound here
+	core->MoveViewportTo( xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV, true );
+	//core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_PRESSED] );
 }
 
 /** Mouse Button Up */

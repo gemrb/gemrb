@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.247 2005/03/19 17:30:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.248 2005/03/20 15:07:09 avenger_teambg Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include "GameScript.h"
 #include "Interface.h"
 #include "../../includes/strrefs.h"
+#include "../../includes/defsounds.h"
 
 //this will skip to the next element in the prototype of an action/trigger
 #define SKIP_ARGUMENT() while(*str && ( *str != ',' ) && ( *str != ')' )) str++
@@ -563,6 +564,9 @@ static ActionLink actionnames[] = {
 	{"startmusic", GameScript::StartMusic,0},
 	{"startsong", GameScript::StartSong,0},
 	{"startstore", GameScript::StartStore,0},
+	{"staticpalette", GameScript::StaticPalette,0},
+	{"staticstart", GameScript::StaticStart,0},
+	{"staticstop", GameScript::StaticStop,0},
 	{"stopmoving", GameScript::StopMoving,0},
 	{"storepartylocations", GameScript::StorePartyLocation,0},
 	{"stuffglobalrandom", GameScript::SetGlobalRandom,0},
@@ -4932,7 +4936,13 @@ int GameScript::TimeLT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::HotKey(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGameControl()->HotKey==parameters->int0Parameter;
+	int ret=core->GetGameControl()->HotKey==parameters->int0Parameter;
+	//probably we need to implement a trigger mechanism, clear
+	//the hotkey only when the triggerblock was evaluated as true
+	if (ret) {
+		core->GetGameControl()->HotKey=0;
+	}
+	return ret;
 }
 
 int GameScript::CombatCounter(Scriptable* /*Sender*/, Trigger* parameters)
@@ -5896,14 +5906,13 @@ void GameScript::SmallWait(Scriptable* Sender, Action* parameters)
 
 void GameScript::MoveViewPoint(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetVideoDriver()->MoveViewportTo( parameters->pointParameter.x,
-		parameters->pointParameter.y );
+	core->MoveViewportTo( parameters->pointParameter.x, parameters->pointParameter.y, true );
 }
 
 void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 {
 	Scriptable * scr = GetActorFromObject( Sender, parameters->objects[1]);
-	core->GetVideoDriver()->MoveViewportTo( scr->Pos.x, scr->Pos.y );
+	core->MoveViewportTo( scr->Pos.x, scr->Pos.y, true );
 }
 
 void GameScript::AddWayPoint(Scriptable* Sender, Action* parameters)
@@ -6603,7 +6612,7 @@ void GameScript::StaticStop(Scriptable* /*Sender*/, Action* parameters)
 			parameters->objects[1]->objectName );
 		return;
 	}
-	anim->Active = false;
+	anim->playOnce = true;
 }
 
 void GameScript::StaticPalette(Scriptable* /*Sender*/, Action* parameters)
@@ -6844,7 +6853,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 			Actor *actor = (Actor *) Sender;
 			if (!Key || !actor->inventory.HasItem(Key,0) ) {
 				//playsound unsuccessful opening of door
-				core->GetSoundMgr()->Play("AMB_D06");
+				core->PlaySound(DS_OPEN_FAIL);
 				return;
 			}
 
@@ -6897,7 +6906,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		//doors could be locked but open, and unable to close
 		if (door->Flags&DOOR_LOCKED) {
 			//playsound unsuccessful closing of door
-			core->GetSoundMgr()->Play("AMB_D06");
+			core->PlaySound(DS_CLOSE_FAIL);
 		}
 		else {
 			door->SetDoorOpen( false, true );
@@ -8409,9 +8418,10 @@ void GameScript::ExpansionEndCredits(Scriptable* /*Sender*/, Action* /*parameter
 	core->PlayMovie("ecredit");
 }
 
-void GameScript::QuitGame(Scriptable* /*Sender*/, Action* /*parameters*/)
+void GameScript::QuitGame(Scriptable* Sender, Action* parameters)
 {
-	core->QuitGame(true);
+	ClearAllActions(Sender, parameters);
+	core->quitflag = 1;
 }
 
 void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)
