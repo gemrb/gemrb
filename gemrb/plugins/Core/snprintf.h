@@ -1,6 +1,10 @@
 #ifndef _PORTABLE_SNPRINTF_H_
 #define _PORTABLE_SNPRINTF_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #define PORTABLE_SNPRINTF_VERSION_MAJOR 2
 #define PORTABLE_SNPRINTF_VERSION_MINOR 2
 
