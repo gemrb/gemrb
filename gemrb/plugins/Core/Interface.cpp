@@ -30,6 +30,7 @@ Interface::Interface(void)
 	hcanims = NULL;
 	guiscript = NULL;
 	windowmgr = NULL;
+	ConsolePopped = false;
 	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
 		printStatus("ERROR", LIGHT_RED);
@@ -75,6 +76,7 @@ Interface::~Interface(void)
 		windows.erase(w);
 		w = windows.begin();
 	}
+	delete(console);
 	delete(plugin);
 }
 
@@ -212,6 +214,13 @@ int Interface::Init()
 	printStatus("OK", LIGHT_GREEN);
 	strcpy(NextScript, "Start");
 	ChangeScript = true;
+	console = new Console();
+	console->XPos = 0;
+	console->YPos = 480-25;
+	console->Width = 640;
+	console->Height = 25;
+	console->SetFont(fonts[2]);
+	console->SetCursor(fonts[2]->chars[2]);
 	printMessage("Core", "Core Initialization Complete!\n", LIGHT_GREEN);
 	return GEM_OK;
 }
@@ -602,13 +611,33 @@ void Interface::DrawWindows(void)
 	}
 }
 
+Window * Interface::GetWindow(unsigned short WindowIndex)
+{
+	if(WindowIndex < windows.size())
+		return windows[WindowIndex];
+	return NULL;
+}
+
 int Interface::DelWindow(unsigned short WindowIndex) 
 {
 	std::vector<Window*>::iterator w = windows.begin();
 	w+=WindowIndex;
 	if(!(*w))
 		return -1;
+	evntmgr->DelWindow((*w)->WindowID);
 	delete(*w);
 	windows.erase(w);
 	return 0;
+}
+
+/** Popup the Console */
+void Interface::PopupConsole()
+{
+	ConsolePopped = !ConsolePopped;
+}
+
+/** Draws the Console */
+void Interface::DrawConsole()
+{
+	console->Draw(0,0);
 }

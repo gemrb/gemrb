@@ -1,5 +1,6 @@
 #include "../../includes/win32def.h"
 #include "SDLVideoDriver.h"
+#include "../Core/Interface.h"
 #include <math.h>
 
 SDLVideoDriver::SDLVideoDriver(void)
@@ -88,6 +89,52 @@ bool SDLVideoDriver::TestVideoMode(VideoMode & vm)
 
 int SDLVideoDriver::SwapBuffers(void)
 {
+	if(core->ConsolePopped) {
+		int ret = GEM_OK;
+		core->DrawConsole();
+		SDL_Event event; /* Event structure */
+		while(SDL_PollEvent(&event)) {  /* Loop until there are no events left on the queue */
+			switch(event.type){  /* Process the appropiate event type */
+			case SDL_QUIT:  /* Handle a KEYDOWN event */         
+				ret = GEM_ERROR;
+			break;
+
+			case SDL_KEYUP:
+				{
+				unsigned char key = event.key.keysym.unicode & 0xff;
+				if(Evnt && (key != 0))
+					Evnt->KeyRelease(key, event.key.keysym.mod);
+				}
+			break;
+
+			case SDL_KEYDOWN:
+				{
+				if(event.key.keysym.sym == SDLK_ESCAPE) {
+					core->PopupConsole();
+					break;
+				}
+				unsigned char key = event.key.keysym.unicode & 0xff;
+				if((key == 0) || (key == 13)){
+					switch(event.key.keysym.sym) {
+						case SDLK_DELETE:
+							key = GEM_DELETE;
+						break;
+
+						case SDLK_RETURN:
+							key = GEM_RETURN;
+						break;
+					}
+					core->console->OnSpecialKeyPress(key);
+				}
+				else if((key != 0))
+					core->console->OnKeyPress(key, event.key.keysym.mod);
+				}
+			break;
+			}
+		}
+		SDL_Flip(disp);
+		return ret;
+	}
 	SDL_Flip(disp);
 	int ret = GEM_OK;
 	//TODO: Implement an efficient Rectangle Merge algorithm for faster redraw
@@ -108,6 +155,10 @@ int SDLVideoDriver::SwapBuffers(void)
 
 		case SDL_KEYDOWN:
 			{
+			if(event.key.keysym.sym == SDLK_ESCAPE) {
+				core->PopupConsole();
+				break;
+			}
 			unsigned char key = event.key.keysym.unicode & 0xff;
 			if(key == 0) {
 				switch(event.key.keysym.sym) {
@@ -392,23 +443,20 @@ void SDLVideoDriver::DrawRect(Region &rgn, Color &color){
 	pal[0].r = color.r;
 	pal[0].g = color.g;
 	pal[0].b = color.b;
+	pal[0].unused = color.a;
 	
 	pal[1].r = 0;
 	pal[1].g = 0;
 	pal[1].b = 0;
+	pal[1].unused = 0;
 
 	SDL_SetPalette(rectsurf, SDL_LOGPAL, pal, 0, 2);
-	SDL_SetColorKey(rectsurf, SDL_SRCCOLORKEY, 1);
-
-	SDL_LockSurface(rectsurf);
-	memset(rectsurf->pixels, 0, rgn.w*rgn.h);
-	SDL_UnlockSurface(rectsurf);
-
-	SDL_Rect drect = {1,1,rgn.w-2, rgn.h-2};
+	
+	SDL_Rect drect = {0,0,rgn.w, rgn.h};
 	SDL_FillRect(rectsurf, &drect, 1);
 
-  drect.x = rgn.x;
-  drect.y = rgn.y;
+	drect.x = rgn.x;
+	drect.y = rgn.y;
 	
 	SDL_BlitSurface(rectsurf, NULL, disp, &drect);
 

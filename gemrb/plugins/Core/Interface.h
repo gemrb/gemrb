@@ -17,6 +17,7 @@
 #include "WindowMgr.h"
 #include "ScriptEngine.h"
 #include "Button.h"
+#include "Console.h"
 
 #ifdef WIN32
 
@@ -87,8 +88,14 @@ public:
 	int SetEvent(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long EventID, char * funcName);
 	/** Set the Status of a Control in a Window */
 	int SetControlStatus(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long Status);
+	/** Get a Window from the Loaded Window List */
+	Window * GetWindow(unsigned short WindowIndex);
 	/** Removes a Loaded Window */
 	int DelWindow(unsigned short WindowIndex);
+	/** Popup the Console */
+	void PopupConsole();
+	/** Draws the Console */
+	void DrawConsole();
 private:
 	bool LoadConfig(void);
 public:
@@ -101,6 +108,10 @@ public:
 	char NextScript[64];
 	/** Need to Load a new Script */
 	bool ChangeScript;
+	/** Console is on Screen */
+	bool ConsolePopped;
+	/** The Console Object */
+	Console * console;
 };
 #ifndef GEM_BUILD_DLL
 #ifdef WIN32

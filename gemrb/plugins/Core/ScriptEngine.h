@@ -26,6 +26,8 @@ public:
 	virtual bool LoadScript(const char * filename) = 0;
 	/** Run Function */
 	virtual bool RunFunction(const char * fname) = 0;
+	/** Exec a single String */
+	virtual char * ExecString(const char * string) = 0;
 };
 
 #endif

@@ -20,6 +20,8 @@ extern "C" {
 #endif
 #endif
 
+#include "../Core/Label.h"
+
 static PyObject * GemRB_LoadWindowPack(PyObject *self, PyObject *args)
 {
 	char *string;
@@ -212,6 +214,35 @@ static PyObject * GemRB_UnloadWindow(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_CreateLabel(PyObject *self, PyObject *args)
+{
+	int WindowIndex, ControlID, x, y, w, h, align;
+	char *font, *text;
+
+	if(!PyArg_ParseTuple(args, "iiiiiissi", &WindowIndex, &ControlID, &x, &y, &w, &h, &font, &text, &align)) {
+		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+	Label * lbl = new Label(4096, core->GetFont(font));
+	lbl->XPos = x;
+	lbl->YPos = y;
+	lbl->Width = w;
+	lbl->Height = h;
+	lbl->ControlID = ControlID;
+	lbl->ControlType = 6;
+	lbl->Owner = win;
+	lbl->SetText(text);
+	lbl->SetAlignment(align);
+	win->AddControl(lbl);
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
     {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
@@ -242,6 +273,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"UnloadWindow", GemRB_UnloadWindow, METH_VARARGS,
      "Unloads a previously Loaded Window."},
+
+	{"CreateLabel", GemRB_CreateLabel, METH_VARARGS,
+     "Creates and Add a new Label to a Window."},
 
     {NULL, NULL, 0, NULL}
 };
@@ -387,4 +421,13 @@ bool GUIScript::RunFunction(const char * fname)
 	}
 	Py_DECREF(pValue);
 	return true;
+}
+
+/** Exec a single String */
+char * GUIScript::ExecString(const char * string)
+{
+	if(PyRun_SimpleString(string)==-1) {
+		PyErr_Print();
+	}
+	return NULL;
 }
