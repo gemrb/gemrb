@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.cpp,v 1.7 2003/12/06 17:32:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.cpp,v 1.8 2003/12/07 13:54:12 avenger_teambg Exp $
  *
  */
 
@@ -42,9 +42,17 @@ IEScript::IEScript(void)
 	memset(triggers, 0, MAX_TRIGGERS*sizeof(TriggerFunction));
 	memset(actions, 0, MAX_ACTIONS*sizeof(ActionFunction));
 	memset(blocking, 0, MAX_ACTIONS*sizeof(bool));
-	triggers[0x400F] = Globals;
+	triggers[0x400a] = Alignment;
+	triggers[0x400b] = Allegiance;
+	triggers[0x400c] = Class;
+	triggers[0x400d] = Exists;
+	triggers[0x400e] = General;
+
+	triggers[0x400f] = Globals;
 	triggers[0x0036] = OnCreation;
 	triggers[0x4023] = True;
+	triggers[0x4030] = False;
+
 	actions[7] = CreateCreature;
 	actions[10] = Enemy;
 	actions[23] = MoveToPoint;
@@ -53,7 +61,7 @@ IEScript::IEScript(void)
 	actions[49] = MoveViewPoint;
 	actions[63] = Wait;
 	blocking[63] = true;
-	actions[83]	= SmallWait;
+	actions[83] = SmallWait;
 	blocking[83] = true;
 	actions[84] = Face;
 	actions[120] = StartCutScene;
@@ -454,7 +462,51 @@ ActorBlock * IEScript::GetActorFromObject(Object * oC)
 // Trigger Functions
 //-------------------------------------------------------------
 
-int  IEScript::Globals(Script * Sender, Trigger * parameters)
+int IEScript::Alignment(Script * Sender, Trigger * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objectParameter);
+	int value = actor->actor->GetStat(IE_ALIGNMENT);
+	int a = parameters->int0Parameter&15;
+	if(a) {
+		if(a!=value&15) return 0;
+	}
+
+	a = parameters->int0Parameter&240;
+	if(a) {
+		if(a!=value&240) return 0;
+	}
+	return 1;
+}
+
+int IEScript::Allegiance(Script * Sender, Trigger * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objectParameter);
+	int value = actor->actor->GetStat(IE_EA);
+	return parameters->int0Parameter==value;
+}
+
+int IEScript::Class(Script * Sender, Trigger * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objectParameter);
+	int value = actor->actor->GetStat(IE_CLASS);
+	return parameters->int0Parameter==value;
+}
+
+int IEScript::Exists(Script * Sender, Trigger * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objectParameter);
+	if(actor==NULL) return 0;
+	return 1;
+}
+
+int IEScript::General(Script * Sender, Trigger * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objectParameter);
+	if(actor==NULL) return 0;
+	return parameters->int0Parameter==actor->actor->GetStat(IE_GENERAL);
+}
+
+int IEScript::Globals(Script * Sender, Trigger * parameters)
 {
 	unsigned long value;
 	if(!globals->Lookup(parameters->string0Parameter, value)) 
@@ -479,9 +531,14 @@ int  IEScript::OnCreation(Script * Sender, Trigger * parameters)
 	return 0;
 }
 
-int	 IEScript::True(Script * Sender, Trigger * parameters)
+int IEScript::True(Script */* Sender*/, Trigger * /*parameters*/)
 {
 	return 1;
+}
+
+int IEScript::False(Script * /*Sender*/, Trigger */*parameters*/)
+{
+	return 0;
 }
 
 //-------------------------------------------------------------
