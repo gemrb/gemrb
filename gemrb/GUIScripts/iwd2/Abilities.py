@@ -51,7 +51,7 @@ def CalcLimits(Abidx):
 	return
 
 def RollPress():
-	global Minimum, Maximum, Add, HasStrExtra
+	global HasStrExtra, PointsLeft, Add
 
 	GemRB.InvalidateWindow(AbilityWindow)
 	GemRB.SetVar("Ability",0)
@@ -173,14 +173,12 @@ def JustPress():
 def LeftPress():
 	global PointsLeft, HasStrExtra
 
+	Abidx = GemRB.GetVar("Ability")
 	GemRB.InvalidateWindow(AbilityWindow)
 	PointsLeft=GemRB.GetVar("Ability -1")
-	#should be more elaborate
-	Minimum=3
-	Maximum=18
+	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
-	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, Abidx, 1) )
 	if PointsLeft == 0:
