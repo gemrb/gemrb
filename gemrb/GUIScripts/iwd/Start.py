@@ -8,6 +8,10 @@ QuitWindow = 0
 def OnLoad():
 	global StartWindow, JoinGameButton
 
+        cheats = GemRB.GetVar ("Cheats")
+        if cheats:
+                GemRB.EnableCheatKeys(1)
+
 	GemRB.LoadWindowPack("GUICONN")
 
 #main window

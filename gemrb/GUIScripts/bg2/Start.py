@@ -13,6 +13,17 @@ def OnLoad():
 	global StartWindow, TutorialWindow, QuitWindow
 	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton
 
+        cheats = GemRB.GetVar ("Cheats")
+        if cheats:
+                GemRB.EnableCheatKeys(1)
+
+        skip_videos = GemRB.GetVar ("SkipIntroVideos")
+        if not skip_videos:
+                GemRB.PlayMovie ("BISLOGO")
+                GemRB.PlayMovie ("BWDRAGON")
+                GemRB.PlayMovie ("WOTC")
+                GemRB.PlayMovie ("INTRO15F")
+
 	GemRB.LoadWindowPack("START")
 #tutorial subwindow
         TutorialWindow = GemRB.LoadWindow(5)
