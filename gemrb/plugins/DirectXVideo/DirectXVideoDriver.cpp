@@ -21,10 +21,48 @@ LONG CALLBACK WinMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg) {
 		case WM_SYSKEYUP:
-		case WM_SYSKEYDOWN:
-		case WM_KEYUP:
+		case WM_SYSKEYDOWN:{
+
+		}
+	    break;
+
+		case WM_KEYUP: {
+
+		}
+	    break;
+
 		case WM_KEYDOWN: {
-			
+			if((lParam & (1<<32)) == 1)
+				break;
+			int key = -1;
+			switch((int)wParam) {
+				case VK_ESCAPE:
+					core->PopupConsole();
+				break;
+
+				case VK_RETURN:
+					key = GEM_RETURN;
+				break;
+
+				case VK_DELETE:
+					key = GEM_DELETE;
+				break;
+
+				case VK_LEFT:
+					key = GEM_LEFT;
+				break;
+
+				case VK_RIGHT:
+					key = GEM_RIGHT;
+				break;
+			}
+			break;
+			if(key != -1) {
+				if(!core->ConsolePopped)
+					core->GetEventMgr()->OnSpecialKeyPress(key);
+				else
+					core->console->OnSpecialKeyPress(key);
+			}
 		}
 		break;
 
@@ -39,14 +77,34 @@ LONG CALLBACK WinMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		case WM_CHAR: {
 			unsigned char key = (unsigned char)wParam;
-			core->GetEventMgr()->KeyPress(key, 0);
+			if((key == 0) || (key == 13)){
+				switch(key) {
+					case VK_DELETE:
+						key = GEM_DELETE;
+					break;
+
+					case VK_RETURN:
+						key = GEM_RETURN;
+					break;
+				}
+				if(!core->ConsolePopped)
+					core->GetEventMgr()->OnSpecialKeyPress(key);
+				else
+					core->console->OnSpecialKeyPress(key);
+				break;
+			}
+			if(!core->ConsolePopped)
+				core->GetEventMgr()->KeyPress(key, 0);
+			else
+				core->console->OnKeyPress(key, 0);
 		}
 		return 0;
 
 		case WM_MOUSEMOVE: {
 			unsigned short xPos = LOWORD(lParam);  // horizontal position of cursor 
 			unsigned short yPos = HIWORD(lParam);  // vertical position of cursor
-			core->GetEventMgr()->MouseMove(xPos, yPos);
+			if(!core->ConsolePopped)
+				core->GetEventMgr()->MouseMove(xPos, yPos);
 		}
 	    return 0;
 
@@ -68,7 +126,8 @@ LONG CALLBACK WinMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				Mod |= 0x01;
 			if(fwKeys & MK_CONTROL)
 				Mod |= 0x02;
-			core->GetEventMgr()->MouseDown(xPos, yPos, button, Mod);
+			if(!core->ConsolePopped)
+				core->GetEventMgr()->MouseDown(xPos, yPos, button, Mod);
 		}
 	    return 0;
 
@@ -90,7 +149,8 @@ LONG CALLBACK WinMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				Mod |= 0x01;
 			if(fwKeys & MK_CONTROL)
 				Mod |= 0x02;
-			core->GetEventMgr()->MouseUp(xPos, yPos, button, Mod);
+			if(!core->ConsolePopped)
+				core->GetEventMgr()->MouseUp(xPos, yPos, button, Mod);
 		}
 	    return 0;
 
@@ -113,6 +173,7 @@ LONG CALLBACK WinMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 DirectXVideoDriver::DirectXVideoDriver(void)
 {
 	sceneBegin = false;
+	quit = 0;
 }
 
 DirectXVideoDriver::~DirectXVideoDriver(void)
@@ -255,10 +316,12 @@ bool DirectXVideoDriver::TestVideoMode(VideoMode & vm)
 int DirectXVideoDriver::SwapBuffers(void)
 {
 	if(!sceneBegin) {
-		//lpD3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0,0,0), 1.0f, 0L);
 		lpD3DDevice->BeginScene();
 		sceneBegin = true;
 	}
+
+	if(core->ConsolePopped)
+		core->DrawConsole();
 
 	lpD3DDevice->EndScene();
 	sceneBegin = false;
@@ -271,7 +334,7 @@ int DirectXVideoDriver::SwapBuffers(void)
 		DispatchMessage( &msg );
 	}
 
-	return 0;
+	return quit;
 }
 
 Sprite2D *DirectXVideoDriver::CreateSprite(int w, int h, int bpp, DWORD rMask, DWORD gMask, DWORD bMask, DWORD aMask, void* pixels, bool cK, int index)
@@ -316,12 +379,28 @@ void DirectXVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, R
 {
 	
 	if(!sceneBegin) {
-		//lpD3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0,0,0), 1.0f, 0L);
 		lpD3DDevice->BeginScene();
 		sceneBegin = true;
 	}
 	Poly * p = (Poly*)spr->vptr;
-	
+
+	Region rgn(x-spr->XPos, y-spr->YPos, spr->Width, spr->Height);
+	if(!anchor) {
+		rgn.x -= Viewport.x;
+		rgn.y -= Viewport.y;
+	}
+
+	if(clip) {
+		if(rgn.x >= clip->x+clip->w)
+			return;
+		if(rgn.y >= clip->y+clip->h)
+			return;
+		if(rgn.x+rgn.w <= clip->x)
+			return;
+		if(rgn.y+rgn.h <= clip->y)
+			return;
+	}
+
 	if(anchor)
 		p->SetVertRect(x-spr->XPos,y-spr->YPos,spr->Width, spr->Height, 0.0f);
 	else
@@ -415,7 +494,6 @@ void DirectXVideoDriver::DrawRect(Region &rgn, Color &color)
 	pVertices[3].tv=1.0;
 
 	if(!sceneBegin) {
-		//lpD3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0,0,0), 1.0f, 0L);
 		lpD3DDevice->BeginScene();
 		sceneBegin = true;
 	}
@@ -447,11 +525,14 @@ void DirectXVideoDriver::BlitTiled(Region rgn, Sprite2D * img, bool anchor)
 /** Send a Quit Signal to the Event Queue */
 bool DirectXVideoDriver::Quit()
 {
+	quit = 1;
 	return true;
 }
 /** Get the Palette of a Sprite */
 Color * DirectXVideoDriver::GetPalette(Sprite2D * spr)
 {
-	return (Color*)(((Poly*)spr->vptr)->m_Texture->palette);
+	Color * pal = (Color*)malloc(256*sizeof(Color));
+	memcpy(pal, (((Poly*)spr->vptr)->m_Texture->palette), 256*sizeof(Color));
+	return pal;
 }
 
