@@ -101,7 +101,10 @@ def ConnectPress():
 
 def PregenPress():
 #GemRB.SetPlayMode(-1) #do not start game after chargen
-        GemRB.SetNextScript("GUICG") #temporarily
+	GemRB.UnloadWindow(StartWindow)
+	GemRB.UnloadWindow(QuitWindow)
+	GemRB.UnloadWindow(TutorialWindow)
+        GemRB.SetNextScript("CharGen") #temporarily
 	return
 
 def LoadSingle():
@@ -110,7 +113,7 @@ def LoadSingle():
 def NewSingle():
 #main menu: -1, single player:0, tutorial mode=1, multi-player:2
 #GemRB.SetPlayMode(0)
-        GemRB.SetNextScript("GUICG") #temporarily
+        GemRB.SetNextScript("CharGen") #temporarily
 	return
 
 def Tutorial():
@@ -124,8 +127,7 @@ def PlayPress():
         GemRB.UnloadWindow(TutorialWindow)
 #main menu: -1, single player:0, tutorial mode=1, multi-player:2
 #GemRB.SetPlayMode(1)
-#GemRB.SetNextScript("GUICG")
-        GemRB.SetNextScript("Start") #temporarily
+	GemRB.SetNextScript("CharGen")
         return
 
 def CancelTut():
@@ -146,6 +148,7 @@ def OptionsPress():
 #apparently the order is important
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
+	GemRB.UnloadWindow(TutorialWindow)
 	GemRB.SetNextScript("StartOpt")
 	return
 	
@@ -153,6 +156,7 @@ def MoviesPress():
 #apparently the order is important
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
+	GemRB.UnloadWindow(TutorialWindow)
 	GemRB.SetNextScript("GUIMOVIE")
 	return
 
