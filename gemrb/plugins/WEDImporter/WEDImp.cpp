@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.7 2003/12/15 09:33:52 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.8 2004/01/04 00:06:01 balrog994 Exp $
  *
  */
 
@@ -62,7 +62,7 @@ bool WEDImp::Open(DataStream * stream, bool autoFree)
 		str->Read(&o.Width, 2);
 		str->Read(&o.Height, 2);
 		str->Read(o.TilesetResRef, 8);
-		str->Seek(4, GEM_CURRENT_POS);
+		str->Read(&o.unknown, 4);
 		str->Read(&o.TilemapOffset, 4);
 		str->Read(&o.TILOffset, 4);
 		overlays.push_back(o);
