@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.16 2004/09/11 07:43:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.17 2004/10/10 13:26:19 avenger_teambg Exp $
  *
  */
 
@@ -66,12 +66,15 @@ public:
 	~Font(void);
 	void AddChar(void* spr, int w, int h, short xPos, short yPos);
 	void Print(Region rgn, unsigned char* string, Color* color,
-		unsigned char Alignment, bool anchor = false, Font* initials = NULL,
-		Color* initcolor = NULL, Sprite2D* cursor = NULL, unsigned int curpos = 0);
+		unsigned char Alignment, bool anchor = false,
+		Font* initials = NULL, Color* initcolor = NULL,
+		Sprite2D* cursor = NULL, unsigned int curpos = 0);
 	void PrintFromLine(int startrow, Region rgn, unsigned char* string,
 		Color* color, unsigned char Alignment, bool anchor = false,
 		Font* initials = NULL, Color* initcolor = NULL,
 		Sprite2D* cursor = NULL, unsigned int curpos = 0);
+	int PrintInitial(int x, int y, Region rgn, char currChar,
+		Color *ipal=NULL, bool anchor = false);
 	void* GetPalette();
 	char ResRef[9];
 	Region size[256];
