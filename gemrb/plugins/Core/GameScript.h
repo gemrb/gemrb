@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.77 2004/03/20 20:46:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.78 2004/03/20 21:01:52 avenger_teambg Exp $
  *
  */
 
@@ -783,6 +783,7 @@ public: //Script Functions
 	static int See(Scriptable* Sender, Trigger* parameters);
 	static int Specific(Scriptable* Sender, Trigger* parameters);
 	static int StateCheck(Scriptable* Sender, Trigger* parameters);
+	static int TargetUnreachable(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariable(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableGT(Scriptable* Sender, Trigger* parameters);

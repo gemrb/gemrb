@@ -38,6 +38,8 @@ public:
 	void AdjustPosition(unsigned int& goalX, unsigned int& goalY);
 	/* Finds the path which leads the farthest from d */
 	PathNode* RunAway(short sX, short sY, short dX, short dY, int PathLen, bool Backing);
+	/* Returns true if there is no path to d */
+	bool TargetUnreachable(short sX, short sY, short dX, short dY);
 	/* Finds the path which leads to d */
 	PathNode* FindPath(short sX, short sY, short dX, short dY);
 	bool IsVisible(short sX, short sY, short dX, short dY);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.108 2004/03/20 20:46:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.109 2004/03/20 21:01:52 avenger_teambg Exp $
  *
  */
 
@@ -107,6 +107,7 @@ static TriggerLink triggernames[] = {
 	{"range", GameScript::Range}, {"see", GameScript::See},
 	{"specific", GameScript::Specific},
 	{"statecheck", GameScript::StateCheck},
+	{"targetunreachable", GameScript::TargetUnreachable},
 	{"true", GameScript::True}, {"xp", GameScript::XP},
 	{"unselectablevariable", GameScript::UnselectableVariable},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT},
@@ -3155,10 +3156,7 @@ int GameScript::InMyArea(Scriptable* Sender, Trigger* parameters)
 int GameScript::InActiveArea(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar) {
-		return 0;
-	}
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor2 = ( Actor* ) tar;
@@ -3175,6 +3173,16 @@ int GameScript::AreaFlag(Scriptable* Sender, Trigger* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	return (map->AreaFlags&parameters->int0Parameter)>0;
+}
+
+int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 1; //well, if it doesn't exist it is unreachable
+	}
+	return core->GetPathFinder()->TargetUnreachable(
+		Sender->XPos, Sender->YPos, tar->XPos, tar->YPos);
 }
 
 //-------------------------------------------------------------

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.78 2004/03/17 20:51:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.79 2004/03/20 21:01:52 avenger_teambg Exp $
  *
  */
 
@@ -860,6 +860,44 @@ PathNode* PathFinder::RunAway(short sX, short sY, short dX, short dY, int PathLe
 		py = ny;
 	}
 	return Return;
+}
+
+bool PathFinder::TargetUnreachable(short sX, short sY, short dX, short dY)
+{
+	unsigned int startX = sX / 16, startY = sY / 12, goalX = dX / 16,
+	goalY = dY / 12;
+	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
+	while (InternalStack.size())
+		InternalStack.pop();
+
+	if (!( Passable[sMap->GetPixelIndex( goalX, goalY )] & 3 )) {
+		return true;
+	}
+	if (!( Passable[sMap->GetPixelIndex( startX, startY )] & 3 )) {
+		return true;
+	}
+
+	unsigned int pos = ( goalX << 16 ) | goalY;
+	unsigned int pos2 = ( startX << 16 ) | startY;
+	InternalStack.push( pos );
+	MapSet[goalY * Width + goalX] = 1;
+
+	while (InternalStack.size() && pos!=pos2) {
+		pos = InternalStack.front();
+		InternalStack.pop();
+		unsigned int x = pos >> 16;
+		unsigned int y = pos & 0xffff;
+
+		SetupNode( x - 1, y - 1, 1 );
+		SetupNode( x + 1, y - 1, 1 );
+		SetupNode( x + 1, y + 1, 1 );
+		SetupNode( x - 1, y + 1, 1 );
+		SetupNode( x, y - 1, 1 );
+		SetupNode( x + 1, y, 1 );
+		SetupNode( x, y + 1, 1 );
+		SetupNode( x - 1, y, 1 );
+	}
+	return pos!=pos2;
 }
 
 PathNode* PathFinder::FindPath(short sX, short sY, short dX, short dY)
