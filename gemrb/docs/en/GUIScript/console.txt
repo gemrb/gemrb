@@ -1,0 +1,9 @@
+The 'cheat console'.
+
+Description: You can pop the Console window anytime by pressing the ESC key. Any command you type in will be executed as a GUIScript command. You can use Python variables, issue Python commands as well as the GemRB scripting commands. If a command didn't execute, GemRB will retry its execution by adding "GemRB." to it, thus you can omit it in case you are extremely lazy.
+
+Examples (typed in the console):
+GemRB.Quit()       - quit the program
+Quit()             - same as above, but shorter
+EnableCheatKeys(1) - enables the debug keys
+

@@ -1,11 +1,14 @@
 
-Prototype:
+Prototype: GemRB.GetSystemVariable(Index)
 
-Description:
+Description: Returns the named Interface attribute.
 
-Parameters:
+Parameters: Index could have the following values:
+0 - bpp (color resolution)
+1 - screen width
+2 - screen height
 
-Return value:
+Return value: This function returns -1 if the index is invalid.
 
-See also:
+See also: GetGameString
 

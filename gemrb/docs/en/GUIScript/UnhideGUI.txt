@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.UnhideGUI()
 
-Description:
+Description: Shows the Game GUI and redraws windows.
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: N/A
 
-See also:
+See also: HideGUI, Invalidate, SetVisible
 

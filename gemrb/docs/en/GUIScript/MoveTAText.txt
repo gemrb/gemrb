@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: MoveTAText(srcWin, srcCtrl, dstWin, dstCtrl)
 
-Description:
+Description: Copies a TextArea content to another TextArea. Both parameter pairs must point to a valid TextArea.
 
-Parameters:
+Parameters: srcWin, srcCtrl - a window index/control index pair of the source control
+ dstWin, dstCtrl - a window index/control index pair of the destination control
 
-Return value:
+Return value: N/A
 
-See also:
+See also: SetText
 

@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.GetGameString(Index)
 
-Description:
+Description: Returns a system variable of string type referenced by Index.
 
-Parameters:
+Parameters: Index
+0 - returns the loading MOS resource's reference
 
-Return value:
+Return value: string - the referenced system variable
 
-See also:
+See also: GetSystemVariable, GetToken
 

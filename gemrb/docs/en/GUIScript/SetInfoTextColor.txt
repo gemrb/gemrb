@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.SetInfoTextColor(red, green, blue, [alpha])
 
-Description:
+Description: Sets the color of floating messages in GameControl. Floating messages are in-game messages issued by actors, or information text coming from game objects.
 
-Parameters:
+Parameters: red,green,blue,alpha - color code, alpha defaults to 255 (completely opaque)
 
-Return value:
+Return value: N/A
 
-See also:
+See also: SetLabelTextColor, SetButtonTextColor
 

@@ -1,11 +1,16 @@
 
-Prototype:
+Prototype: GemRB.ExecuteString(String)
 
-Description:
+Description: Executes an In-Game Script Action in the current Area Script Context. This means that LOCALS will be treated as the current area's variable.
 
-Parameters:
+Parameters: String - a gamescript action
 
-Return value:
+Return value: N/A
 
-See also:
+Example:
+ GemRB.ExecuteString("ActionOverride([PC], Attack(NearestEnemyOf(Myself)) )")
+
+The above example will force the player to attack an enemy, issuing the command as it would come from the current area's script. The current gametype must support the scripting action.
+
+See also: EvaluateString, gamescripts
 
