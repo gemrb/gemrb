@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.158 2004/08/05 22:55:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.159 2004/08/06 23:26:28 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -1132,6 +1132,9 @@ void GameControl::UnhideGUI()
 	ScreenFlags |= SF_GUIENABLED;
 	Variables* dict = core->GetDictionary();
 	unsigned long index;
+	// Unhide the gamecontrol window
+	core->SetVisible( 0, 1 );
+
 	if (dict->Lookup( "MessageWindow", index )) {
 		if (index != (unsigned long) -1) {
 			Window* mw = core->GetWindow( index );
