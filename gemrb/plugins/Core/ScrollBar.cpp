@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.17 2003/11/28 21:54:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.18 2003/12/22 22:09:12 balrog994 Exp $
  *
  */
 
@@ -102,7 +102,8 @@ void ScrollBar::SetImage(unsigned char type, Sprite2D * img)
 /** Mouse Button Down */
 void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	((Window*)Owner)->Invalidate();
+	//((Window*)Owner)->Invalidate();
+	core->RedrawAll();
 	unsigned short upmx = 0, upMx = frames[0]->Width, upmy = 0, upMy = frames[0]->Height;
 	unsigned short domy = Height-frames[2]->Height;
 	unsigned short slheight = domy - upMy;
@@ -162,7 +163,8 @@ void ScrollBar::OnMouseUp(unsigned short x, unsigned short y, unsigned char Butt
 void ScrollBar::OnMouseOver(unsigned short x, unsigned short y)
 {
 	if((State & SLIDER_GRAB) != 0) {
-		((Window*)Owner)->Invalidate();
+		//((Window*)Owner)->Invalidate();
+		core->RedrawAll();
 		unsigned short upMy = frames[0]->Height;
 		unsigned short domy = Height-frames[2]->Height;
 		unsigned short slheight = domy - upMy;
