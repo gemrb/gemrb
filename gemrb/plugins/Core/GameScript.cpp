@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.166 2004/07/21 16:31:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.167 2004/07/21 22:16:37 guidoj Exp $
  *
  */
 
@@ -89,8 +89,8 @@ static TriggerLink triggernames[] = {
 	{"extraproficiencygt", GameScript::ExtraProficiencyGT,0},
 	{"extraproficiencylt", GameScript::ExtraProficiencyLT,0},
 	{"faction", GameScript::Faction,0},
-	{"false", GameScript::False},
-	{"gender", GameScript::Gender},
+	{"false", GameScript::False,0},
+	{"gender", GameScript::Gender,0},
 	{"general", GameScript::General,0},
 	{"global", GameScript::Global,TF_MERGESTRINGS},
 	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger,TF_MERGESTRINGS},
@@ -1061,12 +1061,12 @@ Trigger* GameScript::ReadTrigger(DataStream* stream)
 	stream->ReadLine( line, 1024 );
 	Trigger* tR = new Trigger();
 	if (strcmp( core->GameType, "pst" ) == 0) {
-		sscanf( line, "%hd %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB",
+		sscanf( line, "%hu %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
 			&tR->int1Parameter, &tR->int2Parameter, &tR->XpointParameter,
 			&tR->YpointParameter, tR->string0Parameter, tR->string1Parameter );
 	} else {
-		sscanf( line, "%hd %d %d %d %d \"%[^\"]\" \"%[^\"]\" OB",
+		sscanf( line, "%hu %d %d %d %d \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
 			&tR->int1Parameter, &tR->int2Parameter, tR->string0Parameter,
 			tR->string1Parameter );
@@ -4941,8 +4941,8 @@ void GameScript::CreateCreatureAtLocation(Scriptable* Sender, Action* parameters
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	unsigned int value = CheckVariable(Sender, parameters->string0Parameter);
-	parameters->XpointParameter = *(unsigned short *) value;
-	parameters->YpointParameter = *(((unsigned short *) value)+1);
+	parameters->XpointParameter = value & 0xffff;
+	parameters->YpointParameter = value >> 16;
 	CreateCreatureCore(Sender, parameters, CC_CHECK_IMPASSABLE|CC_STRING1);
 }
 

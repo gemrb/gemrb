@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.56 2004/07/11 11:04:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.57 2004/07/21 22:16:37 guidoj Exp $
  *
  */
 
@@ -320,7 +320,7 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short Mod)
 							}
 						}
 						unsigned long idx=0;
-						sscanf( lines[seltext], "[s=%ld,", &idx);
+						sscanf( lines[seltext], "[s=%lu,", &idx);
 
 						gc->DialogChoose( idx );
 					}
@@ -441,7 +441,7 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y,
 			if (minrow > seltext)
 				return;
 			unsigned long idx;
-			sscanf( lines[seltext], "[s=%ld,", &idx );
+			sscanf( lines[seltext], "[s=%lu,", &idx );
 			Window* win = core->GetWindow( 0 );
 			if (win) {
 				GameControl* gc = ( GameControl* ) win->GetControl( 0 );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptEngine.h,v 1.6 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptEngine.h,v 1.7 2004/07/21 22:16:37 guidoj Exp $
  *
  */
 
@@ -45,9 +45,9 @@ public:
 	/** Load Script */
 	virtual bool LoadScript(const char* filename) = 0;
 	/** Run Function */
-	virtual bool RunFunction(char* fname) = 0;
+	virtual bool RunFunction(const char* fname) = 0;
 	/** Exec a single String */
-	virtual char* ExecString(char* string) = 0;
+	virtual char* ExecString(const char* string) = 0;
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.121 2004/07/21 16:31:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.122 2004/07/21 22:16:37 guidoj Exp $
  *
  */
 
@@ -140,7 +140,7 @@ private:
 public:
 	void Dump()
 	{
-    int i;
+		int i;
 
 		if(objectName[0]) {
 			printf("Object: %s\n",objectName);

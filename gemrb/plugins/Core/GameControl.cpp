@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.145 2004/07/21 20:27:26 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.146 2004/07/21 22:16:37 guidoj Exp $
  */
 
 #ifndef WIN32
@@ -1188,10 +1188,10 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 	DialogChoose( (unsigned int) -1 );
 }
 
-static void AddTalk(TextArea* ta, Actor* speaker, char* speaker_color,
-	char* text, char* text_color)
+static void AddTalk(TextArea* ta, Actor* speaker, const char* speaker_color,
+	char* text, const char* text_color)
 {
-	char* format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
+	const char* format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
 	int newlen = (int)(strlen( format ) + strlen( speaker->LongName ) +
 		strlen( speaker_color ) + strlen( text ) +
 		strlen( text_color ) + 1);
@@ -1441,7 +1441,7 @@ void GameControl::ChangeMap()
 	ChangeArea = false;
 }
 
-void GameControl::DisplayString(char* Text)
+void GameControl::DisplayString(const char* Text)
 {
 	unsigned long WinIndex, TAIndex;
 
