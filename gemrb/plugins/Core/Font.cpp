@@ -37,7 +37,7 @@ void Font::AddChar(Sprite2D * spr)
 
 bool written = false;
 
-void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowcolor, unsigned char Alignment, bool anchor, Font * initials, Color *initcolor)
+void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowcolor, unsigned char Alignment, bool anchor, Font * initials, Color *initcolor, Sprite2D * cursor, int curpos)
 {
 	//TODO: Implement Colored Text
 	Color * pal = NULL, *ipal = NULL;
@@ -48,7 +48,7 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowc
 		ipal = core->GetVideoDriver()->CreatePalette(*initcolor, *lowcolor);
 	}
 	Video * video = core->GetVideoDriver();
-	StringList sl = Prepare(rgn, string, initials);
+	StringList sl = Prepare(rgn, string, initials, curpos);
 	int x = 0, y = 0;
 	if(Alignment & IE_FONT_ALIGN_TOP)
 		y = rgn.y;
@@ -67,6 +67,8 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowc
 					else if(pal != NULL)
 						video->SetPalette(sl.strings[r][i], pal);
 					video->BlitSprite(sl.strings[r][i], x, y, anchor);
+					if((cursor != NULL) && (sl.cury == r) && (sl.curx == i))
+						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos, y, anchor);
 					if(sl.strings[r][i+1] == NULL)
 						break;
 					x+=(sl.strings[r][i]->Width-sl.strings[r][i]->XPos)+sl.strings[r][i+1]->XPos;
@@ -88,6 +90,8 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowc
 					else if(pal != NULL)
 						video->SetPalette(sl.strings[r][i], pal);
 					video->BlitSprite(sl.strings[r][i], x, y, anchor);
+					if((cursor != NULL) && (sl.cury == r) && (sl.curx == i))
+						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos, y, anchor);
 					if(sl.strings[r][i+1] == NULL)
 						break;
 					x+=(sl.strings[r][i]->Width-sl.strings[r][i]->XPos)+sl.strings[r][i+1]->XPos;
@@ -114,6 +118,8 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowc
 					if(pal != NULL)
 						video->SetPalette(sl.strings[r][i], pal);
 					video->BlitSprite(sl.strings[r][i], x, y, anchor);
+					if((cursor != NULL) && (sl.cury == r) && (sl.curx == i))
+						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos, y, anchor);
 					if(i == 0)
 						break;
 					x-=sl.strings[r][i]->XPos+(sl.strings[r][i-1]->Width-sl.strings[r][i-1]->XPos);
@@ -133,7 +139,7 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowc
 	free(sl.lengths);
 }
 /** PreCalculate for Printing */
-StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init)
+StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int curpos)
 {
 	if(init == NULL)
 		init = this;
@@ -159,10 +165,18 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init)
 	x = nextimg->XPos;
 	bool newline = true;
 	for(int i = 0; i < len; i++) {
+		if(i == curpos) {
+			sl.curx = nsi;
+			sl.cury = sl.StringCount-1;
+		}
 		if(x >= rgn.w) {
 			//Check for spaces at the beginning of the row
 			while(string[i] == ' ') {
 				i++;
+				if(i == curpos) {
+					sl.curx = nsi;
+					sl.cury = sl.StringCount-1;
+				}
 			}
 			nextimg = chars[string[i]-1];
 			//New Line
