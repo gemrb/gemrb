@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.9 2004/11/07 19:19:12 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.10 2004/11/08 19:10:53 avenger_teambg Exp $
  *
  */
 
@@ -68,38 +68,46 @@ Item* ITMImp::GetItem()
 {
 	unsigned int i;
 	Item* s = new Item();
+	ieByte k1,k2,k3,k4;
 
-	str->Read( &s->ItemName, 4 );
-	str->Read( &s->ItemNameIdentified, 4 );
-	str->Read( s->ReplacementItem, 8 );
-	str->Read( &s->Flags, 4 );
-	str->Read( &s->ItemType, 2 );
-	str->Read( &s->UsabilityBitmask, 4 );
-	str->Read( s->InventoryIconType, 2 );
-	str->Read( &s->MinLevel, 2 );
-	str->Read( &s->MinStrength, 2 );
-	str->Read( &s->MinStrengthBonus, 2 );
-	str->Read( &s->MinIntelligence, 2 );
-	str->Read( &s->MinDexterity, 2 );
-	str->Read( &s->MinWisdom, 2 );
-	str->Read( &s->MinConstitution, 2 );
-	str->Read( &s->MinCharisma, 2 );
-	str->Read( &s->Price, 4 );
-	str->Read( &s->StackAmount, 2 );
-	str->Read( s->ItemIcon, 8 );
-	str->Read( &s->LoreToID, 2 );
-	str->Read( s->GroundIcon, 8 );
-	str->Read( &s->Weight, 4 );
-	str->Read( &s->ItemDesc, 4 );
-	str->Read( &s->ItemDescIdentified, 4 );
-	str->Read( s->CarriedIcon, 8 );
-	str->Read( &s->Enchantment, 4 );
-	str->Read( &s->ExtHeaderOffset, 4 );
-	str->Read( &s->ExtHeaderCount, 2 );
-	str->Read( &s->FeatureBlockOffset, 4 );
-	str->Read( &s->EquippingFeatureOffset, 2 );
-	str->Read( &s->EquippingFeatureCount, 2 );
-
+	str->ReadDword( &s->ItemName );
+	str->ReadDword( &s->ItemNameIdentified );
+	str->ReadResRef( s->ReplacementItem );
+	str->ReadDword( &s->Flags );
+	str->ReadWord( &s->ItemType );
+	str->ReadDword( &s->UsabilityBitmask );
+	str->Read( s->InventoryIconType,2 );
+	str->ReadWord( &s->MinLevel );
+	str->Read( &s->MinStrength,1 );
+	str->Read( &s->unknown2,1 );
+	str->Read( &s->MinStrengthBonus,1 );
+	str->Read( &k1,1 );
+	str->Read( &s->MinIntelligence,1 );
+	str->Read( &k2,1 );
+	str->Read( &s->MinDexterity,1 );
+	str->Read( &k3,1 );
+	str->Read( &s->MinWisdom,1 );
+	str->Read( &k4,1 );
+	s->KitUsability=(k1<<24) | (k2<<16) | (k3<<8) | k1; //bg2/iwd2 specific
+	str->Read( &s->MinConstitution,1 );
+	str->Read( &s->WeaProf,1 ); //bg2 specific
+	str->Read( &s->MinCharisma,1 );
+	str->Read( &s->unknown3,1 );
+	str->ReadDword( &s->Price );
+	str->ReadWord( &s->StackAmount );
+	str->ReadResRef( s->ItemIcon );
+	str->ReadWord( &s->LoreToID );
+	str->ReadResRef( s->GroundIcon );
+	str->ReadDword( &s->Weight );
+	str->ReadDword( &s->ItemDesc );
+	str->ReadDword( &s->ItemDescIdentified );
+	str->ReadResRef( s->CarriedIcon );
+	str->ReadDword( &s->Enchantment );
+	str->ReadDword( &s->ExtHeaderOffset );
+	str->ReadWord( &s->ExtHeaderCount );
+	str->ReadDword( &s->FeatureBlockOffset );
+	str->ReadWord( &s->EquippingFeatureOffset );
+	str->ReadWord( &s->EquippingFeatureCount );
 
 	s->Dialog[0] = 0;
 	s->DialogName = 0;
@@ -109,9 +117,9 @@ Item* ITMImp::GetItem()
 	if (version == 20) {
 		str->Read( s->unknown, 16 );
 	} else if (version == 11) {
-		str->Read( s->Dialog, 8 );
-		str->Read( &s->DialogName, 4 );
-		str->Read( &s->WieldColor, 2 );
+		str->ReadResRef( s->Dialog );
+		str->ReadDword( &s->DialogName );
+		str->ReadWord( &s->WieldColor );
 		str->Read( s->unknown, 26 );
 	}
 
@@ -166,36 +174,36 @@ ITMExtHeader* ITMImp::GetExtHeader(Item* s)
 	unsigned int i;
 	ITMExtHeader* eh = new ITMExtHeader();
 
-	str->Read( &eh->AttackType, 1 );
-	str->Read( &eh->IDReq, 1 );
-	str->Read( &eh->Location, 1 );
-	str->Read( &eh->unknown1, 1 );
-	str->Read( eh->UseIcon, 8 );
-	str->Read( &eh->Target, 1 );
-	str->Read( &eh->TargetNumber, 1 );
-	str->Read( &eh->Range, 2 );
-	str->Read( &eh->ProjectileType, 2 );
-	str->Read( &eh->Speed, 2 );
-	str->Read( &eh->THAC0Bonus, 2 );
-	str->Read( &eh->DiceSides, 2 );
-	str->Read( &eh->DiceThrown, 2 );
-	str->Read( &eh->DamageBonus, 2 );
-	str->Read( &eh->DamageType, 2 );
-	str->Read( &eh->FeatureCount, 2 );
-	str->Read( &eh->FeatureOffset, 2 );
-	str->Read( &eh->Charges, 2 );
-	str->Read( &eh->ChargeDepletion, 2 );
-	str->Read( &eh->UseStrengthBonus, 1 );
-	str->Read( &eh->Recharge, 1 );
-	str->Read( &eh->unknown2, 2 );
-	str->Read( &eh->ProjectileAnimation, 2 );
+	str->Read( &eh->AttackType,1 );
+	str->Read( &eh->IDReq,1 );
+	str->Read( &eh->Location,1 );
+	str->Read( &eh->unknown1,1 );
+	str->ReadResRef( eh->UseIcon );
+	str->Read( &eh->Target,1 );
+	str->Read( &eh->TargetNumber,1 );
+	str->ReadWord( &eh->Range );
+	str->ReadWord( &eh->ProjectileType );
+	str->ReadWord( &eh->Speed );
+	str->ReadWord( &eh->THAC0Bonus );
+	str->ReadWord( &eh->DiceSides );
+	str->ReadWord( &eh->DiceThrown );
+	str->ReadWord( &eh->DamageBonus );
+	str->ReadWord( &eh->DamageType );
+	str->ReadWord( &eh->FeatureCount );
+	str->ReadWord( &eh->FeatureOffset );
+	str->ReadWord( &eh->Charges );
+	str->ReadWord( &eh->ChargeDepletion );
+	str->ReadDword( &eh->RechargeFlags );
+	//str->Read( &eh->UseStrengthBonus,1 );
+	//str->Read( &eh->Recharge,1 );
+	//str->ReadWord( &eh->unknown2 );
+	str->ReadWord( &eh->ProjectileAnimation );
 	for (i = 0; i < 3; i++) {
-		str->Read( &eh->MeleeAnimation[i], 2 );
+		str->ReadWord( &eh->MeleeAnimation[i] );
 	}
-	str->Read( &eh->BowArrowQualifier, 2 );
-	str->Read( &eh->CrossbowBoltQualifier, 2 );
-	str->Read( &eh->MiscProjectileQualifier, 2 );
-
+	str->ReadWord( &eh->BowArrowQualifier );
+	str->ReadWord( &eh->CrossbowBoltQualifier );
+	str->ReadWord( &eh->MiscProjectileQualifier );
 
 	str->Seek( s->FeatureBlockOffset + eh->FeatureOffset, GEM_STREAM_START );
 	for (i = 0; i < eh->FeatureCount; i++) {
@@ -211,22 +219,22 @@ ITMFeature* ITMImp::GetFeature()
 {
 	ITMFeature* f = new ITMFeature();
 
-	str->Read( &f->Opcode, 2 );
-	str->Read( &f->Target, 1 );
-	str->Read( &f->Power, 1 );
-	str->Read( &f->Parameter1, 4 );
-	str->Read( &f->Parameter2, 4 );
-	str->Read( &f->TimingMode, 1 );
-	str->Read( &f->Resistance, 1 );
-	str->Read( &f->Duration, 4 );
-	str->Read( &f->Probability1, 1 );
-	str->Read( &f->Probability2, 1 );
-	str->Read( f->Resource, 8 );
-	str->Read( &f->DiceThrown, 4 );
-	str->Read( &f->DiceSides, 4 );
-	str->Read( &f->SavingThrowType, 4 );
-	str->Read( &f->SavingThrowBonus, 4 );
-	str->Read( &f->unknown, 4 );
+	str->ReadWord( &f->Opcode );
+	str->Read( &f->Target,1 );
+	str->Read( &f->Power,1 );
+	str->ReadDword( &f->Parameter1 );
+	str->ReadDword( &f->Parameter2 );
+	str->Read( &f->TimingMode,1 );
+	str->Read( &f->Resistance,1 );
+	str->ReadDword( &f->Duration );
+	str->Read( &f->Probability1,1 );
+	str->Read( &f->Probability2,1 );
+	str->ReadResRef( f->Resource );
+	str->ReadDword( &f->DiceThrown );
+	str->ReadDword( &f->DiceSides );
+	str->ReadDword( &f->SavingThrowType );
+	str->ReadDword( &f->SavingThrowBonus );
+	str->ReadDword( &f->unknown );
 
 	return f;
 }
