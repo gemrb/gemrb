@@ -2,14 +2,14 @@ Scripts:
 1. Run All creature scripts when the creatures are 'activated'.
 Creatures are activated if they are:
  a. in visibility range of a player (or object that was marked as a clear fog of war).
- b. affected by the 'aifast' flag (which effectively disables deactivation).
+ b. affected by the 'aifast' flag (which effectively disables deactivation). The creatures always start activated (except if this flag is saved in the area?), thus the OnCreation trigger always fires on creation. This means, deactivation must be checked at the end of script Update() of the actor.
 
 2. Run All area scripts not just the active areas.
 Area scripts are queued, master areas get on the head of the queue, non-master areas get in the tail of the queue. See also: SetMasterArea action/mastarea.2da
 
 3. (DONE) Fix script compiler to group string parameters depending on opcode
 
-4. TLK tags (easy to implement)
+4. (DONE) TLK tags
 
 Items:
 1. (DONE) Loading containers/items in areas
@@ -18,12 +18,13 @@ Items:
 4. Equipping items
 
 Effects:
-1. Create base system for effect blocks
+1. Create base system for effect blocks (ED)
 2. Implement effects
 
 Area:
 1. Implement cover (wallgroups)
 2. Fog of war
+3. Blocking doors (impeded blocks)
 
 Known Bugs:
 1. problem: Dialog options that are disabled by the trigger condition are still accessible via hotkey. (FIXED)
