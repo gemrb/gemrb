@@ -127,7 +127,7 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 	strcat(path, core->GameType);
 	SearchIn(core->GemRBPath, path, resname, type, "[KEYImporter]: Found in GemRB Override...\n");
 	SearchIn(core->GamePath, "override", resname, type, "[KEYImporter]: Found in Override...\n");
-	SearchIn(core->CD1, "Data", resname, type, "[KEYImporter]: Found in Local CD1 Folder...\n");
+	SearchIn(core->GamePath, "Data", resname, type, "[KEYImporter]: Found in Local CD1 Folder...\n");
 	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
 	unsigned long ResLocator;
 	if(resources.Lookup(resname,type,ResLocator) ) {

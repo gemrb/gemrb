@@ -20,6 +20,7 @@
 #include "Slider.h"
 #include "Console.h"
 #include "SoundMgr.h"
+#include "SaveGameIterator.h"
 #include "Variables.h"
 #include "MusicMgr.h"
 #include "TableMgr.h"
@@ -69,6 +70,7 @@ private:
 	WindowMgr * windowmgr;
 	ScriptEngine * guiscript;
 	SoundMgr * soundmgr;
+	SaveGameIterator *sgiterator;
 	/** Windows Array */
 	std::vector<Window*> windows;
 	std::vector<int> topwin;
@@ -143,6 +145,8 @@ public:
 	void DrawConsole();
 	/** Get the Sound Manager */
 	SoundMgr * GetSoundMgr();
+	/** Get the SaveGameIterator */
+	SaveGameIterator * GetSaveGameIterator();
 	/** Get the Variables Dictionary */
 	Variables * GetDictionary();
 	/** Get the Token Dictionary */

@@ -36,6 +36,7 @@ Interface::Interface(void)
 	tokens = NULL;
 	music = NULL;
 	soundmgr = NULL;
+	sgiterator = NULL;
 	ConsolePopped = false;
 	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
@@ -82,6 +83,9 @@ Interface::~Interface(void)
 		delete(music);
 	if(soundmgr)
 		delete(soundmgr);
+	if(sgiterator)
+		delete(sgiterator);
+
 	FreeResourceVector(Font, fonts);
 	FreeResourceVector(Window, windows);
 
@@ -288,6 +292,14 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	if(!soundmgr->Init()) {
+		printStatus("ERROR", LIGHT_RED);
+		return GEM_ERROR;
+	}
+	printStatus("OK", LIGHT_GREEN);
+
+	printMessage("Core", "Allocating SaveGameIterator...", WHITE);
+	sgiterator=new SaveGameIterator();
+	if(sgiterator==NULL) {
 		printStatus("ERROR", LIGHT_RED);
 		return GEM_ERROR;
 	}
@@ -855,6 +867,11 @@ void Interface::DrawConsole()
 SoundMgr * Interface::GetSoundMgr()
 {
 	return soundmgr;
+}
+/** Get the Sound Manager */
+SaveGameIterator * Interface::GetSaveGameIterator()
+{
+	return sgiterator;
 }
 /** Sends a termination signal to the Video Driver */
 bool Interface::Quit(void)

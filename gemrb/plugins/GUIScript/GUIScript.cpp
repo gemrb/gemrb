@@ -1121,6 +1121,11 @@ static PyObject * GemRB_PlayMovie(PyObject */*self*/, PyObject *args)
 	return Py_BuildValue("i", ind);
 }
 
+static PyObject *GemRB_GetSaveGameCount( PyObject */*self*/, PyObject */*args*/)
+{
+  return Py_BuildValue("i",core->GetSaveGameIterator()->GetSaveGameCount() );
+}
+
 static PyObject *GemRB_Roll(PyObject */*self*/, PyObject *args)
 {
 	int Dice, Size, Add;
@@ -1279,6 +1284,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"Roll", GemRB_Roll, METH_VARARGS,
      "Calls traditional dice roll."},
+
+	{"GetSaveGameCount", GemRB_GetSaveGameCount, METH_VARARGS,
+     "Returns the number of saved games."},
 
 	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
 	 "Invalidated the given Window."},

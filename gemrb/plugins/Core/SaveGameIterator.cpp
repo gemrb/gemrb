@@ -21,6 +21,15 @@ SaveGameIterator::~SaveGameIterator(void)
 {
 }
 
+static const char *PlayMode()
+{
+	unsigned long playmode=1;
+
+	core->GetDictionary()->Lookup("PlayMode",playmode);
+	if(playmode==2) return "mpsave";
+	return "save";
+}
+
 int SaveGameIterator::GetSaveGameCount()
 {
 #ifdef WIN32
@@ -30,12 +39,13 @@ int SaveGameIterator::GetSaveGameCount()
 #endif
 	int count = 0;
 	char Path[_MAX_PATH];
+	const char *SaveFolder=PlayMode();
 #ifdef WIN32
-	sprintf(Path, "%smpsave%s*.*", core->GamePath, SPathDelimiter);
+	sprintf(Path, "%s%s%s*.*", core->GamePath, SaveFolder,SPathDelimiter);
 	if((hFile = _findfirst(Path, &c_file)) == -1L) //If there is no file matching our search
 		return -1;
 #else
-	sprintf(Path, "%smpsave", core->GamePath);
+	sprintf(Path, "%s%s", core->GamePath,SaveFolder);
 	DIR * dir = opendir(Path);
 	if(dir == NULL) //If we cannot open the Directory
 		return -1;
@@ -91,12 +101,13 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 #endif
 	int count = -1, prtrt = 0;
 	char Path[_MAX_PATH];
+	const char *SaveFolder=PlayMode();
 #ifdef WIN32
-	sprintf(Path, "%smpsave%s*.*", core->GamePath, SPathDelimiter);
+	sprintf(Path, "%s%s%s*.*", core->GamePath, SaveFolder, SPathDelimiter);
 	if((hFile = _findfirst(Path, &c_file)) == -1L) //If there is no file matching our search
 		return NULL;
 #else
-	sprintf(Path, "%smpsave", core->GamePath);
+	sprintf(Path, "%s%s", core->GamePath, SaveFolder);
 	DIR * dir = opendir(Path);
 	if(dir == NULL) //If we cannot open the Directory
 		return NULL;
@@ -136,10 +147,10 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 #ifdef WIN32
 				long file;
 				struct _finddata_t bmpf;
-				sprintf(tmp, "%smpsave%s%s%s*.bmp", core->GamePath, SPathDelimiter, c_file.name, SPathDelimiter);
+				sprintf(tmp, "%s%s%s%s%s*.bmp", core->GamePath, SaveFolder, SPathDelimiter, c_file.name, SPathDelimiter);
 				file = _findfirst(tmp, &bmpf);
 #else
-				sprintf(Path, "%smpsave", core->GamePath);
+				sprintf(Path, "%s%s", core->GamePath, SaveFolder);
 				DIR * ndir = opendir(Path);
 				if(ndir == NULL) //If we cannot open the Directory
 					return NULL;
@@ -167,7 +178,7 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 #ifdef WIN32
 	} while(_findnext(hFile, &c_file) == 0);
 	_findclose(hFile);
-	sprintf(Path, "%smpsave%s%s", core->GamePath, SPathDelimiter, c_file.name);
+	sprintf(Path, "%s%s%s%s", core->GamePath, SaveFolder,SPathDelimiter, c_file.name);
 #else
 	} while((de = readdir(dir)) != NULL);
 	closedir(dir);  //No other files in the directory, close it
