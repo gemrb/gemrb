@@ -139,6 +139,8 @@ Animation * BAMImp::GetAnimation(unsigned char Cycle, int x, int y, unsigned cha
 
 Sprite2D * BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 {
+	if(findex >= frames.size())
+		findex = 0;
 	str->Seek((frames[findex].FrameData & 0x7FFFFFFF), GEM_STREAM_START);
 	unsigned long pixelcount = frames[findex].Width * frames[findex].Height;
 	void * pixels = malloc(pixelcount);
@@ -149,7 +151,7 @@ Sprite2D * BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 			RLESize = str->Size() - (frames[findex].FrameData & 0x7FFFFFFF);
 		else
 			RLESize = (frames[findex+1].FrameData & 0x7FFFFFFF) - (frames[findex].FrameData & 0x7FFFFFFF);*/
-		RLESize = (unsigned long)(frames[findex].Width * frames[findex].Height * 1.5);
+		RLESize = (unsigned long)ceil(frames[findex].Width * frames[findex].Height * 1.5);
 		void * inpix = malloc(RLESize);
 		unsigned char * p = (unsigned char*)inpix;
 		unsigned char * Buffer = (unsigned char*)pixels;
@@ -224,7 +226,7 @@ Font * BAMImp::GetFont()
   printf("Start Getting Font\n");
   Font * fnt = new Font();
   for(int i = 0; i < 255; i++) {
-    fnt->AddChar(GetFrame(i, 0));
+    fnt->AddChar(GetFrame(cycles[i].FirstFrame, 0));
   }
   printf("Font Created\n");
   return fnt;
