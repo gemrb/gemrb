@@ -140,8 +140,15 @@ Set this parameter to
 on Unix-like systems.
 
 .TP
+.BR AllStringsTagged =(0|1)
+Whether the game should replace tags like <PAGE> or <points> with
+their values. Should be always
+.IR 1 .
+This flag will be removed soon.
+
+.TP
 .BR IgnoreButtonFrames =(0|1)
-Buttons in PS:T usually have zeros for frame indices for selected and
+Buttons in PST usually have zeros for frame indices for selected and
 disabled states (which should usually be 2 and 3). Setting this to
 .IR 1 .
 makes GemRB ignore the zeroed indices and just use 2 and 3.
@@ -162,9 +169,6 @@ Path to directory with scripts controlling game's GUI.
 .TP
 .BR GameOnCD =(0|1)
 
-
-.TP
-.BR AllStringsTagged =(0|1)
 
 .TP
 .BR MidResAvatars =(0|1)
