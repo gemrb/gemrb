@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.29 2005/01/06 22:23:43 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.30 2005/02/07 06:59:59 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -517,7 +517,23 @@ def GetStatOverview (pc):
 		XP = XP/2
 	Experience = GemRB.GetString (19673) + ': ' + str (XP)
 
-	Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
+	#Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
+	# Those are used to check which character we are dealing with
+	AnimIdsTable = GemRB.LoadTable ("avslots")
+	anim_id = GS (IE_ANIMATION_ID)
+	row = "0x%04X" %anim_id
+
+	# Nameless is a special case (dual class)
+	if GemRB.GetTableValue (AnimIdsTable, row, "PC") == "NAMELESS_ONE":
+		if RowName1 == "FIGHTER":
+			Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
+		elif RowName1 == "MAGE":
+			Level = GemRB.GetPlayerStat (pc, IE_LEVEL2)
+		else:
+			Level = GemRB.GetPlayerStat (pc, IE_LEVEL3)
+	else:
+		Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
+
 	ClassName = GemRB.GetString (GemRB.GetTableValue (ClassTable, RowName1, "NAME_REF"))
 	Main = GetClassHeader (pc, ClassName, RowName1, Level, Experience)
 	if Multi:
