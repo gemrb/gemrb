@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSnd.cpp,v 1.5 2004/08/09 13:02:08 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSnd.cpp,v 1.6 2004/08/20 02:37:37 divide Exp $
  *
  */
 
@@ -37,12 +37,12 @@ bool NullSnd::Init(void)
 	return true;
 }
 
-unsigned long NullSnd::Play(const char* ResRef, int XPos, int YPos, unsigned long flags)
+unsigned long NullSnd::Play(const char*, int, int, unsigned long)
 {
 	return 1000; //Returning 1 Second Length
 }
 
-unsigned long NullSnd::StreamFile(const char* filename)
+unsigned long NullSnd::StreamFile(const char*)
 {
 	return 0;
 }
@@ -61,6 +61,6 @@ void NullSnd::ResetMusics()
 {
 }
 
-void NullSnd::UpdateViewportPos(int XPos, int YPos)
+void NullSnd::UpdateViewportPos(int, int)
 {
 }
