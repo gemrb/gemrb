@@ -52,7 +52,6 @@ Button::Button(bool Clear){
 	}
 	Flags = 0x4;
 	ToggleState = false;
-	Value = 0;
 	Picture = NULL;
 }
 Button::~Button(){

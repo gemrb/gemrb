@@ -89,7 +89,8 @@ void Slider::SetPosition(unsigned int pos)
 	if(pos <= KnobStepsCount)
 		Pos = pos;
 	if(VarName[0]!=0) {
-		core->GetDictionary()->SetAt(VarName,pos);
+		if(!Value) Value=1;
+		core->GetDictionary()->SetAt(VarName,pos*Value);
 	}	
 	Changed = true;
 }
@@ -97,6 +98,8 @@ void Slider::SetPosition(unsigned int pos)
 void Slider::RedrawSlider(char *VariableName, int Sum)
 {
 	if(strnicmp(VarName, VariableName, MAX_VARIABLE_LENGTH)) return;
+	if(!Value) Value=1;
+	Sum/=Value;
 	if(Sum <= KnobStepsCount)
 		Pos = Sum;
 	Changed = true;
