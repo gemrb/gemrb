@@ -1128,16 +1128,15 @@ void GameControl::ResizeAdd(Window* win, unsigned char type)
 void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 {
 	DialogMgr* dm = ( DialogMgr* ) core->GetInterface( IE_DLG_CLASS_ID );
-	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ),
-			true );
+	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
 	dlg = dm->GetDialog();
-	strncpy(dlg->ResRef, dlgref, 8); //this isn't handled by GetDialog???
 	core->FreeInterface( dm );
 
 	if (!dlg) {
 		printf( "[GameControl]: Cannot start dialog: %s\n", dlgref );
 		return;
 	}
+	strncpy(dlg->ResRef, dlgref, 8); //this isn't handled by GetDialog???
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)

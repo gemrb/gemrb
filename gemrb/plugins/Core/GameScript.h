@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.95 2004/04/07 20:12:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.96 2004/04/10 18:08:49 avenger_teambg Exp $
  *
  */
 
@@ -514,8 +514,9 @@ public:
 	};
 	~Script()
 	{
+		printf( "Start Freeing Script: %s\n", GetName() );
 		FreeResponseBlocks();
-		printf( "Freeing Script: %s\n", GetName() );
+		printf( "End Freeing Script: %s\n", GetName() );
 	}
 	const char* GetName()
 	{
