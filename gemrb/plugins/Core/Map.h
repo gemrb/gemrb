@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.55 2005/01/09 14:54:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.56 2005/02/20 20:50:06 avenger_teambg Exp $
  *
  */
 
@@ -149,6 +149,8 @@ public:
 	/* Finds the path which leads to d */
 	PathNode* FindPath(Point &s, Point &d);
 	bool IsVisible(Point &s, Point &d);
+	/* returns edge direction of map boundary, only worldmap regions */
+	int WhichEdge(Point &s);
 
 	//ambients
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.230 2005/02/19 19:09:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.231 2005/02/20 20:50:04 avenger_teambg Exp $
  *
  */
 
@@ -442,6 +442,7 @@ static ActionLink actionnames[] = {
 	{"moveviewobject", GameScript::MoveViewPoint,0},
 	{"moveviewpoint", GameScript::MoveViewPoint,0},
 	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING},//we use this for dialogs, hack
+	{"nidspecial2", GameScript::NIDSpecial2,AF_BLOCKING},//we use this for worldmap, another hack
 	{"noaction", GameScript::NoAction,0},
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"panic", GameScript::Panic,0},
@@ -6583,6 +6584,37 @@ void GameScript::PlayerDialogue(Scriptable* Sender, Action* parameters)
 void GameScript::NIDSpecial1(Scriptable* Sender, Action* parameters)
 {
 	BeginDialog( Sender, parameters, BD_INTERRUPT | BD_TARGET | BD_NUMERIC | BD_TALKCOUNT | BD_CHECKDIST );
+}
+
+void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	printf("NIDSpecial2 kicked in!\n");
+	Game *game=core->GetGame();
+	if (!game->EveryoneStopped() ) {
+		printf("But not everyone stopped moving, we can't go.\n");
+		Sender->AddActionInFront( Sender->CurrentAction );
+		//wait for a while
+		Sender->SetWait( 1 * AI_UPDATE_TIME );
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+        if(!game->EveryoneNearPoint(actor->Area, actor->Pos, true) ) {
+		//we abort the command, everyone should be here
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	//travel direction passed to guiscript
+	unsigned int direction = game->GetCurrentMap()->WhichEdge(actor->Pos);
+	printf("Travel direction returned: %d\n", direction);
+	core->GetDictionary()->SetAt("Travel", direction);
+	printf("Now, lets stop the game and bring up the worldmap, can we?\n");
+	core->GetGUIScriptEngine()->RunFunction( "OpenWorldMapWindow" );
+	//sorry, i have absolutely no idea when i should do this :)
+	Sender->CurrentAction = NULL;
 }
 
 void GameScript::StartDialogueInterrupt(Scriptable* Sender, Action* parameters)

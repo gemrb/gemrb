@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.132 2005/02/19 17:34:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.133 2005/02/20 20:50:06 avenger_teambg Exp $
  *
  */
 
@@ -1184,6 +1184,30 @@ bool Map::IsVisible(Point &s, Point &d)
 		}
 	}
 	return true;
+}
+
+//returns direction of area boundary, returns -1 if it isn't a boundary
+int Map::WhichEdge(Point &s)
+{
+	unsigned int sX=s.x/16;
+	unsigned int sY=s.y/12;
+	if (!(Passable[SearchMap->GetPixelIndex( sX, sY )]&PATH_MAP_TRAVEL)) {
+		printf("This isn't a travel region [%d.%d]?\n",sX, sY);
+		return -1;
+	}
+	sX*=Height;
+	sY*=Width;
+	if(sX<sY) { //north or west
+		if(Width*Height<sX+sY) { //
+			return 0;
+		}
+		return 1;
+	}
+	//south or east
+	if(Width*Height<sX+sY) { //
+		return 2; 
+	}
+	return 3;
 }
 
 //--------ambients----------------

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.187 2005/02/13 13:39:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.188 2005/02/20 20:49:59 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -886,6 +886,11 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			actor->ClearActions();
 			sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
 			actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+			//we clicked over a searchmap travel region
+				if( ( ( Window * ) Owner )->Cursor == 34) {
+				sprintf( Tmp, "NIDSpecial2()" );
+				actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+			}
 			return;
 		}
 		//party formation movement
@@ -897,6 +902,11 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			//formations should be rotated based on starting point
 			//of the leader? and destination
 			MoveToPointFormation(actor,p,orient);
+		}
+		//we clicked over a searchmap travel region
+		if( ( ( Window * ) Owner )->Cursor == 34) {
+			sprintf( Tmp, "NIDSpecial2()" );
+			actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 		}
 		return;
 	}

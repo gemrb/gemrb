@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.158 2005/02/19 19:09:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.159 2005/02/20 20:50:05 avenger_teambg Exp $
  *
  */
 
@@ -1072,6 +1072,7 @@ public:
 	static void MoveViewPoint(Scriptable* Sender, Action* parameters);
 	static void MoveViewObject(Scriptable* Sender, Action* parameters);
 	static void NIDSpecial1(Scriptable* Sender, Action* parameters);
+	static void NIDSpecial2(Scriptable* Sender, Action* parameters);
 	static void NoAction(Scriptable* Sender, Action* parameters);
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
 	static void Panic(Scriptable* Sender, Action* parameters);
