@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.19 2003/12/07 13:15:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.20 2003/12/15 09:35:22 balrog994 Exp $
  *
  */
 
@@ -91,7 +91,7 @@ bool MUSImp::Init()
 /** Loads a PlayList for playing */
 bool MUSImp::OpenPlaylist(const char * name)
 {
-	int len=strlen(PLName);
+	int len=(int)strlen(PLName);
 	if(strnicmp(name, PLName, len) == 0)
 		return true;
 	if(Playing)
@@ -118,7 +118,7 @@ bool MUSImp::OpenPlaylist(const char * name)
 	while(count != 0) {
 		char line[64];
 		str->ReadLine(line, 64);
-		int len = strlen(line);
+		int len = (int)strlen(line);
 		int i = 0;
 		int p = 0;
 		PLString pls;
@@ -185,7 +185,7 @@ bool MUSImp::OpenPlaylist(const char * name)
 		}
 		pls.PLEnd[p]=0;
 		bool found = false;
-		for(int i = 0; i < playlist.size(); i++) {
+		for(unsigned int i = 0; i < playlist.size(); i++) {
 			if(stricmp(pls.PLFile, playlist[i].PLFile) == 0) {
 				pls.soundID = playlist[i].soundID;
 				found = true;
@@ -231,7 +231,7 @@ void MUSImp::Start()
 		if(playlist.size()==0)
 			return;
 		if(playlist[PLpos].PLLoop[0] != 0) {
-			for(int i = 0; i < playlist.size(); i++) {
+			for(unsigned int i = 0; i < playlist.size(); i++) {
 				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
 					PLnext = i;
 					break;
@@ -254,7 +254,7 @@ void MUSImp::End()
 			return;
 		if(playlist[PLpos].PLEnd[0] != 0) {
 			//core->GetSoundMgr()->Stop(lastSound);
-			for(int i = 0; i < playlist.size(); i++) {
+			for(unsigned int i = 0; i < playlist.size(); i++) {
 				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLEnd) == 0) {
 					core->GetSoundMgr()->Play(playlist[i].soundID);
 					PLnext = i;
@@ -282,7 +282,7 @@ void MUSImp::End()
 			pls.soundID = core->GetSoundMgr()->LoadFile(FName);
 			//core->GetSoundMgr()->Play(lastSound);
 			playlist.push_back(pls);
-			PLnext = playlist.size()-1;
+			PLnext = (int)playlist.size()-1;
 		}
 		else
 			//core->GetSoundMgr()->Stop(lastSound);
@@ -314,7 +314,7 @@ void MUSImp::PlayNext()
 		PLpos = PLnext;
 		core->GetSoundMgr()->Play(lastSound);
 		if(playlist[PLpos].PLLoop[0] != 0) {
-			for(int i = 0; i < playlist.size(); i++) {
+			for(unsigned int i = 0; i < playlist.size(); i++) {
 				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
 					PLnext = i;
 					break;
