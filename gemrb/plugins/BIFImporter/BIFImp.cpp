@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.18 2004/08/10 20:02:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.19 2004/08/10 22:02:10 avenger_teambg Exp $
  *
  */
 
@@ -78,7 +78,6 @@ int BIFImp::DecompressSaveGame(DataStream *compressed)
 		Current = compressed->Remains();
 		//starting at 50% going up to 100%
 		core->LoadProgress( 50+(All-Current)*50/All );
-printf("LoadProgress: %d\n", 50+(All-Current)*50/All );
 	}
 	while(Current);
 	return GEM_OK;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.193 2004/08/10 20:02:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.194 2004/08/10 22:02:11 avenger_teambg Exp $
  *
  */
 
@@ -1211,12 +1211,12 @@ bool Interface::LoadWindowPack(const char* name)
 	DataStream* stream = GetResourceMgr()->GetResource( name, IE_CHU_CLASS_ID );
 	if (stream == NULL) {
 		printMessage( "Interface", "Error: Cannot find ", LIGHT_RED );
-		printf( "%s.CHU\n", name );
+		printf( "%s.chu\n", name );
 		return false;
 	}
 	if (!GetWindowMgr()->Open( stream, true )) {
 		printMessage( "Interface", "Error: Cannot Load ", LIGHT_RED );
-		printf( "%s.CHU\n", name );
+		printf( "%s.chu\n", name );
 		return false;
 	}
 
