@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.73 2004/10/09 15:27:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.74 2004/10/10 13:03:08 avenger_teambg Exp $
  *
  */
 
@@ -691,18 +691,18 @@ Map* AREImp::GetMap(const char *ResRef)
 			ieWord px,py;
 			ieDword strref;
 
-			str->ReadWord(&px);
-			str->ReadWord(&py);
+			str->ReadWord( &px );
+			str->ReadWord( &py );
 			point.x=px;
 			point.y=py;
-			str->ReadWord(&px);
-			str->ReadWord(&py);
+			str->ReadDword( &strref );
+			str->ReadWord( &px );
+			str->ReadWord( &py );
 			color=py;
-			str->ReadDword(&strref);
-			str->ReadDword(&strref);
+			str->Seek( 40, GEM_CURRENT_POS );
 			text = core->GetString( strref,0 );
 		}
-		map->AddMapNote(point,color,text);
+		map->AddMapNote( point, color, text );
 	}
 	
 	map->AddTileMap( tm, lm, sr, sm );
