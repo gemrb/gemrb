@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.20 2003/12/02 17:10:19 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.21 2003/12/02 18:35:51 avenger_teambg Exp $
  *
  */
 
@@ -134,7 +134,7 @@ unsigned long ACMImp::Play(const char * ResRef)
 			DisplayALError("[ACMImp::Play] alGenBuffers : ", error);
 		}
 		{
-			alutLoadWAVFile(path, &format, &data, &size, &freq, &loop);
+			alutLoadWAVFile((ALbyte *) path, &format, &data, &size, &freq, &loop);
 			if((error = alGetError()) != AL_NO_ERROR) {
 				DisplayALError("[ACMImp::Play] alutLoadWAVFile : ", error);
 			}
@@ -216,7 +216,7 @@ unsigned long ACMImp::Play(const char * ResRef)
 			DisplayALError("[ACMImp::Play] alGenBuffers : ", error);
 		}
 		{
-			alutLoadWAVFile(path, &format, &data, &size, &freq, &loop);
+			alutLoadWAVFile((ALbyte *) path, &format, &data, &size, &freq, &loop);
 			if((error = alGetError()) != AL_NO_ERROR) {
 				DisplayALError("[ACMImp::Play] alutLoadWAVFile : ", error);
 			}
@@ -303,7 +303,7 @@ unsigned long ACMImp::LoadFile(const char * filename)
 			DisplayALError("[ACMImp::LoadFile] alGenBuffers : ", error);
 		}
 		{
-			alutLoadWAVFile(outFile, &format, &data, &size, &freq, &loop);
+			alutLoadWAVFile((ALbyte *) outFile, &format, &data, &size, &freq, &loop);
 			if((error = alGetError()) != AL_NO_ERROR) {
 				DisplayALError("[ACMImp::LoadFile] alutLoadWAVFile : ", error);
 			}
@@ -380,7 +380,7 @@ unsigned long ACMImp::LoadFile(const char * filename)
 			DisplayALError("[ACMImp::LoadFile] alGenBuffers : ", error);
 		}
 		{
-			alutLoadWAVFile(outFile, &format, &data, &size, &freq, &loop);
+			alutLoadWAVFile((ALbyte *) outFile, &format, &data, &size, &freq, &loop);
 			if((error = alGetError()) != AL_NO_ERROR) {
 				DisplayALError("[ACMImp::LoadFile] alutLoadWAVFile : ", error);
 			}
