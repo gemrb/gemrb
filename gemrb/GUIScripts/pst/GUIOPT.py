@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.9 2004/07/25 00:00:02 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.10 2004/08/03 22:00:18 edheldil Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -510,6 +510,7 @@ def OpenLoadMsgWindow ():
 
 def LoadGame ():
 	OpenOptionsWindow ()
+	GemRB.QuitGame ()
 	GemRB.SetNextScript ('GUILOAD')
 
 
@@ -560,10 +561,12 @@ def OpenQuitMsgWindow ():
 
 def QuitGame ():
 	OpenOptionsWindow ()
+	GemRB.QuitGame ()
 	GemRB.SetNextScript ('Start')
 
 def SaveGame ():
 	OpenOptionsWindow ()
+	GemRB.QuitGame ()
 	GemRB.SetNextScript ('GUISAVE')
 
 
