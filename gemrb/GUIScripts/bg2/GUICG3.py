@@ -34,7 +34,6 @@ def OnLoad():
 	for i in range(0,9):
 		Button = GemRB.GetControl(AlignmentWindow, i+2)
 		if GemRB.GetTableValue(AlignmentOk, KitName, GemRB.GetTableValue(AlignmentTable, i, 4) ) != 0:
-			print "Enabled",i
 			GemRB.SetButtonState(AlignmentWindow, Button, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(AlignmentWindow, Button, IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
 			GemRB.SetVarAssoc(AlignmentWindow, Button, "Alignment", i)

@@ -42,7 +42,9 @@ def OnLoad():
 	MultiPlayerButton = GemRB.GetControl(StartWindow, 1)
 	MoviesButton = GemRB.GetControl(StartWindow, 2)
 	DisabledButton = GemRB.GetControl(StartWindow, 5)
-	GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,450,640,30, "REALMS", "GemRB Ver 0.0.1", 1);
+	GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,450,640,30, "REALMS", "", 1);
+	Label=GemRB.GetControl(StartWindow, 0x0fff0000)
+	GemRB.SetText(StartWindow, Label,GEMRB_VERSION)
 	GemRB.SetControlStatus(StartWindow, DisabledButton, IE_GUI_BUTTON_DISABLED);
 	GemRB.SetControlStatus(StartWindow, SinglePlayerButton, IE_GUI_BUTTON_ENABLED);
 	GemRB.SetControlStatus(StartWindow, ExitButton, IE_GUI_BUTTON_ENABLED);
@@ -102,11 +104,12 @@ def ConnectPress():
 	return
 
 def PregenPress():
-#GemRB.SetPlayMode(-1) #do not start game after chargen
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
 	GemRB.UnloadWindow(TutorialWindow)
-        GemRB.SetNextScript("CharGen") #temporarily
+	#do not start game after chargen
+	GemRB.SetVar("PlayMode",-1)
+        GemRB.SetNextScript("CharGen")
 	return
 
 def LoadSingle():
@@ -116,23 +119,20 @@ def NewSingle():
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
 	GemRB.UnloadWindow(TutorialWindow)
-#main menu: -1, single player:0, tutorial mode=1, multi-player:2
-#GemRB.SetPlayMode(0)
+	GemRB.SetVar("PlayMode",0)
         GemRB.SetNextScript("CharGen") #temporarily
 	return
 
 def Tutorial():
 	GemRB.SetVisible(StartWindow,0)
 	GemRB.SetVisible(TutorialWindow,1)
-#        GemRB.ShowModal(TutorialWindow)
 	return
 
 def PlayPress():
         GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
         GemRB.UnloadWindow(TutorialWindow)
-#main menu: -1, single player:0, tutorial mode=1, multi-player:2
-#GemRB.SetPlayMode(1)
+	GemRB.SetVar("PlayMode",1)
 	GemRB.SetNextScript("CharGen")
         return
 
@@ -144,7 +144,6 @@ def CancelTut():
 def ExitPress():
 	GemRB.SetVisible(StartWindow,0)
 	GemRB.SetVisible(QuitWindow,1)
-#	GemRB.ShowModal(QuitWindow)
 	return
 	
 def ExitConfirmed():

@@ -89,9 +89,9 @@ def BiographyPress():
 	return
 
 def NextPress():
-	GemRB.SetButtonState(CharGenWindow, ImportButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetButtonState(CharGenWindow, CancelButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.DrawWindows()   #needed to redraw the windows NOW
+#	GemRB.SetButtonState(CharGenWindow, ImportButton, IE_GUI_BUTTON_DISABLED)
+#	GemRB.SetButtonState(CharGenWindow, CancelButton, IE_GUI_BUTTON_DISABLED)
+#	GemRB.DrawWindows()   #needed to redraw the windows NOW
         GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("GUICG1") #gender
 	return

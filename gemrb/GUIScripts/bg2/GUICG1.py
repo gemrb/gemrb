@@ -9,6 +9,25 @@ def OnLoad():
 	global GenderWindow, TextAreaControl, DoneButton
 	
 	GemRB.LoadWindowPack("GUICG")
+	#this hack will redraw the base CG window
+	GenderWindow = GemRB.LoadWindow(0)
+	PortraitButton = GemRB.GetControl(GenderWindow, 12)
+	GemRB.SetButtonFlags(GenderWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	ImportButton = GemRB.GetControl(GenderWindow, 13)
+	GemRB.SetText(GenderWindow, ImportButton, 13955)
+	GemRB.SetButtonState(GenderWindow,ImportButton,IE_GUI_BUTTON_DISABLED)
+
+	CancelButton = GemRB.GetControl(GenderWindow, 15)
+	GemRB.SetText(GenderWindow, CancelButton, 13727)
+	GemRB.SetButtonState(GenderWindow,CancelButton,IE_GUI_BUTTON_DISABLED)
+
+	BiographyButton = GemRB.GetControl(GenderWindow, 16)
+	GemRB.SetText(GenderWindow, BiographyButton, 18003)
+	GemRB.SetButtonState(GenderWindow,BiographyButton,IE_GUI_BUTTON_DISABLED)
+
+	GemRB.SetVisible(GenderWindow,1)
+	GemRB.DrawWindows()
+	GemRB.UnloadWindow(GenderWindow)
 	GenderWindow = GemRB.LoadWindow(1)
 
 	BackButton = GemRB.GetControl(GenderWindow,6)
