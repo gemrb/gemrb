@@ -1,6 +1,6 @@
-/* $Id: mve_play.cpp,v 1.1 2004/02/24 15:24:03 balrog994 Exp $ */
+/* $Id: mve_play.cpp,v 1.2 2004/02/24 16:05:03 edheldil Exp $ */
 #ifdef HAVE_CONFIG_H
-#include <conf.h>
+#include <config.h>
 #endif
 
 #ifndef __MSDOS__
@@ -118,6 +118,7 @@ static int micro_frame_delay=0;
 static int timer_started=0;
 static struct timeval timer_expire = {0, 0};
 
+#ifdef WIN32
 #if !HAVE_STRUCT_TIMESPEC
 struct timespec
 {
@@ -125,6 +126,7 @@ struct timespec
 	long int tv_nsec;           /* Nanoseconds.  */
 };
 #endif
+#endif  // WIN32
 
 #ifdef _WIN32
 int gettimeofday(struct timeval *tv, void *tz)
