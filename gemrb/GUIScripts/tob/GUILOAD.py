@@ -1,5 +1,6 @@
 #load window
 import GemRB
+from LoadScreen import *
 
 LoadWindow = 0
 TextAreaControl = 0
@@ -91,8 +92,9 @@ def ScrollBarPress():
 
 def LoadGamePress():
 	Pos = GemRB.GetVar("TopIndex")+GemRB.GetVar("LoadIdx")
+	StartLoadScreen()
 	GemRB.LoadGame(Pos) #loads and enters savegame 
-	GemRB.EnterGame()
+	GemRB.EnterGame() #it will close windows, including the loadscreen
 	return
 
 def DeleteGameConfirm():
