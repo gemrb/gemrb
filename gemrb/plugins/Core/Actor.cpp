@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.77 2004/12/07 22:51:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.78 2004/12/17 23:23:05 avenger_teambg Exp $
  *
  */
 
@@ -358,7 +358,7 @@ void Actor::DebugDump()
 		}
 		printf( "Script %d: %s\n", i, poi );
 	}
-	printf( "Area:       %.8s\n", Area );
+	printf( "Area:	%.8s\n", Area );
 	printf( "Dialog:     %.8s\n", Dialog );
 	printf( "Script name:%.32s\n", scriptName );
 	printf( "TalkCount:  %d\n", TalkCount );
@@ -443,7 +443,7 @@ void Actor::Die(Scriptable *killer)
 	if(Modified[IE_HITPOINTS]<=0) {
 		InternalFlags|=IF_REALLYDIED;
 	}
-        SetStance( IE_ANI_DIE );
+	SetStance( IE_ANI_DIE );
 }
 
 bool Actor::CheckOnDeath()
@@ -536,26 +536,31 @@ void Actor::GetNextStance()
 
 int Actor::LearnSpell(const char *spellname, ieDword flags)
 {
-        if(spellbook.HaveSpell(spellname, 0) ) {
-                return LSR_KNOWN;
-        }
-        Spell *spell = core->GetSpell(spellname);
-        if(!spell) {
-                return LSR_INVALID; //not existent spell
-        }
+	if(spellbook.HaveSpell(spellname, 0) ) {
+		return LSR_KNOWN;
+	}
+	Spell *spell = core->GetSpell(spellname);
+	if(!spell) {
+		return LSR_INVALID; //not existent spell
+	}
 	//from now on, you must delete spl if you don't push back it
-        CREKnownSpell *spl = new CREKnownSpell();
-        strncpy(spl->SpellResRef, spellname, 8);
-        spl->Level = spell->SpellLevel;
-        spl->Type = spell->SpellType;
+	CREKnownSpell *spl = new CREKnownSpell();
+	strncpy(spl->SpellResRef, spellname, 8);
+	spl->Type = spell->SpellType;
+	if( spl->Type == IE_SPELL_TYPE_INNATE ) {
+		spl->Level = 0;
+	}
+	else {
+		spl->Level = spell->SpellLevel-1;
+	}
 	bool ret=spellbook.AddKnownSpell(spl->Type, spl->Level, spl);
 	if(!ret) {
 		delete spl;
 		return LSR_INVALID;
 	}
-        if(flags&LS_ADDXP) {
-                //add xp
-        }
-        return LSR_OK;
+	if(flags&LS_ADDXP) {
+		//add xp
+	}
+	return LSR_OK;
 }
 

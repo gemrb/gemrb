@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.19 2004/12/07 22:51:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.20 2004/12/17 23:23:06 avenger_teambg Exp $
  *
  */
 
@@ -104,8 +104,19 @@ unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level)
 
 bool Spellbook::AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl)
 {
-	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
+	if (type >= NUM_SPELL_TYPES) {
 		return false;
+	}
+	if( level >= spells[type].size() ) {
+		CRESpellMemorization *sm = new CRESpellMemorization();
+		sm->Type = type;
+		sm->Level = level+1;
+		sm->Number = sm->Number2 = 0;
+		if( !AddSpellMemorization(sm) ) {
+			delete sm;
+			return false;
+		}
+	}
 	spells[type][level]->known_spells.push_back(spl);
 	return true;
 }
@@ -134,14 +145,19 @@ CREMemorizedSpell* Spellbook::GetMemorizedSpell(int type, unsigned int level, un
 bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 {
 	std::vector<CRESpellMemorization*>* s = &spells[sm->Type];
-
-	for (size_t i = 0; i < s->size(); i++) {
-		if (!(*s)[i]) {
-			(*s)[i] = sm;
-			return true;
-		}
+	unsigned int level = sm->Level-1;
+	if (level > 9 ) {
+		return false;
 	}
-	s->push_back( sm );
+
+	while (s->size() <= level ) {
+		s->push_back( NULL );
+	}
+
+	if ((*s)[level]) {
+		return false;
+	}
+	(*s)[level] = sm;
 	return true;
 }
 
@@ -149,8 +165,19 @@ void Spellbook::SetMemorizableSpellsCount(int Value, ieSpellType type, unsigned 
 {
 	int diff;
 
-	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
+	if (type >= NUM_SPELL_TYPES) {
 		return;
+	}
+	if( level >= spells[type].size() ) {
+		CRESpellMemorization *sm = new CRESpellMemorization();
+		sm->Type = type;
+		sm->Level = level+1;
+		sm->Number = sm->Number2 = 0;
+		if( !AddSpellMemorization(sm) ) {
+			delete sm;
+			return;
+		}
+	}
 	CRESpellMemorization* sm = spells[type][level];
 	if(bonus) {
 		sm->Number2=Value;

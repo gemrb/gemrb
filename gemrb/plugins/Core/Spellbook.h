@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.9 2004/12/07 22:51:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.10 2004/12/17 23:23:06 avenger_teambg Exp $
  *
  */
 
@@ -96,7 +96,7 @@ typedef struct CRESpellMemorization {
 
 class GEM_EXPORT Spellbook {
 private:
-	std::vector<CRESpellMemorization*> spells[3];
+	std::vector<CRESpellMemorization*> spells[NUM_SPELL_TYPES];
 
 public: 
 	Spellbook();
@@ -107,7 +107,6 @@ public:
 	bool HaveSpell(int spellid, ieDword flags);
 
 	bool AddSpellMemorization(CRESpellMemorization* sm);
-	//int AddMemorizedSpell(CREMemorizedSpell* spell);
 
 	unsigned int GetKnownSpellsCount(int type, unsigned int level);
 	bool AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl);

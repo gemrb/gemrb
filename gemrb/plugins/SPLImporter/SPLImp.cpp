@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.7 2004/11/21 22:58:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.8 2004/12/17 23:23:08 avenger_teambg Exp $
  *
  */
 
@@ -63,7 +63,7 @@ bool SPLImp::Open(DataStream* stream, bool autoFree)
 
 Spell* SPLImp::GetSpell()
 {
-  unsigned int i;
+	unsigned int i;
 	Spell* s = new Spell();
 
 	str->Read( &s->SpellName, 4 );
