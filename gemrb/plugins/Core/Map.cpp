@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.41 2003/12/13 17:47:42 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.42 2003/12/13 18:46:23 balrog994 Exp $
  *
  */
 
@@ -269,6 +269,8 @@ void Map::DrawMap(Region viewport)
 			if(actor->Scripts[i])
 				actor->Scripts[i]->Update();
 		}
+		if(actor->DeleteMe)
+			DeleteActor(actor);
 	}
 	for(int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation * vvc = vvcCells.at(i);
@@ -333,6 +335,7 @@ void Map::AddActor(ActorBlock actor)
 	ab->XPos = actor.XPos;
 	ab->YPos = actor.YPos;
 	ab->Selected = false;
+	ab->DeleteMe = false;
 	actors.push_back(ab);
 }
 
@@ -355,7 +358,20 @@ void Map::AddActor(ActorBlock *actor)
 	actor->step = NULL;
 	actor->textDisplaying = 0;
 	actor->overHeadText = NULL;
+	actor->DeleteMe = false;
 	actors.push_back(actor);
+}
+
+void Map::DeleteActor(ActorBlock * actor)
+{
+	std::vector<ActorBlock*>::iterator m;
+	for(m = actors.begin(); m != actors.end(); ++m) {
+		if((*m) == actor) {
+			actors.erase(m);
+			delete(actor);
+			return;
+		}
+	}
 }
 
 ActorBlock * Map::GetActor(int x, int y)
