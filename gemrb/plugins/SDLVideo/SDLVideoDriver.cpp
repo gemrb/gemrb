@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.35 2003/11/30 09:44:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.36 2003/11/30 23:25:00 balrog994 Exp $
  *
  */
 
@@ -172,24 +172,29 @@ int SDLVideoDriver::SwapBuffers(void)
 			break;
 
 			case SDL_MOUSEMOTION:
-				CursorPos.x = event.motion.x;
-				CursorPos.y = event.motion.y;
+				CursorPos.x = event.motion.x-mouseAdjustX[CursorIndex];
+				CursorPos.y = event.motion.y-mouseAdjustY[CursorIndex];
 				if(Evnt)
 					Evnt->MouseMove(event.motion.x, event.motion.y);
 			break;
 
 			case SDL_MOUSEBUTTONDOWN:
 				CursorIndex = 1;
+				CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
+				CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
 			break;
 
 			case SDL_MOUSEBUTTONUP:
 				CursorIndex = 0;
+				CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
+				CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
 			break;
 			}
 		}
 		SDL_BlitSurface(backBuf, NULL, disp, NULL);
-		if(Cursor[CursorIndex])
+		if(Cursor[CursorIndex]) {
 			SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
+		}
 		SDL_Flip(disp);
 		return ret;
 	}
@@ -272,20 +277,24 @@ int SDLVideoDriver::SwapBuffers(void)
 		break;
 
 		case SDL_MOUSEMOTION:
-			CursorPos.x = event.motion.x;
-			CursorPos.y = event.motion.y;
+			CursorPos.x = event.motion.x-mouseAdjustX[CursorIndex];
+			CursorPos.y = event.motion.y-mouseAdjustY[CursorIndex];
 			if(Evnt)
 				Evnt->MouseMove(event.motion.x, event.motion.y);
 		break;
 
 		case SDL_MOUSEBUTTONDOWN:
 			CursorIndex = 1;
+			CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
+			CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
 			if(Evnt)
 				Evnt->MouseDown(event.button.x, event.button.y, event.button.state, 0);
 		break;
 
 		case SDL_MOUSEBUTTONUP:
 			CursorIndex = 0;
+			CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
+			CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
 			if(Evnt)
 				Evnt->MouseUp(event.button.x, event.button.y, event.button.state, 0);
 		break;
@@ -321,7 +330,12 @@ Sprite2D *SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels, voi
 {
 	Sprite2D *spr = new Sprite2D();
 	void * p = SDL_CreateRGBSurfaceFrom(pixels, w, h, 8, w, 0,0,0,0);
-	SDL_SetPalette((SDL_Surface*)p, SDL_LOGPAL, (SDL_Color*)palette, 0, 256);
+	int colorcount;
+	if(bpp == 8)
+		colorcount = 256;
+	else
+		colorcount = 16;
+	SDL_SetPalette((SDL_Surface*)p, SDL_LOGPAL, (SDL_Color*)palette, 0, colorcount);
 	if(p != NULL) {
 		spr->vptr = p;
 		spr->pixels = pixels;
@@ -530,12 +544,18 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D * spr, int x, int y, Color tint)
 }
 void SDLVideoDriver::SetCursor(Sprite2D * up, Sprite2D * down)
 {
-	if(up)
+	if(up) {
 		Cursor[0]=(SDL_Surface*)up->vptr;
+		mouseAdjustX[0] = up->XPos;
+		mouseAdjustY[0] = up->YPos;
+	}
 	else
 		Cursor[0]=NULL;
-	if(down)
+	if(down) {
 		Cursor[1]=(SDL_Surface*)down->vptr;
+		mouseAdjustX[1] = down->XPos;
+		mouseAdjustY[1] = down->YPos;
+	}
 	else
 		Cursor[1]=NULL;
 	return;

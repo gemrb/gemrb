@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.16 2003/11/27 22:09:06 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.17 2003/11/30 23:25:00 balrog994 Exp $
  *
  */
 
@@ -34,6 +34,7 @@ private:
 	Region Viewport;
 	SDL_Surface *Cursor[2];
 	SDL_Rect CursorPos;
+	short mouseAdjustX[2], mouseAdjustY[2];
 	unsigned short CursorIndex;
 public:
 	SDLVideoDriver(void);
