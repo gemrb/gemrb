@@ -7,7 +7,8 @@ TextAreaControl = 0
 def OnLoad():
 	global CharGenWindow, TextAreaControl
 
-	GemRB.SetVar("Abilities",0) #abilities
+	for i in range(1,6):
+		GemRB.SetVar("Ability "+str(i),0) #abilities
 
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)
@@ -85,9 +86,9 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,12136, -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,2))
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,12136, -1)
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1049, -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
-	v = GemRB.FindTableValue(ClassTable,GemRB.GetVar("Alignment")-1,3)
+	v = GemRB.FindTableValue(AlignmentTable,3,GemRB.GetVar("Alignment"))
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(AlignmentTable,v,2))
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
