@@ -82,17 +82,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
 	if(area) {
-#ifdef WIN32
-		unsigned long time = GetTickCount();
-#else
-		struct timeval tv;
-		gettimeofday(&tv, NULL);
-		unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
-#endif
-		if((time-AIUpdateCounter) >= 66) {
-			core->GSUpdate();
-			AIUpdateCounter = time;
-		}
+		core->GSUpdate();
 		area->DrawMap(vp);
 		if(DisableMouse)
 			return;

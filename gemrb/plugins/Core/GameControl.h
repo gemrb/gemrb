@@ -2,7 +2,7 @@
 #define GAMECONTROL_H
 
 #include "Control.h"
-#include "Map.h"
+#include "Interface.h"
 #include "PathFinder.h"
 
 #ifdef WIN32
