@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.12 2003/12/04 22:09:47 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.13 2003/12/12 23:02:19 balrog994 Exp $
  *
  */
 
@@ -191,4 +191,11 @@ InfoPoint * TileMap::GetInfoPoint(const char * Name)
 		}
 	}
 	return NULL;
+}
+
+InfoPoint * TileMap::GetInfoPoint(int index)
+{
+	if(index >= infoPoints.size())
+		return NULL;
+	return &infoPoints.at(index);
 }
