@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.19 2004/08/02 22:18:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.20 2004/08/03 22:22:56 guidoj Exp $
  *
  */
 
@@ -46,54 +46,55 @@
 #define ENEMY   				255
 
 //state bits (IE_STATE)
-#define STATE_SLEEP 1
-#define STATE_BERSERK 2
-#define STATE_PANIC 4
-#define STATE_STUNNED 8
-#define STATE_INVISIBLE 16
-#define STATE_HELPLESS 32
-#define STATE_FROZEN_DEATH 64
-#define STATE_STONE_DEATH 128
-#define STATE_EXPLODING_DEATH 0x100
-#define STATE_FLAME_DEATH 0x200
-#define STATE_ACID_DEATH 0x400
-#define STATE_DEAD  0x800
-#define STATE_SILENCED 0x1000
-#define STATE_CHARMED  0x2000
-#define STATE_POISONED 0x4000
-#define STATE_HASTED   0x8000
-#define STATE_SLOWED   0x10000
-#define STATE_INFRA    0x20000
-#define STATE_BLIND    0x40000
-#define STATE_DISEASED 0x80000
-#define STATE_FEEBLE   0x100000
-#define STATE_NONDET   0x200000
-#define STATE_INVIS2   0x400000
-#define STATE_BLESS    0x800000
-#define STATE_CHANT    0x1000000
-#define STATE_HOLY     0x2000000
-#define STATE_LUCK     0x4000000
-#define STATE_AID      0x8000000
-#define STATE_CHANTBAD 0x10000000
-#define STATE_BLUR     0x20000000
-#define STATE_MIRROR   0x40000000
-#define STATE_CONFUSED 0x80000000
-#define STATE_CANTMOVE 0x80000fef
+#define STATE_SLEEP      0x00000001
+#define STATE_BERSERK    0x00000002
+#define STATE_PANIC      0x00000004
+#define STATE_STUNNED    0x00000008
+#define STATE_INVISIBLE  0x00000010
+#define STATE_HELPLESS   0x00000020
+#define STATE_D1         0x00000040
+#define STATE_D2         0x00000080
+#define STATE_D3         0x00000100
+#define STATE_D4         0x00000200
+#define STATE_D5         0x00000400
+#define STATE_DEAD       0x00000800
+#define STATE_SILENCED   0x00001000
+#define STATE_CHARMED    0x00002000
+#define STATE_POISONED   0x00004000
+#define STATE_HASTED     0x00008000
+#define STATE_SLOWED     0x00010000
+#define STATE_INFRA      0x00020000
+#define STATE_BLIND      0x00040000
+#define STATE_DISEASED   0x00080000
+#define STATE_FEEBLE     0x00100000
+#define STATE_NONDET     0x00200000
+#define STATE_INVIS2     0x00400000
+#define STATE_BLESS      0x00800000
+#define STATE_CHANT      0x01000000
+#define STATE_HOLY       0x02000000
+#define STATE_LUCK       0x04000000
+#define STATE_AID        0x08000000
+#define STATE_CHANTBAD   0x10000000
+#define STATE_BLUR       0x20000000
+#define STATE_MIRROR     0x40000000
+#define STATE_CONFUSED   0x80000000
+
+#define STATE_CANTMOVE   0x80000fef
 #define STATE_CANTLISTEN 0x80000fef
-#define STATE_CANTSTEAL 0xc0
+#define STATE_CANTSTEAL  0x000000c0
+
 
 //Multiclass flags
-#define MC_REMOVE_CORPSE        2
-#define MC_KEEP_CORPSE          4
-#define MC_WAS_FIGHTER		8
-#define MC_WAS_MAGE		16
-#define MC_WAS_CLERIC		32
-#define MC_WAS_THIEF		64
-#define MC_WAS_DRUID		128
-#define MC_WAS_RANGER		256
-#define MC_FALLEN_PALADIN	0x200
-#define MC_FALLEN_RANGER	0x400
-#define MC_EXPORTABLE           0x800
+#define MC_REMOVE_CORPSE        0x0002
+#define MC_KEEP_CORPSE          0x0004
+#define MC_WAS_FIGHTER		0x0008
+#define MC_WAS_MAGE		0x0010
+#define MC_WAS_CLERIC		0x0020
+#define MC_WAS_THIEF		0x0040
+#define MC_WAS_DRUID		0x0080
+#define MC_WAS_RANGER		0x0100
+#define MC_FALLEN_PALADIN	0x0200
+#define MC_FALLEN_RANGER	0x0400
 
 //stats
 #define IE_HITPOINTS 0
