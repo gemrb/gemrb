@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.256 2005/02/11 21:45:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.257 2005/02/13 19:02:19 edheldil Exp $
  *
  */
 
@@ -68,8 +68,7 @@ Interface::Interface(int iargc, char** iargv)
 	hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
 #endif
 	textcolor( LIGHT_WHITE );
-	printf( "GemRB Core Version v%.1f.%d.%d Loading...\n",
-		GEMRB_RELEASE / 1000.0, GEMRB_API_NUM, GEMRB_SDK_REV );
+	printf( "GemRB Core Version v%s Loading...\n", VERSION );
 	video = NULL;
 	key = NULL;
 	strings = NULL;
@@ -652,6 +651,29 @@ int Interface::Init()
 	video->SetCursor( Cursors[0]->GetFrame( 0 ), Cursors[1]->GetFrame( 0 ) );
 	printStatus( "OK", LIGHT_GREEN );
 
+
+	/*
+	// disabled for 0.2.3 release
+
+	str = key->GetResource( "FOGOWAR", IE_BAM_CLASS_ID );
+	printMessage( "Core", "Loading Fog-Of-War bitmaps...", WHITE );
+	anim = ( AnimationMgr * ) GetInterface( IE_BAM_CLASS_ID );
+	anim->Open( str, true );
+	if (anim->GetCycleSize( 0 ) != 8) {
+		// unknown type of fog anim
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
+	}
+
+	//FogSprites = new Animation * [FogCount];
+	for (int i = 0; i < 8; i++) {
+		FogSprites[i] = anim->GetFrameFromCycle( 0, i );
+	}
+	FreeInterface( anim );
+	printStatus( "OK", LIGHT_GREEN );
+	// FIXME: prepare flipped fog sprites here as well
+	*/
+
 	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
 	timer = new GlobalTimer();
 	if (!timer) {
@@ -1094,8 +1116,7 @@ bool Interface::LoadConfig(const char* filename)
 		memcpy( GUIScriptsPath, GemRBPath, sizeof( GUIScriptsPath ) );
 	}
 	if (!GameName[0]) {
-		sprintf( GameName, "GemRB v%.1f.%d.%d", GEMRB_RELEASE / 1000.0,
-			GEMRB_API_NUM, GEMRB_SDK_REV );
+		strcpy( GameName, GEMRB_STRING );
 	}
 	if (!SavePath[0]) {
 		// FIXME: maybe should use UserDir instead of GamePath

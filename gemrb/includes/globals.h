@@ -1,8 +1,8 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#ifndef WIN32
-#include "../../config.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
 #endif
 
 #include "ie_types.h"
@@ -12,6 +12,8 @@
 #define GEMRB_SDK_REV 9			//GemRB SDK Revision
 
 #define VERSION_GEMRB ((GEMRB_RELEASE<<16)+(GEMRB_API_NUM<<8)+GEMRB_SDK_REV)
+
+#define GEMRB_STRING "GemRB v" VERSION
 
 #ifndef GLOBALS_ONLY_DEFS
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.267 2005/02/10 22:41:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.268 2005/02/13 19:02:20 edheldil Exp $
  *
  */
 
@@ -918,9 +918,7 @@ static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 			StrRef = PyInt_AsLong( str );
 			char* str = NULL;
 			if (StrRef == -1) {
-				str = ( char * ) malloc( 20 );
-				sprintf( str, "GemRB v%.1f.%d.%d", GEMRB_RELEASE / 1000.0,
-					GEMRB_API_NUM, GEMRB_SDK_REV );
+				str = strdup( GEMRB_STRING );
 			} else
 				str = core->GetString( StrRef );
 			ret = core->SetText( WindowIndex, ControlIndex, str );
@@ -1055,9 +1053,7 @@ static PyObject* GemRB_SetTooltip(PyObject * /*self*/, PyObject* args)
 			StrRef = PyInt_AsLong( str );
 			char* str = NULL;
 			if (StrRef == -1) {
-				str = ( char * ) malloc( 20 );
-				sprintf( str, "GemRB v%.1f.%d.%d", GEMRB_RELEASE / 1000.0,
-					GEMRB_API_NUM, GEMRB_SDK_REV );
+				str = strdup ( GEMRB_STRING );
 			} else
 				str = core->GetString( StrRef );
 			ret = core->SetTooltip( WindowIndex, ControlIndex, str );
