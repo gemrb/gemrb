@@ -49,6 +49,18 @@ Interface::Interface(void)
 
 Interface::~Interface(void)
 {
+	std::vector<Font*>::iterator m = fonts.begin();
+	for(int i = 0; fonts.size() != 0; ) {
+		delete(*m);
+		fonts.erase(m);
+		m = fonts.begin();
+	}
+	std::vector<Window*>::iterator w = windows.begin();
+	for(int i = 0; windows.size() != 0; ) {
+		delete(*w);
+		windows.erase(w);
+		w = windows.begin();
+	}
 	if(key)
 		plugin->FreePlugin(key);	
 	if(video)
@@ -65,18 +77,6 @@ Interface::~Interface(void)
 		delete(windowmgr);
 	if(guiscript)
 		delete(guiscript);
-	std::vector<Font*>::iterator m = fonts.begin();
-	for(int i = 0; fonts.size() != 0; ) {
-		delete(*m);
-		fonts.erase(m);
-		m = fonts.begin();
-	}
-	std::vector<Window*>::iterator w = windows.begin();
-	for(int i = 0; windows.size() != 0; ) {
-		delete(*w);
-		windows.erase(w);
-		w = windows.begin();
-	}
 	delete(console);
 	delete(plugin);
 }

@@ -255,9 +255,9 @@ static PyObject * GemRB_CreateLabel(PyObject *self, PyObject *args)
 
 static PyObject * GemRB_SetButtonFlags(PyObject *self, PyObject *args)
 {
-	int WindowIndex, ControlIndex, hideImg, hasPicture;
+	int WindowIndex, ControlIndex, hideImg, hasPicture, hasSound;
 
-	if(!PyArg_ParseTuple(args, "iiii", &WindowIndex, &ControlIndex, &hideImg, &hasPicture)) {
+	if(!PyArg_ParseTuple(args, "iiiii", &WindowIndex, &ControlIndex, &hideImg, &hasPicture, &hasSound)) {
 		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
 		return NULL;
 	}
@@ -274,7 +274,7 @@ static PyObject * GemRB_SetButtonFlags(PyObject *self, PyObject *args)
 		return NULL;
 
 	Button * btn = (Button*)ctrl;
-	btn->SetFlags(hideImg, hasPicture);
+	btn->SetFlags(hideImg, hasPicture, hasSound);
 
 	Py_INCREF(Py_None);
 	return Py_None;
