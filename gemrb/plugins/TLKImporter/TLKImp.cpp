@@ -114,7 +114,7 @@ bool TLKImp::ResolveTags(char *dest, char *source, int Length)
 		if(source[i]=='[') {
 			char *tmppoi=strchr(source+i+1, ']');
 			if(tmppoi)
-				i=tmppoi-source+1;
+				i=tmppoi-source;
 			else
 				break;
 		}
