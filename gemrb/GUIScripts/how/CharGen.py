@@ -81,6 +81,7 @@ MageSpellsWindow = 0
 MageSpellsTable = 0
 MageSpellsTextArea = 0
 MageSpellsDoneButton = 0
+MageSpellsSelectPointsLeft = 0
 
 AppearanceButton = 0
 AppearanceWindow = 0
@@ -113,47 +114,47 @@ def OnLoad():
 	CharGenWindow = GemRB.LoadWindow(0)
 	CharGenState = 0
 
-        GenderButton = GemRB.GetControl(CharGenWindow, 0)
+	GenderButton = GemRB.GetControl(CharGenWindow, 0)
 	GemRB.SetButtonState(CharGenWindow, GenderButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(CharGenWindow, GenderButton, IE_GUI_BUTTON_ON_PRESS, "GenderPress")
 	GemRB.SetText(CharGenWindow, GenderButton, 11956)
 
-        RaceButton = GemRB.GetControl(CharGenWindow, 1)
+	RaceButton = GemRB.GetControl(CharGenWindow, 1)
 	GemRB.SetButtonState(CharGenWindow, RaceButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(CharGenWindow, RaceButton, IE_GUI_BUTTON_ON_PRESS, "RacePress")
 	GemRB.SetText(CharGenWindow, RaceButton, 11957)
 
-        ClassButton = GemRB.GetControl(CharGenWindow, 2)
+	ClassButton = GemRB.GetControl(CharGenWindow, 2)
 	GemRB.SetButtonState(CharGenWindow, ClassButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(CharGenWindow, ClassButton, IE_GUI_BUTTON_ON_PRESS, "ClassPress")
 	GemRB.SetText(CharGenWindow, ClassButton, 11959)
 
-        AlignmentButton = GemRB.GetControl(CharGenWindow, 3)
+	AlignmentButton = GemRB.GetControl(CharGenWindow, 3)
 	GemRB.SetButtonState(CharGenWindow, AlignmentButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(CharGenWindow, AlignmentButton, IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
 	GemRB.SetText(CharGenWindow, AlignmentButton, 11958)
 
-        AbilitiesButton = GemRB.GetControl(CharGenWindow, 4)
+	AbilitiesButton = GemRB.GetControl(CharGenWindow, 4)
 	GemRB.SetButtonState(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_ON_PRESS, "AbilitiesPress")
 	GemRB.SetText(CharGenWindow, AbilitiesButton, 11960)
 
-        SkillsButton = GemRB.GetControl(CharGenWindow, 5)
+	SkillsButton = GemRB.GetControl(CharGenWindow, 5)
 	GemRB.SetButtonState(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(CharGenWindow, SkillsButton, IE_GUI_BUTTON_ON_PRESS, "SkillsPress")
 	GemRB.SetText(CharGenWindow, SkillsButton, 11983)
 
-        AppearanceButton = GemRB.GetControl(CharGenWindow, 6)
+	AppearanceButton = GemRB.GetControl(CharGenWindow, 6)
 	GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_ON_PRESS, "AppearancePress")
 	GemRB.SetText(CharGenWindow, AppearanceButton, 11961)
 
-        BiographyButton = GemRB.GetControl(CharGenWindow, 16)
+	BiographyButton = GemRB.GetControl(CharGenWindow, 16)
 	GemRB.SetButtonState(CharGenWindow, BiographyButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(CharGenWindow, BiographyButton, IE_GUI_BUTTON_ON_PRESS, "BiographyPress")
 	GemRB.SetText(CharGenWindow, BiographyButton, 18003)
 
-        NameButton = GemRB.GetControl(CharGenWindow, 7)
+	NameButton = GemRB.GetControl(CharGenWindow, 7)
 	GemRB.SetButtonState(CharGenWindow, NameButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetEvent(CharGenWindow, NameButton, IE_GUI_BUTTON_ON_PRESS, "NamePress")
 	GemRB.SetText(CharGenWindow, NameButton, 11963)
@@ -193,10 +194,13 @@ def OnLoad():
 def BackPress():
 	global CharGenWindow, CharGenState
 	global GenderButton, RaceButton, ClassButton, AlignmentButton, AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
+
+	GemRB.SetToken("CHARNAME","")
 	if CharGenState > 0:
 		CharGenState = CharGenState - 1
 	if CharGenState > 6:
 		CharGenState = 6
+
 	if CharGenState == 0:
 		GemRB.SetButtonState(CharGenWindow, RaceButton, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonState(CharGenWindow, GenderButton, IE_GUI_BUTTON_ENABLED)
@@ -215,10 +219,13 @@ def BackPress():
 	elif CharGenState == 5:
 		GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonState(CharGenWindow, SkillsButton, IE_GUI_BUTTON_ENABLED)
+
 	elif CharGenState == 6:
 		GemRB.SetButtonState(CharGenWindow, NameButton, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonState(CharGenWindow, BiographyButton, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(CharGenWindow, AcceptButton, IE_GUI_BUTTON_DISABLED)
+
 	SetCharacterDescription()
 	return
 
@@ -229,6 +236,42 @@ def CancelPress():
 	return
 
 def AcceptPress():
+	global CharGenWindow
+	MyChar = GemRB.CreatePlayer("charbase",GemRB.GetVar("Slot") )
+	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
+	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
+	#base class
+	#Class=GemRB.GetVar("BaseClass")
+	#GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
+	#kit
+	#GemRB.SetPlayerStat(MyChar, IE_KIT, GemRB.GetVar("Class") )
+
+	GemRB.SetPlayerStat(MyChar, IE_CLASS, GemRB.GetVar("Class") )
+	GemRB.SetPlayerStat(MyChar, IE_KIT, 0x4000)
+	t=GemRB.GetVar("Alignment")
+	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
+	TmpTable=GemRB.LoadTable("repstart")
+	t=GemRB.FindTableValue(AlignmentTable,3,t)
+	t=GemRB.GetTableValue(TmpTable,t,0)
+	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
+	TmpTable=GemRB.LoadTable("strtgold")
+	GemRB.SetPlayerStat(MyChar, IE_EA, 2 )
+	Str=GemRB.GetVar("Ability 1")
+	GemRB.SetPlayerStat(MyChar, IE_STR, Str)
+	if Str==18:
+		GemRB.SetPlayerStat(MyChar,IE_STREXTRA,GemRB.GetVar("StrExtra"))
+	else:
+		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,0)
+
+	GemRB.SetPlayerStat(MyChar, IE_INT, GemRB.GetVar("Ability 2"))
+	GemRB.SetPlayerStat(MyChar, IE_WIS, GemRB.GetVar("Ability 3"))
+	GemRB.SetPlayerStat(MyChar, IE_DEX, GemRB.GetVar("Ability 4"))
+	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar("Ability 5"))
+	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability 6"))
+
+	GemRB.FillPlayerInfo(MyChar,PortraitName+"S", PortraitName+"L")
+	GemRB.UnloadWindow(CharGenWindow)
+	GemRB.SetNextScript("PartyFormation")
 	return
 
 def SetCharacterDescription():
@@ -237,7 +280,7 @@ def SetCharacterDescription():
 	if CharGenState > 7:
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 1047)
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, ": ")
-		GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetToken("Name"))
+		GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetToken("CHARNAME"))
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 	if CharGenState > 0:
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 12135)
@@ -492,10 +535,10 @@ def RacePress():
 	return
 
 def RaceSelectPress():
-        global RaceWindow, RaceDoneButton, RaceTable, RaceTextArea
+	global RaceWindow, RaceDoneButton, RaceTable, RaceTextArea
 	Race = GemRB.GetVar("Race") - 1
 	GemRB.SetText(RaceWindow, RaceTextArea, GemRB.GetTableValue(RaceTable, Race, 1) )
-        GemRB.SetButtonState(RaceWindow, RaceDoneButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(RaceWindow, RaceDoneButton, IE_GUI_BUTTON_ENABLED)
 	return
 
 def RaceDonePress():
@@ -547,7 +590,7 @@ def ClassPress():
 			GemRB.SetText(ClassWindow, ClassSelectButton, GemRB.GetTableValue(ClassTable, i, 0) )
 			GemRB.SetVarAssoc(ClassWindow, ClassSelectButton , "Class", i + 1)
 
-        ClassMultiButton = GemRB.GetControl(ClassWindow, 10)
+	ClassMultiButton = GemRB.GetControl(ClassWindow, 10)
 	if HasMulti == 0:
 		GemRB.SetButtonState(ClassWindow, ClassMultiButton, IE_GUI_BUTTON_DISABLED)
 	else:
@@ -555,7 +598,7 @@ def ClassPress():
 	GemRB.SetEvent(ClassWindow, ClassMultiButton, IE_GUI_BUTTON_ON_PRESS, "ClassMultiPress")
 	GemRB.SetText(ClassWindow, ClassMultiButton, 11993)
 	
-        ClassSpecialButton = GemRB.GetControl(ClassWindow, 11)
+	ClassSpecialButton = GemRB.GetControl(ClassWindow, 11)
 	GemRB.SetButtonState(ClassWindow, ClassSpecialButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(ClassWindow, ClassSpecialButton, IE_GUI_BUTTON_ON_PRESS, "ClassSpecialPress")
 	GemRB.SetText(ClassWindow, ClassSpecialButton, 11994)
@@ -1174,10 +1217,10 @@ def DisplayRacialEnemies():
 	return
 
 def RacialEnemySelectPress():
-        global RacialEnemyWindow, RacialEnemyDoneButton, RacialEnemyTable, RacialEnemyTextArea
+	global RacialEnemyWindow, RacialEnemyDoneButton, RacialEnemyTable, RacialEnemyTextArea
 	RacialEnemy = GemRB.GetVar("RacialEnemyIndex") + GemRB.GetVar("RacialEnemy") - 1
 	GemRB.SetText(RacialEnemyWindow, RacialEnemyTextArea, GemRB.GetTableValue(RacialEnemyTable, RacialEnemy, 1) )
-        GemRB.SetButtonState(RacialEnemyWindow, RacialEnemyDoneButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(RacialEnemyWindow, RacialEnemyDoneButton, IE_GUI_BUTTON_ENABLED)
 	return
 
 def RacialEnemyDonePress():
@@ -1373,25 +1416,29 @@ def ProficienciesCancelPress():
 # Spells Selection
 
 def MageSpellsSelect():
-	global CharGenWindow, MageSpellsWindow, MageSpellsTable, MageSpellsTextArea, MageSpellsDoneButton
+	global CharGenWindow, MageSpellsWindow, MageSpellsTable, MageSpellsTextArea, MageSpellsDoneButton, MageSpellsSelectPointsLeft
 	GemRB.SetVisible(CharGenWindow, 0)
 	MageSpellsWindow = GemRB.LoadWindow(7)
 	MageSpellsTable = GemRB.LoadTable("MAGESP")
 	MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
+	GemRB.SetVar("MageSpellBook", 0)
 
 	MageSpellsSelectPointsLeft = 2
+	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
+	GemRB.SetLabelUseRGB(MageSpellsWindow, PointsLeftLabel, 1)
+	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
 
-	SpellButton = range (0, 24)
 	for i in range (0, 24):
-		SpellButton[i] = GemRB.GetControl(MageSpellsWindow, i + 2)
-		GemRB.SetButtonFlags(MageSpellsWindow, SpellButton[i], IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
+		GemRB.SetButtonFlags(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
 		if (i < MageSpellsCount):
-			GemRB.SetButtonBAM(MageSpellsWindow, SpellButton[i], GemRB.GetTableValue(MageSpellsTable, i, 0), 1, 0, 64)
-			GemRB.SetButtonState(MageSpellsWindow, SpellButton[i], IE_GUI_BUTTON_ENABLED)
-			GemRB.SetEvent(MageSpellsWindow, SpellButton[i], IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
-			#GemRB.SetVarAssoc(MageSpellsWindow, SpellButton[i], "SpellIndex", i)
+			# Color is no good yet :-(
+			GemRB.SetButtonBAM(MageSpellsWindow, SpellButton, GemRB.GetTableValue(MageSpellsTable, i, 0), 1, 0, 63)
+			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
+			GemRB.SetEvent(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
+			GemRB.SetVarAssoc(MageSpellsWindow, SpellButton, "SpellMask", 1 << i)
 		else:
-			GemRB.SetButtonState(MageSpellsWindow, SpellButton[i], IE_GUI_BUTTON_DISABLED)
+			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
 
 	GemRB.SetToken("number", str(MageSpellsSelectPointsLeft))
 	MageSpellsTextArea = GemRB.GetControl(MageSpellsWindow, 27)
@@ -1412,9 +1459,37 @@ def MageSpellsSelect():
 	return
 
 def MageSpellsSelectPress():
-	global MageSpellsWindow, MageSpellsTable, MageSpellsTextArea, MageSpellsDoneButton
-	Spell = GemRB.GetVar("SpellIndex")
-	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, GemRB.GetTableValue(MageSpellsTable, Spell, 1) )
+	global MageSpellsWindow, MageSpellsTable, MageSpellsTextArea, MageSpellsDoneButton, MageSpellsSelectPointsLeft
+	MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
+	MageSpellBook = GemRB.GetVar("MageSpellBook")
+	SpellMask = GemRB.GetVar("SpellMask")
+	Spell = abs(MageSpellBook - SpellMask)
+
+	i = -1
+	while (Spell > 0):
+		i = i + 1
+		Spell = Spell >> 1
+	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, GemRB.GetTableValue(MageSpellsTable, i, 1))
+	
+	if (SpellMask < MageSpellBook):
+		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft + 1
+		for i in range (0, MageSpellsCount):
+			SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
+			if (((1 << i) & SpellMask) == 0):
+				GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonState(MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_DISABLED)
+	else:
+		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft - 1
+		if MageSpellsSelectPointsLeft == 0:
+			for i in range (0, MageSpellsCount):
+				SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
+				if (((1 << i) & SpellMask) == 0):
+					GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetButtonState(MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_ENABLED)
+				
+	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
+	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
+	GemRB.SetVar("MageSpellBook", SpellMask)
 	return
 
 def MageSpellsDonePress():
@@ -1436,12 +1511,74 @@ def MageSpellsCancelPress():
 # Mage Spells Memorize
 
 def MageSpellsMemorize():
+	global CharGenWindow, MageMemorizeWindow, MageMemorizeDoneButton
+	GemRB.SetVisible(CharGenWindow, 0)
+	MageMemorizeWindow = GemRB.LoadWindow(16)
+
+	MageMemorizeDoneButton = GemRB.GetControl(MageMemorizeWindow, 0)
+	GemRB.SetButtonState(MageMemorizeWindow, MageMemorizeDoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent(MageMemorizeWindow, MageMemorizeDoneButton, IE_GUI_BUTTON_ON_PRESS, "MageMemorizeDonePress")
+	GemRB.SetText(MageMemorizeWindow, MageMemorizeDoneButton, 11973)
+	GemRB.SetButtonFlags(MageMemorizeWindow, MageMemorizeDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	MageMemorizeCancelButton = GemRB.GetControl(MageMemorizeWindow, 29)
+	GemRB.SetButtonState(MageMemorizeWindow, MageMemorizeCancelButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(MageMemorizeWindow, MageMemorizeCancelButton, IE_GUI_BUTTON_ON_PRESS, "MageMemorizeCancelPress")
+	GemRB.SetText(MageMemorizeWindow, MageMemorizeCancelButton, 13727)
+
+	GemRB.SetVisible(MageMemorizeWindow, 1)
+	return
+
+def MageMemorizeDonePress():
+	global CharGenWindow, MageMemorizeWindow, SkillsState
+	GemRB.UnloadWindow(MageMemorizeWindow)
+	SkillsState = 4
+	GemRB.SetVisible(CharGenWindow, 1)
+	SkillsPress()
+	return
+
+def MageMemorizeCancelPress():
+	global CharGenWindow, MageMemorizeWindow, SkillsState
+	GemRB.UnloadWindow(MageMemorizeWindow)
+	SkillsState = 0
+	GemRB.SetVisible(CharGenWindow, 1)
 	return
 
 
 # Cleric Spells Memorize
 
 def ClericSpellsMemorize():
+	global CharGenWindow, ClericMemorizeWindow, ClericMemorizeDoneButton
+	GemRB.SetVisible(CharGenWindow, 0)
+	ClericMemorizeWindow = GemRB.LoadWindow(17)
+
+	ClericMemorizeDoneButton = GemRB.GetControl(ClericMemorizeWindow, 0)
+	GemRB.SetButtonState(ClericMemorizeWindow, ClericMemorizeDoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent(ClericMemorizeWindow, ClericMemorizeDoneButton, IE_GUI_BUTTON_ON_PRESS, "ClericMemorizeDonePress")
+	GemRB.SetText(ClericMemorizeWindow, ClericMemorizeDoneButton, 11973)
+	GemRB.SetButtonFlags(ClericMemorizeWindow, ClericMemorizeDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	ClericMemorizeCancelButton = GemRB.GetControl(ClericMemorizeWindow, 29)
+	GemRB.SetButtonState(ClericMemorizeWindow, ClericMemorizeCancelButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(ClericMemorizeWindow, ClericMemorizeCancelButton, IE_GUI_BUTTON_ON_PRESS, "ClericMemorizeCancelPress")
+	GemRB.SetText(ClericMemorizeWindow, ClericMemorizeCancelButton, 13727)
+
+	GemRB.SetVisible(ClericMemorizeWindow, 1)
+	return
+
+def ClericMemorizeDonePress():
+	global CharGenWindow, ClericMemorizeWindow, SkillsState
+	GemRB.UnloadWindow(ClericMemorizeWindow)
+	SkillsState = 4
+	GemRB.SetVisible(CharGenWindow, 1)
+	SkillsPress()
+	return
+
+def ClericMemorizeCancelPress():
+	global CharGenWindow, ClericMemorizeWindow, SkillsState
+	GemRB.UnloadWindow(ClericMemorizeWindow)
+	SkillsState = 0
+	GemRB.SetVisible(CharGenWindow, 1)
 	return
 
 
@@ -1729,6 +1866,7 @@ def NamePress():
 	GemRB.SetText(NameWindow, NameCancelButton, 13727)
 
 	GemRB.SetVisible(NameWindow, 1)
+	GemRB.SetControlStatus(NameWindow, NameField, IE_GUI_CONTROL_FOCUSED)
 	return
 
 def NameEditChange():
@@ -1741,20 +1879,21 @@ def NameEditChange():
 
 def NameDonePress():
 	global CharGenWindow, CharGenState, NameWindow, NameField, AcceptButton
-	GemRB.SetToken("Name", GemRB.QueryText(NameWindow, NameField) )
+	GemRB.SetToken("CHARNAME", GemRB.QueryText(NameWindow, NameField) )
 	GemRB.UnloadWindow(NameWindow)
-	GemRB.SetButtonState(CharGenWindow, AcceptButton, IE_GUI_BUTTON_ENABLED)
 	CharGenState = 8
+	GemRB.SetButtonState(CharGenWindow, AcceptButton, IE_GUI_BUTTON_ENABLED)
 	SetCharacterDescription()
 	GemRB.SetVisible(CharGenWindow, 1)
 	return
 
 def NameCancelPress():
 	global CharGenWindow, NameWindow
+
+	GemRB.SetToken("CHARNAME", "")
 	GemRB.UnloadWindow(NameWindow)
 	GemRB.SetVisible(CharGenWindow, 1)
 	return
-
 
 # Import Character
 
