@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.3 2004/12/04 17:35:12 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.4 2004/12/04 18:01:47 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -173,5 +173,10 @@ def GetWindowPack():
 	width = GemRB.GetSystemVariable (SV_WIDTH)
 	if width == 800:
 		return "GUIW08"
+	if width == 1024:
+		return "GUIW10"
+	if width == 1280:
+		return "GUIW12"
+	#default
 	return "GUIW"
 
