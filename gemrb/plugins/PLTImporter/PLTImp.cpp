@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.3 2003/11/25 13:48:00 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.4 2003/12/15 09:34:50 balrog994 Exp $
  *
  */
 
@@ -87,9 +87,9 @@ Sprite2D * PLTImp::GetImage()
 	unsigned char * p = (unsigned char*)malloc(Width*Height*4);
 	unsigned char * dest = p;
 	unsigned char * src = (unsigned char*)pixels;
-	for(int y = Height-1; y >= 0; y--) {
+	for(unsigned int y = Height-1; y >= 0; y--) {
 		src = (unsigned char*)pixels+(y*Width*2);
-		for(int x = 0; x < Width; x++) {
+		for(unsigned int x = 0; x < Width; x++) {
 			unsigned char intensity = *src++;
 			unsigned char palindex = *src++;
 			if(intensity == 0xff)
