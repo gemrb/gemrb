@@ -202,6 +202,21 @@ Convert all labels to lower case?
 .BR HasPartyINI =(0|1)
 
 .TP
+.BR HasBeastsINI =(0|1)
+Whether game directory contains 
+.I beast.ini 
+and 
+.I quests.ini
+files. Descriptions
+of quests and beasts are held in these files.
+
+Set this option to
+.I 1
+for PST game and to
+.I 0
+elsewhere, since these files are found on PST only.
+
+.TP
 .BR GameDataPath =PATH
 Path to original game's installed data files, relative to GamePath.
 Usually it's 
