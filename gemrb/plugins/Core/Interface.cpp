@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.262 2005/02/19 19:09:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.263 2005/02/20 13:00:54 avenger_teambg Exp $
  *
  */
 
@@ -1054,12 +1054,13 @@ bool Interface::LoadConfig(const char* filename)
 			strcpy( GemRBPath, value );
 		} else if (stricmp( name, "CachePath" ) == 0) {
 			strcpy( CachePath, value );
+		FixPath( CachePath, false );
+		mkdir( CachePath, S_IREAD|S_IWRITE );
 			if (! dir_exists( CachePath )) {
 				printf( "Cache folder %s doesn't exist!", CachePath );
 				fclose( config );
 				return false;
 			}
-			strcat( CachePath, SPathDelimiter );
 		} else if (stricmp( name, "GUIScriptsPath" ) == 0) {
 			strcpy( GUIScriptsPath, value );
 #ifndef WIN32
@@ -1128,7 +1129,7 @@ bool Interface::LoadConfig(const char* filename)
 		strcat( PluginsPath, SPathDelimiter );
 	}
 	FixPath(GemRBPath, true);
-	FixPath(CachePath, false);
+	FixPath(CachePath, true);
 	if (GUIScriptsPath[0]) {
 		FixPath(GUIScriptsPath, true);
 	}
@@ -2771,3 +2772,9 @@ void Interface::FreeSPLExt(SPLExtHeader *p, Effect *e)
 	delete [] p;
 	delete [] e;
 }
+
+WorldMap *Interface::NewWorldMap()
+{
+	return new WorldMap();
+}
+

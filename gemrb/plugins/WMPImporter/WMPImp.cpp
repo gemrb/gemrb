@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.10 2005/02/17 17:21:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.11 2005/02/20 13:00:54 avenger_teambg Exp $
  *
  */
 
@@ -61,10 +61,10 @@ bool WMPImp::Open(DataStream* stream, bool autoFree)
 WorldMap* WMPImp::GetWorldMap(unsigned int index)
 {
 	unsigned int i;
-	WorldMap* m = new WorldMap();
 
 	str->Seek( WorldMapsOffset + index * 184, GEM_STREAM_START );
 
+	WorldMap* m = core->NewWorldMap();
 	str->ReadResRef( m->MapResRef );
 	str->ReadDword( &m->Width );
 	str->ReadDword( &m->Height );
@@ -77,17 +77,18 @@ WorldMap* WMPImp::GetWorldMap(unsigned int index)
 	str->ReadDword( &m->AreaLinksOffset );
 	str->ReadDword( &m->AreaLinksCount );
 	str->ReadResRef( m->MapIconResRef );
-// no problem removing this, because there is a seek after it
-//	str->Read( m->unknown3, 128 );
 
 	str->Seek( m->AreaEntriesOffset, GEM_STREAM_START );
+
+	WMPAreaLink al;
+	WMPAreaEntry ae;
 	for (i = 0; i < m->AreaEntriesCount; i++) {
-		m->AddAreaEntry(GetAreaEntry());
+		m->SetAreaEntry(i,GetAreaEntry(&ae));
 	}
 
 	str->Seek( m->AreaLinksOffset, GEM_STREAM_START );
 	for (i = 0; i < m->AreaLinksCount; i++) {
-		m->AddAreaLink(GetAreaLink());
+		m->SetAreaLink(i,GetAreaLink(&al));
 	}
 
 	// Load map bitmap
@@ -119,10 +120,8 @@ WorldMap* WMPImp::GetWorldMap(unsigned int index)
 	return m;
 }
 
-WMPAreaEntry* WMPImp::GetAreaEntry()
+WMPAreaEntry* WMPImp::GetAreaEntry(WMPAreaEntry* ae)
 {
-	WMPAreaEntry* ae = new WMPAreaEntry();
-
 	str->ReadResRef( ae->AreaName );
 	str->ReadResRef( ae->AreaResRef );
 	str->Read( ae->AreaLongName, 32 );
@@ -139,16 +138,12 @@ WMPAreaEntry* WMPImp::GetAreaEntry()
 		str->ReadDword( &ae->AreaLinksCount[dir] );
 	}
 	str->Seek( 128, GEM_CURRENT_POS );
-//	str->Read( ae->unknown, 128 );
 
 	return ae;
 }
 
-
-WMPAreaLink* WMPImp::GetAreaLink()
+WMPAreaLink* WMPImp::GetAreaLink(WMPAreaLink* al)
 {
-	WMPAreaLink* al = new WMPAreaLink();
-
 	str->ReadDword( &al->AreaIndex );
 	str->Read( al->DestEntryPoint, 32 );
 	str->ReadDword( &al->DistanceScale );
@@ -157,12 +152,10 @@ WMPAreaLink* WMPImp::GetAreaLink()
 		str->ReadResRef( al->EncounterAreaResRef[k] );
 	}
 	str->ReadDword( &al->EncounterChance );
-//	str->Read( al->unknown, 128 );
 	str->Seek( 128, GEM_CURRENT_POS );
 
 	return al;
 }
-
 
 unsigned int WMPImp::GetWorldMapsCount()
 {

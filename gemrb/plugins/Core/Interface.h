@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.136 2005/02/13 19:02:19 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.137 2005/02/20 13:00:55 avenger_teambg Exp $
  *
  */
 
@@ -388,12 +388,13 @@ public:
 	void FreeItem(Item *itm, ieResRef name, bool free=false);
 	Spell* GetSpell(ieResRef resname);
 	void FreeSpell(Spell *spl, ieResRef name, bool free=false);
-	//due to Win32 we have to allocate all common memory from interface
+	//due to Win32 we have to allocate/release all common memory from interface
 	ITMExtHeader *GetITMExt(int count);
 	SPLExtHeader *GetSPLExt(int count);
 	Effect *GetFeatures(int count);
 	void FreeITMExt(ITMExtHeader *p, Effect *e);
 	void FreeSPLExt(SPLExtHeader *p, Effect *e);
+	WorldMap *NewWorldMap();
 
 private:
 	bool LoadConfig(void);

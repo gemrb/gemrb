@@ -32,11 +32,17 @@ public:
 	void AdjustScrolling(short x, short y);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
+	/** Sets the exit direction (we need this to calculate distances) */
+	void SetDirection(int direction);
 	/** Sets the Text of the current control */
-	int SetText(const char* /*string*/, int /*pos*/) { return 0; };
+	int SetText(const char* /*string*/, int /*pos*/) { return 0; };  
 	int ScrollX, ScrollY;
 	unsigned short lastMouseX, lastMouseY;
 	bool MouseIsDown;
+	/** the palette for drawing the area titles */
+	Color *text_pal;
+	/** pointer to last pointed area */
+	WMPAreaEntry *Area;
 private:
 	unsigned char lastCursor;
 	/** Mouse Over Event */

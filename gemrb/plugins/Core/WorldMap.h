@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.9 2005/02/19 16:46:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.10 2005/02/20 13:00:55 avenger_teambg Exp $
  *
  */
 
@@ -45,6 +45,8 @@
 #define WMP_ENTRY_ADJACENT   0x2   // visible from adjacent
 #define WMP_ENTRY_ACCESSIBLE 0x4
 #define WMP_ENTRY_VISITED    0x8
+#define WMP_ENTRY_WALKABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE)
+#define WMP_ENTRY_PASSABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED)
 
 class GEM_EXPORT WMPAreaEntry {
 public:
@@ -74,13 +76,13 @@ typedef struct WMPAreaLink {
 	ieDword Flags;
 	ieResRef EncounterAreaResRef[5];
 	ieDword EncounterChance;
-//	char unknown[128];
 } WMPAreaLink;
 
 class GEM_EXPORT WorldMap {
 public:
 	WorldMap();
 	~WorldMap();
+public: //struct members
 	ieResRef MapResRef;
 	ieDword Width;
 	ieDword Height;
@@ -93,18 +95,37 @@ public:
 	ieDword AreaLinksOffset;
 	ieDword AreaLinksCount;
 	ieResRef MapIconResRef;
+
+public: //non-struct members
 	Sprite2D* MapMOS;
-public:
-	void AddAreaEntry(WMPAreaEntry *ae);
-	void AddAreaLink(WMPAreaLink *al);
 	std::vector< WMPAreaEntry*> area_entries;
 	std::vector< WMPAreaLink*> area_links;
-	/* returns area entry indexed by name */
-	WMPAreaEntry* GetArea(const ieResRef AreaName);
+	int *Distances;
+	int *GotHereFrom;
+public:
+	void SetAreaEntry(unsigned int index, WMPAreaEntry *areaentry);
+	void SetAreaLink(unsigned int index, WMPAreaLink *arealink);
+	void AddAreaEntry(WMPAreaEntry *ae);
+	void AddAreaLink(WMPAreaLink *al);
+	/* calculates the distances from A, call this when first on an area */
+	int CalculateDistances(const ieResRef A, int direction);
+	/* returns the precalculated distance to area B */
+	int GetDistance(const ieResRef A);
+	/* returns the link to area B we will fall into if we head in B direction */
+	//WMPAreaLink *GetLink(const ieResRef B);
+	/* returns the area link we will fall into if we head in B direction */
+	/* if the area name differs it means we are in a random encounter */
+	WMPAreaLink *GetEncounterLink(const ieResRef B, bool &encounter);
 	/* updates visibility of adjacent areas */
 	void UpdateAreaVisibility(const ieResRef AreaName, int direction);
 	/* sets area status */
 	void SetAreaStatus(const ieResRef, int Bits, int Op);
+private:
+	//internal function to get area pointer and index from area name
+	WMPAreaEntry* GetArea(const ieResRef AreaName, int &i);
+	//internal function to calculate the distances from areaindex
+	void CalculateDistance(int areaindex, int direction);
+	int WhoseLinkAmI(int link_index);
 };
 
-#endif  // ! WORLDMAP_H
+#endif // ! WORLDMAP_H

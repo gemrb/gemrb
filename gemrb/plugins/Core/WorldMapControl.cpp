@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.10 2004/11/21 12:57:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.11 2005/02/20 13:00:55 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -37,12 +37,23 @@ WorldMapControl::WorldMapControl(void)
 	ScrollY = 0;
 	MouseIsDown = false;
 	Changed = true;
-	//lastCursor = 0;
+	Area = NULL;
+	if (Value!=(ieDword) -1) {
+		Game* game = core->GetGame();
+		WorldMap* worldmap = core->GetWorldMap();
+		worldmap->CalculateDistances(game->CurrentArea, Value);
+	}
+	// alpha bit is unfortunately ignored
+	Color fore = {0x00, 0x00, 0x00, 0xff};
+	Color back = {0x00, 0x00, 0x00, 0x00};
+	text_pal = core->GetVideoDriver()->CreatePalette( fore, back );
 }
-
 
 WorldMapControl::~WorldMapControl(void)
 {
+	if(text_pal) {
+		core->GetVideoDriver()->FreePalette(text_pal);
+	}
 }
 
 /** Draws the Control on the Output Display */
@@ -59,31 +70,32 @@ void WorldMapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 	Region r( XPos, YPos, Width, Height );
 	video->BlitSprite( worldmap->MapMOS, XPos - ScrollX, YPos - ScrollY, true, &r );
 
-
 	std::vector< WMPAreaEntry*>::iterator m;
 
 	for (m = worldmap->area_entries.begin(); m != worldmap->area_entries.end(); ++m) {
-		if (! (*m)->AreaStatus & WMP_ENTRY_VISIBLE) continue;
+		if (! ((*m)->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
 
-		Region r2 = Region( MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), (*m)->MapIcon->Width, (*m)->MapIcon->Height );
-		// if (xm >= (*m)->X && xm < (*m)->X + (*m)->MapIcon->Width && ym >= (*m)->Y && ym < (*m)->Y + (*m)->MapIcon->Height)
-		video->BlitSprite( (*m)->MapIcon, MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), true, &r );
+		if( (*m)->MapIcon) {
+			Region r2 = Region( MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), (*m)->MapIcon->Width, (*m)->MapIcon->Height );
+			video->BlitSprite( (*m)->MapIcon, MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), true, &r );
+		}
 
 		// wmpty.bam
 	}
 
 	Font* fnt = core->GetButtonFont();
 
-	// alpha bit is unfortunately ignored
-	Color fore = {0x00, 0x00, 0x00, 0xff};
-	Color back = {0x00, 0x00, 0x00, 0x00};
-	Color* text_pal = core->GetVideoDriver()->CreatePalette( fore, back );
-
 	// Draw WMP entry labels
 	for (m = worldmap->area_entries.begin(); m != worldmap->area_entries.end(); ++m) {
-		if (! (*m)->AreaStatus & WMP_ENTRY_VISIBLE) continue;
+		if (! ((*m)->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
+		Sprite2D *icon=(*m)->MapIcon;
+		int h=0,w=0;
+		if (icon) {
+			h=icon->Height;
+			w=icon->Width;
+		}
 
-		Region r2 = Region( MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), (*m)->MapIcon->Width, (*m)->MapIcon->Height );
+		Region r2 = Region( MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), w, h );
 		if (r2.y+r2.h<r.y) continue;
 
 		char *text = core->GetString( (*m)->LocCaptionName );
@@ -91,28 +103,14 @@ void WorldMapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 		int th = fnt->maxHeight;
 
 		fnt->Print( Region( r2.x + (r2.w - tw)/2, r2.y + r2.h, tw, th ),
-			    ( unsigned char * ) text, text_pal, 0, true );
+					( unsigned char * ) text, text_pal, 0, true );
 	}
 }
-
-#if 0
-/** Key Press Event */
-void WorldmapControl::OnKeyPress(unsigned char Key, unsigned short Mod)
-{
-	HotKey=tolower(Key);
-}
-#endif
 
 /** Key Release Event */
 void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
-	//unsigned int i;
-
 	switch (Key) {
-		case '\t':
-			//not GEM_TAB
-			printf( "TAB released\n" );
-			return;
 		case 'f':
 			if (Mod & 64)
 				core->GetVideoDriver()->ToggleFullscreenMode();
@@ -123,12 +121,6 @@ void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			break;
 		default:
 			break;
-	}
-	if (!core->CheatEnabled()) {
-		return;
-	}
-	if (Mod & 64) //ctrl
-	{
 	}
 }
 void WorldMapControl::AdjustScrolling(short x, short y)
@@ -145,6 +137,7 @@ void WorldMapControl::AdjustScrolling(short x, short y)
 	if (ScrollY < 0)
 		ScrollY = 0;
 	Changed = true;
+	Area = NULL;
 }
 
 /** Mouse Over Event */
@@ -160,18 +153,33 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 	lastMouseX = x;
 	lastMouseY = y;
 
-	if (Value) {
+	if (Value!=(ieDword) -1) {
 		x += ScrollX;
 		y += ScrollY;
 
 		std::vector< WMPAreaEntry*>::iterator m;
 		for (m = worldmap->area_entries.begin(); m != worldmap->area_entries.end(); ++m) {
-			if ((*m)->X <= x &&
-			(*m)->X + (*m)->MapIcon->Width > x &&
-			(*m)->Y <= y &&
-			(*m)->Y + (*m)->MapIcon->Height > y) {
-				printf("A: %s\n", (*m)->AreaName);
-				nextCursor = 0; //we are over an area!
+			if (! ((*m)->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
+
+			Sprite2D *icon=(*m)->MapIcon;
+			int h=0,w=0;
+			if (icon) {
+				h=icon->Height;
+				w=icon->Width;
+			}
+			if(h<48)
+				h=48;
+			if(w<48)
+				w=48;
+			if ((*m)->X > x) continue;
+			if ((*m)->X + w < x) continue;
+			if ((*m)->Y > y) continue;
+			if ((*m)->Y + h < y) continue;
+			nextCursor = 0; //we are over an area!
+			if(Area!=*m) {
+				Area=*m;
+				printf("A: %s, Distance: %d\n", Area->AreaName, worldmap->GetDistance(Area->AreaName) );
+				break;
 			}
 		}
 	}
@@ -183,6 +191,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 void WorldMapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 {
 	( ( Window * ) Owner )->Cursor = 0;
+	Area = NULL;
 }
 
 /** Mouse Button Down */
@@ -192,8 +201,6 @@ void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
 	if ((Button != GEM_MB_ACTION) ) {
 		return;
 	}
-	//short WorldmapX = x, WorldmapY = y;
-	//core->GetVideoDriver()->ConvertToWorldmap( WorldmapX, WorldmapY );
 	MouseIsDown = true;
 	lastMouseX = x;
 	lastMouseY = y;
@@ -207,13 +214,6 @@ void WorldMapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	}
 
 	MouseIsDown = false;
-#if 0
-		if(overInfoPoint) {
-			if(HandleActiveRegion(overInfoPoint, selected[0])) {
-				return;
-			}
-		}
-#endif
 }
 
 /** Special Key Press */
