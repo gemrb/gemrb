@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.30 2003/12/18 17:21:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.31 2003/12/28 12:39:47 avenger_teambg Exp $
  *
  */
 
@@ -30,24 +30,23 @@
 #include <unistd.h>
 #endif
 
-static char overridesubfolder[9]="override";
-static char datasubfolder[5]="data";
-
 KeyImp::KeyImp(void)
 {
+#ifndef WIN32
 	if(core->CaseSensitive) {
 		char path[_MAX_PATH];
 		strcpy(path, core->GamePath);
-		strcat(path, overridesubfolder);
+		strcat(path, core->GameOverride);
 		if(!dir_exists(path) ) {
-			overridesubfolder[0]=toupper(overridesubfolder[0]);
+			core->GameOverride[0]=toupper(core->GameOverride[0]);
 		}
 		strcpy(path, core->GamePath);
-		strcat(path, datasubfolder);
+		strcat(path, core->GameData);
 		if(!dir_exists(path) ) {
-			datasubfolder[0]=toupper(datasubfolder[0]);
+			core->GameData[0]=toupper(core->GameData[0]);
 		}
 	}
+#endif
 }
 
 KeyImp::~KeyImp(void)
@@ -196,8 +195,8 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 	strcat(path, SPathDelimiter);
 	strcat(path, core->GameType);
 	SearchIn(core->GemRBPath, path, resname, type, "[KEYImporter]: Found in GemRB Override...\n");
-	SearchIn(core->GamePath, overridesubfolder, resname, type, "[KEYImporter]: Found in Override...\n");
-	SearchIn(core->GamePath, datasubfolder, resname, type, "[KEYImporter]: Found in Local CD1 Folder...\n");
+	SearchIn(core->GamePath, core->GameOverride, resname, type, "[KEYImporter]: Found in Override...\n");
+	SearchIn(core->GamePath, core->GameData, resname, type, "[KEYImporter]: Found in Local CD1 Folder...\n");
 	printMessage("KEYImporter", "Searching for ", WHITE);
 	printf("%.8s%s...", resname, core->TypeExt(type));
 	unsigned long ResLocator;
@@ -321,7 +320,7 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		return fs;
 	}
 	strcpy(path, core->GamePath);
-	strcat(path, overridesubfolder);
+	strcat(path, core->GameOverride);
 	strcat(path, SPathDelimiter);
 	strncat(path, resname, 8);
 	strcat(path, core->TypeExt(type));

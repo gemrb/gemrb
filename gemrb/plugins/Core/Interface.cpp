@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.107 2003/12/21 18:36:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.108 2003/12/28 12:39:47 avenger_teambg Exp $
  *
  */
 
@@ -65,6 +65,8 @@ Interface::Interface(void)
 	GUIScriptsPath[0]=0;
 	GamePath[0]=0;
 	GemRBPath[0]=0;
+	memcpy(GameOverride,"override",9);
+	memcpy(GameData,"data\0\0\0\0",9);
 	memcpy(ButtonFont,"STONESML",9);
 	memcpy(CursorBam,"CAROT\0\0\0",9);
 	GameFeatures=0;
@@ -626,6 +628,12 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "CursorBam") ==0) {
 			strncpy(CursorBam, value, 8);
+		}
+		else if(stricmp(name, "GameDataPath") == 0) {
+			strncpy(GameData,value,8);
+		}
+		else if(stricmp(name, "GameOverridePath") == 0) {
+			strncpy(GameOverride,value,8);
 		}
 		else if(stricmp(name, "ButtonFont") ==0) {
 			strncpy(ButtonFont, value, 8);
