@@ -35,7 +35,7 @@ typedef __POSITION* POSITION;
 #define MYASSERT(f) \
   if(!(f))  \
   {  \
-  printf("Assertion failed: %s %d","f", __LINE__); \
+  printf("Assertion failed: %s %d",#f, __LINE__); \
                 abort(); \
   }
 struct Plex     // warning variable length structure
