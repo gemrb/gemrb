@@ -15,6 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "../../includes/win32def.h"
 #include "CHUImp.h"
 #include "../Core/Interface.h"
 #include "../Core/Button.h"

@@ -1,4 +1,4 @@
-#include "win32def.h"
+#include "../../includes/win32def.h"
 #include "AREImp.h"
 #include "../Core/TileMapMgr.h"
 #include "../Core/AnimationMgr.h"

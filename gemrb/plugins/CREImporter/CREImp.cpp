@@ -1,3 +1,4 @@
+#include "../../includes/win32def.h"
 #include "CREImp.h"
 #include "../Core/Interface.h"
 #include "../Core/HCAnimationSeq.h"

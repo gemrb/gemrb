@@ -1,3 +1,4 @@
+#include "../../includes/win32def.h"
 #include "TISImp.h"
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"

@@ -1,6 +1,7 @@
 // MVEPlayer.cpp : Defines the entry point for the DLL application.
 //
 
+#include "../../includes/win32def.h"
 #include "MVEPlayerDesc.h"
 #include "../../includes/globals.h"
 

@@ -1,4 +1,4 @@
-#include "win32def.h"
+#include "../../includes/win32def.h"
 #include "BMPImp.h"
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"

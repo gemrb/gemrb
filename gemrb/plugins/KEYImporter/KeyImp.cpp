@@ -1,3 +1,4 @@
+#include "../../includes/win32def.h"
 #include "KeyImp.h"
 #include "../../includes/globals.h"
 #include "../Core/FileStream.h"

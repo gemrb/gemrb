@@ -1,3 +1,4 @@
+#include "../../includes/win32def.h"
 #include "WEDImp.h"
 #include "../Core/TileSetMgr.h"
 #include "../Core/Interface.h"

@@ -1,4 +1,4 @@
-#include "win32def.h"
+#include "../../includes/win32def.h"
 #include "BG2HCAnim.h"
 #include "../Core/Interface.h"
 #include "../Core/AnimationMgr.h"

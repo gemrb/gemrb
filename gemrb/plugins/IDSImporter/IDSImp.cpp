@@ -1,3 +1,4 @@
+#include "../../includes/win32def.h"
 #include "IDSImp.h"
 #include "IDSImpDefs.h"
 #include <ctype.h>

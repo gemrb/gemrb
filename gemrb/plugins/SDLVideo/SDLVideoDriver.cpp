@@ -1,3 +1,4 @@
+#include "../../includes/win32def.h"
 #include "SDLVideoDriver.h"
 #include <math.h>
 

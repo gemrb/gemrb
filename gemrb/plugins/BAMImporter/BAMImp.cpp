@@ -1,4 +1,4 @@
-#include "win32def.h"
+#include "../../includes/win32def.h"
 #include "BAMImp.h"
 #include "../Core/Interface.h"
 #include "../Core/Compressor.h"

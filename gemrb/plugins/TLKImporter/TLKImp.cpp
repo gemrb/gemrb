@@ -1,3 +1,4 @@
+#include "../../includes/win32def.h"
 #include "TLKImp.h"
 
 TLKImp::TLKImp(void)

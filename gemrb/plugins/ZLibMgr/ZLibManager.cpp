@@ -1,3 +1,4 @@
+#include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include "ZLibManager.h"
 #include "../../zlib/zlib.h"
