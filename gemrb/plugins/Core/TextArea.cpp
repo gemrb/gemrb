@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.29 2003/12/22 22:09:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.30 2003/12/22 23:37:08 balrog994 Exp $
  *
  */
 
@@ -142,7 +142,8 @@ int TextArea::SetText(const char * text, int pos)
 		strcpy(lines[pos], text);
 	}
 	CalcRowCount();
-	((Window*)Owner)->Invalidate();
+	//((Window*)Owner)->Invalidate();
+	core->RedrawAll();
 	return 0;
 }
 /** Appends a String to the current Text */
@@ -166,7 +167,8 @@ int TextArea::AppendText(const char * text, int pos)
 	}
 	CalcRowCount();
 	Changed = true;
-	((Window*)Owner)->Invalidate();
+	//((Window*)Owner)->Invalidate();
+	core->RedrawAll();
 	if(!sb)
 		return 0;
 	ScrollBar *bar = (ScrollBar*)sb;
