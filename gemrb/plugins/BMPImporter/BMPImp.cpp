@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.11 2003/11/30 23:26:46 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.12 2003/12/10 15:18:50 balrog994 Exp $
  *
  */
 
@@ -168,12 +168,12 @@ Sprite2D * BMPImp::GetImage()
 	if(BitCount == 24) {
 		void *p = malloc(Width*Height*3);
 		memcpy(p, pixels, Width*Height*3);
-		spr = core->GetVideoDriver()->CreateSprite(Width, Height, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, p);
+		spr = core->GetVideoDriver()->CreateSprite(Width, Height, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, p, true, 0x00ff0000);
 	}
 	else if(BitCount == 8) {
 		void *p = malloc(Width*Height);
 		memcpy(p, pixels, Width*Height);
-		spr = core->GetVideoDriver()->CreateSprite8(Width, Height, 8, p, Palette);
+		spr = core->GetVideoDriver()->CreateSprite8(Width, Height, 8, p, Palette, true, 0);
 	}
 	else if(BitCount == 4) {
 		void *p = malloc(Width*Height);
