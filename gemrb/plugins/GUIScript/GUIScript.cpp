@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.144 2004/03/27 17:33:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.145 2004/03/28 14:19:40 avenger_teambg Exp $
  *
  */
 
@@ -1320,7 +1320,7 @@ static PyObject* GemRB_SetControlSize(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &Width,
 			&Height )) {
 		printMessage( "GUIScript",
-			"Syntax Error: SetControlPos(WindowIndex, ControlIndex, Width, Height)\n",
+			"Syntax Error: SetControlSize(WindowIndex, ControlIndex, Width, Height)\n",
 			LIGHT_RED );
 		return NULL;
 	}
@@ -2363,6 +2363,40 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", PlayerSlot );
 }
 
+static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
+{
+	int PlayerSlot, Which;
+
+	Which = 0;
+	if (!PyArg_ParseTuple( args, "i|i", &PlayerSlot, &Which )) {
+		printMessage( "GUIScript", "Syntax Error: GetPlayerName(Slot[, SmallOrLarge])\n",
+			LIGHT_RED );
+		return NULL;
+	}
+	Actor* MyActor = core->GetActor( PlayerSlot );
+	if (!MyActor) {
+		return Py_BuildValue( "s", "");
+	}
+	return Py_BuildValue( "s", MyActor->GetName(Which) );
+}
+
+static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
+{
+	int PlayerSlot, Which;
+
+	Which = 0;
+	if (!PyArg_ParseTuple( args, "i|i", &PlayerSlot, &Which )) {
+		printMessage( "GUIScript", "Syntax Error: GetPlayerPortrait(Slot[, SmallOrLarge])\n",
+			LIGHT_RED );
+		return NULL;
+	}
+	Actor* MyActor = core->GetActor( PlayerSlot );
+	if (!MyActor) {
+		return Py_BuildValue( "s", "");
+	}
+	return Py_BuildValue( "s", MyActor->GetPortrait(Which) );
+}
+
 static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot, StatID, StatValue;
@@ -2372,11 +2406,6 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
-	/*
-		PlayerSlot = core->FindPlayer(PlayerSlot);
-		if(PlayerSlot<0)
-			return NULL;
-	*/
 	//returning the modified stat
 	StatValue = core->GetCreatureStat( PlayerSlot, StatID, 1 );
 	return Py_BuildValue( "i", StatValue );
@@ -2391,13 +2420,6 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 			"Syntax Error: SetPlayerStat(Slot, ID, Value)\n", LIGHT_RED );
 		return NULL;
 	}
-	/*
-		PlayerSlot = core->FindPlayer(PlayerSlot);
-		if(PlayerSlot<0) {
-			printMessage("GUIScript","SetPlayerStat: Can't find actor\n",LIGHT_RED);
-			return NULL;
-		}
-	*/
 	//Setting the creature's base stat, which gets saved (0)
 	if (!core->SetCreatureStat( PlayerSlot, StatID, StatValue, 0 )) {
 		return NULL;
@@ -2409,17 +2431,13 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot;
+	char *Portrait1, *Portrait2;
 
-	if (!PyArg_ParseTuple( args, "i", &PlayerSlot )) {
+	if (!PyArg_ParseTuple( args, "iss", &PlayerSlot, &Portrait1, &Portrait2)) {
 		printMessage( "GUIScript", "Syntax Error: FillPlayerInfo(Slot)\n",
 			LIGHT_RED );
 		return NULL;
 	}
-	/*
-	PlayerSlot = core->FindPlayer(PlayerSlot);
-	if(PlayerSlot<0)
-	return NULL;
-	*/
 	// here comes some code to transfer icon/name to the PC sheet
 	//
 	//
@@ -2427,6 +2445,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	if (!MyActor) {
 		return NULL;
 	}
+/*
 	char* poi;
 	unsigned long PortraitIndex;
 	if (core->GetDictionary()->Lookup( "PortraitIndex", PortraitIndex )) {
@@ -2435,6 +2454,9 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		poi = tm->GetRowName( PortraitIndex );
 		MyActor->SetPortrait( poi );
 	}
+*/
+	MyActor->SetPortrait( Portrait1, 1);
+	MyActor->SetPortrait( Portrait2, 2);
 	int mastertable = core->LoadTable( "avprefix" );
 	TableMgr* mtm = core->GetTable( mastertable );
 	int count = mtm->GetRowCount();
@@ -2442,7 +2464,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		printMessage( "GUIScript", "Table is invalid.\n", LIGHT_RED );
 		return NULL;
 	}
-	poi = mtm->QueryField( 0 );
+	char *poi = mtm->QueryField( 0 );
 	int AnimID = strtoul( poi, NULL, 0 );
 	printf( "Avatar animation base: 0x%0x", AnimID );
 	for (int i = 1; i < count; i++) {
@@ -2965,6 +2987,10 @@ static PyMethodDef GemRBMethods[] = {
 	"Changes a stat."},
 	{"GetPlayerStat", GemRB_GetPlayerStat, METH_VARARGS,
 	"Queries a stat."},
+	{"GetPlayerPortrait", GemRB_GetPlayerPortrait, METH_VARARGS,
+	"Queries the player portrait."},
+	{"GetPlayerName", GemRB_GetPlayerPortrait, METH_VARARGS,
+	"Queries the player name."},
 	{"FillPlayerInfo", GemRB_FillPlayerInfo, METH_VARARGS,
 	"Fills basic character info, that is not stored in stats."},
 	{"SetWorldMapImage", GemRB_SetWorldMapImage, METH_VARARGS,
