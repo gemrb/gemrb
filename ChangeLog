@@ -3,6 +3,7 @@ GemRB v0.2.2.5 Added Features:
   - PlaySound
   - CreateVisualEffect
   - CreateVisualEffectObject
+  - DestroySelf
 - Fixed some In-Game Script OpCodes:
   - Face: is now a Blocking OpCode
   - Global: Added support for GLOBALS & LOCALS Contexts
