@@ -78,7 +78,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 	if(Alignment & IE_FONT_ALIGN_MIDDLE) {
 		int h = 0;
 		for(int i = 0; i <= len; i++) {
-			if(tmp[i] == 0)
+			if((tmp[i] == 0) || (tmp[i] == '\n'))
 				h++;
 		}
 		h = h*ystep;
@@ -92,7 +92,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 			}
 			continue;
 		}
-		if(tmp[i] == 0) {
+		if((tmp[i] == 0) || (tmp[i] == '\n')) {
 			y+=ystep;
 			x=0;
 			if(Alignment & IE_FONT_ALIGN_CENTER) {
@@ -471,23 +471,48 @@ int Font::CalcStringWidth(const char * string)
 void Font::SetupString(char * string, int width)
 {
 	int len = strlen(string);
-	char * str = (char*)malloc(len+1);
-	strcpy(str, string);
-	char * s = strtok(str, " \n");
+	int lastpos = 0;
+	int x = 0, wx = 0;
+	for(int pos = 0; pos < len; pos++) {
+		if(x+wx > width) {
+			string[lastpos] = 0;
+			x = 0;
+		}
+		if(string[pos] == '\n') {
+			string[pos++] = 0;
+			x = 0;
+			wx = 0;
+			lastpos = pos;
+		}
+		wx += chars[((unsigned char)string[pos])-1]->Width;
+		if((string[pos] == ' ') || (string[pos] == '-')) {
+			x+=wx;
+			wx = 0;
+			lastpos = pos;
+		}
+	}
+	/*char * s = strtok(str, " \n");
 	int pos = -1;
 	int x = 0;//chars[s[0]-1]->XPos;
+	bool forceNewLine = false;
 	while(s != NULL) {
 		int ln = strlen(s);
 		int nx = CalcStringWidth(s);
-		if(len > pos+ln+1)
+		if(string[pos+ln+1] == '\n')
+			forceNewLine = true;
+		if((len > pos+ln+1) && (string[pos+ln+1] != '\n'))
 			nx+=chars[' '-1]->Width;
 		if(x+nx >= width) {
 			string[pos] = 0;		
 			x = 0;//chars[s[0]-1]->XPos;
 		}
-		x+=nx;
+		x+=nx;	
 		pos += ln+1;
+		if(forceNewLine) {
+			string[pos] = 0;
+			x = 0;
+			forceNewLine = false;
+		}
 		s = strtok(NULL, " \n");
-	}
-	free(str);
+	}*/
 }
