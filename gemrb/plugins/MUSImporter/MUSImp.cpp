@@ -52,17 +52,6 @@ bool MUSImp::OpenPlaylist(const char * name)
 	if(!pl)
 		return false;
 	int count;
-	fscanf(pl, "%[^\r\n]%*[\r]\n", PLName);
-	fscanf(pl, "%d%*[\r]\n", &count);
-	for(int i = 0; i < count; i++) {
-		char PLVal[20], PLVar[20], PLEnd[20];
-		fscanf(pl, "%[^ ]%*[ ]", PLVal);
-		fscanf(pl, "%[^ ^\r^\n]", PLVar);
-		int ch = fgetc(pl);
-		if(ch == ' ') {
-			
-		}
-	}
 }
 /** Start the PlayList Music Execution */
 void MUSImp::Start(){

@@ -17,6 +17,7 @@
 #define printf cprintf
 
 #else
+#define stricmp strcasecmp
 
 #define ADV_TEXT
 #define textcolor(i) i
