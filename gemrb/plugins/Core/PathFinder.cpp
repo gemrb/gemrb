@@ -1,14 +1,40 @@
 #include "../../includes/win32def.h"
 #include "PathFinder.h"
+#include "Interface.h"
 #include <stdlib.h>
 
-#define NormalCost	10
-#define AdditionalCost	4
-
+static int NormalCost=10;
+static int AdditionalCost=4;
+static int Passable[16]={0,1,1,1,1,1,1,1,0,1,0,0,0,0,1,1};
+static bool PathFinderInited=false;
+extern Interface * core;
 PathFinder::PathFinder(void)
 {
 	MapSet = NULL;
 	sMap = NULL;
+	if(!PathFinderInited) {
+		PathFinderInited=true;
+		int passabletable = core->LoadTable("pathfind");
+                if(passabletable >= 0) {
+                        TableMgr * tm = core->GetTable(passabletable);
+                        if(tm) {
+				char *poi;
+
+				for(int i=0;i<16;i++) {
+					poi=tm->QueryField(0,i);
+					if(*poi!='*')
+						Passable[i]=atoi(poi);
+				}
+				poi=tm->QueryField(1,0);
+				if(*poi!='*')
+					NormalCost=atoi(poi);
+				poi=tm->QueryField(1,1);
+				if(*poi!='*')
+					AdditionalCost=atoi(poi);
+				core->DelTable(passabletable);
+			}
+		}
+	}
 }
 
 PathFinder::~PathFinder(void)
@@ -47,8 +73,6 @@ void PathFinder::Leveldown(unsigned int px, unsigned int py, unsigned int &level
     ny=py;
   }
 }
-
-static int Passable[16]={0,1,1,1,1,1,1,1,0,1,0,0,0,0,1,1};
 
 void PathFinder::SetupNode(unsigned int x,unsigned int y, unsigned int Cost)
 {
