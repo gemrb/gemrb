@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.93 2004/04/28 12:52:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.94 2004/05/09 21:35:43 edheldil Exp $
  *
  */
 
@@ -185,6 +185,8 @@ public:
 	bool LoadWindowPack(const char *name);
 	/** Loads a Window in the Window Manager */
 	int LoadWindow(unsigned short WindowID);
+	/** Creates a Window in the Window Manager */
+	int CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigned int Width, unsigned int Height, char* Background);
 	/** Sets a Window on the Top */
 	void SetOnTop(int Index)
 	{

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.163 2004/05/07 16:54:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.164 2004/05/09 21:35:42 edheldil Exp $
  *
  */
 
@@ -1129,6 +1129,27 @@ static PyObject* GemRB_InvalidateWindow(PyObject * /*self*/, PyObject* args)
 
 	Py_INCREF( Py_None );
 	return Py_None;
+}
+
+static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
+{
+	int WindowID, x, y, w, h;
+	char* Background;
+
+	if (!PyArg_ParseTuple( args, "iiiiis", &WindowID, &x, &y,
+			&w, &h, &Background )) {
+		printMessage( "GUIScript",
+			"Syntax Error: CreateWindow(WindowID, x, y, w, h, mosresref)\n",
+			LIGHT_RED );
+		return NULL;
+	}
+	printf("bg: %s\n", Background);
+	int WindowIndex = core->CreateWindow( WindowID, x, y, w, h, Background );
+	if (WindowIndex == -1) {
+		return NULL;
+	}
+
+	return Py_BuildValue( "i", WindowIndex );
 }
 
 static PyObject* GemRB_CreateLabel(PyObject * /*self*/, PyObject* args)
@@ -2927,6 +2948,8 @@ static PyMethodDef GemRBMethods[] = {
 	"Loads a WindowPack into the Window Manager Module."},
 	{"LoadWindow", GemRB_LoadWindow, METH_VARARGS,
 	"Returns a Window."},
+	{"CreateWindow", GemRB_CreateWindow, METH_VARARGS,
+	"Creates a new empty window and returns its index."},
 	{"SetWindowSize", GemRB_SetWindowSize, METH_VARARGS,
 	"Resizes a Window."},
 	{"SetWindowPos", GemRB_SetWindowPos, METH_VARARGS,

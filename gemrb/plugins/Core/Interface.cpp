@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.168 2004/05/09 17:36:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.169 2004/05/09 21:35:43 edheldil Exp $
  *
  */
 
@@ -1136,6 +1136,62 @@ int Interface::LoadWindow(unsigned short WindowID)
 	if (win == NULL) {
 		return -1;
 	}
+	strcpy( win->WindowPack, WindowPack );
+
+	int slot = -1;
+	for (unsigned int i = 0; i < windows.size(); i++) {
+		if (windows[i] == NULL) {
+			slot = i;
+			break;
+		}
+	}
+	if (slot == -1) {
+		windows.push_back( win );
+		slot = ( int ) windows.size() - 1;
+	} else {
+		windows[slot] = win;
+	}
+	win->Invalidate();
+	return slot;
+}
+// FIXME: it's a clone of LoadWindow
+/** Creates a Window in the Window Manager */
+int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigned int Width, unsigned int Height, char* Background)
+{
+	for (unsigned int i = 0; i < windows.size(); i++) {
+		if (windows[i] == NULL)
+			continue;
+		if (windows[i]->WindowID == WindowID && !stricmp( WindowPack,
+													windows[i]->WindowPack )) {
+			SetOnTop( i );
+			windows[i]->Invalidate();
+			return i;
+		}
+	}
+
+
+	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
+	if (Background[0]) {
+		if (IsAvailable( IE_MOS_CLASS_ID )) {
+			DataStream* bkgr = GetResourceMgr()->GetResource( Background,
+														IE_MOS_CLASS_ID );
+			if (bkgr != NULL) {
+				ImageMgr* mos = ( ImageMgr* )
+					GetInterface( IE_MOS_CLASS_ID );
+				mos->Open( bkgr, true );
+				win->SetBackGround( mos->GetImage(), true );
+				FreeInterface( mos );
+			} else
+				printf( "[Core]: Cannot Load BackGround, skipping\n" );
+		} else
+			printf( "[Core]: No MOS Importer Available, skipping background\n" );
+	}
+
+
+	//Window* win = windowmgr->GetWindow( WindowID );
+	//if (win == NULL) {
+	//	return -1;
+	//}
 	strcpy( win->WindowPack, WindowPack );
 
 	int slot = -1;
