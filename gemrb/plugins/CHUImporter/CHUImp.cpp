@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.33 2004/08/09 18:22:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.34 2004/08/28 14:34:23 avenger_teambg Exp $
  *
  */
 
@@ -391,12 +391,20 @@ Window* CHUImp::GetWindow(unsigned int wid)
 						b.b = back.r;
 						lab->SetColor( f, b );
 					}
-					if (( alignment & ( 1 << 4 ) ) != 0)
+					if (( alignment & 0x10 ) != 0) {
 						lab->SetAlignment( IE_FONT_ALIGN_RIGHT );
-					else if (( alignment & ( 1 << 2 ) ) != 0)
+						goto endalign;
+					}
+					if (( alignment & 0x04 ) != 0) {
 						lab->SetAlignment( IE_FONT_ALIGN_CENTER );
-					else
+						goto endalign;
+					}
+					if (( alignment & 0x08 ) != 0) {
 						lab->SetAlignment( IE_FONT_ALIGN_LEFT );
+						goto endalign;
+					}
+					lab->SetAlignment( IE_FONT_ALIGN_CENTER );
+endalign:
 					free( str );
 					win->AddControl( lab );
 				}
