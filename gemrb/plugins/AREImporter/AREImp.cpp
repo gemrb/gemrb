@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.22 2003/12/06 17:34:41 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.23 2003/12/12 23:13:39 balrog994 Exp $
  *
  */
 
@@ -93,7 +93,7 @@ bool AREImp::Open(DataStream * stream, bool autoFree)
 	str->Seek(0x94+bigheader, GEM_STREAM_START);
 	str->Read(Script, 8);
 	Script[8] = 0;
-	core->LoadScript(Script);
+	//core->LoadScript(Script);
 	str->Seek(0xA4+bigheader, GEM_STREAM_START);
 	str->Read(&DoorsCount, 4);
 	str->Read(&DoorsOffset, 4);
@@ -118,6 +118,8 @@ Map * AREImp::GetMap()
 	DataStream * wedfile = core->GetResourceMgr()->GetResource(WEDResRef, IE_WED_CLASS_ID);
 	tmm->Open(wedfile);
 	TileMap * tm = tmm->GetTileMap();
+
+	map->Script = new GameScript(Script, IE_SCRIPT_AREA);
 
 	char ResRef[9];
 	strcpy(ResRef, WEDResRef);
@@ -264,7 +266,7 @@ Map * AREImp::GetMap()
 		str->Seek(InfoPointsOffset + (i*0xC4), GEM_STREAM_START);
 		unsigned short Type, VertexCount;
 		unsigned long FirstVertex, Cursor;
-		char Name[33];
+		char Name[33], Script[9];
 		str->Read(Name, 32);
 		Name[32] = 0;
 		str->Read(&Type, 2);
@@ -282,6 +284,9 @@ Map * AREImp::GetMap()
 		str->Seek(44, GEM_CURRENT_POS);
 		unsigned long StrRef;
 		str->Read(&StrRef, 4);
+		str->Seek(20, GEM_CURRENT_POS);
+		str->Read(Script, 8);
+		Script[8] = 0;
 		char * string = core->GetString(StrRef);
 		str->Seek(VerticesOffset + (FirstVertex*4), GEM_STREAM_START);
 		Point * points = (Point*)malloc(VertexCount*sizeof(Point));
@@ -297,6 +302,9 @@ Map * AREImp::GetMap()
 		ip->String = string;
 		ip->textDisplaying = 0;
 		ip->startDisplayTime = 0;
+		ip->triggered = false;
+		//strcpy(ip->Script, Script);
+		ip->Script = new GameScript(Script, IE_SCRIPT_TRIGGER);
 	}
 	//Loading Actors
 	str->Seek(ActorOffset, GEM_STREAM_START);
@@ -336,16 +344,24 @@ Map * AREImp::GetMap()
 			crefile = core->GetResourceMgr()->GetResource(CreResRef, IE_CRE_CLASS_ID);
 		}
 		actmgr->Open(crefile, true);
-		ActorBlock ab;
-		ab.XPos = XPos;
-		ab.YPos = YPos;
-		ab.XDes = XDes;
-		ab.YDes = YDes;
-		ab.actor = actmgr->GetActor();
-		ab.AnimID = IE_ANI_AWAKE;
-		if(ab.actor->BaseStats[IE_STATE_ID] & STATE_DEAD)
-			ab.AnimID = IE_ANI_SLEEP;
-		ab.Orientation = (unsigned char)Orientation;
+		ActorBlock *ab = new ActorBlock();
+		ab->XPos = XPos;
+		ab->YPos = YPos;
+		ab->XDes = XDes;
+		ab->YDes = YDes;
+		ab->actor = actmgr->GetActor();
+		ab->AnimID = IE_ANI_AWAKE;
+		if(ab->actor->BaseStats[IE_STATE_ID] & STATE_DEAD)
+			ab->AnimID = IE_ANI_SLEEP;
+		ab->Orientation = (unsigned char)Orientation;
+		for(int i = 0; i < MAX_SCRIPTS; i++) {
+			if((stricmp(ab->actor->Scripts[i], "None") == 0) || (ab->actor->Scripts[i][0] == '\0')) {
+				ab->Scripts[i] = NULL;
+				continue;
+			}
+			ab->Scripts[i] = new GameScript(ab->actor->Scripts[i], 0);
+			ab->Scripts[i]->MySelf = ab;
+		}
 		map->AddActor(ab);
 	}
 	core->FreeInterface(actmgr);
