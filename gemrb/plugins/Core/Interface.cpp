@@ -678,8 +678,12 @@ int Interface::SetVisible(unsigned short WindowIndex, bool visible)
 		win->Invalidate();
 		SetOnTop(WindowIndex);
 	}
-	else
+	else {
+		Region r(win->XPos, win->YPos, win->Width, win->Height);
+		Color black = {0, 0, 0, 128};
 		evntmgr->DelWindow(win->WindowID);
+		video->DrawRect(r, black);
+	}
 	return 0;
 }
 
