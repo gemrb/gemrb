@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.15 2004/09/13 21:18:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.16 2005/03/09 22:32:41 avenger_teambg Exp $
  *
  */
 
@@ -51,19 +51,20 @@ bool DLGImp::Open(DataStream* stream, bool autoFree)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strnicmp( Signature, "DLG V1.0", 8 ) != 0) {
-		if (strnicmp( Signature, "DLGV1.09", 8 ) != 0) {
-			printMessage( "DLGImporter", "Not a valid DLG File...", WHITE );
-			printStatus( "ERROR", LIGHT_RED );
-			Version = 0;
-			return false;
-		} else {
-			Version = 109;
-		}
-	} else {
-		Version = 10;
+		printMessage( "DLGImporter", "Not a valid DLG File...", WHITE );
+		printStatus( "ERROR", LIGHT_RED );
+		Version = 0;
+		return false;
 	}
 	str->ReadDword( &StatesCount );
 	str->ReadDword( &StatesOffset );
+	// bg2
+	if (StatesOffset == 0x34 ) {
+		Version = 104;
+	}
+	else {
+		Version = 100;
+	}
 	str->ReadDword( &TransitionsCount );
 	str->ReadDword( &TransitionsOffset );
 	str->ReadDword( &StateTriggersOffset );
@@ -72,8 +73,11 @@ bool DLGImp::Open(DataStream* stream, bool autoFree)
 	str->ReadDword( &TransitionTriggersCount );
 	str->ReadDword( &ActionsOffset );
 	str->ReadDword( &ActionsCount );
-	if (Version == 109) {
-		str->Seek( 4, GEM_CURRENT_POS );
+	if (Version == 104) {
+		str->ReadDword( &Flags );
+	}
+	else {
+		Flags = 0;
 	}
 	return true;
 }
@@ -84,6 +88,7 @@ Dialog* DLGImp::GetDialog()
 		return NULL;
 	}
 	Dialog* d = new Dialog();
+	d->Flags = Flags;
 	for (unsigned int i = 0; i < StatesCount; i++) {
 		DialogState* ds = GetDialogState( i );
 		d->AddState( ds );
@@ -127,15 +132,31 @@ DialogTransition* DLGImp::GetTransition(unsigned int index)
 	DialogTransition* dt = new DialogTransition();
 	str->ReadDword( &dt->Flags );
 	str->ReadDword( &dt->textStrRef );
+	if (!(dt->Flags & IE_DLG_TR_TEXT)) {
+		dt->textStrRef = 0xffffffff;
+	}
 	str->ReadDword( &dt->journalStrRef );
+	if (!(dt->Flags & IE_DLG_TR_JOURNAL)) {
+		dt->journalStrRef = 0xffffffff;
+	}
 	ieDword TriggerIndex;
 	ieDword ActionIndex;
 	str->ReadDword( &TriggerIndex );
 	str->ReadDword( &ActionIndex );
 	str->ReadResRef( dt->Dialog );
 	str->ReadDword( &dt->stateIndex );
-	dt->trigger = GetTransitionTrigger( TriggerIndex );
-	dt->action = GetAction( ActionIndex );
+	if (dt->Flags &IE_DLG_TR_TRIGGER) {
+		dt->trigger = GetTransitionTrigger( TriggerIndex );
+	}
+	else {
+		dt->trigger = NULL;
+	}
+	if (dt->Flags & IE_DLG_TR_ACTION) {
+		dt->action = GetAction( ActionIndex );
+	}
+	else {
+		dt->action = NULL;
+	}
 	return dt;
 }
 

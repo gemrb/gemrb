@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.h,v 1.8 2004/09/13 21:04:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.h,v 1.9 2005/03/09 22:32:41 avenger_teambg Exp $
  *
  */
 
@@ -64,6 +64,7 @@ private:
 	ieDword TransitionTriggersOffset;
 	ieDword ActionsCount;
 	ieDword ActionsOffset;
+	ieDword Flags;
 	ieDword Version;
 
 public:

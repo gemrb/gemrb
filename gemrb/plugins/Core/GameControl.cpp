@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.195 2005/03/08 19:58:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.196 2005/03/09 22:32:34 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1394,7 +1394,6 @@ void GameControl::DialogChoose(unsigned int choose)
 	char Tmp[256];
 	ieDword index;
 
-printf("Chosen Dialog: %u\n", choose);
 	if (!core->GetDictionary()->Lookup( "MessageWindow", index )) {
 		return;
 	}
@@ -1419,12 +1418,12 @@ printf("Chosen Dialog: %u\n", choose);
 
 		DialogTransition* tr = ds->transitions[choose];
 
-		if(tr->Flags&IE_DLG_TR_JOURNAL) {
+		if (tr->Flags&IE_DLG_TR_JOURNAL) {
 			int Section = 0;
-			if(tr->Flags&IE_DLG_UNSOLVED) {
+			if (tr->Flags&IE_DLG_UNSOLVED) {
 				Section |= 1;
 			}
-			if(tr->Flags&IE_DLG_SOLVED) {
+			if (tr->Flags&IE_DLG_SOLVED) {
 				Section |= 2;
 			}
 			core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16);
@@ -1433,9 +1432,11 @@ printf("Chosen Dialog: %u\n", choose);
 		}
 
 		ta->PopLines( ds->transitionsCount + 1 );
-		char *string = core->GetString( tr->textStrRef );
-		AddTalk( ta, target, "A0A0FF", string, "8080FF" );
-		free( string );
+		if (tr->textStrRef != 0xffffffff) {
+			char *string = core->GetString( tr->textStrRef );
+			AddTalk( ta, target, "A0A0FF", string, "8080FF" );
+			free( string );
+		}
 
 		if (tr->action) {
 			for (unsigned int i = 0; i < tr->action->count; i++) {
@@ -1483,7 +1484,7 @@ printf("Chosen Dialog: %u\n", choose);
 				continue;
 			}
 		}
-		if (ds->transitions[x]->textStrRef == 0) {
+		if (ds->transitions[x]->textStrRef == 0xffffffff) {
 			string = ( char * ) malloc( 40 );
 			sprintf( string, "[s=%d,ffffff,ff0000]Continue", x );
 			i = ta->AppendText( string, -1 );
