@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.191 2004/08/20 13:14:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.192 2004/08/20 13:34:53 avenger_teambg Exp $
  *
  */
 
@@ -1571,8 +1571,7 @@ PyDoc_STRVAR( GemRB_CreateWorldMapControl__doc,
 
 static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h, align;
-	char* font, * text;
+	int WindowIndex, ControlID, x, y, w, h;
 
 	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &x,
 			&y, &w, &h )) {
