@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.4 2004/09/11 07:50:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.5 2004/10/17 15:09:42 avenger_teambg Exp $
  *
  */
 
@@ -45,7 +45,7 @@
 #define IE_ITEM_CRITICAL     0x00000001
 #define IE_ITEM_TWO_HANDED   0x00000002
 #define IE_ITEM_MOVABLE      0x00000004
-#define IE_ITEM_DISPLAYABLE  0x00000008
+#define IE_ITEM_DIITMAYABLE  0x00000008
 #define IE_ITEM_CURSED       0x00000010
 #define IE_ITEM_NOT_COPYABLE 0x00000020
 #define IE_ITEM_MAGICAL      0x00000040
@@ -58,7 +58,7 @@
 #define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN )
 
 
-// the same as SPLFeature
+// the same as ITMFeature
 typedef struct ITMFeature {
 	ieWord Opcode;
 	ieByte Target;
@@ -78,7 +78,10 @@ typedef struct ITMFeature {
 	ieDword unknown;
 } ITMFeature;
 
-typedef struct ITMExtHeader {
+class GEM_EXPORT ITMExtHeader {
+public:
+        ITMExtHeader();
+        ~ITMExtHeader();
 	ieByte AttackType;
 	ieByte IDReq;
 	ieByte Location;
@@ -106,9 +109,8 @@ typedef struct ITMExtHeader {
 	ieWord BowArrowQualifier;
 	ieWord CrossbowBoltQualifier;
 	ieWord MiscProjectileQualifier;
-
 	std::vector< ITMFeature*> features;
-} ITMExtHeader;
+};
 
 
 class GEM_EXPORT Item {
