@@ -190,8 +190,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 			if(VarName[0] != 0) {
 				unsigned long tmp=0;
 				core->GetDictionary()->Lookup( VarName, tmp);
-				core->GetDictionary()->SetAt(VarName, tmp^=Value);
-				((Window*)Owner)->RedrawButtons(VarName, tmp);
+				core->GetDictionary()->SetAt(VarName, tmp^Value);
 			}
 		}
 		else if(Flags & 0x20) {  //radio button
@@ -199,6 +198,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 			State = IE_GUI_BUTTON_SELECTED;
 			if(VarName[0] != 0) {
 				core->GetDictionary()->SetAt(VarName, Value);
+				((Window*)Owner)->RedrawButtons(VarName, Value);
 			}
 		}
 		else
@@ -263,7 +263,8 @@ int Button::SetFlags(int arg_flags, int opcode)
 void Button::RedrawButton(char *VariableName, int Sum)
 {
 	if(strnicmp(VarName, VariableName, MAX_VARIABLE_LENGTH)) return;
-	ToggleState=!!(Sum&Value);
+	ToggleState=(Sum==Value);
+printf("Sum: %d  Value: %d  ToggleState: %d\n",Sum,Value,ToggleState);
 	if(ToggleState)
 		State = IE_GUI_BUTTON_SELECTED;
 	else
