@@ -66,14 +66,15 @@ static PyObject * GemRB_LoadWindow(PyObject */*self*/, PyObject *args)
 static PyObject * GemRB_LoadTable(PyObject */*self*/, PyObject *args)
 {
 	char *string;
+	int noerror=0;
 
-	if(!PyArg_ParseTuple(args, "s", &string)) {
+	if(!PyArg_ParseTuple(args, "s|i", &string, &noerror) ) {
 		printMessage("GUIScript", "Syntax Error: Expected String\n", LIGHT_RED);
 		return NULL;
 	}
 	
 	int ind = core->LoadTable(string);
-	if(ind == -1)
+	if(!noerror && ind == -1)
 	{
 		printMessage("GUIScript","Can't find resource\n",LIGHT_RED);
 		return NULL;
