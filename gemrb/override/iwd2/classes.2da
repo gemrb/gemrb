@@ -18,7 +18,8 @@ PALADIN_MYSTRA   36873      39409      4          7          CLABPA01   SAVEWAR 
 MONK_OLD_ORDER   36877      39410      8          6          CLABMO01   SAVEMONK   1          1          1          1          1          1          1          
 MONK_BROKEN_ONES 36878      39411      0x10       6          CLABMO01   SAVEMONK   1          1          1          1          1          1          1          
 MONK_DARK_MOON   36879      39412      0x20       6          CLABMO01   SAVEMONK   1          1          1          1          1          1          1          
-MAGE_ABJURER     38103      39412      0x40       11         CLABMA02   SAVEWIZ    1          1          1          1          1          1          1          
+MAGE_GENERALIST  9987       9563       0x4000     11         CLABMA01   SAVEWIZ    1          1          1          1          1          1          1          
+MAGE_ABJURER     502        9564       0x40       11         CLABMA02   SAVEWIZ    1          1          1          1          1          1          1          
 MAGE_CONJURER    504        9565       0x80       11         CLABMA06   SAVEWIZ    1          1          1          1          1          1          1          
 MAGE_DIVINER     2012       9566       0x100      11         CLABMA05   SAVEWIZ    1          1          1          1          1          1          1          
 MAGE_ENCHANTER   2022       9567       0x200      11         CLABMA09   SAVEWIZ    1          1          1          1          1          1          1          
@@ -26,7 +27,6 @@ MAGE_EVOKER      12786      9569       0x800      11         CLABMA07   SAVEWIZ 
 MAGE_ILLUSIONIST 12785      9568       0x400      11         CLABMA08   SAVEWIZ    1          1          1          1          1          1          1          
 MAGE_NECROMANCER 12787      9570       0x1000     11         CLABMA03   SAVEWIZ    1          1          1          1          1          1          1          
 MAGE_TRANSMUTER  12788      9571       0x2000     11         CLABMA04   SAVEWIZ    1          1          1          1          1          1          1          
-MAGE_GENERALIST  9987       9563       0x4000     11         CLABMA01   SAVEWIZ    1          1          1          1          1          1          1          
 CLERIC_ILMATER   38097      38118      0x8000     3          CLABCL01   SAVEPRS    1          1          1          1          1          1          1          
 CLERIC_LATHANDER 38098      38119      0x10000    3          CLABCL02   SAVEPRS    1          1          1          1          1          1          1          
 CLERIC_SELUNE    38099      38120      0x20000    3          CLABCL03   SAVEPRS    1          1          1          1          1          1          1          
