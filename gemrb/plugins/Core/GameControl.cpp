@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.175 2004/11/13 13:03:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.176 2004/11/13 22:24:59 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -568,8 +568,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				if (! lastActor)
 					break;
 
-				for (int slot = 0; slot < 10; slot++) {
-					CREItem* ci = lastActor->inventory.GetSlotItem (slot);
+				for (i = 0; i < 10; i++) {
+					CREItem* ci = lastActor->inventory.GetSlotItem (i);
 					if (! ci)
 						continue;
 
