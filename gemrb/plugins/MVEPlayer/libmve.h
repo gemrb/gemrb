@@ -23,7 +23,7 @@ void MVE_sndInit(int x);
 typedef unsigned int (*mve_cb_Read)(void* stream, void* buffer,
 	unsigned int count);
 
-typedef void*(*mve_cb_Alloc)(unsigned int size);
+typedef void*(*mve_cb_Alloc)(size_t size);
 typedef void (*mve_cb_Free)(void* ptr);
 
 typedef void (*mve_cb_ShowFrame)(unsigned char* buffer, unsigned int bufw,
