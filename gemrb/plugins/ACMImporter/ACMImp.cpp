@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.19 2003/12/02 17:06:25 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.20 2003/12/02 17:10:19 balrog994 Exp $
  *
  */
 
@@ -71,8 +71,10 @@ int ACMImp::PlayListManager(void * data)
 			gettimeofday(&tv, NULL);
 			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
 #endif
-			if((time - BufferStartPlayTime) > (BufferDuration-50))
+			if((time - BufferStartPlayTime) > (BufferDuration-50)) {
+				musics[musicIndex].playing = false;
 				core->GetMusicMgr()->PlayNext();
+			}
 		}
 		SDL_mutexV(musicMutex);
 		SDL_Delay(1);
