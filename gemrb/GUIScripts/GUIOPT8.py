@@ -24,7 +24,7 @@ def OnLoad():
 	CancelButton = GemRB.GetControl(GamePlayWindow, 20)
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18042)
 	GemRB.SetText(GamePlayWindow, OkButton, 11973)
-	GemRB.SetText(GamePlayWindow, CancelButton, 13957)
+	GemRB.SetText(GamePlayWindow, CancelButton, 13727)
 	GemRB.SetText(GamePlayWindow, HotKeyButton, 816)
 	GemRB.SetText(GamePlayWindow, CommentsButton, 17163)
 	GemRB.SetText(GamePlayWindow, AutoPauseButton, 17166)
@@ -96,13 +96,15 @@ def HotKeyPress():
 	return
 	
 def CommentsPress():
-	global GamePlayWindow, TextAreaControl
-	#GemRB.SetText(GamePlayWindow, TextAreaControl, 11352)
+	GemRB.SetVisible(GamePlayWindow, 0)
+	GemRB.UnloadWindow(GamePlayWindow)
+	GemRB.SetNextScript("GUIOPT9")
 	return
 	
 def AutoPausePress():
-	global GamePlayWindow, TextAreaControl
-	#GemRB.SetText(GamePlayWindow, TextAreaControl, 11352)
+	GemRB.SetVisible(GamePlayWindow, 0)
+	GemRB.UnloadWindow(GamePlayWindow)
+	GemRB.SetNextScript("GUIOPT10")
 	return
 	
 def OkPress():

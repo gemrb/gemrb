@@ -17,7 +17,7 @@ def OnLoad():
 	CancelButton = GemRB.GetControl(SoundWindow, 25)
 	GemRB.SetText(SoundWindow, TextAreaControl, 18041)
 	GemRB.SetText(SoundWindow, OkButton, 11973)
-	GemRB.SetText(SoundWindow, CancelButton, 13957)
+	GemRB.SetText(SoundWindow, CancelButton, 13727)
 	GemRB.SetEvent(SoundWindow, SubtitleButton, 0x00000000, "SubtitlePress")
 	GemRB.SetEvent(SoundWindow, WarCryButton, 0x00000000, "WarCryPress")
 	GemRB.SetEvent(SoundWindow, StepsButton, 0x00000000, "StepsPress")

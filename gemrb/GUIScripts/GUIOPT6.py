@@ -20,7 +20,7 @@ def OnLoad():
 	CancelButton = GemRB.GetControl(OptionsWindow, 32)
 	GemRB.SetText(OptionsWindow, TextAreaControl, 18038)
 	GemRB.SetText(OptionsWindow, OkButton, 11973)
-	GemRB.SetText(OptionsWindow, CancelButton, 13957)
+	GemRB.SetText(OptionsWindow, CancelButton, 13727)
 	GemRB.SetEvent(OptionsWindow, BrightnessButton, 0x00000000, "BrightnessPress")
 	GemRB.SetEvent(OptionsWindow, ContrastButton, 0x00000000, "ContrastPress")
 	GemRB.SetEvent(OptionsWindow, BppButton, 0x00000000, "BppPress")

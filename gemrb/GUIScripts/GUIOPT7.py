@@ -20,7 +20,7 @@ def OnLoad():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18040)
 	GemRB.SetText(SoundWindow, CharacterSoundButton, 17778)
 	GemRB.SetText(SoundWindow, OkButton, 11973)
-	GemRB.SetText(SoundWindow, CancelButton, 13957)
+	GemRB.SetText(SoundWindow, CancelButton, 13727)
 	GemRB.SetEvent(SoundWindow, AmbientButton, 0x00000000, "AmbientPress")
 	GemRB.SetEvent(SoundWindow, SoundEffectsButton, 0x00000000, "SoundEffectsPress")
 	GemRB.SetEvent(SoundWindow, DialogueButton, 0x00000000, "DialoguePress")
