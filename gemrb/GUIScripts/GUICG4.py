@@ -70,6 +70,8 @@ def OnLoad():
 	return
 
 def RightPress():
+	global PointsLeft
+
 	GemRB.InvalidateWindow(AbilityWindow)
 	Abidx = GemRB.GetVar("AbilityDecrease")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
@@ -87,6 +89,8 @@ def RightPress():
 	return
 
 def LeftPress():
+	global PointsLeft
+
 	GemRB.InvalidateWindow(AbilityWindow)
 	PointsLeft=GemRB.GetVar("PointsLeft")
 	if PointsLeft == 0:
@@ -102,8 +106,8 @@ def LeftPress():
 	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
 	GemRB.SetText(AbilityWindow, Label, str(Ability+1) )
-	if PointsLeft == 1:
-		GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_DISABLED)
+	if PointsLeft == 0:
+		GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_ENABLED)
 	return
 
 def StorePress():
