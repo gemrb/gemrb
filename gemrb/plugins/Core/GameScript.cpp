@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.21 2003/12/25 23:55:08 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.22 2003/12/29 20:11:56 balrog994 Exp $
  *
  */
 
@@ -66,6 +66,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 
 		actions[7] = CreateCreature;
 		actions[8] = Dialogue;
+		blocking[8] = true;
 		actions[10] = Enemy;
 		actions[22] = MoveToObject;
 		blocking[22] = true;
