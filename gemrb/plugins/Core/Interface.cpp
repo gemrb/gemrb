@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.199 2004/08/19 21:14:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.200 2004/08/19 23:35:43 edheldil Exp $
  *
  */
 
@@ -114,11 +114,6 @@ Interface::Interface(int iargc, char** iargv)
 	SkipIntroVideos = false;
 	DrawFPS = false;
 	TooltipDelay = 100;
-	VolumeAmbients = 100;
-	VolumeMovie = 100;
-	VolumeMusic = 100;
-	VolumeSFX = 100;
-	VolumeVoices = 100;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
 	SavePath[0] = 0;
@@ -274,6 +269,20 @@ end:
 
 int Interface::Init()
 {
+	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
+	vars = new Variables();
+	if (!vars) {
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
+	}
+
+	vars->SetAt( "Volume Ambients", 100 );
+	vars->SetAt( "Volume Movie", 100 );
+	vars->SetAt( "Volume Music", 100 );
+	vars->SetAt( "Volume SFX", 100 );
+	vars->SetAt( "Volume Voices", 100 );
+	printStatus( "OK", LIGHT_GREEN );
+
 	printMessage( "Core", "Loading Configuration File...", WHITE );
 	if (!LoadConfig()) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -493,11 +502,6 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
-	vars = new Variables();
-	if (!vars) {
-		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
-	}
 	vars->SetType( GEM_VARIABLES_INT ); {
 		char ini_path[_MAX_PATH];
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
@@ -906,15 +910,15 @@ bool Interface::LoadConfig(const char* filename)
 		} else if (stricmp( name, "CaseSensitive" ) == 0) {
 			CaseSensitive = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "VolumeAmbients" ) == 0) {
-			VolumeAmbients = atoi( value );
+			vars->SetAt( "Volume Ambients", atoi( value ) );
 		} else if (stricmp( name, "VolumeMovie" ) == 0) {
-			VolumeMovie = atoi( value );
+			vars->SetAt( "Volume Movie", atoi( value ) );
 		} else if (stricmp( name, "VolumeMusic" ) == 0) {
-			VolumeMusic = atoi( value );
+			vars->SetAt( "Volume Music", atoi( value ) );
 		} else if (stricmp( name, "VolumeSFX" ) == 0) {
-			VolumeSFX = atoi( value );
+			vars->SetAt( "Volume SFX", atoi( value ) );
 		} else if (stricmp( name, "VolumeVoices" ) == 0) {
-			VolumeVoices = atoi( value );
+			vars->SetAt( "Volume Voices", atoi( value ) );
 		} else if (stricmp( name, "GameOnCD" ) == 0) {
 			GameOnCD = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "TooltipDelay" ) == 0) {
