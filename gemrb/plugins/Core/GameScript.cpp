@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.73 2004/02/26 22:05:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.74 2004/02/27 19:47:09 avenger_teambg Exp $
  *
  */
 
@@ -166,6 +166,9 @@ static ActionLink actionnames[] = {
 
 //Make this an ordered list, so we could use bsearch!
 static ObjectLink objectnames[] = {
+	{"myself",GameScript::Myself},
+	{"player1",GameScript::Player1},
+	{"player1fill",GameScript::Player1Fill},
 	{ NULL,NULL}, 
 };
 
@@ -659,17 +662,13 @@ Object* GameScript::DecodeObject(const char* line)
 	for (int i = 0; i < MaxObjectNesting; i++) {
 		oB->objectIdentifiers[i] = ParseInt( line );
 	}
-printf("a\n");
 	if (HasAdditionalRect) {
 		line++; //Skip [
 		for (int i = 0; i < 4; i++) {
-printf("x\n");
 			oB->objectRect[i] = ParseInt( line );
-printf("%d\n",oB->objectRect[i]);
 		}
 		line++; //Skip ] (not really... it skips a ' ' since the ] was skipped by the ParseInt function
 	}
-printf("z\n");
 	line++; //Skip "
 	ParseString( line, oB->objectName );
 	line++; //Skip " (the same as above)
@@ -837,7 +836,7 @@ Targets* GameScript::EvaluateObject(Scriptable* Sender, Object* oC,
 					if (func) {
 						//If we support that function, just _use_ it :)
 						/* This function will evaluate the parameter */
-						parm = func( parm );
+						parm = func(Sender, parm );
 					} else {
 						//ARGH!!!! We cannot handle that function.... it's better to return NULL
 						if (parm)
@@ -863,7 +862,7 @@ Targets* GameScript::EvaluateObject(Scriptable* Sender, Object* oC,
 			return NULL;
 		}
 		//Good! We can now call the function
-		parm = func( parm );
+		parm = func(Sender, parm );
 	}
 }
 
@@ -1330,6 +1329,34 @@ Trigger* GameScript::GenerateTrigger(char* String)
 		i++;
 	}
 	return newTrigger;
+}
+
+//-------------------------------------------------------------
+// Object Functions
+//-------------------------------------------------------------
+
+//in this implementation, Myself will drop the parameter array
+//i think all object filters could be expected to do so
+//they should remove unnecessary elements from the parameters
+Targets *GameScript::Myself(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(Sender);
+	return parameters;
+}
+
+Targets *GameScript::Player1(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(0));
+	return parameters;
+}
+
+Targets *GameScript::Player1Fill(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(0));
+	return parameters;
 }
 
 //-------------------------------------------------------------

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.50 2004/02/26 22:05:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.51 2004/02/27 19:47:09 avenger_teambg Exp $
  *
  */
 
@@ -60,6 +60,7 @@ public:
 	};
 	~Targets()
 	{
+		Clear();
 	};
 private:
 	std::vector< Scriptable*> objects;
@@ -564,7 +565,7 @@ public:
 
 typedef int (* TriggerFunction)(Scriptable*, Trigger*);
 typedef void (* ActionFunction)(Scriptable*, Action*);
-typedef Targets*(* ObjectFunction)(Targets*);
+typedef Targets*(* ObjectFunction)(Scriptable *, Targets*);
 
 struct TriggerLink {
 	const char* Name;
@@ -811,9 +812,30 @@ public:
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);
+public:
+	//Objects
+	static Targets *Myself(Scriptable *Sender, Targets *parameters);
+	static Targets *Player1(Scriptable *Sender, Targets *parameters);
+	static Targets *Player1Fill(Scriptable *Sender, Targets *parameters);
+	static Targets *Player2(Scriptable *Sender, Targets *parameters);
+	static Targets *Player2Fill(Scriptable *Sender, Targets *parameters);
+	static Targets *Player3(Scriptable *Sender, Targets *parameters);
+	static Targets *Player3Fill(Scriptable *Sender, Targets *parameters);
+	static Targets *Player4(Scriptable *Sender, Targets *parameters);
+	static Targets *Player4Fill(Scriptable *Sender, Targets *parameters);
+	static Targets *Player5(Scriptable *Sender, Targets *parameters);
+	static Targets *Player5Fill(Scriptable *Sender, Targets *parameters);
+	static Targets *Player6(Scriptable *Sender, Targets *parameters);
+	static Targets *Player6Fill(Scriptable *Sender, Targets *parameters);
 
+public:
 	/*GemRB extensions/actions*/
 	static void UnMakeGlobal(Scriptable* Sender, Action* parameters);
+	/*GemRB extensions/objects*/
+	static Targets *Player7(Scriptable *Sender, Targets *parameters);
+	static Targets *Player7Fill(Scriptable *Sender, Targets *parameters);
+	static Targets *Player8(Scriptable *Sender, Targets *parameters);
+	static Targets *Player8Fill(Scriptable *Sender, Targets *parameters);
 };
 
 #endif
