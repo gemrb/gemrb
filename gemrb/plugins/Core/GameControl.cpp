@@ -466,7 +466,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 			if(core->GetDictionary()->Lookup("MessageTextArea", TAIndex)) {
 				TextArea * ta = (TextArea*)core->GetWindow(WinIndex)->GetControl(TAIndex);
 				char Text[256];
-				sprintf(Text, "%c%c%c%cSelected%c%c%c%c: %s", 0xf0, 0xff, 0x00, 0x00, 0xf0, 0x00, 0x00, 0x00, actor->LongName);
+				sprintf(Text, "[color=FF0000]Selected[/color]: %s", actor->LongName);
 				ta->AppendText(Text, -1);
 			}
 		}
@@ -832,9 +832,9 @@ void GameControl::InitDialog(Actor * speaker, Actor * target, Dialog * dlg)
 			TextArea * ta = (TextArea*)win->GetControl(index);
 			DialogState * ds = dlg->GetState(0);
 			char * string = core->GetString(ds->StrRef, 2);
-			int i = ta->AppendText("\xf0\xff\x00\x00", -1);
+			int i = ta->AppendText("[color=FF0000]", -1);
 			ta->AppendText(speaker->LongName, i);
-			ta->AppendText("\xf0\x00\x00\x00: ", i);
+			ta->AppendText("[/color]: ", i);
 			ta->AppendText(string, i);
 			ta->AppendText("", -1);
 			for(int x = 0; x < ds->transitionsCount; x++) {
