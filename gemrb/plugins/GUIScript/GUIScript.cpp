@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.136 2004/03/16 14:00:09 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.137 2004/03/16 19:33:28 guidoj Exp $
  *
  */
 
@@ -1838,60 +1838,6 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "l", value );
 }
 
-static PyObject * GemRB_ReplaceVarsInText (PyObject * /*self*/, PyObject *args)
-{
-        ieStrRef  Strref;
-
-	if(!PyArg_ParseTuple(args, "i", &Strref )) {
-		printMessage("GUIScript", "Syntax Error: ReplaceVarsInText(StrRef)\n", LIGHT_RED);
-		return NULL;
-	}
-
-	char newtext[4096] = "";
-	char *src = core->GetString (Strref);
-	char *dest = newtext;
-	char *next;
-	int  len;
-	char *value;
-
-	while (1) {
-	  next = strchr (src, '<');
-	  if (! next) {
-	    strcpy (dest, src);
-	    break;
-	  }
-
-	  len = next - src;
-	  memcpy (dest, src, len);
-	  src += len;
-	  dest += len;
-
-	  len = strspn (src + 1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_");
-
-	  if (len == 0 || *(src + len + 1) != '>') {
-	    memcpy (dest, src, len + 1);
-	    src += len + 1;
-	    dest += len + 1;
-	    continue;
-	  }
-
-	  // do replace
-	  memcpy (dest, src + 1, len);
-	  dest[len] = 0;
-
-	  if (!core->GetTokenDictionary()->Lookup(dest, (unsigned long &) value)) {
-	    dest += len;
-	  }
-	  else {
-	    strcpy (dest, value);
-	    dest += strlen (dest);
-	  }
-	  src += len + 2;
-	}
-
-	return Py_BuildValue("s", newtext);
-}
-
 static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 {
 	char* string;
@@ -2715,8 +2661,6 @@ static PyMethodDef GemRBMethods[] = {
 	"Starts new game and enters it."},
 	{"StatComment", GemRB_StatComment, METH_VARARGS,
 	"Replaces values into an strref."},
-	{"ReplaceVarsInText", GemRB_ReplaceVarsInText, METH_VARARGS,
-	 "Replaces named vars into an strref."},
 	{"ActorGetSmallPortrait", GemRB_ActorGetSmallPortrait, METH_VARARGS,
 	 "Returns actor's small portrait resref."},
 	{"EndCutSceneMode", GemRB_EndCutSceneMode, METH_NOARGS,
