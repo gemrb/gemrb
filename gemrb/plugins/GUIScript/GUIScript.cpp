@@ -858,7 +858,7 @@ static PyObject *GemRB_Roll(PyObject *self, PyObject *args)
 {
 	int Dice, Size, Add;
 
-	if(!PyArg_ParseTuple(args, "iii", &Dice, &Size, &Add) {
+	if(!PyArg_ParseTuple(args, "iii", &Dice, &Size, &Add) ) {
 		printMessage("GUIScript","Syntax Error: Roll(Dice, Size, Add)\n", LIGHT_RED);
 		return NULL;
 	}
