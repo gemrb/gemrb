@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.cpp,v 1.6 2003/12/05 15:47:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.cpp,v 1.7 2003/12/06 17:32:48 balrog994 Exp $
  *
  */
 
@@ -72,6 +72,8 @@ IEScript::IEScript(void)
 	actions[203] = FadeFromColor;
 	blocking[203] = true;
 	actions[269] = DisplayStringHead;
+	actions[311] = DisplayStringWait;
+	blocking[311] = true;
 	fadeToCounter = 0;
 	fadeFromCounter = 1;
 	fadeFromMax = 0;
@@ -671,5 +673,32 @@ void IEScript::Face(Script * Sender, Action * parameters)
 	ActorBlock * actor = GetActorFromObject(parameters->objects[0]);
 	if(actor) {
 		actor->Orientation = parameters->int0Parameter;
+	}
+}
+
+void IEScript::DisplayStringWait(Script * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objects[0]);
+	if(actor) {
+		printf("Displaying string on: %s\n", actor->actor->ScriptName);
+		if(actor->overHeadText)
+			free(actor->overHeadText);
+		StringBlock sb = core->strings->GetStringBlock(parameters->int0Parameter);
+		//actor->overHeadText = core->GetString(parameters->int0Parameter,2);
+		actor->overHeadText = sb.text;
+		if(sb.Sound[0]) {
+			unsigned long len = core->GetSoundMgr()->Play(sb.Sound);
+			if(len != 0xffffffff)
+				waitCounter = ((15*len)/1000);
+		}
+#ifdef WIN32
+		unsigned long time = GetTickCount();
+#else
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
+#endif
+		actor->timeStartDisplaying = time;
+		actor->textDisplaying = 1;		
 	}
 }
