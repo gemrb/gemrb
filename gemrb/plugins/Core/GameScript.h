@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.154 2005/01/30 16:23:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.155 2005/02/02 17:29:28 avenger_teambg Exp $
  *
  */
 
@@ -65,6 +65,8 @@ class Action;
 #else
 #define GEM_EXPORT
 #endif
+
+typedef std::vector<ieDword> SrcVector;
 
 class GEM_EXPORT Targets {
 public:
@@ -1044,6 +1046,8 @@ public:
 	static void FadeFromColor(Scriptable* Sender, Action* parameters);
 	static void FadeToColor(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixed(Scriptable* Sender, Action* parameters);
+	static void FloatMessageFixedRnd(Scriptable* Sender, Action* parameters);
+	static void FloatMessageRnd(Scriptable* Sender, Action* parameters);
 	static void ForceAIScript(Scriptable* Sender, Action* parameters);
 	static void ForceFacing(Scriptable* Sender, Action* parameters);
 	static void ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.222 2005/01/30 16:23:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.223 2005/02/02 17:29:25 avenger_teambg Exp $
  *
  */
 
@@ -37,6 +37,8 @@ static short actionflags[MAX_ACTIONS];
 static short triggerflags[MAX_TRIGGERS];
 static ObjectFunction objects[MAX_OBJECTS];
 static IDSFunction idtargets[MAX_OBJECT_FIELDS];
+static Cache SrcCache; //cache for string resources (pst)
+//static Cache BcsCache; //cache for scripts
 
 static int ObjectIDSCount = 7;
 static int MaxObjectNesting = 5;
@@ -347,6 +349,8 @@ static ActionLink actionnames[] = {
 	{"fadetocolor", GameScript::FadeToColor,0},
 	{"floatmessage", GameScript::DisplayStringHead,0},
 	{"floatmessagefixed", GameScript::FloatMessageFixed,0},
+	{"floatmessagefixedrnd", GameScript::FloatMessageFixedRnd,0},
+	{"floatmessagernd", GameScript::FloatMessageRnd,0},
 	{"forceaiscript", GameScript::ForceAIScript,0},
 	{"forcefacing", GameScript::ForceFacing,0},
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA,0},
@@ -473,6 +477,7 @@ static ActionLink actionnames[] = {
 	{"runtoobject", GameScript::MoveToObject,AF_BLOCKING}, //until we know better
 	{"runtopoint", GameScript::MoveToPoint,AF_BLOCKING}, //until we know better
 	{"runtopointnorecticle", GameScript::MoveToPoint,AF_BLOCKING},//until we know better
+	{"runtosavedlocation", GameScript::MoveToSavedLocation,AF_BLOCKING},//
 	{"savelocation", GameScript::SaveLocation,0},
 	{"saveplace", GameScript::SaveLocation,0},
 	{"saveobjectlocation", GameScript::SaveObjectLocation,0},
@@ -744,6 +749,37 @@ static void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 			value1 = value2;
 			break;
 	}
+}
+
+static void FreeSrc(SrcVector *poi)
+{
+	if( SrcCache.DecRef((void *) poi, false) <0) {
+		printMessage( "GameScript", "Corrupted Src cache encountered (reference count went below zero)", WHITE );
+                abort();
+	}
+}
+
+static SrcVector *LoadSrc(ieResRef resname)
+{
+        SrcVector *src = (SrcVector *) SrcCache.GetResource(resname);
+        if (src) {
+                return src;
+        }
+	DataStream* str = core->GetResourceMgr()->GetResource( resname, IE_SRC_CLASS_ID );
+	if( !str) {
+		return NULL;
+	}
+	ieDword size=0;
+	str->ReadDword(&size);
+	src = new SrcVector(size);
+	while(size--) {
+		ieDword tmp;
+		str->ReadDword(&tmp);
+		str->ReadDword(&tmp);
+		src->at(size)=tmp;
+	}
+	delete ( str );
+	return src;
 }
 
 GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
@@ -5953,7 +5989,39 @@ void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* paramete
 
 void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
 {
-	DisplayStringCore(Sender, parameters->int0Parameter, DS_CONSOLE|DS_HEAD);
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[0] );
+	if(!target) {
+		target=Sender;
+		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+	}
+
+	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD);
+}
+
+void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[0] );
+	if(!target) {
+		target=Sender;
+		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+	}
+
+	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
+	DisplayStringCore(target, rndstr->at(rand()%rndstr->size()), DS_CONSOLE|DS_HEAD);
+	FreeSrc(rndstr);
+}
+
+void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[0] );
+	if(!target) {
+		target=Sender;
+		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+	}
+
+	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
+	DisplayStringCore(target, rndstr->at(rand()%rndstr->size()), DS_CONSOLE|DS_HEAD);
+	FreeSrc(rndstr);
 }
 
 void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
