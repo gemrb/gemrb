@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.90 2004/03/13 13:51:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.91 2004/03/13 14:25:55 avenger_teambg Exp $
  *
  */
 
@@ -73,6 +73,10 @@ static TriggerLink triggernames[] = {
 	{"hpgt", GameScript::HPGT}, {"hplt", GameScript::HPLT},
 	{"inparty", GameScript::InParty},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog},
+	{"los", GameScript::LOS},
+	{"morale", GameScript::Morale},
+	{"moralegt", GameScript::MoraleGT},
+	{"moralelt", GameScript::MoraleLT},
 	{"numtimestalkedto", GameScript::NumTimesTalkedTo},
 	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT},
 	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT},
@@ -1003,6 +1007,17 @@ Targets* GameScript::EvaluateObject(Object* oC)
 		}
 	}
 	return tgts;
+}
+
+int GameScript::GetObjectCount(Scriptable* Sender, Object* oC)
+{
+	if (!oC) {
+		return 0;
+	}
+	Targets* tgts = EvaluateObject(oC);
+	int count = tgts->Count();
+	delete tgts;
+	return count;
 }
 
 Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
@@ -2433,7 +2448,7 @@ int GameScript::CheckStatLT(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::See(Scriptable* Sender, Trigger* parameters)
+int GameScript::SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return 0;
@@ -2456,10 +2471,85 @@ int GameScript::See(Scriptable* Sender, Trigger* parameters)
 	}
 	if (core->GetPathFinder()->IsVisible( Sender->XPos, Sender->YPos,
 								target->XPos, target->YPos )) {
+		if(justlos) {
+			return 1;
+		}
+		//additional checks for invisibility?
 		snd->LastSeen = (Actor *) target;
 		return 1;
 	}
 	return 0;
+}
+
+int GameScript::See(Scriptable* Sender, Trigger* parameters)
+{
+	return SeeCore(Sender, parameters, 0);
+}
+
+int GameScript::LOS(Scriptable* Sender, Trigger* parameters)
+{
+	int see=SeeCore(Sender, parameters, 1);
+	if(!see) {
+		return 0;
+	}
+	return Range(Sender, parameters); //same as range
+}
+
+int GameScript::NumCreatures(Scriptable* Sender, Trigger* parameters)
+{
+	int value = GetObjectCount(Sender, parameters->objectParameter);
+	return value == parameters->int0Parameter;
+}
+
+int GameScript::NumCreaturesLT(Scriptable* Sender, Trigger* parameters)
+{
+	int value = GetObjectCount(Sender, parameters->objectParameter);
+	return value < parameters->int0Parameter;
+}
+
+int GameScript::NumCreaturesGT(Scriptable* Sender, Trigger* parameters)
+{
+	int value = GetObjectCount(Sender, parameters->objectParameter);
+	return value > parameters->int0Parameter;
+}
+
+int GameScript::Morale(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_MORALEBREAK) == parameters->int0Parameter;
+}
+
+int GameScript::MoraleGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_MORALEBREAK) > parameters->int0Parameter;
+}
+
+int GameScript::MoraleLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_MORALEBREAK) < parameters->int0Parameter;
 }
 
 //-------------------------------------------------------------

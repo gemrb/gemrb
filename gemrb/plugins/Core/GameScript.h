@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.63 2004/03/13 13:51:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.64 2004/03/13 14:25:55 avenger_teambg Exp $
  *
  */
 
@@ -661,9 +661,12 @@ public:
 private:
 	static Action* GenerateAction(char* String);
 	static Trigger* GenerateTrigger(char* String);
+	/* returns the number of actors matching the IDS targeting */
+	static int GetObjectCount(Scriptable* Sender, Object* oC);
 	static Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
-	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 	static int GetHappiness(Scriptable* Sender, int reputation);
+	static int SeeCore(Scriptable* Sender, Trigger* parameters, int flags);
+	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
 		int flags);
 
@@ -736,6 +739,13 @@ public: //Script Functions
 	static int HPLT(Scriptable* Sender, Trigger* parameters);
 	static int InParty(Scriptable* Sender, Trigger* parameters);
 	static int IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters);
+	static int LOS(Scriptable* Sender, Trigger* parameters);
+	static int Morale(Scriptable* Sender, Trigger* parameters);
+	static int MoraleGT(Scriptable* Sender, Trigger* parameters);
+	static int MoraleLT(Scriptable* Sender, Trigger* parameters);
+	static int NumCreatures(Scriptable* Sender, Trigger* parameters);
+	static int NumCreaturesGT(Scriptable* Sender, Trigger* parameters);
+	static int NumCreaturesLT(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedTo(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedToGT(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedToLT(Scriptable* Sender, Trigger* parameters);
