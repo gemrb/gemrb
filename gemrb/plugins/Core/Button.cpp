@@ -317,7 +317,10 @@ int Button::SetFlags(int arg_flags, int opcode)
 /** Redraws a button from a given radio button group */
 void Button::RedrawButton(char *VariableName, int Sum)
 {
-	if(strnicmp(VarName, VariableName, MAX_VARIABLE_LENGTH)) return;
+	if(strnicmp(VarName, VariableName, MAX_VARIABLE_LENGTH))
+		 return;
+	if(State==IE_GUI_BUTTON_DISABLED)
+		return;
 	if(Flags&0x20) ToggleState=(Sum==Value);       //radio button, exact value
 	else if(Flags&0x10) ToggleState=!!(Sum&Value); //checkbox, bitvalue
 	else ToggleState=false;                        //other buttons, no value
