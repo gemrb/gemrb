@@ -80,11 +80,13 @@ AppearanceHairButton = 0
 AppearanceSkinButton = 0
 AppearanceMajorButton = 0
 AppearanceMinorButton = 0
-AppearanceDoneButton = 0
+
+CharSoundWindow = 0
+CharSoundTable = 0
+CharSoundStrings = 0
 
 BiographyButton = 0
 BiographyWindow = 0
-BiographyDoneButton = 0
 
 NameButton = 0
 NameWindow = 0
@@ -741,7 +743,7 @@ def AbilitiesLabelPress():
 	AbilitiesCalcLimits(AbilityIndex)
 	GemRB.SetToken("MINIMUM", str(AbilitiesMinimum) )
 	GemRB.SetToken("MAXIMUM", str(AbilitiesMaximum) )
-	GemRB.SetText(AbilitiesWindow, AbilitiesTextArea, GemRB.ReplaceVarsInText( GemRB.GetTableValue(AbilitiesTable, AbilityIndex, 1) ) )
+	GemRB.SetText(AbilitiesWindow, AbilitiesTextArea, GemRB.GetTableValue(AbilitiesTable, AbilityIndex, 1) )
 	return
 
 def AbilitiesPlusPress():
@@ -750,7 +752,7 @@ def AbilitiesPlusPress():
 	AbilitiesCalcLimits(AbilityIndex)
 	GemRB.SetToken("MINIMUM", str(AbilitiesMinimum) )
 	GemRB.SetToken("MAXIMUM", str(AbilitiesMaximum) )
-	GemRB.SetText(AbilitiesWindow, AbilitiesTextArea, GemRB.ReplaceVarsInText( GemRB.GetTableValue(AbilitiesTable, AbilityIndex, 1) ) )
+	GemRB.SetText(AbilitiesWindow, AbilitiesTextArea, GemRB.GetTableValue(AbilitiesTable, AbilityIndex, 1) )
 	PointsLeft = GemRB.GetVar("Ability0")
 	Ability = GemRB.GetVar("Ability" + str(AbilityIndex + 1) )
 	if PointsLeft > 0 and Ability < AbilitiesMaximum:
@@ -773,7 +775,7 @@ def AbilitiesMinusPress():
 	GemRB.SetToken("MINIMUM", str(AbilitiesMinimum) )
 	GemRB.SetToken("MAXIMUM", str(AbilitiesMaximum) )
 	GemRB.SetText(AbilitiesWindow, AbilitiesTextArea, GemRB.GetTableValue(AbilitiesTable, AbilityIndex, 1) )
-	GemRB.SetText(AbilitiesWindow, AbilitiesTextArea, GemRB.ReplaceVarsInText( GemRB.GetTableValue(AbilitiesTable, AbilityIndex, 1) ) )
+	GemRB.SetText(AbilitiesWindow, AbilitiesTextArea, GemRB.GetTableValue(AbilitiesTable, AbilityIndex, 1) )
 	PointsLeft = GemRB.GetVar("Ability0")
 	Ability = GemRB.GetVar("Ability" + str(AbilityIndex + 1) )
 	if Ability > AbilitiesMinimum:
@@ -927,7 +929,7 @@ def SkillsSelect():
 
 	GemRB.SetToken("number", str(SkillsPointsLeft) )
 	SkillsTextArea = GemRB.GetControl(SkillsWindow, 19)
-	GemRB.SetText(SkillsWindow, SkillsTextArea, GemRB.ReplaceVarsInText(17248) )
+	GemRB.SetText(SkillsWindow, SkillsTextArea, 17248)
 
 	SkillsDoneButton = GemRB.GetControl(SkillsWindow, 0)
 	GemRB.SetButtonState(SkillsWindow, SkillsDoneButton, IE_GUI_BUTTON_DISABLED)
@@ -1089,7 +1091,7 @@ def ProficienciesSelect():
 	GemRB.SetLabelUseRGB(ProficienciesWindow, PointsLeftLabel, 1)
 	GemRB.SetText(ProficienciesWindow, PointsLeftLabel, str(ProficienciesPointsLeft))
 
-	for i in range (0,8):
+	for i in range (0, 8):
 		ProficienciesLabel = GemRB.GetControl(ProficienciesWindow, 69 + i)
 		GemRB.SetButtonState(ProficienciesWindow, ProficienciesLabel, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetEvent(ProficienciesWindow, ProficienciesLabel, IE_GUI_BUTTON_ON_PRESS, "ProficienciesLabelPress")
@@ -1156,7 +1158,7 @@ def ProficienciesSelect():
 
 	GemRB.SetToken("number", str(ProficienciesPointsLeft) )
 	ProficienciesTextArea = GemRB.GetControl(ProficienciesWindow, 68)
-	GemRB.SetText(ProficienciesWindow, ProficienciesTextArea, GemRB.ReplaceVarsInText(9588) )
+	GemRB.SetText(ProficienciesWindow, ProficienciesTextArea, 9588)
 
 	ProficienciesDoneButton = GemRB.GetControl(ProficienciesWindow, 0)
 	GemRB.SetButtonState(ProficienciesWindow, ProficienciesDoneButton, IE_GUI_BUTTON_DISABLED)
@@ -1287,7 +1289,7 @@ def MageSpellsCancelPress():
 # Appearance Selection
 
 def AppearancePress():
-	global CharGenWindow, AppearanceWindow, AppearanceTable, AppearanceDoneButton, PortraitTable, Portrait, AppearanceAvatarButton
+	global CharGenWindow, AppearanceWindow, AppearanceTable, PortraitTable, Portrait, AppearanceAvatarButton
 	global AppearanceHairButton, AppearanceSkinButton, AppearanceMajorButton, AppearanceMinorButton
 	GemRB.SetVisible(CharGenWindow, 0)
 	AppearanceWindow = GemRB.LoadWindow(13)
@@ -1438,6 +1440,65 @@ def AppearanceCancelPress():
 
 
 def CharSoundSelect():
+	global CharGenWindow, CharSoundWindow, CharSoundTable, CharSoundStrings
+	GemRB.SetVisible(CharGenWindow, 0)
+	CharSoundWindow = GemRB.LoadWindow(19)
+	CharSoundTable = GemRB.LoadTable("CHARSND")
+	CharSoundStrings = GemRB.LoadTable("CHARSTR")
+
+	CharSoundVoiceList = GemRB.GetControl(CharSoundWindow, 45)
+	GemRB.SetTextAreaSelectable(CharSoundWindow, CharSoundVoiceList, 1)
+	
+	VoiceList = []
+	i = 0
+	while (i < GemRB.GetTableRowCount(CharSoundStrings) ):
+		VoiceList.append(str(GemRB.GetTableRowName(CharSoundStrings, i)).upper())
+		i = i + 1
+	VoiceList.sort()
+	VoiceList.reverse()
+	while (len(VoiceList) > 0):
+		GemRB.TextAreaAppend(CharSoundWindow, CharSoundVoiceList, VoiceList.pop(), -1)
+
+	CharSoundPlayButton = GemRB.GetControl(CharSoundWindow, 47)
+	GemRB.SetButtonState(CharSoundWindow, CharSoundPlayButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(CharSoundWindow, CharSoundPlayButton, IE_GUI_BUTTON_ON_PRESS, "CharSoundPlayPress")
+	GemRB.SetText(CharSoundWindow, CharSoundPlayButton, "play")
+
+	CharSoundTextArea = GemRB.GetControl(CharSoundWindow, 50)
+	GemRB.SetText(CharSoundWindow, CharSoundTextArea, 11315)
+
+	CharSoundDoneButton = GemRB.GetControl(CharSoundWindow, 0)
+	GemRB.SetButtonState(CharSoundWindow, CharSoundDoneButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(CharSoundWindow, CharSoundDoneButton, IE_GUI_BUTTON_ON_PRESS, "CharSoundDonePress")
+	GemRB.SetText(CharSoundWindow, CharSoundDoneButton, 11973)
+	GemRB.SetButtonFlags(CharSoundWindow, CharSoundDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	CharSoundCancelButton = GemRB.GetControl(CharSoundWindow, 10)
+	GemRB.SetButtonState(CharSoundWindow, CharSoundCancelButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(CharSoundWindow, CharSoundCancelButton, IE_GUI_BUTTON_ON_PRESS, "CharSoundCancelPress")
+	GemRB.SetText(CharSoundWindow, CharSoundCancelButton, 13727)
+	
+	GemRB.SetVisible(CharSoundWindow, 1)
+	return
+
+def CharSoundPlayPress():
+	return
+
+def CharSoundDonePress():
+	global CharGenWindow, CharSoundWindow, AppearanceButton, BiographyButton, NameButton, CharGenState
+	GemRB.UnloadWindow(CharSoundWindow)
+	GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(CharGenWindow, BiographyButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(CharGenWindow, NameButton, IE_GUI_BUTTON_ENABLED)
+	CharGenState = 7
+	SetCharacterDescription()
+	GemRB.SetVisible(CharGenWindow, 1)
+	return
+
+def CharSoundCancelPress():
+	global CharGenWindow, CharSoundWindow
+	GemRB.UnloadWindow(CharSoundWindow)
+	GemRB.SetVisible(CharGenWindow, 1)
 	return
 
 
@@ -1449,7 +1510,7 @@ def BiographyPress():
 	BiographyWindow = GemRB.LoadWindow(51)
 
 	BiographyDoneButton = GemRB.GetControl(BiographyWindow, 5)
-	GemRB.SetButtonState(BiographyWindow, BiographyDoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(BiographyWindow, BiographyDoneButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(BiographyWindow, BiographyDoneButton, IE_GUI_BUTTON_ON_PRESS, "BiographyDonePress")
 	GemRB.SetText(BiographyWindow, BiographyDoneButton, 11973)
 	GemRB.SetButtonFlags(BiographyWindow, BiographyDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
