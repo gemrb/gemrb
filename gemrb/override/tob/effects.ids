@@ -1,8 +1,8 @@
 0x00	Stat:ACVsDamageTypeModifier
 0x01	Stat:AttacksPerRoundModifier
 0x02	Cure:Sleep
-0x03	State:Berserking
-0x04	Cure:Berserking
+0x03	State:Berserk
+0x04	Cure:Berserk
 0x05	State:Charmed
 0x06	Stat:CharismaModifier
 0x07	Color:SetCharacterColorsByPalette
