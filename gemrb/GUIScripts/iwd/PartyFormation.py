@@ -32,7 +32,6 @@ def OnLoad():
 		GemRB.SetControlSize(PartyFormationWindow, Label, 0, 0)
 		Button = GemRB.GetControl(PartyFormationWindow, i-12)
 		ResRef = GemRB.GetPlayerPortrait(i-17, 1)
-		print "RESREF: ",ResRef,"****************************"
 		if ResRef == "":
 			GemRB.SetButtonFlags(PartyFormationWindow, Button, IE_GUI_BUTTON_NORMAL,OP_SET)
 		else:

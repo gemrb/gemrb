@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.14 2004/09/21 00:20:46 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.15 2004/09/26 13:14:46 avenger_teambg Exp $
 
 
 #Character Generation
@@ -1519,7 +1519,7 @@ def MageSpellsSelect():
 		GemRB.SetButtonFlags(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
 		if i < MageSpellsCount:
 			# Color is no good yet :-(
-			GemRB.SetButtonBAM(MageSpellsWindow, SpellButton, GemRB.GetTableValue(MageSpellsTable, i, 0), 1, 0, 63)
+			GemRB.SetButtonBAM(MageSpellsWindow, SpellButton, GemRB.GetTableValue(MageSpellsTable, i, 0), 0, 0, 63)
 			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
 			GemRB.SetVarAssoc(MageSpellsWindow, SpellButton, "SpellMask", 1 << i)
@@ -1619,7 +1619,7 @@ def MageSpellsMemorize():
 			j = j + 1
 		if j < MageSpellsCount:
 			# Color is no good yet :-(
-			GemRB.SetButtonBAM(MageMemorizeWindow, SpellButton, GemRB.GetTableValue(MageSpellsTable, j, 0), 1, 0, 63)
+			GemRB.SetButtonBAM(MageMemorizeWindow, SpellButton, GemRB.GetTableValue(MageSpellsTable, j, 0), 0, 0, 63)
 			GemRB.SetButtonState(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageMemorizeSelectPress")
 			GemRB.SetVarAssoc(MageMemorizeWindow, SpellButton, "SpellMask", 1 << j)
@@ -1728,7 +1728,7 @@ def PriestSpellsMemorize():
 		GemRB.SetButtonFlags(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
 		if i < PriestSpellsCount:
 			# Color is no good yet :-(
-			GemRB.SetButtonBAM(PriestMemorizeWindow, SpellButton, GemRB.GetTableValue(PriestSpellsTable, i, 0), 1, 0, 63)
+			GemRB.SetButtonBAM(PriestMemorizeWindow, SpellButton, GemRB.GetTableValue(PriestSpellsTable, i, 0), 0, 0, 63)
 			GemRB.SetButtonState(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "PriestMemorizeSelectPress")
 			GemRB.SetVarAssoc(PriestMemorizeWindow, SpellButton, "SpellMask", 1 << i)
@@ -1833,25 +1833,25 @@ def AppearancePress():
 	GemRB.SetButtonFlags(AppearanceWindow, AppearanceHairButton, IE_GUI_BUTTON_PICTURE, OP_OR)
 	GemRB.SetButtonState(AppearanceWindow, AppearanceHairButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(AppearanceWindow, AppearanceHairButton, IE_GUI_BUTTON_ON_PRESS, "AppearanceHairPress")
-	GemRB.SetButtonBAM(AppearanceWindow, AppearanceHairButton, "COLGRAD", 1, 0, HairColor)
+	GemRB.SetButtonBAM(AppearanceWindow, AppearanceHairButton, "COLGRAD", 0, 0, HairColor)
 
 	AppearanceSkinButton = GemRB.GetControl(AppearanceWindow, 3)
 	GemRB.SetButtonFlags(AppearanceWindow, AppearanceSkinButton, IE_GUI_BUTTON_PICTURE, OP_OR)
 	GemRB.SetButtonState(AppearanceWindow, AppearanceSkinButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(AppearanceWindow, AppearanceSkinButton, IE_GUI_BUTTON_ON_PRESS, "AppearanceSkinPress")
-	GemRB.SetButtonBAM(AppearanceWindow, AppearanceSkinButton, "COLGRAD", 1, 0, SkinColor)
+	GemRB.SetButtonBAM(AppearanceWindow, AppearanceSkinButton, "COLGRAD", 0, 0, SkinColor)
 
 	AppearanceMajorButton = GemRB.GetControl(AppearanceWindow, 4)
 	GemRB.SetButtonFlags(AppearanceWindow, AppearanceMajorButton, IE_GUI_BUTTON_PICTURE, OP_OR)
 	GemRB.SetButtonState(AppearanceWindow, AppearanceMajorButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(AppearanceWindow, AppearanceMajorButton, IE_GUI_BUTTON_ON_PRESS, "AppearanceMajorPress")
-	GemRB.SetButtonBAM(AppearanceWindow, AppearanceMajorButton, "COLGRAD", 1, 0, MajorColor)
+	GemRB.SetButtonBAM(AppearanceWindow, AppearanceMajorButton, "COLGRAD", 0, 0, MajorColor)
 
 	AppearanceMinorButton = GemRB.GetControl(AppearanceWindow, 5)
 	GemRB.SetButtonFlags(AppearanceWindow, AppearanceMinorButton, IE_GUI_BUTTON_PICTURE, OP_OR)
 	GemRB.SetButtonState(AppearanceWindow, AppearanceMinorButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(AppearanceWindow, AppearanceMinorButton, IE_GUI_BUTTON_ON_PRESS, "AppearanceMinorPress")
-	GemRB.SetButtonBAM(AppearanceWindow, AppearanceMinorButton, "COLGRAD", 1, 0, MinorColor)
+	GemRB.SetButtonBAM(AppearanceWindow, AppearanceMinorButton, "COLGRAD", 0, 0, MinorColor)
 
 	AppearanceDoneButton = GemRB.GetControl(AppearanceWindow, 0)
 	GemRB.SetButtonState(AppearanceWindow, AppearanceDoneButton, IE_GUI_BUTTON_ENABLED)
@@ -1879,7 +1879,7 @@ def ApperanceDrawAvatar():
         AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
 
 	AvatarRef = GemRB.GetTableValue(AppearanceAvatarTable, hex(AvatarID), "LEVEL1")
-	GemRB.SetButtonBAM(AppearanceWindow, AppearanceAvatarButton, AvatarRef, 1, 0, 0)
+	GemRB.SetButtonBAM(AppearanceWindow, AppearanceAvatarButton, AvatarRef, 0, 0, 0)
 	return
 
 def AppearanceHairPress():
@@ -1919,7 +1919,7 @@ def AppearanceColorChoice(CurrentColor):
 		Color = GemRB.GetTableValue(AppearanceColorTable, ColorType, i)
 		if Color != "*":
 			ColorButton = GemRB.GetControl(AppearanceColorWindow, i)
-			GemRB.SetButtonBAM(AppearanceColorWindow, ColorButton, "COLGRAD", 2, 0, Color)
+			GemRB.SetButtonBAM(AppearanceColorWindow, ColorButton, "COLGRAD", 0, 0, Color)
 			GemRB.SetEvent(AppearanceColorWindow, ColorButton, IE_GUI_BUTTON_ON_PRESS, "AppearanceColorSelected")
 			GemRB.SetVarAssoc(AppearanceColorWindow, ColorButton, "SelectedColor", Color)
 	
@@ -1934,16 +1934,16 @@ def AppearanceColorSelected():
 	Color = GemRB.GetVar("SelectedColor")
 	if ColorType == 0:
 		GemRB.SetVar("HairColor", Color)
-		GemRB.SetButtonBAM(AppearanceWindow, AppearanceHairButton, "COLGRAD", 1, 0, Color)
+		GemRB.SetButtonBAM(AppearanceWindow, AppearanceHairButton, "COLGRAD", 0, 0, Color)
 	elif ColorType == 1:
 		GemRB.SetVar("SkinColor", Color)
-		GemRB.SetButtonBAM(AppearanceWindow, AppearanceSkinButton, "COLGRAD", 1, 0, Color)
+		GemRB.SetButtonBAM(AppearanceWindow, AppearanceSkinButton, "COLGRAD", 0, 0, Color)
 	elif ColorType == 2:
 		GemRB.SetVar("MajorColor", Color)
-		GemRB.SetButtonBAM(AppearanceWindow, AppearanceMajorButton, "COLGRAD", 1, 0, Color)
+		GemRB.SetButtonBAM(AppearanceWindow, AppearanceMajorButton, "COLGRAD", 0, 0, Color)
 	elif ColorType == 3:
 		GemRB.SetVar("MinorColor", Color)
-		GemRB.SetButtonBAM(AppearanceWindow, AppearanceMinorButton, "COLGRAD", 1, 0, Color)
+		GemRB.SetButtonBAM(AppearanceWindow, AppearanceMinorButton, "COLGRAD", 0, 0, Color)
 	ApperanceDrawAvatar()
 	GemRB.SetVisible(AppearanceWindow, 1)
 	return

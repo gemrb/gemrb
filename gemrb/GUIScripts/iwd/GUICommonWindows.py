@@ -16,10 +16,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.1 2004/09/23 18:42:13 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.2 2004/09/26 13:14:48 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
+
+###################################################
 
 import GemRB
 from GUIDefines import *
@@ -42,6 +44,7 @@ FRAME_PC_TARGET   = 1
 # 10 TXTE
 
 def SetupMenuWindowControls (Window):
+	# FIXME: add "(key)" to tooltips!
 
 	# Return to Game
 	Button = GemRB.GetControl (Window, 0)
@@ -97,10 +100,15 @@ def SetupMenuWindowControls (Window):
 	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 7)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
 
-	# Rest
+	# Party mgmt
 	Button = GemRB.GetControl (Window, 8)
-	GemRB.SetTooltip (Window, Button, 11942)
-	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
+	GemRB.SetTooltip (Window, Button, 16312)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
+
+## 	# Rest
+## 	Button = GemRB.GetControl (Window, 8)
+## 	GemRB.SetTooltip (Window, Button, 11942)
+## 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
 
 	# AI
 	#Button = GemRB.GetControl (Window, 9)
@@ -110,11 +118,11 @@ def SetupMenuWindowControls (Window):
 
 def AIPress ():
 	print "AIPress"
-	return
+
 
 def RestPress ():
 	print "RestPress"
-	return
+
 
 def SetupActionsWindowControls (Window):
 	# 41627 - Return to the Game World
@@ -130,7 +138,7 @@ def SetupActionsWindowControls (Window):
 	# Formations
 	Button = GemRB.GetControl (Window, 4)
 	GemRB.SetTooltip (Window, Button, 44945)
-	return
+
 
 def GetActorClassTitle (actor):
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
@@ -185,20 +193,44 @@ def PopulatePortraitWindow (Window):
 	global PortraitWindow
 	PortraitWindow = Window
 
-	for i in range (0,6):
+	for i in range (6):
 		Button = GemRB.GetControl (Window, i)
-		GemRB.SetVarAssoc (Window, Button, "SelectedSingle", i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
+		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "PortraitButtonOnDragDrop")
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
+		#GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseOver")
+		#GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
 
-		pic = GemRB.GetPlayerPortrait (i+1,1)
-		GemRB.SetButtonPicture(Window, Button, pic)
-		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE, OP_SET)
-
-		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1,
-2, 2, 0, 255, 0, 255)
+		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
-		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)
-	return
+		pic = GemRB.GetPlayerPortrait (i+1, 1)
+		if not pic:
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			continue
+		
+		#sel = GemRB.GameIsPCSelected (i+1)
+		sel = GemRB.GameGetSelectedPCSingle () == i + 1
+		#GemRB.SetButtonBAM (Window, Button, pic, 0, 0, 0)
+		GemRB.SetButtonPicture(Window, Button, pic)
+		
+		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
+		GemRB.SetButtonFont (Window, Button, 'NUMFONT')
+
+		GemRB.SetVarAssoc (Window, Button, 'PressedPortrait', i)
+
+		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
+		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
+
+		GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
+		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
+		if sel:
+			#GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_SELECTED)
+			GemRB.EnableButtonBorder(Window, Button, FRAME_PC_SELECTED, 1)
+		else:
+			#GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_UNPRESSED)
+			GemRB.EnableButtonBorder(Window, Button, FRAME_PC_SELECTED, 0)
+
 
 def PortraitButtonOnPress ():
 	i = GemRB.GetVar ("PressedPortrait")
@@ -209,7 +241,7 @@ def PortraitButtonOnPress ():
 		GemRB.GameSelectPCSingle (i + 1)
 		SelectionChanged ()
 		RunSelectionChangeHandler ()
-	return
+
 
 def PortraitButtonOnShiftPress ():
 	i = GemRB.GetVar ('PressedPortrait')
@@ -222,27 +254,42 @@ def PortraitButtonOnShiftPress ():
 		GemRB.GameSelectPCSingle (i + 1)
 		SelectionChanged ()
 		RunSelectionChangeHandler ()
-	return
+
 
 def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
-	return
+
 
 # Run by Game class when selection was changed
 def SelectionChanged ():
 	# FIXME: hack. If defined, display single selection
 	if (not SelectionChangeHandler):
-		for i in range (0, 6):
+		for i in range (6):
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
 	else:
 		sel = GemRB.GameGetSelectedPCSingle ()
-		for i in range (0, 6):
-			Button = GemRB.GetControl (PortraitWindow, i)
-
-		for i in range (0, 6):
+		for i in range (6):
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, i + 1 == sel)
+
+
+def PortraitButtonOnDragDrop ():
+	i = GemRB.GetVar ('PressedPortrait')
+	print "DragDrop"
+
+def PortraitButtonOnMouseOver ():
+	i = GemRB.GetVar ('PressedPortrait')
+	if GemRB.IsDraggingItem ():
+		Button = GemRB.GetControl (PortraitWindow, i)
+		GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_TARGET, 1)
+
+def PortraitButtonOnMouseLeave ():
+	i = GemRB.GetVar ('PressedPortrait')
+	if GemRB.IsDraggingItem ():
+		Button = GemRB.GetControl (PortraitWindow, i)
+		GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_TARGET, 0)
+
 
 def GetSavingThrow (SaveName, row, level):
 	SaveTable = GemRB.LoadTable (SaveName)

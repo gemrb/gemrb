@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/PartyFormation.py,v 1.8 2004/09/21 00:20:47 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/PartyFormation.py,v 1.9 2004/09/26 13:14:47 avenger_teambg Exp $
 
 
 # PartyFormation.py - Single Player Party Formation
@@ -56,7 +56,6 @@ def OnLoad():
 		GemRB.SetControlSize(PartyFormationWindow, Label, 0, 0)
 		Button = GemRB.GetControl(PartyFormationWindow, i-12)
 		ResRef = GemRB.GetPlayerPortrait(i-17, 1)
-		print "RESREF: ",ResRef,"****************************"
 		if ResRef == "":
 			GemRB.SetButtonFlags(PartyFormationWindow, Button, IE_GUI_BUTTON_NORMAL,OP_SET)
 		else:
