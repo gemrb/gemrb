@@ -1,5 +1,15 @@
 #include "../../includes/win32def.h"
 #include "PathFinder.h"
+#include <stdlib.h>
+
+#ifndef WIN32
+
+int min(int value1, int value2)
+{
+	return ((value1 < value2) ? value1 : value2);
+}
+
+#endif
 
 PathFinder::PathFinder(void)
 {
