@@ -244,7 +244,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Regio
 		else {
 			if(drect.y >= (clip->y+clip->h))
 				return;
-			t.x = 0;
+			t.y = 0;
 			t.h = spr->Height;
 		}
 		srect = &t;
