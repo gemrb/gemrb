@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.85 2005/03/20 15:07:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.86 2005/03/20 23:36:47 avenger_teambg Exp $
  *
  */
 
@@ -454,27 +454,6 @@ bool Button::SetEvent(int eventType, EventHandler handler)
 	}
 
 	return true;
-}
-
-/** Sets the Display Flags */
-int Button::SetFlags(int arg_flags, int opcode)
-{
-	switch (opcode) {
-		case OP_SET:
-			Flags = arg_flags;  //set
-			break;
-		case OP_OR:
-			Flags |= arg_flags; //turn on
-			break;
-		case OP_NAND:
-			Flags &= ~arg_flags;//turn off
-			break;
-		default:
-			return -1;
-	}
-	Changed = true;
-	( ( Window * ) Owner )->Invalidate();
-	return 0;
 }
 
 /** Redraws a button from a given radio button group */

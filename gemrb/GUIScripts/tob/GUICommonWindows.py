@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.14 2005/03/20 15:47:13 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.15 2005/03/20 23:36:46 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -179,25 +179,27 @@ def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
 
-def OpenPortraitWindow ():
+def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
 	PortraitWindow = Window = GemRB.LoadWindow(1)
 	GemRB.SetVar ("PortraitWindow", PortraitWindow)
 	GemRB.SetVar ("PortraitPosition", 2)    # Right
 
-	Button=GemRB.GetControl(PortraitWindow, 8)
-	GemRB.SetEvent(PortraitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
+	if needcontrols:
+		Button=GemRB.GetControl(PortraitWindow, 8)
+		GemRB.SetEvent(PortraitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
 
-	# AI
-	Button = GemRB.GetControl (Window, 6)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
+		# AI
+		Button = GemRB.GetControl (Window, 6)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
 
-	#Select All
-	Button = GemRB.GetControl (Window, 7)
-	GemRB.SetTooltip (Window, Button, 10485)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+		#Select All
+		Button = GemRB.GetControl (Window, 7)
+		GemRB.SetTooltip (Window, Button, 10485)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetVarAssoc (Window, Button, "SelectedSingle", i)

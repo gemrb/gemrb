@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.69 2005/03/20 15:07:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.70 2005/03/20 23:36:48 avenger_teambg Exp $
  *
  */
 
@@ -33,8 +33,7 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	seltext = -1;
 	Value = 0xffffffff;
 	sb = NULL;
-	Selectable = false;
-	AutoScroll = false;
+	Flags = 0;
 	ResetEventHandler( TextAreaOnChange );
 
 	palette = core->GetVideoDriver()->CreatePalette( hitextcolor,
@@ -75,7 +74,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	if (lines.size() == 0) {
 		return;
 	}
-	if (!Selectable) {
+	if (!(Flags & IE_GUI_TEXTAREA_SELECTABLE) ) {
 		char* Buffer = ( char* ) malloc( 1 );
 		Buffer[0] = 0;
 		int len = 0;
@@ -172,6 +171,7 @@ void TextArea::SetScrollBar(Control* ptr)
 	CalcRowCount();
 	Changed = true;
 }
+
 /** Sets the Actual Text */
 int TextArea::SetText(const char* text, int pos)
 {
@@ -192,20 +192,7 @@ int TextArea::SetText(const char* text, int pos)
 		lines[pos] = ( char * ) realloc( lines[pos], newlen + 1 );
 		memcpy( lines[pos], text, newlen + 1 );
 	}
-	CalcRowCount();
-	Changed = true;
-	if (sb) {
-		ScrollBar* bar = ( ScrollBar* ) sb;
-		if (AutoScroll)
-			pos = rows - ( ( Height - 5 ) / ftext->maxHeight );
-		else
-			pos = 0;
-		//pos=lines.size()-((Height-5)/ftext->maxHeight);
-		if (pos < 0)
-			pos = 0;
-		bar->SetPos( pos );
-	}
-	core->RedrawAll();
+	UpdateControls();
 	return 0;
 }
 
@@ -255,19 +242,7 @@ int TextArea::AppendText(const char* text, int pos)
 		memcpy( lines[pos]+mylen, text, newlen + 1 );
 		ret = pos;
 	}
-	CalcRowCount();
-	Changed = true;
-	if (sb) {
-		ScrollBar* bar = ( ScrollBar* ) sb;
-		if (AutoScroll)
-			pos = rows - ( ( Height - 5 ) / ftext->maxHeight );
-		else
-			pos = 0;
-		if (pos < 0)
-			pos = 0;
-		bar->SetPos( pos );
-	}
-	core->RedrawAll();
+	UpdateControls();
 	return ret;
 }
 
@@ -284,19 +259,23 @@ void TextArea::PopLines(unsigned int count)
 		lrows.pop_back();
 		count--;
 	}
+	UpdateControls();
+}
 
+void TextArea::UpdateControls()
+{
 	int pos;
+
 	CalcRowCount();
 	Changed = true;
 	if (sb) {
 		ScrollBar* bar = ( ScrollBar* ) sb;
-		if (AutoScroll)
+		if (Flags & IE_GUI_TEXTAREA_AUTOSCROLL)
 			pos = rows - ( ( Height - 5 ) / ftext->maxHeight );
 		else
 			pos = 0;
-		if (pos < 0) {
+		if (pos < 0)
 			pos = 0;
-		}
 		bar->SetPos( pos );
 	}
 	core->RedrawAll();
@@ -322,7 +301,7 @@ void TextArea::SetFonts(Font* init, Font* text)
 void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	//Selectable=false for dialogs, rather unintuitive, but fact
-	if (Selectable || ( Key < '1' ) || ( Key > '9' )) 
+	if ((Flags & IE_GUI_TEXTAREA_SELECTABLE) || ( Key < '1' ) || ( Key > '9' )) 
 		return;
 	GameControl *gc = core->GetGameControl();
 	if (gc && (gc->DialogueFlags&DF_IN_DIALOG) ) {
@@ -369,15 +348,6 @@ void TextArea::SetRow(int row)
 		startrow = row;
 	}
 	Changed = true;
-}
-
-/** Set Selectable */
-void TextArea::SetSelectable(bool val)
-{
-	Selectable = val;
-	if (Selectable) {
-		minrow = 0;
-	}
 }
 
 void TextArea::CalcRowCount()

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.294 2005/03/20 15:07:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.295 2005/03/20 23:36:48 avenger_teambg Exp $
  *
  */
 
@@ -337,28 +337,6 @@ static PyObject* GemRB_MoveTAText(PyObject * /*self*/, PyObject* args)
 	}
 
 	SrcTA->CopyTo( DstTA );
-
-	Py_INCREF( Py_None );
-	return Py_None;
-}
-
-PyDoc_STRVAR( GemRB_SetTAAutoScroll__doc,
-"SetTAAutoScroll(WindowIndex, ControlIndex, State)\n\n"
-"Sets the TextArea auto-scroll feature status.");
-
-static PyObject* GemRB_SetTAAutoScroll(PyObject * /*self*/, PyObject* args)
-{
-	int wi, ci, state;
-
-	if (!PyArg_ParseTuple( args, "iii", &wi, &ci, &state )) {
-		return AttributeError( GemRB_SetTAAutoScroll__doc );
-	}
-
-	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
-	if (!ta) {
-		return NULL;
-	}
-	ta->AutoScroll = ( state != 0 );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -766,8 +744,10 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 		TableMgr* tm = core->GetTable( TableIndex );
-		if (!tm)
+		if (!tm) {
+			printMessage("GUIScript", "Table not found!", LIGHT_RED);
 			return NULL;
+		}
 		char* ret;
 		if (PyObject_TypeCheck( row, &PyString_Type )) {
 			char* rows = PyString_AsString( row );
@@ -1965,30 +1945,6 @@ static PyObject* GemRB_SetLabelUseRGB(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_SetTextAreaSelectable__doc,
-"SetTextAreaSelectable(WindowIndex, ControlIndex, Flag)\n\n"
-"Sets the Selectable Flag of a TextArea." );
-
-static PyObject* GemRB_SetTextAreaSelectable(PyObject * /*self*/,
-	PyObject* args)
-{
-	int WindowIndex, ControlIndex, Flag;
-
-	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &Flag )) {
-		return AttributeError( GemRB_SetTextAreaSelectable__doc );
-	}
-
-	TextArea* ta = (TextArea *) GetControl(WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
-	if (!ta) {
-		return NULL;
-	}
-
-	ta->SetSelectable( !!Flag );
-
-	Py_INCREF( Py_None );
-	return Py_None;
-}
-
 PyDoc_STRVAR( GemRB_SetButtonFlags__doc,
 "SetButtonFlags(WindowIndex, ControlIndex, Flags, Operation)\n\n"
 "Sets the Display Flags of a Button." );
@@ -1997,8 +1953,7 @@ static PyObject* GemRB_SetButtonFlags(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, Flags, Operation;
 
-	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &Flags,
-			&Operation )) {
+	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &Flags, &Operation )) {
 		return AttributeError( GemRB_SetButtonFlags__doc );
 	}
 	if (Operation< 0 || Operation>2) {
@@ -2007,12 +1962,47 @@ static PyObject* GemRB_SetButtonFlags(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	Control* btn = ( Control* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
 		return NULL;
 	}
 
-	btn->SetFlags( Flags, Operation );
+	if( btn->SetFlags( Flags, Operation ) ) {
+		printMessage ("GUIScript", "Flag cannot be set!",LIGHT_RED);
+		return NULL;
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetTextAreaFlags__doc,
+"SetTextAreaFlags(WindowIndex, ControlIndex, Flags, Operation)\n\n"
+"Sets the Display Flags of a TextArea. Flags are: IE_GUI_TA_SELECTABLE, IE_GUI_TA_AUTOSCROLL, IE_GUI_TA_SMOOTHSCROLL. Operation defaults to OP_SET." );
+
+static PyObject* GemRB_SetTextAreaFlags(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, Flags;
+	int Operation=0;
+
+	if (!PyArg_ParseTuple( args, "iii|i", &WindowIndex, &ControlIndex, &Flags, &Operation )) {
+		return AttributeError( GemRB_SetTextAreaFlags__doc );
+	}
+	if (Operation< 0 || Operation>2) {
+		printMessage( "GUIScript",
+			"Syntax Error: SetButtonFlags operation must be 0-2\n", LIGHT_RED );
+		return NULL;
+	}
+
+	Control* ta = ( Control* ) GetControl(WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
+	if (!ta) {
+		return NULL;
+	}
+
+	if (ta->SetFlags( Flags, Operation )) {
+		printMessage ("GUIScript", "Flag cannot be set!",LIGHT_RED);
+		return NULL;
+	}
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -4740,7 +4730,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
 	METHOD(UnhideGUI, METH_NOARGS),
-	METHOD(SetTAAutoScroll, METH_VARARGS),
 	METHOD(MoveTAText, METH_VARARGS),
 	METHOD(ExecuteString, METH_VARARGS),
 	METHOD(EvaluateString, METH_VARARGS),
@@ -4815,7 +4804,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetControlPos, METH_VARARGS),
 	METHOD(SetControlSize, METH_VARARGS),
 	METHOD(DeleteControl, METH_VARARGS),
-	METHOD(SetTextAreaSelectable, METH_VARARGS),
+	METHOD(SetTextAreaFlags, METH_VARARGS),
 	METHOD(SetButtonFlags, METH_VARARGS),
 	METHOD(SetButtonState, METH_VARARGS),
 	METHOD(SetButtonPictureClipping, METH_VARARGS),

@@ -35,8 +35,8 @@ void GlobalTimer::Update()
 			int x = shakeStartVP.x;
 			int y = shakeStartVP.y;
 			if (shakeCounter != 1) {
-				x += rand()%shakeX - shakeX>>1;
-				y += rand()%shakeY - shakeY>>1;
+				x += (rand()%shakeX) - (shakeX>>1);
+				y += (rand()%shakeY) - (shakeY>>1);
 			}
 			core->GetVideoDriver()->MoveViewportTo(x,y,false);
 			shakeCounter--;

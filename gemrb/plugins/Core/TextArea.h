@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.21 2004/11/18 23:32:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.22 2005/03/20 23:36:48 avenger_teambg Exp $
  *
  */
 
@@ -27,9 +27,14 @@
 #include "Font.h"
 #include "ScrollBar.h"
 
-// !!! Keep these synchronized with GUIDefines.py
+// Keep these synchronized with GUIDefines.py
 #define IE_GUI_TEXTAREA_ON_CHANGE  0x05000000
 
+// TextArea flags, keep these in sync too
+// the control type is intentionally left out
+#define IE_GUI_TEXTAREA_SELECTABLE 1
+#define IE_GUI_TEXTAREA_AUTOSCROLL 2
+#define IE_GUI_TEXTAREA_SMOOTHSCROLL 4
 
 #ifdef WIN32
 
@@ -78,7 +83,6 @@ public:
 	/** Scrolls automatically to the bottom when the text changes */
 	bool AutoScroll;
 private: // Private attributes
-	bool Selectable;
 	std::vector< char*> lines;
 	std::vector< int> lrows;
 	int seltext;
@@ -100,6 +104,7 @@ private: // Private attributes
 	/** Fonts */
 	Font* finit, * ftext;
 	void CalcRowCount();
+	void UpdateControls();
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

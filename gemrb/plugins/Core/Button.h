@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.40 2005/03/18 20:01:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.41 2005/03/20 23:36:47 avenger_teambg Exp $
  *
  */
 
@@ -152,13 +152,6 @@ public: // Public Events
 	EventHandler MouseEnterButton;
 	EventHandler MouseLeaveButton;
 	EventHandler MouseOverButton;
-	/** Sets the Display Flags */
-	int SetFlags(int Flags, int Operation);
-	/** Returns the Display Flags */
-	unsigned int GetFlags()
-	{
-		return Flags;
-	}
 	/** Refreshes the button from a radio group */
 	void RedrawButton(char* VariableName, unsigned int Sum);
         /** Set palette used for drawing button label in normal state.  */

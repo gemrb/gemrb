@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.31 2004/12/09 21:59:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.32 2005/03/20 23:36:47 avenger_teambg Exp $
  *
  */
 
@@ -141,3 +141,25 @@ void Control::OnSpecialKeyPress(unsigned char /*Key*/)
 	//printf("OnSpecialKeyPress: CtrlID = 0x%08X, Key = %d\n", (unsigned int) ControlID, Key);
 }
 
+/** Sets the Display Flags */
+int Control::SetFlags(int arg_flags, int opcode)
+{
+	if ((arg_flags >>24) != ControlType)
+		return -2;
+	switch (opcode) {
+		case OP_SET:
+			Flags = arg_flags;  //set
+			break;
+		case OP_OR:
+			Flags |= arg_flags; //turn on
+			break;
+		case OP_NAND:
+			Flags &= ~arg_flags;//turn off
+			break;
+		default:
+			return -1;
+	}
+	Changed = true;
+	( ( Window * ) Owner )->Invalidate();
+	return 0;
+}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.27 2004/11/18 23:32:40 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.28 2005/03/20 23:36:47 avenger_teambg Exp $
  *
  */
 
@@ -74,8 +74,11 @@ public:
 	void DisplayTooltip();
 	/** Variables */
 	char VarName[MAX_VARIABLE_LENGTH];
-	/** the value of the button to add to the variable */
+	/** the value of the control to add to the variable */
 	ieDword Value;
+	/** various flags based on the control type */
+	ieDword Flags;
+
 public: // Public attributes
 	/** Defines the Control ID Number used for GUI Scripting */
 	ieDword ControlID;
@@ -101,6 +104,8 @@ public: //Events
 	void ResetEventHandler(EventHandler handler);
 	/** Set handler from function name */
 	void SetEventHandler(EventHandler handler, char* funcName);
+	/** Set the Flags */
+	int SetFlags(int arg_flags, int opcode);
 	/** Set handler for specified event. Override in child classes */
 	virtual bool SetEvent(int eventType, EventHandler handler);
 	/** Run specified handler */

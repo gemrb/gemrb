@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.248 2005/03/20 15:07:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.249 2005/03/20 23:36:47 avenger_teambg Exp $
  *
  */
 
@@ -6296,14 +6296,12 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
-/*iwd2 can play any areasong slot at will*/
 void GameScript::StartMusic(Scriptable* /*Sender*/, Action* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	map->PlayAreaSong(parameters->int0Parameter);
 }
 
-/*bg2 can play only the battle song*/
 void GameScript::BattleSong(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
@@ -6574,7 +6572,7 @@ void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
 void GameScript::SoundActivate(Scriptable* /*Sender*/, Action* parameters)
 {
 	AmbientMgr * ambientmgr = core->GetSoundMgr()->GetAmbientMgr();
-	if(ambientmgr->isActive(parameters->objects[1]->objectName) != parameters->int0Parameter) {
+	if(parameters->int0Parameter) {
 		ambientmgr->activate(parameters->objects[1]->objectName);
 	} else {
 		ambientmgr->deactivate(parameters->objects[1]->objectName);
@@ -7686,23 +7684,41 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 
 void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
-	int chapter = core->LoadTable( parameters->string0Parameter );
+	int chapter;
+	ieDword line;
+	bool iwd=false;
+
+	if (parameters->string0Parameter[0]) {
+		chapter = core->LoadTable( parameters->string0Parameter );
+		line = 1;
+	}
+	else {//iwd/iwd2 has a single table named chapters
+		chapter = core->LoadTable ( "CHAPTERS" );
+		core->GetGame()->globals->Lookup( "CHAPTER", line );
+		iwd = true;
+	}
+
 	if(chapter<0) {
 //add some standard way of notifying the user
 //		MissingResource(parameters->string0Parameter);
 		return;
 	}
+
+	TableMgr *table = core->GetTable(chapter);
+	strnuprcpy(core->GetGame()->LoadMos, table->QueryField(0xffffffff),8);
 	GameControl *gc=core->GetGameControl();
 	if (gc) {
-		char *strref = core->GetTable(chapter)->QueryField(0);
+		char *strref = table->QueryField(line, 0);
 		char *str=core->GetString( strtol(strref,NULL,0) );
 		core->DisplayString(str);
 		free(str);
-		strref = core->GetTable(chapter)->QueryField(1);
+		strref = table->QueryField(line, 1);
 		str=core->GetString( strtol(strref,NULL,0) );
 		core->DisplayString(str);
 		free(str);
 	}
+	core->DelTable(chapter);
+	core->GetGUIScriptEngine()->RunFunction( "StartTextScreen" );
 }
 
 void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
@@ -8410,6 +8426,7 @@ void GameScript::SetRestEncounterChance(Scriptable * /*Sender*/, Action* paramet
 
 void GameScript::EndCredits(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
+printf("Endcredit");
 	core->PlayMovie("credits");
 }
 

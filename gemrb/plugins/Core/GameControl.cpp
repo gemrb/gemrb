@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.203 2005/03/20 15:07:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.204 2005/03/20 23:36:47 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -228,9 +228,10 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Region vp( x + XPos, y + YPos, Width, Height );
 	Map* area = game->GetCurrentMap( );
 	if (!area) {
-		core->GetVideoDriver()->DrawRect( vp, blue );
+		core->GetVideoDriver()->DrawRect( vp, blue, true );
 		return;
 	}
+	core->GetVideoDriver()->DrawRect( vp, black, true );
 	core->GSUpdate();
 	area->DrawMap( vp, this );
 	if (ScreenFlags & SF_DISABLEMOUSE)

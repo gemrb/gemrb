@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUISTORE.py,v 1.10 2005/03/20 21:28:26 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUISTORE.py,v 1.11 2005/03/20 23:36:46 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -26,6 +26,7 @@
 import string
 import GemRB
 from GUIDefines import *
+from GUICommonWindows import *
 from ie_stats import *
 from GUICommonWindows import SetSelectionChangeHandler
 from GUICommon import CloseOtherWindow
@@ -38,6 +39,10 @@ StoreDonateWindow = None
 StoreHealWindow = None
 StoreRumourWindow = None
 StoreRentWindow = None
+OldPortrait = None
+OldAction = None
+OldMessage = None
+OldOptions = None
 
 RentIndex = -1
 Store = None
@@ -72,6 +77,7 @@ def OpenStoreWindow ():
 	global Store
 	global StoreWindow
 	global store_update_funcs, inventory_slots
+	global OldPortrait, OldMessage, OldAction, OldOptions
 
 	#these are function pointers, not strings
 	#can't put this in global init, doh!
@@ -94,17 +100,34 @@ def OpenStoreWindow ():
 		StoreWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.SetVar ("TopWindow", -1)
+		GemRB.SetVar ("PortraitWindow", OldPortrait)
+		GemRB.SetVar ("OptionsWindow", OldOptions)
+		GemRB.SetVar ("ActionWindow", OldAction)
+		GemRB.SetVar ("MessageWindow", OldMessage)
 		SetSelectionChangeHandler( None )
+		GemRB.SetVisible (0,1) #enabling the game control screen
 		GemRB.UnhideGUI ()
 		GemRB.LeaveStore ()
 		return
 
+	OldPortrait = GemRB.GetVar ("PortraitWindow")
+	OldAction = GemRB.GetVar ("ActionWindow")
+	OldMessage = GemRB.GetVar ("MessageWindow")
+	OldOptions = GemRB.GetVar ("OptionsWindow")
+
 	GemRB.HideGUI ()
+	GemRB.SetVisible (0,0) #removing the game control screen
 	GemRB.SetVar ("Action", 0)
 	GemRB.LoadWindowPack ("GUISTORE", 640, 480)
 	StoreWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetWindowFrame (Window)
 	GemRB.SetVar ("OtherWindow", StoreWindow) #this is the store button row
+	OpenPortraitWindow(0)
+	ActionWindow = GemRB.LoadWindow(0)
+	GemRB.SetVar ("ActionWindow", ActionWindow)
+	GemRB.SetWindowFrame (ActionWindow)
+	GemRB.SetVar ("MessageWindow", -1)
+	GemRB.SetVar ("OptionsWindow", -1)
 
 	Store = GemRB.GetStore()
 	# Done
@@ -621,8 +644,8 @@ def RedrawStoreIdentifyWindow ():
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
 			if Flags & 4:
 				if i==Index:
-		        		Label = GemRB.GetControl (Window, 0x10000003)
-				        GemRB.SetText (Window, Label, str(IDPrice))
+					Label = GemRB.GetControl (Window, 0x10000003)
+					GemRB.SetText (Window, Label, str(IDPrice))
 					GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
 				else:
 					GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)

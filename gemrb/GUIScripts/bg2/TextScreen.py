@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/TextScreen.py,v 1.2 2005/03/20 23:36:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/TextScreen.py,v 1.1 2005/03/20 23:36:46 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -57,9 +57,8 @@ def StartTextScreen ():
 	GemRB.SetText (TextScreen, Button, 0)
 	GemRB.SetEvent (TextScreen, Button, IE_GUI_BUTTON_ON_PRESS, "ReplayTextScreen")
 
-	GemRB.HideGUI ()
-	GemRB.SetVisible (0, 0) #removing the gamecontrol screen
 	GemRB.SetVisible (TextScreen, 1)
+	GemRB.HideGUI ()
 
 def ReplayTextScreen ():
 	global TextScreen, TextArea
@@ -71,6 +70,5 @@ def EndTextScreen ():
 
 	GemRB.SetVisible (TextScreen, 0)
 	GemRB.UnloadWindow (TextScreen)
-	GemRB.SetVisible (0, 1) #enabling gamecontrol screen
 	GemRB.UnhideGUI ()
 
