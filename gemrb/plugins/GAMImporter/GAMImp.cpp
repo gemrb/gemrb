@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.26 2004/05/25 16:16:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.27 2004/07/31 22:35:47 avenger_teambg Exp $
  *
  */
 
@@ -168,12 +168,22 @@ Game* GAMImp::GetGame()
 	core->FreeInterface( aM );
 
 	//Loading GLOBALS
+	char Name[33];
+	Name[32] = 0;
 	str->Seek( newGame->GLOBALOffset, GEM_STREAM_START );
 	for (i = 0; i < newGame->GLOBALCount; i++) {
-		char Name[33];
 		unsigned long Value;
 		str->Read( Name, 32 );
-		Name[32] = 0;
+		str->Seek( 8, GEM_CURRENT_POS );
+		str->Read( &Value, 4 );
+		str->Seek( 40, GEM_CURRENT_POS );
+		newGame->globals->SetAt( Name, Value );
+	}
+	str->Seek( newGame->KillVarsOffset, GEM_STREAM_START );
+	memcpy(Name,"SPRITE_IS_DEAD",14);
+	for (i = 0; i < newGame->KillVarsCount; i++) {
+		unsigned long Value;
+		str->Read( Name+14, 18 );
 		str->Seek( 8, GEM_CURRENT_POS );
 		str->Read( &Value, 4 );
 		str->Seek( 40, GEM_CURRENT_POS );
