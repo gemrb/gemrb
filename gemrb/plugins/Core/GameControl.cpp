@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.206 2005/03/22 18:11:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.207 2005/03/23 18:20:51 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -210,14 +210,13 @@ void GameControl::SetInfoTextColor(Color color)
 /** Draws the Control on the Output Display */
 void GameControl::Draw(unsigned short x, unsigned short y)
 {
+	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
+
 	Game* game = core->GetGame();
 	if (game->MapIndex == -1) {
 		return;
 	}
 	if (((short) Width) <=0 || ((short) Height) <= 0) {
-		return;
-	}
-	if (DialogueFlags & DF_FREEZE_SCRIPTS) {
 		return;
 	}
 	if ( game->selected.size() > 0 ) {
@@ -235,8 +234,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 	core->GetVideoDriver()->DrawRect( vp, black, true );
-	core->GSUpdate();
-	area->DrawMap( vp, this );
+	//shall we stop globaltimer?
+	core->GSUpdate(update_scripts);
+	area->DrawMap( vp, this, update_scripts );
 	if (ScreenFlags & SF_DISABLEMOUSE)
 		return;
 	Point p = {lastMouseX,  lastMouseY};

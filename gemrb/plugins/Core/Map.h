@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.65 2005/03/15 17:53:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.66 2005/03/23 18:21:16 avenger_teambg Exp $
  *
  */
 
@@ -114,7 +114,7 @@ public:
 	void DebugDump();
 	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm);
 	void CreateMovement(char *command, const char *area, const char *entrance);
-	void DrawMap(Region viewport, GameControl* gc);
+	void DrawMap(Region viewport, GameControl* gc, bool update_scripts);
 	void PlayAreaSong(int);
 	void AddAnimation(Animation* anim);
 	Animation* GetAnimation(const char* Name);

@@ -25,6 +25,13 @@ void GlobalTimer::Init()
 	startTime = 0;  //forcing an update
 }
 
+void GlobalTimer::Freeze()
+{
+	unsigned long thisTime;
+	GetTime( thisTime );
+	startTime = thisTime;
+}
+
 void GlobalTimer::Update()
 {
 	unsigned long thisTime;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.145 2005/03/15 17:53:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.146 2005/03/23 18:21:15 avenger_teambg Exp $
  *
  */
 
@@ -377,74 +377,76 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	}
 }
 
-void Map::DrawMap(Region viewport, GameControl* gc)
+void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 {
 	unsigned int i;
 	//Draw the Map
 	if (TMap) {
 		TMap->DrawOverlay( 0, viewport );
 	}
-	//Run the Global Script
-	Game* game = core->GetGame();
-	game->ExecuteScript( game->Scripts[0] );
-	game->OnCreation = false;
-	game->ProcessActions();
-	//Run the Map Script
-	if (Scripts[0]) {
-		ExecuteScript( Scripts[0] );
-	}
-	OnCreation = false;
-	//Execute Pending Actions
-	ProcessActions();
-	//Check if we need to start some trigger scripts
-	int ipCount = 0;
-	while (true) {
-		//For each InfoPoint in the map
-		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
-		if (!ip)
-			break;
-		if (!ip->Active)
-			continue;
-		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
-		if (!ip->Scripts[0] && ( ip->Type != ST_TRAVEL ))
-			continue;
+	if (update_scripts) {
+		//Run the Global Script
+		Game* game = core->GetGame();
+		game->ExecuteScript( game->Scripts[0] );
+		game->OnCreation = false;
+		game->ProcessActions();
+		//Run the Map Script
+		if (Scripts[0]) {
+			ExecuteScript( Scripts[0] );
+		}
+		OnCreation = false;
 		//Execute Pending Actions
-		ip->ProcessActions();
-		//If this InfoPoint is a Switch Trigger
-		if (ip->Type == ST_TRIGGER) {
-			//Check if this InfoPoint was activated
-			if (ip->LastTrigger) {
-				//Run the InfoPoint script
-				ip->ExecuteScript( ip->Scripts[0] );
-				//OnCreation won't trigger the INFO point
-				//If it does, alter the condition above
-				ip->OnCreation = false;
-			}
-			continue;
-		}
-		i=actors.size();
-		while (i--) {
-			Actor* actor = actors[i];
-			if (!actor)
+		ProcessActions();
+		//Check if we need to start some trigger scripts
+		int ipCount = 0;
+		while (true) {
+			//For each InfoPoint in the map
+			InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
+			if (!ip)
+				break;
+			if (!ip->Active)
 				continue;
-			if (ip->Type == ST_PROXIMITY) {
-				if (ip->outline->PointIn( actor->Pos )) {
-					ip->LastEntered = actor;
-					ip->LastTrigger = actor;
+			//If this InfoPoint has no script and it is not a Travel Trigger, skip it
+			if (!ip->Scripts[0] && ( ip->Type != ST_TRAVEL ))
+				continue;
+			//Execute Pending Actions
+			ip->ProcessActions();
+			//If this InfoPoint is a Switch Trigger
+			if (ip->Type == ST_TRIGGER) {
+				//Check if this InfoPoint was activated
+				if (ip->LastTrigger) {
+					//Run the InfoPoint script
+					ip->ExecuteScript( ip->Scripts[0] );
+					//OnCreation won't trigger the INFO point
+					//If it does, alter the condition above
+					ip->OnCreation = false;
 				}
-				ip->ExecuteScript( ip->Scripts[0] );
-			} else {
-				//ST_TRAVEL
-				//don't move if doing something else
-				if(actor->GetNextAction())
+				continue;
+			}
+			i=actors.size();
+			while (i--) {
+				Actor* actor = actors[i];
+				if (!actor)
 					continue;
-				if (ip->outline->PointIn( actor->Pos )) {
-					ip->LastEntered = actor;
-					UseExit(actor, ip);
+				if (ip->Type == ST_PROXIMITY) {
+					if (ip->outline->PointIn( actor->Pos )) {
+						ip->LastEntered = actor;
+						ip->LastTrigger = actor;
+					}
+					ip->ExecuteScript( ip->Scripts[0] );
+				} else {
+					//ST_TRAVEL
+					//don't move if doing something else
+					if(actor->GetNextAction())
+						continue;
+					if (ip->outline->PointIn( actor->Pos )) {
+						ip->LastEntered = actor;
+						UseExit(actor, ip);
+					}
 				}
 			}
+			ip->OnCreation = false;
 		}
-		ip->OnCreation = false;
 	}
 	//Blit the Map Animations
 	Video* video = core->GetVideoDriver();
@@ -475,25 +477,27 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 				break;
 			if (!actor->Active)
 				continue;
-			actor->ProcessActions();
-			//moved scripts before display
-			//this should enable scripts for offscreen actors
-			for (i = 0; i < 8; i++) {
-				if (actor->Scripts[i])
-					actor->ExecuteScript( actor->Scripts[i] );
+			if (update_scripts) {
+				actor->ProcessActions();
+				//moved scripts before display
+				//this should enable scripts for offscreen actors
+				for (i = 0; i < 8; i++) {
+					if (actor->Scripts[i])
+						actor->ExecuteScript( actor->Scripts[i] );
+				}
+
+				//returns true if actor should be completely removed
+				if(actor->CheckOnDeath()) {
+					DeleteActor( actor );
+					continue;
+				}
+
+				actor->OnCreation = false;
+				actor->inventory.CalculateWeight();
+				actor->SetStat( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
+
+				actor->DoStep( );
 			}
-
-			//returns true if actor should be completely removed
-			if(actor->CheckOnDeath()) {
-				DeleteActor( actor );
-				continue;
-			}
-
-			actor->OnCreation = false;
-			actor->inventory.CalculateWeight();
-			actor->SetStat( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
-
-			actor->DoStep( );
 			CharAnimations* ca = actor->GetAnims();
 			if (!ca)
 				continue;

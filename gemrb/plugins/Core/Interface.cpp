@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.288 2005/03/22 18:53:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.289 2005/03/23 18:20:52 avenger_teambg Exp $
  *
  */
 
@@ -2348,7 +2348,7 @@ void Interface::QuitGame(bool BackToMain)
 		strcpy(NextScript, "Start");
 		ChangeScript = true;
 	}
-	GSUpdate();
+	GSUpdate(true);
 }
 
 void Interface::LoadGame(int index)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.146 2005/03/20 15:07:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.147 2005/03/23 18:21:14 avenger_teambg Exp $
  *
  */
 
@@ -324,9 +324,14 @@ public:
 	/** returns true if in cutscene mode */
 	bool InCutSceneMode();
 	/** Updates the Game Script Engine State */
-	void GSUpdate()
+	void GSUpdate(bool update_scripts)
 	{
-		timer->Update();
+		if(update_scripts) {
+			timer->Update();
+		}
+		else {
+			timer->Freeze();
+		}
 	}
 	/** Get the Party INI Interpreter */
 	DataFileMgr * GetPartyINI()

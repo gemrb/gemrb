@@ -33,6 +33,7 @@ public:
 	~GlobalTimer(void);
 public:
 	void Init();
+	void Freeze();
 	void Update();
 	void SetFadeToColor(unsigned long Count);
 	void SetFadeFromColor(unsigned long Count);
