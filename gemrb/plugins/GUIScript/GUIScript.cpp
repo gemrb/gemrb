@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.89 2003/12/19 17:27:41 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.90 2003/12/19 20:46:25 balrog994 Exp $
  *
  */
 
@@ -87,7 +87,8 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 	//core->FreeInterface(am);
 	core->DelTable(start);
 	core->GetVideoDriver()->MoveViewportTo(startX, startY);
-	core->GetActor(0);
+	Actor *MyActor = core->GetActor(0);
+	core->GetGame()->SetPC(MyActor);
 	if(core->ConsolePopped) {
 		core->PopupConsole();
 	}
@@ -1695,7 +1696,7 @@ static PyObject *GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject *args)
 	MyActor->XPos = MyActor->XDes = atoi(strta->QueryField(0));
 	MyActor->YPos = MyActor->YDes = atoi(strta->QueryField(1));
 	MyActor->SetOver(false);
-	core->GetGame()->SetPC(MyActor);
+	//core->GetGame()->SetPC(MyActor);
 	core->DelTable(saindex);
 	Py_INCREF(Py_None);
 	return Py_None;
