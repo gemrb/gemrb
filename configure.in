@@ -6,6 +6,7 @@
 dnl Initialize autoconf and automake
 
 AC_INIT(gemrb/GemRB.cpp)
+AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE(gemrb,0.1,no-define)
 
