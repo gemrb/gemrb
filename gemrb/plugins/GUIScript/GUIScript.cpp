@@ -793,6 +793,29 @@ static PyObject * GemRB_SetControlPos(PyObject */*self*/, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SetControlSize(PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex, Width, Height;
+
+	if(!PyArg_ParseTuple(args, "iiii", &WindowIndex, &ControlIndex, &Width, &Height)) {
+		printMessage("GUIScript", "Syntax Error: SetControlPos(WindowIndex, ControlIndex, Width, Height)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(!win)
+		return NULL;
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(!ctrl)
+		return NULL;
+	
+	ctrl->Width = Width;
+	ctrl->Height = Height;
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_SetLabelUseRGB(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex, status;
@@ -1368,6 +1391,9 @@ static PyMethodDef GemRBMethods[] = {
 
  	{"SetControlPos", GemRB_SetControlPos, METH_VARARGS,
 	 "Moves a Control."},
+
+  	{"SetControlSize", GemRB_SetControlSize, METH_VARARGS,
+	 "Resizes a Control."},
 
 	{"SetTextAreaSelectable",GemRB_SetTextAreaSelectable, METH_VARARGS,
      "Sets the Selectable Flag of a TextArea."},
