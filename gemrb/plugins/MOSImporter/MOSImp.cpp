@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.10 2004/09/14 22:09:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.11 2005/02/09 16:36:06 avenger_teambg Exp $
  *
  */
 
@@ -69,7 +69,7 @@ bool MOSImp::Open(DataStream* stream, bool autoFree)
 		} else {
 			//No file found in Cache, Decompressing and storing for further use
 			str->Seek( 4, GEM_CURRENT_POS );
-			//TODO: Decompress Mos File
+
 			if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID )) {
 				printf( "No Compression Manager Available.\nCannot Load Compressed Mos File.\n" );
 				return false;
@@ -115,23 +115,16 @@ Sprite2D* MOSImp::GetImage()
 			int bw = ( x == Cols - 1 ) ?
 				( ( Width % 64 ) == 0 ? 64 : Width % 64 ) :
 				64;
-			str->Seek( PalOffset + ( y * Cols * 1024 ) + ( x * 1024 ),
-					GEM_STREAM_START );
+			str->Seek( PalOffset + ( y * Cols * 1024 ) +
+				( x * 1024 ), GEM_STREAM_START );
 			str->Read( &RevCol[0], 1024 );
-			//for(int i = 0; i < 256; i++) {
-			//	str->Read(&RevCol[i], 4);
-			//}
-			str->Seek( PalOffset +
-					( Rows * Cols * 1024 ) +
-					( y * Cols * 4 ) +
-					( x * 4 ),
-					GEM_STREAM_START );
-			str->Read( &blockoffset, 4 );
-			str->Seek( PalOffset +
-					( Rows * Cols * 1024 ) +
-					( Rows * Cols * 4 ) +
-					blockoffset,
-					GEM_STREAM_START );
+			str->Seek( PalOffset + ( Rows * Cols * 1024 ) +
+				( y * Cols * 4 ) + ( x * 4 ),
+				GEM_STREAM_START );
+			str->ReadDword( &blockoffset );
+			str->Seek( PalOffset + ( Rows * Cols * 1024 ) +
+				( Rows * Cols * 4 ) + blockoffset,
+				GEM_STREAM_START );
 			str->Read( blockpixels, bw * bh );
 			unsigned char * bp = blockpixels;
 			unsigned char * startpixel = pixels +
@@ -149,16 +142,14 @@ Sprite2D* MOSImp::GetImage()
 					startpixel++;
 					bp++;
 				}
-				//startpixel = pixels + (Width*4*y*64) + (4*x*64) + (Width*4*h);
 				startpixel = startpixel + ( Width * 4 ) - ( 4 * bw );
 			}
 		}
 	}
 	free( blockpixels );
 	Sprite2D* ret = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
-												0xff000000, 0x00ff0000,
-												0x0000ff00, 0x00000000,
-												pixels, true, 0x00ff0000 );
+		0xff000000, 0x00ff0000, 0x0000ff00, 0x00000000,
+		pixels, true, 0x00ff0000 );
 	ret->XPos = ret->YPos = 0;
 	return ret;
 }
