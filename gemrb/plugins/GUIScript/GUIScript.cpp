@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.230 2004/10/17 22:18:10 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.231 2004/10/23 13:02:18 avenger_teambg Exp $
  *
  */
 
@@ -2614,13 +2614,14 @@ static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetJournalSize__doc,
-"GetJournalSize(section) => int\n\n"
+"GetJournalSize(chapter[, section]) => int\n\n"
 "Returns the number of entries in the given section of journal." );
 
 static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 {
-	int section;
-	if (!PyArg_ParseTuple( args, "i", &section )) {
+	int section, chapter;
+
+	if (!PyArg_ParseTuple( args, "i|i", &chapter, &section )) {
 		return AttributeError( GemRB_GetJournalSize__doc );
 	}
 
@@ -2628,7 +2629,7 @@ static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 	for (int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
 		GAMJournalEntry* je = core->GetGame()->GetJournalEntry( i );
 		//printf ("JE: sec: %d;   text: %d, time: %d, chapter: %d, un09: %d, un0b: %d\n", je->Section, je->Text, je->GameTime, je->Chapter, je->unknown09, je->unknown0B);
-		if (section == je->Section)
+		if ((section == je->Section) && (chapter==je->Chapter) )
 			count++;
 	}
 
@@ -2636,20 +2637,21 @@ static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 }
 
 PyDoc_STRVAR( GemRB_GetJournalEntry__doc,
-"GetJournalEntry(section, index) => JournalEntry\n\n"
-"Returns dictionary representing journal entry w/ given section and index." );
+"GetJournalEntry(chapter, index[, section]) => JournalEntry\n\n"
+"Returns dictionary representing journal entry w/ given chapter, section and index." );
 
 static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 {
-	int section, index;
-	if (!PyArg_ParseTuple( args, "ii", &section, &index )) {
+	int section=0, index, chapter;
+
+	if (!PyArg_ParseTuple( args, "ii|i", &chapter, &index, &section )) {
 		return AttributeError( GemRB_GetJournalEntry__doc );
 	}
 
 	int count = 0;
 	for (int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
 		GAMJournalEntry* je = core->GetGame()->GetJournalEntry( i );
-		if (section == je->Section) {
+		if ((section == je->Section) && (chapter == je->Chapter)) {
 			if (index == count) {
 				PyObject* dict = PyDict_New();
 				PyDict_SetItemString(dict, "Text", PyInt_FromLong (je->Text));
