@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.151 2004/07/26 22:06:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.152 2004/07/27 21:28:11 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -62,8 +62,18 @@ static Color blue = {
 
 Animation* effect;
 
+#define FORMATIONSIZE 10
+
+typedef Point formation_type[FORMATIONSIZE];
+
+int formationcount;
+static formation_type *formations=NULL;
+
 GameControl::GameControl(void)
 {
+	if(!formations) {
+		ReadFormations();
+	}
 	//this is the default action, individual actors should have one too
 	//at this moment we use only this
 	action = GA_DEFAULT | GA_SELECT | GA_NO_DEAD;
@@ -95,6 +105,50 @@ GameControl::GameControl(void)
 	target = NULL;
 	speaker = NULL;
 	HotKey = 0;
+}
+
+//actually the savegame contains some formation data too, how to use it?
+void GameControl::ReadFormations()
+{
+	TableMgr * tab;
+	int table=core->LoadTable("formatio");
+	if(table<0) {
+		goto fallback;
+	}
+ 	tab = core->GetTable( table);
+	if(!tab) {
+		core->DelTable(table);
+		goto fallback;
+	}
+	formationcount = tab->GetRowCount();
+	formations = (formation_type *) calloc(formationcount, sizeof(formation_type));
+	for(int i=0; i<formationcount; i++) {
+		for(int j=0;j<FORMATIONSIZE;j++) {
+			int k=atoi(tab->QueryField(i,j*2));
+			formations[i][j].x=k;
+			k=atoi(tab->QueryField(i,j*2+1));
+			formations[i][j].y=k;
+		}
+	}
+//
+// read in formation data
+//
+	core->DelTable(table);
+	return;
+fallback:
+	formationcount = 1;
+	formations = (formation_type *) calloc(1,sizeof(formation_type) );
+}
+
+void GameControl::MoveToPointFormation(Actor *actor, int pos, int GameX, int GameY)
+{
+	char Tmp[256];
+	int formation=core->GetGame()->WhichFormation;
+	if(pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
+	GameX+=formations[formation][pos].x*30;
+	GameY+=formations[formation][pos].y*30;
+	sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
+	actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 }
 
 GameControl::~GameControl(void)
@@ -773,10 +827,16 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 					actor=selected[i];
 					actor->ClearPath();
 					actor->ClearActions();
+					//formations should be honoured here
+					//generally a formation pattern is
+					//an array of offsets which alter the
+					//target coordinates based on 'i'
+					MoveToPointFormation(actor,i,GameX,GameY);
+/*
 					char Tmp[256];
 					sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
 					actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
-
+*/
 				}
 			}
 /*

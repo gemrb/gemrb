@@ -87,6 +87,7 @@ private:
 	void CalculateSelection(unsigned short x, unsigned short y);
 	void ResizeDel(Window* win, unsigned char type);
 	void ResizeAdd(Window* win, unsigned char type);
+	void ReadFormations();
 	unsigned char LeftCount, BottomCount, RightCount, TopCount;
 	DialogState* ds;
 	Dialog* dlg;
@@ -101,6 +102,7 @@ public:
 	void HideGUI();
 	void UnhideGUI();
 	void TryToTalk(Actor *source, Actor *target);
+	void MoveToPointFormation(Actor *actor, int pos, int GameX, int GameY);
 	void InitDialog(Actor* speaker, Actor* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
