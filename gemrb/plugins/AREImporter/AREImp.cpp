@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.79 2004/10/17 16:39:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.80 2004/10/17 18:11:23 avenger_teambg Exp $
  *
  */
 
@@ -586,11 +586,11 @@ Map* AREImp::GetMap(const char *ResRef)
 			}
 	
 			if (ab->BaseStats[IE_STATE_ID] & STATE_DEAD)
-				ab->StanceID = IE_ANI_SLEEP;
+				ab->SetStance( IE_ANI_DIE );
 			else
-				ab->StanceID = IE_ANI_AWAKE;
+				ab->SetStance( IE_ANI_AWAKE );
 			
-			ab->Orientation = Orientation%MAX_ORIENT;
+			ab->Orientation = Orientation&(MAX_ORIENT-1);
 			ab->TalkCount = TalkCount;
 			//hack to not load global actors to area
 			//most likely this is unneeded now as we

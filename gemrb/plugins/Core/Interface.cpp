@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.227 2004/10/17 09:30:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.228 2004/10/17 18:11:24 avenger_teambg Exp $
  *
  */
 
@@ -1244,9 +1244,9 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	//both fields are of length 9, make this sure!
 	memcpy(actor->Area, GetGame()->CurrentArea, 9);
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
-		actor->StanceID = IE_ANI_SLEEP;
+		actor->SetStance( IE_ANI_SLEEP );
 	} else {
-		actor->StanceID = IE_ANI_AWAKE;
+		actor->SetStance( IE_ANI_AWAKE );
 	}
 	actor->Orientation = 0;
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.63 2004/10/12 19:55:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.64 2004/10/17 18:11:24 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -200,7 +200,7 @@ void Scriptable::ProcessActions()
 		playDeadCounter--;
 		if (!playDeadCounter) {
 			Moveble* mov = ( Moveble* ) MySelf;
-			mov->StanceID = IE_ANI_GET_UP;
+			mov->SetStance( IE_ANI_GET_UP );
 		}
 	}
 	if (WaitCounter) {
@@ -243,8 +243,8 @@ void Scriptable::ProcessActions()
 		}
 		if (Type == ST_ACTOR) {
 			Moveble* actor = ( Moveble* )this;
-			if (actor->StanceID == IE_ANI_DIE)
-				actor->StanceID = IE_ANI_GET_UP;
+			if (actor->GetStance() == IE_ANI_SLEEP )
+				actor->SetStance( IE_ANI_GET_UP );
 		}
 		GameScript::ExecuteAction( this, CurrentAction );
 		neverExecuted = false;
@@ -378,6 +378,21 @@ Moveble::Moveble(ScriptableType type)
 
 Moveble::~Moveble(void)
 {
+}
+
+unsigned char Moveble::GetStance()
+{
+	return StanceID;
+}
+
+void Moveble::SetStance(unsigned int arg)
+{
+	if(arg<MAX_ANIMS) StanceID=(unsigned char) arg;
+	else
+	{
+		StanceID=IE_ANI_AWAKE; //
+		printMessage("Actor","Tried to set invalid stance id",LIGHT_RED);
+	}
 }
 
 void Moveble::DoStep()

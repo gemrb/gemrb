@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.208 2004/10/17 09:30:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.209 2004/10/17 18:11:24 avenger_teambg Exp $
  *
  */
 
@@ -4619,7 +4619,7 @@ int GameScript::AnimState(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) tar;
-	return actor->StanceID == parameters->int0Parameter;
+	return actor->GetStance() == parameters->int0Parameter;
 }
 
 int GameScript::Time(Scriptable* /*Sender*/, Trigger* parameters)
@@ -5336,7 +5336,7 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 		map = game->GetCurrentMap( );
 	}
 	ab->SetPosition(map, pnt, flags&CC_CHECK_IMPASSABLE, radius );
-	ab->StanceID = IE_ANI_AWAKE;
+	ab->SetStance( IE_ANI_AWAKE );
 	ab->Orientation = parameters->int0Parameter&(MAX_ORIENT-1);
 	map->AddActor( ab );
 
@@ -6155,7 +6155,7 @@ void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->StanceID = parameters->int0Parameter;
+	actor->SetStance( parameters->int0Parameter );
 	actor->SetWait( 1 );
 }
 
@@ -6166,7 +6166,7 @@ void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->StanceID = parameters->int0Parameter;
+	actor->SetStance( parameters->int0Parameter );
 }
 
 /* another object */
@@ -6180,7 +6180,7 @@ void GameScript::SetAnimState(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* target = ( Actor* ) tar;
-	target->StanceID = parameters->int0Parameter;
+	target->SetStance( parameters->int0Parameter );
 }
 
 void GameScript::SetDialogue(Scriptable* Sender, Action* parameters)
@@ -6828,7 +6828,7 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->StanceID = IE_ANI_DIE;
+	actor->SetStance( IE_ANI_DIE );
 	//also set time for playdead!
 	actor->SetWait( parameters->int0Parameter );
 }
@@ -6842,7 +6842,7 @@ void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->StanceID = IE_ANI_DIE;
+	actor->SetStance( IE_ANI_DIE );
 	//also set time for playdead!
 	actor->SetWait( parameters->int0Parameter );
 }
@@ -6854,7 +6854,7 @@ void GameScript::Swing(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->StanceID = IE_ANI_ATTACK;
+	actor->SetStance( IE_ANI_ATTACK );
 	actor->SetWait( 1 );
 }
 
@@ -6865,7 +6865,7 @@ void GameScript::SwingOnce(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->StanceID = IE_ANI_ATTACK;
+	actor->SetStance( IE_ANI_ATTACK );
 	actor->SetWait( 1 );
 }
 
@@ -6875,7 +6875,7 @@ void GameScript::Recoil(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->StanceID = IE_ANI_DAMAGE;
+	actor->SetStance( IE_ANI_DAMAGE );
 	actor->SetWait( 1 );
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.118 2004/10/17 16:39:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.119 2004/10/17 18:11:25 avenger_teambg Exp $
  *
  */
 
@@ -363,13 +363,13 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 if(actor->Orientation>=MAX_ORIENT) {
 	abort();
 }
-			Animation* anim = ca->GetAnimation( actor->StanceID, actor->Orientation );
+			Animation* anim = ca->GetAnimation( actor->GetStance(), actor->Orientation );
 			if (anim &&
 				anim->autoSwitchOnEnd &&
 				anim->endReached &&
 				anim->nextStanceID) {
-				actor->StanceID =anim->nextStanceID;
-				anim = ca->GetAnimation( actor->StanceID, actor->Orientation );
+				actor->SetStance( anim->nextStanceID );
+				anim = ca->GetAnimation( actor->GetStance(), actor->Orientation );
 			}
 			if (( !actor->Modified[IE_NOCIRCLE] ) &&
 			    ( !( actor->Modified[IE_STATE_ID] & STATE_DEAD ) )) {
@@ -398,7 +398,7 @@ if(actor->Orientation>=MAX_ORIENT) {
 					video->BlitSpriteTinted( nextFrame, a.x + viewport.x,
 							a.y + viewport.y, tint, &Screen );
 					if (anim->endReached && anim->autoSwitchOnEnd) {
-						actor->StanceID = anim->nextStanceID;
+						actor->SetStance( anim->nextStanceID );
 						anim->autoSwitchOnEnd = false;
 					}
 				}
@@ -604,25 +604,18 @@ void Map::GenerateQueue(int priority)
 		switch (priority) {
 			case 0:
 				//Top Priority
-				 {
-					if (actor->StanceID != IE_ANI_SLEEP)
-						continue;
-				}
+				if (actor->GetStance() != IE_ANI_SLEEP)
+					continue;
 				break;
 
 			case 1:
 				//Normal Priority
-				 {
-					if (actor->StanceID == IE_ANI_SLEEP)
-						continue;
-				}
+				if (actor->GetStance() == IE_ANI_SLEEP)
+					continue;
 				break;
 
 			case 2:
-				 {
-					continue;
-				}
-				break;
+				continue;
 		} 
 		Qcount[priority]++;
 		queue[priority][Qcount[priority] - 1] = actor;

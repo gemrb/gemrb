@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.74 2004/10/17 10:14:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.75 2004/10/17 18:11:24 avenger_teambg Exp $
  *
  */
 
@@ -441,7 +441,7 @@ void Actor::Die(Scriptable *killer)
 	if(Modified[IE_HITPOINTS]<=0) {
 		InternalFlags|=IF_REALLYDIED;
 	}
-        StanceID = IE_ANI_DIE;
+        SetStance( IE_ANI_DIE );
 }
 
 bool Actor::CheckOnDeath()
@@ -529,7 +529,7 @@ void Actor::GetNextStance()
 
 	if (--Stance < 0) Stance = MAX_ANIMS-1;
 	printf ("StanceID: %d\n", Stance);
-	StanceID = Stance;
+	SetStance( Stance );
 }
 
 //this should be set in a guiscript, and stored in the spellbook structure

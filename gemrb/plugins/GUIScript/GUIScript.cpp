@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.228 2004/10/17 17:25:50 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.229 2004/10/17 18:11:25 avenger_teambg Exp $
  *
  */
 
@@ -3132,7 +3132,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	//setting PST's starting stance to 18
 	poi = mtm->QueryField( 0, 1 );
 	if (*poi != '*') {
-		MyActor->StanceID = atoi( poi );
+		MyActor->SetStance( atoi( poi ) );
 	}
 	core->DelTable( mastertable );
 	// 0 - single player, 1 - tutorial, 2 - multiplayer

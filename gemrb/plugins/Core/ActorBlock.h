@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.49 2004/10/12 19:47:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.50 2004/10/17 18:11:24 avenger_teambg Exp $
  *
  */
 
@@ -185,12 +185,13 @@ public:
 };
 
 class GEM_EXPORT Moveble : public Selectable {
+private: //this one seems to be sensitive, so gets protection
+	unsigned char StanceID;
 public:
 	Moveble(ScriptableType type);
 	virtual ~Moveble(void);
 	Point Destination;
 	unsigned char Orientation;
-	unsigned char StanceID;
 	PathNode* path;
 	PathNode* step;
 	unsigned long timeStartStep;
@@ -199,6 +200,8 @@ public:
 	ieDword TalkCount;
 	int InternalFlags;
 public:
+	void SetStance(unsigned int arg);
+	unsigned char GetStance();
 	void DoStep();
 	void AddWayPoint(Point &Des);
 	void RunAwayFrom(Point &Des, int PathLength, bool Backing);

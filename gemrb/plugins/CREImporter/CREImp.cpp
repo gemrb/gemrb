@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.49 2004/10/17 07:06:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.50 2004/10/17 18:11:24 avenger_teambg Exp $
  *
  */
 
@@ -178,6 +178,8 @@ Actor* CREImp::GetActor()
 	if(!str)
 		return NULL;
 	Actor* act = new Actor();
+	if(!act)
+		return NULL;
 	act->InParty = 0;
 	ieDword strref;
 	str->ReadDword( &strref );
