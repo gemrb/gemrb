@@ -48,7 +48,11 @@ public:
   void AddControl(Control * ctrl);
   /** This function Draws the Window on the Output Screen */
   void DrawWindow();
-private: // Private attributes
+  /** Returns the Control at X,Y Coordinates */
+  Control * GetControl(unsigned short x, unsigned short y);
+  /** Sets 'ctrl' as Focused */
+  void SetFocused(Control * ctrl);
+public: //Public attributes
   /** Window ID */
   unsigned short WindowID;
   /** X Position */
@@ -59,10 +63,15 @@ private: // Private attributes
   unsigned short Width;
   /** Height */
   unsigned short Height;
+private: // Private attributes
   /** BackGround Image. No BackGround if this variable is NULL. */
   Sprite2D * BackGround;
   /** Controls Array */
   std::vector<Control*> Controls;
+  /** Last Control returned by GetControl */
+  Control * lastC;
+  /** Last Focused Control */
+  Control * lastFocus;
 public:
 	void release(void);
 };

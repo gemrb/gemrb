@@ -29,6 +29,8 @@ Window::Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos
 	this->Width = Width;
 	this->Height = Height;
 	this->BackGround = NULL;
+	lastC = NULL;
+	lastFocus = NULL;
 }
 
 Window::~Window()
@@ -64,6 +66,40 @@ void Window::DrawWindow()
 	for(m = Controls.begin(); m != Controls.end(); ++m) {
 		(*m)->Draw(XPos, YPos);
 	}
+}
+
+/** Returns the Control at X,Y Coordinates */
+Control * Window::GetControl(unsigned short x, unsigned short y)
+{
+	Control * ctrl = NULL;
+	//Check if we are always on the last control
+	if(lastC != NULL) {
+		if((XPos+lastC->XPos <= x) && (YPos+lastC->YPos <= y)) { //Maybe we are always there
+			if((XPos+lastC->XPos+lastC->Width >= x) && (YPos+lastC->YPos+lastC->Height >= y)) { //Yes, we are on the last returned Control
+				return lastC;
+			}
+		}
+	}
+	std::vector<Control*>::iterator m;
+	for(m = Controls.begin(); m != Controls.end(); m++) {
+		if((XPos+(*m)->XPos <= x) && (YPos+(*m)->YPos <= y)) { //Maybe we are on this control
+			if((XPos+(*m)->XPos+(*m)->Width >= x) && (YPos+(*m)->YPos+(*m)->Height >= y)) { //Yes, we are here
+				ctrl = *m;
+				break;
+			}
+		}
+	}
+	lastC = ctrl;
+	return ctrl;
+}
+
+/** Sets 'ctrl' as Focused */
+void Window::SetFocused(Control * ctrl)
+{
+	if(lastFocus != NULL)
+		lastFocus->hasFocus = false;
+	lastFocus = ctrl;
+	lastFocus->hasFocus = true;
 }
 
 void Window::release(void)
