@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.6 2004/09/13 20:19:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.7 2004/09/17 17:06:47 avenger_teambg Exp $
  *
  */
 
@@ -35,7 +35,9 @@
 #endif
 
 typedef unsigned char ieByte;
+typedef signed char ieByteSigned;
 typedef unsigned short ieWord;
+typedef signed short ieWordSigned;
 
 #if (SIZEOF_INT == 4)
 typedef unsigned int ieDword;
