@@ -18,22 +18,49 @@ def OnLoad():
 	GemRB.SetVisible(MessageBarWindow, 0)
 	GemRB.SetVisible(CharactersBarWindow, 0)
 	
-	OptionsWindow = GemRB.LoadWindow(2)
-	#Hiding unused buttons
-	Button = GemRB.GetControl(OptionsWindow, 9)
-	GemRB.SetButtonFlags(OptionsWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-	GemRB.SetButtonState(OptionsWindow, Button, IE_GUI_BUTTON_DISABLED)
+	GemRB.UnloadWindow(MessageBarWindow)
+	GemRB.UnloadWindow(CharactersBarWindow)
 	
-	Button = GemRB.GetControl(OptionsWindow, 14)
-	GemRB.SetButtonFlags(OptionsWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-	GemRB.SetButtonState(OptionsWindow, Button, IE_GUI_BUTTON_DISABLED)
+	OptionsWindow = GemRB.LoadWindow(13)
 	
-	Button = GemRB.GetControl(OptionsWindow, 13)
-	GemRB.SetButtonFlags(OptionsWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-	GemRB.SetButtonState(OptionsWindow, Button, IE_GUI_BUTTON_DISABLED)
+	VersionLabel = GemRB.GetControl(OptionsWindow, 0x1000000B)
+	GemRB.SetText(OptionsWindow, VersionLabel, GEMRB_VERSION)
+	
+	GraphicsButton = GemRB.GetControl(OptionsWindow, 7)
+	SoundButton = GemRB.GetControl(OptionsWindow, 8)
+	GamePlayButton = GemRB.GetControl(OptionsWindow, 9)
+	MoviesButton = GemRB.GetControl(OptionsWindow, 14)
+	KeyboardButton = GemRB.GetControl(OptionsWindow, 13)
+	ReturnButton = GemRB.GetControl(OptionsWindow, 11)
+	
+	GemRB.SetText(OptionsWindow, GraphicsButton, 17162)
+	GemRB.SetEvent(OptionsWindow, GraphicsButton, IE_GUI_BUTTON_ON_PRESS, "GraphicsPress")
+	GemRB.SetText(OptionsWindow, SoundButton, 17164)
+	GemRB.SetEvent(OptionsWindow, SoundButton, IE_GUI_BUTTON_ON_PRESS, "SoundPress")
+	GemRB.SetText(OptionsWindow, GamePlayButton, 17165)
+	GemRB.SetText(OptionsWindow, MoviesButton, 15415)
+	GemRB.SetText(OptionsWindow, KeyboardButton, 33468)
+	GemRB.SetText(OptionsWindow, ReturnButton, 10308)
+	GemRB.SetEvent(OptionsWindow, ReturnButton, IE_GUI_BUTTON_ON_PRESS, "ReturnPress")
 	
 	GemRB.SetVisible(OptionsWindow, 1)
 	
 	return
 	
+def ReturnPress():
+	global OptionsWindow
+	GemRB.UnloadWindow(OptionsWindow)
+	GemRB.SetNextScript("Start")
+	return
 	
+def GraphicsPress():
+	global OptionsWindow
+	GemRB.UnloadWindow(OptionsWindow)
+	GemRB.SetNextScript("Graphics")
+	return
+	
+def SoundPress():
+	global OptionsWindow
+	GemRB.UnloadWindow(OptionsWindow)
+	GemRB.SetNextScript("Sound")
+	return
