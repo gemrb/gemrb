@@ -67,6 +67,7 @@ bool dir_exists(const char *path);
 #ifdef WIN32
 
 #else
+char * FindInDir(char * Dir, char * Filename);
 char *strupr(char *string);
 char *strlwr(char *string);
 #endif
