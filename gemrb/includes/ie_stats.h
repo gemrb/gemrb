@@ -194,8 +194,7 @@
 #define IE_LEATHER_COLOR	212
 #define IE_ARMOR_COLOR		213
 #define IE_HAIR_COLOR		214
-#define IE_MC_FLAGS			215
+#define IE_MC_FLAGS		215
 #define IE_TALKCOUNT		216
-
 
 #endif
