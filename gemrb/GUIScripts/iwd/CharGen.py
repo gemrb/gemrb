@@ -6,6 +6,7 @@ CharGenWindow = 0
 CharGenState = 0
 TextArea = 0
 PortraitButton = 0
+AcceptButton = 0
 
 GenderButton = 0
 GenderWindow = 0
@@ -87,14 +88,16 @@ CharSoundStrings = 0
 
 BiographyButton = 0
 BiographyWindow = 0
+BiographyField = 0
 
 NameButton = 0
 NameWindow = 0
+NameField = 0
 NameDoneButton = 0
 
 
 def OnLoad():
-	global CharGenWindow, CharGenState, TextArea, PortraitButton
+	global CharGenWindow, CharGenState, TextArea, PortraitButton, AcceptButton
 	global GenderButton, RaceButton, ClassButton, AlignmentButton, AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
 
 	GemRB.LoadWindowPack("GUICG")
@@ -183,6 +186,8 @@ def BackPress():
 	global GenderButton, RaceButton, ClassButton, AlignmentButton, AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
 	if CharGenState > 0:
 		CharGenState = CharGenState - 1
+	if CharGenState > 6:
+		CharGenState = 6
 	if CharGenState == 0:
 		GemRB.SetButtonState(CharGenWindow, RaceButton, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonState(CharGenWindow, GenderButton, IE_GUI_BUTTON_ENABLED)
@@ -220,6 +225,11 @@ def AcceptPress():
 def SetCharacterDescription():
 	global CharGenWindow, TextArea, CharGenState, ClassTable, RaceTable, AlignmentTable, AbilitiesTable, SkillsTable, ProficienciesTable, RacialEnemyTable
 	GemRB.TextAreaClear(CharGenWindow, TextArea)
+	if CharGenState > 7:
+		GemRB.TextAreaAppend(CharGenWindow, TextArea, 1047)
+		GemRB.TextAreaAppend(CharGenWindow, TextArea, ": ")
+		GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetToken("Name"))
+		GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 	if CharGenState > 0:
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 12135)
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, ": ")
@@ -1080,7 +1090,7 @@ def ProficienciesSelect():
 	GemRB.SetVisible(CharGenWindow, 0)
 	ProficienciesWindow = GemRB.LoadWindow(9)
 	ClassName = GemRB.GetTableRowName(ClassTable, GemRB.GetVar("Class") - 1)
-	ProficienciesTable = GemRB.LoadTable("PROFCNCS")
+	ProficienciesTable = GemRB.LoadTable("WEAPPROF")
 	ProfsTable = GemRB.LoadTable("PROFS")
 	ProfsMaxTable = GemRB.LoadTable("PROFSMAX")
 	ClassWeaponsTable = GemRB.LoadTable("CLASWEAP")
@@ -1099,6 +1109,7 @@ def ProficienciesSelect():
 
 		for j in range (0, 5):
 			ProficienciesMark = GemRB.GetControl(ProficienciesWindow, 27 + i * 5 + j)
+			GemRB.SetButtonSprites(ProficienciesWindow, ProficienciesMark, "GUIPFC", 0, 0, 0, 0, 0)
 			GemRB.SetButtonState(ProficienciesWindow, ProficienciesMark, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetButtonFlags(ProficienciesWindow, ProficienciesMark, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
@@ -1130,6 +1141,7 @@ def ProficienciesSelect():
 
 		for j in range (0, 5):
 			ProficienciesMark = GemRB.GetControl(ProficienciesWindow, 92 + i * 5 + j)
+			GemRB.SetButtonSprites(ProficienciesWindow, ProficienciesMark, "GUIPFC", 0, 0, 0, 0, 0)
 			GemRB.SetButtonState(ProficienciesWindow, ProficienciesMark, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetButtonFlags(ProficienciesWindow, ProficienciesMark, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
@@ -1201,7 +1213,6 @@ def ProficienciesPlusPress():
 		else:
 			ControlID = 51 + ProficienciesIndex * 5 + ProficienciesValue
 		ProficienciesMark = GemRB.GetControl(ProficienciesWindow, ControlID)
-		# TODO: get this right
 		GemRB.SetButtonFlags(ProficienciesWindow, ProficienciesMark, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		
 	GemRB.SetText(ProficienciesWindow, ProficienciesTextArea, GemRB.GetTableValue(ProficienciesTable, ProficienciesIndex, 1) )
@@ -1398,7 +1409,7 @@ def AppearanceColorChoice(CurrentColor):
 			ColorButton = GemRB.GetControl(AppearanceColorWindow, i)
 			GemRB.SetButtonBAM(AppearanceColorWindow, ColorButton, "COLGRAD", 2, 0, Color)
 			GemRB.SetEvent(AppearanceColorWindow, ColorButton, IE_GUI_BUTTON_ON_PRESS, "AppearanceColorSelected")
-			GemRB.SetVarAssoc(AppearanceColorWindow, ColorButton, "SelectedColor", i)
+			GemRB.SetVarAssoc(AppearanceColorWindow, ColorButton, "SelectedColor", Color)
 	
 	GemRB.SetVisible(AppearanceColorWindow, 1)
 	return
@@ -1505,25 +1516,35 @@ def CharSoundCancelPress():
 # Biography Selection
 
 def BiographyPress():
-	global CharGenWindow, BiographyWindow, BiographyDoneButton
+	global CharGenWindow, BiographyWindow, BiographyField
 	GemRB.SetVisible(CharGenWindow, 0)
 	BiographyWindow = GemRB.LoadWindow(51)
 
-	BiographyDoneButton = GemRB.GetControl(BiographyWindow, 5)
+	BiographyField = GemRB.GetControl(BiographyWindow, 4)
+	GemRB.SetText(BiographyWindow, BiographyField, 19423)
+
+	BiographyClearButton = GemRB.GetControl(BiographyWindow, 5)
+	GemRB.SetButtonState(BiographyWindow, BiographyClearButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(BiographyWindow, BiographyClearButton, IE_GUI_BUTTON_ON_PRESS, "BiographyClearPress")
+	GemRB.SetText(BiographyWindow, BiographyClearButton, 18622)
+
+	BiographyCancelButton = GemRB.GetControl(BiographyWindow, 2)
+	GemRB.SetButtonState(BiographyWindow, BiographyCancelButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(BiographyWindow, BiographyCancelButton, IE_GUI_BUTTON_ON_PRESS, "BiographyCancelPress")
+	GemRB.SetText(BiographyWindow, BiographyCancelButton, 13727)
+
+	BiographyDoneButton = GemRB.GetControl(BiographyWindow, 1)
 	GemRB.SetButtonState(BiographyWindow, BiographyDoneButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(BiographyWindow, BiographyDoneButton, IE_GUI_BUTTON_ON_PRESS, "BiographyDonePress")
 	GemRB.SetText(BiographyWindow, BiographyDoneButton, 11973)
 	GemRB.SetButtonFlags(BiographyWindow, BiographyDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 
-	BiographyCancelButton = GemRB.GetControl(BiographyWindow, 1)
-	GemRB.SetButtonState(BiographyWindow, BiographyCancelButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(BiographyWindow, BiographyCancelButton, IE_GUI_BUTTON_ON_PRESS, "BiographyCancelPress")
-	GemRB.SetText(BiographyWindow, BiographyCancelButton, 13727)
-
 	GemRB.SetVisible(BiographyWindow, 1)
 	return
 
-def BiographyDonePress():
+def BiographyClearPress():
+	global BiographyWindow, BiographyField
+	GemRB.SetText(BiographyWindow, BiographyField, "")
 	return
 
 def BiographyCancelPress():
@@ -1532,13 +1553,23 @@ def BiographyCancelPress():
 	GemRB.SetVisible(CharGenWindow, 1)
 	return
 
+def BiographyDonePress():
+	global CharGenWindow, BiographyWindow, BiographyField
+	GemRB.SetToken("Biography", GemRB.QueryText(BiographyWindow, BiographyField) )
+	GemRB.UnloadWindow(BiographyWindow)
+	GemRB.SetVisible(CharGenWindow, 1)
+	return
+
 
 # Name Selection
 
 def NamePress():
-	global CharGenWindow, NameWindow, NameDoneButton
+	global CharGenWindow, NameWindow, NameDoneButton, NameField
 	GemRB.SetVisible(CharGenWindow, 0)
 	NameWindow = GemRB.LoadWindow(5)
+
+	NameField = GemRB.GetControl(NameWindow, 2)
+	GemRB.SetEvent(NameWindow, NameField, IE_GUI_EDIT_ON_CHANGE, "NameEditChange")
 
 	NameDoneButton = GemRB.GetControl(NameWindow, 0)
 	GemRB.SetButtonState(NameWindow, NameDoneButton, IE_GUI_BUTTON_DISABLED)
@@ -1554,7 +1585,22 @@ def NamePress():
 	GemRB.SetVisible(NameWindow, 1)
 	return
 
+def NameEditChange():
+	global NameField
+	if GemRB.QueryText(NameWindow, NameField) == "":
+		GemRB.SetButtonState(NameWindow, NameDoneButton, IE_GUI_BUTTON_DISABLED)
+	else:
+		GemRB.SetButtonState(NameWindow, NameDoneButton, IE_GUI_BUTTON_ENABLED)
+	return
+
 def NameDonePress():
+	global CharGenWindow, CharGenState, NameWindow, NameField, AcceptButton
+	GemRB.SetToken("Name", GemRB.QueryText(NameWindow, NameField) )
+	GemRB.UnloadWindow(NameWindow)
+	GemRB.SetButtonState(CharGenWindow, AcceptButton, IE_GUI_BUTTON_ENABLED)
+	CharGenState = 8
+	SetCharacterDescription()
+	GemRB.SetVisible(CharGenWindow, 1)
 	return
 
 def NameCancelPress():
