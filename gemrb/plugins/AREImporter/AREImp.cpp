@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.14 2003/11/29 20:33:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.15 2003/11/30 00:42:35 balrog994 Exp $
  *
  */
 
@@ -248,6 +248,10 @@ Map * AREImp::GetMap()
 		str->Read(&FirstVertex, 4);
 		str->Seek(4, GEM_CURRENT_POS);
 		str->Read(&Cursor, 4);
+		str->Seek(44, GEM_CURRENT_POS);
+		unsigned long StrRef;
+		str->Read(&StrRef, 4);
+		char * string = core->GetString(StrRef);
 		str->Seek(VerticesOffset + (FirstVertex*4), GEM_STREAM_START);
 		Point * points = (Point*)malloc(VertexCount*sizeof(Point));
 		for(int x = 0; x < VertexCount; x++) {
@@ -259,6 +263,9 @@ Map * AREImp::GetMap()
 		poly->BBox = bbox;
 		InfoPoint * ip = tm->AddInfoPoint(Name, Type, poly);
 		ip->Cursor = Cursor;
+		ip->String = string;
+		ip->textDisplaying = 0;
+		ip->startDisplayTime = 0;
 	}
 	//Loading Actors
 	str->Seek(ActorOffset, GEM_STREAM_START);
