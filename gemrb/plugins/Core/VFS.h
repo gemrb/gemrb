@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.10 2004/08/03 21:31:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.11 2005/02/15 16:33:17 avenger_teambg Exp $
  *
  */
 
@@ -108,5 +108,6 @@ GEM_EXPORT int _fclose(_FILE* stream);
 
 GEM_EXPORT char* PathAppend (char* target, char* dir);
 GEM_EXPORT char* PathJoin (char* target, ...);
+GEM_EXPORT void FixPath (char *path, bool needslash);
 
 #endif  // !VFS_H

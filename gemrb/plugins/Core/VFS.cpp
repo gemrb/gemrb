@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.7 2004/10/09 09:14:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.8 2005/02/15 16:33:17 avenger_teambg Exp $
  *
  */
 
@@ -256,3 +256,24 @@ char* PathJoin (char* target, ...)
 
 	return target;
 }
+
+/* Fixes path delimiter character (slash)
+ * needslash = true : we add a slash
+ * needslash = false: we remove the slash
+ */
+void FixPath (char *path, bool needslash)
+{
+	unsigned int i=strlen(path)-1;
+
+	if(i>=MAX_PATH) return; //don't do anything
+	if(needslash) {
+		if(path[i]=='/' || path[i]=='\\') return;
+		i++;
+		path[i++]=PathDelimiter;
+	}
+	else {
+		if(path[i]!='/' && path[i]!='\\') return;
+	}
+	path[i]=0;
+}
+
