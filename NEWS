@@ -1,3 +1,14 @@
+GemRB V0.2.4 (2005-03...):
+  New features:
+    - Store dialogs (Temple, Inn, Container, Tavern, Store)
+    - Fog of war with line of sight
+    - Doors block path and line of sight
+
+  Improved features:
+    - Fixed dialogs
+    - new GUIScript functions with documentation
+    - Fog of war/door/store related gamescript actions
+
 GemRB v0.2.3 (2005-02-13):
   New features:
     - GUI for most of the games, especially interactive Inventory and Spellbook
