@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.4 2004/11/07 22:56:26 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.5 2004/11/07 23:13:44 edheldil Exp $
  *
  */
 
@@ -220,18 +220,7 @@ int fx_save_vs_death_modifier (Actor* target, Effect* fx)
 {
 	printf( "fx_save_vs_death_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_SAVEVSDEATH, fx->Parameter1);
-		break;
-	case 1:
-		STAT_SET( IE_SAVEVSDEATH, fx->Parameter1);
-		break;
-	case 2:
-		STAT_MUL( IE_SAVEVSDEATH, fx->Parameter1);
-		break;
-	// default: FIXME:should not happen
-	}
+	target->NewStat( IE_SAVEVSDEATH, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
@@ -240,18 +229,7 @@ int fx_save_vs_wands_modifier (Actor* target, Effect* fx)
 {
 	printf( "fx_save_vs_wands_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_SAVEVSWANDS, fx->Parameter1);
-		break;
-	case 1:
-		STAT_SET( IE_SAVEVSWANDS, fx->Parameter1);
-		break;
-	case 2:
-		STAT_MUL( IE_SAVEVSWANDS, fx->Parameter1);
-		break;
-	// default: FIXME:should not happen
-	}
+	target->NewStat( IE_SAVEVSWANDS, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
@@ -260,18 +238,7 @@ int fx_save_vs_poly_modifier (Actor* target, Effect* fx)
 {
 	printf( "fx_save_vs_poly_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_SAVEVSPOLY, fx->Parameter1);
-		break;
-	case 1:
-		STAT_SET( IE_SAVEVSPOLY, fx->Parameter1);
-		break;
-	case 2:
-		STAT_MUL( IE_SAVEVSPOLY, fx->Parameter1);
-		break;
-	// default: FIXME:should not happen
-	}
+	target->NewStat( IE_SAVEVSPOLY, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
@@ -280,18 +247,7 @@ int fx_save_vs_breath_modifier (Actor* target, Effect* fx)
 {
 	printf( "fx_save_vs_breath_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_SAVEVSBREATH, fx->Parameter1);
-		break;
-	case 1:
-		STAT_SET( IE_SAVEVSBREATH, fx->Parameter1);
-		break;
-	case 2:
-		STAT_MUL( IE_SAVEVSBREATH, fx->Parameter1);
-		break;
-	// default: FIXME:should not happen
-	}
+	target->NewStat( IE_SAVEVSBREATH, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
@@ -300,18 +256,7 @@ int fx_save_vs_spell_modifier (Actor* target, Effect* fx)
 {
 	printf( "fx_save_vs_spell_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_SAVEVSSPELL, fx->Parameter1);
-		break;
-	case 1:
-		STAT_SET( IE_SAVEVSSPELL, fx->Parameter1);
-		break;
-	case 2:
-		STAT_MUL( IE_SAVEVSSPELL, fx->Parameter1);
-		break;
-	// default: FIXME:should not happen
-	}
+	target->NewStat( IE_SAVEVSSPELL, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
@@ -320,18 +265,7 @@ int fx_strength_modifier (Actor* target, Effect* fx)
 {
 	printf( "fx_strength_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_STR, fx->Parameter1);
-		break;
-	case 1:
-		STAT_SET( IE_STR, fx->Parameter1);
-		break;
-	case 2:
-		STAT_MUL( IE_STR, fx->Parameter1);
-		break;
-	// default: FIXME:should not happen
-	}
+	target->NewStat( IE_STR, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
@@ -340,18 +274,7 @@ int fx_to_hit_modifier (Actor* target, Effect* fx)
 {
 	printf( "fx_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_THAC0, fx->Parameter1);
-		break;
-	case 1:
-		STAT_SET( IE_THAC0, fx->Parameter1);
-		break;
-	case 2:
-		STAT_MUL( IE_THAC0, fx->Parameter1);
-		break;
-	// default: FIXME:should not happen
-	}
+	target->NewStat( IE_THAC0, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
@@ -360,18 +283,7 @@ int fx_stealth_bonus (Actor* target, Effect* fx)
 {
 	printf( "fx_stealth_bonus (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_STEALTH, fx->Parameter1);
-		break;
-	case 1:
-		STAT_SET( IE_STEALTH, fx->Parameter1);
-		break;
-	case 2:
-		STAT_MUL( IE_STEALTH, fx->Parameter1);
-		break;
-	// default: FIXME:should not happen
-	}
+	target->NewStat( IE_STEALTH, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
@@ -396,18 +308,7 @@ int fx_open_locks_modifier (Actor* target, Effect* fx)
 {
 	printf( "fx_open_locks_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_LOCKPICKING, fx->Parameter1);
-		break;
-	case 1:
-		STAT_SET( IE_LOCKPICKING, fx->Parameter1);
-		break;
-	case 2:
-		STAT_MUL( IE_LOCKPICKING, fx->Parameter1);
-		break;
-	// default: FIXME:should not happen
-	}
+	target->NewStat( IE_LOCKPICKING, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
@@ -416,17 +317,6 @@ int fx_resistance_to_magic_damage (Actor* target, Effect* fx)
 {
 	printf( "fx_resistance_to_magic_damage (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_MAGICDAMAGERESISTANCE, fx->Parameter1);
-		break;
-	case 1:
-		STAT_SET( IE_MAGICDAMAGERESISTANCE, fx->Parameter1);
-		break;
-	case 2:
-		STAT_MUL( IE_MAGICDAMAGERESISTANCE, fx->Parameter1);
-		break;
-	// default: FIXME:should not happen
-	}
+	target->NewStat( IE_MAGICDAMAGERESISTANCE, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
