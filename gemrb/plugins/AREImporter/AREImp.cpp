@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.58 2004/08/04 16:18:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.59 2004/08/05 17:25:06 avenger_teambg Exp $
  *
  */
 
@@ -249,8 +249,8 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->Read( &points[x].x, 2 );
 			str->Read( &points[x].y, 2 );
 		}
-		Gem_Polygon* open = new Gem_Polygon( points, OpenVerticesCount );
-		open->BBox = BBOpen;
+		Gem_Polygon* open = new Gem_Polygon( points, OpenVerticesCount, &BBOpen );
+//		open->BBox = BBOpen;
 		free( points );
 		//Reading Closed Polygon
 		str->Seek( VerticesOffset + ( ClosedFirstVertex * 4 ),
@@ -260,8 +260,8 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->Read( &points[x].x, 2 );
 			str->Read( &points[x].y, 2 );
 		}
-		Gem_Polygon* closed = new Gem_Polygon( points, ClosedVerticesCount );
-		closed->BBox = BBClosed;
+		Gem_Polygon* closed = new Gem_Polygon( points, ClosedVerticesCount, &BBClosed );
+//		closed->BBox = BBClosed;
 		free( points );
 		//Getting Door Information from the WED File
 		bool BaseClosed;
@@ -332,9 +332,9 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->Read( &points[x].x, 2 );
 			str->Read( &points[x].y, 2 );
 		}
-		Gem_Polygon* poly = new Gem_Polygon( points, vertCount );
+		Gem_Polygon* poly = new Gem_Polygon( points, vertCount, &bbox );
 		free( points );
-		poly->BBox = bbox;
+//		poly->BBox = bbox;
 		Container* c = tm->AddContainer( Name, Type, poly );
 		c->LockDifficulty = LockDiff;
 		c->Locked = Locked;
@@ -406,9 +406,9 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->Read( &points[x].x, 2 );
 			str->Read( &points[x].y, 2 );
 		}
-		Gem_Polygon* poly = new Gem_Polygon( points, VertexCount );
+		Gem_Polygon* poly = new Gem_Polygon( points, VertexCount, &bbox);
 		free( points );
-		poly->BBox = bbox;
+//		poly->BBox = bbox;
 		InfoPoint* ip = tm->AddInfoPoint( Name, Type, poly );
 		ip->TrapDetectionDifficulty = TrapDetDiff;
 		ip->TrapRemovalDifficulty = TrapRemDiff;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.8 2004/08/05 16:02:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.9 2004/08/05 17:25:05 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
@@ -23,17 +23,19 @@
 
 extern Interface* core;
 
-Gem_Polygon::Gem_Polygon(Point* points, int cnt, bool precalculate, Color* color)
+Gem_Polygon::Gem_Polygon(Point* points, int cnt, Region *bbox, bool precalculate, Color* color)
 {
 	if (cnt) {
 		this->points = ( Point * ) malloc( cnt * sizeof( Point ) );
+		memcpy( this->points, points, cnt * sizeof( Point ) );
 	} else {
 		this->points = NULL;
 	}
-	memcpy( this->points, points, cnt * sizeof( Point ) );
 	count = cnt;
+	if(bbox) BBox=*bbox;
+	else RecalcBBox();
 	if (precalculate) {
-		fill = core->GetVideoDriver()->PrecalculatePolygon( points, cnt, *color );
+		fill = core->GetVideoDriver()->PrecalculatePolygon( this, *color); //points, cnt, *color, BBox );
 	} else {
 		fill = NULL;
 	}

@@ -23,8 +23,8 @@ typedef struct Point {
 
 class GEM_EXPORT Gem_Polygon {
 public:
-	Gem_Polygon(Point* points, int count, bool precalculate = false,
-		Color* color = NULL);
+	Gem_Polygon(Point* points, int count, Region *bbox = NULL,
+		bool precalculate = false, Color* color = NULL);
 	~Gem_Polygon(void);
 	Region BBox;
 	Point* points;

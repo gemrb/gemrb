@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.10 2004/02/24 22:20:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.11 2004/08/05 17:25:07 avenger_teambg Exp $
  *
  */
 
@@ -150,6 +150,7 @@ TileMap* WEDImp::GetTileMap()
 		str->Seek(OpenPolyOffset, GEM_STREAM_START);
 		unsigned long StartingVertex, VerticesCount;
 		unsigned short BitFlag, MinX, MaxX, MinY, MaxY;
+		Region BBox;
 		str->Read(&StartingVertex, 4);
 		str->Read(&VerticesCount, 4);
 		str->Read(&BitFlag, 2);
@@ -157,6 +158,11 @@ TileMap* WEDImp::GetTileMap()
 		str->Read(&MaxX, 2);
 		str->Read(&MinY, 2);
 		str->Read(&MaxY, 2);
+		BBox.x = minX;
+		BBox.y = minY;
+		BBox.w = maxX - minX;
+		BBox.h = maxY - minY;
+
 		//Reading Vertices
 		str->Seek(VerticesOffset + (StartingVertex*4), GEM_STREAM_START);
 		Point * points = (Point*)malloc(VerticesCount*sizeof(Point));
@@ -164,12 +170,12 @@ TileMap* WEDImp::GetTileMap()
 			str->Read(&points[i].x, 2);
 			str->Read(&points[i].y, 2);
 		}
-		Gem_Polygon * open = new Gem_Polygon(points, VerticesCount);
+		Gem_Polygon * open = new Gem_Polygon(points, VerticesCount, BBox);
 		free(points);
-		open->BBox.x = MinX;
-		open->BBox.y = MinY;
-		open->BBox.w = MaxX-MinX;
-		open->BBox.h = MaxY-MinY;
+//		open->BBox.x = MinX;
+//		open->BBox.y = MinY;
+//		open->BBox.w = MaxX-MinX;
+//		open->BBox.h = MaxY-MinY;
 		//Reading the closed Polygon
 		str->Seek(ClosedPolyOffset, GEM_STREAM_START);
 		str->Read(&StartingVertex, 4);
@@ -179,6 +185,11 @@ TileMap* WEDImp::GetTileMap()
 		str->Read(&MaxX, 2);
 		str->Read(&MinY, 2);
 		str->Read(&MaxY, 2);
+		BBox.x = minX;
+		BBox.y = minY;
+		BBox.w = maxX - minX;
+		BBox.h = maxY - minY;
+
 		//Reading Vertices
 		str->Seek(VerticesOffset + (StartingVertex*4), GEM_STREAM_START);
 		points = (Point*)malloc(VerticesCount*sizeof(Point));
@@ -186,12 +197,12 @@ TileMap* WEDImp::GetTileMap()
 			str->Read(&points[i].x, 2);
 			str->Read(&points[i].y, 2);
 		}
-		Gem_Polygon * closed = new Gem_Polygon(points, VerticesCount);
+		Gem_Polygon * closed = new Gem_Polygon(points, VerticesCount, BBox);
 		free(points);
-		closed->BBox.x = MinX;
-		closed->BBox.y = MinY;
-		closed->BBox.w = MaxX-MinX;
-		closed->BBox.h = MaxY-MinY;
+//		closed->BBox.x = MinX;
+//		closed->BBox.y = MinY;
+//		closed->BBox.w = MaxX-MinX;
+//		closed->BBox.h = MaxY-MinY;
 		tm->AddDoor(Name, DoorClosed, DoorTiles, DoorTileCount, open, closed);
 	}*/
 	core->FreeInterface( tis );

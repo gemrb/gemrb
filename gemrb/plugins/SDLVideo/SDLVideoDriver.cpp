@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.78 2004/08/03 20:21:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.79 2004/08/05 17:25:07 avenger_teambg Exp $
  *
  */
 
@@ -1287,9 +1287,10 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 	}
 }
 
-Sprite2D* SDLVideoDriver::PrecalculatePolygon(Point* points, int count,
-	Color& color)
+Sprite2D* SDLVideoDriver::PrecalculatePolygon(Gem_Polygon *poly, Color &color)
+//Point* points, int count, Color& color, Region& BBox)
 {
+/* we don't need this, the BBox is already stored in the area
 	short minX = 20000, maxX = 0, minY = 20000, maxY = 0;
 	for (int i = 0; i < count; i++) {
 		if (points[i].x < minX)
@@ -1303,23 +1304,24 @@ Sprite2D* SDLVideoDriver::PrecalculatePolygon(Point* points, int count,
 	}
 	short width = maxX - minX;
 	short height = maxY - minY;
+*/
 
-	void* pixels = malloc( width* height );
-	memset( pixels, 0, width * height );
+	void* pixels = malloc( poly->BBox.w * poly->BBox.h );
+	memset( pixels, 0, poly->BBox.w * poly->BBox.h );
 
 	unsigned char * ptr = ( unsigned char * ) pixels;
 
-	Gem_Polygon* poly = new Gem_Polygon( points, count );
+//	Gem_Polygon* poly = new Gem_Polygon( points, count, BBox );
 
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
-			if (poly->PointIn( x + minX, y + minY ))
+	for (int y = 0; y < poly->BBox.h; y++) {
+		for (int x = 0; x < poly->BBox.w; x++) {
+			if (poly->PointIn( poly->BBox.x + x, poly->BBox.y + y ))
 				*ptr = 1;
 			ptr++;
 		}
 	}
 
-	delete( poly );
+//	delete( poly );
 
 	Color palette[2];
 	memset( palette, 0, 2 * sizeof( Color ) );
@@ -1332,16 +1334,14 @@ Sprite2D* SDLVideoDriver::PrecalculatePolygon(Point* points, int count,
 
 
 	Sprite2D* spr = new Sprite2D();
-	void* p = SDL_CreateRGBSurfaceFrom( pixels, width, height, 8, width, 0, 0,
-				0, 0 );
-	SDL_SetPalette( ( SDL_Surface * ) p, SDL_LOGPAL, ( SDL_Color * ) palette,
-		0, 2 );
+	void* p = SDL_CreateRGBSurfaceFrom( pixels, poly->BBox.w, poly->BBox.h, 8, poly->BBox.w, 0, 0, 0, 0 );
+	SDL_SetPalette( ( SDL_Surface * ) p, SDL_LOGPAL, ( SDL_Color * ) palette, 0, 2 );
 	spr->vptr = p;
 	spr->pixels = pixels;
 	SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY | SDL_RLEACCEL, 0 );
 	SDL_SetAlpha( ( SDL_Surface * ) p, SDL_SRCALPHA | SDL_RLEACCEL, 128 );
-	spr->Width = width;
-	spr->Height = height;
+	spr->Width = poly->BBox.w;
+	spr->Height = poly->BBox.h;
 	return spr;
 }
 
@@ -1352,8 +1352,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, Color& color, bool fill)
 	}
 	if (fill) {
 		if (!poly->fill) {
-			poly->fill = PrecalculatePolygon( poly->points, poly->count,
-							color );
+			poly->fill = PrecalculatePolygon( poly, color);//->points, poly->count, color, poly->BBox );
 		}
 		Region Screen = Viewport;
 		Screen.x = xCorr;

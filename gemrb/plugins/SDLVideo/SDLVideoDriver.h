@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.34 2004/08/03 20:21:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.35 2004/08/05 17:25:07 avenger_teambg Exp $
  *
  */
 
@@ -108,7 +108,8 @@ public:
 		y += Viewport.y;
 	}
 	/** */
-	Sprite2D* PrecalculatePolygon(Point* points, int count, Color& color);
+	Sprite2D* PrecalculatePolygon(Gem_Polygon *poly, Color& color);
+//Point* points, int count, Color& color, Region& BBox);
 
 	void SetFadePercent(int percent);
 
