@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.2 2004/01/17 14:51:34 balrog994 Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.3 2004/01/18 18:12:40 edheldil Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -31,7 +31,7 @@
 import GemRB
 from GUIDefines import *
 
-from GUICommonWindows import CloseCommonWindows
+#from GUICommonWindows import CloseCommonWindows
 
 ###################################################
 JournalWindow = None
@@ -43,26 +43,25 @@ QuestsWindow = None
 def OpenJournalWindow ():
 	global JournalWindow
 	
+	GemRB.HideGUI()
+
 	if JournalWindow:
 		if LogWindow: OpenLogWindow()
 		if BeastsWindow: OpenBeastsWindow()
 		if QuestsWindow: OpenQuestsWindow()
-		
-		GemRB.HideGUI()
 		
 		GemRB.UnloadWindow(JournalWindow)
 		JournalWindow = None
 		GemRB.SetVar("OtherWindow", -1)
 		
 		GemRB.UnhideGUI()
-		
 		return
 		
-	GemRB.HideGUI()
-	
 	GemRB.LoadWindowPack ("GUIJRNL")
 	JournalWindow = GemRB.LoadWindow (0)
 	GemRB.SetVar("OtherWindow", JournalWindow)
+
+	print "JournalWindow", JournalWindow
 	
 	# Quests
 	Button = GemRB.GetControl (JournalWindow, 0)
@@ -84,9 +83,9 @@ def OpenJournalWindow ():
 	GemRB.SetText (JournalWindow, Button, 20636)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
-	GemRB.SetVisible (JournalWindow, 1)
-	
+	#GemRB.SetVisible (JournalWindow, 1)
 	GemRB.UnhideGUI()
+	
 
 
 ###################################################
@@ -128,9 +127,9 @@ def OpenQuestsWindow ():
 	GemRB.SetText (QuestsWindow, Button, 20636)
 	GemRB.SetEvent (QuestsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
-	GemRB.SetVisible (QuestsWindow, 1)
-	
+	#GemRB.SetVisible (QuestsWindow, 1)
 	GemRB.UnhideGUI()
+	
 	
 
 ###################################################
@@ -173,8 +172,7 @@ def OpenBeastsWindow ():
 	GemRB.SetText (BeastsWindow, Button, 20636)
 	GemRB.SetEvent (BeastsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
-	GemRB.SetVisible (BeastsWindow, 1)
-	
+	#GemRB.SetVisible (BeastsWindow, 1)
 	GemRB.UnhideGUI()
 
 	
@@ -195,6 +193,7 @@ def OpenLogWindow ():
 		return
 	
 	LogWindow = GemRB.LoadWindow (3)
+	GemRB.SetVar("OtherWindow", LogWindow)
 
 	# Back
 	Button = GemRB.GetControl (LogWindow, 1)

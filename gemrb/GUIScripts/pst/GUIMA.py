@@ -16,28 +16,41 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.1 2004/01/11 16:49:09 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.2 2004/01/18 18:12:40 edheldil Exp $
 
 
-# GUIMA.py - scripts to control map windows from GUIMA winpack
+# GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
 
 ###################################################
 
 import GemRB
 from GUIDefines import *
 
-from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
-import GUICommonWindows
+#from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
+#import GUICommonWindows
 
+MapWindow = None
+WorldMapWindow = None
+
+###################################################
 def OpenMapWindow ():
-	global MainWindow
+	global MapWindow
 
-	CloseCommonWindows ()
+	GemRB.HideGUI()
+
+	if MapWindow:
+		if WorldMapWindow: OpenWorldMapWindow ()
+		
+		GemRB.UnloadWindow (MapWindow)
+		MapWindow = None
+		GemRB.SetVar ("OtherWindow", -1)
+		
+		GemRB.UnhideGUI ()
+		return
 
 	GemRB.LoadWindowPack ("GUIMA")
-        OpenCommonWindows ()
-	#MainWindow = Window = GemRB.LoadWindow (3)
-	MainWindow = Window = GUICommonWindows.MainWindow
+	MapWindow = Window = GemRB.LoadWindow (3)
+	GemRB.SetVar ("OtherWindow", MapWindow)
 
 	# World Map
 	Button = GemRB.GetControl (Window, 0)
@@ -55,28 +68,38 @@ def OpenMapWindow ():
 	# Done
 	Button = GemRB.GetControl (Window, 5)
 	GemRB.SetText (Window, Button, 1403)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 
-	# FIXME: should be hidden while configured and only now made visible?
-	GemRB.SetVisible (Window, 1)
+	#GemRB.SetVisible (Window, 1)
+	GemRB.UnhideGUI ()
+
 
 def OpenWorldMapWindow ():
-	global MainWindow, WorldMapWindow
+	global WorldMapWindow
 
-	CloseCommonWindows ()
+	GemRB.HideGUI()
+
+	if WorldMapWindow:
+		GemRB.UnloadWindow (WorldMapWindow)
+		WorldMapWindow = None
+		GemRB.SetVar ("OtherWindow", MapWindow)
+
+		GemRB.UnhideGUI ()
+		return
 
 	GemRB.LoadWindowPack ("GUIWMAP")
-	WorldMapWindow = GemRB.LoadWindow (0)
-	#GUICommonWindows.MainWindow = WorldMapWindow
+	WorldMapWindow = Window = GemRB.LoadWindow (0)
+	GemRB.SetVar ("OtherWindow", WorldMapWindow)
+
 
 	# Done
-	Button = GemRB.GetControl (WorldMapWindow, 0)
-	GemRB.SetText (WorldMapWindow, Button, 1403)
-	GemRB.SetEvent (WorldMapWindow, Button, IE_GUI_BUTTON_ON_PRESS, "CloseWorldMapWindow")
-	GemRB.SetVisible (WorldMapWindow, 1)
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Button, 1403)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
 
-def CloseWorldMapWindow ():
-	GemRB.UnloadWindow (WorldMapWindow)
-	OpenMapWindow ()
+	#GemRB.SetVisible (WorldMapWindow, 1)
+	GemRB.UnhideGUI ()
+
 
 
 ###################################################

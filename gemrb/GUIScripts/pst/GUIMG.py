@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMG.py,v 1.1 2004/01/11 16:49:09 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMG.py,v 1.2 2004/01/18 18:12:40 edheldil Exp $
 
 
 # GUIMG.py - scripts to control mage spells windows from GUIMG winpack
@@ -26,21 +26,30 @@
 import GemRB
 from GUIDefines import *
 
-from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
-import GUICommonWindows
+#from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
+#import GUICommonWindows
 
-MainWindow = 0
+MageWindow = None
 
 def OpenMageWindow ():
-	global MainWindow
+	global MageWindow
 
-	CloseCommonWindows ()
-	GemRB.LoadWindowPack ("GUIMG")
-        OpenCommonWindows ()
-	#MainWindow = GemRB.LoadWindow (3)
-	MainWindow = Window = GUICommonWindows.MainWindow
+	GemRB.HideGUI ()
 	
-	#GemRB.SetVisible (MainWindow, 1)
+	if MageWindow != None:
+		GemRB.UnloadWindow (MageWindow)
+		MageWindow = None
+		GemRB.SetVar ("OtherWindow", -1)
+		
+		GemRB.UnhideGUI ()
+		return
+		
+	GemRB.LoadWindowPack ("GUIMG")
+	MageWindow = Window = GemRB.LoadWindow (3)
+        GemRB.SetVar ("OtherWindow", MageWindow)
+	
+	GemRB.UnhideGUI ()
+
 
 ###################################################
 # End of file GUIMG.py

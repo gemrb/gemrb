@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.1 2004/01/11 16:49:09 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.2 2004/01/18 18:12:40 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -69,25 +69,36 @@
 import GemRB
 from GUIDefines import *
 
-from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
-import GUICommonWindows
+#from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
+#import GUICommonWindows
 
 ###################################################
-MainWindow = 0
+RecordsWindow = None
+InformationWindow = None
+BiographyWindow = None
 
 ###################################################
-def OpenStatsWindow ():
-	global MainWindow
+def OpenRecordsWindow ():
+	global RecordsWindow
 
-	#GemRB.SetVisible (3, 0)
-	#GemRB.UnloadWindow (3)
+	GemRB.HideGUI ()
+	
+	if RecordsWindow != None:
+		if InformationWindow: OpenInformationWindow ()
+		
+		GemRB.UnloadWindow (RecordsWindow)
+		RecordsWindow = None
+		GemRB.SetVar ("OtherWindow", -1)
+		
+		GemRB.UnhideGUI()
+		return	
 
-	CloseCommonWindows ()
 	GemRB.LoadWindowPack ("GUIREC")
-        OpenCommonWindows ()
+	RecordsWindow = Window = GemRB.LoadWindow (3)
+        GemRB.SetVar ("OtherWindow", RecordsWindow)
 
-	#MainWindow = Window = GemRB.LoadWindow (3)
-	MainWindow = Window = GUICommonWindows.MainWindow
+	GemRB.UnhideGUI ()
+
 
 	# Information
 	Button = GemRB.GetControl (Window, 7)
@@ -158,13 +169,26 @@ def OpenStatsWindow ():
 
 	#GemRB.SetVisible (Window, 1)
 
+
 def OpenInformationWindow ():
 	global InformationWindow
 	
-	GemRB.SetVisible (MainWindow, 0)
-	#GemRB.UnloadWindow (MainWindow)
+	GemRB.HideGUI ()
 	
+	if InformationWindow != None:
+		if BiographyWindow: OpenBiographyWindow ()
+
+		GemRB.UnloadWindow (InformationWindow)
+		InformationWindow = None
+		GemRB.SetVar ("OtherWindow", RecordsWindow)
+		
+		GemRB.UnhideGUI()
+		return
+
 	InformationWindow = Window = GemRB.LoadWindow (5)
+        GemRB.SetVar ("OtherWindow", InformationWindow)
+
+	GemRB.UnhideGUI ()
 
 	# Biography
 	Button = GemRB.GetControl (Window, 1)
@@ -174,53 +198,38 @@ def OpenInformationWindow ():
 	# Done
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 1403)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseInformationWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 
 
-	GemRB.SetVisible (Window, 1)
-
-def CloseInformationWindow ():
-	GemRB.SetVisible (InformationWindow, 0)
-	GemRB.UnloadWindow (InformationWindow)
-
-	GemRB.SetVisible (MainWindow, 1)
+	#GemRB.SetVisible (Window, 1)
 	
 
 def OpenBiographyWindow ():
 	global BiographyWindow
+
+	GemRB.HideGUI ()
 	
-	GemRB.SetVisible (InformationWindow, 0)
-	
+	if BiographyWindow != None:
+		GemRB.UnloadWindow (BiographyWindow)
+		BiographyWindow = None
+		GemRB.SetVar ("OtherWindow", InformationWindow)
+		
+		GemRB.UnhideGUI()
+		return
+
 	BiographyWindow = Window = GemRB.LoadWindow (12)
+        GemRB.SetVar ("OtherWindow", BiographyWindow)
+
+	GemRB.UnhideGUI ()
+	
 
 	# Done
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 1403)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseBiographyWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
-	GemRB.SetVisible (Window, 1)
+	#GemRB.SetVisible (Window, 1)
 	
-def CloseBiographyWindow ():
-	GemRB.SetVisible (BiographyWindow, 0)
-	GemRB.UnloadWindow (BiographyWindow)
-
-	GemRB.SetVisible (InformationWindow, 1)
-	
-
-
-#FillPlayerInfo, 
-#GetPlayerStat
-#SetButtonBAM
-#SetButtonPLT
-#SetButtonPicture
-#SetButtonSprites
-#SetLabelTextColor
-#SetSaveGamePortrait
-#SetSaveGamePreview
-#SetTextAreaSelectable
-#ShowModal
-#StatComment(...)
-#        Replaces values into an strref.
 
 ###################################################
 # End of file GUIREC.py

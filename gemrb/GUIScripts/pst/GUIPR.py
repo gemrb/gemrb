@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIPR.py,v 1.1 2004/01/11 16:49:09 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIPR.py,v 1.2 2004/01/18 18:12:40 edheldil Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -26,21 +26,31 @@
 import GemRB
 from GUIDefines import *
 
-from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
-import GUICommonWindows
+#from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
+#import GUICommonWindows
+
+PriestWindow = None
 
 
 def OpenPriestWindow ():
-	global MainWindow
-	
-	CloseCommonWindows ()
-	GemRB.LoadWindowPack ("GUIPR")
-        OpenCommonWindows ()
-	#MainWindow = GemRB.LoadWindow(3)
-	MainWindow = Window = GUICommonWindows.MainWindow
+	global PriestWindow
 
+	GemRB.HideGUI ()
 	
-	GemRB.SetVisible(MainWindow, 1)
+	if PriestWindow != None:
+		GemRB.UnloadWindow (PriestWindow)
+		PriestWindow = None
+		GemRB.SetVar ("OtherWindow", -1)
+		
+		GemRB.UnhideGUI ()
+		return
+		
+	GemRB.LoadWindowPack ("GUIPR")
+	PriestWindow = Window = GemRB.LoadWindow (3)
+        GemRB.SetVar ("OtherWindow", PriestWindow)
+
+	GemRB.UnhideGUI ()
+	
 
 ###################################################
 # End of file GUIPR.py
