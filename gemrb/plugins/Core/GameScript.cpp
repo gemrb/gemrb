@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.35 2004/01/05 14:02:49 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.36 2004/01/05 15:57:43 balrog994 Exp $
  *
  */
 
@@ -710,6 +710,7 @@ Action * GameScript::GenerateAction(char * String)
 							}
 							*tmp = 0;
 							newAction->YpointParameter = atoi(symbol);
+							free(symbol);
 							src++; //Skip ]
 							}
 						break;
