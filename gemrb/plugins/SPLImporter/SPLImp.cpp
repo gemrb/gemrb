@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.6 2004/11/07 19:19:11 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.7 2004/11/21 22:58:11 avenger_teambg Exp $
  *
  */
 
@@ -110,7 +110,7 @@ Spell* SPLImp::GetSpell()
 		s->ext_headers.push_back( eh );
 	}
 
-	str->Seek( s->FeatureBlockOffset + s->CastingFeatureOffset,
+	str->Seek( s->FeatureBlockOffset + 48*s->CastingFeatureOffset,
 			GEM_STREAM_START );
 	for (i = 0; i < s->CastingFeatureCount; i++) {
 		SPLFeature* f = GetFeature();
@@ -156,7 +156,7 @@ SPLExtHeader* SPLImp::GetExtHeader(Spell* s)
 	str->Read( &eh->ChargeDepletion, 2 );
 	str->Read( &eh->Projectile, 2 );
 
-	str->Seek( s->FeatureBlockOffset + eh->FeatureOffset, GEM_STREAM_START );
+	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
 		SPLFeature* f = GetFeature();
 		eh->features.push_back( f );
