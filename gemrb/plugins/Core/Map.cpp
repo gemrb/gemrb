@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.102 2004/08/04 20:57:16 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.103 2004/08/05 17:40:58 avenger_teambg Exp $
  *
  */
 
@@ -88,7 +88,6 @@ Map::Map(void)
 	if (!PathFinderInited) {
 		InitPathFinder();
 	}
-	ChangeArea=false;
 }
 
 Map::~Map(void)
@@ -177,13 +176,15 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 void Map::UseExit(Actor *actor, InfoPoint *ip)
 {
 	char Tmp[256];
+	Game *game=core->GetGame();
 
-	if(!ChangeArea)
-		return;
 	int EveryOne = ip->CheckTravel(actor);
 	switch(EveryOne) {
 	case 2:
 		core->DisplayConstantString(STR_WHOLEPARTY,0xffffff); //white
+		if(game->EveryoneStopped()) {
+			ip->Flags&=~TRAP_RESET; //exit triggered
+		}
 		return;
 	case 0:
 		return;
@@ -191,10 +192,10 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		break;
 	}
 
+	ip->Flags&=~TRAP_RESET; //exit triggered
 	if (ip->Destination[0] != 0) {
 		CreateMovement(Tmp, ip->Destination, ip->EntranceName);
 		if(EveryOne&2) {
-			Game *game=core->GetGame();
 			int i=game->GetPartySize(false);
 			while(i--) {
 	        	        game->GetPC(i)->ClearPath();
@@ -208,6 +209,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		actor->AddAction( GameScript::GenerateAction( Tmp ) );
 	} else {
 		if (ip->Scripts[0]) {
+			ip->LastEntered = actor;
 			ip->LastTrigger = actor;
 			ip->ExecuteScript( ip->Scripts[0] );
 			ip->ProcessActions();
@@ -262,47 +264,28 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			}
 			continue;
 		}
-		Region BBox = ip->outline->BBox;
-		if (ip->Type == ST_PROXIMITY) {
-			if (BBox.x <= 500)
-				BBox.x = 0;
-			else
-				BBox.x -= 500;
-			if (BBox.y <= 500)
-				BBox.y = 0;
-			else
-				BBox.y -= 500;
-			BBox.h += 1000;
-			BBox.w += 1000;
-		}
-		i=0;
-		while (true) {
-			Actor* actor = core->GetGame()->GetPC( i++ );
+		i=actors.size();
+		while (i--) {
+			Actor* actor = actors[i];
 			if (!actor)
 				break;
-			if (!actor->InParty)
-				break;
-			if (BBox.PointInside( actor->XPos, actor->YPos )) {
-				if (ip->Type == ST_PROXIMITY) {
-					if (ip->outline->BBox.PointInside( actor->XPos, actor->YPos )) {
-						if (ip->outline->PointIn( actor->XPos, actor->YPos )) {
-							ip->LastEntered = actor;
-							ip->LastTrigger = actor;
-						}
-					}
-					ip->ExecuteScript( ip->Scripts[0] );
-					ip->OnCreation = false;
-				} else {
-					//ST_TRAVEL
-					//don't move if doing something else
-					if(actor->GetNextAction())
-						break;
-					if (ip->outline->PointIn( actor->XPos, actor->YPos )) {
-						UseExit(actor, ip);
-					}
+			if (ip->Type == ST_PROXIMITY) {
+				if (ip->outline->PointIn( actor->XPos, actor->YPos )) {
+					ip->LastEntered = actor;
+					ip->LastTrigger = actor;
 				}
-				break;
+				ip->ExecuteScript( ip->Scripts[0] );
+				ip->OnCreation = false;
+			} else {
+				//ST_TRAVEL
+				//don't move if doing something else
+				if(actor->GetNextAction())
+					break;
+				if (ip->outline->PointIn( actor->XPos, actor->YPos )) {
+					UseExit(actor, ip);
+				}
 			}
+			break;
 		}
 	}
 	//Blit the Map Animations

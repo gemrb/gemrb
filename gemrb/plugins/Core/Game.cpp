@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.49 2004/08/02 18:00:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.50 2004/08/05 17:40:57 avenger_teambg Exp $
  *
  */
 
@@ -488,6 +488,14 @@ void Game::ShareXP(int xp)
 	//core->DisplayConstantString(); //you have gained ... xp
 }
 
+bool Game::EveryoneStopped()
+{
+	for(unsigned int i=0; i<PCs.size(); i++) {
+		if(PCs[i]->path ) return false;
+	}
+	return true;
+}
+
 //canmove=true: if some PC can't move (or hostile), then this returns false 
 bool Game::EveryoneNearPoint(const char *area, int x, int y, bool canmove)
 {
@@ -505,8 +513,7 @@ bool Game::EveryoneNearPoint(const char *area, int x, int y, bool canmove)
 		if(stricmp(PCs[i]->Area,area) ) {
 			return false;
 		}
-printf("Checking distance %d\n",i);
-		if(Distance(x,y,PCs[i])>25) {
+		if(Distance(x,y,PCs[i])>MAX_OPERATING_DISTANCE) {
 			return false;
 		}
 	}

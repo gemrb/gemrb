@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.172 2004/08/03 17:32:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.173 2004/08/05 17:40:58 avenger_teambg Exp $
  *
  */
 
@@ -31,9 +31,6 @@ extern HANDLE hConsole;
 
 //this will skip to the next element in the prototype of an action/trigger
 #define SKIP_ARGUMENT() while(*str && ( *str != ',' ) && ( *str != ')' )) str++
-
-//later this could be separated from talking distance
-#define MAX_OPERATING_DISTANCE      40
 
 static int initialized = 0;
 static SymbolMgr* triggersTable;
@@ -53,7 +50,7 @@ static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
-static int InDebug = 1;
+static int InDebug = 0;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {

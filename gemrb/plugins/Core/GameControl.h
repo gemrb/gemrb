@@ -35,6 +35,9 @@ class GameControl;
 #define SF_ALWAYSCENTER  4
 #define SF_GUIENABLED    8
 
+//later this could be separated from talking distance
+#define MAX_OPERATING_DISTANCE      40
+
 class GEM_EXPORT GameControl : public Control {
 public:
 	GameControl(void);
@@ -110,6 +113,8 @@ public:
 	void UnhideGUI();
 	void TryToAttack(Actor *source, Actor *target);
 	void TryToTalk(Actor *source, Actor *target);
+	void HandleDoor(Door *door, Actor *actor);
+	bool HandleActiveRegion(InfoPoint *trap, Actor *actor);
 	void MoveToPointFormation(Actor *actor, int GameX, int GameY);
 	void InitDialog(Actor* speaker, Actor* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.156 2004/08/02 22:22:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.157 2004/08/05 17:40:57 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -387,10 +387,9 @@ void GameControl::DeselectAll()
 
 void GameControl::SelectActor(int whom)
 {
-	ScreenFlags|=SF_CENTERONACTOR;
-	DeselectAll();
 	Game* game = core->GetGame();
 	if(whom==-1) {
+		DeselectAll();
 		for(int i = 0; i < game->GetPartySize(0); i++) {
 			Actor* actor = game->GetPC( i );
 			if (!actor) {
@@ -407,6 +406,9 @@ void GameControl::SelectActor(int whom)
 	/* doesn't fall through here */
 	Actor* actor = game->GetPC( whom );
 	if (actor && actor->ValidTarget(GA_SELECT|GA_NO_DEAD) ) {
+		if((ScreenFlags&SF_ALWAYSCENTER) || actor->IsSelected()) 
+			ScreenFlags|=SF_CENTERONACTOR;
+		DeselectAll();
 		selected.push_back( actor );
 		actor->Select( true );
 	}
@@ -754,6 +756,59 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	source->AddAction( GameScript::GenerateAction( Tmp, true ) );
 }
 
+void GameControl::HandleDoor(Door *door, Actor *actor)
+{
+	char Tmp[256];
+
+	if (door->Flags&DOOR_CLOSED) {
+		actor->ClearPath();
+		actor->ClearActions();
+		sprintf( Tmp, "OpenDoor(\"%s\")", door->Name );
+		actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+	} else {
+		actor->ClearPath();
+		actor->ClearActions();
+		sprintf( Tmp, "CloseDoor(\"%s\")", door->Name );
+		actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+	}
+}
+
+bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor *actor)
+{
+	switch(trap->Type) {
+		case ST_TRAVEL:
+			trap->Flags|=TRAP_RESET;
+			return false;
+		case ST_TRIGGER:
+			//the importer shouldn't load the script
+			//if it is unallowed anyway (though 
+			//deactivated scripts could be reactivated)
+			//only the 'trapped' flag should be honoured
+			//there. Here we have to check on the 
+			//reset trap and deactivated flags
+			if (trap->Scripts[0]) {
+				if(!(trap->Flags&TRAP_DEACTIVATED) ) {
+					trap->LastTrigger = selected[0];
+					trap->Scripts[0]->Update();
+					//if reset trap flag not set, deactivate it
+					if(!(trap->Flags&TRAP_RESET)) {
+						trap->Flags|=TRAP_DEACTIVATED;
+					}
+				}
+			} else {
+				if (trap->overHeadText) {
+					if (trap->textDisplaying != 1) {
+						trap->textDisplaying = 1;
+						GetTime( trap->timeStartDisplaying );
+						DisplayString( trap );
+					}
+				}
+			}
+			return true;
+		default:;
+	}
+	return false;
+}
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
@@ -816,49 +871,14 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	Actor* actor = area->GetActor( GameX, GameY, action );
 
 	if (!actor && ( selected.size() > 0 )) {
-		Door* door = area->tm->GetDoor( GameX, GameY );
-		if (door) {
-			//we are sure we got one element
-			actor = selected[0];
-			if (door->Flags&DOOR_CLOSED) {
-				actor->ClearPath();
-				actor->ClearActions();
-				sprintf( Tmp, "OpenDoor(\"%s\")", door->Name );
-				actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
-			} else {
-				actor->ClearPath();
-				actor->ClearActions();
-				sprintf( Tmp, "CloseDoor(\"%s\")", door->Name );
-				actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
-			}
+		if (overDoor) {
+			HandleDoor(overDoor, selected[0]);
 			return;
 		}
-		if(overInfoPoint && (overInfoPoint->Type==ST_TRIGGER) ) {
-			//the importer shouldn't load the script
-			//if it is unallowed anyway (though 
-			//deactivated scripts could be reactivated)
-			//only the 'trapped' flag should be honoured
-			//there. Here we have to check on the 
-			//reset trap and deactivated flags
-			if (overInfoPoint->Scripts[0]) {
-				if(!(overInfoPoint->Flags&TRAP_DEACTIVATED) ) {
-					overInfoPoint->LastTrigger = selected[0];
-					overInfoPoint->Scripts[0]->Update();
-					//if reset trap flag not set, deactivate it
-					if(!(overInfoPoint->Flags&TRAP_RESET)) {
-						overInfoPoint->Flags|=TRAP_DEACTIVATED;
-					}
-				}
-			} else {
-				if (overInfoPoint->overHeadText) {
-					if (overInfoPoint->textDisplaying != 1) {
-						overInfoPoint->textDisplaying = 1;
-						GetTime( overInfoPoint->timeStartDisplaying );
-						DisplayString( overInfoPoint );
-					}
-				}
+		if(overInfoPoint) {
+			if(HandleActiveRegion(overInfoPoint, selected[0])) {
+				return;
 			}
-			return;
 		}
 		//just a single actor, no formation
 		if(selected.size()==1) {
@@ -1573,9 +1593,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	if(ScreenFlags&SF_CENTERONACTOR) {
 		core->GetVideoDriver()->SetViewport( pc->XPos - ( vp.w / 2 ),
 			pc->YPos - ( vp.h / 2 ) );
-		if(!(ScreenFlags&SF_ALWAYSCENTER)) {
-			ScreenFlags&=~SF_CENTERONACTOR;
-		}
+		ScreenFlags&=~SF_CENTERONACTOR;
 	}
 }
 

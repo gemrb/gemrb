@@ -1,3 +1,22 @@
+/* GemRB - Infinity Engine Emulator
+ * Copyright (C) 2003 The GemRB Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.56 2004/08/05 17:40:57 avenger_teambg Exp $
+ */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
 #include "Interface.h"
@@ -327,10 +346,7 @@ bool Highlightable::IsOver(unsigned short XPos, unsigned short YPos)
 	if (!outline) {
 		return false;
 	}
-	if (outline->BBox.PointInside( XPos, YPos )) {
-		return outline->PointIn( XPos, YPos );
-	}
-	return false;
+	return outline->PointIn(XPos, YPos);
 }
 
 void Highlightable::DrawOutline()
@@ -431,24 +447,10 @@ void Moveble::WalkTo(unsigned short XDes, unsigned short YDes)
 {
 	this->XDes = XDes;
 	this->YDes = YDes;
-/*
-	if (path) {
-		PathNode* nextNode = path->Next;
-		PathNode* thisNode = path;
-		while (true) {
-			delete( thisNode );
-			thisNode = nextNode;
-			if (!thisNode)
-				break;
-			nextNode = thisNode->Next;
-		}
-	}
-*/
 	ClearPath();
 	Game* game = core->GetGame();
 	Map* map = game->GetMap(Area);
 	path = map->FindPath( XPos, YPos, XDes, YDes );
-//	step = NULL;
 }
 
 void Moveble::RunAwayFrom(unsigned short XDes, unsigned short YDes, int PathLength, bool Backing)
@@ -541,7 +543,7 @@ Door::~Door(void)
 
 void Door::ToggleTiles(int State, bool playsound)
 {
-  int i;
+	int i;
 	int state;
 
 	if (State) {
@@ -672,14 +674,14 @@ InfoPoint::~InfoPoint(void)
 //bit 2 : whole team
 int InfoPoint::CheckTravel(Actor *actor)
 {
+	if(!(Flags&TRAP_RESET)) return 0; //experimental hack
 	if(Flags&TRAP_DEACTIVATED) return 0;
 	if(!actor->InParty && (Flags&TRAVEL_NONPC) ) return 0;
-printf("%lx\n",Flags);
 	if(Flags&TRAVEL_PARTY) {
-		if(!core->GetGame()->EveryoneNearPoint(actor->Area, actor->XPos, actor->YPos, true) ) {
-			return 2;
+		if(core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->Area, actor->XPos, actor->YPos, true) ) {
+			return 3;
 		}
-		return 3;
+		return 2;
 	}
 	return 1;
 }
