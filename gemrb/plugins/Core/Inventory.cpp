@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.8 2004/04/13 19:29:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.9 2004/04/13 20:11:45 avenger_teambg Exp $
  *
  */
 
@@ -42,6 +42,7 @@ Inventory::~Inventory()
 int Inventory::CalculateWeight()
 {
 //returns the weight of stored items
+	return 0;
 }
 
 void Inventory::SetInventoryType(int arg)
@@ -189,6 +190,7 @@ int Inventory::AddSlotItem(STOItem* item, unsigned int slot, CREItem **res_item,
 {
 	CREItem *temp;
 	CREItem *remains;
+	int ret = -1;
 
 	for(int i=0;i<count;i++) {
 	//the first part of a STOItem is essentially a CREItem
@@ -200,12 +202,13 @@ int Inventory::AddSlotItem(STOItem* item, unsigned int slot, CREItem **res_item,
 			}
 			item->AmountInStock--;
 		}
-		AddSlotItem(temp, 0, &remains);
+		ret=AddSlotItem(temp, 0, &remains);
 		//FIXME: drop remains at feet of actor
 		if(remains) {
 			delete remains;
 		}
 	}
+	return ret;
 }
 
 bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
