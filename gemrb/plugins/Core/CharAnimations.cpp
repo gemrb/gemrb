@@ -22,6 +22,11 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 	WeaponType = 0;
 	this->RowIndex = RowIndex;
 	Avatars = core->GetTable(core->LoadTable("avatars"));
+	char * val = Avatars->QueryField(RowIndex, 20);
+	if(val[0] == '*')
+		UsePalette = true;
+	else
+		UsePalette = false;
 }
 
 CharAnimations::~CharAnimations(void)
@@ -63,7 +68,7 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 {
 	//TODO: Implement Auto Resource Loading
 	if(Anims[AnimID][Orient]) {
-		if(Anims[AnimID][Orient]->ChangePalette) {
+		if(Anims[AnimID][Orient]->ChangePalette && UsePalette) {
 			Anims[AnimID][Orient]->SetPalette(Palette);
 			Anims[AnimID][Orient]->ChangePalette = false;
 		}
@@ -78,29 +83,62 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 	AnimationMgr * anim = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
 	anim->Open(stream, true);
 	Animation * a = anim->GetAnimation(Cycle, 0, 0, IE_NORMAL);
-	switch(OrientCount) {
-		case 5: 
-		{
-			if((Orient > 8) && (MirrorType == IE_ANI_CODE_MIRROR)) {
-				core->GetVideoDriver()->MirrorAnimation(a);
+	switch(MirrorType) {
+		case IE_ANI_CODE_MIRROR:
+			{
+				switch(OrientCount) {
+					case 5:
+						{
+						if(Orient > 8)
+							core->GetVideoDriver()->MirrorAnimation(a);
+						if(Orient & 1)
+							Orient--;
+						Anims[AnimID][Orient] = a;
+						Anims[AnimID][Orient+1] = a;
+						}
+					break;
+
+					case 9:
+						{
+						if(Orient > 8)
+							core->GetVideoDriver()->MirrorAnimation(a);
+						Anims[AnimID][Orient] = a;
+						}
+					break;
+				}
 			}
-			if(Orient & 1)
-				Orient--;
-			Anims[AnimID][Orient] = a;
-			Anims[AnimID][Orient+1] = a;
-		}
 		break;
 
-		case 9:
-		{
-			if((Orient > 8) && (MirrorType == IE_ANI_CODE_MIRROR)) {
-				core->GetVideoDriver()->MirrorAnimation(a);
+		case IE_ANI_CODE_MIRROR_2:
+			{
+				switch(OrientCount) {
+					case 9:
+						{
+						if(Orient > 8)
+							core->GetVideoDriver()->MirrorAnimation(a);
+						Anims[AnimID][Orient] = a;
+						}
+					break;
+				}
 			}
-			Anims[AnimID][Orient] = a;
-		}
+		break;
+
+		case IE_ANI_TWO_FILES:
+			{
+				switch(OrientCount) {
+					case 5:
+						{
+						if(Orient & 1)
+							Orient--;
+						Anims[AnimID][Orient] = a;
+						Anims[AnimID][Orient+1] = a;
+						}		
+					break;
+				}
+			}
 		break;
 	}
-	if(Anims[AnimID][Orient]->ChangePalette) {
+	if(Anims[AnimID][Orient]->ChangePalette && UsePalette) {
 		Anims[AnimID][Orient]->SetPalette(Palette);
 		Anims[AnimID][Orient]->ChangePalette = false;
 	}

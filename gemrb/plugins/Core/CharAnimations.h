@@ -40,6 +40,7 @@
 #define IE_ANI_ONE_FILE			1
 #define IE_ANI_TWO_FILES		2
 #define IE_ANI_FOUR_FILES		3
+#define IE_ANI_CODE_MIRROR_2	4
 
 #define IE_ANI_NO_ARMOR			0
 #define IE_ANI_LIGHT_ARMOR		1
@@ -66,6 +67,7 @@ public:
 	unsigned char ArmorType, WeaponType, RangedType;
 	char * ResRef;
 	TableMgr * Avatars;
+	bool UsePalette;
 public:
 	CharAnimations(char * BaseResRef, unsigned char OrientCount, unsigned char MirrorType, int RowIndex);
 	~CharAnimations(void);
@@ -124,6 +126,49 @@ private:
 						}
 						if(Orient > 10) {
 							strcat(ResRef, "E");
+						}
+					}
+				}
+			break;
+
+			case IE_ANI_CODE_MIRROR_2:
+				{
+					if(OrientCount == 9) {
+						char * val = Avatars->QueryField(RowIndex, AnimID+3);
+						if(val[0] == '*') {
+							ResRef[0] = 0;
+							return;
+						}
+						Cycle = atoi(val) + (Orient/2);
+						switch(AnimID) {
+							case IE_ANI_ATTACK_BACKSLASH:
+								strcat(ResRef, "G21");
+							break;
+
+							case IE_ANI_ATTACK_SLASH:
+								strcat(ResRef, "G2");
+							break;
+
+							case IE_ANI_ATTACK_JAB:
+								strcat(ResRef, "G22");
+							break;
+
+							case IE_ANI_AWAKE:
+								strcat(ResRef, "G12");
+							break;
+
+							case IE_ANI_DIE:
+							case IE_ANI_DAMAGE:
+								strcat(ResRef, "G14");
+							break;
+
+							case IE_ANI_READY:
+								strcat(ResRef, "G1");
+							break;
+
+							case IE_ANI_WALK:
+								strcat(ResRef, "G11");
+							break;
 						}
 					}
 				}
