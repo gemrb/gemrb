@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.10 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.11 2003/12/15 09:13:59 balrog994 Exp $
  *
  */
 
@@ -52,7 +52,7 @@ static void DelTree(char *Pt)
 	struct _finddata_t c_file;
 	strcat(Path, SPathDelimiter);
 	strcat(Path, "*.*");
-	long hFile=_findfirst(Path, &c_file);
+	long hFile=(long)_findfirst(Path, &c_file);
 	if(!hFile)
 		return;
 #else
@@ -114,7 +114,7 @@ int SaveGameIterator::GetSaveGameCount()
 	const char *SaveFolder=PlayMode();
 #ifdef WIN32
 	sprintf(Path, "%s%s%s*.*", core->GamePath, SaveFolder,SPathDelimiter);
-	if((hFile = _findfirst(Path, &c_file)) == -1L) //If there is no file matching our search
+	if((hFile = (long)_findfirst(Path, &c_file)) == -1L) //If there is no file matching our search
 		return -1;
 #else
 	sprintf(Path, "%s%s", core->GamePath,SaveFolder);
@@ -192,7 +192,7 @@ SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 	const char *SaveFolder=PlayMode();
 #ifdef WIN32
 	sprintf(Path, "%s%s%s*.*", core->GamePath, SaveFolder, SPathDelimiter);
-	if((hFile = _findfirst(Path, &c_file)) == -1L) //If there is no file matching our search
+	if((hFile = (long)_findfirst(Path, &c_file)) == -1L) //If there is no file matching our search
 		return NULL;
 	sprintf(Path, "%s%s%s", core->GamePath, SaveFolder);
 #else
@@ -257,7 +257,7 @@ SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 				long file;
 				struct _finddata_t bmpf;
 				sprintf(Path, "%s%s%s%s%s*.bmp", core->GamePath, SaveFolder, SPathDelimiter, c_file.name, SPathDelimiter);
-				file = _findfirst(Path, &bmpf);
+				file = (long)_findfirst(Path, &bmpf);
 				if(file == NULL) {
 					_findclose(hFile);
 					return NULL;
