@@ -91,8 +91,12 @@ public:
 	void HideGUI();
 	void UnhideGUI();
 	void InitDialog(Actor * speaker, Actor * target, Dialog * dlg);
+	void EndDialog();
 	void DialogChoose(int choose);
 	void DisplayString(Scriptable * target);
+	/* Displays a string in the textarea */
+	void DisplayString(char *Text);
+
 private:
 	void ChangeMap();
 };

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.72 2004/02/08 16:43:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.73 2004/02/09 19:20:31 avenger_teambg Exp $
  *
  */
 
@@ -116,7 +116,8 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 	if(tm)
 		tm->DrawOverlay(0, viewport);
 	//Run the Global Script
-	ExecuteScript(core->GetGame()->GlobalScript);
+	Game *game = core->GetGame();
+	game->ExecuteScript(game->Scripts[0]);
 	//Run the Map Script
 	if(Scripts[0])
 		ExecuteScript(Scripts[0]);
@@ -178,23 +179,17 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 					ip->ExecuteScript(ip->Scripts[0]);
 				} else { //ST_TRAVEL
 					if(ip->outline->PointIn(actor->XPos, actor->YPos)) {
-						unsigned long WinIndex, TAIndex;
-						core->GetDictionary()->Lookup("MessageWindow", WinIndex);
-						if((WinIndex != -1) && (core->GetDictionary()->Lookup("MessageTextArea", TAIndex))) {
-							Window * win = core->GetWindow(WinIndex);
-							if(win) {
-								TextArea * ta = (TextArea*)win->GetControl(TAIndex);
-								char Text[256];
-								sprintf(Text, "[color=00FF00]%s TravelTrigger Activated: [/color]Should Move to Area %s near %s", ip->Name, ip->Destination, ip->EntranceName);
-								ta->AppendText(Text, -1);
-							}
-						}
 						char Tmp[256];
+						sprintf(Tmp, "[color=00FF00]%s TravelTrigger Activated: [/color]Should Move to Area %s near %s", ip->Name, ip->Destination, ip->EntranceName);
+						gc->DisplayString(Tmp);
+						
 						if(ip->Destination[0] != 0) {
 							sprintf(Tmp, "LeaveAreaLUA(\"%s\", \"\", [-1.-1], -1)", ip->Destination);
 							actor->ClearPath();
 							actor->AddActionInFront(GameScript::CreateAction(Tmp));
+/* gc has already been passed to this function!!!
 							GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);
+*/
 							strcpy(gc->EntranceName, ip->EntranceName);
 						} else {
 							if(ip->Scripts[0]) {

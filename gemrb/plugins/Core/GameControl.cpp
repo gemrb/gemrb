@@ -1000,9 +1000,21 @@ static void AddTalk (TextArea *ta, Actor *speaker, char *speaker_color, char *te
 	free (newstr);
 }
 
+void GameControl::EndDialog()
+{
+	if(speaker) speaker->CurrentAction = NULL;
+	speaker=NULL;
+	target=NULL;
+	ds = NULL;
+	dlg = NULL;
+	core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
+	core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
+	DisableMouse = false;
+	Dialogue = false;
+}
+
 void GameControl::DialogChoose(int choose)
 {
-
 	unsigned long index;
 	if(core->GetDictionary()->Lookup("MessageWindow", index)) {
 		Window * win = core->GetWindow(index);
@@ -1020,15 +1032,7 @@ void GameControl::DialogChoose(int choose)
 				AddTalk (ta, target, "A0A0FF", core->GetString(tr->textStrRef), "8080FF");
 
 				if(tr->Flags & IE_DLG_TR_FINAL) {
-					//speaker->CurrentAction->Release();
-					speaker->CurrentAction = NULL;
-					//dlg->Release();
-					ds = NULL;
-					dlg = NULL;
-					core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
-					core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
-					DisableMouse = false;
-					Dialogue = false;
+					EndDialog();
 					ta->SetMinRow(false);
 					return;
 				}					
@@ -1096,10 +1100,7 @@ void GameControl::ChangeMap()
 	Actor * pc = selected.at(0);
 	if(stricmp(pc->Area, core->GetGame()->GetMap(MapIndex)->scriptName) == 0)
 		return;
-	ds = NULL;
-	speaker = NULL;
-	target = NULL;
-	dlg = NULL;
+	EndDialog();
 	overInfoPoint = NULL;
 	overContainer = NULL;
 	overDoor = NULL;
@@ -1135,3 +1136,18 @@ void GameControl::ChangeMap()
 	core->GetVideoDriver()->SetViewport(pc->XPos-(vp.w/2), pc->YPos-(vp.h/2));
 	ChangeArea = false;
 }
+
+void GameControl::DisplayString(char *Text)
+{
+	unsigned long WinIndex, TAIndex;
+
+	core->GetDictionary()->Lookup("MessageWindow", WinIndex);
+	if((WinIndex != -1) && (core->GetDictionary()->Lookup("MessageTextArea", TAIndex))) {
+		Window * win = core->GetWindow(WinIndex);
+		if(win) {
+			TextArea * ta = (TextArea*)win->GetControl(TAIndex);
+			ta->AppendText(Text, -1);
+		}
+	}
+}
+

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.10 2004/02/08 16:43:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.11 2004/02/09 19:20:30 avenger_teambg Exp $
  *
  */
 
@@ -50,7 +50,6 @@ private:
 	std::vector<Actor*> NPCs;
 	std::vector<Map*> Maps;
 public:
-        GameScript *GlobalScript;
 	int PartySize;
 public:
 	Actor* GetPC(unsigned int slot);
@@ -71,8 +70,6 @@ public:
 	int DelMap(unsigned int index, bool autoFree = false);
 	int AddNPC(Actor *npc);
 	Actor* GetNPC(unsigned int Index);
-        //sets the global script (baldur.bcs)
-        void SetScript(const char *aScript);
 };
 
 #endif

@@ -97,7 +97,8 @@ void Scriptable::ExecuteScript(GameScript * Script)
 {
 	if(actionQueue.size())
 		return;
-	Script->Update();
+	if(Script)
+		Script->Update();
 }
 
 void Scriptable::AddAction(Action * aC)

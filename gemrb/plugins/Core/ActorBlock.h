@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.20 2004/02/08 16:43:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.21 2004/02/09 19:20:30 avenger_teambg Exp $
  *
  */
 
@@ -41,6 +41,15 @@ class Door;
 
 #define STEP_TIME		150
 #define MAX_SCRIPTS		8
+
+#define SCR_OVERRIDE 0
+#define SCR_AREA     1
+#define SCR_SPECIFICS 2
+#define SCR_CLASS    3
+#define SCR_UNKNOWN  4
+#define SCR_RACE     5
+#define SCR_GENERAL  6
+#define SCR_DEFAULT  7
 
 #ifdef WIN32
 
@@ -72,7 +81,7 @@ typedef struct ActionStep {
 } ActionStep;
 */
 
-#define SEA_RESET			0x00000002
+#define SEA_RESET		0x00000002
 #define SEA_PARTY_REQUIRED	0x00000004
 
 class GEM_EXPORT Scriptable {

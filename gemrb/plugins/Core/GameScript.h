@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.40 2004/02/08 16:43:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.41 2004/02/09 19:20:31 avenger_teambg Exp $
  *
  */
 
@@ -502,6 +502,9 @@ struct TriggerLink {
 #define BD_LOCMASK   3  //where is the dialog resref
 #define BD_INTERRUPT 4  //interrupts action
 #define BD_TALKCOUNT 8  //increases talkcount
+#define BD_SETDIALOG 16 //also sets dialog (for string0)
+#define BD_CHECKDIST 32 //checks distance, if needs, walks up
+#define BD_OWN       64 //source == target, works for player only
 
 #define AF_NONE      0
 #define AF_INSTANT   1
@@ -540,7 +543,6 @@ public:
 	void EvaluateAllBlocks();
 private: //Internal Functions
 	Script* CacheScript(DataStream * stream, const char * Context);
-//	void FreeScript(Script * script);
 	ResponseBlock * ReadResponseBlock(DataStream * stream);
 	Condition * ReadCondition(DataStream * stream);
 	ResponseSet * ReadResponseSet(DataStream * stream);
@@ -571,7 +573,12 @@ private: //Script Internal Variables
 public:
 	GameScript(const char * ResRef, unsigned char ScriptType, Variables * local = NULL);
 	~GameScript();
-	void SetVariable(const char * VarName, const char * Context, int value);
+	static void ReplaceMyArea(Scriptable *Sender, char *newVarName);
+	static unsigned long CheckVariable(Scriptable *Sender, const char * VarName, const char * Context);
+	static unsigned long CheckVariable(Scriptable *Sender, const char * VarName);
+
+	static void SetVariable(Scriptable *Sender, const char * VarName, const char * Context, int value);
+	static void SetVariable(Scriptable *Sender, const char * VarName, int value);
 	static void ExecuteString(Scriptable * Sender, char * String);
 	static bool EvaluateString(Scriptable * Sender, char * String);
 public: //Script Functions
@@ -694,6 +701,8 @@ public:
 	static void StartDialogueNoSet(Scriptable * Sender, Action * parameters);
 	static void StartDialogueNoSetInterrupt(Scriptable * Sender, Action * parameters);
 	static void StartDialogueInterrupt(Scriptable * Sender, Action * parameters);
+	static void StartDialogueOverride(Scriptable * Sender, Action * parameters);
+	static void StartDialogueOverrideInterrupt(Scriptable * Sender, Action * parameters);
 	static void PlayerDialogue(Scriptable * Sender, Action * parameters);
 };
 

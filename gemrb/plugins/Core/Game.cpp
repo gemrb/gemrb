@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.13 2004/02/08 16:43:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.14 2004/02/09 19:20:30 avenger_teambg Exp $
  *
  */
 
@@ -30,7 +30,7 @@ extern Interface * core;
 Game::Game(void) : Scriptable(ST_GLOBAL)
 {
 	PartySize=6;    //this could be modified later
-        SetScript(core->GlobalScript);
+        SetScript(core->GlobalScript,0);
 }
 
 Game::~Game(void)
@@ -44,8 +44,6 @@ Game::~Game(void)
 	for(size_t i = 0; i < NPCs.size(); i++) {
 		delete(NPCs[i]);
 	}
-        if(GlobalScript)
-                delete GlobalScript;
 }
 
 Actor* Game::GetPC(unsigned int slot)
@@ -183,19 +181,5 @@ Actor* Game::GetNPC(unsigned int Index)
 	if(Index >= NPCs.size())
 		return NULL;
 	return NPCs[Index];
-}
-
-//sets the global script (baldur.bcs, etc)
-//it is used only in bg2 (baldur) or tob (baldur25), but exists everywhere
-//except torment
-void Game::SetScript(const char *aScript)
-{
-        if(GlobalScript) delete GlobalScript;
-        GlobalScript=0;
-        if(aScript[0]) {
-                GlobalScript = new GameScript(aScript, 0, 0); //no locals!!!
-                //don't crash if the script is nonexistent (only in torment)
-                if(GlobalScript) GlobalScript->MySelf = this;
-        }
 }
 

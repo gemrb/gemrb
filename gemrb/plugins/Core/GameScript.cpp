@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.60 2004/02/08 16:43:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.61 2004/02/09 19:20:30 avenger_teambg Exp $
  *
  */
 
@@ -154,6 +154,8 @@ static ActionLink actionnames[]={
 {"startdialogueinterrupt",GameScript::StartDialogueInterrupt,AF_BLOCKING},
 {"startdialoguenoset",GameScript::StartDialogueNoSet,AF_BLOCKING},
 {"startdialoguenosetinterrupt",GameScript::StartDialogueNoSetInterrupt,AF_BLOCKING},
+{"startdialogueoverride",GameScript::StartDialogueOverride,AF_BLOCKING},
+{"startdialogueoverrideinterrupt",GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 {"startmovie",GameScript::StartMovie},
 {"startsong",GameScript::StartSong},
 {"triggeractivation",GameScript::TriggerActivation},
@@ -332,13 +334,67 @@ Script* GameScript::CacheScript(DataStream * stream, const char * Context)
 	return newScript;
 }
 
-void GameScript::SetVariable(const char * VarName, const char * Context, int value)
+void GameScript::ReplaceMyArea(Scriptable *Sender, char *newVarName)
 {
-	char * newVarName = (char*)malloc(strlen(VarName)+strlen(Context)+1);
-	strcpy(newVarName, Context);
-	strcat(newVarName, VarName);
+}
+
+void GameScript::SetVariable(Scriptable *Sender, const char * VarName, const char * Context, int value)
+{
+	if(memcmp(VarName, "LOCALS", 6) == 0) {
+		Sender->locals->SetAt(VarName,value);
+		return;
+	}
+	char * newVarName = (char *) malloc(40);
+	strncpy(newVarName, Context, 6);
+	strncat(newVarName, VarName, 40);
+	if(memcmp(newVarName, "MYAREA", 6) == 0) {
+		ReplaceMyArea(Sender, newVarName);
+	}
 	globals->SetAt(newVarName, (unsigned long)value);
-	free(newVarName);
+}
+
+void GameScript::SetVariable(Scriptable *Sender, const char * VarName, int value)
+{
+	char * newVarName = strndup(VarName,40);
+	if(memcmp(newVarName, "MYAREA", 6) == 0) {
+		ReplaceMyArea(Sender, newVarName);
+	}
+	globals->SetAt(newVarName, (unsigned long)value);
+}
+
+unsigned long GameScript::CheckVariable(Scriptable *Sender, const char *VarName)
+{
+	char newVarName[40];
+	unsigned long value=0;
+
+	if(memcmp(VarName, "LOCALS", 6) == 0) {
+		Sender->locals->Lookup(&VarName[6], value);
+		return value;
+	}
+	strncpy(newVarName, VarName,40);
+	if(memcmp(VarName,"MYAREA",6) == 0) {
+		ReplaceMyArea(Sender, newVarName);
+	}
+	globals->Lookup(newVarName, value);
+	return value;
+}
+
+unsigned long GameScript::CheckVariable(Scriptable *Sender, const char *VarName,const char *Context)
+{
+	char newVarName[40];
+	unsigned long value=0;
+
+	if(memcmp(Context, "LOCALS", 6) == 0) {
+		Sender->locals->Lookup(VarName, value);
+		return value;
+	}
+	strncpy(newVarName, Context, 6);
+	strncat(newVarName, VarName, 40);
+	if(memcmp(VarName,"MYAREA",6) == 0) {
+		ReplaceMyArea(Sender, newVarName);
+	}
+	globals->Lookup(VarName, value);
+	return value;
 }
 
 void GameScript::Update()
@@ -1231,92 +1287,36 @@ int GameScript::General(Scriptable * Sender, Trigger * parameters)
 
 int GameScript::BitCheck(Scriptable * Sender, Trigger * parameters)
 {
-	unsigned long value=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value);
-	}
+	unsigned long value=CheckVariable(Sender, parameters->string0Parameter);
 	int eval = (value & parameters->int0Parameter) ? 1 : 0;
 	return eval;
 }
 
 int GameScript::Global(Scriptable * Sender, Trigger * parameters)
 {
-	unsigned long value=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value);
-	}
+	unsigned long value=CheckVariable(Sender, parameters->string0Parameter);
 	int eval = (value == parameters->int0Parameter) ? 1 : 0;
 	return eval;
 }
 
 int GameScript::GlobalLT(Scriptable * Sender, Trigger * parameters)
 {
-	unsigned long value=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value);
-	}
+	unsigned long value=CheckVariable(Sender, parameters->string0Parameter);
 	int eval = (value < parameters->int0Parameter) ? 1 : 0;
 	return eval;
 }
 
 int GameScript::GlobalGT(Scriptable * Sender, Trigger * parameters)
 {
-	unsigned long value=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value);
-	}
+	unsigned long value=CheckVariable(Sender, parameters->string0Parameter);
 	int eval = (value > parameters->int0Parameter) ? 1 : 0;
 	return eval;
 }
 
 int GameScript::GlobalsEqual(Scriptable * Sender, Trigger * parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string1Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else if(memcmp(parameters->string1Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else {
-		globals->Lookup(parameters->string1Parameter, value2);
-	}
-
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, parameters->string1Parameter);
 	int eval = (value1 == value2) ? 1 : 0;
 	return eval;
 }
@@ -1445,8 +1445,21 @@ int GameScript::Entered(Scriptable * Sender, Trigger * parameters)
 	return 0;
 }
 
+//this function is different in every engines, if you use a string0parameter
+//then it will be considered as a variable check
+//you can also use an object parameter (like in iwd)
 int GameScript::Dead(Scriptable * Sender, Trigger * parameters)
 {
+	if(parameters->string0Parameter) {
+		char Variable[33];
+		if(core->HasFeature(GF_HAS_KAPUTZ)) {
+			sprintf(Variable,"KAPUTZ%32.32s",parameters->string0Parameter);
+		}
+		else {
+			sprintf(Variable,"GLOBALSPRITE_IS_DEAD%18.18s",parameters->string0Parameter);
+		}
+		return CheckVariable(Sender, Variable)>0?1:0;
+	}
 	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
 	if(!target)
 		return 0;
@@ -1526,19 +1539,13 @@ void GameScript::NoAction(Scriptable */*Sender*/, Action */*parameters*/)
 
 void GameScript::SG(Scriptable * Sender, Action * parameters)
 {
-	globals->SetAt(&parameters->string0Parameter[0], parameters->int0Parameter);
+	SetVariable(Sender, "GLOBAL",parameters->string0Parameter, parameters->int0Parameter);
 }
 
 void GameScript::SetGlobal(Scriptable * Sender, Action * parameters)
 {
 	printf("SetGlobal(\"%s\", %d)\n", parameters->string0Parameter, parameters->int0Parameter);
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], parameters->int0Parameter);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], parameters->int0Parameter);
-	else {
-		globals->SetAt(parameters->string0Parameter, parameters->int0Parameter);
-	}
+	SetVariable(Sender, parameters->string0Parameter, parameters->int0Parameter);
 }
 
 void GameScript::ChangeAllegiance(Scriptable * Sender, Action * parameters)
@@ -2082,17 +2089,26 @@ void GameScript::HideGUI(Scriptable * Sender, Action * parameters)
 		gc->HideGUI();
 }
 
+static char PlayerDialogRes[9]="PLAYERx\0";
+
 void GameScript::BeginDialog(Scriptable *Sender, Action * parameters, int Flags)
 {
-	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(!scr)
-		return;
-	if(scr != Sender) { //this is an Action Override
-		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction = NULL;
-		return;
+	Scriptable *tar, *scr;
+
+	if(Flags&BD_OWN) {
+		scr = tar = GetActorFromObject(Sender, parameters->objects[1]);
 	}
-	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
+	else {
+		scr = GetActorFromObject(Sender, parameters->objects[0]);
+		if(!scr)
+			return;
+		if(scr != Sender) { //this is an Action Override
+			scr->AddAction(Sender->CurrentAction);
+			Sender->CurrentAction = NULL;
+			return;
+		}
+		tar = GetActorFromObject(Sender, parameters->objects[1]);
+	}
 	if(!tar)
 		return;
 	//source could be other than Actor, we need to handle this too!
@@ -2112,17 +2128,32 @@ void GameScript::BeginDialog(Scriptable *Sender, Action * parameters, int Flags)
 	}
 	//can't initiate dialog, because it is already there
 	if(gc->Dialogue) {
-		printf("[IEScript]: Dialog cannot be initiated because there is already one.\n");
-		Sender->CurrentAction = NULL;
-		return;
+		if(Flags&BD_INTERRUPT) {
+			//break the current dialog if possible
+			gc->EndDialog();
+		}
+		//check if we could manage to break it, not all dialogs are breakable!
+		if(gc->Dialogue) {
+			printf("[IEScript]: Dialog cannot be initiated because there is already one.\n");
+			Sender->CurrentAction = NULL;
+			return;
+		}
 	}
 
 	const char *Dialog;
 	switch(Flags&BD_LOCMASK)
 	{
-	case BD_STRING0:  Dialog=parameters->string0Parameter; break;
+	case BD_STRING0:
+		Dialog=parameters->string0Parameter;
+		if(Flags&BD_SETDIALOG)
+			actor->SetDialog(Dialog);
+	break;
 	case BD_SOURCE: Dialog=actor->Dialog; break;
 	case BD_TARGET: Dialog=target->Dialog; break;
+	case BD_RESERVED: 
+		PlayerDialogRes[5]='1';
+		Dialog=(const char *) PlayerDialogRes;
+		break;
 	}
 	if(!Dialog) {
 		Sender->CurrentAction = NULL;
@@ -2161,7 +2192,7 @@ void GameScript::BeginDialog(Scriptable *Sender, Action * parameters, int Flags)
 //no string, increase talkcount, no interrupt
 void GameScript::Dialogue(Scriptable * Sender, Action * parameters)
 {
-	BeginDialog(Sender, parameters, BD_SOURCE|BD_TALKCOUNT);
+	BeginDialog(Sender, parameters, BD_SOURCE|BD_TALKCOUNT|BD_CHECKDIST);
 }
 
 void GameScript::DialogueForceInterrupt(Scriptable *Sender, Action *parameters)
@@ -2215,7 +2246,19 @@ void GameScript::SetDialogue(Scriptable * Sender, Action * parameters)
 //string0, no interrupt, talkcount increased
 void GameScript::StartDialogue(Scriptable * Sender, Action * parameters)
 {
+	BeginDialog(Sender, parameters, BD_STRING0|BD_TALKCOUNT|BD_SETDIALOG);
+}
+
+//string0, no interrupt, talkcount increased, don't set default
+void GameScript::StartDialogueOverride(Scriptable * Sender, Action * parameters)
+{
 	BeginDialog(Sender, parameters, BD_STRING0|BD_TALKCOUNT);
+}
+
+//string0, no interrupt, talkcount increased, don't set default
+void GameScript::StartDialogueOverrideInterrupt(Scriptable * Sender, Action * parameters)
+{
+	BeginDialog(Sender, parameters, BD_STRING0|BD_TALKCOUNT|BD_INTERRUPT);
 }
 
 //no string, no interrupt, talkcount increased
@@ -2223,12 +2266,12 @@ void GameScript::PlayerDialogue(Scriptable * Sender, Action * parameters)
 {
 	//i think playerdialog is when a player initiates dialog with the
 	//target, in this case, the dialog is the target's dialog
-	BeginDialog(Sender, parameters, BD_TARGET);
+	BeginDialog(Sender, parameters, BD_RESERVED|BD_OWN);
 }
 
 void GameScript::StartDialogueInterrupt(Scriptable * Sender, Action * parameters)
 {
-	BeginDialog(Sender, parameters, BD_STRING0|BD_INTERRUPT|BD_TALKCOUNT);
+	BeginDialog(Sender, parameters, BD_STRING0|BD_INTERRUPT|BD_TALKCOUNT|BD_SETDIALOG);
 }
 
 //No string, flags:0
@@ -2462,6 +2505,7 @@ void GameScript::JoinParty(Scriptable * Sender, Action * parameters)
 	}
 	Actor *act = (Actor *) scr;
 	core->GetGame()->JoinParty(act);
+	act->SetScript("DPLAYER2",SCR_DEFAULT);
 }
 
 void GameScript::LeaveParty(Scriptable * Sender, Action * parameters)
@@ -2539,16 +2583,7 @@ void GameScript::LeaveAreaLUAPanic(Scriptable * Sender, Action * parameters)
 
 void GameScript::SetTokenGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value);
-	}
+	unsigned long value=CheckVariable(Sender, parameters->string0Parameter);
 	char varname[33]; //this is the Token Name
 	strncpy(varname,parameters->string1Parameter,32);
 	varname[32]=0;
@@ -2575,550 +2610,149 @@ void GameScript::PlayDead(Scriptable *Sender, Action *parameters)
 
 void GameScript::GlobalSetGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value);
-	else {
-		globals->SetAt(parameters->string0Parameter, value);
-	}
+	unsigned long value=CheckVariable(Sender, parameters->string0Parameter);
+	SetVariable(Sender, parameters->string1Parameter, value);
 }
 
 /* adding the second variable to the first, they must be GLOBAL */
 void GameScript::AddGlobals(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=0;
-        char Variable0[6+33], Variable1[6+33];
-
-	memcpy(Variable0,"GLOBAL",6);
-	memcpy(Variable1,"GLOBAL",6);
-	strncpy(Variable0+6,parameters->string0Parameter,32);
-	strncpy(Variable1+6,parameters->string0Parameter,32);
-	globals->Lookup(Variable0, value1);
-	globals->Lookup(Variable1, value2);
-	globals->SetAt(Variable0, value1+value2);
+	unsigned long value1=CheckVariable(Sender, "GLOBAL", parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, "GLOBAL", parameters->string1Parameter);
+	SetVariable(Sender, "GLOBAL", parameters->string0Parameter, value1+value2);
 }
 
 /* adding the second variable to the first, they could be area or locals */
 void GameScript::GlobalAddGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string1Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else if(memcmp(parameters->string1Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else {
-		globals->Lookup(parameters->string1Parameter, value2);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1+value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1+value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1+value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, parameters->string1Parameter);
+	SetVariable(Sender, parameters->string0Parameter, value1+value2);
 }
 
 /* adding the number to the global, they could be area or locals */
 void GameScript::IncrementGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1+parameters->int0Parameter);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1+parameters->int0Parameter);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1+parameters->int0Parameter);
-	}
+	unsigned long value=CheckVariable(Sender, parameters->string0Parameter);
+	SetVariable(Sender, parameters->string0Parameter, value+parameters->int0Parameter);
 }
 
 void GameScript::GlobalSubGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value2);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value2);
-	}
-	else {
-		globals->Lookup(parameters->string1Parameter, value2);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1-value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1-value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1-value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, parameters->string1Parameter);
+	SetVariable(Sender, parameters->string0Parameter, value1-value2);
 }
 
 void GameScript::GlobalAndGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string1Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else if(memcmp(parameters->string1Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else {
-		globals->Lookup(parameters->string1Parameter, value2);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1&&value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1&&value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1&&value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, parameters->string1Parameter);
+	SetVariable(Sender, parameters->string0Parameter, value1&&value2);
 }
 
 void GameScript::GlobalOrGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string1Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else if(memcmp(parameters->string1Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else {
-		globals->Lookup(parameters->string1Parameter, value2);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1||value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1||value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1||value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, parameters->string1Parameter);
+	SetVariable(Sender, parameters->string0Parameter, value1||value2);
 }
 
 void GameScript::GlobalBOrGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string1Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else if(memcmp(parameters->string1Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else {
-		globals->Lookup(parameters->string1Parameter, value2);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1|value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1|value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1|value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, parameters->string1Parameter);
+	SetVariable(Sender, parameters->string0Parameter, value1|value2);
 }
 
 void GameScript::GlobalBAndGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string1Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else if(memcmp(parameters->string1Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else {
-		globals->Lookup(parameters->string1Parameter, value2);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1&value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1&value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1&value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, parameters->string1Parameter);
+	SetVariable(Sender, parameters->string0Parameter, value1&value2);
 }
 
 void GameScript::GlobalBOr(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=parameters->int0Parameter;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1|value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1|value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1|value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	SetVariable(Sender, parameters->string0Parameter, value1|parameters->int0Parameter);
 }
 
 void GameScript::GlobalBAnd(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=parameters->int0Parameter;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1&value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1&value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1&value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	SetVariable(Sender, parameters->string0Parameter, value1&parameters->int0Parameter);
 }
 
 void GameScript::GlobalMax(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=parameters->int0Parameter;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(value1>=value2) return;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	if(value1>parameters->int0Parameter)
+		SetVariable(Sender, parameters->string0Parameter, value1);
 }
 
 void GameScript::GlobalMin(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=parameters->int0Parameter;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(value1<=value2) return;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	if(value1<parameters->int0Parameter)
+		SetVariable(Sender, parameters->string0Parameter, value1);
 }
 
 void GameScript::BitClear(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=parameters->int0Parameter;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1&~value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1&~value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1&~value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	SetVariable(Sender, parameters->string0Parameter, value1&~parameters->int0Parameter);
 }
 
 void GameScript::GlobalShL(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
 	unsigned long value2=parameters->int0Parameter;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
 	if(value2>31) value1=0;
 	else value1<<=value2;
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1);
-	}
+	SetVariable(Sender, parameters->string0Parameter, value1);
 }
 
 void GameScript::GlobalShR(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
 	unsigned long value2=parameters->int0Parameter;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
 	if(value2>31) value1=0;
 	else value1>>=value2;
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1);
-	}
+	SetVariable(Sender, parameters->string0Parameter, value1);
 }
 
 void GameScript::GlobalMaxGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string1Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else if(memcmp(parameters->string1Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else {
-		globals->Lookup(parameters->string1Parameter, value2);
-	}
-
-	if(value1>=value2) return;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, parameters->string1Parameter);
+	if(value1<value2)
+		SetVariable(Sender, parameters->string0Parameter, value1);
 }
 
 void GameScript::GlobalMinGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=0;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
-	if(memcmp(parameters->string1Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else if(memcmp(parameters->string1Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string1Parameter[6], value2);
-	}
-	else {
-		globals->Lookup(parameters->string1Parameter, value2);
-	}
-
-	if(value1<=value2) return;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value2);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value2);
-	else {
-		globals->SetAt(parameters->string0Parameter, value2);
-	}
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, parameters->string1Parameter);
+	if(value1<value2)
+		SetVariable(Sender, parameters->string0Parameter, value1);
 }
 
 void GameScript::GlobalShLGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=parameters->int0Parameter;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, parameters->string1Parameter);
 	if(value2>31) value1=0;
 	else value1<<=value2;
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1);
-	}
+	SetVariable(Sender, parameters->string0Parameter, value1);
 }
 void GameScript::GlobalShRGlobal(Scriptable *Sender, Action *parameters)
 {
-	unsigned long value1=0;
-	unsigned long value2=parameters->int0Parameter;
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
-		globals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
-		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
-	}
-	else {
-		globals->Lookup(parameters->string0Parameter, value1);
-	}
-
+	unsigned long value1=CheckVariable(Sender, parameters->string0Parameter);
+	unsigned long value2=CheckVariable(Sender, parameters->string1Parameter);
 	if(value2>31) value1=0;
 	else value1>>=value2;
-
-	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
-		globals->SetAt(&parameters->string0Parameter[6], value1);
-	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
-		Sender->locals->SetAt(&parameters->string0Parameter[6], value1);
-	else {
-		globals->SetAt(parameters->string0Parameter, value1);
-	}
+	SetVariable(Sender, parameters->string0Parameter, value1);
 }
 
 void GameScript::ClearAllActions(Scriptable *Sender, Action *parameters)
