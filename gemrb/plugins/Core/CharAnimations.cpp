@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.12 2003/11/25 18:59:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.13 2003/11/26 16:29:34 balrog994 Exp $
  *
  */
 
@@ -89,12 +89,10 @@ additional frames added in a second time.
 Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Orient)
 {
 	//TODO: Implement Auto Resource Loading
-	if((LoadedFlag & (1 << AnimID))) {
-		if(Anims[AnimID][Orient]) {
-			if(Anims[AnimID][Orient]->ChangePalette && UsePalette) {
-				Anims[AnimID][Orient]->SetPalette(Palette);
-				Anims[AnimID][Orient]->ChangePalette = false;
-			}
+	if(Anims[AnimID][Orient]) {
+		if(Anims[AnimID][Orient]->ChangePalette && UsePalette) {
+			Anims[AnimID][Orient]->SetPalette(Palette);
+			Anims[AnimID][Orient]->ChangePalette = false;
 		}
 		return Anims[AnimID][Orient];
 	}
@@ -103,6 +101,7 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 	unsigned char Cycle;
 	GetAnimResRef(AnimID, Orient, ResRef, Cycle);
 	DataStream * stream = core->GetResourceMgr()->GetResource(ResRef, IE_BAM_CLASS_ID);
+	printf("Loaded %s\n", ResRef);
 	free(ResRef);
 	AnimationMgr * anim = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
 	anim->Open(stream, true);
@@ -164,7 +163,6 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 			}
 		break;
 	}
-	LoadedFlag |= (1 << AnimID);
 	if(Anims[AnimID][Orient]) {
 		if(Anims[AnimID][Orient]->ChangePalette && UsePalette) {
 			Anims[AnimID][Orient]->SetPalette(Palette);
@@ -172,6 +170,123 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 		}
 	}
 	return Anims[AnimID][Orient];
+}
+
+void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, char * ResRef, unsigned char & Cycle)
+{
+	switch(MirrorType) 
+		{
+		case IE_ANI_CODE_MIRROR:
+			{
+				if(OrientCount == 9) {
+					AddVHRSuffix(ResRef, AnimID, Cycle, Orient);
+					ResRef[8] = 0;
+				}
+				else {
+					
+				}
+			}
+		break;
+
+		case IE_ANI_TWO_FILES_2:
+			{
+				if(OrientCount == 5) {
+					AddMHRSuffix(ResRef, AnimID, Cycle, Orient);
+					ResRef[8] = 0;
+				}
+				else {
+					
+				}
+			}
+		break;
+
+		case IE_ANI_TWO_FILES_3:
+			{
+				if(OrientCount == 5) {
+					AddMMRSuffix(ResRef, AnimID, Cycle, Orient);
+					ResRef[8] = 0;
+				}
+			}
+		break;
+
+		case IE_ANI_TWO_FILES:
+			{
+				if(OrientCount == 5) {
+					char * val = Avatars->QueryField(RowIndex, AnimID+4);
+					if(val[0] == '*') {
+						ResRef[0] = 0;
+						return;
+					}
+					Cycle = atoi(val) + (Orient/2);
+					switch(AnimID) {
+						case IE_ANI_ATTACK:
+						case IE_ANI_ATTACK_BACKSLASH:
+						case IE_ANI_ATTACK_SLASH:
+						case IE_ANI_ATTACK_JAB:
+						case IE_ANI_CAST:
+						case IE_ANI_CONJURE:
+						case IE_ANI_SHOOT:
+							strcat(ResRef, "G2");
+						break;
+
+						default:
+							strcat(ResRef, "G1");
+						break;
+					}
+					if(Orient > 9) {
+						strcat(ResRef, "E");
+					}
+				}
+			}
+		break;
+
+		case IE_ANI_CODE_MIRROR_2:
+			{
+				if(OrientCount == 9) {
+					char * val = Avatars->QueryField(RowIndex, AnimID+4);
+					if(val[0] == '*') {
+						ResRef[0] = 0;
+						return;
+					}
+					if(Orient > 8)
+						Cycle = 7 - (Orient % 9);
+					else
+						Cycle = (Orient % 9);
+					Cycle += atoi(val);
+					switch(AnimID) {
+						case IE_ANI_ATTACK_BACKSLASH:
+							strcat(ResRef, "G21");
+						break;
+
+						case IE_ANI_ATTACK_SLASH:
+							strcat(ResRef, "G2");
+						break;
+
+						case IE_ANI_ATTACK_JAB:
+							strcat(ResRef, "G22");
+						break;
+
+						case IE_ANI_AWAKE:
+							strcat(ResRef, "G12");
+						break;
+
+						case IE_ANI_DIE:
+						case IE_ANI_DAMAGE:
+							strcat(ResRef, "G14");
+						break;
+
+						case IE_ANI_READY:
+							strcat(ResRef, "G1");
+						break;
+
+						case IE_ANI_WALK:
+							strcat(ResRef, "G11");
+						break;
+					}
+				}
+			}
+		break;
+		}
 }
 
 void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient)
@@ -236,7 +351,10 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 						strcat(ResRef, "A7");
 					break;
 					}
-				Cycle = (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
 				}
 			break;
 
@@ -256,7 +374,10 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 						strcat(ResRef, "A8");
 					break;
 					}
-				Cycle = (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
 				}
 			break;
 
@@ -276,42 +397,64 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 						strcat(ResRef, "A9");
 					break;
 					}
-				Cycle = (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
 				}
 			break;
 
 			case IE_ANI_AWAKE:
 				{
 				strcat(ResRef, "G1");
-				Cycle = 9 + (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
+				Cycle+=9;
 				}
 			break;
 
 			case IE_ANI_CAST:
 				{
 				strcat(ResRef, "CA");
-				Cycle = 9 + (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
+				Cycle+=9;
 				}
 			break;
 
 			case IE_ANI_CONJURE:
 				{
 				strcat(ResRef, "CA");
-				Cycle = (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
 				}
 			break;
 
 			case IE_ANI_DAMAGE:
 				{
 				strcat(ResRef, "G14");
-				Cycle = 36 + (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
+				Cycle+=36;
 				}
 			break;
 
 			case IE_ANI_DIE:
 				{
 				strcat(ResRef, "G15");
-				Cycle = 45 + (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
+				Cycle+=45;
 				}
 			break;
 
@@ -320,14 +463,22 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 			case IE_ANI_EMERGE:
 				{
 				strcat(ResRef, "G15");
-				Cycle = 45 + (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
+				Cycle+=45;
 				}
 			break;
 
 			case IE_ANI_HEAD_TURN:
 				{
 				strcat(ResRef, "G12");
-				Cycle = 18 + (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
+				Cycle+=18;
 				}
 			break;
 
@@ -341,7 +492,11 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 			case IE_ANI_READY:
 				{
 				strcat(ResRef, "G13");
-				Cycle = 27 + (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
+				Cycle+=27;
 				}
 			break;
 
@@ -353,45 +508,57 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 					case IE_ANI_RANGED_BOW:
 						{
 						strcat(ResRef, "SA");
-						Cycle = (Orient % 9);
 						}
 					break;
 
 					case IE_ANI_RANGED_XBOW:
 						{
 						strcat(ResRef, "SX");
-						Cycle = (Orient % 9);
 						}
 					break;
 					
 					case IE_ANI_RANGED_THROW:
 						{
 						strcat(ResRef, "SS");
-						Cycle = (Orient % 9);
 						}
 					break;
 					}
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
 				}
 			break;
 
 			case IE_ANI_SLEEP:
 				{
 				strcat(ResRef, "G16");
-				Cycle = 54 + (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
+				Cycle+=54;
 				}
 			break;
 
 			case IE_ANI_TWITCH:
 				{
 				strcat(ResRef, "G17");
-				Cycle = 72 + (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
+				Cycle+=72;
 				}
 			break;
 
 			case IE_ANI_WALK:
 				{
 				strcat(ResRef, "G11");
-				Cycle = (Orient % 9);
+				if(Orient > 8)
+					Cycle = 7 - (Orient % 9);
+				else
+					Cycle = (Orient % 9);
 				}
 			break;
 			}
@@ -580,7 +747,7 @@ void CharAnimations::AddMHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 				}
 			break;
 			}
-		if(Orient > 10)
+		if(Orient > 9)
 			strcat(ResRef, "E");
 	}
 
@@ -680,7 +847,7 @@ void CharAnimations::AddMMRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 				}
 			break;
 			}
-		if(Orient > 10)
+		if(Orient > 9)
 			strcat(ResRef, "E");
 	}
 

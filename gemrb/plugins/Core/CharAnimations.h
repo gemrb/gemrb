@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.13 2003/11/25 18:59:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.14 2003/11/26 16:29:34 balrog994 Exp $
  *
  */
 
@@ -114,118 +114,7 @@ private:
 	void AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient);
 	void AddMHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient);
 	void AddMMRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient);
-	void GetAnimResRef(unsigned char AnimID, unsigned char Orient, char * ResRef, unsigned char & Cycle)
-	{
-		switch(MirrorType) 
-			{
-			case IE_ANI_CODE_MIRROR:
-				{
-					if(OrientCount == 9) {
-						AddVHRSuffix(ResRef, AnimID, Cycle, Orient);
-						ResRef[8] = 0;
-					}
-					else {
-						
-					}
-				}
-			break;
-
-			case IE_ANI_TWO_FILES_2:
-				{
-					if(OrientCount == 5) {
-						AddMHRSuffix(ResRef, AnimID, Cycle, Orient);
-						ResRef[8] = 0;
-					}
-					else {
-						
-					}
-				}
-			break;
-
-			case IE_ANI_TWO_FILES_3:
-				{
-					if(OrientCount == 5) {
-						AddMMRSuffix(ResRef, AnimID, Cycle, Orient);
-						ResRef[8] = 0;
-					}
-				}
-			break;
-
-			case IE_ANI_TWO_FILES:
-				{
-					if(OrientCount == 5) {
-						char * val = Avatars->QueryField(RowIndex, AnimID+4);
-						if(val[0] == '*') {
-							ResRef[0] = 0;
-							return;
-						}
-						Cycle = atoi(val) + (Orient/2);
-						switch(AnimID) {
-							case IE_ANI_ATTACK:
-							case IE_ANI_ATTACK_BACKSLASH:
-							case IE_ANI_ATTACK_SLASH:
-							case IE_ANI_ATTACK_JAB:
-							case IE_ANI_CAST:
-							case IE_ANI_CONJURE:
-							case IE_ANI_SHOOT:
-								strcat(ResRef, "G2");
-							break;
-
-							default:
-								strcat(ResRef, "G1");
-							break;
-						}
-						if(Orient > 10) {
-							strcat(ResRef, "E");
-						}
-					}
-				}
-			break;
-
-			case IE_ANI_CODE_MIRROR_2:
-				{
-					if(OrientCount == 9) {
-						char * val = Avatars->QueryField(RowIndex, AnimID+4);
-						if(val[0] == '*') {
-							ResRef[0] = 0;
-							return;
-						}
-						Cycle = atoi(val) + (Orient/2);
-						switch(AnimID) {
-							case IE_ANI_ATTACK_BACKSLASH:
-								strcat(ResRef, "G21");
-							break;
-
-							case IE_ANI_ATTACK_SLASH:
-								strcat(ResRef, "G2");
-							break;
-
-							case IE_ANI_ATTACK_JAB:
-								strcat(ResRef, "G22");
-							break;
-
-							case IE_ANI_AWAKE:
-								strcat(ResRef, "G12");
-							break;
-
-							case IE_ANI_DIE:
-							case IE_ANI_DAMAGE:
-								strcat(ResRef, "G14");
-							break;
-
-							case IE_ANI_READY:
-								strcat(ResRef, "G1");
-							break;
-
-							case IE_ANI_WALK:
-								strcat(ResRef, "G11");
-							break;
-						}
-					}
-				}
-			break;
-			}
-	}
+	void GetAnimResRef(unsigned char AnimID, unsigned char Orient, char * ResRef, unsigned char & Cycle);
 };
 
 #endif
