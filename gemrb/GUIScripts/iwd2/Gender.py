@@ -36,10 +36,19 @@ def OnLoad():
 	GemRB.SetText(GenderWindow,DoneButton,36789)
 	GemRB.SetButtonFlags(GenderWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-
 	TextAreaControl = GemRB.GetControl(GenderWindow, 5)
 	GemRB.SetText(GenderWindow,TextAreaControl,17236)
 
+	MaleButton = GemRB.GetControl(GenderWindow,7)
+	GemRB.SetEvent(GenderWindow,MaleButton,IE_GUI_BUTTON_ON_PRESS,"ClickedMale")
+	GemRB.SetButtonFlags(GenderWindow,MaleButton,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	FemaleButton = GemRB.GetControl(GenderWindow,8)
+	GemRB.SetEvent(GenderWindow,FemaleButton,IE_GUI_BUTTON_ON_PRESS,"ClickedFemale")
+	GemRB.SetButtonFlags(GenderWindow,FemaleButton,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	GemRB.SetVarAssoc(GenderWindow,MaleButton,"Gender",1)
+	GemRB.SetVarAssoc(GenderWindow,FemaleButton,"Gender",2)
+	
+	
 	MaleButton = GemRB.GetControl(GenderWindow,2)
 	GemRB.SetButtonFlags(GenderWindow,MaleButton,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 	GemRB.SetText(GenderWindow,MaleButton,1050)
