@@ -117,6 +117,7 @@ def OnLoad():
 
 	GenderButton = GemRB.GetControl(CharGenWindow, 0)
 	GemRB.SetButtonState(CharGenWindow, GenderButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow, GenderButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	GemRB.SetEvent(CharGenWindow, GenderButton, IE_GUI_BUTTON_ON_PRESS, "GenderPress")
 	GemRB.SetText(CharGenWindow, GenderButton, 11956)
 
@@ -204,22 +205,33 @@ def BackPress():
 
 	if CharGenState == 0:
 		GemRB.SetButtonState(CharGenWindow, RaceButton, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetButtonFlags(CharGenWindow, RaceButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 		GemRB.SetButtonState(CharGenWindow, GenderButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonFlags(CharGenWindow, GenderButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	elif CharGenState == 1:
 		GemRB.SetButtonState(CharGenWindow, ClassButton, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetButtonFlags(CharGenWindow, ClassButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 		GemRB.SetButtonState(CharGenWindow, RaceButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonFlags(CharGenWindow, RaceButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	elif CharGenState == 2:
 		GemRB.SetButtonState(CharGenWindow, AlignmentButton, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetButtonFlags(CharGenWindow, AlignmentButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 		GemRB.SetButtonState(CharGenWindow, ClassButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonFlags(CharGenWindow, ClassButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	elif CharGenState == 3:
 		GemRB.SetButtonState(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetButtonFlags(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 		GemRB.SetButtonState(CharGenWindow, AlignmentButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonFlags(CharGenWindow, AlignmentButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	elif CharGenState == 4:
 		GemRB.SetButtonState(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetButtonFlags(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 		GemRB.SetButtonState(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonFlags(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	elif CharGenState == 5:
 		GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonState(CharGenWindow, SkillsButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonFlags(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	elif CharGenState == 6:
 		GemRB.SetButtonState(CharGenWindow, NameButton, IE_GUI_BUTTON_DISABLED)
@@ -271,6 +283,7 @@ def AcceptPress():
 	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar("Ability 5"))
 	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability 6"))
 
+	GemRB.SetPlayerName(MyChar, NameField, 0)
 	GemRB.FillPlayerInfo(MyChar,PortraitName+"S", PortraitName+"L")
 	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("PartyFormation")
@@ -363,11 +376,16 @@ def GenderPress():
 
 	MaleButton = GemRB.GetControl(GenderWindow, 2)
 	GemRB.SetButtonState(GenderWindow, MaleButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(GenderWindow, MaleButton, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 	GemRB.SetEvent(GenderWindow, MaleButton, IE_GUI_BUTTON_ON_PRESS, "MalePress")
 
 	FemaleButton = GemRB.GetControl(GenderWindow, 3)
 	GemRB.SetButtonState(GenderWindow, FemaleButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(GenderWindow, FemaleButton, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 	GemRB.SetEvent(GenderWindow, FemaleButton, IE_GUI_BUTTON_ON_PRESS, "FemalePress")
+
+	GemRB.SetVarAssoc(GenderWindow, MaleButton, "Gender", 1)
+	GemRB.SetVarAssoc(GenderWindow, FemaleButton, "Gender", 2)
 
 	GenderTextArea = GemRB.GetControl(GenderWindow, 5)
 	GemRB.SetText(GenderWindow, GenderTextArea, 17236)
@@ -388,14 +406,12 @@ def GenderPress():
 
 def MalePress():
 	global GenderWindow, GenderDoneButton, GenderTextArea
-	GemRB.SetVar("Gender", 1)
 	GemRB.SetText(GenderWindow, GenderTextArea, 13083)
 	GemRB.SetButtonState(GenderWindow, GenderDoneButton, IE_GUI_BUTTON_ENABLED)
 	return
 
 def FemalePress():
 	global GenderWindow, GenderDoneButton, GenderTextArea
-	GemRB.SetVar("Gender", 2)
 	GemRB.SetText(GenderWindow, GenderTextArea, 13084)
 	GemRB.SetButtonState(GenderWindow, GenderDoneButton, IE_GUI_BUTTON_ENABLED)
 	return
@@ -487,7 +503,9 @@ def PortraitDonePress():
 	GemRB.UnloadWindow(PortraitWindow)
 	GemRB.SetButtonPicture(CharGenWindow, PortraitButton, GemRB.GetTableRowName(PortraitTable, Portrait) + "L")
 	GemRB.SetButtonState(CharGenWindow, GenderButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonFlags(CharGenWindow, GenderButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 	GemRB.SetButtonState(CharGenWindow, RaceButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow, RaceButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 1
 	SetCharacterDescription()
 	GemRB.SetVisible(CharGenWindow, 1)
@@ -507,6 +525,7 @@ def RacePress():
 	GemRB.SetVisible(CharGenWindow, 0)
 	RaceWindow = GemRB.LoadWindow(8)
 	RaceTable = GemRB.LoadTable("RACES")
+	GemRB.SetVar("Race", 0)
 
 	for i in range(2, 8):
 		RaceSelectButton = GemRB.GetControl(RaceWindow, i)
@@ -547,7 +566,9 @@ def RaceDonePress():
 	global CharGenWindow, CharGenState, RaceWindow, RaceButton, ClassButton
 	GemRB.UnloadWindow(RaceWindow)
 	GemRB.SetButtonState(CharGenWindow, RaceButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonFlags(CharGenWindow, RaceButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 	GemRB.SetButtonState(CharGenWindow, ClassButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow, ClassButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 2
 	SetCharacterDescription()
 	GemRB.SetVisible(CharGenWindow, 1)
@@ -728,7 +749,9 @@ def ClassDonePress():
 	global CharGenWindow, CharGenState, ClassWindow, ClassButton, AlignmentButton
 	GemRB.UnloadWindow(ClassWindow)
 	GemRB.SetButtonState(CharGenWindow, ClassButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonFlags(CharGenWindow, ClassButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 	GemRB.SetButtonState(CharGenWindow, AlignmentButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow, AlignmentButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 3
 	SetCharacterDescription()
 	GemRB.SetVisible(CharGenWindow, 1)
@@ -795,7 +818,9 @@ def AlignmentDonePress():
 	global CharGenWindow, CharGenState, AlignmentWindow, AlignmentButton, AbilitiesButton
 	GemRB.UnloadWindow(AlignmentWindow)
 	GemRB.SetButtonState(CharGenWindow, AlignmentButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonFlags(CharGenWindow, AlignmentButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 	GemRB.SetButtonState(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 4
 	SetCharacterDescription()
 	GemRB.SetVisible(CharGenWindow, 1)
@@ -987,7 +1012,9 @@ def AbilitiesDonePress():
 	global CharGenWindow, CharGenState, AbilitiesWindow, AbilitiesButton, SkillsButton, SkillsState
 	GemRB.UnloadWindow(AbilitiesWindow)
 	GemRB.SetButtonState(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonFlags(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 	GemRB.SetButtonState(CharGenWindow, SkillsButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 5
 	SkillsState = 0
 	SetCharacterDescription()
@@ -1049,7 +1076,9 @@ def SkillsPress():
 
 	if SkillsState == 4:
 		GemRB.SetButtonState(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetButtonFlags(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 		GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonFlags(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 		CharGenState = 6
 		SetCharacterDescription()
 	return
@@ -1791,6 +1820,7 @@ def CharSoundDonePress():
 	global CharGenWindow, CharSoundWindow, AppearanceButton, BiographyButton, NameButton, CharGenState
 	GemRB.UnloadWindow(CharSoundWindow)
 	GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonFlags(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 	GemRB.SetButtonState(CharGenWindow, BiographyButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetButtonState(CharGenWindow, NameButton, IE_GUI_BUTTON_ENABLED)
 	CharGenState = 7
@@ -1892,6 +1922,7 @@ def NameDonePress():
 	GemRB.UnloadWindow(NameWindow)
 	CharGenState = 8
 	GemRB.SetButtonState(CharGenWindow, AcceptButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow, AcceptButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	SetCharacterDescription()
 	GemRB.SetVisible(CharGenWindow, 1)
 	return

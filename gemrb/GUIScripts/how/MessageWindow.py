@@ -1,12 +1,14 @@
 import GemRB
 
 MessageWindow = 0
+PortraitWindow = 0
 ExpandButton = 0
 ContractButton = 0
 MaxExpand = 2
 
 def OnLoad():
-	global MessageWindow, ExpandButton, Expand
+	global MessageWindow, PortraitWindow, ExpandButton, Expand
+
 	GemRB.LoadWindowPack("GUIW")
 	ActionsWindow = GemRB.LoadWindow(3)
 	PortraitWindow = GemRB.LoadWindow(26)
@@ -135,7 +137,7 @@ def PopulatePortraitWindow ():
 		GemRB.SetVarAssoc (Window, Button, 'SelectedSingle', i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 
-		pic = GemRB.GetPlayerPortrait (i+1,0)
+		pic = GemRB.GetPlayerPortrait (i+1,1)
 		GemRB.SetButtonPicture(Window, Button, pic)
 		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE, OP_SET)
 
