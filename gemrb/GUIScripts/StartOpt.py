@@ -26,25 +26,21 @@ def OnLoad():
 	return
 	
 def SoundPress():
-	global OptionsWindow
 	GemRB.UnloadWindow(OptionsWindow)
 	GemRB.SetNextScript("GUIOPT7")
 	return
 	
 def GamePress():
-	global OptionsWindow
 	GemRB.UnloadWindow(OptionsWindow)
 	GemRB.SetNextScript("GUIOPT8")
 	return
 	
 def GraphicPress():
-	global OptionsWindow
 	GemRB.UnloadWindow(OptionsWindow)
 	GemRB.SetNextScript("GUIOPT6")
 	return
 	
 def BackPress():
-	global OptionsWindow
 	GemRB.UnloadWindow(OptionsWindow)
 	GemRB.SetNextScript("Start")
 	return

@@ -113,6 +113,9 @@ def LoadSingle():
 	return
 
 def NewSingle():
+	GemRB.UnloadWindow(StartWindow)
+	GemRB.UnloadWindow(QuitWindow)
+	GemRB.UnloadWindow(TutorialWindow)
 #main menu: -1, single player:0, tutorial mode=1, multi-player:2
 #GemRB.SetPlayMode(0)
         GemRB.SetNextScript("CharGen") #temporarily

@@ -8,13 +8,17 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)
-#        CancelButton = GemRB.GetControl(CharGenWindow, 11)
+	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
+	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+
+        CancelButton = GemRB.GetControl(CharGenWindow, 15)
 #        NextButton = GemRB.GetControl(CharGenWindow, 10)
-#        GemRB.SetText(CharGenWindow, CancelButton, 13727)
+        GemRB.SetText(CharGenWindow, CancelButton, 13727)
 #        GemRB.SetText(CharGenWindow, NextButton, 33093)
 #        GemRB.SetEvent(CharGenWindow, NextButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
-#        GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.ShowModal(CharGenWindow)
+        GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+#	GemRB.ShowModal(CharGenWindow)
+	GemRB.SetVisible(CharGenWindow,1)
 	return
 	
 def NextPress():
