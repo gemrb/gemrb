@@ -85,11 +85,12 @@ private:
 	bool ChangeArea;
 public:
 	char Destination[33], EntranceName[33];
+	bool Dialogue;
+public:
 	void SetCutSceneMode(bool active);
 	void HideGUI();
 	void UnhideGUI();
 	void InitDialog(Actor * speaker, Actor * target, Dialog * dlg);
-	bool Dialogue;
 	void DialogChoose(int choose);
 	void DisplayString(Scriptable * target);
 private:

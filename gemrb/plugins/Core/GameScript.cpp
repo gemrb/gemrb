@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.59 2004/02/08 07:52:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.60 2004/02/08 16:43:49 avenger_teambg Exp $
  *
  */
 
@@ -45,6 +45,9 @@ static TriggerLink triggernames[]={
 {"alignment", GameScript::Alignment},
 {"allegiance", GameScript::Allegiance},
 {"bitcheck",GameScript::BitCheck},
+{"checkstat",GameScript::CheckStat},
+{"checkstatgt",GameScript::CheckStatGT},
+{"checkstatlt",GameScript::CheckStatLT},
 {"class", GameScript::Class},
 {"clicked", GameScript::Clicked},
 {"dead", GameScript::Dead},
@@ -57,6 +60,7 @@ static TriggerLink triggernames[]={
 {"globallt", GameScript::GlobalLT},
 {"globalsequal", GameScript::GlobalsEqual},
 {"inparty", GameScript::InParty},
+{"isvalidforpartydialog", GameScript::IsValidForPartyDialog},
 {"numtimestalkedto", GameScript::NumTimesTalkedTo},
 {"numtimestalkedtogt", GameScript::NumTimesTalkedToGT},
 {"numtimestalkedtolt", GameScript::NumTimesTalkedToLT},
@@ -570,7 +574,7 @@ bool GameScript::EvaluateTrigger(Scriptable * Sender, Trigger * trigger)
 	TriggerFunction func = triggers[trigger->triggerID];
 	if(!func) {
 		triggers[trigger->triggerID]=False;
-		printf("[IEScript]: Unhandled trigger code: %x\n",trigger->triggerID);
+		printf("[IEScript]: Unhandled trigger code: 0x%04x\n",trigger->triggerID);
 		return false;
 	}
 	int ret = func(Sender, trigger);
@@ -1169,6 +1173,32 @@ int GameScript::Class(Scriptable * Sender, Trigger * parameters)
 	return parameters->int0Parameter==value;
 }
 
+//atm this checks for InParty and See, it is unsure what is required
+int GameScript::IsValidForPartyDialog(Scriptable *Sender, Trigger *parameters)
+{
+	Scriptable * actor = GetActorFromObject(Sender, parameters->objectParameter);
+	if(actor==NULL)
+		return 0;
+	//non actors got no visual range, needs research
+	if(Sender->Type!=ST_ACTOR)
+		return 0;
+	Actor * snd = (Actor*)Sender;
+	if(actor->Type!=ST_ACTOR)
+		return 0;
+//return actor->InParty?1:0; //maybe ???
+	if(!core->GetGame()->InParty((Actor *) actor) )
+		return 0;
+	long x = (actor->XPos - Sender->XPos);
+	long y = (actor->YPos - Sender->YPos);
+	double distance = sqrt((double)(x*x+y*y));
+	if(distance > (snd->Modified[IE_VISUALRANGE]*20))
+		return 0;
+	if(!core->GetPathFinder()->IsVisible(Sender->XPos, Sender->YPos, actor->XPos, actor->YPos))
+		return 0;
+	//further checks, is target alive and talkative
+	return 1;
+}
+
 int GameScript::InParty(Scriptable * Sender, Trigger * parameters)
 {
 	Scriptable * actor = GetActorFromObject(Sender, parameters->objectParameter);
@@ -1417,6 +1447,53 @@ int GameScript::Entered(Scriptable * Sender, Trigger * parameters)
 
 int GameScript::Dead(Scriptable * Sender, Trigger * parameters)
 {
+	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!target)
+		return 0;
+	if(target->Type!=ST_ACTOR)
+		return 0;
+	Actor *actor=(Actor *) target;
+	if(actor->GetStat(IE_STATE_ID)&STATE_DEAD)
+		return 1;
+	return 0;
+}
+
+int GameScript::CheckStat(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!target)
+		return 0;
+	if(target->Type!=ST_ACTOR)
+		return 0;
+	Actor *actor=(Actor *) target;
+	if(actor->GetStat(parameters->int0Parameter)==parameters->int1Parameter)
+		return 1;
+	return 0;
+}
+
+int GameScript::CheckStatGT(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!target)
+		return 0;
+	if(target->Type!=ST_ACTOR)
+		return 0;
+	Actor *actor=(Actor *) target;
+	if(actor->GetStat(parameters->int0Parameter)>parameters->int1Parameter)
+		return 1;
+	return 0;
+}
+
+int GameScript::CheckStatLT(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!target)
+		return 0;
+	if(target->Type!=ST_ACTOR)
+		return 0;
+	Actor *actor=(Actor *) target;
+	if(actor->GetStat(parameters->int0Parameter)<parameters->int1Parameter)
+		return 1;
 	return 0;
 }
 
@@ -1674,6 +1751,8 @@ void GameScript::ChangeAIScript(Scriptable * Sender, Action *parameters)
 	if(scr->Type != ST_ACTOR)
 		return;
 	Actor * actor = (Actor*)scr;
+	//changeaiscript clears the queue, i believe
+	actor->ClearActions();
 	actor->SetScript(parameters->string0Parameter, parameters->int0Parameter);
 }
 
@@ -2010,6 +2089,7 @@ void GameScript::BeginDialog(Scriptable *Sender, Action * parameters, int Flags)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
@@ -2017,6 +2097,7 @@ void GameScript::BeginDialog(Scriptable *Sender, Action * parameters, int Flags)
 		return;
 	//source could be other than Actor, we need to handle this too!
 	if(scr->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	//no need to check these for NULL
@@ -2026,11 +2107,13 @@ void GameScript::BeginDialog(Scriptable *Sender, Action * parameters, int Flags)
 	GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
 	if(gc->ControlType != IE_GUI_GAMECONTROL) {
 		printf("[IEScript]: Dialog cannot be initiated because there is no GameControl.\n");
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	//can't initiate dialog, because it is already there
 	if(gc->Dialogue) {
 		printf("[IEScript]: Dialog cannot be initiated because there is already one.\n");
+		Sender->CurrentAction = NULL;
 		return;
 	}
 
@@ -2041,8 +2124,10 @@ void GameScript::BeginDialog(Scriptable *Sender, Action * parameters, int Flags)
 	case BD_SOURCE: Dialog=actor->Dialog; break;
 	case BD_TARGET: Dialog=target->Dialog; break;
 	}
-	if(!Dialog)
+	if(!Dialog) {
+		Sender->CurrentAction = NULL;
 		return;
+	}
 
 	//we also need to freeze active scripts during a dialog!
 	if((Flags&BD_INTERRUPT) ) target->ClearActions();
@@ -2050,7 +2135,8 @@ void GameScript::BeginDialog(Scriptable *Sender, Action * parameters, int Flags)
 	{
 		if(target->GetNextAction())
 		{
-			printf("Target appears busy!\n");
+			printf("[IEScript]: Target appears busy!\n");
+			Sender->CurrentAction = NULL;
 			return;
 		}
 	}

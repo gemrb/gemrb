@@ -1044,6 +1044,7 @@ void GameControl::DialogChoose(int choose)
 			free(string);
 			int i;
 			ta->SetMinRow(true);
+			int idx=0;
 			for(int x = 0; x < ds->transitionsCount; x++) {
 				if(ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
 					bool ret = true;
@@ -1062,7 +1063,8 @@ void GameControl::DialogChoose(int choose)
 				} else {
 					char * s = core->GetString(ds->transitions[x]->textStrRef);
 					string = (char*)malloc(30);
-					sprintf(string, "[s=%d,ffffff,ff0000]%d - [p]", x, x+1);
+					idx++;
+					sprintf(string, "[s=%d,ffffff,ff0000]%d - [p]", x, idx);
 					i = ta->AppendText(string, -1);
 					ta->AppendText(s, i);
 					ta->AppendText("[/p][/s]", i);

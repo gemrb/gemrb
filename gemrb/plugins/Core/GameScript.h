@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.39 2004/02/08 07:52:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.40 2004/02/08 16:43:49 avenger_teambg Exp $
  *
  */
 
@@ -593,6 +593,7 @@ public: //Script Functions
 	static int  Class(Scriptable * Sender, Trigger * parameters);
 	static int  Exists(Scriptable * Sender, Trigger * parameters);
 	static int  InParty(Scriptable * Sender, Trigger * parameters);
+	static int  IsValidForPartyDialog(Scriptable * Sender, Trigger * parameters);
 	static int  General(Scriptable * Sender, Trigger * parameters);
 	static int  Range(Scriptable * Sender, Trigger * parameters);
 	static int  Or(Scriptable * Sender, Trigger * parameters);
@@ -601,6 +602,9 @@ public: //Script Functions
 	static int  Dead(Scriptable * Sender, Trigger * parameters);
 	static int  See(Scriptable * Sender, Trigger * parameters);
 	static int  BitCheck(Scriptable * Sender, Trigger * parameters);
+	static int  CheckStat(Scriptable * Sender, Trigger * parameters);
+	static int  CheckStatGT(Scriptable * Sender, Trigger * parameters);
+	static int  CheckStatLT(Scriptable * Sender, Trigger * parameters);
 public:
 	//Actions
 	static void NoAction(Scriptable * Sender, Action * parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.71 2004/01/30 22:35:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.72 2004/02/08 16:43:50 avenger_teambg Exp $
  *
  */
 
@@ -115,6 +115,8 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 	//Draw the Map
 	if(tm)
 		tm->DrawOverlay(0, viewport);
+	//Run the Global Script
+	ExecuteScript(core->GetGame()->GlobalScript);
 	//Run the Map Script
 	if(Scripts[0])
 		ExecuteScript(Scripts[0]);

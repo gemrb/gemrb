@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.9 2004/01/31 18:45:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.10 2004/02/08 16:43:49 avenger_teambg Exp $
  *
  */
 
@@ -40,7 +40,7 @@ class Game;
 #include "Actor.h"
 #include "Map.h"
 
-class GEM_EXPORT Game
+class GEM_EXPORT Game : public Scriptable
 {
 public:
 	Game(void);
@@ -50,6 +50,7 @@ private:
 	std::vector<Actor*> NPCs;
 	std::vector<Map*> Maps;
 public:
+        GameScript *GlobalScript;
 	int PartySize;
 public:
 	Actor* GetPC(unsigned int slot);
@@ -70,6 +71,8 @@ public:
 	int DelMap(unsigned int index, bool autoFree = false);
 	int AddNPC(Actor *npc);
 	Actor* GetNPC(unsigned int Index);
+        //sets the global script (baldur.bcs)
+        void SetScript(const char *aScript);
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.118 2004/02/02 01:14:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.119 2004/02/08 16:43:49 avenger_teambg Exp $
  *
  */
 
@@ -78,6 +78,8 @@ Interface::Interface(int iargc, char **iargv)
 	memcpy(GameData,"data\0\0\0\0",9);
 	memcpy(ButtonFont,"STONESML",9);
 	memcpy(CursorBam,"CAROT\0\0\0",9);
+	memcpy(GlobalScript,"BALDUR\0\0",9);
+	memcpy(GlobalMap,"WORLDMAP",9);
 	GameFeatures=0;
 	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
@@ -1586,6 +1588,5 @@ void Interface::LoadGame(int index) {
 	if(game)
 		delete(game);
 	game = sgm->GetGame();
-printf("game loaded and set\n");
 	FreeInterface(sgm);
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.70 2004/02/07 23:52:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.71 2004/02/08 16:43:50 avenger_teambg Exp $
  *
  */
 
@@ -120,6 +120,8 @@ private:
 	char ButtonFont[9];
 	char CursorBam[9];
 public:
+	char GlobalScript[9];
+	char GlobalMap[9];
 	Animation **Cursors;
 	int CursorCount;
 public:
