@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.11 2004/08/06 01:20:07 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.12 2004/08/26 16:36:33 edheldil Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -161,8 +161,8 @@ def OpenVideoOptionsWindow ():
 	OptDone ('VideoOptions', Window, 7)
 	OptCancel ('VideoOptions', Window, 8)
 
-	OptSlider ('Brightness', Window, 1, 10, 31234)
-	OptSlider ('Contrast', Window, 2, 11, 31429)
+	OptSlider ('Brightness', Window, 1, 10, 31234, "Brightness Correction")
+	OptSlider ('Contrast', Window, 2, 11, 31429, "Gamma Correction")
 
 	OptCheckbox ('SoftwareBlitting', Window, 6, 15, 30898)
 	OptCheckbox ('SoftwareMirroring', Window, 4, 13, 30896)
@@ -216,11 +216,11 @@ def OpenAudioOptionsWindow ():
 	OptDone ('AudioOptions', Window, 7)
 	OptCancel ('AudioOptions', Window, 8)
 
-	OptSlider ('AmbientVolume', Window, 1, 10, 31460)
-	OptSlider ('SoundFXVolume', Window, 2, 11, 31466)
-	OptSlider ('VoiceVolume', Window, 3, 12, 31467)
-	OptSlider ('MusicVolume', Window, 4, 13, 31468)
-	OptSlider ('MovieVolume', Window, 5, 14, 31469)
+	OptSlider ('AmbientVolume', Window, 1, 10, 31460, "Volume Ambients")
+	OptSlider ('SoundFXVolume', Window, 2, 11, 31466, "Volume SFX")
+	OptSlider ('VoiceVolume', Window, 3, 12, 31467, "Volume Voices")
+	OptSlider ('MusicVolume', Window, 4, 13, 31468, "Volume Music")
+	OptSlider ('MovieVolume', Window, 5, 14, 31469, "Volume Movie")
 	
 	OptCheckbox ('CreativeEAX', Window, 6, 15, 30900)
 	OptCheckbox ('SoundProcessing', Window, 16, 17, 63242)
@@ -286,10 +286,10 @@ def OpenGameplayOptionsWindow ():
 	OptDone ('GameplayOptions', Window, 10)
 	OptCancel ('GameplayOptions', Window, 11)
 
-	OptSlider ('TooltipDelay', Window, 1, 13, 31481)
-	OptSlider ('MouseScrollingSpeed', Window, 2, 14, 31482)
-	OptSlider ('KeyboardScrollingSpeed', Window, 3, 15, 31480)
-	OptSlider ('Difficulty', Window, 4, 16, 31479)
+	OptSlider ('TooltipDelay', Window, 1, 13, 31481, "Tooltip")
+	OptSlider ('MouseScrollingSpeed', Window, 2, 14, 31482, "Mouse Scroll Speed")
+	OptSlider ('KeyboardScrollingSpeed', Window, 3, 15, 31480, "Keyboard Scroll Speed")
+	OptSlider ('Difficulty', Window, 4, 16, 31479, "Difficulty Level")
 
 	OptCheckbox ('DitherAlways', Window, 5, 17, 31217)
 	OptCheckbox ('Gore', Window, 6, 18, 31218)
@@ -359,10 +359,10 @@ def OpenFeedbackOptionsWindow ():
 	OptDone ('FeedbackOptions', Window, 7)
 	OptCancel ('FeedbackOptions', Window, 8)
 
-	OptSlider ('MarkerFeedback', Window, 1, 10, 37463)
-	OptSlider ('LocatorFeedback', Window, 2, 11, 37586)
-	OptSlider ('SelectionFeedbackLevel', Window, 20, 21, 54879)
-	OptSlider ('CommandFeedbackLevel', Window, 22, 23, 55012)
+	OptSlider ('MarkerFeedback', Window, 1, 10, 37463, "GUI Feedback Level")
+	OptSlider ('LocatorFeedback', Window, 2, 11, 37586, "Locator Feedback Level")
+	OptSlider ('SelectionFeedbackLevel', Window, 20, 21, 54879, "Selection Sounds Frequency")
+	OptSlider ('CommandFeedbackLevel', Window, 22, 23, 55012, "Command Sounds Frequency")
 
 	OptCheckbox ('CharacterStates', Window, 6, 15, 37594)
 	OptCheckbox ('MiscellaneousMessages', Window, 17, 19, 37596)
@@ -792,10 +792,11 @@ def OnCreditsPress ():
 #   control (button, slider ...) and a label
 
 
-def OptSlider (name, window, slider_id, label_id, label_strref):
+def OptSlider (name, window, slider_id, label_id, label_strref, assoc_var):
 	"""Standard slider for option windows"""
 	slider = GemRB.GetControl (window, slider_id)
 	#GemRB.SetEvent (window, slider, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
+	GemRB.SetVarAssoc (window, slider, assoc_var, 1)
 	
 	label = GemRB.GetControl (window, label_id)
 	GemRB.SetText (window, label, label_strref)
