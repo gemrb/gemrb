@@ -124,12 +124,12 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 	while(InternalStack.size())
 		InternalStack.pop();
 
-	unsigned int pos=(goalX<<16)|goalY;
-	unsigned int pos2=(startX<<16)|startY;
-	InternalStack.push(pos);
         if(!Passable[sMap->GetPixelIndex(goalX,goalY)]) {
 		AdjustPosition(goalX,goalY);
 	}
+	unsigned int pos=(goalX<<16)|goalY;
+	unsigned int pos2=(startX<<16)|startY;
+	InternalStack.push(pos);
 	MapSet[goalY*Width+goalX] = 1;
 	
 	while(InternalStack.size()) {
@@ -186,7 +186,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 		Leveldown(px+1,py+1,level,nx,ny, diff);
 		Leveldown(px+1,py-1,level,nx,ny, diff);
 		Leveldown(px-1,py-1,level,nx,ny, diff);
-		if(!diff) abort();
+		if(!diff) return Return;
     		StartNode->x=nx;
 		StartNode->y=ny;
 		StartNode->orient=GetOrient(nx,ny,px,py);
