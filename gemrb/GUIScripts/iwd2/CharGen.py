@@ -12,7 +12,6 @@ def OnLoad():
 	GemRB.SetVar("Gender",0) #gender
 	GemRB.SetVar("Race",0) #race
 	GemRB.SetVar("Class",0) #class
-	GemRB.SetVar("Class Kit",0) #class
 	GemRB.SetVar("Alignment",0) #alignment
 
 	GemRB.LoadWindowPack("GUICG")

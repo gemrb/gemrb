@@ -34,8 +34,6 @@ def OnLoad():
 		Button = GemRB.GetControl(PartySelectWindow,i)
 		GemRB.SetButtonFlags(PartySelectWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		GemRB.SetEvent(PartySelectWindow, Button, IE_GUI_BUTTON_ON_PRESS, "PartyButtonPress")
-		#GemRB.SetButtonState(PartySelectWindow, Button, IE_GUI_BUTTON_DISABLED)
-		GemRB.SetVarAssoc(PartySelectWindow, Button, "PartyIdx",i)
 	
 	ScrollBarPress()
 	PartyButtonPress()
@@ -50,19 +48,26 @@ def ScrollBarPress():
 	for i in range(0,6):
 		ActPos = Pos + i
 		Button = GemRB.GetControl(PartySelectWindow, i)
+		GemRB.SetText(PartySelectWindow, Button, "")
+		GemRB.SetVarAssoc(PartySelectWindow, Button, "PartyIdx",-1)
 		if ActPos<PartyCount:
 			GemRB.SetButtonState(PartySelectWindow, Button, IE_GUI_BUTTON_ENABLED)
+		else:
+			GemRB.SetButtonState(PartySelectWindow, Button, IE_GUI_BUTTON_DISABLED)
+
+	for i in range(0,6):
+		ActPos = Pos + i
+		Button = GemRB.GetControl(PartySelectWindow, i)
+		if ActPos<PartyCount:
+			GemRB.SetVarAssoc(PartySelectWindow, Button, "PartyIdx",ActPos)
 			Tag = "Party " + str(ActPos)
 			PartyDesc = GemRB.GetINIPartyKey(Tag, "Name", "")					
 			GemRB.SetText(PartySelectWindow, Button, PartyDesc)
-		else:
-			GemRB.SetButtonState(PartySelectWindow, Button, IE_GUI_BUTTON_DISABLED)
-			GemRB.SetText(PartySelectWindow, Button, "")
 	return
 
 def DonePress():
 	global PartySelectWindow
-	Pos = GemRB.GetVar("TopIndex") + GemRB.GetVar("PartyIdx")
+	Pos = GemRB.GetVar("PartyIdx")
 	if Pos == 0:
 		GemRB.UnloadWindow(PartySelectWindow)
 		GemRB.SetNextScript("SPPartyFormation")
@@ -76,7 +81,7 @@ def CancelPress():
 	
 def PartyButtonPress():
 	global PartySelectWindow, TextArea
-	i = GemRB.GetVar("PartyIdx") + GemRB.GetVar("TopIndex")
+	i = GemRB.GetVar("PartyIdx")
 	Tag = "Party " + str(i)
 	PartyDesc = ""
 	for j in range(1, 9):

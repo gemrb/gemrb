@@ -4,42 +4,75 @@ import GemRB
 ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
+BackButton = 0
 ClassTable = 0
+ClassCount = 0
+HasSubClass = 0
+ClassID = 0
+
+def AdjustTextArea():
+	global HasSubClass, ClassID
+
+	Class = GemRB.GetVar("Class")-1
+	GemRB.SetText(ClassWindow,TextAreaControl, GemRB.GetTableValue(ClassTable,Class,1) )
+	ClassName = GemRB.GetTableRowName(ClassTable, Class)
+	ClassID = GemRB.GetTableValue(ClassTable, ClassName, "ID")
+	#determining if this class has any subclasses
+	HasSubClass = 0
+	for i in range(1, ClassCount):
+		ClassName = GemRB.GetTableRowName(ClassTable, i-1)
+		#determining if this is a kit or class
+		Allowed = GemRB.GetTableValue(ClassTable, ClassName, "CLASS")
+		if Allowed != ClassID:
+			continue
+		HasSubClass = 1
+		break
+
+	if HasSubClass == 0:
+		GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	return
 
 def OnLoad():
-	global ClassWindow, TextAreaControl, DoneButton
-	global ClassTable
+	global ClassWindow, TextAreaControl, DoneButton, BackButton
+	global ClassTable, ClassCount
 	
 	GemRB.LoadWindowPack("GUICG")
+	#this replaces help02.2da for class restrictions
 	ClassTable = GemRB.LoadTable("classes")
 	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
 	ClassWindow = GemRB.LoadWindow(2)
 	TmpTable=GemRB.LoadTable("races")
         RaceName = GemRB.GetTableRowName(TmpTable, GemRB.GetVar("Race")-1 )
 
-	j = 0
 	#radiobutton groups must be set up before doing anything else to them
-	for i in range(1,ClassCount):
-		Button = GemRB.GetControl(ClassWindow,j+2)
-		GemRB.SetButtonFlags(ClassWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
-		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_DISABLED)
-		j = j+1
-
 	j = 0
-	GemRB.SetVar("MAGESCHOOL",0) 
-	HasMulti = 0
 	for i in range(1,ClassCount):
 		ClassName = GemRB.GetTableRowName(ClassTable, i-1)
+		Allowed = GemRB.GetTableValue(ClassTable, ClassName, "CLASS")
+		if Allowed > 0:
+			continue
+		Button = GemRB.GetControl(ClassWindow,j+2)
+		j = j+1
+		GemRB.SetButtonFlags(ClassWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
+		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_DISABLED)
+
+	j = 0
+	for i in range(1,ClassCount):
+		ClassName = GemRB.GetTableRowName(ClassTable, i-1)
+		#determining if this is a kit or class
+		Allowed = GemRB.GetTableValue(ClassTable, ClassName, "CLASS")
+		if Allowed > 0:
+			continue
 		Allowed = GemRB.GetTableValue(ClassTable, ClassName, RaceName)
 		Button = GemRB.GetControl(ClassWindow,j+2)
 		j = j+1
-		t = GemRB.GetTableValue(ClassTable, i-1, 0)
+		t = GemRB.GetTableValue(ClassTable, ClassName, "NAME_REF")
 		GemRB.SetText(ClassWindow, Button, t )
 
 		if Allowed==0:
 			continue
-		if Allowed==2:
-			GemRB.SetVar("MAGESCHOOL",5) #illusionist
 		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetEvent(ClassWindow, Button, IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
 		GemRB.SetVarAssoc(ClassWindow, Button , "Class", i)
@@ -58,8 +91,7 @@ def OnLoad():
 		GemRB.SetText(ClassWindow,TextAreaControl,17242)
 		GemRB.SetButtonState(ClassWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 	else:
-		GemRB.SetText(ClassWindow,TextAreaControl, GemRB.GetTableValue(ClassTable,Class,1) )
-		GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+		AdjustTextArea()
 
 	GemRB.SetEvent(ClassWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(ClassWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
@@ -67,13 +99,52 @@ def OnLoad():
 	return
 
 def ClassPress():
+	global HasSubClass
+
+	AdjustTextArea()
+	if HasSubClass == 0:
+		return
+
+	GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	j = 0
+	for i in range(1,ClassCount):
+		ClassName = GemRB.GetTableRowName(ClassTable, i-1)
+		Allowed = GemRB.GetTableValue(ClassTable, ClassName, "CLASS")
+		if Allowed > 0:
+			continue
+		Button = GemRB.GetControl(ClassWindow,j+2)
+		j = j+1
+		GemRB.SetButtonFlags(ClassWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
+		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetText(ClassWindow, Button, "")
+
+	j=0
+	for i in range(1, ClassCount):
+		ClassName = GemRB.GetTableRowName(ClassTable, i-1)
+		#determining if this is a kit or class
+		Allowed = GemRB.GetTableValue(ClassTable, ClassName, "CLASS")
+		if Allowed != ClassID:
+			continue
+		Button = GemRB.GetControl(ClassWindow,j+2)
+		j = j+1
+		t = GemRB.GetTableValue(ClassTable, ClassName, "NAME_REF")
+		GemRB.SetText(ClassWindow, Button, t )
+		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetEvent(ClassWindow, Button, IE_GUI_BUTTON_ON_PRESS,  "ClassPress2")
+		GemRB.SetVarAssoc(ClassWindow, Button , "Class", i)
+		
+	GemRB.SetEvent(ClassWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress2")
+	return
+
+def ClassPress2():
 	Class = GemRB.GetVar("Class")-1
 	GemRB.SetText(ClassWindow,TextAreaControl, GemRB.GetTableValue(ClassTable,Class,1) )
 	GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
-	#if no kit selection for this class, don't go to guicg22
-	GemRB.DrawWindows()
-	GemRB.UnloadWindow(ClassWindow)
-	GemRB.SetNextScript("GUICG22")
+	return
+
+def BackPress2():
+	GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	OnLoad()
 	return
 
 def BackPress():
