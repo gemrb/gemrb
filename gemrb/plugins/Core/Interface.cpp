@@ -2,6 +2,8 @@
 #include "Interface.h"
 #include "FileStream.h"
 #include "AnimationMgr.h"
+#include <stdlib.h>
+#include <time.h>
 
 #ifdef WIN32
 #define GEM_EXPORT __declspec(dllexport)
@@ -47,6 +49,9 @@ Interface::Interface(void)
 	printMessage("Core", "Creating Object Factory...", WHITE);
 	factory = new Factory();
 	printStatus("OK", LIGHT_GREEN);
+	time_t t;
+	t = time(NULL);
+	srand(t);
 }
 
 Interface::~Interface(void)
@@ -991,7 +996,7 @@ int Interface::Roll(int dice, int size, int add)
 	if(dice>100)
 		return add+dice*size/2;
 	for(int i=0;i<dice;i++) {
-		add+=random()%size+1;
+		add+=rand()%size+1;
 	}
 	return add;
 }

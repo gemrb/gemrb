@@ -24,6 +24,7 @@
 #include "MusicMgr.h"
 #include "TableMgr.h"
 #include "SymbolMgr.h"
+#include "MoviePlayer.h"
 
 typedef struct Table {
 	TableMgr * tm;

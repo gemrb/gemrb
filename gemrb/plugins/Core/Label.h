@@ -50,6 +50,8 @@ public:
   void SetColor(Color col, Color bac);
   /** Sets the Alignment of Text */
   void SetAlignment(unsigned char Alignment);
+  /** Use the RGB Color for the Font */
+  bool useRGB;
 private: // Private attributes
   /** Text String Buffer */
   char * Buffer;
@@ -57,8 +59,7 @@ private: // Private attributes
   Font * font;
   /** Foreground & Background Colors */
   Color *palette;
-  /** Use the RGB Color for the Font */
-  bool useRGB;
+  
   /** Alignment Variable */
   unsigned char Alignment;
 };
