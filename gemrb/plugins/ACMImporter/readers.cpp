@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.9 2004/10/04 22:02:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.10 2004/10/04 22:33:42 avenger_teambg Exp $
  *
  */
 
@@ -202,9 +202,11 @@ CSoundReader* CreateSoundReader(DataStream* stream, int type, int samples,
 	CSoundReader* res = NULL;
 
 	switch (type) {
+#ifdef HAS_VORBIS_SUPPORT
 		case SND_READER_OGG:
 			res = new COGGReader( stream, autoFree );
 			break;
+#endif
 		case SND_READER_ACM:
 			res = new CACMReader( stream, autoFree );
 			break;
