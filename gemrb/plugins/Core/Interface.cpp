@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.211 2004/08/29 01:19:02 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.212 2004/08/29 09:43:18 avenger_teambg Exp $
  *
  */
 
@@ -1659,13 +1659,13 @@ Window* Interface::GetWindow(unsigned short WindowIndex)
 int Interface::DelWindow(unsigned short WindowIndex)
 {
 	if(WindowIndex == 0xffff) {
-		vars->SetAt("MessageWindow", ~0);
-		vars->SetAt("OptionsWindow", ~0);
-		vars->SetAt("PortraitWindow", ~0);
-		vars->SetAt("ActionsWindow", ~0);
-		vars->SetAt("TopWindow", ~0);
-		vars->SetAt("OtherWindow", ~0);
-		vars->SetAt("FloatWindow", ~0);
+		vars->SetAt("MessageWindow", (ieDword) ~0);
+		vars->SetAt("OptionsWindow", (ieDword) ~0);
+		vars->SetAt("PortraitWindow", (ieDword) ~0);
+		vars->SetAt("ActionsWindow", (ieDword) ~0);
+		vars->SetAt("TopWindow", (ieDword) ~0);
+		vars->SetAt("OtherWindow", (ieDword) ~0);
+		vars->SetAt("FloatWindow", (ieDword) ~0);
 		for(unsigned int WindowIndex=0; WindowIndex<windows.size();WindowIndex++) {
 			Window* win = windows[WindowIndex];
 			if(win) {
