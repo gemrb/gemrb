@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.13 2003/12/03 18:34:58 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.14 2004/02/14 15:08:06 avenger_teambg Exp $
  *
  */
 
@@ -58,6 +58,10 @@ protected:
 		unsigned long nValue;
 		unsigned long nHashValue;
 	};
+	struct MemBlock
+	{
+		MemBlock *pNext;
+	};
 public:
 // Construction
 	Variables(int nBlockSize = 10, int nHashTableSize=2049);
@@ -98,7 +102,7 @@ protected:
 	bool m_lParseKey;
 	int m_nCount;
 	MyAssoc* m_pFreeList;
-	struct Plex* m_pBlocks;
+	MemBlock* m_pBlocks;
 	int m_nBlockSize;
 	int m_type; //could be string or unsigned long
 

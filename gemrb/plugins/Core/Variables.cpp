@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.18 2003/12/15 09:12:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.19 2004/02/14 15:08:06 avenger_teambg Exp $
  *
  */
 
@@ -41,11 +41,13 @@ inline bool Variables::MyCopyKey(char *&dest, const char * key) const
 {
 	int i,j;
 
-	for(i=0,j=0;key[i] && i<MAX_VARIABLE_LENGTH;i++) if(key[i]!=' ') j++;
+	//use j
+	for(i=0,j=0;key[i] && j<MAX_VARIABLE_LENGTH-1;i++)
+		if(key[i]!=' ') j++;
 	dest = new char[j+1];
 	if(!dest)
 		return false;
-	for(i=0,j=0;i<MAX_VARIABLE_LENGTH && key[i];i++)
+	for(i=0,j=0;key[i] && j<MAX_VARIABLE_LENGTH-1;i++)
 	{
 		if(key[i]!=' ') dest[j++]=toupper(key[i]);
    	}
@@ -55,7 +57,7 @@ inline bool Variables::MyCopyKey(char *&dest, const char * key) const
 inline unsigned int Variables::MyHashKey(const char * key) const
 {
    unsigned int nHash = 0;
-   for(int i=0;i<MAX_VARIABLE_LENGTH && key[i];i++)
+   for(int i=0;i<key[i] && i<MAX_VARIABLE_LENGTH;i++)
    {
 //the original engine ignores spaces in variable names
 	if(key[i]!=' ') nHash = (nHash<<5) + nHash + toupper(key[i]);
@@ -66,34 +68,34 @@ inline unsigned int Variables::MyHashKey(const char * key) const
 // functions
 void Variables::GetNextAssoc(POSITION& rNextPosition, const char*& rKey, unsigned long& rValue) const
 {
-        MYASSERT(m_pHashTable != NULL);  // never call on empty map
+	MYASSERT(m_pHashTable != NULL);  // never call on empty map
 
-        Variables::MyAssoc* pAssocRet = (Variables::MyAssoc*)rNextPosition;
-        MYASSERT(pAssocRet != NULL);
+	Variables::MyAssoc* pAssocRet = (Variables::MyAssoc*)rNextPosition;
+	MYASSERT(pAssocRet != NULL);
 
-        if (pAssocRet == (Variables::MyAssoc*) BEFORE_START_POSITION)
-        {
-                // find the first association
-                for (unsigned int nBucket = 0; nBucket < m_nHashTableSize; nBucket++)
-                        if ((pAssocRet = m_pHashTable[nBucket]) != NULL)
-                                break;
-                MYASSERT(pAssocRet != NULL);  // must find something
-        }
-        Variables::MyAssoc* pAssocNext;
-        if ((pAssocNext = pAssocRet->pNext) == NULL)
-        {
-                // go to next bucket
-                for (unsigned int nBucket = pAssocRet->nHashValue + 1;
-                  nBucket < m_nHashTableSize; nBucket++)
-                        if ((pAssocNext = m_pHashTable[nBucket]) != NULL)
-                                break;
-        }
+	if (pAssocRet == (Variables::MyAssoc*) BEFORE_START_POSITION)
+	{
+		// find the first association
+		for (unsigned int nBucket = 0; nBucket < m_nHashTableSize; nBucket++)
+			if ((pAssocRet = m_pHashTable[nBucket]) != NULL)
+				break;
+		MYASSERT(pAssocRet != NULL);  // must find something
+	}
+	Variables::MyAssoc* pAssocNext;
+	if ((pAssocNext = pAssocRet->pNext) == NULL)
+	{
+		// go to next bucket
+		for (unsigned int nBucket = pAssocRet->nHashValue + 1;
+		  nBucket < m_nHashTableSize; nBucket++)
+			if ((pAssocNext = m_pHashTable[nBucket]) != NULL)
+				break;
+	}
 
-        rNextPosition = (POSITION) pAssocNext;
+	rNextPosition = (POSITION) pAssocNext;
 
-        // fill in return data
-        rKey = pAssocRet->key;
-        rValue = pAssocRet->nValue;
+	// fill in return data
+	rKey = pAssocRet->key;
+	rValue = pAssocRet->nValue;
 }
 Variables::Variables(int nBlockSize, int nHashTableSize)
 {
@@ -147,7 +149,7 @@ void Variables::RemoveAll()
 					if(pAssoc->nValue)
 						free((void *)pAssoc->nValue);
 				if(pAssoc->key)
-					delete [] pAssoc->key;
+					delete[] pAssoc->key;
 			}
 		}
 	}
@@ -158,7 +160,12 @@ void Variables::RemoveAll()
 
 	m_nCount = 0;
 	m_pFreeList = NULL;
-	m_pBlocks->FreeDataChain();
+	MemBlock* p = m_pBlocks;
+	while (p != NULL) {
+		MemBlock* pNext = p->pNext;
+		delete[] p;
+		p = pNext;
+	}
 	m_pBlocks = NULL;
 }
 
@@ -174,9 +181,13 @@ Variables::NewAssoc(const char *key)
 	if (m_pFreeList == NULL)
 	{
 		// add another block
-		Plex* newBlock = Plex::Create(m_pBlocks, m_nBlockSize, sizeof(Variables::MyAssoc));
+		Variables::MemBlock *newBlock=
+			(Variables::MemBlock *) new char[m_nBlockSize*sizeof(Variables::MyAssoc)+sizeof(Variables::MemBlock) ];
+		newBlock->pNext=m_pBlocks;
+		m_pBlocks=newBlock;
+
 		// chain them into free list
-		Variables::MyAssoc* pAssoc = (Variables::MyAssoc*) newBlock->data();
+		Variables::MyAssoc* pAssoc = (Variables::MyAssoc*) (newBlock+1);
 		// free in reverse order to make it easier to debug
 		pAssoc += m_nBlockSize - 1;
 		for (int i = m_nBlockSize-1; i >= 0; i--, pAssoc--)
@@ -194,9 +205,12 @@ Variables::NewAssoc(const char *key)
 	else
 	{
 		int len;
-		len=strnlen(key,MAX_VARIABLE_LENGTH)+1;
-		pAssoc->key=new char[len];
-		if(pAssoc->key) strncpy(pAssoc->key,key,len);
+		len=strnlen(key,MAX_VARIABLE_LENGTH-1);
+		pAssoc->key=new char[len+1];
+		if(pAssoc->key) {
+			memcpy(pAssoc->key,key,len);
+			pAssoc->key[len]=0;
+		}
 	}
 	pAssoc->nValue=0xcccccccc;  //invalid value
 	pAssoc->nHashValue=0xcccccccc; //invalid value

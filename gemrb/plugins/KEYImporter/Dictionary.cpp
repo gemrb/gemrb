@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.8 2003/11/25 13:48:00 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.9 2004/02/14 15:08:06 avenger_teambg Exp $
  *
  */
 
@@ -96,7 +96,7 @@ void Dictionary::RemoveAll()
 			for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL;
 			  pAssoc = pAssoc->pNext)
 			{
-          delete [] pAssoc->key;          
+				delete [] pAssoc->key;	  
 			}
 		}
 	}
@@ -107,7 +107,14 @@ void Dictionary::RemoveAll()
 
 	m_nCount = 0;
 	m_pFreeList = NULL;
-	m_pBlocks->FreeDataChain();
+	MemBlock* p = m_pBlocks;
+	while (p != NULL)
+	{
+		MemBlock* pNext = p->pNext;
+		delete[] p;
+		p = pNext;
+	}
+
 	m_pBlocks = NULL;
 }
 
@@ -123,9 +130,14 @@ Dictionary::NewAssoc()
 	if (m_pFreeList == NULL)
 	{
 		// add another block
-		Plex* newBlock = Plex::Create(m_pBlocks, m_nBlockSize, sizeof(Dictionary::MyAssoc));
+                Dictionary::MemBlock *newBlock=
+                        (Dictionary::MemBlock *) new char[m_nBlockSize*sizeof(Dictionary::MyAssoc)+sizeof(Dictionary::MemBlock) ];
+
+		newBlock->pNext=m_pBlocks;
+		m_pBlocks=newBlock;
+
 		// chain them into free list
-		Dictionary::MyAssoc* pAssoc = (Dictionary::MyAssoc*) newBlock->data();
+		Dictionary::MyAssoc* pAssoc = (Dictionary::MyAssoc*) (newBlock+1);
 		// free in reverse order to make it easier to debug
 		pAssoc += m_nBlockSize - 1;
 		for (int i = m_nBlockSize-1; i >= 0; i--, pAssoc--)

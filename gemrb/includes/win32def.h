@@ -1,7 +1,9 @@
 #ifndef WIN32DEF_H
 #define WIN32DEF_H
 
-#define MAX_VARIABLE_LENGTH  32
+//we need 32+6 bytes at least, because we store 'context' in the variable
+//name too
+#define MAX_VARIABLE_LENGTH  40
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -39,30 +41,7 @@ typedef __POSITION* POSITION;
   printf("Assertion failed: %s %d",#f, __LINE__); \
                 abort(); \
   }
-struct Plex     // warning variable length structure
-{
-        Plex* pNext;
-        void* data() { return this+1; }
-  static Plex* Create(Plex*& pHead, unsigned int nMax, unsigned int cbElement)
-  {
-    Plex* p = (Plex*) new unsigned char[sizeof(Plex) + nMax * cbElement];
-    // may throw exception
-    p->pNext = pHead;
-    pHead = p;  // change head (adds in reverse order for simplicity)
-    return p;
-  }
-  void FreeDataChain()
-  {// free this one and links
-    Plex* p = this;
-    while (p != NULL)
-    {
-      unsigned char* bytes = (unsigned char*) p;
-      Plex* pNext = p->pNext;
-      delete[] bytes;
-      p = pNext;
-    }
-  }
-};
+
 #ifndef WIN32
 #define ADV_TEXT
 #define textcolor(i) i
