@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.155 2004/08/02 18:00:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.156 2004/08/02 22:22:05 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -73,11 +73,11 @@ static void AddTalk(TextArea* ta, Actor* speaker, const char* speaker_color,
 	char* text, const char* text_color)
 {
 	const char* format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
-	int newlen = (int)(strlen( format ) + strlen( speaker->LongName ) +
+	int newlen = (int)(strlen( format ) + strlen( speaker->GetName(-1) ) +
 		strlen( speaker_color ) + strlen( text ) +
 		strlen( text_color ) + 1);
 	char* newstr = ( char* ) malloc( newlen );
-	sprintf( newstr, format, speaker_color, speaker->LongName, text_color,
+	sprintf( newstr, format, speaker_color, speaker->GetName(-1), text_color,
 		text );
 
 	ta->AppendText( newstr, -1 );
@@ -206,7 +206,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 	if ( selected.size() > 0 ) {
-		ChangeMap();
+		ChangeMap(selected[0], false);
 	}
 	Video* video = core->GetVideoDriver();
 	Region viewport = core->GetVideoDriver()->GetViewport();
@@ -1551,12 +1551,11 @@ void GameControl::DisplayString(Scriptable* target)
 }
 
 /** changes displayed map to the currently selected PC */
-void GameControl::ChangeMap()
+void GameControl::ChangeMap(Actor *pc, bool forced)
 {
-	Actor* pc = selected.at( 0 );
-	//swap in the area of the first selected actor
+	//swap in the area of the actor
 	Game* game = core->GetGame();
-	if (stricmp( pc->Area, game->CurrentArea) != 0) {
+	if (forced || (stricmp( pc->Area, game->CurrentArea) != 0) ) {
 		EndDialog();
 		overInfoPoint = NULL;
 		overContainer = NULL;

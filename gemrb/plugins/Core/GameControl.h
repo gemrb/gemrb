@@ -122,8 +122,9 @@ public:
 	/* Displays a string on screen */
 	void DisplayString(int X, int Y, const char *Text);
 	Actor *GetLastActor() { return lastActor; }
+	//changes map to the current PC
+	void ChangeMap(Actor *pc, bool forced);
 private:
-	void ChangeMap();
 	/* evaluates a dialog trigger block */
 	bool EvaluateDialogTrigger(Scriptable* target, DialogString* trigger);
 };

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.170 2004/08/02 18:00:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.171 2004/08/02 22:22:05 avenger_teambg Exp $
  *
  */
 
@@ -53,7 +53,7 @@ static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
-static int InDebug = 0;
+static int InDebug = 1;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -4777,7 +4777,6 @@ int GameScript::GetHappiness(Scriptable* Sender, int reputation)
 	char * repvalue = core->GetTable( hptable )->QueryField( reputation/10, alignment );
 //      don't throw this table, we will open it again
 //	core->DelTable( hptable ); 
-printf("happyhandle: %d\n", hptable);
 	return strtol(repvalue,NULL,0); //this one handles 0x values too!
 }
 
@@ -5425,8 +5424,14 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	//source could be other than Actor, we need to handle this too!
-	if (tar->Type != ST_ACTOR) {
+	if((tar==scr) && !(Flags&BD_OWN) ) {
+		printf("[IEScript]: Target is protagonist?\n");
+		parameters->objects[1]->Dump();
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	//target could be other than Actor, we need to handle this too!
+	if (scr->Type != ST_ACTOR) {
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -5487,19 +5492,23 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			core->DelTable( pdtable );
 			break;
 	}
+
+	//maybe we should remove the action queue, but i'm unsure
+	Sender->CurrentAction = NULL;
+
 	if (!Dialog) {
-		Sender->CurrentAction = NULL;
 		return;
 	}
 
 	//we also need to freeze active scripts during a dialog!
-	if (( Flags & BD_INTERRUPT )) {
-		target->ClearActions();
-	} else {
-		if (target->GetNextAction()) {
-			core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
-			Sender->CurrentAction = NULL;
-			return;
+	if(Sender!=target) {
+		if (( Flags & BD_INTERRUPT )) {
+			target->ClearActions();
+		} else {
+			if (target->GetNextAction()) {
+				core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+				return;
+			}
 		}
 	}
 
@@ -5516,7 +5525,8 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			gc->DialogueFlags|=DF_TALKCOUNT;
 		}
 
-		if(Flags & BD_TARGET) {
+	//	if(Flags & BD_TARGET) {
+		if( target->InParty!=1) {
 			gc->InitDialog( target, actor, Dialog );
 		}
 		else {

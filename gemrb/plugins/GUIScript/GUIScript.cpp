@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.177 2004/08/02 16:55:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.178 2004/08/02 22:22:06 avenger_teambg Exp $
  *
  */
 
@@ -185,15 +185,24 @@ static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 	GameControl* gc = StartGameControl();
-	/* setting the pathfinder to the current area */
-	gc->SetCurrentArea(game->LoadMap(game->CurrentArea));
-
-	// Center view on the first PC
 	Actor* actor = game->GetPC (0);
-	if (actor) {
-		core->GetVideoDriver()->MoveViewportTo (actor->XPos, actor->YPos);
+	if(actor) {
+		gc->ChangeMap(actor, true);
+	}
+	else {
+		gc->SetCurrentArea(game->LoadMap(game->CurrentArea));
 	}
 
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_QuitGame__doc,
+"QuitGame()\n\n"
+"Stops the current game.");
+static PyObject* GemRB_QuitGame(PyObject*, PyObject* args)
+{
+	core->QuitGame();
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -3281,6 +3290,8 @@ static PyMethodDef GemRBMethods[] = {
 	GemRB_LoadGame__doc},
 	{"EnterGame", GemRB_EnterGame, METH_NOARGS,
 	GemRB_EnterGame__doc},
+	{"QuitGame", GemRB_QuitGame, METH_NOARGS,
+	GemRB_QuitGame__doc},
 	{"StatComment", GemRB_StatComment, METH_VARARGS,
 	GemRB_StatComment__doc},
 	{"GetString", GemRB_GetString, METH_VARARGS,
