@@ -123,7 +123,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 		return;
 	Changed = false;
 	if(!(Flags & 0x1)) {
-		Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
+		Color *ppoi=NULL;
+//		Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 		int align=0;
 
 		if(Flags&0x100) align|=IE_FONT_ALIGN_LEFT;
@@ -167,11 +168,12 @@ void Button::Draw(unsigned short x, unsigned short y)
 				else if(Unpressed) {
 					core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
 				}
+				ppoi=palette;
 			}
 			break;
 		}
 		if(hasText)
-			font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, NULL, align | IE_FONT_SINGLE_LINE, true);
+			font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, ppoi, align | IE_FONT_SINGLE_LINE, true);
 	}
 	if(Picture && (Flags&0x2)) {
 		short xOffs = (Width / 2) - (Picture->Width / 2);
