@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.18 2004/07/31 08:02:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.19 2004/08/02 22:18:27 avenger_teambg Exp $
  *
  */
 
@@ -52,11 +52,11 @@
 #define STATE_STUNNED 8
 #define STATE_INVISIBLE 16
 #define STATE_HELPLESS 32
-#define STATE_D1 64
-#define STATE_D2 128
-#define STATE_D3 0x100
-#define STATE_D4 0x200
-#define STATE_D5 0x400
+#define STATE_FROZEN_DEATH 64
+#define STATE_STONE_DEATH 128
+#define STATE_EXPLODING_DEATH 0x100
+#define STATE_FLAME_DEATH 0x200
+#define STATE_ACID_DEATH 0x400
 #define STATE_DEAD  0x800
 #define STATE_SILENCED 0x1000
 #define STATE_CHARMED  0x2000
@@ -79,9 +79,22 @@
 #define STATE_MIRROR   0x40000000
 #define STATE_CONFUSED 0x80000000
 #define STATE_CANTMOVE 0x80000fef
+#define STATE_CANTLISTEN 0x80000fef
+#define STATE_CANTSTEAL 0xc0
 
+//Multiclass flags
+#define MC_REMOVE_CORPSE        2
+#define MC_KEEP_CORPSE          4
+#define MC_WAS_FIGHTER		8
+#define MC_WAS_MAGE		16
+#define MC_WAS_CLERIC		32
+#define MC_WAS_THIEF		64
+#define MC_WAS_DRUID		128
+#define MC_WAS_RANGER		256
 #define MC_FALLEN_PALADIN	0x200
 #define MC_FALLEN_RANGER	0x400
+#define MC_EXPORTABLE           0x800
+
 //stats
 #define IE_HITPOINTS 0
 #define IE_MAXHITPOINTS	1
