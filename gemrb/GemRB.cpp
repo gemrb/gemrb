@@ -31,7 +31,7 @@ int main(int argc, char ** argv)
 	Font * fps = core->GetFont("NORMAL\0");
 	char fpsstring[_MAX_PATH];
 	Color fpscolor = {0xff,0xff,0xff,0x00}, fpsblack = {0x00,0x00,0x00,0x00};
-	int frame = 0, time, timebase = 0;
+	unsigned long frame = 0, time, timebase = 0;
 	double frames = 0.0;
 	Region bg(0,0,100,30);
 	Color * palette = core->GetVideoDriver()->CreatePalette(fpscolor, fpsblack);
