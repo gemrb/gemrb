@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.9 2003/12/06 17:29:55 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.10 2004/02/11 22:22:13 avenger_teambg Exp $
  *
  */
 
@@ -23,9 +23,6 @@
 #define TLKIMP_H
 
 #include "../Core/StringMgr.h"
-
-#define IE_STR_STRREFON	1
-#define IE_STR_SOUND	2
 
 class TLKImp : public StringMgr
 {
