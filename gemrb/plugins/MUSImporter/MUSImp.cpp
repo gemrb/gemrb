@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.37 2004/10/30 15:02:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.38 2005/03/20 16:08:32 avenger_teambg Exp $
  *
  */
 
@@ -269,31 +269,24 @@ void MUSImp::PlayMusic(int pos)
 void MUSImp::PlayMusic(char* name)
 {
 	char FName[_MAX_PATH];
-//	strcpy( FName, core->GamePath );
-//	strcat( FName, musicsubfolder );
-//	strcat( FName, SPathDelimiter );
-	//this is in IWD2
-	if (strnicmp( name, "mx0000", 6 ) == 0) {
+	if (strnicmp( name, "mx9000", 6 ) == 0) { //iwd2
+		snprintf( FName, _MAX_PATH, "%s%s%smx9000%s%s.acm", 
+			core->GamePath, musicsubfolder, SPathDelimiter,
+			SPathDelimiter, name);
+	} else if (strnicmp( name, "mx0000", 6 ) == 0) { //iwd
 		snprintf( FName, _MAX_PATH, "%s%s%smx0000%s%s.acm", 
 			core->GamePath, musicsubfolder, SPathDelimiter,
 			SPathDelimiter, name);
-//		strcat( FName, "mx0000" );
-//		strcat( FName, SPathDelimiter );
-	} else if (strnicmp( name, "SPC", 3 ) != 0) {
+	} else if (strnicmp( name, "SPC", 3 ) != 0) { //bg2
 		snprintf( FName, _MAX_PATH, "%s%s%s%s%s%s%s.acm",
 			core->GamePath, musicsubfolder, SPathDelimiter,
 			PLName, SPathDelimiter, PLName, name);
-//		strcat( FName, PLName );
-//		strcat( FName, SPathDelimiter );
-//		strcat( FName, PLName );
 	}
 	else {
 		snprintf(FName, _MAX_PATH, "%s%s%s%s.acm",
 			core->GamePath, musicsubfolder, SPathDelimiter,
 			name);
 	}
-//	strcat( FName, name );
-//	strcat( FName, ".acm" );
 #ifndef WIN32
 		ResolveFilePath( FName );
 #endif
