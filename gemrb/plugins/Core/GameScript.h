@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.61 2004/03/12 17:32:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.62 2004/03/12 20:56:26 avenger_teambg Exp $
  *
  */
 
@@ -855,6 +855,7 @@ public:
 	static void SetGlobalTimer(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
 	static void SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters);
+	static void SetPlayerSound(Scriptable* Sender, Action* parameters);
 	static void SetTokenGlobal(Scriptable* Sender, Action* parameters);
 	static void SG(Scriptable* Sender, Action* parameters);
 	static void SmallWait(Scriptable* Sender, Action* parameters);

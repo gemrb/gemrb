@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.88 2004/03/12 17:32:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.89 2004/03/12 20:56:26 avenger_teambg Exp $
  *
  */
 
@@ -93,6 +93,7 @@ static ActionLink actionnames[] = {
 	{"addxpobject", GameScript::AddXPObject},
 	{"addxpvar", GameScript::AddXP2DA},
 	{"ambientactivate",GameScript::AmbientActivate},
+	{"bashdoor",GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
 	{"bitclear",GameScript::BitClear},
 	{"bitset",GameScript::GlobalBOr}, //probably the same
 	{"changeaiscript",GameScript::ChangeAIScript},
@@ -175,6 +176,7 @@ static ActionLink actionnames[] = {
 	{"noaction",GameScript::NoAction},
 	{"opendoor",GameScript::OpenDoor,AF_BLOCKING},
 	{"permanentstatchange",GameScript::ChangeStat}, //probably the same
+	{"picklock",GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
 	{"playdead",GameScript::PlayDead}, {"playsound",GameScript::PlaySound},
 	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt",GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
@@ -188,6 +190,7 @@ static ActionLink actionnames[] = {
 	{"setglobal",GameScript::SetGlobal},
 	{"setglobaltimer",GameScript::SetGlobalTimer},
 	{"setnumtimestalkedto",GameScript::SetNumTimesTalkedTo},
+	{"setplayersound",GameScript::SetPlayerSound},
 	{"settokenglobal",GameScript::SetTokenGlobal}, {"sg",GameScript::SG},
 	{"smallwait",GameScript::SmallWait,AF_BLOCKING},
 	{"startcutscene",GameScript::StartCutScene},
@@ -2737,6 +2740,16 @@ void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
 	actor->SetScript( parameters->string0Parameter, parameters->int0Parameter );
 }
 
+void GameScript::SetPlayerSound(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
+	actor->StrRefs[parameters->int0Parameter]=parameters->int1Parameter;
+}
+
 void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -2808,6 +2821,15 @@ void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 {
 	Scriptable * scr = GetActorFromObject( Sender, parameters->objects[1]);
 	core->GetVideoDriver()->MoveViewportTo( scr->XPos, scr->YPos );
+}
+
+void GameScript::AddWayPoint(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->AddWayPoint( parameters->XpointParameter, parameters->YpointParameter );
 }
 
 void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
