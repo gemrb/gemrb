@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.43 2004/03/15 15:50:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.44 2004/03/15 16:06:41 avenger_teambg Exp $
  *
  */
 
@@ -37,7 +37,7 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	sb = NULL;
 	Selectable = false;
 	AutoScroll = false;
-        TextAreaOnChange[0] = 0;
+	TextAreaOnChange[0] = 0;
 
 	palette = core->GetVideoDriver()->CreatePalette( hitextcolor,
 										lowtextcolor );
@@ -441,10 +441,6 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y,
 					if (gc->Dialogue) {
 						gc->DialogChoose( idx );
 					}
-					else {
-	                                        if (TextAreaOnChange[0] != 0)
-        	                                        core->GetGUIScriptEngine()->RunFunction( TextAreaOnChange );
-					}
 
 				}
 			}
@@ -455,6 +451,8 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y,
 	if (VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, selline );
 	}
+	if (TextAreaOnChange[0] != 0)
+		core->GetGUIScriptEngine()->RunFunction( TextAreaOnChange );
 }
 
 /** Copies the current TextArea content to another TextArea control */
