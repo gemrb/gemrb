@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.60 2005/02/26 21:08:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.61 2005/02/27 19:13:24 edheldil Exp $
  *
  */
 
@@ -89,6 +89,7 @@ public:
 	bool ChangeArea; //set true if movement is allowed between areas
 	Variables *vars;
 	ieByte* ExploredBitmap;
+	ieByte* VisibleBitmap;
 private:
 	unsigned short* MapSet;
 	std::queue< unsigned int> InternalStack;

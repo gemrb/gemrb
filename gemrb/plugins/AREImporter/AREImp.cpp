@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.96 2005/02/26 21:08:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.97 2005/02/27 19:13:27 edheldil Exp $
  *
  */
 
@@ -791,6 +791,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		ExploredBitmapSize = i;
 		map->ExploredBitmap = (ieByte *) calloc(i, 1);
 	}
+	map->VisibleBitmap = (ieByte *) calloc(i, 1);
 
 	core->FreeInterface( tmm );
 	return map;

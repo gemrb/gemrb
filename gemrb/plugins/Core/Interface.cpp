@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.266 2005/02/24 22:09:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.267 2005/02/27 19:13:25 edheldil Exp $
  *
  */
 
@@ -667,9 +667,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 
-	/*
-	// disabled for 0.2.3 release
-
+	// Load fog-of-war bitmaps
 	str = key->GetResource( "FOGOWAR", IE_BAM_CLASS_ID );
 	printMessage( "Core", "Loading Fog-Of-War bitmaps...", WHITE );
 	anim = ( AnimationMgr * ) GetInterface( IE_BAM_CLASS_ID );
@@ -680,14 +678,65 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 
-	//FogSprites = new Animation * [FogCount];
-	for (int i = 0; i < 8; i++) {
-		FogSprites[i] = anim->GetFrameFromCycle( 0, i );
-	}
+	FogSprites[0] = NULL;
+	FogSprites[1] = anim->GetFrameFromCycle( 0, 0 );
+	FogSprites[2] = anim->GetFrameFromCycle( 0, 1 );
+	FogSprites[3] = anim->GetFrameFromCycle( 0, 2 );
+
+	FogSprites[4] = anim->GetFrameFromCycle( 0, 0 );
+	video->MirrorSpriteVertical( FogSprites[4], false );
+
+	FogSprites[5] = NULL;
+
+	FogSprites[6] = anim->GetFrameFromCycle( 0, 2 );
+	video->MirrorSpriteVertical( FogSprites[6], false );
+
+	FogSprites[7] = NULL;
+
+	FogSprites[8] = anim->GetFrameFromCycle( 0, 1 );
+	video->MirrorSpriteHorizontal( FogSprites[8], false );
+
+	FogSprites[9] = anim->GetFrameFromCycle( 0, 2 );
+	video->MirrorSpriteHorizontal( FogSprites[9], false );
+
+	FogSprites[10] = NULL;
+	FogSprites[11] = NULL;
+
+	FogSprites[12] = anim->GetFrameFromCycle( 0, 2 );
+	video->MirrorSpriteVertical( FogSprites[12], false );
+	video->MirrorSpriteHorizontal( FogSprites[12], false );
+
+
+
+	FogSprites[16] = anim->GetFrameFromCycle( 0, 3 );
+	FogSprites[17] = anim->GetFrameFromCycle( 0, 4 );
+	FogSprites[18] = anim->GetFrameFromCycle( 0, 5 );
+	FogSprites[19] = anim->GetFrameFromCycle( 0, 6 );
+
+	FogSprites[20] = anim->GetFrameFromCycle( 0, 4 );
+	video->MirrorSpriteVertical( FogSprites[20], false );
+
+	FogSprites[21] = NULL;
+
+	FogSprites[22] = anim->GetFrameFromCycle( 0, 6 );
+	video->MirrorSpriteVertical( FogSprites[22], false );
+
+	FogSprites[23] = NULL;
+
+	FogSprites[24] = anim->GetFrameFromCycle( 0, 4 );
+	video->MirrorSpriteHorizontal( FogSprites[24], false );
+
+	FogSprites[25] = anim->GetFrameFromCycle( 0, 7 );
+
+	FogSprites[26] = NULL;
+	FogSprites[27] = NULL;
+
+	FogSprites[28] = anim->GetFrameFromCycle( 0, 7 );
+	video->MirrorSpriteVertical( FogSprites[28], false );
+
 	FreeInterface( anim );
 	printStatus( "OK", LIGHT_GREEN );
-	// FIXME: prepare flipped fog sprites here as well
-	*/
+
 
 	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
 	timer = new GlobalTimer();

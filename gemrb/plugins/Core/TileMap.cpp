@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.34 2005/01/17 21:05:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.35 2005/02/27 19:13:24 edheldil Exp $
  *
  */
 
@@ -90,11 +90,23 @@ void TileMap::DrawOverlay(unsigned int index, Region viewport)
 #define CELL_SIZE  32
 #define CELL_RATIO 2
 
+
+
+// Returns 1 if map at (x;y) was explored, else 0. Points outside map are
+//   always considered as explored
+#define IS_EXPLORED( x, y )   (((x) < 0 || (x) >= w || (y) < 0 || (y) >= h) ? 1 : (explored_mask[(w * (y) + (x)) / 8] & (1 << ((w * (y) + (x)) % 8))))
+
+#define IS_VISIBLE( x, y )   (((x) < 0 || (x) >= w || (y) < 0 || (y) >= h) ? 1 : (visible_mask[(w * (y) + (x)) / 8] & (1 << ((w * (y) + (x)) % 8))))
+
+#define FOG(i)  vid->BlitSprite( core->FogSprites[i], r.x, r.y, true, &r )
+
+
+
 //vp: 45 480 640 407 ; viewport: 0 0 640 407 ; Xcc, Ycc: 50 43 ; wh: 200 172
 //vid->SetViewport(45 480)
 //sx, sy: 2 30 ; dx, dy: 43 56 ; vp: 0 0 640 407
 
-void TileMap::DrawExploredBitmap(ieByte* mask, Region viewport)
+void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region viewport)
 {
 	// viewport - pos & size of the control
 	int w = XCellCount * CELL_RATIO;
@@ -140,30 +152,135 @@ void TileMap::DrawExploredBitmap(ieByte* mask, Region viewport)
 	vp.h = viewport.h;
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
-			int b0 = (w * y + x);
-			int bb = b0 / 8;
-			int bi = b0 % 8;
+			//int b0 = (w * y + x);
+			//int bb = b0 / 8;
+			//int bi = b0 % 8;
 
 		  
-			if (!(mask[bb] & (1 << bi))) {
-				Region r = Region(viewport.x + ( (x - sx) * CELL_SIZE ), viewport.y + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
-				if (LargeMap) {
-					r.x-=16;
-					r.y-=16;
-				}
-				vid->DrawRect(r, black, true, true);
+			Region r = Region(viewport.x + ( (x - sx) * CELL_SIZE ), viewport.y + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
+			if (LargeMap) {
+				r.x-=16;
+				r.y-=16;
 			}
-			/*
-				vid->BlitSprite( tile->anim[tile->tileIndex]->NextFrame(),
-						viewport.x + ( x * 16 ), viewport.y + ( y * 16 ),
-						false, &vp );
-			*/
+			if (! IS_EXPLORED( x, y )) {
+				// Unexplored tiles are all black
+				vid->DrawRect(r, black, true, true);
+				continue;  // Don't draw 'invisible' fog
+			} 
+			else {
+				// If an explored tile is adjacent to an
+				//   unexplored one, we draw border sprite
+				//   (gradient black <-> transparent)
+				// Tiles in four cardinal directions have these
+				//   values. 
+				//
+				//      1
+				//    2   8
+				//      4
+				//
+				// Values of those unexplored are
+				//   added together, the resulting number being
+				//   an index of shadow sprite to use. For now,
+				//   some tiles are made 'on the fly' by 
+				//   drawing two or more tiles
+
+				int e_n = ! IS_EXPLORED( x, y - 1 );
+				int e_e = ! IS_EXPLORED( x + 1, y );
+				int e_s = ! IS_EXPLORED( x, y + 1 );
+				int e_w = ! IS_EXPLORED( x - 1, y );
+
+				int e = 8 * e_e + 4 * e_s + 2 * e_w + e_n;
+
+				switch (e) {
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 6:
+				case 8:
+				case 9:
+				case 12:
+					FOG( e );
+					break;
+				case 7: 
+					FOG( 3 );
+					FOG( 6 );
+					break;
+				case 11: 
+					FOG( 3 );
+					FOG( 9 );
+					break;
+				case 13: 
+					FOG( 9 );
+					FOG( 12 );
+					break;
+				case 14: 
+					FOG( 6 );
+					FOG( 12 );
+					break;
+				}
+			}
+
+			if (! IS_VISIBLE( x, y )) {
+				// Invisible tiles are all gray
+				FOG( 16 );
+				continue;  // Don't draw 'invisible' fog
+			} 
+			else {
+				// If a visible tile is adjacent to an
+				//   invisible one, we draw border sprite
+				//   (gradient gray <-> transparent)
+				// Tiles in four cardinal directions have these
+				//   values. 
+				//
+				//      1
+				//    2   8
+				//      4
+				//
+				// Values of those invisible are
+				//   added together, the resulting number being
+				//   an index of shadow sprite to use. For now,
+				//   some tiles are made 'on the fly' by 
+				//   drawing two or more tiles
+
+				int e_n = ! IS_VISIBLE( x, y - 1 );
+				int e_e = ! IS_VISIBLE( x + 1, y );
+				int e_s = ! IS_VISIBLE( x, y + 1 );
+				int e_w = ! IS_VISIBLE( x - 1, y );
+
+				int e = 8 * e_e + 4 * e_s + 2 * e_w + e_n;
+
+				switch (e) {
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 6:
+				case 8:
+				case 9:
+				case 12:
+					FOG( 16 + e );
+					break;
+				case 7: 
+					FOG( 16 + 3 );
+					FOG( 16 + 6 );
+					break;
+				case 11: 
+					FOG( 16 + 3 );
+					FOG( 16 + 9 );
+					break;
+				case 13: 
+					FOG( 16 + 9 );
+					FOG( 16 + 12 );
+					break;
+				case 14: 
+					FOG( 16 + 6 );
+					FOG( 16 + 12 );
+					break;
+				}
+			}
 		}
 	}
-
-
-
-
 }
 
 Door* TileMap::GetDoor(unsigned int idx)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.137 2005/02/20 13:00:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.138 2005/02/27 19:13:25 edheldil Exp $
  *
  */
 
@@ -163,7 +163,7 @@ public:
 	ieResRef WorldMapName;
 	Animation **Cursors;
 	int CursorCount;
-	Sprite2D *FogSprites[8];
+	Sprite2D *FogSprites[32];
 	Sprite2D **TooltipBack;
 public:
 	Interface(int iargc, char **iargv);
