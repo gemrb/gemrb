@@ -181,6 +181,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			if(infoPoints[i]->textDisplaying == 1) {
 				Font * font = core->GetFont(9);
 				Region rgn(infoPoints[i]->outline->BBox.x+(infoPoints[i]->outline->BBox.w/2)-100, infoPoints[i]->outline->BBox.y, 200, 400);
+				rgn.x+=video->xCorr;
+				rgn.y+=video->yCorr;
 				font->Print(rgn, (unsigned char*)infoPoints[i]->String, InfoTextPalette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, false);
 			}
 		}
@@ -464,7 +466,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 			if(core->GetDictionary()->Lookup("MessageTextArea", TAIndex)) {
 				TextArea * ta = (TextArea*)core->GetWindow(WinIndex)->GetControl(TAIndex);
 				char Text[256];
-				sprintf(Text, "Selected: %s", actor->LongName);
+				sprintf(Text, "%c%c%c%cSelected%c%c%c%c: %s", 0xf0, 0xff, 0x00, 0x00, 0xf0, 0x00, 0x00, 0x00, actor->LongName);
 				ta->AppendText(Text, -1);
 			}
 		}
@@ -830,8 +832,9 @@ void GameControl::InitDialog(Actor * speaker, Actor * target, Dialog * dlg)
 			TextArea * ta = (TextArea*)win->GetControl(index);
 			DialogState * ds = dlg->GetState(0);
 			char * string = core->GetString(ds->StrRef, 2);
-			int i = ta->AppendText(speaker->LongName, -1);
-			ta->AppendText(": ", i);
+			int i = ta->AppendText("\xf0\xff\x00\x00", -1);
+			ta->AppendText(speaker->LongName, i);
+			ta->AppendText("\xf0\x00\x00\x00: ", i);
 			ta->AppendText(string, i);
 			ta->AppendText("", -1);
 			for(int x = 0; x < ds->transitionsCount; x++) {
