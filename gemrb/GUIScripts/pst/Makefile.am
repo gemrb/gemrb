@@ -1,3 +1,3 @@
-pstscript_DATA = GUIDefines.py NewLife.py Start.py
+pstscript_DATA = *.py
 
 pstscriptdir = $(datadir)/GUIScripts/pst/

@@ -1,2 +1,2 @@
-iwdscript_DATA = GUIDefines.py  GUILOAD.py  GUIMOVIE.py  Start.py
+iwdscript_DATA = *.py
 iwdscriptdir = $(datadir)/GUIScripts/iwd/

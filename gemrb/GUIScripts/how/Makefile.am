@@ -1,3 +1,3 @@
-howscript_DATA = GUIDefines.py GUILOAD.py GUIMOVIE.py Start.py
+howscript_DATA = *.py
 
 howscriptdir = $(datadir)/GUIScripts/how/
