@@ -96,9 +96,6 @@ class Scriptable;
 extern unsigned char pl_uppercase[256];
 extern unsigned char pl_lowercase[256];
 
-#define toupper_pl(i) (pl_uppercase[(i)&255])
-#define tolower_pl(i) (pl_lowercase[(i)&255])
-
 GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
 GEM_EXPORT unsigned char GetOrient(Point &s, Point &d);
 GEM_EXPORT unsigned int Distance(Point pos, Point pos2);

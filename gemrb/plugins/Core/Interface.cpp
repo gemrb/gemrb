@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.265 2005/02/22 23:11:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.266 2005/02/24 22:09:33 avenger_teambg Exp $
  *
  */
 
@@ -1148,6 +1148,12 @@ bool Interface::LoadConfig(const char* filename)
 	return true;
 }
 
+static void upperlower(int upper, int lower)
+{
+        pl_uppercase[lower]=upper;
+        pl_lowercase[upper]=lower;
+}
+
 /** Loads gemrb.ini */
 bool Interface::LoadGemRBINI()
 {
@@ -1219,6 +1225,19 @@ bool Interface::LoadGemRBINI()
 	if (s)
 		strcpy( Palette256, s );
 
+        for(int i=0;i<256;i++) {
+                pl_uppercase[i]=toupper(i);
+                pl_lowercase[i]=tolower(i);
+        }
+        upperlower(165,185);
+        upperlower(198,230);
+        upperlower(202,234);
+        upperlower(163,179);
+        upperlower(209,241);
+        upperlower(211,243);
+        upperlower(140,156);
+        upperlower(175,191);
+        upperlower(143,159);
 
 	SetFeature( ini->GetKeyAsInt( "resources", "AutomapIni", 0 ), GF_AUTOMAP_INI );
 	SetFeature( ini->GetKeyAsInt( "resources", "IWDMapDimensions", 0 ), GF_IWD_MAP_DIMENSIONS );
