@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.51 2003/12/25 23:57:35 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.52 2003/12/30 17:48:10 balrog994 Exp $
  *
  */
 
@@ -85,8 +85,15 @@ void Map::DrawMap(Region viewport)
 		InfoPoint * ip = tm->GetInfoPoint(ipCount++);
 		if(!ip)
 			break;
-		if(ip->Type != 0)
+		if(!ip->Active)
 			continue;
+		if(!ip->Scripts[0])
+			continue;
+		if(ip->Type == ST_TRIGGER) {
+			if(ip->Clicker)
+				ip->Scripts[0]->Update();
+			continue;
+		}
 		Region BBox = ip->outline->BBox;
 		if(BBox.x <= 500)
 			BBox.x = 0;
@@ -106,7 +113,7 @@ void Map::DrawMap(Region viewport)
 			if(!actor->InParty)
 				break;
 			if(BBox.PointInside(actor->XPos, actor->YPos)) {
-				ip->Script->Update();
+				ip->Scripts[0]->Update();
 				break;
 			}
 		}
@@ -114,7 +121,8 @@ void Map::DrawMap(Region viewport)
 	Video * video = core->GetVideoDriver();
 	for(unsigned int i = 0; i < animations.size(); i++) {
 		//TODO: Clipping Animations off screen
-		video->BlitSpriteMode(animations[i]->NextFrame(), animations[i]->x+viewport.x, animations[i]->y+viewport.y, animations[i]->BlitMode, false, &viewport);
+		if(animations[i]->Active)
+			video->BlitSpriteMode(animations[i]->NextFrame(), animations[i]->x+viewport.x, animations[i]->y+viewport.y, animations[i]->BlitMode, false, &viewport);
 	}
 	Region vp = video->GetViewport();
 	Region Screen = vp;
@@ -134,26 +142,28 @@ void Map::DrawMap(Region viewport)
 			actor->DrawCircle();
 		if(anim) {
 			Sprite2D * nextFrame = anim->NextFrame();
-			if(actor->lastFrame != nextFrame) {
-				Region newBBox;
-				newBBox.x = actor->XPos-nextFrame->XPos;
-				newBBox.w = nextFrame->Width;
-				newBBox.y = actor->YPos-nextFrame->YPos;
-				newBBox.h = nextFrame->Height;
-				actor->lastFrame = nextFrame;
-				actor->SetBBox(newBBox);
-			}
-			if(!actor->BBox.InsideRegion(vp))
-				continue;
-			int ax = actor->XPos, ay = actor->YPos;
-			int cx = ax/16;
-			int cy = ay/12;
-			Color tint = LightMap->GetPixel(cx, cy);
-			tint.a = 0xA0;
-			video->BlitSpriteTinted(nextFrame, ax+viewport.x, ay+viewport.y, tint, &Screen);
-			if(anim->endReached && anim->autoSwitchOnEnd) {
-				actor->AnimID = anim->nextAnimID;
-				anim->autoSwitchOnEnd = false;
+			if(nextFrame) {
+				if(actor->lastFrame != nextFrame) {
+					Region newBBox;
+					newBBox.x = actor->XPos-nextFrame->XPos;
+					newBBox.w = nextFrame->Width;
+					newBBox.y = actor->YPos-nextFrame->YPos;
+					newBBox.h = nextFrame->Height;
+					actor->lastFrame = nextFrame;
+					actor->SetBBox(newBBox);
+				}
+				if(!actor->BBox.InsideRegion(vp))
+					continue;
+				int ax = actor->XPos, ay = actor->YPos;
+				int cx = ax/16;
+				int cy = ay/12;
+				Color tint = LightMap->GetPixel(cx, cy);
+				tint.a = 0xA0;
+				video->BlitSpriteTinted(nextFrame, ax+viewport.x, ay+viewport.y, tint, &Screen);
+				if(anim->endReached && anim->autoSwitchOnEnd) {
+					actor->AnimID = anim->nextAnimID;
+					anim->autoSwitchOnEnd = false;
+				}
 			}
 		}
 		if(actor->textDisplaying) {
@@ -406,4 +416,13 @@ void Map::AddVVCCell(ScriptedAnimation * vvc)
 		}
 	}
 	vvcCells.push_back(vvc);
+}
+
+Animation* Map::GetAnimation(const char * Name)
+{
+	for(int i = 0; i < animations.size(); i++) {
+		if(strnicmp(animations[i]->ResRef, Name, 8) == 0)
+			return animations[i];
+	}
+	return NULL;
 }
