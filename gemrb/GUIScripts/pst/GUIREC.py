@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.34 2005/02/12 19:42:47 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.35 2005/02/13 14:01:37 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -78,13 +78,15 @@ LevelUpWindow = None
 RecordsWindow = None
 InformationWindow = None
 BiographyWindow = None
-StatTable = GemRB.LoadTable("abcomm")
 statevents =("OnRecordsHelpStrength","OnRecordsHelpIntelligence","OnRecordsHelpWisdom","OnRecordsHelpDexterity","OnRecordsHelpConstitution","OnRecordsHelpCharisma")
 
 ###################################################
 def OpenRecordsWindow ():
 	global RecordsWindow
+	global StatTable
 
+	StatTable = GemRB.LoadTable("abcomm")
+	
 	if CloseOtherWindow (OpenRecordsWindow):
 		GemRB.HideGUI ()
 		if InformationWindow: OpenInformationWindow ()
