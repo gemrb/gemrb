@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.15 2005/02/19 17:15:26 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.16 2005/03/20 15:47:11 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -146,8 +146,6 @@ def GetActorClassTitle (actor):
 		else:
 			ClassTitle=GemRB.GetTableValue(KitTable, KitIndex, 2)
 
-	GemRB.UnloadTable (ClassTable)
-	GemRB.UnloadTable (KitTable)
 	return ClassTitle
 
 def GetActorPaperDoll (actor):
