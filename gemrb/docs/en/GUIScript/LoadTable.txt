@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.LoadTable(2DAResRef, [ignore_error=0])
 
-Description:
+Description: Loads a 2DA Table. In case it was already loaded, it will return the table's existing reference (won't load it again).
 
-Parameters:
+Parameters: 2DAResRef    - the table's name (.2da resref)
+            ignore_error - boolean, if set, then the script won't be blocked by missing files.
 
-Return value:
+Return value: The table's internal reference.
 
-See also:
+See also: UnloadTable, LoadSymbol
 

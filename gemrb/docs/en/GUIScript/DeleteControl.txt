@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.DeleteControl(WindowIndex, ControlID)
 
-Description:
+Description: Deletes a control from a Window.
 
-Parameters:
+Parameters: WindowIndex - the return value of a previous LoadWindow call.
+            ControlID   - a control ID, see the .chu file specification
 
-Return value:
+Return value: N/A
 
-See also:
+See also: GetControl
 

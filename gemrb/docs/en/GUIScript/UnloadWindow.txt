@@ -3,7 +3,7 @@ Prototype: GemRB.UnloadWindow(WindowIndex)
 
 Description: Unloads a previously loaded Window. EnterGame() and QuitGame() automatically unload all loaded windows.
 
-Parameters: WindowIndex is the index returned by LoadWindow()
+Parameters: WindowIndex - the index returned by LoadWindow()
 
 Return value: N/A
 

@@ -1,11 +1,15 @@
 
-Prototype:
+Prototype: GemRB.SetVisible(WindowIndex, Visible)
 
-Description:
+Description: Sets the Visibility Flag of a Window.
 
-Parameters:
+Parameters: WindowIndex - the index returned by LoadWindow()
+            Visible     - 0,1 or 2
+0 - Window is invisible
+1 - Window is visible
+2 - Window is shaded
 
-Return value:
+Return value: N/A
 
-See also:
+See also: ShowModal
 

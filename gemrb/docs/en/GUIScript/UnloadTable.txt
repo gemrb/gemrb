@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.UnloadTable(TableIndex)
 
-Description:
+Description: Unloads a 2DA Table.
 
-Parameters:
+Parameters: TableIndex - returned by a previous LoadTable command.
 
-Return value:
+Return value: N/A
 
-See also:
+See also: LoadTable
 

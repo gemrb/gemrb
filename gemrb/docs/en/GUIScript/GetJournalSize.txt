@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.GetJournalSize(chapter[, section])
 
-Description:
+Description: Returns the number of entries in the given section of journal. Please note that various engines implemented the chapter/sections at various degree. For example PST has none of these. Section will default to zero.
 
-Parameters:
+Parameters: chapter - the chapter of the journal page
+            section - 0,1,2 or 4 - general, quest, solved quest or user notes.
 
-Return value:
+Return value: numeric
 
-See also:
+See also: GetJournalEntry
 
