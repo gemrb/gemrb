@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.61 2004/02/29 21:50:36 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.62 2004/04/13 23:23:04 doc_wagon Exp $
  *
  */
 
@@ -162,7 +162,7 @@ bool SDLVideoDriver::TestVideoMode(VideoMode& vm)
 
 bool SDLVideoDriver::ToggleFullscreenMode()
 {
-	return (bool)SDL_WM_ToggleFullScreen(disp);
+	return SDL_WM_ToggleFullScreen(disp) != 0;
 }
 
 int SDLVideoDriver::SwapBuffers(void)
