@@ -11,7 +11,7 @@ else
 fi
 
 echo Running libtoolize
-libtoolize || exit 1
+libtoolize --force || exit 1
 
 echo Running aclocal
 aclocal || exit 1
