@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.33 2004/02/24 22:20:40 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.34 2004/04/07 09:55:32 edheldil Exp $
  *
  */
 
@@ -71,7 +71,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 			free( newname );
 		}
 	} else
-		#endif
+#endif
 	{
 		strcpy( fn, resfile );
 	}
