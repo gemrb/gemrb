@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.249 2004/11/27 00:06:08 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.250 2004/11/29 22:19:43 avenger_teambg Exp $
  *
  */
 
@@ -352,7 +352,7 @@ static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 	//this could be DANGEROUS, not anymore (snprintf is your friend)
 	snprintf( newtext, bufflen, text, X, Y );
 	free( text );
-	ret = Py_BuildValue( "s", newtext );
+	ret = PyString_FromString( newtext );
 	free( newtext );
 	return ret;
 }
@@ -620,7 +620,7 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 		if (valid_number( ret, val )) {
 			return Py_BuildValue( "l", val );
 		}
-		return Py_BuildValue( "s", ret );
+		return PyString_FromString( ret );
 	}
 
 	return NULL;
@@ -695,7 +695,7 @@ static PyObject* GemRB_GetTableRowName(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	return Py_BuildValue( "s", str );
+	return PyString_FromString( str );
 }
 
 PyDoc_STRVAR( GemRB_GetTableRowCount__doc,
@@ -787,7 +787,7 @@ static PyObject* GemRB_GetSymbolValue(PyObject * /*self*/, PyObject* args)
 			if (!sm)
 				return NULL;
 			const char* str = sm->GetValue( symi );
-			return Py_BuildValue( "s", str );
+			return PyString_FromString( str );
 		}
 	}
 	return AttributeError( GemRB_GetSymbolValue__doc );
@@ -831,11 +831,11 @@ static PyObject* GemRB_QueryText(PyObject * /*self*/, PyObject* args)
 	}
 	switch(ctrl->ControlType) {
 	case IE_GUI_LABEL:
-		return Py_BuildValue( "s",((Label *) ctrl)->QueryText() );
+		return PyString_FromString(((Label *) ctrl)->QueryText() );
 	case IE_GUI_EDIT:
-		return Py_BuildValue( "s",((TextEdit *) ctrl)->QueryText() );
+		return PyString_FromString(((TextEdit *) ctrl)->QueryText() );
 	case IE_GUI_TEXTAREA:
-		return Py_BuildValue( "s",((TextArea *) ctrl)->QueryText() );
+		return PyString_FromString(((TextArea *) ctrl)->QueryText() );
 	default:
 		RuntimeError("Invalid control type");
 		return NULL;
@@ -2231,10 +2231,12 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ss", &Variable, &value )) {
 		return AttributeError( GemRB_SetToken__doc );
 	}
-
+/* SetAtCopy does this trick now
 	char* newvalue = ( char* ) malloc( strlen( value ) + 1 );  //duplicating the string
 	strcpy( newvalue, value );
 	core->GetTokenDictionary()->SetAt( Variable, newvalue );
+*/
+	core->GetTokenDictionary()->SetAtCopy( Variable, value );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -2274,10 +2276,10 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 
 	//returns only the pointer
 	if (!core->GetTokenDictionary()->Lookup( Variable, value )) {
-		return Py_BuildValue( "s", "" );
+		return PyString_FromString( "" );
 	}
 
-	return Py_BuildValue( "s", value );
+	return PyString_FromString( value );
 }
 
 PyDoc_STRVAR( GemRB_GetVar__doc,
@@ -2396,6 +2398,42 @@ static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+static PyObject *GetGameDate(DataStream *ds)
+{
+	ieDword inbuff[3];
+
+	ds->Read(inbuff, 12);
+	delete ds;
+	if(memcmp(inbuff,"GAME",4) ) {
+		return NULL;
+	}
+	int hours = ((int) inbuff[2])/4500;
+	int days = hours/24;
+	hours -= days*24;
+	char tmpstr[10];
+	char *a=NULL,*b=NULL,*c=NULL;
+	PyObject *retval;
+
+	sprintf(tmpstr,"%d",days);
+	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", tmpstr);
+	if(days) {
+		if(days==1) a=core->GetString(10698);
+		else a=core->GetString(10697);
+	}
+	sprintf(tmpstr,"%d",hours);
+	core->GetTokenDictionary()->SetAtCopy("HOUR", tmpstr);
+	if(hours || !a) {
+		if(a) b=core->GetString(10699);
+		if(hours==1) c=core->GetString(10701);
+		else c=core->GetString(10700);
+	}
+	retval = PyString_FromFormat("%s%s%s",a?a:"",b?b:"",c?c:"");
+	if(a) free(a);
+	if(b) free(b);
+	if(c) free(c);
+	return retval;
+}
+
 PyDoc_STRVAR( GemRB_GetSaveGameAttrib__doc,
 "GetSaveGameAttrib(Type, SaveSlotCount) => string\n\n"
 "Returns the name, path or prefix of the saved game." );
@@ -2415,13 +2453,15 @@ static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
 	PyObject* tmp;
 	switch (Type) {
 		case 0:
-			tmp = Py_BuildValue( "s", sg->GetName() ); break;
+			tmp = PyString_FromString( sg->GetName() ); break;
 		case 1:
-			tmp = Py_BuildValue( "s", sg->GetPrefix() ); break;
+			tmp = PyString_FromString( sg->GetPrefix() ); break;
 		case 2:
-			tmp = Py_BuildValue( "s", sg->GetPath() ); break;
+			tmp = PyString_FromString( sg->GetPath() ); break;
 		case 3:
-			tmp = Py_BuildValue( "s", sg->GetDate() ); break;
+			tmp = PyString_FromString( sg->GetDate() ); break;
+		case 4: //ingame date
+			tmp = GetGameDate(sg->GetGame()); break;
 		default:
 			printMessage( "GUIScript",
 				"Syntax Error: GetSaveGameAttrib(Type, SlotCount)\n",
@@ -2712,7 +2752,7 @@ static PyObject* GemRB_GetINIQuestsKey(PyObject * /*self*/, PyObject* args)
 	if (!core->GetQuestsINI()) {
 		return NULL;
 	}
-	return Py_BuildValue( "s",
+	return PyString_FromString(
 			core->GetQuestsINI()->GetKeyAsString( Tag, Key, Default ) );
 }
 
@@ -2729,7 +2769,7 @@ static PyObject* GemRB_GetINIBeastsKey(PyObject * /*self*/, PyObject* args)
 	if (!core->GetBeastsINI()) {
 		return NULL;
 	}
-	return Py_BuildValue( "s",
+	return PyString_FromString(
 			core->GetBeastsINI()->GetKeyAsString( Tag, Key, Default ) );
 }
 
@@ -2746,7 +2786,7 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 	if (!core->GetPartyINI()) {
 		return NULL;
 	}
-	return Py_BuildValue( "s",
+	return PyString_FromString(
 			core->GetPartyINI()->GetKeyAsString( Tag, Key, Default ) );
 }
 
@@ -2804,9 +2844,9 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 	}
 	Actor* MyActor = game->FindPC( PartyID );
 	if (!MyActor) {
-		return Py_BuildValue( "s", "???");
+		return PyString_FromString( "???");
 	}
-	return Py_BuildValue( "s", MyActor->GetName(Which) );
+	return PyString_FromString( MyActor->GetName(Which) );
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerName__doc,
@@ -3079,9 +3119,9 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	PlayerSlot = game->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
 	if (!MyActor) {
-		return Py_BuildValue( "s", "");
+		return PyString_FromString( "");
 	}
-	return Py_BuildValue( "s", MyActor->GetPortrait(Which) );
+	return PyString_FromString( MyActor->GetPortrait(Which) );
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerStat__doc,

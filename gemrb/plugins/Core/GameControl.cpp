@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.180 2004/11/27 14:55:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.181 2004/11/29 22:19:25 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -169,7 +169,6 @@ void GameControl::MoveToPointFormation(Actor *actor, Point p, int Orient)
 	int formation=core->GetGame()->WhichFormation;
 	pos=actor->InParty-1; //either this or the actual # of selected actor?
 	if(pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
-printf("Orient: %d\n", Orient);
 	switch(Orient) {
 	case 11: case 12: case 13://east
 		p.x-=formations[formation][pos].y*30;

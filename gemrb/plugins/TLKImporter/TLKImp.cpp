@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.40 2004/11/28 19:36:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.41 2004/11/29 22:19:47 avenger_teambg Exp $
  *
  */
 
@@ -160,17 +160,21 @@ void TLKImp::GetMonthName(int dayandmonth)
 			char tmpstr[10];
 			
 			sprintf(tmpstr,"%d", dayandmonth+1);
+/*
 		        tmp = ( char* ) malloc( strlen( tmpstr ) + 1 );
 			strcpy( tmp, tmpstr );
-			core->GetTokenDictionary()->SetAt("DAY", tmp);
+*/
+			core->GetTokenDictionary()->SetAtCopy("DAY", tmpstr);
 
 			tmp = GetString( monthnames[i] );
 			core->GetTokenDictionary()->SetAt("MONTHNAME",tmp);
 
 			sprintf(tmpstr,"%d", month);
+/*
 		        tmp = ( char* ) malloc( strlen( tmpstr ) + 1 );
 			strcpy( tmp, tmpstr );
-			core->GetTokenDictionary()->SetAt("MONTH",tmp);
+*/
+			core->GetTokenDictionary()->SetAtCopy("MONTH",tmpstr);
 			return;
 		}
 		dayandmonth-=days[i];

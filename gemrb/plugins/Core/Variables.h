@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.18 2004/08/19 21:14:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.19 2004/11/29 22:19:42 avenger_teambg Exp $
  *
  */
 
@@ -100,6 +100,7 @@ public:
 	bool Lookup(const char* key, char*& dest) const;
 
 	// Operations
+	void SetAtCopy(const char* key, const char* newValue);
 	void SetAt(const char* key, const char* newValue);
 	void SetAt(const char* key, ieDword newValue);
 	void RemoveAll();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.25 2004/08/28 19:33:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.26 2004/11/29 22:19:34 avenger_teambg Exp $
  *
  */
 
@@ -311,6 +311,14 @@ bool Variables::Lookup(const char* key, ieDword& rValue) const
 
 	rValue = pAssoc->Value.nValue;
 	return true;
+}
+
+void Variables::SetAtCopy(const char* key, const char* value)
+{
+	int len = strlen(value)+1;
+	char *str=(char *) malloc(len);
+	memcpy(str,value,len);
+	SetAt(key, (const char *) str);
 }
 
 void Variables::SetAt(const char* key, const char* value)
