@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.21 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.22 2004/03/21 18:28:57 avenger_teambg Exp $
  *
  */
 
@@ -104,7 +104,7 @@ int FileStream::Read(void* dest, int length)
 	//if(feof(str)) { /* slightly modified by brian  oct 11 2003*/
 	//	return GEM_EOF;
 	//}
-	if (c < 0) {
+	if (c != length) {
 		return GEM_ERROR;
 	}
 	if (Encrypted) {
