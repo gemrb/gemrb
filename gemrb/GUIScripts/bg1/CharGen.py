@@ -19,6 +19,9 @@ def OnLoad():
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
+	InfoAreaControl = GemRB.GetControl(CharGenWindow, 9)
+	GemRB.SetText(CharGenWindow, InfoAreaControl, 16575)
+	
 	GenderButton = GemRB.GetControl(CharGenWindow,0)
 	GemRB.SetText(CharGenWindow,GenderButton,11956)
 	GemRB.SetButtonState(CharGenWindow,GenderButton,IE_GUI_BUTTON_ENABLED)
@@ -52,7 +55,6 @@ def OnLoad():
 	GemRB.SetButtonState(CharGenWindow,NameButton,IE_GUI_BUTTON_DISABLED)
 
 	BackButton = GemRB.GetControl(CharGenWindow, 11)
-	#GemRB.SetText(CharGenWindow, BackButton, 15416)
 	GemRB.SetButtonState(CharGenWindow,BackButton,IE_GUI_BUTTON_ENABLED)
 
 	AcceptButton = GemRB.GetControl(CharGenWindow, 8)
