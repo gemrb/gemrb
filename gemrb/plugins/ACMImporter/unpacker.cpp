@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.2 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.3 2004/01/02 15:56:47 balrog994 Exp $
  *
  */
 
@@ -97,7 +97,8 @@ FillerProc Fillers[32] = {
 void CValueUnpacker::prepare_bits (int bits) {
 	while (bits > avail_bits) {
 		unsigned char one_byte;
-		if (!fread (&one_byte, 1, 1, file)) one_byte = 0;
+		if(!stream->Read(&one_byte, 1)) one_byte = 0;
+		//if (!fread (&one_byte, 1, 1, file)) one_byte = 0;
 		next_bits |= ((unsigned long)one_byte << avail_bits);
 		avail_bits += 8;
 	}

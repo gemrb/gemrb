@@ -15,18 +15,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.h,v 1.2 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.h,v 1.3 2004/01/02 15:56:47 balrog994 Exp $
  *
  */
 
 #ifndef _ACM_LAB_VALUE_UNPACKER_H
 #define _ACM_LAB_VALUE_UNPACKER_H
 
+#include "../Core/DataStream.h"
+
 class CValueUnpacker {
 private:
 // Parameters of ACM stream
 	int levels, subblocks;
-	FILE* file;
+	//FILE* file;
+	DataStream * stream;
 // Bits
 	unsigned long next_bits; // new bits
 	int avail_bits; // count of new bits
@@ -61,12 +64,13 @@ public:
 	int t3_7bits (int pass, int ind);
 
 
-	CValueUnpacker (int lev_cnt, int sb_count, FILE* handle)
+	CValueUnpacker (int lev_cnt, int sb_count, DataStream * stream)
 		: levels (lev_cnt), subblocks (sb_count),
-		file (handle),
 		next_bits (0), avail_bits (0),
 		sb_size (1<< levels), block_size (sb_size * subblocks),
-		amp_buffer (NULL), buff_middle (NULL), block_ptr (NULL) {};
+		amp_buffer (NULL), buff_middle (NULL), block_ptr (NULL) {
+			this->stream = stream;
+		};
 	virtual ~CValueUnpacker() { if (amp_buffer) delete amp_buffer; };
 
 	int init_unpacker();
