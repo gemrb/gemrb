@@ -22,6 +22,7 @@ def OnLoad():
 			s = GemRB.GetTableValue(MoviesTable, i, 0)
 			GemRB.TextAreaAppend(MovieWindow, TextAreaControl, s,-1)
 	GemRB.SetVarAssoc(MovieWindow, TextAreaControl, "MovieIndex",0)
+	GemRB.SetTextAreaSelectable(MovieWindow, TextAreaControl, 1)
 	GemRB.SetText(MovieWindow, PlayButton, 17318)
 	GemRB.SetText(MovieWindow, CreditsButton, 15591)
 	GemRB.SetText(MovieWindow, DoneButton, 11973)
