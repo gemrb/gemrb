@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.14 2004/08/21 04:53:59 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.15 2005/03/25 17:32:56 avenger_teambg Exp $
  *
  */
 
@@ -30,7 +30,7 @@
 static const char MVESignature[] = "Interplay MVE File\x1A";
 static const int MVE_SIGNATURE_LEN = 19;
 
-static SDL_Surface* g_screen;
+static SDL_Surface* g_screen = NULL;
 static unsigned char g_palette[768];
 static int g_truecolor;
 
@@ -125,12 +125,6 @@ int MVEPlay::doPlay(const DataStream* mve)
 	int bpp = 0;
 	MVE_videoSpec vSpec;
 
-/*
-	if (SDL_Init( SDL_INIT_AUDIO ) < 0) {
-		fprintf( stderr, "Couldn't initialize SDL Audio: %s\n",
-			SDL_GetError() );
-	}
-*/
 	memset( g_palette, 0, 768 );
 
 	ieDword volume;
@@ -141,18 +135,18 @@ int MVEPlay::doPlay(const DataStream* mve)
 	MVE_sfCallbacks( showFrame );
 	MVE_palCallbacks( setPalette );
 
-	MVE_rmPrepMovie( ( void * ) mve, -1, -1, 1 );
-
-	MVE_getVideoSpec( &vSpec );
-
-	bpp = vSpec.truecolor ? 16 : 8;
-
 	g_screen = ( SDL_Surface * ) core->GetVideoDriver()->GetVideoSurface();
 	SDL_LockSurface( g_screen );
 	memset( g_screen->pixels, 0,
 		g_screen->w * g_screen->h * g_screen->format->BytesPerPixel );
 	SDL_UnlockSurface( g_screen );
 	SDL_Flip( g_screen );
+
+	MVE_rmPrepMovie( ( void * ) mve, -1, -1, 1 );
+
+	MVE_getVideoSpec( &vSpec );
+
+	bpp = vSpec.truecolor ? 16 : 8;
 
 	g_truecolor = vSpec.truecolor;
 
@@ -161,8 +155,8 @@ int MVEPlay::doPlay(const DataStream* mve)
 	}
 
 	MVE_rmEndMovie();
-
-	//fclose(mve);
+	SDL_FreeSurface( g_screen );
+	g_screen = NULL;
 
 	return 0;
 }
