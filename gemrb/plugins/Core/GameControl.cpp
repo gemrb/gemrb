@@ -52,6 +52,8 @@ GameControl::GameControl(void)
 	lastCursor = 0;
 	moveX = moveY = 0;
 	DebugFlags = 0;
+	AIUpdateCounter = 1;
+	DisableMouse = false;
 }
 
 GameControl::~GameControl(void)
@@ -73,7 +75,20 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
 	if(area) {
+#ifdef WIN32
+		unsigned long time = GetTickCount();
+#else
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
+#endif
+		if((time-AIUpdateCounter) >= 66) {
+			core->GSUpdate();
+			AIUpdateCounter = time;
+		}
 		area->DrawMap(vp);
+		if(DisableMouse)
+			return;
 		short GameX = lastMouseX, GameY = lastMouseY;
 		video->ConvertToGame(GameX, GameY);
 		if(DrawSelectionRect) {	
@@ -243,6 +258,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 /** Mouse Over Event */
 void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 {
+	if(DisableMouse)
+		return;
 	int nextCursor=0;
 
 	lastMouseX = x;
@@ -345,6 +362,8 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
+	if(DisableMouse)
+		return;
 	short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	MouseIsDown = true;
@@ -358,6 +377,8 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char 
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
+	if(DisableMouse)
+		return;
 	MouseIsDown = false;
 	short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
@@ -507,5 +528,16 @@ void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 			lastActor = actor;
 			lastActor->actor->anims->DrawCircle = true;
 		}
+	}
+}
+
+void GameControl::SetCutSceneMode(bool active)
+{
+	DisableMouse = active;
+	if(active) {
+		core->GetVideoDriver()->SetCursor(NULL, NULL);
+	}
+	else {
+		core->GetVideoDriver()->SetCursor(core->Cursors[lastCursor]->GetFrame(0), core->Cursors[lastCursor+1]->GetFrame(0));
 	}
 }

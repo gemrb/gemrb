@@ -49,6 +49,8 @@ private:
 	int DebugFlags;
 	short pfsX, pfsY;
 	PathNode * drawPath;
+	unsigned long AIUpdateCounter;
+	bool DisableMouse;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
@@ -64,6 +66,8 @@ public: //Events
 	void OnSpecialKeyPress(unsigned char Key);
 private:
 	void CalculateSelection(unsigned short x, unsigned short y);
+public:
+	void SetCutSceneMode(bool active);
 };
 
 #endif
