@@ -1,3 +1,10 @@
+GemRB v0.2.2.9 Added Features:
+- Bug Fixes:
+  - Fixed Object Parsing in Dialog code
+- Added Features:
+  - Added many scripting actions, triggers, object filters
+  - Added hotkeys like '1-9', '=' to select players
+
 GemRB v0.2.2.8 Added Features:
 - Bug Fixes:
   - Fixed a Big Bug with the Map Displayer: 
