@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.237 2004/11/01 18:54:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.238 2004/11/05 16:28:59 avenger_teambg Exp $
  *
  */
 
@@ -2808,7 +2808,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetSlotType__doc,
 "GetSlotType(idx) => dict\n\n"
-"Returns dictionary of an itemslot type (slottype.ids).");
+"Returns dictionary of an itemslot type (slottype.2da).");
 
 static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 {
@@ -3023,7 +3023,7 @@ static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*a
 	for (int i = 0; i < game->GetPartySize (false); i++) {
 		Actor* actor = game->GetPC (i);
 		if (actor->IsSelected()) {
-			return Py_BuildValue( "i", actor->InParty); // FIXME: or i+1 ?
+			return Py_BuildValue( "i", actor->InParty);
 		}
 	}
 
@@ -3469,7 +3469,7 @@ static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 
 PyDoc_STRVAR( GemRB_SetMemorizableSpellsCount__doc,
 "SetMemorizableSpellsCount(PartyID, Value, SpellType, Level, [Bonus])=>int\n\n"
-"Returns number of memorizable spells of given type and level in PartyID's spellbook" );
+"Sets number of memorizable spells of given type and level in PartyID's spellbook." );
 
 static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
 {
@@ -3766,7 +3766,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_DragItem__doc,
-"DragItem(PartyID, Slot, ResRef, [Count=0])\\n\n"
+"DragItem(PartyID, Slot, ResRef, [Count=0])\n\n"
 "Start dragging specified item" );
 
 static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
@@ -3837,7 +3837,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_DropDraggedItem__doc,
-"DropDraggedItem(PartyID, Slot)=>int\\n\n"
+"DropDraggedItem(PartyID, Slot)=>int\n\n"
 "Stop dragging specified item. Returns 0 (unsuccessful), 1 (partial success) or 2 (complete success)." );
 
 static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
@@ -3872,7 +3872,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_IsDraggingItem__doc,
-"IsDraggingItem()=>int\\n\n"
+"IsDraggingItem()=>int\n\n"
 "Returns 1 if we are dragging some item." );
 
 static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* /*args*/)
@@ -3881,7 +3881,7 @@ static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
-"GetSystemVariable(Variable)=>int\\n\n"
+"GetSystemVariable(Variable)=>int\n\n"
 "Returns the named Interface attribute." );
 
 static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
@@ -3898,6 +3898,43 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 		default: value = -1; break;
 	}
 	return Py_BuildValue( "i", value);
+}
+
+PyDoc_STRVAR( GemRB_CreateItem__doc,
+"CreateItem(PartyID, ItemResRef, [SlotID, Charge0, Charge1, Charge2])\n\n"
+"Creates Item in the inventory of the player character.\n\n");
+
+static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+	int SlotID=-1;
+	int Charge0=1,Charge1=0,Charge2=0;
+	CREItem *TmpItem;
+	char *ItemResRef;
+
+	if (!PyArg_ParseTuple( args, "is|iiii", &PartyID, &ItemResRef, &SlotID, &Charge0, &Charge1, &Charge2)) {
+		return AttributeError( GemRB_CreateItem__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	TmpItem = new CREItem();
+	strncpy(TmpItem->ItemResRef, ItemResRef, 8);
+	TmpItem->Unknown08=0;
+	TmpItem->Usages[0]=Charge0;
+	TmpItem->Usages[1]=Charge1;
+	TmpItem->Usages[2]=Charge2;
+	TmpItem->Flags=IE_INV_ITEM_ACQUIRED;
+	int res = actor->inventory.AddSlotItem( TmpItem, SlotID );
+	if (res!=2) {
+		printf("Inventory is full\n");
+		delete TmpItem; //removal of residue
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 static PyMethodDef GemRBMethods[] = {
@@ -4039,6 +4076,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(DropDraggedItem, METH_VARARGS),
 	METHOD(IsDraggingItem, METH_NOARGS),
 	METHOD(GetSystemVariable, METH_VARARGS),
+	METHOD(CreateItem, METH_VARARGS),
 
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
