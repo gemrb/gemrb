@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.5 2003/11/27 22:04:40 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.6 2003/11/30 21:05:33 avenger_teambg Exp $
  *
  */
 
@@ -55,21 +55,21 @@ void TileOverlay::Draw(Region viewport)
 	Region vp = vid->GetViewport();
 	vp.w = viewport.w;
 	vp.h = viewport.h;
-	if(vp.x < 0)
-		vp.x = 0;
-	else if((vp.x+vp.w) > w*64)
+	if((vp.x+vp.w) > w*64)
 		vp.x = (w*64 - vp.w);
-	if(vp.y < 0)
-		vp.y = 0;
-	else if((vp.y+vp.h) > h*64)
+	if(vp.x < 0)
+		vp.x=0;
+	if((vp.y+vp.h) > h*64)
 		vp.y = (h*64 - vp.h);
+	if(vp.y < 0)
+		vp.y=0;
 	vid->SetViewport(vp.x, vp.y);
 	int sx = vp.x / 64;
 	int sy = vp.y / 64;
 	int dx = (int)ceil((vp.x+vp.w) / 64.0);
 	int dy = (int)ceil((vp.y+vp.h) / 64.0);
-	for(int y = sy; y < dy; y++) {
-		for(int x = sx; x < dx; x++) {
+	for(int y = sy; y < dy && y<h; y++) {
+		for(int x = sx; x < dx && x<w; x++) {
 			Tile * tile = tiles[(y*w)+x];
 			if(tile->anim[tile->tileIndex])
 				vid->BlitSprite(tile->anim[tile->tileIndex]->NextFrame(),viewport.x+(x*64) ,viewport.y+(y*64));
