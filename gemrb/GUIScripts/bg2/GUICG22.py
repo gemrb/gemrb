@@ -21,10 +21,6 @@ def OnLoad():
 	ClassName = GemRB.GetTableRowName(TmpTable, Class)
 	ClassID = GemRB.GetTableValue(TmpTable, Class, 5)
 	ClassList = GemRB.LoadTable("classes")
-	#if ClassID == 1:
-	#	#mages are hacked in the original engine, we simulate this
-	#	KitTable = -1
-	#else:
 	KitTable = GemRB.LoadTable("kittable")
 	KitTableName = GemRB.GetTableValue(KitTable, ClassName, RaceName)
 	KitTable = GemRB.LoadTable(KitTableName,1)
@@ -64,6 +60,7 @@ def OnLoad():
 			else:
 				Kit = 0
 				KitName = GemRB.GetTableValue(ClassList, GemRB.GetVar("Class")-1, 0)
+
 		else:
 			Kit = GemRB.GetTableValue(KitTable,i,0)
 			if ClassID == 1:
@@ -71,7 +68,10 @@ def OnLoad():
 					Kit = Kit - 21
 				KitName = GemRB.GetTableValue(SchoolList, Kit, 0)
 			else:
-				KitName = GemRB.GetTableValue(KitList, Kit, 1)
+				if Kit:
+					KitName = GemRB.GetTableValue(KitList, Kit, 1)
+				else:
+					KitName = GemRB.GetTableValue(ClassList, GemRB.GetVar("Class")-1, 0)
 
 		GemRB.SetButtonState(KitWindow, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetText(KitWindow, Button, KitName)
