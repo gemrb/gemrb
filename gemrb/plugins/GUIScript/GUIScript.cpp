@@ -924,6 +924,13 @@ static PyObject * GemRB_SetButtonPicture(PyObject */*self*/, PyObject *args)
 	if(ctrl->ControlType != IE_GUI_BUTTON)
 		return NULL;
 
+	if(ResRef[0]==0) {
+		Button * btn = (Button*)ctrl;
+		btn->SetPicture(NULL);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
 	DataStream * str = core->GetResourceMgr()->GetResource(ResRef, IE_BMP_CLASS_ID);
 	if(str == NULL)
 		return NULL;
