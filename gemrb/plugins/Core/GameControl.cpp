@@ -322,7 +322,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			}
 		break;
 
-		case 't': // t
+		case 'j': // j
 			{
 				if(selected.size() == 1) {
 					Actor * actor = selected[0];
@@ -342,7 +342,6 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			{
 				Game * game = core->GetGame();
 				Map * area = game->GetMap(MapIndex);
-				//get the area resref, store it first!
 				short cX = lastMouseX; 
 				short cY = lastMouseY;
 				core->GetVideoDriver()->ConvertToGame(cX, cY);
