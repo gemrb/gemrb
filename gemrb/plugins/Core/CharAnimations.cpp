@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.43 2004/08/26 12:09:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.44 2004/08/26 14:07:33 avenger_teambg Exp $
  *
  */
 
@@ -98,7 +98,7 @@ void CharAnimations::SetupColors(ieDword *arg)
 		if (PType==1) 
 			return;
 		char PaletteResRef[8];
-		sprintf(PaletteResRef, "%4.4s_%2.2s",ResRef, (char *) &PType);
+		sprintf(PaletteResRef, "%.4s_%-.2s",ResRef, (char *) &PType);
 		ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
 		if (bmp) {
 			DataStream* s = core->GetResourceMgr()->GetResource( PaletteResRef, IE_BMP_CLASS_ID );
@@ -170,7 +170,7 @@ void CharAnimations::InitAvatarsTable()
 		if( isalpha (tmp[0]) ) {
 			//this is a hack, we store 2 letters on an integer
 			//it was allocated with calloc, so don't bother erasing it
-			strncpy( (char *) &AvatarTable[i].PaletteType, tmp, 2);
+			strncpy( (char *) &AvatarTable[i].PaletteType, tmp, 3);
 		}
 		else {
 			AvatarTable[i].PaletteType=atoi(Avatars->QueryField(i,AV_USE_PALETTE) );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.15 2004/08/02 22:14:21 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.16 2004/08/26 14:07:32 avenger_teambg Exp $
  *
  */
 
@@ -81,6 +81,8 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 	str->Read( &Compression, 4 );
 	str->Read( &ImageSize, 4 );
 	str->Seek( 16, GEM_CURRENT_POS );
+	//str->Read(&Hres, 4);
+	//str->Read(&Vres, 4);
 	//str->Read(&ColorsUsed, 4);
 	//str->Read(&ColorsImportant, 4);
 	if (Compression != 0) {
@@ -209,19 +211,20 @@ Sprite2D* BMPImp::GetImage()
 /** No descriptions */
 void BMPImp::GetPalette(int index, int colors, Color* pal)
 {
-	unsigned char * p = ( unsigned char * ) pixels;
-	p += PaddedRowLength * index;
 	if (BitCount == 24) {
+		unsigned char * p = ( unsigned char * ) pixels;
+		p += PaddedRowLength * index;
 		for (int i = 0; i < colors; i++) {
 			pal[i].b = *p++;
 			pal[i].g = *p++;
 			pal[i].r = *p++;
 		}
 	} else if (BitCount == 8) {
+		int p = index;
 		for (int i = 0; i < colors; i++) {
-			pal[i].r = Palette[*p].r;
-			pal[i].g = Palette[*p].g;
-			pal[i].b = Palette[*p++].b;
+			pal[i].r = Palette[p].r;
+			pal[i].g = Palette[p].g;
+			pal[i].b = Palette[p++].b;
 		}
 	}
 }
