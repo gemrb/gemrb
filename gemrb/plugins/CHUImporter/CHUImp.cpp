@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.38 2004/10/09 15:27:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.39 2004/10/09 22:33:26 avenger_teambg Exp $
  *
  */
 
@@ -178,9 +178,9 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				}
 				bam->Open( s, true );
 				/** Cycle is only a byte for buttons */
-				Sprite2D* tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, core->HasFeature(GF_IGNORE_BUTTON_FRAMES) ? 0 : UnpressedIndex );
+				Sprite2D* tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, UnpressedIndex );
 				btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
-				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ? 1 : PressedIndex );
+				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, PressedIndex );
 				btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
 				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, core->HasFeature( GF_IGNORE_BUTTON_FRAMES ) ?  2 : SelectedIndex );
 				btn->SetImage( IE_GUI_BUTTON_SELECTED, tspr );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.30 2004/10/08 20:32:50 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.31 2004/10/09 22:33:25 avenger_teambg Exp $
  *
  */
 
@@ -146,11 +146,11 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
 {
 	if(Cycle >= CyclesCount ) {
-		printf("[BAMImp] Invalid Cycle\n");
+		printf("[BAMImp] Invalid Cycle %d\n", (int) Cycle);
 		return NULL;
 	}
 	if(cycles[Cycle].FramesCount<=frame) {
-		printf("[BAMImp] Invalid Frame in Cycle\n");
+		printf("[BAMImp] Invalid Frame %d in Cycle %d\n",(int) frame, (int) Cycle);
 		return NULL;
 	}
 	str->Seek( FLTOffset + ( cycles[Cycle].FirstFrame * 2 ) + ( frame * 2 ),
