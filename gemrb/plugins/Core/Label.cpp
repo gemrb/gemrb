@@ -90,6 +90,7 @@ void Label::SetAlignment(unsigned char Alignment)
 		return;
 	this->Alignment = Alignment;
 	if(Alignment == IE_FONT_ALIGN_CENTER)
-		strlwr(Buffer);
+		if(stricmp(core->GameType, "bg2") == 0)
+			strlwr(Buffer);
 	Changed = true;
 }
