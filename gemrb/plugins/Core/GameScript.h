@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.34 2004/01/19 22:58:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.35 2004/01/29 21:40:21 avenger_teambg Exp $
  *
  */
 
@@ -431,7 +431,7 @@ public:
 
 class GEM_EXPORT Script {
 public:
-	Script(const char * Name) {
+	Script(const char * ScriptName) {
 		canary = 0xdeadbeef;
 		RefCount = 1;
 		responseBlocks = NULL;
@@ -440,12 +440,15 @@ public:
 			this->Name[0] = 0;
 			return;
 		}
-		strncpy(this->Name, Name, 8);
-		this->Name[8] = 0;
+		strncpy(Name, ScriptName, 8);
+		Name[8] = 0;
 	};
 	~Script() {
 		FreeResponseBlocks();
 		printf("Freeing Script\n");
+	}
+	const char *GetName() {
+		return this?Name:"<none>";
 	}
 	void AllocateBlocks(unsigned int count) {
 		if(!count) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.54 2004/01/19 23:12:31 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.55 2004/01/29 21:40:21 avenger_teambg Exp $
  *
  */
 
@@ -295,7 +295,6 @@ void GameScript::Update()
 	lastRunTime = thisTime;
 	if(!script)
 		return;
-printf("Update...\n");
 	for(unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock * rB = script->responseBlocks[a];
 		if(EvaluateCondition(this->MySelf, rB->condition)) {
