@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.9 2004/01/25 18:13:47 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.10 2004/01/31 18:45:19 avenger_teambg Exp $
  *
  */
 
@@ -64,6 +64,7 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserv
 #endif
 
 //// Globally used functions
+//returns true if path is an existing directory
 GEM_EXPORT bool dir_exists(const char *path)
 {
         struct stat buf;
@@ -71,6 +72,14 @@ GEM_EXPORT bool dir_exists(const char *path)
         buf.st_mode=0;
         stat(path, &buf);
         return S_ISDIR(buf.st_mode);
+}
+
+//returns the length of string (up to a delimiter)
+GEM_EXPORT int strlench(const char *string, char ch)
+{
+	int i;
+	for(i=0;string[i] && string[i]!=ch;i++);
+	return i;
 }
 
 //// Compatibility functions

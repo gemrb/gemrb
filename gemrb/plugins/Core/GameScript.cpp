@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.55 2004/01/29 21:40:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.56 2004/01/31 18:45:19 avenger_teambg Exp $
  *
  */
 
@@ -33,10 +33,170 @@ static int initialized = 0;
 static Variables * globals;
 static SymbolMgr* triggersTable;
 static SymbolMgr* actionsTable;
+static SymbolMgr* objectsTable;
 static TriggerFunction triggers[MAX_TRIGGERS];
 static ActionFunction actions[MAX_ACTIONS];
-static char blocking[MAX_ACTIONS];
-static char instant[MAX_ACTIONS];
+static ObjectFunction objects[MAX_ACTIONS];
+static int flags[MAX_ACTIONS];
+
+//Make this an ordered list, so we could use bsearch!
+static TriggerLink triggernames[]={
+{"actionlistempty", GameScript::ActionListEmpty},
+{"alignment", GameScript::Alignment},
+{"allegiance", GameScript::Allegiance},
+{"bitcheck",GameScript::BitCheck},
+{"class", GameScript::Class},
+{"clicked", GameScript::Clicked},
+{"dead", GameScript::Dead},
+{"entered", GameScript::Entered},
+{"exists", GameScript::Exists},
+{"false", GameScript::False},
+{"general", GameScript::General},
+{"global", GameScript::Global},
+{"globalgt", GameScript::GlobalGT},
+{"globallt", GameScript::GlobalLT},
+{"globalsequal", GameScript::GlobalsEqual},
+{"inparty", GameScript::InParty},
+{"oncreation", GameScript::OnCreation},
+{"or", GameScript::Or},
+{"partyhasitem", GameScript::PartyHasItem},
+{"range", GameScript::Range},
+{"see", GameScript::See},
+{"true", GameScript::True},
+{ NULL,NULL},
+};
+
+//Make this an ordered list, so we could use bsearch!
+static ActionLink actionnames[]={
+{"actionoverride",NULL},
+{"activate",GameScript::Activate},
+{"addglobals",GameScript::AddGlobals},
+{"ally",GameScript::Ally},
+{"ambientactivate",GameScript::AmbientActivate},
+{"bitclear",GameScript::BitClear},
+{"bitset",GameScript::GlobalBOr}, //probably the same
+{"changeaiscript",GameScript::ChangeAIScript},
+{"changealignment",GameScript::ChangeAlignment},
+{"changeallegiance",GameScript::ChangeAllegiance},
+{"changeclass",GameScript::ChangeClass},
+{"changegender",GameScript::ChangeGender},
+{"changegeneral",GameScript::ChangeGeneral},
+{"changeenemyally",GameScript::ChangeAllegiance}, //this is the same
+{"changerace",GameScript::ChangeRace},
+{"changespecifics",GameScript::ChangeSpecifics},
+{"clearactions",GameScript::ClearActions},
+{"clearallactions",GameScript::ClearAllActions},
+{"closedoor",GameScript::CloseDoor,AF_BLOCKING},
+{"continue",GameScript::Continue,AF_INSTANT|AF_CONTINUE},
+{"createcreature",GameScript::CreateCreature},
+{"createvisualeffect",GameScript::CreateVisualEffect},
+{"createvisualeffectobject",GameScript::CreateVisualEffectObject},
+{"cutsceneid",GameScript::CutSceneID,AF_INSTANT},
+{"deactivate",GameScript::Deactivate},
+{"destroyself",GameScript::DestroySelf},
+{"dialogue",GameScript::Dialogue,AF_BLOCKING},
+{"displaystring",GameScript::DisplayString},
+{"displaystringhead",GameScript::DisplayStringHead},
+{"displaystringwait",GameScript::DisplayStringWait,AF_BLOCKING},
+{"endcutscenemode",GameScript::EndCutSceneMode},
+{"enemy",GameScript::Enemy},
+{"face",GameScript::Face,AF_BLOCKING},
+{"faceobject",GameScript::FaceObject, AF_BLOCKING},
+{"fadefromcolor",GameScript::FadeFromColor},
+{"fadetocolor",GameScript::FadeToColor},
+{"floatmessage",GameScript::DisplayStringHead}, //probably the same
+{"forceaiscript",GameScript::ChangeAIScript}, //probably the same
+{"forcespell",GameScript::ForceSpell},
+{"globalband",GameScript::GlobalBAnd},
+{"globalbandglobal",GameScript::GlobalBAndGlobal},
+{"globalbor",GameScript::GlobalBOr},
+{"globalborglobal",GameScript::GlobalBOrGlobal},
+{"globalmax",GameScript::GlobalMax},
+{"globalmaxglobal",GameScript::GlobalMaxGlobal},
+{"globalmin",GameScript::GlobalMin},
+{"globalminglobal",GameScript::GlobalMinGlobal},
+{"globalshl",GameScript::GlobalShL},
+{"globalshlglobal",GameScript::GlobalShLGlobal},
+{"globalshr",GameScript::GlobalShR},
+{"globalshrglobal",GameScript::GlobalShRGlobal},
+{"hidegui",GameScript::HideGUI},
+{"incrementglobal",GameScript::IncrementGlobal},
+{"joinparty",GameScript::JoinParty},
+{"leavearealua",GameScript::LeaveAreaLUA},
+{"leavearealuapanic",GameScript::LeaveAreaLUAPanic},
+{"movebetweenareas",GameScript::MoveBetweenAreas},
+{"movetoobject",GameScript::MoveToObject,AF_BLOCKING},
+{"movetopoint",GameScript::MoveToPoint,AF_BLOCKING},
+{"moveviewobject",GameScript::MoveViewPoint},
+{"moveviewpoint",GameScript::MoveViewPoint},
+{"noaction",GameScript::NoAction},
+{"opendoor",GameScript::OpenDoor,AF_BLOCKING},
+{"playdead",GameScript::PlayDead},
+{"playsound",GameScript::PlaySound},
+{"screenshake",GameScript::ScreenShake,AF_BLOCKING},
+{"setglobal",GameScript::SetGlobal},
+{"settokenglobal",GameScript::SetTokenGlobal},
+{"sg",GameScript::SG},
+{"smallwait",GameScript::SmallWait,AF_BLOCKING},
+{"startcutscene",GameScript::StartCutScene},
+{"startcutscenemode",GameScript::StartCutSceneMode},
+{"startdialogue",GameScript::StartDialogue,AF_BLOCKING},
+{"startsong",GameScript::StartSong},
+{"triggeractivation",GameScript::TriggerActivation},
+{"unhidegui",GameScript::UnhideGUI},
+{"wait",GameScript::Wait, AF_BLOCKING},
+{ NULL,NULL},
+};
+
+//Make this an ordered list, so we could use bsearch!
+static ObjectLink objectnames[]={
+{ NULL,NULL},
+};
+
+static TriggerLink *FindTrigger(const char *triggername)
+{
+	if(!triggername)
+		return NULL;
+	int len=strlench(triggername,'(');
+	for(int i=0;triggernames[i].Name;i++)
+	{
+		if(!strnicmp(triggernames[i].Name, triggername, len) ) {
+			return triggernames+i;
+		}
+	}
+	printf("Warning: Couldn't assign trigger: %.*s\n", len, triggername);
+	return NULL;
+}
+
+static ActionLink *FindAction(const char *actionname)
+{
+	if(!actionname)
+		return NULL;
+	int len=strlench(actionname,'(');
+	for(int i=0;actionnames[i].Name;i++)
+	{
+		if(!strnicmp(actionnames[i].Name, actionname, len) ) {
+			return actionnames+i;
+		}
+	}
+	printf("Warning: Couldn't assign action: %.*s\n", len, actionname);
+	return NULL;
+}
+
+static ObjectLink *FindObject(const char *objectname)
+{
+	if(!objectname)
+		return NULL;
+	int len=strlench(objectname,'(');
+	for(int i=0;objectnames[i].Name;i++)
+	{
+		if(!strnicmp(objectnames[i].Name, objectname, len) ) {
+			return objectnames+i;
+		}
+	}
+	printf("Warning: Couldn't assign object: %.*s\n", len, objectname);
+	return NULL;
+}
 
 GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables * local)
 {
@@ -50,171 +210,61 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		freeLocals = true;
 	}
 	if(!initialized) {
+		initialized = 1;
 		int tT = core->LoadSymbol("TRIGGER");
 		int aT = core->LoadSymbol("ACTION");
+		int oT = core->LoadSymbol("OBJECT");
+		if(tT<0 || aT<0 || oT<0) {
+			printf("[IEScript]: A critical scripting file is missing!\n");
+			abort();
+		}
 		triggersTable = core->GetSymbol(tT);
 		actionsTable = core->GetSymbol(aT);
+		objectsTable = core->GetSymbol(aT);
+		if(!triggersTable || !actionsTable || !objectsTable) {
+			printf("[IEScript]: A critical scripting file is damaged!\n");
+			abort();
+		}
 		globals = new Variables();
 		globals->SetType(GEM_VARIABLES_INT);
 		memset(triggers, 0, sizeof(triggers) );
 		memset(actions, 0, sizeof(actions) );
-		memset(blocking, 0, sizeof(blocking) );
-		memset(instant, 0, sizeof(instant) );
-		triggers[0x0a] = Alignment;
-		triggers[0x0b] = Allegiance;
-		triggers[0x0c] = Class;
-		triggers[0x0d] = Exists;
-		triggers[0x0e] = General;
-		triggers[0x0f] = Globals;
-		triggers[0x1c] = See;
-		triggers[0x18] = Range;
-		triggers[0x23] = True;
-		triggers[0x2b] = ActionListEmpty;
-		triggers[0x30] = False;
-		triggers[0x36] = OnCreation;
-		triggers[0x42] = PartyHasItem;
-		triggers[0x4C] = Entered;
-		triggers[0x51] = Dead;
-		triggers[0x70] = Clicked;
+		memset(objects, 0, sizeof(objects) );
+		int i;
 
-		actions[0] = NoAction;
-		actions[7] = CreateCreature;
-		//instant[7] = true;
-		actions[8] = Dialogue;
-		blocking[8] = true;
-		actions[10] = Enemy;
-		//instant[10] = true;
-		actions[22] = MoveToObject;
-		blocking[22] = true;
-		actions[23] = MoveToPoint;
-		blocking[23] = true;
-		actions[26] = PlaySound;
-		actions[30] = SetGlobal;
-		//instant[30] = true;
-		actions[36] = Continue;
-		instant[36] = 2; //this is a special value for Continue()
-		actions[40] = PlayDead;
-		actions[49] = MoveViewPoint;
-		actions[50] = MoveViewObject;
-		actions[60] = ChangeAIScript;
-		actions[63] = Wait;
-		blocking[63] = true;
-		actions[83] = SmallWait;
-		blocking[83] = true;
-		actions[84] = Face;
-		blocking[84] = true;
-		actions[109] = IncrementGlobal;
-		actions[110] = LeaveAreaLUA;
-		actions[111] = DestroySelf;
-		//instant[111] = true;
-		actions[113] = ForceSpell;
-		actions[120] = StartCutScene;
-		//instant[120] = true;
-		actions[121] = StartCutSceneMode;
-		//instant[121] = true;
-		actions[122] = EndCutSceneMode;
-		//instant[122] = true;
-		actions[123] = ClearAllActions;
-		//instant[123] = true;
-		actions[125] = Deactivate;
-		//instant[125] = true;
-		actions[126] = Activate;
-		//instant[126] = true;
-		actions[127] = CutSceneId;
-		instant[127] = true;
-		actions[133] = ClearActions;
-		//instant[133] = true;
-		actions[137] = StartDialogue;
-		actions[143] = OpenDoor;
-		blocking[143] = true;
-		actions[144] = CloseDoor;
-		blocking[144] = true;
-		actions[151] = DisplayString;
-		actions[153] = ChangeAllegiance;
-		actions[154] = ChangeGeneral;
-		actions[155] = ChangeRace;
-		actions[156] = ChangeClass;
-		actions[157] = ChangeSpecifics;
-		actions[158] = ChangeGender;
-		actions[159] = ChangeAlignment;
-		actions[177] = TriggerActivation;
-		actions[198] = Dialogue;
-		if(strcmp(core->GameType, "pst") == 0) {
-			actions[215] = FaceObject;
-			actions[227] = GlobalBAnd;
-			//instant[227] = true;
-			actions[228] = GlobalBOr;
-			//instant[228] = true;
-			actions[229] = GlobalShr;
-			//instant[229] = true;
-			actions[230] = GlobalShl;
-			//instant[230] = true;
-			actions[231] = GlobalMax;
-			//instant[231] = true;
-			actions[232] = GlobalMin;
-			//instant[232] = true;
-			actions[233] = GlobalSetGlobal;
-			//instant[233] = true;
-			actions[234] = GlobalAddGlobal;
-			//instant[234] = true;
-			actions[235] = GlobalSubGlobal;
-			//instant[235] = true;
-			actions[236] = GlobalAndGlobal;
-			//instant[236] = true;
-			actions[237] = GlobalOrGlobal;
-			//instant[237] = true;
-			actions[238] = GlobalBAndGlobal;
-			//instant[238] = true;
-			actions[239] = GlobalBOrGlobal;
-			//instant[239] = true;
-			actions[240] = GlobalShrGlobal;
-			//instant[240] = true;
-			actions[241] = GlobalShlGlobal;
-			//instant[241] = true;
-			actions[242] = GlobalMaxGlobal;
-			//instant[242] = true;
-			actions[243] = GlobalMinGlobal;
-			//instant[243] = true;
-			actions[244] = GlobalBOr; //BitSet
-			//instant[244] = true;
-			actions[245] = BitClear; 
-			//instant[245] = true;
-			actions[267] = StartSong;
-			//instant[267] = true;
+		for(i=0;i<MAX_TRIGGERS;i++) {
+			char *triggername=triggersTable->GetValue(i);
+			//maybe we should watch for this bit?
+			if(!triggername)
+				triggername=triggersTable->GetValue(i|0x4000);
+			TriggerLink *poi=FindTrigger(triggername);
+			if(poi==NULL)
+				triggers[i]=NULL;
+			else
+				triggers[i]=poi->Function;
 		}
-		else
-		{
-			actions[202] = FadeToColor;
-			//blocking[202] = true;
-			actions[203] = FadeFromColor;
-			//blocking[203] = true;
-			actions[225] = MoveBetweenAreas;
-			actions[229] = FaceObject;
-			//IWD and SoA are different from #231
-			if(strcmp(core->GameType, "bg2") == 0) {
-				actions[242] = Ally;
-				actions[254] = ScreenShake;
-				blocking[254] = true;
-				actions[255] = AddGlobals;
-				actions[269] = DisplayStringHead;
-				actions[272] = CreateVisualEffect;
-				actions[273] = CreateVisualEffectObject;
-				actions[286] = HideGUI;
-				actions[287] = UnhideGUI;
-				actions[301] = AmbientActivate;
-				actions[307] = SG;
-				actions[311] = DisplayStringWait;
-				blocking[311] = true;
-				actions[335] = SetTokenGlobal;
+
+		for(i=0;i<MAX_ACTIONS;i++) {
+			ActionLink *poi=FindAction(actionsTable->GetValue(i));
+			if(poi==NULL) {
+				actions[i]=NULL;
+				flags[i]=0;
 			}
-			else { //iwd and iwd2
-				actions[241] = DisplayStringHead; //FloatMessage
-				actions[273] = HideGUI;
-				actions[274] = UnhideGUI;
-				actions[297] = ScreenShake;
+			else {
+				actions[i]=poi->Function;
+				flags[i]=poi->Flags;
 			}
 		}
-		initialized = 1;
+		for(i=0;i<MAX_OBJECTS;i++) {
+			ObjectLink *poi=FindObject(objectsTable->GetValue(i));
+			if(poi==NULL) {
+				objects[i]=NULL;
+			}
+			else {
+				objects[i]=poi->Function;
+			}
+		}
+		initialized = 2;
 	}
 	continueExecution = false;
 	DataStream * ds = core->GetResourceMgr()->GetResource(ResRef, IE_BCS_CLASS_ID);
@@ -230,7 +280,6 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 GameScript::~GameScript(void)
 {
 	if(script) {
-		printf("Releasing Script [0x%08X] in %s Line: %d\n", script, __FILE__, __LINE__);
 		script->Release();
 	}
 	if(freeLocals) {
@@ -238,13 +287,7 @@ GameScript::~GameScript(void)
 			delete(locals);
 	}
 }
-/*
-void GameScript::FreeScript(Script * script)
-{
-	printf("Releasing Script [0x%08X] in %s Line: %d\n", script, __FILE__, __LINE__);
-	script->Release();
-}
-*/
+
 Script* GameScript::CacheScript(DataStream * stream, const char * Context)
 {
 	if(!stream)
@@ -492,7 +535,7 @@ bool GameScript::EvaluateCondition(Scriptable * Sender, Condition * condition)
 			result = EvaluateTrigger(Sender, tR);
 		if(result>1) { //we started an Or() block
 			if(ORcount)
-				printf("Scripting error: Unfinished OR block encountered!\n");
+				printf("[IEScript]: Unfinished OR block encountered!\n");
 			ORcount = result;
 			subresult = false;
 			continue;
@@ -506,7 +549,7 @@ bool GameScript::EvaluateCondition(Scriptable * Sender, Condition * condition)
 			return 0;
 	}
 	if(ORcount)
-		printf("Scripting error: Unfinished OR block encountered!\n");
+		printf("[IEScript]: Unfinished OR block encountered!\n");
 	return 1;
 }
 
@@ -517,7 +560,7 @@ bool GameScript::EvaluateTrigger(Scriptable * Sender, Trigger * trigger)
 	TriggerFunction func = triggers[trigger->triggerID];
 	if(!func) {
 		triggers[trigger->triggerID]=False;
-		printf("Unhandled trigger code: %x\n",trigger->triggerID);
+		printf("[IEScript]: Unhandled trigger code: %x\n",trigger->triggerID);
 		return false;
 	}
 	int ret = func(Sender, trigger);
@@ -546,22 +589,22 @@ int GameScript::ExecuteResponseSet(Scriptable * Sender, ResponseSet * rS)
 
 int GameScript::ExecuteResponse(Scriptable * Sender, Response * rE)
 {
-printf("Executing Response\n");
 	int ret = 0;  // continue or not
 	for(int i = 0; i < rE->actionsCount; i++) {
 		Action * aC = rE->actions[i];
-		switch(instant[aC->actionID]) {
-		case 1:
+		switch(flags[aC->actionID]&AF_MASK) {
+		case AF_INSTANT:
 			ExecuteAction(Sender, aC);
 			break;
-		case 0:
+		case AF_NONE:
 			if(Sender->CutSceneId)
 				Sender->CutSceneId->AddAction(aC);
 			else
 				Sender->AddAction(aC);
 			break;
-		case 2:
+		case AF_CONTINUE: case AF_MASK:
 			ret=1;
+			break;
 		}
 	}
 	return ret;
@@ -571,24 +614,21 @@ void GameScript::ExecuteAction(Scriptable * Sender, Action * aC)
 {
 	ActionFunction func = actions[aC->actionID];
 	if(func) {
-		printf("Executing action code; %d\n",aC->actionID);
+		printf("[IEScript]: %s\n",actionsTable->GetValue(aC->actionID) );
 		func(Sender, aC);
 	}
 	else {
 		actions[aC->actionID]=NoAction;
-		blocking[aC->actionID]=false;
-		instant[aC->actionID]=false;
-		printf("Unhandled action code: %d\n",aC->actionID);
+		printf("[IEScript]: Unhandled action code: %d\n",aC->actionID);
 		Sender->CurrentAction = NULL;
 		aC->Release();
 		return;
 	}
-	if(!blocking[aC->actionID]) {
+	if(!(flags[aC->actionID]&AF_BLOCKING)) {
 		Sender->CurrentAction = NULL;	
 	}
-	if(instant[aC->actionID])
+	if(flags[aC->actionID]&AF_INSTANT)
 		return;
-	printf("Releasing Action %d [0x%08X] in %s Line: %d Currentaction was set to:%d\n", aC->actionID, aC, __FILE__, __LINE__, Sender->CurrentAction);
 	aC->Release();
 }
 
@@ -600,10 +640,9 @@ Action* GameScript::CreateAction(char *string, bool autoFree)
 
 Scriptable * GameScript::GetActorFromObject(Scriptable * Sender, Object * oC)
 {
-	//TODO: Implement Object Retieval
+	//TODO: Implement Object Retrieval
 	if(oC) {
 		if(oC->objectName[0] != 0) {
-			//printf("ActionOverride on %s\n", oC->objectName);
 			Map * map = core->GetGame()->GetMap(0);
 			return map->GetActor(oC->objectName);
 		}
@@ -679,7 +718,6 @@ void GameScript::ExecuteString(Scriptable * Sender, char * String)
 	if(!act)
 		return;
 	if(Sender->CurrentAction) {
-		printf("Releasing Action %d [0x%08X] in %s Line: %d\n", Sender->CurrentAction->actionID, Sender->CurrentAction, __FILE__, __LINE__);
 		Sender->CurrentAction->Release();
 	}
 	Sender->CurrentAction = act;
@@ -693,7 +731,6 @@ bool GameScript::EvaluateString(Scriptable * Sender, char * String)
 		return false;
 	Trigger * tri = GenerateTrigger(String);
 	bool ret = EvaluateTrigger(Sender, tri);
-	printf("Releasing Trigger %d [0x%08X] in %s Line: %d\n", tri->triggerID, tri, __FILE__, __LINE__);
 	tri->Release();
 	return ret;
 }
@@ -832,7 +869,6 @@ Action * GameScript::GenerateAction(char * String)
 								Action * act = GenerateAction(action);
 								act->objects[0] = newAction->objects[0];
 								act->objects[0]->IncRef();
-								printf("Releasing Action %d [0x%08X] in %s Line: %d\n", newAction->actionID, newAction, __FILE__, __LINE__);
 								newAction->Release();
 								newAction = act;
 							}
@@ -1123,6 +1159,17 @@ int GameScript::Class(Scriptable * Sender, Trigger * parameters)
 	return parameters->int0Parameter==value;
 }
 
+int GameScript::InParty(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * actor = GetActorFromObject(Sender, parameters->objectParameter);
+	if(actor==NULL)
+		return 0;
+	if(actor->Type!=ST_ACTOR)
+		return 0;
+//return actor->InParty?1:0; //maybe ???
+	return core->GetGame()->InParty((Actor *) actor)>=0 ? 1:0;
+}
+
 int GameScript::Exists(Scriptable * Sender, Trigger * parameters)
 {
 	Scriptable * actor = GetActorFromObject(Sender, parameters->objectParameter);
@@ -1142,7 +1189,23 @@ int GameScript::General(Scriptable * Sender, Trigger * parameters)
 	return parameters->int0Parameter==actor->GetStat(IE_GENERAL);
 }
 
-int GameScript::Globals(Scriptable * Sender, Trigger * parameters)
+int GameScript::BitCheck(Scriptable * Sender, Trigger * parameters)
+{
+	unsigned long value=0;
+	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
+		globals->Lookup(&parameters->string0Parameter[6], value);
+	}
+	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
+		Sender->locals->Lookup(&parameters->string0Parameter[6], value);
+	}
+	else {
+		globals->Lookup(parameters->string0Parameter, value);
+	}
+	int eval = (value & parameters->int0Parameter) ? 1 : 0;
+	return eval;
+}
+
+int GameScript::Global(Scriptable * Sender, Trigger * parameters)
 {
 	unsigned long value=0;
 	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
@@ -1155,6 +1218,66 @@ int GameScript::Globals(Scriptable * Sender, Trigger * parameters)
 		globals->Lookup(parameters->string0Parameter, value);
 	}
 	int eval = (value == parameters->int0Parameter) ? 1 : 0;
+	return eval;
+}
+
+int GameScript::GlobalLT(Scriptable * Sender, Trigger * parameters)
+{
+	unsigned long value=0;
+	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
+		globals->Lookup(&parameters->string0Parameter[6], value);
+	}
+	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
+		Sender->locals->Lookup(&parameters->string0Parameter[6], value);
+	}
+	else {
+		globals->Lookup(parameters->string0Parameter, value);
+	}
+	int eval = (value < parameters->int0Parameter) ? 1 : 0;
+	return eval;
+}
+
+int GameScript::GlobalGT(Scriptable * Sender, Trigger * parameters)
+{
+	unsigned long value=0;
+	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
+		globals->Lookup(&parameters->string0Parameter[6], value);
+	}
+	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
+		Sender->locals->Lookup(&parameters->string0Parameter[6], value);
+	}
+	else {
+		globals->Lookup(parameters->string0Parameter, value);
+	}
+	int eval = (value > parameters->int0Parameter) ? 1 : 0;
+	return eval;
+}
+
+int GameScript::GlobalsEqual(Scriptable * Sender, Trigger * parameters)
+{
+	unsigned long value1=0;
+	unsigned long value2=0;
+	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
+		globals->Lookup(&parameters->string0Parameter[6], value1);
+	}
+	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
+		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
+	}
+	else {
+		globals->Lookup(parameters->string0Parameter, value1);
+	}
+
+	if(memcmp(parameters->string1Parameter, "GLOBAL", 6) == 0) {
+		globals->Lookup(&parameters->string1Parameter[6], value2);
+	}
+	else if(memcmp(parameters->string1Parameter, "LOCALS", 6) == 0) {
+		Sender->locals->Lookup(&parameters->string1Parameter[6], value2);
+	}
+	else {
+		globals->Lookup(parameters->string1Parameter, value2);
+	}
+
+	int eval = (value1 == value2) ? 1 : 0;
 	return eval;
 }
 
@@ -1456,7 +1579,7 @@ void GameScript::StartCutScene(Scriptable * Sender, Action * parameters)
 	delete(gs);
 }
 
-void GameScript::CutSceneId(Scriptable * Sender, Action * parameters)
+void GameScript::CutSceneID(Scriptable * Sender, Action * parameters)
 {
 	if(parameters->objects[1]->genderField != 0) {
 		Sender->CutSceneId = GetActorFromObject(Sender, parameters->objects[1]);
@@ -1586,13 +1709,19 @@ void GameScript::MoveToPoint(Scriptable * Sender, Action * parameters)
 void GameScript::MoveToObject(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(!scr)
+	if(!scr) {
+		Sender->CurrentAction = NULL;
 		return;
+	}
 	Scriptable * target = GetActorFromObject(Sender, parameters->objects[1]);
-	if(!target)
+	if(!target) {
+		Sender->CurrentAction = NULL;
 		return;
-	if(scr->Type != ST_ACTOR)
+	}
+	if(scr->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
+	}
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
 		/* 
@@ -1604,7 +1733,6 @@ void GameScript::MoveToObject(Scriptable * Sender, Action * parameters)
 	}
 	Actor * actor = (Actor*)scr;
 	actor->WalkTo(target->XPos, target->YPos);
-	//core->timer->SetMovingActor(actor);
 }
 
 void GameScript::DisplayStringHead(Scriptable * Sender, Action * parameters)
@@ -1628,10 +1756,14 @@ void GameScript::DisplayStringHead(Scriptable * Sender, Action * parameters)
 void GameScript::Face(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(!scr)
+	if(!scr) {
+		Sender->CurrentAction = NULL;
 		return;
-	if(scr->Type != ST_ACTOR)
+	}
+	if(scr->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
+	}
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
 		/* 
@@ -1661,10 +1793,13 @@ void GameScript::Face(Scriptable * Sender, Action * parameters)
 void GameScript::FaceObject(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(!scr)
+	if(!scr) {
+		Sender->CurrentAction = NULL;
 		return;
+	}
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Scriptable * target = GetActorFromObject(Sender, parameters->objects[1]);
@@ -1673,7 +1808,13 @@ void GameScript::FaceObject(Scriptable * Sender, Action * parameters)
 	if(scr->Type != ST_ACTOR)
 		return;
 	Actor * actor = (Actor*)scr;
-	actor->Orientation = GetOrient(target->XPos, target->YPos, actor->XPos, actor->YPos);
+	if(actor) {
+		actor->Orientation = GetOrient(target->XPos, target->YPos, actor->XPos, actor->YPos);
+		actor->resetAction = true;
+		actor->SetWait(1);
+	} else {
+		Sender->CurrentAction = NULL;
+	}
 }
 
 void GameScript::DisplayStringWait(Scriptable * Sender, Action * parameters)
@@ -1917,19 +2058,26 @@ void GameScript::OpenDoor(Scriptable * Sender, Action * parameters)
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
-	if(scr->Type != ST_ACTOR)
-		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	Scriptable * tar = core->GetGame()->GetMap(0)->tm->GetDoor(parameters->objects[1]->objectName);
-	if(!tar)
+	if(!tar) {
+		Sender->CurrentAction = NULL;
 		return;
-	if(tar->Type != ST_DOOR)
+	}
+	if(tar->Type != ST_DOOR) {
+		Sender->CurrentAction = NULL;
 		return;
+	}
 	Door * door = (Door*)tar;
+	if(scr->Type != ST_ACTOR) {
+		door->SetDoorClosed(false, true);		
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Actor * actor = (Actor*)scr;
 	double distance;
 	Point * p = FindNearPoint(actor, &door->toOpen[0], &door->toOpen[1], distance);	
@@ -1949,19 +2097,26 @@ void GameScript::CloseDoor(Scriptable * Sender, Action * parameters)
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
-	if(scr->Type != ST_ACTOR)
-		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	Scriptable * tar = core->GetGame()->GetMap(0)->tm->GetDoor(parameters->objects[1]->objectName);
-	if(!tar)
+	if(!tar) {
+		Sender->CurrentAction = NULL;
 		return;
-	if(tar->Type != ST_DOOR)
+	}
+	if(tar->Type != ST_DOOR) {
+		Sender->CurrentAction = NULL;
 		return;
+	}
 	Door * door = (Door*)tar;
+	if(scr->Type != ST_ACTOR) {
+		door->SetDoorClosed(true, true);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	Actor * actor = (Actor*)scr;
 	double distance;
 	Point * p = FindNearPoint(actor, &door->toOpen[0], &door->toOpen[1], distance);	
@@ -2074,6 +2229,45 @@ void GameScript::Deactivate(Scriptable * Sender, Action * parameters)
 	if(tar->Type != ST_ACTOR)
 		return;
 	tar->Active = false;
+}
+
+void GameScript::MakeGlobal(Scriptable *Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(scr->Type != ST_ACTOR)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		return;
+	}
+	Actor *act = (Actor *) scr;
+	core->GetGame()->AddNPC(act);
+}
+
+void GameScript::JoinParty(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(scr->Type != ST_ACTOR)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		return;
+	}
+	Actor *act = (Actor *) scr;
+	core->GetGame()->JoinParty(act);
+}
+
+void GameScript::LeaveParty(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(scr->Type != ST_ACTOR)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		return;
+	}
+	Actor *act = (Actor *) scr;
+	core->GetGame()->LeaveParty(act);
 }
 
 void GameScript::Activate(Scriptable * Sender, Action * parameters)
@@ -2549,7 +2743,7 @@ void GameScript::BitClear(Scriptable *Sender, Action *parameters)
 	}
 }
 
-void GameScript::GlobalShl(Scriptable *Sender, Action *parameters)
+void GameScript::GlobalShL(Scriptable *Sender, Action *parameters)
 {
 	unsigned long value1=0;
 	unsigned long value2=parameters->int0Parameter;
@@ -2575,7 +2769,7 @@ void GameScript::GlobalShl(Scriptable *Sender, Action *parameters)
 	}
 }
 
-void GameScript::GlobalShr(Scriptable *Sender, Action *parameters)
+void GameScript::GlobalShR(Scriptable *Sender, Action *parameters)
 {
 	unsigned long value1=0;
 	unsigned long value2=parameters->int0Parameter;
@@ -2669,7 +2863,7 @@ void GameScript::GlobalMinGlobal(Scriptable *Sender, Action *parameters)
 	}
 }
 
-void GameScript::GlobalShlGlobal(Scriptable *Sender, Action *parameters)
+void GameScript::GlobalShLGlobal(Scriptable *Sender, Action *parameters)
 {
 	unsigned long value1=0;
 	unsigned long value2=parameters->int0Parameter;
@@ -2694,7 +2888,7 @@ void GameScript::GlobalShlGlobal(Scriptable *Sender, Action *parameters)
 		globals->SetAt(parameters->string0Parameter, value1);
 	}
 }
-void GameScript::GlobalShrGlobal(Scriptable *Sender, Action *parameters)
+void GameScript::GlobalShRGlobal(Scriptable *Sender, Action *parameters)
 {
 	unsigned long value1=0;
 	unsigned long value2=parameters->int0Parameter;
@@ -2723,10 +2917,12 @@ void GameScript::GlobalShrGlobal(Scriptable *Sender, Action *parameters)
 void GameScript::ClearAllActions(Scriptable *Sender, Action *parameters)
 {
 //just a hack
-	for(int i=0;i<6;i++) {
-		Scriptable * scr = core->GetGame()->GetPC(i);
-		if(scr)
-			scr->ClearActions();
+	Game *game=core->GetGame();
+
+	for(int i=0;i<game->PartySize;i++) {
+		Actor * act = game->GetPC(i);
+		if(act)
+			act->ClearActions();
 	}
 }
 

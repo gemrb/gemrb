@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.8 2004/01/31 15:14:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.9 2004/01/31 18:45:19 avenger_teambg Exp $
  *
  */
 
@@ -55,6 +55,12 @@ public:
 	Actor* GetPC(unsigned int slot);
 	/* finds an actor in party, returns slot, if not there, returns -1*/
 	int InParty(Actor *pc);
+	/* finds an actor in store, returns slot, if not there, returns -1*/
+	int InStore(Actor *pc);
+	/* joins party (if already an npc) */
+	int JoinParty(Actor *pc);
+	/* leaves party (if in there) */
+	int LeaveParty(Actor *pc);
 	/*returns slot*/
 	int SetPC(Actor *pc);
 	int DelPC(unsigned int slot, bool autoFree = false);

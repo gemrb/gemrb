@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.35 2004/01/29 21:40:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.36 2004/01/31 18:45:19 avenger_teambg Exp $
  *
  */
 
@@ -75,7 +75,6 @@ public:
 		canary = 0xdeadbeef;
 	};
 	~Object() {
-		printf("Freeing Object\n");
 	}
 public:
 	int				eaField;
@@ -105,7 +104,6 @@ public:
 			abort();
 		}
 		RefCount--;
-		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
@@ -134,7 +132,6 @@ public:
 		if(objectParameter) {
 			objectParameter->Release();
 		}
-		printf("Freeing Trigger\n");
 	}
 public:
 	unsigned short	triggerID;
@@ -158,7 +155,6 @@ public:
 			abort();
 		}
 		RefCount--;
-		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
@@ -191,7 +187,6 @@ public:
 		}
 		//delete[] triggers;
 		delete triggers;
-		printf("Freeing Condition\n");
 	}
 public:
 	unsigned short triggersCount;
@@ -207,7 +202,6 @@ public:
 			abort();
 		}
 		RefCount--;
-		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
@@ -245,7 +239,6 @@ public:
 			if(objects[c])
 				objects[c]->Release();
 		}
-		printf("Freeing Action\n");
 	}
 public:
 	unsigned short	actionID;
@@ -268,7 +261,6 @@ public:
 			abort();
 		}
 		RefCount--;
-		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
@@ -302,7 +294,6 @@ public:
 		}
 		//delete[] actions;
 		delete actions;
-		printf("Freeing Response\n");
 	}
 public:
 	unsigned char weight;
@@ -319,7 +310,6 @@ public:
 			abort();
 		}
 		RefCount--;
-		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
@@ -352,7 +342,6 @@ public:
 		}
 		//delete[] responses;
 		delete responses;
-		printf("Freeing ResponseSet\n");
 	}
 public:
 	unsigned short responsesCount;
@@ -368,7 +357,6 @@ public:
 			abort();
 		}
 		RefCount--;
-		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
@@ -397,7 +385,6 @@ public:
 			condition->Release();
 		if(responseSet)
 			responseSet->Release();
-		printf("Freeing ResponseBlock\n");
 	}
 public:
 	Condition * condition;
@@ -413,7 +400,6 @@ public:
 			abort();
 		}
 		RefCount--;
-		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
@@ -445,7 +431,7 @@ public:
 	};
 	~Script() {
 		FreeResponseBlocks();
-		printf("Freeing Script\n");
+		printf("Freeing Script: %s\n",GetName());
 	}
 	const char *GetName() {
 		return this?Name:"<none>";
@@ -485,7 +471,6 @@ public:
 			abort();
 		}
 		RefCount--;
-		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
@@ -503,13 +488,37 @@ public:
 
 typedef int (* TriggerFunction)(Scriptable*, Trigger*);
 typedef void (* ActionFunction)(Scriptable*, Action*);
+typedef void (* ObjectFunction)(); //not known yet
+
+struct TriggerLink {
+	const char *Name;
+	TriggerFunction Function;
+};
+
+#define AF_NONE      0
+#define AF_INSTANT   1
+#define AF_CONTINUE  2
+#define AF_MASK      3   //none, instant or continue
+#define AF_BLOCKING  4
+
+struct ActionLink {
+	const char *Name;
+	ActionFunction Function;
+	int Flags;
+};
+
+struct ObjectLink {
+	const char *Name;
+	ObjectFunction Function;
+};
 
 #define IE_SCRIPT_ALWAYS		0
 #define IE_SCRIPT_AREA			1
 #define IE_SCRIPT_TRIGGER		2
 
 #define MAX_TRIGGERS			0xFF
-#define MAX_ACTIONS				400
+#define MAX_ACTIONS			400
+#define MAX_OBJECTS			128
 
 class GEM_EXPORT GameScript
 {
@@ -556,9 +565,12 @@ public:
 	void SetVariable(const char * VarName, const char * Context, int value);
 	static void ExecuteString(Scriptable * Sender, char * String);
 	static bool EvaluateString(Scriptable * Sender, char * String);
-private: //Script Functions
+public: //Script Functions
 	//Triggers
-	static int  Globals(Scriptable * Sender, Trigger * parameters);
+	static int  Global(Scriptable * Sender, Trigger * parameters);
+	static int  GlobalLT(Scriptable * Sender, Trigger * parameters);
+	static int  GlobalGT(Scriptable * Sender, Trigger * parameters);
+	static int  GlobalsEqual(Scriptable * Sender, Trigger * parameters);
 	static int  OnCreation(Scriptable * Sender, Trigger * parameters);
 	static int  PartyHasItem(Scriptable * Sender, Trigger * parameters);
 	static int  True(Scriptable * Sender, Trigger * parameters);
@@ -568,6 +580,7 @@ private: //Script Functions
 	static int  Allegiance(Scriptable * Sender, Trigger * parameters);
 	static int  Class(Scriptable * Sender, Trigger * parameters);
 	static int  Exists(Scriptable * Sender, Trigger * parameters);
+	static int  InParty(Scriptable * Sender, Trigger * parameters);
 	static int  General(Scriptable * Sender, Trigger * parameters);
 	static int  Range(Scriptable * Sender, Trigger * parameters);
 	static int  Or(Scriptable * Sender, Trigger * parameters);
@@ -575,7 +588,8 @@ private: //Script Functions
 	static int  Entered(Scriptable * Sender, Trigger * parameters);
 	static int  Dead(Scriptable * Sender, Trigger * parameters);
 	static int  See(Scriptable * Sender, Trigger * parameters);
-private:
+	static int  BitCheck(Scriptable * Sender, Trigger * parameters);
+public:
 	//Actions
 	static void NoAction(Scriptable * Sender, Action * parameters);
 	static void SetGlobal(Scriptable * Sender, Action * parameters);
@@ -597,7 +611,7 @@ private:
 	static void StartCutSceneMode(Scriptable * Sender, Action * parameters);
 	static void EndCutSceneMode(Scriptable * Sender, Action * parameters);
 	static void StartCutScene(Scriptable * Sender, Action * parameters);
-	static void CutSceneId(Scriptable * Sender, Action * parameters);
+	static void CutSceneID(Scriptable * Sender, Action * parameters);
 	static void Wait(Scriptable * Sender, Action * parameters);
 	static void SmallWait(Scriptable * Sender, Action * parameters);
 	static void MoveViewPoint(Scriptable * Sender, Action * parameters);
@@ -647,12 +661,15 @@ private:
 	static void GlobalMin(Scriptable * Sender, Action * parameters);
 	static void GlobalBOr(Scriptable * Sender, Action * parameters);
 	static void BitClear(Scriptable * Sender, Action * parameters);
-	static void GlobalShlGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalShrGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalShl(Scriptable * Sender, Action * parameters);
-	static void GlobalShr(Scriptable * Sender, Action * parameters);
+	static void GlobalShLGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalShRGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalShL(Scriptable * Sender, Action * parameters);
+	static void GlobalShR(Scriptable * Sender, Action * parameters);
 	static void ClearAllActions(Scriptable * Sender, Action * parameters);
 	static void ClearActions(Scriptable * Sender, Action * parameters);
+	static void JoinParty(Scriptable * Sender, Action * parameters);
+	static void LeaveParty(Scriptable * Sender, Action * parameters);
+	static void MakeGlobal(Scriptable * Sender, Action * parameters);
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.11 2004/01/31 15:14:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.12 2004/01/31 18:45:19 avenger_teambg Exp $
  *
  */
 
@@ -52,6 +52,16 @@ Actor* Game::GetPC(unsigned int slot)
 	return PCs[slot];
 }
 
+int Game::InStore(Actor *pc)
+{
+	for(int i=0;i<NPCs.size();i++)
+	{
+		if(NPCs[i]==pc)
+			return i;
+	}
+	return -1;
+}
+
 int Game::InParty(Actor *pc)
 {
 	for(int i=0;i<PCs.size();i++)
@@ -65,11 +75,15 @@ int Game::InParty(Actor *pc)
 int Game::SetPC(Actor *pc)
 {
 	int slot=InParty(pc);
-	if(slot==-1)
+	if(slot!=-1)
 		return slot;
+	slot=InStore(pc);
+	if(slot!=-1)            //it is an NPC, can't add as PC
+		return -1;
 	PCs.push_back(pc);
 	return (int)PCs.size()-1;
 }
+
 int Game::DelPC(unsigned int slot, bool autoFree)
 {
 	if(slot >= PCs.size())
@@ -81,6 +95,25 @@ int Game::DelPC(unsigned int slot, bool autoFree)
 	PCs[slot] = NULL;
 	return 0;
 }
+
+int Game::LeaveParty(Actor *actor)
+{
+	int slot=InParty(actor);
+	if(slot<0)
+		return slot;
+	PCs.erase(PCs.begin()+slot);
+	NPCs.push_back(actor);
+}
+
+int Game::JoinParty(Actor *actor)
+{
+	int slot=InStore(actor);
+	if(slot<0)
+		return slot;
+	NPCs.erase(PCs.begin()+slot);
+	PCs.push_back(actor);
+}
+
 Map * Game::GetMap(unsigned int index)
 {
 	if(index >= Maps.size())
@@ -132,6 +165,12 @@ int Game::LoadMap(char *ResRef)
 
 int Game::AddNPC(Actor *npc)
 {
+	int slot=InStore(npc); //already an npc
+	if(slot!=-1)
+		return slot;
+	slot=InParty(npc);
+	if(slot!=-1)
+		return -1;     //can't add as npc already in party
 	NPCs.push_back(npc);
 	return NPCs.size()-1;
 }
