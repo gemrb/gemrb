@@ -1,7 +1,7 @@
 #ifndef SCLASS_ID_H
 #define SCLASS_ID_H
 
-typedef unsigned long SClass_ID;
+typedef unsigned int SClass_ID;
 
 #define IE_2DA_CLASS_ID			0x000003F4
 #define IE_ACM_CLASS_ID			0x00010000
