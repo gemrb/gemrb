@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.1 2004/03/29 23:52:29 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.2 2004/04/03 16:04:23 avenger_teambg Exp $
  *
  */
 
@@ -67,6 +67,13 @@ private:
 public: 
 	Inventory();
 	virtual ~Inventory();
+
+	/** returns the count items in the inventory */
+	int CountItems(const char *resref, bool charges);
+	/** looks for a particular item in a slot */
+	bool HasItemInSlot(const char *resref, int slot);
+	/** looks for a particular item in the inventory */
+	bool HasItem(const char *resref);
 
 	/** returns number of all slots in the inventory */
 	int GetSlotCount() { return slots.size(); };

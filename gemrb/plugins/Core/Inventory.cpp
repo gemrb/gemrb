@@ -15,16 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.1 2004/03/29 23:52:29 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.2 2004/04/03 16:04:23 avenger_teambg Exp $
  *
  */
 
 #include <stdio.h>
 #include "../../includes/win32def.h"
-// #include "Interface.h"
 #include "Inventory.h"
-
-
 
 
 Inventory::Inventory()
@@ -40,6 +37,45 @@ Inventory::~Inventory()
 	for (size_t i = 0; i < slots.size(); i++) {
 		delete( slots[i] );
 	}
+}
+
+bool Inventory::HasItemInSlot(const char *resref, int slot)
+{
+	CREItem *item = slots[slot];
+	if (strnicmp( item->ItemResRef, resref,8 ) == 0) {
+		return true;
+	}
+	return false;
+}
+
+int Inventory::CountItems(const char *resref, bool charges)
+{
+	int count = 0;
+	int slot = slots.size();
+	while(slot--) {
+		CREItem *item = slots[slot];
+		if (strnicmp( item->ItemResRef, resref,8 ) == 0) {
+			if (charges) {
+				count+=item->Usages[0];
+			}
+			else {
+				count++;
+			}
+		}
+	}
+	return count;
+}
+
+bool Inventory::HasItem(const char *resref)
+{
+	int slot = slots.size();
+	while(slot--) {
+		CREItem *item = slots[slot];
+		if (strnicmp(item->ItemResRef, resref,8) == 0) {
+			return true;
+		}
+	}
+	return false;
 }
 
 void Inventory::SetSlotItem(CREItem* item, int slot)
@@ -73,9 +109,9 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
 		return true;
 	}
 
-	if (!strcasecmp( target->ItemResRef, source->ItemResRef )) {
+	if (!strnicmp( target->ItemResRef, source->ItemResRef,8 )) {
 		// FIXME: some magic code belongs here ....
-
+		// this should check if the items are stacking or not
 		return true;
 	}
 	return false;
@@ -145,6 +181,6 @@ void Inventory::dump()
 
 		if (!itm) continue;
 
-		printf ( "%2d: %8s   %d (%d %d %d) %x\n", i, itm->ItemResRef, itm->Unknown08, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags );
+		printf ( "%2d: %8s   %d (%d %d %d) %lx\n", i, itm->ItemResRef, itm->Unknown08, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags );
 	}
 }
