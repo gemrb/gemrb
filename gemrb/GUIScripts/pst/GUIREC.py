@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.35 2005/02/13 14:01:37 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.36 2005/02/27 19:17:59 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -605,13 +605,13 @@ def GetStatOverview (pc):
 	#   4210 Lore
 	stats.append ((4210, GS (IE_LORE), ''))
 	#   4211 Open Locks
-	stats.append ((4211, GS (IE_LOCKPICKING), ''))
+	stats.append ((4211, GS (IE_LOCKPICKING), '%'))
 	#   4212 Stealth
-	stats.append ((4212, GS (IE_STEALTH), ''))
+	stats.append ((4212, GS (IE_STEALTH), '%'))
 	#   4213 Find/Remove Traps
-	stats.append ((4213, GS (IE_TRAPS), ''))
+	stats.append ((4213, GS (IE_TRAPS), '%'))
 	#   4214 Pick Pockets
-	stats.append ((4214, GS (IE_PICKPOCKET), ''))
+	stats.append ((4214, GS (IE_PICKPOCKET), '%'))
 	#   4215 Tracking
 	stats.append ((4215, GS (IE_TRACKING), ''))
 	#   4216 Reputation
@@ -621,7 +621,7 @@ def GetStatOverview (pc):
 	#   4218 Lay on Hands Amount
 	stats.append ((4218, GS (IE_LAYONHANDSAMOUNT), ''))
 	#   4219 Backstab Damage
-	stats.append ((4219, GS (IE_BACKSTABDAMAGEMULTIPLIER), ''))
+	stats.append ((4219, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x'))
 	stats.append (None)
 
 	# 4221 Saving Throws
@@ -689,6 +689,8 @@ def GetStatOverview (pc):
 				continue
 			if type == '+':
 				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
+			elif type == 'x':
+				res.append (GemRB.GetString (strref) + ': x' + str (val))
 			else:
 				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
 			
