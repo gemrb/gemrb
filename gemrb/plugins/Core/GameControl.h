@@ -90,7 +90,8 @@ public:
 	void SetCutSceneMode(bool active);
 	void HideGUI();
 	void UnhideGUI();
-	void InitDialog(Actor * speaker, Actor * target, Dialog * dlg);
+	void InitDialog(Actor * speaker, Actor * target, const char *dlgref);
+//	void InitDialog(Actor * speaker, Actor * target, Dialog * dlg);
 	void EndDialog();
 	void DialogChoose(int choose);
 	void DisplayString(Scriptable * target);

@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.63 2004/02/10 20:48:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.64 2004/02/10 22:34:57 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "GameScript.h"
 #include "Interface.h"
-#include "DialogMgr.h"
+//#include "DialogMgr.h"
 
 extern Interface * core;
 #ifdef WIN32
@@ -341,14 +341,14 @@ void GameScript::ReplaceMyArea(Scriptable *Sender, char *newVarName)
 
 void GameScript::SetVariable(Scriptable *Sender, const char * VarName, const char * Context, int value)
 {
-	if(memcmp(VarName, "LOCALS", 6) == 0) {
+	if(strnicmp(VarName, "LOCALS", 6) == 0) {
 		Sender->locals->SetAt(VarName,value);
 		return;
 	}
 	char * newVarName = (char *) malloc(40);
 	strncpy(newVarName, Context, 6);
 	strncat(newVarName, VarName, 40);
-	if(memcmp(newVarName, "MYAREA", 6) == 0) {
+	if(strnicmp(newVarName, "MYAREA", 6) == 0) {
 		ReplaceMyArea(Sender, newVarName);
 	}
 	globals->SetAt(newVarName, (unsigned long)value);
@@ -356,8 +356,12 @@ void GameScript::SetVariable(Scriptable *Sender, const char * VarName, const cha
 
 void GameScript::SetVariable(Scriptable *Sender, const char * VarName, int value)
 {
+	if(strnicmp(VarName, "LOCALS", 6) == 0) {
+		Sender->locals->SetAt(&VarName[6],value);
+		return;
+	}
 	char * newVarName = strndup(VarName,40);
-	if(memcmp(newVarName, "MYAREA", 6) == 0) {
+	if(strnicmp(newVarName, "MYAREA", 6) == 0) {
 		ReplaceMyArea(Sender, newVarName);
 	}
 	globals->SetAt(newVarName, (unsigned long)value);
@@ -368,12 +372,12 @@ unsigned long GameScript::CheckVariable(Scriptable *Sender, const char *VarName)
 	char newVarName[40];
 	unsigned long value=0;
 
-	if(memcmp(VarName, "LOCALS", 6) == 0) {
+	if(strnicmp(VarName, "LOCALS", 6) == 0) {
 		Sender->locals->Lookup(&VarName[6], value);
 		return value;
 	}
 	strncpy(newVarName, VarName,40);
-	if(memcmp(VarName,"MYAREA",6) == 0) {
+	if(strnicmp(VarName,"MYAREA",6) == 0) {
 		ReplaceMyArea(Sender, newVarName);
 	}
 	globals->Lookup(newVarName, value);
@@ -385,13 +389,13 @@ unsigned long GameScript::CheckVariable(Scriptable *Sender, const char *VarName,
 	char newVarName[40];
 	unsigned long value=0;
 
-	if(memcmp(Context, "LOCALS", 6) == 0) {
+	if(strnicmp(Context, "LOCALS", 6) == 0) {
 		Sender->locals->Lookup(VarName, value);
 		return value;
 	}
 	strncpy(newVarName, Context, 6);
 	strncat(newVarName, VarName, 40);
-	if(memcmp(VarName,"MYAREA",6) == 0) {
+	if(strnicmp(VarName,"MYAREA",6) == 0) {
 		ReplaceMyArea(Sender, newVarName);
 	}
 	globals->Lookup(VarName, value);
@@ -810,6 +814,7 @@ bool GameScript::EvaluateString(Scriptable * Sender, char * String)
 
 Action * GameScript::GenerateAction(char * String)
 {
+	strlwr(String);
 	Action * newAction = NULL;
 	int i = 0;
 	while(true) {
@@ -835,7 +840,7 @@ Action * GameScript::GenerateAction(char * String)
 							str++;
 						break;
 
-						case 'P': //Point
+						case 'p': //Point
 							{
 							while((*str != ',') && (*str != ')')) str++;
 							src++; //Skip [
@@ -861,7 +866,7 @@ Action * GameScript::GenerateAction(char * String)
 							}
 						break;
 
-						case 'I': //Integer
+						case 'i': //Integer
 							{
 								while(*str != '*') str++;
 								str++;
@@ -914,7 +919,7 @@ Action * GameScript::GenerateAction(char * String)
 							}
 						break;
 
-						case 'A': //Action
+						case 'a': //Action
 							{
 								while((*str != ',') && (*str != ')')) str++;
 								char action[257];
@@ -947,7 +952,7 @@ Action * GameScript::GenerateAction(char * String)
 							}
 						break;
 
-						case 'O': //Object
+						case 'o': //Object
 							{
 								while((*str != ',') && (*str != ')')) str++;
 								if(*src == '"') { //Object Name
@@ -968,7 +973,7 @@ Action * GameScript::GenerateAction(char * String)
 							}
 						break;
 
-						case 'S': //String
+						case 's': //String
 							{
 								while((*str != ',') && (*str != ')')) str++;
 								src++;
@@ -1004,6 +1009,7 @@ Action * GameScript::GenerateAction(char * String)
 
 Trigger * GameScript::GenerateTrigger(char * String)
 {
+	strlwr(String);
 	Trigger * newTrigger = NULL;
 	bool negate = false;
 	if(*String == '!') {
@@ -1034,7 +1040,7 @@ Trigger * GameScript::GenerateTrigger(char * String)
 							str++;
 						break;
 
-						case 'P': //Point
+						case 'p': //Point
 							{
 							while((*str != ',') && (*str != ')')) str++;
 							src++; //Skip [
@@ -1060,7 +1066,7 @@ Trigger * GameScript::GenerateTrigger(char * String)
 							}
 						break;
 
-						case 'I': //Integer
+						case 'i': //Integer
 							{
 								while(*str != '*') str++;
 								str++;
@@ -1114,7 +1120,7 @@ Trigger * GameScript::GenerateTrigger(char * String)
 							}
 						break;
 
-						case 'O': //Object
+						case 'o': //Object
 							{
 								while((*str != ',') && (*str != ')')) str++;
 								if(*src == '"') { //Object Name
@@ -1136,7 +1142,7 @@ Trigger * GameScript::GenerateTrigger(char * String)
 							}
 						break;
 
-						case 'S': //String
+						case 's': //String
 							{
 								while((*str != ',') && (*str != ')')) str++;
 								src++;
@@ -1762,7 +1768,7 @@ void GameScript::ChangeAIScript(Scriptable * Sender, Action *parameters)
 		return;
 	Actor * actor = (Actor*)scr;
 	//changeaiscript clears the queue, i believe
-	actor->ClearActions();
+//	actor->ClearActions();
 	actor->SetScript(parameters->string0Parameter, parameters->int0Parameter);
 }
 
@@ -2185,10 +2191,11 @@ void GameScript::BeginDialog(Scriptable *Sender, Action * parameters, int Flags)
 	        if(Flags&BD_TALKCOUNT)
         	        actor->TalkCount++;
 
-		DialogMgr * dm = (DialogMgr*)core->GetInterface(IE_DLG_CLASS_ID);
-		dm->Open(core->GetResourceMgr()->GetResource(Dialog, IE_DLG_CLASS_ID), true);
-		gc->InitDialog(actor, target, dm->GetDialog());
-		core->FreeInterface(dm);
+//		DialogMgr * dm = (DialogMgr*)core->GetInterface(IE_DLG_CLASS_ID);
+//		dm->Open(core->GetResourceMgr()->GetResource(Dialog, IE_DLG_CLASS_ID), true);
+//		gc->InitDialog(actor, target, dm->GetDialog());
+		gc->InitDialog(actor, target, Dialog);
+//		core->FreeInterface(dm);
 	}
 }
 

@@ -103,16 +103,20 @@ void Scriptable::ExecuteScript(GameScript * Script)
 
 void Scriptable::AddAction(Action * aC)
 {
-	if(!aC)
+	if(!aC) {
+		printf("[IEScript]: NULL action encountered!\n");
 		return;
+	}
 	actionQueue.push_back(aC);
 	aC->IncRef();
 }
 
 void Scriptable::AddActionInFront(Action * aC)
 {
-	if(!aC)
+	if(!aC) {
+		printf("[IEScript]: NULL action encountered!\n");
 		return;
+	}
 	actionQueue.push_front(aC);
 	aC->IncRef();
 }

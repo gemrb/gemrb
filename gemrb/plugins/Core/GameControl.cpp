@@ -24,6 +24,7 @@
 #include "GameControl.h"
 #include "Interface.h"
 #include "AnimationMgr.h"
+#include "DialogMgr.h"
 
 #define IE_CHEST_CURSOR	32
 
@@ -965,13 +966,26 @@ void GameControl::ResizeAdd(Window * win, unsigned char type)
 	}
 }
 
-void GameControl::InitDialog(Actor * speaker, Actor * target, Dialog * dlg)
+void GameControl::InitDialog(Actor * speaker, Actor * target, const char * dlgref)
 {
+	DialogMgr * dm = (DialogMgr*)core->GetInterface(IE_DLG_CLASS_ID);
+	dm->Open(core->GetResourceMgr()->GetResource(dlgref, IE_DLG_CLASS_ID), true);
+	dlg = dm->GetDialog();
+        core->FreeInterface(dm);
+
+	if(!dlg) {
+		printf("[GameControl]: Cannot start dialog: %s\n",dlgref);
+		return;
+	}
+	//target is here because it could be changed when a dialog runs onto
+	//and external link, we need to find the new target (whose dialog was
+	//linked to)
+	this->target = target;
+	if(Dialogue)
+		return;
+	this->speaker = speaker;
 	DisableMouse = true;
 	Dialogue = true;
-	this->dlg = dlg;
-	this->speaker = speaker;
-	this->target = target;
 	unsigned long index;
 	core->GetDictionary()->Lookup("MessageWindowSize", index);
 	if(index == 0) {
@@ -1031,19 +1045,33 @@ void GameControl::DialogChoose(int choose)
 				ta->PopLines (ds->transitionsCount + 1);
 				AddTalk (ta, target, "A0A0FF", core->GetString(tr->textStrRef), "8080FF");
 
+				if(tr->action) {
+					for(int i = 0; i < tr->action->count; i++) {
+						Action *action=GameScript::CreateAction(tr->action->strings[i], true);
+						if(action) {
+							speaker->AddAction(action);
+						}
+						else {
+							printf("[GameScript]: can't compile action: %s\n",tr->action->strings[i]);
+						}
+					}
+				}
+
 				if(tr->Flags & IE_DLG_TR_FINAL) {
 					EndDialog();
 					ta->SetMinRow(false);
 					return;
-				}					
-				if(tr->action) {
-					for(int i = 0; i < tr->action->count; i++) {
-						speaker->AddAction(GameScript::CreateAction(tr->action->strings[i], true));
-					}
 				}
-				ds = dlg->GetState(tr->stateIndex);
+				int si=tr->stateIndex;
+				//follow external linkage, if required
+				if(tr->Dialog[0] && strnicmp(tr->Dialog, dlg->ResRef,8) )
+				{
+					//target should be recalculated!
+					InitDialog(speaker,target,tr->Dialog);
+				}
+				ds = dlg->GetState(si);
 			}
-			char * string = core->GetString(ds->StrRef, 2);
+			char * string = core->GetString(ds->StrRef, IE_STR_SOUND);
 			AddTalk (ta, speaker, "FF0000", string, "70FF70");
 			free(string);
 			int i;
