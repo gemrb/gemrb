@@ -208,7 +208,7 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 	if(string[0] != 0)
 		nextimg = init->chars[string[0]-1];
 	else
-		nextimg = init->chars[0x20-1];
+		nextimg = init->chars['A'-1];
 	x = nextimg->XPos;
 	bool newline = true, curset = false;
 	if(len != 1) { //Skip if we have an empty string
@@ -254,7 +254,7 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 			//Now the new row will start at nsi index so copy it in the lastnsi index
             lastnsi = nsi;
 			//Now copy the maxHeight of the last row to the heights array
-			sl.heights[sl.StringCount-1] = this->maxHeight;
+			sl.heights[sl.StringCount-1] = maxHeight;
 			//Set our string length for centering text
 			sl.lengths[sl.StringCount-1] = lastx;
 			//Increment the sl.StringCount variable since we have one new Row
@@ -265,9 +265,14 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 			//newline = true;
 		}
 		//Check for new maxHeight
-		/*if(string[i] != 0x20)
+		if(string[i] != 0x20) {
 			if(maxHeight < nextimg->YPos)
-				maxHeight = nextimg->YPos;*/
+				maxHeight = nextimg->YPos;
+		}
+		else {
+			if(maxHeight < chars['A'-1]->YPos)
+				maxHeight = chars['A'-1]->YPos;
+		}
 		//Check for end of String
 		if(string[i+1] == 0)
 			break;
@@ -298,7 +303,7 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 	newstring[++nsi] = NULL;
 	}
 	else { //We have an empty String
-		maxHeight = this->maxHeight; //Use the maxHeight precalculated parameter
+		maxHeight = nextimg->YPos; //Use the maxHeight precalculated parameter
 		newstring[nsi++] = nextimg;  //Add an image placeholder using the 'space' character
 		newstring[nsi] = NULL; //End the String
 		if(!curset) {
@@ -307,7 +312,7 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 		}
 	}
 	sl.strings[sl.StringCount-1] = &newstring[lastnsi];
-	sl.heights[sl.StringCount-1] = this->maxHeight;
+	sl.heights[sl.StringCount-1] = maxHeight;
 	sl.lengths[sl.StringCount-1] = x;
 	int yacc = 0;
 	for(int i = -1; i < sl.StringCount-1; i++) {
