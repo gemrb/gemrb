@@ -1,11 +1,20 @@
 
-Prototype:
+Prototype: GemRB.SetWindowPicture(WindowIndex, MosResRef)
 
-Description:
+Description: Changes the background of a Window.
 
 Parameters:
+WindowIndex - the index returned by LoadWindow()
+MosResRef   - the name of the background image (.mos resref)
 
-Return value:
+Return value: N/A
 
-See also:
+Example:
+        LoadPic = GemRB.GetGameString (STR_LOADMOS)
+        if LoadPic=="":
+                LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
+        GemRB.SetWindowPicture(LoadScreen, LoadPic)
+The above snippet is responsible to generate a random loading screen.
+
+See also: SetButtonPicture
 

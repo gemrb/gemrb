@@ -1,11 +1,15 @@
 
-Prototype:
+Prototype: GemRB.TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Row])
 
-Description:
+Description: Appends the Text to the TextArea Control in the Window. If row is specificed, it can also append text to existing rows.
 
 Parameters:
+WindowIndex, ControlIndex  - the control's reference
+String                     - literal text, it could have embedded colour codes
+Strref                     - a string index from the dialog.tlk table.
+Row                        - the row of text to add the text to, if omitted, the text will be added (in a new row) after the last row.
 
-Return value:
+Return value: N/A
 
-See also:
+See also: TextAreaClear, SetText, QueryText
 

@@ -1,11 +1,18 @@
 
-Prototype:
+Prototype: GemRB.SetWindowPos(WindowIndex, X, Y)
 
-Description:
+Description: Moves a Window.
 
-Parameters:
+Parameters: 
+WindowIndex - the index returned by LoadWindow()
+X,Y         - the new position of the window relative to the screen
 
-Return value:
+Return value: N/A
 
-See also:
+Example:
+ x, y = GemRB.GetVar ("MenuX"), GemRB.GetVar ("MenuY")
+ GemRB.SetWindowPos (Window, x, y)
+The above example is from the PST FloatWindow script. It repositions the floating window over the GameControl.
+
+See also: SetWindowSize, SetControlPos
 

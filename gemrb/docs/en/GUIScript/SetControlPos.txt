@@ -6,7 +6,7 @@ Description: Moves a Control.
 Parameters: WindowIndex, ControlIndex  - the control's reference
 X,Y - the new position of the control relative to the window
 
-Return value:
+Return value: N/A
 
 See also: SetControlSize, accessing_gui_controls
 

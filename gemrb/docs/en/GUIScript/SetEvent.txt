@@ -1,11 +1,43 @@
 
-Prototype:
+Prototype: GemRB.SetEvent(WindowIndex, ControlIndex, EventMask, FunctionName)
 
-Description:
+Description: Sets an event of a control on a window to a script defined function. 
 
-Parameters:
+Parameters: 
+WindowIndex, ControlIndex  - the control's reference
+EventMask                  - a dword describing the event. Its high byte is actually the control's type.
+FunctionName               - must be shorter than 32 bytes
 
-Return value:
+Implemented events:
+IE_GUI_BUTTON_ON_PRESS    = 0x00000000, the user pressed the button.
+IE_GUI_MOUSE_OVER_BUTTON  = 0x00000001, the user hovered the mouse over the button.
+IE_GUI_MOUSE_ENTER_BUTTON = 0x00000002, the user just moved the mouse onto the button.
+IE_GUI_MOUSE_LEAVE_BUTTON = 0x00000003, the mouse just left the button
+IE_GUI_BUTTON_ON_SHIFT_PRESS = 0x00000004, the button was pressed along with the shift key.
+IE_GUI_BUTTON_ON_RIGHT_PRESS = 0x00000005, the button was right clicked
+IE_GUI_BUTTON_ON_DRAG_DROP   = 0x00000006, the button was clicked during a drag&drop action.
+IE_GUI_PROGRESS_END_REACHED = 0x01000000, the progressbar received a 100 percent value.
+IE_GUI_SLIDER_ON_CHANGE   = 0x02000000, the slider's knob position has changed.
+IE_GUI_EDIT_ON_CHANGE     = 0x03000000, the text in the editbox has changed.
+IE_GUI_TEXTAREA_ON_CHANGE = 0x05000000, the text in the textarea has changed.
+IE_GUI_LABEL_ON_PRESS     = 0x06000000, the label was pressed.
+IE_GUI_SCROLLBAR_ON_CHANGE= 0x07000000, the scrollbar's knob position has changed.
 
-See also:
+Return value: N/A
+
+Examples:
+ GemRB.SetEvent (LoadScreen, Bar, IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
+ ...
+ def EndLoadScreen ():
+        Skull = GemRB.GetControl (LoadScreen, 1)
+        GemRB.SetButtonMOS (LoadScreen, Skull, "GSKULON")
+The above example changes the image on the loadscreen when the progressbar reaches the end.
+
+ GemRB.SetEvent(QuitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "YesButton")
+The above example sets up the 'YesButton' function to be called when the button was pressed.
+
+ GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "ChaPress")
+The above example shows how to implement 'context sensitive help'. the 'ChaPress' function displays a help text on the screen when you hover the mouse over a button.
+
+See also: GetControl, SetVarAssoc, accessing_gui_controls
 
