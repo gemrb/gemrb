@@ -1,0 +1,320 @@
+#include "SDLVideoDriver.h"
+#include <math.h>
+
+SDLVideoDriver::SDLVideoDriver(void)
+{
+}
+
+SDLVideoDriver::~SDLVideoDriver(void)
+{
+	SDL_Quit();
+}
+
+int SDLVideoDriver::Init(void)
+{
+  printf("[SDLVideoDriver]: Init...");
+  if(SDL_InitSubSystem(SDL_INIT_VIDEO) == -1) {
+    printf("[ERROR]\n");
+    return GEM_ERROR;
+  }
+  printf("[OK]\n");
+  return GEM_OK;
+}
+
+int SDLVideoDriver::CreateDisplay(int width, int height, int bpp, bool fullscreen)
+{
+	DWORD flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
+	if(fullscreen)
+		flags |= SDL_FULLSCREEN;
+	disp = SDL_SetVideoMode(width, height, bpp, flags);
+	if(disp == NULL)
+		return GEM_ERROR;
+	Viewport.x = Viewport.y = 0;
+	Viewport.w = width;
+	Viewport.h = height;
+	return GEM_OK;
+}
+
+VideoModes SDLVideoDriver::GetVideoModes(bool fullscreen)
+{
+	SDL_Rect ** modes;
+	DWORD flags = SDL_HWSURFACE;
+	if(fullscreen)
+		flags |= SDL_FULLSCREEN;
+	VideoModes vm;
+	//32-bit Video Modes
+	SDL_PixelFormat pf;
+	pf.palette = NULL;
+	pf.BitsPerPixel = 32;
+	pf.BytesPerPixel = 4;
+	pf.Rmask = 0xff000000;
+	pf.Gmask = 0x00ff0000;
+	pf.Bmask = 0x0000ff00;
+	pf.Amask = 0x000000ff;
+	pf.Rshift = 24;
+	pf.Gshift = 16;
+	pf.Bshift = 8;
+	pf.Ashift = 0;
+	modes = SDL_ListModes(&pf, fullscreen);
+	if(modes == (SDL_Rect**)0)
+		return vm;
+	if(modes == (SDL_Rect**)-1) {
+		vm.AddVideoMode(640, 480, 32, fullscreen);
+		vm.AddVideoMode(800, 600, 32, fullscreen);
+		vm.AddVideoMode(1024, 786, 32, fullscreen);
+		vm.AddVideoMode(1280, 1024, 32, fullscreen);
+		vm.AddVideoMode(1600, 1200, 32, fullscreen);
+	}
+	else {
+		for(int i = 0; modes[i]; i++) {
+			vm.AddVideoMode(modes[i]->w, modes[i]->h, 32, fullscreen);
+		}
+	}
+	return vm;
+}
+
+bool SDLVideoDriver::TestVideoMode(VideoMode & vm)
+{
+	DWORD flags = SDL_HWSURFACE;
+	if(vm.GetFullScreen())
+		flags |= SDL_FULLSCREEN;
+	if(SDL_VideoModeOK(vm.GetWidth(), vm.GetHeight(), vm.GetBPP(), flags) == vm.GetBPP())
+		return true;
+	return false;
+}
+
+int SDLVideoDriver::SwapBuffers(void)
+{
+	int ret = GEM_OK;
+	//TODO: Implement an efficient Rectangle Merge algorithm for faster redraw
+	SDL_Event event; /* Event structure */
+	while(SDL_PollEvent(&event)) {  /* Loop until there are no events left on the queue */
+		switch(event.type){  /* Process the appropiate event type */
+		case SDL_QUIT:  /* Handle a KEYDOWN event */         
+			ret = GEM_ERROR;
+		break;
+
+		case SDL_KEYDOWN:
+			if(event.key.keysym.sym == SDLK_RIGHT) {
+				Viewport.x += 64;
+			}
+			else if(event.key.keysym.sym == SDLK_LEFT) {
+				Viewport.x -= 64;
+			}
+			else if(event.key.keysym.sym == SDLK_UP) {
+				Viewport.y -= 64;
+			}
+			else if(event.key.keysym.sym == SDLK_DOWN) {
+				Viewport.y += 64;
+			}
+		break;
+		}
+	}
+	SDL_Flip(disp);
+	return ret;
+}
+
+Sprite2D *SDLVideoDriver::CreateSprite(int w, int h, int bpp, DWORD rMask, DWORD gMask, DWORD bMask, DWORD aMask, void* pixels, bool cK, int index)
+{
+	Sprite2D *spr = new Sprite2D();
+	void * p = SDL_CreateRGBSurfaceFrom(pixels, w, h, bpp, w*(bpp/8), rMask, gMask, bMask, aMask);
+	if(p != NULL) {
+		spr->vptr = p;
+		spr->pixels = pixels;
+	}
+	if(cK)
+		SDL_SetColorKey((SDL_Surface*)p, SDL_SRCCOLORKEY | SDL_RLEACCEL, index);
+	spr->Width = w;
+	spr->Height = h;
+	return spr;
+}
+
+Sprite2D *SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels, void* palette, bool cK, int index)
+{
+	Sprite2D *spr = new Sprite2D();
+	void * p = SDL_CreateRGBSurfaceFrom(pixels, w, h, bpp, w*(bpp/8), 0,0,0,0);
+	if(p != NULL) {
+		spr->vptr = p;
+		spr->pixels = pixels;
+	}
+	SDL_SetPalette((SDL_Surface*)p, SDL_LOGPAL, (SDL_Color*)palette, 0, 256);
+	if(cK)
+		SDL_SetColorKey((SDL_Surface*)p, SDL_SRCCOLORKEY | SDL_RLEACCEL, index);
+	spr->Width = w;
+	spr->Height = h;
+	return spr;
+}
+
+void SDLVideoDriver::FreeSprite(Sprite2D * spr)
+{
+	if(spr->vptr)
+		SDL_FreeSurface((SDL_Surface*)spr->vptr);
+	if(spr->pixels)
+		free(spr->pixels);
+	delete(spr);
+}
+
+void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor)
+{
+	//TODO: Add the destination surface and rect to the Blit Pipeline
+	SDL_Rect drect;
+	if(anchor) {
+		drect.x = x-spr->XPos;
+		drect.y = y-spr->YPos;
+	}
+	else {
+		drect.x = x-spr->XPos-Viewport.x;
+		drect.y = y-spr->YPos-Viewport.y;
+	}
+	SDL_BlitSurface((SDL_Surface*)spr->vptr, NULL, disp, &drect);
+	//Debug Addition: Draws a point to the x,y position
+	/*drect.x = x;
+	drect.y = y;
+	drect.w = 1;
+	drect.h = 1;
+	SDL_FillRect(disp, &drect, 0xffffffff);*/
+}
+
+void SDLVideoDriver::SetCursor(Sprite2D * spr, int x, int y)
+{
+	//TODO: Implement Cursor
+	return;
+}
+
+Region SDLVideoDriver::GetViewport()
+{
+	return Viewport;
+}
+
+void SDLVideoDriver::SetViewport(int x, int y)
+{
+	Viewport.x = x;
+	Viewport.y = y;
+}
+
+void SDLVideoDriver::MoveViewportTo(int x, int y)
+{
+	Viewport.x = x - Viewport.w;
+	Viewport.y = y - Viewport.h;
+}
+/** No descriptions */
+void SDLVideoDriver::SetPalette(Sprite2D * spr, Color * pal){
+	SDL_Surface * sur = (SDL_Surface*)spr->vptr;
+	SDL_SetPalette(sur, SDL_LOGPAL, (SDL_Color*)pal, 0, 256);
+}
+
+void SDLVideoDriver::ConvertToVideoFormat(Sprite2D * sprite)
+{
+	SDL_Surface * ss = (SDL_Surface*)sprite->vptr;
+	if(ss->format->Amask != 0) //Surface already converted
+		return;
+	SDL_Surface * ns = SDL_DisplayFormatAlpha(ss);
+	if(ns == NULL)
+		return;
+	SDL_FreeSurface(ss);
+	if(sprite->pixels)
+		free(sprite->pixels);
+	sprite->pixels = NULL;
+	sprite->vptr = ns;
+}
+
+#define MINCOL 2
+#define MUL    2
+
+void SDLVideoDriver::CalculateAlpha(Sprite2D * sprite)
+{
+	SDL_Surface * surf = (SDL_Surface*)sprite->vptr;
+	SDL_LockSurface(surf);
+	unsigned char * p = (unsigned char*)surf->pixels;
+	unsigned char * end = p + (surf->pitch*surf->h);
+	unsigned char r,g,b,m;
+	while( p < end ) {
+		r = *p++;
+		/*if(r > MINCOL)
+			r = 0xff;
+		else
+			r*=MUL;*/
+		g = *p++;
+		/*if(g > MINCOL)
+			g = 0xff;
+		else
+			g*=MUL;*/
+		b = *p++;
+		/*if(b > MINCOL)
+			b = 0xff;
+		else
+			b*=MUL;*/
+		m = (r+g+b)/3;
+		if(m > MINCOL)
+			if((r == 0) && (g == 0xff) && (b == 0))
+				*p++ = 0xff;
+			else
+				*p++ = (m*MUL > 0xff) ? 0xff : m*MUL;
+		else
+			*p++ = 0;
+	}
+	SDL_UnlockSurface(surf);
+}
+
+/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
+void SDLVideoDriver::DrawRect(Region &rgn, Color &color){
+	SDL_Surface * rectsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, rgn.w, rgn.h, 8, 0,0,0,0);
+	SDL_Color pal[2];
+	pal[0].r = color.r;
+	pal[0].g = color.g;
+	pal[0].b = color.b;
+	
+	pal[1].r = 0;
+	pal[1].g = 0;
+	pal[1].b = 0;
+
+	SDL_SetPalette(rectsurf, SDL_LOGPAL, pal, 0, 2);
+	SDL_SetColorKey(rectsurf, SDL_SRCCOLORKEY, 1);
+
+	SDL_LockSurface(rectsurf);
+	memset(rectsurf->pixels, 0, rgn.w*rgn.h);
+	SDL_UnlockSurface(rectsurf);
+
+	SDL_Rect drect = {1,1,rgn.w-2, rgn.h-2};
+	SDL_FillRect(rectsurf, &drect, 1);
+
+  drect.x = rgn.x;
+  drect.y = rgn.y;
+	
+	SDL_BlitSurface(rectsurf, NULL, disp, &drect);
+
+	SDL_FreeSurface(rectsurf);
+}
+/** Creates a Palette from Color */
+Color * SDLVideoDriver::CreatePalette(Color color)
+{
+	Color * pal = (Color*)malloc(256*sizeof(Color));
+	pal[0].r = 0;
+	pal[0].g = 0xff;
+	pal[0].b = 0;
+	pal[0].a = 0;
+	for(int i = 1; i < 256; i++) {
+		pal[i].r = (unsigned char)((color.r*(i))/255.0);
+		pal[i].g = (unsigned char)((color.g*(i))/255.0);
+		pal[i].b = (unsigned char)((color.b*(i))/255.0);
+		pal[i].a = 0;
+	}
+	return pal;
+}
+/** Blits a Sprite filling the Region */
+void SDLVideoDriver::BlitTiled(Region rgn, Sprite2D * img, bool anchor)
+{
+	if(!anchor) {
+		rgn.x -= Viewport.x;
+		rgn.y -= Viewport.y;
+	}
+	int xrep = (int)ceil(rgn.w/img->Width);
+	int yrep = (int)ceil(rgn.h/img->Height);
+	for(int y = 0; y < yrep; y++) {
+		for(int x = 0; x < xrep; x++) {
+			SDL_Rect srect = {0,0, ((img->Width % rgn.w) == 0) ? img->Width : img->Width % rgn.w, ((img->Height % rgn.h) == 0) ? img->Height : img->Height % rgn.h };
+			SDL_Rect drect = {rgn.x+(x*img->Width), rgn.y+(y*img->Height), 1, 1};
+			SDL_BlitSurface((SDL_Surface*)img->vptr, &srect, disp, &drect);
+		}
+	}
+}
