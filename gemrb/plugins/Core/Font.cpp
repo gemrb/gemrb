@@ -3,17 +3,22 @@
 #include "Interface.h"
 
 extern Interface * core;
+unsigned long lastX = 0;
 
-Font::Font(void)
+Font::Font(int w, int h, void * palette, bool cK, int index)
 {
-	maxHeight = 0;
+	lastX = 0;
 	count = 0;
-	palette = NULL;
+	void * pixels = malloc(w*h);
+	sprBuffer = core->GetVideoDriver()->CreateSprite8(w, h, 8, pixels, palette, cK, index);
+	this->palette = core->GetVideoDriver()->GetPalette(sprBuffer);
+	maxHeight = h;
 }
 
 Font::~Font(void)
 {
 	free(palette);
+	core->GetVideoDriver()->FreeSprite(sprBuffer);
 	/*
 	Since we assume that the font was loaded from a factory Object,
 	we don't need to free the sprites, those will be freed directly
@@ -29,15 +34,42 @@ Font::~Font(void)
 	*/
 }
 
-void Font::AddChar(Sprite2D * spr)
+void Font::AddChar(void * spr, int w, int h, short xPos, short yPos)
 {
-	if(count == 0) {
+	if(!spr) {
+		size[count].x = 0;
+		size[count].y = 0;
+		size[count].w = 0;
+		size[count].h = 0;
+		this->xPos[count] = 0;
+		this->yPos[count] = 0;
+		count++;
+		return;
+	}
+	unsigned char * startPtr = (unsigned char*)sprBuffer->pixels;
+	unsigned char * currPtr;
+	unsigned char * srcPtr = (unsigned char*)spr;
+	for(int y = 0; y < h; y++) {
+		currPtr = startPtr + (y*sprBuffer->Width) + lastX;
+		memcpy(currPtr, srcPtr, w);
+		srcPtr += w;		
+	}
+	size[count].x = lastX;
+	size[count].y = 0;
+	size[count].w = w;
+	size[count].h = h;
+	this->xPos[count] = xPos;
+	this->yPos[count] = yPos;
+	count++;
+	lastX+=w;
+	/*if(count == 0) {
 		palette = core->GetVideoDriver()->GetPalette(spr);
 	}
 	if(maxHeight < spr->YPos)
 		maxHeight = spr->YPos;
 	//chars.push_back(spr);	
-	chars[count++] = spr;
+	chars[count++] = spr;*/
+
 }
 
 bool written = false;
@@ -54,9 +86,10 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 	if(!pal) {
 		pal = palette;
 	}
-	for(int i = 0; i < 255; i++) {
+	/*for(int i = 0; i < 255; i++) {
 		core->GetVideoDriver()->SetPalette(chars[i], pal);
-	}
+	}*/
+	core->GetVideoDriver()->SetPalette(sprBuffer, pal);
 	Video * video = core->GetVideoDriver();
 	int len = strlen((char*)string);
 	char * tmp = (char*)malloc(len+1);
@@ -66,12 +99,12 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 	if(Alignment & IE_FONT_SINGLE_LINE) {
 		for(int i = 0; i < len; i++) {
 			if(tmp[i] != 0)
-				if(ystep < chars[(unsigned char)tmp[i]-1]->YPos)
-					ystep = chars[(unsigned char)tmp[i]-1]->YPos;
+				if(ystep < yPos[(unsigned char)tmp[i]-1])//chars[(unsigned char)tmp[i]-1]->YPos)
+					ystep = yPos[(unsigned char)tmp[i]-1];//chars[(unsigned char)tmp[i]-1]->YPos;
 		}
 	}
 	else
-		ystep = chars[1]->Height;
+		ystep = size[1].h;//chars[1]->Height;
 	int x = 0, y = ystep;
 	if(Alignment & IE_FONT_ALIGN_CENTER) {
 		int w = CalcStringWidth(tmp);
@@ -111,12 +144,14 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 			}
 			continue;
 		}
-		Sprite2D * spr = chars[(unsigned char)tmp[i]-1];
-		x+=spr->XPos;
-		video->BlitSprite(spr, x+rgn.x, y+rgn.y, true, &rgn);
+		unsigned char currChar = (unsigned char)tmp[i]-1;
+		//Sprite2D * spr = chars[(unsigned char)tmp[i]-1];
+		x+=xPos[currChar];//spr->XPos;
+		//video->BlitSprite(spr, x+rgn.x, y+rgn.y, true, &rgn);
+		video->BlitSpriteRegion(sprBuffer, size[currChar], x+rgn.x-xPos[currChar], y+rgn.y-yPos[currChar], true, &rgn);
 		if(cursor &&  (curpos == i))
-			video->BlitSprite(cursor, x-spr->XPos+rgn.x, y+rgn.y, true, &rgn);
-		x+=spr->Width-spr->XPos;
+			video->BlitSprite(cursor, x-xPos[currChar]+rgn.x, y+rgn.y, true, &rgn);//spr->XPos+rgn.x, y+rgn.y, true, &rgn);
+		x+=size[currChar].w-xPos[currChar];//spr->Width-spr->XPos;
 		
 	}
 	free(tmp);
@@ -134,9 +169,10 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	if(!pal) {
 		pal = palette;
 	}
-	for(int i = 0; i < 255; i++) {
-		core->GetVideoDriver()->SetPalette(chars[i], pal);
-	}
+	//for(int i = 0; i < 255; i++) {
+	//	core->GetVideoDriver()->SetPalette(chars[i], pal);
+	//}
+	core->GetVideoDriver()->SetPalette(sprBuffer, pal);
 	Video * video = core->GetVideoDriver();
 	int len = strlen((char*)string);
 	char * tmp = (char*)malloc(len+1);
@@ -146,12 +182,12 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	if(Alignment & IE_FONT_SINGLE_LINE) {
 		for(int i = 0; i < len; i++) {
 			if(tmp[i] != 0)
-				if(ystep < chars[(unsigned char)tmp[i]-1]->YPos)
-					ystep = chars[(unsigned char)tmp[i]-1]->YPos;
+				if(ystep < yPos[(unsigned char)tmp[i]-1])//chars[(unsigned char)tmp[i]-1]->YPos)
+					ystep = yPos[(unsigned char)tmp[i]-1];//chars[(unsigned char)tmp[i]-1]->YPos;
 		}
 	}
 	else
-		ystep = chars[1]->Height;
+		ystep = size[1].h;//chars[1]->Height;
 	int x = 0, y = ystep;
 	if(Alignment & IE_FONT_ALIGN_CENTER) {
 		int w = CalcStringWidth(tmp);
@@ -187,170 +223,24 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 			}
 			continue;
 		}
-		Sprite2D * spr = chars[(unsigned char)tmp[i]-1];
-		x+=spr->XPos;
-		video->BlitSprite(spr, x+rgn.x, y+rgn.y, true, &rgn);
+		//Sprite2D * spr = chars[(unsigned char)tmp[i]-1];
+		unsigned char currChar = (unsigned char)tmp[i]-1;
+		x+=xPos[currChar];//spr->XPos;
+		//video->BlitSprite(spr, x+rgn.x, y+rgn.y, true, &rgn);
+		video->BlitSpriteRegion(sprBuffer, size[currChar], x+rgn.x-xPos[currChar], y+rgn.y-yPos[currChar], true, &rgn);
 		if(cursor &&  (curpos == i))
-			video->BlitSprite(cursor, x-spr->XPos+rgn.x, y+rgn.y, true, &rgn);
-		x+=spr->Width-spr->XPos;
+			video->BlitSprite(cursor, x-xPos[currChar]+rgn.x, y+rgn.y, true, &rgn);//spr->XPos+rgn.x, y+rgn.y, true, &rgn);
+		x+=size[currChar].w-xPos[currChar];//spr->Width-spr->XPos;
 		
 	}
 	free(tmp);
-}
-/** PreCalculate for Printing */
-StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int curpos)
-{
-	if(init == NULL)
-		init = this;
-	StringList sl;
-	sl.StringCount = 1;
-	sl.starty = 0;
-	int len = strlen((char*)string)+1;
-	if(len == 1)
-		len = 1;
-	int nslen = len+1, lastnsi = 0, maxHeight = 0, crowlen = 1;
-	//Allocate our char pointers list
-	Sprite2D ** newstring = (Sprite2D**)malloc(nslen*sizeof(Sprite2D*));
-	//Allocate the first string in the array
-	sl.strings = (Sprite2D***)malloc(sl.StringCount*sizeof(Sprite2D**));
-	/* No Need To Allocate the Row
-	//Allocate the first string size to 1
-	sl.strings[0] = (Sprite2D**)malloc(sizeof(Sprite2D*));
-	*/
-	//Allocate the heights array
-	sl.heights = (unsigned int*)malloc(sizeof(unsigned int));
-	//Allocate the lengths array
-	sl.lengths = (unsigned int*)malloc(sizeof(unsigned int));
-	int x, nsi = 0, lastx = 0;
-	Sprite2D * nextimg, *oldimg = NULL;
-	if(string[0] != 0)
-		nextimg = init->chars[string[0]-1];
-	else
-		nextimg = init->chars['A'-1];
-	x = nextimg->XPos;
-	bool newline = true, curset = false;
-	if(len != 1) { //Skip if we have an empty string
-	for(int i = 0; i < len; i++) {
-		if(i == curpos) {
-			sl.curx = nsi;
-			sl.cury = sl.StringCount-1;
-			curset = true;
-		}
-		if(x >= rgn.w) {
-			//Check for spaces at the beginning of the row
-			while(string[i] == ' ') {
-				i++;
-				if(i == curpos) {
-					if(!curset) {
-						sl.curx = nsi;
-						sl.cury = sl.StringCount-1;
-					}
-				}
-			}
-			nextimg = chars[string[i]-1];
-			//New Line
-			x=nextimg->XPos;
-			//Add one slot to our newstring array sice we will insert a NULL value
-			//at the end of the current row
-			newstring = (Sprite2D**)realloc(newstring, (++nslen)*sizeof(Sprite2D*));
-			//Allocate one extra row in the strings array
-			sl.strings = (Sprite2D***)realloc(sl.strings, (sl.StringCount+1)*sizeof(Sprite2D**));
-			/* No Need To Allocate The Row
-			//Allocate our new Row size to 1
-			sl.strings[sl.StringCount] = (Sprite2D**)malloc(sizeof(Sprite2D*));
-			*/
-			//Allocate one extra space in the heights array
-			sl.heights = (unsigned int*)realloc(sl.heights, (sl.StringCount+1)*sizeof(unsigned int));
-			//Allocate one extra space in the lengths array
-			sl.lengths = (unsigned int*)realloc(sl.lengths, (sl.StringCount+1)*sizeof(unsigned int));
-			//Let's add the '\0' at the end of the current row
-			newstring[nsi] = NULL;
-			//Set the pointer of our new row to the lastnsi index
-			sl.strings[sl.StringCount-1] = &newstring[lastnsi];
-			//Increment the nsi index so the new row will start after the '\0'
-			nsi++;
-			//Now the new row will start at nsi index so copy it in the lastnsi index
-            lastnsi = nsi;
-			//Now copy the maxHeight of the last row to the heights array
-			sl.heights[sl.StringCount-1] = chars[1]->Height;
-			//Set our string length for centering text
-			sl.lengths[sl.StringCount-1] = lastx;
-			//Increment the sl.StringCount variable since we have one new Row
-			sl.StringCount++;
-			//Reset our maxHeight variable
-			maxHeight = 0;
-			//Notify New Line
-			//newline = true;
-		}
-		//Check for new maxHeight
-		if(string[i] != 0x20) {
-			if(maxHeight < nextimg->YPos)
-				maxHeight = nextimg->YPos;
-		}
-		else {
-			if(maxHeight < chars['A'-1]->YPos)
-				maxHeight = chars['A'-1]->YPos;
-		}
-		//Check for end of String
-		if(string[i+1] == 0)
-			break;
-		//Ok, we may continue
-		//Let's move our pointer to the next char Position
-		oldimg = nextimg;
-		if(newline)
-			nextimg = init->chars[string[i+1]-1];
-		else
-			nextimg = chars[string[i+1]-1];
-		lastx = x;
-		x+=(oldimg->Width-oldimg->XPos)+(nextimg->XPos);
-		//Check if we have a New Line Character
-		if(string[i+1] == '\n')
-			x = rgn.w; //This way next time we make the cycle, we will insert a new line
-		//Set our string char value
-		newstring[nsi] = oldimg;
-		//Increment the string pointer
-		nsi++;
-		//Notify continuing this line
-		newline = false;
-	}
-	newstring[nsi] = nextimg;
-	if(!curset) {
-		sl.curx = nsi+1;
-		sl.cury = sl.StringCount-1;
-	}
-	newstring[++nsi] = NULL;
-	}
-	else { //We have an empty String
-		maxHeight = chars[1]->Height;//nextimg->YPos; //Use the maxHeight precalculated parameter
-		newstring[nsi++] = nextimg;  //Add an image placeholder using the 'space' character
-		newstring[nsi] = NULL; //End the String
-		if(!curset) {
-			sl.curx = 0;
-			sl.cury = sl.StringCount-1;
-		}
-	}
-	sl.strings[sl.StringCount-1] = &newstring[lastnsi];
-	if(sl.StringCount == 1)
-		sl.heights[sl.StringCount-1] = maxHeight;
-	else
-		sl.heights[sl.StringCount-1] = chars[1]->Height;
-	sl.lengths[sl.StringCount-1] = x;
-	int yacc = 0;
-	for(int i = -1; i < sl.StringCount-1; i++) {
-		if(yacc+sl.heights[i+1] > rgn.h) {
-			break;
-		}
-		yacc+=sl.heights[i+1];
-	}
-	sl.starty = (rgn.h-yacc)/2;
-	return sl;
 }
 
 int Font::CalcStringWidth(const char * string)
 {
 	int ret = 0, len = strlen(string);
 	for(int i = 0; i < len; i++) {
-		ret += chars[(unsigned char)string[i]-1]->Width;
+		ret += size[(unsigned char)string[i]-1].w;//chars[(unsigned char)string[i]-1]->Width;
 	}
 	return ret;
 }
@@ -375,7 +265,7 @@ void Font::SetupString(char * string, int width)
 			lastpos = pos;
 			continue;
 		}
-		wx += chars[((unsigned char)string[pos])-1]->Width;
+		wx += size[(unsigned char)string[pos]-1].w;//chars[((unsigned char)string[pos])-1]->Width;
 		if((string[pos] == ' ') || (string[pos] == '-')) {
 			x+=wx;
 			wx = 0;

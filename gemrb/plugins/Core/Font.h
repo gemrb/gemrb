@@ -39,19 +39,21 @@ private:
 	//std::vector<Sprite2D*> chars;
 	int count;
 	Color * palette;
+	Sprite2D * sprBuffer;
 public:
-	Font(void);
+	Font(int w, int h, void * palette, bool cK, int index);
 	~Font(void);
-	void AddChar(Sprite2D * spr);
+	void AddChar(void * spr, int w, int h, short xPos, short yPos);
 	void Print(Region rgn, unsigned char * string, Color *color, unsigned char Alignment, bool anchor = false, Font * initials = NULL, Color *initcolor = NULL, Sprite2D * cursor = NULL, int curpos = 0);
 	void PrintFromLine(int startrow, Region rgn, unsigned char * string, Color *color, unsigned char Alignment, bool anchor = false, Font * initials = NULL, Color *initcolor = NULL, Sprite2D * cursor = NULL, int curpos = 0);
 	void * GetPalette();
 	char ResRef[9];
-	Sprite2D * chars[256];
+	//Sprite2D * chars[256];
+	Region	size[256];
+	short	xPos[256];
+	short	yPos[256];
 	int maxHeight;
 private: // Private methods
-  /** PreCalculate for Printing */
-  StringList Prepare(Region &rgn, unsigned char * string, Font * init, int curpos);
   int CalcStringWidth(const char * string);
 public:
   void SetupString(char * string, int width);
