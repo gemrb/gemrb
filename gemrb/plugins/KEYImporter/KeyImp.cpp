@@ -185,9 +185,11 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 		if(ret == NULL)
 			printf("[NOT_FOUND]\n");
 		core->FreeInterface(ai);
-		strncpy(ret->filename, resname,8);
-		ret->filename[8]=0;
-		strcat(ret->filename, core->TypeExt(type));
+		if(ret) {
+			strncpy(ret->filename, resname,8);
+			ret->filename[8]=0;
+			strcat(ret->filename, core->TypeExt(type));
+		}
 		return ret;
 	}
 	return NULL;
