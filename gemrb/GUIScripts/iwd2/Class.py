@@ -156,7 +156,7 @@ def BackPress():
 
 def NextPress():
 	#classcolumn is base class
-	Class = GemRB.GetVar("Class")
+	Class = GemRB.GetVar("Class") - 1
 	ClassColumn = GemRB.GetTableValue(ClassTable, Class, 3) - 1
 	if ClassColumn < 0:  #it was already a base class
 		ClassColumn = Class
