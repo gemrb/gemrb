@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.29 2004/02/28 15:24:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.30 2004/02/28 18:38:32 avenger_teambg Exp $
  *
  */
 
@@ -362,6 +362,8 @@ void Actor::DebugDump()
 
 void Actor::SetPosition(unsigned int XPos, unsigned int YPos)
 {
+	XPos/=16;
+	YPos/=12;
 	if (!GetStat( IE_DONOTJUMP ) || !anims->CircleSize) {
 		core->GetPathFinder()->AdjustPosition( XPos, YPos );
 	}
