@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.15 2003/12/18 15:05:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.16 2003/12/21 18:36:06 avenger_teambg Exp $
  *
  */
 
@@ -44,7 +44,7 @@ void Control::OnKeyPress(unsigned char Key, unsigned short Mod)
 /** Key Release Event */
 void Control::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
-	//printf("OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", ControlID, Key, Key);
+	printf("OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", ControlID, Key, Key);
 }
 /** Mouse Over Event */
 void Control::OnMouseOver(unsigned short x, unsigned short y)

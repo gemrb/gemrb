@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.16 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.17 2003/12/21 18:36:06 avenger_teambg Exp $
  *
  */
 
@@ -70,10 +70,12 @@ public:
   /** Sets the Text of the current control */
   int SetText(const char * string, int pos = 0);
   /** Set Event */
-  void SetEvent(char * funcName);
+  void SetEvent(char * funcName, int eventType);
   /** Sets the Picture */
   void SetPicture(Sprite2D * Picture);
 public: // Public Events
+  /** Mouse Over */
+  void OnMouseOver(unsigned short x, unsigned short y);
   /** Mouse Button Down */
   void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
   /** Mouse Button Up */
@@ -82,6 +84,7 @@ public: // Public Events
   void OnSpecialKeyPress(unsigned char Key);
   /** Button Pressed Event Script Function Name */
   char ButtonOnPress[64];
+  char MouseOverButton[64];
   /** Sets the Display Flags */
   int SetFlags(int Flags, int Operation);
   /** Refreshes the button from a radio group */
