@@ -27,7 +27,7 @@ GEM_EXPORT_DLL int LibNumberClasses()
 GEM_EXPORT_DLL ClassDesc *LibClassDesc(int i) {
 	switch(i) {
 		case 0: 
-			return &p2DAImpCD;
+			return &p2daImpCD;
 		default: 
 			return 0;
 	}
