@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.9 2003/11/25 13:48:00 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.10 2003/11/26 19:50:17 avenger_teambg Exp $
  *
  */
 
@@ -56,7 +56,7 @@ bool MUSImp::OpenPlaylist(const char * name)
 	strcat(path, "music");
 	strcat(path, SPathDelimiter);
 	strcat(path, name);
-	strcat(path, ".mus");
+//	strcat(path, ".mus");
 	if(!str->Open(path, true))
 		return false;
 	str->ReadLine(PLName, 32);
