@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.191 2004/08/25 13:06:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.192 2004/08/26 19:28:17 avenger_teambg Exp $
  *
  */
 
@@ -73,6 +73,7 @@ static TriggerLink triggernames[] = {
 	{"checkstatgt", GameScript::CheckStatGT,0},
 	{"checkstatlt", GameScript::CheckStatLT,0},
 	{"class", GameScript::Class,0},
+	{"classex", GameScript::ClassEx,0}, //will return true for multis
 	{"classlevel", GameScript::ClassLevel,0},
 	{"classlevelgt", GameScript::ClassLevelGT,0},
 	{"classlevellt", GameScript::ClassLevelLT,0},
@@ -2695,9 +2696,10 @@ int GameScript::ID_Class(Actor *actor, int parameter)
 
 int GameScript::ID_ClassMask(Actor *actor, int parameter)
 {
-	//TODO: if parameter >=202, it is of *_ALL type
 	int value = actor->GetStat(IE_CLASS);
-	return parameter==value;
+	if (parameter==value) return 1;
+	//check on multiclass
+	return 0;
 }
 
 int GameScript::ID_AVClass(Actor *actor, int parameter)
@@ -2811,6 +2813,7 @@ int GameScript::Allegiance(Scriptable* Sender, Trigger* parameters)
 	return ID_Allegiance( actor, parameters->int0Parameter);
 }
 
+//should return *_ALL stuff
 int GameScript::Class(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -2819,6 +2822,18 @@ int GameScript::Class(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = (Actor*)scr;
 	return ID_Class( actor, parameters->int0Parameter);
+}
+
+//should not handle >200, but should check on multi-class
+//this is most likely ClassMask
+int GameScript::ClassEx(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr || scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = (Actor*)scr;
+	return ID_ClassMask( actor, parameters->int0Parameter);
 }
 
 int GameScript::Faction(Scriptable* Sender, Trigger* parameters)
@@ -4039,9 +4054,9 @@ int GameScript::ClassLevel(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if(actor->GetStat(IE_CLASS) != (unsigned) parameters->int0Parameter) {
+	
+	if(!ID_ClassMask( actor, parameters->int0Parameter) )
 		return 0;
-	}
 	return actor->GetStat(IE_LEVEL) == (unsigned) parameters->int1Parameter;
 }
 
@@ -4069,9 +4084,8 @@ int GameScript::ClassLevelGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if(actor->GetStat(IE_CLASS) != (unsigned) parameters->int0Parameter) {
+	if(!ID_ClassMask( actor, parameters->int0Parameter) )
 		return 0;
-	}
 	return actor->GetStat(IE_LEVEL) > (unsigned) parameters->int1Parameter;
 }
 
@@ -4098,9 +4112,8 @@ int GameScript::ClassLevelLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if(actor->GetStat(IE_CLASS) != (unsigned) parameters->int0Parameter) {
+	if(!ID_ClassMask( actor, parameters->int0Parameter) )
 		return 0;
-	}
 	return actor->GetStat(IE_LEVEL) < (unsigned) parameters->int1Parameter;
 }
 

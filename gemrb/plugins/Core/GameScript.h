@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.136 2004/08/25 13:06:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.137 2004/08/26 19:28:18 avenger_teambg Exp $
  *
  */
 
@@ -777,6 +777,7 @@ public: //Script Functions
 	static int CheckStatGT(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatLT(Scriptable* Sender, Trigger* parameters);
 	static int Class(Scriptable* Sender, Trigger* parameters);
+	static int ClassEx(Scriptable* Sender, Trigger* parameters);
 	static int ClassLevel(Scriptable* Sender, Trigger* parameters);
 	static int ClassLevelGT(Scriptable* Sender, Trigger* parameters);
 	static int ClassLevelLT(Scriptable* Sender, Trigger* parameters);
