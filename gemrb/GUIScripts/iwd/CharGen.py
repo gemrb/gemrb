@@ -55,6 +55,12 @@ SkillsDoneButton = 0
 SkillsPointsLeft = 0
 SkillsState = 0
 
+RacialEnemyButton = 0
+RacialEnemyWindow = 0
+RacialEnemyTable = 0
+RacialEnemyTextArea = 0
+RacialEnemyDoneButton = 0
+
 ProficienciesWindow = 0
 ProficienciesTable = 0
 ProfsMaxTable = 0
@@ -195,8 +201,17 @@ def BackPress():
 	SetCharacterDescription()
 	return
 
+def CancelPress():
+	global CharGenWindow
+	GemRB.UnloadWindow(CharGenWindow)
+	GemRB.SetNextScript("PartyFormation")
+	return
+
+def AcceptPress():
+	return
+
 def SetCharacterDescription():
-	global CharGenWindow, TextArea, CharGenState, ClassTable, RaceTable, AlignmentTable, AbilitiesTable, ProficienciesTable
+	global CharGenWindow, TextArea, CharGenState, ClassTable, RaceTable, AlignmentTable, AbilitiesTable, SkillsTable, ProficienciesTable, RacialEnemyTable
 	GemRB.TextAreaClear(CharGenWindow, TextArea)
 	if CharGenState > 0:
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 12135)
@@ -232,18 +247,26 @@ def SetCharacterDescription():
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(SkillsTable, i, 2), -1)
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, str(GemRB.GetVar("Skill" + str(i))) )
-		if ClassName == "RANGER":
+				GemRB.TextAreaAppend(CharGenWindow, TextArea, "%" )
+		elif ClassName == "RANGER":
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 8442, -1)
-			GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(SkillsTable, 0, 2), -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, 9461, -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, str(GemRB.GetVar("Skill0")) )
-		if ClassName == "BARD":
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, "%" )
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, 15982, -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(RacialEnemyTable, GemRB.GetVar("RacialEnemy") - 1, 2) )
+		elif ClassName == "BARD":
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, 8442, -1)
-			GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(SkillsTable, 2, 2), -1)
+			n = 2
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, 9463, -1)
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, str(GemRB.GetVar("Skill2")) )
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, "%" )
 
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 9466, -1)
@@ -251,6 +274,7 @@ def SetCharacterDescription():
 			ProficiencyValue = GemRB.GetVar("Proficiency" + str(i) )
 			if ProficiencyValue > 0:
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(ProficienciesTable, i, 2), -1)
+				GemRB.TextAreaAppend(CharGenWindow, TextArea, " ")
 				j = 0
 				while j < ProficiencyValue:
 					GemRB.TextAreaAppend(CharGenWindow, TextArea, "+")
@@ -410,7 +434,6 @@ def RacePress():
 	GemRB.SetVisible(CharGenWindow, 0)
 	RaceWindow = GemRB.LoadWindow(8)
 	RaceTable = GemRB.LoadTable("RACES")
-	GemRB.SetVar("Race", 0)
 
 	for i in range(2, 8):
 		RaceSelectButton = GemRB.GetControl(RaceWindow, i)
@@ -457,16 +480,8 @@ def RaceDonePress():
 	GemRB.SetVisible(CharGenWindow, 1)
 	return
 
-def BackToRacePress():
-	GemRB.SetVar("Race", 0)
-	GemRB.SetButtonState(CharGenWindow, RaceButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetButtonState(CharGenWindow, ClassButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "OnLoad")
-	return
-
 def RaceCancelPress():
 	global CharGenWindow, RaceWindow
-	GemRB.SetVar("Race", 0)
 	GemRB.UnloadWindow(RaceWindow)
 	GemRB.SetVisible(CharGenWindow, 1)
 	return
@@ -824,7 +839,7 @@ def AbilitiesCancelPress():
 # Skills Selection
 
 def SkillsPress():
-	global CharGenWindow, SkillsWindow, ClassTable, RaceTable, SkillsState
+	global CharGenWindow, ClassTable, RaceTable, SkillsState, SkillsButton, AppearanceButton, CharGenState
 	
 	# For now, readability is preferred over speed. This could be optimized later.
 	ClassName = GemRB.GetTableRowName(ClassTable, GemRB.GetVar("Class") - 1)
@@ -843,6 +858,8 @@ def SkillsPress():
 			SkillDexterityTable = GemRB.LoadTable("SKILLDEX")
 			Dexterity = str(GemRB.GetVar("Ability2") )
 			GemRB.SetVar("Skill2", GemRB.GetTableValue(SkillRaceTable, RaceName, "PICK_POCKETS") + GemRB.GetTableValue(SkillDexterityTable, Dexterity, "PICK_POCKETS") + GemRB.GetTableValue(GemRB.LoadTable("SKILLBRD"), "1", "PICK_POCKETS"))
+			SkillsState = 1
+		else:
 			SkillsState = 1
 
 	if SkillsState == 1:
@@ -968,7 +985,7 @@ def SkillsDonePress():
 	return
 
 def SkillsCancelPress():
-	global CharGenWindow, SkillsWindow
+	global CharGenWindow, SkillsWindow, SkillsState
 	GemRB.UnloadWindow(SkillsWindow)
 	SkillsState = 0
 	GemRB.SetVisible(CharGenWindow, 1)
@@ -978,6 +995,73 @@ def SkillsCancelPress():
 # Racial Enemy Selection
 
 def RacialEnemySelect():
+	global CharGenWindow, RacialEnemyWindow, RacialEnemyTable, RacialEnemyTextArea, RacialEnemyDoneButton
+	GemRB.SetVisible(CharGenWindow, 0)
+	RacialEnemyWindow = GemRB.LoadWindow(15)
+	RacialEnemyTable = GemRB.LoadTable("ENEMIES")
+	RacialEnemyCount = GemRB.GetTableRowCount(RacialEnemyTable)
+
+	for i in range(2, 8):
+		RacialEnemySelectButton = GemRB.GetControl(RacialEnemyWindow, i)
+		GemRB.SetButtonFlags(RacialEnemyWindow, RacialEnemySelectButton, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	
+	for i in range(2, 8):
+		RacialEnemySelectButton = GemRB.GetControl(RacialEnemyWindow, i)
+		GemRB.SetButtonState(RacialEnemyWindow, RacialEnemySelectButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetEvent(RacialEnemyWindow, RacialEnemySelectButton, IE_GUI_BUTTON_ON_PRESS, "RacialEnemySelectPress")
+		GemRB.SetVarAssoc(RacialEnemyWindow, RacialEnemySelectButton, "RacialEnemy", i - 1)
+
+	GemRB.SetVar("RacialEnemyIndex", 0)
+	RacialEnemyScrollBar = GemRB.GetControl(RacialEnemyWindow, 1)
+	GemRB.SetVarAssoc(RacialEnemyWindow, RacialEnemyScrollBar, "RacialEnemyIndex", RacialEnemyCount - 5)
+	GemRB.SetEvent(RacialEnemyWindow, RacialEnemyScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "DisplayRacialEnemies")
+
+	RacialEnemyTextArea = GemRB.GetControl(RacialEnemyWindow, 8)
+	GemRB.SetText(RacialEnemyWindow, RacialEnemyTextArea, 17256)
+
+	RacialEnemyDoneButton = GemRB.GetControl(RacialEnemyWindow, 11)
+	GemRB.SetButtonState(RacialEnemyWindow, RacialEnemyDoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent(RacialEnemyWindow, RacialEnemyDoneButton, IE_GUI_BUTTON_ON_PRESS, "RacialEnemyDonePress")
+	GemRB.SetText(RacialEnemyWindow, RacialEnemyDoneButton, 11973)
+	GemRB.SetButtonFlags(RacialEnemyWindow, RacialEnemyDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	RacialEnemyCancelButton = GemRB.GetControl(RacialEnemyWindow, 10)
+	GemRB.SetButtonState(RacialEnemyWindow, RacialEnemyCancelButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(RacialEnemyWindow, RacialEnemyCancelButton, IE_GUI_BUTTON_ON_PRESS, "RacialEnemyCancelPress")
+	GemRB.SetText(RacialEnemyWindow, RacialEnemyCancelButton, 13727)
+
+	DisplayRacialEnemies()
+	GemRB.SetVisible(RacialEnemyWindow, 1)
+	return
+
+def DisplayRacialEnemies():
+	global RacialEnemyWindow, RacialEnemyTable
+	RacialEnemyIndex = GemRB.GetVar("RacialEnemyIndex")
+	for i in range(2, 8):
+		RacialEnemySelectButton = GemRB.GetControl(RacialEnemyWindow, i)
+		GemRB.SetText(RacialEnemyWindow, RacialEnemySelectButton, GemRB.GetTableValue(RacialEnemyTable, RacialEnemyIndex + i - 2, 0))
+	return
+
+def RacialEnemySelectPress():
+        global RacialEnemyWindow, RacialEnemyDoneButton, RacialEnemyTable, RacialEnemyTextArea
+	RacialEnemy = GemRB.GetVar("RacialEnemyIndex") + GemRB.GetVar("RacialEnemy") - 1
+	GemRB.SetText(RacialEnemyWindow, RacialEnemyTextArea, GemRB.GetTableValue(RacialEnemyTable, RacialEnemy, 1) )
+        GemRB.SetButtonState(RacialEnemyWindow, RacialEnemyDoneButton, IE_GUI_BUTTON_ENABLED)
+	return
+
+def RacialEnemyDonePress():
+	global CharGenWindow, RacialEnemyWindow, SkillsState
+	GemRB.UnloadWindow(RacialEnemyWindow)
+	SkillsState = 1
+	GemRB.SetVisible(CharGenWindow, 1)
+	SkillsPress()
+	return
+
+def RacialEnemyCancelPress():
+	global CharGenWindow, RacialEnemyWindow, SkillsState
+	GemRB.UnloadWindow(RacialEnemyWindow)
+	SkillsState = 0
+	GemRB.SetVisible(CharGenWindow, 1)
 	return
 
 
@@ -1140,7 +1224,6 @@ def ProficienciesMinusPress():
 
 def ProficienciesDonePress():
 	global CharGenWindow, ProficienciesWindow, SkillsState
-	GemRB.SetVisible(ProficienciesWindow, 0)
 	GemRB.UnloadWindow(ProficienciesWindow)
 	SkillsState = 2
 	GemRB.SetVisible(CharGenWindow, 1)
@@ -1180,6 +1263,11 @@ def MageSpellsSelect():
 	return
 
 def MageSpellsDonePress():
+	global CharGenWindow, MageSpellsWindow, SkillsState
+	GemRB.UnloadWindow(MageSpellsWindow)
+	SkillsState = 3
+	GemRB.SetVisible(CharGenWindow, 1)
+	SkillsPress()
 	return
 
 def MageSpellsCancelPress():
@@ -1292,6 +1380,12 @@ def ImportPress():
 	GemRB.SetVisible(CharGenWindow, 0)
 	ImportWindow = GemRB.LoadWindow(20)
 
+	ImportDoneButton = GemRB.GetControl(ImportWindow, 0)
+	GemRB.SetButtonState(ImportWindow, ImportDoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent(ImportWindow, ImportDoneButton, IE_GUI_BUTTON_ON_PRESS, "ImportDonePress")
+	GemRB.SetText(ImportWindow, ImportDoneButton, 11973)
+	GemRB.SetButtonFlags(ImportWindow, ImportDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+
 	ImportCancelButton = GemRB.GetControl(ImportWindow, 1)
 	GemRB.SetButtonState(ImportWindow, ImportCancelButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(ImportWindow, ImportCancelButton, IE_GUI_BUTTON_ON_PRESS, "ImportCancelPress")
@@ -1300,19 +1394,12 @@ def ImportPress():
 	GemRB.SetVisible(ImportWindow, 1)
 	return
 
+def ImportDonePress():
+	return
+
 def ImportCancelPress():
 	global CharGenWindow, ImportWindow
 	GemRB.UnloadWindow(ImportWindow)
 	GemRB.SetVisible(CharGenWindow, 1)
-	return
-
-
-def CancelPress():
-	global CharGenWindow
-	GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("PartyFormation")
-	return
-
-def AcceptPress():
 	return
 
