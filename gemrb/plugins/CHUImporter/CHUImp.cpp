@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.23 2003/12/23 18:59:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.24 2004/02/18 23:00:34 edheldil Exp $
  *
  */
 
@@ -170,9 +170,9 @@ Window * CHUImp::GetWindow(unsigned long i)
 				btn->SetImage(IE_GUI_BUTTON_UNPRESSED, tspr);
 				tspr = ani->GetFrame(PressedIndex);
 				btn->SetImage(IE_GUI_BUTTON_PRESSED, tspr);
-				tspr = ani->GetFrame(SelectedIndex);
+				tspr = ani->GetFrame(core->HasFeature (GF_IGNORE_BUTTON_FRAMES) ? 2 : SelectedIndex);
 				btn->SetImage(IE_GUI_BUTTON_SELECTED, tspr);
-				tspr = ani->GetFrame(DisabledIndex);
+				tspr = ani->GetFrame(core->HasFeature (GF_IGNORE_BUTTON_FRAMES) ? 3 : DisabledIndex);
 				btn->SetImage(IE_GUI_BUTTON_DISABLED, tspr);
 				ani->free = false;
 				delete(ani);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.126 2004/02/18 20:59:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.127 2004/02/18 23:00:34 edheldil Exp $
  *
  */
 
@@ -75,6 +75,7 @@ Interface::Interface(int iargc, char **iargv)
 	ConsolePopped = false;
 	CheatFlag = false;
 	CaseSensitive = false;
+        IgnoreButtonFrames = false;
 	GameOnCD = false;
 	GUIScriptsPath[0]=0;
 	GamePath[0]=0;
@@ -743,6 +744,9 @@ bool Interface::LoadConfig(const char *filename)
 		}
 		else if(stricmp(name, "HasPartyIni") == 0) {
 			SetFeature(atoi(value),GF_HAS_PARTY_INI);
+		}
+		else if(stricmp(name, "IgnoreButtonFrames") == 0) {
+			SetFeature(atoi(value), GF_IGNORE_BUTTON_FRAMES);
 		}
 		else if(stricmp(name, "ForceStereo") == 0) {
 			ForceStereo = atoi(value);
