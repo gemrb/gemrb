@@ -6,10 +6,11 @@ Rows: The first row contains 16 bitfields, one for each search map value. The bi
 1 - passable (can walk through)
 2 - travel region
 4 - opaque (can't see through)
+8 - sidewall (blocks sight specially)
 (As you can see 14 marks the travel region).
 The second row contains the cost of walking straight, and the additional cost of walking diagonals.
 
 Example (BG2):
          0 1 2 3 4 5 6 7 8 9 a b c d e f
-PASSABLE 4 1 1 1 1 1 1 1 4 1 0 0 0 0 3 1
+PASSABLE 4 1 1 1 1 1 1 1 0 1 8 0 0 0 3 1
 COST  10 4
