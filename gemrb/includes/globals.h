@@ -31,7 +31,7 @@ typedef unsigned long DWORD;
 #include "../plugins/Core/DataStream.h"
 #include "../plugins/Core/AnimStructures.h"
 
-#endif
+#endif //GLOBALS_ONLY_DEFS
 
 //Global Variables
 
@@ -60,4 +60,16 @@ typedef unsigned long DWORD;
 #define  GF_UPPER_BUTTON_TEXT		4 //bg2
 #define  GF_LOWER_LABEL_TEXT		5 //bg2
 #define  GF_HAS_PARTY_INI               6 //iwd2
+
+/////globally used functions
+bool dir_exists(const char *path);
+
+#ifdef WIN32
+
+#else
+char *strupr(char *string);
+char *strlwr(char *string);
 #endif
+
+#endif //GLOBALS_H
+
