@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.30 2004/01/04 15:23:47 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.31 2004/01/04 18:56:08 balrog994 Exp $
  *
  */
 
@@ -477,7 +477,14 @@ bool GameScript::EvaluateTrigger(Scriptable * Sender, Trigger * trigger)
 		//printf("%s: Trigger not supported\n", tT->GetValue(trigger->triggerID));
 		return false;
 	}
-	return func(Sender, trigger);
+	int ret = func(Sender, trigger);
+	if(trigger->flags&1) {
+		if(ret)
+			ret = 0;
+		else
+			ret = 1;
+	}
+	return ret;
 }
 
 void GameScript::ExecuteResponseSet(Scriptable * Sender, ResponseSet * rS)
@@ -557,7 +564,14 @@ Scriptable * GameScript::GetActorFromObject(Scriptable * Sender, Object * oC)
 			return map->GetActor(oC->objectName);
 		}
 		else {
-			if(oC->genderField != 0) {
+			if(oC->eaField != 0) {
+				switch(oC->eaField) {
+					case 2:
+						return core->GetGame()->GetPC(0);
+					break;
+				}
+			}
+			else if(oC->genderField != 0) {
 				switch(oC->genderField) {
 					case 21:
 						return core->GetGame()->GetPC(0);
@@ -623,8 +637,6 @@ bool GameScript::EvaluateString(Scriptable * Sender, char * String)
 		return false;
 	Trigger * tri = GenerateTrigger(String);
 	bool ret = EvaluateTrigger(Sender, tri);
-	if(tri->flags&1)
-		ret = !ret;
 	if(tri->string0Parameter)
 		free(tri->string0Parameter);
 	if(tri->string1Parameter)
@@ -1125,12 +1137,6 @@ int GameScript::Globals(Scriptable * Sender, Trigger * parameters)
 			value = 0;
 	}
 	int eval = (value == parameters->int0Parameter) ? 1 : 0;
-	if(parameters->flags&1) {
-		if(eval == 0)
-			return 1;
-		else
-			return 0;
-	}
 	return eval;
 }
 
@@ -1165,23 +1171,9 @@ int GameScript::Range(Scriptable * Sender, Trigger * parameters)
 	double distance = sqrt((x*x)+(y*y));
 	printf("Distance = %.3f\n", distance);
 	if(distance <= (parameters->int0Parameter*20)) {
-		if(parameters->flags&1) {
-			printf("Returning = 0\n");
-			return 0;
-		}
-		else {
-			printf("Returning = 1\n");
-			return 1;
-		}
-	}
-	if(parameters->flags&1) {
-		printf("Returning = 1\n");
 		return 1;
 	}
-	else {
-		printf("Returning = 0\n");
-		return 0;
-	}
+	return 0;
 }
 
 int GameScript::Clicked(Scriptable * Sender, Trigger * parameters)
