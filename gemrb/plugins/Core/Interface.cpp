@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.203 2004/08/22 22:10:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.204 2004/08/23 15:21:03 edheldil Exp $
  *
  */
 
@@ -826,6 +826,15 @@ bool Interface::LoadConfig(void)
 	//if (!name[0])		// FIXME: could this happen?
 	//  strcpy (name, PACKAGE);    // ugly hack
 
+	// If we were called as $0 -c <filename>, load config from filename
+	if (argc > 2 && ! strcmp("-c", argv[1])) {
+		if (LoadConfig( argv[2] )) {
+			return true;
+		} else {
+			// Explicitly specified cfg file HAS to be present
+			return false;
+		}
+	}
 
 	// FIXME: temporary hack, to be deleted??
 	if (LoadConfig( "GemRB.cfg" )) {
