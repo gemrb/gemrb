@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.149 2004/04/19 22:05:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.150 2004/04/20 17:53:11 avenger_teambg Exp $
  *
  */
 
@@ -422,7 +422,10 @@ static ObjectLink objectnames[] = {
 	{"fifthnearestenemyof", GameScript::FifthNearestEnemyOf},
 	{"fourthnearest", GameScript::FourthNearest},
 	{"fourthnearestenemyof", GameScript::FourthNearestEnemyOf},
+	{"lastheardby", GameScript::LastHeardBy},
+	{"lasthitter", GameScript::LastHitter},
 	{"lastseenby", GameScript::LastSeenBy},
+	{"lastsummonerof", GameScript::LastSummonerOf},
 	{"lasttalkedtoby", GameScript::LastTalkedToBy},
 	{"lasttrigger", GameScript::LastTrigger},
 	{"myself", GameScript::Myself},
@@ -1929,6 +1932,36 @@ Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
+Targets *GameScript::LastHeardBy(Scriptable *Sender, Targets *parameters)
+{
+	Actor *actor = parameters->GetTarget(0);
+	if(!actor) {
+		if(Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if(actor) {
+		parameters->AddTarget(actor->LastHeard);
+	}
+	return parameters;
+}
+
+Targets *GameScript::LastHitter(Scriptable *Sender, Targets *parameters)
+{
+	Actor *actor = parameters->GetTarget(0);
+	if(!actor) {
+		if(Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if(actor) {
+		parameters->AddTarget(actor->LastHitter);
+	}
+	return parameters;
+}
+
 Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
 {
 	Actor *actor = parameters->GetTarget(0);
@@ -1940,6 +1973,21 @@ Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
 	parameters->Clear();
 	if(actor) {
 		parameters->AddTarget(actor->LastTalkedTo);
+	}
+	return parameters;
+}
+
+Targets *GameScript::LastSummonerOf(Scriptable *Sender, Targets *parameters)
+{
+	Actor *actor = parameters->GetTarget(0);
+	if(!actor) {
+		if(Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if(actor) {
+		parameters->AddTarget(actor->LastSummoner);
 	}
 	return parameters;
 }
@@ -2137,6 +2185,51 @@ Targets *GameScript::WorstAC(Scriptable *Sender, Targets *parameters)
 	Actor *ac=parameters->GetTarget(pos);
 	parameters->Clear();
 	parameters->AddTarget(ac);
+	return parameters;
+}
+
+Targets *GameScript::MostDamagedOf(Scriptable *Sender, Targets *parameters)
+{
+	int i=parameters->Count();
+	if(!i) {
+		return parameters;
+	}
+	Actor *actor=parameters->GetTarget(--i);
+	int worsthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+	int pos=i;
+	while(i--) {
+		actor = parameters->GetTarget(pos);
+		int ac=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+		if(worsthp>ac) {
+			worsthp=ac;
+			pos=i;
+		}
+	}
+	actor=parameters->GetTarget(pos);
+	parameters->Clear();
+	parameters->AddTarget(actor);
+	return parameters;
+}
+Targets *GameScript::LeastDamagedOf(Scriptable *Sender, Targets *parameters)
+{
+	int i=parameters->Count();
+	if(!i) {
+		return parameters;
+	}
+	Actor *actor=parameters->GetTarget(--i);
+	int worsthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+	int pos=i;
+	while(i--) {
+		actor = parameters->GetTarget(pos);
+		int ac=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+		if(worsthp<ac) {
+			worsthp=ac;
+			pos=i;
+		}
+	}
+	actor=parameters->GetTarget(pos);
+	parameters->Clear();
+	parameters->AddTarget(actor);
 	return parameters;
 }
 
