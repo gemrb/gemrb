@@ -54,26 +54,36 @@ Interface::Interface(void)
 	srand(t);
 }
 
+#define FreeInterfaceVector(type, variable, member)   \
+{  \
+  std::vector<type>::iterator i;  \
+  for(i = variable.begin(); i != variable.end(); ++i) { \
+	if(!(*i).free) {  \
+		core->FreeInterface((*i).member); \
+		(*i).free = true; \
+	} \
+  } \
+}
+
+#define FreeResourceVector(type, variable)   \
+{  \
+  std::vector<type*>::iterator i=variable.begin();  \
+  while(variable.size() ) { \
+	if(*i) delete(*i); \
+	variable.erase(i); \
+	i = variable.begin(); \
+	} \
+} 
+
 Interface::~Interface(void)
 {
 	if(music)
 		delete(music);
 	if(soundmgr)
 		delete(soundmgr);
-	std::vector<Font*>::iterator m = fonts.begin();
-	while( fonts.size() ) {
-		delete(*m);
-		fonts.erase(m);
-		m = fonts.begin();
-	}
-	std::vector<Window*>::iterator w = windows.begin();
-	while( windows.size() ) {
-		if((*w)) {
-			delete(*w);
-		}
-		windows.erase(w);
-		w = windows.begin();
-	}
+	FreeResourceVector(Font, fonts);
+	FreeResourceVector(Window, windows);
+
 	if(key)
 		plugin->FreePlugin(key);	
 	if(video)
@@ -94,23 +104,13 @@ Interface::~Interface(void)
 		delete(vars);
 	if(tokens)
 		delete(tokens);
-	std::vector<Table>::iterator t;
-	for(t = tables.begin(); t != tables.end(); ++t) {
-		if(!(*t).free) {
-			core->FreeInterface((*t).tm);
-			(*t).free = true;
-		}
-	}
-	std::vector<Symbol>::iterator s;
-	for(s = symbols.begin(); s != symbols.end(); ++s) {
-		if(!(*s).free) {
-			core->FreeInterface((*s).sm);
-			(*s).free = true;
-		}
-	}
+	FreeInterfaceVector(Table, tables, tm);
+	FreeInterfaceVector(Symbol, symbols, sm);
+	FreeResourceVector(Character, sheets);
 	delete(console);
 	delete(plugin);
 }
+
 
 int Interface::Init()
 {
