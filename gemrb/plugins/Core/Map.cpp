@@ -26,18 +26,19 @@ void Map::AddTileMap(TileMap *tm)
 	this->tm = tm;
 }
 
-void Map::DrawMap(void)
+void Map::DrawMap(Region viewport)
 {	
 	if(tm)
-		tm->DrawOverlay(0);
+		tm->DrawOverlay(0, viewport);
 	Video * video = core->GetVideoDriver();
-	Region vp = video->GetViewport();
 	for(unsigned int i = 0; i < animations.size(); i++) {
 		//TODO: Clipping Animations off screen
 		video->BlitSprite(animations[i]->NextFrame(), animations[i]->x, animations[i]->y);
 	}
 	for(unsigned int i = 0; i < actors.size(); i++) {
 		CharAnimations * ca = actors[i].actor->GetAnims();
+		if(!ca)
+			continue;
 		Animation * anim = ca->GetAnimation(actors[i].AnimID, actors[i].Orientation);
 		if(anim)
 			video->BlitSprite(anim->NextFrame(), actors[i].XPos, actors[i].YPos);

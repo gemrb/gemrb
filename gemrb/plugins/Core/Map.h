@@ -34,7 +34,7 @@ public:
 	Map(void);
 	~Map(void);
 	void AddTileMap(TileMap * tm);
-	void DrawMap(void);
+	void DrawMap(Region viewport);
 	void AddAnimation(Animation * anim);
 	void AddActor(ActorBlock actor);
 };
