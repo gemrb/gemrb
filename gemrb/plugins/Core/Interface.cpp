@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.250 2005/01/22 20:28:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.251 2005/01/22 20:36:22 avenger_teambg Exp $
  *
  */
 
@@ -2617,7 +2617,7 @@ Item* Interface::GetItem(ieResRef resname)
 		return NULL;
 	}
 
-	item = sm->GetItem();
+	item = sm->GetItem(new Item() );
 	if (item == NULL) {
 		FreeInterface( sm );
 		return NULL;
