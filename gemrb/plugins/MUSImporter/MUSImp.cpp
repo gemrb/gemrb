@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.26 2004/01/02 19:30:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.27 2004/01/02 19:54:45 balrog994 Exp $
  *
  */
 
@@ -77,7 +77,14 @@ bool MUSImp::OpenPlaylist(const char * name)
 		return false;
 	}
 	printf("Loading %s\n",name);
-	str->ReadLine(PLName, 32);
+	int c = str->ReadLine(PLName, 32);
+	while(c > 0) {
+		if((PLName[c-1]==' ') || (PLName[c-1]=='\t'))
+			PLName[c-1] = 0;
+		else
+			break;
+		c--;
+	}
 	char counts[5];
 	str->ReadLine(counts, 5);
 	int count = atoi(counts);
@@ -251,11 +258,7 @@ void MUSImp::PlayNext()
 
 void MUSImp::PlayMusic(int pos)
 {
-	if(stricmp(playlist[pos].PLFile, "LOOP") != 0) {
-		PlayMusic(playlist[pos].PLFile);
-	} else {
-		PlayMusic(playlist[pos].PLLoop);
-	}	
+	PlayMusic(playlist[pos].PLFile);	
 }
 
 void MUSImp::PlayMusic(char *name)
