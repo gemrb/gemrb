@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Ambient.h,v 1.4 2004/08/11 21:35:33 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Ambient.h,v 1.5 2004/08/23 23:37:14 avenger_teambg Exp $
  *
  */
  
@@ -37,8 +37,8 @@
 #include <string>
 #include <vector>
 #include <bitset>
-#include <../../includes/ie_types.h>
-#include <../../includes/globals.h>
+#include "../../includes/ie_types.h"
+#include "../../includes/globals.h"
 
 #define IE_AMBI_ENABLED 1
 #define IE_AMBI_POINT   2

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.55 2004/08/21 04:53:41 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.56 2004/08/23 23:37:10 avenger_teambg Exp $
  *
  */
 
@@ -544,7 +544,7 @@ void ACMImp::AmbientMgr::reset()
 		delete (*it);
 	}
 	ambientSources.clear();
-	SoundMgr::AmbientMgr::reset();
+	::SoundMgr::AmbientMgr::reset();
 	if (NULL != player) {
 		SDL_CondSignal(cond);
 		SDL_mutexV(mutex);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.40 2004/08/23 18:50:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.41 2004/08/23 23:37:14 avenger_teambg Exp $
  *
  */
 
@@ -408,15 +408,10 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			}
 			switch (StanceID) {
 				case IE_ANI_WALK:
+				case IE_ANI_RUN:
+				case IE_ANI_PST_START:
 					Anims[StanceID][Orient] = a;
 					break;
-
-				case IE_ANI_PST_START:
-					for (int j = 0; j < MAX_ORIENT; j++) {
-						Anims[IE_ANI_PST_START][j] = a;
-					}
-					break;
-
 				default:
 					Orient &=~1;
 					Anims[StanceID][Orient] = a;
