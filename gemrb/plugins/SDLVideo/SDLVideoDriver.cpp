@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.76 2004/08/01 15:35:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.77 2004/08/03 17:46:14 avenger_teambg Exp $
  *
  */
 
@@ -37,12 +37,14 @@ SDLVideoDriver::SDLVideoDriver(void)
 	yCorr = 0;
 	lastTime = 0;
 	GetTime( lastMouseTime );
+	backBuf=NULL;
+	extra=NULL;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
 {
-	SDL_FreeSurface( backBuf );
-	SDL_FreeSurface( extra );
+	if(backBuf) SDL_FreeSurface( backBuf );
+	if(extra) SDL_FreeSurface( extra );
 	SDL_Quit();
 }
 
