@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.11 2004/01/18 16:20:58 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.12 2004/02/20 19:56:47 avenger_teambg Exp $
  *
  */
 
@@ -111,8 +111,8 @@ bool GAMImp::Open(DataStream * stream, bool autoFree)
 			{
 				str->Read(&UnknownOffset54, 4);
 				str->Read(&UnknownCount58, 4);
-				str->Read(&CurrentArea, 8);
-				CurrentArea[8] = 0;
+				str->Read(&AnotherArea, 8);
+				AnotherArea[8] = 0;
 				str->Read(&KillVarsOffset, 4);
 				str->Read(&KillVarsCount, 4);
 				str->Read(&SomeBytesArrayOffset, 4);
