@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.26 2004/02/22 18:15:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.27 2004/02/23 17:00:49 avenger_teambg Exp $
  *
  */
 
@@ -229,6 +229,9 @@ bool  Actor::SetStat(unsigned int StatIndex, long Value)
 	    return false;
     Modified[StatIndex] = Value;
 	switch(StatIndex) {
+		case IE_ANIMATION_ID:
+			SetAnimationID(Value);
+		break;
 		case IE_EA:
 		case IE_UNSELECTABLE:
 		case IE_MORALEBREAK:
@@ -310,7 +313,7 @@ void Actor::DebugDump()
 
 void Actor::SetPosition(unsigned int XPos, unsigned int YPos)
 {
-	if(!GetStat(IE_DONOTJUMP))
+	if(!GetStat(IE_DONOTJUMP) || !anims->CircleSize)
 		core->GetPathFinder()->AdjustPosition(XPos, YPos);
 	MoveTo((XPos*16)+8, (YPos*12)+6);
 	ClearPath();
