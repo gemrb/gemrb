@@ -50,9 +50,9 @@ unsigned long ACMImp::Play(const char * ResRef)
 		FSOUND_STREAM * sound = FSOUND_Stream_OpenFile(path, FSOUND_LOOP_OFF | FSOUND_2D, 0);
 #endif
 		if(sound) {
-			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
+			/*if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
 				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
-			}
+			}*/
 			FSOUND_Stream_Play(FSOUND_FREE, sound);
 			return true;
 		}
@@ -71,9 +71,9 @@ unsigned long ACMImp::Play(const char * ResRef)
 		FSOUND_STREAM * sound = FSOUND_Stream_OpenFile(path, FSOUND_LOOP_OFF | FSOUND_2D, 0);
 #endif
 		if(sound) {
-			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
+			/*if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
 				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
-			}
+			}*/
 			FSOUND_Stream_Play(FSOUND_FREE, sound);
 			return true;
 		}
