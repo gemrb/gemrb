@@ -124,6 +124,16 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			else {
 				video->DrawPolyline(overDoor->open,cyan,true);
 			}
+			short xs[4] = {overDoor->BBtoOpen.x, overDoor->BBtoOpen.x+overDoor->BBtoOpen.w, overDoor->BBtoOpen.x+overDoor->BBtoOpen.w, overDoor->BBtoOpen.x};
+			short ys[4] = {overDoor->BBtoOpen.y, overDoor->BBtoOpen.y, overDoor->BBtoOpen.y+overDoor->BBtoOpen.h, overDoor->BBtoOpen.y+overDoor->BBtoOpen.h};
+			Point points[4] = {
+				{overDoor->BBtoOpen.x, overDoor->BBtoOpen.y},
+				{overDoor->BBtoOpen.x+overDoor->BBtoOpen.w, overDoor->BBtoOpen.y},
+				{overDoor->BBtoOpen.x+overDoor->BBtoOpen.w, overDoor->BBtoOpen.y+overDoor->BBtoOpen.h},
+				{overDoor->BBtoOpen.x, overDoor->BBtoOpen.y+overDoor->BBtoOpen.h}
+			};
+			Gem_Polygon poly(points, 4);
+			video->DrawPolyline(&poly, green, false);
 		}
 		//draw containers when ALT was pressed
 		if(DebugFlags&4) {
@@ -455,16 +465,17 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
-	Door * door = area->tm->GetDoor(GameX, GameY);
-	if(door) {
-		area->tm->ToggleDoor(door);
-		return;
-	}
 	if(!DrawSelectionRect) {
 		Actor * actor = area->GetActor(GameX, GameY);
 		
 		if(!actor && (selected.size() == 1)) {
 			actor = selected.at(0);
+			Door * door = area->tm->GetDoor(GameX, GameY);
+			if(door) {
+				if(door->BBtoOpen.PointInside(actor->XPos, actor->YPos))
+					area->tm->ToggleDoor(door);
+				return;
+			}
 			if(!overInfoPoint || (overInfoPoint->Type != ST_TRIGGER)) {
 				actor->WalkTo(GameX, GameY);
 				unsigned long WinIndex, TAIndex;
