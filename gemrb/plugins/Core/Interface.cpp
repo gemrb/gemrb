@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.87 2003/12/04 22:11:30 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.88 2003/12/04 23:37:26 avenger_teambg Exp $
  *
  */
 
@@ -535,12 +535,12 @@ const char * Interface::TypeExt(SClass_ID type)
 	return NULL;
 }
 
-char * Interface::GetString(unsigned long strref)
+char * Interface::GetString(unsigned long strref, unsigned long options)
 {
 	unsigned long flags=0;
 
 	vars->Lookup("Strref On",flags);
-	return strings->GetString(strref, flags);
+	return strings->GetString(strref, flags|options);
 }
 
 void Interface::GetHCAnim(Actor * act)

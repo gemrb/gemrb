@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.21 2003/11/28 21:54:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.22 2003/12/04 23:37:27 avenger_teambg Exp $
  *
  */
 
@@ -190,10 +190,11 @@ char * TLKImp::GetString(unsigned long strref, int flags)
 	}
 	unsigned long Volume, Pitch, StrOffset, Length;
 	unsigned short type;
-	char SoundResRef[8];
+	char SoundResRef[9];
 	str->Seek(18+(strref*0x1A), GEM_STREAM_START);
 	str->Read(&type, 2);
 	str->Read(SoundResRef, 8);
+	SoundResRef[8]=0;
 	str->Read(&Volume, 4);
 	str->Read(&Pitch, 4);
 	str->Read(&StrOffset, 4);
@@ -224,14 +225,15 @@ char * TLKImp::GetString(unsigned long strref, int flags)
 			string=string2;
 		}
 	}
+	if((type&2) && (flags&IE_STR_SOUND) ) {
+//if flags&IE_STR_SOUND play soundresref
+		core->GetSoundMgr()->Play(SoundResRef);
+	}
 	if(flags&IE_STR_STRREFON) {
 		char *string2 = (char *) malloc(Length+11);
 		sprintf(string2,"%d: %s", strref, string);
 		free(string);
 		return string2;
-	}
-	if((type&2) && (flags&IE_STR_SOUND) ) {
-//if flags&IE_STR_SOUND play soundresref
 	}
 	return string;
 }
