@@ -268,7 +268,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				ta->Height = Height;
 				ta->ControlType = ControlType;
 				ta->SetFonts(ini, fnt);
-				ta->SetText("Text Area (Temp Value)");
+				//ta->SetText("Text Area (Temp Value)");
 				if(SBID != 0xffff)
 					win->Link(SBID, ControlID);
 			}
