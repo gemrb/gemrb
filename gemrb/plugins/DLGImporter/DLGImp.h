@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.h,v 1.4 2004/02/24 22:20:42 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.h,v 1.5 2004/03/27 13:05:27 avenger_teambg Exp $
  *
  */
 
@@ -68,12 +68,12 @@ public:
 	~DLGImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Dialog* GetDialog();
-	DialogState* GetDialogState(int index);
+	DialogState* GetDialogState(unsigned int index);
 private:
-	DialogTransition* GetTransition(int index);
-	DialogString* GetStateTrigger(int index);
-	DialogString* GetTransitionTrigger(int index);
-	DialogString* GetAction(int index);
+	DialogTransition* GetTransition(unsigned int index);
+	DialogString* GetStateTrigger(unsigned int index);
+	DialogString* GetTransitionTrigger(unsigned int index);
+	DialogString* GetAction(unsigned int index);
 	char** GetStrings(char* string, unsigned long& count);
 	DialogTransition** GetTransitions(unsigned long firstIndex,
 		unsigned long count);

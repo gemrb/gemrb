@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.9 2004/02/24 22:20:42 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.10 2004/03/27 13:05:27 avenger_teambg Exp $
  *
  */
 
@@ -54,6 +54,7 @@ bool DLGImp::Open(DataStream* stream, bool autoFree)
 		if (strnicmp( Signature, "DLGV1.09", 8 ) != 0) {
 			printMessage( "DLGImporter", "Not a valid DLG File...", WHITE );
 			printStatus( "ERROR", LIGHT_RED );
+			Version = 0;
 			return false;
 		} else {
 			Version = 109;
@@ -79,15 +80,18 @@ bool DLGImp::Open(DataStream* stream, bool autoFree)
 
 Dialog* DLGImp::GetDialog()
 {
+	if(!Version) {
+		return NULL;
+	}
 	Dialog* d = new Dialog();
-	for (int i = 0; i < StatesCount; i++) {
+	for (unsigned int i = 0; i < StatesCount; i++) {
 		DialogState* ds = GetDialogState( i );
 		d->AddState( ds );
 	}
 	return d;
 }
 
-DialogState* DLGImp::GetDialogState(int index)
+DialogState* DLGImp::GetDialogState(unsigned int index)
 {
 	DialogState* ds = new DialogState();
 	str->Seek( StatesOffset + ( index * sizeof( State ) ), GEM_STREAM_START );
@@ -106,13 +110,13 @@ DialogTransition** DLGImp::GetTransitions(unsigned long firstIndex,
 {
 	DialogTransition** trans = ( DialogTransition** )
 		malloc( count*sizeof( DialogTransition* ) );
-	for (int i = 0; i < count; i++) {
+	for (unsigned int i = 0; i < count; i++) {
 		trans[i] = GetTransition( firstIndex + i );
 	}
 	return trans;
 }
 
-DialogTransition* DLGImp::GetTransition(int index)
+DialogTransition* DLGImp::GetTransition(unsigned int index)
 {
 	if (index >= TransitionsCount) {
 		return NULL;
@@ -133,7 +137,7 @@ DialogTransition* DLGImp::GetTransition(int index)
 	return dt;
 }
 
-DialogString* DLGImp::GetStateTrigger(int index)
+DialogString* DLGImp::GetStateTrigger(unsigned int index)
 {
 	if (index >= StateTriggersCount) {
 		return NULL;
@@ -152,7 +156,7 @@ DialogString* DLGImp::GetStateTrigger(int index)
 	return ds;
 }
 
-DialogString* DLGImp::GetTransitionTrigger(int index)
+DialogString* DLGImp::GetTransitionTrigger(unsigned int index)
 {
 	if (index >= TransitionTriggersCount) {
 		return NULL;
@@ -171,7 +175,7 @@ DialogString* DLGImp::GetTransitionTrigger(int index)
 	return ds;
 }
 
-DialogString* DLGImp::GetAction(int index)
+DialogString* DLGImp::GetAction(unsigned int index)
 {
 	if (index >= ActionsCount) {
 		return NULL;
@@ -228,8 +232,10 @@ int GetActionLength(const char* string)
    between commands, common in PST dialog */
 char** DLGImp::GetStrings(char* string, unsigned long& count)
 {
+	int col = 0;
 	int level = 0;
 	bool quotes = true;
+	bool ignore = false;
 	char* poi = string;
 
 	count = 0;
@@ -237,6 +243,13 @@ char** DLGImp::GetStrings(char* string, unsigned long& count)
 		while (*poi && MyIsSpace( *poi ))
 			poi++;
 		switch (*poi++) {
+			case '/':
+				if(col==0) {
+					if(*poi=='/') {
+						poi++;
+						ignore=true;
+					}
+				}
 			case '"':
 				quotes = !quotes;
 				break;
@@ -249,7 +262,10 @@ char** DLGImp::GetStrings(char* string, unsigned long& count)
 				if (quotes && level) {
 					level--;
 					if (level == 0) {
-						count++;
+						if(!ignore) {
+							count++;
+						}
+						ignore=false;
 					}
 				}
 				break;
@@ -263,10 +279,14 @@ char** DLGImp::GetStrings(char* string, unsigned long& count)
 		return strings;
 	}
 	poi = string;
-	for (int i = 0; i < count; i++) {
+	for (unsigned int i = 0; i < count; i++) {
 		while (MyIsSpace( *poi ))
 			poi++;
 		int len = GetActionLength( poi );
+		if((*poi=='/') && (*(poi+1)=='/') ) {
+			poi+=len;
+			continue;
+		}
 		strings[i] = ( char * ) malloc( len + 1 );
 		int j;
 		for (j = 0; len; poi++,len--) {
@@ -278,23 +298,3 @@ char** DLGImp::GetStrings(char* string, unsigned long& count)
 	}
 	return strings;
 }
-/*
-char ** DLGImp::GetStrings(char * string, unsigned long &count)
-{
-	char ** strings = NULL;
-	count = 0;
-	char * tmp = strtok(string, "\n");
-	while(tmp) {
-		count++;
-		int len = strlen(tmp);
-		strings = (char**)realloc(strings, count*sizeof(char*));
-		strings[count-1] = (char*)malloc(len+1);
-		memcpy(strings[count-1], tmp, len);
-		if(strings[count-1][len-1] == '\r')
-			len--;
-		strings[count-1][len] = 0;
-		tmp = strtok(NULL, "\n");
-	}
-	return strings;
-}
-*/
