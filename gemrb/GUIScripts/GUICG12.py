@@ -5,15 +5,28 @@ AppearanceWindow = 0
 PortraitButton = 0
 PortraitsTable = 0
 LastPortrait = 0
+Gender = 0
+
+def SetPicture():
+	global PortraitsTable, LastPortrait
+
+	PortraitName = GemRB.GetTableRowName(PortraitsTable, LastPortrait)+"L"
+	print "Loading",PortraitName
+	GemRB.SetButtonPicture(AppearanceWindow, PortraitButton, PortraitName)
+	return
 
 def OnLoad():
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
+	global Gender
 	
+	Gender=GemRB.GetVar("Gender")
+
 	GemRB.LoadWindowPack("GUICG")
 	AppearanceWindow = GemRB.LoadWindow(11)
 
 	#Load the Portraits Table
-	PortraitsTable = GemRB.LoadTable("PORTRAIT")
+	PortraitsTable = GemRB.LoadTable("PICTURES")
+	LastPortrait = 0
 
 	TextAreaControl = GemRB.GetControl(AppearanceWindow, 7)
 	GemRB.SetText(AppearanceWindow, TextAreaControl,"") # why is this here?
@@ -35,27 +48,34 @@ def OnLoad():
 	GemRB.SetEvent(AppearanceWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(AppearanceWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	
-	PortraitName = GemRB.GetTableRowName(PortraitsTable, LastPortrait)
-	print "Loading",PortraitName
-	GemRB.SetButtonPicture(AppearanceWindow, PortraitButton, PortraitName)
-	
+	while True:
+		if GemRB.GetTableValue(PortraitsTable, LastPortrait, 3) == Gender:
+			SetPicture()
+			break
+		LastPortrait = LastPortrait + 1
 	GemRB.SetVisible(AppearanceWindow,1)
 	return
 
 def RightPress():
-	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
-#Portrait=GetNextPortrait()
-#SetPicture(AppearanceWindow, PortraitButton, Portrait)
-	LastPortrait = (LastPortrait + 2) % 64
-	PortraitName = GemRB.GetTableRowName(PortraitsTable, LastPortrait)
-	print "Loading",PortraitName
-	GemRB.SetButtonPicture(AppearanceWindow, PortraitButton, PortraitName)
-	return
+	global LastPortrait
+	while True:
+		LastPortrait = LastPortrait + 1
+		print LastPortrait
+		if LastPortrait >= GemRB.GetTableRowCount(PortraitsTable)-1:
+			LastPortrait = 0
+		if GemRB.GetTableValue(PortraitsTable, LastPortrait, 3) == Gender:
+			SetPicture()
+			return
 
 def LeftPress():
-#Portrait=GetPrevPortrait()
-#SetPicture(AppearanceWindow, PortraitButton, Portrait)
-	return
+	global LastPortrait
+	while True:
+		LastPortrait = LastPortrait - 1
+		if LastPortrait < 0:
+			LastPortrait = GemRB.GetTableRowCount(PortraitsTable)-2
+		if GemRB.GetTableValue(PortraitsTable, LastPortrait, 3) == Gender:
+			SetPicture()
+			return
 
 def BackPress():
 	GemRB.UnloadWindow(AppearanceWindow)
@@ -65,6 +85,7 @@ def BackPress():
 
 def NextPress():
         GemRB.UnloadWindow(AppearanceWindow)
+	GemRB.SetVar("PortraitIndex",LastPortrait)
 	GemRB.SetNextScript("GUICG2") #appearance
 	return
 
