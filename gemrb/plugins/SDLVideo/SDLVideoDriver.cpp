@@ -522,7 +522,7 @@ void SDLVideoDriver::CalculateAlpha(Sprite2D * sprite)
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 void SDLVideoDriver::DrawRect(Region &rgn, Color &color){
-	SDL_Surface * rectsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, rgn.w, rgn.h, 8, 0,0,0,0);
+	/*SDL_Surface * rectsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, rgn.w, rgn.h, 8, 0,0,0,0);
 	SDL_Color pal[2];
 	pal[0].r = color.r;
 	pal[0].g = color.g;
@@ -541,13 +541,15 @@ void SDLVideoDriver::DrawRect(Region &rgn, Color &color){
 
 	drect.x = rgn.x;
 	drect.y = rgn.y;
-
+	
 	if(color.a != 0)
 		SDL_SetAlpha(rectsurf, SDL_SRCALPHA | SDL_RLEACCEL, 128);
 	
 	SDL_BlitSurface(rectsurf, NULL, disp, &drect);
-
-	SDL_FreeSurface(rectsurf);
+	
+	SDL_FreeSurface(rectsurf);*/
+	SDL_Rect drect = {rgn.x,rgn.y,rgn.w, rgn.h};
+	SDL_FillRect(disp, &drect, (color.a << 24)+(color.r<<16)+(color.g<<8)+color.b);
 }
 /** Creates a Palette from Color */
 Color * SDLVideoDriver::CreatePalette(Color color, Color back)
