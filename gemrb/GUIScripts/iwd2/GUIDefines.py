@@ -40,3 +40,6 @@ OP_SET = 0
 OP_OR = 1
 OP_NAND = 2
 global OP_SET, OP_OR, OP_NAND
+
+GEMRB_VERSION = -1
+global GEMRB_VERSION
