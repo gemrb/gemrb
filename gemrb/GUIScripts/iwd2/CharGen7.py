@@ -103,13 +103,25 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,11958,-1) # new line
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(AlignmentTable,GemRB.GetVar("Alignment")-1,0))
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"",-1) #2 new lines
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,17088,-1)
+
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,17088)
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"[/color]")
 	for i in range(0,6):
 		v = GemRB.GetTableValue(AbilityTable, i,2)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
 		v = GemRB.GetVar("Ability "+str(i) )
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": %d  (%+d)"%(v,v/2-5))
+
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,11983)
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"[/color]")
+	# todo: list skills
+
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,36310)
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"[/color]")
+	# todo: list feats
 
 	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "StartOverPress")
 	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
@@ -119,7 +131,7 @@ def OnLoad():
 	
 def NextPress():
 	GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("Abilities") #abilities
+	GemRB.SetNextScript("Appearance") #abilities
 	return
 
 def StartOverPress():

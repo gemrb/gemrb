@@ -13,6 +13,9 @@ PointsLeft = 0
 def RedrawFeats():
 	global TopIndex
 
+	if PointsLeft == 0:
+		GemRB.SetButtonState(FeatWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+
 	SumLabel = GemRB.GetControl(FeatWindow, 0x1000000c)
 	GemRB.SetText(FeatWindow, SumLabel, str(PointsLeft) )
 
@@ -49,7 +52,7 @@ def ScrollBarPress():
 
 def OnLoad():
 	global FeatWindow, TextAreaControl, DoneButton, TopIndex
-	global FeatTable, CostTable
+	global FeatTable
 	global KitName, Level, ClassColumn
 	
 	GemRB.SetVar("Level",1) #for simplicity
@@ -71,9 +74,6 @@ def OnLoad():
 	#calculating the number of new feats
 	for l in (1,Level+1):
 		PointsLeft = GemRB.GetTableValue(FeatTable, l, ClassColumn)
-		print "Pl:", PointsLeft
-		print "a", GemRB.GetTableValue(FeatTable, l, ClassColumn)
-		print "b", GemRB.GetTableValue(FeatClassTable, l, ClassColumn)
 		PointsLeft += GemRB.GetTableValue(FeatClassTable, l, ClassColumn)
 	
 	GemRB.SetToken("number",str(PointsLeft) )
@@ -93,6 +93,10 @@ def OnLoad():
 		Button = GemRB.GetControl(FeatWindow, i*2+15)
 		GemRB.SetVarAssoc(FeatWindow, Button, "Feat",i)
 		GemRB.SetEvent(FeatWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
+		for j in range(0,5):
+			Star=GemRB.GetControl(FeatWindow, i*5+j+36)
+			GemRB.SetButtonState(FeatWindow, Star, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetButtonFlags(FeatWindow, Star, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 
 	BackButton = GemRB.GetControl(FeatWindow,105)
 	GemRB.SetText(FeatWindow,BackButton,15416)
@@ -112,7 +116,6 @@ def OnLoad():
 
 	GemRB.SetEvent(FeatWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(FeatWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	GemRB.SetButtonState(FeatWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 	RedrawFeats()
 	GemRB.SetVisible(FeatWindow,1)
 	return
@@ -127,16 +130,13 @@ def RightPress():
 	global PointsLeft
 
 	Pos = GemRB.GetVar("Feat")+TopIndex+1
-	Cost = GemRB.GetTableValue(CostTable, Pos, ClassColumn)
-	if Cost==0:
-		return
 
 	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
 	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
 	if ActPoint <= 0:
 		return
 	GemRB.SetVar("Feat "+str(Pos),ActPoint-1)
-	PointsLeft = PointsLeft + Cost
+	PointsLeft = PointsLeft + 1
 	RedrawFeats()
 	return
 
@@ -144,18 +144,15 @@ def LeftPress():
 	global PointsLeft
 
 	Pos = GemRB.GetVar("Feat")+TopIndex+1
-	Cost = GemRB.GetTableValue(CostTable, Pos, ClassColumn)
-	if Cost==0:
-		return
 
 	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
-	if PointsLeft < Cost:
+	if PointsLeft < 1:
 		return
 	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
 	if ActPoint >= Level:
 		return
 	GemRB.SetVar("Feat "+str(Pos), ActPoint+1)
-	PointsLeft = PointsLeft - Cost
+	PointsLeft = PointsLeft - 1 
 	RedrawFeats()
 	return
 

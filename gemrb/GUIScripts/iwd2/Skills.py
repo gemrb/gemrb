@@ -56,6 +56,10 @@ def RedrawSkills():
 		Label = GemRB.GetControl(SkillWindow, 0x10000069+i)
 		ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 		GemRB.SetText(SkillWindow, Label, str(ActPoint) )
+		if ActPoint>0:
+			GemRB.SetLabelTextColor(SkillWindow,Label,0,255,255)
+		else:
+			GemRB.SetLabelTextColor(SkillWindow,Label,255,255,255)
 
 	return
 
@@ -79,6 +83,7 @@ def OnLoad():
 	ClassColumn = GemRB.GetTableValue(ClassTable, Class, 3) - 1
 	if ClassColumn < 0:  #it was already a base class
 		ClassColumn = Class
+	GemRB.SetVar("BaseClass", ClassColumn)
 	SkillPtsTable = GemRB.LoadTable("skillpts")
 	p = GemRB.GetTableValue(SkillPtsTable, 0, ClassColumn)
 	IntBonus = GemRB.GetVar("Ability 3")/2-5  #intelligence bonus
