@@ -9,8 +9,8 @@ def OnLoad():
 	global MessageWindow, ExpandButton, Expand
 	GemRB.LoadWindowPack("GUIW")
 	ActionsWindow = GemRB.LoadWindow(3)
-	PortraitWindow = GemRB.LoadWindow(1)
-	OptionsWindow = GemRB.LoadWindow(0)
+	PortraitWindow = GemRB.LoadWindow(26)
+	OptionsWindow = GemRB.LoadWindow(25)
 	MessageWindow = GemRB.LoadWindow(4)
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
 	GemRB.SetTAAutoScroll(MessageWindow, MessageTA, 1)
@@ -26,10 +26,6 @@ def OnLoad():
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)
 	
-	Button=GemRB.GetControl(PortraitWindow, 6)
-
-	Button=GemRB.GetControl(PortraitWindow, 7)
-
 	UpdateResizeButtons()
 	
 	GemRB.SetVisible(ActionsWindow, 1)
