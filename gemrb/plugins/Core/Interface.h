@@ -18,6 +18,7 @@
 #include "ScriptEngine.h"
 #include "Button.h"
 #include "Console.h"
+#include "SoundMgr.h"
 
 #ifdef WIN32
 
@@ -48,6 +49,7 @@ private:
 	EventMgr * evntmgr;
 	WindowMgr * windowmgr;
 	ScriptEngine * guiscript;
+	SoundMgr * soundmgr;
 	/** Windows Array */
 	std::vector<Window*> windows;
 public:
@@ -96,6 +98,8 @@ public:
 	void PopupConsole();
 	/** Draws the Console */
 	void DrawConsole();
+	/** Get the Sound Manager */
+	SoundMgr * GetSoundMgr();
 private:
 	bool LoadConfig(void);
 public:

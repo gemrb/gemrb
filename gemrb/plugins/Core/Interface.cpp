@@ -213,6 +213,7 @@ int Interface::Init()
 	}
 	printStatus("OK", LIGHT_GREEN);
 	strcpy(NextScript, "Start");
+	printMessage("Core", "Setting up the Console...", WHITE);
 	ChangeScript = true;
 	console = new Console();
 	console->XPos = 0;
@@ -221,6 +222,18 @@ int Interface::Init()
 	console->Height = 25;
 	console->SetFont(fonts[2]);
 	console->SetCursor(fonts[2]->chars[2]);
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Starting up the Sound Manager...", WHITE);
+	soundmgr = (SoundMgr*)GetInterface(IE_WAV_CLASS_ID);
+	if(soundmgr == NULL) {
+		printStatus("ERROR", LIGHT_RED);
+		return GEM_ERROR;
+	}
+	if(!soundmgr->Init()) {
+		printStatus("ERROR", LIGHT_RED);
+		return GEM_ERROR;
+	}
+	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Core Initialization Complete!\n", LIGHT_GREEN);
 	return GEM_OK;
 }
@@ -645,4 +658,10 @@ void Interface::PopupConsole()
 void Interface::DrawConsole()
 {
 	console->Draw(0,0);
+}
+
+/** Get the Sound Manager */
+SoundMgr * Interface::GetSoundMgr()
+{
+	return soundmgr;
 }

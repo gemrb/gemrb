@@ -215,4 +215,5 @@ int Button::SetFlags(bool hideImg, bool hasPicture)
 		Flags += 0x02;
 	Changed = true;
 	((Window*)Owner)->Invalidate();
+	return 0;
 }
