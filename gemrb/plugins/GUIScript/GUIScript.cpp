@@ -231,7 +231,7 @@ static PyObject * GemRB_SetVarAssoc(PyObject *self, PyObject *args)
 	/** setting the correct state for this control */
 	/** it is possible to set up a default value, if Lookup returns false, use it */
 	Value=0;
-	core->GetDictionary()->Lookup((const char *) VarName, Value);
+	core->GetDictionary()->Lookup(VarName, Value);
 	win->RedrawControls(VarName, Value);
 
 	Py_INCREF(Py_None);
@@ -370,6 +370,25 @@ static PyObject * GemRB_Quit(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_PlayMusicPL(PyObject *self, PyObject *args)
+{
+	char* ResRef;
+
+	if(!PyArg_ParseTuple(args, "s", &ResRef)) {
+		printMessage("GUIScript", "Syntax Error: PlayMusicPL(MusicPlayListResource)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	bool ret = core->GetMusicMgr()->OpenPlaylist(ResRef);
+	if(!ret)
+		return NULL;
+
+	core->GetMusicMgr()->Start();
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
     {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
@@ -415,6 +434,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"PlaySound", GemRB_PlaySound, METH_VARARGS,
      "Plays a Sound."},
+
+	{"PlayMusicPL", GemRB_PlayMusicPL, METH_VARARGS,
+     "Plays a Music PlayList."},
 
 	{"Quit", GemRB_Quit, METH_NOARGS,
      "Quits GemRB."},
