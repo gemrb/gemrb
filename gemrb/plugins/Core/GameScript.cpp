@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.142 2004/04/15 22:55:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.143 2004/04/16 15:06:12 avenger_teambg Exp $
  *
  */
 
@@ -1216,14 +1216,6 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	aC->Release();
 }
 
-/*
-Action* GameScript::GenerateAction(char* string, bool autoFree)
-{
-	Action* aC = GenerateAction( string, autoFree );
-	return aC;
-}
-*/
-
 /* returns actors that match the [x.y.z] expression */
 Targets* GameScript::EvaluateObject(Object* oC)
 {
@@ -1440,7 +1432,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 static void ParseIdsTarget(const char *&src, Object *&object)
 {
 	for(int i=0;i<ObjectFieldsCount;i++) {
-			GetIdsValue(src, ObjectIDSTableNames[i]);
+			object->objectFields[i]=GetIdsValue(src, ObjectIDSTableNames[i]);
 		if(*src!='.') {
 			break;
 		}
@@ -1580,10 +1572,14 @@ Action *GameScript::GenerateActionCore(const char *src, const char *str, int acI
 					src++;
 				}
 				action[i] = 0;
-				Action* act = GenerateAction( action );
+				Action* act = GenerateAction( action, autoFree );
 				act->objects[0] = newAction->objects[0];
-				act->objects[0]->IncRef();
-				newAction->Release();
+				//act->objects[0]->IncRef(); //avoid freeing of object
+				// newAction->Release(); //freeing action
+				//the previous hack doesn't work anymore
+				//because we create actions with autofree
+				newAction->objects[0] = NULL; //avoid freeing of object
+				delete newAction; //freeing action
 				newAction = act;
 			}
 			break;
@@ -1668,9 +1664,9 @@ Action *GameScript::GenerateActionCore(const char *src, const char *str, int acI
 Action* GameScript::GenerateAction(char* String, bool autoFree)
 {
 	strlwr( String );
-	if(InDebug) {
+	//if(InDebug) {
 		printf("Compiling:%s\n",String);
-	}
+	//}
 	int len = strlench(String,'(')+1; //including (
 	int i = actionsTable->FindString(String, len);
 	if (i<0) {
@@ -1678,9 +1674,9 @@ Action* GameScript::GenerateAction(char* String, bool autoFree)
 	}
 	char *src = String+len;
 	char *str = actionsTable->GetStringIndex( i )+len;
-	if(InDebug) {
+	//if(InDebug) {
 		printf("Match: %s vs. %s\n",src,str);
-	}
+	//}
 	return GenerateActionCore( src, str, i, autoFree);
 }
 
@@ -4742,6 +4738,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 	if(!tar) {
 		printf("[IEScript]: Target for dialog couldn't be found.\n");
+		parameters->objects[1]->Dump();
 		Sender->CurrentAction = NULL;
 		return;
 	}

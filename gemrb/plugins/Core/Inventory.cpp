@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.11 2004/04/15 10:21:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.12 2004/04/16 15:06:12 avenger_teambg Exp $
  *
  */
 
@@ -144,6 +144,30 @@ void Inventory::DestroyItem(const char *resref, ieDword flags)
 		delete item;
 		Slots[slot] = NULL;
 	}
+}
+
+CREItem *Inventory::GetItem(unsigned int slot, unsigned int count)
+{
+	CREItem *item;
+
+	if (slot>=Slots.size() ) {
+		printf("Invalid slot!\n");
+		abort();
+	}
+	item = Slots[slot];
+	if(!count || !(item->Flags&IE_ITEM_STACKED) ) {
+		Slots[slot] = NULL;
+		return item;
+	}
+	if(count >= item->Usages[0]) {
+		Slots[slot] = NULL;
+		return item;
+	}
+
+	CREItem *returned = new CREItem(*item);
+	item->Usages[0]-=count;
+	returned->Usages[0]=count;
+	return returned;
 }
 
 void Inventory::SetSlotItem(CREItem* item, unsigned int slot)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.7 2004/04/13 19:29:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.8 2004/04/16 15:06:12 avenger_teambg Exp $
  *
  */
 
@@ -95,9 +95,9 @@ public:
 	/** sets inventory size, for the first time */
 	void SetSlotCount(unsigned int size);
 
-	/** returns CREItem in specified slot. if count != -1 it
+	/** returns CREItem in specified slot. if count !=0 it
 	** splits the item and returns only requuested amount */
-	CREItem* GetItem(int slot, int count = -1) { return NULL; };
+	CREItem* GetItem(unsigned int slot, unsigned int count = 0);
 
 	/** adds CREItem to the inventory. If slot == -1, finds
 	** first eligible slot, eventually splitting the item to
