@@ -937,9 +937,12 @@ void GameControl::DialogChoose(int choose)
 		Window * win = core->GetWindow(index);
 		if(core->GetDictionary()->Lookup("MessageTextArea", index)) {
 			TextArea * ta = (TextArea*)win->GetControl(index);
+printf("%d\n",choose);
 			if(choose == -1)
 				ds = dlg->GetState(0);
 			else {
+				if(ds->transitionsCount<=choose)
+					return;
 				DialogTransition * tr = ds->transitions[choose];
 				if(tr->Flags & 8) {
 					speaker->DeleteAction(speaker->CurrentAction);
@@ -951,6 +954,7 @@ void GameControl::DialogChoose(int choose)
 					core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
 					DisableMouse = false;
 					Dialogue = false;
+					ta->SetMinRow(false);
 					return;
 				}					
 				if(tr->action) {
@@ -970,6 +974,7 @@ void GameControl::DialogChoose(int choose)
 			ta->AppendText("[/p]", i);
 			ta->AppendText("", -1);
 			free(string);
+			ta->SetMinRow(true);
 			for(int x = 0; x < ds->transitionsCount; x++) {
 				if(ds->transitions[x]->Flags & 2) {
 					bool ret = true;

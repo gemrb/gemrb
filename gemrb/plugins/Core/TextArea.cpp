@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.38 2003/12/29 16:26:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.39 2004/01/07 19:25:00 avenger_teambg Exp $
  *
  */
 
@@ -31,6 +31,7 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {
 	rows = 0;
 	startrow = 0;
+	minrow = 0;
 	seltext = -1;
 	selline = -1;
 	sb = NULL;
@@ -186,6 +187,13 @@ int TextArea::SetText(const char * text, int pos)
 	core->RedrawAll();
 	return 0;
 }
+
+void TextArea::SetMinRow(bool enable)
+{
+  if(enable) minrow=lines.size();
+  else minrow=0;
+}
+
 /** Appends a String to the current Text */
 int TextArea::AppendText(const char * text, int pos)
 {
@@ -234,7 +242,20 @@ void TextArea::SetFonts(Font * init, Font * text)
 /** Key Press Event */
 void TextArea::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
-	
+	if((Key>='1') && (Key<='9')) {
+		//Actually selectable=false for dialogs
+		if(!Selectable) {
+			Window * win = core->GetWindow(0);
+			if(win) {
+				GameControl * gc = (GameControl*)win->GetControl(0);
+				if(gc->ControlType == IE_GUI_GAMECONTROL) {
+					if(gc->Dialogue) {
+						gc->DialogChoose(Key-'1');
+					}
+				}
+			}
+		}
+	}
 }
 /** Special Key Press */
 void TextArea::OnSpecialKeyPress(unsigned char Key)
@@ -266,6 +287,7 @@ void TextArea::SetRow(int row)
 void TextArea::SetSelectable(bool val)
 {
 	Selectable=val;
+	if(Selectable) minrow=0;
 }
 
 void TextArea::CalcRowCount()
@@ -337,6 +359,8 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned char Butto
 	if((x <= Width) && (y <= (Height-5)) && (seltext != -1)) {
 		selline = seltext;
 		if(strnicmp(lines[seltext], "[s=", 3) == 0) {
+			if(minrow>seltext)
+				return;
 			unsigned long idx;
 			size_t len = strlen(lines[seltext]);
 			sscanf(lines[seltext], "[s=%d,", &idx);
