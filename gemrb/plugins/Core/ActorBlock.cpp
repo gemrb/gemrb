@@ -18,6 +18,10 @@ Scriptable::Scriptable(ScriptableType type)
 	textDisplaying = 0;
 	timeStartDisplaying = 0;
 	scriptName[0] = 0;
+	LastTrigger = NULL;
+	Clicker = NULL;
+	LastEntered = NULL;
+	Active = true;
 }
 
 Scriptable::~Scriptable(void)
@@ -61,6 +65,11 @@ void Scriptable::SetScriptName(char * text)
 {
 	strncpy(scriptName, text, 32);
 	scriptName[32] = 0;
+}
+
+void Scriptable::ExecuteScript(GameScript * Script)
+{
+	Script->Update(this);
 }
 
 /********************
@@ -349,3 +358,30 @@ void Door::SetCursor(unsigned char CursorIndex)
 {
 	Cursor = CursorIndex;
 }
+
+/**************
+ * InfoPoint Class *
+ **************/
+
+InfoPoint::InfoPoint(void) : Highlightable(ST_TRIGGER) 
+{
+	Name[0] = 0;
+	ipType = 0;
+	Destination[0] = 0;
+	EntranceName[0] = 0;
+	Flags = 0;
+	TrapDetectionDifficulty = 0;
+	TrapRemovalDifficulty = 0;
+	Trapped = 0;
+	TrapDetected = 0;
+	TrapLaunchX = 0; 
+	TrapLaunchY = 0;
+	KeyResRef[0] = 0;
+	DialogResRef[0] = 0;
+}
+
+InfoPoint::~InfoPoint(void)
+{
+	
+}
+
