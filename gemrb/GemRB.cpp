@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.28 2004/08/01 15:35:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.29 2004/10/17 10:25:20 avenger_teambg Exp $
  *
  */
 
@@ -57,8 +57,8 @@ int main(int argc, char** argv)
 	Color fpscolor = {0xff,0xff,0xff,0xff}, fpsblack = {0x00,0x00,0x00,0xff};
 	unsigned long frame = 0, time, timebase;
 	GetTime(timebase);
-	double frames = 0.0;
-	Region bg( 0, 0, 100, 30 );
+	int frames = 0;
+	Region bg( 0, 0, 50, 20 );
 	Color* palette = core->GetVideoDriver()->CreatePalette( fpscolor, fpsblack );
 	do {
 		if (core->ChangeScript) {
@@ -71,15 +71,14 @@ int main(int argc, char** argv)
 			frame++;
 			GetTime( time );
 			if (time - timebase > 1000) {
-				frames = ( frame * 1000.0 / ( time - timebase ) );
+				frames = ( frame * 1000 / ( time - timebase ) );
 				timebase = time;
 				frame = 0;
-				sprintf( fpsstring, "%.3f fps", frames );
+				sprintf( fpsstring, "%d fps", frames );
 			}
 			core->GetVideoDriver()->DrawRect( bg, fpsblack );
-			fps->Print( Region( 0, 0, 100, 20 ),
-				    ( unsigned char * ) fpsstring, palette,
-				    IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
+			fps->Print( bg, ( unsigned char *) fpsstring, palette,
+				IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_MIDDLE, true);
 		}
 	} while (core->GetVideoDriver()->SwapBuffers() == GEM_OK);
 	core->GetVideoDriver()->FreePalette( palette );
