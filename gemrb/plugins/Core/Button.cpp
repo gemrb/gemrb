@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.62 2004/05/29 11:15:19 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.63 2004/06/24 17:53:17 edheldil Exp $
  *
  */
 
@@ -56,6 +56,7 @@ Button::Button(bool Clear)
 	this->Clear = Clear;
 	State = IE_GUI_BUTTON_UNPRESSED;
 	ButtonOnPress[0] = 0;
+	ButtonOnShiftPress[0] = 0;
 	MouseEnterButton[0] = 0;
 	MouseLeaveButton[0] = 0;
 	MouseOverButton[0] = 0;
@@ -370,7 +371,11 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 			else
 				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_RELEASE0] );
 		}
-		RunEventHandler( ButtonOnPress );
+		if (Mod == 1 and ButtonOnShiftPress[0])
+			RunEventHandler( ButtonOnShiftPress );
+		else
+			RunEventHandler( ButtonOnPress );
+		
 	}
 }
 
@@ -457,6 +462,9 @@ void Button::SetEvent(char* funcName, int eventType)
 			break;
 		case 3:
 			strcpy( MouseLeaveButton, funcName );
+			break;
+		case 4:
+			strcpy( ButtonOnShiftPress, funcName );
 			break;
 	}
 

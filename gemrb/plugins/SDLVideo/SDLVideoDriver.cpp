@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.69 2004/05/29 11:15:21 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.70 2004/06/24 17:53:15 edheldil Exp $
  *
  */
 
@@ -182,7 +182,7 @@ int SDLVideoDriver::SwapBuffers(void)
 					break;
 
 				case SDL_KEYUP:
-					 {
+					{
 						//unsigned char key = Convert(event.key.keysym.sym, event.key.keysym.mod);
 						unsigned char key = event.key.keysym.sym;
 						if (Evnt && ( key != 0 ))
@@ -327,9 +327,9 @@ int SDLVideoDriver::SwapBuffers(void)
 				break;
 
 			case SDL_KEYUP:
-				 {
+				{
 					//unsigned char key = Convert(event.key.keysym.sym, event.key.keysym.mod);
-					unsigned char key = event.key.keysym.sym & 0xff;
+					unsigned int key = event.key.keysym.sym;
 					if (Evnt && ( key != 0 ))
 						Evnt->KeyRelease( key, event.key.keysym.mod );
 				}
@@ -429,7 +429,7 @@ int SDLVideoDriver::SwapBuffers(void)
 					CursorPos.y = event.button.y - mouseAdjustY[CursorIndex];
 					if (Evnt)
 						Evnt->MouseDown( event.button.x, event.button.y,
-								1 << ( event.button.button - 1 ), 0 );
+								1 << ( event.button.button - 1 ), SDL_GetModState() );
 				}
 				break;
 
@@ -442,7 +442,7 @@ int SDLVideoDriver::SwapBuffers(void)
 					CursorPos.y = event.button.y - mouseAdjustY[CursorIndex];
 					if (Evnt)
 						Evnt->MouseUp( event.button.x, event.button.y,
-								1 << ( event.button.button - 1 ), 0 );
+								1 << ( event.button.button - 1 ), SDL_GetModState() );
 				}
 				break;
 

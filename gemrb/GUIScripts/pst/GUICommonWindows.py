@@ -16,13 +16,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.10 2004/05/29 11:15:14 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.11 2004/06/24 17:53:18 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
 
 import GemRB
 from GUIDefines import *
+
+FRAME_PC_SELECTED = 0
+FRAME_PC_TARGET   = 1
 
 TimeWindow = None
 PortWindow = None

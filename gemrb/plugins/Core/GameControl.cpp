@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.142 2004/05/25 16:16:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.143 2004/06/24 17:53:17 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -310,7 +310,7 @@ void GameControl::SelectActor(int whom)
 /** Key Release Event */
 void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
-  unsigned int i;
+	unsigned int i;
 
 	switch (Key) {
 		case '=':

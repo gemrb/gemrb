@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.29 2004/05/29 11:15:19 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.30 2004/06/24 17:53:17 edheldil Exp $
  *
  */
 
@@ -131,6 +131,7 @@ public: // Public Events
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Button Pressed Event Script Function Name */
 	EventHandler ButtonOnPress;
+	EventHandler ButtonOnShiftPress;
 	EventHandler MouseEnterButton;
 	EventHandler MouseLeaveButton;
 	EventHandler MouseOverButton;

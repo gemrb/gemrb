@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.16 2004/04/26 15:15:56 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.17 2004/06/24 17:53:18 edheldil Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -46,6 +46,7 @@ IE_GUI_BUTTON_ON_PRESS    = 0x00000000
 IE_GUI_MOUSE_OVER_BUTTON  = 0x00000001
 IE_GUI_MOUSE_ENTER_BUTTON = 0x00000002
 IE_GUI_MOUSE_LEAVE_BUTTON = 0x00000003
+IE_GUI_BUTTON_ON_SHIFT_PRESS = 0x00000004
 IE_GUI_SLIDER_ON_CHANGE   = 0x02000000
 IE_GUI_EDIT_ON_CHANGE     = 0x03000000
 IE_GUI_TEXTAREA_ON_CHANGE = 0x05000000

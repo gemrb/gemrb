@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.168 2004/05/29 11:15:19 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.169 2004/06/24 17:53:16 edheldil Exp $
  *
  */
 
@@ -2686,16 +2686,44 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_IsPlayerSelected__doc,
-"IsPlayerSelected(Slot) => bool\n\n"
-"Returns true if the player was selected." );
+PyDoc_STRVAR( GemRB_GameSelectPC__doc,
+"GameSelectPC(Slot, Selected)\n\n"
+"Selects or deselects PC. Does not influence other party members." );
 
-static PyObject* GemRB_IsPlayerSelected(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
+{
+	int PlayerSlot, Selected;
+
+	if (!PyArg_ParseTuple( args, "ii", &PlayerSlot, &Selected )) {
+		return AttributeError( GemRB_GameSelectPC__doc );
+	}
+	Game *game = core->GetGame();
+	if(!game) {
+		return NULL;
+	}
+	PlayerSlot = game->FindPlayer( PlayerSlot );
+	Actor* MyActor = game->GetPC( PlayerSlot );
+	if (!MyActor) {
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+	printf("Selected: %d: %d -> %d\n", PlayerSlot, MyActor->IsSelected(), Selected);
+	MyActor->Select( (bool)Selected );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GameIsPCSelected__doc,
+"GameIsPCSelected(Slot) => bool\n\n"
+"Returns true if the PC is selected." );
+
+static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot;
 
 	if (!PyArg_ParseTuple( args, "i", &PlayerSlot )) {
-		return AttributeError( GemRB_IsPlayerSelected__doc );
+		return AttributeError( GemRB_GameIsPCSelected__doc );
 	}
 	Game *game = core->GetGame();
 	if(!game) {
@@ -2706,7 +2734,38 @@ static PyObject* GemRB_IsPlayerSelected(PyObject * /*self*/, PyObject* args)
 	if (!MyActor) {
 		return Py_BuildValue( "s", "");
 	}
-	return Py_BuildValue("d", MyActor->IsSelected() );
+	return Py_BuildValue("i", MyActor->IsSelected() );
+}
+
+PyDoc_STRVAR( GemRB_GameSelectPCSingle__doc,
+"GameSelectPCSingle(index)\n\n"
+"Selects one PC in non-walk environment (i.e. in shops, inventory,...)" );
+
+static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
+{
+	int index;
+
+	if (!PyArg_ParseTuple( args, "i", &index )) {
+		return AttributeError( GemRB_GameSelectPCSingle__doc );
+	}
+
+	core->GetGame()->SelectPCSingle( index );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
+"GameGetSelectedPCSingle() => int\n\n"
+"Returns index of the selected PC in non-walk environment (i.e. in shops, inventory,...)" );
+
+static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* args)
+{
+	if (!PyArg_ParseTuple( args, "" )) {
+		return AttributeError( GemRB_GameGetSelectedPCSingle__doc );
+	}
+
+	return Py_BuildValue( "i", core->GetGame()->GetSelectedPCSingle() );
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerPortrait__doc,
@@ -3119,39 +3178,6 @@ static PyObject* GemRB_GetStoreRoomPrices(PyObject * /*self*/, PyObject* args)
 	return p;
 }
 
-PyDoc_STRVAR( GemRB_GameSelectPCSingle__doc,
-"GameSelectPCSingle(index)\n\n"
-"Selects one PC in non-walk environment (i.e. in shops, inventory,...)" );
-
-static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
-{
-	int index;
-
-	if (!PyArg_ParseTuple( args, "i", &index )) {
-		return AttributeError( GemRB_GameSelectPCSingle__doc );
-	}
-
-	core->GetGame()->SelectPCSingle( index );
-
-	Py_INCREF( Py_None );
-	return Py_None;
-}
-
-PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
-"GameGetSelectedPCSingle() => int\n\n"
-"Returns index of the selected PC in non-walk environment (i.e. in shops, inventory,...)" );
-
-static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* args)
-{
-	if (!PyArg_ParseTuple( args, "" )) {
-		return AttributeError( GemRB_GameGetSelectedPCSingle__doc );
-	}
-
-	return Py_BuildValue( "i", core->GetGame()->GetSelectedPCSingle() );
-}
-
-
-
 PyDoc_STRVAR( GemRB_ExecuteString__doc,
 "ExecuteString(String)\n\n"
 "Executes an In-Game Script Action in the current Area Script Context" );
@@ -3377,8 +3403,14 @@ static PyMethodDef GemRBMethods[] = {
 	GemRB_SetPlayerStat__doc},
 	{"GetPlayerStat", GemRB_GetPlayerStat, METH_VARARGS,
 	GemRB_GetPlayerStat__doc},
-	{"IsPlayerSelected", GemRB_IsPlayerSelected, METH_VARARGS,
-	GemRB_IsPlayerSelected__doc},
+	{"GameSelectPC", GemRB_GameSelectPC, METH_VARARGS,
+	GemRB_GameSelectPC__doc},
+	{"GameIsPCSelected", GemRB_GameIsPCSelected, METH_VARARGS,
+	GemRB_GameIsPCSelected__doc},
+	{"GameSelectPCSingle", GemRB_GameSelectPCSingle, METH_VARARGS,
+	GemRB_GameSelectPCSingle__doc},
+	{"GameGetSelectedPCSingle", GemRB_GameGetSelectedPCSingle, METH_VARARGS,
+	GemRB_GameGetSelectedPCSingle__doc},
 	{"GetPlayerPortrait", GemRB_GetPlayerPortrait, METH_VARARGS,
 	GemRB_GetPlayerPortrait__doc},
 	{"GetPlayerName", GemRB_GetPlayerName, METH_VARARGS,
@@ -3399,10 +3431,6 @@ static PyMethodDef GemRBMethods[] = {
 	GemRB_GetStoreName__doc},
 	{"GetStoreRoomPrices", GemRB_GetStoreRoomPrices, METH_VARARGS,
 	GemRB_GetStoreRoomPrices__doc},
-	{"GameSelectPCSingle", GemRB_GameSelectPCSingle, METH_VARARGS,
-	GemRB_GameSelectPCSingle__doc},
-	{"GameGetSelectedPCSingle", GemRB_GameGetSelectedPCSingle, METH_VARARGS,
-	GemRB_GameGetSelectedPCSingle__doc},
 	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
 	GemRB_InvalidateWindow__doc},
 	{"EnableCheatKeys", GemRB_EnableCheatKeys, METH_VARARGS,
