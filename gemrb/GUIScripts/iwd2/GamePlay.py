@@ -128,13 +128,13 @@ def MaxHPPress():
 def FeedbackPress():
 	GemRB.SetVisible(GamePlayWindow, 0)
 	GemRB.UnloadWindow(GamePlayWindow)
-	GemRB.SetNextScript("GUIOPT9")
+	GemRB.SetNextScript("Feedback")
 	return
 	
 def AutoPausePress():
 	GemRB.SetVisible(GamePlayWindow, 0)
 	GemRB.UnloadWindow(GamePlayWindow)
-	GemRB.SetNextScript("GUIOPT10")
+	GemRB.SetNextScript("AutoPause")
 	return
 	
 def OkPress():
