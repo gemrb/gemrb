@@ -4,12 +4,12 @@
 
 #define THIS_FILE "dictionary.cpp"
 
-#define MYASSERT(f) \
+/*#define MYASSERT(f) \
   if(!(f))  \
   {  \
   printf("Assertion failed: %s %d",THIS_FILE, __LINE__); \
 		abort(); \
-  }
+  }*/
 
 /////////////////////////////////////////////////////////////////////////////
 // inlines

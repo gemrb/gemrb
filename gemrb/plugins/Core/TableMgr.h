@@ -48,6 +48,10 @@ public:
   /** Returns a pointer to a zero terminated 2da element,
       0,0 returns the default value, it may return NULL */
   virtual char *QueryField(int row = 0, int column = 0) const = 0;
+  /** Returns a pointer to a zero terminated 2da element,
+      uses column name and row name to search the field,
+	  may return NULL */
+  virtual char *QueryField(const char* row, const char* column) const = 0;
 
   /** Opens a Table File */
   virtual bool Open(DataStream * stream, bool autoFree = false) = 0;

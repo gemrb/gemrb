@@ -98,6 +98,10 @@ unsigned long CachedFileStream::Size()
 /** No descriptions */
 int CachedFileStream::ReadLine(void * buf, int maxlen)
 {
+	if(feof(str))
+		return -1;
+	if(Pos >= size)
+		return -1;
 	unsigned char *p = (unsigned char*)buf;
 	int i = 0;
 	while(i < (maxlen-1)) {
@@ -109,9 +113,9 @@ int CachedFileStream::ReadLine(void * buf, int maxlen)
 			break;
 		if(ch == '\t')
 			ch = ' ';
-    if(ch != '\r')
+		if(ch != '\r')
 			p[i++] = ch;
 	}
 	p[i] = 0;
-	return i-1;
+	return i;
 }

@@ -63,6 +63,122 @@ static PyObject * GemRB_LoadWindow(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ret);
 }
 
+static PyObject * GemRB_LoadTable(PyObject *self, PyObject *args)
+{
+	char *string;
+
+	if(!PyArg_ParseTuple(args, "s", &string)) {
+		printMessage("GUIScript", "Syntax Error: Expected String\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	int ind = core->LoadTable(string);
+	if(ind == -1)
+		return NULL;
+
+	return Py_BuildValue("i", ind);
+}
+
+static PyObject * GemRB_UnLoadTable(PyObject *self, PyObject *args)
+{
+	int ti;
+
+	if(!PyArg_ParseTuple(args, "i", &ti)) {
+		printMessage("GUIScript", "Syntax Error: Expected Integer\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	int ind = core->DelTable(ti);
+	if(ind == -1)
+		return NULL;
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_GetTable(PyObject *self, PyObject *args)
+{
+	char *string;
+
+	if(!PyArg_ParseTuple(args, "s", &string)) {
+		printMessage("GUIScript", "Syntax Error: Expected String\n", LIGHT_RED);
+		return NULL;
+	}
+
+	int ind = core->GetIndex(string);
+	if(ind == -1)
+		return NULL;
+
+	return Py_BuildValue("i", ind);
+}
+
+static PyObject * GemRB_GetTableValue(PyObject *self, PyObject *args)
+{
+	PyObject *ti, *row, *col;
+
+	if(PyArg_UnpackTuple(args, "ref", 3, 3, &ti, &row, &col)) {
+		if(!PyObject_TypeCheck(ti, &PyInt_Type)) {
+			printMessage("GUIScript", "Syntax Error: GetTableValue(Table, RowIndex/RowString, ColIndex/ColString)\n", LIGHT_RED);
+			return NULL;
+		}
+		int TableIndex = PyInt_AsLong(ti);
+		if((!PyObject_TypeCheck(row, &PyInt_Type)) && (!PyObject_TypeCheck(row, &PyString_Type))) {
+			printMessage("GUIScript", "Syntax Error: GetTableValue(Table, RowIndex/RowString, ColIndex/ColString)\n", LIGHT_RED);
+			return NULL;
+		}
+		if((!PyObject_TypeCheck(col, &PyInt_Type)) && (!PyObject_TypeCheck(col, &PyString_Type))) {
+			printMessage("GUIScript", "Syntax Error: GetTableValue(Table, RowIndex/RowString, ColIndex/ColString)\n", LIGHT_RED);
+			return NULL;
+		}
+		if(PyObject_TypeCheck(row, &PyInt_Type) && (!PyObject_TypeCheck(col, &PyInt_Type))) {
+			printMessage("GUIScript", "Type Error: RowIndex/RowString and ColIndex/ColString must be the same type\n", LIGHT_RED);
+			return NULL;
+		}
+		if(PyObject_TypeCheck(row, &PyString_Type) && (!PyObject_TypeCheck(col, &PyString_Type))) {
+			printMessage("GUIScript", "Type Error: RowIndex/RowString and ColIndex/ColString must be the same type\n", LIGHT_RED);
+			return NULL;
+		}
+		if(PyObject_TypeCheck(row, &PyString_Type)) {
+			char * rows = PyString_AsString(row);
+			char * cols = PyString_AsString(col);
+			TableMgr * tm = core->GetTable(TableIndex);
+			char * ret = tm->QueryField(rows, cols);
+			if(ret == NULL)
+				return NULL;
+			if((ret[0] >= '0') && (ret[0] <= '9')) {
+				if(ret[1] == 'x') {
+					int val;
+					sscanf(ret, "0x%x", &val);
+					return Py_BuildValue("i", val);
+				}
+				else
+					return Py_BuildValue("i", atoi(ret));
+			}
+			return Py_BuildValue("s", ret);
+		}
+		else {
+			int rowi = PyInt_AsLong(row);
+			int coli = PyInt_AsLong(col);
+			TableMgr * tm = core->GetTable(TableIndex);
+			char * ret = tm->QueryField(rowi, coli);
+			if(ret == NULL)
+				return NULL;
+			if((ret[0] >= '0') && (ret[0] <= '9')) {
+				if(ret[1] == 'x') {
+					int val;
+					sscanf(ret, "0x%x", &val);
+					return Py_BuildValue("i", val);
+				}
+				else
+					return Py_BuildValue("i", atoi(ret));
+			}
+			return Py_BuildValue("s", ret);
+		}
+	}
+	
+	return NULL;
+}
+
 static PyObject * GemRB_GetControl(PyObject *self, PyObject *args)
 {
 	int WindowIndex, ControlID;
@@ -468,6 +584,18 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"LoadWindow", GemRB_LoadWindow, METH_VARARGS,
      "Returns a Window."},
+
+ 	{"LoadTable", GemRB_LoadTable, METH_VARARGS,
+     "Loads a 2DA Table."},
+
+	{"UnLoadTable", GemRB_UnLoadTable, METH_VARARGS,
+     "UnLoads a 2DA Table."},
+
+	{"GetTable", GemRB_GetTable, METH_VARARGS,
+     "Returns a Loaded 2DA Table."},
+
+	{"GetTableValue", GemRB_GetTableValue, METH_VARARGS,
+     "Returns a field of a 2DA Table."},
 
 	{"GetControl", GemRB_GetControl, METH_VARARGS,
      "Returns a control in a Window."},

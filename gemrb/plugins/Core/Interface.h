@@ -22,6 +22,13 @@
 #include "SoundMgr.h"
 #include "Variables.h"
 #include "MusicMgr.h"
+#include "TableMgr.h"
+
+typedef struct Table {
+	TableMgr * tm;
+	char ResRef[8];
+	bool free;
+} Table;
 
 #ifdef WIN32
 
@@ -57,6 +64,7 @@ private:
 	std::vector<Window*> windows;
 	Variables * vars;
 	MusicMgr * music;
+	std::vector<Table> tables;
 public:
 	Interface(void);
 	~Interface(void);
@@ -111,6 +119,14 @@ public:
 	Variables * GetDictionary();
 	/** Get the Music Manager */
 	MusicMgr * GetMusicMgr();
+	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
+	int LoadTable(const char * ResRef);
+	/** Gets the index of a loaded table, returns -1 on error */
+	int GetIndex(const char * ResRef);
+	/** Gets a Loaded Table by its index, returns NULL on error */
+	TableMgr * GetTable(int index);
+	/** Frees a Loaded Table, returns false on error, true on success */
+	bool DelTable(int index);
 private:
 	bool LoadConfig(void);
 public:

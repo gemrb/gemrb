@@ -24,7 +24,7 @@ public:
 	int h;
 int DEBUG;
 	Region(const Region & rgn);
-	Region(Region & rgn);
+	//Region(Region & rgn);
 	Region & operator=(Region & rgn);
 	bool operator==(Region & rgn);
 	bool operator!=(Region & rgn);

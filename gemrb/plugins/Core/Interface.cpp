@@ -87,6 +87,13 @@ Interface::~Interface(void)
 		delete(guiscript);
 	if(vars)
 		delete(vars);
+	std::vector<Table>::iterator t;
+	for(t = tables.begin(); t != tables.end(); ++t) {
+		if(!(*t).free) {
+			core->FreeInterface((*t).tm);
+			(*t).free = true;
+		}
+	}
 	delete(console);
 	delete(plugin);
 }
@@ -767,4 +774,72 @@ Variables * Interface::GetDictionary()
 MusicMgr * Interface::GetMusicMgr()
 {
 	return music;
+}
+/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
+int Interface::LoadTable(const char * ResRef)
+{
+	int ind = GetIndex(ResRef);
+	if(ind != -1)
+		return ind;
+	DataStream * str = key->GetResource(ResRef, IE_2DA_CLASS_ID);
+	if(!str)
+		return -1;
+	TableMgr * tm = (TableMgr*)plugin->GetPlugin(IE_2DA_CLASS_ID);
+	if(!tm) {
+		delete(str);
+		return -1;
+	}
+	if(!tm->Open(str, true)) {
+		delete(str);
+		core->FreeInterface(tm);
+		return -1;
+	}
+	Table t;
+	t.free = false;
+	strncpy(t.ResRef, ResRef, 8);
+	t.tm = tm;
+	ind = -1;
+	for(int i = 0; i < tables.size(); i++) {
+		if(tables[i].free) {
+			ind = i;
+			break;
+		}
+	}
+	if(ind != -1) {
+		tables[ind] = t;
+		return ind;
+	}
+	tables.push_back(t);
+	return tables.size()-1;
+}
+/** Gets the index of a loaded table, returns -1 on error */
+int Interface::GetIndex(const char * ResRef)
+{
+	for(int i = 0; i < tables.size(); i++) {
+		if(tables[i].free)
+			continue;
+		if(strnicmp(tables[i].ResRef, ResRef, 8) == 0)
+			return i;
+	}
+	return -1;
+}
+/** Gets a Loaded Table by its index, returns NULL on error */
+TableMgr * Interface::GetTable(int index)
+{
+	if(index >= tables.size())
+		return NULL;
+	if(tables[index].free)
+		return NULL;
+	return tables[index].tm;
+}
+/** Frees a Loaded Table, returns false on error, true on success */
+bool Interface::DelTable(int index)
+{
+	if(index >= tables.size())
+		return false;
+	if(tables[index].free)
+		return false;
+	core->FreeInterface(tables[index].tm);
+	tables[index].free = true;
+	return true;
 }

@@ -1,6 +1,7 @@
 #ifndef VIDEOMODES_H
 #define VIDEOMODES_H
 
+#include "../../includes/win32def.h"
 #include "VideoMode.h"
 #include <vector>
 

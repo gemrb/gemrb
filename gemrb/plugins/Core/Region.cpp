@@ -11,14 +11,14 @@ Region::~Region(void)
 {
 }
 
-Region::Region(Region & rgn)
+/*Region::Region(Region & rgn)
 {
 	x = rgn.x;
 	y = rgn.y;
 	w = rgn.w;
 	h = rgn.h;
 DEBUG=rgn.DEBUG;
-}
+}*/
 
 Region::Region(const Region & rgn)
 {
