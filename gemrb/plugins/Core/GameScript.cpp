@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.6 2003/12/14 01:47:13 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.7 2003/12/14 16:37:17 avenger_teambg Exp $
  *
  */
 
@@ -89,11 +89,13 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType)
 		blocking[202] = true;
 		actions[203] = FadeFromColor;
 		blocking[203] = true;
+		//please note that IWD and SoA are different from action #230
 		actions[254] = ScreenShake;
 		blocking[254] = true;
 		actions[269] = DisplayStringHead;
 		actions[272] = CreateVisualEffect;
 		actions[273] = CreateVisualEffectObject;
+		actions[307] = SG;
 		actions[311] = DisplayStringWait;
 		blocking[311] = true;
 		if(strcmp(core->GameType, "pst") == 0) {
@@ -616,6 +618,11 @@ int GameScript::False(GameScript * /*Sender*/, Trigger */*parameters*/)
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
+
+void GameScript::SG(GameScript * Sender, Action * parameters)
+{
+	globals->SetAt(&parameters->string0Parameter[0], parameters->int0Parameter);
+}
 
 void GameScript::SetGlobal(GameScript * Sender, Action * parameters)
 {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.5 2003/12/14 01:47:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.6 2003/12/14 16:37:17 avenger_teambg Exp $
  *
  */
 
@@ -170,6 +170,7 @@ private: //Script Functions
 	static int  General(GameScript * Sender, Trigger * parameters);
 	//Actions
 	static void SetGlobal(GameScript * Sender, Action * parameters);
+	static void SG(GameScript * Sender, Action * parameters);
 	static void TriggerActivation(GameScript * Sender, Action * parameters);
 	static void FadeToColor(GameScript * Sender, Action * parameters);
 	static void FadeFromColor(GameScript * Sender, Action * parameters);
