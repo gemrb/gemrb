@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.23 2003/12/22 21:06:13 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.24 2003/12/23 17:31:33 balrog994 Exp $
  *
  */
 
@@ -112,6 +112,8 @@ void EventMgr::DelWindow(unsigned short WindowID)
 void EventMgr::MouseMove(unsigned short x, unsigned short y)
 {
 	if(windows.size() == 0)
+		return;
+	if(!lastW)
 		return;
 	std::vector<int>::iterator t;
 	std::vector<Window*>::iterator m;
