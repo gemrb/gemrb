@@ -33,7 +33,7 @@
 #define IE_ANI_ATTACK_JAB		13
 #define IE_ANI_EMERGE			14
 #define IE_ANI_HIDE				15
-#define IE_ANI_SLEEP			17
+#define IE_ANI_SLEEP			16
 
 #define IE_ANI_CODE_MIRROR		0
 #define IE_ANI_ONE_FILE			1
