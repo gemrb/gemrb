@@ -1,3 +1,22 @@
+GemRB v0.2.2.8 Added Features:
+- Bug Fixes:
+  - Fixed a Big Bug with the Map Displayer: 
+      It was crashing while trying to display
+      the left/top border of an area when the GUI was displayed.
+  - Fixed a Bug in the MUS Importer:
+      Error while decoding IWD2 Music PlayLists
+- Added Features:
+  - Full ACM Audio Streaming (no more WAV file in the Cache :)
+  - Added Travel Triggers support
+  - Added Area Travelling (now you can enter doors, etc... :)
+- Enhancements:
+  - Support for 'any-size-music-playlist' (the original engine supports up to 100 entries in a music playlist)
+  - Music JukeBox ;) (actually implemented on BG2 and IWD2. Enter the Movies menù and click on the Credits button :)
+- Cheat/Debug Codes Added:
+  - CTRL+T: Teletransport the current Actor to the mouse position
+- Added In-Game Script OpCodes:
+  - StartDialogue: it is a simple hack using the Dialogue OpCode
+
 GemRB v0.2.2.7 Added Features:
 - Bug Fixes:
   - Fixed a bug when loading GAMEV2.2 Files (IWD2 SaveGames)
