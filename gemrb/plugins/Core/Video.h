@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.29 2004/07/21 20:27:26 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.30 2004/08/03 20:21:58 avenger_teambg Exp $
  *
  */
 
@@ -52,8 +52,8 @@ public:
 	virtual bool ToggleFullscreenMode() = 0;
 	virtual int SwapBuffers(void) = 0;
 	virtual bool ToggleGrabInput() = 0;
-	virtual Sprite2D* CreateSprite(int w, int h, int bpp, DWORD rMask,
-		DWORD gMask, DWORD bMask, DWORD aMask, void* pixels, bool cK = false,
+	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
+		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK = false,
 		int index = 0) = 0;
 	virtual Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
 		void* palette, bool cK = false, int index = 0) = 0;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.33 2004/06/27 23:47:26 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.34 2004/08/03 20:21:58 avenger_teambg Exp $
  *
  */
 
@@ -52,8 +52,8 @@ public:
 	bool ToggleFullscreenMode();
 	int SwapBuffers(void);
 	bool ToggleGrabInput();
-	Sprite2D* CreateSprite(int w, int h, int bpp, DWORD rMask, DWORD gMask,
-		DWORD bMask, DWORD aMask, void* pixels, bool cK = false, int index = 0);
+	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask, ieDword gMask,
+		ieDword bMask, ieDword aMask, void* pixels, bool cK = false, int index = 0);
 	Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
 		void* palette, bool cK = false, int index = 0);
 	void FreeSprite(Sprite2D* spr);

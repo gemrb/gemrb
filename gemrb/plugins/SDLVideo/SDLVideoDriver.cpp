@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.77 2004/08/03 17:46:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.78 2004/08/03 20:21:58 avenger_teambg Exp $
  *
  */
 
@@ -67,7 +67,7 @@ int SDLVideoDriver::CreateDisplay(int width, int height, int bpp,
 	bool fullscreen)
 {
 	printMessage( "SDLVideo", "Creating display\n", WHITE );
-	DWORD flags = SDL_HWSURFACE;// | SDL_DOUBLEBUF;
+	ieDword flags = SDL_HWSURFACE;// | SDL_DOUBLEBUF;
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 	}
@@ -114,7 +114,7 @@ void SDLVideoDriver::SetDisplayTitle(char* title, char* icon)
 VideoModes SDLVideoDriver::GetVideoModes(bool fullscreen)
 {
 	SDL_Rect** modes;
-	DWORD flags = SDL_HWSURFACE;
+	ieDword flags = SDL_HWSURFACE;
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 	}
@@ -152,7 +152,7 @@ VideoModes SDLVideoDriver::GetVideoModes(bool fullscreen)
 
 bool SDLVideoDriver::TestVideoMode(VideoMode& vm)
 {
-	DWORD flags = SDL_HWSURFACE;
+	ieDword flags = SDL_HWSURFACE;
 	if (vm.GetFullScreen()) {
 		flags |= SDL_FULLSCREEN;
 	}
@@ -518,8 +518,8 @@ bool SDLVideoDriver::ToggleGrabInput()
 	}
 }
 
-Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, DWORD rMask,
-	DWORD gMask, DWORD bMask, DWORD aMask, void* pixels, bool cK, int index)
+Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
+	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
 	Sprite2D* spr = new Sprite2D();
 	void* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, bpp, w*( bpp / 8 ),
