@@ -55,3 +55,14 @@ void TextArea::SetFonts(Font * init, Font * text)
 	finit = init;
 	ftext = text;
 }
+
+/** Key Press Event */
+void TextArea::OnKeyPress(unsigned char Key, unsigned short Mod)
+{
+	
+}
+/** Special Key Press */
+void TextArea::OnSpecialKeyPress(unsigned char Key)
+{
+	
+}

@@ -202,10 +202,12 @@ void SDLVideoDriver::FreeSprite(Sprite2D * spr)
 	delete(spr);
 }
 
-void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor)
+void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Region * clip)
 {
 	//TODO: Add the destination surface and rect to the Blit Pipeline
 	SDL_Rect drect;
+	SDL_Rect t;
+	SDL_Rect *srect = NULL;
 	if(anchor) {
 		drect.x = x-spr->XPos;
 		drect.y = y-spr->YPos;
@@ -214,7 +216,34 @@ void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor)
 		drect.x = x-spr->XPos-Viewport.x;
 		drect.y = y-spr->YPos-Viewport.y;
 	}
-	SDL_BlitSurface((SDL_Surface*)spr->vptr, NULL, disp, &drect);
+	if(clip) {
+		if(drect.x < clip->x) {
+			if(clip->x >= (drect.x+spr->Width))
+				return;
+			t.x = clip->x-drect.x;
+			t.w = spr->Width-t.x;
+		}
+		else {
+			if(drect.x >= (clip->x+clip->w))
+				return;
+			t.x = 0;
+			t.w = spr->Width;
+		}
+		if(drect.y < clip->y) {
+			if(clip->y >= (drect.y+spr->Height))
+				return;
+			t.y = clip->y-drect.y;
+			t.h = spr->Height-t.y;
+		}
+		else {
+			if(drect.y >= (clip->y+clip->h))
+				return;
+			t.x = 0;
+			t.h = spr->Height;
+		}
+		srect = &t;
+	}
+	SDL_BlitSurface((SDL_Surface*)spr->vptr, srect, disp, &drect);
 	//Debug Addition: Draws a point to the x,y position
 	/*drect.x = x;
 	drect.y = y;

@@ -21,7 +21,7 @@ public:
 	Sprite2D *CreateSprite(int w, int h, int bpp, DWORD rMask, DWORD gMask, DWORD bMask, DWORD aMask, void* pixels, bool cK = false, int index = 0);
 	Sprite2D *CreateSprite8(int w, int h, int bpp, void* pixels, void* palette, bool cK = false, int index = 0);
 	void FreeSprite(Sprite2D * spr);
-	void BlitSprite(Sprite2D * spr, int x, int y, bool anchor = false);
+	void BlitSprite(Sprite2D * spr, int x, int y, bool anchor = false, Region * clip = NULL);
 	void SetCursor(Sprite2D * spr, int x, int y);
 	Region GetViewport(void);
 	void SetViewport(int x, int y);

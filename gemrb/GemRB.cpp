@@ -70,7 +70,7 @@ int main(int argc, char ** argv)
 	}
 	printStatus("OK", LIGHT_GREEN);
 	printMessage("GemRB", "Loading GUI File...\n", WHITE);
-	DataStream * chu = core->GetResourceMgr()->GetResource("GUIW\0", IE_CHU_CLASS_ID);
+	DataStream * chu = core->GetResourceMgr()->GetResource("GUIOPT\0", IE_CHU_CLASS_ID);
 	if(chu == NULL) {
 		printMessage("GemRB", "Error loading GUI File\n", LIGHT_RED);
 		printf("No CHUFile present...\n");
@@ -80,11 +80,13 @@ int main(int argc, char ** argv)
 	printMessage("GemRB", "GUI File Loaded!\n", LIGHT_GREEN);
 	textcolor(WHITE);
 	wmgr->Open(chu, true);
-	Window * win[1];
-	win[0] = wmgr->GetWindow(9);
+	Window * win[3];
+	win[0] = wmgr->GetWindow(6);
+	win[1] = wmgr->GetWindow(0);
+	win[2] = wmgr->GetWindow(1);
 	core->GetEventMgr()->AddWindow(win[0]);
-	//win[1] = wmgr->GetWindow(0);
-	//win[2] = wmgr->GetWindow(1);
+	core->GetEventMgr()->AddWindow(win[1]);
+	core->GetEventMgr()->AddWindow(win[2]);
 	//Window * win2 = wmgr->GetWindow(1);
 	//Window * win3 = wmgr->GetWindow(2);
 	Font * fps = core->GetFont("NORMAL\0");
@@ -102,7 +104,7 @@ int main(int argc, char ** argv)
 		//win->DrawWindow();
 		//win2->DrawWindow();
 		//win3->DrawWindow();
-		for(int i = 0; i < 1; i++) {
+		for(int i = 0; i < 3; i++) {
 			win[i]->DrawWindow();
 		}
 		frame++;
@@ -123,7 +125,7 @@ int main(int argc, char ** argv)
 	//core->GetVideoDriver()->FreeSprite(img);
 	//core->FreeInterface(mm);
 	core->FreeInterface(wmgr);
-	for(int i = 0; i < 1; i++) {
+	for(int i = 0; i < 3; i++) {
 		win[i]->release();
 	}
 	delete(core);

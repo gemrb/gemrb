@@ -57,6 +57,11 @@ private: // Private attributes
 	Color hi, init, low;
 	/** Fonts */
 	Font *finit, *ftext;
+public: //Events
+	/** Key Press Event */
+	void OnKeyPress(unsigned char Key, unsigned short Mod);
+	/** Special Key Press */
+	void OnSpecialKeyPress(unsigned char Key);
 };
 
 #endif

@@ -31,6 +31,7 @@ typedef struct StringList {
 #define IE_FONT_ALIGN_RIGHT  0x02
 #define IE_FONT_ALIGN_TOP    0x10 //Single-Line and Multi-Line Text
 #define IE_FONT_ALIGN_MIDDLE 0x20 //Only for single line Text
+#define IE_FONT_SINGLE_LINE  0x40
 
 class GEM_EXPORT Font
 {
