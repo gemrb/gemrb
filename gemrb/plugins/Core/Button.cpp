@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.63 2004/06/24 17:53:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.64 2004/06/27 23:47:27 edheldil Exp $
  *
  */
 
@@ -526,4 +526,10 @@ void Button::SetPicture(Sprite2D* Picture)
 	this->Picture = Picture;
 	Changed = true;
 	( ( Window * ) Owner )->Invalidate();
+}
+
+bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
+{
+	if (Picture) return false;
+	return core->GetVideoDriver()->IsSpritePixelTransparent(Unpressed, x, y);
 }

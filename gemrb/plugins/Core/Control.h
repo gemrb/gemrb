@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.18 2004/04/28 12:52:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.19 2004/06/27 23:47:27 edheldil Exp $
  *
  */
 
@@ -36,6 +36,7 @@
 /**This class defines a basic Control Object.
   *@author GemRB Developement Team
   */
+#include "../../includes/RGBAColor.h"
 
 #ifdef WIN32
 
@@ -110,6 +111,9 @@ public: //Events
 		unsigned char Button, unsigned short Mod);
 	/** Special Key Press */
 	virtual void OnSpecialKeyPress(unsigned char Key);
+	virtual bool IsPixelTransparent(unsigned short x, unsigned short y) {
+		return false;
+	}
 };
 
 #endif

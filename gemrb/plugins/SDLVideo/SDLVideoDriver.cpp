@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.71 2004/06/27 19:30:06 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.72 2004/06/27 23:47:26 edheldil Exp $
  *
  */
 
@@ -1041,6 +1041,23 @@ void SDLVideoDriver::GetPixel(short x, short y, Color* color)
 	SDL_UnlockSurface( backBuf );
 
 	SDL_GetRGBA( val, backBuf->format, &color->r, &color->g, &color->b, &color->a );
+}
+
+bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, short x, short y)
+{
+	SDL_Surface *surf = (SDL_Surface*)(sprite->vptr);
+	Color color;
+
+	unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
+		( ( y * surf->w + x) * surf->format->BytesPerPixel );
+	long val = 0;
+	SDL_LockSurface( surf );
+	memcpy( &val, pixels, surf->format->BytesPerPixel );
+	SDL_UnlockSurface( surf );
+
+	//SDL_GetRGBA( val, surf->format, &color.r, &color.g, &color.b, &color.a );
+	//return color.a == 0;
+	return val == 0;
 }
 
 /*

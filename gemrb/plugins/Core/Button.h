@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.30 2004/06/24 17:53:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.31 2004/06/27 23:47:27 edheldil Exp $
  *
  */
 
@@ -174,6 +174,7 @@ private: // Private attributes
 	unsigned short DragX, DragY; //Starting Dragging Positions
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
+	bool IsPixelTransparent (unsigned short x, unsigned short y);
 };
 
 #endif
