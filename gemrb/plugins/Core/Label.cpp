@@ -15,27 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.16 2003/11/29 17:59:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.17 2003/12/07 09:37:06 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "Label.h"
 #include "Interface.h"
-
-#ifndef WIN32
-#include <ctype.h>
-char *strlwr(char *string)
-{
-	char *s;
-	if(string)
-	{
-		for(s = string; *s; ++s)
-			*s = tolower(*s);
-	}
-	return string;
-}
-#endif
 
 extern Interface * core;
 
