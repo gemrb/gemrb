@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.18 2004/12/14 22:37:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.19 2005/02/19 17:15:26 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -101,8 +101,9 @@ def OpenInventoryWindow ():
 		SlotType = GemRB.GetSlotType(slot)
 		if SlotType["Type"]:
 			Button = GemRB.GetControl (Window, SlotType["ID"]) 
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot)
+			GemRB.SetButtonFont (Window, Button, "NUMBER")
 
 	GemRB.UnhideGUI()
 	UpdateInventoryWindow ()
@@ -209,7 +210,7 @@ def UpdateInventoryWindow ():
 	GemRB.SetText (Window, Label, str(encumbrance) + ":")
 
 	Label2 = GemRB.GetControl (Window, 0x10000044)
-	GemRB.SetText (Window, Label2, str(max_encumb) +":")
+	GemRB.SetText (Window, Label2, str(max_encumb) + ":")
 
 	ratio = (0.0 + encumbrance) / max_encumb
 	if ratio > 1.0:
