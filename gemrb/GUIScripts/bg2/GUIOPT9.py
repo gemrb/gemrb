@@ -8,7 +8,6 @@ def OnLoad():
 	global FeedbackWindow, TextAreaControl
 
 	GemRB.LoadWindowPack("GUIOPT")
-
 	FeedbackWindow = GemRB.LoadWindow(9)
 
 	MarkerSlider = GemRB.GetControl(FeedbackWindow, 30)
