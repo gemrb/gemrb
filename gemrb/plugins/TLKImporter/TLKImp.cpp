@@ -167,7 +167,7 @@ bool TLKImp::GetNewStringLength(char *string, unsigned long &Length)
 char * TLKImp::GetString(unsigned long strref, int flags)
 {
 	if(strref >= StrRefCount)
-		return NULL;
+		return "";
 	unsigned long Volume, Pitch, StrOffset, Length;
 	unsigned short type;
 	char SoundResRef[8];
