@@ -34,7 +34,7 @@ def OnLoad():
 	GemRB.SetButtonState(GenderWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 	GemRB.SetVisible(CharGenWindow,0)
 	GemRB.SetVisible(GenderWindow,1)
-	GemRB.ShowModal(GenderWindow)
+	#GemRB.ShowModal(GenderWindow)
 	return
 
 def DonePress():
@@ -98,7 +98,7 @@ def DonePress():
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
         GemRB.SetEvent(CharGenWindow, GenderButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
-	GemRB.ShowModal(GenderWindow)
+	#GemRB.ShowModal(GenderWindow)
 	return
 	
 def ClickedMale():
