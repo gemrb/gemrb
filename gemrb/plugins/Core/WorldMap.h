@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.4 2004/08/09 20:57:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.5 2004/08/20 12:48:25 edheldil Exp $
  *
  */
 
@@ -55,6 +55,8 @@ typedef struct WMPAreaEntry {
 	ieDword AreaLinksIndex[4];
 	ieDword AreaLinksCount[4];
 	char unknown[128];
+
+	Sprite2D* MapIcon;
 } WMPAreaEntry;
 
 
@@ -87,11 +89,9 @@ public:
 	char unknown3[128];
 
 	Sprite2D* MapMOS;
-
 public:
-  void AddAreaEntry(WMPAreaEntry *ae);
-  void AddAreaLink(WMPAreaLink *al);
-private:
+	void AddAreaEntry(WMPAreaEntry *ae);
+	void AddAreaLink(WMPAreaLink *al);
 	std::vector< WMPAreaEntry*> area_entries;
 	std::vector< WMPAreaLink*> area_links;
 };

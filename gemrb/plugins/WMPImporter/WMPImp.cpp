@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.5 2004/08/09 20:57:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.6 2004/08/20 12:48:23 edheldil Exp $
  *
  */
 
@@ -81,18 +81,15 @@ WorldMap* WMPImp::GetWorldMap(unsigned int index)
 
 	str->Seek( m->AreaEntriesOffset, GEM_STREAM_START );
 	for (i = 0; i < m->AreaEntriesCount; i++) {
-//		WMPAreaEntry* ae = GetAreaEntry();
-    m->AddAreaEntry(GetAreaEntry());
-//		m->area_entries.push_back( ae );
+		m->AddAreaEntry(GetAreaEntry());
 	}
 
 	str->Seek( m->AreaLinksOffset, GEM_STREAM_START );
 	for (i = 0; i < m->AreaLinksCount; i++) {
-//		WMPAreaLink* al = GetAreaLink();
-    m->AddAreaLink(GetAreaLink());
-//		m->area_links.push_back( al );
+		m->AddAreaLink(GetAreaLink());
 	}
 
+	// Load map bitmap
 	if (!core->IsAvailable( IE_MOS_CLASS_ID )) {
 		printf( "[WMPImporter]: No MOS Importer Available.\n" );
 		return m;
@@ -103,6 +100,23 @@ WorldMap* WMPImp::GetWorldMap(unsigned int index)
 	mos->Open( mosfile, true ); //autofree
 
 	m->MapMOS = mos->GetImage();
+
+
+
+	// Load location icon
+	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
+		printf( "[WMPImporter]: No BAM Importer Available.\n" );
+		return m;
+	}
+	AnimationMgr* icon = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
+	DataStream* iconfile = core->GetResourceMgr()->GetResource( m->MapIconResRef, IE_BAM_CLASS_ID );
+	icon->Open( iconfile, true ); //autofree
+
+
+	std::vector< WMPAreaEntry*>::iterator ei;
+	for (ei = m->area_entries.begin(); ei != m->area_entries.end(); ++ei) {
+		(*ei)->MapIcon = icon->GetFrameFromCycle( (*ei)->IconSeq, 0 );
+	}
 
 	return m;
 }

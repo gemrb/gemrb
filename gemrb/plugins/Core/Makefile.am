@@ -82,6 +82,7 @@ libgemrb_core_la_SOURCES = \
 	Store.cpp \
 	Inventory.cpp \
 	Spellbook.cpp \
-	Ambient.cpp
+	Ambient.cpp \
+	WorldMapControl.cpp
 
 noinst_HEADERS = *.h

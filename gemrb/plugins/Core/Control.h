@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.23 2004/08/19 21:14:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.24 2004/08/20 12:48:25 edheldil Exp $
  *
  */
 
@@ -30,6 +30,7 @@
 #define IE_GUI_TEXTAREA		5
 #define IE_GUI_LABEL		6
 #define IE_GUI_SCROLLBAR	7
+#define IE_GUI_WORLDMAP         8 // gemrb extension
 #define IE_GUI_GAMECONTROL	128
 
 

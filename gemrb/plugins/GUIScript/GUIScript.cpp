@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.189 2004/08/19 21:14:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.190 2004/08/20 12:48:24 edheldil Exp $
  *
  */
 
@@ -31,6 +31,7 @@
 #include "../Core/SpellMgr.h"
 #include "../Core/ItemMgr.h"
 #include "../Core/StoreMgr.h"
+#include "../Core/WorldMapControl.h"
 
 //this stuff is missing from Python 2.2
 #ifndef PyDoc_VAR
@@ -1559,6 +1560,42 @@ static PyObject* GemRB_SetButtonFont(PyObject * /*self*/, PyObject* args)
 	Button* btn = ( Button* ) ctrl;
 
 	btn->SetFont( core->GetFont( FontResRef ));
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_CreateWorldMapControl__doc,
+"CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h) => ControlIndex\n\n"
+"Creates and adds a new WorldMap control to a Window." );
+
+static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlID, x, y, w, h, align;
+	char* font, * text;
+
+	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &x,
+			&y, &w, &h )) {
+		return AttributeError( GemRB_CreateWorldMapControl__doc );
+	}
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (win == NULL) {
+		return NULL;
+	}
+	WorldMapControl* wmap = new WorldMapControl( );
+	wmap->XPos = x;
+	wmap->YPos = y;
+	wmap->Width = w;
+	wmap->Height = h;
+	wmap->ControlID = ControlID;
+	wmap->ControlType = IE_GUI_WORLDMAP;
+	wmap->Owner = win;
+#if 0
+	lbl->SetText( text );
+	lbl->SetAlignment( align );
+#endif
+	win->AddControl( wmap );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3423,6 +3460,8 @@ static PyMethodDef GemRBMethods[] = {
 	GemRB_EnableButtonBorder__doc},
 	{"SetButtonFont", GemRB_SetButtonFont, METH_VARARGS,
 	GemRB_SetButtonFont__doc},
+	{"CreateWorldMapControl", GemRB_CreateWorldMapControl, METH_VARARGS,
+	GemRB_CreateWorldMapControl__doc},
 	{"SetControlPos", GemRB_SetControlPos, METH_VARARGS,
 	GemRB_SetControlPos__doc},
 	{"SetControlSize", GemRB_SetControlSize, METH_VARARGS,
