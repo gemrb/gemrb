@@ -1,7 +1,12 @@
 2DA V1.0
-
-	DATA	1	2	3	4	5		6	7
-IDS	7	ea	general	race	class	specific	gender	align
-OBJECTS	5
-BOUNDS	0
+0
+			DATA	1	2	3	4	5		6	7
+OBJECT_IDS_COUNT	7	ea	general	race	class	specific	gender	align
+MAX_OBJECT_NESTING	5
+ADDITIONAL_RECT		0
+OBJECT_FIELDS		7
+OBJECT_IDENTIFIERS	5
+RECT_PARAMETER		0
+STRING_PARAMETER	1
+EXTRA_PARAMETERS	0
 
