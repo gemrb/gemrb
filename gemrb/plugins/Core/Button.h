@@ -94,8 +94,8 @@ private: // Private attributes
   Sprite2D * Disabled;
 	/** The current state of the Button */
   unsigned char State;
-  /** Display Flags */
-  unsigned char Flags;
+  /** Display Flags, justification */
+  unsigned long Flags;
 };
 
 #endif

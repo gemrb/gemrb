@@ -47,7 +47,7 @@ bool CHUImp::Open(DataStream * stream, bool autoFree)
 	char Signature[8];
 	str->Read(Signature, 8);
 	if(strncmp(Signature, "CHUIV1  ", 8) != 0) {
-		printf("[CHUImporter]: Not a Vaild CHU File\n");
+		printf("[CHUImporter]: Not a Valid CHU File\n");
 		return false;
 	}
 	str->Read(&WindowCount, 4);
@@ -132,6 +132,8 @@ Window * CHUImp::GetWindow(unsigned long i)
 				str->Read(&PressedIndex, 2);
 				str->Read(&SelectedIndex, 2);
 				str->Read(&DisabledIndex, 2);
+/** Justification comes from the .chu, other bits are set by script */
+				btn->SetFlags(Cycle&0xff00,OP_OR);
 				if(strncmp(BAMFile, "GUICTRL\0", 8) == 0) {
 					if(UnpressedIndex == 0) {
 						printf("Special Button Control, Skipping Image Loading\n");
@@ -145,7 +147,8 @@ Window * CHUImp::GetWindow(unsigned long i)
 					delete(btn);
 					continue;
 					}
-				Animation * ani = bam->GetCycle(Cycle);
+/** Cycle is only a byte for buttons */
+				Animation * ani = bam->GetCycle(Cycle&0xff);
 				Sprite2D * tspr = ani->GetFrame(UnpressedIndex);
 				btn->SetImage(IE_GUI_BUTTON_UNPRESSED, tspr);
 				tspr = ani->GetFrame(PressedIndex);

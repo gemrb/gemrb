@@ -43,7 +43,7 @@ Button::Button(bool Clear){
 	Text = (char*)malloc(64);
 	hasText = false;
 	font = core->GetFont("STONEBIG");
-	Flags = 0x04;
+	Flags = 0x4;
 	ToggleState = false;
 	Value = 0;
 }
