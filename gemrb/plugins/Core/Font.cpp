@@ -262,6 +262,8 @@ void Font::SetupString(char * string, int width)
 			continue;
 		}
 		endword = false;
+		if(string[pos] == '\r')
+			string[pos] = ' ';
 		if(string[pos] == '\n') {
 			string[pos] = 0;
 			x = 0;
