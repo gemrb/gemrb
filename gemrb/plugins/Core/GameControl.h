@@ -39,7 +39,7 @@ private:
 	Actor * lastActor;
 	std::vector<Actor*> selected;
 	std::vector<Actor*> highlighted;
-	std::vector<InfoPoint*> infoPoints;
+	std::vector<Scriptable*> infoTexts;
 	Color * InfoTextPalette;
 	bool DrawSelectionRect;
 	bool MouseIsDown;
@@ -85,6 +85,7 @@ public:
 	void InitDialog(Actor * speaker, Actor * target, Dialog * dlg);
 	bool Dialogue;
 	void DialogChoose(int choose);
+	void DisplayString(Scriptable * target);
 };
 
 #endif

@@ -168,23 +168,24 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				video->DrawPolyline(overInfoPoint->outline, red, true);
 			}
 		}
-		for(size_t i = 0; i < infoPoints.size(); i++) {
+		for(size_t i = 0; i < infoTexts.size(); i++) {
 			unsigned long time;
 			GetTime(time);
-			if((time - infoPoints[i]->startDisplayTime) >= 10000) {
-				infoPoints[i]->textDisplaying = 0;
-				std::vector<InfoPoint*>::iterator m;
-				m = infoPoints.begin()+i;
-				infoPoints.erase(m);
+			if((time - infoTexts[i]->timeStartDisplaying) >= 10000) {
+				infoTexts[i]->textDisplaying = 0;
+				std::vector<Scriptable*>::iterator m;
+				m = infoTexts.begin()+i;
+				infoTexts.erase(m);
 				i--;
 				continue;
 			}
-			if(infoPoints[i]->textDisplaying == 1) {
+			if(infoTexts[i]->textDisplaying == 1) {
 				Font * font = core->GetFont(9);
-				Region rgn(infoPoints[i]->outline->BBox.x+(infoPoints[i]->outline->BBox.w/2)-100, infoPoints[i]->outline->BBox.y, 200, 400);
+				Region rgn(infoTexts[i]->XPos-100, infoTexts[i]->YPos-100, 200, 400);
+				//printf("Printing InfoText at [%d,%d,%d,%d]\n", rgn.x, rgn.y, rgn.w, rgn.h);
 				rgn.x+=video->xCorr;
 				rgn.y+=video->yCorr;
-				font->Print(rgn, (unsigned char*)infoPoints[i]->String, InfoTextPalette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, false);
+				font->Print(rgn, (unsigned char*)infoTexts[i]->overHeadText, InfoTextPalette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, false);
 			}
 		}
 
@@ -369,7 +370,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	overInfoPoint = area->tm->GetInfoPoint(GameX, GameY);
 	if(overInfoPoint) {
-		if(overInfoPoint->Type == 1)
+		if(overInfoPoint->ipType == ST_TRIGGER)
 			nextCursor = overInfoPoint->Cursor;
 	}
 
@@ -459,18 +460,21 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 	}
 	if(!DrawSelectionRect) {
 		Actor * actor = area->GetActor(GameX, GameY);
+		
 		if(!actor && (selected.size() == 1)) {
 			actor = selected.at(0);
-			actor->WalkTo(GameX, GameY);
-			unsigned long WinIndex, TAIndex;
-			core->GetDictionary()->Lookup("MessageWindow", WinIndex);
-			if((WinIndex != -1) && (core->GetDictionary()->Lookup("MessageTextArea", TAIndex))) {
-				Window * win = core->GetWindow(WinIndex);
-				if(win) {
-					TextArea * ta = (TextArea*)win->GetControl(TAIndex);
-					char Text[256];
-					sprintf(Text, "[color=FF0000]Selected[/color]: %s", actor->LongName);
-					ta->AppendText(Text, -1);
+			if(!overInfoPoint || (overInfoPoint->ipType != ST_TRIGGER)) {
+				actor->WalkTo(GameX, GameY);
+				unsigned long WinIndex, TAIndex;
+				core->GetDictionary()->Lookup("MessageWindow", WinIndex);
+				if((WinIndex != -1) && (core->GetDictionary()->Lookup("MessageTextArea", TAIndex))) {
+					Window * win = core->GetWindow(WinIndex);
+					if(win) {
+						TextArea * ta = (TextArea*)win->GetControl(TAIndex);
+						char Text[256];
+						sprintf(Text, "[color=FF0000]Selected[/color]: %s", actor->LongName);
+						ta->AppendText(Text, -1);
+					}
 				}
 			}
 		}
@@ -482,17 +486,18 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 			actor->Select(true);
 		}
 		if(overInfoPoint) {
-			if(overInfoPoint->Type == 1) {
-				if(overInfoPoint->textDisplaying != 1) {
-					overInfoPoint->textDisplaying = 1;
-					infoPoints.push_back(overInfoPoint);
-#ifdef WIN32
-					overInfoPoint->startDisplayTime = GetTickCount();
-#else
-					struct timeval tv;
-					gettimeofday(&tv, NULL);
-					overInfoPoint->startDisplayTime = (tv.tv_usec/1000) + (tv.tv_sec*1000);
-#endif
+			if(overInfoPoint->ipType == ST_TRIGGER) {
+				if(overInfoPoint->overHeadText) {
+					if(overInfoPoint->textDisplaying != 1) {
+						overInfoPoint->textDisplaying = 1;
+						infoTexts.push_back(overInfoPoint);
+						GetTime(overInfoPoint->timeStartDisplaying);
+					}
+				}
+				if(overInfoPoint->Scripts[0] && (selected.size() == 1)) {
+					overInfoPoint->LastTrigger = selected[0];
+					overInfoPoint->Clicker = selected[0];
+					overInfoPoint->Scripts[0]->Update();
 				}
 			}
 		}
@@ -925,4 +930,13 @@ void GameControl::DialogChoose(int choose)
 			ta->AppendText("", -1);
 		}
 	}
+}
+
+void GameControl::DisplayString(Scriptable * target)
+{
+	for(int i = 0; i < infoTexts.size(); i++) {
+		if(infoTexts[i] == target)
+			return;
+	}
+	infoTexts.push_back(target);
 }
