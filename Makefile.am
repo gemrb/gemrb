@@ -1,6 +1,22 @@
 SUBDIRS = gemrb
 EXTRA_DIST = admin/setup.sh 
-MAINTAINERCLEANFILES = subdirs configure.files aclocal.m4 configure config.h.in config.log config.status stamp-h.in admin/config.sub admin/install-sh admin/missing admin/py-compile admin/config.guess admin/depcomp admin/ltmain.sh admin/mkinstalldirs
+MAINTAINERCLEANFILES = \
+	aclocal.m4 \
+	config.h.in \
+	config.log \
+	config.status \
+	configure \
+	configure.files \
+	stamp-h.in \
+	subdirs \
+	admin/config.guess \
+	admin/config.sub \
+	admin/depcomp \
+	admin/install-sh \
+	admin/ltmain.sh \
+	admin/missing \
+	admin/mkinstalldirs \
+	admin/py-compile
 
 dist_man1_MANS = gemrb.1
 

@@ -32,11 +32,12 @@ AC_ARG_ENABLE(subdirs, AS_HELP_STRING(--disable-subdirs,Install plugins and data
 if test "x$gemrb_use_subdirs" = "xno" ; then
   plugindir=$libdir
   moddir=$datadir
+  docdir=$datadir/doc/
 else
   plugindir=$libdir/gemrb
   moddir=$datadir/gemrb
+  docdir=$datadir/doc/gemrb
 fi
-docdir=$libdir/docs
 
 AC_SUBST(plugindir)
 AC_SUBST(moddir)
@@ -150,7 +151,6 @@ AC_SUBST(LIBS)
 AC_CONFIG_FILES([
 Makefile
 gemrb/Makefile 
-gemrb/Config/Makefile 
 gemrb/includes/Makefile 
 gemrb/override/Makefile
 gemrb/override/bg1/Makefile

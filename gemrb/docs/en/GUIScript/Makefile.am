@@ -1,3 +1,3 @@
 guiscriptdocs_DATA = *.txt
-guiscriptdocsdir = $(docdir)/en/GUIScript/
+guiscriptdocsdir = $(docdir)/GUIScript/
 EXTRA_DIST = *.txt

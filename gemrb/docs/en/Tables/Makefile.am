@@ -1,3 +1,3 @@
 tabledocs_DATA = *.txt
-tabledocsdir = $(docdir)/en/GUIScript/
+tabledocsdir = $(docdir)/Tables/
 EXTRA_DIST = *.txt

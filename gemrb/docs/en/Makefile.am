@@ -1,4 +1,4 @@
 SUBDIRS = Tables GUIScript
 docs_DATA = *.txt
-docsdir = $(docdir)/en/
+docsdir = $(docdir)/
 EXTRA_DIST = *.txt
