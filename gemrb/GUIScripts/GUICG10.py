@@ -25,7 +25,7 @@ def OnLoad():
 	for i in range(1,ClassCount):
 		if GemRB.GetTableValue(ClassTable,i-1,3)==0:
 			continue
-		if j>7:
+		if j>11:
 			Button = GemRB.GetControl(ClassWindow,j+7)
 		else:
 			Button = GemRB.GetControl(ClassWindow,j+2)
@@ -33,7 +33,7 @@ def OnLoad():
 		t = GemRB.GetTableValue(ClassTable, i-1, 0)
 		GemRB.SetText(ClassWindow, Button, t )
 		GemRB.SetEvent(ClassWindow, Button, IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
-		GemRB.SetVarAssoc(ClassWindow, Button , "Class", i)
+		GemRB.SetVarAssoc(ClassWindow, Button , "Class", i) #multiclass, actually
 		j=j+1
 
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
@@ -55,30 +55,20 @@ def OnLoad():
         GemRB.SetText(CharGenWindow, BiographyButton, 18003)
         GemRB.SetButtonState(CharGenWindow,BiographyButton,IE_GUI_BUTTON_DISABLED)
 
-	MultiClassButton = GemRB.GetControl(ClassWindow, 10)
-	GemRB.SetText(ClassWindow,MultiClassButton, 11993)
-
 	BackButton = GemRB.GetControl(ClassWindow,14)
 	GemRB.SetText(ClassWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(ClassWindow,0)
 	GemRB.SetText(ClassWindow,DoneButton,11973)
 
-	TextAreaControl = GemRB.GetControl(ClassWindow, 13)
-	GemRB.SetText(ClassWindow,TextAreaControl,17242)
+	TextAreaControl = GemRB.GetControl(ClassWindow, 12)
+	GemRB.SetText(ClassWindow,TextAreaControl,17244)
 
-	GemRB.SetEvent(ClassWindow,MultiClassButton,IE_GUI_BUTTON_ON_PRESS,"MultiClassPress")
 	GemRB.SetEvent(ClassWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(ClassWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	GemRB.SetEvent(CharGenWindow,CancelButton,IE_GUI_BUTTON_ON_PRESS,"CancelPress")
 	GemRB.SetButtonState(ClassWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 	GemRB.SetVisible(CharGenWindow,1)
 	GemRB.SetVisible(ClassWindow,1)
-	return
-
-def MultiClassPress():
-	GemRB.UnloadWindow(CharGenWindow)
-	GemRB.UnloadWindow(ClassWindow)
-	GemRB.SetNextScript("GUICG10")
 	return
 
 def ClassPress():
@@ -90,8 +80,7 @@ def ClassPress():
 def BackPress():
 	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.UnloadWindow(ClassWindow)
-	GemRB.SetNextScript("CharGen3")
-	GemRB.SetVar("Class",0)  #scrapping the class value
+	GemRB.SetNextScript("GUICG2")
 	return
 
 def NextPress():

@@ -10,6 +10,11 @@ def OnLoad():
 
 	GemRB.SetVar("Gender",0) #gender
 	GemRB.SetVar("Race",0) #race
+	GemRB.SetVar("Class",0) #class
+
+	#these are here only for testing purposes
+	GemRB.SetToken("FIGHTERTYPE", "FIGHTER");
+	GemRB.SetToken("MAGESCHOOL", "MAGE");
 
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)
