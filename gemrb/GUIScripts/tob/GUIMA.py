@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.16 2004/11/22 18:55:43 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.17 2004/11/22 21:06:48 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -114,7 +114,7 @@ def AddNoteWindow ():
 	for i in range(8):
 		Label = GemRB.GetControl (NoteWindow, 4+i)
 		#the .chu is crappy, we have to reset the flags
-		GemRB.SetButtonSprites (NoteWindow, Label, "FLAG1", i,0,1,2,2)
+		GemRB.SetButtonSprites (NoteWindow, Label, "FLAG1", i,0,1,2,0)
 		GemRB.SetButtonFlags (NoteWindow, Label, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		GemRB.SetVarAssoc (NoteWindow, Label, "Color", i)
 
