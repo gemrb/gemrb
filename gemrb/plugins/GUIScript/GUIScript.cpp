@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.206 2004/09/11 07:50:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.207 2004/09/11 10:18:25 avenger_teambg Exp $
  *
  */
 
@@ -3958,7 +3958,7 @@ PyDoc_STRVAR( GemRB_IsDraggingItem__doc,
 "IsDraggingItem()=>int\\n\n"
 "Returns 1 if we are dragging some item." );
 
-static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* /*args*/)
 {
 	return Py_BuildValue( "i", core->GetDraggedItem() != NULL );
 }
