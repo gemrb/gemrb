@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.7 2004/01/02 00:58:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.8 2004/01/04 00:29:12 balrog994 Exp $
  *
  */
 
@@ -55,8 +55,9 @@ typedef enum ScriptableType {
 	ST_ACTOR = 0,
 	ST_PROXIMITY = 1,
 	ST_TRIGGER = 2,
-	ST_DOOR = 3,
-	ST_AREA = 4
+	ST_TRAVEL = 3,
+	ST_DOOR = 4,
+	ST_AREA = 5
 } ScriptableType;
 
 typedef struct ActionStep {
@@ -160,6 +161,7 @@ public:
 	void DoStep(ImageMgr * LightMap);
 	void WalkTo(unsigned short XDes, unsigned short YDes);
 	void MoveTo(unsigned short XDes, unsigned short YDes);
+	void ClearPath();
 };
 
 /*class ActorBlock : public Moveble {

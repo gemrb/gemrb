@@ -300,16 +300,7 @@ void Moveble::DoStep(ImageMgr * LightMap)
 	YPos = (step->y*12)+6;
 	if(!step->Next) {
 		//printf("Last Step\n");
-		PathNode * nextNode = path->Next;
-		PathNode * thisNode = path;
-		while(true) {
-			delete(thisNode);
-			thisNode = nextNode;
-			if(!thisNode)
-				break;
-			nextNode = thisNode->Next;
-		}
-		path = NULL;
+		ClearPath();
 		AnimID = IE_ANI_AWAKE;
 		CurrentAction = NULL;
 	}
@@ -348,6 +339,23 @@ void Moveble::MoveTo(unsigned short XDes, unsigned short YDes)
 	YPos = YDes;
 	this->XDes = XDes;
 	this->YDes = YDes;
+}
+
+void Moveble::ClearPath()
+{
+	if(!path)
+		return;
+	PathNode * nextNode = path->Next;
+	PathNode * thisNode = path;
+	while(true) {
+		delete(thisNode);
+		thisNode = nextNode;
+		if(!thisNode)
+			break;
+		nextNode = thisNode->Next;
+	}
+	path = NULL;
+	step = NULL;
 }
 
 /**************
