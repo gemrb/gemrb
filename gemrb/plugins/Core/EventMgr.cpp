@@ -192,7 +192,7 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button,
 			ctrl->OnMouseUp(x-w->XPos-ctrl->XPos,y-w->YPos-ctrl->YPos, Button, Mod);
 		} while(true);
 	}*/
-	int i = 0;
+	/*int i = 0;
 	std::vector<int>::iterator t;
 	for(t = topwin.begin(); t != topwin.end(); ++t) {
 		Window * w = windows[(*t)];
@@ -218,6 +218,9 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button,
 			break;
 		}
 		i++;
+	}*/
+	if(lastF != NULL) {
+		lastF->OnMouseUp(x-lastW->XPos-lastF->XPos, y-lastW->YPos-lastF->YPos, Button, Mod);
 	}
 }
 
