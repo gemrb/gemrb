@@ -15,13 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.32 2003/12/02 19:48:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.33 2003/12/02 19:52:21 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "Map.h"
 #include "Interface.h"
+#ifndef WIN32
+#include <sys/time.h>
+#endif
 
 extern Interface * core;
 
