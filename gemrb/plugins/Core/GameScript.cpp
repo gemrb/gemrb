@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.7 2003/12/14 16:37:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.8 2003/12/14 17:03:01 avenger_teambg Exp $
  *
  */
 
@@ -89,7 +89,8 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType)
 		blocking[202] = true;
 		actions[203] = FadeFromColor;
 		blocking[203] = true;
-		//please note that IWD and SoA are different from action #230
+		//please note that IWD and SoA are different from action #231
+		actions[242] = Ally;
 		actions[254] = ScreenShake;
 		blocking[254] = true;
 		actions[269] = DisplayStringHead;
@@ -546,12 +547,26 @@ int GameScript::Allegiance(GameScript * Sender, Trigger * parameters)
 {
 	ActorBlock * actor = GetActorFromObject(Sender, parameters->objectParameter);
 	int value = actor->actor->GetStat(IE_EA);
+	switch(parameters->int0Parameter)
+	{
+	case 30: //goodcutoff
+		return value<=30;
+	case 31: //notgood
+		return value>=31;
+	case 199: //notevil
+		return value<=199;
+	case 200: //evilcutoff
+		return value>=200;
+	case 0: case 126: //anything
+		return true;
+	}
 	return parameters->int0Parameter==value;
 }
 
 int GameScript::Class(GameScript * Sender, Trigger * parameters)
 {
 	ActorBlock * actor = GetActorFromObject(Sender, parameters->objectParameter);
+	//TODO: if parameter >=202, it is of *_ALL type
 	int value = actor->actor->GetStat(IE_CLASS);
 	return parameters->int0Parameter==value;
 }
@@ -573,7 +588,7 @@ int GameScript::General(GameScript * Sender, Trigger * parameters)
 int GameScript::Globals(GameScript * Sender, Trigger * parameters)
 {
 	unsigned long value;
-	if(memcmp(parameters->string0Parameter, "GLOBALS", 6) == 0) {
+	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
 		if(!globals->Lookup(&parameters->string0Parameter[6], value)) 
 			value = 0;
 	}
@@ -627,7 +642,7 @@ void GameScript::SG(GameScript * Sender, Action * parameters)
 void GameScript::SetGlobal(GameScript * Sender, Action * parameters)
 {
 	printf("SetGlobal(\"%s\", %d)\n", parameters->string0Parameter, parameters->int0Parameter);
-	if(memcmp(parameters->string0Parameter, "GLOBALS", 6) == 0)
+	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
 		globals->SetAt(&parameters->string0Parameter[6], parameters->int0Parameter);
 	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
 		Sender->locals->SetAt(&parameters->string0Parameter[6], parameters->int0Parameter);
@@ -779,6 +794,14 @@ void GameScript::Enemy(GameScript * Sender, Action * parameters)
 	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
 	if(actor) {
 		actor->actor->SetStat(IE_EA,255);
+	}
+}
+
+void GameScript::Ally(GameScript * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
+	if(actor) {
+		actor->actor->SetStat(IE_EA,4);
 	}
 }
 
