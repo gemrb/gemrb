@@ -1,4 +1,4 @@
-/* $Id: mve_play.cpp,v 1.10 2004/08/21 04:53:59 divide Exp $ */
+/* $Id: mve_play.cpp,v 1.11 2004/10/17 17:06:15 avenger_teambg Exp $ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -24,12 +24,12 @@
 # ifndef _WIN32
 #  include <AL/al.h>
 #  include <AL/alc.h>
-#  include <AL/alu.h>
+//#  include <AL/alu.h>
 #  include <AL/alut.h>
 # else
 #  include <al.h>
 #  include <alc.h>
-#  include <alu.h>
+//#  include <alu.h>
 #  include <alut.h>
 # endif
 #endif
