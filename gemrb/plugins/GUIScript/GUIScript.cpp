@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.131 2004/03/01 00:04:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.132 2004/03/05 21:54:58 guidoj Exp $
  *
  */
 
@@ -673,7 +673,7 @@ static PyObject* GemRB_GetControl(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlID )) {
 		printMessage( "GUIScript",
-			"Syntax Error: GetControl(unsigned short WindowIndex, unsigned long ControlID)\n",
+			"Syntax Error: GetControl(WindowIndex, ControlID)\n",
 			LIGHT_RED );
 		return NULL;
 	}
@@ -692,7 +692,7 @@ static PyObject* GemRB_QueryText(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex )) {
 		printMessage( "GUIScript",
-			"Syntax Error: QueryText(unsigned short WindowIndex, unsigned long ControlIndex)\n",
+			"Syntax Error: QueryText(WindowIndex, ControlIndex)\n",
 			LIGHT_RED );
 		return NULL;
 	}
@@ -730,7 +730,7 @@ static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 			!PyObject_TypeCheck( str,
 																&PyInt_Type ) )) {
 			printMessage( "GUIScript",
-				"Syntax Error: SetText(WindowIndex, ControlIndex, String|Strref, [row])\n",
+				"Syntax Error: SetText(WindowIndex, ControlIndex, String|Strref)\n",
 				LIGHT_RED );
 			return NULL;
 		}
@@ -776,13 +776,11 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 
 	if (PyArg_UnpackTuple( args, "ref", 3, 4, &wi, &ci, &str, &row )) {
 		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
-			!PyObject_TypeCheck( ci,
-														&PyInt_Type ) ||
+			!PyObject_TypeCheck( ci, &PyInt_Type ) ||
 			( !PyObject_TypeCheck( str, &PyString_Type ) &&
-			!PyObject_TypeCheck( str,
-																&PyInt_Type ) )) {
+			!PyObject_TypeCheck( str, &PyInt_Type ) )) {
 			printMessage( "GUIScript",
-				"Syntax Error: TextAreaAppend(unsigned short WindowIndex, unsigned short ControlIndex, char * string)\n",
+				"Syntax Error: TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Row])\n",
 				LIGHT_RED );
 			return NULL;
 		}
@@ -826,6 +824,39 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", ret );
 }
 
+static PyObject* GemRB_TextAreaClear(PyObject * /*self*/, PyObject* args)
+{
+	PyObject* wi, * ci;
+	int WindowIndex, ControlIndex;
+
+	if (PyArg_UnpackTuple( args, "ref", 2, 2, &wi, &ci )) {
+		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
+			!PyObject_TypeCheck( ci, &PyInt_Type )) { 
+			printMessage( "GUIScript",
+				"Syntax Error: TextAreaAppend(WindowIndex, ControlIndex)\n",
+				LIGHT_RED );
+			return NULL;
+		}
+		WindowIndex = PyInt_AsLong( wi );
+		ControlIndex = PyInt_AsLong( ci );
+		Window* win = core->GetWindow( WindowIndex );
+		if (!win)
+			return NULL;
+		Control* ctrl = win->GetControl( ControlIndex );
+		if (!ctrl)
+			return NULL;
+		if (ctrl->ControlType != IE_GUI_TEXTAREA)
+			return NULL;
+		TextArea* ta = ( TextArea* ) ctrl;
+		ta->PopLines( ta->GetRowCount() );
+	} else {
+		return NULL;
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 static PyObject* GemRB_SetVisible(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex;
@@ -833,7 +864,7 @@ static PyObject* GemRB_SetVisible(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &visible )) {
 		printMessage( "GUIScript",
-			"Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n",
+			"Syntax Error: SetVisible(WindowIndex, Visible)\n",
 			LIGHT_RED );
 		return NULL;
 	}
@@ -930,7 +961,7 @@ static PyObject* GemRB_SetControlStatus(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &status )) {
 		printMessage( "GUIScript",
-			"Syntax Error: SetControlStatus(WindowIndex, ControlIndex, status)\n",
+			"Syntax Error: SetControlStatus(WindowIndex, ControlIndex, Status)\n",
 			LIGHT_RED );
 		return NULL;
 	}
@@ -1761,8 +1792,7 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 
 	//trying to cheat the pointer out from the Dictionary without allocating it
 	//BuildValue will allocate its own area anyway
-	if (!core->GetTokenDictionary()->Lookup( Variable,
-										( unsigned long & ) value )) {
+	if (!core->GetTokenDictionary()->Lookup( Variable, ( unsigned long & ) value )) {
 		return Py_BuildValue( "s", "" );
 	}
 
@@ -2628,7 +2658,8 @@ static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 
 static PyMethodDef GemRBMethods[] = {
 	{"HideGUI", GemRB_HideGUI, METH_NOARGS,
-	"Hides the Game GUI."}, {"UnhideGUI", GemRB_UnhideGUI, METH_NOARGS,
+	"Hides the Game GUI."},
+	{"UnhideGUI", GemRB_UnhideGUI, METH_NOARGS,
 	"Shows the Game GUI."},
 	{"SetTAAutoScroll", GemRB_SetTAAutoScroll, METH_VARARGS,
 	"Sets the TextArea auto-scroll feature status."},
@@ -2639,16 +2670,15 @@ static PyMethodDef GemRBMethods[] = {
 	{"EvaluateString", GemRB_EvaluateString, METH_VARARGS,
 	"Evaluate an In-Game Script Trigger in the current Area Script Context"},
 	{"LoadGame", GemRB_LoadGame, METH_VARARGS,
-	"Loads and enters the Game."}, {"EnterGame", GemRB_EnterGame, METH_NOARGS,
+	"Loads and enters the Game."},
+	{"EnterGame", GemRB_EnterGame, METH_NOARGS,
 	"Starts new game and enters it."},
 	{"StatComment", GemRB_StatComment, METH_VARARGS,
 	"Replaces values into an strref."},
-
 	{"ReplaceVarsInText", GemRB_ReplaceVarsInText, METH_VARARGS,
 	 "Replaces named vars into an strref."},
 	{"ActorGetSmallPortrait", GemRB_ActorGetSmallPortrait, METH_VARARGS,
 	 "Returns actor's small portrait resref."},
-
 	{"EndCutSceneMode", GemRB_EndCutSceneMode, METH_NOARGS,
 	"Exits the CutScene Mode."},
 	{"GetPartySize", GemRB_GetPartySize, METH_NOARGS,
@@ -2664,14 +2694,18 @@ static PyMethodDef GemRBMethods[] = {
 	{"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
 	"Loads a WindowPack into the Window Manager Module."},
 	{"LoadWindow", GemRB_LoadWindow, METH_VARARGS,
-	"Returns a Window."}, {"SetWindowSize", GemRB_SetWindowSize, METH_VARARGS,
-	"Resizes a Window."}, {"SetWindowPos", GemRB_SetWindowPos, METH_VARARGS,
+	"Returns a Window."},
+	{"SetWindowSize", GemRB_SetWindowSize, METH_VARARGS,
+	"Resizes a Window."},
+	{"SetWindowPos", GemRB_SetWindowPos, METH_VARARGS,
 	"Moves a Window."},
 	{"SetWindowPicture", GemRB_SetWindowPicture, METH_VARARGS,
 	"Changes the background of a Window."},
 	{"LoadTable", GemRB_LoadTable, METH_VARARGS,
-	"Loads a 2DA Table."}, {"UnloadTable", GemRB_UnloadTable, METH_VARARGS,
-	"Unloads a 2DA Table."}, {"GetTable", GemRB_GetTable, METH_VARARGS,
+	"Loads a 2DA Table."},
+	{"UnloadTable", GemRB_UnloadTable, METH_VARARGS,
+	"Unloads a 2DA Table."},
+	{"GetTable", GemRB_GetTable, METH_VARARGS,
 	"Returns a Loaded 2DA Table."},
 	{"GetTableValue", GemRB_GetTableValue, METH_VARARGS,
 	"Returns a field of a 2DA Table."},
@@ -2699,6 +2733,8 @@ static PyMethodDef GemRBMethods[] = {
 	"Returns the Text of a control in a Window."},
 	{"TextAreaAppend", GemRB_TextAreaAppend, METH_VARARGS,
 	"Appends the Text to the TextArea Control in the Window."},
+	{"TextAreaClear", GemRB_TextAreaClear, METH_VARARGS,
+	"Clears the Text from the TextArea Control in the Window."},
 	{"SetVisible", GemRB_SetVisible, METH_VARARGS,
 	"Sets the Visibility Flag of a Window."},
 	{"SetMasterScript", GemRB_SetMasterScript, METH_VARARGS,
@@ -2744,15 +2780,18 @@ static PyMethodDef GemRBMethods[] = {
 	{"SetLabelUseRGB", GemRB_SetLabelUseRGB, METH_VARARGS,
 	"Tells a Label to use the RGB colors with the text."},
 	{"PlaySound", GemRB_PlaySound, METH_VARARGS,
-	"Plays a Sound."}, {"LoadMusicPL", GemRB_LoadMusicPL, METH_VARARGS,
+	"Plays a Sound."},
+	{"LoadMusicPL", GemRB_LoadMusicPL, METH_VARARGS,
 	"Loads and starts a Music PlayList."},
 	{"SoftEndPL", GemRB_SoftEndPL, METH_NOARGS,
 	"Ends a Music Playlist softly."},
 	{"HardEndPL", GemRB_HardEndPL, METH_NOARGS,
 	"Ends a Music Playlist immediately."},
 	{"DrawWindows", GemRB_DrawWindows, METH_NOARGS,
-	"Refreshes the User Interface."}, {"Quit", GemRB_Quit, METH_NOARGS,
-	"Quits GemRB."}, {"GetVar", GemRB_GetVar, METH_VARARGS,
+	"Refreshes the User Interface."},
+	{"Quit", GemRB_Quit, METH_NOARGS,
+	"Quits GemRB."},
+	{"GetVar", GemRB_GetVar, METH_VARARGS,
 	"Get a Variable value from the Global Dictionary."},
 	{"SetVar", GemRB_SetVar, METH_VARARGS,
 	"Set/Create a Variable in the Global Dictionary."},
@@ -2761,7 +2800,8 @@ static PyMethodDef GemRBMethods[] = {
 	{"SetToken", GemRB_SetToken, METH_VARARGS,
 	"Set/Create a Variable in the Token Dictionary."},
 	{"PlayMovie", GemRB_PlayMovie, METH_VARARGS,
-	"Starts the Movie Player."}, {"Roll", GemRB_Roll, METH_VARARGS,
+	"Starts the Movie Player."},
+	{"Roll", GemRB_Roll, METH_VARARGS,
 	"Calls traditional dice roll."},
 	{"GetCharSounds", GemRB_GetCharSounds, METH_VARARGS,
 	"Reads in the contents of the sounds subfolder."},
@@ -2778,8 +2818,10 @@ static PyMethodDef GemRBMethods[] = {
 	{"CreatePlayer", GemRB_CreatePlayer, METH_VARARGS,
 	"Creates a player slot."},
 	{"SetPlayerStat", GemRB_SetPlayerStat, METH_VARARGS,
-	"Changes a stat."}, {"GetPlayerStat", GemRB_GetPlayerStat, METH_VARARGS,
-	"Queries a stat."}, {"FillPlayerInfo", GemRB_FillPlayerInfo, METH_VARARGS,
+	"Changes a stat."},
+	{"GetPlayerStat", GemRB_GetPlayerStat, METH_VARARGS,
+	"Queries a stat."},
+	{"FillPlayerInfo", GemRB_FillPlayerInfo, METH_VARARGS,
 	"Fills basic character info, that is not stored in stats."},
 	{"SetWorldMapImage", GemRB_SetWorldMapImage, METH_VARARGS,
 	"FIXME: Set WM image ...."},
