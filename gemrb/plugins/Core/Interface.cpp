@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.147 2004/04/03 10:14:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.148 2004/04/10 09:55:58 edheldil Exp $
  *
  */
 
@@ -90,6 +90,7 @@ Interface::Interface(int iargc, char** iargv)
 	CheatFlag = false;
 	CaseSensitive = false;
 	GameOnCD = false;
+	SkipIntroVideos = false;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
 	SavePath[0] = 0;
@@ -413,6 +414,8 @@ int Interface::Init()
 		}
 		GameNameResRef[i] = 0;
 	}
+	// FIXME: ugly hack
+	vars->SetAt( strdup( "SkipIntroVideos" ), (unsigned long)SkipIntroVideos );
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Initializing Token Dictionary...", WHITE );
@@ -786,6 +789,8 @@ bool Interface::LoadConfig(const char* filename)
 			Bpp = atoi( value );
 		} else if (stricmp( name, "FullScreen" ) == 0) {
 			FullScreen = ( atoi( value ) == 0 ) ? false : true;
+		} else if (stricmp( name, "SkipIntroVideos" ) == 0) {
+			SkipIntroVideos = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "CaseSensitive" ) == 0) {
 			CaseSensitive = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "GameOnCD" ) == 0) {
