@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.127 2004/08/07 13:42:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.128 2004/08/07 20:41:12 avenger_teambg Exp $
  *
  */
 
@@ -809,6 +809,8 @@ public: //Script Functions
 	static int GlobalLT(Scriptable* Sender, Trigger* parameters);
 	static int GlobalLTGlobal(Scriptable* Sender, Trigger* parameters);
 	static int GlobalsEqual(Scriptable* Sender, Trigger* parameters);
+	static int GlobalsGT(Scriptable* Sender, Trigger* parameters);
+	static int GlobalsLT(Scriptable* Sender, Trigger* parameters);
 	static int GlobalTimerExact(Scriptable* Sender, Trigger* parameters);
 	static int GlobalTimerExpired(Scriptable* Sender, Trigger* parameters);
 	static int GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters);
@@ -851,6 +853,9 @@ public: //Script Functions
 	static int LevelParty(Scriptable* Sender, Trigger* parameters);
 	static int LevelPartyGT(Scriptable* Sender, Trigger* parameters);
 	static int LevelPartyLT(Scriptable* Sender, Trigger* parameters);
+	static int LocalsEqual(Scriptable* Sender, Trigger* parameters);
+	static int LocalsGT(Scriptable* Sender, Trigger* parameters);
+	static int LocalsLT(Scriptable* Sender, Trigger* parameters);
 	static int LOS(Scriptable* Sender, Trigger* parameters);
 	static int Morale(Scriptable* Sender, Trigger* parameters);
 	static int MoraleGT(Scriptable* Sender, Trigger* parameters);

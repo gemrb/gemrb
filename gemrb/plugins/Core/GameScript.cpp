@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.176 2004/08/07 13:42:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.177 2004/08/07 20:41:12 avenger_teambg Exp $
  *
  */
 
@@ -108,6 +108,8 @@ static TriggerLink triggernames[] = {
 	{"globallt", GameScript::GlobalLT,TF_MERGESTRINGS},
 	{"globalltglobal", GameScript::GlobalLTGlobal,TF_MERGESTRINGS},
 	{"globalsequal", GameScript::GlobalsEqual,TF_MERGESTRINGS},
+	{"globalsGT", GameScript::GlobalsGT,TF_MERGESTRINGS},
+	{"globalsLT", GameScript::GlobalsLT,TF_MERGESTRINGS},
 	{"globaltimerexact", GameScript::GlobalTimerExact,TF_MERGESTRINGS},
 	{"globaltimerexpired", GameScript::GlobalTimerExpired,TF_MERGESTRINGS},
 	{"globaltimernotexpired", GameScript::GlobalTimerNotExpired,TF_MERGESTRINGS},
@@ -150,6 +152,9 @@ static TriggerLink triggernames[] = {
 	{"levelparty", GameScript::LevelParty,0},
 	{"levelpartygt", GameScript::LevelPartyGT,0},
 	{"levelpartylt", GameScript::LevelPartyLT,0},
+	{"localsequal", GameScript::LocalsEqual,TF_MERGESTRINGS},
+	{"localsGT", GameScript::LocalsGT,TF_MERGESTRINGS},
+	{"localsLT", GameScript::LocalsLT,TF_MERGESTRINGS},
 	{"los", GameScript::LOS,0},
 	{"morale", GameScript::Morale,0},
 	{"moralegt", GameScript::MoraleGT,0},
@@ -841,6 +846,9 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		if(map) {
 			map->vars->SetAt( VarName, value);
 		}
+		else {
+			printf("invalid area %s in setvariable\n",Context);
+		}
 	}
 	else {
 		core->GetGame()->globals->SetAt( VarName, ( unsigned long ) value );
@@ -871,6 +879,9 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, int value)
 		Map *map=core->GetGame()->GetMap(newVarName);
 		if(map) {
 			map->vars->SetAt( &VarName[6], value);
+		}
+		else {
+			printf("invalid area %s in setvariable\n",VarName);
 		}
 	}
 	else {
@@ -903,6 +914,9 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 		Map *map=core->GetGame()->GetMap(newVarName);
 		if(map) {
 			map->vars->Lookup( &VarName[6], value);
+		}
+		else {
+			printf("invalid area %s in checkvariable\n",VarName);
 		}
 	}
 	else {
@@ -940,6 +954,9 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender,
 		Map *map=core->GetGame()->GetMap(newVarName);
 		if(map) {
 			map->vars->Lookup( VarName, value);
+		}
+		else {
+			printf("invalid area %s in checkvariable2\n",Context);
 		}
 	} else {
 		core->GetGame()->globals->Lookup( VarName, value );
@@ -2974,14 +2991,49 @@ int GameScript::GlobalGTGlobal(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalsEqual(Scriptable* Sender, Trigger* parameters)
 {
-	long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	long value2 = CheckVariable(Sender, parameters->string1Parameter );
+	long value1 = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
+	long value2 = CheckVariable(Sender, parameters->string1Parameter, "GLOBAL" );
 	return ( value1 == value2 );
+}
+
+int GameScript::GlobalsGT(Scriptable* Sender, Trigger* parameters)
+{
+	long value1 = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
+	long value2 = CheckVariable(Sender, parameters->string1Parameter, "GLOBAL" );
+	return ( value1 > value2 );
+}
+
+int GameScript::GlobalsLT(Scriptable* Sender, Trigger* parameters)
+{
+	long value1 = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
+	long value2 = CheckVariable(Sender, parameters->string1Parameter, "GLOBAL" );
+	return ( value1 < value2 );
+}
+
+int GameScript::LocalsEqual(Scriptable* Sender, Trigger* parameters)
+{
+	long value1 = CheckVariable(Sender, parameters->string0Parameter, "LOCALS" );
+	long value2 = CheckVariable(Sender, parameters->string1Parameter, "LOCALS" );
+	return ( value1 == value2 );
+}
+
+int GameScript::LocalsGT(Scriptable* Sender, Trigger* parameters)
+{
+	long value1 = CheckVariable(Sender, parameters->string0Parameter, "LOCALS" );
+	long value2 = CheckVariable(Sender, parameters->string1Parameter, "LOCALS" );
+	return ( value1 > value2 );
+}
+
+int GameScript::LocalsLT(Scriptable* Sender, Trigger* parameters)
+{
+	long value1 = CheckVariable(Sender, parameters->string0Parameter, "LOCALS" );
+	long value2 = CheckVariable(Sender, parameters->string1Parameter, "LOCALS" );
+	return ( value1 < value2 );
 }
 
 int GameScript::RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	unsigned long value2;
 	GetTime(value2);
 	return ( value1 == value2 );
@@ -2989,7 +3041,7 @@ int GameScript::RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	unsigned long value2;
 	GetTime(value2);
 	return ( value1 < value2 );
@@ -2997,7 +3049,7 @@ int GameScript::RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	unsigned long value2;
 	GetTime(value2);
 	return ( value1 > value2 );
@@ -3005,19 +3057,19 @@ int GameScript::RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameter
 
 int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	return ( value1 == core->GetGame()->GameTime );
 }
 
 int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	return ( value1 < core->GetGame()->GameTime );
 }
 
 int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	return ( value1 > core->GetGame()->GameTime );
 }
 
@@ -5596,12 +5648,14 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		Sender->CurrentAction = NULL;
 		return;
 	}
+/*
 	if((tar==scr) && !(Flags&BD_OWN) ) {
 		printf("[IEScript]: Target is protagonist?\n");
 		parameters->objects[1]->Dump();
 		Sender->CurrentAction = NULL;
 		return;
 	}
+*/
 	//target could be other than Actor, we need to handle this too!
 	if (scr->Type != ST_ACTOR) {
 		Sender->CurrentAction = NULL;
