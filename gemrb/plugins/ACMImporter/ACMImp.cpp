@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.33 2004/01/25 16:43:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.34 2004/02/05 18:04:19 avenger_teambg Exp $
  *
  */
 
@@ -363,7 +363,7 @@ unsigned long ACMImp::StreamFile(const char * filename)
 	else {
 		music.reader = CreateSoundReader(str, SND_READER_WAV, str->Size(), true);
 	}
-	/*
+	
 	if(MusicSource == 0) {
 		alGenSources(1, &MusicSource);
 		if((error = alGetError()) != AL_NO_ERROR) {
@@ -379,7 +379,7 @@ unsigned long ACMImp::StreamFile(const char * filename)
 		alSourcefv(MusicSource, AL_VELOCITY, SourceVel);
 		alSourcei (MusicSource, AL_LOOPING,  0        );
 	}
-*/
+
 	SDL_mutexV(musicMutex);
 	return 0;
 }
