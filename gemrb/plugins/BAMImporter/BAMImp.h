@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.13 2004/12/05 12:27:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.14 2004/12/12 22:27:26 avenger_teambg Exp $
  *
  */
 
@@ -47,6 +47,8 @@ private:
 	Color Palette[256];
 	ieByte CompressedColorIndex;
 	ieDword FramesOffset, PaletteOffset, FLTOffset;
+private:
+	void* GetFramePixels(unsigned short findex);
 public:
 	BAMImp(void);
 	~BAMImp(void);
@@ -58,12 +60,14 @@ public:
 	AnimationFactory* GetAnimationFactory(const char* ResRef,
 		unsigned char mode = IE_NORMAL);
 	Sprite2D* GetFrame(unsigned short findex, unsigned char mode = IE_NORMAL);
-	void* GetFramePixels(unsigned short findex, unsigned char mode = IE_NORMAL);
 	/** This function will load the Animation as a Font */
 	Font* GetFont();
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
 	Sprite2D* GetPalette();
+	/** Returns a paperdoll BAM as image */
+	Sprite2D* GetPaperdollImage(int *Colors);
+
 	/** Gets a Pixel Index from the Image, unused */
 	unsigned int GetPixelIndex(unsigned int x, unsigned int y)
 	{
@@ -77,6 +81,7 @@ public:
 		};
 		return null;
 	}
+	void SetupColors(int *Colors);
 public:
 	void release(void)
 	{

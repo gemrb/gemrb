@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.256 2004/12/09 22:16:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.257 2004/12/12 22:27:27 avenger_teambg Exp $
  *
  */
 
@@ -2044,12 +2044,14 @@ PyDoc_STRVAR( GemRB_SetButtonPLT__doc,
 
 static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex, col1, col2, col3, col4, col5, col6, col7,
-		col8;
+	int WindowIndex, ControlIndex;
+	int col[8];
 	char* ResRef;
 
-	if (!PyArg_ParseTuple( args, "iisiiiiiiii", &WindowIndex, &ControlIndex,
-			&ResRef, &col1, &col2, &col3, &col4, &col5, &col6, &col7, &col8 )) {
+	memset(col,-1,sizeof(col));
+	if (!PyArg_ParseTuple( args, "iis|iiiiiiii", &WindowIndex, &ControlIndex,
+			&ResRef, &(col[0]), &(col[1]), &(col[2]), &(col[3]),
+			&(col[4]), &(col[5]), &(col[6]), &(col[7])) ) {
 		return AttributeError( GemRB_SetButtonPLT__doc );
 	}
 
@@ -2064,43 +2066,61 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
+	Sprite2D *Picture;
+
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
-												IE_PLT_CLASS_ID );
-	if (str == NULL) {
-		printf ("No stream\n");
-		return NULL;
-	}
-	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_PLT_CLASS_ID );
-	if (im == NULL) {
-		printf ("No image\n");
-		delete ( str );
-		return NULL;
-	}
+		IE_PLT_CLASS_ID );
+	if (str == NULL ) {
+		str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
+		if (str == NULL) {
+			printf ("No stream\n");
+			return NULL;
+		}
 
-	if (!im->Open( str, true )) {
-		printf ("Can't open image\n");
-		core->FreeInterface( im );
-		return NULL;
-	}
+		AnimationMgr* am = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
+		if (am == NULL) {
+			printf ("No animation manager\n");
+			delete ( str );
+			return NULL;
+		}
 
-	im->GetPalette( 0, col1, NULL );
-	im->GetPalette( 1, col2, NULL );
-	im->GetPalette( 2, col3, NULL );
-	im->GetPalette( 3, col4, NULL );
-	im->GetPalette( 4, col5, NULL );
-	im->GetPalette( 5, col6, NULL );
-	im->GetPalette( 6, col7, NULL );
-	im->GetPalette( 7, col8, NULL );
-	Sprite2D* Picture = im->GetImage();
-	if (Picture == NULL) {
-		printf ("Picture == NULL\n");
+		if (!am->Open( str, true )) {
+			printf ("Can't open bam\n");
+			core->FreeInterface( am );
+			return NULL;
+		}
+		Picture = am->GetPaperdollImage(col[0]==-1?NULL:col);
+		core->FreeInterface( am );
+		if (Picture == NULL) {
+			printf ("Picture == NULL\n");
+			return NULL;
+		}
+	} else {
+		ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_PLT_CLASS_ID );
+		if (im == NULL) {
+			printf ("No image manager\n");
+			delete ( str );
+			return NULL;
+		}
+
+		if (!im->Open( str, true )) {
+			printf ("Can't open image\n");
+			core->FreeInterface( im );
+			return NULL;
+		}
+
+		for(int i=0;i<8;i++) {
+			im->GetPalette( i, col[i], NULL );
+		}
+		Picture = im->GetImage();
 		core->FreeInterface( im );
-		return NULL;
+		if (Picture == NULL) {
+			printf ("Picture == NULL\n");
+			return NULL;
+		}
 	}
 
 	btn->SetPicture( Picture );
-
-	core->FreeInterface( im );
 
 	Py_INCREF( Py_None );
 	return Py_None;

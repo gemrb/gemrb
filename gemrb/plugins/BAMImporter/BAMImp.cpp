@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.32 2004/12/05 12:27:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.33 2004/12/12 22:27:26 avenger_teambg Exp $
  *
  */
 
@@ -200,10 +200,12 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 	if (findex >= FramesCount) {
 		findex = cycles[0].FirstFrame;
 	}
-	void* pixels = GetFramePixels(findex, mode);
+	void* pixels = GetFramePixels(findex);
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(
 		frames[findex].Width, frames[findex].Height, 8,
 		pixels, Palette, true, 0 );
+	//don't free pixels, createsprite stores it
+
 	spr->XPos = frames[findex].XPos;
 	spr->YPos = frames[findex].YPos;
 	if (mode == IE_SHADED) {
@@ -213,7 +215,7 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 	return spr;
 }
 
-void* BAMImp::GetFramePixels(unsigned short findex, unsigned char /*mode*/)
+void* BAMImp::GetFramePixels(unsigned short findex)
 {
 	if (findex >= FramesCount) {
 		findex = cycles[0].FirstFrame;
@@ -383,3 +385,67 @@ Sprite2D* BAMImp::GetPalette()
 	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, Palette, false );
 }
 
+void BAMImp::SetupColors(int *Colors)
+{
+        Color* MetalPal = core->GetPalette( Colors[0], 12 );
+        Color* MinorPal = core->GetPalette( Colors[1], 12 );
+        Color* MajorPal = core->GetPalette( Colors[2], 12 );
+        Color* SkinPal = core->GetPalette( Colors[3], 12 );
+        Color* LeatherPal = core->GetPalette( Colors[4], 12 );
+        Color* ArmorPal = core->GetPalette( Colors[5], 12 );
+        Color* HairPal = core->GetPalette( Colors[6], 12 );
+        memcpy( &Palette[0x04], MetalPal, 12 * sizeof( Color ) );
+        memcpy( &Palette[0x10], MinorPal, 12 * sizeof( Color ) );
+        memcpy( &Palette[0x1C], MajorPal, 12 * sizeof( Color ) );
+        memcpy( &Palette[0x28], SkinPal, 12 * sizeof( Color ) );
+        memcpy( &Palette[0x34], LeatherPal, 12 * sizeof( Color ) );
+        memcpy( &Palette[0x40], ArmorPal, 12 * sizeof( Color ) );
+        memcpy( &Palette[0x4C], HairPal, 12 * sizeof( Color ) );
+        memcpy( &Palette[0x58], &MinorPal[1], 8 * sizeof( Color ) );
+        memcpy( &Palette[0x60], &MajorPal[1], 8 * sizeof( Color ) );
+        memcpy( &Palette[0x68], &MinorPal[1], 8 * sizeof( Color ) );
+        memcpy( &Palette[0x70], &MetalPal[1], 8 * sizeof( Color ) );
+        memcpy( &Palette[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
+        memcpy( &Palette[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
+        memcpy( &Palette[0x88], &MinorPal[1], 8 * sizeof( Color ) );
+
+        int i; //moved here to be compatible with msvc6.0
+
+        for (i = 0x90; i < 0xA8; i += 0x08)
+                memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
+        memcpy( &Palette[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
+        for (i = 0xB8; i < 0xFF; i += 0x08)
+                memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
+
+        free( MetalPal );
+        free( MinorPal );
+        free( MajorPal );
+        free( SkinPal );
+        free( LeatherPal );
+        free( ArmorPal );
+        free( HairPal );
+}
+
+Sprite2D* BAMImp::GetPaperdollImage(int *Colors)
+{
+	if (FramesCount<2) {
+		return NULL;
+	}
+	if(Colors) {
+		SetupColors(Colors);
+	}
+
+        void* pixels = GetFramePixels(0);
+	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(frames[0].Width, frames[0].Height, 8, pixels, Palette, true, 0 );
+	spr->XPos = frames[0].XPos;
+	spr->YPos = frames[0].YPos;
+	//don't free pixels, createsprite stores it
+/*
+        pixels = GetFramePixels(1);
+	spr = core->GetVideoDriver()->CreateSprite8(frames[1].Width, frames[1].Height, 8, pixels, Palette, true, 0 );
+
+	spr->XPos = frames[1].XPos;
+	spr->YPos = frames[1].YPos;
+*/
+	return spr;
+}
