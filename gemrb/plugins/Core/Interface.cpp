@@ -57,8 +57,13 @@ Interface::~Interface(void)
 		m = fonts.begin();
 	}
 	std::vector<Window*>::iterator w = windows.begin();
+	std::vector<bool>::iterator b = freeslots.begin();
 	for(int i = 0; windows.size() != 0; ) {
-		delete(*w);
+		if(!(*b)) {
+			delete(*w);
+		}
+		freeslots.erase(b);
+		b = freeslots.begin();
 		windows.erase(w);
 		w = windows.begin();
 	}
@@ -508,6 +513,8 @@ ScriptEngine * Interface::GetGUIScriptEngine()
 int Interface::LoadWindow(unsigned short WindowID)
 {
 	for(int i = 0; i < windows.size(); i++) {
+		if(freeslots[i])
+			continue;
 		if(windows[i]->WindowID == WindowID) {
 			windows[i]->Invalidate();
 			return i;
@@ -516,7 +523,21 @@ int Interface::LoadWindow(unsigned short WindowID)
 	Window * win = windowmgr->GetWindow(WindowID);
 	if(win == NULL)
 		return -1;
-	windows.push_back(win);
+	int slot = -1;
+	for(int i = 0; i < freeslots.size(); i++) {
+		if(freeslots[i]) {
+			slot = i;
+			break;
+		}
+	}
+	if(slot == -1) {
+		windows.push_back(win);
+		freeslots.push_back(false);
+	}
+	else {
+		windows[slot] = win;
+		freeslots[i] = false;
+	}
 	win->Invalidate();
 	return windows.size()-1;
 }
@@ -664,14 +685,10 @@ int Interface::DelWindow(unsigned short WindowIndex)
 {
 	if(WindowIndex >= windows.size())
 		return -1;
-	std::vector<Window*>::iterator w = windows.begin();
-	w+=WindowIndex;
-	Window * win = (*w);
-	if(!win)
-		return -1;
+	Window * win = windows[WindowIndex];
 	evntmgr->DelWindow(win->WindowID);
 	delete(win);
-	windows.erase(w);
+	freeslots[WindowIndex] = true;
 	return 0;
 }
 
