@@ -1,4 +1,4 @@
-#this is essentially Start.py from the SoA game, except a very small change
+#this is essentially Start.py from the SoA game, except for a very small change
 import GemRB
 
 StartWindow = 0
