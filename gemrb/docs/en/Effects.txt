@@ -1,0 +1,104 @@
+A kind of 'specification' for the IE game effects.
+This description uses the IESDP effect structure definition with updates.
+
+V1.0 effect struct (you need to convert it to V2 on the fly)
+typedef struct {
+  short feature; //opcode
+  unsigned char target; //target type
+  unsigned char power;  //level
+  parameter par1;
+  parameter par2;
+  unsigned char timing; //timing method
+  unsigned char resist; //resistance type
+  long duration;  
+  unsigned char prob2; //usually 100
+  unsigned char prob1; //usually 0
+  char resource[8];    //1. resource
+  long count;
+  long sides;
+  long stype;
+  long sbonus;
+  long unknown2c; //unused in V1.0, but copied over to 2.0
+} feat_block;
+
+//effect body (V2.0 effects)
+Offset Size (data type) Description
+0x0000 4 (char array) For on disk effects, this is a copy of the Signature field from the header. For embedded EFF V2.0 structures, this is zeroed out.
+0x0004 4 (char array) For on disk effects, this is a copy of the Version field from the header. For embedded EFF V2.0 structures, this is zeroed out.
+0x0008 4 (dword) Effect type
+0x000c 4 (dword) Target type
+0x0010 4 (dword) Power (level)
+0x0014 4 (dword) NP1
+0x0018 4 (dword) NP2
+0x001c 4 (dword) Flags (timing method)
+ 0 - duration
+ 1 - permanent
+ 2 - while equipped (source of effect)
+ 3 - delayed duration (after delay duration)
+ 4 - delayed (after delay it is permanent)
+ 5 - special, delayed
+ 6 - special, duration
+ 7 - special, ?
+ 8 - ?
+ 9 - permanent after death
+ 10 - trigger (just expired)
+
+0x0020 4 (dword) Time (duration)
+0x0024 2 (word) Probability 1
+0x0026 2 (word) Probability 2
+0x0028 8 (resref) resource
+0x0030 4 (dword) die sides/max level
+0x0034 4 (dword) dice count/min level
+0x0038 4 (dword) save type (stype)
+0x003c 4 (dword) save bonus (sbonus)
+0x0040 4 (dword) Is Variable? (same as 0x2c in EFF V1.0)
+0x0044 4 (dword) Spell School (used for dispelling)
+0x0048 4*3 (dword) Unknown
+0x0054 4 (dword) Resistance Type (resist)
+0x0058 4 (dword) NP3
+0x005c 4 (dword) NP4
+0x0060 4*2 (dword) unknown
+0x0068 8 (resref) VVC
+0x0070 8 (resref) 3. resource
+0x0078 4*5 (dword) unknown
+0x008c 8 (resref) Source of Effect (used for equipping and dispelling)
+0x0094 4*3 (dword) unknown
+0x00a0 32 (bytes) variable
+0x00c0 4*2 (dword) unknown
+0x00c8 4 (dword) Secondary Type (used for dispelling)
+0x00cc 4*15 (dword) unknown
+
+
+An effect's lifecycle:
+(apply time)
+1. Check if it affects the target
+- if percentages don't match, drop it
+- if level limits don't match, drop it (some effects don't have this)
+- if resistable, check for resistance (once for an applied block)
+- if saving throw applies, check for it (once for an applied block)
+2. If it is a delayed effect
+- precalculate the time of onset (in game time) (store it in the duration field).
+- put it on the fx list
+3. If it is an instant effect (some opcodes ignore delays, so they are always instant)
+
+(in each update cycle in creatures)
+1. copy the original stats to the modified stats
+2. apply all effects in their original order
+- if the effect isn't in time (delayed or delayed duration, 3 or 4), skip it
+- if a delayed effect reached time: change it to permanent (i think this is a different permanent)
+- if a delayed duration effect reached time: change it to duration
+- if the effect is permanent (1 or 9), apply it (some effects couldn't be permanent, these effects just apply, then go away)
+- if the effect reached end (duration), set a special timing method (10)
+- if an effect reached expiration (10) remove it from the queue
+
+(dispelling/removal)
+There should be a way of:
+1. Dispelling all by power level  ( remove all effects <= power level)
+2. Dispelling all by source of effect ( remove all effects == soe)
+3. Dispelling all or first that matches a spell school or secondary type
+- there is a 'dispellable' flag in the effects which normally disables dispelling. But there should be a 'forced dispel' flag.
+4  On death: remove all effects except (9)
+
+(saving)
+Effects that are not saved: 2 -'while equipped'
+
