@@ -29,6 +29,7 @@ class MapControl;
 class GEM_EXPORT MapControl : public Control {
 public:
 	int ScrollX, ScrollY;
+	int NotePosX, NotePosY;
 	unsigned short lastMouseX, lastMouseY;
 	bool MouseIsDown;
 	bool ConvertToGame;

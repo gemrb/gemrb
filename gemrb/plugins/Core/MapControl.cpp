@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.20 2004/11/18 23:32:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.21 2004/11/20 10:58:15 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -67,6 +67,8 @@ MapControl::MapControl(void)
 	LinkedLabel = NULL;
 	ScrollX = 0;
 	ScrollY = 0;
+	NotePosX = 0;
+	NotePosY = 0;
 	MouseIsDown = false;
 	Changed = true;
 	ConvertToGame = true;
@@ -263,17 +265,18 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 				if (LinkedLabel) {
 					LinkedLabel->SetText( mn->text );
 				}
-				//if you ever need something else to do
-				//(like erasing the label before redrawing)
-				//change this return
+				NotePosX = mn->Pos.x;
+				NotePosY = mn->Pos.y;
 				return;
 			}
 		}
+		NotePosX = mp.x;
+		NotePosY = mp.y;
 	}
 	if (LinkedLabel) {
 		LinkedLabel->SetText( "" );
 		//this will erase the label (no idea why is it needed)
-        	( ( Window * ) Owner )->Invalidate();
+        	//( ( Window * ) Owner )->Invalidate();
 	}
 }
 
@@ -282,8 +285,8 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short /*Mod*/)
 {
 	// FIXME: it would be better if the var names were user-settable
-	core->GetDictionary()->SetAt( "MapControlX", SCREEN_TO_MAPX(x) );
-	core->GetDictionary()->SetAt( "MapControlY", SCREEN_TO_MAPX(y) );
+	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
+	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
 	RunEventHandler( MapControlOnPress );
 
 	if ((Button != GEM_MB_ACTION) ) {
