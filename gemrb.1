@@ -66,7 +66,7 @@ Empty lines and lines starting with `#' (hash sign) are ignored.
 .B Parameters:
 
 .TP
-.BR GameType =(bg1|bg2|iwd|iwd2|how|pst)
+.BR GameType =(bg1|bg2|tob|iwd|iwd2|how|pst)
 Type of the game. The value is a name of subdirectory in override/ 
 and GUIScripts/ directories
 with game type-specific files and scripts. It is at present also used
@@ -93,11 +93,11 @@ program found at
 .BR CDn =....
 Path to data files from game's particular CDs.
 
-.TP
-.BR INIConfig =FILE
-Name of the game's INI file, relative to 
-.IR GamePath .
-E.g. for Baldur's Gate game it is baldur.ini.
+.\".TP
+.\".BR INIConfig =FILE
+.\"Name of the game's INI file, relative to 
+.\".IR GamePath .
+.\"E.g. for Baldur's Gate game it is baldur.ini.
 
 
 .TP
@@ -123,6 +123,12 @@ Some older games such as BG1 and PST need this parameter to be
 .IR 1 .
 For other game types set it to
 .IR 0 .
+
+.TP
+.BR TooltipDelay =INT
+Delay (in ms) before tooltips are displayed when mouse is not moving.
+Resaonable number for this option is e.g.
+.IR 500 .
 
 .TP
 .BR SkipIntroVideos =(0|1)
@@ -194,34 +200,34 @@ defaults to
 .TP
 .BR MidResAvatars =(0|1)
 
-.TP
-.BR HasSongList =(0|1)
+.\".TP
+.\".BR HasSongList =(0|1)
 
-.TP
-.BR UpperButtonText =(0|1)
-Convert all button labels to upper case?
+.\".TP
+.\".BR UpperButtonText =(0|1)
+.\"Convert all button labels to upper case?
 
-.TP
-.BR LowerLabelText =(0|1)
-Convert all labels to lower case?
+.\".TP
+.\".BR LowerLabelText =(0|1)
+.\"Convert all labels to lower case?
 
-.TP
-.BR HasPartyINI =(0|1)
+.\".TP
+.\".BR HasPartyINI =(0|1)
 
-.TP
-.BR HasBeastsINI =(0|1)
-Whether game directory contains 
-.I beast.ini 
-and 
-.I quests.ini
-files. Descriptions
-of quests and beasts are held in these files.
+.\".TP
+.\".BR HasBeastsINI =(0|1)
+.\"Whether game directory contains 
+.\".I beast.ini 
+.\"and 
+.\".I quests.ini
+.\"files. Descriptions
+.\"of quests and beasts are held in these files.
 
-Set this option to
-.I 1
-for PST game and to
-.I 0
-elsewhere, since these files are found on PST only.
+.\"Set this option to
+.\".I 1
+.\"for PST game and to
+.\".I 0
+.\"elsewhere, since these files are found on PST only.
 
 .TP
 .BR GameDataPath =PATH
@@ -237,13 +243,13 @@ Usually it's
 .IR override .
 Original games use this directory to place last-minute patches.
 
-.TP
-.BR CursorBAM =RESREF
-Name of resource with cursor pixmap.
+.\".TP
+.\".BR CursorBAM =RESREF
+.\"Name of resource with cursor pixmap.
 
-.TP
-.BR ButtonFont =RESREF
-Name of resource with font used for button labels.
+.\".TP
+.\".BR ButtonFont =RESREF
+.\"Name of resource with font used for button labels.
 
 .\"###################################################
 .SH FILES

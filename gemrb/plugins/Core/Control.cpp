@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.21 2004/04/26 15:15:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.22 2004/04/28 12:52:14 edheldil Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include <string.h>
 #include "../../includes/win32def.h"
 #include "Control.h"
+#include "Window.h"
 #include "Interface.h"
 
 extern Interface* core;
@@ -55,6 +56,14 @@ int Control::SetTooltip(const char* string, int pos)
 	}
 	Changed = true;
 	return 0;
+}
+/** Sets the tooltip to be displayed on the screen now */
+void Control::DisplayTooltip()
+{
+	if (Tooltip)
+		core->DisplayTooltip( (( Window* )Owner)->XPos + XPos + Width / 2, (( Window* )Owner)->YPos + YPos + Height / 2, Tooltip );
+	else
+		core->DisplayTooltip( 0, 0, NULL );
 }
 void Control::RunEventHandler(EventHandler handler)
 {

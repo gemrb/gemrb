@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.63 2004/04/14 23:53:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.64 2004/04/28 12:52:13 edheldil Exp $
  *
  */
 
@@ -36,6 +36,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	xCorr = 0;
 	yCorr = 0;
 	lastTime = 0;
+	GetTime( lastMouseTime );
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -388,6 +389,7 @@ int SDLVideoDriver::SwapBuffers(void)
 
 			case SDL_MOUSEMOTION:
 				 {
+					 GetTime( lastMouseTime );
 					if (DisableMouse)
 						break;
 					CursorPos.x = event.motion.x - mouseAdjustX[CursorIndex];
@@ -455,6 +457,7 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 	unsigned long time;
 	GetTime( time );
+
 	if (( time - lastTime ) < 17) {
 		SDL_Delay(17);
 		return ret;
@@ -472,6 +475,19 @@ int SDLVideoDriver::SwapBuffers(void)
 		};
 		SDL_BlitSurface( extra, &src, disp, &dst );
 	}
+
+	/** Display tooltip if mouse is idle */
+	if (( time - lastMouseTime ) > core->TooltipDelay) {
+		if (Evnt)
+			Evnt->MouseIdle( time - lastMouseTime );
+
+		/** This causes the tooltip to be rendered directly to display */
+		SDL_Surface* tmp = backBuf;
+		backBuf = disp;
+		core->DrawTooltip();
+		backBuf = tmp;
+	}
+
 	if (Cursor[CursorIndex] && !DisableMouse) {
 		short x = CursorPos.x;
 		short y = CursorPos.y;

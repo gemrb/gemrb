@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.17 2004/04/26 15:15:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.18 2004/04/28 12:52:14 edheldil Exp $
  *
  */
 
@@ -62,6 +62,7 @@ public:
 	virtual int SetText(const char* string, int pos = 0) = 0;
 	/** Sets the Tooltip text of the current control */
 	virtual int SetTooltip(const char* string, int pos = 0);
+	void DisplayTooltip();
 	/** Variables */
 	char VarName[MAX_VARIABLE_LENGTH];
 	/** the value of the button to add to the variable */

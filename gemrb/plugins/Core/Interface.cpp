@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.163 2004/04/27 06:19:20 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.164 2004/04/28 12:52:14 edheldil Exp $
  *
  */
 
@@ -84,6 +84,10 @@ Interface::Interface(int iargc, char** iargv)
 	slotmatrix = NULL;
 	slottypes = NULL;
 
+	tooltip_x = 0;
+	tooltip_y = 0;
+	tooltip_text = NULL;
+	
 	pal256 = NULL;
 	pal16 = NULL;
 
@@ -99,6 +103,7 @@ Interface::Interface(int iargc, char** iargv)
 #endif
 	GameOnCD = false;
 	SkipIntroVideos = false;
+	TooltipDelay = 100;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
 	SavePath[0] = 0;
@@ -108,6 +113,7 @@ Interface::Interface(int iargc, char** iargv)
 	memcpy( GameOverride, "override", 9 );
 	memcpy( GameData, "data\0\0\0\0", 9 );
 	memcpy( ButtonFont, "STONESML", 9 );
+	memcpy( TooltipFont, "STONESML", 9 );
 	memcpy( CursorBam, "CAROT\0\0\0", 9 );
 	memcpy( GlobalScript, "BALDUR\0\0", 9 );
 	memcpy( GlobalMap, "WORLDMAP", 9 );
@@ -845,6 +851,8 @@ bool Interface::LoadConfig(const char* filename)
 			SetFeature( atoi( value ), GF_IGNORE_BUTTON_FRAMES );
 		} else if (stricmp( name, "ForceStereo" ) == 0) {
 			ForceStereo = atoi( value );
+		} else if (stricmp( name, "TooltipDelay" ) == 0) {
+			TooltipDelay = atoi( value );
 			/*
 		} else if (stricmp( name, "CursorBam" ) == 0) {
 			strncpy( CursorBam, value, 8 );
@@ -983,6 +991,7 @@ bool Interface::LoadGemRBINI()
 
 	strcpy( CursorBam, ini->GetKeyAsString( "resources", "CursorBAM", "CAROT" ));
 	strcpy( ButtonFont, ini->GetKeyAsString( "resources", "ButtonFont", "STONESML" ));
+	strcpy( TooltipFont, ini->GetKeyAsString( "resources", "TooltipFont", "STONESML" ));
 	strcpy( INIConfig, ini->GetKeyAsString( "resources", "INIConfig", "baldur.ini" ));
 
 
@@ -1225,6 +1234,13 @@ int Interface::SetTooltip(unsigned short WindowIndex,
 	return ctrl->SetTooltip( string );
 }
 
+void Interface::DisplayTooltip(int x, int y, char* text)
+{
+	tooltip_x = x;
+	tooltip_y = y;
+	tooltip_text = text;
+}
+
 /** Set a Window Visible Flag */
 int Interface::SetVisible(unsigned short WindowIndex, int visible)
 {
@@ -1412,6 +1428,24 @@ void Interface::DrawWindows(void)
 			windows[( *t )]->DrawWindow();
 		++t;
 	}
+
+}
+
+void Interface::DrawTooltip ()
+{	
+	if (! tooltip_text) 
+		return;
+
+	int Width = 200;
+	int Height = 100;
+
+	Color fore = {0x00, 0xff, 0x00, 0x00};
+	Color back = {0x00, 0x00, 0x00, 0x00};
+	Color* palette = GetVideoDriver()->CreatePalette( fore, back );
+	
+	GetFont( TooltipFont )->Print( Region( tooltip_x - Width / 2, tooltip_y - Height / 2, Width, Height ),
+				       ( unsigned char * ) tooltip_text, palette,
+				       IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE, true );
 }
 
 Window* Interface::GetWindow(unsigned short WindowIndex)

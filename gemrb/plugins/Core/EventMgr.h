@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.14 2004/04/26 15:15:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.15 2004/04/28 12:52:14 edheldil Exp $
  *
  */
 
@@ -71,6 +71,8 @@ public:
 	/** BroadCast Mouse Move Event */
 	void MouseUp(unsigned short x, unsigned short y, unsigned char Button,
 		unsigned short Mod);
+	/** BroadCast Mouse Idle Event */
+	void MouseIdle(unsigned long time);
 	/** BroadCast Key Press Event */
 	void KeyPress(unsigned char Key, unsigned short Mod);
 	/** BroadCast Key Release Event */

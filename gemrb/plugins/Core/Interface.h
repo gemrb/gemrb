@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.92 2004/04/26 11:14:06 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.93 2004/04/28 12:52:14 edheldil Exp $
  *
  */
 
@@ -118,10 +118,14 @@ private:
 	int GameFeatures;
 	char ButtonFont[9];
 	char CursorBam[9];
+	char TooltipFont[9];
 	unsigned int* slotmatrix; //itemtype vs slottype
 	unsigned int* slottypes;  //slottype vs slot mapping
 	int ItemTypes;
 	int SlotTypes; //this is the same as the inventory size
+	int tooltip_x;
+	int tooltip_y;
+	char* tooltip_text;
 public:
 	char GlobalScript[9];
 	char GlobalMap[9];
@@ -220,6 +224,10 @@ public:
 	int SetText(unsigned short WindowIndex, unsigned short ControlIndex, const char * string);
 	/** Set the Tooltip text of a Control */
 	int SetTooltip(unsigned short WindowIndex, unsigned short ControlIndex, const char * string);
+	/** sets tooltip to be displayed */
+	void DisplayTooltip(int x, int y, char* text);
+	/** Actually draws tooltip on the screen. Called from SDLVideoDriver */
+	void DrawTooltip();
 	/** Set a Window Visible Flag */
 	int SetVisible(unsigned short WindowIndex, int visible);
 	/** Show a Window in Modal Mode */
@@ -335,6 +343,7 @@ public:
 	char CD5[_MAX_PATH];
 	char CD6[_MAX_PATH];
 	int Width, Height, Bpp, ForceStereo;
+	int TooltipDelay;
 	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos;
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);

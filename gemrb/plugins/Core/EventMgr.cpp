@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.30 2004/04/26 15:15:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.31 2004/04/28 12:52:14 edheldil Exp $
  *
  */
 
@@ -125,6 +125,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 	if (!lastW) {
 		return;
 	}
+	core->DisplayTooltip( 0, 0, NULL );
 	std::vector< int>::iterator t;
 	std::vector< Window*>::iterator m;
 	for (t = topwin.begin(); t != topwin.end(); ++t) {
@@ -184,7 +185,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y,
 				//Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
 				Control* ctrl = ( *m )->GetControl( x, y );
-				printf( "dn: ctrl: %p\n", ctrl );
+				//printf( "dn: ctrl: %p\n", ctrl );
 				if (lastW == NULL)
 					lastW = ( *m );
 				if (ctrl != NULL) {
@@ -192,7 +193,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y,
 					ctrl->OnMouseDown( x - lastW->XPos - ctrl->XPos,
 							y - lastW->YPos - ctrl->YPos, Button, Mod );
 					lastF = ctrl;
-					printf( "dn lastF: %p\n", lastF );
+					//printf( "dn lastF: %p\n", lastF );
 				}
 				lastW = *m;
 				return;
@@ -204,15 +205,24 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y,
 	}
 	lastF = NULL;
 }
-/** BroadCast Mouse Move Event */
+/** BroadCast Mouse Up Event */
 void EventMgr::MouseUp(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
 	MButtons &= ~Button;
-	printf( "up lastF: %p\n", lastF );
+	//printf( "up lastF: %p\n", lastF );
 	if (lastF != NULL) {
 		lastF->OnMouseUp( x - lastW->XPos - lastF->XPos,
 				y - lastW->YPos - lastF->YPos, Button, Mod );
+	}
+}
+
+/** BroadCast Mouse Idle Event */
+void EventMgr::MouseIdle(unsigned long time)
+{
+	//MButtons &= ~Button;
+	if (last_ctrl_over != NULL) {
+		last_ctrl_over->DisplayTooltip();
 	}
 }
 
