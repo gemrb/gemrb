@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.28 2004/10/17 17:01:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.29 2005/02/23 20:47:00 guidoj Exp $
  *
  */
 
@@ -66,13 +66,13 @@ public:
 	ACMImp(void);
 	~ACMImp(void);
 	bool Init(void);
-	unsigned long Play(const char* ResRef, int XPos = 0, int YPos = 0, unsigned long flags = GEM_SND_RELATIVE);
-	unsigned long StreamFile(const char* filename);
+	unsigned int Play(const char* ResRef, int XPos = 0, int YPos = 0, unsigned int flags = GEM_SND_RELATIVE);
+	unsigned int StreamFile(const char* filename);
 	bool Play();
 	bool Stop();
 	void ResetMusics();
 	void UpdateViewportPos(int XPos, int YPos);
-	void UpdateVolume( unsigned long which = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS );
+	void UpdateVolume( unsigned int which = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS );
 	static ALuint LoadSound(const char *sound, int *time_length = NULL);
 public:
 	void release(void)

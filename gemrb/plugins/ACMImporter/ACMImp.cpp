@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.59 2004/10/04 22:02:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.60 2005/02/23 20:47:00 guidoj Exp $
  *
  */
 
@@ -318,14 +318,14 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 
 	CSoundReader* acm;
 	acm = CreateSoundReader( stream, type, stream->Size(), true );
-	long cnt = acm->get_length();
-	long riff_chans = acm->get_channels();	
-	long samplerate = acm->get_samplerate();
+	int cnt = acm->get_length();
+	int riff_chans = acm->get_channels();	
+	int samplerate = acm->get_samplerate();
 	//multiply always by 2 because it is in 16 bits
-	long rawsize = cnt * riff_chans * 2;
+	int rawsize = cnt * riff_chans * 2;
 	unsigned char * memory = (unsigned char*) malloc(rawsize); 
 	//multiply always with 2 because it is in 16 bits
-	long cnt1 = acm->read_samples( ( short* ) memory, cnt ) * riff_chans * 2;
+	int cnt1 = acm->read_samples( ( short* ) memory, cnt ) * riff_chans * 2;
 	//Sound Length in milliseconds
 	if (time_length) *time_length = ((cnt / riff_chans) * 1000) / samplerate;
 	//it is always reading the stuff into 16 bits
@@ -347,7 +347,7 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
  * 	GEM_SND_RELATIVE: sound position is relative to the listener
  * the default flags are: GEM_SND_RELATIVE
  */
-unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned long flags)
+unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int flags)
 {
 	unsigned int i;
 
@@ -441,7 +441,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned long
 	return 0;
 }
 
-unsigned long ACMImp::StreamFile(const char* filename)
+unsigned int ACMImp::StreamFile(const char* filename)
 {
 	char path[_MAX_PATH];
 	ALenum error;
@@ -529,7 +529,7 @@ void ACMImp::UpdateViewportPos(int XPos, int YPos)
 	alListener3f( AL_POSITION, ( float ) XPos, ( float ) YPos, 0.0f );
 }
 
-void ACMImp::UpdateVolume( unsigned long which )
+void ACMImp::UpdateVolume( unsigned int which )
 {
 	if ((GEM_SND_VOL_MUSIC & which) && alIsSource( MusicSource )) {
 		SDL_mutexP( musicMutex );

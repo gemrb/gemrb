@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSnd.h,v 1.4 2004/08/07 17:51:28 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSnd.h,v 1.5 2005/02/23 20:47:01 guidoj Exp $
  *
  */
 
@@ -29,8 +29,8 @@ public:
 	NullSnd(void);
 	~NullSnd(void);
 	bool Init(void);
-	unsigned long Play(const char* ResRef, int XPos = 0, int YPos = 0,  unsigned long flags = GEM_SND_RELATIVE);
-	unsigned long StreamFile(const char* filename);
+	unsigned int Play(const char* ResRef, int XPos = 0, int YPos = 0,  unsigned int flags = GEM_SND_RELATIVE);
+	unsigned int StreamFile(const char* filename);
 	bool Play();
 	bool Stop();
 	void ResetMusics();
