@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.7 2004/10/02 11:05:48 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.8 2004/10/17 06:18:03 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -120,21 +120,21 @@ def OpenInventoryWindow ():
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 
 	# encumbrance
-	#Button = GemRB.GetControl (Window, 46);
-	#GemRB.SetButtonFont (Window, Button, "NUMBER")
-	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	Label = GemRB.CreateLabel (Window, 0x10000043, 20,444,56,20,"NUMBER","0:",IE_FONT_ALIGN_TOP);
+	Label = GemRB.CreateLabel (Window, 0x10000044, 20,454,56,20,"NUMBER","0:",IE_FONT_ALIGN_TOP);
+	#GemRB.SetTooltip (Window, Label, 4196)
 
 	# armor class
 	Label = GemRB.GetControl (Window, 0x10000038)
-	GemRB.SetTooltip (Window, Label, 4197)
+	#GemRB.SetTooltip (Window, Label, 4197)
 
 	# hp current
 	Label = GemRB.GetControl (Window, 0x10000039)
-	GemRB.SetTooltip (Window, Label, 4198)
+	#GemRB.SetTooltip (Window, Label, 4198)
 
 	# hp max
 	Label = GemRB.GetControl (Window, 0x1000003a)
-	GemRB.SetTooltip (Window, Label, 4199)
+	#GemRB.SetTooltip (Window, Label, 4199)
 
 	#ground icons scrollbar
 	ScrollBar = GemRB.GetControl (Window, 66)
@@ -259,8 +259,22 @@ def UpdateInventoryWindow ():
 		Color2, Color1, Color3, Color6, Color5, Color4, Color7, 0)
 
 	# encumbrance
-	#Button = GemRB.GetControl (Window, 46);
-	#GemRB.SetText (Window, Button, "\001\n\n\n\n\007\007\007\013")
+	Label = GemRB.GetControl (Window, 0x10000043);
+        # Loading tables of modifications
+        Table = GemRB.LoadTable("strmod")
+        TableEx = GemRB.LoadTable("strmodex")
+        # Getting the character's strength
+        sstr = GemRB.GetPlayerStat (pc, IE_STR)
+        ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
+
+        max_encumb = GemRB.GetTableValue(Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
+        GemRB.SetText (Window, Label, str(max_encumb) + ":")
+
+        # FIXME: Current encumbrance is hardcoded
+	Label = GemRB.GetControl (Window, 0x10000044);
+        # Unloading tables is not necessary, i think (they will stay cached)
+        #GemRB.UnloadTable (Table)
+        #GemRB.UnloadTable (TableEx)
 
 	# armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
