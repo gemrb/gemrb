@@ -58,11 +58,18 @@ bool CHUImp::Open(DataStream * stream, bool autoFree)
 /** Returns the i-th window in the Previously Loaded Stream */
 Window * CHUImp::GetWindow(unsigned long i)
 {
-	if(i >= WindowCount)
-		return NULL;
-	str->Seek(WEOffset+(0x1c*i), GEM_STREAM_START);
 	unsigned short WindowID, XPos, YPos, Width, Height, BackGround, ControlsCount, FirstControl;
-	str->Read(&WindowID, 2);
+	bool found = false;
+	for(int c = 0; c < WindowCount; c++) {
+	str->Seek(WEOffset+(0x1c*c), GEM_STREAM_START);
+		str->Read(&WindowID, 2);
+		if(WindowID == i) {
+			found = true;
+			break;
+		}
+	}
+	if(!found)
+		return NULL;
 	str->Seek(2, GEM_CURRENT_POS);
 	str->Read(&XPos, 2);
 	str->Read(&YPos, 2);
