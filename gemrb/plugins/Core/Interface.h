@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.131 2005/01/15 14:55:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.132 2005/01/22 20:28:58 avenger_teambg Exp $
  *
  */
 
@@ -60,6 +60,7 @@
 #include "WorldMapControl.h"
 #include "GlobalTimer.h"
 #include "SaveGameMgr.h"
+#include "Cache.h"
 
 typedef struct Table {
 	TableMgr * tm;
@@ -110,6 +111,7 @@ public:
 	StringMgr *strings;
 	GlobalTimer * timer;
 private:
+	Cache ItemCache;
 	Factory * factory;
 	ImageMgr * pal256;
 	ImageMgr * pal32;
@@ -380,7 +382,7 @@ public:
 	CREItem* GetDraggedItem() { return DraggedItem; }
 	CREItem *ReadItem(DataStream *str);
 	bool ResolveRandomItem(CREItem *itm);
-	Item* GetItem(const char* resname);
+	Item* GetItem(ieResRef resname);
 	void FreeItem(Item *itm);
 	Spell* GetSpell(const char* resname);
 	void FreeSpell(Spell *spl);

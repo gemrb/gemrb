@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.249 2005/01/16 22:55:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.250 2005/01/22 20:28:49 avenger_teambg Exp $
  *
  */
 
@@ -170,6 +170,7 @@ Interface::Interface(int iargc, char** iargv)
 Interface::~Interface(void)
 {
 	CharAnimations::ReleaseMemory();
+	ItemCache.RemoveAll();
 
 	if (TooltipBack) {
 		for(int i=0;i<3;i++) {
@@ -2599,8 +2600,12 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 	return false;
 }
 
-Item* Interface::GetItem(const char* resname)
+Item* Interface::GetItem(ieResRef resname)
 {
+	Item *item = (Item *) ItemCache.GetResource(resname);
+	if (item) {
+		return item;
+	}
 	DataStream* str = GetResourceMgr()->GetResource( resname, IE_ITM_CLASS_ID );
 	ItemMgr* sm = ( ItemMgr* ) GetInterface( IE_ITM_CLASS_ID );
 	if (sm == NULL) {
@@ -2612,21 +2617,23 @@ Item* Interface::GetItem(const char* resname)
 		return NULL;
 	}
 
-	Item* item = sm->GetItem();
+	item = sm->GetItem();
 	if (item == NULL) {
 		FreeInterface( sm );
 		return NULL;
 	}
 
 	FreeInterface( sm );
+	ItemCache.SetAt(resname, (void *) item);
 	return item;
 }
 
 void Interface::FreeItem(Item *itm)
 {
-	ItemMgr * sm = (ItemMgr *) GetInterface(IE_ITM_CLASS_ID);
-	sm->ReleaseItem(itm);
-	FreeInterface(sm);
+	if( ItemCache.DecRef((void *) itm, false) <0) {
+		printMessage( "Core", "Corrupted Item cache encountered (reference count went below zero)", WHITE );
+		abort();
+	}
 }
 
 Spell* Interface::GetSpell(const char* resname)

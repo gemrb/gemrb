@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.54 2004/11/18 19:42:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.55 2005/01/22 20:28:48 avenger_teambg Exp $
  *
  */
 
@@ -142,20 +142,6 @@ CRESpellMemorization* CREImp::GetSpellMemorization()
 
 	return spl;
 }
-/*
-CREItem* CREImp::GetItem()
-{
-	CREItem *itm = new CREItem();
-	str->ReadResRef( itm->ItemResRef );
-	str->ReadWord( &itm->Unknown08 );
-	str->ReadWord( &itm->Usages[0] );
-	str->ReadWord( &itm->Usages[1] );
-	str->ReadWord( &itm->Usages[2] );
-	str->ReadDword( &itm->Flags );
-
-	return itm;
-}
-*/
 
 void CREImp::SetupColor(ieDword &stat)
 {

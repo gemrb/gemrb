@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.86 2005/01/09 12:28:28 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.87 2005/01/22 20:28:47 avenger_teambg Exp $
  *
  */
 
@@ -94,24 +94,6 @@ AREImp::~AREImp(void)
 		delete( str );
 	}
 }
-
-//this is the same as the function in the creature, you might want to rationalize it
-/*
-CREItem* AREImp::GetItem()
-{
-	CREItem *itm = new CREItem();
-
-	str->ReadResRef( itm->ItemResRef );
-	str->ReadWord( &itm->Unknown08 );
-	str->ReadWord( &itm->Usages[0] );
-	str->ReadWord( &itm->Usages[1] );
-	str->ReadWord( &itm->Usages[2] );
-	str->ReadDword( &itm->Flags );
-	
-	core->ResolveRandomItem(itm);
-	return itm;
-}
-*/
 
 bool AREImp::Open(DataStream* stream, bool autoFree)
 {

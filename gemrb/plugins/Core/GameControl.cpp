@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.184 2005/01/15 14:55:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.185 2005/01/22 20:28:49 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -590,12 +590,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					Item* item = core->GetItem(ci->ItemResRef);
 					if (item) {
 						for (std::vector< ITMFeature* >::iterator f = item->equipping_features.begin(); f != item->equipping_features.end(); f++) {
-							//printf("Slot: %d\n", slot);
 							AddEffect( *f, lastActor, lastActor );
-							//lastActor->fxqueue.AddEffect( *f );
 						}
 						core->FreeItem( item );
-						//delete item;
 					}
 				}
 				lastActor->fxqueue.ApplyAllEffects( lastActor );

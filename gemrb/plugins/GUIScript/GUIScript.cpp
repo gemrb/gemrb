@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.264 2005/01/15 14:26:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.265 2005/01/22 20:28:59 avenger_teambg Exp $
  *
  */
 
@@ -3071,31 +3071,17 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			}
 		}
 		
-		DataStream* str = core->GetResourceMgr()->GetResource( ps->FavouriteWeapons[largest], IE_ITM_CLASS_ID );
-		ItemMgr* sm = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
-		if (sm == NULL) {
-			delete ( str );
-			return NULL;
-		}
-		if (!sm->Open( str, true )) {
-			core->FreeInterface( sm );
-			return NULL;
-		}
-
-		Item* item = sm->GetItem();
+		Item* item = core->GetItem(ps->FavouriteWeapons[largest]);
 		if (item == NULL) {
-			core->FreeInterface( sm );
 			return NULL;
 		}
 
 		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->GetItemName(false)));
 
-		sm->ReleaseItem( item );
-		core->FreeInterface( sm );
+		core->FreeItem( item );
 	} else {
 		PyDict_SetItemString(dict, "FavouriteWeapon", PyString_FromString (""));
 	}
-
 
 	return dict;
 }
@@ -3417,23 +3403,9 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (ItemResRef[0]) {
-		// FIXME!!!
-		DataStream* str = core->GetResourceMgr()->GetResource( ItemResRef, IE_ITM_CLASS_ID );
-		ItemMgr* im = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
-		if (im == NULL) {
-			delete ( str );
-			return NULL;
-		}
-		if (!im->Open( str, true )) {
-			core->FreeInterface( im );
-			return NULL;
-		}
-
-		// FIXME - should use some already allocated in core
-		Item* item = im->GetItem();
+		Item* item = core->GetItem(ItemResRef);
 		if (item == NULL) {
 			btn->SetPicture(NULL);
-			core->FreeInterface( im );
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
@@ -3445,10 +3417,7 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 		else {
 			btn->SetPicture(NULL);
 		}
-		im->ReleaseItem( item );
-		core->FreeInterface( im );
-		//delete item;
-
+		core->FreeItem( item );
 	} else {
 		btn->SetPicture( NULL );
 	}
@@ -3944,30 +3913,11 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetItem__doc );
 	}
 
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_ITM_CLASS_ID );
-	if(!str) { //the file doesn't exist, in this case we let the script decide
+	Item* item = core->GetItem(ResRef);
+	if (item == NULL) {
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	ItemMgr* im = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
-	if (im == NULL) {
-		delete ( str );
-		printf("[GUIScript] Can't get item manager!\n");
-		return NULL;
-	}
-	if (!im->Open( str, true )) {
-		core->FreeInterface( im );
-		printf("[GUIScript] Can't read item header!\n");
-		return NULL;
-	}
-
-	Item* item = im->GetItem();
-	if (item == NULL) {
-		core->FreeInterface( im );
-		printf("[GUIScript] Can't create item!\n");
-		return NULL;
-	}
-
 
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong (item->GetItemName(false)));
@@ -4004,8 +3954,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		default:;
 	}
 	PyDict_SetItemString(dict, "Function", PyInt_FromLong(function));
-	im->ReleaseItem( item );
-	core->FreeInterface( im );
+	core->FreeItem( item );
 	return dict;
 }
 
