@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.30 2004/03/25 22:11:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.31 2004/03/27 12:08:38 avenger_teambg Exp $
  *
  */
 
@@ -266,19 +266,21 @@ Animation* CharAnimations::GetAnimation(unsigned char AnimID,
 		return Anims[AnimID][Orient];
 	}
 	//newresref is based on the prefix (ResRef) and various other things
-	char* NewResRef = ( char* ) malloc( 9 );
+	char NewResRef[9];
 	strcpy( NewResRef, ResRef );
 	unsigned char Cycle;
 	GetAnimResRef( AnimID, Orient, NewResRef, Cycle );
+	NewResRef[8]=0;
 	DataStream* stream = core->GetResourceMgr()->GetResource( NewResRef,
 		IE_BAM_CLASS_ID );
-	free( NewResRef );
 	AnimationMgr* anim = ( AnimationMgr* )
 		core->GetInterface( IE_BAM_CLASS_ID );
 	anim->Open( stream, true );
 	Animation* a = anim->GetAnimation( Cycle, 0, 0, IE_NORMAL );
-	a->pos = 0;
 	core->FreeInterface( anim );
+	if(!a) {
+		return NULL;
+	}
 	a->pos = 0;
 	a->endReached = false;
 	if (( AnimID == IE_ANI_SLEEP ) ||
@@ -294,13 +296,13 @@ Animation* CharAnimations::GetAnimation(unsigned char AnimID,
 	switch (MirrorType) {
 		case IE_ANI_CODE_MIRROR:
 			 {
+				if (Orient > 8) {
+					core->GetVideoDriver()->MirrorAnimation( a );
+				}
 				switch (OrientCount) {
 					case 5:
 						 {
-							if (Orient > 8)
-								core->GetVideoDriver()->MirrorAnimation( a );
-							if (Orient & 1)
-								Orient--;
+							Orient&=~1;
 							Anims[AnimID][Orient] = a;
 							Anims[AnimID][Orient + 1] = a;
 						}
@@ -308,26 +310,23 @@ Animation* CharAnimations::GetAnimation(unsigned char AnimID,
 
 					case 9:
 						 {
-							if (Orient > 8) {
-								core->GetVideoDriver()->MirrorAnimation( a );
-							}
 							Anims[AnimID][Orient] = a;
-							if (AnimID == IE_ANI_EMERGE) {
-								a->playReversed = true;
-								a->autoSwitchOnEnd = true;
-								a->nextAnimID = IE_ANI_AWAKE;
-							}
 						}
 						break;
+				}
+				if (AnimID == IE_ANI_EMERGE) {
+					a->playReversed = true;
+					a->autoSwitchOnEnd = true;
+					a->nextAnimID = IE_ANI_AWAKE;
 				}
 			}
 			break;
 
 		case IE_ANI_ONE_FILE:
-			 {
-				Anims[AnimID][Orient] = a;
-			}
-			break;
+		{
+			Anims[AnimID][Orient] = a;
+		}
+		break;
 
 		case IE_ANI_CODE_MIRROR_2:
 		 {
@@ -352,9 +351,7 @@ Animation* CharAnimations::GetAnimation(unsigned char AnimID,
 			switch (OrientCount) {
 				case 5:
 				{
-					if (Orient & 1) {
-						Orient--;
-					}
+					Orient&=~1;
 					Anims[AnimID][Orient] = a;
 					Anims[AnimID][Orient + 1] = a;
 				}
@@ -388,8 +385,7 @@ Animation* CharAnimations::GetAnimation(unsigned char AnimID,
 
 				default:
 				{
-					if (Orient & 1)
-						Orient--;
+					Orient &=~1;
 					Anims[AnimID][Orient] = a;
 					Anims[AnimID][Orient + 1] = a;
 				}
@@ -422,44 +418,57 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient,
 {
 	switch (MirrorType) {
 		case IE_ANI_CODE_MIRROR:
-			 {
-				if (OrientCount == 9) {
-					AddVHRSuffix( ResRef, AnimID, Cycle, Orient );
-					ResRef[8] = 0;
-				}
+		{
+			if (OrientCount == 9) {
+				AddVHRSuffix( ResRef, AnimID, Cycle, Orient );
 			}
-			break;
+			else {
+				printf("Unsupported animation, IE_ANI_CODE_MIRROR can have only 9 orientations.\n");
+				abort();
+			}
+		}
+		break;
 
 		case IE_ANI_ONE_FILE:
-			 {
-				if (OrientCount == 16) {
-					char* val = Avatars->QueryField( RowIndex, AnimID + 7 );
-					if (val[0] == '*') {
-						ResRef[0] = 0;
-						return;
-					}
-					Cycle = atoi( val ) + Orient;
+		{
+			if (OrientCount == 16) {
+				char* val = Avatars->QueryField( RowIndex, AnimID + 7 );
+				if (val[0] == '*') {
+					ResRef[0] = 0;
+					return;
 				}
+				Cycle = atoi( val ) + Orient;
 			}
-			break;
+			else {
+				printf("Unsupported animation, IE_ANI_ONE_FILE can have only 16 orientations.\n");
+				abort();
+			}
+		}
+		break;
 
 		case IE_ANI_TWO_FILES_2:
-			 {
-				if (OrientCount == 5) {
-					AddMHRSuffix( ResRef, AnimID, Cycle, Orient );
-					ResRef[8] = 0;
-				}
+		{
+			if (OrientCount == 5) {
+				AddMHRSuffix( ResRef, AnimID, Cycle, Orient );
 			}
-			break;
+			else {
+				printf("Unsupported animation, IE_ANI_TWO_FILES_2 can have only 5 orientations.\n");
+				abort();
+			}
+		}
+		break;
 
 		case IE_ANI_TWO_FILES_3:
-			 {
-				if (OrientCount == 5) {
-					AddMMRSuffix( ResRef, AnimID, Cycle, Orient );
-					ResRef[8] = 0;
-				}
+		{
+			if (OrientCount == 5) {
+				AddMMRSuffix( ResRef, AnimID, Cycle, Orient );
 			}
-			break;
+			else {
+				printf("Unsupported animation, IE_ANI_TWO_FILES_3 can have only 5 orientations.\n");
+				abort();
+			}
+		}
+		break;
 
 		case IE_ANI_TWO_FILES:
 		{
@@ -475,11 +484,15 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient,
 					strcat( ResRef, "E" );
 				}
 			}
+			else {
+				printf("Unsupported animation, IE_ANI_TWO_FILES can have only 5 orientations.\n");
+				abort();
+			}
 		}
 		break;
 
 		case IE_ANI_FOUR_FILES:
-		 {
+		{
 			if (OrientCount == 5) {
 				char* val = Avatars->QueryField( RowIndex, AnimID + 7 );
 				if (val[0] == '*') {
@@ -510,7 +523,7 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient,
 		break;
 
 		case IE_ANI_CODE_MIRROR_2:
-		 {
+		{
 			if (OrientCount == 9) {
 				char* val = Avatars->QueryField( RowIndex, AnimID + 7 );
 				if (val[0] == '*') {

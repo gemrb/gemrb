@@ -253,7 +253,7 @@ void Selectable::SetBBox(Region newBBox)
 
 void Selectable::DrawCircle()
 {
-	if (!size) {
+	if (size<=0) {
 		return;
 	}
 	Color* col = NULL;
@@ -265,8 +265,8 @@ void Selectable::DrawCircle()
 		return;
 	}
 	Region vp = core->GetVideoDriver()->GetViewport();
-	core->GetVideoDriver()->DrawEllipse( XPos - vp.x, YPos - vp.y, size * 10,
-								( ( size * 15 ) / 2 ), *col );
+	core->GetVideoDriver()->DrawEllipse( XPos - vp.x, YPos - vp.y,
+		 size * 10, ( ( size * 15 ) / 2 ), *col );
 }
 
 bool Selectable::IsOver(unsigned short XPos, unsigned short YPos)
