@@ -1,3 +1,4 @@
+#instead of credits, you can listen the songs of the game :)
 import GemRB
 
 MovieWindow = 0
@@ -14,11 +15,9 @@ def OnLoad():
 	PlayButton = GemRB.GetControl(MovieWindow, 2)
 	CreditsButton = GemRB.GetControl(MovieWindow, 3)
 	DoneButton = GemRB.GetControl(MovieWindow, 4)
-	MoviesTable = GemRB.LoadTable("MOVIDESC")
+	MoviesTable = GemRB.LoadTable("MUSIC")
 	for i in range(0, GemRB.GetTableRowCount(MoviesTable) ):
-		t = GemRB.GetTableRowName(MoviesTable, i)
-		if GemRB.GetVar(t)==1:
-			s = GemRB.GetTableValue(MoviesTable, i, 0)
+			s = GemRB.GetTableRowName(MoviesTable, i)
 			GemRB.TextAreaAppend(MovieWindow, TextAreaControl, s,-1)
 	GemRB.SetVarAssoc(MovieWindow, TextAreaControl, "MovieIndex",0)
 	GemRB.SetText(MovieWindow, PlayButton, 17318)
@@ -32,23 +31,17 @@ def OnLoad():
 	
 def PlayPress():
 	s = GemRB.GetVar("MovieIndex")
-	for i in range(0, GemRB.GetTableRowCount(MoviesTable) ):
-		t = GemRB.GetTableRowName(MoviesTable, i)
-		if GemRB.GetVar(t)==1:
-			if s==0:
-				s = GemRB.GetTableRowName(MoviesTable, i)
-				GemRB.PlayMovie(s)
-				GemRB.InvalidateWindow(MovieWindow)
-				return
-			s = s - 1
+	t = GemRB.GetTableValue(MoviesTable, s, 0)
+	GemRB.HardEndPL()
+	GemRB.LoadMusicPL(t)
+	GemRB.StartPL()
 	return
 
 def CreditsPress():
-	GemRB.UnloadWindow(MovieWindow)
-	GemRB.SetNextScript("Songs")
 	return
 
 def DonePress():
+	GemRB.HardEndPL()
 	GemRB.UnloadWindow(MovieWindow)
-	GemRB.SetNextScript("Options")
+	GemRB.SetNextScript("Start")
 	return
