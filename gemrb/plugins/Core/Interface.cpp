@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.286 2005/03/20 15:07:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.287 2005/03/20 15:51:40 avenger_teambg Exp $
  *
  */
 
@@ -2817,9 +2817,9 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 			k=1;
 		}
 		j=strtol(NewItem,&endptr,10);
-		if(*endptr) strncpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
+		if(*endptr) strnuprcpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
 		else {
-			strncpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
+			strnuprcpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
 			itm->Usages[0]=Roll(j,k,0);
 		}
 		if( !memcmp( itm->ItemResRef,"NO_DROP",8 ) ) {
