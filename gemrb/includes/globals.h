@@ -7,7 +7,7 @@ typedef unsigned long DWORD;
 
 #define GEMRB_RELEASE 200		//GemRB Release version multiplied by 1000 (i.e. 1200 = 1.2 | 10 = 0.01 )
 #define GEMRB_API_NUM 2			//GemRB API Version
-#define GEMRB_SDK_REV 1			//GemRB SDK Revision
+#define GEMRB_SDK_REV 4			//GemRB SDK Revision
 
 #define VERSION_GEMRB ((GEMRB_RELEASE<<16)+(GEMRB_API_NUM<<8)+GEMRB_SDK_REV)
 
@@ -61,6 +61,9 @@ typedef unsigned long DWORD;
 #define  GF_LOWER_LABEL_TEXT		5 //bg2
 #define  GF_HAS_PARTY_INI               6 //iwd2
 
+/////AI global defines
+#define AI_UPDATE_TIME	15
+
 /////globally used functions
 #ifdef WIN32
 
@@ -84,6 +87,20 @@ void ResolveFilePath(char *FilePath);
 char *strupr(char *string);
 char *strlwr(char *string);
 #endif
+
+#ifdef WIN32
+#define GetTime(store) store = GetTickCount()
+#else
+#include <sys/time.h>
+#define GetTime(store) \
+	{ \
+		struct timeval tv; \
+		gettimeofday(&tv, NULL); \ 
+		store = (tv.tv_usec/1000) + (tv.tv_sec*1000); \
+	}
+#endif
+
+struct ActorBlock;
 
 #endif //GLOBALS_H
 
