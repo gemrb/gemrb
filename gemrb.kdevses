@@ -3,12 +3,24 @@
 <KDevPrjSession>
  <LastCompileConfig>(Default)</LastCompileConfig>
  <Mainframe MaximizeMode="1" />
- <DocsAndViews NumberOfDocuments="2" >
+ <DocsAndViews NumberOfDocuments="6" >
   <Doc0 CursorPosLine="0" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/home/daniele/gemrb/gemrb/GemRB.cpp" >
    <View0 Top="0" Width="1025" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
   </Doc0>
   <Doc1 CursorPosLine="0" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/home/daniele/gemrb/gemrb/plugins/Core/TextArea.cpp" >
-   <View0 Top="0" Width="1025" Attach="1" Height="589" Left="0" Focus="1" Type="KWriteView" MinMaxMode="0" />
+   <View0 Top="0" Width="1025" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
   </Doc1>
+  <Doc2 CursorPosLine="0" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/home/daniele/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp" >
+   <View0 Top="0" Width="1025" Attach="1" Height="589" Left="0" Focus="1" Type="KWriteView" MinMaxMode="0" />
+  </Doc2>
+  <Doc3 CursorPosLine="0" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="0" FileName="/home/daniele/gemrb/admin/old-libtool.m4.in" >
+   <View0 Top="0" Width="1025" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
+  </Doc3>
+  <Doc4 CursorPosLine="21" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="9" FileName="/home/daniele/gemrb/gemrb/plugins/Core/ScriptEngine.h" >
+   <View0 Top="0" Width="1025" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
+  </Doc4>
+  <Doc5 CursorPosLine="22" Type="KWriteDoc" NumberOfViews="1" CursorPosCol="18" FileName="/home/daniele/gemrb/gemrb/plugins/Core/Button.cpp" >
+   <View0 Top="0" Width="1025" Attach="1" Height="589" Left="0" Focus="0" Type="KWriteView" MinMaxMode="0" />
+  </Doc5>
  </DocsAndViews>
 </KDevPrjSession>

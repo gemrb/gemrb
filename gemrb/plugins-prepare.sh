@@ -5,8 +5,9 @@ cp plugins/BIFImporter/.libs/libBIFImporter.so plugins/
 cp plugins/BMPImporter/.libs/libBMPImporter.so plugins/
 cp plugins/CHUImporter/.libs/libCHUImporter.so plugins/
 cp plugins/CREImporter/.libs/libCREImporter.so plugins/
-cp plugins/KEYImporter/.libs/libKEYImporter.so plugins/
+cp plugins/GUIScript/.libs/libGUIScript.so plugins/
 cp plugins/IDSImporter/.libs/libIDSImporter.so plugins/
+cp plugins/KEYImporter/.libs/libKEYImporter.so plugins/
 cp plugins/MOSImporter/.libs/libMOSImporter.so plugins/
 cp plugins/MVEPlayer/.libs/libMVEPlayer.so plugins/
 cp plugins/SDLVideo/.libs/libSDLVideo.so plugins/

@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.4 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.1 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -227,19 +227,19 @@ qt_libraries = @qt_libraries@
 x_includes = @x_includes@
 x_libraries = @x_libraries@
 
-lib_LTLIBRARIES = libBG2HCAnim.la
+lib_LTLIBRARIES = libGUIScript.la
 
 INCLUDES = $(all_includes)
 
 LDFLAGS = 
 
-libBG2HCAnim_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl
+libGUIScript_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -lpython2.3
 
-#>- libBG2HCAnim_la_METASOURCES = AUTO
+#>- libGUIScript_la_METASOURCES = AUTO
 
-libBG2HCAnim_la_SOURCES = BG2HCAnims.cpp BG2HCAnim.cpp BG2HCAnimCD.cpp 
+libGUIScript_la_SOURCES = GUIScriptEngine.cpp GUIScriptCD.cpp GUIScript.cpp 
 
-EXTRA_DIST = BG2HCAnimCD.cpp BG2HCAnimCD.h BG2HCAnim.cpp BG2HCAnim.h BG2HCAnims.cpp 
+EXTRA_DIST = GUIScript.cpp GUIScript.h GUIScriptCD.cpp GUIScriptCD.h GUIScriptEngine.cpp 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -249,13 +249,15 @@ LTLIBRARIES =  $(lib_LTLIBRARIES)
 DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I../../..
 CPPFLAGS = 
 LIBS = 
-libBG2HCAnim_la_LIBADD = 
-#>- libBG2HCAnim_la_OBJECTS =  BG2HCAnims.lo BG2HCAnim.lo BG2HCAnimCD.lo
-#>+ 4
-libBG2HCAnim_la_final_OBJECTS = libBG2HCAnim_la.all_cpp.lo 
-libBG2HCAnim_la_nofinal_OBJECTS = BG2HCAnims.lo BG2HCAnim.lo BG2HCAnimCD.lo
-libBG2HCAnim_la_OBJECTS = $(libBG2HCAnim_la_nofinal_OBJECTS)
-#libBG2HCAnim_la_OBJECTS = $(libBG2HCAnim_la_final_OBJECTS)
+libGUIScript_la_LIBADD = 
+#>- libGUIScript_la_OBJECTS =  GUIScriptEngine.lo GUIScriptCD.lo \
+#>- GUIScript.lo
+#>+ 5
+libGUIScript_la_final_OBJECTS = libGUIScript_la.all_cpp.lo 
+libGUIScript_la_nofinal_OBJECTS = GUIScriptEngine.lo GUIScriptCD.lo \
+	GUIScript.lo
+libGUIScript_la_OBJECTS = $(libGUIScript_la_nofinal_OBJECTS)
+#libGUIScript_la_OBJECTS = $(libGUIScript_la_final_OBJECTS)
 CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
 #>- CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 #>+ 1
@@ -274,14 +276,17 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-#>- DEP_FILES =  .deps/BG2HCAnim.P .deps/BG2HCAnimCD.P .deps/BG2HCAnims.P
-#>+ 4
-#DEP_FILES =   $(DEPDIR)/libBG2HCAnim_la.all_cpp.P \
-		  .deps/BG2HCAnim.P .deps/BG2HCAnimCD.P .deps/BG2HCAnims.P
-DEP_FILES =    .deps/BG2HCAnim.P .deps/BG2HCAnimCD.P .deps/BG2HCAnims.P
+#>- DEP_FILES =  .deps/GUIScript.P .deps/GUIScriptCD.P \
+#>- .deps/GUIScriptEngine.P
+#>+ 6
+#DEP_FILES =   $(DEPDIR)/libGUIScript_la.all_cpp.P \
+		  .deps/GUIScript.P .deps/GUIScriptCD.P \
+	.deps/GUIScriptEngine.P
+DEP_FILES =    .deps/GUIScript.P .deps/GUIScriptCD.P \
+	.deps/GUIScriptEngine.P
 
-SOURCES = $(libBG2HCAnim_la_SOURCES)
-OBJECTS = $(libBG2HCAnim_la_OBJECTS)
+SOURCES = $(libGUIScript_la_SOURCES)
+OBJECTS = $(libGUIScript_la_OBJECTS)
 
 #>- all: all-redirect
 #>+ 1
@@ -289,10 +294,10 @@ all: docs-am  all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .cpp .lo .o .obj .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-#>- 	cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/BG2HCAnim/Makefile
+#>- 	cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/GUIScript/Makefile
 #>+ 2
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/BG2HCAnim/Makefile
-	cd $(top_srcdir) && perl admin/am_edit gemrb/plugins/BG2HCAnim/Makefile.in
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/GUIScript/Makefile
+	cd $(top_srcdir) && perl admin/am_edit gemrb/plugins/GUIScript/Makefile.in
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -362,8 +367,8 @@ distclean-libtool:
 
 maintainer-clean-libtool:
 
-libBG2HCAnim.la: $(libBG2HCAnim_la_OBJECTS) $(libBG2HCAnim_la_DEPENDENCIES)
-	$(CXXLINK) -rpath $(libdir) $(libBG2HCAnim_la_LDFLAGS) $(libBG2HCAnim_la_OBJECTS) $(libBG2HCAnim_la_LIBADD) $(LIBS)
+libGUIScript.la: $(libGUIScript_la_OBJECTS) $(libGUIScript_la_DEPENDENCIES)
+	$(CXXLINK) -rpath $(libdir) $(libGUIScript_la_LDFLAGS) $(libGUIScript_la_OBJECTS) $(libGUIScript_la_LIBADD) $(LIBS)
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 .cpp.obj:
@@ -402,14 +407,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = gemrb/plugins/BG2HCAnim
+subdir = gemrb/plugins/GUIScript
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	&& $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu gemrb/plugins/BG2HCAnim/Makefile
+	&& $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu gemrb/plugins/GUIScript/Makefile
 	@for file in $(DISTFILES); do \
 	d=$(srcdir); \
 	if test -d $$d/$$file; then \
@@ -565,38 +570,38 @@ docs-am:
 
 #>+ 5
 force-reedit:
-		cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/BG2HCAnim/Makefile
-	cd $(top_srcdir) && perl admin/am_edit gemrb/plugins/BG2HCAnim/Makefile.in
+		cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/GUIScript/Makefile
+	cd $(top_srcdir) && perl admin/am_edit gemrb/plugins/GUIScript/Makefile.in
 
 
 #>+ 11
-libBG2HCAnim_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/BG2HCAnims.cpp $(srcdir)/BG2HCAnim.cpp $(srcdir)/BG2HCAnimCD.cpp  
-	@echo 'creating libBG2HCAnim_la.all_cpp.cpp ...'; \
-	rm -f libBG2HCAnim_la.all_cpp.files libBG2HCAnim_la.all_cpp.final; \
-	echo "#define KDE_USE_FINAL 1" >> libBG2HCAnim_la.all_cpp.final; \
-	for file in BG2HCAnims.cpp BG2HCAnim.cpp BG2HCAnimCD.cpp ; do \
-	  echo "#include \"$$file\"" >> libBG2HCAnim_la.all_cpp.files; \
-	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libBG2HCAnim_la.all_cpp.final; \
+libGUIScript_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/GUIScriptEngine.cpp $(srcdir)/GUIScriptCD.cpp $(srcdir)/GUIScript.cpp  
+	@echo 'creating libGUIScript_la.all_cpp.cpp ...'; \
+	rm -f libGUIScript_la.all_cpp.files libGUIScript_la.all_cpp.final; \
+	echo "#define KDE_USE_FINAL 1" >> libGUIScript_la.all_cpp.final; \
+	for file in GUIScriptEngine.cpp GUIScriptCD.cpp GUIScript.cpp ; do \
+	  echo "#include \"$$file\"" >> libGUIScript_la.all_cpp.files; \
+	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libGUIScript_la.all_cpp.final; \
 	done; \
-	cat libBG2HCAnim_la.all_cpp.final libBG2HCAnim_la.all_cpp.files  > libBG2HCAnim_la.all_cpp.cpp; \
-	rm -f libBG2HCAnim_la.all_cpp.final libBG2HCAnim_la.all_cpp.files
+	cat libGUIScript_la.all_cpp.final libGUIScript_la.all_cpp.files  > libGUIScript_la.all_cpp.cpp; \
+	rm -f libGUIScript_la.all_cpp.final libGUIScript_la.all_cpp.files
 
 #>+ 3
 clean-final:
-	-rm -f libBG2HCAnim_la.all_cpp.cpp
+	-rm -f libGUIScript_la.all_cpp.cpp
 
 #>+ 2
 final:
-	$(MAKE) libBG2HCAnim_la_OBJECTS="$(libBG2HCAnim_la_final_OBJECTS)" all-am
+	$(MAKE) libGUIScript_la_OBJECTS="$(libGUIScript_la_final_OBJECTS)" all-am
 #>+ 2
 final-install:
-	$(MAKE) libBG2HCAnim_la_OBJECTS="$(libBG2HCAnim_la_final_OBJECTS)" install-am
+	$(MAKE) libGUIScript_la_OBJECTS="$(libGUIScript_la_final_OBJECTS)" install-am
 #>+ 2
 no-final:
-	$(MAKE) libBG2HCAnim_la_OBJECTS="$(libBG2HCAnim_la_nofinal_OBJECTS)" all-am
+	$(MAKE) libGUIScript_la_OBJECTS="$(libGUIScript_la_nofinal_OBJECTS)" all-am
 #>+ 2
 no-final-install:
-	$(MAKE) libBG2HCAnim_la_OBJECTS="$(libBG2HCAnim_la_nofinal_OBJECTS)" install-am
+	$(MAKE) libGUIScript_la_OBJECTS="$(libGUIScript_la_nofinal_OBJECTS)" install-am
 #>+ 3
 cvs-clean:
 	$(MAKE) -f $(top_srcdir)/admin/Makefile.common cvs-clean

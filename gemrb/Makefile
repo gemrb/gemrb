@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.3 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.4 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -65,12 +65,12 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = i686-pc-linux-gnu
-build_triplet = i686-pc-linux-gnu
-host_alias = i686-pc-linux-gnu
-host_triplet = i686-pc-linux-gnu
-target_alias = i686-pc-linux-gnu
-target_triplet = i686-pc-linux-gnu
+build_alias = i386-linux
+build_triplet = i386-pc-linux-gnu
+host_alias = i386-linux
+host_triplet = i386-pc-linux-gnu
+target_alias = i386-linux
+target_triplet = i386-pc-linux-gnu
 ARTSCCONFIG = @ARTSCCONFIG@
 AS = @AS@
 AUTODIRS = 
@@ -160,8 +160,8 @@ MICO_INCLUDES = @MICO_INCLUDES@
 MICO_LDFLAGS = @MICO_LDFLAGS@
 MOC = @MOC@
 MSGFMT = @MSGFMT@
-NOOPT_CFLAGS = 
-NOOPT_CXXFLAGS =  -fno-exceptions -fno-check-new
+NOOPT_CFLAGS =  -ansi -W -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -g
+NOOPT_CXXFLAGS =  -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -g3 -Wall -fno-exceptions -fno-check-new
 NOREPO = -fno-repo
 OBJDUMP = @OBJDUMP@
 OBJEXT = o
@@ -188,7 +188,7 @@ USE_EXCEPTIONS = -fexceptions
 USE_RTTI = 
 USE_THREADS = @USE_THREADS@
 VERSION = 0.1
-WOVERLOADED_VIRTUAL = 
+WOVERLOADED_VIRTUAL = -Woverloaded-virtual
 XGETTEXT = @XGETTEXT@
 XPMINC = @XPMINC@
 XPMLIB = @XPMLIB@
@@ -230,7 +230,7 @@ x_libraries = @x_libraries@
 bin_PROGRAMS = gemrb
 
 gemrb_SOURCES = GemRB.cpp 
-gemrb_LDADD = ./plugins/AREImporter/libAREImporter.la ./plugins/BAMImporter/libBAMImporter.la ./plugins/BG2HCAnim/libBG2HCAnim.la ./plugins/BIFImporter/libBIFImporter.la ./plugins/BMPImporter/libBMPImporter.la ./plugins/CHUImporter/libCHUImporter.la ./plugins/Core/libcore.la ./plugins/CREImporter/libCREImporter.la ./plugins/IDSImporter/libIDSImporter.la ./plugins/KEYImporter/libKEYImporter.la ./plugins/MOSImporter/libMOSImporter.la ./plugins/MVEPlayer/libMVEPlayer.la ./plugins/SDLVideo/libSDLVideo.la ./plugins/TISImporter/libTISImporter.la ./plugins/TLKImporter/libTLKImporter.la ./plugins/WEDImporter/libWEDImporter.la ./plugins/ZLibMgr/libZLibMgr.la 
+gemrb_LDADD = ./plugins/AREImporter/libAREImporter.la ./plugins/BAMImporter/libBAMImporter.la ./plugins/BG2HCAnim/libBG2HCAnim.la ./plugins/BIFImporter/libBIFImporter.la ./plugins/BMPImporter/libBMPImporter.la ./plugins/CHUImporter/libCHUImporter.la ./plugins/Core/libcore.la ./plugins/CREImporter/libCREImporter.la ./plugins/IDSImporter/libIDSImporter.la ./plugins/KEYImporter/libKEYImporter.la ./plugins/MOSImporter/libMOSImporter.la ./plugins/MVEPlayer/libMVEPlayer.la ./plugins/SDLVideo/libSDLVideo.la ./plugins/TISImporter/libTISImporter.la ./plugins/TLKImporter/libTLKImporter.la ./plugins/WEDImporter/libWEDImporter.la ./plugins/ZLibMgr/libZLibMgr.la ./plugins/GUIScript/libGUIScript.la 
 
 SUBDIRS = plugins includes zlib 
 
@@ -269,8 +269,9 @@ gemrb_DEPENDENCIES =  ./plugins/AREImporter/libAREImporter.la \
 	./plugins/MVEPlayer/libMVEPlayer.la ./plugins/SDLVideo/libSDLVideo.la \
 	./plugins/TISImporter/libTISImporter.la \
 	./plugins/TLKImporter/libTLKImporter.la \
-	./plugins/WEDImporter/libWEDImporter.la ./plugins/ZLibMgr/libZLibMgr.la
-CXXFLAGS = -O2 -fno-exceptions -fno-check-new
+	./plugins/WEDImporter/libWEDImporter.la ./plugins/ZLibMgr/libZLibMgr.la \
+	./plugins/GUIScript/libGUIScript.la
+CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
 #>- CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 #>+ 1
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) $(KDE_CXXFLAGS)

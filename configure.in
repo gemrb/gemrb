@@ -111,6 +111,7 @@ gemrb/plugins/BMPImporter/Makefile \
 gemrb/plugins/CHUImporter/Makefile \
 gemrb/plugins/Core/Makefile \
 gemrb/plugins/CREImporter/Makefile \
+gemrb/plugins/GUIScript/Makefile \
 gemrb/plugins/IDSImporter/Makefile \
 gemrb/plugins/KEYImporter/Makefile \
 gemrb/plugins/MOSImporter/Makefile \

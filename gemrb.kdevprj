@@ -34,7 +34,7 @@ email=Balrog994@yahoo.com
 kdevprj_version=1.3
 lfv_open_groups=
 make_options=\s-j1
-makefiles=Makefile.am,gemrb/Makefile.am,gemrb/docs/Makefile.am,gemrb/docs/en/Makefile.am,gemrb/plugins/AREImporter/Makefile.am,gemrb/plugins/Makefile.am,gemrb/plugins/BAMImporter/Makefile.am,gemrb/plugins/BG2HCAnim/Makefile.am,gemrb/plugins/BIFImporter/Makefile.am,gemrb/plugins/BMPImporter/Makefile.am,gemrb/plugins/CHUImporter/Makefile.am,gemrb/plugins/Core/Makefile.am,gemrb/plugins/CREImporter/Makefile.am,gemrb/plugins/IDSImporter/Makefile.am,gemrb/plugins/KEYImporter/Makefile.am,gemrb/plugins/MOSImporter/Makefile.am,gemrb/plugins/MVEPlayer/Makefile.am,gemrb/plugins/SDLVideo/Makefile.am,gemrb/plugins/TISImporter/Makefile.am,gemrb/plugins/TLKImporter/Makefile.am,gemrb/plugins/WEDImporter/Makefile.am,gemrb/plugins/ZLibMgr/Makefile.am,gemrb/includes/Makefile.am,gemrb/includes/sdl/Makefile.am,gemrb/zlib/Makefile.am
+makefiles=Makefile.am,gemrb/Makefile.am,gemrb/docs/Makefile.am,gemrb/docs/en/Makefile.am,gemrb/plugins/AREImporter/Makefile.am,gemrb/plugins/Makefile.am,gemrb/plugins/BAMImporter/Makefile.am,gemrb/plugins/BG2HCAnim/Makefile.am,gemrb/plugins/BIFImporter/Makefile.am,gemrb/plugins/BMPImporter/Makefile.am,gemrb/plugins/CHUImporter/Makefile.am,gemrb/plugins/Core/Makefile.am,gemrb/plugins/CREImporter/Makefile.am,gemrb/plugins/IDSImporter/Makefile.am,gemrb/plugins/KEYImporter/Makefile.am,gemrb/plugins/MOSImporter/Makefile.am,gemrb/plugins/MVEPlayer/Makefile.am,gemrb/plugins/SDLVideo/Makefile.am,gemrb/plugins/TISImporter/Makefile.am,gemrb/plugins/TLKImporter/Makefile.am,gemrb/plugins/WEDImporter/Makefile.am,gemrb/plugins/ZLibMgr/Makefile.am,gemrb/includes/Makefile.am,gemrb/includes/sdl/Makefile.am,gemrb/zlib/Makefile.am,gemrb/plugins/GUIScript/Makefile.am
 modifyMakefiles=true
 project_name=GemRB
 project_type=normal_cpp
@@ -897,7 +897,7 @@ install_location=
 type=HEADER
 
 [gemrb/plugins/Core/Makefile.am]
-files=gemrb/plugins/Core/Actor.cpp,gemrb/plugins/Core/Actor.h,gemrb/plugins/Core/ActorMgr.cpp,gemrb/plugins/Core/ActorMgr.h,gemrb/plugins/Core/Animation.cpp,gemrb/plugins/Core/AnimationFactory.cpp,gemrb/plugins/Core/AnimationFactory.h,gemrb/plugins/Core/Animation.h,gemrb/plugins/Core/AnimationMgr.cpp,gemrb/plugins/Core/AnimationMgr.h,gemrb/plugins/Core/AnimStructures.h,gemrb/plugins/Core/ArchiveImporter.cpp,gemrb/plugins/Core/ArchiveImporter.h,gemrb/plugins/Core/Button.cpp,gemrb/plugins/Core/Button.h,gemrb/plugins/Core/CachedFileStream.cpp,gemrb/plugins/Core/CachedFileStream.h,gemrb/plugins/Core/CharAnimations.cpp,gemrb/plugins/Core/CharAnimations.h,gemrb/plugins/Core/ClassDesc.cpp,gemrb/plugins/Core/ClassDesc.h,gemrb/plugins/Core/Class_ID.cpp,gemrb/plugins/Core/Class_ID.h,gemrb/plugins/Core/Compressor.cpp,gemrb/plugins/Core/Compressor.h,gemrb/plugins/Core/Control.cpp,gemrb/plugins/Core/Control.h,gemrb/plugins/Core/Core.cpp,gemrb/plugins/Core/DataStream.cpp,gemrb/plugins/Core/DataStream.h,gemrb/plugins/Core/Factory.cpp,gemrb/plugins/Core/Factory.h,gemrb/plugins/Core/FactoryObject.cpp,gemrb/plugins/Core/FactoryObject.h,gemrb/plugins/Core/FileStream.cpp,gemrb/plugins/Core/FileStream.h,gemrb/plugins/Core/Font.cpp,gemrb/plugins/Core/Font.h,gemrb/plugins/Core/HCAnimationSeq.cpp,gemrb/plugins/Core/HCAnimationSeq.h,gemrb/plugins/Core/ImageMgr.cpp,gemrb/plugins/Core/ImageMgr.h,gemrb/plugins/Core/Interface.cpp,gemrb/plugins/Core/InterfaceDesc.cpp,gemrb/plugins/Core/InterfaceDesc.h,gemrb/plugins/Core/Interface.h,gemrb/plugins/Core/Map.cpp,gemrb/plugins/Core/Map.h,gemrb/plugins/Core/MapMgr.cpp,gemrb/plugins/Core/MapMgr.h,gemrb/plugins/Core/MemoryStream.cpp,gemrb/plugins/Core/MemoryStream.h,gemrb/plugins/Core/MoviePlayer.cpp,gemrb/plugins/Core/MoviePlayer.h,gemrb/plugins/Core/Plugin.cpp,gemrb/plugins/Core/Plugin.h,gemrb/plugins/Core/PluginMgr.cpp,gemrb/plugins/Core/PluginMgr.h,gemrb/plugins/Core/Region.cpp,gemrb/plugins/Core/Region.h,gemrb/plugins/Core/ResourceMgr.cpp,gemrb/plugins/Core/ResourceMgr.h,gemrb/plugins/Core/Sprite2D.cpp,gemrb/plugins/Core/Sprite2D.h,gemrb/plugins/Core/StringMgr.cpp,gemrb/plugins/Core/StringMgr.h,gemrb/plugins/Core/SymbolMgr.cpp,gemrb/plugins/Core/SymbolMgr.h,gemrb/plugins/Core/Tile.cpp,gemrb/plugins/Core/Tile.h,gemrb/plugins/Core/TileMap.cpp,gemrb/plugins/Core/TileMap.h,gemrb/plugins/Core/TileMapMgr.cpp,gemrb/plugins/Core/TileMapMgr.h,gemrb/plugins/Core/TileOverlay.cpp,gemrb/plugins/Core/TileOverlay.h,gemrb/plugins/Core/TileSetMgr.cpp,gemrb/plugins/Core/TileSetMgr.h,gemrb/plugins/Core/Video.cpp,gemrb/plugins/Core/Video.h,gemrb/plugins/Core/VideoMode.cpp,gemrb/plugins/Core/VideoMode.h,gemrb/plugins/Core/VideoModes.cpp,gemrb/plugins/Core/VideoModes.h,gemrb/plugins/Core/Window.cpp,gemrb/plugins/Core/Window.h,gemrb/plugins/Core/WindowMgr.cpp,gemrb/plugins/Core/WindowMgr.h,gemrb/plugins/Core/Label.cpp,gemrb/plugins/Core/Label.h,gemrb/plugins/Core/Slider.cpp,gemrb/plugins/Core/Slider.h,gemrb/plugins/Core/TextArea.cpp,gemrb/plugins/Core/TextArea.h,gemrb/plugins/Core/ScrollBar.cpp,gemrb/plugins/Core/ScrollBar.h,gemrb/plugins/Core/EventMgr.cpp,gemrb/plugins/Core/EventMgr.h,gemrb/plugins/Core/TextEdit.cpp,gemrb/plugins/Core/TextEdit.h
+files=gemrb/plugins/Core/Actor.cpp,gemrb/plugins/Core/Actor.h,gemrb/plugins/Core/ActorMgr.cpp,gemrb/plugins/Core/ActorMgr.h,gemrb/plugins/Core/Animation.cpp,gemrb/plugins/Core/AnimationFactory.cpp,gemrb/plugins/Core/AnimationFactory.h,gemrb/plugins/Core/Animation.h,gemrb/plugins/Core/AnimationMgr.cpp,gemrb/plugins/Core/AnimationMgr.h,gemrb/plugins/Core/AnimStructures.h,gemrb/plugins/Core/ArchiveImporter.cpp,gemrb/plugins/Core/ArchiveImporter.h,gemrb/plugins/Core/Button.cpp,gemrb/plugins/Core/Button.h,gemrb/plugins/Core/CachedFileStream.cpp,gemrb/plugins/Core/CachedFileStream.h,gemrb/plugins/Core/CharAnimations.cpp,gemrb/plugins/Core/CharAnimations.h,gemrb/plugins/Core/ClassDesc.cpp,gemrb/plugins/Core/ClassDesc.h,gemrb/plugins/Core/Class_ID.cpp,gemrb/plugins/Core/Class_ID.h,gemrb/plugins/Core/Compressor.cpp,gemrb/plugins/Core/Compressor.h,gemrb/plugins/Core/Control.cpp,gemrb/plugins/Core/Control.h,gemrb/plugins/Core/Core.cpp,gemrb/plugins/Core/DataStream.cpp,gemrb/plugins/Core/DataStream.h,gemrb/plugins/Core/Factory.cpp,gemrb/plugins/Core/Factory.h,gemrb/plugins/Core/FactoryObject.cpp,gemrb/plugins/Core/FactoryObject.h,gemrb/plugins/Core/FileStream.cpp,gemrb/plugins/Core/FileStream.h,gemrb/plugins/Core/Font.cpp,gemrb/plugins/Core/Font.h,gemrb/plugins/Core/HCAnimationSeq.cpp,gemrb/plugins/Core/HCAnimationSeq.h,gemrb/plugins/Core/ImageMgr.cpp,gemrb/plugins/Core/ImageMgr.h,gemrb/plugins/Core/Interface.cpp,gemrb/plugins/Core/InterfaceDesc.cpp,gemrb/plugins/Core/InterfaceDesc.h,gemrb/plugins/Core/Interface.h,gemrb/plugins/Core/Map.cpp,gemrb/plugins/Core/Map.h,gemrb/plugins/Core/MapMgr.cpp,gemrb/plugins/Core/MapMgr.h,gemrb/plugins/Core/MemoryStream.cpp,gemrb/plugins/Core/MemoryStream.h,gemrb/plugins/Core/MoviePlayer.cpp,gemrb/plugins/Core/MoviePlayer.h,gemrb/plugins/Core/Plugin.cpp,gemrb/plugins/Core/Plugin.h,gemrb/plugins/Core/PluginMgr.cpp,gemrb/plugins/Core/PluginMgr.h,gemrb/plugins/Core/Region.cpp,gemrb/plugins/Core/Region.h,gemrb/plugins/Core/ResourceMgr.cpp,gemrb/plugins/Core/ResourceMgr.h,gemrb/plugins/Core/Sprite2D.cpp,gemrb/plugins/Core/Sprite2D.h,gemrb/plugins/Core/StringMgr.cpp,gemrb/plugins/Core/StringMgr.h,gemrb/plugins/Core/SymbolMgr.cpp,gemrb/plugins/Core/SymbolMgr.h,gemrb/plugins/Core/Tile.cpp,gemrb/plugins/Core/Tile.h,gemrb/plugins/Core/TileMap.cpp,gemrb/plugins/Core/TileMap.h,gemrb/plugins/Core/TileMapMgr.cpp,gemrb/plugins/Core/TileMapMgr.h,gemrb/plugins/Core/TileOverlay.cpp,gemrb/plugins/Core/TileOverlay.h,gemrb/plugins/Core/TileSetMgr.cpp,gemrb/plugins/Core/TileSetMgr.h,gemrb/plugins/Core/Video.cpp,gemrb/plugins/Core/Video.h,gemrb/plugins/Core/VideoMode.cpp,gemrb/plugins/Core/VideoMode.h,gemrb/plugins/Core/VideoModes.cpp,gemrb/plugins/Core/VideoModes.h,gemrb/plugins/Core/Window.cpp,gemrb/plugins/Core/Window.h,gemrb/plugins/Core/WindowMgr.cpp,gemrb/plugins/Core/WindowMgr.h,gemrb/plugins/Core/Label.cpp,gemrb/plugins/Core/Label.h,gemrb/plugins/Core/Slider.cpp,gemrb/plugins/Core/Slider.h,gemrb/plugins/Core/TextArea.cpp,gemrb/plugins/Core/TextArea.h,gemrb/plugins/Core/ScrollBar.cpp,gemrb/plugins/Core/ScrollBar.h,gemrb/plugins/Core/EventMgr.cpp,gemrb/plugins/Core/EventMgr.h,gemrb/plugins/Core/TextEdit.cpp,gemrb/plugins/Core/TextEdit.h,gemrb/plugins/Core/ScriptEngine.cpp,gemrb/plugins/Core/ScriptEngine.h
 sharedlib_LDFLAGS=-version-info 0:0:0 -ldl
 sharedlib_rootname=core
 sub_dirs=
@@ -994,6 +994,18 @@ install_location=
 type=SOURCE
 
 [gemrb/plugins/Core/ResourceMgr.h]
+dist=true
+install=false
+install_location=
+type=HEADER
+
+[gemrb/plugins/Core/ScriptEngine.cpp]
+dist=true
+install=false
+install_location=
+type=SOURCE
+
+[gemrb/plugins/Core/ScriptEngine.h]
 dist=true
 install=false
 install_location=
@@ -1203,6 +1215,43 @@ install=false
 install_location=
 type=HEADER
 
+[gemrb/plugins/GUIScript/GUIScript.cpp]
+dist=true
+install=false
+install_location=
+type=SOURCE
+
+[gemrb/plugins/GUIScript/GUIScript.h]
+dist=true
+install=false
+install_location=
+type=HEADER
+
+[gemrb/plugins/GUIScript/GUIScriptCD.cpp]
+dist=true
+install=false
+install_location=
+type=SOURCE
+
+[gemrb/plugins/GUIScript/GUIScriptCD.h]
+dist=true
+install=false
+install_location=
+type=HEADER
+
+[gemrb/plugins/GUIScript/GUIScriptEngine.cpp]
+dist=true
+install=false
+install_location=
+type=SOURCE
+
+[gemrb/plugins/GUIScript/Makefile.am]
+files=gemrb/plugins/GUIScript/GUIScript.cpp,gemrb/plugins/GUIScript/GUIScript.h,gemrb/plugins/GUIScript/GUIScriptCD.cpp,gemrb/plugins/GUIScript/GUIScriptCD.h,gemrb/plugins/GUIScript/GUIScriptEngine.cpp
+sharedlib_LDFLAGS=-version-info 0:0:0 -L../Core -lcore -lpython
+sharedlib_rootname=GUIScript
+sub_dirs=
+type=shared_library
+
 [gemrb/plugins/IDSImporter/IDSImp.cpp]
 dist=true
 install=false
@@ -1358,7 +1407,7 @@ sub_dirs=
 type=shared_library
 
 [gemrb/plugins/Makefile.am]
-sub_dirs=AREImporter,BAMImporter,BG2HCAnim,BIFImporter,BMPImporter,CHUImporter,Core,CREImporter,IDSImporter,KEYImporter,MOSImporter,MVEPlayer,SDLVideo,TISImporter,TLKImporter,WEDImporter,ZLibMgr
+sub_dirs=AREImporter,BAMImporter,BG2HCAnim,BIFImporter,BMPImporter,CHUImporter,Core,CREImporter,IDSImporter,KEYImporter,MOSImporter,MVEPlayer,SDLVideo,TISImporter,TLKImporter,WEDImporter,ZLibMgr,GUIScript
 type=normal
 
 [gemrb/plugins/SDLVideo/Makefile.am]

@@ -1,5 +1,4 @@
-# Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.4 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.1 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -15,49 +14,49 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
 
 
-SHELL = /bin/sh
+SHELL = @SHELL@
 
-srcdir = .
-top_srcdir = ../../..
-VPATH = .
-prefix = /usr/local
-exec_prefix = ${prefix}
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
 #>- 
-bindir = ${exec_prefix}/bin
+bindir = @bindir@
 #>+ 3
 DEPDIR = .deps
 
-bindir = ${exec_prefix}/bin
-sbindir = ${exec_prefix}/sbin
-libexecdir = ${exec_prefix}/libexec
-datadir = ${prefix}/share
-sysconfdir = ${prefix}/etc
-sharedstatedir = ${prefix}/com
-localstatedir = ${prefix}/var
-libdir = ${exec_prefix}/lib
-infodir = ${prefix}/info
-mandir = ${prefix}/man
-includedir = ${prefix}/include
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
 oldincludedir = /usr/include
 
 DESTDIR =
 
-pkgdatadir = $(datadir)/gemrb
-pkglibdir = $(libdir)/gemrb
-pkgincludedir = $(includedir)/gemrb
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
 
 top_builddir = ../../..
 
-ACLOCAL = aclocal-1.4
-AUTOCONF = autoconf
-AUTOMAKE = automake-1.4
-AUTOHEADER = autoheader
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
 
-INSTALL = /usr//bin/install -c -p
-INSTALL_PROGRAM = ${INSTALL} $(INSTALL_STRIP_FLAG) $(AM_INSTALL_PROGRAM_FLAGS)
-INSTALL_DATA = ${INSTALL} -m 644
-INSTALL_SCRIPT = ${INSTALL}
-transform = s,x,x,
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+transform = @program_transform_name@
 
 NORMAL_INSTALL = :
 PRE_INSTALL = :
@@ -65,27 +64,27 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = i386-linux
-build_triplet = i386-pc-linux-gnu
-host_alias = i386-linux
-host_triplet = i386-pc-linux-gnu
-target_alias = i386-linux
-target_triplet = i386-pc-linux-gnu
+build_alias = @build_alias@
+build_triplet = @build@
+host_alias = @host_alias@
+host_triplet = @host@
+target_alias = @target_alias@
+target_triplet = @target@
 ARTSCCONFIG = @ARTSCCONFIG@
 AS = @AS@
-AUTODIRS = 
-CC = gcc
-CONF_FILES =  $(top_srcdir)/configure.in.in
-CPP = cpp
-CXX = c++
-CXXCPP = c++ -E
+AUTODIRS = @AUTODIRS@
+CC = @CC@
+CONF_FILES = @CONF_FILES@
+CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 DCOPIDL = @DCOPIDL@
 DCOPIDL2CPP = @DCOPIDL2CPP@
 DCOP_DEPENDENCIES = @DCOP_DEPENDENCIES@
 DLLTOOL = @DLLTOOL@
 DPMSINC = @DPMSINC@
 DPMSLIB = @DPMSLIB@
-EXEEXT = 
+EXEEXT = @EXEEXT@
 GCJ = @GCJ@
 GCJFLAGS = @GCJFLAGS@
 GLINC = @GLINC@
@@ -98,18 +97,18 @@ JAVAC = @JAVAC@
 JAVAH = @JAVAH@
 JVMLIBS = @JVMLIBS@
 KDECONFIG = @KDECONFIG@
-KDE_CXXFLAGS = 
+KDE_CXXFLAGS = @KDE_CXXFLAGS@
 KDE_EXTRA_RPATH = @KDE_EXTRA_RPATH@
 KDE_INCLUDES = @KDE_INCLUDES@
 KDE_LDFLAGS = @KDE_LDFLAGS@
 KDE_MT_LDFLAGS = @KDE_MT_LDFLAGS@
 KDE_MT_LIBS = @KDE_MT_LIBS@
-KDE_PLUGIN = -avoid-version -module -no-undefined $(KDE_RPATH) $(KDE_MT_LDFLAGS)
+KDE_PLUGIN = @KDE_PLUGIN@
 KDE_RPATH = @KDE_RPATH@
-KDE_USE_CLOSURE_FALSE = #
-KDE_USE_CLOSURE_TRUE = 
-KDE_USE_FINAL_FALSE = 
-KDE_USE_FINAL_TRUE = #
+KDE_USE_CLOSURE_FALSE = @KDE_USE_CLOSURE_FALSE@
+KDE_USE_CLOSURE_TRUE = @KDE_USE_CLOSURE_TRUE@
+KDE_USE_FINAL_FALSE = @KDE_USE_FINAL_FALSE@
+KDE_USE_FINAL_TRUE = @KDE_USE_FINAL_TRUE@
 KDE_XSL_STYLESHEET = @KDE_XSL_STYLESHEET@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
@@ -129,7 +128,7 @@ LIBSHADOW = @LIBSHADOW@
 LIBSM = @LIBSM@
 LIBSOCKET = @LIBSOCKET@
 LIBTIFF = @LIBTIFF@
-LIBTOOL = $(SHELL) $(top_builddir)/libtool
+LIBTOOL = @LIBTOOL@
 LIBUCB = @LIBUCB@
 LIBUTIL = @LIBUTIL@
 LIBXINERAMA = @LIBXINERAMA@
@@ -152,20 +151,20 @@ LIB_QTOPIA = @LIB_QTOPIA@
 LIB_SMB = @LIB_SMB@
 LIB_X11 = @LIB_X11@
 LIB_XEXT = @LIB_XEXT@
-LN_S = ln -s
-MAKEINFO = makeinfo
+LN_S = @LN_S@
+MAKEINFO = @MAKEINFO@
 MCOPIDL = @MCOPIDL@
 MEINPROC = @MEINPROC@
 MICO_INCLUDES = @MICO_INCLUDES@
 MICO_LDFLAGS = @MICO_LDFLAGS@
 MOC = @MOC@
 MSGFMT = @MSGFMT@
-NOOPT_CFLAGS =  -ansi -W -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -g
-NOOPT_CXXFLAGS =  -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -g3 -Wall -fno-exceptions -fno-check-new
-NOREPO = -fno-repo
+NOOPT_CFLAGS = @NOOPT_CFLAGS@
+NOOPT_CXXFLAGS = @NOOPT_CXXFLAGS@
+NOREPO = @NOREPO@
 OBJDUMP = @OBJDUMP@
-OBJEXT = o
-PACKAGE = gemrb
+OBJEXT = @OBJEXT@
+PACKAGE = @PACKAGE@
 PAMLIBS = @PAMLIBS@
 PASSWDLIBS = @PASSWDLIBS@
 PYTHONINC = @PYTHONINC@
@@ -175,20 +174,20 @@ QTE_NORTTI = @QTE_NORTTI@
 QTOPIA_INCLUDES = @QTOPIA_INCLUDES@
 QT_INCLUDES = @QT_INCLUDES@
 QT_LDFLAGS = @QT_LDFLAGS@
-RANLIB = ranlib
-REPO = -frepo
+RANLIB = @RANLIB@
+REPO = @REPO@
 SETUIDFLAGS = @SETUIDFLAGS@
-STRIP = strip
-TOPSUBDIRS =  gemrb
+STRIP = @STRIP@
+TOPSUBDIRS = @TOPSUBDIRS@
 UIC = @UIC@
 UIC_TR = @UIC_TR@
-USER_INCLUDES = 
-USER_LDFLAGS = 
-USE_EXCEPTIONS = -fexceptions
-USE_RTTI = 
+USER_INCLUDES = @USER_INCLUDES@
+USER_LDFLAGS = @USER_LDFLAGS@
+USE_EXCEPTIONS = @USE_EXCEPTIONS@
+USE_RTTI = @USE_RTTI@
 USE_THREADS = @USE_THREADS@
-VERSION = 0.1
-WOVERLOADED_VIRTUAL = -Woverloaded-virtual
+VERSION = @VERSION@
+WOVERLOADED_VIRTUAL = @WOVERLOADED_VIRTUAL@
 XGETTEXT = @XGETTEXT@
 XPMINC = @XPMINC@
 XPMLIB = @XPMLIB@
@@ -196,8 +195,8 @@ X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_INCLUDES = @X_INCLUDES@
 X_LDFLAGS = @X_LDFLAGS@
 X_PRE_LIBS = @X_PRE_LIBS@
-all_includes =  
-all_libraries =  
+all_includes = @all_includes@
+all_libraries = @all_libraries@
 idldir = @idldir@
 jni_includes = @jni_includes@
 kde_appsdir = @kde_appsdir@
@@ -227,36 +226,38 @@ qt_libraries = @qt_libraries@
 x_includes = @x_includes@
 x_libraries = @x_libraries@
 
-lib_LTLIBRARIES = libBG2HCAnim.la
+lib_LTLIBRARIES = libGUIScript.la
 
 INCLUDES = $(all_includes)
 
 LDFLAGS = 
 
-libBG2HCAnim_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl
+libGUIScript_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -lpython2.3
 
-#>- libBG2HCAnim_la_METASOURCES = AUTO
+#>- libGUIScript_la_METASOURCES = AUTO
 
-libBG2HCAnim_la_SOURCES = BG2HCAnims.cpp BG2HCAnim.cpp BG2HCAnimCD.cpp 
+libGUIScript_la_SOURCES = GUIScriptEngine.cpp GUIScriptCD.cpp GUIScript.cpp 
 
-EXTRA_DIST = BG2HCAnimCD.cpp BG2HCAnimCD.h BG2HCAnim.cpp BG2HCAnim.h BG2HCAnims.cpp 
+EXTRA_DIST = GUIScript.cpp GUIScript.h GUIScriptCD.cpp GUIScriptCD.h GUIScriptEngine.cpp 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../../config.h
 CONFIG_CLEAN_FILES = 
 LTLIBRARIES =  $(lib_LTLIBRARIES)
 
 
-DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I../../..
-CPPFLAGS = 
-LIBS = 
-libBG2HCAnim_la_LIBADD = 
-#>- libBG2HCAnim_la_OBJECTS =  BG2HCAnims.lo BG2HCAnim.lo BG2HCAnimCD.lo
-#>+ 4
-libBG2HCAnim_la_final_OBJECTS = libBG2HCAnim_la.all_cpp.lo 
-libBG2HCAnim_la_nofinal_OBJECTS = BG2HCAnims.lo BG2HCAnim.lo BG2HCAnimCD.lo
-libBG2HCAnim_la_OBJECTS = $(libBG2HCAnim_la_nofinal_OBJECTS)
-#libBG2HCAnim_la_OBJECTS = $(libBG2HCAnim_la_final_OBJECTS)
-CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
+DEFS = @DEFS@ -I. -I$(srcdir) -I../../..
+CPPFLAGS = @CPPFLAGS@
+LIBS = @LIBS@
+libGUIScript_la_LIBADD = 
+#>- libGUIScript_la_OBJECTS =  GUIScriptEngine.lo GUIScriptCD.lo \
+#>- GUIScript.lo
+#>+ 5
+libGUIScript_la_final_OBJECTS = libGUIScript_la.all_cpp.lo 
+libGUIScript_la_nofinal_OBJECTS = GUIScriptEngine.lo GUIScriptCD.lo \
+	GUIScript.lo
+@KDE_USE_FINAL_FALSE@libGUIScript_la_OBJECTS = $(libGUIScript_la_nofinal_OBJECTS)
+@KDE_USE_FINAL_TRUE@libGUIScript_la_OBJECTS = $(libGUIScript_la_final_OBJECTS)
+CXXFLAGS = @CXXFLAGS@
 #>- CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 #>+ 1
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) $(KDE_CXXFLAGS)
@@ -274,14 +275,17 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-#>- DEP_FILES =  .deps/BG2HCAnim.P .deps/BG2HCAnimCD.P .deps/BG2HCAnims.P
-#>+ 4
-#DEP_FILES =   $(DEPDIR)/libBG2HCAnim_la.all_cpp.P \
-		  .deps/BG2HCAnim.P .deps/BG2HCAnimCD.P .deps/BG2HCAnims.P
-DEP_FILES =    .deps/BG2HCAnim.P .deps/BG2HCAnimCD.P .deps/BG2HCAnims.P
+#>- DEP_FILES =  .deps/GUIScript.P .deps/GUIScriptCD.P \
+#>- .deps/GUIScriptEngine.P
+#>+ 6
+@KDE_USE_FINAL_TRUE@DEP_FILES =   $(DEPDIR)/libGUIScript_la.all_cpp.P \
+		  .deps/GUIScript.P .deps/GUIScriptCD.P \
+	.deps/GUIScriptEngine.P
+@KDE_USE_FINAL_FALSE@DEP_FILES =    .deps/GUIScript.P .deps/GUIScriptCD.P \
+	.deps/GUIScriptEngine.P
 
-SOURCES = $(libBG2HCAnim_la_SOURCES)
-OBJECTS = $(libBG2HCAnim_la_OBJECTS)
+SOURCES = $(libGUIScript_la_SOURCES)
+OBJECTS = $(libGUIScript_la_OBJECTS)
 
 #>- all: all-redirect
 #>+ 1
@@ -289,10 +293,10 @@ all: docs-am  all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .cpp .lo .o .obj .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-#>- 	cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/BG2HCAnim/Makefile
+#>- 	cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/GUIScript/Makefile
 #>+ 2
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/BG2HCAnim/Makefile
-	cd $(top_srcdir) && perl admin/am_edit gemrb/plugins/BG2HCAnim/Makefile.in
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/GUIScript/Makefile
+	cd $(top_srcdir) && perl admin/am_edit gemrb/plugins/GUIScript/Makefile.in
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -362,8 +366,8 @@ distclean-libtool:
 
 maintainer-clean-libtool:
 
-libBG2HCAnim.la: $(libBG2HCAnim_la_OBJECTS) $(libBG2HCAnim_la_DEPENDENCIES)
-	$(CXXLINK) -rpath $(libdir) $(libBG2HCAnim_la_LDFLAGS) $(libBG2HCAnim_la_OBJECTS) $(libBG2HCAnim_la_LIBADD) $(LIBS)
+libGUIScript.la: $(libGUIScript_la_OBJECTS) $(libGUIScript_la_DEPENDENCIES)
+	$(CXXLINK) -rpath $(libdir) $(libGUIScript_la_LDFLAGS) $(libGUIScript_la_OBJECTS) $(libGUIScript_la_LIBADD) $(LIBS)
 .cpp.o:
 	$(CXXCOMPILE) -c $<
 .cpp.obj:
@@ -402,14 +406,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = gemrb/plugins/BG2HCAnim
+subdir = gemrb/plugins/GUIScript
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	&& $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu gemrb/plugins/BG2HCAnim/Makefile
+	&& $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu gemrb/plugins/GUIScript/Makefile
 	@for file in $(DISTFILES); do \
 	d=$(srcdir); \
 	if test -d $$d/$$file; then \
@@ -565,38 +569,38 @@ docs-am:
 
 #>+ 5
 force-reedit:
-		cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/BG2HCAnim/Makefile
-	cd $(top_srcdir) && perl admin/am_edit gemrb/plugins/BG2HCAnim/Makefile.in
+		cd $(top_srcdir) && $(AUTOMAKE) --gnu gemrb/plugins/GUIScript/Makefile
+	cd $(top_srcdir) && perl admin/am_edit gemrb/plugins/GUIScript/Makefile.in
 
 
 #>+ 11
-libBG2HCAnim_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/BG2HCAnims.cpp $(srcdir)/BG2HCAnim.cpp $(srcdir)/BG2HCAnimCD.cpp  
-	@echo 'creating libBG2HCAnim_la.all_cpp.cpp ...'; \
-	rm -f libBG2HCAnim_la.all_cpp.files libBG2HCAnim_la.all_cpp.final; \
-	echo "#define KDE_USE_FINAL 1" >> libBG2HCAnim_la.all_cpp.final; \
-	for file in BG2HCAnims.cpp BG2HCAnim.cpp BG2HCAnimCD.cpp ; do \
-	  echo "#include \"$$file\"" >> libBG2HCAnim_la.all_cpp.files; \
-	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libBG2HCAnim_la.all_cpp.final; \
+libGUIScript_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/GUIScriptEngine.cpp $(srcdir)/GUIScriptCD.cpp $(srcdir)/GUIScript.cpp  
+	@echo 'creating libGUIScript_la.all_cpp.cpp ...'; \
+	rm -f libGUIScript_la.all_cpp.files libGUIScript_la.all_cpp.final; \
+	echo "#define KDE_USE_FINAL 1" >> libGUIScript_la.all_cpp.final; \
+	for file in GUIScriptEngine.cpp GUIScriptCD.cpp GUIScript.cpp ; do \
+	  echo "#include \"$$file\"" >> libGUIScript_la.all_cpp.files; \
+	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libGUIScript_la.all_cpp.final; \
 	done; \
-	cat libBG2HCAnim_la.all_cpp.final libBG2HCAnim_la.all_cpp.files  > libBG2HCAnim_la.all_cpp.cpp; \
-	rm -f libBG2HCAnim_la.all_cpp.final libBG2HCAnim_la.all_cpp.files
+	cat libGUIScript_la.all_cpp.final libGUIScript_la.all_cpp.files  > libGUIScript_la.all_cpp.cpp; \
+	rm -f libGUIScript_la.all_cpp.final libGUIScript_la.all_cpp.files
 
 #>+ 3
 clean-final:
-	-rm -f libBG2HCAnim_la.all_cpp.cpp
+	-rm -f libGUIScript_la.all_cpp.cpp
 
 #>+ 2
 final:
-	$(MAKE) libBG2HCAnim_la_OBJECTS="$(libBG2HCAnim_la_final_OBJECTS)" all-am
+	$(MAKE) libGUIScript_la_OBJECTS="$(libGUIScript_la_final_OBJECTS)" all-am
 #>+ 2
 final-install:
-	$(MAKE) libBG2HCAnim_la_OBJECTS="$(libBG2HCAnim_la_final_OBJECTS)" install-am
+	$(MAKE) libGUIScript_la_OBJECTS="$(libGUIScript_la_final_OBJECTS)" install-am
 #>+ 2
 no-final:
-	$(MAKE) libBG2HCAnim_la_OBJECTS="$(libBG2HCAnim_la_nofinal_OBJECTS)" all-am
+	$(MAKE) libGUIScript_la_OBJECTS="$(libGUIScript_la_nofinal_OBJECTS)" all-am
 #>+ 2
 no-final-install:
-	$(MAKE) libBG2HCAnim_la_OBJECTS="$(libBG2HCAnim_la_nofinal_OBJECTS)" install-am
+	$(MAKE) libGUIScript_la_OBJECTS="$(libGUIScript_la_nofinal_OBJECTS)" install-am
 #>+ 3
 cvs-clean:
 	$(MAKE) -f $(top_srcdir)/admin/Makefile.common cvs-clean
