@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.118 2004/02/11 23:25:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.119 2004/02/12 17:11:53 edheldil Exp $
  *
  */
 
@@ -37,6 +37,7 @@
 #include "../Core/AnimationMgr.h"
 #include "../Core/GameControl.h"
 #include "../Core/MapMgr.h"
+#include "../Core/WorldMapMgr.h"
 
 inline bool valid_number(const char *string, long &val)
 {
@@ -1942,6 +1943,69 @@ static PyObject *GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject *args)
 	return Py_None;
 }
 
+
+
+
+
+static PyObject *GemRB_SetWorldMapImage( PyObject * /*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex;
+
+	if(!PyArg_ParseTuple(args, "ii", &WindowIndex, &ControlIndex) ) {
+		printMessage("GUIScript","Syntax Error: SetSaveWorldMapImage(WindowID, ControlID)\n", LIGHT_RED);
+		return NULL;
+	}
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL) {
+		printMessage("GUIScript","Runtime Error: Window not found\n", LIGHT_RED);
+		return NULL;
+	}
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL) {
+		printMessage("GUIScript","Runtime Error: Control not found\n", LIGHT_RED);
+		return NULL;
+	}
+
+	if(ctrl->ControlType != IE_GUI_BUTTON) {
+		printMessage("GUIScript","Runtime Error: SetSaveWorldMapImage() - control must be a button\n", LIGHT_RED);
+		return NULL;
+	}
+
+	// FIXME!!!
+	DataStream *str = core->GetResourceMgr()->GetResource(core->GlobalMap, IE_WMP_CLASS_ID);
+	WorldMapMgr * im = (WorldMapMgr*)core->GetInterface(IE_WMP_CLASS_ID);
+	if(im == NULL) {
+		delete (str);
+		return NULL;
+	}
+	if(!im->Open(str, true)) {
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	// FIXME - should use some already allocated in core
+	WorldMap * worldmap = im->GetWorldMap (0);
+	if(worldmap == NULL) {
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	Button * btn = (Button*)ctrl;
+	btn->SetPicture(worldmap->MapMOS);
+	//win->SetBackGround(worldmap->MapMOS);
+	btn->SetFlags(0x80,OP_OR);
+	// FIXME: there's a leak, with MapMOS, I am afraid
+	delete worldmap;
+	core->FreeInterface(im);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+
+
+
+
 static PyObject * GemRB_ExecuteString(PyObject * /*self*/, PyObject *args)
 {
 	char* String;
@@ -2202,6 +2266,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"FillPlayerInfo", GemRB_FillPlayerInfo, METH_VARARGS,
      "Fills basic character info, that is not stored in stats."},
+
+	{"SetWorldMapImage", GemRB_SetWorldMapImage, METH_VARARGS,
+     "FIXME: Set WM image ...."},
 
 	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
 	 "Invalidates the given Window."},
