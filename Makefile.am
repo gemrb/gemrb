@@ -1,30 +1,11 @@
-####### kdevelop will overwrite this part!!! (begin)##########
+SUBDIRS = gemrb
+EXTRA_DIST = setup.sh 
+MAINTAINERCLEANFILES = subdirs configure.in configure.files
 
-SUBDIRS = gemrb 
-
-EXTRA_DIST = gemrb.kdevprj admin AUTHORS COPYING ChangeLog INSTALL README TODO gemrb.lsm 
-
-####### kdevelop will overwrite this part!!! (end)############
-# not a GNU package. You can remove this line, if
-# have all needed files, that a GNU package needs
-AUTOMAKE_OPTIONS = foreign
-
-$(top_srcdir)/configure.in: configure.in.in $(top_srcdir)/subdirs
-	cd $(top_srcdir) && $(MAKE) -f admin/Makefile.common configure.in ;
-
-$(top_srcdir)/subdirs:
-	cd $(top_srcdir) && $(MAKE) -f admin/Makefile.common subdirs
-
-$(top_srcdir)/acinclude.m4: $(top_srcdir)/admin/acinclude.m4.in $(top_srcdir)/admin/libtool.m4.in
-	@cd $(top_srcdir) && cat admin/acinclude.m4.in admin/libtool.m4.in > acinclude.m4
-
-MAINTAINERCLEANFILES = subdirs configure.in acinclude.m4 configure.files
-
-package-messages:
-	$(MAKE) -f admin/Makefile.common package-messages
-
-dist-hook:
-	cd $(top_distdir) && perl admin/am_edit -padmin
-	cd $(top_distdir) && $(MAKE) -f admin/Makefile.common subdirs
-
-
+install-data-hook:
+	rm $(libdir)/libcore.la
+	rm $(libdir)/libcore.so*
+	if test -x $(bindir)/Cache; then 
+		rm -rf $(bindir)/Cache
+	fi
+	mkdir $(bindir)/Cache
