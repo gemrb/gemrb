@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.11 2004/07/21 20:28:50 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.12 2004/08/21 04:53:38 divide Exp $
  *
  */
 
@@ -101,7 +101,7 @@ void ClearLine()
 #endif
 }
 
-int main(int argc, char** argv)
+int main(int , char** )
 {
 	getcwd( CurrentDir, _MAX_PATH );
 	strcat( CurrentDir, SPathDelimiter );

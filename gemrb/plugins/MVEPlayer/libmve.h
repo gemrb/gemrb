@@ -18,7 +18,7 @@ void MVE_rmEndMovie();
 
 void MVE_getVideoSpec(MVE_videoSpec* vSpec);
 
-void MVE_sndInit(int x);
+void MVE_sndInit(int x, unsigned short volume);
 
 typedef unsigned int (*mve_cb_Read)(void* stream, void* buffer,
 	unsigned int count);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.13 2004/07/31 13:17:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.14 2004/08/21 04:53:59 divide Exp $
  *
  */
 
@@ -25,6 +25,7 @@
 #include "../Core/Interface.h"
 #include "MVEPlay.h"
 #include "libmve.h"
+#include "../../includes/ie_types.h"
 
 static const char MVESignature[] = "Interplay MVE File\x1A";
 static const int MVE_SIGNATURE_LEN = 19;
@@ -132,7 +133,9 @@ int MVEPlay::doPlay(const DataStream* mve)
 */
 	memset( g_palette, 0, 768 );
 
-	MVE_sndInit( 1 );
+	ieDword volume;
+	core->GetDictionary()->Lookup( "Volume Movie", volume );
+	MVE_sndInit( 1, volume );
 	MVE_memCallbacks( malloc, free );
 	MVE_ioCallbacks( fileRead );
 	MVE_sfCallbacks( showFrame );

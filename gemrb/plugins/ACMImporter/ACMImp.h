@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.24 2004/08/12 16:00:41 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.25 2004/08/21 04:53:52 divide Exp $
  *
  */
 
@@ -71,6 +71,7 @@ public:
 	bool Stop();
 	void ResetMusics();
 	void UpdateViewportPos(int XPos, int YPos);
+	void UpdateVolume( unsigned long which = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS );
 public:
 	void release(void)
 	{
@@ -88,6 +89,7 @@ public:
 		void activate();
 		void deactivate(const std::string &name);
 		void deactivate();
+		void UpdateVolume();
 	private:
 		class AmbientSource {
 		public:
@@ -96,6 +98,7 @@ public:
 			~AmbientSource();
 			unsigned int tick(unsigned int ticks, Point listener, unsigned int timeslice);
 			void hardStop();
+			void SetVolume(unsigned short volume);
 		private:
 			ALuint source;
 			std::vector<ALuint> buffers;

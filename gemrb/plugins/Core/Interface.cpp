@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.200 2004/08/19 23:35:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.201 2004/08/21 04:53:56 divide Exp $
  *
  */
 
@@ -2017,6 +2017,7 @@ void Interface::QuitGame(bool BackToMain)
 	if(game) {
 		delete game;
 		game=NULL;
+		GetSoundMgr()->GetAmbientMgr()->deactivate(); // stop any ambients which are still enqueued
 	}
 	if(BackToMain) {
 		strcpy(NextScript, "Start");

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.54 2004/08/19 23:35:44 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.55 2004/08/21 04:53:41 divide Exp $
  *
  */
 
@@ -161,10 +161,7 @@ int ACMImp::PlayListManager(void* /*data*/)
 				case AL_PLAYING:
 					break;
 			}
-			ieDword volume;
-			core->GetDictionary()->Lookup( "Volume Music", volume );
 			ALint processed;
-			alSourcef( MusicSource, AL_GAIN, ( volume / 100.0f ) );
 			alGetSourcei( MusicSource, AL_BUFFERS_PROCESSED, &processed );
 			if (processed > 0) {
 				buffersreturned += processed;
@@ -284,8 +281,10 @@ bool ACMImp::Init(void)
 		0.0f, 0.0f, 0.0f
 	};
 
+	ieDword volume;
+	core->GetDictionary()->Lookup( "Volume Music", volume );
 	alSourcef( MusicSource, AL_PITCH, 1.0f );
-	alSourcef( MusicSource, AL_GAIN, 1.0f );
+	alSourcef( MusicSource, AL_GAIN, 0.01f * volume );
 	alSourcei( MusicSource, AL_SOURCE_RELATIVE, 1 );
 	alSourcefv( MusicSource, AL_POSITION, SourcePos );
 	alSourcefv( MusicSource, AL_VELOCITY, SourceVel );
@@ -378,12 +377,14 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned long
 			alGenSources( 1, &speech.Source );
 
 			alSourcef( speech.Source, AL_PITCH, 1.0f );
-			alSourcef( speech.Source, AL_GAIN, 1.0f );
 			alSourcefv( speech.Source, AL_VELOCITY, SourceVel );
 			alSourcei( speech.Source, AL_LOOPING, 0 );
 			alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
 		}
 		alSourceStop( speech.Source );	// legal nop if not playing
+		ieDword volume;
+		core->GetDictionary()->Lookup( "Volume Voices", volume );
+		alSourcef( speech.Source, AL_GAIN, 0.01f * volume );
 		alSourcei( speech.Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
 		alSourcefv( speech.Source, AL_POSITION, SourcePos );
 		alSourcei( speech.Source, AL_BUFFER, Buffer );
@@ -400,9 +401,11 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned long
 			return 0;
 		}
 	
+		ieDword volume;
+		core->GetDictionary()->Lookup( "Volume SFX", volume );
 		alSourcei( Source, AL_BUFFER, Buffer );
 		alSourcef( Source, AL_PITCH, 1.0f );
-		alSourcef( Source, AL_GAIN, 1.0f );
+		alSourcef( Source, AL_GAIN, 0.01f * volume );
 		alSourcefv( Source, AL_VELOCITY, SourceVel );
 		alSourcei( Source, AL_LOOPING, 0 );
 		alSourcef( Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
@@ -483,8 +486,10 @@ unsigned long ACMImp::StreamFile(const char* filename)
 			0.0f, 0.0f, 0.0f
 		};
 
+		ieDword volume;
+		core->GetDictionary()->Lookup( "Volume Music", volume );
 		alSourcef( MusicSource, AL_PITCH, 1.0f );
-		alSourcef( MusicSource, AL_GAIN, 1.0f );
+		alSourcef( MusicSource, AL_GAIN, 0.01f * volume );
 		alSourcei( MusicSource, AL_SOURCE_RELATIVE, 1 );
 		alSourcefv( MusicSource, AL_POSITION, SourcePos );
 		alSourcefv( MusicSource, AL_VELOCITY, SourceVel );
@@ -557,6 +562,7 @@ void ACMImp::AmbientMgr::setAmbients(const std::vector<Ambient *> &a)
 	for (std::vector<Ambient *>::const_iterator it = a.begin(); it != a.end(); ++it) {
 		ambientSources.push_back(new AmbientSource(*it));
 	}
+	UpdateVolume();
 	
 	player = SDL_CreateThread(&play, (void *) this);
 }
@@ -802,3 +808,37 @@ void ACMImp::AmbientMgr::AmbientSource::hardStop()
 	alSourceStop( source );
 	dequeProcessed();
 }
+
+void ACMImp::UpdateVolume( unsigned long which )
+{
+	if ((GEM_SND_VOL_MUSIC & which) && alIsSource( MusicSource )) {
+		SDL_mutexP( musicMutex );
+		ieDword volume;
+		core->GetDictionary()->Lookup( "Volume Music", volume );
+		alSourcef( MusicSource, AL_GAIN, 0.01f * volume );
+		SDL_mutexV( musicMutex );
+	}
+	if ((GEM_SND_VOL_AMBIENTS & which) && ambim) {
+		((ACMImp::AmbientMgr *) ambim) -> UpdateVolume();
+	}
+}
+
+void ACMImp::AmbientMgr::UpdateVolume()
+{
+	ieDword volume;
+	core->GetDictionary()->Lookup( "Volume Ambients", volume );
+	SDL_mutexP( mutex );
+	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
+		(*it) -> SetVolume( volume );
+	}
+	SDL_mutexV( mutex );
+}
+
+/* sets the overall volume (in percent)
+ * the final volume is affected by the specific ambient gain
+ */
+void ACMImp::AmbientMgr::AmbientSource::SetVolume(unsigned short volume)
+{
+	alSourcef( source, AL_GAIN, 0.0001f * ambient->getGain() * volume );
+}
+

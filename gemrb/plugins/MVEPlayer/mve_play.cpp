@@ -1,4 +1,4 @@
-/* $Id: mve_play.cpp,v 1.9 2004/08/19 22:58:26 avenger_teambg Exp $ */
+/* $Id: mve_play.cpp,v 1.10 2004/08/21 04:53:59 divide Exp $ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -260,6 +260,7 @@ static int mve_audio_compressed = 0;
 static int mve_audio_enabled = 1;
 static short * mve_audio_memory = 0;
 static int mve_audio_underruns = 0;
+static unsigned short mve_audio_volume = 100;
 
 #endif
 
@@ -333,7 +334,7 @@ static int create_audiobuf_handler(unsigned char /*major*/, unsigned char minor,
 		};
 
 		alSourcef( mve_audio_source, AL_PITCH, 1.0f );
-		alSourcef( mve_audio_source, AL_GAIN, 1.0f );
+		alSourcef( mve_audio_source, AL_GAIN, 0.01f * mve_audio_volume );
 		alSourcefv( mve_audio_source, AL_POSITION, SourcePos );
 		alSourcefv( mve_audio_source, AL_VELOCITY, SourceVel );
 		alSourcei( mve_audio_source, AL_LOOPING, 0 );
@@ -776,13 +777,14 @@ void MVE_rmHoldMovie()
 }
 
 
-void MVE_sndInit(int x)
+void MVE_sndInit(int x, unsigned short volume)
 {
 #ifdef AUDIO
 	if (x == -1) {
 		mve_audio_enabled = 0;
 	} else {
 		mve_audio_enabled = 1;
+		mve_audio_volume = volume;
 	}
 #endif
 

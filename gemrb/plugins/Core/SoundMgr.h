@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.14 2004/08/12 16:00:43 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.15 2004/08/21 04:53:56 divide Exp $
  *
  */
 
@@ -31,6 +31,8 @@ class Ambient;
 
 #define GEM_SND_RELATIVE 1
 #define GEM_SND_SPEECH   IE_STR_SPEECH // 4
+#define GEM_SND_VOL_MUSIC    1
+#define GEM_SND_VOL_AMBIENTS 2
 
 #ifdef WIN32
 
@@ -55,12 +57,14 @@ public:
 	virtual bool Play() = 0;
 	virtual void ResetMusics() = 0;
 	virtual void UpdateViewportPos(int XPos, int YPos) = 0;
+	// update volumes (possibly on-the-fly)
+	virtual void UpdateVolume( unsigned long = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS ) {}
 	class AmbientMgr {
 	public:
 		AmbientMgr() {}
 		virtual ~AmbientMgr() { reset(); }
 		virtual void reset() { ambients = std::vector<Ambient *> (); }
-		virtual void setAmbients(const std::vector<Ambient *> &a) { reset(); ambients = a; }
+		virtual void setAmbients(const std::vector<Ambient *> &a) { reset(); ambients = a; activate(); }
 		virtual void activate(const std::string &name);
 		virtual void activate() { active = true; } // hard play ;-)
 		virtual void deactivate(const std::string &name);
