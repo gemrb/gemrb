@@ -292,7 +292,7 @@ void GameControl::SelectActor(int whom)
 	}
 	/* doesn't fall through here */
 	Actor* actor = game->GetPC( whom );
-	if (actor && !actor->GetStat(IE_STATE_ID)&STATE_DEAD) {
+	if (actor && !(actor->GetStat(IE_STATE_ID)&STATE_DEAD)) {
 		selected.push_back( actor );
 		actor->Select( true );
 	}
@@ -311,6 +311,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		case '4':
 		case '5':
 		case '6':
+		case '7':
+		case '8':
+		case '9':
 			SelectActor(Key-'1');
 			break;
 		case '\t':

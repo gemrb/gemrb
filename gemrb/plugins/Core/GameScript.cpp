@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.118 2004/03/24 20:19:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.119 2004/03/24 21:09:05 avenger_teambg Exp $
  *
  */
 
@@ -51,7 +51,7 @@ static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
-static int InDebug = 1;
+static int InDebug = 0;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -668,8 +668,10 @@ void GameScript::ReplaceMyArea(Scriptable* Sender, char* newVarName)
 void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 	const char* Context, int value)
 {
-	printf( "Setting variable(\"%s.%s\", %d)\n", Context,
-		VarName, value );
+	if(InDebug) {
+		printf( "Setting variable(\"%s%s\", %d)\n", Context,
+			VarName, value );
+	}
 	if (strnicmp( Context, "LOCALS", 6 ) == 0) {
 		Sender->locals->SetAt( VarName, value );
 		return;
@@ -686,7 +688,9 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 	int value)
 {
-	printf( "Setting variable(\"%s\", %d)\n", VarName, value );
+	if(InDebug) {
+		printf( "Setting variable(\"%s\", %d)\n", VarName, value );
+	}
 	if (strnicmp( VarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->SetAt( &VarName[6], value );
 		return;
@@ -1433,14 +1437,19 @@ Action *GameScript::GenerateActionCore(char *src, char *str, int acIndex)
 	int stringsCount = 0;
 	int intCount = 0;
 	//Here is the Action; Now we need to evaluate the parameters
+/*
 	str++;
 	src++;
+*/
 	while (*str) {
+		if(*(str+1)!=':') {
+			printf("Warning, parser was sidetracked: %s\n",str);
+		}
 		switch (*str) {
 			default:
+				printf("Invalid type: %s\n",str);
 				str++;
 				break;
-
 			case 'p':
 				//Point
 				SKIP_ARGUMENT();
@@ -1607,13 +1616,13 @@ Action *GameScript::GenerateActionCore(char *src, char *str, int acIndex)
 							src++;
 						}
 					}
-					str++;
-					src++; //skipping " and ,
+					src++; //skipping "
 					stringsCount++;
 				}
 				break;
 		}
-		if(*src == ',')
+		str++;
+		if(*src == ',' || *src==')')
 			src++;
 	}
 	return newAction;
@@ -1622,7 +1631,7 @@ Action *GameScript::GenerateActionCore(char *src, char *str, int acIndex)
 Action* GameScript::GenerateAction(char* String)
 {
 	strlwr( String );
-	int len = strlench(String,'(');
+	int len = strlench(String,'(')+1; //including (
 	if(InDebug) {
 		printf("Compiling:%s\n",String);
 	}
@@ -3077,28 +3086,24 @@ int GameScript::SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 		return 0;
 	}
 	Actor* snd = ( Actor* ) Sender;
-	Scriptable* target = GetActorFromObject( Sender,
-							parameters->objectParameter );
-	if (!target) {
-		return 0;
-	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	/* don't set LastSeen if this isn't an actor */
-	if (target->Type !=ST_ACTOR) {
+	if (!tar || tar->Type !=ST_ACTOR) {
 		return 0;
 	}
-	long x = ( target->XPos - Sender->XPos );
-	long y = ( target->YPos - Sender->YPos );
+	long x = ( tar->XPos - Sender->XPos );
+	long y = ( tar->YPos - Sender->YPos );
 	double distance = sqrt( ( double ) ( x* x + y* y ) );
 	if (distance > ( snd->Modified[IE_VISUALRANGE] * 20 )) {
 		return 0;
 	}
 	if (core->GetPathFinder()->IsVisible( Sender->XPos, Sender->YPos,
-								target->XPos, target->YPos )) {
+			tar->XPos, tar->YPos )) {
 		if(justlos) {
 			return 1;
 		}
 		//additional checks for invisibility?
-		snd->LastSeen = (Actor *) target;
+		snd->LastSeen = (Actor *) tar;
 		return 1;
 	}
 	return 0;
@@ -3139,10 +3144,7 @@ int GameScript::NumCreaturesGT(Scriptable* Sender, Trigger* parameters)
 int GameScript::Morale(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar) {
-		return 0;
-	}
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
@@ -3152,10 +3154,7 @@ int GameScript::Morale(Scriptable* Sender, Trigger* parameters)
 int GameScript::MoraleGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar) {
-		return 0;
-	}
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
@@ -3165,10 +3164,7 @@ int GameScript::MoraleGT(Scriptable* Sender, Trigger* parameters)
 int GameScript::MoraleLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar) {
-		return 0;
-	}
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
@@ -3178,10 +3174,7 @@ int GameScript::MoraleLT(Scriptable* Sender, Trigger* parameters)
 int GameScript::StateCheck(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar) {
-		return 0;
-	}
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
@@ -3191,10 +3184,7 @@ int GameScript::StateCheck(Scriptable* Sender, Trigger* parameters)
 int GameScript::NotStateCheck(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar) {
-		return 0;
-	}
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
