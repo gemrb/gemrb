@@ -1134,13 +1134,11 @@ static PyObject *GemRB_GetSaveGameAttrib( PyObject */*self*/, PyObject *args)
 		printMessage("GUIScript","Syntax Error: GetSaveGameAttrib(Type, SlotCount)\n", LIGHT_RED);
 		return NULL;
 	}
-printf("AA\n");
 	SaveGame *sg=core->GetSaveGameIterator()->GetSaveGame(SlotCount);
 	if(sg==NULL) {
 		printMessage("GUIScript","Can't find savegame\n", LIGHT_RED);
 		return NULL;
 	}
-printf("BB\n");
 	PyObject * tmp;
 	switch(Type)
 	{
@@ -1178,7 +1176,7 @@ static PyObject *GemRB_SetSaveGamePortrait( PyObject */*self*/, PyObject *args)
 		printMessage("GUIScript","Can't find savegame\n", LIGHT_RED);
 		return NULL;
 	}
-	if(sg->GetPortraitCount()<PCSlotCount) {
+	if(sg->GetPortraitCount()<=PCSlotCount) {
 		Button * btn = (Button*)ctrl;
 		btn->SetPicture(NULL);
 		Py_INCREF(Py_None);

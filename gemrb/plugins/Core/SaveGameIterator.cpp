@@ -151,27 +151,37 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 				struct _finddata_t bmpf;
 				sprintf(tmp, "%s%s%s%s%s*.bmp", core->GamePath, SaveFolder, SPathDelimiter, c_file.name, SPathDelimiter);
 				file = _findfirst(tmp, &bmpf);
-#else
-				sprintf(Path, "%s%s", core->GamePath, SaveFolder);
-				DIR * ndir = opendir(Path);
-				if(ndir == NULL) //If we cannot open the Directory
+				if(file == NULL) {
+					_findclose(hFile);
 					return NULL;
-#endif
-#ifndef WIN32  //Linux Statement
-				struct dirent * de = readdir(dir);  //Lookup the first entry in the Directory
+				}
+#else
+				sprintf(Path, "%s%s%s%s", core->GamePath, SaveFolder, SPathDelimiter, de->d_name);
+				DIR * ndir = opendir(Path);
+				//If we cannot open the Directory
+				if(ndir == NULL) {
+					closedir(dir);
+					return NULL;
+				}
+				struct dirent * de2 = readdir(ndir);  //Lookup the first entry in the Directory
+				if(de2 == NULL) {  // No first entry!!!
+					closedir(dir);
+					closedir(ndir);
+					return NULL;
+				}
 #endif
 				do {
 #ifdef WIN32
 					if(strnicmp(bmpf.name, "PORTRT", 6) == 0)
 #else
-					if(strnicmp(de->d_name, "PORTRT", 6) == 0)
+					if(strnicmp(de2->d_name, "PORTRT", 6) == 0)
 #endif
 						prtrt++;
 #ifdef WIN32
 				} while(_findnext(file, &bmpf) == 0);
 				_findclose(file);
 #else
-				} while((de = readdir(ndir)) != NULL);
+				} while((de2 = readdir(ndir)) != NULL);
 				closedir(ndir);  //No other files in the directory, close it
 #endif
 				break;
@@ -180,7 +190,6 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 #ifdef WIN32
 	} while(_findnext(hFile, &c_file) == 0);
 	_findclose(hFile);
-//	sprintf(Path, "%s%s%s%s", core->GamePath, SaveFolder,SPathDelimiter, c_file.name);
 #else
 	} while((de = readdir(dir)) != NULL);
 	closedir(dir);  //No other files in the directory, close it
