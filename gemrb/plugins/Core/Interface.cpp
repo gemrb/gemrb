@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.178 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.179 2004/07/31 13:17:53 avenger_teambg Exp $
  *
  */
 
@@ -1833,7 +1833,11 @@ int Interface::PlayMovie(char* ResRef)
 		delete( str );
 		return -1;
 	}
+	//shutting down music before movie
+	if(music) music->HardEnd();
 	mp->Play();
+	//restarting music
+	if(music) music->Start();
 	FreeInterface( mp );
 	return 0;
 }

@@ -1,4 +1,4 @@
-/* $Id: mve_play.cpp,v 1.4 2004/07/31 10:22:53 avenger_teambg Exp $ */
+/* $Id: mve_play.cpp,v 1.5 2004/07/31 13:17:54 avenger_teambg Exp $ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -257,6 +257,7 @@ static int mve_audio_playing = 0;
 static int mve_audio_canplay = 0;
 static int mve_audio_compressed = 0;
 static int mve_audio_enabled = 1;
+static short * mve_audio_memory = 0;
 
 #endif
 
@@ -293,8 +294,10 @@ static int create_audiobuf_handler(unsigned char major, unsigned char minor,
 	} else {
 		compressed = 0;
 	}
-
 	mve_audio_compressed = compressed;
+	// allocate it static, so we don't have to reclaim it over and over
+	// it's actually four bytes per sample in stereo 16-bit
+	mve_audio_memory = ( short * ) mve_alloc( desired_buffer * (1 << (stereo + bitsize)) );
 
 	if (bitsize == 1) {
 		mve_audio_format = ( stereo ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16 );
@@ -320,9 +323,10 @@ static int create_audiobuf_handler(unsigned char major, unsigned char minor,
 			fprintf( stderr, "   failure\n");
 		}
 
-		ALfloat SourcePos[] = {
-			0.0f, 0.0f, 0.0f
-		};
+		ALfloat SourcePos[3];
+		//moving the source to where the listener is
+		//so we don't have to alter listener here
+		alGetListenerfv( AL_POSITION, SourcePos );
 		ALfloat SourceVel[] = {
 			0.0f, 0.0f, 0.0f
 		};
@@ -347,12 +351,13 @@ static int play_audio_handler(unsigned char major, unsigned char minor,
 #ifdef AUDIO
 	if (mve_audio_canplay &&
 		!mve_audio_playing) {
-			ALint queued;
-		alGetSourcei( mve_audio_source, AL_BUFFERS_QUEUED, &queued );
-		if (queued) { // only play if the queue is not empty
-			alSourcePlay( mve_audio_source );
-			mve_audio_playing = 1;
-		}
+
+		// we can play even if the queue is empty
+		// openal won't even start playing (it's a legal nop)
+		// and playing will be resumed at a buffer refill
+		// as though a buffer underrun has happened
+		alSourcePlay( mve_audio_source );
+		mve_audio_playing = 1;
 	}
 #endif
 	return 1;
@@ -384,10 +389,9 @@ static int audio_data_handler(unsigned char major, unsigned char minor,
 				if (mve_audio_compressed) {
 					nsamp += 4;
 
-					short * memory = (short *) mve_alloc( nsamp );
-					mveaudio_uncompress( memory, data, -1 ); /* XXX */
-					alBufferData( buffer, mve_audio_format,
-memory, nsamp, mve_audio_samplerate );
+//					short * memory = (short *) mve_alloc( nsamp );
+					mveaudio_uncompress( mve_audio_memory, data, -1 ); /* XXX */
+					alBufferData( buffer, mve_audio_format, mve_audio_memory, nsamp, mve_audio_samplerate );
 				} else {
 					nsamp -= 8;
 					data += 8;
@@ -396,8 +400,8 @@ memory, nsamp, mve_audio_samplerate );
 data, nsamp, mve_audio_samplerate );
 				}
 			} else {
-					short * memory = ( short * ) mve_alloc( nsamp );
-					alBufferData( buffer, mve_audio_format, memory, nsamp, mve_audio_samplerate );
+					memset(mve_audio_memory,0, nsamp);
+					alBufferData( buffer, mve_audio_format, mve_audio_memory, nsamp, mve_audio_samplerate );
 			}
 			alSourceQueueBuffers( mve_audio_source, 1, &buffer );
 
@@ -709,7 +713,7 @@ void MVE_rmEndMovie()
 	timer_created = 0;
 
 #ifdef AUDIO
-	if (mve_audio_canplay && mve_audio_source && alIsSource( mve_audio_source ) ) {
+	if (alIsSource( mve_audio_source ) ) {
 		// destroy the buffers
 		alSourceStop( mve_audio_source );
 		ALint nbuffers;
@@ -720,9 +724,13 @@ void MVE_rmEndMovie()
 		mve_free( buffers );
 
 		alDeleteSources( 1, &mve_audio_source );
-		mve_audio_source = 0;
-		mve_audio_canplay = 0;
 	}
+	if (mve_audio_memory) {
+	        mve_free( mve_audio_memory );
+	        mve_audio_memory = NULL;
+	}
+
+	mve_audio_source = 0;
 	mve_audio_playing = 0;
 	mve_audio_canplay = 0;
 	mve_audio_compressed = 0;
