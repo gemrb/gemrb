@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.48 2003/12/21 09:47:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.49 2003/12/21 14:07:32 balrog994 Exp $
  *
  */
 
@@ -117,6 +117,9 @@ void Map::DrawMap(Region viewport)
 		video->BlitSpriteMode(animations[i]->NextFrame(), animations[i]->x, animations[i]->y, animations[i]->BlitMode, false);
 	}
 	Region vp = video->GetViewport();
+	Region Screen = vp;
+	Screen.x = 0;
+	Screen.y = 0;
 	GenerateQueue();
 	while(true) {
 		Actor * actor = GetRoot();
@@ -147,7 +150,7 @@ void Map::DrawMap(Region viewport)
 			int cy = ay/12;
 			Color tint = LightMap->GetPixel(cx, cy);
 			tint.a = 0xA0;
-			video->BlitSpriteTinted(nextFrame, ax, ay, tint);
+			video->BlitSpriteTinted(nextFrame, ax, ay, tint, &Screen);
 			if(anim->endReached && anim->autoSwitchOnEnd) {
 				actor->AnimID = anim->nextAnimID;
 				anim->autoSwitchOnEnd = false;
