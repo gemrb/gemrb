@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.43 2003/12/19 20:20:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.44 2003/12/21 09:30:17 avenger_teambg Exp $
  *
  */
 
@@ -25,7 +25,27 @@
 
 extern Interface * core;
 
+#define SND_BUTTON_PRESSED 0
+#define SND_BUTTON_RELEASE0 1
+#define SND_BUTTON_RELEASE1 2
+
+static char ButtonSounds[3][9]={"GAM_09\0\0","GAM_03\0\0","GAM_04\0\0"};
+static bool ButtonInited=false;
+
 Button::Button(bool Clear){
+	if(!ButtonInited) {
+		ButtonInited = true;
+	        int soundtable = core->LoadTable("defsound");
+		if(soundtable) {
+			TableMgr * tm = core->GetTable(soundtable);
+			if(tm) {
+				for(int i=0;i<3;i++) {
+					strncpy(ButtonSounds[i],tm->QueryField(i+2,0), 8 );
+				}
+				core->DelTable(soundtable);
+			}
+		}
+	}
 	Unpressed = Pressed = Selected = Disabled = NULL;
 	this->Clear = Clear;
 	State = IE_GUI_BUTTON_UNPRESSED;
@@ -199,10 +219,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 		State = IE_GUI_BUTTON_PRESSED;
 		Changed = true;
 		if(Flags & 0x04) {
-			if(stricmp(core->GameType, "pst") != 0)
-				core->GetSoundMgr()->Play("GAM_09");
-			else
-				core->GetSoundMgr()->Play("INT_09");
+				core->GetSoundMgr()->Play(ButtonSounds[SND_BUTTON_PRESSED]);
 		}
 	}
 }
@@ -245,18 +262,10 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 				core->GetDictionary()->SetAt(VarName, Value);
 		}
 		if(Flags & 0x04) {
-			if(stricmp(core->GameType, "pst") != 0) {
-				if(Flags & 0x08)
-					core->GetSoundMgr()->Play("GAM_04");
-				else
-					core->GetSoundMgr()->Play("GAM_03");
-			}
-			else {
-				if(Flags & 0x08)
-					core->GetSoundMgr()->Play("INT_04");
-				else
-					core->GetSoundMgr()->Play("INT_03");
-			}
+			if(Flags & 0x08)
+				core->GetSoundMgr()->Play(ButtonSounds[SND_BUTTON_RELEASE1]);
+			else
+				core->GetSoundMgr()->Play(ButtonSounds[SND_BUTTON_RELEASE0]);
 		}
 		if(ButtonOnPress[0] != 0)
 			core->GetGUIScriptEngine()->RunFunction(ButtonOnPress);
