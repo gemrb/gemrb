@@ -53,6 +53,8 @@ Label::~Label(){
 /** Draws the Control on the Output Display */
 void Label::Draw(unsigned short x, unsigned short y)
 {
+	if(!Changed)
+		return;
 	Changed=false;
 	if(XPos==65535)
 		 return;
