@@ -85,7 +85,7 @@ def ExitConfirmed():
 	GemRB.SetVisible(QuitWindow,0)
 	GemRB.SetVisible(StartWindow,0)
 	GemRB.UnloadWindow(QuitWindow)
-#really quit
+	GemRB.Quit()
 	return
 
 def OptionsPress():
