@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.92 2004/03/13 15:18:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.93 2004/03/13 16:33:54 avenger_teambg Exp $
  *
  */
 
@@ -46,6 +46,7 @@ static bool HasAdditionalRect = false;
 static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
+static int RandomNumValue;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -80,14 +81,19 @@ static TriggerLink triggernames[] = {
 	{"morale", GameScript::Morale},
 	{"moralegt", GameScript::MoraleGT},
 	{"moralelt", GameScript::MoraleLT},
+	{"notstatecheck", GameScript::NotStateCheck},
 	{"numtimestalkedto", GameScript::NumTimesTalkedTo},
 	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT},
 	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT},
-	{"objectactionlistempty", GameScript::ActionListEmpty}, //same function
+	{"objectactionlistempty", GameScript::ObjectActionListEmpty}, //same function
 	{"oncreation", GameScript::OnCreation}, {"or", GameScript::Or},
 	{"partyhasitem", GameScript::PartyHasItem}, {"race", GameScript::Race},
+	{"randomnum", GameScript::RandomNum},
+	{"randomnumgt", GameScript::RandomNumGT},
+	{"randomnumlt", GameScript::RandomNumLT},
 	{"range", GameScript::Range}, {"see", GameScript::See},
 	{"specific", GameScript::Specific},
+	{"statecheck", GameScript::StateCheck},
 	{"true", GameScript::True}, {"xp", GameScript::XP},
 	{"xpgt", GameScript::XPGT}, {"xplt", GameScript::XPLT}, { NULL,NULL}, 
 };
@@ -823,6 +829,7 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 	int result = 0;
 	bool subresult = true;
 
+	RandomNumValue=rand();
 	for (int i = 0; i < condition->triggersCount; i++) {
 		Trigger* tR = condition->triggers[i];
 		//do not evaluate triggers in an Or() block if one of them
@@ -882,10 +889,28 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 
 int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
 {
+	switch(rS->responsesCount) {
+		case 0:
+			return 0;
+		case 1:
+			return ExecuteResponse( Sender, rS->responses[0] );
+	}
+	/*default*/
+	int maxWeight, randWeight;
+
+	for (int i = 0; i < rS->responsesCount; i++) {
+		maxWeight+=rS->responses[i]->weight;
+	}
+	if(maxWeight) {
+		randWeight = rand() % maxWeight;
+	}
+	else {
+		randWeight = 0;
+	}
+
 	for (int i = 0; i < rS->responsesCount; i++) {
 		Response* rE = rS->responses[i];
-		int randWeight = ( rand() % 100 ) + 1;
-		if (rE->weight >= randWeight) {
+		if (rE->weight > randWeight) {
 			return ExecuteResponse( Sender, rE );
 			/* this break is only symbolic */
 			break;
@@ -2197,12 +2222,23 @@ int GameScript::ActionListEmpty(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
 	}
 	if (scr->GetNextAction()) {
+		return 0;
+	}
+	return 1;
+}
+
+int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	if (Sender->GetNextAction()) {
 		return 0;
 	}
 	return 1;
@@ -2302,7 +2338,7 @@ int GameScript::Race(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2315,7 +2351,7 @@ int GameScript::Gender(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2328,7 +2364,7 @@ int GameScript::HP(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2344,7 +2380,7 @@ int GameScript::HPGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2360,7 +2396,7 @@ int GameScript::HPLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2376,7 +2412,7 @@ int GameScript::HPPercent(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if(!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (GetHPPercent( scr ) == parameters->int0Parameter) {
 		return 1;
@@ -2388,7 +2424,7 @@ int GameScript::HPPercentGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if(!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (GetHPPercent( scr ) > parameters->int0Parameter) {
 		return 1;
@@ -2400,7 +2436,7 @@ int GameScript::HPPercentLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if(!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (GetHPPercent( scr ) < parameters->int0Parameter) {
 		return 1;
@@ -2412,7 +2448,7 @@ int GameScript::XP(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2428,7 +2464,7 @@ int GameScript::XPGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2444,7 +2480,7 @@ int GameScript::XPLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2612,6 +2648,65 @@ int GameScript::MoraleLT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	return actor->GetStat(IE_MORALEBREAK) < parameters->int0Parameter;
+}
+
+int GameScript::StateCheck(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_STATE_ID) & parameters->int0Parameter;
+}
+
+int GameScript::NotStateCheck(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_STATE_ID) & ~parameters->int0Parameter;
+}
+
+int GameScript::RandomNum(Scriptable* Sender, Trigger* parameters)
+{
+	if(parameters->int0Parameter<0) {
+		return 0;
+	}
+	if(parameters->int1Parameter<0) {
+		return 0;
+	}
+	return parameters->int1Parameter-1 == RandomNumValue%parameters->int0Parameter;
+}
+
+int GameScript::RandomNumGT(Scriptable* Sender, Trigger* parameters)
+{
+	if(parameters->int0Parameter<0) {
+		return 0;
+	}
+	if(parameters->int1Parameter<0) {
+		return 0;
+	}
+	return parameters->int1Parameter-1 == RandomNumValue%parameters->int0Parameter;
+}
+
+int GameScript::RandomNumLT(Scriptable* Sender, Trigger* parameters)
+{
+	if(parameters->int0Parameter<0) {
+		return 0;
+	}
+	if(parameters->int1Parameter<0) {
+		return 0;
+	}
+	return parameters->int1Parameter-1 == RandomNumValue%parameters->int0Parameter;
 }
 
 //-------------------------------------------------------------

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.65 2004/03/13 15:18:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.66 2004/03/13 16:33:55 avenger_teambg Exp $
  *
  */
 
@@ -747,22 +747,28 @@ public: //Script Functions
 	static int Morale(Scriptable* Sender, Trigger* parameters);
 	static int MoraleGT(Scriptable* Sender, Trigger* parameters);
 	static int MoraleLT(Scriptable* Sender, Trigger* parameters);
+	static int NotStateCheck(Scriptable* Sender, Trigger* parameters);
 	static int NumCreatures(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesGT(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesLT(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedTo(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedToGT(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedToLT(Scriptable* Sender, Trigger* parameters);
-	static int Or(Scriptable* Sender, Trigger* parameters);
+	static int ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters);
 	static int OnCreation(Scriptable* Sender, Trigger* parameters);
+	static int Or(Scriptable* Sender, Trigger* parameters);
 	static int PartyHasItem(Scriptable* Sender, Trigger* parameters);
 	static int Race(Scriptable* Sender, Trigger* parameters);
+	static int RandomNum(Scriptable* Sender, Trigger* parameters);
+	static int RandomNumGT(Scriptable* Sender, Trigger* parameters);
+	static int RandomNumLT(Scriptable* Sender, Trigger* parameters);
 	static int Range(Scriptable* Sender, Trigger* parameters);
 	static int Reputation(Scriptable* Sender, Trigger* parameters);
 	static int ReputationGT(Scriptable* Sender, Trigger* parameters);
 	static int ReputationLT(Scriptable* Sender, Trigger* parameters);
 	static int See(Scriptable* Sender, Trigger* parameters);
 	static int Specific(Scriptable* Sender, Trigger* parameters);
+	static int StateCheck(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);
 	static int XP(Scriptable* Sender, Trigger* parameters);
 	static int XPGT(Scriptable* Sender, Trigger* parameters);
