@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.24 2004/04/04 20:22:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.25 2004/04/05 22:20:02 avenger_teambg Exp $
  *
  */
 
@@ -48,7 +48,10 @@
 
 #define MAX_STATS 256
 
-
+//stat modifier type
+#define MOD_ADDITIVE  0
+#define MOD_ABSOLUTE  1
+#define MOD_PERCENT   2
 
 class GEM_EXPORT Actor : public Moveble {
 public:

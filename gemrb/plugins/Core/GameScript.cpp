@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.127 2004/04/04 20:22:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.128 2004/04/05 22:20:02 avenger_teambg Exp $
  *
  */
 
@@ -66,14 +66,20 @@ static TriggerLink triggernames[] = {
 	{"bitcheck",GameScript::BitCheck,TF_MERGESTRINGS},
 	{"bitcheckexact",GameScript::BitCheckExact,TF_MERGESTRINGS},
 	{"bitglobal",GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
-	{"breakingpoint",GameScript::BreakingPoint},
-	{"checkstat",GameScript::CheckStat},
-	{"checkstatgt",GameScript::CheckStatGT},
-	{"checkstatlt",GameScript::CheckStatLT}, {"class", GameScript::Class},
-	{"clicked", GameScript::Clicked}, {"dead", GameScript::Dead},
-	{"entered", GameScript::Entered}, {"exists", GameScript::Exists},
+	{"breakingpoint",GameScript::BreakingPoint,0},
+	{"checkstat",GameScript::CheckStat,0},
+	{"checkstatgt",GameScript::CheckStatGT,0},
+	{"checkstatlt",GameScript::CheckStatLT,0},
+	{"class", GameScript::Class,0},
+	{"clicked", GameScript::Clicked,0},
+	{"dead", GameScript::Dead,0},
+	{"entered", GameScript::Entered,0},
+	{"exists", GameScript::Exists,0},
+	{"extraproficiency", GameScript::ExtraProficiency,0},
+	{"extraproficiencygt", GameScript::ExtraProficiencyGT,0},
+	{"extraproficiencylt", GameScript::ExtraProficiencyLT,0},
 	{"false", GameScript::False}, {"gender", GameScript::Gender},
-	{"general", GameScript::General},
+	{"general", GameScript::General,0},
 	{"global", GameScript::Global,TF_MERGESTRINGS},
 	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger,TF_MERGESTRINGS},
 	{"globalbitglobal",GameScript::GlobalBitGlobal_Trigger,TF_MERGESTRINGS},
@@ -148,6 +154,9 @@ static TriggerLink triggernames[] = {
 	{"partygoldLT", GameScript::PartyGoldLT,0},
 	{"partyhasitem", GameScript::PartyHasItem,0},
 	{"partyhasitemidentified", GameScript::PartyHasItemIdentified,0},
+	{"proficiency", GameScript::Proficiency,0},
+	{"proficiencygt", GameScript::ProficiencyGT,0},
+	{"proficiencylt", GameScript::ProficiencyLT,0},
 	{"race", GameScript::Race,0},
 	{"randomnum", GameScript::RandomNum,0},
 	{"randomnumgt", GameScript::RandomNumGT,0},
@@ -261,6 +270,8 @@ static ActionLink actionnames[] = {
 	{"incrementchapter",GameScript::IncrementChapter,0},
 	{"incrementglobal",GameScript::IncrementGlobal,AF_MERGESTRINGS},
 	{"incrementglobalonce",GameScript::IncrementGlobalOnce,AF_MERGESTRINGS},
+	{"incrementextraproficiency",GameScript::IncrementExtraProficiency,0},
+	{"incrementproficiency",GameScript::IncrementProficiency,0},
 	{"interact",GameScript::Interact,0},
 	{"joinparty",GameScript::JoinParty,0},
 	{"jumptoobject",GameScript::JumpToObject,0},
@@ -3618,6 +3629,96 @@ int GameScript::InCutSceneMode(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
 	return core->InCutSceneMode();
 }
+
+int GameScript::Proficiency(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned int idx = parameters->int0Parameter;
+	if (idx>31) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_PROFICIENCYBASTARDSWORD+idx) == parameters->int1Parameter;
+}
+
+int GameScript::ProficiencyGT(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned int idx = parameters->int0Parameter;
+	if (idx>31) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_PROFICIENCYBASTARDSWORD+idx) > parameters->int1Parameter;
+}
+
+int GameScript::ProficiencyLT(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned int idx = parameters->int0Parameter;
+	if (idx>31) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_PROFICIENCYBASTARDSWORD+idx) < parameters->int1Parameter;
+}
+
+int GameScript::ExtraProficiency(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_EXTRAPROFICIENCY1) == parameters->int0Parameter;
+}
+
+int GameScript::ExtraProficiencyGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_EXTRAPROFICIENCY1) > parameters->int0Parameter;
+}
+
+int GameScript::ExtraProficiencyLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_EXTRAPROFICIENCY1) < parameters->int0Parameter;
+}
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -4830,7 +4931,7 @@ void GameScript::GivePartyGoldGlobal(Scriptable* Sender, Action* parameters)
 	}
 	Actor* act = ( Actor* ) Sender;
 	unsigned long gold = CheckVariable( Sender, parameters->string0Parameter );
-	act->NewStat(IE_GOLD, -gold, 0);
+	act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
 	core->GetGame()->PartyGold+=gold;
 }
 
@@ -4849,7 +4950,7 @@ void GameScript::GivePartyGold(Scriptable* Sender, Action* parameters)
 	if(gold>parameters->int0Parameter) {
 		gold=parameters->int0Parameter;
 	}
-	act->NewStat(IE_GOLD, -gold, 0);
+	act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
 	core->GetGame()->PartyGold+=gold;
 }
 
@@ -4872,7 +4973,7 @@ void GameScript::TakePartyGold(Scriptable* Sender, Action* parameters)
 	if(gold>parameters->int0Parameter) {
 		gold=parameters->int0Parameter;
 	}
-	act->NewStat(IE_GOLD, gold, 0);
+	act->NewStat(IE_GOLD, gold, MOD_ADDITIVE);
 	core->GetGame()->PartyGold-=gold;
 }
 
@@ -4886,7 +4987,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	actor->NewStat(IE_XP, parameters->int0Parameter, 0);
+	actor->NewStat(IE_XP, parameters->int0Parameter, MOD_ADDITIVE);
 }
 
 void GameScript::AddXP2DA(Scriptable* Sender, Action* parameters)
@@ -4910,7 +5011,7 @@ void GameScript::AddXP2DA(Scriptable* Sender, Action* parameters)
 	}
 	else {
 		Actor* actor = ( Actor* ) core->GetGame()->GetPC(0);
-		actor->NewStat(IE_XP, strtol(xpvalue,NULL,0), 0);
+		actor->NewStat(IE_XP, strtol(xpvalue,NULL,0), MOD_ADDITIVE);
 	}
 	core->DelTable( xptable );
 }
@@ -4932,7 +5033,7 @@ void GameScript::SetMoraleAI(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, 1);
+	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, MOD_ABSOLUTE);
 }
 
 void GameScript::IncMoraleAI(Scriptable* Sender, Action* parameters)
@@ -4941,7 +5042,7 @@ void GameScript::IncMoraleAI(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, 0);
+	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, MOD_ADDITIVE);
 }
 
 void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
@@ -4954,7 +5055,7 @@ void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) tar;
-	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, 1);
+	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, MOD_ABSOLUTE);
 }
 
 void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
@@ -4967,7 +5068,7 @@ void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) tar;
-	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, 0);
+	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, MOD_ADDITIVE);
 }
 
 void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
@@ -4980,7 +5081,7 @@ void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) tar;
-	act->NewStat(IE_MORALEBREAK, -parameters->int0Parameter, 0);
+	act->NewStat(IE_MORALEBREAK, -parameters->int0Parameter, MOD_ADDITIVE);
 }
 
 void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
@@ -5538,3 +5639,35 @@ void GameScript::Debug(Scriptable* Sender, Action* parameters)
 	printMessage("IEScript",parameters->string0Parameter,YELLOW);
 }
 
+void GameScript::IncrementProficiency(Scriptable* Sender, Action* parameters)
+{
+	unsigned int idx = parameters->int0Parameter;
+	if (idx>31) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* target = ( Actor* ) tar;
+	//start of the proficiency stats
+	target->NewStat(IE_PROFICIENCYBASTARDSWORD+idx,
+		parameters->int1Parameter,MOD_ADDITIVE);
+}
+
+// i'm unsure why this exists
+void GameScript::IncrementExtraProficiency(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* target = ( Actor* ) tar;
+	target->NewStat(IE_EXTRAPROFICIENCY1, parameters->int0Parameter,MOD_ADDITIVE);
+}

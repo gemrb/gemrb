@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.90 2004/04/04 10:13:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.91 2004/04/05 22:20:03 avenger_teambg Exp $
  *
  */
 
@@ -749,6 +749,9 @@ public: //Script Functions
 	static int Dead(Scriptable* Sender, Trigger* parameters);
 	static int Entered(Scriptable* Sender, Trigger* parameters);
 	static int Exists(Scriptable* Sender, Trigger* parameters);
+	static int ExtraProficiency(Scriptable* Sender, Trigger* parameters);
+	static int ExtraProficiencyGT(Scriptable* Sender, Trigger* parameters);
+	static int ExtraProficiencyLT(Scriptable* Sender, Trigger* parameters);
 	static int False(Scriptable* Sender, Trigger* parameters);
 	static int Gender(Scriptable* Sender, Trigger* parameters);
 	static int General(Scriptable* Sender, Trigger* parameters);
@@ -823,6 +826,9 @@ public: //Script Functions
 	static int PartyGoldLT(Scriptable* Sender, Trigger* parameters);
 	static int PartyHasItem(Scriptable* Sender, Trigger* parameters);
 	static int PartyHasItemIdentified(Scriptable* Sender, Trigger* parameters);
+	static int Proficiency(Scriptable* Sender, Trigger* parameters);
+	static int ProficiencyGT(Scriptable* Sender, Trigger* parameters);
+	static int ProficiencyLT(Scriptable* Sender, Trigger* parameters);
 	static int Race(Scriptable* Sender, Trigger* parameters);
 	static int RandomNum(Scriptable* Sender, Trigger* parameters);
 	static int RandomNumGT(Scriptable* Sender, Trigger* parameters);
@@ -928,6 +934,8 @@ public:
 	static void IncrementChapter(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobal(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobalOnce(Scriptable* Sender, Action* parameters);
+	static void IncrementExtraProficiency(Scriptable* Sender, Action* parameters);
+	static void IncrementProficiency(Scriptable* Sender, Action* parameters);
 	static void Interact(Scriptable* Sender, Action* parameters);
 	static void JoinParty(Scriptable* Sender, Action* parameters);
 	static void JumpToPoint(Scriptable* Sender, Action* parameters);
