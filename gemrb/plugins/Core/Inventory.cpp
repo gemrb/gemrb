@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.6 2004/04/08 17:06:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.7 2004/04/10 17:46:24 avenger_teambg Exp $
  *
  */
 
@@ -23,12 +23,8 @@
 #include "../../includes/win32def.h"
 #include "Inventory.h"
 
-
 Inventory::Inventory()
 {
-	for (int i = 0; i < INVENTORY_SIZE; i++) {
-		slots.push_back( NULL );
-	}
 }
 
 Inventory::~Inventory()
@@ -38,6 +34,17 @@ Inventory::~Inventory()
 			delete( slots[i] );
 		}
 	}
+}
+
+void Inventory::SetSlotCount(unsigned int size)
+{
+	if(slots.size()) {
+		printf("Inventory size changed???\n");
+		//we don't allow reassignment,
+		//if you want this, delete the previous slots here
+		abort(); 
+	}
+	slots.assign((size_t) size, NULL);
 }
 
 /** if you supply a null string, then it checks if the slot is empty */
@@ -124,18 +131,19 @@ void Inventory::DestroyItem(const char *resref, ieDword flags)
 	}
 }
 
-void Inventory::SetSlotItem(CREItem* item, int slot)
+void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 {
-	int d = slot - slots.size() + 1;
-	for ( ; d > 0 ; d--) 
-		slots.push_back( NULL );
+	if (slot>=slots.size() ) {
+		printf("Invalid slot!\n");
+		abort();
+	}
 	if(slots[slot]) {
 		delete slots[slot];
 	}
 	slots[slot] = item;
 }
 
-int Inventory::AddSlotItem(CREItem* item, int slot, CREItem **res_item)
+int Inventory::AddSlotItem(CREItem* item, unsigned int slot, CREItem **res_item)
 {
 	// FIXME: join items if possible
 	for (size_t i = 0; i < slots.size(); i++) {

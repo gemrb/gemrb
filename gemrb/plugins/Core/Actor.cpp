@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.40 2004/04/04 20:22:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.41 2004/04/10 17:46:24 avenger_teambg Exp $
  *
  */
 
@@ -88,7 +88,6 @@ Actor::Actor()
 
 	DeleteMe = false;
 	FromGame = false;
-//	inventory = new Inventory;
 }
 
 Actor::~Actor(void)
@@ -102,7 +101,6 @@ Actor::~Actor(void)
 	if (ShortName) {
 		free( ShortName );
 	}
-//	delete inventory;
 }
 
 void Actor::SetAnimationID(unsigned short AnimID)

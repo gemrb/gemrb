@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.20 2004/03/25 22:11:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.21 2004/04/10 17:46:24 avenger_teambg Exp $
  *
  */
 
@@ -39,6 +39,7 @@
 #define GEM_EXPORT
 #endif
 
+#define MAX_ORIENT				16
 #define MAX_ANIMS				19
 
 #define IE_ANI_ATTACK			0

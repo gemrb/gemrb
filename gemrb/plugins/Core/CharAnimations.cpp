@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.31 2004/03/27 12:08:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.32 2004/04/10 17:46:24 avenger_teambg Exp $
  *
  */
 
@@ -35,7 +35,7 @@ CharAnimations::CharAnimations(char* BaseResRef, unsigned char OrientCount,
 	this->MirrorType = MirrorType;
 	LoadedFlag = 0;
 	for (int i = 0; i < MAX_ANIMS; i++) {
-		for (int j = 0; j < 16; j++) {
+		for (int j = 0; j < MAX_ORIENT; j++) {
 			Anims[i][j] = NULL;
 		}
 	}
@@ -68,10 +68,8 @@ CharAnimations::~CharAnimations(void)
 			switch (OrientCount) {
 				case 5:
 				{
-					for (int AnimID = 0;
-						AnimID < MAX_ANIMS;
-						AnimID++) {
-						for (int i = 0; i < 16; i += 2) {
+					for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
+						for (int i = 0; i < MAX_ORIENT; i += 2) {
 							if (Anims[AnimID][i])
 								delete( Anims[AnimID][i] );
 						}
@@ -82,7 +80,7 @@ CharAnimations::~CharAnimations(void)
 				case 9:
 				{
 					for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-						for (int i = 0; i < 16; i++) {
+						for (int i = 0; i < MAX_ORIENT; i++) {
 							if (Anims[AnimID][i])
 								delete( Anims[AnimID][i] );
 						}
@@ -96,7 +94,7 @@ CharAnimations::~CharAnimations(void)
 		case IE_ANI_ONE_FILE:
 		 {
 			for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-				for (int i = 0; i < 16; i++) {
+				for (int i = 0; i < MAX_ORIENT; i++) {
 					if (Anims[AnimID][i])
 						delete( Anims[AnimID][i] );
 				}
@@ -110,7 +108,7 @@ CharAnimations::~CharAnimations(void)
 				case 9:
 				{
 					for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-						for (int i = 0; i < 16; i++) {
+						for (int i = 0; i < MAX_ORIENT; i++) {
 							if (Anims[AnimID][i])
 								delete( Anims[AnimID][i] );
 						}
@@ -130,7 +128,7 @@ CharAnimations::~CharAnimations(void)
 				case 5:
 				{
 					for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-						for (int i = 0; i < 16; i += 2) {
+						for (int i = 0; i < MAX_ORIENT; i += 2) {
 							if (Anims[AnimID][i])
 								delete( Anims[AnimID][i] );
 						}
@@ -147,7 +145,7 @@ CharAnimations::~CharAnimations(void)
 				switch (AnimID) {
 					case IE_ANI_WALK:
 					{
-						for (int i = 0; i < 16; i++) {
+						for (int i = 0; i < MAX_ORIENT; i++) {
 							if (Anims[AnimID][i])
 								delete( Anims[AnimID][i] );
 						}
@@ -163,7 +161,7 @@ CharAnimations::~CharAnimations(void)
 
 					default:
 					{
-						for (int i = 0; i < 16; i += 2) {
+						for (int i = 0; i < MAX_ORIENT; i += 2) {
 							if (Anims[AnimID][i])
 								delete( Anims[AnimID][i] );
 						}
@@ -254,9 +252,12 @@ IE_ANI_PST_ANIMATION_1: Planescape: Torment Animations are stored in a different
 				 |
 
 */
-Animation* CharAnimations::GetAnimation(unsigned char AnimID,
-	unsigned char Orient)
+Animation* CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Orient)
 {
+	if(AnimID>=MAX_ANIMS) {
+		printf("Illegal animation ID\n");
+		abort();
+	}
 	//TODO: Implement Auto Resource Loading
 	if (Anims[AnimID][Orient]) {
 		if (Anims[AnimID][Orient]->ChangePalette && UsePalette) {
@@ -329,7 +330,7 @@ Animation* CharAnimations::GetAnimation(unsigned char AnimID,
 		break;
 
 		case IE_ANI_CODE_MIRROR_2:
-		 {
+		{
 			switch (OrientCount) {
 				case 9:
 				{
@@ -374,7 +375,7 @@ Animation* CharAnimations::GetAnimation(unsigned char AnimID,
 
 				case IE_ANI_PST_START:
 				{
-					for (int j = 0; j < 16; j++) {
+					for (int j = 0; j < MAX_ORIENT; j++) {
 						Anims[IE_ANI_PST_START][j] = a;
 					}
 					a->autoSwitchOnEnd = true;
@@ -395,14 +396,17 @@ Animation* CharAnimations::GetAnimation(unsigned char AnimID,
 		break;
 
 		case IE_ANI_PST_GHOST:
-			 {
-				for (int i = 0; i < 18; i++) {
-					for (int j = 0; j < 16; j++) {
-						Anims[i][j] = NULL;
-					}
+		{
+			for (int i = 0; i < 18; i++) { //MAX_ANIMS-1 ??
+				for (int j = 0; j < MAX_ORIENT; j++) {
+					Anims[i][j] = NULL;
 				}
 			}
-			break;
+		}
+		break;
+		default:
+			printf("Unknown mirror type\n");
+			abort();
 	}
 	if (Anims[AnimID][Orient]) {
 		if (Anims[AnimID][Orient]->ChangePalette && UsePalette) {

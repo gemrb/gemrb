@@ -1210,7 +1210,6 @@ int GameControl::FindFirstState(Scriptable* target, Dialog* dlg)
 
 bool GameControl::EvaluateDialogTrigger(Scriptable* target, DialogString* trigger)
 {
-return true;
 	int ORcount = 0;
 	int result;
 	bool subresult = true;

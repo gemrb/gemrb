@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.5 2004/04/08 17:06:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.6 2004/04/10 17:46:24 avenger_teambg Exp $
  *
  */
 
@@ -67,7 +67,6 @@ typedef struct CREItem {
 class GEM_EXPORT Inventory {
 private:
 	std::vector<CREItem*> slots;
-	//CREItem* slots[38];
 
 public: 
 	Inventory();
@@ -84,20 +83,23 @@ public:
 	/** returns number of all slots in the inventory */
 	int GetSlotCount() { return slots.size(); };
 
+	/** sets inventory size, for the first time */
+	void SetSlotCount(unsigned int size);
+
 	/** returns CREItem in specified slot. if count != -1 it
 	** splits the item and returns only requuested amount */
 	CREItem* GetItem(int slot, int count = -1) { return NULL; };
 
 	/** adds CREItem to the inventory. If slot == -1, finds
 	** first eligible slot, eventually splitting the item to
-	** more slots. Returns true if successfull.
+	** more slots. Returns true if successful.
 	** FIXME: it should allow for cases when part of the item's amount
 	** can go in and part can't. Maybe return number instead? or CRE?*/
-	int AddSlotItem(CREItem* item, int slot, CREItem** res_item);
+	int AddSlotItem(CREItem* item, unsigned int slot, CREItem** res_item);
 
 	/** flags: see ieCREItemFlagBits */
 	void DestroyItem(const char *resref, ieDword flags);
-	void SetSlotItem(CREItem* item, int slot);
+	void SetSlotItem(CREItem* item, unsigned int slot);
 
 	/** returns weight of whole inventory, i.e. encumbrance? */
 	/** FIXME: but what about IWD2 containers? */
