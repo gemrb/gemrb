@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.17 2004/04/25 22:41:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.18 2004/04/28 12:54:20 edheldil Exp $
  *
  */
 
@@ -170,7 +170,7 @@ void Inventory::DestroyItem(const char *resref, ieDword flags)
 	}
 }
 
-CREItem *Inventory::GetItem(unsigned int slot, unsigned int count)
+CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 {
 	CREItem *item;
 
