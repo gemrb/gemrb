@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.14 2003/11/25 22:50:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.15 2003/11/29 17:09:51 balrog994 Exp $
  *
  */
 
@@ -254,6 +254,7 @@ Actor * CREImp::GetActor()
 	str->Read(act->ScriptName, 32);
 	str->Seek(44,GEM_CURRENT_POS);
 	str->Read(act->Dialog, 8);
+	act->BaseStats[IE_ARMOR_TYPE] = 0;
 	act->SetAnimationID(act->BaseStats[IE_ANIMATION_ID]);
 	if(act->anims)
 		act->anims->DrawCircle = false;
