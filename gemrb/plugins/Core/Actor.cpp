@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.24 2004/02/07 17:10:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.25 2004/02/10 20:48:03 avenger_teambg Exp $
  *
  */
 
@@ -193,7 +193,7 @@ void Actor::SetCircleSize()
 	if(Modified[IE_UNSELECTABLE]) {
 		color=&magenta;
 	}
-	if(BaseStats[IE_MORALEBREAK]>=Modified[IE_MORALEBREAK]) {
+	else if(Modified[IE_MORALEBREAK]<0) {
 		color=&yellow;
 	} else {			
 		switch(BaseStats[IE_EA])

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.4 2004/01/11 16:11:33 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.5 2004/02/10 20:48:07 avenger_teambg Exp $
  *
  */
 
@@ -160,6 +160,90 @@ DialogString * DLGImp::GetAction(int index)
 	return ds;
 }
 
+int GetActionLength(const char *string)
+{
+	int i;
+	int level=0;
+	bool quotes=true;
+	const char *poi=string;
+
+	for(i=0;*poi;i++) {
+		switch(*poi++) {
+			case '"':
+				quotes=!quotes;
+				break;
+			case '(':
+				if(quotes) {
+					level++;
+				}
+				break;
+			case ')':
+				if(quotes && level) {
+					level--;
+					if(level==0) {
+						return i+1;
+					}
+				}
+				break;
+			default:
+				break;
+		
+		}
+	}
+	return i;
+}
+
+/* this function will break up faulty script strings that lack the CRLF
+   between commands, common in PST dialog */
+char **DLGImp::GetStrings(char * string, unsigned long &count)
+{
+	int level=0;
+	bool quotes=true;
+	char *poi=string;
+
+	count=0;
+	while(*poi) {
+		while(*poi && isspace(*poi) ) poi++;
+		switch(*poi++) {
+			case '"':
+				quotes=!quotes;
+				break;
+			case '(':
+				if(quotes) {
+					level++;
+				}
+				break;
+			case ')':
+				if(quotes && level) {
+					level--;
+					if(level==0) {
+						count++;
+					}
+				}
+				break;
+			default:
+				break;
+		}
+	}
+	char **strings = (char**)calloc(count,sizeof(char*));
+	if(strings==NULL) {
+		count=0;
+		return strings;
+	}
+	poi=string;
+	for(int i=0;i<count;i++) {
+		while(isspace(*poi) ) poi++;
+		int len=GetActionLength(poi);
+		strings[i]=(char *) malloc(len+1);
+		memcpy(strings[i],poi,len);
+		poi+=len;
+		if(len && (strings[i][len-1] == '\r'))
+			len--;
+		strings[i][len]=0;
+	}
+	return strings;
+}
+/*
 char ** DLGImp::GetStrings(char * string, unsigned long &count)
 {
 	char ** strings = NULL;
@@ -178,3 +262,4 @@ char ** DLGImp::GetStrings(char * string, unsigned long &count)
 	}
 	return strings;
 }
+*/

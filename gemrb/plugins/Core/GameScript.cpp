@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.62 2004/02/09 19:27:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.63 2004/02/10 20:48:03 avenger_teambg Exp $
  *
  */
 
@@ -129,6 +129,7 @@ static ActionLink actionnames[]={
 {"globalshrglobal",GameScript::GlobalShRGlobal},
 {"hidegui",GameScript::HideGUI},
 {"incrementglobal",GameScript::IncrementGlobal},
+{"incrementglobalonce",GameScript::IncrementGlobalOnce},
 {"joinparty",GameScript::JoinParty},
 {"leavearealua",GameScript::LeaveAreaLUA},
 {"leavearealuapanic",GameScript::LeaveAreaLUAPanic},
@@ -625,8 +626,10 @@ bool GameScript::EvaluateCondition(Scriptable * Sender, Condition * condition)
 
 bool GameScript::EvaluateTrigger(Scriptable * Sender, Trigger * trigger)
 {
-	if(!trigger)
+	if(!trigger) {
+		printf("[IEScript]: Trigger evaluation fails due to NULL trigger.\n");
 		return false;
+	}
 	TriggerFunction func = triggers[trigger->triggerID];
 	if(!func) {
 		triggers[trigger->triggerID]=False;
@@ -2635,6 +2638,16 @@ void GameScript::IncrementGlobal(Scriptable *Sender, Action *parameters)
 {
 	unsigned long value=CheckVariable(Sender, parameters->string0Parameter);
 	SetVariable(Sender, parameters->string0Parameter, value+parameters->int0Parameter);
+}
+
+/* adding the number to the global ONLY if the first global is zero */
+void GameScript::IncrementGlobalOnce(Scriptable *Sender, Action *parameters)
+{
+	unsigned long value=CheckVariable(Sender, parameters->string0Parameter);
+	if(value!=0)
+		return;
+	value=CheckVariable(Sender, parameters->string1Parameter);
+	SetVariable(Sender, parameters->string1Parameter, value+parameters->int0Parameter);
 }
 
 void GameScript::GlobalSubGlobal(Scriptable *Sender, Action *parameters)
