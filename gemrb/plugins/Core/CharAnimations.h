@@ -68,7 +68,7 @@ public:
 	~CharAnimations(void);
 	Animation * GetAnimation(unsigned char AnimID, unsigned char Orient);
 private:
-	void AddVHRSuffix(char * ResRef, unsigned char AnimID)
+	void AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient)
 	{
 		switch(ArmorType)
 			{
@@ -250,14 +250,22 @@ private:
 
 			case IE_ANI_SLEEP:
 				{
-				strcpy(ResRef, "G16");
+				strcat(ResRef, "G16");
 				Cycle = 54 + (Orient % 9);
 				}
 			break;
 
 			case IE_ANI_TWITCH:
 				{
-				strcpy(ResRef, "
+				strcat(ResRef, "G17");
+				Cycle = 72 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_WALK:
+				{
+				strcat(ResRef, "G11");
+				Cycle = (Orient % 9);
 				}
 			break;
 			}
@@ -271,7 +279,11 @@ private:
 				{
 					if(OrientCount == 9) {
 						strcpy(ResRef, this->ResRef);
-						
+						AddVHRSuffix(ResRef, AnimID, Cycle, Orient);
+						ResRef[8] = 0;
+					}
+					else {
+
 					}
 				}
 			break;

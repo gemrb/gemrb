@@ -1,4 +1,5 @@
 #include "../../includes/win32def.h"
+#include "AnimationMgr.h"
 #include "CharAnimations.h"
 #include "Interface.h"
 
@@ -59,7 +60,7 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 	unsigned char Cycle;
 	GetAnimResRef(AnimID, Orient, ResRef, Cycle);
 	DataStream * stream = core->GetResourceMgr()->GetResource(ResRef, IE_BAM_CLASS_ID);
-	AnimationMgr * anim = core->GetInterface(IE_BAM_CLASS_ID);
+	AnimationMgr * anim = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
 	anim->Open(stream, true);
 	Animation * a = anim->GetAnimation(Cycle, 0, 0, IE_NORMAL);
 	switch(OrientCount) {
