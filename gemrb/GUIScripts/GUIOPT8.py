@@ -18,7 +18,7 @@ def OnLoad():
 	WeatherButton = GemRB.GetControl(GamePlayWindow, 46)
 	HealButton = GemRB.GetControl(GamePlayWindow, 48)
 	HotKeyButton = GemRB.GetControl(GamePlayWindow, 51)
-	CommentsButton = GemRB.GetControl(GamePlayWindow, 5)
+	FeedbackButton = GemRB.GetControl(GamePlayWindow, 5)
 	AutoPauseButton = GemRB.GetControl(GamePlayWindow, 6)
 	OkButton = GemRB.GetControl(GamePlayWindow, 7)
 	CancelButton = GemRB.GetControl(GamePlayWindow, 20)
@@ -26,7 +26,7 @@ def OnLoad():
 	GemRB.SetText(GamePlayWindow, OkButton, 11973)
 	GemRB.SetText(GamePlayWindow, CancelButton, 13727)
 	GemRB.SetText(GamePlayWindow, HotKeyButton, 816)
-	GemRB.SetText(GamePlayWindow, CommentsButton, 17163)
+	GemRB.SetText(GamePlayWindow, FeedbackButton, 17163)
 	GemRB.SetText(GamePlayWindow, AutoPauseButton, 17166)
 	GemRB.SetEvent(GamePlayWindow, DelayButton, 0x00000000, "DelayPress")
 	GemRB.SetEvent(GamePlayWindow, KeySpdButton, 0x00000000, "KeySpdPress")
@@ -38,7 +38,7 @@ def OnLoad():
 	GemRB.SetEvent(GamePlayWindow, WeatherButton, 0x00000000, "WeatherPress")
 	GemRB.SetEvent(GamePlayWindow, HealButton, 0x00000000, "HealPress")
 	GemRB.SetEvent(GamePlayWindow, HotKeyButton, 0x00000000, "HotKeyPress")
-	GemRB.SetEvent(GamePlayWindow, CommentsButton, 0x00000000, "CommentsPress")
+	GemRB.SetEvent(GamePlayWindow, FeedbackButton, 0x00000000, "FeedbackPress")
 	GemRB.SetEvent(GamePlayWindow, AutoPauseButton, 0x00000000, "AutoPausePress")
 	GemRB.SetEvent(GamePlayWindow, OkButton, 0x00000000, "OkPress")
 	GemRB.SetEvent(GamePlayWindow, CancelButton, 0x00000000, "CancelPress")
@@ -95,7 +95,7 @@ def HotKeyPress():
 	#GemRB.SetText(GamePlayWindow, TextAreaControl, 18016)
 	return
 	
-def CommentsPress():
+def FeedbackPress():
 	GemRB.SetVisible(GamePlayWindow, 0)
 	GemRB.UnloadWindow(GamePlayWindow)
 	GemRB.SetNextScript("GUIOPT9")
