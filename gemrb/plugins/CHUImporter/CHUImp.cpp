@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.36 2004/09/04 12:18:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.37 2004/09/11 12:58:06 avenger_teambg Exp $
  *
  */
 
@@ -206,7 +206,9 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				{
 					char MOSFile[9], MOSFile2[9];
 					char BAMFile[9];
-					ieWord KnobXPos, KnobYPos, KnobStepsCount;
+					ieWord KnobXPos, KnobYPos;
+					ieWord CapXPos, CapYPos;
+					ieWord KnobStepsCount;
 					ieWord Cycle;
 					
 
@@ -217,6 +219,8 @@ Window* CHUImp::GetWindow(unsigned int wid)
 					str->Read( &Cycle, 2 );
 					str->Read( &KnobXPos, 2 );
 					str->Read( &KnobYPos, 2 );
+					str->Read( &CapXPos, 2 );
+					str->Read( &CapYPos, 2 );
 					Progressbar* pbar = new Progressbar(KnobStepsCount, false); 
 					pbar->ControlID = ControlID;
 					pbar->XPos = XPos;
@@ -224,7 +228,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 					pbar->ControlType = ControlType;
 					pbar->Width = Width;
 					pbar->Height = Height;
-					pbar->SetSliderPos( KnobXPos, KnobYPos );
+					pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
 					ImageMgr* mos = ( ImageMgr* )
 						core->GetInterface( IE_MOS_CLASS_ID );
 					DataStream* s = core->GetResourceMgr()->GetResource( MOSFile, IE_MOS_CLASS_ID );
