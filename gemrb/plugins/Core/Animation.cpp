@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.7 2003/12/06 17:26:33 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.8 2003/12/12 23:14:30 balrog994 Exp $
  *
  */
 
@@ -44,6 +44,10 @@ Animation::Animation(unsigned short * frames, int count)
 	ChangePalette = true;
 	BlitMode = IE_NORMAL;
 	fps = 15;
+	autoSwitchOnEnd = false;
+	endReached = false;
+	nextAnimID = 0;
+	pastLastFrame = false;
 }
 
 Animation::~Animation(void)
@@ -110,6 +114,13 @@ Sprite2D * Animation::NextFrame(void)
 	}
 	//pos += startpos;
 	pos %= frames.size();
+	if(pos == (frames.size()-1))
+		pastLastFrame = true;
+	if(autoSwitchOnEnd && (!endReached)) {
+		if(pastLastFrame && (pos == 0)) {
+			endReached = true;
+		}
+	}
 	return ret;
 }
 
