@@ -1,4 +1,4 @@
-#character generation, class (GUICG2)
+#character generation, multi-class (GUICG10)
 import GemRB
 
 CharGenWindow = 0
@@ -15,7 +15,7 @@ def OnLoad():
 	ClassTable = GemRB.LoadTable("classes")
 	ClassCount = GemRB.GetTableRowCount(ClassTable)-1
 	CharGenWindow = GemRB.LoadWindow(0)
-	ClassWindow = GemRB.LoadWindow(2)
+	ClassWindow = GemRB.LoadWindow(10)
 
 	for i in range(0,7):
         	Button = GemRB.GetControl(CharGenWindow,i)
@@ -23,7 +23,7 @@ def OnLoad():
 
 	j=0
 	for i in range(1,ClassCount):
-		if GemRB.GetTableValue(ClassTable,i-1,3):
+		if GemRB.GetTableValue(ClassTable,i-1,3)==0:
 			continue
 		if j>7:
 			Button = GemRB.GetControl(ClassWindow,j+7)
@@ -57,6 +57,7 @@ def OnLoad():
 
 	MultiClassButton = GemRB.GetControl(ClassWindow, 10)
 	GemRB.SetText(ClassWindow,MultiClassButton, 11993)
+
 	BackButton = GemRB.GetControl(ClassWindow,14)
 	GemRB.SetText(ClassWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(ClassWindow,0)
