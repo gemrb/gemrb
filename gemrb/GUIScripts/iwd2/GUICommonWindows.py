@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.3 2004/10/16 10:47:56 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.4 2004/10/22 21:58:35 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -138,12 +138,13 @@ def GetActorClassTitle (actor):
 	return ClassTitle
 
 def GetActorPaperDoll (actor):
-	PortraitTable = GemRB.LoadTable ("PDOLLS")
+	PortraitTable = GemRB.LoadTable ("avatars")
 	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
 	level = GemRB.GetPlayerStat (actor, IE_ARMOR_TYPE)
 	row = "0x%04X" %anim_id
-	which = "LEVEL%d" %(level+1)
-	return GemRB.GetTableValue (PortraitTable, row, which)
+	which = "AT_%d" %(level+1)
+        return GemRB.GetTableValue (PortraitTable, row, which)
+
 
 SelectionChangeHandler = None
 
