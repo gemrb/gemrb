@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.92 2005/02/23 18:59:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.93 2005/02/24 16:45:15 avenger_teambg Exp $
  *
  */
 
@@ -41,7 +41,7 @@
 
 #define DOOR_HIDDEN 128
 
-static char Sounds[DEF_COUNT][9] = {
+static ieResRef Sounds[DEF_COUNT] = {
 	{-1},
 };
 
@@ -244,7 +244,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		int count;
 		ieDword Flags, OpenFirstVertex, ClosedFirstVertex;
 		ieWord OpenVerticesCount, ClosedVerticesCount;
-		char LongName[33], ShortName[9];
+		char LongName[33];
+		ieResRef ShortName;
 		ieWord minX, maxX, minY, maxY;
 		ieDword cursor;
 		ieResRef KeyResRef, Script;

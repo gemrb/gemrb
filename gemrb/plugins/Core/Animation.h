@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.13 2004/08/22 22:10:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.14 2005/02/24 16:45:17 avenger_teambg Exp $
  *
  */
 
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
+#include "../../includes/globals.h"
 #include "../../includes/RGBAColor.h"
 #include "Sprite2D.h"
 #include "Region.h"
@@ -50,7 +51,7 @@ private:
 	bool pastLastFrame;
 public:
 	bool Active;
-	char ResRef[9];
+	ieResRef ResRef;
 	unsigned char nextStanceID;
 	bool autoSwitchOnEnd;
 	bool endReached;

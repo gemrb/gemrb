@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.19 2004/10/16 14:26:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.20 2005/02/24 16:45:17 avenger_teambg Exp $
  *
  */
 
@@ -77,7 +77,7 @@ public:
 	int PrintInitial(int x, int y, Region rgn, unsigned char currChar,
 		Color *ipal=NULL, bool anchor = false);
 	void* GetPalette();
-	char ResRef[9];
+	ieResRef ResRef;
 	Region size[256];
 	short xPos[256];
 	short yPos[256];

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.54 2005/02/19 19:09:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.55 2005/02/24 16:45:16 avenger_teambg Exp $
  *
  */
 
@@ -235,7 +235,7 @@ public:
 	~Door(void);
 public:
 	char Name[33]; //scriptable name
-	char ID[9];    //WED ID
+	ieResRef ID;    //WED ID
 	TileOverlay* overlay;
 	unsigned short* tiles;
 	unsigned char count;

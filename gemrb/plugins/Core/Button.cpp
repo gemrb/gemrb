@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.80 2004/12/14 16:20:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.81 2005/02/24 16:45:17 avenger_teambg Exp $
  *
  */
 
@@ -29,7 +29,7 @@
 
 #define DEF_BUTTON1 4
 
-static char ButtonSounds[3][9] = {
+static ieResRef ButtonSounds[3] = {
 	"GAM_09\0\0", "GAM_03\0\0", "GAM_04\0\0"
 };
 static bool ButtonInited = false;

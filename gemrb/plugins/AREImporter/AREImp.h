@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.21 2005/01/09 12:28:28 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.22 2005/02/24 16:45:16 avenger_teambg Exp $
  *
  */
 
@@ -45,7 +45,7 @@ private:
 	ieDword ContainersOffset, InfoPointsOffset, ItemsOffset;
 	ieDword AmbiOffset, VariablesOffset;
 	ieDword NoteOffset;
-	char Script[9];
+	ieResRef Script;
 public:
 	AREImp(void);
 	~AREImp(void);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.28 2005/02/21 19:52:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.29 2005/02/24 16:45:17 avenger_teambg Exp $
  *
  */
 
@@ -56,13 +56,13 @@ BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD fdwReason,
 //// Globally used functions
 
 /* this function will copy a string to a zero terminated string with a maximum length */
-void strnuprcpy(char* dest, char *source, int count)
+void strnuprcpy(char* dest, const char *source, int count)
 {
 	while(count--) {
 		*dest++ = toupper( *source );
 		if(!*source++) return;
 	}
-	*source=0;
+	*dest=0;
 }
 
 static unsigned char orientations[25]={
