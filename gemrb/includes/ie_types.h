@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.1 2004/02/11 21:37:58 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.2 2004/07/24 23:06:51 guidoj Exp $
  *
  */
 
@@ -26,7 +26,7 @@
 
 typedef unsigned char ieByte;
 typedef unsigned short ieWord;
-typedef unsigned long ieDword;
+typedef unsigned int ieDword;
 typedef ieDword ieStrRef; 
 typedef char ieResRef[8];
 

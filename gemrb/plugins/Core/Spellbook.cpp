@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.10 2004/07/21 20:27:26 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.11 2004/07/24 23:07:45 guidoj Exp $
  *
  */
 
@@ -166,7 +166,7 @@ void Spellbook::dump()
 			//if (!sm || !sm->Number) continue;
 			if (!sm) continue;
 
-			printf ( "type: %d: L: %d; N1: %d; N2: %d; T: %d; MI: %ld; MC: %ld\n", i, sm->Level, sm->Number, sm->Number2, sm->Type, sm->MemorizedIndex, sm->MemorizedCount );
+			printf ( "type: %d: L: %d; N1: %d; N2: %d; T: %d; MI: %d; MC: %d\n", i, sm->Level, sm->Number, sm->Number2, sm->Type, sm->MemorizedIndex, sm->MemorizedCount );
 
 			if (sm->known_spells.size()) 
 				printf( "  Known spells:\n" );
@@ -183,7 +183,7 @@ void Spellbook::dump()
 				CREMemorizedSpell* spl = sm->memorized_spells[k];
 				if (!spl) continue;
 
-				printf ( "  %2u: %8s  %lx\n", k, spl->SpellResRef, spl->Flags );
+				printf ( "  %2u: %8s  %x\n", k, spl->SpellResRef, spl->Flags );
 			}
 		}
 	}

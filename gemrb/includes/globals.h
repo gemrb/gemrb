@@ -5,9 +5,8 @@
 #include <config.h>
 #endif
 
-typedef unsigned long ulong;
 typedef unsigned char Byte;
-typedef unsigned long DWORD;
+typedef unsigned int  DWORD;
 
 #define GEMRB_RELEASE 200		//GemRB Release version multiplied by 1000 (i.e. 1200 = 1.2 | 10 = 0.01 )
 #define GEMRB_API_NUM 2			//GemRB API Version
