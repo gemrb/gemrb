@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.58 2004/08/05 22:55:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.59 2004/08/08 08:39:15 avenger_teambg Exp $
  *
  */
 
@@ -200,33 +200,12 @@ void Actor::SetAnimationID(unsigned short AnimID)
 		free( HairPal );
 	}
 	else if (palType == 10) {   // Avatars in PS:T
+		int size = 32;
+		int dest = 256-ColorsCount*size;
 		for (int i = 0; i < ColorsCount; i++) {
-			int dest = ColorPlacements[i];
-			int size = 32;
-
-			if (!(AppearanceFlags1 & 0x40)) {  // Ash-Mantle
-				if (dest == 176) dest = 192;
-			}
-			else if (AppearanceFlags1 & 0x100) {
-				if (dest == 144) dest = 224; // minor cloth
-				else if (dest == 176) dest = 192; // skin
-				else if (dest == 128) dest = 160; //hair ??
-				else if (dest == 160) dest = 128; //hair ??
-				else if (dest == 224) dest = 160; //hair ??
-				else if (dest == 208) dest = 160; //metal
-			}
-			else {
-				if (dest == 144) dest = 160; // minor cloth
-				else if (dest == 160) dest = 224; 
-				else if (dest == 176) dest = 192; // skin
-				else if (dest == 224) dest = 128; //hair ??
-			}
-
-			
-
 			Color* NewPal = core->GetPalette( Colors[i], size );
-
 			memcpy( &Pal[dest], NewPal, size * sizeof( Color ) );
+			dest +=size;
 			free( NewPal );
 		}
 	} else {		       
