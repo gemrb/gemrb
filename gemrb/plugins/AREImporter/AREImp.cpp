@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.29 2003/12/30 21:54:52 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.30 2004/01/01 15:47:44 balrog994 Exp $
  *
  */
 
@@ -124,7 +124,10 @@ Map * AREImp::GetMap()
 	tmm->Open(wedfile);
 	TileMap * tm = tmm->GetTileMap();
 
-	map->Script = new GameScript(Script, IE_SCRIPT_AREA);
+	map->Scripts[0] = new GameScript(Script, IE_SCRIPT_AREA);
+	map->MySelf = map;
+	if(map->Scripts[0])
+		map->Scripts[0]->MySelf = map;
 
 	char ResRef[9];
 	strcpy(ResRef, WEDResRef);
@@ -189,6 +192,13 @@ Map * AREImp::GetMap()
 		str->Read(CloseResRef, 8);
 		CloseResRef[8] = 0;
 		str->Read(&cursor, 4);
+		str->Seek(36, GEM_CURRENT_POS);
+		Region BBtoOpen;
+		str->Read(&BBtoOpen.w, 2);
+		str->Read(&BBtoOpen.y, 2);
+		str->Read(&BBtoOpen.x, 2);
+		str->Read(&BBtoOpen.h, 2);
+		BBtoOpen.Normalize();
 		//Reading Open Polygon
 		str->Seek(VerticesOffset + (OpenFirstVertex*4), GEM_STREAM_START);
 		Point * points = (Point*)malloc(OpenVerticesCount*sizeof(Point));
@@ -213,6 +223,7 @@ Map * AREImp::GetMap()
 		unsigned short * indices = tmm->GetDoorIndices(ShortName, &count);
 		Door * door = tm->AddDoor(ShortName, (Flags&1 ? 0 : 1), indices, count, open, closed);
 		door->Cursor = cursor;
+		door->BBtoOpen = BBtoOpen;
 		//Leave the default sound untouched
 		if(OpenResRef[0]) memcpy(door->OpenSound, OpenResRef, 9);
 		else
