@@ -51,6 +51,10 @@ Interface::Interface(void)
 
 Interface::~Interface(void)
 {
+	if(music)
+		delete(music);
+	if(soundmgr)
+		delete(soundmgr);
 	std::vector<Font*>::iterator m = fonts.begin();
 	while( fonts.size() ) {
 		delete(*m);
@@ -83,8 +87,6 @@ Interface::~Interface(void)
 		delete(guiscript);
 	if(vars)
 		delete(vars);
-	if(music)
-		delete(music);
 	delete(console);
 	delete(plugin);
 }

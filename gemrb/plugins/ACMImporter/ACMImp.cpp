@@ -11,37 +11,66 @@
 #include <unistd.h>
 #endif
 
-std::vector<AudioStream> streams;
+static AudioStream streams[MAX_STREAMS];
 
-signed char synchstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param) 
+void ACMImp::clearstreams(bool free) {
+	for(int i = 0; i < MAX_STREAMS; i++) {
+		if(!streams[i].free && free) {
+			FSOUND_Stream_Close(streams[i].stream);
+			FSOUND_DSP_Free(streams[i].dsp);
+		}
+		streams[i].free = true;
+	}
+}
+
+signed char __stdcall ACMImp::endstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param) 
 {
-	printf("Callback\n");
+	printf("End Callback\n");
 	if(stream) {
-		for(int i = 0; i < streams.size(); i++) {
+		for(int i = 0; i < MAX_STREAMS; i++) {
 			if(streams[i].stream == stream) {
-				printf("Stream found on index %d\n", i);
 				streams[i].playing = false;
-				streams[i].end = true;
-				streams[i].free = false;
-				//FSOUND_Stream_SetTime(streams[i].stream, 0);
-				//streams[i].channel = FSOUND_Stream_Play(FSOUND_FREE, streams[i].stream);
-				//FSOUND_SetPaused(streams[i].channel, true);
-				core->GetMusicMgr()->PlayNext();
-				return true;
+				streams[i].end = false;
+				streams[i].free = false;                
+				return 1;
 			}
 		}
 	}
 	else
-		return true;
-	return false;
+		return 1;
+	return 0;
+}
+
+void * __stdcall ACMImp::dspcallback(void *originalbuffer, void *newbuffer, int length, int param)
+{
+	//printf("DSP CallBack\n");
+	if(!streams[param].end) {
+		int curtime = FSOUND_Stream_GetTime(streams[param].stream);
+		int tottime = FSOUND_Stream_GetLengthMs(streams[param].stream);
+		unsigned long volume;
+		core->GetDictionary()->Lookup("Volume Music", volume);
+		FSOUND_SetVolume(streams[param].channel, (volume/10.0)*255);
+		//printf("curtime = %d, tottime = %d, delta = %d\n", curtime, tottime, tottime-curtime);
+		if(curtime > tottime-125) {
+			core->GetMusicMgr()->PlayNext();
+			streams[param].end = true;
+			printf("Playing Next Track\n");
+		}
+	}
+	return newbuffer;
 }
 
 ACMImp::ACMImp(void)
 {
+	for(int i = 0; i < MAX_STREAMS; i++) {
+		streams[i].free = true;
+	}
 }
 
 ACMImp::~ACMImp(void)
 {
+	clearstreams(true);
+	FSOUND_Close();
 }
 
 bool ACMImp::Init(void)
@@ -56,7 +85,8 @@ bool ACMImp::Init(void)
 	if(FSOUND_Init(44100, 32, 0) == false) {
 		return false;
 	}
-	streams.clear();
+	if(!FSOUND_Stream_SetBufferSize(100))
+		printf("Error Setting Buffer Size\n");
 	return true;
 }
 
@@ -114,32 +144,37 @@ unsigned long ACMImp::LoadFile(const char * filename)
 		fclose(str);
 		FSOUND_STREAM * sound = FSOUND_Stream_Open(outFile, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
 		if(sound) {
-			if(!FSOUND_Stream_SetSyncCallback(sound, (FSOUND_STREAMCALLBACK)synchstreamcallback, 0)) {
+			/*if(!FSOUND_Stream_SetSyncCallback(sound, (FSOUND_STREAMCALLBACK)&synchstreamcallback, 0)) {
+				printMessage("ACMImporter", "SetSychCallback Failed\n", YELLOW);
+			}*/
+			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
 				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
 			}
-			AudioStream as;
-			as.stream = sound;
-			as.playing = false;
-			as.end = false;
-			as.free = false;
-			as.channel = -1;
 			int ret = -1;
-			bool found = false;
-			unsigned int strFlags = FSOUND_Stream_GetMode(sound);
-			int lastsample = (FSOUND_Stream_GetLength(sound) / (strFlags & FSOUND_16BITS ? 2 : 1)) / (strFlags & FSOUND_STEREO ? 2 : 1);
-			FSOUND_Stream_AddSyncPoint(sound, lastsample-1000, "End");
-			for(int i = 0; i < streams.size(); i++) {
+			for(int i = 0; i < MAX_STREAMS; i++) {
 				if(streams[i].free) {
-					streams[i] = as;
-					found = true;
+					streams[i].stream = sound;
+					streams[i].playing = false;
+					streams[i].end = false;
+					streams[i].free = false;
+					streams[i].channel = -1;
+					streams[i].dsp = FSOUND_Stream_CreateDSP(sound, dspcallback, 0, i);
+					FSOUND_DSP_SetActive(streams[i].dsp, true);
 					ret = i;
 					break;
 				}
 			}
-			if(!found) {
-				streams.push_back(as);
-				ret = streams.size()-1;
+			if(ret == -1) {
+				FSOUND_Stream_Close(sound);
+				printf("Too many streams loaded\n");
+				return 0xffffffff;
 			}
+			FSOUND_SAMPLE * smp = FSOUND_Stream_GetSample(sound);
+			int freq;
+			FSOUND_Sample_GetDefaults(smp, &freq, NULL, NULL, NULL);
+			unsigned int lastsample = FSOUND_Stream_GetLengthMs(sound)*(freq / 1000.0);
+			if(!FSOUND_Stream_AddSyncPoint(sound, lastsample-1, "End"))
+				printf("Error setting the Synch Point: %d\n", FSOUND_GetError());
 			return ret;
 		}
 		return 0xffffffff;
@@ -162,35 +197,39 @@ unsigned long ACMImp::LoadFile(const char * filename)
 	str = fopen(outFile, "rb");
 	if(str != NULL) {
 		fclose(str);
-		FSOUND_STREAM * sound = FSOUND_Stream_Open(outFile, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
+		FSOUND_STREAM * sound = FSOUND_Stream_Open(outFile, FSOUND_LOOP_OFF, 0, 0);
 		if(sound) {
-			if(!FSOUND_Stream_SetSyncCallback(sound, (FSOUND_STREAMCALLBACK)synchstreamcallback, 0)) {
+			/*if(!FSOUND_Stream_SetSyncCallback(sound, (FSOUND_STREAMCALLBACK)&synchstreamcallback, 0)) {
+				printMessage("ACMImporter", "SetSychCallback Failed\n", YELLOW);
+			}*/
+			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
 				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
 			}
-			
-			AudioStream as;
-			as.stream = sound;
-			as.playing = false;
-			as.end = false;
-			as.free = false;
-			as.channel = -1;
 			int ret = -1;
-			bool found = false;
-			unsigned int strFlags = FSOUND_Stream_GetMode(sound);
-			int lastsample = FSOUND_Stream_GetLength(sound) * (strFlags & FSOUND_16BITS ? 2 : 1) * (strFlags & FSOUND_STEREO ? 2 : 1);
-			FSOUND_Stream_AddSyncPoint(sound, lastsample-1000, "End");
-			for(int i = 0; i < streams.size(); i++) {
+			for(int i = 0; i < MAX_STREAMS; i++) {
 				if(streams[i].free) {
-					streams[i] = as;
-					found = true;
+					streams[i].stream = sound;
+					streams[i].playing = false;
+					streams[i].end = false;
+					streams[i].free = false;
+					streams[i].channel = -1;
+					streams[i].dsp = FSOUND_Stream_CreateDSP(sound, dspcallback, 0, i);
+					FSOUND_DSP_SetActive(streams[i].dsp, true);
 					ret = i;
 					break;
 				}
 			}
-			if(!found) {
-				streams.push_back(as);
-				ret = streams.size()-1;
+			if(ret == -1) {
+				FSOUND_Stream_Close(sound);
+				printf("Too many streams loaded\n");
+				return 0xffffffff;
 			}
+			FSOUND_SAMPLE * smp = FSOUND_Stream_GetSample(sound);
+			int freq;
+			FSOUND_Sample_GetDefaults(smp, &freq, NULL, NULL, NULL);
+			unsigned int lastsample = FSOUND_Stream_GetLengthMs(sound)*(freq / 1000.0);
+			if(!FSOUND_Stream_AddSyncPoint(sound, lastsample-1, "End"))
+				printf("Error setting the Synch Point\n");
 			return ret;
 		}
 		return 0xffffffff;
@@ -253,7 +292,7 @@ bool ACMImp::AcmToWav(DataStream *inFile, const char * tmpFile, const char * out
 
 bool ACMImp::Stop(unsigned long index)
 {
-	if(index >= streams.size())
+	if(index >= MAX_STREAMS)
 		return false;
 	if(streams[index].free)
 		return true;
@@ -268,7 +307,7 @@ bool ACMImp::Stop(unsigned long index)
 
 bool ACMImp::Play(unsigned long index)
 {
-	if(index >= streams.size())
+	if(index >= MAX_STREAMS)
 		return false;
 	if(streams[index].free)
 		return false;

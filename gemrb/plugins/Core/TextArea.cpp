@@ -45,7 +45,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 {
 	if(!Changed)
 		return;
-	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height), Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, true, finit, initpalette);		
+	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height), Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);		
 	Changed = false;
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked

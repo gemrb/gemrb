@@ -9,8 +9,11 @@
 //#include "../../includes/fmodwin32/fmod.h"
 //#endif
 
+#define MAX_STREAMS  30
+
 typedef struct AudioStream {
 	FSOUND_STREAM * stream;
+	FSOUND_DSPUNIT * dsp;
 	bool playing;
 	bool end;
 	bool free;
@@ -19,6 +22,10 @@ typedef struct AudioStream {
 
 class ACMImp : public SoundMgr
 {
+private:
+	void clearstreams(bool free);
+	static signed char __stdcall endstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param);
+	static void * __stdcall dspcallback(void *originalbuffer, void *newbuffer, int length, int param);
 public:
 	ACMImp(void);
 	~ACMImp(void);

@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
+#endif
 
 // abstract iteration position
 struct __POSITION { };
@@ -62,6 +63,7 @@ struct Plex     // warning variable length structure
     }
   }
 };
+#ifndef WIN32
 #define ADV_TEXT
 #define textcolor(i) i
 
