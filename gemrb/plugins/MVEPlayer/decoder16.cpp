@@ -226,10 +226,10 @@ static void patternQuadrant4Pixels(unsigned short* pFrame, unsigned char pat0,
 	unsigned char pat1, unsigned char pat2, unsigned char pat3,
 	unsigned short* p)
 {
-	unsigned long mask = 0x00000003UL;
+	unsigned int mask = 0x00000003UL;
 	int shift = 0;
 	int i;
-	unsigned long pat = ( pat3 << 24 ) |
+	unsigned int pat = ( pat3 << 24 ) |
 		( pat2 << 16 ) |
 		( pat1 << 8 ) |
 		pat0;

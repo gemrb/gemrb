@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/riffhdr.cpp,v 1.4 2004/07/24 17:34:32 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/riffhdr.cpp,v 1.5 2004/08/10 19:11:29 guidoj Exp $
  *
  */
 
@@ -31,7 +31,7 @@ RIFF_HEADER riff = {
 	2, 22050, 22050 * 4, 4, 16, {'d', 'a', 't', 'a'}, 0
 };
 
-void write_riff_header(void* memory, long samples, int channels,
+void write_riff_header(void* memory, int samples, int channels,
 	int samplerate)
 {
 	riff.raw_data_len = samples * sizeof( short );
@@ -46,7 +46,7 @@ WAVC_HEADER wavc = {
 	{'W','A','V','C'}, {'V','1','.','0'}, 0, 0, 28, 2, 16, 22050, 0x9ffdu
 };
 
-void write_wavc_header(FILE* fpoi, long samples, int channels, int compressed,
+void write_wavc_header(FILE* fpoi, int samples, int channels, int compressed,
 	int samplerate)
 {
 	wavc.uncompressed = samples * sizeof( short );

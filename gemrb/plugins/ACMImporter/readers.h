@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.h,v 1.7 2004/08/05 21:30:00 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.h,v 1.8 2004/08/10 19:11:29 guidoj Exp $
  *
  */
 
@@ -36,10 +36,10 @@
 // Abstract Sound Reader class
 class CSoundReader {
 protected:
-	long samples; // total count of sound samples
-	long channels;
-	long samplerate;
-	long samples_left; // count of unread samples
+	int samples; // total count of sound samples
+	int channels;
+	int samplerate;
+	int samples_left; // count of unread samples
 	int is16bit; // 1 - if 16 bit file, 0 - otherwise
 	//FILE* file; // file handle
 	DataStream* stream;
@@ -63,21 +63,21 @@ public:
 		}
 	};
 
-	long get_channels()
+	int get_channels()
 	{
 		return channels;
 	}
-	long get_samplerate()
+	int get_samplerate()
 	{
 		return samplerate;
 	}
 	virtual int init_reader() = 0; // initializes the sound reader
 
-	long get_length()
+	int get_length()
 	{
 		return samples;
 	}; // returns the total samples count
-	long get_samples_left()
+	int get_samples_left()
 	{
 		return samples_left;
 	};
@@ -88,7 +88,7 @@ public:
 
 	virtual const char* get_file_type() = 0;
 
-	virtual long read_samples(short* buffer, long count) = 0; // returns actual count of read samples
+	virtual int read_samples(short* buffer, int count) = 0; // returns actual count of read samples
 //	virtual short read_one_sample(); // returns next sound sample
 };
 
@@ -104,7 +104,7 @@ public:
 	};
 
 	virtual int init_reader();
-	virtual long read_samples(short* buffer, long count);
+	virtual int read_samples(short* buffer, int count);
 	virtual const char* get_file_type()
 	{
 		return ( is16bit ? "RAW16" : "RAW8" );
@@ -114,8 +114,7 @@ public:
 // WAV files
 class CWavPCMReader : public CRawPCMReader {
 public:
-	CWavPCMReader(DataStream* stream, long len, bool autoFree = true)//int fhandle,long len)
-
+	CWavPCMReader(DataStream* stream, int len, bool autoFree = true) 
 		: CRawPCMReader( stream, 16, len, autoFree )
 	{
 	};
@@ -132,7 +131,7 @@ private:
 	int levels, subblocks;
 	int block_size;
 	int* block, * values;
-	long samples_ready;
+	int samples_ready;
 	CValueUnpacker* unpacker; // ACM-stream unpacker
 	CSubbandDecoder* decoder; // IP's subband decoder
 
@@ -162,7 +161,7 @@ public:
 	{
 		return "ACM";
 	};
-	virtual long read_samples(short* buffer, long count);
+	virtual int read_samples(short* buffer, int count);
 
 	int get_levels()
 	{
@@ -211,7 +210,7 @@ const unsigned char data_4cc[] = {
 
 // File open routine.
 CSoundReader* CreateSoundReader(DataStream* stream, int open_mode,
-	long samples, bool autoFree = true);
+	int samples, bool autoFree = true);
 
 // Open modes:
 #define SND_READER_AUTO 0

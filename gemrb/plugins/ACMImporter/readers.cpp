@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.7 2004/08/05 21:30:00 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.8 2004/08/10 19:11:29 guidoj Exp $
  *
  */
 
@@ -79,9 +79,9 @@ int CACMReader::make_new_samples()
 	return 1;
 }
 
-long CACMReader::read_samples(short* buffer, long count)
+int CACMReader::read_samples(short* buffer, int count)
 {
-	long res = 0;
+	int res = 0;
 	while (res < count) {
 		if (samples_ready == 0) {
 			if (samples_left == 0)
@@ -98,7 +98,7 @@ long CACMReader::read_samples(short* buffer, long count)
 	return res;
 }
 
-CSoundReader* CreateSoundReader(DataStream* stream, int type, long samples,
+CSoundReader* CreateSoundReader(DataStream* stream, int type, int samples,
 	bool autoFree)
 {
 	CSoundReader* res = NULL;
@@ -144,18 +144,18 @@ int CRawPCMReader::init_reader()
 	return 1;
 }
 
-long CRawPCMReader::read_samples(short* buffer, long count)
+int CRawPCMReader::read_samples(short* buffer, int count)
 {
 	if (count > samples_left) {
 		count = samples_left;
 	}
-	long res = 0;
+	int res = 0;
 	if (count) {
 		res = stream->Read( buffer, count * ( ( is16bit ? 2 : 1 ) ) );
 	}
 	if (!is16bit) {
 		char* alt_buff = ( char* ) buffer;
-		long i=res;
+		int i = res;
 		while(i--) {
 			alt_buff[( i << 1 ) + 1] = ( char ) ( alt_buff[i] - 0x80 );
 			alt_buff[i << 1] = 0;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.21 2004/08/08 20:49:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.22 2004/08/10 19:11:30 guidoj Exp $
  *
  */
 
@@ -33,6 +33,7 @@
 #define IE_GUI_GAMECONTROL	128
 
 
+#include "../../includes/ie_types.h"
 #include "../../includes/win32def.h"
 /**This class defines a basic Control Object.
   *@author GemRB Developement Team
@@ -68,20 +69,20 @@ public:
 	/** Variables */
 	char VarName[MAX_VARIABLE_LENGTH];
 	/** the value of the button to add to the variable */
-	unsigned long Value;
+	ieDword Value;
 public: // Public attributes
 	/** Defines the Control ID Number used for GUI Scripting */
-	unsigned long ControlID;
+	ieDword ControlID;
 	/** X position of control relative to containing window */
-	unsigned short XPos;
+	ieWord XPos;
 	/** Y position of control relative to containing window */
-	unsigned short YPos;
+	ieWord YPos;
 	/** Width of control */
-	unsigned short Width;
+	ieWord Width;
 	/** Height of control */
-	unsigned short Height;
+	ieWord Height;
 	/** Type of control */
-	unsigned char ControlType;
+	ieByte ControlType;
 	char* Tooltip;	
 	/** Focused Control */
 	bool hasFocus;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.178 2004/08/07 21:15:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.179 2004/08/10 19:11:30 guidoj Exp $
  *
  */
 
@@ -2905,7 +2905,7 @@ int GameScript::BitCheck(Scriptable* Sender, Trigger* parameters)
 int GameScript::BitCheckExact(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
-	return (value & parameters->int0Parameter ) ==(unsigned long) parameters->int0Parameter;
+	return (value & parameters->int0Parameter ) == (unsigned long) parameters->int0Parameter;
 }
 
 //BM_OR would make sense only if this trigger changes the value of the variable
@@ -2930,7 +2930,7 @@ int GameScript::GlobalBAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters
 {
 	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
 	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
-	return ( value1& value2 ) !=0;
+	return ( value1& value2 ) != 0;
 }
 
 int GameScript::GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
@@ -2939,13 +2939,13 @@ int GameScript::GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
 	switch(parameters->int0Parameter) {
 		case BM_AND:
-			return ( value1& value2 ) !=0;
+			return ( value1& value2 ) != 0;
 		case BM_OR:
-			return ( value1| value2 ) !=0;
+			return ( value1| value2 ) != 0;
 		case BM_XOR:
-			return ( value1^ value2 ) !=0;
+			return ( value1^ value2 ) != 0;
 		case BM_NAND:
-			return ( value1& ~value2 ) !=0;
+			return ( value1& ~value2 ) != 0;
 	}
 	return 0;
 }
@@ -3438,13 +3438,13 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 	if (!scr) {
 		return 0;
 	}
-	long value;
+	unsigned long value;
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	value = (long) CheckVariable( scr, parameters->string0Parameter );
-	unsigned short X = *(unsigned short *) &value;
-	unsigned short Y = *(((unsigned short *) &value)+1);
+	value = (unsigned long) CheckVariable( scr, parameters->string0Parameter );
+	unsigned short X = *(unsigned short *) value;
+	unsigned short Y = *(((unsigned short *) value)+1);
 	int distance = Distance(X, Y, scr);
 	if (distance <= ( parameters->int0Parameter * 20 )) {
 		return 1;
@@ -4207,17 +4207,17 @@ int GameScript::LevelPartyGT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::PartyGold(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->PartyGold==(unsigned long) parameters->int0Parameter;
+	return core->GetGame()->PartyGold == (unsigned long) parameters->int0Parameter;
 }
 
 int GameScript::PartyGoldGT(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->PartyGold>(unsigned long) parameters->int0Parameter;
+	return core->GetGame()->PartyGold > (unsigned long) parameters->int0Parameter;
 }
 
 int GameScript::PartyGoldLT(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->PartyGold<(unsigned long) parameters->int0Parameter;
+	return core->GetGame()->PartyGold < (unsigned long) parameters->int0Parameter;
 }
 
 int GameScript::OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters)
@@ -4432,16 +4432,16 @@ int GameScript::AnimState(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::Time(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->GameTime==(unsigned long) parameters->int0Parameter;
+	return core->GetGame()->GameTime == (unsigned long) parameters->int0Parameter;
 }
 
 int GameScript::TimeGT(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->GameTime>(unsigned long) parameters->int0Parameter;
+	return core->GetGame()->GameTime > (unsigned long) parameters->int0Parameter;
 }
 int GameScript::TimeLT(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->GameTime<(unsigned long) parameters->int0Parameter;
+	return core->GetGame()->GameTime < (unsigned long) parameters->int0Parameter;
 }
 
 int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
@@ -4451,17 +4451,17 @@ int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::CombatCounter(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->CombatCounter==(unsigned long) parameters->int0Parameter;
+	return core->GetGame()->CombatCounter == (unsigned long) parameters->int0Parameter;
 }
 
 int GameScript::CombatCounterGT(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->CombatCounter>(unsigned long) parameters->int0Parameter;
+	return core->GetGame()->CombatCounter > (unsigned long) parameters->int0Parameter;
 }
 
 int GameScript::CombatCounterLT(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->CombatCounter<(unsigned long) parameters->int0Parameter;
+	return core->GetGame()->CombatCounter < (unsigned long) parameters->int0Parameter;
 }
 
 int GameScript::TrapTriggered(Scriptable* Sender, Trigger* parameters)
@@ -4515,13 +4515,13 @@ int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	long value;
+	unsigned long value;
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	value = (long) CheckVariable( tar, parameters->string0Parameter );
-	unsigned short X = *(unsigned short *) &value;
-	unsigned short Y = *(((unsigned short *) &value)+1);
+	value = (unsigned long) CheckVariable( tar, parameters->string0Parameter );
+	unsigned short X = *(unsigned short *) value;
+	unsigned short Y = *(((unsigned short *) value)+1);
 	if(actor->Orientation == GetOrient( X, Y, actor->XPos, actor->YPos ) ) {
 		return 1;
 	}
@@ -4876,9 +4876,9 @@ void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	long value = (long) CheckVariable( Sender, parameters->string0Parameter );
-	parameters->XpointParameter = *(unsigned short *) &value;
-	parameters->YpointParameter = *(((unsigned short *) &value)+1);
+	unsigned long value = (unsigned long) CheckVariable( Sender, parameters->string0Parameter );
+	parameters->XpointParameter = *(unsigned short *) value;
+	parameters->YpointParameter = *(((unsigned short *) value)+1);
 	Actor* ab = ( Actor* ) tar;
 	Map *map = core->GetGame()->GetCurrentMap();
 	ab->SetPosition( map, parameters->XpointParameter, parameters->YpointParameter, true );
@@ -5327,9 +5327,9 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	long value = (long) CheckVariable( Sender, parameters->string0Parameter );
-	parameters->XpointParameter = *(unsigned short *) &value;
-	parameters->YpointParameter = *(((unsigned short *) &value)+1);
+	unsigned long value = (unsigned long) CheckVariable( Sender, parameters->string0Parameter );
+	parameters->XpointParameter = *(unsigned short *) value;
+	parameters->YpointParameter = *(((unsigned short *) value)+1);
 	Actor* actor = ( Actor* ) tar;
 	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
 }
@@ -5355,10 +5355,10 @@ void GameScript::StorePartyLocation(Scriptable *Sender, Action* parameters)
 	for (int i = 0; i < game->GetPartySize(0); i++) {
 		Actor* act = game->GetPC( i );
 		if (act) {
-			long value;
+			unsigned long value;
 			*((unsigned short *) &value) = act->XPos;
 			*(((unsigned short *) &value)+1) = (unsigned short) act->YPos;
-			SetVariable( act, "LOCALSsavedlocation",value);
+			SetVariable( act, "LOCALSsavedlocation", value);
 		}
 	}
 
@@ -5370,12 +5370,12 @@ void GameScript::RestorePartyLocation(Scriptable *Sender, Action* parameters)
 	for (int i = 0; i < game->GetPartySize(0); i++) {
 		Actor* act = game->GetPC( i );
 		if (act) {
-			long value=CheckVariable( act, "LOCALSsavedlocation");
+			unsigned long value=CheckVariable( act, "LOCALSsavedlocation");
 			Map *map = game->GetCurrentMap();
 			//setting position, don't put actor on another actor
 			act->SetPosition( map, 
-			*((unsigned short *) &value),
-			*(((unsigned short *) &value)+1), -1 );
+				*((unsigned short *) &value),
+				*(((unsigned short *) &value)+1), -1 );
 		}
 	}
 
@@ -5499,13 +5499,13 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) target;
-	long value;
+	unsigned long value;
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	value = (long) CheckVariable( target, parameters->string0Parameter );
-	unsigned short X = *(unsigned short *) &value;
-	unsigned short Y = *(((unsigned short *) &value)+1);
+	value = (unsigned long) CheckVariable( target, parameters->string0Parameter );
+	unsigned short X = *(unsigned short *) value;
+	unsigned short Y = *(((unsigned short *) value)+1);
 	actor->Orientation = GetOrient( X, Y, actor->XPos, actor->YPos );
 	actor->resetAction = true;
 	actor->SetWait( 1 );
@@ -6156,9 +6156,9 @@ void GameScript::GivePartyGoldGlobal(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	long gold = (long) CheckVariable( Sender, parameters->string0Parameter );
+	unsigned long gold = (unsigned long) CheckVariable( Sender, parameters->string0Parameter );
 	act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
-	core->GetGame()->PartyGold+=gold;
+	core->GetGame()->PartyGold += gold;
 }
 
 void GameScript::CreatePartyGold(Scriptable* Sender, Action* parameters)
@@ -6455,7 +6455,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 {
-	long value = CheckVariable( Sender, parameters->string0Parameter );
+	unsigned long value = CheckVariable( Sender, parameters->string0Parameter );
 	char varname[33]; //this is the Token Name
 	strncpy( varname, parameters->string1Parameter, 32 );
 	varname[32] = 0;
