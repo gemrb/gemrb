@@ -15,14 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.29 2004/08/07 13:42:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.30 2004/08/09 18:24:29 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "TLKImp.h"
 #include "../Core/Interface.h"
-//#include "ie_stats.h"
 
 TLKImp::TLKImp(void)
 {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.63 2004/08/09 05:57:59 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.64 2004/08/09 18:24:27 avenger_teambg Exp $
  *
  */
 
@@ -28,7 +28,6 @@
 #include "../Core/FileStream.h"
 #include "../Core/ImageMgr.h"
 #include "../Core/Ambient.h"
-#include <vector>
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1
@@ -565,6 +564,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Seek( 66, GEM_CURRENT_POS );
 		map->AddEntrance( Name, XPos, YPos, Face );
 	}
+
 	printf( "Loading variables\n" );
 	//Loading Variables
 	map->vars=new Variables();
@@ -585,46 +585,35 @@ Map* AREImp::GetMap(const char *ResRef)
 	printf( "Loading ambients\n" );
 	str->Seek( AmbiOffset, GEM_STREAM_START );
 	for (i = 0; i < AmbiCount; i++) {
-		char name[32];
-		ieWord origin[2];
-		ieWord radius;
-		ieWord height;
-//		char unknown0[6];
-		ieWord gain;
+		Ambient *ambi = new Ambient();
 		ieResRef sounds[10];
 		ieWord numsounds;
-//		ieWord unknown1;
-		ieDword interval;
-		ieDword perset;
-		ieDword appearance;
-		ieDword flags;
-//		char unknown2[64];
 
-		str->Read( &name, 32 );
-		str->Read( &origin, 4 );
-		str->Read( &radius, 2 );
-		str->Read( &height, 2 );
+		str->Read( &ambi->name, 32 );
+		str->Read( &ambi->origin.x, 2 );
+		str->Read( &ambi->origin.y, 2 );
+		str->Read( &ambi->radius, 2 );
+		str->Read( &ambi->height, 2 );
 		str->Seek( 6, GEM_CURRENT_POS );
-		str->Read( &gain, 2 );
+		str->Read( &ambi->gain, 2 );
 		str->Read( &sounds, 80 );
 		str->Read( &numsounds, 2 );
 		str->Seek( 2, GEM_CURRENT_POS );
-		str->Read( &interval, 4 );
-		str->Read( &perset, 4 );
-		str->Read( &appearance, 4 );
-		str->Read( &flags, 4 );
+		str->Read( &ambi->interval, 4 );
+		str->Read( &ambi->perset, 4 );
+		str->Read( &ambi->appearance, 4 );
+		str->Read( &ambi->flags, 4 );
 		str->Seek( 64, GEM_CURRENT_POS );
 		
-		Point orig;
-		orig.x = origin[0];
-		orig.y = origin[1];
-		std::vector<std::string> ssounds(numsounds);
 		for (int i = 0; i < numsounds; ++i) {
-			ssounds[i] = std::string(sounds[i], 8);
+			char *sound = (char *) malloc(9);
+			memcpy(sound, sounds[i], 8);
+			sound[8]=0;
+			ambi->sounds.push_back(sound);
 		}
-		map->AddAmbient( new Ambient( std::string(name, 32), orig, radius, height, gain, ssounds, interval, perset, appearance, flags ) );
+		map->AddAmbient(ambi);
 	}
-	
+
 	map->AddTileMap( tm, lm, sr );
 	core->FreeInterface( tmm );
 	return map;

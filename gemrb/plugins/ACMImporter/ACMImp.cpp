@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.49 2004/08/09 13:02:07 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.50 2004/08/09 18:24:27 avenger_teambg Exp $
  *
  */
 
@@ -620,7 +620,7 @@ unsigned int ACMImp::AmbientMgr::tick(unsigned int ticks)
 	return delay;
 }
 
-ACMImp::AmbientMgr::AmbientSource::AmbientSource(const Ambient *a)
+ACMImp::AmbientMgr::AmbientSource::AmbientSource(Ambient *a)
 : ambient(a), lastticks(0), enqueued(0)
 {
 	alGenSources( 1, &source );
@@ -639,15 +639,21 @@ ACMImp::AmbientMgr::AmbientSource::AmbientSource(const Ambient *a)
 	if (!alIsSource( source )) printf("hey, it's not a source!\n");*/
 	
 	// preload sounds
-	buffers.reserve(a->getSounds().size());
-	buflens.reserve(a->getSounds().size());
-	for (std::vector<std::string>::const_iterator it = a->getSounds().begin(); it != a->getSounds().end(); ++it) {
+	unsigned int i=a->sounds.size();
+	buffers.reserve(i);
+	buflens.reserve(i);
+	while(i--) {
 		int timelen;
-		ALuint buffer = LoadSound(it->c_str(), &timelen);
-		if (0 != buffer) {
+		ALuint buffer = LoadSound(a->sounds[i], &timelen);
+		if (!buffer) {
+			printf("Invalid SoundResRef: %.8s, Dequeueing...\n",a->sounds[i]);
+			free(a->sounds[i]);
+		        a->sounds.erase(a->sounds.begin() + i);
+		} else {
 			buffers.push_back(buffer);
 			buflens.push_back(timelen);
 		}
+		
 	}
 /*	
 	// use OpenAL to loop in this special case so we don't have to
@@ -677,9 +683,10 @@ unsigned int ACMImp::AmbientMgr::AmbientSource::tick(unsigned int ticks, Point l
 	printf("ambient %s: source %x, state %x, queued %d, processed %d\n", ambient->getName().c_str(), source, state, queued, processed);
 	if (!alIsSource( source )) printf("hey, it's not a source!\n");*/
 	
-	if ((! (ambient->getFlags() & IE_AMBI_ENABLED)) || (! ambient->getAppearance().test(timeslice))) {
+	if ((! (ambient->getFlags() & IE_AMBI_ENABLED)) || (! ambient->getAppearance()&(1<<timeslice))) {
 		// don't really stop the source, since we don't want to stop playing abruptly in the middle of
-		// a sample (do we?), and it would end playing by itself in a while
+		// a sample (do we?), and it would end playing by itself in a while (Divide)
+		//this is correct (Avenger)
 		return UINT_MAX;
 	}
 	

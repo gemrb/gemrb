@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.22 2004/08/09 13:02:07 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.23 2004/08/09 18:24:27 avenger_teambg Exp $
  *
  */
 
@@ -89,7 +89,8 @@ public:
 	private:
 		class AmbientSource {
 		public:
-			AmbientSource(const Ambient *a);
+			//not const, we drop invalid resources here
+			AmbientSource(Ambient *a);
 			~AmbientSource();
 			unsigned int tick(unsigned int ticks, Point listener, unsigned int timeslice);
 		private:
