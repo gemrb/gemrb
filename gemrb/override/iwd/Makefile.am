@@ -1,2 +1,2 @@
 howoverride_DATA = *.2da
-howoverridedir = $(datadir)/override/how/
+howoverridedir = $(datadir)/override/iwd/
