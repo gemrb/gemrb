@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.182 2005/01/09 14:54:56 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.183 2005/01/09 22:24:16 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -618,7 +618,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case '7':
 				//show fog of war
 				core->FogOfWar ^= 1;
-				printf("Show Fog-Of-War: %d\n", core->FogOfWar & 1 ? "ON" : "OFF");
+				printf("Show Fog-Of-War: %s\n", core->FogOfWar & 1 ? "ON" : "OFF");
 				break;
 			default:
 				printf( "KeyRelease:%d  %d\n", Key, Mod );
