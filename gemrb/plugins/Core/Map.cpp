@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.126 2004/11/24 21:47:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.127 2005/01/01 20:50:43 avenger_teambg Exp $
  *
  */
 
@@ -1156,7 +1156,7 @@ bool Map::IsVisible(Point &s, Point &d)
 					return false;
 			}
 		} else {
-			for (int startx = sX; startx < dX; sX++) {
+			for (int startx = sX; startx < dX; startx++) {
 				if (Passable[SearchMap->GetPixelIndex( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) )] & PATH_MAP_NO_SEE)
 					return false;
 			}
