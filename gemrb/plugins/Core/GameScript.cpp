@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.69 2004/02/22 18:15:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.70 2004/02/23 20:43:24 avenger_teambg Exp $
  *
  */
 
@@ -60,6 +60,9 @@ static TriggerLink triggernames[]={
 {"globalgt", GameScript::GlobalGT},
 {"globallt", GameScript::GlobalLT},
 {"globalsequal", GameScript::GlobalsEqual},
+{"hp", GameScript::HP},
+{"hpgt", GameScript::HPGT},
+{"hplt", GameScript::HPLT},
 {"inparty", GameScript::InParty},
 {"isvalidforpartydialog", GameScript::IsValidForPartyDialog},
 {"numtimestalkedto", GameScript::NumTimesTalkedTo},
@@ -72,6 +75,9 @@ static TriggerLink triggernames[]={
 {"range", GameScript::Range},
 {"see", GameScript::See},
 {"true", GameScript::True},
+{"xp", GameScript::XP},
+{"xpgt", GameScript::XPGT},
+{"xplt", GameScript::XPLT},
 { NULL,NULL},
 };
 
@@ -1510,6 +1516,84 @@ int GameScript::Gender(Scriptable * Sender, Trigger * parameters)
 		return 0;
 	Actor * actor = (Actor*)scr;
 	if(actor->GetStat(IE_SEX)==parameters->int0Parameter)
+		return 1;
+	return 0;
+}
+
+int GameScript::HP(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	if(actor->GetStat(IE_HITPOINTS)==parameters->int0Parameter)
+		return 1;
+	return 0;
+}
+
+int GameScript::HPGT(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	if(actor->GetStat(IE_HITPOINTS)>parameters->int0Parameter)
+		return 1;
+	return 0;
+}
+
+int GameScript::HPLT(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	if(actor->GetStat(IE_HITPOINTS)<parameters->int0Parameter)
+		return 1;
+	return 0;
+}
+
+int GameScript::XP(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	if(actor->GetStat(IE_XP)==parameters->int0Parameter)
+		return 1;
+	return 0;
+}
+
+int GameScript::XPGT(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	if(actor->GetStat(IE_XP)>parameters->int0Parameter)
+		return 1;
+	return 0;
+}
+
+int GameScript::XPLT(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	if(actor->GetStat(IE_XP)<parameters->int0Parameter)
 		return 1;
 	return 0;
 }

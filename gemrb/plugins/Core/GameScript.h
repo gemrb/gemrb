@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.46 2004/02/22 18:15:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.47 2004/02/23 20:43:24 avenger_teambg Exp $
  *
  */
 
@@ -607,6 +607,9 @@ public: //Script Functions
 	static int  GlobalLT(Scriptable * Sender, Trigger * parameters);
 	static int  GlobalGT(Scriptable * Sender, Trigger * parameters);
 	static int  GlobalsEqual(Scriptable * Sender, Trigger * parameters);
+	static int  HP(Scriptable * Sender, Trigger * parameters);
+	static int  HPGT(Scriptable * Sender, Trigger * parameters);
+	static int  HPLT(Scriptable * Sender, Trigger * parameters);
 	static int  InParty(Scriptable * Sender, Trigger * parameters);
 	static int  IsValidForPartyDialog(Scriptable * Sender, Trigger * parameters);
 	static int  NumTimesTalkedTo(Scriptable * Sender, Trigger * parameters);
@@ -619,6 +622,9 @@ public: //Script Functions
 	static int  Range(Scriptable * Sender, Trigger * parameters);
 	static int  See(Scriptable * Sender, Trigger * parameters);
 	static int  True(Scriptable * Sender, Trigger * parameters);
+	static int  XP(Scriptable * Sender, Trigger * parameters);
+	static int  XPGT(Scriptable * Sender, Trigger * parameters);
+	static int  XPLT(Scriptable * Sender, Trigger * parameters);
 public:
 	//Actions
 	static void Activate(Scriptable * Sender, Action * parameters);
