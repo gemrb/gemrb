@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.1 2004/04/08 15:49:10 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.2 2004/04/10 21:10:35 edheldil Exp $
 
 # ie_stats.py - definitions of creature stats codes
 
@@ -24,7 +24,7 @@
 
 # EA values
 INANIMATE     = 1
-PC= = 2
+PC            = 2
 FAMILIAR      = 3
 ALLY          = 4
 CONTROLLED    = 5
