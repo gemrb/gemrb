@@ -48,5 +48,5 @@ def CreditsPress():
 
 def DonePress():
 	GemRB.UnloadWindow(MovieWindow)
-	GemRB.SetNextScript("Start")
+	GemRB.SetNextScript("Options")
 	return
