@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.15 2004/11/13 22:58:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.16 2004/11/13 23:16:49 avenger_teambg Exp $
  *
  */
 
@@ -46,11 +46,11 @@ public:
 	TableMgr();
 	virtual ~TableMgr();
 	/** Returns the actual number of Rows in the Table */
-	virtual int GetRowCount() = 0;
+	virtual int GetRowCount() const = 0;
 	/** Returns the number of Columns in the Table */
-	virtual int GetColNamesCount() = 0;
+	virtual int GetColNamesCount() const = 0;
 	/** Returns the actual number of Columns in a row */
-	virtual int GetColumnCount(unsigned int row = 0) = 0;
+	virtual int GetColumnCount(unsigned int row = 0) const = 0;
 	/** Returns a pointer to a zero terminated 2da element,
 		 0,0 returns the default value, it may return NULL */
 	virtual char* QueryField(unsigned int row = 0, unsigned int column = 0) const = 0;
@@ -62,6 +62,7 @@ public:
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	/** Returns a Row Name, returns NULL on error */
 	virtual int GetRowIndex(const char* rowname) const = 0;
+	virtual char* GetColumnName(unsigned int index) const = 0;
 	virtual char* GetRowName(unsigned int index) const = 0;
 };
 

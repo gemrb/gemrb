@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.81 2004/11/12 22:20:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.82 2004/11/13 23:16:51 avenger_teambg Exp $
  *
  */
 
@@ -44,7 +44,7 @@
 static char Sounds[DEF_COUNT][9] = {
 	{-1},
 };
-
+Variables *Spawns;
 
 DataFileMgr *INInote = NULL;
 
@@ -54,6 +54,9 @@ void ReleaseMemory()
 	if(INInote) {
 		core->FreeInterface( INInote );
 		INInote = NULL;
+	}
+	if(Spawns) {
+		delete Spawns;
 	}
 }
 
@@ -67,6 +70,56 @@ void ReadAutonoteINI()
 	ResolveFilePath( tINInote );
 	fs->Open( tINInote, true );
 	INInote->Open( fs, true );
+}
+
+void ReadSpawnGroups()
+{
+	ieResRef GroupName;
+	int i;
+	TableMgr * tab;
+
+	int table=core->LoadTable( "spawngrp" );
+
+	if(Spawns) {
+		Spawns->RemoveAll();
+	}
+	else {
+		Spawns=new Variables(10, 17); //block size, hash table size
+		if(!Spawns) {
+			return;
+		}
+		Spawns->SetType( GEM_VARIABLES_STRING );
+	}
+	if(table<0) {
+		return;
+	}
+	tab = core->GetTable( table );
+	if(!tab) {
+		goto end;
+	}
+	i=tab->GetColNamesCount();
+	while (i--) {
+		int j=tab->GetRowCount();
+		while (j--) {
+			char *crename = tab->QueryField( i,j );
+			if (crename[0] != '*') break;
+		}
+		if (j>0) {
+			ieResRef *creatures = (ieResRef *) malloc( sizeof(ieResRef)*(j+1) );
+			//count of creatures
+			*(int *) creatures = j;
+			//difficulty
+			*(((int *) creatures)+1) = atoi( tab->QueryField(i,0) );
+			for(;j;j--) {
+				strncpy( creatures[j], tab->QueryField(i,j), sizeof( ieResRef ) );
+			}
+			strncpy( GroupName, tab->GetColumnName( i ), sizeof( ieResRef ) );
+			strupr( GroupName );
+			Spawns->SetAt( GroupName, (const char *) creatures );
+		}
+	}
+end:
+	core->DelTable( table );
 }
 
 AREImp::AREImp(void)

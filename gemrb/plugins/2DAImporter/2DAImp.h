@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.19 2004/11/13 22:39:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.20 2004/11/13 23:16:50 avenger_teambg Exp $
  *
  */
 
@@ -41,18 +41,18 @@ public:
 	~p2DAImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	/** Returns the actual number of Rows in the Table */
-	inline int GetRowCount()
+	inline int GetRowCount() const
 	{
 		return ( int ) rows.size();
 	}
 
-	inline int GetColNamesCount()
+	inline int GetColNamesCount() const
 	{
 		return (int) colNames.size();
 	}
 
 	/** Returns the actual number of Columns in the Table */
-	inline int GetColumnCount(unsigned int row = 0)
+	inline int GetColumnCount(unsigned int row = 0) const
 	{
 		if (rows.size() <= row) {
 			return 0;
@@ -76,7 +76,7 @@ public:
 	  may return NULL */
 	inline char* QueryField(const char* row, const char* column) const
 	{
-    unsigned int i;
+		unsigned int i;
 
 		int rowi = -1, coli = -1;
 		for (i = 0; i < rowNames.size(); i++) {
@@ -111,6 +111,14 @@ public:
 			}
 		}
 		return -1;
+	};
+
+	inline char* GetColumnName(unsigned int index) const
+	{
+		if (index < colNames.size()) {
+			return colNames[index];
+		}
+		return NULL;
 	};
 
 	inline char* GetRowName(unsigned int index) const
