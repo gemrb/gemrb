@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.27 2003/11/30 13:03:39 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.28 2003/11/30 18:16:14 avenger_teambg Exp $
  *
  */
 
@@ -40,12 +40,15 @@ Map::~Map(void)
 	for(unsigned int i = 0; i < actors.size(); i++) {
 		delete(actors[i].actor);
 	}
+	core->FreeInterface(LightMap);
+	core->FreeInterface(SearchMap);
 }
 
-void Map::AddTileMap(TileMap * tm, ImageMgr * lm)
+void Map::AddTileMap(TileMap * tm, ImageMgr * lm, ImageMgr * sr)
 {
 	this->tm = tm;
 	LightMap = lm;
+	SearchMap = sr;
 }
 static Color green			= {0x00, 0xff, 0x00, 0xff};
 static Color red			= {0xff, 0x00, 0x00, 0xff};
@@ -106,19 +109,16 @@ void Map::DrawMap(Region viewport)
 			case EVILBUTGREEN:
 				if(actors[i].Selected) color=&green;
 				else color=&green_dark;
-	 	                //core->GetVideoDriver()->SetCursor(core->Cursors[0]->GetFrame(0), core->Cursors[1]->GetFrame(0));
 			break;
 
 			case ENEMY:
 			case GOODBUTRED:
 				if(actors[i].Selected) color=&red;
 				else color=&red_dark;
-	 	                //core->GetVideoDriver()->SetCursor(core->Cursors[12]->GetFrame(0), core->Cursors[13]->GetFrame(0));
 			break;
 			default:
 				if(actors[i].Selected) color=&cyan;
 				else color=&cyan_dark;
-	 	                //core->GetVideoDriver()->SetCursor(core->Cursors[18]->GetFrame(0), core->Cursors[19]->GetFrame(0));
 
 			break;
 			}
@@ -233,4 +233,8 @@ void Map::PlayAreaSong(int SongType)
 		}
         char *poi=tm->QueryField(SongHeader.SongList[SongType],column);
         core->GetMusicMgr()->SwitchPlayList(poi, true);
+}
+
+int Map::GetBlocked(int cx, int cy) {
+	Color block = SearchMap->GetPixel(cx/16, cy/16);
 }
