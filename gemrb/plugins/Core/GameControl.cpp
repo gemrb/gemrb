@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.140 2004/04/30 15:15:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.141 2004/05/09 14:50:04 balrog994 Exp $
  */
 
 #ifndef WIN32
@@ -1174,9 +1174,9 @@ static void AddTalk(TextArea* ta, Actor* speaker, char* speaker_color,
 	char* text, char* text_color)
 {
 	char* format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
-	int newlen = strlen( format ) + strlen( speaker->LongName ) +
+	int newlen = (int)(strlen( format ) + strlen( speaker->LongName ) +
 		strlen( speaker_color ) + strlen( text ) +
-		strlen( text_color ) + 1;
+		strlen( text_color ) + 1);
 	char* newstr = ( char* ) malloc( newlen );
 	sprintf( newstr, format, speaker_color, speaker->LongName, text_color,
 		text );

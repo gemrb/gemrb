@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.10 2004/04/13 19:38:22 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.11 2004/05/09 14:50:04 balrog994 Exp $
  *
  */
 
@@ -83,7 +83,7 @@ private:
 public:
 	int StateCount()
 	{
-		return initialStates.size();
+		return (int)initialStates.size();
 	}
 	void Release()
 	{

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.161 2004/05/09 14:34:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.162 2004/05/09 14:50:04 balrog994 Exp $
  *
  */
 
@@ -585,7 +585,7 @@ static IDSLink* FindIdentifier(const char* idsname)
 	if (!idsname) {
 		return NULL;
 	}
-	int len = strlen( idsname );
+	int len = (int)strlen( idsname );
 	for (int i = 0; idsnames[i].Name; i++) {
 		if (!strnicmp( idsnames[i].Name, idsname, len )) {
 			return idsnames + i;
@@ -1009,12 +1009,12 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	rE->weight = 0;
 	int count = stream->ReadLine( line, 1024 );
 	char *poi;
-	rE->weight = strtoul(line,&poi,10);
+	rE->weight = (unsigned char)strtoul(line,&poi,10);
 	std::vector< Action*> aCv;
 	if(strncmp(poi,"AC",2)==0) while (true) {
 		Action* aC = new Action(false);
 		count = stream->ReadLine( line, 1024 );
-		aC->actionID = strtoul(line, NULL,10);
+		aC->actionID = (unsigned short)strtoul(line, NULL,10);
 		for (int i = 0; i < 3; i++) {
 			stream->ReadLine( line, 1024 );
 			Object* oB = DecodeObject( line );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.15 2004/05/07 17:14:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.16 2004/05/09 14:50:04 balrog994 Exp $
  *
  */
 
@@ -95,7 +95,7 @@ public:
 	void SetInventoryType(int arg);
 
 	/** returns number of all slots in the inventory */
-	int GetSlotCount() { return Slots.size(); };
+	int GetSlotCount() { return (int)Slots.size(); };
 
 	/** sets inventory size, for the first time */
 	void SetSlotCount(unsigned int size);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.166 2004/05/07 20:58:11 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.167 2004/05/09 14:50:04 balrog994 Exp $
  *
  */
 
@@ -51,6 +51,7 @@ GEM_EXPORT HANDLE hConsole;
 #endif
 
 #include "../../includes/win32def.h"
+#include "../../includes/globals.h"
 
 //use DialogF.tlk if the protagonist is female, that's why we leave space
 static char dialogtlk[] = "dialog.tlk\0";

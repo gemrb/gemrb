@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.37 2004/04/25 22:41:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.38 2004/05/09 14:50:04 balrog994 Exp $
  *
  */
 
@@ -146,7 +146,7 @@ public:
 	void AddEntrance(char* Name, short XPos, short YPos, short Face);
 	Entrance* GetEntrance(const char* Name);
 	bool CanFree();
-	int GetActorCount() { return actors.size(); }
+	int GetActorCount() { return (int)actors.size(); }
 	Actor* GetActor(int i) { return actors[i]; }
 
 	//PathFinder

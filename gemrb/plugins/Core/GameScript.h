@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.116 2004/05/09 14:34:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.117 2004/05/09 14:50:04 balrog994 Exp $
  *
  */
 
@@ -72,7 +72,7 @@ private:
 public:
 	int Count()
 	{
-		return objects.size();
+		return (int)objects.size();
 	};
 	Actor* GetTarget(unsigned int index)
 	{

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.30 2004/04/21 17:41:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.31 2004/05/09 14:50:04 balrog994 Exp $
  *
  */
 
@@ -138,7 +138,7 @@ public:
 	/* return current party size */
 	int GetPartySize(bool onlyalive);
 	/* returns the npcs count */
-	int GetNPCCount() { return NPCs.size(); }
+	int GetNPCCount() { return (int)NPCs.size(); }
 	/* select PC for non-walking environment (shops, inventory, ...) */
 	bool SelectPCSingle(int index);
 	/* get index of selected PC for non-walking env (shops, inventory, ...) */
