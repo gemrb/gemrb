@@ -60,7 +60,7 @@ int TLKImp::BuiltinToken(char *Token, char *dest)
 
 	if(!strcmp(Token,"MAGESCHOOL") ) {
 //this should be character dependent, we don't have a character sheet yet
-		unsigned long row=0; //default value is 9 (generalist)
+		unsigned long row=0; //default value is 0 (generalist)
  //this is subject to change, the row number in magesch.2da
 		core->GetDictionary()->Lookup("MAGESCHOOL",row); 
 		int ind = core->LoadTable("magesch");
