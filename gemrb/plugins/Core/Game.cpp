@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.36 2004/04/15 16:51:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.37 2004/04/16 16:46:25 doc_wagon Exp $
  *
  */
 
@@ -40,13 +40,15 @@ Game::Game(void)
 
 Game::~Game(void)
 {
-	for (size_t i = 0; i < Maps.size(); i++) {
+	size_t i;
+
+	for (i = 0; i < Maps.size(); i++) {
 		delete( Maps[i] );
 	}
-	for (size_t i = 0; i < PCs.size(); i++) {
+	for (i = 0; i < PCs.size(); i++) {
 		delete ( PCs[i] );
 	}
-	for (size_t i = 0; i < NPCs.size(); i++) {
+	for (i = 0; i < NPCs.size(); i++) {
 		delete ( NPCs[i] );
 	}
 	if (globals) {
@@ -55,7 +57,7 @@ Game::~Game(void)
 	if (familiars) {
 		free (familiars);
 	}
-	size_t i=Journals.size();
+	i=Journals.size();
 	while(i--) {
 		delete Journals[i];
 	}
