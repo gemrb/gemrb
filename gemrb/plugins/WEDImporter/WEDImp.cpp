@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.4 2003/11/27 21:58:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.5 2003/11/28 09:26:31 balrog994 Exp $
  *
  */
 
@@ -114,6 +114,8 @@ TileMap * WEDImp::GetTileMap()
 		}
 	}
 	tm->AddOverlay(over);
+	//Clipping Polygons
+	/*
 	for(int d = 0; d < DoorsCount; d++) {
 		str->Seek(DoorsOffset + (d*0x1A), GEM_STREAM_START);
 		unsigned short DoorClosed, DoorTileStart, DoorTileCount, *DoorTiles;
@@ -181,7 +183,36 @@ TileMap * WEDImp::GetTileMap()
 		closed->BBox.w = MaxX-MinX;
 		closed->BBox.h = MaxY-MinY;
 		tm->AddDoor(Name, DoorClosed, DoorTiles, DoorTileCount, open, closed);
-	}
+	}*/
 	core->FreeInterface(tis);
 	return tm;
+}
+
+unsigned short * WEDImp::GetDoorIndices(char * ResRef, int *count)
+{
+	unsigned short DoorClosed, DoorTileStart, DoorTileCount, *DoorTiles;
+	unsigned short OpenPolyCount, ClosedPolyCount;
+	unsigned long OpenPolyOffset, ClosedPolyOffset;
+	char Name[9];
+	for(int i = 0; i < DoorsCount; i++) {
+		str->Seek(DoorsOffset + (i*0x1A), GEM_STREAM_START);
+		str->Read(Name, 8);
+		Name[8] = 0;
+		if(strnicmp(Name, ResRef, 8)  == 0)
+			break;
+	}
+	str->Read(&DoorClosed, 2);
+	str->Read(&DoorTileStart, 2);
+	str->Read(&DoorTileCount, 2);
+	str->Read(&OpenPolyCount, 2);
+	str->Read(&ClosedPolyCount, 2);
+	str->Read(&OpenPolyOffset, 4);
+	str->Read(&ClosedPolyOffset, 4);
+	//Reading Door Tile Cells
+	str->Seek(DoorTilesOffset + (DoorTileStart*2), GEM_STREAM_START);
+	DoorTiles = (unsigned short*)malloc(DoorTileCount*sizeof(unsigned short));
+	memset(DoorTiles, 0, DoorTileCount*sizeof(unsigned short));
+	str->Read(DoorTiles, DoorTileCount*sizeof(unsigned short));
+	*count = DoorTileCount;
+	return DoorTiles;
 }
