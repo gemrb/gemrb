@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.44 2004/08/07 13:24:37 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.45 2004/08/07 13:28:55 divide Exp $
  *
  */
 
@@ -203,7 +203,7 @@ int ACMImp::PlayListManager(void* data)
 
 ACMImp::ACMImp(void)
 {
-  unsigned int i;
+	unsigned int i;
 
 	for (i = 0; i < MUSICBUFERS; i++)
 		MusicBuffers[i] = 0;
@@ -268,7 +268,7 @@ bool ACMImp::Init(void)
 	if (i == RETRY) {
 		return false;
 	}
-	
+
 	ALfloat SourcePos[] = {
 		0.0f, 0.0f, 0.0f
 	};
@@ -289,7 +289,7 @@ bool ACMImp::Init(void)
  */
 unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, bool IsSpeech)
 {
-  unsigned int i;
+	unsigned int i;
 
 	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef, IE_WAV_CLASS_ID );
 	if (!stream) {
@@ -358,7 +358,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, bool IsSpeech
 		if (alIsBuffer( speech.Buffer )) {
 			alDeleteBuffers( 1, &speech.Buffer );
 		}
-		alSourcefv( Source, AL_POSITION, SourcePos );
+		alSourcefv( speech.Source, AL_POSITION, SourcePos );
 		alSourcei( speech.Source, AL_BUFFER, Buffer );
 		speech.Buffer = Buffer;
 		alSourcePlay( speech.Source );
