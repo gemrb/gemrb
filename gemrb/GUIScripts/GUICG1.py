@@ -1,22 +1,24 @@
-#character generation (GUICG 0)
+#character generation, gender (GUICG1)
 import GemRB
 
 CharGenWindow = 0
+GenderWindow = 0
 TextAreaControl = 0
-CharGenPhase = 0
+CharGenPhase = 1
 
 def OnLoad():
-	global CharGenWindow, TextAreaControl, CharGenPhase
+	global CharGenWindow, GenderWindow, TextAreaControl, CharGenPhase
 
-	CharGenPhase=0
+	CharGenPhase=1
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)
+	GenderWindow = GemRB.LoadWindow(1)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
 	GenderButton = GemRB.GetControl(CharGenWindow,0)
 	GemRB.SetText(CharGenWindow,GenderButton,11956)
-	GemRB.SetButtonState(CharGenWindow,GenderButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(CharGenWindow,GenderButton,IE_GUI_BUTTON_DISABLED)
 
 	RaceButton = GemRB.GetControl(CharGenWindow,1)
 	GemRB.SetText(CharGenWindow,RaceButton, 11957)
@@ -66,24 +68,26 @@ def OnLoad():
 	GemRB.SetText(CharGenWindow, TextAreaControl, 16575)
 
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-        GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+        GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
         GemRB.SetEvent(CharGenWindow, GenderButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
-        GemRB.SetEvent(CharGenWindow, ImportButton, IE_GUI_BUTTON_ON_PRESS, "ImportPress")
-	GemRB.ShowModal(CharGenWindow)
+	GemRB.SetVisible(CharGenWindow,1)
+	GemRB.ShowModal(GenderWindow)
 	return
 	
+def BackPress():
+	GemRB.UnloadWindow(CharGenWindow)
+	GemRB.UnloadWindow(GenderWindow)
+	GemRB.SetNextScript("CharGen")
+	return
+
 def NextPress():
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("GUICG1") #gender
+        GemRB.UnloadWindow(GenderWindow)
+	GemRB.SetNextScript("GUICG2") #gender
 	return
 
 def CancelPress():
         GemRB.UnloadWindow(CharGenWindow)
+        GemRB.UnloadWindow(GenderWindow)
         GemRB.SetNextScript("Start")
         return
-
-def ImportPress():
-        GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("GUICG24") #import
-	return
-
