@@ -1,4 +1,4 @@
-#character generation, import (GUICG24)
+#character generation, biography (GUICG23)
 import GemRB
 
 ImportWindow = 0
@@ -7,7 +7,7 @@ def OnLoad():
 	global ImportWindow
 
 	GemRB.LoadWindowPack("GUICG")
-        ImportWindow = GemRB.LoadWindow(24)
+        ImportWindow = GemRB.LoadWindow(23)
 
 	TextAreaControl = GemRB.GetControl(ImportWindow, 0)
 	GemRB.SetText(ImportWindow, TextAreaControl, 53605)

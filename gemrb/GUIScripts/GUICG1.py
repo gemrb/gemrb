@@ -14,9 +14,9 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG")
 	GenderWindow = GemRB.LoadWindow(1)
         CharGenWindow = GemRB.LoadWindow(0)
-	BackButton = GemRB.GetControl(GenderWindow,0)
+	BackButton = GemRB.GetControl(GenderWindow,6)
 	GemRB.SetText(GenderWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(GenderWindow,6)
+	DoneButton = GemRB.GetControl(GenderWindow,0)
 	GemRB.SetText(GenderWindow,DoneButton,11973)
 
 	MaleButton = GemRB.GetControl(GenderWindow,2)
@@ -92,7 +92,10 @@ def DonePress():
 	BiographyButton = GemRB.GetControl(CharGenWindow, 16)
 	GemRB.SetText(CharGenWindow, BiographyButton, 18003)
 
-	TextAreaControl= GemRB.GetControl(CharGenWindow,9)
+	TextAreaControl = GemRB.GetControl(CharGenWindow,9)
+	GemRB.SetText(CharGenWindow, TextAreaControl, 16575)
+	
+	TextAreaControl = GemRB.GetControl(GenderWindow, 9)
 	GemRB.SetText(CharGenWindow, TextAreaControl, 16575)
 
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
