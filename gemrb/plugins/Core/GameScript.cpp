@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.220 2005/01/24 20:29:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.221 2005/01/30 15:55:12 avenger_teambg Exp $
  *
  */
 
@@ -5920,6 +5920,10 @@ void GameScript::DisplayMessage(Scriptable* Sender, Action* parameters)
 void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[0] );
+	if(!target) {
+		target=Sender;
+		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+	}
 
 	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
 }
