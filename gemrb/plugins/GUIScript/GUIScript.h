@@ -20,6 +20,7 @@ class GUIScript : public ScriptEngine
 private:
 	PyObject *pName, *pModule, *pDict;
 	PyObject *pGemRB, *pGemRBDict;
+	PyObject * maindic;
 public:
 	GUIScript(void);
 	~GUIScript(void);

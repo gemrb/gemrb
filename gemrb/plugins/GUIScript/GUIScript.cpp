@@ -375,8 +375,8 @@ bool GUIScript::Init(void)
 		PyErr_Print();
 		return false;
 	}
-	#ifdef WIN32
 	char path[_MAX_PATH];
+	#ifdef WIN32
 	int len = strlen(core->GemRBPath);
 	int p = 0;
 	for(int i = 0; i < len; i++) {
@@ -402,14 +402,26 @@ bool GUIScript::Init(void)
 		PyErr_Print();
 		return false;
 	}
-	if(PyRun_SimpleString("IE_BUTTON_ON_PRESS=0x00000000") == -1) {
-		PyErr_Print();
+	strcpy(path, core->GUIScriptsPath);
+	strcat(path, "GUIScripts");
+	strcat(path, SPathDelimiter);
+	strcat(path, "GUIDefines.py");
+	FILE * config = fopen(path, "rb");
+	if(!config)
 		return false;
+	while(true) {
+		int ret = fscanf(config, "%[^\r\n]\r\n", path);
+		if(ret != 1)
+			break;
+		int obj = PyRun_SimpleString(path);
+		if(obj == -1) {
+			PyErr_Print();
+			return false;
+		}
 	}
-	if(PyRun_SimpleString("global IE_BUTTON_ON_PRESS")==-1) {
-		PyErr_Print();
-		return false;
-	}
+	fclose(config);
+	PyObject * mainmod = PyImport_AddModule("__main__");
+	maindic = PyModule_GetDict(mainmod);
 	return true;
 }
 
@@ -435,6 +447,8 @@ bool GUIScript::LoadScript(const char * filename)
 
     if (pModule != NULL) {
         pDict = PyModule_GetDict(pModule);
+		if(PyDict_Merge(pDict, maindic, false) == -1)
+			return false;
         /* pDict is a borrowed reference */
     }
 	else {

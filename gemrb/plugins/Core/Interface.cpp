@@ -2,6 +2,7 @@
 #include "Interface.h"
 #include "FileStream.h"
 #include "AnimationMgr.h"
+#include "Slider.h"
 
 #ifdef WIN32
 #define GEM_EXPORT __declspec(dllexport)
@@ -569,13 +570,23 @@ int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex,
 		return -1;
 	switch((EventID & 0xff000000) >> 24) {
 		case 0: //Button
-		{
+			{
 			if(ctrl->ControlType != 0)
 				return -1;
 			Button * btn = (Button*)ctrl;
 			btn->SetEvent(funcName);
 			return 0;
-		}
+			}
+		break;
+
+		case 2: //Slider
+			{
+			if(ctrl->ControlType != 2)
+				return -1;
+			Slider * sld = (Slider*)ctrl;
+			strcpy(sld->SliderOnChange, funcName);
+			return 0;
+			}
 		break;
 	}
 	return -1;
@@ -637,10 +648,11 @@ int Interface::DelWindow(unsigned short WindowIndex)
 		return -1;
 	std::vector<Window*>::iterator w = windows.begin();
 	w+=WindowIndex;
-	if(!(*w))
+	Window * win = (*w);
+	if(!win)
 		return -1;
-	evntmgr->DelWindow((*w)->WindowID);
-	delete(*w);
+	evntmgr->DelWindow(win->WindowID);
+	delete(win);
 	windows.erase(w);
 	return 0;
 }
