@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.24 2003/12/30 17:51:33 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.25 2003/12/30 18:13:33 balrog994 Exp $
  *
  */
 
@@ -90,11 +90,8 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[121] = StartCutSceneMode;
 		actions[122] = EndCutSceneMode;
 		actions[127] = CutSceneId;
-<<<<<<< GameScript.cpp
-		actions[151] = DisplayString;
-=======
 		actions[137] = StartDialogue;
->>>>>>> 1.23
+		actions[151] = DisplayString;
 		actions[153] = ChangeAllegiance;
 		actions[154] = ChangeGeneral;
 		actions[155] = ChangeRace;
