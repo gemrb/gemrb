@@ -1131,6 +1131,7 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ),
 			true );
 	dlg = dm->GetDialog();
+	strncpy(dlg->ResRef, dlgref, 8); //this isn't handled by GetDialog???
 	core->FreeInterface( dm );
 
 	if (!dlg) {
@@ -1207,9 +1208,9 @@ int GameControl::FindFirstState(Scriptable* target, Dialog* dlg)
 	return -1;
 }
 
-bool GameControl::EvaluateDialogTrigger(Scriptable* target,
-	DialogString* trigger)
+bool GameControl::EvaluateDialogTrigger(Scriptable* target, DialogString* trigger)
 {
+return true;
 	int ORcount = 0;
 	int result;
 	bool subresult = true;
@@ -1244,101 +1245,104 @@ bool GameControl::EvaluateDialogTrigger(Scriptable* target,
 void GameControl::DialogChoose(unsigned int choose)
 {
 	unsigned long index;
-	if (core->GetDictionary()->Lookup( "MessageWindow", index )) {
-		Window* win = core->GetWindow( index );
-		if (core->GetDictionary()->Lookup( "MessageTextArea", index )) {
-			TextArea* ta = ( TextArea* ) win->GetControl( index );
-			//get the first state with true triggers!
-			if (choose == (unsigned long) -1) {
-				int si = FindFirstState( target, dlg );
-				if (si < 0) {
-					printf( "[Dialog]: No top level condition evaluated for true.\n" );
-					EndDialog();
-					ta->SetMinRow( false );
-					return;
-				}
-				ds = dlg->GetState( si );
-			} else {
-				if (ds->transitionsCount <= choose)
-					return;
 
-				DialogTransition* tr = ds->transitions[choose];
+	if (!core->GetDictionary()->Lookup( "MessageWindow", index )) {
+		return;
+	}
+	Window* win = core->GetWindow( index );
+	if (!core->GetDictionary()->Lookup( "MessageTextArea", index )) {
+		return;
+	}
+	TextArea* ta = ( TextArea* ) win->GetControl( index );
+	//get the first state with true triggers!
+	if (choose == (unsigned long) -1) {
+		int si = FindFirstState( target, dlg );
+		if (si < 0) {
+			printf( "[Dialog]: No top level condition evaluated for true.\n" );
+			EndDialog();
+			ta->SetMinRow( false );
+			return;
+		}
+		ds = dlg->GetState( si );
+	} else {
+		if (ds->transitionsCount <= choose)
+			return;
 
-				if(tr->Flags&IE_DLG_TR_JOURNAL) {
-					int Section = 0;
-					if(tr->Flags&IE_DLG_UNSOLVED) {
-						Section |= 1;
-					}
-					if(tr->Flags&IE_DLG_SOLVED) {
-						Section |= 2;
-					}
-					core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16);
-//					your journal has changed...
-//					JournalChanged = true;
-				}
+		DialogTransition* tr = ds->transitions[choose];
 
-				ta->PopLines( ds->transitionsCount + 1 );
-				AddTalk( ta, target, "A0A0FF",
-					core->GetString( tr->textStrRef ), "8080FF" );
-
-				if (tr->action) {
-					for (unsigned int i = 0; i < tr->action->count; i++) {
-						Action* action = GameScript::CreateAction( tr->action->strings[i],
-											true );
-						if (action) {
-							speaker->AddAction( action );
-						} else {
-							printf( "[GameScript]: can't compile action: %s\n",
-								tr->action->strings[i] );
-						}
-					}
-				}
-
-				if (tr->Flags & IE_DLG_TR_FINAL) {
-					EndDialog();
-					ta->SetMinRow( false );
-					return;
-				}
-				int si = tr->stateIndex;
-				//follow external linkage, if required
-				if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
-					//target should be recalculated!
-					InitDialog( speaker, target, tr->Dialog );
-				}
-				ds = dlg->GetState( si );
+		if(tr->Flags&IE_DLG_TR_JOURNAL) {
+			int Section = 0;
+			if(tr->Flags&IE_DLG_UNSOLVED) {
+				Section |= 1;
 			}
-			char* string = core->GetString( ds->StrRef, IE_STR_SOUND );
-			AddTalk( ta, speaker, "FF0000", string, "70FF70" );
-			free( string );
-			int i;
-			ta->SetMinRow( true );
-			int idx = 0;
-			for (unsigned int x = 0; x < ds->transitionsCount; x++) {
-				if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-					if(!EvaluateDialogTrigger(speaker, ds->transitions[x]->trigger))
-						continue;
-				}
-				if (ds->transitions[x]->textStrRef == 0) {
-					string = ( char * ) malloc( 30 );
-					sprintf( string, "[s=%d,ffffff,ff0000]Continue", x );
-					i = ta->AppendText( string, -1 );
-					ta->AppendText( "[/s]", i );
-					free( string );
+			if(tr->Flags&IE_DLG_SOLVED) {
+				Section |= 2;
+			}
+			core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16);
+//			your journal has changed...
+//			JournalChanged = true;
+		}
+
+		ta->PopLines( ds->transitionsCount + 1 );
+		AddTalk( ta, target, "A0A0FF",
+			core->GetString( tr->textStrRef ), "8080FF" );
+
+		if (tr->action) {
+			for (unsigned int i = 0; i < tr->action->count; i++) {
+				Action* action = GameScript::CreateAction( tr->action->strings[i], true );
+				if (action) {
+						speaker->AddAction( action );
 				} else {
-					string = ( char * ) malloc( 40 );
-					idx++;
-					sprintf( string, "[s=%d,ffffff,ff0000]%d - [p]", x, idx );
-					i = ta->AppendText( string, -1 );
-					free( string );
-					char* s = core->GetString( ds->transitions[x]->textStrRef );
-					ta->AppendText( s, i );
-					free( s );
-					ta->AppendText( "[/p][/s]", i );
+					printf( "[GameScript]: can't compile action: %s\n",
+						tr->action->strings[i] );
 				}
 			}
-			ta->AppendText( "", -1 );
+		}
+
+		if (tr->Flags & IE_DLG_TR_FINAL) {
+			EndDialog();
+			ta->SetMinRow( false );
+			return;
+		}
+		int si = tr->stateIndex;
+		//follow external linkage, if required
+		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
+			//target should be recalculated!
+			InitDialog( speaker, target, tr->Dialog );
+		}
+		ds = dlg->GetState( si );
+	}
+	char* string = core->GetString( ds->StrRef, IE_STR_SOUND );
+	AddTalk( ta, speaker, "FF0000", string, "70FF70" );
+	free( string );
+	int i;
+	ta->SetMinRow( true );
+	int idx = 0;
+	for (unsigned int x = 0; x < ds->transitionsCount; x++) {
+		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
+			if(!EvaluateDialogTrigger(speaker, ds->transitions[x]->trigger)) {
+				continue;
+			}
+		}
+		if (ds->transitions[x]->textStrRef == 0) {
+			string = ( char * ) malloc( 40 );
+			sprintf( string, "[s=%d,ffffff,ff0000]Continue", x );
+			i = ta->AppendText( string, -1 );
+			free( string );
+			ta->AppendText( "[/s]", i );
+		} else {
+			string = ( char * ) malloc( 40 );
+			idx++;
+			sprintf( string, "[s=%d,ffffff,ff0000]%d - [p]", x, idx );
+			i = ta->AppendText( string, -1 );
+			free( string );
+			string = core->GetString( ds->transitions[x]->textStrRef );
+			ta->AppendText( string, i );
+			free( string );
+			ta->AppendText( "[/p][/s]", i );
 		}
 	}
+	ta->AppendText( "", -1 );
 }
 
 void GameControl::DisplayString(Scriptable* target)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.27 2004/04/06 17:55:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.28 2004/04/10 10:34:32 avenger_teambg Exp $
  *
  */
 
@@ -273,7 +273,8 @@ Actor* Game::GetNPC(unsigned int Index)
 
 void Game::DeleteJournalEntry(ieStrRef strref)
 {
-	for (size_t i=Journals.size();i;i--) {
+	size_t i=Journals.size();
+	while(i--) {
 		if (Journals[i]->Text==strref) {
 			Journals.erase(Journals.begin()+i);
 		}
@@ -282,7 +283,8 @@ void Game::DeleteJournalEntry(ieStrRef strref)
 
 void Game::DeleteJournalGroup(ieByte Group)
 {
-	for (size_t i=Journals.size();i;i--) {
+	size_t i=Journals.size();
+	while(i--) {
 		if (Journals[i]->Group==Group) {
 			Journals.erase(Journals.begin()+i);
 		}
