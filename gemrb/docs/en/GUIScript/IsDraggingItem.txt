@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.IsDraggingItem()
 
-Description:
+Description: Returns 1 if we are dragging some item (usually in the inventory screen).
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: boolean
 
-See also:
+See also: DropDraggedItem, DragItem
 

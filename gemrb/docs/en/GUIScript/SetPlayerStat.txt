@@ -1,11 +1,18 @@
 
-Prototype:
+Prototype: GemRB.SetPlayerStat(Slot, ID, Value)
 
-Description:
+Description: Sets a player character's base stat. The stats are listed in ie_stats.py.
 
-Parameters:
+Parameters: Slot  - actor index in game structure
+            ID    - Stat index
+            Value - New stat value
 
-Return value:
+Return value: N/A
 
-See also:
+Examples: 
+ PickedColor=GemRB.GetTableValue(ColorTable, ColorIndex, GemRB.GetVar("Selected"))
+ GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, PickedColor)
+The above example sets the player's color just picked via the color customisation dialog. ColorTable holds the available colors.
+
+See also: GetPlayerStat, SetPlayerName
 

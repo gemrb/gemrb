@@ -1,11 +1,14 @@
 
-Prototype:
+Prototype: GemRB.GetVar(VariableName)
 
-Description:
+Description: Get a Variable value from the Global Dictionary. Controls could be set up to be associated with such a variable. Even multiple controls could affect the same variable.
 
-Parameters:
+Parameters: VariableName - the name of the variable must be shorter than 32 bytes
 
-Return value:
+Return value: numeric, 0 if the variable doesn't exist
 
-See also:
+Examples:
+        selected = GemRB.GetVar ("SelectedMovie")
+
+See also: SetVar, SetVarAssoc, data_exchange
 

@@ -1,11 +1,14 @@
 
-Prototype:
+Prototype: GemRB.SetVarAssoc(WindowIndex, ControlIndex, VariableName, LongValue)
 
-Description:
+Description: It associates a variable name and value with a control. The control uses this associated value differently, depending on the control. See more about this in "data_exchange".
 
 Parameters:
+WindowIndex, ControlIndex  - the control's reference
+Variablename               - string, a Global Dictionary Name associated with the control
+LongValue                  - numeric, a value associated with the control
 
-Return value:
+Return value: N/A
 
-See also:
+See also: SetButtonFlags, SetVar, GetVar, data_exchange, accessing_gui_controls
 

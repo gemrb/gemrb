@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.DropDraggedItem(PartyID, Slot)
 
-Description:
+Description: Stop dragging specified item. Dropping the item in an invalid slot will result in 0. Partial success may happen if the item was dropped into a stack, but not all items were moved. The dragging status will be removed only after a complete success. Not all inventory slots may carry any type of item. 
 
-Parameters:
+Parameters: PartyID - the actor's inparty index
+            Slot    - the Inventory Slot
 
-Return value:
+Return value: integer, the action was: 0 (unsuccessful), 1 (partial success) or 2 (complete success)
 
-See also:
+See also: DragItem, IsDraggingItem
 

@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.EnableCheatKeys(flag)
 
-Description:
+Description: Turns the debug keys on or off.
 
-Parameters:
+Parameters: flag - boolean
 
-Return value:
+Return value: N/A
 
-See also:
+See also: N/A
 
