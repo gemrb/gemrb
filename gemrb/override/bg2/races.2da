@@ -1,10 +1,10 @@
 2DA V1.0
 -1
-           NAME_REF   DESC_REF
-HUMAN      7193       9550       
-DWARF      7182       9551       
-ELF        7194       9552       
-GNOME      7196       9553       
-HALF_ELF   7197       9555       
-HALFLING   7195       9554       
-HALFORC    53186      53191      
+           NAME_REF   DESC_REF   CAP_REF    
+HUMAN      7193       9550       1096       
+ELF        7194       9552       1097       
+HALF_ELF   7197       9555       1098       
+DWARF      7182       9551       1100       
+HALFLING   7195       9554       1101       
+GNOME      7196       9553       1099       
+HALFORC    53186      53191      53212      
