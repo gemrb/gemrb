@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.6 2003/11/27 22:05:39 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.7 2003/11/28 09:30:11 balrog994 Exp $
  *
  */
 
@@ -44,7 +44,7 @@ void TileMap::AddOverlay(TileOverlay * overlay)
 	overlays.push_back(overlay);
 }
 
-void TileMap::AddDoor(char * Name, unsigned char DoorClosed, unsigned short * indexes, int count, Gem_Polygon * open, Gem_Polygon * closed)
+Door * TileMap::AddDoor(char * Name, unsigned char DoorClosed, unsigned short * indexes, int count, Gem_Polygon * open, Gem_Polygon * closed)
 {
 	Door door;
 	strncpy(door.Name, Name, 8);
@@ -57,6 +57,18 @@ void TileMap::AddDoor(char * Name, unsigned char DoorClosed, unsigned short * in
 		overlays[0]->tiles[indexes[i]]->tileIndex = DoorClosed;
 	}
 	doors.push_back(door);
+	return &doors.at(doors.size()-1);
+}
+
+void TileMap::ToogleDoor(Door * door)
+{
+	unsigned char state = 0;
+	door->DoorClosed = !door->DoorClosed;
+	if(door->DoorClosed)
+		state = 1;
+	for(int i = 0; i < door->count; i++) {
+		overlays[0]->tiles[door->tiles[i]]->tileIndex = state;
+	}
 }
 
 void TileMap::DrawOverlay(unsigned int index, Region viewport)
