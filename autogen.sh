@@ -123,9 +123,9 @@ if [[ -n $AUTOCONF ]];
 then
   my_autoconf=$AUTOCONF
 else
-  for file in autoconf autoconf-2.57 autoconf-2.58 autoconf-2.59; do
+  for file in autoconf autoconf-2.58 autoconf-2.59; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
-    if [[ $version > 2.56 ]];
+    if [[ $version > 2.57 ]];
     then
       my_autoconf=$file
       break
@@ -137,7 +137,7 @@ if [[ ! -n $my_autoconf ]];
 then
   echo "*****************************************************************"
   echo
-  echo "Autoconf version >= 2.57 is required. If it is already installed,"
+  echo "Autoconf version >= 2.58 is required. If it is already installed,"
   echo "set enviroment variable AUTOCONF to point to it."
   echo "(for example in bash do: \"export AUTOCONF=/pathto/autoconf-2.58\")"
   echo
