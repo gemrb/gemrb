@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.89 2004/04/03 17:10:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.90 2004/04/04 10:13:18 avenger_teambg Exp $
  *
  */
 
@@ -602,13 +602,14 @@ struct TriggerLink {
 #define BD_STRING0   0
 #define BD_TARGET    1
 #define BD_SOURCE    2
-#define BD_RESERVED  3
-#define BD_LOCMASK   3  //where is the dialog resref
-#define BD_INTERRUPT 4  //interrupts action
+#define BD_RESERVED  3  //playerX resref
+#define BD_INTERACT  4  //banter dialogs
+#define BD_LOCMASK   7  //where is the dialog resref
 #define BD_TALKCOUNT 8  //increases talkcount
 #define BD_SETDIALOG 16 //also sets dialog (for string0)
 #define BD_CHECKDIST 32 //checks distance, if needs, walks up
 #define BD_OWN  	 64 //source == target, works for player only
+#define BD_INTERRUPT 128  //interrupts action
 
 #define AF_NONE 	 0
 #define AF_INSTANT       1
@@ -927,6 +928,7 @@ public:
 	static void IncrementChapter(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobal(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobalOnce(Scriptable* Sender, Action* parameters);
+	static void Interact(Scriptable* Sender, Action* parameters);
 	static void JoinParty(Scriptable* Sender, Action* parameters);
 	static void JumpToPoint(Scriptable* Sender, Action* parameters);
 	static void JumpToPointInstant(Scriptable* Sender, Action* parameters);
@@ -995,6 +997,7 @@ public:
 	static void Swing(Scriptable* Sender, Action* parameters);
 	static void SwingOnce(Scriptable* Sender, Action* parameters);
 	static void TakePartyGold(Scriptable* Sender, Action* parameters);
+	static void TextScreen(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Unlock(Scriptable* Sender, Action* parameters);

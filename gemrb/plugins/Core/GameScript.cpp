@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.125 2004/04/03 17:10:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.126 2004/04/04 10:13:06 avenger_teambg Exp $
  *
  */
 
@@ -231,6 +231,7 @@ static ActionLink actionnames[] = {
 	{"forcefacing",GameScript::ForceFacing,0},
 	{"forcespell",GameScript::ForceSpell,0},
 	{"giveexperience", GameScript::AddXPObject,0},
+	{"givegoldforce",GameScript::CreatePartyGold,0}, //this is the same
 	{"givepartygold",GameScript::GivePartyGold,0},
 	{"givepartygoldglobal",GameScript::GivePartyGoldGlobal,AF_MERGESTRINGS},
 	{"globaladdglobal",GameScript::GlobalAddGlobal,AF_MERGESTRINGS},
@@ -259,6 +260,7 @@ static ActionLink actionnames[] = {
 	{"incrementchapter",GameScript::IncrementChapter,0},
 	{"incrementglobal",GameScript::IncrementGlobal,AF_MERGESTRINGS},
 	{"incrementglobalonce",GameScript::IncrementGlobalOnce,AF_MERGESTRINGS},
+	{"interact",GameScript::Interact,0},
 	{"joinparty",GameScript::JoinParty,0},
 	{"jumptoobject",GameScript::JumpToObject,0},
 	{"jumptopoint",GameScript::JumpToPoint,0},
@@ -338,6 +340,7 @@ static ActionLink actionnames[] = {
 	{"swing",GameScript::Swing,0},
 	{"swingonce",GameScript::SwingOnce,0},
 	{"takepartygold",GameScript::TakePartyGold,0},
+	{"textscreen",GameScript::TextScreen,0},
 	{"triggeractivation",GameScript::TriggerActivation,0},
 	{"unhidegui",GameScript::UnhideGUI,0},
 	{"unlock",GameScript::Unlock,0},
@@ -4415,6 +4418,12 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			PlayerDialogRes[5] = '1';
 			Dialog = ( const char * ) PlayerDialogRes;
 			break;
+		case BD_INTERACT: //using the source for the dialog
+			int pdtable = core->LoadTable( "interdia" );
+			char* scriptingname = actor->GetScriptName();
+			Dialog = core->GetTable( pdtable )->QueryField( scriptingname, "FILE" );
+			core->DelTable( pdtable );
+			break;
 	}
 	if (!Dialog) {
 		Sender->CurrentAction = NULL;
@@ -4569,6 +4578,12 @@ void GameScript::StartDialogueNoSetInterrupt(Scriptable* Sender,
 	Action* parameters)
 {
 	BeginDialog( Sender, parameters, BD_TALKCOUNT | BD_SOURCE | BD_INTERRUPT );
+}
+
+//no talkcount, using banter scripts
+void GameScript::Interact(Scriptable* Sender, Action* parameters)
+{
+	BeginDialog( Sender, parameters, BD_INTERACT | BD_SOURCE );
 }
 
 static Point* FindNearPoint(Scriptable* Sender, Point* p1, Point* p2, double& distance)
@@ -5415,7 +5430,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender,
 	core->DelTable( pdtable );
 }
 
-void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
+void GameScript::TextScreen(Scriptable* Sender, Action* parameters)
 {
 	int chapter = core->LoadTable( parameters->string0Parameter );
 	if(chapter<0) {
@@ -5432,6 +5447,11 @@ void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
 		str=core->GetString( strtol(strref,NULL,0) );
 		gc->DisplayString(str);
 	}
+}
+
+void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
+{
+	TextScreen(Sender, parameters);
 	unsigned long value=0;
 
 	core->GetGame()->globals->Lookup( "GLOBALCHAPTER", value );
