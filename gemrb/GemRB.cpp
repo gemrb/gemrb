@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.20 2004/01/28 22:16:23 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.21 2004/02/22 13:41:41 avenger_teambg Exp $
  *
  */
 
@@ -58,9 +58,6 @@ int main(int argc, char ** argv)
 	double frames = 0.0;
 	Region bg(0,0,100,30);
 	Color * palette = core->GetVideoDriver()->CreatePalette(fpscolor, fpsblack);
-#ifndef WIN32
-	struct timeval tv;
-#endif
 	do {
 		if(core->ChangeScript) {
 		        core->GetGUIScriptEngine()->LoadScript(core->NextScript);
@@ -69,12 +66,7 @@ int main(int argc, char ** argv)
 		}
 		core->DrawWindows();
 		frame++;
-#ifndef WIN32
-		gettimeofday(&tv, NULL);
-		time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
-#else
-		time = GetTickCount();
-#endif
+		GetTime(time);
 		if(time - timebase > 1000) {
 			frames = (frame*1000.0/(time-timebase));
 			timebase = time;
