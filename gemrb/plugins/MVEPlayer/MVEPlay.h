@@ -74,8 +74,6 @@ static int g_nMapLength=0;
 
 static int stupefaction=0;
 
-static FSOUND_STREAM * stream=NULL;
-
 class MVEPlay :	public MoviePlayer
 {
 private: //MVELib Functions
@@ -362,7 +360,6 @@ end:
 
 		sample_rate = get_short(data + 4);
 		desired_buffer = get_int(data + 6);
-		FSOUND_
 		mve_audio_spec = (SDL_AudioSpec *)malloc(sizeof(SDL_AudioSpec));
 		mve_audio_spec->freq = sample_rate;
 		mve_audio_spec->format = AUDIO_S16LSB;
