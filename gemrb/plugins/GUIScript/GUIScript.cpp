@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.124 2004/02/17 17:44:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.125 2004/02/17 18:01:21 avenger_teambg Exp $
  *
  */
 
@@ -1775,9 +1775,7 @@ static PyObject *GemRB_GetCharSounds(PyObject * /*self*/, PyObject *args)
 
 static PyObject *GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 {
-	if(!core->GetGame())
-		return Py_BuildValue("i",0);
-	return Py_BuildValue("i",core->GetGame()->GetPartySize());
+	return Py_BuildValue("i",core->GetPartySize());
 }
 
 static PyObject *GemRB_GetINIPartyCount(PyObject * /*self*/, PyObject * /*args*/)
