@@ -3,10 +3,9 @@ import GemRB
 
 CharGenWindow = 0
 TextAreaControl = 0
-ImportButton = 0
 
 def OnLoad():
-	global CharGenWindow, TextAreaControl, ImportButton
+	global CharGenWindow, TextAreaControl
 
 	GemRB.SetVar("Race",0) #race
 
@@ -80,14 +79,13 @@ def OnLoad():
 
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
-        GemRB.SetEvent(CharGenWindow, GenderButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+        GemRB.SetEvent(CharGenWindow, RaceButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 	GemRB.ShowModal(CharGenWindow)
 	return
 	
 def NextPress():
-	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_DISABLED)
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("GUICG1") #gender
+	GemRB.SetNextScript("GUICG2") #race
 	return
 
 def CancelPress():
