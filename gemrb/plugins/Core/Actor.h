@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.9 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.10 2003/11/25 20:55:27 balrog994 Exp $
  *
  */
 
@@ -142,6 +142,26 @@ public:
 	{
 		return which?SmallPortrait:LargePortrait;
 	}
+	void SetText(char * ptr, unsigned char type)
+	{
+		switch(type)
+		{
+		case 0:
+			{
+				int len = strlen(ptr)+1;
+				LongName = (char*)realloc(LongName, len);
+				memcpy(LongName, ptr, len);			
+			}
+		break;
 
+		case 1:
+			{
+				int len = strlen(ptr)+1;
+				ShortName = (char*)realloc(ShortName, len);
+				memcpy(ShortName, ptr, len);
+			}
+		break;
+		}
+	}
 };
 #endif
