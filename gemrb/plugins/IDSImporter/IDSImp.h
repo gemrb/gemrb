@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.h,v 1.6 2003/11/25 13:48:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.h,v 1.7 2003/12/19 14:37:56 balrog994 Exp $
  *
  */
 
@@ -43,7 +43,9 @@ public:
 	~IDSImp(void);
 	bool Open(DataStream * stream, bool autoFree = true);
 	long GetValue(const char * txt);
-	const char * GetValue(int val);
+	char * GetValue(int val);
+	char * GetStringIndex(int Index);
+	long GetValueIndex(int Index);
 public:
 	void release(void)
 	{
