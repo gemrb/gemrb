@@ -1,6 +1,6 @@
 2DA V1.0
 *
-           AT_1       AT_2       AT_3       AR_4       TYPE       SPACE      PALETTE    
+           AT_1       AT_2       AT_3       AT_4       TYPE       SPACE      PALETTE    
 0x1000     MWYV       MWYV       MWYV       MWYV       2          5          1          
 0x1100     MTAN       MTAN       MTAN       MTAN       2          5          1          
 0x1200     MDR1       MDR1       MDR1       MDR1       4          5          1          

@@ -1,6 +1,6 @@
 2DA V1.0
 *
-           AT_1       AT_2       AT_3       AR_4       MIRROR_TYPE SPACE      
+           AT_1       AT_2       AT_3       AT_4       TYPE        SPACE      
 0x00       CABSB      CABSB      CABSB      CABSB      16          2          
 0x01       CADVB      CADVB      CADVB      CADVB      16          2          
 0x02       DANNB      DANNB      DANNB      DANNB      16          2          
