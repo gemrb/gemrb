@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.147 2004/07/25 00:29:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.148 2004/07/25 08:50:44 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -521,13 +521,13 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					for (int i=0; i < lastActor->ColorsCount; i++) {
 						printf( "  Color: %3d  Place: %3d\n", lastActor->Colors[i], lastActor->ColorPlacements[i] );
 					}
-					printf("Skin    : %d\n", lastActor->BaseStats[IE_SKIN_COLOR], lastActor->Modified[IE_SKIN_COLOR]);
-					printf("Hair    : %d\n", lastActor->BaseStats[IE_HAIR_COLOR], lastActor->Modified[IE_HAIR_COLOR]);
-					printf("Mj Cloth: %d\n", lastActor->BaseStats[IE_MAJOR_COLOR], lastActor->Modified[IE_MAJOR_COLOR]);
-					printf("Mi Cloth: %d\n", lastActor->BaseStats[IE_MINOR_COLOR], lastActor->Modified[IE_MINOR_COLOR]);
-					printf("Armor   : %d\n", lastActor->BaseStats[IE_ARMOR_COLOR], lastActor->Modified[IE_ARMOR_COLOR]);
-					printf("Metal   : %d\n", lastActor->BaseStats[IE_METAL_COLOR], lastActor->Modified[IE_METAL_COLOR]);
-					printf("Leather : %d\n", lastActor->BaseStats[IE_LEATHER_COLOR], lastActor->Modified[IE_LEATHER_COLOR]);
+					printf("Skin    : %ld/%ld\n", lastActor->BaseStats[IE_SKIN_COLOR], lastActor->Modified[IE_SKIN_COLOR]);
+					printf("Hair    : %ld/%ld\n", lastActor->BaseStats[IE_HAIR_COLOR], lastActor->Modified[IE_HAIR_COLOR]);
+					printf("Mj Cloth: %ld/%ld\n", lastActor->BaseStats[IE_MAJOR_COLOR], lastActor->Modified[IE_MAJOR_COLOR]);
+					printf("Mi Cloth: %ld/%ld\n", lastActor->BaseStats[IE_MINOR_COLOR], lastActor->Modified[IE_MINOR_COLOR]);
+					printf("Armor   : %ld/%ld\n", lastActor->BaseStats[IE_ARMOR_COLOR], lastActor->Modified[IE_ARMOR_COLOR]);
+					printf("Metal   : %ld/%ld\n", lastActor->BaseStats[IE_METAL_COLOR], lastActor->Modified[IE_METAL_COLOR]);
+					printf("Leather : %ld/%ld\n", lastActor->BaseStats[IE_LEATHER_COLOR], lastActor->Modified[IE_LEATHER_COLOR]);
 					printf( "\n" );
 					lastActor->anims->SwapPalettes();
 				}
