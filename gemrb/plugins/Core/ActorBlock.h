@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.57 2005/03/13 15:32:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.58 2005/03/14 11:14:45 avenger_teambg Exp $
  *
  */
 
@@ -138,7 +138,6 @@ public:
 public:
 	void SetScript(ieResRef aScript, int idx);
 	void SetWait(unsigned long time);
-	//void SetPosition(Point &Pos, int areaindex);
 	void SetMySelf(Scriptable* MySelf);
 	char* GetScriptName();
 	Map* GetCurrentArea();
@@ -256,14 +255,16 @@ public:
 	int closedIndex;
 	Gem_Polygon* open;
 	Gem_Polygon* closed;
+	Point* open_ib;   //impeded blocks stored in a Point array
+	Point* closed_ib;
 	Point toOpen[2];
 	ieResRef OpenSound;
 	ieResRef CloseSound;
 private:
 	void ToggleTiles(int State, bool playsound = false);
 public:
-	void SetName(char* Name);
-	void SetScriptName(char* Name);
+	void SetName(const char* Name);
+	void SetScriptName(const char* Name);
 	void SetTiles(unsigned short* Tiles, int count);
 	void SetDoorLocked(bool Locked, bool playsound = false);
 	void SetDoorClosed(bool Closed, bool playsound = false);

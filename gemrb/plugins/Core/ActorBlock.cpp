@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.72 2005/03/05 21:07:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.73 2005/03/14 11:14:45 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -515,6 +515,8 @@ Door::Door(TileOverlay* Overlay)
 	Flags = 0;
 	open = NULL;
 	closed = NULL;
+	open_ib = NULL;
+	closed_ib = NULL;
 	Cursor = 0;
 	OpenSound[0] = 0;
 	CloseSound[0] = 0;
@@ -535,6 +537,12 @@ Door::~Door(void)
 	if (tiles) {
 		free( tiles );
 	}
+	if (open_ib) {
+		free( open_ib );
+	}
+	if (closed_ib) {
+		free( closed_ib );
+	}
 }
 
 void Door::ToggleTiles(int State, bool playsound)
@@ -546,14 +554,18 @@ void Door::ToggleTiles(int State, bool playsound)
 		state = !closedIndex;
 		if (playsound && ( OpenSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( OpenSound );
+		/* no need to change position, door position is pre-determined
 		Pos.x = open->BBox.x + ( open->BBox.w / 2 );
 		Pos.y = open->BBox.y + ( open->BBox.h / 2 );
+		*/
 	} else {
 		state = closedIndex;
 		if (playsound && ( CloseSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( CloseSound );
+		/* ditto
 		Pos.x = closed->BBox.x + ( closed->BBox.w / 2 );
 		Pos.y = closed->BBox.y + ( closed->BBox.h / 2 );
+		*/
 	}
 	for (i = 0; i < count; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = state;
@@ -562,13 +574,13 @@ void Door::ToggleTiles(int State, bool playsound)
 }
 
 //this is the short name (not the scripting name)
-void Door::SetName(char* name)
+void Door::SetName(const char* name)
 {
 	strncpy( ID, name, 8 );
 	ID[8] = 0;
 }
 
-void Door::SetScriptName(char* name)
+void Door::SetScriptName(const char* name)
 {
 	strncpy( Name, name, 32 );
 	Name[32] = 0;
@@ -607,6 +619,7 @@ void Door::SetDoorClosed(bool Closed, bool playsound)
 	} else {
 		outline = open;
 	}
+/* no, we don't need this
 	if (Closed) {
 		Pos.x = closed->BBox.x + ( closed->BBox.w / 2 );
 		Pos.y = closed->BBox.y + ( closed->BBox.h / 2 );
@@ -614,6 +627,7 @@ void Door::SetDoorClosed(bool Closed, bool playsound)
 		Pos.x = open->BBox.x + ( open->BBox.w / 2 );
 		Pos.y = open->BBox.y + ( open->BBox.h / 2 );
 	}
+*/
 }
 
 void Door::SetPolygon(bool Open, Gem_Polygon* poly)

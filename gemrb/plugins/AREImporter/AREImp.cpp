@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.100 2005/03/05 21:07:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.101 2005/03/14 11:14:41 avenger_teambg Exp $
  *
  */
 
@@ -246,8 +246,11 @@ Map* AREImp::GetMap(const char *ResRef)
 	for (i = 0; i < DoorsCount; i++) {
 		str->Seek( DoorsOffset + ( i * 0xc8 ), GEM_STREAM_START );
 		int count;
-		ieDword Flags, OpenFirstVertex, ClosedFirstVertex;
+		ieDword Flags;
+		ieDword OpenFirstVertex, ClosedFirstVertex;
+		ieDword OpenFirstImpeded, ClosedFirstImpeded;
 		ieWord OpenVerticesCount, ClosedVerticesCount;
+		ieWord OpenImpededCount, ClosedImpededCount;
 		char LongName[33];
 		ieResRef ShortName;
 		ieWord minX, maxX, minY, maxY;
@@ -281,7 +284,11 @@ Map* AREImp::GetMap(const char *ResRef)
 		BBClosed.y = minY;
 		BBClosed.w = maxX - minX;
 		BBClosed.h = maxY - minY;
-		str->Seek( 0x10, GEM_CURRENT_POS );
+		str->ReadDword( &OpenFirstImpeded );
+		str->ReadWord( &OpenImpededCount );
+		str->ReadWord( &ClosedImpededCount );
+		str->ReadDword( &ClosedFirstImpeded );
+		str->Seek( 4, GEM_CURRENT_POS );
 		ieResRef OpenResRef, CloseResRef;
 		str->ReadResRef( OpenResRef );
 		str->ReadResRef( CloseResRef );
@@ -316,6 +323,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		}
 		Gem_Polygon* open = new Gem_Polygon( points, OpenVerticesCount, &BBOpen );
 		free( points );
+
 		//Reading Closed Polygon
 		str->Seek( VerticesOffset + ( ClosedFirstVertex * 4 ),
 				GEM_STREAM_START );
@@ -328,12 +336,38 @@ Map* AREImp::GetMap(const char *ResRef)
 		}
 		Gem_Polygon* closed = new Gem_Polygon( points, ClosedVerticesCount, &BBClosed );
 		free( points );
+
 		//Getting Door Information from the WED File
 		bool BaseClosed;
 		unsigned short * indices = tmm->GetDoorIndices( ShortName, &count, BaseClosed );
 		Door* door;
 		door = tm->AddDoor( ShortName, Flags, BaseClosed,
 					indices, count, open, closed );
+
+		//Reading Open Impeded blocks
+		str->Seek( VerticesOffset + ( OpenFirstImpeded * 4 ),
+				GEM_STREAM_START );
+		points = ( Point * ) malloc( OpenImpededCount * sizeof( Point ) );
+		for (x = 0; x < OpenImpededCount; x++) {
+			str->ReadWord( &minX );
+			points[x].x = minX;
+			str->ReadWord( &minY );
+			points[x].y = minY;
+		}
+		door->open_ib = points;
+
+		//Reading Closed Impeded blocks
+		str->Seek( VerticesOffset + ( ClosedFirstImpeded * 4 ),
+				GEM_STREAM_START );
+		points = ( Point * ) malloc( ClosedImpededCount * sizeof( Point ) );
+		for (x = 0; x < ClosedImpededCount; x++) {
+			str->ReadWord( &minX );
+			points[x].x = minX;
+			str->ReadWord( &minY );
+			points[x].y = minY;
+		}
+		door->closed_ib = points;
+
 		door->SetScriptName( LongName );
 		door->Cursor = cursor;
 		memcpy( door->KeyResRef, KeyResRef, sizeof(KeyResRef) );
