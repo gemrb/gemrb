@@ -13,7 +13,7 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 	this->OrientCount = OrientCount;
 	this->MirrorType = MirrorType;
 	LoadedFlag = 0;
-	for(int i = 0; i < 17; i++) {
+	for(int i = 0; i < 18; i++) {
 		for(int j = 0; j < 16; j++)
 			Anims[i][j] = NULL;
 	}
@@ -61,6 +61,10 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 {
 	//TODO: Implement Auto Resource Loading
 	if(Anims[AnimID][Orient]) {
+		if(Anims[AnimID][Orient]->ChangePalette) {
+			Anims[AnimID][Orient]->SetPalette(Palette);
+			Anims[AnimID][Orient]->ChangePalette = false;
+		}
 		return Anims[AnimID][Orient];
 	}
 	char ResRef[9];
@@ -91,6 +95,10 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 			Anims[AnimID][Orient] = a;
 		}
 		break;
+	}
+	if(Anims[AnimID][Orient]->ChangePalette) {
+		Anims[AnimID][Orient]->SetPalette(Palette);
+		Anims[AnimID][Orient]->ChangePalette = false;
 	}
 	return Anims[AnimID][Orient];
 }

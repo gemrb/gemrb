@@ -56,9 +56,10 @@
 
 class GEM_EXPORT CharAnimations
 {
-public:
+private:
 	Animation * Anims[18][16];
 	Color Palette[256];
+public:
 	unsigned long LoadedFlag;
 	unsigned char OrientCount, MirrorType;
 	unsigned char ArmorType, WeaponType, RangedType;
@@ -67,6 +68,16 @@ public:
 	CharAnimations(char * BaseResRef, unsigned char OrientCount, unsigned char MirrorType);
 	~CharAnimations(void);
 	Animation * GetAnimation(unsigned char AnimID, unsigned char Orient);
+	void SetNewPalette(Color * Pal)
+	{
+		memcpy(Palette, Pal, 256*sizeof(Color));
+		for(int i = 0; i < 18; i++) {
+			for(int j = 0; j < 16; j++) {
+				if(Anims[i][j])
+					Anims[i][j]->ChangePalette = true;
+			}
+		}
+	}
 private:
 	void AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient);
 	void GetAnimResRef(unsigned char AnimID, unsigned char Orient, char * ResRef, unsigned char & Cycle)
