@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.13 2005/02/06 11:04:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.14 2005/02/06 18:10:01 avenger_teambg Exp $
  *
  */
 
@@ -125,7 +125,7 @@ Item* ITMImp::GetItem(Item *s)
 		str->Read( s->unknown, 26 );
 	}
 
-	core->GetITMExt( s->ExtHeaderCount );
+	s->ext_headers = core->GetITMExt( s->ExtHeaderCount );
 
 	for (i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 56, GEM_STREAM_START );
@@ -133,7 +133,7 @@ Item* ITMImp::GetItem(Item *s)
 	}
 
 	//48 is the size of the feature block
-	core->GetFeatures( s->EquippingFeatureCount);
+	s->equipping_features = core->GetFeatures( s->EquippingFeatureCount);
 
 	str->Seek( s->FeatureBlockOffset + 48*s->EquippingFeatureOffset,
 			GEM_STREAM_START );
