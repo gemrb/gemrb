@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.66 2004/05/09 17:36:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.67 2004/05/09 21:31:58 edheldil Exp $
  *
  */
 
@@ -476,6 +476,14 @@ int SDLVideoDriver::SwapBuffers(void)
 		SDL_BlitSurface( extra, &src, disp, &dst );
 	}
 
+	if (Cursor[CursorIndex] && !DisableMouse) {
+		short x = CursorPos.x;
+		short y = CursorPos.y;
+		SDL_BlitSurface( Cursor[CursorIndex], NULL, disp, &CursorPos );
+		CursorPos.x = x;
+		CursorPos.y = y;
+	}
+
 	/** Display tooltip if mouse is idle */
 	if (( time - lastMouseTime ) > core->TooltipDelay) {
 		if (Evnt)
@@ -488,13 +496,6 @@ int SDLVideoDriver::SwapBuffers(void)
 		backBuf = tmp;
 	}
 
-	if (Cursor[CursorIndex] && !DisableMouse) {
-		short x = CursorPos.x;
-		short y = CursorPos.y;
-		SDL_BlitSurface( Cursor[CursorIndex], NULL, disp, &CursorPos );
-		CursorPos.x = x;
-		CursorPos.y = y;
-	}
 	SDL_Flip( disp );
 	return ret;
 }
