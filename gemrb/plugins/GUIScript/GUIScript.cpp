@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.72 2003/11/26 01:14:35 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.73 2003/11/27 22:14:55 balrog994 Exp $
  *
  */
 
@@ -1135,10 +1135,10 @@ static PyObject * GemRB_SetButtonPLT(PyObject */*self*/, PyObject *args)
 
 static PyObject * GemRB_SetButtonBAM(PyObject */*self*/, PyObject *args)
 {
-	int WindowIndex, ControlIndex, col1;
+	int WindowIndex, ControlIndex, CycleIndex, FrameIndex, col1;
 	char * ResRef;
 
-	if(!PyArg_ParseTuple(args, "iisi", &WindowIndex, &ControlIndex, &ResRef, &col1)) {
+	if(!PyArg_ParseTuple(args, "iisiii", &WindowIndex, &ControlIndex, &ResRef, &CycleIndex, &FrameIndex, &col1)) {
 		printMessage("GUIScript", "Syntax Error: SetButtonBAM(WindowIndex, ControlIndex, BAMResRef, col1)\n", LIGHT_RED);
 		return NULL;
 	}
@@ -1175,7 +1175,7 @@ static PyObject * GemRB_SetButtonBAM(PyObject */*self*/, PyObject *args)
 		return NULL;
 	}
 
-	Sprite2D * Picture = am->GetFrameFromCycle(0, 0);
+	Sprite2D * Picture = am->GetFrameFromCycle(CycleIndex, FrameIndex);
 	if(Picture == NULL) {
 		core->FreeInterface(am);
 		return NULL;
