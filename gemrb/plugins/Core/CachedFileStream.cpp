@@ -94,4 +94,22 @@ int CachedFileStream::Seek(int pos, int startpos)
 unsigned long CachedFileStream::Size()
 {
 	return size;
+}/** No descriptions */
+int CachedFileStream::ReadLine(void * buf, int maxlen)
+{
+	unsigned char *p = (unsigned char*)buf;
+	int i = 0;
+	while(i < (maxlen-1)) {
+		int ch = fgetc(str);
+		if(Encrypted)
+			p[i]^=GEM_ENCRYPTION_KEY[Pos&63];
+		Pos++;
+		if(ch == '\n')
+			break;
+		if(ch == '\t')
+			ch = ' ';
+    if(ch != '\r')
+			p[i++] = ch;
+	}
+	p[i] = 0;
 }

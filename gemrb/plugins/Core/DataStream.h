@@ -32,6 +32,8 @@ public:
   bool CheckEncrypted();
   /** No descriptions */
   void ReadDecrypted(void * buf, int size);
+  /** No descriptions */
+  virtual int ReadLine(void * buf, int maxlen) = 0;
 	char filename[_MAX_PATH];
 };
 
