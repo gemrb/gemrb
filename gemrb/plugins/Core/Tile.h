@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Tile.h,v 1.2 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Tile.h,v 1.3 2003/11/27 22:07:09 balrog994 Exp $
  *
  */
 
@@ -40,14 +40,15 @@
 class GEM_EXPORT Tile
 {
 public:
-	Tile(Animation * anim);
+	Tile(Animation * anim, Animation * sec = NULL);
 	~Tile(void);
-	unsigned long Flags;
-	Color SearchMap[4];
-	Color HeightMap[4];
-	Color LightMap[4];
-	Color NLightMap[4];
-	Animation * anim;
+	unsigned char tileIndex;
+	unsigned char om;
+	Color SearchMap[16];
+	Color HeightMap[16];
+	Color LightMap[16];
+	Color NLightMap[16];
+	Animation * anim[2];
 };
 
 #endif
