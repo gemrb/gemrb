@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.52 2004/11/12 22:20:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.53 2004/11/14 09:20:53 avenger_teambg Exp $
  *
  */
 
@@ -185,11 +185,11 @@ Actor* CREImp::GetActor()
 	ieDword strref;
 	str->ReadDword( &strref );
 	char* poi = core->GetString( strref );
-	act->SetText( poi, 0 );
+	act->SetText( poi, 1 ); //setting longname
 	free( poi );
 	str->ReadDword( &strref );
 	poi = core->GetString( strref );
-	act->SetText( poi, 1 );
+	act->SetText( poi, 2 ); //setting shortname (for tooltips)
 	free( poi );
 	act->BaseStats[IE_VISUALRANGE] = 30; //this is just a hack
 	str->ReadDword( &act->BaseStats[IE_MC_FLAGS] );
@@ -457,7 +457,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	items = (CREItem **) calloc (act->ItemsCount, sizeof(CREItem *) );
 
 	for (i = 0; i < act->ItemsCount; i++) {
-		items[i] = core->ReadItem(str);
+		items[i] = core->ReadItem(str); //could be NULL item
 	}
 	act->inventory.SetSlotCount(Inventory_Size);
 
@@ -476,7 +476,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				items[index] = NULL;
 				continue;
 			}
-			printf("[CREImp]: Duplicate item (%d) in creature!\n", index);
+			printf("[CREImp]: Duplicate or (no-drop) item (%d) in creature!\n", index);
 		}
 	}
 
