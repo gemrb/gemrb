@@ -33,7 +33,7 @@ def OnLoad():
 	global AbilityTable
 	
 	GemRB.LoadWindowPack("GUICG")
-        AbilityTable = GemRB.LoadTable("weapprof")
+        AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindow(4)
 
 	RollPress()
@@ -75,8 +75,13 @@ def RightPress():
 	GemRB.InvalidateWindow(AbilityWindow)
 	Abidx = GemRB.GetVar("AbilityDecrease")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
-	print Ability
-	if Ability<4:  #should be more elaborate
+	#should be more elaborate
+	Minimum=3
+	Maximum=18
+	GemRB.SetToken("MINIMUM",str(Minimum) )
+	GemRB.SetToken("MAXIMUM",str(Maximum) )
+	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, Abidx, 1) )
+	if Ability<=Minimum:
 		return
 	GemRB.SetVar("Ability "+str(Abidx), Ability-1)
 	PointsLeft = PointsLeft + 1
@@ -93,11 +98,17 @@ def LeftPress():
 
 	GemRB.InvalidateWindow(AbilityWindow)
 	PointsLeft=GemRB.GetVar("Ability -1")
-	if PointsLeft == 0:
-		return
+	#should be more elaborate
+	Minimum=3
+	Maximum=18
+	GemRB.SetToken("MINIMUM",str(Minimum) )
+	GemRB.SetToken("MAXIMUM",str(Maximum) )
 	Abidx = GemRB.GetVar("AbilityIncrease")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
-	if Ability>17:  #should be more elaborate
+	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, Abidx, 1) )
+	if PointsLeft == 0:
+		return
+	if Ability>=Maximum:  #should be more elaborate
 		return
 	GemRB.SetVar("Ability "+str(Abidx), Ability+1)
 	PointsLeft = PointsLeft - 1
