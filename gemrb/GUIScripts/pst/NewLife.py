@@ -1,6 +1,7 @@
 import GemRB
 
 NewLifeWindow = 0
+QuitWindow = 0
 TextArea = 0
 
 StrLabel = 0
@@ -38,13 +39,26 @@ IE_HAIR_COLOR =		214
 IE_ALIGNMENT =  	217
 
 def OnLoad():
-	global NewLifeWindow, TotPoints, AcPoints, HpPoints
+	global NewLifeWindow, QuitWindow
+	global TotPoints, AcPoints, HpPoints
 	global Str, Dex, Con, Wis, Int, Cha
 	global TotLabel, AcLabel, HpLabel
 	global StrLabel, DexLabel, ConLabel, WisLabel, IntLabel, ChaLabel
 	global TextArea
 
 	GemRB.LoadWindowPack("GUICG")
+	#setting up confirmation window
+	QuitWindow = GemRB.LoadWindow(1)
+	TextArea = GemRB.GetControl(QuitWindow, 0)
+	GemRB.SetText(QuitWindow, TextArea, 46782)
+	Button = GemRB.GetControl(QuitWindow, 2)
+	GemRB.SetText(QuitWindow, Button, 46783)
+	GemRB.SetEvent(QuitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OkButton")
+	Button = GemRB.GetControl(QuitWindow,1)
+	GemRB.SetButtonFlags(QuitWindow, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	GemRB.SetButtonState(QuitWindow, Button, IE_GUI_BUTTON_DISABLED)
+
+	#setting up CG window
 	NewLifeWindow = GemRB.LoadWindow(0)
 	
 	Str = 9
@@ -191,7 +205,7 @@ def OnLoad():
 	
 	CancelButton = GemRB.GetControl(NewLifeWindow, 1)
 	GemRB.SetText(NewLifeWindow, CancelButton, 4196)	
-	GemRB.SetEvent(NewLifeWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	GemRB.SetEvent(NewLifeWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	
 	UpdateLabels()
 	
@@ -210,7 +224,7 @@ def UpdateLabels():
 	GemRB.SetText(NewLifeWindow, TotLabel, str(TotPoints))
 	AcPoints = 10
 	if Dex>14:
-		AcPoints = AcPoints + (Dex-14)
+		AcPoints = AcPoints - (Dex-14)
 
 	HpPoints = 20
 	if Con>14:
@@ -222,7 +236,18 @@ def UpdateLabels():
 	#GemRB.DrawWindows()
 	return
 	
+def OkButton():
+	GemRB.SetVisible(QuitWindow, 0)
+	GemRB.SetVisible(NewLifeWindow, 1)
+	GemRB.InvalidateWindow(NewLifeWindow)
+	return
+
 def AcceptPress():
+	if TotPoints:
+		GemRB.SetVisible(NewLifeWindow,2) #go dark
+		GemRB.SetVisible(QuitWindow,1)
+		return
+
 	GemRB.UnloadWindow(NewLifeWindow)
 	#set my character up
 	MyChar = GemRB.CreatePlayer("charbase", 0 ) 
