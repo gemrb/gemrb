@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.26 2004/11/15 00:20:54 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.27 2004/12/02 22:11:44 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -220,8 +220,11 @@ def UpdateRecordsWindow ():
 		GemRB.SetText (Window, Label, str (stats[i]))
 
 	# race
+	# FIXME: for some strange reason, Morte is 1 (Human) in the save files,
+	#   instead of 45 (Morte)
 	RaceTable = GemRB.LoadTable ("RACES")
-	text = GemRB.GetTableValue (RaceTable, GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
+	print "species: %d  race: %d" %(GemRB.GetPlayerStat (pc, IE_SPECIES), GemRB.GetPlayerStat (pc, IE_RACE))
+	text = GemRB.GetTableValue (RaceTable, GemRB.GetPlayerStat (pc, IE_SPECIES) - 1, 0)
 	GemRB.UnloadTable (RaceTable)
 	
 	Label = GemRB.GetControl (Window, 0x10000014)
@@ -525,8 +528,11 @@ def GetStatOverview (pc):
 	GemRB.UnloadTable (ClassTable)
 
 	# 59856 Current State
-	CurrentState = won + GemRB.GetString (59856) + woff + "\n\n"
-
+	StatesTable = GemRB.LoadTable ("states")
+	StateID = GS (IE_STATE_ID)
+	State = GemRB.GetString (GemRB.GetTableValue (StatesTable, str (StateID), "NAME_REF"))
+	CurrentState = won + GemRB.GetString (59856) + woff + "\n" + State + "\n\n"
+	GemRB.UnloadTable (StatesTable)
 
 	# 67049 AC Bonuses
 	stats.append (67049)

@@ -1,0 +1,16 @@
+Description: strrefs for character state names. 
+
+Columns: (keys)   - bitmask for particular state
+         NAME_REF - strref for name of this state
+
+Rows: each row maps one state bit (as a bitmask) to its strref
+
+Example (PST):
+			NAME_REF
+0			67220
+1			59824
+2			59825
+4			59826
+8			59830
+16			59831
+...
