@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.32 2005/02/11 11:17:11 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.33 2005/02/11 14:30:53 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -756,8 +756,18 @@ def OpenInformationWindow ():
 	else:
 		GemRB.SetText (Window, Label, GemRB.GetString (stat['BestKilledName']))
 
-	days = int (stat['JoinDate'] / 21600)
-	hours = int ((stat['JoinDate'] % 21600) / 900)
+	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
+	#   (script updates???). In each case, there are 60 seconds
+	#   in a minute, 24 hours in a day, but ONLY 5 minutes in an hour!!
+	# Hence currentTime (and joinTime after div by 15) has
+	#   7200 secs a day (60 * 5 * 24)
+	currentTime = GemRB.GetGameTime()
+	joinTime = stat['JoinDate'] - stat['AwayTime']
+
+	party_time = currentTime - (joinTime / 15) 
+	days = party_time / 7200
+	hours = (party_time % 7200) / 300
+
 	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
 	
