@@ -190,10 +190,9 @@ Window * CHUImp::GetWindow(unsigned long i)
 				str->Read(&KnobStep, 2);
 				str->Read(&KnobStepsCount, 2);
 				Slider * sldr = new Slider(KnobXPos, KnobYPos, KnobStep, KnobStepsCount, false);
-				win->AddControl(sldr);
+				sldr->ControlID = ControlID;
 				sldr->XPos = XPos;
 				sldr->YPos = YPos;
-				sldr->ControlID = ControlID;
 				sldr->BufferLength = BufferLength;
 				sldr->ControlType = ControlType;
 				sldr->Width = Width;
@@ -209,6 +208,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				sldr->SetImage(IE_GUI_SLIDER_KNOB, img);
 				img = anim->GetFrame(GrabbedKnob);
 				sldr->SetImage(IE_GUI_SLIDER_GRABBEDKNOB, img);
+				win->AddControl(sldr);
 			}
 			break;
 
@@ -228,7 +228,6 @@ Window * CHUImp::GetWindow(unsigned long i)
 				ImageMgr * mos = (ImageMgr*)core->GetInterface(IE_MOS_CLASS_ID);
 				mos->Open(ds, true);
 				TextEdit * te = new TextEdit(maxInput);
-				win->AddControl(te);
 				te->ControlID = ControlID;
 				te->XPos = XPos;
 				te->YPos = YPos;
@@ -239,6 +238,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				te->SetCursor(af->GetFrame(0));
 				te->SetBackGround(mos->GetImage());
 				core->FreeInterface(mos);
+				win->AddControl(te);
 			}
 			break;
 
@@ -265,7 +265,6 @@ Window * CHUImp::GetWindow(unsigned long i)
 				b.g = back.g;
 				b.b = back.b;*/
 				TextArea * ta = new TextArea(fore, init, back);
-				win->AddControl(ta);
 				ta->ControlID = ControlID;
 				ta->XPos = XPos;
 				ta->YPos = YPos;
@@ -273,7 +272,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				ta->Height = Height;
 				ta->ControlType = ControlType;
 				ta->SetFonts(ini, fnt);
-				//ta->SetText("Text Area (Temp Value)");
+				win->AddControl(ta);
 				if(SBID != 0xffff)
 					win->Link(SBID, ControlID);
 			}
@@ -291,7 +290,6 @@ Window * CHUImp::GetWindow(unsigned long i)
 				str->Read(&back, 4);
 				str->Read(&alignment, 2);
 				Label * lab = new Label(BufferLength, fnt);
-				win->AddControl(lab);
 				lab->ControlID = ControlID;
 				lab->XPos = XPos;
 				lab->YPos = YPos;
@@ -315,7 +313,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				else
 					lab->SetAlignment(IE_FONT_ALIGN_LEFT);
 				free(str);
-				
+				win->AddControl(lab);
 			}
 			break;
 
@@ -333,7 +331,6 @@ Window * CHUImp::GetWindow(unsigned long i)
 				str->Read(&Slider, 2);
 				str->Read(&TAID, 2);
 				ScrollBar * sbar = new ScrollBar();
-				win->AddControl(sbar);
 				sbar->ControlID = ControlID;
 				sbar->XPos = XPos;
 				sbar->YPos = YPos;
@@ -350,6 +347,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				sbar->SetImage(IE_GUI_SCROLLBAR_SLIDER, an->GetFrame(Slider));
 				an->free = false;
 				delete(an);
+				win->AddControl(sbar);
 				if(TAID != 0xffff)
 					win->Link(ControlID, TAID);
 			}

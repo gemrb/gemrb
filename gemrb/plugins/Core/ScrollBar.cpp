@@ -10,11 +10,28 @@ ScrollBar::ScrollBar(void)
 	Max = 10;
 	State = 0;
 	ta = NULL;
-	Variable[0] = 0;
 }
 
 ScrollBar::~ScrollBar(void)
 {
+}
+
+void ScrollBar::SetPos(int NewPos)
+{
+	Pos=NewPos;
+	if(ta) {
+		TextArea * t = (TextArea*)ta;
+		t->SetRow(Pos);
+	}
+	if(VarName[0] != 0) {
+		core->GetDictionary()->SetAt(VarName, Pos);
+	}
+}
+
+void ScrollBar::RedrawScrollBar(const char *Variable, int Sum)
+{
+	if(strnicmp(VarName, Variable, MAX_VARIABLE_LENGTH) ) return;
+	SetMax((unsigned short) Sum);
 }
 
 void ScrollBar::Draw(unsigned short x, unsigned short y)
@@ -71,16 +88,7 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 	if((x >= upmx) && (y >= upmy)) {
 		if((x <= upMx) && (y <= upMy)) {
 			if(Pos > 0)
-				Pos--;
-			if(Variable[0] != 0) {
-				char tmp[10];
-				sprintf(tmp, "%d", Pos);
-				core->GetDictionary()->SetAt(Variable, tmp);
-			}
-			if(ta) {
-				TextArea * t = (TextArea*)ta;
-				t->SetRow(Pos);
-			}
+				SetPos(Pos-1);
 			State |= UP_PRESS;
 			return;
 		}
@@ -88,17 +96,8 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 	if((x >= domx) && (y >= domy)) {
 		if((x <= doMx) && (y <= doMy)) {
 			if(Pos < (Max-1))
-				Pos++;
+				SetPos(Pos+1);
 			State |= DOWN_PRESS;
-			if(ta) {
-				TextArea * t = (TextArea*)ta;
-				t->SetRow(Pos);
-			}
-			if(Variable[0] != 0) {
-				char tmp[10];
-				sprintf(tmp, "%d", Pos);
-				core->GetDictionary()->SetAt(Variable, tmp);
-			}
 			return;
 		}
 	}
@@ -109,47 +108,20 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 		}
 	}
 	if(y <= yzero) {
-		Pos = 0;
-		if(ta) {
-			TextArea * t = (TextArea*)ta;
-			t->SetRow(Pos);
-		}
-		if(Variable[0] != 0) {
-			char tmp[10];
-			sprintf(tmp, "%d", Pos);
-			core->GetDictionary()->SetAt(Variable, tmp);
-		}
+		SetPos(0);
 		return;
 	}
 	if(y >= ymax) {
-		Pos = Max-1;
-		if(ta) {
-			TextArea * t = (TextArea*)ta;
-			t->SetRow(Pos);
-		}
-		if(Variable[0] != 0) {
-			char tmp[10];
-			sprintf(tmp, "%d", Pos);
-			core->GetDictionary()->SetAt(Variable, tmp);
-		}
+		SetPos(Max-1);
 		return;
 	}
-	unsigned short befst = ymy / step;
+	unsigned short befst = (unsigned short) (ymy / step);
 	unsigned short aftst = befst + 1;
 	if((ymy-(befst*step)) < ((aftst*step)-ymy)) {
-		Pos = befst;
+		SetPos(befst);
 	}
 	else {
-		Pos = aftst;
-	}
-	if(ta) {
-		TextArea * t = (TextArea*)ta;
-		t->SetRow(Pos);
-	}
-	if(Variable[0] != 0) {
-		char tmp[10];
-		sprintf(tmp, "%d", Pos);
-		core->GetDictionary()->SetAt(Variable, tmp);
+		SetPos(aftst);
 	}
 }
 /** Mouse Button Up */
@@ -172,48 +144,21 @@ void ScrollBar::OnMouseOver(unsigned short x, unsigned short y)
 		unsigned short ymax = yzero+refheight;
 		unsigned short ymy = y-yzero;
 		if(y <= yzero) {
-			Pos = 0;
-			if(ta) {
-				TextArea * t = (TextArea*)ta;
-				t->SetRow(Pos);
-			}
-			if(Variable[0] != 0) {
-				char tmp[10];
-				sprintf(tmp, "%d", Pos);
-				core->GetDictionary()->SetAt(Variable, tmp);
-			}
+			SetPos(0);
 			return;
 		}
 		if(y >= ymax) {
-			Pos = Max-1;
-			if(ta) {
-				TextArea * t = (TextArea*)ta;
-				t->SetRow(Pos);
-			}
-			if(Variable[0] != 0) {
-				char tmp[10];
-				sprintf(tmp, "%d", Pos);
-				core->GetDictionary()->SetAt(Variable, tmp);
-			}
+			SetPos(Max-1);
 			return;
 		}
-		unsigned short befst = ymy / step;
+		unsigned short befst = (unsigned short) (ymy / step);
 		unsigned short aftst = befst + 1;
 		if((ymy-(befst*step)) < ((aftst*step)-ymy)) {
-			Pos = befst;
+			SetPos(befst);
 		}
 		else {
 			if(aftst <= (Max-1))
-				Pos = aftst;
-		}
-		if(ta) {
-			TextArea * t = (TextArea*)ta;
-			t->SetRow(Pos);
-		}
-		if(Variable[0] != 0) {
-			char tmp[10];
-			sprintf(tmp, "%d", Pos);
-			core->GetDictionary()->SetAt(Variable, tmp);
+				SetPos(aftst);
 		}
 	}
 }
@@ -229,17 +174,8 @@ void ScrollBar::SetMax(unsigned short Max)
 {
 	this->Max = Max;
 	if(Max == 0)
-		Pos = 0;
+		SetPos(0);
 	else if(Pos >= Max)
-		Pos = Max-1;
-	if(ta) {
-		TextArea * t = (TextArea*)ta;
-		t->SetRow(Pos);
-	}
-	if(Variable[0] != 0) {
-		char tmp[10];
-		sprintf(tmp, "%d", Pos);
-		core->GetDictionary()->SetAt(Variable, tmp);
-	}
+		SetPos(Max-1);
 	Changed = true;
 }

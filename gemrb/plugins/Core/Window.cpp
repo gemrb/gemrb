@@ -159,6 +159,12 @@ void Window::RedrawControls(char *VarName, unsigned long Sum)
 				sl->RedrawSlider(VarName, Sum);
 				break;
 			}
+			case IE_GUI_SCROLLBAR:
+			{
+				ScrollBar *sb=(ScrollBar *) (Controls[i]);
+				sb->RedrawScrollBar(VarName, Sum);
+//				break;
+			}
 		}
 	}
 }

@@ -33,6 +33,11 @@ class GEM_EXPORT ScrollBar : public Control
 public:
 	ScrollBar(void);
 	~ScrollBar(void);
+	/**sets position, updates associated stuff */
+	void SetPos(int NewPos);
+	/**redraws scrollbar if associated with VarName */
+	void RedrawScrollBar(const char *VarName, int Sum);
+	/**/
 	void Draw(unsigned short x, unsigned short y);
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
@@ -51,8 +56,6 @@ public:
 	void SetMax(unsigned short Max);
 	/** TextArea Associated Control */
 	Control * ta;
-	/** Associated Variable */
-	char Variable[33];
 public: // Public Events
   /** Mouse Button Down */
   void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
