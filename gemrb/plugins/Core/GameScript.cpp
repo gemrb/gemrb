@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.198 2004/10/01 19:40:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.199 2004/10/01 20:59:57 avenger_teambg Exp $
  *
  */
 
@@ -375,6 +375,7 @@ static ActionLink actionnames[] = {
 	{"incrementproficiency", GameScript::IncrementProficiency,0},
 	{"interact", GameScript::Interact,0},
 	{"joinparty", GameScript::JoinParty,0},
+	{"journalentrydone", GameScript::SetQuestDone,0},
 	{"jumptoobject", GameScript::JumpToObject,0},
 	{"jumptopoint", GameScript::JumpToPoint,0},
 	{"jumptopointinstant", GameScript::JumpToPointInstant,0},
@@ -441,6 +442,7 @@ static ActionLink actionnames[] = {
 	{"restorepartylocations", GameScript:: RestorePartyLocation,0},
 	//this is in iwd2, same as movetosavedlocation, with a default variable
 	{"returntosavedlocation", GameScript::MoveToSavedLocation, AF_BLOCKING},
+	{"returntosavedlocationdelete", GameScript::MoveToSavedLocationDelete, AF_BLOCKING},
 	{"returntosavedplace", GameScript::MoveToSavedLocation, AF_BLOCKING},
 	{"revealareaonmap", GameScript::RevealAreaOnMap,0},
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING},
@@ -542,7 +544,9 @@ static ActionLink actionnames[] = {
 static ObjectLink objectnames[] = {
 	{"bestac", GameScript::BestAC},
 	{"eighthnearest", GameScript::EighthNearest},
+	{"eigthnearest", GameScript::EighthNearest}, //typo in iwd?
 	{"eighthnearestenemyof", GameScript::EighthNearestEnemyOf},
+	{"eigthnearestenemyof", GameScript::EighthNearestEnemyOf}, //typo in iwd
 	{"fifthnearest", GameScript::FifthNearest},
 	{"fifthnearestenemyof", GameScript::FifthNearestEnemyOf},
 	{"fourthnearest", GameScript::FourthNearest},
@@ -5594,6 +5598,27 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
+	parameters->pointParameter.x = *(unsigned short *) &value;
+	parameters->pointParameter.y = *(((unsigned short *) &value)+1);
+	Actor* actor = ( Actor* ) tar;
+	actor->WalkTo( parameters->pointParameter );
+}
+
+void GameScript::MoveToSavedLocationDelete(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		tar = Sender;
+	}
+	if(tar->Type != ST_ACTOR) {
+		return;
+	}
+	
+	if(!parameters->string0Parameter[0]) {
+		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+	}
+	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
+	SetVariable( Sender, parameters->string0Parameter, 0);
 	parameters->pointParameter.x = *(unsigned short *) &value;
 	parameters->pointParameter.y = *(((unsigned short *) &value)+1);
 	Actor* actor = ( Actor* ) tar;
