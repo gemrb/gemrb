@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.SetSaveGamePreview(WindowIndex, ControlIndex, SlotCount)
 
-Description:
+Description: Sets a savegame area preview bmp onto a button as picture.
 
-Parameters:
+Parameters: WindowIndex, ControlIndex  - the control's reference
+            SlotCount - the index of a saved game
 
-Return value:
+Return value: N/A
 
-See also:
+See also: SetSaveGamePortrait
 

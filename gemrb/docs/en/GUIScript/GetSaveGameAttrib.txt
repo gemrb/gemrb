@@ -1,11 +1,17 @@
 
-Prototype:
+Prototype: GemRB.GetSaveGameAttrib(Type, SlotCount)
 
-Description:
+Description: Returns the name, path or prefix of the saved game selected.
 
 Parameters:
+Type - the queried attribute's name
+ 0 - name
+ 1 - prefix
+ 2 - path
+ 3 - date
+SlotCount - the index of a saved game
 
-Return value:
+Return value: string
 
 See also:
 

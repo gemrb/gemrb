@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.DeleteSaveGame(SlotCount)
 
-Description:
+Description: Deletes a saved game folder completely.
 
-Parameters:
+Parameters: SlotCount - the index of a saved game
 
-Return value:
+Return value: N/A
 
-See also:
+See also: GetSaveGameCount
 

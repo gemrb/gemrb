@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.GetSaveGameCount()
 
-Description:
+Description: Returns the number of saved games.
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: numeric
 
-See also:
+See also: DeleteSaveGame, GetSaveGameAttrib, SetSaveGameAreaPortrait
 
