@@ -428,7 +428,7 @@ end:
 		w = get_short(data);
 		h = get_short(data+2);
 		if(minor==2)
-			trueColor=get_short(data+4);
+			trueColor=get_short(data+6);
 		else
 			trueColor=false;
 
