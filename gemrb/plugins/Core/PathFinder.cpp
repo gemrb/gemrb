@@ -112,7 +112,9 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 	StartNode->Parent = NULL;
 	StartNode->x=startX;
 	StartNode->y=startY;
-	StartNode->orient=0;
+	StartNode->orient=GetOrient(goalX, goalY, startX, startY);
+	if(pos!=pos2)
+		return Return;
 	unsigned int px = startX;
 	unsigned int py = startY;
 	unsigned int newx, newy;
