@@ -154,15 +154,18 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			//draw infopoints with blue overlay
 			InfoPoint *i;
 			for(unsigned int idx=0; i=area->tm->GetInfoPoint(idx); idx++) {
-				if(i->TrapDetected && i->Trapped) {
-					video->DrawPolyline(i->outline, red, true);
+				if( (i->TrapDetected || (DebugFlags&1) ) && i->Trapped) {
+						video->DrawPolyline(i->outline, red, true);
 				}
-				else if(DebugFlags&4) {
+				else if(DebugFlags&1) {
 					video->DrawPolyline(i->outline, blue, true);
 				}
 			}
 		}
-		else { //overInfoPoint
+		else if(overInfoPoint) {
+			if(overInfoPoint->TrapDetected && overInfoPoint->Trapped) {
+				video->DrawPolyline(overInfoPoint->outline, red, true);
+			}
 		}
 		for(size_t i = 0; i < infoPoints.size(); i++) {
 			unsigned long time;
@@ -245,6 +248,13 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	switch(Key) {
 		case 'a':  //'a'
 			{
+				if(overInfoPoint) {
+					if(overInfoPoint->Trapped && !(overInfoPoint->TrapDetected)) {
+						overInfoPoint->TrapDetected = 1;
+						core->GetVideoDriver()->FreeSprite(overInfoPoint->outline->fill);
+						overInfoPoint->outline->fill = NULL;
+					}
+				}
 				if(overContainer) {
 					if(overContainer->Trapped && !(overContainer->TrapDetected)) {
 						overContainer->TrapDetected = 1;
