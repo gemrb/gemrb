@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.102 2004/08/03 17:36:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.103 2004/08/03 22:58:37 guidoj Exp $
  *
  */
 
@@ -147,7 +147,7 @@ public:
 	const char * TypeExt(SClass_ID type);
 	Video * GetVideoDriver();
 	ResourceMgr * GetResourceMgr();
-	char * GetString(ieStrRef strref, unsigned long options=0);
+	char * GetString(ieStrRef strref, unsigned long options = 0);
 	void FreeInterface(void * ptr);
 	Factory * GetFactory(void);
 	/** No descriptions */

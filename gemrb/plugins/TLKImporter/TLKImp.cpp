@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.27 2004/08/02 20:25:19 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.28 2004/08/03 22:58:37 guidoj Exp $
  *
  */
 
@@ -240,7 +240,7 @@ bool TLKImp::ResolveTags(char* dest, char* source, int Length)
 	return true;
 }
 
-bool TLKImp::GetNewStringLength(char* string, unsigned long& Length)
+bool TLKImp::GetNewStringLength(char* string, int& Length)
 {
 	int NewLength;
 	bool lChange;
@@ -248,7 +248,7 @@ bool TLKImp::GetNewStringLength(char* string, unsigned long& Length)
 
 	lChange = false;
 	NewLength = 0;
-	for (unsigned int i = 0; i < Length; i++) {
+	for (int i = 0; i < Length; i++) {
 		if (string[i] == '<') {
 			// token
 			lChange = true;
@@ -277,15 +277,16 @@ bool TLKImp::GetNewStringLength(char* string, unsigned long& Length)
 	return lChange;
 }
 
-char* TLKImp::GetString(ieStrRef strref, int flags)
+char* TLKImp::GetString(ieStrRef strref, unsigned long flags)
 {
 	if (strref >= StrRefCount) {
 		char* ret = ( char* ) malloc( 1 );
 		ret[0] = 0;
 		return ret;
 	}
-	unsigned long Volume, Pitch, StrOffset, Length;
-	unsigned short type;
+	ieDword Volume, Pitch, StrOffset;
+	int Length;
+	ieWord type;
 	char SoundResRef[9];
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
 	str->Read( &type, 2 );
@@ -336,7 +337,7 @@ char* TLKImp::GetString(ieStrRef strref, int flags)
 	return string;
 }
 
-StringBlock TLKImp::GetStringBlock(ieStrRef strref, int flags)
+StringBlock TLKImp::GetStringBlock(ieStrRef strref, unsigned long flags)
 {
 	StringBlock sb;
 	if (strref >= StrRefCount) {
@@ -346,7 +347,7 @@ StringBlock TLKImp::GetStringBlock(ieStrRef strref, int flags)
 		return sb;
 	}
 	sb.text = GetString( strref, flags );
-	unsigned short type;
+	ieWord type;
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
 	str->Read( &type, 2 );
 	str->Read( sb.Sound, 8 );
