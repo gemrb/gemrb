@@ -30,6 +30,7 @@ def OnLoad():
 		j = j+1
 
 	j = 0
+	GemRB.SetVar("MAGESCHOOL",0) 
 	for i in range(1,ClassCount):
 		if GemRB.GetTableValue(ClassTable,i-1,3):
 			continue
@@ -45,7 +46,7 @@ def OnLoad():
 		if Allowed==0:
 			continue
 		if Allowed==2:
-			GemRB.SetToken("MAGESCHOOL","Illusionist") #temporary
+			GemRB.SetVar("MAGESCHOOL",5) #illusionist
 		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetEvent(ClassWindow, Button, IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
 		GemRB.SetVarAssoc(ClassWindow, Button , "Class", i)

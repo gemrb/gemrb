@@ -14,9 +14,6 @@ def OnLoad():
 	GemRB.SetVar("Class",0) #class
 	GemRB.SetVar("Alignment",0) #alignment
 
-	#these are here only for testing purposes
-	GemRB.SetToken("MAGESCHOOL", "MAGE");
-
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
