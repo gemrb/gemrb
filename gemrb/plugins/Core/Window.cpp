@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.26 2004/03/20 23:02:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.27 2004/03/27 16:12:45 avenger_teambg Exp $
  *
  */
 
@@ -144,6 +144,7 @@ void Window::SetFocused(Control* ctrl)
 	}
 	lastFocus = ctrl;
 	lastFocus->hasFocus = true;
+	lastFocus->Changed = true;
 }
 
 Control* Window::GetControl(unsigned short i)

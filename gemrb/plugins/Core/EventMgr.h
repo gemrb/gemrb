@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.12 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.13 2004/03/27 16:12:45 avenger_teambg Exp $
  *
  */
 
@@ -77,6 +77,8 @@ public:
 	void KeyRelease(unsigned char Key, unsigned short Mod);
 	/** Special Ket Press Event */
 	void OnSpecialKeyPress(unsigned char Key);
+	/** Sets focus to the control of the window */
+	void SetFocused(Window *win, Control *ctrl);
 	/** Mask of which Mouse Buttons are pressed */
 	unsigned char MButtons;
 private:

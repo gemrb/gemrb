@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.143 2004/03/25 17:11:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.144 2004/03/27 16:12:45 avenger_teambg Exp $
  *
  */
 
@@ -1264,7 +1264,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 				SetOnTop( WindowIndex );
 			}
 			break;
-
+		
 		default:
 			win->Visible = ( visible != 0 );
 			break;
@@ -1371,19 +1371,21 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 	if (ctrl == NULL) {
 		return -1;
 	}
+	if(Status&0x80) {
+			evntmgr->SetFocused( win, ctrl);
+	}
 	switch (( Status & 0xff000000 ) >> 24) {
 		case 0:
-			//Button
-			 {
-				if (ctrl->ControlType != 0)
-					return -1;
-				Button* btn = ( Button* ) ctrl;
-				btn->SetState( ( unsigned char ) ( Status & 0xff ) );
-				return 0;
-			}
-			break;
+		//Button
+		 {
+			if (ctrl->ControlType != 0)
+				return -1;
+			Button* btn = ( Button* ) ctrl;
+			btn->SetState( ( unsigned char ) ( Status & 0x7f ) );
+		}
+		break;
 	}
-	return -1;
+	return 0;
 }
 
 /** Show a Window in Modal Mode */
