@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.52 2004/01/19 18:46:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.53 2004/01/19 22:58:53 balrog994 Exp $
  *
  */
 
@@ -66,6 +66,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		triggers[0x0d] = Exists;
 		triggers[0x0e] = General;
 		triggers[0x0f] = Globals;
+		triggers[0x1c] = See;
 		triggers[0x18] = Range;
 		triggers[0x23] = True;
 		triggers[0x2b] = ActionListEmpty;
@@ -1248,6 +1249,21 @@ int GameScript::Entered(Scriptable * Sender, Trigger * parameters)
 
 int GameScript::Dead(Scriptable * Sender, Trigger * parameters)
 {
+	return 0;
+}
+
+int GameScript::See(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!target)
+		return 0;
+	long x = (target->XPos - Sender->XPos);
+	long y = (target->YPos - Sender->YPos);
+	double distance = sqrt((double)(x*x+y*y));
+	if(distance > (parameters->int0Parameter*20))
+		return 0;
+	if(core->GetPathFinder()->IsVisible(Sender->XPos, Sender->YPos, target->XPos, target->YPos))
+		return 1;
 	return 0;
 }
 
