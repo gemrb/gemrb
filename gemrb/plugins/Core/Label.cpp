@@ -19,6 +19,20 @@
 #include "Label.h"
 #include "Interface.h"
 
+#ifndef WIN32
+#include <ctype.h>
+char *strlwr(char *string)
+{
+	char *s;
+	if(string)
+	{
+		for(s = string; *s; ++s)
+			*s = tolower(*s);
+	}
+	return string;
+}
+#endif
+
 extern Interface * core;
 
 Label::Label(unsigned short bLength, Font * font){
