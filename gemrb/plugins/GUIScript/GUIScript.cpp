@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.218 2004/10/10 15:23:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.219 2004/10/11 17:53:23 avenger_teambg Exp $
  *
  */
 
@@ -1651,21 +1651,23 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 
 
 PyDoc_STRVAR( GemRB_CreateMapControl__doc,
-"CreateMapControl(WindowIndex, ControlID, x, y, w, h, [FlagResRef, LabelID]) => ControlIndex\n\n"
+"CreateMapControl(WindowIndex, ControlID, x, y, w, h, "
+"[LabelID, FlagResRef[, Flag2ResRef]])\n\n"
 "Creates and adds a new Area Map Control to a Window.\n"
-"Note: LabelID is an ID, not an index.");
+"Note: LabelID is an ID, not an index. "
+"If there are two flags given, they will be considered a BMP.\n");
 
 static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID, x, y, w, h;
 	int LabelID;
 	char *Flag=NULL;
+	char *Flag2=NULL;
 
-	if (!PyArg_ParseTuple( args, "iiiiii|si", &WindowIndex, &ControlID, &x,
-			&y, &w, &h, &Flag, &LabelID )) {
+	if (!PyArg_ParseTuple( args, "iiiiii|is|s", &WindowIndex, &ControlID,
+			&x, &y, &w, &h, &LabelID, &Flag, &Flag2)) {
 		return AttributeError( GemRB_CreateMapControl__doc );
 	}
-
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
 		return NULL;
@@ -1688,6 +1690,22 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 	map->ControlID = ControlID;
 	map->ControlType = IE_GUI_MAP;
 	map->Owner = win;
+	if (Flag2) { //pst flavour
+		CtrlIndex = core->GetControl( WindowIndex, LabelID );
+		Control *lc = win->GetControl( CtrlIndex );
+		map->LinkedLabel = lc;
+		AnimationMgr *anim = ( AnimationMgr* ) core->GetInterface(IE_BMP_CLASS_ID );
+		DataStream* str = core->GetResourceMgr()->GetResource( Flag, IE_BMP_CLASS_ID );
+		if(anim -> Open(str, true) ) {
+				map->Flag[0] = anim->GetFrame(0);
+			}
+		str = core->GetResourceMgr()->GetResource( Flag2, IE_BMP_CLASS_ID );
+		if(anim -> Open(str, true) ) {
+				map->Flag[1] = anim->GetFrame(0);
+		}
+		core->FreeInterface( anim );
+		goto setup_done;
+	}
 	if (Flag) {
 		CtrlIndex = core->GetControl( WindowIndex, LabelID );
 		Control *lc = win->GetControl( CtrlIndex );
@@ -1702,6 +1720,7 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 		}
 		core->FreeInterface( anim );
 	}
+setup_done:
 	win->AddControl( map );
 
 	Py_INCREF( Py_None );
