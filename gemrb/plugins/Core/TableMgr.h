@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.12 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.13 2004/07/21 20:27:26 guidoj Exp $
  *
  */
 
@@ -59,8 +59,8 @@ public:
 	/** Opens a Table File */
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	/** Returns a Row Name, returns NULL on error */
-	virtual inline int GetRowIndex(const char* rowname) const = 0;
-	virtual inline char* GetRowName(unsigned int index) const = 0;
+	virtual int GetRowIndex(const char* rowname) const = 0;
+	virtual char* GetRowName(unsigned int index) const = 0;
 };
 
 #endif

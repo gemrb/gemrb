@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.28 2004/06/27 23:47:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.29 2004/07/21 20:27:26 guidoj Exp $
  *
  */
 
@@ -85,7 +85,7 @@ public:
 	/** This function Draws a Polygon on the Screen */
 	virtual void DrawPolyline(Gem_Polygon* poly, Color& color,
 		bool fill = false) = 0;
-	virtual inline void DrawLine(short x1, short y1, short x2, short y2,
+	virtual void DrawLine(short x1, short y1, short x2, short y2,
 		Color& color) = 0;
 	/** Frees a Palette */
 	virtual void FreePalette(Color *&palette) = 0;

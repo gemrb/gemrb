@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.9 2004/05/25 16:16:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.10 2004/07/21 20:27:26 guidoj Exp $
  *
  */
 
@@ -157,11 +157,11 @@ bool Spellbook::DepleteSpell(CREMemorizedSpell* spl)
 
 void Spellbook::dump()
 {
-  unsigned int i,j,k;
+	unsigned int k;
 
 	printf( "SPELLBOOK:\n" );
-	for (i = 0; i < NUM_SPELL_TYPES; i++) {
-		for (j = 0; j < spells[i].size(); j++) {
+	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
+		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
 			//if (!sm || !sm->Number) continue;
 			if (!sm) continue;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.144 2004/06/27 19:30:06 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.145 2004/07/21 20:27:26 guidoj Exp $
  */
 
 #ifndef WIN32
@@ -1289,7 +1289,7 @@ void GameControl::DialogChoose(unsigned int choose)
 	}
 	TextArea* ta = ( TextArea* ) win->GetControl( index );
 	//get the first state with true triggers!
-	if (choose == (unsigned long) -1) {
+	if (choose == (unsigned int) -1) {
 		int si = FindFirstState( target, dlg );
 		if (si < 0) {
 			printf( "[Dialog]: No top level condition evaluated for true.\n" );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/decoder.cpp,v 1.4 2004/04/13 21:21:02 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/decoder.cpp,v 1.5 2004/07/21 20:27:25 guidoj Exp $
  *
  */
 
@@ -63,7 +63,7 @@ void CSubbandDecoder::decode_data(long* buffer, int blocks)
 void CSubbandDecoder::sub_4d3fcc(short* memory, long* buffer, int sb_size,
 	int blocks)
 {
-	long row_0, row_1, row_2, row_3, db_0, db_1;
+	long row_0, row_1, row_2 = 0, row_3 = 0, db_0, db_1;
 	int i;
 	int sb_size_2 = sb_size * 2, sb_size_3 = sb_size * 3;
 	if (blocks == 2) {
@@ -134,7 +134,7 @@ void CSubbandDecoder::sub_4d3fcc(short* memory, long* buffer, int sb_size,
 void CSubbandDecoder::sub_4d420c(long* memory, long* buffer, int sb_size,
 	int blocks)
 {
-	long row_0, row_1, row_2, row_3, db_0, db_1;
+	long row_0, row_1, row_2 = 0, row_3 = 0, db_0, db_1;
 	int i;
 	int sb_size_2 = sb_size * 2, sb_size_3 = sb_size * 3;
 	if (blocks == 4) {

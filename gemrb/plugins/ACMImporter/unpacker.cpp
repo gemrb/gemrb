@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.8 2004/05/09 14:34:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.9 2004/07/21 20:27:25 guidoj Exp $
  *
  */
 
@@ -225,8 +225,8 @@ int CValueUnpacker::t1_5bits(int pass, int /*ind*/)
 	// efficiency: always 5/3 bits per value
 	// use it when P0 <= 1/3
 	for (int i = 0; i < subblocks; i++) {
-		char bits = ( char ) ( get_bits( 5 ) & 0x1f );
-		bits = Table1[bits];
+		int bits = ( int ) ( get_bits( 5 ) & 0x1f );
+		bits = ( int ) Table1[bits];
 
 		block_ptr[i * sb_size + pass] = buff_middle[-1 + ( bits & 3 )];
 		if (( ++i ) == subblocks)
@@ -298,7 +298,7 @@ int CValueUnpacker::t2_7bits(int pass, int /*ind*/)
 	// эффективность: 7/3 бита на значение - всегда
 	// use it when p0 <= 1/3
 	for (int i = 0; i < subblocks; i++) {
-		char bits = ( char ) ( get_bits( 7 ) & 0x7f );
+		int bits = ( int ) ( get_bits( 7 ) & 0x7f );
 		short val = Table2[bits];
 
 		block_ptr[i * sb_size + pass] = buff_middle[-2 + ( val & 7 )];
@@ -431,7 +431,7 @@ int CValueUnpacker::t3_7bits(int pass, int /*ind*/)
 	//Rus: все комбинации пар от -5 до +5
 	// эффективность: 7/2 бита на значение - всегда
 	for (int i = 0; i < subblocks; i++) {
-		char bits = ( char ) ( get_bits( 7 ) & 0x7f );
+		int bits = ( int ) ( get_bits( 7 ) & 0x7f );
 		unsigned char val = Table3[bits];
 
 		block_ptr[i * sb_size + pass] = buff_middle[-5 + ( val & 0xF )];

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.170 2004/06/27 21:12:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.171 2004/07/21 20:27:26 guidoj Exp $
  *
  */
 
@@ -2715,7 +2715,7 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 	printf("Selected: %d: %d -> %d\n", PlayerSlot, MyActor->IsSelected(), Selected);
-	printf("IE_EA: %d\n", MyActor->Modified[IE_EA]);
+	printf("IE_EA: %ld\n", MyActor->Modified[IE_EA]);
 	MyActor->Select( (bool)Selected );
 
 	Py_INCREF( Py_None );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.23 2004/07/20 16:22:36 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.24 2004/07/21 20:27:26 guidoj Exp $
  *
  */
 
@@ -58,6 +58,7 @@ int Control::SetTooltip(const char* string, int pos)
 	Changed = true;
 	return 0;
 }
+
 /** Sets the tooltip to be displayed on the screen now */
 void Control::DisplayTooltip()
 {
@@ -66,6 +67,7 @@ void Control::DisplayTooltip()
 	else
 		core->DisplayTooltip( 0, 0, NULL );
 }
+
 void Control::RunEventHandler(EventHandler handler)
 {
 	if (handler[0])
@@ -75,42 +77,50 @@ void Control::RunEventHandler(EventHandler handler)
 /** Key Press Event */
 void Control::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
-	//printf("OnKeyPress: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", ControlID, Key, Key);
+	//printf("OnKeyPress: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", (unsigned int) ControlID, Key, Key);
 }
+
 /** Key Release Event */
 void Control::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
-	  //printf( "OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", ControlID, Key, Key );
+	//printf( "OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", (unsigned int) ControlID, Key, Key );
 }
+
 /** Mouse Enter Event */
 void Control::OnMouseEnter(unsigned short x, unsigned short y)
 {
-	printf("OnMouseEnter: CtrlID = 0x%08X, x = %hd, y = %hd\n", ControlID, x, y);
+	printf("OnMouseEnter: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
 }
+
 /** Mouse Leave Event */
 void Control::OnMouseLeave(unsigned short x, unsigned short y)
 {
-	printf("OnMouseLeave: CtrlID = 0x%08X, x = %hd, y = %hd\n", ControlID, x, y);
+	printf("OnMouseLeave: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
 }
+
 /** Mouse Over Event */
 void Control::OnMouseOver(unsigned short x, unsigned short y)
 {
-	//printf("OnMouseOver: CtrlID = 0x%08X, x = %hd, y = %hd\n", ControlID, x, y);
+	//printf("OnMouseOver: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
 }
+
 /** Mouse Button Down */
 void Control::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
-	//printf("OnMouseDown: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", ControlID, x, y, Button, Mod);
+	//printf("OnMouseDown: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", (unsigned int) ControlID, x, y, Button, Mod);
 }
+
 /** Mouse Button Up */
 void Control::OnMouseUp(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
-	//printf("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", ControlID, x, y, Button, Mod);
+	//printf("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", (unsigned int) ControlID, x, y, Button, Mod);
 }
+
 /** Special Key Press */
 void Control::OnSpecialKeyPress(unsigned char Key)
 {
-	//printf("OnSpecialKeyPress: CtrlID = 0x%08X, Key = %d\n", ControlID, Key);
+	//printf("OnSpecialKeyPress: CtrlID = 0x%08X, Key = %d\n", (unsigned int) ControlID, Key);
 }
+

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.50 2004/07/11 11:04:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.51 2004/07/21 20:27:26 guidoj Exp $
  *
  */
 
@@ -41,6 +41,10 @@ static Color yellow = {
 static Color cyan = {
 	0x00, 0xff, 0xff, 0xff
 };
+static Color magenta = {
+	0xff, 0x00, 0xff, 0xff
+};
+/*
 static Color green_dark = {
 	0x00, 0x80, 0x00, 0xff
 };
@@ -53,9 +57,7 @@ static Color yellow_dark = {
 static Color cyan_dark = {
 	0x00, 0x80, 0x80, 0xff
 };
-static Color magenta = {
-	0xff, 0x00, 0xff, 0xff
-};
+*/
 
 Actor::Actor()
 	: Moveble( ST_ACTOR )
