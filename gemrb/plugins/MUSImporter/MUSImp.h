@@ -18,8 +18,14 @@
 #ifndef MUSIMP_H
 #define MUSIMP_H
 
-#include "../Core/MusicMgr.h"
+#include "../Core/MusicMgr.h
+
+#include "../Core/FileStream.h
+
 #include <stdio.h>
+
+
+
 
 /**MUS PlayList Importer
   *@author GemRB Developement Team
@@ -30,6 +36,7 @@ typedef struct PLString {
 	char PLLoop[4];
 	char PLTag[4];
 	char PLEnd[4];
+	unsigned long soundID;
 } PLString;
   
 class MUSImp : public MusicMgr
@@ -37,8 +44,11 @@ class MUSImp : public MusicMgr
 private:
 	bool Initialized;
 	bool Playing;
-	FILE * pl;
 	char PLName[32];
+	int PLpos;
+	FileStream * str;
+	std::vector<PLString> playlist;
+	unsigned long lastSound;
 public: 
 	MUSImp();
 	~MUSImp();
@@ -52,6 +62,8 @@ public:
   void End();
   /** Start the PlayList Music Execution */
   void Start();
+  /** Plays the Next Entry */
+  void PlayNext();
 };
 
 #endif
