@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.26 2004/11/27 14:52:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.27 2004/12/01 22:33:00 avenger_teambg Exp $
  *
  */
 
@@ -69,7 +69,7 @@ unsigned char GetOrient(Point &s, Point &d)
 	int deltaY = s.y - d.y;
 	int div = Distance(s,d);
 	if(!div) return 0; //default
-	if(div>2) div/=2;
+	if(div>3) div/=2;
 	int aX=deltaX/div;
 	int aY=deltaY/div;
 	return orientations[(aY+2)*5+aX+2];
