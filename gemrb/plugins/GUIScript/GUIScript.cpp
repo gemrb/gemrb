@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.196 2004/08/23 21:46:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.197 2004/08/26 08:44:58 edheldil Exp $
  *
  */
 
@@ -3386,6 +3386,16 @@ static PyObject* GemRB_UpdateAmbientsVolume(PyObject * /*self*/, PyObject* /*arg
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetCurrentArea__doc,
+"GetCurrentArea()=>resref\n\n"
+"Returns current area's ResRef" );
+
+static PyObject* GemRB_GetCurrentArea(PyObject * /*self*/, PyObject* /*args*/)
+{
+	return PyString_FromString( core->GetGame()->CurrentArea );
+}
+
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -3504,6 +3514,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(EnableCheatKeys, METH_VARARGS), 
 	METHOD(UpdateMusicVolume, METH_NOARGS),
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
+	METHOD(GetCurrentArea, METH_NOARGS),
 
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
