@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.25 2003/12/26 15:03:27 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.26 2003/12/26 20:47:07 balrog994 Exp $
  *
  */
 
@@ -25,6 +25,8 @@
 
 extern Interface * core;
 unsigned long lastX = 0;
+
+#define PARAGRAPH_START_X 5;
 
 inline size_t mystrlen(const char * string) 
 {
@@ -115,6 +117,7 @@ bool written = false;
 void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color *hicolor, unsigned char Alignment, bool anchor, Font * initials, Color *initcolor, Sprite2D * cursor, int curpos)
 {
 	Color * pal = NULL, *ipal = NULL;
+	unsigned long psx = PARAGRAPH_START_X;
 	pal = hicolor;
 	if(ipal != NULL) {
 		ipal = initcolor;
@@ -143,7 +146,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 	}
 	else
 		ystep = size[1].h;//chars[1]->Height;
-	int x = 5, y = ystep;
+	int x = psx, y = ystep;
 	if(Alignment & IE_FONT_ALIGN_CENTER) {
 		int w = CalcStringWidth(tmp);
 		x = (rgn.w / 2)-(w/2);
@@ -166,7 +169,8 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 		if(((unsigned char)tmp[i]) == '[') {
 			i++;
 			char tag[256];
-			for(int k = 0; k < 256; k++) {
+			int k = 0;
+			for(k = 0; k < 256; k++) {
 				if(tmp[i] == ']') {
 					tag[k] = 0;
 					break;
@@ -184,6 +188,14 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 			} else {
 				if(stricmp(tag, "/color") == 0) {
 					core->GetVideoDriver()->SetPalette(sprBuffer, pal);
+				} else {
+					if(stricmp("p", tag) == 0) {
+						psx = x;
+					} else {
+						if(stricmp("/p", tag) == 0) {
+							psx = PARAGRAPH_START_X;
+						}
+					}
 				}
 			}
 			continue;
@@ -196,7 +208,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 		}
 		if((tmp[i] == 0) || (tmp[i] == '\n')) {
 			y+=ystep;
-			x=5;
+			x=psx;
 			if(Alignment & IE_FONT_ALIGN_CENTER) {
 				int w = CalcStringWidth(&tmp[i+1]);
 				x = (rgn.w / 2)-(w/2);
@@ -222,6 +234,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned char Alignment, bool anchor, Font * initials, Color *initcolor, Sprite2D * cursor, int curpos)
 {
 	Color * pal = NULL, *ipal = NULL;
+	unsigned long psx = PARAGRAPH_START_X;
 	pal = hicolor;
 	if(ipal != NULL) {
 		ipal = initcolor;
@@ -250,7 +263,7 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	}
 	else
 		ystep = size[1].h;//chars[1]->Height;
-	int x = 5, y = ystep;
+	int x = psx, y = ystep;
 	if(Alignment & IE_FONT_ALIGN_CENTER) {
 		int w = CalcStringWidth(tmp);
 		x = (rgn.w / 2)-(w/2);
@@ -293,13 +306,21 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 			} else {
 				if(stricmp(tag, "/color") == 0) {
 					core->GetVideoDriver()->SetPalette(sprBuffer, pal);
+				} else {
+					if(stricmp("p", tag) == 0) {
+						psx = x;
+					} else {
+						if(stricmp("/p", tag) == 0) {
+							psx = PARAGRAPH_START_X;
+						}
+					}
 				}
 			}
 			continue;
 		}
 		if(tmp[i] == 0) {
 			y+=ystep;
-			x=5;
+			x=psx;
 			if(Alignment & IE_FONT_ALIGN_CENTER) {
 				int w = CalcStringWidth(&tmp[i+1]);
 				x = (rgn.w / 2)-(w/2);
@@ -327,8 +348,17 @@ int Font::CalcStringWidth(char * string)
 {
 	size_t ret = 0, len = mystrlen(string);
 	for(size_t i = 0; i < len; i++) {
-		if(((unsigned char)string[i]) >= 0xf0) {
-			i+=3;
+		if(((unsigned char)string[i]) == '[') {
+			i++;
+			char tag[256];
+			int k = 0;
+			for(k = 0; k < 256; k++) {
+				if(string[i] == ']') {
+					tag[k] = 0;
+					break;
+				}
+				tag[k] = string[i++];
+			}
 			continue;
 		}
 		ret += size[(unsigned char)string[i]-1].w;//chars[(unsigned char)string[i]-1]->Width;
@@ -339,15 +369,16 @@ int Font::CalcStringWidth(char * string)
 void Font::SetupString(char * string, int width)
 {
 	size_t len = mystrlen(string);
+	unsigned long psx = PARAGRAPH_START_X;
 	int lastpos = 0;
-	int x = 5, wx = 0;
+	int x = psx, wx = 0;
 	bool endword = false;
 	for(size_t pos = 0; pos < len; pos++) {
 		if(x+wx > width) {
-			if(!endword && (x == 5))
+			if(!endword && (x == psx))
 				lastpos = (int)pos;
 			string[lastpos] = 0;
-			x = 5;
+			x = psx;
 		}
 		if(string[pos] == 0) {
 			continue;
@@ -357,14 +388,30 @@ void Font::SetupString(char * string, int width)
 			string[pos] = ' ';
 		if(string[pos] == '\n') {
 			string[pos] = 0;
-			x = 5;
+			x = psx;
 			wx = 0;
 			lastpos = (int)pos;
 			endword = true;
 			continue;
 		}
-		if(string[pos] >= 0xf0) {
-			pos+=3;
+		if(((unsigned char)string[pos]) == '[') {
+			pos++;
+			char tag[256];
+			int k = 0;
+			for(k = 0; k < 256; k++) {
+				if(string[pos] == ']') {
+					tag[k] = 0;
+					break;
+				}
+				tag[k] = string[pos++];
+			}
+			if(stricmp("p", tag) == 0) {
+				psx = x;
+			} else {
+				if(stricmp("/p", tag) == 0) {
+					psx = PARAGRAPH_START_X;
+				}
+			}
 			continue;
 		}
 		wx += size[(unsigned char)string[pos]-1].w;//chars[((unsigned char)string[pos])-1]->Width;
