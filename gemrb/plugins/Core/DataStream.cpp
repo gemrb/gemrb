@@ -27,5 +27,6 @@ bool DataStream::CheckEncrypted()
 /** No descriptions */
 void DataStream::ReadDecrypted(void * buf, int size)
 {
-	
+	for(int i=0;i<size;i++)
+		((unsigned char *) buf)[i]^=GEM_ENCRYPTION_KEY[(Pos+i)&63];
 }
