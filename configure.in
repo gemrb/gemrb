@@ -5,12 +5,13 @@
 
 dnl Initialize autoconf and automake
 
+AC_PREREQ(2.57)
 AC_INIT
 AC_CONFIG_SRCDIR([gemrb/GemRB.cpp])
 AC_CONFIG_AUX_DIR([admin])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE([gemrb],[0.2.2.9])
-AC_CONFIG_HEADERS([config.h])
+AM_CONFIG_HEADER([config.h])
 
 for top_builddir in . .. ../.. $ac_auxdir $ac_auxdir/..; do
   test -f $top_builddir/configure && break
