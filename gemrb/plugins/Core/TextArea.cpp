@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.57 2004/07/21 22:16:37 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.58 2004/08/01 14:54:33 avenger_teambg Exp $
  *
  */
 
@@ -220,6 +220,9 @@ void TextArea::SetMinRow(bool enable)
 	}
 }
 
+static char inserted_crap[]="[/color][color=ffffff]";
+#define CRAPLENGTH sizeof(inserted_crap)-1
+
 /** Appends a String to the current Text */
 int TextArea::AppendText(const char* text, int pos)
 {
@@ -228,9 +231,20 @@ int TextArea::AppendText(const char* text, int pos)
 		return -1;
 	}
 	int newlen = ( int ) strlen( text );
+
 	if (pos == -1) {
-		char* str = ( char* ) malloc( newlen + 1 );
-		memcpy( str, text, newlen + 1 );
+		int notepos = strstr(text,"\r\n\r\nNOTE:")-text;
+		char *str;
+		if(notepos<0) {
+			str = ( char* ) malloc( newlen +1 );
+			memcpy(str,text, newlen+1);
+		}
+		else {
+			str = ( char* ) malloc( newlen + CRAPLENGTH+1 );
+			memcpy(str,text,notepos);
+			memcpy(str+notepos,inserted_crap,CRAPLENGTH);
+			memcpy(str+notepos+CRAPLENGTH, text+notepos, newlen-notepos+1);
+		}
 		lines.push_back( str );
 		lrows.push_back( 0 );
 		ret = lines.size() - 1;
