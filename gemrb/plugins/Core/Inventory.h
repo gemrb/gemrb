@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.27 2005/02/12 13:44:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.28 2005/03/09 20:06:52 avenger_teambg Exp $
  *
  */
 
@@ -128,8 +128,9 @@ public:
 	** first eligible slot, eventually splitting the item to
 	** more slots. Returns 2 if completely successful, 1 if partially, 0 else.*/
 	int AddSlotItem(CREItem* item, int slot);
+	/** Adds STOItem to the inventory, it never wielded, action might be STA_STEAL or STA_BUY */
 
-	int AddSlotItem(STOItem* item, unsigned int slot, CREItem** res_item, int count);
+	int AddSlotItem(STOItem* item, int action, int count);
 
 	/** flags: see ieCREItemFlagBits */
         /** count == ~0 means to destroy all */

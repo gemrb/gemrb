@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.286 2005/03/09 18:08:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.287 2005/03/09 20:06:57 avenger_teambg Exp $
  *
  */
 
@@ -3652,6 +3652,57 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong(ret);
 }
 
+PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
+"ChangeStoreItem(pc, idx, action) => int\n\n"
+"Performs an action of buying, selling, identifying or stealing.\n\n" );
+
+static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, Slot;
+	int action;
+
+	if (!PyArg_ParseTuple( args, "iii", &PartyID, &Slot, &action)) {
+		return AttributeError( GemRB_ChangeStoreItem__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+
+	Store *store = core->GetCurrentStore();
+	switch (action) {
+	case IE_STORE_BUY: case IE_STORE_STEAL:
+	{
+		STOItem* si = store->GetItem( Slot );
+		if (!si) {
+			return NULL;
+		}
+		actor->inventory.AddSlotItem(si, action, 1);
+		break;
+	}
+	case IE_STORE_ID:
+	{
+		CREItem* si = actor->inventory.GetSlotItem( Slot );
+		if (!si) {
+			return NULL;
+		}
+		si->Flags|=IE_INV_ITEM_IDENTIFIED;
+		break;
+	}
+	case IE_STORE_SELL:
+	{
+		CREItem* si = actor->inventory.GetSlotItem( Slot );
+		if (!si) {
+			return NULL;
+		}
+		break;
+	}
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_GetStoreItem__doc,
 "GetStoreItem(idx) => string\n\n"
 "Returns the store item referenced by the index. " );
@@ -3678,17 +3729,34 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (si->Usages[1]));
 	PyDict_SetItemString(dict, "Usages2", PyInt_FromLong (si->Usages[2]));
 	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (si->Flags));
+
+	int amount;
 	if (si->InfiniteSupply) {
 		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( -1 ) );
+		amount = 100;
 	} else {
-		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( si->AmountInStock ) );
+		amount = si->AmountInStock;
+		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( amount ) );
 	}
 
 	Item *item = core->GetItem( si->ItemResRef );
 
-	int identified = si->Flags & IE_INV_ITEM_IDENTIFIED;
+	int identified = !(si->Flags & IE_INV_ITEM_IDENTIFIED);
 	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( item->GetItemName( identified )) );
 	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( item->GetItemDesc( identified )) );
+
+	int price = item->Price * store->SellMarkup / 100;
+	//calculate depreciation too
+	//store->DepreciationRate,  mount
+
+	if (item->StackAmount>1) {
+		price *= si->Usages[0];
+	}
+	//is this correct?
+	if (price<1) {
+		price = 1;
+	}
+	PyDict_SetItemString(dict, "Price", PyInt_FromLong( price ) );
 
 	core->FreeItem( item, si->ItemResRef, false );
 	return dict;
@@ -4693,6 +4761,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(ExploreArea, METH_VARARGS),
 	METHOD(GetRumour, METH_VARARGS),
 	METHOD(IsValidStoreItem, METH_VARARGS),
+	METHOD(ChangeStoreItem, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.44 2005/02/26 21:08:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.45 2005/03/09 20:06:52 avenger_teambg Exp $
  *
  */
 
@@ -319,7 +319,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 	return res;
 }
 
-int Inventory::AddSlotItem(STOItem* item, unsigned int /*slot*/, CREItem** /*res_item*/, int count)
+int Inventory::AddSlotItem(STOItem* item, int action, int count)
 {
 	CREItem *temp;
 	int ret = -1;
@@ -336,6 +336,9 @@ int Inventory::AddSlotItem(STOItem* item, unsigned int /*slot*/, CREItem** /*res
 		//the first part of a STOItem is essentially a CREItem
 		temp = new CREItem();
 		memcpy( temp, item, sizeof( CREItem ) ); 
+		if (action==STA_STEAL) {
+			temp->Flags |= IE_INV_ITEM_STOLEN;
+		}
 
 		ret = AddSlotItem( temp, -1 );
 		if (ret != 2) {
