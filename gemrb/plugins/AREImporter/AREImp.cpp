@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.44 2004/03/19 22:37:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.45 2004/03/28 15:10:13 avenger_teambg Exp $
  *
  */
 
@@ -38,7 +38,7 @@
 #define DOOR_HIDDEN 128
 
 static char Sounds[DEF_COUNT][9] = {
-	-1
+	{-1},
 };
 
 AREImp::AREImp(void)
@@ -507,7 +507,7 @@ Map* AREImp::GetMap()
 	printf( "Loading entrances\n" );
 	//Loading Entrances
 	str->Seek( EntrancesOffset, GEM_STREAM_START );
-	for (int i = 0; i < EntrancesCount; i++) {
+	for (unsigned int i = 0; i < EntrancesCount; i++) {
 		char Name[33];
 		short XPos, YPos;
 		str->Read( Name, 32 );
