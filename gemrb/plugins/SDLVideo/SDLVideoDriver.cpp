@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.53 2003/12/23 17:50:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.54 2003/12/23 23:29:07 balrog994 Exp $
  *
  */
 
@@ -32,6 +32,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	moveX = 0;
 	moveY = 0;
 	DisableMouse = false;
+	DisableScroll = false;
 	xCorr = 0;
 	yCorr = 0;
 }
@@ -204,21 +205,27 @@ int SDLVideoDriver::SwapBuffers(void)
 						break;
 					CursorPos.x = event.motion.x-mouseAdjustX[CursorIndex];
 					CursorPos.y = event.motion.y-mouseAdjustY[CursorIndex];
-					if(event.motion.x <= 0)
-						moveX = -5;
-					else {
-						if(event.motion.x >= (core->Width-1))
-							moveX = 5;
-						else
-							moveX = 0;
+					if(DisableScroll) {
+						moveX = 0;
+						moveY = 0;
 					}
-					if(event.motion.y <= 0)
-						moveY = -5;
 					else {
-						if(event.motion.y >= (core->Height-1))
-							moveY = 5;
-						else
-							moveY = 0;
+						if(event.motion.x <= 0)
+							moveX = -5;
+						else {
+							if(event.motion.x >= (core->Width-1))
+								moveX = 5;
+							else
+								moveX = 0;
+						}
+						if(event.motion.y <= 0)
+							moveY = -5;
+						else {
+							if(event.motion.y >= (core->Height-1))
+								moveY = 5;
+							else
+								moveY = 0;
+						}
 					}
 					if(Evnt)
 						Evnt->MouseMove(event.motion.x, event.motion.y);
@@ -360,21 +367,27 @@ int SDLVideoDriver::SwapBuffers(void)
 					break;
 				CursorPos.x = event.motion.x-mouseAdjustX[CursorIndex];
 				CursorPos.y = event.motion.y-mouseAdjustY[CursorIndex];
-				if(event.motion.x <= 0)
-					moveX = -5;
-				else {
-					if(event.motion.x >= (core->Width-1))
-						moveX = 5;
-					else
-						moveX = 0;
+				if(DisableScroll) {
+					moveX = 0;
+					moveY = 0;
 				}
-				if(event.motion.y <= 0)
-					moveY = -5;
 				else {
-					if(event.motion.y >= (core->Height-1))
-						moveY = 5;
-					else
-						moveY = 0;
+					if(event.motion.x <= 0)
+						moveX = -5;
+					else {
+						if(event.motion.x >= (core->Width-1))
+							moveX = 5;
+						else
+							moveX = 0;
+					}
+					if(event.motion.y <= 0)
+						moveY = -5;
+					else {
+						if(event.motion.y >= (core->Height-1))
+							moveY = 5;
+						else
+							moveY = 0;
+					}
 				}
 				if(Evnt)
 					Evnt->MouseMove(event.motion.x, event.motion.y);
