@@ -26,8 +26,9 @@ void Console::Draw(unsigned short x, unsigned short y)
 	if(!Changed)
 		return;
 	Color black = {0x00, 0x00, 0x00, 0x00};
-	core->GetVideoDriver()->DrawRect(Region(x+XPos, y+YPos, Width, Height), black);
-	font->Print(Region(x+XPos, y+YPos, Width, Height), Buffer, NULL, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL, NULL, Cursor, CurPos);
+	Region r(x+XPos, y+YPos, Width, Height);
+	core->GetVideoDriver()->DrawRect(r, black);
+	font->Print(r, Buffer, NULL, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL, NULL, Cursor, CurPos);
 	Changed = false;
 }
 /** Set Font */
