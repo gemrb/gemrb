@@ -1,3 +1,8 @@
+2004-07-20  Edheldil  <edheldil@users.sourceforge.net>
+
+	* gemrb/plugins/Core/Control.cpp: applied patch from wjp, fixes #994601
+
+	
 GemRB v0.2.2.9 Added Features:
 - Bug Fixes:
   - Fixed Object Parsing in Dialog code
