@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.27 2003/12/23 19:46:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.28 2003/12/30 17:53:58 balrog994 Exp $
  *
  */
 
@@ -320,22 +320,26 @@ Map * AREImp::GetMap()
 		free(points);
 		poly->BBox = bbox;
 		InfoPoint * ip = tm->AddInfoPoint(Name, Type, poly);
-		ip->TrapDetectionDiff = TrapDetDiff;
-		ip->TrapRemovalDiff = TrapRemDiff;
+		ip->TrapDetectionDifficulty = TrapDetDiff;
+		ip->TrapRemovalDifficulty = TrapRemDiff;
 		ip->Trapped = Trapped;
 		ip->TrapDetected = TrapDetected;
-		ip->LaunchX = LaunchX;
-		ip->LaunchY = LaunchY;
+		ip->TrapLaunchX = LaunchX;
+		ip->TrapLaunchY = LaunchY;
 		ip->Cursor = Cursor;
-		ip->String = string;
+		ip->overHeadText = string;
 		ip->textDisplaying = 0;
-		ip->startDisplayTime = 0;
-		ip->triggered = false;
+		ip->timeStartDisplaying = 0;
+		ip->XPos = bbox.x+(bbox.w/2);
+		ip->YPos = bbox.y+(bbox.h/2);
+		//ip->triggered = false;
 		//strcpy(ip->Script, Script);
-		if(Script[0] != 0)
-			ip->Script = new GameScript(Script, IE_SCRIPT_TRIGGER);
+		if(Script[0] != 0) {
+			ip->Scripts[0] = new GameScript(Script, IE_SCRIPT_TRIGGER);
+			ip->Scripts[0]->MySelf = ip;
+		}
 		else
-			ip->Script = NULL;
+			ip->Scripts[0] = NULL;
 	}
 	//Loading Actors
 	str->Seek(ActorOffset, GEM_STREAM_START);
@@ -425,6 +429,7 @@ Map * AREImp::GetMap()
 		anim->x = animX;
 		anim->y = animY;
 		anim->BlitMode = mode;
+		strcpy(anim->ResRef, animBam);
 		map->AddAnimation(anim);		
 	}
 	map->AddTileMap(tm, lm, sr);
