@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.233 2005/02/23 18:59:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.234 2005/02/25 16:46:38 avenger_teambg Exp $
  *
  */
 
@@ -602,6 +602,7 @@ static ObjectLink objectnames[] = {
 	{"myself", GameScript::Myself},
 	{"nearest", GameScript::Nearest},
 	{"nearestenemyof", GameScript::NearestEnemyOf},
+	{"nearestpc", GameScript::NearestPC},
 	{"ninthnearest", GameScript::NinthNearest},
 	{"ninthnearestenemyof", GameScript::NinthNearestEnemyOf},
 	{"nothing", GameScript::Nothing},
@@ -1097,14 +1098,14 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, ieDword va
 	if(InDebug&1) {
 		printf( "Setting variable(\"%s\", %d)\n", VarName, value );
 	}
-	if (strnicmp( VarName, "LOCALS", 6 ) == 0) {
-		Sender->locals->SetAt( &VarName[6], value );
-		return;
-	}
 	strncpy( newVarName, VarName, 6 );
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		ReplaceMyArea( Sender, newVarName );
+	}
+	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
+		Sender->locals->SetAt( &VarName[6], value );
+		return;
 	}
 	if(!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
 		core->GetGame()->kaputz->SetAt( &VarName[6], value );
@@ -1129,17 +1130,17 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 	char newVarName[8];
 	ieDword value = 0;
 
-	if (strnicmp( VarName, "LOCALS", 6 ) == 0) {
+	strncpy( newVarName, VarName, 6 );
+	newVarName[6]=0;
+	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
+		ReplaceMyArea( Sender, newVarName );
+	}
+	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( &VarName[6], value );
 		if(InDebug&1) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
 		return value;
-	}
-	strncpy( newVarName, VarName, 6 );
-	newVarName[6]=0;
-	if (strnicmp( VarName, "MYAREA", 6 ) == 0) {
-		ReplaceMyArea( Sender, newVarName );
 	}
 	if(!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
 		core->GetGame()->kaputz->Lookup( &VarName[6], value );
@@ -1151,7 +1152,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 			map->vars->Lookup( &VarName[6], value);
 		}
 		else {
-			printf("invalid area %s in checkvariable\n",VarName);
+			printf("invalid area %s in checkvariable\n",newVarName);
 		}
 	}
 	else {
@@ -1168,17 +1169,17 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 	char newVarName[8];
 	ieDword value = 0;
 
-	if (strnicmp( Context, "LOCALS", 6 ) == 0) {
+	strncpy(newVarName, Context, 6);
+	newVarName[6]=0;
+	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
+		ReplaceMyArea( Sender, newVarName );
+	}
+	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( VarName, value );
 		if(InDebug&1) {
 			printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 		}
 		return value;
-	}
-	strncpy(newVarName, Context, 6);
-	newVarName[6]=0;
-	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
-		ReplaceMyArea( Sender, newVarName );
 	}
 	if(!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
 		core->GetGame()->kaputz->Lookup( VarName, value );
@@ -2760,6 +2761,34 @@ Targets *GameScript::NinthNearestEnemyOf(Scriptable* /*Sender*/, Targets *parame
 Targets *GameScript::TenthNearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
 	return XthNearestEnemyOf(parameters, 9);
+}
+
+Targets *GameScript::NearestPC(Scriptable* /*Sender*/, Targets *parameters)
+{
+	Actor *origin = parameters->GetTarget(0);
+	parameters->Clear();
+	if(!origin) {
+		return parameters;
+	}
+	int i = core->GetGame()->GetCurrentMap()->GetActorCount();
+	Targets *tgts = new Targets();
+	Actor *ac;
+	while(i--) {
+		ac=core->GetGame()->GetCurrentMap()->GetActor(i);
+		if(ac->InParty) {
+			tgts->AddTarget(ac);
+		}
+	}
+	if(tgts->Count()<=0) {
+		delete tgts;
+		return parameters;
+	}
+//	unsigned int distance=0;
+	//order by distance
+	ac=tgts->GetTarget(0);
+	parameters->AddTarget(ac);
+	delete tgts;
+	return parameters;
 }
 
 Targets *GameScript::Nearest(Scriptable* /*Sender*/, Targets *parameters)

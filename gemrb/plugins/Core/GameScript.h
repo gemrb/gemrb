@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.159 2005/02/20 20:50:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.160 2005/02/25 16:46:39 avenger_teambg Exp $
  *
  */
 
@@ -1199,6 +1199,7 @@ public:
 	static Targets *Myself(Scriptable *Sender, Targets *parameters);
 	static Targets *Nearest(Scriptable *Sender, Targets *parameters);
 	static Targets *NearestEnemyOf(Scriptable *Sender, Targets *parameters);
+	static Targets *NearestPC(Scriptable *Sender, Targets *parameters);
 	static Targets *NinthNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *NinthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *Nothing(Scriptable *Sender, Targets *parameters);
