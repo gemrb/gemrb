@@ -4,6 +4,7 @@
 #include <windows.h>
 #else
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <dirent.h>
 #include <fnmatch.h>
 #include <dlfcn.h>
@@ -35,14 +36,14 @@ int SaveGameIterator::GetSaveGameCount()
 		return -1;
 #else
 	sprintf(Path, "%smpsave", core->GamePath);
-	DIR * dir = opendir(path);
+	DIR * dir = opendir(Path);
 	if(dir == NULL) //If we cannot open the Directory
 		return -1;
 #endif
 #ifndef WIN32  //Linux Statement
 	struct dirent * de = readdir(dir);  //Lookup the first entry in the Directory
 	if(de == NULL) //If no entry exists just return
-		return;
+		return -1;
 #endif
 	do { //Iterate through all the available modules to load
 #ifdef WIN32
@@ -54,7 +55,7 @@ int SaveGameIterator::GetSaveGameCount()
 #else
 		char dtmp[_MAX_PATH];
 		struct stat fst;
-		sprintf(dtmp, "%s%s%s", path, SPathDelimiter, de->d_name);
+		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
 		stat(dtmp, &fst);
 		if(S_ISDIR(fst.st_mode)) {
 			if(de->d_name[0] == '.')
@@ -96,14 +97,14 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 		return NULL;
 #else
 	sprintf(Path, "%smpsave", core->GamePath);
-	DIR * dir = opendir(path);
+	DIR * dir = opendir(Path);
 	if(dir == NULL) //If we cannot open the Directory
 		return NULL;
 #endif
 #ifndef WIN32  //Linux Statement
 	struct dirent * de = readdir(dir);  //Lookup the first entry in the Directory
 	if(de == NULL) //If no entry exists just return
-		return;
+		return NULL;
 #endif
 	char Name[_MAX_PATH], Text[_MAX_PATH];
 	do { //Iterate through all the available modules to load
@@ -115,7 +116,7 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 #else
 		char dtmp[_MAX_PATH];
 		struct stat fst;
-		sprintf(dtmp, "%s%s%s", path, SPathDelimiter, de->d_name);
+		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
 		stat(dtmp, &fst);
 		if(S_ISDIR(fst.st_mode)) {
 			if(de->d_name[0] == '.')
