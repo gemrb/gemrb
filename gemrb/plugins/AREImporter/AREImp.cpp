@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.97 2005/02/27 19:13:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.98 2005/02/27 21:09:48 guidoj Exp $
  *
  */
 
@@ -785,8 +785,8 @@ Map* AREImp::GetMap(const char *ResRef)
 	}
 	else {
 		if( ExploredBitmapSize ) {
-			printMessage("AREImp","",LIGHT_RED);
-			printf("ExploredBitmapSize in game: %d != %d. Clearing it\n",ExploredBitmapSize, i);
+			printMessage("AREImp", " ", LIGHT_RED);
+			printf("ExploredBitmapSize in game: %d != %d. Clearing it\n", ExploredBitmapSize, i);
 		}
 		ExploredBitmapSize = i;
 		map->ExploredBitmap = (ieByte *) calloc(i, 1);
