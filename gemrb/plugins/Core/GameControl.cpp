@@ -338,6 +338,33 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			}
 		break;
 
+		case 'm': // 'm'
+			if(lastActor)
+			{
+				lastActor->DebugDump();
+				return;
+			}
+			if(overDoor)
+			{
+				overDoor->DebugDump();
+				return;
+			}
+			if(overContainer)
+			{
+				overContainer->DebugDump();
+				return;
+			}
+			if(overInfoPoint)
+			{
+				overInfoPoint->DebugDump();
+				return;
+			}
+			{
+				Game * game = core->GetGame();
+				Map * area = game->GetMap(MapIndex);
+				area->DebugDump();
+			}
+		break;
 		case 'x': // 'x'
 			{
 				Game * game = core->GetGame();
@@ -347,6 +374,13 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				core->GetVideoDriver()->ConvertToGame(cX, cY);
 				printf("%s [%d.%d]\n",area->scriptName, cX, cY);
 			}
+		break;
+		case 'y':
+				if(lastActor)
+				{
+					lastActor->ClearActions();
+					lastActor->DeleteMe = true;
+				}
 		break;
 		case '4': // '4'  //show all traps
 				DebugFlags^=1;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.15 2004/01/11 18:57:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.16 2004/01/18 17:23:44 avenger_teambg Exp $
  *
  */
 
@@ -66,6 +66,8 @@ private:
 public:
 	Actor(void);
 	~Actor(void);
+	/** prints useful information on console */
+	void DebugDump();
 	void SetAnimationID(unsigned short AnimID);
 	/** returns the animations */
 	CharAnimations *GetAnims();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.67 2004/01/17 21:32:39 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.68 2004/01/18 17:23:44 avenger_teambg Exp $
  *
  */
 
@@ -574,6 +574,11 @@ void Map::RemoveActor(Actor * actor)
 			actors.erase(m);
 		}
 	}
+}
+
+void Map::DebugDump()
+{
+	printf("DebugDump of Area %s:\n",scriptName);
 }
 
 /********************************************************************************/

@@ -527,6 +527,10 @@ void Door::SetCursor(unsigned char CursorIndex)
 {
 	Cursor = CursorIndex;
 }
+void Door::DebugDump()
+{
+	printf("Debugdump of Door %s:\n",Name);
+}
 
 /*******************
  * InfoPoint Class *
@@ -553,6 +557,27 @@ InfoPoint::~InfoPoint(void)
 	
 }
 
+void InfoPoint::DebugDump()
+{
+	switch(Type) {
+	case ST_TRIGGER:
+		printf("Debugdump of InfoPoint Region %s:\n", Name);
+	break;
+	case ST_PROXIMITY:
+		printf("Debugdump of Trap Region %s:\n", Name);
+	break;
+	case ST_TRAVEL:
+		printf("Debugdump of Travel Region %s:\n", Name);
+	break;
+	default:
+		printf("Debugdump of Unsupported Region %s:\n", Name);
+	break;
+	}
+	printf("TrapDetected: %d  Trapped: %d\n",TrapDetected, Trapped);
+	printf("Trap detection: %d  Trap removal: %d\n",TrapDetectionDifficulty, TrapRemovalDifficulty);
+	printf("Key: %s  Dialog: %s\n",KeyResRef, DialogResRef);
+}
+
 /*******************
  * Container Class *
  *******************/
@@ -573,3 +598,12 @@ Container::~Container()
 {
 	
 }
+
+void Container::DebugDump()
+{
+	printf("Debugdump of Container %s\n", Name);
+	printf("Type: %d   LockDifficulty: %d\n",Type, LockDifficulty);
+	printf("Locked: %d  Trapped: %d\n",Locked, Trapped);
+	printf("Trap detection: %d  Trap removal: %d\n",TrapDetectionDiff, TrapRemovalDiff);
+}
+

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.27 2004/01/05 23:44:18 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.28 2004/01/18 17:23:44 avenger_teambg Exp $
  *
  */
 
@@ -96,6 +96,8 @@ private:
 public:
 	Map(void);
 	~Map(void);
+	/** prints useful information on console */
+	void DebugDump();
 	void AddTileMap(TileMap * tm, ImageMgr * lm, ImageMgr * sr);
 	void DrawMap(Region viewport, GameControl * gc);
 	void PlayAreaSong(int);

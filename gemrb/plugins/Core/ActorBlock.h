@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.16 2004/01/16 22:52:19 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.17 2004/01/18 17:23:44 avenger_teambg Exp $
  *
  */
 
@@ -203,12 +203,14 @@ public:
 	void ToggleDoorState();
 	void SetPolygon(bool Open, Gem_Polygon * poly);
 	void SetCursor(unsigned char CursorIndex);
+	void DebugDump();
 };
 
 class GEM_EXPORT Container : public Highlightable {
 public:
 	Container(void);
 	~Container(void);
+	void DebugDump();
 public:
 	char Name[33];
 	Point toOpen;
@@ -226,6 +228,7 @@ class GEM_EXPORT InfoPoint : public Highlightable {
 public:
 	InfoPoint(void);
 	~InfoPoint(void);
+	void DebugDump();
 public:
 	char Name[33];
 	char Destination[9];
