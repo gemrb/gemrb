@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.45 2004/08/30 21:36:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.46 2004/08/31 18:57:19 avenger_teambg Exp $
  *
  */
 
@@ -371,7 +371,7 @@ void CREImp::GetActorPST(Actor *act)
 void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 {
 	CREItem** items;
-	unsigned int i;
+	unsigned int i,j,k;
 
 	str->Seek( act->ItemsOffset, GEM_STREAM_START );
 	items = (CREItem **) calloc (act->ItemsCount, sizeof(CREItem *) );
@@ -419,7 +419,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	// Reading spellbook
 
 	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(act->KnownSpellsCount, sizeof(CREKnownSpell *) );
-	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(act->KnownSpellsCount, sizeof(CREKnownSpell *) );
+	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(act->MemorizedSpellsCount, sizeof(CREKnownSpell *) );
 
 	str->Seek( act->KnownSpellsOffset, GEM_STREAM_START );
 	for (i = 0; i < act->KnownSpellsCount; i++) {
@@ -435,10 +435,11 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	for (i = 0; i < act->SpellMemorizationCount; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization();
 
-		unsigned int j=act->KnownSpellsCount;
+		j=act->KnownSpellsCount;
 		while(j--) {
 			CREKnownSpell* spl = known_spells[j];
 			if (!spl) {
+				printf("[CREImp]: Duplicate known spell (%d) in creature!\n", j);
 				continue;
 			}
 			if (spl->Type == sm->Type && spl->Level == sm->Level) {
@@ -447,8 +448,13 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			}
 		}
 		for (j = 0; j < sm->MemorizedCount; j++) {
-			sm->memorized_spells.push_back( memorized_spells[sm->MemorizedIndex + j] );
-			memorized_spells[sm->MemorizedIndex + j] = NULL;
+			k = sm->MemorizedIndex+j;
+			if (memorized_spells[k]) {
+				sm->memorized_spells.push_back( memorized_spells[k]);
+				memorized_spells[k] = NULL;
+				continue;
+			}
+			printf("[CREImp]: Duplicate memorized spell (%d) in creature!\n", k);
 		}
 		act->spellbook.AddSpellMemorization( sm );
 	}
