@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.39 2003/11/29 17:11:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.40 2003/11/29 17:59:49 avenger_teambg Exp $
  *
  */
 
@@ -274,7 +274,7 @@ int Button::SetText(const char * string, int pos)
 	else {
 		strncpy(Text, string, 63);
 		hasText = true;
-		if(stricmp(core->GameType, "bg2") == 0)
+		if(core->HasFeature(GF_UPPER_BUTTON_TEXT) )
 			Text = strupr(Text);
 	}
 	Changed = true;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.46 2003/11/28 21:54:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.47 2003/11/29 17:59:49 avenger_teambg Exp $
  *
  */
 
@@ -107,6 +107,7 @@ private:
 	DataFileMgr * INIparty;
 	Game * game;
 	int GameFeatures;
+	char ButtonFont[9];
 public:
 	Animation * Cursors[48];
 public:
@@ -129,6 +130,8 @@ public:
 	Color * GetPalette(int index, int colors);
 	/** Returns a preloaded Font */
 	Font * GetFont(char * ResRef);
+	/** Returns the button font */
+	Font * GetButtonFont();
 	/** Returns the Event Manager */
 	EventMgr * GetEventMgr();
 	/** Returns the Window Manager */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.15 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.16 2003/11/29 17:59:49 avenger_teambg Exp $
  *
  */
 
@@ -75,7 +75,7 @@ int Label::SetText(const char * string, int pos)
 	if(Buffer != NULL) {
 		strcpy(Buffer, string);
 		if(Alignment == IE_FONT_ALIGN_CENTER)
-			if(stricmp(core->GameType, "bg2") == 0)
+			if(core->HasFeature(GF_LOWER_LABEL_TEXT) )
 				strlwr(Buffer);
 	}
 	Changed = true;
@@ -96,7 +96,7 @@ void Label::SetAlignment(unsigned char Alignment)
 		return;
 	this->Alignment = Alignment;
 	if(Alignment == IE_FONT_ALIGN_CENTER)
-		if(stricmp(core->GameType, "bg2") == 0)
+		if(core->HasFeature(GF_LOWER_LABEL_TEXT) )
 			strlwr(Buffer);
 	Changed = true;
 }

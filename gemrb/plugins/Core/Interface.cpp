@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.78 2003/11/29 17:11:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.79 2003/11/29 17:59:49 avenger_teambg Exp $
  *
  */
 
@@ -298,7 +298,7 @@ int Interface::Init()
 	console->YPos = core->Height-25;
 	console->Width = core->Width;
 	console->Height = 25;
-	console->SetFont(fonts[2]);
+	console->SetFont(fonts[0]);
 	AnimationFactory *af=(AnimationFactory*) GetResourceMgr()->GetFactoryResource("CURSOR",IE_BAM_CLASS_ID);
 	if(af)
 		console->SetCursor(af->GetFrame(0));
@@ -592,6 +592,12 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "HasSonglist") == 0) {
 			SetFeature(atoi(value),GF_HAS_SONGLIST);
+		}
+		else if(stricmp(name, "UpperButtonText") == 0) {
+			SetFeature(atoi(value),GF_UPPER_BUTTON_TEXT);
+		}
+		else if(stricmp(name, "LowerLabelText") == 0) {
+			SetFeature(atoi(value),GF_LOWER_LABEL_TEXT);
 		}
 		else if(stricmp(name, "ForceStereo") == 0) {
 			ForceStereo = atoi(value);
