@@ -44,6 +44,7 @@ Button::Button(bool Clear){
 	hasText = false;
 	font = core->GetFont("STONEBIG");
 	Flags = 0x04;
+	ToggleState = false;
 }
 Button::~Button(){
 	Video * video = core->GetVideoDriver();
@@ -178,7 +179,18 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 	if(State == IE_GUI_BUTTON_DISABLED)
 		return;
 	Changed = true;
-	State = IE_GUI_BUTTON_UNPRESSED;
+	if(Flags & 0x10) {
+		ToggleState = !ToggleState;
+		if(ToggleState)
+			State = IE_GUI_BUTTON_UNPRESSED;
+		else
+			State = IE_GUI_BUTTON_SELECTED;
+	}
+	else
+		State = IE_GUI_BUTTON_UNPRESSED;
+	if(VarName[0] != 0) {
+		core->GetDictionary()->SetAt(VarName, ToggleState);
+	}
 	if((x >= 0) && (x <= Width))
 		if((y >= 0) && (y <= Height)) {
 			if(Flags & 0x04) {
@@ -217,7 +229,7 @@ void Button::SetEvent(char * funcName)
 }
 
 /** Sets the Display Flags */
-int Button::SetFlags(bool hideImg, bool hasPicture, bool playSound)
+int Button::SetFlags(bool hideImg, bool hasPicture, bool playSound, bool isExit, bool isToggle)
 {
 	Flags = 0;
 	if(hideImg)
@@ -226,6 +238,10 @@ int Button::SetFlags(bool hideImg, bool hasPicture, bool playSound)
 		Flags += 0x02;
 	if(playSound)
 		Flags += 0x04;
+	if(isExit)
+		Flags += 0x08;
+	if(isToggle)
+		Flags += 0x10;
 	Changed = true;
 	((Window*)Owner)->Invalidate();
 	return 0;
