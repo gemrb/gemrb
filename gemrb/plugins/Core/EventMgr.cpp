@@ -38,7 +38,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				Control * ctrl = lastW->GetControl(x,y);
 				if(ctrl != NULL) {
 					if(ctrl->hasFocus)
-						ctrl->OnMouseOver(x,y);
+						ctrl->OnMouseOver(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos);
 				}
 				return;
 			}	
@@ -52,7 +52,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				Control * ctrl = (*m)->GetControl(x,y);
 				if(ctrl != NULL) {
 					if(ctrl->hasFocus)
-						ctrl->OnMouseOver(x,y);
+						ctrl->OnMouseOver(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos);
 				}
 				lastW = *m;
 				return;
@@ -71,7 +71,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 				Control * ctrl = lastW->GetControl(x,y);
 				if(ctrl != NULL) {
 					lastW->SetFocused(ctrl);
-					ctrl->OnMouseDown(x,y, Button, Mod);
+					ctrl->OnMouseDown(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos, Button, Mod);
 					lastF = ctrl;
 				}
 				return;
@@ -86,7 +86,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 				Control * ctrl = (*m)->GetControl(x,y);
 				if(ctrl != NULL) {
 					(*m)->SetFocused(ctrl);
-					ctrl->OnMouseDown(x,y, Button, Mod);
+					ctrl->OnMouseDown(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos, Button, Mod);
 					lastF = ctrl;
 				}
 				lastW = *m;
@@ -101,33 +101,41 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 /** BroadCast Mouse Move Event */
 void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	if(lastW != NULL) {
+	/*if(lastW != NULL) {
 		if((lastW->XPos <= x) && (lastW->YPos <= y)) { //Maybe we are on the window, let's check
 			if((lastW->XPos+lastW->Width >= x) && (lastW->YPos+lastW->Height >= y)) { //Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
 				Control * ctrl = lastW->GetControl(x,y);
 				if(ctrl != NULL) {
 					if(ctrl->hasFocus)
-						ctrl->OnMouseUp(x,y, Button, Mod);
+						ctrl->OnMouseUp(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos, Button, Mod);
 				}
 				return;
 			}	
 		}
-	}
+	}*/
 	std::vector<Window*>::iterator m;
 	for(m = windows.begin(); m != windows.end(); m++) {
-		if(((*m)->XPos <= x) && ((*m)->YPos <= y)) { //Maybe we are on the window, let's check
-			if(((*m)->XPos+(*m)->Width >= x) && ((*m)->YPos+(*m)->Height >= y)) { //Yes, we are on the Window
+		//if(((*m)->XPos <= x) && ((*m)->YPos <= y)) { //Maybe we are on the window, let's check
+		//	if(((*m)->XPos+(*m)->Width >= x) && ((*m)->YPos+(*m)->Height >= y)) { //Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
-				Control * ctrl = (*m)->GetControl(x,y);
-				if(ctrl != NULL) {
-					if(ctrl->hasFocus)
-						ctrl->OnMouseUp(x,y, Button, Mod);
-				}
-				lastW = *m;
-				return;
-			}	
-		}
+		//		Control * ctrl = (*m)->GetControl(x,y);
+		//		if(ctrl != NULL) {
+		//			if(ctrl->hasFocus)
+		Window * w = (*m);
+		Control *ctrl = NULL;
+		int i = 0;
+		do {
+			ctrl = w->GetControl(i++);
+			if(ctrl == NULL)
+				break;
+			ctrl->OnMouseUp(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos, Button, Mod);
+		} while(true);
+				//}
+				//lastW = *m;
+				//return;
+			//}	
+		//}
 	}
 }
 
