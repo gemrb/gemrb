@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.123 2004/11/16 20:55:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.124 2004/11/18 19:17:51 avenger_teambg Exp $
  *
  */
 
@@ -71,16 +71,16 @@ void InitSpawnGroups()
 	while (i--) {
 		int j=tab->GetRowCount();
 		while (j--) {
-			char *crename = tab->QueryField( i,j );
+			char *crename = tab->QueryField( j,i );
 			if (crename[0] != '*') break;
 		}
 		if (j>0) {
 			ieResRef *creatures = (ieResRef *) malloc( sizeof(ieResRef)*(j+1) );
 			//count of creatures
-			*(int *) creatures = j;
+			*(ieDword *) creatures = (ieDword) j;
 			//difficulty
-			*(((int *) creatures)+1) = atoi( tab->QueryField(i,0) );			for(;j;j--) {
-				strncpy( creatures[j], tab->QueryField(i,j), sizeof( ieResRef ) );
+			*(((ieDword *) creatures)+1) = (ieDword) atoi( tab->QueryField(i,0) );			for(;j;j--) {
+				strncpy( creatures[j], tab->QueryField(j,i), sizeof( ieResRef ) );
 			}
 			strncpy( GroupName, tab->GetColumnName( i ), sizeof( ieResRef ) );
 			strupr( GroupName );
@@ -1234,8 +1234,8 @@ void Map::SpawnCreature(Point pos, char *CreName, int radius)
 		return;
 	}
 	//adjust this with difflev too
-	//int difficulty = *(int *) Spawngroup;
-	int count = *(((int *) Spawngroup)+1);
+	int count = *(ieDword *) Spawngroup;
+	//int difficulty = *(((ieDword *) Spawngroup)+1);
 	while( count-- ) {
 		DataStream *stream = core->GetResourceMgr()->GetResource( ((ieResRef *) Spawngroup)[count+1], IE_CRE_CLASS_ID );
 		creature = core->GetCreature(stream); 
