@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.7 2004/01/02 12:34:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.8 2004/01/04 00:23:16 balrog994 Exp $
  *
  */
 
@@ -134,7 +134,6 @@ Game * GAMImp::GetGame()
 		globals->SetType(GEM_VARIABLES_INT);
 	}
 	Game * newGame = new Game();
-	MapMgr * mM = (MapMgr*)core->GetInterface(IE_ARE_CLASS_ID);
 	if(!CurrentArea[0]) {
 	        // 0 - single player, 1 - tutorial, 2 - multiplayer
 	        unsigned long playmode=0;
@@ -146,10 +145,8 @@ Game * GAMImp::GetGame()
 		strncpy(CurrentArea, resref, 8);
 		CurrentArea[8] = 0;
 	}
-	DataStream * ds = core->GetResourceMgr()->GetResource(CurrentArea, IE_ARE_CLASS_ID);
-	mM->Open(ds, true);
-	Map * newMap = mM->GetMap();
-	core->FreeInterface(mM);
+	int mi = newGame->LoadMap(CurrentArea);
+	Map * newMap = newGame->GetMap(mi);
 	//Loading PCs
 	ActorMgr * aM = (ActorMgr*)core->GetInterface(IE_CRE_CLASS_ID);
 	for(unsigned int i = 0; i < PCCount; i++) {
@@ -219,6 +216,6 @@ Game * GAMImp::GetGame()
 		str->Seek(40, GEM_CURRENT_POS);
 		globals->SetAt(Name, Value);
 	}
-	newGame->AddMap(newMap);
+	//newGame->AddMap(newMap);
 	return newGame;
 }
