@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Ambient.h,v 1.1 2004/08/08 05:11:32 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Ambient.h,v 1.2 2004/08/09 13:02:08 divide Exp $
  *
  */
  
@@ -49,10 +49,18 @@ class GEM_EXPORT Ambient {
 public:
 	Ambient(const std::string &name, Point origin, unsigned int radius, int height, int gain, const std::vector<std::string> &sounds, unsigned int interval, unsigned int perset, const std::bitset<24> &appearance, unsigned long flags);
 	~Ambient();
+	std::string getName() const { return name; }
+	const Point &getOrigin() const { return origin; }
+	unsigned int getRadius() const { return radius; }
+	int getHeight() const { return height; }
+	unsigned int getGain() const { return gain; }
+	const std::vector<std::string> &getSounds() const { return sounds; }
+	unsigned int getInterval() const { return interval; }
+	unsigned int getPerset() const { return perset; }
+	const std::bitset<24> &getAppearance() const { return appearance; }
 	unsigned long getFlags() const { return flags; }
 	void setActive() { flags |= IE_AMBI_ENABLED; }
 	void setInactive() { flags &= !IE_AMBI_ENABLED; }
-	std::string getName() const { return name; }
     
 private:
 	std::string name;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.12 2004/08/08 05:11:33 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.13 2004/08/09 13:02:08 divide Exp $
  *
  */
 
@@ -58,17 +58,17 @@ public:
 	class AmbientMgr {
 	public:
 		AmbientMgr() {}
-		virtual ~AmbientMgr() {}
+		virtual ~AmbientMgr() { reset(); }
 		virtual void reset() { ambients = std::vector<Ambient *> (); }
 		virtual void setAmbients(const std::vector<Ambient *> &a) { reset(); ambients = a; }
 		virtual void activate(const std::string &name);
 		virtual void deactivate(const std::string &name);
 		virtual bool isActive(const std::string &name) const;
-	private:
+	protected:
 		std::vector<Ambient *> ambients;
 	};
 	virtual AmbientMgr *GetAmbientMgr() { return ambim; }
-private:
+protected:
 	AmbientMgr *ambim;
 };
 

@@ -15,20 +15,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.cpp,v 1.3 2004/08/08 05:11:33 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.cpp,v 1.4 2004/08/09 13:02:08 divide Exp $
  *
  */
 
 #include "SoundMgr.h"
 #include "Ambient.h"
 
-SoundMgr::SoundMgr(void) : ambim(new SoundMgr::AmbientMgr)
+SoundMgr::SoundMgr(void)
 {
 }
 
 SoundMgr::~SoundMgr(void)
 {
-	delete(ambim);
 }
 
 void SoundMgr::AmbientMgr::activate(const std::string &name)
