@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.225 2004/10/17 07:06:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.226 2004/10/17 10:14:28 avenger_teambg Exp $
  *
  */
 
@@ -3391,14 +3391,14 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetMemorizableSpellsCount__doc,
-"GetMemorizableSpellsCount(PartyID, SpellType, Level)=>int\n\n"
+"GetMemorizableSpellsCount(PartyID, SpellType, Level [,Bonus])=>int\n\n"
 "Returns number of memorizable spells of given type and level in PartyID's spellbook" );
 
 static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
 {
-	int PartyID, SpellType, Level;
+	int PartyID, SpellType, Level, Bonus=1;
 
-	if (!PyArg_ParseTuple( args, "iii", &PartyID, &SpellType, &Level )) {
+	if (!PyArg_ParseTuple( args, "iii|i", &PartyID, &SpellType, &Level, &Bonus )) {
 		return AttributeError( GemRB_GetMemorizableSpellsCount__doc );
 	}
 	Game *game = core->GetGame();
@@ -3408,7 +3408,31 @@ static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 	}
 
 	//this isn't in the actor's spellbook, handles Wisdom
-	return Py_BuildValue( "i", actor->GetMemorizableSpellsCount( (ieSpellType) SpellType, Level ) );
+	return Py_BuildValue( "i", actor->spellbook.GetMemorizableSpellsCount( (ieSpellType) SpellType, Level, Bonus ) );
+}
+
+PyDoc_STRVAR( GemRB_SetMemorizableSpellsCount__doc,
+"SetMemorizableSpellsCount(PartyID, Value, SpellType, Level, [Bonus])=>int\n\n"
+"Returns number of memorizable spells of given type and level in PartyID's spellbook" );
+
+static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
+{
+	int PartyID, Value, SpellType, Level, Bonus=1;
+
+	if (!PyArg_ParseTuple( args, "iiii|i", &PartyID, &Value, &SpellType, &Level, &Bonus )) {
+		return AttributeError( GemRB_SetMemorizableSpellsCount__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	//this isn't in the actor's spellbook, handles Wisdom
+	actor->spellbook.SetMemorizableSpellsCount( Value, (ieSpellType) SpellType, Level, Bonus );
+
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_GetKnownSpellsCount__doc,
@@ -3953,6 +3977,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetCurrentArea, METH_NOARGS),
 	METHOD(MoveToArea, METH_VARARGS),
 	METHOD(GetMemorizableSpellsCount, METH_VARARGS),
+	METHOD(SetMemorizableSpellsCount, METH_VARARGS),
 	METHOD(GetKnownSpellsCount, METH_VARARGS),
 	METHOD(GetKnownSpell, METH_VARARGS),
 	METHOD(GetMemorizedSpellsCount, METH_VARARGS),

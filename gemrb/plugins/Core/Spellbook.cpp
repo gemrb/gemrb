@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.16 2004/10/17 09:30:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.17 2004/10/17 10:14:29 avenger_teambg Exp $
  *
  */
 
@@ -135,6 +135,33 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 	}
 	s->push_back( sm );
 	return true;
+}
+
+void Spellbook::SetMemorizableSpellsCount(int Value, ieSpellType type, unsigned int level, bool bonus)
+{
+	int diff;
+
+	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
+		return;
+	CRESpellMemorization* sm = spells[type][level];
+	if(bonus) {
+		sm->Number2=Value;
+	}
+	else {
+		diff=sm->Number2-sm->Number;
+		sm->Number=Value;
+		sm->Number2=Value+diff;
+	}
+}
+
+int Spellbook::GetMemorizableSpellsCount(ieSpellType type, unsigned int level, bool bonus)
+{
+	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
+		return 0;
+	CRESpellMemorization* sm = spells[type][level];
+	if(bonus)
+		return sm->Number2;
+	return sm->Number;
 }
 
 bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.73 2004/10/17 07:06:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.74 2004/10/17 10:14:29 avenger_teambg Exp $
  *
  */
 
@@ -532,6 +532,8 @@ void Actor::GetNextStance()
 	StanceID = Stance;
 }
 
+//this should be set in a guiscript, and stored in the spellbook structure
+#if 0
 //we have to determine if the actor is able to cast priest or mage
 //spells (IWD2 has a different system)
 //-1 means the actor can't memorize that type of spells
@@ -595,7 +597,6 @@ int Actor::GetMemorizableSpellsCount(ieSpellType Type, int Level)
 	return count;
 }
 
-#if 0
 //IWD2 has a more complex system, including bardsongs, druid shapes, etc
 int Actor::GetMemorizableSpellsCountIWD2(ieSpellType Type, int Level)
 {
