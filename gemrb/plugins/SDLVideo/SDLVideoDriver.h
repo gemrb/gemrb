@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.37 2004/09/09 16:42:12 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.38 2004/09/18 15:24:18 avenger_teambg Exp $
  *
  */
 
@@ -123,7 +123,7 @@ private:
 	inline void GetPixel(short x, short y, Color* color);
 
 public:
-	bool IsSpritePixelTransparent (Sprite2D* sprite, short x, short y);
+	bool IsSpritePixelTransparent (Sprite2D* sprite, unsigned short x, unsigned short y);
 	void release(void)
 	{
 		delete this;

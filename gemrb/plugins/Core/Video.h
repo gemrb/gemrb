@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.33 2004/09/09 16:42:15 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.34 2004/09/18 15:24:17 avenger_teambg Exp $
  *
  */
 
@@ -118,7 +118,7 @@ public:
 	short xCorr, yCorr;
 public:
 	virtual void* GetVideoSurface() = 0;
-	virtual bool IsSpritePixelTransparent(Sprite2D* sprite, short x, short y) = 0;
+	virtual bool IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x, unsigned short y) = 0;
 };
 
 #endif
