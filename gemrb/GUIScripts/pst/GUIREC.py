@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.28 2005/01/06 22:09:14 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.29 2005/01/06 22:23:43 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -703,6 +703,13 @@ def OpenInformationWindow ():
 	GemRB.SetVar ("FloatWindow", InformationWindow)
 
 
+	TotalPartyExp = 0
+	TotalPartyKills = 0
+	for i in range (1, GemRB.GetPartySize() + 1):
+		stat = GemRB.GetPCStats(i)
+		TotalPartyExp = TotalPartyExp + stat['KillsChapterXP']
+		TotalPartyKills = TotalPartyKills + stat['KillsChapterCount']
+
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -743,10 +750,18 @@ def OpenInformationWindow ():
 	GemRB.SetText (Window, Label, stat['FavouriteWeapon'])
 
 	Label = GemRB.GetControl (Window, 0x10000006)
-	GemRB.SetText (Window, Label, str (stat['KillsChapterXP']))
+	if TotalPartyExp != 0:
+		PartyExp = int ((stat['KillsChapterXP'] * 100) / TotalPartyExp)
+		GemRB.SetText (Window, Label, str (PartyExp) + '%')
+	else:
+		GemRB.SetText (Window, Label, "0%")
 
 	Label = GemRB.GetControl (Window, 0x10000007)
-	GemRB.SetText (Window, Label, str (stat['KillsChapterCount']))
+	if TotalPartyKills != 0:
+		PartyKills = int ((stat['KillsChapterCount'] * 100) / TotalPartyKills)
+		GemRB.SetText (Window, Label, str (PartyKills) + '%')
+	else:
+		GemRB.SetText (Window, Label, '0%')
 
 	Label = GemRB.GetControl (Window, 0x10000008)
 	GemRB.SetText (Window, Label, str (stat['KillsTotalXP']))
