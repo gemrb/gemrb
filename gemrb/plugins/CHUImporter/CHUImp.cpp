@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.27 2004/05/25 16:16:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.28 2004/08/03 22:27:29 guidoj Exp $
  *
  */
 
@@ -36,12 +36,14 @@ CHUImp::CHUImp()
 	str = NULL;
 	autoFree = false;
 }
+
 CHUImp::~CHUImp()
 {
 	if (autoFree && str) {
 		delete( str );
 	}
 }
+
 /** This function loads all available windows from the 'stream' parameter. */
 bool CHUImp::Open(DataStream* stream, bool autoFree)
 {
@@ -64,12 +66,13 @@ bool CHUImp::Open(DataStream* stream, bool autoFree)
 	str->Read( &WEOffset, 4 );
 	return true;
 }
+
 /** Returns the i-th window in the Previously Loaded Stream */
-Window* CHUImp::GetWindow(unsigned long wid)
+Window* CHUImp::GetWindow(unsigned int wid)
 {
-	unsigned short WindowID, XPos, YPos, Width, Height, BackGround;
-	unsigned short ControlsCount, FirstControl;
-  int i;
+	ieWord WindowID, XPos, YPos, Width, Height, BackGround;
+	ieWord ControlsCount, FirstControl;
+	unsigned int i;
 
 	bool found = false;
 	for (unsigned int c = 0; c < WindowCount; c++) {
@@ -118,16 +121,15 @@ Window* CHUImp::GetWindow(unsigned long wid)
 	}
 	for (i = 0; i < ControlsCount; i++) {
 		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );
-		unsigned long COffset, CLength, ControlID;
-		unsigned short BufferLength, XPos, YPos, Width, Height;
-		unsigned char ControlType, temp;
+		ieDword COffset, CLength, ControlID;
+		ieWord BufferLength, XPos, YPos, Width, Height;
+		ieByte ControlType, temp;
 		str->Read( &COffset, 4 );
 		str->Read( &CLength, 4 );
 		str->Seek( COffset, GEM_STREAM_START );
 		str->Read( &ControlID, 4 );
 		//str->Read(&BufferLength, 2);
-		BufferLength = ( unsigned short )
-			( ( ControlID & 0xffff0000 ) >> 16 );
+		BufferLength = ( ieWord ) ( ( ControlID & 0xffff0000 ) >> 16 );
 		str->Read( &XPos, 2 );
 		str->Read( &YPos, 2 );
 		str->Read( &Width, 2 );
@@ -147,7 +149,7 @@ Window* CHUImp::GetWindow(unsigned long wid)
 					btn->Height = Height;
 					btn->ControlType = ControlType;
 					char BAMFile[9];
-					unsigned short Cycle, UnpressedIndex, PressedIndex,
+					ieDword Cycle, UnpressedIndex, PressedIndex,
 					SelectedIndex, DisabledIndex;
 					str->Read( BAMFile, 8 );
 					BAMFile[8] = 0;
@@ -206,8 +208,8 @@ Window* CHUImp::GetWindow(unsigned long wid)
 				 {
 					//Slider
 					char MOSFile[9], BAMFile[9];
-					unsigned short Cycle, Knob, GrabbedKnob;
-					short KnobXPos, KnobYPos, KnobStep, KnobStepsCount;
+					ieWord Cycle, Knob, GrabbedKnob;
+					ieWord KnobXPos, KnobYPos, KnobStep, KnobStepsCount;
 					str->Read( MOSFile, 8 );
 					str->Read( BAMFile, 8 );
 					str->Read( &Cycle, 2 );
@@ -249,7 +251,7 @@ Window* CHUImp::GetWindow(unsigned long wid)
 				 {
 					//Text Edit
 					char FontResRef[9], CursorResRef[9], BGMos[9];
-					unsigned short maxInput;
+					ieWord maxInput;
 					str->Read( BGMos, 8 );
 					str->Seek( 16, GEM_CURRENT_POS );
 					str->Read( CursorResRef, 8 );
@@ -259,12 +261,9 @@ Window* CHUImp::GetWindow(unsigned long wid)
 					str->Read( &maxInput, 2 );
 					Font* fnt = core->GetFont( FontResRef );
 					AnimationFactory* af = ( AnimationFactory* )
-						core->GetResourceMgr()->GetFactoryResource( CursorResRef,
-													IE_BAM_CLASS_ID );
-					DataStream* ds = core->GetResourceMgr()->GetResource( BGMos,
-																IE_MOS_CLASS_ID );
-					ImageMgr* mos = ( ImageMgr* )
-						core->GetInterface( IE_MOS_CLASS_ID );
+						core->GetResourceMgr()->GetFactoryResource( CursorResRef, IE_BAM_CLASS_ID );
+					DataStream* ds = core->GetResourceMgr()->GetResource( BGMos, IE_MOS_CLASS_ID );
+					ImageMgr* mos = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
 					mos->Open( ds, true );
 					TextEdit* te = new TextEdit( maxInput );
 					te->ControlID = ControlID;
@@ -286,7 +285,7 @@ Window* CHUImp::GetWindow(unsigned long wid)
 					//Text Area
 					char FontResRef[9], InitResRef[9];
 					Color fore, init, back;
-					unsigned short SBID;
+					ieWord SBID;
 					str->Read( FontResRef, 8 );
 					str->Read( InitResRef, 8 );
 					Font* fnt = core->GetFont( FontResRef );
@@ -323,9 +322,9 @@ Window* CHUImp::GetWindow(unsigned long wid)
 				 {
 					//Label
 					char FontResRef[9];
-					unsigned long StrRef;
+					ieStrRef StrRef;
 					RevColor fore, back;
-					unsigned short alignment;
+					ieWord alignment;
 					str->Read( &StrRef, 4 );
 					str->Read( FontResRef, 8 );
 					Font* fnt = core->GetFont( FontResRef );
@@ -367,8 +366,7 @@ Window* CHUImp::GetWindow(unsigned long wid)
 				 {
 					//ScrollBar
 					char BAMResRef[9];
-					unsigned short Cycle, UpUnPressed, UpPressed,
-						DownUnPressed,
+					ieWord Cycle, UpUnPressed, UpPressed, DownUnPressed,
 					DownPressed, Trough, Slider, TAID;
 					str->Read( BAMResRef, 8 );
 					BAMResRef[8] = 0;
@@ -388,8 +386,7 @@ Window* CHUImp::GetWindow(unsigned long wid)
 					sbar->Height = Height;
 					sbar->ControlType = ControlType;
 					AnimationFactory* anim = ( AnimationFactory* )
-						core->GetResourceMgr()->GetFactoryResource( BAMResRef,
-													IE_BAM_CLASS_ID );
+						core->GetResourceMgr()->GetFactoryResource( BAMResRef, IE_BAM_CLASS_ID );
 					Animation* an = anim->GetCycle( ( unsigned char ) Cycle );
 					sbar->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED,
 							an->GetFrame( UpUnPressed ) );
@@ -418,7 +415,7 @@ Window* CHUImp::GetWindow(unsigned long wid)
 	return win;
 }
 /** Returns the number of available windows */
-unsigned long CHUImp::GetWindowsCount()
+unsigned int CHUImp::GetWindowsCount()
 {
 	return WindowCount;
 }

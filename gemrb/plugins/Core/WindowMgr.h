@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WindowMgr.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WindowMgr.h,v 1.4 2004/08/03 22:27:30 guidoj Exp $
  *
  */
 
@@ -49,9 +49,9 @@ public:
 	/** This function loads all available windows from the 'stream' parameter. */
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	/** Returns the i-th window in the Previously Loaded Stream */
-	virtual Window* GetWindow(unsigned long i) = 0;
+	virtual Window* GetWindow(unsigned int i) = 0;
 	/** Returns the number of available windows */
-	virtual unsigned long GetWindowsCount() = 0;
+	virtual unsigned int GetWindowsCount() = 0;
 };
 
 #endif

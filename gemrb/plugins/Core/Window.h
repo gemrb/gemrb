@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.14 2004/03/20 23:02:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.15 2004/08/03 22:27:30 guidoj Exp $
  *
  */
 
@@ -66,7 +66,7 @@ public:
 	/** Redraw all the Window */
 	void Invalidate();
 	/** Redraw controls of the same group */
-	void RedrawControls(char* VarName, unsigned long tmp);
+	void RedrawControls(char* VarName, unsigned int Sum);
 	/** Links a scrollbar to a text area */
 	void Link(unsigned short SBID, unsigned short TAID);
 public: //Public attributes

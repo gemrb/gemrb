@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.38 2004/07/31 22:37:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.39 2004/08/03 22:27:29 guidoj Exp $
  *
  */
 
@@ -157,7 +157,7 @@ Actor* CREImp::GetActor()
 {
 	Actor* act = new Actor();
 	act->InParty = false;
-	unsigned long strref;
+	ieDword strref;
 	str->Read( &strref, 4 );
 	char* poi = core->GetString( strref );
 	act->SetText( poi, 0 );
@@ -192,7 +192,7 @@ Actor* CREImp::GetActor()
         SetupColor(act->BaseStats[IE_ARMOR_COLOR]);
         SetupColor(act->BaseStats[IE_HAIR_COLOR]);
 
-	unsigned char TotSCEFF;
+	ieByte TotSCEFF;
 	str->Read( &TotSCEFF, 1 );
 	str->Read( act->SmallPortrait, 8 );
 	act->SmallPortrait[8] = 0;

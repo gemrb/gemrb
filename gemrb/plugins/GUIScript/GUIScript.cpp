@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.179 2004/08/03 17:54:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.180 2004/08/03 22:27:30 guidoj Exp $
  *
  */
 
@@ -308,7 +308,8 @@ PyDoc_STRVAR( GemRB_StatComment__doc,
 
 static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 {
-	int Strref, X, Y;
+	ieStrRef Strref;
+	int X, Y;
 	PyObject* ret;
 
 	if (!PyArg_ParseTuple( args, "iii", &Strref, &X, &Y )) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.28 2004/06/27 23:47:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.29 2004/08/03 22:27:30 guidoj Exp $
  *
  */
 
@@ -185,7 +185,7 @@ void Window::Invalidate()
 	Changed = true;
 }
 
-void Window::RedrawControls(char* VarName, unsigned long Sum)
+void Window::RedrawControls(char* VarName, unsigned int Sum)
 {
 	for (unsigned int i = 0; i < Controls.size(); i++) {
 		switch (Controls[i]->ControlType) {
