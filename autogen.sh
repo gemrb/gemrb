@@ -146,19 +146,19 @@ then
 fi
 
 echo Running libtoolize
-libtoolize --force || exit 1
+$my_libtoolize --force || exit 1
 
 echo Running aclocal
-aclocal || exit 1
+$my_aclocal || exit 1
 
 echo Running autoconf
-autoconf || exit 1
+$my_autoconf || exit 1
 
 echo Running autoheader
-autoheader || exit 1
+$my_autoheader || exit 1
 
 echo Running automake
-automake --add-missing || exit 1
+$my_automake --add-missing || exit 1
 
 echo Running configure
 
