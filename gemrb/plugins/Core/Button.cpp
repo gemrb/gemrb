@@ -112,7 +112,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 			if(Unpressed)
 				core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
 			if(hasText)
-				font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
+				font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
 			Changed = false;
 		}
 		break;
@@ -122,7 +122,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 			if(Pressed)
 				core->GetVideoDriver()->BlitSprite(Pressed, x+XPos, y+YPos, true);
 			if(hasText)
-				font->Print(Region(x+XPos+2, y+YPos+2, Width, Height), (unsigned char*)Text, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
+				font->Print(Region(x+XPos+2, y+YPos+2, Width, Height), (unsigned char*)Text, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
 			Changed = false;
 		}
 		break;

@@ -26,6 +26,9 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {
 	BufferLength = 4096;
 	Buffer = (unsigned char*)malloc(BufferLength);
+	Buffer[0] = 0;
+	rows = 0;
+	startrow = 0;
 	sb = NULL;
 	palette = core->GetVideoDriver()->CreatePalette(hitextcolor, lowtextcolor);
 	initpalette = core->GetVideoDriver()->CreatePalette(initcolor, lowtextcolor);
@@ -42,20 +45,22 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 {
 	if(!Changed)
 		return;
-	ftext->Print(Region(x+XPos, y+YPos, Width, Height), Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, true, finit, initpalette);		
+	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height), Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, true, finit, initpalette);		
 	Changed = false;
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
     to this Text Area Control. */
-void TextArea::SetScrollBar(ScrollBar * ptr)
+void TextArea::SetScrollBar(Control * ptr)
 {
 	sb = ptr;
+	CalcRowCount();
 	Changed = true;
 }
 /** Sets the Actual Text */
 int TextArea::SetText(const char * text)
 {
 	strncpy((char*)Buffer, text, BufferLength);
+	CalcRowCount();
 	((Window*)Owner)->Invalidate();
 	return 0;
 }
@@ -76,4 +81,32 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short Mod)
 void TextArea::OnSpecialKeyPress(unsigned char Key)
 {
 	
+}
+
+/** Set Starting Row */
+void TextArea::SetRow(int row)
+{
+	if(row < rows)
+		startrow = row;
+	Changed = true;
+}
+
+void TextArea::CalcRowCount()
+{
+	if(Buffer[0] != 0) {
+		int len = strlen((char*)Buffer);
+		char * tmp = (char*)malloc(BufferLength);
+		strcpy(tmp, (char*)Buffer);
+		ftext->SetupString(tmp, Width);
+		rows = 0;
+		for(int i = 0; i <= len; i++) {
+			if(tmp[i] == 0)
+				rows++;
+		}
+		free(tmp);
+	}
+	if(!sb)
+		return;
+	ScrollBar *bar = (ScrollBar*)sb;
+	bar->SetMax(rows);
 }

@@ -20,6 +20,8 @@
 
 #include "Sprite2D.h"
 #include "Control.h"
+#include "TextArea.h"
+#include "ScrollBar.h"
 #include <vector>
 
 /**This class defines a Window as an Items Container.
@@ -56,6 +58,7 @@ public:
   void SetFocused(Control * ctrl);
   /** Redraw all the Window */
   void Invalidate();
+  void Link(unsigned short SBID, unsigned short TAID);
 public: //Public attributes
   /** Window ID */
   unsigned short WindowID;

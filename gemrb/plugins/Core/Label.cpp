@@ -55,9 +55,9 @@ void Label::Draw(unsigned short x, unsigned short y)
 {
 	if(font && Changed) {
 		if(useRGB)
-			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, palette, Alignment | IE_FONT_ALIGN_MIDDLE, true);
+			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, palette, Alignment | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
 		else
-			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, NULL, Alignment | IE_FONT_ALIGN_MIDDLE, true);
+			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, NULL, Alignment | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
 		Changed = false;
 	}
 }

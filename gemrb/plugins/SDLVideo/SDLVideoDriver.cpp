@@ -217,15 +217,53 @@ void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Regio
 		drect.y = y-spr->YPos-Viewport.y;
 	}
 	if(clip) {
-		/*if(drect.x+spr->Width < clip->x)
+		if(drect.x+spr->Width <= clip->x)
 			return;
-		if(drect.y+spr->Height < clip-y)
+		else {
+			if(drect.x < clip->x) {
+				t.x = clip->x-drect.x;
+				t.w = spr->Width-t.x;
+			}
+			else {
+				if(drect.x+spr->Width <= clip->x+clip->w) {
+					t.x = 0;
+					t.w = spr->Width;
+				}
+				else {
+					if(drect.x >= clip->x+clip->w) {
+						return;
+					}
+					else {
+						t.x = 0;
+						t.w = (clip->x+clip->w)-drect.x;
+					}
+				}
+			}
+		}
+		if(drect.y+spr->Height <= clip->y)
 			return;
-		if(drect.x >= clip->x+clip->w)
-			return;
-		if(drect.y >= clip->y+clip->h)
-			return;*/
-		if(drect.x < clip->x) {
+		else {
+			if(drect.y < clip->y) {
+				t.y = clip->y-drect.y;
+				t.h = spr->Height-t.y;
+			}
+			else {
+				if(drect.y+spr->Height <= clip->y+clip->h) {
+					t.y = 0;
+					t.h = spr->Height;
+				}
+				else {
+					if(drect.y >= clip->y+clip->h) {
+						return;
+					}
+					else {
+						t.y = 0;
+						t.h = (clip->y+clip->h)-drect.y;
+					}
+				}
+			}
+		}
+		/*if(drect.x < clip->x) {
 			if(clip->x >= (drect.x+spr->Width))
 				return;
 			t.x = clip->x-drect.x;
@@ -254,7 +292,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Regio
 				return;
 			t.y = 0;
 			t.h = spr->Height;
-		}
+		}*/
 		srect = &t;
 	}
 	SDL_BlitSurface((SDL_Surface*)spr->vptr, srect, disp, &drect);

@@ -127,3 +127,31 @@ void Window::Invalidate()
 	}
 	Changed = true;
 }
+
+/** Searches for a ScrollBar and a TextArea to link them */
+void Window::Link(unsigned short SBID, unsigned short TAID)
+{
+	ScrollBar *sb = NULL;
+	TextArea *ta = NULL;
+	std::vector<Control*>::iterator m;
+	for(m = Controls.begin(); m != Controls.end(); m++) {
+		if((*m)->ControlType == 7) {
+			if((*m)->ControlID == SBID) {
+				sb = (ScrollBar*)(*m);
+				if(ta != NULL)
+					break;
+			}
+		}
+		else if((*m)->ControlType == 5) {
+			if((*m)->ControlID == TAID) {
+				ta = (TextArea*)(*m);
+				if(sb != NULL)
+					break;
+			}
+		}
+	}
+	if(sb && ta) {
+		sb->ta = ta;
+		ta->SetScrollBar(sb);
+	}
+}

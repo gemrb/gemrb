@@ -2,6 +2,7 @@
 #define SCROLLBAR_H
 
 #include "Control.h"
+#include "TextArea.h"
 #include "Sprite2D.h"
 
 #define IE_GUI_SCROLLBAR_UP_UNPRESSED   0
@@ -46,6 +47,10 @@ private: //Private attributes
 	int SetText(const char * string);
 public:
 	void SetImage(unsigned char type, Sprite2D * img);
+	/** Sets the Maximum Value of the ScrollBar */
+	void SetMax(unsigned short Max);
+	/** TextArea Associated Control */
+	Control * ta;
 public: // Public Events
   /** Mouse Button Down */
   void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);

@@ -231,6 +231,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 			case 5: { //Text Area
 				char FontResRef[8], InitResRef[8];
 				Color fore, init, back;
+				unsigned short SBID;
 				str->Read(FontResRef, 8);
 				str->Read(InitResRef, 8);
 				Font * fnt = core->GetFont(FontResRef);
@@ -238,6 +239,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				str->Read(&fore, 4);
 				str->Read(&init, 4);
 				str->Read(&back, 4);
+				str->Read(&SBID, 2);
 				/*Color f,i,b;
 				f.r = fore.r;
 				f.g = fore.g;
@@ -259,6 +261,8 @@ Window * CHUImp::GetWindow(unsigned long i)
 				ta->SetFonts(ini, fnt);
 				ta->SetText("Text Area (Temp Value)");				
 				win->AddControl(ta);
+				if(SBID != 0xffff)
+					win->Link(SBID, ControlID);
 			}
 			break;
 
@@ -304,7 +308,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 
 			case 7: { //ScrollBar
 				char BAMResRef[9];
-				unsigned short Cycle, UpUnPressed, UpPressed, DownUnPressed, DownPressed, Trough, Slider;
+				unsigned short Cycle, UpUnPressed, UpPressed, DownUnPressed, DownPressed, Trough, Slider, TAID;
 				str->Read(BAMResRef, 8);
 				BAMResRef[8] = 0;
 				str->Read(&Cycle, 2);
@@ -314,6 +318,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				str->Read(&DownPressed, 2);
 				str->Read(&Trough, 2);
 				str->Read(&Slider, 2);
+				str->Read(&TAID, 2);
 				ScrollBar * sbar = new ScrollBar();
 				sbar->ControlID = ControlID;
 				sbar->XPos = XPos;
@@ -333,6 +338,8 @@ Window * CHUImp::GetWindow(unsigned long i)
 				an->free = false;
 				delete(an);
 				win->AddControl(sbar);
+				if(TAID != 0xffff)
+					win->Link(ControlID, TAID);
 			}
 			break;
 

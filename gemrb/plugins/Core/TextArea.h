@@ -43,21 +43,28 @@ public:
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	/** Sets the Scroll Bar Pointer */
-	void SetScrollBar(ScrollBar * ptr);
+	void SetScrollBar(Control * ptr);
 	/** Sets the Actual Text */
 	int SetText(const char * text);
 	/** Sets the Fonts */
 	void SetFonts(Font * init, Font * text);
+	/** Set Starting Row */
+	void SetRow(int row);
 private: // Private attributes
 	/** Text Buffer */
 	unsigned char * Buffer;
+	/** Number of Text Rows */
+	int rows;
+	/** Starting Row */
+	int startrow;
 	/** Attached Scroll Bar Pointer*/
-	ScrollBar * sb;
+	Control * sb;
 	/** Text Colors */
 	Color * palette;
 	Color * initpalette;
 	/** Fonts */
 	Font *finit, *ftext;
+	void CalcRowCount();
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

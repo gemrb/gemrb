@@ -37,6 +37,85 @@ void Font::AddChar(Sprite2D * spr)
 
 bool written = false;
 
+void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color *hicolor, unsigned char Alignment, bool anchor, Font * initials, Color *initcolor, Sprite2D * cursor, int curpos)
+{
+	Color * pal = NULL, *ipal = NULL;
+	pal = hicolor;
+	if(ipal != NULL) {
+		ipal = initcolor;
+	}
+	else
+		ipal = pal;
+	if(pal) {
+		for(int i = 0; i < 256; i++) {
+			core->GetVideoDriver()->SetPalette(chars[i], pal);
+		}
+	}
+	Video * video = core->GetVideoDriver();
+	int len = strlen((char*)string);
+	char * tmp = (char*)malloc(len+1);
+	strcpy(tmp, (char*)string);
+	SetupString(tmp, rgn.w);
+	int ystep = 0;
+	if(Alignment & IE_FONT_SINGLE_LINE) {
+		for(int i = 0; i < len; i++) {
+			if(tmp[i] != 0)
+				if(ystep < chars[(unsigned char)tmp[i]-1]->YPos)
+					ystep = chars[(unsigned char)tmp[i]-1]->YPos;
+		}
+	}
+	else
+		ystep = chars[1]->Height;
+	int x = 0, y = ystep;
+	if(Alignment & IE_FONT_ALIGN_CENTER) {
+		int w = CalcStringWidth(tmp);
+		x = (rgn.w / 2)-(w/2);
+	}
+	else if(Alignment & IE_FONT_ALIGN_RIGHT) {
+		int w = CalcStringWidth(tmp);
+		x = (rgn.w-w);
+	}
+	if(Alignment & IE_FONT_ALIGN_MIDDLE) {
+		int h = 0;
+		for(int i = 0; i <= len; i++) {
+			if(tmp[i] == 0)
+				h++;
+		}
+		h = h*ystep;
+		y += (rgn.h/2)-(h/2);
+	}
+	int row = 0;
+	for(int i = 0; i < len; i++) {
+		if(row < startrow) {
+			if(tmp[i] == 0) {
+				row++;
+			}
+			continue;
+		}
+		if(tmp[i] == 0) {
+			y+=ystep;
+			x=0;
+			if(Alignment & IE_FONT_ALIGN_CENTER) {
+				int w = CalcStringWidth(&tmp[i+1]);
+				x = (rgn.w / 2)-(w/2);
+			}
+			else if(Alignment & IE_FONT_ALIGN_RIGHT) {
+				int w = CalcStringWidth(&tmp[i+1]);
+				x = (rgn.w-w);
+			}
+			continue;
+		}
+		Sprite2D * spr = chars[(unsigned char)tmp[i]-1];
+		x+=spr->XPos;
+		video->BlitSprite(spr, x+rgn.x, y+rgn.y, true, &rgn);
+		if(cursor &&  (curpos == i))
+			video->BlitSprite(cursor, x-spr->XPos+rgn.x, y+rgn.y, true, &rgn);
+		x+=spr->Width-spr->XPos;
+		
+	}
+	free(tmp);
+}
+
 void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned char Alignment, bool anchor, Font * initials, Color *initcolor, Sprite2D * cursor, int curpos)
 {
 	//TODO: Implement Colored Text
@@ -62,28 +141,62 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 		}
 	}
 	Video * video = core->GetVideoDriver();
-	/*char * tmp = (char*)malloc(strlen((char*)string)+1);
+	int len = strlen((char*)string);
+	char * tmp = (char*)malloc(len+1);
 	strcpy(tmp, (char*)string);
-	char * str = strtok(tmp, " \n");
-	int x = 0, y = chars[1]->Height;
-	while(str != NULL) {
-		int width = CalcStringWidth(str);
-		if(x+width >= rgn.w) {
-			y+=chars[1]->Height;
-			x=0;
-		}
-		int len = strlen(str);
+	SetupString(tmp, rgn.w);
+	int ystep = 0;
+	if(Alignment & IE_FONT_SINGLE_LINE) {
 		for(int i = 0; i < len; i++) {
-			Sprite2D * spr = chars[(unsigned char)str[i]-1];
-			x+=spr->XPos;
-			video->BlitSprite(spr, x+rgn.x, y+rgn.y, true, &rgn);
-			x+=spr->Width-spr->XPos;
+			if(tmp[i] != 0)
+				if(ystep < chars[(unsigned char)tmp[i]-1]->YPos)
+					ystep = chars[(unsigned char)tmp[i]-1]->YPos;
 		}
-		x+=chars[' '-1]->Width;
-		str = strtok(NULL, " \n");
 	}
-	free(tmp);*/
-	StringList sl = Prepare(rgn, string, initials, curpos);
+	else
+		ystep = chars[1]->Height;
+	int x = 0, y = ystep;
+	if(Alignment & IE_FONT_ALIGN_CENTER) {
+		int w = CalcStringWidth(tmp);
+		x = (rgn.w / 2)-(w/2);
+	}
+	else if(Alignment & IE_FONT_ALIGN_RIGHT) {
+		int w = CalcStringWidth(tmp);
+		x = (rgn.w-w);
+	}
+	if(Alignment & IE_FONT_ALIGN_MIDDLE) {
+		int h = 0;
+		for(int i = 0; i <= len; i++) {
+			if(tmp[i] == 0)
+				h++;
+		}
+		h = h*ystep;
+		y += (rgn.h/2)-(h/2);
+	}
+	for(int i = 0; i < len; i++) {
+		if(tmp[i] == 0) {
+			y+=ystep;
+			x=0;
+			if(Alignment & IE_FONT_ALIGN_CENTER) {
+				int w = CalcStringWidth(&tmp[i+1]);
+				x = (rgn.w / 2)-(w/2);
+			}
+			else if(Alignment & IE_FONT_ALIGN_RIGHT) {
+				int w = CalcStringWidth(&tmp[i+1]);
+				x = (rgn.w-w);
+			}
+			continue;
+		}
+		Sprite2D * spr = chars[(unsigned char)tmp[i]-1];
+		x+=spr->XPos;
+		video->BlitSprite(spr, x+rgn.x, y+rgn.y, true, &rgn);
+		if(cursor &&  (curpos == i))
+			video->BlitSprite(cursor, x-spr->XPos+rgn.x, y+rgn.y, true, &rgn);
+		x+=spr->Width-spr->XPos;
+		
+	}
+	free(tmp);
+	/*StringList sl = Prepare(rgn, string, initials, curpos);
 	int x = 0, y = 0;
 	if(Alignment & IE_FONT_ALIGN_TOP)
 		y = rgn.y;
@@ -195,7 +308,7 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	free(sl.strings[0]);
 	free(sl.strings);
 	free(sl.heights);
-	free(sl.lengths);
+	free(sl.lengths);*/
 }
 /** PreCalculate for Printing */
 StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int curpos)
@@ -353,4 +466,28 @@ int Font::CalcStringWidth(const char * string)
 		ret += chars[(unsigned char)string[i]-1]->Width;
 	}
 	return ret;
+}
+
+void Font::SetupString(char * string, int width)
+{
+	int len = strlen(string);
+	char * str = (char*)malloc(len+1);
+	strcpy(str, string);
+	char * s = strtok(str, " \n");
+	int pos = -1;
+	int x = 0;//chars[s[0]-1]->XPos;
+	while(s != NULL) {
+		int ln = strlen(s);
+		int nx = CalcStringWidth(s);
+		if(len > pos+ln+1)
+			nx+=chars[' '-1]->Width;
+		if(x+nx >= width) {
+			string[pos] = 0;		
+			x = 0;//chars[s[0]-1]->XPos;
+		}
+		x+=nx;
+		pos += ln+1;
+		s = strtok(NULL, " \n");
+	}
+	free(str);
 }
