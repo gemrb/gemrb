@@ -48,7 +48,7 @@ def OnLoad():
 	GemRB.SetEvent(StartWindow, OptionsButton, IE_GUI_BUTTON_ON_PRESS, "OptionsPress")
 	GemRB.SetEvent(StartWindow, LoadGameButton, IE_GUI_BUTTON_ON_PRESS, "LoadPress")
 	GemRB.SetVisible(StartWindow, 1)
-	GemRB.LoadMusicPL("Theme")
+	GemRB.LoadMusicPL("Theme.mus")
 	GemRB.StartPL()
 	return
 

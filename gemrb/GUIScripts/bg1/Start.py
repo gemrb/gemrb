@@ -28,11 +28,12 @@ def OnLoad():
 	MultiPlayerButton = GemRB.GetControl(StartWindow, 1)
 	MoviesButton = GemRB.GetControl(StartWindow, 2)
 	ExitButton = GemRB.GetControl(StartWindow, 3)
+
 	#GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,450,640,30, "REALMS", "GemRB Ver 0.0.1", 1);
 	
 	BackToMain();
 	
-	GemRB.LoadMusicPL("Theme")
+	GemRB.LoadMusicPL("Theme.mus")
 	GemRB.StartPL()
 	return
 	
