@@ -15,16 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSnd.cpp,v 1.6 2004/08/20 02:37:37 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSnd.cpp,v 1.7 2004/08/29 01:19:03 divide Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "NullSnd.h"
+#include "../Core/AmbientMgr.h"
 
 NullSnd::NullSnd(void)
 {
-	ambim = new SoundMgr::AmbientMgr();
+	ambim = new AmbientMgr();
 }
 
 NullSnd::~NullSnd(void)

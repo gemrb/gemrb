@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2003-2004 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,33 +15,27 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.57 2004/08/28 10:33:01 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.58 2004/08/29 01:19:01 divide Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "../Core/Interface.h"
-#include "../Core/Ambient.h"
 #include "ACMImp.h"
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <limits.h>
-#include <cmath>
-#include <cassert>
 #ifdef WIN32
 #include <io.h>
 #else
 #include <unistd.h>
 #include <sys/time.h>
 #endif
+#include "AmbientMgrAL.h"
 
 #define DisplayALError(string, error) printf("%s0x%04X", string, error);
 #define ACM_BUFFERSIZE 8192
 #define MUSICBUFERS 10
-
-// the distance at which sound is played at full volume
-#define REFERENCE_DISTANCE 50
 
 static AudioStream streams[MAX_STREAMS], speech;
 static CSoundReader *MusicReader;
@@ -217,7 +211,7 @@ ACMImp::ACMImp(void)
 	musicMutex = SDL_CreateMutex();
 	static_memory = (unsigned char *) malloc(ACM_BUFFERSIZE);
 	musicThread = SDL_CreateThread( PlayListManager, NULL );
-	ambim = new AmbientMgr();
+	ambim = new AmbientMgrAL();
 }
 
 ACMImp::~ACMImp(void)
@@ -534,281 +528,6 @@ void ACMImp::UpdateViewportPos(int XPos, int YPos)
 	alListener3f( AL_POSITION, ( float ) XPos, ( float ) YPos, 0.0f );
 }
 
-// legal nop if already reset
-void ACMImp::AmbientMgr::reset()
-{
-	if (NULL != player){
-		SDL_mutexP(mutex);
-	}
-	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
-		delete (*it);
-	}
-	ambientSources.clear();
-	AmbientMgrBase::reset();
-	if (NULL != player) {
-		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
-		SDL_WaitThread(player, NULL);
-		player = NULL;
-	}
-}
-
-void ACMImp::AmbientMgr::setAmbients(const std::vector<Ambient *> &a)
-{
-	AmbientMgrBase::setAmbients(a);
-	assert(NULL == player);
-	
-	ambientSources.reserve(a.size());
-	for (std::vector<Ambient *>::const_iterator it = a.begin(); it != a.end(); ++it) {
-		ambientSources.push_back(new AmbientSource(*it));
-	}
-	UpdateVolume();
-	
-	player = SDL_CreateThread(&play, (void *) this);
-}
-
-void ACMImp::AmbientMgr::activate(const std::string &name) 
-{
-	if (NULL != player)
-		SDL_mutexP(mutex);
-	AmbientMgrBase::activate(name);
-	if (NULL != player) {
-		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
-	}
-}
-
-void ACMImp::AmbientMgr::activate()
-{
-	if (NULL != player)
-		SDL_mutexP(mutex);
-	AmbientMgrBase::activate();
-	if (NULL != player) {
-		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
-	}
-}
-
-void ACMImp::AmbientMgr::deactivate(const std::string &name) 
-{
-	if (NULL != player)
-		SDL_mutexP(mutex);
-	AmbientMgrBase::deactivate(name);
-	if (NULL != player) {
-		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
-	}
-}
-
-void ACMImp::AmbientMgr::deactivate() 
-{
-	if (NULL != player)
-		SDL_mutexP(mutex);
-	AmbientMgrBase::deactivate();
-	hardStop();
-	if (NULL != player)
-		SDL_mutexV(mutex);
-}
-
-void ACMImp::AmbientMgr::hardStop()
-{
-	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
-		(*it)->hardStop();
-	}
-}
-
-int ACMImp::AmbientMgr::play(void *am) 
-{
-	AmbientMgr * ambim = (AmbientMgr *) am;
-	SDL_mutexP(ambim->mutex);
-	while (0 != ambim->ambientSources.size()) {
-		if (NULL == core->GetGame()) { // we don't have any game, and we need one
-			break;
-		}
-		unsigned int delay = ambim->tick(SDL_GetTicks());
-		assert(delay > 0);
-		SDL_CondWaitTimeout(ambim->cond, ambim->mutex, delay);
-	}
-	SDL_mutexV(ambim->mutex);
-	return 0;
-}
-
-unsigned int ACMImp::AmbientMgr::tick(unsigned int ticks)
-{
-	unsigned int delay = 60000; // wait one minute if all sources are off
-	
-	if (!active)
-		return delay;
-	
-	ALfloat listen[3];
-	alGetListenerfv( AL_POSITION, listen );
-	Point listener;
-	listener.x = (short) listen[0];
-	listener.y = (short) listen[1];
-	
-	unsigned int timeslice = ((core->GetGame()->GameTime / 60 + 30) / 60 - 1) % 24;
-	
-	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
-		unsigned int newdelay = (*it)->tick(ticks, listener, timeslice);
-		if (newdelay < delay)
-			delay = newdelay;
-	}
-	return delay;
-}
-
-ACMImp::AmbientMgr::AmbientSource::AmbientSource(Ambient *a)
-: ambient(a), lastticks(0), enqueued(0)
-{
-	alGenSources( 1, &source );
-	
-	ALfloat position[] = { (float) a->getOrigin().x, (float) a->getOrigin().y, (float) a->getHeight() };
-	alSourcefv( source, AL_POSITION, position );
-	alSourcef( source, AL_GAIN, 0.01f * a->getGain() );
-	alSourcei( source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
-	alSourcei( source, AL_ROLLOFF_FACTOR, (a->getFlags() & IE_AMBI_POINT) ? 1 : 0 );
-	
-/*	ALint state, queued, processed;
-	alGetSourcei( source, AL_SOURCE_STATE, &state );
-	alGetSourcei( source, AL_BUFFERS_QUEUED, &queued );
-	alGetSourcei( source, AL_BUFFERS_PROCESSED, &processed );
-	printf("ambient %s: source %x, state %x, queued %d, processed %d\n", ambient->getName().c_str(), source, state, queued, processed);
-	if (!alIsSource( source )) printf("hey, it's not a source!\n");*/
-	
-	// preload sounds
-	unsigned int i=a->sounds.size();
-	buffers.reserve(i);
-	buflens.reserve(i);
-	while(i--) {
-		int timelen;
-		ALuint buffer = LoadSound(a->sounds[i], &timelen);
-		if (!buffer) {
-			printf("Invalid SoundResRef: %.8s, Dequeueing...\n",a->sounds[i]);
-			free(a->sounds[i]);
-		        a->sounds.erase(a->sounds.begin() + i);
-		} else {
-			buffers.push_back(buffer);
-			buflens.push_back(timelen);
-		}
-		
-	}
-/*	
-	// use OpenAL to loop in this special case so we don't have to
-	if ((buffers.size() == 1) && (a->getInterval() == 0)) {
-		alSourcei( source, AL_LOOPING, 1 );
-		alSourcei( source, AL_BUFFER, buffers[0] );
-	}*/
-}
-
-ACMImp::AmbientMgr::AmbientSource::~AmbientSource()
-{
-	alSourceStop( source );	// legal nop if not playing
-//	printf("deleting source %x\n", source);
-	alDeleteSources( 1, &source );
-	for (std::vector<ALuint>::iterator it = buffers.begin(); it != buffers.end(); ++it) {
-		alDeleteBuffers( 1, &(*it) );
-	}
-}
-
-unsigned int ACMImp::AmbientMgr::AmbientSource::tick(unsigned int ticks, Point listener, unsigned int timeslice)
-{
-	ALint state;
-/*	ALint queued, processed;
-	alGetSourcei( source, AL_SOURCE_STATE, &state );
-	alGetSourcei( source, AL_BUFFERS_QUEUED, &queued );
-	alGetSourcei( source, AL_BUFFERS_PROCESSED, &processed );
-	printf("ambient %s: source %x, state %x, queued %d, processed %d\n", ambient->getName().c_str(), source, state, queued, processed);
-	if (!alIsSource( source )) printf("hey, it's not a source!\n");*/
-	
-	if ((! (ambient->getFlags() & IE_AMBI_ENABLED)) || (! ambient->getAppearance()&(1<<timeslice))) {
-		// don't really stop the source, since we don't want to stop playing abruptly in the middle of
-		// a sample (do we?), and it would end playing by itself in a while (Divide)
-		//this is correct (Avenger)
-		return UINT_MAX;
-	}
-	
-	int delay = ambient->getInterval() * 1000;
-	int left = lastticks - ticks + delay;
-	if (0 < left) // we are still waiting
-		return left;
-	if (enqueued > 0) // we have already played that much
-		enqueued += left;
-	if (enqueued < 0)
-		enqueued = 0;
-	
-	lastticks = ticks;
-	if (0 == delay) // it's a non-stop ambient, so in any case wait only a sec
-		delay = 1000;
-	
-	if (! (ambient->getFlags() & IE_AMBI_MAIN) && !isHeard( listener )) { // we are out of range
-		return delay;
-	}
-	
-	dequeProcessed();
-	
-	/* it seems that the following (commented out) is not the purpose of the perset field, as
-	it leads to ambients playing non-stop and queues overfilled */
-/*	int leftNum = ambient -> getPerset(); */
-	int leftNum = 1;
-	int leftMS = 0;
-	if (0 == ambient->getInterval()) {
-		leftNum = 0;
-		leftMS = 1000 - enqueued; // let's have at least 1 second worth queue
-	}
-	while (0 < leftNum || 0 < leftMS) {
-		int len = enqueue();
-		--leftNum;
-		leftMS -= len;
-		enqueued += len;
-	}
-	
-	// oh, and don't forget to push play
-	alGetSourcei( source, AL_SOURCE_STATE, &state );
-	if (AL_PLAYING != state) { // play on playing source would rewind it
-		alSourcePlay( source );
-	}
-	
-	return delay;
-}
-
-/* dequeues already processed buffers */
-void ACMImp::AmbientMgr::AmbientSource::dequeProcessed()
-{
-	ALint processed;
-	alGetSourcei( source, AL_BUFFERS_PROCESSED, &processed );
-	if (0 == processed) return;
-	ALuint * buffers = (ALuint *) malloc ( processed * sizeof(ALuint) );
-	alSourceUnqueueBuffers( source, processed, buffers );
-	free(buffers);
-	// do not destroy buffers since we reuse them
-}
-
-/* enqueues a random sound and returns its length */
-unsigned int ACMImp::AmbientMgr::AmbientSource::enqueue()
-{
-	int index = rand() % buffers.size();
-	/* yeah, yeah, I know what rand(3) says... but we don't need much randomness here and this is fast
-	 * (fast to write, also ;-)
-	 */
-	
-	alSourceQueueBuffers( source, 1, &(buffers[index]) );
-	
-	return buflens[index];
-}
-
-bool ACMImp::AmbientMgr::AmbientSource::isHeard(const Point &listener) const
-{
-	float xdist = listener.x - ambient->getOrigin().x;
-	float ydist = listener.y - ambient->getOrigin().y;
-	float dist = sqrt(xdist * xdist + ydist * ydist);
-	return dist < ambient->getRadius();
-}
-
-void ACMImp::AmbientMgr::AmbientSource::hardStop()
-{
-	alSourceStop( source );
-	dequeProcessed();
-}
-
 void ACMImp::UpdateVolume( unsigned long which )
 {
 	if ((GEM_SND_VOL_MUSIC & which) && alIsSource( MusicSource )) {
@@ -819,26 +538,8 @@ void ACMImp::UpdateVolume( unsigned long which )
 		SDL_mutexV( musicMutex );
 	}
 	if ((GEM_SND_VOL_AMBIENTS & which) && ambim) {
-		((ACMImp::AmbientMgr *) ambim) -> UpdateVolume();
+		ieDword volume;
+		core->GetDictionary()->Lookup( "Volume Ambients", volume );
+		((AmbientMgrAL *) ambim) -> UpdateVolume( volume );
 	}
 }
-
-void ACMImp::AmbientMgr::UpdateVolume()
-{
-	ieDword volume;
-	core->GetDictionary()->Lookup( "Volume Ambients", volume );
-	SDL_mutexP( mutex );
-	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
-		(*it) -> SetVolume( volume );
-	}
-	SDL_mutexV( mutex );
-}
-
-/* sets the overall volume (in percent)
- * the final volume is affected by the specific ambient gain
- */
-void ACMImp::AmbientMgr::AmbientSource::SetVolume(unsigned short volume)
-{
-	alSourcef( source, AL_GAIN, 0.0001f * ambient->getGain() * volume );
-}
-

@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2003-2004 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.210 2004/08/28 19:33:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.211 2004/08/29 01:19:02 divide Exp $
  *
  */
 
@@ -40,6 +40,7 @@
 #include "AnimationMgr.h"
 #include "ArchiveImporter.h"
 #include "WorldMapMgr.h"
+#include "AmbientMgr.h"
 
 GEM_EXPORT Interface* core;
 

@@ -15,12 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.cpp,v 1.4 2004/08/09 13:02:08 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.cpp,v 1.5 2004/08/29 01:19:02 divide Exp $
  *
  */
 
 #include "SoundMgr.h"
-#include "Ambient.h"
 
 SoundMgr::SoundMgr(void)
 {
@@ -28,34 +27,4 @@ SoundMgr::SoundMgr(void)
 
 SoundMgr::~SoundMgr(void)
 {
-}
-
-void SoundMgr::AmbientMgr::activate(const std::string &name)
-{
-	for (std::vector<Ambient *>::iterator it = ambients.begin(); it != ambients.end(); ++it) {
-		if ((*it) -> getName() == name) {
-			(*it) -> setActive();
-			break;
-		}
-	}
-}
-
-void SoundMgr::AmbientMgr::deactivate(const std::string &name)
-{
-	for (std::vector<Ambient *>::iterator it = ambients.begin(); it != ambients.end(); ++it) {
-		if ((*it) -> getName() == name) {
-			(*it) -> setInactive();
-			break;
-		}
-	}
-}
-
-bool SoundMgr::AmbientMgr::isActive(const std::string &name) const
-{
-	for (std::vector<Ambient *>::const_iterator it = ambients.begin(); it != ambients.end(); ++it) {
-		if ((*it) -> getName() == name) {
-			return (*it) -> getFlags() & IE_AMBI_ENABLED;
-		}
-	}
-	return false;
 }

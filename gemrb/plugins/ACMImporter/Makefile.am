@@ -3,5 +3,5 @@ INCLUDES = $(all_includes)
 libACMImporter_la_LDFLAGS = -module -version-info 0:0:0 -lopenal -lSDL @LIBPTHREAD@
 libACMImporter_la_LIBADD = ../Core/libgemrb_core.la
 libACMImporter_la_METASOURCES = AUTO
-libACMImporter_la_SOURCES = unpacker.cpp riffhdr.cpp readers.cpp decoder.cpp ACMImporterCD.cpp ACMImporter.cpp ACMImp.cpp 
-noinst_HEADERS = ACMImp.h ACMImporterCD.h decoder.h general.h readers.h riffhdr.h unpacker.h 
+libACMImporter_la_SOURCES = unpacker.cpp riffhdr.cpp readers.cpp decoder.cpp ACMImporterCD.cpp ACMImporter.cpp ACMImp.cpp AmbientMgrAL.cpp 
+noinst_HEADERS = ACMImp.h ACMImporterCD.h decoder.h general.h readers.h riffhdr.h unpacker.h AmbientMgrAL.h

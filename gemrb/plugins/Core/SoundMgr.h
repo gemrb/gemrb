@@ -15,19 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.15 2004/08/21 04:53:56 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.16 2004/08/29 01:19:02 divide Exp $
  *
  */
 
 #ifndef SOUNDMGR_H
 #define SOUNDMGR_H
 
-#include <vector>
-#include <string>
 #include "Plugin.h"
-#include "../../includes/globals.h"
 
-class Ambient;
+class AmbientMgr;
 
 #define GEM_SND_RELATIVE 1
 #define GEM_SND_SPEECH   IE_STR_SPEECH // 4
@@ -59,24 +56,10 @@ public:
 	virtual void UpdateViewportPos(int XPos, int YPos) = 0;
 	// update volumes (possibly on-the-fly)
 	virtual void UpdateVolume( unsigned long = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS ) {}
-	class AmbientMgr {
-	public:
-		AmbientMgr() {}
-		virtual ~AmbientMgr() { reset(); }
-		virtual void reset() { ambients = std::vector<Ambient *> (); }
-		virtual void setAmbients(const std::vector<Ambient *> &a) { reset(); ambients = a; activate(); }
-		virtual void activate(const std::string &name);
-		virtual void activate() { active = true; } // hard play ;-)
-		virtual void deactivate(const std::string &name);
-		virtual void deactivate() { active = false; } // hard stop
-		virtual bool isActive(const std::string &name) const;
-	protected:
-		std::vector<Ambient *> ambients;
-		bool active;
-	};
 	virtual AmbientMgr *GetAmbientMgr() { return ambim; }
 protected:
 	AmbientMgr *ambim;
 };
+
 
 #endif

@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2003-2004 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.26 2004/08/28 10:33:02 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.27 2004/08/29 01:19:01 divide Exp $
  *
  */
 
@@ -27,9 +27,8 @@
 
 #include <SDL.h>
 #include <SDL_thread.h>
-#include <vector>
 
-class Ambient;
+class AmbientMgrAL;
 
 #ifndef WIN32
 #include <AL/al.h>
@@ -47,6 +46,9 @@ class Ambient;
 
 #define MAX_STREAMS  30
 
+// the distance at which sound is played at full volume
+#define REFERENCE_DISTANCE 50
+
 typedef struct AudioStream {
 	ALuint Buffer;
 	ALuint Source;
@@ -60,7 +62,6 @@ class ACMImp : public SoundMgr {
 private:
 	void clearstreams(bool free);
 	static int PlayListManager(void* data);
-	static ALuint LoadSound(const char *sound, int *time_length = NULL);
 public:
 	ACMImp(void);
 	~ACMImp(void);
@@ -72,55 +73,12 @@ public:
 	void ResetMusics();
 	void UpdateViewportPos(int XPos, int YPos);
 	void UpdateVolume( unsigned long which = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS );
+	static ALuint LoadSound(const char *sound, int *time_length = NULL);
 public:
 	void release(void)
 	{
 		delete this;
 	}
-	
-	typedef SoundMgr::AmbientMgr AmbientMgrBase;
-	class AmbientMgr : public AmbientMgrBase {
-	public:
-		AmbientMgr() : AmbientMgrBase(), mutex(SDL_CreateMutex()), 
-		               player(NULL), cond(SDL_CreateCond()) { }
-		~AmbientMgr() { reset(); SDL_DestroyMutex(mutex); SDL_DestroyCond(cond); }
-		void reset();
-		void setAmbients(const std::vector<Ambient *> &a);
-		void activate(const std::string &name);
-		void activate();
-		void deactivate(const std::string &name);
-		void deactivate();
-		void UpdateVolume();
-	private:
-		class AmbientSource {
-		public:
-			//not const, we drop invalid resources here
-			AmbientSource(Ambient *a);
-			~AmbientSource();
-			unsigned int tick(unsigned int ticks, Point listener, unsigned int timeslice);
-			void hardStop();
-			void SetVolume(unsigned short volume);
-		private:
-			ALuint source;
-			std::vector<ALuint> buffers;
-			std::vector<unsigned int> buflens;
-			const Ambient * ambient;
-			unsigned int lastticks;
-			int enqueued;
-			bool isHeard(const Point &listener) const;
-			unsigned int enqueue();
-			void dequeProcessed();
-		};
-		std::vector<AmbientSource *> ambientSources;
-		
-		static int play(void *am);
-		unsigned int tick(unsigned int ticks);
-		void hardStop();
-		
-		SDL_mutex *mutex;
-		SDL_Thread *player;
-		SDL_cond *cond;
-	};
 };
 
 #endif
