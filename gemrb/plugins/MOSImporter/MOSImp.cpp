@@ -64,6 +64,7 @@ bool MOSImp::Open(DataStream * stream, bool autoFree)
 			FILE * newfile = fopen(cpath, "wb");
 			fwrite(outbuf, 1, UnCompLength, newfile);
 			fclose(newfile);
+			free(outbuf);
 			FileStream * s = new FileStream();
 			s->Open(cpath);
 			str = s;
