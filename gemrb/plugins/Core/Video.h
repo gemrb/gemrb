@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.15 2003/11/26 20:22:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.16 2003/11/27 21:59:43 balrog994 Exp $
  *
  */
 
@@ -26,6 +26,7 @@
 #include "Plugin.h"
 #include "EventMgr.h"
 #include "Animation.h"
+#include "Polygon.h"
 
 #ifdef WIN32
 
@@ -66,11 +67,11 @@ public:
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(Region &rgn, Color &color) = 0;
 	/** This functions Draws a Circle */
-	virtual void DrawCircle(unsigned short cx, unsigned short cy, unsigned short r, Color &color) = 0;
+	virtual void DrawCircle(short cx, short cy, unsigned short r, Color &color) = 0;
 	/** This functions Draws an Ellipse */
-	virtual void DrawEllipse(unsigned short cx, unsigned short cy, unsigned short xr, unsigned short yr, Color &color) = 0;
+	virtual void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, Color &color) = 0;
 	/** This function Draws a Polygon on the Screen */
-	virtual void DrawPolyline(unsigned short *x, unsigned short *y, int count, Color &color, bool fill = false) = 0;
+	virtual void DrawPolyline(Gem_Polygon * poly, Color &color, bool fill = false) = 0;
 	/** Creates a Palette from Color */
 	virtual Color * CreatePalette(Color color, Color back) = 0;
 	/** Blits a Sprite filling the Region */
@@ -84,7 +85,9 @@ public:
 	/** Mirrors an Animation Horizontally */
 	virtual void MirrorAnimation(Animation * anim) = 0;
 	/** Convers a Screen Coordinate to a Game Coordinate */
-	virtual void ConvertToGame(unsigned short &x, unsigned short &y) = 0;
+	virtual void ConvertToGame(short &x, short &y) = 0;
+	/** */
+	virtual Sprite2D * PrecalculatePolygon(Point * points, int count, Color &color) = 0;
 public:
 	/** Event Manager Pointer */
 	EventMgr * Evnt;
