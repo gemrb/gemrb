@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.5 2004/03/12 02:11:04 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.6 2004/03/15 19:55:41 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -193,6 +193,7 @@ def OpenBeastsWindow ():
 	BeastsList = List = GemRB.GetControl (Window, 0)
 	GemRB.SetTextAreaSelectable (Window, List, 1)
 	GemRB.SetVarAssoc (Window, List, 'SelectedBeast', -1)
+	GemRB.SetEvent(Window,List, IE_GUI_TEXTAREA_ON_CHANGE, "OnJournalBeastSelect")
 	PopulateBeastsList ()
 
 	GemRB.CreateButton (Window, 8, 20, 20, 281, 441)
