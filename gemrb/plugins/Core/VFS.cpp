@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.5 2004/03/20 12:59:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.6 2004/03/20 13:24:11 edheldil Exp $
  *
  */
 
@@ -221,27 +221,33 @@ char* PathAppend (char* target, char* dir)
 
 /*
  * Joins NULL-terminated list of directories and and copies it to 'target'.
- * Previous content of 'target' is NOT part of the list. Returns pointer
- * to 'target'.
+ * Previous content of 'target' is NOT part of the list, except 'target' can be
+ * safely used as a first var arg. Returns pointer to 'target'.
  *
- * Example:
+ * Example 1:
  * char filepath[_MAX_PATH];
  * PathJoin( filepath, core->GUIScriptsPath, core->GameType, 'GUIDefines.py', NULL );
+ *
+ * Example 2:
+ * char filepath[_MAX_PATH];
+ * strcpy (filepath, core->GUIScriptsPath);
+ * PathJoin( filepath, filepath, core->GameType, 'GUIDefines.py', NULL );
  */
 char* PathJoin (char* target, ...)
 {
 	va_list ap;
 	char* s;
 
-	target[0] = '\0';
-
 	va_start( ap, target );
 
 	s = va_arg( ap, char* );
-	if (s == NULL)
+	if (s == NULL) {
+		target[0] = '\0';
 		return target;
-
-	strcpy( target, s );
+	}
+	// This allows for 'target' being also the first var arg
+	if (target != s)
+		strcpy( target, s );
 
 	while ((s = va_arg( ap, char* )) != NULL) {
 		PathAppend( target, s );
