@@ -41,6 +41,9 @@ public:
 	bool Quit();
 	/** Get the Palette of a Sprite */
 	Color * GetPalette(Sprite2D * spr);
+	/** Mirrors an Animation Horizontally */
+	void MirrorAnimation(Animation * anim);
+
 	void * GetVideoSurface()
 	{
 		return disp;

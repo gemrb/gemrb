@@ -606,3 +606,25 @@ Color * SDLVideoDriver::GetPalette(Sprite2D * spr)
 	return pal;
 }
 
+void SDLVideoDriver::MirrorAnimation(Animation * anim)
+{
+	Sprite2D * frame = NULL;
+	int i = 0;
+	do {
+		frame = anim->GetFrame(i++);
+		if(!frame)
+			break;
+		unsigned char *buffer = (unsigned char*)malloc(frame->Width*frame->Height);
+		unsigned char *dst = buffer;
+		for(int y = 0; y < frame->Height; y++) {
+			unsigned char *src = ((unsigned char*)frame->pixels)+(y*frame->Width)+frame->Width;
+			for(int x = 0; x < frame->Width; x++) {
+				*dst = *src;
+				dst++;
+				src--;
+			}
+		}
+		memcpy(frame->pixels, buffer, frame->Width*frame->Height);
+		free(buffer);
+	} while(true);
+}
