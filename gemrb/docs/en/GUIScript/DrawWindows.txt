@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.DrawWindows()
 
-Description:
+Description: Refreshes the User Interface by redrawing invalidated controls.
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: N/A
 
-See also:
+See also: Invalidate, UnhideGUI
 

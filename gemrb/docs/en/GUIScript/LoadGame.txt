@@ -5,7 +5,7 @@ Description: Loads a saved game. This must be done before party creation.
 You must set the variable called PlayMode before loading a game (see SetVar).
 
 Parameters: index	- the saved game's index, -1 means new game.
-PlayMode (variable)	- 0 (single) ,1 (multi) ,2 (tutorial)
+PlayMode (variable)	- 0 (single player) ,1 (tutorial) ,2 (multi player)
 
 Return value: N/A
 
