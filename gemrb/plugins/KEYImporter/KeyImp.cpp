@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.31 2003/12/28 12:39:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.32 2003/12/30 02:34:13 balrog994 Exp $
  *
  */
 
@@ -124,7 +124,10 @@ bool KeyImp::LoadResFile(const char * resfile)
 		}
 		if(core->CaseSensitive) {
 			char fullPath[_MAX_PATH], tmpPath[_MAX_PATH] = {0}, fn[_MAX_PATH] = {0};
-			strncpy( tmpPath , be.name, (strrchr(be.name, PathDelimiter)+1)-be.name);
+			char * ptr = strrchr(be.name, PathDelimiter);
+			if(ptr) {
+				strncpy( tmpPath , be.name, (ptr+1)-be.name);	
+			}
 			strcpy(fullPath, core->GamePath);
 			strcat(fullPath, tmpPath);
 			if(!dir_exists(fullPath) ) {
@@ -133,7 +136,12 @@ bool KeyImp::LoadResFile(const char * resfile)
 				strcpy(fullPath, core->GamePath);
 				strcat(fullPath, tmpPath);
 			}
-			ExtractFileFromPath(fn, be.name);
+			if(ptr) {
+				ExtractFileFromPath(fn, be.name);
+			}
+			else {
+				strcpy(fn, be.name);
+			}
 			char * newname = FindInDir(fullPath, fn);
 			if(newname) {
 				strcpy(be.name, tmpPath);
