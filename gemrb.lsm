@@ -2,13 +2,13 @@ Begin3
 Title:          GemRB 
 Version:        0.1
 Entered-date:   
-Description:    
-Keywords:        
-Author:         GemRB Developement Team <Balrog994@yahoo.com> 
-Maintained-by:  GemRB Developement Team <Balrog994@yahoo.com> 
+Description:    OpenSource reimplementation of the InfinityEngine
+Keywords:       Infinity Engine 
+Author:         GemRB Developement Team <avenger_teambg@users.sourceforge.net> 
+Maintained-by:  GemRB Developement Team <avenger_teambg@users.sourceforge.net> 
 Primary-site:   	        
-Home-page:      http:// 
+Home-page:      http://gemrb.sourceforge.net 
 Original-site:  
-Platforms:       Linux and other Unices
+Platforms:      Linux and other Unices, Windows
 Copying-policy: GNU Public License
 End
