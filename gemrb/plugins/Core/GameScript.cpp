@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.141 2004/04/15 22:39:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.142 2004/04/15 22:55:34 avenger_teambg Exp $
  *
  */
 
@@ -4399,11 +4399,12 @@ void GameScript::VerbalConstantHead(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) tar;
 	printf( "Displaying string on: %s\n", actor->scriptName );
 	char *str=core->GetString( actor->StrRefs[parameters->int0Parameter], 2 );
-	actor->DisplayHeadText( str);
 	GameControl *gc=core->GetGameControl();
-	if(gc) {
+	if (gc) {
 		gc->DisplayString( str);
 	}
+	//this will free the string, no need of freeing it up!
+	actor->DisplayHeadText( str);
 }
 
 void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
@@ -4415,9 +4416,11 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) tar;
 	printf( "Displaying string on: %s\n", actor->scriptName );
 	GameControl *gc=core->GetGameControl();
-	if(gc) {
-		gc->DisplayString( core->GetString( actor->StrRefs[parameters->int0Parameter], 2 ) );
+	char *str = core->GetString( actor->StrRefs[parameters->int0Parameter], 2 );
+	if (gc) {
+		gc->DisplayString(str);
 	}
+	free(str);
 }
 
 void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
@@ -4564,6 +4567,7 @@ void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 {
 	if (Sender) {
 		printf( "Displaying string on: %s (without name)\n", Sender->scriptName );
+		//no need of freeing this string up!!!
 		Sender->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
 	}
 }
@@ -4572,6 +4576,7 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 {
 	if (Sender) {
 		printf( "Displaying string on: %s\n", Sender->scriptName );
+		//no need of freeing this string up!!!
 		Sender->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
 	}
 }
@@ -4852,6 +4857,7 @@ void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
 
 void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 {
+	//no need of freeing this string
 	Sender->DisplayHeadText( core->GetString( parameters->int0Parameter) );
 	Sender->textDisplaying = 0; //why?
 	GameControl* gc = core->GetGameControl();
@@ -5832,9 +5838,11 @@ void GameScript::TextScreen(Scriptable* Sender, Action* parameters)
 		char *strref = core->GetTable(chapter)->QueryField(0);
 		char *str=core->GetString( strtol(strref,NULL,0) );
 		gc->DisplayString(str);
+		free(str);
 		strref = core->GetTable(chapter)->QueryField(1);
 		str=core->GetString( strtol(strref,NULL,0) );
 		gc->DisplayString(str);
+		free(str);
 	}
 }
 
