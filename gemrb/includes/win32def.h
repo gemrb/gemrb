@@ -1,3 +1,6 @@
+#ifndef WIN32DEF_H
+#define WIN32DEF_H
+
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -69,5 +72,7 @@ typedef __POSITION* POSITION;
 #define printBracket(status, color) textcolor(WHITE); printf("["); textcolor(color); printf("%s", status); textcolor(WHITE); printf("]")
 #define printStatus(status, color) printBracket(status, color); printf("\n")
 #define printMessage(owner, message, color) printBracket(owner, LIGHT_WHITE); printf(": "); textcolor(color); printf("%s", message)
+
+#endif
 
 #endif
