@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.10 2005/01/11 17:41:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.11 2005/01/15 14:26:49 avenger_teambg Exp $
  *
  */
 
@@ -30,7 +30,16 @@
 #define FX_APPLIED 1
 
 int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx);
+int fx_attacks_per_round_modifier (Actor* target, Effect* fx);
+int fx_cure_sleep_state (Actor* target, Effect* fx);
+int fx_set_berserk_state (Actor* target, Effect* fx);
+int fx_cure_berserk_state (Actor* target, Effect* fx);
+int fx_set_charmed_state (Actor* target, Effect* fx);
+int fx_charisma_modifier (Actor* target, Effect* fx);
 int fx_constitution_modifier (Actor* target, Effect* fx);
+int fx_cure_poisoned_state (Actor* target, Effect* fx);
+int fx_damage (Actor* target, Effect* fx);
+int fx_death (Actor* target, Effect* fx);
 int fx_maximum_hp_modifier (Actor* target, Effect* fx);
 int fx_intelligence_modifier (Actor* target, Effect* fx);
 int fx_save_vs_death_modifier (Actor* target, Effect* fx);
@@ -38,6 +47,7 @@ int fx_save_vs_wands_modifier (Actor* target, Effect* fx);
 int fx_save_vs_poly_modifier (Actor* target, Effect* fx);
 int fx_save_vs_breath_modifier (Actor* target, Effect* fx);
 int fx_save_vs_spell_modifier (Actor* target, Effect* fx);
+int fx_set_sleep_state (Actor* target, Effect* fx);
 int fx_bonus_wizard_spells (Actor* target, Effect* fx);
 int fx_strength_modifier (Actor* target, Effect* fx);
 int fx_to_hit_modifier (Actor* target, Effect* fx);
@@ -49,14 +59,18 @@ int fx_resistance_to_magic_damage (Actor* target, Effect* fx);
 
 static int initialized = 0;
 static EffectFunction effect_fns[MAX_EFFECTS];
-
+static int efftexts[MAX_EFFECTS]; //from efftext.2da
 
 // FIXME: this list should be dynamic (stl::vector). It should be populated
 //   by fx plugins, so it would be easier to add new effects etc.
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectLink effectnames[] = {
+	{ "Cure:Berserk", fx_cure_berserk_state },
+	{ "Cure:Poison", fx_cure_poisoned_state },
+	{ "Cure:Sleep", fx_cure_sleep_state },
 	{ "HP:MaximumHPModifier", fx_maximum_hp_modifier },
 	{ "Stat:ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier },
+	{ "Stat:AttacksPerRoundModifier", fx_attacks_per_round_modifier },
 	{ "Stat:ConstitutionModifier", fx_constitution_modifier },
 	{ "Stat:IntelligenceModifier", fx_intelligence_modifier },
 	{ "Stat:SaveVsBreathModifier", fx_save_vs_breath_modifier },
@@ -65,8 +79,19 @@ static EffectLink effectnames[] = {
 	{ "Stat:SaveVsSpellsModifier", fx_save_vs_spell_modifier },
 	{ "Stat:SaveVsWandsModifier", fx_save_vs_wands_modifier },
 	{ "Stat:StrengthModifier", fx_strength_modifier },
+	{ "State:Berserk", fx_set_berserk_state },
+	{ "State:Charmed", fx_set_charmed_state },
+	{ "State:Sleep", fx_set_sleep_state },
 	{ NULL, NULL },
 };
+
+inline bool valid_number(const char* string, long& val)
+{
+        char* endpr;
+
+        val = strtol( string, &endpr, 0 );
+        return ( const char * ) endpr != string;
+}
 
 static EffectLink* FindEffect(const char* effectname)
 {
@@ -85,11 +110,16 @@ static EffectLink* FindEffect(const char* effectname)
 bool Init_EffectQueue()
 {
 	if (!initialized) {
+		TableMgr* efftextTable=NULL;
 		SymbolMgr* effectsTable;
 		memset( effect_fns, 0, sizeof( effect_fns ) );
+		memset( efftexts, -1, sizeof( efftexts ) );
 
 		initialized = 1;
 
+		int effT = core->LoadTable( "EFFTEXT" );
+		efftextTable = core->GetTable( effT );
+		
 		int eT = core->LoadSymbol( "EFFECTS" );
 		if (eT < 0) {
 			printMessage( "IEScript","A critical scripting file is missing!\n",LIGHT_RED );
@@ -103,6 +133,17 @@ bool Init_EffectQueue()
 
 		for (int i = 0; i < MAX_EFFECTS; i++) {
 			char* effectname = effectsTable->GetValue( i );
+			if(efftextTable) {
+				int row=efftextTable->GetRowCount();
+				while(row--) {
+                			char* ret = efftextTable->QueryField( row, 0 );
+		        	        long val;
+                			if (valid_number( ret, val ) && (i == val) ) {
+						efftexts[i] = atoi(efftextTable->QueryField( row,1 ) );
+					}
+				}
+			}
+
 			EffectLink* poi = FindEffect( effectname );
 			if (poi == NULL) {
 				effect_fns[i] = NULL;
@@ -112,7 +153,8 @@ bool Init_EffectQueue()
 			}
 			printf("-------- FN: %d, %s\n", i, effectname);
 		}
-
+		core->DelSymbol( eT );
+		if( efftextTable ) core->DelTable( effT );
 	}
 	return true;
 }
@@ -206,7 +248,8 @@ inline int MAX(int a, int b)
 #define STAT_ADD(stat, mod)  target->Modified[ stat ] = (ieDword)(target->Modified[ stat ] + ( mod ))
 #define STAT_SET(stat, mod)  target->Modified[ stat ] = (ieDword)( mod )
 #define STAT_MUL(stat, mod)  target->Modified[ stat ] = (ieDword)(target->Modified[ stat ] * (( mod ) / 100.0))
-
+#define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
+#define STATE_SET( mod ) target->Modified[ IE_STATE_ID ] |= (ieDword) ( mod )
 
 // 0x00
 int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx)
@@ -214,19 +257,69 @@ int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx)
 	printf( "fx_ac_vs_damage_type_modifier (%2d): AC Modif: %d ; Type: %d ; MinLevel: %d ; MaxLevel: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2, (int) fx->DiceSides, (int) fx->DiceThrown );
 	CHECK_LEVEL();
 
-	// FIXME: is it bitmask or just a single num?
+	// it is a bitmask
 	int type = fx->Parameter2;
 	if (type == 0) type = 15;
 
-	if (type && 1) STAT_ADD( IE_ACCRUSHINGMOD, fx->Parameter1 );
-	if (type && 2) STAT_ADD( IE_ACMISSILEMOD, fx->Parameter1 );
-	if (type && 4) STAT_ADD( IE_ACPIERCINGMOD, fx->Parameter1 );
-	if (type && 8) STAT_ADD( IE_ACSLASHINGMOD, fx->Parameter1 );
+	if (type & 1) STAT_ADD( IE_ACCRUSHINGMOD, fx->Parameter1 );
+	if (type & 2) STAT_ADD( IE_ACMISSILEMOD, fx->Parameter1 );
+	if (type & 4) STAT_ADD( IE_ACPIERCINGMOD, fx->Parameter1 );
+	if (type & 8) STAT_ADD( IE_ACSLASHINGMOD, fx->Parameter1 );
 
 	// FIXME: set to Param1 or Param1-1 ?
 	if (type == 16 && target->Modified[IE_ARMORCLASS] > fx->Parameter1)
 		STAT_SET( IE_ARMORCLASS, fx->Parameter1 );
 
+	return FX_APPLIED;
+}
+
+// 0x01
+int fx_attacks_per_round_modifier (Actor* target, Effect* fx)
+{
+	printf( "fx_attacks_per_round_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	target->NewStat( IE_NUMBEROFATTACKS, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x02
+int fx_cure_sleep_state (Actor* target, Effect* fx)
+{
+	printf( "fx_cure_sleep_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STATE_CURE( STATE_SLEEP );
+	return FX_APPLIED;
+}
+
+// 0x03
+int fx_cure_berserk_state (Actor* target, Effect* fx)
+{
+	printf( "fx_cure_berserk_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STATE_CURE( STATE_BERSERK );
+	return FX_APPLIED;
+}
+
+// 0x04
+int fx_set_berserk_state (Actor* target, Effect* fx)
+{
+	printf( "fx_set_berserk_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STATE_SET( STATE_BERSERK );
+	return FX_APPLIED;
+}
+
+// 0x05
+//fixme, this is much more complex, alters IE_EA too
+int fx_set_charmed_state (Actor* target, Effect* fx)
+{
+	printf( "fx_set_charmed_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STATE_SET( STATE_CHARMED );
+	return FX_APPLIED;
+}
+
+// 0x06
+int fx_charisma_modifier (Actor* target, Effect* fx)
+{
+	printf( "fx_charisma_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_CHR, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
@@ -236,6 +329,34 @@ int fx_constitution_modifier (Actor* target, Effect* fx)
 	printf( "fx_constitution_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	target->NewStat( IE_CON, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x0B
+int fx_cure_poisoned_state (Actor* target, Effect* fx)
+{
+	printf( "fx_cure_poisoned_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STATE_CURE( STATE_POISONED );
+	return FX_APPLIED;
+}
+
+// 0x0C Damage
+// this is a very important effect
+int fx_damage (Actor* target, Effect* fx)
+{
+	printf( "fx_damage (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	int damage; //FIXME damage calculation, random damage, etc
+
+	damage = 1;
+	target->Damage(damage, fx->Parameter2, target); //FIXME!
+	return FX_APPLIED;
+}
+
+//0x0D
+int fx_death (Actor* target, Effect* fx)
+{
+	printf( "fx_death (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	target->Die(target); //FIXME!
 	return FX_APPLIED;
 }
 
@@ -280,25 +401,6 @@ int fx_intelligence_modifier (Actor* target, Effect* fx)
 	printf( "fx_intelligence_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	target->NewStat( IE_INT, fx->Parameter1, fx->Parameter2 );
-	return FX_APPLIED;
-}
-
-// 0x2A
-int fx_bonus_wizard_spells (Actor* target, Effect* fx)
-{
-	printf( "fx_bonus_wizard_spells (%2d): Spell Add: %d ; Spell Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	
-	int i=1;
-	for( int j=0;j<9;j++) {
-		if (fx->Parameter2&i) {
-			if(fx->Parameter1) {
-				STAT_ADD( IE_WIZARDBONUS1+j, fx->Parameter1);
-			}
-			else {
-				STAT_ADD( IE_WIZARDBONUS1+j, target->BaseStats[ IE_WIZARDBONUS1+j ]);
-			}
-		}
-	}
 	return FX_APPLIED;
 }
 
@@ -347,6 +449,33 @@ int fx_save_vs_spell_modifier (Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
+// 0x27
+int fx_set_sleep_state (Actor* target, Effect* fx)
+{
+	printf( "fx_set_sleep_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STATE_SET( STATE_SLEEP );
+	return FX_APPLIED;
+}
+
+// 0x2A
+int fx_bonus_wizard_spells (Actor* target, Effect* fx)
+{
+	printf( "fx_bonus_wizard_spells (%2d): Spell Add: %d ; Spell Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	
+	int i=1;
+	for( int j=0;j<9;j++) {
+		if (fx->Parameter2&i) {
+			if(fx->Parameter1) {
+				STAT_ADD( IE_WIZARDBONUS1+j, fx->Parameter1);
+			}
+			else {
+				STAT_ADD( IE_WIZARDBONUS1+j, target->BaseStats[ IE_WIZARDBONUS1+j ]);
+			}
+		}
+	}
+	return FX_APPLIED;
+}
+
 // 0x2C
 int fx_strength_modifier (Actor* target, Effect* fx)
 {
@@ -379,14 +508,7 @@ int fx_damage_bonus (Actor* target, Effect* fx)
 {
 	printf( "fx_damage_bonus (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	switch (fx->Parameter2) {
-	case 0: 
-		STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
-		break;
-	default:
-		STAT_SET( IE_DAMAGEBONUS, fx->Parameter1);
-		break;
-	}
+	target->NewStat( IE_DAMAGEBONUS, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
