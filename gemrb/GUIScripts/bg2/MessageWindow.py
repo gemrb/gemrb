@@ -21,7 +21,6 @@
 import GemRB
 
 from GUICommonWindows import *
-import GUICommonWindows
 from GUIJRNL import *
 from GUIMA import *
 from GUIMG import *
@@ -45,12 +44,10 @@ def OnLoad():
 
 	GemRB.LoadWindowPack(GetWindowPack())
 	ActionsWindow = GemRB.LoadWindow(3)
-	#PortraitWindow = GemRB.LoadWindow(1)
 	OptionsWindow = GemRB.LoadWindow(0)
 	MessageWindow = GemRB.LoadWindow(4)
-	#fixme ugly
-	OpenPortraitWindow()
-	PortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow(1)
+
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
 	GemRB.SetTextAreaFlags(MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	Button=GemRB.GetControl(OptionsWindow, 10)
@@ -62,14 +59,14 @@ def OnLoad():
 	Button=GemRB.GetControl(ActionsWindow, 61)
 	GemRB.SetEvent(ActionsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MaximizePortraits")
 
-	#GemRB.SetVar("PortraitWindow", PortraitWindow)
+	GemRB.SetVar("PortraitWindow", PortraitWindow)
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
 	GemRB.SetVar("OptionsWindow", OptionsWindow)
 	GemRB.SetVar("MessageWindow", MessageWindow)
 	GemRB.SetVar("TopWindow", -1)
 	GemRB.SetVar("OtherWindow", -1)
 	GemRB.SetVar("FloatWindow", -1)
-	#GemRB.SetVar("PortraitPosition", 2) #Right
+	GemRB.SetVar("PortraitPosition", 2) #Right
 	GemRB.SetVar("ActionsPosition", 4) #BottomAdded
 	GemRB.SetVar("OptionsPosition", 0) #Left
 	GemRB.SetVar("MessagePosition", 4) #BottomAdded
@@ -85,7 +82,6 @@ def OnLoad():
 	UpdateResizeButtons()
 	
 	GemRB.SetVisible(ActionsWindow, 1)
-	#GemRB.SetVisible(PortraitWindow, 0)
 	GemRB.SetVisible(OptionsWindow, 0)
 	GemRB.SetVisible(MessageWindow, 1)
 	return

@@ -36,16 +36,12 @@ MessageTA = 0
 
 def OnLoad():
 	global MessageWindow, MessageTA
-	GemRB.LoadWindowPack("GUIW08")
+	GemRB.LoadWindowPack(GetWindowPack())
 	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
 	MessageTA = GemRB.GetControl(MessageWindow, 1)
 	GemRB.SetTextAreaFlags(MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
+	ActionsWindow = PortraitWindow = OpenPortraitWindow(1)
 
-	OpenPortraitWindow()
-	ActionsWindow = PortraitWindow = GUICommonWindows.PortraitWindow
-
-	#ActionsWindow = PortraitWindow = GemRB.LoadWindow(1)
-	
 	GemRB.SetVar("MessageWindow", MessageWindow)
 	GemRB.SetVar("PortraitWindow", PortraitWindow)
 	GemRB.SetVar("TopWindow", -1)
@@ -54,6 +50,7 @@ def OnLoad():
 	GemRB.SetVar("ActionsPosition", -1) #already handled in portraitwindow
 	GemRB.SetVar("OptionsPosition", -1) #already handled in messagewindow
 	GemRB.SetVar("MessagePosition", 4)
+	GemRB.SetVar("PortraitPosition", 4)
 	GemRB.SetVar("OtherPosition", 5) #Inactivating
 	GemRB.SetVar("TopPosition", 5) #Inactivating
 

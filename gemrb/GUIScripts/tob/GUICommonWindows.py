@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.15 2005/03/20 23:36:46 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.16 2005/03/21 23:09:34 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -183,8 +183,6 @@ def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
 	PortraitWindow = Window = GemRB.LoadWindow(1)
-	GemRB.SetVar ("PortraitWindow", PortraitWindow)
-	GemRB.SetVar ("PortraitPosition", 2)    # Right
 
 	if needcontrols:
 		Button=GemRB.GetControl(PortraitWindow, 8)
@@ -207,7 +205,6 @@ def OpenPortraitWindow (needcontrols):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
 
-		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_PICTURE, OP_SET)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1,
 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
@@ -215,7 +212,7 @@ def OpenPortraitWindow (needcontrols):
 		GemRB.SetButtonFont (Window, Button, "NORMAL")
 
 	UpdatePortraitWindow ()
-	return
+	return Window
 
 def UpdatePortraitWindow ():
 	Window = PortraitWindow
@@ -224,10 +221,10 @@ def UpdatePortraitWindow ():
 		Button = GemRB.GetControl (Window, i)
 		pic = GemRB.GetPlayerPortrait (i+1,1)
 		if not pic:
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			continue
 
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		GemRB.SetButtonPicture(Window, Button, pic)
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
 		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
@@ -235,7 +232,6 @@ def UpdatePortraitWindow ():
 		GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
 		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
 
-	return
 
 def PortraitButtonOnPress ():
 	i = GemRB.GetVar ("PressedPortrait")
@@ -267,17 +263,17 @@ def SelectAllOnPress ():
 
 # Run by Game class when selection was changed
 def SelectionChanged ():
+	global PortraitWindow
+
 	# FIXME: hack. If defined, display single selection
 	if (not SelectionChangeHandler):
-		for i in range (0, PARTY_SIZE):
+		for i in range (PARTY_SIZE):
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
 	else:
 		sel = GemRB.GameGetSelectedPCSingle ()
-		for i in range (0, PARTY_SIZE):
-			Button = GemRB.GetControl (PortraitWindow, i)
 
-		for i in range (0, PARTY_SIZE):
+		for i in range (PARTY_SIZE):
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, i + 1 == sel)
 
@@ -307,10 +303,8 @@ def SetupSavingThrows (pc):
 			Class = GemRB.FindTableValue (ClassTable, 5, 4)
 		SaveName2 = GemRB.GetTableValue (ClassTable, Class, 3)
 		Class = 0  #fighter
-		print "SaveName2", SaveName2
 
 	SaveName1 = GemRB.GetTableValue (ClassTable, Class, 3)
-	print "SaveName1", SaveName1
 
 	for row in range(5):
 		tmp1 = GetSavingThrow (SaveName1, row, level1)
@@ -319,6 +313,5 @@ def SetupSavingThrows (pc):
 			if tmp2<tmp1:
 				tmp1=tmp2
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
-		print "Savingthrow:", tmp1
 	return
 

@@ -42,13 +42,10 @@ def OnLoad():
 
 	GemRB.LoadWindowPack(GetWindowPack())
 	ActionsWindow = GemRB.LoadWindow(3)
-	#PortraitWindow = GemRB.LoadWindow(1)
-	#PopulatePortraitWindow()
 	OptionsWindow = GemRB.LoadWindow(0)
 	MessageWindow = GemRB.LoadWindow(4)
-	#fixme ugly
-	OpenPortraitWindow()
-	PortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow(1)
+
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
 	GemRB.SetTextAreaFlags(MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	GemRB.SetVar("PortraitWindow", PortraitWindow)
