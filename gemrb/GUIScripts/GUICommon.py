@@ -16,9 +16,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.2 2004/12/05 09:50:06 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.3 2004/12/05 12:30:00 avenger_teambg Exp $
 
-
+import GemRB
 # GUICommon.py - common functions for GUIScripts of all game types
 
 OtherWindowFn = None
@@ -40,21 +40,40 @@ def CloseOtherWindow (NewWindowFn):
 
 def GetLearnableMageSpells (Kit, Alignment, Level):
 	Learnable =[]
+
+	Table=GemRB.LoadTable("aligns")
+	#usability is the bitset we look for
+	Usability=Kit | GemRB.GetTableValue(Table, Alignment, 5)
+	GemRB.UnloadTable(Table)
+
+	SchoolFlag = Kit | Usability
 	for i in range(99):
 		SpellName = "SPWI%d%02d"%(Level,i)
 		ms = GemRB.GetSpell(SpellName)
 		if ms == None:
 			continue
-		Learnable.append (ms['SpellResRef'])
+		if Usability & ms['SpellSchool']:
+			continue
+		Learnable.append (SpellName)
 	return Learnable
 
-def GetLearnablePriestSpells (Kit, Alignment, Level):
+def GetLearnablePriestSpells (Class, Alignment, Level):
 	Learnable =[]
+
+	Table=GemRB.LoadTable("aligns")
+	#usability is the bitset we look for
+	Usability=GemRB.GetTableValue(Table, Alignment, 5)
+	GemRB.UnloadTable(Table)
+
 	for i in range(99):
 		SpellName = "SPPR%d%02d"%(Level,i)
 		ms = GemRB.GetSpell(SpellName)
 		if ms == None:
 			continue
-		Learnable.append (ms['SpellResRef'])
+		if Class & ms['SpellDivine']:
+			continue
+		if Usability & ms['SpellSchool']:
+			continue
+		Learnable.append (SpellName)
 	return Learnable
 
