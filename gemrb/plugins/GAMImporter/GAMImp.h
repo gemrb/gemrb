@@ -43,6 +43,7 @@ public:
 	}
 private:
 	Actor* GetActor( ActorMgr* aM, bool is_in_party );
+	PCStatsStruct* GetPCStats();
 	GAMJournalEntry* GetJournalEntry();
 };
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.45 2004/08/22 22:10:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.46 2004/08/26 22:39:59 edheldil Exp $
  *
  */
 
@@ -82,11 +82,30 @@ class Map;
 //dead actor may not be selected
 #define GA_NO_DEAD  32
 
+typedef struct PCStatsStruct {
+	ieStrRef  BestKilledName;
+	ieDword   BestKilledXP;
+	ieDword   unknown08;
+	ieDword   JoinDate;
+	ieDword   unknown10;
+	ieDword   KillsChapterXP;
+	ieDword   KillsChapterCount;
+	ieDword   KillsTotalXP;
+	ieDword   KillsTotalCount;
+	ieResRef  FavouriteSpells[4];
+	ieWord    FavouriteSpellsCount[4];
+	ieResRef  FavouriteWeapons[4];
+	ieWord    FavouriteWeaponsCount[4];
+} PCStatsStruct;
+
+
+
 class GEM_EXPORT Actor : public Moveble {
 public:
 	//CRE DATA FIELDS
 	ieDword BaseStats[MAX_STATS];
 	ieDword Modified[MAX_STATS];
+	PCStatsStruct*  PCStats;
 	char Dialog[9];
 	char SmallPortrait[9];
 	char LargePortrait[9];

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.37 2004/08/22 22:10:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.38 2004/08/26 22:39:59 edheldil Exp $
  *
  */
 
@@ -253,6 +253,8 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	}
 	str->Read( &pcInfo.TalkCount, 4 );
 
+	PCStatsStruct* ps = GetPCStats();
+
 	if (pcInfo.OffsetToCRE) {
 		str->Seek( pcInfo.OffsetToCRE, GEM_STREAM_START );
 		void* Buffer = malloc( pcInfo.CRESize );
@@ -260,7 +262,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize );
 		aM->Open( ms );
 		actor = aM->GetActor();
-		if(pcInfo.Name[0]!=-1) { //torment has them as -1
+		if(pcInfo.Name[0]!=0) { //torment has them as 0
 			actor->SetText(pcInfo.Name,0); //setting both names
 		}
 		actor->TalkCount = pcInfo.TalkCount;
@@ -279,7 +281,40 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	actor->StanceID = IE_ANI_AWAKE;
 	strcpy( actor->Area, pcInfo.Area );
 
+	actor->PCStats = ps;
+
 	return actor;
+}
+
+PCStatsStruct* GAMImp::GetPCStats ()
+{
+	PCStatsStruct* ps = new PCStatsStruct();
+	int i;
+
+	str->Read( &ps->BestKilledName, 4 );
+	str->Read( &ps->BestKilledXP, 4 );
+	str->Read( &ps->unknown08, 4 );
+	str->Read( &ps->JoinDate, 4 );
+	str->Read( &ps->unknown10, 4 );
+	str->Read( &ps->KillsChapterXP, 4 );
+	str->Read( &ps->KillsChapterCount, 4 );
+	str->Read( &ps->KillsTotalXP, 4 );
+	str->Read( &ps->KillsTotalCount, 4 );
+	for (i = 0; i <= 3; i++) {
+		str->Read( &ps->FavouriteSpells[i], 8 );
+		//ps->FavouriteSpells[i][8] = 0;
+	}
+	for (i = 0; i <= 3; i++)
+		str->Read( &ps->FavouriteSpellsCount[i], 2 );
+
+	for (i = 0; i <= 3; i++) {
+		str->Read( &ps->FavouriteWeapons[i], 8 );
+		//ps->FavouriteWeapons[i][8] = 0;
+	}
+	for (i = 0; i <= 3; i++)
+		str->Read( &ps->FavouriteWeaponsCount[i],2 );
+
+	return ps;
 }
 
 GAMJournalEntry* GAMImp::GetJournalEntry()

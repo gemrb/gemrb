@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.198 2004/08/26 13:29:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.199 2004/08/26 22:39:58 edheldil Exp $
  *
  */
 
@@ -2806,25 +2806,24 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerName__doc,
-"GetPlayerName(Slot[, LongOrShort]) => string\n\n"
+"GetPlayerName(PartyID[, LongOrShort]) => string\n\n"
 "Queries the player name." );
 
 static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 {
-	int PlayerSlot, Which;
+	int PartyID, Which;
 
 	Which = 0;
-	if (!PyArg_ParseTuple( args, "i|i", &PlayerSlot, &Which )) {
+	if (!PyArg_ParseTuple( args, "i|i", &PartyID, &Which )) {
 		return AttributeError( GemRB_GetPlayerName__doc );
 	}
 	Game *game = core->GetGame();
 	if(!game) {
 		return NULL;
 	}
-	PlayerSlot = game->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
+	Actor* MyActor = game->FindPC( PartyID );
 	if (!MyActor) {
-		return Py_BuildValue( "s", "");
+		return Py_BuildValue( "s", "???");
 	}
 	return Py_BuildValue( "s", MyActor->GetName(Which) );
 }
@@ -2855,6 +2854,103 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	Py_INCREF( Py_None );
 	return Py_None;
 }
+
+PyDoc_STRVAR( GemRB_GetPCStats__doc,
+"GetPCStats(PartyID) => dict\n\n"
+"Returns dictionary or PC's performance stats." );
+
+static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+
+	if (!PyArg_ParseTuple( args, "i", &PartyID )) {
+		return AttributeError( GemRB_GetPCStats__doc );
+	}
+	Game *game = core->GetGame();
+	if(!game) {
+		return NULL;
+	}
+	Actor* MyActor = game->FindPC( PartyID );
+	if (!MyActor || !MyActor->PCStats) {
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
+	PyObject* dict = PyDict_New();
+	PCStatsStruct* ps = MyActor->PCStats;
+
+	PyDict_SetItemString(dict, "BestKilledName", PyInt_FromLong (ps->BestKilledName));
+	PyDict_SetItemString(dict, "BestKilledXP", PyInt_FromLong (ps->BestKilledXP));
+	PyDict_SetItemString(dict, "JoinDate", PyInt_FromLong (ps->JoinDate));
+	PyDict_SetItemString(dict, "KillsChapterXP", PyInt_FromLong (ps->KillsChapterXP));
+	PyDict_SetItemString(dict, "KillsChapterCount", PyInt_FromLong (ps->KillsChapterCount));
+	PyDict_SetItemString(dict, "KillsTotalXP", PyInt_FromLong (ps->KillsTotalXP));
+	PyDict_SetItemString(dict, "KillsTotalCount", PyInt_FromLong (ps->KillsTotalCount));
+
+
+
+	// FIXME!!!
+	if (ps->FavouriteSpells[0][0]) {
+		DataStream* str = core->GetResourceMgr()->GetResource( ps->FavouriteSpells[0], IE_SPL_CLASS_ID );
+		SpellMgr* sm = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
+		if (sm == NULL) {
+			delete ( str );
+			return NULL;
+		}
+		if (!sm->Open( str, true )) {
+			core->FreeInterface( sm );
+			return NULL;
+		}
+
+		Spell* spell = sm->GetSpell();
+		if (spell == NULL) {
+			core->FreeInterface( sm );
+			return NULL;
+		}
+
+		core->FreeInterface( sm );
+
+		PyDict_SetItemString(dict, "FavouriteSpell", PyInt_FromLong (spell->SpellName));
+
+		delete spell;
+	} else {
+		PyDict_SetItemString(dict, "FavouriteSpell", PyString_FromString (""));
+	}
+
+
+
+	// FIXME!!!
+	if (ps->FavouriteWeapons[0][0]) {
+		DataStream* str = core->GetResourceMgr()->GetResource( ps->FavouriteWeapons[0], IE_ITM_CLASS_ID );
+		ItemMgr* sm = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
+		if (sm == NULL) {
+			delete ( str );
+			return NULL;
+		}
+		if (!sm->Open( str, true )) {
+			core->FreeInterface( sm );
+			return NULL;
+		}
+
+		Item* item = sm->GetItem();
+		if (item == NULL) {
+			core->FreeInterface( sm );
+			return NULL;
+		}
+
+		core->FreeInterface( sm );
+
+		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->ItemName));
+
+		delete item;
+	} else {
+		PyDict_SetItemString(dict, "FavouriteWeapon", PyString_FromString (""));
+	}
+
+
+	return dict;
+}
+
 
 PyDoc_STRVAR( GemRB_GameSelectPC__doc,
 "GameSelectPC(Slot, Selected)\n\n"
@@ -3535,6 +3631,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPlayerPortrait, METH_VARARGS),
 	METHOD(GetPlayerName, METH_VARARGS),
 	METHOD(SetPlayerName, METH_VARARGS),
+	METHOD(GetPCStats, METH_VARARGS),
 	METHOD(FillPlayerInfo, METH_VARARGS),
 	METHOD(SetWorldMapImage, METH_VARARGS),
 	METHOD(SetSpellIcon, METH_VARARGS),

@@ -16,13 +16,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.13 2004/08/21 04:58:55 divide Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.14 2004/08/26 22:40:00 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
 
 # GUIREC:
-# 0,1,2 - sommon windows (time, message, menu)
+# 0,1,2 - common windows (time, message, menu)
 # 3 - main statistics window
 # 4 - level up win
 # 5 - info - kills, weapons ...
@@ -95,7 +95,7 @@ def OpenRecordsWindow ():
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		SetSelectionChangeHandler (None)
-		
+
 		GemRB.UnhideGUI()
 		return	
 
@@ -146,7 +146,6 @@ def OpenRecordsWindow ():
 	SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
 
-	#GemRB.SetVisible (Window, 1)
 	GemRB.UnhideGUI ()
 
 
@@ -222,7 +221,7 @@ def UpdateRecordsWindow ():
 	
 	Label = GemRB.GetControl (Window, 0x10000015)
 	GemRB.SetText (Window, Label, text)
-	print "SEX:", GemRB.GetPlayerStat (pc, IE_SEX)
+	#print "SEX:", GemRB.GetPlayerStat (pc, IE_SEX)
 
 
 	# class
@@ -232,14 +231,14 @@ def UpdateRecordsWindow ():
 
 	Label = GemRB.GetControl (Window, 0x10000016)
 	GemRB.SetText (Window, Label, text)
-	print "CLASS:", GemRB.GetPlayerStat (pc, IE_CLASS)
+	#print "CLASS:", GemRB.GetPlayerStat (pc, IE_CLASS)
 
 	# alignment
 	align = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
-	print 'ALIGN:', align
+	#print 'ALIGN:', align
 	ss = GemRB.LoadSymbol ("ALIGN")
 	sym = GemRB.GetSymbolValue (ss, align)
-	print "ALIGN SYM:", sym
+	#print "ALIGN SYM:", sym
 
 	AlignmentTable = GemRB.LoadTable ("ALIGNS")
 	#print "ALIGN DESC:", GemRB.GetTableValue (AlignmentTable, align + 1, 0)
@@ -256,7 +255,7 @@ def UpdateRecordsWindow ():
 
 	# faction
 	faction = GemRB.GetPlayerStat (pc, IE_FACTION)
-	print 'FACTION:', faction
+	#print 'FACTION:', faction
 
 	FactionTable = GemRB.LoadTable ("FACTIONS")
 	faction_help = GemRB.GetString (GemRB.GetTableValue (FactionTable, faction, 0))
@@ -637,6 +636,66 @@ def OpenInformationWindow ():
 
 	InformationWindow = Window = GemRB.LoadWindow (5)
 	GemRB.SetVar ("FloatWindow", InformationWindow)
+
+
+	# These are used to get the stats
+	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = pc + 1;
+
+	stat = GemRB.GetPCStats (pc);
+
+	Label = GemRB.GetControl (Window, 0x10000001)
+	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc))
+
+	Label = GemRB.GetControl (Window, 0x10000002)
+	GemRB.SetText (Window, Label, GemRB.GetString (stat['BestKilledName']) + '  (%d XP)' %stat['BestKilledXP'])
+
+	Label = GemRB.GetControl (Window, 0x10000003)
+	GemRB.SetText (Window, Label, str (stat['JoinDate']))
+
+	Label = GemRB.GetControl (Window, 0x10000004)
+	GemRB.SetText (Window, Label, stat['FavouriteSpell'])
+
+	Label = GemRB.GetControl (Window, 0x10000005)
+	GemRB.SetText (Window, Label, stat['FavouriteWeapon'])
+
+	Label = GemRB.GetControl (Window, 0x10000006)
+	GemRB.SetText (Window, Label, str (stat['KillsChapterXP']))
+
+	Label = GemRB.GetControl (Window, 0x10000007)
+	GemRB.SetText (Window, Label, str (stat['KillsChapterCount']))
+
+	Label = GemRB.GetControl (Window, 0x10000008)
+	GemRB.SetText (Window, Label, str (stat['KillsTotalXP']))
+
+	Label = GemRB.GetControl (Window, 0x10000009)
+	GemRB.SetText (Window, Label, str (stat['KillsTotalCount']))
+
+
+	Label = GemRB.GetControl (Window, 0x1000000B)
+	GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+
+	Label = GemRB.GetControl (Window, 0x1000000C)
+	GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+
+	Label = GemRB.GetControl (Window, 0x1000000D)
+	GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+
+	Label = GemRB.GetControl (Window, 0x1000000E)
+	GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+
+	Label = GemRB.GetControl (Window, 0x1000000F)
+	GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+
+	Label = GemRB.GetControl (Window, 0x10000010)
+	GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+
+	Label = GemRB.GetControl (Window, 0x10000011)
+	GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+
+	Label = GemRB.GetControl (Window, 0x10000012)
+	GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+
 
 
 	# Biography

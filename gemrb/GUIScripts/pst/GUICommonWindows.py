@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.13 2004/07/25 00:00:02 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.14 2004/08/26 22:40:00 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -154,29 +154,8 @@ def SetupMenuWindowControls (Window):
 	GemRB.SetTooltip (Window, Button, 41660)  # or 41661 Close ...
 
 
-PokWindow = None
 def CntReachPress ():
 	print "CntReachPress"
-	global PokWindow
-	
-	GemRB.HideGUI()
-	
-	if PokWindow != None:
-		
-		GemRB.UnloadWindow(PokWindow)
-		PokWindow = None
-		GemRB.SetVar("OtherWindow", -1)
-		#SetSelectionChangeHandler (None)
-		GemRB.UnhideGUI()
-		return
-		
-	GemRB.LoadWindowPack ("GUIWORLD")
-	#PokWindow = Window = GemRB.CreateWindow (100, 0, 0, 640, 480, "GUIID")
-	PokWindow = Window = GemRB.CreateWindow (100, 0, 0, 640, 480, "GUILS05")
-        GemRB.SetVar("OtherWindow", PokWindow)
-
-	GemRB.UnhideGUI ()
-
 
 def AIPress ():
 	print "AIPress"
