@@ -63,6 +63,7 @@ private: // Private attributes
 	std::vector<char *> lines;
 	std::vector<int> lrows;
 	int seltext;
+	int selline;
 	///** Text Buffer */
 	//unsigned char * Buffer;
 	/** Number of Text Rows */
@@ -75,6 +76,7 @@ private: // Private attributes
 	Color * palette;
 	Color * initpalette;
 	Color * selected;
+	Color * lineselpal;
 	/** Fonts */
 	Font *finit, *ftext;
 	void CalcRowCount();
@@ -85,6 +87,8 @@ public: //Events
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
+	/** Mouse Button Up */
+	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
 };
 
 #endif

@@ -30,18 +30,25 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	rows = 0;
 	startrow = 0;
 	seltext = -1;
+	selline = -1;
 	sb = NULL;
 	Selectable = true;
 	palette = core->GetVideoDriver()->CreatePalette(hitextcolor, lowtextcolor);
 	initpalette = core->GetVideoDriver()->CreatePalette(initcolor, lowtextcolor);
 	Color tmp = {hitextcolor.b, hitextcolor.g, hitextcolor.r, 0};
 	selected = core->GetVideoDriver()->CreatePalette(tmp, lowtextcolor);
+	tmp.r = 255;
+	tmp.g = 152;
+	tmp.b = 102;
+	lineselpal = core->GetVideoDriver()->CreatePalette(tmp, lowtextcolor);
 }
 
 TextArea::~TextArea(void)
 {
 	free(palette);
 	free(initpalette);
+	free(selected);
+	free(lineselpal);
 	for(int i = 0; i < lines.size(); i++) {
 		free(lines[i]);
 	}
@@ -85,7 +92,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
   		Color * pal = NULL;
   		if(seltext == i)
   			pal = selected;
-  		else
+  		else if(selline == i)
+			pal = lineselpal;
+		else
   			pal = palette;
   		ftext->PrintFromLine(sr, Region(x+XPos, y+YPos, Width, Height), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
   		yl = lrows[i]-sr;
@@ -95,7 +104,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
   		Color * pal = NULL;
   		if(seltext == i)
   			pal = selected;
-  		else
+  		else if(selline == i)
+			pal = lineselpal;
+		else
   			pal = palette;
   		ftext->Print(Region(x+XPos, y+YPos+(yl*ftext->chars[1]->Height), Width, Height-(yl*ftext->chars[1]->Height)), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true);
 		yl+=lrows[i];
@@ -243,4 +254,12 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	}
 	seltext = -1;
 	printf("seltext = %d, rows %d, row %d, r = %d\n", seltext, rows, row, r);
+}
+/** Mouse Button Up */
+void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
+{
+	if((x <= Width) && (y <= Height)) {
+		selline = seltext;
+		((Window*)Owner)->Invalidate();
+	}
 }
