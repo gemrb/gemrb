@@ -961,9 +961,7 @@ void GameControl::DialogChoose(int choose)
 				}					
 				if(tr->action) {
 					for(int i = 0; i < tr->action->count; i++) {
-						if(speaker->Scripts[0]) {
-							speaker->AddAction(GameScript::CreateAction(tr->action->strings[i], true));
-						}
+						speaker->AddAction(GameScript::CreateAction(tr->action->strings[i], true));
 					}
 				}
 				ds = dlg->GetState(tr->stateIndex);
