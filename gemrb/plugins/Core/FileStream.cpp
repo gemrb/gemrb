@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.24 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.25 2004/04/17 12:28:21 doc_wagon Exp $
  *
  */
 
@@ -95,7 +95,7 @@ bool FileStream::Open(_FILE* stream, int startpos, int size, bool autoFree)
 	return true;
 }
 
-int FileStream::Read(void* dest, unsigned int length)
+int FileStream::Read(void* dest, int length)
 {
 	if (!opened) {
 		return GEM_ERROR;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.8 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.9 2004/04/17 12:28:21 doc_wagon Exp $
  *
  */
 
@@ -45,7 +45,7 @@ public:
 	bool Encrypted;
 	DataStream(void);
 	virtual ~DataStream(void);
-	virtual int Read(void* dest, unsigned int len) = 0;
+	virtual int Read(void* dest, int len) = 0;
 	virtual int Seek(int pos, int startpos) = 0;
 	virtual unsigned long Size() = 0;
 	/** Returns true if the stream is encrypted */
