@@ -18,7 +18,7 @@
 #ifndef MUSIMP_H
 #define MUSIMP_H
 
-#include <../Core/MusicMgr.h>
+#include "../Core/MusicMgr.h"
 #include <stdio.h>
 
 /**MUS PlayList Importer

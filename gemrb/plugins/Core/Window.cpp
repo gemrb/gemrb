@@ -127,7 +127,7 @@ void Window::release(void)
 /** Redraw all the Window */
 void Window::Invalidate()
 {
-	for(int i = 0; i < Controls.size(); i++) {
+	for(unsigned int i = 0; i < Controls.size(); i++) {
 		Controls[i]->Changed = true;
 	}
 	Changed = true;
@@ -135,7 +135,7 @@ void Window::Invalidate()
 
 void Window::RedrawControls(char *VarName, unsigned long Sum)
 {
-	for(int i = 0; i < Controls.size(); i++) {
+	for(unsigned int i = 0; i < Controls.size(); i++) {
 		switch(Controls[i]->ControlType)
                 {
 			case IE_GUI_BUTTON:

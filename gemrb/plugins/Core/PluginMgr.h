@@ -1,6 +1,7 @@
 #ifndef PLUGINMGR_H
 #define PLUGINMGR_H
 
+#include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include <vector>
 

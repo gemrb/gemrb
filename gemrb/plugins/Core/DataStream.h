@@ -28,12 +28,12 @@ public:
 	virtual int Read(void * dest, int len) = 0;
 	virtual int Seek(int pos, int startpos) = 0;
 	virtual unsigned long Size() = 0;
-  /** Returns true if the stream is encrypted */
-  bool CheckEncrypted();
-  /** No descriptions */
-  void ReadDecrypted(void * buf, int size);
-  /** No descriptions */
-  virtual int ReadLine(void * buf, int maxlen) = 0;
+	/** Returns true if the stream is encrypted */
+	bool CheckEncrypted();
+	/** No descriptions */
+	void ReadDecrypted(void * buf, int size);
+	/** No descriptions */
+	virtual int ReadLine(void * buf, int maxlen) = 0;
 	char filename[_MAX_PATH];
 };
 

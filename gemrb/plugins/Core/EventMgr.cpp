@@ -16,7 +16,7 @@ void EventMgr::AddWindow(Window * win)
 {
 	if(win == NULL)
 		return;
-	for(int i = 0; i < windows.size(); i++) {
+	for(unsigned int i = 0; i < windows.size(); i++) {
 		if(windows[i] == win)
 			return;
 	}
@@ -141,7 +141,7 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button,
 			}	
 		}
 	}*/
-	for(int i = 0; i < windows.size(); i++) {
+	for(unsigned int i = 0; i < windows.size(); i++) {
 		//if(((*m)->XPos <= x) && ((*m)->YPos <= y)) { //Maybe we are on the window, let's check
 		//	if(((*m)->XPos+(*m)->Width >= x) && ((*m)->YPos+(*m)->Height >= y)) { //Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer

@@ -1,4 +1,19 @@
 #include "Variables.h"
+#ifdef WIN32
+int strnlen(const char * string, int maxlen) {
+	if(!string)
+		return -1;
+	int acc = 0;
+	int i = 0;
+	while(maxlen > 0) {
+		if(string[i++])
+			acc++;
+		else
+			break;
+	}
+	return acc;
+}
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // inlines

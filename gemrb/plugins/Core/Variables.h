@@ -26,7 +26,19 @@
 /////////////////////////////////////////////////////////////////////////////
 // Variables<unsigned long, VALUE>
 
-class Variables //: public CObject
+#ifdef WIN32
+
+#ifdef GEM_BUILD_DLL
+#define GEM_EXPORT __declspec(dllexport)
+#else
+#define GEM_EXPORT __declspec(dllimport)
+#endif
+
+#else
+#define GEM_EXPORT
+#endif
+
+class GEM_EXPORT Variables //: public CObject
 {
 protected:
 	// Association

@@ -1,7 +1,11 @@
 #include "../../includes/win32def.h"
 #include "../Core/Interface.h"
 #include "ACMImp.h"
+#ifndef WIN32
 #include "../../includes/fmod/fmod.h"
+#else
+#include "../../includes/fmodwin32/fmod.h"
+#endif
 #include "acmsound.h"
 #include <fcntl.h>
 #include <stdlib.h>

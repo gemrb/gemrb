@@ -18,13 +18,25 @@
 #ifndef MUSICMGR_H
 #define MUSICMGR_H
 
-#include <../Core/Plugin.h>
+#include "Plugin.h"
 
 /**Base class for Music Playlist Player Plugin
   *@author GemRB Developement Team
   */
 
-class MusicMgr : public Plugin
+#ifdef WIN32
+
+#ifdef GEM_BUILD_DLL
+#define GEM_EXPORT __declspec(dllexport)
+#else
+#define GEM_EXPORT __declspec(dllimport)
+#endif
+
+#else
+#define GEM_EXPORT
+#endif
+
+class GEM_EXPORT MusicMgr : public Plugin
 {
 public: 
 	MusicMgr();

@@ -508,7 +508,7 @@ ScriptEngine * Interface::GetGUIScriptEngine()
 
 void Interface::RedrawAll()
 {
-	for(int i = 0; i < windows.size(); i++) {
+	for(unsigned int i = 0; i < windows.size(); i++) {
 		if(windows[i]!=NULL)
 			windows[i]->Invalidate();
 	}
@@ -517,7 +517,7 @@ void Interface::RedrawAll()
 /** Loads a Window in the Window Manager */
 int Interface::LoadWindow(unsigned short WindowID)
 {
-	for(int i = 0; i < windows.size(); i++) {
+	for(unsigned int i = 0; i < windows.size(); i++) {
 		if(windows[i]==NULL)
 			continue;
 		if(windows[i]->WindowID == WindowID) {
@@ -529,7 +529,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 	if(win == NULL)
 		return -1;
 	int slot = -1;
-	for(int i = 0; i < windows.size(); i++) {
+	for(unsigned int i = 0; i < windows.size(); i++) {
 		if(windows[i]==NULL) {
 			slot = i;
 			break;
@@ -692,7 +692,7 @@ int Interface::ShowModal(unsigned short WindowIndex)
 
 void Interface::DrawWindows(void)
 {
-	for(int i = 0; i < windows.size(); i++) {
+	for(unsigned int i = 0; i < windows.size(); i++) {
 		if(windows[i]!=NULL && windows[i]->Visible)
 			windows[i]->DrawWindow();
 	}
