@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.12 2003/11/27 21:15:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.13 2003/11/28 21:22:13 avenger_teambg Exp $
  *
  */
 
@@ -145,7 +145,12 @@ bool MUSImp::OpenPlaylist(const char * name)
       		strcpy(FName, core->GamePath);
 			strcat(FName, "music");
 			strcat(FName, SPathDelimiter);
-			if(stricmp(pls.PLFile, "SPC1") != 0) {
+			//this is in IWD2
+			if(strnicmp(pls.PLFile, "MX0000",6)==0) {
+				strcat(FName, "MX0000");
+				strcat(FName, SPathDelimiter);
+			}
+			else if(strnicmp(pls.PLFile, "SPC",3) != 0) {
 				strcat(FName, PLName);
 				strcat(FName, SPathDelimiter);
 				strcat(FName, PLName);
