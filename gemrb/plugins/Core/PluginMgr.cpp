@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.7 2003/12/15 09:14:28 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.8 2004/01/28 22:16:24 edheldil Exp $
  *
  */
 
@@ -65,12 +65,12 @@ PluginMgr::PluginMgr(char * pluginpath)
 	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
 	struct _finddata_t c_file;
 	long hFile;
-	strcat(path, "plugins\\*.dll");
+	strcat(path, "*.dll");
 	printMessage("PluginMgr", "Searching for plugins in: ", WHITE);
 	printf("%s\n", path);
 	if((hFile = (long)_findfirst(path, &c_file)) == -1L) //If there is no file matching our search
 #else
-	strcat(path, "plugins");
+	  //strcat(path, "plugins");
 	printMessage("PluginMgr", "Searching for plugins in: ", WHITE);
 	printf("%s\n", path);
 	DIR * dir = opendir(path);
@@ -89,7 +89,7 @@ PluginMgr::PluginMgr(char * pluginpath)
 	do { //Iterate through all the available modules to load
 #ifdef WIN32
 		strcpy(path, pluginpath);
-		strcat(path, "plugins\\");
+		//strcat(path, "plugins\\");
 		strcat(path, c_file.name);
 		printBracket("PluginMgr", LIGHT_WHITE);
 		printf(": Loading: ");
@@ -112,7 +112,7 @@ PluginMgr::PluginMgr(char * pluginpath)
 		if(fnmatch("*.so", de->d_name, 0) != 0) //If the current file has no ".so" extension, skip it
 			continue;
 		strcpy(path, pluginpath);
-		strcat(path, "plugins/");
+		//strcat(path, "plugins/");
 		strcat(path, de->d_name);
 		printBracket("PluginMgr", LIGHT_WHITE);
 		printf(": Loading: ");

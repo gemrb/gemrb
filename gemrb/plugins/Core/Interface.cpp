@@ -15,9 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.115 2004/01/19 18:27:29 dragonmeat Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.116 2004/01/28 22:16:24 edheldil Exp $
  *
  */
+
+#include <config.h>
 
 #define INTERFACE
 #include "Interface.h"
@@ -40,8 +42,10 @@ GEM_EXPORT HANDLE hConsole;
 
 #include "../../includes/win32def.h"
 
-Interface::Interface(void)
+Interface::Interface(int iargc, char **iargv)
 {
+        argc = iargc;
+        argv = iargv;
 #ifdef WIN32
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 #endif
@@ -65,6 +69,7 @@ Interface::Interface(void)
 	GUIScriptsPath[0]=0;
 	GamePath[0]=0;
 	GemRBPath[0]=0;
+	PluginsPath[0]=0;
 	GameName[0]=0;
 	memcpy(GameOverride,"override",9);
 	memcpy(GameData,"data\0\0\0\0",9);
@@ -79,7 +84,7 @@ Interface::Interface(void)
 	}
 	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Starting Plugin Manager...\n", WHITE);
-	plugin = new PluginMgr(GemRBPath);
+	plugin = new PluginMgr(PluginsPath);
 	printMessage("Core", "Plugin Loading Complete...", WHITE);
 	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Creating Object Factory...", WHITE);
@@ -571,10 +576,99 @@ int Interface::HasFeature(int position)
 	return GameFeatures&(1<<position);
 }
 
-bool Interface::LoadConfig(void)
+/** Search directories and load a config file */
+bool Interface::LoadConfig (void)
+{
+
+#ifndef WIN32
+  char  path[_MAX_PATH];
+  char  name[_MAX_PATH];
+
+  // Find directory where user stores GemRB configurations (~/.gemrb).
+  // FIXME: Create it if it does not exist
+  // Use current dir if $HOME is not defined (or bomb out??)
+
+  char  *s = getenv ("HOME");
+  if (s) {
+    strcpy (UserDir, s);
+    strcat (UserDir, "/."PACKAGE"/");
+  } else {
+    strcpy (UserDir, "./");
+  }
+
+  // Find basename of this program. It does the same as basename (3),
+  //   but that's probably missing on some archs 
+  s = strrchr (argv[0], PathDelimiter);
+  if (s)
+    s++;
+  else
+    s = argv[0];
+
+  strcpy (name, s);
+  //if (!name[0])                // FIXME: could this happen?
+  //  strcpy (name, PACKAGE);    // ugly hack
+
+
+  // FIXME: temporary hack, to be deleted??
+  if (LoadConfig ("GemRB.cfg")) {
+    return true;
+  }
+
+
+
+  strcpy (path, UserDir);
+  strcat (path, name);
+  strcat (path, ".cfg");
+
+  if (LoadConfig (path)) {
+    return true;
+  }
+
+#ifdef SYSCONFDIR
+  strcpy (path, SYSCONFDIR);
+  strcat (path, SPathDelimiter);
+  strcat (path, name);
+  strcat (path, ".cfg");
+
+  if (LoadConfig (path)) {
+    return true;
+  }
+#endif
+
+  // Don't try with default binary name if we have tried it already
+  if (! strcmp (name, PACKAGE)) {
+    return false;
+  }
+
+  strcpy (path, UserDir);
+  strcat (path, PACKAGE);
+  strcat (path, ".cfg");
+
+  if (LoadConfig (path)) {
+    return true;
+  }
+
+#ifdef SYSCONFDIR
+  strcpy (path, SYSCONFDIR);
+  strcat (path, SPathDelimiter);
+  strcat (path, PACKAGE);
+  strcat (path, ".cfg");
+
+  if (LoadConfig (path)) {
+    return true;
+  }
+#endif
+
+  return false;
+#else   // WIN32
+  return LoadConfig ("GemRB.cfg");
+#endif  // WIN32
+}
+
+bool Interface::LoadConfig(const char *filename)
 {
 	FILE * config;
-	config = fopen("GemRB.cfg", "rb");
+	config = fopen(filename, "rb");
 	if(config == NULL)
 		return false;
 	char name[65], value[_MAX_PATH+3];
@@ -663,6 +757,12 @@ bool Interface::LoadConfig(void)
 			ResolveFilePath(GUIScriptsPath);
 #endif
 		}
+		else if(stricmp(name, "PluginsPath") == 0) {
+			strcpy(PluginsPath, value);
+#ifndef WIN32
+			ResolveFilePath(PluginsPath);
+#endif
+		}
 		else if(stricmp(name, "GamePath") == 0) {
 			strcpy(GamePath, value);
 #ifndef WIN32
@@ -710,10 +810,28 @@ bool Interface::LoadConfig(void)
 		}
 	}
 	fclose(config);
+#ifdef DATADIR
+	if (!GemRBPath[0]) {
+	        strcpy (GemRBPath, DATADIR);
+		strcat (GemRBPath, SPathDelimiter);
+	}
+#endif
+	if(!PluginsPath[0]) {
+#ifdef PLUGINDIR
+	        strcpy (PluginsPath, PLUGINDIR);
+#else
+		memcpy(PluginsPath,GemRBPath,sizeof(PluginsPath));
+		strcat (PluginsPath, SPathDelimiter);
+		strcat (PluginsPath, "plugins");
+#endif
+		strcat (PluginsPath, SPathDelimiter);
+	}
 	if(!GUIScriptsPath[0])
 		memcpy(GUIScriptsPath,GemRBPath,sizeof(GUIScriptsPath));
 	if(!GameName[0])
 		sprintf(GameName, "GemRB v%.1f.%d.%d", GEMRB_RELEASE/1000.0, GEMRB_API_NUM, GEMRB_SDK_REV);
+
+	printf("Loaded config file %s\n", filename);
 	return true;
 }
 /** No descriptions */

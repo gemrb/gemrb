@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.66 2004/01/11 16:58:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.67 2004/01/28 22:16:24 edheldil Exp $
  *
  */
 
@@ -122,7 +122,7 @@ public:
 	Animation **Cursors;
 	int CursorCount;
 public:
-	Interface(void);
+	Interface(int iargc, char **iargv);
 	~Interface(void);
 	int Init(void);
 	//TODO: Core Methods in Interface Class
@@ -277,11 +277,15 @@ public:
 
 private:
 	bool LoadConfig(void);
+	bool LoadConfig(const char *filename);
 	bool LoadINI(const char * filename);
 public:
 	char GameData[9];
 	char GameOverride[9];
-	char GameName[_MAX_PATH], GameType[_MAX_PATH], GemRBPath[_MAX_PATH], CachePath[_MAX_PATH], GUIScriptsPath[_MAX_PATH], GamePath[_MAX_PATH], INIConfig[_MAX_PATH], CD1[_MAX_PATH], CD2[_MAX_PATH], CD3[_MAX_PATH], CD4[_MAX_PATH], CD5[_MAX_PATH], CD6[_MAX_PATH];
+	char UserDir[_MAX_PATH];
+	int argc;
+	char **argv;	  
+	char GameName[_MAX_PATH], GameType[_MAX_PATH], GemRBPath[_MAX_PATH], PluginsPath[_MAX_PATH], CachePath[_MAX_PATH], GUIScriptsPath[_MAX_PATH], GamePath[_MAX_PATH], INIConfig[_MAX_PATH], CD1[_MAX_PATH], CD2[_MAX_PATH], CD3[_MAX_PATH], CD4[_MAX_PATH], CD5[_MAX_PATH], CD6[_MAX_PATH];
 	int Width, Height, Bpp, ForceStereo;
 	bool FullScreen, CaseSensitive, GameOnCD;
 	/** Draws the Visible windows in the Windows Array */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.19 2004/01/11 16:58:19 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.20 2004/01/28 22:16:23 edheldil Exp $
  *
  */
 
@@ -44,7 +44,7 @@
 
 int main(int argc, char ** argv)
 {
-	core = new Interface();
+	core = new Interface(argc, argv);
  	if(core->Init() == GEM_ERROR) {
 		delete(core);
 		return -1;
