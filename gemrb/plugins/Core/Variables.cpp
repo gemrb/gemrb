@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.20 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.21 2004/04/14 14:06:00 avenger_teambg Exp $
  *
  */
 
@@ -150,8 +150,10 @@ void Variables::RemoveAll()
 				if (m_type == GEM_VARIABLES_STRING)
 					if (pAssoc->nValue)
 						free( ( void * ) pAssoc->nValue );
-				if (pAssoc->key)
-					delete[] pAssoc->key;
+				if (pAssoc->key) {
+					free(pAssoc->key);
+					pAssoc->key = NULL;
+				}
 			}
 		}
 	}
@@ -204,7 +206,7 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 	} else {
 		int len;
 		len = strnlen( key, MAX_VARIABLE_LENGTH - 1 );
-		pAssoc->key = new char[len + 1];
+		pAssoc->key = (char *) malloc(len + 1);
 		if (pAssoc->key) {
 			memcpy( pAssoc->key, key, len );
 			pAssoc->key[len] = 0;
@@ -218,7 +220,8 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 void Variables::FreeAssoc(Variables::MyAssoc* pAssoc)
 {
 	if (pAssoc->key) {
-		delete[] pAssoc->key;
+		free(pAssoc->key);
+		pAssoc->key = NULL;
 	}
 	pAssoc->pNext = m_pFreeList;
 	m_pFreeList = pAssoc;
