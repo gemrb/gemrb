@@ -1,0 +1,17 @@
+Description: This table assigns item types to inventory slot types. It tells which item may go into which inventory slot. The slot types are the bit values of slottypes.2da
+   1 - helm (or earring in pst)
+   2 - armour
+   4 - shield
+   8 - gauntlet
+  16 - ring
+  32 - amulet
+  64 - belt
+ 128 - boot
+ 256 - weapon
+ 512 - quiver
+1024 - cloak
+2048 - quick item
+
+Columns:  Slot types. They must follow in the same order in any engine, you may add additional columns if needed. (Probably only in PST).
+
+Rows: Item types. They must follow the natural order of item types as of the original engine.
