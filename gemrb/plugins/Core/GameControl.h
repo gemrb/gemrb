@@ -94,12 +94,16 @@ public:
 //	void InitDialog(Actor * speaker, Actor * target, Dialog * dlg);
 	void EndDialog();
 	void DialogChoose(int choose);
+	/** finds the first true condition in a dialog */
+	int FindFirstState(Scriptable *target, Dialog *dlg);
 	void DisplayString(Scriptable * target);
 	/* Displays a string in the textarea */
 	void DisplayString(char *Text);
 
 private:
 	void ChangeMap();
+	/* evaluates a dialog trigger block */
+	bool EvaluateDialogTrigger(Scriptable *target, DialogString *trigger);
 };
 
 #endif

@@ -974,7 +974,7 @@ void GameControl::InitDialog(Actor * speaker, Actor * target, const char * dlgre
 	DialogMgr * dm = (DialogMgr*)core->GetInterface(IE_DLG_CLASS_ID);
 	dm->Open(core->GetResourceMgr()->GetResource(dlgref, IE_DLG_CLASS_ID), true);
 	dlg = dm->GetDialog();
-        core->FreeInterface(dm);
+	core->FreeInterface(dm);
 
 	if(!dlg) {
 		printf("[GameControl]: Cannot start dialog: %s\n",dlgref);
@@ -1005,7 +1005,7 @@ void GameControl::InitDialog(Actor * speaker, Actor * target, const char * dlgre
 
 static void AddTalk (TextArea *ta, Actor *speaker, char *speaker_color, char *text, char *text_color)
 {
-        char *format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
+	char *format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
 	int newlen = strlen (format) + strlen (speaker->LongName) + +strlen (speaker_color) + strlen (text) + strlen (text_color) + 1;
 	char *newstr = (char*) malloc (newlen);
 	sprintf (newstr, format, speaker_color, speaker->LongName, text_color, text);
@@ -1030,6 +1030,45 @@ void GameControl::EndDialog()
 	Dialogue = false;
 }
 
+int GameControl::FindFirstState(Scriptable *target, Dialog *dlg)
+{
+	for(int i=0;i<dlg->StateCount();i++) {
+		if(EvaluateDialogTrigger(target, dlg->GetState(i)->trigger))
+			return i;
+	}
+	return -1;
+}
+
+bool GameControl::EvaluateDialogTrigger(Scriptable *target, DialogString *trigger)
+{
+	int ORcount = 0;
+	int result;
+	bool subresult = true;
+
+	if(!trigger)
+		return false;
+	for(int t = 0; t < trigger->count; t++) {
+	       result = GameScript::EvaluateString(target, trigger->strings[t]);
+	       if(result>1) {
+		       if(ORcount)
+			       printf("[Dialog]: Unfinished OR block encountered!\n");
+		       ORcount = result;
+		       subresult = false;
+		       continue;
+	       }
+	       if(ORcount) {
+		       subresult |= result;
+		       if(--ORcount) continue;
+		       result = subresult;
+	       }
+	       if(!result)
+		       return 0;
+	}
+	if(ORcount)
+	       printf("[Dialog]: Unfinished OR block encountered!\n");
+	return 1;
+}
+
 void GameControl::DialogChoose(int choose)
 {
 	unsigned long index;
@@ -1037,8 +1076,17 @@ void GameControl::DialogChoose(int choose)
 		Window * win = core->GetWindow(index);
 		if(core->GetDictionary()->Lookup("MessageTextArea", index)) {
 			TextArea * ta = (TextArea*)win->GetControl(index);
-			if(choose == -1)
-				ds = dlg->GetState(0);
+			//get the first state with true triggers!
+			if(choose == -1) {
+				int si = FindFirstState(target, dlg);
+				if(si<0) {
+					printf("[Dialog]: No top level condition evaluated for true.\n");
+					EndDialog();
+					ta->SetMinRow(false);
+					return;
+				}
+				ds = dlg->GetState(si);
+			}
 			else {
 				if(ds->transitionsCount<=choose)
 					return;

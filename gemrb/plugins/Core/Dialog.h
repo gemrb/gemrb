@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.6 2004/01/19 17:34:02 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.7 2004/02/23 20:46:17 avenger_teambg Exp $
  *
  */
 
@@ -79,6 +79,7 @@ private:
 	void FreeDialogState(DialogState *ds);
 	void FreeDialogString(DialogString *ds);
 public:
+	int StateCount() { return initialStates.size(); }
 	void Release() {
 		delete this;
 	}
