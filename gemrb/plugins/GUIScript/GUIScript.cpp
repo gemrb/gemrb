@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.214 2004/10/09 15:27:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.215 2004/10/09 19:07:26 avenger_teambg Exp $
  *
  */
 
@@ -1447,22 +1447,22 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	AnimationFactory* bam = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( ResRef, IE_BAM_CLASS_ID );
-	if (!bam) {
+	AnimationMgr* bam = ( AnimationMgr* )
+		core->GetInterface( IE_BAM_CLASS_ID );
+	DataStream *str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
+	if (!bam->Open(str, true) ) {
 		printMessage( "GUIScript", "Error: %s.BAM not Found\n", LIGHT_RED );
 		return NULL;
 	}
-
-	Animation* ani = bam->GetCycle( cycle );
-
-	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, ani->GetFrame( unpressed ) );
-	btn->SetImage( IE_GUI_BUTTON_PRESSED, ani->GetFrame( pressed ) );
-	btn->SetImage( IE_GUI_BUTTON_SELECTED, ani->GetFrame( selected ) );
-	btn->SetImage( IE_GUI_BUTTON_DISABLED, ani->GetFrame( disabled ) );
-	ani->autofree = false;
-
-	delete( ani );
+	Sprite2D *tspr = bam->GetFrameFromCycle( (unsigned char) cycle, unpressed);
+	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
+	tspr = bam->GetFrameFromCycle( (unsigned char) cycle, pressed);
+	btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
+	tspr = bam->GetFrameFromCycle( (unsigned char) cycle, selected);
+	btn->SetImage( IE_GUI_BUTTON_SELECTED, tspr );
+	tspr = bam->GetFrameFromCycle( (unsigned char) cycle, disabled);
+	btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
+	core->FreeInterface( bam );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -1682,13 +1682,15 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 	map->ControlType = IE_GUI_MAP;
 	map->Owner = win;
 	if (Flag) {
-		AnimationFactory *anim = ( AnimationFactory* ) core->GetResourceMgr()->GetFactoryResource( Flag, IE_BAM_CLASS_ID );
-		if(anim) {
+		AnimationMgr *anim = ( AnimationMgr* ) core->GetInterface(IE_BAM_CLASS_ID );
+		DataStream* str = core->GetResourceMgr()->GetResource( Flag, IE_BAM_CLASS_ID );
+		if(anim -> Open(str, true) ) {
 			for(int i=0;i<8;i++) {
 				map->Flag[i] = anim->GetFrame(0,i);
 			}
 			
 		}
+		core->FreeInterface( anim );
 	}
 	win->AddControl( map );
 
@@ -1924,8 +1926,7 @@ static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
-												IE_BMP_CLASS_ID );
+	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_BMP_CLASS_ID );
 	if (str == NULL) {
 		return NULL;
 	}
