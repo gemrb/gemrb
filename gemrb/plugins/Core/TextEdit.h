@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.11 2004/11/18 23:32:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.12 2004/11/22 21:08:14 avenger_teambg Exp $
  *
  */
 
@@ -57,6 +57,8 @@ public:
 	int SetText(const char* string, int pos = 0);
 	/** Sets the Text of the current control */
 	const char* QueryText();
+	/** Sets the buffer length */
+	void SetBufferLength(int buflen);
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;
