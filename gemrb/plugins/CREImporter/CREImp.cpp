@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.17 2003/12/10 16:55:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.18 2003/12/15 09:37:08 balrog994 Exp $
  *
  */
 
@@ -246,10 +246,16 @@ Actor * CREImp::GetActor()
 	str->Read(&act->BaseStats[IE_MORALERECOVERYTIME],1);
 	str->Seek(1,GEM_CURRENT_POS);
 	str->Read(&act->BaseStats[IE_KIT],4);
-	for(int i=0;i<5;i++)
-	{
-		str->Read(act->Scripts[i],8);
-		act->Scripts[i][8]=0;
+	for(int i = 0; i < 5; i++) {
+		char aScript[9];
+		str->Read(aScript,8);
+		aScript[8] = 0;
+		if((stricmp(aScript, "None") == 0) || (aScript[0] == '\0')) {
+			act->Scripts[i] = NULL;
+			continue;
+		}
+		act->Scripts[i] = new GameScript(aScript, 0);
+		act->Scripts[i]->MySelf = act;
 	}
 	switch(CREVersion) {
 		case IE_CRE_V1_2:
@@ -271,13 +277,13 @@ Actor * CREImp::GetActor()
 	str->Seek(5,GEM_CURRENT_POS);
 	str->Read(&act->BaseStats[IE_ALIGNMENT], 1);
 	str->Seek(4,GEM_CURRENT_POS);
-	str->Read(act->ScriptName, 32);
+	str->Read(act->scriptName, 32);
 	str->Seek(44,GEM_CURRENT_POS);
 	str->Read(act->Dialog, 8);
 	act->BaseStats[IE_ARMOR_TYPE] = 0;
-	act->SetAnimationID(act->BaseStats[IE_ANIMATION_ID]);
-	if(act->anims)
-		act->anims->DrawCircle = false;
+	act->SetAnimationID((unsigned short)act->BaseStats[IE_ANIMATION_ID]);
+	/*if(act->anims)
+		act->anims->DrawCircle = false;*/
 
 	act->Init(); //applies effects, updates Modified
 	return act;
