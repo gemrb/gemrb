@@ -124,6 +124,8 @@ void MVEPlay::dispatchDecoder(unsigned char **pFrame, unsigned char codeType, un
     {
         case 0x0:
                   copyFrame(*pFrame, *pFrame + (g_vBackBuf2 - g_vBackBuf1));
+                  *pFrame += 8;
+                  break;
         case 0x1:
                   *pFrame += 8;
                   break;
@@ -158,6 +160,7 @@ void MVEPlay::dispatchDecoder(unsigned char **pFrame, unsigned char codeType, un
                   break;
 
         case 0x6:
+/* appears to be unused
                   for (i=0; i<2; i++)
                   {
                       *pFrame += 16;
@@ -169,6 +172,7 @@ void MVEPlay::dispatchDecoder(unsigned char **pFrame, unsigned char codeType, un
                               return;
                       }
                   }
+*/
                   break;
 
         case 0x7:
@@ -680,6 +684,11 @@ int MVEPlay::mve_play_next_chunk(MVESTREAM *movie)
             if (! movie->handlers[major](major, minor, data, len, movie->context))
                 return 0;
         }
+	else
+	{
+		printf("Unhandled opcode: %d\n",major);
+		return 0;
+	}
 
         /* advance to next segment */
         mvefile_advance_segment(movie->movie);

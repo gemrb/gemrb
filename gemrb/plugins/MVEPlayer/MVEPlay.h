@@ -17,7 +17,6 @@
 
 typedef struct MVEFILE
 {
-    //FILE           *stream;
 	DataStream     *stream;
     unsigned char  *cur_chunk;
     unsigned int    buf_size;
@@ -190,8 +189,12 @@ private: //Decoder Functions
 		mve_set_handler(mve, 0x09, audio_data_handler);
 		mve_set_handler(mve, 0x0a, init_video_handler);
 		mve_set_handler(mve, 0x0c, video_palette_handler);
+		mve_set_handler(mve, 0x0d, video_compressed_palette_handler);
 		mve_set_handler(mve, 0x0f, video_codemap_handler);
 		mve_set_handler(mve, 0x11, video_data_handler);
+		mve_set_handler(mve, 0x13, do_nothing);
+		mve_set_handler(mve, 0x14, do_something); //this may do something
+		mve_set_handler(mve, 0x15, do_nothing);
 	}
 
 	static void playMovie(MVESTREAM *mve)
@@ -426,8 +429,8 @@ end:
 		g_height = h << 3;
 		g_vBackBuf1 = (unsigned char*)malloc(g_width * g_height * 1.5);
 		g_vBackBuf2 = (unsigned char*)malloc(g_width * g_height * 1.5);
-		memset(g_vBackBuf1, 0, g_width * g_height);
-		memset(g_vBackBuf2, 0, g_width * g_height);
+		memset(g_vBackBuf1, 0, g_width * g_height*1.5);
+		memset(g_vBackBuf2, 0, g_width * g_height*1.5);
 		return 1;
 	}
 
@@ -528,6 +531,28 @@ end:
 		return 1;
 	}
 
+	static int video_compressed_palette_handler(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
+	{
+abort();
+		int pos=0;
+		for(int i=0;i<32;i++) {
+			int bits = *data++;
+			if(!bits)
+				pos+=24;
+				continue;
+			int k=1;
+			for(int j=0;j<8;j++) {
+				if(k&bits) {
+					memcpy(g_palette + pos, data, 3);
+					data+=3;
+				}
+				pos+=3;
+				k<<=1;
+			}
+		}
+		return 1;
+	}
+
 	static int video_codemap_handler(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
 	{
 		g_pCurMap = data;
@@ -556,9 +581,9 @@ end:
 
 		if (nFlags & 1)
 			{
-			temp = g_vBackBuf1;
-			g_vBackBuf1 = g_vBackBuf2;
-			g_vBackBuf2 = temp;
+			temp = g_vBackBuf2;
+			g_vBackBuf2 = g_vBackBuf1;
+			g_vBackBuf1 = temp;
 			}
 
 		/* convert the frame */
@@ -567,6 +592,22 @@ end:
 		return 1;
 	}
 
+	static int do_something(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
+	{
+		printf("****%d %d %d****\n",major, minor, len);
+		if(len>16) len=16;
+		for(int i=0;i<len; i++)
+		{
+			printf("%02x ",data[i]);
+		}
+		printf("\n");
+		return 1;
+	}
+
+	static int do_nothing(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
+	{
+		return 1;
+	}
 	static int end_chunk_handler(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
 	{
 		g_pCurMap=NULL;
