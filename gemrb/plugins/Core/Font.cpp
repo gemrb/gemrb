@@ -7,6 +7,7 @@ extern Interface * core;
 Font::Font(void)
 {
 	maxHeight = 0;
+	count = 0;
 }
 
 Font::~Font(void)
@@ -30,23 +31,30 @@ void Font::AddChar(Sprite2D * spr)
 {
 	if(maxHeight < spr->YPos)
 		maxHeight = spr->YPos;
-	chars.push_back(spr);	
+	//chars.push_back(spr);	
+	chars[count++] = spr;
 }
 
 bool written = false;
 
-void Font::Print(Region rgn, unsigned char * string, Color *color, unsigned char Alignment, bool anchor)
+void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowcolor, unsigned char Alignment, bool anchor, Font * initials, Color *initcolor)
 {
 	//TODO: Implement Colored Text
-	Color * pal = NULL;
-	if(color != NULL) {
-		pal = core->GetVideoDriver()->CreatePalette(*color);
+	Color * pal = NULL, *ipal = NULL;
+	if(hicolor != NULL) {
+		pal = core->GetVideoDriver()->CreatePalette(*hicolor, *lowcolor);
+	}
+	if(initcolor != NULL) {
+		ipal = core->GetVideoDriver()->CreatePalette(*initcolor, *lowcolor);
 	}
 	Video * video = core->GetVideoDriver();
-	StringList sl = Prepare(rgn, string);
-	int x = 0;
-	int y = rgn.y+sl.starty;
-	switch(Alignment) {
+	StringList sl = Prepare(rgn, string, initials);
+	int x = 0, y = 0;
+	if(Alignment & IE_FONT_ALIGN_TOP)
+		y = rgn.y;
+	else if(Alignment & IE_FONT_ALIGN_MIDDLE)
+		y = rgn.y+sl.starty;
+	switch(Alignment & 0x0F) {
 		case IE_FONT_ALIGN_LEFT: 
 		{
 			for(int r = 0; r < sl.StringCount; r++) {
@@ -54,7 +62,9 @@ void Font::Print(Region rgn, unsigned char * string, Color *color, unsigned char
 				y += sl.heights[0];
 				int	i = 0;
 				while(true) {
-					if(pal != NULL)
+					if((ipal != NULL) && (r == 0) && (i == 0))
+						video->SetPalette(sl.strings[r][i], pal);
+					else if(pal != NULL)
 						video->SetPalette(sl.strings[r][i], pal);
 					video->BlitSprite(sl.strings[r][i], x, y, anchor);
 					if(sl.strings[r][i+1] == NULL)
@@ -73,7 +83,9 @@ void Font::Print(Region rgn, unsigned char * string, Color *color, unsigned char
 				y += sl.heights[0];
 				int	i = 0;
 				while(true) {
-					if(pal != NULL)
+					if((ipal != NULL) && (r == 0) && (i == 0))
+						video->SetPalette(sl.strings[r][i], pal);
+					else if(pal != NULL)
 						video->SetPalette(sl.strings[r][i], pal);
 					video->BlitSprite(sl.strings[r][i], x, y, anchor);
 					if(sl.strings[r][i+1] == NULL)
@@ -96,6 +108,9 @@ void Font::Print(Region rgn, unsigned char * string, Color *color, unsigned char
 				y += sl.heights[0];
 				int	i = len;
 				while(i >= 0) {
+					if((ipal != NULL) && (r == 0) && (i == 0))
+						video->SetPalette(sl.strings[r][i], pal);
+					else 
 					if(pal != NULL)
 						video->SetPalette(sl.strings[r][i], pal);
 					video->BlitSprite(sl.strings[r][i], x, y, anchor);
@@ -110,14 +125,18 @@ void Font::Print(Region rgn, unsigned char * string, Color *color, unsigned char
 	}
 	if(pal)
 		free(pal);
+	if(ipal)
+		free(ipal);
 	free(sl.strings[0]);
 	free(sl.strings);
 	free(sl.heights);
 	free(sl.lengths);
 }
 /** PreCalculate for Printing */
-StringList Font::Prepare(Region &rgn, unsigned char * string)
-{	
+StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init)
+{
+	if(init == NULL)
+		init = this;
 	StringList sl;
 	sl.StringCount = 1;
 	sl.starty = 0;
@@ -136,8 +155,9 @@ StringList Font::Prepare(Region &rgn, unsigned char * string)
 	//Allocate the lengths array
 	sl.lengths = (unsigned int*)malloc(sizeof(unsigned int));
 	int x, nsi = 0, lastx = 0;
-	Sprite2D * nextimg = chars[string[0]-1], *oldimg = NULL;
+	Sprite2D * nextimg = init->chars[string[0]-1], *oldimg = NULL;
 	x = nextimg->XPos;
+	bool newline = true;
 	for(int i = 0; i < len; i++) {
 		if(x >= rgn.w) {
 			//Check for spaces at the beginning of the row
@@ -176,6 +196,8 @@ StringList Font::Prepare(Region &rgn, unsigned char * string)
 			sl.StringCount++;
 			//Reset our maxHeight variable
 			maxHeight = 0;
+			//Notify New Line
+			//newline = true;
 		}
 		//Check for new maxHeight
 		if(maxHeight < nextimg->YPos)
@@ -186,13 +208,21 @@ StringList Font::Prepare(Region &rgn, unsigned char * string)
 		//Ok, we may continue
 		//Let's move our pointer to the next char Position
 		oldimg = nextimg;
-		nextimg = chars[string[i+1]-1];
+		if(newline)
+			nextimg = init->chars[string[i+1]-1];
+		else
+			nextimg = chars[string[i+1]-1];
 		lastx = x;
 		x+=(oldimg->Width-oldimg->XPos)+(nextimg->XPos);
+		//Check if we have a New Line Character
+		if(string[i+1] == '\n')
+			x = rgn.w; //This way next time we make the cycle, we will insert a new line
 		//Set our string char value
 		newstring[nsi] = oldimg;
 		//Increment the string pointer
 		nsi++;
+		//Notify continuing this line
+		newline = false;
 	}
 	newstring[nsi++] = nextimg;
 	newstring[nsi] = NULL;
@@ -209,3 +239,8 @@ StringList Font::Prepare(Region &rgn, unsigned char * string)
 	sl.starty = (rgn.h-yacc)/2;
 	return sl;
 }
+
+/*Sprite2D ** Font::GetChars()
+{
+	return chars;
+}*/
