@@ -1,12 +1,15 @@
 GemRB v0.2.2.6 Added Features:
 - New Plugins:
   - GAM Importer
+- New Features:
+  - In-Game Script Interpreter
+  - Added Console functions to run/evaluate In-Game Script Functions
 - Optimizations:
   - Now the Decompression Phase is fast also on Systems with Low Memory (Thanks to |Cable|)
 - Console Output Cleanup
 - Applied Patches:
-  - 862003: ZLib Decompression Fix for Low Memory Systems
-  - 862660: GameOnCD Option (Saves a big amount of Cache Space while having a full game installation)
+  - 862003: ZLib Decompression Fix for Low Memory Systems (Submitted bu |Cable|)
+  - 862660: GameOnCD Option (Saves a big amount of Cache Space while having a full game installation) (Submitted by |Cable|)
 
 GemRB v0.2.2.5 Added Features:
 - Added some In-Game Script OpCodes:
