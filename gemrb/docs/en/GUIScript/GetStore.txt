@@ -1,0 +1,20 @@
+
+Prototype: GetStore( )
+
+Description: Gets the basic header information of a store an returns it in a dictionary. The information is precompiled based on room availability, store type
+
+Parameters: -
+
+Return value: dictionary
+"StoreType"       - numeric (see IESDP)
+"StoreName"       - the StrRef of the store name
+"StoreDrinkCount" - the count of drinks served (tavern)
+"StoreCureCount"  - the count of cures served (temple)
+"StoreItemCount"  - the count of items sold
+"StoreCapacity"   - the capacity of the store
+"StoreRoomPrices" - a four elements tuple, negative if the room type is unavailable
+"StoreButtons"    - a four elements tuple, possible actions
+"StoreFlags"      - the store flags if you ever need them, StoreButtons is a digested information, but you might have something else in mind based on these
+
+See also: EnterStore, GetStoreCure, GetStoreDrink
+

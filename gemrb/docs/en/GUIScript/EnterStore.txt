@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: EnterStore( StoreResRef )
 
-Description:
+Description: Loads a store and sets it as current (used) store.
 
-Parameters:
+Parameters: StoreResRef - the store's resource name
 
-Return value:
+Return value: None
 
-See also:
+See also: GetStore, GetStoreCure, GetStoreDrink
 
