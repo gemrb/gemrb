@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.44 2004/02/21 18:36:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.45 2004/02/22 17:35:32 avenger_teambg Exp $
  *
  */
 
@@ -35,7 +35,7 @@ class Action;
   if(!(f))  \
   {  \
   printf("Assertion failed: %s [0x%08X] Line %d",#f, c, __LINE__); \
-                abort(); \
+		abort(); \
   }
 
 #ifdef WIN32
@@ -90,8 +90,8 @@ public:
 	int				XobjectPosition;
 	int				YobjectPosition;
 	int				WobjectPosition;
-	int             HobjectPosition;
-	char            PositionMask[65];
+	int	     HobjectPosition;
+	char	    PositionMask[65];
 	char			objectName[65];
 private:
 	int				RefCount;
@@ -122,7 +122,7 @@ public:
 class GEM_EXPORT Trigger {
 public:
 	Trigger() {
-	        objectParameter = NULL;
+		objectParameter = NULL;
 		RefCount = 1;
 		string0Parameter[0] = 0;
 		string1Parameter[0] = 0;
@@ -135,17 +135,17 @@ public:
 	}
 public:
 	unsigned short	triggerID;
-	int				int0Parameter;
-	int				flags;
-	int				int1Parameter;
-	int				int2Parameter;
-	int				XpointParameter;
-	int				YpointParameter;
+	int			int0Parameter;
+	int			flags;
+	int			int1Parameter;
+	int			int2Parameter;
+	int			XpointParameter;
+	int			YpointParameter;
 	char			string0Parameter[65];
 	char			string1Parameter[65];
 	Object*			objectParameter;
 private:
-	int				RefCount;
+	int			RefCount;
 	volatile unsigned long canary;
 public:
 	void Release() {
@@ -292,7 +292,6 @@ public:
 			if(actions[c])
 				actions[c]->Release();
 		}
-		//delete[] actions;
 		delete actions;
 	}
 public:
@@ -589,131 +588,135 @@ public:
 	static bool EvaluateString(Scriptable * Sender, char * String);
 public: //Script Functions
 	//Triggers
-	static int  Global(Scriptable * Sender, Trigger * parameters);
-	static int  GlobalLT(Scriptable * Sender, Trigger * parameters);
-	static int  GlobalGT(Scriptable * Sender, Trigger * parameters);
-	static int  GlobalsEqual(Scriptable * Sender, Trigger * parameters);
-	static int  OnCreation(Scriptable * Sender, Trigger * parameters);
-	static int  PartyHasItem(Scriptable * Sender, Trigger * parameters);
-	static int  True(Scriptable * Sender, Trigger * parameters);
 	static int  ActionListEmpty(Scriptable * Sender, Trigger * parameters);
-	static int  NumTimesTalkedTo(Scriptable * Sender, Trigger * parameters);
-	static int  NumTimesTalkedToGT(Scriptable * Sender, Trigger * parameters);
-	static int  NumTimesTalkedToLT(Scriptable * Sender, Trigger * parameters);
-	static int  False(Scriptable * Sender, Trigger * parameters);
 	static int  Alignment(Scriptable * Sender, Trigger * parameters);
 	static int  Allegiance(Scriptable * Sender, Trigger * parameters);
-	static int  Class(Scriptable * Sender, Trigger * parameters);
-	static int  Exists(Scriptable * Sender, Trigger * parameters);
-	static int  InParty(Scriptable * Sender, Trigger * parameters);
-	static int  IsValidForPartyDialog(Scriptable * Sender, Trigger * parameters);
-	static int  General(Scriptable * Sender, Trigger * parameters);
-	static int  Range(Scriptable * Sender, Trigger * parameters);
-	static int  Or(Scriptable * Sender, Trigger * parameters);
-	static int  Clicked(Scriptable * Sender, Trigger * parameters);
-	static int  Entered(Scriptable * Sender, Trigger * parameters);
-	static int  Dead(Scriptable * Sender, Trigger * parameters);
-	static int  See(Scriptable * Sender, Trigger * parameters);
 	static int  BitCheck(Scriptable * Sender, Trigger * parameters);
 	static int  CheckStat(Scriptable * Sender, Trigger * parameters);
 	static int  CheckStatGT(Scriptable * Sender, Trigger * parameters);
 	static int  CheckStatLT(Scriptable * Sender, Trigger * parameters);
+	static int  Class(Scriptable * Sender, Trigger * parameters);
+	static int  Clicked(Scriptable * Sender, Trigger * parameters);
+	static int  Dead(Scriptable * Sender, Trigger * parameters);
+	static int  Entered(Scriptable * Sender, Trigger * parameters);
+	static int  Exists(Scriptable * Sender, Trigger * parameters);
+	static int  False(Scriptable * Sender, Trigger * parameters);
+	static int  Gender(Scriptable * Sender, Trigger * parameters);
+	static int  General(Scriptable * Sender, Trigger * parameters);
+	static int  Global(Scriptable * Sender, Trigger * parameters);
+	static int  GlobalLT(Scriptable * Sender, Trigger * parameters);
+	static int  GlobalGT(Scriptable * Sender, Trigger * parameters);
+	static int  GlobalsEqual(Scriptable * Sender, Trigger * parameters);
+	static int  InParty(Scriptable * Sender, Trigger * parameters);
+	static int  IsValidForPartyDialog(Scriptable * Sender, Trigger * parameters);
+	static int  NumTimesTalkedTo(Scriptable * Sender, Trigger * parameters);
+	static int  NumTimesTalkedToGT(Scriptable * Sender, Trigger * parameters);
+	static int  NumTimesTalkedToLT(Scriptable * Sender, Trigger * parameters);
+	static int  Or(Scriptable * Sender, Trigger * parameters);
+	static int  OnCreation(Scriptable * Sender, Trigger * parameters);
+	static int  PartyHasItem(Scriptable * Sender, Trigger * parameters);
+	static int  Race(Scriptable * Sender, Trigger * parameters);
+	static int  Range(Scriptable * Sender, Trigger * parameters);
+	static int  See(Scriptable * Sender, Trigger * parameters);
+	static int  True(Scriptable * Sender, Trigger * parameters);
 public:
 	//Actions
-	static void NoAction(Scriptable * Sender, Action * parameters);
-	static void SetGlobal(Scriptable * Sender, Action * parameters);
-	static void SG(Scriptable * Sender, Action * parameters);
-	static void TriggerActivation(Scriptable * Sender, Action * parameters);
-	static void FadeToColor(Scriptable * Sender, Action * parameters);
-	static void FadeFromColor(Scriptable * Sender, Action * parameters);
+	static void Activate(Scriptable * Sender, Action * parameters);
+	static void AddGlobals(Scriptable * Sender, Action * parameters);
+	static void Ally(Scriptable * Sender, Action * parameters);
+	static void AmbientActivate(Scriptable * Sender, Action * parameters);
+	static void BitClear(Scriptable * Sender, Action * parameters);
+	static void CloseDoor(Scriptable * Sender, Action * parameters);
 	static void CreateCreature(Scriptable * Sender, Action * parameters);
 	static void CreateCreatureObject(Scriptable * Sender, Action * parameters);
-	static void Enemy(Scriptable * Sender, Action * parameters);
-	static void Ally(Scriptable * Sender, Action * parameters);
 	static void ChangeAIScript(Scriptable * Sender, Action * parameters);
+	static void ChangeAlignment(Scriptable * Sender, Action * parameters);
 	static void ChangeAllegiance(Scriptable * Sender, Action * parameters);
+	static void ChangeClass(Scriptable * Sender, Action * parameters);
+	static void ChangeGender(Scriptable * Sender, Action * parameters);
 	static void ChangeGeneral(Scriptable * Sender, Action * parameters);
 	static void ChangeRace(Scriptable * Sender, Action * parameters);
-	static void ChangeClass(Scriptable * Sender, Action * parameters);
 	static void ChangeSpecifics(Scriptable * Sender, Action * parameters);
-	static void ChangeGender(Scriptable * Sender, Action * parameters);
-	static void ChangeAlignment(Scriptable * Sender, Action * parameters);
-	static void StartCutSceneMode(Scriptable * Sender, Action * parameters);
-	static void EndCutSceneMode(Scriptable * Sender, Action * parameters);
-	static void StartCutScene(Scriptable * Sender, Action * parameters);
+	static void ChangeStat(Scriptable * Sender, Action * parameters);
+	static void ClearActions(Scriptable * Sender, Action * parameters);
+	static void ClearAllActions(Scriptable * Sender, Action * parameters);
+	static void Continue(Scriptable * Sender, Action * parameters);
+	static void CreateVisualEffect(Scriptable * Sender, Action * parameters);
+	static void CreateVisualEffectObject(Scriptable * Sender, Action * parameters);
 	static void CutSceneID(Scriptable * Sender, Action * parameters);
-	static void Wait(Scriptable * Sender, Action * parameters);
-	static void SmallWait(Scriptable * Sender, Action * parameters);
-	static void MoveViewPoint(Scriptable * Sender, Action * parameters);
-	static void MoveViewObject(Scriptable * Sender, Action * parameters);
-	static void MoveToPoint(Scriptable * Sender, Action * parameters);
-	static void MoveToObject(Scriptable * Sender, Action * parameters);
+	static void Deactivate(Scriptable * Sender, Action * parameters);
+	static void DestroySelf(Scriptable * Sender, Action * parameters);
+	static void Dialogue(Scriptable * Sender, Action * parameters);
+	static void DialogueForceInterrupt(Scriptable * Sender, Action * parameters);
+	static void DisplayString(Scriptable * Sender, Action * parameters);
 	static void DisplayStringHead(Scriptable * Sender, Action * parameters);
+	static void DisplayStringWait(Scriptable * Sender, Action * parameters);
+	static void EndCutSceneMode(Scriptable * Sender, Action * parameters);
+	static void Enemy(Scriptable * Sender, Action * parameters);
 	static void Face(Scriptable * Sender, Action * parameters);
 	static void FaceObject(Scriptable * Sender, Action * parameters);
-	static void DisplayStringWait(Scriptable * Sender, Action * parameters);
-	static void DisplayString(Scriptable * Sender, Action * parameters);
-	static void StartSong(Scriptable * Sender, Action * parameters);
-	static void Continue(Scriptable * Sender, Action * parameters);
-	static void PlayDead(Scriptable * Sender, Action * parameters);
-	static void PlaySound(Scriptable * Sender, Action * parameters);
-	static void CreateVisualEffectObject(Scriptable * Sender, Action * parameters);
-	static void CreateVisualEffect(Scriptable * Sender, Action * parameters);
-	static void DestroySelf(Scriptable * Sender, Action * parameters);
-	static void ScreenShake(Scriptable * Sender, Action * parameters);
-	static void HideGUI(Scriptable * Sender, Action * parameters);
-	static void UnhideGUI(Scriptable * Sender, Action * parameters);
-	static void Dialogue(Scriptable * Sender, Action * parameters);
-	static void SetDialogue(Scriptable * Sender, Action * parameters);
-	static void AmbientActivate(Scriptable * Sender, Action * parameters);
-	static void StartDialogue(Scriptable * Sender, Action * parameters);
-	static void OpenDoor(Scriptable * Sender, Action * parameters);
-	static void CloseDoor(Scriptable * Sender, Action * parameters);
-	static void MoveBetweenAreas(Scriptable * Sender, Action * parameters);
+	static void FadeFromColor(Scriptable * Sender, Action * parameters);
+	static void FadeToColor(Scriptable * Sender, Action * parameters);
 	static void ForceSpell(Scriptable * Sender, Action * parameters);
-	static void Deactivate(Scriptable * Sender, Action * parameters);
-	static void Activate(Scriptable * Sender, Action * parameters);
-	static void LeaveAreaLUA(Scriptable * Sender, Action * parameters);
-	static void LeaveAreaLUAPanic(Scriptable * Sender, Action * parameters);
-	static void SetTokenGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalSetGlobal(Scriptable * Sender, Action * parameters);
 	static void GlobalAddGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalAndGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalBAnd(Scriptable * Sender, Action * parameters);
+	static void GlobalBAndGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalBOr(Scriptable * Sender, Action * parameters);
+	static void GlobalBOrGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalMax(Scriptable * Sender, Action * parameters);
+	static void GlobalMaxGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalMin(Scriptable * Sender, Action * parameters);
+	static void GlobalMinGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalOrGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalSetGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalShL(Scriptable * Sender, Action * parameters);
+	static void GlobalShLGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalShR(Scriptable * Sender, Action * parameters);
+	static void GlobalShRGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalSubGlobal(Scriptable * Sender, Action * parameters);
+	static void HideGUI(Scriptable * Sender, Action * parameters);
 	static void IncrementGlobal(Scriptable * Sender, Action * parameters);
 	static void IncrementGlobalOnce(Scriptable * Sender, Action * parameters);
-	static void AddGlobals(Scriptable * Sender, Action * parameters);
-	static void GlobalSubGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalAndGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalOrGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalBAndGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalBOrGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalBAnd(Scriptable * Sender, Action * parameters);
-	static void GlobalMaxGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalMinGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalMax(Scriptable * Sender, Action * parameters);
-	static void GlobalMin(Scriptable * Sender, Action * parameters);
-	static void GlobalBOr(Scriptable * Sender, Action * parameters);
-	static void BitClear(Scriptable * Sender, Action * parameters);
-	static void GlobalShLGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalShRGlobal(Scriptable * Sender, Action * parameters);
-	static void GlobalShL(Scriptable * Sender, Action * parameters);
-	static void GlobalShR(Scriptable * Sender, Action * parameters);
-	static void ClearAllActions(Scriptable * Sender, Action * parameters);
-	static void ClearActions(Scriptable * Sender, Action * parameters);
 	static void JoinParty(Scriptable * Sender, Action * parameters);
+	static void LeaveAreaLUA(Scriptable * Sender, Action * parameters);
+	static void LeaveAreaLUAPanic(Scriptable * Sender, Action * parameters);
 	static void LeaveParty(Scriptable * Sender, Action * parameters);
 	static void MakeGlobal(Scriptable * Sender, Action * parameters);
-	static void UnMakeGlobal(Scriptable * Sender, Action * parameters);
-	static void SetNumTimesTalkedTo(Scriptable * Sender, Action * parameters);
-	static void StartMovie(Scriptable * Sender, Action * parameters);
+	static void MoveBetweenAreas(Scriptable * Sender, Action * parameters);
+	static void MoveToPoint(Scriptable * Sender, Action * parameters);
+	static void MoveToObject(Scriptable * Sender, Action * parameters);
+	static void MoveViewPoint(Scriptable * Sender, Action * parameters);
+	static void MoveViewObject(Scriptable * Sender, Action * parameters);
+	static void NoAction(Scriptable * Sender, Action * parameters);
+	static void OpenDoor(Scriptable * Sender, Action * parameters);
+	static void PlayDead(Scriptable * Sender, Action * parameters);
+	static void PlayerDialogue(Scriptable * Sender, Action * parameters);
+	static void PlaySound(Scriptable * Sender, Action * parameters);
+	static void ScreenShake(Scriptable * Sender, Action * parameters);
+	static void SetDialogue(Scriptable * Sender, Action * parameters);
+	static void SetGlobal(Scriptable * Sender, Action * parameters);
 	static void SetLeavePartyDialogFile(Scriptable * Sender, Action * parameters);
-	static void DialogueForceInterrupt(Scriptable * Sender, Action * parameters);
+	static void SetNumTimesTalkedTo(Scriptable * Sender, Action * parameters);
+	static void SetTokenGlobal(Scriptable * Sender, Action * parameters);
+	static void SG(Scriptable * Sender, Action * parameters);
+	static void SmallWait(Scriptable * Sender, Action * parameters);
+	static void StartCutSceneMode(Scriptable * Sender, Action * parameters);
+	static void StartCutScene(Scriptable * Sender, Action * parameters);
+	static void StartDialogue(Scriptable * Sender, Action * parameters);
+	static void StartDialogueInterrupt(Scriptable * Sender, Action * parameters);
 	static void StartDialogueNoSet(Scriptable * Sender, Action * parameters);
 	static void StartDialogueNoSetInterrupt(Scriptable * Sender, Action * parameters);
-	static void StartDialogueInterrupt(Scriptable * Sender, Action * parameters);
 	static void StartDialogueOverride(Scriptable * Sender, Action * parameters);
 	static void StartDialogueOverrideInterrupt(Scriptable * Sender, Action * parameters);
-	static void PlayerDialogue(Scriptable * Sender, Action * parameters);
-	static void ChangeStat(Scriptable * Sender, Action * parameters);
+	static void StartMovie(Scriptable * Sender, Action * parameters);
+	static void StartSong(Scriptable * Sender, Action * parameters);
+	static void TriggerActivation(Scriptable * Sender, Action * parameters);
+	static void UnhideGUI(Scriptable * Sender, Action * parameters);
+	static void Wait(Scriptable * Sender, Action * parameters);
+
+	/*GemRB extensions/actions*/
+	static void UnMakeGlobal(Scriptable * Sender, Action * parameters);
 };
 
 #endif

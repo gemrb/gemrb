@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.67 2004/02/21 18:36:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.68 2004/02/22 17:35:32 avenger_teambg Exp $
  *
  */
 
@@ -54,6 +54,7 @@ static TriggerLink triggernames[]={
 {"entered", GameScript::Entered},
 {"exists", GameScript::Exists},
 {"false", GameScript::False},
+{"gender", GameScript::Gender},
 {"general", GameScript::General},
 {"global", GameScript::Global},
 {"globalgt", GameScript::GlobalGT},
@@ -67,6 +68,7 @@ static TriggerLink triggernames[]={
 {"oncreation", GameScript::OnCreation},
 {"or", GameScript::Or},
 {"partyhasitem", GameScript::PartyHasItem},
+{"race", GameScript::Race},
 {"range", GameScript::Range},
 {"see", GameScript::See},
 {"true", GameScript::True},
@@ -1479,6 +1481,32 @@ int GameScript::Dead(Scriptable * Sender, Trigger * parameters)
 		return 0;
 	Actor *actor=(Actor *) target;
 	if(actor->GetStat(IE_STATE_ID)&STATE_DEAD)
+		return 1;
+	return 0;
+}
+
+int GameScript::Race(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	if(actor->GetStat(IE_RACE)==parameters->int0Parameter)
+		return 1;
+	return 0;
+}
+
+int GameScript::Gender(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	if(actor->GetStat(IE_SEX)==parameters->int0Parameter)
 		return 1;
 	return 0;
 }
