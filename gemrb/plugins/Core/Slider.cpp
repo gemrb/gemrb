@@ -54,8 +54,10 @@ void Slider::Draw(unsigned short x, unsigned short y)
 		if((BackGround->Width < Width) || (BackGround->Height < Height)) {
 			core->GetVideoDriver()->BlitTiled(Region(x+XPos, y+YPos, Width, Height), BackGround, true);
 		}
-		else 
-			core->GetVideoDriver()->BlitSprite(BackGround, x+XPos, y+YPos, true);
+		else {
+			Region r(x+XPos, y+YPos, Width, Height);
+			core->GetVideoDriver()->BlitSprite(BackGround, x+XPos, y+YPos, true, &r);
+		}
 	}
 	switch(State) {
 		case IE_GUI_SLIDER_KNOB:
