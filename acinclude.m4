@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.7 2005/02/02 00:36:35 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.8 2005/02/03 21:13:51 edheldil Exp $
 
 ###################################################
 dnl Configure paths for SDL
@@ -274,7 +274,7 @@ else:
 ])
 
 ###################################################
-dnl a macro to check for ability to create python extensions
+dnl Macro to check for availability of python headers
 dnl  AM_CHECK_PYTHON_HEADERS([ACTION-IF-POSSIBLE], [ACTION-IF-NOT-POSSIBLE])
 dnl function also defines PYTHON_INCLUDES
 
@@ -299,6 +299,39 @@ $1],dnl
 $2])
 CPPFLAGS="$save_CPPFLAGS"
 ])
+
+###################################################
+dnl Macro to check for availability of python libraries
+dnl  AM_CHECK_PYTHON_LIBS([ACTION-IF-POSSIBLE], [ACTION-IF-NOT-POSSIBLE])
+dnl function also defines PYTHON_LIBS
+
+AC_DEFUN([AM_CHECK_PYTHON_LIBS],
+[AC_REQUIRE([AM_PATH_PYTHON])
+AC_MSG_CHECKING(for python libraries)
+dnl deduce PYTHON_LIBS
+py_prefix=`$PYTHON -c "import sys; print sys.prefix"`
+py_exec_prefix=`$PYTHON -c "import sys; print sys.exec_prefix"`
+PYTHON_LIBS="-L${py_prefix}/lib -lpython${PYTHON_VERSION}"
+if test "$py_prefix" != "$py_exec_prefix"; then
+  PYTHON_LIBS="$PYTHON_LIBS -L${py_exec_prefix}/lib -lpython${PYTHON_VERSION}"
+fi
+AC_SUBST(PYTHON_LIBS)
+dnl check if the lib links:
+save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $PYTHON_INCLUDES"
+save_LIBS="$LIBS"
+LIBS="$LIBS $PYTHON_LIBS"
+AC_TRY_LINK([#include <Python.h>],[
+Py_Initialize();
+],dnl
+[AC_MSG_RESULT(found)
+$1],dnl
+[AC_MSG_RESULT(not found)
+$2])
+LIBS="$save_LIBS"
+CPPFLAGS="$save_CPPFLAGS"
+])
+
 
 ###################################################
 dnl Check for ZLib (gzip compression) library

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.44 2005/02/02 00:36:34 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.45 2005/02/03 21:13:51 edheldil Exp $
 
 ###################################################
 
@@ -106,6 +106,13 @@ AM_CHECK_PYTHON_HEADERS([], [AC_MSG_ERROR([
 
 *** You need Python >=2.3.0 headers installed to compile GemRB
 *** See if your distribution offers -dev packages!
+])])
+
+dnl Check for Python libraries, fail if not found.
+AM_CHECK_PYTHON_LIBS([], [AC_MSG_ERROR([
+
+*** You need Python >=2.3.0 shared libraries installed to compile GemRB
+*** Maybe you need to recompile python with --shared-libs
 ])])
 
 
