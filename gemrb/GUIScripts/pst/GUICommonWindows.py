@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.5 2004/03/20 23:02:34 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.6 2004/04/11 12:42:23 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -132,6 +132,7 @@ def SetupMenuWindowControls (Window):
 	Button = GemRB.GetControl (Window, 0)
 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPartyManageWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenContainerWindow")
 
 
 def CntReachPress ():
@@ -146,3 +147,49 @@ def TxtePress ():
 def RestPress ():
 	print "RestPress"
 
+
+# which=0: inventory; 1: rec screen
+def GetActorPortrait (actor, which):
+	name = GemRB.GetPlayerName (actor, 1)
+	if name == 'Nameless One':
+		#p = 'NOA'
+		#p = 'NOC'
+		#p = 'NOD'
+		#p = 'NOF'
+		#p = 'NOH'
+		#p = 'NOM'
+		#p = 'NOS'
+		p = 'NOZ'
+	elif name == 'Annah':
+		p = 'ANN'
+	elif name == "Dak'kon":
+		p = 'DKK'
+	elif name == 'Fall-from-Grace':
+		p = 'FFG'
+	elif name == 'Morte':
+		p = 'MRT'
+	elif name == 'Nodrom':
+		p = 'NDM'
+	elif name == 'Ignus':
+		p = 'IGY'
+	elif name == 'Vhailor':
+		p = 'VHA'
+	else:
+		print 'Unknown name:', name
+		p = None
+
+	if which == 0:
+		return 'IVP' + p
+	else:
+		return 'STP' + p
+
+
+SelectionChangeHandler = None
+
+def SetSelectionChangeHandler (handler):
+	global SelectionChangeHandler
+	SelectionChangeHandler = handler
+
+def RunSelectionChangeHandler ():
+	if SelectionChangeHandler:
+		SelectionChangeHandler ()

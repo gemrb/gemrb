@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.14 2004/04/07 09:47:27 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.15 2004/04/11 12:42:23 edheldil Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -165,11 +165,23 @@ def PopulatePortraitWindow ():
 
 	for i in range (size):
 		#actor = GemRB.PartyGetActor ()
+		Button = GemRB.GetControl (Window, i)
+		GemRB.SetVarAssoc (Window, Button, 'SelectedSingle', i)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
+
 		if i < party_size:
 			pic = GemRB.ActorGetSmallPortrait (i)
-			Button = GemRB.GetControl (Window, i)
 			#GemRB.SetButtonSprites (Window, Button, pic, 0, 0, 1, 0, 0)
 			GemRB.SetButtonBAM (Window, Button, pic, 0, 0, 0)
 			GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
 		else:
 			pass
+
+def PortraitButtonOnPress ():
+	var = GemRB.GetVar ("SelectedSingle")
+	#print "SELECTED:", var
+
+	if var < GemRB.GetPartySize ():
+		GemRB.GameSelectPCSingle (var)
+
+		RunSelectionChangeHandler ()
