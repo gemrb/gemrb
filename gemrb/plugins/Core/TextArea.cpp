@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.53 2004/04/29 04:20:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.54 2004/05/09 14:49:09 balrog994 Exp $
  *
  */
 
@@ -95,7 +95,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 				bcolor = strtoul( rest + 1, &rest, 16 );
 				if (*rest != ']')
 					goto notmatched;
-				tlen = strstr( rest + 1, "[/s]" ) - rest - 1;
+				tlen = (int)(strstr( rest + 1, "[/s]" ) - rest - 1);
 				if (tlen < 0)
 					goto notmatched;
 				len += tlen + 23;
