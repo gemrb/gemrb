@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.165 2004/05/12 22:12:20 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.166 2004/05/15 08:44:13 edheldil Exp $
  *
  */
 
@@ -669,14 +669,16 @@ static PyObject* GemRB_GetTableRowCount(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", tm->GetRowCount() );
 }
 
+PyDoc_STRVAR( GemRB_LoadSymbol__doc,
+"LoadSymbol(IDSResRef) => SymbolIndex\n\n" 
+"Loads a IDS Symbol Table." );
+
 static PyObject* GemRB_LoadSymbol(PyObject * /*self*/, PyObject* args)
 {
 	char* string;
 
 	if (!PyArg_ParseTuple( args, "s", &string )) {
-		printMessage( "GUIScript", "Syntax Error: Expected String\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_LoadSymbol__doc );
 	}
 
 	int ind = core->LoadSymbol( string );
@@ -687,14 +689,16 @@ static PyObject* GemRB_LoadSymbol(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", ind );
 }
 
+PyDoc_STRVAR( GemRB_UnloadSymbol__doc,
+"UnloadSymbol(SymbolIndex)\n\n"
+"Unloads a IDS Symbol Table." );
+
 static PyObject* GemRB_UnloadSymbol(PyObject * /*self*/, PyObject* args)
 {
 	int si;
 
 	if (!PyArg_ParseTuple( args, "i", &si )) {
-		printMessage( "GUIScript",
-			"Syntax Error:UnloadSymbol Expected Integer\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_UnloadSymbol__doc );
 	}
 
 	int ind = core->DelSymbol( si );
@@ -706,14 +710,16 @@ static PyObject* GemRB_UnloadSymbol(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetSymbol__doc,
+"GetSymbol(string) => int\n\n"
+"Returns a Loaded IDS Symbol Table." );
+
 static PyObject* GemRB_GetSymbol(PyObject * /*self*/, PyObject* args)
 {
 	char* string;
 
 	if (!PyArg_ParseTuple( args, "s", &string )) {
-		printMessage( "GUIScript", "Syntax Error: Expected String\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetSymbol__doc );
 	}
 
 	int ind = core->GetSymbolIndex( string );
@@ -724,16 +730,18 @@ static PyObject* GemRB_GetSymbol(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", ind );
 }
 
+PyDoc_STRVAR( GemRB_GetSymbolValue__doc,
+"GetSymbolValue(SymbolIndex, StringVal) => int\n"
+"GetSymbolValue(SymbolIndex, IntVal) => string\n\n"
+"Returns a field of a IDS Symbol Table." );
+
 static PyObject* GemRB_GetSymbolValue(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* si, * sym;
 
 	if (PyArg_UnpackTuple( args, "ref", 2, 2, &si, &sym )) {
 		if (!PyObject_TypeCheck( si, &PyInt_Type )) {
-			printMessage( "GUIScript",
-				"Syntax Error: GetSymbolValue(Table, RowIndex/RowString, ColIndex/ColString)\n",
-				LIGHT_RED );
-			return NULL;
+			return AttributeError( GemRB_GetSymbolValue__doc );
 		}
 		int SymbolIndex = PyInt_AsLong( si );
 		if (PyObject_TypeCheck( sym, &PyString_Type )) {
@@ -753,21 +761,19 @@ static PyObject* GemRB_GetSymbolValue(PyObject * /*self*/, PyObject* args)
 			return Py_BuildValue( "s", str );
 		}
 	}
-	printMessage( "GUIScript",
-		"Type Error: GetSymbolValue(SymbolTable, StringVal/IntVal)\n",
-		LIGHT_RED );
-	return NULL;
+	return AttributeError( GemRB_GetSymbolValue__doc );
 }
+
+PyDoc_STRVAR( GemRB_GetControl__doc,
+"GetControl(WindowIndex, ControlID) => ControlIndex\n\n"
+"Returns a control in a Window." );
 
 static PyObject* GemRB_GetControl(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID;
 
 	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlID )) {
-		printMessage( "GUIScript",
-			"Syntax Error: GetControl(WindowIndex, ControlID)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetControl__doc );
 	}
 
 	int ret = core->GetControl( WindowIndex, ControlID );
@@ -778,15 +784,16 @@ static PyObject* GemRB_GetControl(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", ret );
 }
 
+PyDoc_STRVAR( GemRB_QueryText__doc,
+"QueryText(WindowIndex, ControlIndex) => string\n\n"
+"Returns the Text of a control in a Window." );
+
 static PyObject* GemRB_QueryText(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 
 	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex )) {
-		printMessage( "GUIScript",
-			"Syntax Error: QueryText(WindowIndex, ControlIndex)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_QueryText__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -806,6 +813,10 @@ static PyObject* GemRB_QueryText(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "s", ( ( TextEdit * ) ctrl )->QueryText() );
 }
 
+PyDoc_STRVAR( GemRB_SetText__doc,
+"SetText(WindowIndex, ControlIndex, String|Strref) => int\n\n"
+"Sets the Text of a control in a Window." );
+
 static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* wi, * ci, * str;
@@ -821,10 +832,7 @@ static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 			( !PyObject_TypeCheck( str, &PyString_Type ) &&
 			!PyObject_TypeCheck( str,
 																&PyInt_Type ) )) {
-			printMessage( "GUIScript",
-				"Syntax Error: SetText(WindowIndex, ControlIndex, String|Strref)\n",
-				LIGHT_RED );
-			return NULL;
+			return AttributeError( GemRB_SetText__doc );
 		}
 
 		WindowIndex = PyInt_AsLong( wi );
@@ -859,6 +867,10 @@ static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", ret );
 }
 
+PyDoc_STRVAR( GemRB_TextAreaAppend__doc,
+"TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Row]) => int\n\n"
+"Appends the Text to the TextArea Control in the Window." );
+
 static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* wi, * ci, * str, * row = NULL;
@@ -871,10 +883,7 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 			!PyObject_TypeCheck( ci, &PyInt_Type ) ||
 			( !PyObject_TypeCheck( str, &PyString_Type ) &&
 			!PyObject_TypeCheck( str, &PyInt_Type ) )) {
-			printMessage( "GUIScript",
-				"Syntax Error: TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Row])\n",
-				LIGHT_RED );
-			return NULL;
+			return AttributeError( GemRB_TextAreaAppend__doc );
 		}
 		WindowIndex = PyInt_AsLong( wi );
 		ControlIndex = PyInt_AsLong( ci );
@@ -916,6 +925,10 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", ret );
 }
 
+PyDoc_STRVAR( GemRB_TextAreaClear__doc,
+"TextAreaClear(WindowIndex, ControlIndex)\n\n"
+"Clears the Text from the TextArea Control in the Window." );
+
 static PyObject* GemRB_TextAreaClear(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* wi, * ci;
@@ -924,10 +937,7 @@ static PyObject* GemRB_TextAreaClear(PyObject * /*self*/, PyObject* args)
 	if (PyArg_UnpackTuple( args, "ref", 2, 2, &wi, &ci )) {
 		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
 			!PyObject_TypeCheck( ci, &PyInt_Type )) { 
-			printMessage( "GUIScript",
-				"Syntax Error: TextAreaAppend(WindowIndex, ControlIndex)\n",
-				LIGHT_RED );
-			return NULL;
+			return AttributeError( GemRB_TextAreaClear__doc );
 		}
 		WindowIndex = PyInt_AsLong( wi );
 		ControlIndex = PyInt_AsLong( ci );
@@ -949,6 +959,10 @@ static PyObject* GemRB_TextAreaClear(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetTooltip__doc,
+"SetTooltip(WindowIndex, ControlIndex, String|Strref) => int\n\n"
+"Sets control's tooltip." );
+
 static PyObject* GemRB_SetTooltip(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* wi, * ci, * str;
@@ -964,10 +978,7 @@ static PyObject* GemRB_SetTooltip(PyObject * /*self*/, PyObject* args)
 			( !PyObject_TypeCheck( str, &PyString_Type ) &&
 			!PyObject_TypeCheck( str,
 																&PyInt_Type ) )) {
-			printMessage( "GUIScript",
-				"Syntax Error: SetTooltip(WindowIndex, ControlIndex, String|Strref)\n",
-				LIGHT_RED );
-			return NULL;
+			return AttributeError( GemRB_SetTooltip__doc );
 		}
 
 		WindowIndex = PyInt_AsLong( wi );
@@ -1002,16 +1013,17 @@ static PyObject* GemRB_SetTooltip(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", ret );
 }
 
+PyDoc_STRVAR( GemRB_SetVisible__doc,
+"SetVisible(WindowIndex, Visible)\n\n"
+"Sets the Visibility Flag of a Window." );
+
 static PyObject* GemRB_SetVisible(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex;
 	int visible;
 
 	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &visible )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetVisible(WindowIndex, Visible)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetVisible__doc );
 	}
 
 	int ret = core->SetVisible( WindowIndex, visible );
@@ -1024,15 +1036,17 @@ static PyObject* GemRB_SetVisible(PyObject * /*self*/, PyObject* args)
 }
 
 //useful only for ToB and HoW, sets masterscript/worldmap name
+PyDoc_STRVAR( GemRB_SetMasterScript__doc,
+"SetMasterScript(ScriptResRef, WMPResRef)\n\n"
+"Sets the worldmap and masterscript names." );
+
 PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 {
 	char* script;
 	char* worldmap;
 
 	if (!PyArg_ParseTuple( args, "ss", &script, &worldmap )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetMasterScript expects 2 ResRefs\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetMasterScript__doc );
 	}
 	strncpy( core->GlobalScript, script, 8 );
 	strncpy( core->GlobalMap, worldmap, 8 );
@@ -1040,14 +1054,16 @@ PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_ShowModal__doc,
+"ShowModal(WindowIndex)\n\n"
+"Show a Window on Screen setting the Modal Status." );
+
 static PyObject* GemRB_ShowModal(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex;
 
 	if (!PyArg_ParseTuple( args, "i", &WindowIndex )) {
-		printMessage( "GUIScript", "Syntax Error: Expected a window index\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_ShowModal__doc );
 	}
 
 	int ret = core->ShowModal( WindowIndex );
@@ -1059,6 +1075,10 @@ static PyObject* GemRB_ShowModal(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetEvent__doc,
+"SetEvent(WindowIndex, ControlIndex, EventMask, FunctionName)\n\n"
+"Sets an event of a control on a window to a script defined function." );
+
 static PyObject* GemRB_SetEvent(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
@@ -1067,10 +1087,7 @@ static PyObject* GemRB_SetEvent(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "iiis", &WindowIndex, &ControlIndex, &event,
 			&funcName )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetEvent(WindowIndex, ControlIndex, EventMask, FunctionName)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetEvent__doc );
 	}
 
 	int ret = core->SetEvent( WindowIndex, ControlIndex, event, funcName );
@@ -1082,14 +1099,16 @@ static PyObject* GemRB_SetEvent(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetNextScript__doc,
+"SetNextScript(GUIScriptName)\n\n"
+"Sets the Next Script File to be loaded." );
+
 static PyObject* GemRB_SetNextScript(PyObject * /*self*/, PyObject* args)
 {
 	char* funcName;
 
 	if (!PyArg_ParseTuple( args, "s", &funcName )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetNextScript expects a script name\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetNextScript__doc );
 	}
 
 	strcpy( core->NextScript, funcName );
@@ -1099,16 +1118,17 @@ static PyObject* GemRB_SetNextScript(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetControlStatus__doc,
+"SetControlStatus(WindowIndex, ControlIndex, Status)\n\n"
+"Sets the status of a Control." );
+
 static PyObject* GemRB_SetControlStatus(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	int status;
 
 	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &status )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetControlStatus(WindowIndex, ControlIndex, Status)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetControlStatus__doc );
 	}
 
 	int ret = core->SetControlStatus( WindowIndex, ControlIndex, status );
@@ -1120,6 +1140,10 @@ static PyObject* GemRB_SetControlStatus(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetVarAssoc__doc,
+"SetVarAssoc(WindowIndex, ControlIndex, VariableName, LongValue)\n\n"
+"Sets the name of the Variable associated with a control." );
+
 static PyObject* GemRB_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
@@ -1128,10 +1152,7 @@ static PyObject* GemRB_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "iisl", &WindowIndex, &ControlIndex,
 			&VarName, &Value )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetVarAssoc(WindowIndex, ControlIndex, VariableName, LongValue)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetVarAssoc__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1156,14 +1177,16 @@ static PyObject* GemRB_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_UnloadWindow__doc,
+"UnloadWindow(WindowIndex)\n\n"
+"Unloads a previously Loaded Window." );
+
 static PyObject* GemRB_UnloadWindow(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex;
 
 	if (!PyArg_ParseTuple( args, "i", &WindowIndex )) {
-		printMessage( "GUIScript",
-			"Syntax Error: UnloadWindow(WindowIndex)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_UnloadWindow__doc );
 	}
 
 	int ret = core->DelWindow( WindowIndex );
@@ -1175,14 +1198,16 @@ static PyObject* GemRB_UnloadWindow(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_InvalidateWindow__doc,
+"InvalidateWindow(WindowIndex)\n\n"
+"Invalidates the given Window." );
+
 static PyObject* GemRB_InvalidateWindow(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex;
 
 	if (!PyArg_ParseTuple( args, "i", &WindowIndex )) {
-		printMessage( "GUIScript",
-			"Syntax Error: InvalidateWindow(WindowIndex)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_InvalidateWindow__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1216,6 +1241,10 @@ static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", WindowIndex );
 }
 
+PyDoc_STRVAR( GemRB_CreateLabel__doc,
+"CreateLabel(WindowIndex, ControlID, x, y, w, h, font, text, align) => ControlIndex\n\n"
+"Creates and adds a new Label to a Window." );
+
 static PyObject* GemRB_CreateLabel(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID, x, y, w, h, align;
@@ -1223,10 +1252,7 @@ static PyObject* GemRB_CreateLabel(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "iiiiiissi", &WindowIndex, &ControlID, &x,
 			&y, &w, &h, &font, &text, &align )) {
-		printMessage( "GUIScript",
-			"Syntax Error: CreateLabel(WindowIndex, ControlIndex, x, y, w, h, font, text, align)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_CreateLabel__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1249,16 +1275,17 @@ static PyObject* GemRB_CreateLabel(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetLabelTextColor__doc,
+"SetLabelTextColor(WindowIndex, ControlIndex, red, green, blue)\n\n"
+"Sets the Text Color of a Label Control." );
+
 static PyObject* GemRB_SetLabelTextColor(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, r, g, b;
 
 	if (!PyArg_ParseTuple( args, "iiiii", &WindowIndex, &ControlIndex, &r, &g,
 			&b )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetLabelTextColor(WindowIndex, ControlIndex, red, green, blue)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetLabelTextColor__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1282,16 +1309,17 @@ static PyObject* GemRB_SetLabelTextColor(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_CreateButton__doc,
+"CreateButton(WindowIndex, ControlID, x, y, w, h) => ControlIndex\n\n"
+"Creates and adds a new Button to a Window." );
+
 static PyObject* GemRB_CreateButton(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID, x, y, w, h;
 
 	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &x, &y,
 			&w, &h )) {
-		printMessage( "GUIScript",
-			"Syntax Error: CreateButton(WindowIndex, ControlIndex, x, y, w, h)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_CreateButton__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1313,6 +1341,10 @@ static PyObject* GemRB_CreateButton(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetButtonSprites__doc,
+"SetButtonSprites(WindowIndex, ControlIndex, ResRef, Cycle, UnpressedFrame, PressedFrame, SelectedFrame, DisabledFrame)\n\n"
+"Sets a Button Sprites Images." );
+
 static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, cycle, unpressed, pressed, selected,
@@ -1321,10 +1353,7 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "iisiiiii", &WindowIndex, &ControlIndex,
 			&ResRef, &cycle, &unpressed, &pressed, &selected, &disabled )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetButtonSprites(WindowIndex, ControlIndex, ResRef, Cycle, UnpressedFrame, PressedFrame, SelectedFrame, DisabledFrame)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetButtonSprites__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1374,15 +1403,16 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetControlPos__doc,
+"SetControlPos(WindowIndex, ControlIndex, X, Y)\n\n"
+"Moves a Control." );
+
 static PyObject* GemRB_SetControlPos(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, X, Y;
 
 	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &X, &Y )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetControlPos(WindowIndex, ControlIndex, X, Y)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetControlPos__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1401,16 +1431,17 @@ static PyObject* GemRB_SetControlPos(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetControlSize__doc,
+"SetControlSize(WindowIndex, ControlIndex, Width, Height)\n\n"
+"Resizes a Control." );
+
 static PyObject* GemRB_SetControlSize(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, Width, Height;
 
 	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &Width,
 			&Height )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetControlSize(WindowIndex, ControlIndex, Width, Height)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetControlSize__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1429,14 +1460,16 @@ static PyObject* GemRB_SetControlSize(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetLabelUseRGB__doc,
+"SetLabelUseRGB(WindowIndex, ControlIndex, status)\n\n"
+"Tells a Label to use the RGB colors with the text." );
+
 static PyObject* GemRB_SetLabelUseRGB(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, status;
 
 	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &status )) {
-		printMessage( "GUIScript",
-			"Syntax Error: UnloadWindow(WindowIndex)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetLabelUseRGB__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1457,16 +1490,17 @@ static PyObject* GemRB_SetLabelUseRGB(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetTextAreaSelectable__doc,
+"SetTextAreaSelectable(WindowIndex, ControlIndex, Flag)\n\n"
+"Sets the Selectable Flag of a TextArea." );
+
 static PyObject* GemRB_SetTextAreaSelectable(PyObject * /*self*/,
 	PyObject* args)
 {
 	int WindowIndex, ControlIndex, Flag;
 
 	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &Flag )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetTextAreaSelectable(WindowIndex, ControlIndex, Flag)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetTextAreaSelectable__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1491,16 +1525,17 @@ static PyObject* GemRB_SetTextAreaSelectable(PyObject * /*self*/,
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetButtonFlags__doc,
+"SetButtonFlags(WindowIndex, ControlIndex, Flags, Operation)\n\n"
+"Sets the Display Flags of a Button." );
+
 static PyObject* GemRB_SetButtonFlags(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, Flags, Operation;
 
 	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &Flags,
 			&Operation )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetButtonFlags(WindowIndex, ControlIndex, Flags, Operation)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetButtonFlags__doc );
 	}
 	if (Operation< 0 || Operation>2) {
 		printMessage( "GUIScript",
@@ -1529,15 +1564,16 @@ static PyObject* GemRB_SetButtonFlags(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetButtonState__doc,
+"SetButtonState(WindowIndex, ControlIndex, State)\n\n"
+"Sets the state of a Button Control." );
+
 static PyObject* GemRB_SetButtonState(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, state;
 
 	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &state )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetButtonState(WindowIndex, ControlIndex, State)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetButtonState__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1561,16 +1597,17 @@ static PyObject* GemRB_SetButtonState(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetButtonPicture__doc,
+"SetButtonPicture(WindowIndex, ControlIndex, PictureResRef)\n\n"
+"Sets the Picture of a Button Control from a BMP file." );
+
 static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	char* ResRef;
 
 	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex, &ResRef )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetButtonPicture(WindowIndex, ControlIndex, PictureResRef)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetButtonPicture__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1625,16 +1662,17 @@ static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetButtonMOS__doc,
+"SetButtonMOS(WindowIndex, ControlIndex, MOSResRef)\n\n"
+"Sets the Picture of a Button Control from a MOS file." );
+
 static PyObject* GemRB_SetButtonMOS(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	char* ResRef;
 
 	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex, &ResRef )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetButtonMOS(WindowIndex, ControlIndex, MOSResRef)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetButtonMOS__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1690,6 +1728,10 @@ static PyObject* GemRB_SetButtonMOS(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetButtonPLT__doc,
+"SetButtonPLT(WindowIndex, ControlIndex, PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8)\n\n"
+"Sets the Picture of a Button Control from a PLT file." );
+
 static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, col1, col2, col3, col4, col5, col6, col7,
@@ -1698,10 +1740,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "iisiiiiiiii", &WindowIndex, &ControlIndex,
 			&ResRef, &col1, &col2, &col3, &col4, &col5, &col6, &col7, &col8 )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetButtonPLT(WindowIndex, ControlIndex, PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetButtonPLT__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1764,6 +1803,10 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetButtonBAM__doc,
+"SetButtonBAM(WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)\n\n"
+"Sets the Picture of a Button Control from a BAM file." );
+
 static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, CycleIndex, FrameIndex, col1;
@@ -1771,10 +1814,7 @@ static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "iisiii", &WindowIndex, &ControlIndex,
 			&ResRef, &CycleIndex, &FrameIndex, &col1 )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetButtonBAM(WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetButtonBAM__doc );
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
@@ -1837,14 +1877,16 @@ static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_PlaySound__doc,
+"PlaySound(SoundResource)\n\n"
+"Plays a Sound." );
+
 static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
 	char* ResRef;
 
 	if (!PyArg_ParseTuple( args, "s", &ResRef )) {
-		printMessage( "GUIScript", "Syntax Error: PlaySound(SoundResource)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_PlaySound__doc );
 	}
 
 	int ret = core->GetSoundMgr()->Play( ResRef );
@@ -1856,6 +1898,10 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_DrawWindows__doc,
+"DrawWindows()\n\n"
+"Refreshes the User Interface." );
+
 static PyObject* GemRB_DrawWindows(PyObject * /*self*/, PyObject * /*args*/)
 {
 	core->DrawWindows();
@@ -1863,6 +1909,10 @@ static PyObject* GemRB_DrawWindows(PyObject * /*self*/, PyObject * /*args*/)
 	Py_INCREF( Py_None );
 	return Py_None;
 }
+
+PyDoc_STRVAR( GemRB_Quit__doc,
+"Quit()\n\n"
+"Quits GemRB." );
 
 static PyObject* GemRB_Quit(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -1875,15 +1925,17 @@ static PyObject* GemRB_Quit(PyObject * /*self*/, PyObject * /*args*/)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_LoadMusicPL__doc,
+"LoadMusicPL(MusicPlayListResource)\n\n"
+"Loads and starts a Music PlayList." );
+
 static PyObject* GemRB_LoadMusicPL(PyObject * /*self*/, PyObject* args)
 {
 	char* ResRef;
 	int HardEnd = 0;
 
 	if (!PyArg_ParseTuple( args, "s|i", &ResRef, &HardEnd )) {
-		printMessage( "GUIScript",
-			"Syntax Error: LoadMusicPL(MusicPlayListResource)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_LoadMusicPL__doc );
 	}
 
 	core->GetMusicMgr()->SwitchPlayList( ResRef, HardEnd );
@@ -1891,6 +1943,10 @@ static PyObject* GemRB_LoadMusicPL(PyObject * /*self*/, PyObject* args)
 	Py_INCREF( Py_None );
 	return Py_None;
 }
+
+PyDoc_STRVAR( GemRB_SoftEndPL__doc,
+"SoftEndPL()\n\n"
+"Ends a Music Playlist softly." );
 
 static PyObject* GemRB_SoftEndPL(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -1900,6 +1956,10 @@ static PyObject* GemRB_SoftEndPL(PyObject * /*self*/, PyObject * /*args*/)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_HardEndPL__doc,
+"HardEndPL()\n\n"
+"Ends a Music Playlist immediately." );
+
 static PyObject* GemRB_HardEndPL(PyObject * /*self*/, PyObject * /*args*/)
 {
 	core->GetMusicMgr()->HardEnd();
@@ -1908,15 +1968,17 @@ static PyObject* GemRB_HardEndPL(PyObject * /*self*/, PyObject * /*args*/)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetToken__doc,
+"SetToken(VariableName, Value)\n\n"
+"Set/Create a token to be replaced in StrRefs." );
+
 static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 {
 	char* Variable;
 	char* value;
 
 	if (!PyArg_ParseTuple( args, "ss", &Variable, &value )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetVar(VariableName, Value)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetToken__doc );
 	}
 
 	char* newvalue = ( char* ) malloc( strlen( value ) + 1 );  //duplicating the string
@@ -1927,15 +1989,17 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetVar__doc,
+"SetVar(VariableName, Value)\n\n"
+"Set/Create a Variable in the Global Dictionary." );
+
 static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 {
 	char* Variable;
 	unsigned long value;
 
 	if (!PyArg_ParseTuple( args, "sl", &Variable, &value )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetVar(VariableName, Value)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetVar__doc );
 	}
 
 	core->GetDictionary()->SetAt( Variable, value );
@@ -1944,15 +2008,17 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetToken__doc,
+"GetToken(VariableName) => string\n\n"
+"Get a Variable value from the Token Dictionary." );
+
 static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 {
 	char* Variable;
 	char* value;
 
 	if (!PyArg_ParseTuple( args, "s", &Variable )) {
-		printMessage( "GUIScript", "Syntax Error: GetToken(VariableName)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetToken__doc );
 	}
 
 	//trying to cheat the pointer out from the Dictionary without allocating it
@@ -1964,15 +2030,17 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "s", value );
 }
 
+PyDoc_STRVAR( GemRB_GetVar__doc,
+"GetVar(VariableName) => int\n\n"
+"Get a Variable value from the Global Dictionary." );
+
 static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 {
 	char* Variable;
 	unsigned long value;
 
 	if (!PyArg_ParseTuple( args, "s", &Variable )) {
-		printMessage( "GUIScript", "Syntax Error: GetVar(VariableName)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetVar__doc );
 	}
 
 	if (!core->GetDictionary()->Lookup( Variable, value )) {
@@ -1982,15 +2050,17 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "l", value );
 }
 
+PyDoc_STRVAR( GemRB_CheckVar__doc,
+"CheckVar(VariableName, Context) => long\n\n"
+"Display the value of a Game Variable." );
+
 static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 {
 	char* Variable;
 	char* Context;
 
 	if (!PyArg_ParseTuple( args, "ss", &Variable, &Context )) {
-		printMessage( "GUIScript", "Syntax Error: CheckVar(VariableName, Context)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_CheckVar__doc );
 	}
 	GameControl *gc = core->GetGameControl();
 	if(!gc) {
@@ -2012,15 +2082,17 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "l", value );
 }
 
+PyDoc_STRVAR( GemRB_GetGameVar__doc,
+"GetGameVar(VariableName) => long\n\n"
+"Get a Variable value from the Game Global Dictionary." );
+
 static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 {
 	char* Variable;
 	unsigned long value;
 
 	if (!PyArg_ParseTuple( args, "s", &Variable )) {
-		printMessage( "GUIScript", "Syntax Error: GetGameVar(VariableName)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetGameVar__doc );
 	}
 
 	if (!core->GetGame()->globals->Lookup( Variable, value )) {
@@ -2030,14 +2102,16 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "l", value );
 }
 
+PyDoc_STRVAR( GemRB_PlayMovie__doc,
+"PlayMovie(MOVResRef) => int\n\n"
+"Starts the Movie Player." );
+
 static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 {
 	char* string;
 
 	if (!PyArg_ParseTuple( args, "s", &string )) {
-		printMessage( "GUIScript", "Syntax Error: Expected String\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_PlayMovie__doc );
 	}
 
 	int ind = core->PlayMovie( string );
@@ -2048,6 +2122,10 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", ind );
 }
 
+PyDoc_STRVAR( GemRB_GetSaveGameCount__doc,
+"GetSaveGameCount() => int\n\n"
+"Returns the number of saved games." );
+
 static PyObject* GemRB_GetSaveGameCount(PyObject * /*self*/,
 	PyObject * /*args*/)
 {
@@ -2055,28 +2133,32 @@ static PyObject* GemRB_GetSaveGameCount(PyObject * /*self*/,
 			core->GetSaveGameIterator()->GetSaveGameCount() );
 }
 
+PyDoc_STRVAR( GemRB_DeleteSaveGame__doc,
+"DeleteSaveGame(SlotCount)\n\n"
+"Deletes a saved game folder completely." );
+
 static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 {
 	int SlotCount;
 
 	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
-		printMessage( "GUIScript",
-			"Syntax Error: DeleteSaveGame(SlotCount)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_DeleteSaveGame__doc );
 	}
 	core->GetSaveGameIterator()->DeleteSaveGame( SlotCount );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetSaveGameAttrib__doc,
+"GetSaveGameAttrib(Type, SaveSlotCount) => string\n\n"
+"Returns the name, path or prefix of the saved game." );
+
 static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
 {
 	int Type, SlotCount;
 
 	if (!PyArg_ParseTuple( args, "ii", &Type, &SlotCount )) {
-		printMessage( "GUIScript",
-			"Syntax Error: GetSaveGameAttrib(Type, SlotCount)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetSaveGameAttrib__doc );
 	}
 	SaveGame* sg = core->GetSaveGameIterator()->GetSaveGame( SlotCount );
 	if (sg == NULL) {
@@ -2103,16 +2185,17 @@ static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
 	return tmp;
 }
 
+PyDoc_STRVAR( GemRB_SetSaveGamePortrait__doc,
+"SetSaveGameAreaPortrait(WindowIndex, ControlIndex, SaveSlotCount, PCSlotCount)\n\n"
+"Sets a savegame PC portrait bmp onto a button as picture." );
+
 static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, SaveSlotCount, PCSlotCount;
 
 	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex,
 			&SaveSlotCount, &PCSlotCount )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetSaveGameAreaPortrait(WindowID, ControlID, SaveSlotCount, PCSlotCount)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetSaveGamePortrait__doc );
 	}
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
@@ -2167,16 +2250,17 @@ static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetSaveGamePreview__doc,
+"SetSaveGameAreaPreview(WindowIndex, ControlIndex, SaveSlotCount)\n\n"
+"Sets a savegame area preview bmp onto a button as picture." );
+
 static PyObject* GemRB_SetSaveGamePreview(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, SlotCount;
 
 	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex,
 			&SlotCount )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetSaveGameAreaPreview(WindowID, ControlID, SlotCount)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetSaveGamePreview__doc );
 	}
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
@@ -2224,25 +2308,30 @@ static PyObject* GemRB_SetSaveGamePreview(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_Roll__doc,
+"Roll(Dice, Size, Add) => int\n\n"
+"Calls traditional dice roll." );
+
 static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 {
 	int Dice, Size, Add;
 
 	if (!PyArg_ParseTuple( args, "iii", &Dice, &Size, &Add )) {
-		printMessage( "GUIScript", "Syntax Error: Roll(Dice, Size, Add)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_Roll__doc );
 	}
 	return Py_BuildValue( "i", core->Roll( Dice, Size, Add ) );
 }
+
+PyDoc_STRVAR( GemRB_GetCharSounds__doc,
+"GetCharSounds(WindowIndex, ControlIndex) => int\n\n"
+"Reads in the contents of the sounds subfolder." );
 
 static PyObject* GemRB_GetCharSounds(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci;
 
 	if (!PyArg_ParseTuple( args, "ii", &wi, &ci )) {
-		printMessage( "GUIScript",
-			"Syntax Error: GetCharSounds(WindowID, ControlID)\n", LIGHT_RED );
+		return AttributeError( GemRB_GetCharSounds__doc );
 	}
 	Window* win = core->GetWindow( wi );
 	if (!win) {
@@ -2258,14 +2347,22 @@ static PyObject* GemRB_GetCharSounds(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", core->GetCharSounds( ta ) );
 }
 
+PyDoc_STRVAR( GemRB_GetPartySize__doc,
+"GetPartySize() => int\n\n"
+"Returns the number of PCs." );
+
 static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 {
 	Game *game = core->GetGame();
 	if(!game) {
-		return 0;
+		return NULL;
 	}
 	return Py_BuildValue( "i", game->GetPartySize(0) );
 }
+
+PyDoc_STRVAR( GemRB_GameGetPartyGold__doc,
+"GameGetPartyGold() => int\n\n"
+"Returns current party gold." );
 
 static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* args)
 {
@@ -2273,20 +2370,26 @@ static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", Gold );
 }
 
+PyDoc_STRVAR( GemRB_GameGetFormation__doc,
+"GameGetFormation() => int\n\n"
+"Returns current party formation." );
+
 static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* args)
 {
 	int Formation = core->GetGame()->WhichFormation;
 	return Py_BuildValue( "i", Formation );
 }
 
+PyDoc_STRVAR( GemRB_GameSetFormation__doc,
+"GameSetFormation(Formation)\n\n"
+"Sets party formation." );
+
 static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
 {
 	int Formation;
 
 	if (!PyArg_ParseTuple( args, "i", &Formation )) {
-		printMessage( "GUIScript",
-			"Syntax Error: GameSetFormation(Formation)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GameSetFormation__doc );
 	}
 	core->GetGame()->WhichFormation = Formation;
 
@@ -2294,12 +2397,15 @@ static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetJournalSize__doc,
+"GetJournalSize(section) => int\n\n"
+"Returns the number of entries in the given section of journal." );
+
 static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 {
 	int section;
 	if (!PyArg_ParseTuple( args, "i", &section )) {
-		printMessage( "GUIScript",
-			"Syntax Error: GetJournalSize(section)\n", LIGHT_RED );
+		return AttributeError( GemRB_GetJournalSize__doc );
 	}
 
 	int count = 0;
@@ -2313,12 +2419,15 @@ static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 	return Py_BuildValue( "i", count );
 }
 
+PyDoc_STRVAR( GemRB_GetJournalEntry__doc,
+"GetJournalEntry(section, index) => JournalEntry\n\n"
+"Returns dictionary representing journal entry w/ given section and index." );
+
 static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 {
 	int section, index;
 	if (!PyArg_ParseTuple( args, "ii", &section, &index )) {
-		printMessage( "GUIScript",
-			"Syntax Error: GetJournalEntry(section, index)\n", LIGHT_RED );
+		return AttributeError( GemRB_GetJournalEntry__doc );
 	}
 
 	int count = 0;
@@ -2342,16 +2451,23 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GameIsBeastKnown__doc,
+"GameIsBeastKnown(index) => int\n\n"
+"Returns whether beast with given index is known to PCs (works only on PST)." );
+
 static PyObject* GemRB_GameIsBeastKnown(PyObject * /*self*/, PyObject * args)
 {
 	int index;
 	if (!PyArg_ParseTuple( args, "i", &index )) {
-		printMessage( "GUIScript",
-			"Syntax Error: GameIsBeastKnown(index)\n", LIGHT_RED );
+		return AttributeError( GemRB_GameIsBeastKnown__doc );
 	}
 
 	return Py_BuildValue( "i", core->GetGame()->IsBeastKnown( index ));
 }
+
+PyDoc_STRVAR( GemRB_GetINIPartyCount__doc,
+"GetINIPartyCount() =>int\n\n"
+"Returns the Number of Party defined in Party.ini (works only on IWD2)." );
 
 static PyObject* GemRB_GetINIPartyCount(PyObject * /*self*/,
 	PyObject * /*args*/)
@@ -2362,13 +2478,15 @@ static PyObject* GemRB_GetINIPartyCount(PyObject * /*self*/,
 	return Py_BuildValue( "i", core->GetPartyINI()->GetTagsCount() );
 }
 
+PyDoc_STRVAR( GemRB_GetINIQuestsKey__doc,
+"GetINIQuestsKey(Tag, Key, Default) => string\n\n"
+"Returns a Value from the quests.ini File (works only on PST)." );
+
 static PyObject* GemRB_GetINIQuestsKey(PyObject * /*self*/, PyObject* args)
 {
 	char* Tag, * Key, * Default;
 	if (!PyArg_ParseTuple( args, "sss", &Tag, &Key, &Default )) {
-		printMessage( "GUIScript",
-			"Syntax Error: GetINIQuestsKey(Tag, Key, Default)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetINIQuestsKey__doc );
 	}
 	if (!core->GetQuestsINI()) {
 		return NULL;
@@ -2377,13 +2495,15 @@ static PyObject* GemRB_GetINIQuestsKey(PyObject * /*self*/, PyObject* args)
 			core->GetQuestsINI()->GetKeyAsString( Tag, Key, Default ) );
 }
 
+PyDoc_STRVAR( GemRB_GetINIBeastsKey__doc,
+"GetINIBeastsKey(Tag, Key, Default) => string\n\n"
+"Returns a Value from the beasts.ini File (works only on PST)." );
+
 static PyObject* GemRB_GetINIBeastsKey(PyObject * /*self*/, PyObject* args)
 {
 	char* Tag, * Key, * Default;
 	if (!PyArg_ParseTuple( args, "sss", &Tag, &Key, &Default )) {
-		printMessage( "GUIScript",
-			"Syntax Error: GetINIBeastsKey(Tag, Key, Default)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetINIBeastsKey__doc );
 	}
 	if (!core->GetBeastsINI()) {
 		return NULL;
@@ -2392,13 +2512,15 @@ static PyObject* GemRB_GetINIBeastsKey(PyObject * /*self*/, PyObject* args)
 			core->GetBeastsINI()->GetKeyAsString( Tag, Key, Default ) );
 }
 
+PyDoc_STRVAR( GemRB_GetINIPartyKey__doc,
+"GetINIPartyKey(Tag, Key, Default) => string\n\n"
+"Returns a Value from the Party.ini File (works only on IWD2)." );
+
 static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 {
 	char* Tag, * Key, * Default;
 	if (!PyArg_ParseTuple( args, "sss", &Tag, &Key, &Default )) {
-		printMessage( "GUIScript",
-			"Syntax Error: GetINIPartyKey(Tag, Key, Default)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetINIPartyKey__doc );
 	}
 	if (!core->GetPartyINI()) {
 		return NULL;
@@ -2407,15 +2529,17 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 			core->GetPartyINI()->GetKeyAsString( Tag, Key, Default ) );
 }
 
+PyDoc_STRVAR( GemRB_CreatePlayer__doc,
+"CreatePlayer(CREResRef, Slot) => PlayerSlot\n\n"
+"Creates a player slot." );
+
 static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 {
 	char* CreResRef;
 	int PlayerSlot, Slot;
 
 	if (!PyArg_ParseTuple( args, "si", &CreResRef, &PlayerSlot )) {
-		printMessage( "GUIScript",
-			"Syntax Error: CreatePlayer(ResRef, Slot)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_CreatePlayer__doc );
 	}
 	//PlayerSlot is zero based, if not, remove the +1
 	//removed it!
@@ -2440,15 +2564,17 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", PlayerSlot );
 }
 
+PyDoc_STRVAR( GemRB_GetPlayerName__doc,
+"GetPlayerName(Slot[, LongOrShort]) => string\n\n"
+"Queries the player name." );
+
 static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot, Which;
 
 	Which = 0;
 	if (!PyArg_ParseTuple( args, "i|i", &PlayerSlot, &Which )) {
-		printMessage( "GUIScript", "Syntax Error: GetPlayerName(Slot[, LongOrShort])\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetPlayerName__doc );
 	}
 	Game *game = core->GetGame();
 	if(!game) {
@@ -2462,6 +2588,10 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "s", MyActor->GetName(Which) );
 }
 
+PyDoc_STRVAR( GemRB_SetPlayerName__doc,
+"SetPlayerName(Slot, Name[, LongOrShort])\n\n"
+"Sets the player name." );
+
 static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 {
 	char *Name=NULL;
@@ -2469,9 +2599,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 
 	Which = 0;
 	if (!PyArg_ParseTuple( args, "is|i", &PlayerSlot, &Name, &Which )) {
-		printMessage( "GUIScript", "Syntax Error: SetPlayerName(Slot, Name[, LongOrShort])\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetPlayerName__doc );
 	}
 	Game *game = core->GetGame();
 	if(!game) {
@@ -2487,13 +2615,16 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_IsPlayerSelected__doc,
+"IsPlayerSelected(Slot) => bool\n\n"
+"Returns true if the player was selected." );
+
 static PyObject* GemRB_IsPlayerSelected(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot;
 
 	if (!PyArg_ParseTuple( args, "i", &PlayerSlot )) {
-		printMessage( "GUIScript", "Syntax Error: IsPlayerSelected(Slot)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_IsPlayerSelected__doc );
 	}
 	Game *game = core->GetGame();
 	if(!game) {
@@ -2507,15 +2638,17 @@ static PyObject* GemRB_IsPlayerSelected(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue("d", MyActor->IsSelected() );
 }
 
+PyDoc_STRVAR( GemRB_GetPlayerPortrait__doc,
+"GetPlayerPortrait(Slot[, SmallOrLarge]) => string\n\n"
+"Queries the player portrait." );
+
 static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot, Which;
 
 	Which = 0;
 	if (!PyArg_ParseTuple( args, "i|i", &PlayerSlot, &Which )) {
-		printMessage( "GUIScript", "Syntax Error: GetPlayerPortrait(Slot[, SmallOrLarge])\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetPlayerPortrait__doc );
 	}
 	Game *game = core->GetGame();
 	if(!game) {
@@ -2529,28 +2662,32 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "s", MyActor->GetPortrait(Which) );
 }
 
+PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
+"GetPlayerStat(Slot, ID) => int\n\n"
+"Queries a stat." );
+
 static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot, StatID, StatValue;
 
 	if (!PyArg_ParseTuple( args, "ii", &PlayerSlot, &StatID )) {
-		printMessage( "GUIScript", "Syntax Error: GetPlayerStat(Slot, ID)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetPlayerStat__doc );
 	}
 	//returning the modified stat
 	StatValue = core->GetCreatureStat( PlayerSlot, StatID, 1 );
 	return Py_BuildValue( "i", StatValue );
 }
 
+PyDoc_STRVAR( GemRB_SetPlayerStat__doc,
+"SetPlayerStat(Slot, ID, Value)\n\n"
+"Changes a stat." );
+
 static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot, StatID, StatValue;
 
 	if (!PyArg_ParseTuple( args, "iii", &PlayerSlot, &StatID, &StatValue )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetPlayerStat(Slot, ID, Value)\n", LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetPlayerStat__doc );
 	}
 	//Setting the creature's base stat, which gets saved (0)
 	if (!core->SetCreatureStat( PlayerSlot, StatID, StatValue, 0 )) {
@@ -2560,15 +2697,17 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_FillPlayerInfo__doc,
+"FillPlayerInfo(Slot[, Portrait1, Portrait2])\n\n"
+"Fills basic character info, that is not stored in stats." );
+
 static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot;
 	char *Portrait1=NULL, *Portrait2=NULL;
 
 	if (!PyArg_ParseTuple( args, "i|ss", &PlayerSlot, &Portrait1, &Portrait2)) {
-		printMessage( "GUIScript", "Syntax Error: FillPlayerInfo(Slot)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_FillPlayerInfo__doc );
 	}
 	// here comes some code to transfer icon/name to the PC sheet
 	//
@@ -2640,15 +2779,16 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetWorldMapImage__doc,
+"SetSaveWorldMapImage(WindowIndex, ButtonIndex)\n\n"
+"Sets worldmap image on a control." );
+
 static PyObject* GemRB_SetWorldMapImage(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 
 	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetSaveWorldMapImage(WindowID, ControlID)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetWorldMapImage__doc );
 	}
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
@@ -2701,6 +2841,10 @@ static PyObject* GemRB_SetWorldMapImage(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetSpellIcon__doc,
+"SetSpellIcon(WindowIndex, ControlIndex, SPLResRef)\n\n"
+"FIXME: temporary Sets Spell icon image on a button." );
+
 static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
@@ -2708,10 +2852,7 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex,
 			&SpellResRef )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetSpellIcon(WindowID, ControlID, SpellName)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetSpellIcon__doc );
 	}
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
@@ -2769,6 +2910,10 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetItemIcon__doc,
+"SetItemIcon(WindowIndex, ControlIndex, ITMResRef)\n\n"
+"FIXME: temporary Sets Item icon image on a button." );
+
 static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
@@ -2776,10 +2921,7 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex,
 			&ItemResRef )) {
-		printMessage( "GUIScript",
-			"Syntax Error: SetItemIcon(WindowID, ControlID, ItemName)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_SetItemIcon__doc );
 	}
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
@@ -2830,6 +2972,10 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_EnterStore__doc,
+"EnterStore(STOResRef)\n\n"
+"FIXME: temporary Sets current store." );
+
 // FIXME: ugly, should be in core
 Store* store;
 
@@ -2838,9 +2984,7 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	char* StoreResRef;
 
 	if (!PyArg_ParseTuple( args, "s", &StoreResRef )) {
-		printMessage( "GUIScript", "Syntax Error: EnterStore(StoreName)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_EnterStore__doc );
 	}
 
 	// FIXME!!!
@@ -2872,23 +3016,27 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetStoreName__doc,
+"GetStoreName() => string\n\n"
+"FIXME: temporary Returns name of the current store" );
+
 static PyObject* GemRB_GetStoreName(PyObject * /*self*/, PyObject* args)
 {
 	if (!PyArg_ParseTuple( args, "" )) {
-		printMessage( "GUIScript", "Syntax Error: GetStoreName()\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetStoreName__doc );
 	}
 
 	return PyString_FromString( core->GetString( store->StoreName ) );
 }
 
+PyDoc_STRVAR( GemRB_GetStoreRoomPrices__doc,
+"GetStoreRoomPrices() => tuple\n\n"
+"FIXME: temporary Returns tuple of room prices for the current store." );
+
 static PyObject* GemRB_GetStoreRoomPrices(PyObject * /*self*/, PyObject* args)
 {
 	if (!PyArg_ParseTuple( args, "" )) {
-		printMessage( "GUIScript", "Syntax Error: GetStoreRoomPrices()\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GetStoreRoomPrices__doc );
 	}
 
 	PyObject* p = PyTuple_New( 4 );
@@ -2900,14 +3048,16 @@ static PyObject* GemRB_GetStoreRoomPrices(PyObject * /*self*/, PyObject* args)
 	return p;
 }
 
+PyDoc_STRVAR( GemRB_GameSelectPCSingle__doc,
+"GameSelectPCSingle(index)\n\n"
+"Selects one PC in non-walk environment (i.e. in shops, inventory,...)" );
+
 static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 {
 	int index;
 
 	if (!PyArg_ParseTuple( args, "i", &index )) {
-		printMessage( "GUIScript", "Syntax Error: GameSelectPCSingle(index)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GameSelectPCSingle__doc );
 	}
 
 	core->GetGame()->SelectPCSingle( index );
@@ -2916,12 +3066,14 @@ static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
+"GameGetSelectedPCSingle() => int\n\n"
+"Returns index of the selected PC in non-walk environment (i.e. in shops, inventory,...)" );
+
 static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* args)
 {
 	if (!PyArg_ParseTuple( args, "" )) {
-		printMessage( "GUIScript", "Syntax Error: GameGetSelectedPCSingle()\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_GameGetSelectedPCSingle__doc );
 	}
 
 	return Py_BuildValue( "i", core->GetGame()->GetSelectedPCSingle() );
@@ -2929,28 +3081,32 @@ static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* ar
 
 
 
+PyDoc_STRVAR( GemRB_ExecuteString__doc,
+"ExecuteString(String)\n\n"
+"Executes an In-Game Script Action in the current Area Script Context" );
+
 static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 {
 	char* String;
 
 	if (!PyArg_ParseTuple( args, "s", &String )) {
-		printMessage( "GUIScript", "Syntax Error: ExecuteString(String)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_ExecuteString__doc );
 	}
 	GameScript::ExecuteString( core->GetGame()->GetCurrentMap( ), String );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_EvaluateString__doc,
+"EvaluateString(String)\n\n"
+"Evaluate an In-Game Script Trigger in the current Area Script Context" );
+
 static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 {
 	char* String;
 
 	if (!PyArg_ParseTuple( args, "s", &String )) {
-		printMessage( "GUIScript", "Syntax Error: EvaluateString(String)\n",
-			LIGHT_RED );
-		return NULL;
+		return AttributeError( GemRB_EvaluateString__doc );
 	}
 	if (GameScript::EvaluateString( core->GetGame()->GetCurrentMap( ), String )) {
 		printf( "%s returned True\n", String );
@@ -2973,9 +3129,9 @@ static PyMethodDef GemRBMethods[] = {
 	{"MoveTAText", GemRB_MoveTAText, METH_VARARGS,
 	GemRB_MoveTAText__doc},
 	{"ExecuteString", GemRB_ExecuteString, METH_VARARGS,
-	"Executes an In-Game Script Action in the current Area Script Context"},
+	GemRB_ExecuteString__doc},
 	{"EvaluateString", GemRB_EvaluateString, METH_VARARGS,
-	"Evaluate an In-Game Script Trigger in the current Area Script Context"},
+	GemRB_EvaluateString__doc},
 	{"LoadGame", GemRB_LoadGame, METH_VARARGS,
 	GemRB_LoadGame__doc},
 	{"EnterGame", GemRB_EnterGame, METH_NOARGS,
@@ -2987,27 +3143,27 @@ static PyMethodDef GemRBMethods[] = {
 	{"EndCutSceneMode", GemRB_EndCutSceneMode, METH_NOARGS,
 	GemRB_EndCutSceneMode__doc},
 	{"GetPartySize", GemRB_GetPartySize, METH_NOARGS,
-	"Returns the number of PCs."},
+	GemRB_GetPartySize__doc},
 	{"GameGetPartyGold", GemRB_GameGetPartyGold, METH_NOARGS,
-	"Returns current party gold."},
+	GemRB_GameGetPartyGold__doc},
 	{"GameGetFormation", GemRB_GameGetFormation, METH_NOARGS,
-	"Returns current party formation."},
+	GemRB_GameGetFormation__doc},
 	{"GameSetFormation", GemRB_GameSetFormation, METH_VARARGS,
-	"Sets party formation."},
+	GemRB_GameSetFormation__doc},
 	{"GetJournalSize", GemRB_GetJournalSize, METH_VARARGS,
-	"Returns the number of entries in the given section of journal."},
+	GemRB_GetJournalSize__doc},
 	{"GetJournalEntry", GemRB_GetJournalEntry, METH_VARARGS,
-	"Returns dictionary representing journal entry w/ given section and index."},
+	GemRB_GetJournalEntry__doc},
 	{"GameIsBeastKnown", GemRB_GameIsBeastKnown, METH_VARARGS,
-	"Returns whether beast with given index is known to PCs (works only on PST)."},
+	GemRB_GameIsBeastKnown__doc},
 	{"GetINIPartyCount", GemRB_GetINIPartyCount, METH_NOARGS,
-	"Returns the Number of Party defined in Party.ini (works only on IWD2)."},
+	GemRB_GetINIPartyCount__doc},
 	{"GetINIQuestsKey", GemRB_GetINIQuestsKey, METH_VARARGS,
-	"Returns a Value from the quests.ini File (works only on PST)."},
+	GemRB_GetINIQuestsKey__doc},
 	{"GetINIBeastsKey", GemRB_GetINIBeastsKey, METH_VARARGS,
-	"Returns a Value from the beasts.ini File (works only on PST)."},
+	GemRB_GetINIBeastsKey__doc},
 	{"GetINIPartyKey", GemRB_GetINIPartyKey, METH_VARARGS,
-	"Returns a Value from the Party.ini File (works only on IWD2)."},
+	GemRB_GetINIPartyKey__doc},
 	{"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
 	GemRB_LoadWindowPack__doc},
 	{"LoadWindow", GemRB_LoadWindow, METH_VARARGS,
@@ -3037,143 +3193,143 @@ static PyMethodDef GemRBMethods[] = {
 	{"GetTableRowCount", GemRB_GetTableRowCount, METH_VARARGS,
 	GemRB_GetTableRowCount__doc},
 	{"LoadSymbol", GemRB_LoadSymbol, METH_VARARGS,
-	"Loads a IDS Symbol Table."},
+	GemRB_LoadSymbol__doc},
 	{"UnloadSymbol", GemRB_UnloadSymbol, METH_VARARGS,
-	"Unloads a IDS Symbol Table."},
+	GemRB_UnloadSymbol__doc},
 	{"GetSymbol", GemRB_GetSymbol, METH_VARARGS,
-	"Returns a Loaded IDS Symbol Table."},
+	GemRB_GetSymbol__doc},
 	{"GetSymbolValue", GemRB_GetSymbolValue, METH_VARARGS,
-	"Returns a field of a IDS Symbol Table."},
+	GemRB_GetSymbolValue__doc},
 	{"GetControl", GemRB_GetControl, METH_VARARGS,
-	"Returns a control in a Window."},
+	GemRB_GetControl__doc},
 	{"SetText", GemRB_SetText, METH_VARARGS,
-	"Sets the Text of a control in a Window."},
+	GemRB_SetText__doc},
 	{"QueryText", GemRB_QueryText, METH_VARARGS,
-	"Returns the Text of a control in a Window."},
+	GemRB_QueryText__doc},
 	{"TextAreaAppend", GemRB_TextAreaAppend, METH_VARARGS,
-	"Appends the Text to the TextArea Control in the Window."},
+	GemRB_TextAreaAppend__doc},
 	{"TextAreaClear", GemRB_TextAreaClear, METH_VARARGS,
-	"Clears the Text from the TextArea Control in the Window."},
+	GemRB_TextAreaClear__doc},
 	{"SetTooltip", GemRB_SetTooltip, METH_VARARGS,
-	"Sets control's tooltip."},
+	GemRB_SetTooltip__doc},
 	{"SetVisible", GemRB_SetVisible, METH_VARARGS,
-	"Sets the Visibility Flag of a Window."},
+	GemRB_SetVisible__doc},
 	{"SetMasterScript", GemRB_SetMasterScript, METH_VARARGS,
-	"Sets the worldmap and masterscript names."},
+	GemRB_SetMasterScript__doc},
 	{"ShowModal", GemRB_ShowModal, METH_VARARGS,
-	"Show a Window on Screen setting the Modal Status."},
+	GemRB_ShowModal__doc},
 	{"SetEvent", GemRB_SetEvent, METH_VARARGS,
-	"Sets an Event of a Control on a Window to a Script Defined Function."},
+	GemRB_SetEvent__doc},
 	{"SetNextScript", GemRB_SetNextScript, METH_VARARGS,
-	"Sets the Next Script File to be loaded."},
+	GemRB_SetNextScript__doc},
 	{"SetControlStatus", GemRB_SetControlStatus, METH_VARARGS,
-	"Sets the status of a Control."},
+	GemRB_SetControlStatus__doc},
 	{"SetVarAssoc", GemRB_SetVarAssoc, METH_VARARGS,
-	"Sets the name of the Variable associated with a control."},
+	GemRB_SetVarAssoc__doc},
 	{"UnloadWindow", GemRB_UnloadWindow, METH_VARARGS,
-	"Unloads a previously Loaded Window."},
+	GemRB_UnloadWindow__doc},
 	{"CreateLabel", GemRB_CreateLabel, METH_VARARGS,
-	"Creates and Add a new Label to a Window."},
+	GemRB_CreateLabel__doc},
 	{"SetLabelTextColor", GemRB_SetLabelTextColor, METH_VARARGS,
-	"Sets the Text Color of a Label Control."},
+	GemRB_SetLabelTextColor__doc},
 	{"CreateButton", GemRB_CreateButton, METH_VARARGS,
-	"Creates and Add a new Button to a Window."},
+	GemRB_CreateButton__doc},
 	{"SetButtonSprites", GemRB_SetButtonSprites, METH_VARARGS,
-	"Sets a Button Sprites Images."},
+	GemRB_SetButtonSprites__doc},
 	{"SetControlPos", GemRB_SetControlPos, METH_VARARGS,
-	"Moves a Control."},
+	GemRB_SetControlPos__doc},
 	{"SetControlSize", GemRB_SetControlSize, METH_VARARGS,
-	"Resizes a Control."},
+	GemRB_SetControlSize__doc},
 	{"SetTextAreaSelectable",GemRB_SetTextAreaSelectable, METH_VARARGS,
-	"Sets the Selectable Flag of a TextArea."},
+	GemRB_SetTextAreaSelectable__doc},
 	{"SetButtonFlags", GemRB_SetButtonFlags, METH_VARARGS,
-	"Sets the Display Flags of a Button."},
+	GemRB_SetButtonFlags__doc},
 	{"SetButtonState", GemRB_SetButtonState, METH_VARARGS,
-	"Sets the state of a Button Control."},
+	GemRB_SetButtonState__doc},
 	{"SetButtonPicture", GemRB_SetButtonPicture, METH_VARARGS,
-	"Sets the Picture of a Button Control from a BMP file."},
+	GemRB_SetButtonPicture__doc},
 	{"SetButtonMOS", GemRB_SetButtonMOS, METH_VARARGS,
-	"Sets the Picture of a Button Control from a MOS file."},
+	GemRB_SetButtonMOS__doc},
 	{"SetButtonPLT", GemRB_SetButtonPLT, METH_VARARGS,
-	"Sets the Picture of a Button Control from a PLT file."},
+	GemRB_SetButtonPLT__doc},
 	{"SetButtonBAM", GemRB_SetButtonBAM, METH_VARARGS,
-	"Sets the Picture of a Button Control from a BAM file."},
+	GemRB_SetButtonBAM__doc},
 	{"SetLabelUseRGB", GemRB_SetLabelUseRGB, METH_VARARGS,
-	"Tells a Label to use the RGB colors with the text."},
+	GemRB_SetLabelUseRGB__doc},
 	{"PlaySound", GemRB_PlaySound, METH_VARARGS,
-	"Plays a Sound."},
+	GemRB_PlaySound__doc},
 	{"LoadMusicPL", GemRB_LoadMusicPL, METH_VARARGS,
-	"Loads and starts a Music PlayList."},
+	GemRB_LoadMusicPL__doc},
 	{"SoftEndPL", GemRB_SoftEndPL, METH_NOARGS,
-	"Ends a Music Playlist softly."},
+	GemRB_SoftEndPL__doc},
 	{"HardEndPL", GemRB_HardEndPL, METH_NOARGS,
-	"Ends a Music Playlist immediately."},
+	GemRB_HardEndPL__doc},
 	{"DrawWindows", GemRB_DrawWindows, METH_NOARGS,
-	"Refreshes the User Interface."},
+	GemRB_DrawWindows__doc},
 	{"Quit", GemRB_Quit, METH_NOARGS,
-	"Quits GemRB."},
+	GemRB_Quit__doc},
 	{"GetVar", GemRB_GetVar, METH_VARARGS,
-	"Get a Variable value from the Global Dictionary."},
+	GemRB_GetVar__doc},
 	{"SetVar", GemRB_SetVar, METH_VARARGS,
-	"Set/Create a Variable in the Global Dictionary."},
+	GemRB_SetVar__doc},
 	{"GetToken", GemRB_GetToken, METH_VARARGS,
-	"Get a Variable value from the Token Dictionary."},
+	GemRB_GetToken__doc},
 	{"SetToken", GemRB_SetToken, METH_VARARGS,
-	"Set/Create a Global Variable."},
+	GemRB_SetToken__doc},
 	{"GetGameVar", GemRB_GetGameVar, METH_VARARGS,
-	"Get a Variable value from the Game Global Dictionary."},
+	GemRB_GetGameVar__doc},
 	{"CheckVar", GemRB_CheckVar, METH_VARARGS,
-	"Display the value of a Game Variable."},
+	GemRB_CheckVar__doc},
 	{"PlayMovie", GemRB_PlayMovie, METH_VARARGS,
-	"Starts the Movie Player."},
+	GemRB_PlayMovie__doc},
 	{"Roll", GemRB_Roll, METH_VARARGS,
-	"Calls traditional dice roll."},
+	GemRB_Roll__doc},
 	{"GetCharSounds", GemRB_GetCharSounds, METH_VARARGS,
-	"Reads in the contents of the sounds subfolder."},
+	GemRB_GetCharSounds__doc},
 	{"GetSaveGameCount", GemRB_GetSaveGameCount, METH_VARARGS,
-	"Returns the number of saved games."},
+	GemRB_GetSaveGameCount__doc},
 	{"DeleteSaveGame", GemRB_DeleteSaveGame, METH_VARARGS,
-	"Deletes a saved game folder completely."},
+	GemRB_DeleteSaveGame__doc},
 	{"GetSaveGameAttrib", GemRB_GetSaveGameAttrib, METH_VARARGS,
-	"Returns the name, path or prefix of the saved game."},
+	GemRB_GetSaveGameAttrib__doc},
 	{"SetSaveGamePreview", GemRB_SetSaveGamePreview, METH_VARARGS,
-	"Sets a savegame area preview bmp onto a button as picture."},
+	GemRB_SetSaveGamePreview__doc},
 	{"SetSaveGamePortrait", GemRB_SetSaveGamePortrait, METH_VARARGS,
-	"Sets a savegame PC portrait bmp onto a button as picture."},
+	GemRB_SetSaveGamePortrait__doc},
 	{"CreatePlayer", GemRB_CreatePlayer, METH_VARARGS,
-	"Creates a player slot."},
+	GemRB_CreatePlayer__doc},
 	{"SetPlayerStat", GemRB_SetPlayerStat, METH_VARARGS,
-	"Changes a stat."},
+	GemRB_SetPlayerStat__doc},
 	{"GetPlayerStat", GemRB_GetPlayerStat, METH_VARARGS,
-	"Queries a stat."},
+	GemRB_GetPlayerStat__doc},
 	{"IsPlayerSelected", GemRB_IsPlayerSelected, METH_VARARGS,
-	"Returns true if the player was selected."},
+	GemRB_IsPlayerSelected__doc},
 	{"GetPlayerPortrait", GemRB_GetPlayerPortrait, METH_VARARGS,
-	"Queries the player portrait."},
+	GemRB_GetPlayerPortrait__doc},
 	{"GetPlayerName", GemRB_GetPlayerName, METH_VARARGS,
-	"Queries the player name."},
+	GemRB_GetPlayerName__doc},
 	{"SetPlayerName", GemRB_SetPlayerName, METH_VARARGS,
-	"Sets the player name."},
+	GemRB_SetPlayerName__doc},
 	{"FillPlayerInfo", GemRB_FillPlayerInfo, METH_VARARGS,
-	"Fills basic character info, that is not stored in stats."},
+	GemRB_FillPlayerInfo__doc},
 	{"SetWorldMapImage", GemRB_SetWorldMapImage, METH_VARARGS,
-	"FIXME: Set WM image ...."},
+	GemRB_SetWorldMapImage__doc},
 	{"SetSpellIcon", GemRB_SetSpellIcon, METH_VARARGS,
-	"FIXME: temporary Set Spell icon image ...."},
+	GemRB_SetSpellIcon__doc},
 	{"SetItemIcon", GemRB_SetItemIcon, METH_VARARGS,
-	"FIXME: temporary Set Item icon image ...."},
+	GemRB_SetItemIcon__doc},
 	{"EnterStore", GemRB_EnterStore, METH_VARARGS,
-	"FIXME: temporary EnterStore (StoreName) ...."},
+	GemRB_EnterStore__doc},
 	{"GetStoreName", GemRB_GetStoreName, METH_VARARGS,
-	"FIXME: temporary GetStoreName () ...."},
+	GemRB_GetStoreName__doc},
 	{"GetStoreRoomPrices", GemRB_GetStoreRoomPrices, METH_VARARGS,
-	"FIXME: temporary GetStoreRoomPrices () ...."},
+	GemRB_GetStoreRoomPrices__doc},
 	{"GameSelectPCSingle", GemRB_GameSelectPCSingle, METH_VARARGS,
-	"Selects one PC in non-walk environment (i.e. in shops, inventory,...)"},
+	GemRB_GameSelectPCSingle__doc},
 	{"GameGetSelectedPCSingle", GemRB_GameGetSelectedPCSingle, METH_VARARGS,
-	"Get index of selected PC in non-walk environment (i.e. in shops, inventory,...)"},
+	GemRB_GameGetSelectedPCSingle__doc},
 	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
-	"Invalidates the given Window."},
+	GemRB_InvalidateWindow__doc},
 	{"EnableCheatKeys", GemRB_EnableCheatKeys, METH_VARARGS,
 	GemRB_EnableCheatKeys__doc}, {NULL, NULL, 0, NULL}
 };
@@ -3197,6 +3353,11 @@ GUIScript::~GUIScript(void)
 	}
 }
 
+PyDoc_STRVAR( GemRB__doc,
+"Module exposing GemRB data and engine internals\n\n"
+"This module exposes to python GUIScripts GemRB engine data and internals."
+"It's implemented in gemrb/plugins/GUIScript/GUIScript.cpp\n\n" );
+
 /** Initialization Routine */
 bool GUIScript::Init(void)
 {
@@ -3206,7 +3367,7 @@ bool GUIScript::Init(void)
 	if (!Py_IsInitialized()) {
 		return false;
 	}
-	pGemRB = Py_InitModule( "GemRB", GemRBMethods );
+	pGemRB = Py_InitModule3( "GemRB", GemRBMethods, GemRB__doc );
 	if (!pGemRB) {
 		return false;
 	}
