@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.97 2005/03/20 15:07:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.98 2005/03/22 20:52:02 guidoj Exp $
  *
  */
 
@@ -1356,7 +1356,7 @@ void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 		return;
 	SDL_Surface * surf = (SDL_Surface *) sprite->vptr;
 	SDL_LockSurface(surf);
-	unsigned long *pixels = (unsigned long *) malloc (sprite->Width * sprite->Height * 4);
+	unsigned int *pixels = (unsigned int *) malloc (sprite->Width * sprite->Height * 4);
 	int i=0;
 	for (int y = 0; y < sprite->Height; y++) {
 		for (int x = 0; x < sprite->Width; x++) {
