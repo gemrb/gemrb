@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.14 2004/04/04 20:22:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.15 2004/05/04 20:40:31 edheldil Exp $
  *
  */
 
@@ -77,7 +77,6 @@ public:
 	short xPos[256];
 	short yPos[256];
 	int maxHeight;
-private: // Private methods
 	int CalcStringWidth(char* string);
 public:
 	void SetupString(char* string, unsigned int width);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.164 2004/04/28 12:52:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.165 2004/05/04 20:40:31 edheldil Exp $
  *
  */
 
@@ -1436,16 +1436,30 @@ void Interface::DrawTooltip ()
 	if (! tooltip_text) 
 		return;
 
-	int Width = 200;
-	int Height = 100;
+	Font* fnt = GetFont( TooltipFont );
+
+	int Width = fnt->CalcStringWidth( tooltip_text );
+	//int Width = 200;
+	int Height = fnt->maxHeight;
+
+	int x = tooltip_x - Width / 2;
+	int y = tooltip_y - Height / 2;
+
+	// Ensure placement within the screen
+	if (x < 0) x = 0;
+	else if (x + Width > core->Width) 
+		x = core->Width - Width;
+	if (y < 0) y = 0;
+	else if (y + Height > core->Height) 
+		y = core->Height - Height;
 
 	Color fore = {0x00, 0xff, 0x00, 0x00};
 	Color back = {0x00, 0x00, 0x00, 0x00};
 	Color* palette = GetVideoDriver()->CreatePalette( fore, back );
 	
-	GetFont( TooltipFont )->Print( Region( tooltip_x - Width / 2, tooltip_y - Height / 2, Width, Height ),
-				       ( unsigned char * ) tooltip_text, palette,
-				       IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE, true );
+	fnt->Print( Region( x, y, Width, Height ),
+		    ( unsigned char * ) tooltip_text, palette,
+		    IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE, true );
 }
 
 Window* Interface::GetWindow(unsigned short WindowIndex)
