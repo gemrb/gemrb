@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.2 2004/08/27 15:37:34 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.3 2004/08/28 15:31:28 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -162,7 +162,6 @@ def UpdateRecordsWindow ():
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1; 
 	
 	# name
 	Label = GemRB.GetControl (Window, 0x1000000a)
@@ -222,7 +221,7 @@ def UpdateRecordsWindow ():
 	
 	Label = GemRB.GetControl (Window, 0x10000015)
 	GemRB.SetText (Window, Label, text)
-	print "SEX:", GemRB.GetPlayerStat (pc, IE_SEX)
+	#print "SEX:", GemRB.GetPlayerStat (pc, IE_SEX)
 
 
 	# class
@@ -232,14 +231,14 @@ def UpdateRecordsWindow ():
 
 	Label = GemRB.GetControl (Window, 0x10000016)
 	GemRB.SetText (Window, Label, text)
-	print "CLASS:", GemRB.GetPlayerStat (pc, IE_CLASS)
+	#print "CLASS:", GemRB.GetPlayerStat (pc, IE_CLASS)
 
 	# alignment
 	align = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
-	print 'ALIGN:', align
+	#print 'ALIGN:', align
 	ss = GemRB.LoadSymbol ("ALIGN")
 	sym = GemRB.GetSymbolValue (ss, align)
-	print "ALIGN SYM:", sym
+	#print "ALIGN SYM:", sym
 
 	AlignmentTable = GemRB.LoadTable ("ALIGNS")
 	#print "ALIGN DESC:", GemRB.GetTableValue (AlignmentTable, align + 1, 0)
@@ -256,7 +255,7 @@ def UpdateRecordsWindow ():
 
 	# faction
 	faction = GemRB.GetPlayerStat (pc, IE_FACTION)
-	print 'FACTION:', faction
+	#print 'FACTION:', faction
 
 	FactionTable = GemRB.LoadTable ("FACTIONS")
 	faction_help = GemRB.GetString (GemRB.GetTableValue (FactionTable, faction, 0))
@@ -345,7 +344,6 @@ def OnRecordsHelpStrength ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's strength
 	s = GemRB.GetPlayerStat (pc, IE_STR)
@@ -374,7 +372,6 @@ def OnRecordsHelpDexterity ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's dexterity
 	Dex = GemRB.GetPlayerStat (pc, IE_DEX)
@@ -391,7 +388,6 @@ def OnRecordsHelpIntelligence ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's intelligence
 	Int = GemRB.GetPlayerStat (pc, IE_INT)
@@ -405,7 +401,6 @@ def OnRecordsHelpWisdom ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's wisdom
 	Wis = GemRB.GetPlayerStat (pc, IE_WIS)
@@ -422,7 +417,6 @@ def OnRecordsHelpConstitution ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's constitution
 	Con = GemRB.GetPlayerStat (pc, IE_CON)
@@ -439,7 +433,6 @@ def OnRecordsHelpCharisma ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's charisma
 	Cha = GemRB.GetPlayerStat (pc, IE_CHR)

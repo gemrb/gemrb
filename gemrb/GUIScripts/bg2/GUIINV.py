@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.1 2004/08/26 19:05:40 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.2 2004/08/28 15:31:28 edheldil Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -168,7 +168,6 @@ def UpdateInventoryWindow ():
 	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1; 
 	
 	# name
 	Label = GemRB.GetControl (Window, 0x10000039)
