@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.210 2004/09/19 20:01:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.211 2004/09/21 19:00:23 avenger_teambg Exp $
  *
  */
 
@@ -3147,13 +3147,14 @@ PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
 
 static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
-	int PlayerSlot, StatID, StatValue;
+	int PlayerSlot, StatID, StatValue, BaseStat;
 
-	if (!PyArg_ParseTuple( args, "ii", &PlayerSlot, &StatID )) {
+	BaseStat = 0;
+	if (!PyArg_ParseTuple( args, "ii|i", &PlayerSlot, &StatID, &BaseStat )) {
 		return AttributeError( GemRB_GetPlayerStat__doc );
 	}
-	//returning the modified stat
-	StatValue = core->GetCreatureStat( PlayerSlot, StatID, 1 );
+	//returning the modified stat if BaseStat was 0 (default)
+	StatValue = core->GetCreatureStat( PlayerSlot, StatID, !BaseStat );
 	return Py_BuildValue( "i", StatValue );
 }
 
