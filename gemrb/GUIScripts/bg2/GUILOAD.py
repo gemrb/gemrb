@@ -92,12 +92,33 @@ def LoadGamePress():
 	Pos = GemRB.GetVar("TopIndex")+GemRB.GetVar("LoadIdx")
 	return
 
-def DeleteGamePress():
+def DeleteGameConfirm():
 	TopIndex = GemRB.GetVar("TopIndex")
 	Pos = TopIndex +GemRB.GetVar("LoadIdx")
 	GemRB.DeleteSaveGame(Pos)
-	GemRB.SetVar("TopIndex",TopIndex-1)
+	if TopIndex>0:
+		GemRB.SetVar("TopIndex",TopIndex-1)
 	ScrollBarPress()
+	GemRB.UnloadWindow(ConfirmWindow)
+	GemRB.SetVisible(LoadWindow,1)
+	return
+
+def DeleteGameCancel():
+	GemRB.UnloadWindow(ConfirmWindow)
+	GemRB.SetVisible(LoadWindow,1)
+	return
+
+def DeleteGamePress():
+	global ConfirmWindow
+
+	ConfirmWindow=GemRB.LoadWindow(1)
+	DeleteButton=GemRB.GetControl(ConfirmWindow, 1)
+	GemRB.SetText(ConfirmWindow, DeleteButton, 13575)
+	GemRB.SetEvent(ConfirmWindow, DeleteButton, IE_GUI_BUTTON_ON_PRESS, "DeleteGameConfirm")
+	CancelButton=GemRB.GetControl(ConfirmWindow, 2)
+	GemRB.SetText(ConfirmWindow, CancelButton, 13727)
+	GemRB.SetEvent(ConfirmWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "DeleteGameCancel")
+	GemRB.SetVisible(ConfirmWindow,1)
 	return
 	
 def CancelPress():
