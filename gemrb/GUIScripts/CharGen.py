@@ -4,9 +4,10 @@ import GemRB
 CharGenWindow = 0
 TextAreaControl = 0
 CharGenPhase = 0
+ImportButton = 0
 
 def OnLoad():
-	global CharGenWindow, TextAreaControl, CharGenPhase
+	global CharGenWindow, TextAreaControl, CharGenPhase, ImportButton
 
 	CharGenPhase=0
 	GemRB.SetVar("Gender",0) #gender
@@ -51,6 +52,7 @@ def OnLoad():
 
 	BackButton = GemRB.GetControl(CharGenWindow, 11)
 	GemRB.SetText(CharGenWindow, BackButton, 15416)
+	GemRB.SetButtonState(CharGenWindow,BackButton,IE_GUI_BUTTON_ENABLED)
 
 	AcceptButton = GemRB.GetControl(CharGenWindow, 8)
 	GemRB.SetText(CharGenWindow, AcceptButton, 11962)
@@ -58,12 +60,15 @@ def OnLoad():
 
 	ImportButton = GemRB.GetControl(CharGenWindow, 13)
 	GemRB.SetText(CharGenWindow, ImportButton, 13955)
+	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_ENABLED)
 
         CancelButton = GemRB.GetControl(CharGenWindow, 15)
         GemRB.SetText(CharGenWindow, CancelButton, 13727)
+	GemRB.SetButtonState(CharGenWindow,CancelButton,IE_GUI_BUTTON_ENABLED)
 
 	BiographyButton = GemRB.GetControl(CharGenWindow, 16)
 	GemRB.SetText(CharGenWindow, BiographyButton, 18003)
+	GemRB.SetButtonState(CharGenWindow,BiographyButton,IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl= GemRB.GetControl(CharGenWindow,9)
 	GemRB.SetText(CharGenWindow, TextAreaControl, 16575)
@@ -72,10 +77,17 @@ def OnLoad():
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.SetEvent(CharGenWindow, GenderButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
         GemRB.SetEvent(CharGenWindow, ImportButton, IE_GUI_BUTTON_ON_PRESS, "ImportPress")
+        GemRB.SetEvent(CharGenWindow, BiographyButton, IE_GUI_BUTTON_ON_PRESS, "BiographyPress")
 	GemRB.ShowModal(CharGenWindow)
 	return
 	
+def BiographyPress():
+        GemRB.UnloadWindow(CharGenWindow)
+	GemRB.SetNextScript("GUICG23") #biography
+	return
+
 def NextPress():
+	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_DISABLED)
         GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("GUICG1") #gender
 	return
