@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.103 2003/12/30 19:55:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.104 2003/12/30 20:20:39 avenger_teambg Exp $
  *
  */
 
@@ -1783,10 +1783,13 @@ static PyObject *GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject *args)
 		AnimID+=strtoul(poi,NULL,0);
 		core->DelTable(table);
 	}
-	core->DelTable(mastertable);
 	printf("Set animation complete: 0x%0x\n",AnimID);
 	MyActor->SetAnimationID(AnimID);
+	//setting PST's starting stance to 18
+	poi=mtm->QueryField(0,1);
+	if(*poi!='*') MyActor->AnimID=atoi(poi);
 	MyActor->Init();
+	core->DelTable(mastertable);
 	int saindex = core->LoadTable("STARTPOS");
 	TableMgr * strta = core->GetTable(saindex);
 	MyActor->XPos = MyActor->XDes = atoi(strta->QueryField(0));
