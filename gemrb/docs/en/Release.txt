@@ -1,22 +1,33 @@
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/Release.txt,v 1.1 2004/02/15 17:31:05 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/Release.txt,v 1.2 2005/02/13 20:31:18 edheldil Exp $
 
 
 How to make a release
 *********************
 
-1) Make sure that version number in configure.in is correct
-     for the upcoming version
+* Make sure that version number in configure.in is correct
+  for the upcoming version. For the time being, set various version
+  numbers in gemrb/include/globals.h as well.
 
-2) Update ChangeLog with highlights since the last release 
+* Update ChangeLog with highlights since the last release 
 
-3) Make sure that GemRB CVS is in compilable and running state
-   i.e. download a clean CVS tree and test it
+* Make sure that GemRB CVS is in compilable and running state
+  i.e. download a clean CVS tree and test it.
 
-4) Tag current CVS to version number
+  Make distribution .tar.gz  (make dist) and test it as well -
+  - especially make sure all needed files are included.
 
-5) Update from CVS to the tagged version
+* Tag current CVS to version number e.g. GEMRB_0_2_3
 
-6) on Unix/Linux: 
-   aclocal && autoheader && automake && autoconf
-   ./configure
-   make dist
+* Update from CVS to the tagged version
+
+* on Unix/Linux: 
+  ./autogen.sh
+  make dist
+
+* To be defined: Windows binary 
+
+* Put the tarballs/binaries into Releases on SF
+
+* Announce on homepage & SF
+
+* Possibly announce on Freshmeat/Happypenguin
