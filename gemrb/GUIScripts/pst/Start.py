@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/Start.py,v 1.5 2004/04/10 08:48:07 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/Start.py,v 1.6 2004/08/02 16:57:31 avenger_teambg Exp $
 
 
 # Start.py - intro and main menu screens
@@ -30,6 +30,10 @@ QuitWindow = 0
 
 def OnLoad():
 	global StartWindow, QuitWindow
+
+	cheats = GemRB.GetVar ("Cheats")
+	if cheats:
+		GemRB.EnableCheatKeys(1)
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos:
