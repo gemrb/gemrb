@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.13 2004/09/28 14:25:25 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.14 2004/10/07 17:16:39 edheldil Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -146,14 +146,14 @@ def OpenVideoOptionsWindow ():
 	if VideoOptionsWindow:
 		GemRB.UnloadWindow (VideoOptionsWindow)
 		VideoOptionsWindow = None
-		GemRB.SetVar ("OtherWindow", OptionsWindow)
+		GemRB.SetVar ("FloatWindow", -1)
 		
 		GemRB.UnhideGUI ()
 		return
 
 	
 	VideoOptionsWindow = Window = GemRB.LoadWindow (1)
-	GemRB.SetVar ("OtherWindow", VideoOptionsWindow)
+	GemRB.SetVar ("FloatWindow", VideoOptionsWindow)
 
 
 	VideoHelpText = OptHelpText ('VideoOptions', Window, 9, 31052)
@@ -168,8 +168,8 @@ def OpenVideoOptionsWindow ():
 	OptCheckbox ('SoftwareMirroring', Window, 4, 13, 30896)
 	OptCheckbox ('SoftwareTransparency', Window, 5, 14, 30897)
 
-	#GemRB.SetVisible (Window, 1)
 	GemRB.UnhideGUI ()
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	
 	
 
@@ -192,6 +192,8 @@ def DisplayHelpSoftwareTransparency ():
 
 ###################################################
 
+saved_audio_options = {}
+
 def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
 	global AudioOptionsWindow, AudioHelpText
@@ -201,25 +203,37 @@ def OpenAudioOptionsWindow ():
 	if AudioOptionsWindow:
 		GemRB.UnloadWindow (AudioOptionsWindow)
 		AudioOptionsWindow = None
-		GemRB.SetVar ("OtherWindow", OptionsWindow)
+		GemRB.SetVar ("FloatWindow", -1)
+
+		# Restore values in case of cancel
+		if GemRB.GetVar ("Cancel") == 1:
+			for k, v in saved_audio_options.items ():
+				GemRB.SetVar (k, v)
+			UpdateVolume ()
 		
 		GemRB.UnhideGUI ()
 		return
 
 	
 	AudioOptionsWindow = Window = GemRB.LoadWindow (5)
-	GemRB.SetVar ("OtherWindow", AudioOptionsWindow)
+	GemRB.SetVar ("FloatWindow", AudioOptionsWindow)
 	
+
+	# save values, so we can restore them on cancel
+	for v in "Volume Ambients", "Volume SFX", "Volume Voices", "Volume Music", "Volume Movie":
+		saved_audio_options[v] = GemRB.GetVar (v)
+
 
 	AudioHelpText = OptHelpText ('AudioOptions', Window, 9, 31210)
 
 	OptDone ('AudioOptions', Window, 7)
 	OptCancel ('AudioOptions', Window, 8)
 
-	OptSlider ('AmbientVolume', Window, 1, 10, 31460, "Volume Ambients")
+
+	OptSlider ('AmbientVolume', Window, 1, 10, 31460, "Volume Ambients", "UpdateVolume")
 	OptSlider ('SoundFXVolume', Window, 2, 11, 31466, "Volume SFX")
 	OptSlider ('VoiceVolume', Window, 3, 12, 31467, "Volume Voices")
-	OptSlider ('MusicVolume', Window, 4, 13, 31468, "Volume Music")
+	OptSlider ('MusicVolume', Window, 4, 13, 31468, "Volume Music", "UpdateVolume")
 	OptSlider ('MovieVolume', Window, 5, 14, 31469, "Volume Movie")
 	
 	OptCheckbox ('CreativeEAX', Window, 6, 15, 30900)
@@ -229,7 +243,13 @@ def OpenAudioOptionsWindow ():
 
 	#GemRB.SetVisible (AudioOptionsWindow, 1)
 	GemRB.UnhideGUI ()
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	
+def UpdateVolume ():
+	GemRB.UpdateAmbientsVolume ()
+	GemRB.UpdateMusicVolume ()
+	
+
 
 def DisplayHelpAmbientVolume ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31227)
@@ -271,14 +291,14 @@ def OpenGameplayOptionsWindow ():
 
 		GemRB.UnloadWindow (GameplayOptionsWindow)
 		GameplayOptionsWindow = None
-		GemRB.SetVar ("OtherWindow", OptionsWindow)
+		GemRB.SetVar ("FloatWindow", -1)
 		
 		GemRB.UnhideGUI ()
 		return
 
 	
 	GameplayOptionsWindow = Window = GemRB.LoadWindow (6)
-	GemRB.SetVar ("OtherWindow", GameplayOptionsWindow)
+	GemRB.SetVar ("FloatWindow", GameplayOptionsWindow)
 	
 
 	GameplayHelpText = OptHelpText ('GameplayOptions', Window, 12, 31212)
@@ -298,8 +318,8 @@ def OpenGameplayOptionsWindow ():
 	OptButton ('FeedbackOptions', Window, 8, 20, 31478)
 	OptButton ('AutopauseOptions', Window, 9, 21, 31470)
 
-	#GemRB.SetVisible (Window, 1)
 	GemRB.UnhideGUI ()
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 
 
 def DisplayHelpTooltipDelay ():
@@ -344,14 +364,15 @@ def OpenFeedbackOptionsWindow ():
 	if FeedbackOptionsWindow:
 		GemRB.UnloadWindow (FeedbackOptionsWindow)
 		FeedbackOptionsWindow = None
-		GemRB.SetVar ("OtherWindow", GameplayOptionsWindow)
+		GemRB.SetVar ("FloatWindow", GameplayOptionsWindow)
 		
 		GemRB.UnhideGUI ()
+		GemRB.ShowModal (GameplayOptionsWindow, MODAL_SHADOW_GRAY)
 		return
 
 	
 	FeedbackOptionsWindow = Window = GemRB.LoadWindow (8)
-	GemRB.SetVar ("OtherWindow", FeedbackOptionsWindow)
+	GemRB.SetVar ("FloatWindow", FeedbackOptionsWindow)
 
 
 	FeedbackHelpText = OptHelpText ('FeedbackOptions', Window, 9, 37410)
@@ -371,8 +392,8 @@ def OpenFeedbackOptionsWindow ():
 	OptCheckbox ('SpellCasting', Window, 5, 14, 37592)
 
 
-	#GemRB.SetVisible (FeedbackOptionsWindow, 1)
 	GemRB.UnhideGUI ()
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	
 
 def DisplayHelpMarkerFeedback ():
@@ -414,14 +435,15 @@ def OpenAutopauseOptionsWindow ():
 	if AutopauseOptionsWindow:
 		GemRB.UnloadWindow (AutopauseOptionsWindow)
 		AutopauseOptionsWindow = None
-		GemRB.SetVar ("OtherWindow", GameplayOptionsWindow)
+		GemRB.SetVar ("FloatWindow", GameplayOptionsWindow)
 		
 		GemRB.UnhideGUI ()
+		GemRB.ShowModal (GameplayOptionsWindow, MODAL_SHADOW_GRAY)
 		return
 
 	
 	AutopauseOptionsWindow = Window = GemRB.LoadWindow (9)
-	GemRB.SetVar ("OtherWindow", AutopauseOptionsWindow)
+	GemRB.SetVar ("FloatWindow", AutopauseOptionsWindow)
 
 
 	AutopauseHelpText = OptHelpText ('AutopauseOptions', Window, 1, 31214)
@@ -437,8 +459,8 @@ def OpenAutopauseOptionsWindow ():
 	OptCheckbox ('TargetGone', Window, 7, 14, 37685)
 	OptCheckbox ('EndOfRound', Window, 8, 15, 37686)
 
-	#GemRB.SetVisible (AutopauseOptionsWindow, 1)
 	GemRB.UnhideGUI ()
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	
 
 def DisplayHelpCharacterHit ():
@@ -792,10 +814,12 @@ def OnCreditsPress ():
 #   control (button, slider ...) and a label
 
 
-def OptSlider (name, window, slider_id, label_id, label_strref, assoc_var):
+def OptSlider (name, window, slider_id, label_id, label_strref, assoc_var, fn = None):
 	"""Standard slider for option windows"""
 	slider = GemRB.GetControl (window, slider_id)
 	#GemRB.SetEvent (window, slider, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
+	if fn: GemRB.SetEvent (window, slider, IE_GUI_SLIDER_ON_CHANGE, fn)
+
 	GemRB.SetVarAssoc (window, slider, assoc_var, 1)
 	
 	label = GemRB.GetControl (window, label_id)
@@ -842,13 +866,15 @@ def OptDone (name, window, button_id):
 	"""Standard `Done' button for option windows"""
 	button = GemRB.GetControl (window, button_id)
 	GemRB.SetText (window, button, 1403) # Done
-	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "Open%sWindow" %name)	
+	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "Open%sWindow" %name)
+	GemRB.SetVarAssoc (window, button, "Cancel", 0)
 
 def OptCancel (name, window, button_id):
 	"""Standard `Cancel' button for option windows"""
 	button = GemRB.GetControl (window, button_id)
 	GemRB.SetText (window, button, 4196) # Cancel
 	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "Open%sWindow" %name)	
+	GemRB.SetVarAssoc (window, button, "Cancel", 1)
 
 def OptHelpText (name, window, text_id, text_strref):
 	"""Standard textarea with context help for option windows"""
