@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.135 2004/08/22 22:10:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.136 2004/08/25 13:06:22 avenger_teambg Exp $
  *
  */
 
@@ -790,6 +790,9 @@ public: //Script Functions
 	static int DamageTakenLT(Scriptable* Sender, Trigger* parameters);
 	static int Dead(Scriptable* Sender, Trigger* parameters);
 	static int Die(Scriptable* Sender, Trigger* parameters);
+	static int Difficulty(Scriptable* Sender, Trigger* parameters);
+	static int DifficultyGT(Scriptable* Sender, Trigger* parameters);
+	static int DifficultyLT(Scriptable* Sender, Trigger* parameters);
 	static int Entered(Scriptable* Sender, Trigger* parameters);
 	static int EntirePartyOnMap(Scriptable* Sender, Trigger* parameters);
 	static int Exists(Scriptable* Sender, Trigger* parameters);
@@ -802,6 +805,7 @@ public: //Script Functions
 	static int False(Scriptable* Sender, Trigger* parameters);
 	static int Gender(Scriptable* Sender, Trigger* parameters);
 	static int General(Scriptable* Sender, Trigger* parameters);
+	static int G_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int Global(Scriptable* Sender, Trigger* parameters);
 	static int GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int GlobalBAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
@@ -816,6 +820,8 @@ public: //Script Functions
 	static int GlobalTimerExact(Scriptable* Sender, Trigger* parameters);
 	static int GlobalTimerExpired(Scriptable* Sender, Trigger* parameters);
 	static int GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters);
+	static int GGT_Trigger(Scriptable* Sender, Trigger* parameters);
+	static int GLT_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int Happiness(Scriptable* Sender, Trigger* parameters);
 	static int HappinessGT(Scriptable* Sender, Trigger* parameters);
 	static int HappinessLT(Scriptable* Sender, Trigger* parameters);

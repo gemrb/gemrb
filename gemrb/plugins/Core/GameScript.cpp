@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.190 2004/08/25 11:52:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.191 2004/08/25 13:06:22 avenger_teambg Exp $
  *
  */
 
@@ -87,6 +87,9 @@ static TriggerLink triggernames[] = {
 	{"damagetakenlt", GameScript::DamageTakenLT,0},
 	{"dead", GameScript::Dead,0},
 	{"die", GameScript::Die,0},
+	{"difficulty", GameScript::Difficulty,0},
+	{"difficultygt", GameScript::DifficultyGT,0},
+	{"difficultylt", GameScript::DifficultyLT,0},
 	{"entered", GameScript::Entered,0},
 	{"entirepartyonmap", GameScript::EntirePartyOnMap,0},
 	{"exists", GameScript::Exists,0},
@@ -97,8 +100,11 @@ static TriggerLink triggernames[] = {
 	{"fallenpaladin", GameScript::FallenPaladin,0},
 	{"fallenranger", GameScript::FallenRanger,0},
 	{"false", GameScript::False,0},
+	{"g", GameScript::G_Trigger,0},
 	{"gender", GameScript::Gender,0},
 	{"general", GameScript::General,0},
+	{"ggt", GameScript::GGT_Trigger,0},
+	{"glt", GameScript::GLT_Trigger,0},
 	{"global", GameScript::Global,TF_MERGESTRINGS},
 	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger,TF_MERGESTRINGS},
 	{"globalband", GameScript::BitCheck,AF_MERGESTRINGS},
@@ -3024,10 +3030,22 @@ int GameScript::Xor(Scriptable* Sender, Trigger* parameters)
 	return ( value ^ parameters->int0Parameter ) != 0;
 }
 
+int GameScript::G_Trigger(Scriptable* Sender, Trigger* parameters)
+{
+	long value = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
+	return ( value == parameters->int0Parameter );
+}
+
 int GameScript::Global(Scriptable* Sender, Trigger* parameters)
 {
 	long value = CheckVariable(Sender, parameters->string0Parameter );
 	return ( value == parameters->int0Parameter );
+}
+
+int GameScript::GLT_Trigger(Scriptable* Sender, Trigger* parameters)
+{
+	long value = CheckVariable(Sender, parameters->string0Parameter,"GLOBAL" );
+	return ( value < parameters->int0Parameter );
 }
 
 int GameScript::GlobalLT(Scriptable* Sender, Trigger* parameters)
@@ -3036,17 +3054,23 @@ int GameScript::GlobalLT(Scriptable* Sender, Trigger* parameters)
 	return ( value < parameters->int0Parameter );
 }
 
-int GameScript::GlobalLTGlobal(Scriptable* Sender, Trigger* parameters)
+int GameScript::GGT_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	long value2 = CheckVariable(Sender, parameters->string1Parameter );
-	return ( value1 < value2 );
+	long value = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
+	return ( value > parameters->int0Parameter );
 }
 
 int GameScript::GlobalGT(Scriptable* Sender, Trigger* parameters)
 {
 	long value = CheckVariable(Sender, parameters->string0Parameter );
 	return ( value > parameters->int0Parameter );
+}
+
+int GameScript::GlobalLTGlobal(Scriptable* Sender, Trigger* parameters)
+{
+	long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	long value2 = CheckVariable(Sender, parameters->string1Parameter );
+	return ( value1 < value2 );
 }
 
 int GameScript::GlobalGTGlobal(Scriptable* Sender, Trigger* parameters)
@@ -4669,6 +4693,30 @@ int GameScript::FallenRanger(Scriptable* Sender, Trigger* /*parameters*/)
 	}
 	Actor* act = ( Actor* ) Sender;
 	return (act->GetStat(IE_MC_FLAGS) & MC_FALLEN_RANGER)!=0;
+}
+
+int GameScript::Difficulty(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	ieDword diff;
+
+	core->GetDictionary()->Lookup("Difficulty Level", diff);
+	return diff==(ieDword) parameters->int0Parameter;
+}
+
+int GameScript::DifficultyGT(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	ieDword diff;
+
+	core->GetDictionary()->Lookup("Difficulty Level", diff);
+	return diff>(ieDword) parameters->int0Parameter;
+}
+
+int GameScript::DifficultyLT(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	ieDword diff;
+
+	core->GetDictionary()->Lookup("Difficulty Level", diff);
+	return diff<(ieDword) parameters->int0Parameter;
 }
 
 //-------------------------------------------------------------
