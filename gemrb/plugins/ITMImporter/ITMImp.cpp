@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.1 2004/02/15 14:26:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.2 2004/02/15 23:56:08 edheldil Exp $
  *
  */
 
@@ -46,14 +46,17 @@ bool ITMImp::Open(DataStream * stream, bool autoFree)
 	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read(Signature, 8);
-	if(strncmp(Signature, "ITM V1.0", 8) == 0) {
+	if(strncmp(Signature, "ITM V1  ", 8) == 0) {
 	        version = 10;
 	} 
 	else if(strncmp(Signature, "ITM V1.1", 8) == 0) {
 	        version = 11;
 	}
+	else if(strncmp(Signature, "ITM V2.0", 8) == 0) {
+	        version = 20;
+	}
 	else {
-	        printf("[ITMImporter]: This file is not a valid ITM File (Signature: %s)\n", Signature);
+	        printf("[ITMImporter]: This file is not a valid ITM File\n");
 		return false;
 	}
 
@@ -95,10 +98,20 @@ Item * ITMImp::GetItem ()
 	str->Read(&s->EquippingFeatureOffset, 2);
 	str->Read(&s->EquippingFeatureCount, 2);
 
-	if (version == 11) {
-		for (int i = 0; i < 7; i++) {
-		        str->Read(&s->unknown[i], 4);
-		}
+
+	s->Dialog[0] = 0;
+	s->DialogName = 0;
+	s->WieldColor = 0;
+	memset (s->unknown, 0, 26);
+
+	if (version == 20) {
+	        str->Read(s->unknown, 16);
+	}
+	else if (version == 11) {
+	        str->Read (s->Dialog, 8);
+	        str->Read (&s->DialogName, 4);
+	        str->Read (&s->WieldColor, 2);
+	        str->Read (s->unknown, 26);
 	}
 
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.1 2004/02/15 14:26:54 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.2 2004/02/15 23:56:05 edheldil Exp $
  *
  */
 
@@ -122,6 +122,9 @@ public:
 	ieDword FeatureBlockOffset;
 	ieWord CastingFeatureOffset;
 	ieWord CastingFeatureCount;
+
+	// IWD2 only
+	char unknown13[16];
 
 	AnimationMgr *SpellIconBAM;
 };

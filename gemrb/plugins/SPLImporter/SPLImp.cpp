@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.1 2004/02/15 14:26:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.2 2004/02/15 23:56:07 edheldil Exp $
  *
  */
 
@@ -46,7 +46,13 @@ bool SPLImp::Open(DataStream * stream, bool autoFree)
 	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read(Signature, 8);
-	if(strncmp(Signature, "SPL V1  ", 8) != 0) {
+	if(strncmp(Signature, "SPL V1  ", 8) == 0) {
+	        version = 1;
+	}
+	else if (strncmp(Signature, "SPL V2.0", 8) == 0) {
+	        version = 20;
+	}
+	else {
 		printf("[SPLImporter]: This file is not a valid SPL File\n");
 		return false;
 	}
@@ -89,6 +95,11 @@ Spell * SPLImp::GetSpell ()
 	str->Read(&s->FeatureBlockOffset, 4);
 	str->Read(&s->CastingFeatureOffset, 2);
 	str->Read(&s->CastingFeatureCount, 2);
+
+	memset (s->unknown13, 0, 16);
+	if (version == 20) {
+	        str->Read (s->unknown13, 16);
+	}
 
 
 	for (unsigned int i = 0; i < s->ExtHeaderCount; i++) {

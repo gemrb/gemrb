@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.h,v 1.1 2004/02/15 14:26:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.h,v 1.2 2004/02/15 23:56:07 edheldil Exp $
  *
  */
 
@@ -32,6 +32,7 @@ class SPLImp : public SpellMgr
 private:
 	DataStream * str;
 	bool autoFree;
+	int version;
 
 public:
 	SPLImp(void);
