@@ -81,7 +81,6 @@ void Label::SetColor(Color col, Color bac)
 	if(palette)
 		free(palette);
 	palette = core->GetVideoDriver()->CreatePalette(col, bac);
-	useRGB = true;
 	Changed = true;
 }
 
