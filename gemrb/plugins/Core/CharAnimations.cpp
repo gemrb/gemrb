@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.42 2004/08/26 10:26:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.43 2004/08/26 12:09:57 avenger_teambg Exp $
  *
  */
 
@@ -267,10 +267,18 @@ IE_ANI_TWO_FILES:	The whole animation is in 2 files. The East and West part are 
 IE_ANI_FOUR_FILES:	The Animation is coded in Four Files. Probably it is an old Two File animation with
 			additional frames added in a second time.
 
-IE_ANI_TWO_FILES_2:	This Animation Type stores the Animation in the following format
+IE_ANI_TWENTYTWO:	This Animation Type stores the Animation in the following format
 			[NAME][ACTIONCODE][/E]
-			ACTIONCODE=A1-9, CA, SX, SA, W2 (sling is A1)
+			ACTIONCODE=A1-6, CA, SX, SA (sling is A1)
 			The G1 file contains several animation states. See MHR
+			Probably it could use A7-9 files too, bringing the file numbers to 28.
+
+IE_ANI_SIX_FILES:	The layout for these files is:
+			[NAME][G1-3][/E]
+			Each state contains 16 Orientations, but the last 6 are stored in the East file.
+			G1 contains only the walking animation.
+			G2 contains stand, ready, get hit, die and twitch.
+			G3 contains 3 attacks.
 
 IE_ANI_TWO_FILES_3:	Animations using this type was stored using the following template:
 			[NAME][ACTIONTYPE][/E]
@@ -422,6 +430,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			}
 			break;
 
+		case IE_ANI_SIX_FILES: //16 anims some are stored elsewhere
 		case IE_ANI_ONE_FILE: //16 orientations
 			Anims[StanceID][Orient] = a;
 			break;
@@ -434,7 +443,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			break;
 
 		case IE_ANI_TWO_FILES:
-		case IE_ANI_TWO_FILES_2:
+		case IE_ANI_TWENTYTWO:
 		case IE_ANI_TWO_FILES_3:
 		case IE_ANI_FOUR_FILES:
 			Orient&=~1;
@@ -500,8 +509,11 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 		case IE_ANI_ONE_FILE:
 			Cycle = StanceID * 16 + Orient;
 			break;
+		case IE_ANI_SIX_FILES:
+			AddSixSuffix( ResRef, StanceID, Cycle, Orient );
+			break;
 
-		case IE_ANI_TWO_FILES_2:  //8+8 animations
+		case IE_ANI_TWENTYTWO:  //8+8 animations
 			AddMHRSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
@@ -768,6 +780,64 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 	}
 }
 
+
+void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	switch (StanceID) {
+		case IE_ANI_WALK:
+			strcat( ResRef, "G1" );
+			Cycle = Orient;
+			break;
+
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_SLASH:
+			strcat( ResRef, "G3" );
+			Cycle = Orient;
+			break;
+
+		case IE_ANI_ATTACK_BACKSLASH:
+			strcat( ResRef, "G3" );
+			Cycle = 16 + Orient;
+			break;
+
+		case IE_ANI_ATTACK_JAB:
+			strcat( ResRef, "G3" );
+			Cycle = 32 + Orient;
+			break;
+
+		case IE_ANI_AWAKE:
+			strcat( ResRef, "G2" );
+			Cycle = 0 + Orient;
+			break;
+
+		case IE_ANI_READY:
+			strcat( ResRef, "G2" );
+			Cycle = 16 + Orient;
+			break;
+
+		case IE_ANI_DAMAGE:
+			strcat( ResRef, "G2" );
+			Cycle = 32 + Orient;
+			break;
+
+		case IE_ANI_DIE:
+		case IE_ANI_GET_UP:
+			strcat( ResRef, "G2" );
+			Cycle = 48 + Orient;
+			break;
+
+		case IE_ANI_TWITCH:
+			strcat( ResRef, "G2" );
+			Cycle = 64 + Orient;
+			break;
+
+	}
+	if (Orient>9) {
+		strcat( ResRef, "E" );
+	}
+}
+
 void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)
 {
@@ -848,7 +918,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_DAMAGE:
-			strcat( ResRef, "G14" );
+			strcat( ResRef, "G1" );
 			Cycle = 40 + Orient;
 			break;
 

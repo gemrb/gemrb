@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.27 2004/08/26 10:26:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.28 2004/08/26 12:09:57 avenger_teambg Exp $
  *
  */
 
@@ -78,10 +78,10 @@
 #define IE_ANI_TWO_FILES		3
 #define IE_ANI_CODE_MIRROR_2		4
 #define IE_ANI_ONE_FILE_2		5
-#define IE_ANI_TWO_FILES_2		6
-#define IE_ANI_CODE_MIRROR_3	7
-#define IE_ANI_ONE_FILE_3		8
-#define IE_ANI_TWO_FILES_3		9
+#define IE_ANI_TWENTYTWO		6
+#define IE_ANI_CODE_MIRROR_3		7
+#define IE_ANI_SIX_FILES		8    //MCAR/MWYV
+#define IE_ANI_TWO_FILES_3		9    //iwd animations
 
 //PST animation types
 #define IE_ANI_PST_ANIMATION_1		16   //full animation
@@ -141,6 +141,8 @@ private:
 	void AddVHR2Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddVHRSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void AddSixSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddMHRSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
