@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.1 2003/12/04 22:14:41 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.2 2003/12/12 23:08:55 balrog994 Exp $
  *
  */
 
@@ -23,7 +23,91 @@
 #define GAMESCRIPT_H
 
 #include "DataStream.h"
-#include "Plugin.h"
+#include "Variables.h"
+#include <list>
+
+typedef struct Object {
+	int				eaField;
+	int				factionField;
+	int				teamField;
+	int				generalField;
+	int				raceField;
+	int				classField;
+	int				specificField;
+	int				genderField;
+	int				alignmentField;
+	int				identifiersField;
+	int				XobjectPosition;
+	int				YobjectPosition;
+	int				WobjectPosition;
+	int             HobjectPosition;
+	char            PositionMask[32];
+	char*			objectName;
+} Object;
+
+typedef struct Trigger {
+	unsigned short	triggerID;
+	int				int0Parameter;
+	int				flags;
+	int				int1Parameter;
+	int				int2Parameter;
+	int				XpointParameter;
+	int				YpointParameter;
+	char*			string0Parameter;
+	char*			string1Parameter;
+	Object*			objectParameter;
+} Trigger;
+
+typedef struct Condition {
+	unsigned short triggersCount;
+	Trigger ** triggers;
+} Condition;
+
+typedef struct Action {
+	unsigned short	actionID;
+	Object*			objects[3];
+	int				int0Parameter;
+	int				XpointParameter;
+	int				YpointParameter;
+	int				int1Parameter;
+	int				int2Parameter;
+	char*			string0Parameter;
+	char*			string1Parameter;
+} Action;
+
+typedef struct Response {
+	unsigned char weight;
+	unsigned char actionsCount;
+	Action ** actions;
+} Response;
+
+typedef struct ResponseSet {
+	unsigned short responsesCount;
+	Response ** responses;
+} ResponseSet;
+
+typedef struct ResponseBlock {
+	Condition * condition;
+	ResponseSet * responseSet;
+} ResponseBlock;
+
+typedef struct Script {
+	unsigned char responseBlocksCount;
+	ResponseBlock ** responseBlocks;
+	char * Name;
+} Script;
+
+class GameScript;
+
+typedef int (* TriggerFunction)(GameScript*, Trigger*);
+typedef void (* ActionFunction)(GameScript*, Action*);
+
+#define IE_SCRIPT_ALWAYS		0
+#define IE_SCRIPT_AREA			1
+#define IE_SCRIPT_TRIGGER		2
+
+#define MAX_TRIGGERS			0x40D5
+#define MAX_ACTIONS				325
 
 #ifdef WIN32
 
@@ -37,14 +121,83 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT GameScript : public Plugin
+class GEM_EXPORT GameScript
 {
 public:
-	GameScript(void);
-	virtual ~GameScript(void);
-	virtual int CacheScript(DataStream * stream, const char * Context) = 0;
-	virtual void SetVariable(const char * VarName, const char * Context, int value) = 0;
-	virtual void Update() = 0;
+	Variables * locals;
+	Script * script;
+	ActorBlock * MySelf;
+	unsigned long scriptRunDelay;
+	bool endReached;
+	void Update();
+private: //Internal Functions
+	Script* CacheScript(DataStream * stream, const char * Context);
+	void FreeScript(Script * script);
+	ResponseBlock * ReadResponseBlock(DataStream * stream);
+	Condition * ReadCondition(DataStream * stream);
+	ResponseSet * ReadResponseSet(DataStream * stream);
+	Response * ReadResponse(DataStream * stream);
+	Trigger * ReadTrigger(DataStream * stream);
+	Object * DecodeObject(const char * line);
+	bool EvaluateCondition(GameScript * sender, Condition * condition);
+	bool EvaluateTrigger(GameScript * sender, Trigger * trigger);
+	void ExecuteResponseSet(GameScript * sender, ResponseSet * rS);
+	void ExecuteResponse(GameScript * sender, Response * rE);
+	void ExecuteAction(GameScript * sender, Action * aC);
+	static ActorBlock * GetActorFromObject(GameScript * Sender, Object * oC);
+	static unsigned char GetOrient(short sX, short sY, short dX, short dY);
+private: //Internal variables
+	unsigned long lastRunTime;
+	unsigned long scriptType;
+private: //Script Internal Variables
+	bool continueExecution;
+	std::list<Action*> programmedActions;
+	char Name[9];
+public:
+	GameScript(const char * ResRef, unsigned char ScriptType);
+	~GameScript();
+	void SetVariable(const char * VarName, const char * Context, int value);
+private: //Script Functions
+	//Triggers
+	static int  Globals(GameScript * Sender, Trigger * parameters);
+	static int  OnCreation(GameScript * Sender, Trigger * parameters);
+	static int	True(GameScript * Sender, Trigger * parameters);
+	static int  False(GameScript * Sender, Trigger * parameters);
+	static int  Alignment(GameScript * Sender, Trigger * parameters);
+	static int  Allegiance(GameScript * Sender, Trigger * parameters);
+	static int  Class(GameScript * Sender, Trigger * parameters);
+	static int  Exists(GameScript * Sender, Trigger * parameters);
+	static int  General(GameScript * Sender, Trigger * parameters);
+	//Actions
+	static void SetGlobal(GameScript * Sender, Action * parameters);
+	static void TriggerActivation(GameScript * Sender, Action * parameters);
+	static void FadeToColor(GameScript * Sender, Action * parameters);
+	static void FadeFromColor(GameScript * Sender, Action * parameters);
+	static void CreateCreature(GameScript * Sender, Action * parameters);
+	static void Enemy(GameScript * Sender, Action * parameters);
+	static void ChangeAllegiance(GameScript * Sender, Action * parameters);
+	static void ChangeGeneral(GameScript * Sender, Action * parameters);
+	static void ChangeRace(GameScript * Sender, Action * parameters);
+	static void ChangeClass(GameScript * Sender, Action * parameters);
+	static void ChangeSpecifics(GameScript * Sender, Action * parameters);
+	static void ChangeGender(GameScript * Sender, Action * parameters);
+	static void ChangeAlignment(GameScript * Sender, Action * parameters);
+	static void StartCutSceneMode(GameScript * Sender, Action * parameters);
+	static void EndCutSceneMode(GameScript * Sender, Action * parameters);
+	static void StartCutScene(GameScript * Sender, Action * parameters);
+	static void CutSceneId(GameScript * Sender, Action * parameters);
+	static void Wait(GameScript * Sender, Action * parameters);
+	static void SmallWait(GameScript * Sender, Action * parameters);
+	static void MoveViewPoint(GameScript * Sender, Action * parameters);
+	static void MoveViewObject(GameScript * Sender, Action * parameters);
+	static void MoveToPoint(GameScript * Sender, Action * parameters);
+	static void MoveToObject(GameScript * Sender, Action * parameters);
+	static void DisplayStringHead(GameScript * Sender, Action * parameters);
+	static void Face(GameScript * Sender, Action * parameters);
+	static void FaceObject(GameScript * Sender, Action * parameters);
+	static void DisplayStringWait(GameScript * Sender, Action * parameters);
+	static void StartSong(GameScript * Sender, Action * parameters);
+	static void Continue(GameScript * Sender, Action * parameters);
 };
 
 #endif
