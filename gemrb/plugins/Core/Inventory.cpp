@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.31 2004/10/09 18:26:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.32 2004/10/17 09:50:44 edheldil Exp $
  *
  */
 
@@ -54,18 +54,32 @@ void Inventory::AddItem(CREItem *item)
 
 void Inventory::CalculateWeight()
 {
-	if(!Changed) {
+	if (!Changed) {
 		return;
 	}
-	Weight=0;
-	for(size_t i=0;i<Slots.size(); i++) {
-		if(!Slots[i]) {
+	Weight = 0;
+	for (size_t i = 0; i < Slots.size(); i++) {
+		CREItem *slot = Slots[i];
+		if(!slot) {
 			continue;
 		}
-		Slots[i]->Flags&=~IE_INV_ITEM_ACQUIRED;
-//		Item *itm=core->GetItemManager()->GetItem(Slots[i]->ItemResRef);
-//		Weight+=itm->Weight;
+		slot->Flags &= ~IE_INV_ITEM_ACQUIRED;
+		// This is a lame attempt to cache the item weights, so
+		// it is not SO slow until we get proper object caching
+		printf ("%2d: %8s : %d x %d\n", i, slot->ItemResRef, slot->Weight, slot->Usages[0]);
+		if (slot->Weight == 0) {
+			Item *itm = core->GetItem( slot->ItemResRef );
+			slot->Weight = -1;
+			if (itm) {
+				if (itm->Weight) slot->Weight = itm->Weight;
+				delete itm;
+			}
+		}
+		if (slot->Weight > 0) {
+			Weight += slot->Weight * (slot->Usages[0] ? slot->Usages[0] : 1);
+		}
 	}
+	Changed = false;
 }
 
 void Inventory::SetInventoryType(int arg)
@@ -192,6 +206,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 		destructed+=removed;
 		if((count!=(unsigned int) ~0) && (destructed==count) ) break;
 	}
+
 	return destructed;
 }
 
@@ -375,6 +390,7 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 			continue;
 		}
 		map->tm->AddItemToLocation(loc, item);
+		Changed = true;
 		Slots[i]=NULL;
 		//if it isn't all items then we stop here
 		if(resref[0])
@@ -459,4 +475,8 @@ void Inventory::dump()
 
 		printf ( "%2u: %8.8s   %d (%d %d %d) %x\n", i, itm->ItemResRef, itm->Unknown08, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags );
 	}
+
+	Changed = true;
+	CalculateWeight();
+	printf( "Total weight: %d\n", Weight );
 }

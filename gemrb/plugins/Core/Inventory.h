@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.22 2004/10/09 18:26:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.23 2004/10/17 09:50:44 edheldil Exp $
  *
  */
 
@@ -69,6 +69,8 @@ typedef struct CREItem {
 	ieWord Unknown08;
 	ieWord Usages[3];
 	ieDword Flags;
+	// cached value from associated item. LEAVE IT SIGNED!
+	int Weight;
 } CREItem;
 
 class GEM_EXPORT Inventory {

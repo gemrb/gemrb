@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.4 2004/09/17 14:54:52 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.5 2004/10/17 09:50:43 edheldil Exp $
 
 # ie_stats.py - definitions of creature stats codes
 
@@ -119,7 +119,7 @@ IE_WEB 				= 67
 IE_LEVEL2 			= 68
 IE_LEVEL3 			= 69
 IE_CasterHold 			= 70
-IE_ENCUMBERANCE 		= 71
+IE_ENCUMBRANCE                  = 71
 IE_MISSILETHAC0BONUS 		= 72  
 IE_MAGICDAMAGERESISTANCE 	= 73
 IE_RESISTPOISON 		= 74

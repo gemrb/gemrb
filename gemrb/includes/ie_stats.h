@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.24 2004/10/09 17:38:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.25 2004/10/17 09:50:44 edheldil Exp $
  *
  */
 
@@ -170,7 +170,7 @@
 #define IE_LEVEL2   	   68
 #define IE_LEVEL3   	   69
 #define IE_CasterHold	70
-#define IE_ENCUMBERANCE    71
+#define IE_ENCUMBRANCE    71
 #define IE_MISSILETHAC0BONUS	  72  
 #define IE_MAGICDAMAGERESISTANCE  73
 #define IE_RESISTPOISON 	 74

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.2 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.3 2004/10/17 09:50:44 edheldil Exp $
  *
  */
 
@@ -48,6 +48,8 @@ typedef struct STOItem {
 	ieWord Usage2;
 	ieWord Usage3;
 	ieDword Flags;
+	// cached value from associated item. LEAVE IT SIGNED!
+	int Weight;
 	ieDword AmountInStock;
 	ieDword InfiniteSupply;
 	// V1.1
