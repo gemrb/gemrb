@@ -10,17 +10,17 @@ RowCount = 0
 PointsLeft = 0
 
 def RedrawSkills():
-	SumLabel = GemRB.GetControl(SkillWindow, 0)
+	SumLabel = GemRB.GetControl(SkillWindow, 0x10000009)
 	GemRB.SetText(SkillWindow, SumLabel, str(PointsLeft) )  #points to distribute
 
 	for i in range(0,8):
 		Pos=TopIndex+i
 		SkillName = GemRB.GetTableValue(SkillTable, Pos+7, 1) #we add the bg1 skill count offset
-		GemRB.SetText(SkillWindow, i+1, SkillName)
+		GemRB.SetText(SkillWindow, 0x1000001+i, SkillName)
 		ActPoint = GemRB.GetVar("Proficiency "+str(Pos) )
 		for j in range(0,5):  #5 is maximum distributable
 			Star=GemRB.GetControl(SkillWindow, i*5+j+27)
-			if ActPoint >=j:
+			if ActPoint >j:
 				GemRB.SetButtonFlags(SkillWindow, Star, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
 			else:
 				GemRB.SetButtonFlags(SkillWindow, Star, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
@@ -74,11 +74,12 @@ def OnLoad():
 	DoneButton = GemRB.GetControl(SkillWindow,0)
 	GemRB.SetText(SkillWindow,DoneButton,11973)
 
-	TextAreaControl = GemRB.GetControl(SkillWindow, 19)
-	GemRB.SetText(SkillWindow,TextAreaControl,9602)
+	TextAreaControl = GemRB.GetControl(SkillWindow, 68)
+	GemRB.SetText(SkillWindow,TextAreaControl,9588)
 
 	ScrollBarControl = GemRB.GetControl(SkillWindow, 78)
 	GemRB.SetVarAssoc(SkillWindow, ScrollBarControl, "TopIndex", RowCount)
+	GemRB.SetEvent(SkillWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
 
 	GemRB.SetEvent(SkillWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(SkillWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
@@ -88,6 +89,10 @@ def OnLoad():
 	GemRB.SetVisible(SkillWindow,1)
 	return
 
+def ScrollBarPress():
+	TopIndex = GemRB.GetVar("TopIndex")
+	RedrawSkills()
+	return
 
 def RightPress():
 	Pos = GemRB.GetVar("Skill")+TopIndex

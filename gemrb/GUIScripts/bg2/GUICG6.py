@@ -49,7 +49,7 @@ def OnLoad():
 	GemRB.SetText(SkillWindow,DoneButton,11973)
 
 	TextAreaControl = GemRB.GetControl(SkillWindow, 19)
-	GemRB.SetText(SkillWindow,TextAreaControl,9602)
+	GemRB.SetText(SkillWindow,TextAreaControl,17248)
 
 	GemRB.SetEvent(SkillWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(SkillWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
