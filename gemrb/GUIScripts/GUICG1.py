@@ -5,14 +5,42 @@ CharGenWindow = 0
 GenderWindow = 0
 TextAreaControl = 0
 CharGenPhase = 1
+DoneButton = 0
 
 def OnLoad():
-	global CharGenWindow, GenderWindow, TextAreaControl, CharGenPhase
+	global CharGenWindow, GenderWindow, TextAreaControl, CharGenPhase, DoneButton
 
-	CharGenPhase=1
+	CharGenPhase = 1
 	GemRB.LoadWindowPack("GUICG")
-        CharGenWindow = GemRB.LoadWindow(0)
 	GenderWindow = GemRB.LoadWindow(1)
+        CharGenWindow = GemRB.LoadWindow(0)
+	BackButton = GemRB.GetControl(GenderWindow,0)
+	GemRB.SetText(GenderWindow,BackButton,15416)
+	DoneButton = GemRB.GetControl(GenderWindow,6)
+	GemRB.SetText(GenderWindow,DoneButton,11973)
+
+	MaleButton = GemRB.GetControl(GenderWindow,2)
+	GemRB.SetButtonFlags(GenderWindow,MaleButton,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+
+	FemaleButton = GemRB.GetControl(GenderWindow,3)
+	GemRB.SetButtonFlags(GenderWindow,FemaleButton,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+
+	GemRB.SetVarAssoc(GenderWindow,MaleButton,"Gender",1)
+	GemRB.SetVarAssoc(GenderWindow,FemaleButton,"Gender",2)
+	GemRB.SetEvent(GenderWindow,MaleButton,IE_GUI_BUTTON_ON_PRESS,"ClickedMale")
+	GemRB.SetEvent(GenderWindow,FemaleButton,IE_GUI_BUTTON_ON_PRESS,"ClickedFemale")
+	GemRB.SetEvent(GenderWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"DonePress")
+	GemRB.SetEvent(GenderWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	GemRB.SetButtonState(GenderWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetVisible(CharGenWindow,0)
+	GemRB.SetVisible(GenderWindow,1)
+	GemRB.ShowModal(GenderWindow)
+	return
+
+def DonePress():
+
+	GemRB.SetVisible(GenderWindow,0)
+	GemRB.SetVisible(CharGenWindow,1)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
@@ -70,10 +98,19 @@ def OnLoad():
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
         GemRB.SetEvent(CharGenWindow, GenderButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
-	GemRB.SetVisible(CharGenWindow,1)
 	GemRB.ShowModal(GenderWindow)
 	return
 	
+def ClickedMale():
+	GemRB.SetText(CharGenWindow,TextAreaControl,13083)
+	GemRB.SetButtonState(GenderWindow,DoneButton,IE_GUI_BUTTON_ENABLED)
+	return
+
+def ClickedFemale():
+	GemRB.SetText(CharGenWindow,TextAreaControl,13084)
+	GemRB.SetButtonState(GenderWindow,DoneButton,IE_GUI_BUTTON_ENABLED)
+	return
+
 def BackPress():
 	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.UnloadWindow(GenderWindow)
