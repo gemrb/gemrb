@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.32 2004/04/17 11:28:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.33 2004/04/25 22:41:40 avenger_teambg Exp $
  *
  */
 
@@ -166,6 +166,7 @@ Actor* CREImp::GetActor()
 	poi = core->GetString( strref );
 	act->SetText( poi, 1 );
 	free( poi );
+	act->BaseStats[IE_VISUALRANGE] = 30; //this is just a hack
 	str->Read( &act->BaseStats[IE_MC_FLAGS], 2 );
 	str->Seek( 2, GEM_CURRENT_POS );
 	str->Read( &act->BaseStats[IE_XPVALUE], 4 );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.15 2004/02/24 22:20:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.16 2004/04/25 22:41:39 avenger_teambg Exp $
  *
  */
 
@@ -54,7 +54,7 @@ public:
 		return ( int ) rows[0].size();
 	}
 	/** Returns a pointer to a zero terminated 2da element,
-		   0,0 returns the default value, it may return NULL */
+		if it cannot return a value, it returns the default */
 	inline char* QueryField(unsigned int row = 0, unsigned int column = 0) const
 	{
 		if (rows.size() <= row) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.47 2004/04/22 20:44:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.48 2004/04/25 22:41:40 avenger_teambg Exp $
  *
  */
 
@@ -402,6 +402,9 @@ void Actor::DebugDump()
 	printf( "TalkCount:  %ld\n", TalkCount );
 	printf( "PartySlot:  %d\n", InParty );
 	printf( "Allegiance: %d\n",(int) GetStat(IE_EA) );
+	printf( "Visualrange:%d\n", (int) GetStat(IE_VISUALRANGE) );
+	inventory.dump();
+	spellbook.dump();
 }
 
 void Actor::SetPosition(Map *map, unsigned int XPos, unsigned int YPos, bool jump)
@@ -448,8 +451,16 @@ void Actor::Die(bool xp_allowed)
 	//handle reputation???
 	//if chunked death, then set DeleteMe
 	//DeleteMe = true;
+	DropItem("",0);
         AnimID = IE_ANI_DIE;
 	Active = false; //do we need it?
-	SetStat(IE_STATE_ID, GetStat(IE_STATE_ID)|STATE_DEAD);
+	Modified[IE_STATE_ID] |= STATE_DEAD;
+}
+
+/* this will create a heap at location, and transfer the item(s) */
+void Actor::DropItem(const char *resref, unsigned int flags)
+{
+	Map *map = core->GetGame()->GetMap(Area);
+	inventory.DropItemAtLocation(resref, flags, map, XPos, YPos);
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.49 2004/04/23 20:26:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.50 2004/04/25 22:41:40 avenger_teambg Exp $
  *
  */
 
@@ -123,18 +123,16 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	str->Read( &EntrancesCount, 4 );
 	str->Read( &ContainersOffset, 4 );
 	str->Read( &ContainersCount, 2 );
-	str->Seek( 0x7C + bigheader, GEM_STREAM_START );
+	str->Read( &ItemsCount, 2 );
+	str->Read( &ItemsOffset, 4 );
 	str->Read( &VerticesOffset, 4 );
 	str->Read( &VerticesCount, 2 );
 	str->Seek( 0x94 + bigheader, GEM_STREAM_START );
 	str->Read( Script, 8 );
 	Script[8] = 0;
-	//core->LoadScript(Script);
 	str->Seek( 0xA4 + bigheader, GEM_STREAM_START );
 	str->Read( &DoorsCount, 4 );
 	str->Read( &DoorsOffset, 4 );
-	//str->Seek(0xac, GEM_STREAM_START);
-	//str->Seek(0xac+bigheader, GEM_STREAM_START);
 	str->Read( &AnimCount, 4 );
 	str->Read( &AnimOffset, 4 );
 	str->Seek( 8, GEM_CURRENT_POS ); //skipping some
@@ -292,8 +290,9 @@ Map* AREImp::GetMap(const char *ResRef)
 	//Loading Containers
 	for (int i = 0; i < ContainersCount; i++) {
 		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
-		unsigned short Type, LockDiff, Locked, Unknown, TrapDetDiff,
-		TrapRemDiff, Trapped, TrapDetected;
+		unsigned short Type, LockDiff, Locked, Unknown;
+		unsigned short TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
+		unsigned long ItemIndex, ItemCount;
 		char Name[33];
 		Point p;
 		str->Read( Name, 32 );
@@ -316,7 +315,10 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Read( &bbox.h, 2 );
 		bbox.w -= bbox.x;
 		bbox.h -= bbox.y;
-		str->Seek( 16, GEM_CURRENT_POS );
+		str->Read( &ItemIndex, 4 );
+		str->Read( &ItemCount, 4 );
+		str->Read( Script, 8 );
+		Script[8]=0;
 		unsigned long firstIndex, vertCount;
 		str->Read( &firstIndex, 4 );
 		str->Read( &vertCount, 4 );
@@ -337,7 +339,14 @@ Map* AREImp::GetMap(const char *ResRef)
 		c->Trapped = Trapped;
 		c->TrapDetected = TrapDetected;
 		//reading items into a container
-		
+		while(ItemCount--) {
+//			c->inventory.AddItem(
+		}
+		if (Script[0] != 0) {
+			c->Scripts[0] = new GameScript( Script, IE_SCRIPT_TRIGGER );
+			c->Scripts[0]->MySelf = c;
+		} else
+			c->Scripts[0] = NULL;
 	}
 	printf( "Loading regions\n" );
 	//Loading InfoPoints

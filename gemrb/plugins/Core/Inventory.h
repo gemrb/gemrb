@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.11 2004/04/21 17:41:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.12 2004/04/25 22:41:41 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,7 @@
 #include "../../includes/ie_types.h"
 
 #include "Store.h"
+class Map;
 
 #ifdef WIN32
 
@@ -78,6 +79,8 @@ public:
 	Inventory();
 	virtual ~Inventory();
 
+	/** adds an item to the inventory */
+	void AddItem(CREItem *item);
 	/** returns the count items in the inventory */
 	int CountItems(const char *resref, bool charges);
 	/** looks for a particular item in a slot */
@@ -117,6 +120,7 @@ public:
 	int GetWeight() {return Weight;}
 
 	bool ItemsAreCompatible(CREItem* target, CREItem* source);
+	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, unsigned short x, unsigned short y);
 
 	void dump();
 };

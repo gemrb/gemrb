@@ -463,7 +463,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'y':
 				if (lastActor) {
 					lastActor->ClearActions();
-					lastActor->DeleteMe = true;
+					char Tmp[40];
+					strncpy(Tmp,"Kill(Myself)",sizeof(Tmp) );
+					lastActor->AddAction( GameScript::GenerateAction(Tmp) );
 				}
 				break;
 			case '4':
@@ -595,7 +597,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	}
 	char Tmp[40];
 
-	strncpy(Tmp,"NIDSpecial1()",40);
+	strncpy(Tmp,"NIDSpecial1()",sizeof(Tmp) );
 	target=tgt; //this is a hack, a deadly one
 	source->AddAction( GameScript::GenerateAction( Tmp, true ) );
 }

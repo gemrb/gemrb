@@ -54,6 +54,12 @@ Scriptable::~Scriptable(void)
 	}
 }
 
+/** Gets the DeathVariable */
+char* Scriptable::GetScriptName(void)
+{
+	 return scriptName;
+}
+
 void Scriptable::SetScript(const char* aScript, int idx)
 {
 	if (Scripts[idx]) {

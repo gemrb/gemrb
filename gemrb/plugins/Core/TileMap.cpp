@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.28 2004/04/15 15:38:35 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.29 2004/04/25 22:41:41 avenger_teambg Exp $
  *
  */
 
@@ -192,10 +192,14 @@ Container* TileMap::GetContainer(const char* Name)
 	return NULL;
 }
 
-Container* TileMap::GetContainer(unsigned short x, unsigned short y)
+Container* TileMap::GetContainer(unsigned short x, unsigned short y, int type)
 {
 	for (size_t i = 0; i < containers.size(); i++) {
 		Container* c = containers[i];
+		if(type!=-1) {
+			if(c->Type!=type)
+				continue;
+		}
 		if (c->outline->BBox.x > x)
 			continue;
 		if (c->outline->BBox.y > y)
@@ -209,6 +213,30 @@ Container* TileMap::GetContainer(unsigned short x, unsigned short y)
 	}
 	return NULL;
 }
+
+void TileMap::AddItemToLocation(unsigned short x, unsigned short y, CREItem *item)
+{
+	Point tmp[4];
+	char heapname[32];
+	sprintf(heapname,"heap_%d.%d",x,y);
+	Container *container = GetContainer(x,y,CN_PILE);
+	if(!container) {
+		tmp[0].x=x-5;
+		tmp[0].y=y-5;
+		tmp[1].x=x+5;
+		tmp[1].y=y-5;
+		tmp[2].x=x+5;
+		tmp[2].y=y+5;
+		tmp[3].x=x-5;
+		tmp[3].y=y+5;
+                Gem_Polygon* outline = new Gem_Polygon( tmp, 4 );
+	        container = AddContainer(heapname,CN_HEAP, outline);
+		container->XPos=x;
+		container->YPos=y;
+	}
+	container->inventory.AddItem(item);
+}
+
 InfoPoint* TileMap::AddInfoPoint(char* Name, unsigned short Type,
 	Gem_Polygon* outline)
 {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.155 2004/04/23 20:26:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.156 2004/04/25 22:41:40 avenger_teambg Exp $
  *
  */
 
@@ -52,7 +52,7 @@ static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
-static int InDebug = 1;
+static int InDebug = 0;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -60,10 +60,11 @@ static TriggerLink triggernames[] = {
 	{"acquired", GameScript::Acquired,0},
 	{"alignment", GameScript::Alignment,0},
 	{"allegiance", GameScript::Allegiance,0},
+	{"animstate", GameScript::AnimState,0},
 	{"areacheck", GameScript::AreaCheck,0},
 	{"areacheckobject", GameScript::AreaCheck,0},
-	{"areatype", GameScript::AreaType,0},
 	{"areaflag", GameScript::AreaFlag,0},
+	{"areatype", GameScript::AreaType,0},
 	{"bitcheck", GameScript::BitCheck,TF_MERGESTRINGS},
 	{"bitcheckexact", GameScript::BitCheckExact,TF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
@@ -80,6 +81,7 @@ static TriggerLink triggernames[] = {
 	{"combatcounter", GameScript::CombatCounter,0},
 	{"combatcountergt", GameScript::CombatCounterGT,0},
 	{"combatcounterlt", GameScript::CombatCounterLT,0},
+	{"contains", GameScript::Contains,0},
 	{"dead", GameScript::Dead,0},
 	{"entered", GameScript::Entered,0},
 	{"exists", GameScript::Exists,0},
@@ -87,7 +89,8 @@ static TriggerLink triggernames[] = {
 	{"extraproficiencygt", GameScript::ExtraProficiencyGT,0},
 	{"extraproficiencylt", GameScript::ExtraProficiencyLT,0},
 	{"faction", GameScript::Faction,0},
-	{"false", GameScript::False}, {"gender", GameScript::Gender},
+	{"false", GameScript::False},
+	{"gender", GameScript::Gender},
 	{"general", GameScript::General,0},
 	{"global", GameScript::Global,TF_MERGESTRINGS},
 	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger,TF_MERGESTRINGS},
@@ -108,6 +111,7 @@ static TriggerLink triggernames[] = {
 	{"happinesslt", GameScript::HappinessLT,0},
 	{"harmlessentered", GameScript::Entered,0}, //this isn't sure the same
 	{"hasitem", GameScript::HasItem,0},
+	{"hasitemequipped", GameScript::HasItemEquipped,0},
 	{"hasitemslot", GameScript::HasItemSlot,0},
 	{"hasiteminslot", GameScript::HasItemSlot,0},
 	{"haveanyspells", GameScript::HaveAnySpells,0},
@@ -143,6 +147,7 @@ static TriggerLink triggernames[] = {
 	{"morale", GameScript::Morale,0},
 	{"moralegt", GameScript::MoraleGT,0},
 	{"moralelt", GameScript::MoraleLT,0},
+	{"nearbydialog", GameScript::NearbyDialog,0},
 	{"nearlocation", GameScript::NearLocation,0},
 	{"notstatecheck", GameScript::NotStateCheck,0},
 	{"nulldialog", GameScript::NullDialog,0},
@@ -215,6 +220,7 @@ static ActionLink actionnames[] = {
 	{"addexperienceparty", GameScript::AddExperienceParty,0},
 	{"addexperiencepartyglobal", GameScript::AddExperiencePartyGlobal,AF_MERGESTRINGS},
 	{"addglobals", GameScript::AddGlobals,0},
+	{"addjournalentry", GameScript::AddJournalEntry,0},
 	{"addwaypoint", GameScript::AddWayPoint,AF_BLOCKING},
 	{"addxp2da", GameScript::AddXP2DA,0},
 	{"addxpobject", GameScript::AddXPObject,0},
@@ -243,8 +249,11 @@ static ActionLink actionnames[] = {
 	{"continue", GameScript::Continue,AF_INSTANT | AF_CONTINUE},
 	{"createcreature", GameScript::CreateCreature,0}, //point is relative to Sender
 	{"createcreatureatfeet", GameScript::CreateCreatureAtFeet,0}, 
+	{"createcreatureatlocation", GameScript::CreateCreatureAtLocation,0},
+	{"createcreatureimpassable", GameScript::CreateCreatureImpassable,0},
 	{"createcreatureobject", GameScript::CreateCreatureObjectOffset,0}, //the same
 	{"createcreatureobjectoffset", GameScript::CreateCreatureObjectOffset,0}, //the same
+	{"createcreatureoffscreen", GameScript::CreateCreatureOffScreen,0},
 	{"createpartygold", GameScript::CreatePartyGold,0},
 	{"createvisualeffect", GameScript::CreateVisualEffect,0},
 	{"createvisualeffectobject", GameScript::CreateVisualEffectObject,0},
@@ -267,6 +276,7 @@ static ActionLink actionnames[] = {
 	{"erasejournalentry", GameScript::RemoveJournalEntry,0},
 	{"face", GameScript::Face,AF_BLOCKING},
 	{"faceobject", GameScript::FaceObject, AF_BLOCKING},
+	{"facesavedlocation", GameScript::FaceSavedLocation, AF_BLOCKING},
 	{"fadefromblack", GameScript::FadeFromColor,0}, //probably the same
 	{"fadefromcolor", GameScript::FadeFromColor,0},
 	{"fadetoblack", GameScript::FadeToColor,0}, //probably the same
@@ -310,10 +320,10 @@ static ActionLink actionnames[] = {
 	{"incrementproficiency", GameScript::IncrementProficiency,0},
 	{"interact", GameScript::Interact,0},
 	{"joinparty", GameScript::JoinParty,0},
-	{"addjournalentry", GameScript::AddJournalEntry,0},
 	{"jumptoobject", GameScript::JumpToObject,0},
 	{"jumptopoint", GameScript::JumpToPoint,0},
 	{"jumptopointinstant", GameScript::JumpToPointInstant,0},
+	{"jumptosavedlocation", GameScript::JumpToSavedLocation,0},
 	{"kill", GameScript::Kill,0},
 	{"leavearea", GameScript::LeaveAreaLUA,0}, //so far the same
 	{"leavearealua", GameScript::LeaveAreaLUA,0},
@@ -337,21 +347,27 @@ static ActionLink actionnames[] = {
 	{"movetooffset", GameScript::MoveToOffset,AF_BLOCKING},
 	{"movetopoint", GameScript::MoveToPoint,AF_BLOCKING},
 	{"movetopointnorecticle", GameScript::MoveToPoint,AF_BLOCKING},//the same until we know better
+	{"movetosavedlocation", GameScript::MoveToSavedLocation,AF_BLOCKING},
+	//take care of the typo in the original bg2 action.ids
+	{"movetosavedlocationn", GameScript::MoveToSavedLocation,AF_BLOCKING},
 	{"moveviewobject", GameScript::MoveViewPoint,0},
 	{"moveviewpoint", GameScript::MoveViewPoint,0},
-	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING},
+	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING},//we use this for dialogs, hack
 	{"noaction", GameScript::NoAction,0},
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"permanentstatchange", GameScript::ChangeStat,0}, //probably the same
 	{"picklock", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
 	{"playdead", GameScript::PlayDead,0},
+	{"playdeadinterruptable", GameScript::PlayDeadInterruptable,0},
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playsound", GameScript::PlaySound,0},
 	{"recoil", GameScript::Recoil,0},
-	{"removeareatype", GameScript::RemoveAreaType,0},
 	{"removeareaflag", GameScript::RemoveAreaFlag,0},
+	{"removeareatype", GameScript::RemoveAreaType,0},
 	{"removejournalentry", GameScript::RemoveJournalEntry,0},
+	//this is in iwd2, same as movetosavedlocation, with a default variable
+	{"returntosavedlocation", GameScript::MoveToSavedLocation, AF_BLOCKING},
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint", GameScript::RunAwayFromPoint,AF_BLOCKING},
@@ -362,23 +378,27 @@ static ActionLink actionnames[] = {
 	{"saveobjectlocation", GameScript::SaveObjectLocation,0},
 	{"screenshake", GameScript::ScreenShake,AF_BLOCKING},
 	{"setanimstate", GameScript::SetAnimState,AF_BLOCKING},
-	{"setarearestflag", GameScript::SetAreaRestFlag,0},
 	{"setapparentnamestrref", GameScript::SetApparentName,0},
-	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile,0},
-	{"setregularnamestrref", GameScript::SetRegularName,0},
+	{"setarearestflag", GameScript::SetAreaRestFlag,0},
 	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags,0},
 	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
+	{"setdialoguerange", GameScript::SetVisualRange,0}, //same until we know better
 	{"setdoorlocked", GameScript::Lock,AF_BLOCKING},//key shouldn't be checked!
 	{"setfaction", GameScript::SetFaction,0},
 	{"setglobal", GameScript::SetGlobal,AF_MERGESTRINGS},
 	{"setglobaltimer", GameScript::SetGlobalTimer,AF_MERGESTRINGS},
 	{"sethp", GameScript::SetHP,0},
 	{"setinternal", GameScript::SetInternal,0},
+	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile,0},
 	{"setmoraleai", GameScript::SetMoraleAI,0},
+	{"setname", GameScript::SetApparentName,0},
 	{"setnumtimestalkedto", GameScript::SetNumTimesTalkedTo,0},
 	{"setplayersound", GameScript::SetPlayerSound,0},
 	{"setquestdone", GameScript::SetQuestDone,0},
+	{"setregularnamestrref", GameScript::SetRegularName,0},
+	{"setsavedlocation", GameScript::SaveObjectLocation, 0},
+	{"setsavedlocationpoint", GameScript::SaveLocation, 0},
 	{"setteam", GameScript::SetTeam,0},
 	{"settextcolor", GameScript::SetTextColor,0},
 	{"settokenglobal", GameScript::SetTokenGlobal,AF_MERGESTRINGS},
@@ -412,6 +432,7 @@ static ActionLink actionnames[] = {
 	{"unlock", GameScript::Unlock,0},
 	{"unmakeglobal", GameScript::UnMakeGlobal,0}, //this is a GemRB extension
 	{"verbalconstant", GameScript::VerbalConstant,0},
+	{"verbalconstanthead", GameScript::VerbalConstantHead,0},
 	{"wait", GameScript::Wait, AF_BLOCKING},
 	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING}, { NULL,NULL,0},
 };
@@ -1209,7 +1230,7 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	if(InDebug) {
-		printf("Sender: %s\n",Sender->scriptName);
+		printf("Sender: %s\n",Sender->GetScriptName() );
 	}
 	ActionFunction func = actions[aC->actionID];
 	if (func) {
@@ -2270,11 +2291,6 @@ Targets *GameScript::XthNearestEnemyOf(Scriptable *Sender, Targets *parameters, 
 	Actor *ac;
 	while(i--) {
 		ac=core->GetGame()->GetCurrentMap()->GetActor(i);
-/*
-		long x = ( ac->XPos - origin->XPos );
-		long y = ( ac->YPos - origin->YPos );
-		double distance = sqrt( ( double ) ( x* x + y* y ) );
-*/
 		if(type) { //origin is PC
 			if(ac->GetStat(IE_EA) >= EVILCUTOFF) {
 				tgts->AddTarget(ac);
@@ -2626,6 +2642,41 @@ int GameScript::Team(Scriptable* Sender, Trigger* parameters)
 	return ID_Team( actor, parameters->int0Parameter);
 }
 
+int GameScript::ValidForDialogCore(Scriptable* Sender, Actor *target)
+{
+	int range;
+
+	if (Sender->Type != ST_ACTOR) {
+		//non actors got no visual range, needs research
+		range = 20 * 20;
+	}
+	else {
+		Actor* snd = ( Actor* ) Sender;
+		range = snd->Modified[IE_VISUALRANGE] * 20;
+	}
+	if (Distance(target->XPos, target->YPos, Sender) > range) {
+		return 0;
+	}
+	Map *map = core->GetGame()->GetCurrentMap();
+	if (!map->IsVisible( Sender->XPos, Sender->YPos, target->XPos, target->YPos )) {
+		return 0;
+	}
+	//we should rather use STATE_SPEECHLESS_MASK
+	if(target->GetStat(IE_STATE_ID)&STATE_DEAD) {
+		return 0;
+	}
+	return 1;
+}
+
+int GameScript::NearbyDialog(Scriptable* Sender, Trigger* parameters)
+{
+	Actor *target = core->GetGame()->GetCurrentMap()->GetActorByDialog(parameters->string0Parameter);
+	if( !target ) {
+		return 0;
+	}
+	return ValidForDialogCore( Sender, target );
+}
+
 //atm this checks for InParty and See, it is unsure what is required
 int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 {
@@ -2636,32 +2687,11 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	if (scr->Type != ST_ACTOR) {
 		return 0;
 	}
-	//return actor->InParty?1:0; //maybe ???
-	if (!core->GetGame()->InParty( ( Actor * ) scr )) {
+	Actor *target = (Actor *) scr;
+	if (!core->GetGame()->InParty( target )) {
 		return 0;
 	}
-	int range;
-	if (Sender->Type != ST_ACTOR) {
-		//non actors got no visual range, needs research
-		range = 20 * 20;
-	}
-	else {
-		Actor* snd = ( Actor* ) Sender;
-		range = snd->Modified[IE_VISUALRANGE] * 20;
-	}
-	long x = ( scr->XPos - Sender->XPos );
-	long y = ( scr->YPos - Sender->YPos );
-	double distance = sqrt( ( double ) ( x* x + y* y ) );
-	if (distance > range) {
-		return 0;
-	}
-	Map *map = core->GetGame()->GetCurrentMap();
-	if (!map->IsVisible( Sender->XPos, Sender->YPos,
-		scr->XPos, scr->YPos )) {
-		return 0;
-	}
-	//further checks, is target alive and talkative
-	return 1;
+	return ValidForDialogCore( Sender, target );
 }
 
 int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
@@ -3513,10 +3543,7 @@ int GameScript::SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 	if (!tar || tar->Type !=ST_ACTOR) {
 		return 0;
 	}
-	long x = ( tar->XPos - Sender->XPos );
-	long y = ( tar->YPos - Sender->YPos );
-	double distance = sqrt( ( double ) ( x* x + y* y ) );
-	if (distance > ( snd->Modified[IE_VISUALRANGE] * 20 )) {
+	if (Distance(Sender, tar) > ( snd->Modified[IE_VISUALRANGE] * 20 )) {
 		return 0;
 	}
 	Map *map = core->GetGame()->GetCurrentMap();
@@ -4444,12 +4471,31 @@ void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
 void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* ab = ( Actor* ) tar;
+	Map *map = core->GetGame()->GetCurrentMap();
+	ab->SetPosition( map, parameters->XpointParameter, parameters->YpointParameter, true );
+}
+
+/** instant jump to location saved in variable, default: savedlocation */
+/** default subject is the current actor */
+void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
+		tar = Sender;
+	}
+	if(tar->Type != ST_ACTOR) {
 		return;
 	}
-	if (tar->Type != ST_ACTOR) {
-		return;
+	if(!parameters->string0Parameter[0]) {
+		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
+	long value = (long) CheckVariable( Sender, parameters->string0Parameter );
+	parameters->XpointParameter = *(unsigned short *) value;
+	parameters->YpointParameter = *(((unsigned short *) value)+1);
 	Actor* ab = ( Actor* ) tar;
 	Map *map = core->GetGame()->GetCurrentMap();
 	ab->SetPosition( map, parameters->XpointParameter, parameters->YpointParameter, true );
@@ -4580,7 +4626,14 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	int flags)
 {
 	ActorMgr* aM = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
-	DataStream* ds = core->GetResourceMgr()->GetResource( parameters->string0Parameter, IE_CRE_CLASS_ID );
+	DataStream* ds;
+
+	if(flags & CC_STRING1) {
+		ds = core->GetResourceMgr()->GetResource( parameters->string1Parameter, IE_CRE_CLASS_ID );
+	}
+	else {
+		ds = core->GetResourceMgr()->GetResource( parameters->string0Parameter, IE_CRE_CLASS_ID );
+	}
 	aM->Open( ds, true );
 	Actor* ab = aM->GetActor();
 	core->FreeInterface( aM );
@@ -4611,7 +4664,8 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	Map* map;
 	Game* game=core->GetGame();
 	if(Sender->Type==ST_AREA) {
-		map = game->GetMap(Sender->scriptName);
+		map = (Map*) Sender;
+//game->GetMap(Sender->GetScriptName() );
 	}
 	else {
 		map = game->GetCurrentMap( );
@@ -4707,15 +4761,13 @@ void GameScript::Ally(Scriptable* Sender, Action* parameters)
 	actor->SetStat( IE_EA, 4 );
 }
 
+/** GemRB extension: you can replace baldur.bcs */
 void GameScript::ChangeAIScript(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
+	if(parameters->int0Parameter>7) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
-	//changeaiscript clears the queue, i believe
-	//	actor->ClearActions();
-	actor->SetScript( parameters->string0Parameter, parameters->int0Parameter );
+	Sender->SetScript( parameters->string0Parameter, parameters->int0Parameter );
 }
 
 void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
@@ -4748,7 +4800,7 @@ void GameScript::VerbalConstantHead(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	printf( "Displaying string on: %s\n", actor->scriptName );
+	printf( "Displaying string on: %s\n", actor->GetScriptName() );
 	char *str=core->GetString( actor->StrRefs[parameters->int0Parameter], 2 );
 	GameControl *gc=core->GetGameControl();
 	if (gc) {
@@ -4765,7 +4817,7 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	printf( "Displaying string on: %s\n", actor->scriptName );
+	printf( "Displaying string on: %s\n", actor->GetScriptName() );
 	GameControl *gc=core->GetGameControl();
 	char *str = core->GetString( actor->StrRefs[parameters->int0Parameter], 2 );
 	if (gc) {
@@ -4774,16 +4826,21 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 	free(str);
 }
 
+/** in IWD2 this has no string parameter, saves the location into a local */
 void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
 {
 	unsigned int value;
 
 	*((unsigned short *) &value) = parameters->XpointParameter;
 	*(((unsigned short *) &value)+1) = (unsigned short) parameters->YpointParameter;
+	if(!parameters->string0Parameter[0]) {
+		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+	}
 	printf("SaveLocation: %s\n",parameters->string0Parameter);
 	SetVariable(Sender, parameters->string0Parameter, value);
 }
 
+/** in IWD2 this has no string parameter, saves the location into a local */
 void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 {
 	unsigned int value;
@@ -4791,16 +4848,24 @@ void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	*((unsigned short *) &value) = tar->XPos;
 	*(((unsigned short *) &value)+1) = (unsigned short) tar->YPos;
+	if(!parameters->string0Parameter[0]) {
+		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+	}
 	printf("SaveLocation: %s\n",parameters->string0Parameter);
 	SetVariable(Sender, parameters->string0Parameter, value);
 }
 
+/** you may omit the string0parameter, in this case this will be a */
+/** CreateCreatureAtSavedLocation */
 void GameScript::CreateCreatureAtLocation(Scriptable* Sender, Action* parameters)
 {
+	if(!parameters->string0Parameter[0]) {
+		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+	}
 	unsigned int value = CheckVariable(Sender, parameters->string0Parameter);
 	parameters->XpointParameter = *(unsigned short *) value;
-	parameters->XpointParameter = *(((unsigned short *) value)+1);
-	CreateCreatureCore(Sender, parameters, CC_CHECK_IMPASSABLE);
+	parameters->YpointParameter = *(((unsigned short *) value)+1);
+	CreateCreatureCore(Sender, parameters, CC_CHECK_IMPASSABLE|CC_STRING1);
 }
 
 void GameScript::WaitRandom(Scriptable* Sender, Action* parameters)
@@ -4853,6 +4918,28 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
+	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
+}
+/** this function extends bg2: movetosavedlocationn (sic), */
+/** iwd2 returntosavedlocation (with default variable) */
+/** use Sender as default subject */
+void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		tar = Sender;
+	}
+	if(tar->Type != ST_ACTOR) {
+		return;
+	}
+	
+	if(!parameters->string0Parameter[0]) {
+		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+	}
+	long value = (long) CheckVariable( Sender, parameters->string0Parameter );
+	parameters->XpointParameter = *(unsigned short *) value;
+	parameters->YpointParameter = *(((unsigned short *) value)+1);
+	Actor* actor = ( Actor* ) tar;
 	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
 }
 
@@ -4917,7 +5004,7 @@ void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 {
 	if (Sender) {
-		printf( "Displaying string on: %s (without name)\n", Sender->scriptName );
+		printf( "Displaying string on: %s (without name)\n", Sender->GetScriptName() );
 		//no need of freeing this string up!!!
 		Sender->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
 	}
@@ -4926,7 +5013,7 @@ void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 {
 	if (Sender) {
-		printf( "Displaying string on: %s\n", Sender->scriptName );
+		printf( "Displaying string on: %s\n", Sender->GetScriptName() );
 		//no need of freeing this string up!!!
 		Sender->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
 	}
@@ -4973,6 +5060,26 @@ void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 	actor->SetWait( 1 );
 }
 
+void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!target) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) target;
+	long value;
+	if(!parameters->string0Parameter[0]) {
+		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+	}
+	value = (long) CheckVariable( target, parameters->string0Parameter );
+	unsigned short X = *(unsigned short *) value;
+	unsigned short Y = *(((unsigned short *) value)+1);
+	actor->Orientation = GetOrient( X, Y, actor->XPos, actor->YPos );
+	actor->resetAction = true;
+	actor->SetWait( 1 );
+}
+
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -4980,7 +5087,7 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	printf( "Displaying string on: %s\n", actor->scriptName );
+	printf( "Displaying string on: %s\n", actor->GetScriptName() );
 	StringBlock sb = core->strings->GetStringBlock( parameters->int0Parameter );
 	actor->DisplayHeadText( sb.text );
 	if (sb.Sound[0]) {
@@ -5048,8 +5155,14 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* parameters)
 
 void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 {
-	core->timer->SetScreenShake( parameters->XpointParameter,
-					parameters->YpointParameter, parameters->int0Parameter );
+	if(parameters->int1Parameter) { //IWD2 has a different profile
+		core->timer->SetScreenShake( parameters->int1Parameter,
+			parameters->int2Parameter, parameters->int0Parameter );
+	}
+	else {
+		core->timer->SetScreenShake( parameters->XpointParameter,
+			parameters->YpointParameter, parameters->int0Parameter );
+	}
 	Sender->SetWait( parameters->int0Parameter );
 }
 
@@ -5331,12 +5444,8 @@ void GameScript::Interact(Scriptable* Sender, Action* parameters)
 
 static Point* FindNearPoint(Scriptable* Sender, Point* p1, Point* p2, double& distance)
 {
-	long x1 = ( Sender->XPos - p1->x );
-	long y1 = ( Sender->YPos - p1->y );
-	double distance1 = sqrt( ( double ) ( x1* x1 + y1* y1 ) );
-	long x2 = ( Sender->XPos - p2->x );
-	long y2 = ( Sender->YPos - p2->y );
-	double distance2 = sqrt( ( double ) ( x2* x2 + y2* y2 ) );
+	int distance1 = Distance(p1->x, p1->y, Sender);
+	int distance2 = Distance(p2->x, p2->y, Sender);
 	if (distance1 < distance2) {
 		distance = distance1;
 		return p1;
@@ -5747,22 +5856,24 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	/* calling this, so it is simpler to change */
+	/* i'm not sure this is required here at all */
 	SetBeenInPartyFlags(Sender, parameters);
 	Actor* act = ( Actor* ) Sender;
-	core->GetGame()->JoinParty( act );
 	act->SetStat( IE_EA, PC );
 	if(core->HasFeature( GF_HAS_DPLAYER ))  {
 		act->SetScript( "DPLAYER2", SCR_DEFAULT );
 	}
-	if(core->HasFeature( GF_HAS_PDIALOG )) {
-		int pdtable = core->LoadTable( "pdialog" );
-		char* scriptingname = act->GetScriptName();
-		act->SetDialog( core->GetTable( pdtable )->QueryField( scriptingname,
-				"JOIN_DIALOG_FILE" ) );
+	int pdtable = core->LoadTable( "pdialog" );
+	if( pdtable >= 0 ) {
+		char* scriptname = act->GetScriptName();
+		char* resref = core->GetTable( pdtable )->QueryField( scriptname, "JOIN_DIALOG_FILE");
+		if( resref!=core->GetTable( pdtable )->QueryField((unsigned int)-1) ) {
+			act->SetDialog( resref );
+		}
 		core->DelTable( pdtable );
 	}
+	core->GetGame()->JoinParty( act );
 	core->GetGUIScriptEngine()->RunFunction( "PopulatePortraitWindow" );
-
 }
 
 void GameScript::LeaveParty(Scriptable* Sender, Action* parameters)
@@ -5771,9 +5882,12 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	core->GetGame()->LeaveParty( act );
 	act->SetStat( IE_EA, NEUTRAL );
-	act->SetScript( "", SCR_DEFAULT );
+	core->GetGame()->LeaveParty( act );
+	if(core->HasFeature( GF_HAS_DPLAYER ))  {
+		act->SetScript( "", SCR_DEFAULT );
+	}
+/* apparently this is handled by script in dplayer3 (or2)
 	if(core->HasFeature( GF_HAS_PDIALOG )) {
 		int pdtable = core->LoadTable( "pdialog" );
 		char* scriptingname = act->GetScriptName();
@@ -5781,6 +5895,7 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* parameters)
 				"POST_DIALOG_FILE" ) );
 		core->DelTable( pdtable );
 	}
+*/
 	core->GetGUIScriptEngine()->RunFunction( "PopulatePortraitWindow" );
 }
 
@@ -5873,6 +5988,20 @@ void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 }
 
 void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->AnimID = IE_ANI_DIE;
+	//also set time for playdead!
+	actor->SetWait( parameters->int0Parameter );
+}
+
+/** no difference at this moment, but this action should be interruptable */
+/** probably that means, we don't have to issue the SetWait, but this needs */
+/** further research */
+void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.32 2004/04/21 17:41:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.33 2004/04/25 22:41:40 avenger_teambg Exp $
  *
  */
 
@@ -112,6 +112,7 @@ public:
 	void SetWait(unsigned long time);
 	void SetPosition(unsigned short XPos, unsigned short YPos);
 	void SetMySelf(Scriptable* MySelf);
+	char* GetScriptName();
 	void SetScript(int index, GameScript* script);
 	void DisplayHeadText(char* text);
 	void SetScriptName(char* text);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.16 2004/04/21 17:41:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.17 2004/04/25 22:41:41 avenger_teambg Exp $
  *
  */
 
@@ -42,6 +42,12 @@ Inventory::~Inventory()
 			Slots[i] = NULL;
 		}
 	}
+}
+
+void Inventory::AddItem(CREItem *item)
+{
+	Slots.push_back(item);
+	//Changed=true; //probably not needed, chests got no encumbrance
 }
 
 void Inventory::CalculateWeight()
@@ -76,12 +82,15 @@ void Inventory::SetSlotCount(unsigned int size)
 	Slots.assign((size_t) size, NULL);
 }
 
-/** if you supply a null string, then it checks if the slot is empty */
+/** if you supply a "" string, then it checks if the slot is empty */
 bool Inventory::HasItemInSlot(const char *resref, int slot)
 {
 	CREItem *item = Slots[slot];
 	if(!item) {
-		return false;
+		if(resref[0]) {
+			return false;
+		}
+		return true;
 	}
 	if (strnicmp( item->ItemResRef, resref, 8 )==0) {
 		return true;
@@ -124,7 +133,7 @@ bool Inventory::HasItem(const char *resref, ieDword flags)
 		if( (flags&item->Flags)!=flags) {
 				continue;
 		}
-		if (strnicmp(item->ItemResRef, resref,8) ) {
+		if (resref[0] && strnicmp(item->ItemResRef, resref,8) ) {
 			continue;
 		}
 		return true;
@@ -132,7 +141,7 @@ bool Inventory::HasItem(const char *resref, ieDword flags)
 	return false;
 }
 
-/** if resref is NULL, then destroy ALL items
+/** if resref is "", then destroy ALL items
     this function can look for stolen, equipped, identified, destructible
     etc, items. You just have to specify the flags in the bitmask
     specifying 1 in a bit signifies a requirement */
@@ -149,7 +158,7 @@ void Inventory::DestroyItem(const char *resref, ieDword flags)
 		if( (flags&item->Flags)!=flags) {
 				continue;
 		}
-		if(resref && strnicmp(item->ItemResRef, resref, 8) ) {
+		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
 		//we need to acknowledge that the item was destroyed
@@ -272,6 +281,24 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
 	return false;
 }
 
+void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, unsigned short x, unsigned short y)
+{
+	for (size_t i = 0; i < Slots.size(); i++) {
+		CREItem *item = Slots[i];
+		if (!item) {
+			continue;
+		}
+		if( (flags&item->Flags)!=flags) {
+				continue;
+		}
+		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
+			continue;
+		}
+		map->tm->AddItemToLocation(x, y, item);
+		Slots[i]=NULL;
+	}
+}
+
 #if 0
 
 // Returns index of first empty slot or slot with the same
@@ -282,6 +309,12 @@ int Inventory::FindCandidateSlot(CREItem* item, int first_slot)
 		return -1;
 
 	for (size_t i = first_slot; i < Slots.size(); i++) {
+		if(!Slots[i]) {
+			continue;
+		}
+		if(!(Slots[i]->Flags&IE_ITEM_STACKED) ) {
+			continue;
+		}
 	}
 
 	return -1;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.32 2004/04/22 20:44:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.33 2004/04/25 22:41:40 avenger_teambg Exp $
  *
  */
 
@@ -174,7 +174,6 @@ public:
 	/** Gets the DeathVariable */
 	char* GetScriptName(void)
 	{
-		//return ScriptName;
 		return scriptName;
 	}
 	/** Gets a Script ResRef */
@@ -201,5 +200,6 @@ public:
 	/* returns carried weight atm, could calculate with strength*/
 	int GetEncumbrance();
 	void Die(bool xp_allowed);
+	void DropItem(const char *resref, unsigned int flags);
 };
 #endif

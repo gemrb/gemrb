@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.110 2004/04/23 18:41:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.111 2004/04/25 22:41:41 avenger_teambg Exp $
  *
  */
 
@@ -618,6 +618,7 @@ struct TriggerLink {
 #define CC_MASK      3
 #define CC_CHECK_IMPASSABLE  4  //adjust position
 #define CC_PLAY_ANIM 8          //play animation
+#define CC_STRING1   16         //resref is in second string
 
 //begindialog flags
 #define BD_STRING0   0
@@ -692,12 +693,13 @@ private: //Internal Functions
 	static Targets* EvaluateObject(Object* oC);
 	static int ParseInt(const char*& src);
 	static void ParseString(const char*& src, char* tmp);
-
-public:
-	static void ExecuteAction(Scriptable* Sender, Action* aC);
-	static Action* GenerateAction(char* String, bool autoFree=false);
-	static void MoveBetweenAreasCore(Actor* actor, const char *area, int X, int Y, int face, bool adjust);
+	static int ValidForDialogCore(Scriptable* Sender, Actor* target);
 private:
+	static void CreateVisualEffectCore(int X, int Y, const char *effect);
+	static int SeeCore(Scriptable* Sender, Trigger* parameters, int flags);
+	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
+	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
+		int flags);
 	static Action *GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree);
 	static Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 	static Trigger* GenerateTrigger(char* String);
@@ -706,11 +708,6 @@ private:
 	static Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
 	static int GetHappiness(Scriptable* Sender, int reputation);
 	static int GetHPPercent(Scriptable* Sender);
-	static void CreateVisualEffectCore(int X, int Y, const char *effect);
-	static int SeeCore(Scriptable* Sender, Trigger* parameters, int flags);
-	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
-	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
-		int flags);
 	static Targets *XthNearestOf(Scriptable *Sender, Targets *parameters, int count);
 	static Targets *XthNearestEnemyOf(Scriptable *Sender, Targets *parameters, int count);
 
@@ -737,6 +734,9 @@ public:
 	static void SetVariable(Scriptable* Sender, const char* VarName, int value);
 	static void ExecuteString(Scriptable* Sender, char* String);
 	static bool EvaluateString(Scriptable* Sender, char* String);
+	static void ExecuteAction(Scriptable* Sender, Action* aC);
+	static Action* GenerateAction(char* String, bool autoFree=false);
+	static void MoveBetweenAreasCore(Actor* actor, const char *area, int X, int Y, int face, bool adjust);
 public: //Script Functions
 	static int ID_Alignment(Actor *actor, int parameter);
 	static int ID_Allegiance(Actor *actor, int parameter);
@@ -840,6 +840,7 @@ public: //Script Functions
 	static int Morale(Scriptable* Sender, Trigger* parameters);
 	static int MoraleGT(Scriptable* Sender, Trigger* parameters);
 	static int MoraleLT(Scriptable* Sender, Trigger* parameters);
+	static int NearbyDialog(Scriptable* Sender, Trigger* parameters);
 	static int NearLocation(Scriptable* Sender, Trigger* parameters);
 	static int NotStateCheck(Scriptable* Sender, Trigger* parameters);
 	static int NullDialog(Scriptable* Sender, Trigger* parameters);
@@ -913,8 +914,8 @@ public:
 	static void AddXPObject(Scriptable *Sender, Action* parameters);
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
-	static void BitGlobal(Scriptable* Sender, Action* parameters);
 	static void BitClear(Scriptable* Sender, Action* parameters);
+	static void BitGlobal(Scriptable* Sender, Action* parameters);
 	static void ChangeAIScript(Scriptable* Sender, Action* parameters);
 	static void ChangeAlignment(Scriptable* Sender, Action* parameters);
 	static void ChangeAllegiance(Scriptable* Sender, Action* parameters);
@@ -936,7 +937,6 @@ public:
 	static void CreateCreatureObject(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureOffScreen(Scriptable* Sender, Action* parameters);
-	static void CreateCreatureOffset(Scriptable* Sender, Action* parameters);
 	static void CreatePartyGold(Scriptable *Sender, Action *parameters);
 	static void CreateVisualEffect(Scriptable* Sender, Action* parameters);
 	static void CreateVisualEffectObject(Scriptable* Sender,
@@ -959,6 +959,7 @@ public:
 	static void Enemy(Scriptable* Sender, Action* parameters);
 	static void Face(Scriptable* Sender, Action* parameters);
 	static void FaceObject(Scriptable* Sender, Action* parameters);
+	static void FaceSavedLocation(Scriptable* Sender, Action* parameters);
 	static void FadeFromColor(Scriptable* Sender, Action* parameters);
 	static void FadeToColor(Scriptable* Sender, Action* parameters);
 	static void ForceAIScript(Scriptable* Sender, Action* parameters);
@@ -999,6 +1000,7 @@ public:
 	static void JumpToPoint(Scriptable* Sender, Action* parameters);
 	static void JumpToPointInstant(Scriptable* Sender, Action* parameters);
 	static void JumpToObject(Scriptable* Sender, Action* parameters);
+	static void JumpToSavedLocation(Scriptable* Sender, Action* parameters);
 	static void Kill(Scriptable* Sender, Action* parameters);
 	static void LeaveArea(Scriptable* Sender, Action* parameters);
 	static void LeaveAreaLUA(Scriptable* Sender, Action* parameters);
@@ -1021,49 +1023,51 @@ public:
 	static void MoveToPoint(Scriptable* Sender, Action* parameters);
 	static void MoveToObject(Scriptable* Sender, Action* parameters);
 	static void MoveToOffset(Scriptable* Sender, Action* parameters);
+	static void MoveToSavedLocation(Scriptable* Sender, Action* parameters);
 	static void MoveViewPoint(Scriptable* Sender, Action* parameters);
 	static void MoveViewObject(Scriptable* Sender, Action* parameters);
 	static void NIDSpecial1(Scriptable* Sender, Action* parameters);
 	static void NoAction(Scriptable* Sender, Action* parameters);
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
 	static void PlayDead(Scriptable* Sender, Action* parameters);
+	static void PlayDeadInterruptable(Scriptable* Sender, Action* parameters);
 	static void PlayerDialogue(Scriptable* Sender, Action* parameters);
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
-	static void SaveLocation(Scriptable* Sender, Action* parameters);
-	static void SetFaction(Scriptable* Sender, Action* parameters);
-	static void SetHP(Scriptable* Sender, Action* parameters);
-	static void SetInternal(Scriptable* Sender, Action* parameters);
-	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
-	static void SetQuestDone(Scriptable* Sender, Action* parameters);
-	static void SetTeam(Scriptable* Sender, Action* parameters);
-	static void SetTextColor(Scriptable* Sender, Action* parameters);
-	static void SetVisualRange(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaFlag(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaType(Scriptable* Sender, Action* parameters);
 	static void RemoveJournalEntry(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
+	static void SaveLocation(Scriptable* Sender, Action* parameters);
 	static void SaveObjectLocation(Scriptable* Sender, Action* parameters);
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
 	static void SetAnimState(Scriptable* Sender, Action* parameters);
 	static void SetApparentName(Scriptable* Sender, Action* parameters);
-	static void SetRegularName(Scriptable* Sender, Action* parameters);
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
-
 	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
+	static void SetFaction(Scriptable* Sender, Action* parameters);
 	static void SetGlobal(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTimer(Scriptable* Sender, Action* parameters);
+	static void SetHP(Scriptable* Sender, Action* parameters);
+	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
+	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
 	static void SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters);
 	static void SetPlayerSound(Scriptable* Sender, Action* parameters);
+	static void SetQuestDone(Scriptable* Sender, Action* parameters);
+	static void SetRegularName(Scriptable* Sender, Action* parameters);
+	static void SetTeam(Scriptable* Sender, Action* parameters);
+	static void SetTextColor(Scriptable* Sender, Action* parameters);
+
 	static void SetTokenGlobal(Scriptable* Sender, Action* parameters);
+	static void SetVisualRange(Scriptable* Sender, Action* parameters);
 	static void SG(Scriptable* Sender, Action* parameters);
 	static void SmallWait(Scriptable* Sender, Action* parameters);
-	static void StartCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void StartCutScene(Scriptable* Sender, Action* parameters);
+	static void StartCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void StartDialogue(Scriptable* Sender, Action* parameters);
 	static void StartDialogueInterrupt(Scriptable* Sender, Action* parameters);
 	static void StartDialogueNoSet(Scriptable* Sender, Action* parameters);

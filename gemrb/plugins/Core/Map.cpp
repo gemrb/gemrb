@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.95 2004/04/23 18:41:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.96 2004/04/25 22:41:41 avenger_teambg Exp $
  *
  */
 
@@ -473,9 +473,22 @@ Actor* Map::GetActor(unsigned int x, unsigned int y, int flags)
 
 Actor* Map::GetActor(const char* Name)
 {
-	for (size_t i = 0; i < actors.size(); i++) {
-		Actor* actor = actors.at( i );
+	unsigned int i = actors.size();
+	while(i--) {
+		Actor* actor = actors[i];
 		if (stricmp( actor->scriptName, Name ) == 0) {
+			return actor;
+		}
+	}
+	return NULL;
+}
+
+Actor* Map::GetActorByDialog(const char *resref)
+{
+	unsigned int i = actors.size();
+	while(i--) {
+		Actor* actor = actors[i];
+		if (strnicmp( actor->Dialog, resref, 8 ) == 0) {
 			return actor;
 		}
 	}
@@ -486,8 +499,9 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn)
 {
 	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
 	int count = 0;
-	for (size_t i = 0; i < actors.size(); i++) {
-		Actor* actor = actors.at( i );
+	unsigned int i = actors.size();
+	while(i--) {
+		Actor* actor = actors[i];
 		if (actor->BaseStats[IE_UNSELECTABLE] ||
 			( actor->BaseStats[IE_STATE_ID] & STATE_DEAD ) ||
 			( !actor->Active ))
@@ -556,8 +570,9 @@ void Map::GenerateQueue(int priority)
 		lastActorCount[priority] = ( int ) actors.size();
 	}
 	Qcount[priority] = 0;
-	for (unsigned int i = 0; i < actors.size(); i++) {
-		Actor* actor = actors.at( i );
+	unsigned int i=actors.size();
+	while(i--) {
+		Actor* actor = actors[i];
 		switch (priority) {
 			case 0:
 				//Top Priority
@@ -634,7 +649,8 @@ Actor* Map::GetRoot(int priority)
 
 void Map::AddVVCCell(ScriptedAnimation* vvc)
 {
-	for (unsigned int i = 0; i < vvcCells.size(); i++) {
+	unsigned int i=vvcCells.size();
+	while(i--) {
 		if (vvcCells[i] == NULL) {
 			vvcCells[i] = vvc;
 			return;
@@ -645,7 +661,8 @@ void Map::AddVVCCell(ScriptedAnimation* vvc)
 
 Animation* Map::GetAnimation(const char* Name)
 {
-	for (unsigned int i = 0; i < animations.size(); i++) {
+	unsigned int i=animations.size();
+	while(i--) {
 		if (strnicmp( animations[i]->ResRef, Name, 8 ) == 0) {
 			return animations[i];
 		}
@@ -665,7 +682,8 @@ void Map::AddEntrance(char* Name, short XPos, short YPos, short Face)
 
 Entrance* Map::GetEntrance(const char* Name)
 {
-	for (unsigned int i = 0; i < entrances.size(); i++) {
+	unsigned int i=entrances.size();
+	while(i--) {
 		if (stricmp( entrances[i]->Name, Name ) == 0) {
 			return entrances[i];
 		}
@@ -1093,6 +1111,7 @@ unsigned char Map::GetOrient(short sX, short sY, short dX, short dY)
 
 bool Map::IsVisible(short sX, short sY, short dX, short dY)
 {
+	sX/=16; sY/=12; dX/=16; dY/=12;
 	int diffx = sX - dX;
 	int diffy = sY - dY;
 	if (abs( diffx ) >= abs( diffy )) {
