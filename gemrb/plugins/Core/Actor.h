@@ -50,8 +50,6 @@ public:
 	bool  SetStat(unsigned int StatIndex, long Value);
         /** Returns the difference */
         long  GetMod(unsigned int StatIndex);
-	/** Sets a Stat Value (unsaved) */
-	bool  SetMod(unsigned int StatIndex, long Value);
         /** Returns a Stat Base Value */
         long  GetBase(unsigned int StatIndex);
         /** Sets a Stat Base Value */

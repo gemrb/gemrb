@@ -709,7 +709,7 @@ int Interface::SetCreatureStat(int Slot, unsigned int StatID, int StatValue, int
 	if(!actors[Slot])
 		return 0;
 	if(Mod)
-		actors[Slot]->SetMod(StatID, StatValue);
+		actors[Slot]->SetStat(StatID, StatValue);
 	else
 		actors[Slot]->SetBase(StatID, StatValue);
 	return 1;
