@@ -41,6 +41,7 @@ def OnLoad():
 
 	DoneButton = GemRB.GetControl(AppearanceWindow,0)
 	GemRB.SetText(AppearanceWindow,DoneButton,11973)
+	GemRB.SetButtonFlags(AppearanceWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	GemRB.SetEvent(AppearanceWindow,RightButton,IE_GUI_BUTTON_ON_PRESS,"RightPress")
 	GemRB.SetEvent(AppearanceWindow,LeftButton,IE_GUI_BUTTON_ON_PRESS,"LeftPress")

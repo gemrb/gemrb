@@ -98,6 +98,7 @@ def OnLoad():
 	AbilityWindow = GemRB.LoadWindow(4)
 
 	RollPress()
+	StorePress()
 	for i in range(0,6):
 		Button = GemRB.GetControl(AbilityWindow, i+30)
 		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
@@ -122,6 +123,7 @@ def OnLoad():
 	GemRB.SetText(AbilityWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(AbilityWindow,0)
 	GemRB.SetText(AbilityWindow,DoneButton,11973)
+	GemRB.SetButtonFlags(AbilityWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(AbilityWindow, 29)
 	GemRB.SetText(AbilityWindow,TextAreaControl,17247)
