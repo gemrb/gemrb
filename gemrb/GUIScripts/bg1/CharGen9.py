@@ -16,6 +16,7 @@ def OnLoad():
 	PortraitTable = GemRB.LoadTable("pictures")
 	PortraitName = GemRB.GetTableRowName(PortraitTable,GemRB.GetVar("PortraitIndex") )
 	GemRB.SetButtonPicture(CharGenWindow,PortraitButton, PortraitName+"L")
+	GemRB.UnloadTable(PortraitTable)
 
 	RaceTable = GemRB.LoadTable("races")
 	ClassTable = GemRB.LoadTable("classes")
@@ -122,9 +123,12 @@ def NextPress():
 	TmpTable=GemRB.LoadTable("repstart")
 	t=GemRB.GetTableValue(TmpTable,t,0)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
+	GemRB.UnloadTable(TmpTable)
+
 	TmpTable=GemRB.LoadTable("strtgold")
-	t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,0),GemRB.GetTableValue(TmpTable,Class,1),0 )
-	GemRB.SetPlayerStat(MyChar, IE_GOLD, t*2)
+	t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,1),GemRB.GetTableValue(TmpTable,Class,0), GemRB.GetTableValue(TmpTable,Class,2) )
+	GemRB.SetPlayerStat(MyChar, IE_GOLD, t*GemRB.GetTableValue(TmpTable,Class,3) )
+	GemRB.UnloadTable(TmpTable)
 
 	GemRB.SetPlayerStat(MyChar, IE_HATEDRACE, GemRB.GetVar("HatedRace") )
 	TmpTable=GemRB.LoadTable("ability")
@@ -132,11 +136,15 @@ def NextPress():
 	for i in range(0,AbilityCount):
 		StatID=GemRB.GetTableValue(TmpTable, i,4)
 		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Ability "+str(i) ) )
+	GemRB.UnloadTable(TmpTable)
+
 	TmpTable=GemRB.LoadTable("weapprof")
 	ProfCount = GemRB.GetTableRowCount(TmpTable)
 	for i in range(7,ProfCount):
 		StatID=GemRB.GetTableValue(TmpTable, i, 0)
 		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Prof "+str(i) ) )
+	GemRB.UnloadTable(TmpTable)
+
 	GemRB.SetPlayerStat(MyChar, IE_HAIR_COLOR, GemRB.GetVar("Color1") )
 	GemRB.SetPlayerStat(MyChar, IE_SKIN_COLOR, GemRB.GetVar("Color2") )
 	GemRB.SetPlayerStat(MyChar, IE_MAJOR_COLOR, GemRB.GetVar("Color4") )
@@ -168,6 +176,7 @@ def NextPress():
 		GemRB.EnterGame()
 	else:
 		#leaving multi player pregen
+		GemRB.UnloadWindow(CharGenWindow)
 		GemRB.SetNextScript("GUIMP")
 	return
 
