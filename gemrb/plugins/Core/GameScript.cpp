@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.121 2004/03/28 11:20:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.122 2004/03/29 23:41:57 edheldil Exp $
  *
  */
 
@@ -1444,9 +1444,9 @@ Action *GameScript::GenerateActionCore(const char *src, const char *str, int acI
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newAction->XpointParameter = strtol( src, &(char *) src, 10 );
+				newAction->XpointParameter = strtol( src, (char **) &src, 10 );
 				src++; //Skip .
-				newAction->YpointParameter = strtol( src, &(char *) src, 10 );
+				newAction->YpointParameter = strtol( src, (char **) &src, 10 );
 				src++; //Skip ]
 				break;
 
@@ -1471,11 +1471,11 @@ Action *GameScript::GenerateActionCore(const char *src, const char *str, int acI
 						value = GetIdsValue(src, idsTabName);
 					}
 					else {
-						value = strtol( src, &(char *) src, 0);
+						value = strtol( src, (char **) &src, 0);
 					}
 				}
 				else { //no IDS table
-					value = strtol( src, &(char *) src, 0);
+					value = strtol( src, (char **) &src, 0);
 				}
 				if (!intCount) {
 					newAction->int0Parameter = value;
@@ -1640,9 +1640,9 @@ Trigger *GameScript::GenerateTriggerCore(const char *src, const char *str, int t
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newTrigger->XpointParameter = strtol( src, &(char *) src, 10 );
+				newTrigger->XpointParameter = strtol( src, (char **) &src, 10 );
 				src++; //Skip .
-				newTrigger->YpointParameter = strtol( src, &(char *) src, 10 );
+				newTrigger->YpointParameter = strtol( src, (char **) &src, 10 );
 				src++; //Skip ]
 				break;
 
@@ -1667,11 +1667,11 @@ Trigger *GameScript::GenerateTriggerCore(const char *src, const char *str, int t
 						value = GetIdsValue(src, idsTabName);
 					}
 					else {
-						value = strtol( src, &(char *) src, 0);
+						value = strtol( src, (char **) &src, 0);
 					}
 				}
 				else { //no IDS table
-					value = strtol( src, &(char *) src, 0);
+					value = strtol( src, (char **) &src, 0);
 				}
 				if (!intCount) {
 					newTrigger->int0Parameter = value;
