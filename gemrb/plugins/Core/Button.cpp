@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.60 2004/04/26 15:15:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.61 2004/05/09 17:36:25 avenger_teambg Exp $
  *
  */
 
@@ -100,7 +100,7 @@ Button::~Button()
 	if (Text) {
 		free( Text );
 	}
-	free( palette );
+	video->FreePalette( palette );
 }
 /** Sets the 'type' Image of the Button to 'img'.
 'type' may assume the following values:

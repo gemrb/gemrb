@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.54 2004/05/09 14:49:09 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.55 2004/05/09 17:36:26 avenger_teambg Exp $
  *
  */
 
@@ -55,10 +55,11 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 
 TextArea::~TextArea(void)
 {
-	free( palette );
-	free( initpalette );
-	free( selected );
-	free( lineselpal );
+	Video *video = core->GetVideoDriver();
+	video->FreePalette( palette );
+	video->FreePalette( initpalette );
+	video->FreePalette( selected );
+	video->FreePalette( lineselpal );
 	for (size_t i = 0; i < lines.size(); i++) {
 		free( lines[i] );
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.33 2004/04/14 17:58:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.34 2004/05/09 17:36:28 avenger_teambg Exp $
  *
  */
 
@@ -35,13 +35,13 @@ MUSImp::MUSImp()
 	lastSound = 0xffffffff;
 #ifndef WIN32
 	if (core->CaseSensitive) {
-		//TODO: a better, generalised function 
+		//TODO: a better, less hackish function 
 		char path[_MAX_PATH];
-		strcpy( path, core->GamePath );
-		strcat( path, musicsubfolder );
-		if (!dir_exists( path )) {
-			musicsubfolder[0] = toupper( musicsubfolder[0] );
-		}
+		strncpy( path, core->GamePath, _MAX_PATH-sizeof(musicsubfolder) );
+		int pos = strlen(path);
+		memcpy( path+pos, musicsubfolder, sizeof(musicsubfolder) );
+		ResolveFilePath( path );
+		memcpy(musicsubfolder, path+pos, sizeof(musicsubfolder) );
 	}
 #endif
 }
@@ -287,13 +287,10 @@ void MUSImp::PlayMusic(char* name)
 	}
 	strcat( FName, name );
 	strcat( FName, ".acm" );
-	int soundID = core->GetSoundMgr()->StreamFile( FName );
 #ifndef WIN32
-	if (( soundID == -1 ) && core->CaseSensitive) {
 		ResolveFilePath( FName );
-		soundID = core->GetSoundMgr()->StreamFile( FName );
-	}
 #endif
+	int soundID = core->GetSoundMgr()->StreamFile( FName );
 	if (soundID == -1) {
 		core->GetSoundMgr()->Stop();
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.29 2004/04/04 20:22:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.30 2004/05/09 17:36:26 avenger_teambg Exp $
  *
  */
 
@@ -51,16 +51,16 @@ Font::Font(int w, int h, void* palette, bool cK, int index)
 	lastX = 0;
 	count = 0;
 	void* pixels = malloc( w* h );
-	sprBuffer = core->GetVideoDriver()->CreateSprite8( w, h, 8, pixels,
-											palette, cK, index );
+	sprBuffer = core->GetVideoDriver()->CreateSprite8( w, h, 8, pixels, palette, cK, index );
 	this->palette = core->GetVideoDriver()->GetPalette( sprBuffer );
 	maxHeight = h;
 }
 
 Font::~Font(void)
 {
-	free( palette );
-	core->GetVideoDriver()->FreeSprite( sprBuffer );
+	Video *video = core->GetVideoDriver();
+	video->FreePalette( palette );
+	video->FreeSprite( sprBuffer );
 	/*
 	Since we assume that the font was loaded from a factory Object,
 	we don't need to free the sprites, those will be freed directly
@@ -70,7 +70,7 @@ Font::~Font(void)
 	std::vector<Sprite2D*>::iterator m;
 	for(; chars.size() != 0; ) {
 	m = chars.begin();
-		core->GetVideoDriver()->FreeSprite((*m));
+		video->FreeSprite((*m));
 		chars.erase(m);
 	}
 	*/

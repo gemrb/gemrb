@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.167 2004/05/09 14:50:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.168 2004/05/09 17:36:26 avenger_teambg Exp $
  *
  */
 
@@ -173,13 +173,13 @@ Interface::~Interface(void)
 
 	FreeResourceVector( Font, fonts );
 	FreeResourceVector( Window, windows );
+	if (console) {
+		delete( console );
+	}
 
 	if (key) {
 		FreeInterface( key );
 	}	
-	if (video) {
-		FreeInterface( video );
-	}
 	if (strings) {
 		FreeInterface( strings );
 	}
@@ -192,6 +192,10 @@ Interface::~Interface(void)
 
 	if (windowmgr) {
 		FreeInterface( windowmgr );
+	}
+
+	if (video) {
+		FreeInterface( video );
 	}
 
 	if (timer) {
@@ -212,7 +216,6 @@ Interface::~Interface(void)
 	}
 	FreeInterfaceVector( Table, tables, tm );
 	FreeInterfaceVector( Symbol, symbols, sm );
-	delete( console );
 
 	if(INIquests) {
 		FreeInterface(INIquests);

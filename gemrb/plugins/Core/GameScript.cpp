@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.162 2004/05/09 14:50:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.163 2004/05/09 17:36:26 avenger_teambg Exp $
  *
  */
 
@@ -319,6 +319,7 @@ static ActionLink actionnames[] = {
 	{"globalsubglobal", GameScript::GlobalSubGlobal,AF_MERGESTRINGS},
 	{"globalxor", GameScript::GlobalXor,AF_MERGESTRINGS},
 	{"globalxorglobal", GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
+	{"hidecreature", GameScript::HideCreature,0},
 	{"hidegui", GameScript::HideGUI,0},
 	{"incinternal", GameScript::IncInternal,0},
 	{"incmoraleai", GameScript::IncMoraleAI,0},
@@ -5968,6 +5969,16 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* parameters)
 	}
 */
 	core->GetGUIScriptEngine()->RunFunction( "PopulatePortraitWindow" );
+}
+
+//no idea why we would need this  if we have activate/deactivate
+void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	tar->Active = parameters->int0Parameter;
 }
 
 void GameScript::Activate(Scriptable* Sender, Action* parameters)
