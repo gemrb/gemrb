@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.147 2004/03/31 21:31:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.148 2004/04/06 18:44:20 avenger_teambg Exp $
  *
  */
 
@@ -2229,7 +2229,7 @@ static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 	int count = 0;
 	for (int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
 		GAMJournalEntry* je = core->GetGame()->GetJournalEntry( i );
-		//printf ("JE: sec: %d;   text: %d, time: %d, chapter: %d, un09: %d, un0b: %d\n", je->Section, je->Text, je->Time, je->Chapter, je->unknown09, je->unknown0B);
+		//printf ("JE: sec: %d;   text: %d, time: %d, chapter: %d, un09: %d, un0b: %d\n", je->Section, je->Text, je->GameTime, je->Chapter, je->unknown09, je->unknown0B);
 		if (section == je->Section)
 			count++;
 	}
@@ -2252,7 +2252,7 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 			if (index == count) {
 				PyObject* dict = PyDict_New();
 				PyDict_SetItemString(dict, "Text", PyInt_FromLong (je->Text));
-				PyDict_SetItemString(dict, "Time", PyInt_FromLong (je->Time));
+				PyDict_SetItemString(dict, "GameTime", PyInt_FromLong (je->GameTime));
 				PyDict_SetItemString(dict, "Section", PyInt_FromLong (je->Section));
 				PyDict_SetItemString(dict, "Chapter", PyInt_FromLong (je->Chapter));
 
