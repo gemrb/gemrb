@@ -58,23 +58,23 @@ KeyImp::~KeyImp(void)
 
 bool KeyImp::LoadResFile(const char * resfile)
 {
-	char chitin[_MAX_PATH];
-	strcpy(chitin, resfile);
+	char fn[_MAX_PATH] = {0};
 #ifndef WIN32
 	if(core->CaseSensitive) {
-		char fn[_MAX_PATH] = {0};
 		ExtractFileFromPath(fn, resfile);
 		char * newname = FindInDir(core->GamePath, fn);
 		if(newname) {
-			strcpy(chitin, core->GamePath);
-			strcat(chitin, newname);
+			strcpy(fn, core->GamePath);
+			strcat(fn, newname);
 			free(newname);
 		}
 	}
+	else
 #endif
-	printf("[KEY Importer]: Opening %s...", resfile);
+	strcpy(fn,resfile);
+	printf("[KEY Importer]: Opening %s...", fn);
 	FileStream * f = new FileStream();
-	if(!f->Open(chitin)) {
+	if(!f->Open(fn)) {
 		printf("[ERROR]\nCannot open Chitin.key\n");
 		delete(f);
 		return false;
