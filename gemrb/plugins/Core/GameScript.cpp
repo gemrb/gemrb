@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.10 2003/12/15 09:52:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.11 2003/12/15 11:08:47 balrog994 Exp $
  *
  */
 
@@ -86,9 +86,9 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType)
 		actions[159] = ChangeAlignment;
 		actions[177] = TriggerActivation;
 		actions[202] = FadeToColor;
-		blocking[202] = true;
+		//blocking[202] = true;
 		actions[203] = FadeFromColor;
-		blocking[203] = true;
+		//blocking[203] = true;
 		//please note that IWD and SoA are different from action #231
 		actions[242] = Ally;
 		actions[254] = ScreenShake;
