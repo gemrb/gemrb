@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.246 2005/03/15 17:53:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.247 2005/03/19 17:30:09 avenger_teambg Exp $
  *
  */
 
@@ -314,6 +314,7 @@ static ActionLink actionnames[] = {
 	{"createcreatureoffscreen", GameScript::CreateCreatureOffScreen,0},
 	{"createitem", GameScript::CreateItem,0},
 	{"createitemglobal", GameScript::CreateItemNumGlobal,0},
+	{"createitemnumglobal", GameScript::CreateItemNumGlobal,0},
 	{"createpartygold", GameScript::CreatePartyGold,0},
 	{"createvisualeffect", GameScript::CreateVisualEffect,0},
 	{"createvisualeffectobject", GameScript::CreateVisualEffectObject,0},
@@ -323,6 +324,7 @@ static ActionLink actionnames[] = {
 	{"debug", GameScript::Debug,0},
 	{"debugoutput", GameScript::Debug,0},
 	{"deletejournalentry", GameScript::RemoveJournalEntry,0},
+	{"demoend", GameScript::QuitGame, 0}, //same for now
 	{"destroyalldestructableequipment", GameScript::DestroyAllDestructableEquipment,0},
 	{"destroyallequipment", GameScript::DestroyAllEquipment,0},
 	{"destroygold", GameScript::DestroyGold,0},
@@ -337,14 +339,17 @@ static ActionLink actionnames[] = {
 	{"displaystringhead", GameScript::DisplayStringHead,0},
 	{"displaystringheadowner", GameScript::DisplayStringHeadOwner,0},
 	{"displaystringheaddead", GameScript::DisplayStringHead,0}, //same?
+	{"displaystringnoname", GameScript::DisplayStringNoName,0},
 	{"displaystringnonamehead", GameScript::DisplayStringNoNameHead,0},
 	{"displaystringwait", GameScript::DisplayStringWait,AF_BLOCKING},
 	{"dropinventory", GameScript::DropInventory, 0},
 	{"dropitem", GameScript::DropItem, AF_BLOCKING},
+	{"endcredits", GameScript::EndCredits, 0},//movie
 	{"endcutscenemode", GameScript::EndCutSceneMode,0},
 	{"enemy", GameScript::Enemy,0},
 	{"equipitem", GameScript::EquipItem, AF_BLOCKING},
 	{"erasejournalentry", GameScript::RemoveJournalEntry,0},
+	{"expansionendcredits", GameScript::QuitGame, 0},//ends game too
 	{"explore", GameScript::Explore,0},
 	{"exploremapchunk", GameScript::ExploreMapChunk,0},
 	{"face", GameScript::Face,AF_BLOCKING},
@@ -393,6 +398,7 @@ static ActionLink actionnames[] = {
 	{"globalsubglobal", GameScript::GlobalSubGlobal,AF_MERGESTRINGS},
 	{"globalxor", GameScript::GlobalXor,AF_MERGESTRINGS},
 	{"globalxorglobal", GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
+	{"gotostartscreen", GameScript::QuitGame, 0},
 	{"help", GameScript::Help,0},
 	{"hideareaonmap", GameScript::HideAreaOnMap,0},
 	{"hidecreature", GameScript::HideCreature,0},
@@ -474,6 +480,7 @@ static ActionLink actionnames[] = {
 	{"removerangerhood", GameScript::RemoveRangerHood,0},
 	{"reputationinc", GameScript::ReputationInc,0},
 	{"reputationset", GameScript::ReputationSet,0},
+	{"resetfogofwar", GameScript::UndoExplore,0}, //pst
 	{"restorepartylocations", GameScript:: RestorePartyLocation,0},
 	//this is in iwd2, same as movetosavedlocation, with a default variable
 	{"returntosavedlocation", GameScript::MoveToSavedLocation, AF_BLOCKING},
@@ -536,6 +543,7 @@ static ActionLink actionnames[] = {
 	{"shout", GameScript::Shout,0},
 	{"sinisterpoof", GameScript::CreateVisualEffect,0},
 	{"smallwait", GameScript::SmallWait,AF_BLOCKING},
+	{"soundactivate", GameScript::SoundActivate,0},
 	{"startcutscene", GameScript::StartCutScene,0},
 	{"startcutscenemode", GameScript::StartCutSceneMode,0},
 	{"startdialog", GameScript::StartDialogue,AF_BLOCKING},
@@ -6101,6 +6109,11 @@ void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 	actor->RunAwayFrom( parameters->pointParameter, parameters->int0Parameter, false);
 }
 
+void GameScript::DisplayStringNoName(Scriptable* Sender, Action* parameters)
+{
+	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE|DS_NONAME);
+}
+
 void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 {
 	DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD|DS_CONSOLE|DS_NONAME);
@@ -6548,6 +6561,18 @@ void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
 	BeginDialog( Sender, parameters, BD_SOURCE | BD_TALKCOUNT | BD_INTERRUPT );
 }
 
+// not in IESDP but this one should affect ambients
+void GameScript::SoundActivate(Scriptable* /*Sender*/, Action* parameters)
+{
+	AmbientMgr * ambientmgr = core->GetSoundMgr()->GetAmbientMgr();
+	if(ambientmgr->isActive(parameters->objects[1]->objectName) != parameters->int0Parameter) {
+		ambientmgr->activate(parameters->objects[1]->objectName);
+	} else {
+		ambientmgr->deactivate(parameters->objects[1]->objectName);
+	}
+}
+
+// according to IESDP this action is about animations
 void GameScript::AmbientActivate(Scriptable* /*Sender*/, Action* parameters)
 {
 	Animation* anim = core->GetGame()->GetCurrentMap( )->GetAnimation( parameters->objects[1]->objectName );
@@ -6557,6 +6582,48 @@ void GameScript::AmbientActivate(Scriptable* /*Sender*/, Action* parameters)
 		return;
 	}
 	anim->Active = ( parameters->int0Parameter != 0 );
+}
+
+void GameScript::StaticStart(Scriptable* /*Sender*/, Action* parameters)
+{
+	Animation *anim = core->GetGame()->GetCurrentMap()->GetAnimation(parameters->objects[1]->objectName);
+	if (!anim) {
+		printf( "Script error: No Animation Named \"%s\"\n",
+			parameters->objects[1]->objectName );
+		return;
+	}
+	anim->Active = true;
+}
+
+void GameScript::StaticStop(Scriptable* /*Sender*/, Action* parameters)
+{
+	Animation *anim = core->GetGame()->GetCurrentMap()->GetAnimation(parameters->objects[1]->objectName);
+	if (!anim) {
+		printf( "Script error: No Animation Named \"%s\"\n",
+			parameters->objects[1]->objectName );
+		return;
+	}
+	anim->Active = false;
+}
+
+void GameScript::StaticPalette(Scriptable* /*Sender*/, Action* parameters)
+{
+	Animation *anim = core->GetGame()->GetCurrentMap()->GetAnimation(parameters->objects[1]->objectName);
+	if (!anim) {
+		printf( "Script error: No Animation Named \"%s\"\n",
+			parameters->objects[1]->objectName );
+		return;
+	}
+	ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
+	if (!bmp) {
+		return;
+	}
+	DataStream* s = core->GetResourceMgr()->GetResource( parameters->string0Parameter, IE_BMP_CLASS_ID );
+	bmp->Open( s, true );
+	Color *pal = (Color *) malloc( sizeof(Color*) * 256 );
+	bmp->GetPalette( 0, 256, pal );
+	core->FreeInterface( bmp );
+	anim->SetPalette( pal );
 }
 
 void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
@@ -8330,6 +8397,16 @@ void GameScript::SetRestEncounterChance(Scriptable * /*Sender*/, Action* paramet
 	Map *map=core->GetGame()->GetCurrentMap();
 	map->RestHeader.DayChance = parameters->int0Parameter;
 	map->RestHeader.NightChance = parameters->int1Parameter;
+}
+
+void GameScript::EndCredits(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	core->PlayMovie("credits");
+}
+
+void GameScript::ExpansionEndCredits(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	core->PlayMovie("ecredit");
 }
 
 void GameScript::QuitGame(Scriptable* /*Sender*/, Action* /*parameters*/)

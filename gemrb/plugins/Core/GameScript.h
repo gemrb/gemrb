@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.163 2005/03/14 09:08:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.164 2005/03/19 17:30:10 avenger_teambg Exp $
  *
  */
 
@@ -977,13 +977,16 @@ public:
 	static void DisplayString(Scriptable* Sender, Action* parameters);
 	static void DisplayStringHead(Scriptable* Sender, Action* parameters);
 	static void DisplayStringHeadOwner(Scriptable* Sender, Action* parameters);
+	static void DisplayStringNoName(Scriptable* Sender, Action* parameters);
 	static void DisplayStringNoNameHead(Scriptable* Sender, Action* parameters);
 	static void DisplayStringWait(Scriptable* Sender, Action* parameters);
 	static void DropInventory(Scriptable* Sender, Action* parameters);
 	static void DropItem(Scriptable* Sender, Action* parameters);
+	static void EndCredits(Scriptable* Sender, Action* parameters);
 	static void EndCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void Enemy(Scriptable* Sender, Action* parameters);
 	static void EquipItem(Scriptable *Sender, Action *parameters);
+	static void ExpansionEndCredits(Scriptable* Sender, Action* parameters);
 	static void Explore(Scriptable *Sender, Action *parameters);
 	static void ExploreMapChunk(Scriptable *Sender, Action *parameters);
 	static void Face(Scriptable* Sender, Action* parameters);
@@ -1144,6 +1147,7 @@ public:
 	static void SG(Scriptable* Sender, Action* parameters);
 	static void Shout(Scriptable* Sender, Action* parameters);
 	static void SmallWait(Scriptable* Sender, Action* parameters);
+	static void SoundActivate(Scriptable* Sender, Action* parameters);
 	static void StartCutScene(Scriptable* Sender, Action* parameters);
 	static void StartCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void StartDialogue(Scriptable* Sender, Action* parameters);
@@ -1158,6 +1162,9 @@ public:
 	static void StartMusic(Scriptable* Sender, Action* parameters);
 	static void StartSong(Scriptable* Sender, Action* parameters);
 	static void StartStore(Scriptable* Sender, Action* parameters);
+	static void StaticPalette(Scriptable* Sender, Action* parameters);
+	static void StaticStart(Scriptable* Sender, Action* parameters);
+	static void StaticStop(Scriptable* Sender, Action* parameters);
 	static void StopMoving(Scriptable* Sender, Action* parameters);
 	static void StorePartyLocation(Scriptable *Sender, Action* parameters);
 	static void Swing(Scriptable* Sender, Action* parameters);
