@@ -961,3 +961,17 @@ bool Interface::DelSymbol(int index)
 	symbols[index].free = true;
 	return true;
 }
+
+int Interface::Roll(int dice, int size, int add)
+{
+	if(dice<1)
+		return 0;
+	if(size<1)
+		return 0;
+	if(dice>100)
+		return add+dice*size/2;
+	for(int i=0;i<dice;i++) {
+		add+=random()%size+1;
+	}
+	return add;
+}

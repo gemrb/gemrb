@@ -162,6 +162,9 @@ public:
 	SymbolMgr * GetSymbol(int index);
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
 	bool DelSymbol(int index);
+	/** Generates traditional random number xdy+z */
+	int Roll(int dice, int size, int add);
+
 private:
 	bool LoadConfig(void);
 public:
