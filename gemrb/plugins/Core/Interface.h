@@ -19,6 +19,7 @@
 #include "Button.h"
 #include "Console.h"
 #include "SoundMgr.h"
+#include "Variables.h"
 
 #ifdef WIN32
 
@@ -52,6 +53,7 @@ private:
 	SoundMgr * soundmgr;
 	/** Windows Array */
 	std::vector<Window*> windows;
+	Variables * vars;
 public:
 	Interface(void);
 	~Interface(void);

@@ -39,8 +39,27 @@ inline int Variables::GetCount() const
 	{ return m_nCount; }
 inline bool Variables::IsEmpty() const
 	{ return m_nCount == 0; }
+inline POSITION Variables::GetStartPosition() const
+        { return (m_nCount == 0) ? NULL : BEFORE_START_POSITION; }
+
 /////////////////////////////////////////////////////////////////////////////
 // out of lines
+/*
+        ASSERT(m_pHashTable != NULL);  // never call on empty map
+
+        CAssoc* pAssocRet = (CAssoc*)rNextPosition;
+        ASSERT(pAssocRet != NULL);
+
+        if (pAssocRet == (CAssoc*) BEFORE_START_POSITION)
+        {
+                // find the first association
+                for (UINT nBucket = 0; nBucket < m_nHashTableSize; nBucket++)
+                        if ((pAssocRet = m_pHashTable[nBucket]) != NULL)
+                                break;
+                ASSERT(pAssocRet != NULL);  // must find something
+        }
+*/
+
 Variables::Variables(int nBlockSize, int nHashTableSize)
 {
 	MYASSERT(nBlockSize > 0);

@@ -31,41 +31,6 @@
 
 #define MAX_VARIABLE_LENGTH  32
 
-#define MYASSERT(f) \
-  if(!(f))  \
-  {  \
-  printf("Assertion failed: %s %d",THIS_FILE, __LINE__); \
-		abort(); \
-  }
-
-struct Plex     // warning variable length structure
-{
-	Plex* pNext;
-
-	void* data() { return this+1; }
-  
-  static Plex* Create(Plex*& pHead, unsigned int nMax, unsigned int cbElement)
-  {
-    MYASSERT(nMax > 0 && cbElement > 0);
-    Plex* p = (Plex*) new unsigned char[sizeof(Plex) + nMax * cbElement];
-    // may throw exception
-    p->pNext = pHead;
-    pHead = p;  // change head (adds in reverse order for simplicity)
-    return p;
-  }
-  void FreeDataChain()
-  {// free this one and links
-    Plex* p = this;
-    while (p != NULL)
-    {
-      unsigned char* bytes = (unsigned char*) p;
-      Plex* pNext = p->pNext;
-      delete[] bytes;
-      p = pNext;
-    }
-  }
-};
-
 /////////////////////////////////////////////////////////////////////////////
 // Variables<unsigned long, VALUE>
 
