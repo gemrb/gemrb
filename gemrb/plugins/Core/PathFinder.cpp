@@ -117,7 +117,6 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 		return Return;
 	unsigned int px = startX;
 	unsigned int py = startY;
-	unsigned int newx, newy;
 	pos2 = goalY * Width + goalX;
 	while( (pos=py*Width+px) !=pos2) {
 		StartNode->Next = new PathNode;
