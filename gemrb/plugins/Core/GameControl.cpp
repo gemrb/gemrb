@@ -143,7 +143,17 @@ int GameControl::SetText(const char * string, int pos)
 /** Key Press Event */
 void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
-	printf("KeyPress\n");
+#ifdef _DEBUG
+	if(Key == 'a') {
+		if(overContainer) {
+			if(overContainer->Trapped && !(overContainer->TrapDetected)) {
+				overContainer->TrapDetected = 1;
+				core->GetVideoDriver()->FreeSprite(overContainer->outline->fill);
+				overContainer->outline->fill = NULL;
+			}
+		}
+	}
+#endif
 }
 /** Key Release Event */
 void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
