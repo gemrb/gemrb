@@ -127,13 +127,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			//draw traps with blue overlay
 		}
 		for(size_t i = 0; i < infoPoints.size(); i++) {
-#ifdef WIN32
-			unsigned long time = GetTickCount();
-#else
-			struct timeval tv;
-			gettimeofday(&tv, NULL);
-			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
-#endif
+			unsigned long time;
+			GetTime(time);
 			if((time - infoPoints[i]->startDisplayTime) >= 10000) {
 				infoPoints[i]->textDisplaying = 0;
 				std::vector<InfoPoint*>::iterator m;
@@ -464,22 +459,6 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 {	
 	Region Viewport = core->GetVideoDriver()->GetViewport();
 	switch(Key) {
-		case GEM_RIGHT:
-			Viewport.x += 64;
-		break;
-
-		case GEM_LEFT:
-			Viewport.x -= 64;
-		break;
-
-		case GEM_UP:
-			Viewport.y -= 64;
-		break;
-
-		case GEM_DOWN:
-			Viewport.y += 64;
-		break;
-
 		case GEM_MOUSEOUT:
 			moveX = 0;
 			moveY = 0;
