@@ -1,163 +1,166 @@
 #feedback
 import GemRB
 
-GamePlayWindow = 0
+FeedbackWindow = 0
 TextAreaControl = 0
 
 def OnLoad():
-	global GamePlayWindow, TextAreaControl
+	global FeedbackWindow, TextAreaControl
 	GemRB.LoadWindowPack("GUIOPT")
-	GamePlayWindow = GemRB.LoadWindow(9)
+	FeedbackWindow = GemRB.LoadWindow(9)
 
-	S1 = GemRB.GetControl(GamePlayWindow, 30)
-	S2 = GemRB.GetControl(GamePlayWindow, 31)
+	S1 = GemRB.GetControl(FeedbackWindow, 30)
+	S1S = GemRB.GetControl(FeedbackWindow, 8)
 
-	B1 = GemRB.GetControl(GamePlayWindow, 32)
-	B1B = GemRB.GetControl(GamePlayWindow, 10)
+	S2 = GemRB.GetControl(FeedbackWindow, 31)
+	S2S = GemRB.GetControl(FeedbackWindow, 9)
 
-	B2 = GemRB.GetControl(GamePlayWindow, 33)
-	B2B = GemRB.GetControl(GamePlayWindow, 11)
+	B1 = GemRB.GetControl(FeedbackWindow, 32)
+	B1B = GemRB.GetControl(FeedbackWindow, 10)
 
-	B3 = GemRB.GetControl(GamePlayWindow, 34)
-	B3B = GemRB.GetControl(GamePlayWindow, 12)
+	B2 = GemRB.GetControl(FeedbackWindow, 33)
+	B2B = GemRB.GetControl(FeedbackWindow, 11)
 
-	B4 = GemRB.GetControl(GamePlayWindow, 35)
-	B4B = GemRB.GetControl(GamePlayWindow, 13)
+	B3 = GemRB.GetControl(FeedbackWindow, 34)
+	B3B = GemRB.GetControl(FeedbackWindow, 12)
 
-	B5 = GemRB.GetControl(GamePlayWindow, 36)
-	B5B = GemRB.GetControl(GamePlayWindow, 14)
+	B4 = GemRB.GetControl(FeedbackWindow, 35)
+	B4B = GemRB.GetControl(FeedbackWindow, 13)
 
-	B6 = GemRB.GetControl(GamePlayWindow, 37)
-	B6B = GemRB.GetControl(GamePlayWindow, 15)
-	OkButton = GemRB.GetControl(GamePlayWindow, 26)
-	CancelButton = GemRB.GetControl(GamePlayWindow, 27)
-	TextAreaControl = GemRB.GetControl(GamePlayWindow, 28)
+	B5 = GemRB.GetControl(FeedbackWindow, 36)
+	B5B = GemRB.GetControl(FeedbackWindow, 14)
 
-        GemRB.SetText(GamePlayWindow, TextAreaControl, 18043)
-        GemRB.SetText(GamePlayWindow, OkButton, 11973)
-        GemRB.SetText(GamePlayWindow, CancelButton, 13727)
+	B6 = GemRB.GetControl(FeedbackWindow, 37)
+	B6B = GemRB.GetControl(FeedbackWindow, 15)
+	OkButton = GemRB.GetControl(FeedbackWindow, 26)
+	CancelButton = GemRB.GetControl(FeedbackWindow, 27)
+	TextAreaControl = GemRB.GetControl(FeedbackWindow, 28)
+
+        GemRB.SetText(FeedbackWindow, TextAreaControl, 18043)
+        GemRB.SetText(FeedbackWindow, OkButton, 11973)
+        GemRB.SetText(FeedbackWindow, CancelButton, 13727)
 	
-	GemRB.SetEvent(GamePlayWindow, S1, IE_GUI_BUTTON_ON_PRESS, "S1Press")
-#	GemRB.SetEvent(GamePlayWindow, S1S, IE_GUI_BUTTON_ON_PRESS, "S1SChange")
-	GemRB.SetEvent(GamePlayWindow, S2, IE_GUI_BUTTON_ON_PRESS, "S2Press")
-#	GemRB.SetEvent(GamePlayWindow, S2S, IE_GUI_BUTTON_ON_PRESS, "S2SChange")
+	GemRB.SetEvent(FeedbackWindow, S1, IE_GUI_BUTTON_ON_PRESS, "S1Press")
+	GemRB.SetEvent(FeedbackWindow, S1S, IE_GUI_SLIDER_ON_CHANGE, "S1SChange")
+	GemRB.SetEvent(FeedbackWindow, S2, IE_GUI_BUTTON_ON_PRESS, "S2Press")
+	GemRB.SetEvent(FeedbackWindow, S2S, IE_GUI_SLIDER_ON_CHANGE, "S2SChange")
 
-	GemRB.SetEvent(GamePlayWindow, B1, IE_GUI_BUTTON_ON_PRESS, "B1Press")
-	GemRB.SetEvent(GamePlayWindow, B1B, IE_GUI_BUTTON_ON_PRESS, "B1BPress")
-	GemRB.SetEvent(GamePlayWindow, B2, IE_GUI_BUTTON_ON_PRESS, "B2Press")
-	GemRB.SetEvent(GamePlayWindow, B2B, IE_GUI_BUTTON_ON_PRESS, "B2BPress")
-	GemRB.SetEvent(GamePlayWindow, B3, IE_GUI_BUTTON_ON_PRESS, "B3Press")
-	GemRB.SetEvent(GamePlayWindow, B3B, IE_GUI_BUTTON_ON_PRESS, "B3BPress")
-	GemRB.SetEvent(GamePlayWindow, B4, IE_GUI_BUTTON_ON_PRESS, "B4Press")
-	GemRB.SetEvent(GamePlayWindow, B4B, IE_GUI_BUTTON_ON_PRESS, "B4BPress")
-	GemRB.SetEvent(GamePlayWindow, B5, IE_GUI_BUTTON_ON_PRESS, "B5Press")
-	GemRB.SetEvent(GamePlayWindow, B5B, IE_GUI_BUTTON_ON_PRESS, "B5BPress")
-	GemRB.SetEvent(GamePlayWindow, B6, IE_GUI_BUTTON_ON_PRESS, "B6Press")
-	GemRB.SetEvent(GamePlayWindow, B6B, IE_GUI_BUTTON_ON_PRESS, "B6BPress")
-        GemRB.SetEvent(GamePlayWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
-        GemRB.SetEvent(GamePlayWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-        GemRB.ShowModal(GamePlayWindow)
+	GemRB.SetEvent(FeedbackWindow, B1, IE_GUI_BUTTON_ON_PRESS, "B1Press")
+	GemRB.SetEvent(FeedbackWindow, B1B, IE_GUI_BUTTON_ON_PRESS, "B1BPress")
+	GemRB.SetEvent(FeedbackWindow, B2, IE_GUI_BUTTON_ON_PRESS, "B2Press")
+	GemRB.SetEvent(FeedbackWindow, B2B, IE_GUI_BUTTON_ON_PRESS, "B2BPress")
+	GemRB.SetEvent(FeedbackWindow, B3, IE_GUI_BUTTON_ON_PRESS, "B3Press")
+	GemRB.SetEvent(FeedbackWindow, B3B, IE_GUI_BUTTON_ON_PRESS, "B3BPress")
+	GemRB.SetEvent(FeedbackWindow, B4, IE_GUI_BUTTON_ON_PRESS, "B4Press")
+	GemRB.SetEvent(FeedbackWindow, B4B, IE_GUI_BUTTON_ON_PRESS, "B4BPress")
+	GemRB.SetEvent(FeedbackWindow, B5, IE_GUI_BUTTON_ON_PRESS, "B5Press")
+	GemRB.SetEvent(FeedbackWindow, B5B, IE_GUI_BUTTON_ON_PRESS, "B5BPress")
+	GemRB.SetEvent(FeedbackWindow, B6, IE_GUI_BUTTON_ON_PRESS, "B6Press")
+	GemRB.SetEvent(FeedbackWindow, B6B, IE_GUI_BUTTON_ON_PRESS, "B6BPress")
+        GemRB.SetEvent(FeedbackWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
+        GemRB.SetEvent(FeedbackWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+        GemRB.ShowModal(FeedbackWindow)
 	return
 
 def S1Press():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18024)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18024)
 	return
 
 def S1SChange():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18024)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18024)
 #also handle slider1
 	return
 
 def S2Press():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18025)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18025)
 	return
 
 def S2SChange():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18025)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18025)
 #also handle slider2
 	return
 
 def B1Press():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18026)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18026)
 	return
 
 def B1BPress():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18026)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18026)
 #also handle to hit feedback
 	return
 
 def B2Press():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18027)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18027)
 	return
 
 def B2BPress():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18027)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18027)
 #also handle combat info
 	return
 
 def B3Press():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18028)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18028)
 	return
 
 def B3BPress():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18028)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18028)
 #also handle actions
 	return
 
 def B4Press():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18029)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18029)
 	return
 
 def B4BPress():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18029)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18029)
 #also handle state changes
 	return
 
 def B5Press():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18030)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18030)
 	return
 
 def B5BPress():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18030)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18030)
 #also handle selection
 	return
 
 def B6Press():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18031)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18031)
 	return
 
 def B6BPress():
-        global GamePlayWindow, TextAreaControl
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18031)
+        global FeedbackWindow, TextAreaControl
+	GemRB.SetText(FeedbackWindow, TextAreaControl, 18031)
 #also handle misc. feedback
 	return
 
 def OkPress():
-        global GamePlayWindow, TextAreaControl
-        GemRB.SetVisible(GamePlayWindow, 0)
-        GemRB.UnloadWindow(GamePlayWindow)
+        global FeedbackWindow, TextAreaControl
+        GemRB.SetVisible(FeedbackWindow, 0)
+        GemRB.UnloadWindow(FeedbackWindow)
         GemRB.SetNextScript("GUIOPT8")
         return
 
 def CancelPress():
-        global GamePlayWindow, TextAreaControl
-        GemRB.SetVisible(GamePlayWindow, 0)
-        GemRB.UnloadWindow(GamePlayWindow)
+        global FeedbackWindow, TextAreaControl
+        GemRB.SetVisible(FeedbackWindow, 0)
+        GemRB.UnloadWindow(FeedbackWindow)
         GemRB.SetNextScript("GUIOPT8")
         return
 

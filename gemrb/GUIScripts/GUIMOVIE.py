@@ -11,7 +11,7 @@ def OnLoad():
 	PlayButton = GemRB.GetControl(MovieWindow, 2)
 	CreditsButton = GemRB.GetControl(MovieWindow, 3)
 	DoneButton = GemRB.GetControl(MovieWindow, 4)
-#GemRB.Read2DAToControl(MovieWindow, TextAreaControl, "MOVIES")
+#GemRB.SetupListBoxFrom2DA(MovieWindow,TextAreaControl, "MOVIDESC")
 	GemRB.SetText(MovieWindow, PlayButton, 17318)
 	GemRB.SetText(MovieWindow, CreditsButton, 15591)
 	GemRB.SetText(MovieWindow, DoneButton, 11973)
