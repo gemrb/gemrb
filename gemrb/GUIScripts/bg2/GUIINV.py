@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.3 2004/08/28 21:11:46 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.4 2004/09/03 23:23:34 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -26,8 +26,8 @@
 from GUIDefines import *
 from ie_stats import *
 import GemRB
-from GUICommonWindows import GetActorPaperDoll, SetSelectionChangeHandler
-#import GUICommonWindows
+from GUICommonWindows import GetActorClassTitle, GetActorPaperDoll
+from GUICommonWindows import SetSelectionChangeHandler
 
 InventoryWindow = None
 
@@ -234,7 +234,7 @@ def UpdateInventoryWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# name
-	Label = GemRB.GetControl (Window, 0x10000039)
+	Label = GemRB.GetControl (Window, 0x10000032)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
 
 	# portrait
@@ -243,8 +243,11 @@ def UpdateInventoryWindow ():
 	Color2 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
 	Color3 = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
 	Color4 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
+	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
+	Color6 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
+	Color7 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 	GemRB.SetButtonPLT (Window, Button, GetActorPaperDoll (pc),
-		Color2, Color1, Color3, Color4, 0, 0, 0, 0)
+		Color2, Color1, Color3, Color6, Color5, Color4, Color7, 0)
 
 	# encumbrance
 	#Button = GemRB.GetControl (Window, 46);
@@ -269,10 +272,10 @@ def UpdateInventoryWindow ():
 	Label = GemRB.GetControl (Window, 0x10000040)
 	GemRB.SetText (Window, Label, str (GemRB.GameGetPartyGold ()))
 
-	# class (but this is set by a stat)
-	text = GemRB.GetPlayerStat (pc, IE_TITLE1)
+	# class
+	ClassTitle = GetActorClassTitle (pc)
 	Label = GemRB.GetControl (Window, 0x10000042)
-	GemRB.SetText (Window, Label, text)
+	GemRB.SetText (Window, Label, ClassTitle)
 
 	Button = GemRB.GetControl (Window, 62);
 	Color = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)

@@ -16,14 +16,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.3 2004/08/28 21:11:46 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.4 2004/09/03 23:23:34 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
 
 import GemRB
-import ie_stats
 from GUIDefines import *
+from ie_stats import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -85,7 +85,7 @@ def SetupMenuWindowControls (Window):
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMageWindow")
 	# Priest
 	Button = GemRB.GetControl (Window, 6)
-	GemRB.SetTooltip (Window, Button, 16310)
+	GemRB.SetTooltip (Window, Button, 14930)
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 6)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPriestWindow")
@@ -130,11 +130,30 @@ def SetupActionsWindowControls (Window):
 	# Formations
 	Button = GemRB.GetControl (Window, 4)
 	GemRB.SetTooltip (Window, Button, 44945)
+	return
+
+def GetActorClassTitle (actor):
+        ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
+        KitIndex = GemRB.GetPlayerStat (actor, IE_KIT) & 0xfff
+        Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+        ClassTable = GemRB.LoadTable ("classes")
+        KitTable = GemRB.LoadTable ("kitlist")
+
+        if ClassTitle==0:
+                if KitIndex == 0:
+                        ClassTitle=GemRB.GetTableValue(ClassTable, Class, 2)
+                else:
+                        ClassTitle=GemRB.GetTableValue(KitTable, KitIndex, 2)
+
+        GemRB.UnloadTable (ClassTable)
+        GemRB.UnloadTable (KitTable)
+        print "TITLE:", ClassTitle
+	return ClassTitle
 
 def GetActorPaperDoll (actor):
 	PortraitTable = GemRB.LoadTable ("PDOLLS")
-	anim_id = GemRB.GetPlayerStat (actor, ie_stats.IE_ANIMATION_ID)
-	level = GemRB.GetPlayerStat (actor, ie_stats.IE_ARMOR_TYPE)
+	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
+	level = GemRB.GetPlayerStat (actor, IE_ARMOR_TYPE)
 	row = "0x%04X" %anim_id
 	which = "LEVEL%d" %(level+1)
 	print row, which

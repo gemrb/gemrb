@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.5 2004/08/28 21:11:46 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.6 2004/09/03 23:23:34 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -67,7 +67,9 @@ import string
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from GUICommonWindows import SetSelectionChangeHandler, RunSelectionChangeHandler
+from GUICommonWindows import SetSelectionChangeHandler
+#, RunSelectionChangeHandler
+from GUICommonWindows import GetActorClassTitle
 from GUIWORLD import OpenReformPartyWindow
 
 ###################################################
@@ -132,11 +134,18 @@ def UpdateRecordsWindow ():
 	Label = GemRB.GetControl (Window, 0x10000030)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
 
+	# level
+	Label = GemRB.GetControl (Window, 0x10000011)
+	Level = GemRB.GetString (48156) + ': ' + str (GemRB.GetPlayerStat (pc, IE_LEVEL))
+	#multiclass!!!
+	GemRB.SetText (Window, Label, Level)
+
+	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
 	# portrait
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	GemRB.SetButtonPicture (Window, Button, GemRB.GetPlayerPortrait (pc,1))
+	GemRB.SetButtonPicture (Window, Button, GemRB.GetPlayerPortrait (pc,0))
 
 	# armorclass
 	Label = GemRB.GetControl (Window, 0x10000028)
@@ -197,26 +206,9 @@ def UpdateRecordsWindow ():
 	GemRB.SetText (Window, Label, text)
 
 	# class
-	ClassTitle = GemRB.GetPlayerStat (pc, IE_TITLE1)
-	print "TITLE:", ClassTitle
-	KitIndex = GemRB.GetPlayerStat (pc, IE_KIT)
-	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassTable = GemRB.LoadTable ("classes")
-	KitTable = GemRB.LoadTable ("kitlist")
-
-	if ClassTitle==0:
-		if KitIndex == 0:
-			ClassTitle=GemRB.GetTableValue(ClassTable,Class,2)
-		else:
-			ClassTitle=GemRB.GetTableValue(KitTable, KitIndex,2)
-
-	GemRB.UnloadTable (ClassTable)
-	GemRB.UnloadTable (KitTable)
-
+	ClassTitle = GetActorClassTitle (pc)
 	Label = GemRB.GetControl (Window, 0x1000000f)
 	GemRB.SetText (Window, Label, ClassTitle)
-	print "CLASS:", Class
-	print "KIT:", KitIndex
 
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)
@@ -247,21 +239,7 @@ def GetStatOverview (pc):
 	stats = []
 	# 19672 Level <LEVEL> Spells
 
-	ClassTitle = GemRB.GetPlayerStat (pc, IE_TITLE1)
-	print "TITLE:", ClassTitle
-	KitIndex = GemRB.GetPlayerStat (pc, IE_KIT)
-	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassTable = GemRB.LoadTable ("classes")
-	KitTable = GemRB.LoadTable ("kitlist")
-
-	if ClassTitle==0:
-		if KitIndex == 0:
-			ClassTitle=GemRB.GetTableValue(ClassTable,Class,2)
-		else:
-			ClassTitle=GemRB.GetTableValue(KitTable, KitIndex,2)
-
-	GemRB.UnloadTable (ClassTable)
-	GemRB.UnloadTable (KitTable)
+	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
 
 	# 48156 Level
 	Level = GemRB.GetString (48156) + ': ' + str (GemRB.GetPlayerStat (pc, IE_LEVEL))
