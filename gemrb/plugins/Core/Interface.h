@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.51 2003/12/03 18:35:55 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.52 2003/12/04 02:00:19 doc_wagon Exp $
  *
  */
 
@@ -132,7 +132,7 @@ public:
 	Color * GetPalette(int index, int colors);
 	/** Returns a preloaded Font */
 	Font * GetFont(char * ResRef);
-	Font * GetFont(int index);
+	Font * GetFont(unsigned int index);
 	/** Returns the button font */
 	Font * GetButtonFont();
 	/** Returns the Event Manager */
@@ -144,15 +144,15 @@ public:
 	/** Returns an actor index, by loading a creature */
 	int LoadCreature(char *ResRef, int InParty);
 	/** Removes a creature */
-	int UnloadCreature(int Slot);
+	int UnloadCreature(unsigned int Slot);
 	/** Returns the actor pointer for Slot */
-	Actor *GetActor(int Slot);
+	Actor *GetActor(unsigned int Slot);
 	/** Returns actor index for partyslot PartySlotCount */
 	int FindPlayer(int PartySlotCount);
 	/** Sets a stat for the creature in actor index Slot */
-	int SetCreatureStat(int Slot, unsigned int StatID, int StatValue, int Mod);
+	int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue, int Mod);
 	/** returns the stat of a creature (mod:1-modified, 0-base) */
-	int GetCreatureStat(int Slot, unsigned int StatID, int Mod);
+	int GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod);
 	/** Loads a Window in the Window Manager */
 	int LoadWindow(unsigned short WindowID);
 	/** Sets a Window on the Top */
@@ -225,17 +225,17 @@ public:
 	/** Gets the index of a loaded table, returns -1 on error */
 	int GetIndex(const char * ResRef);
 	/** Gets a Loaded Table by its index, returns NULL on error */
-	TableMgr * GetTable(int index);
+	TableMgr * GetTable(unsigned int index);
 	/** Frees a Loaded Table, returns false on error, true on success */
-	bool DelTable(int index);
+	bool DelTable(unsigned int index);
 	/** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
 	int LoadSymbol(const char * ResRef);
 	/** Gets the index of a loaded Symbol Table, returns -1 on error */
 	int GetSymbolIndex(const char * ResRef);
 	/** Gets a Loaded Symbol Table by its index, returns NULL on error */
-	SymbolMgr * GetSymbol(int index);
+	SymbolMgr * GetSymbol(unsigned int index);
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
-	bool DelSymbol(int index);
+	bool DelSymbol(unsigned int index);
 	/** Plays a Movie */
 	int PlayMovie(char * ResRef);
 	/** Generates traditional random number xdy+z */

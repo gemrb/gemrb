@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.85 2003/12/03 18:27:06 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.86 2003/12/04 02:00:12 doc_wagon Exp $
  *
  */
 
@@ -687,7 +687,7 @@ Font * Interface::GetFont(char * ResRef)
 	return NULL;
 }
 
-Font * Interface::GetFont(int index)
+Font * Interface::GetFont(unsigned int index)
 {
 	if(index >= fonts.size())
 		return NULL;
@@ -717,7 +717,7 @@ ScriptEngine * Interface::GetGUIScriptEngine()
 	return guiscript;
 }
 
-int Interface::UnloadCreature(int Slot)
+int Interface::UnloadCreature(unsigned int Slot)
 {
 	if(Slot>=actors.size())
 		return 0;
@@ -728,7 +728,7 @@ int Interface::UnloadCreature(int Slot)
 	return 1;
 }
 
-Actor *Interface::GetActor(int Slot)
+Actor *Interface::GetActor(unsigned int Slot)
 {
 	if(Slot>=actors.size())
 		return 0;
@@ -771,7 +771,7 @@ int Interface::FindPlayer(int PartySlotCount)
 	return index;
 }
 
-int Interface::GetCreatureStat(int Slot, unsigned int StatID, int Mod)
+int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 {
 	if(Slot>=actors.size())
 		return 0xdadadada;
@@ -782,7 +782,7 @@ int Interface::GetCreatureStat(int Slot, unsigned int StatID, int Mod)
 	return actors[Slot]->GetBase(StatID);
 }
 
-int Interface::SetCreatureStat(int Slot, unsigned int StatID, int StatValue, int Mod)
+int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue, int Mod)
 {
 	if(Slot>=actors.size())
 		return 0;
@@ -898,7 +898,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 		break;
 
 		default:
-			win->Visible = visible;
+			win->Visible = (visible != 0);
 		break;
 	}
 	return 0;
@@ -1151,7 +1151,7 @@ int Interface::GetIndex(const char * ResRef)
 	return -1;
 }
 /** Gets a Loaded Table by its index, returns NULL on error */
-TableMgr * Interface::GetTable(int index)
+TableMgr * Interface::GetTable(unsigned int index)
 {
 	if(index >= tables.size())
 		return NULL;
@@ -1160,7 +1160,7 @@ TableMgr * Interface::GetTable(int index)
 	return tables[index].tm;
 }
 /** Frees a Loaded Table, returns false on error, true on success */
-bool Interface::DelTable(int index)
+bool Interface::DelTable(unsigned int index)
 {
 	if(index >= tables.size())
 		return false;
@@ -1218,7 +1218,7 @@ int Interface::GetSymbolIndex(const char * ResRef)
 	return -1;
 }
 /** Gets a Loaded Symbol Table by its index, returns NULL on error */
-SymbolMgr * Interface::GetSymbol(int index)
+SymbolMgr * Interface::GetSymbol(unsigned int index)
 {
 	if(index >= symbols.size())
 		return NULL;
@@ -1227,7 +1227,7 @@ SymbolMgr * Interface::GetSymbol(int index)
 	return symbols[index].sm;
 }
 /** Frees a Loaded Symbol Table, returns false on error, true on success */
-bool Interface::DelSymbol(int index)
+bool Interface::DelSymbol(unsigned int index)
 {
 	if(index >= symbols.size())
 		return false;
