@@ -1,6 +1,11 @@
 #include "../../includes/win32def.h"
 #include "FileStream.h"
 
+#ifdef _DEBUG
+#include "Interface.h"
+extern Interface * core;
+#endif
+
 FileStream::FileStream(void)
 {
 	opened = false;
@@ -10,13 +15,20 @@ FileStream::FileStream(void)
 
 FileStream::~FileStream(void)
 {
-	if(autoFree && str)
+	if(autoFree && str) {
+#ifdef _DEBUG
+		core->FileStreamPtrCount--;
+#endif
 		fclose(str);
+	}
 }
 
 bool FileStream::Open(const char * filename, bool autoFree)
 {
 	if(str && this->autoFree) {
+#ifdef _DEBUG
+		core->FileStreamPtrCount--;
+#endif
 		fclose(str);
 	}
 	this->autoFree = autoFree;
@@ -24,6 +36,9 @@ bool FileStream::Open(const char * filename, bool autoFree)
 	if(str == NULL) {
 		return false;
 	}
+#ifdef _DEBUG
+	core->FileStreamPtrCount++;
+#endif
 	startpos = 0;
 	opened = true;
 	fseek(str, 0, SEEK_END);
@@ -37,12 +52,18 @@ bool FileStream::Open(const char * filename, bool autoFree)
 bool FileStream::Open(FILE * stream, int startpos, int size, bool autoFree)
 {
 	if(str && this->autoFree) {
+#ifdef _DEBUG
+		core->FileStreamPtrCount--;
+#endif
 		fclose(str);
 	}
 	this->autoFree = autoFree;
 	str = stream;
 	if(str == NULL)
 		return false;
+#ifdef _DEBUG
+	core->FileStreamPtrCount++;
+#endif
 	this->startpos = startpos;
 	opened = true;
 	this->size = size;

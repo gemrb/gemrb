@@ -23,6 +23,11 @@ public:
 	bool Open(DataStream * stream, bool autoFree = true);
 	long GetValue(const char * txt);
 	const char * GetValue(int val);
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

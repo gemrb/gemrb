@@ -55,6 +55,10 @@ Interface::Interface(void)
 	time_t t;
 	t = time(NULL);
 	srand(t);
+#ifdef _DEBUG
+	FileStreamPtrCount = 0;
+	CachedFileStreamPtrCount = 0;
+#endif
 }
 
 #define FreeInterfaceVector(type, variable, member)   \
@@ -386,7 +390,7 @@ ResourceMgr * Interface::GetResourceMgr()
 	return key;
 }
 
-char * Interface::TypeExt(SClass_ID type)
+const char * Interface::TypeExt(SClass_ID type)
 {
 	switch(type) {
 		case IE_2DA_CLASS_ID:
@@ -945,6 +949,7 @@ int Interface::LoadTable(const char * ResRef)
 	int ind = GetIndex(ResRef);
 	if(ind != -1)
 		return ind;
+	printf("(%s) Table not found... Loading from file\n", ResRef);
 	DataStream * str = key->GetResource(ResRef, IE_2DA_CLASS_ID);
 	if(!str)
 		return -1;

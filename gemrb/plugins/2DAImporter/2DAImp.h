@@ -79,6 +79,11 @@ public:
 			return rowNames[index];
 		return NULL;
 	};
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

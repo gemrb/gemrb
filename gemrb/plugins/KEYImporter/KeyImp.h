@@ -28,6 +28,11 @@ public:
 	bool LoadResFile(const char * resfile);
 	DataStream * GetResource(const char * resname, SClass_ID type);
 	void * GetFactoryResource(const char * resname, SClass_ID type, unsigned char mode = IE_NORMAL);
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

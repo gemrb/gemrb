@@ -15,7 +15,13 @@ CachedFileStream::CachedFileStream(char * stream, bool autoFree)
 	str = fopen(path, "rb");
 	if(str == NULL) {
 		FILE * src = fopen(stream, "rb");
+#ifdef _DEBUG
+		core->CachedFileStreamPtrCount++;
+#endif
 		FILE * dest = fopen(path, "wb");
+#ifdef _DEBUG
+		core->CachedFileStreamPtrCount++;
+#endif
 		void * buff = malloc(1024*1000);
 		do {
 			size_t len = fread(buff, 1, 1024*1000, src);
@@ -23,9 +29,18 @@ CachedFileStream::CachedFileStream(char * stream, bool autoFree)
 		} while(!feof(src));
 		free(buff);
 		fclose(src);
+#ifdef _DEBUG
+		core->CachedFileStreamPtrCount--;
+#endif
 		fclose(dest);
+#ifdef _DEBUG
+		core->CachedFileStreamPtrCount--;
+#endif
 		str = fopen(path, "rb");
 	}
+#ifdef _DEBUG
+	core->CachedFileStreamPtrCount++;
+#endif
 	startpos = 0;
 	fseek(str, 0, SEEK_END);
 	size = ftell(str);
@@ -47,7 +62,9 @@ CachedFileStream::CachedFileStream(CachedFileStream * cfs, int startpos, int siz
 	if(str == NULL) {
 		printf("\nDANGER WILL ROBINSON!!! str == NULL\nI'll wait a second hoping to open the file...");
 	}
-
+#ifdef _DEBUG
+	core->CachedFileStreamPtrCount++;
+#endif
 	fseek(str, startpos, SEEK_SET);
 	Pos = 0;
 }
@@ -55,6 +72,9 @@ CachedFileStream::CachedFileStream(CachedFileStream * cfs, int startpos, int siz
 CachedFileStream::~CachedFileStream(void)
 {
 	if(autoFree && str) {
+#ifdef _DEBUG
+		core->CachedFileStreamPtrCount--;
+#endif
 		fclose(str);
 	}
 	autoFree = false; //File stream destructor hack

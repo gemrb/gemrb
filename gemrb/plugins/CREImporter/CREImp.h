@@ -13,6 +13,11 @@ public:
 	~CREImp(void);
 	bool Open(DataStream * stream, bool autoFree = true);
 	Actor * GetActor();
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

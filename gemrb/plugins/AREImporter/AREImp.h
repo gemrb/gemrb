@@ -16,6 +16,11 @@ public:
 	~AREImp(void);
 	bool Open(DataStream * stream, bool autoFree = true);
 	Map * GetMap();
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

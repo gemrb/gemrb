@@ -37,6 +37,11 @@ public:
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
 	Sprite2D * GetPalette();
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

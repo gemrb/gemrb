@@ -18,7 +18,7 @@ class GEM_EXPORT Plugin
 public:
 	Plugin(void);
 	~Plugin(void);
-	void release(void);
+	virtual void release(void) = 0;
 };
 
 #endif

@@ -15,8 +15,13 @@ public:
 	~MOSImp(void);
 	bool Open(DataStream * stream, bool autoFree = true);
 	Sprite2D * GetImage();
-  /** No descriptions */
-  void GetPalette(int index, int colors, Color * pal);
+	/** No descriptions */
+	void GetPalette(int index, int colors, Color * pal);
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

@@ -120,10 +120,14 @@ Sprite2D * BMPImp::GetImage()
 {
 	Sprite2D * spr = NULL;
 	if(BitCount == 24) {
-		spr = core->GetVideoDriver()->CreateSprite(Width, Height, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, pixels);
+		void *p = malloc(Width*Height*3);
+		memcpy(p, pixels, Width*Height*3);
+		spr = core->GetVideoDriver()->CreateSprite(Width, Height, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, p);
 	}
 	else if(BitCount == 8) {
-		spr = core->GetVideoDriver()->CreateSprite8(Width, Height, 8, pixels, Palette);
+		void *p = malloc(Width*Height);
+		memcpy(p, pixels, Width*Height);
+		spr = core->GetVideoDriver()->CreateSprite8(Width, Height, 8, p, Palette);
 	}
 	return spr;
 }

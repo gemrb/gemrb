@@ -18,6 +18,11 @@ private:
 
 	void LoadMonsterMidRes(const char * ResRef, Actor * actor);
 	void LoadCritter(const char * ResRef, Actor * actor, bool bow);
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

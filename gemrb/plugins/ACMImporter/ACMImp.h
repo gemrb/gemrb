@@ -37,6 +37,11 @@ public:
 	bool Play(unsigned long index);
 	bool Stop(unsigned long index);
 	void ResetMusics();
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

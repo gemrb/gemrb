@@ -56,6 +56,11 @@ public:
 	{
 		return NULL;
 	}
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

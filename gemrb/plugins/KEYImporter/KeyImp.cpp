@@ -195,7 +195,7 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 				strcpy(path, core->CD5);
 			}
 			else {
-				printf("[KEYImporter]: Error: Cannot find Bif file... Resource unavailable.\n");
+				printf("[KEYImporter]: Error: Cannot find %s... Resource unavailable.\n", biffiles[bifnum].name);
 				return NULL;
 			}
 			strcat(path, biffiles[bifnum].name);

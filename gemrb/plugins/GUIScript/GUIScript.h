@@ -32,6 +32,11 @@ public:
 	bool RunFunction(const char * fname);
 	/** Exec a single String */
 	char * ExecString(const char * string);
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

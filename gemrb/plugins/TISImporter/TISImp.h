@@ -17,6 +17,11 @@ public:
 	bool Open(DataStream * stream, bool autoFree = true);
 	Tile * GetTile(unsigned short * indexes, int count);
 	Sprite2D * GetTile(int index);
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

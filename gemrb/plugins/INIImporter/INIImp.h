@@ -130,6 +130,11 @@ public:
 	}
 	const char * GetKeyAsString(const char * Tag, const char * Key, const char * Default);
 	const int GetKetAsInt(const char * Tag, const char * Key, const int Default);
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

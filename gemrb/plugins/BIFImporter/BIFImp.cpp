@@ -12,12 +12,22 @@ BIFImp::BIFImp(void)
 
 BIFImp::~BIFImp(void)
 {
-	if(stream)
+#ifdef _DEBUG
+	printf("BIFImp::~BIFImp()\n");
+#endif
+	if(stream) {
+#ifdef _DEBUG
+		printf("delete(stream);\n");
+#endif
 		delete(stream);
+	}
 }
 
 int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 {
+#ifdef _DEBUG
+	printf("BIFImp::OpenArchive(%s, %s)\n", filename, (cacheCheck ? "true" : "false"));
+#endif
 	DataStream *stmp;
 	if(stream) {
 		delete(stream);

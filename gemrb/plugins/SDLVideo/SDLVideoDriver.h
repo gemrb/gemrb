@@ -45,6 +45,11 @@ public:
 	{
 		return disp;
 	}
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

@@ -47,19 +47,24 @@ private:
 public: 
 	MUSImp();
 	~MUSImp();
-  /** Loads a PlayList for playing */
-  bool OpenPlaylist(const char * name);
-  /** Initializes the PlayList Manager */
-  bool Init();
-  /** Switches the current PlayList while playing the current one */
-  void SwitchPlayList(const char * name);
-  /** Ends the Current PlayList Execution */
-  void End();
-  void HardEnd();
-  /** Start the PlayList Music Execution */
-  void Start();
-  /** Plays the Next Entry */
-  void PlayNext();
+	/** Loads a PlayList for playing */
+	bool OpenPlaylist(const char * name);
+	/** Initializes the PlayList Manager */
+	bool Init();
+	/** Switches the current PlayList while playing the current one */
+	void SwitchPlayList(const char * name);
+	/** Ends the Current PlayList Execution */
+	void End();
+	void HardEnd();
+	/** Start the PlayList Music Execution */
+	void Start();
+	/** Plays the Next Entry */
+	void PlayNext();
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif

@@ -89,7 +89,7 @@ public:
 	//TODO: Core Methods in Interface Class
 	bool IsAvailable(SClass_ID filetype);
 	void * GetInterface(SClass_ID filetype);
-	char * TypeExt(SClass_ID type);
+	const char * TypeExt(SClass_ID type);
 	Video * GetVideoDriver();
 	ResourceMgr * GetResourceMgr();
 	char * GetString(unsigned long strref);
@@ -200,6 +200,10 @@ public:
 	bool ConsolePopped;
 	/** The Console Object */
 	Console * console;
+#ifdef _DEBUG
+	int FileStreamPtrCount;
+	int CachedFileStreamPtrCount;
+#endif
 };
 #ifndef GEM_BUILD_DLL
 #ifdef WIN32

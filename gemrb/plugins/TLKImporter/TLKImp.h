@@ -32,6 +32,11 @@ private:
 	   if dest is not NULL it also returns the decoded value
 	   */
 	int BuiltinToken(char *Token, char *dest);
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
 #endif
