@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.10 2005/02/15 22:54:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.11 2005/02/24 22:09:05 edheldil Exp $
  *
  */
 
@@ -212,7 +212,7 @@ int _fclose(_FILE* stream)
  */
 char* PathAppend (char* target, char* dir)
 {
-	if (target[strlen( target ) - 1] != PathDelimiter)
+	if (target[0] != 0 && target[strlen( target ) - 1] != PathDelimiter)
 		strncat( target, SPathDelimiter, _MAX_PATH );
 	strncat( target, dir, _MAX_PATH );
 

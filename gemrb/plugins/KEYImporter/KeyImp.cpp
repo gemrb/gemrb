@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.50 2005/02/23 20:45:26 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.51 2005/02/24 22:09:03 edheldil Exp $
  *
  */
 
@@ -33,15 +33,14 @@
 KeyImp::KeyImp(void)
 {
 #ifndef WIN32
+	// FIXME: Use FindInPath() and do NOT compile out for Windows
 	if (core->CaseSensitive) {
 		char path[_MAX_PATH];
-		strcpy( path, core->GamePath );
-		strcat( path, core->GameOverride );
+		PathJoin( path, core->GamePath, core->GameOverride, NULL );
 		if (!dir_exists( path )) {
 			core->GameOverride[0] = toupper( core->GameOverride[0] );
 		}
-		strcpy( path, core->GamePath );
-		strcat( path, core->GameData );
+		PathJoin( path, core->GamePath, core->GameData, NULL );
 		if (!dir_exists( path )) {
 			core->GameData[0] = toupper( core->GameData[0] );
 		}
@@ -67,8 +66,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 		ExtractFileFromPath( fn, resfile );
 		char* newname = FindInDir( core->GamePath, fn );
 		if (newname) {
-			strcpy( fn, core->GamePath );
-			strcat( fn, newname );
+			PathJoin( fn, core->GamePath, newname, NULL );
 			free( newname );
 		}
 	} else
@@ -126,7 +124,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 #ifndef WIN32
 		for (int p = 0; p < ASCIIZLen; p++) {
 			if (be.name[p] == '\\')
-				be.name[p] = '/';
+				be.name[p] = PathDelimiter;
 		}
 		if (core->CaseSensitive) {
 			char fullPath[_MAX_PATH], tmpPath[_MAX_PATH] = {0},
@@ -135,13 +133,11 @@ bool KeyImp::LoadResFile(const char* resfile)
 			if (ptr) {
 				strncpy( tmpPath, be.name, ( ptr + 1 ) - be.name );
 			}
-			strcpy( fullPath, core->GamePath );
-			strcat( fullPath, tmpPath );
+			PathJoin( fullPath, core->GamePath, tmpPath, NULL );
 			if (!dir_exists( fullPath )) {
 				tmpPath[0] = toupper( tmpPath[0] );
 				be.name[0] = toupper( be.name[0] );
-				strcpy( fullPath, core->GamePath );
-				strcat( fullPath, tmpPath );
+				PathJoin( fullPath, core->GamePath, tmpPath, NULL );
 			}
 			if (ptr) {
 				ExtractFileFromPath( fn, be.name );
@@ -150,8 +146,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 			}
 			char* newname = FindInDir( fullPath, fn );
 			if (newname) {
-				strcpy( be.name, tmpPath );
-				strcat( be.name, newname );
+				PathJoin( be.name, tmpPath, newname, NULL );
 				free( newname );
 			}
 		}
@@ -209,9 +204,7 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 	printMessage( "KEYImporter", "Searching for ", WHITE );
 	printf( "%.8s%s...", resname, core->TypeExt( type ) );
 	//Search it in the GemRB override Directory
-	strcpy( path, "override" ); //this shouldn't change
-	strcat( path, SPathDelimiter );
-	strcat( path, core->GameType );
+	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
 	SearchIn( core->CachePath, "", resname, type,
 		"Found in Cache" );
 	SearchIn( core->GemRBPath, path, resname, type,
@@ -229,18 +222,19 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 		int bifnum = ( ResLocator & 0xFFF00000 ) >> 20;
 		FILE* exist = NULL;
 		if (exist == NULL) {
-			strcpy( path, core->GamePath );
-			strcat( path, biffiles[bifnum].name );
+			PathJoin( path, core->GamePath, biffiles[bifnum].name, NULL );
 			exist = fopen( path, "rb" );
 			if (!exist) {
 				path[0] = toupper( path[0] );
 				exist = fopen( path, "rb" );
 			}
 			if (!exist) {
-				strcpy( path, core->GamePath );
-				strncat( path, biffiles[bifnum].name,
-					strlen( biffiles[bifnum].name ) - 4 );
-				strcat( path, ".cbf" );
+				PathJoin( path, core->GamePath, biffiles[bifnum].name, NULL );
+				strcpy( path + strlen( path ) - 4, ".cbf" );
+				//strcpy( path, core->GamePath );
+				//strncat( path, biffiles[bifnum].name,
+				//	strlen( biffiles[bifnum].name ) - 4 );
+				//strcat( path, ".cbf" );
 				exist = fopen( path, "rb" );
 				if (!exist) {
 					path[0] = toupper( path[0] );
@@ -265,18 +259,20 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 					biffiles[bifnum].name );
 					return NULL;
 			}
-			strcpy( path, BasePath );
-			strcat( path, biffiles[bifnum].name );
+			PathJoin( path, BasePath, biffiles[bifnum].name, NULL );
 #ifndef WIN32
 			ResolveFilePath(path);
 #endif
 			exist = fopen( path, "rb" );
 			if (exist == NULL) {
 				//Trying CBF Extension
-				strcpy( path, BasePath );
-				strncat( path, biffiles[bifnum].name,
-					strlen( biffiles[bifnum].name ) - 4 );
-				strcat( path, ".cbf" );
+				PathJoin( path, BasePath, biffiles[bifnum].name, NULL );
+				strcpy( path + strlen( path ) - 4, ".cbf" );
+
+				//strcpy( path, BasePath );
+				//strncat( path, biffiles[bifnum].name,
+				//	strlen( biffiles[bifnum].name ) - 4 );
+				//strcat( path, ".cbf" );
 #ifndef WIN32
 				ResolveFilePath(path);
 #endif
