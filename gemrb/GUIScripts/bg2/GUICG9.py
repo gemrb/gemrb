@@ -107,6 +107,7 @@ def OnLoad():
 	TextAreaControl = GemRB.GetControl(SkillWindow, 68)
 	GemRB.SetText(SkillWindow,TextAreaControl,9588)
 
+	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl = GemRB.GetControl(SkillWindow, 78)
 	GemRB.SetEvent(SkillWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
 	GemRB.SetVarAssoc(SkillWindow, ScrollBarControl, "TopIndex", RowCount-8) #decrease it with the number of controls
