@@ -95,7 +95,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Map * area = game->GetMap(MapIndex);
 	if(area) {
 		core->GSUpdate();
-		area->DrawMap(vp);
+		area->DrawMap(vp, this);
 		if(DisableMouse)
 			return;
 		short GameX = lastMouseX, GameY = lastMouseY;
@@ -124,13 +124,13 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				}
 			}
 		}
-		else if(overDoor) {
+		/*else if(overDoor) {
 			if(overDoor->DoorClosed)
 				video->DrawPolyline(overDoor->closed,cyan,true);
 			else {
 				video->DrawPolyline(overDoor->open,cyan,true);
 			}
-		}
+		}*/
 		//draw containers when ALT was pressed
 		if(DebugFlags&4) {
 			Container *c;
@@ -143,14 +143,14 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				}
 			}
 		}
-		else if(overContainer) {
+		/*else if(overContainer) {
 			if(overContainer->TrapDetected && overContainer->Trapped) {
 				video->DrawPolyline(overContainer->outline, red, true);
 			}
 			else {
 				video->DrawPolyline(overContainer->outline, cyan, true);
 			}
-		}
+		}*/
 		if(effect) {
 			if((selected.size() == 1)) {
 				Actor * actor = selected.at(0);
@@ -406,16 +406,27 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			nextCursor = overInfoPoint->Cursor;
 	}
 
-	overDoor = area->tm->GetDoor(GameX, GameY);
 	if(overDoor)
+		overDoor->Highlight = false;
+	overDoor = area->tm->GetDoor(GameX, GameY);
+	if(overDoor) {
+		overDoor->Highlight = true;
 		nextCursor = overDoor->Cursor;
+		overDoor->outlineColor = cyan;
+	}
 
+	if(overContainer)
+		overContainer->Highlight = false;
 	overContainer = area->tm->GetContainer(GameX, GameY);
 	if(overContainer) {
-		if(overContainer->TrapDetected && overContainer->Trapped)
+		overContainer->Highlight = true;
+		if(overContainer->TrapDetected && overContainer->Trapped) {
 				nextCursor=38;
-		else
+				overContainer->outlineColor = red;
+		} else {
 				nextCursor=2;
+				overContainer->outlineColor = cyan;
+		}
 	}
 
 	if(!DrawSelectionRect) {

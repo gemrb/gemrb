@@ -1,3 +1,5 @@
+class GameControl;
+
 #ifndef GAMECONTROL_H
 #define GAMECONTROL_H
 
@@ -45,9 +47,11 @@ private:
 	bool MouseIsDown;
 	Region SelectionRect;
 	short StartX, StartY;
+public:
 	Door * overDoor;
 	Container * overContainer;
 	InfoPoint * overInfoPoint;
+private:
 	unsigned char lastCursor;
 	short moveX, moveY;
 	unsigned short lastMouseX, lastMouseY;
