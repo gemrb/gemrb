@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.13 2004/02/29 19:32:34 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.14 2004/08/03 17:36:16 avenger_teambg Exp $
  *
  */
 
@@ -148,6 +148,7 @@ public:
 	int GetSaveGameCount();
 	SaveGame* GetSaveGame(int index);
 	void DeleteSaveGame(int index);
+	void CreateSaveGame(int index, const char *slotname);
 };
 
 #endif

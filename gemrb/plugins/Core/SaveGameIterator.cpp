@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.21 2004/08/02 18:00:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.22 2004/08/03 17:36:16 avenger_teambg Exp $
  *
  */
 
@@ -74,7 +74,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 
 
 	char dtmp[_MAX_PATH];
-	sprintf( dtmp, "%s%s%s", Path, SPathDelimiter, slotname );
+	snprintf( dtmp, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, slotname );
 
 	struct stat  fst;
 	if (stat( dtmp, &fst ))
@@ -84,7 +84,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 		return false;
 
 	char ftmp[_MAX_PATH];
-	sprintf( ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter,
+	snprintf( ftmp, _MAX_PATH, "%s%s%s.bmp", dtmp, SPathDelimiter,
 		 core->GameNameResRef );
 
 #ifndef WIN32
@@ -112,7 +112,7 @@ bool SaveGameIterator::RescanSaveGames()
 	save_slots.clear();
 
 	char Path[_MAX_PATH];
-	sprintf( Path, "%s%s", core->SavePath, PlayMode() );
+	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, PlayMode() );
 
 	DIR* dir = opendir( Path );
 	if (dir == NULL) //If we cannot open the Directory
@@ -153,7 +153,7 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 
 	int prtrt = 0;
 	char Path[_MAX_PATH];
-	sprintf( Path, "%s%s%s%s", core->SavePath, PlayMode(),
+	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(),
 		 SPathDelimiter, slotname );
 
 
@@ -188,6 +188,23 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 	return sg;
 }
 
+void SaveGameIterator::CreateSaveGame(int index, const char *slotname)
+{
+	char Path[_MAX_PATH];
+
+	if (index < 0 || index >= GetSaveGameCount()) {
+		index=GetSaveGameCount();
+	} else {
+		char* oldslotname  = save_slots[index];
+		snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, oldslotname );
+		core->DelTree(Path, false);
+		rmdir(Path);
+	}
+	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, slotname );
+	mkdir(Path,S_IWRITE|S_IREAD);
+	//save files here
+}
+
 void SaveGameIterator::DeleteSaveGame(int index)
 {
 	if (index < 0 || index >= GetSaveGameCount())
@@ -197,9 +214,8 @@ void SaveGameIterator::DeleteSaveGame(int index)
 
 
 	char Path[_MAX_PATH];
-	sprintf( Path, "%s%s%s%s", core->SavePath, PlayMode(), 
-		 SPathDelimiter, slotname );
-	DelTree( Path );
+	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, slotname );
+	core->DelTree( Path, false ); //remove all files from folder
 	rmdir( Path );
 
 	delete slotname;

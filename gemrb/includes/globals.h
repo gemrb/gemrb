@@ -106,9 +106,7 @@ char* FindInDir(char* Dir, char* Filename);
 void ResolveFilePath(char* FilePath);
 char* strupr(char* string);
 char* strlwr(char* string);
-void DelTree(char *Pt);
 #endif
-void DelTree(char* Pt);
 
 #ifdef WIN32
 #define GetTime(store) store = GetTickCount()

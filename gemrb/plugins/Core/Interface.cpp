@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.183 2004/08/02 22:10:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.184 2004/08/03 17:36:15 avenger_teambg Exp $
  *
  */
 
@@ -84,6 +84,7 @@ Interface::Interface(int iargc, char** iargv)
 	INIquests = NULL;
 	game = NULL;
 	timer = NULL;
+  evntmgr = NULL;
 	console = NULL;
 	slotmatrix = NULL;
 	slottypes = NULL;
@@ -244,6 +245,7 @@ Interface::~Interface(void)
 
 bool Interface::ReadStrrefs()
 {
+  int i;
         TableMgr * tab;
         int table=core->LoadTable("strings");
         memset(strref_table,-1,sizeof(strref_table) );
@@ -254,7 +256,7 @@ bool Interface::ReadStrrefs()
         if(!tab) {
                 goto end;
         }
-        for(int i=0;i<STRREFCOUNT;i++) {
+        for(i=0;i<STRREFCOUNT;i++) {
                 strref_table[i]=atoi(tab->QueryField(i,0));
         }
 end:
@@ -1965,6 +1967,7 @@ void Interface::LoadGame(int index)
 	DataStream* ds;
 	DataStream* sav;
 
+	DelTree((const char *) CachePath, true);
 	if (index == -1) {
 		//Load the Default Game
 		ds = GetResourceMgr()->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
@@ -2065,18 +2068,18 @@ bool Interface::InitItemTypes()
 	return (it && st);
 }
 
-bool Interface::CanUseItemType(int itype, int slottype)
+int Interface::CanUseItemType(int itype, int slottype)
 {
 	if( !slottype ) { 
 		//inventory slot, can hold any item, including invalid
-		return true;
+		return 1;
 	}
 	if( itype>=ItemTypes ) {
 		//invalid itemtype
-		return false;
+		return 0;
 	}
 	//if any bit is true, we return true (int->bool conversion)
-	return (bool) (slotmatrix[itype]&slottype);
+	return (slotmatrix[itype]&slottype);
 }
 
 void Interface::DisplayConstantString(int stridx, unsigned int color)
@@ -2095,10 +2098,54 @@ void Interface::DisplayConstantString(int stridx, unsigned int color)
         const char* format = "[/color][p][color=%lX]%s[/color][/p]";
         int newlen = (int)(strlen( format ) + strlen( text ) + 10);
         char* newstr = ( char* ) malloc( newlen );
-        sprintf( newstr, format, color, text );
+        snprintf( newstr, newlen, format, color, text );
         free(text);
         ta->AppendText( newstr, -1 );
         ta->AppendText( "", -1 );
         free( newstr );
 }
 
+static char *saved_extensions[]={".are",".sto",0};
+
+//returns true if file should be saved
+bool Interface::SavedExtension(const char *filename)
+{
+	char *str=strchr(filename,'.');
+	if(!str) return false;
+	int i=0;
+	while(saved_extensions[i]) {
+		if(!strcasecmp(saved_extensions[i], str) ) return true;
+		i++;
+	}
+	return false;
+}
+
+void Interface::DelTree(const char* Pt, bool onlysave)
+{
+        char Path[_MAX_PATH];
+        strcpy( Path, Pt );
+        DIR* dir = opendir( Path );
+        if (dir == NULL) {
+                return;
+        }
+        struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
+        if (de == NULL) {
+                closedir( dir );
+                return;
+        }
+        do {
+                char dtmp[_MAX_PATH];
+                struct stat fst;
+                snprintf( dtmp, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, de->d_name );
+                stat( dtmp, &fst );
+                if (S_ISDIR( fst.st_mode ))
+                        continue;
+                if (de->d_name[0] == '.')
+                        continue;
+		if (!onlysave || SavedExtension(de->d_name) ) {
+printf("*unlinking %s\n",dtmp);
+                	unlink( dtmp );
+		}
+        } while (( de = readdir( dir ) ) != NULL);
+        closedir( dir );
+}
