@@ -26,6 +26,7 @@
 #define GEM_RIGHT  2
 #define GEM_DELETE 3
 #define GEM_RETURN 4
+#define GEM_BACKSP 5
 
 #ifdef WIN32
 

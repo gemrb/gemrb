@@ -12,6 +12,7 @@
 #include "HCAnimationSeq.h"
 #include "Factory.h"
 #include "ImageMgr.h"
+#include "ActorMgr.h"
 #include "Font.h"
 #include "EventMgr.h"
 #include "WindowMgr.h"
@@ -72,6 +73,7 @@ private:
 	ScriptEngine * guiscript;
 	SoundMgr * soundmgr;
 	SaveGameIterator *sgiterator;
+	std::vector<Actor*> actors;
 	/** Windows Array */
 	std::vector<Window*> windows;
 	std::vector<int> topwin;
@@ -106,6 +108,8 @@ public:
 	WindowMgr * GetWindowMgr();
 	/** Get GUI Script Manager */
 	ScriptEngine * GetGUIScriptEngine();
+	/** Returns an actor index, by loading a creature */
+	int LoadCreature(char *ResRef);
 	/** Loads a Window in the Window Manager */
 	int LoadWindow(unsigned short WindowID);
 	/** Sets a Window on the Top */

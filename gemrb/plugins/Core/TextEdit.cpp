@@ -12,7 +12,8 @@ TextEdit::TextEdit(unsigned short maxLength)
 	Cursor = NULL;
 	Back = NULL;
 	CurPos = 0;
-	strncpy((char*)Buffer, "Text Edit", max);
+	Buffer[0]=0;
+	EditOnChange[0]=0;
 	Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 	palette = core->GetVideoDriver()->CreatePalette(white, black);
 }
@@ -71,10 +72,41 @@ void TextEdit::OnKeyPress(unsigned char Key, unsigned short Mod)
 				Buffer[i] = Buffer[i-1];
 			}
 			Buffer[CurPos] = Key;
+			Buffer[len+1] = 0;
 			CurPos++;
 		}
 	}
-	else if(Key == '\b') {
+	if(EditOnChange[0] != 0)
+              core->GetGUIScriptEngine()->RunFunction(EditOnChange);
+}
+/** Special Key Press */
+void TextEdit::OnSpecialKeyPress(unsigned char Key)
+{
+	int len;
+
+	((Window*)Owner)->Invalidate();
+	Changed = true;
+	switch(Key)
+	{
+	case GEM_LEFT:
+		if(CurPos > 0)
+			CurPos--;
+		break;
+	case GEM_RIGHT:
+		len = strlen((char*)Buffer);
+		if(CurPos < len) {
+			CurPos++;
+		}
+		break;
+	case GEM_DELETE:
+		len = strlen((char*)Buffer);
+		if(CurPos < len) {
+			for(int i = CurPos; i < len; i++) {
+				Buffer[i] = Buffer[i+1];
+			}
+		}
+		break;		
+	case GEM_BACKSP:
 		if(CurPos != 0) {
 			int len = strlen((char*)Buffer);
 			for(int i = CurPos; i < len; i++) {
@@ -83,32 +115,10 @@ void TextEdit::OnKeyPress(unsigned char Key, unsigned short Mod)
 			Buffer[len-1] = 0;
 			CurPos--;
 		}
+		break;
 	}
-	//else if(key == '     
-}
-/** Special Key Press */
-void TextEdit::OnSpecialKeyPress(unsigned char Key)
-{
-	((Window*)Owner)->Invalidate();
-	Changed = true;
-	if(Key == GEM_LEFT) {
-		if(CurPos > 0)
-			CurPos--;
-	}
-	else if(Key == GEM_RIGHT) {
-		int len = strlen((char*)Buffer);
-		if(CurPos < len) {
-			CurPos++;
-		}
-	}
-	else if(Key == GEM_DELETE) {
-		int len = strlen((char*)Buffer);
-		if(CurPos < len) {
-			for(int i = CurPos; i < len; i++) {
-				Buffer[i] = Buffer[i+1];
-			}
-		}			
-	}
+	if(EditOnChange[0] != 0)
+              core->GetGUIScriptEngine()->RunFunction(EditOnChange);
 }
 
 /** Sets the Text of the current control */

@@ -40,6 +40,10 @@ LONG CALLBACK WinMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 					core->PopupConsole();
 				break;
 
+				case VK_BACKSPACE:
+					key = GEM_BACKSP;
+				break;
+
 				case VK_RETURN:
 					key = GEM_RETURN;
 				break;

@@ -644,6 +644,21 @@ ScriptEngine * Interface::GetGUIScriptEngine()
 	return guiscript;
 }
 
+int Interface::LoadCreature(char *ResRef)
+{
+	ActorMgr *actormgr=(ActorMgr *) GetInterface(IE_CRE_CLASS_ID);
+	DataStream *stream=GetResourceMgr()->GetResource(ResRef,IE_CRE_CLASS_ID);
+	if(!actormgr->Open(stream, true))
+	{
+		FreeInterface(actormgr);
+		return 0;
+	}
+	Actor *actor=actormgr->GetActor();
+	FreeInterface(actormgr);
+	actors.push_back(actor);
+	return actors.size()-1;
+}
+
 void Interface::RedrawAll()
 {
 	for(unsigned int i = 0; i < windows.size(); i++) {
@@ -784,6 +799,14 @@ int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex,
 			{
 			Button * btn = (Button*)ctrl;
 			btn->SetEvent(funcName);
+			return 0;
+			}
+		break;
+
+		case IE_GUI_EDIT: //Slider
+			{
+			TextEdit * te = (TextEdit*)ctrl;
+			strncpy(te->EditOnChange, funcName,64);
 			return 0;
 			}
 		break;

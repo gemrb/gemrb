@@ -71,6 +71,8 @@ public: //Events
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
+	/** OnChange Scripted Event Function Name */
+	char EditOnChange[64];
 };
 
 #endif

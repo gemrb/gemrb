@@ -114,8 +114,12 @@ int SDLVideoDriver::SwapBuffers(void)
 					break;
 				}
 				unsigned char key = event.key.keysym.unicode & 0xff;
-				if((key == 0) || (key == 13)){
+				if(key<32 || key==127 ){
 					switch(event.key.keysym.sym) {
+						case SDLK_BACKSPACE:
+							key = GEM_BACKSP;
+						break;
+
 						case SDLK_DELETE:
 							key = GEM_DELETE;
 						break;
@@ -160,7 +164,7 @@ int SDLVideoDriver::SwapBuffers(void)
 				break;
 			}
 			unsigned char key = event.key.keysym.unicode & 0xff;
-			if(key == 0) {
+			if(key <32 || key==127) {
 				switch(event.key.keysym.sym) {
 					case SDLK_LEFT:
 						key = GEM_LEFT;
@@ -168,6 +172,10 @@ int SDLVideoDriver::SwapBuffers(void)
 
 					case SDLK_RIGHT:
 						key = GEM_RIGHT;
+					break;
+
+					case SDLK_BACKSPACE:
+						key = GEM_BACKSP;
 					break;
 
 					case SDLK_DELETE:
