@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.88 2003/12/04 23:37:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.89 2003/12/07 08:05:38 avenger_teambg Exp $
  *
  */
 
@@ -228,8 +228,8 @@ int Interface::Init()
 	strings->Open(fs, true);
 	printMessage("Core", "Loading Palettes...\n", WHITE);
 	DataStream * bmppal256 = NULL, * bmppal16 = NULL;
-	if(stricmp(core->GameType, "bg1") != 0) {
-		bmppal256 = key->GetResource("MPAL256\0", IE_BMP_CLASS_ID);
+	bmppal256 = key->GetResource("MPAL256\0", IE_BMP_CLASS_ID);
+	if(bmppal256) {
 		pal256 = (ImageMgr*)this->GetInterface(IE_BMP_CLASS_ID);
 		pal256->Open(bmppal256, true);
 	}
@@ -362,7 +362,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus("OK", LIGHT_GREEN);
-	if(stricmp(GameType, "iwd2") == 0) {
+	if(HasFeature(GF_HAS_PARTY_INI) ) {
 		printMessage("Core", "Loading IceWind Dale 2 Extension Files...", YELLOW);
 		INIparty = (DataFileMgr*)GetInterface(IE_INI_CLASS_ID);
 		FileStream * fs = new FileStream();
@@ -616,6 +616,9 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "LowerLabelText") == 0) {
 			SetFeature(atoi(value),GF_LOWER_LABEL_TEXT);
+		}
+		else if(stricmp(name, "HasPartyIni") == 0) {
+			SetFeature(atoi(value),GF_HAS_PARTY_INI);
 		}
 		else if(stricmp(name, "ForceStereo") == 0) {
 			ForceStereo = atoi(value);
