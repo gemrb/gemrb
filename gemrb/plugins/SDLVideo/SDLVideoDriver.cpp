@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.90 2005/02/25 15:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.91 2005/03/02 19:27:39 avenger_teambg Exp $
  *
  */
 
@@ -201,6 +201,12 @@ int SDLVideoDriver::SwapBuffers(void)
 						unsigned char key = (unsigned char) event.key.keysym.unicode;
 						if (key < 32 || key == 127) {
 							switch (event.key.keysym.sym) {
+								case SDLK_END:
+									key = GEM_END;
+									break;
+								case SDLK_HOME:
+									key = GEM_HOME;
+									break;
 								case SDLK_LEFT:
 									key = GEM_LEFT;
 									break;
@@ -820,7 +826,7 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D* spr, int x, int y,
 	SDL_LockSurface( backBuf );
 
 	unsigned char * src, * dst;
-  //reusing x and y!
+	//reusing x and y!
 
 	for (y = srect->y; y < srect->h; y++) {
 		if (( desty < yCorr ) || ( desty >= ( yCorr + Screen.h ) )) {
@@ -922,7 +928,11 @@ void SDLVideoDriver::SetViewport(int x, int y)
 
 void SDLVideoDriver::SetViewport(int x, int y, unsigned int w, unsigned int h)
 {
+	if (x>disp->w)
+		x=disp->w;
 	xCorr = x;
+	if (y>disp->h)
+		y=disp->h;
 	yCorr = y;
 	if (w>(unsigned int) disp->w)
 		w=0;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.24 2004/11/22 21:08:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.25 2005/03/02 19:27:38 avenger_teambg Exp $
  *
  */
 
@@ -117,6 +117,12 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 	( ( Window * ) Owner )->Invalidate();
 	Changed = true;
 	switch (Key) {
+		case GEM_HOME:
+			CurPos = 0;
+			break;
+		case GEM_END:
+			CurPos = strlen( (char * ) Buffer);
+			break;
 		case GEM_LEFT:
 			if (CurPos > 0)
 				CurPos--;
