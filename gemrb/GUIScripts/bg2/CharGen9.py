@@ -1,16 +1,19 @@
 #character generation (GUICG 0)
 import GemRB
 
-IE_SEX =        35
-IE_HATEDRACE =  49
-IE_KIT =        152
-IE_RACE =       201
-IE_CLASS =	202
-IE_MINOR_COLOR =209
-IE_MAJOR_COLOR =210
-IE_SKIN_COLOR = 211
-IE_HAIR_COLOR = 214
-IE_ALIGNMENT =  217
+IE_SEX =        	35
+IE_HATEDRACE =  	49
+IE_KIT =        	152
+IE_RACE =       	201
+IE_CLASS =		202
+IE_METAL_COLOR =	208
+IE_MINOR_COLOR =	209
+IE_MAJOR_COLOR =	210
+IE_SKIN_COLOR = 	211
+IE_LEATHER_COLOR = 	212
+IE_ARMOR_COLOR = 	213
+IE_HAIR_COLOR =		214
+IE_ALIGNMENT =  	217
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -139,11 +142,14 @@ def NextPress():
 	for i in range(7,ProfCount):
 		StatID=GemRB.GetTableValue(TmpTable, i, 0)
 		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Prof "+str(i) ) )
-	GemRB.FillPlayerInfo(MyChar) #does all the rest
 	GemRB.SetPlayerStat(MyChar, IE_HAIR_COLOR, GemRB.GetVar("Color1") )
 	GemRB.SetPlayerStat(MyChar, IE_SKIN_COLOR, GemRB.GetVar("Color2") )
-	GemRB.SetPlayerStat(MyChar, IE_MAJOR_COLOR, GemRB.GetVar("Color3") )
-	GemRB.SetPlayerStat(MyChar, IE_MINOR_COLOR, GemRB.GetVar("Color4") )
+	GemRB.SetPlayerStat(MyChar, IE_MAJOR_COLOR, GemRB.GetVar("Color4") )
+	GemRB.SetPlayerStat(MyChar, IE_MINOR_COLOR, GemRB.GetVar("Color3") )
+	GemRB.SetPlayerStat(MyChar, IE_METAL_COLOR, 0x1B )
+	GemRB.SetPlayerStat(MyChar, IE_LEATHER_COLOR, 0x16 )
+	GemRB.SetPlayerStat(MyChar, IE_ARMOR_COLOR, 0x17 )
+	GemRB.FillPlayerInfo(MyChar) #does all the rest
 	#LETS PLAY!!
 	GemRB.EnterGame()
 	return
