@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.176 2004/07/31 13:56:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.177 2004/08/02 16:55:22 avenger_teambg Exp $
  *
  */
 
@@ -2236,10 +2236,7 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 	}
 
 	int ind = core->PlayMovie( string );
-	if (ind == -1) {
-		return NULL;
-	}
-
+	//don't return NULL
 	return Py_BuildValue( "i", ind );
 }
 
