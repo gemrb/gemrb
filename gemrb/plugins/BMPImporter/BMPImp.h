@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.15 2005/03/14 16:42:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.16 2005/03/14 23:27:52 avenger_teambg Exp $
  *
  */
 
@@ -61,9 +61,11 @@ public:
 		unsigned char * p = ( unsigned char * ) pixels;
 		p += ( PaddedRowLength * y ) + ( x >> 1 );
 		if (x&1) {
+			*p &= ~15;
 			*p |= (unsigned char) (idx&15);
 		}
 		else {
+			*p &= 15;
 			*p |= (unsigned char) (idx<<4);
 		}
 	}
