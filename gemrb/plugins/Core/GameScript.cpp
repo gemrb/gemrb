@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.79 2004/02/28 18:39:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.80 2004/02/29 17:33:37 avenger_teambg Exp $
  *
  */
 
@@ -3239,7 +3239,15 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	}
 	Actor* act = ( Actor* ) Sender;
 	core->GetGame()->JoinParty( act );
+	act->SetStat( IE_EA, PC );
 	act->SetScript( "DPLAYER2", SCR_DEFAULT );
+	if(core->HasFeature( GF_HAS_PDIALOG )) {
+		int pdtable = core->LoadTable( "pdialog" );
+		char* scriptingname = act->GetScriptName();
+		act->SetDialog( core->GetTable( pdtable )->QueryField( scriptingname,
+				"JOIN_DIALOG_FILE" ) );
+		core->DelTable( pdtable );
+	}
 }
 
 void GameScript::LeaveParty(Scriptable* Sender, Action* parameters)
@@ -3249,6 +3257,15 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* parameters)
 	}
 	Actor* act = ( Actor* ) Sender;
 	core->GetGame()->LeaveParty( act );
+	act->SetStat( IE_EA, NEUTRAL );
+	act->SetScript( "", SCR_DEFAULT );
+	if(core->HasFeature( GF_HAS_PDIALOG )) {
+		int pdtable = core->LoadTable( "pdialog" );
+		char* scriptingname = act->GetScriptName();
+		act->SetDialog( core->GetTable( pdtable )->QueryField( scriptingname,
+				"POST_DIALOG_FILE" ) );
+		core->DelTable( pdtable );
+	}
 }
 
 void GameScript::Activate(Scriptable* Sender, Action* parameters)
@@ -3569,9 +3586,9 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender,
 		return;
 	}
 	int pdtable = core->LoadTable( "pdialog" );
-	Actor* actor = ( Actor* ) Sender;
-	char* scriptingname = actor->GetScriptName();
-	actor->SetDialog( core->GetTable( pdtable )->QueryField( scriptingname,
+	Actor* act = ( Actor* ) Sender;
+	char* scriptingname = act->GetScriptName();
+	act->SetDialog( core->GetTable( pdtable )->QueryField( scriptingname,
 			"POST_DIALOG_FILE" ) );
 	core->DelTable( pdtable );
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.30 2004/02/28 18:38:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.31 2004/02/29 17:33:37 avenger_teambg Exp $
  *
  */
 
@@ -62,8 +62,6 @@ Actor::Actor()
 {
 	int i;
 
-	//memset(BaseStats, 0, MAX_STATS*sizeof(*BaseStats));
-	//memset(Modified, 0, MAX_STATS*sizeof(*Modified));
 	for (i = 0; i < MAX_STATS; i++) {
 		BaseStats[i] = 0;
 		Modified[i] = 0;
@@ -109,6 +107,7 @@ void Actor::SetAnimationID(unsigned short AnimID)
 {
 	char tmp[7];
 	sprintf( tmp, "0x%04X", AnimID );
+
 	int AvatarTable = core->LoadTable( "avatars" );
 	TableMgr* at = core->GetTable( AvatarTable );
 	int RowIndex = at->GetRowIndex( tmp );
@@ -307,6 +306,9 @@ bool Actor::SetBase(unsigned int StatIndex, long Value)
 	}
 	BaseStats[StatIndex] = Value;
 	switch (StatIndex) {
+		case IE_ANIMATION_ID:
+			SetAnimationID( Value );
+			break;
 		case IE_EA:
 		case IE_UNSELECTABLE:
 		case IE_MORALEBREAK:
