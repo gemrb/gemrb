@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.150 2004/11/14 14:20:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.151 2004/11/15 21:54:45 avenger_teambg Exp $
  *
  */
 
@@ -969,6 +969,7 @@ public:
 	static void AddExperiencePartyGlobal(Scriptable *Sender, Action* parameters);
 	static void AddGlobals(Scriptable* Sender, Action* parameters);
 	static void AddJournalEntry(Scriptable* Sender, Action* parameters);
+	static void AddMapnote(Scriptable* Sender, Action* parameters);
 	static void AddWayPoint(Scriptable* Sender, Action* parameters);
 	static void AddXP2DA(Scriptable *Sender, Action* parameters);
 	static void AddXPObject(Scriptable *Sender, Action* parameters);
@@ -1135,6 +1136,7 @@ public:
 	static void RemoveAreaFlag(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaType(Scriptable* Sender, Action* parameters);
 	static void RemoveJournalEntry(Scriptable* Sender, Action* parameters);
+	static void RemoveMapnote(Scriptable* Sender, Action* parameters);
 	static void RemovePaladinHood(Scriptable* Sender, Action* parameters);
 	static void RemoveRangerHood(Scriptable* Sender, Action* parameters);
 	static void ReputationInc(Scriptable* Sender, Action* parameters);
@@ -1228,6 +1230,7 @@ public:
 	static Targets *FourthNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *FourthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *Gabber(Scriptable *Sender, Targets *parameters);
+	static Targets *LastCommandedBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastHeardBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastHelp(Scriptable *Sender, Targets *parameters);
 	static Targets *LastHitter(Scriptable *Sender, Targets *parameters);

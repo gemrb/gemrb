@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.213 2004/11/14 14:20:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.214 2004/11/15 21:54:41 avenger_teambg Exp $
  *
  */
 
@@ -262,6 +262,7 @@ static ActionLink actionnames[] = {
 	{"addexperiencepartyglobal", GameScript::AddExperiencePartyGlobal,AF_MERGESTRINGS},
 	{"addglobals", GameScript::AddGlobals,0},
 	{"addjournalentry", GameScript::AddJournalEntry,0},
+	{"addmapnote", GameScript::AddMapnote,0},
 	{"addwaypoint", GameScript::AddWayPoint,AF_BLOCKING},
 	{"addxp2da", GameScript::AddXP2DA,0},
 	{"addxpobject", GameScript::AddXPObject,0},
@@ -450,6 +451,7 @@ static ActionLink actionnames[] = {
 	{"removeareaflag", GameScript::RemoveAreaFlag,0},
 	{"removeareatype", GameScript::RemoveAreaType,0},
 	{"removejournalentry", GameScript::RemoveJournalEntry,0},
+	{"removemapnote", GameScript::RemoveMapnote,0},
 	{"removepaladinhood", GameScript::RemovePaladinHood,0},
 	{"removerangerhood", GameScript::RemoveRangerHood,0},
 	{"reputationinc", GameScript::ReputationInc,0},
@@ -570,6 +572,7 @@ static ObjectLink objectnames[] = {
 	{"fourthnearest", GameScript::FourthNearest},
 	{"fourthnearestenemyof", GameScript::FourthNearestEnemyOf},
 	{"lastattackerof", GameScript::LastHitter}, //is it important to be different?
+	{"lastcommandedby", GameScript::LastCommandedBy},
 	{"lastheardby", GameScript::LastHeardBy},
 	{"lasthelp", GameScript::LastHelp},
 	{"lasthitter", GameScript::LastHitter},
@@ -2197,6 +2200,21 @@ Targets *GameScript::LastHeardBy(Scriptable *Sender, Targets *parameters)
 	parameters->Clear();
 	if(actor) {
 		parameters->AddTarget(actor->LastHeard);
+	}
+	return parameters;
+}
+
+Targets *GameScript::LastCommandedBy(Scriptable *Sender, Targets *parameters)
+{
+	Actor *actor = parameters->GetTarget(0);
+	if(!actor) {
+		if(Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if(actor) {
+		parameters->AddTarget(actor->LastCommander);
 	}
 	return parameters;
 }
@@ -8134,4 +8152,15 @@ void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
 	map->Shout(Sender, 0, 40);
 }
 
+void GameScript::AddMapnote( Scriptable* /*Sender*/, Action* parameters)
+{
+	Map *map = core->GetGame()->GetCurrentMap();
+	char *str = core->GetString( parameters->int0Parameter, 0);
+	map->AddMapNote(parameters->pointParameter, parameters->int1Parameter, str);
+}
 
+void GameScript::RemoveMapnote( Scriptable* /*Sender*/, Action* parameters)
+{
+	Map *map = core->GetGame()->GetCurrentMap();
+	map->RemoveMapNote(parameters->pointParameter);
+}

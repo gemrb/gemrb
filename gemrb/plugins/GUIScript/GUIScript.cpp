@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.240 2004/11/13 15:56:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.241 2004/11/15 21:54:39 avenger_teambg Exp $
  *
  */
 
@@ -3924,9 +3924,12 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_CreateItem__doc );
 	}
 	Game *game = core->GetGame();
+	if( !game ) {
+		return RuntimeError( "Not in game" );
+	}
 	Actor* actor = game->FindPC( PartyID );
 	if (! actor) {
-		return NULL;
+		return RuntimeError( "Actor not found" );
 	}
 
 	TmpItem = new CREItem();
@@ -3942,6 +3945,71 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		printf("Inventory is full\n");
 		delete TmpItem; //removal of residue
 	}
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetMapnote__doc,
+"SetMapnote(X, Y, color, Text)\n\n"
+"Adds or removes a mapnote.\n\n");
+
+static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
+{
+	int x,y;
+	int color=0;
+	char *txt=NULL;
+
+	if (!PyArg_ParseTuple( args, "ii|is", &x, &y, &color, &txt)) {
+		return AttributeError( GemRB_SetMapnote__doc );
+	}
+	Game *game = core->GetGame();
+	if( !game ) {
+		return RuntimeError( "Not in game" );
+	}
+	Map *map = game->GetCurrentMap();
+	if( !map ) {
+		return RuntimeError( "No current area" );
+	}
+	Point point;
+	point.x=x;
+	point.y=y;
+	if(txt && txt[0]) {
+		map->AddMapNote(point, color, txt);
+	}
+	else {
+		map->RemoveMapNote(point);
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_CreateCreature__doc,
+"CreateCreature(PartyID, CreResRef)\n\n"
+"Creates Creature in vicinity of a player character.\n\n");
+
+static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+	char *CreResRef;
+
+	if (!PyArg_ParseTuple( args, "is", &PartyID, &CreResRef)) {
+		return AttributeError( GemRB_CreateCreature__doc );
+	}
+
+	Game *game = core->GetGame();
+	if( !game ) {
+		return RuntimeError( "Not in game" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	Map *map=game->GetCurrentMap();
+	if( !map ) {
+		return RuntimeError( "No current area" );
+	}
+
+	map->SpawnCreature(actor->Pos, CreResRef,10);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -4086,6 +4154,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(IsDraggingItem, METH_NOARGS),
 	METHOD(GetSystemVariable, METH_VARARGS),
 	METHOD(CreateItem, METH_VARARGS),
+	METHOD(SetMapnote, METH_VARARGS),
+	METHOD(CreateCreature, METH_VARARGS),
 
 	// terminating entry	
 	{NULL, NULL, 0, NULL}

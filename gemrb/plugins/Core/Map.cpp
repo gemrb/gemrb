@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.121 2004/11/14 14:20:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.122 2004/11/15 21:54:45 avenger_teambg Exp $
  *
  */
 
@@ -1194,6 +1194,7 @@ void Map::AddMapNote(Point point, int color, char *text)
 	mn->Pos=point;
 	mn->color=color;
 	mn->text=text;
+	RemoveMapNote(point);    //delete previous mapnote
 	mapnotes.push_back(mn);
 }
 

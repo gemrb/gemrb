@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.53 2004/11/14 14:20:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.54 2004/11/15 21:54:45 avenger_teambg Exp $
  *
  */
 
@@ -160,15 +160,16 @@ public:
 	MapNote *GetMapNote(Point point);
 	int GetMapNoteCount() { return mapnotes.size(); }
 
-	/* Spawns creature(s), returns true in case of an interrupted rest */
+	/* May spawn creature(s), returns true in case of an interrupted rest */
 	bool Rest(Point pos, int hours);
+	/* Spawns creature(s) in radius of position */
+	void SpawnCreature(Point pos, char *CreName, int radius = 0);
 private:
 	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
 		Point &p, unsigned int& diff);
 	void SetupNode(unsigned int x, unsigned int y, unsigned int Cost);
 	//maybe this is unneeded and orientation could be calculated on the fly
 	void UseExit(Actor *pc, InfoPoint *ip);
-	void SpawnCreature(Point pos, char *CreName, int radius = 0);
 };
 
 #endif
