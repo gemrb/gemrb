@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.18 2004/08/29 21:28:02 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.19 2004/09/17 14:54:53 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -557,6 +557,7 @@ def GetStatOverview (pc):
 	# 4227 Weapon Proficiencies
 	stats.append (4227)
 	#   55011 Unused Slots
+	stats.append ((55011, GS (IE_FREESLOTS), ''))
 	#   33642 Fist
 	#   33649 Edged Weapon
 	#   33651 Hammer
