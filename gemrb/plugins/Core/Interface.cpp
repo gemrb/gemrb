@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.172 2004/06/28 20:27:59 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.173 2004/07/01 23:18:59 guidoj Exp $
  *
  */
 
@@ -278,7 +278,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Initializing Resource Manager...", WHITE );
+	printMessage( "Core", "Initializing Resource Manager...\n", WHITE );
 	key = ( ResourceMgr * ) GetInterface( IE_KEY_CLASS_ID );
 	char ChitinPath[_MAX_PATH];
 	PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
@@ -294,7 +294,6 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 
-	//printStatus("OK", LIGHT_GREEN);
 	printMessage( "Core", "Checking for Dialogue Manager...", WHITE );
 	if (!IsAvailable( IE_TLK_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -324,14 +323,14 @@ int Interface::Init()
 	}
 	bmppal256 = key->GetResource( "MPAL256\0", IE_BMP_CLASS_ID );
 	if (bmppal256) {
-		pal256 = ( ImageMgr * )this->GetInterface( IE_BMP_CLASS_ID );
+		pal256 = ( ImageMgr * ) GetInterface( IE_BMP_CLASS_ID );
 		pal256->Open( bmppal256, true );
 	} else {
 		pal256 = NULL;
 	}
 	bmppal16 = key->GetResource( "MPALETTE", IE_BMP_CLASS_ID );
 	if (bmppal16) {
-		pal16 = ( ImageMgr * )this->GetInterface( IE_BMP_CLASS_ID );
+		pal16 = ( ImageMgr * ) GetInterface( IE_BMP_CLASS_ID );
 		pal16->Open( bmppal16, true );
 	} else {
 		pal16 = NULL;
