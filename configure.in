@@ -88,7 +88,7 @@ AC_CHECK_FUNCS([strchr])
 AC_CHECK_FUNCS([strrchr])
 AC_CHECK_FUNCS([strtol])
 AC_CHECK_FUNCS([strtoul])
-AC_CHECK_FUNCS([strnlen])
+AC_CHECK_FUNCS([strnlen strndup])
 AC_CHECK_HEADERS([fcntl.h])
 AC_CHECK_HEADERS([sys/time.h])
 AC_CHECK_HEADERS([sys/stat.h])
@@ -168,5 +168,6 @@ gemrb/plugins/SDLVideo/Makefile
 gemrb/plugins/TISImporter/Makefile 
 gemrb/plugins/TLKImporter/Makefile 
 gemrb/plugins/WEDImporter/Makefile 
+gemrb/plugins/WMPImporter/Makefile 
 gemrb/plugins/ZLibMgr/Makefile 
 )
