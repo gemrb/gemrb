@@ -1,7 +1,7 @@
 #ifndef IE_STATS_H
 #define IE_STATS_H
 
-#define IE_IE_MAXHITPOINTS	1
+#define IE_MAXHITPOINTS	1
 #define IE_ARMORCLASS	2
 #define IE_ACCRUSHINGMOD	3
 #define IE_ACMISSILEMOD	4
