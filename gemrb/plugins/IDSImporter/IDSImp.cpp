@@ -31,8 +31,8 @@ bool IDSImp::Open(DataStream * stream, bool autoFree)
 	this->autoFree = autoFree;
 
 	str->CheckEncrypted();
-	char tmp[6];
-	str->ReadLine(tmp, 6);
+	char tmp[10];
+	str->ReadLine(tmp, 10);
 	while(true) {
 		char * line = (char*)malloc(256);
 		int len = str->ReadLine(line, 256);
