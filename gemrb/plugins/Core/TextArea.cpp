@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.49 2004/04/14 23:53:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.50 2004/04/15 10:21:41 avenger_teambg Exp $
  *
  */
 
@@ -258,14 +258,14 @@ int TextArea::AppendText(const char* text, int pos)
 }
 
 /** Deletes last `count' lines */ 
-void TextArea::PopLines(int count)
+void TextArea::PopLines(unsigned int count)
 {
-	if (count > ( int ) lines.size()) {
+	if (count > lines.size()) {
 		count = lines.size();
 	}
 
 	while (count > 0 ) {
-		free(lines[0]);
+		free(lines.back() );
 		lines.pop_back();
 		lrows.pop_back();
 		count--;

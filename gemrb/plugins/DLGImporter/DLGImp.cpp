@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.11 2004/04/14 23:53:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.12 2004/04/15 10:21:41 avenger_teambg Exp $
  *
  */
 
@@ -240,8 +240,15 @@ char** DLGImp::GetStrings(char* string, unsigned long& count)
 
 	count = 0;
 	while (*poi) {
+/* maybe we don't need this at all
 		while (MyIsSpace( *poi ))
 			poi++;
+		//i think we need this, 
+		//think of an empty line containing only whitespace
+		if(!poi) {
+			break;
+		}
+*/
 		switch (*poi++) {
 			case '/':
 				if(col==0) {

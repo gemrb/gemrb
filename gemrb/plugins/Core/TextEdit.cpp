@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.16 2004/04/14 23:53:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.17 2004/04/15 10:21:41 avenger_teambg Exp $
  *
  */
 
@@ -35,7 +35,6 @@ TextEdit::TextEdit(unsigned short maxLength)
 	CurPos = 0;
 	Buffer[0] = 0;
 	EditOnChange[0] = 0;
-	Back = 0;
 	Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 	palette = core->GetVideoDriver()->CreatePalette( white, black );
 }
@@ -44,7 +43,7 @@ TextEdit::~TextEdit(void)
 {
 	free( palette );
 	free( Buffer );
-	delete Back;
+	core->GetVideoDriver()->FreeSprite( Back );
 }
 
 /** Draws the Control on the Output Display */

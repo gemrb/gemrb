@@ -15,17 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.3 2004/04/13 18:51:23 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.4 2004/04/15 10:21:41 avenger_teambg Exp $
  *
  */
 
 #include <stdio.h>
 #include "../../includes/win32def.h"
-// #include "Interface.h"
 #include "Spellbook.h"
-
-
-
 
 Spellbook::Spellbook()
 {
@@ -35,7 +31,10 @@ Spellbook::~Spellbook()
 {
 	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
-			delete( spells[i][j] );
+			if(spells[i][j]) {
+				delete( spells[i][j] );
+				spells[i][j] = NULL;
+			}
 		}
 	}
 }

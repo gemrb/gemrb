@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.18 2004/03/21 13:47:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.19 2004/04/15 10:21:41 avenger_teambg Exp $
  *
  */
 
@@ -52,7 +52,7 @@ public:
 	/** Appends a String to the current Text */
 	int AppendText(const char* text, int pos = 0);
 	/** Deletes last `count' lines */ 
-	void PopLines(int count);
+	void PopLines(unsigned int count);
 	/** Sets the Fonts */
 	void SetFonts(Font* init, Font* text);
 	/** Returns Number of Rows */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.153 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.154 2004/04/15 10:21:40 avenger_teambg Exp $
  *
  */
 
@@ -381,8 +381,8 @@ int Interface::Init()
 	ChangeScript = true;
 	console = new Console();
 	console->XPos = 0;
-	console->YPos = core->Height - 25;
-	console->Width = core->Width;
+	console->YPos = Height - 25;
+	console->Width = Width;
 	console->Height = 25;
 	console->SetFont( fonts[0] );
 	if (af) {
@@ -1687,7 +1687,7 @@ int Interface::PlayMovie(char* ResRef)
 	if (!mp) {
 		return 0;
 	}
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
+	DataStream* str = GetResourceMgr()->GetResource( ResRef,
 												IE_MVE_CLASS_ID );
 	if (!str) {
 		FreeInterface( mp );
@@ -1820,7 +1820,7 @@ void Interface::LoadGame(int index)
 		//Load the Default Game
 		ds = GetResourceMgr()->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
 	} else {
-		SaveGame* sg = core->GetSaveGameIterator()->GetSaveGame( index );
+		SaveGame* sg = GetSaveGameIterator()->GetSaveGame( index );
 		if (!sg)
 			return;
 		ds = sg->GetGame();
@@ -1845,7 +1845,7 @@ void Interface::LoadGame(int index)
 
 GameControl *Interface::GetGameControl()
 {
- 	Window *window = core->GetWindow( 0 );
+ 	Window *window = GetWindow( 0 );
 	Control* gc = window->GetControl(0);
 	if(gc->ControlType!=IE_GUI_GAMECONTROL) {
 		return NULL;

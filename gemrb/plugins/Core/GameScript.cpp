@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.136 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.137 2004/04/15 10:21:40 avenger_teambg Exp $
  *
  */
 
@@ -120,6 +120,7 @@ static TriggerLink triggernames[] = {
 	{"isaclown", GameScript::IsAClown,0},
 	{"islocked", GameScript::IsLocked,0},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog,0},
+	{"itemisidentified", GameScript::ItemIsIdentified,0},
 	{"level", GameScript::Level,0},
 	{"levelgt", GameScript::LevelGT,0},
 	{"levellt", GameScript::LevelLT,0},
@@ -2843,6 +2844,19 @@ int GameScript::HasItem(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) scr;
 	if (actor->inventory.HasItem(parameters->string0Parameter, 0) ) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::ItemIsIdentified(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if( !scr || scr->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) scr;
+	if (actor->inventory.HasItem(parameters->string0Parameter, IE_ITEM_IDENTIFIED) ) {
 		return 1;
 	}
 	return 0;
