@@ -70,6 +70,7 @@ def ExitCancelPress():
 	
 def GeneratePress():
 	global PartyFormationWindow
+	print "SLOT:", GemRB.GetVar("Slot")
 	GemRB.UnloadWindow(PartyFormationWindow)
 	GemRB.SetNextScript("CharGen")
 	return

@@ -23,9 +23,9 @@ def OnLoad():
 		Button = GemRB.GetControl(RaceWindow,i)
 		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		
-	Race = GemRB.GetVar("Race")-1
+	Race = GemRB.GetVar("Race")
 	GemRB.SetVar("BaseRace",Race)
-	RaceName = GemRB.GetTableRowName(RaceTable, Race)
+	RaceName = GemRB.GetTableRowName(RaceTable, Race-1)
 
 	PureRace = GemRB.GetTableValue(SubRacesTable, RaceName , "PURE_RACE")
 	Button = GemRB.GetControl(RaceWindow,1)
