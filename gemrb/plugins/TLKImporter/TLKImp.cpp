@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.42 2005/01/22 10:15:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.43 2005/02/07 19:59:03 avenger_teambg Exp $
  *
  */
 
@@ -162,20 +162,12 @@ void TLKImp::GetMonthName(int dayandmonth)
 			char tmpstr[10];
 			
 			sprintf(tmpstr,"%d", dayandmonth+1);
-/*
-		        tmp = ( char* ) malloc( strlen( tmpstr ) + 1 );
-			strcpy( tmp, tmpstr );
-*/
 			core->GetTokenDictionary()->SetAtCopy("DAY", tmpstr);
 
 			tmp = GetString( monthnames[i] );
 			core->GetTokenDictionary()->SetAt("MONTHNAME",tmp);
 
 			sprintf(tmpstr,"%d", month);
-/*
-		        tmp = ( char* ) malloc( strlen( tmpstr ) + 1 );
-			strcpy( tmp, tmpstr );
-*/
 			core->GetTokenDictionary()->SetAtCopy("MONTH",tmpstr);
 			return;
 		}
@@ -331,8 +323,7 @@ bool TLKImp::ResolveTags(char* dest, char* source, int Length)
 	NewLength = 0;
 	for (int i = 0; source[i]; i++) {
 		if (source[i] == '<') {
-			i += mystrncpy( Token, source + i + 1, MAX_VARIABLE_LENGTH, '>' ) -
-				Token + 1;
+			i += (int) (mystrncpy( Token, source + i + 1, MAX_VARIABLE_LENGTH, '>' ) - Token) + 1;
 			int TokenLength = BuiltinToken( Token, dest + NewLength );
 			if (TokenLength == -1) {
 				TokenLength = core->GetTokenDictionary()->GetValueLength( Token );
@@ -347,7 +338,7 @@ bool TLKImp::ResolveTags(char* dest, char* source, int Length)
 			if (source[i] == '[') {
 				char* tmppoi = strchr( source + i + 1, ']' );
 				if (tmppoi)
-					i = tmppoi - source;
+					i = (int) (tmppoi - source);
 				else
 					break;
 			} else
@@ -372,7 +363,7 @@ bool TLKImp::GetNewStringLength(char* string, int& Length)
 		if (string[i] == '<') {
 			// token
 			lChange = true;
-			i += mystrncpy( Token, string + i + 1, MAX_VARIABLE_LENGTH, '>' ) - Token + 1;
+			i += (int) (mystrncpy( Token, string + i + 1, MAX_VARIABLE_LENGTH, '>' ) - Token) + 1;
 			int TokenLength = BuiltinToken( Token, NULL );
 			if (TokenLength == -1) {
 				NewLength += core->GetTokenDictionary()->GetValueLength( Token );
@@ -385,7 +376,7 @@ bool TLKImp::GetNewStringLength(char* string, int& Length)
 				lChange = true;
 				char* tmppoi = strchr( string + i + 1, ']' );
 				if (tmppoi)
-					i += tmppoi - string - i;
+					i += (int) (tmppoi - string) - i;
 				else
 					break;
 			} else {
