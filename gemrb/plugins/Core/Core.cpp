@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.29 2005/02/24 16:45:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.30 2005/02/24 17:45:55 avenger_teambg Exp $
  *
  */
 
@@ -39,9 +39,28 @@
 #include <crtdbg.h>
 #endif
 
+void upperlower(int upper, int lower)
+{
+	pl_toupper[lower]=upper;
+	pl_tolower[upper]=lower;
+}
+
 BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD fdwReason,
 	LPVOID lpvReserved)
 {
+	for(int i=0;i<256;i++) {
+		pl_toupper[i]=toupper(i);
+		pl_tolower[i]=tolower(i);
+	}
+	upperlower(165,185);
+	upperlower(198,230);
+	upperlower(202,234);
+	upperlower(163,179);
+	upperlower(209,241);
+	upperlower(211,243);
+	upperlower(140,156);
+	upperlower(175,191);
+	upperlower(143,159);
 	return true;
 }
 #endif
@@ -59,11 +78,14 @@ BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD fdwReason,
 void strnuprcpy(char* dest, const char *source, int count)
 {
 	while(count--) {
-		*dest++ = toupper( *source );
+		*dest++ = toupper_pl( *source );
 		if(!*source++) return;
 	}
 	*dest=0;
 }
+
+unsigned char pl_uppercase[256];
+unsigned char pl_lowercase[256];
 
 static unsigned char orientations[25]={
 6,7,8,9,10,

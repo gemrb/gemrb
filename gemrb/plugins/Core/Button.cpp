@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.81 2005/02/24 16:45:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.82 2005/02/24 17:45:55 avenger_teambg Exp $
  *
  */
 
@@ -477,10 +477,11 @@ int Button::SetText(const char* string, int /*pos*/)
 	} else if (string[0] == 0) {
 		hasText = false;
 	} else {
-		strncpy( Text, string, 63 );
-		hasText = true;
 		if (core->HasFeature( GF_UPPER_BUTTON_TEXT ))
-			Text = strupr( Text );
+			strnuprcpy( Text, string, 63 );
+		else
+			strncpy( Text, string, 63 );
+		hasText = true;
 	}
 	Changed = true;
 	return 0;
