@@ -21,6 +21,27 @@ char *strlwr(char *string)
 	}
 	return string;
 }
+
+char * FindInDir(char * Dir, char * Filename)
+{ 
+	char * fn = NULL; 
+	DIR * dir = opendir(Dir); 
+	if(dir == NULL) 
+		return NULL; 
+	struct dirent * de = readdir(dir); 
+	if(de == NULL) 
+		return NULL;
+	do { 
+		if(strnicmp(de->d_name, Filename, sizeof(Filename)) == 0) {
+			fn = (char*)malloc(strlen(de->d_name)+1);
+			strcpy(fn, de->d_name);
+			break;
+		}
+	} while((de = readdir(dir)) != NULL);
+	closedir(dir);  //No other files in the directory, close it
+	return fn;
+}
+
 #endif
 
 KeyImp::KeyImp(void)
@@ -76,6 +97,19 @@ bool KeyImp::LoadResFile(const char * resfile)
 		  if(be.name[p] == '\\')
 		    be.name[p] = '/';
 		}
+		if(core->CaseSensitive) {
+			char fullPath[_MAX_PATH], tmpPath[_MAX_PATH] = {0}, fn[_MAX_PATH] = {0};
+			strncpy( tmpPath , be.name, strrchr(be.name, PathDelimiter)-be.name)
+			strcpy(fullPath, core->GamePath);
+			strcat(fullPath, tmpPath);
+			ExtractFileFromPath(fn, be.name);
+			char * newname = FindInDir(fullPath, fn);
+			if(newname) {
+				strcpy(be.name, tmpPath);
+				strcat(be.name, newname);
+				free(newname);
+			}
+		}
 #endif
 		biffiles.push_back(be);
 	}
@@ -116,7 +150,7 @@ bool KeyImp::LoadResFile(const char * resfile)
 		fs->Open(p, true); \
 		return fs; \
 	} \
-} 
+}
 
 DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 {
