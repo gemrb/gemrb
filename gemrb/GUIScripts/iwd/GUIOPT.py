@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIOPT.py,v 1.1 2004/10/15 20:38:55 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIOPT.py,v 1.2 2004/11/07 18:23:49 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -210,18 +210,15 @@ def OpenAudioOptionsWindow ():
 	OptDone ('AudioOptions', Window, 24)
 	OptCancel ('AudioOptions', Window, 25)
 
-## 	OptSlider ('AmbientVolume', Window, 1, 10, 31460)
-## 	OptSlider ('SoundFXVolume', Window, 2, 11, 31466)
-## 	OptSlider ('VoiceVolume', Window, 3, 12, 31467)
-## 	OptSlider ('MusicVolume', Window, 4, 13, 31468)
-## 	OptSlider ('MovieVolume', Window, 5, 14, 31469)
+ 	OptSlider ('AmbientVolume', Window, 1, 16, 31460)
+ 	OptSlider ('SoundFXVolume', Window, 2, 17, 31466)
+ 	OptSlider ('VoiceVolume', Window, 3, 18, 31467)
+ 	OptSlider ('MusicVolume', Window, 4, 19, 31468)
+ 	OptSlider ('MovieVolume', Window, 22, 20, 31469)
 
 	OptButton ('TalkOptions', Window, 13, 17778)
 
-## 	OptCheckbox ('CreativeEAX', Window, 6, 15, 30900)
-## 	OptCheckbox ('SoundProcessing', Window, 16, 17, 63242)
-## 	OptCheckbox ('MusicProcessing', Window, 18, 19, 63243)
-
+ 	OptCheckbox ('CreativeEAX', Window, 26, 28, 30900)
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
@@ -229,6 +226,7 @@ def OpenAudioOptionsWindow ():
 
 def DisplayHelpAmbientVolume ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31227)
+	UpdateAmbientsVolume ()
 	
 def DisplayHelpSoundFXVolume ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31228)
@@ -238,20 +236,13 @@ def DisplayHelpVoiceVolume ():
 
 def DisplayHelpMusicVolume ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31225)
+	UpdateMusicVolume ()
 
 def DisplayHelpMovieVolume ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31229)
 
 def DisplayHelpCreativeEAX ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31224)
-
-def DisplayHelpSoundProcessing ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 63244)
-	
-def DisplayHelpMusicProcessing ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 63247)
-
-
 
 ###################################################
 

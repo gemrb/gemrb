@@ -62,6 +62,7 @@ def OnLoad():
 	
 def AmbientPress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18008)
+	GemRB.UpdateAmbientsVolume ()
 	return
 	
 def SoundEffectsPress():
@@ -74,6 +75,7 @@ def DialoguePress():
 	
 def MusicPress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18011)
+	GemRB.UpdateMusicVolume ()
 	return
 	
 def MoviesPress():

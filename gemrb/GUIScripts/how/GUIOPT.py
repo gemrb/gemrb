@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIOPT.py,v 1.1 2004/09/28 14:13:59 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIOPT.py,v 1.2 2004/11/07 18:23:49 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -147,22 +147,21 @@ def OpenVideoOptionsWindow ():
 	VideoOptionsWindow = Window = GemRB.LoadWindow (6)
 	GemRB.SetVar ("FloatWindow", VideoOptionsWindow)
 
-
 	VideoHelpText = OptHelpText ('VideoOptions', Window, 33, 18038)
 
 	OptDone ('VideoOptions', Window, 21)
 	OptCancel ('VideoOptions', Window, 32)
 
-## 	OptSlider ('Brightness', Window, 1, 10, 31234)
-## 	OptSlider ('Contrast', Window, 2, 11, 31429)
+	OptSlider ('Brightness', Window, 3, 35)
+	OptSlider ('Contrast', Window, 22, 36)
 
-## 	OptCheckbox ('SoftwareBlitting', Window, 6, 15, 30898)
-## 	OptCheckbox ('SoftwareMirroring', Window, 4, 13, 30896)
-## 	OptCheckbox ('SoftwareTransparency', Window, 5, 14, 30897)
+	OptCheckbox ('Full Screen', Window, 9, 38)
+	OptCheckbox ('SoftwareMirroring', Window, 40, 44)
+	OptCheckbox ('SoftwareTransparency', Window, 41, 46)
+	OptCheckbox ('SoftwareBlitting', Window, 42, 48)
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
-	
 	
 
 def DisplayHelpBrightness ():
@@ -210,18 +209,15 @@ def OpenAudioOptionsWindow ():
 	OptDone ('AudioOptions', Window, 24)
 	OptCancel ('AudioOptions', Window, 25)
 
-## 	OptSlider ('AmbientVolume', Window, 1, 10, 31460)
-## 	OptSlider ('SoundFXVolume', Window, 2, 11, 31466)
-## 	OptSlider ('VoiceVolume', Window, 3, 12, 31467)
-## 	OptSlider ('MusicVolume', Window, 4, 13, 31468)
-## 	OptSlider ('MovieVolume', Window, 5, 14, 31469)
+	OptSlider ('AmbientVolume', Window, 1, 16)
+	OptSlider ('SoundFXVolume', Window, 2, 17)
+	OptSlider ('VoiceVolume', Window, 3, 18)
+	OptSlider ('MusicVolume', Window, 4, 19)
+	OptSlider ('MovieVolume', Window, 22, 20)
 
-	OptButton ('TalkOptions', Window, 13, 17778)
+	OptButton ('TalkOptions', Window, 13)
 
-## 	OptCheckbox ('CreativeEAX', Window, 6, 15, 30900)
-## 	OptCheckbox ('SoundProcessing', Window, 16, 17, 63242)
-## 	OptCheckbox ('MusicProcessing', Window, 18, 19, 63243)
-
+	OptCheckbox ('CreativeEAX', Window, 26, 28)
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
@@ -229,6 +225,7 @@ def OpenAudioOptionsWindow ():
 
 def DisplayHelpAmbientVolume ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31227)
+	UpdateAmbientsVolume ()
 	
 def DisplayHelpSoundFXVolume ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31228)
@@ -238,20 +235,13 @@ def DisplayHelpVoiceVolume ():
 
 def DisplayHelpMusicVolume ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31225)
+	UpdateMusicVolume ()
 
 def DisplayHelpMovieVolume ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31229)
 
 def DisplayHelpCreativeEAX ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31224)
-
-def DisplayHelpSoundProcessing ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 63244)
-	
-def DisplayHelpMusicProcessing ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 63247)
-
-
 
 ###################################################
 
@@ -280,13 +270,13 @@ def OpenTalkOptionsWindow ():
 	OptDone ('TalkOptions', Window, 24)
 	OptCancel ('TalkOptions', Window, 25)
 
-## 	OptCheckbox ('CharacterHit', Window, 2, 9, 37598)
-## 	OptCheckbox ('CharacterInjured', Window, 3, 10, 37681)
-## 	OptCheckbox ('CharacterDead', Window, 4, 11, 37682)
-## 	OptCheckbox ('CharacterAttacked', Window, 5, 12, 37683)
-## 	OptCheckbox ('WeaponUnusable', Window, 6, 13, 37684)
-## 	OptCheckbox ('TargetGone', Window, 7, 14, 37685)
-## 	OptCheckbox ('EndOfRound', Window, 8, 15, 37686)
+##	OptCheckbox ('CharacterHit', Window, 2, 9)
+##	OptCheckbox ('CharacterInjured', Window, 3, 10)
+##	OptCheckbox ('CharacterDead', Window, 4, 11)
+##	OptCheckbox ('CharacterAttacked', Window, 5, 12)
+##	OptCheckbox ('WeaponUnusable', Window, 6, 13)
+##	OptCheckbox ('TargetGone', Window, 7, 14)
+##	OptCheckbox ('EndOfRound', Window, 8, 15)
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
@@ -320,17 +310,16 @@ def OpenGameplayOptionsWindow ():
 	OptDone ('GameplayOptions', Window, 7)
 	OptCancel ('GameplayOptions', Window, 20)
 
-## 	OptSlider ('TooltipDelay', Window, 1, 13, 31481)
-## 	OptSlider ('MouseScrollingSpeed', Window, 2, 14, 31482)
-## 	OptSlider ('KeyboardScrollingSpeed', Window, 3, 15, 31480)
-## 	OptSlider ('Difficulty', Window, 4, 16, 31479)
+##	OptSlider ('TooltipDelay', Window, 1, 13)
+##	OptSlider ('MouseScrollingSpeed', Window, 2, 14)
+##	OptSlider ('KeyboardScrollingSpeed', Window, 3, 15)
+##	OptSlider ('Difficulty', Window, 4, 16)
 
-## 	OptCheckbox ('DitherAlways', Window, 5, 17, 31217)
-## 	OptCheckbox ('Gore', Window, 6, 18, 31218)
-## 	OptCheckbox ('AlwaysRun', Window, 22, 23, 62418)
+##	OptCheckbox ('DitherAlways', Window, 5, 17)
+##	OptCheckbox ('Gore', Window, 6, 18)
 
-	OptButton ('FeedbackOptions', Window, 5, 17163)
-	OptButton ('AutopauseOptions', Window, 6, 17166)
+	OptButton ('FeedbackOptions', Window, 5)
+	OptButton ('AutopauseOptions', Window, 6)
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
@@ -394,16 +383,15 @@ def OpenFeedbackOptionsWindow ():
 	OptDone ('FeedbackOptions', Window, 26)
 	OptCancel ('FeedbackOptions', Window, 27)
 
-## 	OptSlider ('MarkerFeedback', Window, 1, 10, 37463)
-## 	OptSlider ('LocatorFeedback', Window, 2, 11, 37586)
-## 	OptSlider ('SelectionFeedbackLevel', Window, 20, 21, 54879)
-## 	OptSlider ('CommandFeedbackLevel', Window, 22, 23, 55012)
+	OptSlider ('MarkerFeedback', Window, 8, 30)
+	OptSlider ('LocatorFeedback', Window, 9, 31)
 
-## 	OptCheckbox ('CharacterStates', Window, 6, 15, 37594)
-## 	OptCheckbox ('MiscellaneousMessages', Window, 17, 19, 37596)
-## 	OptCheckbox ('ToHitRolls', Window, 3, 12, 37588)
-## 	OptCheckbox ('CombatInfo', Window, 4, 13, 37590)
-## 	OptCheckbox ('SpellCasting', Window, 5, 14, 37592)
+	OptCheckbox ('ToHitRolls', Window, 10, 32)
+	OptCheckbox ('CombatInfo', Window, 11, 33)
+	OptCheckbox ('Actions', Window, 12, 34)
+	OptCheckbox ('CharacterStates', Window, 13, 35)
+	OptCheckbox ('SelectionText', Window, 14, 36)
+	OptCheckbox ('MiscellaneousMessages', Window, 15, 37)
 
 
 	GemRB.UnhideGUI ()
@@ -465,13 +453,13 @@ def OpenAutopauseOptionsWindow ():
 	OptDone ('AutopauseOptions', Window, 11)
 	OptCancel ('AutopauseOptions', Window, 14)
 
-## 	OptCheckbox ('CharacterHit', Window, 2, 9, 37598)
-## 	OptCheckbox ('CharacterInjured', Window, 3, 10, 37681)
-## 	OptCheckbox ('CharacterDead', Window, 4, 11, 37682)
-## 	OptCheckbox ('CharacterAttacked', Window, 5, 12, 37683)
-## 	OptCheckbox ('WeaponUnusable', Window, 6, 13, 37684)
-## 	OptCheckbox ('TargetGone', Window, 7, 14, 37685)
-## 	OptCheckbox ('EndOfRound', Window, 8, 15, 37686)
+##	OptCheckbox ('CharacterHit', Window, 2, 9, 37598)
+##	OptCheckbox ('CharacterInjured', Window, 3, 10, 37681)
+##	OptCheckbox ('CharacterDead', Window, 4, 11, 37682)
+##	OptCheckbox ('CharacterAttacked', Window, 5, 12, 37683)
+##	OptCheckbox ('WeaponUnusable', Window, 6, 13, 37684)
+##	OptCheckbox ('TargetGone', Window, 7, 14, 37685)
+##	OptCheckbox ('EndOfRound', Window, 8, 15, 37686)
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
@@ -829,13 +817,12 @@ def SaveGame ():
 #   control (button, slider ...) and a label
 
 
-def OptSlider (name, window, slider_id, label_id, label_strref):
+def OptSlider (name, window, slider_id, label_id):
 	"""Standard slider for option windows"""
 	slider = GemRB.GetControl (window, slider_id)
 	#GemRB.SetEvent (window, slider, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
 	
 	label = GemRB.GetControl (window, label_id)
-	GemRB.SetText (window, label, label_strref)
 	GemRB.SetButtonFlags (window, label, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	GemRB.SetButtonState (window, label, IE_GUI_BUTTON_LOCKED)
 	#GemRB.SetEvent (window, label, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
@@ -844,7 +831,7 @@ def OptSlider (name, window, slider_id, label_id, label_strref):
 	return slider
 
 
-def OptCheckbox (name, window, button_id, label_id, label_strref):
+def OptCheckbox (name, window, button_id, label_id):
 	"""Standard checkbox for option windows"""
 
 	button = GemRB.GetControl (window, button_id)
@@ -853,7 +840,6 @@ def OptCheckbox (name, window, button_id, label_id, label_strref):
 	GemRB.SetEvent (window, button, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
 
 	label = GemRB.GetControl (window, label_id)
-	GemRB.SetText (window, label, label_strref)
 	GemRB.SetButtonFlags (window, label, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	GemRB.SetButtonState (window, label, IE_GUI_BUTTON_LOCKED)
 	#GemRB.SetEvent (window, label, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
@@ -861,13 +847,10 @@ def OptCheckbox (name, window, button_id, label_id, label_strref):
 
 	return button
 
-def OptButton (name, window, button_id, button_strref):
+def OptButton (name, window, button_id):
 	"""Standard subwindow button for option windows"""
 	button = GemRB.GetControl (window, button_id)
 	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "Open%sWindow" %name)	
-
-	GemRB.SetText (window, button, button_strref)
-
 
 def OptDone (name, window, button_id):
 	"""Standard `Done' button for option windows"""
