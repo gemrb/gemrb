@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.31 2003/12/23 15:16:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.32 2003/12/23 18:05:32 balrog994 Exp $
  *
  */
 
@@ -236,9 +236,10 @@ void TextArea::CalcRowCount()
 			char * tmp = (char*)malloc(len+1);
 			memcpy(tmp, lines[i], len+1);
 			ftext->SetupString(tmp, Width);
-			for(int p = 0; p < len; p++) {
+			for(int p = 0; p <= len; p++) {
 				if(tmp[p] == 0) {
-					rows++;
+					if(p != len)
+						rows++;
 					tr++;
 				}
 			lrows[i] = tr;
