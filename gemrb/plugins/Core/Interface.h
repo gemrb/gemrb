@@ -70,6 +70,7 @@ private:
 	/** Windows Array */
 	std::vector<Window*> windows;
 	Variables * vars;
+	Variables * tokens;
 	MusicMgr * music;
 	std::vector<Table> tables;
 	std::vector<Symbol> symbols;
@@ -125,6 +126,8 @@ public:
 	SoundMgr * GetSoundMgr();
 	/** Get the Variables Dictionary */
 	Variables * GetDictionary();
+	/** Get the Token Dictionary */
+	Variables * GetTokenDictionary();
 	/** Get the Music Manager */
 	MusicMgr * GetMusicMgr();
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */

@@ -3,6 +3,9 @@
 
 #include "../Core/StringMgr.h"
 
+#define IE_STR_STRREFON	1
+#define IE_STR_SOUND	2
+
 class TLKImp : public StringMgr
 {
 private:
@@ -15,7 +18,7 @@ public:
 	TLKImp(void);
 	~TLKImp(void);
 	bool Open(DataStream * stream, bool autoFree = true);
-	char * GetString(unsigned long strref);
+	char * GetString(unsigned long strref, int flags=0);
 };
 
 #endif

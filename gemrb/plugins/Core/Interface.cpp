@@ -2,7 +2,6 @@
 #include "Interface.h"
 #include "FileStream.h"
 #include "AnimationMgr.h"
-#include "Slider.h"
 
 #ifdef WIN32
 #define GEM_EXPORT __declspec(dllexport)
@@ -32,6 +31,7 @@ Interface::Interface(void)
 	guiscript = NULL;
 	windowmgr = NULL;
 	vars = NULL;
+	tokens = NULL;
 	music = NULL;
 	ConsolePopped = false;
 	printMessage("Core", "Loading Configuration File...", WHITE);
@@ -87,6 +87,8 @@ Interface::~Interface(void)
 		delete(guiscript);
 	if(vars)
 		delete(vars);
+	if(tokens)
+		delete(tokens);
 	std::vector<Table>::iterator t;
 	for(t = tables.begin(); t != tables.end(); ++t) {
 		if(!(*t).free) {
@@ -264,6 +266,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus("OK", LIGHT_GREEN);
+
 	printMessage("Core", "Initializing Variables Dictionary...", WHITE);
 	vars = new Variables();
 	if(!vars) {
@@ -271,6 +274,16 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus("OK", LIGHT_GREEN);
+
+	printMessage("Core", "Initializing Token Dictionary...", WHITE);
+	tokens = new Variables();
+	if(!tokens) {
+		printStatus("ERROR", LIGHT_RED);
+		return GEM_ERROR;
+	}
+	tokens->SetType(GEM_VARIABLES_STRING);
+	printStatus("OK", LIGHT_GREEN);
+
 	printMessage("Core", "Initializing Music Manager...", WHITE);
 	music = (MusicMgr*)GetInterface(IE_MUS_CLASS_ID);
 	if(!music) {
@@ -779,10 +792,15 @@ bool Interface::Quit(void)
 {
 	return video->Quit();
 }
-
+/** Returns the variables dictionary */
 Variables * Interface::GetDictionary()
 {
 	return vars;
+}
+/** Returns the token dictionary */
+Variables * Interface::GetTokenDictionary()
+{
+	return tokens;
 }
 /** Get the Music Manager */
 MusicMgr * Interface::GetMusicMgr()

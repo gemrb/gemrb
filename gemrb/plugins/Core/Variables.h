@@ -26,6 +26,9 @@
 /////////////////////////////////////////////////////////////////////////////
 // Variables<unsigned long, VALUE>
 
+#define GEM_VARIABLES_INT      0
+#define GEM_VARIABLES_STRING   1
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -38,7 +41,7 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT Variables //: public CObject
+class GEM_EXPORT Variables
 {
 protected:
 	// Association
@@ -54,18 +57,32 @@ public:
 	Variables(int nBlockSize = 10, int nHashTableSize=2049);
 
 // Attributes
-	// number of elements
-	int GetCount() const;
-	bool IsEmpty() const;
+//sets the way we handle keys, no parsing for .ini file entries, parsing for game variables
+//you should set this only on an empty mapping
+inline int ParseKey(int arg) {
+        MYASSERT(m_nCount==0);
+        m_lParseKey=arg;
+}
+//sets the way we handle values
+inline void SetType(int type)
+        { m_type=type; }
+inline int GetCount() const
+        { return m_nCount; }
+inline bool IsEmpty() const
+        { return m_nCount == 0; }
+inline POSITION GetStartPosition() const
+        { return (m_nCount == 0) ? NULL : BEFORE_START_POSITION; }
 
 	// Lookup
+	int GetValueLength(const char *key) const;
+        bool Lookup(const char *key, char *dest, int MaxLength) const;
 	bool Lookup(const char *key, unsigned long& rValue) const;
 
 // Operations
+	void SetAt(const char *key, const char *newValue);
 	void SetAt(const char *key, unsigned long newValue);
 	void RemoveAll();
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
-	int ParseKey(int arg);
 
 // Implementation
 protected:
@@ -76,13 +93,14 @@ protected:
 	MyAssoc* m_pFreeList;
 	struct Plex* m_pBlocks;
 	int m_nBlockSize;
+	int m_type; //could be string or unsigned long
 
 	MyAssoc* NewAssoc(const char *key);
 	void FreeAssoc(MyAssoc*);
 	MyAssoc* GetAssocAt(const char *, unsigned int&) const;
 	inline bool MyCopyKey(char *&dest, const char * key) const;
         inline unsigned int MyHashKey(const char *) const;
-        POSITION GetStartPosition() const;
+//	 POSITION GetStartPosition() const;
         void GetNextAssoc(POSITION& rNextPosition, const char*& rKey, unsigned long& rValue) const;
 
 public:

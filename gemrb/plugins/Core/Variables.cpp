@@ -1,22 +1,21 @@
 #include "Variables.h"
 #ifdef WIN32
-int strnlen(const char * string, int maxlen) {
+
+static int strnlen(const char * string, int maxlen) {
 	if(!string)
 		return -1;
-	int acc = 0;
 	int i = 0;
-	while(maxlen > 0) {
-		if(string[i++])
-			acc++;
-		else
+	while(maxlen-- > 0) {
+		if(!string[i])
 			break;
+		i++;
 	}
-	return acc;
+	return i; 
 }
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// inlines
+// private inlines 
 inline bool Variables::MyCopyKey(char *&dest, const char * key) const
 {
 	int i,j;
@@ -42,22 +41,8 @@ inline unsigned int Variables::MyHashKey(const char * key) const
    }
    return nHash;
 }
-//sets the way we handle keys, no parsing for .ini file entries, parsing for game variables
-//you should set this only on an empty mapping
-inline int Variables::ParseKey(int arg)
-{
-	MYASSERT(m_nCount==0);
-	m_lParseKey=arg;
-}
-inline int Variables::GetCount() const
-	{ return m_nCount; }
-inline bool Variables::IsEmpty() const
-	{ return m_nCount == 0; }
-inline POSITION Variables::GetStartPosition() const
-        { return (m_nCount == 0) ? NULL : BEFORE_START_POSITION; }
-
 /////////////////////////////////////////////////////////////////////////////
-// out of lines
+// functions
 void Variables::GetNextAssoc(POSITION& rNextPosition, const char*& rKey, unsigned long& rValue) const
 {
         MYASSERT(m_pHashTable != NULL);  // never call on empty map
@@ -137,8 +122,11 @@ void Variables::RemoveAll()
 			for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL;
 			  pAssoc = pAssoc->pNext)
 			{
+				if(m_type==GEM_VARIABLES_STRING)
+					if(pAssoc->nValue)
+						free((void *)pAssoc->nValue);
 				if(pAssoc->key)
-					delete [] pAssoc->key;          
+					delete [] pAssoc->key;
 			}
 		}
 	}
@@ -226,9 +214,37 @@ Variables::GetAssocAt(const char *key, unsigned int& nHash) const
 	return NULL;
 }
 
+int Variables::GetValueLength(const char *key) const
+{
+	unsigned int nHash;
+	Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
+	if (pAssoc == NULL)
+	{
+		return 0;  // not in map
+	}
+
+	return strlen((char *) pAssoc->nValue);
+}
+
+bool Variables::Lookup(const char *key, char *dest, int MaxLength) const
+{
+	unsigned int nHash;
+	MYASSERT(m_type==GEM_VARIABLES_STRING);
+	Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
+	if (pAssoc == NULL)
+	{
+		dest[0]=0;
+		return false;  // not in map
+	}
+
+	strncpy(dest,(char *) pAssoc->nValue, MaxLength);
+	return true;
+}
+
 bool Variables::Lookup(const char *key, unsigned long& rValue) const
 {
 	unsigned int nHash;
+	MYASSERT(m_type==GEM_VARIABLES_INT);
 	Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL)
 		return false;  // not in map
@@ -237,11 +253,43 @@ bool Variables::Lookup(const char *key, unsigned long& rValue) const
 	return true;
 }
 
+void Variables::SetAt(const char *key, const char *value)
+{
+	unsigned int nHash;
+	Variables::MyAssoc* pAssoc;
+
+	MYASSERT(m_type==GEM_VARIABLES_STRING);
+	if ((pAssoc = GetAssocAt(key, nHash)) == NULL)
+	{
+		if (m_pHashTable == NULL)
+			InitHashTable(m_nHashTableSize);
+
+		// it doesn't exist, add a new Association
+		pAssoc = NewAssoc(key);
+		// put into hash table
+		pAssoc->pNext = m_pHashTable[nHash];
+		m_pHashTable[nHash] = pAssoc;
+	}
+	else {
+		if(pAssoc->nValue)
+			free((char *) pAssoc->nValue);
+		pAssoc->nValue=0;
+	}
+
+//set value only if we have a key
+	if(pAssoc->key)
+	 {
+		pAssoc->nValue=(unsigned long) value;
+		pAssoc->nHashValue=nHash;
+	}
+}
+
 void Variables::SetAt(const char *key, unsigned long value)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
 
+	MYASSERT(m_type==GEM_VARIABLES_INT);
 	if ((pAssoc = GetAssocAt(key, nHash)) == NULL)
 	{
 		if (m_pHashTable == NULL)

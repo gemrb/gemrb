@@ -22,7 +22,7 @@ public:
 	StringMgr(void);
 	virtual ~StringMgr(void);
 	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
-	virtual char * GetString(unsigned long strref) = 0;
+	virtual char * GetString(unsigned long strref, int flag=0) = 0;
 };
 
 #endif

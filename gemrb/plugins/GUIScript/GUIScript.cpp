@@ -750,6 +750,24 @@ static PyObject * GemRB_HardEndPL(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SetToken(PyObject *self, PyObject *args)
+{	
+	char* Variable;
+	char* value;
+
+	if(!PyArg_ParseTuple(args, "ss", &Variable, &value)) {
+		printMessage("GUIScript", "Syntax Error: SetVar(VariableName, Value)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	char *newvalue = (char *) malloc(strlen(value)+1);  //duplicating the string
+	strcpy(newvalue, value);
+	core->GetDictionary()->SetAt(Variable, newvalue);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_SetVar(PyObject *self, PyObject *args)
 {	
 	char* Variable;
@@ -764,6 +782,24 @@ static PyObject * GemRB_SetVar(PyObject *self, PyObject *args)
 
 	Py_INCREF(Py_None);
 	return Py_None;
+}
+
+static PyObject * GemRB_GetToken(PyObject *self, PyObject *args)
+{	
+	char* Variable;
+	char* value;
+
+	if(!PyArg_ParseTuple(args, "s", &Variable)) {
+		printMessage("GUIScript", "Syntax Error: GetToken(VariableName)\n", LIGHT_RED);
+		return NULL;
+	}
+
+//trying to cheat the pointer out from the Dictionary without allocating it
+//BuildValue will allocate its own area anyway
+	if(!core->GetTokenDictionary()->Lookup(Variable, (unsigned long &) value))
+		return Py_BuildValue("s", "");
+
+	return Py_BuildValue("s", value);
 }
 
 static PyObject * GemRB_GetVar(PyObject *self, PyObject *args)
@@ -884,6 +920,12 @@ static PyMethodDef GemRBMethods[] = {
 
  	{"SetVar", GemRB_SetVar, METH_VARARGS,
      "Set/Create a Variable in the Global Dictionary."},
+
+ 	{"GetToken", GemRB_GetToken, METH_VARARGS,
+     "Get a Variable value from the Token Dictionary."},
+
+ 	{"SetToken", GemRB_SetToken, METH_VARARGS,
+     "Set/Create a Variable in the Token Dictionary."},
 
     {NULL, NULL, 0, NULL}
 };
