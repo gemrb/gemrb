@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.26 2004/11/29 22:19:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.27 2005/02/09 19:54:52 avenger_teambg Exp $
  *
  */
 
@@ -48,7 +48,7 @@ inline bool Variables::MyCopyKey(char*& dest, const char* key) const
 		if (key[i] != ' ') {
 			j++;
 		}
-	dest = new char[j + 1];
+	dest = (char *) malloc(j + 1);
 	if (!dest) {
 		return false;
 	}
@@ -130,12 +130,12 @@ void Variables::InitHashTable(unsigned int nHashSize, bool bAllocNow)
 
 	if (m_pHashTable != NULL) {
 		// free hash table
-		delete[] m_pHashTable;
+		free(m_pHashTable);
 		m_pHashTable = NULL;
 	}
 
 	if (bAllocNow) {
-		m_pHashTable = new Variables::MyAssoc * [nHashSize];
+		m_pHashTable =(Variables::MyAssoc **) malloc(sizeof( Variables::MyAssoc *) * nHashSize);
 		memset( m_pHashTable, 0, sizeof( Variables::MyAssoc * ) * nHashSize );
 	}
 	m_nHashTableSize = nHashSize;
@@ -165,7 +165,7 @@ void Variables::RemoveAll()
 	}
 
 	// free hash table
-	delete[] m_pHashTable;
+	free(m_pHashTable);
 	m_pHashTable = NULL;
 
 	m_nCount = 0;
@@ -173,7 +173,7 @@ void Variables::RemoveAll()
 	MemBlock* p = m_pBlocks;
 	while (p != NULL) {
 		MemBlock* pNext = p->pNext;
-		delete[] p;
+		free(p);
 		p = pNext;
 	}
 	m_pBlocks = NULL;
@@ -182,27 +182,27 @@ void Variables::RemoveAll()
 Variables::~Variables()
 {
 	RemoveAll();
-	MYASSERT( m_nCount == 0 );
 }
 
 Variables::MyAssoc* Variables::NewAssoc(const char* key)
 {
 	if (m_pFreeList == NULL) {
 		// add another block
-		Variables::MemBlock* newBlock = ( Variables::MemBlock* ) new char[m_nBlockSize*sizeof( Variables::MyAssoc ) + sizeof( Variables::MemBlock )];
+		Variables::MemBlock* newBlock = ( Variables::MemBlock* ) malloc( m_nBlockSize*sizeof( Variables::MyAssoc ) + sizeof( Variables::MemBlock ));
+		MYASSERT( newBlock != NULL );  // we must have something
 		newBlock->pNext = m_pBlocks;
 		m_pBlocks = newBlock;
 
 		// chain them into free list
 		Variables::MyAssoc* pAssoc = ( Variables::MyAssoc* ) ( newBlock + 1 );
 		// free in reverse order to make it easier to debug
-		pAssoc += m_nBlockSize - 1;
-		for (int i = m_nBlockSize - 1; i >= 0; i--, pAssoc--) {
+		//pAssoc += m_nBlockSize - 1;
+		for (int i = 0; i < m_nBlockSize; i++) {
 			pAssoc->pNext = m_pFreeList;
-			m_pFreeList = pAssoc;
+			m_pFreeList = pAssoc++;
 		}
 	}
-	MYASSERT( m_pFreeList != NULL );  // we must have something
+	
 	Variables::MyAssoc* pAssoc = m_pFreeList;
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
@@ -218,8 +218,10 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 			pAssoc->key[len] = 0;
 		}
 	}
+#ifdef DEBUG
 	pAssoc->Value.nValue = 0xcccccccc;  //invalid value
 	pAssoc->nHashValue = 0xcccccccc; //invalid value
+#endif
 	return pAssoc;
 }
 
@@ -372,4 +374,3 @@ void Variables::SetAt(const char* key, ieDword value)
 		pAssoc->nHashValue = nHash;
 	}
 }
-

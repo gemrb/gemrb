@@ -15,14 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.19 2004/11/29 22:19:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.20 2005/02/09 19:54:52 avenger_teambg Exp $
  *
  */
 
-// |Variables.h|  -  stolen Map class from MFC
-
-#if !defined(AFX_VARIABLES_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_)
-#define AFX_VARIABLES_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_
+#if !defined(VARIABLES_H)
+#define VARIABLES_H
 
 #include <ctype.h>
 #include "../../includes/win32def.h"
@@ -122,7 +120,6 @@ protected:
 	MyAssoc* GetAssocAt(const char*, unsigned int&) const;
 	inline bool MyCopyKey(char*& dest, const char* key) const;
 	inline unsigned int MyHashKey(const char*) const;
-	//	 POSITION GetStartPosition() const;
 	void GetNextAssoc(POSITION& rNextPosition, const char*& rKey,
 		ieDword& rValue) const;
 
@@ -130,4 +127,4 @@ public:
 	~Variables();
 };
 
-#endif // !defined(AFX_VARIABLES_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_)
+#endif // !defined(VARIABLES_H)

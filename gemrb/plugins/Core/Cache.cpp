@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.3 2005/01/22 20:54:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.4 2005/02/09 19:54:52 avenger_teambg Exp $
  *
  */
 
@@ -50,6 +50,14 @@ Cache::Cache()
 
 void Cache::RemoveAll()
 {
+/*
+	HashMapType::iterator m=hashmap.begin();
+
+	while(m!=hashmap.end() ) {
+		delete (*m).second.data;
+		m++;
+	}
+*/
 	hashmap.clear();
 }
 
