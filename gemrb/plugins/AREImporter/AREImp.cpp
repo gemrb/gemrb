@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.19 2003/11/30 19:13:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.20 2003/12/02 19:57:31 avenger_teambg Exp $
  *
  */
 
@@ -28,10 +28,27 @@
 #include "../Core/FileStream.h"
 #include "../Core/ImageMgr.h"
 
+#define DEF_OPEN  0
+#define DEF_CLOSE 1
+
+#define DEF_COUNT 2
+static char Sounds[DEF_COUNT][9]={-1};
+
 AREImp::AREImp(void)
 {
 	autoFree = false;
 	str = NULL;
+	if(Sounds[0][0]==-1) {
+		memset(Sounds,0,sizeof(Sounds) );
+	        int SoundTable = core->LoadTable("defsound");
+       		TableMgr * at = core->GetTable(SoundTable);
+		if(at) {
+			for(int i=0; i<DEF_COUNT;i++) {
+				strncpy(Sounds[i],at->QueryField(i,0),8);
+			}
+		}
+		core->DelTable(SoundTable);
+	}
 }
 
 AREImp::~AREImp(void)
@@ -187,7 +204,9 @@ Map * AREImp::GetMap()
 		door->Cursor = cursor;
 		//Leave the default sound untouched
 		if(OpenResRef[0]) memcpy(door->OpenSound, OpenResRef, 9);
+		else memcpy(door->OpenSound,Sounds[DEF_OPEN],9);
 		if(CloseResRef[0]) memcpy(door->CloseSound, CloseResRef, 9);
+		else memcpy(door->CloseSound,Sounds[DEF_CLOSE],9);
 	}
 	//Loading Containers
 	for(int i = 0; i < ContainersCount; i++) {
