@@ -1,4 +1,4 @@
 pstscript_DATA = *.py
-pstscriptdir = $(datadir)/GUIScripts/pst/
+pstscriptdir = $(moddir)/GUIScripts/pst/
 EXTRA_DIST = *.py
 MOSTLYCLEANFILES = *.pyc

@@ -1,4 +1,4 @@
 iwdscript_DATA = *.py
-iwdscriptdir = $(datadir)/GUIScripts/iwd/
+iwdscriptdir = $(moddir)/GUIScripts/iwd/
 EXTRA_DIST = *.py
 MOSTLYCLEANFILES = *.pyc
