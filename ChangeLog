@@ -1,3 +1,20 @@
+GemRB v0.2.2.5 Added Features:
+- Added some In-Game Script OpCodes:
+  - PlaySound
+  - CreateVisualEffect
+  - CreateVisualEffectObject
+- Fixed some In-Game Script OpCodes:
+  - Face: is now a Blocking OpCode
+  - Global: Added support for GLOBALS & LOCALS Contexts
+  - SetGlobal: Added support for GLOBALS & LOCALS Contexts
+
+GemRB v0.2.2.4 Added Features:
+- Planescape: Torment support Added
+- Rewritten the Audio Driver to use OpenAL (no more FMOD)
+- Added Basic In-Game Scripts support
+- Added a PathFinder
+- Added Basic Visual Effects (VVC)
+
 GemRB v0.2.2.0 Added Features:
 - Major Bug Fixed: Never Freeing Plugin Instances
 - A fully working BG2 Character Generation GUI
