@@ -23,12 +23,31 @@
 
 #include "../Core/SaveGameMgr.h"
 
+typedef struct PCStruct {
+	unsigned short Unknown0;
+	unsigned short PartyOrder;
+	unsigned long  OffsetToCRE;
+	unsigned long  CRESize;
+	char           CREResRef[8];
+	unsigned long  Unknown14;
+	char           Area[8];
+	unsigned short XPos;
+	unsigned short YPos;
+	unsigned short ViewXPos;
+	unsigned short ViewYPos;
+	unsigned char  Unknown28[100];
+	unsigned char  Unknown8C[16];
+	char           ResRef[8][3];
+	unsigned char  UnknownB4[12];
+} PCStruct;
+
 class GAMImp : public SaveGameMgr
 {
 private:
 	DataStream * str;
 	bool autoFree;
 	int version;
+	unsigned long PCSize;
 
 public:
 	unsigned int GameTime;
@@ -42,10 +61,26 @@ public:
 	unsigned long UnknownCount;
 	unsigned long NPCOffset;
 	unsigned long NPCCount;
+	unsigned long GLOBALOffset;
+	unsigned long GLOBALCount;
+	char AREResRef[9];
+	unsigned long Unknown48;
+	unsigned long JournalCount;
+	unsigned long JournalOffset;
+	unsigned long Unknown54;
+	unsigned long UnknownOffset54;
+	unsigned long UnknownCount58;
+	unsigned long KillVarsOffset;
+	unsigned long KillVarsCount;
+	unsigned long SomeBytesArrayOffset;
+	char AnotherArea[9];
+	char CurrentArea[9];
+	unsigned char Unknowns[84];
 public:
 	GAMImp(void);
 	~GAMImp(void);
 	bool Open(DataStream * stream, bool autoFree = true);
+	Game * GetGame();
 public:
 	void release(void)
 	{
