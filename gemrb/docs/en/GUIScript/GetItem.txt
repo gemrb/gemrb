@@ -14,6 +14,10 @@ The fields of the dictionary are the following:
 "ItemIcon"           - the item's icon (.bam resref)
 "StackAmount"        - maximum stackable amount
 "Dialog"             - item dialog (.dlg resref)
+"Function"           - returns special function
+  0 - no special function
+  1 - item is a copyable scroll (2. header's 1. feature is 'Learn spell')
+  2 - item is a drinkable potion 
 
 See also: GetSpell, SetItemIcon
 
