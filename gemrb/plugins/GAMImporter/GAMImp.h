@@ -29,7 +29,7 @@ typedef struct PCStruct {
 	unsigned long  OffsetToCRE;
 	unsigned long  CRESize;
 	char           CREResRef[8];
-	unsigned long  Unknown14;
+	unsigned long  Orientation;
 	char           Area[8];
 	unsigned short XPos;
 	unsigned short YPos;

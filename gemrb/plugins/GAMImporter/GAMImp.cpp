@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.5 2003/12/19 23:05:54 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.6 2003/12/20 18:29:36 balrog994 Exp $
  *
  */
 
@@ -70,7 +70,7 @@ bool GAMImp::Open(DataStream * stream, bool autoFree)
 	}
 	else if(strncmp(Signature, "GAMEV2.2", 8) == 0) {//iwd2
 		version=22;
-		PCSize = 0x160;
+		PCSize = 0x340;
 	}
 	else {
                 printf("[GAMImporter]: This file is not a valid GAM File\n");
@@ -129,6 +129,10 @@ Game * GAMImp::GetGame()
 {
 	if(globals)
 		globals->RemoveAll();
+	else {
+		globals = new Variables();
+		globals->SetType(GEM_VARIABLES_INT);
+	}
 	Game * newGame = new Game();
 	MapMgr * mM = (MapMgr*)core->GetInterface(IE_ARE_CLASS_ID);
 	if(!CurrentArea[0]) {
@@ -150,18 +154,26 @@ Game * GAMImp::GetGame()
 		str->Read(&pcInfo, 0xC0);
 		if(stricmp(pcInfo.Area, CurrentArea) != 0)
 			continue;
-		str->Seek(pcInfo.OffsetToCRE, GEM_STREAM_START);
-		void *Buffer = malloc(pcInfo.CRESize);
-		str->Read(Buffer, pcInfo.CRESize);
-		MemoryStream * ms = new MemoryStream(Buffer, pcInfo.CRESize);
-		aM->Open(ms);
-		Actor * actor = aM->GetActor();
+		Actor * actor;
+		if(pcInfo.OffsetToCRE) {
+			str->Seek(pcInfo.OffsetToCRE, GEM_STREAM_START);
+			void *Buffer = malloc(pcInfo.CRESize);
+			str->Read(Buffer, pcInfo.CRESize);
+			MemoryStream * ms = new MemoryStream(Buffer, pcInfo.CRESize);
+			aM->Open(ms);
+			actor = aM->GetActor();
+		} else {
+			DataStream * ds = core->GetResourceMgr()->GetResource(pcInfo.CREResRef, IE_CRE_CLASS_ID);
+			aM->Open(ds);
+			actor = aM->GetActor();
+		}
 		actor->XPos = pcInfo.XPos;
 		actor->YPos = pcInfo.YPos;
+		actor->Orientation = pcInfo.Orientation;
 		actor->InParty = true;
+		actor->AnimID = IE_ANI_AWAKE;
 		newMap->AddActor(actor);
 		newGame->SetPC(actor);
-		delete(ms);
 	}
 	//Loading NPCs
 	for(unsigned int i = 0; i < NPCCount; i++) {
@@ -185,6 +197,7 @@ Game * GAMImp::GetGame()
 		}
 		actor->XPos = pcInfo.XPos;
 		actor->YPos = pcInfo.YPos;
+		actor->Orientation = pcInfo.Orientation;
 		actor->InParty = false;
 		actor->AnimID = IE_ANI_AWAKE;
 		newMap->AddActor(actor);
