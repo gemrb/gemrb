@@ -44,7 +44,7 @@ def OnIncreaseSize():
 	TMessageWindow = 0
 	TMessageTA = 0
 	
-	GemRB.ExecuteString('HideGUI()')
+	GemRB.HideGUI()
 	MessageTA = GemRB.GetVar("MessageTextArea")
 	Expand = GemRB.GetVar("MessageWindowSize")
 	
@@ -72,7 +72,7 @@ def OnIncreaseSize():
 	
 	GemRB.SetVar("MessageWindowSize", Expand)
 	UpdateResizeButtons()
-	GemRB.ExecuteString('UnhideGUI()')
+	GemRB.UnhideGUI()
 	return
 	
 def OnDecreaseSize():
@@ -81,7 +81,7 @@ def OnDecreaseSize():
 	TMessageWindow = 0
 	TMessageTA = 0
 	
-	GemRB.ExecuteString('HideGUI()')
+	GemRB.HideGUI()
 	MessageTA = GemRB.GetVar("MessageTextArea")
 	Expand = GemRB.GetVar("MessageWindowSize")
 	
@@ -109,7 +109,7 @@ def OnDecreaseSize():
 	
 	GemRB.SetVar("MessageWindowSize", Expand)
 	UpdateResizeButtons()
-	GemRB.ExecuteString('UnhideGUI()')
+	GemRB.UnhideGUI()
 	return
 	
 def UpdateResizeButtons():
