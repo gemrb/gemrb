@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.37 2004/02/24 22:20:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.38 2004/04/09 13:38:36 avenger_teambg Exp $
  *
  */
 
@@ -39,10 +39,8 @@
 static AudioStream streams[MAX_STREAMS];
 static AudioStream music;
 static ALuint MusicSource, MusicBuffers[MUSICBUFERS];
-static int BufferDuration, BufferStartPlayTime;
 static SDL_mutex* musicMutex;
 static bool musicPlaying;
-static int musicIndex;
 static SDL_Thread* musicThread;
 static unsigned char* static_memory;
 
@@ -110,10 +108,8 @@ void ACMImp::clearstreams(bool free)
 
 int ACMImp::PlayListManager(void* data)
 {
-	ALuint count = 0;
 	ALuint buffersreturned = 0;
 	ALboolean bFinished = AL_FALSE;
-	ALuint buffersinqueue = MUSICBUFERS;
 	while (true) {
 		SDL_mutexP( musicMutex );
 		if (musicPlaying) {
@@ -129,28 +125,25 @@ int ACMImp::PlayListManager(void* data)
 				case AL_INITIAL:
 					 {
 						printf( "Music in INITIAL State. AutoStarting\n" );
-						int size = ACM_BUFFERSIZE;
 						unsigned char * memory = new unsigned char[ACM_BUFFERSIZE];
 						for (int i = 0; i < MUSICBUFERS; i++) {
-							int cnt = music.reader->read_samples( ( short* )
-														memory,
-														ACM_BUFFERSIZE >>
-														1 );
+							music.reader->read_samples( ( short* ) memory, ACM_BUFFERSIZE >> 1 );
 							alBufferData( MusicBuffers[i], AL_FORMAT_STEREO16,
 								memory, ACM_BUFFERSIZE,
 								music.reader->get_samplerate() );
 						}
 						delete( memory );
-						alSourceQueueBuffers( MusicSource, MUSICBUFERS,
-							MusicBuffers );
-						if (alIsSource( MusicSource ))
+						alSourceQueueBuffers( MusicSource, MUSICBUFERS, MusicBuffers );
+						if (alIsSource( MusicSource )) {
 							alSourcePlay( MusicSource );
+						}
 					}
 					break;
 				case AL_STOPPED:
 					printf( "WARNING: Buffer Underrun. AutoRestarting Stream Playback\n" );
-					if (alIsSource( MusicSource ))
+					if (alIsSource( MusicSource )) {
 						alSourcePlay( MusicSource );
+					}
 					break;
 				case AL_PLAYING:
 					break;
@@ -171,9 +164,7 @@ int ACMImp::PlayListManager(void* data)
 					if (!bFinished) {
 						int size = ACM_BUFFERSIZE;
 						int cnt = music.reader->read_samples( ( short* )
-													static_memory,
-													ACM_BUFFERSIZE >>
-													1 );
+													static_memory, ACM_BUFFERSIZE >> 1 );
 						size -= ( cnt * 2 );
 						if (size != 0)
 							bFinished = AL_TRUE;
@@ -183,11 +174,7 @@ int ACMImp::PlayListManager(void* data)
 							core->GetMusicMgr()->PlayNext();
 							if (music.reader) {
 								printf( "Queuing New Music\n" );
-								int cnt1 = music.reader->read_samples( ( short* )
-															( static_memory +
-									( cnt*2 ) ),
-															size >>
-															1 );
+								int cnt1 = music.reader->read_samples( ( short* ) ( static_memory + ( cnt*2 ) ), size >> 1 );
 								printf( "Added %d Samples", cnt1 );
 								bFinished = false;
 							} else {
@@ -283,8 +270,7 @@ bool ACMImp::Init(void)
 
 unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 {
-	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef,
-													IE_WAV_CLASS_ID );
+	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef, IE_WAV_CLASS_ID );
 	if (!stream) {
 		return 0;
 	}
@@ -308,8 +294,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 		}
 	}
 	if (error != AL_NO_ERROR) {
-		DisplayALError( "Cannot Create a Buffer for this sound. Skipping",
-			error );
+		DisplayALError( "Cannot Create a Buffer for this sound. Skipping", error );
 		return 0;
 	}
 	CSoundReader* acm;
@@ -325,9 +310,8 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 	unsigned char * memory = new unsigned char[cnt * 2]; 
 	memset( memory, 0, cnt * 2 );
 	long cnt1 = acm->read_samples( ( short* ) memory, cnt );
-	int duration = ( ( cnt* riff_chans ) * 1000 ) / samplerate;
-	alBufferData( Buffer, GetFormatEnum( riff_chans, bits ), memory, cnt * 2,
-		samplerate );
+	int duration = ( ( cnt1 * riff_chans ) * 1000 ) / samplerate;
+	alBufferData( Buffer, GetFormatEnum( riff_chans, bits ), memory, cnt1 * 2, samplerate );
 	if (( error = alGetError() ) != AL_NO_ERROR) {
 		DisplayALError( "[ACMImp::Play] alBufferData : ", error );
 		alDeleteBuffers( 1, &Buffer );
@@ -387,7 +371,6 @@ unsigned long ACMImp::StreamFile(const char* filename)
 {
 	char path[_MAX_PATH];
 	ALenum error;
-	ALint state;
 
 	strcpy( path, core->GamePath );
 	strcpy( path, filename );
@@ -401,8 +384,6 @@ unsigned long ACMImp::StreamFile(const char* filename)
 	if (music.reader) {
 		delete( music.reader );
 	}
-	ALuint* Buffer;
-
 	if (MusicBuffers[0] == 0) {
 		alGenBuffers( MUSICBUFERS, MusicBuffers );
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.17 2004/02/24 22:20:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.18 2004/04/09 13:38:43 avenger_teambg Exp $
  *
  */
 
@@ -44,21 +44,6 @@
 #include "readers.h"
 
 #define MAX_STREAMS  30
-
-/*
-typedef struct AudioStream {
-	FSOUND_STREAM * stream;
-	FSOUND_DSPUNIT * dsp;
-	bool playing;
-	bool end;
-	bool free;
-	int channel;
-} AudioStream;
-*/
-
-static ALfloat ListenerPos[3];
-static ALfloat ListenerVel[3];
-static ALfloat ListenerOri[6];
 
 typedef struct AudioStream {
 	ALuint Buffer;
