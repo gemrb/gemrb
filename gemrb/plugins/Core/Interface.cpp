@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.97 2003/12/18 15:05:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.98 2003/12/18 17:21:12 balrog994 Exp $
  *
  */
 
@@ -46,7 +46,7 @@ Interface::Interface(void)
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 #endif
 	textcolor(LIGHT_WHITE);
-	printf("GemRB Core Version %d.%d Sub. %d Loading...\n", GEMRB_RELEASE, GEMRB_API_NUM, GEMRB_SDK_REV);
+	printf("GemRB Core Version v%.1f.%d.%d Loading...\n", GEMRB_RELEASE/1000.0, GEMRB_API_NUM, GEMRB_SDK_REV);
 	video = NULL;
 	key = NULL;
 	strings = NULL;
@@ -74,7 +74,8 @@ Interface::Interface(void)
 	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Starting Plugin Manager...\n", WHITE);
 	plugin = new PluginMgr(GemRBPath);
-	printMessage("Core", "Plugin Loading Complete!\n", LIGHT_GREEN);
+	printMessage("Core", "Plugin Loading Complete...", WHITE);
+	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Creating Object Factory...", WHITE);
 	factory = new Factory();
 	printStatus("OK", LIGHT_GREEN);
@@ -181,7 +182,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus("OK", LIGHT_GREEN);
-	printMessage("Core", "Initializing Resource Manager...", WHITE);
+	printMessage("Core", "Initializing Resource Manager...\n", WHITE);
 	key = (ResourceMgr*)GetInterface(IE_KEY_CLASS_ID);
 	char ChitinPath[_MAX_PATH];
 	strcpy(ChitinPath, GamePath);
@@ -191,7 +192,7 @@ int Interface::Init()
 		printf("Cannot Load Chitin.key\nTermination in Progress...\n");
 		return GEM_ERROR;
 	}
-	printStatus("OK", LIGHT_GREEN);
+	//printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Checking for Dialogue Manager...", WHITE);
 	if(!IsAvailable(IE_TLK_CLASS_ID)) {
 		printStatus("ERROR", LIGHT_RED);
@@ -225,7 +226,7 @@ int Interface::Init()
 	bmppal16 = key->GetResource("MPALETTE", IE_BMP_CLASS_ID);
 	pal16  = (ImageMgr*)this->GetInterface(IE_BMP_CLASS_ID);
 	pal16->Open(bmppal16, true);
-	printMessage("Core", "Palettes Loaded\n", LIGHT_GREEN);
+	printMessage("Core", "Palettes Loaded\n", WHITE);
 	printMessage("Core", "Loading Fonts...\n", WHITE);
 	AnimationMgr * anim = (AnimationMgr*)GetInterface(IE_BAM_CLASS_ID);
 	int table = LoadTable("fonts");
@@ -259,21 +260,22 @@ int Interface::Init()
 		DelTable(table);
 	}
 	FreeInterface(anim);
-	printMessage("Core", "Fonts Loaded\n", LIGHT_GREEN);
+	printMessage("Core", "Fonts Loaded...", WHITE);
+	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Initializing the Event Manager...", WHITE);
 	evntmgr = new EventMgr();
 	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "BroadCasting Event Manager...", WHITE);
 	video->SetEventMgr(evntmgr);
 	printStatus("OK", LIGHT_GREEN);
-	printMessage("Core", "Initializing Window Manager...", YELLOW);
+	printMessage("Core", "Initializing Window Manager...", WHITE);
 	windowmgr = (WindowMgr*)GetInterface(IE_CHU_CLASS_ID);
 	if(windowmgr == NULL) {
 		printStatus("ERROR", LIGHT_RED);
 		return GEM_ERROR;
 	}
 	printStatus("OK", LIGHT_GREEN);
-	printMessage("Core", "Initializing GUI Script Engine...", YELLOW);
+	printMessage("Core", "Initializing GUI Script Engine...", WHITE);
 	guiscript = (ScriptEngine*)GetInterface(IE_GUI_SCRIPT_CLASS_ID);
 	if(guiscript == NULL) {
 		printStatus("ERROR", LIGHT_RED);
@@ -286,6 +288,7 @@ int Interface::Init()
 	}
 	printStatus("OK", LIGHT_GREEN);
 	strcpy(NextScript, "Start");
+	AnimationFactory *af=(AnimationFactory*) GetResourceMgr()->GetFactoryResource("CAROT",IE_BAM_CLASS_ID);
 	printMessage("Core", "Setting up the Console...", WHITE);
 	ChangeScript = true;
 	console = new Console();
@@ -294,7 +297,6 @@ int Interface::Init()
 	console->Width = core->Width;
 	console->Height = 25;
 	console->SetFont(fonts[0]);
-	AnimationFactory *af=(AnimationFactory*) GetResourceMgr()->GetFactoryResource("CAROT",IE_BAM_CLASS_ID);
 	if(af)
 		console->SetCursor(af->GetFrame(0));
 	printStatus("OK", LIGHT_GREEN);
@@ -350,7 +352,7 @@ int Interface::Init()
 	}
 	printStatus("OK", LIGHT_GREEN);
 	if(HasFeature(GF_HAS_PARTY_INI) ) {
-		printMessage("Core", "Loading IceWind Dale 2 Extension Files...", YELLOW);
+		printMessage("Core", "Loading IceWind Dale 2 Extension Files...", WHITE);
 		INIparty = (DataFileMgr*)GetInterface(IE_INI_CLASS_ID);
 		FileStream * fs = new FileStream();
 		char tINIparty[_MAX_PATH];
@@ -365,15 +367,16 @@ int Interface::Init()
 		}
 	}
 	game = new Game();
+	DataStream * str = GetResourceMgr()->GetResource("CURSORS", IE_BAM_CLASS_ID);
 	printMessage("Core", "Loading Cursors...", WHITE);
 	anim = (AnimationMgr*)GetInterface(IE_BAM_CLASS_ID);
-	DataStream * str = GetResourceMgr()->GetResource("CURSORS", IE_BAM_CLASS_ID);
 	anim->Open(str, true);
 	for(int i = 0; i < 48; i++) {
 		Cursors[i] = anim->GetAnimation(i, 0, 0);
 	}
 	FreeInterface(anim);
 	video->SetCursor(Cursors[0]->GetFrame(0), Cursors[1]->GetFrame(0));
+	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Initializing A* PathFinder...", WHITE);
 	pathfinder = new PathFinder();
 	printStatus("OK", LIGHT_GREEN);
@@ -384,7 +387,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus("OK", LIGHT_GREEN);
-	printMessage("Core", "Core Initialization Complete!\n", LIGHT_GREEN);
+	printMessage("Core", "Core Initialization Complete!\n", WHITE);
 	return GEM_OK;
 }
 
@@ -697,14 +700,14 @@ Color * Interface::GetPalette(int index, int colors){
 /** Returns a preloaded Font */
 Font * Interface::GetFont(char * ResRef)
 {
-	printf("Searching Font %.8s...", ResRef);
+	//printf("Searching Font %.8s...", ResRef);
 	for(unsigned int i = 0; i < fonts.size(); i++) {
 		if(strncmp(fonts[i]->ResRef, ResRef, 8) == 0) {
-			printf("[FOUND]\n");
+			//printf("[FOUND]\n");
 			return fonts[i];
 		}
 	}
-	printf("[NOT FOUND]\n");
+	//printf("[NOT FOUND]\n");
 	return NULL;
 }
 

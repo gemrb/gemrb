@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.11 2003/12/18 15:05:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.12 2003/12/18 17:21:12 balrog994 Exp $
  *
  */
 
@@ -273,7 +273,7 @@ AnimationFactory * BAMImp::GetAnimationFactory(const char * ResRef, unsigned cha
 /** This function will load the Animation as a Font */
 Font * BAMImp::GetFont()
 {
-	printf("Start Getting Font\n");
+	//printf("Start Getting Font\n");
 	//printf("Calculating Font Buffer Max Size...");
 	int w = 0,h = 0;
 	for(unsigned int i = 0; i < cycles.size(); i++) {
@@ -297,7 +297,7 @@ Font * BAMImp::GetFont()
 		fnt->AddChar(pixels, frames[cycles[i].FirstFrame].Width, frames[cycles[i].FirstFrame].Height, frames[cycles[i].FirstFrame].XPos, frames[cycles[i].FirstFrame].YPos);//GetFrame(cycles[i].FirstFrame, 0));
 		free(pixels);
 	}
-	printf("Font Created\n");
+	//printf("Font Created\n");
 	return fnt;
 }
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.

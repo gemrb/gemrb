@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.29 2003/12/18 15:05:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.30 2003/12/18 17:21:12 balrog994 Exp $
  *
  */
 
@@ -84,7 +84,7 @@ bool KeyImp::LoadResFile(const char * resfile)
 		return false;
 	}
 	printStatus("OK", LIGHT_GREEN);
-	printf("Checking file type...");
+	printMessage("KEYImporter", "Checking file type...", WHITE);
 	char Signature[8];
 	f->Read(Signature, 8);
 	if(strncmp(Signature, "KEY V1  ", 8) != 0) {
@@ -101,7 +101,10 @@ bool KeyImp::LoadResFile(const char * resfile)
 	f->Read(&ResCount, 4);
 	f->Read(&BifOffset, 4);
 	f->Read(&ResOffset, 4);
-	printf("BIF Files Count: %ld (Starting at %ld Bytes)\nRES Count: %ld (Starting at %ld Bytes)\n", BifCount, BifOffset, ResCount, ResOffset);
+	printMessage("KEYImporter", "", WHITE);
+	printf("BIF Files Count: %ld (Starting at %ld Bytes)\n", BifCount, BifOffset);
+	printMessage("KEYImporter", "", WHITE);
+	printf("RES Count: %ld (Starting at %ld Bytes)\n", ResCount, ResOffset);
 	f->Seek(BifOffset, GEM_STREAM_START);
 	unsigned long BifLen, ASCIIZOffset;
 	unsigned short ASCIIZLen;
@@ -173,7 +176,6 @@ bool KeyImp::LoadResFile(const char * resfile)
 	strcat(p, f); \
 	FILE * exist = fopen(p, "rb"); \
 	if(exist) { \
-		printf(foundMessage); \
 		fclose(exist); \
 		FileStream * fs = new FileStream(); \
 		if(!fs) return NULL; \
@@ -181,6 +183,8 @@ bool KeyImp::LoadResFile(const char * resfile)
 		return fs; \
 	} \
 }
+
+//printf(foundMessage); \
 
 DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 {
