@@ -67,7 +67,7 @@ Actor * CREImp::GetActor()
 	str->Read(&act->BaseStats[IE_HITPOINTS], 2);
 	str->Read(&act->BaseStats[IE_MAXHITPOINTS], 2);
 	str->Read(&act->BaseStats[IE_ANIMATION_ID], 2);
-	str->Seek(1, GEM_CURRENT_POS);
+	str->Seek(2, GEM_CURRENT_POS);
 	str->Read(&act->BaseStats[IE_METAL_COLOR], 1);
 	str->Read(&act->BaseStats[IE_MINOR_COLOR], 1);
 	str->Read(&act->BaseStats[IE_MAJOR_COLOR], 1);
