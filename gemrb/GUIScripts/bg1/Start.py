@@ -66,10 +66,12 @@ def ConnectPress():
 	return
 
 def PregenPress():
-	GemRB.SetPlayMode(-1) #do not start game after chargen
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
-	GemRB.SetNextScript("CharGen") #temporarily
+	GemRB.SetVar("PlayMode",0) #loadgame needs this hack
+	GemRB.LoadGame(-1)
+	GemRB.SetVar("PlayMode",-1)
+	GemRB.SetNextScript("GUIMP")
 	return
 
 def LoadSingle():

@@ -168,8 +168,7 @@ def NextPress():
 		GemRB.EnterGame()
 	else:
 		#leaving multi player pregen
-		GemRB.UnloadWindow(CharGenWindow)
-		GemRB.SetNextScript("Start")
+		GemRB.SetNextScript("GUIMP")
 	return
 
 def CancelPress():
