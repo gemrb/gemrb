@@ -141,10 +141,12 @@ static PyObject * GemRB_GetTableValue(PyObject *self, PyObject *args)
 			printMessage("GUIScript", "Type Error: RowIndex/RowString and ColIndex/ColString must be the same type\n", LIGHT_RED);
 			return NULL;
 		}
+		TableMgr * tm = core->GetTable(TableIndex);
+		if(!tm)
+			return NULL;
 		if(PyObject_TypeCheck(row, &PyString_Type)) {
 			char * rows = PyString_AsString(row);
 			char * cols = PyString_AsString(col);
-			TableMgr * tm = core->GetTable(TableIndex);
 			char * ret = tm->QueryField(rows, cols);
 			if(ret == NULL)
 				return NULL;
@@ -162,24 +164,50 @@ static PyObject * GemRB_GetTableValue(PyObject *self, PyObject *args)
 		else {
 			int rowi = PyInt_AsLong(row);
 			int coli = PyInt_AsLong(col);
-			TableMgr * tm = core->GetTable(TableIndex);
 			char * ret = tm->QueryField(rowi, coli);
 			if(ret == NULL)
 				return NULL;
 			if((ret[0] >= '0') && (ret[0] <= '9')) {
 				if(ret[1] == 'x') {
-					int val;
-					sscanf(ret, "0x%x", &val);
-					return Py_BuildValue("i", val);
+					unsigned long val;
+					sscanf(ret, "0x%lx", &val);
+					return Py_BuildValue("l", val);
 				}
 				else
-					return Py_BuildValue("i", atoi(ret));
+					return Py_BuildValue("l", atol(ret));
 			}
 			return Py_BuildValue("s", ret);
 		}
 	}
 	
 	return NULL;
+}
+
+static PyObject * GemRB_FindTableValue(PyObject *self, PyObject *args)
+{
+	int ti, col, row;
+	unsigned long Value, val;
+
+	if(!PyArg_ParseTuple(args, "iil", &ti, &col, &Value)) {
+		printMessage("GUIScript", "Syntax Error: FindTableValue(TableIndex, ColumnIndex, Value)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	TableMgr * tm = core->GetTable(ti);
+	if(tm == NULL)
+		return NULL;
+	for(row = 0; row < tm->GetRowCount(); row++) {
+		char * ret = tm->QueryField(row, col);
+		if((ret[0] >= '0') && (ret[0] <= '9')) {
+			if(ret[1] == 'x')
+				sscanf(ret, "0x%lx", &val);
+			else
+				 val=atol(ret);
+			if(Value==val)
+				return Py_BuildValue("i", row);
+		}
+	}
+	return Py_BuildValue("i",-1); //row not found
 }
 
 static PyObject * GemRB_GetTableRowName(PyObject *self, PyObject *args)
@@ -699,6 +727,14 @@ static PyObject * GemRB_PlaySound(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_DrawWindows(PyObject *self, PyObject *args)
+{
+	core->DrawWindows();
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_Quit(PyObject *self, PyObject *args)
 {
 	bool ret = core->Quit();
@@ -837,6 +873,9 @@ static PyMethodDef GemRBMethods[] = {
 	{"GetTableValue", GemRB_GetTableValue, METH_VARARGS,
      "Returns a field of a 2DA Table."},
 
+	{"FindTableValue", GemRB_FindTableValue, METH_VARARGS,
+     "Returns the first rowcount of a field of a 2DA Table."},
+
 	{"GetTableRowName", GemRB_GetTableRowName, METH_VARARGS,
      "Returns the Name of a Row in a 2DA Table."},
 
@@ -911,6 +950,9 @@ static PyMethodDef GemRBMethods[] = {
 
  	{"HardEndPL", GemRB_HardEndPL, METH_NOARGS,
      "Ends a Music Playlist immediately."},
+
+	{"DrawWindows", GemRB_DrawWindows, METH_NOARGS,
+     "Refreshes the User Interface."},
 
 	{"Quit", GemRB_Quit, METH_NOARGS,
      "Quits GemRB."},
