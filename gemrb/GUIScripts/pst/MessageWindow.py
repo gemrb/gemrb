@@ -5,6 +5,7 @@ ActionsWindow = 0
 PortraitWindow = 0
 OptionsWindow = 0
 CloseButton = 0
+OpenButton = 0
 MaxExpand = 1
 
 def OnLoad():
@@ -28,7 +29,11 @@ def OnLoad():
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)
 	
-	CloseButton=GemRB.GetControl(MessageWindow, 0)
+	CloseButton= GemRB.GetControl(MessageWindow, 0)
+	GemRB.SetText(MessageWindow, CloseButton, 4243)
+	
+	OpenButton = GemRB.GetControl(OptionsWindow, 10)
+	GemRB.SetEvent(OptionsWindow, OpenButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 
 	UpdateResizeButtons()
 	
@@ -39,18 +44,24 @@ def OnLoad():
 	return
 	
 def OnIncreaseSize():
-	global MessageWindow
+	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow
 	
 	MessageTA = GemRB.GetVar("MessageTextArea")
 	Expand = GemRB.GetVar("MessageWindowSize")
 	
+	print "OnIncreaseSize()"
+	print "Expand ="
+	print Expand
+	
 	if Expand == 1:
 		return
+		
+	print "Executing"
 	
 	GemRB.HideGUI()
 	
 	if Expand == 0:
-		GemRB.SetVar("MessageWindow", MessageWindow);
+		GemRB.SetVar("MessageWindow", MessageWindow)
 		GemRB.SetVar("PortraitWindow", -1)
 		GemRB.SetVar("ActionsWindow", -1)
 		GemRB.SetVar("OptionsWindow", -1)
@@ -67,18 +78,24 @@ def OnIncreaseSize():
 	return
 	
 def OnDecreaseSize():
-	global MessageWindow
+	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow
 	
 	MessageTA = GemRB.GetVar("MessageTextArea")
 	Expand = GemRB.GetVar("MessageWindowSize")
 	
+	print "OnDecreaseSize()"
+	print "Expand ="
+	print Expand
+	
 	if Expand == 0:
 		return
+		
+	print "Executing"
 	
 	GemRB.HideGUI()
 	
-	if Expand == 0:
-		GemRB.SetVar("MessageWindow", -1);
+	if Expand == 1:
+		GemRB.SetVar("MessageWindow", -1)
 		GemRB.SetVar("PortraitWindow", PortraitWindow)
 		GemRB.SetVar("ActionsWindow", ActionsWindow)
 		GemRB.SetVar("OptionsWindow", OptionsWindow)
