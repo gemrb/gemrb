@@ -40,7 +40,7 @@ void EventMgr::DelWindow(unsigned short WindowID)
 	if(windows.size() == 0)
 		return;
 	std::vector<Window*>::iterator m;
-	for(m = windows.begin(); m != windows.end(); m++) {
+	for(m = windows.begin(); m != windows.end(); ++m) {
 		if((*m)->WindowID == WindowID) {
 			if(lastW == (*m))
 				lastW = NULL;
@@ -70,7 +70,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 		}
 	}
 	std::vector<Window*>::iterator m;
-	for(m = windows.begin(); m != windows.end(); m++) {
+	for(m = windows.begin(); m != windows.end(); ++m) {
 		if(((*m)->XPos <= x) && ((*m)->YPos <= y)) { //Maybe we are on the window, let's check
 			if(((*m)->XPos+(*m)->Width >= x) && ((*m)->YPos+(*m)->Height >= y)) { //Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
@@ -104,7 +104,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 		}
 	}
 	std::vector<Window*>::iterator m;
-	for(m = windows.begin(); m != windows.end(); m++) {
+	for(m = windows.begin(); m != windows.end(); ++m) {
 		if(((*m)->XPos <= x) && ((*m)->YPos <= y)) { //Maybe we are on the window, let's check
 			if(((*m)->XPos+(*m)->Width >= x) && ((*m)->YPos+(*m)->Height >= y)) { //Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
@@ -141,21 +141,22 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button,
 			}	
 		}
 	}*/
-	for(unsigned int i = 0; i < windows.size(); i++) {
+	std::vector<Window*>::iterator w;
+	for(w = windows.begin(); w != windows.end(); ++w) {
+	//for(unsigned int i = 0; i < windows.size(); i++) {
 		//if(((*m)->XPos <= x) && ((*m)->YPos <= y)) { //Maybe we are on the window, let's check
 		//	if(((*m)->XPos+(*m)->Width >= x) && ((*m)->YPos+(*m)->Height >= y)) { //Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
 		//		Control * ctrl = (*m)->GetControl(x,y);
 		//		if(ctrl != NULL) {
 		//			if(ctrl->hasFocus)
-		Window * w = windows[i];
 		Control *ctrl = NULL;
-		int i = 0;
+		int c = 0;
 		do {
-			ctrl = w->GetControl(i++);
+			ctrl = (*w)->GetControl(c++);
 			if(ctrl == NULL)
 				break;
-			ctrl->OnMouseUp(x-w->XPos-ctrl->XPos,y-w->YPos-ctrl->YPos, Button, Mod);
+			ctrl->OnMouseUp(x-(*w)->XPos-ctrl->XPos,y-(*w)->YPos-ctrl->YPos, Button, Mod);
 		} while(true);
 				//}
 				//lastW = *m;
