@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.50 2004/01/18 16:20:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.51 2004/01/18 16:25:09 avenger_teambg Exp $
  *
  */
 
@@ -2135,7 +2135,7 @@ void GameScript::SetTokenGlobal(Scriptable *Sender, Action *parameters)
 	printf("SetTokenGlobal: %d -> %s\n",value, varname);
 	char tmpstr[10];
 	sprintf(tmpstr,"%d",value);
-	char newvalue=malloc(strlen[tmpstr]+1);
+	char *newvalue=(char *) malloc(strlen(tmpstr)+1);
 	strcpy(newvalue,tmpstr);
 	core->GetTokenDictionary()->SetAt(varname, newvalue);
 }
