@@ -30,7 +30,7 @@ public:
         }
 	/** Returns a pointer to a zero terminated 2da element,
         0,0 returns the default value, it may return NULL */
-    inline char *QueryField(int row = 0, int column = 0) const
+    inline char *QueryField(unsigned int row = 0, unsigned int column = 0) const
 	{
 		if(rows.size()<=row) return (char*)defVal;
 		if(rows[row].size()<=column) return (char*)defVal;
@@ -73,7 +73,7 @@ public:
 		return -1;
 	};
 
-	inline char *GetRowName(int index) const
+	inline char *GetRowName(unsigned int index) const
 	{
 		if(index < rowNames.size())
 			return rowNames[index];
