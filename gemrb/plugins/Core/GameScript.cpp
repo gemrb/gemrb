@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.146 2004/04/17 11:28:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.147 2004/04/17 22:22:59 avenger_teambg Exp $
  *
  */
 
@@ -76,6 +76,9 @@ static TriggerLink triggernames[] = {
 	{"classlevelgt", GameScript::ClassLevelGT,0},
 	{"classlevellt", GameScript::ClassLevelLT,0},
 	{"clicked", GameScript::Clicked,0},
+	{"combatcounter", GameScript::CombatCounter,0},
+	{"combatcountergt", GameScript::CombatCounterGT,0},
+	{"combatcounterlt", GameScript::CombatCounterLT,0},
 	{"dead", GameScript::Dead,0},
 	{"entered", GameScript::Entered,0},
 	{"exists", GameScript::Exists,0},
@@ -117,6 +120,10 @@ static TriggerLink triggernames[] = {
 	{"inparty", GameScript::InParty,0},
 	{"inpartyallowdead", GameScript::InPartyAllowDead,0},
 	{"inpartyslot", GameScript::InPartySlot,0},
+	{"internal", GameScript::Internal,0},
+	{"internalgt", GameScript::InternalGT,0},
+	{"internallt", GameScript::InternalLT,0},
+	{"interactingwith", GameScript::InteractingWith,0},
 	{"isaclown", GameScript::IsAClown,0},
 	{"islocked", GameScript::IsLocked,0},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog,0},
@@ -184,6 +191,7 @@ static TriggerLink triggernames[] = {
 	{"time", GameScript::Time,0},
 	{"timegt", GameScript::TimeGT,0},
 	{"timelt", GameScript::TimeLT,0},
+	{"traptriggered", GameScript::TrapTriggered,0},
 	{"true", GameScript::True,0},
 	{"unselectablevariable", GameScript::UnselectableVariable,0},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT,0},
@@ -3997,6 +4005,52 @@ int GameScript::TimeLT(Scriptable* Sender, Trigger* parameters)
 int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
 {
 	return core->GetGameControl()->HotKey==parameters->int0Parameter;
+}
+
+int GameScript::CombatCounter(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->CombatCounter==(unsigned long) parameters->int0Parameter;
+}
+
+int GameScript::CombatCounterGT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->CombatCounter>(unsigned long) parameters->int0Parameter;
+}
+
+int GameScript::CombatCounterLT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->CombatCounter<(unsigned long) parameters->int0Parameter;
+}
+
+int GameScript::TrapTriggered(Scriptable* Sender, Trigger* parameters)
+{
+	if(Sender->Type!=ST_TRIGGER) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	return (Sender->LastTrigger==tar);
+}
+
+int GameScript::InteractingWith(Scriptable* Sender, Trigger* parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	GameControl *gc = core->GetGameControl();
+	if(Sender != gc->target && Sender!=gc->speaker) {
+		return 0;
+	}
+	if(tar != gc->target && tar!=gc->speaker) {
+		return 0;
+	}
+	return 1;
 }
 
 //-------------------------------------------------------------

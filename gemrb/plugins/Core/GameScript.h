@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.103 2004/04/17 11:28:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.104 2004/04/17 22:23:00 avenger_teambg Exp $
  *
  */
 
@@ -773,6 +773,9 @@ public: //Script Functions
 	static int ClassLevelGT(Scriptable* Sender, Trigger* parameters);
 	static int ClassLevelLT(Scriptable* Sender, Trigger* parameters);
 	static int Clicked(Scriptable* Sender, Trigger* parameters);
+	static int CombatCounter(Scriptable* Sender, Trigger* parameters);
+	static int CombatCounterGT(Scriptable* Sender, Trigger* parameters);
+	static int CombatCounterLT(Scriptable* Sender, Trigger* parameters);
 	static int Contains(Scriptable* Sender, Trigger* parameters);
 	static int Dead(Scriptable* Sender, Trigger* parameters);
 	static int Entered(Scriptable* Sender, Trigger* parameters);
@@ -815,6 +818,7 @@ public: //Script Functions
 	static int InParty(Scriptable* Sender, Trigger* parameters);
 	static int InPartyAllowDead(Scriptable* Sender, Trigger* parameters);
 	static int InPartySlot(Scriptable* Sender, Trigger* parameters);
+	static int InteractingWith(Scriptable* Sender, Trigger* parameters);
 	static int Internal(Scriptable* Sender, Trigger* parameters);
 	static int InternalGT(Scriptable* Sender, Trigger* parameters);
 	static int InternalLT(Scriptable* Sender, Trigger* parameters);
@@ -883,6 +887,7 @@ public: //Script Functions
 	static int TimeGT(Scriptable* Sender, Trigger* parameters);
 	static int TimeLT(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);
+	static int TrapTriggered(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariable(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableGT(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableLT(Scriptable* Sender, Trigger* parameters);

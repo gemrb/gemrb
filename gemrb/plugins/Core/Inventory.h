@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.8 2004/04/16 15:06:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.9 2004/04/17 22:23:00 avenger_teambg Exp $
  *
  */
 
@@ -52,13 +52,13 @@ typedef enum ieCREItemFlagBits {
 	IE_ITEM_UNSTEALABLE = 2,
 	IE_ITEM_STOLEN = 4,
 	//is this item stackable?
-	IE_ITEM_STACKED = 0x80,      //this is a gemrb extension
+	IE_ITEM_STACKED = 0x80,	 //this is a gemrb extension
 	//is this item already equipped?
-	IE_ITEM_EQUIPPED = 0x40,     //this is a gemrb extension 
+	IE_ITEM_EQUIPPED = 0x40,	//this is a gemrb extension 
 	//is this item destructible normally?
 	IE_ITEM_DESTRUCTIBLE = 0x20, //this is a gemrb extension
+	IE_ITEM_ACQUIRED = 0x10,	//this is a gemrb extension
 } ieCREItemFlagBits;
-
 
 typedef struct CREItem {
 	ieResRef  ItemResRef;
@@ -67,12 +67,12 @@ typedef struct CREItem {
 	ieDword Flags;
 } CREItem;
 
-
-
 class GEM_EXPORT Inventory {
 private:
 	std::vector<CREItem*> Slots;
 	int InventoryType;
+	int Changed;
+	int Weight;
 
 public: 
 	Inventory();
@@ -95,6 +95,7 @@ public:
 	/** sets inventory size, for the first time */
 	void SetSlotCount(unsigned int size);
 
+
 	/** returns CREItem in specified slot. if count !=0 it
 	** splits the item and returns only requuested amount */
 	CREItem* GetItem(unsigned int slot, unsigned int count = 0);
@@ -110,8 +111,9 @@ public:
 
 	/** flags: see ieCREItemFlagBits */
 	void DestroyItem(const char *resref, ieDword flags);
+	/** flags: see ieCREItemFlagBits */
+	void SetItemFlags(CREItem* item, ieDword flags);
 	void SetSlotItem(CREItem* item, unsigned int slot);
-
 	/** returns weight of whole inventory, i.e. encumbrance? */
 	/** FIXME: but what about IWD2 containers? */
 	int GetWeight() {return 0;};

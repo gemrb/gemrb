@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.27 2004/04/17 11:28:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.28 2004/04/17 22:22:59 avenger_teambg Exp $
  *
  */
 
@@ -90,6 +90,7 @@ public:
 	Variables* globals;
 	ieByte* familiars;
 	int MapIndex;
+	unsigned long CombatCounter;
 
 	/** index of PC selected in non-walking environment (shops, inventory...) */
 	int SelectedSingle;

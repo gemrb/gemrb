@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.12 2004/04/16 15:06:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.13 2004/04/17 22:23:00 avenger_teambg Exp $
  *
  */
 
@@ -28,6 +28,8 @@ static int Inited=-1;
 Inventory::Inventory()
 {
 	InventoryType = INVENTORY_HEAP;
+	Changed = false;
+	Weight = 0;
 }
 
 Inventory::~Inventory()
@@ -42,8 +44,12 @@ Inventory::~Inventory()
 
 int Inventory::CalculateWeight()
 {
+	if(!Changed) {
+		return Weight;
+	}
+	
 //returns the weight of stored items
-	return 0;
+	return Weight;
 }
 
 void Inventory::SetInventoryType(int arg)
@@ -143,6 +149,7 @@ void Inventory::DestroyItem(const char *resref, ieDword flags)
 		//until that, we simply erase it
 		delete item;
 		Slots[slot] = NULL;
+		Changed = true;
 	}
 }
 
@@ -154,6 +161,7 @@ CREItem *Inventory::GetItem(unsigned int slot, unsigned int count)
 		printf("Invalid slot!\n");
 		abort();
 	}
+	Changed = true;
 	item = Slots[slot];
 	if(!count || !(item->Flags&IE_ITEM_STACKED) ) {
 		Slots[slot] = NULL;
@@ -176,6 +184,7 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 		printf("Invalid slot!\n");
 		abort();
 	}
+	Changed = true;
 	if(Slots[slot]) {
 		delete Slots[slot];
 	}
@@ -185,6 +194,7 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 int Inventory::AddSlotItem(CREItem* item, unsigned int slot, CREItem **res_item)
 {
 	// FIXME: join items if possible
+	Changed = true;
 	for (size_t i = 0; i < Slots.size(); i++) {
 		if (!Slots[i]) {
 			Slots[i] = item;

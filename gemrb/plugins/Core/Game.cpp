@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.40 2004/04/17 11:28:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.41 2004/04/17 22:22:59 avenger_teambg Exp $
  *
  */
 
@@ -27,13 +27,14 @@
 
 extern Interface* core;
 
-Game::Game(void)
-	: Scriptable( ST_GLOBAL )
+Game::Game(void) : Scriptable( ST_GLOBAL )
 {
 	PartyGold = 0;
 	SetScript( core->GlobalScript, 0 );
 	MapIndex = -1;
 	SelectedSingle = 0;
+	Reputation = 0;
+	CombatCounter = 0; //stored here until we know better
 	globals = NULL;
 	familiars = NULL;
 }
@@ -119,6 +120,9 @@ int Game::SetPC(Actor* pc)
 	if (slot != -1)	   //it is an NPC, we remove it from the NPC vector
 	{
 		DelNPC(slot, false);
+	}
+	if(!PCs.size() ) {
+		Reputation = pc->GetStat(IE_REPUTATION);
 	}
 	PCs.push_back( pc );
 	return ( int ) PCs.size() - 1;
