@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.97 2003/12/22 18:59:45 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.98 2003/12/24 14:30:50 avenger_teambg Exp $
  *
  */
 
@@ -91,6 +91,24 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 
 	Py_INCREF(Py_None);
 	return Py_None;
+}
+
+static PyObject * GemRB_StatComment(PyObject * /*self*/, PyObject *args)
+{
+	int Strref, X, Y;
+	PyObject * ret;
+
+	if(!PyArg_ParseTuple(args, "iii", &Strref, &X, &Y)) {
+		printMessage("GUIScript", "Syntax Error: StatComment(Strref, X, Y)\n", LIGHT_RED);
+		return NULL;
+	}
+	char *text=core->GetString(Strref);
+	char *newtext=(char *) malloc(strlen(text)+12);
+	sprintf(newtext,text,X,Y);
+	free(text);
+	ret=Py_BuildValue("s", newtext);
+	free(newtext);
+	return ret;
 }
 
 static PyObject * GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject *args)
@@ -1747,6 +1765,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"EnterGame", GemRB_EnterGame, METH_NOARGS,
      "Enters the Game."},
+
+	{"StatComment", GemRB_StatComment, METH_VARARGS,
+     "Replaces values into an strref."},
 
 	{"EndCutSceneMode", GemRB_EndCutSceneMode, METH_NOARGS,
      "Exits the CutScene Mode."},
