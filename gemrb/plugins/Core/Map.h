@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.24 2004/01/01 15:42:45 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.25 2004/01/04 00:22:01 balrog994 Exp $
  *
  */
 
@@ -66,6 +66,11 @@ typedef struct WallGroup {
 	int polygons;
 } WallGroup;
 
+typedef struct Entrance {
+	char Name[33];
+	unsigned int XPos, YPos;
+} Entrance;
+
 class GEM_EXPORT Map : public Scriptable
 {
 public:
@@ -78,6 +83,7 @@ private:
 	std::vector<Actor*> actors;
 	std::vector<WallGroup*> wallGroups;
 	std::vector<ScriptedAnimation*> vvcCells;
+	std::vector<Entrance*> entrances;
 	Actor ** queue;
 	int Qcount;
 	int lastActorCount;
@@ -100,6 +106,8 @@ public:
 	int GetActorInRect(Actor ** & actors, Region &rgn);
 	SongHeaderType SongHeader;
 	void AddVVCCell(ScriptedAnimation * vvc);
+	void AddEntrance(char *Name, short XPos, short YPos);
+	Entrance * GetEntrance(char *Name);
 };
 
 #endif

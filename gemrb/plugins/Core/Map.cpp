@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.56 2004/01/02 12:34:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.57 2004/01/04 00:22:01 balrog994 Exp $
  *
  */
 
@@ -80,7 +80,11 @@ Map::~Map(void)
 		delete(animations[i]);
 	}
 	for(unsigned int i = 0; i < actors.size(); i++) {
-		delete(actors[i]);
+		if(!actors[i]->InParty)
+			delete(actors[i]);
+	}
+	for(unsigned int i = 0; i < entrances.size(); i++) {
+		delete(entrances[i]);
 	}
 	core->FreeInterface(LightMap);
 	core->FreeInterface(SearchMap);
@@ -110,7 +114,7 @@ void Map::DrawMap(Region viewport)
 			break;
 		if(!ip->Active)
 			continue;
-		if(!ip->Scripts[0])
+		if(!ip->Scripts[0] && (ip->Type != ST_TRAVEL))
 			continue;
 		ip->ProcessActions();
 		if(ip->Type == ST_TRIGGER) {
@@ -119,16 +123,18 @@ void Map::DrawMap(Region viewport)
 			continue;
 		}
 		Region BBox = ip->outline->BBox;
-		if(BBox.x <= 500)
-			BBox.x = 0;
-		else
-			BBox.x -= 500;
-		if(BBox.y <= 500)
-			BBox.y = 0;
-		else
-			BBox.y -= 500;
-		BBox.h += 1000;
-		BBox.w += 1000;
+		if(ip->Type == ST_PROXIMITY) {
+			if(BBox.x <= 500)
+				BBox.x = 0;
+			else
+				BBox.x -= 500;
+			if(BBox.y <= 500)
+				BBox.y = 0;
+			else
+				BBox.y -= 500;
+			BBox.h += 1000;
+			BBox.w += 1000;
+		}
 		int i = 0;
 		while(true) {
 			Actor * actor = core->GetGame()->GetPC(i++);
@@ -137,11 +143,31 @@ void Map::DrawMap(Region viewport)
 			if(!actor->InParty)
 				break;
 			if(BBox.PointInside(actor->XPos, actor->YPos)) {
-				if(ip->outline->BBox.PointInside(actor->XPos, actor->YPos)) {
-					ip->LastEntered = actor;
-					ip->LastTrigger = actor;
+				if(ip->Type == ST_PROXIMITY) {
+					if(ip->outline->BBox.PointInside(actor->XPos, actor->YPos)) {
+						if(ip->outline->PointIn(actor->XPos, actor->YPos)) {
+							ip->LastEntered = actor;
+							ip->LastTrigger = actor;
+						}
+					}
+					ip->Scripts[0]->Update();
+				} else { //ST_TRAVEL
+					if(ip->outline->PointIn(actor->XPos, actor->YPos)) {
+						unsigned long WinIndex, TAIndex;
+						core->GetDictionary()->Lookup("MessageWindow", WinIndex);
+						if((WinIndex != -1) && (core->GetDictionary()->Lookup("MessageTextArea", TAIndex))) {
+							Window * win = core->GetWindow(WinIndex);
+							if(win) {
+								TextArea * ta = (TextArea*)win->GetControl(TAIndex);
+								char Text[256];
+								sprintf(Text, "[color=00FF00]%s TravelTrigger Activated: [/color]Should Move to Area %s near %s", ip->Name, ip->Destination, ip->EntranceName);
+								ta->AppendText(Text, -1);
+							}
+						}
+						GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);
+						gc->MoveToArea(ip->Destination, ip->EntranceName);
+					}
 				}
-				ip->Scripts[0]->Update();
 				break;
 			}
 		}
@@ -374,13 +400,21 @@ void Map::GenerateQueue()
 		while(lastPos != 1) {
 			int parentPos = (lastPos/2)-1;
 			Actor * parent = queue[parentPos];
-			if(actor->YPos < parent->YPos) {
+			if(actor->AnimID == IE_ANI_SLEEP) {
 				queue[parentPos] = actor;
 				queue[lastPos-1] = parent;
 				lastPos = parentPos+1;
+			} else {
+				if(parent->AnimID == IE_ANI_SLEEP)
+					break;
+				if(actor->YPos < parent->YPos) {
+				queue[parentPos] = actor;
+				queue[lastPos-1] = parent;
+				lastPos = parentPos+1;
+				}
+				else
+					break;
 			}
-			else
-				break;
 		}
 	}
 }
@@ -402,13 +436,22 @@ Actor * Map::GetRoot()
 		int childPos = leftChildPos;
 		if(rightChildPos < Qcount) { //If both Child Exist
 			Actor * rightChild = queue[lastPos*2];
-			if(rightChild->YPos < child->YPos) {
+			if(rightChild->AnimID == IE_ANI_SLEEP) {
 				childPos = rightChildPos;
 				child = rightChild;
-			}
-			
+			} else {
+				if(child->AnimID != IE_ANI_SLEEP) {	
+					if(rightChild->YPos < child->YPos) {
+						childPos = rightChildPos;
+						child = rightChild;
+					}
+				}
+			}			
 		}
+		//if((node->YPos > child->YPos) || (child->AnimID == IE_ANI_SLEEP)) {
 		if(node->YPos > child->YPos) {
+			if(node->AnimID == IE_ANI_SLEEP)
+				break;
 			queue[lastPos-1] = child;
 			queue[childPos] = node;
 			lastPos = childPos+1;
@@ -432,12 +475,32 @@ void Map::AddVVCCell(ScriptedAnimation * vvc)
 
 Animation* Map::GetAnimation(const char * Name)
 {
-	for(int i = 0; i < animations.size(); i++) {
+	for(unsigned int i = 0; i < animations.size(); i++) {
 		if(strnicmp(animations[i]->ResRef, Name, 8) == 0)
 			return animations[i];
 	}
 	return NULL;
 }
+
+void Map::AddEntrance(char *Name, short XPos, short YPos)
+{
+	Entrance * ent = new Entrance();
+	strcpy(ent->Name, Name);
+	ent->XPos = XPos;
+	ent->YPos = YPos;
+	entrances.push_back(ent);
+}
+
+Entrance * Map::GetEntrance(char *Name)
+{
+	for(unsigned int i = 0; i < entrances.size(); i++) {
+		if(stricmp(entrances[i]->Name, Name) == 0)
+			return entrances[i];
+	}
+	return NULL;
+}
+
+/********************************************************************************/
 
 PathFinder::PathFinder(void)
 {
