@@ -186,6 +186,7 @@ void Scriptable::ProcessActions()
 			
 			break;
 		}
+		printf("Executing Action: %s\n", this->scriptName);
 		GameScript::ExecuteAction(this, CurrentAction);
 		neverExecuted = false;
 	}
@@ -386,8 +387,8 @@ void Moveble::ClearPath()
 	path = NULL;
 	step = NULL;
 	AnimID = IE_ANI_AWAKE;
-	if(CurrentAction)
-		CurrentAction->Release();
+	//if(CurrentAction)
+	//	CurrentAction->Release();
 	CurrentAction = NULL;
 }
 
