@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.121 2004/02/15 23:05:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.122 2004/02/17 17:43:46 avenger_teambg Exp $
  *
  */
 
@@ -937,6 +937,21 @@ Actor *Interface::GetActor(unsigned int Slot)
 	return actors[Slot];
 }
 
+void Interface::EnterActors(const char *StartArea)
+{
+	int i=actors.size();
+	while(i--) {
+		Actor *MyActor = GetActor(i);
+		if(MyActor && MyActor->InParty && (!MyActor->FromGame) ) {
+			GetGame()->SetPC(MyActor);
+			GetGame()->GetMap(0)->AddActor(MyActor);
+			strncpy(MyActor->Area, StartArea, 8);
+			MyActor->FromGame = true;
+			MyActor->MySelf = MyActor;
+		}
+	}
+}
+
 int Interface::LoadCreature(char *ResRef, int InParty)
 {
 	ActorMgr *actormgr=(ActorMgr *) GetInterface(IE_CRE_CLASS_ID);
@@ -974,14 +989,15 @@ int Interface::LoadCreature(char *ResRef, int InParty)
 int Interface::FindPlayer(int PartySlotCount)
 {
 	int index=(int)actors.size();
+	unsigned char s=(unsigned char) (PartySlotCount+1);
 	while(index--) {
 		if(!actors[index])
 			continue;
-		if(actors[index]->InParty ) {
-			break;
+		if(actors[index]->InParty == s) {
+			return index;
 		}
 	}
-	return index;
+	return -1;
 }
 
 int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)

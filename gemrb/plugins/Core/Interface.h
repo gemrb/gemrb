@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.73 2004/02/15 23:05:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.74 2004/02/17 17:43:47 avenger_teambg Exp $
  *
  */
 
@@ -156,6 +156,8 @@ public:
 	int UnloadCreature(unsigned int Slot);
 	/** Returns the actor pointer for Slot */
 	Actor *GetActor(unsigned int Slot);
+	/** Enters the premade actors (chargen PC's) into the game */
+	void EnterActors(const char *StartArea);
 	/** Returns actor index for partyslot PartySlotCount */
 	int FindPlayer(int PartySlotCount);
 	/** Sets a stat for the creature in actor index Slot */
