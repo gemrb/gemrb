@@ -71,6 +71,7 @@ def OnLoad():
 	GemRB.SetText(KitWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(KitWindow,7)
 	GemRB.SetText(KitWindow,DoneButton,11973)
+        GemRB.SetButtonFlags(KitWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(KitWindow, 5)
 	GemRB.SetText(KitWindow,TextAreaControl,17247)

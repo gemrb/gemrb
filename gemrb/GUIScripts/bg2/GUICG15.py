@@ -51,6 +51,7 @@ def OnLoad():
 	GemRB.SetText(RaceWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(RaceWindow,5)
 	GemRB.SetText(RaceWindow,DoneButton,11973)
+        GemRB.SetButtonFlags(RaceWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
         GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl = GemRB.GetControl(RaceWindow, 2)

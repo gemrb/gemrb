@@ -90,9 +90,9 @@ def OnLoad():
 	global KitIndex, Minimum, Maximum
 	
 	Kit = GemRB.GetVar("Class Kit")
+	ClassTable = GemRB.LoadTable("classes")
+	Class = GemRB.GetVar("Class")-1
 	if Kit == 0:
-		ClassTable = GemRB.LoadTable("classes")
-		Class = GemRB.GetVar("Class")-1
 		KitName = GemRB.GetTableRowName(ClassTable, Class)
 	else:
 		KitList = GemRB.LoadTable("kitlist")
@@ -137,6 +137,7 @@ def OnLoad():
 	GemRB.SetText(AbilityWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(AbilityWindow,0)
 	GemRB.SetText(AbilityWindow,DoneButton,11973)
+        GemRB.SetButtonFlags(AbilityWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(AbilityWindow, 29)
 	GemRB.SetText(AbilityWindow,TextAreaControl,17247)

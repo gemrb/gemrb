@@ -16,6 +16,7 @@ def OnLoad():
 
 	DoneButton = GemRB.GetControl(NameWindow,0)
 	GemRB.SetText(NameWindow, DoneButton, 11973)
+	GemRB.SetButtonFlags(NameWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 	GemRB.SetButtonState(NameWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
 
 	NameField = GemRB.GetControl(NameWindow, 2)

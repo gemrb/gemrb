@@ -42,6 +42,7 @@ def OnLoad():
 	GemRB.SetText(AlignmentWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(AlignmentWindow,0)
 	GemRB.SetText(AlignmentWindow,DoneButton,11973)
+        GemRB.SetButtonFlags(AlignmentWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(AlignmentWindow, 11)
 	GemRB.SetText(AlignmentWindow,TextAreaControl,9602)
