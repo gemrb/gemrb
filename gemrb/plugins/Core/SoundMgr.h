@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.5 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.6 2004/01/02 15:50:19 balrog994 Exp $
  *
  */
 
@@ -43,7 +43,7 @@ public:
 	virtual ~SoundMgr(void);
 	virtual bool Init(void) = 0;
 	virtual unsigned long Play(const char * ResRef) = 0;
-	virtual unsigned long LoadFile(const char * filename) = 0;
+	virtual unsigned long StreamFile(const char * filename) = 0;
 	virtual bool Stop(unsigned long index) = 0;
 	virtual bool Play(unsigned long index) = 0;
 	virtual void ResetMusics() = 0;
