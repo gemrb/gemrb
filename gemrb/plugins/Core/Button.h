@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.33 2004/08/29 21:22:59 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.34 2004/09/02 08:55:55 edheldil Exp $
  *
  */
 
@@ -92,6 +92,7 @@ typedef struct ButtonBorder {
 	int dx2;
 	int dy2;
 	Color color;
+	bool filled;
 	bool enabled;
 } ButtonBorder;
 
@@ -120,7 +121,7 @@ public:
 	/** Sets the Picture */
 	void SetPicture(Sprite2D* Picture);
 	/** Sets border/frame parameters */
-	void SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled = false);
+	void SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled = false, bool filled = false);
 	/** Sets font used for drawing button label */
 	void SetFont(Font* newfont);
 	/** Enables or disables specified border/frame */

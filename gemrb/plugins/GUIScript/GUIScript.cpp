@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.204 2004/09/01 18:32:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.205 2004/09/02 08:55:52 edheldil Exp $
  *
  */
 
@@ -1472,15 +1472,15 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetButtonBorder__doc,
-"SetButtonBorder(WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, R, G, B, A, [enabled])\n\n"
+"SetButtonBorder(WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, R, G, B, A, [enabled, filled])\n\n"
 "Sets border/frame parameters for a button" );
 
 static PyObject* GemRB_SetButtonBorder(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, r, g, b, a, enabled = 0;
+	int WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, r, g, b, a, enabled = 0, filled = 0;
 
-	if (!PyArg_ParseTuple( args, "iiiiiiiiiii|i", &WindowIndex, &ControlIndex,
-			&BorderIndex, &dx1, &dy1, &dx2, &dy2, &r, &g, &b, &a, &enabled)) {
+	if (!PyArg_ParseTuple( args, "iiiiiiiiiii|ii", &WindowIndex, &ControlIndex,
+			&BorderIndex, &dx1, &dy1, &dx2, &dy2, &r, &g, &b, &a, &enabled, &filled)) {
 		return AttributeError( GemRB_SetButtonBorder__doc );
 	}
 
@@ -1502,7 +1502,7 @@ static PyObject* GemRB_SetButtonBorder(PyObject * /*self*/, PyObject* args)
 
 
 	Color color = { r, g, b, a };
-	btn->SetBorder( BorderIndex, dx1, dy1, dx2, dy2, &color, (bool)enabled );
+	btn->SetBorder( BorderIndex, dx1, dy1, dx2, dy2, &color, (bool)enabled, (bool)filled );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3658,17 +3658,12 @@ static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-
-
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "SpellResRef", PyString_FromResRef (ms->SpellResRef));
 	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (ms->Flags));
 
 	return dict;
 }
-
-
-
 
 
 PyDoc_STRVAR( GemRB_GetSpell__doc,
@@ -3709,6 +3704,58 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 
 	delete spell;
 	return dict;
+}
+
+
+PyDoc_STRVAR( GemRB_MemorizeSpell__doc,
+"MemorizeSpell(PartyID, SpellType, Level, Index)=>bool\n\n"
+"Memorizes specified known spell. Returns 1 on success." );
+
+static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, SpellType, Level, Index;
+
+	if (!PyArg_ParseTuple( args, "iiii", &PartyID, &SpellType, &Level, &Index )) {
+		return AttributeError( GemRB_MemorizeSpell__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
+	if (! ks) {
+		return NULL;
+	}
+
+	return Py_BuildValue( "i", actor->spellbook.MemorizeSpell( ks, false ) );
+}
+
+
+PyDoc_STRVAR( GemRB_UnmemorizeSpell__doc,
+"UnmemorizeSpell(PartyID, SpellType, Level, Index)=>bool\n\n"
+"Unmemorizes specified known spell. Returns 1 on success." );
+
+static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, SpellType, Level, Index;
+
+	if (!PyArg_ParseTuple( args, "iiii", &PartyID, &SpellType, &Level, &Index )) {
+		return AttributeError( GemRB_UnmemorizeSpell__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	CREMemorizedSpell* ms = actor->spellbook.GetMemorizedSpell( SpellType, Level, Index );
+	if (! ms) {
+		return NULL;
+	}
+
+	return Py_BuildValue( "i", actor->spellbook.UnmemorizeSpell( ms ) );
 }
 
 
@@ -3839,6 +3886,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetMemorizedSpellsCount, METH_VARARGS),
 	METHOD(GetMemorizedSpell, METH_VARARGS),
 	METHOD(GetSpell, METH_VARARGS),
+	METHOD(MemorizeSpell, METH_VARARGS),
+	METHOD(UnmemorizeSpell, METH_VARARGS),
 
 	// terminating entry	
 	{NULL, NULL, 0, NULL}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.71 2004/08/29 21:22:59 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.72 2004/09/02 08:55:55 edheldil Exp $
  *
  */
 
@@ -245,7 +245,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 		if (! fr->enabled) continue;
 
 		Region r = Region( x + XPos + fr->dx1, y + YPos + fr->dy1, Width - (fr->dx1 + fr->dx2 + 1), Height - (fr->dy1 + fr->dy2 + 1) );
-		core->GetVideoDriver()->DrawRect( r, fr->color, false );
+		core->GetVideoDriver()->DrawRect( r, fr->color, fr->filled );
 	}
 }
 /** Sets the Button State */
@@ -260,7 +260,7 @@ void Button::SetState(unsigned char state)
 	}
 	State = state;
 }
-void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled)
+void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled, bool filled)
 {
 	if (index >= MAX_NUM_BORDERS)
 		return;
@@ -272,6 +272,7 @@ void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* col
 	fr->dy2 = dy2;
 	memcpy( &(fr->color), color, sizeof( Color ));
 	fr->enabled = enabled;
+	fr->filled = filled;
 	Changed = true;
 }
 
