@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libMUSImporter.la
 INCLUDES = $(all_includes)
-#LDFLAGS =     
+CXXFLAGS = -O2
 libMUSImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libMUSImporter_la_LIBADD = ../Core/libcore.la
 libMUSImporter_la_METASOURCES = AUTO

@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = lib2DAImporter.la
 INCLUDES = $(all_includes)
-#LDFLAGS =     
+CXXFLAGS = -O2
 lib2DAImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 lib2DAImporter_la_LIBADD = ../Core/libcore.la
 lib2DAImporter_la_METASOURCES = AUTO

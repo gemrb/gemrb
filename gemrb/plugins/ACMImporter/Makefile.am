@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libACMImporter.la
 INCLUDES = $(all_includes)
-#LDFLAGS =          
+CXXFLAGS = -O2
 libACMImporter_la_LDFLAGS = -module -version-info 0:0:0 -lopenal -lSDL @LIBPTHREAD@
 libACMImporter_la_LIBADD = ../Core/libcore.la
 libACMImporter_la_METASOURCES = AUTO

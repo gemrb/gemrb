@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libSDLVideo.la
 INCLUDES = $(all_includes)
-#LDFLAGS =     
+CXXFLAGS = -O2
 libSDLVideo_la_LDFLAGS = -module -version-info 0:0:0 -lSDL @LIBPTHREAD@
 libSDLVideo_la_LIBADD = ../Core/libcore.la
 libSDLVideo_la_METASOURCES = AUTO

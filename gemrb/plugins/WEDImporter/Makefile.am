@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libWEDImporter.la
 INCLUDES = $(all_includes)
-#LDFLAGS =     
+CXXFLAGS = -O2
 libWEDImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libWEDImporter_la_LIBADD = ../Core/libcore.la
 libWEDImporter_la_METASOURCES = AUTO

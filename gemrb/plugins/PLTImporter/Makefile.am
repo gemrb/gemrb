@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libPLTImporter.la
 INCLUDES = $(all_includes)
-#LDFLAGS =     
+CXXFLAGS = -O2
 libPLTImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libPLTImporter_la_LIBADD = ../Core/libcore.la
 libPLTImporter_la_METASOURCES = AUTO
