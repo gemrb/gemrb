@@ -229,19 +229,22 @@ void Button::SetEvent(char * funcName)
 }
 
 /** Sets the Display Flags */
-int Button::SetFlags(bool hideImg, bool hasPicture, bool playSound, bool isExit, bool isToggle)
+int Button::SetFlags(int arg_flags, int opcode)
 {
-	Flags = 0;
-	if(hideImg)
-		Flags = 0x01;
-	if(hasPicture)
-		Flags += 0x02;
-	if(playSound)
-		Flags += 0x04;
-	if(isExit)
-		Flags += 0x08;
-	if(isToggle)
-		Flags += 0x10;
+	switch(opcode)
+	{
+	case OP_SET:
+		Flags = arg_flags;  //set
+		break;
+	case OP_OR:
+		Flags |= arg_flags; //turn on
+		break;
+	case OP_NAND:
+		Flags &= ~arg_flags;//turn off
+		break;
+	default:
+		return -1;
+	}
 	Changed = true;
 	((Window*)Owner)->Invalidate();
 	return 0;

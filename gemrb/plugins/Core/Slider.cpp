@@ -203,7 +203,7 @@ void Slider::OnMouseOver(unsigned short x, unsigned short y)
 	Changed = true;
 	int oldPos = Pos;
 	if(State == IE_GUI_SLIDER_GRABBEDKNOB) {
-		unsigned short mx = KnobXPos, Mx = mx + (KnobStep*KnobStepsCount);
+		unsigned short mx = KnobXPos; //, Mx = mx + (KnobStep*KnobStepsCount);
 		unsigned short xmx = x-mx;
 		if(x < mx) {
 			Pos = 0;

@@ -27,8 +27,12 @@
 #define IE_GUI_BUTTON_SELECTED  2
 #define IE_GUI_BUTTON_DISABLED  3
 
+#define OP_SET  0  //set
+#define OP_OR   1  //turn on
+#define OP_NAND 2  //turn off
+
 /**Button Class. Used also for PixMaps (static images) or for Toggle Buttons.
-  *@author GemRB Developement Team
+  *@author GemRB Development Team
   */
 
 #ifdef WIN32
@@ -77,7 +81,7 @@ public: // Public Events
   /** Button Pressed Event Script Function Name */
   char ButtonOnPress[64];
   /** Sets the Display Flags */
-  int SetFlags(bool hideImg, bool hasPicture, bool playSound = true, bool isExit = false, bool isToggle = false);
+  int SetFlags(int Flags, int Operation);
 private: // Private attributes
 	/** Button Unpressed Image */
   Sprite2D * Unpressed;

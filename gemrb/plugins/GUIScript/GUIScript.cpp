@@ -141,7 +141,7 @@ static PyObject * GemRB_ShowModal(PyObject *self, PyObject *args)
 	int WindowIndex;
 
 	if(!PyArg_ParseTuple(args, "i", &WindowIndex)) {
-		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: Expected a window index\n", LIGHT_RED);
 		return NULL;
 	}
 	
@@ -160,7 +160,7 @@ static PyObject * GemRB_SetEvent(PyObject *self, PyObject *args)
 	char *funcName;
 
 	if(!PyArg_ParseTuple(args, "iiis", &WindowIndex, &ControlIndex, &event, &funcName)) {
-		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: SetEvent(WindowIndex, ControlIndex, EventMask, FunctionName)\n", LIGHT_RED);
 		return NULL;
 	}
 
@@ -177,7 +177,7 @@ static PyObject * GemRB_SetNextScript(PyObject *self, PyObject *args)
 	char *funcName;
 
 	if(!PyArg_ParseTuple(args, "s", &funcName)) {
-		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: Expected a script name\n", LIGHT_RED);
 		return NULL;
 	}
 
@@ -194,7 +194,7 @@ static PyObject * GemRB_SetControlStatus(PyObject *self, PyObject *args)
 	int status;
 
 	if(!PyArg_ParseTuple(args, "iii", &WindowIndex, &ControlIndex, &status)) {
-		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: SetControlStatus(WindowIndex, ControlIndex, status)\n", LIGHT_RED);
 		return NULL;
 	}
 
@@ -213,7 +213,7 @@ static PyObject * GemRB_SetVarAssoc(PyObject *self, PyObject *args)
 	char* varname;
 
 	if(!PyArg_ParseTuple(args, "iis", &WindowIndex, &ControlIndex, &varname)) {
-		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: SetVarAssoc(WindowIndex, ControlIndex, VariableName)\n", LIGHT_RED);
 		return NULL;
 	}
 
@@ -236,7 +236,7 @@ static PyObject * GemRB_UnloadWindow(PyObject *self, PyObject *args)
 	int WindowIndex;
 
 	if(!PyArg_ParseTuple(args, "i", &WindowIndex)) {
-		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: UnloadWindow(WindowIndex)\n", LIGHT_RED);
 		return NULL;
 	}
 	
@@ -254,7 +254,7 @@ static PyObject * GemRB_CreateLabel(PyObject *self, PyObject *args)
 	char *font, *text;
 
 	if(!PyArg_ParseTuple(args, "iiiiiissi", &WindowIndex, &ControlID, &x, &y, &w, &h, &font, &text, &align)) {
-		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: CreateLabel(WindowIndex, ControlIndex, x, y, w, h, font, text, align)\n", LIGHT_RED);
 		return NULL;
 	}
 	
@@ -279,10 +279,15 @@ static PyObject * GemRB_CreateLabel(PyObject *self, PyObject *args)
 
 static PyObject * GemRB_SetButtonFlags(PyObject *self, PyObject *args)
 {
-	int WindowIndex, ControlIndex, hideImg, hasPicture, hasSound;
+	int WindowIndex, ControlIndex, Flags, Operation;
 
-	if(!PyArg_ParseTuple(args, "iiiii", &WindowIndex, &ControlIndex, &hideImg, &hasPicture, &hasSound)) {
-		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+	if(!PyArg_ParseTuple(args, "iiii", &WindowIndex, &ControlIndex, &Flags, &Operation)) {
+		printMessage("GUIScript", "Syntax Error: SetButtonFlags(WindowIndex, ControlIndex, Flags, Operation)\n", LIGHT_RED);
+		return NULL;
+	}
+	if(Operation<0 || Operation>2)
+	{
+		printMessage("GUIScript","Syntax Error: SetButtonFlags operation must be 0-2\n", LIGHT_RED);
 		return NULL;
 	}
 
@@ -298,7 +303,7 @@ static PyObject * GemRB_SetButtonFlags(PyObject *self, PyObject *args)
 		return NULL;
 
 	Button * btn = (Button*)ctrl;
-	btn->SetFlags(hideImg, hasPicture, hasSound);
+	btn->SetFlags(Flags, Operation);
 
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -309,7 +314,7 @@ static PyObject * GemRB_SetButtonState(PyObject *self, PyObject *args)
 	int WindowIndex, ControlIndex, state;
 
 	if(!PyArg_ParseTuple(args, "iii", &WindowIndex, &ControlIndex, &state)) {
-		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: SetButtonState(WindowIndex, ControlIndex, State)\n", LIGHT_RED);
 		return NULL;
 	}
 
@@ -336,7 +341,7 @@ static PyObject * GemRB_PlaySound(PyObject *self, PyObject *args)
 	char* ResRef;
 
 	if(!PyArg_ParseTuple(args, "s", &ResRef)) {
-		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: PlaySound(SoundResource)\n", LIGHT_RED);
 		return NULL;
 	}
 	

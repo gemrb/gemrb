@@ -51,13 +51,13 @@ Interface::Interface(void)
 Interface::~Interface(void)
 {
 	std::vector<Font*>::iterator m = fonts.begin();
-	for(int i = 0; fonts.size() != 0; ) {
+	while( fonts.size() ) {
 		delete(*m);
 		fonts.erase(m);
 		m = fonts.begin();
 	}
 	std::vector<Window*>::iterator w = windows.begin();
-	for(int i = 0; windows.size() != 0; ) {
+	while( windows.size() ) {
 		if((*w)) {
 			delete(*w);
 		}
@@ -601,22 +601,19 @@ int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex,
 {
 	if(WindowIndex >= windows.size())
 	{
-		printf("Core","Window not found: %d", WindowIndex);
-		printStatus("ERROR", LIGHT_RED);
+		printMessage("Core","Window not found",LIGHT_RED);
 		return -1;
 	}
 	Window * win = windows[WindowIndex];
 	if(win==NULL)
 	{
-		printf("Core","Window already freed: %d", WindowIndex);
-		printStatus("ERROR", LIGHT_RED);
+		printMessage("Core","Window already freed", LIGHT_RED);
 		return -1;
 	}
 	Control * ctrl = win->GetControl(ControlIndex);
 	if(ctrl == NULL)
 	{
-		printf("Core","Control not found: %d", ControlIndex);
-		printStatus("ERROR", LIGHT_RED);
+		printMessage("Core","Control not found", LIGHT_RED);
 		return -1;
 	}
 	if(ctrl->ControlType!=(EventID>>24) )
@@ -677,15 +674,13 @@ int Interface::ShowModal(unsigned short WindowIndex)
 {
 	if(WindowIndex >= windows.size())
 	{
-		printf("Core","Window not found: %d", WindowIndex);
-		printStatus("ERROR", LIGHT_RED);
+		printMessage("Core","Window not found", LIGHT_RED);
 		return -1;
 	}
 	Window * win = windows[WindowIndex];
 	if(win==NULL)
 	{
-		printf("Core","Window already freed: %d", WindowIndex);
-		printStatus("ERROR", LIGHT_RED);
+		printMessage("Core","Window already freed", LIGHT_RED);
 		return -1;
 	}
 	win->Visible = true;
@@ -717,8 +712,7 @@ int Interface::DelWindow(unsigned short WindowIndex)
 	Window * win = windows[WindowIndex];
 	if(win==NULL)
 	{
-		printf("Window deleted again: %0d",WindowIndex);
-		printStatus("ERROR", LIGHT_RED);
+		printMessage("Core","Window deleted again",LIGHT_RED);
 		return -1;
 	}
 	evntmgr->DelWindow(win->WindowID);
