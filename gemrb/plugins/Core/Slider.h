@@ -56,6 +56,9 @@ public:
   void SetImage(unsigned char type, Sprite2D * img);
   /** Sets the Text of the current control */
   int SetText(const char * string);
+  /** Redraws a slider which is associated with VariableName */
+  void RedrawSlider(char *VariableName, int Sum);
+
 private: // Private attributes
   /** BackGround Image. If smaller than the Control Size, the image will be tiled. */
   Sprite2D * BackGround;

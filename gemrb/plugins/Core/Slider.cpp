@@ -91,6 +91,14 @@ void Slider::SetPosition(unsigned int pos)
 	}	
 	Changed = true;
 }
+/** Redraws a slider which is associated with VariableName */
+void Slider::RedrawSlider(char *VariableName, int Sum)
+{
+	if(strnicmp(VarName, VariableName, MAX_VARIABLE_LENGTH)) return;
+	if(Sum <= KnobStepsCount)
+		Pos = Sum;
+	Changed = true;
+}
 /** Sets the selected image */
 void Slider::SetImage(unsigned char type, Sprite2D * img)
 {

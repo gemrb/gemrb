@@ -147,7 +147,7 @@ void Window::RedrawControls(char *VarName, unsigned long Sum)
 			case IE_GUI_SLIDER:
 			{
 				Slider *sl =(Slider *) (Controls[i]);
-//				sl->RedrawSlider(VarName, Sum);
+				sl->RedrawSlider(VarName, Sum);
 				break;
 			}
 		}
