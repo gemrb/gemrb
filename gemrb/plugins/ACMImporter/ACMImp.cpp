@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.32 2004/01/09 11:41:13 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.33 2004/01/25 16:43:42 avenger_teambg Exp $
  *
  */
 
@@ -44,7 +44,7 @@ static SDL_mutex *musicMutex;
 static bool musicPlaying;
 static int musicIndex;
 static SDL_Thread * musicThread;
-static unsigned char *memory;
+static unsigned char *static_memory;
 
 bool isWAVC(DataStream * stream) {
 	if(!stream)
@@ -102,7 +102,15 @@ int ACMImp::PlayListManager(void * data)
 		if(musicPlaying) {
 			ALint state;
 			alGetSourcei(MusicSource, AL_SOURCE_STATE, &state);
-			if(state == AL_INITIAL) {
+			switch(state) {
+			default:
+				printf("WARNING: Unhandled Music state: %x\n",state);
+				musicPlaying=false;
+				alSourcePlay(MusicSource);
+				SDL_mutexV(musicMutex);
+				return -1;
+			case AL_INITIAL:
+				{
 				printf("Music in INITIAL State. AutoStarting\n");
 				int size = ACM_BUFFERSIZE;
 				unsigned char *memory = new unsigned char[ACM_BUFFERSIZE];
@@ -114,10 +122,15 @@ int ACMImp::PlayListManager(void * data)
 				alSourceQueueBuffers(MusicSource, MUSICBUFERS, MusicBuffers);
 				if(alIsSource(MusicSource))
 					alSourcePlay(MusicSource);
-			} else if(state == AL_STOPPED) {
+				}
+				break;
+			case AL_STOPPED:
 				printf("WARNING: Buffer Underrun. AutoRestarting Stream Playback\n");
 				if(alIsSource(MusicSource))
 					alSourcePlay(MusicSource);
+				break;
+			case AL_PLAYING:
+				break;
 			}
 			unsigned long volume;
 			if(!core->GetDictionary()->Lookup("Volume Music", volume)) {
@@ -134,7 +147,7 @@ int ACMImp::PlayListManager(void * data)
 					alSourceUnqueueBuffers(MusicSource, 1, &BufferID);
 					if(!bFinished) {
 						int size = ACM_BUFFERSIZE;
-						int cnt = music.reader->read_samples((short*)memory, ACM_BUFFERSIZE>>1);
+						int cnt = music.reader->read_samples((short*)static_memory, ACM_BUFFERSIZE>>1);
 						size -= (cnt*2);
 						if(size != 0)
 							bFinished = AL_TRUE;
@@ -143,16 +156,16 @@ int ACMImp::PlayListManager(void * data)
 							core->GetMusicMgr()->PlayNext();
 							if(music.reader) {
 								printf("Queuing New Music\n");
-								int cnt1 = music.reader->read_samples((short*)(memory+(cnt*2)), size>>1);
+								int cnt1 = music.reader->read_samples((short*)(static_memory+(cnt*2)), size>>1);
 								printf("Added %d Samples", cnt1);
 								bFinished = false;
 							} else {
 								printf("No Other Music\n");
-								memset(memory+(cnt*2), 0, size);
+								memset(static_memory+(cnt*2), 0, size);
 								musicPlaying = false;
 							}
 						}
-						alBufferData(BufferID, AL_FORMAT_STEREO16, memory, ACM_BUFFERSIZE, music.reader->get_samplerate());
+						alBufferData(BufferID, AL_FORMAT_STEREO16, static_memory, ACM_BUFFERSIZE, music.reader->get_samplerate());
 						alSourceQueueBuffers(MusicSource, 1, &BufferID);
 						processed--;
 					} 
@@ -175,7 +188,7 @@ ACMImp::ACMImp(void)
 	}
 	musicMutex = SDL_CreateMutex();
 	musicPlaying = false;
-	memory = new unsigned char[ACM_BUFFERSIZE];
+	static_memory = new unsigned char[ACM_BUFFERSIZE];
 	musicThread = SDL_CreateThread(PlayListManager, NULL);
 }
 
@@ -184,20 +197,49 @@ ACMImp::~ACMImp(void)
 	clearstreams(true);
 	SDL_KillThread(musicThread);
 	SDL_DestroyMutex(musicMutex);
-	delete(memory);
+	delete(static_memory);
 	alutExit();
 }
 
+#define RETRY 5
+
 bool ACMImp::Init(void)
 {
+	int i;
+
 	alutInit(0, NULL);
 	ALenum error = alGetError();
 	if(error != AL_NO_ERROR)
 		return false;
+
+	if(MusicSource && alIsSource(MusicSource) )
+		alDeleteSources(1,&MusicSource);
+	MusicSource=0;
+	for(i=0;i<RETRY;i++) {
+		alGenSources(1, &MusicSource);
+		if((error = alGetError()) != AL_NO_ERROR) {
+			DisplayALError("[ACMImp::Play] alGenSources : ", error);
+		}
+		if(alIsSource(MusicSource)) {
+			break;
+		}
+		printf("Retrying to open sound, last error:(%d)\n",alGetError());
+		sleep(15);
+		alutInit(0,NULL);
+	}
+	if(i==RETRY)
+		return false;
+
+	ALfloat SourcePos[] = {0.0f, 0.0f, 0.0f};
+	ALfloat SourceVel[] = {0.0f, 0.0f, 0.0f};
+
+	alSourcef (MusicSource, AL_PITCH,    1.0f     );
+	alSourcef (MusicSource, AL_GAIN,     1.0f     );
+	alSourcefv(MusicSource, AL_POSITION, SourcePos);
+	alSourcefv(MusicSource, AL_VELOCITY, SourceVel);
+	alSourcei (MusicSource, AL_LOOPING,  0        );
 	return true;
 }
-
-#define RETRY	5
 
 unsigned long ACMImp::Play(const char * ResRef, int XPos, int YPos)
 {
@@ -211,6 +253,7 @@ unsigned long ACMImp::Play(const char * ResRef, int XPos, int YPos)
 	ALfloat SourceVel[] = {0.0f, 0.0f, 0.0f};
 
 	ALenum error;
+	ALint state;
 
 	for(int i = 0; i < RETRY; i++) {
 		alGenBuffers(1, &Buffer);
@@ -247,10 +290,11 @@ unsigned long ACMImp::Play(const char * ResRef, int XPos, int YPos)
 	}
 	delete(memory);
 	delete(acm);
-				
+			
 	alGenSources(1, &Source);
 	if((error = alGetError()) != AL_NO_ERROR) {
 		DisplayALError("[ACMImp::Play] alGenSources : ", error);
+		return 0;
 	}
 
 	alSourcei (Source, AL_BUFFER,   Buffer   );
@@ -265,7 +309,6 @@ unsigned long ACMImp::Play(const char * ResRef, int XPos, int YPos)
 
 	for(int i = 0; i < MAX_STREAMS; i++) {
 		if(!streams[i].free) {
-			ALint state;
 			alGetSourcei(streams[i].Source, AL_SOURCE_STATE, &state);
 			if(state == AL_STOPPED) {
 				alDeleteBuffers(1, &streams[i].Buffer);
@@ -295,6 +338,9 @@ unsigned long ACMImp::Play(const char * ResRef, int XPos, int YPos)
 unsigned long ACMImp::StreamFile(const char * filename)
 {
 	char path[_MAX_PATH];
+	ALenum error;
+	ALint state;
+
 	strcpy(path, core->GamePath);
 	strcpy(path, filename);
 	FileStream * str = new FileStream();
@@ -317,9 +363,12 @@ unsigned long ACMImp::StreamFile(const char * filename)
 	else {
 		music.reader = CreateSoundReader(str, SND_READER_WAV, str->Size(), true);
 	}
-	
+	/*
 	if(MusicSource == 0) {
 		alGenSources(1, &MusicSource);
+		if((error = alGetError()) != AL_NO_ERROR) {
+			DisplayALError("[ACMImp::Play] alGenSources : ", error);
+		}
 
 		ALfloat SourcePos[] = {0.0f, 0.0f, 0.0f};
 		ALfloat SourceVel[] = {0.0f, 0.0f, 0.0f};
@@ -330,6 +379,7 @@ unsigned long ACMImp::StreamFile(const char * filename)
 		alSourcefv(MusicSource, AL_VELOCITY, SourceVel);
 		alSourcei (MusicSource, AL_LOOPING,  0        );
 	}
+*/
 	SDL_mutexV(musicMutex);
 	return 0;
 }
