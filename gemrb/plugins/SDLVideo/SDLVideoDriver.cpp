@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.94 2005/03/06 20:48:13 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.95 2005/03/18 18:10:20 avenger_teambg Exp $
  *
  */
 
@@ -1340,19 +1340,6 @@ void SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAnchor)
 	free( buffer );
 	if (MirrorAnchor)
 		sprite->XPos = sprite->Width - sprite->XPos;
-}
-
-
-void SDLVideoDriver::MirrorAnimation(Animation* anim)
-{
-	Sprite2D* frame = NULL;
-	int i = 0;
-	do {
-		frame = anim->GetFrame( i++ );
-		if (!frame)
-			break;
-		MirrorSpriteHorizontal( frame, true );
-	} while (true);
 }
 
 void SDLVideoDriver::SetFadePercent(int percent)

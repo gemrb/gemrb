@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.41 2005/03/06 09:28:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.42 2005/03/18 18:10:21 avenger_teambg Exp $
  *
  */
 
@@ -103,8 +103,6 @@ public:
 	void MirrorSpriteVertical(Sprite2D *sprite, bool MirrorAnchor);
 	/** Flips sprite horizontally */
 	void MirrorSpriteHorizontal(Sprite2D *sprite, bool MirrorAnchor);
-	/** Mirrors an Animation Horizontally */
-	void MirrorAnimation(Animation* anim);
 	/** Set Clip Rect */
 	void SetClipRect(Region* clip);
 	/** Convers a Screen Coordinate to a Game Coordinate */

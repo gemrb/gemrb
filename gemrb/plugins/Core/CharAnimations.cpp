@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.47 2005/01/29 17:59:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.48 2005/03/18 18:10:12 avenger_teambg Exp $
  *
  */
 
@@ -417,14 +417,14 @@ printf("Die switch to twitch\n");
 	switch (GetAnimType()) {
 		case IE_ANI_CODE_MIRROR_3: //bird animations
 			if (Orient > 8) {
-				core->GetVideoDriver()->MirrorAnimation( a );
+				a->MirrorAnimation( );
 			}
 			Anims[StanceID][Orient] = a;
 			break;
 
 		case IE_ANI_CODE_MIRROR:
 			if (Orient > 8) {
-				core->GetVideoDriver()->MirrorAnimation( a );
+				a->MirrorAnimation( );
 			}
 			Anims[StanceID][Orient] = a;
 			if ((StanceID == IE_ANI_EMERGE) ||
@@ -440,7 +440,7 @@ printf("Die switch to twitch\n");
 
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
 			if (Orient > 8) {
-				core->GetVideoDriver()->MirrorAnimation( a );
+				a->MirrorAnimation( );
 			}
 			Anims[StanceID][Orient] = a;
 			break;
@@ -457,7 +457,7 @@ printf("Die switch to twitch\n");
 		case IE_ANI_PST_ANIMATION_2:  //no std just stc
 		case IE_ANI_PST_ANIMATION_1:
 			if (Orient > 8) {
-				core->GetVideoDriver()->MirrorAnimation( a );
+				a->MirrorAnimation( );
 			}
 			switch (StanceID) {
 				case IE_ANI_WALK:

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.21 2004/08/22 22:10:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.22 2005/03/18 18:10:12 avenger_teambg Exp $
  *
  */
 
@@ -64,8 +64,10 @@ Animation::~Animation(void)
 	if (!autofree) {
 		return;
 	}
+	Video *video = core->GetVideoDriver();
+
 	for (unsigned int i = 0; i < frames.size(); i++) {
-		core->GetVideoDriver()->FreeSprite( frames[i] );
+		video->FreeSprite( frames[i] );
 	}
 }
 
@@ -166,7 +168,19 @@ Sprite2D* Animation::GetFrame(unsigned long i)
 
 void Animation::SetPalette(Color* Palette)
 {
+	Video *video = core->GetVideoDriver();
+
 	for (size_t i = 0; i < frames.size(); i++) {
-		core->GetVideoDriver()->SetPalette( frames[i], Palette );
+		video->SetPalette( frames[i], Palette );
 	}
 }
+
+void Animation::MirrorAnimation()
+{
+	Video *video = core->GetVideoDriver();
+
+	for (size_t i = 0; i < frames.size(); i++) {
+		video->MirrorSpriteHorizontal( frames[i], true );
+	}
+}
+

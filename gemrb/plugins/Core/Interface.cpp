@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.281 2005/03/16 17:08:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.282 2005/03/18 18:10:18 avenger_teambg Exp $
  *
  */
 
@@ -812,12 +812,12 @@ void* Interface::GetInterface(SClass_ID filetype)
 	return plugin->GetPlugin( filetype );
 }
 
-Video* Interface::GetVideoDriver()
+Video* Interface::GetVideoDriver() const
 {
 	return video;
 }
 
-ResourceMgr* Interface::GetResourceMgr()
+ResourceMgr* Interface::GetResourceMgr() const
 {
 	return key;
 }
@@ -949,7 +949,7 @@ void Interface::FreeInterface(void* ptr)
 	plugin->FreePlugin( ptr );
 }
 
-Factory* Interface::GetFactory(void)
+Factory* Interface::GetFactory(void) const
 {
 	return factory;
 }
@@ -963,7 +963,7 @@ int Interface::SetFeature(int flag, int position)
 	}
 	return GameFeatures;
 }
-int Interface::HasFeature(int position)
+int Interface::HasFeature(int position) const
 {
 	return GameFeatures & ( 1 << position );
 }
@@ -1368,7 +1368,7 @@ Color* Interface::GetPalette(int index, int colors)
 	return pal;
 }
 /** Returns a preloaded Font */
-Font* Interface::GetFont(char* ResRef)
+Font* Interface::GetFont(const char *ResRef) const
 {
 	for (unsigned int i = 0; i < fonts.size(); i++) {
 		if (strnicmp( fonts[i]->ResRef, ResRef, 8 ) == 0) {
@@ -1378,7 +1378,7 @@ Font* Interface::GetFont(char* ResRef)
 	return NULL;
 }
 
-Font* Interface::GetFont(unsigned int index)
+Font* Interface::GetFont(unsigned int index) const
 {
 	if (index >= fonts.size()) {
 		return NULL;
@@ -1386,25 +1386,25 @@ Font* Interface::GetFont(unsigned int index)
 	return fonts[index];
 }
 
-Font* Interface::GetButtonFont()
+Font* Interface::GetButtonFont() const
 {
 	return GetFont( ButtonFont );
 }
 
 /** Returns the Event Manager */
-EventMgr* Interface::GetEventMgr()
+EventMgr* Interface::GetEventMgr() const
 {
 	return evntmgr;
 }
 
 /** Returns the Window Manager */
-WindowMgr* Interface::GetWindowMgr()
+WindowMgr* Interface::GetWindowMgr() const
 {
 	return windowmgr;
 }
 
 /** Get GUI Script Manager */
-ScriptEngine* Interface::GetGUIScriptEngine()
+ScriptEngine* Interface::GetGUIScriptEngine() const
 {
 	return guiscript;
 }

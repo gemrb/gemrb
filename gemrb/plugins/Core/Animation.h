@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.14 2005/02/24 16:45:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.15 2005/03/18 18:10:12 avenger_teambg Exp $
  *
  */
 
@@ -71,6 +71,8 @@ public:
 	Sprite2D* GetFrame(unsigned long i);
 	/** Sets the Animation Palette */
 	void SetPalette(Color* Palette);
+	/** Mirrors all the frames vertically */
+	void MirrorAnimation();
 	bool ChangePalette;
 };
 

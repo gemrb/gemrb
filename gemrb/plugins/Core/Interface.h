@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.144 2005/03/16 01:42:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.145 2005/03/18 18:10:19 avenger_teambg Exp $
  *
  */
 
@@ -174,28 +174,28 @@ public:
 	int Init(void);
 	//TODO: Core Methods in Interface Class
 	int SetFeature(int value, int position);
-	int HasFeature(int position);
+	int HasFeature(int position) const;
 	bool IsAvailable(SClass_ID filetype);
 	void * GetInterface(SClass_ID filetype);
 	const char * TypeExt(SClass_ID type);
-	Video * GetVideoDriver();
-	ResourceMgr * GetResourceMgr();
+	Video * GetVideoDriver() const;
+	ResourceMgr * GetResourceMgr() const;
 	char * GetString(ieStrRef strref, unsigned long options = 0);
 	void FreeInterface(void * ptr);
-	Factory * GetFactory(void);
+	Factory * GetFactory() const;
 	/** No descriptions */
 	Color * GetPalette(int index, int colors);
 	/** Returns a preloaded Font */
-	Font * GetFont(char * ResRef);
-	Font * GetFont(unsigned int index);
+	Font * GetFont(const char *) const;
+	Font * GetFont(unsigned int index) const;
 	/** Returns the button font */
-	Font * GetButtonFont();
+	Font * GetButtonFont() const;
 	/** Returns the Event Manager */
-	EventMgr * GetEventMgr();
+	EventMgr * GetEventMgr() const;
 	/** Returns the Window Manager */
-	WindowMgr * GetWindowMgr();
+	WindowMgr * GetWindowMgr() const;
 	/** Get GUI Script Manager */
-	ScriptEngine * GetGUIScriptEngine();
+	ScriptEngine * GetGUIScriptEngine() const;
 	/** Returns actor */
 	Actor *GetCreature(DataStream *stream);
 	/** Returns a PC index, by loading a creature */
