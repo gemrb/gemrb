@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.99 2003/12/24 21:49:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.100 2003/12/28 20:34:21 balrog994 Exp $
  *
  */
 
@@ -88,6 +88,62 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 	if(core->ConsolePopped) {
 		core->PopupConsole();
 	}
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_MoveTAText(PyObject * /*self*/, PyObject *args)
+{
+	int srcWin, srcCtrl, dstWin, dstCtrl;
+
+	if(!PyArg_ParseTuple(args, "iiii", &srcWin, &srcCtrl, &dstWin, &dstCtrl)) {
+		printMessage("GUIScript", "Syntax Error: MoveTAText(srcWin, srcCtrl, dstWin, dstCtrl)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	Window * SrcWin = core->GetWindow(srcWin);
+	if(!SrcWin)
+		return NULL;
+	TextArea * SrcTA = (TextArea*)SrcWin->GetControl(srcCtrl);
+	if(!SrcTA)
+		return NULL;
+	if(SrcTA->ControlType != IE_GUI_TEXTAREA)
+		return NULL;
+
+	Window * DstWin = core->GetWindow(dstWin);
+	if(!DstWin)
+		return NULL;
+	TextArea * DstTA = (TextArea*)DstWin->GetControl(dstCtrl);
+	if(!DstTA)
+		return NULL;
+	if(DstTA->ControlType != IE_GUI_TEXTAREA)
+		return NULL;
+
+	SrcTA->CopyTo(DstTA);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_SetTAAutoScroll(PyObject * /*self*/, PyObject *args)
+{
+	int wi, ci, state;
+
+	if(!PyArg_ParseTuple(args, "iii", &wi, &ci, &state)) {
+		printMessage("GUIScript", "Syntax Error: SetTAAutoScroll(WindowIndex, ControlIndex, State)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	Window * win = core->GetWindow(wi);
+	if(!win)
+		return NULL;
+	TextArea * ta = (TextArea*)win->GetControl(ci);
+	if(!ta)
+		return NULL;
+	if(ta->ControlType != IE_GUI_TEXTAREA)
+		return NULL;
+	ta->AutoScroll = state;
 
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -1757,6 +1813,12 @@ static PyObject * GemRB_EvaluateString(PyObject * /*self*/, PyObject *args)
 }
 
 static PyMethodDef GemRBMethods[] = {
+	{"SetTAAutoScroll", GemRB_SetTAAutoScroll, METH_VARARGS,
+	 "Sets the TextArea auto-scroll feature status."},
+
+	{"MoveTAText", GemRB_MoveTAText, METH_VARARGS,
+	 "Copies a TextArea content to another."},
+
 	{"ExecuteString", GemRB_ExecuteString, METH_VARARGS,
 	 "Executes an In-Game Script Action in the current Area Script Context"},
 
