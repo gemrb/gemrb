@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.214 2004/11/15 21:54:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.215 2004/11/18 19:42:45 avenger_teambg Exp $
  *
  */
 
@@ -118,8 +118,8 @@ static TriggerLink triggernames[] = {
 	{"globalltglobal", GameScript::GlobalLTGlobal,TF_MERGESTRINGS},
 	{"globalorglobal", GameScript::GlobalOrGlobal_Trigger,TF_MERGESTRINGS},
 	{"globalsequal", GameScript::GlobalsEqual,TF_MERGESTRINGS},
-	{"globalsGT", GameScript::GlobalsGT,TF_MERGESTRINGS},
-	{"globalsLT", GameScript::GlobalsLT,TF_MERGESTRINGS},
+	{"globalsgt", GameScript::GlobalsGT,TF_MERGESTRINGS},
+	{"globalslt", GameScript::GlobalsLT,TF_MERGESTRINGS},
 	{"globaltimerexact", GameScript::GlobalTimerExact,TF_MERGESTRINGS},
 	{"globaltimerexpired", GameScript::GlobalTimerExpired,TF_MERGESTRINGS},
 	{"globaltimernotexpired", GameScript::GlobalTimerNotExpired,TF_MERGESTRINGS},
@@ -169,8 +169,8 @@ static TriggerLink triggernames[] = {
 	{"levelpartygt", GameScript::LevelPartyGT,0},
 	{"levelpartylt", GameScript::LevelPartyLT,0},
 	{"localsequal", GameScript::LocalsEqual,TF_MERGESTRINGS},
-	{"localsGT", GameScript::LocalsGT,TF_MERGESTRINGS},
-	{"localsLT", GameScript::LocalsLT,TF_MERGESTRINGS},
+	{"localsgt", GameScript::LocalsGT,TF_MERGESTRINGS},
+	{"localslt", GameScript::LocalsLT,TF_MERGESTRINGS},
 	{"los", GameScript::LOS,0},
 	{"morale", GameScript::Morale,0},
 	{"moralegt", GameScript::MoraleGT,0},
@@ -183,11 +183,14 @@ static TriggerLink triggernames[] = {
 	{"partymemberdied", GameScript::PartyMemberDied,0},
 	{"nulldialog", GameScript::NullDialog,0},
 	{"numcreature", GameScript::NumCreatures,0},
-	{"numcreatureGT", GameScript::NumCreaturesGT,0},
-	{"numcreatureLT", GameScript::NumCreaturesLT,0},
+	{"numcreaturegt", GameScript::NumCreaturesGT,0},
+	{"numcreaturelt", GameScript::NumCreaturesLT,0},
+	{"numcreaturevsparty", GameScript::NumCreatureVsParty,0},
+	{"numcreaturevspartygt", GameScript::NumCreatureVsPartyGT,0},
+	{"numcreaturevspartylt", GameScript::NumCreatureVsPartyLT,0},
 	{"numdead", GameScript::NumDead,0},
-	{"numdeadGT", GameScript::NumDeadGT,0},
-	{"numdeadLT", GameScript::NumDeadLT,0},
+	{"numdeadgt", GameScript::NumDeadGT,0},
+	{"numdeadlt", GameScript::NumDeadLT,0},
 	{"numinparty", GameScript::PartyCountEQ,0},
 	{"numinpartyalive", GameScript::PartyCountAliveEQ,0},
 	{"numinpartyalivegt", GameScript::PartyCountAliveGT,0},
@@ -212,8 +215,8 @@ static TriggerLink triggernames[] = {
 	{"partycountgt", GameScript::PartyCountGT,0},
 	{"partycountlt", GameScript::PartyCountLT,0},
 	{"partygold", GameScript::PartyGold,0},
-	{"partygoldGT", GameScript::PartyGoldGT,0},
-	{"partygoldLT", GameScript::PartyGoldLT,0},
+	{"partygoldgt", GameScript::PartyGoldGT,0},
+	{"partygoldlt", GameScript::PartyGoldLT,0},
 	{"partyhasitem", GameScript::PartyHasItem,0},
 	{"partyhasitemidentified", GameScript::PartyHasItemIdentified,0},
 	{"proficiency", GameScript::Proficiency,0},
@@ -4067,6 +4070,27 @@ int GameScript::NumCreaturesGT(Scriptable* Sender, Trigger* parameters)
 	return value > parameters->int0Parameter;
 }
 
+int GameScript::NumCreatureVsParty(Scriptable* Sender, Trigger* parameters)
+{
+	parameters->objectParameter->objectFields[0]=EVILCUTOFF;
+	int value = GetObjectCount(Sender, parameters->objectParameter);
+	return value == parameters->int0Parameter;
+}
+
+int GameScript::NumCreatureVsPartyGT(Scriptable* Sender, Trigger* parameters)
+{
+	parameters->objectParameter->objectFields[0]=EVILCUTOFF;
+	int value = GetObjectCount(Sender, parameters->objectParameter);
+	return value > parameters->int0Parameter;
+}
+
+int GameScript::NumCreatureVsPartyLT(Scriptable* Sender, Trigger* parameters)
+{
+	parameters->objectParameter->objectFields[0]=EVILCUTOFF;
+	int value = GetObjectCount(Sender, parameters->objectParameter);
+	return value < parameters->int0Parameter;
+}
+
 int GameScript::Morale(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -5459,7 +5483,9 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 		map = game->GetCurrentMap( );
 	}
 	ab->SetPosition(map, pnt, flags&CC_CHECK_IMPASSABLE, radius );
-	ab->SetStance( IE_ANI_AWAKE );
+	//i think  this isn't needed, the creature's stance should be set in
+	//the creature, GetActor sets it correctly
+	//ab->SetStance( IE_ANI_AWAKE );
 	ab->Orientation = parameters->int0Parameter&(MAX_ORIENT-1);
 	map->AddActor( ab );
 

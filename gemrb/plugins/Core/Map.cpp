@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.124 2004/11/18 19:17:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.125 2004/11/18 19:42:46 avenger_teambg Exp $
  *
  */
 
@@ -1230,6 +1230,7 @@ void Map::SpawnCreature(Point pos, char *CreName, int radius)
 		creature = core->GetCreature(stream); 
 		if( creature ) {
 			creature->SetPosition( this, pos, true, radius );
+			AddActor(creature);
 		}
 		return;
 	}
@@ -1241,6 +1242,7 @@ void Map::SpawnCreature(Point pos, char *CreName, int radius)
 		creature = core->GetCreature(stream); 
 		if( creature ) {
 			creature->SetPosition( this, pos, true, radius );
+			AddActor(creature);
 		}
 	}
 }
