@@ -1,12 +1,12 @@
 
-Prototype: GemRB.SetSpellIcon(WindowIndex, ControlIndex, SPLResRef)
+Prototype: GemRB.SetSpellIcon(WindowIndex, ControlIndex, SPLResRef[, type])
 
-Description: Sets Spell icon image on a Button control.
+Description: Sets Spell icon image on a Button control. Type determines the icon type, if set to 1 it will use the Memorised Icon instead of the Spellbook Icon
 
 Parameters:
 WindowIndex, ControlIndex  - the control's reference
 SPLResRef                  - the name of the spell (.spl resref)
-
+type                       - (0 or 1)
 Return value: N/A
 
 See also: SetItemIcon

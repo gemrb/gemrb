@@ -1,0 +1,15 @@
+
+Prototype: GetStoreItem( index )
+
+Description: Gets the item resref, price and description of a store item referenced by the index. In case of PST stores the item's availability is also checked against the availability trigger.
+
+Parameters: index - the number of the cure in the store list
+
+Return value: dictionary
+"ItemResRef"   - the ResRef of the item
+"Description"  - the StrRef of the item's description
+"Price"        - the price of the item (subtract this from the party gold)
+"Amount"       - the amount of item in store (-1 means infinite)
+
+See also: EnterStore, GetStoreDrink, GetStoreCure, GetStore
+
