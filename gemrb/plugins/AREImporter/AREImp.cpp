@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.31 2004/01/02 00:56:26 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.32 2004/01/04 00:27:47 balrog994 Exp $
  *
  */
 
@@ -89,7 +89,9 @@ bool AREImp::Open(DataStream * stream, bool autoFree)
 	str->Seek(0x5A+bigheader, GEM_STREAM_START);
 	str->Read(&InfoPointsCount, 2);
 	str->Read(&InfoPointsOffset, 4);
-	str->Seek(0x70+bigheader, GEM_STREAM_START);
+	str->Seek(0x68+bigheader, GEM_STREAM_START);
+	str->Read(&EntrancesOffset, 4);
+	str->Read(&EntrancesCount, 4);
 	str->Read(&ContainersOffset, 4);
 	str->Read(&ContainersCount, 2);
 	str->Seek(0x7C+bigheader, GEM_STREAM_START);
@@ -292,7 +294,7 @@ Map * AREImp::GetMap()
 		unsigned long FirstVertex, Cursor, EndFlags;
 		unsigned short TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
 		unsigned short LaunchX, LaunchY;
-		char Name[33], Script[9], Key[9];
+		char Name[33], Script[9], Key[9], Destination[9], Entrance[33];
 		str->Read(Name, 32);
 		Name[32] = 0;
 		str->Read(&Type, 2);
@@ -307,7 +309,10 @@ Map * AREImp::GetMap()
 		str->Read(&FirstVertex, 4);
 		str->Seek(4, GEM_CURRENT_POS);
 		str->Read(&Cursor, 4);
-		str->Seek(40, GEM_CURRENT_POS);
+		str->Read(Destination, 8);
+		Destination[8] = 0;
+		str->Read(Entrance, 32);
+		Entrance[32] = 0;
 		str->Read(&EndFlags, 4);
 		unsigned long StrRef;
 		str->Read(&StrRef, 4);
@@ -345,6 +350,8 @@ Map * AREImp::GetMap()
 		ip->XPos = bbox.x+(bbox.w/2);
 		ip->YPos = bbox.y+(bbox.h/2);
 		ip->EndAction = EndFlags;
+		strcpy(ip->Destination, Destination);
+		strcpy(ip->EntranceName, Entrance);
 		//ip->triggered = false;
 		//strcpy(ip->Script, Script);
 		if(Script[0] != 0) {
@@ -442,8 +449,21 @@ Map * AREImp::GetMap()
 		anim->x = animX;
 		anim->y = animY;
 		anim->BlitMode = mode;
+		anim->free = false;
 		strcpy(anim->ResRef, animBam);
 		map->AddAnimation(anim);		
+	}
+	//Loading Entrances
+	str->Seek(EntrancesOffset, GEM_STREAM_START);
+	for(int i = 0; i < EntrancesCount; i++) {
+		char Name[33];
+		short XPos, YPos;
+		str->Read(Name, 32);
+		Name[32] = 0;
+		str->Read(&XPos, 2);
+		str->Read(&YPos, 2);
+		str->Seek(68, GEM_CURRENT_POS);
+		map->AddEntrance(Name, XPos, YPos);
 	}
 	map->AddTileMap(tm, lm, sr);
 	core->FreeInterface(tmm);
