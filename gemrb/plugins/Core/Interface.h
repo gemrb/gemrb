@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.60 2003/12/19 14:54:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.61 2003/12/19 17:28:24 balrog994 Exp $
  *
  */
 
@@ -56,6 +56,7 @@ class Interface;
 #include "Game.h"
 #include "GameControl.h"
 #include "GlobalTimer.h"
+#include "SaveGameMgr.h"
 
 typedef struct Table {
 	TableMgr * tm;
@@ -270,6 +271,7 @@ public:
 	{
 		return pathfinder;
 	}
+	void LoadGame(int index);
 
 private:
 	bool LoadConfig(void);

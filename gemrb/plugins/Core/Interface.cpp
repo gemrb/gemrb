@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.99 2003/12/19 14:54:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.100 2003/12/19 17:28:24 balrog994 Exp $
  *
  */
 
@@ -368,7 +368,7 @@ int Interface::Init()
 			printStatus("OK", LIGHT_GREEN);
 		}
 	}
-	game = new Game();
+	game = NULL;//new Game();
 	DataStream * str = GetResourceMgr()->GetResource("CURSORS", IE_BAM_CLASS_ID);
 	printMessage("Core", "Loading Cursors...", WHITE);
 	anim = (AnimationMgr*)GetInterface(IE_BAM_CLASS_ID);
@@ -1365,4 +1365,24 @@ void Interface::SetCutSceneMode(bool active)
 	Window * win = GetWindow(0);
 	GameControl * gc = (GameControl*)win->GetControl(0);
 	gc->SetCutSceneMode(active);
+}
+
+void Interface::LoadGame(int index) {
+	if(index == -1) {
+		//Load the Default Game
+		char ResRef[9];
+		int i = 0;
+		for(i = 0; i < 8; i++) {
+			if(INIConfig[i] == '.')
+				break;
+			ResRef[i] = INIConfig[i];
+		}
+		ResRef[i] = 0;
+		DataStream * ds = GetResourceMgr()->GetResource(ResRef, IE_GAM_CLASS_ID);
+		SaveGameMgr * sgm = (SaveGameMgr*)GetInterface(IE_GAM_CLASS_ID);
+		sgm->Open(ds);
+		if(game)
+			delete(game);
+		game = sgm->GetGame();
+	}
 }
