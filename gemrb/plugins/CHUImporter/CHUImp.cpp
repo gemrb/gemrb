@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.32 2004/08/08 20:49:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.33 2004/08/09 18:22:48 avenger_teambg Exp $
  *
  */
 
@@ -238,6 +238,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 						/* Getting the Cycle of the bam */
 						pbar->SetAnimation(anim->GetCycle( ( unsigned char ) Cycle ) );
 					}
+					win->AddControl( pbar );
 				}
 				break;
 			case IE_GUI_SLIDER:
