@@ -207,6 +207,30 @@ static PyObject * GemRB_SetControlStatus(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SetVarAssoc(PyObject *self, PyObject *args)
+{
+	int WindowIndex, ControlIndex;
+	char* varname;
+
+	if(!PyArg_ParseTuple(args, "iis", &WindowIndex, &ControlIndex, &varname)) {
+		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return NULL;
+
+	strncpy(ctrl->VarName, varname, MAX_VARIABLE_LENGTH);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_UnloadWindow(PyObject *self, PyObject *args)
 {
 	int WindowIndex;
@@ -361,6 +385,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"SetControlStatus", GemRB_SetControlStatus, METH_VARARGS,
      "Sets the status of a Control."},
+
+	{"SetVarAssoc", GemRB_SetVarAssoc, METH_VARARGS,
+     "Sets the name of the Variable associated with a control."},
 
 	{"UnloadWindow", GemRB_UnloadWindow, METH_VARARGS,
      "Unloads a previously Loaded Window."},
