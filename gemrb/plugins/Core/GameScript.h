@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.76 2004/03/20 19:55:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.77 2004/03/20 20:46:46 avenger_teambg Exp $
  *
  */
 
@@ -715,6 +715,7 @@ public: //Script Functions
 	static int Alignment(Scriptable* Sender, Trigger* parameters);
 	static int Allegiance(Scriptable* Sender, Trigger* parameters);
 	static int AreaCheck(Scriptable* Sender, Trigger* parameter);
+	static int AreaCheckObject(Scriptable* Sender, Trigger* parameter);
 	static int AreaFlag(Scriptable* Sender, Trigger* parameter);
 	static int AreaType(Scriptable* Sender, Trigger* parameter);
 	static int BitCheck(Scriptable* Sender, Trigger* parameters);
@@ -906,6 +907,7 @@ public:
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
 	static void SetAnimState(Scriptable* Sender, Action* parameters);
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
+	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
 	static void SetGlobal(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTimer(Scriptable* Sender, Action* parameters);
@@ -928,6 +930,7 @@ public:
 	static void StartMovie(Scriptable* Sender, Action* parameters);
 	static void StartSong(Scriptable* Sender, Action* parameters);
 	static void Swing(Scriptable* Sender, Action* parameters);
+	static void SwingOnce(Scriptable* Sender, Action* parameters);
 	static void TakePartyGold(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);

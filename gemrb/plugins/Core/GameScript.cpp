@@ -15,14 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.107 2004/03/20 19:55:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.108 2004/03/20 20:46:46 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "GameScript.h"
 #include "Interface.h"
-//#include "DialogMgr.h"
 
 extern Interface* core;
 #ifdef WIN32
@@ -54,6 +53,7 @@ static TriggerLink triggernames[] = {
 	{"alignment", GameScript::Alignment},
 	{"allegiance", GameScript::Allegiance},
 	{"areacheck", GameScript::AreaCheck},
+	{"areacheckobject", GameScript::AreaCheck},
 	{"areatype", GameScript::AreaType},
 	{"areaflag", GameScript::AreaFlag},
 	{"bitcheck",GameScript::BitCheck},
@@ -220,6 +220,7 @@ static ActionLink actionnames[] = {
 	{"recoil",GameScript::Recoil},
 	{"removeareatype", GameScript::RemoveAreaType},
 	{"removeareaflag", GameScript::RemoveAreaFlag},
+	{"setbeeninpartyflags",GameScript::SetBeenInPartyFlags},
 	{"setmoraleai",GameScript::SetMoraleAI},
 	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt",GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
@@ -255,6 +256,7 @@ static ActionLink actionnames[] = {
 	{"startmovie",GameScript::StartMovie},
 	{"startsong",GameScript::StartSong},
 	{"swing",GameScript::Swing},
+	{"swingonce",GameScript::SwingOnce},
 	{"takepartygold",GameScript::TakePartyGold},
 	{"triggeractivation",GameScript::TriggerActivation},
 	{"unhidegui",GameScript::UnhideGUI},
@@ -3106,10 +3108,7 @@ int GameScript::UnselectableVariableGT(Scriptable* Sender, Trigger* parameters)
 int GameScript::UnselectableVariableLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar) {
-		return 0;
-	}
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
@@ -3122,6 +3121,16 @@ int GameScript::AreaCheck(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
+	return strnicmp(actor->Area, parameters->string0Parameter, 8)==0;
+}
+
+int GameScript::AreaCheckObject(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
 	return strnicmp(actor->Area, parameters->string0Parameter, 8)==0;
 }
 
@@ -4484,6 +4493,8 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
+	/* calling this, so it is simpler to change */
+	SetBeenInPartyFlags(Sender, parameters);
 	Actor* act = ( Actor* ) Sender;
 	core->GetGame()->JoinParty( act );
 	act->SetStat( IE_EA, PC );
@@ -4626,7 +4637,19 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 	actor->SetWait( parameters->int0Parameter );
 }
 
+/* this may not be correct, just a placeholder you can fix */
 void GameScript::Swing(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->AnimID = IE_ANI_ATTACK;
+	actor->SetWait( 1 );
+}
+
+/* this may not be correct, just a placeholder you can fix */
+void GameScript::SwingOnce(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -4938,4 +4961,14 @@ void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
 
 	core->GetGame()->globals->Lookup( "GLOBALCHAPTER", value );
 	core->GetGame()->globals->SetAt( "GLOBALCHAPTER", value+1 );
+}
+
+void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	//i think it is bit 15 
+	actor->SetStat(IE_MC_FLAGS,actor->GetStat(IE_MC_FLAGS)|32768);
 }
