@@ -102,6 +102,8 @@ public:
 	void DrawConsole();
 	/** Get the Sound Manager */
 	SoundMgr * GetSoundMgr();
+	/** Get the Variables Dictionary */
+	Variables * GetDictionary();
 private:
 	bool LoadConfig(void);
 public:

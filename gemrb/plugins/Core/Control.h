@@ -27,7 +27,7 @@
 #define IE_GUI_SCROLLBAR 7
 
 
-
+#include "../../includes/win32def.h"
 /**This class defines a basic Control Object.
   *@author GemRB Developement Team
   */
@@ -52,6 +52,8 @@ public:
 	virtual void Draw(unsigned short x, unsigned short y) = 0;
 	/** Sets the Text of the current control */
 	virtual int SetText(const char * string) = 0;
+	/** Variables */
+	char VarName[MAX_VARIABLE_LENGTH];
 public: // Public attributes
 	/** Defines the Control ID Number used for GUI Scripting */
 	unsigned long ControlID;
@@ -86,14 +88,6 @@ public: //Events
 	virtual void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
 	/** Special Key Press */
 	virtual void OnSpecialKeyPress(unsigned char Key);
-	/** Associated Variable for the current Control */
-  char VarName[32];
-  int  VarValue;
-	/** Variable Functions */
-	void SetVariableName(const char * varname);
-	char* GetVariableName();
-	void SetVariableValue(int val);
-	int GetVariableValue();
 };
 
 #endif

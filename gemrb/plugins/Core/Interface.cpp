@@ -31,6 +31,7 @@ Interface::Interface(void)
 	hcanims = NULL;
 	guiscript = NULL;
 	windowmgr = NULL;
+	vars = NULL;
 	ConsolePopped = false;
 	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
@@ -77,6 +78,8 @@ Interface::~Interface(void)
 		delete(windowmgr);
 	if(guiscript)
 		delete(guiscript);
+	if(vars)
+		delete(vars);
 	delete(console);
 	delete(plugin);
 }
@@ -231,6 +234,13 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	if(!soundmgr->Init()) {
+		printStatus("ERROR", LIGHT_RED);
+		return GEM_ERROR;
+	}
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Initializing Variables Dictionary...", WHITE);
+	vars = new Variables();
+	if(!vars) {
 		printStatus("ERROR", LIGHT_RED);
 		return GEM_ERROR;
 	}
@@ -689,4 +699,9 @@ SoundMgr * Interface::GetSoundMgr()
 bool Interface::Quit(void)
 {
 	return video->Quit();
+}
+
+Variables * Interface::GetDictionary()
+{
+	return vars;
 }
