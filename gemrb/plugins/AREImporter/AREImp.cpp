@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.30 2004/01/01 15:47:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.31 2004/01/02 00:56:26 balrog994 Exp $
  *
  */
 
@@ -193,12 +193,11 @@ Map * AREImp::GetMap()
 		CloseResRef[8] = 0;
 		str->Read(&cursor, 4);
 		str->Seek(36, GEM_CURRENT_POS);
-		Region BBtoOpen;
-		str->Read(&BBtoOpen.w, 2);
-		str->Read(&BBtoOpen.y, 2);
-		str->Read(&BBtoOpen.x, 2);
-		str->Read(&BBtoOpen.h, 2);
-		BBtoOpen.Normalize();
+		Point toOpen[2];
+		str->Read(&toOpen[0].x, 2);
+		str->Read(&toOpen[0].y, 2);
+		str->Read(&toOpen[1].x, 2);
+		str->Read(&toOpen[1].y, 2);
 		//Reading Open Polygon
 		str->Seek(VerticesOffset + (OpenFirstVertex*4), GEM_STREAM_START);
 		Point * points = (Point*)malloc(OpenVerticesCount*sizeof(Point));
@@ -223,7 +222,8 @@ Map * AREImp::GetMap()
 		unsigned short * indices = tmm->GetDoorIndices(ShortName, &count);
 		Door * door = tm->AddDoor(ShortName, (Flags&1 ? 0 : 1), indices, count, open, closed);
 		door->Cursor = cursor;
-		door->BBtoOpen = BBtoOpen;
+		door->toOpen[0] = toOpen[0];
+		door->toOpen[1] = toOpen[1];
 		//Leave the default sound untouched
 		if(OpenResRef[0]) memcpy(door->OpenSound, OpenResRef, 9);
 		else
