@@ -1,0 +1,12 @@
+
+Prototype: GemRB.GameGetSelectedPCSingle()
+
+Description: Returns currently active pc in non-walk environment (i.e. in shops, inventory,...).
+
+Parameters: N/A
+
+Return value: PartyID (1-10)
+
+See also: GameSelectPC, GameSelectPCSingle
+
+MD5: b19700ed972c915b0910b40a746a87ee

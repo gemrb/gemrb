@@ -8,5 +8,6 @@ PartyID   - the PC's position in the party
 
 Return value: N/A
 
-See also: GameSelectPC
+See also: GameSelectPC, GameGetSelectedPCSingle
 
+MD5: 6ff47eca2a1cc470e3b909a8c1f9fa0b

@@ -10,5 +10,6 @@ x,y,w,h     - X position, Y position, Width and Height of the control
 
 Return value: N/A
 
-See also: CreateLabel, CreateMapControl, CreateWorldMapControl
+See also: CreateLabel, CreateMapControl, CreateWorldMapControl, CreateTextEdit
 
+MD5: cca3f572a4ebf8b1e9974f83f6e756aa
