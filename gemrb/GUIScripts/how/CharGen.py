@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.17 2004/12/04 12:35:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.18 2004/12/05 12:46:35 avenger_teambg Exp $
 
 
 #Character Generation
@@ -25,7 +25,7 @@
 
 import GemRB
 from ie_stats import *
-
+from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells
 
 CharGenWindow = 0
 CharGenState = 0
@@ -1516,11 +1516,12 @@ def ProficienciesCancelPress():
 # Spells Selection
 
 def MageSpellsSelect():
-	global CharGenWindow, MageSpellsWindow, MageSpellsTable, MageSpellsTextArea, MageSpellsDoneButton, MageSpellsSelectPointsLeft
+	global CharGenWindow, MageSpellsWindow, MageSpellsTextArea, MageSpellsDoneButton, MageSpellsSelectPointsLeft, Learnable
+
 	GemRB.SetVisible(CharGenWindow, 0)
 	MageSpellsWindow = GemRB.LoadWindow(7)
-	MageSpellsTable = GemRB.LoadTable("MAGESP")
-	MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
+	#kit (school), alignment, level
+	Learnable = GetLearnableMageSpells(GemRB.GetVar("Kit"), GemRB.GetVar("Alignment"),1)
 	GemRB.SetVar("MageSpellBook", 0)
 	GemRB.SetVar("SpellMask", 0)
 
@@ -1529,15 +1530,17 @@ def MageSpellsSelect():
 	GemRB.SetLabelUseRGB(MageSpellsWindow, PointsLeftLabel, 1)
 	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
 
-	for i in range (0, 24):
+	for i in range (24):
 		SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
 		GemRB.SetButtonFlags(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
-		if i < MageSpellsCount:
-			# Color is no good yet :-(
-			GemRB.SetButtonBAM(MageSpellsWindow, SpellButton, GemRB.GetTableValue(MageSpellsTable, i, 0), 0, 0, 63)
+		if i < len(Learnable):
+			Spell = GemRB.GetSpell(Learnable[i])
+			GemRB.SetSpellIcon(MageSpellsWindow, SpellButton, Learnable[i])
 			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
 			GemRB.SetVarAssoc(MageSpellsWindow, SpellButton, "SpellMask", 1 << i)
+			GemRB.SetTooltip(MageSpellsWindow, SpellButton, Spell['SpellName'])
+			#GemRB.SetButtonBorder(MageSpellsWindow, SpellButton, 0,1,1,2,2, 128,0,0,0)
 		else:
 			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
 
@@ -1560,32 +1563,35 @@ def MageSpellsSelect():
 	return
 
 def MageSpellsSelectPress():
-	global MageSpellsWindow, MageSpellsTable, MageSpellsTextArea, MageSpellsDoneButton, MageSpellsSelectPointsLeft
-	MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
+	global MageSpellsWindow, MageSpellsTextArea, MageSpellsDoneButton, MageSpellsSelectPointsLeft, Learnable
+
 	MageSpellBook = GemRB.GetVar("MageSpellBook")
 	SpellMask = GemRB.GetVar("SpellMask")
-	Spell = abs(MageSpellBook - SpellMask)
 
+	#getting the bit index
+	Spell = abs(MageSpellBook - SpellMask)
 	i = -1
 	while (Spell > 0):
 		i = i + 1
 		Spell = Spell >> 1
-	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, GemRB.GetTableValue(MageSpellsTable, i, 1))
+
+	Spell = GemRB.GetSpell(Learnable[i])
+	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, Spell['SpellDesc'])
 
 	if SpellMask < MageSpellBook:
 		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft + 1
-		for i in range (0, MageSpellsCount):
+		for i in range (len(Learnable)):
 			SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
-			if (((1 << i) & SpellMask) == 0):
+			if ((1 << i) & SpellMask) == 0:
 				GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonState(MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_DISABLED)
 	else:
 		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft - 1
 		if MageSpellsSelectPointsLeft == 0:
-			for i in range (0, MageSpellsCount):
+			for i in range (len(Learnable)):
 				SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
 				if ((1 << i) & SpellMask) == 0:
-					GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
+					GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_LOCKED)
 			GemRB.SetButtonState(MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_ENABLED)
 
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
@@ -1613,9 +1619,9 @@ def MageSpellsCancelPress():
 
 def MageSpellsMemorize():
 	global CharGenWindow, MageMemorizeWindow, MageSpellsTable, MageMemorizeTextArea, MageMemorizeDoneButton, MageMemorizePointsLeft
+
 	GemRB.SetVisible(CharGenWindow, 0)
 	MageMemorizeWindow = GemRB.LoadWindow(16)
-	MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
 	MaxSpellsMageTable = GemRB.LoadTable("MXSPLWIZ")
 	MageSpellBook = GemRB.GetVar("MageSpellBook")
 	GemRB.SetVar("MageMemorized", 0)
@@ -1627,14 +1633,13 @@ def MageSpellsMemorize():
 	GemRB.SetText(MageMemorizeWindow, PointsLeftLabel, str(MageMemorizePointsLeft))
 
 	j = 0
-	for i in range (0, 12):
+	for i in range (12):
 		SpellButton = GemRB.GetControl(MageMemorizeWindow, i + 2)
 		GemRB.SetButtonFlags(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
-		while (j < MageSpellsCount) and (((1 << j) & MageSpellBook) == 0):
+		while (j < len(Learnable)) and (((1 << j) & MageSpellBook) == 0):
 			j = j + 1
-		if j < MageSpellsCount:
-			# Color is no good yet :-(
-			GemRB.SetButtonBAM(MageMemorizeWindow, SpellButton, GemRB.GetTableValue(MageSpellsTable, j, 0), 0, 0, 63)
+		if j < len(Learnable):
+			GemRB.SetSpellIcon(MageMemorizeWindow, SpellButton, Learnable[j])
 			GemRB.SetButtonState(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageMemorizeSelectPress")
 			GemRB.SetVarAssoc(MageMemorizeWindow, SpellButton, "SpellMask", 1 << j)
@@ -1661,27 +1666,29 @@ def MageSpellsMemorize():
 	return
 
 def MageMemorizeSelectPress():
-	global MageMemorizeWindow, MageSpellsTable, MageMemorizeTextArea, MageMemorizeDoneButton, MageMemorizePointsLeft
-	MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
+	global MageMemorizeWindow, MageMemorizeTextArea, MageMemorizeDoneButton, MageMemorizePointsLeft, Learnable
+
 	MageSpellBook = GemRB.GetVar("MageSpellBook")
 	MageMemorized = GemRB.GetVar("MageMemorized")
 	SpellMask = GemRB.GetVar("SpellMask")
-	Spell = abs(MageMemorized - SpellMask)
 
+	Spell = abs(MageMemorized - SpellMask)
 	i = -1
 	while (Spell > 0):
 		i = i + 1
 		Spell = Spell >> 1
-	GemRB.SetText(MageMemorizeWindow, MageMemorizeTextArea, GemRB.GetTableValue(MageSpellsTable, i, 1))
+
+	Spell = GemRB.GetSpell(Learnable[i])
+	GemRB.SetText(MageMemorizeWindow, MageMemorizeTextArea, Spell['SpellDesc'])
 
 	if SpellMask < MageMemorized:
 		MageMemorizePointsLeft = MageMemorizePointsLeft + 1
 		j = 0
-		for i in range (0, 12):
+		for i in range (12):
 			SpellButton = GemRB.GetControl(MageMemorizeWindow, i + 2)
-			while (j < MageSpellsCount) and (((1 << j) & MageSpellBook) == 0):
+			while (j < len(Learnable) ) and (((1 << j) & MageSpellBook) == 0):
 				j = j + 1
-			if j < MageSpellsCount:
+			if j < len(Learnable):
 				GemRB.SetButtonState(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 				j = j + 1
 		GemRB.SetButtonState(MageMemorizeWindow, MageMemorizeDoneButton, IE_GUI_BUTTON_DISABLED)
@@ -1689,11 +1696,11 @@ def MageMemorizeSelectPress():
 		MageMemorizePointsLeft = MageMemorizePointsLeft - 1
 		if MageMemorizePointsLeft == 0:
 			j = 0
-			for i in range (0, 12):
+			for i in range (12):
 				SpellButton = GemRB.GetControl(MageMemorizeWindow, i + 2)
-				while (j < MageSpellsCount) and (((1 << j) & MageSpellBook) == 0):
+				while (j < len(Learnable) ) and (((1 << j) & MageSpellBook) == 0):
 					j = j + 1
-				if j < MageSpellsCount:
+				if j < len(Learnable):
 					if ((1 << j) & SpellMask) == 0:
 						GemRB.SetButtonState(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
 					j = j + 1
