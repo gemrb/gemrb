@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.14 2004/10/23 15:25:17 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.15 2004/11/21 17:55:00 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -29,6 +29,7 @@ from GUIDefines import *
 #import GUICommonWindows
 
 MapWindow = None
+NoteWindow = None
 WorldMapWindow = None
 WorldMapControl = None
 
@@ -61,6 +62,8 @@ def OpenMapWindow ():
 	# Hide or Show mapnotes
 	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	# Is this an option?
+	GemRB.SetVar ("ShowMapNotes", 1)
 	GemRB.SetVarAssoc (Window, Button, "ShowMapNotes", 1)
 
 	Label = GemRB.GetControl (Window, 0x10000003)
@@ -70,19 +73,63 @@ def OpenMapWindow ():
 	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0, 0x10000003, "FLAG1")
 	Map = GemRB.GetControl (Window, 2)
 	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", 1)
-
+	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "AddNoteWindow")
 	GemRB.UnhideGUI ()
 
 def LeftDoublePressMap ():
 	print "MoveToPoint"
 	return
 
-def LeftPressMap ():
-	print "MoveRectangle"
+def CloseNoteWindow ():
+	GemRB.SetVisible (NoteWindow, 0)
+	GemRB.SetVisible (MapWindow, 1)
+	return
+
+def RemoveMapNote ():
+	PosX = GemRB.GetVar("MapControlX")
+	PosY = GemRB.GetVar("MapControlY")
+	GemRB.SetMapnote (PosX, PosY, 0, "")
+	CloseNoteWindow ()
+	return
+
+def SetMapNote ():
+	PosX = GemRB.GetVar("MapControlX")
+	PosY = GemRB.GetVar("MapControlY")
+	Label = GemRB.GetControl (NoteWindow, 1)
+	Text = GemRB.QueryText (NoteWindow, Label)
+	Color = GemRB.GetVar("Color")
+	GemRB.SetMapnote (PosX, PosY, Color, Text)
+	CloseNoteWindow ()
 	return
 
 def AddNoteWindow ():
-	print "Add Note"
+	global NoteWindow
+
+	Label = GemRB.GetControl (MapWindow, 0x10000003)
+	Text = GemRB.QueryText (MapWindow, Label)
+	NoteWindow = GemRB.LoadWindow (5)
+	Label = GemRB.GetControl (NoteWindow, 1)
+	GemRB.SetText (NoteWindow, Label, Text )
+	GemRB.SetControlStatus (NoteWindow, Label, IE_GUI_CONTROL_FOCUSED)
+	for i in range(8):
+		Label = GemRB.GetControl (NoteWindow, 4+i)
+		#the .chu is crappy, we have to reset the flags
+		GemRB.SetButtonSprites (NoteWindow, Label, "FLAG1", i,0,1,2,2)
+		GemRB.SetButtonFlags (NoteWindow, Label, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
+		GemRB.SetVarAssoc (NoteWindow, Label, "Color", i)
+
+	#set
+	Label = GemRB.GetControl (NoteWindow, 0)
+	GemRB.SetEvent (NoteWindow, Label, IE_GUI_BUTTON_ON_PRESS,"SetMapNote")
+	#remove
+	Label = GemRB.GetControl (NoteWindow, 2)
+	GemRB.SetEvent (NoteWindow, Label, IE_GUI_BUTTON_ON_PRESS,"RemoveMapNote")
+	#cancel
+	Label = GemRB.GetControl (NoteWindow, 3)
+	GemRB.SetEvent (NoteWindow, Label, IE_GUI_BUTTON_ON_PRESS,"CloseNoteWindow")
+
+	GemRB.SetVisible (MapWindow, 2)
+	GemRB.SetVisible (NoteWindow, 1)
 	return
 
 def OpenWorldMapWindowInside ():
