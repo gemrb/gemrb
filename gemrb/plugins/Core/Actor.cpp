@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.95 2005/04/01 18:48:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.96 2005/04/03 21:00:02 avenger_teambg Exp $
  *
  */
 
@@ -77,11 +77,11 @@ static void InitActorTables()
 	wizardspelltables = (char **) calloc(classcount, sizeof(char*));
 	for(i = 0; i<classcount; i++) {
 		char *spelltablename = tm->QueryField( i, 1 );
-		if(spelltablename[0]!='*') {
+		if (spelltablename[0]!='*') {
 			clericspelltables[i]=strdup(spelltablename);
 		}
 		spelltablename = tm->QueryField( i, 2 );
-		if(spelltablename[0]!='*') {
+		if (spelltablename[0]!='*') {
 			wizardspelltables[i]=strdup(spelltablename);
 		}
 	}
@@ -180,12 +180,12 @@ void Actor::SetText(char* ptr, unsigned char type)
 {
 	size_t len = strlen( ptr ) + 1;
 	//32 is the maximum possible length of the actor name in the original games
-	if(len>32) len=33; 
-	if(type!=2) {
+	if (len>32) len=33; 
+	if (type!=2) {
 		LongName = ( char * ) realloc( LongName, len );
 		memcpy( LongName, ptr, len );
 	}
-	if(type!=1) {
+	if (type!=1) {
 		ShortName = ( char * ) realloc( ShortName, len );
 		memcpy( ShortName, ptr, len );
 	}
@@ -193,12 +193,12 @@ void Actor::SetText(char* ptr, unsigned char type)
 
 void Actor::SetText(int strref, unsigned char type)
 {
-	if(type!=2) {
-		if(LongName) free(LongName);
+	if (type!=2) {
+		if (LongName) free(LongName);
 		LongName = core->GetString( strref );
 	}
-	if(type!=1) {
-		if(ShortName) free(ShortName);
+	if (type!=1) {
+		if (ShortName) free(ShortName);
 		ShortName = core->GetString( strref );
 	}
 }
@@ -209,10 +209,10 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		delete( anims );
 	}
 	//hacking PST no palette
-	if(core->HasFeature(GF_ONE_BYTE_ANIMID) )
+	if (core->HasFeature(GF_ONE_BYTE_ANIMID) )
 	{
-		if(AnimID&0x8000) {
-			if(BaseStats[IE_COLORCOUNT]) {
+		if (AnimID&0x8000) {
+			if (BaseStats[IE_COLORCOUNT]) {
 				printf("[Actor] Animation ID %x is supposed to be real colored (no recoloring), patched creature\n", AnimID);
 			}
 			BaseStats[IE_COLORCOUNT]=0;
@@ -223,7 +223,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		//bird animations are not hindered by searchmap
 		//only animtype==7 (mirror3) uses this feature
 		//this is a hardcoded hack, but works for all engine type
-		if(anims->GetAnimType()!=IE_ANI_CODE_MIRROR_3) {
+		if (anims->GetAnimType()!=IE_ANI_CODE_MIRROR_3) {
 			BaseStats[IE_DONOTJUMP]=0;
 		} else {
 			BaseStats[IE_DONOTJUMP]=3;
@@ -305,12 +305,12 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 	if (StatIndex >= MAX_STATS) {
 		return false;
 	}
-	if( (signed) Value<-100) {
+	if ( (signed) Value<-100) {
 		Value = (ieDword) -100;
 	}
 	else {
-		if( maximum_values[StatIndex]>0) {
-			if( (signed) Value>maximum_values[StatIndex]) {
+		if ( maximum_values[StatIndex]>0) {
+			if ( (signed) Value>maximum_values[StatIndex]) {
 				Value = (ieDword) maximum_values[StatIndex];
 			}
 		}
@@ -318,7 +318,7 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 	Modified[StatIndex] = Value;
 	switch (StatIndex) {
 		case IE_GOLD:
-			if(InParty) {
+			if (InParty) {
 				core->GetGame()->PartyGold+=Modified[IE_GOLD];
 				Modified[IE_GOLD]=0;
 			}
@@ -341,10 +341,10 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 			SetCircleSize();
 			break;
 		case IE_HITPOINTS:
-			if(GetHPMod()+(signed) Value<=0) {
+			if (GetHPMod()+(signed) Value<=0) {
 				Die(NULL);
 			}
-			if((signed) Value>(signed) Modified[IE_MAXHITPOINTS]) {
+			if ((signed) Value>(signed) Modified[IE_MAXHITPOINTS]) {
 				Modified[IE_HITPOINTS]=Modified[IE_MAXHITPOINTS];
 			}
 			break;
@@ -498,21 +498,21 @@ int Actor::GetEncumbrance()
 void Actor::Die(Scriptable *killer)
 {
 	int minhp=Modified[IE_MINHITPOINTS];
-	if(minhp) { //can't die
+	if (minhp) { //can't die
 		SetStat(IE_HITPOINTS, minhp);
 		return;
 	}
 	Selected=false;
 	InternalFlags|=IF_JUSTDIED;
-	if(!InParty) {
+	if (!InParty) {
 		Actor *act=NULL;
 		
-		if(killer) {
-			if(killer->Type==ST_ACTOR) {
+		if (killer) {
+			if (killer->Type==ST_ACTOR) {
 				act = (Actor *) killer;
 			}
 		}
-		if(act && act->InParty) {
+		if (act && act->InParty) {
 			//adjust game statistics here
 			//game->KillStat(this, killer);
 			InternalFlags|=IF_GIVEXP;
@@ -525,14 +525,15 @@ void Actor::Die(Scriptable *killer)
 
 bool Actor::CheckOnDeath()
 {
-	if(!(InternalFlags&IF_REALLYDIED) ) return false;
+	if (InternalFlags&IF_CLEANUP) return true;
+	if (!(InternalFlags&IF_REALLYDIED) ) return false;
 	//don't mess with the already deceased
-	if(Modified[IE_STATE_ID]&STATE_DEAD) return false;
+	if (Modified[IE_STATE_ID]&STATE_DEAD) return false;
 	//we need to check animID here, if it has not played the death
 	//sequence yet, then we could return now
 	ClearActions();
 
-	if(InternalFlags&IF_GIVEXP) {
+	if (InternalFlags&IF_GIVEXP) {
 		//give experience to party
 		core->GetGame()->ShareXP(GetStat(IE_XPVALUE), true );
 		//handle reputation here
@@ -542,8 +543,8 @@ bool Actor::CheckOnDeath()
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9
 	Modified[IE_STATE_ID] |= STATE_DEAD;
-	if(Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
-	if(Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
+	if (Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
+	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
 	//if chunked death, then return true
 	return false;
 }
@@ -558,21 +559,21 @@ bool Actor::ValidTarget(int ga_flags)
 {
 	switch(ga_flags&GA_ACTION) {
 	case GA_PICK:
-		if(Modified[IE_STATE_ID] & STATE_CANTSTEAL) return false;
+		if (Modified[IE_STATE_ID] & STATE_CANTSTEAL) return false;
 		break;
 	case GA_TALK:
 		//can't talk to dead
-		if(Modified[IE_STATE_ID] & STATE_CANTLISTEN) return false;
+		if (Modified[IE_STATE_ID] & STATE_CANTLISTEN) return false;
 		//can't talk to hostile
-		if(Modified[IE_EA]>=EVILCUTOFF) return false;
+		if (Modified[IE_EA]>=EVILCUTOFF) return false;
 		break;
 	}
-	if(ga_flags&GA_NO_DEAD) {
-		if(InternalFlags&IF_JUSTDIED) return false;
-		if(Modified[IE_STATE_ID] & STATE_DEAD) return false;
+	if (ga_flags&GA_NO_DEAD) {
+		if (InternalFlags&IF_JUSTDIED) return false;
+		if (Modified[IE_STATE_ID] & STATE_DEAD) return false;
 	}
-	if(ga_flags&GA_SELECT) {
-		if(Modified[IE_UNSELECTABLE]) return false;
+	if (ga_flags&GA_SELECT) {
+		if (Modified[IE_UNSELECTABLE]) return false;
 	}
 	return true;
 }
@@ -582,8 +583,8 @@ bool Actor::ValidTarget(int ga_flags)
 //it will be saved in the savegame
 bool Actor::Persistent()
 {
-	if(InParty) return true;
-	if(InternalFlags&IF_FROMGAME) return true;
+	if (InParty) return true;
+	if (InternalFlags&IF_FROMGAME) return true;
 	return false;
 }
 
@@ -604,7 +605,7 @@ void Actor::GetNextAnimation()
 int Actor::GetWeaponRange()
 {
 	CREItem *wield = inventory.GetUsedWeapon();
-	if( !wield) {
+	if ( !wield) {
 		//should return FIST if not wielding anything
 		return 0;
 	}
@@ -632,29 +633,29 @@ void Actor::GetNextStance()
 
 int Actor::LearnSpell(ieResRef spellname, ieDword flags)
 {
-	if(spellbook.HaveSpell(spellname, 0) ) {
+	if (spellbook.HaveSpell(spellname, 0) ) {
 		return LSR_KNOWN;
 	}
 	Spell *spell = core->GetSpell(spellname);
-	if(!spell) {
+	if (!spell) {
 		return LSR_INVALID; //not existent spell
 	}
 	//from now on, you must delete spl if you don't push back it
 	CREKnownSpell *spl = new CREKnownSpell();
 	strncpy(spl->SpellResRef, spellname, 8);
 	spl->Type = spell->SpellType;
-	if( spl->Type == IE_SPELL_TYPE_INNATE ) {
+	if ( spl->Type == IE_SPELL_TYPE_INNATE ) {
 		spl->Level = 0;
 	}
 	else {
 		spl->Level = (ieWord) (spell->SpellLevel-1);
 	}
 	bool ret=spellbook.AddKnownSpell(spl->Type, spl->Level, spl);
-	if(!ret) {
+	if (!ret) {
 		delete spl;
 		return LSR_INVALID;
 	}
-	if(flags&LS_ADDXP) {
+	if (flags&LS_ADDXP) {
 		NewStat(IE_XP,spl->Level*100,MOD_ADDITIVE);
 	}
 	return LSR_OK;

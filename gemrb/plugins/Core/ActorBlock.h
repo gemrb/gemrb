@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.64 2005/04/01 18:48:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.65 2005/04/03 21:00:02 avenger_teambg Exp $
  *
  */
 
@@ -88,6 +88,12 @@ class Door;
 
 //scriptable (actor) flags
 #define SCR_ACTIVE        1
+
+//CheckTravel return value
+#define CT_CANTMOVE       0 //inactive
+#define CT_ACTIVE         1 //actor can move
+#define CT_GO_CLOSER      2 //entire team would move, but not close enough
+#define CT_WHOLE          3 //team can move
 
 #ifdef WIN32
 
@@ -322,6 +328,8 @@ public:
 	bool VisibleTrap(bool only_detected);
 	//returns true if trap has been triggered, tumble skill???
 	bool TriggerTrap(int skill);
+	//call this when some actor entered the trigger zone
+	void Entered(Actor *actor);
 	//checks if the actor may use this travel trigger
 	int CheckTravel(Actor *actor);
 	void DebugDump();

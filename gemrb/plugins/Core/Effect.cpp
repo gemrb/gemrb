@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.cpp,v 1.2 2004/11/13 22:24:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.cpp,v 1.3 2005/04/03 21:00:03 avenger_teambg Exp $
  *
  */
 
@@ -48,7 +48,7 @@ void AddEffect(Effect* fx, Actor* self, Actor* pretarget)
 		break;
 
 	case FX_TARGET_GLOBAL_INCL_PARTY:
-		map=core->GetGame()->GetMap(self->Area);
+		map=self->GetCurrentArea();
 		for (i = map->GetActorCount(); i >= 0; i--) {
 			Actor* actor = map->GetActor( i );
 			actor->fxqueue.AddEffect( fx );
@@ -56,7 +56,7 @@ void AddEffect(Effect* fx, Actor* self, Actor* pretarget)
 		break;
 
 	case FX_TARGET_GLOBAL_EXCL_PARTY:
-		map=core->GetGame()->GetMap(self->Area);
+		map=self->GetCurrentArea();
 		for (i = map->GetActorCount(); i >= 0; i--) {
 			Actor* actor = map->GetActor( i );
 			if (actor->InParty) continue;

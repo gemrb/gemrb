@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.69 2005/03/22 18:11:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.70 2005/04/03 21:00:03 avenger_teambg Exp $
  *
  */
 
@@ -25,6 +25,8 @@
 #include "DataStream.h"
 #include "Interface.h"
 #include "../../includes/strrefs.h"
+
+#define MAX_MAPS_LOADED  5
 
 Game::Game(void) : Scriptable( ST_GLOBAL )
 {
@@ -39,7 +41,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	kaputz = NULL;
 	familiars = NULL;
 	int mtab = core->LoadTable("mastarea");
-	if(mtab) {
+	if (mtab) {
 		TableMgr *table = core->GetTable(mtab);
 		int i = table->GetRowCount();
 		while(i--) {
@@ -85,8 +87,8 @@ Game::~Game(void)
 
 int Game::FindPlayer(unsigned int partyID)
 {
-	for(unsigned int slot=0; slot<PCs.size(); slot++) {
-		if(PCs[slot]->InParty==partyID) {
+	for (unsigned int slot=0; slot<PCs.size(); slot++) {
+		if (PCs[slot]->InParty==partyID) {
 			return slot;
 		}
 	}
@@ -95,16 +97,16 @@ int Game::FindPlayer(unsigned int partyID)
 
 Actor* Game::FindPC(unsigned int partyID)
 {
-	for(unsigned int slot=0; slot<PCs.size(); slot++) {
-		if(PCs[slot]->InParty==partyID) return PCs[slot];
+	for (unsigned int slot=0; slot<PCs.size(); slot++) {
+		if (PCs[slot]->InParty==partyID) return PCs[slot];
 	}
 	return NULL;
 }
 
 Actor* Game::FindPC(const char *scriptingname)
 {
-	for(unsigned int slot=0; slot<PCs.size(); slot++) {
-		if(strnicmp(PCs[slot]->GetScriptName(),scriptingname,32)==0 )
+	for (unsigned int slot=0; slot<PCs.size(); slot++) {
+		if (strnicmp(PCs[slot]->GetScriptName(),scriptingname,32)==0 )
 		{
 			return PCs[slot];
 		}
@@ -114,16 +116,16 @@ Actor* Game::FindPC(const char *scriptingname)
 
 Actor* Game::FindNPC(unsigned int partyID)
 {
-	for(unsigned int slot=0; slot<NPCs.size(); slot++) {
-		if(NPCs[slot]->InParty==partyID) return NPCs[slot];
+	for (unsigned int slot=0; slot<NPCs.size(); slot++) {
+		if (NPCs[slot]->InParty==partyID) return NPCs[slot];
 	}
 	return NULL;
 }
 
 Actor* Game::FindNPC(const char *scriptingname)
 {
-	for(unsigned int slot=0; slot<NPCs.size(); slot++) {
-		if(strnicmp(NPCs[slot]->GetScriptName(),scriptingname,32)==0 )
+	for (unsigned int slot=0; slot<NPCs.size(); slot++) {
+		if (strnicmp(NPCs[slot]->GetScriptName(),scriptingname,32)==0 )
 		{
 			return NPCs[slot];
 		}
@@ -215,7 +217,7 @@ int Game::JoinParty(Actor* actor, bool join)
 	}
 	if (join) {
 		actor->PCStats->JoinDate = GameTime;
-		if(!PCs.size() ) {
+		if (!PCs.size() ) {
 			Reputation = actor->GetStat(IE_REPUTATION);
 		}
 	}
@@ -376,7 +378,7 @@ int Game::WriteGame()
 }
 */
 
-Map* Game::GetMap(unsigned int index)
+Map* Game::GetMap(unsigned int index) const
 {
 	if (index >= Maps.size()) {
 		return NULL;
@@ -384,25 +386,25 @@ Map* Game::GetMap(unsigned int index)
 	return Maps[index];
 }
 
-Map *Game::GetMap(const char *areaname)
+Map *Game::GetMap(const char *areaname, bool change)
 {
 	int index = LoadMap(areaname);
-	if(index>=0) {
+	if (index >= 0) {
+		if (change) {
+			MapIndex = index;
+			area = GetMap(index);
+			memcpy (CurrentArea, areaname, 8);
+		}
 		return GetMap(index);
 	}
 	return NULL;
-}
-
-Map *Game::GetCurrentMap()
-{
-	return GetMap(MapIndex);
 }
 
 bool Game::MasterArea(const char *area)
 {
 	int i=mastarea.size();
 	while(i--) {
-		if(strnicmp(mastarea[i], area, 8) ) {
+		if (strnicmp(mastarea[i], area, 8) ) {
 			return true;
 		}
 	}
@@ -411,29 +413,19 @@ bool Game::MasterArea(const char *area)
 
 void Game::SetMasterArea(const char *area)
 {
-	if(MasterArea(area) ) return;
+	if (MasterArea(area) ) return;
 	char *tmp = (char *) malloc(9);
-	strncpy (tmp,area,8);
-	tmp[8]=0;
+	strnuprcpy (tmp,area,8);
 	mastarea.push_back(tmp);
 }
 
 int Game::AddMap(Map* map)
 {
-/* we don't allow holes in this vector
-	unsigned int i=Maps.size();
-	while(i--) {
-		if (!Maps[i]) {
-			Maps[i] = map;
-			return ( int ) i;
-		}
-	}
-*/
 	unsigned int i = Maps.size();
-	if(MasterArea(map->GetScriptName()) ) {
+	if (MasterArea(map->GetScriptName()) ) {
 		//no push_front, we do this ugly hack
 		Maps.push_back(NULL);
-		for(;i;i--) {
+		for (;i;i--) {
 			Maps[i]=Maps[i-1];
 		}
 		Maps[0] = map;
@@ -451,15 +443,29 @@ int Game::DelMap(unsigned int index, bool forced)
 	if (index >= Maps.size()) {
 		return -1;
 	}
-	Map *map = Maps[index];
 
-	if (!map) {
+	if (MapIndex==(int) index) { //can't remove current map in any case
 		return -1;
 	}
-	if(forced || map->CanFree() )
+
+	Map *map = Maps[index];
+
+	if (!map) { //this shouldn't happen, i guess
+		printMessage("Game","Erased NULL Map\n",YELLOW);
+		Maps.erase( Maps.begin()+index);
+		if (MapIndex>(int) index) {
+			MapIndex--;
+		}
+		return 1;
+	}
+	if (forced || ((Maps.size()>MAX_MAPS_LOADED) && map->CanFree() ) )
 	{
 		delete( Maps[index] );
 		Maps.erase( Maps.begin()+index);
+		//current map will be decreased
+		if (MapIndex>(int) index) {
+			MapIndex--;
+		}
 		return 1;
 	}
 	//didn't remove the map
@@ -472,11 +478,11 @@ int Game::LoadMap(const char* ResRef)
 {
 	unsigned int i;
 	int index = FindMap(ResRef);
-	if(index>=0) {
+	if (index>=0) {
 		return index;
 	}
 	//check if any other areas could be removed (cached)
-	//areas cannot be removed with actors
+	//areas cannot be removed with PCs
 	//master areas cannot be removed with active actors (pathlength!=0 or combat)
 	index = Maps.size();
 	while (index--) {
@@ -485,7 +491,7 @@ int Game::LoadMap(const char* ResRef)
 
 	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
 	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef, IE_ARE_CLASS_ID );
-	if(!ds) {
+	if (!ds) {
 		core->FreeInterface( mM );
 		return -1;
 	}
@@ -587,19 +593,19 @@ GAMJournalEntry* Game::GetJournalEntry(unsigned int Index)
 
 void Game::ShareXP(int xp, bool divide)
 {
-	if(divide) {
+	if (divide) {
 		int PartySize = GetPartySize(true); //party size, only alive
-		if(PartySize<1) {
+		if (PartySize<1) {
 			return;
 		}
 		xp /= PartySize;
 	}
 
-	if(!xp) {
+	if (!xp) {
 		return;
 	}
 	
-	for(unsigned int i=0; i<PCs.size(); i++) {
+	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
 		}
@@ -614,8 +620,8 @@ void Game::ShareXP(int xp, bool divide)
 
 bool Game::EveryoneStopped()
 {
-	for(unsigned int i=0; i<PCs.size(); i++) {
-		if(PCs[i]->path ) return false;
+	for (unsigned int i=0; i<PCs.size(); i++) {
+		if (PCs[i]->path ) return false;
 	}
 	return true;
 }
@@ -623,24 +629,24 @@ bool Game::EveryoneStopped()
 //canmove=true: if some PC can't move (or hostile), then this returns false 
 bool Game::EveryoneNearPoint(const char *area, Point &p, bool canmove)
 {
-	for(unsigned int i=0; i<PCs.size(); i++) {
+	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
 		}
-		if(canmove) {
+		if (canmove) {
 			//someone is uncontrollable, can't move
-			if(PCs[i]->GetStat(IE_EA)>GOODCUTOFF) {
+			if (PCs[i]->GetStat(IE_EA)>GOODCUTOFF) {
 				return false;
 			}
 
-			if(PCs[i]->GetStat(IE_STATE_ID)&STATE_CANTMOVE) {
+			if (PCs[i]->GetStat(IE_STATE_ID)&STATE_CANTMOVE) {
 				return false;
 			}
 		}
-		if(stricmp(PCs[i]->Area,area) ) {
+		if (stricmp(PCs[i]->Area,area) ) {
 			return false;
 		}
-		if(Distance(p,PCs[i])>MAX_TRAVELING_DISTANCE) {
+		if (Distance(p,PCs[i])>MAX_TRAVELING_DISTANCE) {
 			return false;
 		}
 	}
@@ -649,8 +655,8 @@ bool Game::EveryoneNearPoint(const char *area, Point &p, bool canmove)
 
 bool Game::PartyMemberDied()
 {
-	for(unsigned int i=0; i<PCs.size(); i++) {
-		if(PCs[i]->InternalFlags&IF_JUSTDIED)
+	for (unsigned int i=0; i<PCs.size(); i++) {
+		if (PCs[i]->InternalFlags&IF_JUSTDIED)
 			return true;
 	}
 	return false;
@@ -660,7 +666,7 @@ void Game::IncrementChapter()
 {
 	//clear statistics
 	
-	for(unsigned int i=0; i<PCs.size(); i++) {
+	for (unsigned int i=0; i<PCs.size(); i++) {
 		//all PCs must have this!
 		PCs[i]->PCStats->IncrementChapter();
 	}
@@ -674,7 +680,7 @@ void Game::SetReputation(int r)
 	if (r<10) r=10;
 	else if (r>200) r=200;
 	Reputation = (ieDword) r;
-	for(unsigned int i=0; i<PCs.size(); i++) {
+	for (unsigned int i=0; i<PCs.size(); i++) {
 		PCs[i]->SetStat(IE_REPUTATION, Reputation);
 	}
 }

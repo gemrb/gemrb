@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.106 2005/04/01 18:48:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.107 2005/04/03 21:00:01 avenger_teambg Exp $
  *
  */
 
@@ -181,7 +181,6 @@ Map* AREImp::GetMap(const char *ResRef)
 	//we have to set this here because the actors will receive their
 	//current area setting here, areas' 'scriptname' is their name
 	map->SetScriptName( ResRef );
-	//strnuprcpy(map->scriptName, ResRef, 8);
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
 		printf( "[AREImporter]: No Tile Map Manager Available.\n" );
@@ -418,6 +417,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		//this is an odd field, only 24 chars!
 		strnuprcpy(door->LinkedInfo, LinkedInfo, 24);
 	}
+
 	printf( "Loading containers\n" );
 	//Loading Containers
 	for (i = 0; i < ContainersCount; i++) {
@@ -492,6 +492,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		} else
 			c->Scripts[0] = NULL;
 	}
+
 	printf( "Loading regions\n" );
 	//Loading InfoPoints
 	for (i = 0; i < InfoPointsCount; i++) {
@@ -577,8 +578,6 @@ Map* AREImp::GetMap(const char *ResRef)
 		} else
 			ip->Scripts[0] = NULL;
 	}
-	//we need this so we can filter global actors
-	//Game *game=core->GetGame();
 	printf( "Loading actors\n" );
 	//Loading Actors
 	str->Seek( ActorOffset, GEM_STREAM_START );
@@ -624,7 +623,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			//TODO: iwd2 script?
 			str->ReadResRef( Scripts[6] );
 			str->Seek( 120, GEM_CURRENT_POS );
-			//actually, CreatureAreaFlag&1 signs that the creature
+			//actually, Flags&1 signs that the creature
 			//is not loaded yet
 			if (CreOffset != 0) {
 				CachedFileStream *fs = new CachedFileStream( (CachedFileStream *) str, CreOffset, CreSize, true);
@@ -661,6 +660,9 @@ Map* AREImp::GetMap(const char *ResRef)
 		}
 		core->FreeInterface( actmgr );
 	}
+
+	printf( "Loading animations\n" );
+	//Loading Animations
 	str->Seek( AnimOffset, GEM_STREAM_START );
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		printf( "[AREImporter]: No Animation Manager Available, skipping animations\n" );
@@ -672,7 +674,8 @@ Map* AREImp::GetMap(const char *ResRef)
 			ieWord animX, animY;
 			str->ReadWord( &animX );
 			str->ReadWord( &animY );
-			str->Seek( 4, GEM_CURRENT_POS );
+			ieDword animSchedule;
+			str->ReadDword( &animSchedule );
 			ieResRef animBam;
 			str->ReadResRef( animBam );
 			ieWord animCycle, animFrame;
@@ -699,11 +702,11 @@ Map* AREImp::GetMap(const char *ResRef)
 				printf("Cannot load animation: %s\n", animBam);
 				continue;
 			}
-			anim->Flags=animFlags;
+			anim->Flags = animFlags;
 			anim->x = animX;
 			anim->y = animY;
-			anim->autofree = false;
-			//strcpy( anim->ResRef, animBam );
+			//they are autofree by default
+			//anim->autofree = false;
 			anim->SetScriptName(animName);
 			if (animFlags&A_ANI_MIRROR) {
 				anim->MirrorAnimation();
@@ -717,11 +720,13 @@ Map* AREImp::GetMap(const char *ResRef)
 					bmp->GetPalette(0, 256, Palette);
 					core->FreeInterface( bmp );
 				}
+printf("Setting palette: %s\n",animPal);
 				anim->SetPalette( Palette, true );
 			}
 			map->AddAnimation( anim );
 		}
 	}
+
 	printf( "Loading entrances\n" );
 	//Loading Entrances
 	str->Seek( EntrancesOffset, GEM_STREAM_START );
@@ -778,6 +783,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Seek( 2, GEM_CURRENT_POS );
 		str->ReadDword( &ambi->interval );
 		str->ReadDword( &ambi->perset );
+		// schedule bits
 		str->ReadDword( &ambi->appearance );
 		str->ReadDword( &ambi->flags );
 		str->Seek( 64, GEM_CURRENT_POS );

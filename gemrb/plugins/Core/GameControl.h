@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.61 2005/03/26 12:21:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.62 2005/04/03 21:00:03 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -72,7 +72,9 @@ public:
 	/** Sets the Text of the current control */
 	int SetText(const char* string, int pos = 0);
 	/** Sets the current area to Display */
+/*
 	Map *SetCurrentArea(int Index);
+*/
 	/** Sets the InfoTextColor, used in PST
 	*/
 	void SetInfoTextColor(Color color);

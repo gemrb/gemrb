@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.28 2005/04/01 18:48:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.29 2005/04/03 21:00:03 avenger_teambg Exp $
  *
  */
 
@@ -168,6 +168,7 @@ void Animation::SetPalette(Color* Pal, bool local)
 		if (Pal)
 			memcpy( Palette, Pal, sizeof(Palette) );
 	} else {
+	//no idea if this part will ever be used
 		for (size_t i = 0; i < indicesCount; i++) {
 			video->SetPalette( frames[i], Pal );
 		}
@@ -179,8 +180,15 @@ void Animation::MirrorAnimation()
 	Video *video = core->GetVideoDriver();
 
 	for (size_t i = 0; i < indicesCount; i++) {
-		frames[i] = video->MirrorSpriteHorizontal( frames[i], true );
+		Sprite2D * tmp = frames[i];
+		frames[i] = video->MirrorSpriteHorizontal( tmp, true );
+		// we free the original sprite if it was referenced only by us
+		if (autofree) {
+			video->FreeSprite(tmp);
+		}
 	}
+	// This function will create independent sprites we have to free
+	autofree = true;
 }
 
 void Animation::SetScriptName(const char *name)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.80 2005/04/01 18:48:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.81 2005/04/03 21:00:02 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -83,7 +83,18 @@ char* Scriptable::GetScriptName(void)
 
 Map* Scriptable::GetCurrentArea()
 {
-	return area;
+	if (area)
+		return area;
+/*	if (Type!=ST_GLOBAL) { */
+		printMessage("Map","Scriptable object has no area!!!\n", LIGHT_RED);
+		abort();
+/*
+	}
+	// FIXME:
+	// actually this is the same object but a higher layer
+	// probably it is possible to merge GetCurrentMap and GetCurrentArea
+	return core->GetGame()->GetCurrentMap();
+*/
 }
 
 void Scriptable::SetMap(Map *map)
@@ -382,7 +393,7 @@ Moveble::~Moveble(void)
 
 void Moveble::SetStance(unsigned int arg)
 {
-	if(arg<MAX_ANIMS) StanceID=(unsigned char) arg;
+	if (arg<MAX_ANIMS) StanceID=(unsigned char) arg;
 	else
 	{
 		StanceID=IE_ANI_AWAKE; //
@@ -431,7 +442,7 @@ void Moveble::DoStep()
 
 void Moveble::AddWayPoint(Point &Des)
 {
-	if(!path) {
+	if (!path) {
 		WalkTo(Des);
 		return;
 	}
@@ -439,10 +450,10 @@ void Moveble::AddWayPoint(Point &Des)
 	while(endNode->Next) {
 		endNode=endNode->Next;
 	}
-	Game* game = core->GetGame();
-	Map* map = game->GetMap(Area);
+	//Game* game = core->GetGame();
+	//Map* map = game->GetMap(Area, false);
 	Point p = {endNode->x, endNode->y};
-	PathNode *path2 = map->FindPath( p, Des );
+	PathNode *path2 = area->FindPath( p, Des );
 	endNode->Next=path2;
 }
 
@@ -450,17 +461,17 @@ void Moveble::WalkTo(Point &Des)
 {
 	Destination = Des;
 	ClearPath();
-	Game* game = core->GetGame();
-	Map* map = game->GetMap(Area);
-	path = map->FindPath( Pos, Destination );
+	//Game* game = core->GetGame();
+	//Map* map = game->GetMap(Area, false);
+	path = area->FindPath( Pos, Destination );
 }
 
 void Moveble::RunAwayFrom(Point &Des, int PathLength, bool Backing)
 {
 	ClearPath();
-	Game* game = core->GetGame();
-	Map* map = game->GetMap(Area);
-	path = map->RunAway( Pos, Des, PathLength, Backing );
+	//Game* game = core->GetGame();
+	//Map* map = game->GetMap(Area, false);
+	path = area->RunAway( Pos, Des, PathLength, Backing );
 }
 
 void Moveble::MoveTo(Point &Des)
@@ -593,7 +604,7 @@ void Door::UpdateDoor()
 	}
 	InfoPoint *ip=area->TMap->GetInfoPoint(LinkedInfo);
 	if (ip) {
-		if(Flags&DOOR_OPEN) ip->Flags&=~INFO_DOOR;
+		if (Flags&DOOR_OPEN) ip->Flags&=~INFO_DOOR;
 		else ip->Flags|=INFO_DOOR;
 	}
 }
@@ -715,16 +726,16 @@ InfoPoint::~InfoPoint(void)
 //bit 2 : whole team
 int InfoPoint::CheckTravel(Actor *actor)
 {
-	if(!(Flags&TRAP_RESET)) return 0; //experimental hack
-	if(Flags&TRAP_DEACTIVATED) return 0;
-	if(!actor->InParty && (Flags&TRAVEL_NONPC) ) return 0;
-	if(Flags&TRAVEL_PARTY) {
-		if(core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->Area, actor->Pos, true) ) {
-			return 3;
+	if (!(Flags&TRAP_RESET)) return CT_CANTMOVE; //experimental hack
+	if (Flags&TRAP_DEACTIVATED) return CT_CANTMOVE;
+	if (!actor->InParty && (Flags&TRAVEL_NONPC) ) return CT_CANTMOVE;
+	if (Flags&TRAVEL_PARTY) {
+		if (core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->Area, actor->Pos, true) ) {
+			return CT_WHOLE;
 		}
-		return 2;
+		return CT_GO_CLOSER;
 	}
-	return 1;
+	return CT_ACTIVE;
 }
 
 //detect this trap, using a skill, skill could be set to 256 for 'sure'
@@ -732,11 +743,11 @@ int InfoPoint::CheckTravel(Actor *actor)
 //a trapdetectiondifficulty of 100 means impossible detection short of a spell
 void InfoPoint::DetectTrap(int skill)
 {
-	if(Type!=ST_TRIGGER) return;
-	if(!Scripts[0]) return;
-	if(Flags&(TRAP_DEACTIVATED|TRAP_INVISIBLE) ) return;
-	if((skill>=100) && (skill!=256) ) skill=100;
-	if(skill/2+core->Roll(1,skill/2,0)>TrapDetectionDifficulty) {
+	if (Type!=ST_TRIGGER) return;
+	if (!Scripts[0]) return;
+	if (Flags&(TRAP_DEACTIVATED|TRAP_INVISIBLE) ) return;
+	if ((skill>=100) && (skill!=256) ) skill=100;
+	if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDifficulty) {
 		TrapDetected=1; //probably could be set to the player #?
 	}
 }
@@ -746,30 +757,39 @@ void InfoPoint::DetectTrap(int skill)
 //players, really nice for multiplayer
 bool InfoPoint::VisibleTrap(bool see_all)
 {
-	if(Type!=ST_TRIGGER) return false;
-	if(!Scripts[0]) return false;
-	if(Flags&(TRAP_DEACTIVATED|TRAP_INVISIBLE) ) return false;
-	if(see_all) return true;
-	if(TrapDetected ) return true;
+	if (Type!=ST_TRIGGER) return false;
+	if (!Scripts[0]) return false;
+	if (Flags&(TRAP_DEACTIVATED|TRAP_INVISIBLE) ) return false;
+	if (see_all) return true;
+	if (TrapDetected ) return true;
 	return false;
 }
 
 //trap that will fire now
 bool InfoPoint::TriggerTrap(int skill)
 {
-	if(Type!=ST_TRIGGER) return false;
+	if (Type!=ST_TRIGGER) return false;
 	//actually this could be script name[0]
-	if(!Scripts[0]) return false;
-	if(Flags&TRAP_DEACTIVATED) return false;
+	if (!Scripts[0]) return false;
+	if (Flags&TRAP_DEACTIVATED) return false;
 	TrapDetected=1; //probably too late :)
-	if((skill>=100) && (skill!=256) ) skill=100;
-	if(skill/2+core->Roll(1,skill/2,0)>TrapDetectionDifficulty) {
+	if ((skill>=100) && (skill!=256) ) skill=100;
+	if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDifficulty) {
 		//tumble???
 		return false;
 	}
-	if(Flags&TRAP_RESET) return true;
+	if (Flags&TRAP_RESET) return true;
 	Flags|=TRAP_DEACTIVATED;
 	return true;
+}
+
+void InfoPoint::Entered(Actor *actor)
+{
+	if (Flags&TRAP_DEACTIVATED) return;
+	if (actor->InParty || (Flags&TRAP_NPC) ) {
+		LastEntered = actor;
+		LastTrigger = actor;
+	}
 }
 
 void InfoPoint::DebugDump()

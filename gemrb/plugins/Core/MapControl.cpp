@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.27 2005/03/20 15:07:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.28 2005/04/03 21:00:04 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -82,7 +82,7 @@ MapControl::MapControl(void)
 	VarName[0] = 0;
 	ResetEventHandler( MapControlOnPress );
 
-	MyMap = core->GetGame()->GetCurrentMap();
+	MyMap = core->GetGame()->GetCurrentArea();
 	MapMOS = MyMap->SmallMap->GetImage();
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.147 2005/04/01 18:48:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.148 2005/04/03 21:00:04 avenger_teambg Exp $
  *
  */
 
@@ -200,6 +200,7 @@ void InitExplore()
 Map::Map(void)
 	: Scriptable( ST_AREA )
 {
+	area=this;
 	vars = NULL;
 	TMap = NULL;
 	LightMap = NULL;
@@ -261,7 +262,7 @@ Map::~Map(void)
 		core->FreeInterface( SmallMap );
 	for (i = 0; i < 3; i++) {
 		if (queue[i]) {
-			delete[] queue[i];
+			free(queue[i]);
 			queue[i] = NULL;
 		}
 	}
@@ -306,7 +307,7 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 //check worldmap entry, if that doesn't contain anything,
 //make a random pick
 	Game* game = core->GetGame();
-	Map* map = game->GetMap(area);
+	Map* map = game->GetMap(area, false);
 	if (!map) {
 		printf("[Map] Invalid map: %s\n",area);
 		command[0]=0;
@@ -337,13 +338,13 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 
 	int EveryOne = ip->CheckTravel(actor);
 	switch(EveryOne) {
-	case 2:
+	case CT_GO_CLOSER:
 		core->DisplayConstantString(STR_WHOLEPARTY,0xffffff); //white
 		if (game->EveryoneStopped()) {
 			ip->Flags&=~TRAP_RESET; //exit triggered
 		}
 		return;
-	case 0:
+	case CT_CANTMOVE:
 		return;
 	case 1: case 3:
 		break;
@@ -430,8 +431,11 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 					continue;
 				if (ip->Type == ST_PROXIMITY) {
 					if (ip->outline->PointIn( actor->Pos )) {
+						ip->Entered(actor);
+/*
 						ip->LastEntered = actor;
 						ip->LastTrigger = actor;
+*/
 					}
 					ip->ExecuteScript( ip->Scripts[0] );
 				} else {
@@ -440,7 +444,6 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 					if (actor->GetNextAction())
 						continue;
 					if (ip->outline->PointIn( actor->Pos )) {
-						ip->LastEntered = actor;
 						UseExit(actor, ip);
 					}
 				}
@@ -496,11 +499,6 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 				}
 
 				//returns true if actor should be completely removed
-				if (actor->CheckOnDeath()) {
-					DeleteActor( actor );
-					continue;
-				}
-
 				actor->OnCreation = false;
 				actor->inventory.CalculateWeight();
 				actor->SetStat( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
@@ -689,22 +687,14 @@ void Map::AddActor(Actor* actor)
 	actors.push_back( actor );
 }
 
-void Map::DeleteActor(Actor* actor)
+void Map::DeleteActor(int i)
 {
-	std::vector< Actor*>::iterator m;
-	for (m = actors.begin(); m != actors.end(); ++m) {
-		if (( *m ) == actor) {
-			Game *game = core->GetGame();
-			game->LeaveParty( actor );
-			game->DelNPC( game->InStore(actor) );
-			actors.erase( m );
-			delete (actor);
-			lastActorCount[0] = 0;
-			lastActorCount[1] = 0;
-			lastActorCount[2] = 0;
-			return;
-		}
-	}
+	Actor *actor = actors[i];
+	Game *game = core->GetGame();
+	game->LeaveParty( actor );
+	game->DelNPC( game->InStore(actor) );
+	actors.erase( actors.begin()+i );
+	delete (actor);
 }
 
 /** flags: GA_SELECT=1   - unselectable actors don't play
@@ -820,16 +810,22 @@ void Map::GenerateQueue(int priority)
 {
 	if (lastActorCount[priority] != actors.size()) {
 		if (queue[priority]) {
-			delete[] queue[priority];
+			free(queue[priority]);
 			queue[priority] = NULL;
 		}
-		queue[priority] = new Actor * [actors.size()];
+		queue[priority] = (Actor **) calloc( actors.size(), sizeof(Actor *) );
 		lastActorCount[priority] = ( int ) actors.size();
 	}
 	Qcount[priority] = 0;
 	unsigned int i=actors.size();
 	while(i--) {
 		Actor* actor = actors[i];
+
+		if (actor->CheckOnDeath()) {
+			DeleteActor( i );
+			continue;
+		}
+
 		//don't queue inactive actors
 		if (!(actor->Active&1))
 			continue;

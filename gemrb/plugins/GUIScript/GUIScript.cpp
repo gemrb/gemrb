@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.297 2005/03/27 13:27:01 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.298 2005/04/03 21:00:05 avenger_teambg Exp $
  *
  */
 
@@ -293,12 +293,7 @@ static PyObject* GemRB_EnterGame(PyObject*, PyObject* /*args*/)
 	}
 	GameControl* gc = StartGameControl();
 	Actor* actor = game->GetPC (0);
-	if (actor) {
-		gc->ChangeMap(actor, true);
-	}
-	else {
-		gc->SetCurrentArea(game->LoadMap(game->CurrentArea));
-	}
+	gc->ChangeMap(actor, true);
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -2567,7 +2562,7 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 	}
 	Scriptable *Sender = (Scriptable *) gc->GetLastActor();
 	if (!Sender) {
-		Sender = (Scriptable *) core->GetGame()->GetCurrentMap();
+		Sender = (Scriptable *) core->GetGame()->GetCurrentArea();
 	}
 	if (!Sender) {
 		printMessage("GUIScript","No Game!\n", LIGHT_RED);
@@ -4024,7 +4019,7 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "s", &String )) {
 		return AttributeError( GemRB_ExecuteString__doc );
 	}
-	GameScript::ExecuteString( core->GetGame()->GetCurrentMap( ), String );
+	GameScript::ExecuteString( core->GetGame()->GetCurrentArea( ), String );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -4040,7 +4035,7 @@ static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "s", &String )) {
 		return AttributeError( GemRB_EvaluateString__doc );
 	}
-	if (GameScript::EvaluateString( core->GetGame()->GetCurrentMap( ), String )) {
+	if (GameScript::EvaluateString( core->GetGame()->GetCurrentArea( ), String )) {
 		printf( "%s returned True\n", String );
 	} else {
 		printf( "%s returned False\n", String );
@@ -4094,7 +4089,7 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_MoveToArea__doc );
 	}
 	Game *game = core->GetGame();
-	Map* map2 = game->GetMap(String);
+	Map* map2 = game->GetMap(String, true);
 	if (!map2) {
 		return NULL;
 	}
@@ -4104,7 +4099,7 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 		if (!actor->Selected) {
 			continue;
 		}
-		Map* map1 = game->GetMap(actor->Area);
+		Map* map1 = actor->GetCurrentArea();
 		if (map1) {
 			map1->RemoveActor( actor );
 		}
@@ -4670,7 +4665,7 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Map *map = game->GetCurrentMap();
+	Map *map = game->GetCurrentArea();
 	if (!map) {
 		return RuntimeError( "No current area" );
 	}
@@ -4710,7 +4705,7 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
-	Map *map=game->GetCurrentMap();
+	Map *map=game->GetCurrentArea();
 	if (!map) {
 		return RuntimeError( "No current area" );
 	}
@@ -4735,7 +4730,7 @@ static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Map *map=game->GetCurrentMap();
+	Map *map=game->GetCurrentArea();
 	if (!map) {
 		return RuntimeError( "No current area" );
 	}

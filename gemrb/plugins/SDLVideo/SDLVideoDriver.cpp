@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.100 2005/04/03 09:05:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.101 2005/04/03 21:00:07 avenger_teambg Exp $
  *
  */
 
@@ -1222,12 +1222,13 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnch
 			src -= dest->Width;
 		}
 	}
+	SDL_UnlockSurface( tmp );
+
 	dest->XPos = dest->XPos;
 	if (MirrorAnchor)
 		dest->YPos = sprite->Height - sprite->YPos;
 	else
 		dest->YPos = sprite->YPos;
-	SDL_UnlockSurface( tmp );
 
 	return dest;
 }
@@ -1258,12 +1259,13 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 			*src-- = swp;
 		}
 	}
+	SDL_UnlockSurface( tmp );
+
 	if (MirrorAnchor)
 		dest->XPos = sprite->Width - sprite->XPos;
 	else
 		dest->XPos = sprite->XPos;
 	dest->YPos = sprite->YPos;
-	SDL_UnlockSurface( tmp );
 
 	return dest;
 }

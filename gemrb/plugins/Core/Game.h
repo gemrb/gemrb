@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.46 2005/03/08 19:58:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.47 2005/04/03 21:00:03 avenger_teambg Exp $
  *
  */
 
@@ -96,12 +96,12 @@ private:
 	std::vector< Map*> Maps;
 	std::vector< GAMJournalEntry*> Journals;
 	std::vector< char*> mastarea;
+	int MapIndex;
 public:
 	std::vector< Actor*> selected;
 	Variables* globals;
 	Variables* kaputz;
 	ieByte* familiars;
-	int MapIndex;
 	ieDword CombatCounter;
 
 	/** index of PC selected in non-walking environment (shops, inventory...) */
@@ -171,13 +171,14 @@ public:
 	int DelPC(unsigned int slot, bool autoFree = false);
 	int DelNPC(unsigned int slot, bool autoFree = false);
 	/* returns map in index */
-	Map* GetMap(unsigned int index);
+	Map* GetMap(unsigned int index) const;
 	/* returns a map from area name, loads it if needed */
-	/* use it for the biggest safety */
-	Map* GetMap(const char *areaname);
+	/* use it for the biggest safety, change = true will change the current map */
+	Map* GetMap(const char *areaname, bool change);
 	/* returns slot of the map if found */
 	int FindMap(const char *ResRef);
-	Map * GetCurrentMap();
+	/* use GetCurrentArea() */
+	//Map * GetCurrentMap();
 	int AddMap(Map* map);
 	/* determine if area is master area*/
 	bool MasterArea(const char *area);

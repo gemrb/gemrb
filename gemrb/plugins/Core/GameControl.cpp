@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.213 2005/04/03 09:03:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.214 2005/04/03 21:00:03 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -213,9 +213,11 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
 
 	Game* game = core->GetGame();
+/*
 	if (game->MapIndex == -1) {
 		return;
 	}
+*/
 	if (((short) Width) <=0 || ((short) Height) <= 0) {
 		return;
 	}
@@ -228,7 +230,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	viewport.y += video->moveY;
 	core->MoveViewportTo( viewport.x, viewport.y, false );
 	Region vp( x + XPos, y + YPos, Width, Height );
-	Map* area = game->GetCurrentMap( );
+	Map* area = game->GetCurrentArea( );
 	if (!area) {
 		core->GetVideoDriver()->DrawRect( vp, blue, true );
 		return;
@@ -491,7 +493,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 							nextNode = thisNode->Next;
 						}
 					}
-					drawPath = core->GetGame()->GetCurrentMap()->FindPath( pfs, p );
+					drawPath = core->GetGame()->GetCurrentArea()->FindPath( pfs, p );
 
 				}
 				break;
@@ -541,12 +543,12 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					overInfoPoint->DebugDump();
 					return;
 				}
-				core->GetGame()->GetCurrentMap()->DebugDump();
+				core->GetGame()->GetCurrentArea()->DebugDump();
 				break;
 			case 'v':
 				// explore map from point
 				 {
-					Map* area = game->GetCurrentMap( );
+					Map* area = game->GetCurrentArea( );
 					Point p = {lastMouseX, lastMouseY};
 					core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 					area->ExploreMapChunk( p, rand()%30, true );
@@ -555,7 +557,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'x':
 				// shows coordinates
 				 {
-					Map* area = game->GetCurrentMap( );
+					Map* area = game->GetCurrentArea( );
 					short cX = lastMouseX; 
 					short cY = lastMouseY;
 					core->GetVideoDriver()->ConvertToGame( cX, cY );
@@ -635,7 +637,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 	}
 	Game* game = core->GetGame();
-	Map* area = game->GetCurrentMap( );
+	Map* area = game->GetCurrentArea( );
 
 	switch (area->GetBlocked( p ) & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL)) {
 		case 0:
@@ -857,7 +859,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	Point p = {x,y};
 	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 	Game* game = core->GetGame();
-	Map* area = game->GetCurrentMap( );
+	Map* area = game->GetCurrentArea( );
 	if (DrawSelectionRect) {
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
@@ -1002,12 +1004,12 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 		core->MoveViewportTo( Viewport.x, Viewport.y, false );
 	}
 }
-
+/*
 Map *GameControl::SetCurrentArea(int Index)
 {
 	Game* game = core->GetGame();
 	game->MapIndex = Index;
-	Map* area = game->GetCurrentMap( );
+	Map* area = game->GetCurrentArea( );
 	memcpy(game->CurrentArea, area->GetScriptName(), 9);
 	area->SetupAmbients();
 	//night or day?
@@ -1016,12 +1018,12 @@ Map *GameControl::SetCurrentArea(int Index)
 	area->PlayAreaSong( 0 );
 	return area;
 }
-
+*/
 void GameControl::CalculateSelection(Point &p)
 {
 	unsigned int i;
 	Game* game = core->GetGame();
-	Map* area = game->GetCurrentMap( );
+	Map* area = game->GetCurrentArea( );
 	if (DrawSelectionRect) {
 		if (p.x < StartX) {
 			SelectionRect.w = StartX - p.x;
@@ -1429,7 +1431,7 @@ void GameControl::DialogChoose(unsigned int choose)
 		//follow external linkage, if required
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
 			//target should be recalculated!
-			speaker = core->GetGame()->GetCurrentMap()->GetActorByDialog(tr->Dialog);
+			speaker = core->GetGame()->GetCurrentArea()->GetActorByDialog(tr->Dialog);
 			if(!speaker) {
 				printMessage("Dialog","Can't redirect dialog",YELLOW);
 				ta->SetMinRow( false );
@@ -1516,8 +1518,17 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		}
 		infoTexts.clear();
 		/*this is loadmap, because we need the index, not the pointer*/
-		int mi = core->GetGame()->LoadMap( pc->Area );
-		SetCurrentArea( mi );
+		char *areaname = game->CurrentArea;
+		if (pc) {
+			areaname = pc->Area;
+		}
+		Map *map = game->GetMap( areaname, true );
+		map->SetupAmbients();
+		//night or day?
+		//if in combat, play battlesong (or don't stop song here)
+		//if night, play night song
+		map->PlayAreaSong( 0 );
+
 		ScreenFlags|=SF_CENTERONACTOR;
 	}
 	//center on first selected actor

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.68 2005/04/01 18:48:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.69 2005/04/03 21:00:04 avenger_teambg Exp $
  *
  */
 
@@ -129,7 +129,7 @@ private:
 	unsigned int lastActorCount[3];
 	void GenerateQueue(int priority);
 	Actor* GetRoot(int priority);
-	void DeleteActor(Actor* actor);
+	void DeleteActor(int i);
 public:
 	Map(void);
 	~Map(void);
