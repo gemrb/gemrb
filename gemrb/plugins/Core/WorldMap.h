@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.11 2005/02/25 15:12:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.12 2005/02/26 17:42:28 avenger_teambg Exp $
  *
  */
 
@@ -47,6 +47,14 @@
 #define WMP_ENTRY_VISITED    0x8
 #define WMP_ENTRY_WALKABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE)
 #define WMP_ENTRY_PASSABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED)
+
+//this is the physical order they appear in WMPAreaEntry
+typedef enum ieDirectionType {
+	WMP_NORTH=0,
+	WMP_WEST=1,
+	WMP_SOUTH=2, 
+	WMP_EAST=3
+} ieDirectionType;
 
 class GEM_EXPORT WMPAreaEntry {
 public:

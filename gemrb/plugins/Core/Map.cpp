@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.135 2005/02/23 18:59:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.136 2005/02/26 17:42:28 avenger_teambg Exp $
  *
  */
 
@@ -1199,15 +1199,15 @@ int Map::WhichEdge(Point &s)
 	sY*=Width;
 	if(sX<sY) { //north or west
 		if(Width*Height<sX+sY) { //
-			return 0;
+			return WMP_NORTH;
 		}
-		return 1;
+		return WMP_WEST;
 	}
 	//south or east
 	if(Width*Height<sX+sY) { //
-		return 2; 
+		return WMP_SOUTH; 
 	}
-	return 3;
+	return WMP_EAST;
 }
 
 //--------ambients----------------
@@ -1295,5 +1295,17 @@ bool Map::Rest(Point pos, int hours)
 		}
 	}
 	return false;
+}
+
+//--------explored bitmap-----------
+int Map::GetExploredMapSize() const
+{
+	int x = Width/32;
+	int y = Width/32;
+	if (!core->HasFeature(GF_SMALL_FOG) ) {
+		x++;
+		y++;
+	}
+	return (x*y+7)/8;
 }
 
