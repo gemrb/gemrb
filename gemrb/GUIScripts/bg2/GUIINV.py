@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.12 2004/10/30 12:44:14 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.13 2004/10/30 15:34:25 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -74,22 +74,17 @@ def OpenInventoryWindow ():
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 
 	# encumbrance
-	Label = GemRB.CreateLabel (Window, 0x10000043, 20,440,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
-	#GemRB.SetTooltip (Window, Label, 4196)
-	Label = GemRB.CreateLabel (Window, 0x10000044, 20,455,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
-	#GemRB.SetTooltip (Window, Label, 4196)
+	Label = GemRB.CreateLabel (Window, 0x10000043, 5,385,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
+	Label = GemRB.CreateLabel (Window, 0x10000044, 5,455,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
 
 	# armor class
 	Label = GemRB.GetControl (Window, 0x10000038)
-	#GemRB.SetTooltip (Window, Label, 4197)
 
 	# hp current
 	Label = GemRB.GetControl (Window, 0x10000039)
-	#GemRB.SetTooltip (Window, Label, 4198)
 
 	# hp max
 	Label = GemRB.GetControl (Window, 0x1000003a)
-	#GemRB.SetTooltip (Window, Label, 4199)
 
 	#ground icons scrollbar
 	ScrollBar = GemRB.GetControl (Window, 66)
@@ -99,6 +94,14 @@ def OpenInventoryWindow ():
 	GemRB.SetText (Window, Label, "")
 
 	SetSelectionChangeHandler (UpdateInventoryWindow)
+	
+	for slot in range(38):
+		SlotType = GemRB.GetSlotType(slot)
+		if SlotType["Type"]:
+			Button = GemRB.GetControl (Window, SlotType["ID"]) 
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
+			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot)
+
 	UpdateInventoryWindow ()
 
 	GemRB.UnhideGUI()
@@ -169,8 +172,6 @@ def GetColor():
 
 
 def UpdateInventoryWindow ():
-	global ItemHash
-
 	GemRB.HideGUI()
 	Window = InventoryWindow
 
@@ -269,6 +270,7 @@ def UpdateSlot (pc, slot):
 	Button = GemRB.GetControl (Window, SlotType["ID"])
 	slot_item = GemRB.GetSlotItem (pc, slot)
 
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		identified = slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED
@@ -287,10 +289,8 @@ def UpdateSlot (pc, slot):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnDragItem")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoWindow")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
 	else:
 
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
 		if SlotType["ResRef"]=="*":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
 		else:
@@ -298,11 +298,31 @@ def UpdateSlot (pc, slot):
 		GemRB.SetText (Window, Button, "")
 		GemRB.SetTooltip (Window, Button, SlotType["Tip"])
 
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "")
-
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 	return
+
+def OnDragItem ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+
+	slot = GemRB.GetVar ("ItemButton")
+	if not GemRB.IsDraggingItem ():
+		slot_item = GemRB.GetSlotItem (pc, slot)
+	        item = GemRB.GetItem (slot_item["ItemResRef"])
+		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0, 0)
+	else:
+		GemRB.DropDraggedItem (pc, slot)
+
+	UpdateInventoryWindow ()
+	return
+
+def OnDropItemToPC ():
+	pc = GemRB.GetVar ("PressedPortrait") + 1
+	print "PC", pc
+	GemRB.DropDraggedItem (pc, -1)
+	UpdateInventoryWindow ()
+	return
+
 ###################################################
 # End of file GUIINV.py
