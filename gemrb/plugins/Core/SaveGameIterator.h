@@ -5,7 +5,19 @@
 #include <sys/stat.h>
 #include "FileStream.h"
 
-class SaveGame {
+#ifdef WIN32
+
+#ifdef GEM_BUILD_DLL
+#define GEM_EXPORT __declspec(dllexport)
+#else
+#define GEM_EXPORT __declspec(dllimport)
+#endif
+
+#else
+#define GEM_EXPORT
+#endif
+
+class GEM_EXPORT SaveGame {
 public:
 	SaveGame(char * path, char * name, char * prefix, int pCount)
 	{
@@ -52,7 +64,7 @@ private:
 	int  PortraitCount;
 };
 
-class SaveGameIterator
+class GEM_EXPORT SaveGameIterator
 {
 public:
 	SaveGameIterator(void);
