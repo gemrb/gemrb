@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.8 2004/11/11 19:46:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.9 2004/11/11 19:51:15 avenger_teambg Exp $
  *
  */
 
@@ -45,7 +45,7 @@
 #define IE_ITEM_CRITICAL     0x00000001
 #define IE_ITEM_TWO_HANDED   0x00000002
 #define IE_ITEM_MOVABLE      0x00000004
-#define IE_ITEM_DIITMAYABLE  0x00000008
+#define IE_ITEM_DISPLAYABLE  0x00000008
 #define IE_ITEM_CURSED       0x00000010
 #define IE_ITEM_NOT_COPYABLE 0x00000020
 #define IE_ITEM_MAGICAL      0x00000040
