@@ -87,7 +87,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 		PathNode * topNode = OpenStack.front();
 		std::vector<PathNode*>::iterator m = OpenStack.begin();
 		OpenStack.erase(m);
-		printf("[this=%08X, x=%d, y=%d, Parent=%08X, Next=%08X]\n", topNode, topNode->x, topNode->y, topNode->Parent, topNode->Next);
+		//printf("[this=%08X, x=%d, y=%d, Parent=%08X, Next=%08X]\n", topNode, topNode->x, topNode->y, topNode->Parent, topNode->Next);
 		if((topNode->x == goalX) && (topNode->y == goalY)) {//We've found _a_ path
 			printf("GOAL!!!\n");
 			FinalStack.push_back(topNode);
@@ -139,11 +139,30 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 		}
 	}
 	PathNode * ret = FinalStack.back();
+	PathNode * newNode = NULL;
 	while(ret && (ret->Parent != NULL)) {
 		ret->Parent->Next = ret;
+		PathNode * node = new PathNode();
+		node->x = ret->x;
+		node->y = ret->y;
+		node->orient = ret->orient;
+		node->passable = ret->passable;
+		node->Next = newNode;
+		node->Parent = NULL;
+		if(newNode)
+			newNode->Parent = node;
+		newNode = node;
 		ret = ret->Parent;
 	}
-	return ret;
+	ret->orient = GetOrient(ret->x, ret->y, ret->Next->x, ret->Next->y);
+	PathNode * node = new PathNode();
+	node->x = ret->x;
+	node->y = ret->y;
+	node->orient = ret->orient;
+	node->passable = ret->passable;
+	node->Next = newNode;
+	node->Parent = NULL;
+	return node;
 }
 
 unsigned long PathFinder::GetDistance(short sX, short sY, short dX, short dY)
