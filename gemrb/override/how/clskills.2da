@@ -1,22 +1,22 @@
 2DA V1.0
 *
-                    HATERACE   CLERICSPELL MAGESPELL  STARTXP
-UNUSED              *          *           *          *
-MAGE                *          *           MXSPLWIZ   0
-FIGHTER             *          *           *          0
-CLERIC              *          MXSPLPRS    *          0 
-THIEF               *          *           *          0
-BARD                *          *           MXSPLBRD   0
-PALADIN             *          MXSPLPAL    *          0
-FIGHTER_MAGE        *          *           MXSPLWIZ   0
-FIGHTER_CLERIC      *          MXSPLPRS    *          0
-FIGHTER_THIEF       *          *           *          0
-FIGHTER_MAGE_THIEF  *          *           MXSPLWIZ   0
-DRUID               *          MXSPLDRU    *          0
-RANGER              HATERACE   MXSPLRAN    *          0
-MAGE_THIEF          *          *           MXSPLWIZ   0
-CLERIC_MAGE         *          MXSPLPRS    MXSPLWIZ   0
-CLERIC_THIEF        *          MXSPLPRS    *          0
-FIGHTER_DRUID       *          MXSPLDRU    *          0
-FIGHTER_MAGE_CLERIC *          MXSPLPRS    MXSPLWIZ   0
-CLERIC_RANGER       HATERACE   MXSPLPRS    *          0
+                    HATERACE   CLERICSPELL MAGESPELL  STARTXP  BARDSKILL  THIEFSKILL
+UNUSED              *          *           *          *        *          *
+MAGE                *          *           MXSPLWIZ   0        *          *
+FIGHTER             *          *           *          0        *          *
+CLERIC              *          MXSPLPRS    *          0        *          *
+THIEF               *          *           *          0        *          SKILLS
+BARD                *          *           MXSPLBRD   0        SKILLBRD   *
+PALADIN             *          MXSPLPAL    *          0        *          *
+FIGHTER_MAGE        *          *           MXSPLWIZ   0        *          *
+FIGHTER_CLERIC      *          MXSPLPRS    *          0        *          *
+FIGHTER_THIEF       *          *           *          0        *          SKILLS
+FIGHTER_MAGE_THIEF  *          *           MXSPLWIZ   0        *          SKILLS
+DRUID               *          MXSPLDRU    *          0        *          *
+RANGER              HATERACE   MXSPLRAN    *          0        *          *
+MAGE_THIEF          *          *           MXSPLWIZ   0        *          SKILLS
+CLERIC_MAGE         *          MXSPLPRS    MXSPLWIZ   0        *          *
+CLERIC_THIEF        *          MXSPLPRS    *          0        *          SKILLS
+FIGHTER_DRUID       *          MXSPLDRU    *          0        *          *
+FIGHTER_MAGE_CLERIC *          MXSPLPRS    MXSPLWIZ   0        *          *
+CLERIC_RANGER       HATERACE   MXSPLPRS    *          0        *          *
