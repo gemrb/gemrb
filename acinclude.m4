@@ -9,7 +9,7 @@
 dnl AM_PATH_SDL([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl Test for SDL, and define SDL_CFLAGS and SDL_LIBS
 dnl
-AC_DEFUN(AM_PATH_SDL,
+AC_DEFUN([AM_PATH_SDL],
 [dnl 
 dnl Get the cflags and libraries from the sdl-config script
 dnl
@@ -341,7 +341,7 @@ fi
 dnl Test whether STL library defines method container::at().
 dnl Older versions (e.g. 2.95.x on Debian) don't and newer (3.x) do
 dnl Syntax: AC_CHECK_STL_CONTAINER_AT([ACTION-IF-YES], [ACTION-IF-NO])
-AC_DEFUN(AC_CHECK_STL_CONTAINER_AT,
+AC_DEFUN([AC_CHECK_STL_CONTAINER_AT],
 [
 AC_MSG_CHECKING(for container::at)
 AC_TRY_COMPILE(
@@ -371,7 +371,7 @@ $2])
 dnl Check for the name of Posix threads library.
 dnl Ripped from XMMS by Peter Alm & co and modified to integrate w/ GemRB
 
-AC_DEFUN(AC_CHECK_PTHREADS,
+AC_DEFUN([AC_CHECK_PTHREADS],
 [
 LIBPTHREAD=error
 AC_MSG_CHECKING(for old style FreeBSD -pthread flag)
@@ -403,3 +403,4 @@ if test "x$LIBPTHREAD" = xerror; then
 fi
 AC_SUBST(LIBPTHREAD)
 ])
+
