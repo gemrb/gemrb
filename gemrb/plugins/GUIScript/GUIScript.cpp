@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.200 2004/08/27 13:23:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.201 2004/08/27 15:40:02 avenger_teambg Exp $
  *
  */
 
@@ -1571,7 +1571,7 @@ static PyObject* GemRB_SetButtonFont(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_DeleteControl__doc,
 "DeleteControl(WindowIndex, ControlID)\n\n"
-"Creates and adds a new WorldMap control to a Window." );
+"Deletes a control from a Window." );
 
 static PyObject* GemRB_DeleteControl(PyObject * /*self*/, PyObject* args)
 {
@@ -3221,46 +3221,6 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_SetWorldMapImage__doc,
-"SetSaveWorldMapImage(WindowIndex, ButtonIndex)\n\n"
-"Sets worldmap image on a control." );
-
-static PyObject* GemRB_SetWorldMapImage(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex;
-
-	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex )) {
-		return AttributeError( GemRB_SetWorldMapImage__doc );
-	}
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		printMessage( "GUIScript", "Runtime Error: Window not found\n",
-			LIGHT_RED );
-		return NULL;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		printMessage( "GUIScript", "Runtime Error: Control not found\n",
-			LIGHT_RED );
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_BUTTON) {
-		printMessage( "GUIScript",
-			"Runtime Error: SetSaveWorldMapImage() - control must be a button\n",
-			LIGHT_RED );
-		return NULL;
-	}
-
-	Button* btn = ( Button* ) ctrl;
-	btn->SetFlags( IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_DRAGGABLE, OP_OR );
-	btn->SetPicture( core->GetWorldMap()->MapMOS );
-	// FIXME: when the button is deleted, so is MapMOS. That's wrong!!!!
-
-	Py_INCREF( Py_None );
-	return Py_None;
-}
-
 PyDoc_STRVAR( GemRB_SetSpellIcon__doc,
 "SetSpellIcon(WindowIndex, ControlIndex, SPLResRef)\n\n"
 "FIXME: temporary Sets Spell icon image on a button." );
@@ -3680,7 +3640,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetPlayerName, METH_VARARGS),
 	METHOD(GetPCStats, METH_VARARGS),
 	METHOD(FillPlayerInfo, METH_VARARGS),
-	METHOD(SetWorldMapImage, METH_VARARGS),
 	METHOD(SetSpellIcon, METH_VARARGS),
 	METHOD(SetItemIcon, METH_VARARGS),
 	METHOD(EnterStore, METH_VARARGS),
