@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.15 2003/11/26 20:23:13 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.16 2003/11/27 22:09:06 balrog994 Exp $
  *
  */
 
@@ -60,11 +60,11 @@ public:
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(Region &rgn, Color &color);
 	/** This functions Draws a Circle */
-	void DrawCircle(unsigned short cx, unsigned short cy, unsigned short r, Color &color);
+	void DrawCircle(short cx, short cy, unsigned short r, Color &color);
 	/** This functions Draws an Ellipse */
-	void DrawEllipse(unsigned short cx, unsigned short cy, unsigned short xr, unsigned short yr, Color &color);
+	void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, Color &color);
 	/** This function Draws a Polygon on the Screen */
-	void DrawPolyline(unsigned short *x, unsigned short *y, int count, Color &color, bool fill = false);
+	void DrawPolyline(Gem_Polygon * poly, Color &color, bool fill = false);
 	/** Creates a Palette from Color */
 	Color * CreatePalette(Color color, Color back);
 	/** Blits a Sprite filling the Region */
@@ -76,19 +76,22 @@ public:
 	/** Mirrors an Animation Horizontally */
 	void MirrorAnimation(Animation * anim);
 	/** Convers a Screen Coordinate to a Game Coordinate */
-	void ConvertToGame(unsigned short &x, unsigned short &y)
+	void ConvertToGame(short &x, short &y)
 	{
 		x += Viewport.x;
 		y += Viewport.y;
 	}
+	/** */
+	Sprite2D * PrecalculatePolygon(Point * points, int count, Color &color);
 
 	void * GetVideoSurface()
 	{
 		return disp;
 	}
 private:
-	inline void SetPixel(unsigned short x, unsigned short y, Color &color);
-	inline void DrawLine(unsigned short x1, unsigned short y1, unsigned short x2, unsigned short y2, Color &color);
+	inline void SetPixel(short x, short y, Color &color);
+	inline void DrawLine(short x1, short y1, short x2, short y2, Color &color);
+	inline void GetPixel(short x, short y, Color *color);
 
 public:
 	void release(void)
