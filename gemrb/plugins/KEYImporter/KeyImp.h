@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.h,v 1.6 2004/02/24 22:20:40 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.h,v 1.7 2004/08/02 21:53:45 guidoj Exp $
  *
  */
 
@@ -27,14 +27,14 @@
 #include "Dictionary.h"
 
 typedef struct RESEntry {
-	char ResRef[8];
-	unsigned short Type;
-	unsigned long ResLocator;
+	ieResRef ResRef;
+	ieWord   Type;
+	ieDword  ResLocator;
 } RESEntry;
 
 typedef struct BIFEntry {
 	char* name;
-	unsigned short BIFLocator;
+	ieWord BIFLocator;
 } BIFEntry;
 
 class KeyImp : public ResourceMgr {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.40 2004/07/01 23:17:51 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.41 2004/08/02 21:53:45 guidoj Exp $
  *
  */
 
@@ -58,7 +58,7 @@ KeyImp::~KeyImp(void)
 
 bool KeyImp::LoadResFile(const char* resfile)
 {
-  unsigned int i;
+	unsigned int i;
 	char fn[_MAX_PATH] = {
 		0
 	};
@@ -100,19 +100,19 @@ bool KeyImp::LoadResFile(const char* resfile)
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "KEYImporter", "Reading Resources...\n", WHITE );
-	unsigned long BifCount, ResCount, BifOffset, ResOffset;
+	ieDword BifCount, ResCount, BifOffset, ResOffset;
 	f->Read( &BifCount, 4 );
 	f->Read( &ResCount, 4 );
 	f->Read( &BifOffset, 4 );
 	f->Read( &ResOffset, 4 );
 	printMessage( "KEYImporter", "", WHITE );
-	printf( "BIF Files Count: %ld (Starting at %ld Bytes)\n", BifCount,
+	printf( "BIF Files Count: %d (Starting at %d Bytes)\n", BifCount,
 		BifOffset );
 	printMessage( "KEYImporter", "", WHITE );
-	printf( "RES Count: %ld (Starting at %ld Bytes)\n", ResCount, ResOffset );
+	printf( "RES Count: %d (Starting at %d Bytes)\n", ResCount, ResOffset );
 	f->Seek( BifOffset, GEM_STREAM_START );
-	unsigned long BifLen, ASCIIZOffset;
-	unsigned short ASCIIZLen;
+	ieDword BifLen, ASCIIZOffset;
+	ieWord ASCIIZLen;
 	for (i = 0; i < BifCount; i++) {
 		BIFEntry be;
 		f->Seek( BifOffset + ( 12 * i ), GEM_STREAM_START );
