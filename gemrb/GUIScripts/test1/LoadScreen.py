@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003 The GemRB Project
+# Copyright (C) 2003-2004 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/test1/LoadScreen.py,v 1.3 2004/08/11 22:13:43 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/test1/LoadScreen.py,v 1.4 2005/03/13 14:25:08 avenger_teambg Exp $
 
 # LoadScreen.py - display Loading screen
 
@@ -26,16 +26,17 @@ import GemRB
 from GUIDefines import *
 
 LoadScreen = None
-ProgressBar = None
 
 def StartLoadScreen ():
-	global LoadScreen, ProgressBar
+	global LoadScreen
 
 	GemRB.LoadWindowPack ("guils")
 	LoadScreen = GemRB.LoadWindow (0)
-	mosname = GemRB.GetToken ("LoadScreen")
-
-	Label = GemRB.GetControl (LoadScreen, 1)
+	Middle = GemRB.GetControl (LoadScreen, 3)
+	LoadPic = GemRB.GetGameString (STR_LOADMOS)
+	if LoadPic == "":
+		LoadPic = "GTRSK00"+str(GemRB.Roll(1,5,1) )
+	GemRB.SetButtonMOS (LoadScreen, Middle, LoadPic)
 	Progress = 0
 	GemRB.SetVar ("Progress", Progress)
 	Table = GemRB.LoadTable ("loadhint")
@@ -44,10 +45,6 @@ def StartLoadScreen ():
 	HintStr = GemRB.GetTableValue (Table, tmp, 0)
 	TextArea = GemRB.GetControl (LoadScreen, 2)
 	GemRB.SetText (LoadScreen, TextArea, HintStr)
-	ProgressBar = GemRB.GetControl (LoadScreen, 0)
-	GemRB.SetVarAssoc (LoadScreen, ProgressBar, "Progress", Progress)
+	Bar = GemRB.GetControl (LoadScreen, 0)
+	GemRB.SetVarAssoc (LoadScreen, Bar, "Progress", Progress)
 	GemRB.SetVisible (LoadScreen, 1)
-
-def CloseLoadScreen ():
-	GemRB.UnloadWindow (LoadScreen)
-

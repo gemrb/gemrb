@@ -22,4 +22,15 @@ def OnLoad():
 	GemRB.PlaySound("compress")
 	print "6. Enabling cheatkeys"
 	GemRB.EnableCheatKeys(1)
-	StartLoadScreen()
+
+	# for loadscreen testing
+	#StartLoadScreen()
+
+	# for store testing
+	#GemRB.EnterStore("bag01")
+	#GemRB.SetNextScript("GUISTORE")
+	#return
+
+	# for character sets
+	GemRB.SetNextScript("CharSet")
+	#return
