@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.124 2004/04/03 11:29:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.125 2004/04/03 17:10:45 avenger_teambg Exp $
  *
  */
 
@@ -90,6 +90,8 @@ static TriggerLink triggernames[] = {
 	{"happinessgt", GameScript::HappinessGT,0},
 	{"happinesslt", GameScript::HappinessLT,0},
 	{"harmlessentered", GameScript::Entered,0}, //this isn't sure the same
+	{"hasitem", GameScript::HasItem,0},
+	{"hasitemslot", GameScript::HasItemSlot,0},
 	{"hp", GameScript::HP,0},
 	{"hpgt", GameScript::HPGT,0}, {"hplt", GameScript::HPLT,0},
 	{"hppercent", GameScript::HPPercent,0},
@@ -123,6 +125,12 @@ static TriggerLink triggernames[] = {
 	{"numinpartyalivelt", GameScript::PartyCountAliveLT,0},
 	{"numinpartygt", GameScript::PartyCountGT,0},
 	{"numinpartylt", GameScript::PartyCountLT,0},
+	{"numitems", GameScript::NumItems,0},
+	{"numitemsgt", GameScript::NumItemsGT,0},
+	{"numitemslt", GameScript::NumItemsLT,0},
+	{"numitemsparty", GameScript::NumItemsParty,0},
+	{"numitemspartygt", GameScript::NumItemsPartyGT,0},
+	{"numitemspartylt", GameScript::NumItemsPartyLT,0},
 	{"numtimestalkedto", GameScript::NumTimesTalkedTo,0},
 	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT,0},
 	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT,0},
@@ -139,6 +147,7 @@ static TriggerLink triggernames[] = {
 	{"partygoldGT", GameScript::PartyGoldGT,0},
 	{"partygoldLT", GameScript::PartyGoldLT,0},
 	{"partyhasitem", GameScript::PartyHasItem,0},
+	{"partyhasitemidentified", GameScript::PartyHasItemIdentified,0},
 	{"race", GameScript::Race,0},
 	{"randomnum", GameScript::RandomNum,0},
 	{"randomnumgt", GameScript::RandomNumGT,0},
@@ -2674,11 +2683,164 @@ int GameScript::OnCreation(Scriptable* Sender, Trigger* parameters)
 */
 }
 
+int GameScript::NumItemsParty(Scriptable* Sender, Trigger* parameters)
+{
+	int cnt = 0;
+	Actor *actor;
+	Game *game=core->GetGame();
+
+	//there is an assignment here
+	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+		cnt+=actor->inventory->CountItems(parameters->string0Parameter,1);
+	}
+	return cnt==parameters->int0Parameter;
+}
+
+int GameScript::NumItemsPartyGT(Scriptable* Sender, Trigger* parameters)
+{
+	int cnt = 0;
+	Actor *actor;
+	Game *game=core->GetGame();
+
+	//there is an assignment here
+	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+		cnt+=actor->inventory->CountItems(parameters->string0Parameter,1);
+	}
+	return cnt>parameters->int0Parameter;
+}
+
+int GameScript::NumItemsPartyLT(Scriptable* Sender, Trigger* parameters)
+{
+	int cnt = 0;
+	Actor *actor;
+	Game *game=core->GetGame();
+
+	//there is an assignment here
+	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+		cnt+=actor->inventory->CountItems(parameters->string0Parameter,1);
+	}
+	return cnt<parameters->int0Parameter;
+}
+
+int GameScript::NumItems(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if( !tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	int cnt = actor->inventory->CountItems(parameters->string0Parameter,1);
+	return cnt==parameters->int0Parameter;
+}
+
+int GameScript::NumItemsGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if( !tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	int cnt = actor->inventory->CountItems(parameters->string0Parameter,1);
+	return cnt>parameters->int0Parameter;
+}
+
+int GameScript::NumItemsLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if( !tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	int cnt = actor->inventory->CountItems(parameters->string0Parameter,1);
+	return cnt<parameters->int0Parameter;
+}
+
+int GameScript::Contains(Scriptable* Sender, Trigger* parameters)
+{
+//actually this should be a container
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if( !tar || tar->Type!=ST_CONTAINER) {
+		return 0;
+	}
+	Container *cnt = (Container *) tar;
+	if (cnt->inventory->HasItem(parameters->string0Parameter,0) ) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::HasItem(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if( !scr || scr->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) scr;
+	if (actor->inventory->HasItem(parameters->string0Parameter, 0) ) {
+		return 1;
+	}
+	return 0;
+}
+
+/** HasItemSlot is extended with an optional argument */
+/** if the string is zero, then it will return true if there is any item in the slot */
+/** if the string is non-zero, it will return true, if the given item was in the slot */
+int GameScript::HasItemSlot(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if( !scr || scr->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) scr;
+	//this might require a conversion of the slots
+	if (actor->inventory->HasItemInSlot(parameters->string0Parameter, parameters->int0Parameter) ) {
+		return !parameters->string0Parameter;
+	}
+	return !!parameters->string0Parameter;
+}
+
+int GameScript::HasItemEquipped(Scriptable * Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	Actor *actor = (Actor *) scr;
+	if (actor->inventory->HasItem(parameters->string0Parameter, 1) ) {
+		return 1;
+	}
+	return 0;
+}
+
+/** this trigger accepts a numeric parameter, this number could be: */
+/** 0 - normal, 1 - equipped, 2 - identified, 3 - equipped&identified */
+/** this is a GemRB extension */
 int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger* parameters)
 {
 	/*hacked to never have the item, this requires inventory!*/
 	if (stricmp( parameters->string0Parameter, "MISC4G" ) == 0) {
 		return 1;
+	}
+	/** */
+	Actor *actor;
+	Game *game=core->GetGame();
+
+	//there is an assignment here
+	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+		if (actor->inventory->HasItem(parameters->string0Parameter,parameters->int0Parameter) ) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* parameters)
+{
+	Actor *actor;
+	Game *game=core->GetGame();
+
+	//there is an assignment here
+	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+		if (actor->inventory->HasItem(parameters->string0Parameter,2) ) {
+			return 1;
+		}
 	}
 	return 0;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.2 2004/04/03 16:04:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.3 2004/04/03 17:10:45 avenger_teambg Exp $
  *
  */
 
@@ -39,23 +39,24 @@ Inventory::~Inventory()
 	}
 }
 
+/** if you supply a null string, then it checks if the slot is empty */
 bool Inventory::HasItemInSlot(const char *resref, int slot)
 {
 	CREItem *item = slots[slot];
-	if (strnicmp( item->ItemResRef, resref,8 ) == 0) {
+	if (strnicmp( item->ItemResRef, resref, 8 )==0) {
 		return true;
 	}
 	return false;
 }
 
-int Inventory::CountItems(const char *resref, bool charges)
+int Inventory::CountItems(const char *resref, bool stacks)
 {
 	int count = 0;
 	int slot = slots.size();
 	while(slot--) {
 		CREItem *item = slots[slot];
 		if (strnicmp( item->ItemResRef, resref,8 ) == 0) {
-			if (charges) {
+			if (stacks && item->Flags&IE_ITEM_STACKED) {
 				count+=item->Usages[0];
 			}
 			else {
@@ -66,12 +67,18 @@ int Inventory::CountItems(const char *resref, bool charges)
 	return count;
 }
 
-bool Inventory::HasItem(const char *resref)
+bool Inventory::HasItem(const char *resref, int flags)
 {
 	int slot = slots.size();
 	while(slot--) {
 		CREItem *item = slots[slot];
 		if (strnicmp(item->ItemResRef, resref,8) == 0) {
+			if(flags&2) { //identified?
+				if(item->Flags&IE_ITEM_IDENTIFIED) {
+					return true;
+				}
+				continue; //not identified
+			}
 			return true;
 		}
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.27 2004/03/21 17:18:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.28 2004/04/03 17:10:45 avenger_teambg Exp $
  *
  */
 
@@ -36,7 +36,7 @@ class Door;
 #include "Polygon.h"
 #include "TileOverlay.h"
 #include "Variables.h"
-//#include "GameScript.h"
+#include "Inventory.h"
 #include <list>
 
 #define STEP_TIME		150
@@ -106,6 +106,7 @@ public:
 	bool resetAction;
 	bool OnCreation;
 	unsigned long playDeadCounter;
+	Inventory *inventory;
 public:
 	void SetScript(const char* aScript, int idx);
 	void SetWait(unsigned long time);

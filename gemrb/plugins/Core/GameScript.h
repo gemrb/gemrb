@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.88 2004/03/28 11:21:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.89 2004/04/03 17:10:45 avenger_teambg Exp $
  *
  */
 
@@ -744,6 +744,7 @@ public: //Script Functions
 	static int CheckStatLT(Scriptable* Sender, Trigger* parameters);
 	static int Class(Scriptable* Sender, Trigger* parameters);
 	static int Clicked(Scriptable* Sender, Trigger* parameters);
+	static int Contains(Scriptable* Sender, Trigger* parameters);
 	static int Dead(Scriptable* Sender, Trigger* parameters);
 	static int Entered(Scriptable* Sender, Trigger* parameters);
 	static int Exists(Scriptable* Sender, Trigger* parameters);
@@ -764,6 +765,9 @@ public: //Script Functions
 	static int Happiness(Scriptable* Sender, Trigger* parameters);
 	static int HappinessGT(Scriptable* Sender, Trigger* parameters);
 	static int HappinessLT(Scriptable* Sender, Trigger* parameters);
+	static int HasItem(Scriptable* Sender, Trigger* parameters);
+	static int HasItemEquipped(Scriptable* Sender, Trigger* parameters);
+	static int HasItemSlot(Scriptable* Sender, Trigger* parameters);
 	static int HP(Scriptable* Sender, Trigger* parameters);
 	static int HPGT(Scriptable* Sender, Trigger* parameters);
 	static int HPLT(Scriptable* Sender, Trigger* parameters);
@@ -793,6 +797,12 @@ public: //Script Functions
 	static int NumCreatures(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesGT(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesLT(Scriptable* Sender, Trigger* parameters);
+	static int NumItems(Scriptable* Sender, Trigger* parameters);
+	static int NumItemsGT(Scriptable* Sender, Trigger* parameters);
+	static int NumItemsLT(Scriptable* Sender, Trigger* parameters);
+	static int NumItemsParty(Scriptable* Sender, Trigger* parameters);
+	static int NumItemsPartyGT(Scriptable* Sender, Trigger* parameters);
+	static int NumItemsPartyLT(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedTo(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedToGT(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedToLT(Scriptable* Sender, Trigger* parameters);
@@ -811,6 +821,7 @@ public: //Script Functions
 	static int PartyGoldGT(Scriptable* Sender, Trigger* parameters);
 	static int PartyGoldLT(Scriptable* Sender, Trigger* parameters);
 	static int PartyHasItem(Scriptable* Sender, Trigger* parameters);
+	static int PartyHasItemIdentified(Scriptable* Sender, Trigger* parameters);
 	static int Race(Scriptable* Sender, Trigger* parameters);
 	static int RandomNum(Scriptable* Sender, Trigger* parameters);
 	static int RandomNumGT(Scriptable* Sender, Trigger* parameters);
