@@ -9,7 +9,17 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG")
 	NameWindow = GemRB.LoadWindow(5)
 
+	BackButton = GemRB.GetControl(NameWindow,3)
+	GemRB.SetText(NameWindow, BackButton, 15416)
+
+	DoneButton = GemRB.GetControl(NameWindow,0)
+	GemRB.SetText(NameWindow, DoneButton, 11973)
+
 	NameField = GemRB.GetControl(NameWindow, 2)
+
+	GemRB.SetEvent(NameWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	GemRB.SetEvent(NameWindow, BackButton, IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	GemRB.SetVisible(NameWindow,1)
 	return
 
 def BackPress():
@@ -19,6 +29,6 @@ def BackPress():
 
 def NextPress():
         GemRB.UnloadWindow(NameWindow)
-	GemRB.SetNextScript("CharGen2") #Before race
+	GemRB.SetNextScript("CharGen9")
 	return
 

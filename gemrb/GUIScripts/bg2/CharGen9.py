@@ -51,7 +51,7 @@ def OnLoad():
 
 	NameButton = GemRB.GetControl(CharGenWindow,7)
 	GemRB.SetText(CharGenWindow,NameButton, 11963)
-	GemRB.SetButtonState(CharGenWindow,NameButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(CharGenWindow,NameButton,IE_GUI_BUTTON_DISABLED)
 
 	BackButton = GemRB.GetControl(CharGenWindow, 11)
 	GemRB.SetText(CharGenWindow, BackButton, 15416)
@@ -59,7 +59,7 @@ def OnLoad():
 
 	AcceptButton = GemRB.GetControl(CharGenWindow, 8)
 	GemRB.SetText(CharGenWindow, AcceptButton, 11962)
-	GemRB.SetButtonState(CharGenWindow,AcceptButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(CharGenWindow,AcceptButton,IE_GUI_BUTTON_ENABLED)
 
 	ImportButton = GemRB.GetControl(CharGenWindow, 13)
 	GemRB.SetText(CharGenWindow, ImportButton, 13955)
@@ -100,13 +100,14 @@ def OnLoad():
 
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
-        GemRB.SetEvent(CharGenWindow, NameButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+        GemRB.SetEvent(CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 	GemRB.SetVisible(CharGenWindow,1)
 	return
 	
 def NextPress():
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("GUICG5") #name
+	#LETS PLAY!!
+	GemRB.SetNextScript("Start")
 	return
 
 def CancelPress():
@@ -116,6 +117,6 @@ def CancelPress():
 
 def BackPress():
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("CharGen7") #appearance
+	GemRB.SetNextScript("CharGen8") #name
 	return
 

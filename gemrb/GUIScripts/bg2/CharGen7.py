@@ -119,6 +119,6 @@ def CancelPress():
 
 def BackPress():
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("CharGen5") #abilities
+	GemRB.SetNextScript("CharGen6") #skills
 	return
 
