@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.54 2003/12/23 23:29:07 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.55 2004/01/07 20:21:04 balrog994 Exp $
  *
  */
 
@@ -254,17 +254,19 @@ int SDLVideoDriver::SwapBuffers(void)
 			}
 		}
 		SDL_BlitSurface(backBuf, NULL, disp, NULL);
+		if(fadePercent) {
+			//printf("Fade Percent = %d%%\n", fadePercent);
+			SDL_SetAlpha(extra, SDL_SRCALPHA, (255*fadePercent)/100);
+			SDL_Rect src = {0, 0, Viewport.w, Viewport.h};
+			SDL_Rect dst = {xCorr, yCorr, 0, 0};
+			SDL_BlitSurface(extra, &src, disp, &dst);
+		}
 		if(Cursor[CursorIndex] && !DisableMouse) {
 			short x = CursorPos.x;
 			short y = CursorPos.y;
 			SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
 			CursorPos.x = x;
 			CursorPos.y = y;
-		}
-		if(fadePercent) {
-			//printf("Fade Percent = %d%%\n", fadePercent);
-			SDL_SetAlpha(extra, SDL_SRCALPHA, (255*fadePercent)/100);
-			SDL_BlitSurface(extra, NULL, disp, NULL);
 		}
 		SDL_Flip(disp);
 		return ret;
@@ -402,7 +404,7 @@ int SDLVideoDriver::SwapBuffers(void)
 				CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
 				CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
 				if(Evnt)
-					Evnt->MouseDown(event.button.x, event.button.y, event.button.state, 0);
+					Evnt->MouseDown(event.button.x, event.button.y, event.button.button, 0);
 			}
 		break;
 
@@ -414,7 +416,7 @@ int SDLVideoDriver::SwapBuffers(void)
 				CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
 				CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
 				if(Evnt)
-					Evnt->MouseUp(event.button.x, event.button.y, event.button.state, 0);
+					Evnt->MouseUp(event.button.x, event.button.y, event.button.button, 0);
 			}
 		break;
 
@@ -428,17 +430,19 @@ int SDLVideoDriver::SwapBuffers(void)
 		}
 	}
 	SDL_BlitSurface(backBuf, NULL, disp, NULL);
+	if(fadePercent) {
+		//printf("Fade Percent = %d%%\n", fadePercent);
+		SDL_SetAlpha(extra, SDL_SRCALPHA, (255*fadePercent)/100);
+		SDL_Rect src = {0, 0, Viewport.w, Viewport.h};
+		SDL_Rect dst = {xCorr, yCorr, 0, 0};
+		SDL_BlitSurface(extra, &src, disp, &dst);
+	}
 	if(Cursor[CursorIndex] && !DisableMouse) {
 		short x = CursorPos.x;
 		short y = CursorPos.y;
 		SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
 		CursorPos.x = x;
 		CursorPos.y = y;
-	}
-	if(fadePercent) {
-		//printf("Fade Percent = %d%%\n", fadePercent);
-		SDL_SetAlpha(extra, SDL_SRCALPHA, (255*fadePercent)/100);
-		SDL_BlitSurface(extra, NULL, disp, NULL);
 	}
 	SDL_Flip(disp);
 	return ret;
