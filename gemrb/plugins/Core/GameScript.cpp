@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.65 2004/02/11 22:35:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.66 2004/02/16 21:12:07 avenger_teambg Exp $
  *
  */
 
@@ -133,6 +133,7 @@ static ActionLink actionnames[]={
 {"joinparty",GameScript::JoinParty},
 {"leavearealua",GameScript::LeaveAreaLUA},
 {"leavearealuapanic",GameScript::LeaveAreaLUAPanic},
+{"makeglobal",GameScript::MakeGlobal},
 {"movebetweenareas",GameScript::MoveBetweenAreas},
 {"movetoobject",GameScript::MoveToObject,AF_BLOCKING},
 {"movetopoint",GameScript::MoveToPoint,AF_BLOCKING},
@@ -161,6 +162,7 @@ static ActionLink actionnames[]={
 {"startsong",GameScript::StartSong},
 {"triggeractivation",GameScript::TriggerActivation},
 {"unhidegui",GameScript::UnhideGUI},
+{"unmakeglobal",GameScript::UnMakeGlobal}, //this is a GemRB extension
 {"wait",GameScript::Wait, AF_BLOCKING},
 { NULL,NULL},
 };
@@ -2501,7 +2503,24 @@ void GameScript::MakeGlobal(Scriptable *Sender, Action * parameters)
 		return;
 	}
 	Actor *act = (Actor *) scr;
-	core->GetGame()->AddNPC(act);
+	if(!core->GetGame()->InParty(act) )
+		core->GetGame()->AddNPC(act);
+}
+
+void GameScript::UnMakeGlobal(Scriptable *Sender, Action * parameters)
+{
+        Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+        if(scr->Type != ST_ACTOR)
+                return;
+        if(scr != Sender) { //this is an Action Override
+                scr->AddAction(Sender->CurrentAction);
+                return;
+        }
+        Actor *act = (Actor *) scr;
+	int slot;
+	slot=core->GetGame()->InStore(act);
+	if(slot>=0)
+        	core->GetGame()->DelNPC(slot);
 }
 
 void GameScript::JoinParty(Scriptable * Sender, Action * parameters)
