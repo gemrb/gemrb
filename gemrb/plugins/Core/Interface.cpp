@@ -37,6 +37,7 @@ Interface::Interface(void)
 	music = NULL;
 	soundmgr = NULL;
 	sgiterator = NULL;
+	INIparty = NULL;
 	ConsolePopped = false;
 	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
@@ -341,6 +342,21 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus("OK", LIGHT_GREEN);
+	if(stricmp(GameType, "iwd2") == 0) {
+		printMessage("Core", "Loading IceWind Dale 2 Extension Files...", YELLOW);
+		INIparty = (DataFileMgr*)plugin->GetPlugin(IE_INI_CLASS_ID);
+		FileStream * fs = new FileStream();
+		char tINIparty[_MAX_PATH];
+		strcpy(tINIparty, GamePath);
+		strcat(tINIparty, "Party.ini");
+		fs->Open(tINIparty, true);
+		if(!INIparty->Open(fs, true)) {
+			printStatus("ERROR", LIGHT_RED);
+		}
+		else {
+			printStatus("OK", LIGHT_GREEN);
+		}
+	}
 	printMessage("Core", "Core Initialization Complete!\n", LIGHT_GREEN);
 	return GEM_OK;
 }
