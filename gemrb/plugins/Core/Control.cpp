@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.26 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.27 2004/10/17 08:20:34 avenger_teambg Exp $
  *
  */
 
@@ -47,8 +47,10 @@ Control::~Control()
 /** Sets the Tooltip text of the current control */
 int Control::SetTooltip(const char* string, int /*pos*/)
 {
-	if (Tooltip && (string == NULL || string[0] == 0)) {
-		free (Tooltip);
+	if (Tooltip)
+		free(Tooltip);
+
+	if ((string == NULL) || (string[0] == 0)) {
 		Tooltip = NULL;
 	} else {
 		Tooltip = strdup (string);
