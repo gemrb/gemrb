@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.6 2004/05/04 20:43:55 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.7 2004/05/09 21:38:39 edheldil Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -116,6 +116,42 @@ def OpenInventoryWindow ():
 	Button = GemRB.GetControl (Window, 46);
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
+	# armor class
+	Label = GemRB.GetControl (Window, 0x1000003a)
+	GemRB.SetTooltip (Window, Label, 4197)
+
+	# hp current
+	Label = GemRB.GetControl (Window, 0x1000003b)
+	GemRB.SetTooltip (Window, Label, 4198)
+
+	# hp max
+	Label = GemRB.GetControl (Window, 0x1000003c)
+	GemRB.SetTooltip (Window, Label, 4199)
+
+	# 4263 Armor
+	# 4264 Gauntlets
+	# 4265 Helmet
+	# 4266 Amulet
+	# 4267 Belt
+	# 4268 Left Ring
+	# 4269 Right Ring
+	# 4270 Cloak
+	# 4271 Boots
+	# 4272 Shield
+	# 31580 Left Earring
+	# 32857 Right Earring
+
+	# 32795 Magnifying Lens
+	# 32796 Helm
+	# 32797 Tattoo
+	# 32798 Chest
+	# 32799 Teeth
+	# 32800 Finger
+	# 32801 Hand
+	# 32802 Wrist
+	# 32803 Crossbow
+	# 32804 Quarrel
+	
 
 	SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
@@ -150,12 +186,12 @@ def UpdateInventoryWindow ():
 
 	# hp current
 	hp = GemRB.GetPlayerStat (pc, ie_stats.IE_HITPOINTS)
-	Label = GemRB.GetControl (Window, 0x1000003c)
+	Label = GemRB.GetControl (Window, 0x1000003b)
 	GemRB.SetText (Window, Label, str (hp))
 
 	# hp max
 	hpmax = GemRB.GetPlayerStat (pc, ie_stats.IE_MAXHITPOINTS)
-	Label = GemRB.GetControl (Window, 0x1000003b)
+	Label = GemRB.GetControl (Window, 0x1000003c)
 	GemRB.SetText (Window, Label, str (hpmax))
 
 	# party gold

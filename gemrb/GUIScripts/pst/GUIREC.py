@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.8 2004/04/27 06:23:10 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.9 2004/05/09 21:38:39 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -125,10 +125,12 @@ def OpenRecordsWindow ():
 	# AC button
 	Button = GemRB.GetControl (Window, 37)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	GemRB.SetControlSize (Window, Button, 0, 0)
 
 	# HP button
 	Button = GemRB.GetControl (Window, 38)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	GemRB.SetControlSize (Window, Button, 0, 0)
 
 	SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
@@ -165,14 +167,17 @@ def UpdateRecordsWindow ():
 	# armorclass
 	Label = GemRB.GetControl (Window, 0x1000000b)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
+	GemRB.SetTooltip (Window, Label, 4197)
 
 	# hp now
-	Label = GemRB.GetControl (Window, 0x1000000d)
+	Label = GemRB.GetControl (Window, 0x1000000c)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
+	GemRB.SetTooltip (Window, Label, 4198)
 
 	# hp max
-	Label = GemRB.GetControl (Window, 0x1000000c)
+	Label = GemRB.GetControl (Window, 0x1000000d)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
+	GemRB.SetTooltip (Window, Label, 4199)
 
 	# stats
 
@@ -306,6 +311,16 @@ def OnRecordsHelpAlignment ():
 	# 33952 CE
 
 	# 33930 - attr comments
+
+#Bio:
+# 38787 no
+# 39423 morte
+# 39424 annah
+# 39425 dakkon
+# 39426 ffg
+# 39427 ignus
+# 39428 nordom
+# 39429 vhailor
 
 
 def GetStatOverview (pc):
@@ -524,6 +539,9 @@ def OpenBiographyWindow ():
 
 	BiographyWindow = Window = GemRB.LoadWindow (12)
         GemRB.SetVar ("FloatWindow", BiographyWindow)
+
+	TextArea = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, TextArea, 39424)
 
 	
 	# Done
