@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.26 2005/01/09 14:54:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.27 2005/01/17 21:05:38 avenger_teambg Exp $
  *
  */
 
@@ -28,51 +28,6 @@
 
 //container types
 #define CN_PILE   0
-
-/*typedef struct Door {
-	char Name[9];
-	unsigned short * tiles;
-	unsigned char count;
-	unsigned char DoorClosed;
-	Gem_Polygon * open;
-	Gem_Polygon * closed;
-	unsigned long Cursor;
-	char OpenSound[9];
-	char CloseSound[9];
-} Door;*/
-
-/*typedef struct Container {
-	char Name[33];
-	Point toOpen;
-	unsigned short Type;
-	unsigned short LockDifficulty;
-	unsigned short Locked;
-	unsigned short TrapDetectionDiff;
-	unsigned short TrapRemovalDiff;
-	unsigned short Trapped;
-	unsigned short TrapDetected;
-	//Region BBox;
-	Point trapTarget;
-	Gem_Polygon * outline;
-} Container;*/
-
-/*typedef struct InfoPoint {
-	char Name[32];
-	unsigned short Type;
-	Gem_Polygon * outline;
-	unsigned long Cursor;
-	char * String;
-	unsigned long startDisplayTime;
-	unsigned char textDisplaying;
-	unsigned char Active;
-	bool triggered;
-	GameScript * Script;
-	unsigned short TrapDetectionDiff;
-	unsigned short TrapRemovalDiff;
-	unsigned short Trapped;
-	unsigned short TrapDetected;
-	unsigned short LaunchX, LaunchY;
-} InfoPoint;*/
 
 #ifdef WIN32
 
@@ -95,6 +50,7 @@ private:
 	std::vector< Door*> doors;
 	std::vector< Container*> containers;
 	std::vector< InfoPoint*> infoPoints;
+	bool LargeMap;
 public:
 	TileMap(void);
 	~TileMap(void);

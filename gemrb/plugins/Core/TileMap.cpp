@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.33 2005/01/09 14:54:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.34 2005/01/17 21:05:37 avenger_teambg Exp $
  *
  */
 
@@ -29,11 +29,12 @@ TileMap::TileMap(void)
 {
 	XCellCount = 0;
 	YCellCount = 0;
+	LargeMap = !core->HasFeature(GF_SMALL_FOG);
 }
 
 TileMap::~TileMap(void)
 {
-  size_t i;
+	size_t i;
 
 	for (i = 0; i < overlays.size(); i++) {
 		delete( overlays[i] );
@@ -95,10 +96,13 @@ void TileMap::DrawOverlay(unsigned int index, Region viewport)
 
 void TileMap::DrawExploredBitmap(ieByte* mask, Region viewport)
 {
-
 	// viewport - pos & size of the control
 	int w = XCellCount * CELL_RATIO;
 	int h = YCellCount * CELL_RATIO;
+	if (LargeMap) {
+		w++;
+		h++;
+	}
 	Color black = { 0, 0, 0, 255 };
 
 	Video* vid = core->GetVideoDriver();
@@ -126,28 +130,28 @@ void TileMap::DrawExploredBitmap(ieByte* mask, Region viewport)
 	int sy = ( vp.y - viewport.y ) / CELL_SIZE;
 	int dx = ( vp.x + vp.w + CELL_SIZE - 1 ) / CELL_SIZE;
 	int dy = ( vp.y + vp.h + CELL_SIZE - 1 ) / CELL_SIZE;
+	if (LargeMap) {
+		dx++;
+		dy++;
+	}
 	vp.x = viewport.x;
 	vp.y = viewport.y;
 	vp.w = viewport.w;
 	vp.h = viewport.h;
-	//printf("sx, sy: %d %d ; dx, dy: %d %d ; vp: %d %d %d %d\n", sx, sy, dx, dy, vp.x, vp.y, vp.w, vp.h);
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
-		  /*
-			Tile* tile = tiles[( y* w ) + x];
-			//this hack is for alternate tiles with a value of -1
-			if (!tile->anim[tile->tileIndex]) {
-		        	tile->tileIndex=0;
-			}
-		  */
 			int b0 = (w * y + x);
-		  int bb = b0 / 8;
-		  int bi = b0 % 8;
+			int bb = b0 / 8;
+			int bi = b0 % 8;
 
 		  
-		  if (!(mask[bb] & (1 << bi))) {
-			  Region r = Region(viewport.x + ( (x - sx) * CELL_SIZE ), viewport.y + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
-			  vid->DrawRect(r, black, true, true);
+			if (!(mask[bb] & (1 << bi))) {
+				Region r = Region(viewport.x + ( (x - sx) * CELL_SIZE ), viewport.y + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
+				if (LargeMap) {
+					r.x-=16;
+					r.y-=16;
+				}
+				vid->DrawRect(r, black, true, true);
 			}
 			/*
 				vid->BlitSprite( tile->anim[tile->tileIndex]->NextFrame(),
