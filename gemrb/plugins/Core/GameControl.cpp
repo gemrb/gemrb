@@ -105,12 +105,24 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	if(MouseIsDown && (!DrawSelectionRect)) {
-	if((abs(GameX-StartX) > 5) || (abs(GameY-StartY) > 5))
-		DrawSelectionRect = true;
+		if((abs(GameX-StartX) > 5) || (abs(GameY-StartY) > 5))
+			DrawSelectionRect = true;
 	}
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
 	
+	if(!DrawSelectionRect) {
+		ActorBlock * actor = area->GetActor(GameX, GameY);
+		if(lastActor)
+			lastActor->actor->anims->DrawCircle = false;
+		if(!actor) {
+			lastActor = NULL;
+		}
+		else {
+			lastActor = actor;
+			lastActor->actor->anims->DrawCircle = true;
+		}
+	}
 	//CalculateSelection(GameX, GameY);
 
 	Door * door = area->tm->GetDoor(GameX, GameY);
