@@ -3,10 +3,10 @@ import GemRB
 
 LoadWindow = 0
 TextAreaControl = 0
-LoadsTable = 0
+GameCount = 0
 
 def OnLoad():
-	global LoadWindow, TextAreaControl, MoviesTable
+	global LoadWindow, TextAreaControl, GameCount
 
 	GemRB.LoadWindowPack("GUILOAD")
 	LoadWindow = GemRB.LoadWindow(0)
@@ -15,8 +15,9 @@ def OnLoad():
 	GemRB.SetEvent(LoadWindow,CancelButton,IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetVar("LoadIdx",0)
 	GemRB.SetVar("TopIndex",0)
-	GameCount=0   #count of games in save folder?
-	
+	GameCount=GemRB.GetSaveGameCount()   #count of games in save folder?
+	print "GameCount", GameCount
+
 	for i in range(0,4):
 		Button = GemRB.GetControl(LoadWindow,26+i)
 		GemRB.SetButtonState(LoadWindow, Button, IE_GUI_BUTTON_DISABLED)
@@ -42,7 +43,7 @@ def OnLoad():
 	ScrollBar=GemRB.GetControl(LoadWindow, 25)
 	GemRB.SetVarAssoc(LoadWindow, ScrollBar, "TopIndex", GameCount)
 	GemRB.SetEvent(LoadWindow, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
-
+	ScrollBarPress()
 	GemRB.SetVisible(LoadWindow,1)
 	return
 
@@ -51,6 +52,28 @@ def ScrollBarPress():
 	Pos = GemRB.GetVar("TopIndex")
 	for i in range(0,4):
 		ActPos = Pos + i
+
+		Slotname = GemRB.GetSaveGameAttrib(0,ActPos)
+		Label = GemRB.GetControl(LoadWindow, 0x10000008+i)
+		GemRB.SetText(LoadWindow, Label, Slotname)
+
+		Slotname = GemRB.GetSaveGameAttrib(1,ActPos)
+		Label = GemRB.GetControl(LoadWindow, 0x10000010+i)
+		GemRB.SetText(LoadWindow, Label, Slotname)
+
+		Button=GemRB.GetControl(LoadWindow, 1+i)
+		if ActPos<GameCount:
+		#			Portrait=GemRB.GetAreaPortrait(ActPos)
+			Portrait=""
+		else:
+			Portrait=""
+		GemRB.SetButtonPicture(LoadWindow, Button, Portrait)
+		for j in range(0,8):
+			Button=GemRB.GetControl(LoadWindow, 40 + i*6 + j)
+			if ActPos<GameCount:
+		#				Portrait=GemRB.GetPCPortrait(ActPos,j+1)
+				Portrait=""
+			GemRB.SetButtonPicture(LoadWindow, Button, Portrait)
 	return
 
 def LoadGamePress():
