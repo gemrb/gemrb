@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.42 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.43 2003/11/26 01:13:37 balrog994 Exp $
  *
  */
 
@@ -50,6 +50,7 @@
 #include "SymbolMgr.h"
 #include "MoviePlayer.h"
 #include "DataFileMgr.h"
+#include "Game.h"
 
 typedef struct Table {
 	TableMgr * tm;
@@ -104,6 +105,7 @@ private:
 	std::vector<Table> tables;
 	std::vector<Symbol> symbols;
 	DataFileMgr * INIparty;
+	Game * game;
 public:
 	Interface(void);
 	~Interface(void);
@@ -231,6 +233,11 @@ public:
 	DataFileMgr * GetPartyINI()
 	{
 		return INIparty;
+	}
+	/** Gets the Game class */
+	Game * GetGame()
+	{
+		return game;
 	}
 
 private:

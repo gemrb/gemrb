@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.71 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.72 2003/11/26 01:13:37 balrog994 Exp $
  *
  */
 
@@ -389,6 +389,7 @@ int Interface::Init()
 			printStatus("OK", LIGHT_GREEN);
 		}
 	}
+	game = new Game();
 	printMessage("Core", "Core Initialization Complete!\n", LIGHT_GREEN);
 	return GEM_OK;
 }
