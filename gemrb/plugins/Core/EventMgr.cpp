@@ -128,41 +128,16 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 /** BroadCast Mouse Move Event */
 void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	/*if(lastW != NULL) {
-		if((lastW->XPos <= x) && (lastW->YPos <= y)) { //Maybe we are on the window, let's check
-			if((lastW->XPos+lastW->Width >= x) && (lastW->YPos+lastW->Height >= y)) { //Yes, we are on the Window
-				//Let's check if we have a Control under the Mouse Pointer
-				Control * ctrl = lastW->GetControl(x,y);
-				if(ctrl != NULL) {
-					if(ctrl->hasFocus)
-						ctrl->OnMouseUp(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos, Button, Mod);
-				}
-				return;
-			}	
-		}
-	}*/
-	std::vector<Window*>::iterator w;
-	for(w = windows.begin(); w != windows.end(); ++w) {
-	//for(unsigned int i = 0; i < windows.size(); i++) {
-		//if(((*m)->XPos <= x) && ((*m)->YPos <= y)) { //Maybe we are on the window, let's check
-		//	if(((*m)->XPos+(*m)->Width >= x) && ((*m)->YPos+(*m)->Height >= y)) { //Yes, we are on the Window
-				//Let's check if we have a Control under the Mouse Pointer
-		//		Control * ctrl = (*m)->GetControl(x,y);
-		//		if(ctrl != NULL) {
-		//			if(ctrl->hasFocus)
+	for(unsigned int i = 0; i < windows.size(); i++) {
+		Window * w = windows[i];
 		Control *ctrl = NULL;
 		int c = 0;
 		do {
-			ctrl = (*w)->GetControl(c++);
+			ctrl = w->GetControl(c++);
 			if(ctrl == NULL)
 				break;
-			ctrl->OnMouseUp(x-(*w)->XPos-ctrl->XPos,y-(*w)->YPos-ctrl->YPos, Button, Mod);
+			ctrl->OnMouseUp(x-w->XPos-ctrl->XPos,y-w->YPos-ctrl->YPos, Button, Mod);
 		} while(true);
-				//}
-				//lastW = *m;
-				//return;
-			//}	
-		//}
 	}
 }
 
