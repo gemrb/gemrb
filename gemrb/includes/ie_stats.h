@@ -164,5 +164,21 @@
 #define SCRIPTINGSTATE8           163
 #define SCRIPTINGSTATE9           164
 #define SCRIPTINGSTATE10          165
+#define MELEETHAC0	166
+#define MELEEDAMAGE	167
+#define MISSILEDAMAGE	168
+#define NOCIRCLE	169
+#define FISTTHAC0	170
+#define FISTDAMAGE	171
+#define TITLE1		172
+#define TITLE2		173
+#define DISABLEOVERLAY	174
+#define DISABLEBACKSTAB	175
+
 #define STONESKINSGOLEM	199
 #define LEVELDRAIN	200
+#define RACE		201
+#define CLASS		202
+#define GENERAL		203
+#define EA		204
+#define SPECIFIC	205
