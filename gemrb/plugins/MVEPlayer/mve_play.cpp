@@ -1,4 +1,4 @@
-/* $Id: mve_play.cpp,v 1.7 2004/08/12 14:54:17 divide Exp $ */
+/* $Id: mve_play.cpp,v 1.8 2004/08/19 22:35:32 avenger_teambg Exp $ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -97,7 +97,7 @@ static int get_int(unsigned char* data)
 static unsigned int unhandled_chunks[32 * 256];
 
 static int default_seg_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+	unsigned char* /*data*/, int /*len*/, void* /*context*/)
 {
 	unhandled_chunks[major << 8 | minor]++;
 	//fprintf(stderr, "unknown chunk type %02x/%02x\n", major, minor);
@@ -108,8 +108,8 @@ static int default_seg_handler(unsigned char major, unsigned char minor,
 /*************************
  * general handlers
  *************************/
-static int end_movie_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int end_movie_handler(unsigned char /*major*/, unsigned char /*minor*/,
+	unsigned char* /*data*/, int /*len*/, void* /*context*/)
 {
 	return 0;
 }
@@ -161,8 +161,8 @@ int gettimeofday(struct timeval* tv, void* tz)
 #endif
 
 
-static int create_timer_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int create_timer_handler(unsigned char /*major*/, unsigned char /*minor*/,
+	unsigned char* data, int /*len*/, void* /*context*/)
 {
 #ifndef _WIN32 //FIXME
 	__extension__ long long temp;
@@ -263,8 +263,8 @@ static int mve_audio_underruns = 0;
 
 #endif
 
-static int create_audiobuf_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int create_audiobuf_handler(unsigned char /*major*/, unsigned char minor,
+	unsigned char* data, int /*len*/, void* /*context*/)
 {
 #ifdef AUDIO
 	int flags;
@@ -349,8 +349,8 @@ static int create_audiobuf_handler(unsigned char major, unsigned char minor,
 	return 1;
 }
 
-static int play_audio_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int play_audio_handler(unsigned char /*major*/, unsigned char /*minor*/,
+	unsigned char* /*data*/, int /*len*/, void* /*context*/)
 {
 #ifdef AUDIO
 	if (mve_audio_canplay &&
@@ -367,8 +367,8 @@ static int play_audio_handler(unsigned char major, unsigned char minor,
 	return 1;
 }
 
-static int audio_data_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int audio_data_handler(unsigned char major, unsigned char /*minor*/,
+	unsigned char* data, int /*len*/, void* /*context*/)
 {
 #ifdef AUDIO
 	static const int selected_chan = 1;
@@ -444,8 +444,8 @@ static unsigned char* g_pCurMap = NULL;
 static int g_nMapLength = 0;
 static int g_truecolor;
 
-static int create_videobuf_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int create_videobuf_handler(unsigned char /*major*/, unsigned char minor,
+	unsigned char* data, int /*len*/, void* /*context*/)
 {
 	short w, h;
 	short count, truecolor;
@@ -499,8 +499,8 @@ static int create_videobuf_handler(unsigned char major, unsigned char minor,
 	return 1;
 }
 
-static int display_video_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int display_video_handler(unsigned char /*major*/, unsigned char /*minor*/,
+	unsigned char* /*data*/, int /*len*/, void* /*context*/)
 {
 	if (g_destX == -1) // center it
 	{
@@ -524,8 +524,8 @@ static int display_video_handler(unsigned char major, unsigned char minor,
 	return 1;
 }
 
-static int init_video_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int init_video_handler(unsigned char /*major*/, unsigned char /*minor*/,
+	unsigned char* data, int /*len*/, void* /*context*/)
 {
 	short width, height;
 
@@ -544,8 +544,8 @@ static int init_video_handler(unsigned char major, unsigned char minor,
 	return 1;
 }
 
-static int video_palette_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int video_palette_handler(unsigned char /*major*/, unsigned char /*minor*/,
+	unsigned char* data, int /*len*/, void* /*context*/)
 {
 	short start, count;
 	unsigned char * p;
@@ -560,16 +560,16 @@ static int video_palette_handler(unsigned char major, unsigned char minor,
 	return 1;
 }
 
-static int video_codemap_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int video_codemap_handler(unsigned char /*major*/, unsigned char /*minor*/,
+	unsigned char* data, int len, void* /*context*/)
 {
 	g_pCurMap = data;
 	g_nMapLength = len;
 	return 1;
 }
 
-static int video_data_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int video_data_handler(unsigned char /*major*/, unsigned char /*minor*/,
+	unsigned char* data, int len, void* /*context*/)
 {
 	short nFrameHot, nFrameCold;
 	short nXoffset, nYoffset;
@@ -603,8 +603,8 @@ static int video_data_handler(unsigned char major, unsigned char minor,
 	return 1;
 }
 
-static int end_chunk_handler(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context)
+static int end_chunk_handler(unsigned char /*major*/, unsigned char /*minor*/,
+	unsigned char* /*data*/, int /*len*/, void* /*context*/)
 {
 	g_pCurMap = NULL;
 	return 1;
@@ -634,7 +634,7 @@ void MVE_palCallbacks(mve_cb_SetPalette setpalette)
 	mve_setpalette = setpalette;
 }
 
-int MVE_rmPrepMovie(void* src, int x, int y, int track)
+int MVE_rmPrepMovie(void* src, int x, int y, int /*track*/)
 {
 	int i;
 
