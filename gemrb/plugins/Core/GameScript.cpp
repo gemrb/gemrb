@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.229 2005/02/13 13:39:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.230 2005/02/19 19:09:45 avenger_teambg Exp $
  *
  */
 
@@ -38,7 +38,7 @@ static short triggerflags[MAX_TRIGGERS];
 static ObjectFunction objects[MAX_OBJECTS];
 static IDSFunction idtargets[MAX_OBJECT_FIELDS];
 static Cache SrcCache; //cache for string resources (pst)
-//static Cache BcsCache; //cache for scripts
+static Cache BcsCache; //cache for scripts
 
 static int ObjectIDSCount = 7;
 static int MaxObjectNesting = 5;
@@ -796,7 +796,8 @@ static void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 static void FreeSrc(SrcVector *poi, ieResRef key)
 {
 	if( SrcCache.DecRef((void *) poi, key, false) <0) {
-		printMessage( "GameScript", "Corrupted Src cache encountered (reference count went below zero)", WHITE );
+		printMessage( "GameScript", "Corrupted Src cache encountered (reference count went below zero), ", LIGHT_RED );
+		printf( "Src name is: %.8s\n", key);
 		abort();
 	}
 }
@@ -824,7 +825,7 @@ static SrcVector *LoadSrc(ieResRef resname)
 	return src;
 }
 
-GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
+GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 	Variables* local)
 {
 	if (local) {
@@ -932,9 +933,7 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 		initialized = 2;
 	}
 	continueExecution = false;
-	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef,
-		IE_BCS_CLASS_ID );
-	script = CacheScript( ds, ResRef );
+	script = CacheScript( ResRef );
 	MySelf = NULL;
 	scriptRunDelay = 1000;
 	scriptType = ScriptType;
@@ -945,20 +944,40 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 
 GameScript::~GameScript(void)
 {
-	if (script) {
-		script->Release();
-	}
 	if (freeLocals) {
 		if (locals) {
 			delete( locals );
 		}
 	}
+	if (script) {
+		//set 3. parameter to true if you want instant free
+		//and possible death
+		int res = BcsCache.DecRef(script, Name, false);
+	        if (res<0) {
+	                printMessage( "GameScript", "Corrupted Script cache encountered (reference count went below zero), ", LIGHT_RED );
+			printf( "Script name is: %.8s\n", Name);
+        	        abort();
+	        }
+	        if (!res) {
+			printf("Freeing script %s because its refcount has reached 0.\n", Name);
+/* don't free scripts yet
+	        	script->Release();
+*/
+		}
+		script = NULL;
+	}
 }
 
-Script* GameScript::CacheScript(DataStream* stream, const char* Context)
+Script* GameScript::CacheScript(ieResRef ResRef)
 {
 	char line[10];
 
+	Script *newScript = (Script *) BcsCache.GetResource(ResRef);
+	if( newScript )
+		return newScript;
+
+	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef,
+		IE_BCS_CLASS_ID );
 	if (!stream) {
 		return NULL;
 	}
@@ -968,7 +987,9 @@ Script* GameScript::CacheScript(DataStream* stream, const char* Context)
 		delete( stream );
 		return NULL;
 	}
-	Script* newScript = new Script( Context );
+	newScript = new Script( );
+	BcsCache.SetAt( ResRef, (void *) newScript );
+	
 	std::vector< ResponseBlock*> rBv;
 	while (true) {
 		ResponseBlock* rB = ReadResponseBlock( stream );
@@ -990,14 +1011,15 @@ Script* GameScript::CacheScript(DataStream* stream, const char* Context)
 void GameScript::ReplaceMyArea(Scriptable* Sender, char* newVarName)
 {
 	switch(Sender->Type) {
-/*
-		case ST_TRIGGER:
-		{
-			InfoPoint *ip = (InfoPoint *) Sender;
-			memcpy(newVarName, ip->Area, 6);
+		case ST_AREA:
+			//myarea=local variable for areas
+			memcpy(newVarName, "LOCALS", 6); 
 			break;
-		}
-*/
+
+		case ST_GLOBAL:
+			memcpy(newVarName, "GLOBAL", 6);
+			break;
+
 		case ST_ACTOR:
 		{
 			Actor *act = (Actor *) Sender;
@@ -1005,8 +1027,12 @@ void GameScript::ReplaceMyArea(Scriptable* Sender, char* newVarName)
 			break;
 		}
 		default:
-			memcpy(newVarName, "GLOBAL", 6);
-			break;
+		{
+//			InfoPoint *ip = (InfoPoint *) Sender;
+//			memcpy(newVarName, ip->Area, 6);
+//			break;
+			memcpy(newVarName, "LOCALS", 6);
+		}
 	}
 }
 
@@ -1019,14 +1045,14 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		printf( "Setting variable(\"%s%s\", %d)\n", Context,
 			VarName, value );
 	}
-	if (strnicmp( Context, "LOCALS", 6 ) == 0) {
-		Sender->locals->SetAt( VarName, value );
-		return;
-	}
 	strncpy( newVarName, Context, 6 );
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		ReplaceMyArea( Sender, newVarName );
+	}
+	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
+		Sender->locals->SetAt( VarName, value );
+		return;
 	}
 	if(!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
 		core->GetGame()->kaputz->SetAt( VarName, value );
@@ -1175,7 +1201,7 @@ void GameScript::Update()
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (EvaluateCondition( this->MySelf, rB->condition )) {
 			continueExecution = ( ExecuteResponseSet( this->MySelf,
-									rB->responseSet ) != 0 );
+						rB->responseSet ) != 0 );
 			endReached = false;
 			if (!continueExecution)
 				break;
@@ -1935,10 +1961,6 @@ Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIn
 				action[i] = 0;
 				Action* act = GenerateAction( action, autoFree );
 				act->objects[0] = newAction->objects[0];
-				//act->objects[0]->IncRef(); //avoid freeing of object
-				// newAction->Release(); //freeing action
-				//the previous hack doesn't work anymore
-				//because we create actions with autofree
 				newAction->objects[0] = NULL; //avoid freeing of object
 				delete newAction; //freeing action
 				newAction = act;
@@ -3637,7 +3659,7 @@ int GameScript::HaveSpell(Scriptable *Sender, Trigger *parameters)
 	if(parameters->string0Parameter[0]) {
 		return actor->spellbook.HaveSpell(parameters->string0Parameter, 1);
 	}
-	char tmpname[9];
+	ieResRef tmpname;
 	CreateSpellName(tmpname, parameters->int0Parameter);
 	return actor->spellbook.HaveSpell(tmpname, 1);
 }
@@ -3654,10 +3676,9 @@ int GameScript::HaveAnySpells(Scriptable* Sender, Trigger* /*parameters*/)
 int GameScript::HaveSpellParty(Scriptable* /*Sender*/, Trigger *parameters)
 {
 	Actor *actor;
-	Game *game=core->GetGame();
-
-	char tmpname[9];
 	char *poi;
+	ieResRef tmpname;
+	Game *game=core->GetGame();
 
 	if(parameters->string0Parameter[0]) {
 		poi=parameters->string0Parameter;
@@ -5650,8 +5671,7 @@ void GameScript::EndCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
 
 void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 {
-	GameScript* gs = new GameScript( parameters->string0Parameter,
-							IE_SCRIPT_ALWAYS );
+	GameScript* gs = new GameScript( parameters->string0Parameter, ST_GLOBAL );
 	gs->MySelf = Sender;
 	gs->EvaluateAllBlocks();
 	delete( gs );
@@ -6320,7 +6340,7 @@ static const char *GetDialog(Scriptable* scr)
 	return NULL;
 }
 
-static char PlayerDialogRes[9] = "PLAYERx\0";
+static ieResRef PlayerDialogRes = "PLAYERx\0";
 
 void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
@@ -8378,7 +8398,7 @@ void GameScript::AttackCore(Scriptable *Sender, Scriptable *target, Action *para
 	Actor *actor = (Actor *) Sender;
 	unsigned int wrange = actor->GetWeaponRange() * 10;
 	if( wrange == 0) {
-		printMessage("[GameScript]","Zero weapon range!",LIGHT_RED);
+		printMessage("[GameScript]","Zero weapon range!\n",LIGHT_RED);
 		return;
 	}
 	if( Distance(Sender, target) > wrange ) {

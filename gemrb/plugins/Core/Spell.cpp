@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.cpp,v 1.6 2005/02/06 11:04:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.cpp,v 1.7 2005/02/19 19:09:46 avenger_teambg Exp $
  *
  */
 
@@ -34,14 +34,16 @@ SPLExtHeader::~SPLExtHeader(void)
 
 Spell::Spell(void)
 {
-	SpellIconBAM = NULL;
+//	SpellIconBAM = NULL;
 }
 
 Spell::~Spell(void)
 {
-  core->FreeSPLExt(ext_headers, casting_features);
+	core->FreeSPLExt(ext_headers, casting_features);
+/*
 	if (SpellIconBAM) {
 		core->FreeInterface( SpellIconBAM );
 		SpellIconBAM = NULL;
 	}
+*/
 }

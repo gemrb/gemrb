@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.157 2005/02/12 13:44:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.158 2005/02/19 19:09:46 avenger_teambg Exp $
  *
  */
 
@@ -29,7 +29,6 @@ class Action;
 #include "Variables.h"
 #include "SymbolMgr.h"
 #include "Actor.h"
-#include <list>
 
 //displaystring flags
 #define DS_WAIT    1
@@ -132,7 +131,6 @@ class GEM_EXPORT Object {
 public:
 	Object()
 	{
-		RefCount = 1;
 		objectName[0] = 0;
 
 		memset( objectFields, 0, MAX_OBJECT_FIELDS * sizeof( int ) );
@@ -150,13 +148,13 @@ public:
 	int objectRect[4];
 	char objectName[65];
 private:
-	int RefCount;
 	volatile unsigned long canary;
 public:
 	void Dump()
 	{
 		int i;
 
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if(objectName[0]) {
 			printf("Object: %s\n",objectName);
 			return;
@@ -176,24 +174,8 @@ public:
 	void Release()
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		if (!RefCount) {
-			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
-				__LINE__ );
-			abort();
-		}
-		RefCount--;
-		if (!RefCount) {
-			delete this;
-		}
-	}
-	void IncRef()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		RefCount++;
-		if (RefCount >= 4) {
-			printf( "Refcount increased to: %d in object\n", RefCount );
-			abort();
-		}
+		canary = 0xdddddddd;
+		delete this;
 	}
 };
 
@@ -240,6 +222,7 @@ public:
 		}
 		RefCount--;
 		if (!RefCount) {
+			canary = 0xdddddddd;
 			delete this;
 		}
 	}
@@ -247,7 +230,7 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		if (RefCount >= 4) {
+		if (RefCount >= 4000) {
 			printf( "Refcount increased to: %d in trigger\n", RefCount );
 			abort();
 		}
@@ -293,6 +276,7 @@ public:
 		}
 		RefCount--;
 		if (!RefCount) {
+			canary = 0xdddddddd;
 			delete this;
 		}
 	}
@@ -300,7 +284,7 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		if (RefCount >= 4) {
+		if (RefCount >= 4000) {
 			printf( "Refcount increased to: %d in condition\n", RefCount );
 			abort();
 		}
@@ -362,6 +346,7 @@ public:
 		}
 		RefCount--;
 		if (!RefCount) {
+			canary = 0xdddddddd;
 			delete this;
 		}
 	}
@@ -369,7 +354,7 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		if (RefCount >= 4) {
+		if (RefCount >= 4000) {
 			printf( "Refcount increased to: %d in action %d\n", RefCount,
 				actionID );
 			abort();
@@ -418,6 +403,7 @@ public:
 		}
 		RefCount--;
 		if (!RefCount) {
+			canary = 0xdddddddd;
 			delete this;
 		}
 	}
@@ -425,7 +411,7 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		if (RefCount >= 4) {
+		if (RefCount >= 4000) {
 			printf( "Refcount increased to: %d in response\n", RefCount );
 			abort();
 		}
@@ -469,6 +455,7 @@ public:
 		}
 		RefCount--;
 		if (!RefCount) {
+			canary = 0xdddddddd;
 			delete this;
 		}
 	}
@@ -476,7 +463,7 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		if (RefCount >= 4) {
+		if (RefCount >= 4000) {
 			printf( "Refcount increased to: %d\n", RefCount );
 			abort();
 		}
@@ -487,7 +474,6 @@ class GEM_EXPORT ResponseBlock {
 public:
 	ResponseBlock()
 	{
-		RefCount = 1;
 		condition = NULL;
 		responseSet = NULL;
 		canary = (unsigned long) 0xdeadbeef;
@@ -507,55 +493,27 @@ public:
 	Condition* condition;
 	ResponseSet* responseSet;
 private:
-	int RefCount;
 	volatile unsigned long canary;
 public:
 	void Release()
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		if (!RefCount) {
-			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
-				__LINE__ );
-			abort();
-		}
-		RefCount--;
-		if (!RefCount) {
-			delete this;
-		}
-	}
-	void IncRef()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		RefCount++;
-		if (RefCount >= 4) {
-			printf( "Refcount increased to: %d\n", RefCount );
-			abort();
-		}
+		canary = 0xdddddddd;
+		delete this;
 	}
 };
 
 class GEM_EXPORT Script {
 public:
-	Script(const char* ScriptName)
+	Script()
 	{
 		canary = (unsigned long) 0xdeadbeef;
-		RefCount = 1;
 		responseBlocks = NULL;
 		responseBlocksCount = 0;
-		if (!Name) {
-			this->Name[0] = 0;
-			return;
-		}
-		strncpy( Name, ScriptName, 8 );
-		Name[8] = 0;
 	};
 	~Script()
 	{
 		FreeResponseBlocks();
-	}
-	const char* GetName()
-	{
-		return this ? Name : "<none>";
 	}
 	void AllocateBlocks(unsigned int count)
 	{
@@ -584,32 +542,14 @@ private:
 public:
 	unsigned int responseBlocksCount;
 	ResponseBlock** responseBlocks;
-	char Name[9];
 private:
-	int RefCount;
 	volatile unsigned long canary;
 public:
 	void Release()
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		if (!RefCount) {
-			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
-				__LINE__ );
-			abort();
-		}
-		RefCount--;
-		if (!RefCount) {
-			delete this;
-		}
-	}
-	void IncRef()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		RefCount++;
-		if (RefCount >= 4) {
-			printf( "Refcount increased to: %d\n", RefCount );
-			abort();
-		}
+		canary = 0xdddddddd;
+		delete this;
 	}
 };
 
@@ -678,10 +618,6 @@ struct IDSLink {
 	IDSFunction Function;
 };
 
-#define IE_SCRIPT_ALWAYS		0
-#define IE_SCRIPT_AREA			1
-#define IE_SCRIPT_TRIGGER		2
-
 #define MAX_TRIGGERS			0xFF
 #define MAX_ACTIONS			400
 #define MAX_OBJECTS			128
@@ -698,7 +634,7 @@ public:
 	void Update();
 	void EvaluateAllBlocks();
 private: //Internal Functions
-	Script* CacheScript(DataStream* stream, const char* Context);
+	Script* CacheScript(ieResRef ResRef);
 	ResponseBlock* ReadResponseBlock(DataStream* stream);
 	Condition* ReadCondition(DataStream* stream);
 	ResponseSet* ReadResponseSet(DataStream* stream);
@@ -740,14 +676,14 @@ private: //Internal variables
 	unsigned long lastRunTime;
 	unsigned long scriptType;
 private: //Script Internal Variables
+	ieResRef Name;
 	bool continueExecution;
-	std::list< Action*> programmedActions;
-	char Name[9];
 	bool freeLocals;
 public:
-	GameScript(const char* ResRef, unsigned char ScriptType,
+	GameScript(ieResRef ResRef, unsigned char ScriptType,
 		Variables* local = NULL);
 	~GameScript();
+	const char *GetName() { return this?Name:"<NULL>"; }
 	static void ReplaceMyArea(Scriptable* Sender, char* newVarName);
 	static ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context);
 	static ieDword CheckVariable(Scriptable* Sender, const char* VarName);

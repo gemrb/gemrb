@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.5 2005/02/10 22:40:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.6 2005/02/19 19:09:45 avenger_teambg Exp $
  *
  */
 
@@ -25,7 +25,7 @@
 inline unsigned int Cache::MyHashKey(const char* key) const
 {
 	int nHash = key[0];
-	for(int i=1;(i<KEYSIZE) && key[i];i++) {
+	for (int i=1;(i<KEYSIZE) && key[i];i++) {
 		nHash = (nHash << 5) ^ key[i];
 	}
 	return nHash % m_nHashTableSize;
@@ -64,15 +64,24 @@ void Cache::InitHashTable(unsigned int nHashSize, bool bAllocNow)
 	m_nHashTableSize = nHashSize;
 }
 
-void Cache::RemoveAll()
+void Cache::RemoveAll(ReleaseFun fun)
 {
-	//removed the part about freeing values/keys
-	//because the complete value/key pair is stored in the
-	//node which is freed in the memblocks
-
+	if (m_pHashTable) {
+		for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++)
+		{
+			MyAssoc* pAssoc;
+			for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL;
+				pAssoc = pAssoc->pNext)
+			{
+				if (fun)
+					fun(pAssoc->data);
+				pAssoc->MyAssoc::~MyAssoc();
+			}
+		}
 	// free hash table
-	free( m_pHashTable );
-	m_pHashTable = NULL;
+		free( m_pHashTable );
+		m_pHashTable = NULL;
+	}
 
 	m_nCount = 0;
 	m_pFreeList = NULL;
@@ -90,7 +99,7 @@ void Cache::RemoveAll()
 
 Cache::~Cache()
 {
-	RemoveAll();
+	RemoveAll(NULL);
 }
  
 Cache::MyAssoc* Cache::NewAssoc()
@@ -133,13 +142,13 @@ void Cache::FreeAssoc(Cache::MyAssoc* pAssoc)
 
 	// if no more elements, cleanup completely
 	if (m_nCount == 0) {
-		RemoveAll();
+		RemoveAll(NULL);
 	}
 }
 
 Cache::MyAssoc *Cache::GetNextAssoc(Cache::MyAssoc *Position) const
 {
-	if(m_pHashTable == NULL || m_nCount==0) {
+	if (m_pHashTable == NULL || m_nCount==0) {
 		return NULL;
 	}
 
@@ -216,10 +225,10 @@ bool Cache::SetAt(ieResRef key, void *rValue)
 
 	// it doesn't exist, add a new Association
 	pAssoc = NewAssoc();
-	for(i=0;i<KEYSIZE && key[i];i++) {
+	for (i=0;i<KEYSIZE && key[i];i++) {
 		pAssoc->key[i]=toupper(key[i]);
 	}
-	for(;i<KEYSIZE;i++) {
+	for (;i<KEYSIZE;i++) {
 		pAssoc->key[i]=0;
 	}
 	pAssoc->data=rValue;
@@ -236,7 +245,7 @@ int Cache::DecRef(void *data, ieResRef key, bool remove)
 
 	if (key) {
 		pAssoc=GetAssocAt( key );
-		if(pAssoc->data==data) {
+		if (pAssoc && (pAssoc->data==data) ) {
 			if (remove) {
 				FreeAssoc(pAssoc);
 				return 0;
@@ -250,8 +259,8 @@ int Cache::DecRef(void *data, ieResRef key, bool remove)
 
 	pAssoc=(Cache::MyAssoc *) GetNextAssoc(NULL);
 
-	while(pAssoc) {
-		if(pAssoc->data == data) {
+	while (pAssoc) {
+		if (pAssoc->data == data) {
 			if (remove) {
 				FreeAssoc(pAssoc);
 				return 0;
@@ -270,9 +279,9 @@ void Cache::Cleanup()
 {
 	Cache::MyAssoc* pAssoc=(Cache::MyAssoc *) GetNextAssoc(NULL);
 
-	while(pAssoc)
+	while (pAssoc)
 	{
-		if(pAssoc->nRefCount == 0) {
+		if (pAssoc->nRefCount == 0) {
 			FreeAssoc(pAssoc);
 		}
 		pAssoc=GetNextAssoc(pAssoc);

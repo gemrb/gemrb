@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.82 2005/02/13 13:39:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.83 2005/02/19 19:09:44 avenger_teambg Exp $
  *
  */
 
@@ -355,7 +355,7 @@ void Actor::DebugDump()
 	for (i = 0; i < MAX_SCRIPTS; i++) {
 		const char* poi = "<none>";
 		if (Scripts[i] && Scripts[i]->script) {
-			poi = Scripts[i]->script->GetName();
+			poi = Scripts[i]->GetName();
 		}
 		printf( "Script %d: %s\n", i, poi );
 	}

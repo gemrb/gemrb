@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.70 2005/02/13 13:39:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.71 2005/02/19 19:09:45 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -78,14 +78,14 @@ char* Scriptable::GetScriptName(void)
 	 return scriptName;
 }
 
-void Scriptable::SetScript(const char* aScript, int idx)
+void Scriptable::SetScript(ieResRef aScript, int idx)
 {
 	if (Scripts[idx]) {
 		delete Scripts[idx];
 	}
 	Scripts[idx] = 0;
 	if (aScript[0]) {
-		Scripts[idx] = new GameScript( aScript, 0, locals );
+		Scripts[idx] = new GameScript( aScript, Type, locals );
 		Scripts[idx]->MySelf = this;
 	}
 }
@@ -222,27 +222,6 @@ void Scriptable::ProcessActions()
 	while (!CurrentAction) {
 		CurrentAction = PopNextAction();
 		if (!CurrentAction) {
-			/* we don't need this
-			if (!neverExecuted) {
-				switch (Type) {
-					case ST_PROXIMITY:
-						 {
-							if (!( Flags & TRAP_RESET ))
-								Active = false;
-						}
-						break;
-
-					case ST_TRIGGER:
-						 {
-							LastTrigger = NULL;
-							neverExecuted = true;
-						}
-						break;
-					default: //all others are unused
-						break;
-				}
-			}
-			*/
 			if (CutSceneId)
 				CutSceneId = NULL;
 			break;
@@ -321,9 +300,9 @@ void Selectable::Select(bool Value)
 	Selected = Value;
 }
 
-void Selectable::SetCircle(int size, Color color)
+void Selectable::SetCircle(int circlesize, Color color)
 {
-	this->size = size;
+	size = circlesize;
 	selectedColor = color;
 	overColor.r = color.r >> 1;
 	overColor.g = color.g >> 1;

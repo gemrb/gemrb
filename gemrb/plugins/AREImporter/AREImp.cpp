@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.89 2005/02/19 17:34:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.90 2005/02/19 19:09:37 avenger_teambg Exp $
  *
  */
 
@@ -149,6 +149,7 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	ieDword tmp;
 	str->ReadDword( &tmp );
 	str->ReadResRef( Script );
+	strupr( Script );
 	str->ReadDword( &ExploredBitmapSize );
 	str->ReadDword( &ExploredBitmapOffset );
 	str->ReadDword( &DoorsCount );
@@ -192,7 +193,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	tmm->Open( wedfile );
 	TileMap* tm = tmm->GetTileMap();
 
-	map->Scripts[0] = new GameScript( Script, IE_SCRIPT_AREA );
+	map->Scripts[0] = new GameScript( Script, ST_AREA );
 	map->MySelf = map;
 	if (map->Scripts[0]) {
 		map->Scripts[0]->MySelf = map;
@@ -247,6 +248,10 @@ Map* AREImp::GetMap(const char *ResRef)
 		char LongName[33], ShortName[9];
 		ieWord minX, maxX, minY, maxY;
 		ieDword cursor;
+		ieResRef KeyResRef, Script;
+		ieWord TrapDetect, TrapRemoval;
+		ieWord LaunchX, LaunchY;
+		ieDword TrapFlags, Locked, LockRemoval;
 		Region BBClosed, BBOpen;
 		str->Read( LongName, 32 );
 		LongName[32] = 0;
@@ -277,7 +282,17 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadResRef( OpenResRef );
 		str->ReadResRef( CloseResRef );
 		str->ReadDword( &cursor );
-		str->Seek( 36, GEM_CURRENT_POS );
+		str->ReadWord( &TrapDetect );
+		str->ReadWord( &TrapRemoval );
+		str->ReadDword( &TrapFlags );
+		str->ReadWord( &LaunchX );
+		str->ReadWord( &LaunchY );
+		str->ReadResRef( KeyResRef );
+		strupr( KeyResRef );
+		str->ReadResRef( Script );
+		strupr( Script );
+		str->ReadDword( &Locked );
+		str->ReadDword( &LockRemoval );
 		Point toOpen[2];
 		str->ReadWord( &minX );
 		toOpen[0].x = minX;
@@ -319,11 +334,18 @@ Map* AREImp::GetMap(const char *ResRef)
 					indices, count, open, closed );
 		door->SetScriptName( LongName );
 		door->Cursor = cursor;
+		memcpy( door->KeyResRef, KeyResRef, sizeof(KeyResRef) );
+		if (Script[0] != 0) {
+			door->Scripts[0] = new GameScript( Script, ST_DOOR );
+			door->Scripts[0]->MySelf = door;
+		} else
+			door->Scripts[0] = NULL;
+
 		door->toOpen[0] = toOpen[0];
 		door->toOpen[1] = toOpen[1];
 		//Leave the default sound untouched
 		if (OpenResRef[0])
-			memcpy( door->OpenSound, OpenResRef, 9 );
+			memcpy( door->OpenSound, OpenResRef, sizeof(OpenResRef) );
 		else {
 			if (Flags & DOOR_HIDDEN)
 				memcpy( door->OpenSound, Sounds[DEF_HOPEN], 9 );
@@ -331,7 +353,7 @@ Map* AREImp::GetMap(const char *ResRef)
 				memcpy( door->OpenSound, Sounds[DEF_OPEN], 9 );
 		}
 		if (CloseResRef[0])
-			memcpy( door->CloseSound, CloseResRef, 9 );
+			memcpy( door->CloseSound, CloseResRef, sizeof(CloseResRef) );
 		else {
 			if (Flags & DOOR_HIDDEN)
 				memcpy( door->CloseSound, Sounds[DEF_HCLOSE], 9 );
@@ -381,6 +403,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadDword( &ItemIndex );
 		str->ReadDword( &ItemCount );
 		str->ReadResRef( Script );
+		strupr( Script );
 		ieDword firstIndex, vertCount;
 		str->ReadDword( &firstIndex );
 		str->ReadDword( &vertCount );
@@ -413,7 +436,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			c->inventory.AddItem( core->ReadItem(str));
 		}
 		if (Script[0] != 0) {
-			c->Scripts[0] = new GameScript( Script, IE_SCRIPT_TRIGGER );
+			c->Scripts[0] = new GameScript( Script, ST_CONTAINER );
 			c->Scripts[0]->MySelf = c;
 		} else
 			c->Scripts[0] = NULL;
@@ -459,9 +482,11 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadWord( &LaunchX );
 		str->ReadWord( &LaunchY );
 		str->ReadResRef( KeyResRef );
+		strupr( KeyResRef );
 		//don't even bother reading the script if it isn't trapped
 		if(Trapped || Type) {
 			str->ReadResRef( Script );
+			strupr( Script );
 		}
 		else {
 			Script[0] = 0;
@@ -493,12 +518,12 @@ Map* AREImp::GetMap(const char *ResRef)
 		ip->Pos.x = bbox.x + ( bbox.w / 2 );
 		ip->Pos.y = bbox.y + ( bbox.h / 2 );
 		ip->Flags = Flags;
-		strcpy( ip->Destination, Destination );
-		strcpy( ip->EntranceName, Entrance );
-		strcpy( ip->KeyResRef, KeyResRef );
-		strcpy( ip->DialogResRef, DialogResRef );
+		memcpy( ip->Destination, Destination, sizeof(Destination) );
+		memcpy( ip->EntranceName, Entrance, sizeof(Entrance) );
+		memcpy( ip->KeyResRef, KeyResRef, sizeof(KeyResRef) );
+		memcpy( ip->DialogResRef, DialogResRef, sizeof(DialogResRef) );
 		if (Script[0] != 0) {
-			ip->Scripts[0] = new GameScript( Script, IE_SCRIPT_TRIGGER );
+			ip->Scripts[0] = new GameScript( Script, ST_TRIGGER );
 			ip->Scripts[0]->MySelf = ip;
 		} else
 			ip->Scripts[0] = NULL;

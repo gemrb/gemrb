@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.261 2005/02/18 21:59:54 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.262 2005/02/19 19:09:46 avenger_teambg Exp $
  *
  */
 
@@ -166,11 +166,21 @@ Interface::Interface(int iargc, char** iargv)
 	variable.clear(); \
 }
 
+static void ReleaseItem(void *poi)
+{
+	delete ((Item *) poi);
+}
+
+static void ReleaseSpell(void *poi)
+{
+	delete ((Spell *) poi);
+}
+
 Interface::~Interface(void)
 {
 	CharAnimations::ReleaseMemory();
-	ItemCache.RemoveAll();
-	SpellCache.RemoveAll();
+	ItemCache.RemoveAll(ReleaseItem);
+	SpellCache.RemoveAll(ReleaseSpell);
 
 	if (TooltipBack) {
 		for(int i=0;i<3;i++) {
@@ -187,6 +197,8 @@ Interface::~Interface(void)
 	if (game) {
 		delete( game );
 	}
+	if (worldmap)
+		delete( worldmap );
 	if (music) {
 		FreeInterface( music );
 	}
@@ -457,8 +469,11 @@ int Interface::Init()
 			}
 			strncpy( fnt->ResRef, ResRef, 8 );
 			if (needpalette) {
-				Color fore = {0xff, 0xff, 0xff, 0x00},
-					back = {0x00, 0x00, 0x00, 0x00};
+				Color fore = {0xff, 0xff, 0xff, 0x00};
+				Color back = {0x00, 0x00, 0x00, 0x00};
+				if (!strncmp( TooltipFont, ResRef, 8) ) {
+					fore = TooltipColor;
+				}
 				Color* pal = video->CreatePalette( fore, back );
 				memcpy( fnt->GetPalette(), pal, 256 * sizeof( Color ) );
 				video->FreePalette( pal );
@@ -1742,10 +1757,10 @@ void Interface::DrawTooltip ()
 		video->BlitSprite( TooltipBack[2], x + w - w2, y, true );
 	}
 
-	Color back = {0x00, 0x00, 0x00, 0x00};
-	Color* palette = video->CreatePalette( TooltipColor, back );
+//	Color back = {0x00, 0x00, 0x00, 0x00};
+//	Color* palette = video->CreatePalette( TooltipColor, back );
 	
-	fnt->Print( Region( x, y, w, h ), (ieByte *) tooltip_text, palette,
+	fnt->Print( Region( x, y, w, h ), (ieByte *) tooltip_text, NULL,
 		    IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true );
 }
 
@@ -2256,7 +2271,6 @@ void Interface::LoadGame(int index)
 	if (worldmap)
 		delete( worldmap );
 
-
 	game = new_game;
 	worldmap = new_worldmap;
 
@@ -2679,7 +2693,8 @@ void Interface::FreeItem(Item *itm, ieResRef name, bool free)
 
 	res=ItemCache.DecRef((void *) itm, name, free);
 	if (res<0) {
-		printMessage( "Core", "Corrupted Item cache encountered (reference count went below zero)", WHITE );
+		printMessage( "Core", "Corrupted Item cache encountered (reference count went below zero), ", LIGHT_RED );
+		printf( "Item name is: %.8s\n", name);
 		abort();
 	}
 	if (res) return;
@@ -2720,7 +2735,8 @@ void Interface::FreeSpell(Spell *spl, ieResRef name, bool free)
 
 	res=SpellCache.DecRef((void *) spl, name, free);
 	if (res<0) {
-		printMessage( "Core", "Corrupted Spell cache encountered (reference count went below zero)", WHITE );
+		printMessage( "Core", "Corrupted Spell cache encountered (reference count went below zero), ", LIGHT_RED );
+		printf( "Spell name is: %.8s\n", name);
 		abort();
 	}
 	if (res) return;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.9 2005/02/06 11:04:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.10 2005/02/19 19:09:48 avenger_teambg Exp $
  *
  */
 
@@ -115,7 +115,7 @@ Spell* SPLImp::GetSpell(Spell *s)
 	for (i = 0; i < s->CastingFeatureCount; i++) {
 		GetFeature( s->casting_features+i);
 	}
-
+/*
 	DataStream* bamfile = core->GetResourceMgr()->GetResource( s->SpellbookIcon, IE_BAM_CLASS_ID );
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		printf( "[SPLImporter]: No BAM Importer Available.\n" );
@@ -126,7 +126,7 @@ Spell* SPLImp::GetSpell(Spell *s)
 	bam->Open( bamfile );
 
 	s->SpellIconBAM = bam;
-
+*/
 
 	return s;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.4 2005/02/10 22:40:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.5 2005/02/19 19:09:45 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,12 @@
 // Cache<ieResRef, void*>
 
 #define KEYSIZE 8
+/*
+struct ReleaseFun {
+	void operator()(void *) const;
+};
+*/
+typedef void (*ReleaseFun)(void *);
 
 class Cache
 {
@@ -59,16 +65,13 @@ public:
 		return m_nCount==0;
 	}
 	// Lookup
-	//	bool Lookup(const ieResRef key, unsigned int type, unsigned long& rValue) const;
 	void *GetResource(ieResRef key);
 	// Operations
-	//void SetAt(const ieResRef key, unsigned int type, unsigned long newValue);
 	bool SetAt(ieResRef key, void *rValue);
-	//void RemoveAt(const ieResRef key, unsigned int type);
 	// decreases refcount or drops data
 	//if name is supplied it is faster, it will use rValue to validate the request
 	int DecRef(void *rValue, ieResRef name, bool free);
-	void RemoveAll();//removes all refcounts (doesn't clear referenced data!)
+	void RemoveAll(ReleaseFun fun);//removes all refcounts
 	void Cleanup();  //removes only zero refcounts
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
 

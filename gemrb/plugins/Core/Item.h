@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.14 2005/02/09 21:19:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.15 2005/02/19 19:09:46 avenger_teambg Exp $
  *
  */
 
@@ -154,10 +154,11 @@ public:
 
 	// PST and IWD2 only
 	char unknown[26];
-
+/*
 	AnimationMgr* ItemIconBAM;
 	AnimationMgr* GroundIconBAM;
 	AnimationMgr* CarriedIconBAM;
+*/
 public:
 	ieStrRef GetItemName(bool identified)
 	{

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.268 2005/02/13 19:02:20 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.269 2005/02/19 19:09:47 avenger_teambg Exp $
  *
  */
 
@@ -125,14 +125,19 @@ inline Control *GetControl( int wi, int ci, int ct)
 
 inline Sprite2D* GetBAMSprite(ieResRef ResRef, int cycle, int frame)
 {
-	AnimationMgr* bam = ( AnimationMgr* )
-		core->GetInterface( IE_BAM_CLASS_ID );
+	AnimationMgr* bam = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
 	DataStream *str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
 	if (!bam->Open( str, true ) ) {
 		printMessage( "GUIScript", "Error: %s.BAM not found\n", LIGHT_RED );
 		return NULL;
 	}
-	Sprite2D *tspr = bam->GetFrameFromCycle( (unsigned char) cycle, frame );
+	Sprite2D *tspr;
+	if (cycle==-1) {
+		tspr = bam->GetFrame( frame );
+	}
+	else {
+		tspr = bam->GetFrameFromCycle( (unsigned char) cycle, frame );
+	}
 	core->FreeInterface( bam );
 
 	return tspr;
@@ -3329,7 +3334,13 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	AnimationMgr *bam = spell->SpellIconBAM;
+	AnimationMgr* bam = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
+	DataStream *str = core->GetResourceMgr()->GetResource( spell->SpellbookIcon, IE_BAM_CLASS_ID );
+	if (!bam->Open( str, true ) ) {
+		printMessage( "GUIScript", "Error: %s.BAM not found\n", LIGHT_RED );
+		return NULL;
+	}
+	//AnimationMgr *bam = spell->SpellIconBAM;
 	//small difference between pst and others
 	if (bam->GetCycleSize(0)!=4) { //non-pst
 		btn->SetPicture( bam->GetFrameFromCycle(0, 0));
@@ -3340,6 +3351,7 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 		btn->SetImage( IE_GUI_BUTTON_SELECTED, bam->GetFrameFromCycle(0, 2));
 		btn->SetImage( IE_GUI_BUTTON_DISABLED, bam->GetFrameFromCycle(0, 3));
 	}
+	core->FreeInterface( bam );
 	core->FreeSpell( spell, SpellResRef, false );
 
 	Py_INCREF( Py_None );
@@ -3373,12 +3385,8 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 		}
 
 		btn->SetFlags( IE_GUI_BUTTON_PICTURE, OP_OR );
-		if (item->ItemIconBAM) {
-			btn->SetPicture( item->ItemIconBAM->GetFrame( Which ) );
-		}
-		else {
-			btn->SetPicture(NULL);
-		}
+		Sprite2D* Picture = GetBAMSprite(item->ItemIcon, -1, Which);
+		btn->SetPicture( Picture );
 		core->FreeItem( item, ItemResRef, false );
 	} else {
 		btn->SetPicture( NULL );
@@ -3936,7 +3944,8 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	core->DragItem (si);
-
+	Sprite2D *Picture = GetBAMSprite( ResRef, CycleIndex, FrameIndex );
+/*
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
 												IE_BAM_CLASS_ID );
 	if (str == NULL) {
@@ -3955,17 +3964,11 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	Sprite2D* Picture = am->GetFrameFromCycle( CycleIndex, FrameIndex );
+*/
 	if (Picture == NULL) {
-		core->FreeInterface( am );
+//		core->FreeInterface( am );
 		return NULL;
 	}
-
-// 	Color* pal = core->GetPalette( col1, 12 );
-// 	Color* orgpal = core->GetVideoDriver()->GetPalette( Picture );
-// 	memcpy( &orgpal[4], pal, 12 * sizeof( Color ) );
-// 	core->GetVideoDriver()->SetPalette( Picture, orgpal );
-// 	free( pal );
-// 	free( orgpal );
 
 	core->GetVideoDriver()->SetDragCursor (Picture);
 
@@ -4327,8 +4330,6 @@ PyDoc_STRVAR( GemRB__doc,
 
 bool GUIScript::Init(void)
 {
-//this should be a file name to python, not a title!
-//	Py_SetProgramName( "GemRB -- Python" );
 	Py_Initialize();
 	if (!Py_IsInitialized()) {
 		return false;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.53 2005/02/13 13:39:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.54 2005/02/19 19:09:45 avenger_teambg Exp $
  *
  */
 
@@ -125,7 +125,7 @@ public:
 	unsigned long playDeadCounter;
 	Inventory inventory;
 public:
-	void SetScript(const char* aScript, int idx);
+	void SetScript(ieResRef aScript, int idx);
 	void SetWait(unsigned long time);
 	//void SetPosition(Point &Pos, int areaindex);
 	void SetMySelf(Scriptable* MySelf);
@@ -174,6 +174,7 @@ public:
 	bool Highlight;
 	ieResRef DialogResRef;
 	Point TrapLaunch;
+	ieResRef KeyResRef;
 public:
 	bool IsOver(Point &Pos);
 	void DrawOutline();
@@ -243,8 +244,8 @@ public:
 	Gem_Polygon* open;
 	Gem_Polygon* closed;
 	Point toOpen[2];
-	char OpenSound[9];
-	char CloseSound[9];
+	ieResRef OpenSound;
+	ieResRef CloseSound;
 private:
 	void ToggleTiles(int State, bool playsound = false);
 public:
@@ -300,7 +301,6 @@ public:
 	unsigned short TrapRemovalDifficulty;
 //	unsigned short Trapped;
 	unsigned short TrapDetected;
-	ieResRef KeyResRef;
 };
 
 #endif

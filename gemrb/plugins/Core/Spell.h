@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.8 2005/02/06 11:04:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.9 2005/02/19 19:09:46 avenger_teambg Exp $
  *
  */
 
@@ -116,7 +116,7 @@ public:
 	// IWD2 only
 	char unknown13[16];
 
-	AnimationMgr* SpellIconBAM;
+//	AnimationMgr* SpellIconBAM;
 };
 
 #endif  // ! SPELL_H

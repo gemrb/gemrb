@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.14 2005/02/06 18:10:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.15 2005/02/19 19:09:48 avenger_teambg Exp $
  *
  */
 
@@ -146,7 +146,7 @@ Item* ITMImp::GetItem(Item *s)
 		printf( "[ITMImporter]: No BAM Importer Available.\n" );
 		return NULL;
 	}
-
+/*
 	DataStream* bamfile;
 	AnimationMgr* bam;
 
@@ -170,7 +170,7 @@ Item* ITMImp::GetItem(Item *s)
 		bam->Open( bamfile );
 		s->CarriedIconBAM = bam;
 	}
-
+*/
 	return s;
 }
 
