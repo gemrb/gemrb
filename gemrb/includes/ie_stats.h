@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.15 2004/04/08 15:49:07 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.16 2004/05/08 12:55:57 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,8 @@
 //state bits (IE_STATE)
 #define STATE_DEAD  2048
 
+#define MC_FALLEN_PALADIN	0x200
+#define MC_FALLEN_RANGER	0x400
 //stats
 #define IE_HITPOINTS 0
 #define IE_MAXHITPOINTS	1
