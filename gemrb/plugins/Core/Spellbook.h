@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.4 2004/04/18 19:20:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.5 2004/07/20 22:32:10 guidoj Exp $
  *
  */
 
@@ -45,7 +45,7 @@ const int NUM_SPELL_TYPES = 3;
 typedef enum ieSpellType {
 	IE_SPELL_TYPE_PRIEST = 0,
 	IE_SPELL_TYPE_WIZARD = 1,
-	IE_SPELL_TYPE_INNATE = 2,
+	IE_SPELL_TYPE_INNATE = 2
 } ieSpellType;
 
 typedef struct CREKnownSpell {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.18 2004/07/18 08:33:40 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.19 2004/07/20 22:32:10 guidoj Exp $
  *
  */
 
@@ -45,7 +45,7 @@ class Map;
 
 typedef enum ieInventoryType {
 	INVENTORY_HEAP = 0,
-	INVENTORY_CREATURE = 1,
+	INVENTORY_CREATURE = 1
 } ieInventoryType;
 
 typedef enum ieCREItemFlagBits {
@@ -60,7 +60,7 @@ typedef enum ieCREItemFlagBits {
 	//is this item already equipped?
 	IE_ITEM_EQUIPPED = 0x40,	//this is a gemrb extension 
 	//is this item stackable?
-	IE_ITEM_STACKED = 0x80,	        //this is a gemrb extension
+	IE_ITEM_STACKED = 0x80	        //this is a gemrb extension
 } ieCREItemFlagBits;
 
 typedef struct CREItem {
