@@ -40,13 +40,17 @@ def OnLoad():
 	BackButton = GemRB.GetControl(AppearanceWindow,5)
 	GemRB.SetText(AppearanceWindow,BackButton,15416)
 
+	CustomButton = GemRB.GetControl(AppearanceWindow, 6)
+	GemRB.SetText(AppearanceWindow, CustomButton, 17545)
+
 	DoneButton = GemRB.GetControl(AppearanceWindow,0)
 	GemRB.SetText(AppearanceWindow,DoneButton,11973)
 
-	GemRB.SetEvent(AppearanceWindow,LeftButton,IE_GUI_BUTTON_ON_PRESS,"LeftPress")
 	GemRB.SetEvent(AppearanceWindow,RightButton,IE_GUI_BUTTON_ON_PRESS,"RightPress")
-	GemRB.SetEvent(AppearanceWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	GemRB.SetEvent(AppearanceWindow,LeftButton,IE_GUI_BUTTON_ON_PRESS,"LeftPress")
 	GemRB.SetEvent(AppearanceWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	GemRB.SetEvent(AppearanceWindow,CustomButton,IE_GUI_BUTTON_ON_PRESS,"CustomPress")
+	GemRB.SetEvent(AppearanceWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	
 	while True:
 		if GemRB.GetTableValue(PortraitsTable, LastPortrait, 3) == Gender:
@@ -81,6 +85,10 @@ def BackPress():
 	GemRB.UnloadWindow(AppearanceWindow)
 	GemRB.SetNextScript("GUICG1")
 	GemRB.SetVar("Gender",0)  #scrapping the gender value
+	return
+
+def CustomPress():
+#
 	return
 
 def NextPress():

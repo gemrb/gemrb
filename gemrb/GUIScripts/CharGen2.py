@@ -60,10 +60,10 @@ def OnLoad():
 
 	ImportButton = GemRB.GetControl(CharGenWindow, 13)
 	GemRB.SetText(CharGenWindow, ImportButton, 13955)
-	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_DISABLED)
 
         CancelButton = GemRB.GetControl(CharGenWindow, 15)
-        GemRB.SetText(CharGenWindow, CancelButton, 13727)
+        GemRB.SetText(CharGenWindow, CancelButton, 8159)
 	GemRB.SetButtonState(CharGenWindow,CancelButton,IE_GUI_BUTTON_ENABLED)
 
 	BiographyButton = GemRB.GetControl(CharGenWindow, 16)
@@ -79,18 +79,11 @@ def OnLoad():
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 1051)
 
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-        GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+        GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
         GemRB.SetEvent(CharGenWindow, GenderButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
-        GemRB.SetEvent(CharGenWindow, ImportButton, IE_GUI_BUTTON_ON_PRESS, "ImportPress")
-        GemRB.SetEvent(CharGenWindow, BiographyButton, IE_GUI_BUTTON_ON_PRESS, "BiographyPress")
 	GemRB.ShowModal(CharGenWindow)
 	return
 	
-def BiographyPress():
-        GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("GUICG23") #biography
-	return
-
 def NextPress():
 	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_DISABLED)
         GemRB.UnloadWindow(CharGenWindow)
@@ -99,11 +92,11 @@ def NextPress():
 
 def CancelPress():
         GemRB.UnloadWindow(CharGenWindow)
-        GemRB.SetNextScript("Start")
+        GemRB.SetNextScript("CharGen")
         return
 
-def ImportPress():
+def BackPress():
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("GUICG24") #import
+	GemRB.SetNextScript("GUICG12") #appearance
 	return
 
