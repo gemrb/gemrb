@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.5 2004/10/17 09:50:43 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.6 2004/11/01 17:25:10 avenger_teambg Exp $
 
 # ie_stats.py - definitions of creature stats codes
 
@@ -250,7 +250,9 @@ IE_ARMOR_TYPE			= 219
 IE_TEAM				= 220
 IE_FACTION			= 221
 IE_SUBRACE			= 222
-
+IE_SPECIES                      = 223 #pst specific
+IE_PRIESTBONUS1                 = 224 #6 more slots used
+IE_WIZARDBONUS1                 = 231 #8 more slots used
 # These are in original PST, IWD, IWD2, but not as stats
 IE_INTERNAL_0			= 240
 IE_INTERNAL_1			= 241

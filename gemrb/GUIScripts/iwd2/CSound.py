@@ -39,6 +39,7 @@ def OnLoad():
 
 def DefaultPress():
 	GemRB.SetVar("Sound",0)  #scrapping the sound value
+	GemRB.SetVarAssoc(SoundWindow, TextAreaControl, "Sound", 0)
 	return
 
 def BackPress():
@@ -48,6 +49,7 @@ def BackPress():
 	return
 
 def NextPress():
+	GemRB.SetToken("VoiceSet", GemRB.QueryText(SoundWindow, TextAreaControl))
 	GemRB.UnloadWindow(SoundWindow)
 	GemRB.SetNextScript("CharGen8") #name
 	return

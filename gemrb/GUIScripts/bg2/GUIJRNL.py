@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.6 2004/10/23 15:40:51 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.7 2004/11/01 17:25:12 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -137,7 +137,7 @@ def UpdateLogWindow ():
 
 	Text = GemRB.GetControl (Window, 1)
 
-	GemRB.SetText (Window, Text, "")
+	GemRB.TextAreaClear (Window, Text )
 	for i in range (GemRB.GetJournalSize (Chapter, Section)):
 		je = GemRB.GetJournalEntry (Chapter, i, Section)
 
