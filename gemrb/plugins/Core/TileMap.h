@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.21 2004/03/15 14:18:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.22 2004/04/15 12:28:15 avenger_teambg Exp $
  *
  */
 
@@ -103,6 +103,7 @@ public:
 	Container* AddContainer(char* Name, unsigned short Type,
 		Gem_Polygon* outline);
 	Container* GetContainer(unsigned short x, unsigned short y);
+	Container* GetContainer(const char* Name);
 	Container* GetContainer(unsigned int idx);
 
 	InfoPoint* AddInfoPoint(char* Name, unsigned short Type,

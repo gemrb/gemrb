@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.26 2004/04/03 10:14:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.27 2004/04/15 12:28:16 avenger_teambg Exp $
  *
  */
 
@@ -171,6 +171,25 @@ Container* TileMap::GetContainer(unsigned int idx)
 		return NULL;
 	}
 	return containers.at( idx );
+}
+
+Container* TileMap::GetContainer(const char* Name)
+{
+	for (size_t i = 0; i < containers.size(); i++) {
+		Container* cn = containers.at( i );
+		int len = ( int ) strlen( cn->Name );
+		int p = 0;
+		for (int x = 0; x < len; x++) {
+			if (cn->Name[x] == ' ')
+				continue;
+			if (cn->Name[x] != Name[p])
+				break;
+			if (x == len - 1)
+				return cn;
+			p++;
+		}
+	}
+	return NULL;
 }
 
 Container* TileMap::GetContainer(unsigned short x, unsigned short y)
