@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.11 2004/11/07 08:36:11 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.12 2004/12/12 18:19:47 avenger_teambg Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -34,6 +34,7 @@ from GUIMA import *
 from GUIMG import *
 from GUIOPT import *
 from GUIPR import *
+from GUIWORLD import *
 
 MessageWindow = 0
 PortraitWindow = 0
@@ -45,7 +46,7 @@ def OnLoad():
 	global MessageWindow, ExpandButton, Expand
 	global PortraitWindow, OptionsWindow
 
-	GemRB.LoadWindowPack("GUIW")
+	GemRB.LoadWindowPack(GetWindowPack())
 	ActionsWindow = GemRB.LoadWindow(3)
 	#PortraitWindow = GemRB.LoadWindow(26)
 	OptionsWindow = GemRB.LoadWindow(25)
@@ -91,7 +92,7 @@ def OnIncreaseSize():
 	Expand = GemRB.GetVar("MessageWindowSize")
 	
 	if Expand == 0:
-		GemRB.LoadWindowPack("GUIW")
+		GemRB.LoadWindowPack(GetWindowPack())
 		TMessageWindow = GemRB.LoadWindow(12)
 		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 		GemRB.SetVar("MessageWindow", TMessageWindow)
@@ -99,7 +100,7 @@ def OnIncreaseSize():
 		GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
 	else :
 		if Expand == 1:
-			GemRB.LoadWindowPack("GUIW")
+			GemRB.LoadWindowPack(GetWindowPack())
 			TMessageWindow = GemRB.LoadWindow(7)
 			TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 			GemRB.SetVar("MessageWindow", TMessageWindow)
@@ -129,7 +130,7 @@ def OnDecreaseSize():
 	Expand = GemRB.GetVar("MessageWindowSize")
 	
 	if Expand == 2:
-		GemRB.LoadWindowPack("GUIW")
+		GemRB.LoadWindowPack(GetWindowPack())
 		TMessageWindow = GemRB.LoadWindow(12)
 		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 		GemRB.SetVar("MessageWindow", TMessageWindow)
@@ -137,7 +138,7 @@ def OnDecreaseSize():
 		GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
 	else:
 		if Expand == 1:
-			GemRB.LoadWindowPack("GUIW")
+			GemRB.LoadWindowPack(GetWindowPack())
 			TMessageWindow = GemRB.LoadWindow(4)
 			TMessageTA = GemRB.GetControl(TMessageWindow, 3)
 			GemRB.SetVar("MessageWindow", TMessageWindow)
