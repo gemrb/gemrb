@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.2 2003/12/12 23:08:55 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.3 2003/12/12 23:51:26 balrog994 Exp $
  *
  */
 
@@ -695,15 +695,23 @@ void GameScript::CreateCreature(GameScript * Sender, Action * parameters)
 	ActorMgr * aM = (ActorMgr*)core->GetInterface(IE_CRE_CLASS_ID);
 	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_CRE_CLASS_ID);
 	aM->Open(ds, true);
-	ActorBlock ab;
-	ab.XPos = parameters->XpointParameter;
-	ab.YPos = parameters->YpointParameter;
-	ab.XDes = parameters->XpointParameter;
-	ab.YDes = parameters->YpointParameter;
-	ab.actor = aM->GetActor();
-	ab.AnimID = IE_ANI_AWAKE;
-	ab.Orientation = parameters->int0Parameter;
+	ActorBlock *ab = new ActorBlock();
+	ab->XPos = parameters->XpointParameter;
+	ab->YPos = parameters->YpointParameter;
+	ab->XDes = parameters->XpointParameter;
+	ab->YDes = parameters->YpointParameter;
+	ab->actor = aM->GetActor();
+	ab->AnimID = IE_ANI_AWAKE;
+	ab->Orientation = parameters->int0Parameter;
 	Map * map = core->GetGame()->GetMap(0);
+	for(int i = 0; i < MAX_SCRIPTS; i++) {
+		if((stricmp(ab->actor->Scripts[i], "None") == 0) || (ab->actor->Scripts[i][0] == '\0')) {
+			ab->Scripts[i] = NULL;
+			continue;
+		}
+		ab->Scripts[i] = new GameScript(ab->actor->Scripts[i], 0);
+		ab->Scripts[i]->MySelf = ab;
+	}
 	map->AddActor(ab);
 	core->FreeInterface(aM);
 }

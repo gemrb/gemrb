@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.94 2003/12/12 23:05:08 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.95 2003/12/12 23:51:26 balrog994 Exp $
  *
  */
 
@@ -799,7 +799,12 @@ int Interface::LoadCreature(char *ResRef, int InParty)
 		ab->AnimID = IE_ANI_SLEEP;
 	ab->Orientation = 0;
 	for(int i = 0; i < MAX_SCRIPTS; i++) {
-		ab->Scripts[i] = NULL;
+		if((stricmp(ab->actor->Scripts[i], "None") == 0) || (ab->actor->Scripts[i][0] == '\0')) {
+			ab->Scripts[i] = NULL;
+			continue;
+		}
+		ab->Scripts[i] = new GameScript(ab->actor->Scripts[i], 0);
+		ab->Scripts[i]->MySelf = ab;
 	}
 	size_t index;
 	for(index=0;index<actors.size(); index++) {
