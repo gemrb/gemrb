@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.13 2004/01/01 15:49:34 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.14 2004/01/05 23:54:38 balrog994 Exp $
  *
  */
 
@@ -60,6 +60,7 @@ public:
 	char LargePortrait[9];
 	unsigned long StrRefs[100];
 	bool DeleteMe;
+	bool FromGame;
 private:
 	void SetCircleSize();
 public:
