@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.120 2004/02/11 20:41:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.121 2004/02/15 23:05:02 avenger_teambg Exp $
  *
  */
 
@@ -27,6 +27,12 @@
 #include "AnimationMgr.h"
 #include <stdlib.h>
 #include <time.h>
+
+#ifdef WIN32
+#include <direct.h>
+#else
+#include <dirent.h>
+#endif
 
 #ifdef WIN32
 #define GEM_EXPORT __declspec(dllexport)
@@ -47,8 +53,8 @@ static char dialogtlk[]="dialog.tlk\0";
 
 Interface::Interface(int iargc, char **iargv)
 {
-        argc = iargc;
-        argv = iargv;
+	argc = iargc;
+	argv = iargv;
 #ifdef WIN32
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 #endif
@@ -283,7 +289,7 @@ int Interface::Init()
 			if(needpalette) {
 				Color fore = {0xff, 0xff, 0xff, 0x00}, back = {0x00, 0x00, 0x00, 0x00};
 				Color * pal = core->GetVideoDriver()->CreatePalette(fore, back);
-		        memcpy(fnt->GetPalette(), pal, 256*sizeof(Color));
+			memcpy(fnt->GetPalette(), pal, 256*sizeof(Color));
 				free(pal);
 			}
 			fonts.push_back(fnt);
@@ -622,7 +628,7 @@ bool Interface::LoadConfig (void)
     s = argv[0];
 
   strcpy (name, s);
-  //if (!name[0])                // FIXME: could this happen?
+  //if (!name[0])		// FIXME: could this happen?
   //  strcpy (name, PACKAGE);    // ugly hack
 
 
@@ -718,6 +724,9 @@ bool Interface::LoadConfig(const char *filename)
 		}
 		else if(stricmp(name, "AllStringsTagged") == 0) {
 			SetFeature(atoi(value),GF_ALL_STRINGS_TAGGED);
+		}
+		else if(stricmp(name, "SoundFolders") == 0) {
+			SetFeature(atoi(value),GF_SOUNDFOLDERS);
 		}
 		else if(stricmp(name, "MidResAvatars") == 0) {
 			SetFeature(atoi(value),GF_MID_RES_AVATARS);
@@ -829,13 +838,13 @@ bool Interface::LoadConfig(const char *filename)
 	fclose(config);
 #ifdef DATADIR
 	if (!GemRBPath[0]) {
-	        strcpy (GemRBPath, DATADIR);
+		strcpy (GemRBPath, DATADIR);
 		strcat (GemRBPath, SPathDelimiter);
 	}
 #endif
 	if(!PluginsPath[0]) {
 #ifdef PLUGINDIR
-	        strcpy (PluginsPath, PLUGINDIR);
+		strcpy (PluginsPath, PLUGINDIR);
 #else
 		memcpy(PluginsPath,GemRBPath,sizeof(PluginsPath));
 		strcat (PluginsPath, SPathDelimiter);
@@ -1252,17 +1261,6 @@ void Interface::DrawWindows(void)
 			windows[(*t)]->DrawWindow();
 		++t;
 	}
-	/*
-	for(t = topwin.rbegin(); t != topwin.rend(); ++t) {
-		if(((*t) >= windows.size()) || ((*t) < 0))
-			continue;
-		if(windows[(*t)]!=NULL && windows[(*t)]->Visible)
-			windows[(*t)]->DrawWindow();
-	}*/
-	//for(unsigned int i = 0; i < windows.size(); i++) {
-	//	if(windows[i]!=NULL && windows[i]->Visible)
-	//		windows[i]->DrawWindow();
-	//}
 }
 
 Window * Interface::GetWindow(unsigned short WindowIndex)
@@ -1509,6 +1507,66 @@ int Interface::Roll(int dice, int size, int add)
 	return add;
 }
 
+int Interface::GetCharSounds(TextArea *ta)
+{
+	bool hasfolders;
+	int count=0;
+	char Path[_MAX_PATH];
+
+	memcpy(Path, GamePath,_MAX_PATH);
+	strcat(Path,"sounds");
+#ifdef WIN32
+	char Pt[_MAX_PATH];
+	memcpy(Pt,Path,sizeof(Path) );
+#endif
+	hasfolders=HasFeature(GF_SOUNDFOLDERS);
+#ifdef WIN32
+	struct _finddata_t c_file;
+	strcat(Path, SPathDelimiter);
+	strcat(Path, "*.*");
+	long hFile=(long)_findfirst(Path, &c_file);
+	if(!hFile)
+		return -1;
+#else
+	DIR * dir = opendir(Path);
+	if(dir==NULL)
+		return -1;
+	//Lookup the first entry in the Directory
+	struct dirent * de = readdir(dir);
+	if(de == NULL) {
+		closedir(dir);
+		return -1;
+	}
+#endif
+	printf("Looking in %s\n",Path);
+	do {
+		char dtmp[_MAX_PATH];
+#ifdef WIN32
+		if(c_file.name[0] == '.')
+			continue;
+		sprintf(dtmp, "%s%s%s", Pt, SPathDelimiter, c_file.name);
+#else
+		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
+		if(de->d_name[0] == '.')
+			continue;
+#endif
+		struct stat fst;
+		stat(dtmp, &fst);
+		if(hasfolders==!S_ISDIR(fst.st_mode) )
+			continue;
+		count++;
+#ifdef WIN32
+		ta->AppendText(c_file.name,-1);
+	} while(_findnext(hFile, &c_file) == 0);
+	_findclose(hFile);
+#else
+		ta->AppendText(de->d_name,-1);
+	} while((de = readdir(dir)) != NULL);
+	closedir(dir);
+#endif
+	return count;
+}
+
 bool Interface::LoadINI(const char * filename)
 {
 	FILE * config;
@@ -1534,7 +1592,7 @@ bool Interface::LoadINI(const char * filename)
 		fseek(config, -1, SEEK_CUR);
 		fscanf(config, "%[^=]=%[^\r\n]%*[\r\n]", name, value);
 		if((value[0] >= '0') && (value[0] <= '9')) {
-	        vars->SetAt(name, atoi(value));
+		vars->SetAt(name, atoi(value));
 		}
 	}
 	fclose(config);
