@@ -130,9 +130,10 @@ Window * CHUImp::GetWindow(unsigned long i)
 				btn->Width = Width;
 				btn->Height = Height;
 				btn->ControlType = ControlType;
-				char BAMFile[8];
+				char BAMFile[9];
 				unsigned short Cycle, UnpressedIndex, PressedIndex, SelectedIndex, DisabledIndex;
 				str->Read(BAMFile, 8);
+				BAMFile[8]=0;
 				str->Read(&Cycle, 2);
 				str->Read(&UnpressedIndex, 2);
 				str->Read(&PressedIndex, 2);
@@ -171,7 +172,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 			break;
 
 			case 2: { //Slider
-				char MOSFile[8], BAMFile[8];
+				char MOSFile[9], BAMFile[9];
 				unsigned short Cycle, Knob, GrabbedKnob;
 				short KnobXPos, KnobYPos, KnobStep, KnobStepsCount;
 				str->Read(MOSFile, 8);
@@ -207,7 +208,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 			break;
 
 			case 3: { //Text Edit
-				char FontResRef[8], CursorResRef[8], BGMos[8];
+				char FontResRef[9], CursorResRef[9], BGMos[9];
 				unsigned short maxInput;
 				str->Read(BGMos, 8);
 				str->Seek(16, GEM_CURRENT_POS);
@@ -237,7 +238,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 			break;
 
 			case 5: { //Text Area
-				char FontResRef[8], InitResRef[8];
+				char FontResRef[9], InitResRef[9];
 				Color fore, init, back;
 				unsigned short SBID;
 				str->Read(FontResRef, 8);
@@ -274,7 +275,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 			break;
 
 			case 6: { //Label
-				char FontResRef[8];
+				char FontResRef[9];
 				unsigned long StrRef;
 				RevColor fore, back;
 				unsigned short alignment;

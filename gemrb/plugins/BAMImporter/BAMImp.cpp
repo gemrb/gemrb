@@ -25,6 +25,7 @@ bool BAMImp::Open(DataStream * stream, bool autoFree)
 	char Signature[8];
 	str->Read(Signature, 8);
 	if(strncmp(Signature, "BAMCV1  ", 8) == 0) {
+printf("Compressed file found...\n");
 		//Check if Decompressed file has already been Cached
 		char cpath[_MAX_PATH];
 		strcpy(cpath, core->CachePath);

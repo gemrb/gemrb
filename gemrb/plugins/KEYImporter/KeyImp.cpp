@@ -104,6 +104,7 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 	strcat(path, core->GameType);
 	strcat(path, SPathDelimiter);
 	strncpy(filename, resname, 8);
+	filename[8]=0;
 	strcat(filename, core->TypeExt(type));
 	strlwr(filename);
 	strcat(path, filename);
@@ -112,20 +113,23 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 		printf("[KEYImporter]: Found in GemRB Override...\n");
 		fclose(exist);
 		FileStream * fs = new FileStream();
+		if(!fs)
+			return NULL;
 		fs->Open(path, true);
 		return fs;
 	}
 	strcpy(path, core->GamePath);
 	strcat(path, "override");
 	strcat(path, SPathDelimiter);
-	//strcat(path, biffiles[bifnum].name);
 	strncat(path, resname, 8);
 	strcat(path, core->TypeExt(type));
 	exist = fopen(path, "rb");
 	if(exist) {
-		printf("[KEYImporter]: Found Override...\n");
+		printf("[KEYImporter]: Found in Override...\n");
 		fclose(exist);
 		FileStream * fs = new FileStream();
+		if(!fs)
+			return NULL;
 		fs->Open(path, true);
 		return fs;
 	}
@@ -179,7 +183,8 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 		if(ret == NULL)
 			printf("[NOT_FOUND]\n");
 		core->FreeInterface(ai);
-		strcpy(ret->filename, resname);
+		strncpy(ret->filename, resname,8);
+		ret->filename[8]=0;
 		strcat(ret->filename, core->TypeExt(type));
 		return ret;
 	}
@@ -205,6 +210,7 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 	strcat(path, core->GameType);
 	strcat(path, SPathDelimiter);
 	strncpy(filename, resname, 8);
+	filename[8]=0;
 	strcat(filename, core->TypeExt(type));
 	strlwr(filename);
 	strcat(path, filename);
@@ -213,21 +219,39 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		printf("[KEYImporter]: Found in GemRB Override...\n");
 		fclose(exist);
 		FileStream * fs = new FileStream();
+		if(!fs)
+			return NULL;
 		fs->Open(path, true);
 		return fs;
 	}
 	strcpy(path, core->GamePath);
 	strcat(path, "override");
 	strcat(path, SPathDelimiter);
-	//strcat(path, biffiles[bifnum].name);
 	strncat(path, resname, 8);
 	strcat(path, core->TypeExt(type));
 	exist = fopen(path, "rb");
 	if(exist) {
+		printf("[KEYImporter]: Found in Override...\n");
 		fclose(exist);
+		AnimationMgr * ani = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
+		if(!ani)
+			return NULL;
 		FileStream * fs = new FileStream();
+		if(!fs)
+			return NULL;
+		fs->Open(path, true);
+		ani->Open(fs, true);
+		AnimationFactory * af = ani->GetAnimationFactory(resname, mode);
+		core->FreeInterface(ani);
+		core->GetFactory()->AddFactoryObject(af);
+		return af;
+/*
+		FileStream * fs = new FileStream();
+		if(!fs)
+			return NULL;
 		fs->Open(path, true);
 		return fs;
+*/
 	}
 	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
 	unsigned long ResLocator;
@@ -279,6 +303,8 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		ret->filename[8] = 0;
 		strcat(ret->filename, core->TypeExt(type));
 		AnimationMgr * ani = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
+		if(!ani)
+			return NULL;
 		ani->Open(ret, true);
 		AnimationFactory * af = ani->GetAnimationFactory(resname, mode);
 		core->FreeInterface(ani);
