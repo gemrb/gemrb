@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.59 2005/02/26 17:42:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.60 2005/02/26 21:08:45 avenger_teambg Exp $
  *
  */
 
@@ -80,7 +80,7 @@ public:
 
 class GEM_EXPORT Map : public Scriptable {
 public:
-	TileMap* tm;
+	TileMap* TMap;
 	ImageMgr* LightMap;
 	ImageMgr* SearchMap;
 	ImageMgr* SmallMap;

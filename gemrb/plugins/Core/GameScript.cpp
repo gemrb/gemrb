@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.234 2005/02/25 16:46:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.235 2005/02/26 21:08:41 avenger_teambg Exp $
  *
  */
 
@@ -1707,18 +1707,18 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 	Targets* tgts = EvaluateObject(oC);
 	if(!tgts && oC->objectName[0]) {
 		//It was not an actor... maybe it is a door?
-		Scriptable * aC = core->GetGame()->GetCurrentMap( )->tm->GetDoor( oC->objectName );
+		Scriptable * aC = core->GetGame()->GetCurrentMap( )->TMap->GetDoor( oC->objectName );
 		if (aC) {
 			return aC;
 		}
 		//No... it was not a door... maybe an InfoPoint?
-		aC = core->GetGame()->GetCurrentMap( )->tm->GetInfoPoint( oC->objectName );
+		aC = core->GetGame()->GetCurrentMap( )->TMap->GetInfoPoint( oC->objectName );
 		if (aC) {
 			return aC;
 		}
 
 		//No... it was not an infopoint... maybe a Container?
-		aC = core->GetGame()->GetCurrentMap( )->tm->GetContainer( oC->objectName );
+		aC = core->GetGame()->GetCurrentMap( )->TMap->GetContainer( oC->objectName );
 		if (aC) {
 			return aC;
 		}
@@ -5416,7 +5416,7 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 	if(!parameters->objects[1]->objectName[0]) {
 		ip=Sender;
 	} else {
-		ip = core->GetGame()->GetCurrentMap( )->tm->GetInfoPoint(parameters->objects[1]->objectName);
+		ip = core->GetGame()->GetCurrentMap( )->TMap->GetInfoPoint(parameters->objects[1]->objectName);
 	}
 	if(!ip) {
 		printf("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
@@ -8026,7 +8026,7 @@ int GameScript::MoveItemCore(Scriptable *Sender, Scriptable *target, const char 
 		return MIC_NOITEM;
 	if ( 2 != myinv->AddSlotItem(item, -1)) {
 		// drop it at my feet
-		map->tm->AddItemToLocation(Sender->Pos, item);
+		map->TMap->AddItemToLocation(Sender->Pos, item);
 		return MIC_FULL;
 	}
 	return MIC_GOTITEM;
@@ -8132,7 +8132,7 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 		if ( 2 != myinv->AddSlotItem(item, -1)) {
 			Map *map=((Actor *) Sender)->area;
 			// drop it at my feet
-			map->tm->AddItemToLocation(Sender->Pos, item);
+			map->TMap->AddItemToLocation(Sender->Pos, item);
 		}
 	}
 }
@@ -8161,7 +8161,7 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 		if ( 2 != myinv->AddSlotItem(item, -1)) {
 			Map *map=((Actor *) Sender)->area;
 			// drop it at my feet
-			map->tm->AddItemToLocation(Sender->Pos, item);
+			map->TMap->AddItemToLocation(Sender->Pos, item);
 		}
 	}
 }
@@ -8182,7 +8182,7 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 	CreateItemCore(item, parameters->string0Parameter, -1, 0, 0);
 	if (2 != scr->inventory.AddSlotItem(item,slot)) {
 		Map *map=core->GetGame()->GetMap(((Actor *) scr)->Area);
-		map->tm->AddItemToLocation(Sender->Pos, item);
+		map->TMap->AddItemToLocation(Sender->Pos, item);
 	}
 }
 

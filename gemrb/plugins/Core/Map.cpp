@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.136 2005/02/26 17:42:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.137 2005/02/26 21:08:44 avenger_teambg Exp $
  *
  */
 
@@ -120,7 +120,7 @@ Map::Map(void)
 	: Scriptable( ST_AREA )
 {
 	vars = NULL;
-	tm = NULL;
+	TMap = NULL;
 	LightMap = NULL;
 	SearchMap = NULL;
 	SmallMap = NULL;
@@ -150,20 +150,20 @@ Map::~Map(void)
 	}
 
 	if (MapSet) {
-		free(MapSet);
+		free( MapSet );
 	}
-	if (tm) {
-		delete( tm );
+	if (TMap) {
+		delete TMap;
 	}
 	for (i = 0; i < animations.size(); i++) {
-		delete( animations[i] );
+		delete animations[i];
 	}
 
 	for (i = 0; i < actors.size(); i++) {
 		Actor* a = actors[i];
 		//don't delete NPC/PC 
 		if (a && !a->Persistent() ) {
-			delete ( a );
+			delete a;
 		}
 	}
 
@@ -203,12 +203,12 @@ Map::~Map(void)
 
 void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm)
 {
-	this->tm = tm;
+	TMap = tm;
 	LightMap = lm;
 	SearchMap = sr;
 	SmallMap = sm;
-	Width=tm->XCellCount * 4;
-	Height=( tm->YCellCount * 64 ) / 12;
+	Width=TMap->XCellCount * 4;
+	Height=( TMap->YCellCount * 64 ) / 12;
 	//Filling Matrices
 	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
 }
@@ -232,8 +232,8 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 		textcolor( YELLOW );
 		printf( "WARNING!!! %s EntryPoint does not Exists\n", entrance );
 		textcolor( WHITE );
-		X = map->tm->XCellCount * 64;
-		Y = map->tm->YCellCount * 64;
+		X = map->TMap->XCellCount * 64;
+		Y = map->TMap->YCellCount * 64;
 		face = -1;
 	} else {
 		X = ent->Pos.x;
@@ -295,8 +295,8 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 {
 	unsigned int i;
 	//Draw the Map
-	if (tm) {
-		tm->DrawOverlay( 0, viewport );
+	if (TMap) {
+		TMap->DrawOverlay( 0, viewport );
 	}
 	//Run the Global Script
 	Game* game = core->GetGame();
@@ -314,7 +314,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 	int ipCount = 0;
 	while (true) {
 		//For each InfoPoint in the map
-		InfoPoint* ip = tm->GetInfoPoint( ipCount++ );
+		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
 		if (!ip)
 			break;
 		if (!ip->Active)
@@ -497,8 +497,8 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 		}
 	}
 
-	if (core->FogOfWar && tm) {
-		tm->DrawExploredBitmap( ExploredBitmap, viewport );
+	if (core->FogOfWar && TMap) {
+		TMap->DrawExploredBitmap( ExploredBitmap, viewport );
 	}
 }
 
@@ -1300,8 +1300,8 @@ bool Map::Rest(Point pos, int hours)
 //--------explored bitmap-----------
 int Map::GetExploredMapSize() const
 {
-	int x = Width/32;
-	int y = Width/32;
+	int x = TMap->XCellCount*2;
+	int y = TMap->YCellCount*2;
 	if (!core->HasFeature(GF_SMALL_FOG) ) {
 		x++;
 		y++;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.95 2005/02/26 17:42:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.96 2005/02/26 21:08:20 avenger_teambg Exp $
  *
  */
 
@@ -778,14 +778,16 @@ Map* AREImp::GetMap(const char *ResRef)
 
 	printf( "Loading explored bitmap\n" );
 	i = map->GetExploredMapSize();
-	printf("ExploredBitmapSize in game: %d\n",ExploredBitmapSize);
-	printf("ExploredBitmapSize calculated by me: %d\n",i);
 	if (ExploredBitmapSize==i) {
 		map->ExploredBitmap = (ieByte *) malloc(ExploredBitmapSize);
 		str->Seek( ExploredBitmapOffset, GEM_STREAM_START );
 		str->Read( map->ExploredBitmap, ExploredBitmapSize );
 	}
 	else {
+		if( ExploredBitmapSize ) {
+			printMessage("AREImp","",LIGHT_RED);
+			printf("ExploredBitmapSize in game: %d != %d. Clearing it\n",ExploredBitmapSize, i);
+		}
 		ExploredBitmapSize = i;
 		map->ExploredBitmap = (ieByte *) calloc(i, 1);
 	}

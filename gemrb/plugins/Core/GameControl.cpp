@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.188 2005/02/20 20:49:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.189 2005/02/26 21:08:39 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -252,7 +252,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		Door* d;
 		//there is a real assignment in the loop!
 		for (unsigned int idx = 0;
-			(d = area->tm->GetDoor( idx ));
+			(d = area->TMap->GetDoor( idx ));
 			idx++) {
 			if (d->Flags & DOOR_CLOSED) {
 				video->DrawPolyline( d->closed, cyan, true );
@@ -268,7 +268,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		Container* c;
 		//there is a real assignment in the loop!
 		for (unsigned int idx = 0;
-			(c = area->tm->GetContainer( idx ));
+			(c = area->TMap->GetContainer( idx ));
 			idx++) {
 			if (c->TrapDetected && c->Trapped) {
 				video->DrawPolyline( c->outline, red, true );
@@ -293,7 +293,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		//draw infopoints with blue overlay
 		InfoPoint* i;
 		//there is a real assignment in the loop!
-		for (unsigned int idx = 0; (i = area->tm->GetInfoPoint( idx )); idx++) {
+		for (unsigned int idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
 			if (i->VisibleTrap( DebugFlags & DEBUG_SHOW_INFOPOINTS ) ) {
 				video->DrawPolyline( i->outline, red, true );
 			} else if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
@@ -658,7 +658,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			break;
 	}
 
-	overInfoPoint = area->tm->GetInfoPoint( p );
+	overInfoPoint = area->TMap->GetInfoPoint( p );
 	if (overInfoPoint) {
 		if (overInfoPoint->Type != ST_PROXIMITY) {
 			nextCursor = overInfoPoint->Cursor;
@@ -668,7 +668,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (overDoor) {
 		overDoor->Highlight = false;
 	}
-	overDoor = area->tm->GetDoor( p );
+	overDoor = area->TMap->GetDoor( p );
 	if (overDoor) {
 		overDoor->Highlight = true;
 		nextCursor = overDoor->Cursor;
@@ -678,7 +678,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (overContainer) {
 		overContainer->Highlight = false;
 	}
-	overContainer = area->tm->GetContainer( p );
+	overContainer = area->TMap->GetContainer( p );
 	if (overContainer) {
 		overContainer->Highlight = true;
 		if (overContainer->TrapDetected && overContainer->Trapped) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.43 2005/02/12 22:58:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.44 2005/02/26 21:08:43 avenger_teambg Exp $
  *
  */
 
@@ -396,7 +396,7 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
-		map->tm->AddItemToLocation(loc, item);
+		map->TMap->AddItemToLocation(loc, item);
 		Changed = true;
 		Slots[i]=NULL;
 		//if it isn't all items then we stop here
