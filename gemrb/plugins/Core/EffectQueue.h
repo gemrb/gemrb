@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.2 2004/11/13 13:03:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.3 2005/01/09 15:08:17 edheldil Exp $
  *
  */
 
@@ -30,6 +30,9 @@ class Actor;
 
 //#define MAX_FX_OPCODES  255
 
+#define MAX_EFFECTS 255
+
+bool Init_EffectQueue();
 
 class EffectQueue {
 	std::vector< Effect* >  effects;
@@ -44,6 +47,14 @@ public:
 
 	void ApplyAllEffects(Actor* target);
 	void ApplyEffect(Actor* target, Effect* fx);
+};
+
+typedef int (* EffectFunction)(Actor*, Effect*);
+
+
+struct EffectLink {
+	const char* Name;
+	EffectFunction Function;
 };
 
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.6 2004/11/13 13:03:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.7 2005/01/09 15:08:17 edheldil Exp $
  *
  */
 
@@ -29,8 +29,94 @@
 #define FX_NOT_APPLIED  0
 #define FX_APPLIED 1
 
+int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx);
+int fx_condition_modifier (Actor* target, Effect* fx);
+int fx_maximum_hp_modifier (Actor* target, Effect* fx);
+int fx_save_vs_death_modifier (Actor* target, Effect* fx);
+int fx_save_vs_wands_modifier (Actor* target, Effect* fx);
+int fx_save_vs_poly_modifier (Actor* target, Effect* fx);
+int fx_save_vs_breath_modifier (Actor* target, Effect* fx);
+int fx_save_vs_spell_modifier (Actor* target, Effect* fx);
+int fx_bonus_wizard_spells (Actor* target, Effect* fx);
+int fx_strength_modifier (Actor* target, Effect* fx);
+int fx_to_hit_modifier (Actor* target, Effect* fx);
+int fx_stealth_bonus (Actor* target, Effect* fx);
+int fx_damage_bonus (Actor* target, Effect* fx);
+int fx_open_locks_modifier (Actor* target, Effect* fx);
+int fx_resistance_to_magic_damage (Actor* target, Effect* fx);
+
+
+static int initialized = 0;
+static EffectFunction effect_fns[MAX_EFFECTS];
+
+
+//Make this an ordered list, so we could use bsearch!
+static EffectLink effectnames[] = {
+	{ "ac_vs_damage_type_modifier", fx_ac_vs_damage_type_modifier },
+	{ "condition_modifier", fx_condition_modifier },
+	{ "maximum_hp_modifier", fx_maximum_hp_modifier },
+	{ "save_vs_death_modifier", fx_save_vs_death_modifier },
+	{ "save_vs_wands_modifier", fx_save_vs_wands_modifier },
+	{ "save_vs_poly_modifier", fx_save_vs_poly_modifier },
+	{ "save_vs_breath_modifier", fx_save_vs_breath_modifier },
+	{ "save_vs_spell_modifier", fx_save_vs_spell_modifier },
+	{ NULL, NULL },
+};
+
+static EffectLink* FindEffect(const char* effectname)
+{
+	if (!effectname) {
+		return NULL;
+	}
+	for (int i = 0; effectnames[i].Name; i++) {
+		if (!stricmp( effectnames[i].Name, effectname )) {
+			return effectnames + i;
+		}
+	}
+	printf( "Warning: Couldn't assign effect: %s\n", effectname );
+	return NULL;
+}
+
+bool Init_EffectQueue()
+{
+	if (!initialized) {
+		SymbolMgr* effectsTable;
+		memset( effect_fns, 0, sizeof( effect_fns ) );
+
+		initialized = 1;
+
+		int eT = core->LoadSymbol( "EFFECTS" );
+		if (eT < 0) {
+			printMessage( "IEScript]","A critical scripting file is missing!\n",LIGHT_RED );
+			abort();
+		}
+		effectsTable = core->GetSymbol( eT );
+		if (!effectsTable) {
+			printMessage( "IEScript","A critical scripting file is damaged!\n",LIGHT_RED );
+			abort();
+		}
+
+		for (int i = 0; i < MAX_EFFECTS; i++) {
+			char* effectname = effectsTable->GetValue( i );
+			EffectLink* poi = FindEffect( effectname );
+			if (poi == NULL) {
+				effect_fns[i] = NULL;
+			}
+			else {
+				effect_fns[i] = poi->Function;
+			}
+			printf("-------- FN: %d, %s\n", i, effectname);
+		}
+
+	}
+}
+
+
+
+
 EffectQueue::EffectQueue()
 {
+
 }
 
 EffectQueue::~EffectQueue()
@@ -47,7 +133,8 @@ bool EffectQueue::AddEffect(Effect* fx)
 		return false;
 
 	// FIXME: roll saving throws and resistance
-
+	//if (core->SavingThrow( target->Modified[fx->SavingThrowType], fx->SavingThrowBonus )) {
+	//}
 
 	Effect* new_fx = new Effect;
 	memcpy( new_fx, fx, sizeof( Effect ) );
@@ -72,21 +159,6 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 	}
 }
 
-int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx);
-int fx_condition_modifier (Actor* target, Effect* fx);
-int fx_maximum_hp_modifier (Actor* target, Effect* fx);
-int fx_save_vs_death_modifier (Actor* target, Effect* fx);
-int fx_save_vs_wands_modifier (Actor* target, Effect* fx);
-int fx_save_vs_poly_modifier (Actor* target, Effect* fx);
-int fx_save_vs_breath_modifier (Actor* target, Effect* fx);
-int fx_save_vs_spell_modifier (Actor* target, Effect* fx);
-int fx_bonus_wizard_spells (Actor* target, Effect* fx);
-int fx_strength_modifier (Actor* target, Effect* fx);
-int fx_to_hit_modifier (Actor* target, Effect* fx);
-int fx_stealth_bonus (Actor* target, Effect* fx);
-int fx_damage_bonus (Actor* target, Effect* fx);
-int fx_open_locks_modifier (Actor* target, Effect* fx);
-int fx_resistance_to_magic_damage (Actor* target, Effect* fx);
 
 // these opcodes are true for PS:T
 void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
