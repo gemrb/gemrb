@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.27 2004/12/02 22:11:44 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.28 2005/01/06 22:09:14 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -723,7 +723,10 @@ def OpenInformationWindow ():
 
 
 	Label = GemRB.GetControl (Window, 0x10000002)
-	GemRB.SetText (Window, Label, GemRB.GetString (stat['BestKilledName']) + '  (%d XP)' %stat['BestKilledXP'])
+	if stat['BestKilledName'] == -1:
+		GemRB.SetText (Window, Label, GemRB.GetString (41275))
+	else:
+		GemRB.SetText (Window, Label, GemRB.GetString (stat['BestKilledName']))
 
 	days = int (stat['JoinDate'] / 21600)
 	hours = int ((stat['JoinDate'] % 21600) / 900)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.261 2005/01/04 18:37:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.262 2005/01/06 22:09:05 edheldil Exp $
  *
  */
 
@@ -3025,7 +3025,15 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 	// FIXME!!!
 	if (ps->FavouriteSpells[0][0]) {
-		DataStream* str = core->GetResourceMgr()->GetResource( ps->FavouriteSpells[0], IE_SPL_CLASS_ID );
+		int largest = 0;
+		
+		for (int i = 1; i < 4; ++i) {
+			if (ps->FavouriteSpellsCount[i] > ps->FavouriteSpellsCount[largest]) {
+				largest = i;
+			}
+		}
+		
+		DataStream* str = core->GetResourceMgr()->GetResource( ps->FavouriteSpells[largest], IE_SPL_CLASS_ID );
 		SpellMgr* sm = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
 		if (sm == NULL) {
 			delete ( str );
@@ -3055,7 +3063,15 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 	// FIXME!!!
 	if (ps->FavouriteWeapons[0][0]) {
-		DataStream* str = core->GetResourceMgr()->GetResource( ps->FavouriteWeapons[0], IE_ITM_CLASS_ID );
+		int largest = 0;
+		
+		for (int i = 1; i < 4; ++i) {
+			if (ps->FavouriteWeaponsCount[i] > ps->FavouriteWeaponsCount[largest]) {
+				largest = i;
+			}
+		}
+		
+		DataStream* str = core->GetResourceMgr()->GetResource( ps->FavouriteWeapons[largest], IE_ITM_CLASS_ID );
 		ItemMgr* sm = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
 		if (sm == NULL) {
 			delete ( str );
@@ -3073,7 +3089,12 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 		}
 
 
-		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->ItemName));
+		if (*core->GetString (item->ItemName) == 0) {
+			PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->ItemNameIdentified));
+		}
+		else {
+			PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->ItemName));
+		}
 
 		sm->ReleaseItem( item );
 		core->FreeInterface( sm );
