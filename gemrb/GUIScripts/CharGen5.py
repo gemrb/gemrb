@@ -89,7 +89,7 @@ def OnLoad():
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
         GemRB.SetEvent(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
-	GemRB.ShowModal(CharGenWindow)
+	GemRB.SetVisible(CharGenWindow,1)
 	return
 	
 def NextPress():
