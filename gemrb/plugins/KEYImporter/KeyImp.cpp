@@ -63,7 +63,7 @@ bool KeyImp::LoadResFile(const char * resfile)
 		biffiles.push_back(be);
 	}
 	f->Seek(ResOffset, GEM_STREAM_START);
-        //resources.InitHashSize(ResCount);//maybe
+        resources.InitHashTable(ResCount);
 	for(unsigned int i = 0; i < ResCount; i++) {
 		RESEntry re;
 		f->Read(re.ResRef, 8);
@@ -99,7 +99,6 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
         unsigned long ResLocator;
 	if(resources.Lookup(resname,type,ResLocator) ) {
-printf("[RESLOCATOR] 0x%x\n",ResLocator);
 		if(!core->IsAvailable(IE_BIF_CLASS_ID)) {
 			printf("[ERROR]\nAn Archive Plug-in is not Available\n");
 			return NULL;
@@ -151,7 +150,6 @@ printf("[RESLOCATOR] 0x%x\n",ResLocator);
 		strcat(ret->filename, core->TypeExt(type));
 		return ret;
 	}
-printf("Notfound %.8s\n",resname);
 	return NULL;
 }
 void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned char mode)
@@ -236,6 +234,5 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		core->GetFactory()->AddFactoryObject(af);
 		return af;
 	}
-printf("[NOTFOUND: %.8s",resname);
 	return NULL;
 }
