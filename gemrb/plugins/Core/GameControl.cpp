@@ -270,20 +270,24 @@ void GameControl::SelectActor(int whom)
 	selected.clear();
 	Game* game = core->GetGame();
 	if(whom==-1) {
-		for(int i = 0; i < game->GetPartySize(); i++) {
+		for(int i = 0; i < game->GetPartySize(0); i++) {
 			Actor* actor = game->GetPC( i );
-			if (actor) {
-				selected.push_back( actor );
-				actor->Select( true );
+			if (!actor) {
+				continue;
 			}
+			if (actor->GetStat(IE_STATE_ID)&STATE_DEAD) {
+				continue;
+			}
+			selected.push_back( actor );
+			actor->Select( true );
 		}
+		return;
 	}
-	else {
-			Actor* actor = game->GetPC( whom );
-			if (actor) {
-				selected.push_back( actor );
-				actor->Select( true );
-			}
+	/* doesn't fall through here */
+	Actor* actor = game->GetPC( whom );
+	if (actor && !actor->GetStat(IE_STATE_ID)&STATE_DEAD) {
+		selected.push_back( actor );
+		actor->Select( true );
 	}
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.24 2004/03/21 19:00:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.25 2004/03/22 18:29:23 avenger_teambg Exp $
  *
  */
 
@@ -30,7 +30,7 @@ extern Interface* core;
 Game::Game(void)
 	: Scriptable( ST_GLOBAL )
 {
-	PartySize = 6;    //this could be modified later
+//	PartySize = 6;    //this isn't required anymore
 	PartyGold = 0;
 	SetScript( core->GlobalScript, 0 );
 	MapIndex = -1;
@@ -159,18 +159,33 @@ int Game::JoinParty(Actor* actor)
 	return ( int ) PCs.size() - 1;
 }
 
-int Game::GetPartySize()
+int Game::GetPartySize(bool onlyalive)
 {
-	return PCs.size();
-/* we will remove dropped members immediatelly, so this is unwanted
-	int count = 0;
-	for (int i = 0; i < PCs.size(); i++) {
-		if (PCs[i]) {
+	if (onlyalive) {
+		int count = 0;
+		for (int i = 0; i < PCs.size(); i++) {
+			if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
+				continue;
+			}
 			count++;
 		}
+		return count;
+	}
+	return PCs.size();
+}
+
+int Game::GetPartyLevel(bool onlyalive)
+{
+	int count = 0;
+	for (int i = 0; i<PCs.size(); i++) {
+			if (onlyalive) {
+				if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
+					continue;
+				}
+			}
+			count += PCs[i]->GetXPLevel(0);
 	}
 	return count;
-*/
 }
 
 Map* Game::GetMap(unsigned int index)
@@ -279,11 +294,15 @@ GAMJournalEntry* Game::GetJournalEntry(unsigned int Index)
 
 void Game::ShareXP(int xp)
 {
-        if(PartySize<1) {
-                return;
-        }
-        xp /= PartySize;
-        for(int i=0; i<PartySize; i++) {
-                GetPC(i)->NewStat(IE_XP,xp,0);
-        }
+	int PartySize = GetPartySize(true); //party size, only alive
+	if(PartySize<1) {
+		return;
+	}
+	xp /= PartySize;
+	for(int i=0; i<PartySize; i++) {
+		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
+			continue;
+		}
+		PCs[i]->NewStat(IE_XP,xp,0);
+	}
 }

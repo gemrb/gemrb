@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.35 2004/03/21 20:24:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.36 2004/03/22 18:29:23 avenger_teambg Exp $
  *
  */
 
@@ -371,5 +371,16 @@ void Actor::SetPosition(unsigned int XPos, unsigned int YPos)
 	}
 	MoveTo( ( XPos * 16 ) + 8, ( YPos * 12 ) + 6 );
 	ClearPath();
+}
+
+/* this is returning the level of the character for xp calculations 
+   later it could calculate with dual/multiclass, 
+   also with iwd2's 3rd ed rules */
+int Actor::GetXPLevel(int modified)
+{
+	if (modified) {
+		return Modified[IE_LEVEL];
+	}
+	return BaseStats[IE_LEVEL];
 }
 

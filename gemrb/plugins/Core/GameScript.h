@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.82 2004/03/21 20:24:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.83 2004/03/22 18:29:23 avenger_teambg Exp $
  *
  */
 
@@ -606,6 +606,10 @@ struct TriggerLink {
 #define AF_MASK 	 3   //none, instant or continue
 #define AF_BLOCKING      4
 #define AF_MERGESTRINGS  8
+//we could use this flag to restrict player scripts from using dangerous
+//opcodes, it would be a very useful and easy to implement feature!
+#define AF_RESTRICTED    16 
+//#define AF_RESTRICTED_LEVEL2  32 //maybe we could use 2 bits for this???
 
 struct ActionLink {
 	const char* Name;
@@ -762,6 +766,9 @@ public: //Script Functions
 	static int Level(Scriptable* Sender, Trigger* parameters);
 	static int LevelGT(Scriptable* Sender, Trigger* parameters);
 	static int LevelLT(Scriptable* Sender, Trigger* parameters);
+	static int LevelParty(Scriptable* Sender, Trigger* parameters);
+	static int LevelPartyGT(Scriptable* Sender, Trigger* parameters);
+	static int LevelPartyLT(Scriptable* Sender, Trigger* parameters);
 	static int LOS(Scriptable* Sender, Trigger* parameters);
 	static int Morale(Scriptable* Sender, Trigger* parameters);
 	static int MoraleGT(Scriptable* Sender, Trigger* parameters);
@@ -781,6 +788,9 @@ public: //Script Functions
 	static int PartyCountEQ(Scriptable* Sender, Trigger* parameters);
 	static int PartyCountGT(Scriptable* Sender, Trigger* parameters);
 	static int PartyCountLT(Scriptable* Sender, Trigger* parameters);
+	static int PartyCountAliveEQ(Scriptable* Sender, Trigger* parameters);
+	static int PartyCountAliveGT(Scriptable* Sender, Trigger* parameters);
+	static int PartyCountAliveLT(Scriptable* Sender, Trigger* parameters);
 	static int PartyGold(Scriptable* Sender, Trigger* parameters);
 	static int PartyGoldGT(Scriptable* Sender, Trigger* parameters);
 	static int PartyGoldLT(Scriptable* Sender, Trigger* parameters);
@@ -915,6 +925,7 @@ public:
 	static void PlaySound(Scriptable* Sender, Action* parameters);
 	static void SaveLocation(Scriptable* Sender, Action* parameters);
 	static void SetFaction(Scriptable* Sender, Action* parameters);
+	static void SetHP(Scriptable* Sender, Action* parameters);
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
 	static void SetTeam(Scriptable* Sender, Action* parameters);
 	static void SetTextColor(Scriptable* Sender, Action* parameters);

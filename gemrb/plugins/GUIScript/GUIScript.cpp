@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.141 2004/03/21 12:54:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.142 2004/03/22 18:29:24 avenger_teambg Exp $
  *
  */
 
@@ -1914,10 +1914,10 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 		printMessage("GUIScript","No Game!\n", LIGHT_RED);
 		return NULL;
 	}
-printf("a\n");
 	long value =(long) GameScript::CheckVariable(Sender, Variable, Context);
-printf("b\n");
+	printMessage("GUISCript","",YELLOW);
 	printf("%s %s=%d\n",Context, Variable, value);
+	textcolor(WHITE);
 	return Py_BuildValue( "l", value );
 }
 
@@ -2181,7 +2181,11 @@ static PyObject* GemRB_ActorGetSmallPortrait(PyObject * /*self*/, PyObject* args
 
 static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 {
-	return Py_BuildValue( "i", core->GetPartySize() );
+	Game *game = core->GetGame();
+	if(!game) {
+		return 0;
+	}
+	return Py_BuildValue( "i", game->GetPartySize(0) );
 }
 
 static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* args)

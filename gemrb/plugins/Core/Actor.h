@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.20 2004/02/28 15:24:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.21 2004/03/22 18:29:23 avenger_teambg Exp $
  *
  */
 
@@ -150,6 +150,9 @@ public:
 		//return Scripts[ScriptIndex];
 		return NULL;
 	}
+	/** Gets the Character's level for XP calculations */
+	int GetXPLevel(int modified);
+
 	/** Gets the Dialog ResRef */
 	char* GetDialog(void)
 	{

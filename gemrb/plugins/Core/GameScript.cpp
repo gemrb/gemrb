@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.114 2004/03/21 20:37:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.115 2004/03/22 18:29:23 avenger_teambg Exp $
  *
  */
 
@@ -100,11 +100,23 @@ static TriggerLink triggernames[] = {
 	{"level", GameScript::Level},
 	{"levelgt", GameScript::LevelGT},
 	{"levellt", GameScript::LevelLT},
+	{"levelparty", GameScript::LevelParty},
+	{"levelpartygt", GameScript::LevelPartyGT},
+	{"levelpartylt", GameScript::LevelPartyLT},
 	{"los", GameScript::LOS},
 	{"morale", GameScript::Morale},
 	{"moralegt", GameScript::MoraleGT},
 	{"moralelt", GameScript::MoraleLT},
 	{"notstatecheck", GameScript::NotStateCheck},
+	{"numcreature", GameScript::NumCreatures},
+	{"numcreatureGT", GameScript::NumCreaturesGT},
+	{"numcreatureLT", GameScript::NumCreaturesLT},
+	{"numinparty", GameScript::PartyCountEQ},
+	{"numinpartyalive", GameScript::PartyCountAliveEQ},
+	{"numinpartyalivegt", GameScript::PartyCountAliveGT},
+	{"numinpartyalivelt", GameScript::PartyCountAliveLT},
+	{"numinpartygt", GameScript::PartyCountGT},
+	{"numinpartylt", GameScript::PartyCountLT},
 	{"numtimestalkedto", GameScript::NumTimesTalkedTo},
 	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT},
 	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT},
@@ -257,6 +269,7 @@ static ActionLink actionnames[] = {
 	{"saveobjectlocation", GameScript::SaveObjectLocation,0},
 	{"setbeeninpartyflags",GameScript::SetBeenInPartyFlags,0},
 	{"setfaction",GameScript::SetFaction,0},
+	{"sethp",GameScript::SetHP,0},
 	{"setmoraleai",GameScript::SetMoraleAI,0},
 	{"setteam",GameScript::SetTeam,0},
 	{"settextcolor",GameScript::SetTextColor,0},
@@ -3336,17 +3349,47 @@ int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::PartyCountEQ(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->GetPartySize()<parameters->int0Parameter;
+	return core->GetGame()->GetPartySize(0)<parameters->int0Parameter;
 }
 
 int GameScript::PartyCountLT(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->GetPartySize()<parameters->int0Parameter;
+	return core->GetGame()->GetPartySize(0)<parameters->int0Parameter;
 }
 
 int GameScript::PartyCountGT(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->GetPartySize()>parameters->int0Parameter;
+	return core->GetGame()->GetPartySize(0)>parameters->int0Parameter;
+}
+
+int GameScript::PartyCountAliveEQ(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GetPartySize(1)<parameters->int0Parameter;
+}
+
+int GameScript::PartyCountAliveLT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GetPartySize(1)<parameters->int0Parameter;
+}
+
+int GameScript::PartyCountAliveGT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GetPartySize(1)>parameters->int0Parameter;
+}
+
+int GameScript::LevelParty(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GetPartyLevel(1)<parameters->int0Parameter;
+}
+
+int GameScript::LevelPartyLT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GetPartyLevel(1)<parameters->int0Parameter;
+}
+
+int GameScript::LevelPartyGT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GetPartyLevel(1)>parameters->int0Parameter;
 }
 
 int GameScript::PartyGold(Scriptable* Sender, Trigger* parameters)
@@ -3543,6 +3586,15 @@ void GameScript::SetFaction(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStat( IE_FACTION, parameters->int0Parameter );
+}
+
+void GameScript::SetHP(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->SetStat( IE_HITPOINTS, parameters->int0Parameter );
 }
 
 void GameScript::SetTeam(Scriptable* Sender, Action* parameters)
