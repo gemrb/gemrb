@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.81 2004/03/12 02:11:02 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.82 2004/03/20 12:24:33 avenger_teambg Exp $
  *
  */
 
@@ -293,6 +293,8 @@ public:
 	{
 		return pathfinder;
 	}
+	GameControl *GetGameControl();
+
 	void LoadGame(int index);
 	/*reads the filenames of the sounds folder into a list */
 	int GetCharSounds(TextArea *ta);
