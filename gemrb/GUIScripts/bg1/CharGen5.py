@@ -42,6 +42,7 @@ def OnLoad():
 	AbilitiesButton = GemRB.GetControl(CharGenWindow,4)
 	GemRB.SetText(CharGenWindow,AbilitiesButton, 11960)
 	GemRB.SetButtonState(CharGenWindow,AbilitiesButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow,AbilitiesButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	SkillButton = GemRB.GetControl(CharGenWindow,5)
 	GemRB.SetText(CharGenWindow,SkillButton, 17372)

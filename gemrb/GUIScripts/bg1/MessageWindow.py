@@ -2,13 +2,12 @@ import GemRB
 
 MessageWindow = 0
 PortraitWindow = 0
-OptionsWindow = 0
 ExpandButton = 0
 ContractButton = 0
+MaxExpand = 2
 
 def OnLoad():
-	global MessageWindow, ExpandButton, Expand
-	global PortraitWindow, OptionsWindow
+	global MessageWindow, PortraitWindow, ExpandButton, Expand
 
 	GemRB.LoadWindowPack("GUIW")
 	ActionsWindow = GemRB.LoadWindow(3)
@@ -18,15 +17,6 @@ def OnLoad():
 	MessageWindow = GemRB.LoadWindow(4)
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
 	GemRB.SetTAAutoScroll(MessageWindow, MessageTA, 1)
-	Button=GemRB.GetControl(OptionsWindow, 10)
-	GemRB.SetEvent(OptionsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizeOptions")
-	Button=GemRB.GetControl(PortraitWindow, 8)
-	GemRB.SetEvent(PortraitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
-	Button=GemRB.GetControl(ActionsWindow, 60)
-	GemRB.SetEvent(ActionsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MaximizeOptions")
-	Button=GemRB.GetControl(ActionsWindow, 61)
-	GemRB.SetEvent(ActionsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MaximizePortraits")
-
 	GemRB.SetVar("PortraitWindow", PortraitWindow)
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
 	GemRB.SetVar("OptionsWindow", OptionsWindow)
@@ -38,41 +28,15 @@ def OnLoad():
 	
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)
-
+	
 	UpdateResizeButtons()
 	
-	GemRB.SetVisible(ActionsWindow, 1)
-	GemRB.SetVisible(PortraitWindow, 0)
-	GemRB.SetVisible(OptionsWindow, 0)
-	GemRB.SetVisible(MessageWindow, 1)
+	GemRB.SetVisible(PortraitWindow, 2) #right
+	GemRB.SetVisible(ActionsWindow, 4) #bottom
+	GemRB.SetVisible(OptionsWindow, 0) #left
+	GemRB.SetVisible(MessageWindow, 4) #bottom
 	return
-
-def MinimizeOptions():
-	GemRB.HideGUI()
-	GemRB.SetVisible(OptionsWindow, 0)
-	GemRB.SetVar("OptionsWindow", -1)
-	GemRB.UnhideGUI()
-	return
-
-def MaximizeOptions():
-	GemRB.HideGUI()
-	GemRB.SetVar("OptionsWindow", OptionsWindow)
-	GemRB.UnhideGUI()
-	return
-
-def MinimizePortraits():
-	GemRB.HideGUI()
-	GemRB.SetVisible(PortraitWindow, 0)
-	GemRB.SetVar("PortraitWindow", -1)
-	GemRB.UnhideGUI()
-	return
-
-def MaximizePortraits():
-	GemRB.HideGUI()
-	GemRB.SetVar("PortraitWindow", PortraitWindow)
-	GemRB.UnhideGUI()
-	return
-
+	
 def OnIncreaseSize():
 	global MessageWindow, ExpandButton
 	
@@ -99,7 +63,7 @@ def OnIncreaseSize():
 			GemRB.SetVar("MessageTextArea", TMessageTA)
 			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
 		else:
-			 return
+			return
 			
 	GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
 	GemRB.UnloadWindow(MessageWindow)
@@ -151,9 +115,11 @@ def OnDecreaseSize():
 	UpdateResizeButtons()
 	GemRB.UnhideGUI()
 	if Expand:
-		GemRB.SetControlStatus(TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED);
-	else:
+		GemRB.SetControlStatus(TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED);       
+	else:	   
 		GemRB.SetControlStatus(0,0,IE_GUI_CONTROL_FOCUSED);
+	return	  
+
 	return
 	
 def UpdateResizeButtons():
@@ -179,7 +145,7 @@ def PopulatePortraitWindow ():
 
 	for i in range (0,5):
 		Button = GemRB.GetControl (Window, i)
-		GemRB.SetVarAssoc (Window, Button, "SelectedSingle", i)
+		GemRB.SetVarAssoc (Window, Button, 'SelectedSingle', i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 
 		pic = GemRB.GetPlayerPortrait (i+1,1)

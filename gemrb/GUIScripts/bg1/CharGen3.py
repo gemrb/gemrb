@@ -31,6 +31,7 @@ def OnLoad():
 	ClassButton = GemRB.GetControl(CharGenWindow,2)
 	GemRB.SetText(CharGenWindow,ClassButton, 11959)
 	GemRB.SetButtonState(CharGenWindow,ClassButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow,ClassButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	AlignmentButton = GemRB.GetControl(CharGenWindow,3)
 	GemRB.SetText(CharGenWindow,AlignmentButton, 11958)
