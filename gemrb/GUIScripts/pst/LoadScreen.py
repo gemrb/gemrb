@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/LoadScreen.py,v 1.1 2004/08/09 15:34:30 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/LoadScreen.py,v 1.2 2004/08/12 21:14:21 avenger_teambg Exp $
 
 # LoadScreen.py - display Loading screen
 
@@ -27,18 +27,20 @@ from GUIDefines import *
 
 LoadScreen = None
 
-def OpenLoadScreen ():
+def StartLoadScreen ():
 	global LoadScreen
 
-	GemRB.LoadWindowPack ("GUILS")
+	GemRB.LoadWindowPack ("guils")
 	LoadScreen = GemRB.LoadWindow (0)
-	mosname = GemRB.GetVar("LoadScreen")
-
-def UpdateLoadScreen ():
-	
-	Button = GemRB.GetControl (LoadScreen, 0)
-	GemRB.SetButtonSprites (LoadScreen, Button, 0, 0, 0, 1, 2, 3)
-
-def CloseLoadScreen ():
-	GemRB.UnloadWindow(LoadScreen)
+	LoadPic = GemRB.GetGameString (STR_LOADMOS)
+	if LoadPic=="":
+		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
+	GemRB.SetWindowPicture(LoadScreen, LoadPic)
+	Bar = GemRB.GetControl (LoadScreen, 0)
+	Progress = 0
+	GemRB.SetVar ("Progress", Progress)
+	GemRB.SetVarAssoc (LoadScreen, Bar, "Progress", Progress)
+	Skull = GemRB.GetControl (LoadScreen, 1)
+	GemRB.SetButtonMOS (LoadScreen, Skull, "GSKULOFF")
+	GemRB.SetVisible (LoadScreen, 1)
 

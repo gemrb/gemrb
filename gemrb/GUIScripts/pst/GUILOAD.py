@@ -16,13 +16,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUILOAD.py,v 1.5 2004/04/26 12:48:51 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUILOAD.py,v 1.6 2004/08/12 21:14:20 avenger_teambg Exp $
 
 # GUILOAD.py - Load game window from GUILOAD winpack
 
 ###################################################
 
 import GemRB
+from LoadScreen import *
 
 LoadWindow = 0
 TextAreaControl = 0
@@ -114,6 +115,7 @@ def ScrollBarPress():
 
 def LoadGamePress():
 	Pos = GemRB.GetVar("TopIndex")+GemRB.GetVar("LoadIdx")
+	StartLoadScreen()
 	GemRB.LoadGame(Pos) # load & start game
 	GemRB.EnterGame()
 	return
