@@ -13,6 +13,7 @@ GameControl::GameControl(void)
 	DrawSelectionRect = false;
 	overDoor = NULL;
 	overContainer = NULL;
+	overInfoPoint = NULL;
 	lastCursor = 0;
 	moveX = moveY = 0;
 }
@@ -150,6 +151,13 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		overDoor = NULL;
 	}
 	overContainer = area->tm->GetContainer(GameX, GameY);
+	overInfoPoint = area->tm->GetInfoPoint(GameX, GameY);
+	if(overInfoPoint) {
+		if(overInfoPoint->Cursor != lastCursor) {
+			core->GetVideoDriver()->SetCursor(core->Cursors[overInfoPoint->Cursor]->GetFrame(0), core->Cursors[overInfoPoint->Cursor+1]->GetFrame(0));
+			lastCursor = overInfoPoint->Cursor;
+		}
+	}
 }
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)

@@ -39,6 +39,7 @@ private:
 	short StartX, StartY;
 	Door * overDoor;
 	Container * overContainer;
+	InfoPoint * overInfoPoint;
 	unsigned char lastCursor;
 	short moveX, moveY;
 	unsigned short lastMouseX, lastMouseY;
