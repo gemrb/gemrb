@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.70 2004/01/19 21:24:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.71 2004/01/30 22:35:10 avenger_teambg Exp $
  *
  */
 
@@ -705,7 +705,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 	while(InternalStack.size())
 		InternalStack.pop();
 
-        if(!Passable[sMap->GetPixelIndex(goalX,goalY)]) {
+        if(!(Passable[sMap->GetPixelIndex(goalX,goalY)]&3) ) {
 		AdjustPosition(goalX,goalY);
 	}
 	unsigned int pos=(goalX<<16)|goalY;
