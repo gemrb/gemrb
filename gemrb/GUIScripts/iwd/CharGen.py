@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.25 2004/12/06 21:44:52 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.26 2004/12/08 20:02:16 avenger_teambg Exp $
 
 
 #Character Generation
@@ -51,6 +51,7 @@ RaceDoneButton = 0
 ClassButton = 0
 ClassWindow = 0
 ClassTable = 0
+KitTable = 0
 ClassTextArea = 0
 ClassDoneButton = 0
 
@@ -289,9 +290,29 @@ def AcceptPress():
 	GemRB.CreatePlayer("charbase", MyChar)
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
-	GemRB.SetPlayerStat(MyChar, IE_KIT, 0x4000)
+	KitIndex = GemRB.GetVar("Class Kit")
+	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
 	t = GemRB.GetVar("Alignment")
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
+
+	#mage spells
+	Learnable = GetLearnableMageSpells( KitIndex, t, 1)
+	SpellBook = GemRB.GetVar("MageSpellBook")
+	j=1
+	for i in range(len(Learnable) ):
+		if SpellBook & j:
+			GemRB.LearnSpell(MyChar, Learnable[i], 0)
+		j=j<<1
+
+	#priest spells
+	TmpTable = GemRB.LoadTable("clskills")
+	TableName = GemRB.GetTableValue(TmpTable, Class, 1)
+	if TableName != "*":
+		ClassFlag = 0 #set this according to class
+		Learnable = GetLearnablePriestSpells( ClassFlag, GemRB.GetVar("Alignment"), 1)
+		for i in range(len(Learnable) ):
+			GemRB.LearnSpell(MyChar, Learnable[i], 0)
+
 	TmpTable = GemRB.LoadTable("repstart")
 	t = GemRB.FindTableValue(AlignmentTable, 3, t)
 	t = GemRB.GetTableValue(TmpTable, t, 0)
@@ -334,7 +355,7 @@ def AcceptPress():
 	return
 
 def SetCharacterDescription():
-	global CharGenWindow, TextArea, CharGenState, ClassTable, RaceTable, AlignmentTable, AbilitiesTable, SkillsTable, ProficienciesTable, RacialEnemyTable, MageSpellsTable, PriestSpellsTable
+	global CharGenWindow, TextArea, CharGenState, ClassTable, KitTable, RaceTable, AlignmentTable, AbilitiesTable, SkillsTable, ProficienciesTable, RacialEnemyTable, MageSpellsTable, PriestSpellsTable
 	GemRB.TextAreaClear(CharGenWindow, TextArea)
 	if CharGenState > 7:
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 1047)
@@ -351,7 +372,15 @@ def SetCharacterDescription():
 	if CharGenState > 2:
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 12136, -1)
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, ": ")
-		GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(ClassTable, GemRB.GetVar("Class") - 1, 2) )
+		#this is only mage school in iwd
+		KitIndex = GemRB.GetVar("Class Kit")
+		if KitIndex == 0:
+			Class = GemRB.GetVar("Class")-1
+			ClassTitle=GemRB.GetTableValue(ClassTable, Class, 2)
+		else:
+			ClassTitle=GemRB.GetTableValue(KitTable, KitIndex, 2)
+		GemRB.TextAreaAppend(CharGenWindow, TextArea, ClassTitle)
+
 	if CharGenState > 1:
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 1048, -1)
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, ": ")
@@ -656,6 +685,7 @@ def ClassPress():
 	GemRB.SetVisible(CharGenWindow, 0)
 	ClassWindow = GemRB.LoadWindow(2)
 	ClassTable = GemRB.LoadTable("CLASSES")
+	KitTable = GemRB.LoadTable("MAGESCH")
 	ClassCount = GemRB.GetTableRowCount(ClassTable)
 	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race") - 1)
 	GemRB.SetVar("Class", 0)

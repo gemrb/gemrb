@@ -143,14 +143,15 @@ def NextPress():
 	for i in range(len(Learnable) ):
 		if SpellBook & j:
 			GemRB.LearnSpell(MyChar, Learnable[i], 0)
-		j=j+j
+		j=j<<1
 
 	#priest spells
+	TmpTable = GemRB.LoadTable("clskills")
 	TableName = GemRB.GetTableValue(TmpTable, Class, 1)
 	if TableName != "*":
 		ClassFlag = 0 #set this according to class
 		Learnable = GetLearnablePriestSpells( ClassFlag, GemRB.GetVar("Alignment"), 1)
-		for(i in range(len(Learnable) ):
+		for i in range(len(Learnable) ):
 			GemRB.LearnSpell(MyChar, Learnable[i], 0)
 
 	TmpTable=GemRB.LoadTable("repstart")
