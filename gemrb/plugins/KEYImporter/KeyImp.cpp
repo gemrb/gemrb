@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.27 2003/12/07 11:57:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.28 2003/12/07 12:19:10 avenger_teambg Exp $
  *
  */
 
@@ -28,33 +28,10 @@
 #include "../Core/AnimationMgr.h"
 #ifndef WIN32
 #include <unistd.h>
-#include <dirent.h>
 #endif
 
 static char overridesubfolder[9]="override";
 static char datasubfolder[5]="data";
-
-#ifndef WIN32
-char * FindInDir(char * Dir, char * Filename)
-{ 
-	char * fn = NULL; 
-	DIR * dir = opendir(Dir); 
-	if(dir == NULL) 
-		return NULL; 
-	struct dirent * de = readdir(dir); 
-	if(de == NULL) 
-		return NULL;
-	do { 
-		if(strnicmp(de->d_name, Filename, strlen(Filename)) == 0) {
-			fn = (char*)malloc(strlen(de->d_name)+1);
-			strcpy(fn, de->d_name);
-			break;
-		}
-	} while((de = readdir(dir)) != NULL);
-	closedir(dir);  //No other files in the directory, close it
-	return fn;
-}
-#endif
 
 KeyImp::KeyImp(void)
 {
