@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.9 2003/11/26 21:36:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.10 2003/11/26 22:07:21 avenger_teambg Exp $
  *
  */
 
@@ -136,7 +136,7 @@ Map * AREImp::GetMap()
 		ab.YDes = YDes;
 		ab.actor = actmgr->GetActor();
 		ab.AnimID = IE_ANI_AWAKE;
-		if(ab.actor->BaseStats[IE_STATE_ID] & 0x00000800)
+		if(ab.actor->BaseStats[IE_STATE_ID] & STATE_DEAD)
 			ab.AnimID = IE_ANI_SLEEP;
 		ab.Orientation = (unsigned char)Orientation;
 		map->AddActor(ab);
