@@ -1,5 +1,7 @@
 import GemRB
 
+from GUICommonWindows import *
+
 MessageWindow = 0
 MessageTA = 0
 
@@ -16,21 +18,11 @@ def OnLoad():
 	GemRB.SetVar("PortraitWindow", PortraitWindow)
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	
+	PopulatePortraitWindow(PortraitWindow)
+
 	GemRB.SetVar("MessagePosition", 4)
 	GemRB.SetVar("PortraitPosition", 4)
 	
 	GemRB.SetVisible(MessageWindow, 1)
 	GemRB.SetVisible(PortraitWindow, 1)
 	return
-
-def PopulatePortraitWindow():
-	Window = PortraitWindow
-
-	for i in range (0,5):
-		Button = GemRB.GetControl (Window, i)
-		GemRB.SetVarAssoc (Window, Button, "SelectedSingle", i)
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
-		
-		pic = GemRB.GetPlayerPortrait (i+1,1)
-		GemRB.SetButtonPicture(Window, Button, pic)
-		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE, OP_SET)
