@@ -6,7 +6,7 @@
 #include "PluginMgr.h"
 #include "Video.h"
 #include "ResourceMgr.h"
-#include "SClassID.h"
+#include "../../includes/SClassID.h"
 #include "StringMgr.h"
 #include "Actor.h"
 #include "HCAnimationSeq.h"

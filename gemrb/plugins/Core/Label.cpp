@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "win32def.h"
+#include "../../includes/win32def.h"
 #include "Label.h"
 
 Label::Label(unsigned short bLength, Font * font){
