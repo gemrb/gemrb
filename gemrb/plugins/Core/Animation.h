@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.11 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.12 2004/05/25 16:16:29 avenger_teambg Exp $
  *
  */
 
@@ -41,7 +41,6 @@
 
 class GEM_EXPORT Animation {
 private:
-	//std::vector<unsigned short> indices;
 	std::vector< Sprite2D*> frames;
 	std::vector< int> link;
 	unsigned short* indices;
@@ -56,7 +55,7 @@ public:
 	bool autoSwitchOnEnd;
 	bool endReached;
 	unsigned int pos;
-	bool free;
+	bool autofree;
 	int x, y;
 	unsigned char BlitMode;
 	unsigned char fps;

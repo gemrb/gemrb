@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.18 2004/04/09 13:38:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.19 2004/05/25 16:16:25 avenger_teambg Exp $
  *
  */
 
@@ -24,7 +24,6 @@
 
 #include "../Core/SoundMgr.h"
 #include "../Core/FileStream.h"
-
 
 #include <SDL.h>
 #include <SDL_thread.h>

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.67 2004/05/09 21:31:58 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.68 2004/05/25 16:16:48 avenger_teambg Exp $
  *
  */
 
@@ -810,8 +810,9 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D* spr, int x, int y,
 	SDL_LockSurface( backBuf );
 
 	unsigned char * src, * dst;
+  //reusing x and y!
 
-	for (int y = srect->y; y < srect->h; y++) {
+	for (y = srect->y; y < srect->h; y++) {
 		if (( desty < yCorr ) || ( desty >= ( yCorr + Screen.h ) )) {
 			desty++;
 			continue;
@@ -821,7 +822,7 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D* spr, int x, int y,
 		dst = ( ( unsigned char * ) backBuf->pixels ) +
 			( desty * backBuf->pitch ) +
 			( destx * backBuf->format->BytesPerPixel );
-		for (int x = srect->x; x < srect->w; x++) {
+		for (x = srect->x; x < srect->w; x++) {
 			if (( destx < xCorr ) || ( destx >= ( xCorr + Screen.w ) )) {
 				src++;
 				destx++;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.30 2004/05/01 00:07:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.31 2004/05/25 16:16:31 avenger_teambg Exp $
  *
  */
 
@@ -33,16 +33,18 @@ TileMap::TileMap(void)
 
 TileMap::~TileMap(void)
 {
-	for (size_t i = 0; i < overlays.size(); i++) {
+  size_t i;
+
+	for (i = 0; i < overlays.size(); i++) {
 		delete( overlays[i] );
 	}
-	for (size_t i = 0; i < infoPoints.size(); i++) {
+	for (i = 0; i < infoPoints.size(); i++) {
 		delete( infoPoints[i] );
 	}
-	for (size_t i = 0; i < containers.size(); i++) {
+	for (i = 0; i < containers.size(); i++) {
 		delete( containers[i] );
 	}
-	for (size_t i = 0; i < doors.size(); i++) {
+	for (i = 0; i < doors.size(); i++) {
 		delete( doors[i] );
 	}
 }

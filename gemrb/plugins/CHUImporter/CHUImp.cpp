@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.26 2004/03/21 12:32:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.27 2004/05/25 16:16:28 avenger_teambg Exp $
  *
  */
 
@@ -65,15 +65,17 @@ bool CHUImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 /** Returns the i-th window in the Previously Loaded Stream */
-Window* CHUImp::GetWindow(unsigned long i)
+Window* CHUImp::GetWindow(unsigned long wid)
 {
-	unsigned short WindowID, XPos, YPos, Width, Height, BackGround,
-	ControlsCount, FirstControl;
+	unsigned short WindowID, XPos, YPos, Width, Height, BackGround;
+	unsigned short ControlsCount, FirstControl;
+  int i;
+
 	bool found = false;
 	for (unsigned int c = 0; c < WindowCount; c++) {
 		str->Seek( WEOffset + ( 0x1c * c ), GEM_STREAM_START );
 		str->Read( &WindowID, 2 );
-		if (WindowID == i) {
+		if (WindowID == wid) {
 			found = true;
 			break;
 		}
@@ -114,7 +116,7 @@ Window* CHUImp::GetWindow(unsigned long i)
 		printf( "[CHUImporter]: No BAM Importer Available, skipping controls\n" );
 		return win;
 	}
-	for (int i = 0; i < ControlsCount; i++) {
+	for (i = 0; i < ControlsCount; i++) {
 		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );
 		unsigned long COffset, CLength, ControlID;
 		unsigned short BufferLength, XPos, YPos, Width, Height;
@@ -194,7 +196,7 @@ Window* CHUImp::GetWindow(unsigned long i)
 									3 :
 									DisabledIndex );
 					btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
-					ani->free = false;
+					ani->autofree = false;
 					delete( ani );
 					win->AddControl( btn );
 				}
@@ -401,7 +403,7 @@ Window* CHUImp::GetWindow(unsigned long i)
 							an->GetFrame( Trough ) );
 					sbar->SetImage( IE_GUI_SCROLLBAR_SLIDER,
 							an->GetFrame( Slider ) );
-					an->free = false;
+					an->autofree = false;
 					delete( an );
 					win->AddControl( sbar );
 					if (TAID != 0xffff)

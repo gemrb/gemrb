@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.96 2004/04/25 22:41:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.97 2004/05/25 16:16:31 avenger_teambg Exp $
  *
  */
 
@@ -90,35 +90,37 @@ Map::Map(void)
 
 Map::~Map(void)
 {
+  unsigned int i;
+
 	if (MapSet) {
 		free(MapSet);
 	}
 	if (tm) {
 		delete( tm );
 	}
-	for (unsigned int i = 0; i < animations.size(); i++) {
+	for (i = 0; i < animations.size(); i++) {
 		delete( animations[i] );
 	}
 
-	for (unsigned int i = 0; i < actors.size(); i++) {
+	for (i = 0; i < actors.size(); i++) {
 		Actor* a = actors[i];
 		if (a && !a->InParty && !a->FromGame) {
 			delete ( a );
 		}
 	}
 
-	for (unsigned int i = 0; i < entrances.size(); i++) {
+	for (i = 0; i < entrances.size(); i++) {
 		delete( entrances[i] );
 	}
 	core->FreeInterface( LightMap );
 	core->FreeInterface( SearchMap );
-	for (int i = 0; i < 3; i++) {
+	for (i = 0; i < 3; i++) {
 		if (queue[i]) {
 			delete[] queue[i];
 			queue[i] = NULL;
 		}
 	}
-	for (unsigned int i = 0; i < vvcCells.size(); i++) {
+	for (i = 0; i < vvcCells.size(); i++) {
 		if (vvcCells[i]) {
 			delete vvcCells[i];
 			vvcCells[i] = NULL;
@@ -170,6 +172,7 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 
 void Map::DrawMap(Region viewport, GameControl* gc)
 {
+  int i;
 	//Draw the Map
 	if (tm) {
 		tm->DrawOverlay( 0, viewport );
@@ -221,7 +224,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			BBox.h += 1000;
 			BBox.w += 1000;
 		}
-		int i = 0;
+    i=0;
 		while (true) {
 			Actor* actor = core->GetGame()->GetPC( i++ );
 			if (!actor)
@@ -270,7 +273,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 	}
 	//Blit the Map Animations
 	Video* video = core->GetVideoDriver();
-	for (unsigned int i = 0; i < animations.size(); i++) {
+	for (i = 0; i < animations.size(); i++) {
 		if (animations[i]->Active) {
 			video->BlitSpriteMode( animations[i]->NextFrame(),
 					animations[i]->x + viewport.x,
@@ -359,7 +362,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 							false );
 				}
 			}
-			for (int i = 0; i < 8; i++) {
+			for (i = 0; i < 8; i++) {
 				if (actor->Scripts[i])
 					actor->ExecuteScript( actor->Scripts[i] );
 			}
@@ -367,7 +370,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			actor->inventory.CalculateWeight();
 		}
 	}
-	for (unsigned int i = 0; i < vvcCells.size(); i++) {
+	for (i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells.at( i );
 		if (!vvc)
 			continue;

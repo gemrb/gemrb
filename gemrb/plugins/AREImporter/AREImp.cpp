@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.52 2004/05/11 17:11:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.53 2004/05/25 16:16:25 avenger_teambg Exp $
  *
  */
 
@@ -145,6 +145,8 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 
 Map* AREImp::GetMap(const char *ResRef)
 {
+  unsigned int i,x;
+
 	Map* map = new Map();
 	map->AreaFlags=AreaFlags;
 	map->AreaType=AreaType;
@@ -186,13 +188,13 @@ Map* AREImp::GetMap(const char *ResRef)
 
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
-	for (int i = 0; i < 5; i++) {
+	for (i = 0; i < 5; i++) {
 		str->Read( map->SongHeader.SongList + i, 4 );
 	}
 
 	printf( "Loading doors\n" );
 	//Loading Doors
-	for (unsigned long i = 0; i < DoorsCount; i++) {
+	for (i = 0; i < DoorsCount; i++) {
 		str->Seek( DoorsOffset + ( i * 0xc8 ), GEM_STREAM_START );
 		int count;
 		unsigned long Flags, OpenFirstVertex, ClosedFirstVertex;
@@ -243,7 +245,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Seek( VerticesOffset + ( OpenFirstVertex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* )
 			malloc( OpenVerticesCount*sizeof( Point ) );
-		for (int x = 0; x < OpenVerticesCount; x++) {
+		for (x = 0; x < OpenVerticesCount; x++) {
 			str->Read( &points[x].x, 2 );
 			str->Read( &points[x].y, 2 );
 		}
@@ -254,7 +256,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Seek( VerticesOffset + ( ClosedFirstVertex * 4 ),
 				GEM_STREAM_START );
 		points = ( Point * ) malloc( ClosedVerticesCount * sizeof( Point ) );
-		for (int x = 0; x < ClosedVerticesCount; x++) {
+		for (x = 0; x < ClosedVerticesCount; x++) {
 			str->Read( &points[x].x, 2 );
 			str->Read( &points[x].y, 2 );
 		}
@@ -290,7 +292,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	}
 	printf( "Loading containers\n" );
 	//Loading Containers
-	for (int i = 0; i < ContainersCount; i++) {
+	for (i = 0; i < ContainersCount; i++) {
 		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
 		unsigned short Type, LockDiff, Locked, Unknown;
 		unsigned short TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
@@ -341,8 +343,9 @@ Map* AREImp::GetMap(const char *ResRef)
 		c->Trapped = Trapped;
 		c->TrapDetected = TrapDetected;
 		//reading items into a container
+		str->Seek( ItemsOffset+( ItemIndex * 0x14 ), GEM_STREAM_START);
 		while(ItemCount--) {
-//			c->inventory.AddItem(
+			c->inventory.AddItem( GetItem());
 		}
 		if (Script[0] != 0) {
 			c->Scripts[0] = new GameScript( Script, IE_SCRIPT_TRIGGER );
@@ -352,7 +355,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	}
 	printf( "Loading regions\n" );
 	//Loading InfoPoints
-	for (int i = 0; i < InfoPointsCount; i++) {
+	for (i = 0; i < InfoPointsCount; i++) {
 		str->Seek( InfoPointsOffset + ( i * 0xC4 ), GEM_STREAM_START );
 		unsigned short Type, VertexCount;
 		unsigned long FirstVertex, Cursor, EndFlags;
@@ -393,7 +396,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		char* string = core->GetString( StrRef );
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
-		for (int x = 0; x < VertexCount; x++) {
+		for (x = 0; x < VertexCount; x++) {
 			str->Read( &points[x].x, 2 );
 			str->Read( &points[x].y, 2 );
 		}
@@ -434,7 +437,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		return map;
 	}
 	ActorMgr* actmgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
-	for (int i = 0; i < ActorCount; i++) {
+	for (i = 0; i < ActorCount; i++) {
 		char DefaultName[33];
 		char CreResRef[9];
 		unsigned long TalkCount;
@@ -503,7 +506,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		printf( "[AREImporter]: No Animation Manager Available, skipping animations\n" );
 		return map;
 	}
-	for (unsigned int i = 0; i < AnimCount; i++) {
+	for (i = 0; i < AnimCount; i++) {
 		Animation* anim;
 		str->Seek( 32, GEM_CURRENT_POS );
 		unsigned short animX, animY;
@@ -530,14 +533,14 @@ Map* AREImp::GetMap(const char *ResRef)
 		anim->x = animX;
 		anim->y = animY;
 		anim->BlitMode = mode;
-		anim->free = false;
+		anim->autofree = false;
 		strcpy( anim->ResRef, animBam );
 		map->AddAnimation( anim );
 	}
 	printf( "Loading entrances\n" );
 	//Loading Entrances
 	str->Seek( EntrancesOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < EntrancesCount; i++) {
+	for (i = 0; i < EntrancesCount; i++) {
 		char Name[33];
 		short XPos, YPos, Face;
 		str->Read( Name, 32 );

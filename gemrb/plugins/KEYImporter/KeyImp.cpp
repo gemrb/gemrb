@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.38 2004/04/29 20:06:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.39 2004/05/25 16:16:47 avenger_teambg Exp $
  *
  */
 
@@ -58,6 +58,7 @@ KeyImp::~KeyImp(void)
 
 bool KeyImp::LoadResFile(const char* resfile)
 {
+  unsigned int i;
 	char fn[_MAX_PATH] = {
 		0
 	};
@@ -112,7 +113,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 	f->Seek( BifOffset, GEM_STREAM_START );
 	unsigned long BifLen, ASCIIZOffset;
 	unsigned short ASCIIZLen;
-	for (unsigned int i = 0; i < BifCount; i++) {
+	for (i = 0; i < BifCount; i++) {
 		BIFEntry be;
 		f->Seek( BifOffset + ( 12 * i ), GEM_STREAM_START );
 		f->Read( &BifLen, 4 );
@@ -159,7 +160,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 	}
 	f->Seek( ResOffset, GEM_STREAM_START );
 	resources.InitHashTable( ResCount );
-	for (unsigned int i = 0; i < ResCount; i++) {
+	for (i = 0; i < ResCount; i++) {
 		RESEntry re;
 		f->Read( re.ResRef, 8 );
 		f->Read( &re.Type, 2 );

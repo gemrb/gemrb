@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.35 2004/05/01 00:07:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.36 2004/05/25 16:16:29 avenger_teambg Exp $
  *
  */
 
@@ -193,7 +193,7 @@ public:
 	char OpenSound[9];
 	char CloseSound[9];
 private:
-	void ToggleTiles(bool State, bool playsound = false);
+	void ToggleTiles(int State, bool playsound = false);
 public:
 	void SetName(char* Name);
 	void SetTiles(unsigned short* Tiles, int count);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.170 2004/05/11 17:09:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.171 2004/05/25 16:16:31 avenger_teambg Exp $
  *
  */
 
@@ -318,6 +318,10 @@ int Interface::Init()
 	strings->Open( fs, true );
 	printMessage( "Core", "Loading Palettes...\n", WHITE );
 	DataStream* bmppal256 = NULL, * bmppal16 = NULL;
+	if (!IsAvailable( IE_BMP_CLASS_ID )) {
+		printf( "No BMP Importer Available.\nTermination in Progress...\n" );
+		return GEM_ERROR;
+	}
 	bmppal256 = key->GetResource( "MPAL256\0", IE_BMP_CLASS_ID );
 	if (bmppal256) {
 		pal256 = ( ImageMgr * )this->GetInterface( IE_BMP_CLASS_ID );
@@ -330,7 +334,15 @@ int Interface::Init()
 	pal16->Open( bmppal16, true );
 	printMessage( "Core", "Palettes Loaded\n", WHITE );
 	printMessage( "Core", "Loading Fonts...\n", WHITE );
+	if (!IsAvailable( IE_BAM_CLASS_ID )) {
+		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
+		return GEM_ERROR;
+	}
 	AnimationMgr* anim = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
+	if (!IsAvailable( IE_2DA_CLASS_ID )) {
+		printf( "No 2DA Importer Available.\nTermination in Progress...\n" );
+		return GEM_ERROR;
+	}
 	int table = LoadTable( "fonts" );
 	if (table < 0) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -848,6 +860,7 @@ bool Interface::LoadConfig(const char* filename)
 				fclose( config );
 				return false;
 			}
+      strcat(CachePath,"/");
 		} else if (stricmp( name, "GUIScriptsPath" ) == 0) {
 			strcpy( GUIScriptsPath, value );
 #ifndef WIN32
@@ -1122,7 +1135,9 @@ bool Interface::LoadWindowPack(const char* name)
 /** Loads a Window in the Window Manager */
 int Interface::LoadWindow(unsigned short WindowID)
 {
-	for (unsigned int i = 0; i < windows.size(); i++) {
+  unsigned int i;
+
+	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == NULL)
 			continue;
 		if (windows[i]->WindowID == WindowID && !stricmp( WindowPack,
@@ -1139,7 +1154,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 	strcpy( win->WindowPack, WindowPack );
 
 	int slot = -1;
-	for (unsigned int i = 0; i < windows.size(); i++) {
+	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == NULL) {
 			slot = i;
 			break;
@@ -1158,7 +1173,9 @@ int Interface::LoadWindow(unsigned short WindowID)
 /** Creates a Window in the Window Manager */
 int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigned int Width, unsigned int Height, char* Background)
 {
-	for (unsigned int i = 0; i < windows.size(); i++) {
+  unsigned int i;
+
+	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == NULL)
 			continue;
 		if (windows[i]->WindowID == WindowID && !stricmp( WindowPack,
@@ -1168,7 +1185,6 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 			return i;
 		}
 	}
-
 
 	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
 	if (Background[0]) {
@@ -1187,15 +1203,10 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 			printf( "[Core]: No MOS Importer Available, skipping background\n" );
 	}
 
-
-	//Window* win = windowmgr->GetWindow( WindowID );
-	//if (win == NULL) {
-	//	return -1;
-	//}
 	strcpy( win->WindowPack, WindowPack );
 
 	int slot = -1;
-	for (unsigned int i = 0; i < windows.size(); i++) {
+	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == NULL) {
 			slot = i;
 			break;
@@ -1966,6 +1977,6 @@ bool Interface::CanUseItemType(int itype, int slottype)
 		return false;
 	}
 	//if any bit is true, we return true (int->bool conversion)
-	return slotmatrix[itype]&slottype;
+	return (bool) (slotmatrix[itype]&slottype);
 }
 

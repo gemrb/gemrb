@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.5 2004/04/15 16:20:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.6 2004/05/25 16:16:34 avenger_teambg Exp $
  *
  */
 
@@ -65,6 +65,7 @@ bool ITMImp::Open(DataStream* stream, bool autoFree)
 
 Item* ITMImp::GetItem()
 {
+  unsigned int i;
 	Item* s = new Item();
 
 	str->Read( &s->ItemName, 4 );
@@ -113,8 +114,7 @@ Item* ITMImp::GetItem()
 		str->Read( s->unknown, 26 );
 	}
 
-
-	for (unsigned int i = 0; i < s->ExtHeaderCount; i++) {
+	for (i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 56, GEM_STREAM_START );
 		ITMExtHeader* eh = GetExtHeader( s );
 		s->ext_headers.push_back( eh );
@@ -122,7 +122,7 @@ Item* ITMImp::GetItem()
 
 	str->Seek( s->FeatureBlockOffset + s->EquippingFeatureOffset,
 			GEM_STREAM_START );
-	for (unsigned int i = 0; i < s->EquippingFeatureCount; i++) {
+	for (i = 0; i < s->EquippingFeatureCount; i++) {
 		ITMFeature* f = GetFeature();
 		s->equipping_features.push_back( f );
 	}
@@ -158,6 +158,7 @@ Item* ITMImp::GetItem()
 
 ITMExtHeader* ITMImp::GetExtHeader(Item* s)
 {
+  unsigned int i;
 	ITMExtHeader* eh = new ITMExtHeader();
 
 	str->Read( &eh->AttackType, 1 );
@@ -183,7 +184,7 @@ ITMExtHeader* ITMImp::GetExtHeader(Item* s)
 	str->Read( &eh->Recharge, 1 );
 	str->Read( &eh->unknown2, 2 );
 	str->Read( &eh->ProjectileAnimation, 2 );
-	for (int i = 0; i < 3; i++) {
+	for (i = 0; i < 3; i++) {
 		str->Read( &eh->MeleeAnimation[i], 2 );
 	}
 	str->Read( &eh->BowArrowQualifier, 2 );
@@ -192,7 +193,7 @@ ITMExtHeader* ITMImp::GetExtHeader(Item* s)
 
 
 	str->Seek( s->FeatureBlockOffset + eh->FeatureOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
+	for (i = 0; i < eh->FeatureCount; i++) {
 		ITMFeature* f = GetFeature();
 		eh->features.push_back( f );
 	}

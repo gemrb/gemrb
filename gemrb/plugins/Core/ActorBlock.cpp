@@ -522,8 +522,9 @@ Door::~Door(void)
 	}
 }
 
-void Door::ToggleTiles(bool State, bool playsound)
+void Door::ToggleTiles(int State, bool playsound)
 {
+  int i;
 	int state;
 
 	if (State) {
@@ -539,7 +540,7 @@ void Door::ToggleTiles(bool State, bool playsound)
 		XPos = closed->BBox.x + ( closed->BBox.w / 2 );
 		YPos = closed->BBox.y + ( closed->BBox.h / 2 );
 	}
-	for (int i = 0; i < count; i++) {
+	for (i = 0; i < count; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = state;
 	}
 	Flags = (Flags & ~1) | State;

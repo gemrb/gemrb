@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.141 2004/05/09 14:50:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.142 2004/05/25 16:16:29 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -310,6 +310,8 @@ void GameControl::SelectActor(int whom)
 /** Key Release Event */
 void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
+  unsigned int i;
+
 	switch (Key) {
 		case '=':
 			SelectActor(-1);
@@ -420,7 +422,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 			case 'j':
 				// j
-					for (unsigned int i = 0; i < selected.size(); i++) {
+					for (i = 0; i < selected.size(); i++) {
 						Actor* actor = selected[i];
 						short cX = lastMouseX; 
 						short cY = lastMouseY;
@@ -624,6 +626,8 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
+  unsigned int i;
+
 	if (DisableMouse) {
 		return;
 	}
@@ -718,7 +722,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		}
 		switch (type) {
 		case 0:
-			for (size_t i = 0; i < selected.size(); i++)
+			for (i = 0; i < selected.size(); i++)
 				selected[i]->Select( false );
 			selected.clear();
 			if (actor) {
@@ -736,17 +740,17 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		}
 	} else {
 		Actor** ab;
-		int count = area->GetActorInRect( ab, SelectionRect );
-		for (size_t i = 0; i < highlighted.size(); i++)
+		unsigned int count = area->GetActorInRect( ab, SelectionRect );
+		for (i = 0; i < highlighted.size(); i++)
 			highlighted[i]->SetOver( false );
 		highlighted.clear();
-		for (size_t i = 0; i < selected.size(); i++) {
+		for (i = 0; i < selected.size(); i++) {
 			selected[i]->Select( false );
 			selected[i]->SetOver( false );
 		}
 		selected.clear();
 		if (count != 0) {
-			for (int i = 0; i < count; i++) {
+			for (i = 0; i < count; i++) {
 				ab[i]->Select( true );
 				selected.push_back( ab[i] );
 			}
@@ -810,6 +814,7 @@ Map *GameControl::SetCurrentArea(int Index)
 
 void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 {
+  unsigned int i;
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentMap( );
 	if (DrawSelectionRect) {
@@ -828,12 +833,12 @@ void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 			SelectionRect.h = y - StartY;
 		}
 		Actor** ab;
-		int count = area->GetActorInRect( ab, SelectionRect );
+		unsigned int count = area->GetActorInRect( ab, SelectionRect );
 		if (count != 0) {
-			for (size_t i = 0; i < highlighted.size(); i++)
+			for (i = 0; i < highlighted.size(); i++)
 				highlighted[i]->SetOver( false );
 			highlighted.clear();
-			for (int i = 0; i < count; i++) {
+			for (i = 0; i < count; i++) {
 				ab[i]->SetOver( true );
 				highlighted.push_back( ab[i] );
 			}

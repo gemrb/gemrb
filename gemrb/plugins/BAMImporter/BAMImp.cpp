@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.21 2004/05/15 13:08:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.22 2004/05/25 16:16:26 avenger_teambg Exp $
  *
  */
 
@@ -50,6 +50,8 @@ BAMImp::~BAMImp(void)
 
 bool BAMImp::Open(DataStream* stream, bool autoFree)
 {
+  unsigned int i;
+
 	if (stream == NULL) {
 		return false;
 	}
@@ -116,7 +118,7 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 	str->Read( &FLTOffset, 4 );
 	str->Seek( FramesOffset, GEM_STREAM_START );
 	frames = new FrameEntry[FramesCount];
-	for (unsigned int i = 0; i < FramesCount; i++) {
+	for (i = 0; i < FramesCount; i++) {
 		str->Read( &frames[i].Width, 2 );
 		str->Read( &frames[i].Height, 2 );
 		str->Read( &frames[i].XPos, 2 );
@@ -124,12 +126,12 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 		str->Read( &frames[i].FrameData, 4 );
 	}
 	cycles = new CycleEntry[CyclesCount];
-	for (unsigned int i = 0; i < CyclesCount; i++) {
+	for (i = 0; i < CyclesCount; i++) {
 		str->Read( &cycles[i].FramesCount, 2 );
 		str->Read( &cycles[i].FirstFrame, 2 );
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < 256; i++) {
+	for (i = 0; i < 256; i++) {
 		RevColor rc;
 		str->Read( &rc, 4 );
 		Palette[i].r = rc.r;
@@ -155,6 +157,8 @@ Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
 Animation* BAMImp::GetAnimation(unsigned char Cycle, int x, int y,
 	unsigned char mode)
 {
+  unsigned int i;
+
 	if(Cycle >=CyclesCount ) {
 		return NULL;
 	}
@@ -164,13 +168,13 @@ Animation* BAMImp::GetAnimation(unsigned char Cycle, int x, int y,
 	str->Seek( FLTOffset + ( cycles[Cycle].FirstFrame * 2 ), GEM_STREAM_START );
 	unsigned short * findex = ( unsigned short * )
 		malloc( cycles[Cycle].FramesCount * sizeof(unsigned short) );
-	for (unsigned int i = 0; i < cycles[Cycle].FramesCount; i++) {
+	for (i = 0; i < cycles[Cycle].FramesCount; i++) {
 		str->Read( &findex[i], 2 );
 	}
 	Animation* anim = new Animation( findex, cycles[Cycle].FramesCount );
 	anim->x = x;
 	anim->y = y;
-	for (int i = 0; i < cycles[Cycle].FramesCount; i++) {
+	for (i = 0; i < cycles[Cycle].FramesCount; i++) {
 		anim->AddFrame( GetFrame( findex[i], mode ), findex[i] );
 	}
 	free( findex );
@@ -242,9 +246,11 @@ void* BAMImp::GetFramePixels(unsigned short findex, unsigned char mode)
 AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 	unsigned char mode)
 {
+  unsigned int i;
+
 	AnimationFactory* af = new AnimationFactory( ResRef );
 	int count = 0;
-	for (unsigned int i = 0; i < CyclesCount; i++) {
+	for (i = 0; i < CyclesCount; i++) {
 		if (cycles[i].FirstFrame + cycles[i].FramesCount > count) {
 			count = cycles[i].FirstFrame + cycles[i].FramesCount;
 		}
@@ -253,7 +259,7 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 	str->Seek( FLTOffset, GEM_STREAM_START );
 	str->Read( FLT, count * 2 );
 	std::vector< unsigned short> indices;
-	for (unsigned int i = 0; i < CyclesCount; i++) {
+	for (i = 0; i < CyclesCount; i++) {
 		unsigned int ff = cycles[i].FirstFrame,
 		lf = ff + cycles[i].FramesCount;
 		for (unsigned int f = ff; f < lf; f++) {
@@ -282,8 +288,10 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 /** This function will load the Animation as a Font */
 Font* BAMImp::GetFont()
 {
+  unsigned int i;
+
 	int w = 0, h = 0;
-	for (unsigned int i = 0; i < CyclesCount; i++) {
+	for (i = 0; i < CyclesCount; i++) {
 		unsigned int index = cycles[i].FirstFrame;
 		if (index >= FramesCount)
 			continue;
@@ -294,7 +302,7 @@ Font* BAMImp::GetFont()
 			h = frames[index].Height;
 	}
 	Font* fnt = new Font( w*( int ) CyclesCount, h, Palette, true, 0 );
-	for (unsigned int i = 0; i < CyclesCount; i++) {
+	for (i = 0; i < CyclesCount; i++) {
 		if (cycles[i].FirstFrame >= FramesCount) {
 			fnt->AddChar( NULL, 0, 0, 0, 0 );
 			continue;

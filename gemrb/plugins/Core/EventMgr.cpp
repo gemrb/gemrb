@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.31 2004/04/28 12:52:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.32 2004/05/25 16:16:29 avenger_teambg Exp $
  *
  */
 
@@ -41,17 +41,18 @@ EventMgr::~EventMgr(void)
 /** Adds a Window to the Event Manager */
 void EventMgr::AddWindow(Window* win)
 {
+  unsigned int i;
 	if (win == NULL) {
 		return;
 	}
-	for (unsigned int i = 0; i < windows.size(); i++) {
+	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == win) {
 			SetOnTop( i );
 			return;
 		}
 	}
 	bool found = false;
-	for (unsigned int i = 0; i < windows.size(); i++) {
+	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == NULL) {
 			windows[i] = win;
 			SetOnTop( i );

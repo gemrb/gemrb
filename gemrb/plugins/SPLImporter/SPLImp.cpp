@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.3 2004/02/24 22:20:39 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.4 2004/05/25 16:16:49 avenger_teambg Exp $
  *
  */
 
@@ -63,6 +63,7 @@ bool SPLImp::Open(DataStream* stream, bool autoFree)
 
 Spell* SPLImp::GetSpell()
 {
+  unsigned int i;
 	Spell* s = new Spell();
 
 	str->Read( &s->SpellName, 4 );
@@ -103,7 +104,7 @@ Spell* SPLImp::GetSpell()
 	}
 
 
-	for (unsigned int i = 0; i < s->ExtHeaderCount; i++) {
+	for (i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 40, GEM_STREAM_START );
 		SPLExtHeader* eh = GetExtHeader( s );
 		s->ext_headers.push_back( eh );
@@ -111,11 +112,10 @@ Spell* SPLImp::GetSpell()
 
 	str->Seek( s->FeatureBlockOffset + s->CastingFeatureOffset,
 			GEM_STREAM_START );
-	for (unsigned int i = 0; i < s->CastingFeatureCount; i++) {
+	for (i = 0; i < s->CastingFeatureCount; i++) {
 		SPLFeature* f = GetFeature();
 		s->casting_features.push_back( f );
 	}
-
 
 	DataStream* bamfile = core->GetResourceMgr()->GetResource( s->SpellBookIcon,
 													IE_BAM_CLASS_ID );
@@ -161,7 +161,6 @@ SPLExtHeader* SPLImp::GetExtHeader(Spell* s)
 		SPLFeature* f = GetFeature();
 		eh->features.push_back( f );
 	}
-
 
 	return eh;
 }

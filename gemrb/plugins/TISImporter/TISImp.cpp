@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.7 2004/04/18 14:26:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.8 2004/05/25 16:16:52 avenger_teambg Exp $
  *
  */
 
@@ -91,9 +91,9 @@ Sprite2D* TISImp::GetTile(int index)
 	unsigned long pos = index *(1024+4096) + headerShift;
 	if(str->Size()<pos) {
 		printf("Invalid tile index: %d\n",index);
-		printf("FileSize: %d\n", str->Size() );
-		printf("Position: %d\n", pos);
-		printf("Shift: %d\n (aborting)\n", headerShift);
+		printf("FileSize: %ld\n", str->Size() );
+		printf("Position: %ld\n", pos);
+		printf("Shift: %ld\n", headerShift);
 	}
 	str->Seek( ( index * ( 1024 + 4096 ) + headerShift ), GEM_STREAM_START );
 	str->Read( &RevCol, 1024 );

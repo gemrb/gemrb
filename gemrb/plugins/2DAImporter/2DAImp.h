@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.16 2004/04/25 22:41:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.17 2004/05/25 16:16:19 avenger_teambg Exp $
  *
  */
 
@@ -70,8 +70,10 @@ public:
 	  may return NULL */
 	inline char* QueryField(const char* row, const char* column) const
 	{
+    unsigned int i;
+
 		int rowi = -1, coli = -1;
-		for (unsigned int i = 0; i < rowNames.size(); i++) {
+		for (i = 0; i < rowNames.size(); i++) {
 			if (stricmp( rowNames[i], row ) == 0) {
 				rowi = i;
 				break;
@@ -80,7 +82,7 @@ public:
 		if (rowi == -1) {
 			return ( char * ) defVal;
 		}
-		for (unsigned int i = 0; i < colNames.size(); i++) {
+		for (i = 0; i < colNames.size(); i++) {
 			if (stricmp( colNames[i], column ) == 0) {
 				coli = i;
 				break;

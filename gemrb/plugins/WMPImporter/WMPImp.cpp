@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.3 2004/04/15 10:21:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.4 2004/05/25 16:16:52 avenger_teambg Exp $
  *
  */
 
@@ -60,6 +60,7 @@ bool WMPImp::Open(DataStream* stream, bool autoFree)
 
 WorldMap* WMPImp::GetWorldMap(unsigned int index)
 {
+  unsigned int i;
 	WorldMap* m = new WorldMap();
 
 	str->Seek( WorldMapsOffset + index * 184, GEM_STREAM_START );
@@ -79,13 +80,13 @@ WorldMap* WMPImp::GetWorldMap(unsigned int index)
 	str->Read( m->unknown3, 128 );
 
 	str->Seek( m->AreaEntriesOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < m->AreaEntriesCount; i++) {
+	for (i = 0; i < m->AreaEntriesCount; i++) {
 		WMPAreaEntry* ae = GetAreaEntry();
 		m->area_entries.push_back( ae );
 	}
 
 	str->Seek( m->AreaLinksOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < m->AreaLinksCount; i++) {
+	for (i = 0; i < m->AreaLinksCount; i++) {
 		WMPAreaLink* al = GetAreaLink();
 		m->area_links.push_back( al );
 	}

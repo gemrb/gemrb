@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.4 2004/04/15 15:49:16 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.5 2004/05/25 16:16:31 avenger_teambg Exp $
  *
  */
 
@@ -32,10 +32,12 @@ WorldMap::WorldMap(void)
 
 WorldMap::~WorldMap(void)
 {
-	for (size_t i = 0; i < area_entries.size(); i++) {
+  unsigned int i;
+
+	for (i = 0; i < area_entries.size(); i++) {
 		delete( area_entries[i] );
 	}
-	for (size_t i = 0; i < area_links.size(); i++) {
+	for (i = 0; i < area_links.size(); i++) {
 		delete( area_links[i] );
 	}
 	if(MapMOS) {

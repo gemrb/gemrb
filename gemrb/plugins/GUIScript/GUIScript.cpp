@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.166 2004/05/15 08:44:13 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.167 2004/05/25 16:16:33 avenger_teambg Exp $
  *
  */
 
@@ -1395,7 +1395,7 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 	btn->SetImage( IE_GUI_BUTTON_PRESSED, ani->GetFrame( pressed ) );
 	btn->SetImage( IE_GUI_BUTTON_SELECTED, ani->GetFrame( selected ) );
 	btn->SetImage( IE_GUI_BUTTON_DISABLED, ani->GetFrame( disabled ) );
-	ani->free = false;
+	ani->autofree = false;
 
 	delete( ani );
 
@@ -3392,13 +3392,15 @@ bool GUIScript::Init(void)
 	PathAppend( path2, core->GameType );
 
 #ifdef WIN32
-	for (char *p = path; *p != 0; p++)
+  char *p;
+
+	for (p = path; *p != 0; p++)
 	{
 		if (*p == '\\')
 			*p = '/';
 	}
 
-	for (char *p = path2; *p != 0; p++)
+	for (p = path2; *p != 0; p++)
 	{
 		if (*p == '\\')
 			*p = '/';

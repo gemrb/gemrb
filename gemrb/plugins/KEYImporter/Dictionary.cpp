@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.11 2004/04/13 23:06:41 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.12 2004/05/25 16:16:35 avenger_teambg Exp $
  *
  */
 
@@ -95,7 +95,7 @@ void Dictionary::RemoveAll()
 			for (pAssoc = m_pHashTable[nHash];
 				pAssoc != NULL;
 				pAssoc = pAssoc->pNext) {
-				delete[] pAssoc->key;
+				delete[] (char *) pAssoc->key;
 			}
 		}
 	}
@@ -153,7 +153,7 @@ Dictionary::MyAssoc* Dictionary::NewAssoc()
 
 void Dictionary::FreeAssoc(Dictionary::MyAssoc* pAssoc)
 {
-	delete[] pAssoc->key;
+	delete[] (char *) pAssoc->key;
 	pAssoc->pNext = m_pFreeList;
 	m_pFreeList = pAssoc;
 	m_nCount--;
@@ -219,7 +219,7 @@ void Dictionary::SetAt(const char* key, unsigned int type, unsigned long value)
 		m_pHashTable[nHash] = pAssoc;
 	} else {
 		//keep the stuff consistent (we need only one key in case of duplications)
-		delete[] pAssoc->key; 
+		delete[] (char *) pAssoc->key; 
 		pAssoc->key = key;
 	}
 	pAssoc->type = type;

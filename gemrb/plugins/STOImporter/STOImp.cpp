@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.3 2004/04/13 23:26:23 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.4 2004/05/25 16:16:50 avenger_teambg Exp $
  *
  */
 
@@ -65,6 +65,7 @@ bool STOImp::Open(DataStream* stream, bool autoFree)
 
 Store* STOImp::GetStore()
 {
+  unsigned int i;
 	Store* s = new Store();
 
 	str->Read( &s->Type, 4 );
@@ -87,7 +88,7 @@ Store* STOImp::GetStore()
 	str->Read( &s->DrinksCount, 4 );
 	str->Read( s->RumoursTemple, 8 );
 	str->Read( &s->AvailableRooms, 4 );
-	for (int i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) {
 		str->Read( &s->RoomPrices[i], 4 );
 	}
 	str->Read( &s->CuresOffset, 4 );
@@ -99,24 +100,23 @@ Store* STOImp::GetStore()
 		str->Read( s->unknown3, 80 );
 	}
 
-
 	str->Seek( s->PurchasedCategoriesOffset, GEM_STREAM_START );
 	s->purchased_categories = GetPurchasedCategories( s );
 
 	str->Seek( s->ItemsOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < s->ItemsCount; i++) {
+	for (i = 0; i < s->ItemsCount; i++) {
 		STOItem* it = GetItem();
 		s->items.push_back( it );
 	}
 
 	str->Seek( s->DrinksOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < s->DrinksCount; i++) {
+	for (i = 0; i < s->DrinksCount; i++) {
 		STODrink* dr = GetDrink();
 		s->drinks.push_back( dr );
 	}
 
 	str->Seek( s->CuresOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < s->CuresCount; i++) {
+	for (i = 0; i < s->CuresCount; i++) {
 		STOCure* cu = GetCure();
 		s->cures.push_back( cu );
 	}

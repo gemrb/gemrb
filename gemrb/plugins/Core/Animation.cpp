@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.18 2004/03/27 11:49:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.19 2004/05/25 16:16:29 avenger_teambg Exp $
  *
  */
 
@@ -32,7 +32,7 @@ extern Interface* core;
 
 Animation::Animation(unsigned short* frames, int count)
 {
-	indices = new unsigned short[count];
+	indices = (unsigned short *) malloc(count * sizeof(unsigned short) );
 	indicesCount = count;
 	memcpy( indices, frames, count * sizeof( unsigned short ) );
 	if(count) {
@@ -44,7 +44,7 @@ Animation::Animation(unsigned short* frames, int count)
 	starttime = 0;
 	x = 0;
 	y = 0;
-	free = true;
+	autofree = true;
 	ChangePalette = true;
 	BlitMode = IE_NORMAL;
 	fps = 15;
@@ -60,8 +60,8 @@ Animation::Animation(unsigned short* frames, int count)
 
 Animation::~Animation(void)
 {
-	delete[] indices;
-	if (!free) {
+	free(indices);
+	if (!autofree) {
 		return;
 	}
 	for (unsigned int i = 0; i < frames.size(); i++) {

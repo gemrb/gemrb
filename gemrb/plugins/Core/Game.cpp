@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.46 2004/05/12 21:22:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.47 2004/05/25 16:16:29 avenger_teambg Exp $
  *
  */
 
@@ -361,20 +361,14 @@ int Game::DelMap(unsigned int index, bool forced)
 //FIXME: changepf is removed now
 int Game::LoadMap(const char* ResRef)
 {
+  unsigned int i;
 	int index = FindMap(ResRef);
 	if(index>=0) {
-/*
-		if (changepf) {
-			core->GetPathFinder()->SetMap( GetMap(index));
-		}
-*/
 		return index;
 	}
 	//check if the current area could be removed, 
 	//don't remove it if the pathfinder is still connected to it 
-//	if(changepf) {
-		DelMap( MapIndex, false );
-//	}
+	DelMap( MapIndex, false );
 
 	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
 	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef, IE_ARE_CLASS_ID );
@@ -384,17 +378,13 @@ int Game::LoadMap(const char* ResRef)
 	if (!newMap) {
 		return -1;
 	}
-/*
-	if (changepf) {
-		core->GetPathFinder()->SetMap( newMap );
-	}
-*/
-	for (unsigned int i = 0; i < PCs.size(); i++) {
+
+	for (i = 0; i < PCs.size(); i++) {
 		if (stricmp( PCs[i]->Area, ResRef ) == 0) {
 			newMap->AddActor( PCs[i] );
 		}
 	}
-	for (unsigned int i = 0; i < NPCs.size(); i++) {
+	for (i = 0; i < NPCs.size(); i++) {
 		if (stricmp( NPCs[i]->Area, ResRef ) == 0) {
 			newMap->AddActor( NPCs[i] );
 		}

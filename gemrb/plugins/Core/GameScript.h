@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.118 2004/05/09 17:36:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.119 2004/05/25 16:16:30 avenger_teambg Exp $
  *
  */
 
@@ -140,17 +140,19 @@ private:
 public:
 	void Dump()
 	{
+    int i;
+
 		if(objectName[0]) {
 			printf("Object: %s\n",objectName);
 			return;
 		}
 		printf("IDS Targeting: ");
-		for(int i=0;i<MAX_OBJECT_FIELDS;i++) {
+		for(i=0;i<MAX_OBJECT_FIELDS;i++) {
 			printf("%d ",objectFields[i]);
 		}
 		printf("\n");
 		printf("Filters: ");
-		for(int i=0;i<MAX_NESTING;i++) {
+		for(i=0;i<MAX_NESTING;i++) {
 			printf("%d ",objectFilters[i]);
 		}
 		printf("\n");

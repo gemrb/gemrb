@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.163 2004/05/09 17:36:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.164 2004/05/25 16:16:29 avenger_teambg Exp $
  *
  */
 
@@ -1099,16 +1099,18 @@ void GameScript::ParseString(const char*& src, char* tmp)
 
 Object* GameScript::DecodeObject(const char* line)
 {
+  int i;
+
 	Object* oB = new Object();
-	for (int i = 0; i < ObjectFieldsCount; i++) {
+	for (i = 0; i < ObjectFieldsCount; i++) {
 		oB->objectFields[i] = ParseInt( line );
 	}
-	for (int i = 0; i < MaxObjectNesting; i++) {
+	for (i = 0; i < MaxObjectNesting; i++) {
 		oB->objectFilters[i] = ParseInt( line );
 	}
 	if (HasAdditionalRect) {
 		line++; //Skip [
-		for (int i = 0; i < 4; i++) {
+		for (i = 0; i < 4; i++) {
 			oB->objectRect[i] = ParseInt( line );
 		}
 		line++; //Skip ] (not really... it skips a ' ' since the ] was skipped by the ParseInt function
@@ -1116,7 +1118,7 @@ Object* GameScript::DecodeObject(const char* line)
 	line++; //Skip "
 	ParseString( line, oB->objectName );
 	line++; //Skip " (the same as above)
-	for (int i = 0; i < ExtraParametersCount; i++) {
+	for (i = 0; i < ExtraParametersCount; i++) {
 		oB->objectFields[i + ObjectFieldsCount] = ParseInt( line );
 	}
 	return oB;
@@ -1195,6 +1197,8 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 
 int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
 {
+  int i;
+
 	switch(rS->responsesCount) {
 		case 0:
 			return 0;
@@ -1205,7 +1209,7 @@ int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
 	int randWeight;
 	int maxWeight = 0;
 
-	for (int i = 0; i < rS->responsesCount; i++) {
+	for (i = 0; i < rS->responsesCount; i++) {
 		maxWeight+=rS->responses[i]->weight;
 	}
 	if(maxWeight) {
@@ -1215,7 +1219,7 @@ int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
 		randWeight = 0;
 	}
 
-	for (int i = 0; i < rS->responsesCount; i++) {
+	for (i = 0; i < rS->responsesCount; i++) {
 		Response* rE = rS->responses[i];
 		if (rE->weight > randWeight) {
 			return ExecuteResponse( Sender, rE );
@@ -5978,7 +5982,7 @@ void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	tar->Active = parameters->int0Parameter;
+	tar->Active = (bool) parameters->int0Parameter;
 }
 
 void GameScript::Activate(Scriptable* Sender, Action* parameters)

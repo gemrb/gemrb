@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.42 2004/04/21 19:03:11 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.43 2004/05/25 16:16:25 avenger_teambg Exp $
  *
  */
 
@@ -203,10 +203,12 @@ int ACMImp::PlayListManager(void* data)
 
 ACMImp::ACMImp(void)
 {
-	for (int i = 0; i < MUSICBUFERS; i++)
+  unsigned int i;
+
+	for (i = 0; i < MUSICBUFERS; i++)
 		MusicBuffers[i] = 0;
 	MusicSource = 0;
-	for (int i = 0; i < MAX_STREAMS; i++) {
+	for (i = 0; i < MAX_STREAMS; i++) {
 		streams[i].free = true;
 	}
 	MusicReader = NULL;
@@ -284,6 +286,8 @@ bool ACMImp::Init(void)
 
 unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 {
+  unsigned int i;
+
 	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef, IE_WAV_CLASS_ID );
 	if (!stream) {
 		return 0;
@@ -301,7 +305,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 	ALenum error;
 	ALint state;
 
-	for (int i = 0; i < RETRY; i++) {
+	for (i = 0; i < RETRY; i++) {
 		alGenBuffers( 1, &Buffer );
 		if (( error = alGetError() ) == AL_NO_ERROR) {
 			break;
@@ -355,7 +359,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 		return 0;
 	}
 
-	for (int i = 0; i < MAX_STREAMS; i++) {
+	for (i = 0; i < MAX_STREAMS; i++) {
 		if (!streams[i].free) {
 			alGetSourcei( streams[i].Source, AL_SOURCE_STATE, &state );
 			if (state == AL_STOPPED) {

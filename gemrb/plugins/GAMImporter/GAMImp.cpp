@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.25 2004/04/17 11:28:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.26 2004/05/25 16:16:32 avenger_teambg Exp $
  *
  */
 
@@ -84,12 +84,13 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 
 Game* GAMImp::GetGame()
 {
-	Game* newGame = new Game();
+  unsigned int i;
 
+	Game* newGame = new Game();
 
 	str->Read( &newGame->GameTime, 4 );
 	str->Read( &newGame->WhichFormation, 2 );
-	for (int i = 0; i < 5; i++) {
+	for (i = 0; i < 5; i++) {
 		str->Read( &newGame->Formations[i], 2 );
 	}
 	str->Read( &newGame->PartyGold, 4 );
@@ -152,14 +153,14 @@ Game* GAMImp::GetGame()
 
 	//Loading PCs
 	ActorMgr* aM = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
-	for (unsigned int i = 0; i < newGame->PCCount; i++) {
+	for (i = 0; i < newGame->PCCount; i++) {
 		str->Seek( newGame->PCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, true );
 		newGame->SetPC( actor );
 	}
 
 	//Loading NPCs
-	for (unsigned int i = 0; i < newGame->NPCCount; i++) {
+	for (i = 0; i < newGame->NPCCount; i++) {
 		str->Seek( newGame->NPCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, false );
 		newGame->AddNPC( actor );
@@ -168,7 +169,7 @@ Game* GAMImp::GetGame()
 
 	//Loading GLOBALS
 	str->Seek( newGame->GLOBALOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < newGame->GLOBALCount; i++) {
+	for (i = 0; i < newGame->GLOBALCount; i++) {
 		char Name[33];
 		unsigned long Value;
 		str->Read( Name, 32 );
@@ -181,7 +182,7 @@ Game* GAMImp::GetGame()
 
 	//Loading Journal entries
 	str->Seek( newGame->JournalOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < newGame->JournalCount; i++) {
+	for (i = 0; i < newGame->JournalCount; i++) {
 		GAMJournalEntry* je = GetJournalEntry();
 		newGame->AddJournalEntry( je );
 	}
@@ -199,9 +200,9 @@ Game* GAMImp::GetGame()
 
 Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 {
+  unsigned int i;
 	PCStruct pcInfo;
 	Actor* actor;
-
 
 	str->Read( &pcInfo.Unknown0, 2 );
 	str->Read( &pcInfo.PartyOrder, 2 );
@@ -215,14 +216,14 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	str->Read( &pcInfo.ViewXPos, 2 );
 	str->Read( &pcInfo.ViewYPos, 2 );
 	str->Read( &pcInfo.Unknown28, 100 );
-	for (int i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) {
 		str->Read( &pcInfo.QuickWeaponSlot[i], 2 );
 	}
 	str->Read( &pcInfo.Unknown94, 8 );
-	for (int i = 0; i < 3; i++) {
+	for (i = 0; i < 3; i++) {
 		str->Read( &pcInfo.QuickSpellResRef[i], 8 );
 	}
-	for (int i = 0; i < 3; i++) {
+	for (i = 0; i < 3; i++) {
 		str->Read( &pcInfo.QuickItemSlot[i], 2 );
 	}
 	str->Read( &pcInfo.UnknownBA, 6 );
