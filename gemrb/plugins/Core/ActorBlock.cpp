@@ -95,6 +95,8 @@ void Scriptable::SetScriptName(char * text)
 
 void Scriptable::ExecuteScript(GameScript * Script)
 {
+	if(actionQueue.size())
+		return;
 	Script->Update();
 }
 
@@ -133,6 +135,7 @@ Action * Scriptable::PopNextAction()
 void Scriptable::ClearActions()
 {
 	if(CurrentAction) {
+		//CurrentAction->Release();
 		CurrentAction = NULL;
 	}
 	for(int i = 0; i < actionQueue.size(); i++) {
