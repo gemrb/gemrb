@@ -15,12 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.h,v 1.2 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.h,v 1.3 2003/12/09 18:57:57 balrog994 Exp $
  *
  */
 
 #ifndef SPRITE2D_H
 #define SPRITE2D_H
+
+#include "../../includes/RGBAColor.h"
 
 #ifdef WIN32
 
@@ -39,6 +41,7 @@ class GEM_EXPORT Sprite2D
 public:
 	void * vptr;		//Pointer to the Driver Video Structure
 	void * pixels;
+	Color * palette;
 	int XPos, YPos, Width, Height;
 	Sprite2D(void);
 	~Sprite2D(void);
