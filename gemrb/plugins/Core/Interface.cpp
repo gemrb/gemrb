@@ -273,6 +273,7 @@ int Interface::Init()
 		printStatus("ERROR", LIGHT_RED);
 		return GEM_ERROR;
 	}
+	vars->SetType(GEM_VARIABLES_INT);
 	printStatus("OK", LIGHT_GREEN);
 
 	printMessage("Core", "Initializing Token Dictionary...", WHITE);

@@ -244,7 +244,7 @@ bool Variables::Lookup(const char *key, char *dest, int MaxLength) const
 bool Variables::Lookup(const char *key, unsigned long& rValue) const
 {
 	unsigned int nHash;
-	MYASSERT(m_type==GEM_VARIABLES_INT);
+//	MYASSERT(m_type==GEM_VARIABLES_INT); //we could look up pointers, hey!
 	Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL)
 		return false;  // not in map

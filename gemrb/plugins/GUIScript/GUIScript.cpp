@@ -762,7 +762,7 @@ static PyObject * GemRB_SetToken(PyObject *self, PyObject *args)
 
 	char *newvalue = (char *) malloc(strlen(value)+1);  //duplicating the string
 	strcpy(newvalue, value);
-	core->GetDictionary()->SetAt(Variable, newvalue);
+	core->GetTokenDictionary()->SetAt(Variable, newvalue);
 
 	Py_INCREF(Py_None);
 	return Py_None;
