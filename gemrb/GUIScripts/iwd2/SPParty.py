@@ -52,7 +52,7 @@ def ScrollBarPress():
 		if ActPos<PartyCount:
 			GemRB.SetButtonState(PartySelectWindow, Button, IE_GUI_BUTTON_ENABLED)
 			Tag = "Party " + str(ActPos)
-			PartyDesc = GemRB.GetINIPartyKey(Tag, "Name", "Not Found")
+			PartyDesc = GemRB.GetINIPartyKey(Tag, "Name", "")					
 			GemRB.SetText(PartySelectWindow, Button, PartyDesc)
 		else:
 			GemRB.SetButtonState(PartySelectWindow, Button, IE_GUI_BUTTON_DISABLED)
@@ -69,6 +69,13 @@ def PartyButtonPress():
 	global PartySelectWindow, TextArea
 	i = GemRB.GetVar("PartyIdx") + GemRB.GetVar("TopIndex")
 	Tag = "Party " + str(i)
-	PartyDesc = GemRB.GetINIPartyKey(Tag, "Descr1", "Not Found")
+	PartyDesc = ""
+	for j in range(1, 9):
+		Key = "Descr" + str(j)
+		NewString = GemRB.GetINIPartyKey(Tag, Key, "")
+		if NewString != "":
+			NewString = NewString + "\n\n"
+			PartyDesc = PartyDesc + NewString
+	
 	GemRB.SetText(PartySelectWindow, TextArea, PartyDesc)
 	return
