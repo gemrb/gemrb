@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.279 2005/03/05 10:50:59 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.280 2005/03/05 18:15:48 avenger_teambg Exp $
  *
  */
 
@@ -3453,8 +3453,9 @@ static int storebuttons[6][4]={
 {STA_CURE, STA_DONATE|STA_OPTIONAL,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL},
 {STA_BUYSELL,-1,-1,-1,},{STA_BUYSELL,-1,-1,-1} };
 
-//buy/sell, identify, steal, cure, donate, drink
-static int storebits[6]={3,4,8,0x10,0x20,0x40};
+//buy/sell, identify, steal, cure, donate, drink, rent
+static int storebits[7]={IE_STORE_BUY|IE_STORE_SELL,IE_STORE_ID,IE_STORE_STEAL,
+IE_STORE_CURE,IE_STORE_DONATE,IE_STORE_DRINK,IE_STORE_RENT};
 
 static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 {
@@ -3527,7 +3528,8 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current store!");
 	}
 	if (index>=(int) store->DrinksCount) {
-		return RuntimeError("Wrong index!");
+		Py_INCREF( Py_None );
+		return Py_None;
 	}
 	PyObject* dict = PyDict_New();
 	STODrink *drink=store->GetDrink(index);
@@ -3590,7 +3592,8 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current store!");
 	}
 	if (index>=(int) store->CuresCount) {
-		return RuntimeError("Wrong index!");
+		Py_INCREF( Py_None );
+		return Py_None;
 	}
 	PyObject* dict = PyDict_New();
 	STOCure *cure=store->GetCure(index);

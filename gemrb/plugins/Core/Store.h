@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.8 2005/03/03 22:33:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.9 2005/03/05 18:15:52 avenger_teambg Exp $
  *
  */
 
@@ -50,11 +50,12 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
 #define IE_STORE_SELL    2
 #define IE_STORE_ID      4
 #define IE_STORE_STEAL   8
-#define IE_STORE_CURE    16
-#define IE_STORE_DONATE  32
+#define IE_STORE_DONATE  16     //gemrb extension
+#define IE_STORE_CURE    32
 #define IE_STORE_DRINK   64
-
-#define IE_STORE_FENCE   0x200
+#define IE_STORE_RENT    128    //gemrb extension
+#define IE_STORE_QUALITY 0x600  //2 bits
+#define IE_STORE_FENCE   0x2000 //
 
 typedef struct STOItem {
 	ieResRef ItemResRef;
