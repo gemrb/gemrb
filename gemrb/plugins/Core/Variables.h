@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.12 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.13 2003/12/03 18:34:58 doc_wagon Exp $
  *
  */
 
@@ -67,7 +67,8 @@ public:
 //you should set this only on an empty mapping
 inline int ParseKey(int arg) {
         MYASSERT(m_nCount==0);
-        m_lParseKey=arg;
+        m_lParseKey=(arg > 0);
+        return 0;
 }
 //sets the way we handle values
 inline void SetType(int type)
