@@ -42,6 +42,8 @@ public:
 	void SetMovingActor(Actor * actor);
 	void SetCutScene(GameScript * script);
 	void SetScreenShake(unsigned long shakeX, unsigned long shakeY, unsigned long Count);
+public:
+	bool CutSceneMode;
 };
 
 #endif

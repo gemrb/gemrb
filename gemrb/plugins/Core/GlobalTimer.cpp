@@ -46,27 +46,24 @@ void GlobalTimer::Update()
 				}
 			}
 		}
-		if(MovingActor && MovingActor->path)
-			return;
-		if(waitCounter) {
-			waitCounter--;
-			return;
-		}
+		//if(MovingActor && MovingActor->path)
+		//	return;
+		//if(waitCounter) {
+		//	waitCounter--;
+		//	return;
+		//}
 		GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);
 		if(gc->ControlType == IE_GUI_GAMECONTROL) {
 			if(gc->Dialogue)
 				return;
 		}
-		MovingActor = NULL;
+		//MovingActor = NULL;
 		if(CutScene) {
-			if(!CutScene->endReached) {
-				printf("Running CutScene\n");
-				CutScene->Update();
-			}
-			else {
+			if(CutScene->endReached) {
 				printf("CutScene End\n");
 				delete(CutScene);
 				CutScene = NULL;
+				CutSceneMode = false;
 			}
 			return;
 		}
@@ -105,7 +102,7 @@ void GlobalTimer::SetCutScene(GameScript * script)
 	CutScene = script;
 	if(CutScene) {
 		CutScene->Update(); //Caches the Script
-		CutScene->Update(); //Executes the Script
+		CutSceneMode = true;
 		return;
 	}
 }
