@@ -512,22 +512,25 @@ Door::~Door(void)
 
 void Door::ToggleTiles(bool playsound)
 {
-	unsigned char state = ( closedIndex == 1 ) ? 0 : 1;
+	int state;
+
 	if (Flags&1) {
+		state = closedIndex;
 		if (playsound && ( OpenSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( OpenSound );
 		XPos = open->BBox.x + ( open->BBox.w / 2 );
 		YPos = open->BBox.y + ( open->BBox.h / 2 );
 	} else {
+		state = !closedIndex;
 		if (playsound && ( CloseSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( CloseSound );
 		XPos = closed->BBox.x + ( closed->BBox.w / 2 );
 		YPos = closed->BBox.y + ( closed->BBox.h / 2 );
 	}
-	Flags ^=1;
 	for (int i = 0; i < count; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = state;
 	}
+	Flags ^=1;
 }
 
 void Door::SetName(char* Name)
@@ -616,9 +619,9 @@ void Door::SetCursor(unsigned char CursorIndex)
 void Door::DebugDump()
 {
 	printf( "Debugdump of Door %s:\n", Name );
-	printf( "DoorClosed: %s\n", Flags&1 ? "Yes":"No");
-	printf( "DoorLocked: %s\n", Flags&2 ? "Yes":"No");
-	printf( "DoorTrapped: %s\n", Flags&4 ? "Yes":"No");
+	printf( "Door Closed: %s\n", Flags&1 ? "Yes":"No");
+	printf( "Door Locked: %s\n", Flags&2 ? "Yes":"No");
+	printf( "Door Trapped: %s\n", Flags&4 ? "Yes":"No");
 	printf( "Trap removable: %s\n", Flags&8 ? "Yes":"No");
 }
 

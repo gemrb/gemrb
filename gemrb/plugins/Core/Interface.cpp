@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.146 2004/03/28 14:29:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.147 2004/04/03 10:14:20 avenger_teambg Exp $
  *
  */
 
@@ -1751,14 +1751,6 @@ bool Interface::LoadINI(const char* filename)
 	}
 	fclose( config );
 	return true;
-}
-
-int Interface::LoadScript(const char* ResRef)
-{
-	//DataStream * dS = core->GetResourceMgr()->GetResource(ResRef, IE_BCS_CLASS_ID);
-	//return script->CacheScript(dS, ResRef);
-	return -1;
-	//The DataStream is automatically freed by the Script Engine
 }
 
 void Interface::SetGameVariable(const char* VarName, const char* Context,

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.122 2004/03/29 23:41:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.123 2004/04/03 10:14:20 avenger_teambg Exp $
  *
  */
 
@@ -52,7 +52,7 @@ static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
-static int InDebug = 1;
+static int InDebug = 0;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -4486,6 +4486,8 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		if(door->Flags&2) {
 			//playsound unsuccessful opening of door
 			core->GetSoundMgr()->Play("AMB_D06");
+			//temp. hack
+			door->SetDoorClosed( false, true );
 		}
 		else {
 			door->SetDoorClosed( false, true );
@@ -5280,7 +5282,7 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	//i think it is bit 15
+	//i think it is bit 15 of the multi-class flags
 	actor->SetStat(IE_MC_FLAGS,actor->GetStat(IE_MC_FLAGS)|32768);
 }
 
@@ -5305,7 +5307,7 @@ void GameScript::BitGlobal(Scriptable* Sender, Action* parameters)
 			value = ( value| parameters->int0Parameter );
 		case BM_XOR:
 			value = ( value^ parameters->int0Parameter );
-		case BM_NAND:
+		case BM_NAND: //this is a GemRB extension
 			value = ( value& ~parameters->int0Parameter );
 	}
 	SetVariable(Sender, parameters->string0Parameter, value);
@@ -5322,7 +5324,7 @@ void GameScript::GlobalBitGlobal(Scriptable* Sender, Action* parameters)
 			value1 = ( value1| value2);
 		case BM_XOR:
 			value1 = ( value1^ value2);
-		case BM_NAND:
+		case BM_NAND: //this is a GemRB extension
 			value1 = ( value1& ~value2);
 	}
 	SetVariable(Sender, parameters->string0Parameter, value1);
@@ -5348,6 +5350,7 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 
 void GameScript::Debug(Scriptable* Sender, Action* parameters)
 {
+	InDebug=1;
 	printMessage("IEScript",parameters->string0Parameter,YELLOW);
 }
 
