@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.8 2004/02/08 11:49:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.9 2004/02/19 22:50:28 edheldil Exp $
  *
  */
 
@@ -61,6 +61,7 @@ typedef struct GameStruct {
 	int  LowerLabelText;
 	int  HasPartyINI;
 	int  ForceStereo;
+        int  IgnoreButtonFrames;
 	char CursorBAM[9];
 	char GameDataPath[_MAX_PATH];
 	char GameOverridePath[_MAX_PATH];
@@ -316,6 +317,7 @@ void InitGames()
 		1,					//LowerLabelText		
 		0,					//HasPartyINI
 		1,					//ForceStereo
+		0,                                      //IgnoreButtonFrames
 		"CAROT",			//CursorBAM
 		"",					//GameDataPath
 		"",					//GameOverridePath
@@ -351,6 +353,7 @@ void InitGames()
 		1,					//LowerLabelText		
 		0,					//HasPartyINI
 		0,					//ForceStereo
+		0,                                      //IgnoreButtonFrames
 		"CAROT",			//CursorBAM
 		"",					//GameDataPath
 		"",					//GameOverridePath
@@ -385,6 +388,7 @@ void InitGames()
 		1,					//LowerLabelText		
 		0,					//HasPartyINI
 		0,					//ForceStereo
+		0,                                      //IgnoreButtonFrames
 		"CAROT",			//CursorBAM
 		"",					//GameDataPath
 		"",					//GameOverridePath
@@ -420,6 +424,7 @@ void InitGames()
 		0,					//LowerLabelText		
 		0,					//HasPartyINI
 		1,					//ForceStereo
+		0,                                      //IgnoreButtonFrames
 		"CAROT",			//CursorBAM
 		"",					//GameDataPath
 		"",					//GameOverridePath
@@ -455,6 +460,7 @@ void InitGames()
 		0,					//LowerLabelText		
 		1,					//HasPartyINI
 		0,					//ForceStereo
+		0,                                      //IgnoreButtonFrames
 		"CAROT",			//CursorBAM
 		"",					//GameDataPath
 		"",					//GameOverridePath
@@ -490,6 +496,7 @@ void InitGames()
 		0,					//LowerLabelText		
 		0,					//HasPartyINI
 		1,					//ForceStereo
+		0,                                      //IgnoreButtonFrames
 		"CAROT",			//CursorBAM
 		"",					//GameDataPath
 		"",					//GameOverridePath
@@ -525,6 +532,7 @@ void InitGames()
 		0,					//LowerLabelText		
 		0,					//HasPartyINI
 		1,					//ForceStereo
+		1,                                      //IgnoreButtonFrames
 		"CARET",			//CursorBAM
 		"",					//GameDataPath
 		"",					//GameOverridePath
@@ -608,6 +616,7 @@ int WriteConfig(GameStruct * game, char * file)
 	fprintf(c, "LowerLabelText=%d\n", game->LowerLabelText);
 	fprintf(c, "HasPartyINI=%d\n", game->HasPartyINI);
 	fprintf(c, "ForceStereo=%d\n", game->ForceStereo);
+	fprintf(c, "IgnoreButtonFrames=%d\n", game->IgnoreButtonFrames);
 	fprintf(c, "CursorBAM=%s\n", game->CursorBAM);
 	if(game->ButtonFont[0] != 0)
 		fprintf(c, "ButtonFont=%s\n", game->ButtonFont);

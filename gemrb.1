@@ -140,6 +140,13 @@ Set this parameter to
 on Unix-like systems.
 
 .TP
+.BR IgnoreButtonFrames =(0|1)
+Buttons in PS:T usually have zeros for frame indices for selected and
+disabled states (which should usually be 2 and 3). Setting this to
+.IR 1 .
+makes GemRB ignore the zeroed indices and just use 2 and 3.
+
+.TP
 .BR CachePath =PATH
 User-writable directory where the engine caches uncompressed and temporary
 files.
