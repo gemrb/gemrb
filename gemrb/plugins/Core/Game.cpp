@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.30 2004/04/13 19:38:22 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.31 2004/04/14 15:11:13 avenger_teambg Exp $
  *
  */
 
@@ -34,6 +34,7 @@ Game::Game(void)
 	SetScript( core->GlobalScript, 0 );
 	MapIndex = -1;
 	SelectedSingle = 0;
+	globals = NULL;
 }
 
 Game::~Game(void)
@@ -46,6 +47,9 @@ Game::~Game(void)
 	}
 	for (size_t i = 0; i < NPCs.size(); i++) {
 		delete( NPCs[i] );
+	}
+	if (globals) {
+		delete globals;
 	}
 }
 
