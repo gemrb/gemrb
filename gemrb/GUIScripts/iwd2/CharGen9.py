@@ -148,8 +148,21 @@ def NextPress():
 	t=GemRB.GetTableValue(TmpTable,t,0)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
 	TmpTable=GemRB.LoadTable("strtgold")
-	t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,0),GemRB.GetTableValue(TmpTable,Class,1),0 )
-	GemRB.SetPlayerStat(MyChar, IE_GOLD, t*2)
+	a = GemRB.GetTableValue(TmpTable, Class, 1) #number of dice
+	b = GemRB.GetTableValue(TmpTable, Class, 0) #size
+	c = GemRB.GetTableValue(TmpTable, Class, 2) #adjustment
+	d = GemRB.GetTableValue(TmpTable, Class, 3) #external multiplier
+	e = GemRB.GetTableValue(TmpTable, Class, 4) #level bonus rate
+	t = GemRB.GetPlayerStat(IE_LEVEL) #FIXME: calculate multiclass average
+	if t>1:
+		e=e*(t-1)
+	else:
+		e=0
+	GemRB.UnloadTable(TmpTable)
+	t = GemRB.Roll(a,b,c)*d+e
+	GemRB.SetPlayerStat(MyChar, IE_GOLD, t)
+	GemRB.UnloadTable(TmpTable)
+	#t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,0),GemRB.GetTableValue(TmpTable,Class,1),0 )*2
 	GemRB.SetPlayerStat(MyChar, IE_HATEDRACE, GemRB.GetVar("HatedRace") )
 	TmpTable=GemRB.LoadTable("ability")
 	AbilityCount = GemRB.GetTableRowCount(TmpTable)

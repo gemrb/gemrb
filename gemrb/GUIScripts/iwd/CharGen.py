@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.22 2004/10/23 15:25:16 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.23 2004/12/04 12:35:21 avenger_teambg Exp $
 
 
 #Character Generation
@@ -289,15 +289,30 @@ def AcceptPress():
 	GemRB.CreatePlayer("charbase", MyChar)
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
-	GemRB.SetPlayerStat(MyChar, IE_CLASS, GemRB.GetVar("Class") )
 	GemRB.SetPlayerStat(MyChar, IE_KIT, 0x4000)
 	t = GemRB.GetVar("Alignment")
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
 	TmpTable = GemRB.LoadTable("repstart")
 	t = GemRB.FindTableValue(AlignmentTable, 3, t)
 	t = GemRB.GetTableValue(TmpTable, t, 0)
+	GemRB.UnloadTable(TmpTable)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
+	t = GemRB.GetVar("Class")
+	GemRB.SetPlayerStat(MyChar, IE_CLASS, t)
 	TmpTable = GemRB.LoadTable("strtgold")
+	a = GemRB.GetTableValue(TmpTable, t, 1) #number of dice
+	b = GemRB.GetTableValue(TmpTable, t, 0) #size
+	c = GemRB.GetTableValue(TmpTable, t, 2) #adjustment
+	d = GemRB.GetTableValue(TmpTable, t, 3) #external multiplier
+	e = GemRB.GetTableValue(TmpTable, t, 4) #level bonus rate
+	t = GemRB.GetPlayerStat(IE_LEVEL) #FIXME: calculate multiclass average
+	if t>1:
+		e=e*(t-1)
+	else:
+		e=0
+	GemRB.UnloadTable(TmpTable)
+	t = GemRB.Roll(a,b,c)*d+e
+	GemRB.SetPlayerStat(MyChar, IE_GOLD, t)
 	GemRB.SetPlayerStat(MyChar, IE_EA, 2 )
 	Str = GemRB.GetVar("Ability 1")
 	GemRB.SetPlayerStat(MyChar, IE_STR, Str)
@@ -1871,12 +1886,12 @@ def ApperanceDrawAvatar():
 	global AppearanceAvatarButton, RaceTable, ClassTable
 	AppearanceAvatarTable = GemRB.LoadTable("PDOLLS")
 	AvatarID = 0x5000
-        table = GemRB.LoadTable("AVPREFR")
-        AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Race"),0)
-        table = GemRB.LoadTable("AVPREFC")
-        AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Class"),0)
-        table = GemRB.LoadTable("AVPREFG")
-        AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
+	table = GemRB.LoadTable("AVPREFR")
+	AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Race"),0)
+	table = GemRB.LoadTable("AVPREFC")
+	AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Class"),0)
+	table = GemRB.LoadTable("AVPREFG")
+	AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
 
 	AvatarRef = GemRB.GetTableValue(AppearanceAvatarTable, hex(AvatarID), "LEVEL1")
 	GemRB.SetButtonBAM(AppearanceWindow, AppearanceAvatarButton, AvatarRef, 0, 0, 0)
