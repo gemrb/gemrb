@@ -32,7 +32,9 @@ private:
 	int MapIndex;
 	ActorBlock * lastActor;
 	std::vector<ActorBlock*> selected;
+	std::vector<ActorBlock*> highlighted;
 	bool DrawSelectionRect;
+	bool MouseIsDown;
 	Region SelectionRect;
 	unsigned short StartX, StartY;
 public: //Events

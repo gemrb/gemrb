@@ -9,6 +9,7 @@ GameControl::GameControl(void)
 	MapIndex = -1;
 	Changed = true;
 	lastActor = NULL;
+	MouseIsDown = false;
 	DrawSelectionRect = false;
 }
 
@@ -63,6 +64,12 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 {
 	unsigned short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
+	if(MouseIsDown && (!DrawSelectionRect)) {
+	if((abs(GameX-StartX) > 5) || (abs(GameY-StartY) > 5))
+		DrawSelectionRect = true;
+	}
+	Game * game = core->GetGame();
+	Map * area = game->GetMap(MapIndex);
 	if(DrawSelectionRect) {
 		if(GameX < SelectionRect.x) {
 			SelectionRect.w = StartX-GameX;
@@ -80,11 +87,21 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			SelectionRect.y = StartY;
 			SelectionRect.h = GameY-SelectionRect.y;
 		}
+		ActorBlock ** ab;
+		int count = area->GetActorInRect(ab, SelectionRect);
+		if(count != 0) {
+			for(int i = 0; i < highlighted.size(); i++)
+				highlighted[i]->actor->anims->DrawCircle = false;
+			highlighted.clear();
+			for(int i = 0; i < count; i++) {
+				ab[i]->actor->anims->DrawCircle = true;
+				highlighted.push_back(ab[i]);
+			}
+		}
+		free(ab);
 		//TODO: Check if an actor is inside the rect
 	}
 	else {
-		Game * game = core->GetGame();
-		Map * area = game->GetMap(MapIndex);
 		ActorBlock * actor = area->GetActor(GameX, GameY);
 		if(lastActor)
 			lastActor->actor->anims->DrawCircle = false;
@@ -101,7 +118,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char 
 {
 	unsigned short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
-	DrawSelectionRect = true;
+	MouseIsDown = true;
 	SelectionRect.x = GameX;
 	SelectionRect.y = GameY;
 	StartX = GameX;
@@ -112,19 +129,41 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char 
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	DrawSelectionRect = false;
+	MouseIsDown = false;
 	unsigned short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
-	ActorBlock * actor = area->GetActor(GameX, GameY);
-	for(int i = 0; i < selected.size(); i++)
-		selected[i]->Selected = false;
-	selected.clear();
-	if(!actor)
-		return;
-	selected.push_back(actor);
-	actor->Selected = true;
+	if(!DrawSelectionRect) {
+		ActorBlock * actor = area->GetActor(GameX, GameY);
+		for(int i = 0; i < selected.size(); i++)
+			selected[i]->Selected = false;
+		selected.clear();
+		if(!actor)
+			return;
+		selected.push_back(actor);
+		actor->Selected = true;
+	}
+	else {
+		ActorBlock ** ab;
+		int count = area->GetActorInRect(ab, SelectionRect);
+		for(int i = 0; i < highlighted.size(); i++)
+			highlighted[i]->actor->anims->DrawCircle = false;
+		highlighted.clear();
+		for(int i = 0; i < selected.size(); i++) {
+			selected[i]->Selected = false;
+			selected[i]->actor->anims->DrawCircle = false;
+		}
+		selected.clear();
+		if(count != 0) {
+			for(int i = 0; i < count; i++) {
+				ab[i]->Selected = true;
+				selected.push_back(ab[i]);
+			}
+		}
+		free(ab);
+	}
+	DrawSelectionRect = false;
 }
 /** Special Key Press */
 void GameControl::OnSpecialKeyPress(unsigned char Key)
