@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.27 2004/01/01 15:45:07 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.28 2004/01/02 00:53:02 balrog994 Exp $
  *
  */
 
@@ -94,6 +94,10 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[127] = CutSceneId;
 		instant[127] = true;
 		actions[137] = StartDialogue;
+		actions[143] = OpenDoor;
+		blocking[143] = true;
+		actions[144] = CloseDoor;
+		blocking[144] = true;
 		actions[151] = DisplayString;
 		actions[153] = ChangeAllegiance;
 		actions[154] = ChangeGeneral;
@@ -375,6 +379,8 @@ Response * GameScript::ReadResponse(DataStream * stream)
 	std::vector<Action*> aCv;
 	while(true) {
 		Action * aC = new Action();
+		aC->autoFree = false;
+		aC->delayFree = false;
 		count = stream->ReadLine(line, 1024);
 		aC->actionID = 0;
 		for(int i = 0; i < count; i++) {
@@ -509,27 +515,57 @@ void GameScript::ExecuteAction(Scriptable * Sender, Action * aC)
 	}
 	if(!blocking[aC->actionID])
 		Sender->CurrentAction = NULL;
+	if(aC->autoFree) {
+		if(aC->delayFree)
+			aC->delayFree = false;
+		else {
+			if(aC->string0Parameter)
+				free(aC->string0Parameter);
+			if(aC->string1Parameter)
+				free(aC->string1Parameter);
+			for(int c = 0; c < 3; c++) {
+				Object * oB = aC->objects[c];
+				if(oB) {
+					if(oB->objectName)
+						free(oB->objectName);
+					delete(oB);
+				}
+			}
+			delete(aC);
+		}
+	}
+}
+
+Action* GameScript::CreateAction(char *string, bool autoFree)
+{
+	Action * aC = GenerateAction(string);
+	if(aC) {
+		aC->autoFree = autoFree;
+		aC->delayFree = false;
+	}
+	return aC;
 }
 
 Scriptable * GameScript::GetActorFromObject(Scriptable * Sender, Object * oC)
 {
 	//TODO: Implement Object Retieval
-
-	if(oC->objectName[0] != 0) {
-		printf("ActionOverride on %s\n", oC->objectName);
-		Map * map = core->GetGame()->GetMap(0);
-		return map->GetActor(oC->objectName);
-	}
-	else {
-		if(oC->genderField != 0) {
-			switch(oC->genderField) {
-				case 21:
-					return core->GetGame()->GetPC(0);
-				break;
-				
-				case 17:
-					return Sender->LastTrigger;
-				break;
+	if(oC) {
+		if(oC->objectName[0] != 0) {
+			//printf("ActionOverride on %s\n", oC->objectName);
+			Map * map = core->GetGame()->GetMap(0);
+			return map->GetActor(oC->objectName);
+		}
+		else {
+			if(oC->genderField != 0) {
+				switch(oC->genderField) {
+					case 21:
+						return core->GetGame()->GetPC(0);
+					break;
+					
+					case 17:
+						return Sender->LastTrigger;
+					break;
+				}
 			}
 		}
 	}
@@ -567,36 +603,25 @@ unsigned char GameScript::GetOrient(short sX, short sY, short dX, short dY)
 	return 0;
 }
 
-void GameScript::ExecuteString(char * String)
+void GameScript::ExecuteString(Scriptable * Sender, char * String)
 {
 	if(String[0] == 0)
 		return;
 	Action * act = GenerateAction(String);
 	if(!act)
 		return;
-	ExecuteAction(this->MySelf, act);
-	if(act->string0Parameter)
-		free(act->string0Parameter);
-	if(act->string1Parameter)
-		free(act->string1Parameter);
-	for(int c = 0; c < 3; c++) {
-		Object * oB = act->objects[c];
-		if(oB) {
-			if(oB->objectName)
-				free(oB->objectName);
-			delete(oB);
-		}
-	}
-	delete(act);
+	act->autoFree = true;
+	Sender->CurrentAction = act;
+	ExecuteAction(Sender, act);
 	return;
 }
 
-bool GameScript::EvaluateString(char * String)
+bool GameScript::EvaluateString(Scriptable * Sender, char * String)
 {
 	if(String[0] == 0)
 		return false;
 	Trigger * tri = GenerateTrigger(String);
-	bool ret = EvaluateTrigger(this->MySelf, tri);
+	bool ret = EvaluateTrigger(Sender, tri);
 	if(tri->flags&1)
 		ret = !ret;
 	if(tri->string0Parameter)
@@ -1355,6 +1380,7 @@ void GameScript::Enemy(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1371,6 +1397,7 @@ void GameScript::Ally(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1385,6 +1412,7 @@ void GameScript::Wait(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1398,6 +1426,7 @@ void GameScript::SmallWait(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1429,6 +1458,7 @@ void GameScript::MoveToPoint(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1449,6 +1479,7 @@ void GameScript::MoveToObject(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1466,6 +1497,7 @@ void GameScript::DisplayStringHead(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1485,6 +1517,7 @@ void GameScript::Face(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1502,6 +1535,7 @@ void GameScript::FaceObject(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1523,6 +1557,7 @@ void GameScript::DisplayStringWait(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1566,6 +1601,7 @@ void GameScript::PlaySound(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1582,6 +1618,7 @@ void GameScript::CreateVisualEffectObject(Scriptable * Sender, Action * paramete
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1607,6 +1644,7 @@ void GameScript::DestroySelf(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1642,6 +1680,7 @@ void GameScript::Dialogue(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1694,6 +1733,7 @@ void GameScript::StartDialogue(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1711,5 +1751,89 @@ void GameScript::StartDialogue(Scriptable * Sender, Action * parameters)
 		if(gc->ControlType == IE_GUI_GAMECONTROL)
 			gc->InitDialog(actor, target, dm->GetDialog());
 		core->FreeInterface(dm);
+	}
+}
+
+void GameScript::OpenDoor(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Scriptable * tar = core->GetGame()->GetMap(0)->tm->GetDoor(parameters->objects[1]->objectName);
+	if(!tar)
+		return;
+	if(tar->Type != ST_DOOR)
+		return;
+	Door * door = (Door*)tar;
+	Actor * actor = (Actor*)scr;
+	long x = (actor->XPos - door->XPos);
+	long y = (actor->YPos - door->YPos);
+	double distance = sqrt((x*x)+(y*y));		
+	if(distance <= 128) {
+		door->SetDoorClosed(false, true);
+		Sender->CurrentAction = NULL;
+	} else {
+		Sender->AddActionInFront(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
+		long x1 = (actor->XPos - door->toOpen[0].x);
+		long y1 = (actor->YPos - door->toOpen[0].y);
+		double distance1 = sqrt((x1*x1)+(y1*y1));
+		long x2 = (actor->XPos - door->toOpen[1].x);
+		long y2 = (actor->YPos - door->toOpen[1].y);
+		double distance2 = sqrt((x2*x2)+(y2*y2));
+		if(distance1 < distance2)
+			actor->WalkTo(door->toOpen[0].x, door->toOpen[0].y);
+		else
+			actor->WalkTo(door->toOpen[1].x, door->toOpen[1].y);
+	}
+}
+
+void GameScript::CloseDoor(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Scriptable * tar = core->GetGame()->GetMap(0)->tm->GetDoor(parameters->objects[1]->objectName);
+	if(!tar)
+		return;
+	if(tar->Type != ST_DOOR)
+		return;
+	Door * door = (Door*)tar;
+	Actor * actor = (Actor*)scr;
+	long x = (actor->XPos - door->XPos);
+	long y = (actor->YPos - door->YPos);
+	double distance = sqrt((x*x)+(y*y));		
+	if(distance <= 100) {
+		door->SetDoorClosed(true, true);
+		Sender->CurrentAction = NULL;
+	} else {
+		Sender->AddActionInFront(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
+		long x1 = (actor->XPos - door->toOpen[0].x);
+		long y1 = (actor->YPos - door->toOpen[0].y);
+		double distance1 = sqrt((x1*x1)+(y1*y1));
+		long x2 = (actor->XPos - door->toOpen[1].x);
+		long y2 = (actor->YPos - door->toOpen[1].y);
+		double distance2 = sqrt((x2*x2)+(y2*y2));
+		if(distance1 < distance2)
+			actor->WalkTo(door->toOpen[0].x, door->toOpen[0].y);
+		else
+			actor->WalkTo(door->toOpen[1].x, door->toOpen[1].y);
 	}
 }

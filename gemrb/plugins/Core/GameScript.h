@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.18 2004/01/01 15:45:07 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.19 2004/01/02 00:53:02 balrog994 Exp $
  *
  */
 
@@ -77,7 +77,8 @@ typedef struct Action {
 	int				int2Parameter;
 	char*			string0Parameter;
 	char*			string1Parameter;
-	bool			EndReached;
+	bool			autoFree;
+	bool			delayFree;
 } Action;
 
 typedef struct Response {
@@ -145,14 +146,15 @@ private: //Internal Functions
 	Trigger * ReadTrigger(DataStream * stream);
 	Object * DecodeObject(const char * line);
 	bool EvaluateCondition(Scriptable * Sender, Condition * condition);
-	bool EvaluateTrigger(Scriptable * Sender, Trigger * trigger);
+	static bool EvaluateTrigger(Scriptable * Sender, Trigger * trigger);
 	void ExecuteResponseSet(Scriptable * Sender, ResponseSet * rS);
 	void ExecuteResponse(Scriptable * Sender, Response * rE);
 public:
 	static void ExecuteAction(Scriptable * Sender, Action * aC);
+	static Action* CreateAction(char *string, bool autoFree = true);
 private:
-	Action * GenerateAction(char * String);
-	Trigger * GenerateTrigger(char * String);
+	static Action * GenerateAction(char * String);
+	static Trigger * GenerateTrigger(char * String);
 	static Scriptable * GetActorFromObject(Scriptable * Sender, Object * oC);
 	static unsigned char GetOrient(short sX, short sY, short dX, short dY);
 private: //Internal variables
@@ -167,8 +169,8 @@ public:
 	GameScript(const char * ResRef, unsigned char ScriptType, Variables * local = NULL);
 	~GameScript();
 	void SetVariable(const char * VarName, const char * Context, int value);
-	void ExecuteString(char * String);
-	bool EvaluateString(char * String);
+	static void ExecuteString(Scriptable * Sender, char * String);
+	static bool EvaluateString(Scriptable * Sender, char * String);
 private: //Script Functions
 	//Triggers
 	static int  Globals(Scriptable * Sender, Trigger * parameters);
@@ -183,7 +185,7 @@ private: //Script Functions
 	static int  Range(Scriptable * Sender, Trigger * parameters);
 	static int  Clicked(Scriptable * Sender, Trigger * parameters);
 	static int  Entered(Scriptable * Sender, Trigger * parameters);
-public:
+private:
 	//Actions
 	static void SetGlobal(Scriptable * Sender, Action * parameters);
 	static void SG(Scriptable * Sender, Action * parameters);
@@ -227,6 +229,8 @@ public:
 	static void Dialogue(Scriptable * Sender, Action * parameters);
 	static void AmbientActivate(Scriptable * Sender, Action * parameters);
 	static void StartDialogue(Scriptable * Sender, Action * parameters);
+	static void OpenDoor(Scriptable * Sender, Action * parameters);
+	static void CloseDoor(Scriptable * Sender, Action * parameters);
 };
 
 #endif
