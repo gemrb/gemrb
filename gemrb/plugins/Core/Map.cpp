@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.47 2003/12/19 20:20:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.48 2003/12/21 09:47:35 avenger_teambg Exp $
  *
  */
 
@@ -294,7 +294,7 @@ void Map::PlayAreaSong(int SongType)
                 tablename="music";
         }
         int songlist = core->LoadTable(tablename);
-        if(!songlist)
+        if(songlist<0)
                 return;
         TableMgr * tm = core->GetTable(songlist);
         if(!tm) {

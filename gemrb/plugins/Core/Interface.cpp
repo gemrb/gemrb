@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.105 2003/12/20 19:19:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.106 2003/12/21 09:47:35 avenger_teambg Exp $
  *
  */
 
@@ -241,7 +241,7 @@ int Interface::Init()
 	printMessage("Core", "Loading Fonts...\n", WHITE);
 	AnimationMgr * anim = (AnimationMgr*)GetInterface(IE_BAM_CLASS_ID);
 	int table = LoadTable("fonts");
-	if(table == -1) {
+	if(table < 0) {
 		printStatus("ERROR", LIGHT_RED);
 		printf("Cannot find fonts.2da.\nTermination in Progress...\n");
 		return GEM_ERROR;

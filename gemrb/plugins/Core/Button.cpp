@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.44 2003/12/21 09:30:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.45 2003/12/21 09:47:35 avenger_teambg Exp $
  *
  */
 
@@ -36,7 +36,7 @@ Button::Button(bool Clear){
 	if(!ButtonInited) {
 		ButtonInited = true;
 	        int soundtable = core->LoadTable("defsound");
-		if(soundtable) {
+		if(soundtable >= 0) {
 			TableMgr * tm = core->GetTable(soundtable);
 			if(tm) {
 				for(int i=0;i<3;i++) {
