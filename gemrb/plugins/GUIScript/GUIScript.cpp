@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.116 2004/02/11 23:07:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.117 2004/02/11 23:12:07 balrog994 Exp $
  *
  */
 
@@ -1308,6 +1308,7 @@ static PyObject * GemRB_SetButtonMOS(PyObject * /*self*/, PyObject *args)
 
 	Button * btn = (Button*)ctrl;
 	btn->SetPicture(Picture);
+	btn->SetDraggable(true);
 
 	core->FreeInterface(im);
 
