@@ -98,7 +98,8 @@ def MultiPlayerPress():
 	return
 	
 def MoviesPress():
-	
+	GemRB.UnloadWindow(StartWindow)
+	GemRB.SetNextScript("GUIMOVIE")
 	return
 
 def ExitCancelled():
