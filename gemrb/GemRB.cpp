@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.12 2003/12/07 09:36:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.13 2003/12/07 12:15:26 avenger_teambg Exp $
  *
  */
 
@@ -37,6 +37,7 @@
 #ifndef WIN32
 #include <ctype.h>
 #include <sys/time.h>
+#include <dirent.h>
 #else
 #include <windows.h>
 #endif
@@ -100,6 +101,26 @@ bool dir_exists(const char *path)
 #ifdef WIN32
 
 #else
+char * FindInDir(char * Dir, char * Filename)
+{
+        char * fn = NULL;
+        DIR * dir = opendir(Dir);
+        if(dir == NULL)
+                return NULL;
+        struct dirent * de = readdir(dir);
+        if(de == NULL)
+                return NULL;
+        do {
+                if(strnicmp(de->d_name, Filename, strlen(Filename)) == 0) {
+                        fn = (char*)malloc(strlen(de->d_name)+1);
+                        strcpy(fn, de->d_name);
+                        break;
+                }
+        } while((de = readdir(dir)) != NULL);
+        closedir(dir);  //No other files in the directory, close it
+        return fn;
+}
+
 char *strupr(char *string)
 {
         char *s;
