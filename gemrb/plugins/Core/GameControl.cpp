@@ -119,7 +119,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		}
 		if(effect) {
 			if((selected.size() == 1)) {
-				ActorBlock * actor = selected.at(0);
+				Actor * actor = selected.at(0);
 				video->BlitSpriteMode(effect->NextFrame(), actor->XPos, actor->YPos, 1, false);
 			}
 		}
@@ -338,17 +338,17 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 
 	if(!DrawSelectionRect) {
-		ActorBlock * actor = area->GetActor(GameX, GameY);
+		Actor * actor = area->GetActor(GameX, GameY);
 		if(lastActor)
-			lastActor->actor->anims->DrawCircle = false;
+			lastActor->SetOver(false);
 		if(!actor) {
 			lastActor = NULL;
 		}
 		else {
 			lastActor = actor;
-			lastActor->actor->anims->DrawCircle = true;
-			if((lastActor->actor->Modified[IE_STATE_ID]&STATE_DEAD) == 0) {
-				switch(lastActor->actor->Modified[IE_EA]) {
+			lastActor->SetOver(true);
+			if((lastActor->Modified[IE_STATE_ID]&STATE_DEAD) == 0) {
+				switch(lastActor->Modified[IE_EA]) {
 					case EVILCUTOFF:
 					case GOODCUTOFF:
 					break;
@@ -410,20 +410,17 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 		return;
 	}
 	if(!DrawSelectionRect) {
-		ActorBlock * actor = area->GetActor(GameX, GameY);
+		Actor * actor = area->GetActor(GameX, GameY);
 		if(!actor && (selected.size() == 1)) {
 			actor = selected.at(0);
-			actor->XDes = GameX;
-			actor->YDes = GameY;
-			actor->path = core->GetPathFinder()->FindPath(actor->XPos, actor->YPos, GameX, GameY);
-			actor->step = NULL;
+			actor->WalkTo(GameX, GameY);
 		}
 		for(size_t i = 0; i < selected.size(); i++)
-			selected[i]->Selected = false;
+			selected[i]->Select(false);
 		selected.clear();
 		if(actor) {
 			selected.push_back(actor);
-			actor->Selected = true;
+			actor->Select(true);
 		}
 		if(overInfoPoint) {
 			if(overInfoPoint->Type == 1) {
@@ -442,19 +439,19 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 		}
 	}
 	else {
-		ActorBlock ** ab;
+		Actor ** ab;
 		int count = area->GetActorInRect(ab, SelectionRect);
 		for(size_t i = 0; i < highlighted.size(); i++)
-			highlighted[i]->actor->anims->DrawCircle = false;
+			highlighted[i]->SetOver(false);
 		highlighted.clear();
 		for(size_t i = 0; i < selected.size(); i++) {
-			selected[i]->Selected = false;
-			selected[i]->actor->anims->DrawCircle = false;
+			selected[i]->Select(false);
+			selected[i]->SetOver(false);
 		}
 		selected.clear();
 		if(count != 0) {
 			for(int i = 0; i < count; i++) {
-				ab[i]->Selected = true;
+				ab[i]->Select(true);
 				selected.push_back(ab[i]);
 			}
 		}
@@ -495,7 +492,7 @@ void GameControl::SetCurrentArea(int Index)
 	MapIndex = Index;
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
-	ActorBlock *ab = game->GetPC(0);
+	Actor *ab = game->GetPC(0);
 	if(ab)
 		area->AddActor(ab);
 	//night or day?
@@ -524,29 +521,29 @@ void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 			SelectionRect.y = StartY;
 			SelectionRect.h = y-StartY;
 		}
-		ActorBlock ** ab;
+		Actor ** ab;
 		int count = area->GetActorInRect(ab, SelectionRect);
 		if(count != 0) {
 			for(size_t i = 0; i < highlighted.size(); i++)
-				highlighted[i]->actor->anims->DrawCircle = false;
+				highlighted[i]->SetOver(false);
 			highlighted.clear();
 			for(int i = 0; i < count; i++) {
-				ab[i]->actor->anims->DrawCircle = true;
+				ab[i]->SetOver(true);
 				highlighted.push_back(ab[i]);
 			}
 		}
 		free(ab);
 	}
 	else {
-		ActorBlock * actor = area->GetActor(x, y);
+		Actor * actor = area->GetActor(x, y);
 		if(lastActor)
-			lastActor->actor->anims->DrawCircle = false;
+			lastActor->SetOver(false);
 		if(!actor) {
 			lastActor = NULL;
 		}
 		else {
 			lastActor = actor;
-			lastActor->actor->anims->DrawCircle = true;
+			lastActor->SetOver(true);
 		}
 	}
 }

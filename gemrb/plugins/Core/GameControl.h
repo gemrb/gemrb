@@ -17,7 +17,9 @@
 #define GEM_EXPORT
 #endif
 
+#ifndef _DEBUG
 #define _DEBUG
+#endif
 
 class GEM_EXPORT GameControl : public Control
 {
@@ -33,9 +35,9 @@ public:
 	void SetCurrentArea(int Index);
 private:
 	int MapIndex;
-	ActorBlock * lastActor;
-	std::vector<ActorBlock*> selected;
-	std::vector<ActorBlock*> highlighted;
+	Actor * lastActor;
+	std::vector<Actor*> selected;
+	std::vector<Actor*> highlighted;
 	std::vector<InfoPoint*> infoPoints;
 	Color * InfoTextPalette;
 	bool DrawSelectionRect;
