@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.26 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.27 2004/08/26 16:35:21 edheldil Exp $
  *
  */
 
@@ -129,7 +129,7 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned short slheight = domy - upMy;
 	unsigned short refheight = slheight - frames[5]->Height;
 	double step = refheight / ( double ) ( Value == 1 ? Value : Value - 1 );
-	unsigned short yzero = upMy + ( frames[5]->Height / 2 );
+	unsigned short yzero = upMy/* + ( frames[5]->Height / 2 )*/;
 	unsigned short ymax = yzero + refheight;
 	unsigned short ymy = y - yzero;
 	unsigned short domx = 0, doMx = frames[2]->Width, doMy = Height;

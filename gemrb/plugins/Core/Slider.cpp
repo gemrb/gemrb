@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.25 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.26 2004/08/26 16:35:21 edheldil Exp $
  *
  */
 
@@ -154,15 +154,16 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 {
 	Changed = true;
 	unsigned int oldPos = Pos;
-	unsigned short mx = KnobXPos + ( Pos * KnobStep ) - Knob->XPos,
+	short mx = KnobXPos + ( Pos * KnobStep ) - Knob->XPos,
 	my = KnobYPos - Knob->YPos;
-	unsigned short Mx = mx + Knob->Width, My = my + Knob->Height;
+	short Mx = mx + Knob->Width, My = my + Knob->Height;
+
 	if (( x >= mx ) && ( y >= my )) {
 		if (( x <= Mx ) && ( y <= My )) {
 			State = IE_GUI_SLIDER_GRABBEDKNOB;
 		} else {
-			unsigned short mx = KnobXPos;
-			unsigned short xmx = x - mx;
+			short mx = KnobXPos;
+			short xmx = x - mx;
 			if (x < mx) {
 				SetPosition( 0 );
 				if (oldPos != Pos) {
@@ -170,7 +171,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 				}
 				return;
 			}
-			unsigned short befst = xmx / KnobStep;
+			short befst = xmx / KnobStep;
 			if (befst >= KnobStepsCount) {
 				SetPosition( KnobStepsCount - 1 );
 				if (oldPos != Pos) {
@@ -178,7 +179,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 				}
 				return;
 			}
-			unsigned short aftst = befst + KnobStep;
+			short aftst = befst + KnobStep;
 			if (( xmx - ( befst * KnobStep ) ) <
 				( ( aftst * KnobStep ) - xmx )) {
 				SetPosition( befst );
@@ -190,8 +191,8 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 			}
 		}
 	} else {
-		unsigned short mx = KnobXPos;
-		unsigned short xmx = x - mx;
+		short mx = KnobXPos;
+		short xmx = x - mx;
 		if (x < mx) {
 			SetPosition( 0 );
 			if (oldPos != Pos) {
@@ -199,7 +200,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 			}
 			return;
 		}
-		unsigned short befst = xmx / KnobStep;
+		short befst = xmx / KnobStep;
 		if (befst >= KnobStepsCount) {
 			SetPosition( KnobStepsCount - 1 );
 			if (oldPos != Pos) {
@@ -207,7 +208,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 			}
 			return;
 		}
-		unsigned short aftst = befst + KnobStep;
+		short aftst = befst + KnobStep;
 		if (( xmx - ( befst * KnobStep ) ) < ( ( aftst * KnobStep ) - xmx )) {
 			SetPosition( befst );
 		} else {
@@ -233,8 +234,8 @@ void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 	Changed = true;
 	unsigned int oldPos = Pos;
 	if (State == IE_GUI_SLIDER_GRABBEDKNOB) {
-		unsigned short mx = KnobXPos;
-		unsigned short xmx = x - mx;
+		short mx = KnobXPos;
+		short xmx = x - mx;
 		if (x < mx) {
 			SetPosition( 0 );
 			if (oldPos != Pos) {
@@ -242,7 +243,7 @@ void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 			}
 			return;
 		}
-		unsigned short befst = xmx / KnobStep;
+		short befst = xmx / KnobStep;
 		if (befst >= KnobStepsCount) {
 			SetPosition( KnobStepsCount - 1 );
 			if (oldPos != Pos) {
@@ -250,7 +251,7 @@ void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 			}
 			return;
 		}
-		unsigned short aftst = befst + KnobStep;
+		short aftst = befst + KnobStep;
 		if (( xmx - ( befst * KnobStep ) ) < ( ( aftst * KnobStep ) - xmx )) {
 			SetPosition( befst );
 		} else {

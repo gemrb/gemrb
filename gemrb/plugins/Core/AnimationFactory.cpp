@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.8 2004/05/25 16:16:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.9 2004/08/26 16:35:21 edheldil Exp $
  *
  */
 
@@ -84,8 +84,8 @@ Animation* AnimationFactory::GetCycle(unsigned char cycle)
 /** No descriptions */
 Sprite2D* AnimationFactory::GetFrame(unsigned short index)
 {
-	if (index >= frames.size()) {
+	if (index -1 >= frames.size()) {
 		return NULL;
 	}
-	return frames[index];
+	return frames[index - 1];
 }
