@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.47 2004/08/22 19:24:26 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.48 2004/08/28 17:21:20 avenger_teambg Exp $
  *
  */
 
@@ -123,6 +123,8 @@ public:
 	bool CanFree();
 	int GetActorCount() { return (int)actors.size(); }
 	Actor* GetActor(int i) { return actors[i]; }
+	int GetWidth() { return Width; }
+	int GetHeight() { return Height; }
 
 	//PathFinder
 	/* Finds the nearest passable point */
