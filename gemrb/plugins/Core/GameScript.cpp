@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.12 2003/12/15 22:36:51 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.13 2003/12/17 20:18:03 balrog994 Exp $
  *
  */
 
@@ -32,10 +32,17 @@ static TriggerFunction triggers[MAX_TRIGGERS];
 static ActionFunction actions[MAX_ACTIONS];
 static bool blocking[MAX_ACTIONS];
 
-GameScript::GameScript(const char * ResRef, unsigned char ScriptType)
+GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables * local)
 {
-	locals = new Variables();
-	locals->SetType(GEM_VARIABLES_INT);
+	if(local) {
+		locals = local;
+		freeLocals = false;
+	}
+	else {
+		locals = new Variables();
+		locals->SetType(GEM_VARIABLES_INT);
+		freeLocals = true;
+	}
 	if(!initialized) {
 		triggersTable = core->LoadSymbol("TRIGGER");
 		actionsTable = core->LoadSymbol("ACTION");
@@ -120,6 +127,10 @@ GameScript::~GameScript(void)
 {
 	if(script)
 		FreeScript(script);
+	if(freeLocals) {
+		if(locals)
+			delete(locals);
+	}
 }
 
 void GameScript::FreeScript(Script * script)
@@ -219,7 +230,7 @@ void GameScript::SetVariable(const char * VarName, const char * Context, int val
 void GameScript::Update()
 {
 	while(programmedActions.size()) {
-		printf("Executing Script Step\n");
+		//printf("Executing Script Step\n");
 		Action * aC = programmedActions.front();
 		ExecuteAction(this, aC);
 		programmedActions.pop_front();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.8 2003/12/15 09:27:10 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.9 2003/12/17 20:18:03 balrog994 Exp $
  *
  */
 
@@ -156,8 +156,9 @@ private: //Script Internal Variables
 	bool continueExecution;
 	std::list<Action*> programmedActions;
 	char Name[9];
+	bool freeLocals;
 public:
-	GameScript(const char * ResRef, unsigned char ScriptType);
+	GameScript(const char * ResRef, unsigned char ScriptType, Variables * local = NULL);
 	~GameScript();
 	void SetVariable(const char * VarName, const char * Context, int value);
 private: //Script Functions
