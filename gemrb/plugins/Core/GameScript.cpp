@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.14 2003/12/18 15:05:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.15 2003/12/19 14:35:02 balrog994 Exp $
  *
  */
 
@@ -26,8 +26,8 @@ extern Interface * core;
 int initialized = 0;
 
 static Variables * globals;
-static int triggersTable;
-static int actionsTable;
+static SymbolMgr* triggersTable;
+static SymbolMgr* actionsTable;
 static TriggerFunction triggers[MAX_TRIGGERS];
 static ActionFunction actions[MAX_ACTIONS];
 static bool blocking[MAX_ACTIONS];
@@ -44,8 +44,10 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		freeLocals = true;
 	}
 	if(!initialized) {
-		triggersTable = core->LoadSymbol("TRIGGER");
-		actionsTable = core->LoadSymbol("ACTION");
+		int tT = core->LoadSymbol("TRIGGER");
+		int aT = core->LoadSymbol("ACTION");
+		triggersTable = core->GetSymbol(tT);
+		actionsTable = core->GetSymbol(aT);
 		globals = new Variables();
 		globals->SetType(GEM_VARIABLES_INT);
 		memset(triggers, 0, MAX_TRIGGERS*sizeof(TriggerFunction));
@@ -539,6 +541,438 @@ unsigned char GameScript::GetOrient(short sX, short sY, short dX, short dY)
 		}
 	}
 	return 0;
+}
+
+void GameScript::ExecuteString(char * String)
+{
+	if(String[0] == 0)
+		return;
+	Action * act = GenerateAction(String);
+	ExecuteAction(this, act);
+	if(act->string0Parameter)
+		free(act->string0Parameter);
+	if(act->string1Parameter)
+		free(act->string1Parameter);
+	for(int c = 0; c < 3; c++) {
+		Object * oB = act->objects[c];
+		if(oB) {
+			if(oB->objectName)
+				free(oB->objectName);
+			delete(oB);
+		}
+	}
+	delete(act);
+	return;
+}
+
+bool GameScript::EvaluateString(char * String)
+{
+	if(String[0] == 0)
+		return false;
+	Trigger * tri = GenerateTrigger(String);
+	bool ret = EvaluateTrigger(this, tri);
+	if(tri->flags&1)
+		ret = !ret;
+	if(tri->string0Parameter)
+		free(tri->string0Parameter);
+	if(tri->string1Parameter)
+		free(tri->string1Parameter);
+	if(tri->objectParameter) {
+		if(tri->objectParameter->objectName)
+			free(tri->objectParameter->objectName);
+		delete(tri->objectParameter);
+	}
+	delete(tri);
+	return ret;
+}
+
+Action * GameScript::GenerateAction(char * String)
+{
+	Action * newAction = NULL;
+	int i = 0;
+	while(true) {
+		char * src = String;
+		char * str = actionsTable->GetStringIndex(i);
+		if(!str)
+			return newAction;
+		while(*str) {
+			if(*str != *src)
+				break;
+			if(*str == '(') {
+				newAction = new Action();
+				newAction->actionID = actionsTable->GetValueIndex(i);
+				newAction->objects[0] = NULL;
+				newAction->objects[1] = NULL;
+				newAction->objects[2] = NULL;
+				newAction->string0Parameter = NULL;
+				newAction->string1Parameter = NULL;
+				int objectCount = (newAction->actionID == 1) ? 0 : 1;
+				int stringsCount = 0;
+				int intCount = 0;
+				//Here is the Trigger; Now we need to evaluate the parameters
+				str++;
+				src++;
+				while(*str) {
+					switch(*str) {
+						default:
+							str++;
+						break;
+
+						case 'P': //Point
+							{
+							while((*str != ',') && (*str != ')')) str++;
+							src++; //Skip [
+							char * symbol = (char*)malloc(32);
+							char * tmp = symbol;
+							while((*src >= '0') && (*src <= '9')) {
+								*tmp = *src;
+								tmp++;
+								src++;
+							}
+							*tmp = 0;
+							newAction->XpointParameter = atoi(symbol);
+							src++; //Skip .
+							tmp = symbol;
+							while((*src >= '0') && (*src <= '9')) {
+								*tmp = *src;
+								tmp++;
+								src++;
+							}
+							*tmp = 0;
+							newAction->YpointParameter = atoi(symbol);
+							src++; //Skip ]
+							}
+						break;
+
+						case 'I': //Integer
+							{
+								while(*str != '*') str++;
+								str++;
+								SymbolMgr * valHook = NULL;
+								if((*str != ',') && (*str != ')')) {
+									char * idsTabName = (char*)malloc(32);
+									char * tmp = idsTabName;
+									while((*str != ',') && (*str != ')')) {
+										*tmp = *str;
+										tmp++;
+										str++;
+									}
+									*tmp = 0;
+									int i = core->LoadSymbol(idsTabName);
+									valHook = core->GetSymbol(i);
+									free(idsTabName);
+								}
+								if(!valHook) {
+									char * symbol = (char*)malloc(32);
+									char * tmp = symbol;
+									while((*src >= '0') && (*src <= '9')) {
+										*tmp = *src;
+										tmp++;
+										src++;
+									}
+									*tmp = 0;
+									if(!intCount) {
+										newAction->int0Parameter = atoi(symbol);
+									} else if(intCount == 1) {
+										newAction->int1Parameter = atoi(symbol);
+									} else {
+										newAction->int2Parameter = atoi(symbol);
+									}
+									free(symbol);
+								} else {
+									char * symbol = (char*)malloc(32);
+									char * tmp = symbol;
+									while((*src != ',') && (*src != ')')) {
+										*tmp = *src;
+										tmp++;
+										src++;
+									}
+									*tmp = 0;
+									if(!intCount) {
+										newAction->int0Parameter = valHook->GetValue(symbol);
+									} else if(intCount == 1) {
+										newAction->int1Parameter = valHook->GetValue(symbol);
+									} else {
+										newAction->int2Parameter = valHook->GetValue(symbol);
+									}
+									free(symbol);
+								}
+							}
+						break;
+
+						case 'A': //Action
+							{
+								while((*str != ',') && (*str != ')')) str++;
+								char *action = (char*)malloc(128);
+								char *dst = action;
+								int openParentesisCount = 0;
+								while(true) {
+									if(*src == ')') {
+										if(!openParentesisCount)
+											break;
+										openParentesisCount--;
+									} else {
+										if(*src == '(') {
+											openParentesisCount++;
+										}
+										else {
+											if((*src == ',') && !openParentesisCount)
+												break;
+										}
+									}
+									*dst = *src;
+									dst++;
+									src++;
+								}
+								*dst = 0;
+								Action * act = GenerateAction(action);
+								free(action);
+								act->objects[0] = new Object(*newAction->objects[0]);
+								if(newAction->string0Parameter)
+									free(newAction->string0Parameter);
+								if(newAction->string1Parameter)
+									free(newAction->string1Parameter);
+								for(int c = 1; c < 3; c++) {
+									Object * oB = newAction->objects[c];
+									if(oB) {
+										if(oB->objectName)
+											free(oB->objectName);
+										delete(oB);
+									}
+								}
+								delete(newAction);
+								newAction = act;
+							}
+						break;
+
+						case 'O': //Object
+							{
+								while((*str != ',') && (*str != ')')) str++;
+								if(*src == '"') { //Object Name
+									src++;
+									newAction->objects[objectCount] = new Object();
+									newAction->objects[objectCount]->objectName = (char*)malloc(128);
+									char *dst = newAction->objects[objectCount]->objectName;
+									while(*src != '"') {
+										*dst = *src;
+										dst++;
+										src++;
+									}
+									*dst = 0;
+									src++;
+								} else {
+									
+								}
+								objectCount++;
+							}
+						break;
+
+						case 'S': //String
+							{
+								while((*str != ',') && (*str != ')')) str++;
+								src++;
+								char * dst;
+								if(!stringsCount) {
+									newAction->string0Parameter = (char*)malloc(128);
+									dst = newAction->string0Parameter;
+								} else {
+									newAction->string1Parameter = (char*)malloc(128);
+									dst = newAction->string1Parameter;
+								}
+								while(*src != '"') {
+									*dst = *src;
+									dst++;
+									src++;
+								}
+								src++;
+							}
+						break;
+					}
+					while((*src == ',') || (*src == ' '))
+						src++;
+				}
+				return newAction;
+			}
+			src++;
+			str++;
+		}
+		i++;
+	}
+	return newAction;
+}
+
+Trigger * GameScript::GenerateTrigger(char * String)
+{
+	Trigger * newTrigger = NULL;
+	bool negate = false;
+	if(*String == '!') {
+		String++;
+		negate = true;
+	}
+	int i = 0;
+	while(true) {
+		char * src = String;
+		char * str = triggersTable->GetStringIndex(i);
+		if(!str)
+			return newTrigger;
+		while(*str) {
+			if(*str != *src)
+				break;
+			if(*str == '(') {
+				newTrigger = new Trigger();
+				newTrigger->triggerID = triggersTable->GetValueIndex(i);
+				newTrigger->objectParameter = NULL;
+				newTrigger->string0Parameter = NULL;
+				newTrigger->string1Parameter = NULL;
+				newTrigger->flags = (negate) ? 1 : 0;
+				int stringsCount = 0;
+				int intCount = 0;
+				//Here is the Trigger; Now we need to evaluate the parameters
+				str++;
+				src++;
+				while(*str) {
+					switch(*str) {
+						default:
+							str++;
+						break;
+
+						case 'P': //Point
+							{
+							while((*str != ',') && (*str != ')')) str++;
+							src++; //Skip [
+							char * symbol = (char*)malloc(32);
+							char * tmp = symbol;
+							while((*src >= '0') && (*src <= '9')) {
+								*tmp = *src;
+								tmp++;
+								src++;
+							}
+							*tmp = 0;
+							newTrigger->XpointParameter = atoi(symbol);
+							src++; //Skip .
+							tmp = symbol;
+							while((*src >= '0') && (*src <= '9')) {
+								*tmp = *src;
+								tmp++;
+								src++;
+							}
+							*tmp = 0;
+							newTrigger->YpointParameter = atoi(symbol);
+							src++; //Skip ]
+							}
+						break;
+
+						case 'I': //Integer
+							{
+								while(*str != '*') str++;
+								str++;
+								SymbolMgr * valHook = NULL;
+								if((*str != ',') && (*str != ')')) {
+									char * idsTabName = (char*)malloc(32);
+									char * tmp = idsTabName;
+									while((*str != ',') && (*str != ')')) {
+										*tmp = *str;
+										tmp++;
+										str++;
+									}
+									*tmp = 0;
+									int i = core->LoadSymbol(idsTabName);
+									valHook = core->GetSymbol(i);
+									free(idsTabName);
+								}
+								if(!valHook) {
+									char * symbol = (char*)malloc(32);
+									char * tmp = symbol;
+									while((*src >= '0') && (*src <= '9')) {
+										*tmp = *src;
+										tmp++;
+										src++;
+									}
+									*tmp = 0;
+									if(!intCount) {
+										newTrigger->int0Parameter = atoi(symbol);
+									} else if(intCount == 1) {
+										newTrigger->int1Parameter = atoi(symbol);
+									} else {
+										newTrigger->int2Parameter = atoi(symbol);
+									}
+									free(symbol);
+								} else {
+									char * symbol = (char*)malloc(32);
+									char * tmp = symbol;
+									while((*src != ',') && (*src != ')')) {
+										*tmp = *src;
+										tmp++;
+										src++;
+									}
+									*tmp = 0;
+									if(!intCount) {
+										newTrigger->int0Parameter = valHook->GetValue(symbol);
+									} else if(intCount == 1) {
+										newTrigger->int1Parameter = valHook->GetValue(symbol);
+									} else {
+										newTrigger->int2Parameter = valHook->GetValue(symbol);
+									}
+									free(symbol);
+								}
+								intCount++;
+							}
+						break;
+
+						case 'O': //Object
+							{
+								while((*str != ',') && (*str != ')')) str++;
+								if(*src == '"') { //Object Name
+									src++;
+									newTrigger->objectParameter = new Object();
+									newTrigger->objectParameter->objectName = (char*)malloc(128);
+									char *dst = newTrigger->objectParameter->objectName;
+									while(*src != '"') {
+										*dst = *src;
+										dst++;
+										src++;
+									}
+									*dst = 0;
+									src++;
+								} else {
+									
+								}
+							}
+						break;
+
+						case 'S': //String
+							{
+								while((*str != ',') && (*str != ')')) str++;
+								src++;
+								char * dst;
+								if(!stringsCount) {
+									newTrigger->string0Parameter = (char*)malloc(128);
+									dst = newTrigger->string0Parameter;
+								} else {
+									newTrigger->string1Parameter = (char*)malloc(128);
+									dst = newTrigger->string1Parameter;
+								}
+								while(*src != '"') {
+									*dst = *src;
+									dst++;
+									src++;
+								}
+								src++;
+								stringsCount++;
+							}
+						break;
+					}
+					while((*src == ',') || (*src == ' '))
+						src++;
+				}
+				return newTrigger;
+			}
+			src++;
+			str++;
+		}
+		i++;
+	}
+	return newTrigger;
 }
 
 //-------------------------------------------------------------

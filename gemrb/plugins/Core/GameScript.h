@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.9 2003/12/17 20:18:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.10 2003/12/19 14:35:02 balrog994 Exp $
  *
  */
 
@@ -147,6 +147,8 @@ private: //Internal Functions
 	void ExecuteResponseSet(GameScript * sender, ResponseSet * rS);
 	void ExecuteResponse(GameScript * sender, Response * rE);
 	void ExecuteAction(GameScript * sender, Action * aC);
+	Action * GenerateAction(char * String);
+	Trigger * GenerateTrigger(char * String);
 	static Scriptable * GetActorFromObject(GameScript * Sender, Object * oC);
 	static unsigned char GetOrient(short sX, short sY, short dX, short dY);
 private: //Internal variables
@@ -161,6 +163,8 @@ public:
 	GameScript(const char * ResRef, unsigned char ScriptType, Variables * local = NULL);
 	~GameScript();
 	void SetVariable(const char * VarName, const char * Context, int value);
+	void ExecuteString(char * String);
+	bool EvaluateString(char * String);
 private: //Script Functions
 	//Triggers
 	static int  Globals(GameScript * Sender, Trigger * parameters);
