@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.287 2005/03/20 15:51:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.288 2005/03/22 18:53:31 avenger_teambg Exp $
  *
  */
 
@@ -786,13 +786,16 @@ int Interface::Init()
 	video->MirrorSpriteVertical( FogSprites[28], false );
 	video->MirrorSpriteHorizontal( FogSprites[28], false );
 
-	unsigned int i;
-	for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-		video->CreateAlpha( FogSprites[i] );
-	}
 	FreeInterface( anim );
 	printStatus( "OK", LIGHT_GREEN );
 
+	ieDword i = 0;
+	vars->Lookup("Translucent Shadows", i);
+	if (i) {
+		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
+			video->CreateAlpha( FogSprites[i] );
+		}
+	}
 
 	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
 	timer = new GlobalTimer();
