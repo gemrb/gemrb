@@ -939,6 +939,7 @@ void GameControl::DialogChoose(int choose)
 			else {
 				DialogTransition * tr = ds->transitions[choose];
 				if(tr->Flags & 8) {
+					speaker->DeleteAction(speaker->CurrentAction);
 					speaker->CurrentAction = NULL;
 					delete(dlg);
 					ds = NULL;
