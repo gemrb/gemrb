@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.36 2004/10/10 13:26:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.37 2004/10/10 17:27:41 avenger_teambg Exp $
  *
  */
 
@@ -362,8 +362,8 @@ void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
 	free( tmp );
 }
 
-int Font::PrintInitial(int x, int y, Region rgn, char currChar, Color *ipal,
-	bool anchor)
+int Font::PrintInitial(int x, int y, Region rgn, unsigned char currChar,
+	Color *ipal, bool anchor)
 {
 	Video *video = core->GetVideoDriver();
 	if (!ipal)

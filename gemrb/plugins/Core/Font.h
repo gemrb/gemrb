@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.17 2004/10/10 13:26:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.18 2004/10/10 17:27:41 avenger_teambg Exp $
  *
  */
 
@@ -73,7 +73,7 @@ public:
 		Color* color, unsigned char Alignment, bool anchor = false,
 		Font* initials = NULL, Color* initcolor = NULL,
 		Sprite2D* cursor = NULL, unsigned int curpos = 0);
-	int PrintInitial(int x, int y, Region rgn, char currChar,
+	int PrintInitial(int x, int y, Region rgn, unsigned char currChar,
 		Color *ipal=NULL, bool anchor = false);
 	void* GetPalette();
 	char ResRef[9];
