@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.10 2003/11/26 22:31:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.11 2003/11/27 22:13:28 balrog994 Exp $
  *
  */
 
@@ -55,8 +55,9 @@ typedef struct ActorBlock {
 
 class GEM_EXPORT Map
 {
-private:
+public:
 	TileMap * tm;
+private:
 	ImageMgr * LightMap;
 	std::vector<Animation*> animations;
 	std::vector<ActorBlock> actors;
