@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.28 2004/11/22 18:55:25 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.29 2005/03/09 20:08:36 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -39,8 +39,9 @@ IE_GUI_BUTTON_ALIGN_TOP  = 0x00000400
 #end of hardcoded section
 IE_GUI_BUTTON_ALIGN_BOTTOM = 0x00000800
 
-IE_GUI_BUTTON_ANIMATED   = 0x00010000
+IE_GUI_BUTTON_ANIMATED   = 0x00010000   # the button is animated
 IE_GUI_BUTTON_NO_TEXT    = 0x00020000   # don't draw button label
+IE_GUI_BUTTON_PLAYONCE   = 0x00040000   # the button animation won't restart
 
 #events
 IE_GUI_BUTTON_ON_PRESS    = 0x00000000
@@ -70,7 +71,10 @@ IE_GUI_BUTTON_DISABLED   = 0x00000003
 # Like DISABLED, but processes MouseOver events and draws UNPRESSED bitmap
 IE_GUI_BUTTON_LOCKED   = 0x00000004
 
-#mapcontrol states
+#edit field states
+IE_GUI_EDIT_NUMBER    =  0x030000001
+
+#mapcontrol states (add 0x090000000 if used with SetControlStatus)
 IE_GUI_MAP_NO_NOTES   =  0
 IE_GUI_MAP_VIEW_NOTES =  1
 IE_GUI_MAP_SET_NOTE   =  2
