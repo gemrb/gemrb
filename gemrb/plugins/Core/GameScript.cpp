@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.49 2004/01/18 14:51:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.50 2004/01/18 16:20:42 avenger_teambg Exp $
  *
  */
 
@@ -294,6 +294,7 @@ void GameScript::Update()
 	lastRunTime = thisTime;
 	if(!script)
 		return;
+printf("Update...\n");
 	for(unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock * rB = script->responseBlocks[a];
 		if(EvaluateCondition(this->MySelf, rB->condition)) {
@@ -491,7 +492,7 @@ bool GameScript::EvaluateCondition(Scriptable * Sender, Condition * condition)
 			result = EvaluateTrigger(Sender, tR);
 		if(result>1) { //we started an Or() block
 			if(ORcount)
-				printf("Unfinished OR block encountered!\n");
+				printf("Scripting error: Unfinished OR block encountered!\n");
 			ORcount = result;
 			subresult = false;
 			continue;
@@ -505,7 +506,7 @@ bool GameScript::EvaluateCondition(Scriptable * Sender, Condition * condition)
 			return 0;
 	}
 	if(ORcount)
-		printf("Unfinished OR block encountered!\n");
+		printf("Scripting error: Unfinished OR block encountered!\n");
 	return 1;
 }
 
@@ -544,6 +545,8 @@ int GameScript::ExecuteResponseSet(Scriptable * Sender, ResponseSet * rS)
 
 int GameScript::ExecuteResponse(Scriptable * Sender, Response * rE)
 {
+printf("Executing Response\n");
+	int ret = 0;  // continue or not
 	for(int i = 0; i < rE->actionsCount; i++) {
 		Action * aC = rE->actions[i];
 		switch(instant[aC->actionID]) {
@@ -556,10 +559,11 @@ int GameScript::ExecuteResponse(Scriptable * Sender, Response * rE)
 			else
 				Sender->AddAction(aC);
 			break;
-		case 2: //Continue() reached
-			return 1; 
+		case 2:
+			ret=1;
 		}
 	}
+	return ret;
 }
 
 void GameScript::ExecuteAction(Scriptable * Sender, Action * aC)
@@ -571,7 +575,12 @@ void GameScript::ExecuteAction(Scriptable * Sender, Action * aC)
 	}
 	else {
 		actions[aC->actionID]=NoAction;
+		blocking[aC->actionID]=false;
+		instant[aC->actionID]=false;
 		printf("Unhandled action code: %d\n",aC->actionID);
+		Sender->CurrentAction = NULL;
+		aC->Release();
+		return;
 	}
 	if(!blocking[aC->actionID]) {
 		Sender->CurrentAction = NULL;	
@@ -1447,7 +1456,7 @@ void GameScript::Enemy(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction = NULL;
+		//Sender->CurrentAction = NULL;
 		return;
 	}
 	Actor * actor = (Actor*)scr;
@@ -1471,16 +1480,12 @@ void GameScript::Ally(Scriptable * Sender, Action * parameters)
 
 void GameScript::ChangeAIScript(Scriptable * Sender, Action *parameters)
 {
-printf("ChangeAIScript\n");
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
-printf("A\n");
 	if(scr->Type != ST_ACTOR)
 		return;
-printf("B\n");
 	Actor * actor = (Actor*)scr;
-printf("E\n");
 	actor->SetScript(parameters->string0Parameter, parameters->int0Parameter);
 }
 
@@ -2124,13 +2129,15 @@ void GameScript::SetTokenGlobal(Scriptable *Sender, Action *parameters)
 	else {
 		globals->Lookup(parameters->string0Parameter, value);
 	}
-	char varname[33];
+	char varname[33]; //this is the Token Name
 	strncpy(varname,parameters->string1Parameter,32);
 	varname[32]=0;
 	printf("SetTokenGlobal: %d -> %s\n",value, varname);
 	char tmpstr[10];
 	sprintf(tmpstr,"%d",value);
-	core->GetTokenDictionary()->SetAt(varname, tmpstr);
+	char newvalue=malloc(strlen[tmpstr]+1);
+	strcpy(newvalue,tmpstr);
+	core->GetTokenDictionary()->SetAt(varname, newvalue);
 }
 
 void GameScript::PlayDead(Scriptable *Sender, Action *parameters)
@@ -2143,6 +2150,7 @@ void GameScript::PlayDead(Scriptable *Sender, Action *parameters)
 	Actor * actor = (Actor*)scr;
 	actor->AnimID=IE_ANI_DIE;
 	//also set time for playdead!
+	actor->SetWait(parameters->int0Parameter);
 }
 
 void GameScript::GlobalSetGlobal(Scriptable *Sender, Action *parameters)
