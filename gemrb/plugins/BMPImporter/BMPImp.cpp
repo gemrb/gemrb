@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.8 2003/11/26 14:01:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.9 2003/11/26 14:57:45 balrog994 Exp $
  *
  */
 
@@ -85,9 +85,12 @@ bool BMPImp::Open(DataStream * stream, bool autoFree)
 	Palette = NULL;
 	NumColors = 256;
 	if(BitCount <= 8) {
-		Palette = (RevColor*)malloc(4*NumColors);
+		Palette = (Color*)malloc(4*NumColors);
 		for(unsigned int i = 0; i < NumColors; i++) {
-			str->Read(&Palette[i], 4);
+			str->Read(&Palette[i].b, 1);
+			str->Read(&Palette[i].g, 1);
+			str->Read(&Palette[i].r, 1);
+			str->Read(&Palette[i].a, 1);
 		}
 	}
 	//RASTERDATA
@@ -165,8 +168,8 @@ void BMPImp::GetPalette(int index, int colors, Color * pal){
 	}
 	else if(BitCount == 8) {
 		for(int i = 0; i < colors; i++) {
-			pal[i].r = Palette[*p++].r;
-			pal[i].g = Palette[*p++].g;
+			pal[i].r = Palette[*p].r;
+			pal[i].g = Palette[*p].g;
 			pal[i].b = Palette[*p++].b;
 		}
 	}
