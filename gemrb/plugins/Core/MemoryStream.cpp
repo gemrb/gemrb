@@ -15,23 +15,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.8 2003/11/29 10:33:20 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.9 2003/12/19 17:25:24 balrog994 Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "MemoryStream.h"
 
-MemoryStream::MemoryStream(void * buffer, int length)
+MemoryStream::MemoryStream(void * buffer, int length, bool autoFree)
 {
 	ptr = buffer;
 	this->length = length;
 	Pos = 0;
 	strcpy(filename, "");
+	this->autoFree = autoFree;
 }
 
 MemoryStream::~MemoryStream(void)
 {
+	if(autoFree)
+		free(ptr);
 }
 
 int MemoryStream::Read(void * dest, int length)
