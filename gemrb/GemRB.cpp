@@ -31,6 +31,7 @@ int main(int argc, char ** argv)
 	Font * fps = core->GetFont("NORMAL\0");
 	char fpsstring[_MAX_PATH];
 	Color fpscolor = {0xff,0xff,0xff,0x00}, fpsblack = {0x00,0x00,0x00,0x00};
+	Color * palette = core->GetVideoDriver()->CreatePalette(fpscolor, fpsblack);
 	int frame = 0, time, timebase = 0;
 	double frames = 0.0;
 #ifndef WIN32
@@ -56,7 +57,7 @@ int main(int argc, char ** argv)
 			frame = 0;
 		}
 		sprintf(fpsstring, "%.3f fps", frames);
-		fps->Print(Region(0,0,100,20), (unsigned char *)fpsstring, &fpscolor, &fpsblack, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE,true);
+		fps->Print(Region(0,0,100,20), (unsigned char *)fpsstring, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE,true);
 	} while(core->GetVideoDriver()->SwapBuffers() == GEM_OK);
 	delete(core);
 	return 0;

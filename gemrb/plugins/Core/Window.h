@@ -54,6 +54,8 @@ public:
   Control * GetControl(unsigned short i);
   /** Sets 'ctrl' as Focused */
   void SetFocused(Control * ctrl);
+  /** Redraw all the Window */
+  void Invalidate();
 public: //Public attributes
   /** Window ID */
   unsigned short WindowID;
@@ -67,6 +69,8 @@ public: //Public attributes
   unsigned short Height;
   /** Visible */
   bool Visible;
+  /** Changed Flag */
+  bool Changed;
 private: // Private attributes
   /** BackGround Image. No BackGround if this variable is NULL. */
   Sprite2D * BackGround;

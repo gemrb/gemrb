@@ -32,6 +32,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos
 	lastC = NULL;
 	lastFocus = NULL;
 	Visible = false;
+	Changed = true;
 }
 
 Window::~Window()
@@ -48,6 +49,7 @@ void Window::AddControl(Control * ctrl)
 {
 	if(ctrl != NULL)
 		Controls.push_back(ctrl);
+	Changed = true;
 }
 /** Set the Window's BackGround Image. If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
 void Window::SetBackGround(Sprite2D * img, bool clean)
@@ -56,17 +58,19 @@ void Window::SetBackGround(Sprite2D * img, bool clean)
 		core->GetVideoDriver()->FreeSprite(this->BackGround);
 	}
 	BackGround = img;
+	Changed = true;
 }
 /** This function Draws the Window on the Output Screen */
 void Window::DrawWindow()
 {
 	Video * video = core->GetVideoDriver();
-	if(BackGround)
+	if(BackGround && Changed)
 		video->BlitSprite(BackGround, XPos, YPos, true);
 	std::vector<Control*>::iterator m;
 	for(m = Controls.begin(); m != Controls.end(); ++m) {
 		(*m)->Draw(XPos, YPos);
 	}
+	Changed = false;
 }
 
 /** Returns the Control at X,Y Coordinates */
@@ -113,4 +117,13 @@ Control * Window::GetControl(unsigned short i)
 void Window::release(void)
 {
 	delete this;
+}
+
+/** Redraw all the Window */
+void Window::Invalidate()
+{
+	for(int i = 0; i < Controls.size(); i++) {
+		Controls[i]->Changed = true;
+	}
+	Changed = true;
 }

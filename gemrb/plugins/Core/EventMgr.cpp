@@ -108,6 +108,8 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 			if(((*m)->XPos+(*m)->Width >= x) && ((*m)->YPos+(*m)->Height >= y)) { //Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
 				Control * ctrl = (*m)->GetControl(x,y);
+				if(lastW == NULL)
+					lastW = (*m);
 				if(ctrl != NULL) {
 					(*m)->SetFocused(ctrl);
 					ctrl->OnMouseDown(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos, Button, Mod);

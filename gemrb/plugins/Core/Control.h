@@ -69,6 +69,10 @@ public: // Public attributes
 	unsigned char ControlType;
 	/** Focused Control */
 	bool hasFocus;
+	/** Changed Flag */
+	bool Changed;
+	/** Owner Window */
+	void * Owner;
 public: //Events
 	/** Key Press Event */
 	virtual void OnKeyPress(unsigned char Key, unsigned short Mod);

@@ -43,12 +43,13 @@ public:
 	Font(void);
 	~Font(void);
 	void AddChar(Sprite2D * spr);
-	void Print(Region rgn, unsigned char * string, Color *color, Color *lowcolor, unsigned char Alignment, bool anchor = false, Font * initials = NULL, Color *initcolor = NULL, Sprite2D * cursor = NULL, int curpos = 0);
+	void Print(Region rgn, unsigned char * string, Color *color, unsigned char Alignment, bool anchor = false, Font * initials = NULL, Color *initcolor = NULL, Sprite2D * cursor = NULL, int curpos = 0);
 	char ResRef[9];
 	Sprite2D * chars[256];
 private: // Private methods
   /** PreCalculate for Printing */
   StringList Prepare(Region &rgn, unsigned char * string, Font * init, int curpos);
+  int CalcStringWidth(const char * string);
 };
 
 #endif

@@ -98,10 +98,13 @@ void Button::SetImage(unsigned char type, Sprite2D * img)
 		}
 		break;
 	}
+	Changed = true;
 }
 /** Draws the Control on the Output Display */
 void Button::Draw(unsigned short x, unsigned short y)
 {
+	if(!Changed)
+		return;
 	Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 	switch(State) {
 		case IE_GUI_BUTTON_UNPRESSED:
@@ -109,7 +112,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 			if(Unpressed)
 				core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
 			if(hasText)
-				font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, NULL, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
+				font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
+			Changed = false;
 		}
 		break;
 		
@@ -118,7 +122,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 			if(Pressed)
 				core->GetVideoDriver()->BlitSprite(Pressed, x+XPos, y+YPos, true);
 			if(hasText)
-				font->Print(Region(x+XPos+2, y+YPos+2, Width, Height), (unsigned char*)Text, NULL, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
+				font->Print(Region(x+XPos+2, y+YPos+2, Width, Height), (unsigned char*)Text, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
+			Changed = false;
 		}
 		break;
 		
@@ -128,6 +133,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 				core->GetVideoDriver()->BlitSprite(Selected, x+XPos, y+YPos, true);
 			else if(Unpressed)
 				core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
+			Changed = false;
 		}
 		break;
 		
@@ -137,6 +143,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 				core->GetVideoDriver()->BlitSprite(Disabled, x+XPos, y+YPos, true);
 			else if(Unpressed)
 				core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
+			Changed = false;
 		}
 		break;
 	}
@@ -146,6 +153,8 @@ void Button::SetState(unsigned char state)
 {
 	if(state > 3) // If wrong value inserted
 		return;
+	if(State != state)
+		Changed = true;
 	State = state;
 }
 
@@ -154,6 +163,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 {
 	if((Button == 1) && (State != IE_GUI_BUTTON_DISABLED)) {
 		State = IE_GUI_BUTTON_PRESSED;
+		Changed = true;
 	}
 }
 /** Mouse Button Up */
@@ -161,6 +171,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 {
 	if(State == IE_GUI_BUTTON_DISABLED)
 		return;
+	Changed = true;
 	State = IE_GUI_BUTTON_UNPRESSED;
 	if((x >= 0) && (x <= Width))
 		if((y >= 0) && (y <= Height))
@@ -180,6 +191,7 @@ int Button::SetText(const char * string)
 		hasText = true;
 		Text = strupr(Text);
 	}
+	Changed = true;
 	return 0;
 }
 
@@ -187,4 +199,5 @@ int Button::SetText(const char * string)
 void Button::SetEvent(char * funcName)
 {
 	strcpy(ButtonOnPress, funcName);
+	Changed = true;
 }

@@ -56,7 +56,7 @@ private: // Private attributes
   /** Font for Text Writing */
   Font * font;
   /** Foreground & Background Colors */
-  Color fore, back;
+  Color *palette;
   /** Use the RGB Color for the Font */
   bool useRGB;
   /** Alignment Variable */

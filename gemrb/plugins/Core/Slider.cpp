@@ -50,6 +50,8 @@ Slider::~Slider()
 /** Draws the Control on the Output Display */
 void Slider::Draw(unsigned short x, unsigned short y)
 {
+	if(!Changed)
+		return;
 	if(BackGround) {
 		if((BackGround->Width < Width) || (BackGround->Height < Height)) {
 			core->GetVideoDriver()->BlitTiled(Region(x+XPos, y+YPos, Width, Height), BackGround, true);
@@ -72,6 +74,7 @@ void Slider::Draw(unsigned short x, unsigned short y)
 			}
 		break;
 	}
+	Changed = false;
 }
 /** Returns the actual Slider Position */
 unsigned int Slider::GetPosition()
@@ -83,6 +86,7 @@ void Slider::SetPosition(unsigned int pos)
 {
 	if(pos <= KnobStepsCount)
 		Pos = pos;
+	Changed = true;
 }
 /** Sets the selected image */
 void Slider::SetImage(unsigned char type, Sprite2D * img)
@@ -106,11 +110,13 @@ void Slider::SetImage(unsigned char type, Sprite2D * img)
 			BackGround = img;
 		break;
 	}
+	Changed = true;
 }
 
 /** Mouse Button Down */
 void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
+	Changed = true;
 	unsigned short mx = KnobXPos+(Pos*KnobStep)-Knob->XPos, my = KnobYPos-Knob->YPos;
 	unsigned short Mx = mx + Knob->Width, My = my + Knob->Height;
 	if((x >= mx) && (y >= my)) {
@@ -162,6 +168,8 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 /** Mouse Button Up */
 void Slider::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
+	if(State != IE_GUI_SLIDER_KNOB)
+		Changed = true;
 	State = IE_GUI_SLIDER_KNOB;
 }
 /** Mouse Over Event */
@@ -186,6 +194,7 @@ void Slider::OnMouseOver(unsigned short x, unsigned short y)
 		else {
 			Pos = aftst;
 		}
+		Changed = true;
 	}
 }
 

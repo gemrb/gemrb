@@ -23,6 +23,7 @@
 
 Control::Control(){
 	hasFocus = false;
+	Changed = true;
 }
 
 Control::~Control(){

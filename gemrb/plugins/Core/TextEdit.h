@@ -62,6 +62,8 @@ private:
 	unsigned char * Buffer;
 	/** Cursor Position */
 	unsigned short CurPos;
+	/** Color Palette */
+	Color * palette;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

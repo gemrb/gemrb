@@ -479,13 +479,16 @@ ScriptEngine * Interface::GetGUIScriptEngine()
 int Interface::LoadWindow(unsigned short WindowID)
 {
 	for(int i = 0; i < windows.size(); i++) {
-		if(windows[i]->WindowID == WindowID)
+		if(windows[i]->WindowID == WindowID) {
+			windows[i]->Invalidate();
 			return i;
+		}
 	}
 	Window * win = windowmgr->GetWindow(WindowID);
 	if(win == NULL)
 		return -1;
 	windows.push_back(win);
+	win->Invalidate();
 	return windows.size()-1;
 }
 
@@ -524,8 +527,10 @@ int Interface::SetVisible(unsigned short WindowIndex, bool visible)
 		return -1;
 	Window * win = windows[WindowIndex];
 	win->Visible = visible;
-	if(win->Visible)
+	if(win->Visible) {
 		evntmgr->AddWindow(win);
+		win->Invalidate();
+	}
 	else
 		evntmgr->DelWindow(win->WindowID);
 	return 0;
@@ -584,6 +589,7 @@ int Interface::ShowModal(unsigned short WindowIndex)
 		return -1;
 	Window * win = windows[WindowIndex];
 	win->Visible = true;
+	win->Invalidate();
 	evntmgr->Clear();
 	evntmgr->AddWindow(win);
 }

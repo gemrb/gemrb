@@ -217,6 +217,14 @@ void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Regio
 		drect.y = y-spr->YPos-Viewport.y;
 	}
 	if(clip) {
+		/*if(drect.x+spr->Width < clip->x)
+			return;
+		if(drect.y+spr->Height < clip-y)
+			return;
+		if(drect.x >= clip->x+clip->w)
+			return;
+		if(drect.y >= clip->y+clip->h)
+			return;*/
 		if(drect.x < clip->x) {
 			if(clip->x >= (drect.x+spr->Width))
 				return;

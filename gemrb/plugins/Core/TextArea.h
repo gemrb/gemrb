@@ -54,7 +54,8 @@ private: // Private attributes
 	/** Attached Scroll Bar Pointer*/
 	ScrollBar * sb;
 	/** Text Colors */
-	Color hi, init, low;
+	Color * palette;
+	Color * initpalette;
 	/** Fonts */
 	Font *finit, *ftext;
 public: //Events

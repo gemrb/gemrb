@@ -123,6 +123,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				btn->Width = Width;
 				btn->Height = Height;
 				btn->ControlType = ControlType;
+				btn->Owner = win;
 				char BAMFile[8];
 				unsigned short Cycle, UnpressedIndex, PressedIndex, SelectedIndex, DisabledIndex;
 				str->Read(BAMFile, 8);
@@ -180,6 +181,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				sldr->ControlType = ControlType;
 				sldr->Width = Width;
 				sldr->Height = Height;
+				sldr->Owner = win;
 				ImageMgr * mos = (ImageMgr*)core->GetInterface(IE_MOS_CLASS_ID);
 				DataStream * s = core->GetResourceMgr()->GetResource(MOSFile, IE_MOS_CLASS_ID);
 				mos->Open(s, true);
@@ -216,6 +218,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				te->YPos = YPos;
 				te->Width = Width;
 				te->Height = Height;
+				te->Owner = win;
 				te->ControlType = ControlType;
 				te->SetFont(fnt);
 				te->SetCursor(af->GetFrame(0));
@@ -251,6 +254,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				ta->YPos = YPos;
 				ta->Width = Width;
 				ta->Height = Height;
+				ta->Owner = win;
 				ta->ControlType = ControlType;
 				ta->SetFonts(ini, fnt);
 				ta->SetText("Text Area (Temp Value)");				
@@ -275,6 +279,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				lab->YPos = YPos;
 				lab->Width = Width;
 				lab->Height = Height;
+				lab->Owner = win;
 				lab->ControlType = ControlType;
 				char * str = core->GetString(StrRef);
 				lab->SetText(str);
@@ -315,6 +320,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				sbar->YPos = YPos;
 				sbar->Width = Width;
 				sbar->Height = Height;
+				sbar->Owner = win;
 				sbar->ControlType = ControlType;
 				AnimationFactory * anim = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(BAMResRef, IE_BAM_CLASS_ID);
 				Animation * an = anim->GetCycle(Cycle);

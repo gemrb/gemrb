@@ -17,6 +17,9 @@
 
 #include "../../includes/win32def.h"
 #include "Label.h"
+#include "Interface.h"
+
+extern Interface * core;
 
 Label::Label(unsigned short bLength, Font * font){
 	this->font = font;
@@ -25,33 +28,43 @@ Label::Label(unsigned short bLength, Font * font){
 		Buffer = (char*)malloc(bLength);
 	useRGB = false;
 	Alignment = IE_FONT_ALIGN_LEFT;
+	palette = NULL;
 }
 Label::~Label(){
+	if(palette)
+		free(palette);
 	if(Buffer)
 		free(Buffer);
 }
 /** Draws the Control on the Output Display */
 void Label::Draw(unsigned short x, unsigned short y)
 {
-	if(font) {
+	if(font && Changed) {
 		if(useRGB)
-			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, &fore, &back, Alignment | IE_FONT_ALIGN_MIDDLE, true);
+			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, palette, Alignment | IE_FONT_ALIGN_MIDDLE, true);
 		else
-			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, NULL, NULL, Alignment | IE_FONT_ALIGN_MIDDLE, true);
+			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, NULL, Alignment | IE_FONT_ALIGN_MIDDLE, true);
+		Changed = false;
 	}
 }
 /** This function sets the actual Label Text */
 int Label::SetText(const char * string)
 {
-	if(Buffer != NULL)
+	if(Buffer != NULL) {
 		strcpy(Buffer, string);
+		if(Alignment == IE_FONT_ALIGN_CENTER)
+			strlwr(Buffer);
+	}
+	Changed = true;
 	return 0;
 }
 /** Sets the Foreground Font Color */
 void Label::SetColor(Color col, Color bac)
 {
-	fore = col;
-	back = bac;
+	if(palette)
+		free(palette);
+	palette = core->GetVideoDriver()->CreatePalette(col, bac);
+	Changed = true;
 }
 
 void Label::SetAlignment(unsigned char Alignment)
@@ -59,4 +72,7 @@ void Label::SetAlignment(unsigned char Alignment)
 	if(Alignment > IE_FONT_ALIGN_RIGHT)
 		return;
 	this->Alignment = Alignment;
+	if(Alignment == IE_FONT_ALIGN_CENTER)
+		strlwr(Buffer);
+	Changed = true;
 }

@@ -17,6 +17,8 @@ ScrollBar::~ScrollBar(void)
 
 void ScrollBar::Draw(unsigned short x, unsigned short y)
 {
+	if(!Changed)
+		return;
 	unsigned short upmx = 0, upMx = frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Width, upmy = 0, upMy = frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
 	unsigned short domx = 0, doMx = frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Width, domy = Height-frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height, doMy = Height;
 	unsigned short slmx = 0, slMx = frames[IE_GUI_SCROLLBAR_SLIDER]->Width, slmy = upMy+(Pos*((domy-frames[5]->Height-upMy)/(double)Max)), slMy = slmy+frames[IE_GUI_SCROLLBAR_SLIDER]->Height;
@@ -36,6 +38,7 @@ void ScrollBar::Draw(unsigned short x, unsigned short y)
 	else
 		core->GetVideoDriver()->BlitSprite(frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED], x+XPos, maxy, true);
 	core->GetVideoDriver()->BlitSprite(frames[IE_GUI_SCROLLBAR_SLIDER], x+XPos, y+YPos+slmy, true);
+	Changed = false;
 }
 
 void ScrollBar::SetImage(unsigned char type, Sprite2D * img)
@@ -43,10 +46,12 @@ void ScrollBar::SetImage(unsigned char type, Sprite2D * img)
 	if(type > IE_GUI_SCROLLBAR_SLIDER)
 		return;
 	frames[type] = img;
+	Changed = true;
 }
 /** Mouse Button Down */
 void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
+	Changed = true;
 	unsigned short upmx = 0, upMx = frames[0]->Width, upmy = 0, upMy = frames[0]->Height;
 	unsigned short domy = Height-frames[2]->Height;
 	unsigned short slheight = domy - upMy;
@@ -99,12 +104,14 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 /** Mouse Button Up */
 void ScrollBar::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
+	Changed = true;
 	State = 0;
 }
 /** Mouse Over Event */
 void ScrollBar::OnMouseOver(unsigned short x, unsigned short y)
 {
 	if((State & SLIDER_GRAB) != 0) {
+		Changed = true;
 		unsigned short upMy = frames[0]->Height;
 		unsigned short domy = Height-frames[2]->Height;
 		unsigned short slheight = domy - upMy;

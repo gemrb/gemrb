@@ -13,21 +13,26 @@ TextEdit::TextEdit(unsigned short maxLength)
 	Back = NULL;
 	CurPos = 0;
 	strncpy((char*)Buffer, "Text Edit", max);
+	Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
+	palette = core->GetVideoDriver()->CreatePalette(white, black);
 }
 
 TextEdit::~TextEdit(void)
 {
+	free(palette);
 	free(Buffer);
 }
 
 /** Draws the Control on the Output Display */
 void TextEdit::Draw(unsigned short x, unsigned short y)
 {
-	Color hi = {0xff, 0xff, 0xff, 0x00}, low = {0x00, 0x00, 0x00, 0x00};
+	if(!Changed)
+		return;
 	if(hasFocus)
-		font->Print(Region(x+XPos, y+YPos, Width, Height), Buffer, &hi, &low, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL, NULL, Cursor, CurPos);
+		font->Print(Region(x+XPos, y+YPos, Width, Height), Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL, NULL, Cursor, CurPos);
 	else
-		font->Print(Region(x+XPos, y+YPos, Width, Height), Buffer, &hi, &low, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true);
+		font->Print(Region(x+XPos, y+YPos, Width, Height), Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true);
+	Changed = false;
 }
 
 /** Set Font */
@@ -35,6 +40,7 @@ void TextEdit::SetFont(Font * f)
 {
 	if(f != NULL)
 		font = f;
+	Changed = true;
 }
 
 /** Set Cursor */
@@ -42,6 +48,7 @@ void TextEdit::SetCursor(Sprite2D * cur)
 {
 	if(cur != NULL)
 		Cursor = cur;
+	Changed = true;
 }
 
 /** Set BackGround */
@@ -49,11 +56,13 @@ void TextEdit::SetBackGround(Sprite2D * back)
 {
 	//if 'back' is NULL then no BackGround will be drawn
 	Back = back;
+	Changed = true;
 }
 
 /** Key Press Event */
 void TextEdit::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
+	Changed = true;
 	if(Key >= 0x20) {
 		int len = strlen((char*)Buffer);
 		if(len+1 < max) {
@@ -79,6 +88,7 @@ void TextEdit::OnKeyPress(unsigned char Key, unsigned short Mod)
 /** Special Key Press */
 void TextEdit::OnSpecialKeyPress(unsigned char Key)
 {
+	Changed = true;
 	if(Key == GEM_LEFT) {
 		if(CurPos > 0)
 			CurPos--;
@@ -103,5 +113,6 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 int TextEdit::SetText(const char * string)
 {
 	strncpy((char*)Buffer, string, max);
+	((Window*)Owner)->Invalidate();
 	return 0;
 }
