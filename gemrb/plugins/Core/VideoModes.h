@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VideoModes.h,v 1.4 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VideoModes.h,v 1.5 2005/03/05 10:26:52 guidoj Exp $
  *
  */
 
@@ -46,10 +46,10 @@ public:
 	~VideoModes(void);
 	int AddVideoMode(int w, int h, int bpp, bool fs, bool checkUnique = true);
 	int FindVideoMode(VideoMode& vm);
-	void RemoveEntry(unsigned long n);
+	void RemoveEntry(unsigned int n);
 	void Empty(void);
-	VideoMode operator[](unsigned long n);
-	int Count(void);
+	VideoMode operator[](unsigned int n);
+	unsigned int Count(void);
 };
 
 #endif

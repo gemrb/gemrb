@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VideoModes.cpp,v 1.4 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VideoModes.cpp,v 1.5 2005/03/05 10:26:52 guidoj Exp $
  *
  */
 
@@ -38,7 +38,7 @@ int VideoModes::AddVideoMode(int w, int h, int bpp, bool fs, bool checkUnique)
 {
 	VideoMode vm( w, h, bpp, fs );
 	if (checkUnique) {
-		for (unsigned long i = 0; i < modes.size(); i++) {
+		for (unsigned int i = 0; i < modes.size(); i++) {
 			if (modes[i] == vm) {
 				return GEM_ERROR;
 			}
@@ -50,7 +50,7 @@ int VideoModes::AddVideoMode(int w, int h, int bpp, bool fs, bool checkUnique)
 
 int VideoModes::FindVideoMode(VideoMode& vm)
 {
-	for (unsigned long i = 0; i < modes.size(); i++) {
+	for (unsigned int i = 0; i < modes.size(); i++) {
 		if (modes[i] == vm) {
 			return i;
 		}
@@ -58,7 +58,7 @@ int VideoModes::FindVideoMode(VideoMode& vm)
 	return GEM_ERROR;
 }
 
-void VideoModes::RemoveEntry(unsigned long n)
+void VideoModes::RemoveEntry(unsigned int n)
 {
 	if (n >= modes.size()) {
 		return;
@@ -76,7 +76,7 @@ void VideoModes::Empty(void)
 	}
 }
 
-VideoMode VideoModes::operator[](unsigned long n)
+VideoMode VideoModes::operator[](unsigned int n)
 {
 	if (n >= modes.size()) {
 		return VideoMode();
@@ -84,7 +84,8 @@ VideoMode VideoModes::operator[](unsigned long n)
 	return modes[n];
 }
 
-int VideoModes::Count(void)
+unsigned int VideoModes::Count(void)
 {
-	return ( int ) modes.size();
+	return modes.size();
 }
+
