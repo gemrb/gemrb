@@ -1,0 +1,21 @@
+
+Prototype: GemRB.CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, flags)
+
+Description: This command will create a special WorldMapControl, which is currently unavailable via .chu files. If WindowIndex and ControlID (not ControlIndex!) point to a valid control, it will replace that control with the WorldMapControl using the original control's dimensions (x,y,w,h are ignored). 
+
+Parameters:
+WindowIndex - the value returned from LoadWindow
+ControlID   - the new control will be available via this controlID
+x,y,w,h     - X position, Y position, Width and Height of the control
+flags       - 0 - don't change cursor when it is hovering over an area
+              1 - change cursor when it is hovering over an area
+
+Return value: N/A
+
+Example: 
+        Window = GemRB.LoadWindow (0)
+        GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel)
+        WorldMapControl = GemRB.GetControl (Window, 4)
+
+See also:
+

@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.GetPartySize()
 
-Description:
+Description: Returns the actual number of PCs (dead included). This command works only after a LoadGame().
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: numeric (should be 0-8)
 
-See also:
+See also: LoadGame, QuitGame
 
