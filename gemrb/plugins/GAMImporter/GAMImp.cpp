@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.4 2003/12/19 17:27:00 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.5 2003/12/19 23:05:54 balrog994 Exp $
  *
  */
 
@@ -101,8 +101,8 @@ bool GAMImp::Open(DataStream * stream, bool autoFree)
 		default: 
 			{
 				str->Read(&Unknown54, 4);
-				str->Read(&AREResRef, 8);
-				AREResRef[8] = 0;
+				str->Read(&CurrentArea, 8);
+				CurrentArea[8] = 0;
 				str->Read(&Unknowns, 84);
 			}
 		break;
@@ -131,6 +131,13 @@ Game * GAMImp::GetGame()
 		globals->RemoveAll();
 	Game * newGame = new Game();
 	MapMgr * mM = (MapMgr*)core->GetInterface(IE_ARE_CLASS_ID);
+	if(!CurrentArea[0]) {
+		int i = core->LoadTable("STARTARE");
+		TableMgr * tm = core->GetTable(i);
+		char * resref = tm->QueryField();
+		strncpy(CurrentArea, resref, 8);
+		CurrentArea[8] = 0;
+	}
 	DataStream * ds = core->GetResourceMgr()->GetResource(CurrentArea, IE_ARE_CLASS_ID);
 	mM->Open(ds, true);
 	Map * newMap = mM->GetMap();
