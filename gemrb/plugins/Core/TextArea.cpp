@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.35 2003/12/25 23:58:30 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.36 2003/12/26 20:47:51 balrog994 Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include "TextArea.h"
 #include "Interface.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 extern Interface * core;
 
@@ -82,58 +83,100 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	if(lines.size() == 0)
 		return;
 	if(!Selectable) {
-  	char * Buffer = (char*)malloc(1);
-  	Buffer[0] = 0;
-  	int len = 0;
-	int lastlen = 0;
-  	for(size_t i = 0; i < lines.size(); i++) {
-  		len += (int)mystrlen(lines[i])+1;
-  		Buffer = (char*)realloc(Buffer, len+1);
-  		memcpy(&Buffer[lastlen], lines[i], len+1-lastlen);
-		lastlen=len;
-		if(i != lines.size()-1) {
-			Buffer[lastlen-1] = '\n';
-			Buffer[lastlen] = 0;
-  			//strcat(Buffer, "\n");
-		}
-  	}
-  	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height-5), (unsigned char*)Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
-  	free(Buffer);
+  		char * Buffer = (char*)malloc(1);
+  		Buffer[0] = 0;
+  		int len = 0;
+		int lastlen = 0;
+  		for(size_t i = 0; i < lines.size(); i++) {
+			if(seltext == i) {
+				if(strnicmp("[s=", lines[i], 3) == 0) {
+					int tlen = (int)mystrlen(lines[i])+1;
+					char * tmp = (char*)malloc(tlen);
+					unsigned long idx, ar, ag, ab, br, bg, bb;
+					sscanf(lines[i], "[s=%d,%02X%02X%02X,%02X%02X%02X]%[^[][/s]", &idx, &ar, &ag, &ab, &br, &bg, &bb, tmp);
+					tlen = 14+strlen(tmp)+8+1;
+					char * tmp1 = (char*)malloc(tlen);
+					sprintf(tmp1, "[color=%02X%02X%02X]%s[/color]", ar, ag, ab, tmp);
+					free(tmp);
+					len += tlen;
+					Buffer = (char*)realloc(Buffer, len+1);
+					memcpy(&Buffer[lastlen], tmp1, len+1-lastlen);
+					lastlen = len;
+					free(tmp1);
+				}
+				else {
+  					len += (int)mystrlen(lines[i])+1;
+  					Buffer = (char*)realloc(Buffer, len+1);
+  					memcpy(&Buffer[lastlen], lines[i], len+1-lastlen);
+					lastlen=len;
+				}
+			}
+			else {
+  				if(strnicmp("[s=", lines[i], 3) == 0) {
+					int tlen = (int)mystrlen(lines[i])+1;
+					char * tmp = (char*)malloc(tlen);
+					unsigned long idx, ar, ag, ab, br, bg, bb;
+					sscanf(lines[i], "[s=%d,%02X%02X%02X,%02X%02X%02X]%[^[][/s]", &idx, &ar, &ag, &ab, &br, &bg, &bb, tmp);
+					tlen = 14+strlen(tmp)+8+1;
+					char * tmp1 = (char*)malloc(tlen);
+					sprintf(tmp1, "[color=%02X%02X%02X]%s[/color]", br, bg, bb, tmp);
+					free(tmp);
+					len += tlen;
+					Buffer = (char*)realloc(Buffer, len+1);
+					memcpy(&Buffer[lastlen], tmp1, len+1-lastlen);
+					lastlen = len;
+					free(tmp1);
+				}
+				else {
+  					len += (int)mystrlen(lines[i])+1;
+  					Buffer = (char*)realloc(Buffer, len+1);
+  					memcpy(&Buffer[lastlen], lines[i], len+1-lastlen);
+					lastlen=len;
+				}
+			}
+			if(i != lines.size()-1) {
+				Buffer[lastlen-1] = '\n';
+				Buffer[lastlen] = 0;
+  				//strcat(Buffer, "\n");
+			}
+  		}
+  		ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height-5), (unsigned char*)Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
+  		free(Buffer);
 	}
 	else {
-  	int rc = 0;
-  	int acc = 0;
-  	int sr = startrow;
-  	unsigned int i = 0;
-  	int yl = 0;
-  	for(i = 0; i < lines.size(); i++) {
-  		if(rc+lrows[i] <= sr) {
-  			rc+=lrows[i];
-  			continue;
+  		int rc = 0;
+  		int acc = 0;
+  		int sr = startrow;
+  		unsigned int i = 0;
+  		int yl = 0;
+  		for(i = 0; i < lines.size(); i++) {
+  			if(rc+lrows[i] <= sr) {
+  				rc+=lrows[i];
+  				continue;
+  			}
+  			sr -= rc;
+  			Color * pal = NULL;
+  			if(seltext == i)
+  				pal = selected;
+  			else if(selline == i)
+				pal = lineselpal;
+			else
+  				pal = palette;
+  			ftext->PrintFromLine(sr, Region(x+XPos, y+YPos, Width, Height-5), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
+  			yl = lrows[i]-sr;
+  			break;
   		}
-  		sr -= rc;
-  		Color * pal = NULL;
-  		if(seltext == i)
-  			pal = selected;
-  		else if(selline == i)
-			pal = lineselpal;
-		else
-  			pal = palette;
-  		ftext->PrintFromLine(sr, Region(x+XPos, y+YPos, Width, Height-5), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
-  		yl = lrows[i]-sr;
-  		break;
-  	}
-  	for(i++;i < lines.size(); i++) {
-  		Color * pal = NULL;
-  		if(seltext == i)
-  			pal = selected;
-  		else if(selline == i)
-			pal = lineselpal;
-		else
-  			pal = palette;
-  		ftext->Print(Region(x+XPos, y+YPos+(yl*ftext->size[1].h/*chars[1]->Height*/), Width, Height-5-(yl*ftext->size[1].h/*chars[1]->Height*/)), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true);
-		yl+=lrows[i];
-  	}
+  		for(i++;i < lines.size(); i++) {
+  			Color * pal = NULL;
+  			if(seltext == i)
+  				pal = selected;
+  			else if(selline == i)
+				pal = lineselpal;
+			else
+  				pal = palette;
+  			ftext->Print(Region(x+XPos, y+YPos+(yl*ftext->size[1].h/*chars[1]->Height*/), Width, Height-5-(yl*ftext->size[1].h/*chars[1]->Height*/)), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true);
+			yl+=lrows[i];
+  		}
 	}
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
@@ -262,8 +305,18 @@ void TextArea::CalcRowCount()
 			memcpy(tmp, lines[i], len+1);
 			ftext->SetupString(tmp, Width);
 			for(int p = 0; p <= len; p++) {
-				if(((unsigned char)tmp[p]) >= 0xf0) {
-					p+=3;
+				if(((unsigned char)tmp[p]) == '[') {
+					p++;
+					char tag[256];
+					int k = 0;
+					for(k = 0; k < 256; k++) {
+						if(tmp[p] == ']') {
+							tag[k] = 0;
+							break;
+						}
+						tag[k] = tmp[p++];
+					}
+					continue;
 				}
 				if(tmp[p] == 0) {
 					if(p != len)
@@ -283,28 +336,45 @@ void TextArea::CalcRowCount()
 /** Mouse Over Event */
 void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 {
-	if(!Selectable)
-		return;
 	int height = ftext->size[1].h;//ftext->chars[1]->Height;
 	int r = y/height;
 	int row = 0;
-	((Window*)Owner)->Invalidate();
+	//((Window*)Owner)->Invalidate();
+	
 	for(size_t i = 0; i < lines.size(); i++) {
 		row+=lrows[i];
 		if(r < (row-startrow)) {
+			if(seltext != i)
+				core->RedrawAll();
 			seltext = (int)i;
-			printf("CtrlId = 0x%08lx, seltext = %d, rows = %d, row = %d, r = %d\n", ControlID, i, rows, row, r);
+			//printf("CtrlId = 0x%08lx, seltext = %d, rows = %d, row = %d, r = %d\n", ControlID, i, rows, row, r);
 			return;
 		}
 	}
+	if(seltext != -1)
+		core->RedrawAll();
 	seltext = -1;
-	printf("CtrlId = 0x%08lx, seltext = %d, rows %d, row %d, r = %d\n", ControlID, seltext, rows, row, r);
+	//printf("CtrlId = 0x%08lx, seltext = %d, rows %d, row %d, r = %d\n", ControlID, seltext, rows, row, r);
 }
 /** Mouse Button Up */
 void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
 	if((x <= Width) && (y <= (Height-5))) {
 		selline = seltext;
+		if(strnicmp(lines[seltext], "[s=", 3) == 0) {
+			unsigned long idx, r, g, b;
+			size_t len = strlen(lines[seltext]);
+			sscanf(lines[seltext], "[s=%d,%02X%02X%02X]", &idx, &r, &g, &b);
+			Window * win = core->GetWindow(0);
+			if(win) {
+				GameControl * gc = (GameControl*)win->GetControl(0);
+				if(gc->ControlType == IE_GUI_GAMECONTROL) {
+					if(gc->Dialogue) {
+						gc->DialogChoose(idx);
+					}
+				}
+			}
+		}
 		//((Window*)Owner)->Invalidate();
 		core->RedrawAll();
 	}
