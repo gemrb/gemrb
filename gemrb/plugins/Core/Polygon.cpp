@@ -21,7 +21,8 @@ Gem_Polygon::Gem_Polygon(Point * points, int count, bool precalculate, Color * c
 
 Gem_Polygon::~Gem_Polygon(void)
 {
-	free(points);
+	if(points)
+		free(points);
 	if(fill)
 		core->GetVideoDriver()->FreeSprite(fill);
 }
