@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.32 2005/02/24 22:18:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.33 2005/02/25 15:07:46 avenger_teambg Exp $
  *
  */
 
@@ -39,8 +39,8 @@
 #include <crtdbg.h>
 #endif
 
-BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD fdwReason,
-	LPVOID lpvReserved)
+BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
+	LPVOID /*lpvReserved*/)
 {
 	return true;
 }
