@@ -1,22 +1,43 @@
 #include "../../includes/win32def.h"
+#include "TableMgr.h"
 #include "Actor.h"
+#include "Interface.h"
 
-Actor::Actor(void)
+extern Interface * core;
+#ifdef WIN32
+extern HANDLE hConsole;
+#endif
+
+Actor::Actor(unsigned short AnimationID)
 {
 	int i;
 
-        for(i = 0; i < MAX_STATS; i++) {
-                BaseStats[i] = 0;
-                Modified[i] = 0;
-        }
-        for(i = 0; i < MAX_SCRIPTS; i++) {
-                Scripts[i][0]=0;
-        }
-        Dialog[0] = 0;
-        ScriptName[0] = 0;
-        Icon[0] = 0;
+	for(i = 0; i < MAX_STATS; i++) {
+		BaseStats[i] = 0;
+		Modified[i] = 0;
+	}
+	for(i = 0; i < MAX_SCRIPTS; i++) {
+		Scripts[i][0]=0;
+	}
+	Dialog[0] = 0;
+	ScriptName[0] = 0;
+	Icon[0] = 0;
 
-	//anims = new CharAnimations();
+	char tmp[7];
+	sprintf(tmp, "0x%04X", AnimationID);
+	int AvatarTable = core->LoadTable("Avatars");
+	TableMgr * at = core->GetTable(AvatarTable);
+	int RowIndex = at->GetRowIndex(tmp);
+	if(RowIndex < 0) {
+		printMessage("Actor", "Avatar Animation not supported!\n", YELLOW);
+		anims = NULL;
+	}
+	else {
+		char * BaseResRef = at->QueryField(RowIndex, 0);
+		char * Mirror = at->QueryField(RowIndex, 1);
+		char * Orient = at->QueryField(RowIndex, 2);
+		anims = new CharAnimations(BaseResRef, atoi(Orient), atoi(Mirror));
+	}
 	LongName = NULL;
 	ShortName = NULL;
 }

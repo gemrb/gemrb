@@ -39,7 +39,7 @@ public:
 	char LargePortrait[9];
 	unsigned long StrRefs[100];
 public:
-	Actor(void);
+	Actor(unsigned short AnimationID);
 	~Actor(void);
 
 	/** returns the animations */
