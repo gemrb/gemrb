@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.25 2004/01/10 21:53:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.26 2004/01/11 16:08:07 balrog994 Exp $
  *
  */
 
@@ -46,7 +46,7 @@ class Action;
 class GEM_EXPORT Object {
 public:
 	Object() {
-		RefCount = 0;
+		RefCount = 1;
 		objectName[0] = 0;
 		PositionMask[0] = 0;
 	};
@@ -87,7 +87,7 @@ class GEM_EXPORT Trigger {
 public:
 	Trigger() {
         objectParameter = NULL;
-		RefCount = 0;
+		RefCount = 1;
 		string0Parameter[0] = 0;
 		string1Parameter[0] = 0;
 	};
@@ -123,14 +123,14 @@ public:
 class GEM_EXPORT Condition {
 public:
 	Condition() {
-		RefCount = 0;
+		RefCount = 1;
 	};
 	~Condition() {
 		for(int c = 0; c < triggersCount; c++) {
 			if(triggers[c])
 				triggers[c]->Release();
 		}
-		delete(triggers);
+		delete[] triggers;
 	}
 public:
 	unsigned short triggersCount;
@@ -162,7 +162,7 @@ public:
 		YpointParameter = 0;
 		int1Parameter = 0;
 		int2Parameter = 0;
-		RefCount = 0;
+		RefCount = 1;
 	};
 	~Action() {
 		for(int c = 0; c < 3; c++) {
@@ -198,14 +198,14 @@ public:
 class GEM_EXPORT Response {
 public:
 	Response() {
-		RefCount = 0;
+		RefCount = 1;
 	};
 	~Response() {
 		for(int c = 0; c < actionsCount; c++) {
 			if(actions[c])
 				actions[c]->Release();
 		}
-		delete(actions);
+		delete[] actions;
 	}
 public:
 	unsigned char weight;
@@ -227,14 +227,14 @@ public:
 class GEM_EXPORT ResponseSet {
 public:
 	ResponseSet() {
-		RefCount = 0;
+		RefCount = 1;
 	};
 	~ResponseSet() {
 		for(int b = 0; b < responsesCount; b++) {
 			Response * rP = responses[b];
 			rP->Release();
 		}
-		delete(responses);
+		delete[] responses;
 	}
 public:
 	unsigned short responsesCount;
@@ -255,7 +255,7 @@ public:
 class GEM_EXPORT ResponseBlock {
 public:
 	ResponseBlock() {
-		RefCount = 0;
+		RefCount = 1;
 	};
 	~ResponseBlock() {
 		if(condition)
@@ -282,7 +282,7 @@ public:
 class GEM_EXPORT Script {
 public:
 	Script(const char * Name) {
-		RefCount = 0;
+		RefCount = 1;
 		responseBlocks = NULL;
 		responseBlocksCount = 0;
 		if(!Name) {
@@ -312,6 +312,7 @@ private:
 			if(responseBlocks[i])
 				responseBlocks[i]->Release();
 		}
+		delete[] responseBlocks;
 	}
 public:
 	unsigned int responseBlocksCount;
