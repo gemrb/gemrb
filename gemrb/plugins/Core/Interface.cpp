@@ -432,7 +432,10 @@ char * Interface::TypeExt(SClass_ID type)
 
 char * Interface::GetString(unsigned long strref)
 {
-	return strings->GetString(strref);
+	unsigned long flags;
+
+	vars->Lookup("StrrefOn",flags);
+	return strings->GetString(strref, flags);
 }
 
 void Interface::GetHCAnim(Actor * act)

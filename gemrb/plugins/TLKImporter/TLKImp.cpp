@@ -49,20 +49,17 @@ static bool ResolveTags(char *dest, char *source, int Length)
   int NewLength;
   char Token[MAX_VARIABLE_LENGTH+1];
 
-printf("ResolveTags: %s into %d\n",source,Length);
   NewLength=0;
   for(int i=0; source[i];i++) {
 	if(source[i]=='<') {
-		i+=mystrncpy(Token, source+i+1, MAX_VARIABLE_LENGTH, '>' )-Token+2;
-printf("TOKEN: %.32s\n",Token);
+		i+=mystrncpy(Token, source+i+1, MAX_VARIABLE_LENGTH, '>' )-Token+1;
 		int TokenLength=core->GetTokenDictionary()->GetValueLength(Token);
-		if(TokenLength+NewLength>=Length)
-			return false;
-		char *str=NULL;
-		core->GetTokenDictionary()->Lookup(Token, str, TokenLength);
-                if(str)
-			memcpy(dest+NewLength, str, TokenLength);
-		NewLength+=TokenLength;
+		if(TokenLength) {
+			if(TokenLength+NewLength>Length)
+				return false;
+			core->GetTokenDictionary()->Lookup(Token, dest+NewLength, TokenLength);
+			NewLength+=TokenLength;
+		}
 	}
 	else {
 		if(source[i]=='[') {
@@ -72,8 +69,9 @@ printf("TOKEN: %.32s\n",Token);
 			else
 				break;
 		}
-		dest[NewLength++]=source[i];
-		if(NewLength>=Length)
+		else
+			dest[NewLength++]=source[i];
+		if(NewLength>Length)
 			return false;
 	}
   }
@@ -89,8 +87,7 @@ static bool GetNewStringLength(char *string, unsigned long &Length)
   NewLength=0;
   for(int i=0;i<Length;i++) {
 	if(string[i]=='<') {
-		i+=mystrncpy(Token, string+i+1, MAX_VARIABLE_LENGTH, '>' )-Token+2;
-printf("TOKEN: %.32s\n",Token);
+		i+=mystrncpy(Token, string+i+1, MAX_VARIABLE_LENGTH, '>' )-Token+1;
 		NewLength+=core->GetTokenDictionary()->GetValueLength(Token);
 	}
 	else {
@@ -104,7 +101,6 @@ printf("TOKEN: %.32s\n",Token);
 		else NewLength++;
 	}
   }
-printf("NewStringLength: %d\n",NewLength);
   if(NewLength!=Length)
   {
 	Length=NewLength;
@@ -145,7 +141,6 @@ char * TLKImp::GetString(unsigned long strref, int flags)
 //GetNewStringLength will look in string and return true
 //if the new Length will change due to tokens
 //if there is no new length, we are done
-printf("Resolve: %s\n",string);
 		while(GetNewStringLength(string, Length) ) {
 			char *string2 = (char *) malloc(Length+1);
 //ResolveTags will copy string to string2
