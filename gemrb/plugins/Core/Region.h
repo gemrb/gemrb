@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.4 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.5 2003/12/14 09:17:17 avenger_teambg Exp $
  *
  */
 
@@ -46,9 +46,9 @@ public:
 int DEBUG;
 	Region(const Region & rgn);
 	//Region(Region & rgn);
-	Region & operator=(Region & rgn);
-	bool operator==(Region & rgn);
-	bool operator!=(Region & rgn);
+	Region & operator=(const Region & rgn);
+	bool operator==(const Region & rgn);
+	bool operator!=(const Region & rgn);
 	Region(int x, int y, int w, int h, int DEBUG=0);
 };
 
