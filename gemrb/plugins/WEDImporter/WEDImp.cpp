@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.6 2003/11/30 09:53:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.7 2003/12/15 09:33:52 balrog994 Exp $
  *
  */
 
@@ -194,7 +194,7 @@ unsigned short * WEDImp::GetDoorIndices(char * ResRef, int *count)
 	unsigned short OpenPolyCount, ClosedPolyCount;
 	unsigned long OpenPolyOffset, ClosedPolyOffset;
 	char Name[9];
-	int i;
+	unsigned int i;
 	for(i = 0; i < DoorsCount; i++) {
 		str->Seek(DoorsOffset + (i*0x1A), GEM_STREAM_START);
 		str->Read(Name, 8);
