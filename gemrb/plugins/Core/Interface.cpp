@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.129 2004/02/21 20:31:15 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.130 2004/02/24 21:20:17 edheldil Exp $
  *
  */
 
@@ -1232,6 +1232,14 @@ int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex,
 			{
 			Slider * sld = (Slider*)ctrl;
 			strncpy(sld->SliderOnChange, funcName,64);
+			return 0;
+			}
+		break;
+
+		case IE_GUI_LABEL: //Label
+			{
+			Label * lab = (Label*)ctrl;
+			strncpy(lab->LabelOnPress, funcName,64);
 			return 0;
 			}
 		break;

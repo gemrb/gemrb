@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.23 2003/12/26 13:46:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.24 2004/02/24 21:20:17 edheldil Exp $
  *
  */
 
@@ -101,7 +101,7 @@ Control * Window::GetControl(unsigned short x, unsigned short y)
 {
 	Control * ctrl = NULL;
 	//Check if we are always on the last control
-	if((lastC != NULL) && (lastC->ControlType != IE_GUI_LABEL)) {
+	if((lastC != NULL) /*&& (lastC->ControlType != IE_GUI_LABEL)*/) {
 		if((XPos+lastC->XPos <= x) && (YPos+lastC->YPos <= y)) { //Maybe we are always there
 			if((XPos+lastC->XPos+lastC->Width >= x) && (YPos+lastC->YPos+lastC->Height >= y)) { //Yes, we are on the last returned Control
 				return lastC;
@@ -110,8 +110,10 @@ Control * Window::GetControl(unsigned short x, unsigned short y)
 	}
 	std::vector<Control*>::iterator m;
 	for(m = Controls.begin(); m != Controls.end(); m++) {
+	  /*
 		if((*m)->ControlType == IE_GUI_LABEL)
 			continue;
+	  */
 		if((XPos+(*m)->XPos <= x) && (YPos+(*m)->YPos <= y)) { //Maybe we are on this control
 			if((XPos+(*m)->XPos+(*m)->Width >= x) && (YPos+(*m)->YPos+(*m)->Height >= y)) { //Yes, we are here
 				ctrl = *m;

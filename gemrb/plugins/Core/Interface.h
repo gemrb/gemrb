@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.77 2004/02/19 22:50:31 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.78 2004/02/24 21:20:17 edheldil Exp $
  *
  */
 
@@ -38,6 +38,7 @@
 #include "WindowMgr.h"
 #include "ScriptEngine.h"
 #include "Button.h"
+#include "Label.h"
 #include "Slider.h"
 #include "TextEdit.h"
 #include "Console.h"

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.26 2004/01/09 17:44:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.27 2004/02/24 21:20:17 edheldil Exp $
  *
  */
 
@@ -157,12 +157,14 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 			if(((*m)->XPos+(*m)->Width >= x) && ((*m)->YPos+(*m)->Height >= y)) { //Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
 				Control * ctrl = (*m)->GetControl(x,y);
+				printf ("dn: ctrl: %p\n", ctrl);
 				if(lastW == NULL)
 					lastW = (*m);
 				if(ctrl != NULL) {
 					(*m)->SetFocused(ctrl);
 					ctrl->OnMouseDown(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos, Button, Mod);
 					lastF = ctrl;
+					printf("dn lastF: %p\n", lastF);
 				}
 				lastW = *m;
 				return;
@@ -177,6 +179,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
 	MButtons &= ~Button;
+	printf("up lastF: %p\n", lastF);
 	if(lastF != NULL) {
 		lastF->OnMouseUp(x-lastW->XPos-lastF->XPos, y-lastW->YPos-lastF->YPos, Button, Mod);
 	}
