@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.10 2003/11/25 13:47:59 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.11 2003/11/25 16:45:36 balrog994 Exp $
  *
  */
 
@@ -64,6 +64,12 @@ public:
 	Color * GetPalette(Sprite2D * spr);
 	/** Mirrors an Animation Horizontally */
 	void MirrorAnimation(Animation * anim);
+	/** Convers a Screen Coordinate to a Game Coordinate */
+	void ConvertToGame(unsigned short &x, unsigned short &y)
+	{
+		x += Viewport.x;
+		y += Viewport.y;
+	}
 
 	void * GetVideoSurface()
 	{
