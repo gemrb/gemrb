@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.51 2004/11/25 21:04:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.52 2005/02/11 21:45:02 avenger_teambg Exp $
  *
  */
 
@@ -185,23 +185,40 @@ public:
 };
 
 class GEM_EXPORT Moveble : public Selectable {
-private: //this one seems to be sensitive, so gets protection
+private: //these seem to be sensitive, so get protection
 	unsigned char StanceID;
+	unsigned char Orientation;
 public:
 	Moveble(ScriptableType type);
 	virtual ~Moveble(void);
 	Point Destination;
-	unsigned char Orientation;
 	PathNode* path;
 	PathNode* step;
 	unsigned long timeStartStep;
 	Sprite2D* lastFrame;
-	char Area[9];
 	ieDword TalkCount;
 	int InternalFlags;
+	ieResRef Area;
 public:
+//inliners to protect data consistency
+	inline unsigned char GetOrientation() {
+		return Orientation;
+	}
+	inline unsigned char GetStance() {
+		return StanceID;
+	}
+
+	inline void SetOrientation(int value) {
+		Orientation=(unsigned char) value;
+#ifdef _DEBUG
+		if (Orientation>=MAX_ORIENT) {
+			printMessage("[Actor]","We are badly oriented!",LIGHT_RED);
+			abort();
+		}
+#endif
+	}
+
 	void SetStance(unsigned int arg);
-	unsigned char GetStance();
 	void DoStep();
 	void AddWayPoint(Point &Des);
 	void RunAwayFrom(Point &Des, int PathLength, bool Backing);

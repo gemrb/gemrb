@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.87 2005/01/22 20:28:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.88 2005/02/11 21:44:57 avenger_teambg Exp $
  *
  */
 
@@ -504,7 +504,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			ip->Scripts[0] = NULL;
 	}
 	//we need this so we can filter global actors
-	Game *game=core->GetGame();
+	//Game *game=core->GetGame();
 	printf( "Loading actors\n" );
 	//Loading Actors
 	str->Seek( ActorOffset, GEM_STREAM_START );
@@ -583,16 +583,18 @@ Map* AREImp::GetMap(const char *ResRef)
 				ab->SetScriptName(DefaultName);
 			}
 	
-			ab->Orientation = Orientation&(MAX_ORIENT-1);
+			ab->SetOrientation( Orientation&(MAX_ORIENT-1) );
 			ab->TalkCount = TalkCount;
 			//hack to not load global actors to area
 			//most likely this is unneeded now as we
 			//load saved game areas
-			if(!game->FindPC(ab->scriptName) && !game->FindNPC(ab->scriptName) ) {
+			//if(!game->FindPC(ab->scriptName) && !game->FindNPC(ab->scriptName) ) {
 				map->AddActor( ab );
+/*
 			} else {
 				delete ab;
 			}
+*/
 		}
 		core->FreeInterface( actmgr );
 	}

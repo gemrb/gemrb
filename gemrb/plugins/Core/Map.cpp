@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.129 2005/01/15 14:55:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.130 2005/02/11 21:45:34 avenger_teambg Exp $
  *
  */
 
@@ -409,16 +409,13 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			CharAnimations* ca = actor->GetAnims();
 			if (!ca)
 				continue;
-if(actor->Orientation>=MAX_ORIENT) {
-	abort();
-}
-			Animation* anim = ca->GetAnimation( actor->GetStance(), actor->Orientation );
+			Animation* anim = ca->GetAnimation( actor->GetStance(), actor->GetOrientation() );
 			if (anim &&
 				anim->autoSwitchOnEnd &&
 				anim->endReached &&
 				anim->nextStanceID) {
 				actor->SetStance( anim->nextStanceID );
-				anim = ca->GetAnimation( actor->GetStance(), actor->Orientation );
+				anim = ca->GetAnimation( actor->GetStance(), actor->GetOrientation() );
 			}
 			if (( !actor->Modified[IE_NOCIRCLE] ) &&
 			    ( !( actor->Modified[IE_STATE_ID] & STATE_DEAD ) )) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.224 2005/02/10 22:40:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.225 2005/02/11 21:45:02 avenger_teambg Exp $
  *
  */
 
@@ -4849,7 +4849,7 @@ int GameScript::IsRotation(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if( actor->Orientation == parameters->int0Parameter ) {
+	if( actor->GetOrientation() == parameters->int0Parameter ) {
 		return 1;
 	}
 	return 0;
@@ -4868,7 +4868,7 @@ int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
 	}
 	value = (ieDword) CheckVariable( tar, parameters->string0Parameter );
 	Point p = { *(unsigned short *) &value, *(((unsigned short *) &value)+1) };
-	if(actor->Orientation == GetOrient( p, actor->Pos ) ) {
+	if(actor->GetOrientation() == GetOrient( p, actor->Pos ) ) {
 		return 1;
 	}
 	return 0;
@@ -5516,7 +5516,7 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	//i think  this isn't needed, the creature's stance should be set in
 	//the creature, GetActor sets it correctly
 	//ab->SetStance( IE_ANI_AWAKE );
-	ab->Orientation = parameters->int0Parameter&(MAX_ORIENT-1);
+	ab->SetOrientation(parameters->int0Parameter&(MAX_ORIENT-1) );
 	map->AddActor( ab );
 
 	//setting the deathvariable if it exists (iwd2)
@@ -6042,7 +6042,7 @@ void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) tar;
-	actor->Orientation = parameters->int0Parameter&(MAX_ORIENT-1);
+	actor->SetOrientation(parameters->int0Parameter&(MAX_ORIENT-1) );
 }
 
 /* A -1 means random facing? */
@@ -6054,9 +6054,9 @@ void GameScript::Face(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (parameters->int0Parameter==-1) {
-		actor->Orientation = core->Roll(1,MAX_ORIENT,-1);
+		actor->SetOrientation(core->Roll(1,MAX_ORIENT,-1) );
 	} else {
-		actor->Orientation = parameters->int0Parameter&(MAX_ORIENT-1);
+		actor->SetOrientation(parameters->int0Parameter&(MAX_ORIENT-1));
 	}
 	actor->resetAction = true;
 	actor->SetWait( 1 );
@@ -6074,7 +6074,7 @@ void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->Orientation = GetOrient( target->Pos, actor->Pos );
+	actor->SetOrientation( GetOrient( target->Pos, actor->Pos ) );
 	actor->resetAction = true;
 	actor->SetWait( 1 );
 }
@@ -6093,7 +6093,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 	value = (ieDword) CheckVariable( target, parameters->string0Parameter );
 	Point p = { *(unsigned short *) &value, *(((unsigned short *) &value)+1)};
-	actor->Orientation = GetOrient( p, actor->Pos );
+	actor->SetOrientation ( GetOrient( p, actor->Pos ) );
 	actor->resetAction = true;
 	actor->SetWait( 1 );
 }
@@ -6355,11 +6355,11 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 
 	if(scr->Type==ST_ACTOR) {
-		((Actor *)scr)->Orientation = GetOrient( tar->Pos, scr->Pos );
+		((Actor *)scr)->SetOrientation(GetOrient( tar->Pos, scr->Pos));
 		//scr->resetAction = true; //im not sure this is needed
 	}
 	if(tar->Type==ST_ACTOR) {
-		((Actor *)tar)->Orientation = GetOrient( scr->Pos, tar->Pos );
+		((Actor *)tar)->SetOrientation(GetOrient( scr->Pos, tar->Pos));
 		//tar->resetAction = true;//nor this
 	}
 
@@ -6676,7 +6676,7 @@ void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, Point &pos
 	}
 	actor->SetPosition(map2, position, adjust);
 	if (face !=-1) {
-		actor->Orientation = face&(MAX_ORIENT-1);
+		actor->SetOrientation( face&(MAX_ORIENT-1) );
 	}
 	GameControl *gc=core->GetGameControl();
 	gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);

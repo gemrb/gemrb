@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.255 2005/02/10 22:41:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.256 2005/02/11 21:45:21 avenger_teambg Exp $
  *
  */
 
@@ -1302,7 +1302,7 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	} else {
 		actor->SetStance( IE_ANI_AWAKE );
 	}
-	actor->Orientation = rand()&15;
+	actor->SetOrientation( 0 );
 
 	if( InParty ) {
 		return game->SetPC( actor );
