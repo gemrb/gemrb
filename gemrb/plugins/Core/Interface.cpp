@@ -463,6 +463,9 @@ bool Interface::LoadConfig(void)
 		else if(stricmp(name, "FullScreen") == 0) {
 			FullScreen = (atoi(value) == 0) ? false : true;
 		}
+		else if(stricmp(name, "GameType") == 0) {
+			strcpy(GameType, value);
+		}
 		else if(stricmp(name, "GemRBPath") == 0) {
 			strcpy(GemRBPath, value);
 		}

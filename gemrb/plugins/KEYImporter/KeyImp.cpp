@@ -5,6 +5,21 @@
 #include "../Core/Interface.h"
 #include "../Core/ArchiveImporter.h"
 #include "../Core/AnimationMgr.h"
+#include <unistd.h>
+
+#ifndef WIN32
+#include <ctype.h>
+char *strlwr(char *string)
+{
+	char *s;
+	if(string)
+	{
+		for(s = string; *s; ++s)
+			*s = tolower(*s);
+	}
+	return string;
+}
+#endif
 
 KeyImp::KeyImp(void)
 {
@@ -81,14 +96,32 @@ bool KeyImp::LoadResFile(const char * resfile)
 
 DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 {
-	char path[_MAX_PATH];
+	char path[_MAX_PATH], filename[_MAX_PATH];
+	//Search it in the GemRB override Directory
+	strcpy(path, core->GemRBPath);
+	strcat(path, "override");
+	strcat(path, SPathDelimiter);
+	strcat(path, core->GameType);
+	strcat(path, SPathDelimiter);
+	strncpy(filename, resname, 8);
+	strcat(filename, core->TypeExt(type));
+	strlwr(filename);
+	strcat(path, filename);
+	FILE * exist = fopen(path, "rb");
+	if(exist) {
+		printf("[KEYImporter]: Found in GemRB Override...\n");
+		fclose(exist);
+		FileStream * fs = new FileStream();
+		fs->Open(path, true);
+		return fs;
+	}
 	strcpy(path, core->GamePath);
 	strcat(path, "override");
 	strcat(path, SPathDelimiter);
 	//strcat(path, biffiles[bifnum].name);
 	strncat(path, resname, 8);
 	strcat(path, core->TypeExt(type));
-	FILE * exist = fopen(path, "rb");
+	exist = fopen(path, "rb");
 	if(exist) {
 		printf("[KEYImporter]: Found Override...\n");
 		fclose(exist);
@@ -98,7 +131,7 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 	}
 	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
         unsigned long ResLocator;
-	if(resources.Lookup(resname,type,ResLocator) ) {
+	if(resources.Lookup(resname,type,ResLocator) ) {                , filename[_MAX_PATH]
 		if(!core->IsAvailable(IE_BIF_CLASS_ID)) {
 			printf("[ERROR]\nAn Archive Plug-in is not Available\n");
 			return NULL;
@@ -164,14 +197,32 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		return core->GetFactory()->GetFactoryObject(fobjindex);
 	}
 	printf("[KEYImporter]: No Factory Object Found, Loading...\n");
-	char path[_MAX_PATH];
+	char path[_MAX_PATH], filename[_MAX_PATH];
+	//Search it in the GemRB override Directory
+	strcpy(path, core->GemRBPath);
+	strcat(path, "override");
+	strcat(path, SPathDelimiter);
+	strcat(path, core->GameType);
+	strcat(path, SPathDelimiter);
+	strncpy(filename, resname, 8);
+	strcat(filename, core->TypeExt(type));
+	strlwr(filename);
+	strcat(path, filename);
+	FILE * exist = fopen(path, "rb");
+	if(exist) {
+		printf("[KEYImporter]: Found in GemRB Override...\n");
+		fclose(exist);
+		FileStream * fs = new FileStream();
+		fs->Open(path, true);
+		return fs;
+	}
 	strcpy(path, core->GamePath);
 	strcat(path, "override");
 	strcat(path, SPathDelimiter);
 	//strcat(path, biffiles[bifnum].name);
 	strncat(path, resname, 8);
 	strcat(path, core->TypeExt(type));
-	FILE * exist = fopen(path, "rb");
+	exist = fopen(path, "rb");
 	if(exist) {
 		fclose(exist);
 		FileStream * fs = new FileStream();
