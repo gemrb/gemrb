@@ -45,6 +45,7 @@ def OnLoad():
 	GemRB.SetEvent(StartWindow, QuitGameButton, IE_GUI_BUTTON_ON_PRESS, "QuitPress")
 	GemRB.SetEvent(StartWindow, ProtocolButton, IE_GUI_BUTTON_ON_PRESS, "ProtocolPress")
 	GemRB.SetEvent(StartWindow, OptionsButton, IE_GUI_BUTTON_ON_PRESS, "OptionsPress")
+	GemRB.SetEvent(StartWindow, LoadGameButton, IE_GUI_BUTTON_ON_PRESS, "LoadPress")
 	GemRB.SetVisible(StartWindow, 1)
 	GemRB.LoadMusicPL("Theme")
 	GemRB.StartPL()
@@ -110,6 +111,13 @@ def ProtocolDonePress():
 	GemRB.SetVisible(StartWindow, 1)
 	return
 	
+def LoadPress():
+	global StartWindow
+
+	GemRB.UnloadWindow(StartWindow)
+	GemRB.SetNextScript("GUILOAD")
+	return
+
 def OptionsPress():
 	global StartWindow
 	GemRB.UnloadWindow(StartWindow)
