@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.12 2004/09/11 07:50:28 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.13 2004/09/19 20:04:52 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -172,7 +172,7 @@ def UpdateInventoryWindow ():
 	GemRB.SetText (Window, Label, str (GemRB.GameGetPartyGold ()))
 
 	# class
-	ClassTable = GemRB.LoadTable ("CLASS")
+	ClassTable = GemRB.LoadTable ("classes")
 	text = GemRB.GetTableValue (ClassTable, GemRB.GetPlayerStat (pc, ie_stats.IE_CLASS) - 1, 0)
 	GemRB.UnloadTable (ClassTable)
 

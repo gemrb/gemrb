@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.19 2004/09/17 14:54:53 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.20 2004/09/19 20:04:52 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -225,7 +225,7 @@ def UpdateRecordsWindow ():
 
 
 	# class
-	ClassTable = GemRB.LoadTable ("CLASS")
+	ClassTable = GemRB.LoadTable ("classes")
 	text = GemRB.GetTableValue (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
 	GemRB.UnloadTable (ClassTable)
 
@@ -352,10 +352,10 @@ def OnRecordsHelpStrength ():
 	x = GemRB.GetTableValue(Table, s, 0) + GemRB.GetTableValue(TableEx, e, 0)
 	y = GemRB.GetTableValue(Table, s, 1) + GemRB.GetTableValue(TableEx, e, 1)
 	if x==0:
-	        x=y
-	        y=0
+		x=y
+		y=0
 	if e>60:
-	        s=19
+		s=19
 	GemRB.SetText(Window, TextArea, 18489)
 	GemRB.TextAreaAppend(Window, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,s,0),x,y) )
 
@@ -456,19 +456,33 @@ def GetStatOverview (pc):
 	stats = []
 	# 19672 Level <LEVEL> Spells
 
-	ClassTable = GemRB.LoadTable ("CLASS")
-	ClassName = GemRB.GetString (GemRB.GetTableValue (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0))
+	ClassTable = GemRB.LoadTable ("classes")
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1;
+	RowName = GemRB.GetTableRowName (ClassTable, Class)
+	ClassName = GemRB.GetString (GemRB.GetTableValue (ClassTable, Class, 0))
 	GemRB.UnloadTable (ClassTable)
 
 	# 48156 Level
-	Level = GemRB.GetString (48156) + ': ' + str (GemRB.GetPlayerStat (pc, IE_LEVEL))
+	LevelNum = GemRB.GetPlayerStat (pc, IE_LEVEL)
+	Level = GemRB.GetString (48156) + ': ' + str (LevelNum)
 
 	# 19673 Experience
 	Experience = GemRB.GetString (19673) + ': ' + str (GemRB.GetPlayerStat (pc, IE_XP))
 	# 19674 Next Level
+	NextLevelTable = GemRB.LoadTable ("XPLEVEL")
+	if (GemRB.GetPlayerStat (pc, IE_LEVEL) < 21):
+		NextLevel = GemRB.GetString (19674) + ': ' + str (GemRB.GetTableValue (NextLevelTable, RowName, str(LevelNum+1) ) )
+	else:
+		After21ExpTable = GemRB.LoadTable ("LVL21PLS")
+		ExpGap = GemRB.GetTableValue (After21ExpTable, RowName, 'XPGAP')
+		#GemRB.UnloadTable (After21ExpTable)
+		LevDiff = LevelNum - 19
+		Lev20Exp = GemRB.GetTableValue (NextLevelTable, RowName, "20")
+		NextLevel = GemRB.GetString (19674) + ': ' + str (Lev20Exp + (LevDiff * ExpGap))
+	#GemRB.UnloadTable(NextLevelTable)
 
-	Main = ClassName + "\n" + Level + "\n" + Experience + "\n\n"
-	
+	Main = ClassName + "\n" + Level + "\n" + Experience + "\n" + NextLevel + "\n\n"
+
 	# 59856 Current State
 	CurrentState = won + GemRB.GetString (59856) + woff + "\n\n"
 
@@ -643,7 +657,7 @@ def OpenInformationWindow ():
 
 
 	# class
-	ClassTable = GemRB.LoadTable ("CLASS")
+	ClassTable = GemRB.LoadTable ("classes")
 	text = GemRB.GetTableValue (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
 	GemRB.UnloadTable (ClassTable)
 

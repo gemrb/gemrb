@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.8 2004/09/18 17:54:50 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.9 2004/09/19 20:04:52 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -212,6 +212,13 @@ def UpdateRecordsWindow ():
 	else:
 		GemRB.SetText (Window, Label, 7199)
 
+	#collecting tokens for stat overview
+        ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
+
+        GemRB.SetToken("CLASS", ClassTitle)
+        GemRB.SetToken("LEVEL", str (GemRB.GetPlayerStat (pc, IE_LEVEL) ) )
+        GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
+
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)
 	Text = GemRB.GetControl (Window, 45)
@@ -230,27 +237,18 @@ def GetStatOverview (pc):
 	# Experience: <EXPERIENCE>
 	# Next Level: <NEXTLEVEL>
 
-	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
-
 	Main = GemRB.GetString (16480)
-	Main = Main.replace ("<CLASS>", ClassTitle)
-	Main = Main.replace ("<LEVEL>",  str (GemRB.GetPlayerStat (pc, IE_LEVEL)) )
-	Main = Main.replace ("<EXPERIENCE>", str (GemRB.GetPlayerStat (pc, IE_XP)) )
-	Main = Main.replace ("<NEXTLEVEL>", "??")
-
-	# 59856 Current State
-	CurrentState = won + GemRB.GetString (59856) + woff + "\n\n"
 
 	# 67049 AC Bonuses
 	stats.append (67049)
-	#   67204 AC vs. Slashing
-	stats.append ((67204, GS (IE_ACSLASHINGMOD), ''))
-	#   67205 AC vs. Piercing
-	stats.append ((67205, GS (IE_ACPIERCINGMOD), ''))
-	#   67206 AC vs. Crushing
-	stats.append ((67206, GS (IE_ACCRUSHINGMOD), ''))
-	#   67207 AC vs. Missile
-	stats.append ((67207, GS (IE_ACMISSILEMOD), ''))
+	#   14079 AC vs. Slashing
+	stats.append ((14079, GS (IE_ACSLASHINGMOD), ''))
+	#   14081 AC vs. Piercing
+	stats.append ((14081, GS (IE_ACPIERCINGMOD), ''))
+	#   14080 AC vs. Crushing
+	stats.append ((14080, GS (IE_ACCRUSHINGMOD), ''))
+	#   14082 AC vs. Missile
+	stats.append ((14082, GS (IE_ACMISSILEMOD), ''))
 	stats.append (None)
 
 	
@@ -377,7 +375,7 @@ def GetStatOverview (pc):
 				res.append ("")
 				lines = 0
 
-	return Main + CurrentState + string.join (res, "\n")
+	return Main + string.join (res, "\n")
 	pass
 
 
