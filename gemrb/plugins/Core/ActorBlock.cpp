@@ -154,7 +154,7 @@ void Scriptable::ClearActions()
 		//CurrentAction->Release();
 		CurrentAction = NULL;
 	}
-	for (int i = 0; i < actionQueue.size(); i++) {
+	for (unsigned int i = 0; i < actionQueue.size(); i++) {
 		Action* aC = actionQueue.front();
 		actionQueue.pop_front();
 		aC->Release();
@@ -204,6 +204,8 @@ void Scriptable::ProcessActions()
 							Clicker = NULL;
 							neverExecuted = true;
 						}
+						break;
+					default: //all others are unused
 						break;
 				}
 			}
