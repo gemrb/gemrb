@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.27 2003/12/15 09:13:07 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.28 2003/12/21 14:06:19 balrog994 Exp $
  *
  */
 
@@ -151,7 +151,6 @@ int TextArea::AppendText(const char * text, int pos)
 	if(pos >= (int)lines.size())
 		return -1;
 	int newlen = (int)strlen(text);
-
 	if(pos == -1) {
 		char * str = (char*)malloc(newlen+1);
 		strcpy(str, text);
@@ -166,7 +165,12 @@ int TextArea::AppendText(const char * text, int pos)
 		strcat(lines[pos], text);
 	}
 	CalcRowCount();
+	Changed = true;
 	((Window*)Owner)->Invalidate();
+	if(!sb)
+		return 0;
+	ScrollBar *bar = (ScrollBar*)sb;
+	bar->SetPos(lines.size()-(Height/ftext->maxHeight));
 	return 0;
 }
 /** Sets the Fonts */
@@ -217,7 +221,7 @@ void TextArea::SetSelectable(bool val)
 void TextArea::CalcRowCount()
 {
 	if(lines.size() != 0) {
-		rows = -1;
+		rows = 0;
 		for(size_t i = 0; i < lines.size(); i++) {
 			rows++;
 			int tr = 0;
@@ -225,7 +229,7 @@ void TextArea::CalcRowCount()
 			char * tmp = (char*)malloc(len+1);
 			memcpy(tmp, lines[i], len+1);
 			ftext->SetupString(tmp, Width);
-			for(int p = 0; p <= len; p++) {
+			for(int p = 0; p < len; p++) {
 				if(tmp[p] == 0) {
 					rows++;
 					tr++;
