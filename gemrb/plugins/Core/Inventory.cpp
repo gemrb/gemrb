@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.37 2004/11/19 23:09:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.38 2004/11/23 21:47:00 avenger_teambg Exp $
  *
  */
 
@@ -24,10 +24,6 @@
 #include "Interface.h"
 #include "Inventory.h"
 #include "Item.h"
-
-// FIXME: it's true only for pst
-#define FIRST_DEFAULT_SLOT 25
-#define LAST_DEFAULT_SLOT  44
 
 Inventory::Inventory()
 {
@@ -310,7 +306,11 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 	}
 
 	int res = 0;
-	for (size_t i = FIRST_DEFAULT_SLOT; i <= LAST_DEFAULT_SLOT; i++) {
+	for (size_t i = 0; i<Slots.size(); i++) {
+		//looking for default inventory slot (-1)
+		if (core->QuerySlotType(i)!=-1) {
+			continue;
+		}
 		int part_res = AddSlotItem (item, i);
 		if (part_res == 2) return 2;
 		else if (part_res == 1) res = 1;
