@@ -3,6 +3,7 @@
 
 #include "Animation.h"
 #include "../../includes/RGBAColor.h"
+#include "TableMgr.h"
 #include <vector>
 
 #ifdef WIN32
@@ -60,12 +61,13 @@ private:
 	Animation * Anims[18][16];
 	Color Palette[256];
 public:
-	unsigned long LoadedFlag;
+	unsigned long LoadedFlag, RowIndex;
 	unsigned char OrientCount, MirrorType;
 	unsigned char ArmorType, WeaponType, RangedType;
 	char * ResRef;
+	TableMgr * Avatars;
 public:
-	CharAnimations(char * BaseResRef, unsigned char OrientCount, unsigned char MirrorType);
+	CharAnimations(char * BaseResRef, unsigned char OrientCount, unsigned char MirrorType, int RowIndex);
 	~CharAnimations(void);
 	Animation * GetAnimation(unsigned char AnimID, unsigned char Orient);
 	void SetNewPalette(Color * Pal)
@@ -87,12 +89,42 @@ private:
 			case IE_ANI_CODE_MIRROR:
 				{
 					if(OrientCount == 9) {
-						strcpy(ResRef, this->ResRef);
 						AddVHRSuffix(ResRef, AnimID, Cycle, Orient);
 						ResRef[8] = 0;
 					}
 					else {
+						
+					}
+				}
+			break;
 
+			case IE_ANI_TWO_FILES:
+				{
+					if(OrientCount == 5) {
+						char * val = Avatars->QueryField(RowIndex, AnimID+3);
+						if(val[0] == '*') {
+							ResRef[0] = 0;
+							return;
+						}
+						Cycle = atoi(val) + (Orient/2);
+						switch(AnimID) {
+							case IE_ANI_ATTACK:
+							case IE_ANI_ATTACK_BACKSLASH:
+							case IE_ANI_ATTACK_SLASH:
+							case IE_ANI_ATTACK_JAB:
+							case IE_ANI_CAST:
+							case IE_ANI_CONJURE:
+							case IE_ANI_SHOOT:
+								strcat(ResRef, "G2");
+							break;
+
+							default:
+								strcat(ResRef, "G1");
+							break;
+						}
+						if(Orient > 5) {
+							strcat(ResRef, "E");
+						}
 					}
 				}
 			break;

@@ -5,7 +5,7 @@
 
 extern Interface * core;
 
-CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, unsigned char MirrorType)
+CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, unsigned char MirrorType, int RowIndex)
 {
 	int len = strlen(BaseResRef);
 	ResRef = (char*)malloc(len+1);
@@ -20,6 +20,8 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 	ArmorType = 0;
 	RangedType = 0;
 	WeaponType = 0;
+	this->RowIndex = RowIndex;
+	Avatars = core->GetTable(core->LoadTable("avatars"));
 }
 
 CharAnimations::~CharAnimations(void)
@@ -67,10 +69,12 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 		}
 		return Anims[AnimID][Orient];
 	}
-	char ResRef[9];
+	char *ResRef = (char*)malloc(9);
+	strcpy(ResRef, this->ResRef);
 	unsigned char Cycle;
 	GetAnimResRef(AnimID, Orient, ResRef, Cycle);
 	DataStream * stream = core->GetResourceMgr()->GetResource(ResRef, IE_BAM_CLASS_ID);
+	free(ResRef);
 	AnimationMgr * anim = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
 	anim->Open(stream, true);
 	Animation * a = anim->GetAnimation(Cycle, 0, 0, IE_NORMAL);
