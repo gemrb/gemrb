@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.35 2004/01/04 21:47:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.36 2004/01/07 20:39:17 balrog994 Exp $
  *
  */
 
@@ -129,6 +129,7 @@ Map * AREImp::GetMap()
 
 	map->Scripts[0] = new GameScript(Script, IE_SCRIPT_AREA);
 	map->MySelf = map;
+	strcpy(map->scriptName, WEDResRef);
 	if(map->Scripts[0])
 		map->Scripts[0]->MySelf = map;
 
