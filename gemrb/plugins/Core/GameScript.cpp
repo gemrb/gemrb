@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.33 2004/01/05 12:09:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.34 2004/01/05 12:36:48 balrog994 Exp $
  *
  */
 
@@ -628,7 +628,8 @@ void GameScript::ExecuteString(Scriptable * Sender, char * String)
 	Action * act = GenerateAction(String);
 	if(!act)
 		return;
-	act->autoFree = true;
+	if(Sender->CurrentAction)
+		Sender->DeleteAction(Sender->CurrentAction);
 	Sender->CurrentAction = act;
 	ExecuteAction(Sender, act);
 	return;
@@ -673,6 +674,8 @@ Action * GameScript::GenerateAction(char * String)
 				newAction->objects[2] = NULL;
 				newAction->string0Parameter = NULL;
 				newAction->string1Parameter = NULL;
+				newAction->autoFree = true;
+				newAction->delayFree = false;
 				int objectCount = (newAction->actionID == 1) ? 0 : 1;
 				int stringsCount = 0;
 				int intCount = 0;
@@ -1458,9 +1461,9 @@ void GameScript::MoveToPoint(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
+	Sender->CurrentAction->delayFree = true;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1479,9 +1482,9 @@ void GameScript::MoveToObject(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
+	Sender->CurrentAction->delayFree = true;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
