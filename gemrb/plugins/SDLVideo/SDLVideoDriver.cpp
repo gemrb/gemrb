@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.36 2003/11/30 23:25:00 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.37 2003/12/01 16:33:21 balrog994 Exp $
  *
  */
 
@@ -354,6 +354,7 @@ void SDLVideoDriver::FreeSprite(Sprite2D * spr)
 	if(spr->pixels)
 		free(spr->pixels);
 	delete(spr);
+	spr = NULL;
 }
 
 void SDLVideoDriver::BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y, bool anchor, Region * clip)
