@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIJRNL.py,v 1.5 2004/10/23 13:01:43 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIJRNL.py,v 1.6 2004/10/23 15:40:52 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -35,7 +35,8 @@ from GUIDefines import *
 JournalWindow = None
 LogWindow = None
 QuestsWindow = None
-Section = 0
+global Section
+Section = 1
 Chapter = 0
 Order = 0
 
@@ -71,6 +72,7 @@ def OpenJournalWindow ():
 	Button = GemRB.GetControl (JournalWindow, 4)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "NextChapterPress")
 
+	GemRB.SetVar("Section", Section)
 	# Quests
 	Button = GemRB.GetControl (JournalWindow, 6)
 	GemRB.SetVarAssoc(JournalWindow, Button, "Section", 1)
@@ -105,7 +107,6 @@ def OpenJournalWindow ():
 	#GemRB.SetText (JournalWindow, Button, 20636)
 	#GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
-	Section = 0
 	Chapter = GemRB.GetGameVar("chapter")
 	GemRB.UnhideGUI()
 	UpdateLogWindow()

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.9 2004/10/23 15:25:15 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.10 2004/10/23 15:40:51 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -271,7 +271,7 @@ def UpdateInventoryWindow ():
         GemRB.SetText (Window, Label, str(max_encumb) + ":")
 
 	Label = GemRB.GetControl (Window, 0x10000044)
-	GemRB.SetText (Window, Label, str(GemRB.GetPlayerStat (pc, ie_stats.IE_ENCUMBRANCE))
+	GemRB.SetText (Window, Label, str(GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)))
         # Unloading tables is not necessary, i think (they will stay cached)
         #GemRB.UnloadTable (Table)
         #GemRB.UnloadTable (TableEx)
