@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.283 2005/03/07 06:31:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.284 2005/03/07 18:05:40 avenger_teambg Exp $
  *
  */
 
@@ -810,7 +810,7 @@ static PyObject* GemRB_GetSymbolValue(PyObject * /*self*/, PyObject* args)
 			if (!sm)
 				return NULL;
 			long val = sm->GetValue( syms );
-			return PyLong_FromLong( val );
+			return PyInt_FromLong( val );
 		}
 		if (PyObject_TypeCheck( sym, &PyInt_Type )) {
 			long symi = PyInt_AsLong( sym );
@@ -2379,10 +2379,10 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (!core->GetDictionary()->Lookup( Variable, value )) {
-		return PyLong_FromLong( ( unsigned long ) 0 );
+		return PyInt_FromLong( ( unsigned long ) 0 );
 	}
 
-	return PyLong_FromLong( value );
+	return PyInt_FromLong( value );
 }
 
 PyDoc_STRVAR( GemRB_CheckVar__doc,
@@ -2414,7 +2414,7 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 	printMessage("GUISCript"," ",YELLOW);
 	printf("%s %s=%ld\n",Context, Variable, value);
 	textcolor(WHITE);
-	return PyLong_FromLong( value );
+	return PyInt_FromLong( value );
 }
 
 PyDoc_STRVAR( GemRB_GetGameVar__doc,
@@ -2431,10 +2431,10 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (!core->GetGame()->globals->Lookup( Variable, value )) {
-		return PyLong_FromLong( ( unsigned long ) 0 );
+		return PyInt_FromLong( ( unsigned long ) 0 );
 	}
 
-	return PyLong_FromLong( value );
+	return PyInt_FromLong( value );
 }
 
 PyDoc_STRVAR( GemRB_PlayMovie__doc,
