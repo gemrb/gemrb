@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.10 2003/11/26 19:50:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.11 2003/11/26 22:04:37 avenger_teambg Exp $
  *
  */
 
@@ -233,7 +233,11 @@ void MUSImp::HardEnd()
 }
 
 /** Switches the current PlayList while playing the current one */
-void MUSImp::SwitchPlayList(const char * name){
+void MUSImp::SwitchPlayList(const char * name, bool Hard) {
+	if(Hard) HardEnd();
+	else End();
+	OpenPlaylist(name);
+	Start();
 }
 /** Plays the Next Entry */
 void MUSImp::PlayNext()

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.17 2003/11/26 21:36:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.18 2003/11/26 22:04:36 avenger_teambg Exp $
  *
  */
 
@@ -227,8 +227,7 @@ void Map::PlayAreaSong(int SongType)
         if(!tm)
                 return;
         char *poi=tm->QueryField(SongHeader.SongList[SongType],column);
-        printf("Switching to playlist: %s\n",poi);
-        core->GetMusicMgr()->SwitchPlayList(poi);
+        core->GetMusicMgr()->SwitchPlayList(poi, true);
         core->DelTable(songlist);
 }
 
