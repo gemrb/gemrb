@@ -62,7 +62,19 @@ typedef unsigned long DWORD;
 #define  GF_HAS_PARTY_INI               6 //iwd2
 
 /////globally used functions
-bool dir_exists(const char *path);
+#ifdef WIN32
+
+#ifdef GEM_BUILD_DLL
+#define GEM_EXPORT __declspec(dllexport)
+#else
+#define GEM_EXPORT __declspec(dllimport)
+#endif
+
+#else
+#define GEM_EXPORT
+#endif
+
+GEM_EXPORT bool dir_exists(const char *path);
 
 #ifdef WIN32
 

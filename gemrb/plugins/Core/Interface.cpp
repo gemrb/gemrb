@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.92 2003/12/09 23:09:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.93 2003/12/10 00:10:11 balrog994 Exp $
  *
  */
 
@@ -644,38 +644,54 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "GUIScriptsPath") == 0) {
 			strcpy(GUIScriptsPath, value);
+#ifndef WIN32
 			ResolveFilePath(GUIScriptsPath);
+#endif
 		}
 		else if(stricmp(name, "GamePath") == 0) {
 			strcpy(GamePath, value);
+#ifndef WIN32
 			ResolveFilePath(GamePath);
+#endif
 		}
 		else if(stricmp(name, "INIConfig") == 0) {
 			strcpy(INIConfig, value);
 		}
 		else if(stricmp(name, "CD1") == 0) {
 			strcpy(CD1, value);
+#ifndef WIN32
 			ResolveFilePath(CD1);
+#endif
 		}
 		else if(stricmp(name, "CD2") == 0) {
 			strcpy(CD2, value);
+#ifndef WIN32
 			ResolveFilePath(CD2);
+#endif
 		}
 		else if(stricmp(name, "CD3") == 0) {
 			strcpy(CD3, value);
+#ifndef WIN32
 			ResolveFilePath(CD3);
+#endif
 		}
 		else if(stricmp(name, "CD4") == 0) {
 			strcpy(CD4, value);
+#ifndef WIN32
 			ResolveFilePath(CD4);
+#endif
 		}
 		else if(stricmp(name, "CD5") == 0) {
 			strcpy(CD5, value);
+#ifndef WIN32
 			ResolveFilePath(CD5);
+#endif
 		}
 		else if(stricmp(name, "CD6") == 0) {
 			strcpy(CD6, value);
+#ifndef WIN32
 			ResolveFilePath(CD6);
+#endif
 		}
 	}
 	fclose(config);
