@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImp.h,v 1.8 2004/02/24 22:20:41 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImp.h,v 1.9 2004/03/12 01:53:43 edheldil Exp $
  *
  */
 
@@ -152,7 +152,7 @@ public:
 	}
 	const char* GetKeyAsString(const char* Tag, const char* Key,
 		const char* Default);
-	const int GetKetAsInt(const char* Tag, const char* Key, const int Default);
+	const int GetKeyAsInt(const char* Tag, const char* Key, const int Default);
 public:
 	void release(void)
 	{
