@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.18 2004/10/10 17:27:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.19 2004/10/16 14:26:43 edheldil Exp $
  *
  */
 
@@ -61,6 +61,7 @@ private:
 	int count;
 	Color* palette;
 	Sprite2D* sprBuffer;
+	unsigned char FirstChar;
 public:
 	Font(int w, int h, void* palette, bool cK, int index);
 	~Font(void);
@@ -84,6 +85,9 @@ public:
 	int CalcStringWidth(char* string);
 public:
 	void SetupString(char* string, unsigned int width);
+	// Sets ASCII code of the first character in the font
+	//  (it allows remapping numeric fonts from \000 to '0')
+	void SetFirstChar(unsigned char first);
 };
 
 #endif

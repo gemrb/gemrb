@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.37 2004/10/10 17:27:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.38 2004/10/16 14:26:43 edheldil Exp $
  *
  */
 
@@ -49,6 +49,7 @@ Font::Font(int w, int h, void* palette, bool cK, int index)
 {
 	lastX = 0;
 	count = 0;
+	FirstChar = 0;
 	void* pixels = malloc( w* h );
 	memset( xPos, 0, sizeof( xPos) );
 	memset( yPos, 0, sizeof( yPos) );
@@ -447,6 +448,10 @@ void Font::SetupString(char* string, unsigned int width)
 			}
 			continue;
 		}
+
+		if (string[pos] && string[pos] != ' ') 
+			string[pos] -= FirstChar;
+
 		wx += size[( unsigned char ) string[pos] - 1].w;//chars[((unsigned char)string[pos])-1]->Width;
 		if (( string[pos] == ' ' ) || ( string[pos] == '-' )) {
 			x += wx;
@@ -460,4 +465,9 @@ void Font::SetupString(char* string, unsigned int width)
 void* Font::GetPalette()
 {
 	return palette;
+}
+
+void Font::SetFirstChar( unsigned char first)
+{
+	FirstChar = first;
 }

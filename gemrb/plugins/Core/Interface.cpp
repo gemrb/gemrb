@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.225 2004/10/16 08:10:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.226 2004/10/16 14:26:43 edheldil Exp $
  *
  */
 
@@ -431,6 +431,7 @@ int Interface::Init()
 		for (int i = 0; i < count; i++) {
 			char* ResRef = tab->QueryField( i, 0 );
 			int needpalette = atoi( tab->QueryField( i, 1 ) );
+			int first_char = atoi( tab->QueryField( i, 2 ) );
 			DataStream* fstr = key->GetResource( ResRef, IE_BAM_CLASS_ID );
 			if (!anim->Open( fstr, true )) {
 				delete( fstr );
@@ -448,6 +449,7 @@ int Interface::Init()
 				memcpy( fnt->GetPalette(), pal, 256 * sizeof( Color ) );
 				video->FreePalette( pal );
 			}
+			fnt->SetFirstChar( first_char );
 			fonts.push_back( fnt );
 		}
 		DelTable( table );
