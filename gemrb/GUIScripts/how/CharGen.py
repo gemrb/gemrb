@@ -238,7 +238,8 @@ def CancelPress():
 
 def AcceptPress():
 	global CharGenWindow
-	MyChar = GemRB.CreatePlayer("charbase",GemRB.GetVar("Slot") )
+	MyChar = GemRB.GetVar("Slot")
+	GemRB.CreatePlayer("charbase", MyChar)
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
 	#base class

@@ -7,6 +7,8 @@ ExitWindow = 0
 
 def OnLoad():
 	global PartyFormationWindow
+
+	GemRB.LoadGame(-1);  #loading the base game
 	GemRB.LoadWindowPack("GUISP")
 	PartyFormationWindow = GemRB.LoadWindow(0)
 
@@ -30,7 +32,7 @@ def OnLoad():
 		#removing this label, it just disturbs us
 		GemRB.SetControlSize(PartyFormationWindow, Label, 0, 0)
 		Button = GemRB.GetControl(PartyFormationWindow, i-12)
-		ResRef = GemRB.GetPlayerPortrait(i-18, 0)
+		ResRef = GemRB.GetPlayerPortrait(i-17, 0)
 		if ResRef == "":
 			GemRB.SetButtonFlags(PartyFormationWindow, Button, IE_GUI_BUTTON_NORMAL,OP_SET)
 		else:
