@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.162 2005/02/28 17:35:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.163 2005/03/14 09:08:57 avenger_teambg Exp $
  *
  */
 
@@ -985,6 +985,7 @@ public:
 	static void Enemy(Scriptable* Sender, Action* parameters);
 	static void EquipItem(Scriptable *Sender, Action *parameters);
 	static void Explore(Scriptable *Sender, Action *parameters);
+	static void ExploreMapChunk(Scriptable *Sender, Action *parameters);
 	static void Face(Scriptable* Sender, Action* parameters);
 	static void FaceObject(Scriptable* Sender, Action* parameters);
 	static void FaceSavedLocation(Scriptable* Sender, Action* parameters);

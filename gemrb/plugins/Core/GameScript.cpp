@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.243 2005/03/13 10:45:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.244 2005/03/14 09:08:55 avenger_teambg Exp $
  *
  */
 
@@ -346,6 +346,7 @@ static ActionLink actionnames[] = {
 	{"equipitem", GameScript::EquipItem, AF_BLOCKING},
 	{"erasejournalentry", GameScript::RemoveJournalEntry,0},
 	{"explore", GameScript::Explore,0},
+	{"exploremapchunk", GameScript::ExploreMapChunk,0},
 	{"face", GameScript::Face,AF_BLOCKING},
 	{"faceobject", GameScript::FaceObject, AF_BLOCKING},
 	{"facesavedlocation", GameScript::FaceSavedLocation, AF_BLOCKING},
@@ -8564,6 +8565,18 @@ void GameScript::Explore( Scriptable* /*Sender*/, Action* /*parameters*/)
 void GameScript::UndoExplore( Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	core->GetGame()->GetCurrentMap( )->Explore(-1);
+}
+
+void GameScript::ExploreMapChunk( Scriptable* /*Sender*/, Action* parameters)
+{
+	Map *map = core->GetGame()->GetCurrentMap();
+	/*
+	There is a mode flag in int1Parameter, but i don't know what is it,
+	our implementation uses it for LOS=1, or no LOS=0
+	ExploreMapChunk will reveal both visibility/explored map, but the
+	visibility will fade in the next update cycle (which is quite frequent)
+	*/
+	map->ExploreMapChunk(parameters->pointParameter, parameters->int0Parameter, parameters->int1Parameter);
 }
 
 void GameScript::StartStore( Scriptable* Sender, Action* parameters)
