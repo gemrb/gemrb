@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.20 2004/03/11 20:26:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.21 2004/03/11 20:48:32 avenger_teambg Exp $
  *
  */
 
@@ -267,4 +267,15 @@ GAMJournalEntry* Game::GetJournalEntry(unsigned int Index)
 		return NULL;
 	}
 	return Journals[Index];
+}
+
+void Game::ShareXP(int xp)
+{
+        if(PartySize<1) {
+                return;
+        }
+        xp /= PartySize;
+        for(int i=0; i<PartySize; i++) {
+                GetPC(i)->NewStat(IE_XP,xp,0);
+        }
 }
