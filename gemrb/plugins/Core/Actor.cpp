@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.12 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.13 2003/11/26 01:15:52 balrog994 Exp $
  *
  */
 
@@ -111,8 +111,20 @@ void Actor::SetAnimationID(unsigned short AnimID)
 	memcpy(&Pal[0x34], LeatherPal, 12*sizeof(Color));
 	memcpy(&Pal[0x40], ArmorPal,   12*sizeof(Color));
 	memcpy(&Pal[0x4C], HairPal,    12*sizeof(Color));
-	for(int i = 0x58; i < 0xFF; i+=0x08)
-		memcpy(&Pal[i], &MinorPal[1], 8*sizeof(Color));
+	//for(int i = 0x58; i < 0xFF; i+=0x08)
+	//	memcpy(&Pal[i], &MinorPal[1], 8*sizeof(Color));
+	memcpy(&Pal[0x58], &MinorPal[1], 8*sizeof(Color));
+	memcpy(&Pal[0x60], &MajorPal[1], 8*sizeof(Color));
+	memcpy(&Pal[0x68], &MinorPal[1], 8*sizeof(Color));
+	memcpy(&Pal[0x70], &MetalPal[1], 8*sizeof(Color));
+	memcpy(&Pal[0x78], &LeatherPal[1], 8*sizeof(Color));
+	memcpy(&Pal[0x80], &LeatherPal[1], 8*sizeof(Color));
+	memcpy(&Pal[0x88], &MinorPal[1], 8*sizeof(Color));
+	for(int i = 0x90; i < 0xA8; i+=0x08)
+		memcpy(&Pal[i], &LeatherPal[1], 8*sizeof(Color));
+	memcpy(&Pal[0xB0], &SkinPal[1], 8*sizeof(Color));
+	for(int i = 0xB8; i < 0xFF; i+=0x08)
+		memcpy(&Pal[i], &LeatherPal[1], 8*sizeof(Color));
 	free(MetalPal);
 	free(MinorPal);
 	free(MajorPal);
