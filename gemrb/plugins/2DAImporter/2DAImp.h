@@ -32,8 +32,8 @@ public:
         0,0 returns the default value, it may return NULL */
     inline char *QueryField(int row = 0, int column = 0) const
 	{
-		if(rows.size()<=row) return NULL;
-		if(rows[row].size()<=column) return NULL;
+		if(rows.size()<=row) return (char*)defVal;
+		if(rows[row].size()<=column) return (char*)defVal;
 		return rows[row][column];
 	};
 	/** Returns a pointer to a zero terminated 2da element,
@@ -49,7 +49,7 @@ public:
 			}
 		}
 		if(rowi == -1)
-			return NULL;
+			return (char*)defVal;
 		for(int i = 0; i < colNames.size(); i++) {
 			if(stricmp(colNames[i], column) == 0) {
 				coli = i;
@@ -57,7 +57,7 @@ public:
 			}
 		}
 		if(coli == -1)
-			return NULL;
+			return (char*)defVal;
 		return rows[rowi][coli];
 	};
 
