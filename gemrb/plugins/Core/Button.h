@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.26 2004/03/28 14:29:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.27 2004/04/11 12:31:20 edheldil Exp $
  *
  */
 
@@ -27,12 +27,14 @@
 #include "Font.h"
 #include "Animation.h"
 
+// NOTE: keep these synchronized with GUIDefines.py!!!
 #define IE_GUI_BUTTON_UNPRESSED 0
 #define IE_GUI_BUTTON_PRESSED   1
 #define IE_GUI_BUTTON_SELECTED  2
 #define IE_GUI_BUTTON_DISABLED  3
+// Like DISABLED, but processes MouseOver events and draws UNPRESSED bitmap
+#define IE_GUI_BUTTON_LOCKED    4
 
-// NOTE: keep these synchronized with GUIDefines.py!!!
 #define IE_GUI_BUTTON_NO_IMAGE     0x00000001   // don't draw image (BAM)
 #define IE_GUI_BUTTON_PICTURE      0x00000002   // draw picture (BMP, MOS, ...)
 #define IE_GUI_BUTTON_SOUND        0x00000004

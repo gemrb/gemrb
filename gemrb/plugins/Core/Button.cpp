@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.57 2004/03/28 14:29:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.58 2004/04/11 12:31:21 edheldil Exp $
  *
  */
 
@@ -110,6 +110,7 @@ void Button::SetImage(unsigned char type, Sprite2D* img)
 {
 	switch (type) {
 		case IE_GUI_BUTTON_UNPRESSED:
+		case IE_GUI_BUTTON_LOCKED:
 			 {
 				if (Unpressed && Clear)
 					core->GetVideoDriver()->FreeSprite( Unpressed );
@@ -160,6 +161,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 
 		switch (State) {
 			case IE_GUI_BUTTON_UNPRESSED:
+			case IE_GUI_BUTTON_LOCKED:
 				Image = Unpressed;
 				break;
 
@@ -237,7 +239,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 /** Sets the Button State */
 void Button::SetState(unsigned char state)
 {
-	if (state > IE_GUI_BUTTON_DISABLED) // If wrong value inserted
+	if (state > IE_GUI_BUTTON_LOCKED) // If wrong value inserted
 	{
 		return;
 	}
@@ -249,7 +251,7 @@ void Button::SetState(unsigned char state)
 /** Handling The default button (enter) */
 void Button::OnSpecialKeyPress(unsigned char Key)
 {
-	if (State == IE_GUI_BUTTON_DISABLED) {
+	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
 		return;
 	}
 	if (Flags & IE_GUI_BUTTON_DEFAULT) {
@@ -263,19 +265,21 @@ void Button::OnSpecialKeyPress(unsigned char Key)
 void Button::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
+	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
+		return;
+	}
+
 	//Button == 1 means Left Mouse Button
 	if (Button == 1) {
-		if (State != IE_GUI_BUTTON_DISABLED) {
-			State = IE_GUI_BUTTON_PRESSED;
-			Changed = true;
-			if (Flags & IE_GUI_BUTTON_SOUND) {
-				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_PRESSED] );
-			}
-			if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
-				Dragging = true;
-				DragX = x;
-				DragY = y;
-			}
+		State = IE_GUI_BUTTON_PRESSED;
+		Changed = true;
+		if (Flags & IE_GUI_BUTTON_SOUND) {
+			core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_PRESSED] );
+		}
+		if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
+			Dragging = true;
+			DragX = x;
+			DragY = y;
 		}
 	}
 }
@@ -283,7 +287,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 void Button::OnMouseUp(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
-	if (State == IE_GUI_BUTTON_DISABLED) {
+	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
 		return;
 	}
 	if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
@@ -336,7 +340,13 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
+
 	RunEventHandler( MouseOverButton );
+
+	if (State == IE_GUI_BUTTON_LOCKED) {
+		return;
+	}
+
 	if (Dragging) {
 		ScrollX += ( x - DragX );
 		ScrollY += ( y - DragY );
