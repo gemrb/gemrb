@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.72 2004/06/27 23:47:26 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.73 2004/06/30 22:18:51 edheldil Exp $
  *
  */
 
@@ -991,8 +991,8 @@ void SDLVideoDriver::DrawRect(Region& rgn, Color& color, bool fill, bool clipped
 		rgn.x, rgn.y, rgn.w, rgn.h
 	};
 	if (fill) {
-		SDL_FillRect( backBuf, &drect,
-			      ( color.a << 24 ) + ( color.r << 16 ) + ( color.g << 8 ) + color.b );
+		long val = SDL_MapRGBA( backBuf->format, color.r, color.g, color.b, color.a );
+		SDL_FillRect( backBuf, &drect, val );
 	} else {
 		DrawHLine( rgn.x, rgn.y, rgn.x + rgn.w - 1, color, clipped );
 		DrawVLine( rgn.x, rgn.y, rgn.y + rgn.h - 1, color, clipped );
