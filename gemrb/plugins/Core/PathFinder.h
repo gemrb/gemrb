@@ -38,7 +38,7 @@ public:
 	PathNode * FindPath(short sX, short sY, short dX, short dY);
 private:
 	void Leveldown(unsigned int px, unsigned int py, unsigned int &level, unsigned int &nx, unsigned int &ny, unsigned int &diff);
-	void SetupNode(unsigned int x,unsigned int y, int Cost);
+	void SetupNode(unsigned int x,unsigned int y, unsigned int Cost);
 //maybe this is unneeded and orientation could be calculated on the fly
 	unsigned char GetOrient(short sX, short sY, short dX, short dY);
 };

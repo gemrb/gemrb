@@ -50,7 +50,7 @@ void PathFinder::Leveldown(unsigned int px, unsigned int py, unsigned int &level
 
 static int Passable[16]={0,1,1,1,1,1,1,1,0,1,0,0,0,0,1,1};
 
-void PathFinder::SetupNode(unsigned int x,unsigned int y, int Cost)
+void PathFinder::SetupNode(unsigned int x,unsigned int y, unsigned int Cost)
 {
 	unsigned int pos;
 
@@ -90,7 +90,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 			//printf("GOAL!!!\n");
 			break;
 		}
-		int Cost = MapSet[y*Width+x]+NormalCost;
+		unsigned int Cost = MapSet[y*Width+x]+NormalCost;
 		if(Cost>65500) {
 			//printf("Path not found!\n");
 			break;
