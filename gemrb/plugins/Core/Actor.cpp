@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.79 2005/02/06 11:04:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.80 2005/02/09 21:19:10 avenger_teambg Exp $
  *
  */
 
@@ -523,6 +523,24 @@ void Actor::GetNextAnimation()
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum)->AnimID;
 	printf ("AnimID: %04X\n", NewAnimID);
 	SetAnimationID ( NewAnimID );
+}
+
+int Actor::GetWeaponRange()
+{
+	CREItem *wield = inventory.GetUsedWeapon();
+	if( !wield) {
+		//should return FIST if not wielding anything
+		return 0;
+	}
+	Item *item = core->GetItem(wield->ItemResRef);
+	if (!item) {
+		return 0;
+	}
+	ITMExtHeader * which = item->GetExtHeader(0);
+	if (!which) {
+		return 0;
+	}
+	return which->Range;
 }
 
 void Actor::GetNextStance()

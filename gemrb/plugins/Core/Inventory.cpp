@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.39 2005/02/06 11:04:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.40 2005/02/09 21:19:10 avenger_teambg Exp $
  *
  */
 
@@ -24,6 +24,10 @@
 #include "Interface.h"
 #include "Inventory.h"
 #include "Item.h"
+
+static int SLOT_MAGIC = 12;
+static int SLOT_FIST = 12;
+static int SLOT_WEAPON = 12;
 
 Inventory::Inventory()
 {
@@ -411,6 +415,19 @@ CREItem *Inventory::GetSlotItem(unsigned int slot)
 	return Slots[slot];
 }
 
+CREItem *Inventory::GetUsedWeapon()
+{
+	CREItem *ret;
+	int slot;
+
+	ret = GetSlotItem(SLOT_MAGIC);
+	if( ret->ItemResRef[0] ) {
+		return ret;
+	}
+	if( Equipped == 1000 ) slot = SLOT_FIST;
+	else slot = SLOT_WEAPON;
+	return GetSlotItem(slot);
+}
 
 #if 0
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.55 2005/02/06 11:04:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.56 2005/02/09 21:19:10 avenger_teambg Exp $
  *
  */
 
@@ -292,6 +292,7 @@ public:
 	/* returns the count of memorizable spells of type at the given level */
 	int GetMemorizableSpellsCount(ieSpellType Type, int Level);
 	int LearnSpell(ieResRef resref, ieDword flags);
-
+	/* Returns weapon range */
+	int GetWeaponRange();
 };
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.13 2005/02/06 11:04:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.14 2005/02/09 21:19:11 avenger_teambg Exp $
  *
  */
 
@@ -105,10 +105,8 @@ public:
 	Item();
 	~Item();
 
-  ITMExtHeader *ext_headers;
-  Effect *equipping_features;
-	//std::vector< ITMExtHeader*> ext_headers;
-	//std::vector< ITMFeature*> equipping_features;
+	ITMExtHeader *ext_headers;
+	Effect *equipping_features;
 
 	ieStrRef ItemName;
 	ieStrRef ItemNameIdentified;
@@ -184,6 +182,13 @@ public:
 		return ItemDescIdentified;
 	}
 
+	ITMExtHeader *GetExtHeader(int which)
+	{
+        	if(ExtHeaderCount>=which) {
+                	return NULL;
+	        }
+        	return ext_headers+which;
+	}
 };
 
 #endif  // ! ITEM_H
