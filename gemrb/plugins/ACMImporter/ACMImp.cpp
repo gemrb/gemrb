@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.47 2004/08/07 15:41:51 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.48 2004/08/07 17:51:26 divide Exp $
  *
  */
 
@@ -281,17 +281,20 @@ bool ACMImp::Init(void)
 
 	alSourcef( MusicSource, AL_PITCH, 1.0f );
 	alSourcef( MusicSource, AL_GAIN, 1.0f );
-	alSourcefv( MusicSource, AL_POSITION, SourcePos );
 	alSourcei( MusicSource, AL_SOURCE_RELATIVE, 1 );
+	alSourcefv( MusicSource, AL_POSITION, SourcePos );
 	alSourcefv( MusicSource, AL_VELOCITY, SourceVel );
 	alSourcei( MusicSource, AL_LOOPING, 0 );
 	return true;
 }
 
 /*
- * if IsSpeech, replace any previous sounds that were speech
+ * flags: 
+ * 	GEM_SND_SPEECH: replace any previous with this flag set
+ * 	GEM_SND_RELATIVE: sound position is relative to the listener
+ * the default flags are: GEM_SND_RELATIVE
  */
-unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, bool IsSpeech)
+unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned long flags)
 {
 	unsigned int i;
 
@@ -349,7 +352,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, bool IsSpeech
 		return 0;
 	}
 
-	if (IsSpeech) {
+	if (flags & GEM_SND_SPEECH) {
 		if (!alIsSource( speech.Source )) {
 			alGenSources( 1, &speech.Source );
 
@@ -360,6 +363,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, bool IsSpeech
 			alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
 		}
 		alSourceStop( speech.Source );	// legal nop if not playing
+		alSourcei( speech.Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
 		alSourcefv( speech.Source, AL_POSITION, SourcePos );
 		alSourcei( speech.Source, AL_BUFFER, Buffer );
 		if (alIsBuffer( speech.Buffer )) {
@@ -378,11 +382,12 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, bool IsSpeech
 		alSourcei( Source, AL_BUFFER, Buffer );
 		alSourcef( Source, AL_PITCH, 1.0f );
 		alSourcef( Source, AL_GAIN, 1.0f );
-		alSourcefv( Source, AL_POSITION, SourcePos );
 		alSourcefv( Source, AL_VELOCITY, SourceVel );
 		alSourcei( Source, AL_LOOPING, 0 );
 		alSourcef( Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
-	
+		alSourcei( Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
+		alSourcefv( Source, AL_POSITION, SourcePos );
+			
 		if (alGetError() != AL_NO_ERROR) {
 			return 0;
 		}
@@ -459,6 +464,7 @@ unsigned long ACMImp::StreamFile(const char* filename)
 
 		alSourcef( MusicSource, AL_PITCH, 1.0f );
 		alSourcef( MusicSource, AL_GAIN, 1.0f );
+		alSourcei( MusicSource, AL_SOURCE_RELATIVE, 1 );
 		alSourcefv( MusicSource, AL_POSITION, SourcePos );
 		alSourcefv( MusicSource, AL_VELOCITY, SourceVel );
 		alSourcei( MusicSource, AL_LOOPING, 0 );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.20 2004/08/07 13:24:37 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.21 2004/08/07 17:51:26 divide Exp $
  *
  */
 
@@ -61,7 +61,7 @@ public:
 	ACMImp(void);
 	~ACMImp(void);
 	bool Init(void);
-	unsigned long Play(const char* ResRef, int XPos = 0, int YPos = 0, bool IsSpeech = false);
+	unsigned long Play(const char* ResRef, int XPos = 0, int YPos = 0, unsigned long flags = GEM_SND_RELATIVE);
 	unsigned long StreamFile(const char* filename);
 	bool Play();
 	bool Stop();

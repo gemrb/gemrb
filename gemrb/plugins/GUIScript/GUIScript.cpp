@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.184 2004/08/07 13:42:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.185 2004/08/07 17:51:28 divide Exp $
  *
  */
 
@@ -2024,7 +2024,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
 	char* ResRef;
 	int XPos, YPos;
-	bool speech;
+	unsigned long int flags;
 
 	if (!PyArg_ParseTuple( args, "s", &ResRef )) {
 		return AttributeError( GemRB_PlaySound__doc );
@@ -2032,18 +2032,18 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 
 	//this could be less hardcoded, but would do for a test
 	XPos=YPos=0;
-	speech=false;
+	flags=0;
 	Game *game=core->GetGame();
 	if(game) {
 		Scriptable *pc=game->GetPC(game->GetSelectedPCSingle());
 		if(pc) {
 			XPos=pc->XPos;
 			YPos=pc->YPos;
-			speech=true;
+			flags |= GEM_SND_SPEECH;
 		}
 	}
 	
-	int ret = core->GetSoundMgr()->Play( ResRef, XPos, YPos, speech );
+	int ret = core->GetSoundMgr()->Play( ResRef, XPos, YPos, flags );
 	if (!ret) {
 		return NULL;
 	}
