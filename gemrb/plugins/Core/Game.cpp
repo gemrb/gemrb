@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.14 2004/02/09 19:20:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.15 2004/02/11 22:39:11 balrog994 Exp $
  *
  */
 
@@ -102,8 +102,10 @@ int Game::LeaveParty(Actor *actor)
 	int slot=InParty(actor);
 	if(slot<0)
 		return slot;
-	PCs.erase(PCs.begin()+slot);
+	std::vector<Actor*>::iterator m = PCs.begin()+slot;
+	PCs.erase(m);
 	NPCs.push_back(actor);
+	return (int)NPCs.size()-1;
 }
 
 int Game::JoinParty(Actor *actor)
@@ -111,8 +113,10 @@ int Game::JoinParty(Actor *actor)
 	int slot=InStore(actor);
 	if(slot<0)
 		return slot;
-	NPCs.erase(PCs.begin()+slot);
+	std::vector<Actor*>::iterator m = NPCs.begin()+slot;
+	NPCs.erase(m);
 	PCs.push_back(actor);
+	return (int)PCs.size()-1;
 }
 
 Map * Game::GetMap(unsigned int index)
