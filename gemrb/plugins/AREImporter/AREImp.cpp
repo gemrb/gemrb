@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.39 2004/02/07 17:10:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.40 2004/02/18 15:08:22 balrog994 Exp $
  *
  */
 
@@ -402,7 +402,7 @@ Map * AREImp::GetMap()
 			char cpath[_MAX_PATH];
 			strcpy(cpath, core->GamePath);
 			strcat(cpath, str->filename);
-			FILE * str = fopen(cpath, "rb");
+			_FILE * str = _fopen(cpath, "rb");
 			FileStream * fs = new FileStream();
 			fs->Open(str, CreOffset, CreSize, true);
 			crefile = fs;
