@@ -2,12 +2,14 @@ Changes to the original engines.
 Generally the changes were designed to be compatible with the original game files. No additional fields added (so far), only previously unused parts are used.
 
 1. Items entries:
-Item entries in stores, containers, creatures will have additional flags. These flags will extend the usage of HasItem, DestroyItem, TakeItem scripting functions. The first three flags should be familiar.
+Item entries in stores, containers, creatures will have additional flags. These flags will extend the usage of HasItem, DestroyItem, TakeItem scripting functions. The first four flags should be familiar.
 
 IE_ITEM_IDENTIFIED = 1
 IE_ITEM_UNSTEALABLE = 2
 IE_ITEM_STOLEN = 4
+IE_ITEM_UNDROPPABLE = 8
 //these are GemRB extensions
+IE_ITEM_ACQUIRED = 0x10
 IE_ITEM_DESTRUCTIBLE = 0x20
 IE_ITEM_EQUIPPED = 0x40
 IE_ITEM_STACKED = 0x80
