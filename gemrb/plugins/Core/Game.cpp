@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.67 2005/03/13 20:08:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.68 2005/03/16 16:31:46 avenger_teambg Exp $
  *
  */
 
@@ -268,7 +268,7 @@ int Game::GetSelectedPCSingle()
  * flags:
  * SELECT_ONE   - if true, deselect all other actors when selecting one
  * SELECT_QUIET - do not run handler if selection was changed. Used for
- *                nested calls to SelectActor()
+ * nested calls to SelectActor()
  */
 
 bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
@@ -336,6 +336,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 	return true;
 }
 
+// Gets average party level, of onlyalive is true, then counts only living PCs
 int Game::GetPartyLevel(bool onlyalive)
 {
 	int count = 0;
@@ -350,6 +351,7 @@ int Game::GetPartyLevel(bool onlyalive)
 	return count;
 }
 
+// Returns map structure (ARE) if it is already loaded in memory
 int Game::FindMap(const char *ResRef)
 {
 	int index = Maps.size();
@@ -473,9 +475,13 @@ int Game::LoadMap(const char* ResRef)
 	if(index>=0) {
 		return index;
 	}
-	//check if the current area could be removed, 
-	//don't remove it if the pathfinder is still connected to it 
-	DelMap( MapIndex, false );
+	//check if any other areas could be removed (cached)
+	//areas cannot be removed with actors
+	//master areas cannot be removed with active actors (pathlength!=0 or combat)
+	index = Maps.size();
+	while (index--) {
+		DelMap( index, false );
+	}
 
 	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
 	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef, IE_ARE_CLASS_ID );
