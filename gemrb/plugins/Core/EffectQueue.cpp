@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.1 2004/11/07 19:48:44 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.2 2004/11/07 21:21:36 avenger_teambg Exp $
  *
  */
 
@@ -96,7 +96,7 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 	case 0x49: fx_damage_bonus ( target, fx ); break;
 	case 0x5A: fx_open_locks_modifier ( target, fx ); break;
 	case 0xA6: fx_resistance_to_magic_damage ( target, fx ); break;
-	default: printf( "fx_???: (%d) %d %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	default: printf( "fx_???: (%d) %d %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 	}
 }
 
@@ -133,7 +133,7 @@ inline int MAX(int a, int b)
 // 0x00
 int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_ac_vs_damage_type_modifier (%2d): AC Modif: %d ; Type: %d ; MinLevel: %d ; MaxLevel: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2, fx->DiceSides, fx->DiceThrown );
+	printf( "fx_ac_vs_damage_type_modifier (%2d): AC Modif: %d ; Type: %d ; MinLevel: %d ; MaxLevel: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2, (int) fx->DiceSides, (int) fx->DiceThrown );
 	CHECK_LEVEL();
 
 	// FIXME: is it bitmask or just a single num?
@@ -155,7 +155,7 @@ int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx)
 // 0x0A
 int fx_condition_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_condition_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_condition_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
@@ -175,7 +175,7 @@ int fx_condition_modifier (Actor* target, Effect* fx)
 // 0x12
 int fx_maximum_hp_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_maximum_hp_modifier (%2d): Stat Modif: %d ; Modif Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_maximum_hp_modifier (%2d): Stat Modif: %d ; Modif Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	int bonus;
 
@@ -210,15 +210,26 @@ int fx_maximum_hp_modifier (Actor* target, Effect* fx)
 // 0x2A
 int fx_bonus_wizard_spells (Actor* target, Effect* fx)
 {
-	printf( "fx_bonus_wizard_spells (%2d): Spell Add: %d ; Spell Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-
+	printf( "fx_bonus_wizard_spells (%2d): Spell Add: %d ; Spell Level: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
+	
+	int i=1;
+	for( int j=0;j<9;j++) {
+		if (fx->Parameter2&i) {
+			if(fx->Parameter1) {
+				STAT_ADD( IE_WIZARDBONUS1+j, fx->Parameter1);
+			}
+			else {
+				STAT_ADD( IE_WIZARDBONUS1+j, target->BaseStats[ IE_WIZARDBONUS1+j ]);
+			}
+		}
+	}
 	return FX_APPLIED;
 }
 
 // 0x21
 int fx_save_vs_death_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_save_vs_death_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_save_vs_death_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
@@ -238,7 +249,7 @@ int fx_save_vs_death_modifier (Actor* target, Effect* fx)
 // 0x22
 int fx_save_vs_wands_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_save_vs_wands_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_save_vs_wands_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
@@ -258,7 +269,7 @@ int fx_save_vs_wands_modifier (Actor* target, Effect* fx)
 // 0x23
 int fx_save_vs_poly_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_save_vs_poly_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_save_vs_poly_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
@@ -278,7 +289,7 @@ int fx_save_vs_poly_modifier (Actor* target, Effect* fx)
 // 0x24
 int fx_save_vs_breath_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_save_vs_breath_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_save_vs_breath_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
@@ -298,7 +309,7 @@ int fx_save_vs_breath_modifier (Actor* target, Effect* fx)
 // 0x25
 int fx_save_vs_spell_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_save_vs_spell_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_save_vs_spell_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
@@ -318,7 +329,7 @@ int fx_save_vs_spell_modifier (Actor* target, Effect* fx)
 // 0x2C
 int fx_strength_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_strength_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_strength_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
@@ -338,7 +349,7 @@ int fx_strength_modifier (Actor* target, Effect* fx)
 // 0x36
 int fx_to_hit_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
@@ -358,7 +369,7 @@ int fx_to_hit_modifier (Actor* target, Effect* fx)
 // 0x3B
 int fx_stealth_bonus (Actor* target, Effect* fx)
 {
-	printf( "fx_stealth_bonus (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_stealth_bonus (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
@@ -378,7 +389,7 @@ int fx_stealth_bonus (Actor* target, Effect* fx)
 // 0x49
 int fx_damage_bonus (Actor* target, Effect* fx)
 {
-	printf( "fx_damage_bonus (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_damage_bonus (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
@@ -394,7 +405,7 @@ int fx_damage_bonus (Actor* target, Effect* fx)
 // 0x5A
 int fx_open_locks_modifier (Actor* target, Effect* fx)
 {
-	printf( "fx_open_locks_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_open_locks_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
@@ -414,7 +425,7 @@ int fx_open_locks_modifier (Actor* target, Effect* fx)
 // 0xA6
 int fx_resistance_to_magic_damage (Actor* target, Effect* fx)
 {
-	printf( "fx_resistance_to_magic_damage (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	printf( "fx_resistance_to_magic_damage (%2d): Mod: %d, Type: %d\n", fx->Opcode, (int) fx->Parameter1, (int) fx->Parameter2 );
 
 	switch (fx->Parameter2) {
 	case 0: 
