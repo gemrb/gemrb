@@ -1026,7 +1026,8 @@ void GameControl::MoveToArea(char *Destination, char *EntranceName, bool fullPar
 }
 
 void GameControl::ChangeMap()
-{
+{	
+	Actor * pc = core->GetGame()->GetPC(0);
 	ds = NULL;
 	speaker = NULL;
 	target = NULL;
@@ -1036,10 +1037,10 @@ void GameControl::ChangeMap()
 	overDoor = NULL;
 	selected.clear();
 	core->GetGame()->DelMap(MapIndex, true);
+	strcpy(pc->Area, Destination);
 	int mi = core->GetGame()->LoadMap(Destination);
 	Map * map = core->GetGame()->GetMap(mi);
 	SetCurrentArea(mi);
-	Actor * pc = core->GetGame()->GetPC(0);
 	pc->ClearActions();
 	pc->ClearPath();
 	pc->AnimID = IE_ANI_AWAKE;
