@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.13 2004/09/13 21:04:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.14 2005/03/05 01:07:55 avenger_teambg Exp $
  *
  */
 
@@ -74,14 +74,15 @@ public:
 	~Dialog(void);
 private:
 	std::vector< DialogState*> initialStates;
-public:
-	void AddState(DialogState* ds);
-	DialogState* GetState(unsigned int index);
-	ieResRef ResRef;
-private:
+
 	void FreeDialogState(DialogState* ds);
 	void FreeDialogString(DialogString* ds);
 public:
+	void AddState(DialogState* ds);
+	DialogState* GetState(unsigned int index);
+	int FindFirstState(Scriptable* target);
+	bool EvaluateDialogTrigger(Scriptable* target, DialogString* trigger);
+
 	int StateCount()
 	{
 		return (int)initialStates.size();
@@ -90,6 +91,8 @@ public:
 	{
 		delete this;
 	}
+public:
+	ieResRef ResRef;
 };
 
 #endif

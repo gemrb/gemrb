@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.140 2005/03/03 22:33:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.141 2005/03/05 01:07:56 avenger_teambg Exp $
  *
  */
 
@@ -400,6 +400,7 @@ public:
 	Store *GetCurrentStore();
 	int CloseCurrentStore();
 	Store *SetCurrentStore(ieResRef resname);
+	ieStrRef GetRumour(ieResRef resname);
 
 private:
 	bool LoadConfig(void);

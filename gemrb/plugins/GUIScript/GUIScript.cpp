@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.277 2005/03/03 22:33:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.278 2005/03/05 01:07:56 avenger_teambg Exp $
  *
  */
 
@@ -2726,6 +2726,23 @@ static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* /*args*/)
 	return Py_BuildValue( "i", Gold );
 }
 
+PyDoc_STRVAR( GemRB_GameSetPartyGold__doc,
+"GameSetPartyGold() => int\n\n"
+"Sets current party gold." );
+
+static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
+{
+	int Gold;
+
+	if (!PyArg_ParseTuple( args, "i", &Gold )) {
+		return AttributeError( GemRB_GameSetPartyGold__doc );
+	}
+	core->GetGame()->PartyGold=Gold;
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_GameGetFormation__doc,
 "GameGetFormation() => int\n\n"
 "Returns current party formation." );
@@ -3491,6 +3508,8 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	}
 	PyDict_SetItemString(dict, "StoreButtons", p);
 	PyDict_SetItemString(dict, "StoreFlags", PyInt_FromLong( store->Flags ) );
+	PyDict_SetItemString(dict, "TavernRumour", PyString_FromResRef( store->RumoursTavern ));
+	PyDict_SetItemString(dict, "TempleRumour", PyString_FromResRef( store->RumoursTemple ));
 	return dict;
 }
 
@@ -4287,6 +4306,27 @@ static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+
+PyDoc_STRVAR( GemRB_GetRumour__doc,
+"GetRumour(percent, ResRef) => ieStrRef\n\n"
+"Returns a string to a rumour message. ResRef is a dialog resource.\n\n");
+
+static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
+{
+	int percent;
+	char *ResRef;
+
+	if (!PyArg_ParseTuple( args, "is", &percent, &ResRef)) {
+		return AttributeError( GemRB_GetRumour__doc );
+	}
+	if(rand()%100 >= percent) {
+		return PyInt_FromLong( -1 );
+	}
+
+	ieStrRef strref = core->GetRumour( ResRef );
+	return PyInt_FromLong( strref );
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -4305,6 +4345,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPartySize, METH_NOARGS),
 	METHOD(GetGameTime, METH_NOARGS),
 	METHOD(GameGetPartyGold, METH_NOARGS),
+	METHOD(GameSetPartyGold, METH_VARARGS),
 	METHOD(GameGetFormation, METH_NOARGS),
 	METHOD(GameSetFormation, METH_VARARGS),
 	METHOD(GetJournalSize, METH_VARARGS),
@@ -4436,6 +4477,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetMapnote, METH_VARARGS),
 	METHOD(CreateCreature, METH_VARARGS),
 	METHOD(ExploreArea, METH_VARARGS),
+	METHOD(GetRumour, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };

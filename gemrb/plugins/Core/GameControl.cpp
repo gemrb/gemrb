@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.192 2005/03/03 22:33:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.193 2005/03/05 01:07:55 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1333,7 +1333,7 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 		printf( "[GameControl]: Cannot start dialog: %s\n", dlgref );
 		return;
 	}
-	strncpy(dlg->ResRef, dlgref, 8); //this isn't handled by GetDialog???
+	strnuprcpy(dlg->ResRef, dlgref, 8); //this isn't handled by GetDialog???
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
@@ -1389,49 +1389,6 @@ void GameControl::EndDialog(bool try_to_break)
 	DialogueFlags = 0;
 }
 
-int GameControl::FindFirstState(Scriptable* target, Dialog* dlg)
-{
-	for (int i = 0; i < dlg->StateCount(); i++) {
-		if (EvaluateDialogTrigger( target, dlg->GetState( i )->trigger )) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-bool GameControl::EvaluateDialogTrigger(Scriptable* target, DialogString* trigger)
-{
-	int ORcount = 0;
-	int result;
-	bool subresult = true;
-
-	if (!trigger) {
-		return false;
-	}
-	for (unsigned int t = 0; t < trigger->count; t++) {
-		result = GameScript::EvaluateString( target, trigger->strings[t] );
-		if (result > 1) {
-			if (ORcount)
-				printf( "[Dialog]: Unfinished OR block encountered!\n" );
-			ORcount = result;
-			subresult = false;
-			continue;
-		}
-		if (ORcount) {
-			subresult |= ( result != 0 );
-			if (--ORcount)
-				continue;
-			result = subresult ? 1 : 0;
-		}
-		if (!result)
-			return 0;
-	}
-	if (ORcount) {
-		printf( "[Dialog]: Unfinished OR block encountered!\n" );
-	}
-	return 1;
-}
-
 void GameControl::DialogChoose(unsigned int choose)
 {
 	char Tmp[256];
@@ -1447,7 +1404,7 @@ void GameControl::DialogChoose(unsigned int choose)
 	TextArea* ta = ( TextArea* ) win->GetControl( index );
 	//get the first state with true triggers!
 	if (choose == (unsigned int) -1) {
-		int si = FindFirstState( target, dlg );
+		int si = dlg->FindFirstState( target );
 		if (si < 0) {
 			printf( "[Dialog]: No top level condition evaluated for true.\n" );
 			ta->SetMinRow( false );
@@ -1521,7 +1478,7 @@ void GameControl::DialogChoose(unsigned int choose)
 	int idx = 0;
 	for (unsigned int x = 0; x < ds->transitionsCount; x++) {
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-			if(!EvaluateDialogTrigger(speaker, ds->transitions[x]->trigger)) {
+			if(!dlg->EvaluateDialogTrigger(speaker, ds->transitions[x]->trigger)) {
 				continue;
 			}
 		}

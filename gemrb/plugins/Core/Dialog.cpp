@@ -15,12 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.8 2004/04/15 12:33:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.9 2005/03/05 01:07:55 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "Dialog.h"
+#include "GameScript.h"
 
 Dialog::Dialog(void)
 {
@@ -73,4 +74,47 @@ void Dialog::FreeDialogString(DialogString* ds)
 	}
 	free( ds->strings );
 	delete( ds );
+}
+
+int Dialog::FindFirstState(Scriptable* target)
+{
+	for (unsigned int i = 0; i < initialStates.size(); i++) {
+		if (EvaluateDialogTrigger( target, GetState( i )->trigger )) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+bool Dialog::EvaluateDialogTrigger(Scriptable* target, DialogString* trigger)
+{
+	int ORcount = 0;
+	int result;
+	bool subresult = true;
+
+	if (!trigger) {
+		return false;
+	}
+	for (unsigned int t = 0; t < trigger->count; t++) {
+		result = GameScript::EvaluateString( target, trigger->strings[t] );
+		if (result > 1) {
+			if (ORcount)
+				printf( "[Dialog]: Unfinished OR block encountered!\n" );
+			ORcount = result;
+			subresult = false;
+			continue;
+		}
+		if (ORcount) {
+			subresult |= ( result != 0 );
+			if (--ORcount)
+				continue;
+			result = subresult ? 1 : 0;
+		}
+		if (!result)
+			return 0;
+	}
+	if (ORcount) {
+		printf( "[Dialog]: Unfinished OR block encountered!\n" );
+	}
+	return 1;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.56 2005/01/15 14:55:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.57 2005/03/05 01:07:55 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -139,8 +139,6 @@ public:
 	void InitDialog(Actor* speaker, Actor* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
-	/** finds the first true condition in a dialog */
-	int FindFirstState(Scriptable* target, Dialog* dlg);
 	void DisplayString(Scriptable* target);
 	/* Displays a string in the textarea */
 	//void DisplayString(const char* Text);
@@ -149,9 +147,6 @@ public:
 	Actor *GetLastActor() { return lastActor; }
 	//changes map to the current PC
 	void ChangeMap(Actor *pc, bool forced);
-private:
-	/* evaluates a dialog trigger block */
-	bool EvaluateDialogTrigger(Scriptable* target, DialogString* trigger);
 };
 
 #endif

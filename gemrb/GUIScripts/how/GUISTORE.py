@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUISTORE.py,v 1.3 2005/03/04 23:30:13 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUISTORE.py,v 1.4 2005/03/05 01:07:52 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -488,7 +488,7 @@ def DonateGold ():
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ANIMATE)
 	Field = GetControl (Window, 5)
 	donation = val(GemRB.QueryText(Window, Field))
-	GemRB.SetPartyGold( GemRB.GetPartyGold()-donation)
+	GemRB.GameSetPartyGold( GemRB.GetPartyGold()-donation)
 	donation = donation / 1000
 	if donation>0:
 		#GemRB.IncreaseReputation (donation)
@@ -527,6 +527,7 @@ def GulpDrink ():
 	GemRB.SetTAAutoScroll(Window, TextArea, 1)
 	pc = GemRB.GameGetSelectedPCSingle ()
 	intox = GemRB.GetPlayerStat (pc, IE_INTOXICATION)
+	intox = 0
 	if intox > 80:
 		GemRB.TextAreaAppend (Window, TextArea, 10832, -1)
 		return
@@ -538,9 +539,12 @@ def GulpDrink ():
 		print "No money"
 		return
 
+	GemRB.GameSetPartyGold( gold-Drink['Price'])
 	GemRB.SetPlayerStat (pc, IE_INTOXICATION, intox+Drink['Strength'])
-	#get some rumour
+	Text = GemRB.GetRumour (Drink['Strength'], Store['TavernRumour'])
+	GemRB.TextAreaAppend (Window, TextArea, Text, -1)
 	GemRB.PlaySound("gam_07")
+	UpdateStoreRumourWindow()
 
 
 def UpdateStoreRentWindow ():

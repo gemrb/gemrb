@@ -15,6 +15,8 @@ Return value: dictionary
 "StoreRoomPrices" - a four elements tuple, negative if the room type is unavailable
 "StoreButtons"    - a four elements tuple, possible actions
 "StoreFlags"      - the store flags if you ever need them, StoreButtons is a digested information, but you might have something else in mind based on these
+"TavernRumour"    - ResRef of tavern rumour dialog
+"TempleRumour"    - ResRef of temple rumour dialog
 
-See also: EnterStore, GetStoreCure, GetStoreDrink
+See also: EnterStore, GetStoreCure, GetStoreDrink, GetRumour
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.270 2005/03/04 23:27:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.271 2005/03/05 01:07:55 avenger_teambg Exp $
  *
  */
 
@@ -44,6 +44,7 @@
 #include "ItemMgr.h"
 #include "SpellMgr.h"
 #include "StoreMgr.h"
+#include "DialogMgr.h"
 #include "MapControl.h"
 #include "EffectQueue.h"
 
@@ -2905,5 +2906,30 @@ Store *Interface::SetCurrentStore( ieResRef resname )
 	memcpy(CurrentStore->Name, resname, 8);
 
 	return CurrentStore;
+}
+
+ieStrRef Interface::GetRumour(ieResRef dlgref)
+{
+	DialogMgr* dm = ( DialogMgr* ) core->GetInterface( IE_DLG_CLASS_ID );
+	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
+	Dialog *dlg = dm->GetDialog();
+	core->FreeInterface( dm );
+
+	if (!dlg) {
+		printf( "[Interface]: Cannot load dialog: %s\n", dlgref );
+		return (ieStrRef) -1;
+	}
+	Scriptable *pc=game->GetPC(game->GetSelectedPCSingle());
+	
+	ieStrRef ret = (ieStrRef) -1;
+        for (int i = 0; i < dlg->StateCount(); i++) {
+		DialogState *ds = dlg->GetState( i );
+                if (dlg->EvaluateDialogTrigger( pc, ds->trigger )) {
+			ret = ds->StrRef;
+			break;
+                }
+        }
+	delete dlg;
+	return ret;
 }
 
