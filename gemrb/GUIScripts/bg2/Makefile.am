@@ -1,0 +1,2 @@
+bg2script_DATA = CharGen.py CharGen2.py CharGen3.py CharGen4.py CharGen5.py CharGen6.py CharGen7.py CharGen8.py CharGen9.py GUICG1.py GUICG10.py GUICG12.py GUICG13.py GUICG15.py GUICG2.py GUICG22.py GUICG23.py GUICG24.py GUICG3.py GUICG4.py GUICG5.py GUICG6.py GUICG8.py GUICG9.py GUIDefines.py GUILOAD.py GUIMOVIE.py GUIOPT10.py GUIOPT12.py GUIOPT6.py GUIOPT7.py GUIOPT8.py GUIOPT9.py ImportFile.py ImportGame.py Start.py StartOpt.py 
+bg2scriptdir = $(datadir)/GUIScripts/bg2/
