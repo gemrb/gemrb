@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.28 2004/01/16 20:26:27 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.29 2004/01/16 22:56:35 balrog994 Exp $
  *
  */
 
@@ -74,6 +74,10 @@ private:
 	int				RefCount;
 public:
 	void Release() {
+		if(!RefCount) {
+			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
+			abort();
+		}
 		RefCount--;
 		if(!RefCount)
 			delete this;
@@ -112,6 +116,10 @@ private:
 	int				RefCount;
 public:
 	void Release() {
+		if(!RefCount) {
+			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
+			abort();
+		}
 		RefCount--;
 		if(!RefCount)
 			delete this;
@@ -141,6 +149,10 @@ private:
 	int				RefCount;
 public:
 	void Release() {
+		if(!RefCount) {
+			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
+			abort();
+		}
 		RefCount--;
 		if(!RefCount)
 			delete this;
@@ -165,8 +177,6 @@ public:
 		int1Parameter = 0;
 		int2Parameter = 0;
 		RefCount = 1;
-		autoFree = false;
-		delayFree = false;
 	};
 	~Action() {
 		for(int c = 0; c < 3; c++) {
@@ -185,12 +195,14 @@ public:
 	int				int2Parameter;
 	char			string0Parameter[33];
 	char			string1Parameter[33];
-	bool			autoFree;
-	bool			delayFree;
 private:
 	int				RefCount;
 public:
 	void Release() {
+		if(!RefCount) {
+			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
+			abort();
+		}
 		RefCount--;
 		if(!RefCount)
 			delete this;
@@ -221,6 +233,10 @@ private:
 	int				RefCount;
 public:
 	void Release() {
+		if(!RefCount) {
+			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
+			abort();
+		}
 		RefCount--;
 		if(!RefCount)
 			delete this;
@@ -250,6 +266,10 @@ private:
 	int				RefCount;
 public:
 	void Release() {
+		if(!RefCount) {
+			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
+			abort();
+		}
 		RefCount--;
 		if(!RefCount)
 			delete this;
@@ -278,6 +298,10 @@ private:
 	int				RefCount;
 public:
 	void Release() {
+		if(!RefCount) {
+			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
+			abort();
+		}
 		RefCount--;
 		if(!RefCount)
 			delete this;
@@ -331,6 +355,10 @@ private:
 	int				RefCount;
 public:
 	void Release() {
+		if(!RefCount) {
+			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
+			abort();
+		}
 		RefCount--;
 		if(!RefCount)
 			delete this;

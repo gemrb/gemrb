@@ -15,16 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.45 2004/01/16 20:26:27 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.46 2004/01/16 22:56:35 balrog994 Exp $
  *
  */
-
-#define _CRTDBG_MAP_ALLOC
 
 #include "GameScript.h"
 #include "Interface.h"
 #include "DialogMgr.h"
-#include <crtdbg.h>
 
 extern Interface * core;
 
@@ -676,7 +673,6 @@ Action * GameScript::GenerateAction(char * String)
 			if(*str == '(') {
 				newAction = new Action();
 				newAction->actionID = (unsigned short)actionsTable->GetValueIndex(i);
-				newAction->autoFree = true;
 				int objectCount = (newAction->actionID == 1) ? 0 : 1;
 				int stringsCount = 0;
 				int intCount = 0;
@@ -1879,7 +1875,6 @@ void GameScript::OpenDoor(Scriptable * Sender, Action * parameters)
 		door->SetDoorClosed(false, true);		
 	} else {
 		Sender->AddActionInFront(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		char Tmp[256];
 		sprintf(Tmp, "MoveToPoint([%d,%d])", p->x, p->y);
 		actor->AddActionInFront(GameScript::CreateAction(Tmp, true));
@@ -1912,7 +1907,6 @@ void GameScript::CloseDoor(Scriptable * Sender, Action * parameters)
 		door->SetDoorClosed(true, true);
 	} else {
 		Sender->AddActionInFront(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		char Tmp[256];
 		sprintf(Tmp, "MoveToPoint([%d,%d])", p->x, p->y);
 		actor->AddActionInFront(GameScript::CreateAction(Tmp, true));
