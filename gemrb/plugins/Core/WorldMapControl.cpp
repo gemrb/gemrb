@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.9 2004/10/11 19:33:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.10 2004/11/21 12:57:30 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -37,7 +37,7 @@ WorldMapControl::WorldMapControl(void)
 	ScrollY = 0;
 	MouseIsDown = false;
 	Changed = true;
-	lastCursor = 0;
+	//lastCursor = 0;
 }
 
 
@@ -176,50 +176,15 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 	}
 
-	if (lastCursor != nextCursor) {
-		( ( Window * ) Owner )->Cursor = nextCursor;
-		lastCursor = nextCursor;
-	}
+	( ( Window * ) Owner )->Cursor = nextCursor;
 }
 
-#if 0
-bool WorldMapControl::HandleActiveRegion(InfoPoint *trap, Actor *actor)
+/** Mouse Leave Event */
+void WorldMapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 {
-	switch(trap->Type) {
-		case ST_TRAVEL:
-			trap->Flags|=TRAP_RESET;
-			return false;
-		case ST_TRIGGER:
-			//the importer shouldn't load the script
-			//if it is unallowed anyway (though 
-			//deactivated scripts could be reactivated)
-			//only the 'trapped' flag should be honoured
-			//there. Here we have to check on the 
-			//reset trap and deactivated flags
-			if (trap->Scripts[0]) {
-				if(!(trap->Flags&TRAP_DEACTIVATED) ) {
-					trap->LastTrigger = selected[0];
-					trap->Scripts[0]->Update();
-					//if reset trap flag not set, deactivate it
-					if(!(trap->Flags&TRAP_RESET)) {
-						trap->Flags|=TRAP_DEACTIVATED;
-					}
-				}
-			} else {
-				if (trap->overHeadText) {
-					if (trap->textDisplaying != 1) {
-						trap->textDisplaying = 1;
-						GetTime( trap->timeStartDisplaying );
-						DisplayString( trap );
-					}
-				}
-			}
-			return true;
-		default:;
-	}
-	return false;
+	( ( Window * ) Owner )->Cursor = 0;
 }
-#endif
+
 /** Mouse Button Down */
 void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short /*Mod*/)
@@ -286,33 +251,3 @@ void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 		ScrollY = 0;
 }
 
-#if 0
-void WorldmapControl::DisplayString(int X, int Y, const char *Text)
-{
-	Scriptable* scr = new Scriptable( ST_TRIGGER );
-	scr->overHeadText = (char *) Text;
-	scr->textDisplaying = 1;
-	scr->timeStartDisplaying = 0;
-	scr->XPos = X;
-	scr->YPos = Y;
-	scr->MySelf = NULL;
-	infoTexts.push_back( scr );
-}
-
-
-void WorldmapControl::DisplayString(const char* Text)
-{
-	unsigned long WinIndex, TAIndex;
-
-	core->GetDictionary()->Lookup( "MessageWindow", WinIndex );
-	if (( WinIndex != (unsigned long) -1 ) &&
-		( core->GetDictionary()->Lookup( "MessageTextArea", TAIndex ) )) {
-		Window* win = core->GetWindow( WinIndex );
-		if (win) {
-			TextArea* ta = ( TextArea* ) win->GetControl( TAIndex );
-			ta->AppendText( Text, -1 );
-		}
-	}
-}
-
-#endif

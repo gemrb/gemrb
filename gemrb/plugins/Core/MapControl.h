@@ -7,7 +7,7 @@ class MapControl;
 #include "Interface.h"
 
 // !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_MAP_ON_PRESS        0x09000000
+#define IE_GUI_MAP_ON_PRESS	0x09000000
 
 
 #ifdef WIN32
@@ -63,6 +63,8 @@ public:
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
+	/** Mouse Leave Event */
+	void OnMouseLeave(unsigned short x, unsigned short y);
 	/** Mouse Button Down */
 	void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button,
 		unsigned short Mod);

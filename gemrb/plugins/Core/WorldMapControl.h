@@ -41,6 +41,8 @@ private:
 	unsigned char lastCursor;
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
+	/** Mouse Leave Event */
+	void OnMouseLeave(unsigned short x, unsigned short y);
 	/** Mouse Button Down */
 	void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button,
 		unsigned short Mod);
