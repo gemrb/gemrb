@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.8 2005/02/15 16:33:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.9 2005/02/15 17:39:02 avenger_teambg Exp $
  *
  */
 
@@ -265,7 +265,7 @@ void FixPath (char *path, bool needslash)
 {
 	unsigned int i=strlen(path)-1;
 
-	if(i>=MAX_PATH) return; //don't do anything
+	if(i>=_MAX_PATH) return; //don't do anything
 	if(needslash) {
 		if(path[i]=='/' || path[i]=='\\') return;
 		i++;
