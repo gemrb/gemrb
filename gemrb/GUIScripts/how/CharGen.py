@@ -84,6 +84,17 @@ MageSpellsTextArea = 0
 MageSpellsDoneButton = 0
 MageSpellsSelectPointsLeft = 0
 
+MageMemorizeWindow = 0
+MageMemorizeTextArea = 0
+MageMemorizeDoneButton = 0
+MageMemorizePointsLeft = 0
+
+PriestSpellsTable = 0
+PriestMemorizeWindow = 0
+PriestMemorizeTextArea = 0
+PriestMemorizeDoneButton = 0
+PriestMemorizePointsLeft = 0
+
 AppearanceButton = 0
 AppearanceWindow = 0
 AppearanceTable = 0
@@ -194,7 +205,7 @@ def OnLoad():
 	return
 
 def BackPress():
-	global CharGenWindow, CharGenState
+	global CharGenWindow, CharGenState, SkillsState
 	global GenderButton, RaceButton, ClassButton, AlignmentButton, AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
 
 	GemRB.SetToken("CHARNAME","")
@@ -232,13 +243,13 @@ def BackPress():
 		GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonState(CharGenWindow, SkillsButton, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonFlags(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
-
+		SkillsState = 0
 	elif CharGenState == 6:
 		GemRB.SetButtonState(CharGenWindow, NameButton, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonState(CharGenWindow, BiographyButton, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetButtonState(CharGenWindow, AcceptButton, IE_GUI_BUTTON_DISABLED)
 
+	GemRB.SetButtonState(CharGenWindow, AcceptButton, IE_GUI_BUTTON_DISABLED)
 	SetCharacterDescription()
 	return
 
@@ -254,28 +265,22 @@ def AcceptPress():
 	GemRB.CreatePlayer("charbase", MyChar)
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
-	#base class
-	#Class=GemRB.GetVar("BaseClass")
-	#GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
-	#kit
-	#GemRB.SetPlayerStat(MyChar, IE_KIT, GemRB.GetVar("Class") )
-
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, GemRB.GetVar("Class") )
 	GemRB.SetPlayerStat(MyChar, IE_KIT, 0x4000)
-	t=GemRB.GetVar("Alignment")
+	t = GemRB.GetVar("Alignment")
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
-	TmpTable=GemRB.LoadTable("repstart")
-	t=GemRB.FindTableValue(AlignmentTable,3,t)
-	t=GemRB.GetTableValue(TmpTable,t,0)
+	TmpTable = GemRB.LoadTable("repstart")
+	t = GemRB.FindTableValue(AlignmentTable, 3, t)
+	t = GemRB.GetTableValue(TmpTable, t, 0)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
-	TmpTable=GemRB.LoadTable("strtgold")
+	TmpTable = GemRB.LoadTable("strtgold")
 	GemRB.SetPlayerStat(MyChar, IE_EA, 2 )
-	Str=GemRB.GetVar("Ability 1")
+	Str = GemRB.GetVar("Ability 1")
 	GemRB.SetPlayerStat(MyChar, IE_STR, Str)
-	if Str==18:
-		GemRB.SetPlayerStat(MyChar,IE_STREXTRA,GemRB.GetVar("StrExtra"))
+	if Str == 18:
+		GemRB.SetPlayerStat(MyChar, IE_STREXTRA, GemRB.GetVar("StrExtra"))
 	else:
-		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,0)
+		GemRB.SetPlayerStat(MyChar, IE_STREXTRA, 0)
 
 	GemRB.SetPlayerStat(MyChar, IE_INT, GemRB.GetVar("Ability 2"))
 	GemRB.SetPlayerStat(MyChar, IE_WIS, GemRB.GetVar("Ability 3"))
@@ -290,7 +295,7 @@ def AcceptPress():
 	return
 
 def SetCharacterDescription():
-	global CharGenWindow, TextArea, CharGenState, ClassTable, RaceTable, AlignmentTable, AbilitiesTable, SkillsTable, ProficienciesTable, RacialEnemyTable
+	global CharGenWindow, TextArea, CharGenState, ClassTable, RaceTable, AlignmentTable, AbilitiesTable, SkillsTable, ProficienciesTable, RacialEnemyTable, MageSpellsTable, PriestSpellsTable
 	GemRB.TextAreaClear(CharGenWindow, TextArea)
 	if CharGenState > 7:
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 1047)
@@ -354,7 +359,7 @@ def SetCharacterDescription():
 
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 9466, -1)
-		for i in range(0,15):
+		for i in range(0, 15):
 			ProficiencyValue = GemRB.GetVar("Proficiency" + str(i) )
 			if ProficiencyValue > 0:
 				GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(ProficienciesTable, i, 2), -1)
@@ -363,6 +368,31 @@ def SetCharacterDescription():
 				while j < ProficiencyValue:
 					GemRB.TextAreaAppend(CharGenWindow, TextArea, "+")
 					j = j + 1
+
+		if ClassName == "MAGE" or ClassName == "FIGHTER_MAGE" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF" or ClassName == "CLERIC_MAGE" or ClassName == "FIGHTER_MAGE_CLERIC":
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, 11027, -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
+			MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
+			MageSpellBook = GemRB.GetVar("MageSpellBook")
+			MageMemorized = GemRB.GetVar("MageMemorized")
+			for i in range(0, MageSpellsCount):
+				if (1 << i) & MageSpellBook:
+					GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(MageSpellsTable, i, 2), -1)
+					GemRB.TextAreaAppend(CharGenWindow, TextArea, " ")
+					if (1 << i) & MageMemorized:
+						GemRB.TextAreaAppend(CharGenWindow, TextArea, "+")
+
+		if ClassName == "CLERIC" or ClassName == "FIGHTER_CLERIC" or ClassName == "CLERIC_THIEF" or ClassName == "CLERIC_RANGER" or ClassName == "CLERIC_MAGE" or ClassName == "FIGHTER_MAGE_CLERIC":
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, 11028, -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
+			PriestSpellsCount = GemRB.GetTableRowCount(PriestSpellsTable)
+			PriestMemorized = GemRB.GetVar("MageMemorized")
+			for i in range(0, PriestSpellsCount):
+				if (1 << i) & PriestMemorized:
+					GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(PriestSpellsTable, i, 2), -1)
+					GemRB.TextAreaAppend(CharGenWindow, TextArea, " +")
 	return
 
 
@@ -1067,10 +1097,10 @@ def SkillsPress():
 		if ClassName == "MAGE" or ClassName == "FIGHTER_MAGE" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF":
 			MageSpellsMemorize()
 		elif ClassName == "CLERIC" or ClassName == "FIGHTER_CLERIC" or ClassName == "CLERIC_THIEF" or ClassName == "CLERIC_RANGER":
-			ClericSpellsMemorize()
+			PriestSpellsMemorize()
 		elif ClassName == "CLERIC_MAGE" or ClassName == "FIGHTER_MAGE_CLERIC":
 			MageSpellsMemorize()
-			ClericSpellsMemorize()
+			PriestSpellsMemorize()
 		else:
 			SkillsState = 4
 
@@ -1453,6 +1483,7 @@ def MageSpellsSelect():
 	MageSpellsTable = GemRB.LoadTable("MAGESP")
 	MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
 	GemRB.SetVar("MageSpellBook", 0)
+	GemRB.SetVar("SpellMask", 0)
 
 	MageSpellsSelectPointsLeft = 2
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
@@ -1462,7 +1493,7 @@ def MageSpellsSelect():
 	for i in range (0, 24):
 		SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
 		GemRB.SetButtonFlags(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
-		if (i < MageSpellsCount):
+		if i < MageSpellsCount:
 			# Color is no good yet :-(
 			GemRB.SetButtonBAM(MageSpellsWindow, SpellButton, GemRB.GetTableValue(MageSpellsTable, i, 0), 1, 0, 63)
 			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
@@ -1501,8 +1532,8 @@ def MageSpellsSelectPress():
 		i = i + 1
 		Spell = Spell >> 1
 	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, GemRB.GetTableValue(MageSpellsTable, i, 1))
-	
-	if (SpellMask < MageSpellBook):
+
+	if SpellMask < MageSpellBook:
 		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft + 1
 		for i in range (0, MageSpellsCount):
 			SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
@@ -1514,10 +1545,10 @@ def MageSpellsSelectPress():
 		if MageSpellsSelectPointsLeft == 0:
 			for i in range (0, MageSpellsCount):
 				SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
-				if (((1 << i) & SpellMask) == 0):
+				if ((1 << i) & SpellMask) == 0:
 					GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetButtonState(MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_ENABLED)
-				
+
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
 	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
 	GemRB.SetVar("MageSpellBook", SpellMask)
@@ -1542,9 +1573,39 @@ def MageSpellsCancelPress():
 # Mage Spells Memorize
 
 def MageSpellsMemorize():
-	global CharGenWindow, MageMemorizeWindow, MageMemorizeDoneButton
+	global CharGenWindow, MageMemorizeWindow, MageSpellsTable, MageMemorizeTextArea, MageMemorizeDoneButton, MageMemorizePointsLeft
 	GemRB.SetVisible(CharGenWindow, 0)
 	MageMemorizeWindow = GemRB.LoadWindow(16)
+	MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
+	MaxSpellsMageTable = GemRB.LoadTable("MXSPLWIZ")
+	MageSpellBook = GemRB.GetVar("MageSpellBook")
+	GemRB.SetVar("MageMemorized", 0)
+	GemRB.SetVar("SpellMask", 0)
+
+	MageMemorizePointsLeft = GemRB.GetTableValue(MaxSpellsMageTable, "1", "1" )
+	PointsLeftLabel = GemRB.GetControl(MageMemorizeWindow, 0x1000001b)
+	GemRB.SetLabelUseRGB(MageMemorizeWindow, PointsLeftLabel, 1)
+	GemRB.SetText(MageMemorizeWindow, PointsLeftLabel, str(MageMemorizePointsLeft))
+
+	j = 0
+	for i in range (0, 12):
+		SpellButton = GemRB.GetControl(MageMemorizeWindow, i + 2)
+		GemRB.SetButtonFlags(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		while (j < MageSpellsCount) and (((1 << j) & MageSpellBook) == 0):
+			j = j + 1
+		if j < MageSpellsCount:
+			# Color is no good yet :-(
+			GemRB.SetButtonBAM(MageMemorizeWindow, SpellButton, GemRB.GetTableValue(MageSpellsTable, j, 0), 1, 0, 63)
+			GemRB.SetButtonState(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
+			GemRB.SetEvent(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageMemorizeSelectPress")
+			GemRB.SetVarAssoc(MageMemorizeWindow, SpellButton, "SpellMask", 1 << j)
+			j = j + 1
+		else:
+			GemRB.SetButtonState(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
+
+	GemRB.SetToken("number", str(MageMemorizePointsLeft))
+	MageMemorizeTextArea = GemRB.GetControl(MageMemorizeWindow, 27)
+	GemRB.SetText(MageMemorizeWindow, MageMemorizeTextArea, 17253)
 
 	MageMemorizeDoneButton = GemRB.GetControl(MageMemorizeWindow, 0)
 	GemRB.SetButtonState(MageMemorizeWindow, MageMemorizeDoneButton, IE_GUI_BUTTON_DISABLED)
@@ -1558,6 +1619,50 @@ def MageSpellsMemorize():
 	GemRB.SetText(MageMemorizeWindow, MageMemorizeCancelButton, 13727)
 
 	GemRB.SetVisible(MageMemorizeWindow, 1)
+	return
+
+def MageMemorizeSelectPress():
+	global MageMemorizeWindow, MageSpellsTable, MageMemorizeTextArea, MageMemorizeDoneButton, MageMemorizePointsLeft
+	MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
+	MageSpellBook = GemRB.GetVar("MageSpellBook")
+	MageMemorized = GemRB.GetVar("MageMemorized")
+	SpellMask = GemRB.GetVar("SpellMask")
+	Spell = abs(MageMemorized - SpellMask)
+
+	i = -1
+	while (Spell > 0):
+		i = i + 1
+		Spell = Spell >> 1
+	GemRB.SetText(MageMemorizeWindow, MageMemorizeTextArea, GemRB.GetTableValue(MageSpellsTable, i, 1))
+
+	if SpellMask < MageMemorized:
+		MageMemorizePointsLeft = MageMemorizePointsLeft + 1
+		j = 0
+		for i in range (0, 12):
+			SpellButton = GemRB.GetControl(MageMemorizeWindow, i + 2)
+			while (j < MageSpellsCount) and (((1 << j) & MageSpellBook) == 0):
+				j = j + 1
+			if j < MageSpellsCount:
+				GemRB.SetButtonState(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
+				j = j + 1
+		GemRB.SetButtonState(MageMemorizeWindow, MageMemorizeDoneButton, IE_GUI_BUTTON_DISABLED)
+	else:
+		MageMemorizePointsLeft = MageMemorizePointsLeft - 1
+		if MageMemorizePointsLeft == 0:
+			j = 0
+			for i in range (0, 12):
+				SpellButton = GemRB.GetControl(MageMemorizeWindow, i + 2)
+				while (j < MageSpellsCount) and (((1 << j) & MageSpellBook) == 0):
+					j = j + 1
+				if j < MageSpellsCount:
+					if ((1 << j) & SpellMask) == 0:
+						GemRB.SetButtonState(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
+					j = j + 1
+			GemRB.SetButtonState(MageMemorizeWindow, MageMemorizeDoneButton, IE_GUI_BUTTON_ENABLED)
+
+	PointsLeftLabel = GemRB.GetControl(MageMemorizeWindow, 0x1000001b)
+	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageMemorizePointsLeft))
+	GemRB.SetVar("MageMemorized", SpellMask)
 	return
 
 def MageMemorizeDonePress():
@@ -1576,38 +1681,99 @@ def MageMemorizeCancelPress():
 	return
 
 
-# Cleric Spells Memorize
+# Priest Spells Memorize
 
-def ClericSpellsMemorize():
-	global CharGenWindow, ClericMemorizeWindow, ClericMemorizeDoneButton
+def PriestSpellsMemorize():
+	global CharGenWindow, PriestMemorizeWindow, PriestSpellsTable
+	global PriestMemorizeTextArea, PriestMemorizeDoneButton, PriestMemorizePointsLeft
 	GemRB.SetVisible(CharGenWindow, 0)
-	ClericMemorizeWindow = GemRB.LoadWindow(17)
+	PriestMemorizeWindow = GemRB.LoadWindow(17)
+	PriestSpellsTable = GemRB.LoadTable("PRIESTSP")
+	PriestSpellsCount = GemRB.GetTableRowCount(PriestSpellsTable)
+	MaxSpellsPriestTable = GemRB.LoadTable("MXSPLPRS")
+	GemRB.SetVar("PriestMemorized", 0)
+	GemRB.SetVar("SpellMask", 0)
 
-	ClericMemorizeDoneButton = GemRB.GetControl(ClericMemorizeWindow, 0)
-	GemRB.SetButtonState(ClericMemorizeWindow, ClericMemorizeDoneButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent(ClericMemorizeWindow, ClericMemorizeDoneButton, IE_GUI_BUTTON_ON_PRESS, "ClericMemorizeDonePress")
-	GemRB.SetText(ClericMemorizeWindow, ClericMemorizeDoneButton, 11973)
-	GemRB.SetButtonFlags(ClericMemorizeWindow, ClericMemorizeDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+	PriestMemorizePointsLeft = GemRB.GetTableValue(MaxSpellsPriestTable, "1", "1" )
+	PointsLeftLabel = GemRB.GetControl(PriestMemorizeWindow, 0x1000001b)
+	GemRB.SetLabelUseRGB(PriestMemorizeWindow, PointsLeftLabel, 1)
+	GemRB.SetText(PriestMemorizeWindow, PointsLeftLabel, str(PriestMemorizePointsLeft))
 
-	ClericMemorizeCancelButton = GemRB.GetControl(ClericMemorizeWindow, 29)
-	GemRB.SetButtonState(ClericMemorizeWindow, ClericMemorizeCancelButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(ClericMemorizeWindow, ClericMemorizeCancelButton, IE_GUI_BUTTON_ON_PRESS, "ClericMemorizeCancelPress")
-	GemRB.SetText(ClericMemorizeWindow, ClericMemorizeCancelButton, 13727)
+	for i in range (0, 12):
+		SpellButton = GemRB.GetControl(PriestMemorizeWindow, i + 2)
+		GemRB.SetButtonFlags(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		if i < PriestSpellsCount:
+			# Color is no good yet :-(
+			GemRB.SetButtonBAM(PriestMemorizeWindow, SpellButton, GemRB.GetTableValue(PriestSpellsTable, i, 0), 1, 0, 63)
+			GemRB.SetButtonState(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
+			GemRB.SetEvent(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "PriestMemorizeSelectPress")
+			GemRB.SetVarAssoc(PriestMemorizeWindow, SpellButton, "SpellMask", 1 << i)
+		else:
+			GemRB.SetButtonState(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
 
-	GemRB.SetVisible(ClericMemorizeWindow, 1)
+	GemRB.SetToken("number", str(PriestMemorizePointsLeft))
+	PriestMemorizeTextArea = GemRB.GetControl(PriestMemorizeWindow, 27)
+	GemRB.SetText(PriestMemorizeWindow, PriestMemorizeTextArea, 17253)
+
+	PriestMemorizeDoneButton = GemRB.GetControl(PriestMemorizeWindow, 0)
+	GemRB.SetButtonState(PriestMemorizeWindow, PriestMemorizeDoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent(PriestMemorizeWindow, PriestMemorizeDoneButton, IE_GUI_BUTTON_ON_PRESS, "PriestMemorizeDonePress")
+	GemRB.SetText(PriestMemorizeWindow, PriestMemorizeDoneButton, 11973)
+	GemRB.SetButtonFlags(PriestMemorizeWindow, PriestMemorizeDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	PriestMemorizeCancelButton = GemRB.GetControl(PriestMemorizeWindow, 29)
+	GemRB.SetButtonState(PriestMemorizeWindow, PriestMemorizeCancelButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(PriestMemorizeWindow, PriestMemorizeCancelButton, IE_GUI_BUTTON_ON_PRESS, "PriestMemorizeCancelPress")
+	GemRB.SetText(PriestMemorizeWindow, PriestMemorizeCancelButton, 13727)
+
+	GemRB.SetVisible(PriestMemorizeWindow, 1)
 	return
 
-def ClericMemorizeDonePress():
-	global CharGenWindow, ClericMemorizeWindow, SkillsState
-	GemRB.UnloadWindow(ClericMemorizeWindow)
+def PriestMemorizeSelectPress():
+	global PriestMemorizeWindow, PriestSpellsTable, PriestMemorizeTextArea, PriestMemorizeDoneButton, PriestMemorizePointsLeft
+	PriestSpellsCount = GemRB.GetTableRowCount(PriestSpellsTable)
+	PriestMemorized = GemRB.GetVar("PriestMemorized")
+	SpellMask = GemRB.GetVar("SpellMask")
+	Spell = abs(PriestMemorized - SpellMask)
+
+	i = -1
+	while (Spell > 0):
+		i = i + 1
+		Spell = Spell >> 1
+	GemRB.SetText(PriestMemorizeWindow, PriestMemorizeTextArea, GemRB.GetTableValue(PriestSpellsTable, i, 1))
+
+	if SpellMask < PriestMemorized:
+		PriestMemorizePointsLeft = PriestMemorizePointsLeft + 1
+		for i in range (0, PriestSpellsCount):
+			SpellButton = GemRB.GetControl(PriestMemorizeWindow, i + 2)
+			if (((1 << i) & SpellMask) == 0):
+				GemRB.SetButtonState(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonState(PriestMemorizeWindow, PriestMemorizeDoneButton, IE_GUI_BUTTON_DISABLED)
+	else:
+		PriestMemorizePointsLeft = PriestMemorizePointsLeft - 1
+		if PriestMemorizePointsLeft == 0:
+			for i in range (0, PriestSpellsCount):
+				SpellButton = GemRB.GetControl(PriestMemorizeWindow, i + 2)
+				if ((1 << i) & SpellMask) == 0:
+					GemRB.SetButtonState(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetButtonState(PriestMemorizeWindow, PriestMemorizeDoneButton, IE_GUI_BUTTON_ENABLED)
+
+	PointsLeftLabel = GemRB.GetControl(PriestMemorizeWindow, 0x1000001b)
+	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(PriestMemorizePointsLeft))
+	GemRB.SetVar("PriestMemorized", SpellMask)
+	return
+
+def PriestMemorizeDonePress():
+	global CharGenWindow, PriestMemorizeWindow, SkillsState
+	GemRB.UnloadWindow(PriestMemorizeWindow)
 	SkillsState = 4
 	GemRB.SetVisible(CharGenWindow, 1)
 	SkillsPress()
 	return
 
-def ClericMemorizeCancelPress():
-	global CharGenWindow, ClericMemorizeWindow, SkillsState
-	GemRB.UnloadWindow(ClericMemorizeWindow)
+def PriestMemorizeCancelPress():
+	global CharGenWindow, PriestMemorizeWindow, SkillsState
+	GemRB.UnloadWindow(PriestMemorizeWindow)
 	SkillsState = 0
 	GemRB.SetVisible(CharGenWindow, 1)
 	return
