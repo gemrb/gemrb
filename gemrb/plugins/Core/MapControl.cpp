@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.4 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.5 2004/09/04 12:08:55 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -23,7 +23,9 @@
 #include "Interface.h"
 
 // Ratio between pixel sizes of an Area (Big map) and a Small map
-#define MAP_SCALE 10.67
+
+static int MAP_DIV   = 3;
+static int MAP_MULT  = 32;
 
 static Color green = {
 	0x00, 0xff, 0x00, 0xff
@@ -39,12 +41,20 @@ static Color darkgreen = {
 #define SCREEN_TO_MAPX(x) (x) - XCenter + ScrollX
 #define SCREEN_TO_MAPY(y) (y) - YCenter + ScrollY
 
-#define GAME_TO_SCREENX(x) MAP_TO_SCREENX((int)((x) / MAP_SCALE))
-#define GAME_TO_SCREENY(y) MAP_TO_SCREENY((int)((y) / MAP_SCALE))
-
+#define GAME_TO_SCREENX(x) MAP_TO_SCREENX((int)((x) * MAP_DIV / MAP_MULT))
+#define GAME_TO_SCREENY(y) MAP_TO_SCREENY((int)((y) * MAP_DIV / MAP_MULT))
 
 MapControl::MapControl(void)
 {
+	if(core->HasFeature(GF_IWD_MAP_DIMENSIONS) ) {
+		MAP_DIV=1;
+		MAP_MULT=8;
+	}
+	else {
+		MAP_DIV=3;
+		MAP_MULT=32;
+	}
+
 	ScrollX = 0;
 	ScrollY = 0;
 	MouseIsDown = false;
@@ -64,16 +74,21 @@ void MapControl::Realize()
 	Video* video = core->GetVideoDriver();
 
 	// FIXME: ugly!! How to get area size in pixels?
-	MapWidth = (int)(MapMOS->Width * MAP_SCALE);
-	MapHeight = (int)(MapMOS->Height * MAP_SCALE);
+	Map *map = core->GetGame()->GetCurrentMap();
+
+	MapWidth = map->GetWidth();
+	MapHeight = map->GetHeight();
+printf("%d %d\n",MapWidth, MapHeight);
+printf("%d %d\n",MapMOS->Width, MapMOS->Height);
 
 	// FIXME: ugly hack! What is the actual viewport size?
 	Region vp = video->GetViewport();
-	ViewWidth = (int)((vp.w ? vp.w : core->Width) / MAP_SCALE);
-	ViewHeight = (int)((vp.h ? vp.h : core->Height) / MAP_SCALE);
 
-	XCenter = (Width - MapMOS->Width) / 2;
-	YCenter = (Height - MapMOS->Height) / 2;
+	ViewWidth = core->Width * MAP_DIV / MAP_MULT;
+	ViewHeight = core->Height * MAP_DIV / MAP_MULT;
+
+	XCenter = (Width - MapWidth ) / 2;
+	YCenter = (Height - MapHeight ) / 2;
 	if (XCenter < 0) XCenter = 0;
 	if (YCenter < 0) YCenter = 0;
 }
@@ -151,10 +166,10 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 		ScrollX -= x - lastMouseX;
 		ScrollY -= y - lastMouseY;
 
-		if (ScrollX > MapMOS->Width - Width)
-			ScrollX = MapMOS->Width - Width;
-		if (ScrollY > MapMOS->Height - Height)
-			ScrollY = MapMOS->Height - Height;
+		if (ScrollX > MapWidth - Width)
+			ScrollX = MapWidth - Width;
+		if (ScrollY > MapHeight - Height)
+			ScrollY = MapHeight - Height;
 		if (ScrollX < 0)
 			ScrollX = 0;
 		if (ScrollY < 0)
@@ -181,16 +196,15 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y,
 	lastMouseX = x;
 	lastMouseY = y;
 
-
 	short xp = SCREEN_TO_MAPX(x) - ViewWidth / 2;
 	short yp = SCREEN_TO_MAPY(y) - ViewHeight / 2;
 
-	if (xp + ViewWidth > MapMOS->Width) xp = MapMOS->Width - ViewWidth;
-	if (yp + ViewHeight > MapMOS->Height) yp = MapMOS->Height - ViewHeight;
+	if (xp + ViewWidth > MapWidth) xp = MapWidth - ViewWidth;
+	if (yp + ViewHeight > MapHeight) yp = MapHeight - ViewHeight;
 	if (xp < 0) xp = 0;
 	if (yp < 0) yp = 0;
 
-	core->GetVideoDriver()->SetViewport( (int)(xp * MAP_SCALE), (int)(yp * MAP_SCALE) );
+	core->GetVideoDriver()->SetViewport( xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV );
 
 	// FIXME: play button sound here
 }
@@ -230,10 +244,10 @@ void MapControl::OnSpecialKeyPress(unsigned char Key)
 			break;
 	}
 
-	if (ScrollX > MapMOS->Width - Width)
-		ScrollX = MapMOS->Width - Width;
-	if (ScrollY > MapMOS->Height - Height)
-		ScrollY = MapMOS->Height - Height;
+	if (ScrollX > MapWidth - Width)
+		ScrollX = MapWidth - Width;
+	if (ScrollY > MapHeight - Height)
+		ScrollY = MapHeight - Height;
 	if (ScrollX < 0)
 		ScrollX = 0;
 	if (ScrollY < 0)
