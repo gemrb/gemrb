@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.12 2003/11/25 18:55:54 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.13 2003/11/26 11:01:17 balrog994 Exp $
  *
  */
 
@@ -29,8 +29,12 @@ class SDLVideoDriver : public Video
 {
 private:
 	SDL_Surface * disp;
+	SDL_Surface * backBuf;
 	std::vector<Region> upd;	//Regions of the Screen to Update in the next SwapBuffer operation.
 	Region Viewport;
+	SDL_Surface *Cursor[2];
+	SDL_Rect CursorPos;
+	unsigned short CursorIndex;
 public:
 	SDLVideoDriver(void);
 	~SDLVideoDriver(void);
@@ -44,7 +48,7 @@ public:
 	void FreeSprite(Sprite2D * spr);
 	void BlitSprite(Sprite2D * spr, int x, int y, bool anchor = false, Region * clip = NULL);
 	void BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y, bool anchor = true, Region * clip = NULL);
-	void SetCursor(Sprite2D * spr, int x, int y);
+	void SetCursor(Sprite2D * up, Sprite2D * down);
 	Region GetViewport(void);
 	void SetViewport(int x, int y);
 	void MoveViewportTo(int x, int y);

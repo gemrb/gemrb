@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.26 2003/11/26 01:11:52 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.27 2003/11/26 11:01:17 balrog994 Exp $
  *
  */
 
@@ -26,6 +26,9 @@
 
 SDLVideoDriver::SDLVideoDriver(void)
 {
+	CursorIndex = 0;
+	Cursor[0] = NULL;
+	Cursor[1] = NULL;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -43,6 +46,7 @@ int SDLVideoDriver::Init(void)
   printf("[OK]\n");
   SDL_EnableUNICODE(1);
   SDL_EnableKeyRepeat(500, 50);
+  SDL_ShowCursor(SDL_DISABLE);
   return GEM_OK;
 }
 
@@ -57,6 +61,9 @@ int SDLVideoDriver::CreateDisplay(int width, int height, int bpp, bool fullscree
 	Viewport.x = Viewport.y = 0;
 	Viewport.w = width;
 	Viewport.h = height;
+	SDL_Surface * tmp = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, bpp, 0xff000000, 0x00ff0000, 0x0000ff00, 0x00000000);
+	backBuf = SDL_DisplayFormat(tmp);
+	SDL_FreeSurface(tmp);
 	return GEM_OK;
 }
 
@@ -163,11 +170,32 @@ int SDLVideoDriver::SwapBuffers(void)
 					core->console->OnKeyPress(key, event.key.keysym.mod);
 				}
 			break;
+
+			case SDL_MOUSEMOTION:
+				CursorPos.x = event.motion.x;
+				CursorPos.y = event.motion.y;
+				if(Evnt)
+					Evnt->MouseMove(event.motion.x, event.motion.y);
+			break;
+
+			case SDL_MOUSEBUTTONDOWN:
+				CursorIndex = 1;
+			break;
+
+			case SDL_MOUSEBUTTONUP:
+				CursorIndex = 0;
+			break;
 			}
 		}
+		SDL_BlitSurface(backBuf, NULL, disp, NULL);
+		if(Cursor[CursorIndex])
+			SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
 		SDL_Flip(disp);
 		return ret;
 	}
+	SDL_BlitSurface(backBuf, NULL, disp, NULL);
+	if(Cursor[CursorIndex])
+			SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
 	SDL_Flip(disp);
 	int ret = GEM_OK;
 	//TODO: Implement an efficient Rectangle Merge algorithm for faster redraw
@@ -236,16 +264,20 @@ int SDLVideoDriver::SwapBuffers(void)
 		break;
 
 		case SDL_MOUSEMOTION:
+			CursorPos.x = event.motion.x;
+			CursorPos.y = event.motion.y;
 			if(Evnt)
 				Evnt->MouseMove(event.motion.x, event.motion.y);
 		break;
 
 		case SDL_MOUSEBUTTONDOWN:
+			CursorIndex = 1;
 			if(Evnt)
 				Evnt->MouseDown(event.button.x, event.button.y, event.button.state, 0);
 		break;
 
 		case SDL_MOUSEBUTTONUP:
+			CursorIndex = 0;
 			if(Evnt)
 				Evnt->MouseUp(event.button.x, event.button.y, event.button.state, 0);
 		break;
@@ -355,7 +387,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y
 			}
 		}
 	}
-	SDL_BlitSurface((SDL_Surface*)spr->vptr, &t, disp, &drect);
+	SDL_BlitSurface((SDL_Surface*)spr->vptr, &t, backBuf, &drect);
 }
 
 void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Region * clip)
@@ -451,7 +483,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Regio
 		}*/
 		srect = &t;
 	}
-	SDL_BlitSurface((SDL_Surface*)spr->vptr, srect, disp, &drect);
+	SDL_BlitSurface((SDL_Surface*)spr->vptr, srect, backBuf, &drect);
 	//Debug Addition: Draws a point to the x,y position
 	/*drect.x = x;
 	drect.y = y;
@@ -460,9 +492,16 @@ void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Regio
 	SDL_FillRect(disp, &drect, 0xffffffff);*/
 }
 
-void SDLVideoDriver::SetCursor(Sprite2D * spr, int x, int y)
+void SDLVideoDriver::SetCursor(Sprite2D * up, Sprite2D * down)
 {
-	//TODO: Implement Cursor
+	if(up)
+		Cursor[0]=(SDL_Surface*)up->vptr;
+	else
+		Cursor[0]=NULL;
+	if(down)
+		Cursor[1]=(SDL_Surface*)down->vptr;
+	else
+		Cursor[1]=NULL;
 	return;
 }
 
@@ -570,13 +609,13 @@ void SDLVideoDriver::DrawRect(Region &rgn, Color &color){
 	
 	SDL_FreeSurface(rectsurf);*/
 	SDL_Rect drect = {rgn.x,rgn.y,rgn.w, rgn.h};
-	SDL_FillRect(disp, &drect, (color.a << 24)+(color.r<<16)+(color.g<<8)+color.b);
+	SDL_FillRect(backBuf, &drect, (color.a << 24)+(color.r<<16)+(color.g<<8)+color.b);
 }
 void SDLVideoDriver::SetPixel(unsigned short x, unsigned short y, Color &color)
 {
 	if((x > disp->w) || (y > disp->h))
 		return;
-	unsigned char *pixels = ((unsigned char *)disp->pixels)+((y*disp->w)*disp->format->BytesPerPixel)+(x*disp->format->BytesPerPixel);
+	unsigned char *pixels = ((unsigned char *)backBuf->pixels)+((y*disp->w)*disp->format->BytesPerPixel)+(x*disp->format->BytesPerPixel);
 	*pixels++ = color.b;
 	*pixels++ = color.g;
 	*pixels++ = color.r;
@@ -710,7 +749,7 @@ void SDLVideoDriver::BlitTiled(Region rgn, Sprite2D * img, bool anchor)
 		for(int x = 0; x < xrep; x++) {
 			SDL_Rect srect = {0,0, ((img->Width % rgn.w) == 0) ? img->Width : img->Width % rgn.w, ((img->Height % rgn.h) == 0) ? img->Height : img->Height % rgn.h };
 			SDL_Rect drect = {rgn.x+(x*img->Width), rgn.y+(y*img->Height), 1, 1};
-			SDL_BlitSurface((SDL_Surface*)img->vptr, &srect, disp, &drect);
+			SDL_BlitSurface((SDL_Surface*)img->vptr, &srect, backBuf, &drect);
 		}
 	}
 }
