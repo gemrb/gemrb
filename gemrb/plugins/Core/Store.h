@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.11 2005/03/07 06:28:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.12 2005/03/07 18:26:27 avenger_teambg Exp $
  *
  */
 
@@ -91,9 +91,8 @@ public:
 	~Store();
 
 	std::vector< STOItem*> items;
-	std::vector< STODrink*> drinks;
-	std::vector< STOCure*> cures;
-
+	STODrink* drinks;
+	STOCure* cures;
 	ieDword* purchased_categories;
 
 	ieResRef Name;
@@ -137,4 +136,4 @@ private:
 	bool IsItemAvailable(unsigned int slot);
 };
 
-#endif  // ! STORE_H
+#endif // ! STORE_H

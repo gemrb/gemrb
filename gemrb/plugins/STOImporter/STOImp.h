@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.h,v 1.3 2004/11/07 22:56:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.h,v 1.4 2005/03/07 18:26:30 avenger_teambg Exp $
  *
  */
 
@@ -41,17 +41,17 @@ public:
 	STOImp(void);
 	~STOImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	Store* GetStore();
+	Store* GetStore(Store *store);
 
 	void release(void)
 	{
 		delete this;
 	}
 private:
-	STOItem* GetItem();
-	STODrink* GetDrink();
-	STOCure* GetCure();
-	ieDword* GetPurchasedCategories(Store* s);
+	void GetItem(STOItem *item);
+	void GetDrink(STODrink *drink);
+	void GetCure(STOCure *cure);
+	void GetPurchasedCategories(Store* s);
 };
 
 

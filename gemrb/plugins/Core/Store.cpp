@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.7 2005/03/07 06:28:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.8 2005/03/07 18:26:27 avenger_teambg Exp $
  *
  */
 
@@ -26,6 +26,9 @@
 Store::Store(void)
 {
 	HasTriggers=false;
+	purchased_categories=NULL;
+	drinks=NULL;
+	cures=NULL;
 }
 
 Store::~Store(void)
@@ -35,13 +38,17 @@ Store::~Store(void)
 	for (i = 0; i < items.size(); i++) {
 		delete( items[i] );
 	}
-	for (i = 0; i < drinks.size(); i++) {
-		delete( drinks[i] );
-	}
-	for (i = 0; i < cures.size(); i++) {
-		delete( cures[i] );
-	}
-	free( purchased_categories );
+	//	for (i = 0; i < drinks.size(); i++) {
+	//		delete( drinks[i] );
+	//	}
+	//	for (i = 0; i < cures.size(); i++) {
+	//		delete( cures[i] );
+	if(drinks)
+		free(drinks);
+	if(cures)
+		free(cures);
+	if (purchased_categories)
+		free( purchased_categories );
 }
 
 bool Store::IsItemAvailable(unsigned int slot)
@@ -103,12 +110,12 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags) const
 
 STOCure *Store::GetCure(int idx) const
 {
-	return cures[idx];
+	return cures+idx;
 }
 
 STODrink *Store::GetDrink(int idx) const
 {
-	return drinks[idx];
+	return drinks+idx;
 }
 
 //We need this weirdness for PST item lookup

@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.142 2005/03/07 06:31:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.143 2005/03/07 18:26:26 avenger_teambg Exp $
  *
  */
 
@@ -97,9 +97,9 @@ typedef struct SlotType {
 
 // Colors of modal window shadow
 // !!! Keep these synchronized with GUIDefines.py !!!
-#define MODAL_SHADOW_NONE   0
-#define MODAL_SHADOW_GRAY   1
-#define MODAL_SHADOW_BLACK  2
+#define MODAL_SHADOW_NONE	0
+#define MODAL_SHADOW_GRAY	1
+#define MODAL_SHADOW_BLACK	2
 
 class GEM_EXPORT Interface : public InterfaceDesc
 {
@@ -390,17 +390,19 @@ public:
 	void FreeItem(Item *itm, ieResRef name, bool free=false);
 	Spell* GetSpell(ieResRef resname);
 	void FreeSpell(Spell *spl, ieResRef name, bool free=false);
-	//due to Win32 we have to allocate/release all common memory from interface
+	ieStrRef GetRumour(ieResRef resname);
+	Store *GetCurrentStore();
+	int CloseCurrentStore();
+	Store *SetCurrentStore(ieResRef resname);
+	// FIXME: due to Win32 we have to allocate/release all common
+	// memory from Interface. Yes, it is ugly.
 	ITMExtHeader *GetITMExt(int count);
 	SPLExtHeader *GetSPLExt(int count);
 	Effect *GetFeatures(int count);
 	void FreeITMExt(ITMExtHeader *p, Effect *e);
 	void FreeSPLExt(SPLExtHeader *p, Effect *e);
 	WorldMap *NewWorldMap();
-	Store *GetCurrentStore();
-	int CloseCurrentStore();
-	Store *SetCurrentStore(ieResRef resname);
-	ieStrRef GetRumour(ieResRef resname);
+	void DoTheStoreHack(Store *s);
 
 private:
 	bool LoadConfig(void);
@@ -416,11 +418,11 @@ public:
 	char GameData[9];
 	char GameOverride[9];
 	ieResRef GameNameResRef;
-	ieResRef GoldResRef;     //MISC07.itm
+	ieResRef GoldResRef; //MISC07.itm
 	Variables *RtRows;
 	char UserDir[_MAX_PATH];
 	int argc;
-	char **argv;	  
+	char **argv;
 	char GameName[_MAX_PATH];
 	char GameType[_MAX_PATH];
 	char GemRBPath[_MAX_PATH];

@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.273 2005/03/07 06:31:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.274 2005/03/07 18:26:25 avenger_teambg Exp $
  *
  */
 
@@ -111,7 +111,7 @@ Interface::Interface(int iargc, char** iargv)
 	CheatFlag = false;
 	FogOfWar = 0;
 #ifndef WIN32
-	CaseSensitive = true;  //this is the default value, so CD1/CD2 will be resolved
+	CaseSensitive = true; //this is the default value, so CD1/CD2 will be resolved
 #else
 	CaseSensitive = false;
 #endif
@@ -147,19 +147,19 @@ Interface::Interface(int iargc, char** iargv)
 	GameFeatures = 0;
 }
 
-#define FreeInterfaceVector(type, variable, member)   \
-{  \
-  std::vector<type>::iterator i;  \
-  for(i = variable.begin(); i != variable.end(); ++i) { \
-	if(!(*i).free) {  \
+#define FreeInterfaceVector(type, variable, member) \
+{ \
+	std::vector<type>::iterator i; \
+	for(i = variable.begin(); i != variable.end(); ++i) { \
+	if(!(*i).free) { \
 		FreeInterface((*i).member); \
 		(*i).free = true; \
 	} \
-  } \
+	} \
 }
 
-#define FreeResourceVector(type, variable)   \
-{  \
+#define FreeResourceVector(type, variable) \
+{ \
 	unsigned int i=variable.size(); \
 	while(i--) { \
 		if(variable[i]) { \
@@ -975,7 +975,7 @@ bool Interface::LoadConfig(void)
 	}
 
 	// Find basename of this program. It does the same as basename (3),
-	//   but that's probably missing on some archs 
+	// but that's probably missing on some archs 
 	s = strrchr( argv[0], PathDelimiter );
 	if (s) {
 		s++;
@@ -985,7 +985,7 @@ bool Interface::LoadConfig(void)
 
 	strcpy( name, s );
 	//if (!name[0])		// FIXME: could this happen?
-	//  strcpy (name, PACKAGE);    // ugly hack
+	//	strcpy (name, PACKAGE); // ugly hack
 
 	// If we were called as $0 -c <filename>, load config from filename
 	if (argc > 2 && ! strcmp("-c", argv[1])) {
@@ -1040,10 +1040,10 @@ bool Interface::LoadConfig(void)
 #endif
 
 	return false;
-#else   // WIN32
+#else // WIN32
 	strcpy( UserDir, ".\\" );
 	return LoadConfig( "GemRB.cfg" );
-#endif  // WIN32
+#endif// WIN32
 }
 
 bool Interface::LoadConfig(const char* filename)
@@ -1212,8 +1212,7 @@ static void upperlower(int upper, int lower)
 /** Loads gemrb.ini */
 bool Interface::LoadGemRBINI()
 {
-	printMessage( "Core", "Loading game type-specific GemRB setup...",
-		      WHITE );
+	printMessage( "Core", "Loading game type-specific GemRB setup...", WHITE );
 
 	DataStream* inifile = key->GetResource( "gemrb", IE_INI_CLASS_ID );
 	if (! inifile) {
@@ -1261,7 +1260,7 @@ bool Interface::LoadGemRBINI()
 		}
 	}
 
-	SetScriptDebugMode(ini->GetKeyAsInt( "resources", "ScriptDebugMode",  0));
+	SetScriptDebugMode(ini->GetKeyAsInt( "resources", "ScriptDebugMode", 0));
 	TooltipMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", TooltipMargin );
 
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
@@ -1825,7 +1824,7 @@ void Interface::DrawTooltip ()
 
 
 	// FIXME: add tooltip scroll animation for bg. also, take back[0] from
-	//   center, not from left end
+	// center, not from left end
 	if (TooltipBack) {
 		Region r2 = Region( x + w1, y, w - (w1 + w2), h );
 		video->BlitSprite( TooltipBack[0], x + w1, y, true, &r2 );
@@ -1837,7 +1836,7 @@ void Interface::DrawTooltip ()
 //	Color* palette = video->CreatePalette( TooltipColor, back );
 	
 	fnt->Print( Region( x, y, w, h ), (ieByte *) tooltip_text, NULL,
-		    IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true );
+		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true );
 }
 
 Window* Interface::GetWindow(unsigned short WindowIndex)
@@ -2109,7 +2108,7 @@ int Interface::PlayMovie(char* ResRef)
 	}
 	// Disable all the windows, so they do not receive mouse clicks
 	// FIXME: of course, movies played before GameControl is created
-	//    are different story
+	// are different story
 	GameControl* gc = GetGameControl();
 	if (gc) gc->HideGUI();
 	else SetVisible (0, 0);
@@ -2241,7 +2240,7 @@ bool Interface::InCutSceneMode()
 
 void Interface::QuitGame(bool BackToMain)
 {
-	DelWindow(0xffff);  //delete all windows, including GameControl
+	DelWindow(0xffff); //delete all windows, including GameControl
 	if(game) {
 		delete game;
 		game=NULL;
@@ -2256,8 +2255,8 @@ void Interface::QuitGame(bool BackToMain)
 void Interface::LoadGame(int index)
 {
 	// This function has rather painful error handling,
-	//   as it should swap all the objects or none at all
-	//   and the loading can fail for various reasons
+	// as it should swap all the objects or none at all
+	// and the loading can fail for various reasons
 
 	// Yes, it uses goto. Other ways were too awkward for me.
 
@@ -2546,7 +2545,7 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 	if (dir == NULL) {
 		return;
 	}
-	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
+	struct dirent* de = readdir( dir ); //Lookup the first entry in the Directory
 	if (de == NULL) {
 		closedir( dir );
 		return;
@@ -2903,7 +2902,7 @@ Store *Interface::SetCurrentStore( ieResRef resname )
 	// not really, only one store is open at a time, then it is
 	// unloaded, we don't really have to cache it, it will be saved in
 	// Cache anyway!
-	CurrentStore = sm->GetStore();
+	CurrentStore = sm->GetStore( new Store() );
 	if (CurrentStore == NULL) {
 		FreeInterface( sm );
 		return NULL;
@@ -2934,5 +2933,20 @@ ieStrRef Interface::GetRumour(ieResRef dlgref)
 	}
 	delete dlg;
 	return ret;
+}
+
+void Interface::DoTheStoreHack(Store *s)
+{
+	size_t size = s->PurchasedCategoriesCount * sizeof( ieDword );
+	s->purchased_categories=(ieDword *) malloc(size);
+
+	size = s->CuresCount * sizeof( STOCure );
+	s->cures=(STOCure *) malloc(size);
+
+	size = s->DrinksCount * sizeof( STODrink );
+	s->drinks=(STODrink *) malloc(size);
+
+	for(size=0;size<s->ItemsCount;size++)
+		s->items.push_back( new STOItem() );
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.cpp,v 1.7 2005/02/19 19:09:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.cpp,v 1.8 2005/03/07 18:26:26 avenger_teambg Exp $
  *
  */
 
@@ -34,28 +34,9 @@ ITMExtHeader::~ITMExtHeader(void)
 
 Item::Item(void)
 {
-/*
-	GroundIconBAM = NULL;
-	ItemIconBAM = NULL;
-	CarriedIconBAM = NULL;
-*/
 }
 
 Item::~Item(void)
 {
 	core->FreeITMExt( ext_headers, equipping_features );
-/*
-	if (GroundIconBAM) {
-		core->FreeInterface( GroundIconBAM );
-		GroundIconBAM = NULL;
-	}
-	if (ItemIconBAM) {
-		core->FreeInterface( ItemIconBAM );
-		ItemIconBAM = NULL;
-	}
-	if (CarriedIconBAM) {
-		core->FreeInterface( CarriedIconBAM );
-		CarriedIconBAM = NULL;
-	}
-*/
 }

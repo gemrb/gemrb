@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.9 2005/03/07 06:28:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.10 2005/03/07 18:26:30 avenger_teambg Exp $
  *
  */
 
@@ -63,11 +63,12 @@ bool STOImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Store* STOImp::GetStore()
+Store* STOImp::GetStore(Store *s)
 {
 	unsigned int i;
-	Store* s = new Store();
 
+	if (!s)
+		return NULL;
 	str->ReadDword( &s->Type );
 	str->ReadDword( &s->StoreName );
 	str->ReadDword( &s->Flags );
@@ -100,35 +101,41 @@ Store* STOImp::GetStore()
 		str->Read( s->unknown3, 80 );
 	}
 
+	//Allocation must be done in the same place as destruction.
+	//Yeah, this is intentionally so ugly, someone who doesn't like this
+	//may fix it. 
+	core->DoTheStoreHack(s);
+
 	str->Seek( s->PurchasedCategoriesOffset, GEM_STREAM_START );
-	s->purchased_categories = GetPurchasedCategories( s );
+//	s->purchased_categories = GetPurchasedCategories( s );
+	GetPurchasedCategories( s );
 
 	str->Seek( s->ItemsOffset, GEM_STREAM_START );
 	for (i = 0; i < s->ItemsCount; i++) {
-		STOItem* it = GetItem();
-		if (it->TriggerRef>0)	
+		GetItem(s->items[i]);
+		if (s->items[i]->TriggerRef>0)	
 			s->HasTriggers=true;
-		s->items.push_back( it );
+//		s->items.push_back( it );
 	}
 
 	str->Seek( s->DrinksOffset, GEM_STREAM_START );
 	for (i = 0; i < s->DrinksCount; i++) {
-		STODrink* dr = GetDrink();
-		s->drinks.push_back( dr );
+		GetDrink(s->drinks+i);
+//		s->drinks.push_back( dr );
 	}
 
 	str->Seek( s->CuresOffset, GEM_STREAM_START );
 	for (i = 0; i < s->CuresCount; i++) {
-		STOCure* cu = GetCure();
-		s->cures.push_back( cu );
+		GetCure(s->cures+i);
+//		s->cures.push_back( cu );
 	}
 
 	return s;
 }
 
-STOItem* STOImp::GetItem()
+void STOImp::GetItem(STOItem *it)
 {
-	STOItem* it = new STOItem();
+//	STOItem* it = new STOItem();
 
 	str->ReadResRef( it->ItemResRef );
 	str->ReadWord( &it->unknown );
@@ -146,40 +153,38 @@ STOItem* STOImp::GetItem()
 		memset( it->unknown2, 0, 56 );
 	}
 
-	return it;
+//	return it;
 }
 
-STODrink* STOImp::GetDrink()
+void STOImp::GetDrink(STODrink *dr)
 {
-	STODrink* dr = new STODrink();
+//	STODrink* dr = new STODrink();
 
 	str->ReadResRef( dr->RumourResRef );
 	str->ReadDword( &dr->DrinkName );
 	str->ReadDword( &dr->Price );
 	str->ReadDword( &dr->Strength );
 
-	return dr;
+//	return dr;
 }
 
-STOCure* STOImp::GetCure()
+void STOImp::GetCure(STOCure *cu)
 {
-	STOCure* cu = new STOCure();
+//	STOCure* cu = new STOCure();
 
 	str->ReadResRef( cu->CureResRef );
 	str->ReadDword( &cu->Price );
 
-	return cu;
+//	return cu;
 }
 
-ieDword* STOImp::GetPurchasedCategories(Store* s)
+void STOImp::GetPurchasedCategories(Store* s)
 {
-	int size = s->PurchasedCategoriesCount * sizeof( ieDword );
-	ieDword* pc = ( ieDword* ) malloc( size );
+//	int size = s->PurchasedCategoriesCount * sizeof( ieDword );
+//	ieDword* pc = ( ieDword* ) malloc( size );
 
 	for (unsigned int i = 0; i < s->PurchasedCategoriesCount; i++) {
-		str->ReadDword( &pc[i] );
+		str->ReadDword( &s->purchased_categories[i] );
 	}
-
-	return pc;
 }
 
