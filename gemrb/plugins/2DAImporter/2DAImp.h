@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.13 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.14 2003/12/15 09:38:59 balrog994 Exp $
  *
  */
 
@@ -42,12 +42,12 @@ public:
 	~p2DAImp(void);
 	bool Open(DataStream * stream, bool autoFree = true);
 	/** Returns the actual number of Rows in the Table */
-	inline int GetRowCount() { return rows.size(); }
+	inline int GetRowCount() { return (int)rows.size(); }
 	/** Returns the actual number of Columns in the Table */
 	inline int GetColumnCount()
         {
         	if(rows.size()<=0) return 0;
-			return rows[0].size();
+			return (int)rows[0].size();
         }
 	/** Returns a pointer to a zero terminated 2da element,
         0,0 returns the default value, it may return NULL */
@@ -63,7 +63,7 @@ public:
 	inline char *QueryField(const char* row, const char* column) const
 	{
 		int rowi = -1, coli = -1;
-		for(int i = 0; i < rowNames.size(); i++) {
+		for(unsigned int i = 0; i < rowNames.size(); i++) {
 			if(stricmp(rowNames[i], row) == 0) {
 				rowi = i;
 				break;
@@ -71,7 +71,7 @@ public:
 		}
 		if(rowi == -1)
 			return (char*)defVal;
-		for(int i = 0; i < colNames.size(); i++) {
+		for(unsigned int i = 0; i < colNames.size(); i++) {
 			if(stricmp(colNames[i], column) == 0) {
 				coli = i;
 				break;
@@ -79,14 +79,14 @@ public:
 		}
 		if(coli == -1)
 			return (char*)defVal;
-		if(rows[rowi].size() <= coli)
+		if(rows[rowi].size() <= (unsigned int)coli)
 			return (char*)defVal;
 		return rows[rowi][coli];
 	};
 
 	inline int GetRowIndex(const char *string) const
 	{
-		for(int index = 0; index<rowNames.size(); index++) {
+		for(unsigned int index = 0; index<rowNames.size(); index++) {
 			if(stricmp(rowNames[index],string) == 0) {
 				return index;
 			}
