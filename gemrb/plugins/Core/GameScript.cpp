@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.94 2004/03/13 16:55:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.95 2004/03/14 15:53:38 avenger_teambg Exp $
  *
  */
 
@@ -247,9 +247,19 @@ static ActionLink actionnames[] = {
 //Make this an ordered list, so we could use bsearch!
 static ObjectLink objectnames[] = {
 	{"bestac",GameScript::BestAC},
+	{"eighthnearest",GameScript::EighthNearest},
+	{"eighthnearestenemyof",GameScript::EighthNearestEnemyOf},
+	{"fifthnearest",GameScript::FifthNearest},
+	{"fifthnearestenemyof",GameScript::FifthNearestEnemyOf},
+	{"fourthnearest",GameScript::FourthNearest},
+	{"fourthnearestenemyof",GameScript::FourthNearestEnemyOf},
 	{"lastseenby",GameScript::LastSeenBy},
 	{"lasttalkedtoby",GameScript::LastTalkedToBy},
 	{"myself",GameScript::Myself},
+	{"nearest",GameScript::Nearest},
+	{"nearestenemyof",GameScript::NearestEnemyOf},
+	{"ninthnearest",GameScript::NinthNearest},
+	{"ninthnearestenemyof",GameScript::NinthNearestEnemyOf},
 	{"player1",GameScript::Player1},
 	{"player1fill",GameScript::Player1Fill},
 	{"player2",GameScript::Player2},
@@ -267,7 +277,17 @@ static ObjectLink objectnames[] = {
 	{"player8",GameScript::Player8},
 	{"player8fill",GameScript::Player8Fill},
 	{"protagonist",GameScript::Protagonist},
+	{"secondnearest",GameScript::SecondNearest},
+	{"secondnearestenemyof",GameScript::SecondNearestEnemyOf},
+	{"seventhnearest",GameScript::SeventhNearest},
+	{"seventhnearestenemyof",GameScript::SeventhNearestEnemyOf},
+	{"sixthnearest",GameScript::SixthNearest},
+	{"sixthnearestenemyof",GameScript::SixthNearestEnemyOf},
 	{"strongestof",GameScript::StrongestOf},
+	{"tenthnearest",GameScript::TenthNearest},
+	{"tenthnearestenemyof",GameScript::TenthNearestEnemyOf},
+	{"thirdnearest",GameScript::ThirdNearest},
+	{"thirdnearestenemyof",GameScript::ThirdNearestEnemyOf},
 	{"weakestof",GameScript::WeakestOf},
 	{"worstac",GameScript::WorstAC},
 	{ NULL,NULL}, 
@@ -591,6 +611,7 @@ void GameScript::Update()
 	if (!script) {
 		return;
 	}
+printf("Executing script: %s.BCS\n",Name);
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (EvaluateCondition( this->MySelf, rB->condition )) {
@@ -872,16 +893,18 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 		return false;
 	}
 	TriggerFunction func = triggers[trigger->triggerID];
+	const char *tmpstr=triggersTable->GetValue(trigger->triggerID);
+	if(!tmpstr) {
+		tmpstr=triggersTable->GetValue(trigger->triggerID|0x4000);
+	}
 	if (!func) {
 		triggers[trigger->triggerID] = False;
-		const char *tmpstr=triggersTable->GetValue(trigger->triggerID);
-		if(!tmpstr) {
-			tmpstr=triggersTable->GetValue(trigger->triggerID|0x4000);
-		}
 		printf( "[IEScript]: Unhandled trigger code: 0x%04x %s\n",
 			trigger->triggerID, tmpstr );
 		return false;
 	}
+	printf( "[IEScript]: Executing trigger code: 0x%04x %s\n",
+			trigger->triggerID, tmpstr );
 	int ret = func( Sender, trigger );
 	if (trigger->flags & 1) {
 		if (ret) {
@@ -952,6 +975,7 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	ActionFunction func = actions[aC->actionID];
+printf( "[IEScript]: action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
 	if (func) {
 		Scriptable* scr = GetActorFromObject( Sender, aC->objects[0]);
 		if(scr && scr!=Sender) {
@@ -965,6 +989,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			return;
 		}
 		else {
+			printf( "[IEScript]: Executing action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
 			func( Sender, aC );
 		}
 	}
@@ -998,6 +1023,9 @@ Targets* GameScript::EvaluateObject(Object* oC)
 	if (oC->objectName[0]) {
 		//We want the object by its name... (doors/triggers don't play here!)
 		Actor* aC = core->GetGame()->GetMap( 0 )->GetActor( oC->objectName );
+		if(!aC) {
+			return tgts;
+		}
 		//Ok :) we now have our Object. Let's create a Target struct and add the object to it
 		tgts = new Targets();
 		tgts->AddTarget( aC );
@@ -1785,6 +1813,166 @@ Targets *GameScript::WorstAC(Scriptable *Sender, Targets *parameters)
 	parameters->Clear();
 	parameters->AddTarget(ac);
 	return parameters;
+}
+
+Targets *GameScript::XthNearestOf(Scriptable *Sender, Targets *parameters, int count)
+{
+	Actor *origin = parameters->GetTarget(count);
+	parameters->Clear();
+	if(!origin) {
+		return parameters;
+	}
+	parameters->AddTarget(origin);
+	return parameters;
+}
+
+Targets *GameScript::XthNearestEnemyOf(Scriptable *Sender, Targets *parameters, int count)
+{
+	Actor *origin = parameters->GetTarget(0);
+	parameters->Clear();
+	if(!origin) {
+		return parameters;
+	}
+	//determining the allegiance of the origin
+	int type = 2; //neutral, has no enemies
+	if(origin->GetStat(IE_EA) <= GOODCUTOFF) {
+		type=0; //PC
+	}
+	if(origin->GetStat(IE_EA) >= EVILCUTOFF) {
+		type=1;
+	}
+	if(type==2) {
+		return parameters;
+	}
+	int i = core->GetActorCount();
+	Targets *tgts = new Targets();
+	Actor *ac;
+	while(i--) {
+		ac=core->GetActor(i);
+		long x = ( ac->XPos - origin->XPos );
+		long y = ( ac->YPos - origin->YPos );
+		double distance = sqrt( ( double ) ( x* x + y* y ) );
+		if(type) { //origin is PC
+			if(ac->GetStat(IE_EA) >= EVILCUTOFF) {
+				tgts->AddTarget(ac);
+			}
+		}
+		else {
+			if(ac->GetStat(IE_EA) <= GOODCUTOFF) {
+				tgts->AddTarget(ac);
+			}
+		}
+	}
+	if(tgts->Count()<=count) {
+		delete tgts;
+		return parameters;
+	}
+	unsigned int distance=0;
+	//order by distance
+	ac=tgts->GetTarget(count);
+	parameters->AddTarget(ac);
+	delete tgts;
+	return parameters;
+}
+
+Targets *GameScript::NearestEnemyOf(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestEnemyOf(Sender, parameters, 0);
+}
+
+Targets *GameScript::SecondNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestEnemyOf(Sender, parameters, 1);
+}
+
+Targets *GameScript::ThirdNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestEnemyOf(Sender, parameters, 2);
+}
+
+Targets *GameScript::FourthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestEnemyOf(Sender, parameters, 3);
+}
+
+Targets *GameScript::FifthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestEnemyOf(Sender, parameters, 4);
+}
+
+Targets *GameScript::SixthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestEnemyOf(Sender, parameters, 5);
+}
+
+Targets *GameScript::SeventhNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestEnemyOf(Sender, parameters, 6);
+}
+
+Targets *GameScript::EighthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestEnemyOf(Sender, parameters, 7);
+}
+
+Targets *GameScript::NinthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestEnemyOf(Sender, parameters, 8);
+}
+
+Targets *GameScript::TenthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestEnemyOf(Sender, parameters, 9);
+}
+
+Targets *GameScript::Nearest(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestOf(Sender, parameters, 0);
+}
+
+Targets *GameScript::SecondNearest(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestOf(Sender, parameters, 1);
+}
+
+Targets *GameScript::ThirdNearest(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestOf(Sender, parameters, 2);
+}
+
+Targets *GameScript::FourthNearest(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestOf(Sender, parameters, 3);
+}
+
+Targets *GameScript::FifthNearest(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestOf(Sender, parameters, 4);
+}
+
+Targets *GameScript::SixthNearest(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestOf(Sender, parameters, 5);
+}
+
+Targets *GameScript::SeventhNearest(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestOf(Sender, parameters, 6);
+}
+
+Targets *GameScript::EighthNearest(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestOf(Sender, parameters, 7);
+}
+
+Targets *GameScript::NinthNearest(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestOf(Sender, parameters, 8);
+}
+
+Targets *GameScript::TenthNearest(Scriptable *Sender, Targets *parameters)
+{
+	return XthNearestOf(Sender, parameters, 9);
 }
 
 //-------------------------------------------------------------
@@ -2731,6 +2919,11 @@ int GameScript::RandomNumLT(Scriptable* Sender, Trigger* parameters)
 int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if(!tar) {
+		printf("[IEScript]: couldn't find door/container:%s\n",parameters->objectParameter->objectName);
+		abort();
+		return 0;
+	}
 	switch(tar->Type) {
 		case ST_DOOR:
 		{
@@ -2743,6 +2936,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 			return cont->Locked == parameters->int0Parameter;
 		}
 		default:
+			printf("[IEScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
 			return 0;
 	}
 }
@@ -3457,26 +3651,35 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
 	Scriptable* tar, *scr;
 
+	printf("BeginDialog core\n");
 	if (Flags & BD_OWN) {
 		scr = tar = GetActorFromObject( Sender, parameters->objects[1] );
 	} else {
 		tar = GetActorFromObject( Sender, parameters->objects[1] );
 		scr = Sender;
 	}
+	if(!tar) {
+		printf("[IEScript]: Target for dialog couldn't be found.\n");
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	//source could be other than Actor, we need to handle this too!
 	if (tar->Type != ST_ACTOR) {
 		Sender->CurrentAction = NULL;
 		return;
 	}
+printf("a\n");
 	Actor* actor = ( Actor* ) scr;
 	Actor* target = ( Actor* ) tar;
 
 	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );	
+printf("b\n");
 	if (gc->ControlType != IE_GUI_GAMECONTROL) {
 		printf( "[IEScript]: Dialog cannot be initiated because there is no GameControl.\n" );
 		Sender->CurrentAction = NULL;
 		return;
 	}
+printf("c\n");
 	//can't initiate dialog, because it is already there
 	if (gc->Dialogue) {
 		if (Flags & BD_INTERRUPT) {
@@ -3491,6 +3694,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 	}
 
+printf("d\n");
 	const char* Dialog;
 	switch (Flags & BD_LOCMASK) {
 		case BD_STRING0:
@@ -3499,14 +3703,17 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 				actor->SetDialog( Dialog );
 			break;
 		case BD_SOURCE:
-			Dialog = actor->Dialog; break;
+			Dialog = actor->Dialog;
+			break;
 		case BD_TARGET:
-			Dialog = target->Dialog; break;
+			Dialog = target->Dialog;
+			break;
 		case BD_RESERVED:
 			PlayerDialogRes[5] = '1';
 			Dialog = ( const char * ) PlayerDialogRes;
 			break;
 	}
+printf("e\n");
 	if (!Dialog) {
 		Sender->CurrentAction = NULL;
 		return;
@@ -3522,6 +3729,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			return;
 		}
 	}
+printf("f\n");
 
 	actor->Orientation = GetOrient( target->XPos, target->YPos, actor->XPos,
 							actor->YPos );
@@ -3529,6 +3737,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	target->Orientation = GetOrient( actor->XPos, actor->YPos, target->XPos,
 							target->YPos );
 	target->resetAction = true;//nor this
+printf("g\n");
 
 	if (Dialog[0]) {
 		//increasing NumTimesTalkedTo
@@ -3537,6 +3746,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 		gc->InitDialog( actor, target, Dialog );
 	}
+printf("h\n");
 }
 
 //no string, increase talkcount, no interrupt
@@ -3646,13 +3856,13 @@ void GameScript::StartDialogueInterrupt(Scriptable* Sender, Action* parameters)
 //No string, flags:0
 void GameScript::StartDialogueNoSet(Scriptable* Sender, Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_SOURCE );
+	BeginDialog( Sender, parameters, BD_TALKCOUNT | BD_SOURCE );
 }
 
 void GameScript::StartDialogueNoSetInterrupt(Scriptable* Sender,
 	Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_SOURCE | BD_INTERRUPT );
+	BeginDialog( Sender, parameters, BD_TALKCOUNT | BD_SOURCE | BD_INTERRUPT );
 }
 
 Point* FindNearPoint(Actor* Sender, Point* p1, Point* p2, double& distance)

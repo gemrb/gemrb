@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.67 2004/03/13 16:55:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.68 2004/03/14 15:53:40 avenger_teambg Exp $
  *
  */
 
@@ -670,6 +670,8 @@ private:
 	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
 		int flags);
+	static Targets *XthNearestOf(Scriptable *Sender, Targets *parameters, int count);
+	static Targets *XthNearestEnemyOf(Scriptable *Sender, Targets *parameters, int count);
 
 	static unsigned char GetOrient(short sX, short sY, short dX, short dY);
 private: //Internal variables
@@ -915,10 +917,20 @@ public:
 public:
 	//Objects
 	static Targets *BestAC(Scriptable *Sender, Targets *parameters);
+	static Targets *EighthNearest(Scriptable *Sender, Targets *parameters);
+	static Targets *EighthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
+	static Targets *FifthNearest(Scriptable *Sender, Targets *parameters);
+	static Targets *FifthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
+	static Targets *FourthNearest(Scriptable *Sender, Targets *parameters);
+	static Targets *FourthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *Gabber(Scriptable *Sender, Targets *parameters);
 	static Targets *LastSeenBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastTalkedToBy(Scriptable *Sender, Targets *parameters);
 	static Targets *Myself(Scriptable *Sender, Targets *parameters);
+	static Targets *Nearest(Scriptable *Sender, Targets *parameters);
+	static Targets *NearestEnemyOf(Scriptable *Sender, Targets *parameters);
+	static Targets *NinthNearest(Scriptable *Sender, Targets *parameters);
+	static Targets *NinthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *Player1(Scriptable *Sender, Targets *parameters);
 	static Targets *Player1Fill(Scriptable *Sender, Targets *parameters);
 	static Targets *Player2(Scriptable *Sender, Targets *parameters);
@@ -932,7 +944,17 @@ public:
 	static Targets *Player6(Scriptable *Sender, Targets *parameters);
 	static Targets *Player6Fill(Scriptable *Sender, Targets *parameters);
 	static Targets *Protagonist(Scriptable *Sender, Targets *parameters);
+	static Targets *SecondNearest(Scriptable *Sender, Targets *parameters);
+	static Targets *SecondNearestEnemyOf(Scriptable *Sender, Targets *parameters);
+	static Targets *SeventhNearest(Scriptable *Sender, Targets *parameters);
+	static Targets *SeventhNearestEnemyOf(Scriptable *Sender, Targets *parameters);
+	static Targets *SixthNearest(Scriptable *Sender, Targets *parameters);
+	static Targets *SixthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *StrongestOf(Scriptable *Sender, Targets *parameters);
+	static Targets *TenthNearest(Scriptable *Sender, Targets *parameters);
+	static Targets *TenthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
+	static Targets *ThirdNearest(Scriptable *Sender, Targets *parameters);
+	static Targets *ThirdNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *WeakestOf(Scriptable *Sender, Targets *parameters);
 	static Targets *WorstAC(Scriptable *Sender, Targets *parameters);
 

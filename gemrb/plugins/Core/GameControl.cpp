@@ -640,8 +640,6 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 				sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
 				//GameScript::ExecuteString(actor, Tmp);
 				actor->AddAction( GameScript::CreateAction( Tmp, true ) );
-				DisplayString("EZ AZ");
-				DisplayString(Tmp);
 			}
 		}
 		for (size_t i = 0; i < selected.size(); i++)
