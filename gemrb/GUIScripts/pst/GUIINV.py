@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.16 2004/10/16 14:26:44 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.17 2004/10/17 05:21:03 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -150,7 +150,20 @@ def UpdateInventoryWindow ():
 
 	# encumbrance
 	Button = GemRB.GetControl (Window, 46);
-	GemRB.SetText (Window, Button, "12345\n\n\n\n67890:")
+
+	# Loading tables of modifications
+	Table = GemRB.LoadTable("strmod")
+	TableEx = GemRB.LoadTable("strmodex")
+	# Getting the character's strength
+	sstr = GemRB.GetPlayerStat (pc, ie_stats.IE_STR)
+	ext_str = GemRB.GetPlayerStat (pc, ie_stats.IE_STREXTRA)
+
+	max_encumb = GemRB.GetTableValue(Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
+	GemRB.SetText (Window, Button, "0:\n\n\n\n" + str(max_encumb) + ":")
+	# FIXME: Current encumberance is hardcoded
+	# Unloading tables is not necessary, i think (they will stay cached)
+	#GemRB.UnloadTable (Table)
+	#GemRB.UnloadTable (TableEx)
 
 	# armor class
 	ac = GemRB.GetPlayerStat (pc, ie_stats.IE_ARMORCLASS)
