@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.55 2004/07/27 18:27:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.56 2004/08/02 18:00:17 avenger_teambg Exp $
  *
  */
 
@@ -358,7 +358,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	for (i = 0; i < InfoPointsCount; i++) {
 		str->Seek( InfoPointsOffset + ( i * 0xC4 ), GEM_STREAM_START );
 		unsigned short Type, VertexCount;
-		unsigned long FirstVertex, Cursor, EndFlags;
+		unsigned long FirstVertex, Cursor, Flags;
 		unsigned short TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
 		unsigned short LaunchX, LaunchY;
 		char Name[33], Script[9], Key[9], Destination[9], Entrance[33];
@@ -380,7 +380,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		Destination[8] = 0;
 		str->Read( Entrance, 32 );
 		Entrance[32] = 0;
-		str->Read( &EndFlags, 4 );
+		str->Read( &Flags, 4 );
 		unsigned long StrRef;
 		str->Read( &StrRef, 4 );
 		str->Read( &TrapDetDiff, 2 );
@@ -414,7 +414,6 @@ Map* AREImp::GetMap(const char *ResRef)
 		ip->TrapRemovalDifficulty = TrapRemDiff;
 		//we don't need this flag, because the script is loaded
 		//only if it exists
-//		ip->Trapped = Trapped;
 		ip->TrapDetected = TrapDetected;
 		ip->TrapLaunchX = LaunchX;
 		ip->TrapLaunchY = LaunchY;
@@ -424,7 +423,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		ip->timeStartDisplaying = 0;
 		ip->XPos = bbox.x + ( bbox.w / 2 );
 		ip->YPos = bbox.y + ( bbox.h / 2 );
-		ip->EndAction = EndFlags;
+		ip->Flags = Flags;
 		strcpy( ip->Destination, Destination );
 		strcpy( ip->EntranceName, Entrance );
 		//ip->triggered = false;

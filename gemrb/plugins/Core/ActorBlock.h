@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.40 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.41 2004/08/02 18:00:18 avenger_teambg Exp $
  *
  */
 
@@ -86,8 +86,8 @@ class Door;
 typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
 ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
 
-#define SEA_RESET		0x00000002
-#define SEA_PARTY_REQUIRED	0x00000004
+//#define SEA_RESET		0x00000002
+//#define SEA_PARTY_REQUIRED	0x00000004
 
 class GEM_EXPORT Scriptable {
 public:
@@ -112,7 +112,6 @@ public:
 	bool Active;
 	Scriptable* LastTrigger;
 	Scriptable* LastEntered;
-	unsigned long EndAction;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
 	bool resetAction;

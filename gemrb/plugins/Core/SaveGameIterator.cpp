@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.20 2004/04/14 18:40:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.21 2004/08/02 18:00:21 avenger_teambg Exp $
  *
  */
 
@@ -36,33 +36,6 @@ SaveGameIterator::~SaveGameIterator(void)
 	while(i--) {
 		free( save_slots[i] );
 	}
-}
-
-static void DelTree(char* Pt)
-{
-	char Path[_MAX_PATH];
-	strcpy( Path, Pt );
-	DIR* dir = opendir( Path );
-	if (dir == NULL) {
-		return;
-	}
-	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
-	if (de == NULL) {
-		closedir( dir );
-		return;
-	}
-	do {
-		char dtmp[_MAX_PATH];
-		struct stat fst;
-		sprintf( dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name );
-		stat( dtmp, &fst );
-		if (S_ISDIR( fst.st_mode ))
-			continue;
-		if (de->d_name[0] == '.')
-			continue;
-		unlink( dtmp );
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir );
 }
 
 static const char* PlayMode()

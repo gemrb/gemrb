@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.8 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.9 2004/08/02 18:00:21 avenger_teambg Exp $
  *
  */
 
@@ -42,13 +42,12 @@ public:
 	int y;
 	int w;
 	int h;
-	int DEBUG;
 	Region(const Region& rgn);
 	//Region(Region & rgn);
 	Region& operator=(const Region& rgn);
 	bool operator==(const Region& rgn);
 	bool operator!=(const Region& rgn);
-	Region(int x, int y, int w, int h, int DEBUG = 0);
+	Region(int x, int y, int w, int h);
 	bool PointInside(unsigned short XPos, unsigned short YPos);
 	bool InsideRegion(Region& rgn);
 	void Normalize();

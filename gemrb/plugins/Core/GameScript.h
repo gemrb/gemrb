@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.123 2004/07/31 22:37:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.124 2004/08/02 18:00:19 avenger_teambg Exp $
  *
  */
 
@@ -91,7 +91,9 @@ public:
 	};
 	void AddTarget(Actor* Target)
 	{
-		if(Target && !Target->DeleteMe) {
+		//i don't know if unselectable actors are targetable by script
+		//if yes, then remove GA_SELECT
+		if(Target && Target->ValidTarget(GA_SELECT|GA_NO_DEAD) ) {
 			objects.push_back( Target );
 		}
 	};
@@ -760,9 +762,11 @@ public: //Script Functions
 	static int Alignment(Scriptable* Sender, Trigger* parameters);
 	static int Allegiance(Scriptable* Sender, Trigger* parameters);
 	static int AnimState(Scriptable* Sender, Trigger* parameters);
+	static int AnyPCOnMap(Scriptable* Sender, Trigger* parameters);
 	static int AreaCheck(Scriptable* Sender, Trigger* parameter);
 	static int AreaCheckObject(Scriptable* Sender, Trigger* parameter);
 	static int AreaFlag(Scriptable* Sender, Trigger* parameter);
+	static int AreaRestDisabled(Scriptable* Sender, Trigger* parameter);
 	static int AreaType(Scriptable* Sender, Trigger* parameter);
 	static int BitCheck(Scriptable* Sender, Trigger* parameters);
 	static int BitCheckExact(Scriptable* Sender, Trigger* parameters);
@@ -782,7 +786,9 @@ public: //Script Functions
 	static int CombatCounterLT(Scriptable* Sender, Trigger* parameters);
 	static int Contains(Scriptable* Sender, Trigger* parameters);
 	static int Dead(Scriptable* Sender, Trigger* parameters);
+	static int Die(Scriptable* Sender, Trigger* parameters);
 	static int Entered(Scriptable* Sender, Trigger* parameters);
+	static int EntirePartyOnMap(Scriptable* Sender, Trigger* parameters);
 	static int Exists(Scriptable* Sender, Trigger* parameters);
 	static int ExtraProficiency(Scriptable* Sender, Trigger* parameters);
 	static int ExtraProficiencyGT(Scriptable* Sender, Trigger* parameters);
@@ -830,7 +836,9 @@ public: //Script Functions
 	static int InternalGT(Scriptable* Sender, Trigger* parameters);
 	static int InternalLT(Scriptable* Sender, Trigger* parameters);
 	static int IsAClown(Scriptable* Sender, Trigger* parameters);
+	static int IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsLocked(Scriptable* Sender, Trigger* parameters);
+	static int IsRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters);
 	static int ItemIsIdentified(Scriptable* Sender, Trigger* parameters);
 	static int Level(Scriptable* Sender, Trigger* parameters);
@@ -843,6 +851,7 @@ public: //Script Functions
 	static int Morale(Scriptable* Sender, Trigger* parameters);
 	static int MoraleGT(Scriptable* Sender, Trigger* parameters);
 	static int MoraleLT(Scriptable* Sender, Trigger* parameters);
+	static int NamelessBitTheDust(Scriptable* Sender, Trigger* parameters);
 	static int NearbyDialog(Scriptable* Sender, Trigger* parameters);
 	static int NearLocation(Scriptable* Sender, Trigger* parameters);
 	static int NotStateCheck(Scriptable* Sender, Trigger* parameters);
@@ -875,6 +884,7 @@ public: //Script Functions
 	static int PartyGoldLT(Scriptable* Sender, Trigger* parameters);
 	static int PartyHasItem(Scriptable* Sender, Trigger* parameters);
 	static int PartyHasItemIdentified(Scriptable* Sender, Trigger* parameters);
+	static int PartyMemberDied(Scriptable* Sender, Trigger* parameters);
 	static int Proficiency(Scriptable* Sender, Trigger* parameters);
 	static int ProficiencyGT(Scriptable* Sender, Trigger* parameters);
 	static int ProficiencyLT(Scriptable* Sender, Trigger* parameters);

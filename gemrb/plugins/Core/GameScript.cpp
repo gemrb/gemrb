@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.169 2004/07/31 22:37:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.170 2004/08/02 18:00:19 avenger_teambg Exp $
  *
  */
 
@@ -62,6 +62,7 @@ static TriggerLink triggernames[] = {
 	{"alignment", GameScript::Alignment,0},
 	{"allegiance", GameScript::Allegiance,0},
 	{"animstate", GameScript::AnimState,0},
+	{"anypconmap", GameScript::AnyPCOnMap,0},
 	{"areacheck", GameScript::AreaCheck,0},
 	{"areacheckobject", GameScript::AreaCheck,0},
 	{"areaflag", GameScript::AreaFlag,0},
@@ -84,7 +85,9 @@ static TriggerLink triggernames[] = {
 	{"combatcounterlt", GameScript::CombatCounterLT,0},
 	{"contains", GameScript::Contains,0},
 	{"dead", GameScript::Dead,0},
+	{"die", GameScript::Die,0},
 	{"entered", GameScript::Entered,0},
+	{"entirepartyonmap", GameScript::EntirePartyOnMap,0},
 	{"exists", GameScript::Exists,0},
 	{"extraproficiency", GameScript::ExtraProficiency,0},
 	{"extraproficiencygt", GameScript::ExtraProficiencyGT,0},
@@ -136,6 +139,7 @@ static TriggerLink triggernames[] = {
 	{"interactingwith", GameScript::InteractingWith,0},
 	{"isaclown", GameScript::IsAClown,0},
 	{"islocked", GameScript::IsLocked,0},
+	{"isscriptname", GameScript::CalledByName,0}, //seems the same
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog,0},
 	{"itemisidentified", GameScript::ItemIsIdentified,0},
 	{"level", GameScript::Level,0},
@@ -148,9 +152,11 @@ static TriggerLink triggernames[] = {
 	{"morale", GameScript::Morale,0},
 	{"moralegt", GameScript::MoraleGT,0},
 	{"moralelt", GameScript::MoraleLT,0},
+	{"namelessbitthedust", GameScript::NamelessBitTheDust,0},
 	{"nearbydialog", GameScript::NearbyDialog,0},
 	{"nearlocation", GameScript::NearLocation,0},
 	{"notstatecheck", GameScript::NotStateCheck,0},
+	{"partymemberdied", GameScript::PartyMemberDied,0},
 	{"nulldialog", GameScript::NullDialog,0},
 	{"numcreature", GameScript::NumCreatures,0},
 	{"numcreatureGT", GameScript::NumCreaturesGT,0},
@@ -197,6 +203,7 @@ static TriggerLink triggernames[] = {
 	{"reputation", GameScript::Reputation,0},
 	{"reputationgt", GameScript::ReputationGT,0},
 	{"reputationlt", GameScript::ReputationLT,0},
+	{"isrotation", GameScript::IsRotation,0},
 	{"see", GameScript::See,0},
 	{"specifics", GameScript::Specifics,0},
 	{"statecheck", GameScript::StateCheck,0},
@@ -2733,7 +2740,7 @@ int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	//don't allow dead
-	return (tar->GetStat(IE_STATE_ID)&STATE_DEAD)!=STATE_DEAD;
+	return tar->ValidTarget(GA_NO_DEAD);
 }
 
 int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
@@ -3379,6 +3386,32 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::Die(Scriptable* Sender, Trigger* parameters)
+{
+	if(!Sender || Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *act=(Actor *) Sender;
+	if(act->InternalFlags&IF_JUSTDIED) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::PartyMemberDied(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->PartyMemberDied();
+}
+
+int GameScript::NamelessBitTheDust(Scriptable* Sender, Trigger* parameters)
+{
+	Actor* actor = core->GetGame()->FindPC(1);
+	if(actor->InternalFlags&IF_JUSTDIED) {
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::Race(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -3914,6 +3947,38 @@ int GameScript::AreaCheckObject(Scriptable* Sender, Trigger* parameters)
 	return strnicmp(actor->Area, parameters->string0Parameter, 8)==0;
 }
 
+int GameScript::EntirePartyOnMap(Scriptable* Sender, Trigger* parameters)
+{
+	Game *game=core->GetGame();
+	int i=game->GetPartySize(false);
+	while(i--) {
+		Actor *actor=game->GetPC(i);
+		if(strnicmp(game->CurrentArea, actor->Area, 8) ) return 0;
+	}
+	return 1;
+}
+
+int GameScript::AnyPCOnMap(Scriptable* Sender, Trigger* parameters)
+{
+	Game *game=core->GetGame();
+	int i=game->GetPartySize(false);
+	while(i--) {
+		Actor *actor=game->GetPC(i);
+		if(!strnicmp(game->CurrentArea, actor->Area, 8) ) return 1;
+	}
+	return 0;
+}
+
+int GameScript::InActiveArea(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor2 = ( Actor* ) tar;
+	return strnicmp(core->GetGame()->CurrentArea, actor2->Area, 8) ==0;
+}
+
 int GameScript::InMyArea(Scriptable* Sender, Trigger* parameters)
 {
 	if(Sender->Type != ST_ACTOR) {
@@ -3932,16 +3997,6 @@ int GameScript::InMyArea(Scriptable* Sender, Trigger* parameters)
 	return strnicmp(actor1->Area, actor2->Area, 8)==0;
 }
 
-int GameScript::InActiveArea(Scriptable* Sender, Trigger* parameters)
-{
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor2 = ( Actor* ) tar;
-	return strnicmp(core->GetGame()->CurrentArea, actor2->Area, 8) ==0;
-}
-
 int GameScript::AreaType(Scriptable* Sender, Trigger* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
@@ -3952,6 +4007,15 @@ int GameScript::AreaFlag(Scriptable* Sender, Trigger* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	return (map->AreaFlags&parameters->int0Parameter)>0;
+}
+
+int GameScript::AreaRestDisabled(Scriptable *Sender, Trigger* parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	if(map->AreaFlags&2) {
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* parameters)
@@ -4205,6 +4269,8 @@ int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+//this one checks scriptname (deathvar), i hope it is right
+//IsScriptName depends on this too
 int GameScript::CalledByName(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -4297,6 +4363,39 @@ int GameScript::InteractingWith(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	return 1;
+}
+
+int GameScript::IsRotation(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if( actor->Orientation == parameters->int0Parameter ) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	long value;
+	if(!parameters->string0Parameter[0]) {
+		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+	}
+	value = (long) CheckVariable( tar, parameters->string0Parameter );
+	unsigned short X = *(unsigned short *) value;
+	unsigned short Y = *(((unsigned short *) value)+1);
+	if(actor->Orientation == GetOrient( X, Y, actor->XPos, actor->YPos ) ) {
+		return 1;
+	}
+	return 0;
 }
 
 //-------------------------------------------------------------
@@ -4430,8 +4529,8 @@ void GameScript::SetNamelessClass(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetNamelessDisguise(Scriptable* Sender, Action* parameters)
 {
-	Actor *actor = core->GetGame()->FindPC(1);
-	SetVariable(actor, "APPEARANCE", parameters->int0Parameter);
+	SetVariable(Sender, "APPEARANCE", "GLOBAL", parameters->int0Parameter);
+//maybe add a guiscript call here ?
 	if(parameters->int0Parameter) {
 	}
 	else {
@@ -4742,7 +4841,6 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	Game* game=core->GetGame();
 	if(Sender->Type==ST_AREA) {
 		map = (Map*) Sender;
-//game->GetMap(Sender->GetScriptName() );
 	}
 	else {
 		map = game->GetCurrentMap( );
@@ -5267,7 +5365,7 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->DeleteMe = true;
+	actor->InternalFlags |= IF_JUSTDIED;
 }
 
 void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
@@ -5800,9 +5898,7 @@ void GameScript::MakeGlobal(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	if (!core->GetGame()->InParty( act )) {
-		core->GetGame()->AddNPC( act );
-	}
+	core->GetGame()->AddNPC( act );
 }
 
 void GameScript::UnMakeGlobal(Scriptable* Sender, Action* parameters)
@@ -6743,7 +6839,8 @@ void GameScript::Kill(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* target = ( Actor* ) tar;
-	target->Die(false); //die, no XP
+//	target->SetStat(IE_HITPOINTS,0); //probably this is the proper way
+	target->Die(Sender);
 }
 
 void GameScript::SetGabber(Scriptable* Sender, Action* parameters)

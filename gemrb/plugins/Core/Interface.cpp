@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.180 2004/07/31 22:32:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.181 2004/08/02 18:00:20 avenger_teambg Exp $
  *
  */
 
@@ -28,6 +28,7 @@
 #include "Interface.h"
 #include "FileStream.h"
 #include "AnimationMgr.h"
+#include "ArchiveImporter.h"
 #include <stdlib.h>
 #include <time.h>
 
@@ -1137,13 +1138,13 @@ int Interface::LoadCreature(char* ResRef, int InParty)
 	}
 	Actor* actor = actormgr->GetActor();
 	FreeInterface( actormgr );
-	actor->FromGame = true;
 	actor->InParty = InParty;
-	actor->AnimID = IE_ANI_AWAKE;
 	//both fields are of length 9, make this sure!
 	memcpy(actor->Area, GetGame()->CurrentArea, 9);
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		actor->AnimID = IE_ANI_SLEEP;
+	} else {
+		actor->AnimID = IE_ANI_AWAKE;
 	}
 	actor->Orientation = 0;
 
@@ -1953,15 +1954,18 @@ bool Interface::InCutSceneMode()
 void Interface::LoadGame(int index)
 {
 	DataStream* ds;
+	DataStream* sav;
 
 	if (index == -1) {
 		//Load the Default Game
 		ds = GetResourceMgr()->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
+		sav = NULL;
 	} else {
 		SaveGame* sg = GetSaveGameIterator()->GetSaveGame( index );
 		if (!sg)
 			return;
 		ds = sg->GetGame();
+		sav = sg->GetSave();
 		delete sg;
 	}
 	if (!ds) {
@@ -1970,6 +1974,7 @@ void Interface::LoadGame(int index)
 	SaveGameMgr* sgm = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
 	if (!sgm) {
 		delete ds;
+		if(sav) delete sav;
 		return;
 	}
 	sgm->Open( ds );
@@ -1979,6 +1984,13 @@ void Interface::LoadGame(int index)
 	}
 	game = sgm->GetGame();
 	FreeInterface( sgm );
+	if(sav) {
+		if(game) {
+			ArchiveImporter * ai = (ArchiveImporter*)core->GetInterface(IE_BIF_CLASS_ID);
+			ai->DecompressSaveGame(sav);
+		}
+		delete sav;
+	}
 }
 
 GameControl *Interface::GetGameControl()

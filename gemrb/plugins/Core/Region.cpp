@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.cpp,v 1.9 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.cpp,v 1.10 2004/08/02 18:00:21 avenger_teambg Exp $
  *
  */
 
@@ -25,21 +25,11 @@
 Region::Region(void)
 {
 	x = y = w = h = 0;
-	DEBUG = 0;
 }
 
 Region::~Region(void)
 {
 }
-
-/*Region::Region(Region & rgn)
-{
-	x = rgn.x;
-	y = rgn.y;
-	w = rgn.w;
-	h = rgn.h;
-DEBUG=rgn.DEBUG;
-}*/
 
 Region::Region(const Region& rgn)
 {
@@ -47,7 +37,6 @@ Region::Region(const Region& rgn)
 	y = rgn.y;
 	w = rgn.w;
 	h = rgn.h;
-	DEBUG = rgn.DEBUG;
 }
 
 Region& Region::operator=(const Region& rgn)
@@ -56,7 +45,6 @@ Region& Region::operator=(const Region& rgn)
 	y = rgn.y;
 	w = rgn.w;
 	h = rgn.h;
-	DEBUG = rgn.DEBUG;
 	return *this;
 }
 
@@ -76,13 +64,12 @@ bool Region::operator!=(const Region& rgn)
 	return false;
 }
 
-Region::Region(int x, int y, int w, int h, int debug)
+Region::Region(int x, int y, int w, int h)
 {
 	this->x = x;
 	this->y = y;
 	this->w = w;
 	this->h = h;
-	this->DEBUG = DEBUG;
 }
 
 bool Region::PointInside(unsigned short XPos, unsigned short YPos)

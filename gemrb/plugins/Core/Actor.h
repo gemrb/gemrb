@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.39 2004/07/31 22:37:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.40 2004/08/02 18:00:18 avenger_teambg Exp $
  *
  */
 
@@ -55,6 +55,31 @@ class Map;
 #define MOD_ADDITIVE  0
 #define MOD_ABSOLUTE  1
 #define MOD_PERCENT   2
+
+//internal actor flags
+#define IF_GIVEXP     1     //give xp for this death
+#define IF_JUSTDIED   2     //Died() will return true
+#define IF_FROMGAME   4     //this is an NPC or PC
+#define IF_REALLYDIED 8     //real death happened, actor will be set to dead
+
+/** flags for GetActor */
+//default action
+#define GA_DEFAULT  0
+//actor selected for talk
+#define GA_TALK     1
+//actor selected for attack
+#define GA_ATTACK   2
+//actor selected for spell target
+#define GA_SPELL    3
+//actor selected for pick pockets
+#define GA_PICK     4
+
+//action mask
+#define GA_ACTION   15
+//unselectable actor may not be selected (can still block)
+#define GA_SELECT   16
+//dead actor may not be selected
+#define GA_NO_DEAD  32
 
 class GEM_EXPORT Actor : public Moveble {
 public:
@@ -97,8 +122,7 @@ public:
 public:
 	//this stuff don't get saved
 	CharAnimations* anims;
-	bool DeleteMe;
-	bool FromGame;
+	int InternalFlags;
 
 	Actor *LastTalkedTo;
 	Actor *LastAttacker;
@@ -110,6 +134,7 @@ public:
 	Actor *LastSeen;
 	Actor *LastHeard;
 	Actor *LastSummoner;
+	int LastDamageType;
 
 private:
 	void SetCircleSize();
@@ -125,6 +150,8 @@ public:
 	CharAnimations* GetAnims();
 	/** Inits the Modified vector */
 	void Init();
+	/** Returns true if the actor is targetable */
+	bool ValidTarget(int ga_flags);
 	/** Returns a Stat value */
 	long GetStat(unsigned int StatIndex);
 	/** Sets a Stat Value (unsaved) */
@@ -213,7 +240,15 @@ public:
 	void SetText(int strref, unsigned char type);
 	/* returns carried weight atm, could calculate with strength*/
 	int GetEncumbrance();
-	void Die(bool xp_allowed);
+	/* checks on death of actor, returns true if it should be removed*/
+	bool CheckOnDeath();
+	/* deals damage to this actor */
+	int Damage(int damage, int damagetype, Actor *hitter);
+	/* drops items from inventory to current spot */
 	void DropItem(const char *resref, unsigned int flags);
+	/* returns true if the actor is PC/joinable*/
+	bool Persistent();
+	/* schedules actor to die*/
+	void Die(Scriptable *killer);
 };
 #endif

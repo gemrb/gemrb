@@ -22,7 +22,6 @@ Scriptable::Scriptable(ScriptableType type)
 	LastTrigger = NULL;
 	LastEntered = NULL;
 	Active = true;
-	EndAction = 2;
 	CurrentAction = NULL;
 	startTime = 0;
 	interval = ( 1000 / AI_UPDATE_TIME );
@@ -197,11 +196,12 @@ void Scriptable::ProcessActions()
 	while (!CurrentAction) {
 		CurrentAction = PopNextAction();
 		if (!CurrentAction) {
+			/* we don't need this
 			if (!neverExecuted) {
 				switch (Type) {
 					case ST_PROXIMITY:
 						 {
-							if (!( EndAction & SEA_RESET ))
+							if (!( Flags & TRAP_RESET ))
 								Active = false;
 						}
 						break;
@@ -216,9 +216,9 @@ void Scriptable::ProcessActions()
 						break;
 				}
 			}
+			*/
 			if (CutSceneId)
 				CutSceneId = NULL;
-
 			break;
 		}
 		if (Type == ST_ACTOR) {
@@ -657,6 +657,7 @@ int InfoPoint::CheckTravel(Actor *actor)
 {
 	if(Flags&TRAP_DEACTIVATED) return 0;
 	if(!actor->InParty && (Flags&TRAVEL_NONPC) ) return 0;
+printf("%lx\n",Flags);
 	if(Flags&TRAVEL_PARTY) {
 		if(!core->GetGame()->EveryoneNearPoint(actor->Area, actor->XPos, actor->YPos, true) ) {
 			return 2;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.40 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.41 2004/08/02 18:00:20 avenger_teambg Exp $
  *
  */
 
@@ -23,25 +23,6 @@ class Map;
 
 #ifndef MAP_H
 #define MAP_H
-
-/** flags for GetActor */
-//default action
-#define GA_DEFAULT  0
-//actor selected for talk
-#define GA_TALK     1
-//actor selected for attack
-#define GA_ATTACK   2
-//actor selected for spell target
-#define GA_SPELL    3
-//actor selected for pick pockets
-#define GA_PICK     4
-
-//action mask
-#define GA_ACTION   15
-//unselectable actor may not be selected (can still block)
-#define GA_SELECT   16      
-//dead actor may not be selected 
-#define GA_NO_DEAD  32      
 
 #include "TileMap.h"
 #include "ImageMgr.h"

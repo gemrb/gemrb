@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.99 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.100 2004/08/02 18:00:20 avenger_teambg Exp $
  *
  */
 
@@ -107,10 +107,8 @@ Map::~Map(void)
 
 	for (i = 0; i < actors.size(); i++) {
 		Actor* a = actors[i];
-		if (a && !a->InParty && !a->FromGame) {
-			//don't delete NPC/PC
-			//deleted PC's should also be saved with the
-			//area
+		//don't delete NPC/PC 
+		if (a && !a->Persistent() ) {
 			delete ( a );
 		}
 	}
@@ -183,7 +181,6 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	if(!ChangeArea)
 		return;
 	int EveryOne = ip->CheckTravel(actor);
-printf("Checktravel returned %d\n",EveryOne);
 	switch(EveryOne) {
 	case 2:
 		core->DisplayConstantString(STR_WHOLEPARTY,0xffffff); //white
@@ -345,7 +342,8 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 					actor->ExecuteScript( actor->Scripts[i] );
 			}
 
-			if (actor->DeleteMe) {
+			//returns true if actor should be completely removed
+			if(actor->CheckOnDeath()) {
 				DeleteActor( actor );
 				continue;
 			}
@@ -497,18 +495,8 @@ Actor* Map::GetActor(unsigned int x, unsigned int y, int flags)
 	while (i--) {
 		Actor* actor = actors[i];
 		
-		if (actor->DeleteMe) {
-			continue; //actor is already marked for removal
-		}
-		if (flags&GA_SELECT) {
-			if (actor->GetStat(IE_UNSELECTABLE) ) {
-				continue;
-			}
-		}
-		if (flags&GA_NO_DEAD) {
-			if (actor->GetStat(IE_STATE_ID) & STATE_DEAD) {
-				continue;
-			}
+		if (!actor->ValidTarget(flags) ) {
+			continue; 
 		}
 		if (actor->IsOver( ( unsigned short ) x, ( unsigned short ) y ))
 			return actor;

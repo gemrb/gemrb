@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.154 2004/07/31 22:34:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.155 2004/08/02 18:00:19 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -114,10 +114,10 @@ GameControl::GameControl(void)
 
 	core->GetDictionary()->Lookup("Center",tmp);
 	if(tmp) {
-		ScreenFlags=SF_ALWAYSCENTER;
+		ScreenFlags=SF_ALWAYSCENTER|SF_CENTERONACTOR;
 	}
 	else {
-		ScreenFlags = 0;
+		ScreenFlags = SF_CENTERONACTOR;
 	}
 	LeftCount = 0;
 	BottomCount = 0;
@@ -396,7 +396,7 @@ void GameControl::SelectActor(int whom)
 			if (!actor) {
 				continue;
 			}
-			if (actor->GetStat(IE_STATE_ID)&STATE_DEAD) {
+			if (!actor->ValidTarget(GA_SELECT|GA_NO_DEAD) ) {
 				continue;
 			}
 			selected.push_back( actor );
@@ -406,7 +406,7 @@ void GameControl::SelectActor(int whom)
 	}
 	/* doesn't fall through here */
 	Actor* actor = game->GetPC( whom );
-	if (actor && !(actor->GetStat(IE_STATE_ID)&STATE_DEAD)) {
+	if (actor && actor->ValidTarget(GA_SELECT|GA_NO_DEAD) ) {
 		selected.push_back( actor );
 		actor->Select( true );
 	}
@@ -509,7 +509,6 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					}
 					drawPath = core->GetGame()->GetCurrentMap()->FindPath( pfsX, pfsY, GameX, GameY );
 
-					//drawPath = core->GetPathFinder()->FindPath( pfsX, pfsY, GameX, GameY );
 				}
 				break;
 
@@ -797,7 +796,6 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	core->GetVideoDriver()->ConvertToGame( GameX, GameY );
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentMap( );
-	area->ChangeArea = true; //allow movement
 	if (DrawSelectionRect) {
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
@@ -923,7 +921,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 /** Special Key Press */
 void GameControl::OnSpecialKeyPress(unsigned char Key)
 {
-	if(DialogueFlags&1) {
+	if(DialogueFlags&DF_IN_DIALOG) {
 		return; //don't accept keys in dialog
 	}
 	Region Viewport = core->GetVideoDriver()->GetViewport();
@@ -1576,7 +1574,7 @@ void GameControl::ChangeMap()
 	if(ScreenFlags&SF_CENTERONACTOR) {
 		core->GetVideoDriver()->SetViewport( pc->XPos - ( vp.w / 2 ),
 			pc->YPos - ( vp.h / 2 ) );
-		if(!ScreenFlags&SF_ALWAYSCENTER) {
+		if(!(ScreenFlags&SF_ALWAYSCENTER)) {
 			ScreenFlags&=~SF_CENTERONACTOR;
 		}
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.21 2004/04/29 04:20:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.22 2004/08/02 18:00:21 avenger_teambg Exp $
  *
  */
 
@@ -70,8 +70,7 @@ void Slider::Draw(unsigned short x, unsigned short y)
 	}
 	if (BackGround) {
 		if (( BackGround->Width < Width ) || ( BackGround->Height < Height )) {
-			core->GetVideoDriver()->BlitTiled( Region( x + XPos, y + YPos,
-												Width, Height, 1 ),
+			core->GetVideoDriver()->BlitTiled( Region( x + XPos, y + YPos, Width, Height),
 										BackGround, true );
 		} else {
 			Region r( x + XPos, y + YPos, Width, Height );

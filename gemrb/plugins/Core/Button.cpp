@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.67 2004/07/25 13:36:39 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.68 2004/08/02 18:00:18 avenger_teambg Exp $
  *
  */
 
@@ -368,12 +368,14 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 			if (VarName[0] != 0)
 				core->GetDictionary()->SetAt( VarName, Value );
 		}
+/* divide says these sounds are tied to the window, not the released button
 		if (Flags & IE_GUI_BUTTON_SOUND) {
 			if (Flags & IE_GUI_BUTTON_ALT_SOUND)
 				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_RELEASE1] );
 			else
 				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_RELEASE0] );
 		}
+*/
 		if ((Mod == 1) && ButtonOnShiftPress[0])
 			RunEventHandler( ButtonOnShiftPress );
 		else

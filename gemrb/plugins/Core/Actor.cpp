@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.55 2004/07/31 22:37:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.56 2004/08/02 18:00:18 avenger_teambg Exp $
  *
  */
 
@@ -87,9 +87,9 @@ Actor::Actor()
 	LastSeen = NULL;
 	LastHeard = NULL;
 	LastSummoner = NULL;
+	LastDamageType = 0;
 
-	DeleteMe = false;
-	FromGame = false;
+	InternalFlags = 0;
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 }
 
@@ -298,7 +298,10 @@ bool Actor::SetStat(unsigned int StatIndex, long Value)
 			break;
 		case IE_HITPOINTS:
 			if(Value<=0) {
-				Die(true);
+				Die(NULL);
+			}
+			if(Value>Modified[IE_MAXHITPOINTS]) {
+				Modified[IE_HITPOINTS]=Modified[IE_MAXHITPOINTS];
 			}
 			break;
 	}
@@ -338,7 +341,7 @@ bool Actor::SetBase(unsigned int StatIndex, long Value)
 			break;
 		case IE_HITPOINTS:
 			if(Value<=0) {
-				Die(true);
+				Die(NULL);
 			}
 			break;
 	}
@@ -358,20 +361,30 @@ int Actor::NewStat(unsigned int StatIndex, long ModifierValue,
 	int oldmod = Modified[StatIndex];
 
 	switch (ModifierType) {
-		case 0:
+		case MOD_ADDITIVE:
 			//flat point modifier
 			SetStat(StatIndex, Modified[StatIndex]+ModifierValue);
 			break;
-		case 1:
+		case MOD_ABSOLUTE:
 			//straight stat change
 			SetStat(StatIndex, ModifierValue);
 			break;
-		case 2:
+		case MOD_PERCENT:
 			//percentile
 			SetStat(StatIndex, BaseStats[StatIndex] * 100 / ModifierValue);
 			break;
 	}
 	return Modified[StatIndex] - oldmod;
+}
+
+//returns actual damage
+int Actor::Damage(int damage, int damagetype, Actor *hitter)
+{
+//recalculate damage based on resistances and difficulty level
+	NewStat(IE_HITPOINTS,-damage, MOD_ADDITIVE);
+	LastDamageType=damagetype;
+	LastHitter=hitter;
+	return damage;
 }
 
 void Actor::DebugDump()
@@ -394,7 +407,7 @@ void Actor::DebugDump()
 	printf( "Mod[IE_EA]: %ld\n", Modified[IE_EA]);
 	printf( "Mod[IE_ANIMATION_ID]: 0x%04lX\n", Modified[IE_ANIMATION_ID]);
 	unsigned long tmp=0;
-	locals->Lookup("APPEARANCE",tmp);
+	core->GetGame()->globals->Lookup("APPEARANCE",tmp);
 	printf( "Disguise: %ld\n", tmp);
 	inventory.dump();
 	spellbook.dump();
@@ -429,25 +442,57 @@ int Actor::GetEncumbrance()
 	return inventory.GetWeight();
 }
 
-void Actor::Die(bool xp_allowed)
+void Actor::Die(Scriptable *killer)
 {
-	if(InParty) {
-		//trigger namelessonebitthedust
-		//partymemberdied, etc
+	int minhp=Modified[IE_MINHITPOINTS];
+	if(minhp) { //can't die
+		SetStat(IE_HITPOINTS, minhp);
 	}
-	else {
-		if(xp_allowed) {
-			//give experience to party
-			core->GetGame()->ShareXP(GetStat(IE_XPVALUE) );
+	InternalFlags|=IF_JUSTDIED;
+	if(!InParty) {
+		Actor *act=NULL;
+		
+		if(killer) {
+			 killer=killer->MySelf;
+		}
+		if(killer->Type==ST_ACTOR) {
+			act = (Actor *) killer;
+		}
+		if(act && act->InParty) {
+			//adjust game statistics here
+			//game->KillStat(this, killer);
+			InternalFlags|=IF_GIVEXP;
 		}
 	}
-	//handle reputation???
-	//if chunked death, then set DeleteMe
-	//DeleteMe = true;
-	DropItem("",0);
+//
+//
+	if(Modified[IE_HITPOINTS]<=0) {
+		InternalFlags|=IF_REALLYDIED;
+	}
         AnimID = IE_ANI_DIE;
-	Active = false; //do we need it?
+}
+
+bool Actor::CheckOnDeath()
+{
+	if(!(InternalFlags&IF_REALLYDIED) ) return false;
+	//don't mess with the already deceased
+	if(Modified[IE_STATE_ID]&STATE_DEAD) return false;
+	//we need to check animID here, if it has not played the death
+	//sequence yet, then we could return now
+
+	if(InternalFlags&IF_GIVEXP) {
+		//give experience to party
+		core->GetGame()->ShareXP(GetStat(IE_XPVALUE) );
+		//handle reputation here
+		//
+	}
+	DropItem("",0);
+	Active = false; //we its scripts here, do we need it?
 	Modified[IE_STATE_ID] |= STATE_DEAD;
+	if(Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
+	if(Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
+	//if chunked death, then return true
+	return false;
 }
 
 /* this will create a heap at location, and transfer the item(s) */
@@ -457,3 +502,35 @@ void Actor::DropItem(const char *resref, unsigned int flags)
 	inventory.DropItemAtLocation(resref, flags, map, XPos, YPos);
 }
 
+bool Actor::ValidTarget(int ga_flags)
+{
+	switch(ga_flags&GA_ACTION) {
+	case GA_PICK:
+		if(Modified[IE_STATE_ID] & STATE_CANTSTEAL) return false;
+		break;
+	case GA_TALK:
+		//can't talk to dead
+		if(Modified[IE_STATE_ID] & STATE_CANTLISTEN) return false;
+		//can't talk to hostile
+		if(Modified[IE_EA]>=EVILCUTOFF) return false;
+		break;
+	}
+	if(ga_flags&GA_NO_DEAD) {
+		if(InternalFlags&IF_JUSTDIED) return false;
+		if(Modified[IE_STATE_ID] & STATE_DEAD) return false;
+	}
+	if(ga_flags&GA_SELECT) {
+		if(Modified[IE_UNSELECTABLE]) return false;
+	}
+	return true;
+}
+
+//returns true if it won't be destroyed with an area
+//in this case it shouldn't be saved with the area either
+//it will be saved in the savegame
+bool Actor::Persistent()
+{
+	if(InParty) return true;
+	if(InternalFlags&IF_FROMGAME) return true;
+	return false;
+}

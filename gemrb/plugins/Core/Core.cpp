@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.18 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.19 2004/08/02 18:00:19 avenger_teambg Exp $
  *
  */
 
@@ -220,4 +220,30 @@ void ResolveFilePath(char* FilePath)
 
 #endif
 
+void DelTree(char* Pt)
+{
+        char Path[_MAX_PATH];
+        strcpy( Path, Pt );
+        DIR* dir = opendir( Path );
+        if (dir == NULL) {
+                return;
+        }
+        struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
+        if (de == NULL) {
+                closedir( dir );
+                return;
+        }
+        do {
+                char dtmp[_MAX_PATH];
+                struct stat fst;
+                sprintf( dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name );
+                stat( dtmp, &fst );
+                if (S_ISDIR( fst.st_mode ))
+                        continue;
+                if (de->d_name[0] == '.')
+                        continue;
+                unlink( dtmp );
+        } while (( de = readdir( dir ) ) != NULL);
+        closedir( dir );
+}
 

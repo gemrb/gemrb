@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.48 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.49 2004/08/02 18:00:19 avenger_teambg Exp $
  *
  */
 
@@ -402,6 +402,7 @@ int Game::AddNPC(Actor* npc)
 	if (slot != -1) {
 		return -1;
 	}     //can't add as npc already in party
+	npc->InternalFlags|=IF_FROMGAME;
 	NPCs.push_back( npc );
 	return NPCs.size() - 1;
 }
@@ -510,5 +511,14 @@ printf("Checking distance %d\n",i);
 		}
 	}
 	return true;
+}
+
+bool Game::PartyMemberDied()
+{
+	for(unsigned int i=0; i<PCs.size(); i++) {
+		if(PCs[i]->InternalFlags&IF_JUSTDIED)
+			return true;
+	}
+	return false;
 }
 
