@@ -1,14 +1,38 @@
 2DA V1.0
 *
-           NAME_REF   DESC_REF   ID         HUMAN      ELF        HALF_ELF   DWARF      HALFLING   GNOME      HALFORC    
-BARBARIAN  31         37         1          1          1          1          1          1          1          1          
-BARD       7206       9562       2          1          1          1          1          1          1          1          
-CLERIC     7204       9559       3          1          1          1          1          1          1          1          
-DRUID      7210       9560       4          1          1          1          1          0          0          0          
-FIGHTER    7201       9556       5          1          1          1          1          1          1          1          
-MONK       30         36         6          1          0          0          0          0          0          0          
-PALADIN    7217       9558       7          1          0          1          0          0          0          0          
-RANGER     7200       9557       8          1          1          1          0          0          0          0          
-ROGUE      7202       9561       9          1          1          1          1          1          1          1          
-SORCERER   29         35         10         1          1          1          0          0          0          0          
-WIZARD     7203       10942      11         1          1          1          0          0          2          0          
+                 NAME_REF   DESC_REF   ID         CLASS      CLAB       SAVE       HUMAN      ELF        HALF_ELF   DWARF      HALFLING   GNOME      HALFORC    
+BARBARIAN        34         37         1          0          CLABFI05   SAVEWAR    1          1          1          1          1          1          1          
+BARD             1083       9562       2          0          CLABBA01   SAVEBRD    1          1          1          1          1          1          1          
+CLERIC           1079       9559       3          0          CLABPR01   SAVEPRS    1          1          1          1          1          1          1          
+DRUID            1080       9560       4          0          CLABDR01   SAVEPRS    1          1          1          1          1          1          1          
+FIGHTER          10174      9556       5          0          CLABFI01   SAVEWAR    1          1          1          1          1          1          1          
+MONK             33         36         6          0          CLABMO01   SAVEMONK   1          1          1          1          1          1          1          
+PALADIN          1078       9558       7          0          CLABPA01   SAVEWAR    1          1          1          1          1          1          1          
+RANGER           1077       9557       8          0          CLABRN01   SAVEWAR    1          1          1          1          1          1          1          
+ROGUE            1082       9561       9          0          CLABTH01   SAVEROG    1          1          1          1          1          1          1          
+SORCERER         32         35         10         0          CLABSR01   SAVEWIZ    1          1          1          1          1          1          1          
+WIZARD           9987       9563       11         0          CLABMA01   SAVEWIZ    1          1          1          1          1          1          1          
+PALADIN_ILMATER  36875      39407      1          7          CLABPA01   SAVEWAR    1          1          1          1          1          1          1          
+PALADIN_HELM     36872      39408      2          7          CLABPA01   SAVEWAR    1          1          1          1          1          1          1          
+PALADIN_MYSTRA   36873      39409      4          7          CLABPA01   SAVEWAR    1          1          1          1          1          1          1          
+MONK_OLD_ORDER   36877      39410      8          6          CLABMO01   SAVEMONK   1          1          1          1          1          1          1          
+MONK_BROKEN_ONES 36878      39411      0x10       6          CLABMO01   SAVEMONK   1          1          1          1          1          1          1          
+MONK_DARK_MOON   36879      39412      0x20       6          CLABMO01   SAVEMONK   1          1          1          1          1          1          1          
+MAGE_ABJURER     38103      39412      0x40       11         CLABMA02   SAVEWIZ    1          1          1          1          1          1          1          
+MAGE_CONJURER    504        9565       0x80       11         CLABMA06   SAVEWIZ    1          1          1          1          1          1          1          
+MAGE_DIVINER     2012       9566       0x100      11         CLABMA05   SAVEWIZ    1          1          1          1          1          1          1          
+MAGE_ENCHANTER   2022       9567       0x200      11         CLABMA09   SAVEWIZ    1          1          1          1          1          1          1          
+MAGE_EVOKER      12786      9569       0x800      11         CLABMA07   SAVEWIZ    1          1          1          1          1          1          1          
+MAGE_ILLUSIONIST 12785      9568       0x400      11         CLABMA08   SAVEWIZ    1          1          1          1          1          1          1          
+MAGE_NECROMANCER 12787      9570       0x1000     11         CLABMA03   SAVEWIZ    1          1          1          1          1          1          1          
+MAGE_TRANSMUTER  12788      9571       0x2000     11         CLABMA04   SAVEWIZ    1          1          1          1          1          1          1          
+MAGE_GENERALIST  9987       9563       0x4000     11         CLABMA01   SAVEWIZ    1          1          1          1          1          1          1          
+CLERIC_ILMATER   38097      38118      0x8000     3          CLABCL01   SAVEPRS    1          1          1          1          1          1          1          
+CLERIC_LATHANDER 38098      38119      0x10000    3          CLABCL02   SAVEPRS    1          1          1          1          1          1          1          
+CLERIC_SELUNE    38099      38120      0x20000    3          CLABCL03   SAVEPRS    1          1          1          1          1          1          1          
+CLERIC_HELM      38100      38121      0x40000    3          CLABCL04   SAVEPRS    1          1          1          1          1          1          1          
+CLERIC_OGHMA     38101      38122      0x80000    3          CLABCL05   SAVEPRS    1          1          1          1          1          1          1          
+CLERIC_TEMPUS    38102      38123      0x100000   3          CLABCL06   SAVEPRS    1          1          1          1          1          1          1          
+CLERIC_BANE      38103      38124      0x200000   3          CLABCL07   SAVEPRS    1          1          1          1          1          1          1          
+CLERIC_MASK      38106      38125      0x400000   3          CLABCL08   SAVEPRS    1          1          1          1          1          1          1          
+CLERIC_TALOS     38107      38126      0x800000   3          CLABCL09   SAVEPRS    1          1          1          1          1          1          1          
