@@ -55,6 +55,7 @@ public:
   /** Opens a Table File */
   virtual bool Open(DataStream * stream, bool autoFree = false) = 0;
   /** Returns a Row Name, returns NULL on error */
+  virtual inline int GetRowIndex(const char *rowname) const = 0;
   virtual inline char *GetRowName(int index) const = 0;
 };
 

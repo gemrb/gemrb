@@ -160,7 +160,7 @@ static PyObject * GemRB_GetTableValue(PyObject */*self*/, PyObject *args)
 			return NULL;
 		if((ret[0] >= '0') && (ret[0] <= '9')) {
 			if(ret[1] == 'x') {
-				int val;
+				unsigned int val;
 				sscanf(ret, "0x%x", &val);
 				return Py_BuildValue("i", val);
 			}
@@ -200,6 +200,23 @@ static PyObject * GemRB_FindTableValue(PyObject */*self*/, PyObject *args)
 	return Py_BuildValue("i",-1); //row not found
 }
 
+static PyObject * GemRB_GetTableRowIndex(PyObject */*self*/, PyObject *args)
+{
+	int ti;
+	char *rowname;
+
+	if(!PyArg_ParseTuple(args, "is", &ti, &rowname)) {
+		printMessage("GUIScript", "Syntax Error: GetTableRowIndex(TableIndex, RowName)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	TableMgr * tm = core->GetTable(ti);
+	if(tm == NULL)
+		return NULL;
+	int row = tm->GetRowIndex(rowname);
+	//no error if the row doesn't exist
+	return Py_BuildValue("i", row);
+}
 static PyObject * GemRB_GetTableRowName(PyObject */*self*/, PyObject *args)
 {
 	int ti, row;
@@ -934,6 +951,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"FindTableValue", GemRB_FindTableValue, METH_VARARGS,
      "Returns the first rowcount of a field of a 2DA Table."},
+
+	{"GetTableRowIndex", GemRB_GetTableRowIndex, METH_VARARGS,
+     "Returns the Index of a Row in a 2DA Table."},
 
 	{"GetTableRowName", GemRB_GetTableRowName, METH_VARARGS,
      "Returns the Name of a Row in a 2DA Table."},
