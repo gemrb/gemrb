@@ -113,7 +113,7 @@ AC_CHECK_PTHREADS
 
 AC_C_CONST
 AC_C_INLINE
-AC_C_RESTRICT
+#AC_C_RESTRICT
 AC_C_VOLATILE
 AC_FUNC_CLOSEDIR_VOID
 AC_FUNC_MALLOC
@@ -138,7 +138,7 @@ CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wstrict-prototypes -Wmissing-prototypes -W
 
 AC_SUBST(LIBS)
 
-AC_OUTPUT(./Makefile
+AC_OUTPUT(Makefile
 gemrb/Makefile 
 gemrb/Config/Makefile 
 gemrb/includes/Makefile 
@@ -150,6 +150,7 @@ gemrb/override/iwd/Makefile
 gemrb/override/iwd2/Makefile
 gemrb/override/pst/Makefile
 gemrb/override/tob/Makefile
+gemrb/override/test1/Makefile
 gemrb/GUIScripts/Makefile
 gemrb/GUIScripts/bg1/Makefile
 gemrb/GUIScripts/bg2/Makefile
@@ -158,6 +159,7 @@ gemrb/GUIScripts/iwd/Makefile
 gemrb/GUIScripts/iwd2/Makefile
 gemrb/GUIScripts/pst/Makefile
 gemrb/GUIScripts/tob/Makefile
+gemrb/GUIScripts/test1/Makefile
 gemrb/plugins/Makefile 
 gemrb/plugins/2DAImporter/Makefile 
 gemrb/plugins/ACMImporter/Makefile 
