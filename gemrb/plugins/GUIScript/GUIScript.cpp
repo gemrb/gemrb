@@ -571,6 +571,24 @@ static PyObject * GemRB_UnloadWindow(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_InvalidateWindow(PyObject *self, PyObject *args)
+{
+	int WindowIndex;
+
+	if(!PyArg_ParseTuple(args, "i", &WindowIndex)) {
+		printMessage("GUIScript", "Syntax Error: UnloadWindow(WindowIndex)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(!win)
+		return NULL;
+	win->Invalidate();
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_CreateLabel(PyObject *self, PyObject *args)
 {
 	int WindowIndex, ControlID, x, y, w, h, align;
@@ -595,6 +613,30 @@ static PyObject * GemRB_CreateLabel(PyObject *self, PyObject *args)
 	lbl->SetText(text);
 	lbl->SetAlignment(align);
 	win->AddControl(lbl);
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_SetLabelUseRGB(PyObject *self, PyObject *args)
+{
+	int WindowIndex, ControlIndex, status;
+
+	if(!PyArg_ParseTuple(args, "iii", &WindowIndex, &ControlIndex, &status)) {
+		printMessage("GUIScript", "Syntax Error: UnloadWindow(WindowIndex)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(!win)
+		return NULL;
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(!ctrl)
+		return NULL;
+	if(ctrl->ControlType != 6)
+		return NULL;
+	Label * lab = (Label*)ctrl;
+	lab->useRGB = status;
 	
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -963,6 +1005,9 @@ static PyMethodDef GemRBMethods[] = {
 	{"SetButtonPicture", GemRB_SetButtonPicture, METH_VARARGS,
      "Sets the Picture of a Button Control."},
 
+ 	{"SetLabelUseRGB", GemRB_SetLabelUseRGB, METH_VARARGS,
+     "Tells a Label to use the RGB colors with the text."},
+
 	{"PlaySound", GemRB_PlaySound, METH_VARARGS,
      "Plays a Sound."},
 
@@ -1001,6 +1046,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"Roll", GemRB_Roll, METH_VARARGS,
      "Calls traditional dice roll."},
+
+	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
+	 "Invalidated the given Window."},
 
     {NULL, NULL, 0, NULL}
 };
