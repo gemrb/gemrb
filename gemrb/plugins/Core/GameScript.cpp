@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.116 2004/03/23 18:25:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.117 2004/03/23 19:08:28 avenger_teambg Exp $
  *
  */
 
@@ -51,7 +51,7 @@ static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
-static int InDebug = 0;
+static int InDebug = 1;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -904,12 +904,12 @@ Trigger* GameScript::ReadTrigger(DataStream* stream)
 	stream->ReadLine( line, 1024 );
 	Trigger* tR = new Trigger();
 	if (strcmp( core->GameType, "pst" ) == 0) {
-		sscanf( line, "%d %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB",
+		sscanf( line, "%hd %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
 			&tR->int1Parameter, &tR->int2Parameter, &tR->XpointParameter,
 			&tR->YpointParameter, tR->string0Parameter, tR->string1Parameter );
 	} else {
-		sscanf( line, "%d %d %d %d %d \"%[^\"]\" \"%[^\"]\" OB",
+		sscanf( line, "%hd %d %d %d %d \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
 			&tR->int1Parameter, &tR->int2Parameter, tR->string0Parameter,
 			tR->string1Parameter );
@@ -1101,6 +1101,9 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	ActionFunction func = actions[aC->actionID];
 	if (func) {
+		if(InDebug) {
+			printf("Executing action: %d %s\n", aC->actionID, actionsTable->GetValue(aC->actionID));
+		}
 		Scriptable* scr = GetActorFromObject( Sender, aC->objects[0]);
 		if(scr && scr!=Sender) {
 			//this is an Action Override
@@ -1336,7 +1339,7 @@ static void ParseIdsTarget(char *&src, Object *&object)
 		else {
 			int x;
 			char symbol[64];
-			for(x=0;isalnum(*src) && x<sizeof(symbol)-1;x++) {
+			for(x=0;isalnum(*src) && x<(int)sizeof(symbol)-1;x++) {
 				symbol[x]=*src;
 				src++;
 			}
@@ -1359,7 +1362,7 @@ static void ParseObject(char *&str, char *&src, Object *&object)
 		//Object Name
 		src++;
 		int i;
-		for(i=0;i<sizeof(object->objectName)-1 && *src!='"';i++)
+		for(i=0;i<(int) sizeof(object->objectName)-1 && *src!='"';i++)
 		{
 			object->objectName[i] = *src;
 			src++;
@@ -1377,12 +1380,12 @@ static void ParseObject(char *&str, char *&src, Object *&object)
 		while(Nesting++<MaxObjectNesting) {
 			char filtername[64];
 			int x;
-			for(x=0;isalnum(*src) && x<sizeof(filtername)-1;x++) {
+			for(x=0;isalnum(*src) && x<(int) sizeof(filtername)-1;x++) {
 				filtername[x]=*src;
 				src++;
 			}
 			filtername[x]=0;
-			memmove(object->objectFilters+1, object->objectFilters, sizeof(int) *(MaxObjectNesting-1) );
+			memmove(object->objectFilters+1, object->objectFilters, (int) sizeof(int) *(MaxObjectNesting-1) );
 			object->objectFilters[0]=GetIdsValue(filtername,"object");
 			if(*src!='(') {
 				break;
@@ -2088,9 +2091,11 @@ Targets *GameScript::XthNearestEnemyOf(Scriptable *Sender, Targets *parameters, 
 	Actor *ac;
 	while(i--) {
 		ac=core->GetActor(i);
+/*
 		long x = ( ac->XPos - origin->XPos );
 		long y = ( ac->YPos - origin->YPos );
 		double distance = sqrt( ( double ) ( x* x + y* y ) );
+*/
 		if(type) { //origin is PC
 			if(ac->GetStat(IE_EA) >= EVILCUTOFF) {
 				tgts->AddTarget(ac);
@@ -2106,7 +2111,7 @@ Targets *GameScript::XthNearestEnemyOf(Scriptable *Sender, Targets *parameters, 
 		delete tgts;
 		return parameters;
 	}
-	unsigned int distance=0;
+//	unsigned int distance=0;
 	//order by distance
 	ac=tgts->GetTarget(count);
 	parameters->AddTarget(ac);
@@ -2360,50 +2365,41 @@ int GameScript::BreakingPoint(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::Happiness(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	int value=GetHappiness(Sender, core->GetGame()->Reputation );
 	return value == parameters->int0Parameter;
 }
 
 int GameScript::HappinessGT(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	int value=GetHappiness(Sender, core->GetGame()->Reputation );
 	return value > parameters->int0Parameter;
 }
 
 int GameScript::HappinessLT(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	int value=GetHappiness(Sender, core->GetGame()->Reputation );
 	return value < parameters->int0Parameter;
 }
 
 int GameScript::Reputation(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	return core->GetGame()->Reputation == parameters->int0Parameter;
+	return core->GetGame()->Reputation == (unsigned int) parameters->int0Parameter;
 }
 
 int GameScript::ReputationGT(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	return core->GetGame()->Reputation > parameters->int0Parameter;
+	return core->GetGame()->Reputation > (unsigned int) parameters->int0Parameter;
 }
 
 int GameScript::ReputationLT(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	return core->GetGame()->Reputation < parameters->int0Parameter;
+	return core->GetGame()->Reputation < (unsigned int) parameters->int0Parameter;
 }
 
 int GameScript::Alignment(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr) {
-		scr = Sender;
-	}
-	if (scr->Type != ST_ACTOR) {
+	if (!scr || scr->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
@@ -2413,11 +2409,8 @@ int GameScript::Alignment(Scriptable* Sender, Trigger* parameters)
 int GameScript::Allegiance(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr) {
-		scr = Sender;
-	}
-	if (scr->Type != ST_ACTOR) {
-		return false;
+	if (!scr || scr->Type != ST_ACTOR) {
+		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
 	return ID_Allegiance( actor, parameters->int0Parameter);
@@ -2426,12 +2419,10 @@ int GameScript::Allegiance(Scriptable* Sender, Trigger* parameters)
 int GameScript::Class(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if(!scr) {
-		scr = Sender;
-	}
-	if(scr->Type != ST_ACTOR)
+	if (!scr || scr->Type != ST_ACTOR) {
 		return 0;
-	Actor * actor = (Actor*)scr;
+	}
+	Actor* actor = (Actor*)scr;
 	return ID_Class( actor, parameters->int0Parameter);
 }
 
@@ -2572,7 +2563,7 @@ int GameScript::BitCheck(Scriptable* Sender, Trigger* parameters)
 int GameScript::BitCheckExact(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
-	return (value & parameters->int0Parameter ) ==parameters->int0Parameter;
+	return (value & parameters->int0Parameter ) ==(unsigned long) parameters->int0Parameter;
 }
 
 //BM_OR would make sense only if this trigger changes the value of the variable
@@ -2619,40 +2610,40 @@ int GameScript::Xor(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::Global(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
+	long value = CheckVariable(Sender, parameters->string0Parameter );
 	return ( value == parameters->int0Parameter );
 }
 
 int GameScript::GlobalLT(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
+	long value = CheckVariable(Sender, parameters->string0Parameter );
 	return ( value < parameters->int0Parameter );
 }
 
 int GameScript::GlobalLTGlobal(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
+	long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	long value2 = CheckVariable(Sender, parameters->string1Parameter );
 	return ( value1 < value2 );
 }
 
 int GameScript::GlobalGT(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
+	long value = CheckVariable(Sender, parameters->string0Parameter );
 	return ( value > parameters->int0Parameter );
 }
 
 int GameScript::GlobalGTGlobal(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
+	long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	long value2 = CheckVariable(Sender, parameters->string1Parameter );
 	return ( value1 > value2 );
 }
 
 int GameScript::GlobalsEqual(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
+	long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	long value2 = CheckVariable(Sender, parameters->string1Parameter );
 	return ( value1 == value2 );
 }
 
@@ -3265,7 +3256,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		case ST_DOOR:
 		{
 			Door *door =(Door *) tar;
-			return (door->Flags&1) == parameters->int0Parameter;
+			return (int) (door->Flags&1) == parameters->int0Parameter;
 		}
 		case ST_CONTAINER:
 		{
@@ -3469,17 +3460,17 @@ int GameScript::LevelPartyGT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::PartyGold(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->PartyGold==parameters->int0Parameter;
+	return core->GetGame()->PartyGold==(unsigned long) parameters->int0Parameter;
 }
 
 int GameScript::PartyGoldGT(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->PartyGold>parameters->int0Parameter;
+	return core->GetGame()->PartyGold>(unsigned long) parameters->int0Parameter;
 }
 
 int GameScript::PartyGoldLT(Scriptable* Sender, Trigger* parameters)
 {
-	return core->GetGame()->PartyGold<parameters->int0Parameter;
+	return core->GetGame()->PartyGold<(unsigned long) parameters->int0Parameter;
 }
 
 int GameScript::OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters)
@@ -4608,6 +4599,10 @@ void GetPositionFromScriptable(Scriptable* scr, unsigned short& X,
 	unsigned short& Y)
 {
 	switch (scr->Type) {
+		case ST_AREA:
+		case ST_GLOBAL:
+			X = Y = 0;
+			break;
 		case ST_TRIGGER:
 		case ST_PROXIMITY:
 		case ST_TRAVEL:
@@ -4978,13 +4973,12 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value = CheckVariable( Sender, parameters->string0Parameter );
+	long value = CheckVariable( Sender, parameters->string0Parameter );
 	char varname[33]; //this is the Token Name
 	strncpy( varname, parameters->string1Parameter, 32 );
 	varname[32] = 0;
-	printf( "SetTokenGlobal: %d -> %s\n", value, varname );
 	char tmpstr[10];
-	sprintf( tmpstr, "%d", value );
+	sprintf( tmpstr, "%ld", value );
 	char* newvalue = ( char* ) malloc( strlen( tmpstr ) + 1 );
 	strcpy( newvalue, tmpstr );
 	core->GetTokenDictionary()->SetAt( varname, newvalue );
@@ -5160,8 +5154,7 @@ void GameScript::GlobalXor(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalMax(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+	long value1 = CheckVariable( Sender, parameters->string0Parameter );
 	if (value1 > parameters->int0Parameter) {
 		SetVariable( Sender, parameters->string0Parameter, value1 );
 	}
@@ -5169,8 +5162,7 @@ void GameScript::GlobalMax(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalMin(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
-							parameters->string0Parameter );
+	long value1 = CheckVariable( Sender, parameters->string0Parameter );
 	if (value1 < parameters->int0Parameter) {
 		SetVariable( Sender, parameters->string0Parameter, value1 );
 	}

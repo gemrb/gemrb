@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.84 2004/03/23 18:25:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.85 2004/03/23 19:08:28 avenger_teambg Exp $
  *
  */
 
@@ -42,7 +42,7 @@ class Action;
 #define GSASSERT(f,c) \
   if(!(f))  \
   {  \
-  printf("Assertion failed: %s [0x%08X] Line %d",#f, c, __LINE__); \
+  printf("Assertion failed: %s [0x%08lX] Line %d",#f, c, __LINE__); \
 		abort(); \
   }
 
@@ -74,16 +74,16 @@ public:
 	{
 		return objects.size();
 	};
-	Actor* GetTarget(int index)
+	Actor* GetTarget(unsigned int index)
 	{
 		if (index >= objects.size()) {
 			return NULL;
 		}
 		return objects.at( index );
 	};
-	void RemoveTargetAt(int index)
+	void RemoveTargetAt(unsigned int index)
 	{
-		if(index>objects.size() ) {
+		if (index > objects.size() ) {
 			return;
 		}
 		std::vector< Actor*>::iterator m=objects.begin()+index;
@@ -124,7 +124,7 @@ public:
 		memset( objectFilters, 0, MAX_NESTING * sizeof( int ) );
 		memset( objectRect, 0, 4 * sizeof( int ) );
 
-		canary = 0xdeadbeef;
+		canary = (unsigned long) 0xdeadbeef;
 	};
 	~Object()
 	{
@@ -140,7 +140,7 @@ private:
 public:
 	void Release()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if (!RefCount) {
 			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__ );
@@ -153,7 +153,7 @@ public:
 	}
 	void IncRef()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
 		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
@@ -171,7 +171,7 @@ public:
 		RefCount = 1;
 		string0Parameter[0] = 0;
 		string1Parameter[0] = 0;
-		canary = 0xdeadbeef;
+		canary = (unsigned long) 0xdeadbeef;
 	};
 	~Trigger()
 	{
@@ -196,7 +196,7 @@ private:
 public:
 	void Release()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if (!RefCount) {
 			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__ );
@@ -209,7 +209,7 @@ public:
 	}
 	void IncRef()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
 		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
@@ -226,7 +226,7 @@ public:
 		RefCount = 1;
 		triggers = NULL;
 		triggersCount = 0;
-		canary = 0xdeadbeef;
+		canary = (unsigned long) 0xdeadbeef;
 	};
 	~Condition()
 	{
@@ -250,7 +250,7 @@ private:
 public:
 	void Release()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if (!RefCount) {
 			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__ );
@@ -263,7 +263,7 @@ public:
 	}
 	void IncRef()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
 		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
@@ -289,7 +289,7 @@ public:
 		int1Parameter = 0;
 		int2Parameter = 0;
 		RefCount = 1;
-		canary = 0xdeadbeef;
+		canary = (unsigned long) 0xdeadbeef;
 	};
 	~Action()
 	{
@@ -315,7 +315,7 @@ private:
 public:
 	void Release()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if (!RefCount) {
 			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__ );
@@ -328,7 +328,7 @@ public:
 	}
 	void IncRef()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
 		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
@@ -347,7 +347,7 @@ public:
 		actions = NULL;
 		weight = 0;
 		actionsCount = 0;
-		canary = 0xdeadbeef;
+		canary = (unsigned long) 0xdeadbeef;
 	};
 	~Response()
 	{
@@ -371,7 +371,7 @@ private:
 public:
 	void Release()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if (!RefCount) {
 			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__ );
@@ -384,7 +384,7 @@ public:
 	}
 	void IncRef()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
 		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
@@ -401,7 +401,7 @@ public:
 		RefCount = 1;
 		responses = NULL;
 		responsesCount = 0;
-		canary = 0xdeadbeef;
+		canary = (unsigned long) 0xdeadbeef;
 	};
 	~ResponseSet()
 	{
@@ -424,7 +424,7 @@ private:
 public:
 	void Release()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if (!RefCount) {
 			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__ );
@@ -437,7 +437,7 @@ public:
 	}
 	void IncRef()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
 		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
@@ -454,7 +454,7 @@ public:
 		RefCount = 1;
 		condition = NULL;
 		responseSet = NULL;
-		canary = 0xdeadbeef;
+		canary = (unsigned long) 0xdeadbeef;
 	};
 	~ResponseBlock()
 	{
@@ -474,7 +474,7 @@ private:
 public:
 	void Release()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if (!RefCount) {
 			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__ );
@@ -487,7 +487,7 @@ public:
 	}
 	void IncRef()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
 		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
@@ -501,7 +501,7 @@ class GEM_EXPORT Script {
 public:
 	Script(const char* ScriptName)
 	{
-		canary = 0xdeadbeef;
+		canary = (unsigned long) 0xdeadbeef;
 		RefCount = 1;
 		responseBlocks = NULL;
 		responseBlocksCount = 0;
@@ -555,7 +555,7 @@ private:
 public:
 	void Release()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if (!RefCount) {
 			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__ );
@@ -568,7 +568,7 @@ public:
 	}
 	void IncRef()
 	{
-		GSASSERT( canary == 0xdeadbeef, canary );
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
 		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
