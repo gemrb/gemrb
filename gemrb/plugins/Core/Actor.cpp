@@ -25,7 +25,7 @@ Actor::Actor(unsigned short AnimationID)
 
 	char tmp[7];
 	sprintf(tmp, "0x%04X", AnimationID);
-	int AvatarTable = core->LoadTable("Avatars");
+	int AvatarTable = core->LoadTable("avatars");
 	TableMgr * at = core->GetTable(AvatarTable);
 	int RowIndex = at->GetRowIndex(tmp);
 	if(RowIndex < 0) {
