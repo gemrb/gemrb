@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.150 2004/04/13 19:38:22 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.151 2004/04/14 14:06:50 avenger_teambg Exp $
  *
  */
 
@@ -277,12 +277,12 @@ int Interface::Init()
 	strcpy( strpath, GamePath );
 	strcat( strpath, dialogtlk );
 	FileStream* fs = new FileStream();
-	if (!fs->Open( strpath )) {
+	if (!fs->Open( strpath, true )) { //using AUTOFREE
 		dialogtlk[0] = 'D';
 		strcpy( strpath, GamePath );
 		strcat( strpath, dialogtlk );
 	}
-	if (!fs->Open( strpath )) {
+	if (!fs->Open( strpath, true )) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find Dialog.tlk.\nTermination in Progress...\n" );
 		delete( fs );
@@ -418,7 +418,9 @@ int Interface::Init()
 		GameNameResRef[i] = 0;
 	}
 	// FIXME: ugly hack
-	vars->SetAt( strdup( "SkipIntroVideos" ), (unsigned long)SkipIntroVideos );
+//	vars->SetAt( strdup( "SkipIntroVideos" ), (unsigned long)SkipIntroVideos );
+	//no need of strdup, variables do copy the key!
+	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Initializing Token Dictionary...", WHITE );
