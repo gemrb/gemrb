@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.82 2003/12/10 15:22:20 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.83 2003/12/12 23:07:35 balrog994 Exp $
  *
  */
 
@@ -1697,11 +1697,14 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 		printf("Set animation complete: 0x%0x\n",AnimID);
 		MyActor->actor->SetAnimationID(AnimID);
 	}
+	else {
+		MyActor->AnimID = IE_ANI_PST_START;
+	}
 	MyActor->actor->Init();
-	int saindex = core->LoadTable("STARTARE");
+	int saindex = core->LoadTable("STARTPOS");
 	TableMgr * strta = core->GetTable(saindex);
-	MyActor->XPos = MyActor->XDes = atoi(strta->QueryField(1));
-	MyActor->YPos = MyActor->YDes = atoi(strta->QueryField(2));
+	MyActor->XPos = MyActor->XDes = atoi(strta->QueryField(0));
+	MyActor->YPos = MyActor->YDes = atoi(strta->QueryField(1));
 	MyActor->actor->anims->DrawCircle = false;
 	core->GetGame()->SetPC(MyActor);
 	core->DelTable(saindex);
