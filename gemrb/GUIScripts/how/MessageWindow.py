@@ -1,4 +1,30 @@
+# -*-python-*-
+# GemRB - Infinity Engine Emulator
+# Copyright (C) 2003 The GemRB Project
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.7 2004/09/21 00:20:47 edheldil Exp $
+
+
+# MessageWindow.py - scripts and GUI for main (walk) window
+
+###################################################
+
 import GemRB
+from GUICommonWindows import *
 
 MessageWindow = 0
 PortraitWindow = 0
@@ -13,7 +39,7 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUIW")
 	ActionsWindow = GemRB.LoadWindow(3)
 	PortraitWindow = GemRB.LoadWindow(26)
-	PopulatePortraitWindow()
+	PopulatePortraitWindow(PortraitWindow)
 	OptionsWindow = GemRB.LoadWindow(25)
 	MessageWindow = GemRB.LoadWindow(4)
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
@@ -33,6 +59,7 @@ def OnLoad():
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)
 	
+	SetupMenuWindowControls (OptionsWindow)
 	UpdateResizeButtons()
 	
 	GemRB.SetVisible(ActionsWindow, 1)
@@ -136,16 +163,4 @@ def UpdateResizeButtons():
 			ContractButton = GemRB.GetControl(MessageWindow, 0)
 			GemRB.SetEvent(MessageWindow, ContractButton, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 	return
-
-def PopulatePortraitWindow ():
-	Window = PortraitWindow
-
-	for i in range (0,5):
-		Button = GemRB.GetControl (Window, i)
-		GemRB.SetVarAssoc (Window, Button, "SelectedSingle", i)
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
-
-		pic = GemRB.GetPlayerPortrait (i+1,1)
-		GemRB.SetButtonPicture(Window, Button, pic)
-		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE, OP_SET)
 
