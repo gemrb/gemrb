@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.20 2004/04/04 15:49:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.21 2004/04/29 04:20:32 edheldil Exp $
  *
  */
 
@@ -61,7 +61,7 @@ Slider::~Slider()
 /** Draws the Control on the Output Display */
 void Slider::Draw(unsigned short x, unsigned short y)
 {
-	if (!Changed) {
+	if (!Changed && !((Window*)Owner)->Floating) {
 		return;
 	}
 	Changed = false;

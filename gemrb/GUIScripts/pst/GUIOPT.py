@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.7 2004/04/26 15:16:57 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.8 2004/04/29 04:20:33 edheldil Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -705,7 +705,7 @@ def OpenMoviesWindow ():
 	if MoviesWindow:		
 		GemRB.UnloadWindow (MoviesWindow)
 		MoviesWindow = None
-		GemRB.SetVar ("OtherWindow", OptionsWindow)
+		GemRB.SetVar ("FloatWindow", -1)
 		
 		GemRB.UnhideGUI ()
 		return
@@ -713,7 +713,7 @@ def OpenMoviesWindow ():
 	GemRB.LoadWindowPack ("GUIMOVIE")
 	# FIXME: clean the window to black
 	MoviesWindow = Window = GemRB.LoadWindow (0)
-	GemRB.SetVar ("OtherWindow", MoviesWindow)
+	GemRB.SetVar ("FloatWindow", MoviesWindow)
 
 
 	# Play Movie
