@@ -544,6 +544,9 @@ bool Interface::LoadConfig(void)
 		else if(stricmp(name, "CD5") == 0) {
 			strcpy(CD5, value);
 		}
+    else if(stricmp(name, "CD6") == 0) {
+      strcpy(CD6, value);
+    }
 	}
 	fclose(config);
 	return true;
