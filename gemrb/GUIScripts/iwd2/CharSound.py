@@ -26,7 +26,7 @@ def OnLoad():
 	SSNeverButtonB = GemRB.GetControl(CSoundWindow, 60)
 	OkButton = GemRB.GetControl(CSoundWindow, 24)
 	CancelButton = GemRB.GetControl(CSoundWindow, 25)
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18040)
+	GemRB.SetText(CSoundWindow, TextAreaControl, 18041)
 	GemRB.SetText(CSoundWindow, OkButton, 11973)
 	GemRB.SetText(CSoundWindow, CancelButton, 13727)
 	
@@ -81,33 +81,24 @@ def OnLoad():
 	GemRB.SetVisible(CSoundWindow,1)
 	return
 	
-def AmbientPress():
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18008)
+def SubtitlesPress():
+	GemRB.SetText(CSoundWindow, TextAreaControl, 18015)
 	return
 	
-def SoundEffectsPress():
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18009)
+def AttackSoundPress():
+	GemRB.SetText(CSoundWindow, TextAreaControl, 18013)
 	return
 	
-def DialoguePress():
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18010)
+def MovementSoundPress():
+	GemRB.SetText(CSoundWindow, TextAreaControl, 18014)
 	return
 	
-def MusicPress():
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18011)
+def CommandSoundPress():
+	GemRB.SetText(CSoundWindow, TextAreaControl, 18016)
 	return
 	
-def MoviesPress():
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18012)
-	return
-	
-def EnvironmentalPress():
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18022)
-	return
-	
-def CharacterSoundPress():
-	GemRB.UnloadWindow(CSoundWindow)
-	GemRB.SetNextScript("GUIOPT12")
+def SelectionSoundPress():
+	GemRB.SetText(CSoundWindow, TextAreaControl, 11352)
 	return
 	
 def OkPress():
