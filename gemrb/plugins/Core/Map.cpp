@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.139 2005/02/27 20:32:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.140 2005/03/02 22:34:43 avenger_teambg Exp $
  *
  */
 
@@ -462,7 +462,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 					actor->textDisplaying = 0;
 				}
 				if (actor->textDisplaying == 1) {
-					Font* font = core->GetFont( 9 );
+					Font* font = core->GetFont( 1 );
 					Region rgn( actor->Pos.x - 100 + viewport.x,
 						actor->Pos.y - 100 + viewport.y, 200, 400 );
 					font->Print( rgn, ( unsigned char * ) actor->overHeadText,

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.190 2005/03/02 19:36:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.191 2005/03/02 22:34:23 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -321,7 +321,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			continue;
 		}
 		if (infoTexts[i]->textDisplaying == 1) {
-			Font* font = core->GetFont( 9 );
+			Font* font = core->GetFont( 1 );
 			Region rgn( infoTexts[i]->Pos.x - 200,
 				infoTexts[i]->Pos.y - 100, 400, 400 );
 			//printf("Printing InfoText at [%d,%d,%d,%d]\n", rgn.x, rgn.y, rgn.w, rgn.h);
