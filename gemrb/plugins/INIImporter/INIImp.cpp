@@ -55,6 +55,7 @@ bool INIImp::Open(DataStream * stream, bool autoFree)
 		lastTag->AddLine(strbuf);
 	} while(true);
 	free(strbuf);
+	return true;
 }
 
 const char * INIImp::GetKeyAsString(const char * Tag, const char * Key, const char * Default)
