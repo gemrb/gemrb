@@ -57,4 +57,6 @@ typedef unsigned long DWORD;
 #define  GF_ALL_STRINGS_TAGGED	1  //bg1, pst, iwd1
 #define  GF_HAS_SONGLIST		2  //bg2
 #define  GF_MID_RES_AVATARS		3  //iwd1
+#define  GF_UPPER_BUTTON_TEXT		4 //bg2
+#define  GF_LOWER_LABEL_TEXT		5 //bg2
 #endif
