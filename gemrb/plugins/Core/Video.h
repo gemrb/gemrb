@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.17 2003/12/01 16:32:49 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.18 2003/12/04 22:04:52 balrog994 Exp $
  *
  */
 
@@ -89,6 +89,8 @@ public:
 	virtual void ConvertToGame(short &x, short &y) = 0;
 	/** */
 	virtual Sprite2D * PrecalculatePolygon(Point * points, int count, Color &color) = 0;
+	/** Sets the Fading to Black Percentage */
+	virtual void SetFadePercent(int percent) = 0;
 public:
 	/** Event Manager Pointer */
 	EventMgr * Evnt;
