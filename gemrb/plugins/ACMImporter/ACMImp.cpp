@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.60 2005/02/23 20:47:00 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.61 2005/03/25 21:30:36 avenger_teambg Exp $
  *
  */
 
@@ -519,6 +519,10 @@ bool ACMImp::Play()
 	return true;
 }
 
+bool ACMImp::CanPlay()
+{
+	return true;
+}
 void ACMImp::ResetMusics()
 {
 	clearstreams( true );

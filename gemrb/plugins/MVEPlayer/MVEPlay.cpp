@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.15 2005/03/25 17:32:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.16 2005/03/25 21:30:39 avenger_teambg Exp $
  *
  */
 
@@ -129,7 +129,7 @@ int MVEPlay::doPlay(const DataStream* mve)
 
 	ieDword volume;
 	core->GetDictionary()->Lookup( "Volume Movie", volume );
-	MVE_sndInit( 1, volume );
+	MVE_sndInit( core->GetSoundMgr()->CanPlay()?1:-1, volume );
 	MVE_memCallbacks( malloc, free );
 	MVE_ioCallbacks( fileRead );
 	MVE_sfCallbacks( showFrame );
@@ -155,8 +155,6 @@ int MVEPlay::doPlay(const DataStream* mve)
 	}
 
 	MVE_rmEndMovie();
-	SDL_FreeSurface( g_screen );
-	g_screen = NULL;
 
 	return 0;
 }

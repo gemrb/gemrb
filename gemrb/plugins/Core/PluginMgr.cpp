@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.14 2005/02/14 19:53:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.15 2005/03/25 21:30:37 avenger_teambg Exp $
  *
  */
 
@@ -63,7 +63,6 @@ PluginMgr::PluginMgr(char* pluginpath)
 	printf( "%s\n", path );
 	if (( hFile = ( long ) _findfirst( path, &c_file ) ) == -1L) //If there is no file matching our search
 		#else
-		//strcat(path, "plugins");
 	{
 		printMessage( "PluginMgr", "Searching for plugins in: ", WHITE );
 	}
@@ -114,7 +113,6 @@ PluginMgr::PluginMgr(char* pluginpath)
 		if (fnmatch( "*.so", de->d_name, 0 ) != 0) //If the current file has no ".so" extension, skip it
 			continue;
 		strcpy( path, pluginpath );
-		//strcat(path, "plugins/");
 		strcat( path, de->d_name );
 		printBracket( "PluginMgr", LIGHT_WHITE );
 		printf( ": Loading: " );
@@ -216,14 +214,6 @@ void* PluginMgr::GetPlugin(SClass_ID plugintype)
 			return ( plugins[plugs] )->Create();
 		}
 	}
-/*
-	std::vector< ClassDesc*>::iterator plugs;
-	for (plugs = plugins.begin(); plugs != plugins.end(); ++plugs) {
-		if (( *plugs )->SuperClassID() == plugintype) {
-			return ( *plugs )->Create();
-		}
-	}
-*/
 	return NULL;
 }
 

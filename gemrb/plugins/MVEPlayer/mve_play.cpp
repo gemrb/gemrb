@@ -1,4 +1,4 @@
-/* $Id: mve_play.cpp,v 1.12 2005/02/10 22:41:06 avenger_teambg Exp $ */
+/* $Id: mve_play.cpp,v 1.13 2005/03/25 21:30:39 avenger_teambg Exp $ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -264,6 +264,24 @@ static unsigned short mve_audio_volume = 100;
 
 #endif
 
+static void free_audio_source()
+{
+	if (!alIsSource( mve_audio_source ) )
+		return;
+	// destroy the buffers
+	alSourceStop( mve_audio_source );
+	ALint nbuffers;
+	ALuint *buffers;
+
+	alGetSourcei( mve_audio_source, AL_BUFFERS_PROCESSED, &nbuffers );
+	buffers = (ALuint *) mve_alloc( nbuffers * sizeof(ALuint) );
+	alSourceUnqueueBuffers( mve_audio_source, nbuffers, buffers );
+	alDeleteBuffers( nbuffers, buffers );
+	mve_free( buffers );
+
+	alDeleteSources( 1, &mve_audio_source );
+}
+
 static int create_audiobuf_handler(unsigned char /*major*/, unsigned char minor,
 	unsigned char* data, int /*len*/)
 {
@@ -313,33 +331,28 @@ static int create_audiobuf_handler(unsigned char /*major*/, unsigned char minor,
 		"sample rate = %d, stereo = %d, bitsize = %d, compressed = %d\n",
 		mve_audio_samplerate, stereo, bitsize ? 16 : 8, compressed );
 
-	if (mve_audio_source && alIsSource(mve_audio_source)) {
-		alDeleteSources(1, &mve_audio_source);
-	}
-
+	free_audio_source();
 	mve_audio_source = 0;
 
-	if (mve_audio_source == 0) {
-		alGenSources( 1, &mve_audio_source );
-		ALenum error = alGetError();
-		if ( error != AL_NO_ERROR) {
-			fprintf( stderr, "   failure\n");
-		}
-
-		ALfloat SourcePos[] = {
-			0.0f, 0.0f, 0.0f
-		};
-		ALfloat SourceVel[] = {
-			0.0f, 0.0f, 0.0f
-		};
-
-		alSourcef( mve_audio_source, AL_PITCH, 1.0f );
-		alSourcef( mve_audio_source, AL_GAIN, 0.01f * mve_audio_volume );
-		alSourcefv( mve_audio_source, AL_POSITION, SourcePos );
-		alSourcefv( mve_audio_source, AL_VELOCITY, SourceVel );
-		alSourcei( mve_audio_source, AL_LOOPING, 0 );
-		alSourcei( mve_audio_source, AL_SOURCE_RELATIVE, 1 );
+	alGenSources( 1, &mve_audio_source );
+	ALenum error = alGetError();
+	if ( error != AL_NO_ERROR) {
+		fprintf( stderr, "   failure\n");
 	}
+
+	ALfloat SourcePos[] = {
+		0.0f, 0.0f, 0.0f
+	};
+	ALfloat SourceVel[] = {
+		0.0f, 0.0f, 0.0f
+	};
+
+	alSourcef( mve_audio_source, AL_PITCH, 1.0f );
+	alSourcef( mve_audio_source, AL_GAIN, 0.01f * mve_audio_volume );
+	alSourcefv( mve_audio_source, AL_POSITION, SourcePos );
+	alSourcefv( mve_audio_source, AL_VELOCITY, SourceVel );
+	alSourcei( mve_audio_source, AL_LOOPING, 0 );
+	alSourcei( mve_audio_source, AL_SOURCE_RELATIVE, 1 );
 
 	fprintf( stderr, "   success\n" );
 	mve_audio_canplay = 1;
@@ -731,18 +744,7 @@ void MVE_rmEndMovie()
 	timer_created = 0;
 
 #ifdef AUDIO
-	if (alIsSource( mve_audio_source ) ) {
-		// destroy the buffers
-		alSourceStop( mve_audio_source );
-		ALint nbuffers;
-		alGetSourcei( mve_audio_source, AL_BUFFERS_QUEUED, &nbuffers );
-		ALuint * buffers = (ALuint *) mve_alloc( nbuffers * sizeof(ALuint) );
-		alSourceUnqueueBuffers( mve_audio_source, nbuffers, buffers );
-		alDeleteBuffers( nbuffers, buffers );
-		mve_free( buffers );
-
-		alDeleteSources( 1, &mve_audio_source );
-	}
+	free_audio_source();
 	if (mve_audio_memory) {
 	        mve_free( mve_audio_memory );
 	        mve_audio_memory = NULL;
