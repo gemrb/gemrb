@@ -160,7 +160,7 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 				strcpy(path, core->CD5);
 			}
 			else {
-				printf("[KEYImporter]: Error in Bif Locator... Resource unavailable.\n");
+				printf("[KEYImporter]: Error: Cannot find Bif file... Resource unavailable.\n");
 				return NULL;
 			}
 			strcat(path, biffiles[bifnum].name);
@@ -278,7 +278,7 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 				strcpy(path, core->CD5);
 			}
 			else {
-				printf("[KEYImporter]: Error in Bif Locator... Resource unavailable.\n");
+				printf("[KEYImporter]: Error: Cannot find Bif file... Resource unavailable.\n");
 				return NULL;
 			}
 			strcat(path, biffiles[bifnum].name);

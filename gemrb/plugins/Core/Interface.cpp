@@ -185,11 +185,16 @@ int Interface::Init()
 	printStatus("OK", LIGHT_GREEN);
 	strings->Open(fs, true);
 	printMessage("Core", "Loading Palettes...\n", WHITE);
-	DataStream * bmppal256 = key->GetResource("MPAL256\0", IE_BMP_CLASS_ID);
-	DataStream * bmppal16 = key->GetResource("MPALETTE", IE_BMP_CLASS_ID);
-	pal256 = (ImageMgr*)this->GetInterface(IE_BMP_CLASS_ID);
+	DataStream * bmppal256m = NULL, * bmppal16 = NULL;
+	if(stricmp(core->GameType, "bg1") != 0) {
+		bmppal256 = key->GetResource("MPAL256\0", IE_BMP_CLASS_ID);
+		pal256 = (ImageMgr*)this->GetInterface(IE_BMP_CLASS_ID);
+		pal256->Open(bmppal256, true);
+	}
+	else
+		pal256 = NULL;
+	bmppal16 = key->GetResource("MPALETTE", IE_BMP_CLASS_ID);
 	pal16  = (ImageMgr*)this->GetInterface(IE_BMP_CLASS_ID);
-	pal256->Open(bmppal256, true);
 	pal16->Open(bmppal16, true);
 	printMessage("Core", "Palettes Loaded\n", LIGHT_GREEN);
 	printMessage("Core", "Loading Fonts...\n", WHITE);
