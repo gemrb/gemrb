@@ -22,6 +22,14 @@ extern "C" {
 
 #include "../Core/Label.h"
 
+inline bool valid_number(const char *string, long &val)
+{
+  char *endpr;
+
+  val = strtol(string, &endpr, 0);
+  return (const char *) endpr!=string;
+}
+
 static PyObject * GemRB_LoadWindowPack(PyObject */*self*/, PyObject *args)
 {
 	char *string;
@@ -158,14 +166,10 @@ static PyObject * GemRB_GetTableValue(PyObject */*self*/, PyObject *args)
 		}
 		if(ret == NULL)
 			return NULL;
-		if((ret[0] >= '0') && (ret[0] <= '9')) {
-			if(ret[1] == 'x') {
-				unsigned int val;
-				sscanf(ret, "0x%x", &val);
-				return Py_BuildValue("i", val);
-			}
-			else
-				return Py_BuildValue("i", atoi(ret));
+
+		long val;
+		if(valid_number(ret,val) ) {
+			return Py_BuildValue("l", val);
 		}
 		return Py_BuildValue("s", ret);
 	}
@@ -188,14 +192,9 @@ static PyObject * GemRB_FindTableValue(PyObject */*self*/, PyObject *args)
 		return NULL;
 	for(row = 0; row < tm->GetRowCount(); row++) {
 		char * ret = tm->QueryField(row, col);
-		if((ret[0] >= '0') && (ret[0] <= '9')) {
-			if(ret[1] == 'x')
-				sscanf(ret, "0x%lx", &val);
-			else
-				 val=atol(ret);
-			if(Value==val)
+		long val;
+		if(valid_number(ret, val) && Value==val)
 				return Py_BuildValue("i", row);
-		}
 	}
 	return Py_BuildValue("i",-1); //row not found
 }
