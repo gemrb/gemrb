@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.11 2003/12/26 13:46:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.12 2004/02/02 01:14:43 edheldil Exp $
  *
  */
 
@@ -69,6 +69,8 @@ public:
   /** Links a scrollbar to a text area */
   void Link(unsigned short SBID, unsigned short TAID);
 public: //Public attributes
+  /** WinPack */
+  char WindowPack[10];
   /** Window ID */
   unsigned short WindowID;
   /** X Position */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.68 2004/01/29 20:37:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.69 2004/02/02 01:14:43 edheldil Exp $
  *
  */
 
@@ -100,6 +100,7 @@ private:
 	std::vector<Font*> fonts;
 	EventMgr * evntmgr;
 	WindowMgr * windowmgr;
+	char WindowPack[10];
 	ScriptEngine * guiscript;
 	SoundMgr * soundmgr;
 	SaveGameIterator *sgiterator;
@@ -161,6 +162,8 @@ public:
 	int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue, int Mod);
 	/** returns the stat of a creature (mod:1-modified, 0-base) */
 	int GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod);
+	/** Loads a WindowPack (CHUI file) in the Window Manager */
+	bool LoadWindowPack(const char *name);
 	/** Loads a Window in the Window Manager */
 	int LoadWindow(unsigned short WindowID);
 	/** Sets a Window on the Top */

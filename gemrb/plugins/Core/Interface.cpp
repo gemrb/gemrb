@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.117 2004/01/29 20:37:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.118 2004/02/02 01:14:43 edheldil Exp $
  *
  */
 
@@ -1005,13 +1005,34 @@ void Interface::RedrawAll()
 	}
 }
 
+/** Loads a WindowPack (CHUI file) in the Window Manager */
+bool Interface::LoadWindowPack (const char *name)
+{
+	DataStream * stream = GetResourceMgr()->GetResource(name, IE_CHU_CLASS_ID);
+	if(stream == NULL) {
+		printMessage("Interface", "Error: Cannot find ", LIGHT_RED);
+		printf("%s.CHU\n", name);
+		return false;
+	}
+	if(!GetWindowMgr()->Open(stream, true)) {
+		printMessage("Interface", "Error: Cannot Load ", LIGHT_RED);
+		printf("%s.CHU\n", name);
+		return false;
+	}
+
+	strncpy (WindowPack, name, sizeof (WindowPack));
+	WindowPack[sizeof (WindowPack) - 1] = '\0';
+
+	return true;
+}
+
 /** Loads a Window in the Window Manager */
 int Interface::LoadWindow(unsigned short WindowID)
 {
 	for(unsigned int i = 0; i < windows.size(); i++) {
 		if(windows[i]==NULL)
 			continue;
-		if(windows[i]->WindowID == WindowID) {
+		if(windows[i]->WindowID == WindowID && ! stricmp (WindowPack, windows[i]->WindowPack) ) {
 			SetOnTop(i);
 			windows[i]->Invalidate();
 			return i;
@@ -1020,6 +1041,8 @@ int Interface::LoadWindow(unsigned short WindowID)
 	Window * win = windowmgr->GetWindow(WindowID);
 	if(win == NULL)
 		return -1;
+	strcpy (win->WindowPack, WindowPack);
+
 	int slot = -1;
 	for(unsigned int i = 0; i < windows.size(); i++) {
 		if(windows[i]==NULL) {
