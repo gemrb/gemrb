@@ -26,6 +26,10 @@ def OnLoad():
 	GemRB.SetText(PartyFormationWindow, ExitButton, 13906)
 
 	for i in range(18,24):
+		Label = GemRB.GetControl(PartyFormationWindow, 0x10000012+i)
+		#removing this label, it just disturbs us
+		GemRB.SetControlSize(PartyFormationWindow, Label, 0, 0)
+
 		CreateCharButton = GemRB.GetControl(PartyFormationWindow,i)
 		GemRB.SetEvent(PartyFormationWindow, CreateCharButton, IE_GUI_BUTTON_ON_PRESS, "CreateCharPress")
 		GemRB.SetControlStatus(PartyFormationWindow, CreateCharButton, IE_GUI_BUTTON_ENABLED)
@@ -81,7 +85,7 @@ def DonePress():
 	return
 	
 def ExitPress():
-        global PartyFormationWindow, ExitWindow
+	global PartyFormationWindow, ExitWindow
 	GemRB.SetVisible(PartyFormationWindow, 0)
 	ExitWindow = GemRB.LoadWindow(7)
 	
@@ -100,13 +104,13 @@ def ExitPress():
 	return
 
 def ExitCancelPress():
-        global PartyFormationWindow, ExitWindow
+	global PartyFormationWindow, ExitWindow
 	GemRB.UnloadWindow(ExitWindow)
 	GemRB.SetVisible(PartyFormationWindow, 1)
 	return
 
 def ExitExitPress():
-        global PartyFormationWindow, ExitWindow
+	global PartyFormationWindow, ExitWindow
 	GemRB.UnloadWindow(ExitWindow)
 	GemRB.UnloadWindow(PartyFormationWindow)
 	GemRB.SetNextScript("Start")

@@ -20,20 +20,36 @@ def OnLoad():
 
 	DoneButton = GemRB.GetControl(PartyFormationWindow, 28)
 	GemRB.SetText(PartyFormationWindow, DoneButton, 11973)
-	if GemRB.GetPartySize()==0:
-		GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
-	else:
-		GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(PartyFormationWindow,DoneButton, IE_GUI_BUTTON_ON_PRESS,"EnterGamePress")
+	Portraits = 0
 	
 	for i in range(18,24):
-		Button = GemRB.GetControl(PartyFormationWindow,i)
+		Label = GemRB.GetControl(PartyFormationWindow, 0x10000012+i)
+		#removing this label, it just disturbs us
+		GemRB.SetControlSize(PartyFormationWindow, Label, 0, 0)
+		Button = GemRB.GetControl(PartyFormationWindow, i-12)
+		ResRef = GemRB.GetPlayerPortrait(i-18, 0)
+		if ResRef == "":
+			GemRB.SetButtonFlags(PartyFormationWindow, Button, IE_GUI_BUTTON_NORMAL,OP_SET)
+		else:
+			GemRB.SetButtonPicture(PartyFormationWindow, Button, ResRef)
+			GemRB.SetButtonFlags(PartyFormationWindow, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
+			Portraits = Portraits+1
+
+		GemRB.SetVarAssoc(PartyFormationWindow, Button, "Slot",i-18)
+		GemRB.SetEvent(PartyFormationWindow, Button, IE_GUI_BUTTON_ON_PRESS, "GeneratePress")
+
+		Button = GemRB.GetControl(PartyFormationWindow, i)
 		GemRB.SetVarAssoc(PartyFormationWindow, Button, "Slot",i-18)
 		GemRB.SetText(PartyFormationWindow, Button, 10264)
 		GemRB.SetEvent(PartyFormationWindow, Button, IE_GUI_BUTTON_ON_PRESS, "GeneratePress")
 	
+	if Portraits == 0:
+		GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	else:
+		GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(PartyFormationWindow,DoneButton, IE_GUI_BUTTON_ON_PRESS,"EnterGamePress")
+
 	GemRB.SetVisible(PartyFormationWindow, 1)
-	
 	return
 	
 def ExitPress():
@@ -70,7 +86,10 @@ def ExitCancelPress():
 	
 def GeneratePress():
 	global PartyFormationWindow
-	print "SLOT:", GemRB.GetVar("Slot")
+	slot = GemRB.GetVar("Slot")
+	ResRef = GemRB.GetPlayerPortrait(slot, 0)
+	if ResRef:
+		print "Already existing slot, we should drop it"
 	GemRB.UnloadWindow(PartyFormationWindow)
 	GemRB.SetNextScript("CharGen")
 	return

@@ -30,9 +30,10 @@ IE_SUBRACE =		222
 CharGenWindow = 0
 TextAreaControl = 0
 AlignmentTable = 0
+PortraitName = ""
 
 def OnLoad():
-	global CharGenWindow, TextAreaControl, AlignmentTable
+	global CharGenWindow, TextAreaControl, AlignmentTable, PortraitName
 
 	GemRB.LoadWindowPack("GUICG")
 	CharGenWindow = GemRB.LoadWindow(0)
@@ -204,7 +205,8 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar("Ability 5"))
 	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability 6"))
 
-	GemRB.FillPlayerInfo(MyChar) #does all the rest
+	#does all the rest
+	GemRB.FillPlayerInfo(MyChar,PortraitName+"S", PortraitName+"L")
 	GemRB.SetNextScript("SPPartyFormation")
 	return
 
