@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.74 2003/11/28 17:28:47 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.75 2003/11/29 22:08:11 avenger_teambg Exp $
  *
  */
 
@@ -81,7 +81,13 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 	int startY = atoi(tm->QueryField(2,0));
 	DataStream * str = core->GetResourceMgr()->GetResource(StartArea, IE_ARE_CLASS_ID);
 	MapMgr * am = (MapMgr*)core->GetInterface(IE_ARE_CLASS_ID);
-	am->Open(str, true);
+	if(!am) {
+		return NULL;
+	}
+	if(am->Open(str, true)) {
+		printMessage("GUIScript", "Can't load area.\n", LIGHT_RED);
+		return NULL;
+	}
 	Map * map = am->GetMap();
 	int areaindex = core->GetGame()->AddMap(map);
 	gc->SetCurrentArea(areaindex);
@@ -1629,8 +1635,6 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 		poi = tm->GetRowName(PortraitIndex);
 		MyActor->SetPortrait(poi);
 	}
-	char resref[9];
-	memset(resref,0,sizeof(resref));
 	int mastertable=core->LoadTable("avprefix");
 	TableMgr * mtm = core->GetTable(mastertable);
 	int count=mtm->GetRowCount();
@@ -1638,14 +1642,11 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 		printMessage("GUIScript","Table is invalid.\n",LIGHT_RED);
 		return NULL;
 	}
-	for(int i=0;i<count;i++)
+	poi=mtm->QueryField(0);
+	int AnimID=strtoul(poi,NULL,0);
+	printf("Avatar animation base: 0x%0x",AnimID);
+	for(int i=1;i<count;i++)
 	{
-		poi=mtm->QueryField(i,1);
-		if(poi[0]!='*')
-		{
-			strncat(resref,poi,8);
-			continue;
-		}
 		poi = mtm->QueryField(i);
 		printf("Part table: %s\n",poi);
 		int table = core->LoadTable(poi);
@@ -1658,29 +1659,12 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 		printf("Value:%d\n",StatID);
 		poi = tm->QueryField(StatID);
 		printf("Part: %s\n",poi);
-		strncat(resref,poi,8);
+		AnimID+=strtoul(poi,NULL,0);
 		core->DelTable(table);
 	}
-	printf("Resref: %s\n",resref);
 	core->DelTable(mastertable);
-	mastertable = core->LoadTable("avatars");
-	printf("Got avatars\n");
-	mtm = core->GetTable(mastertable);
-	count = mtm->GetRowCount();
-	for(int i = 0; i < count; i++) {
-		char * ret = mtm->QueryField(i);
-		if(strnicmp(ret,resref,8) ) continue;
-		printf("Found avatar\n");
-		poi = mtm->GetRowName(i);
-		printf("Rowname: %s\n",poi);
-		//MyActor->BaseStats[IE_LEATHER_COLOR] = 0x1D;
-		//MyActor->BaseStats[IE_ARMOR_COLOR] = 0x4D;
-		//MyActor->BaseStats[IE_METAL_COLOR] = 0x4E;
-		MyActor->SetAnimationID(strtoul(poi,NULL,0) );
-		printf("Set animation complete\n");
-		break;
-	}
-	core->DelTable(mastertable);
+	printf("Set animation complete: 0x%0x\n",AnimID);
+	MyActor->SetAnimationID(AnimID);
 	MyActor->Init();
 	int saindex = core->LoadTable("STARTARE");
 	TableMgr * strta = core->GetTable(saindex);
