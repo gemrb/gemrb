@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.101 2003/12/29 20:09:28 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.102 2003/12/30 19:29:32 avenger_teambg Exp $
  *
  */
 
@@ -1756,41 +1756,36 @@ static PyObject *GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject *args)
 		poi = tm->GetRowName(PortraitIndex);
 		MyActor->SetPortrait(poi);
 	}
-	if(strcmp(core->GameType, "pst") != 0) {
-		int mastertable=core->LoadTable("avprefix");
-		TableMgr * mtm = core->GetTable(mastertable);
-		int count=mtm->GetRowCount();
-		if(count<4 || count>8) {
-			printMessage("GUIScript","Table is invalid.\n",LIGHT_RED);
-			return NULL;
-		}
-		poi=mtm->QueryField(0);
-		int AnimID=strtoul(poi,NULL,0);
-		printf("Avatar animation base: 0x%0x",AnimID);
-		for(int i=1;i<count;i++)
-		{
-			poi = mtm->QueryField(i);
-			printf("Part table: %s\n",poi);
-			int table = core->LoadTable(poi);
-			printf("Part table id:%d\n",table);
-			TableMgr * tm = core->GetTable(table);
-			printf("Loaded part table\n");
-			int StatID = atoi(tm->QueryField() );
-			printf("Stat ID:%d\n",StatID);
-			StatID=MyActor->GetBase(StatID);
-			printf("Value:%d\n",StatID);
-			poi = tm->QueryField(StatID);
-			printf("Part: %s\n",poi);
-			AnimID+=strtoul(poi,NULL,0);
-			core->DelTable(table);
-		}
-		core->DelTable(mastertable);
-		printf("Set animation complete: 0x%0x\n",AnimID);
-		MyActor->SetAnimationID(AnimID);
+	int mastertable=core->LoadTable("avprefix");
+	TableMgr * mtm = core->GetTable(mastertable);
+	int count=mtm->GetRowCount();
+	if(count<4 || count>8) {
+		printMessage("GUIScript","Table is invalid.\n",LIGHT_RED);
+		return NULL;
 	}
-	else {
-		MyActor->AnimID = IE_ANI_PST_START;
+	poi=mtm->QueryField(0);
+	int AnimID=strtoul(poi,NULL,0);
+	printf("Avatar animation base: 0x%0x",AnimID);
+	for(int i=1;i<count;i++)
+	{
+		poi = mtm->QueryField(i);
+		printf("Part table: %s\n",poi);
+		int table = core->LoadTable(poi);
+		printf("Part table id:%d\n",table);
+		TableMgr * tm = core->GetTable(table);
+		printf("Loaded part table\n");
+		int StatID = atoi(tm->QueryField() );
+		printf("Stat ID:%d\n",StatID);
+		StatID=MyActor->GetBase(StatID);
+		printf("Value:%d\n",StatID);
+		poi = tm->QueryField(StatID);
+		printf("Part: %s\n",poi);
+		AnimID+=strtoul(poi,NULL,0);
+		core->DelTable(table);
 	}
+	core->DelTable(mastertable);
+	printf("Set animation complete: 0x%0x\n",AnimID);
+	MyActor->SetAnimationID(AnimID);
 	MyActor->Init();
 	int saindex = core->LoadTable("STARTPOS");
 	TableMgr * strta = core->GetTable(saindex);
