@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.h,v 1.11 2004/07/24 17:20:34 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.h,v 1.12 2004/10/02 20:43:19 avenger_teambg Exp $
  *
  */
 
@@ -34,6 +34,10 @@
 #else
 #include <Python.h>
 #endif
+
+#define SV_BPP 0
+#define SV_WIDTH 1
+#define SV_HEIGHT 2
 
 class GUIScript : public ScriptEngine {
 private:

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.212 2004/10/02 10:51:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.213 2004/10/02 20:43:19 avenger_teambg Exp $
  *
  */
 
@@ -3985,7 +3985,25 @@ static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* /*args*/)
 	return Py_BuildValue( "i", core->GetDraggedItem() != NULL );
 }
 
+PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
+"GetSystemVariable(Variable)=>int\\n\n"
+"Returns the named Interface attribute." );
 
+static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
+{
+	int Variable, value;
+
+	if (!PyArg_ParseTuple( args, "i", &Variable)) {
+		return AttributeError( GemRB_DropDraggedItem__doc );
+	}
+	switch(Variable) {
+		case SV_BPP: value = core->Bpp; break;
+		case SV_WIDTH: value = core->Width; break;
+		case SV_HEIGHT: value = core->Height; break;
+		default: value = -1; break;
+	}
+	return Py_BuildValue( "i", value);
+}
 
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
@@ -4122,6 +4140,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(DragItem, METH_VARARGS),
 	METHOD(DropDraggedItem, METH_VARARGS),
 	METHOD(IsDraggingItem, METH_NOARGS),
+	METHOD(GetSystemVariable, METH_VARARGS),
 
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
