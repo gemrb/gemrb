@@ -9,6 +9,24 @@ MVEPlay::MVEPlay(void)
 {
 	str = NULL;
 	autoFree = false;
+	micro_frame_delay = 0;
+	timer_started = 0;
+	timer_expire = 0;
+
+	mve_audio_curbuf_curpos = 0;
+	mve_audio_bufhead = 0;
+	mve_audio_buftail = 0;
+	mve_audio_playing = 0;
+	mve_audio_canplay = 0;
+	mve_audio_spec = NULL;
+	mve_audio_mutex = NULL;
+
+	g_pCurMap=NULL;
+	g_nMapLength=0;
+
+	stupefaction=0;
+
+	stream = NULL;
 }
 
 MVEPlay::~MVEPlay(void)
