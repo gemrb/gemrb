@@ -1,4 +1,7 @@
 import GemRB
+import LoadScreen
+global LoadScreenWindow
+from LoadScreen import * 
 
 def OnLoad():
 	print "Testing basic guiscript functions"
@@ -19,5 +22,4 @@ def OnLoad():
 	GemRB.PlaySound("compress")
 	print "6. Enabling cheatkeys"
 	GemRB.EnableCheatKeys(1)
-	print "7. Swapping to another script"
-	GemRB.SetNextScript("LoadScreen")
+	StartLoadScreen()

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/LoadScreen.py,v 1.2 2004/08/10 16:48:06 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/LoadScreen.py,v 1.3 2004/08/10 19:54:43 avenger_teambg Exp $
 
 # LoadScreen.py - display Loading screen
 
@@ -32,16 +32,20 @@ def StartLoadScreen ():
 
 	GemRB.LoadWindowPack ("GUILS")
 	LoadScreen = GemRB.LoadWindow (0)
-	mosname = GemRB.GetVar ("LoadScreen")
+	Middle = GemRB.GetControl (LoadScreen, 3)
+	LoadPic = GemRB.GetGameString (STR_LOADMOS)
+	if LoadPic == "":
+		LoadPic = "GTRSK00"+str(GemRB.Roll(1,6,0) )
+	GemRB.SetButtonMOS (LoadScreen, Middle, LoadPic)
 	Label = GemRB.GetControl (LoadScreen, 1)
 	Progress = 0
-	GemRB.SetVar("Progress", Progress)
-	Table = GemRB.LoadTable( "loadhint" )
-	tmp = GemRB.GetTableRowCount(Table)
+	GemRB.SetVar ("Progress", Progress)
+	Table = GemRB.LoadTable ("loadhint")
+	tmp = GemRB.GetTableRowCount (Table)
 	tmp = GemRB.Roll (1,tmp,0)
-	HintStr = GemRB.GetTableValue( Table, tmp, 0 )
+	HintStr = GemRB.GetTableValue (Table, tmp, 0)
 	TextArea = GemRB.GetControl (LoadScreen, 2)
-	GemRB.SetText( LoadScreen, TextArea, HintStr )
+	GemRB.SetText (LoadScreen, TextArea, HintStr)
 	Bar = GemRB.GetControl (LoadScreen, 0)
-	GemRB.SetVarAssoc( LoadScreen, Bar, "Progress", Progress)
-	GemRB.SetVisible(LoadScreen, 1)
+	GemRB.SetVarAssoc (LoadScreen, Bar, "Progress", Progress)
+	GemRB.SetVisible (LoadScreen, 1)
