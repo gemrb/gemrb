@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.278 2005/03/16 01:42:56 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.279 2005/03/16 06:10:08 edheldil Exp $
  *
  */
 
@@ -726,8 +726,9 @@ int Interface::Init()
 
 	FogSprites[21] = NULL;
 
-	FogSprites[22] = anim->GetFrameFromCycle( 0, 6 );
+	FogSprites[22] = anim->GetFrameFromCycle( 0, 7 );
 	video->MirrorSpriteVertical( FogSprites[22], false );
+	video->MirrorSpriteHorizontal( FogSprites[22], false );
 
 	FogSprites[23] = NULL;
 
@@ -739,8 +740,9 @@ int Interface::Init()
 	FogSprites[26] = NULL;
 	FogSprites[27] = NULL;
 
-	FogSprites[28] = anim->GetFrameFromCycle( 0, 7 );
+	FogSprites[28] = anim->GetFrameFromCycle( 0, 6 );
 	video->MirrorSpriteVertical( FogSprites[28], false );
+	video->MirrorSpriteHorizontal( FogSprites[28], false );
 
 	FreeInterface( anim );
 	printStatus( "OK", LIGHT_GREEN );
