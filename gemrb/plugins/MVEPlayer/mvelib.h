@@ -68,7 +68,7 @@ int mvefile_fetch_next_chunk(MVEFILE* movie);
  * callback for segment type
  */
 typedef int (*MVESEGMENTHANDLER)(unsigned char major, unsigned char minor,
-	unsigned char* data, int len, void* context);
+	unsigned char* data, int len/*, void* context*/);
 
 /*
  * structure for maintaining an MVE stream

@@ -286,8 +286,8 @@ int mve_play_next_chunk(MVESTREAM* movie)
 			len = mvefile_get_next_segment_size( movie->movie );
 			data = mvefile_get_next_segment( movie->movie );
 
-			if (!movie->handlers[major]( major, minor, data, len,
-				movie->context ))
+			if (!movie->handlers[major]( major, minor, data, len/*,
+				movie->context*/ ))
 				return 0;
 		}
 
@@ -362,7 +362,7 @@ static int _mvefile_open(MVEFILE* file, void* stream)
 /*
  * allocate an MVEFILE
  */
-static void _mvefile_reset(MVEFILE* file)
+static void _mvefile_reset(MVEFILE* /*file*/)
 {
 #if 0
 	file->cur_chunk = NULL;

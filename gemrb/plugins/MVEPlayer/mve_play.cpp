@@ -1,4 +1,4 @@
-/* $Id: mve_play.cpp,v 1.8 2004/08/19 22:35:32 avenger_teambg Exp $ */
+/* $Id: mve_play.cpp,v 1.9 2004/08/19 22:58:26 avenger_teambg Exp $ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -97,7 +97,7 @@ static int get_int(unsigned char* data)
 static unsigned int unhandled_chunks[32 * 256];
 
 static int default_seg_handler(unsigned char major, unsigned char minor,
-	unsigned char* /*data*/, int /*len*/, void* /*context*/)
+	unsigned char* /*data*/, int /*len*/)
 {
 	unhandled_chunks[major << 8 | minor]++;
 	//fprintf(stderr, "unknown chunk type %02x/%02x\n", major, minor);
@@ -109,7 +109,7 @@ static int default_seg_handler(unsigned char major, unsigned char minor,
  * general handlers
  *************************/
 static int end_movie_handler(unsigned char /*major*/, unsigned char /*minor*/,
-	unsigned char* /*data*/, int /*len*/, void* /*context*/)
+	unsigned char* /*data*/, int /*len*/)
 {
 	return 0;
 }
@@ -162,7 +162,7 @@ int gettimeofday(struct timeval* tv, void* tz)
 
 
 static int create_timer_handler(unsigned char /*major*/, unsigned char /*minor*/,
-	unsigned char* data, int /*len*/, void* /*context*/)
+	unsigned char* data, int /*len*/)
 {
 #ifndef _WIN32 //FIXME
 	__extension__ long long temp;
@@ -264,7 +264,7 @@ static int mve_audio_underruns = 0;
 #endif
 
 static int create_audiobuf_handler(unsigned char /*major*/, unsigned char minor,
-	unsigned char* data, int /*len*/, void* /*context*/)
+	unsigned char* data, int /*len*/)
 {
 #ifdef AUDIO
 	int flags;
@@ -350,7 +350,7 @@ static int create_audiobuf_handler(unsigned char /*major*/, unsigned char minor,
 }
 
 static int play_audio_handler(unsigned char /*major*/, unsigned char /*minor*/,
-	unsigned char* /*data*/, int /*len*/, void* /*context*/)
+	unsigned char* /*data*/, int /*len*/)
 {
 #ifdef AUDIO
 	if (mve_audio_canplay &&
@@ -368,7 +368,7 @@ static int play_audio_handler(unsigned char /*major*/, unsigned char /*minor*/,
 }
 
 static int audio_data_handler(unsigned char major, unsigned char /*minor*/,
-	unsigned char* data, int /*len*/, void* /*context*/)
+	unsigned char* data, int /*len*/)
 {
 #ifdef AUDIO
 	static const int selected_chan = 1;
@@ -445,7 +445,7 @@ static int g_nMapLength = 0;
 static int g_truecolor;
 
 static int create_videobuf_handler(unsigned char /*major*/, unsigned char minor,
-	unsigned char* data, int /*len*/, void* /*context*/)
+	unsigned char* data, int /*len*/)
 {
 	short w, h;
 	short count, truecolor;
@@ -500,7 +500,7 @@ static int create_videobuf_handler(unsigned char /*major*/, unsigned char minor,
 }
 
 static int display_video_handler(unsigned char /*major*/, unsigned char /*minor*/,
-	unsigned char* /*data*/, int /*len*/, void* /*context*/)
+	unsigned char* /*data*/, int /*len*/)
 {
 	if (g_destX == -1) // center it
 	{
@@ -525,7 +525,7 @@ static int display_video_handler(unsigned char /*major*/, unsigned char /*minor*
 }
 
 static int init_video_handler(unsigned char /*major*/, unsigned char /*minor*/,
-	unsigned char* data, int /*len*/, void* /*context*/)
+	unsigned char* data, int /*len*/)
 {
 	short width, height;
 
@@ -545,7 +545,7 @@ static int init_video_handler(unsigned char /*major*/, unsigned char /*minor*/,
 }
 
 static int video_palette_handler(unsigned char /*major*/, unsigned char /*minor*/,
-	unsigned char* data, int /*len*/, void* /*context*/)
+	unsigned char* data, int /*len*/)
 {
 	short start, count;
 	unsigned char * p;
@@ -561,7 +561,7 @@ static int video_palette_handler(unsigned char /*major*/, unsigned char /*minor*
 }
 
 static int video_codemap_handler(unsigned char /*major*/, unsigned char /*minor*/,
-	unsigned char* data, int len, void* /*context*/)
+	unsigned char* data, int len)
 {
 	g_pCurMap = data;
 	g_nMapLength = len;
@@ -569,7 +569,7 @@ static int video_codemap_handler(unsigned char /*major*/, unsigned char /*minor*
 }
 
 static int video_data_handler(unsigned char /*major*/, unsigned char /*minor*/,
-	unsigned char* data, int len, void* /*context*/)
+	unsigned char* data, int len)
 {
 	short nFrameHot, nFrameCold;
 	short nXoffset, nYoffset;
@@ -604,7 +604,7 @@ static int video_data_handler(unsigned char /*major*/, unsigned char /*minor*/,
 }
 
 static int end_chunk_handler(unsigned char /*major*/, unsigned char /*minor*/,
-	unsigned char* /*data*/, int /*len*/, void* /*context*/)
+	unsigned char* /*data*/, int /*len*/)
 {
 	g_pCurMap = NULL;
 	return 1;

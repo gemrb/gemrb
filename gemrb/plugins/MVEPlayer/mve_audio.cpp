@@ -43,7 +43,7 @@ static void processSwath(short* fout, unsigned char* data, int swath,
 	}
 }
 
-void mveaudio_uncompress(short* buffer, unsigned char* data, int length)
+void mveaudio_uncompress(short* buffer, unsigned char* data, int /*length*/)
 {
 	int nCurOffsets[2];
 	int swath;
