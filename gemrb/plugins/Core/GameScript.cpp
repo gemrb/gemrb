@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.83 2004/03/11 20:26:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.84 2004/03/11 20:49:36 avenger_teambg Exp $
  *
  */
 
@@ -121,6 +121,7 @@ static ActionLink actionnames[] = {
 	{"forceaiscript",GameScript::ChangeAIScript}, //probably the same
 	{"forcespell",GameScript::ForceSpell},
 	{"givepartygold",GameScript::GivePartyGold},
+	{"givepartygoldglobal",GameScript::GivePartyGoldGlobal},
 	{"globalband",GameScript::GlobalBAnd},
 	{"globalbandglobal",GameScript::GlobalBAndGlobal},
 	{"globalbor",GameScript::GlobalBOr},
@@ -178,6 +179,7 @@ static ActionLink actionnames[] = {
 	{"triggeractivation",GameScript::TriggerActivation},
 	{"unhidegui",GameScript::UnhideGUI},
 	{"unmakeglobal",GameScript::UnMakeGlobal}, //this is a GemRB extension
+	{"verbalconstant",GameScript::VerbalConstant},
 	{"wait",GameScript::Wait, AF_BLOCKING}, { NULL,NULL}, 
 };
 
@@ -2665,6 +2667,18 @@ void GameScript::ChangeAIScript(Scriptable* Sender, Action* parameters)
 	actor->SetScript( parameters->string0Parameter, parameters->int0Parameter );
 }
 
+void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if (actor) {
+		printf( "Displaying string on: %s\n", actor->scriptName );
+		actor->DisplayHeadText( core->GetString( actor->StrRefs[parameters->int0Parameter], 2 ) );
+	}
+}
+
 void GameScript::Wait(Scriptable* Sender, Action* parameters)
 {
 	Sender->SetWait( parameters->int0Parameter * AI_UPDATE_TIME );
@@ -3247,6 +3261,17 @@ void GameScript::UnMakeGlobal(Scriptable* Sender, Action* parameters)
 	}
 }
 
+void GameScript::GivePartyGoldGlobal(Scriptable *Sender, Action *parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* act = ( Actor* ) Sender;
+	unsigned long gold = CheckVariable( Sender, parameters->string0Parameter );
+	act->NewStat(IE_GOLD, -gold, 0);
+	core->GetGame()->PartyGold+=gold;
+}
+
 void GameScript::GivePartyGold(Scriptable *Sender, Action *parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -3273,6 +3298,17 @@ void GameScript::TakePartyGold(Scriptable *Sender, Action *parameters)
 	}
 	act->NewStat(IE_GOLD, gold, 0);
 	core->GetGame()->PartyGold-=gold;
+}
+
+void GameScript::AddExperienceParty(Scriptable *Sender, Action* parameters)
+{
+	core->GetGame()->ShareXP(parameters->int0Parameter);
+}
+
+void GameScript::AddExperiencePartyGlobal(Scriptable *Sender, Action* parameters)
+{
+	unsigned long xp = CheckVariable( Sender, parameters->string0Parameter );
+	core->GetGame()->ShareXP(xp);
 }
 
 void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)

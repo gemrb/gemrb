@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.56 2004/03/11 20:26:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.57 2004/03/11 20:49:36 avenger_teambg Exp $
  *
  */
 
@@ -746,6 +746,8 @@ public: //Script Functions
 public:
 	//Actions
 	static void Activate(Scriptable* Sender, Action* parameters);
+	static void AddExperienceParty(Scriptable *Sender, Action* parameters);
+	static void AddExperiencePartyGlobal(Scriptable *Sender, Action* parameters);
 	static void AddGlobals(Scriptable* Sender, Action* parameters);
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
@@ -784,6 +786,7 @@ public:
 	static void FadeToColor(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
 	static void GivePartyGold(Scriptable* Sender, Action* parameters);
+	static void GivePartyGoldGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalAddGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalAndGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalBAnd(Scriptable* Sender, Action* parameters);
@@ -850,6 +853,7 @@ public:
 	static void TakePartyGold(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
+	static void VerbalConstant(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);
 public:
 	//Objects
