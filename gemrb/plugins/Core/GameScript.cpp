@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.96 2004/03/14 18:09:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.97 2004/03/15 14:18:08 avenger_teambg Exp $
  *
  */
 
@@ -47,8 +47,7 @@ static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
-
-static int InDebug=0;
+static int InDebug = 0;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -908,8 +907,10 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 			trigger->triggerID, tmpstr );
 		return false;
 	}
-	printf( "[IEScript]: Executing trigger code: 0x%04x %s\n",
-			trigger->triggerID, tmpstr );
+	if(InDebug) {
+		printf( "[IEScript]: Executing trigger code: 0x%04x %s\n",
+				trigger->triggerID, tmpstr );
+	}
 	int ret = func( Sender, trigger );
 	if (trigger->flags & 1) {
 		if (ret) {
@@ -993,7 +994,9 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			return;
 		}
 		else {
-			printf( "[IEScript]: Executing action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
+			if(InDebug) {
+				printf( "[IEScript]: Executing action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
+			}
 			func( Sender, aC );
 		}
 	}
@@ -1088,10 +1091,6 @@ int GameScript::GetObjectCount(Scriptable* Sender, Object* oC)
 
 Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 {
-if(InDebug)
-{
-printf("Gafo\n");
-}
 	if (!oC) {
 		return NULL;
 	}
@@ -1114,10 +1113,6 @@ printf("Gafo\n");
 	//like (Myself, Protagonist etc)
 	if(!tgts) {
 		tgts = new Targets();
-if(InDebug)
-{
-printf("Gafo created targets from scratch\n");
-}
 	}
 	for (int i = 0; i < MaxObjectNesting; i++) {
 		int filterid = oC->objectIdentifiers[i];
@@ -1131,11 +1126,6 @@ printf("Gafo created targets from scratch\n");
 		else {
 			printf("[IEScript]: Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
 		}
-if(InDebug)
-{
-printf("[IEScript]: Executing object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
-printf("filter %d resulted in %d objects\n", i, tgts->Count());
-}
 		if(!tgts->Count()) {
 			delete tgts;
 			return NULL;
@@ -1364,6 +1354,10 @@ Action* GameScript::GenerateAction(char* String)
 									*dst = 0;
 									src++;
 								} else {
+									
+									textcolor( LIGHT_RED );
+									printf( "[GenerateAction]: OBJECT TYPE NOT SUPPORTED\n" );
+									textcolor( WHITE );
 								}
 								objectCount++;
 							}
@@ -1652,10 +1646,6 @@ Targets *GameScript::Player1(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->GetPC(0));
-if(parameters->Count()!=1) {
-printf("player1 didn't work!\n");
-abort();
-}
 	return parameters;
 }
 
@@ -3710,7 +3700,6 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
 	Scriptable* tar, *scr;
 
-InDebug=true;
 	printf("BeginDialog core\n");
 	if (Flags & BD_OWN) {
 		scr = tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -3718,7 +3707,6 @@ InDebug=true;
 		tar = GetActorFromObject( Sender, parameters->objects[1] );
 		scr = Sender;
 	}
-InDebug=false;
 	if(!tar) {
 		printf("[IEScript]: Target for dialog couldn't be found.\n");
 		Sender->CurrentAction = NULL;
@@ -4293,7 +4281,9 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	Actor* act = ( Actor* ) Sender;
 	core->GetGame()->JoinParty( act );
 	act->SetStat( IE_EA, PC );
-	act->SetScript( "DPLAYER2", SCR_DEFAULT );
+	if(core->HasFeature( GF_HAS_DPLAYER ))  {
+		act->SetScript( "DPLAYER2", SCR_DEFAULT );
+	}
 	if(core->HasFeature( GF_HAS_PDIALOG )) {
 		int pdtable = core->LoadTable( "pdialog" );
 		char* scriptingname = act->GetScriptName();

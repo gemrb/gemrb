@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.135 2004/03/12 02:11:02 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.136 2004/03/15 14:18:08 avenger_teambg Exp $
  *
  */
 
@@ -1763,7 +1763,6 @@ void Interface::LoadGame(int index)
 {
 	DataStream* ds;
 
-	printf("XXXXXXXX: Interface::LoadGame: %d\n", index);
 	if (index == -1) {
 		//Load the Default Game
 		ds = GetResourceMgr()->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
@@ -1787,6 +1786,5 @@ void Interface::LoadGame(int index)
 		delete( game );
 	}
 	game = sgm->GetGame();
-	printf ("XXXXX: GAME: %p\n", game);
 	FreeInterface( sgm );
 }

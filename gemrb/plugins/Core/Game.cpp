@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.21 2004/03/11 20:48:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.22 2004/03/15 14:18:08 avenger_teambg Exp $
  *
  */
 
@@ -150,12 +150,12 @@ int Game::LeaveParty(Actor* actor)
 int Game::JoinParty(Actor* actor)
 {
 	int slot = InStore( actor );
-	if (slot < 0) {
-		return slot;
+	if (slot >= 0) {
+		std::vector< Actor*>::iterator m = NPCs.begin() + slot;
+		NPCs.erase( m );
 	}
-	std::vector< Actor*>::iterator m = NPCs.begin() + slot;
-	NPCs.erase( m );
 	PCs.push_back( actor );
+	actor->InParty = PCs.size();
 	return ( int ) PCs.size() - 1;
 }
 

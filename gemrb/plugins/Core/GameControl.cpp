@@ -260,27 +260,46 @@ int GameControl::SetText(const char* string, int pos)
 void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
 }
+
+void GameControl::SelectActor(int whom)
+{
+	for (size_t i = 0; i < selected.size(); i++) {
+		selected[i]->Select( false );
+	}
+	selected.clear();
+	Game* game = core->GetGame();
+	if(whom==-1) {
+		for(int i = 0; i < 12; i++) {
+			Actor* actor = game->GetPC( i );
+			if (actor) {
+				selected.push_back( actor );
+				actor->Select( true );
+			}
+		}
+	}
+	else {
+			Actor* actor = game->GetPC( whom );
+			if (actor) {
+				selected.push_back( actor );
+				actor->Select( true );
+			}
+	}
+}
+
 /** Key Release Event */
 void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
 	switch (Key) {
+		case '=':
+			SelectActor(-1);
+			break;
 		case '1':
 		case '2':
 		case '3':
 		case '4':
 		case '5':
 		case '6':
-			 {
-				for (size_t i = 0; i < selected.size(); i++)
-					selected[i]->Select( false );
-				selected.clear();
-				Game* game = core->GetGame();
-				Actor* actor = game->GetPC( Key - '1' );
-				if (actor) {
-					selected.push_back( actor );
-					actor->Select( true );
-				}
-			}
+			SelectActor(Key-'1');
 			break;
 		case '\t':
 			//not GEM_TAB
