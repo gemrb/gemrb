@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.180 2004/08/12 21:44:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.181 2004/08/17 16:12:34 avenger_teambg Exp $
  *
  */
 
@@ -289,6 +289,7 @@ static ActionLink actionnames[] = {
 	{"destroyself", GameScript::DestroySelf,0},
 	{"dialogue", GameScript::Dialogue,AF_BLOCKING},
 	{"dialogueforceinterrupt", GameScript::DialogueForceInterrupt,AF_BLOCKING},
+	{"displaymessage", GameScript::DisplayStringHead,0},
 	{"displaystring", GameScript::DisplayString,0},
 	{"displaystringhead", GameScript::DisplayStringHead,0},
 	{"displaystringnonamehead", GameScript::DisplayStringNoNameHead,0},
@@ -475,6 +476,7 @@ static ActionLink actionnames[] = {
 	{"takeitemreplace", GameScript::TakeItemReplace,0},
 	{"takepartygold", GameScript::TakePartyGold,0},
 	{"textscreen", GameScript::TextScreen,0},
+	{"tomsstringdisplayer", GameScript::DisplayStringHead,0},
 	{"triggeractivation", GameScript::TriggerActivation,0},
 	{"unhidegui", GameScript::UnhideGUI,0},
 	{"unloadarea", GameScript::UnloadArea,0},
