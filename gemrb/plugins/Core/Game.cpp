@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.17 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.18 2004/02/27 19:46:25 avenger_teambg Exp $
  *
  */
 
@@ -45,6 +45,16 @@ Game::~Game(void)
 	for (size_t i = 0; i < NPCs.size(); i++) {
 		delete( NPCs[i] );
 	}
+}
+
+Actor* Game::FindPC(unsigned int partyID)
+{
+	int slot;
+
+	for(slot=0; slot<PCs.size(); slot++) {
+		if(PCs[slot]->InParty==partyID) return PCs[slot];
+	}
+	return NULL;
 }
 
 Actor* Game::GetPC(unsigned int slot)
