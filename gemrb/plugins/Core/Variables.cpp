@@ -1,5 +1,3 @@
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
 #include "Variables.h"
 
 #define THIS_FILE "variables.cpp"

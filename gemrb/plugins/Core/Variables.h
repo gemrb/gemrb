@@ -24,6 +24,7 @@
 
 #include <ctype.h>
 #include "../../includes/win32def.h"
+#include "../../includes/globals.h"
 #include "../../includes/SClassID.h"
 
 #define THIS_FILE "variables.h"
@@ -108,6 +109,8 @@ protected:
 	void FreeAssoc(MyAssoc*);
 	MyAssoc* GetAssocAt(const char *, unsigned int&) const;
         unsigned int MyHashKey(const char *) const;
+        POSITION GetStartPosition() const;
+        void GetNextAssoc(POSITION& rNextPosition, char*& rKey, unsigned long& rValue) const;
 
 public:
 	~Variables();
