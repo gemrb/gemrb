@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.17 2003/12/07 12:16:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.18 2003/12/07 13:13:13 avenger_teambg Exp $
  *
  */
 
@@ -25,6 +25,38 @@
 
 static char musicsubfolder[6]="music";
 
+void ResolveFilePath(char *FilePath)
+{
+	char TempFilePath[_MAX_PATH];
+	char TempFileName[_MAX_PATH];
+	int j, pos;
+
+	TempFilePath[0]=FilePath[0];
+	for(pos=1;FilePath[pos] && FilePath[pos]!='/';pos++)
+		TempFilePath[pos]=FilePath[pos];
+	TempFilePath[pos]=0;
+	while(FilePath[pos]=='/') {
+		pos++;
+		for(j=0;FilePath[pos+j] && FilePath[pos+j]!='/';j++) {
+			TempFileName[j]=FilePath[pos+j];
+		}
+		TempFileName[j]=0;
+		pos+=j;
+		char *NewName = FindInDir(TempFilePath, TempFileName);
+		if(NewName) {
+			strcat(TempFilePath, SPathDelimiter);
+			strcat(TempFilePath, NewName);
+			free(NewName);
+		}
+		else {
+			abort();
+		}
+		printf("TempFilePath: %s\n",TempFilePath);
+	}
+	//should work (same size)
+	strcpy(FilePath,TempFilePath);
+}
+
 MUSImp::MUSImp()
 {
 	Initialized = false;
@@ -32,6 +64,7 @@ MUSImp::MUSImp()
 	str = new FileStream();
 	PLpos = 0;
 	lastSound = 0xffffffff;
+#ifndef WIN32
 	if(core->CaseSensitive) {
 		//TODO: a better, generalised function 
 		char path[_MAX_PATH];
@@ -41,6 +74,7 @@ MUSImp::MUSImp()
 			 musicsubfolder[0]=toupper(musicsubfolder[0]);
 		}
 	}
+#endif
 }
 MUSImp::~MUSImp(){
 	if(str)
@@ -162,8 +196,8 @@ bool MUSImp::OpenPlaylist(const char * name)
 			strcat(FName, musicsubfolder);
 			strcat(FName, SPathDelimiter);
 			//this is in IWD2
-			if(strnicmp(pls.PLFile, "MX0000",6)==0) {
-				strcat(FName, "MX0000");
+			if(strnicmp(pls.PLFile, "mx0000",6)==0) {
+				strcat(FName, "mx0000");
 				strcat(FName, SPathDelimiter);
 			}
 			else if(strnicmp(pls.PLFile, "SPC",3) != 0) {
@@ -173,18 +207,14 @@ bool MUSImp::OpenPlaylist(const char * name)
 			}
 			strcat(FName, pls.PLFile);
 			strcat(FName, ".acm");
-			printf("Loading: %s\n",FName);
 			pls.soundID = core->GetSoundMgr()->LoadFile(FName);
+#ifndef WIN32
 			if((pls.soundID==-1) && core->CaseSensitive) {
-				strcpy(FName, core->GamePath);
-				strcat(FName, musicsubfolder);
-				strcat(FName, SPathDelimiter);
-				char *NewName = FindInDir(FName, PLName);
-				if(NewName) {
-					strcat(FName, NewName);
-					free(NewName);
-				}
+					ResolveFilePath(FName);
+					pls.soundID = core->GetSoundMgr()->LoadFile(FName);
 			}
+#endif
+			printf("Loading: %s / %d\n",FName,pls.soundID);
 		}
 		playlist.push_back(pls);
 		count--;
