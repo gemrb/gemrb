@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.16 2004/05/09 17:36:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.17 2004/07/01 06:34:48 edheldil Exp $
  *
  */
 
@@ -121,6 +121,7 @@ char* FindInDir(char* Dir, char* Filename)
 	strcat( TempFilePath, Filename );
 
 	if (!access( TempFilePath, F_OK )) {
+		closedir( dir );
 		return strdup( Filename );
 	}
 
@@ -128,6 +129,7 @@ char* FindInDir(char* Dir, char* Filename)
 	//    with different case
 	struct dirent* de = readdir( dir );
 	if (de == NULL) {
+		closedir( dir );
 		return NULL;
 	}
 	do {
