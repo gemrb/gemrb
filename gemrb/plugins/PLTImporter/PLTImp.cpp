@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.7 2004/08/19 21:14:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.8 2004/09/14 22:11:37 avenger_teambg Exp $
  *
  */
 
@@ -67,8 +67,8 @@ bool PLTImp::Open(DataStream* stream, bool autoFree)
 	}
 
 	str->Read( unknown, 8 );
-	str->Read( &Width, 4 );
-	str->Read( &Height, 4 );
+	str->ReadDword( &Width );
+	str->ReadDword( &Height );
 
 	pixels = malloc( Width * Height * 2 );
 	str->Read( pixels, Width * Height * 2 );
