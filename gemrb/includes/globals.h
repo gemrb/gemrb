@@ -97,6 +97,7 @@ extern unsigned char pl_uppercase[256];
 extern unsigned char pl_lowercase[256];
 
 GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
+GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l);
 GEM_EXPORT unsigned char GetOrient(Point &s, Point &d);
 GEM_EXPORT unsigned int Distance(Point pos, Point pos2);
 GEM_EXPORT unsigned int Distance(Point pos, Scriptable *b);
