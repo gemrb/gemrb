@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.4 2003/12/15 09:20:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.5 2004/01/04 00:26:22 balrog994 Exp $
  *
  */
 
@@ -52,6 +52,7 @@ public:
 	int DelPC(unsigned int slot, bool autoFree = false);
 	Map * GetMap(unsigned int index);
 	int AddMap(Map* map);
+	int LoadMap(char *ResRef);
 	int DelMap(unsigned int index, bool autoFree = false);
 };
 

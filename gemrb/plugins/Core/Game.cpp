@@ -15,12 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.5 2003/12/15 09:20:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.6 2004/01/04 00:26:22 balrog994 Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "Game.h"
+#include "MapMgr.h"
+#include "DataStream.h"
+#include "Interface.h"
+
+extern Interface * core;
 
 Game::Game(void)
 {
@@ -85,4 +90,16 @@ int Game::DelMap(unsigned int index, bool autoFree)
 		delete(Maps[index]);
 	Maps[index] = NULL;
 	return 0;
+}
+
+int Game::LoadMap(char *ResRef)
+{
+	MapMgr * mM = (MapMgr*)core->GetInterface(IE_ARE_CLASS_ID);
+	DataStream * ds = core->GetResourceMgr()->GetResource(ResRef, IE_ARE_CLASS_ID);
+	mM->Open(ds, true);
+	Map * newMap = mM->GetMap();
+	core->FreeInterface(mM);
+	if(!newMap)
+		return -1;
+	return AddMap(newMap);
 }
