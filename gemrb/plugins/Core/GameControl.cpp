@@ -402,8 +402,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 							nextNode = thisNode->Next;
 						}
 					}
-					drawPath = core->GetPathFinder()->FindPath( pfsX, pfsY,
-														GameX, GameY );
+					drawPath = core->GetGame()->GetCurrentMap()->FindPath( pfsX, pfsY, GameX, GameY );
+
+					//drawPath = core->GetPathFinder()->FindPath( pfsX, pfsY, GameX, GameY );
 				}
 				break;
 
@@ -418,17 +419,14 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 			case 'j':
 				// j
-				 {
 					for (unsigned int i = 0; i < selected.size(); i++) {
 						Actor* actor = selected[i];
 						short cX = lastMouseX; 
 						short cY = lastMouseY;
 						core->GetVideoDriver()->ConvertToGame( cX, cY );
-						memcpy(actor->Area, core->GetGame()->CurrentArea, 9);
-						actor->SetPosition( cX, cY, true );
+						GameScript::MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, cX, cY, -1, true);
 						printf( "Teleported to %d, %d\n", cX, cY );
 					}
-				}
 				break;
 
 			case 'm':
@@ -1379,8 +1377,8 @@ void GameControl::ChangeMap()
 		delete( infoTexts[i] );
 	}
 	infoTexts.clear();
-	/* loading map and setting up pathfinder */
-	int mi = core->GetGame()->LoadMap( pc->Area, true );
+	/*this is loadmap, because we need the index, not the pointer*/
+	int mi = core->GetGame()->LoadMap( pc->Area );
 	SetCurrentArea( mi );
 	Region vp = core->GetVideoDriver()->GetViewport();
 	core->GetVideoDriver()->SetViewport( pc->XPos - ( vp.w / 2 ),

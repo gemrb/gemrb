@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.10 2004/04/19 22:05:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.11 2004/04/21 17:41:40 avenger_teambg Exp $
  *
  */
 
@@ -114,9 +114,7 @@ public:
 	/** flags: see ieCREItemFlagBits */
 	void SetItemFlags(CREItem* item, ieDword flags);
 	void SetSlotItem(CREItem* item, unsigned int slot);
-	/** returns weight of whole inventory, i.e. encumbrance? */
-	/** FIXME: but what about IWD2 containers? */
-	int GetWeight() {return 0;};
+	int GetWeight() {return Weight;}
 
 	bool ItemsAreCompatible(CREItem* target, CREItem* source);
 

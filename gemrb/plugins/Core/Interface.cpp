@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.158 2004/04/18 14:25:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.159 2004/04/21 17:41:40 avenger_teambg Exp $
  *
  */
 
@@ -79,7 +79,6 @@ Interface::Interface(int iargc, char** iargv)
 	INIbeasts = NULL;
 	INIquests = NULL;
 	game = NULL;
-	pathfinder = NULL;
 	timer = NULL;
 	console = NULL;
 	slotmatrix = NULL;
@@ -171,9 +170,6 @@ Interface::~Interface(void)
 	}
 	if (sgiterator) {
 		delete( sgiterator );
-	}
-	if (pathfinder) {
-		delete( pathfinder );
 	}
 	if (factory) {
 		delete( factory );
@@ -515,9 +511,11 @@ int Interface::Init()
 	FreeInterface( anim );
 	video->SetCursor( Cursors[0]->GetFrame( 0 ), Cursors[1]->GetFrame( 0 ) );
 	printStatus( "OK", LIGHT_GREEN );
+/*
 	printMessage( "Core", "Initializing A* PathFinder...", WHITE );
 	pathfinder = new PathFinder();
 	printStatus( "OK", LIGHT_GREEN );
+*/
 	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
 	timer = new GlobalTimer();
 	if (!timer) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.92 2004/04/20 22:34:03 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.93 2004/04/21 17:41:40 avenger_teambg Exp $
  *
  */
 
@@ -71,6 +71,7 @@ Map::Map(void)
 	: Scriptable( ST_AREA )
 {
 	tm = NULL;
+	MapSet = NULL;
 	queue[0] = NULL;
 	queue[1] = NULL;
 	queue[2] = NULL;
@@ -87,6 +88,9 @@ Map::Map(void)
 
 Map::~Map(void)
 {
+	if (MapSet) {
+		free(MapSet);
+	}
 	if (tm) {
 		delete( tm );
 	}
@@ -125,6 +129,10 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr)
 	this->tm = tm;
 	LightMap = lm;
 	SearchMap = sr;
+	Width=tm->XCellCount * 4;
+	Height=( tm->YCellCount * 64 ) / 12;
+	//Filling Matrices
+	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
 }
 
 /* this command will load the target area and set the coordinates according to the entrance string*/
@@ -134,7 +142,7 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 //check worldmap entry, if that doesn't contain anything,
 //make a random pick
 	Game* game = core->GetGame();
-	Map* map = game->GetMap(game->LoadMap(area, false));
+	Map* map = game->GetMap(area);
 	if(!map) {
 		printf("Invalid map: %s\n",area);
 		command[0]=0;
@@ -690,8 +698,8 @@ void Map::DebugDump()
 }
 
 /********************************************************************************/
-
-PathFinder::PathFinder(void)
+/*
+Map::PathFinder(void)
 {
 	MapSet = NULL;
 	area = NULL;
@@ -701,14 +709,14 @@ PathFinder::PathFinder(void)
 }
 
 
-PathFinder::~PathFinder(void)
+Map::~PathFinder(void)
 {
 	if (MapSet) {
 		free(MapSet);
 	}
 }
 
-void PathFinder::SetMap(Map *newarea)
+void Map::SetMap()
 {
 	if(area==newarea) {
 		return;
@@ -718,13 +726,10 @@ void PathFinder::SetMap(Map *newarea)
 	}
 	area=newarea;
 	sMap=area->SearchMap;
-	Width=area->tm->XCellCount * 4;
-	Height=( area->tm->YCellCount * 64 ) / 12;
-	//Filling Matrices
-	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
 }
+*/
 
-void PathFinder::Leveldown(unsigned int px, unsigned int py,
+void Map::Leveldown(unsigned int px, unsigned int py,
 	unsigned int& level, unsigned int& nx, unsigned int& ny,
 	unsigned int& diff)
 {
@@ -751,7 +756,7 @@ void PathFinder::Leveldown(unsigned int px, unsigned int py,
 	}
 }
 
-void PathFinder::SetupNode(unsigned int x, unsigned int y, unsigned int Cost)
+void Map::SetupNode(unsigned int x, unsigned int y, unsigned int Cost)
 {
 	unsigned int pos;
 
@@ -762,7 +767,7 @@ void PathFinder::SetupNode(unsigned int x, unsigned int y, unsigned int Cost)
 	if (MapSet[pos]) {
 		return;
 	}
-	if (!( Passable[sMap->GetPixelIndex( x, y )] & 3 )) {
+	if (!( Passable[SearchMap->GetPixelIndex( x, y )] & 3 )) {
 		MapSet[pos] = 65535;
 		return;
 	}
@@ -770,7 +775,7 @@ void PathFinder::SetupNode(unsigned int x, unsigned int y, unsigned int Cost)
 	InternalStack.push( ( x << 16 ) | y );
 }
 
-void PathFinder::AdjustPosition(unsigned int& goalX, unsigned int& goalY)
+void Map::AdjustPosition(unsigned int& goalX, unsigned int& goalY)
 {
 	unsigned int maxr = Width;
 	if (maxr < Height) {
@@ -792,14 +797,14 @@ void PathFinder::AdjustPosition(unsigned int& goalX, unsigned int& goalY)
 
 		for (unsigned int scanx = minx; scanx < maxx; scanx++) {
 			if (goalY >= radius) {
-				if (Passable[sMap->GetPixelIndex( scanx, goalY - radius )] & 3) {
+				if (Passable[SearchMap->GetPixelIndex( scanx, goalY - radius )] & 3) {
 					goalX = scanx;
 					goalY -= radius;
 					return;
 				}
 			}
 			if (goalY + radius < Height) {
-				if (Passable[sMap->GetPixelIndex( scanx, goalY + radius )] & 3) {
+				if (Passable[SearchMap->GetPixelIndex( scanx, goalY + radius )] & 3) {
 					goalX = scanx;
 					goalY += radius;
 					return;
@@ -814,14 +819,14 @@ void PathFinder::AdjustPosition(unsigned int& goalX, unsigned int& goalY)
 			maxy = Height;
 		for (unsigned int scany = miny; scany < maxy; scany++) {
 			if (goalX >= radius) {
-				if (Passable[sMap->GetPixelIndex( goalX - radius, scany )] & 3) {
+				if (Passable[SearchMap->GetPixelIndex( goalX - radius, scany )] & 3) {
 					goalX -= radius;
 					goalY = scany;
 					return;
 				}
 			}
 			if (goalX + radius < Width) {
-				if (Passable[sMap->GetPixelIndex( goalX - radius, scany )] & 3) {
+				if (Passable[SearchMap->GetPixelIndex( goalX - radius, scany )] & 3) {
 					goalX += radius;
 					goalY = scany;
 					return;
@@ -832,7 +837,7 @@ void PathFinder::AdjustPosition(unsigned int& goalX, unsigned int& goalY)
 }
 
 //run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
-PathNode* PathFinder::RunAway(short sX, short sY, short dX, short dY, unsigned int PathLen, bool Backing)
+PathNode* Map::RunAway(short sX, short sY, short dX, short dY, unsigned int PathLen, bool Backing)
 {
 	unsigned int startX = sX / 16, startY = sY / 12;
 	unsigned int goalX = dX / 16, goalY = dY / 12;
@@ -842,7 +847,7 @@ PathNode* PathFinder::RunAway(short sX, short sY, short dX, short dY, unsigned i
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[sMap->GetPixelIndex( startX, startY )] & 3 )) {
+	if (!( Passable[SearchMap->GetPixelIndex( startX, startY )] & 3 )) {
 		AdjustPosition( startX, startY );
 	}
 	unsigned int pos = ( startX << 16 ) | startY;
@@ -931,7 +936,7 @@ PathNode* PathFinder::RunAway(short sX, short sY, short dX, short dY, unsigned i
 	return Return;
 }
 
-bool PathFinder::TargetUnreachable(short sX, short sY, short dX, short dY)
+bool Map::TargetUnreachable(short sX, short sY, short dX, short dY)
 {
 	unsigned int startX = sX / 16, startY = sY / 12, goalX = dX / 16,
 	goalY = dY / 12;
@@ -939,10 +944,10 @@ bool PathFinder::TargetUnreachable(short sX, short sY, short dX, short dY)
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[sMap->GetPixelIndex( goalX, goalY )] & 3 )) {
+	if (!( Passable[SearchMap->GetPixelIndex( goalX, goalY )] & 3 )) {
 		return true;
 	}
-	if (!( Passable[sMap->GetPixelIndex( startX, startY )] & 3 )) {
+	if (!( Passable[SearchMap->GetPixelIndex( startX, startY )] & 3 )) {
 		return true;
 	}
 
@@ -969,7 +974,7 @@ bool PathFinder::TargetUnreachable(short sX, short sY, short dX, short dY)
 	return pos!=pos2;
 }
 
-PathNode* PathFinder::FindPath(short sX, short sY, short dX, short dY)
+PathNode* Map::FindPath(short sX, short sY, short dX, short dY)
 {
 	unsigned int startX = sX / 16, startY = sY / 12, goalX = dX / 16,
 	goalY = dY / 12;
@@ -977,7 +982,7 @@ PathNode* PathFinder::FindPath(short sX, short sY, short dX, short dY)
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[sMap->GetPixelIndex( goalX, goalY )] & 3 )) {
+	if (!( Passable[SearchMap->GetPixelIndex( goalX, goalY )] & 3 )) {
 		AdjustPosition( goalX, goalY );
 	}
 	unsigned int pos = ( goalX << 16 ) | goalY;
@@ -1054,7 +1059,7 @@ PathNode* PathFinder::FindPath(short sX, short sY, short dX, short dY)
 	return Return;
 }
 
-unsigned char PathFinder::GetOrient(short sX, short sY, short dX, short dY)
+unsigned char Map::GetOrient(short sX, short sY, short dX, short dY)
 {
 	short deltaX = ( dX- sX), deltaY = ( dY - sY );
 	if (deltaX > 0) {
@@ -1083,7 +1088,7 @@ unsigned char PathFinder::GetOrient(short sX, short sY, short dX, short dY)
 	return 0;
 }
 
-bool PathFinder::IsVisible(short sX, short sY, short dX, short dY)
+bool Map::IsVisible(short sX, short sY, short dX, short dY)
 {
 	int diffx = sX - dX;
 	int diffy = sY - dY;
@@ -1092,12 +1097,12 @@ bool PathFinder::IsVisible(short sX, short sY, short dX, short dY)
 		double elevationy = fabs((double)diffx ) / diffy;
 		if (sX > dX) {
 			for (int startx = sX; startx > dX; startx--) {
-				if (Passable[sMap->GetPixelIndex( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) )] & 4)
+				if (Passable[SearchMap->GetPixelIndex( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) )] & 4)
 					return false;
 			}
 		} else {
 			for (int startx = sX; startx < dX; sX++) {
-				if (Passable[sMap->GetPixelIndex( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) )] & 4)
+				if (Passable[SearchMap->GetPixelIndex( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) )] & 4)
 					return false;
 			}
 		}
@@ -1105,12 +1110,12 @@ bool PathFinder::IsVisible(short sX, short sY, short dX, short dY)
 		double elevationx = fabs((double)diffy ) / diffx;
 		if (sY > dY) {
 			for (int starty = sY; starty > dY; starty--) {
-				if (Passable[sMap->GetPixelIndex( sX - ( int ) ( ( sY - starty ) / elevationx ), starty )] & 4)
+				if (Passable[SearchMap->GetPixelIndex( sX - ( int ) ( ( sY - starty ) / elevationx ), starty )] & 4)
 					return false;
 			}
 		} else {
 			for (int starty = sY; starty < dY; starty++) {
-				if (Passable[sMap->GetPixelIndex( sX + ( int ) ( ( sY - starty ) / elevationx ), starty )] & 4)
+				if (Passable[SearchMap->GetPixelIndex( sX + ( int ) ( ( sY - starty ) / elevationx ), starty )] & 4)
 					return false;
 			}
 		}

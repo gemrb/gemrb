@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.107 2004/04/20 17:53:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.108 2004/04/21 17:41:39 avenger_teambg Exp $
  *
  */
 
@@ -696,6 +696,7 @@ private: //Internal Functions
 public:
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 	static Action* GenerateAction(char* String, bool autoFree=false);
+	static void MoveBetweenAreasCore(Actor* actor, const char *area, int X, int Y, int face, bool adjust);
 private:
 	static Action *GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree);
 	static Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
@@ -706,7 +707,6 @@ private:
 	static int GetHappiness(Scriptable* Sender, int reputation);
 	static int GetHPPercent(Scriptable* Sender);
 	static void CreateVisualEffectCore(int X, int Y, const char *effect);
-	static void MoveBetweenAreasCore(Actor* actor, const char *area, int X, int Y, int face, bool adjust);
 	static int SeeCore(Scriptable* Sender, Trigger* parameters, int flags);
 	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,

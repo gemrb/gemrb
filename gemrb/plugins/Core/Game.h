@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.29 2004/04/18 19:20:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.30 2004/04/21 17:41:38 avenger_teambg Exp $
  *
  */
 
@@ -153,6 +153,9 @@ public:
 	int DelNPC(unsigned int slot, bool autoFree = false);
 	/* returns map in index */
 	Map* GetMap(unsigned int index);
+	/* returns a map from area name, loads it if needed */
+	/* use it for the biggest safety */
+	Map* GetMap(const char *areaname);
 	/* returns slot of the map if found */
 	int FindMap(const char *ResRef);
         Map * GetCurrentMap();
@@ -162,7 +165,7 @@ public:
 	/* returns slot of the map, if it was already loaded,
 	 	don't load it again, set changepf == true,
 		if you want to change the pathfinder too. */
-	int LoadMap(const char* ResRef, bool changepf = false);
+	int LoadMap(const char* ResRef);
 	int DelMap(unsigned int index, bool autoFree = false);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.31 2004/04/16 18:39:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.32 2004/04/21 17:41:38 avenger_teambg Exp $
  *
  */
 
@@ -32,11 +32,12 @@ class Door;
 
 #include "Sprite2D.h"
 #include "CharAnimations.h"
-#include "PathFinder.h"
 #include "Polygon.h"
 #include "TileOverlay.h"
 #include "Variables.h"
 #include "Inventory.h"
+#include "PathFinder.h"
+#include "ImageMgr.h"
 #include <list>
 
 #define STEP_TIME		150
@@ -234,6 +235,7 @@ public:
 	unsigned short Trapped;
 	unsigned short TrapDetected;
 	Point trapTarget;
+	Inventory inventory;
 };
 
 class GEM_EXPORT InfoPoint : public Highlightable {

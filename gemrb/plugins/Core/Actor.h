@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.30 2004/04/18 19:20:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.31 2004/04/21 17:41:38 avenger_teambg Exp $
  *
  */
 
@@ -26,6 +26,8 @@
 #include "Animation.h"
 #include "CharAnimations.h"
 #include "ActorBlock.h"
+
+class Map;
 
 #ifdef WIN32
 
@@ -103,7 +105,7 @@ public:
 	/** prints useful information on console */
 	void DebugDump();
 	/** sets the actor's position, calculating with the nojump flag*/
-	void SetPosition(unsigned int XPos, unsigned int YPos, bool jump);
+	void SetPosition(Map *map, unsigned int XPos, unsigned int YPos, bool jump);
 	void SetAnimationID(unsigned short AnimID);
 	/** returns the animations */
 	CharAnimations* GetAnims();
@@ -195,5 +197,7 @@ public:
 	}
 	void SetText(char* ptr, unsigned char type);
 	void SetText(int strref, unsigned char type);
+	/* returns carried weight atm, could calculate with strength*/
+	int GetEncumbrance();
 };
 #endif

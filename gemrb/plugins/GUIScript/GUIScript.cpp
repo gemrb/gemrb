@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.159 2004/04/17 11:28:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.160 2004/04/21 17:41:41 avenger_teambg Exp $
  *
  */
 
@@ -147,8 +147,7 @@ static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
 	}
 	GameControl* gc = StartGameControl();
 	/* setting the pathfinder to the current area */
-	game->LoadMap(game->CurrentArea, true);
-	gc->SetCurrentArea( 0 );
+	gc->SetCurrentArea(game->LoadMap(game->CurrentArea));
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -2821,7 +2820,7 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
-	GameScript::ExecuteString( core->GetGame()->GetMap( 0 ), String );
+	GameScript::ExecuteString( core->GetGame()->GetCurrentMap( ), String );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -2835,7 +2834,7 @@ static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
-	if (GameScript::EvaluateString( core->GetGame()->GetMap( 0 ), String )) {
+	if (GameScript::EvaluateString( core->GetGame()->GetCurrentMap( ), String )) {
 		printf( "%s returned True\n", String );
 	} else {
 		printf( "%s returned False\n", String );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.150 2004/04/20 17:53:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.151 2004/04/21 17:41:38 avenger_teambg Exp $
  *
  */
 
@@ -2652,8 +2652,9 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	if (distance > range) {
 		return 0;
 	}
-	if (!core->GetPathFinder()->IsVisible( Sender->XPos, Sender->YPos,
-						scr->XPos, scr->YPos )) {
+	Map *map = core->GetGame()->GetCurrentMap();
+	if (!map->IsVisible( Sender->XPos, Sender->YPos,
+		scr->XPos, scr->YPos )) {
 		return 0;
 	}
 	//further checks, is target alive and talkative
@@ -3514,8 +3515,8 @@ int GameScript::SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 	if (distance > ( snd->Modified[IE_VISUALRANGE] * 20 )) {
 		return 0;
 	}
-	if (core->GetPathFinder()->IsVisible( Sender->XPos, Sender->YPos,
-			tar->XPos, tar->YPos )) {
+	Map *map = core->GetGame()->GetCurrentMap();
+	if (map->IsVisible( Sender->XPos, Sender->YPos, tar->XPos, tar->YPos )) {
 		if(justlos) {
 			return 1;
 		}
@@ -3879,8 +3880,8 @@ int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return 1; //well, if it doesn't exist it is unreachable
 	}
-	return core->GetPathFinder()->TargetUnreachable(
-		Sender->XPos, Sender->YPos, tar->XPos, tar->YPos);
+	Map* map=core->GetGame()->GetCurrentMap();
+	return map->TargetUnreachable( Sender->XPos, Sender->YPos, tar->XPos, tar->YPos);
 }
 
 int GameScript::PartyCountEQ(Scriptable* Sender, Trigger* parameters)
@@ -4432,7 +4433,8 @@ void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* ab = ( Actor* ) Sender;
-	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter, true );
+	Map *map = core->GetGame()->GetCurrentMap();
+	ab->SetPosition( map, parameters->XpointParameter, parameters->YpointParameter, true );
 }
 
 void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
@@ -4445,7 +4447,8 @@ void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* ab = ( Actor* ) tar;
-	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter, true );
+	Map *map = core->GetGame()->GetCurrentMap();
+	ab->SetPosition( map, parameters->XpointParameter, parameters->YpointParameter, true );
 }
 
 void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
@@ -4573,10 +4576,10 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	int flags)
 {
 	ActorMgr* aM = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
-	DataStream* ds = core->GetResourceMgr()->GetResource( parameters->string0Parameter,
-												IE_CRE_CLASS_ID );
+	DataStream* ds = core->GetResourceMgr()->GetResource( parameters->string0Parameter, IE_CRE_CLASS_ID );
 	aM->Open( ds, true );
 	Actor* ab = aM->GetActor();
+	core->FreeInterface( aM );
 	int x,y;
 
 	switch (flags & CC_MASK) {
@@ -4591,34 +4594,45 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 			x = parameters->XpointParameter+Sender->XPos;
 			y = parameters->YpointParameter+Sender->YPos;
 			break;
-		default: //absolute point
+		default: //absolute point, but -1,-1 means AtFeet
 			x = parameters->XpointParameter;
 			y = parameters->YpointParameter;
+			if(x==-1 && y==-1) {
+				x = Sender->XPos;
+				y = Sender->YPos;
+			}
 			break;
 	}
-	ab->SetPosition( parameters->XpointParameter, parameters->YpointParameter, flags&CC_CHECK_IMPASSABLE );
+	printf("CreateCreature: %s at [%d.%d] face:%d\n",parameters->string0Parameter, x,y,parameters->int0Parameter);
+	Map* map;
+	Game* game=core->GetGame();
+	if(Sender->Type==ST_AREA) {
+		map = game->GetMap(Sender->scriptName);
+	}
+	else {
+		map = game->GetCurrentMap( );
+	}
+	ab->SetPosition(map, x, y, flags&CC_CHECK_IMPASSABLE );
 	ab->AnimID = IE_ANI_AWAKE;
 	ab->Orientation = parameters->int0Parameter;
-	Map* map = core->GetGame()->GetCurrentMap( );
 	map->AddActor( ab );
 
 	//setting the deathvariable if it exists (iwd2)
 	if(parameters->string1Parameter[0]) {
 		ab->SetScriptName(parameters->string1Parameter);
 	}
-	core->FreeInterface( aM );
 }
 
-//use offset from Sender
+//don't use offset from Sender
 void GameScript::CreateCreature(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, CC_OFFSET | CC_CHECK_IMPASSABLE );
+	CreateCreatureCore( Sender, parameters, CC_CHECK_IMPASSABLE );
 }
 
-//use offset from Sender
+//don't use offset from Sender
 void GameScript::CreateCreatureImpassable(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, CC_OFFSET );
+	CreateCreatureCore( Sender, parameters, 0 );
 }
 
 //use offset from Sender
@@ -5431,13 +5445,13 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, int X, int Y, int face, bool adjust)
 {
 	printf("MoveBetweenAreas: %s to %s [%d.%d] face: %d\n", actor->GetName(0), area,X,Y, face);
+	Map* map2;
+	Game* game = core->GetGame();
 	if(area[0]) { //do we need to switch area?
-		Game* game = core->GetGame();
-		//no need to change the pathfinder to the source area
-		Map * map1 = game->GetMap(game->LoadMap( actor->Area ));
+		Map* map1 = game->GetMap(actor->Area);
 		//we have to change the pathfinder
 		//to the target area if adjust==true
-		Map * map2 = game->GetMap(game->LoadMap( area, adjust ));
+		map2 = game->GetMap(area);
 		if( map1!=map2 ) {
 			if(map1) {
 				map1->RemoveActor( actor );
@@ -5445,7 +5459,10 @@ void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, int X, int
 		        map2->AddActor( actor );
 		}
 	}
-	actor->SetPosition( X, Y, adjust);
+	else {
+		map2=game->GetMap(actor->Area);
+	}
+	actor->SetPosition(map2, X, Y, adjust);
 	if (face !=-1) {
 		actor->Orientation = face;
 	}
@@ -5790,7 +5807,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	Game *game = core->GetGame();
 	strncpy(game->LoadMos, parameters->string1Parameter,8);
 	//no need to change the pathfinder just for getting the entrance
-	Map *map = game->GetMap(game->LoadMap( actor->Area ));
+	Map *map = game->GetMap(actor->Area);
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
 	if (Distance(ent->XPos, ent->YPos, Sender) <= 40) {
 		LeaveAreaLUA(Sender, parameters);
@@ -5821,7 +5838,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	Game *game = core->GetGame();
 	strncpy(game->LoadMos, parameters->string1Parameter,8);
 	//no need to change the pathfinder just for getting the entrance
-	Map *map = game->GetMap(game->LoadMap( actor->Area ));
+	Map *map = game->GetMap( actor->Area );
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
 	if (Distance(ent->XPos, ent->YPos, Sender) <= 40) {
 		LeaveAreaLUAPanic(Sender, parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.45 2004/04/18 19:20:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.46 2004/04/21 17:41:38 avenger_teambg Exp $
  *
  */
 
@@ -88,6 +88,7 @@ Actor::Actor()
 
 	DeleteMe = false;
 	FromGame = false;
+	inventory.SetInventoryType(INVENTORY_CREATURE);
 }
 
 Actor::~Actor(void)
@@ -393,27 +394,32 @@ void Actor::DebugDump()
 	printf( "Allegiance: %d\n",(int) GetStat(IE_EA) );
 }
 
-void Actor::SetPosition(unsigned int XPos, unsigned int YPos, bool jump)
+void Actor::SetPosition(Map *map, unsigned int XPos, unsigned int YPos, bool jump)
 {
 	ClearPath();
 	XPos/=16;
 	YPos/=12;
 	if (jump && !GetStat( IE_DONOTJUMP ) && anims->CircleSize) {
-		PathFinder *pf = core->GetPathFinder();
-///		pf->SetMap(core->GetGame()->GetCurrentArea() );
-		pf->AdjustPosition( XPos, YPos );
+		map->AdjustPosition( XPos, YPos );
 	}
 	MoveTo( ( XPos * 16 ) + 8, ( YPos * 12 ) + 6 );
 }
 
 /* this is returning the level of the character for xp calculations 
    later it could calculate with dual/multiclass, 
-   also with iwd2's 3rd ed rules */
+   also with iwd2's 3rd ed rules, this is why it is a separate function */
 int Actor::GetXPLevel(int modified)
 {
 	if (modified) {
 		return Modified[IE_LEVEL];
 	}
 	return BaseStats[IE_LEVEL];
+}
+
+/** maybe this would be more useful if we calculate with the strength too
+*/
+int Actor::GetEncumbrance()
+{
+	return inventory.GetWeight();
 }
 

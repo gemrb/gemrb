@@ -415,7 +415,9 @@ void Moveble::AddWayPoint(unsigned short XDes, unsigned short YDes)
 	while(endNode->Next) {
 		endNode=endNode->Next;
 	}
-	PathNode *path2 = core->GetPathFinder()->FindPath( endNode->x, endNode->y, XDes, YDes );
+	Game* game = core->GetGame();
+	Map* map = game->GetMap(Area);
+	PathNode *path2 = map->FindPath( endNode->x, endNode->y, XDes, YDes );
 	endNode->Next=path2;
 }
 
@@ -437,14 +439,18 @@ void Moveble::WalkTo(unsigned short XDes, unsigned short YDes)
 	}
 */
 	ClearPath();
-	path = core->GetPathFinder()->FindPath( XPos, YPos, XDes, YDes );
+	Game* game = core->GetGame();
+	Map* map = game->GetMap(Area);
+	path = map->FindPath( XPos, YPos, XDes, YDes );
 //	step = NULL;
 }
 
 void Moveble::RunAwayFrom(unsigned short XDes, unsigned short YDes, int PathLength, bool Backing)
 {
 	ClearPath();
-	path = core->GetPathFinder()->RunAway( XPos, YPos, XDes, YDes, PathLength, Backing );
+	Game* game = core->GetGame();
+	Map* map = game->GetMap(Area);
+	path = map->RunAway( XPos, YPos, XDes, YDes, PathLength, Backing );
 }
 
 void Moveble::MoveTo(unsigned short XDes, unsigned short YDes)
@@ -687,6 +693,7 @@ Container::Container(void)
 	TrapRemovalDiff = 0;
 	Trapped = 0;
 	TrapDetected = 0;
+	inventory.SetInventoryType(INVENTORY_HEAP);
 }
 
 Container::~Container()

@@ -5,8 +5,8 @@ class GameControl;
 
 #include "Control.h"
 #include "Interface.h"
-#include "PathFinder.h"
 #include "Dialog.h"
+#include "Map.h"
 
 #ifdef WIN32
 

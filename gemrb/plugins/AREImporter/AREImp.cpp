@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.47 2004/04/17 11:28:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.48 2004/04/21 17:41:37 avenger_teambg Exp $
  *
  */
 
@@ -63,6 +63,21 @@ AREImp::~AREImp(void)
 	if (autoFree && str) {
 		delete( str );
 	}
+}
+
+//this is the same as the function in the creature, you might want to rationalize it
+CREItem* AREImp::GetItem()
+{
+	CREItem *itm = new CREItem();
+
+	str->Read( itm->ItemResRef, 8 );
+	str->Read( &itm->Unknown08, 2 );
+	str->Read( &itm->Usages[0], 2 );
+	str->Read( &itm->Usages[1], 2 );
+	str->Read( &itm->Usages[2], 2 );
+	str->Read( &itm->Flags, 4 );
+
+	return itm;
 }
 
 bool AREImp::Open(DataStream* stream, bool autoFree)
@@ -321,6 +336,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		c->TrapRemovalDiff = TrapRemDiff;
 		c->Trapped = Trapped;
 		c->TrapDetected = TrapDetected;
+		//reading items into a container
+		
 	}
 	printf( "Loading regions\n" );
 	//Loading InfoPoints

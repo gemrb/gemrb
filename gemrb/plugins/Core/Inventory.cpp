@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.15 2004/04/19 22:05:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.16 2004/04/21 17:41:40 avenger_teambg Exp $
  *
  */
 
@@ -51,6 +51,9 @@ void Inventory::CalculateWeight()
 	}
 	Weight=0;
 	for(size_t i=0;i<Slots.size(); i++) {
+		if(!Slots[i]) {
+			continue;
+		}
 		Slots[i]->Flags&=~IE_ITEM_ACQUIRED;
 //		Item *itm=core->GetItemManager()->GetItem(Slots[i]->ItemResRef);
 //		Weight+=itm->Weight;
@@ -270,13 +273,6 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
 }
 
 #if 0
-CREItem* Inventory::GetSlotItem(int index)
-{
-	if (index >= Slots.size()) {
-		return NULL;
-	}
-	return Slots[index];
-}
 
 // Returns index of first empty slot or slot with the same
 //    item and not full stack. On fail returns -1

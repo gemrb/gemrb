@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.35 2004/04/18 19:20:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.36 2004/04/21 17:41:40 avenger_teambg Exp $
  *
  */
 
@@ -68,6 +68,8 @@ class Map;
 #include "Actor.h"
 #include "ScriptedAnimation.h"
 #include "GameControl.h"
+#include "PathFinder.h"
+#include <queue>
 
 #ifdef WIN32
 
@@ -103,6 +105,11 @@ public:
 	ImageMgr* SearchMap;
 	unsigned long AreaFlags;
 	unsigned short AreaType;
+private:
+	unsigned short* MapSet;
+	std::queue< unsigned int> InternalStack;
+	unsigned int Width, Height;
+
 private:
 	std::vector< Animation*> animations;
 	std::vector< Actor*> actors;
@@ -140,6 +147,24 @@ public:
 	bool CanFree();
 	int GetActorCount() { return actors.size(); }
 	Actor* GetActor(int i) { return actors[i]; }
+
+	//PathFinder
+	/* Finds the nearest passable point */
+	void AdjustPosition(unsigned int& goalX, unsigned int& goalY);
+	/* Finds the path which leads the farthest from d */
+	PathNode* RunAway(short sX, short sY, short dX, short dY, unsigned int PathLen, bool Backing);
+	/* Returns true if there is no path to d */
+	bool TargetUnreachable(short sX, short sY, short dX, short dY);
+	/* Finds the path which leads to d */
+	PathNode* FindPath(short sX, short sY, short dX, short dY);
+	bool IsVisible(short sX, short sY, short dX, short dY);
+private:
+	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
+		unsigned int& nx, unsigned int& ny, unsigned int& diff);
+	void SetupNode(unsigned int x, unsigned int y, unsigned int Cost);
+	//maybe this is unneeded and orientation could be calculated on the fly
+	unsigned char GetOrient(short sX, short sY, short dX, short dY);
+
 };
 
 #endif
