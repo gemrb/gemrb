@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.119 2004/02/12 17:11:53 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.120 2004/02/12 22:10:39 avenger_teambg Exp $
  *
  */
 
@@ -1308,8 +1308,8 @@ static PyObject * GemRB_SetButtonMOS(PyObject * /*self*/, PyObject *args)
 	}
 
 	Button * btn = (Button*)ctrl;
+	btn->SetFlags(0x82,OP_OR);
 	btn->SetPicture(Picture);
-	btn->SetFlags(0x80,OP_OR);
 
 	core->FreeInterface(im);
 
@@ -1943,10 +1943,6 @@ static PyObject *GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject *args)
 	return Py_None;
 }
 
-
-
-
-
 static PyObject *GemRB_SetWorldMapImage( PyObject * /*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex;
@@ -1991,9 +1987,8 @@ static PyObject *GemRB_SetWorldMapImage( PyObject * /*self*/, PyObject *args)
 	}
 
 	Button * btn = (Button*)ctrl;
+	btn->SetFlags(0x82,OP_OR);
 	btn->SetPicture(worldmap->MapMOS);
-	//win->SetBackGround(worldmap->MapMOS);
-	btn->SetFlags(0x80,OP_OR);
 	// FIXME: there's a leak, with MapMOS, I am afraid
 	delete worldmap;
 	core->FreeInterface(im);
