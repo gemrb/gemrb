@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.2 2005/01/22 14:40:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.3 2005/01/22 20:54:57 avenger_teambg Exp $
  *
  */
 
@@ -83,7 +83,7 @@ bool Cache::SetAt(ieResRef key, void *rValue)
 	//this creates a new element
 	ValueType *ret=&hashmap[key];
 	ret->data=rValue;
-	ret->nRefCount=0;
+	ret->nRefCount=1;
 	return true;
 }
 
