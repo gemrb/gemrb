@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.24 2004/10/17 19:34:59 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.25 2004/10/17 22:18:12 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -220,6 +220,9 @@ def RunSelectionChangeHandler ():
 		SelectionChangeHandler ()
 
 
+portrait_hp_numeric = [0, 0, 0, 0, 0, 0]
+
+
 def OpenPortraitWindow ():
 	global PortraitWindow
 
@@ -230,8 +233,8 @@ def OpenPortraitWindow ():
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
-		ButtonHP = GemRB.GetControl (Window, 6 + i)
 		#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+		GemRB.SetVarAssoc (Window, Button, 'PressedPortrait', i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
 		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "PortraitButtonOnDragDrop")
@@ -241,6 +244,14 @@ def OpenPortraitWindow ():
 
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
+
+		ButtonHP = GemRB.GetControl (Window, 6 + i)
+		GemRB.SetVarAssoc (Window, ButtonHP, 'PressedPortraitHP', i)
+		GemRB.SetEvent (Window, ButtonHP, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonHPOnPress")
+
+		portrait_hp_numeric[i] = 0
+
+
 
 	UpdatePortraitWindow ()
 	GemRB.SetVisible (PortraitWindow, 1)
@@ -264,14 +275,30 @@ def UpdatePortraitWindow ():
 		GemRB.SetButtonBAM (Window, Button, pic, 0, 0, -1)
 		
 		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+
 		GemRB.SetButtonFlags(Window, ButtonHP, IE_GUI_BUTTON_PICTURE, OP_SET)
-		GemRB.SetVarAssoc (Window, Button, 'PressedPortrait', i)
 
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
 		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
 
+		ratio = (hp + 0.0) / hp_max
+		if ratio > 1.0: ratio = 1.0
+		r = int (255 * (1.0 - ratio))
+		g = int (255 * ratio)
+
 		GemRB.SetText (Window, ButtonHP, "%d / %d" %(hp, hp_max))
-		# FILLBAR.BAM
+		GemRB.SetButtonTextColor (Window, ButtonHP, r, g, 0, False)
+		GemRB.SetButtonBAM (Window, ButtonHP, 'FILLBAR', 0, 0, -1)
+		GemRB.SetButtonPictureClipping (Window, ButtonHP, ratio)
+
+		if portrait_hp_numeric[i]:
+			op = OP_NAND
+		else:
+			op = OP_OR
+			
+		GemRB.SetButtonFlags (Window, ButtonHP, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
+
+
 		if sel:
 			#GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_SELECTED)
 			GemRB.EnableButtonBorder(Window, Button, FRAME_PC_SELECTED, 1)
@@ -302,6 +329,23 @@ def PortraitButtonOnShiftPress ():
 		GemRB.GameSelectPCSingle (i + 1)
 		SelectionChanged ()
 		RunSelectionChangeHandler ()
+
+
+def PortraitButtonHPOnPress ():
+	Window = PortraitWindow
+	
+	i = GemRB.GetVar ('PressedPortraitHP')
+
+	portrait_hp_numeric[i] = not portrait_hp_numeric[i]
+	ButtonHP = GemRB.GetControl (Window, 6 + i)
+
+	if portrait_hp_numeric[i]:
+		op = OP_NAND
+	else:
+		op = OP_OR
+			
+	GemRB.SetButtonFlags (Window, ButtonHP, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
+
 
 
 def SelectAllOnPress ():

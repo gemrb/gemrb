@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.36 2004/10/17 16:19:21 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.37 2004/10/17 22:18:11 edheldil Exp $
  *
  */
 
@@ -162,6 +162,8 @@ public: // Public Events
 	void RedrawButton(char* VariableName, unsigned int Sum);
         /** Set palette used for drawing button label in normal state.  */
 	void SetTextColor(Color fore, Color back);
+	/** Sets percent (0-1.0) of width for clipping picture */
+	void SetPictureClipping(double clip)  { Clipping = clip; };
 private: // Private attributes
 	bool Clear;
 	char* Text;
@@ -189,6 +191,7 @@ private: // Private attributes
 	/** MOS Draggable Variables */
 	unsigned short ScrollX, ScrollY;
 	bool Dragging;
+	double Clipping;
 	unsigned short DragX, DragY; //Starting Dragging Positions
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];

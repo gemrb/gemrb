@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.75 2004/10/17 16:19:21 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.76 2004/10/17 22:18:11 edheldil Exp $
  *
  */
 
@@ -78,6 +78,7 @@ Button::Button(bool Clear)
 	Dragging = false;
 	ScrollX = 0;
 	ScrollY = 0;
+	Clipping = 1.0;
 	memset( borders, 0, sizeof( borders ));
 }
 Button::~Button()
@@ -213,8 +214,9 @@ void Button::Draw(unsigned short x, unsigned short y)
 		} else {
 			short xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
 			short yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
+			Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
 			core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs,
-										y + YPos + yOffs, true );
+										y + YPos + yOffs, true, &r );
 		}
 	}
 

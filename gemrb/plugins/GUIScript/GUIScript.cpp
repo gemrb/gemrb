@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.229 2004/10/17 18:11:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.230 2004/10/17 22:18:10 edheldil Exp $
  *
  */
 
@@ -1842,6 +1842,30 @@ static PyObject* GemRB_SetButtonState(PyObject * /*self*/, PyObject* args)
 	}
 
 	btn->SetState( state );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetButtonPictureClipping__doc,
+"SetButtonPictureClipping(Window, Button, ClippingPercent)\n\n"
+"Sets percent (0-1.0) of width to which button picture will be clipped." );
+
+static PyObject* GemRB_SetButtonPictureClipping(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+	double Clipping;
+
+	if (!PyArg_ParseTuple( args, "iid", &WindowIndex, &ControlIndex, &Clipping )) {
+		return AttributeError( GemRB_SetButtonPictureClipping__doc );
+	}
+
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if(!btn) {
+		return NULL;
+	}
+
+	btn->SetPictureClipping( Clipping );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3965,6 +3989,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetTextAreaSelectable, METH_VARARGS),
 	METHOD(SetButtonFlags, METH_VARARGS),
 	METHOD(SetButtonState, METH_VARARGS),
+	METHOD(SetButtonPictureClipping, METH_VARARGS),
 	METHOD(SetButtonPicture, METH_VARARGS),
 	METHOD(SetButtonMOS, METH_VARARGS),
 	METHOD(SetButtonPLT, METH_VARARGS),
