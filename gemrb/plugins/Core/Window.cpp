@@ -102,6 +102,13 @@ void Window::SetFocused(Control * ctrl)
 	lastFocus->hasFocus = true;
 }
 
+Control * Window::GetControl(unsigned short i)
+{
+	if(i < Controls.size())
+		return Controls[i];
+	return NULL;
+}
+
 void Window::release(void)
 {
 	delete this;

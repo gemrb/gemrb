@@ -50,6 +50,8 @@ public:
   void DrawWindow();
   /** Returns the Control at X,Y Coordinates */
   Control * GetControl(unsigned short x, unsigned short y);
+  /** Returns the Control by Index */
+  Control * GetControl(unsigned short i);
   /** Sets 'ctrl' as Focused */
   void SetFocused(Control * ctrl);
 public: //Public attributes
