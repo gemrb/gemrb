@@ -54,7 +54,7 @@ void Slider::Draw(unsigned short x, unsigned short y)
 		return;
 	if(BackGround) {
 		if((BackGround->Width < Width) || (BackGround->Height < Height)) {
-			core->GetVideoDriver()->BlitTiled(Region(x+XPos, y+YPos, Width, Height), BackGround, true);
+			core->GetVideoDriver()->BlitTiled(Region(x+XPos, y+YPos, Width, Height,1), BackGround, true);
 		}
 		else {
 			Region r(x+XPos, y+YPos, Width, Height);

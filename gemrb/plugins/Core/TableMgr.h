@@ -18,7 +18,8 @@
 #ifndef TABLEMGR_H
 #define TABLEMGR_H
 
-#include <Plugin.h>
+#include "Plugin.h"
+#include "../../includes/globals.h"
 
 /**Abstract class for Table Manager Plugins implementation
   *@author GemRB Developement Team
@@ -30,6 +31,12 @@ public:
 	~TableMgr();
   /** Returns the actual number of Rows in the Table */
   virtual int GetRowCount() = 0;
+  /** Returns the actual number of Columns in the Table */
+  virtual int GetColumnCount() = 0;
+  /** Returns a pointer to a zero terminated 2da element,
+      0,0 returns the default value, it may return NULL */
+  virtual char *QueryField(int row = 0, int column = 0) const = 0;
+
   /** Opens a Table File */
   virtual bool Open(DataStream * stream, bool autoFree = false) = 0;
 };

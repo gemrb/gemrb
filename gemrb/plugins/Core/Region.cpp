@@ -4,6 +4,7 @@
 Region::Region(void)
 {
 	x = y = w = h = 0;
+DEBUG=0;
 }
 
 Region::~Region(void)
@@ -16,6 +17,7 @@ Region::Region(Region & rgn)
 	y = rgn.y;
 	w = rgn.w;
 	h = rgn.h;
+DEBUG=rgn.DEBUG;
 }
 
 Region::Region(const Region & rgn)
@@ -24,6 +26,7 @@ Region::Region(const Region & rgn)
   y = rgn.y;
   w = rgn.w;
   h = rgn.h;
+DEBUG=rgn.DEBUG;
 }
 
 Region & Region::operator=(Region & rgn)
@@ -32,6 +35,7 @@ Region & Region::operator=(Region & rgn)
 	y = rgn.y;
 	w = rgn.w;
 	h = rgn.h;
+DEBUG=rgn.DEBUG;
 	return *this;
 }
 
@@ -49,10 +53,11 @@ bool Region::operator!=(Region & rgn)
 	return false;
 }
 
-Region::Region(int x, int y, int w, int h)
+Region::Region(int x, int y, int w, int h, int debug)
 {
 	this->x = x;
 	this->y = y;
 	this->w = w;
 	this->h = h;
+this->DEBUG=DEBUG;
 }

@@ -22,12 +22,13 @@ public:
 	int y;
 	int w;
 	int h;
+int DEBUG;
 	Region(const Region & rgn);
 	Region(Region & rgn);
 	Region & operator=(Region & rgn);
 	bool operator==(Region & rgn);
 	bool operator!=(Region & rgn);
-	Region(int x, int y, int w, int h);
+	Region(int x, int y, int w, int h, int DEBUG=0);
 };
 
 #endif
