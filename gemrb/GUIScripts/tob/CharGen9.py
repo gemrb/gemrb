@@ -11,6 +11,7 @@ IE_CON =		41
 IE_CHR =		42
 IE_XP =			44
 IE_GOLD =		45
+IE_REPUTATION =		48
 IE_HATEDRACE =  	49
 IE_KIT =        	152
 IE_EA =			200
@@ -141,7 +142,15 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, GemRB.GetVar("Class") )
-	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, GemRB.GetVar("Alignment") )
+	t=GemRB.GetVar("Alignment")
+	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
+	TmpTable=GemRB.LoadTable("repstart")
+	t=GemRB.GetTableValue(TmpTable,t)
+	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
+        TmpTable=GemRB.LoadTable("strtgold")
+        t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,0),GemRB.GetTableValue(TmpTable,Class,1) )
+        GemRB.SetPlayerStat(MyChar, IE_GOLD, t*2)
+
 	GemRB.SetPlayerStat(MyChar, IE_HATEDRACE, GemRB.GetVar("HatedRace") )
 	TmpTable=GemRB.LoadTable("ability")
 	AbilityCount = GemRB.GetTableRowCount(TmpTable)

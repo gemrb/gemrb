@@ -10,19 +10,16 @@ def OnLoad():
 	
 	GemRB.LoadWindowPack("GUICG")
 	#this hack will redraw the base CG window
-	SoundWindow = GemRB.LoadWindow(52)
+	SoundWindow = GemRB.LoadWindow(19)
 	GemRB.SetVar("Sound",0)  #scrapping the sound value
 
-	Label = GemRB.GetControl(SoundWindow, 0x1000000a)
-	GemRB.SetText(SoundWindow, Label, 17164)
-
-	BackButton = GemRB.GetControl(SoundWindow,14)
+	BackButton = GemRB.GetControl(SoundWindow,10)
 	GemRB.SetText(SoundWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(SoundWindow,0)
 	GemRB.SetText(SoundWindow,DoneButton,36789)
 	GemRB.SetButtonFlags(SoundWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	TextAreaControl = GemRB.GetControl(SoundWindow, 5)
+	TextAreaControl = GemRB.GetControl(SoundWindow, 50)
 	GemRB.SetText(SoundWindow,TextAreaControl,17236)
 
 	GemRB.SetEvent(SoundWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
