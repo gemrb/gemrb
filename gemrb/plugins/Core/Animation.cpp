@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.15 2004/01/19 18:27:29 dragonmeat Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.16 2004/01/19 20:04:27 avenger_teambg Exp $
  *
  */
 
@@ -76,7 +76,7 @@ void Animation::AddFrame(Sprite2D * frame, int index)
 	if(x < animArea.x)
 		animArea.x = x;
 	if(y < animArea.y)
-		y = y;
+		animArea.y = y;
 	if(w > animArea.w)
 		animArea.w = w;
 	if(h > animArea.h)
