@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.206 2004/08/23 21:46:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.207 2004/08/25 11:55:51 avenger_teambg Exp $
  *
  */
 
@@ -40,12 +40,6 @@
 #include "AnimationMgr.h"
 #include "ArchiveImporter.h"
 #include "WorldMapMgr.h"
-
-#ifdef WIN32
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT
-#endif
 
 GEM_EXPORT Interface* core;
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.11 2004/04/15 14:30:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.12 2004/08/25 11:55:51 avenger_teambg Exp $
  *
  */
 
@@ -40,11 +40,6 @@ typedef unsigned long (* ulongvoid)(void);
 typedef char*(* charvoid)(void);
 typedef int (* intvoid)(void);
 typedef ClassDesc*(* cdint)(int);
-
-extern Interface* core;
-#ifdef WIN32
-extern HANDLE hConsole;
-#endif
 
 PluginMgr::PluginMgr(char* pluginpath)
 {

@@ -15,15 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.33 2004/08/19 21:14:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.34 2004/08/25 11:55:51 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "EventMgr.h"
 #include "Interface.h"
-
-extern Interface* core;
 
 EventMgr::EventMgr(void)
 {
@@ -41,7 +39,7 @@ EventMgr::~EventMgr(void)
 /** Adds a Window to the Event Manager */
 void EventMgr::AddWindow(Window* win)
 {
-  unsigned int i;
+	unsigned int i;
 	if (win == NULL) {
 		return;
 	}

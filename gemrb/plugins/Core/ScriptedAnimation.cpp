@@ -3,8 +3,6 @@
 #include "AnimationMgr.h"
 #include "Interface.h"
 
-extern Interface* core;
-
 ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree,
 	long X, long Y)
 {

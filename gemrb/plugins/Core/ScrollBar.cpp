@@ -15,15 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.25 2004/08/19 21:14:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.26 2004/08/25 11:55:51 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "ScrollBar.h"
 #include "Interface.h"
-
-extern Interface* core;
 
 ScrollBar::ScrollBar(void)
 {

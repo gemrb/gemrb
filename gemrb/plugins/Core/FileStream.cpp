@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.29 2004/05/15 13:08:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.30 2004/08/25 11:55:51 avenger_teambg Exp $
  *
  */
 
@@ -24,7 +24,6 @@
 
 #ifdef _DEBUG
 #include "Interface.h"
-extern Interface* core;
 #endif
 
 FileStream::FileStream(void)

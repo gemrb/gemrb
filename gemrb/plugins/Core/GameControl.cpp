@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.168 2004/08/24 19:49:55 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.169 2004/08/25 11:55:51 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -36,11 +36,6 @@
 #define DEBUG_SHOW_SEARCHMAP    0x04
 #define DEBUG_SHOW_PALETTES     0x08
 #define DEBUG_XXX               0x10
-
-extern Interface* core;
-#ifdef WIN32
-extern HANDLE hConsole;
-#endif
 
 static Color cyan = {
 	0x00, 0xff, 0xff, 0xff

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.60 2004/08/19 21:14:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.61 2004/08/25 11:55:51 avenger_teambg Exp $
  *
  */
 
@@ -24,8 +24,6 @@
 #include "Interface.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-extern Interface* core;
 
 TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {

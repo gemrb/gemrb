@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.112 2004/08/19 23:35:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.113 2004/08/25 11:55:51 avenger_teambg Exp $
  *
  */
 
@@ -414,10 +414,19 @@ public:
 #endif
 };
 
-#ifndef GEM_BUILD_DLL
+#ifdef GEM_BUILD_DLL
+
+#ifndef INTERFACE
+extern Interface* core;
 #ifdef WIN32
-__declspec(dllimport) Interface * core;
-__declspec(dllimport) HANDLE hConsole;
+extern HANDLE hConsole;
+#endif
+#endif
+
+#else
+#ifdef WIN32
+GEM_EXPORT Interface * core;
+GEM_EXPORT HANDLE hConsole;
 #else
 extern Interface * core;
 #endif

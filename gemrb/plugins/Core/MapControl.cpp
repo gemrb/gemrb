@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.3 2004/08/24 11:41:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.4 2004/08/25 11:55:51 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -25,8 +25,6 @@
 // Ratio between pixel sizes of an Area (Big map) and a Small map
 #define MAP_SCALE 10.67
 
-
-extern Interface* core;
 static Color green = {
 	0x00, 0xff, 0x00, 0xff
 };

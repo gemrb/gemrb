@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.5 2004/08/24 19:43:12 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.6 2004/08/25 11:55:51 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -24,13 +24,6 @@
 #include "../../includes/win32def.h"
 #include "WorldMapControl.h"
 #include "Interface.h"
-//#include "AnimationMgr.h"
-//#include "../../includes/strrefs.h"
-
-extern Interface* core;
-/*static Color green = {
-	0x00, 0xff, 0x00, 0xff
-};*/
 
 #define MAP_TO_SCREENX(x) XPos - ScrollX + (x)
 #define MAP_TO_SCREENY(y) YPos - ScrollY + (y)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.22 2004/08/20 13:03:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.23 2004/08/25 11:55:51 avenger_teambg Exp $
  *
  */
 
@@ -51,18 +51,6 @@ BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD fdwReason,
 
 #ifndef S_ISDIR
 #define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
-#endif
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
 #endif
 
 //// Globally used functions
