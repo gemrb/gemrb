@@ -5,7 +5,6 @@ PortraitWindow = 0
 OptionsWindow = 0
 ExpandButton = 0
 ContractButton = 0
-MaxExpand = 2
 
 def OnLoad():
 	global MessageWindow, ExpandButton, Expand
@@ -99,6 +98,8 @@ def OnIncreaseSize():
 			GemRB.SetVar("MessageWindow", TMessageWindow)
 			GemRB.SetVar("MessageTextArea", TMessageTA)
 			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+		else:
+			 return
 			
 	GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
 	GemRB.UnloadWindow(MessageWindow)
@@ -137,6 +138,8 @@ def OnDecreaseSize():
 			GemRB.SetVar("MessageWindow", TMessageWindow)
 			GemRB.SetVar("MessageTextArea", TMessageTA)
 			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+		else:
+			return
 			
 	GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
 	GemRB.UnloadWindow(MessageWindow)
