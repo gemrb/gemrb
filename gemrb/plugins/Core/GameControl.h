@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.52 2004/09/12 21:58:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.53 2004/09/13 17:09:36 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -134,7 +134,7 @@ public:
 	void TryToTalk(Actor *source, Actor *target);
 	void HandleDoor(Door *door, Actor *actor);
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor);
-	void MoveToPointFormation(Actor *actor, Point &p);
+	void MoveToPointFormation(Actor *actor, Point p);
 	void InitDialog(Actor* speaker, Actor* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
