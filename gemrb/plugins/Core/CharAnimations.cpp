@@ -13,6 +13,13 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 	this->OrientCount = OrientCount;
 	this->MirrorType = MirrorType;
 	LoadedFlag = 0;
+	for(int i = 0; i < 17; i++) {
+		for(int j = 0; j < 16; j++)
+			Anims[i][j] = NULL;
+	}
+	ArmorType = 0;
+	RangedType = 0;
+	WeaponType = 0;
 }
 
 CharAnimations::~CharAnimations(void)
@@ -37,15 +44,15 @@ IE_ANI_FOUR_FILES: The Animation is coded in Four Files. Probably it is an old T
 additional frames added in a second time.
 
 
- EAST PART       |       WEST PART
+ WEST PART       |       EAST PART
                  |
-        NE  NNE  N  NNW  NW
-     NE 006 007 008 009 010 NW
-    ENE 005      |      011 WNW
-      E 004     xxx     012 W
-    ESE 003      |      013 WSW
-     SE 002 001 000 015 014 SW
-	    SE  SSE  S  SSW  SW
+        NW  NNW  N  NNE  NE
+     NW 006 007 008 009 010 NE
+    WNW 005      |      011 ENE
+      W 004     xxx     012 E
+    WSW 003      |      013 ESE
+     SW 002 001 000 015 014 SE
+	    SW  SSW  S  SSE  SE
                  |
                  |
 
@@ -87,3 +94,226 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 	}
 	return Anims[AnimID][Orient];
 }
+
+void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient)
+	{
+		switch(ArmorType)
+			{
+			case 0: // No Armor
+				{
+				if(stricmp(core->GameType, "bg2") == 0) {
+					if(ResRef[3] != 'W')
+						ResRef[3] = 'B';
+				}
+				else {
+					if((ResRef[3] != 'T') && (ResRef[3] != 'W'))
+						ResRef[3] = 'B';
+				}
+				strcat(ResRef, "1");
+				}
+			break;
+
+			case 1: // Light Armor
+				{
+				if((ResRef[3] != 'T') && (ResRef[3] != 'W'))
+					ResRef[3] = 'B';
+				strcat(ResRef, "2");
+				}
+			break;
+
+			case 2: // Medium Armor
+				{
+				if((ResRef[3] != 'T') && (ResRef[3] != 'W'))
+					ResRef[3] = 'B';
+				strcat(ResRef, "3");
+				}
+			break;
+
+			case 3: // Heavy Armor
+				{
+				strcat(ResRef, "4");
+				}
+			break;
+			}
+		switch(AnimID)
+			{
+			//Attack is a special case... it cycles randomly
+			//through SLASH, BACKSLASH and JAB so we will choose
+			//which animation return randomly
+			case IE_ANI_ATTACK:
+			case IE_ANI_ATTACK_SLASH:
+				{
+				switch(WeaponType)
+					{
+					case IE_ANI_WEAPON_1H:
+                        strcat(ResRef, "A1");
+					break;
+
+					case IE_ANI_WEAPON_2H:
+						strcat(ResRef, "A3");
+					break;
+
+					case IE_ANI_WEAPON_2W:
+						strcat(ResRef, "A7");
+					break;
+					}
+				Cycle = (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_ATTACK_BACKSLASH:
+				{
+				switch(WeaponType)
+					{
+					case IE_ANI_WEAPON_1H:
+                        strcat(ResRef, "A2");
+					break;
+
+					case IE_ANI_WEAPON_2H:
+						strcat(ResRef, "A4");
+					break;
+
+					case IE_ANI_WEAPON_2W:
+						strcat(ResRef, "A8");
+					break;
+					}
+				Cycle = (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_ATTACK_JAB:
+				{
+				switch(WeaponType)
+					{
+					case IE_ANI_WEAPON_1H:
+                        strcat(ResRef, "A3");
+					break;
+
+					case IE_ANI_WEAPON_2H:
+						strcat(ResRef, "A5");
+					break;
+
+					case IE_ANI_WEAPON_2W:
+						strcat(ResRef, "A9");
+					break;
+					}
+				Cycle = (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_AWAKE:
+				{
+				strcat(ResRef, "G1");
+				Cycle = 9 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_CAST:
+				{
+				strcat(ResRef, "CA");
+				Cycle = 9 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_CONJURE:
+				{
+				strcat(ResRef, "CA");
+				Cycle = (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_DAMAGE:
+				{
+				strcat(ResRef, "G14");
+				Cycle = 36 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_DIE:
+				{
+				strcat(ResRef, "G15");
+				Cycle = 45 + (Orient % 9);
+				}
+			break;
+
+			//I cannot find an emerge animation...
+			//Maybe is Die reversed
+			case IE_ANI_EMERGE:
+				{
+				strcat(ResRef, "G15");
+				Cycle = 45 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_HEAD_TURN:
+				{
+				strcat(ResRef, "G12");
+				Cycle = 18 + (Orient % 9);
+				}
+			break;
+
+			//Unknown... maybe only a transparency effect apply
+			case IE_ANI_HIDE:
+				{
+
+				}
+			break;
+
+			case IE_ANI_READY:
+				{
+				strcat(ResRef, "G13");
+				Cycle = 27 + (Orient % 9);
+				}
+			break;
+
+			//This depends on the ranged weapon equipped
+			case IE_ANI_SHOOT:
+				{
+				switch(RangedType)
+					{
+					case IE_ANI_RANGED_BOW:
+						{
+						strcat(ResRef, "SA");
+						Cycle = (Orient % 9);
+						}
+					break;
+
+					case IE_ANI_RANGED_XBOW:
+						{
+						strcat(ResRef, "SX");
+						Cycle = (Orient % 9);
+						}
+					break;
+					
+					case IE_ANI_RANGED_THROW:
+						{
+						strcat(ResRef, "SS");
+						Cycle = (Orient % 9);
+						}
+					break;
+					}
+				}
+			break;
+
+			case IE_ANI_SLEEP:
+				{
+				strcat(ResRef, "G16");
+				Cycle = 54 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_TWITCH:
+				{
+				strcat(ResRef, "G17");
+				Cycle = 72 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_WALK:
+				{
+				strcat(ResRef, "G11");
+				Cycle = (Orient % 9);
+				}
+			break;
+			}
+	}
