@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.32 2003/11/28 09:31:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.33 2003/11/28 17:27:39 balrog994 Exp $
  *
  */
 
@@ -231,6 +231,14 @@ int SDLVideoDriver::SwapBuffers(void)
 						key = GEM_RIGHT;
 					break;
 
+					case SDLK_UP:
+						key = GEM_UP;
+					break;
+
+					case SDLK_DOWN:
+						key = GEM_DOWN;
+					break;
+
 					case SDLK_BACKSPACE:
 						key = GEM_BACKSP;
 					break;
@@ -248,7 +256,7 @@ int SDLVideoDriver::SwapBuffers(void)
 			}
 			else if(Evnt && (key != 0))
 				Evnt->KeyPress(key, event.key.keysym.mod);
-			if(event.key.keysym.sym == SDLK_RIGHT) {
+			/*if(event.key.keysym.sym == SDLK_RIGHT) {
 				Viewport.x += 64;
 			}
 			else if(event.key.keysym.sym == SDLK_LEFT) {
@@ -259,7 +267,7 @@ int SDLVideoDriver::SwapBuffers(void)
 			}
 			else if(event.key.keysym.sym == SDLK_DOWN) {
 				Viewport.y += 64;
-			}
+			}*/
 			}
 		break;
 
@@ -280,6 +288,14 @@ int SDLVideoDriver::SwapBuffers(void)
 			CursorIndex = 0;
 			if(Evnt)
 				Evnt->MouseUp(event.button.x, event.button.y, event.button.state, 0);
+		break;
+
+		case SDL_ACTIVEEVENT:
+			{
+				if(event.active.state == SDL_APPMOUSEFOCUS)
+					if(Evnt && !event.active.gain)
+						Evnt->OnSpecialKeyPress(GEM_MOUSEOUT);
+			}
 		break;
 		}
 	}
