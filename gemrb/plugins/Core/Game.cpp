@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.65 2005/03/08 19:58:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.66 2005/03/13 10:45:16 avenger_teambg Exp $
  *
  */
 
@@ -24,6 +24,7 @@
 #include "MapMgr.h"
 #include "DataStream.h"
 #include "Interface.h"
+#include "../../includes/strrefs.h"
 
 Game::Game(void) : Scriptable( ST_GLOBAL )
 {
@@ -596,7 +597,11 @@ void Game::ShareXP(int xp, bool divide)
 		}
 		PCs[i]->NewStat(IE_XP,xp,MOD_ADDITIVE);
 	}
-	//core->DisplayConstantString(); //you have gained ... xp
+	char value[10];
+
+	sprintf( value, "%d", xp );
+	core->GetTokenDictionary()->SetAtCopy( "XP", value );
+	core->DisplayConstantString( STR_GOTXP, 0xc0c000); //you have gained ... xp
 }
 
 bool Game::EveryoneStopped()

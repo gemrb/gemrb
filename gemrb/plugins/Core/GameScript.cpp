@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.242 2005/03/10 23:53:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.243 2005/03/13 10:45:16 avenger_teambg Exp $
  *
  */
 
@@ -7028,6 +7028,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 	}
 	if (xptable<0) {
 		printMessage("IEScript","Can't perform ADDXP2DA",LIGHT_RED);
+		return;
 	}
 	char * xpvalue = core->GetTable( xptable )->QueryField( parameters->string0Parameter, "0" ); //level is unused
 	
@@ -7037,7 +7038,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 	}
 	else {
 		//give xp everyone
-		core->GetGame()->ShareXP(atoi(xpvalue+2), false );
+		core->GetGame()->ShareXP(atoi(xpvalue), false );
 	}
 	core->DelTable( xptable );
 }
