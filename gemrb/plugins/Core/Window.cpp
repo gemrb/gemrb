@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.20 2003/12/03 18:27:06 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.21 2003/12/21 13:58:01 balrog994 Exp $
  *
  */
 
@@ -38,6 +38,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos
 	lastFocus = NULL;
 	Visible = false;
 	Changed = true;
+	Cursor = 0;
 }
 
 Window::~Window()
