@@ -11,6 +11,20 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // inlines
+inline bool Variables::MyCopyKey(char *&dest, const char * key) const
+{
+	int i,j;
+
+	for(i=0;key[i] && i<MAX_VARIABLE_LENGTH;i++) if(key[i]!=' ') j++;
+	dest = new char[j];
+	if(!dest)
+		return false;
+	for(i=0,j=0;i<MAX_VARIABLE_LENGTH && key[i];i++)
+	{
+		if(key[i]!=' ') dest[j++]=toupper(key[i]);
+   	}
+	return true;
+}
 inline unsigned int Variables::MyHashKey(const char * key) const
 {
    unsigned int nHash = 0;
@@ -96,7 +110,7 @@ Variables::~Variables()
 }
 
 Variables::MyAssoc *
-Variables::NewAssoc()
+Variables::NewAssoc(const char *key)
 {
 	if (m_pFreeList == NULL)
 	{
@@ -118,7 +132,7 @@ Variables::NewAssoc()
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
 	MYASSERT(m_nCount > 0);    // make sure we don't overflow
-	pAssoc->key=NULL;
+	MyCopyKey(pAssoc->key,key);
 	pAssoc->value=0xcccccccc;  //invalid value
 	return pAssoc;
 }
@@ -176,18 +190,12 @@ void Variables::SetAt(const char *key, unsigned long value)
 			InitHashTable(m_nHashTableSize);
 
 		// it doesn't exist, add a new Association
-		pAssoc = NewAssoc();
-		pAssoc->key = key;
+		pAssoc = NewAssoc(pAssoc->key);
 
 		// put into hash table
 		pAssoc->pNext = m_pHashTable[nHash];
 		m_pHashTable[nHash] = pAssoc;
 	}
-  else
-  {//keep the stuff consistent (we need only one key in case of duplications)
-    delete [] pAssoc->key; 
-    pAssoc->key=key;
-  }
-  pAssoc->value=value;
+	pAssoc->value=value;
 }
 

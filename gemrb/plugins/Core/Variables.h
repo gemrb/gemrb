@@ -76,7 +76,7 @@ protected:
 	struct MyAssoc
 	{
 		MyAssoc* pNext;
-		const char *key;
+		char *key;
 		unsigned long value;
 	};
 public:
@@ -105,10 +105,11 @@ protected:
 	struct Plex* m_pBlocks;
 	int m_nBlockSize;
 
-	MyAssoc* NewAssoc();
+	MyAssoc* NewAssoc(const char *key);
 	void FreeAssoc(MyAssoc*);
 	MyAssoc* GetAssocAt(const char *, unsigned int&) const;
-        unsigned int MyHashKey(const char *) const;
+	inline bool MyCopyKey(char *&dest, const char * key) const;
+        inline unsigned int MyHashKey(const char *) const;
         POSITION GetStartPosition() const;
         void GetNextAssoc(POSITION& rNextPosition, char*& rKey, unsigned long& rValue) const;
 
