@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.33 2005/02/11 14:30:53 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.34 2005/02/12 19:42:47 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -222,11 +222,11 @@ def UpdateRecordsWindow ():
 		GemRB.SetText (Window, Label, str (stats[i]))
 
 	# race
-	# FIXME: for some strange reason, Morte is 1 (Human) in the save files,
-	#   instead of 45 (Morte)
+	# FIXME: for some strange reason, Morte's race is 1 (Human)
+	#   in the save files, instead of 45 (Morte)
 	RaceTable = GemRB.LoadTable ("RACES")
 	print "species: %d  race: %d" %(GemRB.GetPlayerStat (pc, IE_SPECIES), GemRB.GetPlayerStat (pc, IE_RACE))
-	text = GemRB.GetTableValue (RaceTable, GemRB.GetPlayerStat (pc, IE_SPECIES) - 1, 0)
+	text = GemRB.GetTableValue (RaceTable, GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
 	GemRB.UnloadTable (RaceTable)
 	
 	Label = GemRB.GetControl (Window, 0x10000014)
@@ -268,7 +268,7 @@ def UpdateRecordsWindow ():
 
 	# faction
 	faction = GemRB.GetPlayerStat (pc, IE_FACTION)
-
+	print "FACTION:", faction
 	FactionTable = GemRB.LoadTable ("FACTIONS")
 	faction_help = GemRB.GetString (GemRB.GetTableValue (FactionTable, faction, 0))
 	frame = GemRB.GetTableValue (FactionTable, faction, 1)
@@ -544,7 +544,7 @@ def GetStatOverview (pc):
 	if Multi:
 		Level = GemRB.GetPlayerStat (pc, IE_LEVEL2)
 		ClassName = GemRB.GetString (GemRB.GetTableValue (ClassTable, RowName2, "NAME_REF"))
-		Main = Main + GetClassHeader (pc, ClassName, RowName2, Level, Experience)
+		Main = GemRB.GetString (19414) + "\n\n" + Main + GetClassHeader (pc, ClassName, RowName2, Level, Experience)
 
 	GemRB.UnloadTable (ClassTable)
 
