@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.59 2004/04/15 22:39:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.60 2004/04/26 15:15:57 edheldil Exp $
  *
  */
 
@@ -56,6 +56,8 @@ Button::Button(bool Clear)
 	this->Clear = Clear;
 	State = IE_GUI_BUTTON_UNPRESSED;
 	ButtonOnPress[0] = 0;
+	MouseEnterButton[0] = 0;
+	MouseLeaveButton[0] = 0;
 	MouseOverButton[0] = 0;
 	Text = ( char * ) calloc( 64, sizeof(char) );
 	hasText = false;
@@ -367,6 +369,25 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 	}
 }
 
+void Button::OnMouseEnter(unsigned short x, unsigned short y)
+{
+	if (State == IE_GUI_BUTTON_DISABLED) {
+		return;
+	}
+
+	RunEventHandler( MouseEnterButton );
+}
+
+void Button::OnMouseLeave(unsigned short x, unsigned short y)
+{
+	if (State == IE_GUI_BUTTON_DISABLED) {
+		return;
+	}
+
+	RunEventHandler( MouseLeaveButton );
+}
+
+
 /** Sets the Text of the current control */
 int Button::SetText(const char* string, int pos)
 {
@@ -393,6 +414,12 @@ void Button::SetEvent(char* funcName, int eventType)
 			break;
 		case 1:
 			strcpy( MouseOverButton, funcName );
+			break;
+		case 2:
+			strcpy( MouseEnterButton, funcName );
+			break;
+		case 3:
+			strcpy( MouseLeaveButton, funcName );
 			break;
 	}
 

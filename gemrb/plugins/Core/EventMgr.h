@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.13 2004/03/27 16:12:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.14 2004/04/26 15:15:57 edheldil Exp $
  *
  */
 
@@ -86,6 +86,8 @@ private:
 	Window* lastW;
 	/** Last Focused Control */
 	Control* lastF;
+	/** Last Active (entered) Control */
+	Control* last_ctrl_over;
 	/** Sets a Window on the Top of the Window Queue */
 	void SetOnTop(int Index)
 	{

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.16 2004/03/21 13:47:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.17 2004/04/26 15:15:57 edheldil Exp $
  *
  */
 
@@ -95,6 +95,10 @@ public: //Events
 	virtual void OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Key Release Event */
 	virtual void OnKeyRelease(unsigned char Key, unsigned short Mod);
+	/** Mouse Enter Event */
+	virtual void OnMouseEnter(unsigned short x, unsigned short y);
+	/** Mouse Leave Event */
+	virtual void OnMouseLeave(unsigned short x, unsigned short y);
 	/** Mouse Over Event */
 	virtual void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Button Down */

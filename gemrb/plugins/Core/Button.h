@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.27 2004/04/11 12:31:20 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.28 2004/04/26 15:15:57 edheldil Exp $
  *
  */
 
@@ -98,6 +98,10 @@ public:
 	/** Sets the Picture */
 	void SetPicture(Sprite2D* Picture);
 public: // Public Events
+	/** Mouse Enter */
+	void OnMouseEnter(unsigned short x, unsigned short y);
+	/** Mouse Leave */
+	void OnMouseLeave(unsigned short x, unsigned short y);
 	/** Mouse Over */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Button Down */
@@ -110,6 +114,8 @@ public: // Public Events
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Button Pressed Event Script Function Name */
 	EventHandler ButtonOnPress;
+	EventHandler MouseEnterButton;
+	EventHandler MouseLeaveButton;
 	EventHandler MouseOverButton;
 	/** Sets the Display Flags */
 	int SetFlags(int Flags, int Operation);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.29 2004/03/27 16:12:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.30 2004/04/26 15:15:57 edheldil Exp $
  *
  */
 
@@ -29,6 +29,8 @@ EventMgr::EventMgr(void)
 {
 	lastW = NULL;
 	lastF = NULL;
+	// Last control we were over. Used to determine MouseEnter and MouseLeave events
+	last_ctrl_over = NULL;
 	MButtons = 0;
 }
 
@@ -66,6 +68,7 @@ void EventMgr::AddWindow(Window* win)
 	}
 	lastW = win;
 	lastF = NULL;
+	last_ctrl_over = NULL;
 }
 /** Frees and Removes all the Windows in the Array */
 void EventMgr::Clear()
@@ -77,6 +80,7 @@ void EventMgr::Clear()
 	}
 	lastW = NULL;
 	lastF = NULL;
+	last_ctrl_over = NULL;
 }
 
 /** Remove a Window fro the array */
@@ -97,6 +101,7 @@ void EventMgr::DelWindow(unsigned short WindowID)
 			//windows.erase(m);
 			( *m ) = NULL;
 			lastF = NULL;
+			last_ctrl_over = NULL;
 			break;
 		}
 	}
@@ -136,6 +141,15 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				//Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
 				Control* ctrl = ( *m )->GetControl( x, y );
+				if (ctrl != last_ctrl_over) {
+					if (last_ctrl_over)
+						last_ctrl_over->OnMouseLeave( x - lastW->XPos - last_ctrl_over->XPos,
+									      y - lastW->YPos - last_ctrl_over->YPos );
+					if (ctrl)
+						ctrl->OnMouseEnter( x - lastW->XPos - ctrl->XPos,
+								    y - lastW->YPos - ctrl->YPos );
+					last_ctrl_over = ctrl;
+				}
 				if (ctrl != NULL) {
 					ctrl->OnMouseOver( x - lastW->XPos - ctrl->XPos,
 							y - lastW->YPos - ctrl->YPos );
