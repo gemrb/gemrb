@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.8 2003/11/30 18:10:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.9 2003/11/30 23:26:46 balrog994 Exp $
  *
  */
 
@@ -53,7 +53,10 @@ public:
 	unsigned long GetPixelIndex(int x, int y)
 	{
 		unsigned char *p=(unsigned char *)pixels;
-		p+=(PaddedRowLength*y)+(x*(BitCount/8));
+		if(BitCount == 4)
+			p+=(PaddedRowLength*y)+(x>>1);
+		else
+			p+=(PaddedRowLength*y)+(x*(BitCount/8));
 		if(BitCount == 24) {
 			int ret = *(unsigned long *) p;
 			return ret|0xff000000;
@@ -62,11 +65,13 @@ public:
 			return (unsigned long) *p;
 		}
 		else if(BitCount == 4) {
-			int ret=(unsigned long) *p;
-			if(x&1)
+			unsigned char ret=*p;
+			if(x&1) {
 				return ret&15;
-			else
+			}
+			else {
 				return (ret>>4)&15;
+			}
 		}
 	}
 	/** Gets a Pixel from the Image */
@@ -74,7 +79,10 @@ public:
 	{
 		Color ret;
 		unsigned char * p = (unsigned char*)pixels;
-		p+=(PaddedRowLength*y)+(x*(BitCount/8));
+		if(BitCount == 4)
+			p+=(PaddedRowLength*y)+(x>>1);
+		else
+			p+=(PaddedRowLength*y)+(x*(BitCount/8));
 		if(BitCount == 24) {
 			ret.b = *p++;
 			ret.g = *p++;

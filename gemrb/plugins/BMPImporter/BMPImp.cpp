@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.10 2003/11/30 17:44:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.11 2003/11/30 23:26:46 balrog994 Exp $
  *
  */
 
@@ -83,8 +83,11 @@ bool BMPImp::Open(DataStream * stream, bool autoFree)
 	}
 	//COLORTABLE
 	Palette = NULL;
-	NumColors = 256;
 	if(BitCount <= 8) {
+		if(BitCount == 8)
+			NumColors = 256;
+		else
+			NumColors = 16;
 		Palette = (Color*)malloc(4*NumColors);
 		for(unsigned int i = 0; i < NumColors; i++) {
 			str->Read(&Palette[i].b, 1);
@@ -93,6 +96,7 @@ bool BMPImp::Open(DataStream * stream, bool autoFree)
 			str->Read(&Palette[i].a, 1);
 		}
 	}
+	str->Seek(DataOffset, GEM_STREAM_START);
 	//RASTERDATA
 	switch(BitCount) {
 		case 24:
@@ -108,16 +112,16 @@ bool BMPImp::Open(DataStream * stream, bool autoFree)
 		break;
 
 		case 4:
-			PaddedRowLength = (Width+1)/2;
+			PaddedRowLength = (Width>>1);
 		break;
 		default:
 			printf("[BMPImporter]: BitCount not supported.\n");
 			return false;
 	}
-	if(BitCount!=4)
-	{
+	//if(BitCount!=4)
+	//{
 	  if(PaddedRowLength&3) PaddedRowLength+=4-(PaddedRowLength&3);
-	}
+	//}
 	void * rpixels = malloc(PaddedRowLength*Height);
 	str->Read(rpixels, PaddedRowLength*Height);
 	if(BitCount == 24) {
@@ -170,6 +174,25 @@ Sprite2D * BMPImp::GetImage()
 		void *p = malloc(Width*Height);
 		memcpy(p, pixels, Width*Height);
 		spr = core->GetVideoDriver()->CreateSprite8(Width, Height, 8, p, Palette);
+	}
+	else if(BitCount == 4) {
+		void *p = malloc(Width*Height);
+		unsigned char *dst = (unsigned char*)p;
+		for(int y = 0; y < Height; y++) {
+			unsigned char *src = (unsigned char*)pixels+(PaddedRowLength*y);
+			for(int x = 0; x < Width; x++) {
+				*dst = (*src>>4);
+				dst++;
+				if(x == (Width-1))
+					if(!(Width&1))
+						continue;
+				*dst = (*src&0x0f);
+				dst++;
+				src++;
+				x++;
+			}
+		}
+		spr = core->GetVideoDriver()->CreateSprite8(Width, Height, 4, p, Palette);
 	}
 	return spr;
 }
