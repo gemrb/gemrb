@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.5 2004/12/06 21:51:57 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.6 2004/12/06 22:07:13 edheldil Exp $
 # character generation, mage spells (GUICG7)
 
 import GemRB
@@ -29,7 +29,7 @@ Learnable = []
 
 def OnLoad():
 	global MageSpellsWindow, TextAreaControl, DoneButton
-	global Learnable
+	global MageSpellsSelectPointsLeft, Learnable
 	
 	ClassTable = GemRB.LoadTable("classes")
 	ClassRow = GemRB.GetVar("Class")-1
@@ -134,6 +134,8 @@ def MageSpellsDonePress():
 	return
 
 def MageSpellsPickPress():
+	global MageSpellsSelectPointsLeft, Learnable
+
 	Range = len(Learnable)
 	if MageSpellsSelectPointsLeft > Range:
 		MageSpellsSelectPointsLeft = Range
