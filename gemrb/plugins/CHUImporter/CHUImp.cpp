@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.22 2003/12/15 23:52:28 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.23 2003/12/23 18:59:27 avenger_teambg Exp $
  *
  */
 
@@ -305,12 +305,12 @@ Window * CHUImp::GetWindow(unsigned long i)
 				if(alignment & 1) {
 					lab->useRGB = true;
 					Color f,b;
-					f.r = fore.r;
+					f.r = fore.b;
 					f.g = fore.g;
-					f.b = fore.b;
-					b.r = back.r;
+					f.b = fore.r;
+					b.r = back.b;
 					b.g = back.g;
-					b.b = back.b;
+					b.b = back.r;
 					lab->SetColor(f, b);
 				}
 				if((alignment & (1<<4)) != 0)
