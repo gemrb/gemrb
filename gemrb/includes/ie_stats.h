@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.27 2005/03/06 10:47:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.28 2005/03/13 15:51:53 avenger_teambg Exp $
  *
  */
 
@@ -81,8 +81,8 @@
 
 #define STATE_CANTMOVE   0x80000fef
 #define STATE_CANTLISTEN 0x80000fef
-#define STATE_CANTSTEAL  0x000000c0
-
+#define STATE_CANTSTEAL  0x00000fc0
+#define STATE_CANTSEE    0x00000fc0
 
 //Multiclass flags
 #define MC_REMOVE_CORPSE        0x0002
