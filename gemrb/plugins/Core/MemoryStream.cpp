@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.13 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.14 2004/04/17 11:44:41 doc_wagon Exp $
  *
  */
 
@@ -38,7 +38,7 @@ MemoryStream::~MemoryStream(void)
 	}
 }
 
-int MemoryStream::Read(void* dest, unsigned int length)
+int MemoryStream::Read(void* dest, int length)
 {
 	if (length + Pos > this->length) {
 		return GEM_ERROR;
