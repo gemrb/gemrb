@@ -4,8 +4,6 @@
 
 extern Interface * core;
 
-
-
 /***********************
  *	Scriptable Class   *
  ***********************/
@@ -30,8 +28,10 @@ Scriptable::Scriptable(ScriptableType type)
 	startTime = 0;
 	interval = (1000/AI_UPDATE_TIME);
 	WaitCounter = 0;
+	playDeadCounter = 0;
 	resetAction = false;
 	neverExecuted = true;
+	Terminate = false;
 
 	locals = new Variables();
 	locals->SetType(GEM_VARIABLES_INT);
@@ -151,6 +151,13 @@ void Scriptable::ProcessActions()
 	if((thisTime-startTime) < interval)
 		return;
 	startTime = thisTime;
+	if(playDeadCounter) {
+		playDeadCounter--;
+		if(!playDeadCounter) {
+			Moveble * mov = (Moveble*)MySelf;
+			mov->AnimID = IE_ANI_GET_UP;
+		}
+	}
 	if(WaitCounter) {
 		WaitCounter--;
 		if(!WaitCounter)
@@ -185,6 +192,11 @@ void Scriptable::ProcessActions()
 				CutSceneId = NULL;
 			
 			break;
+		}
+		if(Type == ST_ACTOR) {
+			Moveble * actor = (Moveble*)this;
+			if(actor->AnimID == IE_ANI_DIE)
+				actor->AnimID = IE_ANI_GET_UP;
 		}
 		printf("Executing Action: %s\n", this->scriptName);
 		GameScript::ExecuteAction(this, CurrentAction);
@@ -252,7 +264,7 @@ void Selectable::SetCircle(int size, Color color)
 {
 	this->size = size;
 	selectedColor = color;
-    overColor.r = color.r>>1;
+    	overColor.r = color.r>>1;
 	overColor.g = color.g>>1;
 	overColor.b = color.b>>1;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.15 2004/01/11 18:57:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.16 2004/01/16 22:52:19 balrog994 Exp $
  *
  */
 
@@ -97,6 +97,8 @@ public:
 	std::list<Action*> actionQueue;
 	Action * CurrentAction;
 	bool resetAction;
+	bool Terminate; //Used only in CutScenes
+	unsigned long playDeadCounter;
 public:
 	void SetScript(const char *aScript, int idx);
 	void SetWait(unsigned long time);
