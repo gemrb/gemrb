@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.20 2003/12/12 23:11:58 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.21 2003/12/15 09:16:14 balrog994 Exp $
  *
  */
 
@@ -28,7 +28,7 @@ extern Interface * core;
 
 CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, unsigned char MirrorType, int RowIndex)
 {
-	int len = strlen(BaseResRef);
+	size_t len = strlen(BaseResRef);
 	ResRef = (char*)malloc(len+1);
 	memcpy(ResRef, BaseResRef, len+1);
 	this->OrientCount = OrientCount;
