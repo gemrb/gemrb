@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.28 2003/12/30 17:53:58 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.29 2003/12/30 21:54:52 balrog994 Exp $
  *
  */
 
@@ -278,7 +278,7 @@ Map * AREImp::GetMap()
 	for(int i = 0; i < InfoPointsCount; i++) {
 		str->Seek(InfoPointsOffset + (i*0xC4), GEM_STREAM_START);
 		unsigned short Type, VertexCount;
-		unsigned long FirstVertex, Cursor;
+		unsigned long FirstVertex, Cursor, EndFlags;
 		unsigned short TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
 		unsigned short LaunchX, LaunchY;
 		char Name[33], Script[9], Key[9];
@@ -296,7 +296,8 @@ Map * AREImp::GetMap()
 		str->Read(&FirstVertex, 4);
 		str->Seek(4, GEM_CURRENT_POS);
 		str->Read(&Cursor, 4);
-		str->Seek(44, GEM_CURRENT_POS);
+		str->Seek(40, GEM_CURRENT_POS);
+		str->Read(&EndFlags, 4);
 		unsigned long StrRef;
 		str->Read(&StrRef, 4);
 		str->Read(&TrapDetDiff,2);
@@ -332,6 +333,7 @@ Map * AREImp::GetMap()
 		ip->timeStartDisplaying = 0;
 		ip->XPos = bbox.x+(bbox.w/2);
 		ip->YPos = bbox.y+(bbox.h/2);
+		ip->EndAction = EndFlags;
 		//ip->triggered = false;
 		//strcpy(ip->Script, Script);
 		if(Script[0] != 0) {
