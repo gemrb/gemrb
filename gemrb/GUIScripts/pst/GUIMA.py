@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.15 2004/11/18 23:32:42 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.16 2004/11/21 21:28:22 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -29,6 +29,8 @@ from GUICommon import CloseOtherWindow
 
 MapWindow = None
 WorldMapWindow = None
+PosX = 0
+PosY = 0
 
 ###################################################
 def OpenMapWindow ():
@@ -58,6 +60,7 @@ def OpenMapWindow ():
 	# Add Note
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetText (Window, Button, 4182)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AddMapNote")
 
 	Text = GemRB.GetControl (Window, 4)
 	GemRB.SetText (Window, Text, "")
@@ -67,14 +70,13 @@ def OpenMapWindow ():
 	# 4 is the Label's control ID
 	GemRB.CreateMapControl (Window, 3, 24, 23, 480, 360, 4, "USERNOTE","RONOTE")
 	Map = GemRB.GetControl (Window, 3)
-	GemRB.SetVar("x",1)
+	GemRB.SetVar ("x",1)
 	GemRB.SetVarAssoc (Window, Map, "x", 1)
 
 	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "SetMapNote")
-	
 
 	MapTable = GemRB.LoadTable( "MAPNAME" )
-	MapName = GemRB.GetTableValue(MapTable, GemRB.GetCurrentArea (), 'STRING')
+	MapName = GemRB.GetTableValue (MapTable, GemRB.GetCurrentArea (), "STRING")
 	GemRB.UnloadTable( MapTable )
 	
 	Label = GemRB.GetControl (Window, 0x10000005)
@@ -91,9 +93,33 @@ def OpenMapWindow ():
 
 	GemRB.UnhideGUI ()
 
+def NoteChanged ():
+	Label = GemRB.GetControl (MapWindow, 4)
+	Text = GemRB.QueryText (MapWindow, Label)
+	GemRB.SetMapNote (PosX, PosY, 0, Text)
+	return
+	
 def SetMapNote ():
-	print "SetMapNote", GemRB.GetVar ("MapControlX"), GemRB.GetVar ("MapControlY")
+	global PosX, PosY
 
+	Label = GemRB.GetControl (MapWindow, 4)
+	GemRB.SetEvent (MapWindow, Label, IE_GUI_EDIT_ON_CHANGE, "NoteChanged")
+	PosX = GemRB.GetVar("MapControlX")
+	PosY = GemRB.GetVar("MapControlY")
+	GemRB.SetControlStatus (MapWindow, Label, IE_GUI_CONTROL_FOCUSED)
+	Map = GemRB.GetControl (MapWindow, 3)
+	GemRB.SetVar ("x",1)
+	GemRB.SetVarAssoc (MapWindow, Map, "x", 1)
+	return
+
+def AddMapNote ():
+	Map = GemRB.GetControl (MapWindow, 3)
+	GemRB.SetVar ("x",2)
+	GemRB.SetVarAssoc (MapWindow, Map, "x", 2)
+	return
+
+###################################################
+# End of file GUIMA.py
 def OpenWorldMapWindow ():
 	global WorldMapWindow, Travel
 
@@ -122,10 +148,5 @@ def OpenWorldMapWindow ():
 	GemRB.SetText (Window, Button, 1403)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
 
-	#GemRB.SetVisible (WorldMapWindow, 1)
 	GemRB.UnhideGUI ()
 
-
-
-###################################################
-# End of file GUIMA.py
