@@ -149,8 +149,9 @@ Dictionary::GetAssocAt(const char *key, unsigned int type, unsigned int& nHash) 
 	MyAssoc* pAssoc;
 	for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL; pAssoc = pAssoc->pNext)
 	{
-		if(!strnicmp(pAssoc->key, key,8) )
-			return pAssoc;
+		if(type==pAssoc->type)
+			if(!strnicmp(pAssoc->key, key,8) )
+				return pAssoc;
 	}
 	return NULL;
 }
