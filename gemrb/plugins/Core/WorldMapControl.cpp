@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.2 2004/08/20 13:32:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.3 2004/08/23 21:46:22 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -44,6 +44,7 @@ WorldMapControl::WorldMapControl(void)
 	ScrollY = 0;
 	MouseIsDown = false;
 	Changed = true;
+	lastCursor = 0;
 }
 
 
@@ -96,7 +97,7 @@ void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			//not GEM_TAB
 			printf( "TAB released\n" );
 			return;
-	        case 'f':
+		case 'f':
 			if (Mod & 64)
 				core->GetVideoDriver()->ToggleFullscreenMode();
 			break;
@@ -118,7 +119,7 @@ void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 {
 	WorldMap* worldmap = core->GetWorldMap();
-	//int nextCursor = 0;
+	int nextCursor = 44; //this is the grabbing hand
 
 	if (MouseIsDown) {
 		ScrollX -= x - lastMouseX;
@@ -137,81 +138,26 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 	lastMouseX = x;
 	lastMouseY = y;
 
+	if (Value) {
+		x += ScrollX;
+		y += ScrollY;
 
-	x += ScrollX;
-	y += ScrollY;
-
-	std::vector< WMPAreaEntry*>::iterator m;
-	for (m = worldmap->area_entries.begin(); m != worldmap->area_entries.end(); ++m) {
-		if ((*m)->X <= x && (*m)->X + (*m)->MapIcon->Width > x && (*m)->Y <= y && (*m)->Y + (*m)->MapIcon->Height > y)
-			printf("A: %s\n", (*m)->AreaName);
-	}
-
-
-#if 0
-	short WorldmapX = x, WorldmapY = y;
-	core->GetVideoDriver()->ConvertToWorldmap( WorldmapX, WorldmapY );
-	if (MouseIsDown && ( !DrawSelectionRect )) {
-		if (( abs( WorldmapX - StartX ) > 5 ) || ( abs( WorldmapY - StartY ) > 5 )) {
-			DrawSelectionRect = true;
+		std::vector< WMPAreaEntry*>::iterator m;
+		for (m = worldmap->area_entries.begin(); m != worldmap->area_entries.end(); ++m) {
+			if ((*m)->X <= x &&
+			(*m)->X + (*m)->MapIcon->Width > x &&
+			(*m)->Y <= y &&
+			(*m)->Y + (*m)->MapIcon->Height > y) {
+				printf("A: %s\n", (*m)->AreaName);
+				nextCursor = 0; //we are over an area!
+			}
 		}
 	}
-	Worldmap* worldmap = core->GetWorldmap();
-	Map* area = worldmap->GetCurrentMap( );
-
-	switch (area->GetBlocked( WorldmapX, WorldmapY ) & 3) {
-		case 0:
-			nextCursor = 6;
-			break;
-
-		case 1:
-			nextCursor = 4;
-			break;
-
-		case 2:
-		case 3:
-			nextCursor = 34;
-			break;
-	}
-
-	overInfoPoint = area->tm->GetInfoPoint( WorldmapX, WorldmapY );
-	if (overInfoPoint) {
-		if (overInfoPoint->Type != ST_PROXIMITY) {
-			nextCursor = overInfoPoint->Cursor;
-		}
-	}
-
-	if (overDoor) {
-		overDoor->Highlight = false;
-	}
-	overDoor = area->tm->GetDoor( WorldmapX, WorldmapY );
-	if (overDoor) {
-		overDoor->Highlight = true;
-		nextCursor = overDoor->Cursor;
-		overDoor->outlineColor = cyan;
-	}
-
-	if (overContainer) {
-		overContainer->Highlight = false;
-	}
-	overContainer = area->tm->GetContainer( WorldmapX, WorldmapY );
-	if (overContainer) {
-		overContainer->Highlight = true;
-		if (overContainer->TrapDetected && overContainer->Trapped) {
-			nextCursor = 38;
-			overContainer->outlineColor = red;
-		} else {
-			nextCursor = 2;
-			overContainer->outlineColor = cyan;
-		}
-	}
-
 
 	if (lastCursor != nextCursor) {
 		( ( Window * ) Owner )->Cursor = nextCursor;
 		lastCursor = nextCursor;
 	}
-#endif
 }
 
 #if 0

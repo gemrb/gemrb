@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.5 2004/08/22 19:24:29 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.6 2004/08/23 21:46:27 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -87,8 +87,9 @@ def OpenMapWindow ():
 
 
 def OpenWorldMapWindow ():
-	global WorldMapWindow
+	global WorldMapWindow, Travel
 
+	Travel = 1 #allow travel or not, this should be set somehow
 	GemRB.HideGUI()
 
 	if WorldMapWindow:
@@ -109,7 +110,7 @@ def OpenWorldMapWindow ():
 	#print "WMAP win is %d , button is %d" %(Window, Button)
 	#GemRB.SetWorldMapImage (Window, Button)
 
-	Map = GemRB.CreateWorldMapControl (Window, 5, 0, 62, 640, 418)
+	Map = GemRB.CreateWorldMapControl (Window, 5, 0, 62, 640, 418, Travel)
 	
 	# Done
 	Button = GemRB.GetControl (Window, 0)

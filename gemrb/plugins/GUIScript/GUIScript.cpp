@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.195 2004/08/22 22:10:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.196 2004/08/23 21:46:26 avenger_teambg Exp $
  *
  */
 
@@ -1570,15 +1570,15 @@ static PyObject* GemRB_SetButtonFont(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateWorldMapControl__doc,
-"CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h) => ControlIndex\n\n"
+"CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, flags) => ControlIndex\n\n"
 "Creates and adds a new WorldMap control to a Window." );
 
 static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h;
+	int WindowIndex, ControlID, x, y, w, h, flags;
 
-	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &x,
-			&y, &w, &h )) {
+	if (!PyArg_ParseTuple( args, "iiiiiii", &WindowIndex, &ControlID, &x,
+			&y, &w, &h, &flags )) {
 		return AttributeError( GemRB_CreateWorldMapControl__doc );
 	}
 
@@ -1594,10 +1594,7 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 	wmap->ControlID = ControlID;
 	wmap->ControlType = IE_GUI_WORLDMAP;
 	wmap->Owner = win;
-#if 0
-	lbl->SetText( text );
-	lbl->SetAlignment( align );
-#endif
+	wmap->Value = flags;
 	win->AddControl( wmap );
 
 	Py_INCREF( Py_None );
