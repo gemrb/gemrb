@@ -15,13 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.15 2003/12/02 23:09:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.16 2003/12/07 09:38:12 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "MUSImp.h"
 #include "../Core/Interface.h"
+
+static char musicsubfolder[6]="music";
 
 MUSImp::MUSImp()
 {
@@ -30,6 +32,15 @@ MUSImp::MUSImp()
 	str = new FileStream();
 	PLpos = 0;
 	lastSound = 0xffffffff;
+	if(core->CaseSensitive) {
+		//TODO: a better, generalised function 
+		char path[_MAX_PATH];
+		strcpy(path, core->GamePath);
+		strcat(path, musicsubfolder);
+		if(!dir_exists(path) ) {
+			 musicsubfolder[0]=toupper(musicsubfolder[0]);
+		}
+	}
 }
 MUSImp::~MUSImp(){
 	if(str)
@@ -56,11 +67,14 @@ bool MUSImp::OpenPlaylist(const char * name)
 		return false;
 	char path[_MAX_PATH];
 	strcpy(path, core->GamePath);
-	strcat(path, "music");
+	strcat(path, musicsubfolder);
 	strcat(path, SPathDelimiter);
 	strcat(path, name);
-	if(!str->Open(path, true))
+	if(!str->Open(path, true)) {
+		printf("%s [NOT FOUND]\n",path);
 		return false;
+	}
+	printf("Loading %s\n",name);
 	str->ReadLine(PLName, 32);
 	char counts[5];
 	str->ReadLine(counts, 5);
@@ -144,8 +158,8 @@ bool MUSImp::OpenPlaylist(const char * name)
 		}
 		if(!found) {
 			char FName[_MAX_PATH];
-      		strcpy(FName, core->GamePath);
-			strcat(FName, "music");
+			strcpy(FName, core->GamePath);
+			strcat(FName, musicsubfolder);
 			strcat(FName, SPathDelimiter);
 			//this is in IWD2
 			if(strnicmp(pls.PLFile, "MX0000",6)==0) {
@@ -159,6 +173,7 @@ bool MUSImp::OpenPlaylist(const char * name)
 			}
 			strcat(FName, pls.PLFile);
 			strcat(FName, ".acm");
+			printf("Loading: %s\n",FName);
 			pls.soundID = core->GetSoundMgr()->LoadFile(FName);
 		}
 		playlist.push_back(pls);
@@ -212,7 +227,7 @@ void MUSImp::End()
 			pls.PLTag[0] = 0;
 			char FName[_MAX_PATH];
 			strcpy(FName, core->GamePath);
-			strcat(FName, "music");
+			strcat(FName, musicsubfolder);
 			strcat(FName, SPathDelimiter);
 			if(stricmp(pls.PLFile, "SPC1") != 0) {
 				strcat(FName, PLName);
