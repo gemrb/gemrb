@@ -153,7 +153,7 @@ bool TLKImp::GetNewStringLength(char *string, unsigned long &Length)
 			lChange=true;
 			char *tmppoi=strchr(string+i+1,']');
 			if(tmppoi)
-				NewLength+=tmppoi-string-i-1;
+				i+=tmppoi-string-i;
 			else
 				break;
 		}
