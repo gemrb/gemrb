@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.SetControlSize(WindowIndex, ControlIndex, Width, Height)
 
-Description:
+Description: Resizes a Control.
 
-Parameters:
+Parameters: WindowIndex, ControlIndex  - the control's reference
+Width, Height - the new dimensions of the control
 
-Return value:
+Return value: N/A
 
-See also:
+See also: SetControlPos, accessing_gui_controls
 

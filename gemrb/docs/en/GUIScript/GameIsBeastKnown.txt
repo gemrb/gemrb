@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GameIsBeastKnown(index)
 
-Description:
+Description: Returns whether beast with given index is known to PCs (works only on PST).
 
-Parameters:
+Parameters: index - the beast's index as of beast.ini
 
-Return value:
+Return value: boolean, 1 means beast is known.
 
-See also:
+See also: GetINIBeastsKey
 

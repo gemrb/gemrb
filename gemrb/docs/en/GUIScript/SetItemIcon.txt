@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.SetItemIcon(WindowIndex, ControlIndex, ITMResRef)
 
-Description:
+Description: Sets Item icon image on a Button control.
 
 Parameters:
+WindowIndex, ControlIndex  - the control's reference
+ITMResRef                  - the name of the item (.itm resref)
 
-Return value:
+Return value: N/A
 
-See also:
-
+See also: SetSpellIcon

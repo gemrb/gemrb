@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.GetINIPartyCount()
 
-Description:
+Description: Returns the Number of Parties defined in Party.ini (works only on IWD2).
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: the number of predefined parties as of party.ini
 
-See also:
+See also: GetINIPartyKey
 

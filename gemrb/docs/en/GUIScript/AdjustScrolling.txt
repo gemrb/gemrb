@@ -1,11 +1,22 @@
 
-Prototype:
+Prototype: AdjustScrolling(WindowIndex, ControlIndex, x, y)
 
-Description:
+Description: Sets the scrolling offset of a WorldMapControl.
 
-Parameters:
+Parameters: WindowIndex, ControlIndex  - the control's reference
+x,y - scrolling offset values
 
-Return value:
+Return value: N/A
 
-See also:
+Example:
+        #northeast
+        Button = GemRB.GetControl (Window, 9)
+        GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapNE")
+...
+def MapNE():
+        GemRB.AdjustScrolling (Window, WorldMapControl, 10, -10)
+        return
+The above lines set up a button event. When the button is pressed the worldmap will be shifted in the northeastern direction.
+
+See also: CreateWorldMapControl
 

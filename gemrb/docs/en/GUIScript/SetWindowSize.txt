@@ -1,11 +1,13 @@
 
-Prototype:
+Prototype: GemRB.SetWindowSize(WindowIndex, Width, Height)
 
-Description:
+Description: Resizes a Window.
 
 Parameters:
+WindowIndex   - the index returned by LoadWindow()
+Width, Height - the new dimensions of the window
 
-Return value:
+Return value: N/A
 
-See also:
+See also: LoadWindow, SetWindowPos, SetControlSize
 

@@ -1,11 +1,14 @@
 
-Prototype:
+Prototype: GemRB.GetINIQuestsKey(Tag, Key, Default)
 
-Description:
+Description: Returns a Value from the quests.ini File (works only on PST).
 
 Parameters:
+Tag - a section in the quests.ini file
+Key - a field in the section
+Default - default value in case the entry doesn't exist
 
-Return value:
+Return value: string, the entry from the ini file
 
-See also:
+See also: GetINIBeastsKey
 

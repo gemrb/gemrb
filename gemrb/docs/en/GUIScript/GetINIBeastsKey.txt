@@ -1,11 +1,13 @@
 
-Prototype:
+Prototype: GemRB.GetINIBeastsKey(Tag, Key, Default)
 
-Description:
+Description: Returns a Value from the beast.ini File (works only on PST).
 
 Parameters:
+Tag - a section in the beast.ini file
+Key - a field in the section
+Default - default value in case the entry doesn't exist
 
-Return value:
+Return value: string, the entry from the ini file
 
-See also:
-
+See also: GetINIQuestsKey

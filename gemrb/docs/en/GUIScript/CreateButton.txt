@@ -1,11 +1,14 @@
 
-Prototype:
+Prototype: GemRB.CreateButton(WindowIndex, ControlID, x, y, w, h)
 
-Description:
+Description: Creates and adds a new Button to a Window.
 
 Parameters:
+WindowIndex - the value returned from LoadWindow
+ControlID   - the new control will be available via this controlID
+x,y,w,h     - X position, Y position, Width and Height of the control
 
-Return value:
+Return value: N/A
 
-See also:
+See also: CreateLabel, CreateMapControl, CreateWorldMapControl
 

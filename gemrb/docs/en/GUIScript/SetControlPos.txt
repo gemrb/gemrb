@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.SetControlPos(WindowIndex, ControlIndex, X, Y)
 
-Description:
+Description: Moves a Control.
 
-Parameters:
+Parameters: WindowIndex, ControlIndex  - the control's reference
+X,Y - the new position of the control relative to the window
 
 Return value:
 
-See also:
+See also: SetControlSize, accessing_gui_controls
 

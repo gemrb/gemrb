@@ -1,11 +1,14 @@
 
-Prototype:
+Prototype: GemRB.EnableButtonBorder(WindowIndex, ControlIndex, BorderIndex, enabled)
 
-Description:
+Description: Enable or disable specified border/frame/overlay of a button control.
 
-Parameters:
+Parameters: 
+WindowIndex, ControlIndex  - the control's reference
+BorderIndex                - 0,1 or 2
+enabled                    - boolean, true enables the border
 
-Return value:
+Return value: N/A
 
-See also:
+See also: SetButtonBAM, SetButtonFlags, SetButtonBorder
 
