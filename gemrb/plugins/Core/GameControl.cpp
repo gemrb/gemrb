@@ -112,9 +112,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			Door *d;
 			for(unsigned int idx=0; d=area->tm->GetDoor(idx); idx++) {
 				if(d->DoorClosed)
-					video->DrawPolyline(d->closed,blue,true);
+					video->DrawPolyline(d->closed,cyan,true);
 				else {
-					video->DrawPolyline(d->open,blue,true);
+					video->DrawPolyline(d->open,cyan,true);
 				}
 			}
 		}
@@ -125,7 +125,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				video->DrawPolyline(overDoor->open,cyan,true);
 			}
 		}
-		//draw containers when TAB is held
+		//draw containers when ALT was pressed
 		if(DebugFlags&4) {
 			Container *c;
 			for(unsigned int idx=0; c=area->tm->GetContainer(idx); idx++) {

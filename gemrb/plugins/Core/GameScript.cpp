@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.22 2003/12/29 20:11:56 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.23 2003/12/29 22:04:00 avenger_teambg Exp $
  *
  */
 
@@ -88,6 +88,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[121] = StartCutSceneMode;
 		actions[122] = EndCutSceneMode;
 		actions[127] = CutSceneId;
+		actions[137] = StartDialogue;
 		actions[153] = ChangeAllegiance;
 		actions[154] = ChangeGeneral;
 		actions[155] = ChangeRace;
@@ -1122,7 +1123,7 @@ void GameScript::SG(GameScript * Sender, Action * parameters)
 
 void GameScript::SetGlobal(GameScript * Sender, Action * parameters)
 {
-	printf("SetGlobal(\"%s\", %d)\n", parameters->string0Parameter, parameters->int0Parameter);
+//	printf("SetGlobal(\"%s\", %d)\n", parameters->string0Parameter, parameters->int0Parameter);
 	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
 		globals->SetAt(&parameters->string0Parameter[6], parameters->int0Parameter);
 	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
@@ -1500,6 +1501,28 @@ void GameScript::Dialogue(GameScript * Sender, Action * parameters)
 	if(actor->Dialog[0] != 0) {
 		DialogMgr * dm = (DialogMgr*)core->GetInterface(IE_DLG_CLASS_ID);
 		dm->Open(core->GetResourceMgr()->GetResource(actor->Dialog, IE_DLG_CLASS_ID), true);
+		GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
+		if(gc->ControlType == IE_GUI_GAMECONTROL)
+			gc->InitDialog(actor, target, dm->GetDialog());
+		core->FreeInterface(dm);
+	}
+}
+
+void GameScript::StartDialogue(GameScript * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!tar)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	Actor * target = (Actor*)tar;
+	if(parameters->string0Parameter[0] != 0) {
+		DialogMgr * dm = (DialogMgr*)core->GetInterface(IE_DLG_CLASS_ID);
+		dm->Open(core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_DLG_CLASS_ID), true);
 		GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
 		if(gc->ControlType == IE_GUI_GAMECONTROL)
 			gc->InitDialog(actor, target, dm->GetDialog());

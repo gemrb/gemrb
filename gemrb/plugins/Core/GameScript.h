@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.14 2003/12/23 23:32:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.15 2003/12/29 22:04:00 avenger_teambg Exp $
  *
  */
 
@@ -216,6 +216,7 @@ private: //Script Functions
 	static void HideGUI(GameScript * Sender, Action * parameters);
 	static void UnhideGUI(GameScript * Sender, Action * parameters);
 	static void Dialogue(GameScript * Sender, Action * parameters);
+	static void StartDialogue(GameScript * Sender, Action * parameters);
 };
 
 #endif
