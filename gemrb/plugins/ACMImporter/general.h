@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/general.h,v 1.2 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/general.h,v 1.3 2005/02/23 22:20:52 guidoj Exp $
  *
  */
 
@@ -27,8 +27,8 @@
 
 #pragma pack (push, 1)
 struct ACM_Header {
-	long signature;
-	long samples;
+	unsigned int signature;
+	unsigned int samples;
 	unsigned short channels;
 	unsigned short rate;
 	unsigned short levels : 4;
