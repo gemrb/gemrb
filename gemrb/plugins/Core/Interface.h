@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.69 2004/02/02 01:14:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.70 2004/02/07 23:52:47 avenger_teambg Exp $
  *
  */
 
@@ -31,7 +31,7 @@ class Interface;
 #include "ResourceMgr.h"
 #include "../../includes/SClassID.h"
 #include "StringMgr.h"
-#include "Actor.h"
+#include "ActorBlock.h"
 #include "Factory.h"
 #include "ImageMgr.h"
 #include "ActorMgr.h"

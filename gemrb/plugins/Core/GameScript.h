@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.37 2004/02/07 17:10:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.38 2004/02/07 23:52:47 avenger_teambg Exp $
  *
  */
 
@@ -27,8 +27,8 @@ class Action;
 
 #include "DataStream.h"
 #include "Variables.h"
-#include "ActorBlock.h"
 #include "SymbolMgr.h"
+#include "Actor.h"
 #include <list>
 
 #define GSASSERT(f,c) \
@@ -495,6 +495,9 @@ struct TriggerLink {
 	TriggerFunction Function;
 };
 
+#define BD_INTERRUPT 1  //interrupts action
+#define BD_TALKCOUNT 2  //increases talkcount
+
 #define AF_NONE      0
 #define AF_INSTANT   1
 #define AF_CONTINUE  2
@@ -550,6 +553,7 @@ private:
 	static Action * GenerateAction(char * String);
 	static Trigger * GenerateTrigger(char * String);
 	static Scriptable * GetActorFromObject(Scriptable * Sender, Object * oC);
+	static void BeginDialog(Actor *actor, Actor *target, const char *dialog, int flags);
 	static unsigned char GetOrient(short sX, short sY, short dX, short dY);
 private: //Internal variables
 	unsigned long lastRunTime;
@@ -676,6 +680,12 @@ public:
 	static void MakeGlobal(Scriptable * Sender, Action * parameters);
 	static void SetNumTimesTalkedTo(Scriptable * Sender, Action * parameters);
 	static void StartMovie(Scriptable * Sender, Action * parameters);
+	static void SetLeavePartyDialogFile(Scriptable * Sender, Action * parameters);
+	static void DialogueForceInterrupt(Scriptable * Sender, Action * parameters);
+	static void StartDialogueNoSet(Scriptable * Sender, Action * parameters);
+	static void StartDialogueNoSetInterrupt(Scriptable * Sender, Action * parameters);
+	static void StartDialogueInterrupt(Scriptable * Sender, Action * parameters);
+	static void PlayerDialogue(Scriptable * Sender, Action * parameters);
 };
 
 #endif

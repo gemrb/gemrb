@@ -15,10 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.18 2004/02/07 17:10:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.19 2004/02/07 23:52:47 avenger_teambg Exp $
  *
  */
 
+class GameScript;
+class Action;
 class Scriptable;
 class Selectable;
 class Highlightable;
@@ -31,9 +33,10 @@ class Door;
 #include "Sprite2D.h"
 #include "CharAnimations.h"
 #include "PathFinder.h"
-#include "GameScript.h"
 #include "Polygon.h"
 #include "TileOverlay.h"
+#include "Variables.h"
+//#include "GameScript.h"
 #include <list>
 
 #define STEP_TIME		150
@@ -61,10 +64,12 @@ typedef enum ScriptableType {
 	ST_AREA = 6
 } ScriptableType;
 
+/*
 typedef struct ActionStep {
 	Action * action;
 	bool EndReached;
 } ActionStep;
+*/
 
 #define SEA_RESET			0x00000002
 #define SEA_PARTY_REQUIRED	0x00000004
@@ -84,7 +89,7 @@ public:
 	unsigned short XPos, YPos;
 	Scriptable * MySelf;
 	Scriptable * CutSceneId;
-    GameScript * Scripts[MAX_SCRIPTS];
+    	GameScript * Scripts[MAX_SCRIPTS];
 	char * overHeadText;
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
