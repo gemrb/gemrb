@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.24 2003/12/23 18:46:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.25 2003/12/26 15:28:17 avenger_teambg Exp $
  *
  */
 
@@ -48,8 +48,8 @@ void ACMImp::clearstreams(bool free) {
 		if(!musics[i].free && free) {
 			alDeleteBuffers(1, &musics[i].Buffer);
 			alDeleteSources(1, &musics[i].Source);
+			musics[i].free = true;
 		}
-		streams[i].free = true;
 	}
 }
 
