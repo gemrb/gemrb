@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.39 2004/04/14 23:53:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.40 2004/04/16 15:07:22 avenger_teambg Exp $
  *
  */
 
@@ -307,7 +307,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 	long riff_chans = acm->get_channels();	
 	long bits = acm->get_bits();
 	long samplerate = acm->get_samplerate();
-	unsigned char * memory = new unsigned char[cnt * 2]; 
+	unsigned char * memory = (unsigned char *) malloc(sizeof(unsigned char)*cnt * 2); 
 	memset( memory, 0, cnt * 2 );
 	long cnt1 = acm->read_samples( ( short* ) memory, cnt );
 	int duration = ( ( cnt1 * riff_chans ) * 1000 ) / samplerate;
@@ -315,11 +315,11 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 	if (( error = alGetError() ) != AL_NO_ERROR) {
 		DisplayALError( "[ACMImp::Play] alBufferData : ", error );
 		alDeleteBuffers( 1, &Buffer );
-		delete[] memory;
+		free( memory );
 		delete( acm );
 		return 0;
 	}
-	delete[] memory;
+	free( memory );
 	delete( acm );
 
 	alGenSources( 1, &Source );
