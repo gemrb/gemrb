@@ -101,7 +101,7 @@ void GlobalTimer::SetCutScene(GameScript * script)
 {
 	CutScene = script;
 	if(CutScene) {
-		CutScene->Update(); //Caches the Script
+		CutScene->EvaluateAllBlocks(); //Caches the Script
 		CutSceneMode = true;
 		return;
 	}
