@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.21 2003/12/13 18:46:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.22 2003/12/15 09:29:39 balrog994 Exp $
  *
  */
 
@@ -42,7 +42,7 @@
 
 #include "TileMap.h"
 #include "ImageMgr.h"
-#include "ActorBlock.h"
+#include "Actor.h"
 #include "ScriptedAnimation.h"
 
 #ifdef WIN32
@@ -76,15 +76,15 @@ public:
 	bool justCreated;
 private:
 	std::vector<Animation*> animations;
-	std::vector<ActorBlock*> actors;
+	std::vector<Actor*> actors;
 	std::vector<WallGroup*> wallGroups;
 	std::vector<ScriptedAnimation*> vvcCells;
-	ActorBlock ** queue;
+	Actor ** queue;
 	int Qcount;
 	int lastActorCount;
 	void GenerateQueue();
-	ActorBlock * GetRoot();
-	void DeleteActor(ActorBlock * actor);
+	Actor * GetRoot();
+	void DeleteActor(Actor * actor);
 public:
 	Map(void);
 	~Map(void);
@@ -92,13 +92,12 @@ public:
 	void DrawMap(Region viewport);
 	void PlayAreaSong(int);
 	void AddAnimation(Animation * anim);
-	void AddActor(ActorBlock actor);
-	void AddActor(ActorBlock *actor);
+	void AddActor(Actor *actor);
 	void AddWallGroup(WallGroup * wg);
 	int GetBlocked(int x, int y);
-	ActorBlock * GetActor(int x, int y);
-	ActorBlock * GetActor(const char * Name);
-	int GetActorInRect(ActorBlock ** & actors, Region &rgn);
+	Actor * GetActor(int x, int y);
+	Actor * GetActor(const char * Name);
+	int GetActorInRect(Actor ** & actors, Region &rgn);
 	SongHeaderType SongHeader;
 	void AddVVCCell(ScriptedAnimation * vvc);
 };

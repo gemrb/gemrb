@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.43 2003/12/14 01:47:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.44 2003/12/15 09:29:39 balrog994 Exp $
  *
  */
 
@@ -48,7 +48,6 @@ Map::~Map(void)
 		delete(animations[i]);
 	}
 	for(unsigned int i = 0; i < actors.size(); i++) {
-		delete(actors[i]->actor);
 		delete(actors[i]);
 	}
 	core->FreeInterface(LightMap);
@@ -63,7 +62,8 @@ void Map::AddTileMap(TileMap * tm, ImageMgr * lm, ImageMgr * sr)
 	LightMap = lm;
 	SearchMap = sr;
 }
-static Color green			= {0x00, 0xff, 0x00, 0xff};
+
+/*static Color green			= {0x00, 0xff, 0x00, 0xff};
 static Color red			= {0xff, 0x00, 0x00, 0xff};
 static Color yellow		= {0xff, 0xff, 0x00, 0xff};
 static Color cyan			= {0x00, 0xff, 0xff, 0xff};
@@ -71,7 +71,7 @@ static Color green_dark	= {0x00, 0x80, 0x00, 0xff};
 static Color red_dark		= {0x80, 0x00, 0x00, 0xff};
 static Color yellow_dark	= {0x80, 0x80, 0x00, 0xff};
 static Color cyan_dark		= {0x00, 0x80, 0x80, 0xff};
-static Color magenta		= {0xff, 0x00, 0xff, 0xff};
+static Color magenta		= {0xff, 0x00, 0xff, 0xff};*/
 
 void Map::DrawMap(Region viewport)
 {	
@@ -81,7 +81,7 @@ void Map::DrawMap(Region viewport)
 		Script->Update();
 	int ipCount = 0;
 	while(true) {
-		ActorBlock ** acts;
+		Actor ** acts;
 		int count;
 		InfoPoint * ip = tm->GetInfoPoint(ipCount++);
 		if(!ip)
@@ -101,7 +101,7 @@ void Map::DrawMap(Region viewport)
 		BBox.w += 1000;
 		count = GetActorInRect(acts, BBox);
 		for(int x = 0; x < count; x++) {
-			if(acts[x]->actor->Modified[IE_EA] == 2) {
+			if(acts[x]->Modified[IE_EA] == 2) {
 				ip->Script->Update();
 				break;
 			}
@@ -113,135 +113,36 @@ void Map::DrawMap(Region viewport)
 		video->BlitSpriteMode(animations[i]->NextFrame(), animations[i]->x, animations[i]->y, animations[i]->BlitMode, false);
 	}
 	Region vp = video->GetViewport();
-	//for(unsigned int i = 0; i < actors.size(); i++) {
 	GenerateQueue();
 	while(true) {
-		//ActorBlock * actor = &actors.at(i);
-		ActorBlock * actor = GetRoot();
+		Actor * actor = GetRoot();
 		if(!actor)
 			break;
-		if(actor->path) {	
-#ifndef WIN32
-			struct timeval tv;
-			gettimeofday(&tv, NULL);
-			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
-#else
-			unsigned long time = GetTickCount();
-#endif
-			if(!actor->step) {
-				actor->step = actor->path;
-				actor->timeStartStep = time;
-			}
-			if((time-actor->timeStartStep) >= STEP_TIME) {
-				printf("[New Step] : Orientation = %d\n", actor->step->orient);
-				actor->step = actor->step->Next;
-				actor->timeStartStep = time;
-			}
-			actor->Orientation = actor->step->orient;
-			actor->AnimID = IE_ANI_WALK;
-			actor->XPos = (actor->step->x*16)+8;
-			actor->YPos = (actor->step->y*12)+6;
-			if(!actor->step->Next) {
-				printf("Last Step\n");
-				PathNode * nextNode = actor->path->Next;
-				PathNode * thisNode = actor->path;
-				while(true) {
-					delete(thisNode);
-					thisNode = nextNode;
-					if(!thisNode)
-						break;
-					nextNode = thisNode->Next;
-				}
-				actor->path = NULL;
-				actor->AnimID = IE_ANI_AWAKE;
-			}
-			else {
-				if(actor->step->Next->x > actor->step->x)
-					actor->XPos += ((((actor->step->Next->x*16)+8)-actor->XPos)*(time-actor->timeStartStep))/STEP_TIME;
-				else
-					actor->XPos -= ((actor->XPos-((actor->step->Next->x*16)+8))*(time-actor->timeStartStep))/STEP_TIME;
-				if(actor->step->Next->y > actor->step->y)
-					actor->YPos += ((((actor->step->Next->y*12)+6)-actor->YPos)*(time-actor->timeStartStep))/STEP_TIME;
-				else
-					actor->YPos -= ((actor->YPos-((actor->step->Next->y*12)+6))*(time-actor->timeStartStep))/STEP_TIME;
-			}
-		}
-		CharAnimations * ca = actor->actor->GetAnims();
+		actor->DoStep(LightMap);
+		CharAnimations * ca = actor->GetAnims();
 		if(!ca)
 			continue;
 		Animation * anim = ca->GetAnimation(actor->AnimID, actor->Orientation);
-		bool DrawCircle=ca->DrawCircle;
-		if(actor->Selected)
-			DrawCircle = true;
-		if(DrawCircle && (ca->CircleSize==0) ) DrawCircle=false;
-		else {
-			if(actor->actor->Modified[IE_NOCIRCLE]) DrawCircle=false;
-			else {
-				 if(actor->actor->Modified[IE_STATE_ID]&STATE_DEAD) DrawCircle=false;
-			}
-		}
-		if(DrawCircle) {
-			Color *color;
-
-			if(actor->actor->BaseStats[IE_UNSELECTABLE]) {
-				color=&magenta;
-			}
-			if(actor->actor->BaseStats[IE_MORALEBREAK]<actor->actor->Modified[IE_MORALEBREAK])
-			{
-				if(actor->Selected) color=&yellow;
-				else color=&yellow_dark;
-			} else switch(actor->actor->BaseStats[IE_EA])
-			{
-			case EVILCUTOFF:
-			case GOODCUTOFF:
-			break;
-
-			case PC:
-			case FAMILIAR:
-			case ALLY:
-			case CONTROLLED:
-			case CHARMED:
-			case EVILBUTGREEN:
-				if(actor->Selected) color=&green;
-				else color=&green_dark;
-			break;
-
-			case ENEMY:
-			case GOODBUTRED:
-				if(actor->Selected) color=&red;
-				else color=&red_dark;
-			break;
-			default:
-				if(actor->Selected) color=&cyan;
-				else color=&cyan_dark;
-
-			break;
-			}
-			video->DrawEllipse(actor->XPos-vp.x, actor->YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), *color);
-		}
+		if((!actor->Modified[IE_NOCIRCLE]) && (!(actor->Modified[IE_STATE_ID]&STATE_DEAD)))
+			actor->DrawCircle();
 		if(anim) {
 			Sprite2D * nextFrame = anim->NextFrame();
 			if(actor->lastFrame != nextFrame) {
-				actor->MinX = actor->XPos-nextFrame->XPos;
-				actor->MaxX = actor->MinX+nextFrame->Width;
-				actor->MinY = actor->YPos-nextFrame->YPos;
-				actor->MaxY = actor->MinY+nextFrame->Height;
+				Region newBBox;
+				newBBox.x = actor->XPos-nextFrame->XPos;
+				newBBox.w = nextFrame->Width;
+				newBBox.y = actor->YPos-nextFrame->YPos;
+				newBBox.h = nextFrame->Height;
 				actor->lastFrame = nextFrame;
+				actor->SetBBox(newBBox);
 			}
-			if(actor->MinX > (vp.x+vp.w))
-				continue;
-			if(actor->MaxX < vp.x)
-				continue;
-			if(actor->MinY > (vp.y+vp.h))
-				continue;
-			if(actor->MaxY < vp.y)
+			if(!actor->BBox.InsideRegion(vp))
 				continue;
 			int ax = actor->XPos, ay = actor->YPos;
 			int cx = ax/16;
 			int cy = ay/12;
 			Color tint = LightMap->GetPixel(cx, cy);
 			tint.a = 0xA0;
-			//video->BlitSprite(nextFrame, actors[i].XPos, actors[i].YPos);
 			video->BlitSpriteTinted(nextFrame, ax, ay, tint);
 			if(anim->endReached && anim->autoSwitchOnEnd) {
 				actor->AnimID = anim->nextAnimID;
@@ -249,13 +150,8 @@ void Map::DrawMap(Region viewport)
 			}
 		}
 		if(actor->textDisplaying) {
-#ifdef WIN32
-			unsigned long time = GetTickCount();
-#else
-			struct timeval tv;
-			gettimeofday(&tv, NULL);
-			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
-#endif
+			unsigned long time;
+			GetTime(time);
 			if((time - actor->timeStartDisplaying) >= 6000) {
 				actor->textDisplaying = 0;
 			}
@@ -272,7 +168,7 @@ void Map::DrawMap(Region viewport)
 		if(actor->DeleteMe)
 			DeleteActor(actor);
 	}
-	for(int i = 0; i < vvcCells.size(); i++) {
+	for(unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation * vvc = vvcCells.at(i);
 		if(!vvc)
 			continue;
@@ -302,75 +198,28 @@ void Map::AddAnimation(Animation * anim)
 	animations.push_back(anim);
 }
 
-void Map::AddActor(ActorBlock actor)
+void Map::AddActor(Actor *actor)
 {
-	ActorBlock * ab = new ActorBlock();
-	CharAnimations * ca = actor.actor->GetAnims();
-	if(ca) {
-		Animation * anim = ca->GetAnimation(actor.AnimID, actor.Orientation);
-		Sprite2D * nextFrame = anim->NextFrame();
-		if(actor.lastFrame != nextFrame) {
-			actor.MinX = actor.XPos-nextFrame->XPos;
-			actor.MaxX = actor.MinX+nextFrame->Width;
-			actor.MinY = actor.YPos-nextFrame->YPos;
-			actor.MaxY = actor.MinY+nextFrame->Width;
-			actor.lastFrame = nextFrame;
-		}
-	}
-	actor.Selected = false;
-	actor.path = NULL;
-	actor.step = NULL;
-	actor.textDisplaying = 0;
-	actor.overHeadText = NULL;
-	ab->actor = actor.actor;
-	ab->AnimID = actor.AnimID;
-	ab->lastFrame = actor.lastFrame;
-	ab->MaxX = actor.MaxX;
-	ab->MaxY = actor.MaxY;
-	ab->MinX = actor.MinX;
-	ab->MinY = actor.MinY;
-	ab->Orientation = actor.Orientation;
-	ab->overHeadText = NULL;
-	ab->path = NULL;
-	ab->step = NULL;
-	ab->textDisplaying = 0;
-	ab->timeStartDisplaying = 0;
-	ab->timeStartStep = 0;
-	ab->XDes = actor.XDes;
-	ab->YDes = actor.YDes;
-	ab->XPos = actor.XPos;
-	ab->YPos = actor.YPos;
-	ab->Selected = false;
-	ab->DeleteMe = false;
-	actors.push_back(ab);
-}
-
-void Map::AddActor(ActorBlock *actor)
-{
-	CharAnimations * ca = actor->actor->GetAnims();
+	CharAnimations * ca = actor->GetAnims();
 	if(ca) {
 		Animation * anim = ca->GetAnimation(actor->AnimID, actor->Orientation);
 		Sprite2D * nextFrame = anim->NextFrame();
 		if(actor->lastFrame != nextFrame) {
-			actor->MinX = actor->XPos-nextFrame->XPos;
-			actor->MaxX = actor->MinX+nextFrame->Width;
-			actor->MinY = actor->YPos-nextFrame->YPos;
-			actor->MaxY = actor->MinY+nextFrame->Width;
+			Region newBBox;
+			newBBox.x = actor->XPos-nextFrame->XPos;
+			newBBox.w = nextFrame->Width;
+			newBBox.y = actor->YPos-nextFrame->YPos;
+			newBBox.h = nextFrame->Height;
 			actor->lastFrame = nextFrame;
+			actor->SetBBox(newBBox);
 		}
 	}
-	actor->Selected = false;
-	actor->path = NULL;
-	actor->step = NULL;
-	actor->textDisplaying = 0;
-	actor->overHeadText = NULL;
-	actor->DeleteMe = false;
 	actors.push_back(actor);
 }
 
-void Map::DeleteActor(ActorBlock * actor)
+void Map::DeleteActor(Actor * actor)
 {
-	std::vector<ActorBlock*>::iterator m;
+	std::vector<Actor*>::iterator m;
 	for(m = actors.begin(); m != actors.end(); ++m) {
 		if((*m) == actor) {
 			actors.erase(m);
@@ -380,44 +229,45 @@ void Map::DeleteActor(ActorBlock * actor)
 	}
 }
 
-ActorBlock * Map::GetActor(int x, int y)
+Actor * Map::GetActor(int x, int y)
 {
 	for(size_t i = 0; i < actors.size(); i++) {
-		ActorBlock *actor = actors.at(i);
-		if((actor->MinX > x) || (actor->MinY > y))
+		Actor *actor = actors.at(i);
+		if(actor->BaseStats[IE_UNSELECTABLE] || (actor->BaseStats[IE_STATE_ID]&STATE_DEAD))
 			continue;
-		if((actor->MaxX < x) || (actor->MaxY < y))
-			continue;
-		return actor;
+		if(actor->IsOver((unsigned short)x, (unsigned short)y))
+			return actor;
 	}
 	return NULL;
 }
 
-ActorBlock * Map::GetActor(const char * Name)
+Actor * Map::GetActor(const char * Name)
 {
 	for(size_t i = 0; i < actors.size(); i++) {
-		ActorBlock *actor = actors.at(i);
-		if(stricmp(actor->actor->ScriptName, Name) == 0) {
-			printf("Returning Actor %d: %s\n", i, actor->actor->ScriptName);
+		Actor *actor = actors.at(i);
+		if(stricmp(actor->scriptName, Name) == 0) {
+			printf("Returning Actor %d: %s\n", i, actor->scriptName);
 			return actor;
 		}
 	}
 	return NULL;
 }
 
-int Map::GetActorInRect(ActorBlock ** & actors, Region &rgn)
+int Map::GetActorInRect(Actor ** & actors, Region &rgn)
 {
-	actors = (ActorBlock**)malloc(this->actors.size()*sizeof(ActorBlock*));
+	actors = (Actor**)malloc(this->actors.size()*sizeof(Actor*));
 	int count = 0;
 	for(size_t i = 0; i < this->actors.size(); i++) {
-		ActorBlock *actor = this->actors.at(i);
-		if((actor->MinX > (rgn.x+rgn.w)) || (actor->MinY > (rgn.y+rgn.h)))
+		Actor *actor = this->actors.at(i);
+		if(actor->BaseStats[IE_UNSELECTABLE] || (actor->BaseStats[IE_STATE_ID]&STATE_DEAD))
 			continue;
-		if((actor->MaxX < rgn.x) || (actor->MaxY < rgn.y))
+		if((actor->BBox.x > (rgn.x+rgn.w)) || (actor->BBox.y > (rgn.y+rgn.h)))
+			continue;
+		if(((actor->BBox.x+actor->BBox.w) < rgn.x) || ((actor->BBox.y+actor->BBox.h) < rgn.y))
 			continue;
 		actors[count++] = actor;
 	}
-	actors = (ActorBlock**)realloc(actors, count*sizeof(ActorBlock*));
+	actors = (Actor**)realloc(actors, count*sizeof(Actor*));
 	return count;
 }
 
@@ -483,18 +333,18 @@ void Map::GenerateQueue()
 	if(lastActorCount != actors.size()) {
 		if(queue)
 			delete(queue);
-		queue = new ActorBlock*[actors.size()];
-		lastActorCount = actors.size();
+		queue = new Actor*[actors.size()];
+		lastActorCount = (int)actors.size();
 	}
 	Qcount = 0;
-	for(int i = 0; i < actors.size(); i++) {
-		ActorBlock * actor = actors.at(i);
+	for(unsigned int i = 0; i < actors.size(); i++) {
+		Actor * actor = actors.at(i);
 		Qcount++;
 		queue[Qcount-1] = actor;
 		int lastPos = Qcount;
 		while(lastPos != 1) {
 			int parentPos = (lastPos/2)-1;
-			ActorBlock * parent = queue[parentPos];
+			Actor * parent = queue[parentPos];
 			if(actor->YPos < parent->YPos) {
 				queue[parentPos] = actor;
 				queue[lastPos-1] = parent;
@@ -506,12 +356,12 @@ void Map::GenerateQueue()
 	}
 }
 
-ActorBlock * Map::GetRoot()
+Actor * Map::GetRoot()
 {
 	if(Qcount==0)
 		return NULL;
-	ActorBlock * ret = queue[0];
-	ActorBlock * node = queue[0] = queue[Qcount-1];
+	Actor * ret = queue[0];
+	Actor * node = queue[0] = queue[Qcount-1];
 	Qcount--;
 	int lastPos = 1;
 	while(true) {
@@ -519,10 +369,10 @@ ActorBlock * Map::GetRoot()
 		int rightChildPos = lastPos*2;
 		if(leftChildPos >= Qcount)
 			break;
-		ActorBlock * child  = queue[leftChildPos];
+		Actor * child  = queue[leftChildPos];
 		int childPos = leftChildPos;
 		if(rightChildPos < Qcount) { //If both Child Exist
-			ActorBlock * rightChild = queue[lastPos*2];
+			Actor * rightChild = queue[lastPos*2];
 			if(rightChild->YPos < child->YPos) {
 				childPos = rightChildPos;
 				child = rightChild;
@@ -542,7 +392,7 @@ ActorBlock * Map::GetRoot()
 
 void Map::AddVVCCell(ScriptedAnimation * vvc)
 {
-	for(int i = 0; i < vvcCells.size(); i++) {
+	for(unsigned int i = 0; i < vvcCells.size(); i++) {
 		if(vvcCells[i] == NULL) {
 			vvcCells[i] = vvc;
 			return;
