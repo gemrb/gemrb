@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.58 2003/12/15 09:28:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.59 2003/12/15 13:14:56 balrog994 Exp $
  *
  */
 
@@ -178,7 +178,7 @@ public:
 	/** Add a window to the Window List */
 	void AddWindow(Window * win)
 	{
-		size_t slot = -1;
+		int slot = -1;
 		for(unsigned int i = 0; i < windows.size(); i++) {
 			if(windows[i]==NULL) {
 				slot = i;
@@ -187,7 +187,7 @@ public:
 		}
 		if(slot == -1) {
 			windows.push_back(win);
-			slot=windows.size()-1;
+			slot=(int)windows.size()-1;
 		}
 		else
 			windows[slot] = win;
