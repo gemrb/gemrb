@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.36 2003/12/04 22:10:33 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.37 2003/12/04 23:10:50 balrog994 Exp $
  *
  */
 
@@ -187,24 +187,6 @@ void Map::DrawMap(Region viewport)
 			}
 			video->DrawEllipse(actor->XPos-vp.x, actor->YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), *color);
 		}
-		if(actor->textDisplaying) {
-#ifdef WIN32
-			unsigned long time = GetTickCount();
-#else
-			struct timeval tv;
-			gettimeofday(&tv, NULL);
-			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
-#endif
-			if((time - actor->timeStartDisplaying) >= 3000) {
-				actor->textDisplaying = 0;
-			}
-			if(actor->textDisplaying == 1) {
-				Font * font = core->GetFont(9);
-				Region rgn(actor->XPos-100, actor->YPos-100, 200, 400);
-				font->Print(rgn, (unsigned char*)actor->overHeadText, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false);
-			}
-		}
-
 		if(anim) {
 			Sprite2D * nextFrame = anim->NextFrame();
 			if(actor->lastFrame != nextFrame) {
@@ -229,6 +211,23 @@ void Map::DrawMap(Region viewport)
 			tint.a = 0xA0;
 			//video->BlitSprite(nextFrame, actors[i].XPos, actors[i].YPos);
 			video->BlitSpriteTinted(nextFrame, ax, ay, tint);
+		}
+		if(actor->textDisplaying) {
+#ifdef WIN32
+			unsigned long time = GetTickCount();
+#else
+			struct timeval tv;
+			gettimeofday(&tv, NULL);
+			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
+#endif
+			if((time - actor->timeStartDisplaying) >= 3000) {
+				actor->textDisplaying = 0;
+			}
+			if(actor->textDisplaying == 1) {
+				Font * font = core->GetFont(9);
+				Region rgn(actor->XPos-100, actor->YPos-100, 200, 400);
+				font->Print(rgn, (unsigned char*)actor->overHeadText, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false);
+			}
 		}
 	}
 	//TODO: Check if here is a door
