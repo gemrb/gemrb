@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.76 2004/02/28 09:40:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.77 2004/02/28 10:36:48 avenger_teambg Exp $
  *
  */
 
@@ -846,7 +846,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	printf( "[IEScript]: %s\n", actionsTable->GetValue( aC->actionID ) );
 	if (func) {
 		Scriptable* scr = GetActorFromObject( Sender, aC->objects[0]);
-		if(scr!=Sender) {
+		if(scr && scr!=Sender) {
 			//this is an Action Override
 			scr->AddAction( Sender->CurrentAction );
 			Sender->CurrentAction = NULL;
@@ -928,8 +928,6 @@ Targets* GameScript::EvaluateObject(Object* oC)
 				Actor *ac=core->GetActor(i);
 				if(ac && func(ac, oC->objectFields[j]) ) {
 					tgts->AddTarget(ac);
-printf("actor: %x\n",ac);
-printf("Adding actor: %s\n",ac->GetName(0));
 				}
 			}
 		}
@@ -1628,7 +1626,6 @@ int GameScript::ID_Alignment(Actor *actor, int parameter)
 
 int GameScript::ID_Allegiance(Actor *actor, int parameter)
 {
-printf("Running allegiance checker\n");
 	int value = actor->GetStat( IE_EA );
 	switch (parameter) {
 		case 30:
@@ -2565,13 +2562,11 @@ void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
-printf("MovetoTarget is: %x\n", target);
 	if (!target) {
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-printf("walkto...\n");
 	actor->WalkTo( target->XPos, target->YPos );
 }
 
@@ -2733,12 +2728,13 @@ static char PlayerDialogRes[9] = "PLAYERx\0";
 
 void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
-	Scriptable* tar, * scr;
+	Scriptable* tar, *scr;
 
 	if (Flags & BD_OWN) {
 		scr = tar = GetActorFromObject( Sender, parameters->objects[1] );
 	} else {
 		tar = GetActorFromObject( Sender, parameters->objects[1] );
+		scr = Sender;
 	}
 	//source could be other than Actor, we need to handle this too!
 	if (tar->Type != ST_ACTOR) {
@@ -3412,22 +3408,15 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* parameters)
 
 void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (scr) {
-		scr->ClearActions();
-	}
+	Sender->ClearActions();
 }
 
 void GameScript::SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (scr->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	actor->TalkCount = parameters->int0Parameter;
 }
 
@@ -3439,18 +3428,14 @@ void GameScript::StartMovie(Scriptable* Sender, Action* parameters)
 void GameScript::SetLeavePartyDialogFile(Scriptable* Sender,
 	Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
-	if (!scr) {
-		return;
-	}
-	if (scr->Type != ST_ACTOR) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
 	int pdtable = core->LoadTable( "pdialog" );
-	Actor* actor = ( Actor* ) scr;
+	Actor* actor = ( Actor* ) Sender;
 	char* scriptingname = actor->GetScriptName();
 	actor->SetDialog( core->GetTable( pdtable )->QueryField( scriptingname,
-													"POST_DIALOG_FILE" ) );
+			"POST_DIALOG_FILE" ) );
 	core->DelTable( pdtable );
 }
 
