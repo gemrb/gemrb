@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.21 2003/12/18 15:01:59 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.22 2003/12/18 21:32:53 avenger_teambg Exp $
  *
  */
 
@@ -24,40 +24,6 @@
 #include "../Core/Interface.h"
 
 static char musicsubfolder[6]="music";
-
-#ifndef WIN32
-void ResolveFilePathMUS(char *FilePath)
-{
-	char TempFilePath[_MAX_PATH];
-	char TempFileName[_MAX_PATH];
-	int j, pos;
-
-	TempFilePath[0]=FilePath[0];
-	for(pos=1;FilePath[pos] && FilePath[pos]!='/';pos++)
-		TempFilePath[pos]=FilePath[pos];
-	TempFilePath[pos]=0;
-	while(FilePath[pos]=='/') {
-		pos++;
-		for(j=0;FilePath[pos+j] && FilePath[pos+j]!='/';j++) {
-			TempFileName[j]=FilePath[pos+j];
-		}
-		TempFileName[j]=0;
-		pos+=j;
-		char *NewName = FindInDir(TempFilePath, TempFileName);
-		if(NewName) {
-			strcat(TempFilePath, SPathDelimiter);
-			strcat(TempFilePath, NewName);
-			free(NewName);
-		}
-		else {
-			abort();
-		}
-		printf("TempFilePath: %s\n",TempFilePath);
-	}
-	//should work (same size)
-	strcpy(FilePath,TempFilePath);
-}
-#endif
 
 MUSImp::MUSImp()
 {
@@ -212,7 +178,7 @@ bool MUSImp::OpenPlaylist(const char * name)
 			pls.soundID = core->GetSoundMgr()->LoadFile(FName);
 #ifndef WIN32
 			if((pls.soundID==-1) && core->CaseSensitive) {
-					ResolveFilePathMUS(FName);
+					ResolveFilePath(FName);
 					pls.soundID = core->GetSoundMgr()->LoadFile(FName);
 			}
 #endif
