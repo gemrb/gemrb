@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.26 2004/03/14 18:09:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.27 2004/03/21 17:18:01 avenger_teambg Exp $
  *
  */
 
@@ -140,6 +140,7 @@ public:
 	void DrawCircle();
 	bool IsOver(unsigned short XPos, unsigned short YPos);
 	void SetOver(bool over);
+	bool IsSelected();
 	void Select(bool Value);
 	void SetCircle(int size, Color color);
 };

@@ -113,7 +113,7 @@ void Scriptable::ExecuteScript(GameScript* Script)
 void Scriptable::AddAction(Action* aC)
 {
 	if (!aC) {
-		printf( "[IEScript]: NULL action encountered!\n" );
+		printf( "[IEScript]: NULL action encountered for %s!\n",scriptName );
 		return;
 	}
 	actionQueue.push_back( aC );
@@ -123,7 +123,7 @@ void Scriptable::AddAction(Action* aC)
 void Scriptable::AddActionInFront(Action* aC)
 {
 	if (!aC) {
-		printf( "[IEScript]: NULL action encountered!\n" );
+		printf( "[IEScript]: NULL action encountered for %s!\n",scriptName );
 		return;
 	}
 	actionQueue.push_front( aC );
@@ -270,6 +270,11 @@ void Selectable::DrawCircle()
 bool Selectable::IsOver(unsigned short XPos, unsigned short YPos)
 {
 	return BBox.PointInside( XPos, YPos );
+}
+
+bool Selectable::IsSelected()
+{
+	return Selected;
 }
 
 void Selectable::SetOver(bool over)
