@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.9 2004/08/19 21:14:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.10 2004/09/14 22:09:51 avenger_teambg Exp $
  *
  */
 
@@ -91,12 +91,12 @@ bool MOSImp::Open(DataStream* stream, bool autoFree)
 	if (strncmp( Signature, "MOS V1  ", 8 ) != 0) {
 		return false;
 	}
-	str->Read( &Width, 2 );
-	str->Read( &Height, 2 );
-	str->Read( &Cols, 2 );
-	str->Read( &Rows, 2 );
-	str->Read( &BlockSize, 4 );
-	str->Read( &PalOffset, 4 );
+	str->ReadWord( &Width );
+	str->ReadWord( &Height );
+	str->ReadWord( &Cols );
+	str->ReadWord( &Rows );
+	str->ReadDword( &BlockSize );
+	str->ReadDword( &PalOffset );
 	return true;
 }
 
