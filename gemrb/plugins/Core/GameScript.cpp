@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.201 2004/10/09 16:49:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.202 2004/10/09 17:38:54 avenger_teambg Exp $
  *
  */
 
@@ -116,6 +116,7 @@ static TriggerLink triggernames[] = {
 	{"globalgtglobal", GameScript::GlobalGTGlobal,TF_MERGESTRINGS},
 	{"globallt", GameScript::GlobalLT,TF_MERGESTRINGS},
 	{"globalltglobal", GameScript::GlobalLTGlobal,TF_MERGESTRINGS},
+	{"globalorglobal", GameScript::GlobalOrGlobal_Trigger,TF_MERGESTRINGS},
 	{"globalsequal", GameScript::GlobalsEqual,TF_MERGESTRINGS},
 	{"globalsGT", GameScript::GlobalsGT,TF_MERGESTRINGS},
 	{"globalsLT", GameScript::GlobalsLT,TF_MERGESTRINGS},
@@ -239,6 +240,7 @@ static TriggerLink triggernames[] = {
 	{"unselectablevariable", GameScript::UnselectableVariable,0},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT,0},
 	{"unselectablevariablelt", GameScript::UnselectableVariableLT,0},
+	{"vacant",GameScript::Vacant,0},
 	{"xor", GameScript::Xor,TF_MERGESTRINGS},
 	{"xp", GameScript::XP,0},
 	{"xpgt", GameScript::XPGT,0},
@@ -307,6 +309,7 @@ static ActionLink actionnames[] = {
 	{"destroygold", GameScript::DestroyGold,0},
 	{"destroyitem", GameScript::DestroyItem,0},
 	{"destroypartygold", GameScript::DestroyPartyGold,0},
+	{"destroypartyitem", GameScript::DestroyPartyItem,0},
 	{"destroyself", GameScript::DestroySelf,0},
 	{"dialogue", GameScript::Dialogue,AF_BLOCKING},
 	{"dialogueforceinterrupt", GameScript::DialogueForceInterrupt,AF_BLOCKING},
@@ -461,6 +464,7 @@ static ActionLink actionnames[] = {
 	{"setareaflags", GameScript::SetAreaFlags,0},
 	{"setarearestflag", GameScript::SetAreaRestFlag,0},
 	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags,0},
+	{"setcorpseenabled", GameScript::SetCorpseEnabled,0},
 	{"setcreatureareaflags", GameScript::SetCreatureAreaFlags,0},
 	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
@@ -546,13 +550,13 @@ static ActionLink actionnames[] = {
 static ObjectLink objectnames[] = {
 	{"bestac", GameScript::BestAC},
 	{"eighthnearest", GameScript::EighthNearest},
-	{"eigthnearest", GameScript::EighthNearest}, //typo in iwd?
 	{"eighthnearestenemyof", GameScript::EighthNearestEnemyOf},
 	{"eigthnearestenemyof", GameScript::EighthNearestEnemyOf}, //typo in iwd
 	{"fifthnearest", GameScript::FifthNearest},
 	{"fifthnearestenemyof", GameScript::FifthNearestEnemyOf},
 	{"fourthnearest", GameScript::FourthNearest},
 	{"fourthnearestenemyof", GameScript::FourthNearestEnemyOf},
+	{"lastattackerof", GameScript::LastHitter}, //is it important to be different?
 	{"lastheardby", GameScript::LastHeardBy},
 	{"lasthitter", GameScript::LastHitter},
 	{"lastseenby", GameScript::LastSeenBy},
@@ -3109,6 +3113,15 @@ int GameScript::BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 	return value!=0;
 }
 
+int GameScript::GlobalOrGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
+{
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
+	if ( value1 ) return 1;
+	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter );
+	if ( value2 ) return 1;
+	return 0;
+}
+
 int GameScript::GlobalBAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
@@ -4793,7 +4806,7 @@ int GameScript::HitBy(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if(parameters->int0Parameter) {
-		if(!(parameters->int0Parameter&actor->LastDamageType) ) {
+		if (!(parameters->int0Parameter&actor->LastDamageType) ) {
 			return 0;
 		}
 	}
@@ -4843,6 +4856,16 @@ int GameScript::DifficultyLT(Scriptable* /*Sender*/, Trigger* parameters)
 	return diff<(ieDword) parameters->int0Parameter;
 }
 
+int GameScript::Vacant(Scriptable* Sender, Trigger* /*parameters*/)
+{
+	if (Sender->Type!=ST_AREA) {
+		return 0;
+	}
+	Map *map = (Map *) Sender;
+	if ( map->CanFree() ) return 1;
+	return 0;
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -4851,7 +4874,7 @@ void GameScript::SetExtendedNight(Scriptable* /*Sender*/, Action* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	//sets the 'can rest other' bit
-	if(parameters->int0Parameter) {
+	if (parameters->int0Parameter) {
 		map->AreaType|=0x40;
 	}
 	else {
@@ -4863,7 +4886,7 @@ void GameScript::SetAreaRestFlag(Scriptable* /*Sender*/, Action* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	//sets the 'can rest other' bit
-	if(parameters->int0Parameter) {
+	if (parameters->int0Parameter) {
 		map->AreaType|=0x80;
 	}
 	else {
@@ -5165,7 +5188,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	char Area[9];
+	ieResRef Area;
 
 	if(tar->Type == ST_ACTOR) {
 		Actor *ac = ( Actor* ) tar;
@@ -7158,7 +7181,26 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	//it is bit 15 of the multi-class flags (confirmed)
-	actor->SetStat(IE_MC_FLAGS,actor->GetStat(IE_MC_FLAGS)|32768);
+	actor->SetStat(IE_MC_FLAGS,actor->GetStat(IE_MC_FLAGS)|MC_BEENINPARTY);
+}
+
+/*pst sets the corpse enabled flags */
+void GameScript::SetCorpseEnabled(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor* act = ( Actor* ) Sender;
+	int value = act->GetStat(IE_MC_FLAGS);
+	if( parameters->int0Parameter) {
+		value |= MC_KEEP_CORPSE;
+		value &= ~MC_REMOVE_CORPSE;
+	}
+	else {
+		value |= MC_REMOVE_CORPSE;
+		value &= ~MC_KEEP_CORPSE;
+	}
+	act->SetStat(IE_MC_FLAGS, value);
 }
 
 /*iwd2 sets the high MC bits this way*/
@@ -7354,6 +7396,16 @@ void GameScript::DestroyGold(Scriptable* Sender, Action* parameters)
 		max=parameters->int0Parameter;
 	}
 	act->NewStat(IE_GOLD, -max, MOD_ADDITIVE);
+}
+
+void GameScript::DestroyPartyItem(Scriptable* /*Sender*/, Action* parameters)
+{
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Inventory *inv = &(game->GetPC(i)->inventory);
+		inv->DestroyItem(parameters->string0Parameter, 0);
+	}
 }
 
 void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* /*parameters*/)

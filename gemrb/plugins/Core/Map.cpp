@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.114 2004/10/09 08:19:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.115 2004/10/09 17:38:55 avenger_teambg Exp $
  *
  */
 
@@ -453,24 +453,6 @@ void Map::AddAnimation(Animation* anim)
 
 void Map::AddActor(Actor* actor)
 {
-/*
-	CharAnimations* ca = actor->GetAnims();
-	if (ca) {
-		Animation* anim = ca->GetAnimation( actor->StanceID, actor->Orientation );
-		if (anim) {
-			Sprite2D* nextFrame = anim->NextFrame();
-			if (actor->lastFrame != nextFrame) {
-				Region newBBox;
-				newBBox.x = actor->Pos.x - nextFrame->XPos;
-				newBBox.w = nextFrame->Width;
-				newBBox.y = actor->Pos.y - nextFrame->YPos;
-				newBBox.h = nextFrame->Height;
-				actor->lastFrame = nextFrame;
-				actor->SetBBox( newBBox );
-			}
-		}
-	}
-*/
 	//setting the current area for the actor as this one
 	memcpy(actor->Area, scriptName, 9);
 	actors.push_back( actor );

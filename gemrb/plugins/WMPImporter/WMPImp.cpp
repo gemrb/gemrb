@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.8 2004/09/13 20:19:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.9 2004/10/09 17:38:56 avenger_teambg Exp $
  *
  */
 
@@ -95,13 +95,10 @@ WorldMap* WMPImp::GetWorldMap(unsigned int index)
 		return m;
 	}
 	ImageMgr* mos = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
-	DataStream* mosfile = core->GetResourceMgr()->GetResource( m->MapResRef,
-													IE_MOS_CLASS_ID );
+	DataStream* mosfile = core->GetResourceMgr()->GetResource( m->MapResRef, IE_MOS_CLASS_ID );
 	mos->Open( mosfile, true ); //autofree
-
 	m->MapMOS = mos->GetImage();
-
-
+	core->FreeInterface( mos );
 
 	// Load location icon
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
@@ -112,11 +109,11 @@ WorldMap* WMPImp::GetWorldMap(unsigned int index)
 	DataStream* iconfile = core->GetResourceMgr()->GetResource( m->MapIconResRef, IE_BAM_CLASS_ID );
 	icon->Open( iconfile, true ); //autofree
 
-
 	std::vector< WMPAreaEntry*>::iterator ei;
 	for (ei = m->area_entries.begin(); ei != m->area_entries.end(); ++ei) {
 		(*ei)->MapIcon = icon->GetFrameFromCycle( (*ei)->IconSeq, 0 );
 	}
+	core->FreeInterface( icon );
 
 	return m;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.23 2004/09/13 20:19:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.24 2004/10/09 17:38:56 avenger_teambg Exp $
  *
  */
 
@@ -95,6 +95,8 @@
 #define MC_WAS_RANGER		0x0100
 #define MC_FALLEN_PALADIN	0x0200
 #define MC_FALLEN_RANGER	0x0400
+
+#define MC_BEENINPARTY          0x8000
 
 //stats
 #define IE_HITPOINTS		0

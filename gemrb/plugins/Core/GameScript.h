@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.143 2004/10/09 16:49:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.144 2004/10/09 17:38:55 avenger_teambg Exp $
  *
  */
 
@@ -825,6 +825,7 @@ public: //Script Functions
 	static int GlobalGTGlobal(Scriptable* Sender, Trigger* parameters);
 	static int GlobalLT(Scriptable* Sender, Trigger* parameters);
 	static int GlobalLTGlobal(Scriptable* Sender, Trigger* parameters);
+	static int GlobalOrGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int GlobalsEqual(Scriptable* Sender, Trigger* parameters);
 	static int GlobalsGT(Scriptable* Sender, Trigger* parameters);
 	static int GlobalsLT(Scriptable* Sender, Trigger* parameters);
@@ -945,6 +946,7 @@ public: //Script Functions
 	static int UnselectableVariable(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableGT(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableLT(Scriptable* Sender, Trigger* parameters);
+	static int Vacant(Scriptable* Sender, Trigger* parameters);
 	static int Xor(Scriptable* Sender, Trigger* parameters);
 	static int XP(Scriptable* Sender, Trigger* parameters);
 	static int XPGT(Scriptable* Sender, Trigger* parameters);
@@ -1005,6 +1007,7 @@ public:
 	static void DestroyGold(Scriptable* Sender, Action* parameters);
 	static void DestroyItem(Scriptable* Sender, Action* parameters);
 	static void DestroyPartyGold(Scriptable* Sender, Action* parameters);
+	static void DestroyPartyItem(Scriptable* Sender, Action* parameters);
 	static void DestroySelf(Scriptable* Sender, Action* parameters);
 	static void Dialogue(Scriptable* Sender, Action* parameters);
 	static void DialogueForceInterrupt(Scriptable* Sender, Action* parameters);
@@ -1134,6 +1137,7 @@ public:
 	static void SetAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
 	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
+	static void SetCorpseEnabled(Scriptable* Sender, Action* parameters);
 	static void SetCreatureAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
 	static void SetExtendedNight(Scriptable* Sender, Action* parameters);
