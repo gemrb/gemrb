@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.11 2003/12/03 18:27:06 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.12 2003/12/04 22:09:47 balrog994 Exp $
  *
  */
 
@@ -150,6 +150,7 @@ InfoPoint * TileMap::AddInfoPoint(char * Name, unsigned short Type, Gem_Polygon 
 	strncpy(ip.Name, Name, 32);
 	ip.Type = Type;
 	ip.outline = outline;
+	ip.Active = true;
 	infoPoints.push_back(ip);
 	return &infoPoints.at(infoPoints.size()-1);
 }
@@ -157,6 +158,8 @@ InfoPoint * TileMap::GetInfoPoint(unsigned short x, unsigned short y)
 {
 	for(size_t i = 0; i < infoPoints.size(); i++) {
 		InfoPoint * ip = &infoPoints.at(i);
+		if(!ip->Active)
+			continue;
 		if(ip->outline->BBox.x > x)
 			continue;
 		if(ip->outline->BBox.y > y)
@@ -169,4 +172,23 @@ InfoPoint * TileMap::GetInfoPoint(unsigned short x, unsigned short y)
 			return ip;
 	}
 	return NULL;	
+}
+
+InfoPoint * TileMap::GetInfoPoint(const char * Name)
+{
+	for(size_t i = 0; i < infoPoints.size(); i++) {
+		InfoPoint * ip = &infoPoints.at(i);
+		int len = strlen(ip->Name);
+		int p = 0;
+		for(int x = 0; x < len; x++) {
+			if(ip->Name[x] == ' ')
+				continue;
+			if(ip->Name[x] != Name[p])
+				break;
+			if(x == len-1)
+				return ip;
+			p++;
+		}
+	}
+	return NULL;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.10 2003/11/30 09:50:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.11 2003/12/04 22:09:47 balrog994 Exp $
  *
  */
 
@@ -60,6 +60,7 @@ typedef struct InfoPoint {
 	char * String;
 	unsigned long startDisplayTime;
 	unsigned char textDisplaying;
+	unsigned char Active;
 } InfoPoint;
 
 #ifdef WIN32
@@ -91,6 +92,7 @@ public:
 	Container * GetContainer(unsigned short x, unsigned short y);
 	InfoPoint * AddInfoPoint(char * Name, unsigned short Type, Gem_Polygon * outline);
 	InfoPoint * GetInfoPoint(unsigned short x, unsigned short y);
+	InfoPoint * GetInfoPoint(const char * Name);
 	void ToggleDoor(Door * door);
 	void DrawOverlay(unsigned int index, Region viewport);
 public:
