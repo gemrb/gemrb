@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.167 2004/05/25 16:16:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.168 2004/05/29 11:15:19 edheldil Exp $
  *
  */
 
@@ -1398,6 +1398,77 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 	ani->autofree = false;
 
 	delete( ani );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+PyDoc_STRVAR( GemRB_SetButtonBorder__doc,
+"SetButtonBorder(WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, R, G, B, A, [enabled])\n\n"
+"Sets border/frame parameters for a button" );
+
+static PyObject* GemRB_SetButtonBorder(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, r, g, b, a, enabled = 0;
+
+	if (!PyArg_ParseTuple( args, "iiiiiiiiiii|i", &WindowIndex, &ControlIndex,
+			&BorderIndex, &dx1, &dy1, &dx2, &dy2, &r, &g, &b, &a, &enabled)) {
+		return AttributeError( GemRB_SetButtonBorder__doc );
+	}
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (win == NULL) {
+		return NULL;
+	}
+
+	Control* ctrl = win->GetControl( ControlIndex );
+	if (!ctrl) {
+		return NULL;
+	}
+
+	if (ctrl->ControlType != 0) {
+		return NULL;
+	}
+
+	Button* btn = ( Button* ) ctrl;
+
+
+	Color color = { r, g, b, a };
+	btn->SetBorder( BorderIndex, dx1, dy1, dx2, dy2, &color, (bool)enabled );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_EnableButtonBorder__doc,
+"EnableButtonBorder(WindowIndex, ControlIndex, BorderIndex, enabled)\n\n"
+"Enable or disable specified border/frame" );
+
+static PyObject* GemRB_EnableButtonBorder(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, BorderIndex, enabled;
+
+	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex,
+			&BorderIndex, &enabled)) {
+		return AttributeError( GemRB_EnableButtonBorder__doc );
+	}
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (win == NULL) {
+		return NULL;
+	}
+
+	Control* ctrl = win->GetControl( ControlIndex );
+	if (!ctrl) {
+		return NULL;
+	}
+
+	if (ctrl->ControlType != 0) {
+		return NULL;
+	}
+
+	Button* btn = ( Button* ) ctrl;
+
+	btn->EnableBorder( BorderIndex, (bool)enabled );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3236,6 +3307,10 @@ static PyMethodDef GemRBMethods[] = {
 	GemRB_CreateButton__doc},
 	{"SetButtonSprites", GemRB_SetButtonSprites, METH_VARARGS,
 	GemRB_SetButtonSprites__doc},
+	{"SetButtonBorder", GemRB_SetButtonBorder, METH_VARARGS,
+	GemRB_SetButtonBorder__doc},
+	{"EnableButtonBorder", GemRB_EnableButtonBorder, METH_VARARGS,
+	GemRB_EnableButtonBorder__doc},
 	{"SetControlPos", GemRB_SetControlPos, METH_VARARGS,
 	GemRB_SetControlPos__doc},
 	{"SetControlSize", GemRB_SetControlSize, METH_VARARGS,

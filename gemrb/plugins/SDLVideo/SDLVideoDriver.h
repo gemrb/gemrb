@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.31 2004/05/09 14:34:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.32 2004/05/29 11:15:30 edheldil Exp $
  *
  */
 
@@ -75,7 +75,7 @@ public:
 	/** No descriptions */
 	void SetPalette(Sprite2D* spr, Color* pal);
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	void DrawRect(Region& rgn, Color& color);
+	void DrawRect(Region& rgn, Color& color, bool fill = true, bool clipped = false);
 	/** This functions Draws a Circle */
 	void DrawCircle(short cx, short cy, unsigned short r, Color& color);
 	/** This functions Draws an Ellipse */
@@ -83,6 +83,8 @@ public:
 		Color& color);
 	/** This function Draws a Polygon on the Screen */
 	void DrawPolyline(Gem_Polygon* poly, Color& color, bool fill = false);
+	inline void DrawHLine(short x1, short y, short x2, Color& color, bool clipped = false);
+	inline void DrawVLine(short x, short y1, short y2, Color& color, bool clipped = false);
 	inline void DrawLine(short x1, short y1, short x2, short y2, Color& color);
 	/** Frees a Palette */
 	void FreePalette(Color *&palette);
@@ -115,7 +117,7 @@ public:
 		return disp;
 	}
 private:
-	inline void SetPixel(short x, short y, Color& color);
+	inline void SetPixel(short x, short y, Color& color, bool clipped = true);
 	inline void GetPixel(short x, short y, Color* color);
 
 public:

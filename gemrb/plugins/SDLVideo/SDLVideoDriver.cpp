@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.68 2004/05/25 16:16:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.69 2004/05/29 11:15:21 edheldil Exp $
  *
  */
 
@@ -798,7 +798,7 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D* spr, int x, int y,
 		return;
 	}
 	int destx = drect. x, desty = drect.y;
-	Region Screen = core->GetVideoDriver()->GetViewport();
+	Region Screen = GetViewport();
 	if (( destx > ( xCorr + Screen.w ) ) || ( ( destx + srect->w ) < xCorr )) {
 		return;
 	}
@@ -966,7 +966,7 @@ void SDLVideoDriver::CalculateAlpha(Sprite2D* sprite)
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-void SDLVideoDriver::DrawRect(Region& rgn, Color& color)
+void SDLVideoDriver::DrawRect(Region& rgn, Color& color, bool fill, bool clipped)
 {
 	/*SDL_Surface * rectsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, rgn.w, rgn.h, 8, 0,0,0,0);
 	SDL_Color pal[2];
@@ -990,37 +990,82 @@ void SDLVideoDriver::DrawRect(Region& rgn, Color& color)
 	SDL_Rect drect = {
 		rgn.x, rgn.y, rgn.w, rgn.h
 	};
-	SDL_FillRect( backBuf, &drect,
-		( color.a << 24 ) + ( color.r << 16 ) + ( color.g << 8 ) + color.b );
+	if (fill) {
+		SDL_FillRect( backBuf, &drect,
+			      ( color.a << 24 ) + ( color.r << 16 ) + ( color.g << 8 ) + color.b );
+	} else {
+		DrawHLine( rgn.x, rgn.y, rgn.x + rgn.w - 1, color, clipped );
+		DrawVLine( rgn.x, rgn.y, rgn.y + rgn.h - 1, color, clipped );
+		DrawHLine( rgn.x, rgn.y + rgn.h - 1, rgn.x + rgn.w - 1, color, clipped );
+		DrawVLine( rgn.x + rgn.w - 1, rgn.y, rgn.y + rgn.h - 1, color, clipped );
+	}
 }
-void SDLVideoDriver::SetPixel(short x, short y, Color& color)
+void SDLVideoDriver::SetPixel(short x, short y, Color& color, bool clipped)
 {
-	x += xCorr;
-	y += yCorr;
-	if (( x >= ( xCorr + Viewport.w ) ) || ( y >= ( yCorr + Viewport.h ) )) {
-		return;
+	//printf("x: %d; y: %d; XC: %d; YC: %d, VX: %d, VY: %d, VW: %d, VH: %d\n", x, y, xCorr, yCorr, Viewport.x, Viewport.y, Viewport.w, Viewport.h);
+	if (clipped) {
+		x += xCorr;
+		y += yCorr;
+		if (( x >= ( xCorr + Viewport.w ) ) || ( y >= ( yCorr + Viewport.h ) )) {
+			return;
+		}
+		if (( x < xCorr ) || ( y < yCorr )) {
+			return;
+		}
+	} else {
+		if (( x >= disp->w ) || ( y >= disp->h )) {
+			return;
+		}
+		if (( x < 0 ) || ( y < 0 )) {
+			return;
+		}
 	}
-	if (( x < xCorr ) || ( y < yCorr )) {
-		return;
-	}
+
 	unsigned char * pixels = ( ( unsigned char * ) backBuf->pixels ) +
-		( ( y * disp->w ) * disp->format->BytesPerPixel ) +
-		( x * disp->format->BytesPerPixel );
-	*pixels++ = color.b;
-	*pixels++ = color.g;
-	*pixels++ = color.r;
-	*pixels++ = color.a;
+		( ( y * disp->w + x) * disp->format->BytesPerPixel );
+
+	long val = SDL_MapRGBA( backBuf->format, color.r, color.g, color.b, color.a );
+	SDL_LockSurface( backBuf );
+	// FIXME: is it endian safe?
+	memcpy( pixels, &val, disp->format->BytesPerPixel );
+	SDL_UnlockSurface( backBuf );
 }
+
 void SDLVideoDriver::GetPixel(short x, short y, Color* color)
 {
 	unsigned char * pixels = ( ( unsigned char * ) backBuf->pixels ) +
-		( ( y * disp->w ) * disp->format->BytesPerPixel ) +
-		( x * disp->format->BytesPerPixel );
-	color->b = *pixels++;
-	color->g = *pixels++;
-	color->r = *pixels++;
-	color->a = *pixels++;
+		( ( y * disp->w + x) * disp->format->BytesPerPixel );
+	long val = 0;
+	SDL_LockSurface( backBuf );
+	memcpy( &val, pixels, disp->format->BytesPerPixel );
+	SDL_UnlockSurface( backBuf );
+
+	SDL_GetRGBA( val, backBuf->format, &color->r, &color->g, &color->b, &color->a );
 }
+void SDLVideoDriver::DrawHLine(short x1, short y, short x2, Color& color, bool clipped)
+{
+	if (x1 > x2) {
+		short tmpx = x1;
+		x1 = x2;
+		x2 = tmpx;
+	}
+
+	for ( ; x1 <= x2 ; x1++ ) 
+		SetPixel( x1, y, color, clipped );
+}
+
+void SDLVideoDriver::DrawVLine(short x, short y1, short y2, Color& color, bool clipped)
+{
+	if (y1 > y2) {
+		short tmpy = y1;
+		y1 = y2;
+		y2 = tmpy;
+	}
+
+	for ( ; y1 <= y2 ; y1++ ) 
+		SetPixel( x, y1, color, clipped );
+}
+
 void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
 	Color& color)
 {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.61 2004/05/09 17:36:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.62 2004/05/29 11:15:19 edheldil Exp $
  *
  */
 
@@ -76,6 +76,7 @@ Button::Button(bool Clear)
 	Dragging = false;
 	ScrollX = 0;
 	ScrollY = 0;
+	memset( borders, 0, sizeof( borders ));
 }
 Button::~Button()
 {
@@ -192,6 +193,12 @@ void Button::Draw(unsigned short x, unsigned short y)
 		}
 	}
 
+	if (State == IE_GUI_BUTTON_PRESSED) {
+		//shift the writing/border a bit
+		x+= 2;
+		y+= 2;
+	}
+
 	// Button label
 	if (hasText && ! ( Flags & IE_GUI_BUTTON_NO_TEXT )) {
 		Color* ppoi = NULL;
@@ -202,11 +209,6 @@ void Button::Draw(unsigned short x, unsigned short y)
 		// FIXME: hopefully there's no button which sunks when selected
 		//   AND has text label
 		//else if (State == IE_GUI_BUTTON_PRESSED || State == IE_GUI_BUTTON_SELECTED) {
-		else if (State == IE_GUI_BUTTON_PRESSED) {
-			//shift the writing a bit
-			x += 2;
-			y += 2;
-		}
 
 		if (Flags & IE_GUI_BUTTON_ALIGN_LEFT)
 			align |= IE_FONT_ALIGN_LEFT;
@@ -237,6 +239,14 @@ void Button::Draw(unsigned short x, unsigned short y)
 										y + YPos + yOffs, true );
 		}
 	}
+
+	for (int i = 0; i < MAX_NUM_BORDERS; i++) {
+		ButtonBorder *fr = &borders[i];
+		if (! fr->enabled) continue;
+
+		Region r = Region( x + XPos + fr->dx1, y + YPos + fr->dy1, Width - (fr->dx1 + fr->dx2 + 1), Height - (fr->dy1 + fr->dy2 + 1) );
+		core->GetVideoDriver()->DrawRect( r, fr->color, false );
+	}
 }
 /** Sets the Button State */
 void Button::SetState(unsigned char state)
@@ -250,6 +260,33 @@ void Button::SetState(unsigned char state)
 	}
 	State = state;
 }
+void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled)
+{
+	if (index >= MAX_NUM_BORDERS)
+		return;
+
+	ButtonBorder *fr = &borders[index];
+	fr->dx1 = dx1;
+	fr->dy1 = dy1;
+	fr->dx2 = dx2;
+	fr->dy2 = dy2;
+	memcpy( &(fr->color), color, sizeof( Color ));
+	fr->enabled = enabled;
+	Changed = true;
+}
+
+void Button::EnableBorder(int index, bool enabled)
+{
+	if (index >= MAX_NUM_BORDERS)
+		return;
+
+	if (borders[index].enabled != enabled) {
+		borders[index].enabled = enabled;
+		Changed = true;
+	}
+}
+
+
 /** Handling The default button (enter) */
 void Button::OnSpecialKeyPress(unsigned char Key)
 {

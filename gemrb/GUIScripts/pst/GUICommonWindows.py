@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.9 2004/04/29 19:55:22 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.10 2004/05/29 11:15:14 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -142,15 +142,37 @@ def SetupMenuWindowControls (Window):
 	GemRB.SetTooltip (Window, Button, 41647)  # or 41648 Unlock ...
 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPartyManageWindow")
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenContainerWindow")
+	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenContainerWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CntReachPress")
 
 	# Message popup
 	Button = GemRB.GetControl (Window, 10)
 	GemRB.SetTooltip (Window, Button, 41660)  # or 41661 Close ...
 
 
+PokWindow = None
 def CntReachPress ():
 	print "CntReachPress"
+	global PokWindow
+	
+	GemRB.HideGUI()
+	
+	if PokWindow != None:
+		
+		GemRB.UnloadWindow(PokWindow)
+		PokWindow = None
+		GemRB.SetVar("OtherWindow", -1)
+		#SetSelectionChangeHandler (None)
+		GemRB.UnhideGUI()
+		return
+		
+	GemRB.LoadWindowPack ("GUIWORLD")
+	#PokWindow = Window = GemRB.CreateWindow (100, 0, 0, 640, 480, "GUIID")
+	PokWindow = Window = GemRB.CreateWindow (100, 0, 0, 640, 480, "GUILS05")
+        GemRB.SetVar("OtherWindow", PokWindow)
+
+	GemRB.UnhideGUI ()
+
 
 def AIPress ():
 	print "AIPress"
@@ -162,6 +184,8 @@ def RestPress ():
 	print "RestPress"
 
 def SetupActionsWindowControls (Window):
+	# 41627 - Return to the Game World
+
 	# Select all characters
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetTooltip (Window, Button, 41659)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.28 2004/04/26 15:15:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.29 2004/05/29 11:15:19 edheldil Exp $
  *
  */
 
@@ -76,6 +76,19 @@
 #define GEM_EXPORT
 #endif
 
+/** Border/frame settings for a button */
+typedef struct ButtonBorder {
+	int dx1;
+	int dy1;
+	int dx2;
+	int dy2;
+	Color color;
+	bool enabled;
+} ButtonBorder;
+
+#define MAX_NUM_BORDERS 3
+
+
 class GEM_EXPORT Button : public Control {
 public: 
 	Button(bool Clear = false);
@@ -97,6 +110,10 @@ public:
 	void SetEvent(char* funcName, int eventType);
 	/** Sets the Picture */
 	void SetPicture(Sprite2D* Picture);
+	/** Sets border/frame parameters */
+	void SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled = false);
+	/** Enables or disables specified border/frame */
+	void EnableBorder(int index, bool enabled);
 public: // Public Events
 	/** Mouse Enter */
 	void OnMouseEnter(unsigned short x, unsigned short y);
@@ -154,6 +171,8 @@ private: // Private attributes
 	unsigned short ScrollX, ScrollY;
 	bool Dragging;
 	unsigned short DragX, DragY; //Starting Dragging Positions
+	/** frame settings */
+	ButtonBorder borders[MAX_NUM_BORDERS];
 };
 
 #endif

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.19 2004/05/15 21:13:57 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.20 2004/05/29 11:15:14 edheldil Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -166,15 +166,25 @@ def PopulatePortraitWindow ():
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 
+		GemRB.SetButtonBorder (Window, Button, 0, 1, 1, 2, 2, 0, 255, 0, 255)
+		GemRB.SetButtonBorder (Window, Button, 1, 3, 3, 4, 4, 255, 255, 0, 255)
 		pic = GemRB.GetPlayerPortrait (i+1,0)
+		if not pic:
+			GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			continue
+		
 		sel = GemRB.IsPlayerSelected (i+1)
 		GemRB.SetButtonBAM (Window, Button, pic, 0, 0, 0)
+		
 		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
 		GemRB.SetVarAssoc (Window, Button, 'SelectedSingle', i)
 		if sel:
-			GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_SELECTED)
+			#GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_SELECTED)
+			GemRB.EnableButtonBorder(Window, Button, 0, 1)
+			GemRB.EnableButtonBorder(Window, Button, 1, 1)
 		else:
 			GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_UNPRESSED)
+			GemRB.EnableButtonBorder(Window, Button, 0, 0)
 
 def PortraitButtonOnPress ():
 	var = GemRB.GetVar ("SelectedSingle")
