@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.18 2004/04/29 19:55:23 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.19 2004/05/15 21:13:57 avenger_teambg Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -164,12 +164,17 @@ def PopulatePortraitWindow ():
 
 	for i in range (0,6):
 		Button = GemRB.GetControl (Window, i)
-		GemRB.SetVarAssoc (Window, Button, 'SelectedSingle', i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 
 		pic = GemRB.GetPlayerPortrait (i+1,0)
+		sel = GemRB.IsPlayerSelected (i+1)
 		GemRB.SetButtonBAM (Window, Button, pic, 0, 0, 0)
 		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+		GemRB.SetVarAssoc (Window, Button, 'SelectedSingle', i)
+		if sel:
+			GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_SELECTED)
+		else:
+			GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_UNPRESSED)
 
 def PortraitButtonOnPress ():
 	var = GemRB.GetVar ("SelectedSingle")

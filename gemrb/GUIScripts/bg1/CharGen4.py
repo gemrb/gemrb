@@ -84,11 +84,11 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,GemRB.GetVar("Race")-1,2))
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,12136, -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
-	#KitIndex = GemRB.GetVar("Class Kit")
-	#if KitIndex == 0:
-	#	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,2))
-	#else:
-	#	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, GemRB.GetTableValue(KitTable, KitIndex,2) )
+	KitIndex = GemRB.GetVar("Class Kit")
+	if KitIndex == 0:
+		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,2))
+	else:
+		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, GemRB.GetTableValue(KitTable, KitIndex,2) )
 
 	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
