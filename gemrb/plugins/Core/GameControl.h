@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.58 2005/03/20 15:07:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.59 2005/03/21 22:43:19 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -116,6 +116,8 @@ private:
 	void CalculateSelection(Point &p);
 	void ResizeDel(Window* win, unsigned char type);
 	void ResizeAdd(Window* win, unsigned char type);
+	void HandleWindowHide(const char *WindowName, const char *WindowPosition);
+	void HandleWindowReveal(const char *WindowName, const char *WindowPosition);
 	void ReadFormations();
 	unsigned char LeftCount, BottomCount, RightCount, TopCount;
 	DialogState* ds;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.295 2005/03/20 23:36:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.296 2005/03/21 22:43:21 avenger_teambg Exp $
  *
  */
 
@@ -1958,7 +1958,7 @@ static PyObject* GemRB_SetButtonFlags(PyObject * /*self*/, PyObject* args)
 	}
 	if (Operation< 0 || Operation>2) {
 		printMessage( "GUIScript",
-			"Syntax Error: SetButtonFlags operation must be 0-2\n", LIGHT_RED );
+			"Syntax Error: operation must be 0-2\n", LIGHT_RED );
 		return NULL;
 	}
 
@@ -1990,7 +1990,7 @@ static PyObject* GemRB_SetTextAreaFlags(PyObject * /*self*/, PyObject* args)
 	}
 	if (Operation< 0 || Operation>2) {
 		printMessage( "GUIScript",
-			"Syntax Error: SetButtonFlags operation must be 0-2\n", LIGHT_RED );
+			"Syntax Error: operation must be 0-2\n", LIGHT_RED );
 		return NULL;
 	}
 

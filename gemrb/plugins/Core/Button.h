@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.41 2005/03/20 23:36:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.42 2005/03/21 22:43:17 avenger_teambg Exp $
  *
  */
 
@@ -181,8 +181,6 @@ private: // Private attributes
 	Animation* anim;
 	/** The current state of the Button */
 	unsigned char State;
-	/** Display Flags, justification */
-	unsigned long Flags;
 	double Clipping;
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];

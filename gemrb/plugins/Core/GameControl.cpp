@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.204 2005/03/20 23:36:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.205 2005/03/21 22:43:18 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1071,68 +1071,43 @@ void GameControl::SetCutSceneMode(bool active)
 	}
 }
 
+void GameControl::HandleWindowHide(const char *WindowName, const char *WindowPosition)
+{
+	Variables* dict = core->GetDictionary();
+	ieDword index;
+
+	if (dict->Lookup( WindowName, index )) {
+		if (index != (ieDword) -1) {
+			Window* w = core->GetWindow( index );
+			if (w) {
+				core->SetVisible( index, 0 );
+				if (dict->Lookup( WindowPosition, index )) {
+					ResizeDel( w, index );
+				}
+				return;
+			}
+			printMessage("GameControl", "Invalid Window Index", LIGHT_RED);
+			printf("%s:%u\n",WindowName, index);
+		}
+	}
+}
+
 void GameControl::HideGUI()
 {
 	if (!(ScreenFlags&SF_GUIENABLED) ) {
 		return;
 	}
 	ScreenFlags &=~SF_GUIENABLED;
+	HandleWindowHide("MessageWindow", "MessagePosition");
+	HandleWindowHide("OptionsWindow", "OptionsPosition");
+	HandleWindowHide("PortraitWindow", "PortraitPosition");
+	HandleWindowHide("ActionsWindow", "ActionsPosition");
+	HandleWindowHide("TopWindow", "TopPosition");
+	HandleWindowHide("OtherWindow", "OtherPosition");
+	//FloatWindow doesn't affect gamecontrol, so it is special
 	Variables* dict = core->GetDictionary();
 	ieDword index;
-	if (dict->Lookup( "MessageWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* mw = core->GetWindow( index );
-			core->SetVisible( index, 0 );
-			if (dict->Lookup( "MessagePosition", index )) {
-				ResizeDel( mw, index );
-			}
-		}
-	}
-	if (dict->Lookup( "OptionsWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* ow = core->GetWindow( index );
-			core->SetVisible( index, 0 );
-			if (dict->Lookup( "OptionsPosition", index )) {
-				ResizeDel( ow, index );
-			}
-		}
-	}
-	if (dict->Lookup( "PortraitWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* pw = core->GetWindow( index );
-			core->SetVisible( index, 0 );
-			if (dict->Lookup( "PortraitPosition", index )) {
-				ResizeDel( pw, index );
-			}
-		}
-	}
-	if (dict->Lookup( "ActionsWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* aw = core->GetWindow( index );
-			core->SetVisible( index, 0 );
-			if (dict->Lookup( "ActionsPosition", index )) {
-				ResizeDel( aw, index );
-			}
-		}
-	}
-	if (dict->Lookup( "TopWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* tw = core->GetWindow( index );
-			core->SetVisible( index, 0 );
-			if (dict->Lookup( "TopPosition", index )) {
-				ResizeDel( tw, index );
-			}
-		}
-	}
-	if (dict->Lookup( "OtherWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* ow = core->GetWindow( index );
-			core->SetVisible( index, 0 );
-			if (dict->Lookup( "OtherPosition", index )) {
-				ResizeDel( ow, index );
-			}
-		}
-	}
+
 	if (dict->Lookup( "FloatWindow", index )) {
 		if (index != (ieDword) -1) {
 			core->SetVisible( index, 0 );
@@ -1141,71 +1116,47 @@ void GameControl::HideGUI()
 	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos, ( ( Window * ) Owner )->YPos, Width, Height );
 }
 
+
+void GameControl::HandleWindowReveal(const char *WindowName, const char *WindowPosition)
+{
+	Variables* dict = core->GetDictionary();
+	ieDword index;
+
+	if (dict->Lookup( WindowName, index )) {
+		if (index != (ieDword) -1) {
+			Window* w = core->GetWindow( index );
+			if (w) {
+				core->SetVisible( index, 1 );
+				if (dict->Lookup( WindowPosition, index )) {
+					ResizeAdd( w, index );
+				}
+				return;
+			}
+			printMessage("GameControl", "Invalid Window Index", LIGHT_RED);
+			printf("%s:%u\n",WindowName, index);
+		}
+	}
+}
+
 void GameControl::UnhideGUI()
 {
 	if (ScreenFlags&SF_GUIENABLED) {
 		return;
 	}
 	ScreenFlags |= SF_GUIENABLED;
-	Variables* dict = core->GetDictionary();
-	ieDword index;
 	// Unhide the gamecontrol window
 	core->SetVisible( 0, 1 );
 
-	if (dict->Lookup( "MessageWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* mw = core->GetWindow( index );
-			core->SetVisible( index, 1 );
-			if (dict->Lookup( "MessagePosition", index )) {
-				ResizeAdd( mw, index );
-			}
-		}
-	}
-	if (dict->Lookup( "ActionsWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* aw = core->GetWindow( index );
-			core->SetVisible( index, 1 );
-			if (dict->Lookup( "ActionsPosition", index )) {
-				ResizeAdd( aw, index );
-			}
-		}
-	}
-	if (dict->Lookup( "OptionsWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* ow = core->GetWindow( index );
-			core->SetVisible( index, 1 );
-			if (dict->Lookup( "OptionsPosition", index )) {
-				ResizeAdd( ow, index );
-			}
-		}
-	}
-	if (dict->Lookup( "PortraitWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* pw = core->GetWindow( index );
-			core->SetVisible( index, 1 );
-			if (dict->Lookup( "PortraitPosition", index )) {
-				ResizeAdd( pw, index );
-			}
-		}
-	}
-	if (dict->Lookup( "TopWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* tw = core->GetWindow( index );
-			core->SetVisible( index, 1 );
-			if (dict->Lookup( "TopPosition", index )) {
-				ResizeAdd( tw, index );
-			}
-		}
-	}
-	if (dict->Lookup( "OtherWindow", index )) {
-		if (index != (ieDword) -1) {
-			Window* ow = core->GetWindow( index );
-			core->SetVisible( index, 1 );
-			if (dict->Lookup( "OtherPosition", index )) {
-				ResizeAdd( ow, index );
-			}
-		}
-	}
+	HandleWindowReveal("MessageWindow", "MessagePosition");
+	HandleWindowReveal("OptionsWindow", "OptionsPosition");
+	HandleWindowReveal("PortraitWindow", "PortraitPosition");
+	HandleWindowReveal("ActionsWindow", "ActionsPosition");
+	HandleWindowReveal("TopWindow", "TopPosition");
+	HandleWindowReveal("OtherWindow", "OtherPosition");
+	//the floatwindow is a special case
+	Variables* dict = core->GetDictionary();
+	ieDword index;
+
 	if (dict->Lookup( "FloatWindow", index )) {
 		if (index != (ieDword) -1) {
 			Window* fw = core->GetWindow( index );
