@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.24 2004/04/14 12:20:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.25 2004/04/14 14:07:55 avenger_teambg Exp $
  *
  */
 
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 				( unsigned char * ) fpsstring, palette,
 				IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 	} while (core->GetVideoDriver()->SwapBuffers() == GEM_OK);
-	delete( palette );
+	free( palette );
 	delete( core );
 	return 0;
 }
