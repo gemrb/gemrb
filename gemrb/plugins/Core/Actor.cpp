@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.71 2004/10/09 16:31:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.72 2004/10/17 06:35:47 avenger_teambg Exp $
  *
  */
 
@@ -540,7 +540,7 @@ int Actor::GetMemorizableSpellsCount(ieSpellType Type, int Level)
 	if( classcount < 0 ) {
 		InitSpellTables();
 	}
-	int ActorLevel = GetStat(IE_LEVEL);
+	int ActorLevel = GetStat(IE_LEVEL)-1;
 	int MCFlags = GetStat(IE_MC_FLAGS);
 	int Class = GetStat(IE_CLASS);
 	if( Class>=classcount ) {
