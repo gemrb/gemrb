@@ -92,6 +92,27 @@ static PyObject * GemRB_SetWindowSize(PyObject */*self*/, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SetWindowPos(PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, X, Y;
+
+	if(!PyArg_ParseTuple(args, "iii", &WindowIndex, &X, &Y)) {
+		printMessage("GUIScript", "Syntax Error: SetWindowPos(WindowIndex, X, Y)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(!win)
+		return NULL;
+
+	win->XPos = X;
+	win->YPos = Y;
+	win->Invalidate();
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_LoadTable(PyObject */*self*/, PyObject *args)
 {
 	char *string;
@@ -742,6 +763,29 @@ static PyObject * GemRB_SetButtonSprites(PyObject */*self*/, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SetControlPos(PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex, X, Y;
+
+	if(!PyArg_ParseTuple(args, "iiii", &WindowIndex, &ControlIndex, &X, &Y)) {
+		printMessage("GUIScript", "Syntax Error: SetControlPos(WindowIndex, ControlIndex, X, Y)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(!win)
+		return NULL;
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(!ctrl)
+		return NULL;
+	
+	ctrl->XPos = X;
+	ctrl->YPos = Y;
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_SetLabelUseRGB(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex, status;
@@ -1084,6 +1128,9 @@ static PyMethodDef GemRBMethods[] = {
 	{"SetWindowSize", GemRB_SetWindowSize, METH_VARARGS,
 	 "Resized a Window."},
 
+ 	{"SetWindowPos", GemRB_SetWindowPos, METH_VARARGS,
+	 "Moves a Window."},
+
  	{"LoadTable", GemRB_LoadTable, METH_VARARGS,
      "Loads a 2DA Table."},
 
@@ -1161,6 +1208,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"SetButtonSprites", GemRB_SetButtonSprites, METH_VARARGS,
 	 "Sets a Button Sprites Images."},
+
+ 	{"SetControlPos", GemRB_SetControlPos, METH_VARARGS,
+	 "Moves a Control."},
 
 	{"SetTextAreaSelectable",GemRB_SetTextAreaSelectable, METH_VARARGS,
      "Sets the Selectable Flag of a TextArea."},
