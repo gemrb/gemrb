@@ -1149,6 +1149,19 @@ static PyObject *GemRB_GetSaveGameCount( PyObject */*self*/, PyObject */*args*/)
   return Py_BuildValue("i",core->GetSaveGameIterator()->GetSaveGameCount() );
 }
 
+static PyObject *GemRB_DeleteSaveGame( PyObject */*self*/, PyObject *args)
+{
+	int SlotCount;
+
+	if(!PyArg_ParseTuple(args, "i", &SlotCount) ) {
+		printMessage("GUIScript","Syntax Error: DeleteSaveGame(SlotCount)\n", LIGHT_RED);
+		return NULL;
+	}
+	core->GetSaveGameIterator()->GetSaveGame(SlotCount, true);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject *GemRB_GetSaveGameAttrib( PyObject */*self*/, PyObject *args)
 {
 	int Type, SlotCount;
@@ -1451,6 +1464,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"GetSaveGameCount", GemRB_GetSaveGameCount, METH_VARARGS,
      "Returns the number of saved games."},
+
+	{"DeleteSaveGame", GemRB_DeleteSaveGame, METH_VARARGS,
+     "Deletes a saved game folder completely."},
 
         {"GetSaveGameAttrib", GemRB_GetSaveGameAttrib, METH_VARARGS,
      "Returns the name, path or prefix of the saved game."},
