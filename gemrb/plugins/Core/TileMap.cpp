@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.37 2005/03/05 10:03:49 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.38 2005/03/14 11:51:16 avenger_teambg Exp $
  *
  */
 
@@ -187,9 +187,17 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				case 12:
 					FOG( e );
 					break;
+				case 5: 
+					FOG( 1 );
+					FOG( 4 );
+					break;
 				case 7: 
 					FOG( 3 );
 					FOG( 6 );
+					break;
+				case 10: 
+					FOG( 2 );
+					FOG( 8 );
 					break;
 				case 11: 
 					FOG( 3 );
@@ -246,9 +254,17 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				case 12:
 					FOG( 16 + e );
 					break;
+				case 5: 
+					FOG( 16 + 1 );
+					FOG( 16 + 4 );
+					break;
 				case 7: 
 					FOG( 16 + 3 );
 					FOG( 16 + 6 );
+					break;
+				case 10: 
+					FOG( 16 + 2 );
+					FOG( 16 + 8 );
 					break;
 				case 11: 
 					FOG( 16 + 3 );
