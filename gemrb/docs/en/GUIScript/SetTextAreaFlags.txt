@@ -1,0 +1,27 @@
+
+Prototype: GemRB.SetTextAreaFlags(WindowIndex, ControlIndex, Flags)
+
+Description: Sets the Flags of a TextArea.
+
+Parameters: WindowIndex, ControlIndex  - the control's reference
+Flags                      - various bits altering the behaviour of the control
+To make sure the flags are not misplaced, the high byte must be 5 (the textarea control's type).
+
+IE_GUI_TEXTAREA_SELECTABLE   - 0x05000001
+The TextArea will be able to return a selected row.
+IE_GUI_TEXTAREA_AUTOSCROLL   - 0x05000002
+Some TextAreas are autoscrolling while text was written into them, thus always showing the last content.
+IE_GUI_TEXTAREA_SMOOTHSCROLL - 0x05000004
+The TextArea will slowly scroll its content.
+
+Return value: N/A
+
+Example:
+        TextAreaControl = GemRB.GetControl(SoundWindow, 45)
+        GemRB.SetTextAreaFlags(SoundWindow, TextAreaControl,IE_GUI_TEXTAREA_SELECTABLE)
+        GemRB.SetVarAssoc(SoundWindow, TextAreaControl, "Sound", 0)
+        RowCount=GemRB.GetCharSounds(SoundWindow, TextAreaControl)
+The above code will set up the TextArea as a ListBox control, by reading the names of available character soundsets into the TextArea and setting it up as selectable. When the user clicks on row, the "Sound" variable will be assigned a row number.
+
+See also: GetCharSounds, GetCharList, QueryText, accessing_gui_controls
+
