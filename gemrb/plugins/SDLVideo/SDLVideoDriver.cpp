@@ -19,6 +19,8 @@ int SDLVideoDriver::Init(void)
     return GEM_ERROR;
   }
   printf("[OK]\n");
+  SDL_EnableUNICODE(1);
+  SDL_EnableKeyRepeat(500, 50);
   return GEM_OK;
 }
 
@@ -95,7 +97,19 @@ int SDLVideoDriver::SwapBuffers(void)
 			ret = GEM_ERROR;
 		break;
 
+		case SDL_KEYUP:
+			{
+			unsigned char key = event.key.keysym.unicode & 0xff;
+			if(Evnt && (key != 0))
+				Evnt->KeyRelease(key, event.key.keysym.mod);
+			}
+		break;
+
 		case SDL_KEYDOWN:
+			{
+			unsigned char key = event.key.keysym.unicode & 0xff;
+			if(Evnt && (key != 0))
+				Evnt->KeyPress(key, event.key.keysym.mod);
 			if(event.key.keysym.sym == SDLK_RIGHT) {
 				Viewport.x += 64;
 			}
@@ -108,6 +122,22 @@ int SDLVideoDriver::SwapBuffers(void)
 			else if(event.key.keysym.sym == SDLK_DOWN) {
 				Viewport.y += 64;
 			}
+			}
+		break;
+
+		case SDL_MOUSEMOTION:
+			if(Evnt)
+				Evnt->MouseMove(event.motion.x, event.motion.y);
+		break;
+
+		case SDL_MOUSEBUTTONDOWN:
+			if(Evnt)
+				Evnt->MouseDown(event.button.x, event.button.y, event.button.state, 0);
+		break;
+
+		case SDL_MOUSEBUTTONUP:
+			if(Evnt)
+				Evnt->MouseUp(event.button.x, event.button.y, event.button.state, 0);
 		break;
 		}
 	}
