@@ -32,10 +32,11 @@ def OnLoad():
 def PlayPress():
 	s = GemRB.GetVar("MovieIndex")
 	t = GemRB.GetTableValue(MoviesTable, s, 1)
-	GemRB.LoadMusicPL(t)
+	GemRB.LoadMusicPL(t,1)
 	return
 
 def CreditsPress():
+	GemRB.PlayMovie("endcrdit");
 	return
 
 def DonePress():
