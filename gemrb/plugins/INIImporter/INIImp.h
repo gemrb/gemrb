@@ -73,8 +73,8 @@ public:
 		char * VKptr = ValueKey;
 		while(*VKptr != '\0') {
 			if((*VKptr == ' ') && (*(VKptr+1) == ' ')) {
+				*VKptr++ = '\n';
 				*VKptr = '\n';
-				VKptr++;
 			}
 			VKptr++;
 		}
