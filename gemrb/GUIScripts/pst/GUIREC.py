@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.24 2004/10/23 15:25:17 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.25 2004/11/06 10:47:44 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -614,12 +614,17 @@ def GetStatOverview (pc):
 	#   55011 Unused Slots
 	stats.append ((55011, GS (IE_FREESLOTS), ''))
 	#   33642 Fist
+	stats.append ((33642, GS (IE_PROFICIENCYBASTARDSWORD), '+'))
 	#   33649 Edged Weapon
+	stats.append ((33649, GS (IE_PROFICIENCYLONGSWORD), '+'))
 	#   33651 Hammer
+	stats.append ((33651, GS (IE_PROFICIENCYSHORTSWORD), '+'))
 	#   44990 Axe
-	stats.append ((44990, GS (IE_PROFICIENCYAXE), ''))
+	stats.append ((44990, GS (IE_PROFICIENCYAXE), '+'))
 	#   33653 Club
+	stats.append ((33653, GS (IE_PROFICIENCYTWOHANDEDSWORD), '+'))
 	#   33655 Bow
+	stats.append ((33655, GS (IE_PROFICIENCYKATANA), '+'))
 	stats.append (None)
 	
 	# 4228 Ability Bonuses
@@ -653,7 +658,11 @@ def GetStatOverview (pc):
 			strref, val, type = s
 			if val == 0 and type != '0':
 				continue
-			res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
+			if type == '+':
+				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
+			else:
+				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
+			
 			lines = 1
 		except:
 			if s != None:
