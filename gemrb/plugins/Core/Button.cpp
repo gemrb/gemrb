@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.49 2003/12/26 13:46:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.50 2004/02/11 22:36:15 balrog994 Exp $
  *
  */
 
@@ -66,6 +66,11 @@ Button::Button(bool Clear){
 	Flags = 0x4;
 	ToggleState = false;
 	Picture = NULL;
+	//MOS Draggable Stuff
+	Draggable = false;
+	Dragging = false;
+	ScrollX = 0;
+	ScrollY = 0;
 }
 Button::~Button(){
 	Video * video = core->GetVideoDriver();
@@ -190,9 +195,14 @@ void Button::Draw(unsigned short x, unsigned short y)
 			font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, ppoi, align | IE_FONT_SINGLE_LINE, true);
 	}
 	if(Picture && (Flags&0x2)) {
-		short xOffs = (Width / 2) - (Picture->Width / 2);
-		short yOffs = (Height / 2) - (Picture->Height / 2);
-		core->GetVideoDriver()->BlitSprite(Picture, x+XPos+xOffs, y+YPos+yOffs, true);
+		if(Draggable) {
+			Region r(XPos, YPos, Width, Height);
+			core->GetVideoDriver()->BlitSprite(Picture, XPos+ScrollX, YPos+ScrollY, true, &r);
+		} else {
+			short xOffs = (Width / 2) - (Picture->Width / 2);
+			short yOffs = (Height / 2) - (Picture->Height / 2);
+			core->GetVideoDriver()->BlitSprite(Picture, x+XPos+xOffs, y+YPos+yOffs, true);
+		}
 	}
 }
 /** Sets the Button State */
@@ -222,11 +232,19 @@ void Button::OnSpecialKeyPress(unsigned char Key)
 /** Mouse Button Down */
 void Button::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	if((Button == 1) && (State != IE_GUI_BUTTON_DISABLED)) {
-		State = IE_GUI_BUTTON_PRESSED;
-		Changed = true;
-		if(Flags & 0x04) {
+	//Button == 1 means Left Mouse Button
+	if(Button == 1) {
+		if(State != IE_GUI_BUTTON_DISABLED) {
+			State = IE_GUI_BUTTON_PRESSED;
+			Changed = true;
+			if(Flags & 0x04) {
 				core->GetSoundMgr()->Play(ButtonSounds[SND_BUTTON_PRESSED]);
+			}
+			if(Draggable) {
+				Dragging = true;
+				DragX = x;
+				DragY = y;
+			}
 		}
 	}
 }
@@ -235,6 +253,8 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 {
 	if(State == IE_GUI_BUTTON_DISABLED)
 		return;
+	if(Draggable)
+		Dragging = false;
 	if(State == IE_GUI_BUTTON_PRESSED)
 	{
 		if(ToggleState)
@@ -285,6 +305,19 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	if(MouseOverButton[0] != 0)
 		core->GetGUIScriptEngine()->RunFunction(MouseOverButton);
+	if(Dragging) {
+		ScrollX += (x-DragX);
+		ScrollY += (y-DragY);
+		if(ScrollX < (-Picture->Width))
+			ScrollX = -Picture->Width;
+		if(ScrollY < (-Picture->Height))
+			ScrollY = -Picture->Height;
+		if(ScrollX > 0)
+			ScrollX = 0;
+		if(ScrollY > 0)
+			ScrollY = 0;
+		Changed = true;
+	}
 }
 
 /** Sets the Text of the current control */
@@ -371,4 +404,9 @@ void Button::SetPicture(Sprite2D * Picture)
 void SetAnimatedButton(bool animated)
 {
 	
+}
+
+void Button::SetDraggable(bool Value)
+{
+	Draggable = Value;
 }
