@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIPR.py,v 1.9 2004/11/15 00:20:54 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIPR.py,v 1.10 2004/12/01 22:09:52 avenger_teambg Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -25,6 +25,7 @@
 
 import GemRB
 from GUIDefines import *
+from ie_stats import *
 from GUICommon import CloseOtherWindow
 from GUICommonWindows import SetSelectionChangeHandler
 
@@ -50,7 +51,7 @@ def OpenPriestWindow ():
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIPR")
 	PriestWindow = Window = GemRB.LoadWindow (3)
-        GemRB.SetVar ("OtherWindow", PriestWindow)
+	GemRB.SetVar ("OtherWindow", PriestWindow)
 
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PriestPrevLevelPress")
@@ -65,10 +66,8 @@ def OpenPriestWindow ():
 
 
 	SetSelectionChangeHandler (UpdatePriestWindow)
-	UpdatePriestWindow ()
-
 	GemRB.UnhideGUI ()
-	
+	UpdatePriestWindow ()
 
 def UpdatePriestWindow ():
 	global PriestMemorizedSpellList, PriestKnownSpellList
@@ -140,6 +139,11 @@ def UpdatePriestWindow ():
 			GemRB.SetEvent (Window, Icon, IE_GUI_BUTTON_ON_PRESS, "")
 			GemRB.SetEvent (Window, Icon, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			GemRB.SetTooltip (Window, Icon, '')
+	Table = GemRB.LoadTable ("clskills")
+	if (GemRB.GetTableValue (Table, GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
+		GemRB.SetVisible (Window, 2)
+	else:
+		GemRB.SetVisible (Window, 1)
 
 
 def PriestPrevLevelPress ():
@@ -172,7 +176,7 @@ def OpenPriestSpellInfoWindow ():
 		return
 		
 	PriestSpellInfoWindow = Window = GemRB.LoadWindow (4)
-        GemRB.SetVar ("FloatWindow", PriestSpellInfoWindow)
+	GemRB.SetVar ("FloatWindow", PriestSpellInfoWindow)
 
 	Button = GemRB.GetControl (Window, 4)
 	GemRB.SetText (Window, Button, 1403)
@@ -232,7 +236,7 @@ def OpenPriestSpellUnmemorizeWindow ():
 		return
 		
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
-        GemRB.SetVar ("FloatWindow", PriestSpellUnmemorizeWindow)
+	GemRB.SetVar ("FloatWindow", PriestSpellUnmemorizeWindow)
 
 	# "Are you sure you want to ....?"
 	TextArea = GemRB.GetControl (Window, 2)
