@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.15 2004/08/03 22:27:30 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.16 2004/08/27 13:22:07 avenger_teambg Exp $
  *
  */
 
@@ -59,6 +59,8 @@ public:
 	Control* GetControl(unsigned short x, unsigned short y);
 	/** Returns the Control by Index */
 	Control* GetControl(unsigned short i);
+	/** Deletes the xth. Control */
+	void DelControl(unsigned short i);
 	/** Returns the Default Control which is a button atm */
 	Control* GetDefaultControl();
 	/** Sets 'ctrl' as Focused */

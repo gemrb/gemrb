@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.30 2004/08/08 20:49:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.31 2004/08/27 13:22:01 avenger_teambg Exp $
  *
  */
 
@@ -148,6 +148,15 @@ Control* Window::GetControl(unsigned short i)
 		return Controls[i];
 	}
 	return NULL;
+}
+
+void Window::DelControl(unsigned short i)
+{
+	if (i < Controls.size() ) {
+		delete Controls[i];
+		Controls.erase(Controls.begin()+i);
+	}
+	Invalidate();
 }
 
 Control* Window::GetDefaultControl()
