@@ -26,7 +26,7 @@ void EventMgr::AddWindow(Window * win)
 	if(windows.size() == 1)
 		topwin.push_back(0);
 	else
-		SetOnTop(i);
+		SetOnTop(windows.size()-1);
 	lastW = win;
 	lastF = NULL;
 }
