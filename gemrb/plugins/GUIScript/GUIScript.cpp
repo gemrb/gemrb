@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.234 2004/11/01 09:16:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.235 2004/11/01 16:06:43 avenger_teambg Exp $
  *
  */
 
@@ -94,7 +94,6 @@ inline PyObject* AttributeError(char* doc_string)
 	printMessage( "GUIScript", "Syntax Error:\n", LIGHT_RED );
 	printf( "%s\n\n", doc_string );
 	return NULL;
-	
 }
 
 inline Control *GetControl( int wi, int ci, int ct)
@@ -858,7 +857,7 @@ static PyObject* GemRB_GetControl(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_QueryText__doc,
 "QueryText(WindowIndex, ControlIndex) => string\n\n"
-"Returns the Text of a control in a Window." );
+"Returns the Text of a TextEdit control." );
 
 static PyObject* GemRB_QueryText(PyObject * /*self*/, PyObject* args)
 {
@@ -868,12 +867,19 @@ static PyObject* GemRB_QueryText(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_QueryText__doc );
 	}
 
-	TextEdit *ctrl = (TextEdit *) GetControl(wi, ci, IE_GUI_EDIT);
+	TextEdit *ctrl = (TextEdit *) GetControl(wi, ci, -1);
 	if (!ctrl) {
 		return NULL;
 	}
-
-	return Py_BuildValue( "s", ctrl->QueryText() );
+	switch(ctrl->ControlType) {
+	case IE_GUI_EDIT:
+		return Py_BuildValue( "s",((TextEdit *) ctrl)->QueryText() );
+	case IE_GUI_TEXTAREA:
+		return Py_BuildValue( "s",((TextArea *) ctrl)->QueryText() );
+	default:
+		RuntimeError("Invalid control type");
+		return NULL;
+	}
 }
 
 PyDoc_STRVAR( GemRB_SetText__doc,
@@ -2306,7 +2312,7 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_CheckVar__doc,
 "CheckVar(VariableName, Context) => long\n\n"
-"Display the value of a Game Variable." );
+"Display (and return) the value of a Game Variable." );
 
 static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 {

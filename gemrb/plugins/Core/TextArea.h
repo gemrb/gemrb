@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.19 2004/04/15 10:21:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.20 2004/11/01 16:06:42 avenger_teambg Exp $
  *
  */
 
@@ -67,6 +67,10 @@ public:
 	void SetMinRow(bool enable);
 	/** Copies the current TextArea content to another TextArea control */
 	void CopyTo(TextArea* ta);
+	/** Returns the selected text */
+	const char* QueryText();
+	/** Redraws the textarea with a new value */
+	void RedrawTextArea(char*, unsigned int);
 	/** Scrolls automatically to the bottom when the text changes */
 	bool AutoScroll;
 private: // Private attributes
@@ -74,7 +78,6 @@ private: // Private attributes
 	std::vector< char*> lines;
 	std::vector< int> lrows;
 	int seltext;
-	int selline;
 	/** minimum selectable row */
 	int minrow;
 	///** Text Buffer */

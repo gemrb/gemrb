@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.34 2004/10/23 17:47:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.35 2004/11/01 16:06:42 avenger_teambg Exp $
  *
  */
 
@@ -212,6 +212,12 @@ void Window::RedrawControls(char* VarName, unsigned int Sum)
 			{
 				Button* bt = ( Button* ) ( Controls[i] );
 				bt->RedrawButton( VarName, Sum );
+				break;
+			}
+			case IE_GUI_TEXTAREA:
+			{
+				TextArea* pb = ( TextArea* ) ( Controls[i] );
+				pb->RedrawTextArea( VarName, Sum );
 				break;
 			}
 			case IE_GUI_PROGRESSBAR:

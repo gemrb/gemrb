@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.61 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.62 2004/11/01 16:06:42 avenger_teambg Exp $
  *
  */
 
@@ -31,7 +31,7 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	startrow = 0;
 	minrow = 0;
 	seltext = -1;
-	selline = -1;
+	Value = 0xffffffff;
 	sb = NULL;
 	Selectable = false;
 	AutoScroll = false;
@@ -137,7 +137,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			Color* pal = NULL;
 			if (seltext == (int) i)
 				pal = selected;
-			else if (selline == (int) i)
+			else if (Value == i)
 				pal = lineselpal;
 			else
 				pal = palette;
@@ -152,7 +152,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			Color* pal = NULL;
 			if (seltext == (int) i)
 				pal = selected;
-			else if (selline == (int) i)
+			else if (Value == i)
 				pal = lineselpal;
 			else
 				pal = palette;
@@ -216,6 +216,7 @@ void TextArea::SetMinRow(bool enable)
 	} else {
 		minrow = 0;
 	}
+	Changed = true;
 }
 
 static char inserted_crap[]="[/color][color=ffffff]";
@@ -321,6 +322,7 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 				GameControl* gc = ( GameControl* ) win->GetControl( 0 );
 				if (gc->ControlType == IE_GUI_GAMECONTROL) {
 					if (gc->DialogueFlags&DF_IN_DIALOG) {
+						Changed = true;
 //FIXME: this should choose only valid options
 						seltext=minrow-1;
 						for(int i=0;i<Key-'0';i++) {
@@ -449,7 +451,7 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y,
 	unsigned char /*Button*/, unsigned short /*Mod*/)
 {
 	if (( x <= Width ) && ( y <= ( Height - 5 ) ) && ( seltext != -1 )) {
-		selline = seltext;
+		Value = (unsigned int) seltext;
 		if (strnicmp( lines[seltext], "[s=", 3 ) == 0) {
 			if (minrow > seltext)
 				return;
@@ -466,11 +468,10 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y,
 				}
 			}
 		}
-		//((Window*)Owner)->Invalidate();
 		core->RedrawAll();
 	}
 	if (VarName[0] != 0) {
-		core->GetDictionary()->SetAt( VarName, selline );
+		core->GetDictionary()->SetAt( VarName, Value );
 	}
 	RunEventHandler( TextAreaOnChange );
 }
@@ -481,4 +482,21 @@ void TextArea::CopyTo(TextArea* ta)
 	for (size_t i = 0; i < lines.size(); i++) {
 		ta->SetText( lines[i], -1 );
 	}
+}
+
+void TextArea::RedrawTextArea(char* VariableName, unsigned int Sum)
+{
+        if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
+                return;
+        }
+	Value = Sum;
+	Changed = true;
+}
+
+const char* TextArea::QueryText()
+{
+	if( Value<lines.size() ) {
+	        return ( const char * ) lines[Value];
+	}
+	return ( const char *) "";
 }
