@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.37 2004/10/17 22:18:11 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.38 2004/11/18 23:32:40 edheldil Exp $
  *
  */
 
@@ -118,8 +118,6 @@ public:
 	void SetState(unsigned char state);
 	/** Sets the Text of the current control */
 	int SetText(const char* string, int pos = 0);
-	/** Set Event */
-	void SetEvent(char* funcName, int eventType);
 	/** Sets the Picture */
 	void SetPicture(Sprite2D* Picture);
 	/** Sets border/frame parameters */
@@ -143,6 +141,8 @@ public: // Public Events
 		unsigned short Mod);	
 	/** A special key has been pressed */
 	void OnSpecialKeyPress(unsigned char Key);
+	/** Set handler for specified event */
+	bool SetEvent(int eventType, EventHandler handler);
 	/** Button Pressed Event Script Function Name */
 	EventHandler ButtonOnPress;
 	EventHandler ButtonOnShiftPress;

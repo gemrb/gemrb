@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.26 2004/08/26 16:35:21 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.27 2004/11/18 23:32:41 edheldil Exp $
  *
  */
 
@@ -34,7 +34,7 @@ Slider::Slider(short KnobXPos, short KnobYPos, short KnobStep,
 	GrabbedKnob = NULL;
 	BackGround = NULL;
 	this->Clear = Clear;
-	SliderOnChange[0] = 0;
+	ResetEventHandler( SliderOnChange );
 	State = IE_GUI_SLIDER_KNOB;
 	Pos = 0;
 	Value = 1;
@@ -267,4 +267,19 @@ void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 int Slider::SetText(const char* /*string*/, int /*pos*/)
 {
 	return 0;
+}
+
+bool Slider::SetEvent(int eventType, EventHandler handler)
+{
+	Changed = true;
+
+	switch (eventType) {
+	case IE_GUI_SLIDER_ON_CHANGE:
+		SetEventHandler( SliderOnChange, handler );
+		break;
+	default:
+		return Control::SetEvent( eventType, handler );
+	}
+
+	return true;
 }

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.14 2004/11/18 21:03:23 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.15 2004/11/18 23:32:42 edheldil Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -70,7 +70,7 @@ def OpenMapWindow ():
 	GemRB.SetVar("x",1)
 	GemRB.SetVarAssoc (Window, Map, "x", 1)
 
-	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_CLICK, "SetMapNote")
+	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "SetMapNote")
 	
 
 	MapTable = GemRB.LoadTable( "MAPNAME" )

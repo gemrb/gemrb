@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.26 2004/11/18 21:03:23 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.27 2004/11/18 23:32:41 edheldil Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -56,7 +56,7 @@ IE_GUI_EDIT_ON_CHANGE     = 0x03000000
 IE_GUI_TEXTAREA_ON_CHANGE = 0x05000000
 IE_GUI_LABEL_ON_PRESS     = 0x06000000
 IE_GUI_SCROLLBAR_ON_CHANGE= 0x07000000
-IE_GUI_MAP_ON_CLICK       = 0x09000000
+IE_GUI_MAP_ON_PRESS       = 0x09000000
 
 #common states
 IE_GUI_CONTROL_FOCUSED    = 0xff000080

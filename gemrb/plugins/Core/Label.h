@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.h,v 1.12 2004/08/08 13:21:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.h,v 1.13 2004/11/18 23:32:41 edheldil Exp $
  *
  */
 
@@ -25,6 +25,9 @@
 #include "Control.h"
 #include "Font.h"
 #include "../../includes/RGBAColor.h"
+
+// !!! Keep these synchronized with GUIDefines.py !!!
+#define IE_GUI_LABEL_ON_PRESS      0x06000000
 
 /**Static Text GUI Control
   *@author GemRB Developement Team
@@ -58,6 +61,8 @@ public:
 	/** Mouse Button Down */
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 		unsigned short Mod);
+	/** Set handler for specified event */
+	bool SetEvent(int eventType, EventHandler handler);
 	/** Use the RGB Color for the Font */
 	bool useRGB;
 	/** OnPress Scripted Event Function Name */

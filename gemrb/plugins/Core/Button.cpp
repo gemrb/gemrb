@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.76 2004/10/17 22:18:11 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.77 2004/11/18 23:32:40 edheldil Exp $
  *
  */
 
@@ -53,13 +53,13 @@ Button::Button(bool Clear)
 	Unpressed = Pressed = Selected = Disabled = NULL;
 	this->Clear = Clear;
 	State = IE_GUI_BUTTON_UNPRESSED;
-	ButtonOnPress[0] = 0;
-	ButtonOnShiftPress[0] = 0;
-	ButtonOnRightPress[0] = 0;
-	ButtonOnDragDrop[0] = 0;
-	MouseEnterButton[0] = 0;
-	MouseLeaveButton[0] = 0;
-	MouseOverButton[0] = 0;
+	ResetEventHandler( ButtonOnPress );
+	ResetEventHandler( ButtonOnShiftPress );
+	ResetEventHandler( ButtonOnRightPress );
+	ResetEventHandler( ButtonOnDragDrop );
+	ResetEventHandler( MouseEnterButton );
+	ResetEventHandler( MouseLeaveButton );
+	ResetEventHandler( MouseOverButton );
 	Text = ( char * ) calloc( 64, sizeof(char) );
 	hasText = false;
 	font = core->GetButtonFont();
@@ -476,34 +476,38 @@ int Button::SetText(const char* string, int /*pos*/)
 	return 0;
 }
 
-/** Set Event */
-void Button::SetEvent(char* funcName, int eventType)
+/** Set Event Handler */
+bool Button::SetEvent(int eventType, EventHandler handler)
 {
+	Changed = true;
+
 	switch (eventType) {
 		case IE_GUI_BUTTON_ON_PRESS:
-			strcpy( ButtonOnPress, funcName );
+			SetEventHandler( ButtonOnPress, handler );
 			break;
 		case IE_GUI_MOUSE_OVER_BUTTON:
-			strcpy( MouseOverButton, funcName );
+			SetEventHandler( MouseOverButton, handler );
 			break;
 		case IE_GUI_MOUSE_ENTER_BUTTON:
-			strcpy( MouseEnterButton, funcName );
+			SetEventHandler( MouseEnterButton, handler );
 			break;
 		case IE_GUI_MOUSE_LEAVE_BUTTON:
-			strcpy( MouseLeaveButton, funcName );
+			SetEventHandler( MouseLeaveButton, handler );
 			break;
 		case IE_GUI_BUTTON_ON_SHIFT_PRESS:
-			strcpy( ButtonOnShiftPress, funcName );
+			SetEventHandler( ButtonOnShiftPress, handler );
 			break;
 		case IE_GUI_BUTTON_ON_RIGHT_PRESS:
-			strcpy( ButtonOnRightPress, funcName );
+			SetEventHandler( ButtonOnRightPress, handler );
 			break;
 		case IE_GUI_BUTTON_ON_DRAG_DROP:
-			strcpy( ButtonOnDragDrop, funcName );
+			SetEventHandler( ButtonOnDragDrop, handler );
 			break;
+	default:
+		return Control::SetEvent( eventType, handler );
 	}
 
-	Changed = true;
+	return true;
 }
 
 /** Sets the Display Flags */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.28 2004/10/31 14:50:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.29 2004/11/18 23:32:40 edheldil Exp $
  *
  */
 
@@ -66,6 +66,21 @@ void Control::DisplayTooltip()
 		core->DisplayTooltip( (( Window* )Owner)->XPos + XPos + Width / 2, (( Window* )Owner)->YPos + YPos + Height / 2, this );
 	else
 		core->DisplayTooltip( 0, 0, NULL );
+}
+
+void Control::ResetEventHandler(EventHandler handler)
+{
+	handler[0] = 0;
+}
+
+void Control::SetEventHandler(EventHandler handler, char* funcName)
+{
+	strncpy( handler, funcName, sizeof( EventHandler ) );
+}
+
+bool Control::SetEvent(int /*eventType*/, EventHandler /*handler*/)
+{
+	return false;
 }
 
 void Control::RunEventHandler(EventHandler handler)

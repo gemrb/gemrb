@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.30 2004/10/09 16:55:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.31 2004/11/18 23:32:41 edheldil Exp $
  *
  */
 
@@ -28,7 +28,7 @@ ScrollBar::ScrollBar(void)
 	Pos = 0;
 	Value = 10;
 	State = 0;
-	ScrollBarOnChange[0] = 0;
+	ResetEventHandler( ScrollBarOnChange );
 	ta = NULL;
 	for(int i=0;i<6;i++)  {
 		Frames[i]=NULL;
@@ -243,4 +243,19 @@ void ScrollBar::SetMax(unsigned short Max)
 		SetPos( Max - 1 );
 	}
 	Changed = true;
+}
+
+bool ScrollBar::SetEvent(int eventType, EventHandler handler)
+{
+	Changed = true;
+
+	switch (eventType) {
+	case IE_GUI_SCROLLBAR_ON_CHANGE:
+		SetEventHandler( ScrollBarOnChange, handler );
+		break;
+	default:
+		return Control::SetEvent( eventType, handler );
+	}
+
+	return true;
 }

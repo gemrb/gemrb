@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.26 2004/11/07 22:56:26 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.27 2004/11/18 23:32:40 edheldil Exp $
  *
  */
 
@@ -97,6 +97,12 @@ public: // Public attributes
 	/** Owner Window */
 	void* Owner;
 public: //Events
+	/** Reset/init event handler */
+	void ResetEventHandler(EventHandler handler);
+	/** Set handler from function name */
+	void SetEventHandler(EventHandler handler, char* funcName);
+	/** Set handler for specified event. Override in child classes */
+	virtual bool SetEvent(int eventType, EventHandler handler);
 	/** Run specified handler */
 	void RunEventHandler(EventHandler handler);
 	/** Key Press Event */

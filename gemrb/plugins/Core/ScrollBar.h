@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.h,v 1.13 2004/10/09 16:31:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.h,v 1.14 2004/11/18 23:32:41 edheldil Exp $
  *
  */
 
@@ -25,6 +25,10 @@
 #include "Control.h"
 #include "TextArea.h"
 #include "Sprite2D.h"
+
+// !!! Keep these synchronized with GUIDefines.py !!!
+#define IE_GUI_SCROLLBAR_ON_CHANGE  0x07000000
+
 
 #define IE_GUI_SCROLLBAR_UP_UNPRESSED   0
 #define IE_GUI_SCROLLBAR_UP_PRESSED 	1
@@ -83,6 +87,8 @@ public: // Public Events
 		unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
+	/** Set handler for specified event */
+	bool SetEvent(int eventType, EventHandler handler);
 	/** OnChange Scripted Event Function Name */
 	EventHandler ScrollBarOnChange;
 };

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.238 2004/11/18 21:03:21 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.239 2004/11/18 23:32:40 edheldil Exp $
  *
  */
 
@@ -1571,107 +1571,6 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 	return 0;
 }
 
-/** Set an Event of a Control */
-int Interface::SetEvent(unsigned short WindowIndex,
-	unsigned short ControlIndex, unsigned long EventID, char* funcName)
-{
-	if (WindowIndex >= windows.size()) {
-		printMessage( "Core", "Window not found", LIGHT_RED );
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		printMessage( "Core", "Window already freed", LIGHT_RED );
-		return -1;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		printMessage( "Core", "Control not found", LIGHT_RED );
-		return -1;
-	}
-	if (ctrl->ControlType != ( EventID >> 24 )) {
-		printf( "Expected control: %0x, but got: %0x", (int) (EventID >> 24),
-			(int) ctrl->ControlType );
-		printStatus( "ERROR", LIGHT_RED );
-		return -1;
-	}
-	switch (ctrl->ControlType) {
-		case IE_GUI_BUTTON:
-			//Button
-			 {
-				Button* btn = ( Button* ) ctrl;
-				btn->SetEvent( funcName, EventID & 255 );
-				return 0;
-			}
-			break;
-
-		case IE_GUI_PROGRESSBAR:
-			//Progressbar
-			 {
-				Progressbar* te = ( Progressbar* ) ctrl;
-				strncpy( te->EndReached, funcName, sizeof(EventHandler) );
-				return 0;
-			}
-			break;
-
-
-		case IE_GUI_TEXTAREA:
-			//TextArea
-			 {
-				TextArea* te = ( TextArea* ) ctrl;
-				strncpy( te->TextAreaOnChange, funcName, sizeof(EventHandler) );
-				return 0;
-			}
-			break;
-
-		case IE_GUI_EDIT:
-			//Slider
-			 {
-				TextEdit* te = ( TextEdit* ) ctrl;
-				strncpy( te->EditOnChange, funcName,sizeof(EventHandler) );
-				return 0;
-			}
-			break;
-
-		case IE_GUI_SLIDER:
-			//Slider
-			 {
-				Slider* sld = ( Slider* ) ctrl;
-				strncpy( sld->SliderOnChange, funcName, sizeof(EventHandler) );
-				return 0;
-			}
-			break;
-
-		case IE_GUI_LABEL:
-			//Label
-			 {
-				Label* lab = ( Label* ) ctrl;
-				strncpy( lab->LabelOnPress, funcName, sizeof(EventHandler) );
-				return 0;
-			}
-			break;
-
-		case IE_GUI_SCROLLBAR:
-			//ScrollBar
-			 {
-				ScrollBar* sb = ( ScrollBar* ) ctrl;
-				strncpy( sb->ScrollBarOnChange, funcName, sizeof(EventHandler) );
-				return 0;
-			}
-			break;
-		case IE_GUI_MAP:
-			//MapControl
-			 {
-				MapControl* mc = ( MapControl* ) ctrl;
-				strncpy( mc->MapControlOnClick, funcName, sizeof(EventHandler) );
-				return 0;
-			}
-			break;
-	}
-	printf( "Control has no event implemented: %0x", (int) ctrl->ControlID );
-	printStatus( "ERROR", LIGHT_RED );
-	return -1;
-}
 
 /** Set the Status of a Control in a Window */
 int Interface::SetControlStatus(unsigned short WindowIndex,

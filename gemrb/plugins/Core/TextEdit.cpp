@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.21 2004/10/22 21:35:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.22 2004/11/18 23:32:41 edheldil Exp $
  *
  */
 
@@ -32,7 +32,7 @@ TextEdit::TextEdit(unsigned short maxLength)
 	Back = NULL;
 	CurPos = 0;
 	Buffer[0] = 0;
-	EditOnChange[0] = 0;
+	ResetEventHandler( EditOnChange );
 	Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 	palette = core->GetVideoDriver()->CreatePalette( white, black );
 }
@@ -161,4 +161,19 @@ int TextEdit::SetText(const char* string, int /*pos*/)
 const char* TextEdit::QueryText()
 {
 	return ( const char * ) Buffer;
+}
+
+bool TextEdit::SetEvent(int eventType, EventHandler handler)
+{
+	Changed = true;
+
+	switch (eventType) {
+	case IE_GUI_EDIT_ON_CHANGE:
+		SetEventHandler( EditOnChange, handler );
+		break;
+	default:
+		return Control::SetEvent( eventType, handler );
+	}
+
+	return true;
 }

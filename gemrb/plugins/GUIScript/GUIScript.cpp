@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.242 2004/11/16 20:55:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.243 2004/11/18 23:32:38 edheldil Exp $
  *
  */
 
@@ -1110,9 +1110,14 @@ static PyObject* GemRB_SetEvent(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetEvent__doc );
 	}
 
-	int ret = core->SetEvent( WindowIndex, ControlIndex, event, funcName );
-	if (ret == -1) {
+	Control* ctrl = GetControl( WindowIndex, ControlIndex, -1 );
+	if (!ctrl)
 		return NULL;
+
+	if (! ctrl->SetEvent( event, funcName )) {
+		char buf[256];
+		snprintf( buf, sizeof( buf ), "Can't set event handler!" );
+		return RuntimeError( buf );
 	}
 
 	Py_INCREF( Py_None );

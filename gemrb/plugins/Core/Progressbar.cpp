@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.12 2004/11/04 20:57:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.13 2004/11/18 23:32:41 edheldil Exp $
  *
  */
 
@@ -33,6 +33,7 @@ Progressbar::Progressbar( unsigned short KnobStepsCount, bool Clear)
 	PBarCap = NULL;
 	KnobXPos = KnobYPos = 0;
 	CapXPos = CapYPos = 0;
+	ResetEventHandler( EndReached );
 }
 
 Progressbar::~Progressbar()
@@ -168,3 +169,17 @@ int Progressbar::SetText(const char* /*string*/, int /*pos*/)
 	return 0;
 }
 
+bool Progressbar::SetEvent(int eventType, EventHandler handler)
+{
+	Changed = true;
+
+	switch (eventType) {
+	case IE_GUI_PROGRESS_END_REACHED:
+		SetEventHandler( EndReached, handler );
+		break;
+	default:
+		return Control::SetEvent( eventType, handler );
+	}
+
+	return true;
+}

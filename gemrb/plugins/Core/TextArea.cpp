@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.62 2004/11/01 16:06:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.63 2004/11/18 23:32:41 edheldil Exp $
  *
  */
 
@@ -35,7 +35,7 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	sb = NULL;
 	Selectable = false;
 	AutoScroll = false;
-	TextAreaOnChange[0] = 0;
+	ResetEventHandler( TextAreaOnChange );
 
 	palette = core->GetVideoDriver()->CreatePalette( hitextcolor,
 										lowtextcolor );
@@ -499,4 +499,19 @@ const char* TextArea::QueryText()
 	        return ( const char * ) lines[Value];
 	}
 	return ( const char *) "";
+}
+
+bool TextArea::SetEvent(int eventType, EventHandler handler)
+{
+	Changed = true;
+
+	switch (eventType) {
+	case IE_GUI_TEXTAREA_ON_CHANGE:
+		SetEventHandler( TextAreaOnChange, handler );
+		break;
+	default:
+		return Control::SetEvent( eventType, handler );
+	}
+
+	return true;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.20 2004/11/01 16:06:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.21 2004/11/18 23:32:41 edheldil Exp $
  *
  */
 
@@ -26,6 +26,10 @@
 #include "../../includes/RGBAColor.h"
 #include "Font.h"
 #include "ScrollBar.h"
+
+// !!! Keep these synchronized with GUIDefines.py
+#define IE_GUI_TEXTAREA_ON_CHANGE  0x05000000
+
 
 #ifdef WIN32
 
@@ -106,6 +110,8 @@ public: //Events
 	/** Mouse Button Up */
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 		unsigned short Mod);
+	/** Set handler for specified event */
+	bool SetEvent(int eventType, EventHandler handler);
 	/** OnChange Scripted Event Function Name */
 	EventHandler TextAreaOnChange;
 };

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.5 2004/09/11 12:18:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.6 2004/11/18 23:32:41 edheldil Exp $
  *
  */
 
@@ -30,6 +30,10 @@
 /**Progressbar Control
   *@author GemRB Development Team
   */
+
+// !!! Keep in sync with GUIDefines.py !!!
+#define IE_GUI_PROGRESS_END_REACHED  0x01000000
+
 
 #ifdef WIN32
 
@@ -65,6 +69,8 @@ public:
   int SetText(const char * string, int pos = 0);
   /** Redraws a progressbar which is associated with VariableName */
   void RedrawProgressbar(char *VariableName, int Sum);
+  /** Set handler for specified event */
+  bool SetEvent(int eventType, EventHandler handler);
 
 private: // Private attributes
   /** BackGround Images. If smaller than the Control Size, the image will be tiled. */

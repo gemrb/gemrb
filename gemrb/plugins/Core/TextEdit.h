@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.10 2004/03/21 13:47:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.11 2004/11/18 23:32:41 edheldil Exp $
  *
  */
 
@@ -25,6 +25,9 @@
 #include "Control.h"
 #include "../../includes/RGBAColor.h"
 #include "Font.h"
+
+// !!! Keep these synchronized with GUIDefines.py
+#define IE_GUI_EDIT_ON_CHANGE      0x03000000
 
 #ifdef WIN32
 
@@ -74,6 +77,8 @@ public: //Events
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
+	/** Set handler for specified event */
+	bool SetEvent(int eventType, EventHandler handler);
 	/** OnChange Scripted Event Function Name */
 	EventHandler EditOnChange;
 };

@@ -6,6 +6,10 @@ class MapControl;
 #include "Control.h"
 #include "Interface.h"
 
+// !!! Keep these synchronized with GUIDefines.py !!!
+#define IE_GUI_MAP_ON_PRESS        0x09000000
+
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -41,7 +45,7 @@ public:
 	// Size of area viewport. FIXME: hack!
 	short ViewWidth, ViewHeight;
 	short XCenter, YCenter;
-	EventHandler MapControlOnClick;
+	EventHandler MapControlOnPress;
 
 	MapControl(void);
 	~MapControl(void);
@@ -68,6 +72,8 @@ public:
 	void OnKeyRelease(unsigned char Key, unsigned short Mod);
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
+	/** Set handler for specified event */
+	bool SetEvent(int eventType, EventHandler handler);
 };
 
 #endif

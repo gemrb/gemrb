@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.27 2004/08/28 14:34:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.28 2004/11/18 23:32:41 edheldil Exp $
  *
  */
 
@@ -28,7 +28,7 @@ Label::Label(Font* font)
 	this->font = font;
 	Buffer = NULL;
 	useRGB = false;
-	LabelOnPress[0] = 0;
+	ResetEventHandler( LabelOnPress );
 
 	Alignment = IE_FONT_ALIGN_CENTER;
 	palette = NULL;
@@ -107,4 +107,19 @@ void Label::OnMouseUp(unsigned short x, unsigned short y,
 			RunEventHandler( LabelOnPress );
 		}
 	}
+}
+
+bool Label::SetEvent(int eventType, EventHandler handler)
+{
+	Changed = true;
+
+	switch (eventType) {
+	case IE_GUI_LABEL_ON_PRESS:
+		SetEventHandler( LabelOnPress, handler );
+		break;
+	default:
+		return Control::SetEvent( eventType, handler );
+	}
+
+	return true;
 }

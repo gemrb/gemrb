@@ -22,6 +22,10 @@
 #include "Sprite2D.h"
 #include <math.h>
 
+// !!! Keep these synchronized with GUIDefines.py !!!
+#define IE_GUI_SLIDER_ON_CHANGE    0x02000000
+
+
 #define IE_GUI_SLIDER_KNOB        0
 #define IE_GUI_SLIDER_GRABBEDKNOB 1
 #define IE_GUI_SLIDER_BACKGROUND  2
@@ -89,6 +93,8 @@ public: // Public Events
   void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
   /** Mouse Over Event */
   void OnMouseOver(unsigned short x, unsigned short y);
+  /** Set handler for specified event */
+  bool SetEvent(int eventType, EventHandler handler);
   /** OnChange Scripted Event Function Name */
   EventHandler SliderOnChange;
 };
