@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.8 2004/01/29 20:37:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.9 2004/02/01 18:02:44 edheldil Exp $
  *
  */
 
@@ -49,6 +49,7 @@ public:
 		char nPath[_MAX_PATH];
 		struct stat my_stat;
 		sprintf(nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix);
+		ResolveFilePath (nPath);
 		stat(nPath, &my_stat);
 		strftime(Date, _MAX_PATH, "%c",localtime(&my_stat.st_mtime));
 	};
@@ -65,6 +66,7 @@ public:
 			return NULL;
 		char nPath[_MAX_PATH];
 		sprintf(nPath, "%s%sPORTRT%d.bmp", Path, SPathDelimiter, index);
+		ResolveFilePath (nPath);
 		FileStream * fs = new FileStream();
 		fs->Open(nPath, true);
 		return fs;
@@ -73,6 +75,7 @@ public:
 	{
 		char nPath[_MAX_PATH];
 		sprintf(nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix);
+		ResolveFilePath (nPath);
 		FileStream * fs = new FileStream();
 		fs->Open(nPath, true);
 		return fs;
@@ -81,6 +84,7 @@ public:
 	{
 		char nPath[_MAX_PATH];
 		sprintf(nPath, "%s%s%s.gam", Path, SPathDelimiter, Prefix);
+		ResolveFilePath (nPath);
 		FileStream * fs = new FileStream();
 		fs->Open(nPath, true);
 		return fs;
@@ -89,6 +93,7 @@ public:
 	{
 		char nPath[_MAX_PATH];
 		sprintf(nPath, "%s%s%s.sav", Path, SPathDelimiter, Prefix);
+		ResolveFilePath (nPath);
 		FileStream * fs = new FileStream();
 		fs->Open(nPath, true);
 		return fs;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.10 2004/01/31 18:45:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.11 2004/02/01 18:02:44 edheldil Exp $
  *
  */
 
@@ -46,6 +46,7 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserv
 #endif
 
 #include "../../includes/globals.h"
+#include "Interface.h" 
 
 #ifndef S_ISDIR
 #define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
@@ -143,9 +144,13 @@ char *strlwr(char *string)
 
 void ResolveFilePath(char *FilePath)
 {
+#ifndef WIN32
         char TempFilePath[_MAX_PATH];
         char TempFileName[_MAX_PATH];
         int j, pos;
+
+	if (!core || !core->CaseSensitive) return;
+
 
         TempFilePath[0]=FilePath[0];
         for(pos=1;FilePath[pos] && FilePath[pos]!='/';pos++)
@@ -174,6 +179,7 @@ void ResolveFilePath(char *FilePath)
         }
         //should work (same size)
         strcpy(FilePath,TempFilePath);
+#endif  //! WIN32
 }
 
 #endif

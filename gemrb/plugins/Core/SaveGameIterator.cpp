@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.12 2004/01/29 20:37:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.13 2004/02/01 18:02:44 edheldil Exp $
  *
  */
 
@@ -146,6 +146,7 @@ int SaveGameIterator::GetSaveGameCount()
 #endif
 			char ftmp[_MAX_PATH];
 			sprintf(ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter, core->GameNameResRef);
+			ResolveFilePath (ftmp);
 			FILE * exist = fopen(ftmp, "rb");
 			if(!exist)
 				continue;
@@ -228,6 +229,7 @@ SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 #endif
 			char ftmp[_MAX_PATH];
 			sprintf(ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter, core->GameNameResRef);
+			ResolveFilePath (ftmp);
 			FILE * exist = fopen(ftmp, "rb");
 			if(!exist)
 				continue;
