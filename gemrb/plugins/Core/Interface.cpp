@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.122 2004/02/17 17:43:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.123 2004/02/17 17:56:48 avenger_teambg Exp $
  *
  */
 
@@ -935,6 +935,18 @@ Actor *Interface::GetActor(unsigned int Slot)
 	if(!actors[Slot])
 		return 0;
 	return actors[Slot];
+}
+
+int Interface::GetPartySize()
+{
+	int count=0;
+	int i=actors.size();
+	while(i--) {
+		Actor *MyActor = GetActor(i);
+		if(MyActor && MyActor->InParty)
+			count++;
+	}
+	return count;
 }
 
 void Interface::EnterActors(const char *StartArea)
