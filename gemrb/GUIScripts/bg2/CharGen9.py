@@ -1,5 +1,6 @@
 #character generation (GUICG 0)
 import GemRB
+import ie_stats
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -112,7 +113,7 @@ def OnLoad():
 def NextPress():
         GemRB.UnloadWindow(CharGenWindow)
 	#set my character up
-	MyChar = GemRB.CreatePlayer("charbase")
+	MyChar = GemRB.CreatePlayer("charbase",0) #slot count
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, GemRB.GetVar("Class") )
@@ -121,12 +122,13 @@ def NextPress():
 	TmpTable=GemRB.LoadTable("ability")
 	AbilityCount = GemRB.GetTableRowCount(TmpTable)
 	for i in range(0,AbilityCount):
-		GemRB.SetPlayerStat(MyChar, GemRB.GetTableValue(i,4),GemRB.GetVar("Ability "+str(i) )
+		StatID=GemRB.GetTableValue(i,4)
+		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Ability "+str(i) ) )
 	TmpTable=GemRB.LoadTable("weapprof")
 	ProfCount = GemRB.GetTableRowCount(TmpTable)
 	for i in range(7,ProfCount):
-		ProfID=GemRB.GetTableValue(TmpTable, i, 0)
-		GemRB.SetPlayerStat(MyChar, ProfID, GemRB.GetVar("Prof "+str(i) )
+		StatID=GemRB.GetTableValue(TmpTable, i, 0)
+		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Prof "+str(i) ) )
 	GemRB.SetupPlayerInfo() #does all the rest
 	#LETS PLAY!!
 	GemRB.EnterGame()
