@@ -127,7 +127,7 @@ currently buggy.
 .TP
 .BR TooltipDelay =INT
 Delay (in ms) before tooltips are displayed when mouse is not moving.
-Resaonable number for this option is e.g.
+Reasonable number for this option is e.g.
 .IR 500 .
 
 .TP
@@ -142,6 +142,15 @@ the intro and logo videos are skipped to save developer's nerves. Default is
 This parameter is meant for developers. If set to
 .IR 1 ,
 current FPS (Frames per Second) value is drawn in top left window corner. Default is
+.IR 0 .
+
+.TP
+.BR EnableCheatKeys =(0|1)
+This parameter is meant for developers. If set to
+.IR 1 ,
+certain keys allow you to inspect internal state of objects, do forbidden things, etc. The keys are listed in 
+.I CheatKeys.txt
+file. Do NOT use this option unless you want to make your hands dirty :-). Default is
 .IR 0 .
 
 .TP

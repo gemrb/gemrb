@@ -13,10 +13,6 @@ def OnLoad():
 	global StartWindow, TutorialWindow, QuitWindow
 	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton
 
-        cheats = GemRB.GetVar ("Cheats")
-        if cheats:
-                GemRB.EnableCheatKeys(1)
-
         skip_videos = GemRB.GetVar ("SkipIntroVideos")
         if not skip_videos:
                 GemRB.PlayMovie ("BISLOGO")

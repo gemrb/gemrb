@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.184 2004/08/03 17:36:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.185 2004/08/03 22:58:14 edheldil Exp $
  *
  */
 
@@ -892,6 +892,8 @@ bool Interface::LoadConfig(const char* filename)
 			SkipIntroVideos = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "DrawFPS" ) == 0) {
 			DrawFPS = ( atoi( value ) == 0 ) ? false : true;
+		} else if (stricmp( name, "EnableCheatKeys" ) == 0) {
+			EnableCheatKeys ( atoi( value ) );
 		} else if (stricmp( name, "CaseSensitive" ) == 0) {
 			CaseSensitive = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "GameOnCD" ) == 0) {

@@ -6,10 +6,6 @@ StartWindow = 0
 def OnLoad():
 	global StartWindow
 
-        cheats = GemRB.GetVar ("Cheats")
-        if cheats:
-                GemRB.EnableCheatKeys(1)
-
 	GemRB.LoadWindowPack("START")
 	StartWindow = GemRB.LoadWindow(7)
 	GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,0,640,30, "REALMS", "", 1);

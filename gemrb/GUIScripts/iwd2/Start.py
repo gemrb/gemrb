@@ -7,10 +7,6 @@ QuitWindow = 0
 def OnLoad():
 	global StartWindow
 
-        cheats = GemRB.GetVar ("Cheats")
-        if cheats:
-                GemRB.EnableCheatKeys(1)
-
 	GemRB.LoadWindowPack("GUICONN")
 
 #main window

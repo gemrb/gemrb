@@ -11,10 +11,6 @@ def OnLoad():
 	global StartWindow, QuitWindow
 	global ExitButton, MultiPlayerButton, MoviesButton
 
-        cheats = GemRB.GetVar ("Cheats")
-        if cheats:
-                GemRB.EnableCheatKeys(1)
-
 	GemRB.LoadWindowPack("START")
 #quit subwindow
 	QuitWindow = GemRB.LoadWindow(3)
