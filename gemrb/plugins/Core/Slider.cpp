@@ -31,8 +31,10 @@ Slider::Slider(short KnobXPos, short KnobYPos, short KnobStep, unsigned short Kn
 	GrabbedKnob = NULL;
 	BackGround = NULL;
 	this->Clear = Clear;
+	SliderOnChange[0]=0;
 	State = IE_GUI_SLIDER_KNOB;
 	Pos = 0;
+	Value = 1;
 }
 
 Slider::~Slider()

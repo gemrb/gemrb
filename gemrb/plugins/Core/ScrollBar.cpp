@@ -9,6 +9,7 @@ ScrollBar::ScrollBar(void)
 	Pos = 0;
 	Value = 10;
 	State = 0;
+	ScrollBarOnChange[0]=0;
 	ta = NULL;
 }
 
@@ -18,6 +19,8 @@ ScrollBar::~ScrollBar(void)
 
 void ScrollBar::SetPos(int NewPos)
 {
+	if(Pos==NewPos)
+		return;
 	Pos=NewPos;
 	if(ta) {
 		TextArea * t = (TextArea*)ta;
@@ -26,6 +29,8 @@ void ScrollBar::SetPos(int NewPos)
 	if(VarName[0] != 0) {
 		core->GetDictionary()->SetAt(VarName, Pos);
 	}
+	if(ScrollBarOnChange[0] != 0)
+		core->GetGUIScriptEngine()->RunFunction(ScrollBarOnChange);
 }
 
 void ScrollBar::RedrawScrollBar(const char *Variable, int Sum)
@@ -84,7 +89,7 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 	unsigned short ymax = yzero+refheight;
 	unsigned short ymy = y-yzero;
 	unsigned short domx = 0, doMx = frames[2]->Width, doMy = Height;
-	unsigned short slmx = 0, slMx = frames[5]->Width, slmy = yzero+(Pos*step), slMy = slmy+frames[5]->Height;
+	unsigned short slmx = 0, slMx = frames[5]->Width, slmy = yzero+(unsigned short) (Pos*step), slMy = slmy+frames[5]->Height;
 	if((x >= upmx) && (y >= upmy)) {
 		if((x <= upMx) && (y <= upMy)) {
 			if(Pos > 0)
