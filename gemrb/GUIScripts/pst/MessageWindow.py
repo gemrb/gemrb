@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.24 2004/10/17 19:34:59 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.25 2004/10/23 15:25:17 avenger_teambg Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -124,7 +124,7 @@ def OnIncreaseSize():
 	GemRB.SetVar("MessageWindowSize", Expand)
 	UpdateResizeButtons()
 	GemRB.UnhideGUI()
-	GemRB.SetControlStatus(MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED);
+	GemRB.SetControlStatus(MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
 	return
 	
 def OnDecreaseSize():
@@ -154,9 +154,9 @@ def OnDecreaseSize():
 	UpdateResizeButtons()
 	GemRB.UnhideGUI()
 	if Expand:
-		GemRB.SetControlStatus(MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED);
+		GemRB.SetControlStatus(MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
 	else:
-		GemRB.SetControlStatus(0,0,IE_GUI_CONTROL_FOCUSED);
+		GemRB.SetControlStatus(0,0,IE_GUI_CONTROL_FOCUSED)
 	return
 	
 def UpdateResizeButtons():

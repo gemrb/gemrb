@@ -129,7 +129,7 @@ def OnIncreaseSize():
 		UpdateResizeButtons()
 
 	GemRB.UnhideGUI()
-	GemRB.SetControlStatus(TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED);
+	GemRB.SetControlStatus(TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED)
 	return
 	
 def OnDecreaseSize():
@@ -167,9 +167,9 @@ def OnDecreaseSize():
 
 	GemRB.UnhideGUI()
 	if Expand:
-		GemRB.SetControlStatus(TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED);
+		GemRB.SetControlStatus(TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED)
 	else:
-		GemRB.SetControlStatus(0,0,IE_GUI_CONTROL_FOCUSED);
+		GemRB.SetControlStatus(0,0,IE_GUI_CONTROL_FOCUSED)
 	return
 	
 def UpdateResizeButtons():

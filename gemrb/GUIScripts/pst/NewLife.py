@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.16 2004/07/31 12:37:15 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.17 2004/10/23 15:25:17 avenger_teambg Exp $
 
 # NewLife.py - Character generation screen
 
@@ -60,7 +60,7 @@ def OnLoad():
 	global StrLabel, DexLabel, ConLabel, WisLabel, IntLabel, ChaLabel
 	global TextArea
 
-	GemRB.LoadGame(-1);  #loading the base game
+	GemRB.LoadGame(-1)  #loading the base game
 	StatTable = GemRB.LoadTable("abcomm")
 	GemRB.LoadWindowPack("GUICG")
 	#setting up confirmation window
@@ -328,7 +328,7 @@ def StrPress():
 	GemRB.SetText(NewLifeWindow, TextArea, 18489)
 	Table = GemRB.LoadTable("strmod")
 	TableEx = GemRB.LoadTable("strmodex")
-	s = Str;
+	s = Str
 	if s>18:
 		e=extras[s-19]
 		s=18

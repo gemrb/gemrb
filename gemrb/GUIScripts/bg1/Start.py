@@ -29,9 +29,9 @@ def OnLoad():
 	MoviesButton = GemRB.GetControl(StartWindow, 2)
 	ExitButton = GemRB.GetControl(StartWindow, 3)
 
-	#GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,450,640,30, "REALMS", "GemRB Ver 0.0.1", 1);
+	#GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,450,640,30, "REALMS", "GemRB Ver 0.0.1", 1)
 	
-	BackToMain();
+	BackToMain()
 	
 	GemRB.LoadMusicPL("Theme.mus")
 	return
@@ -58,7 +58,7 @@ def MultiPlayerPress():
 	GemRB.SetEvent(StartWindow, MultiPlayerButton, 0, "ConnectPress")
 	GemRB.SetEvent(StartWindow, MoviesButton, 0, "BackToMain")
 	GemRB.SetEvent(StartWindow, ExitButton, 0, "")
-	GemRB.SetControlStatus(StartWindow, ExitButton, IE_GUI_BUTTON_DISABLED);
+	GemRB.SetControlStatus(StartWindow, ExitButton, IE_GUI_BUTTON_DISABLED)
 	return
 
 def ConnectPress():
@@ -117,10 +117,10 @@ def ExitCancelled():
 	return
 	
 def BackToMain():
-	GemRB.SetControlStatus(StartWindow, SinglePlayerButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(StartWindow, MoviesButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(StartWindow, ExitButton, IE_GUI_BUTTON_ENABLED);
+	GemRB.SetControlStatus(StartWindow, SinglePlayerButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(StartWindow, MoviesButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(StartWindow, ExitButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetText(StartWindow, SinglePlayerButton, 15413)
 	GemRB.SetText(StartWindow, MultiPlayerButton, 15414)
 	GemRB.SetText(StartWindow, MoviesButton, 15415)

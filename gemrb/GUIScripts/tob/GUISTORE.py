@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.3 2004/08/28 20:36:39 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.4 2004/10/23 15:25:17 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -81,48 +81,48 @@ def OpenStoreWindow ():
 
 
 	# Done
-	Button = GemRB.GetControl (Window, 0);
+	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 1403)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
 
 	# buy / sell
-	Button = GemRB.GetControl (Window, 1);
+	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreShoppingWindow")
 	store_buttons['shopping'] = Button
 	store_update_functions['shopping'] = UpdateStoreShoppingWindow
 
 	# identify
-	Button = GemRB.GetControl (Window, 2);
+	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreIdentifyWindow")
 	store_buttons['identify'] = Button
 	store_update_functions['identify'] = UpdateStoreIdentifyWindow
 
 	# steal
-	Button = GemRB.GetControl (Window, 3);
+	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreStealWindow")
 	store_buttons['steal'] = Button
 	store_update_functions['steal'] = UpdateStoreStealWindow
 
 	# donate
-	Button = GemRB.GetControl (Window, 4);
+	Button = GemRB.GetControl (Window, 4)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreDonateWindow")
 	store_buttons['donate'] = Button
 	store_update_functions['donate'] = UpdateStoreDonateWindow
 
 	# heal / cure
-	Button = GemRB.GetControl (Window, 5);
+	Button = GemRB.GetControl (Window, 5)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreHealWindow")
 	store_buttons['heal'] = Button
 	store_update_functions['heal'] = UpdateStoreHealWindow
 
 	# rumour
-	Button = GemRB.GetControl (Window, 6);
+	Button = GemRB.GetControl (Window, 6)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreRumourWindow")
 	store_buttons['rumour'] = Button
 	store_update_functions['rumour'] = UpdateStoreRumourWindow
 
 	# rent room
-	Button = GemRB.GetControl (Window, 7);
+	Button = GemRB.GetControl (Window, 7)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreRentWindow")
 	store_buttons['rent'] = Button
 	store_update_functions['rent'] = UpdateStoreRentWindow

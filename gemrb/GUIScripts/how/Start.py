@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/Start.py,v 1.8 2004/09/21 00:20:47 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/Start.py,v 1.9 2004/10/23 15:25:16 avenger_teambg Exp $
 
 
 # Start.py - intro and main menu screens
@@ -61,7 +61,7 @@ def OnLoad():
 	GemRB.SetControlStatus(StartWindow, LoadGameButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetControlStatus(StartWindow, MoviesButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetControlStatus(StartWindow, QuitGameButton, IE_GUI_BUTTON_ENABLED)
-	LastProtocol = GemRB.GetVar("Last Protocol Used");
+	LastProtocol = GemRB.GetVar("Last Protocol Used")
 	if LastProtocol == 0:
 		GemRB.SetText(StartWindow, ProtocolButton, 15413)
 		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_DISABLED)
@@ -126,7 +126,7 @@ def ProtocolPress():
 	GemRB.SetEvent(ProtocolWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "ProtocolDonePress")
 	
 	GemRB.SetVisible(ProtocolWindow, 1)
-	return;
+	return
 	
 def ProtocolDonePress():
 	global StartWindow, ProtocolWindow, JoinGameButton
@@ -134,7 +134,7 @@ def ProtocolDonePress():
 	
 	ProtocolButton = GemRB.GetControl(StartWindow, 0x00)
 	
-	LastProtocol = GemRB.GetVar("Last Protocol Used");
+	LastProtocol = GemRB.GetVar("Last Protocol Used")
 	if LastProtocol == 0:
 		GemRB.SetText(StartWindow, ProtocolButton, 15413)
 		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_DISABLED)
@@ -170,7 +170,7 @@ def MoviesPress():
 def QuitPress():
 	global StartWindow, QuitWindow
 	GemRB.SetVisible(StartWindow, 0)
-	QuitWindow = GemRB.LoadWindow(22);
+	QuitWindow = GemRB.LoadWindow(22)
 	CancelButton = GemRB.GetControl(QuitWindow, 2)
 	GemRB.SetEvent(QuitWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "QuitCancelPress")
 	
@@ -178,9 +178,9 @@ def QuitPress():
 	GemRB.SetEvent(QuitWindow, QuitButton, IE_GUI_BUTTON_ON_PRESS, "QuitQuitPress")
 	
 	TextArea = GemRB.GetControl(QuitWindow, 0)
-	GemRB.SetText(QuitWindow, CancelButton, 13727);
-	GemRB.SetText(QuitWindow, QuitButton, 15417);
-	GemRB.SetText(QuitWindow, TextArea, 19532);
+	GemRB.SetText(QuitWindow, CancelButton, 13727)
+	GemRB.SetText(QuitWindow, QuitButton, 15417)
+	GemRB.SetText(QuitWindow, TextArea, 19532)
 	GemRB.SetVisible(QuitWindow, 1)
 	return
 	

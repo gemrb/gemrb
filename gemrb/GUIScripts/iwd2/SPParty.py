@@ -77,7 +77,7 @@ def DonePress():
 		GemRB.UnloadWindow(PartySelectWindow)
 		GemRB.LoadGame(-1)
 		#here we should load the party characters
-		LoadPartyCharacters();
+		LoadPartyCharacters()
 		GemRB.SetNextScript("SPPartyFormation")
 	return	
 	

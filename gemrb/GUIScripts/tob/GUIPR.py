@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIPR.py,v 1.10 2004/10/02 09:55:04 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIPR.py,v 1.11 2004/10/23 15:25:17 avenger_teambg Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -341,9 +341,9 @@ def OnPriestRemoveSpell ():
 	index = GemRB.GetVar ("SpellButton")
 
 	#remove spell from memory
-	#GemRB.UnmemorizeSpell (pc, type, level, index);
+	#GemRB.UnmemorizeSpell (pc, type, level, index)
 	#remove spell from book
-	#GemRB.RemoveSpell (pc, type, level, index);
+	#GemRB.RemoveSpell (pc, type, level, index)
 	UpdatePriestWindow ()
 	return
 

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.19 2004/10/17 16:19:20 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.20 2004/10/23 15:25:17 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -87,30 +87,30 @@ def OpenInventoryWindow ():
 
 	# inventory slots
 	for i in range (44):
-		Button = GemRB.GetControl (Window, i);
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR);
-		#GemRB.SetButtonFont (Window, Button, 'NUMBER');
+		Button = GemRB.GetControl (Window, i)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
+		#GemRB.SetButtonFont (Window, Button, 'NUMBER')
 		GemRB.SetVarAssoc (Window, Button, 'ItemButton', i)
 
 	# Ground Item
 	for i in range (47, 57):
-		Button = GemRB.GetControl (Window, i);
+		Button = GemRB.GetControl (Window, i)
 		GemRB.SetTooltip (Window, Button, 4273)
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR);
-		#GemRB.SetButtonFont (Window, Button, 'NUMBER');
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
+		#GemRB.SetButtonFont (Window, Button, 'NUMBER')
 	
 	for i in range (57, 64):
-		Label = GemRB.GetControl (Window, 0x10000000 + i);
+		Label = GemRB.GetControl (Window, 0x10000000 + i)
 		GemRB.SetText (Window, Label, str (i))
 		
 
 	# portrait
-	Button = GemRB.GetControl (Window, 44);
+	Button = GemRB.GetControl (Window, 44)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 
 	# encumbrance
-	Button = GemRB.GetControl (Window, 46);
+	Button = GemRB.GetControl (Window, 46)
 	GemRB.SetButtonFont (Window, Button, "NUMBER")
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -148,14 +148,14 @@ def UpdateInventoryWindow ():
 	
 
 	# portrait
-	Button = GemRB.GetControl (Window, 44);
+	Button = GemRB.GetControl (Window, 44)
 	GemRB.SetButtonPicture (Window, Button, GetActorPortrait (pc, 'INVENTORY'))
 
 	# encumbrance
-	Button = GemRB.GetControl (Window, 46);
+	Button = GemRB.GetControl (Window, 46)
 
 	# Current encumbrance
-	encumbrance = GemRB.GetPlayerStat (pc, ie_stats.IE_ENCUMBRANCE);
+	encumbrance = GemRB.GetPlayerStat (pc, ie_stats.IE_ENCUMBRANCE)
 
 	# Loading tables of modifications
 	Table = GemRB.LoadTable("strmod")

@@ -74,7 +74,7 @@ def OnLoad():
 	TextAreaControl= GemRB.GetControl(CharGenWindow,9)
 	
 	GemRB.SetText(CharGenWindow, TextAreaControl, 1047)
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, ": ");
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, ": ")
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, GemRB.GetToken("CHARNAME") )
 
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 12135, -1)

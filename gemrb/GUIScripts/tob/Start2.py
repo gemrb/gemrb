@@ -47,15 +47,15 @@ def OnLoad():
 	MultiPlayerButton = GemRB.GetControl(StartWindow, 1)
 	MoviesButton = GemRB.GetControl(StartWindow, 2)
 	DisabledButton = GemRB.GetControl(StartWindow, 5)
-	GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,450,640,30, "REALMS", "", 1);
+	GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,450,640,30, "REALMS", "", 1)
 	Label=GemRB.GetControl(StartWindow, 0x0fff0000)
 	GemRB.SetText(StartWindow, Label,GEMRB_VERSION)
-	GemRB.SetControlStatus(StartWindow, DisabledButton, IE_GUI_BUTTON_DISABLED);
-	GemRB.SetControlStatus(StartWindow, SinglePlayerButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(StartWindow, ExitButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(StartWindow, OptionsButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(StartWindow, MoviesButton, IE_GUI_BUTTON_ENABLED);
+	GemRB.SetControlStatus(StartWindow, DisabledButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetControlStatus(StartWindow, SinglePlayerButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(StartWindow, ExitButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(StartWindow, OptionsButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(StartWindow, MoviesButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetText(StartWindow, SinglePlayerButton, 15413)
 	GemRB.SetText(StartWindow, ExitButton, 15417)
 	GemRB.SetText(StartWindow, OptionsButton, 13905)
@@ -85,7 +85,7 @@ def SinglePlayerPress():
 	GemRB.SetEvent(StartWindow, SinglePlayerButton, 0, "NewSingle")
 	GemRB.SetEvent(StartWindow, MoviesButton, 0, "Tutorial")
 	GemRB.SetEvent(StartWindow, ExitButton, 0, "BackToMain")
-	GemRB.SetControlStatus(StartWindow, OptionsButton, IE_GUI_BUTTON_DISABLED);
+	GemRB.SetControlStatus(StartWindow, OptionsButton, IE_GUI_BUTTON_DISABLED)
 	return
 
 def MultiPlayerPress():
@@ -99,8 +99,8 @@ def MultiPlayerPress():
 	GemRB.SetEvent(StartWindow, SinglePlayerButton, 0, "ConnectPress")
 	GemRB.SetEvent(StartWindow, MoviesButton, 0, "PregenPress")
 	GemRB.SetEvent(StartWindow, ExitButton, 0, "BackToMain")
-	GemRB.SetControlStatus(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_DISABLED);
-	GemRB.SetControlStatus(StartWindow, OptionsButton, IE_GUI_BUTTON_DISABLED);
+	GemRB.SetControlStatus(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetControlStatus(StartWindow, OptionsButton, IE_GUI_BUTTON_DISABLED)
 	return
 
 def ConnectPress():
@@ -186,9 +186,9 @@ def ExitCancelled():
 	return
 	
 def BackToMain():
-	GemRB.SetControlStatus(StartWindow, SinglePlayerButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(StartWindow, OptionsButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_ENABLED);
+	GemRB.SetControlStatus(StartWindow, SinglePlayerButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(StartWindow, OptionsButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetText(StartWindow, SinglePlayerButton, 15413)
 	GemRB.SetText(StartWindow, ExitButton, 15417)
 	GemRB.SetText(StartWindow, OptionsButton, 13905)

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.21 2004/09/26 13:14:48 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.22 2004/10/23 15:25:16 avenger_teambg Exp $
 
 
 #Character Generation
@@ -491,7 +491,7 @@ def PortraitSelect():
 
 	# this is not the correct one, but I don't know which is
 	PortraitTable = GemRB.LoadTable("PICTURES")
-	Portrait = 0;
+	Portrait = 0
 	
 	PortraitPortraitButton = GemRB.GetControl(PortraitWindow, 1)
 	GemRB.SetButtonFlags(PortraitWindow, PortraitPortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE, OP_SET)

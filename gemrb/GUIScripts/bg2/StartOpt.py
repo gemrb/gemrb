@@ -10,10 +10,10 @@ def OnLoad():
 	GameButton = GemRB.GetControl(OptionsWindow, 9)
 	GraphicButton = GemRB.GetControl(OptionsWindow, 7)
 	BackButton = GemRB.GetControl(OptionsWindow, 11)
-	GemRB.SetControlStatus(OptionsWindow, SoundButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(OptionsWindow, GameButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(OptionsWindow, GraphicButton, IE_GUI_BUTTON_ENABLED);
-	GemRB.SetControlStatus(OptionsWindow, BackButton, IE_GUI_BUTTON_ENABLED);
+	GemRB.SetControlStatus(OptionsWindow, SoundButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(OptionsWindow, GameButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(OptionsWindow, GraphicButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetControlStatus(OptionsWindow, BackButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetText(OptionsWindow, SoundButton, 17164)
 	GemRB.SetText(OptionsWindow, GameButton, 17165)
 	GemRB.SetText(OptionsWindow, GraphicButton, 17162)

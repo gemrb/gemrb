@@ -77,7 +77,7 @@ def ExitPress():
 	
 def ExitDonePress():
 	global PartyFormationWindow, ExitWindow
-	GemRB.UnloadWindow(ExitWindow);
+	GemRB.UnloadWindow(ExitWindow)
 	GemRB.UnloadWindow(PartyFormationWindow)
 	GemRB.SetNextScript("Start")
 	return

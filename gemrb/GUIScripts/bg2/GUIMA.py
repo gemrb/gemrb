@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.13 2004/10/16 10:47:55 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.14 2004/10/23 15:25:15 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -115,39 +115,39 @@ def WorldMapWindowCommon(Travel):
 
 	#north
 	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapN");
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapN")
 
 	#south
 	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapS");
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapS")
 
 	#northwest
 	Button = GemRB.GetControl (Window, 8)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapNW");
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapNW")
 
 	#northeast
 	Button = GemRB.GetControl (Window, 9)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapNE");
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapNE")
 
 	#west
 	Button = GemRB.GetControl (Window, 10)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapW");
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapW")
 
 	#center
 	Button = GemRB.GetControl (Window, 11)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapC");
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapC")
 
 	#east
 	Button = GemRB.GetControl (Window, 12)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapE");
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapE")
 
 	#southwest
 	Button = GemRB.GetControl (Window, 13)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapSW");
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapSW")
 
 	#southeast
 	Button = GemRB.GetControl (Window, 14)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapSE");
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapSE")
 
 	# Done
 	Button = GemRB.GetControl (Window, 0)

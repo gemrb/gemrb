@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/Start.py,v 1.8 2004/09/21 18:44:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/Start.py,v 1.9 2004/10/23 15:25:17 avenger_teambg Exp $
 
 
 # Start.py - intro and main menu screens
@@ -56,10 +56,10 @@ def OnLoad():
 	ResumeLifeButton = GemRB.GetControl(StartWindow, 2)
 	ExitButton = GemRB.GetControl(StartWindow, 3)
 	GemRB.SetEvent(StartWindow, NewLifeButton, IE_GUI_BUTTON_ON_PRESS, "NewLifePress")
-	GemRB.SetEvent(StartWindow, ResumeLifeButton, IE_GUI_BUTTON_ON_PRESS, "ResumeLifePress");
+	GemRB.SetEvent(StartWindow, ResumeLifeButton, IE_GUI_BUTTON_ON_PRESS, "ResumeLifePress")
 	GemRB.SetEvent(StartWindow, ExitButton, IE_GUI_BUTTON_ON_PRESS, "ExitPress")
 
-	GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,415,640,30, "EXOFONT", "", 1);
+	GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,415,640,30, "EXOFONT", "", 1)
 	Label=GemRB.GetControl(StartWindow, 0x0fff0000)
 	GemRB.SetText(StartWindow, Label,GEMRB_VERSION)
 	

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.23 2004/09/28 14:25:25 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.24 2004/10/23 15:25:17 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -493,7 +493,7 @@ def GetStatOverview (pc):
 	# 19672 Level <LEVEL> Spells
 
 	ClassTable = GemRB.LoadTable ("classes")
-	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1;
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
 	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
 	if Multi:
 		RowName1 = "FIGHTER"
@@ -691,7 +691,7 @@ def OpenInformationWindow ():
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	stat = GemRB.GetPCStats (pc);
+	stat = GemRB.GetPCStats (pc)
 
 	Label = GemRB.GetControl (Window, 0x10000001)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc))

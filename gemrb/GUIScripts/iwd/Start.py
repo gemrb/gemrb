@@ -27,7 +27,7 @@ def OnLoad():
 	GemRB.SetControlStatus(StartWindow, LoadGameButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetControlStatus(StartWindow, MoviesButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetControlStatus(StartWindow, QuitGameButton, IE_GUI_BUTTON_ENABLED)
-	LastProtocol = GemRB.GetVar("Last Protocol Used");
+	LastProtocol = GemRB.GetVar("Last Protocol Used")
 	if LastProtocol == 0:
 		GemRB.SetText(StartWindow, ProtocolButton, 15413)
 		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_DISABLED)
@@ -92,7 +92,7 @@ def ProtocolPress():
 	GemRB.SetEvent(ProtocolWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "ProtocolDonePress")
 	
 	GemRB.SetVisible(ProtocolWindow, 1)
-	return;
+	return
 	
 def ProtocolDonePress():
 	global StartWindow, ProtocolWindow, JoinGameButton
@@ -100,7 +100,7 @@ def ProtocolDonePress():
 	
 	ProtocolButton = GemRB.GetControl(StartWindow, 0x00)
 	
-	LastProtocol = GemRB.GetVar("Last Protocol Used");
+	LastProtocol = GemRB.GetVar("Last Protocol Used")
 	if LastProtocol == 0:
 		GemRB.SetText(StartWindow, ProtocolButton, 15413)
 		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_DISABLED)
@@ -136,7 +136,7 @@ def MoviesPress():
 def QuitPress():
 	global StartWindow, QuitWindow
 	GemRB.SetVisible(StartWindow, 0)
-	QuitWindow = GemRB.LoadWindow(22);
+	QuitWindow = GemRB.LoadWindow(22)
 	CancelButton = GemRB.GetControl(QuitWindow, 2)
 	GemRB.SetEvent(QuitWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "QuitCancelPress")
 	
@@ -144,9 +144,9 @@ def QuitPress():
 	GemRB.SetEvent(QuitWindow, QuitButton, IE_GUI_BUTTON_ON_PRESS, "QuitQuitPress")
 	
 	TextArea = GemRB.GetControl(QuitWindow, 0)
-	GemRB.SetText(QuitWindow, CancelButton, 13727);
-	GemRB.SetText(QuitWindow, QuitButton, 15417);
-	GemRB.SetText(QuitWindow, TextArea, 19532);
+	GemRB.SetText(QuitWindow, CancelButton, 13727)
+	GemRB.SetText(QuitWindow, QuitButton, 15417)
+	GemRB.SetText(QuitWindow, TextArea, 19532)
 	GemRB.SetVisible(QuitWindow, 1)
 	return
 	
