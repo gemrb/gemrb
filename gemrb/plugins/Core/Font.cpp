@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.22 2003/12/15 09:15:05 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.23 2003/12/21 14:13:30 balrog994 Exp $
  *
  */
 
@@ -126,7 +126,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 	}
 	else
 		ystep = size[1].h;//chars[1]->Height;
-	int x = 0, y = ystep;
+	int x = 5, y = ystep;
 	if(Alignment & IE_FONT_ALIGN_CENTER) {
 		int w = CalcStringWidth(tmp);
 		x = (rgn.w / 2)-(w/2);
@@ -154,7 +154,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 		}
 		if((tmp[i] == 0) || (tmp[i] == '\n')) {
 			y+=ystep;
-			x=0;
+			x=5;
 			if(Alignment & IE_FONT_ALIGN_CENTER) {
 				int w = CalcStringWidth(&tmp[i+1]);
 				x = (rgn.w / 2)-(w/2);
@@ -209,7 +209,7 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	}
 	else
 		ystep = size[1].h;//chars[1]->Height;
-	int x = 0, y = ystep;
+	int x = 5, y = ystep;
 	if(Alignment & IE_FONT_ALIGN_CENTER) {
 		int w = CalcStringWidth(tmp);
 		x = (rgn.w / 2)-(w/2);
@@ -233,7 +233,7 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	for(size_t i = 0; i < len; i++) {
 		if(tmp[i] == 0) {
 			y+=ystep;
-			x=0;
+			x=5;
 			if(Alignment & IE_FONT_ALIGN_CENTER) {
 				int w = CalcStringWidth(&tmp[i+1]);
 				x = (rgn.w / 2)-(w/2);
@@ -270,14 +270,14 @@ void Font::SetupString(char * string, int width)
 {
 	size_t len = strlen(string);
 	int lastpos = 0;
-	int x = 0, wx = 0;
+	int x = 5, wx = 0;
 	bool endword = false;
 	for(size_t pos = 0; pos < len; pos++) {
 		if(x+wx > width) {
-			if(!endword && (x == 0))
+			if(!endword && (x == 5))
 				lastpos = (int)pos;
 			string[lastpos] = 0;
-			x = 0;
+			x = 5;
 		}
 		if(string[pos] == 0) {
 			continue;
@@ -287,7 +287,7 @@ void Font::SetupString(char * string, int width)
 			string[pos] = ' ';
 		if(string[pos] == '\n') {
 			string[pos] = 0;
-			x = 0;
+			x = 5;
 			wx = 0;
 			lastpos = (int)pos;
 			endword = true;
