@@ -5,6 +5,7 @@ def OnLoad():
 	global AutoPauseWindow, TextAreaControl
 
 	GemRB.LoadWindowPack("GUIOPT")
+	
 	AutoPauseWindow = GemRB.LoadWindow(10)
 	TextAreaControl = GemRB.GetControl(AutoPauseWindow, 15)
 
@@ -163,4 +164,3 @@ def CancelPress():
         GemRB.UnloadWindow(AutoPauseWindow)
         GemRB.SetNextScript("GUIOPT8")
         return
-
