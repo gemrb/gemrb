@@ -30,7 +30,8 @@ public:
 	void SetCurrentArea(int Index);
 private:
 	int MapIndex;
-	Actor * lastActor;
+	ActorBlock * lastActor;
+	std::vector<ActorBlock*> selected;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

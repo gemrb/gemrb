@@ -58,13 +58,13 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	Map * area = game->GetMap(MapIndex);
 	ActorBlock * actor = area->GetActor(GameX, GameY);
 	if(lastActor)
-		lastActor->anims->DrawCircle = false;
+		lastActor->actor->anims->DrawCircle = false;
 	if(!actor) {
 		lastActor = NULL;
 		return;
 	}
-	lastActor = actor->actor;
-	lastActor->anims->DrawCircle = true;
+	lastActor = actor;
+	lastActor->actor->anims->DrawCircle = true;
 }
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
@@ -79,10 +79,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
 	ActorBlock * actor = area->GetActor(GameX, GameY);
+	for(int i = 0; i < selected.size(); i++)
+		selected[i]->Selected = false;
+	selected.clear();
 	if(!actor)
 		return;
-	actor->Orientation = ((actor->Orientation+1) % 16);
-	printf("%d\n", actor->Orientation);
+	selected.push_back(actor);
+	actor->Selected = true;
 }
 /** Special Key Press */
 void GameControl::OnSpecialKeyPress(unsigned char Key)
