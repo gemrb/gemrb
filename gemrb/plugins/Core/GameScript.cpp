@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.207 2004/10/14 19:20:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.208 2004/10/17 09:30:42 avenger_teambg Exp $
  *
  */
 
@@ -693,6 +693,11 @@ static IDSLink* FindIdentifier(const char* idsname)
 	return NULL;
 }
 
+void SetScriptDebugMode(int arg)
+{
+	InDebug=arg;
+}
+
 static void GoNearAndRetry(Scriptable *Sender, Point &p)
 {
 	Sender->AddActionInFront( Sender->CurrentAction );
@@ -801,7 +806,7 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 				triggerflags[i] = 0;
 			}
 			else {
-				if(InDebug) {
+				if(InDebug&1) {
 					printf("Found trigger:%04x %s\n",i,triggername);
 				}
 				triggers[i] = poi->Function;
@@ -913,7 +918,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 {
 	char newVarName[8];
 
-	if(InDebug) {
+	if(InDebug&1) {
 		printf( "Setting variable(\"%s%s\", %d)\n", Context,
 			VarName, value );
 	}
@@ -948,7 +953,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, ieDword va
 {
 	char newVarName[8];
 
-	if(InDebug) {
+	if(InDebug&1) {
 		printf( "Setting variable(\"%s\", %d)\n", VarName, value );
 	}
 	if (strnicmp( VarName, "LOCALS", 6 ) == 0) {
@@ -985,7 +990,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 
 	if (strnicmp( VarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( &VarName[6], value );
-		if(InDebug) {
+		if(InDebug&1) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
 		return value;
@@ -1011,7 +1016,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 	else {
 		core->GetGame()->globals->Lookup( &VarName[6], value );
 	}
-	if(InDebug) {
+	if(InDebug&1) {
 		printf("CheckVariable %s: %d\n",VarName, value);
 	}
 	return value;
@@ -1024,7 +1029,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 
 	if (strnicmp( Context, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( VarName, value );
-		if(InDebug) {
+		if(InDebug&1) {
 			printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 		}
 		return value;
@@ -1049,7 +1054,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 	} else {
 		core->GetGame()->globals->Lookup( VarName, value );
 	}
-	if(InDebug) {
+	if(InDebug&1) {
 		printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 	}
 	return value;
@@ -1353,7 +1358,7 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 		printMessage( "IEScript",Tmp,YELLOW);
 		return false;
 	}
-	if(InDebug) {
+	if(InDebug&1) {
 		printf( "[IEScript]: Executing trigger code: 0x%04x %s\n",
 				trigger->triggerID, tmpstr );
 	}
@@ -1425,7 +1430,7 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
-	if(InDebug) {
+	if(InDebug&1) {
 		printf("Sender: %s\n",Sender->GetScriptName() );
 	}
 	ActionFunction func = actions[aC->actionID];
@@ -1442,7 +1447,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			return;
 		}
 		else {
-			if(InDebug) {
+			if(InDebug&1) {
 				printf( "[IEScript]: Executing action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
 			}
 			func( Sender, aC );
@@ -1626,7 +1631,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	SymbolMgr *valHook = core->GetSymbol(idsfile);
 	if(!valHook) {
 		//FIXME:missing ids file!!!
-		if(InDebug) {
+		if(InDebug&1) {
 			char Tmp[256];
 
 			sprintf(Tmp,"Missing IDS file %s for symbol %s!\n",idsname, symbol);
@@ -1909,9 +1914,9 @@ Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIn
 Action* GameScript::GenerateAction(char* String, bool autoFree)
 {
 	strlwr( String );
-	//if(InDebug) {
+	if(InDebug&1) {
 		printf("Compiling:%s\n",String);
-	//}
+	}
 	int len = strlench(String,'(')+1; //including (
 	int i = actionsTable->FindString(String, len);
 	if (i<0) {
@@ -1919,9 +1924,6 @@ Action* GameScript::GenerateAction(char* String, bool autoFree)
 	}
 	char *src = String+len;
 	char *str = actionsTable->GetStringIndex( i )+len;
-	//if(InDebug) {
-		printf("Match: %s vs. %s\n",src,str);
-	//}
 	return GenerateActionCore( src, str, i, autoFree);
 }
 
@@ -2068,7 +2070,7 @@ Trigger *GameScript::GenerateTriggerCore(const char *src, const char *str, int t
 Trigger* GameScript::GenerateTrigger(char* String)
 {
 	strlwr( String );
-	if(InDebug) {
+	if(InDebug&1) {
 		printf("Compiling:%s\n",String);
 	}
 	int negate = 0;
@@ -2083,9 +2085,6 @@ Trigger* GameScript::GenerateTrigger(char* String)
 	}
 	char *src = String+len;
 	char *str = triggersTable->GetStringIndex( i )+len;
-	if(InDebug) {
-		printf("Match: %s vs. %s\n",src,str);
-	}
 	return GenerateTriggerCore(src, str, i, negate);
 }
 
@@ -5411,7 +5410,9 @@ void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 	}
 	if(!Sender->CutSceneId) {
 		printMessage("IEScript","Failed to set CutSceneID!\n",YELLOW);
-		abort();
+		if(InDebug&2) {
+			abort();
+		}
 	}
 }
 
@@ -5991,7 +5992,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
 	Scriptable* tar, *scr;
 
-	if(InDebug) {
+	if(InDebug&1) {
 		printf("BeginDialog core\n");
 	}
 	if (Flags & BD_OWN) {
@@ -7256,7 +7257,7 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 
 void GameScript::Debug(Scriptable* /*Sender*/, Action* parameters)
 {
-	InDebug=1;
+	InDebug=parameters->int0Parameter;
 	printMessage("IEScript",parameters->string0Parameter,YELLOW);
 }
 

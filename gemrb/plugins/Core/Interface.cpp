@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.226 2004/10/16 14:26:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.227 2004/10/17 09:30:43 avenger_teambg Exp $
  *
  */
 
@@ -1114,6 +1114,7 @@ bool Interface::LoadGemRBINI()
 		}
 	}
 
+	SetScriptDebugMode(ini->GetKeyAsInt( "resources", "ScriptDebugMode",  0));
 	TooltipMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", TooltipMargin );
 
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.147 2004/10/12 19:47:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.148 2004/10/17 09:30:43 avenger_teambg Exp $
  *
  */
 
@@ -680,6 +680,8 @@ struct IDSLink {
 #define MAX_TRIGGERS			0xFF
 #define MAX_ACTIONS			400
 #define MAX_OBJECTS			128
+
+extern void SetScriptDebugMode(int arg);
 
 class GEM_EXPORT GameScript {
 public:
