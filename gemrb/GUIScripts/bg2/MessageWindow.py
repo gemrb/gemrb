@@ -25,6 +25,10 @@ def OnLoad():
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)
 	
+	Button=GemRB.GetControl(PortraitWindow, 6)
+
+	Button=GemRB.GetControl(PortraitWindow, 7)
+
 	UpdateResizeButtons()
 	
 	GemRB.SetVisible(ActionsWindow, 1)
