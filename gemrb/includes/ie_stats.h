@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.17 2004/07/25 00:11:45 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.18 2004/07/31 08:02:05 avenger_teambg Exp $
  *
  */
 
@@ -46,7 +46,39 @@
 #define ENEMY   				255
 
 //state bits (IE_STATE)
-#define STATE_DEAD  2048
+#define STATE_SLEEP 1
+#define STATE_BERSERK 2
+#define STATE_PANIC 4
+#define STATE_STUNNED 8
+#define STATE_INVISIBLE 16
+#define STATE_HELPLESS 32
+#define STATE_D1 64
+#define STATE_D2 128
+#define STATE_D3 0x100
+#define STATE_D4 0x200
+#define STATE_D5 0x400
+#define STATE_DEAD  0x800
+#define STATE_SILENCED 0x1000
+#define STATE_CHARMED  0x2000
+#define STATE_POISONED 0x4000
+#define STATE_HASTED   0x8000
+#define STATE_SLOWED   0x10000
+#define STATE_INFRA    0x20000
+#define STATE_BLIND    0x40000
+#define STATE_DISEASED 0x80000
+#define STATE_FEEBLE   0x100000
+#define STATE_NONDET   0x200000
+#define STATE_INVIS2   0x400000
+#define STATE_BLESS    0x800000
+#define STATE_CHANT    0x1000000
+#define STATE_HOLY     0x2000000
+#define STATE_LUCK     0x4000000
+#define STATE_AID      0x8000000
+#define STATE_CHANTBAD 0x10000000
+#define STATE_BLUR     0x20000000
+#define STATE_MIRROR   0x40000000
+#define STATE_CONFUSED 0x80000000
+#define STATE_CANTMOVE 0x80000fef
 
 #define MC_FALLEN_PALADIN	0x200
 #define MC_FALLEN_RANGER	0x400
