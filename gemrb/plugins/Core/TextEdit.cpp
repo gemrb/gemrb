@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.11 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.12 2003/12/15 09:12:52 balrog994 Exp $
  *
  */
 
@@ -87,7 +87,7 @@ void TextEdit::OnKeyPress(unsigned char Key, unsigned short Mod)
 	((Window*)Owner)->Invalidate();
 	Changed = true;
 	if(Key >= 0x20) {
-		int len = strlen((char*)Buffer);
+		int len = (int)strlen((char*)Buffer);
 		if(len+1 < max) {
 			for(int i = len; i > CurPos; i--) {
 				Buffer[i] = Buffer[i-1];
@@ -114,13 +114,13 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 			CurPos--;
 		break;
 	case GEM_RIGHT:
-		len = strlen((char*)Buffer);
+		len = (int)strlen((char*)Buffer);
 		if(CurPos < len) {
 			CurPos++;
 		}
 		break;
 	case GEM_DELETE:
-		len = strlen((char*)Buffer);
+		len = (int)strlen((char*)Buffer);
 		if(CurPos < len) {
 			for(int i = CurPos; i < len; i++) {
 				Buffer[i] = Buffer[i+1];
@@ -129,7 +129,7 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 		break;		
 	case GEM_BACKSP:
 		if(CurPos != 0) {
-			int len = strlen((char*)Buffer);
+			int len = (int)strlen((char*)Buffer);
 			for(int i = CurPos; i < len; i++) {
 				Buffer[i-1] = Buffer[i];
 			}
