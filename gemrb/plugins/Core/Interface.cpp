@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.108 2003/12/28 12:39:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.109 2003/12/29 20:11:06 balrog994 Exp $
  *
  */
 
@@ -1081,11 +1081,21 @@ int Interface::ShowModal(unsigned short WindowIndex)
 
 void Interface::DrawWindows(void)
 {
-	std::vector<int>::reverse_iterator t;
-	for(t = topwin.rbegin(); t != topwin.rend(); ++t) {
+	std::vector<int>::reverse_iterator t = topwin.rbegin();
+	for(int i = 0; i < topwin.size(); i++) {
+		if(((*t) >= windows.size()) || ((*t) < 0))
+			continue;
 		if(windows[(*t)]!=NULL && windows[(*t)]->Visible)
 			windows[(*t)]->DrawWindow();
+		++t;
 	}
+	/*
+	for(t = topwin.rbegin(); t != topwin.rend(); ++t) {
+		if(((*t) >= windows.size()) || ((*t) < 0))
+			continue;
+		if(windows[(*t)]!=NULL && windows[(*t)]->Visible)
+			windows[(*t)]->DrawWindow();
+	}*/
 	//for(unsigned int i = 0; i < windows.size(); i++) {
 	//	if(windows[i]!=NULL && windows[i]->Visible)
 	//		windows[i]->DrawWindow();
