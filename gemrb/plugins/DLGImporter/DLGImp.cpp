@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.6 2004/02/11 22:27:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.7 2004/02/11 22:37:22 balrog994 Exp $
  *
  */
 
@@ -193,6 +193,8 @@ int GetActionLength(const char *string)
 	return i;
 }
 
+#define MyIsSpace(c) (((c) == ' ') || ((c) == '\n') || ((c) == '\r'))
+
 /* this function will break up faulty script strings that lack the CRLF
    between commands, common in PST dialog */
 char **DLGImp::GetStrings(char * string, unsigned long &count)
@@ -203,7 +205,7 @@ char **DLGImp::GetStrings(char * string, unsigned long &count)
 
 	count=0;
 	while(*poi) {
-		while(*poi && isspace(*poi) ) poi++;
+		while(*poi && MyIsSpace(*poi) ) poi++;
 		switch(*poi++) {
 			case '"':
 				quotes=!quotes;
@@ -232,7 +234,7 @@ char **DLGImp::GetStrings(char * string, unsigned long &count)
 	}
 	poi=string;
 	for(int i=0;i<count;i++) {
-		while(isspace(*poi) ) poi++;
+		while(MyIsSpace(*poi) ) poi++;
 		int len=GetActionLength(poi);
 		strings[i]=(char *) malloc(len+1);
 		int j;
