@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.9 2005/03/05 01:07:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.10 2005/03/05 10:31:20 avenger_teambg Exp $
  *
  */
 
@@ -79,6 +79,25 @@ void Dialog::FreeDialogString(DialogString* ds)
 int Dialog::FindFirstState(Scriptable* target)
 {
 	for (unsigned int i = 0; i < initialStates.size(); i++) {
+		if (EvaluateDialogTrigger( target, GetState( i )->trigger )) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+int Dialog::FindRandomState(Scriptable* target)
+{
+	unsigned int i;
+	unsigned int max = initialStates.size();
+	if (!max) return -1;
+	unsigned int pick = rand()%max;
+	for (i=pick; i < max; i++) {
+		if (EvaluateDialogTrigger( target, GetState( i )->trigger )) {
+			return i;
+		}
+	}
+	for (i=0; i < pick; i++) {
 		if (EvaluateDialogTrigger( target, GetState( i )->trigger )) {
 			return i;
 		}

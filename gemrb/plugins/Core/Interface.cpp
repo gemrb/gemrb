@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.271 2005/03/05 01:07:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.272 2005/03/05 10:31:20 avenger_teambg Exp $
  *
  */
 
@@ -2501,7 +2501,7 @@ void Interface::DisplayString(const char* Text)
 	vars->Lookup( "MessageWindow", WinIndex );
 	if (( WinIndex != (ieDword) -1 ) &&
 		( vars->Lookup( "MessageTextArea", TAIndex ) )) {
-		Window* win = core->GetWindow( WinIndex );
+		Window* win = GetWindow( WinIndex );
 		if (win) {
 			TextArea* ta = ( TextArea* ) win->GetControl( TAIndex );
 			ta->AppendText( Text, -1 );
@@ -2865,8 +2865,13 @@ int Interface::CloseCurrentStore()
 	if( !CurrentStore ) {
 		return -1;
 	}
+	StoreMgr* sm = ( StoreMgr* ) GetInterface( IE_STO_CLASS_ID );
+	if (sm == NULL) {
+		return -1;
+	}
 	// save current store to cache!
 	//
+	FreeInterface( sm );
 	delete CurrentStore;
 	CurrentStore = NULL;
 	return 0;
@@ -2882,14 +2887,14 @@ Store *Interface::SetCurrentStore( ieResRef resname )
 		delete CurrentStore;
 	}
 
-	DataStream* str = core->GetResourceMgr()->GetResource( resname, IE_STO_CLASS_ID );
-	StoreMgr* sm = ( StoreMgr* ) core->GetInterface( IE_STO_CLASS_ID );
+	DataStream* str = key->GetResource( resname, IE_STO_CLASS_ID );
+	StoreMgr* sm = ( StoreMgr* ) GetInterface( IE_STO_CLASS_ID );
 	if (sm == NULL) {
 		delete ( str );
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
-		core->FreeInterface( sm );
+		FreeInterface( sm );
 		return NULL;
 	}
 
@@ -2899,10 +2904,10 @@ Store *Interface::SetCurrentStore( ieResRef resname )
 	// Cache anyway!
 	CurrentStore = sm->GetStore();
 	if (CurrentStore == NULL) {
-		core->FreeInterface( sm );
+		FreeInterface( sm );
 		return NULL;
 	}
-	core->FreeInterface( sm );
+	FreeInterface( sm );
 	memcpy(CurrentStore->Name, resname, 8);
 
 	return CurrentStore;
@@ -2910,25 +2915,22 @@ Store *Interface::SetCurrentStore( ieResRef resname )
 
 ieStrRef Interface::GetRumour(ieResRef dlgref)
 {
-	DialogMgr* dm = ( DialogMgr* ) core->GetInterface( IE_DLG_CLASS_ID );
-	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
+	DialogMgr* dm = ( DialogMgr* ) GetInterface( IE_DLG_CLASS_ID );
+	dm->Open( key->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
 	Dialog *dlg = dm->GetDialog();
-	core->FreeInterface( dm );
+	FreeInterface( dm );
 
 	if (!dlg) {
 		printf( "[Interface]: Cannot load dialog: %s\n", dlgref );
 		return (ieStrRef) -1;
 	}
-	Scriptable *pc=game->GetPC(game->GetSelectedPCSingle());
+	Scriptable *pc=game->GetPC( game->GetSelectedPCSingle() );
 	
 	ieStrRef ret = (ieStrRef) -1;
-        for (int i = 0; i < dlg->StateCount(); i++) {
-		DialogState *ds = dlg->GetState( i );
-                if (dlg->EvaluateDialogTrigger( pc, ds->trigger )) {
-			ret = ds->StrRef;
-			break;
-                }
-        }
+	int i = dlg->FindRandomState( pc );
+	if (i>=0 ) {
+		ret = dlg->GetState( i )->StrRef;
+	}
 	delete dlg;
 	return ret;
 }
