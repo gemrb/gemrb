@@ -811,3 +811,39 @@ void GameControl::ResizeAdd(Window * win, unsigned char type)
 		break;
 	}
 }
+
+void GameControl::InitDialog(Actor * speaker, Actor * target, Dialog * dlg)
+{
+	//core->GetVideoDriver()->DisableScroll = true;
+	DisableMouse = true;
+	unsigned long index;
+	core->GetDictionary()->Lookup("MessageWindowSize", index);
+	if(index < 1) {
+		core->GetGUIScriptEngine()->RunFunction("OnIncreaseSize");
+	}
+	else {
+		if(index > 1) {
+			core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
+		}
+	}
+	if(core->GetDictionary()->Lookup("MessageWindow", index)) {
+		Window * win = core->GetWindow(index);
+		if(core->GetDictionary()->Lookup("MessageTextArea", index)) {
+			TextArea * ta = (TextArea*)win->GetControl(index);
+			DialogState * ds = dlg->GetState(0);
+			char * string = core->GetString(ds->StrRef, 2);
+			int i = ta->AppendText(speaker->LongName, -1);
+			ta->AppendText(": ", i);
+			ta->AppendText(string, i);
+			ta->AppendText("", -1);
+			for(int x = 0; x < ds->transitionsCount; x++) {
+				char * s = core->GetString(ds->transitions[x]->textStrRef);
+				sprintf(string, "%d - ", x+1);
+				i = ta->AppendText(string, -1);
+				ta->AppendText(s, i);
+				free(s);
+			}
+			free(string);
+		}
+	}
+}

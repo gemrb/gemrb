@@ -4,6 +4,7 @@
 #include "Control.h"
 #include "Interface.h"
 #include "PathFinder.h"
+#include "Dialog.h"
 
 #ifdef WIN32
 
@@ -73,11 +74,12 @@ private:
 	void CalculateSelection(unsigned short x, unsigned short y);
 	void ResizeDel(Window * win, unsigned char type);
 	void ResizeAdd(Window * win, unsigned char type);
+	unsigned char LeftCount, BottomCount, RightCount, TopCount;
 public:
 	void SetCutSceneMode(bool active);
 	void HideGUI();
 	void UnhideGUI();
-	unsigned char LeftCount, BottomCount, RightCount, TopCount;
+	void InitDialog(Actor * speaker, Actor * target, Dialog * dlg);
 };
 
 #endif
