@@ -12,6 +12,7 @@
 
 #ifndef WIN32
 extern Interface * core;
+#include <sys/time.h>
 #else
 #include <windows.h>
 #endif
@@ -80,6 +81,9 @@ int main(int argc, char ** argv)
 	Color fpscolor = {0xff,0xff,0xff,0x00}, fpsblack = {0x00,0x00,0x00,0x00};
 	int frame = 0, time, timebase = 0;
 	double frames = 0.0;
+#ifndef WIN32
+	struct timeval tv;
+#endif
 	do {
     //fnt->Print(rgn, (unsigned char*)("La Agile Volpe Bruna Salta Sopra Il Cane Pigro."), 79, 0);
     //core->GetVideoDriver()->DrawRect(rgn, rcol);
@@ -91,7 +95,12 @@ int main(int argc, char ** argv)
 			win[i]->DrawWindow();
 		}
 		frame++;
+#ifndef WIN32
+		gettimeofday(&tv, NULL);
+		time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
+#else
 		time = GetTickCount();
+#endif
 		if(time - timebase > 1000) {
 			frames = (frame*1000.0/(time-timebase));
 			timebase = time;
