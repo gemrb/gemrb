@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.185 2004/08/07 17:51:28 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.186 2004/08/08 13:22:43 avenger_teambg Exp $
  *
  */
 
@@ -1290,7 +1290,7 @@ static PyObject* GemRB_CreateLabel(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return NULL;
 	}
-	Label* lbl = new Label( 4096, core->GetFont( font ) );
+	Label* lbl = new Label( core->GetFont( font ) );
 	lbl->XPos = x;
 	lbl->YPos = y;
 	lbl->Width = w;
