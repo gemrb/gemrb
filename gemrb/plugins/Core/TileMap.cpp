@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.27 2004/04/15 12:28:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.28 2004/04/15 15:38:35 doc_wagon Exp $
  *
  */
 
@@ -108,13 +108,13 @@ Door* TileMap::GetDoor(unsigned int idx)
 	if (idx >= doors.size()) {
 		return NULL;
 	}
-	return doors.at( idx );
+	return doors[idx];
 }
 
 Door* TileMap::GetDoor(unsigned short x, unsigned short y)
 {
 	for (size_t i = 0; i < doors.size(); i++) {
-		Door* door = doors.at( i );
+		Door* door = doors[i];
 		if (door->Flags&1) {
 			if (door->closed->BBox.x > x)
 				continue;
@@ -148,7 +148,7 @@ Door* TileMap::GetDoor(const char* Name)
 		return NULL;
 	}
 	for (size_t i = 0; i < doors.size(); i++) {
-		Door* door = doors.at( i );
+		Door* door = doors[i];
 		if (stricmp( door->Name, Name ) == 0)
 			return door;
 	}
@@ -170,13 +170,13 @@ Container* TileMap::GetContainer(unsigned int idx)
 	if (idx >= containers.size()) {
 		return NULL;
 	}
-	return containers.at( idx );
+	return containers[idx];
 }
 
 Container* TileMap::GetContainer(const char* Name)
 {
 	for (size_t i = 0; i < containers.size(); i++) {
-		Container* cn = containers.at( i );
+		Container* cn = containers[i];
 		int len = ( int ) strlen( cn->Name );
 		int p = 0;
 		for (int x = 0; x < len; x++) {
@@ -195,7 +195,7 @@ Container* TileMap::GetContainer(const char* Name)
 Container* TileMap::GetContainer(unsigned short x, unsigned short y)
 {
 	for (size_t i = 0; i < containers.size(); i++) {
-		Container* c = containers.at( i );
+		Container* c = containers[i];
 		if (c->outline->BBox.x > x)
 			continue;
 		if (c->outline->BBox.y > y)
@@ -235,7 +235,7 @@ InfoPoint* TileMap::AddInfoPoint(char* Name, unsigned short Type,
 InfoPoint* TileMap::GetInfoPoint(unsigned short x, unsigned short y)
 {
 	for (size_t i = 0; i < infoPoints.size(); i++) {
-		InfoPoint* ip = infoPoints.at( i );
+		InfoPoint* ip = infoPoints[i];
 		if (!ip->Active)
 			continue;
 		if (ip->outline->BBox.x > x)
@@ -255,7 +255,7 @@ InfoPoint* TileMap::GetInfoPoint(unsigned short x, unsigned short y)
 InfoPoint* TileMap::GetInfoPoint(const char* Name)
 {
 	for (size_t i = 0; i < infoPoints.size(); i++) {
-		InfoPoint* ip = infoPoints.at( i );
+		InfoPoint* ip = infoPoints[i];
 		int len = ( int ) strlen( ip->Name );
 		int p = 0;
 		for (int x = 0; x < len; x++) {
@@ -276,5 +276,5 @@ InfoPoint* TileMap::GetInfoPoint(unsigned int idx)
 	if (idx >= infoPoints.size()) {
 		return NULL;
 	}
-	return infoPoints.at( idx );
+	return infoPoints[idx];
 }
