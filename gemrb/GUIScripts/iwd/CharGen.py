@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.30 2004/12/09 22:44:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.31 2004/12/10 20:31:27 avenger_teambg Exp $
 
 
 #Character Generation
@@ -296,11 +296,8 @@ def AcceptPress():
 	KitIndex = GemRB.GetVar("Class Kit")
 	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
 	print "AlignmentTable:",AlignmentTable
-	print "Rownumber:",GemRB.GetVar("Alignment")-1
-	print "Value:",GemRB.GetTableValue(AlignmentTable, GemRB.GetVar("Alignment")-1, 3)
 	t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment")-1, 3)
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
-	print "Set:",t
 
 	#mage spells
 	Learnable = GetLearnableMageSpells( KitIndex, t, 1)
@@ -1158,7 +1155,7 @@ def AbilitiesCancelPress():
 # Skills Selection
 
 def SkillsPress():
-	global CharGenWindow, ClassTable, RaceTable, SkillsState, SkillsButton, AppearanceButton, CharGenState
+	global CharGenWindow, ClassTable, RaceTable, SkillsState, SkillsButton, AppearanceButton, CharGenState, ClassFlag
 	
 	# For now, readability is preferred over speed. This could be optimized later.
 	ClassName = GemRB.GetTableRowName(ClassTable, GemRB.GetVar("Class") - 1)
@@ -1194,9 +1191,14 @@ def SkillsPress():
 		if ClassName == "MAGE" or ClassName == "FIGHTER_MAGE" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF":
 			MageSpellsMemorize()
 		elif ClassName == "CLERIC" or ClassName == "FIGHTER_CLERIC" or ClassName == "CLERIC_THIEF" or ClassName == "CLERIC_RANGER":
+			ClassFlag = 0x4000
+			PriestSpellsMemorize()
+		elif ClassName == "DRUID":
+			ClassFlag = 0x8000
 			PriestSpellsMemorize()
 		elif ClassName == "CLERIC_MAGE" or ClassName == "FIGHTER_MAGE_CLERIC":
 			MageSpellsMemorize()
+			ClassFlag = 0x4000
 			PriestSpellsMemorize()
 		else:
 			SkillsState = 4
@@ -1599,7 +1601,7 @@ def MageSpellsSelect():
 			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
 			GemRB.SetVarAssoc(MageSpellsWindow, SpellButton, "SpellMask", 1 << i)
-			GemRB.SetTooltip(MageSpellsWindow, SpellButton, Spell['SpellName'])
+			GemRB.SetTooltip(MageSpellsWindow, SpellButton, Spell["SpellName"])
 		else:
 			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
 
@@ -1635,7 +1637,7 @@ def MageSpellsSelectPress():
 		Spell = Spell >> 1
 
 	Spell = GemRB.GetSpell(Learnable[i])
-	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, Spell['SpellDesc'])
+	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, Spell["SpellDesc"])
 
 	if SpellMask < MageSpellBook:
 		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft + 1
@@ -1699,7 +1701,7 @@ def MageSpellsMemorize():
 			j = j + 1
 		if j < len(Learnable):
 			Spell = GemRB.GetSpell(Learnable[j])
-			GemRB.SetTooltip(MageMemorizeWindow, SpellButton, Spell['SpellName'])
+			GemRB.SetTooltip(MageMemorizeWindow, SpellButton, Spell["SpellName"])
 			GemRB.SetSpellIcon(MageMemorizeWindow, SpellButton, Learnable[j])
 			GemRB.SetButtonState(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(MageMemorizeWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageMemorizeSelectPress")
@@ -1740,7 +1742,7 @@ def MageMemorizeSelectPress():
 		Spell = Spell >> 1
 
 	Spell = GemRB.GetSpell(Learnable[i])
-	GemRB.SetText(MageMemorizeWindow, MageMemorizeTextArea, Spell['SpellDesc'])
+	GemRB.SetText(MageMemorizeWindow, MageMemorizeTextArea, Spell["SpellDesc"])
 
 	if SpellMask < MageMemorized:
 		MageMemorizePointsLeft = MageMemorizePointsLeft + 1
@@ -1791,12 +1793,14 @@ def MageMemorizeCancelPress():
 # Priest Spells Memorize
 
 def PriestSpellsMemorize():
-	global CharGenWindow, PriestMemorizeWindow, PriestSpellsTable
+	global CharGenWindow, PriestMemorizeWindow, Learnable, ClassFlag
 	global PriestMemorizeTextArea, PriestMemorizeDoneButton, PriestMemorizePointsLeft
+
 	GemRB.SetVisible(CharGenWindow, 0)
 	PriestMemorizeWindow = GemRB.LoadWindow(17)
-	PriestSpellsTable = GemRB.LoadTable("PRIESTSP")
-	PriestSpellsCount = GemRB.GetTableRowCount(PriestSpellsTable)
+	t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment")-1, 3)
+	Learnable = GetLearnablePriestSpells( ClassFlag, t, 1)
+	
 	MaxSpellsPriestTable = GemRB.LoadTable("MXSPLPRS")
 	GemRB.SetVar("PriestMemorized", 0)
 	GemRB.SetVar("SpellMask", 0)
@@ -1809,9 +1813,10 @@ def PriestSpellsMemorize():
 	for i in range (0, 12):
 		SpellButton = GemRB.GetControl(PriestMemorizeWindow, i + 2)
 		GemRB.SetButtonFlags(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
-		if i < PriestSpellsCount:
-			# Color is no good yet :-(
-			GemRB.SetButtonBAM(PriestMemorizeWindow, SpellButton, GemRB.GetTableValue(PriestSpellsTable, i, 0), 0, 0, 63)
+		if i < len(Learnable):
+			Spell = GemRB.GetSpell(Learnable[i])
+			GemRB.SetTooltip(PriestMemorizeWindow, SpellButton, Spell["SpellName"])
+			GemRB.SetSpellIcon(PriestMemorizeWindow, SpellButton, Learnable[i])
 			GemRB.SetButtonState(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "PriestMemorizeSelectPress")
 			GemRB.SetVarAssoc(PriestMemorizeWindow, SpellButton, "SpellMask", 1 << i)
@@ -1837,8 +1842,7 @@ def PriestSpellsMemorize():
 	return
 
 def PriestMemorizeSelectPress():
-	global PriestMemorizeWindow, PriestSpellsTable, PriestMemorizeTextArea, PriestMemorizeDoneButton, PriestMemorizePointsLeft
-	PriestSpellsCount = GemRB.GetTableRowCount(PriestSpellsTable)
+	global PriestMemorizeWindow, Learnable, PriestMemorizeTextArea, PriestMemorizeDoneButton, PriestMemorizePointsLeft
 	PriestMemorized = GemRB.GetVar("PriestMemorized")
 	SpellMask = GemRB.GetVar("SpellMask")
 	Spell = abs(PriestMemorized - SpellMask)
@@ -1847,11 +1851,13 @@ def PriestMemorizeSelectPress():
 	while (Spell > 0):
 		i = i + 1
 		Spell = Spell >> 1
-	GemRB.SetText(PriestMemorizeWindow, PriestMemorizeTextArea, GemRB.GetTableValue(PriestSpellsTable, i, 1))
+
+	Spell=GemRB.GetSpell(Learnable[i])
+	GemRB.SetText(PriestMemorizeWindow, PriestMemorizeTextArea, Spell["SpellDesc"])
 
 	if SpellMask < PriestMemorized:
 		PriestMemorizePointsLeft = PriestMemorizePointsLeft + 1
-		for i in range (0, PriestSpellsCount):
+		for i in range (len(Learnable)):
 			SpellButton = GemRB.GetControl(PriestMemorizeWindow, i + 2)
 			if (((1 << i) & SpellMask) == 0):
 				GemRB.SetButtonState(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
@@ -1859,14 +1865,14 @@ def PriestMemorizeSelectPress():
 	else:
 		PriestMemorizePointsLeft = PriestMemorizePointsLeft - 1
 		if PriestMemorizePointsLeft == 0:
-			for i in range (0, PriestSpellsCount):
+			for i in range (len(Learnable)):
 				SpellButton = GemRB.GetControl(PriestMemorizeWindow, i + 2)
 				if ((1 << i) & SpellMask) == 0:
 					GemRB.SetButtonState(PriestMemorizeWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetButtonState(PriestMemorizeWindow, PriestMemorizeDoneButton, IE_GUI_BUTTON_ENABLED)
 
 	PointsLeftLabel = GemRB.GetControl(PriestMemorizeWindow, 0x1000001b)
-	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(PriestMemorizePointsLeft))
+	GemRB.SetText(PriestMemorizeWindow, PointsLeftLabel, str(PriestMemorizePointsLeft))
 	GemRB.SetVar("PriestMemorized", SpellMask)
 	return
 
