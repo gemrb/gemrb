@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.23 2004/10/17 09:50:44 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.24 2004/11/07 19:41:16 edheldil Exp $
  *
  */
 
@@ -69,8 +69,9 @@ typedef struct CREItem {
 	ieWord Unknown08;
 	ieWord Usages[3];
 	ieDword Flags;
-	// cached value from associated item. LEAVE IT SIGNED!
+	// 2 cached values from associated item. LEAVE IT SIGNED!
 	int Weight;
+	int StackAmount;
 } CREItem;
 
 class GEM_EXPORT Inventory {
@@ -79,6 +80,8 @@ private:
 	int InventoryType;
 	int Changed;
 	int Weight;
+
+	ieDword Equipped;
 
 public: 
 	Inventory();
@@ -130,6 +133,8 @@ public:
 	/*finds the first slot of named item, if resref is empty, finds the first filled! slot*/
 	int FindItem(const char *resref, unsigned int flags);
 	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
+	void SetEquippedSlot(ieDword slotcode)  { Equipped = slotcode; }
+	ieDword GetEquippedSlot()  { return Equipped; }
 	// Returns item in specified slot. Does NOT change inventory
 	CREItem* GetSlotItem(unsigned int slot);
 	void dump();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.50 2004/10/17 18:11:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.51 2004/11/07 19:41:15 edheldil Exp $
  *
  */
 
@@ -494,7 +494,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	// weird values - quiver
 	ieDword Equipped;
 	str->ReadDword( &Equipped );
-
+	act->inventory.SetEquippedSlot( Equipped );
 	// Reading spellbook
 
 	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(act->KnownSpellsCount, sizeof(CREKnownSpell *) );

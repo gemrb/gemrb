@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.34 2004/10/20 19:30:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.35 2004/11/07 19:41:16 edheldil Exp $
  *
  */
 
@@ -34,6 +34,8 @@ Inventory::Inventory()
 	InventoryType = INVENTORY_HEAP;
 	Changed = false;
 	Weight = 0;
+	// 1000 means none equipped
+	Equipped = 1000;
 }
 
 Inventory::~Inventory()
@@ -71,12 +73,15 @@ void Inventory::CalculateWeight()
 			Item *itm = core->GetItem( slot->ItemResRef );
 			slot->Weight = -1;
 			if (itm) {
-				if (itm->Weight) slot->Weight = itm->Weight;
+				if (itm->Weight) {
+					slot->Weight = itm->Weight;
+					slot->StackAmount = itm->StackAmount;
+				}
 				delete itm;
 			}
 		}
 		if (slot->Weight > 0) {
-			Weight += slot->Weight * (slot->Usages[0] ? slot->Usages[0] : 1);
+			Weight += slot->Weight * ((slot->Usages[0] && slot->StackAmount > 1) ? slot->Usages[0] : 1);
 		}
 	}
 	Changed = false;
@@ -473,9 +478,10 @@ void Inventory::dump()
 			continue;
 		}
 
-		printf ( "%2u: %8.8s   %d (%d %d %d) %x\n", i, itm->ItemResRef, itm->Unknown08, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags );
+		printf ( "%2u: %8.8s   %d (%d %d %d) %x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Unknown08, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->StackAmount, itm->Weight );
 	}
 
+	printf( "Equipped: %d\n", Equipped );
 	Changed = true;
 	CalculateWeight();
 	printf( "Total weight: %d\n", Weight );
