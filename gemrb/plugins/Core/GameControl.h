@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.53 2004/09/13 17:09:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.54 2004/11/24 21:47:05 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -112,6 +112,7 @@ public: //Events
 		unsigned short Mod);
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
+	void SetScreenFlags(int value, int mode);
 private:
 	void CalculateSelection(Point &p);
 	void ResizeDel(Window* win, unsigned char type);

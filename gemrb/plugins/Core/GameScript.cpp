@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.215 2004/11/18 19:42:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.216 2004/11/24 21:47:05 avenger_teambg Exp $
  *
  */
 
@@ -6582,6 +6582,8 @@ void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, Point &pos
 	if (face !=-1) {
 		actor->Orientation = face&(MAX_ORIENT-1);
 	}
+	GameControl *gc=core->GetGameControl();
+	gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);
 }
 
 void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.125 2004/11/18 19:42:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.126 2004/11/24 21:47:22 avenger_teambg Exp $
  *
  */
 
@@ -333,25 +333,25 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 		while (i--) {
 			Actor* actor = actors[i];
 			if (!actor)
-				break;
+				continue;
 			if (ip->Type == ST_PROXIMITY) {
 				if (ip->outline->PointIn( actor->Pos )) {
 					ip->LastEntered = actor;
 					ip->LastTrigger = actor;
 				}
 				ip->ExecuteScript( ip->Scripts[0] );
-				ip->OnCreation = false;
 			} else {
 				//ST_TRAVEL
 				//don't move if doing something else
 				if(actor->GetNextAction())
-					break;
+					continue;
 				if (ip->outline->PointIn( actor->Pos )) {
+					ip->LastEntered = actor;
 					UseExit(actor, ip);
 				}
 			}
-			break;
 		}
+		ip->OnCreation = false;
 	}
 	//Blit the Map Animations
 	Video* video = core->GetVideoDriver();

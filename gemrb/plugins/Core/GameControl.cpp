@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.177 2004/11/19 23:09:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.178 2004/11/24 21:47:04 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -200,9 +200,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (game->MapIndex == -1) {
 		return;
 	}
-	// in HOW, the size can get negative; comparison to 32768
-	//   is thanks to size being unsigned, grrr
-	if (!Width || !Height || Width >= 32768 || Height >= 32768) {
+	if (((int) Width) <=0 || ((int) Height) <= 0) {
 		return;
 	}
 	if ( game->selected.size() > 0 ) {
@@ -1575,6 +1573,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		/*this is loadmap, because we need the index, not the pointer*/
 		int mi = core->GetGame()->LoadMap( pc->Area );
 		SetCurrentArea( mi );
+		ScreenFlags|=SF_CENTERONACTOR;
 	}
 	//center on first selected actor
 	Region vp = core->GetVideoDriver()->GetViewport();
@@ -1600,3 +1599,13 @@ void GameControl::DisplayString(const char* Text)
 	}
 }
 
+void GameControl::SetScreenFlags(int value, int mode)
+{
+	switch(mode) {
+		case BM_OR: ScreenFlags|=value; break;
+		case BM_NAND: ScreenFlags&=~value; break;
+		case BM_SET: ScreenFlags=value; break;
+		case BM_AND: ScreenFlags&=value; break;
+		case BM_XOR: ScreenFlags^=value; break;
+	}
+}

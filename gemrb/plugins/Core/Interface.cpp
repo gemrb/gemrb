@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.241 2004/11/20 10:39:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.242 2004/11/24 21:47:22 avenger_teambg Exp $
  *
  */
 
@@ -2285,11 +2285,6 @@ bool Interface::InitItemTypes()
 		SlotTypes = st->GetRowCount();
 		//make sure unsigned int is 32 bits
 		slottypes = (SlotType *) malloc(SlotTypes * sizeof(SlotType) );
-/*
-		slotids = (ieDword *) malloc(SlotTypes * sizeof(ieDword) );
-		slottips = (ieDword *) malloc(SlotTypes * sizeof(ieDword) );
-		slotresrefs = (ieResRef *) malloc(SlotTypes * sizeof(ieResRef) );
-*/
 		for (int i=0;i<SlotTypes;i++) {
 			slottypes[i].slottype = (ieDword) strtol(st->QueryField(i,0),NULL,0 );
 			slottypes[i].slotid = (ieDword) strtol(st->QueryField(i,1),NULL,0 );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.65 2004/11/08 19:09:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.66 2004/11/24 21:47:04 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -760,6 +760,7 @@ void InfoPoint::DebugDump()
 	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDifficulty,
 		TrapRemovalDifficulty );
 	printf( "Key: %s  Dialog: %s\n", KeyResRef, DialogResRef );
+	printf( "Active: %s\n", Active?"Yes":"No");
 }
 
 /*******************
