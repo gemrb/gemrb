@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.87 2004/04/14 18:40:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.88 2004/04/15 16:20:17 avenger_teambg Exp $
  *
  */
 
@@ -103,7 +103,6 @@ private:
 	ScriptEngine * guiscript;
 	SoundMgr * soundmgr;
 	SaveGameIterator *sgiterator;
-	std::vector<Actor*> actors;
 	/** Windows Array */
 	std::vector<Window*> windows;
 	std::vector<int> topwin;
@@ -153,24 +152,24 @@ public:
 	WindowMgr * GetWindowMgr();
 	/** Get GUI Script Manager */
 	ScriptEngine * GetGUIScriptEngine();
-	/** Returns an actor index, by loading a creature */
+	/** Returns a PC index, by loading a creature */
 	int LoadCreature(char *ResRef, int InParty);
 	/** Removes a creature by slot */
-	int UnloadCreature(unsigned int Slot);
+//	int UnloadCreature(unsigned int Slot);
 	/** Removes a creature by pointer */
-	int UnloadCreature(Actor *actor);
+//	int UnloadCreature(Actor *actor);
 	/** Returns the actor count */
-	int GetActorCount() { return actors.size(); };
+//	int GetActorCount() { return actors.size(); };
 	/** Add the actor to the list of actors and returns its index */
-	int AddActor(Actor* actor);
+//	int AddActor(Actor* actor);
 	/** Returns the actor pointer for Slot */
-	Actor *GetActor(unsigned int Slot);
+//	Actor *GetActor(unsigned int Slot);
 	/** Enters the premade actors (chargen PC's) into the game */
-	void EnterActors(const char *StartArea);
+//	void EnterActors(const char *StartArea);
 	/** Returns the starting party size (chargen PC's) count */
-	int GetPartySize();
+//	int GetPartySize();
 	/** Returns actor index for partyslot PartySlotCount */
-	int FindPlayer(int PartySlotCount);
+//	int FindPlayer(int PartySlotCount);
 	/** Sets a stat for the creature in actor index Slot */
 	int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue, int Mod);
 	/** returns the stat of a creature (mod:1-modified, 0-base) */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.155 2004/04/15 14:30:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.156 2004/04/15 16:20:16 avenger_teambg Exp $
  *
  */
 
@@ -223,7 +223,7 @@ Interface::~Interface(void)
 	}
 	FreeInterfaceVector( Table, tables, tm );
 	FreeInterfaceVector( Symbol, symbols, sm );
-	FreeResourceVector(Actor, actors);
+//	FreeResourceVector(Actor, actors);
 	delete( console );
 
 	if(INIquests) {
@@ -819,6 +819,10 @@ bool Interface::LoadConfig(const char* filename)
 			SetFeature( atoi( value ), GF_HAS_DPLAYER );
 		} else if (stricmp( name, "HasPDIALOG" ) == 0) {
 			SetFeature( atoi( value ), GF_HAS_PDIALOG );
+		} else if (stricmp( name, "HasPickSound" ) == 0) {
+			SetFeature( atoi( value ), GF_HAS_PICK_SOUND );
+		} else if (stricmp( name, "HasDescIcon" ) == 0) {
+			SetFeature( atoi( value ), GF_HAS_DESC_ICON );
 		} else if (stricmp( name, "HasEXPTABLE" ) == 0) {
 			SetFeature( atoi( value ), GF_HAS_EXPTABLE );
 		} else if (stricmp( name, "SoundFolders" ) == 0) {
@@ -1006,71 +1010,6 @@ ScriptEngine* Interface::GetGUIScriptEngine()
 	return guiscript;
 }
 
-int Interface::UnloadCreature(unsigned int Slot)
-{
-	if (Slot >= actors.size()) {
-		return 0;
-	}
-	if (!actors[Slot]) {
-		return 0;
-	}
-	delete actors[Slot];
-	actors[Slot] = NULL;
-	return 1;
-}
-
-int Interface::UnloadCreature(Actor *actor)
-{
-	for (unsigned int index = 0; index < actors.size(); index++) {
-		if(actor == actors[index]) {
-			delete actors[index];
-			actors[index] = NULL;
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int Interface::AddActor(Actor* actor)
-{
-	for (unsigned int index = 0; index < actors.size(); index++) {
-		if (!actors[index]) {
-			actors[index] = actor;
-			return index;
-		}
-	}
-	actors.push_back( actor );
-	return actors.size() - 1;
-}
-
-Actor* Interface::GetActor(unsigned int Slot)
-{
-	if (Slot >= actors.size()) {
-		return 0;
-	}
-	if (!actors[Slot]) {
-		return 0;
-	}
-	return actors[Slot];
-}
-
-void Interface::EnterActors(const char* StartArea)
-{
-	int i = actors.size();
-	while (i--) {
-		Actor* MyActor = GetActor( i );
-		if (MyActor && !MyActor->FromGame) {
-			GetGame()->SetPC( MyActor );
-			GetGame()->GetMap( 0 )->AddActor( MyActor );
-			strncpy( MyActor->Area, StartArea, 8 );
-			MyActor->Init();
-			MyActor->FromGame = true;
-			MyActor->MySelf = MyActor;
-		}
-	}
-	actors.clear();
-}
-
 int Interface::LoadCreature(char* ResRef, int InParty)
 {
 	ActorMgr* actormgr = ( ActorMgr* ) GetInterface( IE_CRE_CLASS_ID );
@@ -1082,57 +1021,43 @@ int Interface::LoadCreature(char* ResRef, int InParty)
 	}
 	Actor* actor = actormgr->GetActor();
 	FreeInterface( actormgr );
+	actor->FromGame = true;
 	actor->InParty = InParty;
 	actor->AnimID = IE_ANI_AWAKE;
+	//both fields are of length 9, make this sure!
+	memcpy(actor->Area, GetGame()->CurrentArea, 9);
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		actor->AnimID = IE_ANI_SLEEP;
 	}
 	actor->Orientation = 0;
 
-	return AddActor( actor );
-}
-
-int Interface::FindPlayer(int PartySlotCount)
-{
-	int index = ( int ) actors.size();
-	unsigned char s = ( unsigned char ) ( PartySlotCount + 1 );
-	while (index--) {
-		if (!actors[index])
-			continue;
-		if (actors[index]->InParty == s) {
-			return index;
-		}
-	}
-	return -1;
+	return game->SetPC( actor );
 }
 
 int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 {
-	if (Slot >= actors.size()) {
+	Actor * actor = GetGame()->FindPC(Slot);
+	if (!actor) {
 		return 0xdadadada;
 	}
-	if (!actors[Slot]) {
-		return 0xdadadada;
-	}
+
 	if (Mod) {
-		return actors[Slot]->GetStat( StatID );
+		return actor->GetStat( StatID );
 	}
-	return actors[Slot]->GetBase( StatID );
+	return actor->GetBase( StatID );
 }
 
 int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID,
 	int StatValue, int Mod)
 {
-	if (Slot >= actors.size()) {
-		return 0;
-	}
-	if (!actors[Slot]) {
+	Actor * actor = GetGame()->FindPC(Slot);
+	if (!actor) {
 		return 0;
 	}
 	if (Mod) {
-		actors[Slot]->SetStat( StatID, StatValue );
+		actor->SetStat( StatID, StatValue );
 	} else {
-		actors[Slot]->SetBase( StatID, StatValue );
+		actor->SetBase( StatID, StatValue );
 	}
 	return 1;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.139 2004/04/15 14:30:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.140 2004/04/15 16:20:15 avenger_teambg Exp $
  *
  */
 
@@ -2136,11 +2136,11 @@ Targets *GameScript::XthNearestEnemyOf(Scriptable *Sender, Targets *parameters, 
 	if(type==2) {
 		return parameters;
 	}
-	int i = core->GetActorCount();
+	int i = core->GetGame()->GetCurrentMap()->GetActorCount();
 	Targets *tgts = new Targets();
 	Actor *ac;
 	while(i--) {
-		ac=core->GetActor(i);
+		ac=core->GetGame()->GetCurrentMap()->GetActor(i);
 /*
 		long x = ( ac->XPos - origin->XPos );
 		long y = ( ac->YPos - origin->YPos );
@@ -2271,10 +2271,11 @@ Targets *GameScript::TenthNearest(Scriptable *Sender, Targets *parameters)
 
 Targets *GameScript::SelectedCharacter(Scriptable *Sender, Targets *parameters)
 {
+	Map *cm = core->GetGame()->GetCurrentMap();
 	parameters->Clear();
-	int i = core->GetActorCount();
+	int i = cm->GetActorCount();
 	while(i--) {
-		Actor *ac=core->GetActor(i);
+		Actor *ac=cm->GetActor(i);
 		if(ac->IsSelected()) {
 			parameters->AddTarget(ac);
 		}
@@ -5383,6 +5384,8 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 				"JOIN_DIALOG_FILE" ) );
 		core->DelTable( pdtable );
 	}
+	core->GetGUIScriptEngine()->RunFunction( "PopulatePortraitWindow" );
+
 }
 
 void GameScript::LeaveParty(Scriptable* Sender, Action* parameters)
@@ -5401,6 +5404,7 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* parameters)
 				"POST_DIALOG_FILE" ) );
 		core->DelTable( pdtable );
 	}
+	core->GetGUIScriptEngine()->RunFunction( "PopulatePortraitWindow" );
 }
 
 void GameScript::Activate(Scriptable* Sender, Action* parameters)

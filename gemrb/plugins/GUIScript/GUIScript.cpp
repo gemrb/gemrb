@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.153 2004/04/14 23:53:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.154 2004/04/15 16:20:17 avenger_teambg Exp $
  *
  */
 
@@ -134,14 +134,19 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 		return NULL;
 	}
 	core->LoadGame( GameIndex );
+/*
 	GameControl* gc = StartGameControl();
 	gc->SetCurrentArea( 0 );
+*/
 	Py_INCREF( Py_None );
 	return Py_None;
 }
 
 static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
 {
+	GameControl* gc = StartGameControl();
+	gc->SetCurrentArea( 0 );
+/*
 	core->LoadGame( -1 );
 	GameControl* gc = StartGameControl();
 	// 0 - single player, 1 - tutorial, 2 - multiplayer
@@ -157,6 +162,7 @@ static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
 	core->GetVideoDriver()->MoveViewportTo( startX, startY );
 	core->EnterActors( StartArea );
 	core->DelTable( start );
+*/
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -2164,21 +2170,6 @@ static PyObject* GemRB_GetCharSounds(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", core->GetCharSounds( ta ) );
 }
 
-static PyObject* GemRB_ActorGetSmallPortrait(PyObject * /*self*/, PyObject* args)
-{
-	int index;
-
-	if (!PyArg_ParseTuple( args, "i", &index )) {
-		printMessage( "GUIScript",
-			"Syntax Error: ActorGetSmallPortrait(index)\n", LIGHT_RED );
-	}
-
-	//printf ("game: %p\n", core->GetGame ());
-	Actor * actor = core->GetGame ()->GetPC (index);
-	//printf ("actor: %p\n", actor);
-	return Py_BuildValue( "s", actor->GetPortrait (0));
-}
-
 static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 {
 	Game *game = core->GetGame();
@@ -2338,7 +2329,7 @@ static PyObject* GemRB_GetActorByPartyID(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	int ActorSlot = core->FindPlayer( PartyID );
+	int ActorSlot = core->GetGame()->FindPlayer( PartyID );
 	if (ActorSlot < 0) {
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -2358,14 +2349,15 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	//PlayerSlot is zero based, if not, remove the +1
-	Slot = ( PlayerSlot & 0x7fff ) + 1; 
+	//removed it!
+	Slot = ( PlayerSlot & 0x7fff ); 
 	if (PlayerSlot & 0x8000) {
-		PlayerSlot = core->FindPlayer( Slot );
+		PlayerSlot = core->GetGame()->FindPlayer( Slot );
 		if (PlayerSlot < 0) {
 			PlayerSlot = core->LoadCreature( CreResRef, Slot );
 		}
 	} else {
-		PlayerSlot = core->FindPlayer( PlayerSlot );
+		PlayerSlot = core->GetGame()->FindPlayer( PlayerSlot );
 		if (PlayerSlot >= 0) {
 			printMessage( "GUIScript", "Slot is already filled!\n", LIGHT_RED );
 			return NULL;
@@ -2385,12 +2377,12 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 
 	Which = 0;
 	if (!PyArg_ParseTuple( args, "i|i", &PlayerSlot, &Which )) {
-		printMessage( "GUIScript", "Syntax Error: GetPlayerName(Slot[, SmallOrLarge])\n",
+		printMessage( "GUIScript", "Syntax Error: GetPlayerName(Slot[, LongOrShort])\n",
 			LIGHT_RED );
 		return NULL;
 	}
-	PlayerSlot = core->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetActor( PlayerSlot );
+	PlayerSlot = core->GetGame()->FindPlayer( PlayerSlot );
+	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
 	if (!MyActor) {
 		return Py_BuildValue( "s", "");
 	}
@@ -2407,8 +2399,8 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
-	PlayerSlot = core->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetActor( PlayerSlot );
+	PlayerSlot = core->GetGame()->FindPlayer( PlayerSlot );
+	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
 	if (!MyActor) {
 		return Py_BuildValue( "s", "");
 	}
@@ -2425,7 +2417,6 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	//returning the modified stat
-	PlayerSlot = core->FindPlayer( PlayerSlot );
 	StatValue = core->GetCreatureStat( PlayerSlot, StatID, 1 );
 	return Py_BuildValue( "i", StatValue );
 }
@@ -2440,7 +2431,6 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	//Setting the creature's base stat, which gets saved (0)
-	PlayerSlot = core->FindPlayer( PlayerSlot );
 	if (!core->SetCreatureStat( PlayerSlot, StatID, StatValue, 0 )) {
 		return NULL;
 	}
@@ -2461,8 +2451,8 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	// here comes some code to transfer icon/name to the PC sheet
 	//
 	//
-	PlayerSlot = core->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetActor( PlayerSlot );
+	PlayerSlot = core->GetGame()->FindPlayer( PlayerSlot );
+	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
 	if (!MyActor) {
 		return NULL;
 	}
@@ -2867,8 +2857,6 @@ static PyMethodDef GemRBMethods[] = {
 	"Starts new game and enters it."},
 	{"StatComment", GemRB_StatComment, METH_VARARGS,
 	"Replaces values into an strref."},
-	{"ActorGetSmallPortrait", GemRB_ActorGetSmallPortrait, METH_VARARGS,
-	 "Returns actor's small portrait resref."},
 	{"EndCutSceneMode", GemRB_EndCutSceneMode, METH_NOARGS,
 	"Exits the CutScene Mode."},
 	{"GetPartySize", GemRB_GetPartySize, METH_NOARGS,
@@ -3023,8 +3011,6 @@ static PyMethodDef GemRBMethods[] = {
 	"Sets a savegame area preview bmp onto a button as picture."},
 	{"SetSaveGamePortrait", GemRB_SetSaveGamePortrait, METH_VARARGS,
 	"Sets a savegame PC portrait bmp onto a button as picture."},
-	{"GetActorByPartyID", GemRB_GetActorByPartyID, METH_VARARGS,
-	"Returns ActorSlot for PC specified by its PartyID."},
 	{"CreatePlayer", GemRB_CreatePlayer, METH_VARARGS,
 	"Creates a player slot."},
 	{"SetPlayerStat", GemRB_SetPlayerStat, METH_VARARGS,

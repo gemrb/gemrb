@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.34 2004/04/14 23:53:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.35 2004/04/15 16:20:15 avenger_teambg Exp $
  *
  */
 
@@ -61,6 +61,14 @@ Game::~Game(void)
 	}
 }
 
+int Game::FindPlayer(unsigned int partyID)
+{
+	for(unsigned int slot=0; slot<PCs.size(); slot++) {
+		if(PCs[slot]->InParty==partyID) return slot;
+	}
+	return -1;
+}
+
 Actor* Game::FindPC(unsigned int partyID)
 {
 	for(unsigned int slot=0; slot<PCs.size(); slot++) {
@@ -104,9 +112,9 @@ int Game::SetPC(Actor* pc)
 		return slot;
 	}
 	slot = InStore( pc );
-	if (slot != -1)	   //it is an NPC, can't add as PC
+	if (slot != -1)	   //it is an NPC, we remove it from the NPC vector
 	{
-		return -1;
+		DelNPC(slot, false);
 	}
 	PCs.push_back( pc );
 	return ( int ) PCs.size() - 1;
@@ -141,7 +149,6 @@ int Game::DelNPC(unsigned int slot, bool autoFree)
 	}
 	std::vector< Actor*>::iterator m = NPCs.begin() + slot;
 	NPCs.erase( m );
-	//	NPCs[slot] = NULL;
 	return 0;
 }
 
