@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.100 2004/08/02 18:00:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.101 2004/08/02 22:02:45 avenger_teambg Exp $
  *
  */
 
@@ -538,9 +538,7 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 //use this function only for party?
 		if(onlyparty && !actor->InParty)
 			continue;
-		if (actor->BaseStats[IE_UNSELECTABLE] ||
-			( actor->BaseStats[IE_STATE_ID] & STATE_DEAD ) ||
-			( !actor->Active ))
+		if (!actor->ValidTarget(GA_SELECT|GA_NO_DEAD) )
 			continue;
 		if (( actor->BBox.x > ( rgn.x + rgn.w ) ) ||
 			( actor->BBox.y > ( rgn.y + rgn.h ) ))
