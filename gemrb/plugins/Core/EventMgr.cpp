@@ -187,7 +187,10 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button,
 			printf("Broadcasting MouseUp Event on Window %d of %d\n", i, topwin.size());
 			Control * ctrl = NULL;
 			int c = 0;
+			int lastWinArraySize = topwin.size();
 			do {
+				if(topwin.size() != lastWinArraySize)
+					break;
 				ctrl = w->GetControl(c++);
 				if(ctrl == NULL)
 					break;
