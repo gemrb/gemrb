@@ -620,6 +620,8 @@ Window * Interface::GetWindow(unsigned short WindowIndex)
 
 int Interface::DelWindow(unsigned short WindowIndex) 
 {
+	if(WindowIndex >= windows.size())
+		return -1;
 	std::vector<Window*>::iterator w = windows.begin();
 	w+=WindowIndex;
 	if(!(*w))
@@ -634,6 +636,9 @@ int Interface::DelWindow(unsigned short WindowIndex)
 void Interface::PopupConsole()
 {
 	ConsolePopped = !ConsolePopped;
+	if(windows.size() != 0)
+		windows[0]->Invalidate();
+	console->Changed = true;
 }
 
 /** Draws the Console */
