@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImpCD.cpp,v 1.4 2005/01/27 17:27:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImpCD.cpp,v 1.5 2005/03/13 18:38:45 avenger_teambg Exp $
  *
  */
 
@@ -26,11 +26,11 @@ CREImpCD::CREImpCD(void)
 {
 }
 
-extern void ReleaseMemory();
+extern void ReleaseMemoryCRE();
 
 CREImpCD::~CREImpCD(void)
 {
-	ReleaseMemory();
+	ReleaseMemoryCRE();
 }
 
 void* CREImpCD::Create(void)
