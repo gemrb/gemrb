@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.15 2004/02/11 22:39:11 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.16 2004/02/16 21:10:56 avenger_teambg Exp $
  *
  */
 
@@ -93,7 +93,23 @@ int Game::DelPC(unsigned int slot, bool autoFree)
 		return -1;
 	if(autoFree)
 		delete(PCs[slot]);
-	PCs[slot] = NULL;
+	std::vector<Actor*>::iterator m = PCs.begin()+slot;
+	PCs.erase(m);
+//	PCs[slot] = NULL;
+	return 0;
+}
+
+int Game::DelNPC(unsigned int slot, bool autoFree)
+{
+	if(slot >= NPCs.size())
+		return -1;
+	if(!NPCs[slot])
+		return -1;
+	if(autoFree)
+		delete(NPCs[slot]);
+	std::vector<Actor*>::iterator m = NPCs.begin()+slot;
+	NPCs.erase(m);
+//	NPCs[slot] = NULL;
 	return 0;
 }
 
@@ -119,12 +135,24 @@ int Game::JoinParty(Actor *actor)
 	return (int)PCs.size()-1;
 }
 
+int Game::GetPartySize()
+{
+	int count=0;
+	for(int i=0;i<PCs.size();i++)
+	{
+		if(PCs[i])
+			count++;
+	}
+	return count;
+}
+
 Map * Game::GetMap(unsigned int index)
 {
 	if(index >= Maps.size())
 		return NULL;
 	return Maps[index];
 }
+
 int Game::AddMap(Map* map)
 {
 	for(size_t i = 0; i < Maps.size(); i++) {
@@ -136,6 +164,7 @@ int Game::AddMap(Map* map)
 	Maps.push_back(map);
 	return (int)Maps.size()-1;
 }
+
 int Game::DelMap(unsigned int index, bool autoFree)
 {
 	if(index >= Maps.size())

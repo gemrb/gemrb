@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.11 2004/02/09 19:20:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.12 2004/02/16 21:10:56 avenger_teambg Exp $
  *
  */
 
@@ -59,11 +59,14 @@ public:
 	int InStore(Actor *pc);
 	/* joins party (if already an npc) */
 	int JoinParty(Actor *pc);
+	/* return current party size */
+	int GetPartySize();
 	/* leaves party (if in there) */
 	int LeaveParty(Actor *pc);
 	/*returns slot*/
 	int SetPC(Actor *pc);
 	int DelPC(unsigned int slot, bool autoFree = false);
+	int DelNPC(unsigned int slot, bool autoFree = false);
 	Map * GetMap(unsigned int index);
 	int AddMap(Map* map);
 	int LoadMap(char *ResRef);
