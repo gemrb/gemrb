@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.56 2005/03/05 21:07:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.57 2005/03/13 15:32:50 avenger_teambg Exp $
  *
  */
 
@@ -65,11 +65,21 @@ class Door;
 #define TRAP_DEACTIVATED  256
 #define TRAVEL_NONPC      512
 //#define TRAP_1024       1024 //override?
-#define INFO_DOOR	 2048 //info trigger linked to door
+#define INFO_DOOR	 2048 //info trigger linked to a door
 
 //door flags
 #define DOOR_CLOSED      1
 #define DOOR_LOCKED      2
+#define DOOR_RESET       4   //reset trap
+#define DOOR_DETECTABLE  8   //trap detectable
+#define DOOR_16          16  //unknown
+#define DOOR_32          32  //unknown
+#define DOOR_LINKED      64   //info trigger linked to this door
+#define DOOR_SECRET      128  //door is secret
+#define DOOR_FOUND       256  //secret door found
+#define DOOR_TRANSPARENT 512  //obscures vision
+#define DOOR_KEY         1024 //key removed when used
+#define DOOR_SLIDE       2048 //impeded blocks ignored
 
 //container flags
 #define CONT_LOCKED      1
