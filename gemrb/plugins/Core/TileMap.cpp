@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.9 2003/11/29 20:32:32 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.10 2003/11/30 09:49:57 avenger_teambg Exp $
  *
  */
 
@@ -63,7 +63,7 @@ Door * TileMap::AddDoor(char * Name, unsigned char DoorClosed, unsigned short * 
 	return &doors.at(doors.size()-1);
 }
 
-void TileMap::ToogleDoor(Door * door)
+void TileMap::ToggleDoor(Door * door)
 {
 	unsigned char state = 0;
 	door->DoorClosed = !door->DoorClosed;
@@ -108,9 +108,9 @@ Door * TileMap::GetDoor(unsigned short x, unsigned short y)
 				continue;
 			if(door->open->BBox.y > y)
 				continue;
-			if(door->open->BBox.x+door->closed->BBox.w < x)
+			if(door->open->BBox.x+door->open->BBox.w < x)
 				continue;
-			if(door->open->BBox.y+door->closed->BBox.h < y)
+			if(door->open->BBox.y+door->open->BBox.h < y)
 				continue;
 			if(door->open->PointIn(x,y))
 				return door;
