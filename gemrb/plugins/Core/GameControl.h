@@ -3,6 +3,7 @@
 
 #include "Control.h"
 #include "Map.h"
+#include "PathFinder.h"
 
 #ifdef WIN32
 
@@ -45,6 +46,10 @@ private:
 	unsigned char lastCursor;
 	short moveX, moveY;
 	unsigned short lastMouseX, lastMouseY;
+#ifdef _DEBUG
+	short pfsX, pfsY;
+	PathNode * drawPath;
+#endif
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

@@ -45,6 +45,9 @@ GameControl::GameControl(void)
 	overDoor = NULL;
 	overContainer = NULL;
 	overInfoPoint = NULL;
+#ifdef _DEBUG
+	drawPath = NULL;
+#endif
 	InfoTextPalette = core->GetVideoDriver()->CreatePalette(white, black);
 	lastCursor = 0;
 	moveX = moveY = 0;
@@ -123,6 +126,26 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				font->Print(rgn, (unsigned char*)infoPoints[i]->String, InfoTextPalette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, false);
 			}
 		}
+#ifdef _DEBUG
+		if(drawPath) {
+			PathNode * node = drawPath;
+			while(true) {
+				short GameX = (node->x*16)+8, GameY = (node->y*12)+6;
+				if(!node->Parent) {
+					video->DrawCircle(GameX, GameY, 2, green);
+				}
+				else {
+					short oldX = (node->Parent->x*16)+8, oldY = (node->Parent->y*12)+6;
+					video->DrawLine(oldX, oldY, GameX, GameY, green);
+				}
+				if(!node->Next) {
+					video->DrawCircle(GameX, GameY, 2, green);
+					break;
+				}
+				node = node->Next;
+			}
+		}
+#endif
 #ifdef DEBUG_SEARCH_MAP
 		Sprite2D * spr = area->SearchMap->GetImage();
 		video->BlitSprite(spr, 0, 0, true);
@@ -144,14 +167,34 @@ int GameControl::SetText(const char * string, int pos)
 void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
 #ifdef _DEBUG
-	if(Key == 'a') {
-		if(overContainer) {
-			if(overContainer->Trapped && !(overContainer->TrapDetected)) {
-				overContainer->TrapDetected = 1;
-				core->GetVideoDriver()->FreeSprite(overContainer->outline->fill);
-				overContainer->outline->fill = NULL;
+	switch(Key) {
+		case 'a': 
+			{
+				if(overContainer) {
+					if(overContainer->Trapped && !(overContainer->TrapDetected)) {
+						overContainer->TrapDetected = 1;
+						core->GetVideoDriver()->FreeSprite(overContainer->outline->fill);
+						overContainer->outline->fill = NULL;
+					}
+				}
 			}
-		}
+		break;
+
+		case 'p':
+			{
+				short GameX = lastMouseX, GameY = lastMouseY;
+				core->GetVideoDriver()->ConvertToGame(GameX, GameY);
+				drawPath = core->GetPathFinder()->FindPath(pfsX, pfsY, GameX, GameY);
+			}
+		break;
+
+		case 's':
+			{
+				pfsX = lastMouseX; 
+				pfsY = lastMouseY;
+				core->GetVideoDriver()->ConvertToGame(pfsX, pfsY);
+			}
+		break;
 	}
 #endif
 }
@@ -372,6 +415,7 @@ void GameControl::SetCurrentArea(int Index)
 		area->AddActor(ab);
 	//night or day?
 	area->PlayAreaSong(0);
+	core->GetPathFinder()->SetMap(area->SearchMap, area->tm->XCellCount*4, (area->tm->YCellCount*64)/12);
 }
 
 void GameControl::CalculateSelection(unsigned short x, unsigned short y)
