@@ -31,8 +31,12 @@ def OnLoad():
 
 	j = 0
 	GemRB.SetVar("MAGESCHOOL",0) 
+	HasMulti = 0
 	for i in range(1,ClassCount):
+		Allowed = GemRB.GetTableValue(ClassTable, i-1, RaceColumn)
 		if GemRB.GetTableValue(ClassTable,i-1,3):
+			if Allowed!=0:
+				HasMulti = 1
 			continue
 		if j>7:
 			Button = GemRB.GetControl(ClassWindow,j+7)
@@ -53,6 +57,9 @@ def OnLoad():
 
 	MultiClassButton = GemRB.GetControl(ClassWindow, 10)
 	GemRB.SetText(ClassWindow,MultiClassButton, 11993)
+	if HasMulti == 0:
+		GemRB.SetButtonState(ClassWindow,MultiClassButton, IE_GUI_BUTTON_DISABLED)
+
 	BackButton = GemRB.GetControl(ClassWindow,14)
 	GemRB.SetText(ClassWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(ClassWindow,0)

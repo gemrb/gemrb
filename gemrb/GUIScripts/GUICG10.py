@@ -14,6 +14,7 @@ def OnLoad():
 	ClassTable = GemRB.LoadTable("classes")
 	ClassCount = GemRB.GetTableRowCount(ClassTable)-1
 	ClassWindow = GemRB.LoadWindow(10)
+	RaceColumn = GemRB.GetVar("Race")+3
 
 	j=0
 	for i in range(1,ClassCount):
@@ -25,9 +26,10 @@ def OnLoad():
 			Button = GemRB.GetControl(ClassWindow,j+2)
 		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonFlags(ClassWindow, Button, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-
+		j = j + 1
 	j=0
 	for i in range(1,ClassCount):
+		Allowed = GemRB.GetTableValue(ClassTable, i-1, RaceColumn)
 		if GemRB.GetTableValue(ClassTable,i-1,3)==0:
 			continue
 		if j>11:
@@ -37,10 +39,12 @@ def OnLoad():
 
 		t = GemRB.GetTableValue(ClassTable, i-1, 0)
 		GemRB.SetText(ClassWindow, Button, t )
+		j=j+1
+		if Allowed ==0:
+			continue
 		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetEvent(ClassWindow, Button, IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
 		GemRB.SetVarAssoc(ClassWindow, Button , "Class", i) #multiclass, actually
-		j=j+1
 
 	BackButton = GemRB.GetControl(ClassWindow,14)
 	GemRB.SetText(ClassWindow,BackButton,15416)
