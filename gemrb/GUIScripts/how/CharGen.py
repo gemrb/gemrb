@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.22 2004/12/09 22:08:05 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.23 2004/12/09 22:25:57 avenger_teambg Exp $
 
 
 #Character Generation
@@ -338,18 +338,18 @@ def AcceptPress():
 	t = GemRB.Roll(a,b,c)*d+e
 	GemRB.SetPlayerStat(MyChar, IE_GOLD, t)
 	GemRB.SetPlayerStat(MyChar, IE_EA, 2 )
-	Str = GemRB.GetVar("Ability 1")
+	Str = GemRB.GetVar("Ability1")
 	GemRB.SetPlayerStat(MyChar, IE_STR, Str)
 	if Str == 18:
 		GemRB.SetPlayerStat(MyChar, IE_STREXTRA, GemRB.GetVar("StrExtra"))
 	else:
 		GemRB.SetPlayerStat(MyChar, IE_STREXTRA, 0)
 
-	GemRB.SetPlayerStat(MyChar, IE_INT, GemRB.GetVar("Ability 2"))
-	GemRB.SetPlayerStat(MyChar, IE_WIS, GemRB.GetVar("Ability 3"))
-	GemRB.SetPlayerStat(MyChar, IE_DEX, GemRB.GetVar("Ability 4"))
-	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar("Ability 5"))
-	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability 6"))
+	GemRB.SetPlayerStat(MyChar, IE_INT, GemRB.GetVar("Ability2"))
+	GemRB.SetPlayerStat(MyChar, IE_WIS, GemRB.GetVar("Ability3"))
+	GemRB.SetPlayerStat(MyChar, IE_DEX, GemRB.GetVar("Ability4"))
+	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar("Ability5"))
+	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability6"))
 
 	GemRB.SetPlayerName(MyChar, GemRB.GetToken("CHARNAME"), 0)
 	TmpTable = GemRB.LoadTable ("clskills")

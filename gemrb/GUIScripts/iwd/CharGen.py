@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.28 2004/12/09 22:08:06 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.29 2004/12/09 22:25:58 avenger_teambg Exp $
 
 
 #Character Generation
@@ -285,7 +285,6 @@ def CancelPress():
 	return
 
 def AcceptPress():
-	global CharGenWindow
 	MyChar = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer("charbase", MyChar)
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
@@ -296,8 +295,12 @@ def AcceptPress():
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar("Class Kit")
 	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
-	t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment"), 3)
+	print "AlignmentTable:",AlignmentTable
+	print "Rownumber:",GemRB.GetVar("Alignment")-1
+	print "Value:",GemRB.GetTableValue(AlignmentTable, GemRB.GetVar("Alignment")-1, 3)
+	t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment")-1, 3)
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
+	print "Set:",t
 
 	#mage spells
 	Learnable = GetLearnableMageSpells( KitIndex, t, 1)
@@ -320,7 +323,6 @@ def AcceptPress():
 	TmpTable = GemRB.LoadTable("repstart")
 	t=GemRB.FindTableValue(AlignmentTable, 3, t)
 	t = GemRB.GetTableValue(TmpTable, t, 0)
-	GemRB.UnloadTable(TmpTable)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
 	TmpTable = GemRB.LoadTable("strtgold")
 	a = GemRB.GetTableValue(TmpTable, Class, 1) #number of dice
@@ -333,31 +335,30 @@ def AcceptPress():
 		e=e*(t-1)
 	else:
 		e=0
-	GemRB.UnloadTable(TmpTable)
 	t = GemRB.Roll(a,b,c)*d+e
 	GemRB.SetPlayerStat(MyChar, IE_GOLD, t)
 	GemRB.SetPlayerStat(MyChar, IE_EA, 2 )
-	Str = GemRB.GetVar("Ability 1")
+	Str = GemRB.GetVar("Ability1")
 	GemRB.SetPlayerStat(MyChar, IE_STR, Str)
 	if Str == 18:
 		GemRB.SetPlayerStat(MyChar, IE_STREXTRA, GemRB.GetVar("StrExtra"))
 	else:
 		GemRB.SetPlayerStat(MyChar, IE_STREXTRA, 0)
 
-	GemRB.SetPlayerStat(MyChar, IE_INT, GemRB.GetVar("Ability 2"))
-	GemRB.SetPlayerStat(MyChar, IE_WIS, GemRB.GetVar("Ability 3"))
-	GemRB.SetPlayerStat(MyChar, IE_DEX, GemRB.GetVar("Ability 4"))
-	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar("Ability 5"))
-	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability 6"))
+	GemRB.SetPlayerStat(MyChar, IE_INT, GemRB.GetVar("Ability2"))
+	GemRB.SetPlayerStat(MyChar, IE_WIS, GemRB.GetVar("Ability3"))
+	GemRB.SetPlayerStat(MyChar, IE_DEX, GemRB.GetVar("Ability4"))
+	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar("Ability5"))
+	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability6"))
 
 	GemRB.SetPlayerName(MyChar, GemRB.GetToken("CHARNAME"), 0)
 	TmpTable = GemRB.LoadTable ("clskills")
 	GemRB.SetPlayerStat(MyChar, IE_XP, GemRB.GetTableValue (TmpTable, Class, 3) )  #this will also set the level (automatically)
-	GemRB.UnloadTable(TmpTable)
 
 	GemRB.FillPlayerInfo(MyChar, PortraitName+"L", PortraitName+"S")
 	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("PartyFormation")
+	print "lastcheck:%x"%GemRB.GetPlayerStat(MyChar, IE_ALIGNMENT)
 	return
 
 def SetCharacterDescription():
@@ -897,8 +898,8 @@ def AlignmentPress():
 	global CharGenWindow, AlignmentWindow, AlignmentTable, AlignmentTextArea, AlignmentDoneButton
 	GemRB.SetVisible(CharGenWindow, 0)
 	AlignmentWindow = GemRB.LoadWindow(3)
-	AlignmentTable = GemRB.LoadTable("ALIGNS")
-	ClassAlignmentTable = GemRB.LoadTable("ALIGNMNT")
+	AlignmentTable = GemRB.LoadTable("aligns")
+	ClassAlignmentTable = GemRB.LoadTable("alignmnt")
 	ClassName = GemRB.GetTableRowName(ClassTable, GemRB.GetVar("Class") - 1)
 	GemRB.SetVar("Alignment", 0)
 	
@@ -1579,8 +1580,7 @@ def MageSpellsSelect():
 	GemRB.SetVisible(CharGenWindow, 0)
 	MageSpellsWindow = GemRB.LoadWindow(7)
 	#kit (school), alignment, level
-	AlignmentTable = GemRB.LoadTable("aligns")
-	t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment"), 3)
+	t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment")-1, 3)
 	Learnable = GetLearnableMageSpells(GemRB.GetVar("Kit"), t,1)
 	GemRB.SetVar("MageSpellBook", 0)
 	GemRB.SetVar("SpellMask", 0)
