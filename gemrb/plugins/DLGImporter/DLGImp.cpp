@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.7 2004/02/11 22:37:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.8 2004/02/21 13:42:13 avenger_teambg Exp $
  *
  */
 
@@ -92,7 +92,7 @@ DialogState * DLGImp::GetDialogState(int index)
 	State state;
 	str->Read(&state, sizeof(State));
 	ds->StrRef = state.StrRef;
-	ds->trigger = GetTrigger(state.TriggerIndex);
+	ds->trigger = GetStateTrigger(state.TriggerIndex);
 	ds->transitions = GetTransitions(state.FirstTransitionIndex, state.TransitionsCount);
 	ds->transitionsCount = state.TransitionsCount;
 	return ds;
@@ -118,7 +118,7 @@ DialogTransition * DLGImp::GetTransition(int index)
 	dt->Flags = trans.Flags;
 	dt->textStrRef = trans.AnswerStrRef;
 	dt->journalStrRef = trans.JournalStrRef;
-	dt->trigger = GetTrigger(trans.TriggerIndex);
+	dt->trigger = GetTransitionTrigger(trans.TriggerIndex);
 	dt->action = GetAction(trans.ActionIndex);
 	strncpy(dt->Dialog, trans.DLGResRef, 8);
 	dt->Dialog[8] = 0;
@@ -126,11 +126,28 @@ DialogTransition * DLGImp::GetTransition(int index)
 	return dt;
 }
 
-DialogString * DLGImp::GetTrigger(int index)
+DialogString * DLGImp::GetStateTrigger(int index)
 {
 	if(index >= StateTriggersCount)
 		return NULL;
 	str->Seek(StateTriggersOffset+(index*sizeof(VarOffset)), GEM_STREAM_START);
+	VarOffset offset;
+	str->Read(&offset, sizeof(VarOffset));
+	DialogString * ds = new DialogString();
+	str->Seek(offset.Offset, GEM_STREAM_START);
+	char * string = (char*)malloc(offset.Length+1);
+	str->Read(string, offset.Length);
+	string[offset.Length] = 0;
+	ds->strings = GetStrings(string, ds->count);
+	free(string);
+	return ds;
+}
+
+DialogString * DLGImp::GetTransitionTrigger(int index)
+{
+	if(index >= TransitionTriggersCount)
+		return NULL;
+	str->Seek(TransitionTriggersOffset+(index*sizeof(VarOffset)), GEM_STREAM_START);
 	VarOffset offset;
 	str->Read(&offset, sizeof(VarOffset));
 	DialogString * ds = new DialogString();
