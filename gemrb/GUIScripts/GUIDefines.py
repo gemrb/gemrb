@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.23 2004/09/11 07:50:29 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.24 2004/10/02 11:05:48 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -130,6 +130,9 @@ IE_INV_ITEM_DESTRUCTIBLE  = 0x20
 IE_INV_ITEM_EQUIPPED      = 0x40
 IE_INV_ITEM_STACKED       = 0x80
 
+
+#game constants
+PARTY_SIZE = 6
 
 #game strings
 STR_LOADMOS  = 0

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.7 2004/10/02 09:55:03 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.8 2004/10/02 11:05:50 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -247,15 +247,15 @@ def SelectAllOnPress ():
 def SelectionChanged ():
 	# FIXME: hack. If defined, display single selection
 	if (not SelectionChangeHandler):
-		for i in range (0, 6):
+		for i in range (0, PARTY_SIZE):
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
 	else:
 		sel = GemRB.GameGetSelectedPCSingle ()
-		for i in range (0, 6):
+		for i in range (0, PARTY_SIZE):
 			Button = GemRB.GetControl (PortraitWindow, i)
 
-		for i in range (0, 6):
+		for i in range (0, PARTY_SIZE):
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, i + 1 == sel)
 
