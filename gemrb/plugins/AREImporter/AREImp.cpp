@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.15 2003/11/30 00:42:35 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.16 2003/11/30 09:52:18 avenger_teambg Exp $
  *
  */
 
@@ -174,12 +174,13 @@ Map * AREImp::GetMap()
 		Gem_Polygon * closed = new Gem_Polygon(points, ClosedVerticesCount);
 		closed->BBox = BBClosed;
 		free(points);
-		//Getting Door Information fro the WED File
+		//Getting Door Information from the WED File
 		unsigned short * indices = tmm->GetDoorIndices(ShortName, &count);
 		Door * door = tm->AddDoor(ShortName, (Flags&1 ? 0 : 1), indices, count, open, closed);
 		door->Cursor = cursor;
-		memcpy(door->OpenSound, OpenResRef, 9);
-		memcpy(door->CloseSound, CloseResRef, 9);
+		//Leave the default sound untouched
+		if(OpenResRef[0]) memcpy(door->OpenSound, OpenResRef, 9);
+		if(CloseResRef[0]) memcpy(door->CloseSound, CloseResRef, 9);
 	}
 	//Loading Containers
 	for(int i = 0; i < ContainersCount; i++) {
