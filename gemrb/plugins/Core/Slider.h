@@ -72,9 +72,16 @@ private: // Private attributes
   /** If true, on deletion the Slider will destroy the associated images */
   bool Clear;
   /** Actual Knob Status */
-  unsigned char Status;
+  unsigned char State;
   /** Slider Position Value */
   unsigned int Pos;
+public: // Public Events
+  /** Mouse Button Down */
+  void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+  /** Mouse Button Up */
+  void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+  /** Mouse Over Event */
+  void OnMouseOver(unsigned short x, unsigned short y);
 };
 
 #endif
