@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.8 2005/02/03 21:13:51 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.9 2005/02/06 20:19:08 edheldil Exp $
 
 ###################################################
 dnl Configure paths for SDL
@@ -320,7 +320,7 @@ dnl check if the lib links:
 save_CPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $PYTHON_INCLUDES"
 save_LIBS="$LIBS"
-LIBS="$LIBS $PYTHON_LIBS"
+LIBS="$LIBS $PYTHON_LIBS $LIBPTHREAD"
 AC_TRY_LINK([#include <Python.h>],[
 Py_Initialize();
 ],dnl

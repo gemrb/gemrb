@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.45 2005/02/03 21:13:51 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.46 2005/02/06 20:19:08 edheldil Exp $
 
 ###################################################
 
@@ -80,6 +80,39 @@ if test "x$prefix" = "xNONE"; then
   ac_configure_args="$ac_configure_args --prefix $prefix"
 fi
 
+dnl Check various functions.
+AC_CHECK_SIZEOF([char])
+AC_CHECK_SIZEOF([short int])
+AC_CHECK_SIZEOF([int])
+AC_CHECK_SIZEOF([long int])
+AC_CHECK_SIZEOF([long long int])
+AC_CHECK_FUNCS([getcwd])
+AC_CHECK_FUNCS([gettimeofday])
+AC_CHECK_FUNCS([memchr])
+AC_CHECK_FUNCS([memmove])
+AC_CHECK_FUNCS([memset])
+AC_CHECK_FUNCS([mkdir])
+AC_CHECK_FUNCS([rmdir])
+AC_CHECK_FUNCS([sqrt])
+AC_CHECK_FUNCS([strcasecmp])
+AC_CHECK_FUNCS([strchr])
+AC_CHECK_FUNCS([strdup])
+AC_CHECK_FUNCS([strrchr])
+AC_CHECK_FUNCS([strstr])
+AC_CHECK_FUNCS([strtol])
+AC_CHECK_FUNCS([strtoul])
+AC_CHECK_FUNCS([strndup])
+AC_CHECK_FUNCS([strnlen])
+AC_CHECK_FUNCS([snprintf])
+AC_CHECK_HEADERS([fcntl.h])
+AC_CHECK_HEADERS([stddef.h])
+AC_CHECK_HEADERS([sys/time.h])
+AC_CHECK_HEADERS([sys/stat.h])
+AC_CHECK_LIB(dl, dlopen, [LIBDL="-ldl"], [LIBDL=""])
+AC_SUBST(LIBDL)
+
+AC_CHECK_PTHREADS
+
 dnl Check for zlib.
 CHECK_ZLIB()
 
@@ -116,41 +149,9 @@ AM_CHECK_PYTHON_LIBS([], [AC_MSG_ERROR([
 ])])
 
 
-dnl Check various functions.
-AC_CHECK_SIZEOF([char])
-AC_CHECK_SIZEOF([short int])
-AC_CHECK_SIZEOF([int])
-AC_CHECK_SIZEOF([long int])
-AC_CHECK_SIZEOF([long long int])
-AC_CHECK_FUNCS([getcwd])
-AC_CHECK_FUNCS([gettimeofday])
-AC_CHECK_FUNCS([memchr])
-AC_CHECK_FUNCS([memmove])
-AC_CHECK_FUNCS([memset])
-AC_CHECK_FUNCS([mkdir])
-AC_CHECK_FUNCS([rmdir])
-AC_CHECK_FUNCS([sqrt])
-AC_CHECK_FUNCS([strcasecmp])
-AC_CHECK_FUNCS([strchr])
-AC_CHECK_FUNCS([strdup])
-AC_CHECK_FUNCS([strrchr])
-AC_CHECK_FUNCS([strstr])
-AC_CHECK_FUNCS([strtol])
-AC_CHECK_FUNCS([strtoul])
-AC_CHECK_FUNCS([strndup])
-AC_CHECK_FUNCS([strnlen])
-AC_CHECK_FUNCS([snprintf])
-AC_CHECK_HEADERS([fcntl.h])
-AC_CHECK_HEADERS([stddef.h])
-AC_CHECK_HEADERS([sys/time.h])
-AC_CHECK_HEADERS([sys/stat.h])
-AC_CHECK_LIB(dl, dlopen, [LIBDL="-ldl"], [LIBDL=""])
-AC_SUBST(LIBDL)
 AC_CHECK_LIB(vorbisfile, ov_info, 
 	AC_DEFINE( HAS_VORBIS_SUPPORT, 1, [Handling of .ogg soundfiles])
 	LIBS="$LIBS -lvorbis -lvorbisfile",, -lvorbis )
-
-AC_CHECK_PTHREADS
 
 AC_C_CONST
 AC_C_INLINE
