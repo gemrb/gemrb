@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.76 2003/11/29 07:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.77 2003/11/29 10:30:11 balrog994 Exp $
  *
  */
 
@@ -610,6 +610,9 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "AllStringsTagged") == 0) {
 			SetFeature(atoi(value),GF_ALL_STRINGS_TAGGED);
+		}
+		else if(stricmp(name, "MidResAvatars") == 0) {
+			SetFeature(atoi(value),GF_MID_RES_AVATARS);
 		}
 		else if(stricmp(name, "HasSonglist") == 0) {
 			SetFeature(atoi(value),GF_HAS_SONGLIST);
