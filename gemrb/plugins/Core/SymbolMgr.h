@@ -25,7 +25,9 @@ public:
 	virtual ~SymbolMgr(void);
 	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
 	virtual long GetValue(const char * text) = 0;
-	virtual const char * GetValue(int val) = 0;
+	virtual char * GetValue(int val) = 0;
+	virtual char * GetStringIndex(int Index) = 0;
+	virtual long GetValueIndex(int Index) = 0;
 };
 
 #endif
