@@ -3,9 +3,10 @@ GemRB v0.2.2.7 Added Features:
   - Fixed a bug when loading GAMEV2.2 Files (IWD2 SaveGames)
 - Added Features:
   - Added CursorBAM=CARET option for Planescape: Torment
-  - Message Window working on IWD2
+  - Basic In-Game GUI for IWD2, PST, and BG2
 - Added In-Game Script OpCodes:
-  - UnhideGUI: Actually only End the CutScene Mode
+  - UnhideGUI: Shows the In-Game GUI and Ends the CutScene Mode
+  - HideGUI: Hides the In-Game GUI
 
 GemRB v0.2.2.6 Added Features:
 - New Plugins:
