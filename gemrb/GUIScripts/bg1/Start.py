@@ -11,6 +11,15 @@ def OnLoad():
 	global StartWindow, QuitWindow
 	global ExitButton, MultiPlayerButton, MoviesButton
 
+	skip_videos = GemRB.GetVar ("SkipIntroVideos")
+	if not skip_videos:
+		GemRB.PlayMovie ('BG4LOGO',1)
+		GemRB.PlayMovie ('TSRLOGO',1)
+		GemRB.PlayMovie ('BILOGO',1)
+		GemRB.PlayMovie ('INFELOGO',1)
+		GemRB.PlayMovie ('INTRO',1)
+		GemRB.SetVar ("SkipIntroVideos", 1)
+
 	GemRB.LoadWindowPack("START")
 #quit subwindow
 	QuitWindow = GemRB.LoadWindow(3)
