@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUILOAD.py,v 1.6 2004/08/12 21:14:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUILOAD.py,v 1.7 2004/08/27 15:39:26 avenger_teambg Exp $
 
 # GUILOAD.py - Load game window from GUILOAD winpack
 
@@ -56,11 +56,13 @@ def OnLoad():
 
 		#area previews
 		Button = GemRB.GetControl(LoadWindow, 1+i)
+		GemRB.SetButtonState (LoadWindow, Button, IE_GUI_BUTTON_LOCKED)
 		GemRB.SetButtonFlags(LoadWindow, Button, IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 		#PC portraits
 		for j in range(0,6):
 			Button = GemRB.GetControl(LoadWindow,22+i*6+j)
+			GemRB.SetButtonState (LoadWindow, Button, IE_GUI_BUTTON_LOCKED)
 			GemRB.SetButtonFlags(LoadWindow, Button, IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 	ScrollBar=GemRB.GetControl(LoadWindow, 13)
