@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.20 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.21 2003/12/15 09:37:21 balrog994 Exp $
  *
  */
 
@@ -64,7 +64,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 {
 	unsigned short WindowID, XPos, YPos, Width, Height, BackGround, ControlsCount, FirstControl;
 	bool found = false;
-	for(int c = 0; c < WindowCount; c++) {
+	for(unsigned int c = 0; c < WindowCount; c++) {
 	str->Seek(WEOffset+(0x1c*c), GEM_STREAM_START);
 		str->Read(&WindowID, 2);
 		if(WindowID == i) {
@@ -117,7 +117,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 		str->Seek(COffset, GEM_STREAM_START);
 		str->Read(&ControlID, 4);
 		//str->Read(&BufferLength, 2);
-		BufferLength = (ControlID & 0xffff0000)>>16;
+		BufferLength = (unsigned short)(ControlID & 0xffff0000)>>16;
 		str->Read(&XPos, 2);
 		str->Read(&YPos, 2);
 		str->Read(&Width, 2);
@@ -278,7 +278,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				ta->SetFonts(ini, fnt);
 				win->AddControl(ta);
 				if(SBID != 0xffff)
-					win->Link(SBID, ControlID);
+					win->Link(SBID, (unsigned short)ControlID);
 			}
 			break;
 
@@ -345,7 +345,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				sbar->Height = Height;
 				sbar->ControlType = ControlType;
 				AnimationFactory * anim = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(BAMResRef, IE_BAM_CLASS_ID);
-				Animation * an = anim->GetCycle(Cycle);
+				Animation * an = anim->GetCycle((unsigned char)Cycle);
 				sbar->SetImage(IE_GUI_SCROLLBAR_UP_UNPRESSED, an->GetFrame(UpUnPressed));
 				sbar->SetImage(IE_GUI_SCROLLBAR_UP_PRESSED, an->GetFrame(UpPressed));
 				sbar->SetImage(IE_GUI_SCROLLBAR_DOWN_UNPRESSED, an->GetFrame(DownUnPressed));
@@ -356,7 +356,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				delete(an);
 				win->AddControl(sbar);
 				if(TAID != 0xffff)
-					win->Link(ControlID, TAID);
+					win->Link((unsigned short)ControlID, TAID);
 			}
 			break;
 
