@@ -25,8 +25,9 @@ Gem_Polygon::~Gem_Polygon(void)
 
 bool Gem_Polygon::PointIn(unsigned short x, unsigned short y)
 {
-	register int   j, yflag0, yflag1, inside_flag, xflag0 , index;
+	register int   j, yflag0, yflag1, xflag0 , index;
 	register long ty, tx;
+  bool inside_flag = false;
 	Point *vtx0, *vtx1;
 
 	index = 0;
@@ -37,8 +38,6 @@ bool Gem_Polygon::PointIn(unsigned short x, unsigned short y)
 	vtx0 = &points[count-1];
 	yflag0 = ( vtx0->y >= ty );
 	vtx1 = &points[index];
-
-	inside_flag = 0;
 
 	for( j = count+1; --j ; ) {
 		yflag1 = ( vtx1->y >= ty );
@@ -56,5 +55,5 @@ bool Gem_Polygon::PointIn(unsigned short x, unsigned short y)
 		vtx0 = vtx1;
 		vtx1 = &points[++index];
 	}
-	return (bool)inside_flag;
+	return inside_flag;
 }
