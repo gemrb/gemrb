@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.35 2003/12/03 21:02:39 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.36 2003/12/04 22:10:33 balrog994 Exp $
  *
  */
 
@@ -28,7 +28,7 @@
 
 extern Interface * core;
 
-#define STEP_TIME 100
+#define STEP_TIME 150
 
 Map::Map(void)
 {
@@ -36,6 +36,7 @@ Map::Map(void)
 	queue = NULL;
 	Qcount = 0;
 	lastActorCount = 0;
+	justCreated = true;
 }
 
 Map::~Map(void)
@@ -186,6 +187,23 @@ void Map::DrawMap(Region viewport)
 			}
 			video->DrawEllipse(actor->XPos-vp.x, actor->YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), *color);
 		}
+		if(actor->textDisplaying) {
+#ifdef WIN32
+			unsigned long time = GetTickCount();
+#else
+			struct timeval tv;
+			gettimeofday(&tv, NULL);
+			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
+#endif
+			if((time - actor->timeStartDisplaying) >= 3000) {
+				actor->textDisplaying = 0;
+			}
+			if(actor->textDisplaying == 1) {
+				Font * font = core->GetFont(9);
+				Region rgn(actor->XPos-100, actor->YPos-100, 200, 400);
+				font->Print(rgn, (unsigned char*)actor->overHeadText, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false);
+			}
+		}
 
 		if(anim) {
 			Sprite2D * nextFrame = anim->NextFrame();
@@ -238,6 +256,8 @@ void Map::AddActor(ActorBlock actor)
 	actor.Selected = false;
 	actor.path = NULL;
 	actor.step = NULL;
+	actor.textDisplaying = 0;
+	actor.overHeadText = NULL;
 	actors.push_back(actor);
 }
 
@@ -253,6 +273,19 @@ ActorBlock * Map::GetActor(int x, int y)
 	}
 	return NULL;
 }
+
+ActorBlock * Map::GetActor(const char * Name)
+{
+	for(size_t i = 0; i < actors.size(); i++) {
+		ActorBlock *actor = &actors.at(i);
+		if(stricmp(actor->actor->ScriptName, Name) == 0) {
+			printf("Returning Actor %d: %s\n", i, actor->actor->ScriptName);
+			return actor;
+		}
+	}
+	return NULL;
+}
+
 int Map::GetActorInRect(ActorBlock ** & actors, Region &rgn)
 {
 	actors = (ActorBlock**)malloc(this->actors.size()*sizeof(ActorBlock*));
