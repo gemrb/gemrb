@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.8 2003/11/29 07:47:05 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.9 2003/11/29 20:32:32 balrog994 Exp $
  *
  */
 
@@ -144,4 +144,29 @@ Container * TileMap::GetContainer(unsigned short x, unsigned short y)
 	}
 	return NULL;	
 }
-
+InfoPoint * TileMap::AddInfoPoint(char * Name, unsigned short Type, Gem_Polygon * outline)
+{
+	InfoPoint ip;
+	strncpy(ip.Name, Name, 32);
+	ip.Type = Type;
+	ip.outline = outline;
+	infoPoints.push_back(ip);
+	return &infoPoints.at(infoPoints.size()-1);
+}
+InfoPoint * TileMap::GetInfoPoint(unsigned short x, unsigned short y)
+{
+	for(int i = 0; i < infoPoints.size(); i++) {
+		InfoPoint * ip = &infoPoints.at(i);
+		if(ip->outline->BBox.x > x)
+			continue;
+		if(ip->outline->BBox.y > y)
+			continue;
+		if(ip->outline->BBox.x+ip->outline->BBox.w < x)
+			continue;
+		if(ip->outline->BBox.y+ip->outline->BBox.h < y)
+			continue;
+		if(ip->outline->PointIn(x,y))
+			return ip;
+	}
+	return NULL;	
+}

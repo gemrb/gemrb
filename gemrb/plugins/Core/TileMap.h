@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.7 2003/11/29 07:47:05 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.8 2003/11/29 20:32:32 balrog994 Exp $
  *
  */
 
@@ -52,6 +52,13 @@ typedef struct Container {
 	Gem_Polygon * outline;
 } Container;
 
+typedef struct InfoPoint {
+	char Name[32];
+	unsigned short Type;
+	Gem_Polygon * outline;
+	unsigned long Cursor;
+} InfoPoint;
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -70,6 +77,7 @@ private:
 	std::vector<TileOverlay *> overlays;
 	std::vector<Door> doors;
 	std::vector<Container> containers;
+	std::vector<InfoPoint> infoPoints;
 public:
 	TileMap(void);
 	~TileMap(void);
@@ -78,6 +86,8 @@ public:
 	Door * GetDoor(unsigned short x, unsigned short y);
 	Container * AddContainer(char * Name, unsigned short Type, Gem_Polygon * outline);
 	Container * GetContainer(unsigned short x, unsigned short y);
+	InfoPoint * AddInfoPoint(char * Name, unsigned short Type, Gem_Polygon * outline);
+	InfoPoint * GetInfoPoint(unsigned short x, unsigned short y);
 	void ToogleDoor(Door * door);
 	void DrawOverlay(unsigned int index, Region viewport);
 public:
