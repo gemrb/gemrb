@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.59 2004/01/05 12:07:10 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.60 2004/01/05 15:55:53 balrog994 Exp $
  *
  */
 
@@ -86,8 +86,9 @@ Map::~Map(void)
 		delete(animations[i]);
 	}
 	for(unsigned int i = 0; i < actors.size(); i++) {
-		if(!actors[i]->InParty)
-			delete(actors[i]);
+		Actor * a = actors[i];
+		if(!a->InParty)
+			delete(a);
 	}
 	for(unsigned int i = 0; i < entrances.size(); i++) {
 		delete(entrances[i]);
