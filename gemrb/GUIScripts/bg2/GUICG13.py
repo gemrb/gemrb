@@ -11,6 +11,10 @@ HairButton = 0
 SkinButton = 0
 MajorButton = 0
 MinorButton = 0
+Color1 = 0
+Color2 = 0
+Color3 = 0
+Color4 = 0
 
 def OnLoad():
 	global ColorWindow, DoneButton, ColorTable
@@ -59,6 +63,7 @@ def OnLoad():
 	return
 
 def DonePress():
+	global Color1, Color2, Color3, Color4
 	GemRB.UnloadWindow(ColorPicker)
 	ColorWindow=GemRB.LoadWindow(13)
 	GemRB.SetVisible(ColorWindow,1)
