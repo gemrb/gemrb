@@ -48,16 +48,19 @@ AbilitiesRecallButton = 0
 AbilitiesDoneButton = 0
 
 SkillsButton = 0
+SkillsWindow = 0
+SkillsTable = 0
+SkillsTextArea = 0
+SkillsDoneButton = 0
+SkillsPointsLeft = 0
+SkillsState = 0
+
 ProficienciesWindow = 0
 ProficienciesTable = 0
 ProfsMaxTable = 0
 ProficienciesTextArea = 0
 ProficienciesDoneButton = 0
 ProficienciesPointsLeft = 0
-
-SkillsWindow = 0
-SkillsTextArea = 0
-SkillsDoneButton = 0
 
 MageSpellsWindow = 0
 MageSpellsTextArea = 0
@@ -221,6 +224,27 @@ def SetCharacterDescription():
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
 			GemRB.TextAreaAppend(CharGenWindow, TextArea, str(GemRB.GetVar("Ability" + str(i + 1))) )
 	if CharGenState > 5:
+		ClassName = GemRB.GetTableRowName(ClassTable, GemRB.GetVar("Class") - 1)
+		if ClassName == "THIEF" or ClassName == "FIGHTER_THIEF" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF" or ClassName == "CLERIC_THIEF":
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, 8442, -1)
+			for i in range (0, 4):
+				GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(SkillsTable, i, 2), -1)
+				GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
+				GemRB.TextAreaAppend(CharGenWindow, TextArea, str(GemRB.GetVar("Skill" + str(i))) )
+		if ClassName == "RANGER":
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, 8442, -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(SkillsTable, 0, 2), -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, str(GemRB.GetVar("Skill0")) )
+		if ClassName == "BARD":
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, 8442, -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetTableValue(SkillsTable, 2, 2), -1)
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, ": " )
+			GemRB.TextAreaAppend(CharGenWindow, TextArea, str(GemRB.GetVar("Skill2")) )
+
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, "", -1)
 		GemRB.TextAreaAppend(CharGenWindow, TextArea, 9466, -1)
 		for i in range(0,15):
@@ -780,11 +804,12 @@ def AbilitiesRerollPress():
 	return
 
 def AbilitiesDonePress():
-	global CharGenWindow, CharGenState, AbilitiesWindow, AbilitiesButton, SkillsButton
+	global CharGenWindow, CharGenState, AbilitiesWindow, AbilitiesButton, SkillsButton, SkillsState
 	GemRB.UnloadWindow(AbilitiesWindow)
 	GemRB.SetButtonState(CharGenWindow, AbilitiesButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetButtonState(CharGenWindow, SkillsButton, IE_GUI_BUTTON_ENABLED)
 	CharGenState = 5
+	SkillsState = 0
 	SetCharacterDescription()
 	GemRB.SetVisible(CharGenWindow, 1)
 	return
@@ -799,6 +824,166 @@ def AbilitiesCancelPress():
 # Skills Selection
 
 def SkillsPress():
+	global CharGenWindow, SkillsWindow, ClassTable, RaceTable, SkillsState
+	
+	# For now, readability is preferred over speed. This could be optimized later.
+	ClassName = GemRB.GetTableRowName(ClassTable, GemRB.GetVar("Class") - 1)
+	if SkillsState == 0:
+		RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race") - 1)
+		if ClassName == "THIEF" or ClassName == "FIGHTER_THIEF" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF" or ClassName == "CLERIC_THIEF":
+			SkillsSelect()
+		elif ClassName == "RANGER":
+			SkillRaceTable = GemRB.LoadTable("SKILLRAC")
+			SkillDexterityTable = GemRB.LoadTable("SKILLDEX")
+			Dexterity = str(GemRB.GetVar("Ability2") )
+			GemRB.SetVar("Skill0", GemRB.GetTableValue(SkillRaceTable, RaceName, "STEALTH") + GemRB.GetTableValue(SkillDexterityTable, Dexterity, "STEALTH") + GemRB.GetTableValue(GemRB.LoadTable("SKILLRNG"), "1", "STEALTH"))
+			RacialEnemySelect()
+		elif ClassName == "BARD":
+			SkillRaceTable = GemRB.LoadTable("SKILLRAC")
+			SkillDexterityTable = GemRB.LoadTable("SKILLDEX")
+			Dexterity = str(GemRB.GetVar("Ability2") )
+			GemRB.SetVar("Skill2", GemRB.GetTableValue(SkillRaceTable, RaceName, "PICK_POCKETS") + GemRB.GetTableValue(SkillDexterityTable, Dexterity, "PICK_POCKETS") + GemRB.GetTableValue(GemRB.LoadTable("SKILLBRD"), "1", "PICK_POCKETS"))
+			SkillsState = 1
+
+	if SkillsState == 1:
+		ProficienciesSelect()
+
+	if SkillsState == 2:
+		if ClassName == "MAGE" or ClassName == "FIGHTER_MAGE" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF" or ClassName == "CLERIC_MAGE" or ClassName == "FIGHTER_MAGE_CLERIC":
+			MageSpellsSelect()
+		else:
+			SkillsState = 3
+
+	if SkillsState == 3:
+		GemRB.SetButtonState(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_ENABLED)
+		CharGenState = 6
+		SetCharacterDescription()
+	return
+
+
+def SkillsSelect():
+	global CharGenWindow, SkillsWindow, SkillsTextArea, SkillsTable, SkillsDoneButton, RaceTable, SkillsPointsLeft
+	GemRB.SetVisible(CharGenWindow, 0)
+	SkillsWindow = GemRB.LoadWindow(6)
+	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race") - 1)
+	Dexterity = str(GemRB.GetVar("Ability2") )
+	SkillsTable = GemRB.LoadTable("SKILLS")
+	SkillRaceTable = GemRB.LoadTable("SKILLRAC")
+	SkillDexterityTable = GemRB.LoadTable("SKILLDEX")
+
+	SkillsPointsLeft = 30
+	SkillsPointsLeftLabel = GemRB.GetControl(SkillsWindow, 0x10000005)
+	GemRB.SetLabelUseRGB(SkillsWindow, SkillsPointsLeftLabel, 1)
+	GemRB.SetText(SkillsWindow, SkillsPointsLeftLabel, str(SkillsPointsLeft))
+	GemRB.SetToken("number", str(SkillsPointsLeft) )
+
+	for i in range (0, 4):
+		SkillsLabelButton = GemRB.GetControl(SkillsWindow, 21 + i)
+		GemRB.SetButtonState(SkillsWindow, SkillsLabelButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetEvent(SkillsWindow, SkillsLabelButton, IE_GUI_BUTTON_ON_PRESS, "SkillsLabelPress")
+		GemRB.SetVarAssoc(SkillsWindow, SkillsLabelButton, "SkillIndex", i)
+
+		SkillsPlusButton = GemRB.GetControl(SkillsWindow, 11 + i * 2)
+		GemRB.SetButtonState(SkillsWindow, SkillsPlusButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetEvent(SkillsWindow, SkillsPlusButton, IE_GUI_BUTTON_ON_PRESS, "SkillsPlusPress")
+		GemRB.SetVarAssoc(SkillsWindow, SkillsPlusButton, "SkillIndex", i)
+
+		SkillsMinusButton = GemRB.GetControl(SkillsWindow, 12 + i * 2)
+		GemRB.SetButtonState(SkillsWindow, SkillsMinusButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetEvent(SkillsWindow, SkillsMinusButton, IE_GUI_BUTTON_ON_PRESS, "SkillsMinusPress")
+		GemRB.SetVarAssoc(SkillsWindow, SkillsMinusButton, "SkillIndex", i)
+
+		SkillName = GemRB.GetTableRowName(SkillsTable, i)
+		SkillValue = GemRB.GetTableValue(SkillRaceTable, RaceName, SkillName)
+		SkillValue = SkillValue + GemRB.GetTableValue(SkillDexterityTable, Dexterity, SkillName)
+		GemRB.SetVar("Skill" + str(i), SkillValue)
+		GemRB.SetVar("SkillBase" + str(i), SkillValue)
+		SkillLabel = GemRB.GetControl(SkillsWindow, 0x10000001 + i)
+		GemRB.SetLabelUseRGB(SkillsWindow, SkillLabel, 1)
+		GemRB.SetText(SkillsWindow, SkillLabel, str(SkillValue))
+
+	SkillsTextArea = GemRB.GetControl(SkillsWindow, 19)
+	GemRB.SetText(SkillsWindow, SkillsTextArea, 17248)
+
+	SkillsDoneButton = GemRB.GetControl(SkillsWindow, 0)
+	GemRB.SetButtonState(SkillsWindow, SkillsDoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent(SkillsWindow, SkillsDoneButton, IE_GUI_BUTTON_ON_PRESS, "SkillsDonePress")
+	GemRB.SetText(SkillsWindow, SkillsDoneButton, 11973)
+	GemRB.SetButtonFlags(SkillsWindow, SkillsDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	SkillsCancelButton = GemRB.GetControl(SkillsWindow, 25)
+	GemRB.SetButtonState(SkillsWindow, SkillsCancelButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(SkillsWindow, SkillsCancelButton, IE_GUI_BUTTON_ON_PRESS, "SkillsCancelPress")
+	GemRB.SetText(SkillsWindow, SkillsCancelButton, 13727)
+
+	GemRB.SetVisible(SkillsWindow, 1)
+	return
+
+def SkillsLabelPress():
+	global SkillsWindow, SkillsTextArea, SkillsTable
+	SkillIndex = GemRB.GetVar("SkillIndex")
+	GemRB.SetText(SkillsWindow, SkillsTextArea, GemRB.GetTableValue(SkillsTable, SkillIndex, 1) )
+	return
+
+def SkillsPlusPress():
+	global SkillsWindow, SkillsTextArea, SkillsTable, SkillsPointsLeft
+	SkillIndex = GemRB.GetVar("SkillIndex")
+	SkillValue = GemRB.GetVar("Skill" + str(SkillIndex))
+	GemRB.SetText(SkillsWindow, SkillsTextArea, GemRB.GetTableValue(SkillsTable, SkillIndex, 1) )
+	if SkillValue < 99 and SkillsPointsLeft > 0:
+		SkillsPointsLeft = SkillsPointsLeft - 1
+		SkillsPointsLeftLabel = GemRB.GetControl(SkillsWindow, 0x10000005)
+		GemRB.SetText(SkillsWindow, SkillsPointsLeftLabel, str(SkillsPointsLeft))
+		SkillValue = SkillValue + 1
+		GemRB.SetVar("Skill" + str(SkillIndex), SkillValue)
+		SkillLabel = GemRB.GetControl(SkillsWindow, 0x10000001 + SkillIndex)
+		GemRB.SetText(SkillsWindow, SkillLabel, str(SkillValue))
+		if SkillsPointsLeft == 0:
+			GemRB.SetButtonState(SkillsWindow, SkillsDoneButton, IE_GUI_BUTTON_ENABLED)
+	return
+
+def SkillsMinusPress():
+	global SkillsWindow, SkillsTextArea, SkillsTable, SkillsPointsLeft
+	SkillIndex = GemRB.GetVar("SkillIndex")
+	SkillValue = GemRB.GetVar("Skill" + str(SkillIndex))
+	GemRB.SetText(SkillsWindow, SkillsTextArea, GemRB.GetTableValue(SkillsTable, SkillIndex, 1) )
+	if SkillValue > GemRB.GetVar("SkillBase" + str(SkillIndex)):
+		SkillValue = SkillValue - 1
+		GemRB.SetVar("Skill" + str(SkillIndex), SkillValue)
+		SkillLabel = GemRB.GetControl(SkillsWindow, 0x10000001 + SkillIndex)
+		GemRB.SetText(SkillsWindow, SkillLabel, str(SkillValue))
+		SkillsPointsLeft = SkillsPointsLeft + 1
+		SkillsPointsLeftLabel = GemRB.GetControl(SkillsWindow, 0x10000005)
+		GemRB.SetText(SkillsWindow, SkillsPointsLeftLabel, str(SkillsPointsLeft))
+		GemRB.SetButtonState(SkillsWindow, SkillsDoneButton, IE_GUI_BUTTON_DISABLED)
+	return
+
+def SkillsDonePress():
+	global CharGenWindow, SkillsWindow, SkillsState
+	GemRB.UnloadWindow(SkillsWindow)
+	SkillsState = 1
+	GemRB.SetVisible(CharGenWindow, 1)
+	SkillsPress()
+	return
+
+def SkillsCancelPress():
+	global CharGenWindow, SkillsWindow
+	GemRB.UnloadWindow(SkillsWindow)
+	SkillsState = 0
+	GemRB.SetVisible(CharGenWindow, 1)
+	return
+
+
+# Racial Enemy Selection
+
+def RacialEnemySelect():
+	return
+
+
+# Weapon Proficiencies Selection
+
+def ProficienciesSelect():
 	global CharGenWindow, ProficienciesWindow, ProficienciesTable, ProficienciesTextArea, ProficienciesPointsLeft, ProficienciesDoneButton, ClassTable, ProfsMaxTable
 	GemRB.SetVisible(CharGenWindow, 0)
 	ProficienciesWindow = GemRB.LoadWindow(9)
@@ -877,7 +1062,7 @@ def SkillsPress():
 		GemRB.SetEvent(ProficienciesWindow, ProficienciesMinusButton, IE_GUI_BUTTON_ON_PRESS, "ProficienciesMinusPress")
 		GemRB.SetVarAssoc(ProficienciesWindow, ProficienciesMinusButton, "ProficienciesIndex", i + 9)
 
-	for i in range(1,16):
+	for i in range(1, 16):
 		GemRB.SetVar("Proficiency" + str(i), 0)
 
 	ProficienciesTextArea = GemRB.GetControl(ProficienciesWindow, 68)
@@ -954,90 +1139,18 @@ def ProficienciesMinusPress():
 	return
 
 def ProficienciesDonePress():
-	global CharGenWindow, ProficienciesWindow, SkillsButton, AppearanceButton, CharGenState
+	global CharGenWindow, ProficienciesWindow, SkillsState
 	GemRB.SetVisible(ProficienciesWindow, 0)
 	GemRB.UnloadWindow(ProficienciesWindow)
+	SkillsState = 2
 	GemRB.SetVisible(CharGenWindow, 1)
-
-	# For now, readability is preferred over speed. This could be optimized later.
-	ClassName = GemRB.GetTableRowName(ClassTable, GemRB.GetVar("Class") - 1)
-	if ClassName == "RANGER" or ClassName == "THIEF" or ClassName == "FIGHTER_THIEF" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF" or ClassName == "CLERIC_THIEF" or ClassName == "CLERIC_RANGER":
-		SkillsSelect()
-	elif ClassName == "MAGE" or ClassName == "FIGHTER_MAGE" or ClassName == "FIGHTER_MAGE_THIEF" or ClassName == "MAGE_THIEF" or ClassName == "CLERIC_MAGE" or ClassName == "FIGHTER_MAGE_CLERIC":
-		MageSpellsSelect()
-
-	GemRB.SetVisible(CharGenWindow, 0)
-	GemRB.SetButtonState(CharGenWindow, SkillsButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetButtonState(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_ENABLED)
-	CharGenState = 6
-	SetCharacterDescription()
-	GemRB.SetVisible(CharGenWindow, 1)
+	SkillsPress()
 	return
 
 def ProficienciesCancelPress():
-	global CharGenWindow, ProficienciesWindow
+	global CharGenWindow, ProficienciesWindow, SkillsState
 	GemRB.UnloadWindow(ProficienciesWindow)
-	GemRB.SetVisible(CharGenWindow, 1)
-	return
-
-
-# Skills Selection
-
-def SkillsSelect():
-	global CharGenWindow, SkillsWindow, SkillsTextArea, SkillsDoneButton, RaceTable, ClassTable
-	GemRB.SetVisible(CharGenWindow, 0)
-	SkillsWindow = GemRB.LoadWindow(6)
-	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race") - 1)
-	ClassName = GemRB.GetTableRowName(ClassTable, GemRB.GetVar("Class") - 1)
-
-	for i in range (0, 4):
-		SkillsLabelButton = GemRB.GetControl(SkillsWindow, 21 + i)
-		GemRB.SetButtonState(SkillsWindow, SkillsLabelButton, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetEvent(SkillsWindow, SkillsLabelButton, IE_GUI_BUTTON_ON_PRESS, "SkillsLabelPress")
-		GemRB.SetVarAssoc(SkillsWindow, SkillsLabelButton, "SkillIndex", i + 1)
-
-		SkillsPlusButton = GemRB.GetControl(SkillsWindow, 11 + i * 2)
-		GemRB.SetButtonState(SkillsWindow, SkillsPlusButton, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetEvent(SkillsWindow, SkillsPlusButton, IE_GUI_BUTTON_ON_PRESS, "SkillsPlusPress")
-		GemRB.SetVarAssoc(SkillsWindow, SkillsPlusButton, "SkillIndex", i + 1)
-
-		SkillsMinusButton = GemRB.GetControl(SkillsWindow, 12 + i * 2)
-		GemRB.SetButtonState(SkillsWindow, SkillsMinusButton, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetEvent(SkillsWindow, SkillsMinusButton, IE_GUI_BUTTON_ON_PRESS, "SkillsMinusPress")
-		GemRB.SetVarAssoc(SkillsWindow, SkillsMinusButton, "SkillIndex", i + 1)
-
-	SkillsTextArea = GemRB.GetControl(SkillsWindow, 19)
-	GemRB.SetText(SkillsWindow, SkillsTextArea, 17248)
-
-	SkillsDoneButton = GemRB.GetControl(SkillsWindow, 0)
-	GemRB.SetButtonState(SkillsWindow, SkillsDoneButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent(SkillsWindow, SkillsDoneButton, IE_GUI_BUTTON_ON_PRESS, "SkillsDonePress")
-	GemRB.SetText(SkillsWindow, SkillsDoneButton, 11973)
-	GemRB.SetButtonFlags(SkillsWindow, SkillsDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
-
-	SkillsCancelButton = GemRB.GetControl(SkillsWindow, 25)
-	GemRB.SetButtonState(SkillsWindow, SkillsCancelButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(SkillsWindow, SkillsCancelButton, IE_GUI_BUTTON_ON_PRESS, "SkillsCancelPress")
-	GemRB.SetText(SkillsWindow, SkillsCancelButton, 13727)
-
-	GemRB.SetVisible(SkillsWindow, 1)
-	return
-
-def SkillsLabelPress():
-	return
-
-def SkillsPlusPress():
-	return
-
-def SkillsMinusPress():
-	return
-
-def SkillsDonePress():
-	return
-
-def SkillsCancelPress():
-	global CharGenWindow, SkillsWindow
-	GemRB.UnloadWindow(SkillsWindow)
+	SkillsState = 0
 	GemRB.SetVisible(CharGenWindow, 1)
 	return
 
@@ -1070,8 +1183,9 @@ def MageSpellsDonePress():
 	return
 
 def MageSpellsCancelPress():
-	global CharGenWindow, MageSpellsWindow
+	global CharGenWindow, MageSpellsWindow, SkillsState
 	GemRB.UnloadWindow(MageSpellsWindow)
+	SkillsState = 0
 	GemRB.SetVisible(CharGenWindow, 1)
 	return
 
