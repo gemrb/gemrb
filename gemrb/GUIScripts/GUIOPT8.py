@@ -1,66 +1,118 @@
 import GemRB
 
-SoundWindow = 0
+GamePlayWindow = 0
 TextAreaControl = 0
 
 def OnLoad():
-	global SoundWindow, TextAreaControl
+	global GamePlayWindow, TextAreaControl
 	GemRB.LoadWindowPack("GUIOPT")
-	SoundWindow = GemRB.LoadWindow(8)
-	TextAreaControl = GemRB.GetControl(SoundWindow, 16)
-	SubtitleButton = GemRB.GetControl(SoundWindow, 20)
-	WarCryButton = GemRB.GetControl(SoundWindow, 18)
-	StepsButton = GemRB.GetControl(SoundWindow, 19)
-	ActionButton = GemRB.GetControl(SoundWindow, 21)
-	SelectionButton = GemRB.GetControl(SoundWindow, 57)
-	OkButton = GemRB.GetControl(SoundWindow, 24)
-	CancelButton = GemRB.GetControl(SoundWindow, 25)
-	GemRB.SetText(SoundWindow, TextAreaControl, 18041)
-	GemRB.SetText(SoundWindow, OkButton, 11973)
-	GemRB.SetText(SoundWindow, CancelButton, 13957)
-	GemRB.SetEvent(SoundWindow, SubtitleButton, 0x00000000, "SubtitlePress")
-	GemRB.SetEvent(SoundWindow, WarCryButton, 0x00000000, "WarCryPress")
-	GemRB.SetEvent(SoundWindow, StepsButton, 0x00000000, "StepsPress")
-	GemRB.SetEvent(SoundWindow, ActionButton, 0x00000000, "ActionPress")
-	GemRB.SetEvent(SoundWindow, SelectionButton, 0x00000000, "SelectionPress")
-	GemRB.SetEvent(SoundWindow, OkButton, 0x00000000, "OkPress")
-	GemRB.SetEvent(SoundWindow, CancelButton, 0x00000000, "CancelPress")
-	GemRB.ShowModal(SoundWindow)
+	GamePlayWindow = GemRB.LoadWindow(8)
+	TextAreaControl = GemRB.GetControl(GamePlayWindow, 40)
+	DelayButton = GemRB.GetControl(GamePlayWindow, 21)
+	KeySpdButton = GemRB.GetControl(GamePlayWindow, 23)
+	MouseSpdButton = GemRB.GetControl(GamePlayWindow, 22)
+	DifficultyButton = GemRB.GetControl(GamePlayWindow, 24)
+	BloodButton = GemRB.GetControl(GamePlayWindow, 27)
+	ShowPGButton = GemRB.GetControl(GamePlayWindow, 25)
+	InfravisionButton = GemRB.GetControl(GamePlayWindow, 44)
+	WeatherButton = GemRB.GetControl(GamePlayWindow, 46)
+	HealButton = GemRB.GetControl(GamePlayWindow, 48)
+	HotKeyButton = GemRB.GetControl(GamePlayWindow, 51)
+	CommentsButton = GemRB.GetControl(GamePlayWindow, 5)
+	AutoPauseButton = GemRB.GetControl(GamePlayWindow, 6)
+	OkButton = GemRB.GetControl(GamePlayWindow, 7)
+	CancelButton = GemRB.GetControl(GamePlayWindow, 20)
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 18042)
+	GemRB.SetText(GamePlayWindow, OkButton, 11973)
+	GemRB.SetText(GamePlayWindow, CancelButton, 13957)
+	GemRB.SetText(GamePlayWindow, HotKeyButton, 816)
+	GemRB.SetText(GamePlayWindow, CommentsButton, 17163)
+	GemRB.SetText(GamePlayWindow, AutoPauseButton, 17166)
+	GemRB.SetEvent(GamePlayWindow, DelayButton, 0x00000000, "DelayPress")
+	GemRB.SetEvent(GamePlayWindow, KeySpdButton, 0x00000000, "KeySpdPress")
+	GemRB.SetEvent(GamePlayWindow, MouseSpdButton, 0x00000000, "MouseSpdPress")
+	GemRB.SetEvent(GamePlayWindow, DifficultyButton, 0x00000000, "DifficultyPress")
+	GemRB.SetEvent(GamePlayWindow, BloodButton, 0x00000000, "BloodPress")
+	GemRB.SetEvent(GamePlayWindow, ShowPGButton, 0x00000000, "ShowPGPress")
+	GemRB.SetEvent(GamePlayWindow, InfravisionButton, 0x00000000, "InfravisionPress")
+	GemRB.SetEvent(GamePlayWindow, WeatherButton, 0x00000000, "WeatherPress")
+	GemRB.SetEvent(GamePlayWindow, HealButton, 0x00000000, "HealPress")
+	GemRB.SetEvent(GamePlayWindow, HotKeyButton, 0x00000000, "HotKeyPress")
+	GemRB.SetEvent(GamePlayWindow, CommentsButton, 0x00000000, "CommentsPress")
+	GemRB.SetEvent(GamePlayWindow, AutoPauseButton, 0x00000000, "AutoPausePress")
+	GemRB.SetEvent(GamePlayWindow, OkButton, 0x00000000, "OkPress")
+	GemRB.SetEvent(GamePlayWindow, CancelButton, 0x00000000, "CancelPress")
+	GemRB.ShowModal(GamePlayWindow)
 	return
 	
-def SubtitlePress():
-	global SoundWindow, TextAreaControl
-	GemRB.SetText(SoundWindow, TextAreaControl, 18015)
+def DelayPress():
+	global GamePlayWindow, TextAreaControl
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 18017)
 	return
 	
-def WarCryPress():
-	global SoundWindow, TextAreaControl
-	GemRB.SetText(SoundWindow, TextAreaControl, 18013)
+def KeySpdPress():
+	global GamePlayWindow, TextAreaControl
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 18019)
 	return
 	
-def StepsPress():
-	global SoundWindow, TextAreaControl
-	GemRB.SetText(SoundWindow, TextAreaControl, 18014)
+def MouseSpdPress():
+	global GamePlayWindow, TextAreaControl
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 18018)
 	return
 	
-def ActionPress():
-	global SoundWindow, TextAreaControl
-	GemRB.SetText(SoundWindow, TextAreaControl, 18016)
+def DifficultyPress():
+	global GamePlayWindow, TextAreaControl
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 18020)
 	return
 	
-def SelectionPress():
-	global SoundWindow, TextAreaControl
-	GemRB.SetText(SoundWindow, TextAreaControl, 11352)
+def BloodPress():
+	global GamePlayWindow, TextAreaControl
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 18023)
+	return
+	
+def ShowPGPress():
+	global GamePlayWindow, TextAreaControl
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 18021)
+	return
+	
+def InfravisionPress():
+	global GamePlayWindow, TextAreaControl
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 11797)
+	return
+	
+def WeatherPress():
+	global GamePlayWindow, TextAreaControl
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 20619)
+	return
+	
+def HealPress():
+	global GamePlayWindow, TextAreaControl
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 2242)
+	return
+	
+def HotKeyPress():
+	global GamePlayWindow, TextAreaControl
+	#GemRB.SetText(GamePlayWindow, TextAreaControl, 18016)
+	return
+	
+def CommentsPress():
+	global GamePlayWindow, TextAreaControl
+	#GemRB.SetText(GamePlayWindow, TextAreaControl, 11352)
+	return
+	
+def AutoPausePress():
+	global GamePlayWindow, TextAreaControl
+	#GemRB.SetText(GamePlayWindow, TextAreaControl, 11352)
 	return
 	
 def OkPress():
-	global SoundWindow, TextAreaControl
-	GemRB.SetVisible(SoundWindow, 0)
-	GemRB.SetNextScript("GUIOPT7")
+	global GamePlayWindow, TextAreaControl
+	GemRB.SetVisible(GamePlayWindow, 0)
+	GemRB.SetNextScript("StartOpt")
 	return
 	
 def CancelPress():
-	global SoundWindow, TextAreaControl
-	GemRB.SetVisible(SoundWindow, 0)
-	GemRB.SetNextScript("GUIOPT7")
+	global GamePlayWindow, TextAreaControl
+	GemRB.SetVisible(GamePlayWindow, 0)
+	GemRB.SetNextScript("StartOpt")
 	return
