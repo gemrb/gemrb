@@ -1,6 +1,16 @@
 #character generation (GUICG 0)
 import GemRB
-import ie_stats
+
+IE_SEX =        35
+IE_HATEDRACE =  49
+IE_KIT =        152
+IE_RACE =       201
+IE_CLASS =	202
+IE_MINOR_COLOR =209
+IE_MAJOR_COLOR =210
+IE_SKIN_COLOR = 211
+IE_HAIR_COLOR = 214
+IE_ALIGNMENT =  217
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -113,23 +123,27 @@ def OnLoad():
 def NextPress():
         GemRB.UnloadWindow(CharGenWindow)
 	#set my character up
-	MyChar = GemRB.CreatePlayer("charbase",0) #slot count
+	MyChar = GemRB.CreatePlayer("charbase",GemRB.GetVar("Slot") ) 
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, GemRB.GetVar("Class") )
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, GemRB.GetVar("Alignment") )
-	GemRB.SetPlayerStat(MyChar, IE_HATERACE, GemRB.GetVar("HatedRace") )
+	GemRB.SetPlayerStat(MyChar, IE_HATEDRACE, GemRB.GetVar("HatedRace") )
 	TmpTable=GemRB.LoadTable("ability")
 	AbilityCount = GemRB.GetTableRowCount(TmpTable)
 	for i in range(0,AbilityCount):
-		StatID=GemRB.GetTableValue(i,4)
+		StatID=GemRB.GetTableValue(TmpTable, i,4)
 		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Ability "+str(i) ) )
 	TmpTable=GemRB.LoadTable("weapprof")
 	ProfCount = GemRB.GetTableRowCount(TmpTable)
 	for i in range(7,ProfCount):
 		StatID=GemRB.GetTableValue(TmpTable, i, 0)
 		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Prof "+str(i) ) )
-	GemRB.SetupPlayerInfo() #does all the rest
+	GemRB.FillPlayerInfo(MyChar) #does all the rest
+	GemRB.SetPlayerStat(MyChar, IE_SKIN_COLOR, GemRB.GetVar("Skin") )
+	GemRB.SetPlayerStat(MyChar, IE_HAIR_COLOR, GemRB.GetVar("Hair") )
+	GemRB.SetPlayerStat(MyChar, IE_MAJOR_COLOR, GemRB.GetVar("Major") )
+	GemRB.SetPlayerStat(MyChar, IE_MINOR_COLOR, GemRB.GetVar("Minor") )
 	#LETS PLAY!!
 	GemRB.EnterGame()
 	return

@@ -1,4 +1,3 @@
-
 IE_SEX =		35
 global IE_SEX
 IE_KIT =	152 
