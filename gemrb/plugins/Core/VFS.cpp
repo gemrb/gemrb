@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.9 2005/02/15 17:39:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.10 2005/02/15 22:54:18 edheldil Exp $
  *
  */
 
@@ -263,17 +263,19 @@ char* PathJoin (char* target, ...)
  */
 void FixPath (char *path, bool needslash)
 {
-	unsigned int i=strlen(path)-1;
+	unsigned int i = strlen( path ) - 1;
 
-	if(i>=_MAX_PATH) return; //don't do anything
-	if(needslash) {
-		if(path[i]=='/' || path[i]=='\\') return;
+	if (needslash) {
+		if (path[i] == PathDelimiter) return;
+
+		// if path is already too long, don't do anything
+		if (i >= _MAX_PATH - 2) return;
 		i++;
-		path[i++]=PathDelimiter;
+		path[i++] = PathDelimiter;
 	}
 	else {
-		if(path[i]!='/' && path[i]!='\\') return;
+		if (path[i] != PathDelimiter) return;
 	}
-	path[i]=0;
+	path[i] = 0;
 }
 
