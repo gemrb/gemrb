@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.239 2004/11/13 01:12:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.240 2004/11/13 15:56:13 avenger_teambg Exp $
  *
  */
 
@@ -3937,7 +3937,6 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	TmpItem->Usages[2]=Charge2;
 	TmpItem->Flags=IE_INV_ITEM_ACQUIRED;
 	core->ResolveRandomItem(TmpItem);
-printf("Resolved to %s\n",TmpItem->ItemResRef);
 	int res = actor->inventory.AddSlotItem( TmpItem, SlotID );
 	if (res!=2) {
 		printf("Inventory is full\n");

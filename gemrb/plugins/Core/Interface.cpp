@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.234 2004/11/13 01:12:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.235 2004/11/13 15:56:12 avenger_teambg Exp $
  *
  */
 
@@ -2517,7 +2517,7 @@ bool Interface::ReadItemTable(ieResRef TableName, const char * Prefix)
 {
 	ieResRef ItemName;
 	TableMgr * tab;
-	ieResRef *Items;
+	ieResRef *itemlist;
 	int i,j;
 
 	int table=LoadTable(TableName);
@@ -2536,14 +2536,19 @@ bool Interface::ReadItemTable(ieResRef TableName, const char * Prefix)
 			strncpy(ItemName,tab->GetRowName(j),sizeof(ieResRef) );
 		}
 		//Variable elements are free'd, so we have to use malloc
-		Items = (ieResRef *) malloc(sizeof(ieResRef) * 20 );
-		for(int k=0;k<20;k++) {
-			strncpy(Items[k],tab->QueryField(j,k),sizeof(ieResRef) );
+		int l=tab->GetColumnCount(j);
+		if (l<1) continue;
+		//we just allocate one more ieResRef for the item count
+		itemlist = (ieResRef *) malloc( sizeof(ieResRef) * (l+1) );
+		//ieResRef (9 bytes) is bigger than int (on any platform)
+		*(int *) itemlist=l;
+		for(int k=1;k<=l;k++) {
+			strncpy(itemlist[k],tab->QueryField(j,k),sizeof(ieResRef) );
 		}
 		ItemName[8]=0;
 		strupr(ItemName);
-		printf("Adding random item: %s\n",ItemName);
-		RtRows->SetAt(ItemName, (const char *) Items);
+		printf("Adding random item: %s ItemPointer:%d\n",ItemName,(int) itemlist);
+		RtRows->SetAt(ItemName, (const char *) itemlist);
 	}
 end:
 	DelTable(table);
@@ -2580,7 +2585,6 @@ bool Interface::ReadRandomItems()
 	if( GoldResRef[0]=='*' ) {
 		return false;
 	}
-printf("GoldResRef: %s\n",GoldResRef);
 	strncpy( RtResRef, tab->QueryField( 1, difflev ), sizeof(ieResRef) );
 	i=atoi( RtResRef );
 	if(i<1) {
@@ -2609,37 +2613,47 @@ CREItem *Interface::ReadItem(DataStream *str)
 	str->ReadWord( &itm->Usages[1] );
 	str->ReadWord( &itm->Usages[2] );
 	str->ReadDword( &itm->Flags );
-	ResolveRandomItem(itm);
-	return itm;
+	if(ResolveRandomItem(itm) )
+	{
+		return itm;
+	}
+	delete itm;
+	return NULL;
 }
 
-void Interface::ResolveRandomItem(CREItem *itm)
+bool Interface::ResolveRandomItem(CREItem *itm)
 {
-	if(!RtRows) return;
-	ieResRef *Items=NULL;
-	RtRows->Lookup( itm->ItemResRef, (char *) Items );
-	if( !Items ) {
-		printf("%s [NOT FOUND]\n",itm->ItemResRef);
-		return;
+	if(!RtRows) return true;
+	char *itemlist=NULL;
+	if( (!RtRows->Lookup( itm->ItemResRef, itemlist )) )
+	{
+		return true;
 	}
 	int i,j,k;
 	char *endptr;
-	i=Roll(1,20,-1); //0-19
+	i=Roll(1,*(int *) itemlist,0);
 	ieResRef NewItem;
-	strncpy( NewItem, Items[i], sizeof(ieResRef) );
-	i=(int) (strchr(NewItem,'*')-NewItem);
-	if(i!=-1) NewItem[i]=0;
-	j=strtol(NewItem,&endptr,10);
-	k=strtol(NewItem+i+1,NULL,10);
-	if(i!=-1) itm->Usages[0]=k;
-	else {
-		if(*endptr) strncpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
-		else {
-			strncpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
-			itm->Usages[0]=Roll(j,k,0);
-		}
+	strncpy( NewItem, ((ieResRef *) itemlist)[i], sizeof(ieResRef) );
+	char *p=(char *) strchr(NewItem,'*');
+	if(p)
+	{
+		*p=0; //doing this so endptr is ok
+		k=strtol(p+1,NULL,10);
 	}
-printf("Resolved item: %s stack:%d\n",itm->ItemResRef, itm->Usages[0]);
+	else {
+		k=1;
+	}
+	j=strtol(NewItem,&endptr,10);
+	if(*endptr) strncpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
+	else {
+		strncpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
+		itm->Usages[0]=Roll(j,k,0);
+	}
+	if( !memcmp( itm->ItemResRef,"NO_DROP",8 ) ) {
+		itm->ItemResRef[0]=0;
+	}
+	if( !itm->ItemResRef[0] ) return false;
+	return true;
 }
 
 Item* Interface::GetItem(const char* resname)

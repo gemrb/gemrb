@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.35 2004/11/07 19:41:16 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.36 2004/11/13 15:56:12 avenger_teambg Exp $
  *
  */
 
@@ -50,6 +50,7 @@ Inventory::~Inventory()
 
 void Inventory::AddItem(CREItem *item)
 {
+	if(!item) return; //invalid items get no slot
 	Slots.push_back(item);
 	//Changed=true; //probably not needed, chests got no encumbrance
 }
