@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.18 2003/12/22 22:09:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.19 2003/12/23 15:16:17 avenger_teambg Exp $
  *
  */
 
@@ -40,7 +40,7 @@ ScrollBar::~ScrollBar(void)
 
 void ScrollBar::SetPos(int NewPos)
 {
-	if(Pos==NewPos)
+	if(Pos && (Pos==NewPos) )
 		return;
 	Pos=NewPos;
 	if(ta) {
