@@ -61,6 +61,10 @@ GameControl::GameControl(void)
 	AIUpdateCounter = 1;
 	effect = NULL;
 	DisableMouse = false;
+	LeftCount = 0;
+	BottomCount = 0;
+	RightCount = 0;
+	TopCount = 0;
 }
 
 GameControl::~GameControl(void)
@@ -546,5 +550,197 @@ void GameControl::SetCutSceneMode(bool active)
 	}
 	else {
 		core->GetVideoDriver()->SetCursor(core->Cursors[lastCursor]->GetFrame(0), core->Cursors[lastCursor+1]->GetFrame(0));
+	}
+}
+
+void GameControl::HideGUI()
+{
+	Variables * dict = core->GetDictionary();
+	unsigned long index;
+	if(dict->Lookup("MessageWindow", index)) {
+		Window * mw = core->GetWindow(index);
+		mw->Visible = false;
+		mw->Invalidate();
+		if(dict->Lookup("MessagePosition", index)) {
+			ResizeDel(mw, index);
+		}
+	}
+	if(dict->Lookup("OptionsWindow", index)) {
+		Window * ow = core->GetWindow(index);
+		ow->Visible = false;
+		ow->Invalidate();
+		if(dict->Lookup("OptionsPosition", index)) {
+			ResizeDel(ow, index);
+		}
+	}
+	if(dict->Lookup("PortraitWindow", index)) {
+		Window * pw = core->GetWindow(index);
+		pw->Visible = false;
+		pw->Invalidate();
+		if(dict->Lookup("PortraitPosition", index)) {
+			ResizeDel(pw, index);
+		}
+	}
+	if(dict->Lookup("ActionsWindow", index)) {
+		Window * aw = core->GetWindow(index);
+		aw->Visible = false;
+		aw->Invalidate();
+		if(dict->Lookup("ActionsPosition", index)) {
+			ResizeDel(aw, index);
+		}
+	}
+	if(dict->Lookup("TopWindow", index)) {
+		Window * tw = core->GetWindow(index);
+		tw->Visible = false;
+		tw->Invalidate();
+		if(dict->Lookup("TopPosition", index)) {
+			ResizeDel(tw, index);
+		}
+	}
+	core->GetVideoDriver()->SetViewport(0,0, Width, Height);
+}
+
+void GameControl::UnhideGUI()
+{
+	Variables * dict = core->GetDictionary();
+	unsigned long index;
+	if(dict->Lookup("MessageWindow", index)) {
+		Window * mw = core->GetWindow(index);
+		mw->Visible = true;
+		mw->Invalidate();
+		core->SetOnTop(index);
+		if(dict->Lookup("MessagePosition", index)) {
+			ResizeAdd(mw, index);
+		}
+	}
+	if(dict->Lookup("OptionsWindow", index)) {
+		Window * ow = core->GetWindow(index);
+		ow->Visible = true;
+		ow->Invalidate();
+		core->SetOnTop(index);
+		if(dict->Lookup("OptionsPosition", index)) {
+			ResizeAdd(ow, index);
+		}
+	}
+	if(dict->Lookup("PortraitWindow", index)) {
+		Window * pw = core->GetWindow(index);
+		pw->Visible = true;
+		pw->Invalidate();
+		core->SetOnTop(index);
+		if(dict->Lookup("PortraitPosition", index)) {
+			ResizeAdd(pw, index);
+		}
+	}
+	if(dict->Lookup("ActionsWindow", index)) {
+		Window * aw = core->GetWindow(index);
+		aw->Visible = true;
+		aw->Invalidate();
+		core->SetOnTop(index);
+		if(dict->Lookup("ActionsPosition", index)) {
+			ResizeAdd(aw, index);
+		}
+	}
+	if(dict->Lookup("TopWindow", index)) {
+		Window * tw = core->GetWindow(index);
+		tw->Visible = true;
+		tw->Invalidate();
+		if(dict->Lookup("TopPosition", index)) {
+			ResizeAdd(tw, index);
+		}
+	}
+	core->GetVideoDriver()->SetViewport(0,0, Width, Height);
+}
+
+void GameControl::ResizeDel(Window * win, unsigned char type)
+{
+	switch(type) {
+		case 0: //Left
+			{
+				LeftCount--;
+				if(!LeftCount) {
+					((Window*)Owner)->XPos-=win->Width;
+					((Window*)Owner)->Width+=win->Width;
+					Width = ((Window*)Owner)->Width;
+				}
+			}
+		break;
+
+		case 1: //Bottom
+			{
+				BottomCount--;
+				if(!BottomCount) {
+					((Window*)Owner)->Height+=win->Height;
+					Height = ((Window*)Owner)->Height;
+				}
+			}
+		break;
+
+		case 2: //Right
+			{
+				RightCount--;
+				if(!RightCount) {
+					((Window*)Owner)->Width+=win->Width;
+					Width = ((Window*)Owner)->Width;
+				}
+			}
+		break;
+
+		case 3: //Top
+			{
+				TopCount--;
+				if(!TopCount) {
+					((Window*)Owner)->YPos-=win->Height;
+					((Window*)Owner)->Height+=win->Height;
+					Height = ((Window*)Owner)->Height;
+				}
+			}
+		break;
+	}
+}
+
+void GameControl::ResizeAdd(Window * win, unsigned char type)
+{
+	switch(type) {
+		case 0: //Left
+			{
+				LeftCount++;
+				if(LeftCount == 1) {
+					((Window*)Owner)->XPos+=win->Width;
+					((Window*)Owner)->Width-=win->Width;
+					Width = ((Window*)Owner)->Width;
+				}
+			}
+		break;
+
+		case 1: //Bottom
+			{
+				BottomCount++;
+				if(BottomCount == 1) {
+					((Window*)Owner)->Height-=win->Height;
+					Height = ((Window*)Owner)->Height;
+				}
+			}
+		break;
+
+		case 2: //Right
+			{
+				RightCount++;
+				if(RightCount == 1) {
+					((Window*)Owner)->Width-=win->Width;
+					Width = ((Window*)Owner)->Width;
+				}
+			}
+		break;
+
+		case 3: //Top
+			{
+				TopCount++;
+				if(TopCount == 1) {
+					((Window*)Owner)->YPos+=win->Height;
+					((Window*)Owner)->Height-=win->Height;
+					Height = ((Window*)Owner)->Height;
+				}
+			}
+		break;
 	}
 }

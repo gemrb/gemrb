@@ -70,8 +70,13 @@ public: //Events
 	void OnSpecialKeyPress(unsigned char Key);
 private:
 	void CalculateSelection(unsigned short x, unsigned short y);
+	void ResizeDel(Window * win, unsigned char type);
+	void ResizeAdd(Window * win, unsigned char type);
 public:
 	void SetCutSceneMode(bool active);
+	void HideGUI();
+	void UnhideGUI();
+	unsigned char LeftCount, BottomCount, RightCount, TopCount;
 };
 
 #endif
