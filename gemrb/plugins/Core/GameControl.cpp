@@ -42,6 +42,7 @@ GameControl::GameControl(void)
 {
 	MapIndex = -1;
 	Changed = true;
+	ChangeArea = false;
 	lastActor = NULL;
 	MouseIsDown = false;
 	DrawSelectionRect = false;
@@ -79,6 +80,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 {
 	if(MapIndex == -1)
 		return;
+	if(ChangeArea)
+		ChangeMap();
 	Video * video = core->GetVideoDriver();
 	Region viewport = core->GetVideoDriver()->GetViewport();
 	viewport.x += video->moveX;
@@ -315,6 +318,23 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				core->GetVideoDriver()->ConvertToGame(pfsX, pfsY);
 			}
 		break;
+
+		case 't': // t
+			{
+				if(selected.size() == 1) {
+					Actor * actor = selected[0];
+					short cX = lastMouseX; 
+					short cY = lastMouseY;
+					core->GetVideoDriver()->ConvertToGame(cX, cY);
+					unsigned int XPos = cX, YPos = cY;
+					core->GetPathFinder()->AdjustPosition(XPos, YPos);
+					actor->XPos = XPos;
+					actor->YPos = YPos;
+					printf("Teleported to %d, %d\n", XPos, YPos);
+				}
+			}
+		break;
+
 		case 'x': // 'x'
 			{
 				Game * game = core->GetGame();
@@ -372,7 +392,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	overInfoPoint = area->tm->GetInfoPoint(GameX, GameY);
 	if(overInfoPoint) {
-		if(overInfoPoint->Type == ST_TRIGGER)
+		if(overInfoPoint->Type != ST_PROXIMITY)
 			nextCursor = overInfoPoint->Cursor;
 	}
 
@@ -475,6 +495,37 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 				}
 				return;
 			}
+			if(overInfoPoint) {
+				switch(overInfoPoint->Type) {
+					case ST_TRIGGER:
+						{
+							if(overInfoPoint->Scripts[0]) {
+								overInfoPoint->LastTrigger = selected[0];
+								overInfoPoint->Clicker = selected[0];
+								overInfoPoint->Scripts[0]->Update();
+							} else {
+								if(overInfoPoint->overHeadText) {
+									if(overInfoPoint->textDisplaying != 1) {
+										overInfoPoint->textDisplaying = 1;
+										//infoTexts.push_back(overInfoPoint);
+										GetTime(overInfoPoint->timeStartDisplaying);
+										DisplayString(overInfoPoint);
+									}
+								}
+							}
+						}
+					break;
+
+					case ST_TRAVEL:
+						{
+							actor->ClearActions();
+							char Tmp[256];
+							sprintf(Tmp, "MoveToPoint([%d,%d])", overInfoPoint->XPos, overInfoPoint->YPos);
+							actor->AddAction(GameScript::CreateAction(Tmp, true));
+						}
+					break;
+				}
+			}
 			if(!overInfoPoint || (overInfoPoint->Type != ST_TRIGGER)) {
 				//actor->WalkTo(GameX, GameY);
 				actor->ClearActions();
@@ -489,7 +540,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 					if(win) {
 						TextArea * ta = (TextArea*)win->GetControl(TAIndex);
 						char Text[256];
-						sprintf(Text, "[color=FF0000]Selected[/color]: %s", actor->LongName);
+						sprintf(Text, "[color=FF0000]%s: [/color]MoveToPoint(%d,%d)", actor->LongName, GameX, GameY);
 						ta->AppendText(Text, -1);
 					}
 				}
@@ -501,24 +552,6 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 		if(actor) {
 			selected.push_back(actor);
 			actor->Select(true);
-		}
-		if(overInfoPoint) {
-			if(overInfoPoint->Type == ST_TRIGGER) {
-				if(overInfoPoint->Scripts[0] && (selected.size() == 1)) {
-					overInfoPoint->LastTrigger = selected[0];
-					overInfoPoint->Clicker = selected[0];
-					overInfoPoint->Scripts[0]->Update();
-				} else {
-					if(overInfoPoint->overHeadText) {
-						if(overInfoPoint->textDisplaying != 1) {
-							overInfoPoint->textDisplaying = 1;
-							//infoTexts.push_back(overInfoPoint);
-							GetTime(overInfoPoint->timeStartDisplaying);
-							DisplayString(overInfoPoint);
-						}
-					}
-				}
-			}
 		}
 	}
 	else {
@@ -963,4 +996,44 @@ void GameControl::DisplayString(Scriptable * target)
 	scr->YPos = target->YPos;
 	scr->MySelf = target;
 	infoTexts.push_back(scr);
+}
+
+void GameControl::MoveToArea(char *Destination, char *EntranceName, bool fullParty)
+{
+	strcpy(this->Destination, Destination);
+	if(EntranceName[0] != 0)
+		strcpy(this->EntranceName, EntranceName);
+	ChangeArea = true;
+}
+
+void GameControl::ChangeMap()
+{
+	ds = NULL;
+	speaker = NULL;
+	target = NULL;
+	dlg = NULL;
+	overInfoPoint = NULL;
+	overContainer = NULL;
+	overDoor = NULL;
+	selected.clear();
+	core->GetGame()->DelMap(MapIndex, true);
+	int mi = core->GetGame()->LoadMap(Destination);
+	Map * map = core->GetGame()->GetMap(mi);
+	SetCurrentArea(mi);
+	Actor * pc = core->GetGame()->GetPC(0);
+	pc->ClearActions();
+	pc->ClearPath();
+	pc->AnimID = IE_ANI_AWAKE;
+	pc->CurrentAction = NULL;
+	selected.push_back(pc);
+	if(EntranceName[0] && pc) {
+		Entrance * ent = map->GetEntrance(EntranceName);
+		unsigned int XPos = ent->XPos, YPos = ent->YPos;
+		core->GetPathFinder()->AdjustPosition(XPos, YPos);
+		pc->XPos = (unsigned short)XPos;
+		pc->YPos = (unsigned short)YPos;
+		Region vp = core->GetVideoDriver()->GetViewport();
+		core->GetVideoDriver()->SetViewport(XPos-(vp.w/2), YPos-(vp.h/2));
+	}
+	ChangeArea = false;
 }

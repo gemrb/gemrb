@@ -78,6 +78,8 @@ private:
 	DialogState * ds;
 	Actor * speaker, * target;
 	Dialog * dlg;
+	char Destination[33], EntranceName[33];
+	bool ChangeArea;
 public:
 	void SetCutSceneMode(bool active);
 	void HideGUI();
@@ -86,6 +88,9 @@ public:
 	bool Dialogue;
 	void DialogChoose(int choose);
 	void DisplayString(Scriptable * target);
+	void MoveToArea(char *Destination, char *EntranceName, bool fullParty = false);
+private:
+	void ChangeMap();
 };
 
 #endif
