@@ -175,6 +175,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				infoTexts[i]->textDisplaying = 0;
 				std::vector<Scriptable*>::iterator m;
 				m = infoTexts.begin()+i;
+				(*m)->MySelf->textDisplaying = 0;
 				delete(*m);
 				infoTexts.erase(m);
 				i--;
@@ -945,5 +946,6 @@ void GameControl::DisplayString(Scriptable * target)
 	scr->timeStartDisplaying = target->timeStartDisplaying;
 	scr->XPos = target->XPos;
 	scr->YPos = target->YPos;
+	scr->MySelf = target;
 	infoTexts.push_back(scr);
 }
