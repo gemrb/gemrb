@@ -23,8 +23,7 @@ def OnLoad():
 		Button = GemRB.GetControl(RaceWindow,i)
 		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		
-	Race = GemRB.GetVar("Race")
-	GemRB.SetVar("BaseRace",Race)
+	Race = GemRB.GetVar("BaseRace")
 	RaceName = GemRB.GetTableRowName(RaceTable, Race-1)
 
 	PureRace = GemRB.GetTableValue(SubRacesTable, RaceName , "PURE_RACE")
@@ -79,7 +78,8 @@ def SubRacePress():
 def BackPress():
 	GemRB.UnloadWindow(RaceWindow)
 	GemRB.SetNextScript("Race")
-	GemRB.SetVar("Race",0)  #scrapping the race value
+	GemRB.SetVar("Race",0)  #scrapping the subrace value
+	GemRB.SetVar("BaseRace",0)  #scrapping the race value
 	return
 
 def NextPress():

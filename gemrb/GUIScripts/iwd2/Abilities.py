@@ -16,7 +16,7 @@ def CalcLimits(Abidx):
 
 	RaceTable = GemRB.LoadTable("races")
 	Abracead = GemRB.LoadTable("ABRACEAD")
-	Race = GemRB.GetVar("Race")-1
+	Race = GemRB.GetVar("BaseRace")-1
 	RaceName = GemRB.GetTableRowName(RaceTable, Race)
 
 	Minimum = 3

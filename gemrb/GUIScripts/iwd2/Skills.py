@@ -104,7 +104,7 @@ def OnLoad():
 
 	SkillRacTable = GemRB.LoadTable("SKILLRAC")
 	RaceTable = GemRB.LoadTable("RACES")
-	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race")-1)
+	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("BaseRace")-1)
 
 	for i in range(0,RowCount):
 		SkillName = GemRB.GetTableRowName(SkillTable,i)

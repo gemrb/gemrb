@@ -26,12 +26,15 @@ def RefreshPDoll():
 	AnimID=0x6000
 	table=GemRB.LoadTable("avprefr")
 	AnimID=AnimID+GemRB.GetTableValue(table,GemRB.GetVar("BaseRace"),0)
+	print "baserace:", hex(GemRB.GetVar("BaseRace") )
 	table=GemRB.LoadTable("avprefc")
 	AnimID=AnimID+GemRB.GetTableValue(table,GemRB.GetVar("BaseClass"),0)
+	print "baseclass:", hex(GemRB.GetVar("BaseClass") )
 	table=GemRB.LoadTable("avprefg")
 	AnimID=AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
 	print "Anim ID:", hex(AnimID)
 	ResRef=GemRB.GetTableValue(PDollTable,hex(AnimID), "AT_1")+"G1"
+	print "ResRef:", ResRef 
 	GemRB.SetButtonBAM(ColorWindow, PDollButton, ResRef,10,0,0)
 	GemRB.SetButtonFlags(ColorWindow, PDollButton, IE_GUI_BUTTON_ANIMATED,OP_OR)
 	return
