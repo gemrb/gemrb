@@ -485,8 +485,8 @@ void SDLVideoDriver::BlitTiled(Region rgn, Sprite2D * img, bool anchor)
 		rgn.x -= Viewport.x;
 		rgn.y -= Viewport.y;
 	}
-	int xrep = (int)ceil(rgn.w/img->Width);
-	int yrep = (int)ceil(rgn.h/img->Height);
+	int xrep = (rgn.w + img->Width - 1)/img->Width;
+	int yrep = (rgn.h + img->Height - 1)/img->Height;
 	for(int y = 0; y < yrep; y++) {
 		for(int x = 0; x < xrep; x++) {
 			SDL_Rect srect = {0,0, ((img->Width % rgn.w) == 0) ? img->Width : img->Width % rgn.w, ((img->Height % rgn.h) == 0) ? img->Height : img->Height % rgn.h };
