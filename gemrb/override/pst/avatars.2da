@@ -36,6 +36,7 @@
 0x20       CGDGB      CGDGB      CGDGB      CGDGB      16          2          
 0x21       CGRIB      CGRIB      CGRIB      CGRIB      19          2          
 0x22       CGRKB      CGRKB      CGRKB      CGRKB      19          2          
+0x23	   CHRSB      CHRSB      CHRSB      CHRSB      19          2
 0x24       CIGYB      CIGYB      CIGYB      CIGYB      16          2          
 0x25       CJBRB      CJBRB      CJBRB      CJBRB      16          2          
 0x26       CJFTB      CJFTB      CJFTB      CJFTB      19          2          
