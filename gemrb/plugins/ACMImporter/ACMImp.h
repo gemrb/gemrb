@@ -36,6 +36,7 @@ public:
 	unsigned long LoadFile(const char * filename);
 	bool Play(unsigned long index);
 	bool Stop(unsigned long index);
+	void ResetMusics();
 };
 
 #endif

@@ -44,6 +44,7 @@ bool MUSImp::OpenPlaylist(const char * name)
 		return true;
 	if(Playing)
 		return false;
+	core->GetSoundMgr()->ResetMusics();
 	playlist.clear();
 	PLpos = 0;
 	char path[_MAX_PATH];

@@ -346,3 +346,8 @@ bool ACMImp::Play(unsigned long index)
 	streams[index].end = false;
 	return true;
 }
+
+void ACMImp::ResetMusics()
+{
+	clearstreams(true);
+}

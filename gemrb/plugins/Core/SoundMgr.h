@@ -25,6 +25,7 @@ public:
 	virtual unsigned long LoadFile(const char * filename) = 0;
 	virtual bool Stop(unsigned long index) = 0;
 	virtual bool Play(unsigned long index) = 0;
+	virtual void ResetMusics() = 0;
 };
 
 #endif
