@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.97 2004/07/25 00:23:16 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.98 2004/07/25 11:38:35 edheldil Exp $
  *
  */
 
@@ -355,7 +355,7 @@ public:
 	char CD6[_MAX_PATH];
 	int Width, Height, Bpp, ForceStereo;
 	unsigned int TooltipDelay;
-	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos;
+	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);
 	/** Sends a termination signal to the Video Driver */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.26 2004/05/09 14:34:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.27 2004/07/25 11:38:35 edheldil Exp $
  *
  */
 
@@ -67,18 +67,20 @@ int main(int argc, char** argv)
 			core->GetGUIScriptEngine()->RunFunction( "OnLoad" );
 		}
 		core->DrawWindows();
-		frame++;
-		GetTime( time );
-		if (time - timebase > 1000) {
-			frames = ( frame * 1000.0 / ( time - timebase ) );
-			timebase = time;
-			frame = 0;
-			sprintf( fpsstring, "%.3f fps", frames );
+		if (core->DrawFPS) {
+			frame++;
+			GetTime( time );
+			if (time - timebase > 1000) {
+				frames = ( frame * 1000.0 / ( time - timebase ) );
+				timebase = time;
+				frame = 0;
+				sprintf( fpsstring, "%.3f fps", frames );
+			}
+			core->GetVideoDriver()->DrawRect( bg, fpsblack );
+			fps->Print( Region( 0, 0, 100, 20 ),
+				    ( unsigned char * ) fpsstring, palette,
+				    IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 		}
-		core->GetVideoDriver()->DrawRect( bg, fpsblack );
-		fps->Print( Region( 0, 0, 100, 20 ),
-				( unsigned char * ) fpsstring, palette,
-				IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 	} while (core->GetVideoDriver()->SwapBuffers() == GEM_OK);
 	core->GetVideoDriver()->FreePalette( palette );
 	delete( core );

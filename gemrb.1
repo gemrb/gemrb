@@ -138,6 +138,13 @@ the intro and logo videos are skipped to save developer's nerves. Default is
 .IR 0 .
 
 .TP
+.BR DrawFPS =(0|1)
+This parameter is meant for developers. If set to
+.IR 1 ,
+current FPS (Frames per Second) value is drawn in top left window corner. Default is
+.IR 0 .
+
+.TP
 .BR CaseSensitive =(0|1)
 When 
 this parameter is set to 
@@ -198,38 +205,6 @@ defaults to
 
 
 .TP
-.BR MidResAvatars =(0|1)
-
-.\".TP
-.\".BR HasSongList =(0|1)
-
-.\".TP
-.\".BR UpperButtonText =(0|1)
-.\"Convert all button labels to upper case?
-
-.\".TP
-.\".BR LowerLabelText =(0|1)
-.\"Convert all labels to lower case?
-
-.\".TP
-.\".BR HasPartyINI =(0|1)
-
-.\".TP
-.\".BR HasBeastsINI =(0|1)
-.\"Whether game directory contains 
-.\".I beast.ini 
-.\"and 
-.\".I quests.ini
-.\"files. Descriptions
-.\"of quests and beasts are held in these files.
-
-.\"Set this option to
-.\".I 1
-.\"for PST game and to
-.\".I 0
-.\"elsewhere, since these files are found on PST only.
-
-.TP
 .BR GameDataPath =PATH
 Path to original game's installed data files, relative to GamePath.
 Usually it's 
@@ -242,14 +217,6 @@ Path to original game's override dir, relative to GamePath.
 Usually it's 
 .IR override .
 Original games use this directory to place last-minute patches.
-
-.\".TP
-.\".BR CursorBAM =RESREF
-.\"Name of resource with cursor pixmap.
-
-.\".TP
-.\".BR ButtonFont =RESREF
-.\"Name of resource with font used for button labels.
 
 .\"###################################################
 .SH FILES

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.176 2004/07/25 00:23:16 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.177 2004/07/25 11:38:35 edheldil Exp $
  *
  */
 
@@ -105,6 +105,7 @@ Interface::Interface(int iargc, char** iargv)
 #endif
 	GameOnCD = false;
 	SkipIntroVideos = false;
+	DrawFPS = false;
 	TooltipDelay = 100;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
@@ -857,6 +858,8 @@ bool Interface::LoadConfig(const char* filename)
 			FullScreen = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "SkipIntroVideos" ) == 0) {
 			SkipIntroVideos = ( atoi( value ) == 0 ) ? false : true;
+		} else if (stricmp( name, "DrawFPS" ) == 0) {
+			DrawFPS = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "CaseSensitive" ) == 0) {
 			CaseSensitive = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "GameOnCD" ) == 0) {
@@ -875,14 +878,12 @@ bool Interface::LoadConfig(const char* filename)
 			strcpy( GemRBPath, value );
 		} else if (stricmp( name, "CachePath" ) == 0) {
 			strcpy( CachePath, value );
-			struct stat mystat;
-			stat( CachePath, &mystat );
-			if (!( mystat.st_mode & S_IFDIR )) {
-				printf( "%s folder doesn't exist!", CachePath );
+			if (! dir_exists( CachePath )) {
+				printf( "Cache folder %s doesn't exist!", CachePath );
 				fclose( config );
 				return false;
 			}
-      strcat(CachePath,"/");
+			strcat( CachePath, SPathDelimiter );
 		} else if (stricmp( name, "GUIScriptsPath" ) == 0) {
 			strcpy( GUIScriptsPath, value );
 #ifndef WIN32
@@ -903,10 +904,6 @@ bool Interface::LoadConfig(const char* filename)
 #ifndef WIN32
 			ResolveFilePath( SavePath );
 #endif
-			/*
-		} else if (stricmp( name, "INIConfig" ) == 0) {
-			strcpy( INIConfig, value );
-			*/
 		} else if (stricmp( name, "CD1" ) == 0) {
 			strcpy( CD1, value );
 #ifndef WIN32
