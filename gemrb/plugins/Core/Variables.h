@@ -81,7 +81,7 @@ protected:
 	};
 public:
 // Construction
-	Variables(int nBlockSize = 10, int nHashTableSize=32769);
+	Variables(int nBlockSize = 10, int nHashTableSize=2049);
 
 // Attributes
 	// number of elements

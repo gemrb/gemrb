@@ -149,7 +149,7 @@ Variables::GetAssocAt(const char *key, unsigned int& nHash) const
 	MyAssoc* pAssoc;
 	for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL; pAssoc = pAssoc->pNext)
 	{
-		if(!strnicmp(pAssoc->key, key,8) )
+		if(!strnicmp(pAssoc->key, key,MAX_VARIABLE_LENGTH) )
 			return pAssoc;
 	}
 	return NULL;
