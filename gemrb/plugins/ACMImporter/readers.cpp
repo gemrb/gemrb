@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.5 2004/04/14 23:53:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.6 2004/04/17 19:37:23 avenger_teambg Exp $
  *
  */
 
@@ -71,12 +71,6 @@ int CACMReader::make_new_samples()
 		return 0;
 	}
 
-	long* test = block;
-	for (int i = 0; i < block_size; i++, test++)
-		if (*( short * ) test != *test) {
-			printf( "! %ld ", *test );
-		}
-
 	decoder->decode_data( block, subblocks );
 	values = block;
 	samples_ready = ( block_size > samples_left ) ? samples_left : block_size;
@@ -84,6 +78,7 @@ int CACMReader::make_new_samples()
 
 	return 1;
 }
+
 long CACMReader::read_samples(short* buffer, long count)
 {
 	long res = 0;
@@ -100,8 +95,6 @@ long CACMReader::read_samples(short* buffer, long count)
 		res += 1;
 		samples_ready--;
 	}
-	for (int i = res; i < count; i++, buffer++)
-		*buffer = 0;
 	return res;
 }
 
@@ -127,6 +120,7 @@ CSoundReader* CreateSoundReader(DataStream* stream, int type, long samples,
 	return res;
 }
 
+/*
 short CSoundReader::read_one_sample()
 {
 	short res;
@@ -135,15 +129,16 @@ short CSoundReader::read_one_sample()
 	} // no more samples left => return 0;
 	return res;
 }
+*/
 
 int CRawPCMReader::init_reader()
 {
 	if (samples < 0) {
 		samples = stream->Size();
 		stream->Seek( 0, GEM_STREAM_START );
-		//fseek (file, 0, SEEK_END); samples = ftell (file); rewind (file);
-		if (is16bit)
+		if (is16bit) {
 			samples >>= 1; // each sample has 16 bit
+		}
 	}
 	samples_left = samples;
 	return 1;
@@ -151,25 +146,24 @@ int CRawPCMReader::init_reader()
 
 long CRawPCMReader::read_samples(short* buffer, long count)
 {
-	long bkup_count = count;
 	if (count > samples_left) {
 		count = samples_left;
 	}
-	long res = 0, i;
+	long res = 0;
 	if (count) {
 		res = stream->Read( buffer, count * ( ( is16bit ? 2 : 1 ) ) );
 	}
-	//res = fread (buffer, (is16bit)?2:1, count, file);
 	if (!is16bit) {
 		char* alt_buff = ( char* ) buffer;
-		for (i = res - 1; i >= 0; i--) {
+		long i=res;
+		while(i--) {
 			alt_buff[( i << 1 ) + 1] = ( char ) ( alt_buff[i] - 0x80 );
 			alt_buff[i << 1] = 0;
 		}
 	}
-	buffer += res;
-	for (i = res; i < bkup_count; i++, buffer++)
-		*buffer = 0;
+	if(is16bit) {
+		res >>= 1;
+	}
 	samples_left -= res;
 	return res;
 }
@@ -186,32 +180,27 @@ int CWavPCMReader::init_reader()
 	memset( &fmt, 0, sizeof( fmt ) );
 	stream->Read( &r_hdr, sizeof( r_hdr ) );
 	stream->Read( &wave, 4 );
-	//fread (&r_hdr, 1, sizeof(r_hdr), file); fread (&wave, 1, 4, file);
 	if (r_hdr.fourcc != *( unsigned long * ) RIFF_4cc ||
 		wave != *( unsigned long * ) WAVE_4cc) {
 		return 0;
 	}
 
 	stream->Read( &fmt_hdr, sizeof( fmt_hdr ) );
-	//fread (&fmt_hdr, 1, sizeof(fmt_hdr), file);
 	if (fmt_hdr.fourcc != *( unsigned long * ) fmt_4cc ||
 		fmt_hdr.length > sizeof( cWAVEFORMATEX )) {
 		return 0;
 	}
 	stream->Read( &fmt, fmt_hdr.length );
-	//fread (&fmt, 1, fmt_hdr.length, file);
 	if (fmt.wFormatTag != 1) {
 		return 0;
 	}
 	is16bit = ( fmt.wBitsPerSample == 16 );
 
 	stream->Read( &data_hdr, sizeof( data_hdr ) );
-	//fread (&data_hdr, 1, sizeof(data_hdr), file);
+
 	if (data_hdr.fourcc == *( unsigned long * ) fact_4cc) {
 		stream->Seek( data_hdr.length, GEM_CURRENT_POS );
 		stream->Read( &data_hdr, sizeof( data_hdr ) );
-		//fseek (file, data_hdr.length, SEEK_CUR);
-		//fread (&data_hdr, 1, sizeof(data_hdr), file);
 	}
 	if (data_hdr.fourcc != *( unsigned long * ) data_4cc) {
 		return 0;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.40 2004/04/16 15:07:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.41 2004/04/17 19:37:22 avenger_teambg Exp $
  *
  */
 
@@ -37,7 +37,7 @@
 #define MUSICBUFERS 10
 
 static AudioStream streams[MAX_STREAMS];
-static AudioStream music;
+static CSoundReader *MusicReader;
 static ALuint MusicSource, MusicBuffers[MUSICBUFERS];
 static SDL_mutex* musicMutex;
 static bool musicPlaying;
@@ -102,10 +102,18 @@ void ACMImp::clearstreams(bool free)
 		musicPlaying = false;
 	}
 	for (int i = 0; i < MAX_STREAMS; i++) {
-		streams[i].free = true;
+		if(!streams[i].free) {
+			delete streams[i].reader;
+			streams[i].free = true;
+		}
+	}
+	if(MusicReader) {
+		delete MusicReader;
+		MusicReader = NULL;
 	}
 }
 
+/* this stuff is in a separate thread, it is using static_memory, others shouldn't use that */
 int ACMImp::PlayListManager(void* data)
 {
 	ALuint buffersreturned = 0;
@@ -125,14 +133,12 @@ int ACMImp::PlayListManager(void* data)
 				case AL_INITIAL:
 					 {
 						printf( "Music in INITIAL State. AutoStarting\n" );
-						unsigned char * memory = new unsigned char[ACM_BUFFERSIZE];
 						for (int i = 0; i < MUSICBUFERS; i++) {
-							music.reader->read_samples( ( short* ) memory, ACM_BUFFERSIZE >> 1 );
+							MusicReader->read_samples( ( short* ) static_memory, ACM_BUFFERSIZE >> 1 );
 							alBufferData( MusicBuffers[i], AL_FORMAT_STEREO16,
-								memory, ACM_BUFFERSIZE,
-								music.reader->get_samplerate() );
+								static_memory, ACM_BUFFERSIZE,
+								MusicReader->get_samplerate() );
 						}
-						delete[] memory;
 						alSourceQueueBuffers( MusicSource, MUSICBUFERS, MusicBuffers );
 						if (alIsSource( MusicSource )) {
 							alSourcePlay( MusicSource );
@@ -163,8 +169,7 @@ int ACMImp::PlayListManager(void* data)
 					alSourceUnqueueBuffers( MusicSource, 1, &BufferID );
 					if (!bFinished) {
 						int size = ACM_BUFFERSIZE;
-						int cnt = music.reader->read_samples( ( short* )
-													static_memory, ACM_BUFFERSIZE >> 1 );
+						int cnt = MusicReader->read_samples( ( short* ) static_memory, ACM_BUFFERSIZE >> 1 );
 						size -= ( cnt * 2 );
 						if (size != 0)
 							bFinished = AL_TRUE;
@@ -172,9 +177,9 @@ int ACMImp::PlayListManager(void* data)
 							printf( "Playing Next Music: Last Size was %d\n",
 								cnt );
 							core->GetMusicMgr()->PlayNext();
-							if (music.reader) {
+							if (MusicReader) {
 								printf( "Queuing New Music\n" );
-								int cnt1 = music.reader->read_samples( ( short* ) ( static_memory + ( cnt*2 ) ), size >> 1 );
+								int cnt1 = MusicReader->read_samples( ( short* ) ( static_memory + ( cnt*2 ) ), size >> 1 );
 								printf( "Added %d Samples", cnt1 );
 								bFinished = false;
 							} else {
@@ -183,9 +188,7 @@ int ACMImp::PlayListManager(void* data)
 								musicPlaying = false;
 							}
 						}
-						alBufferData( BufferID, AL_FORMAT_STEREO16,
-							static_memory, ACM_BUFFERSIZE,
-							music.reader->get_samplerate() );
+						alBufferData( BufferID, AL_FORMAT_STEREO16, static_memory, ACM_BUFFERSIZE, MusicReader->get_samplerate() );
 						alSourceQueueBuffers( MusicSource, 1, &BufferID );
 						processed--;
 					}
@@ -193,7 +196,7 @@ int ACMImp::PlayListManager(void* data)
 			}
 		}
 		SDL_mutexV( musicMutex );
-		SDL_Delay( 10 );
+		SDL_Delay( 30 );
 	}
 	return 0;
 }
@@ -206,18 +209,29 @@ ACMImp::ACMImp(void)
 	for (int i = 0; i < MAX_STREAMS; i++) {
 		streams[i].free = true;
 	}
-	musicMutex = SDL_CreateMutex();
+	MusicReader = NULL;
 	musicPlaying = false;
-	static_memory = new unsigned char[ACM_BUFFERSIZE];
+	musicMutex = SDL_CreateMutex();
+	static_memory = (unsigned char *) malloc(ACM_BUFFERSIZE);
 	musicThread = SDL_CreateThread( PlayListManager, NULL );
 }
 
 ACMImp::~ACMImp(void)
 {
-	clearstreams( true );
+	//locking the mutex so we could gracefully kill the thread
+	SDL_mutexP( musicMutex );
+	//the thread is safely killable now
 	SDL_KillThread( musicThread );
+	//release the mutex after the thread was killed
+	SDL_mutexV( musicMutex );
+	//the mutex could be removed now too
 	SDL_DestroyMutex( musicMutex );
-	delete[] static_memory;
+	clearstreams( true );
+	if(MusicReader) {
+		delete MusicReader;
+	}
+	//freeing the memory of the music thread
+	free(static_memory);
 	alutExit();
 }
 
@@ -278,7 +292,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 	ALuint Buffer;
 	ALuint Source;
 	ALfloat SourcePos[] = {
-		0.0f, 0.0f, 0.0f
+		(float) XPos, (float) YPos, 0.0f
 	};
 	ALfloat SourceVel[] = {
 		0.0f, 0.0f, 0.0f
@@ -305,22 +319,22 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 	}
 	long cnt = acm->get_length();
 	long riff_chans = acm->get_channels();	
-	long bits = acm->get_bits();
+	//long bits = acm->get_bits();
 	long samplerate = acm->get_samplerate();
-	unsigned char * memory = (unsigned char *) malloc(sizeof(unsigned char)*cnt * 2); 
-	memset( memory, 0, cnt * 2 );
-	long cnt1 = acm->read_samples( ( short* ) memory, cnt );
-	int duration = ( ( cnt1 * riff_chans ) * 1000 ) / samplerate;
-	alBufferData( Buffer, GetFormatEnum( riff_chans, bits ), memory, cnt1 * 2, samplerate );
+	//multiply always by 2 because it is in 16 bits
+	long rawsize = cnt * riff_chans * 2;
+	unsigned char * memory = (unsigned char*) malloc(rawsize); 
+	//multiply always with 2 because it is in 16 bits
+	long cnt1 = acm->read_samples( ( short* ) memory, cnt ) * riff_chans * 2;
+	//it is always reading the stuff into 16 bits
+	alBufferData( Buffer, GetFormatEnum( riff_chans, 16 ), memory, cnt1, samplerate );
+	delete( acm );
+	free(memory);
 	if (( error = alGetError() ) != AL_NO_ERROR) {
 		DisplayALError( "[ACMImp::Play] alBufferData : ", error );
 		alDeleteBuffers( 1, &Buffer );
-		free( memory );
-		delete( acm );
 		return 0;
 	}
-	free( memory );
-	delete( acm );
 
 	alGenSources( 1, &Source );
 	if (( error = alGetError() ) != AL_NO_ERROR) {
@@ -349,7 +363,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 				streams[i].Source = Source;
 				streams[i].playing = false;
 				alSourcePlay( Source );
-				return duration;
+				return 1;
 			}
 		} else {
 			streams[i].Buffer = Buffer;
@@ -357,7 +371,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 			streams[i].free = false;
 			streams[i].playing = false;
 			alSourcePlay( Source );
-			return duration;
+			return 1;
 		}
 	}
 
@@ -381,17 +395,17 @@ unsigned long ACMImp::StreamFile(const char* filename)
 		return 0xffffffff;
 	}
 	SDL_mutexP( musicMutex );
-	if (music.reader) {
-		delete( music.reader );
+	if (MusicReader) {
+		delete( MusicReader );
 	}
 	if (MusicBuffers[0] == 0) {
 		alGenBuffers( MUSICBUFERS, MusicBuffers );
 	}
 	if (isWAVC( str )) {
-		music.reader = CreateSoundReader( str, SND_READER_ACM, str->Size(),
+		MusicReader = CreateSoundReader( str, SND_READER_ACM, str->Size(),
 						true );
 	} else {
-		music.reader = CreateSoundReader( str, SND_READER_WAV, str->Size(),
+		MusicReader = CreateSoundReader( str, SND_READER_WAV, str->Size(),
 						true );
 	}
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.156 2004/04/15 16:20:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.157 2004/04/17 19:37:26 avenger_teambg Exp $
  *
  */
 
@@ -211,7 +211,6 @@ Interface::~Interface(void)
 	if (evntmgr) {
 		delete( evntmgr );
 	}
-
 	if (guiscript) {
 		delete( guiscript );
 	}
@@ -223,7 +222,6 @@ Interface::~Interface(void)
 	}
 	FreeInterfaceVector( Table, tables, tm );
 	FreeInterfaceVector( Symbol, symbols, sm );
-//	FreeResourceVector(Actor, actors);
 	delete( console );
 
 	if(INIquests) {

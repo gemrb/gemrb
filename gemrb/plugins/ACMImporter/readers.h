@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.h,v 1.5 2004/04/14 23:53:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.h,v 1.6 2004/04/17 19:37:23 avenger_teambg Exp $
  *
  */
 
@@ -89,7 +89,7 @@ public:
 	virtual const char* get_file_type() = 0;
 
 	virtual long read_samples(short* buffer, long count) = 0; // returns actual count of read samples
-	virtual short read_one_sample(); // returns next sound sample
+//	virtual short read_one_sample(); // returns next sound sample
 };
 
 // RAW file reader
