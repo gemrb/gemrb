@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.70 2003/11/25 20:54:28 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.71 2003/11/25 21:04:59 avenger_teambg Exp $
  *
  */
 
@@ -1621,8 +1621,10 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 	char *poi;
 	unsigned long PortraitIndex;
 	if(core->GetDictionary()->Lookup("PortraitIndex", PortraitIndex)) {
-		//TODO: Fix that Value
-		//MyActor->SetPortrait(poi);
+		int table = core->LoadTable("pictures");
+		TableMgr *tm = core->GetTable(table);
+		poi = tm->GetRowName(PortraitIndex);
+		MyActor->SetPortrait(poi);
 	}
 	char resref[9];
 	memset(resref,0,sizeof(resref));
