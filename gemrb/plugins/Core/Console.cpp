@@ -12,11 +12,19 @@ Console::Console(void)
 	Buffer[0] = 0;
 	CurPos = 0;
 	Changed = true;
+	if(stricmp(core->GameType, "iwd2") == 0) {
+		Color fore = {0xff, 0xff, 0xff, 0x00}, back = {0x00, 0x00, 0x00, 0x00};
+		palette = core->GetVideoDriver()->CreatePalette(fore, back);
+	}
+	else
+		palette = NULL;
 }
 
 Console::~Console(void)
 {
 	free(Buffer);
+	if(palette)
+		free(palette);
 }
 
 /** Draws the Console on the Output Display */
@@ -29,7 +37,7 @@ void Console::Draw(unsigned short x, unsigned short y)
 	Color black = {0x00, 0x00, 0x00, 0x00};
 	Region r(x+XPos, y+YPos, Width, Height);
 	core->GetVideoDriver()->DrawRect(r, black);
-	font->Print(r, Buffer, NULL, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL, NULL, Cursor, CurPos);
+	font->Print(r, Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL, NULL, Cursor, CurPos);
 	Changed = false;
 }
 /** Set Font */
