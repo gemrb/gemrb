@@ -1131,14 +1131,16 @@ static PyObject *GemRB_GetSaveGameAttrib( PyObject */*self*/, PyObject *args)
 	int Type, SlotCount;
 
 	if(!PyArg_ParseTuple(args, "ii", &Type, &SlotCount) ) {
-		printMessage("GUIScript","Syntax Error: GetSaveGameName(Type, SlotCount)\n", LIGHT_RED);
+		printMessage("GUIScript","Syntax Error: GetSaveGameAttrib(Type, SlotCount)\n", LIGHT_RED);
 		return NULL;
 	}
+printf("AA\n");
 	SaveGame *sg=core->GetSaveGameIterator()->GetSaveGame(SlotCount);
 	if(sg==NULL) {
 		printMessage("GUIScript","Can't find savegame\n", LIGHT_RED);
 		return NULL;
 	}
+printf("BB\n");
 	PyObject * tmp;
 	switch(Type)
 	{
@@ -1146,11 +1148,121 @@ static PyObject *GemRB_GetSaveGameAttrib( PyObject */*self*/, PyObject *args)
 	case 1: tmp=Py_BuildValue("s", sg->GetPrefix()); break;
 	case 2: tmp=Py_BuildValue("s", sg->GetPath()); break;
 	default:
-		printMessage("GUIScript","Syntax Error: GetSaveGameName(Type, SlotCount)\n", LIGHT_RED);
+		printMessage("GUIScript","Syntax Error: GetSaveGameAttrib(Type, SlotCount)\n", LIGHT_RED);
 		return NULL;
 	}
-	delete [] sg;
+	delete sg;
 	return tmp;
+}
+
+static PyObject *GemRB_SetSaveGamePortrait( PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex, SaveSlotCount, PCSlotCount;
+
+	if(!PyArg_ParseTuple(args, "iiii", &WindowIndex, &ControlIndex, &SaveSlotCount, &PCSlotCount) ) {
+		printMessage("GUIScript","Syntax Error: SetSaveGameAreaPortrait(WindowID, ControlID, SaveSlotCount, PCSlotCount)\n", LIGHT_RED);
+		return NULL;
+	}
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return NULL;
+
+	if(ctrl->ControlType != IE_GUI_BUTTON)
+		return NULL;
+
+	SaveGame *sg=core->GetSaveGameIterator()->GetSaveGame(SaveSlotCount);
+	if(sg==NULL) {
+		printMessage("GUIScript","Can't find savegame\n", LIGHT_RED);
+		return NULL;
+	}
+	if(sg->GetPortraitCount()<PCSlotCount) {
+		Button * btn = (Button*)ctrl;
+		btn->SetPicture(NULL);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
+	DataStream *str = sg->GetPortrait(PCSlotCount);
+	ImageMgr * im = (ImageMgr*)core->GetInterface(IE_BMP_CLASS_ID);
+	if(im == NULL) {
+		delete (str);
+		return NULL;
+	}
+	if(!im->Open(str, true)) {
+		delete(str);
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	Sprite2D * Picture = im->GetImage();
+	if(Picture == NULL) {
+		delete(str);
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	Button * btn = (Button*)ctrl;
+	btn->SetPicture(Picture);
+
+	core->FreeInterface(im);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject *GemRB_SetSaveGamePreview( PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex, SlotCount;
+
+	if(!PyArg_ParseTuple(args, "iii", &WindowIndex, &ControlIndex, &SlotCount) ) {
+		printMessage("GUIScript","Syntax Error: SetSaveGameAreaPreview(WindowID, ControlID, SlotCount)\n", LIGHT_RED);
+		return NULL;
+	}
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return NULL;
+
+	if(ctrl->ControlType != IE_GUI_BUTTON)
+		return NULL;
+
+	SaveGame *sg=core->GetSaveGameIterator()->GetSaveGame(SlotCount);
+	if(sg==NULL) {
+		printMessage("GUIScript","Can't find savegame\n", LIGHT_RED);
+		return NULL;
+	}
+	DataStream *str = sg->GetScreen();
+	ImageMgr * im = (ImageMgr*)core->GetInterface(IE_BMP_CLASS_ID);
+	if(im == NULL) {
+		delete (str);
+		return NULL;
+	}
+	if(!im->Open(str, true)) {
+		delete(str);
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	Sprite2D * Picture = im->GetImage();
+	if(Picture == NULL) {
+		delete(str);
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	Button * btn = (Button*)ctrl;
+	btn->SetPicture(Picture);
+
+	core->FreeInterface(im);
+
+	Py_INCREF(Py_None);
+	return Py_None;
 }
 
 static PyObject *GemRB_Roll(PyObject */*self*/, PyObject *args)
@@ -1317,6 +1429,12 @@ static PyMethodDef GemRBMethods[] = {
 
         {"GetSaveGameAttrib", GemRB_GetSaveGameAttrib, METH_VARARGS,
      "Returns the name, path or prefix of the saved game."},
+
+        {"SetSaveGamePreview", GemRB_SetSaveGamePreview, METH_VARARGS,
+     "Sets a savegame area preview bmp onto a button as picture."},
+
+        {"SetSaveGamePortrait", GemRB_SetSaveGamePortrait, METH_VARARGS,
+     "Sets a savegame PC portrait bmp onto a button as picture."},
 
 	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
 	 "Invalidated the given Window."},

@@ -101,6 +101,7 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 #endif
 	int count = -1, prtrt = 0;
 	char Path[_MAX_PATH];
+	char dtmp[_MAX_PATH];
 	const char *SaveFolder=PlayMode();
 #ifdef WIN32
 	sprintf(Path, "%s%s%s*.*", core->GamePath, SaveFolder, SPathDelimiter);
@@ -120,12 +121,12 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 	char Name[_MAX_PATH], Text[_MAX_PATH];
 	do { //Iterate through all the available modules to load
 #ifdef WIN32
+		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, c_file.name);
 		if(c_file.attrib & _A_SUBDIR) {
 			if(c_file.name[0] == '.')
 				continue;
 			int cnt = sscanf(c_file.name, "%*d-%s - %s", Name, Text);
 #else
-		char dtmp[_MAX_PATH];
 		struct stat fst;
 		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
 		stat(dtmp, &fst);
@@ -139,6 +140,7 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 				count++;
 			}
 			if(cnt == 1) {
+				Text[0]=0;
 				printf("[Name = %s, No Description]\n", Name);
 				count++;
 			}
@@ -178,13 +180,15 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 #ifdef WIN32
 	} while(_findnext(hFile, &c_file) == 0);
 	_findclose(hFile);
-	sprintf(Path, "%s%s%s%s", core->GamePath, SaveFolder,SPathDelimiter, c_file.name);
+//	sprintf(Path, "%s%s%s%s", core->GamePath, SaveFolder,SPathDelimiter, c_file.name);
 #else
 	} while((de = readdir(dir)) != NULL);
 	closedir(dir);  //No other files in the directory, close it
 #endif
 	char Prefix[10];
-	sscanf(core->INIConfig, "%[^.]", Prefix);
-	SaveGame * sg = new SaveGame(Path, Name, Prefix, prtrt);
+	int i;
+	for(i=0;i<8 && core->INIConfig[i] && core->INIConfig[i]!='.';i++) Prefix[i]=core->INIConfig[i];
+	Prefix[i]=0;
+	SaveGame * sg = new SaveGame(dtmp, Name, Prefix, prtrt);
 	return sg;
 }

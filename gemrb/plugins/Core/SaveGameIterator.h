@@ -5,11 +5,11 @@
 
 class SaveGame {
 public:
-	SaveGame(char * Path, char * Name, char * prefix, int pCount)
+	SaveGame(char * path, char * name, char * prefix, int pCount)
 	{
-		strcpy(Prefix, prefix);
-		strcpy(this->Path, Path);
-		strcpy(this->Name, Name);
+		strncpy(Prefix, prefix, sizeof(Prefix) );
+		strncpy(Path, path, sizeof(Path) );
+		strncpy(Name, name, sizeof(Name) );
 		PortraitCount = pCount;
 	};
 	~SaveGame() {};
