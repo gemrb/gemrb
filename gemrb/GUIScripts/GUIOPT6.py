@@ -11,8 +11,12 @@ def OnLoad():
 	TextAreaControl = GemRB.GetControl(GraphicsWindow, 33)
 	BrightnessButton = GemRB.GetControl(GraphicsWindow, 35)
 	BrightnessSlider = GemRB.GetControl(GraphicsWindow, 3)
+	GemRB.SetVarAssoc(GraphicsWindow, BrightnessSlider, "Brightness Correction",0)
+
 	ContrastButton = GemRB.GetControl(GraphicsWindow, 36)
 	ContrastSlider = GemRB.GetControl(GraphicsWindow, 22)
+	GemRB.SetVarAssoc(GraphicsWindow, ContrastSlider, "Gamma Correction",0)
+
 	BppButton = GemRB.GetControl(GraphicsWindow, 37)
 	BppButtonB1 = GemRB.GetControl(GraphicsWindow, 5)
 	BppButtonB2 = GemRB.GetControl(GraphicsWindow, 6)

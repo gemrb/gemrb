@@ -39,23 +39,46 @@ def OnLoad():
 	GemRB.SetText(GamePlayWindow, FeedbackButton, 17163)
 	GemRB.SetText(GamePlayWindow, AutoPauseButton, 17166)
 	GemRB.SetEvent(GamePlayWindow, DelayButton, IE_GUI_BUTTON_ON_PRESS, "DelayPress")
-	GemRB.SetEvent(GamePlayWindow, DelaySlider, IE_GUI_SLIDER_ON_CHANGE, "DelayPressB")
+	GemRB.SetEvent(GamePlayWindow, DelaySlider, IE_GUI_SLIDER_ON_CHANGE, "DelayPress")
+	GemRB.SetVarAssoc(GamePlayWindow, DelaySlider, "Tooltips",0)
+
 	GemRB.SetEvent(GamePlayWindow, KeySpdButton, IE_GUI_BUTTON_ON_PRESS, "KeySpdPress")
-	GemRB.SetEvent(GamePlayWindow, KeySpdSlider, IE_GUI_SLIDER_ON_CHANGE, "KeySpdPressB")
+	GemRB.SetEvent(GamePlayWindow, KeySpdSlider, IE_GUI_SLIDER_ON_CHANGE, "KeySpdPress")
+	GemRB.SetVarAssoc(GamePlayWindow, KeySpdSlider, "Keyboard Scroll Speed",0)
+
 	GemRB.SetEvent(GamePlayWindow, MouseSpdButton, IE_GUI_BUTTON_ON_PRESS, "MouseSpdPress")
-	GemRB.SetEvent(GamePlayWindow, MouseSpdSlider, IE_GUI_SLIDER_ON_CHANGE, "MouseSpdPressB")
+	GemRB.SetEvent(GamePlayWindow, MouseSpdSlider, IE_GUI_SLIDER_ON_CHANGE, "MouseSpdPress")
+	GemRB.SetVarAssoc(GamePlayWindow, MouseSpdSlider, "Mouse Scroll Speed",0)
+
 	GemRB.SetEvent(GamePlayWindow, DifficultyButton, IE_GUI_BUTTON_ON_PRESS, "DifficultyPress")
-	GemRB.SetEvent(GamePlayWindow, DifficultySlider, IE_GUI_SLIDER_ON_CHANGE, "DifficultyPressB")
+	GemRB.SetEvent(GamePlayWindow, DifficultySlider, IE_GUI_SLIDER_ON_CHANGE, "DifficultyPress")
+	GemRB.SetVarAssoc(GamePlayWindow, DifficultySlider, "Difficulty Level",0)
+
 	GemRB.SetEvent(GamePlayWindow, BloodButton, IE_GUI_BUTTON_ON_PRESS, "BloodPress")
-	GemRB.SetEvent(GamePlayWindow, BloodButtonB, IE_GUI_BUTTON_ON_PRESS, "BloodPressB")
+	GemRB.SetEvent(GamePlayWindow, BloodButtonB, IE_GUI_BUTTON_ON_PRESS, "BloodPress")
+	GemRB.SetButtonFlags(GamePlayWindow, BloodButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	GemRB.SetVarAssoc(GamePlayWindow, BloodButtonB, "Gore",1)
+
 	GemRB.SetEvent(GamePlayWindow, DitherButton, IE_GUI_BUTTON_ON_PRESS, "DitherPress")
-	GemRB.SetEvent(GamePlayWindow, DitherButtonB, IE_GUI_BUTTON_ON_PRESS, "DitherPressB")
+	GemRB.SetEvent(GamePlayWindow, DitherButtonB, IE_GUI_BUTTON_ON_PRESS, "DitherPress")
+	GemRB.SetButtonFlags(GamePlayWindow, DitherButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	GemRB.SetVarAssoc(GamePlayWindow, DitherButtonB, "Always Dither",1)
+
 	GemRB.SetEvent(GamePlayWindow, InfravisionButton, IE_GUI_BUTTON_ON_PRESS, "InfravisionPress")
-	GemRB.SetEvent(GamePlayWindow, InfravisionButtonB, IE_GUI_BUTTON_ON_PRESS, "InfravisionPressB")
+	GemRB.SetEvent(GamePlayWindow, InfravisionButtonB, IE_GUI_BUTTON_ON_PRESS, "InfravisionPress")
+	GemRB.SetButtonFlags(GamePlayWindow, InfravisionButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	GemRB.SetVarAssoc(GamePlayWindow, InfravisionButtonB, "Infravision",1)
+
 	GemRB.SetEvent(GamePlayWindow, WeatherButton, IE_GUI_BUTTON_ON_PRESS, "WeatherPress")
-	GemRB.SetEvent(GamePlayWindow, WeatherButtonB, IE_GUI_BUTTON_ON_PRESS, "WeatherPressB")
+	GemRB.SetEvent(GamePlayWindow, WeatherButtonB, IE_GUI_BUTTON_ON_PRESS, "WeatherPress")
+	GemRB.SetButtonFlags(GamePlayWindow, WeatherButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	GemRB.SetVarAssoc(GamePlayWindow, WeatherButtonB, "Weather",1)
+
 	GemRB.SetEvent(GamePlayWindow, HealButton, IE_GUI_BUTTON_ON_PRESS, "HealPress")
 	GemRB.SetEvent(GamePlayWindow, HealButtonB, IE_GUI_BUTTON_ON_PRESS, "HealPressB")
+	GemRB.SetButtonFlags(GamePlayWindow, HealButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	GemRB.SetVarAssoc(GamePlayWindow, HealButtonB, "Heal Party on Rest",1)
+
 	GemRB.SetEvent(GamePlayWindow, HotKeyButton, IE_GUI_BUTTON_ON_PRESS, "HotKeyPress")
 	GemRB.SetEvent(GamePlayWindow, FeedbackButton, IE_GUI_BUTTON_ON_PRESS, "FeedbackPress")
 	GemRB.SetEvent(GamePlayWindow, AutoPauseButton, IE_GUI_BUTTON_ON_PRESS, "AutoPausePress")
@@ -68,15 +91,7 @@ def DelayPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18017)
 	return
 	
-def DelayPressB():
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18017)
-	return
-	
 def KeySpdPress():
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18019)
-	return
-	
-def KeySpdPressB():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18019)
 	return
 	
@@ -84,15 +99,7 @@ def MouseSpdPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18018)
 	return
 	
-def MouseSpdPressB():
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18018)
-	return
-	
 def DifficultyPress():
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18020)
-	return
-	
-def DifficultyPressB():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18020)
 	return
 	
@@ -100,15 +107,7 @@ def BloodPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18023)
 	return
 	
-def BloodPressB():
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18023)
-	return
-	
 def DitherPress():
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 18021)
-	return
-	
-def DitherPressB():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18021)
 	return
 	
@@ -116,23 +115,11 @@ def InfravisionPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 11797)
 	return
 	
-def InfravisionPressB():
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 11797)
-	return
-	
 def WeatherPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 20619)
 	return
 	
-def WeatherPressB():
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 20619)
-	return
-	
 def HealPress():
-	GemRB.SetText(GamePlayWindow, TextAreaControl, 2242)
-	return
-	
-def HealPressB():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 2242)
 	return
 	
