@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.64 2004/04/28 12:52:13 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.65 2004/05/09 14:34:24 avenger_teambg Exp $
  *
  */
 
@@ -1264,6 +1264,14 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, Color& color, bool fill)
 	DrawLine( lastX, lastY, poly->points[0].x, poly->points[0].y, color );
 	return;
 }
+
+/** Frees a Palette */
+void SDLVideoDriver::FreePalette(Color *&palette)
+{
+	free(palette);
+	palette = NULL;
+}
+
 /** Creates a Palette from Color */
 Color* SDLVideoDriver::CreatePalette(Color color, Color back)
 {

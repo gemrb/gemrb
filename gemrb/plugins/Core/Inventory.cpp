@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.19 2004/05/07 17:14:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.20 2004/05/09 14:34:08 avenger_teambg Exp $
  *
  */
 
@@ -304,12 +304,13 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
 
 void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, unsigned short x, unsigned short y)
 {
+	//this loop is going from start
 	for (size_t i = 0; i < Slots.size(); i++) {
 		CREItem *item = Slots[i];
 		if (!item) {
 			continue;
 		}
-		if( (flags&item->Flags)!=flags) {
+		if( ((flags^IE_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 				continue;
 		}
 		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
@@ -317,6 +318,9 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		}
 		map->tm->AddItemToLocation(x, y, item);
 		Slots[i]=NULL;
+		//if it isn't all items then we stop here
+		if(resref[0])
+			break;
 	}
 }
 

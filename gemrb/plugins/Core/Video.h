@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.25 2004/02/29 21:50:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.26 2004/05/09 14:34:08 avenger_teambg Exp $
  *
  */
 
@@ -87,6 +87,8 @@ public:
 		bool fill = false) = 0;
 	virtual inline void DrawLine(short x1, short y1, short x2, short y2,
 		Color& color) = 0;
+	/** Frees a Palette */
+	virtual void FreePalette(Color *&palette) = 0;
 	/** Creates a Palette from Color */
 	virtual Color* CreatePalette(Color color, Color back) = 0;
 	/** Blits a Sprite filling the Region */

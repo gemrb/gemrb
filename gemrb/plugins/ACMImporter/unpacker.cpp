@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.7 2004/04/18 14:25:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.8 2004/05/09 14:34:04 avenger_teambg Exp $
  *
  */
 
@@ -133,7 +133,6 @@ int CValueUnpacker::get_one_block(long* block)
 	for (int pass = 0; pass < sb_size; pass++) {
 		int ind = get_bits( 5 ) & 0x1F;
 		if (!( ( this->*Fillers[ind] ) ( pass, ind ) )) {
-abort();
 			return 0;
 		}
 	}

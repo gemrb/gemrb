@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.115 2004/05/07 17:41:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.116 2004/05/09 14:34:08 avenger_teambg Exp $
  *
  */
 
@@ -959,6 +959,8 @@ public:
 	static void DisplayStringHead(Scriptable* Sender, Action* parameters);
 	static void DisplayStringNoNameHead(Scriptable* Sender, Action* parameters);
 	static void DisplayStringWait(Scriptable* Sender, Action* parameters);
+	static void DropInventory(Scriptable* Sender, Action* parameters);
+	static void DropItem(Scriptable* Sender, Action* parameters);
 	static void EndCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void Enemy(Scriptable* Sender, Action* parameters);
 	static void Face(Scriptable* Sender, Action* parameters);

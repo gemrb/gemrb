@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DirectXVideo/DirectXVideoDriver.cpp,v 1.7 2004/02/24 22:20:38 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DirectXVideo/DirectXVideoDriver.cpp,v 1.8 2004/05/09 14:34:10 avenger_teambg Exp $
  *
  */
 
@@ -555,6 +555,13 @@ void DirectXVideoDriver::DrawRect(Region& rgn, Color& color)
 	lpD3DDevice->SetTexture( 0, NULL );
 	lpD3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2,
 					( void * ) pVertices, sizeof( CUSTOMVERTEX ) );
+}
+
+/** Frees a Palette */
+void DirectXVideoDriver::FreePalette(Color *&palette)
+{
+	free(palette);
+	palette = NULL;
 }
 /** Creates a Palette from Color */
 Color* DirectXVideoDriver::CreatePalette(Color color, Color back)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.160 2004/05/07 17:41:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.161 2004/05/09 14:34:08 avenger_teambg Exp $
  *
  */
 
@@ -274,6 +274,8 @@ static ActionLink actionnames[] = {
 	{"displaystringhead", GameScript::DisplayStringHead,0},
 	{"displaystringnonamehead", GameScript::DisplayStringNoNameHead,0},
 	{"displaystringwait", GameScript::DisplayStringWait,AF_BLOCKING},
+	{"dropinventory", GameScript::DropInventory, 0},
+	{"dropitem", GameScript::DropItem, AF_BLOCKING},
 	{"endcutscenemode", GameScript::EndCutSceneMode,0},
 	{"enemy", GameScript::Enemy,0},
 	{"erasejournalentry", GameScript::RemoveJournalEntry,0},
@@ -6598,7 +6600,7 @@ void GameScript::DestroyAllEquipment(Scriptable* Sender, Action* parameters)
 		default:;
 	}
 	if(inv) {
-		inv->DestroyItem(NULL,0);
+		inv->DestroyItem("",0);
 	}
 }
 
@@ -6634,7 +6636,7 @@ void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* par
 		default:;
 	}
 	if(inv) {
-		inv->DestroyItem(NULL, IE_ITEM_DESTRUCTIBLE);
+		inv->DestroyItem("", IE_ITEM_DESTRUCTIBLE);
 	}
 }
 
@@ -6839,5 +6841,34 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action *parameters)
 		Map *map=core->GetGame()->GetMap(((Actor *) scr)->Area);
 		map->tm->AddItemToLocation(x, y, item);
 	}
+}
+
+void GameScript::DropItem(Scriptable *Sender, Action *parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	if (Distance(Sender->XPos, Sender->YPos, Sender) > 10) {
+		Point p={parameters->XpointParameter, parameters->YpointParameter};
+		GoNearAndRetry(Sender, &p);
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor *scr = (Actor *) Sender;
+	Map *map = core->GetGame()->GetMap(scr->Area);
+	//dropping location isn't exactly our place, this is why i didn't use
+	//scr->DropItem(parameters->string0Parameter,0);
+	scr->inventory.DropItemAtLocation(parameters->string0Parameter, 0, map,
+		parameters->XpointParameter, parameters->YpointParameter);
+	Sender->CurrentAction = NULL;
+}
+
+void GameScript::DropInventory(Scriptable *Sender, Action *parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *) Sender;
+	scr->DropItem("",0);
 }
 

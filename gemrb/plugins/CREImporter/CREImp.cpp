@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.33 2004/04/25 22:41:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.34 2004/05/09 14:34:07 avenger_teambg Exp $
  *
  */
 
@@ -351,7 +351,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				items[index] = NULL;
 			}
 			else {
-				printf("[CREImp]: Duplicate item in creature!\n");
+				printf("[CREImp]: Duplicate item (%d) in creature!\n", index);
 			}
 		}
 	}
@@ -363,6 +363,10 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			delete items[i];
 		}
 	}
+	//this dword contains the equipping info (which slot is selected)
+	unsigned int Equipped;
+	str->Read(&Equipped, 4);
+
 //	act->inventory.dump();
 
 	// Reading spellbook
@@ -384,10 +388,10 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	for (i = 0; i < act->SpellMemorizationCount; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization();
 
-		for (unsigned int j = 0; j < known_spells.size(); j++) {
+		unsigned int j=known_spells.size();
+		while(j--) {
 			CREKnownSpell* spl = known_spells[j];
 			if (!spl) {
-				printf("[CREImp]: Duplicate spell in creature!\n");
 				continue;
 			}
 			if (spl->Type == sm->Type && spl->Level == sm->Level) {
@@ -395,7 +399,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				known_spells[j] = NULL;
 			}
 		}
-		for (unsigned int j = 0; j < sm->MemorizedCount; j++) {
+		for (j = 0; j < sm->MemorizedCount; j++) {
 			sm->memorized_spells.push_back( memorized_spells[sm->MemorizedIndex + j] );
 			memorized_spells[sm->MemorizedIndex + j] = NULL;
 		}
