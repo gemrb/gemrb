@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.73 2004/03/19 23:03:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.74 2004/03/20 10:06:18 avenger_teambg Exp $
  *
  */
 
@@ -792,6 +792,8 @@ public: //Script Functions
 public:
 	//Actions
 	static void Activate(Scriptable* Sender, Action* parameters);
+	static void AddAreaFlag(Scriptable* Sender, Action* parameters);
+	static void AddAreaType(Scriptable* Sender, Action* parameters);
 	static void AddExperienceParty(Scriptable *Sender, Action* parameters);
 	static void AddExperiencePartyGlobal(Scriptable *Sender, Action* parameters);
 	static void AddGlobals(Scriptable* Sender, Action* parameters);
@@ -891,11 +893,14 @@ public:
 	static void PlaySound(Scriptable* Sender, Action* parameters);
 	static void SaveLocation(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
+	static void RemoveAreaFlag(Scriptable* Sender, Action* parameters);
+	static void RemoveAreaType(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
 	static void SaveObjectLocation(Scriptable* Sender, Action* parameters);
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
 	static void SetAnimState(Scriptable* Sender, Action* parameters);
+	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
 	static void SetGlobal(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTimer(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.104 2004/03/19 23:03:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.105 2004/03/20 10:06:18 avenger_teambg Exp $
  *
  */
 
@@ -117,14 +117,16 @@ static TriggerLink triggernames[] = {
 //Make this an ordered list, so we could use bsearch!
 static ActionLink actionnames[] = {
 	{"actionoverride",NULL}, {"activate",GameScript::Activate},
+	{"addareatype", GameScript::AddAreaType},
+	{"addareaflag", GameScript::AddAreaFlag},
 	{"addexperienceparty",GameScript::AddExperienceParty},
 	{"addexperiencepartyglobal",GameScript::AddExperiencePartyGlobal},
 	{"addglobals",GameScript::AddGlobals},
 	{"addwaypoint",GameScript::AddWayPoint,AF_BLOCKING},
-	{"ally",GameScript::Ally},
 	{"addxp2da", GameScript::AddXP2DA},
 	{"addxpobject", GameScript::AddXPObject},
 	{"addxpvar", GameScript::AddXP2DA},
+	{"ally",GameScript::Ally},
 	{"ambientactivate",GameScript::AmbientActivate},
 	{"bashdoor",GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
 	{"bitclear",GameScript::BitClear},
@@ -212,6 +214,8 @@ static ActionLink actionnames[] = {
 	{"picklock",GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
 	{"playdead",GameScript::PlayDead}, {"playsound",GameScript::PlaySound},
 	{"recoil",GameScript::Recoil},
+	{"removeareatype", GameScript::RemoveAreaType},
+	{"removeareaflag", GameScript::RemoveAreaFlag},
 	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt",GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint",GameScript::RunAwayFromPoint,AF_BLOCKING},
@@ -220,6 +224,7 @@ static ActionLink actionnames[] = {
 	{"runtopointnorecticle",GameScript::MoveToPoint,AF_BLOCKING},//until we know better
 	{"screenshake",GameScript::ScreenShake,AF_BLOCKING},
 	{"setanimstate",GameScript::SetAnimState,AF_BLOCKING},
+	{"setarearestflag", GameScript::SetAreaRestFlag},
 	{"setdialogue",GameScript::SetDialogue,AF_BLOCKING},
 	{"setglobal",GameScript::SetGlobal},
 	{"setglobaltimer",GameScript::SetGlobalTimer},
@@ -3139,6 +3144,37 @@ int GameScript::AreaFlag(Scriptable* Sender, Trigger* parameters)
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
+
+void GameScript::SetAreaRestFlag(Scriptable* /*Sender*/, Action* parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	//either whole number, or just the lowest bit, needs research
+	map->AreaFlags=parameters->int0Parameter;
+}
+
+void GameScript::AddAreaFlag(Scriptable* /*Sender*/, Action* parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->AreaFlags|=parameters->int0Parameter;
+}
+
+void GameScript::RemoveAreaFlag(Scriptable* /*Sender*/, Action* parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->AreaFlags&=~parameters->int0Parameter;
+}
+
+void GameScript::AddAreaType(Scriptable* /*Sender*/, Action* parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->AreaType|=parameters->int0Parameter;
+}
+
+void GameScript::RemoveAreaType(Scriptable* /*Sender*/, Action* parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->AreaType&=~parameters->int0Parameter;
+}
 
 void GameScript::NoAction(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
