@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.h,v 1.7 2004/08/02 21:41:04 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.h,v 1.8 2004/09/13 21:04:17 avenger_teambg Exp $
  *
  */
 
@@ -25,13 +25,15 @@
 #include "../Core/DialogMgr.h"
 #include "../../includes/globals.h"
 
+/*
 typedef struct State {
 	ieStrRef StrRef;
 	ieDword  FirstTransitionIndex;
 	ieDword  TransitionsCount;
 	ieDword  TriggerIndex;
 } State;
-
+*/
+/*
 typedef struct Transition {
 	ieDword  Flags;
 	ieStrRef AnswerStrRef;
@@ -41,12 +43,13 @@ typedef struct Transition {
 	ieResRef DLGResRef;
 	ieDword  NextStateIndex;
 } Transition;
-
+*/
+/*
 typedef struct VarOffset {
 	ieDword Offset;
 	ieDword Length;
 } VarOffset;
-
+*/
 class DLGImp : public DialogMgr {
 private:
 	DataStream* str;

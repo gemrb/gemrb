@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.12 2004/08/02 21:41:03 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.13 2004/09/13 21:04:16 avenger_teambg Exp $
  *
  */
 
@@ -57,7 +57,7 @@ typedef struct DialogTransition {
 	ieStrRef journalStrRef;
 	DialogString* trigger;
 	DialogString* action;
-	char Dialog[9];
+	ieResRef Dialog;
 	ieDword stateIndex;
 } DialogTransition;
 
@@ -77,7 +77,7 @@ private:
 public:
 	void AddState(DialogState* ds);
 	DialogState* GetState(unsigned int index);
-	char ResRef[9];
+	ieResRef ResRef;
 private:
 	void FreeDialogState(DialogState* ds);
 	void FreeDialogString(DialogString* ds);

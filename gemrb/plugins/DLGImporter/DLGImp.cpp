@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.13 2004/08/02 21:41:04 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.14 2004/09/13 21:04:17 avenger_teambg Exp $
  *
  */
 
@@ -62,16 +62,16 @@ bool DLGImp::Open(DataStream* stream, bool autoFree)
 	} else {
 		Version = 10;
 	}
-	str->Read( &StatesCount, 4 );
-	str->Read( &StatesOffset, 4 );
-	str->Read( &TransitionsCount, 4 );
-	str->Read( &TransitionsOffset, 4 );
-	str->Read( &StateTriggersOffset, 4 );
-	str->Read( &StateTriggersCount, 4 );
-	str->Read( &TransitionTriggersOffset, 4 );
-	str->Read( &TransitionTriggersCount, 4 );
-	str->Read( &ActionsOffset, 4 );
-	str->Read( &ActionsCount, 4 );
+	str->ReadDword( &StatesCount );
+	str->ReadDword( &StatesOffset );
+	str->ReadDword( &TransitionsCount );
+	str->ReadDword( &TransitionsOffset );
+	str->ReadDword( &StateTriggersOffset );
+	str->ReadDword( &StateTriggersCount );
+	str->ReadDword( &TransitionTriggersOffset );
+	str->ReadDword( &TransitionTriggersCount );
+	str->ReadDword( &ActionsOffset );
+	str->ReadDword( &ActionsCount );
 	if (Version == 109) {
 		str->Seek( 4, GEM_CURRENT_POS );
 	}
@@ -94,19 +94,20 @@ Dialog* DLGImp::GetDialog()
 DialogState* DLGImp::GetDialogState(unsigned int index)
 {
 	DialogState* ds = new DialogState();
-	str->Seek( StatesOffset + ( index * sizeof( State ) ), GEM_STREAM_START );
-	State state;
-	str->Read( &state, sizeof( State ) );
-	ds->StrRef = state.StrRef;
-	ds->trigger = GetStateTrigger( state.TriggerIndex );
-	ds->transitions = GetTransitions( state.FirstTransitionIndex,
-						state.TransitionsCount );
-	ds->transitionsCount = state.TransitionsCount;
+	//16 = sizeof(State)
+	str->Seek( StatesOffset + ( index * 16 ), GEM_STREAM_START );
+        ieDword  FirstTransitionIndex;
+        ieDword  TriggerIndex;
+	str->ReadDword( &ds->StrRef );
+	str->ReadDword( &TriggerIndex );
+	str->ReadDword( &FirstTransitionIndex );
+	ds->trigger = GetStateTrigger( TriggerIndex );
+	str->ReadDword( &ds->transitionsCount );
+	ds->transitions = GetTransitions( FirstTransitionIndex, ds->transitionsCount );
 	return ds;
 }
 
-DialogTransition** DLGImp::GetTransitions(unsigned int firstIndex,
-	unsigned int count)
+DialogTransition** DLGImp::GetTransitions(unsigned int firstIndex, unsigned int count)
 {
 	DialogTransition** trans = ( DialogTransition** )
 		malloc( count*sizeof( DialogTransition* ) );
@@ -121,19 +122,20 @@ DialogTransition* DLGImp::GetTransition(unsigned int index)
 	if (index >= TransitionsCount) {
 		return NULL;
 	}
-	str->Seek( TransitionsOffset + ( index * sizeof( Transition ) ),
-			GEM_STREAM_START );
-	Transition trans;
-	str->Read( &trans, sizeof( Transition ) );
+	//32 = sizeof(Transition)
+	str->Seek( TransitionsOffset + ( index * 32 ), GEM_STREAM_START );
 	DialogTransition* dt = new DialogTransition();
-	dt->Flags = trans.Flags;
-	dt->textStrRef = trans.AnswerStrRef;
-	dt->journalStrRef = trans.JournalStrRef;
-	dt->trigger = GetTransitionTrigger( trans.TriggerIndex );
-	dt->action = GetAction( trans.ActionIndex );
-	strncpy( dt->Dialog, trans.DLGResRef, 8 );
-	dt->Dialog[8] = 0;
-	dt->stateIndex = trans.NextStateIndex;
+	str->ReadDword( &dt->Flags );
+	str->ReadDword( &dt->textStrRef );
+	str->ReadDword( &dt->journalStrRef );
+	ieDword TriggerIndex;
+	str->ReadDword( &TriggerIndex );
+	dt->trigger = GetTransitionTrigger( TriggerIndex );
+	ieDword ActionIndex;
+	str->ReadDword( &ActionIndex );
+	dt->action = GetAction( ActionIndex );
+	str->ReadResRef( dt->Dialog );
+	str->ReadDword( &dt->stateIndex );
 	return dt;
 }
 
@@ -142,15 +144,16 @@ DialogString* DLGImp::GetStateTrigger(unsigned int index)
 	if (index >= StateTriggersCount) {
 		return NULL;
 	}
-	str->Seek( StateTriggersOffset + ( index * sizeof( VarOffset ) ),
-			GEM_STREAM_START );
-	VarOffset offset;
-	str->Read( &offset, sizeof( VarOffset ) );
+	//8 = sizeof(VarOffset)
+	str->Seek( StateTriggersOffset + ( index * 8 ), GEM_STREAM_START );
+	ieDword Offset, Length;
+	str->ReadDword( &Offset );
+	str->ReadDword( &Length );
 	DialogString* ds = new DialogString();
-	str->Seek( offset.Offset, GEM_STREAM_START );
-	char* string = ( char* ) malloc( offset.Length + 1 );
-	str->Read( string, offset.Length );
-	string[offset.Length] = 0;
+	str->Seek( Offset, GEM_STREAM_START );
+	char* string = ( char* ) malloc( Length + 1 );
+	str->Read( string, Length );
+	string[Length] = 0;
 	ds->strings = GetStrings( string, ds->count );
 	free( string );
 	return ds;
@@ -161,15 +164,15 @@ DialogString* DLGImp::GetTransitionTrigger(unsigned int index)
 	if (index >= TransitionTriggersCount) {
 		return NULL;
 	}
-	str->Seek( TransitionTriggersOffset + ( index * sizeof( VarOffset ) ),
-			GEM_STREAM_START );
-	VarOffset offset;
-	str->Read( &offset, sizeof( VarOffset ) );
+	str->Seek( TransitionTriggersOffset + ( index * 8 ), GEM_STREAM_START );
+	ieDword Offset, Length;
+	str->ReadDword( &Offset );
+	str->ReadDword( &Length );
 	DialogString* ds = new DialogString();
-	str->Seek( offset.Offset, GEM_STREAM_START );
-	char* string = ( char* ) malloc( offset.Length + 1 );
-	str->Read( string, offset.Length );
-	string[offset.Length] = 0;
+	str->Seek( Offset, GEM_STREAM_START );
+	char* string = ( char* ) malloc( Length + 1 );
+	str->Read( string, Length );
+	string[Length] = 0;
 	ds->strings = GetStrings( string, ds->count );
 	free( string );
 	return ds;
@@ -180,15 +183,15 @@ DialogString* DLGImp::GetAction(unsigned int index)
 	if (index >= ActionsCount) {
 		return NULL;
 	}
-	str->Seek( ActionsOffset + ( index * sizeof( VarOffset ) ),
-			GEM_STREAM_START );
-	VarOffset offset;
-	str->Read( &offset, sizeof( VarOffset ) );
+	str->Seek( ActionsOffset + ( index * 8 ), GEM_STREAM_START );
+	ieDword Offset, Length;
+	str->ReadDword( &Offset );
+	str->ReadDword( &Length );
 	DialogString* ds = new DialogString();
-	str->Seek( offset.Offset, GEM_STREAM_START );
-	char* string = ( char* ) malloc( offset.Length + 1 );
-	str->Read( string, offset.Length );
-	string[offset.Length] = 0;
+	str->Seek( Offset, GEM_STREAM_START );
+	char* string = ( char* ) malloc( Length + 1 );
+	str->Read( string, Length );
+	string[Length] = 0;
 	ds->strings = GetStrings( string, ds->count );
 	free( string );
 	return ds;
@@ -240,15 +243,6 @@ char** DLGImp::GetStrings(char* string, unsigned int& count)
 
 	count = 0;
 	while (*poi) {
-/* maybe we don't need this at all
-		while (MyIsSpace( *poi ))
-			poi++;
-		//i think we need this, 
-		//think of an empty line containing only whitespace
-		if(!poi) {
-			break;
-		}
-*/
 		switch (*poi++) {
 			case '/':
 				if(col==0) {

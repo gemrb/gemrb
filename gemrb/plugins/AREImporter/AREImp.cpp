@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.69 2004/09/13 20:31:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.70 2004/09/13 21:04:15 avenger_teambg Exp $
  *
  */
 
@@ -177,16 +177,14 @@ Map* AREImp::GetMap(const char *ResRef)
 		map->Scripts[0]->MySelf = map;
 	}
 
-	char TmpResRef[9];
-	strcpy( TmpResRef, WEDResRef );
-	strcat( TmpResRef, "LM" );
+	ieResRef TmpResRef;
+	snprintf( TmpResRef, 9, "%sLM", WEDResRef);
 
 	ImageMgr* lm = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
 	DataStream* lmstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
 	lm->Open( lmstr, true );
 
-	strcpy( TmpResRef, WEDResRef );
-	strcat( TmpResRef, "SR" );
+	snprintf( TmpResRef, 9, "%sSR", WEDResRef);
 
 	ImageMgr* sr = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
 	DataStream* srstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
@@ -196,7 +194,6 @@ Map* AREImp::GetMap(const char *ResRef)
 	ImageMgr* sm = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
 	DataStream* smstr = core->GetResourceMgr()->GetResource( WEDResRef, IE_MOS_CLASS_ID );
 	sm->Open( smstr, true );
-
 
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
@@ -485,7 +482,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		ActorMgr* actmgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
 		for (i = 0; i < ActorCount; i++) {
 			char DefaultName[33];
-			char CreResRef[9];
+			ieResRef CreResRef;
 			ieDword TalkCount;
 			ieDword Orientation, Schedule;
 			ieWord XPos, YPos, XDes, YDes;
@@ -630,7 +627,9 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadWord( &ambi->height );
 		str->Seek( 6, GEM_CURRENT_POS );
 		str->ReadWord( &ambi->gain );
-		str->Read( &sounds, 80 );
+		for(i=0;i<10;i++) {
+			str->ReadResRef( sounds[i] );
+		}
 		str->ReadWord( &numsounds );
 		str->Seek( 2, GEM_CURRENT_POS );
 		str->ReadDword( &ambi->interval );
@@ -641,8 +640,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		
 		for (int i = 0; i < numsounds; ++i) {
 			char *sound = (char *) malloc(9);
-			memcpy(sound, sounds[i], 8);
-			sound[8]=0;
+			memcpy(sound, sounds[i], 9);
 			ambi->sounds.push_back(sound);
 		}
 		map->AddAmbient(ambi);
