@@ -185,7 +185,7 @@ int Interface::Init()
 	printStatus("OK", LIGHT_GREEN);
 	strings->Open(fs, true);
 	printMessage("Core", "Loading Palettes...\n", WHITE);
-	DataStream * bmppal256m = NULL, * bmppal16 = NULL;
+	DataStream * bmppal256 = NULL, * bmppal16 = NULL;
 	if(stricmp(core->GameType, "bg1") != 0) {
 		bmppal256 = key->GetResource("MPAL256\0", IE_BMP_CLASS_ID);
 		pal256 = (ImageMgr*)this->GetInterface(IE_BMP_CLASS_ID);
