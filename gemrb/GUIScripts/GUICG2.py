@@ -17,11 +17,14 @@ def OnLoad():
 	CharGenWindow = GemRB.LoadWindow(0)
 	ClassWindow = GemRB.LoadWindow(2)
 
+	RaceColumn = GemRB.GetVar("Race")+3
+
 	for i in range(0,7):
         	Button = GemRB.GetControl(CharGenWindow,i)
         	GemRB.SetButtonState(CharGenWindow,Button,IE_GUI_BUTTON_DISABLED)
 
-	j=0
+	j = 0
+	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1,ClassCount):
 		if GemRB.GetTableValue(ClassTable,i-1,3):
 			continue
@@ -29,12 +32,30 @@ def OnLoad():
 			Button = GemRB.GetControl(ClassWindow,j+7)
 		else:
 			Button = GemRB.GetControl(ClassWindow,j+2)
+		GemRB.SetButtonFlags(ClassWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
+		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_DISABLED)
+		j = j+1
 
+	j = 0
+	for i in range(1,ClassCount):
+		if GemRB.GetTableValue(ClassTable,i-1,3):
+			continue
+		if j>7:
+			Button = GemRB.GetControl(ClassWindow,j+7)
+		else:
+			Button = GemRB.GetControl(ClassWindow,j+2)
+		j = j+1
 		t = GemRB.GetTableValue(ClassTable, i-1, 0)
 		GemRB.SetText(ClassWindow, Button, t )
+
+		Allowed = GemRB.GetTableValue(ClassTable, i-1, RaceColumn)
+		if Allowed==0:
+			continue
+		if Allowed==2:
+			GemRB.SetToken("MAGESCHOOL","Illusionist") #temporary
+		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetEvent(ClassWindow, Button, IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
 		GemRB.SetVarAssoc(ClassWindow, Button , "Class", i)
-		j=j+1
 
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
         GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)

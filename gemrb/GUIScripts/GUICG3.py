@@ -20,10 +20,10 @@ def OnLoad():
 
 	for i in range(0,8):
 		print i+2
-		Button = GemRB.GetControl(AlignmentWindow, i+2)
-		GemRB.SetText(AlignmentWindow, Button, GemRB.GetTableValue(AlignmentTable,i,0) )
-		GemRB.SetEvent(AlignmentWindow, Button, IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
-		GemRB.SetVarAssoc(AlignmentWindow, Button, "Alignment", GemRB.GetTableValue(AlignmentTable,i,3) )
+#		Button = GemRB.GetControl(AlignmentWindow, i+2)
+#		GemRB.SetText(AlignmentWindow, Button, GemRB.GetTableValue(AlignmentTable,i,0) )
+#		GemRB.SetEvent(AlignmentWindow, Button, IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
+#		GemRB.SetVarAssoc(AlignmentWindow, Button, "Alignment", GemRB.GetTableValue(AlignmentTable,i,3) )
 
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
         GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -44,8 +44,8 @@ def OnLoad():
         GemRB.SetText(CharGenWindow, BiographyButton, 18003)
         GemRB.SetButtonState(CharGenWindow,BiographyButton,IE_GUI_BUTTON_DISABLED)
 
-	BackButton = GemRB.GetControl(AlignmentWindow,13)
-	GemRB.SetText(AlignmentWindow,BackButton,15416)
+#	BackButton = GemRB.GetControl(AlignmentWindow,13)
+#	GemRB.SetText(AlignmentWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(AlignmentWindow,0)
 	GemRB.SetText(AlignmentWindow,DoneButton,11973)
 
@@ -53,7 +53,7 @@ def OnLoad():
 	GemRB.SetText(AlignmentWindow,TextAreaControl,9602)
 
 	GemRB.SetEvent(AlignmentWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	GemRB.SetEvent(AlignmentWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
+#	GemRB.SetEvent(AlignmentWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	GemRB.SetEvent(CharGenWindow,CancelButton,IE_GUI_BUTTON_ON_PRESS,"CancelPress")
 	GemRB.SetButtonState(AlignmentWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 	GemRB.SetVisible(CharGenWindow,1)
