@@ -622,38 +622,48 @@ void GameControl::HideGUI()
 	Variables * dict = core->GetDictionary();
 	unsigned long index;
 	if(dict->Lookup("MessageWindow", index)) {
-		Window * mw = core->GetWindow(index);
-		core->SetVisible(index, 0);
-		if(dict->Lookup("MessagePosition", index)) {
-			ResizeDel(mw, index);
+		if(index != -1) {
+			Window * mw = core->GetWindow(index);
+			core->SetVisible(index, 0);
+			if(dict->Lookup("MessagePosition", index)) {
+				ResizeDel(mw, index);
+			}
 		}
 	}
 	if(dict->Lookup("OptionsWindow", index)) {
-		Window * ow = core->GetWindow(index);
-		core->SetVisible(index, 0);
-		if(dict->Lookup("OptionsPosition", index)) {
-			ResizeDel(ow, index);
+		if(index != -1) {
+			Window * ow = core->GetWindow(index);
+			core->SetVisible(index, 0);
+			if(dict->Lookup("OptionsPosition", index)) {
+				ResizeDel(ow, index);
+			}
 		}
 	}
 	if(dict->Lookup("PortraitWindow", index)) {
-		Window * pw = core->GetWindow(index);
-		core->SetVisible(index, 0);
-		if(dict->Lookup("PortraitPosition", index)) {
-			ResizeDel(pw, index);
+		if(index != -1) {
+			Window * pw = core->GetWindow(index);
+			core->SetVisible(index, 0);
+			if(dict->Lookup("PortraitPosition", index)) {
+				ResizeDel(pw, index);
+			}
 		}
 	}
 	if(dict->Lookup("ActionsWindow", index)) {
-		Window * aw = core->GetWindow(index);
-		core->SetVisible(index, 0);
-		if(dict->Lookup("ActionsPosition", index)) {
-			ResizeDel(aw, index);
+		if(index != -1) {
+			Window * aw = core->GetWindow(index);
+			core->SetVisible(index, 0);
+			if(dict->Lookup("ActionsPosition", index)) {
+				ResizeDel(aw, index);
+			}
 		}
 	}
 	if(dict->Lookup("TopWindow", index)) {
-		Window * tw = core->GetWindow(index);
-		core->SetVisible(index, 0);
-		if(dict->Lookup("TopPosition", index)) {
-			ResizeDel(tw, index);
+		if(index != -1) {
+			Window * tw = core->GetWindow(index);
+			core->SetVisible(index, 0);
+			if(dict->Lookup("TopPosition", index)) {
+				ResizeDel(tw, index);
+			}
 		}
 	}
 	core->GetVideoDriver()->SetViewport(((Window*)Owner)->XPos,((Window*)Owner)->YPos, Width, Height);
@@ -667,38 +677,48 @@ void GameControl::UnhideGUI()
 	Variables * dict = core->GetDictionary();
 	unsigned long index;
 	if(dict->Lookup("MessageWindow", index)) {
-		Window * mw = core->GetWindow(index);
-		core->SetVisible(index, 1);
-		if(dict->Lookup("MessagePosition", index)) {
-			ResizeAdd(mw, index);
+		if(index != -1) {
+			Window * mw = core->GetWindow(index);
+			core->SetVisible(index, 1);
+			if(dict->Lookup("MessagePosition", index)) {
+				ResizeAdd(mw, index);
+			}
 		}
 	}
 	if(dict->Lookup("ActionsWindow", index)) {
-		Window * aw = core->GetWindow(index);
-		core->SetVisible(index, 1);
-		if(dict->Lookup("ActionsPosition", index)) {
-			ResizeAdd(aw, index);
+		if(index != -1) {
+			Window * aw = core->GetWindow(index);
+			core->SetVisible(index, 1);
+			if(dict->Lookup("ActionsPosition", index)) {
+				ResizeAdd(aw, index);
+			}
 		}
 	}
 	if(dict->Lookup("OptionsWindow", index)) {
-		Window * ow = core->GetWindow(index);
-		core->SetVisible(index, 1);
-		if(dict->Lookup("OptionsPosition", index)) {
-			ResizeAdd(ow, index);
+		if(index != -1) {
+			Window * ow = core->GetWindow(index);
+			core->SetVisible(index, 1);
+			if(dict->Lookup("OptionsPosition", index)) {
+				ResizeAdd(ow, index);
+			}
 		}
 	}
 	if(dict->Lookup("PortraitWindow", index)) {
-		Window * pw = core->GetWindow(index);
-		core->SetVisible(index, 1);
-		if(dict->Lookup("PortraitPosition", index)) {
-			ResizeAdd(pw, index);
+		if(index != -1) {
+			Window * pw = core->GetWindow(index);
+			core->SetVisible(index, 1);
+			if(dict->Lookup("PortraitPosition", index)) {
+				ResizeAdd(pw, index);
+			}
 		}
 	}
 	if(dict->Lookup("TopWindow", index)) {
-		Window * tw = core->GetWindow(index);
-		core->SetVisible(index, 1);
-		if(dict->Lookup("TopPosition", index)) {
-			ResizeAdd(tw, index);
+		if(index != -1) {
+			Window * tw = core->GetWindow(index);
+			core->SetVisible(index, 1);
+			if(dict->Lookup("TopPosition", index)) {
+				ResizeAdd(tw, index);
+			}
 		}
 	}
 	core->GetVideoDriver()->SetViewport(((Window*)Owner)->XPos,((Window*)Owner)->YPos, Width, Height);
