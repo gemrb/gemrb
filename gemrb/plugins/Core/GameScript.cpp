@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.225 2005/02/11 21:45:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.226 2005/02/12 10:59:03 avenger_teambg Exp $
  *
  */
 
@@ -156,6 +156,7 @@ static TriggerLink triggernames[] = {
 	{"internalgt", GameScript::InternalGT,0},
 	{"internallt", GameScript::InternalLT,0},
 	{"interactingwith", GameScript::InteractingWith,0},
+	{"inweaponrange", GameScript::InWeaponRange,0},
 	{"isaclown", GameScript::IsAClown,0},
 	{"isactive", GameScript::IsActive,0},
 	{"isgabber", GameScript::IsGabber,0},
@@ -276,6 +277,8 @@ static ActionLink actionnames[] = {
 	{"ambientactivate", GameScript::AmbientActivate,0},
 	{"applydamage", GameScript::ApplyDamage,0},
 	{"applydamagepercent", GameScript::ApplyDamagePercent,0},
+	{"attack", GameScript::Attack,AF_BLOCKING},
+	{"attackreevaluate", GameScript::AttackReevaluate,AF_BLOCKING},
 	{"bashdoor", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
 	{"battlesong", GameScript::BattleSong,0},
 	{"berserk", GameScript::Berserk,0}, 
@@ -352,6 +355,7 @@ static ActionLink actionnames[] = {
 	{"floatmessagefixedrnd", GameScript::FloatMessageFixedRnd,0},
 	{"floatmessagernd", GameScript::FloatMessageRnd,0},
 	{"forceaiscript", GameScript::ForceAIScript,0},
+	{"forceattack", GameScript::ForceAttack,0},
 	{"forcefacing", GameScript::ForceFacing,0},
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA,0},
 	{"forcespell", GameScript::ForceSpell,0},
@@ -722,12 +726,49 @@ void SetScriptDebugMode(int arg)
 	InDebug=arg;
 }
 
+static void GoNearAndRetry(Scriptable *Sender, Scriptable *target)
+{
+	Sender->AddActionInFront( Sender->CurrentAction );
+	char Tmp[256];
+	sprintf( Tmp, "MoveToPoint([%hd.%hd])", target->Pos.x, target->Pos.y );
+	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
+}
+
 static void GoNearAndRetry(Scriptable *Sender, Point &p)
 {
 	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
 	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
+}
+
+#define MEMCPY(a,b) memcpy((a),(b),sizeof(a) )
+
+static Object *ObjectCopy(Object *object)
+{
+	if (!object) return NULL;
+	Object *newObject = new Object();
+	MEMCPY( newObject->objectFields, object->objectFields );
+	MEMCPY( newObject->objectFilters, object->objectFilters );
+	MEMCPY( newObject->objectRect, object->objectRect );
+	MEMCPY( newObject->objectName, object->objectName );
+	return newObject;
+}
+
+static Action *ParamCopy(Action *parameters)
+{
+	Action *newAction = new Action(true);
+	newAction->actionID = parameters->actionID;
+	newAction->int0Parameter = parameters->int0Parameter;
+	newAction->int1Parameter = parameters->int1Parameter;
+	newAction->int2Parameter = parameters->int2Parameter;
+	newAction->pointParameter = parameters->pointParameter;
+	MEMCPY( newAction->string0Parameter, parameters->string0Parameter );
+	MEMCPY( newAction->string1Parameter, parameters->string1Parameter );
+	for(int c=0;c<3;c++) {
+		newAction->objects[c]= ObjectCopy( parameters->objects[c] );
+	}
+	return newAction;
 }
 
 static void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
@@ -5015,6 +5056,23 @@ int GameScript::Vacant(Scriptable* Sender, Trigger* /*parameters*/)
 	return 0;
 }
 
+int GameScript::InWeaponRange(Scriptable* Sender, Trigger* parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	Actor *actor = (Actor *) Sender;
+	unsigned int wrange = actor->GetWeaponRange() * 10;
+	if( Distance( Sender, tar ) <= wrange ) {
+		return 1;
+	}
+	return 0;
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -6277,7 +6335,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	//}
 	if(Flags&BD_CHECKDIST) {
 		if(Distance(Sender, tar)>40) {
-			GoNearAndRetry(Sender, tar->Pos);
+			GoNearAndRetry(Sender, tar);
 			Sender->CurrentAction = NULL;
 			return;
 		}
@@ -8291,4 +8349,72 @@ void GameScript::RemoveMapnote( Scriptable* /*Sender*/, Action* parameters)
 {
 	Map *map = core->GetGame()->GetCurrentMap();
 	map->RemoveMapNote(parameters->pointParameter);
+}
+
+//It is possible to attack CONTAINERS/DOORS as well!!!
+void GameScript::AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int flags)
+{
+	//this is a dangerous cast, make sure actor is Actor *  !!!
+	Actor *actor = (Actor *) Sender;
+	unsigned int wrange = actor->GetWeaponRange() * 10;
+	if( wrange == 0) {
+		printMessage("[GameScript]","Zero weapon range!",LIGHT_RED);
+		return;
+	}
+	if( Distance(Sender, target) > wrange ) {
+		char Tmp[256];
+
+		sprintf( Tmp, "MoveToPoint([%d.%d])", target->Pos.x, target->Pos.y );
+		Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
+		return;
+	}
+	//TODO:
+	//send Attack trigger to attacked
+	actor->SetStance( IE_ANI_ATTACK );
+	actor->SetWait( 1 );
+	//attackreevaluate
+	if( (flags&AC_REEVALUATE) && parameters->int0Parameter) {
+		parameters->int0Parameter--;
+		Sender->AddAction( parameters );
+	}
+}
+
+void GameScript::Attack( Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[0] );
+	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
+		return;
+	}
+	AttackCore(Sender, tar, NULL, 0);
+}
+
+void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
+	if (!scr || scr->Type != ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
+		return;
+	}
+	AttackCore(scr, tar, NULL, 0);
+}
+
+void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[0] );
+	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
+		return;
+	}
+	//pumping parameters back for AttackReevaluate
+	//FIXME: we should make a copy of parameters here
+	Action *newAction = ParamCopy( parameters);
+	AttackCore(Sender, tar, newAction, AC_REEVALUATE);
 }

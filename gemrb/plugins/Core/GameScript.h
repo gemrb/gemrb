@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.155 2005/02/02 17:29:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.156 2005/02/12 10:59:04 avenger_teambg Exp $
  *
  */
 
@@ -37,6 +37,9 @@ class Action;
 #define DS_CONSOLE 4
 #define DS_CONST   8
 #define DS_NONAME  16
+
+//attack core flags
+#define AC_REEVALUATE 1
 
 #define BM_SET  0 //gemrb extension
 #define BM_AND  1
@@ -718,6 +721,7 @@ private:
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
 		int flags);
 	static int MoveItemCore(Scriptable *Sender, Scriptable *Target, const char *resref, int flags);
+	static void AttackCore(Scriptable *actor, Scriptable *target, Action *parameters, int flags);
 	static Action *GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree);
 	static Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 	static Trigger* GenerateTrigger(char* String);
@@ -869,6 +873,7 @@ public: //Script Functions
 	static int Internal(Scriptable* Sender, Trigger* parameters);
 	static int InternalGT(Scriptable* Sender, Trigger* parameters);
 	static int InternalLT(Scriptable* Sender, Trigger* parameters);
+	static int InWeaponRange(Scriptable* Sender, Trigger* parameter);
 	static int IsAClown(Scriptable* Sender, Trigger* parameters);
 	static int IsActive(Scriptable* Sender, Trigger* parameters);
 	static int IsGabber(Scriptable* Sender, Trigger* parameters);
@@ -982,6 +987,8 @@ public:
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
 	static void ApplyDamage(Scriptable* Sender, Action* parameters);
 	static void ApplyDamagePercent(Scriptable* Sender, Action* parameters);
+	static void Attack(Scriptable* Sender, Action* parameters);
+	static void AttackReevaluate(Scriptable* Sender, Action* parameters);
 	static void BattleSong(Scriptable* Sender, Action* parameters);
 	static void Berserk(Scriptable* Sender, Action* parameters);
 	static void BitClear(Scriptable* Sender, Action* parameters);
@@ -1049,6 +1056,7 @@ public:
 	static void FloatMessageFixedRnd(Scriptable* Sender, Action* parameters);
 	static void FloatMessageRnd(Scriptable* Sender, Action* parameters);
 	static void ForceAIScript(Scriptable* Sender, Action* parameters);
+	static void ForceAttack(Scriptable* Sender, Action* parameters);
 	static void ForceFacing(Scriptable* Sender, Action* parameters);
 	static void ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
