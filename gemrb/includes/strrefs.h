@@ -27,5 +27,8 @@
 #define STR_TARGETBUSY      21
 #define STR_CANTTALKTRANS   22
 #define STR_GOTXP           23
+#define STR_GOTABILITY      24
+#define STR_GOTSPELL        25
+#define STR_GOTSONG         26
 
 #endif //IE_STRINGS_H
