@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.173 2004/07/25 13:36:40 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.174 2004/07/25 13:49:57 avenger_teambg Exp $
  *
  */
 
 #include "GUIScript.h"
 #include "../Core/Interface.h"
 #include "../Core/Map.h"
+
 #ifdef WIN32
 #ifdef _DEBUG
 #undef _DEBUG
@@ -33,6 +34,7 @@
 #else
 #include "Python.h"
 #endif
+
 #include "../Core/Label.h"
 #include "../Core/AnimationMgr.h"
 #include "../Core/GameControl.h"
@@ -286,9 +288,13 @@ static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_StatComment__doc );
 	}
 	char* text = core->GetString( Strref );
-	char* newtext = ( char* ) malloc( strlen( text ) + 12 );
-	//this could be DANGEROUS
-	sprintf( newtext, text, X, Y );
+	int bufflen = strlen( text ) + 12;
+	if(bufflen<12) {
+		return AttributeError( GemRB_StatComment__doc );
+	}
+	char* newtext = ( char* ) malloc( bufflen );
+	//this could be DANGEROUS, not anymore (snprintf is your friend)
+	snprintf( newtext, bufflen, text, X, Y );
 	free( text );
 	ret = Py_BuildValue( "s", newtext );
 	free( newtext );
@@ -3509,6 +3515,7 @@ PyDoc_STRVAR( GemRB__doc,
 "It's implemented in gemrb/plugins/GUIScript/GUIScript.cpp\n\n" );
 
 /** Initialization Routine */
+
 bool GUIScript::Init(void)
 {
 //this should be a file name to python, not a title!
