@@ -77,6 +77,8 @@ static const char *PlayMode()
 
 int SaveGameIterator::GetSaveGameCount()
 {
+	char Prefix[10] = {0};
+	for(int i=0;i<8 && core->INIConfig[i] && core->INIConfig[i]!='.';i++) Prefix[i]=core->INIConfig[i];
 #ifdef WIN32
 	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
 	struct _finddata_t c_file;
@@ -101,22 +103,32 @@ int SaveGameIterator::GetSaveGameCount()
 	}
 #endif
 	do { //Iterate through all the available modules to load
+		char dtmp[_MAX_PATH];
 #ifdef WIN32
 		if(c_file.attrib & _A_SUBDIR) {
 			if(c_file.name[0] == '.')
 				continue;
-			char Name[_MAX_PATH], Text[_MAX_PATH];
-			int cnt = sscanf(c_file.name, "%*d-%s - %s", Name, Text);
+			sprintf(dtmp, "%s%s%s%s", core->GamePath, SaveFolder, SPathDelimiter, c_file.name);
 #else
-		char dtmp[_MAX_PATH];
 		struct stat fst;
 		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
 		stat(dtmp, &fst);
 		if(S_ISDIR(fst.st_mode)) {
 			if(de->d_name[0] == '.')
 				continue;
+#endif
+			char ftmp[_MAX_PATH];
+			sprintf(ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter, Prefix);
+			FILE * exist = fopen(ftmp, "rb");
+			if(!exist)
+				continue;
+			fclose(exist);
+#ifndef WIN32
 			char Name[_MAX_PATH], Text[_MAX_PATH];
 			int cnt = sscanf(de->d_name, "%*d-%s - %s", Name, Text);
+#else
+			char Name[_MAX_PATH], Text[_MAX_PATH];
+			int cnt = sscanf(c_file.name, "%*d-%s - %s", Name, Text);
 #endif
 			if(cnt == 2) {
 				printf("[Name = %s, Text = %s]\n", Name, Text);
@@ -139,6 +151,10 @@ int SaveGameIterator::GetSaveGameCount()
 
 SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 {
+	char Prefix[10];
+	int i;
+	for(i=0;i<8 && core->INIConfig[i] && core->INIConfig[i]!='.';i++) Prefix[i]=core->INIConfig[i];
+	Prefix[i]=0;
 #ifdef WIN32
 	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
 	struct _finddata_t c_file;
@@ -153,6 +169,7 @@ SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 	sprintf(Path, "%s%s%s*.*", core->GamePath, SaveFolder, SPathDelimiter);
 	if((hFile = _findfirst(Path, &c_file)) == -1L) //If there is no file matching our search
 		return NULL;
+	sprintf(Path, "%s%s%s", core->GamePath, SaveFolder);
 #else
 	sprintf(Path, "%s%s", core->GamePath, SaveFolder);
 	DIR * dir = opendir(Path);
@@ -171,7 +188,7 @@ SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 		if(c_file.attrib & _A_SUBDIR) {
 			if(c_file.name[0] == '.')
 				continue;
-			int cnt = sscanf(c_file.name, "%*d-%s - %s", Name, Text);
+			sprintf(dtmp, "%s%s%s%s", core->GamePath, SaveFolder, SPathDelimiter, c_file.name);
 #else
 		struct stat fst;
 		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
@@ -179,7 +196,17 @@ SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 		if(S_ISDIR(fst.st_mode)) {
 			if(de->d_name[0] == '.')
 				continue;
+#endif
+			char ftmp[_MAX_PATH];
+			sprintf(ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter, Prefix);
+			FILE * exist = fopen(ftmp, "rb");
+			if(!exist)
+				continue;
+			fclose(exist);
+#ifndef WIN32
 			int cnt = sscanf(de->d_name, "%*d-%s - %s", Name, Text);
+#else
+			int cnt = sscanf(c_file.name, "%*d-%s - %s", Name, Text);
 #endif
 			if(cnt == 2) {
 				printf("[Name = %s, Text = %s]\n", Name, Text);
@@ -245,7 +272,7 @@ SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 #ifdef WIN32
 	} while((flg=_findnext(hFile, &c_file)) == 0);
 	_findclose(hFile);
-	if(Remove || !flg)
+	if(Remove || (flg != 0))
 		return NULL;
 #else
 	} while((de = readdir(dir)) != NULL);
@@ -253,10 +280,6 @@ SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 	if(Remove || (de == NULL) )
 		return NULL;
 #endif
-	char Prefix[10];
-	int i;
-	for(i=0;i<8 && core->INIConfig[i] && core->INIConfig[i]!='.';i++) Prefix[i]=core->INIConfig[i];
-	Prefix[i]=0;
 	SaveGame * sg = new SaveGame(dtmp, Name, Prefix, prtrt);
 	return sg;
 }
