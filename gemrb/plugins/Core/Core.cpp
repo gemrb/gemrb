@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.25 2004/10/09 13:14:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.26 2004/11/27 14:52:20 avenger_teambg Exp $
  *
  */
 
@@ -55,33 +55,24 @@ BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD fdwReason,
 
 //// Globally used functions
 
+static unsigned char orientations[25]={
+6,7,8,9,10,
+5,6,8,10,11,
+4,4,0,12,12,
+3,2,0,14,13,
+2,1,0,15,14
+};
+
 unsigned char GetOrient(Point &s, Point &d)
 {
-	short deltaX = ( d.x- s.x), deltaY = ( d.y - s.y );
-	if (deltaX > 0) {
-		if (deltaY > 0) {
-			return 6;
-		} else if (deltaY == 0) {
-			return 4;
-		} else {
-			return 2;
-		}
-	} else if (deltaX == 0) {
-		if (deltaY > 0) {
-			return 8;
-		} else {
-			return 0;
-		}
-	} else {
-		if (deltaY > 0) {
-			return 10;
-		} else if (deltaY == 0) {
-			return 12;
-		} else {
-			return 14;
-		}
-	}
-	return 0;
+	int deltaX = s.x - d.x;
+	int deltaY = s.y - d.y;
+	int div = Distance(s,d);
+	if(!div) return 0; //default
+	if(div>2) div/=2;
+	int aX=deltaX/div;
+	int aY=deltaY/div;
+	return orientations[(aY+2)*5+aX+2];
 }
 
 unsigned int Distance(Point p, Point q)
