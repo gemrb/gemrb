@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.11 2005/02/24 22:09:05 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.12 2005/02/25 15:09:29 avenger_teambg Exp $
  *
  */
 
@@ -142,6 +142,8 @@ size_t _fseek(_FILE* stream, long offset, int whence)
 		case SEEK_END:
 			method = FILE_END;
 			break;
+		default:
+			return ( size_t ) 1;
 	}
 	if (SetFilePointer( stream->hFile, offset, NULL, method ) == 0xffffffff) {
 		return ( size_t ) 1;
