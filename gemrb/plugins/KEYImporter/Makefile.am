@@ -1,7 +1,7 @@
 lib_LTLIBRARIES = libKEYImporter.la
 INCLUDES = $(all_includes)
 LDFLAGS =     
-libKEYImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBS@
+libKEYImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libKEYImporter_la_LIBADD = ../Core/libcore.la
 libKEYImporter_la_METASOURCES = AUTO
 libKEYImporter_la_SOURCES = Dictionary.cpp KEYImporter.cpp KeyImp.cpp KEYImpCD.cpp 

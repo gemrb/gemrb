@@ -54,8 +54,10 @@ AC_CHECK_FUNCS([strnlen])
 AC_CHECK_HEADERS([fcntl.h])
 AC_CHECK_HEADERS([sys/time.h])
 AC_CHECK_HEADERS([sys/stat.h])
-AC_CHECK_LIB(dl, dlopen)
-AC_CHECK_LIB(pthread, main)
+AC_CHECK_LIB(dl, dlopen, [LIBDL="-ldl"], [LIBDL=""])
+AC_SUBST(LIBDL)
+AC_CHECK_LIB(pthread, main, [LIBPTHREAD="-lpthread"], [LIBPTHREAD=""])
+AC_SUBST(LIBPTHREAD)
 
 AC_C_CONST
 AC_C_INLINE
