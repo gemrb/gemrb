@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.18 2003/12/22 19:00:33 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.19 2003/12/22 23:33:37 balrog994 Exp $
  *
  */
 
@@ -106,6 +106,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[269] = DisplayStringHead;
 		actions[272] = CreateVisualEffect;
 		actions[273] = CreateVisualEffectObject;
+		actions[286] = HideGUI;
 		actions[287] = UnhideGUI;
 		actions[307] = SG;
 		actions[311] = DisplayStringWait;
