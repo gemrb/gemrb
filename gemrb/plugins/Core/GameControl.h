@@ -75,11 +75,16 @@ private:
 	void ResizeDel(Window * win, unsigned char type);
 	void ResizeAdd(Window * win, unsigned char type);
 	unsigned char LeftCount, BottomCount, RightCount, TopCount;
+	DialogState * ds;
+	Actor * speaker, * target;
+	Dialog * dlg;
 public:
 	void SetCutSceneMode(bool active);
 	void HideGUI();
 	void UnhideGUI();
 	void InitDialog(Actor * speaker, Actor * target, Dialog * dlg);
+	bool Dialogue;
+	void DialogChoose(int choose);
 };
 
 #endif

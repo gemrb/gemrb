@@ -66,6 +66,7 @@ GameControl::GameControl(void)
 	RightCount = 0;
 	TopCount = 0;
 	GUIEnabled = false;
+	Dialogue = false;
 }
 
 GameControl::~GameControl(void)
@@ -816,35 +817,71 @@ void GameControl::ResizeAdd(Window * win, unsigned char type)
 void GameControl::InitDialog(Actor * speaker, Actor * target, Dialog * dlg)
 {
 	DisableMouse = true;
+	Dialogue = true;
+	this->dlg = dlg;
+	this->speaker = speaker;
+	this->target = target;
 	unsigned long index;
 	core->GetDictionary()->Lookup("MessageWindowSize", index);
 	if(index < 1) {
 		core->GetGUIScriptEngine()->RunFunction("OnIncreaseSize");
 	}
+
 	else {
 		if(index > 1) {
 			core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
 		}
 	}
+	DialogChoose(-1);
+}
+
+void GameControl::DialogChoose(int choose)
+{
+	unsigned long index;
 	if(core->GetDictionary()->Lookup("MessageWindow", index)) {
 		Window * win = core->GetWindow(index);
 		if(core->GetDictionary()->Lookup("MessageTextArea", index)) {
 			TextArea * ta = (TextArea*)win->GetControl(index);
-			DialogState * ds = dlg->GetState(0);
+			if(choose == -1)
+				ds = dlg->GetState(0);
+			else {
+				DialogTransition * tr = ds->transitions[choose];
+				if(tr->action) {
+					for(int i = 0; i < tr->action->count; i++) {
+						if(speaker->Scripts[0]) {
+							speaker->Scripts[0]->ExecuteString(tr->action->strings[i]);
+						}
+					}
+				}
+				ds = dlg->GetState(tr->stateIndex);
+			}
 			char * string = core->GetString(ds->StrRef, 2);
 			int i = ta->AppendText("[color=FF0000]", -1);
 			ta->AppendText(speaker->LongName, i);
-			ta->AppendText("[/color]: ", i);
+			ta->AppendText("[/color]: [p]", i);
 			ta->AppendText(string, i);
+			ta->AppendText("[/p]", i);
 			ta->AppendText("", -1);
-			for(int x = 0; x < ds->transitionsCount; x++) {
-				char * s = core->GetString(ds->transitions[x]->textStrRef);
-				sprintf(string, "%d - ", x+1);
-				i = ta->AppendText(string, -1);
-				ta->AppendText(s, i);
-				free(s);
-			}
 			free(string);
+			for(int x = 0; x < ds->transitionsCount; x++) {
+				if(ds->transitions[x]->textStrRef == 0) {
+					string = (char*)malloc(29);
+					sprintf(string, "[s=%d,ffffff,ff0000]Continue", x);
+					i = ta->AppendText(string, -1);
+					ta->AppendText("[/s]", i);
+					free(string);
+				} else {
+					char * s = core->GetString(ds->transitions[x]->textStrRef);
+					string = (char*)malloc(25);
+					sprintf(string, "[s=%d,ffffff,ff0000]%d - ", x, x+1);
+					i = ta->AppendText(string, -1);
+					ta->AppendText(s, i);
+					ta->AppendText("[/s]", i);
+					free(string);
+					free(s);
+				}
+			}
+			ta->AppendText("", -1);
 		}
 	}
 }
