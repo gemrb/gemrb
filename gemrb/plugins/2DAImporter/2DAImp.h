@@ -58,6 +58,8 @@ public:
 		}
 		if(coli == -1)
 			return (char*)defVal;
+		if(rows[rowi].size() <= coli)
+			return (char*)defVal;
 		return rows[rowi][coli];
 	};
 
