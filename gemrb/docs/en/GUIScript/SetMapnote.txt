@@ -1,0 +1,14 @@
+
+Prototype: GemRB.SetMapnote(X,Y,color,text)
+
+Description: Adds or removes a mapnote.
+
+Parameters: 
+X,Y:   the position of the mapnote
+color: the color index (0-7) of the note (in case of PST it is only 0 or 1)
+text:  string, the text of the note
+
+Return value: N/A
+
+See also: CreateMapControl
+

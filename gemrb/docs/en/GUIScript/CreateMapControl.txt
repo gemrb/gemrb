@@ -14,5 +14,5 @@ Flag2ResRef - the readonly mapnotes are marked by this .bam (red pin)
 
 Return value: N/A
 
-See also: SetVarAssoc
+See also: SetVarAssoc, SetMapnote
 
