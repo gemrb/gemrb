@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.78 2004/11/22 18:55:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.79 2004/12/05 11:09:16 avenger_teambg Exp $
  *
  */
 
@@ -175,6 +175,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 
 			case IE_GUI_BUTTON_PRESSED:
 				Image = Pressed;
+				if (! Image)
+					Image = Unpressed;
 				break;
 
 			case IE_GUI_BUTTON_SELECTED:
