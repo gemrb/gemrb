@@ -38,7 +38,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos
 Window::~Window()
 {
 	std::vector<Control*>::iterator m = Controls.begin();
-	for(int i = 0; Controls.size() != 0;) {
+	while(Controls.size() != 0) {
 		Control * ctrl = (*m);
 		delete(ctrl);
 		Controls.erase(m);
