@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.39 2004/01/07 19:25:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.40 2004/01/10 21:53:43 avenger_teambg Exp $
  *
  */
 
@@ -98,7 +98,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 notmatched:
   				len += (int)strlen(lines[i])+1;
   				Buffer = (char*)realloc(Buffer, len+2);
-  				memcpy(&Buffer[lastlen], lines[i], len+1-lastlen);
+  				memcpy(&Buffer[lastlen], lines[i], len-lastlen);
 			}
 			lastlen=len;
 			if(i != lines.size()-1) {

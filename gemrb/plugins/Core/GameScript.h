@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.24 2004/01/09 11:41:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.25 2004/01/10 21:53:43 avenger_teambg Exp $
  *
  */
 
@@ -403,6 +403,7 @@ private: //Script Functions
 	static int  Dead(Scriptable * Sender, Trigger * parameters);
 private:
 	//Actions
+	static void NoAction(Scriptable * Sender, Action * parameters);
 	static void SetGlobal(Scriptable * Sender, Action * parameters);
 	static void SG(Scriptable * Sender, Action * parameters);
 	static void TriggerActivation(Scriptable * Sender, Action * parameters);
@@ -435,6 +436,7 @@ private:
 	static void DisplayString(Scriptable * Sender, Action * parameters);
 	static void StartSong(Scriptable * Sender, Action * parameters);
 	static void Continue(Scriptable * Sender, Action * parameters);
+	static void PlayDead(Scriptable * Sender, Action * parameters);
 	static void PlaySound(Scriptable * Sender, Action * parameters);
 	static void CreateVisualEffectObject(Scriptable * Sender, Action * parameters);
 	static void CreateVisualEffect(Scriptable * Sender, Action * parameters);
@@ -453,6 +455,25 @@ private:
 	static void Activate(Scriptable * Sender, Action * parameters);
 	static void LeaveAreaLUA(Scriptable * Sender, Action * parameters);
 	static void LeaveAreaLUAPanic(Scriptable * Sender, Action * parameters);
+	static void SetTokenGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalSetGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalAddGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalSubGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalAndGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalOrGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalBAndGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalBOrGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalBAnd(Scriptable * Sender, Action * parameters);
+	static void GlobalMaxGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalMinGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalMax(Scriptable * Sender, Action * parameters);
+	static void GlobalMin(Scriptable * Sender, Action * parameters);
+	static void GlobalBOr(Scriptable * Sender, Action * parameters);
+	static void BitClear(Scriptable * Sender, Action * parameters);
+	static void GlobalShlGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalShrGlobal(Scriptable * Sender, Action * parameters);
+	static void GlobalShl(Scriptable * Sender, Action * parameters);
+	static void GlobalShr(Scriptable * Sender, Action * parameters);
 };
 
 #endif
