@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.26 2003/12/07 10:02:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.27 2003/12/07 11:57:50 avenger_teambg Exp $
  *
  */
 
@@ -32,6 +32,7 @@
 #endif
 
 static char overridesubfolder[9]="override";
+static char datasubfolder[5]="data";
 
 #ifndef WIN32
 char * FindInDir(char * Dir, char * Filename)
@@ -44,7 +45,7 @@ char * FindInDir(char * Dir, char * Filename)
 	if(de == NULL) 
 		return NULL;
 	do { 
-		if(strnicmp(de->d_name, Filename, sizeof(Filename)) == 0) {
+		if(strnicmp(de->d_name, Filename, strlen(Filename)) == 0) {
 			fn = (char*)malloc(strlen(de->d_name)+1);
 			strcpy(fn, de->d_name);
 			break;
@@ -63,6 +64,11 @@ KeyImp::KeyImp(void)
 		strcat(path, overridesubfolder);
 		if(!dir_exists(path) ) {
 			overridesubfolder[0]=toupper(overridesubfolder[0]);
+		}
+		strcpy(path, core->GamePath);
+		strcat(path, datasubfolder);
+		if(!dir_exists(path) ) {
+			datasubfolder[0]=toupper(datasubfolder[0]);
 		}
 	}
 }
@@ -135,6 +141,12 @@ bool KeyImp::LoadResFile(const char * resfile)
 			strncpy( tmpPath , be.name, (strrchr(be.name, PathDelimiter)+1)-be.name);
 			strcpy(fullPath, core->GamePath);
 			strcat(fullPath, tmpPath);
+			if(!dir_exists(fullPath) ) {
+				tmpPath[0]=toupper(tmpPath[0]);
+				be.name[0]=toupper(be.name[0]);
+				strcpy(fullPath, core->GamePath);
+				strcat(fullPath, tmpPath);
+			}
 			ExtractFileFromPath(fn, be.name);
 			char * newname = FindInDir(fullPath, fn);
 			if(newname) {
@@ -187,14 +199,16 @@ bool KeyImp::LoadResFile(const char * resfile)
 
 DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 {
-	char path[_MAX_PATH], BasePath[_MAX_PATH], filename[_MAX_PATH] = {0};
+	char path[_MAX_PATH];
+	char BasePath[_MAX_PATH] = {0};
+	char filename[_MAX_PATH] = {0};
 	//Search it in the GemRB override Directory
 	strcpy(path, "override"); //this shouldn't change
 	strcat(path, SPathDelimiter);
 	strcat(path, core->GameType);
 	SearchIn(core->GemRBPath, path, resname, type, "[KEYImporter]: Found in GemRB Override...\n");
 	SearchIn(core->GamePath, overridesubfolder, resname, type, "[KEYImporter]: Found in Override...\n");
-	SearchIn(core->GamePath, "Data", resname, type, "[KEYImporter]: Found in Local CD1 Folder...\n");
+	SearchIn(core->GamePath, datasubfolder, resname, type, "[KEYImporter]: Found in Local CD1 Folder...\n");
 	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
 	unsigned long ResLocator;
 	if(resources.Lookup(resname,type,ResLocator) ) {
@@ -210,10 +224,18 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 			strcat(path, biffiles[bifnum].name);
 			exist = fopen(path, "rb");
 			if(!exist) {
+				path[0]=toupper(path[0]);
+				exist = fopen(path, "rb");
+			}
+			if(!exist) {
 				strcpy(path, core->GamePath);
 				strncat(path, biffiles[bifnum].name, strlen(biffiles[bifnum].name)-4);
 				strcat(path, ".cbf");
 				exist = fopen(path, "rb");
+				if(!exist) {
+					path[0]=toupper(path[0]);
+					exist = fopen(path, "rb");
+				}
 			}
 		}
 		if(exist == NULL) {
@@ -246,7 +268,7 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 				strcat(path, ".cbf");
 				exist = fopen(path, "rb");
 				if(!exist) {
-					printf("[KEYImporter]: Cannot find %s.", path);
+					printf("[KEYImporter]: Cannot find %s\n", path);
 					core->FreeInterface(ai);
 					return NULL;
 				}
@@ -258,14 +280,14 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 			fclose(exist);
 		ai->OpenArchive(path);
 		DataStream * ret = ai->GetStream(ResLocator, type);
-		if(ret == NULL)
-			printf("[NOT_FOUND]\n");
 		core->FreeInterface(ai);
 		if(ret) {
 			strncpy(ret->filename, resname,8);
 			ret->filename[8]=0;
 			strcat(ret->filename, core->TypeExt(type));
 		}
+		else
+			printf("[NOT_FOUND]\n");
 		return ret;
 	}
 	return NULL;
@@ -325,13 +347,6 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		core->FreeInterface(ani);
 		core->GetFactory()->AddFactoryObject(af);
 		return af;
-/*
-		FileStream * fs = new FileStream();
-		if(!fs)
-			return NULL;
-		fs->Open(path, true);
-		return fs;
-*/
 	}
 	/*printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
 	unsigned long ResLocator;
