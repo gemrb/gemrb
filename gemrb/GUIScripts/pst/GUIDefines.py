@@ -6,6 +6,7 @@ IE_GUI_BUTTON_SOUND      = 0x00000004
 IE_GUI_BUTTON_ALT_SOUND  = 0x00000008
 IE_GUI_BUTTON_CHECKBOX   = 0x00000010   #or radio button
 IE_GUI_BUTTON_RADIOBUTTON= 0x00000020   #sticks in a state
+IE_GUI_BUTTON_DEFAULT    = 0x00000040   #enter button triggers it                                   
 
 #events
 IE_GUI_BUTTON_ON_PRESS    = 0x00000000

@@ -59,7 +59,9 @@ def OnLoad():
 	GemRB.SetText(QuitWindow, TextArea, 46782)
 	Button = GemRB.GetControl(QuitWindow, 2)
 	GemRB.SetText(QuitWindow, Button, 46783)
+        GemRB.SetButtonFlags(QuitWindow, Button, IE_GUI_BUTTON_DEFAULT,OP_OR)
 	GemRB.SetEvent(QuitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OkButton")
+
 	Button = GemRB.GetControl(QuitWindow,1)
 	GemRB.SetButtonFlags(QuitWindow, Button, IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	GemRB.SetButtonState(QuitWindow, Button, IE_GUI_BUTTON_DISABLED)
@@ -208,6 +210,7 @@ def OnLoad():
 	AcceptButton = GemRB.GetControl(NewLifeWindow, 0)
 	GemRB.SetText(NewLifeWindow, AcceptButton, 4192)
 	GemRB.SetEvent(NewLifeWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "AcceptPress")
+        GemRB.SetButtonFlags(NewLifeWindow, AcceptButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 	
 	CancelButton = GemRB.GetControl(NewLifeWindow, 1)
 	GemRB.SetText(NewLifeWindow, CancelButton, 4196)	
