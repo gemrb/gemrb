@@ -1,4 +1,4 @@
-/* $Id: mve_play.cpp,v 1.6 2004/08/07 15:41:52 divide Exp $ */
+/* $Id: mve_play.cpp,v 1.7 2004/08/12 14:54:17 divide Exp $ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -67,6 +67,8 @@
 int g_spdFactorNum = 0;
 static int g_spdFactorDenom = 10;
 static int g_frameUpdated = 0;
+static int g_framesToDrop = 0;
+static int g_framesDropped = 0;
 
 static short get_short(unsigned char* data)
 {
@@ -215,10 +217,9 @@ static void do_timer_wait(void)
 	}
 
 	gettimeofday( &tv, NULL );
-	if (tv.tv_sec > timer_expire.tv_sec) {
-		goto end;
-	} else if (tv.tv_sec == timer_expire.tv_sec &&
-		tv.tv_usec >= timer_expire.tv_usec) {
+	if ((tv.tv_sec > timer_expire.tv_sec) || (tv.tv_sec == timer_expire.tv_sec &&
+		tv.tv_usec >= timer_expire.tv_usec)) {
+		++ g_framesToDrop; // we are late, so we have to catch up to audio not to lose synchro
 		goto end;
 	}
 
@@ -258,6 +259,7 @@ static int mve_audio_canplay = 0;
 static int mve_audio_compressed = 0;
 static int mve_audio_enabled = 1;
 static short * mve_audio_memory = 0;
+static int mve_audio_underruns = 0;
 
 #endif
 
@@ -333,13 +335,15 @@ static int create_audiobuf_handler(unsigned char major, unsigned char minor,
 		alSourcef( mve_audio_source, AL_PITCH, 1.0f );
 		alSourcef( mve_audio_source, AL_GAIN, 1.0f );
 		alSourcefv( mve_audio_source, AL_POSITION, SourcePos );
-		alSourcei( mve_audio_source, AL_SOURCE_RELATIVE, 1 );
 		alSourcefv( mve_audio_source, AL_VELOCITY, SourceVel );
 		alSourcei( mve_audio_source, AL_LOOPING, 0 );
+		alSourcei( mve_audio_source, AL_SOURCE_RELATIVE, 1 );
 	}
 
 	fprintf( stderr, "   success\n" );
 	mve_audio_canplay = 1;
+
+	mve_audio_underruns = 0;
 #endif
 
 	return 1;
@@ -396,8 +400,7 @@ static int audio_data_handler(unsigned char major, unsigned char minor,
 					nsamp -= 8;
 					data += 8;
 
-					alBufferData( buffer, mve_audio_format,
-data, nsamp, mve_audio_samplerate );
+					alBufferData( buffer, mve_audio_format, data, nsamp, mve_audio_samplerate );
 				}
 			} else {
 					memset(mve_audio_memory,0, nsamp);
@@ -406,12 +409,18 @@ data, nsamp, mve_audio_samplerate );
 			alSourceQueueBuffers( mve_audio_source, 1, &buffer );
 
 			ALenum state;
-			alGetSourcei( mve_audio_source, AL_SOURCE_STATE, &state
-);
+			alGetSourcei( mve_audio_source, AL_SOURCE_STATE, &state );
 
 			if (AL_STOPPED == state) { // it seems we have a buffer underrun; press play to continue...
+				mve_audio_underruns ++;
+				fprintf( stderr, "\nbuffer underrun\n" );
 				alSourcePlay( mve_audio_source );
 			}
+
+			ALint queued, processed;
+			alGetSourcei( mve_audio_source, AL_BUFFERS_QUEUED, &queued );
+			alGetSourcei( mve_audio_source, AL_BUFFERS_PROCESSED, &processed );
+			fprintf(stderr, "audio buffers: %d queued, %d processed\r", queued, processed);
 
 		}
 	}
@@ -502,8 +511,13 @@ static int display_video_handler(unsigned char major, unsigned char minor,
 		g_destY = ( g_screenHeight - g_height ) >> 1;
 	}
 
-	mve_showframe( ( unsigned char * ) g_vBackBuf1, g_width, g_height, 0, 0,
-		g_width, g_height, g_destX, g_destY );
+	if (0 == g_framesToDrop) { // this is the most expensive operation, so we want to drop frames here
+		mve_showframe( ( unsigned char * ) g_vBackBuf1, g_width, g_height, 0, 0,
+			g_width, g_height, g_destX, g_destY );
+	} else {
+		-- g_framesToDrop;
+		++ g_framesDropped;
+	}
 
 	g_frameUpdated = 1;
 
@@ -666,6 +680,9 @@ int MVE_rmPrepMovie(void* src, int x, int y, int track)
 	mve_play_next_chunk( mve ); /* video initialization chunk */
 	mve_play_next_chunk( mve ); /* audio initialization chunk */
 
+	g_framesToDrop = 0;
+	g_framesDropped = 0;
+	
 	return 0;
 }
 
@@ -735,6 +752,8 @@ void MVE_rmEndMovie()
 	mve_audio_canplay = 0;
 	mve_audio_compressed = 0;
 	audiobuf_created = 0;
+
+	fprintf( stderr, "\ntotal buffer underruns: %d\n", mve_audio_underruns );
 #endif
 
 	mve_free( g_vBuffers );
@@ -743,6 +762,8 @@ void MVE_rmEndMovie()
 	g_nMapLength = 0;
 	videobuf_created = 0;
 	video_initialized = 0;
+
+	fprintf( stderr, "dropped frames: %d\n", g_framesDropped );
 
 	mve_close( mve );
 	mve = NULL;
