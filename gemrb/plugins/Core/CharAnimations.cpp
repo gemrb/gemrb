@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.39 2004/08/23 18:26:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.40 2004/08/23 18:50:20 avenger_teambg Exp $
  *
  */
 
@@ -330,7 +330,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 	}
 	//newresref is based on the prefix (ResRef) and various other things
 	char NewResRef[12]; //this is longer than expected so it won't overflow
-	strncpy( NewResRef, ResRef, 7 ); //we need this long for special anims
+	strncpy( NewResRef, ResRef, 8 ); //we need this long for special anims
 	unsigned char Cycle;
 	GetAnimResRef( StanceID, Orient, NewResRef, Cycle );
 	NewResRef[8]=0; //cutting right to size
