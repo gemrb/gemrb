@@ -72,21 +72,22 @@ bool BMPImp::Open(DataStream * stream, bool autoFree)
 	//RASTERDATA
 	switch(BitCount) {
 		case 24:
-			PaddedRowLength = ((Width*3)+((Width*3)%4));
+			PaddedRowLength = Width*3;
 		break;
 
 		case 16:
-			PaddedRowLength = ((Width*2)+((Width*2)%4));
+			PaddedRowLength = Width*2;
 		break;
 
 		case 8:
-			PaddedRowLength = (Width+(Width%4));
+			PaddedRowLength = Width;
 		break;
 
 		default:
 			printf("[BMPImporter]: BitCount not supported.\n");
 			return false;
 	}
+	if(PaddedRowLength&3) PaddedRowLength+=4-(PaddedRowLength&3);
 	void * rpixels = malloc(PaddedRowLength*Height);
 	str->Read(rpixels, PaddedRowLength*Height);
 	if(BitCount == 24) {
