@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.219 2004/09/22 14:08:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.220 2004/10/07 20:06:31 avenger_teambg Exp $
  *
  */
 
@@ -613,11 +613,7 @@ int Interface::Init()
 	FreeInterface( anim );
 	video->SetCursor( Cursors[0]->GetFrame( 0 ), Cursors[1]->GetFrame( 0 ) );
 	printStatus( "OK", LIGHT_GREEN );
-/*
-	printMessage( "Core", "Initializing A* PathFinder...", WHITE );
-	pathfinder = new PathFinder();
-	printStatus( "OK", LIGHT_GREEN );
-*/
+
 	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
 	timer = new GlobalTimer();
 	if (!timer) {
@@ -1124,6 +1120,7 @@ bool Interface::LoadGemRBINI()
 		strcpy( Palette256, s );
 
 
+	SetFeature( ini->GetKeyAsInt( "resources", "AutomapIni", 0 ), GF_AUTOMAP_INI );
 	SetFeature( ini->GetKeyAsInt( "resources", "IWDMapDimensions", 0 ), GF_IWD_MAP_DIMENSIONS );
 	SetFeature( ini->GetKeyAsInt( "resources", "OneByteAnimationID", 0 ), GF_ONE_BYTE_ANIMID );
 	SetFeature( ini->GetKeyAsInt( "resources", "IgnoreButtonFrames", 1 ), GF_IGNORE_BUTTON_FRAMES );

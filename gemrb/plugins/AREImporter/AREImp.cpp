@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.71 2004/09/14 20:41:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.72 2004/10/07 20:06:33 avenger_teambg Exp $
  *
  */
 
@@ -149,6 +149,11 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	str->Seek( 8, GEM_CURRENT_POS ); //skipping some
 	str->ReadDword( &SongHeader );
 	str->ReadDword( &RestHeader );
+	if (core->HasFeature(GF_AUTOMAP_INI) ) {
+		str->ReadDword( &tmp ); //skipping crap in PST
+	}
+	str->ReadDword( &NoteCount );
+	str->ReadDword( &NoteOffset );
 	return true;
 }
 
