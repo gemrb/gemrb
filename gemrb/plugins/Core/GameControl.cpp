@@ -28,6 +28,13 @@
 
 extern Interface * core;
 
+static Color cyan = {0x00, 0xff, 0xff, 0xff};
+static Color red  = {0xff, 0x00, 0x00, 0xff};
+static Color green = {0x00, 0xff, 0x00, 0xff};
+static Color white = {0xff, 0xff, 0xff, 0xff};
+static Color black = {0x00, 0x00, 0x00, 0xff};
+static Color blue = {0x00, 0x00,0xff,0x80};
+
 GameControl::GameControl(void)
 {
 	MapIndex = -1;
@@ -38,7 +45,6 @@ GameControl::GameControl(void)
 	overDoor = NULL;
 	overContainer = NULL;
 	overInfoPoint = NULL;
-	Color white = {0xff, 0xff, 0xff, 0xff}, black = {0x00, 0x00, 0x00, 0xff};
 	InfoTextPalette = core->GetVideoDriver()->CreatePalette(white, black);
 	lastCursor = 0;
 	moveX = moveY = 0;
@@ -68,8 +74,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			short GameX = lastMouseX, GameY = lastMouseY;
 			video->ConvertToGame(GameX, GameY);
 			CalculateSelection(GameX, GameY);
-
-			Color green = {0x00, 0xff, 0x00, 0xff};
 			
 			short xs[4] = {SelectionRect.x, SelectionRect.x+SelectionRect.w, SelectionRect.x+SelectionRect.w, SelectionRect.x};
 			short ys[4] = {SelectionRect.y, SelectionRect.y, SelectionRect.y+SelectionRect.h, SelectionRect.y+SelectionRect.h};
@@ -83,22 +87,18 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			video->DrawPolyline(&poly, green, false);
 		}
 		if(overDoor) {
-			Color cyan = {0x00, 0xff, 0xff, 0xff};
 			if(overDoor->DoorClosed)
-				video->DrawPolyline(overDoor->closed, cyan, true);	
-			else 
-				video->DrawPolyline(overDoor->open, cyan, true);	
+				video->DrawPolyline(overDoor->closed,cyan,true);
+			else {
+				video->DrawPolyline(overDoor->open,cyan,true);
+			}
 		}
 		if(overContainer) {
-			Color cyan = {0x00, 0xff, 0xff, 0xff};
-			Color red  = {0xff, 0x00, 0x00, 0xff};
 			if(overContainer->TrapDetected && overContainer->Trapped) {
 				video->DrawPolyline(overContainer->outline, red, true);
-				core->GetVideoDriver()->SetCursor(core->Cursors[39]->GetFrame(0),core->Cursors[40]->GetFrame(0));
 			}
 			else {
 				video->DrawPolyline(overContainer->outline, cyan, true);
-				core->GetVideoDriver()->SetCursor(core->Cursors[2]->GetFrame(0),core->Cursors[3]->GetFrame(0));
 			}
 		}
 		for(int i = 0; i < infoPoints.size(); i++) {
@@ -125,12 +125,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		}
 	}
 	else {
-		Color Blue;
-		Blue.b = 0xff;
-		Blue.r = 0;
-		Blue.g = 0;
-		Blue.a = 128;
-		core->GetVideoDriver()->DrawRect(vp, Blue);
+		core->GetVideoDriver()->DrawRect(vp, blue);
 	}
 }
 /** Sets the Text of the current control */
@@ -151,6 +146,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 /** Mouse Over Event */
 void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 {
+	int nextCursor=0;
+
 	lastMouseX = x;
 	lastMouseY = y;
 	if(x < 20)
@@ -188,34 +185,24 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 	//CalculateSelection(GameX, GameY);
 
-	Door * door = area->tm->GetDoor(GameX, GameY);
-	if(door) {
-		if(door->Cursor != lastCursor) {
-			core->GetVideoDriver()->SetCursor(core->Cursors[door->Cursor]->GetFrame(0), core->Cursors[door->Cursor+1]->GetFrame(0));
-			lastCursor = door->Cursor;
-		}
-		overDoor = door;
-	}
-	else {
-		if(lastCursor != 0) {
-			core->GetVideoDriver()->SetCursor(core->Cursors[0]->GetFrame(0), core->Cursors[1]->GetFrame(0));
-			lastCursor = 0;
-		}
-		overDoor = NULL;
-	}
+	overDoor = area->tm->GetDoor(GameX, GameY);
+	if(overDoor)
+		nextCursor = overDoor->Cursor;
 	overContainer = area->tm->GetContainer(GameX, GameY);
 	if(overContainer) {
-		if(lastCursor != IE_CHEST_CURSOR) {
-			core->GetVideoDriver()->SetCursor(core->Cursors[IE_CHEST_CURSOR]->GetFrame(0), core->Cursors[IE_CHEST_CURSOR+1]->GetFrame(0));
-			lastCursor = IE_CHEST_CURSOR;
+		if(overContainer->TrapDetected && overContainer->Trapped) {
+				nextCursor=39;
+		}
+		else {
+				nextCursor=2;
 		}
 	}
 	overInfoPoint = area->tm->GetInfoPoint(GameX, GameY);
-	if(overInfoPoint) {
-		if(overInfoPoint->Cursor != lastCursor) {
-			core->GetVideoDriver()->SetCursor(core->Cursors[overInfoPoint->Cursor]->GetFrame(0), core->Cursors[overInfoPoint->Cursor+1]->GetFrame(0));
-			lastCursor = overInfoPoint->Cursor;
-		}
+	if(overInfoPoint)
+		nextCursor = overInfoPoint->Cursor;
+	if(lastCursor != nextCursor) {
+		core->GetVideoDriver()->SetCursor(core->Cursors[nextCursor]->GetFrame(0), core->Cursors[nextCursor+1]->GetFrame(0));
+		lastCursor = nextCursor;
 	}
 }
 /** Mouse Button Down */
@@ -241,7 +228,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 	Map * area = game->GetMap(MapIndex);
 	Door * door = area->tm->GetDoor(GameX, GameY);
 	if(door) {
-		area->tm->ToogleDoor(door);
+		area->tm->ToggleDoor(door);
+		return;
 	}
 	if(!DrawSelectionRect) {
 		ActorBlock * actor = area->GetActor(GameX, GameY);
