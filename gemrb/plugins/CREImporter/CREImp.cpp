@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.28 2004/04/10 17:44:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.29 2004/04/13 22:19:28 doc_wagon Exp $
  *
  */
 
@@ -373,7 +373,7 @@ void CREImp::ReadInventory(Actor *act, int Inventory_Size)
 
 		for (unsigned int j = 0; j < known_spells.size(); j++) {
 			CREKnownSpell* spl = known_spells[j];
-			if (spl->Type == sm->Type and spl->Level == sm->Level)
+			if (spl->Type == sm->Type && spl->Level == sm->Level)
 				sm->known_spells.push_back( spl );
 		}
 		for (unsigned int j = 0; j < sm->MemorizedCount; j++) {
