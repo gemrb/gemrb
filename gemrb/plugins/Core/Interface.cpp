@@ -189,38 +189,58 @@ int Interface::Init()
 	printMessage("Core", "Palettes Loaded\n", LIGHT_GREEN);
 	printMessage("Core", "Loading Fonts...\n", WHITE);
 	AnimationMgr * anim = (AnimationMgr*)GetInterface(IE_BAM_CLASS_ID);
-	for(int i = 0; i < 5; i++) {
-		char ResRef[9];
-		switch(i) {
-			case 0:
-				strcpy(ResRef, "REALMS\0\0\0");
-			break;
+	int table = LoadTable("fonts");
+	if(table == -1) {
+		for(int i = 0; i < 5; i++) {
+			char ResRef[9];
+			switch(i) {
+				case 0:
+					strcpy(ResRef, "REALMS\0\0\0");
+				break;
 
-			case 1:
-				strcpy(ResRef, "STONEBIG\0");
-			break;
+				case 1:
+					strcpy(ResRef, "STONEBIG\0");
+				break;
 
-			case 2:
-				strcpy(ResRef, "STONESML\0");
-			break;
+				case 2:
+					strcpy(ResRef, "STONESML\0");
+				break;
 
-			case 3:
-				strcpy(ResRef, "NORMAL\0\0\0");
-			break;
+				case 3:
+					strcpy(ResRef, "NORMAL\0\0\0");
+				break;
 
-			case 4:
-				strcpy(ResRef, "TOOLFONT");
-			break;
+				case 4:
+					strcpy(ResRef, "TOOLFONT");
+				break;
+			}
+			DataStream * fstr = key->GetResource(ResRef, IE_BAM_CLASS_ID);
+			if(!anim->Open(fstr, true)) {
+					printStatus("ERROR", LIGHT_RED);
+					delete(fstr);
+					continue;
+			}
+			Font * fnt = anim->GetFont();
+			strncpy(fnt->ResRef, ResRef, 8);
+			fonts.push_back(fnt);
 		}
-		DataStream * fstr = key->GetResource(ResRef, IE_BAM_CLASS_ID);
-		if(!anim->Open(fstr, true)) {
-				printStatus("ERROR", LIGHT_RED);
-				delete(fstr);
-				continue;
+	}
+	else {
+		TableMgr * tab = GetTable(table);
+		int count = tab->GetRowCount();
+		for(int i = 0; i < count; i++) {
+			char * ResRef = tab->QueryField(i, 0);
+			DataStream * fstr = key->GetResource(ResRef, IE_BAM_CLASS_ID);
+			if(!anim->Open(fstr, true)) {
+					printStatus("ERROR", LIGHT_RED);
+					delete(fstr);
+					continue;
+			}
+			Font * fnt = anim->GetFont();
+			strncpy(fnt->ResRef, ResRef, 8);
+			fonts.push_back(fnt);
 		}
-		Font * fnt = anim->GetFont();
-		strncpy(fnt->ResRef, ResRef, 8);
-		fonts.push_back(fnt);
+		DelTable(table);
 	}
 	FreeInterface(anim);
 	printMessage("Core", "Fonts Loaded\n", LIGHT_GREEN);
@@ -1023,7 +1043,7 @@ bool Interface::LoadINI(const char * filename)
 		value[0] = 0;
 		char rem;
 		fread(&rem, 1, 1, config);
-		if((rem == '#') || (rem == '[') || (rem == '\r') || (rem == '\n')) {
+		if((rem == '#') || (rem == '[') || (rem == '\r') || (rem == '\n') || (rem == ';')) {
 			if(rem == '\r') {
 				fgetc(config);
 				continue;
