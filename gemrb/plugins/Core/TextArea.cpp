@@ -29,9 +29,14 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	//Buffer[0] = 0;
 	rows = 0;
 	startrow = 0;
+	seltext = -1;
 	sb = NULL;
+	Selectable = true;
 	palette = core->GetVideoDriver()->CreatePalette(hitextcolor, lowtextcolor);
 	initpalette = core->GetVideoDriver()->CreatePalette(initcolor, lowtextcolor);
+	Color tmp = {hitextcolor.b, hitextcolor.g, hitextcolor.r, 0};
+	selected = core->GetVideoDriver()->CreatePalette(tmp, lowtextcolor);
+	selected = NULL;
 }
 
 TextArea::~TextArea(void)
@@ -52,18 +57,50 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		return;
 	if(lines.size() == 0)
 		return;
-	char * Buffer = (char*)malloc(1);
-	Buffer[0] = 0;
-	int len = 0;
-	for(int i = 0; i < lines.size(); i++) {
-		len += strlen(lines[i]);
-		Buffer = (char*)realloc(Buffer, len+1);
-		strcat(Buffer, lines[i]);
-		if(i != lines.size()-1)
-			strcat(Buffer, "\n");
+	if(!Selectable) {
+  	char * Buffer = (char*)malloc(1);
+  	Buffer[0] = 0;
+  	int len = 0;
+  	for(int i = 0; i < lines.size(); i++) {
+  		len += strlen(lines[i]);
+  		Buffer = (char*)realloc(Buffer, len+1);
+  		strcat(Buffer, lines[i]);
+  		if(i != lines.size()-1)
+  			strcat(Buffer, "\n");
+  	}
+  	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
+  	free(Buffer);
 	}
-	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
-	free(Buffer);
+	else {
+  	int rc = 0;
+  	int acc = 0;
+  	int sr = startrow;
+  	int i = 0;
+  	int yl = 0;
+  	for(i = 0; i < lines.size(); i++) {
+  		if(rc+lrows[i] <= sr) {
+  			rc+=lrows[i];
+  			continue;
+  		}
+  		sr -= rc;
+  		Color * pal = NULL;
+  		if(seltext == i)
+  			pal = selected;
+  		else
+  			pal = palette;
+  		ftext->PrintFromLine(sr, Region(x+XPos, y+YPos, Width, Height), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
+  		yl = lrows[i]-sr;
+  		break;
+  	}
+  	for(i++;i < lines.size(); i++) {
+  		Color * pal = NULL;
+  		if(seltext == i)
+  			pal = selected;
+  		else
+  			pal = palette;
+  		ftext->Print(Region(x+XPos, y+YPos+(yl*ftext->chars[1]->Height), Width, Height-(yl*ftext->chars[1]->Height)), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true);
+  	}
+	}
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
     to this Text Area Control. */
@@ -86,6 +123,7 @@ int TextArea::SetText(const char * text, int pos)
 		char * str = (char*)malloc(newlen+1);
 		strcpy(str, text);
 		lines.push_back(str);
+		lrows.push_back(0);
 	}
 	else {
 		int mylen = strlen(lines[pos]);
@@ -108,6 +146,7 @@ int TextArea::AppendText(const char * text, int pos)
 		char * str = (char*)malloc(newlen+1);
 		strcpy(str, text);
 		lines.push_back(str);
+		lrows.push_back(0);
 	}
 	else
 	{
@@ -165,13 +204,17 @@ void TextArea::CalcRowCount()
 		rows = -1;
 		for(int i = 0; i < lines.size(); i++) {
 			rows++;
+			int tr = 0;
 			int len = strlen(lines[i]);
 			char * tmp = (char*)malloc(len+1);
 			strcpy(tmp, lines[i]);
 			ftext->SetupString(tmp, Width);
-			for(int i = 0; i <= len; i++) {
-				if(tmp[i] == 0)
+			for(int p = 0; p <= len; p++) {
+				if(tmp[p] == 0) {
 					rows++;
+					tr++;
+				}
+			lrows[i] = tr;
 			}
 			free(tmp);
 		}
@@ -180,4 +223,24 @@ void TextArea::CalcRowCount()
 		return;
 	ScrollBar *bar = (ScrollBar*)sb;
 	bar->SetMax(rows);
+}
+/** Mouse Over Event */
+void TextArea::OnMouseOver(unsigned short x, unsigned short y)
+{
+	if(!Selectable)
+		return;
+	int height = ftext->chars[1]->Height;
+	int r = y/height;
+	int row = 0;
+	((Window*)Owner)->Invalidate();
+	for(int i = 0; i < lines.size(); i++) {
+		row+=lrows[i];
+		if(r < (row-startrow)) {
+			seltext = i;
+			printf("seltext = %d, rows = %d, row = %d, r = %d\n", i, rows, row, r);
+			return;
+		}
+	}
+	seltext = -1;
+	printf("seltext = %d, rows %d, row %d, r = %d\n", seltext, rows, row, r);
 }

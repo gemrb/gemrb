@@ -51,13 +51,18 @@ public:
 	/** Sets the Fonts */
 	void SetFonts(Font * init, Font * text);
 	/** Returns Number of Rows */
-        int GetRowCount();
+	int GetRowCount();
 	/** Returns Starting Row */
-        int GetTopIndex();
+	int GetTopIndex();
 	/** Set Starting Row */
 	void SetRow(int row);
+	/** Set Selectable */
+	void SetSelectable(bool val);
+	bool Selectable;
 private: // Private attributes
 	std::vector<char *> lines;
+	std::vector<int> lrows;
+	int seltext;
 	///** Text Buffer */
 	//unsigned char * Buffer;
 	/** Number of Text Rows */
@@ -69,6 +74,7 @@ private: // Private attributes
 	/** Text Colors */
 	Color * palette;
 	Color * initpalette;
+	Color * selected;
 	/** Fonts */
 	Font *finit, *ftext;
 	void CalcRowCount();
@@ -77,6 +83,8 @@ public: //Events
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
+	/** Mouse Over Event */
+	void OnMouseOver(unsigned short x, unsigned short y);
 };
 
 #endif
