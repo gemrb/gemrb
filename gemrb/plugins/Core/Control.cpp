@@ -59,4 +59,20 @@ void Control::OnSpecialKeyPress(unsigned char Key)
 {
 	printf("OnSpecialKeyPress: CtrlID = 0x%08X, Key = %d\n", ControlID, Key);
 }
-
+/** Variable Functions */
+void SetVariableName(const char * varname)
+{
+	strncpy(VarName, varname, 32);
+}
+char& GetVariableName()
+{
+	return VarName;
+}
+void SetVariableValue(int val)
+{
+	VarValue = val;
+}
+int GetVariableValue()
+{
+	return VarValue;
+}
