@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.8 2005/03/06 14:18:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.9 2005/03/07 06:28:22 avenger_teambg Exp $
  *
  */
 
@@ -106,6 +106,8 @@ Store* STOImp::GetStore()
 	str->Seek( s->ItemsOffset, GEM_STREAM_START );
 	for (i = 0; i < s->ItemsCount; i++) {
 		STOItem* it = GetItem();
+		if (it->TriggerRef>0)	
+			s->HasTriggers=true;
 		s->items.push_back( it );
 	}
 
@@ -137,10 +139,10 @@ STOItem* STOImp::GetItem()
 	str->ReadDword( &it->AmountInStock );
 	str->ReadDword( &it->InfiniteSupply );
 	if (version == 11) {
-		str->ReadDword( &it->Trigger );
+		str->ReadDword( &it->TriggerRef );
 		str->Read( it->unknown2, 56 );
 	} else {
-		it->Trigger = 0;
+		it->TriggerRef = 0;
 		memset( it->unknown2, 0, 56 );
 	}
 

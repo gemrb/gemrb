@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.10 2005/03/06 14:18:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.11 2005/03/07 06:28:21 avenger_teambg Exp $
  *
  */
 
@@ -68,7 +68,7 @@ typedef struct STOItem {
 	ieDword AmountInStock;
 	ieDword InfiniteSupply;
 	// V1.1
-	ieDword Trigger;
+	ieDword TriggerRef;
 	char unknown2[56];
 } STOItem;
 
@@ -109,6 +109,7 @@ public:
 	ieDword PurchasedCategoriesOffset;
 	ieDword PurchasedCategoriesCount;
 	ieDword ItemsOffset;
+ 	//don't use this value directly, use GetRealStockSize
 	ieDword ItemsCount;
 	ieDword Lore;
 	ieDword IDPrice;
@@ -120,16 +121,20 @@ public:
 	ieDword RoomPrices[4];
 	ieDword CuresOffset;
 	ieDword CuresCount;
+	bool HasTriggers;
 	char unknown2[36];
 
 	// IWD2 only
 	char unknown3[80];
 
 public: //queries
-	bool AcceptableItemType(ieDword type, ieDword invflags) const;
+	int AcceptableItemType(ieDword type, ieDword invflags) const;
 	STOCure *GetCure(int idx) const;
 	STODrink *GetDrink(int idx) const;
-	STOItem *GetItem(int idx) const;
+	STOItem *GetItem(int idx);
+	int GetRealStockSize();
+private:
+	bool IsItemAvailable(unsigned int slot);
 };
 
 #endif  // ! STORE_H

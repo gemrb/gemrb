@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.6 2005/02/28 19:01:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.7 2005/03/07 06:28:21 avenger_teambg Exp $
  *
  */
 
@@ -25,6 +25,7 @@
 
 Store::Store(void)
 {
+	HasTriggers=false;
 }
 
 Store::~Store(void)
@@ -43,25 +44,61 @@ Store::~Store(void)
 	free( purchased_categories );
 }
 
-bool Store::AcceptableItemType(ieDword type, ieDword invflags) const
+bool Store::IsItemAvailable(unsigned int slot)
 {
+	Game * game = core->GetGame();
+	int trigger =items[slot]->TriggerRef;
+	if (trigger>0) {
+		char *TriggerCode = core->GetString( trigger );
+		return GameScript::EvaluateString (game->GetPC(game->GetSelectedPCSingle()),TriggerCode);
+	}
+	return false;
+}
+
+int Store::GetRealStockSize()
+{
+	int count=ItemsCount;
+	if (!HasTriggers) return count;
+	for (unsigned int i=0;i<ItemsCount;i++) {
+		if (!IsItemAvailable(i) ) {
+			count--;
+		}
+	}
+	return count;
+}
+
+int Store::AcceptableItemType(ieDword type, ieDword invflags) const
+{
+	int ret;
+
+	if (invflags&IE_INV_ITEM_UNDROPPABLE) {
+		ret = 0;
+	} else {
+		ret = IE_STORE_BUY|IE_STORE_SELL|IE_STORE_STEAL;
+	}
+	if (invflags&IE_INV_ITEM_UNSTEALABLE) {
+		ret &= ~IE_STORE_STEAL;
+	}
+	if (!(invflags&IE_INV_ITEM_IDENTIFIED) ) {
+		ret |= IE_STORE_ID;
+	}
 	if (Type<STT_BG2CONT) {
 		//can't sell undroppable or critical items
-		if ((invflags&(IE_INV_ITEM_DESTRUCTIBLE|IE_INV_ITEM_UNDROPPABLE))==IE_INV_ITEM_DESTRUCTIBLE) {
-			return false;
+		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE)) {
+			ret&=~IE_STORE_SELL;
 		}
 		//check if store buys stolen items
 		if ((invflags&IE_INV_ITEM_STOLEN) && !(Type&IE_STORE_FENCE) ) {
-			return false;
+			ret&=~IE_STORE_SELL;
 		}
 	}
 
 	for (ieDword i=0;i<PurchasedCategoriesCount;i++) {
 		if (type==purchased_categories[i]) {
-			return true;
+			return ret;
 		}
 	}
-	return false;
+	return 0;
 }
 
 STOCure *Store::GetCure(int idx) const
@@ -71,11 +108,23 @@ STOCure *Store::GetCure(int idx) const
 
 STODrink *Store::GetDrink(int idx) const
 {
-        return drinks[idx];
+	return drinks[idx];
 }
 
-STOItem *Store::GetItem(int idx) const
+//We need this weirdness for PST item lookup
+STOItem *Store::GetItem(int idx)
 {
-        return items[idx];
+	if (!HasTriggers)
+		return items[idx];
+
+	for (unsigned int i=0;i<ItemsCount;i++) {
+		if (IsItemAvailable(i)) {
+			if (!idx) {
+				return items[i];
+			}
+			idx--;
+		}
+	}
+	return NULL;
 }
 
