@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.171 2004/05/25 16:16:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.172 2004/06/28 20:27:59 guidoj Exp $
  *
  */
 
@@ -330,8 +330,12 @@ int Interface::Init()
 		pal256 = NULL;
 	}
 	bmppal16 = key->GetResource( "MPALETTE", IE_BMP_CLASS_ID );
-	pal16 = ( ImageMgr * )this->GetInterface( IE_BMP_CLASS_ID );
-	pal16->Open( bmppal16, true );
+	if (bmppal16) {
+		pal16 = ( ImageMgr * )this->GetInterface( IE_BMP_CLASS_ID );
+		pal16->Open( bmppal16, true );
+	} else {
+		pal16 = NULL;
+	}
 	printMessage( "Core", "Palettes Loaded\n", WHITE );
 	printMessage( "Core", "Loading Fonts...\n", WHITE );
 	if (!IsAvailable( IE_BAM_CLASS_ID )) {
