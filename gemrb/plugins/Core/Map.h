@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.51 2004/10/09 08:19:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.52 2004/11/07 19:21:54 avenger_teambg Exp $
  *
  */
 
@@ -116,6 +116,7 @@ public:
 	void PlayAreaSong(int);
 	void AddAnimation(Animation* anim);
 	Animation* GetAnimation(const char* Name);
+	void Shout(Scriptable* Sender, int shoutID, unsigned int radius);
 	void AddActor(Actor* actor);
 	void AddWallGroup(WallGroup* wg);
 	int GetBlocked(Point &p);

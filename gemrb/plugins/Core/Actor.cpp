@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.75 2004/10/17 18:11:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.76 2004/11/07 19:21:54 avenger_teambg Exp $
  *
  */
 
@@ -112,6 +112,8 @@ Actor::Actor()
 	LastHeard = NULL;
 	LastSummoner = NULL;
 	PCStats = NULL;
+	LastCommand = 0; //used by order
+	LastShout = 0; //used by heard
 	LastDamage = 0;
 	LastDamageType = 0;
 

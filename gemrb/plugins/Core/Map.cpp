@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.119 2004/10/17 18:11:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.120 2004/11/07 19:21:54 avenger_teambg Exp $
  *
  */
 
@@ -453,6 +453,25 @@ if(actor->Orientation>=MAX_ORIENT) {
 void Map::AddAnimation(Animation* anim)
 {
 	animations.push_back( anim );
+}
+
+void Map::Shout(Scriptable* actor, int shoutID, unsigned int radius)
+{
+	int i=actors.size();
+	while(i--) {
+		if(radius) {
+			if(Distance(actor->Pos, actors[i]->Pos)>radius) {
+				continue;
+			}
+		}
+		if(shoutID) {
+			actors[i]->LastHeard = (Actor *) actor;
+			actors[i]->LastShout = shoutID;
+		}
+		else {
+			actors[i]->LastHelp = (Actor *) actor;
+		}
+	}
 }
 
 void Map::AddActor(Actor* actor)
@@ -1075,39 +1094,9 @@ PathNode* Map::FindPath(Point &s, Point &d)
 	}
 	return Return;
 }
-/*
-unsigned char Map::GetOrient( sX, short sY, short dX, short dY)
-{
-	short deltaX = ( dX- sX), deltaY = ( dY - sY );
-	if (deltaX > 0) {
-		if (deltaY > 0) {
-			return 6;
-		} else if (deltaY == 0) {
-			return 4;
-		} else {
-			return 2;
-		}
-	} else if (deltaX == 0) {
-		if (deltaY > 0) {
-			return 8;
-		} else {
-			return 0;
-		}
-	} else {
-		if (deltaY > 0) {
-			return 10;
-		} else if (deltaY == 0) {
-			return 12;
-		} else {
-			return 14;
-		}
-	}
-	return 0;
-}
-*/
+
 bool Map::IsVisible(Point &s, Point &d)
 {
-printf("IsVisible : %d.%d from %d.%d\n",s.x,s.y,d.x,d.y);
 	int sX=s.x/16;
 	int sY=s.y/12;
 	int dX=d.x/16;
@@ -1157,7 +1146,6 @@ void Map::AddMapNote(Point point, int color, char *text)
 {
 	MapNote *mn = new MapNote;
 
-printf("X: %d Y:%d  - %d %s\n",point.x, point.y, color, text);
 	mn->Pos=point;
 	mn->color=color;
 	mn->text=text;
