@@ -42,7 +42,7 @@ def OnLoad():
 	UpdateResizeButtons()
 	
 	GemRB.SetVisible(ActionsWindow, 1)
-	GemRB.SetVisible(PortraitWindow, 1)
+	GemRB.SetVisible(PortraitWindow, 0)
 	GemRB.SetVisible(OptionsWindow, 0)
 	GemRB.SetVisible(MessageWindow, 1)
 	return

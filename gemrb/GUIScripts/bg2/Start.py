@@ -101,6 +101,7 @@ def MultiPlayerPress():
 
 def ConnectPress():
 #well...
+	#GemRB.SetVar("PlayMode",2)
 	return
 
 def PregenPress():
@@ -125,7 +126,7 @@ def NewSingle():
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
 	GemRB.UnloadWindow(TutorialWindow)
-	GemRB.SetVar("PlayMode",0) #tutorial mode
+	GemRB.SetVar("PlayMode",0) 
 	GemRB.SetVar("Slot",0)
         GemRB.SetNextScript("CharGen")
 	return
@@ -139,7 +140,7 @@ def PlayPress():
         GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
         GemRB.UnloadWindow(TutorialWindow)
-	GemRB.SetVar("PlayMode",1)
+	GemRB.SetVar("PlayMode",1) #tutorial
 	GemRB.SetVar("Slot",0)
 	GemRB.SetNextScript("CharGen")
         return

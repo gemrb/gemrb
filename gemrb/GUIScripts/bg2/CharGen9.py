@@ -174,7 +174,14 @@ def NextPress():
 
 	GemRB.FillPlayerInfo(MyChar) #does all the rest
 	#LETS PLAY!!
-	GemRB.EnterGame()
+	playmode = GemRB.GetVar("PlayMode")
+	if playmode >=0:
+		print "PlayMode: ",playmode
+		GemRB.EnterGame()
+	else:
+		#leaving multi player pregen
+		GemRB.UnloadWindow(CharGenWindow)
+		GemRB.SetNextScript("Start")
 	return
 
 def CancelPress():
