@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.123 2004/02/17 17:56:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.124 2004/02/18 10:27:29 balrog994 Exp $
  *
  */
 
@@ -30,6 +30,10 @@
 
 #ifdef WIN32
 #include <direct.h>
+#include <io.h>
+#ifndef S_ISDIR
+#define S_ISDIR(x) (x & S_IFDIR)
+#endif
 #else
 #include <dirent.h>
 #endif
