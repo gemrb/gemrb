@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.155 2004/04/15 16:51:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.156 2004/04/15 20:33:57 avenger_teambg Exp $
  *
  */
 
@@ -134,10 +134,6 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 		return NULL;
 	}
 	core->LoadGame( GameIndex );
-/*
-	GameControl* gc = StartGameControl();
-	gc->SetCurrentArea( 0 );
-*/
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -145,24 +141,8 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
 {
 	GameControl* gc = StartGameControl();
+	core->GetGame()->LoadMap(core->GetGame()->CurrentArea);
 	gc->SetCurrentArea( 0 );
-/*
-	core->LoadGame( -1 );
-	GameControl* gc = StartGameControl();
-	// 0 - single player, 1 - tutorial, 2 - multiplayer
-	unsigned long playmode = 0;
-	core->GetDictionary()->Lookup( "PlayMode", playmode );
-	playmode *= 3;
-	int start = core->LoadTable( "STARTARE" );
-	TableMgr* tm = core->GetTable( start );
-	char* StartArea = tm->QueryField( playmode );
-	int startX = atoi( tm->QueryField( playmode + 1 ) );
-	int startY = atoi( tm->QueryField( playmode + 2 ) );
-	gc->SetCurrentArea( 0 );
-	core->GetVideoDriver()->MoveViewportTo( startX, startY );
-	core->EnterActors( StartArea );
-	core->DelTable( start );
-*/
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -356,8 +336,8 @@ static PyObject* GemRB_SetWindowPicture(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	DataStream* bkgr = core->GetResourceMgr()->GetResource( MosResRef,
-												IE_MOS_CLASS_ID );
+	DataStream* bkgr = core->GetResourceMgr()->GetResource( MosResRef, IE_MOS_CLASS_ID );
+
 	if (bkgr != NULL) {
 		ImageMgr* mos = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
 		mos->Open( bkgr, true );
@@ -409,7 +389,6 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 		printMessage( "GUIScript", "Can't find resource\n", LIGHT_RED );
 		return NULL;
 	}
-
 	return Py_BuildValue( "i", ind );
 }
 
@@ -2374,6 +2353,31 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "s", MyActor->GetName(Which) );
 }
 
+static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
+{
+	char *Name=NULL;
+	int PlayerSlot, Which;
+
+	Which = 0;
+	if (!PyArg_ParseTuple( args, "is|i", &PlayerSlot, &Which )) {
+		printMessage( "GUIScript", "Syntax Error: GetPlayerName(Slot[, LongOrShort])\n",
+			LIGHT_RED );
+		return NULL;
+	}
+	Game *game = core->GetGame();
+	if(!game) {
+		return NULL;
+	}
+	PlayerSlot = game->FindPlayer( PlayerSlot );
+	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
+	if (!MyActor) {
+		return NULL;
+	}
+	MyActor->SetText(Name, Which);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot, Which;
@@ -2711,8 +2715,7 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	}
 
 	// FIXME!!!
-	DataStream* str = core->GetResourceMgr()->GetResource( StoreResRef,
-												IE_STO_CLASS_ID );
+	DataStream* str = core->GetResourceMgr()->GetResource( StoreResRef, IE_STO_CLASS_ID );
 	StoreMgr* sm = ( StoreMgr* ) core->GetInterface( IE_STO_CLASS_ID );
 	if (sm == NULL) {
 		delete ( str );
@@ -3014,6 +3017,8 @@ static PyMethodDef GemRBMethods[] = {
 	"Queries the player portrait."},
 	{"GetPlayerName", GemRB_GetPlayerName, METH_VARARGS,
 	"Queries the player name."},
+	{"SetPlayerName", GemRB_SetPlayerName, METH_VARARGS,
+	"Sets the player name."},
 	{"FillPlayerInfo", GemRB_FillPlayerInfo, METH_VARARGS,
 	"Fills basic character info, that is not stored in stats."},
 	{"SetWorldMapImage", GemRB_SetWorldMapImage, METH_VARARGS,

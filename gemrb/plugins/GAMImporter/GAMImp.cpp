@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.23 2004/04/15 10:21:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.24 2004/04/15 20:33:56 avenger_teambg Exp $
  *
  */
 
@@ -154,18 +154,11 @@ Game* GAMImp::GetGame()
 		newGame->CurrentArea[8] = 0;
 	}
 
-	int mi = newGame->LoadMap( newGame->CurrentArea );
-	Map* newMap = newGame->GetMap( mi );
-
 	//Loading PCs
 	ActorMgr* aM = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
 	for (unsigned int i = 0; i < newGame->PCCount; i++) {
 		str->Seek( newGame->PCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, true );
-
-		if (stricmp( actor->Area, newGame->CurrentArea ) == 0) {
-			newMap->AddActor( actor );
-		}
 		newGame->SetPC( actor );
 	}
 
@@ -173,10 +166,6 @@ Game* GAMImp::GetGame()
 	for (unsigned int i = 0; i < newGame->NPCCount; i++) {
 		str->Seek( newGame->NPCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, false );
-
-		if (stricmp( actor->Area, newGame->CurrentArea ) == 0) {
-			newMap->AddActor( actor );
-		}
 		newGame->AddNPC( actor );
 	}
 	core->FreeInterface( aM );
