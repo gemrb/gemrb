@@ -75,8 +75,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		return;
 	Video * video = core->GetVideoDriver();
 	Region viewport = core->GetVideoDriver()->GetViewport();
-	viewport.x += moveX;
-	viewport.y += moveY;
+	viewport.x += video->moveX;
+	viewport.y += video->moveY;
 	video->SetViewport(viewport.x, viewport.y);
 	Region vp(x+XPos, y+YPos, Width, Height);
 	Game * game = core->GetGame();
@@ -279,18 +279,18 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	lastMouseX = x;
 	lastMouseY = y;
-	if(x < 20)
+	/*if(x <= 5)
 		moveX = -5;
-	else if(x > (core->Width-20))
+	else if(x >= (core->Width-5))
 		moveX = 5;
 	else
 		moveX = 0;
-	if(y < 20)
+	if(y <= 5)
 		moveY = -5;
-	else if(y > (core->Height-20))
+	else if(y >= (core->Height-5))
 		moveY = 5;
 	else
-		moveY = 0;
+		moveY = 0;*/
 	short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	if(MouseIsDown && (!DrawSelectionRect)) {
@@ -370,7 +370,8 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 
 	if(lastCursor != nextCursor) {
-		core->GetVideoDriver()->SetCursor(core->Cursors[nextCursor]->GetFrame(0), core->Cursors[nextCursor+1]->GetFrame(0));
+		//core->GetVideoDriver()->SetCursor(core->Cursors[nextCursor]->GetFrame(0), core->Cursors[nextCursor+1]->GetFrame(0));
+		((Window*)Owner)->Cursor = nextCursor;
 		lastCursor = nextCursor;
 	}
 }
@@ -409,6 +410,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 		if(!actor && (selected.size() == 1)) {
 			actor = selected.at(0);
 			actor->WalkTo(GameX, GameY);
+			unsigned long WinIndex, TAIndex;
+			core->GetDictionary()->Lookup("MessageWindow", WinIndex);
+			core->GetDictionary()->Lookup("MessageTextArea", TAIndex);
+			TextArea * ta = (TextArea*)core->GetWindow(WinIndex)->GetControl(TAIndex);
+			char Text[256];
+			sprintf(Text, "Selected: %s", actor->LongName);
+			ta->AppendText(Text, -1);
 		}
 		for(size_t i = 0; i < selected.size(); i++)
 			selected[i]->Select(false);
