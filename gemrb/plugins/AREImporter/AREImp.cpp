@@ -59,7 +59,7 @@ Map * AREImp::GetMap()
 		printf("[AREImporter]: No Actor Manager Available, skipping actors\n");
 		return map;
 	}
-	ActorMgr * actmgr = (ActorMgr*)core->GetInterface(IE_CRE_CLASS_ID);
+	/*ActorMgr * actmgr = (ActorMgr*)core->GetInterface(IE_CRE_CLASS_ID);
 	for(int i = 0; i < ActorCount; i++) {
 		char		   CreResRef[8];
 		unsigned long  Orientation;
@@ -99,8 +99,8 @@ Map * AREImp::GetMap()
 		actor->Orientation = (unsigned char)Orientation;
 		map->AddActor(actor);
 	}
+	core->FreeInterface(actmgr);*/
 	str->Seek(AnimOffset, GEM_STREAM_START);
-	core->FreeInterface(actmgr);
 	if(!core->IsAvailable(IE_BAM_CLASS_ID)) {
 		printf("[AREImporter]: No Animation Manager Available, skipping animations\n");
 		return map;
