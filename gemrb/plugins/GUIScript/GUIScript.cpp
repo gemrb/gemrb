@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.205 2004/09/02 08:55:52 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.206 2004/09/11 07:50:27 edheldil Exp $
  *
  */
 
@@ -3330,11 +3330,11 @@ PyDoc_STRVAR( GemRB_SetItemIcon__doc,
 
 static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex;
+	int WindowIndex, ControlIndex, Which = 0;
 	char* ItemResRef;
 
-	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex,
-			&ItemResRef )) {
+	if (!PyArg_ParseTuple( args, "iis|i", &WindowIndex, &ControlIndex,
+			&ItemResRef, &Which )) {
 		return AttributeError( GemRB_SetItemIcon__doc );
 	}
 	Window* win = core->GetWindow( WindowIndex );
@@ -3357,31 +3357,35 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	// FIXME!!!
-	DataStream* str = core->GetResourceMgr()->GetResource( ItemResRef,
-												IE_ITM_CLASS_ID );
-	ItemMgr* im = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
-	if (im == NULL) {
-		delete ( str );
-		return NULL;
-	}
-	if (!im->Open( str, true )) {
-		core->FreeInterface( im );
-		return NULL;
-	}
-
-	// FIXME - should use some already allocated in core
-	Item* item = im->GetItem();
-	if (item == NULL) {
-		core->FreeInterface( im );
-		return NULL;
-	}
-
 	Button* btn = ( Button* ) ctrl;
-	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, item->ItemIconBAM->GetFrame( 0 ) );
-	delete item;
-	core->FreeInterface( im );
 
+	if (ItemResRef[0]) {
+		// FIXME!!!
+		DataStream* str = core->GetResourceMgr()->GetResource( ItemResRef, IE_ITM_CLASS_ID );
+		ItemMgr* im = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
+		if (im == NULL) {
+			delete ( str );
+			return NULL;
+		}
+		if (!im->Open( str, true )) {
+			core->FreeInterface( im );
+			return NULL;
+		}
+
+		// FIXME - should use some already allocated in core
+		Item* item = im->GetItem();
+		if (item == NULL) {
+			core->FreeInterface( im );
+			return NULL;
+		}
+
+		btn->SetFlags( IE_GUI_BUTTON_PICTURE, OP_OR );
+		btn->SetPicture( item->ItemIconBAM->GetFrame( Which ) );
+		delete item;
+		core->FreeInterface( im );
+	} else {
+		btn->SetPicture( NULL );
+	}
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -3758,6 +3762,208 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "i", actor->spellbook.UnmemorizeSpell( ms ) );
 }
 
+PyDoc_STRVAR( GemRB_GetSlotItem__doc,
+"GetSlotItem(PartyID, slot)=>dict\n\n"
+"Returns dict with specified slot item from PC's inventory" );
+
+static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, Slot;
+
+	if (!PyArg_ParseTuple( args, "ii", &PartyID, &Slot)) {
+		return AttributeError( GemRB_GetSlotItem__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	CREItem* si = actor->inventory.GetSlotItem( Slot );
+	if (! si) {
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
+	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef (si->ItemResRef));
+	PyDict_SetItemString(dict, "Usages0", PyInt_FromLong (si->Usages[0]));
+	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (si->Usages[1]));
+	PyDict_SetItemString(dict, "Usages2", PyInt_FromLong (si->Usages[2]));
+	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (si->Flags));
+
+	return dict;
+}
+
+PyDoc_STRVAR( GemRB_GetItem__doc,
+"GetItem(ResRef)=>dict\n\n"
+"Returns dict with specified item" );
+
+static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
+{
+	char* ResRef;
+
+	if (!PyArg_ParseTuple( args, "s", &ResRef)) {
+		return AttributeError( GemRB_GetItem__doc );
+	}
+
+	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_ITM_CLASS_ID );
+	ItemMgr* im = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
+	if (im == NULL) {
+		delete ( str );
+		return NULL;
+	}
+	if (!im->Open( str, true )) {
+		core->FreeInterface( im );
+		return NULL;
+	}
+
+	Item* item = im->GetItem();
+	if (item == NULL) {
+		core->FreeInterface( im );
+		return NULL;
+	}
+
+	core->FreeInterface( im );
+
+	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong (item->ItemName));
+	PyDict_SetItemString(dict, "ItemNameIdentified", PyInt_FromLong (item->ItemNameIdentified));
+	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong (item->ItemDesc));
+	PyDict_SetItemString(dict, "ItemDescIdentified", PyInt_FromLong (item->ItemDescIdentified));
+	PyDict_SetItemString(dict, "ItemIcon", PyString_FromResRef (item->ItemIcon));
+	PyDict_SetItemString(dict, "StackAmount", PyInt_FromLong (item->StackAmount));
+	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));
+
+	delete item;
+	return dict;
+}
+
+PyDoc_STRVAR( GemRB_DragItem__doc,
+"DragItem(PartyID, Slot, ResRef, [Count=0])\\n\n"
+"Start dragging specified item" );
+
+static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, Slot, Count = 0, CycleIndex = 0, FrameIndex = 0;
+	char *ResRef;
+
+	if (!PyArg_ParseTuple( args, "iis|iii", &PartyID, &Slot, &ResRef, &Count, &CycleIndex, &FrameIndex)) {
+		return AttributeError( GemRB_DragItem__doc );
+	}
+
+	// FIXME
+	if (core->GetDraggedItem()) {
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	CREItem* si = actor->inventory.RemoveItem( Slot, Count );
+	if (! si) {
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
+	core->DragItem (si);
+
+
+
+
+
+	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
+												IE_BAM_CLASS_ID );
+	if (str == NULL) {
+		return NULL;
+	}
+	AnimationMgr* am = ( AnimationMgr* )
+		core->GetInterface( IE_BAM_CLASS_ID );
+	if (am == NULL) {
+		delete ( str );
+		return NULL;
+	}
+
+	if (!am->Open( str, true )) {
+		core->FreeInterface( am );
+		return NULL;
+	}
+
+	Sprite2D* Picture = am->GetFrameFromCycle( CycleIndex, FrameIndex );
+	if (Picture == NULL) {
+		core->FreeInterface( am );
+		return NULL;
+	}
+
+// 	Color* pal = core->GetPalette( col1, 12 );
+// 	Color* orgpal = core->GetVideoDriver()->GetPalette( Picture );
+// 	memcpy( &orgpal[4], pal, 12 * sizeof( Color ) );
+// 	core->GetVideoDriver()->SetPalette( Picture, orgpal );
+// 	free( pal );
+// 	free( orgpal );
+
+
+
+	core->GetVideoDriver()->SetDragCursor (Picture);
+
+
+
+
+
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_DropDraggedItem__doc,
+"DropDraggedItem(PartyID, Slot)=>int\\n\n"
+"Stop dragging specified item. Returns 0 (unsuccessful), 1 (partial success) or 2 (complete success)." );
+
+static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, Slot;
+
+	if (!PyArg_ParseTuple( args, "ii", &PartyID, &Slot)) {
+		return AttributeError( GemRB_DropDraggedItem__doc );
+	}
+
+	// FIXME
+	if (core->GetDraggedItem() == NULL) {
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	int res = actor->inventory.AddSlotItem( core->GetDraggedItem(), Slot );
+
+	if (res == 2) {
+		// Whole amount was placed
+		core->DragItem (NULL);
+		core->GetVideoDriver()->SetDragCursor (NULL);
+	} 
+
+	return Py_BuildValue( "i", res );
+}
+
+PyDoc_STRVAR( GemRB_IsDraggingItem__doc,
+"IsDraggingItem()=>int\\n\n"
+"Returns 1 if we are dragging some item." );
+
+static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* args)
+{
+	return Py_BuildValue( "i", core->GetDraggedItem() != NULL );
+}
+
+
 
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
@@ -3888,6 +4094,11 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetSpell, METH_VARARGS),
 	METHOD(MemorizeSpell, METH_VARARGS),
 	METHOD(UnmemorizeSpell, METH_VARARGS),
+	METHOD(GetSlotItem, METH_VARARGS),
+	METHOD(GetItem, METH_VARARGS),
+	METHOD(DragItem, METH_VARARGS),
+	METHOD(DropDraggedItem, METH_VARARGS),
+	METHOD(IsDraggingItem, METH_NOARGS),
 
 	// terminating entry	
 	{NULL, NULL, 0, NULL}

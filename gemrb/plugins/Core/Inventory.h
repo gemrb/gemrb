@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.19 2004/07/20 22:32:10 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.20 2004/09/11 07:50:27 edheldil Exp $
  *
  */
 
@@ -48,19 +48,20 @@ typedef enum ieInventoryType {
 	INVENTORY_CREATURE = 1
 } ieInventoryType;
 
+// !!! Keep these synchronized with GUIDefines.py !!!
 typedef enum ieCREItemFlagBits {
-	IE_ITEM_IDENTIFIED = 1,
-	IE_ITEM_UNSTEALABLE = 2,
-	IE_ITEM_STOLEN = 4,
-	IE_ITEM_UNDROPPABLE =8,
+	IE_INV_ITEM_IDENTIFIED = 1,
+	IE_INV_ITEM_UNSTEALABLE = 2,
+	IE_INV_ITEM_STOLEN = 4,
+	IE_INV_ITEM_UNDROPPABLE =8,
 	//just recently acquired
-	IE_ITEM_ACQUIRED = 0x10,	//this is a gemrb extension
+	IE_INV_ITEM_ACQUIRED = 0x10,	//this is a gemrb extension
 	//is this item destructible normally?
-	IE_ITEM_DESTRUCTIBLE = 0x20,    //this is a gemrb extension
+	IE_INV_ITEM_DESTRUCTIBLE = 0x20,    //this is a gemrb extension
 	//is this item already equipped?
-	IE_ITEM_EQUIPPED = 0x40,	//this is a gemrb extension 
+	IE_INV_ITEM_EQUIPPED = 0x40,	//this is a gemrb extension 
 	//is this item stackable?
-	IE_ITEM_STACKED = 0x80	        //this is a gemrb extension
+	IE_INV_ITEM_STACKED = 0x80	        //this is a gemrb extension
 } ieCREItemFlagBits;
 
 typedef struct CREItem {
@@ -109,10 +110,8 @@ public:
 
 	/** adds CREItem to the inventory. If slot == -1, finds
 	** first eligible slot, eventually splitting the item to
-	** more slots. Returns true if successful.
-	** FIXME: it should allow for cases when part of the item's amount
-	** can go in and part can't. Maybe return number instead? or CRE?*/
-	int AddSlotItem(CREItem* item, unsigned int slot, CREItem** res_item);
+	** more slots. Returns 2 if completely successful, 1 if partially, 0 else.*/
+	int AddSlotItem(CREItem* item, int slot);
 
 	int AddSlotItem(STOItem* item, unsigned int slot, CREItem** res_item, int count);
 
@@ -127,7 +126,8 @@ public:
 	/*finds the first slot of named item, if resref is empty, finds the first filled! slot*/
 	int FindItem(const char *resref, unsigned int flags);
 	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, unsigned short x, unsigned short y);
-
+	// Returns item in specified slot. Does NOT change inventory
+	CREItem* GetSlotItem(unsigned int slot);
 	void dump();
 };
 

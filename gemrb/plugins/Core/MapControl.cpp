@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.5 2004/09/04 12:08:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.6 2004/09/11 07:50:27 edheldil Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -87,8 +87,8 @@ printf("%d %d\n",MapMOS->Width, MapMOS->Height);
 	ViewWidth = core->Width * MAP_DIV / MAP_MULT;
 	ViewHeight = core->Height * MAP_DIV / MAP_MULT;
 
-	XCenter = (Width - MapWidth ) / 2;
-	YCenter = (Height - MapHeight ) / 2;
+	XCenter = (Width - MapMOS->Width ) / 2;
+	YCenter = (Height - MapMOS->Height ) / 2;
 	if (XCenter < 0) XCenter = 0;
 	if (YCenter < 0) YCenter = 0;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.193 2004/08/27 13:24:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.194 2004/09/11 07:50:27 edheldil Exp $
  *
  */
 
@@ -3331,7 +3331,7 @@ int GameScript::ItemIsIdentified(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) scr;
-	if (actor->inventory.HasItem(parameters->string0Parameter, IE_ITEM_IDENTIFIED) ) {
+	if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
 		return 1;
 	}
 	return 0;
@@ -3357,7 +3357,7 @@ int GameScript::HasItemEquipped(Scriptable * Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	Actor *actor = (Actor *) scr;
-	if (actor->inventory.HasItem(parameters->string0Parameter, IE_ITEM_EQUIPPED) ) {
+	if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_EQUIPPED) ) {
 		return 1;
 	}
 	return 0;
@@ -3369,7 +3369,7 @@ int GameScript::Acquired(Scriptable * Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) Sender;
-	if (actor->inventory.HasItem(parameters->string0Parameter, IE_ITEM_ACQUIRED) ) {
+	if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_ACQUIRED) ) {
 		return 1;
 	}
 	return 0;
@@ -3404,7 +3404,7 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* paramet
 
 	//there is an assignment here
 	for(int i=0; (actor = game->GetPC(i)) ; i++) {
-		if (actor->inventory.HasItem(parameters->string0Parameter, IE_ITEM_IDENTIFIED) ) {
+		if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
 			return 1;
 		}
 	}
@@ -7353,7 +7353,7 @@ void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* /*p
 		default:;
 	}
 	if(inv) {
-		inv->DestroyItem("", IE_ITEM_DESTRUCTIBLE);
+		inv->DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE);
 	}
 }
 
@@ -7497,8 +7497,7 @@ int GameScript::MoveItemCore(Scriptable *Sender, Scriptable *target, const char 
 	scr->inventory.RemoveItem(resref, flags, &item);
 	if(!item)
 		return MIC_NOITEM;
-	myinv->AddSlotItem(item, 0, &item);
-	if( item ) {
+	if ( 2 != myinv->AddSlotItem(item, -1)) {
 		// drop it at my feet
 		int x = Sender->XPos;
 		int y = Sender->YPos;
@@ -7569,7 +7568,7 @@ void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 		item->Usages[1]=b;
 		item->Usages[2]=c;
 	}
-	item->Flags=IE_ITEM_ACQUIRED; //get the flags right
+	item->Flags=IE_INV_ITEM_ACQUIRED; //get the flags right
 }
 
 //this action creates an item in a container or a creature
@@ -7626,8 +7625,7 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 		item = new CREItem();
 	}
 	CreateItemCore(item, parameters->string0Parameter, -1, 0, 0);
-	scr->inventory.AddSlotItem(item,slot,&item);
-	if(item) {
+	if (2 != scr->inventory.AddSlotItem(item,slot)) {
 		int x = Sender->XPos;
 		int y = Sender->YPos;
 		Map *map=core->GetGame()->GetMap(((Actor *) scr)->Area);
@@ -7707,7 +7705,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	Actor *snd = (Actor *) Sender;
 	Actor *scr = (Actor *) tar;
 	//find a candidate item for stealing (unstealable items are noticed)
-	int slot = tar->inventory.FindItem("", IE_ITEM_UNSTEALABLE | IE_ITEM_EQUIPPED);
+	int slot = tar->inventory.FindItem("", IE_INV_ITEM_UNSTEALABLE | IE_INV_ITEM_EQUIPPED);
 	int money=0;
 	if(slot<0) {
 		//go for money too

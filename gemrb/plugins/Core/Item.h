@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.4 2004/09/11 07:50:27 edheldil Exp $
  *
  */
 
@@ -39,6 +39,24 @@
 #else
 #define GEM_EXPORT
 #endif
+
+// Item Flags bits
+// !!! Keep these synchronized with GUIDefines.h !!!
+#define IE_ITEM_CRITICAL     0x00000001
+#define IE_ITEM_TWO_HANDED   0x00000002
+#define IE_ITEM_MOVABLE      0x00000004
+#define IE_ITEM_DISPLAYABLE  0x00000008
+#define IE_ITEM_CURSED       0x00000010
+#define IE_ITEM_NOT_COPYABLE 0x00000020
+#define IE_ITEM_MAGICAL      0x00000040
+#define IE_ITEM_BOW          0x00000080
+#define IE_ITEM_SILVER       0x00000100
+#define IE_ITEM_COLD_IRON    0x00000200
+#define IE_ITEM_STOLEN       0x00000400
+#define IE_ITEM_CONVERSABLE  0x00000800
+#define IE_ITEM_PULSATING    0x00001000
+#define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN )
+
 
 // the same as SPLFeature
 typedef struct ITMFeature {
