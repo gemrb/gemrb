@@ -38,6 +38,7 @@ def OnLoad():
 	GemRB.SetText(OptionsWindow, SoundButton, 17164)
 	GemRB.SetEvent(OptionsWindow, SoundButton, IE_GUI_BUTTON_ON_PRESS, "SoundPress")
 	GemRB.SetText(OptionsWindow, GamePlayButton, 17165)
+	GemRB.SetEvent(OptionsWindow, GamePlayButton, IE_GUI_BUTTON_ON_PRESS, "GamePlayPress")
 	GemRB.SetText(OptionsWindow, MoviesButton, 15415)
 	GemRB.SetText(OptionsWindow, KeyboardButton, 33468)
 	GemRB.SetText(OptionsWindow, ReturnButton, 10308)
@@ -63,4 +64,10 @@ def SoundPress():
 	global OptionsWindow
 	GemRB.UnloadWindow(OptionsWindow)
 	GemRB.SetNextScript("Sound")
+	return
+	
+def GamePlayPress():
+	global OptionsWindow
+	GemRB.UnloadWindow(OptionsWindow)
+	GemRB.SetNextScript("GamePlay")
 	return
