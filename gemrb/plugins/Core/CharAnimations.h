@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.19 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.20 2004/03/25 22:11:22 avenger_teambg Exp $
  *
  */
 
@@ -63,8 +63,8 @@
 
 #define IE_ANI_CODE_MIRROR		0
 #define IE_ANI_ONE_FILE			1
-#define IE_ANI_TWO_FILES		2
-#define IE_ANI_FOUR_FILES		3
+#define IE_ANI_FOUR_FILES		2
+#define IE_ANI_TWO_FILES		3
 #define IE_ANI_CODE_MIRROR_2	4
 #define IE_ANI_ONE_FILE_2		5
 #define IE_ANI_TWO_FILES_2		6
@@ -98,7 +98,7 @@ public:
 	unsigned char ArmorType, WeaponType, RangedType;
 	unsigned char CircleSize;
 	bool DrawCircle;
-	char* ResRef;
+	char ResRef[9];
 	TableMgr* Avatars;
 	bool UsePalette;
 public:
