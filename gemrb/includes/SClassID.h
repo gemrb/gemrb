@@ -1,9 +1,7 @@
 #ifndef SCLASS_ID_H
 #define SCLASS_ID_H
 
-#include "ie_types.h"
-
-typedef ie_uint32 SClass_ID;
+typedef unsigned long SClass_ID;
 
 #define IE_2DA_CLASS_ID			0x000003F4
 #define IE_ACM_CLASS_ID			0x00010000
@@ -44,9 +42,9 @@ typedef ie_uint32 SClass_ID;
 #define IE_VIDEO_CLASS_ID		0x000B0000
 #define IE_AUDIO_CLASS_ID		0x000C0000
 #define IE_SCRIPT_CLASS_ID		0x000D0000
-#define IE_GUI_SCRIPT_CLASS_ID	0x000E0000
-#define IE_COMPRESSION_CLASS_ID 0x000F0000
-#define IE_PLUGINMGR_CLASS_ID   0x00100000
-#define IE_HCANIMS_CLASS_ID     0x00200000
+#define IE_GUI_SCRIPT_CLASS_ID		0x000E0000
+#define IE_COMPRESSION_CLASS_ID 	0x000F0000
+#define IE_PLUGINMGR_CLASS_ID   	0x00100000
+#define IE_HCANIMS_CLASS_ID     	0x00200000
 
 #endif

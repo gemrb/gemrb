@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.h,v 1.8 2004/08/02 15:52:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.h,v 1.9 2004/08/02 21:26:53 guidoj Exp $
  *
  */
 
@@ -27,20 +27,20 @@
 #include "../Core/CachedFileStream.h"
 
 typedef struct FileEntry {
-	ie_uint32 resLocator;
-	ie_uint32 dataOffset;
-	ie_uint32 fileSize;
-	ie_uint16 type;
-	ie_uint16 u1; //Unknown Field
+	ieDword resLocator;
+	ieDword dataOffset;
+	ieDword fileSize;
+	ieWord  type;
+	ieWord  u1; //Unknown Field
 } FileEntry;
 
 typedef struct TileEntry {
-	ie_uint32 resLocator;
-	ie_uint32 dataOffset;
-	ie_uint32 tilesCount;
-	ie_uint32 tileSize; //named tilesize so it isn't confused
-	ie_uint16 type;
-	ie_uint16 u1; //Unknown Field
+	ieDword resLocator;
+	ieDword dataOffset;
+	ieDword tilesCount;
+	ieDword tileSize; //named tilesize so it isn't confused
+	ieWord  type;
+	ieWord  u1; //Unknown Field
 } TileEntry;
 
 class BIFImp : public ArchiveImporter {

@@ -6,8 +6,8 @@
 #endif
 
 #include "ie_types.h"
-typedef ie_uint8  Byte;
-typedef ie_uint32 DWORD;
+typedef ieByte  BYTE;
+typedef ieDword DWORD;
 
 #define GEMRB_RELEASE 200		//GemRB Release version multiplied by 1000 (i.e. 1200 = 1.2 | 10 = 0.01 )
 #define GEMRB_API_NUM 2			//GemRB API Version
@@ -106,6 +106,7 @@ char* FindInDir(char* Dir, char* Filename);
 void ResolveFilePath(char* FilePath);
 char* strupr(char* string);
 char* strlwr(char* string);
+void DelTree(char *Pt);
 #endif
 
 #ifdef WIN32

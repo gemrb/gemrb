@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.h,v 1.5 2004/03/27 13:05:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.h,v 1.6 2004/08/02 21:26:54 guidoj Exp $
  *
  */
 
@@ -26,20 +26,20 @@
 #include "../../includes/globals.h"
 
 typedef struct State {
-	unsigned long StrRef;
-	unsigned long FirstTransitionIndex;
-	unsigned long TransitionsCount;
-	unsigned long TriggerIndex;
+	ieStrRef StrRef;
+	ieDword  FirstTransitionIndex;
+	ieDword  TransitionsCount;
+	ieDword  TriggerIndex;
 } State;
 
 typedef struct Transition {
-	unsigned long Flags;
-	unsigned long AnswerStrRef;
-	unsigned long JournalStrRef;
-	unsigned long TriggerIndex;
-	unsigned long ActionIndex;
-	char DLGResRef[8];
-	unsigned long NextStateIndex;
+	ieDword  Flags;
+	ieStrRef AnswerStrRef;
+	ieStrRef JournalStrRef;
+	ieDword  TriggerIndex;
+	ieDword  ActionIndex;
+	ieResRef DLGResRef;
+	ieDword  NextStateIndex;
 } Transition;
 
 typedef struct VarOffset {

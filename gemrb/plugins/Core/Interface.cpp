@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.181 2004/08/02 18:00:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.182 2004/08/02 21:26:54 guidoj Exp $
  *
  */
 
@@ -747,7 +747,7 @@ const char* Interface::TypeExt(SClass_ID type)
 	return NULL;
 }
 
-char* Interface::GetString(unsigned long strref, unsigned long options)
+char* Interface::GetString(ieStrRef strref, unsigned long options)
 {
 	unsigned long flags = 0;
 
