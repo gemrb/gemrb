@@ -96,6 +96,7 @@ public:
 	void SetCutSceneMode(bool active);
 	void HideGUI();
 	void UnhideGUI();
+	void TryToTalk(Actor *source, Actor *target);
 	void InitDialog(Actor* speaker, Actor* target, const char* dlgref);
 	void EndDialog();
 	void DialogChoose(int choose);

@@ -569,6 +569,19 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		lastCursor = nextCursor;
 	}
 }
+
+void GameControl::TryToTalk(Actor *source, Actor *target)
+{
+	char Tmp[256];
+
+	sprintf( Tmp, "StartDialogNoSet([%s])", source->GetName(0) );
+	if(target->GetNextAction()) {
+		DisplayString("Target is busy...");
+		return;
+	}
+	target->AddAction( GameScript::CreateAction( Tmp, true ) );
+}
+
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
@@ -660,16 +673,38 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 				actor->ClearActions();
 				char Tmp[256];
 				sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
-				//GameScript::ExecuteString(actor, Tmp);
 				actor->AddAction( GameScript::CreateAction( Tmp, true ) );
 			}
 		}
-		for (size_t i = 0; i < selected.size(); i++)
-			selected[i]->Select( false );
-		selected.clear();
-		if (actor) {
-			selected.push_back( actor );
-			actor->Select( true );
+		//determining the type of the clicked actor
+		int type = 0;
+		if(actor) {
+			type = actor->GetStat(IE_EA);
+			if( type>=EVILCUTOFF ) {
+				type = 2;
+			}
+			else if( type > GOODCUTOFF ) {
+				type = 1;
+			}
+		}
+
+		switch (type) {
+		case 0:
+			for (size_t i = 0; i < selected.size(); i++)
+				selected[i]->Select( false );
+			selected.clear();
+			if (actor) {
+				selected.push_back( actor );
+				actor->Select( true );
+			}
+			break;
+		case 1:
+			//talk
+			TryToTalk(actor, selected[0]);
+			break;
+		case 2:
+			//attack
+			break;
 		}
 	} else {
 		Actor** ab;

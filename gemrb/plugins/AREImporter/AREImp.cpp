@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.42 2004/03/14 18:10:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.43 2004/03/15 15:25:14 avenger_teambg Exp $
  *
  */
 
@@ -122,7 +122,8 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 Map* AREImp::GetMap()
 {
 	Map* map = new Map();
-	strcpy( map->scriptName, WEDResRef );
+	strncpy( map->scriptName, WEDResRef, 8);
+	map->scriptName[8]=0;
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
 		printf( "[AREImporter]: No Tile Map Manager Available.\n" );
@@ -239,7 +240,6 @@ Map* AREImp::GetMap()
 		unsigned short * indices = tmm->GetDoorIndices( ShortName, &count,
 											BaseClosed );
 		Door* door;
-//		door = tm->AddDoor( ShortName, ( Flags & 1 ? 0 : 1 ), BaseClosed,
 		door = tm->AddDoor( ShortName, Flags, BaseClosed,
 					indices, count, open, closed );
 		door->Cursor = cursor;
@@ -436,6 +436,9 @@ Map* AREImp::GetMap()
 		ab->XDes = XDes;
 		ab->YDes = YDes;
 		ab->AnimID = IE_ANI_AWAKE;
+		//copying the area name into the actor
+		strcpy(ab->Area, map->scriptName);
+
 		if (ab->BaseStats[IE_STATE_ID] & STATE_DEAD)
 			ab->AnimID = IE_ANI_SLEEP;
 		ab->Orientation = ( unsigned char ) Orientation;

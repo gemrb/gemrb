@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.97 2004/03/15 14:18:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.98 2004/03/15 15:25:13 avenger_teambg Exp $
  *
  */
 
@@ -53,7 +53,9 @@ static int InDebug = 0;
 static TriggerLink triggernames[] = {
 	{"actionlistempty", GameScript::ActionListEmpty},
 	{"alignment", GameScript::Alignment},
-	{"allegiance", GameScript::Allegiance}, {"bitcheck",GameScript::BitCheck},
+	{"allegiance", GameScript::Allegiance},
+	{"areacheck", GameScript::AreaCheck},
+	{"bitcheck",GameScript::BitCheck},
 	{"breakingpoint",GameScript::BreakingPoint},
 	{"checkstat",GameScript::CheckStat},
 	{"checkstatgt",GameScript::CheckStatGT},
@@ -76,6 +78,7 @@ static TriggerLink triggernames[] = {
 	{"hppercent", GameScript::HPPercent},
 	{"hppercentgt", GameScript::HPPercentGT},
 	{"hppercentlt", GameScript::HPPercentLT},
+	{"inmyarea", GameScript::InMyArea},
 	{"inparty", GameScript::InParty},
 	{"inpartyslot", GameScript::InPartySlot},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog},
@@ -3029,11 +3032,38 @@ int GameScript::UnselectableVariableLT(Scriptable* Sender, Trigger* parameters)
 	return actor->GetStat(IE_UNSELECTABLE) < parameters->int0Parameter;
 }
 
+int GameScript::AreaCheck(Scriptable* Sender, Trigger* parameters)
+{
+	if(Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	return strnicmp(actor->Area, parameters->string0Parameter, 8)==0;
+}
+
+int GameScript::InMyArea(Scriptable* Sender, Trigger* parameters)
+{
+	if(Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor1 = ( Actor* ) Sender;
+	Actor* actor2 = ( Actor* ) tar;
+	
+	return strnicmp(actor1->Area, actor2->Area, 8)==0;
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
 
-void GameScript::NoAction(Scriptable */*Sender*/, Action */*parameters*/)
+void GameScript::NoAction(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	//thats all :)
 }
