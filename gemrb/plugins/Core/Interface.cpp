@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.103 2003/12/19 20:58:56 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.104 2003/12/19 23:05:30 avenger_teambg Exp $
  *
  */
 
@@ -125,10 +125,11 @@ Interface::~Interface(void)
 		delete(pathfinder);
 	if(factory)
 		delete(factory);
-	for(int i = 0; i < 48; i++) {
+	for(int i = 0; i < CursorCount; i++) {
 		if(Cursors[i])
 			delete(Cursors[i]);
 	}
+	delete(Cursors);
 
 	FreeResourceVector(Font, fonts);
 	FreeResourceVector(Window, windows);
@@ -380,7 +381,9 @@ int Interface::Init()
 	printMessage("Core", "Loading Cursors...", WHITE);
 	anim = (AnimationMgr*)GetInterface(IE_BAM_CLASS_ID);
 	anim->Open(str, true);
-	for(int i = 0; i < 48; i++) {
+	CursorCount=anim->GetCycleCount();
+	Cursors = new Animation *[CursorCount];
+	for(int i = 0; i < CursorCount; i++) {
 		Cursors[i] = anim->GetAnimation(i, 0, 0);
 	}
 	FreeInterface(anim);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.6 2003/11/30 18:09:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.7 2003/12/19 23:05:30 avenger_teambg Exp $
  *
  */
 
@@ -52,6 +52,7 @@ public:
 		Color null = {0x00, 0x00, 0x00, 0x00};
 		return null;
 	}
+	int GetCycleCount() { return 1; }
 public:
 	void release(void)
 	{
