@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.6 2004/11/07 19:19:12 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.7 2004/11/13 13:03:33 edheldil Exp $
  *
  */
 
@@ -26,7 +26,7 @@
 #include "../../includes/ie_types.h"
 
 #include "AnimationMgr.h"
-
+#include "Effect.h"
 
 #ifdef WIN32
 
@@ -40,25 +40,9 @@
 #define GEM_EXPORT
 #endif
 
+// FIXME: drop SPLFeature completely and just use Effect
+typedef Effect SPLFeature;
 
-typedef struct SPLFeature {
-	ieWord Opcode;
-	ieByte Target;
-	ieByte Power;
-	ieDword Parameter1;
-	ieDword Parameter2;
-	ieByte TimingMode;
-	ieByte Resistance;
-	ieDword Duration;
-	ieByte Probability1;
-	ieByte Probability2;
-	ieResRef Resource;
-	ieDword DiceThrown;
-	ieDword DiceSides;
-	ieDword SavingThrowType;
-	ieDword SavingThrowBonus;
-	ieDword unknown;
-} SPLFeature;
 
 class GEM_EXPORT SPLExtHeader {
 public:

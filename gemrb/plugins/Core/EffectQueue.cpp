@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.5 2004/11/07 23:13:44 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.6 2004/11/13 13:03:32 edheldil Exp $
  *
  */
 
 #include <stdio.h>
 #include "Interface.h"
 #include "Actor.h"
+#include "Effect.h"
 #include "EffectQueue.h"
 
 #define FX_EXPIRED -1
@@ -41,9 +42,19 @@ EffectQueue::~EffectQueue()
 
 bool EffectQueue::AddEffect(Effect* fx)
 {
+	// Check probability of the effect occuring
+	if (fx->Probability1 < core->Roll( 1, 100, 0 ))
+		return false;
+
+	// FIXME: roll saving throws and resistance
+
+
 	Effect* new_fx = new Effect;
 	memcpy( new_fx, fx, sizeof( Effect ) );
 	effects.push_back( new_fx );
+
+	// pre-roll dice for fx needing them and stow them in the effect
+	new_fx->random_value = core->Roll( fx->DiceThrown, fx->DiceSides, 0 );
 
 	return true;
 }
