@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.251 2005/03/28 07:50:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.252 2005/03/31 13:54:33 avenger_teambg Exp $
  *
  */
 
@@ -162,12 +162,15 @@ static TriggerLink triggernames[] = {
 	{"inweaponrange", GameScript::InWeaponRange,0},
 	{"isaclown", GameScript::IsAClown,0},
 	{"isactive", GameScript::IsActive,0},
+	{"isanimationid", GameScript::AnimationID,0},
 	{"isgabber", GameScript::IsGabber,0},
 	{"islocked", GameScript::IsLocked,0},
+	{"isextendednight", GameScript::IsExtendedNight,0},
 	{"isscriptname", GameScript::CalledByName,0}, //seems the same
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog,0},
 	{"itemisidentified", GameScript::ItemIsIdentified,0},
 	{"kit", GameScript::Kit,0},
+	{"lastmarkedobject", GameScript::LastMarkedObject_Trigger,0},
 	{"level", GameScript::Level,0},
 	{"levelgt", GameScript::LevelGT,0},
 	{"levellt", GameScript::LevelLT,0},
@@ -186,7 +189,6 @@ static TriggerLink triggernames[] = {
 	{"nearlocation", GameScript::NearLocation,0},
 	{"nearsavedlocation", GameScript::NearSavedLocation,0},
 	{"notstatecheck", GameScript::NotStateCheck,0},
-	{"partymemberdied", GameScript::PartyMemberDied,0},
 	{"nulldialog", GameScript::NullDialog,0},
 	{"numcreature", GameScript::NumCreatures,0},
 	{"numcreaturegt", GameScript::NumCreaturesGT,0},
@@ -225,6 +227,8 @@ static TriggerLink triggernames[] = {
 	{"partygoldlt", GameScript::PartyGoldLT,0},
 	{"partyhasitem", GameScript::PartyHasItem,0},
 	{"partyhasitemidentified", GameScript::PartyHasItemIdentified,0},
+	{"partymemberdied", GameScript::PartyMemberDied,0},
+	{"pcinstore", GameScript::PCInStore,0},
 	{"proficiency", GameScript::Proficiency,0},
 	{"proficiencygt", GameScript::ProficiencyGT,0},
 	{"proficiencylt", GameScript::ProficiencyLT,0},
@@ -436,6 +440,7 @@ static ActionLink actionnames[] = {
 	{"log", GameScript::Debug,0}, //the same until we know better
 	{"makeglobal", GameScript::MakeGlobal,0},
 	{"makeunselectable", GameScript::MakeUnselectable,0},
+	{"markobject", GameScript::MarkObject,0},
 	{"moraledec", GameScript::MoraleDec,0},
 	{"moraleinc", GameScript::MoraleInc,0},
 	{"moraleset", GameScript::MoraleSet,0},
@@ -514,7 +519,7 @@ static ActionLink actionnames[] = {
 	{"setcreatureareaflags", GameScript::SetCreatureAreaFlags,0},
 	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
-	{"setdialoguerange", GameScript::SetVisualRange,0}, //same until we know better
+	{"setdialoguerange", GameScript::SetDialogueRange,0},
 	{"setdoorlocked", GameScript::Lock,AF_BLOCKING},//key shouldn't be checked!
 	{"setextendednight", GameScript::SetExtendedNight,0},
 	{"setfaction", GameScript::SetFaction,0},
@@ -618,6 +623,7 @@ static ObjectLink objectnames[] = {
 	{"lastheardby", GameScript::LastHeardBy},
 	{"lasthelp", GameScript::LastHelp},
 	{"lasthitter", GameScript::LastHitter},
+	{"lastmarkedobject", GameScript::LastSeenBy},
 	{"lastseenby", GameScript::LastSeenBy},
 	{"lastsummonerof", GameScript::LastSummonerOf},
 	{"lasttalkedtoby", GameScript::LastTalkedToBy},
@@ -934,31 +940,36 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		/* Initializing the Script Engine */
 
 		memset( triggers, 0, sizeof( triggers ) );
+		memset( triggerflags, 0, sizeof( triggerflags ) );
 		memset( actions, 0, sizeof( actions ) );
+		memset( actionflags, 0, sizeof( actionflags ) );
 		memset( objects, 0, sizeof( objects ) );
 
-		for (i = 0; i < MAX_TRIGGERS; i++) {
-			char* triggername = triggersTable->GetValue( i );
+		int j;
+
+		j = triggersTable->GetSize();
+		while (j--) {
+			i = triggersTable->GetValueIndex( j );
 			//maybe we should watch for this bit?
-			if (!triggername) {
-				triggername = triggersTable->GetValue( i | 0x4000 );
-			}
-			TriggerLink* poi = FindTrigger( triggername );
+			//bool triggerflag = i & 0x4000;
+			i &= 0x3fff;
+			if (triggers[i]) continue; //we already found an alternative
+			TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ) );
 			if (poi == NULL) {
 				triggers[i] = NULL;
 				triggerflags[i] = 0;
 			}
 			else {
-				if(InDebug&1) {
-					printf("Found trigger:%04x %s\n",i,triggername);
-				}
 				triggers[i] = poi->Function;
 				triggerflags[i] = poi->Flags;
 			}
 		}
 
-		for (i = 0; i < MAX_ACTIONS; i++) {
-			ActionLink* poi = FindAction( actionsTable->GetValue( i ) );
+		j = actionsTable->GetSize();
+		while (j--) {
+			i = actionsTable->GetValueIndex( j );
+			if (actions[i]) continue; //we already found an alternative
+			ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ) );
 			if (poi == NULL) {
 				actions[i] = NULL;
 				actionflags[i] = 0;
@@ -967,8 +978,11 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 				actionflags[i] = poi->Flags;
 			}
 		}
-		for (i = 0; i < MAX_OBJECTS; i++) {
-			ObjectLink* poi = FindObject( objectsTable->GetValue( i ) );
+		j = objectsTable->GetSize();
+		while (j--) {
+			i = objectsTable->GetValueIndex( j );
+			if (objects[i]) continue;
+			ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ) );
 			if (poi == NULL) {
 				objects[i] = NULL;
 			} else {
@@ -1178,7 +1192,8 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 			map->vars->Lookup( &VarName[6], value);
 		}
 		else {
-			printf("invalid area %s in checkvariable\n",newVarName);
+			printMessage("GameScript"," ",YELLOW);
+			printf("Invalid area %s in checkvariable\n",newVarName);
 		}
 	}
 	else {
@@ -1217,7 +1232,8 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 			map->vars->Lookup( VarName, value);
 		}
 		else {
-			printf("invalid area %s in checkvariable2\n",Context);
+			printMessage("GameScript"," ",YELLOW);
+			printf("Invalid area %s in checkvariable\n",Context);
 		}
 	} else {
 		core->GetGame()->globals->Lookup( VarName, value );
@@ -2102,6 +2118,8 @@ Action* GameScript::GenerateAction(char* String, bool autoFree)
 	int len = strlench(String,'(')+1; //including (
 	int i = actionsTable->FindString(String, len);
 	if (i<0) {
+		printMessage("GameScript"," ",YELLOW);
+		printf("Invalid scripting action: %s\n", String);
 		return NULL;
 	}
 	char *src = String+len;
@@ -4602,6 +4620,15 @@ int GameScript::AreaType(Scriptable* /*Sender*/, Trigger* parameters)
 	return (map->AreaType&parameters->int0Parameter)>0;
 }
 
+int GameScript::IsExtendedNight( Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	if (map->AreaType&AT_EXTENDED_NIGHT) {
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::AreaFlag(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
@@ -5113,6 +5140,15 @@ int GameScript::Heard(Scriptable* Sender, Trigger* parameters)
 	return MatchActor(actor->LastHeard, parameters->objectParameter);
 }
 
+int GameScript::LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	return MatchActor(actor->LastSeen, parameters->objectParameter);
+}
+
 int GameScript::Help_Trigger(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -5204,6 +5240,14 @@ int GameScript::HasWeaponEquipped(Scriptable* Sender, Trigger* parameters)
 	return 1;
 }
 
+int GameScript::PCInStore( Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	if (core->GetCurrentStore()) {
+		return 1;
+	}
+	return 0;
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -5213,10 +5257,10 @@ void GameScript::SetExtendedNight(Scriptable* /*Sender*/, Action* parameters)
 	Map *map=core->GetGame()->GetCurrentMap();
 	//sets the 'can rest other' bit
 	if (parameters->int0Parameter) {
-		map->AreaType|=0x40;
+		map->AreaType|=AT_EXTENDED_NIGHT;
 	}
 	else {
-		map->AreaType&=~0x40;
+		map->AreaType&=~AT_EXTENDED_NIGHT;
 	}
 }
 
@@ -5225,10 +5269,10 @@ void GameScript::SetAreaRestFlag(Scriptable* /*Sender*/, Action* parameters)
 	Map *map=core->GetGame()->GetCurrentMap();
 	//sets the 'can rest other' bit
 	if (parameters->int0Parameter) {
-		map->AreaType|=0x80;
+		map->AreaType|=AT_CAN_REST;
 	}
 	else {
-		map->AreaType&=~0x80;
+		map->AreaType&=~AT_CAN_REST;
 	}
 }
 
@@ -6486,7 +6530,10 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		scr = Sender;
 	}
 	if(!tar) {
-		printf("[IEScript]: Target for dialog couldn't be found.\n");
+		printf("[IEScript]: Target for dialog couldn't be found (Sender: %s).\n", Sender->GetScriptName());
+		if(Sender->Type == ST_ACTOR) {
+			((Actor *) Sender)->DebugDump();
+		}
 		parameters->objects[1]->Dump();
 		Sender->CurrentAction = NULL;
 		return;
@@ -6497,8 +6544,10 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	//	Sender->CurrentAction = NULL;
 	//	return;
 	//}
-	if(Flags&BD_CHECKDIST) {
-		if(Distance(Sender, tar)>MAX_OPERATING_DISTANCE) {
+	//CHECKDIST works only for mobile scriptables
+	if((Flags&BD_CHECKDIST) && (Sender->Type==ST_ACTOR) ) {
+		Actor *actor = (Actor *) Sender;
+		if(Distance(Sender, tar)>actor->GetStat(IE_DIALOGRANGE)*20 ) {
 			GoNearAndRetry(Sender, tar);
 			Sender->CurrentAction = NULL;
 			return;
@@ -8770,5 +8819,28 @@ void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
 void GameScript::AdvanceTime( Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->GameTime += parameters->int0Parameter;
+}
+
+//IWD2 special, can mark only actors, hope it is enough
+void GameScript::MarkObject(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if(!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->LastSeen = (Actor *) tar;
+}
+
+void GameScript::SetDialogueRange(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->SetStat( IE_DIALOGRANGE, parameters->int0Parameter );
 }
 

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.8 2005/03/06 10:46:31 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.9 2005/03/31 13:54:31 avenger_teambg Exp $
 
 # ie_stats.py - definitions of creature stats codes
 
@@ -227,7 +227,8 @@ IE_DISABLEOVERLAY		= 174
 IE_DISABLEBACKSTAB		= 175
 IE_XP_MAGE	 		= 176 # In PST this stores secondary level exp
 IE_XP_THIEF	 		= 177 # In PST this stores tertiary level exp
-#178-198 unused
+IE_DIALOGRANGE                  = 178 # distance for dialogue
+#179-198 unused
 IE_STONESKINSGOLEM		= 199
 IE_LEVELDRAIN			= 200
 IE_RACE				= 201

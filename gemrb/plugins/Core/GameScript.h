@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.165 2005/03/26 12:21:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.166 2005/03/31 13:54:34 avenger_teambg Exp $
  *
  */
 
@@ -814,12 +814,14 @@ public: //Script Functions
 	static int IsAClown(Scriptable* Sender, Trigger* parameters);
 	static int IsActive(Scriptable* Sender, Trigger* parameters);
 	static int IsGabber(Scriptable* Sender, Trigger* parameters);
+	static int IsExtendedNight(Scriptable* Sender, Trigger* parameters);
 	static int IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsLocked(Scriptable* Sender, Trigger* parameters);
 	static int IsRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters);
 	static int ItemIsIdentified(Scriptable* Sender, Trigger* parameters);
 	static int Kit(Scriptable* Sender, Trigger* parameters);
+	static int LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int Level(Scriptable* Sender, Trigger* parameters);
 	static int LevelGT(Scriptable* Sender, Trigger* parameters);
 	static int LevelLT(Scriptable* Sender, Trigger* parameters);
@@ -874,6 +876,7 @@ public: //Script Functions
 	static int PartyHasItem(Scriptable* Sender, Trigger* parameters);
 	static int PartyHasItemIdentified(Scriptable* Sender, Trigger* parameters);
 	static int PartyMemberDied(Scriptable* Sender, Trigger* parameters);
+	static int PCInStore(Scriptable* Sender, Trigger* parameters);
 	static int Proficiency(Scriptable* Sender, Trigger* parameters);
 	static int ProficiencyGT(Scriptable* Sender, Trigger* parameters);
 	static int ProficiencyLT(Scriptable* Sender, Trigger* parameters);
@@ -1057,6 +1060,7 @@ public:
 	static void LeaveParty(Scriptable* Sender, Action* parameters);
 	static void Lock(Scriptable* Sender, Action* parameters);
 	static void LockScroll(Scriptable* Sender, Action* parameters);
+	static void MarkObject(Scriptable* Sender, Action* parameters);
 	static void MakeGlobal(Scriptable* Sender, Action* parameters);
 	static void MakeUnselectable(Scriptable* Sender, Action* parameters);
 	static void MoraleDec(Scriptable* Sender, Action* parameters);
@@ -1120,6 +1124,7 @@ public:
 	static void SetCorpseEnabled(Scriptable* Sender, Action* parameters);
 	static void SetCreatureAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
+	static void SetDialogueRange(Scriptable* Sender, Action* parameters);
 	static void SetExtendedNight(Scriptable* Sender, Action* parameters);
 	static void SetFaction(Scriptable* Sender, Action* parameters);
 	static void SetGabber(Scriptable* Sender, Action* parameters);

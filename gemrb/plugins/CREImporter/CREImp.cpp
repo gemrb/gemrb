@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.63 2005/03/13 18:38:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.64 2005/03/31 13:54:32 avenger_teambg Exp $
  *
  */
 
@@ -220,6 +220,7 @@ Actor* CREImp::GetActor()
 	act->SetText( poi, 2 ); //setting shortname (for tooltips)
 	free( poi );
 	act->BaseStats[IE_VISUALRANGE] = 30; //this is just a hack
+	act->BaseStats[IE_DIALOGRANGE] = 15; //this is just a hack
 	str->ReadDword( &act->BaseStats[IE_MC_FLAGS] );
 	str->ReadDword( &act->BaseStats[IE_XPVALUE] );
 	str->ReadDword( &act->BaseStats[IE_XP] );

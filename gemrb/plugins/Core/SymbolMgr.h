@@ -29,6 +29,7 @@ public:
 	virtual int GetValueIndex(unsigned int Index) = 0;
 	virtual int FindValue(int val) = 0;
 	virtual int FindString(char *str, int len) = 0;
+	virtual int GetSize() = 0;
 };
 
 #endif

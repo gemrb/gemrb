@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.66 2005/03/23 18:21:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.67 2005/03/31 13:54:34 avenger_teambg Exp $
  *
  */
 
@@ -45,6 +45,10 @@ class Ambient;
 #else
 #define GEM_EXPORT
 #endif
+
+//area types
+#define AT_EXTENDED_NIGHT  0x40
+#define AT_CAN_REST        0x80
 
 typedef struct SongHeaderType {
 	ieDword SongList[5];

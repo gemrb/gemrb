@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.h,v 1.11 2004/08/07 21:00:35 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.h,v 1.12 2005/03/31 13:54:34 avenger_teambg Exp $
  *
  */
 
@@ -47,7 +47,7 @@ public:
 	int GetValueIndex(unsigned int Index);
 	int FindString(char *str, int len);
 	int FindValue(int val);
-
+	int GetSize() { return pairs.size(); }
 public:
 	void release(void)
 	{
