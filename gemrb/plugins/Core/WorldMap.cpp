@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.11 2005/02/22 21:01:47 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.12 2005/02/22 21:30:11 avenger_teambg Exp $
  *
  */
 
@@ -232,7 +232,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 		}
 	}
 
-	printf("Walkpath size is: %ld\n",walkpath.size());
+	printf("Walkpath size is: %d\n",(int) walkpath.size());
 	if (!walkpath.size()) {
 		return NULL;
 	}
