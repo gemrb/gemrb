@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.16 2004/02/24 22:20:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.17 2004/03/27 11:51:36 avenger_teambg Exp $
  *
  */
 
@@ -155,11 +155,18 @@ Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
 Animation* BAMImp::GetAnimation(unsigned char Cycle, int x, int y,
 	unsigned char mode)
 {
+	if(Cycle >=CyclesCount ) {
+		return NULL;
+	}
+	if(!cycles[Cycle].FramesCount) {
+		return NULL;
+	}
 	str->Seek( FLTOffset + ( cycles[Cycle].FirstFrame * 2 ), GEM_STREAM_START );
 	unsigned short * findex = ( unsigned short * )
-		malloc( cycles[Cycle].FramesCount * 2 );
-	for (unsigned int i = 0; i < cycles[Cycle].FramesCount; i++)
+		malloc( cycles[Cycle].FramesCount * sizeof(unsigned short) );
+	for (unsigned int i = 0; i < cycles[Cycle].FramesCount; i++) {
 		str->Read( &findex[i], 2 );
+	}
 	Animation* anim = new Animation( findex, cycles[Cycle].FramesCount );
 	anim->x = x;
 	anim->y = y;
