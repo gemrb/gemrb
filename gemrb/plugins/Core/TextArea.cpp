@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.64 2004/11/21 21:18:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.65 2004/11/26 23:51:32 avenger_teambg Exp $
  *
  */
 
@@ -75,8 +75,6 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	if (lines.size() == 0) {
 		return;
 	}
-	ieDword initials=1;
-	core->GetDictionary()->Lookup("Drop Capitals", initials);
 	if (!Selectable) {
 		char* Buffer = ( char* ) malloc( 1 );
 		Buffer[0] = 0;
@@ -123,7 +121,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		ftext->PrintFromLine( startrow,
 			Region( x + XPos, y + YPos, Width, Height - 5 ),
 			( unsigned char * ) Buffer, palette,
-			IE_FONT_ALIGN_LEFT, !initials,
+			IE_FONT_ALIGN_LEFT, true, 
 			finit, initpalette );
 		free( Buffer );
 	} else {
@@ -147,7 +145,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			ftext->PrintFromLine( sr,
 				Region( x + XPos, y + YPos, Width, Height - 5 ),
 				( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT,
-				!i && !initials, finit, initpalette );
+				true, finit, initpalette );
 			yl = lrows[i] - sr;
 			break;
 		}
@@ -162,7 +160,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			ftext->Print( Region( x + XPos, y + YPos +
 				( yl * ftext->size[1].h ), Width,
 				Height - 5 - ( yl * ftext->size[1].h) ),
-				( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT, false );
+				( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT, true );
 			yl += lrows[i];
 		}
 	}
@@ -309,7 +307,14 @@ void TextArea::PopLines(unsigned int count)
 /** Sets the Fonts */
 void TextArea::SetFonts(Font* init, Font* text)
 {
-	finit = init;
+	ieDword initials = 0;
+	core->GetDictionary()->Lookup("Drop Capitals", initials);
+	if(initials) {
+		finit = NULL;
+	}
+	else {
+		finit = init;
+	}
 	ftext = text;
 	Changed = true;
 }
