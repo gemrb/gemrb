@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.16 2004/08/26 14:07:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.17 2004/09/14 22:08:06 avenger_teambg Exp $
  *
  */
 
@@ -67,19 +67,19 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 		printf( "[BMPImporter]: Not a valid BMP File.\n" );
 		return false;
 	}
-	str->Read( &FileSize, 4 );
+	str->ReadDword( &FileSize );
 	str->Seek( 4, GEM_CURRENT_POS );
-	str->Read( &DataOffset, 4 );
+	str->ReadDword( &DataOffset );
 
 	//BITMAPINFOHEADER
 
-	str->Read( &Size, 4 );
-	str->Read( &Width, 4 );
-	str->Read( &Height, 4 );
-	str->Read( &Planes, 2 );
-	str->Read( &BitCount, 2 );
-	str->Read( &Compression, 4 );
-	str->Read( &ImageSize, 4 );
+	str->ReadDword( &Size );
+	str->ReadDword( &Width );
+	str->ReadDword( &Height );
+	str->ReadWord( &Planes );
+	str->ReadWord( &BitCount );
+	str->ReadDword( &Compression );
+	str->ReadDword( &ImageSize );
 	str->Seek( 16, GEM_CURRENT_POS );
 	//str->Read(&Hres, 4);
 	//str->Read(&Vres, 4);
@@ -98,6 +98,7 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 		else
 			NumColors = 16;
 		Palette = ( Color * ) malloc( 4 * NumColors );
+		//no idea if we have to swap this or not
 		for (unsigned int i = 0; i < NumColors; i++) {
 			str->Read( &Palette[i].b, 1 );
 			str->Read( &Palette[i].g, 1 );
@@ -106,6 +107,7 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 		}
 	}
 	str->Seek( DataOffset, GEM_STREAM_START );
+	//no idea if we have to swap this or not
 	//RASTERDATA
 	switch (BitCount) {
 		case 24:
