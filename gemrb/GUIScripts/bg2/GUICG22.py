@@ -63,6 +63,8 @@ def OnLoad():
 		GemRB.SetButtonState(KitWindow, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetText(KitWindow, Button, KitName)
 		GemRB.SetVarAssoc(KitWindow, Button, "Class Kit",Kit)
+		if i==0:
+			GemRB.SetVar("Class Kit",Kit)
 		GemRB.SetEvent(KitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "KitPress")
 
 	BackButton = GemRB.GetControl(KitWindow,8)

@@ -61,13 +61,15 @@ def OnLoad():
 	
 	ClassTable = GemRB.LoadTable("classes")
 	Class = GemRB.GetVar("Class")-1
+	ClassID = GemRB.GetTableValue(ClassTable, Class, 5)
+	KitList = GemRB.LoadTable("kitlist")
+	Class = GemRB.FindTableValue(ClassTable, 5, ClassID)
 	ClassName = GemRB.GetTableRowName(ClassTable, Class)
 	Kit = GemRB.GetVar("Class Kit")
 	if Kit == 0:
 		KitName = ClassName
 		ProfColumn = GemRB.GetTableValue(ClassTable,Class,5)+2
 	else:
-		KitList = GemRB.LoadTable("kitlist")
 		#rowname is just a number, the kitname is the first data column
 		KitName = GemRB.GetTableValue(KitList, Kit, 0)
 		#this is the proficiency column number in kitlist
