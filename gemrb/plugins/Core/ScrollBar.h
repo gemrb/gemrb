@@ -44,8 +44,6 @@ private: //Private attributes
 	Sprite2D * frames[6];
 	/** Cursor Position */
 	unsigned short Pos;
-	/** Cursor Max Position */
-	unsigned short Max;
 	/** Scroll Bar Status */
 	unsigned short State;
 	/** Sets the Text of the current control */

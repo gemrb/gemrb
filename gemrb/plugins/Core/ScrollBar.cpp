@@ -7,7 +7,7 @@ extern Interface * core;
 ScrollBar::ScrollBar(void)
 {
 	Pos = 0;
-	Max = 10;
+	Value = 10;
 	State = 0;
 	ta = NULL;
 }
@@ -31,7 +31,7 @@ void ScrollBar::SetPos(int NewPos)
 void ScrollBar::RedrawScrollBar(const char *Variable, int Sum)
 {
 	if(strnicmp(VarName, Variable, MAX_VARIABLE_LENGTH) ) return;
-	SetMax((unsigned short) Sum);
+	SetMax(Sum);
 }
 
 void ScrollBar::Draw(unsigned short x, unsigned short y)
@@ -43,7 +43,7 @@ void ScrollBar::Draw(unsigned short x, unsigned short y)
 		return;
 	unsigned short upmx = 0, upMx = frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Width, upmy = 0, upMy = frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
 	unsigned short domx = 0, doMx = frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Width, domy = Height-frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height, doMy = Height;
-	unsigned short slmx = 0, slMx = frames[IE_GUI_SCROLLBAR_SLIDER]->Width, slmy = upMy+(Pos*((domy-frames[5]->Height-upMy)/(double)(Max == 1 ? Max : Max -1))), slMy = slmy+frames[IE_GUI_SCROLLBAR_SLIDER]->Height;
+	unsigned short slmx = 0, slMx = frames[IE_GUI_SCROLLBAR_SLIDER]->Width, slmy = upMy+(Pos*((domy-frames[5]->Height-upMy)/(double)(Value == 1 ? Value : Value -1))), slMy = slmy+frames[IE_GUI_SCROLLBAR_SLIDER]->Height;
 	unsigned short slx  = (Width/2)-(frames[IE_GUI_SCROLLBAR_SLIDER]->Width/2);
 
 	if((State & UP_PRESS) != 0)
@@ -79,7 +79,7 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 	unsigned short domy = Height-frames[2]->Height;
 	unsigned short slheight = domy - upMy;
 	unsigned short refheight = slheight - frames[5]->Height;
-	double step = refheight/(double)(Max == 1 ? Max : Max-1);
+	double step = refheight/(double)(Value == 1 ? Value : Value-1);
 	unsigned short yzero = upMy+(frames[5]->Height/2);
 	unsigned short ymax = yzero+refheight;
 	unsigned short ymy = y-yzero;
@@ -95,7 +95,7 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 	}
 	if((x >= domx) && (y >= domy)) {
 		if((x <= doMx) && (y <= doMy)) {
-			if(Pos < (Max-1))
+			if(Pos < (Value-1))
 				SetPos(Pos+1);
 			State |= DOWN_PRESS;
 			return;
@@ -112,7 +112,7 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y, unsigned char Bu
 		return;
 	}
 	if(y >= ymax) {
-		SetPos(Max-1);
+		SetPos(Value-1);
 		return;
 	}
 	unsigned short befst = (unsigned short) (ymy / step);
@@ -139,7 +139,7 @@ void ScrollBar::OnMouseOver(unsigned short x, unsigned short y)
 		unsigned short domy = Height-frames[2]->Height;
 		unsigned short slheight = domy - upMy;
 		unsigned short refheight = slheight - frames[5]->Height;
-		double step = refheight/(double)(Max == 1 ? Max : Max-1);
+		double step = refheight/(double)(Value == 1 ? Value : Value-1);
 		unsigned short yzero = upMy+(frames[5]->Height/2);
 		unsigned short ymax = yzero+refheight;
 		unsigned short ymy = y-yzero;
@@ -148,7 +148,7 @@ void ScrollBar::OnMouseOver(unsigned short x, unsigned short y)
 			return;
 		}
 		if(y >= ymax) {
-			SetPos(Max-1);
+			SetPos(Value-1);
 			return;
 		}
 		unsigned short befst = (unsigned short) (ymy / step);
@@ -157,7 +157,7 @@ void ScrollBar::OnMouseOver(unsigned short x, unsigned short y)
 			SetPos(befst);
 		}
 		else {
-			if(aftst <= (Max-1))
+			if(aftst <= (Value-1))
 				SetPos(aftst);
 		}
 	}
@@ -172,7 +172,7 @@ int ScrollBar::SetText(const char * string, int pos)
 /** Sets the Maximum Value of the ScrollBar */
 void ScrollBar::SetMax(unsigned short Max)
 {
-	this->Max = Max;
+	Value = Max;
 	if(Max == 0)
 		SetPos(0);
 	else if(Pos >= Max)

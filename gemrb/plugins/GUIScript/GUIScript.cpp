@@ -1074,35 +1074,6 @@ static PyObject *GemRB_Roll(PyObject */*self*/, PyObject *args)
 	return Py_BuildValue("i",core->Roll(Dice, Size, Add) );
 }
 
-static PyObject *GemRB_SetScrollBarVarMax(PyObject */*self*/, PyObject *args)
-{
-	int WindowIndex, ControlIndex, Max;
-	char * VarName;
-
-	if(!PyArg_ParseTuple(args, "iisi", &WindowIndex, &ControlIndex, &VarName, &Max) ) {
-		printMessage("GUIScript","Syntax Error: SetScrollBarVarMax(WindowIndex, ControlIndex, VariableName, MaxValue)\n", LIGHT_RED);
-		return NULL;
-	}
-
-	Window * win = core->GetWindow(WindowIndex);
-	if(!win)
-		return NULL;
-
-	Control * ctrl = win->GetControl(ControlIndex);
-	if(!ctrl)
-		return NULL;
-
-	if(ctrl->ControlType != IE_GUI_SCROLLBAR)
-		return NULL;
-
-	ScrollBar * sb = (ScrollBar*)ctrl;
-	strcpy(sb->VarName, VarName);
-	sb->SetMax(Max);
-
-	Py_INCREF(Py_None);
-	return Py_None;
-}
-
 static PyMethodDef GemRBMethods[] = {
     {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
@@ -1247,9 +1218,6 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
 	 "Invalidated the given Window."},
-
-	{"SetScrollBarVarMax", GemRB_SetScrollBarVarMax, METH_VARARGS,
-	 "Sets the Associated Variable of a ScrollBar and the Max Value."},
 
     {NULL, NULL, 0, NULL}
 };
