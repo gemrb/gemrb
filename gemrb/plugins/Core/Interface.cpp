@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.142 2004/03/23 18:25:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.143 2004/03/25 17:11:45 avenger_teambg Exp $
  *
  */
 
@@ -1291,8 +1291,8 @@ int Interface::SetEvent(unsigned short WindowIndex,
 		return -1;
 	}
 	if (ctrl->ControlType != ( EventID >> 24 )) {
-		printf( "Expected control: %0x, but got: %0x", EventID >> 24,
-			ctrl->ControlType );
+		printf( "Expected control: %0x, but got: %0x", (int) (EventID >> 24),
+			(int) ctrl->ControlType );
 		printStatus( "ERROR", LIGHT_RED );
 		return -1;
 	}
@@ -1351,7 +1351,7 @@ int Interface::SetEvent(unsigned short WindowIndex,
 			}
 			break;
 	}
-	printf( "Control has no event implemented: %0x", ctrl->ControlID );
+	printf( "Control has no event implemented: %0x", (int) ctrl->ControlID );
 	printStatus( "ERROR", LIGHT_RED );
 	return -1;
 }
@@ -1409,8 +1409,8 @@ int Interface::ShowModal(unsigned short WindowIndex)
 void Interface::DrawWindows(void)
 {
 	std::vector< int>::reverse_iterator t = topwin.rbegin();
-	for (int i = 0; i < topwin.size(); i++) {
-		if (( ( *t ) >= windows.size() ) || ( ( *t ) < 0 ))
+	for (unsigned int i = 0; i < topwin.size(); i++) {
+		if ( (unsigned int) ( *t ) >=windows.size() )
 			continue;
 		if (windows[( *t )] != NULL && windows[( *t )]->Visible)
 			windows[( *t )]->DrawWindow();
