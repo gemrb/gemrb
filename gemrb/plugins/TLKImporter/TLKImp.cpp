@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.19 2003/11/25 20:58:25 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.20 2003/11/27 14:47:02 doc_wagon Exp $
  *
  */
 
@@ -31,6 +31,11 @@ TLKImp::TLKImp(void)
 		isBG1 = true;
 	else
 		isBG1 = false;
+
+  if(stricmp(core->GameType, "iwd") == 0)
+    isIWD = true;
+  else
+    isIWD = false;
 }
 
 TLKImp::~TLKImp(void)
@@ -233,8 +238,8 @@ char * TLKImp::GetString(unsigned long strref, int flags)
 		string = (char*) malloc(1);
 	}
 	string[Length] = 0;
-//tagged text, bg1 doesn't mark them speciafically, all entries are tagged
-	if(isBG1 || (type&4)) {
+//tagged text, bg1 and iwd don't mark them speciafically, all entries are tagged
+	if(isIWD || isBG1 || (type&4)) {
 //GetNewStringLength will look in string and return true
 //if the new Length will change due to tokens
 //if there is no new length, we are done
