@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.85 2004/04/15 22:40:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.86 2004/04/16 14:53:43 avenger_teambg Exp $
  *
  */
 
@@ -385,6 +385,9 @@ void Map::DeleteActor(Actor* actor)
 	std::vector< Actor*>::iterator m;
 	for (m = actors.begin(); m != actors.end(); ++m) {
 		if (( *m ) == actor) {
+			Game *game = core->GetGame();
+			game->LeaveParty( actor );
+			game->DelNPC( game->InStore(actor) );
 			actors.erase( m );
 			delete (actor);
 			lastActorCount[0] = 0;
