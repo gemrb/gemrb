@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.131 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.132 2004/02/29 17:31:59 avenger_teambg Exp $
  *
  */
 
@@ -757,6 +757,10 @@ bool Interface::LoadConfig(const char* filename)
 			GameOnCD = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "AllStringsTagged" ) == 0) {
 			SetFeature( atoi( value ), GF_ALL_STRINGS_TAGGED );
+		} else if (stricmp( name, "HasDPLAYER" ) == 0) {
+			SetFeature( atoi( value ), GF_HAS_DPLAYER );
+		} else if (stricmp( name, "HasPDIALOG" ) == 0) {
+			SetFeature( atoi( value ), GF_HAS_PDIALOG );
 		} else if (stricmp( name, "SoundFolders" ) == 0) {
 			SetFeature( atoi( value ), GF_SOUNDFOLDERS );
 		} else if (stricmp( name, "MidResAvatars" ) == 0) {
@@ -972,10 +976,11 @@ void Interface::EnterActors(const char* StartArea)
 	int i = actors.size();
 	while (i--) {
 		Actor* MyActor = GetActor( i );
-		if (MyActor && MyActor->InParty && ( !MyActor->FromGame )) {
+		if (MyActor && !MyActor->FromGame) {
 			GetGame()->SetPC( MyActor );
 			GetGame()->GetMap( 0 )->AddActor( MyActor );
 			strncpy( MyActor->Area, StartArea, 8 );
+			MyActor->Init();
 			MyActor->FromGame = true;
 			MyActor->MySelf = MyActor;
 		}
