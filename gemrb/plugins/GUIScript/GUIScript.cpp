@@ -387,7 +387,7 @@ static PyObject * GemRB_GetSymbolValue(PyObject */*self*/, PyObject *args)
 
 	if(PyArg_UnpackTuple(args, "ref", 2, 2, &si, &sym)) {
 		if(!PyObject_TypeCheck(si, &PyInt_Type)) {
-			printMessage("GUIScript", "Syntax Error: GetTableValue(Table, RowIndex/RowString, ColIndex/ColString)\n", LIGHT_RED);
+			printMessage("GUIScript", "Syntax Error: GetSymbolValue(Table, RowIndex/RowString, ColIndex/ColString)\n", LIGHT_RED);
 			return NULL;
 		}
 		int SymbolIndex = PyInt_AsLong(si);
@@ -1594,6 +1594,38 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 	// here comes some code to transfer icon/name to the PC sheet
 	//
 	//
+	Actor *MyActor = core->GetActor(PlayerSlot);
+	if(!MyActor)
+		return NULL;
+	char *poi;
+	core->GetTokenDictionary()->Lookup("Portrait", (unsigned long &) poi);
+	char resref[9];
+	memset(resref,0,sizeof(resref));
+	int mastertable=core->LoadTable("avprefix");
+	TableMgr * mtm = core->GetTable(mastertable);
+	int count=mtm->GetRowCount();
+	if(count<4 || count>8) {
+		printMessage("GUIScript","Table is invalid.\n",LIGHT_RED);
+		return NULL;
+	}
+	for(int i=0;i<count;i++)
+	{
+		poi=mtm->QueryField(i,1);
+		if(poi[0]!='*')
+		{
+			strncat(resref,poi,8);
+			continue;
+		}
+		poi = mtm->QueryField(i,0);
+		int table = core->LoadTable(poi);
+		TableMgr * tm = core->GetTable(table);
+		int StatID = atoi(tm->QueryField() );
+		poi = tm->QueryField(StatID, 0);
+		strncat(resref,poi,8);
+		core->DelTable(table);
+	}
+	core->DelTable(mastertable);
+	MyActor->SetPortrait(poi);
 	Py_INCREF(Py_None);
 	return Py_None;
 }

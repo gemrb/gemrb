@@ -21,7 +21,8 @@ Actor::Actor()
 	}
 	Dialog[0] = 0;
 	ScriptName[0] = 0;
-	Icon[0] = 0;
+	SmallPortrait[0] = 0;
+	LargePortrait[0] = 0;
 
 	anims = NULL;
 

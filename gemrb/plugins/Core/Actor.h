@@ -32,7 +32,6 @@ public:
 	char  ScriptName[33]; //death variable
 	char  Scripts[MAX_SCRIPTS][9];
 	char  Dialog[9];
-	char  Icon[9];
 	//CRE DATA FIELDS
 	char *LongName, *ShortName;
 	char SmallPortrait[9];
@@ -82,11 +81,19 @@ public:
 		strncpy(Dialog, ResRef, 8);
 	}
 	/** Sets the Icon ResRef */
-	void  SetIcon(const char * ResRef)
+	void  SetPortrait(const char * ResRef)
 	{
+		int i;
+
 		if(ResRef == NULL)
 			return;
-		strncpy(Icon, ResRef, 8);
+		for(i=0;i<8 && ResRef[i];i++);
+		memset(SmallPortrait,0,8);
+		memset(LargePortrait,0,8);
+		strncpy(SmallPortrait, ResRef, 8);
+		strncpy(LargePortrait, ResRef, 8);
+		SmallPortrait[i]='S';
+		LargePortrait[i]='M';
 	}
 	/** Gets the Character Long Name/Short Name */
 	char *GetName(int which)
@@ -109,10 +116,10 @@ public:
 	{
 		return Dialog;
 	}
-	/** Gets the Icon ResRef */
-	char *GetIcon(void)
+	/** Gets the Portrait ResRef */
+	char *GetPortrait(int which)
 	{
-			return Icon;
+		return which?SmallPortrait:LargePortrait;
 	}
 
 };
