@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.29 2004/11/20 10:39:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.30 2004/11/21 16:12:07 avenger_teambg Exp $
  *
  */
 
@@ -70,7 +70,9 @@ int Label::SetText(const char* string, int /*pos*/)
 		Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 		SetColor(white, black);
 	}
-	Changed = true;
+	if (Owner) {
+		( ( Window * ) Owner )->Invalidate();
+	}
 	return 0;
 }
 /** Sets the Foreground Font Color */
@@ -127,5 +129,5 @@ bool Label::SetEvent(int eventType, EventHandler handler)
 /** Simply returns the pointer to the text, don't modify it! */
 const char* Label::QueryText()
 {
-        return ( const char * ) Buffer;
+	return ( const char * ) Buffer;
 }

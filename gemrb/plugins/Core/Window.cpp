@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.36 2004/11/01 16:28:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.37 2004/11/21 16:12:07 avenger_teambg Exp $
  *
  */
 
@@ -181,6 +181,9 @@ void Window::Invalidate()
 {
 	DefaultControl = -1;
 	for (unsigned int i = 0; i < Controls.size(); i++) {
+		if (!Controls[i]) {
+			continue;
+		}
 		Controls[i]->Changed = true;
 		switch (Controls[i]->ControlType) {
 			case IE_GUI_BUTTON:
