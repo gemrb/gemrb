@@ -1,1 +1,13 @@
+Scripts:
+1. Run All creature scripts when the creatures are 'activated'.
+Creatures are activated if they are:
+ a. in visibility range of a player (or object that was marked as a clear fog of war).
+ b. affected by the 'aifast' flag (which effectively disables deactivation).
+
+2. Run All area scripts not just the active areas.
+Area scripts are queued, master areas get on the head of the queue, non-master areas get in the tail of the queue. See also: SetMasterArea action/mastarea.2da
+
+Known Bugs:
+1. problem: Dialog options that are disabled by the trigger condition are still accessible via hotkey.
+   solution: The options should be marked at evaluation time
 
