@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.156 2004/04/15 20:33:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.157 2004/04/15 21:28:38 avenger_teambg Exp $
  *
  */
 
@@ -2359,8 +2359,8 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	int PlayerSlot, Which;
 
 	Which = 0;
-	if (!PyArg_ParseTuple( args, "is|i", &PlayerSlot, &Which )) {
-		printMessage( "GUIScript", "Syntax Error: GetPlayerName(Slot[, LongOrShort])\n",
+	if (!PyArg_ParseTuple( args, "is|i", &PlayerSlot, &Name, &Which )) {
+		printMessage( "GUIScript", "Syntax Error: SetPlayerName(Slot, Name[, LongOrShort])\n",
 			LIGHT_RED );
 		return NULL;
 	}
