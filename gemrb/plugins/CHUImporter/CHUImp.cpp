@@ -98,14 +98,15 @@ Window * CHUImp::GetWindow(unsigned long i)
 	}
 	for(int i = 0;i < ControlsCount; i++) {
 		str->Seek(CTOffset+((FirstControl+i)*8), GEM_STREAM_START);
-		unsigned long COffset, CLength;
-		unsigned short ControlID, BufferLength, XPos, YPos, Width, Height;
+		unsigned long COffset, CLength, ControlID;
+		unsigned short BufferLength, XPos, YPos, Width, Height;
 		unsigned char ControlType, temp;
 		str->Read(&COffset, 4);
 		str->Read(&CLength, 4);
 		str->Seek(COffset, GEM_STREAM_START);
-		str->Read(&ControlID, 2);
-		str->Read(&BufferLength, 2);
+		str->Read(&ControlID, 4);
+		//str->Read(&BufferLength, 2);
+		BufferLength = (ControlID & 0xffff0000)>>16;
 		str->Read(&XPos, 2);
 		str->Read(&YPos, 2);
 		str->Read(&Width, 2);

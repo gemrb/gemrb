@@ -54,7 +54,7 @@ public:
 	virtual int SetText(const char * string) = 0;
 public: // Public attributes
 	/** Defines the Control ID Number used for GUI Scripting */
-	unsigned short ControlID;
+	unsigned long ControlID;
 	/** Buffer length of an attached buffer (only significant for some types of text controls) */
 	unsigned short BufferLength;
 	/** X position of control relative to containing window */
