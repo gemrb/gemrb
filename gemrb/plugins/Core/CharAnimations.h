@@ -17,78 +17,266 @@
 #define GEM_EXPORT
 #endif
 
-#define IE_ANI_STAND	0
-#define IE_ANI_WALK		1
-#define IE_ANI_ATTACK	2
-#define IE_ANI_CAST		3
-#define IE_ANI_TAKEHIT	4
-#define IE_ANI_DEAD		5
-#define IE_ANI_SLEEP	6
+#define IE_ANI_ATTACK			0
+#define IE_ANI_AWAKE			1
+#define IE_ANI_CAST				2
+#define IE_ANI_CONJURE			3
+#define IE_ANI_DAMAGE			4
+#define IE_ANI_DIE				5
+#define IE_ANI_HEAD_TURN		6
+#define IE_ANI_READY			7
+#define IE_ANI_SHOOT			8
+#define IE_ANI_TWITCH			9
+#define IE_ANI_WALK				10
+#define IE_ANI_ATTACK_SLASH		11
+#define IE_ANI_ATTACK_BACKSLASH	12
+#define IE_ANI_ATTACK_JAB		13
+#define IE_ANI_EMERGE			14
+#define IE_ANI_HIDE				15
+#define IE_ANI_SLEEP			17
 
-#define IE_ANI_MIRROR				0x00000001
-#define IE_ANI_1H_BLUNT				0x00000002
-#define IE_ANI_2H_BLUNT				0x00000004
-#define IE_ANI_1H_SLASH				0x00000008
-#define IE_ANI_2H_SLASH				0x00000010
-#define IE_ANI_1H_PIERCE			0x00000020
-#define IE_ANI_2H_PIERCE			0x00000040
-#define IE_ANI_2W_BLUNT				0x00000080 //NOT SURE
-#define IE_ANI_2W_SLASH				0x00000100 //NOT SURE
-#define IE_ANI_2W_PIERCE			0x00000200 //NOT SURE
-// I cannot really understand how the Casting Animations are coded... 
-// The last Idea was that they are one per Magic School...
-/*
-#define IE_ANI_CAST_STANDARD		0x00000400
-#define IE_ANI_CAST_ISTANT			0x00000800
-#define IE_ANI_CAST_DIVINE			0x00001000 //NOT SURE
-#define IE_ANI_CAST_DIVINE_INST		0x00002000 //NOT SURE
-#define IE_ANI_CAST_LONG			0x00004000
-*/
-#define IE_ANI_CAST_ABJURATION		0x00000400
-#define IE_ANI_CAST_CONJURATION		0x00000800
-#define IE_ANI_CAST_DIVINATION		0x00001000
-#define IE_ANI_CAST_ENCHANTMENT		0x00002000
-#define IE_ANI_CAST_ILLUSIONISM		0x00004000
-#define IE_ANI_CAST_EVOCATION		0x00008000
-#define IE_ANI_CAST_NECROMANCY		0x00010000
-#define IE_ANI_CAST_TRANSMUTATION	0x00020000
+#define IE_ANI_CODE_MIRROR		0
+#define IE_ANI_ONE_FILE			1
+#define IE_ANI_TWO_FILES		2
+#define IE_ANI_FOUR_FILES		3
 
-#define IE_ANI_WALK_DISARMED		0x00040000
+#define IE_ANI_NO_ARMOR			0
+#define IE_ANI_LIGHT_ARMOR		1
+#define IE_ANI_MEDIUM_ARMOR		2
+#define IE_ANI_HEAVY_ARMOR		3
 
-#define IE_ANI_STAND_LOOKING		0x00080000
-#define IE_ANI_STAND_2H_WEAPON		0x00100000
+#define IE_ANI_WEAPON_1H		0
+#define IE_ANI_WEAPON_2H		1
+#define IE_ANI_WEAPON_2W		2
 
-#define IE_ANI_TAKE_HIT_DISARMED	0x00200000
-#define IE_ANI_TAKE_HIT_1H_WEAPON	0x00400000
+#define IE_ANI_RANGED_BOW		0
+#define IE_ANI_RANGED_XBOW		1
+#define IE_ANI_RANGED_THROW		2
 
-#define IE_ANI_COMPOSED_DEAD		0x00800000
-
-#define IE_ANI_STAND_DISARMED       0x01000000
-#define IE_ANI_STAND_YAWNING		0x02000000
-
-#define IE_ANI_DIEING				0x04000000
-
-#define IE_ANI_BOW					0x08000000
-#define IE_ANI_LAUNCH				0x10000000
-#define IE_ANI_XBOW					0x20000000
-
-#define IE_ANI_MIDRES				0x40000000
-#define IE_ANI_LOWRES				0x80000000
-
-#define IE_ANI_ALL					0x3FFFFFFF
 
 class GEM_EXPORT CharAnimations
 {
 public:
-	Animation * Anims[30][16];
+	Animation * Anims[18][16];
 	Color Palette[256];
 	unsigned long LoadedFlag;
-	unsigned long SupportedAnims;
+	unsigned char OrientCount, MirrorType;
+	unsigned char ArmorType, WeaponType, RangedType;
 	char * ResRef;
 public:
-	CharAnimations(char * BaseResRef, unsigned long AniType);
+	CharAnimations(char * BaseResRef, unsigned char OrientCount, unsigned char MirrorType);
 	~CharAnimations(void);
 	Animation * GetAnimation(unsigned char AnimID, unsigned char Orient);
+private:
+	void AddVHRSuffix(char * ResRef, unsigned char AnimID)
+	{
+		switch(ArmorType)
+			{
+			case 0: // No Armor
+				strcat(ResRef, "1");
+			break;
+
+			case 1: // Light Armor
+				strcat(ResRef, "2");
+			break;
+
+			case 2: // Medium Armor
+				strcat(ResRef, "3");
+			break;
+
+			case 3: // Heavy Armor
+				strcat(ResRef, "4");
+			break;
+			}
+		switch(AnimID)
+			{
+			//Attack is a special case... it cycles randomly
+			//through SLASH, BACKSLASH and JAB so we will choose
+			//which animation return randomly
+			case IE_ANI_ATTACK:
+			case IE_ANI_ATTACK_SLASH:
+				{
+				switch(WeaponType)
+					{
+					case IE_ANI_WEAPON_1H:
+                        strcat(ResRef, "A1");
+					break;
+
+					case IE_ANI_WEAPON_2H:
+						strcat(ResRef, "A3");
+					break;
+
+					case IE_ANI_WEAPON_2W:
+						strcat(ResRef, "A7");
+					break;
+					}
+				Cycle = (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_ATTACK_BACKSLASH:
+				{
+				switch(WeaponType)
+					{
+					case IE_ANI_WEAPON_1H:
+                        strcat(ResRef, "A2");
+					break;
+
+					case IE_ANI_WEAPON_2H:
+						strcat(ResRef, "A4");
+					break;
+
+					case IE_ANI_WEAPON_2W:
+						strcat(ResRef, "A8");
+					break;
+					}
+				Cycle = (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_ATTACK_JAB:
+				{
+				switch(WeaponType)
+					{
+					case IE_ANI_WEAPON_1H:
+                        strcat(ResRef, "A3");
+					break;
+
+					case IE_ANI_WEAPON_2H:
+						strcat(ResRef, "A5");
+					break;
+
+					case IE_ANI_WEAPON_2W:
+						strcat(ResRef, "A9");
+					break;
+					}
+				Cycle = (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_AWAKE:
+				{
+				strcat(ResRef, "G1");
+				Cycle = 9 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_CAST:
+				{
+				strcat(ResRef, "CA");
+				Cycle = 9 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_CONJURE:
+				{
+				strcat(ResRef, "CA");
+				Cycle = (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_DAMAGE:
+				{
+				strcat(ResRef, "G14");
+				Cycle = 36 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_DIE:
+				{
+				strcat(ResRef, "G15");
+				Cycle = 45 + (Orient % 9);
+				}
+			break;
+
+			//I cannot find an emerge animation...
+			//Maybe is Die reversed
+			case IE_ANI_EMERGE:
+				{
+				strcat(ResRef, "G15");
+				Cycle = 45 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_HEAD_TURN:
+				{
+				strcat(ResRef, "G12");
+				Cycle = 18 + (Orient % 9);
+				}
+			break;
+
+			//Unknown... maybe only a transparency effect apply
+			case IE_ANI_HIDE:
+				{
+
+				}
+			break;
+
+			case IE_ANI_READY:
+				{
+				strcat(ResRef, "G13");
+				Cycle = 27 + (Orient % 9);
+				}
+			break;
+
+			//This depends on the ranged weapon equipped
+			case IE_ANI_SHOOT:
+				{
+				switch(RangedType)
+					{
+					case IE_ANI_RANGED_BOW:
+						{
+						strcat(ResRef, "SA");
+						Cycle = (Orient % 9);
+						}
+					break;
+
+					case IE_ANI_RANGED_XBOW:
+						{
+						strcat(ResRef, "SX");
+						Cycle = (Orient % 9);
+						}
+					break;
+					
+					case IE_ANI_RANGED_THROW:
+						{
+						strcat(ResRef, "SS");
+						Cycle = (Orient % 9);
+						}
+					break;
+					}
+				}
+			break;
+
+			case IE_ANI_SLEEP:
+				{
+				strcpy(ResRef, "G16");
+				Cycle = 54 + (Orient % 9);
+				}
+			break;
+
+			case IE_ANI_TWITCH:
+				{
+				strcpy(ResRef, "
+				}
+			break;
+			}
+	}
+
+	void GetAnimResRef(unsigned char AnimID, unsigned char Orient, char * ResRef, unsigned char & Cycle)
+	{
+		switch(MirrorType) 
+			{
+			case IE_ANI_CODE_MIRROR:
+				{
+					if(OrientCount == 9) {
+						strcpy(ResRef, this->ResRef);
+						
+					}
+				}
+			break;
+			}
+	}
 };
 
 #endif
