@@ -1,0 +1,57 @@
+
+Container specification (based on IESDP)
+
+Relevant structures:
+--------------------
+
+typedef struct {
+  char containername[32];
+  short posx, posy;
+  short type;
+  short lockdiff;
+  long flags;
+  short trapdetect;
+  short trapremove;
+  short trapped;
+  short trapvisible;
+  short launchx, launchy;
+  short p1x, p1y, p2x, p2y; //minimum bounding box
+  long firstitem;
+  long itemcount;
+  char trapscript[8];
+  long firstvertex;
+  short vertexcount;
+  short unknown56;
+  char scriptname[32];
+  char keyitem[8];
+  short unknown80;
+  short unknown82;
+  long strref;             //STRREF!!!
+  char unused[56];
+} area_container;
+
+
+Description:
+------------
+The container's name is not really relevant, it is used only in editors. Scripts reference a container by
+the scriptname field. The container's position determines the opening location. 
+All container types are similar, except that only a few got a special graphics (BAM), see containr.2da in GemRB.
+The ground piles are special containers of type 4. Ground pile containers show the item's ground icon instead of
+the container's trigger polygon. Containers could be locked, the lockdiff field determines the difficulty to open
+them by force. The trapdetect and trapremove fields determine the trap detection and removal difficulties.
+The trapped field shows if the trap is still trapped, and the trapvisible field  (GemRB implements it as a countdown)
+shows if the trap is still visible. The launch point determines the origin of spells cast by the trap script.
+The bounding box has effect on the polygon only. The trapscript is not necessarily a trap, this script is always running
+not like the door's script. There are several triggers that might affect this script. (OpenFail, Open, Lockpick fail).
+The firstitem/itemcount fields point to the inventory of the container (or ground pile).
+The keyitem determines if there is a key. (There should be a keyremoval field like with doors, but it isn't yet found).
+The strref is the openfail message (when it is 100% impossible to open).
+
+Container flags:
+----------------
+0x00000001 - The container is locked, opening by brute force, key or lockpick is needed.
+0x00000002 - ?
+0x00000004 - ?
+0x00000008 - The script isn't removed when it is triggered.
+0x00000010 - ?
+0x00000020 - The container is disabled, the polygon is still active, but the container is not accessible to PC's

@@ -1,0 +1,101 @@
+
+Door specification (based on IESDP)
+
+Relevant structures:
+--------------------
+
+typedef struct {
+  char doorid[8];          //matched with area_door.doorid
+  short closed;            //this is largely unknown, probably it shows which tile represents the closed state
+  short firstdoortileidx;  //door tile cell indices are 16 bit values
+  short countdoortileidx;
+  short countpolygonopen;  //wallpolygon count for the open door state
+  short countpolygonclose; //wallpolygon count for the closed door state
+  long offsetpolygonopen;  //wallpolygon offset for the open door state
+  long offsetpolygonclose; //wallpolygon offset for the closed door state
+} wed_door;
+
+typedef struct {
+  char doorname[32];         //scripting name
+  char doorid[8];            //wed reference
+  long flags;                //door flags, see below
+  long firstvertexopen;      //first open vertex index
+  short countvertexopen;     //count of open vertices
+  short countvertexclose;    //count of closed vertices
+  long firstvertexclose;     //first closed vertex index
+  short op1x,op1y,op2x,op2y; //minimum bounding box for open
+  short cp1x,cp1y,cp2x,cp2y; //minimum bounding box for close
+  long firstblockopen;       //first open impeded blocks (for searchmap)
+  short countblockopen;      //count of open impeded blocks
+  short countblockclose;     //count of closed impeded blocks
+  long firstblockclose;      //first closed impeded blocks (for searchmap)
+  long unknown54;           
+  char openres[8];           //opening sound resource reference
+  char closeres[8];          //closing sound resource reference
+  long cursortype;           //mouse cursor type (when mouse is over the door polygon)
+  short trapdetect;          //difficulty of detecting a trap
+  short trapremoval;         //difficulty of removing a trap
+  short trapflags;           //
+  short trapdetflags;        //
+  short launchx, launchy;    //traps are launched from this point
+  char key[8];               //key item resource reference
+  char openscript[8];        //(trap) script, activated at first triggering (opening door)
+  long locked;               //
+  long lockremoval;          //difficulty of opening the door
+  short locp1x, locp1y;      //open location 1
+  short locp2x, locp2y;      //open location 2
+  long strref;               //check this for missing strings STRREF!!!
+  char regionlink[24];
+  long nameref;              //check this for missing strings  STRREF!!!
+  char dlgref[8];            //?
+  char unknownc0[8];         //?
+} area_door;
+
+Description:
+------------
+
+Scripts reference the door using the doorname field (Scripting Name).
+The relation between the two structures (wed/area) is established by the doorid field.
+Each door is a 'wall', the wall polygons are stored in the wed part of the door.
+The doors also reference two sets of tiles (also in the wed).
+Each door is a special info point with a separate trigger area (polygon) for the open/closed state.
+The bounding boxes are used when rendering the trigger area polygons (actually, could be auto-generated).
+The impeded blocks are superpositioned on the searchmap, they block passage, vision (unless door is transparent) or
+changing the door's state (unless door is sliding).
+The opening/closing sounds of a door are modifiable, though there is a default one (PST has no default sounds).
+If a door is hidden, then the default sound is different.
+The cursor type applies when the mouse is over the trigger area of the door (both states have the same cursor).
+If a door has a script assigned and the trap is detectable the trap detection difficulty determines the chance of
+success. If the difficulty is exactly 100, then it is impossible to detect (a flaw in the original engine lets >100
+values to be detectable). In the impossible case, a message (strref) will be displayed.
+The trap removal difficulty is similarly handled. If trapflags is nonzero, then the trap is still active.
+If Trapdetflags is nonzero, then the trap is still visible. (GemRB will implement the latter as a counter which
+counts down until 0). The trap (if the script starts a spell) is fired from the launch point.
+The key resource has meaning only if the door is locked. If it is empty, then the door cannot be unlocked by key.
+The door is also openable by brute force, the difficulty for this is stored in lockremoval.
+The actor who operates the door will walk up to the closest of the open locations.
+Regionlink is a reference to a travel region which is blocked by the door, if the door is closed.
+//not tested
+Nameref is the name of the door in case of a dialog. DlgRef is the door's dialog.
+
+The door flags are these:
+
+Value          Meaning if set
+-----          --------------
+0x00000001 -   The door is closed (PST), the door is open (other games). When a door's state is changed,
+ (OpenDoor/CloseDoor actions), its (trap) script is triggered.
+0x00000002 -   The door is locked, the lock difficulty must be set to nonzero to have this any effect.
+0x00000004 -   The script isn't removed when it is triggered.
+0x00000008 -   The trap (script) is detectable (fair to set it for real traps).
+0x00000010 -   ?
+0x00000020 -   ?
+0x00000040 -   ?
+0x00000080 -   Secret door
+0x00000100 -   Secret door already found (purple outline)
+0x00000200 -   The impeded doors are ignored concerning vision (door is transparent)
+0x00000400 -   The key object is removed when unlocking the door
+0x00000800 -   The impeded blocks are ignored when opening the door (sliding door)
+0x00001000 -   ?
+0x00002000 -   ?
+0x00004000 -   ?
+0x00008000 -   ?
