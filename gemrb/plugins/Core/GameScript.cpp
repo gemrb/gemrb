@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.3 2003/12/12 23:51:26 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.4 2003/12/13 17:52:52 balrog994 Exp $
  *
  */
 
@@ -61,6 +61,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType)
 		blocking[22] = true;
 		actions[23] = MoveToPoint;
 		blocking[23] = true;
+		actions[26] = PlaySound;
 		actions[30] = SetGlobal;
 		actions[36] = Continue;
 		actions[49] = MoveViewPoint;
@@ -70,6 +71,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType)
 		actions[83] = SmallWait;
 		blocking[83] = true;
 		actions[84] = Face;
+		blocking[84] = true;
 		actions[120] = StartCutScene;
 		actions[121] = StartCutSceneMode;
 		actions[122] = EndCutSceneMode;
@@ -87,6 +89,8 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType)
 		actions[203] = FadeFromColor;
 		blocking[203] = true;
 		actions[269] = DisplayStringHead;
+		actions[272] = CreateVisualEffect;
+		actions[273] = CreateVisualEffectObject;
 		actions[311] = DisplayStringWait;
 		blocking[311] = true;
 		if(strcmp(core->GameType, "pst") == 0) {
@@ -564,8 +568,18 @@ int GameScript::General(GameScript * Sender, Trigger * parameters)
 int GameScript::Globals(GameScript * Sender, Trigger * parameters)
 {
 	unsigned long value;
-	if(!globals->Lookup(parameters->string0Parameter, value)) 
-		value = 0;
+	if(strnicmp(parameters->string0Parameter, "GLOBALS", 6) == 0) {
+		if(!globals->Lookup(&parameters->string0Parameter[6], value)) 
+			value = 0;
+	}
+	else if(strnicmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
+		if(!Sender->locals->Lookup(&parameters->string0Parameter[6], value)) 
+			value = 0;
+	}
+	else {
+		if(!globals->Lookup(parameters->string0Parameter, value)) 
+			value = 0;
+	}
 	int eval = (value == parameters->int0Parameter) ? 1 : 0;
 	if(parameters->flags&1) {
 		if(eval == 0)
@@ -603,7 +617,13 @@ int GameScript::False(GameScript * /*Sender*/, Trigger */*parameters*/)
 void GameScript::SetGlobal(GameScript * Sender, Action * parameters)
 {
 	printf("SetGlobal(\"%s\", %d)\n", parameters->string0Parameter, parameters->int0Parameter);
-	globals->SetAt(parameters->string0Parameter, parameters->int0Parameter);
+	if(strnicmp(parameters->string0Parameter, "GLOBALS", 6) == 0)
+		globals->SetAt(&parameters->string0Parameter[6], parameters->int0Parameter);
+	else if(strnicmp(parameters->string0Parameter, "LOCALS", 6) == 0)
+		Sender->locals->SetAt(&parameters->string0Parameter[6], parameters->int0Parameter);
+	else {
+		globals->SetAt(parameters->string0Parameter, parameters->int0Parameter);
+	}
 }
 
 void GameScript::ChangeAllegiance(GameScript * Sender, Action * parameters)
@@ -883,4 +903,29 @@ void GameScript::StartSong(GameScript * Sender, Action * parameters)
 void GameScript::Continue(GameScript * Sender, Action * parameters)
 {
 	Sender->continueExecution = true;
+}
+
+void GameScript::PlaySound(GameScript * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(Sender, parameters->objects[0]);
+	if(actor) {
+		core->GetSoundMgr()->Play(parameters->string0Parameter);
+	}
+}
+
+void GameScript::CreateVisualEffectObject(GameScript * Sender, Action * parameters)
+{
+	ActorBlock * target = GetActorFromObject(Sender, parameters->objects[1]);
+	if(target) {
+		DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_VVC_CLASS_ID);
+		ScriptedAnimation * vvc = new ScriptedAnimation(ds, true, target->XPos, target->YPos);
+		core->GetGame()->GetMap(0)->AddVVCCell(vvc);
+	}
+}
+
+void GameScript::CreateVisualEffect(GameScript * Sender, Action * parameters)
+{
+	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_VVC_CLASS_ID);
+	ScriptedAnimation * vvc = new ScriptedAnimation(ds, true, parameters->XpointParameter, parameters->YpointParameter);
+	core->GetGame()->GetMap(0)->AddVVCCell(vvc);
 }
