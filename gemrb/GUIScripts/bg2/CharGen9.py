@@ -2,6 +2,15 @@
 import GemRB
 
 IE_SEX =        	35
+IE_STR =		36
+IE_STREXTRA = 		37
+IE_INT =		38
+IE_WIS =		39
+IE_DEX =		40
+IE_CON =		41
+IE_CHR =		42
+IE_XP =			44
+IE_GOLD =		45
 IE_HATEDRACE =  	49
 IE_KIT =        	152
 IE_RACE =       	201
@@ -149,6 +158,18 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_METAL_COLOR, 0x1B )
 	GemRB.SetPlayerStat(MyChar, IE_LEATHER_COLOR, 0x16 )
 	GemRB.SetPlayerStat(MyChar, IE_ARMOR_COLOR, 0x17 )
+	GemRB.SetPlayerStat(MyChar, IE_STR, GemRB.GetVar("Ability 1")
+	if Str==18:
+		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,GemRb.GetVar("StrExtra")
+	else
+		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,0)
+
+	GemRB.SetPlayerStat(MyChar, IE_INT, GemRB.GetVar("Ability 2"))
+	GemRB.SetPlayerStat(MyChar, IE_WIS, GemRB.GetVar("Ability 3"))
+	GemRB.SetPlayerStat(MyChar, IE_DEX, GemRB.GetVar("Ability 4"))
+	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar("Ability 5"))
+	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability 6"))
+
 	GemRB.FillPlayerInfo(MyChar) #does all the rest
 	#LETS PLAY!!
 	GemRB.EnterGame()

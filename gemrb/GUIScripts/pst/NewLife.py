@@ -23,8 +23,20 @@ Cha = 0
 TotPoints = 0
 AcPoints = 0
 HpPoints = 0
+strings = ("30","60","90","99","00")
+extras = (30,60,90,99,100)
 
+IE_HITPOINTS =		0
 IE_SEX =        	35
+IE_STR =                36
+IE_STREXTRA =           37
+IE_INT =                38
+IE_WIS =                39
+IE_DEX =                40
+IE_CON =                41
+IE_CHR =                42
+IE_XP =                 44
+IE_GOLD =               45
 IE_HATEDRACE =  	49
 IE_KIT =        	152
 IE_RACE =       	201
@@ -215,7 +227,10 @@ def OnLoad():
 def UpdateLabels():
 	global AcPoints, HpPoints
 
-	GemRB.SetText(NewLifeWindow, StrLabel, str(Str))
+	if Str<=18:
+		GemRB.SetText(NewLifeWindow, StrLabel, str(Str))
+	else:
+		GemRB.SetText(NewLifeWindow, StrLabel,"18/"+strings[Str-19])
 	GemRB.SetText(NewLifeWindow, DexLabel, str(Dex))
 	GemRB.SetText(NewLifeWindow, ConLabel, str(Con))
 	GemRB.SetText(NewLifeWindow, WisLabel, str(Wis))
@@ -228,7 +243,9 @@ def UpdateLabels():
 
 	HpPoints = 20
 	if Con>14:
-		HpPoints = HpPoints + (Con-14)
+		HpPoints = HpPoints + (Con-10)*2 + (Con-14)
+	else:
+		HpPoints = HpPoints + (Con-10)*2
 
 	GemRB.SetText(NewLifeWindow, AcLabel, str(AcPoints))
 	GemRB.SetText(NewLifeWindow, HpLabel, str(HpPoints))
@@ -251,6 +268,23 @@ def AcceptPress():
 	GemRB.UnloadWindow(NewLifeWindow)
 	#set my character up
 	MyChar = GemRB.CreatePlayer("charbase", 0 ) 
+
+	if Str<=18:
+		GemRB.SetPlayerStat(MyChar, IE_STR, Str)
+		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,0)
+	else:
+		GemRB.SetPlayerStat(MyChar, IE_STR, 18)
+		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,extras[Str-18])
+
+	GemRB.SetPlayerStat(MyChar, IE_INT, Int)
+	GemRB.SetPlayerStat(MyChar, IE_WIS, Wis)
+	GemRB.SetPlayerStat(MyChar, IE_DEX, Dex)
+	GemRB.SetPlayerStat(MyChar, IE_CON, Con)
+	GemRB.SetPlayerStat(MyChar, IE_CHR, Cha)
+
+	#don't add con bonus, it will be calculated by the game
+	GemRB.SetPlayerStat(MyChar, IE_HP, 20 + (Con-10)*2)
+
 	GemRB.FillPlayerInfo(MyChar) #does all the rest
 	#LETS PLAY!!
 	GemRB.EnterGame()
@@ -342,18 +376,28 @@ def IncreasePress():
 	Pressed = GemRB.GetVar("Pressed")
 	if Pressed == 0:
 		Sum = Str
+		if Sum>=23:
+			return
 	if Pressed == 1:
 		Sum = Int
+		if Sum>=18:
+			return
 	if Pressed == 2:
 		Sum = Wis 
+		if Sum>=18:
+			return
 	if Pressed == 3:
 		Sum = Dex
+		if Sum>=18:
+			return
 	if Pressed == 4:
 		Sum = Con
+		if Sum>=18:
+			return
 	if Pressed == 5:
 		Sum = Cha
-	if Sum>=18:
-		return
+		if Sum>=18:
+			return
 	TotPoints = TotPoints-1
 	Sum = Sum+1
 	if Pressed == 0:
