@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.174 2004/07/18 08:33:40 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.175 2004/07/24 23:47:46 avenger_teambg Exp $
  *
  */
 
@@ -372,7 +372,7 @@ int Interface::Init()
 					back = {0x00, 0x00, 0x00, 0x00};
 				Color* pal = video->CreatePalette( fore, back );
 				memcpy( fnt->GetPalette(), pal, 256 * sizeof( Color ) );
-				free( pal );
+				video->FreePalette( pal );
 			}
 			fonts.push_back( fnt );
 		}
