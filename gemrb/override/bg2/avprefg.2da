@@ -2,5 +2,5 @@
 *
 		GENDER
 TYPE		35
-MALE 		M
-FEMALE	 	F
+MALE 		0
+FEMALE	 	0x10
