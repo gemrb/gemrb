@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.138 2005/02/27 19:13:24 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.139 2005/02/27 20:32:27 avenger_teambg Exp $
  *
  */
 
@@ -1311,5 +1311,10 @@ int Map::GetExploredMapSize() const
 		y++;
 	}
 	return (x*y+7)/8;
+}
+
+void Map::Explore(int setreset)
+{
+	memset (ExploredBitmap, setreset, GetExploredMapSize() );
 }
 

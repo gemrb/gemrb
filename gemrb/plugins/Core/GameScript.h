@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.160 2005/02/25 16:46:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.161 2005/02/27 20:32:27 avenger_teambg Exp $
  *
  */
 
@@ -984,6 +984,7 @@ public:
 	static void EndCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void Enemy(Scriptable* Sender, Action* parameters);
 	static void EquipItem(Scriptable *Sender, Action *parameters);
+	static void Explore(Scriptable *Sender, Action *parameters);
 	static void Face(Scriptable* Sender, Action* parameters);
 	static void FaceObject(Scriptable* Sender, Action* parameters);
 	static void FaceSavedLocation(Scriptable* Sender, Action* parameters);
@@ -1168,6 +1169,7 @@ public:
 	static void TeleportParty(Scriptable* Sender, Action* parameters);
 	static void TextScreen(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
+	static void UndoExplore(Scriptable *Sender, Action *parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Unlock(Scriptable* Sender, Action* parameters);
 	static void VerbalConstant(Scriptable* Sender, Action* parameters);

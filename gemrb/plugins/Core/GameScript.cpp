@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.235 2005/02/26 21:08:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.236 2005/02/27 20:32:26 avenger_teambg Exp $
  *
  */
 
@@ -345,6 +345,7 @@ static ActionLink actionnames[] = {
 	{"enemy", GameScript::Enemy,0},
 	{"equipitem", GameScript::EquipItem, AF_BLOCKING},
 	{"erasejournalentry", GameScript::RemoveJournalEntry,0},
+	{"explore", GameScript::Explore,0},
 	{"face", GameScript::Face,AF_BLOCKING},
 	{"faceobject", GameScript::FaceObject, AF_BLOCKING},
 	{"facesavedlocation", GameScript::FaceSavedLocation, AF_BLOCKING},
@@ -567,6 +568,7 @@ static ActionLink actionnames[] = {
 	{"textscreen", GameScript::TextScreen,0},
 	{"tomsstringdisplayer", GameScript::DisplayMessage,0},
 	{"triggeractivation", GameScript::TriggerActivation,0},
+	{"undoexplore", GameScript::UndoExplore,0},
 	{"unhidegui", GameScript::UnhideGUI,0},
 	{"unloadarea", GameScript::UnloadArea,0},
 	{"unlock", GameScript::Unlock,0},
@@ -8544,3 +8546,14 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 	Action *newAction = ParamCopy( parameters);
 	AttackCore(Sender, tar, newAction, AC_REEVALUATE);
 }
+
+void GameScript::Explore( Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	core->GetGame()->GetCurrentMap( )->Explore(0);
+}
+
+void GameScript::UndoExplore( Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	core->GetGame()->GetCurrentMap( )->Explore(-1);
+}
+

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.272 2005/02/25 15:12:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.273 2005/02/27 20:32:31 avenger_teambg Exp $
  *
  */
 
@@ -4152,6 +4152,31 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_ExploreArea__doc,
+"ExploreArea([bitvalue=-1])\n\n"
+"Creates Creature in vicinity of a player character.\n\n");
+
+static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
+{
+	int Value=-1;
+
+	if (!PyArg_ParseTuple( args, "|i", &Value)) {
+		return AttributeError( GemRB_ExploreArea__doc );
+	}
+	Game *game = core->GetGame();
+	if( !game ) {
+		return RuntimeError( "Not in game" );
+	}
+	Map *map=game->GetCurrentMap();
+	if( !map ) {
+		return RuntimeError( "No current area" );
+	}
+	map->Explore( Value );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -4298,7 +4323,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CreateItem, METH_VARARGS),
 	METHOD(SetMapnote, METH_VARARGS),
 	METHOD(CreateCreature, METH_VARARGS),
-
+	METHOD(ExploreArea, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };
