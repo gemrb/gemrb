@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.142 2004/03/22 18:29:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.143 2004/03/25 22:14:52 avenger_teambg Exp $
  *
  */
 
@@ -116,7 +116,6 @@ GameControl* StartGameControl()
 	core->SetVisible( 0, 1 );
 	if (core->GetGUIScriptEngine()->LoadScript( "MessageWindow" )) {
 		core->GetGUIScriptEngine()->RunFunction( "OnLoad" );
-		unsigned long index;
 		gc->UnhideGUI();
 	}
 	if (core->ConsolePopped) {
@@ -515,7 +514,7 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 {
 	int ti, col, row;
-	unsigned long Value;
+	long Value;
 
 	if (!PyArg_ParseTuple( args, "iil", &ti, &col, &Value )) {
 		printMessage( "GUIScript",
@@ -531,7 +530,7 @@ static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 	for (row = 0; row < tm->GetRowCount(); row++) {
 		char* ret = tm->QueryField( row, col );
 		long val;
-		if (valid_number( ret, val ) && Value == val)
+		if (valid_number( ret, val ) && (Value == val) )
 			return Py_BuildValue( "i", row );
 	}
 	return Py_BuildValue( "i", -1 ); //row not found
@@ -1916,7 +1915,7 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 	}
 	long value =(long) GameScript::CheckVariable(Sender, Variable, Context);
 	printMessage("GUISCript","",YELLOW);
-	printf("%s %s=%d\n",Context, Variable, value);
+	printf("%s %s=%ld\n",Context, Variable, value);
 	textcolor(WHITE);
 	return Py_BuildValue( "l", value );
 }
