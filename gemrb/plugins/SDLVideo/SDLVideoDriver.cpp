@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.24 2003/11/25 13:47:59 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.25 2003/11/25 18:55:54 balrog994 Exp $
  *
  */
 
@@ -571,6 +571,115 @@ void SDLVideoDriver::DrawRect(Region &rgn, Color &color){
 	SDL_FreeSurface(rectsurf);*/
 	SDL_Rect drect = {rgn.x,rgn.y,rgn.w, rgn.h};
 	SDL_FillRect(disp, &drect, (color.a << 24)+(color.r<<16)+(color.g<<8)+color.b);
+}
+void SDLVideoDriver::SetPixel(unsigned short x, unsigned short y, Color &color)
+{
+	if((x > disp->w) || (y > disp->h))
+		return;
+	unsigned char *pixels = ((unsigned char *)disp->pixels)+((y*disp->w)*disp->format->BytesPerPixel)+(x*disp->format->BytesPerPixel);
+	*pixels++ = color.b;
+	*pixels++ = color.g;
+	*pixels++ = color.r;
+	*pixels++ = color.a;
+}
+/** This functions Draws a Circle */
+void SDLVideoDriver::DrawCircle(unsigned short cx, unsigned short cy, unsigned short r, Color &color)
+{
+	//Uses the Breshenham's Circle Algorithm
+	long x, y, xc, yc, re;
+
+	x = r;
+	y = 0;
+	xc = 1-(2*r);
+	yc = 1;
+	re = 0;
+
+	if(SDL_MUSTLOCK(disp))
+		SDL_LockSurface(disp);
+	while(x >= y) {
+		SetPixel(cx + x, cy + y, color);
+		SetPixel(cx - x, cy + y, color);
+		SetPixel(cx - x, cy - y, color);
+		SetPixel(cx + x, cy - y, color);
+		SetPixel(cx + y, cy + x, color);
+		SetPixel(cx - y, cy + x, color);
+		SetPixel(cx - y, cy - x, color);
+		SetPixel(cx + y, cy - x, color);
+
+		y++;
+		re+=yc;
+		yc+=2;
+
+		if(((2*re) + xc) > 0) {
+			x--;
+			re+=xc;
+			xc+=2;
+		}
+	}
+	if(SDL_MUSTLOCK(disp))
+		SDL_UnlockSurface(disp);
+}
+/** This functions Draws an Ellipse */
+void SDLVideoDriver::DrawEllipse(unsigned short cx, unsigned short cy, unsigned short xr, unsigned short yr, Color &color)
+{
+	//Uses the Breshenham's Ellipse Algorithm
+	long x, y, xc, yc, ee, tas, tbs, sx, sy;
+
+	if(SDL_MUSTLOCK(disp))
+		SDL_LockSurface(disp);
+	tas = 2*xr*xr;
+	tbs = 2*yr*yr;
+	x = xr;
+	y = 0;
+	xc = yr*yr*(1-(2*xr));
+	yc = xr*xr;
+	ee = 0;
+	sx = tbs*xr;
+	sy = 0;
+
+	while( sx >= sy ) {
+		SetPixel(cx+x, cy+y, color);
+		SetPixel(cx-x, cy+y, color);
+		SetPixel(cx-x, cy-y, color);
+		SetPixel(cx+x, cy-y, color);
+		y++;
+		sy+=tas;
+		ee+=yc;
+		yc+=tas;
+		if((2*ee+xc) > 0) {
+			x--;
+			sx-=tbs;
+			ee+=xc;
+			xc+=tbs;
+		}
+	}
+
+	x = 0;
+	y = yr;
+	xc = yr*yr;
+	yc = xr*xr*(1-(2*yr));
+	ee = 0;
+	sx = 0;
+	sy = tas*yr;
+
+	while( sx <= sy) {
+		SetPixel(cx+x, cy+y, color);
+		SetPixel(cx-x, cy+y, color);
+		SetPixel(cx-x, cy-y, color);
+		SetPixel(cx+x, cy-y, color);
+		x++;
+		sx+=tbs;
+		ee+=xc;
+		xc+=tbs;
+		if((2*ee+yc) > 0) {
+			y--;
+			sy-=tas;
+			ee+=yc;
+			yc+=tas;
+		}
+	}
+	if(SDL_MUSTLOCK(disp))
+		SDL_UnlockSurface(disp);
 }
 /** Creates a Palette from Color */
 Color * SDLVideoDriver::CreatePalette(Color color, Color back)
