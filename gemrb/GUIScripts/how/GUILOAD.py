@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUILOAD.py,v 1.7 2004/10/15 20:38:54 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUILOAD.py,v 1.8 2004/11/30 17:28:57 avenger_teambg Exp $
 
 
 # GUILOAD.py - Load window
@@ -98,7 +98,7 @@ def ScrollBarPress():
 		GemRB.SetText(LoadWindow, Label, Slotname)
 
 		if ActPos<GameCount:
-			Slotname = GemRB.GetSaveGameAttrib(3,ActPos)
+			Slotname = GemRB.GetSaveGameAttrib(4,ActPos)
 		else:
 			Slotname = ""
 		Label = GemRB.GetControl(LoadWindow, 0x10000010+i)

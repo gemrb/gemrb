@@ -76,7 +76,7 @@ def ScrollBarPress():
 		GemRB.SetText(LoadWindow, Label, Slotname)
 
 		if ActPos<GameCount:
-			Slotname = GemRB.GetSaveGameAttrib(3,ActPos)
+			Slotname = GemRB.GetSaveGameAttrib(4,ActPos)
 		else:
 			Slotname = ""
 		Label = GemRB.GetControl(LoadWindow, 0x1000000a+i)
