@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.4 2004/08/24 14:39:36 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.5 2004/08/24 19:43:12 divide Exp $
  */
 
 #ifndef WIN32
@@ -28,9 +28,9 @@
 //#include "../../includes/strrefs.h"
 
 extern Interface* core;
-static Color green = {
+/*static Color green = {
 	0x00, 0xff, 0x00, 0xff
-};
+};*/
 
 #define MAP_TO_SCREENX(x) XPos - ScrollX + (x)
 #define MAP_TO_SCREENY(y) YPos - ScrollY + (y)
@@ -65,8 +65,8 @@ void WorldMapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 
 
 	std::vector< WMPAreaEntry*>::iterator m;
-	unsigned int xm = SCREEN_TO_MAPX(lastMouseX + XPos);
-	unsigned int ym = SCREEN_TO_MAPY(lastMouseY + YPos);
+//	unsigned int xm = SCREEN_TO_MAPX(lastMouseX + XPos);
+//	unsigned int ym = SCREEN_TO_MAPY(lastMouseY + YPos);
 
 	for (m = worldmap->area_entries.begin(); m != worldmap->area_entries.end(); ++m) {
 		if (! (*m)->AreaStatus & WMP_ENTRY_VISIBLE) continue;
