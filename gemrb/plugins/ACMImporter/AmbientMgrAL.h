@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.h,v 1.1 2004/08/29 01:19:01 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.h,v 1.2 2004/10/17 17:01:50 avenger_teambg Exp $
  *
  */
 
@@ -30,12 +30,12 @@
 #ifndef WIN32
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <AL/alu.h>
+//#include <AL/alu.h>
 #include <AL/alut.h>
 #else
 #include <al.h>
 #include <alc.h>
-#include <alu.h>
+//#include <alu.h>
 #include <alut.h>
 #endif
 
