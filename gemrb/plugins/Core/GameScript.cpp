@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.179 2004/08/10 19:11:30 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.180 2004/08/12 21:44:59 avenger_teambg Exp $
  *
  */
 
@@ -3443,8 +3443,8 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	value = (unsigned long) CheckVariable( scr, parameters->string0Parameter );
-	unsigned short X = *(unsigned short *) value;
-	unsigned short Y = *(((unsigned short *) value)+1);
+	unsigned short X = *(unsigned short *) &value;
+	unsigned short Y = *(((unsigned short *) &value)+1);
 	int distance = Distance(X, Y, scr);
 	if (distance <= ( parameters->int0Parameter * 20 )) {
 		return 1;
@@ -4520,8 +4520,8 @@ int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	value = (unsigned long) CheckVariable( tar, parameters->string0Parameter );
-	unsigned short X = *(unsigned short *) value;
-	unsigned short Y = *(((unsigned short *) value)+1);
+	unsigned short X = *(unsigned short *) &value;
+	unsigned short Y = *(((unsigned short *) &value)+1);
 	if(actor->Orientation == GetOrient( X, Y, actor->XPos, actor->YPos ) ) {
 		return 1;
 	}
@@ -4877,8 +4877,8 @@ void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	unsigned long value = (unsigned long) CheckVariable( Sender, parameters->string0Parameter );
-	parameters->XpointParameter = *(unsigned short *) value;
-	parameters->YpointParameter = *(((unsigned short *) value)+1);
+	parameters->XpointParameter = *(unsigned short *) &value;
+	parameters->YpointParameter = *(((unsigned short *) &value)+1);
 	Actor* ab = ( Actor* ) tar;
 	Map *map = core->GetGame()->GetCurrentMap();
 	ab->SetPosition( map, parameters->XpointParameter, parameters->YpointParameter, true );
@@ -5328,8 +5328,8 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	unsigned long value = (unsigned long) CheckVariable( Sender, parameters->string0Parameter );
-	parameters->XpointParameter = *(unsigned short *) value;
-	parameters->YpointParameter = *(((unsigned short *) value)+1);
+	parameters->XpointParameter = *(unsigned short *) &value;
+	parameters->YpointParameter = *(((unsigned short *) &value)+1);
 	Actor* actor = ( Actor* ) tar;
 	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
 }
@@ -5504,8 +5504,8 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	value = (unsigned long) CheckVariable( target, parameters->string0Parameter );
-	unsigned short X = *(unsigned short *) value;
-	unsigned short Y = *(((unsigned short *) value)+1);
+	unsigned short X = *(unsigned short *) &value;
+	unsigned short Y = *(((unsigned short *) &value)+1);
 	actor->Orientation = GetOrient( X, Y, actor->XPos, actor->YPos );
 	actor->resetAction = true;
 	actor->SetWait( 1 );
