@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.5 2004/07/20 22:32:10 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.6 2004/08/29 21:25:36 edheldil Exp $
  *
  */
 
@@ -42,6 +42,7 @@
 
 const int NUM_SPELL_TYPES = 3;
 
+// !!! Keep these synchronized with GUIDefines.py !!!
 typedef enum ieSpellType {
 	IE_SPELL_TYPE_PRIEST = 0,
 	IE_SPELL_TYPE_WIZARD = 1,
@@ -95,8 +96,11 @@ public:
 	bool AddSpellMemorization(CRESpellMemorization* sm);
 	//int AddMemorizedSpell(CREMemorizedSpell* spell);
 
-	int GetKnownSpellsCount(int type, int level);
-	int GetMemorizedSpellsCount(int type, int level);
+	unsigned int GetKnownSpellsCount(int type, int level);
+	CREKnownSpell* GetKnownSpell(int type, int level, int index);
+	unsigned int GetMemorizedSpellsCount(int type, int level);
+	CREMemorizedSpell* GetMemorizedSpell(int type, int level, int index);
+
 
 	//int GetKnownSpellsCountOnLevel( int level );
 	//int GetMemorizedSpellsCountOnLevel( int level );

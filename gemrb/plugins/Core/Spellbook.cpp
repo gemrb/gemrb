@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.12 2004/08/22 23:19:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.13 2004/08/29 21:25:36 edheldil Exp $
  *
  */
 
@@ -93,6 +93,34 @@ bool Spellbook::HaveSpell(const char *resref, ieDword /*flags*/)
 		}
 	}
 	return false;
+}
+
+unsigned int Spellbook::GetKnownSpellsCount(int type, int level)
+{
+	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
+		return 0;
+	return spells[type][level]->known_spells.size();
+}
+
+CREKnownSpell* Spellbook::GetKnownSpell(int type, int level, int index)
+{
+	if (type >= NUM_SPELL_TYPES || level >= spells[type].size() || index >= spells[type][level]->known_spells.size())
+		return NULL;
+	return spells[type][level]->known_spells[index];
+}
+
+unsigned int Spellbook::GetMemorizedSpellsCount(int type, int level)
+{
+	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
+		return 0;
+	return spells[type][level]->memorized_spells.size();
+}
+
+CREMemorizedSpell* Spellbook::GetMemorizedSpell(int type, int level, int index)
+{
+	if (type >= NUM_SPELL_TYPES || level >= spells[type].size() || index >= spells[type][level]->memorized_spells.size())
+		return NULL;
+	return spells[type][level]->memorized_spells[index];
 }
 
 bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)

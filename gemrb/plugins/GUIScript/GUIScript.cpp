@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.202 2004/08/28 15:00:36 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.203 2004/08/29 21:25:33 edheldil Exp $
  *
  */
 
@@ -61,6 +61,16 @@ inline bool valid_number(const char* string, long& val)
 
 	val = strtol( string, &endpr, 0 );
 	return ( const char * ) endpr != string;
+}
+
+// Like PyString_FromString(), but for  ResRef
+PyObject* PyString_FromResRef(char* ResRef)
+{
+	char  tmp[9];
+	memcpy( tmp, ResRef, 8 );
+	tmp[8] = 0;
+
+	return PyString_FromString( tmp );
 }
 
 /* Sets RuntimeError exception and returns NULL, so this function
@@ -3530,7 +3540,7 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 	char *String;
 
 	if (!PyArg_ParseTuple( args, "s", &String )) {
-		return AttributeError( GemRB_EvaluateString__doc );
+		return AttributeError( GemRB_MoveToArea__doc );
 	}
 	Game *game = core->GetGame();
 	Map* map2 = game->GetMap(String);
@@ -3553,6 +3563,153 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 	Py_INCREF( Py_None );
 	return Py_None;
 }
+
+PyDoc_STRVAR( GemRB_GetKnownSpellsCount__doc,
+"GetKnownSpellsCount(PartyID, SpellType, Level)=>int\n\n"
+"Returns number of known spells of given type and level in PartyID's spellbook" );
+
+static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, SpellType, Level;
+
+	if (!PyArg_ParseTuple( args, "iii", &PartyID, &SpellType, &Level )) {
+		return AttributeError( GemRB_GetKnownSpellsCount__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	return Py_BuildValue( "i", actor->spellbook.GetKnownSpellsCount( SpellType, Level ) );
+}
+
+PyDoc_STRVAR( GemRB_GetKnownSpell__doc,
+"GetKnownSpell(PartyID, SpellType, Level, Index)=>dict\n\n"
+"Returns dict with specified known spell from PC's spellbook" );
+
+static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, SpellType, Level, Index;
+
+	if (!PyArg_ParseTuple( args, "iiii", &PartyID, &SpellType, &Level, &Index )) {
+		return AttributeError( GemRB_GetKnownSpell__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
+	if (! ks) {
+		return NULL;
+	}
+
+
+
+	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "SpellResRef", PyString_FromResRef (ks->SpellResRef));
+	//PyDict_SetItemString(dict, "Flags", PyInt_FromLong (ms->Flags));
+
+	return dict;
+}
+
+
+PyDoc_STRVAR( GemRB_GetMemorizedSpellsCount__doc,
+"GetMemorizedSpellsCount(PartyID, SpellType, Level)=>int\n\n"
+"Returns number of spells of given type and level in PartyID's spellbook" );
+
+static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, SpellType, Level;
+
+	if (!PyArg_ParseTuple( args, "iii", &PartyID, &SpellType, &Level )) {
+		return AttributeError( GemRB_GetMemorizedSpellsCount__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	return Py_BuildValue( "i", actor->spellbook.GetMemorizedSpellsCount( SpellType, Level ) );
+}
+
+PyDoc_STRVAR( GemRB_GetMemorizedSpell__doc,
+"GetMemorizedSpell(PartyID, SpellType, Level, Index)=>dict\n\n"
+"Returns dict with specified memorized spell from PC's spellbook" );
+
+static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, SpellType, Level, Index;
+
+	if (!PyArg_ParseTuple( args, "iiii", &PartyID, &SpellType, &Level, &Index )) {
+		return AttributeError( GemRB_GetMemorizedSpell__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	CREMemorizedSpell* ms = actor->spellbook.GetMemorizedSpell( SpellType, Level, Index );
+	if (! ms) {
+		return NULL;
+	}
+
+
+
+	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "SpellResRef", PyString_FromResRef (ms->SpellResRef));
+	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (ms->Flags));
+
+	return dict;
+}
+
+
+
+
+
+PyDoc_STRVAR( GemRB_GetSpell__doc,
+"GetSpell(ResRef)=>dict\n\n"
+"Returns dict with specified spell" );
+
+static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
+{
+	char* ResRef;
+
+	if (!PyArg_ParseTuple( args, "s", &ResRef)) {
+		return AttributeError( GemRB_GetSpell__doc );
+	}
+
+	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_SPL_CLASS_ID );
+	SpellMgr* sm = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
+	if (sm == NULL) {
+		delete ( str );
+		return NULL;
+	}
+	if (!sm->Open( str, true )) {
+		core->FreeInterface( sm );
+		return NULL;
+	}
+
+	Spell* spell = sm->GetSpell();
+	if (spell == NULL) {
+		core->FreeInterface( sm );
+		return NULL;
+	}
+
+	core->FreeInterface( sm );
+
+	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "SpellName", PyInt_FromLong (spell->SpellName));
+	PyDict_SetItemString(dict, "SpellDesc", PyInt_FromLong (spell->SpellDesc));
+
+	delete spell;
+	return dict;
+}
+
 
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
@@ -3676,6 +3833,11 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
 	METHOD(GetCurrentArea, METH_NOARGS),
 	METHOD(MoveToArea, METH_VARARGS),
+	METHOD(GetKnownSpellsCount, METH_VARARGS),
+	METHOD(GetKnownSpell, METH_VARARGS),
+	METHOD(GetMemorizedSpellsCount, METH_VARARGS),
+	METHOD(GetMemorizedSpell, METH_VARARGS),
+	METHOD(GetSpell, METH_VARARGS),
 
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
