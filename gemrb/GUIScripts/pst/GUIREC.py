@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.9 2004/05/09 21:38:39 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.10 2004/06/27 19:30:07 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -162,7 +162,7 @@ def UpdateRecordsWindow ():
 	# portrait
 	Image = GemRB.GetControl (Window, 2)
 	GemRB.SetButtonFlags(Window, Image, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	GemRB.SetButtonPicture (Window, Image, GetActorPortrait (pc, 1))
+	GemRB.SetButtonPicture (Window, Image, GetActorPortrait (pc, 'STATS'))
 
 	# armorclass
 	Label = GemRB.GetControl (Window, 0x1000000b)

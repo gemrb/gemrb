@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.70 2004/06/24 17:53:15 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.71 2004/06/27 19:30:06 edheldil Exp $
  *
  */
 
@@ -1042,6 +1042,12 @@ void SDLVideoDriver::GetPixel(short x, short y, Color* color)
 
 	SDL_GetRGBA( val, backBuf->format, &color->r, &color->g, &color->b, &color->a );
 }
+
+/*
+ * Draws horizontal line. When clipped=true, it draws the line relative 
+ * to Area origin and clips it by Area viewport borders, 
+ * else it draws relative to screen origin and ignores the vieport
+ */
 void SDLVideoDriver::DrawHLine(short x1, short y, short x2, Color& color, bool clipped)
 {
 	if (x1 > x2) {
@@ -1049,17 +1055,31 @@ void SDLVideoDriver::DrawHLine(short x1, short y, short x2, Color& color, bool c
 		x1 = x2;
 		x2 = tmpx;
 	}
-
+	if (clipped) {
+		x1 -= Viewport.x;
+		y -= Viewport.y;
+		x2 -= Viewport.x;
+	}
 	for ( ; x1 <= x2 ; x1++ ) 
 		SetPixel( x1, y, color, clipped );
 }
 
+/*
+ * Draws vertical line. When clipped=true, it draws the line relative 
+ * to Area origin and clips it by Area viewport borders, 
+ * else it draws relative to screen origin and ignores the vieport
+ */
 void SDLVideoDriver::DrawVLine(short x, short y1, short y2, Color& color, bool clipped)
 {
 	if (y1 > y2) {
 		short tmpy = y1;
 		y1 = y2;
 		y2 = tmpy;
+	}
+	if (clipped) {
+		x -= Viewport.x;
+		y1 -= Viewport.y;
+		y2 -= Viewport.y;
 	}
 
 	for ( ; y1 <= y2 ; y1++ ) 

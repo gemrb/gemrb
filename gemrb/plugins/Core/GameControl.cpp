@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.143 2004/06/24 17:53:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.144 2004/06/27 19:30:06 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -149,6 +149,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				SelectionRect.y + SelectionRect.h
 			};
 */
+/*
 			Point points[4] = {
 				{SelectionRect.x, SelectionRect.y},
 				{SelectionRect.x + SelectionRect.w, SelectionRect.y},
@@ -156,7 +157,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				{SelectionRect.x, SelectionRect.y + SelectionRect.h}
 			};
 			Gem_Polygon poly( points, 4 );
-			video->DrawPolyline( &poly, green, false );
+			//video->DrawPolyline( &poly, green, false );
+			*/
+			video->DrawRect( SelectionRect, green, false, true );
 		}
 		if (DebugFlags & 4) {
 			Door* d;
@@ -609,7 +612,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
-	if (DisableMouse) {
+	if (DisableMouse || Button != GEM_MB_ACTION) {
 		return;
 	}
 	short GameX = x, GameY = y;
@@ -631,6 +634,16 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	if (DisableMouse) {
 		return;
 	}
+	if (Button == GEM_MB_MENU) {
+		core->GetDictionary()->SetAt( "MenuX", x );
+		core->GetDictionary()->SetAt( "MenuY", y );
+		core->GetGUIScriptEngine()->RunFunction( "OpenFloatMenuWindow" );
+		return;
+	}
+	if (Button != GEM_MB_ACTION) {
+		return;
+	}
+
 	MouseIsDown = false;
 	short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame( GameX, GameY );

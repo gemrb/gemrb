@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.7 2004/05/09 21:38:39 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.8 2004/06/27 19:30:07 edheldil Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -173,7 +173,7 @@ def UpdateInventoryWindow ():
 
 	# portrait
 	Button = GemRB.GetControl (Window, 44);
-	GemRB.SetButtonPicture (Window, Button, GetActorPortrait (pc, 0))
+	GemRB.SetButtonPicture (Window, Button, GetActorPortrait (pc, 'INVENTORY'))
 
 	# encumbrance
 	Button = GemRB.GetControl (Window, 46);

@@ -16,13 +16,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.11 2004/06/24 17:53:18 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.12 2004/06/27 19:30:07 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
 
 import GemRB
 from GUIDefines import *
+from ie_stats import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -207,38 +208,12 @@ def SetupActionsWindowControls (Window):
 def GetActorPortrait (actor, which):
 	#return GemRB.GetPlayerPortrait( actor, which)
 
-	name = GemRB.GetPlayerName (actor, 0)
-	if name == 'Nameless One':
-		#p = 'NOA'
-		#p = 'NOC'
-		#p = 'NOD'
-		#p = 'NOF'
-		#p = 'NOH'
-		#p = 'NOM'
-		#p = 'NOS'
-		p = 'NOZ'
-	elif name == 'Annah':
-		p = 'ANN'
-	elif name == "Dak'kon":
-		p = 'DKK'
-	elif name == 'Fall-from-Grace':
-		p = 'FFG'
-	elif name == 'Morte':
-		p = 'MRT'
-	elif name == 'Nodrom':
-		p = 'NDM'
-	elif name == 'Ignus':
-		p = 'IGY'
-	elif name == 'Vhailor':
-		p = 'VHA'
-	else:
-		print 'Unknown name:', name
-		return None
+	PortraitTable = GemRB.LoadTable ("PDOLLS")
+	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
+	row = "0x%04X" %anim_id
 
-	if which == 0:
-		return 'IVP' + p
-	else:
-		return 'STP' + p
+	return GemRB.GetTableValue (PortraitTable, row, which)
+	
 
 
 SelectionChangeHandler = None
