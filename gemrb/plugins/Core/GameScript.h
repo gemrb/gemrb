@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.20 2004/01/04 21:25:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.21 2004/01/05 23:47:37 balrog994 Exp $
  *
  */
 
@@ -186,6 +186,7 @@ private: //Script Functions
 	static int  Range(Scriptable * Sender, Trigger * parameters);
 	static int  Clicked(Scriptable * Sender, Trigger * parameters);
 	static int  Entered(Scriptable * Sender, Trigger * parameters);
+	static int  Dead(Scriptable * Sender, Trigger * parameters);
 private:
 	//Actions
 	static void SetGlobal(Scriptable * Sender, Action * parameters);
@@ -232,6 +233,8 @@ private:
 	static void StartDialogue(Scriptable * Sender, Action * parameters);
 	static void OpenDoor(Scriptable * Sender, Action * parameters);
 	static void CloseDoor(Scriptable * Sender, Action * parameters);
+	static void MoveBetweenAreas(Scriptable * Sender, Action * parameters);
+	static void ForceSpell(Scriptable * Sender, Action * parameters);
 };
 
 #endif

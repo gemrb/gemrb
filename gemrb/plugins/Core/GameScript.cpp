@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.37 2004/01/05 18:33:39 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.38 2004/01/05 23:47:37 balrog994 Exp $
  *
  */
 
@@ -67,6 +67,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		triggers[0x36] = OnCreation;
 		triggers[0x42] = PartyHasItem;
 		triggers[0x4C] = Entered;
+		triggers[0x51] = Dead;
 		triggers[0x70] = Clicked;
 
 		actions[7] = CreateCreature;
@@ -89,6 +90,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[84] = Face;
 		blocking[84] = true;
 		actions[111] = DestroySelf;
+		actions[113] = ForceSpell;
 		actions[120] = StartCutScene;
 		actions[121] = StartCutSceneMode;
 		actions[122] = EndCutSceneMode;
@@ -110,9 +112,8 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[177] = TriggerActivation;
 		actions[198] = Dialogue;
 		actions[202] = FadeToColor;
-		//blocking[202] = true;
 		actions[203] = FadeFromColor;
-		//blocking[203] = true;
+		actions[225] = MoveBetweenAreas;
 		//please note that IWD and SoA are different from action #231
 		actions[242] = Ally;
 		if(strcmp(core->GameType, "bg2") == 0) {
@@ -1218,6 +1219,11 @@ int GameScript::Entered(Scriptable * Sender, Trigger * parameters)
 	return 0;
 }
 
+int GameScript::Dead(Scriptable * Sender, Trigger * parameters)
+{
+	return 0;
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -1318,7 +1324,16 @@ void GameScript::ChangeAlignment(Scriptable * Sender, Action * parameters)
 
 void GameScript::TriggerActivation(Scriptable * Sender, Action * parameters)
 {
-	InfoPoint * ip = core->GetGame()->GetMap(0)->tm->GetInfoPoint(parameters->objects[1]->objectName);
+	Scriptable * ip;
+	if(parameters->objects[1]->genderField != 0) {
+		switch(parameters->objects[1]->genderField) {
+			case 1:
+				ip = Sender;
+			break;
+		}
+	}
+	else
+		ip = core->GetGame()->GetMap(0)->tm->GetInfoPoint(parameters->objects[1]->objectName);
 	if(!ip) {
 		printf("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
 		return;
@@ -1847,4 +1862,93 @@ void GameScript::CloseDoor(Scriptable * Sender, Action * parameters)
 		actor->AddActionInFront(GameScript::CreateAction(Tmp, true));
 		Sender->CurrentAction = NULL;
 	}
+}
+
+void GameScript::MoveBetweenAreas(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor * actor = (Actor*)Sender;
+	strcpy(actor->Area, parameters->string0Parameter);
+	if(!actor->FromGame) {
+		actor->FromGame = true;
+		if(actor->InParty)
+			core->GetGame()->SetPC(actor);
+		else
+			core->GetGame()->AddNPC(actor);
+		core->GetGame()->GetMap(0)->RemoveActor(actor);
+		actor->XPos = parameters->XpointParameter;
+		actor->YPos = parameters->YpointParameter;
+		actor->Orientation = parameters->int0Parameter;
+		Sender->CurrentAction = NULL;
+	}
+}
+
+void GetPositionFromScriptable(Scriptable * scr, unsigned short &X, unsigned short &Y)
+{
+	switch(scr->Type) {
+		case ST_TRIGGER:
+		case ST_PROXIMITY:
+		case ST_TRAVEL:
+			{
+				InfoPoint * ip = (InfoPoint*)scr;
+				X = ip->TrapLaunchX;
+				Y = ip->TrapLaunchY;
+			}
+		break;
+
+		case ST_ACTOR:
+			{
+				Actor * ac = (Actor*)scr;
+				X = ac->XPos;
+				Y = ac->YPos;
+			}
+		break;
+
+		case ST_DOOR:
+			{
+				Door * door = (Door*)scr;
+				X = door->XPos;
+				Y = door->YPos;
+			}
+		break;
+
+		case ST_CONTAINER:
+			{
+				Container * cont = (Container*)scr;
+				X = cont->trapTarget.x;
+				Y = cont->trapTarget.y;
+			}
+		break;
+	}
+}
+
+void GameScript::ForceSpell(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!tar)
+		return;
+	unsigned short sX,sY, dX,dY;
+	GetPositionFromScriptable(scr, sX, sY);
+	GetPositionFromScriptable(tar, dX, dY);
+	printf("ForceSpell from [%d,%d] to [%d,%d]\n", sX, sY, dX, dY);
+	Sender->CurrentAction = NULL;
 }
