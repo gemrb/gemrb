@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Ambient.h,v 1.3 2004/08/09 18:24:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Ambient.h,v 1.4 2004/08/11 21:35:33 divide Exp $
  *
  */
  
@@ -49,16 +49,25 @@ class GEM_EXPORT Ambient {
 public:
 	Ambient();
 	~Ambient();
-	const char *getName() const;
-	const Point &getOrigin() const;
-	ieWord getRadius() const;
-	ieWord getHeight() const;
-	ieWord getGain() const;
-	char *getSound(ieDword i);
-	ieDword getInterval() const;
-	ieDword getPerset() const;
-	ieDword getAppearance() const;
-	ieDword getFlags() const;
+	
+	/* there is a good reason to have these in the header:
+	 * they are automatically inlined, so we have
+	 * no roundtrips and no overhead for accessors --Divide */
+	const char *getName() const { return name; }
+	const Point &getOrigin() const { return origin; }
+	ieWord getRadius() const { return radius; }
+	ieWord getHeight() const { return height; }
+	ieWord getGain() const { return gain; }
+	char *getSound(ieDword i)
+	{
+		if(i<sounds.size()) return sounds[i];
+		return NULL;
+	}
+	ieDword getInterval() const { return interval; }
+	ieDword getPerset() const { return perset; }
+	ieDword getAppearance() const { return appearance; }
+	ieDword getFlags() const { return flags; }
+	
 	void setActive();
 	void setInactive();
     
