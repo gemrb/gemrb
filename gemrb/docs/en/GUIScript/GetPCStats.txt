@@ -3,7 +3,7 @@ Prototype: GemRB.GetPCStats(PartyID)
 
 Description: Returns dictionary of PC's performance stats.
 
-Parameters: PartyID - the PC's position in the party
+Parameters: PartyID - the PC's position in the party (1 based)
 
 Return value: A Python dictionary containing the following items
 "BestKilledName"   - strref of killed creature with biggest XP

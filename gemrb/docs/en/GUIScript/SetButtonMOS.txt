@@ -1,11 +1,13 @@
 
-Prototype:
+Prototype: GemRB.SetButtonMOS(WindowIndex, ControlIndex, MOSResRef)
 
-Description:
+Description: Sets the Picture of a Button Control from a MOS file.
 
 Parameters:
+WindowIndex, ControlIndex  - the control's reference
+MOSResRef                  - the name of the picture (a .mos resref)
 
-Return value:
+Return value: N/A
 
-See also:
+See also: SetButtonBAM, SetButtonPLT, SetButtonPicture
 

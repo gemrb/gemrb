@@ -1,11 +1,13 @@
 
-Prototype:
+Prototype: GemRB.SetButtonPictureClipping(Window, Button, ClippingPercent)
 
-Description:
+Description: Sets percent (0-1.0) of width to which button picture will be clipped.
 
-Parameters:
+Parameters: 
+Window, Button  - the control's reference
+ClippingPercent - a floating point value from the 0-1 interval
 
-Return value:
+Return value: N/A
 
-See also:
+See also: SetButtonPicture
 

@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.GameGetFirstSelectedPC()
 
-Description:
+Description: Returns index of the first selected PC or 0 if none.
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: the first selected PC's position in the party (it will look in the original party order, thus the protagonist will be always first!)
 
-See also:
+See also: GameSelectPC, GameIsPCSelected
 
