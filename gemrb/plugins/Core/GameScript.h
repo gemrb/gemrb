@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.145 2004/10/09 18:26:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.146 2004/10/09 18:51:12 avenger_teambg Exp $
  *
  */
 
@@ -994,6 +994,7 @@ public:
 	static void CreateCreatureObjectOffScreen(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureOffScreen(Scriptable* Sender, Action* parameters);
 	static void CreateItem(Scriptable* Sender, Action* parameters);
+	static void CreateItemNumGlobal(Scriptable* Sender, Action* parameters);
 	static void CreatePartyGold(Scriptable *Sender, Action *parameters);
 	static void CreateVisualEffect(Scriptable* Sender, Action* parameters);
 	static void CreateVisualEffectObject(Scriptable* Sender,

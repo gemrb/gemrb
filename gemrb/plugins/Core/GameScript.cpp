@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.203 2004/10/09 18:26:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.204 2004/10/09 18:51:12 avenger_teambg Exp $
  *
  */
 
@@ -295,6 +295,7 @@ static ActionLink actionnames[] = {
 	{"createcreatureobjectoffset", GameScript::CreateCreatureObjectOffset,0}, //the same
 	{"createcreatureoffscreen", GameScript::CreateCreatureOffScreen,0},
 	{"createitem", GameScript::CreateItem,0},
+	{"createitemglobal", GameScript::CreateItemNumGlobal,0},
 	{"createpartygold", GameScript::CreatePartyGold,0},
 	{"createvisualeffect", GameScript::CreateVisualEffect,0},
 	{"createvisualeffectobject", GameScript::CreateVisualEffectObject,0},
@@ -7693,10 +7694,40 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 		myinv->AddItem(item);
 	}
 	else {
-	//destroys previous item, slot should be inventory
-	//we should find a slot
-		int slot = 0;
-		myinv->SetSlotItem(item,slot);
+		if ( 2 != myinv->AddSlotItem(item, -1)) {
+			Map *map=((Actor *) Sender)->area;
+			// drop it at my feet
+			map->tm->AddItemToLocation(Sender->Pos, item);
+		}
+	}
+}
+
+void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
+{
+	Inventory *myinv;
+
+	switch(Sender->Type) {
+		case ST_ACTOR:
+			myinv = &((Actor *) Sender)->inventory;
+			break;
+		case ST_CONTAINER:
+			myinv = &((Container *) Sender)->inventory;
+			break;
+		default:
+			return;
+	}
+	int value = CheckVariable( Sender, parameters->string0Parameter );
+	CREItem *item = new CREItem();
+	CreateItemCore(item, parameters->string1Parameter, value, 0, 0);
+	if(Sender->Type==ST_CONTAINER) {
+		myinv->AddItem(item);
+	}
+	else {
+		if ( 2 != myinv->AddSlotItem(item, -1)) {
+			Map *map=((Actor *) Sender)->area;
+			// drop it at my feet
+			map->tm->AddItemToLocation(Sender->Pos, item);
+		}
 	}
 }
 
