@@ -56,8 +56,6 @@ int FileStream::Read(void * dest, int length)
 	if(!opened)
 		return GEM_ERROR;
 	size_t c = fread(dest, 1, length, str);
-	if(c != -1)
-		Pos+=c;
 	if(feof(str)) { /* slightly modified by brian  oct 11 2003*/
 		return GEM_EOF;
 	}
@@ -66,6 +64,8 @@ int FileStream::Read(void * dest, int length)
 	}
 	if(Encrypted)
 		ReadDecrypted(dest, c);
+	if(c != -1)
+		Pos+=c;
 	return (int)c;
 }
 
