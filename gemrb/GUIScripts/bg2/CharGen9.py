@@ -153,14 +153,18 @@ def NextPress():
 		for i in range(len(Learnable) ):
 			GemRB.LearnSpell(MyChar, Learnable[i], 0)
 
+	GemRB.UnloadTable(TmpTable)
 	TmpTable=GemRB.LoadTable("repstart")
+	AlignmentTable = GemRB.LoadTable("aligns")
 	t=GemRB.FindTableValue(AlignmentTable, 3, t)
 	t=GemRB.GetTableValue(TmpTable,t,0)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
+
 	GemRB.UnloadTable(TmpTable)
 	TmpTable=GemRB.LoadTable("strtgold")
 	t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,1),GemRB.GetTableValue(TmpTable,Class,0), GemRB.GetTableValue(TmpTable,Class,2) )
 	GemRB.SetPlayerStat(MyChar, IE_GOLD, t*GemRB.GetTableValue(TmpTable,Class,3) )
+	GemRB.UnloadTable(AlignmentTable)
 	GemRB.UnloadTable(ClassTable)
 	GemRB.UnloadTable(RaceTable)
 	GemRB.UnloadTable(TmpTable)
