@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.13 2003/11/26 14:02:16 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.14 2003/11/26 14:59:19 balrog994 Exp $
  *
  */
 
@@ -80,6 +80,7 @@ void Map::DrawMap(Region viewport)
 		//TODO: Clipping Animations off screen
 		video->BlitSprite(animations[i]->NextFrame(), animations[i]->x, animations[i]->y);
 	}
+	Region vp = video->GetViewport();
 	for(unsigned int i = 0; i < actors.size(); i++) {
 		CharAnimations * ca = actors[i].actor->GetAnims();
 		if(!ca)
@@ -93,9 +94,8 @@ void Map::DrawMap(Region viewport)
 				 if(actors[i].actor->Modified[IE_STATE_ID]&STATE_DEAD) DrawCircle=false;
 			}
 		}
-	
-		if(DrawCircle) {
-			Region vp = video->GetViewport();
+		
+		if(DrawCircle) {	
 			switch(actors[i].actor->BaseStats[IE_EA])
 			{
 			case EVILCUTOFF:
@@ -135,6 +135,14 @@ void Map::DrawMap(Region viewport)
 				actors[i].MaxY = actors[i].MinY+nextFrame->Height;
 				actors[i].lastFrame = nextFrame;
 			}
+			if(actors[i].MinX > (vp.x+vp.w))
+				continue;
+			if(actors[i].MaxX < vp.x)
+				continue;
+			if(actors[i].MinY > (vp.y+vp.h))
+				continue;
+			if(actors[i].MaxY < vp.y)
+				continue;
 			int ax = actors[i].XPos, ay = actors[i].YPos;
 			int cx = ax/16;
 			int cy = ay/16;
