@@ -103,6 +103,8 @@ int FileStream::ReadLine(void * buf, int maxlen)
 	int i = 0;
 	while(i < (maxlen-1)) {
 		int ch = fgetc(str);
+		if(feof(str))
+			 break;
 		if(Encrypted)
 			p[i]^=GEM_ENCRYPTION_KEY[Pos&63];
 		Pos++;
