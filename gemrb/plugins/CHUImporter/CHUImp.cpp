@@ -24,6 +24,7 @@
 #include "../Core/ScrollBar.h"
 #include "../Core/AnimationMgr.h"
 #include "../Core/TextArea.h"
+#include "../Core/TextEdit.h"
 #include "../../includes/RGBAColor.h"
 
 CHUImp::CHUImp(){
@@ -190,6 +191,36 @@ Window * CHUImp::GetWindow(unsigned long i)
 				img = anim->GetFrame(GrabbedKnob);
 				sldr->SetImage(IE_GUI_SLIDER_GRABBEDKNOB, img);
 				win->AddControl(sldr);
+			}
+			break;
+
+			case 3: { //Text Edit
+				char FontResRef[8], CursorResRef[8], BGMos[8];
+				unsigned short maxInput;
+				str->Read(BGMos, 8);
+				str->Seek(16, GEM_CURRENT_POS);
+				str->Read(CursorResRef, 8);
+				str->Seek(12, GEM_CURRENT_POS);
+				str->Read(FontResRef, 8);
+				str->Seek(34, GEM_CURRENT_POS);
+				str->Read(&maxInput, 2);
+				Font * fnt = core->GetFont(FontResRef);
+				AnimationFactory * af = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(CursorResRef, IE_BAM_CLASS_ID);
+				DataStream * ds = core->GetResourceMgr()->GetResource(BGMos, IE_MOS_CLASS_ID);
+				ImageMgr * mos = (ImageMgr*)core->GetInterface(IE_MOS_CLASS_ID);
+				mos->Open(ds, true);
+				TextEdit * te = new TextEdit(maxInput);
+				te->ControlID = ControlID;
+				te->XPos = XPos;
+				te->YPos = YPos;
+				te->Width = Width;
+				te->Height = Height;
+				te->ControlType = ControlType;
+				te->SetFont(fnt);
+				te->SetCursor(af->GetFrame(0));
+				te->SetBackGround(mos->GetImage());
+				core->FreeInterface(mos);
+				win->AddControl(te);
 			}
 			break;
 
