@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.12 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.13 2003/12/28 20:32:02 balrog994 Exp $
  *
  */
 
@@ -62,6 +62,10 @@ public:
 	void SetRow(int row);
 	/** Set Selectable */
 	void SetSelectable(bool val);
+	/** Copies the current TextArea content to another TextArea control */
+	void CopyTo(TextArea * ta);
+	/** Scrolls automatically to the bottom when the text changes */
+	bool AutoScroll;
 private: // Private attributes
 	bool Selectable;
 	std::vector<char *> lines;

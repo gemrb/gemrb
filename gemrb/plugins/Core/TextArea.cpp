@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.36 2003/12/26 20:47:51 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.37 2003/12/28 20:32:02 balrog994 Exp $
  *
  */
 
@@ -52,6 +52,7 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	selline = -1;
 	sb = NULL;
 	Selectable = false;
+	AutoScroll = false;
 	palette = core->GetVideoDriver()->CreatePalette(hitextcolor, lowtextcolor);
 	initpalette = core->GetVideoDriver()->CreatePalette(initcolor, lowtextcolor);
 	Color tmp = {hitextcolor.b, hitextcolor.g, hitextcolor.r, 0};
@@ -93,7 +94,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 					int tlen = (int)mystrlen(lines[i])+1;
 					char * tmp = (char*)malloc(tlen);
 					unsigned long idx, ar, ag, ab, br, bg, bb;
-					sscanf(lines[i], "[s=%d,%02X%02X%02X,%02X%02X%02X]%[^[][/s]", &idx, &ar, &ag, &ab, &br, &bg, &bb, tmp);
+					sscanf(lines[i], "[s=%d,%02X%02X%02X,%02X%02X%02X]%[^\0][/s]", &idx, &ar, &ag, &ab, &br, &bg, &bb, tmp);
 					tlen = 14+strlen(tmp)+8+1;
 					char * tmp1 = (char*)malloc(tlen);
 					sprintf(tmp1, "[color=%02X%02X%02X]%s[/color]", ar, ag, ab, tmp);
@@ -116,7 +117,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 					int tlen = (int)mystrlen(lines[i])+1;
 					char * tmp = (char*)malloc(tlen);
 					unsigned long idx, ar, ag, ab, br, bg, bb;
-					sscanf(lines[i], "[s=%d,%02X%02X%02X,%02X%02X%02X]%[^[][/s]", &idx, &ar, &ag, &ab, &br, &bg, &bb, tmp);
+					sscanf(lines[i], "[s=%d,%02X%02X%02X,%02X%02X%02X]%[^\0][/s]", &idx, &ar, &ag, &ab, &br, &bg, &bb, tmp);
 					tlen = 14+strlen(tmp)+8+1;
 					char * tmp1 = (char*)malloc(tlen);
 					sprintf(tmp1, "[color=%02X%02X%02X]%s[/color]", br, bg, bb, tmp);
@@ -210,7 +211,13 @@ int TextArea::SetText(const char * text, int pos)
 	Changed = true;
 	if(sb) {
 		ScrollBar *bar = (ScrollBar*)sb;
-		bar->SetPos(0);
+		if(AutoScroll)
+			pos=rows-((Height-5)/ftext->maxHeight);
+		else
+			pos = 0;
+		//pos=lines.size()-((Height-5)/ftext->maxHeight);
+		if(pos<0) pos=0;
+		bar->SetPos(pos);
 	}
 	core->RedrawAll();
 	return 0;
@@ -241,7 +248,11 @@ int TextArea::AppendText(const char * text, int pos)
 	Changed = true;
 	if(sb) {
 		ScrollBar *bar = (ScrollBar*)sb;
-		pos=lines.size()-((Height-5)/ftext->maxHeight);
+		if(AutoScroll)
+			pos=rows-((Height-5)/ftext->maxHeight);
+		else
+			pos = 0;
+		//pos=lines.size()-((Height-5)/ftext->maxHeight);
 		if(pos<0) pos=0;
 		bar->SetPos(pos);
 	}
@@ -323,8 +334,8 @@ void TextArea::CalcRowCount()
 						rows++;
 					tr++;
 				}
-			lrows[i] = tr;
 			}
+			lrows[i] = tr;
 			free(tmp);
 		}
 	}
@@ -359,12 +370,12 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 /** Mouse Button Up */
 void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	if((x <= Width) && (y <= (Height-5))) {
+	if((x <= Width) && (y <= (Height-5)) && (seltext != -1)) {
 		selline = seltext;
 		if(strnicmp(lines[seltext], "[s=", 3) == 0) {
-			unsigned long idx, r, g, b;
+			unsigned long idx;
 			size_t len = strlen(lines[seltext]);
-			sscanf(lines[seltext], "[s=%d,%02X%02X%02X]", &idx, &r, &g, &b);
+			sscanf(lines[seltext], "[s=%d,", &idx);
 			Window * win = core->GetWindow(0);
 			if(win) {
 				GameControl * gc = (GameControl*)win->GetControl(0);
@@ -380,4 +391,12 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned char Butto
 	}
 	if(VarName[0]!=0)
 		core->GetDictionary()->SetAt(VarName,selline);
+}
+
+/** Copies the current TextArea content to another TextArea control */
+void TextArea::CopyTo(TextArea * ta)
+{
+	for(int i = 0; i < lines.size(); i++) {
+		ta->SetText(lines[i], -1);
+	}
 }
