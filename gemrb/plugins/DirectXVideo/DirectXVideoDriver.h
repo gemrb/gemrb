@@ -2,6 +2,7 @@
 #define SDLVIDEODRIVER_H
 
 #include "../Core/Video.h"
+#include "../Core/Interface.h"
 #include "d3d9.h"
 #include "d3dx9.h"
 

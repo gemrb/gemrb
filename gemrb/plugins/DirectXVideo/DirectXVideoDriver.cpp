@@ -5,16 +5,12 @@
 #include <windows.h>
 #include <commctrl.h>
 #include "Poly.h"
-#include "dinput.h"
 
 HINSTANCE hInst;
 LPDIRECT3D9				lpD3D;
 LPDIRECT3DDEVICE9		lpD3DDevice;
 int						ScreenWidth, 
 						ScreenHeight;
-
-LPDIRECTINPUT8			lpDI;
-LPDIRECTINPUTDEVICE8	lpDIDevice;
 
 /* The main Win32 event handler
 DJM: This is no longer static as (DX5/DIB)_CreateWindow needs it
@@ -26,9 +22,62 @@ LONG CALLBACK WinMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_SYSKEYDOWN:
 		case WM_KEYUP:
 		case WM_KEYDOWN: {
-			/* Ignore windows keyboard messages */;
+			
 		}
-		return(0);
+		break;
+
+		case WM_CHAR: {
+			unsigned char key = (unsigned char)wParam;
+			core->GetEventMgr()->KeyPress(key, 0);
+		}
+		return 0;
+
+		case WM_MOUSEMOVE: {
+			unsigned short xPos = LOWORD(lParam);  // horizontal position of cursor 
+			unsigned short yPos = HIWORD(lParam);  // vertical position of cursor
+			core->GetEventMgr()->MouseMove(xPos, yPos);
+		}
+	    return 0;
+
+		case WM_MBUTTONDOWN: {
+			unsigned long  fwKeys = wParam;        // key flags 
+			unsigned short xPos = LOWORD(lParam);  // horizontal position of cursor 
+			unsigned short yPos = HIWORD(lParam);  // vertical position of cursor
+			unsigned char button;
+			unsigned short Mod;
+			if(fwKeys & MK_LBUTTON)
+				button |= 0x01;
+			if(fwKeys & MK_MBUTTON)
+				button |= 0x02;
+			if(fwKeys & MK_RBUTTON)
+				button |= 0x04;
+			if(fwKeys & MK_SHIFT)
+				Mod |= 0x01;
+			if(fwKeys & MK_CONTROL)
+				Mod |= 0x02;
+			core->GetEventMgr()->MouseDown(xPos, yPos, button, Mod);
+		}
+	    return 0;
+
+		case WM_MBUTTONUP: {
+			unsigned long  fwKeys = wParam;        // key flags 
+			unsigned short xPos = LOWORD(lParam);  // horizontal position of cursor 
+			unsigned short yPos = HIWORD(lParam);  // vertical position of cursor
+			unsigned char button;
+			unsigned short Mod;
+			if(fwKeys & MK_LBUTTON)
+				button |= 0x01;
+			if(fwKeys & MK_MBUTTON)
+				button |= 0x02;
+			if(fwKeys & MK_RBUTTON)
+				button |= 0x04;
+			if(fwKeys & MK_SHIFT)
+				Mod |= 0x01;
+			if(fwKeys & MK_CONTROL)
+				Mod |= 0x02;
+			core->GetEventMgr()->MouseUp(xPos, yPos, button, Mod);
+		}
+	    return 0;
 
 		/* Don't allow screen savers or monitor power downs.
 		   This is because they quietly clear DirectX surfaces.
@@ -57,10 +106,6 @@ DirectXVideoDriver::~DirectXVideoDriver(void)
 		lpD3DDevice->Release();
 	if( lpD3D )
 		lpD3D->Release();
-	if( lpDIDevice )
-		lpDIDevice->Release();
-	if( lpDI )
-		lpDI->Release();
 }
 
 int DirectXVideoDriver::Init(void)
@@ -148,26 +193,6 @@ int DirectXVideoDriver::Init(void)
 	lpD3DDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
 
 	lpD3DDevice->SetFVF( D3DFVF_CUSTOMVERTEX );
-
-	//Direct3D Initialized. Now let's initialize DirectInput
-
-	HRESULT ddrval = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&lpDI, NULL);
-	if(ddrval != DI_OK)
-		return GEM_ERROR;
-
-	ddrval = lpDI->CreateDevice(GUID_SysKeyboard, &lpDIDevice, NULL);
-	if(ddrval != DI_OK)
-		return GEM_ERROR;
-
-	ddrval = lpDIDevice->SetDataFormat(&c_dfDIKeyboard);
-	if(ddrval != DI_OK)
-		return GEM_ERROR;
-
-	ddrval = lpDIDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-	if(ddrval != DI_OK)
-		return GEM_ERROR;
-
-	lpDIDevice->Acquire();
 
 	return GEM_OK;
 }
