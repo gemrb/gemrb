@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.30 2005/02/07 06:59:59 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.31 2005/02/11 10:38:27 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -74,6 +74,7 @@ from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, RunSel
 from GUIWORLD import OpenReformPartyWindow
 
 ###################################################
+LevelUpWindow = None
 RecordsWindow = None
 InformationWindow = None
 BiographyWindow = None
@@ -115,6 +116,7 @@ def OpenRecordsWindow ():
 	# Level Up
 	Button = GemRB.GetControl (Window, 9)
 	GemRB.SetText (Window, Button, 4246)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLevelUpWindow")
 
 	# stat buttons
 	for i in range (6):
@@ -866,5 +868,35 @@ def OpenBiographyWindow ():
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	
+
+def OpenLevelUpWindow ():
+	global LevelUpWindow
+
+	GemRB.HideGUI ()
+
+	if LevelUpWindow != None:
+		GemRB.UnloadWindow (LevelUpWindow)
+		LevelUpWindow = None
+		GemRB.SetVar ("FloatWindow", -1)
+
+		GemRB.UnhideGUI()
+		return
+
+	LevelUpWindow = Window = GemRB.LoadWindow (4)
+	GemRB.SetVar ("FloatWindow", LevelUpWindow)
+
+	# Accept
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Button, 4192)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLevelUpWindow")
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	# name
+	Label = GemRB.GetControl (Window, 0x10000000)
+	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 1))
+
+	GemRB.UnhideGUI ()
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+
 ###################################################
 # End of file GUIREC.py
