@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.72 2004/09/02 08:55:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.73 2004/09/11 07:43:55 edheldil Exp $
  *
  */
 
@@ -56,6 +56,7 @@ Button::Button(bool Clear)
 	ButtonOnPress[0] = 0;
 	ButtonOnShiftPress[0] = 0;
 	ButtonOnRightPress[0] = 0;
+	ButtonOnDragDrop[0] = 0;
 	MouseEnterButton[0] = 0;
 	MouseLeaveButton[0] = 0;
 	MouseOverButton[0] = 0;
@@ -199,6 +200,22 @@ void Button::Draw(unsigned short x, unsigned short y)
 		y+= 2;
 	}
 
+
+	// Button picture
+	if (Picture && ( Flags & IE_GUI_BUTTON_PICTURE )) {
+		if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
+			Region r( XPos, YPos, Width, Height );
+			core->GetVideoDriver()->BlitSprite( Picture, XPos + ScrollX,
+										YPos + ScrollY, true, &r );
+		} else {
+			short xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
+			short yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
+			core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs,
+										y + YPos + yOffs, true );
+		}
+	}
+
+
 	// Button label
 	if (hasText && ! ( Flags & IE_GUI_BUTTON_NO_TEXT )) {
 		Color* ppoi = NULL;
@@ -216,28 +233,17 @@ void Button::Draw(unsigned short x, unsigned short y)
 			align |= IE_FONT_ALIGN_RIGHT;
 		else
 			align |= IE_FONT_ALIGN_CENTER;
+
 		if (Flags & IE_GUI_BUTTON_ALIGN_TOP)
 			align |= IE_FONT_ALIGN_TOP;
+		else if (Flags & IE_GUI_BUTTON_ALIGN_BOTTOM)
+			align |= IE_FONT_ALIGN_BOTTOM;
 		else
 			align |= IE_FONT_ALIGN_MIDDLE;
 
-		font->Print( Region( x + XPos, y + YPos, Width, Height ),
+		font->Print( Region( x + XPos, y + YPos, Width - 2, Height - 2 ),
 			     ( unsigned char * ) Text, ppoi,
 			     align | IE_FONT_SINGLE_LINE, true );
-	}
-
-	// Button picture
-	if (Picture && ( Flags & IE_GUI_BUTTON_PICTURE )) {
-		if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
-			Region r( XPos, YPos, Width, Height );
-			core->GetVideoDriver()->BlitSprite( Picture, XPos + ScrollX,
-										YPos + ScrollY, true, &r );
-		} else {
-			short xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
-			short yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
-			core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs,
-										y + YPos + yOffs, true );
-		}
 	}
 
 	for (int i = 0; i < MAX_NUM_BORDERS; i++) {
@@ -312,6 +318,9 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		return;
 	}
 
+	if (core->GetDraggedItem () && !ButtonOnDragDrop[0])
+		return;
+
 	//Button == 1 means Left Mouse Button
 	if (Button == 1) {
 		State = IE_GUI_BUTTON_PRESSED;
@@ -333,6 +342,9 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
 		return;
 	}
+	if (core->GetDraggedItem () && !ButtonOnDragDrop[0])
+		return;
+
 	if (Flags & IE_GUI_BUTTON_DRAGGABLE) {
 		Dragging = false;
 	}
@@ -376,7 +388,9 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_RELEASE0] );
 		}
 */
-		if (Button == GEM_MB_ACTION) {
+		if (core->GetDraggedItem()) {
+			RunEventHandler( ButtonOnDragDrop );
+		} else if (Button == GEM_MB_ACTION) {
 			if ((Mod == 1) && ButtonOnShiftPress[0])
 				RunEventHandler( ButtonOnShiftPress );
 			else 
@@ -477,6 +491,9 @@ void Button::SetEvent(char* funcName, int eventType)
 		case IE_GUI_BUTTON_ON_RIGHT_PRESS:
 			strcpy( ButtonOnRightPress, funcName );
 			break;
+		case IE_GUI_BUTTON_ON_DRAG_DROP:
+			strcpy( ButtonOnDragDrop, funcName );
+			break;
 	}
 
 	Changed = true;
@@ -533,6 +550,10 @@ void Button::SetPicture(Sprite2D* Picture)
 {
 	if (this->Picture) {
 		core->GetVideoDriver()->FreeSprite( this->Picture );
+	}
+	if (Picture) {
+		Picture->XPos = 0;
+		Picture->YPos = 0;
 	}
 	this->Picture = Picture;
 	Changed = true;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.15 2004/05/04 20:40:31 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.16 2004/09/11 07:43:55 edheldil Exp $
  *
  */
 
@@ -50,6 +50,7 @@ typedef struct StringList {
 #define IE_FONT_ALIGN_LEFT   0x00
 #define IE_FONT_ALIGN_CENTER 0x01
 #define IE_FONT_ALIGN_RIGHT  0x02
+#define IE_FONT_ALIGN_BOTTOM 0x04
 #define IE_FONT_ALIGN_TOP    0x10 //Single-Line and Multi-Line Text
 #define IE_FONT_ALIGN_MIDDLE 0x20 //Only for single line Text
 #define IE_FONT_SINGLE_LINE  0x40

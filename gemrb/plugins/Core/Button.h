@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.34 2004/09/02 08:55:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.35 2004/09/11 07:43:55 edheldil Exp $
  *
  */
 
@@ -49,6 +49,7 @@
 #define IE_GUI_BUTTON_ALIGN_RIGHT  0x00000200
 #define IE_GUI_BUTTON_ALIGN_TOP    0x00000400
 //end of hardcoded part
+#define IE_GUI_BUTTON_ALIGN_BOTTOM 0x00000800
 
 #define IE_GUI_BUTTON_ANIMATED     0x00010000
 #define IE_GUI_BUTTON_NO_TEXT      0x00020000   // don't draw button label
@@ -67,6 +68,7 @@
 #define IE_GUI_MOUSE_LEAVE_BUTTON    0x00000003
 #define IE_GUI_BUTTON_ON_SHIFT_PRESS 0x00000004
 #define IE_GUI_BUTTON_ON_RIGHT_PRESS 0x00000005
+#define IE_GUI_BUTTON_ON_DRAG_DROP   0x00000006
 
 
 /**Button Class. Used also for PixMaps (static images) or for Toggle Buttons.
@@ -145,6 +147,7 @@ public: // Public Events
 	EventHandler ButtonOnPress;
 	EventHandler ButtonOnShiftPress;
 	EventHandler ButtonOnRightPress;
+	EventHandler ButtonOnDragDrop;
 	EventHandler MouseEnterButton;
 	EventHandler MouseLeaveButton;
 	EventHandler MouseOverButton;
