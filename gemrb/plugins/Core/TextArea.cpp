@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.63 2004/11/18 23:32:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.64 2004/11/21 21:18:32 avenger_teambg Exp $
  *
  */
 
@@ -75,6 +75,8 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	if (lines.size() == 0) {
 		return;
 	}
+	ieDword initials=1;
+	core->GetDictionary()->Lookup("Drop Capitals", initials);
 	if (!Selectable) {
 		char* Buffer = ( char* ) malloc( 1 );
 		Buffer[0] = 0;
@@ -119,9 +121,10 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			}
 		}
 		ftext->PrintFromLine( startrow,
-				Region( x + XPos, y + YPos, Width, Height - 5 ),
-				( unsigned char * ) Buffer, palette, IE_FONT_ALIGN_LEFT, true,
-				finit, initpalette );
+			Region( x + XPos, y + YPos, Width, Height - 5 ),
+			( unsigned char * ) Buffer, palette,
+			IE_FONT_ALIGN_LEFT, !initials,
+			finit, initpalette );
 		free( Buffer );
 	} else {
 		int rc = 0;
@@ -142,9 +145,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			else
 				pal = palette;
 			ftext->PrintFromLine( sr,
-					Region( x + XPos, y + YPos, Width, Height - 5 ),
-					( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT,
-					true, finit, initpalette );
+				Region( x + XPos, y + YPos, Width, Height - 5 ),
+				( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT,
+				!i && !initials, finit, initpalette );
 			yl = lrows[i] - sr;
 			break;
 		}
@@ -157,9 +160,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			else
 				pal = palette;
 			ftext->Print( Region( x + XPos, y + YPos +
-					( yl * ftext->size[1].h/*chars[1]->Height*/ ), Width,
-					Height - 5 - ( yl * ftext->size[1].h/*chars[1]->Height*/ ) ),
-					( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT, true );
+				( yl * ftext->size[1].h ), Width,
+				Height - 5 - ( yl * ftext->size[1].h) ),
+				( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT, false );
 			yl += lrows[i];
 		}
 	}
