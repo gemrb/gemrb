@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.h,v 1.16 2003/12/02 17:22:52 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.h,v 1.17 2004/01/12 17:12:33 avenger_teambg Exp $
  *
  */
 
@@ -648,7 +648,7 @@ abort();
 
 	static void dispatchDecoder(unsigned char **pFrame, unsigned char codeType, unsigned char **pData, int *pDataRemain, int *curXb, int *curYb);
 
-	static void relClose(int i, int *x, int *y)
+	static void relClose(unsigned int i, int *x, int *y)
 	{
 		int ma, mi;
 
@@ -659,7 +659,7 @@ abort();
 		*y = ma - 8;
 	}
 
-	static void relFar(int i, int sign, int *x, int *y)
+	static void relFar(unsigned int i, int sign, int *x, int *y)
 	{
 		if (i < 56)
 			{
