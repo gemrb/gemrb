@@ -18,6 +18,7 @@
 
 #else
 #define stricmp strcasecmp
+#define strnicmp strncasecmp
 
 #define ADV_TEXT
 #define textcolor(i) i
