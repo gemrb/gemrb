@@ -8,7 +8,7 @@ Parameters: Strref - a string index from the dialog.tlk table.
 Return value: A string with resolved tokens. To resolve %d's, you must either use StatComment, or do it manually.
 
 Example: GemRB.SetText (Window, Label, GemRB.GetString(12137)+str(level+1) )
-The above example will display "Level: [LEVEL]" in the addressed label.
+The above example will display "Level: <LEVEL>" in the addressed label.
 
 See also: StatComment, SetText
 

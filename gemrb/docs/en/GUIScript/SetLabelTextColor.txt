@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.SetLabelTextColor(WindowIndex, ControlIndex, red, green, blue)
 
-Description:
+Description: Sets the Text Color of a Label Control. If the the Font has no own palette, you can set a default palette by this command.
 
-Parameters:
+Parameters: WindowIndex, ControlIndex  - the control's reference
+            red,green,blue             - the control's desired text color
 
-Return value:
+Return value: N/A
 
-See also:
+See also: SetLabelUseRGB
 

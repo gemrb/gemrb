@@ -1,11 +1,14 @@
 
-Prototype:
+Prototype: GemRB.CheckVar(VariableName, Context)
 
-Description:
+Description: Display (and return) the value of a Game Variable. It executes the CheckVariable gamescript function in the last actor's context, or, short of that, in the current area's context. If there is no running game, it terminates the script.
+GetGameVar("variable") is effectively the same as CheckVar("variable","GLOBAL").
 
-Parameters:
+Parameters: VariableName - must be shorter than 32 bytes
+            Context      - must be exactly 6 bytes long
+Special cases for Context: LOCALS, GLOBAL, MYAREA
 
-Return value:
+Return value: numeric
 
-See also:
+See also: GetGameVar
 
