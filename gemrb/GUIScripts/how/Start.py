@@ -1,11 +1,12 @@
 import GemRB
 
 StartWindow = 0
+JoinGameButton = 0
 ProtocolWindow = 0
 QuitWindow = 0
 
 def OnLoad():
-	global StartWindow
+	global StartWindow, JoinGameButton
 
 	GemRB.LoadWindowPack("GUICONN")
 
@@ -24,16 +25,18 @@ def OnLoad():
 	GemRB.SetControlStatus(StartWindow, ProtocolButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetControlStatus(StartWindow, CreateGameButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetControlStatus(StartWindow, LoadGameButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetControlStatus(StartWindow, MoviesButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetControlStatus(StartWindow, QuitGameButton, IE_GUI_BUTTON_ENABLED)
 	LastProtocol = GemRB.GetVar("Last Protocol Used");
 	if LastProtocol == 0:
 		GemRB.SetText(StartWindow, ProtocolButton, 15413)
+		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_DISABLED)
 	elif LastProtocol == 1:
 		GemRB.SetText(StartWindow, ProtocolButton, 13967)
+		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_ENABLED)
 	elif LastProtocol == 2:
 		GemRB.SetText(StartWindow, ProtocolButton, 13968)
+		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetText(StartWindow, CreateGameButton, 13963)
 	GemRB.SetText(StartWindow, LoadGameButton, 13729)
 	GemRB.SetText(StartWindow, JoinGameButton, 13964)
@@ -92,7 +95,7 @@ def ProtocolPress():
 	return;
 	
 def ProtocolDonePress():
-	global StartWindow, ProtocolWindow
+	global StartWindow, ProtocolWindow, JoinGameButton
 	GemRB.UnloadWindow(ProtocolWindow)
 	
 	ProtocolButton = GemRB.GetControl(StartWindow, 0x00)
@@ -100,10 +103,13 @@ def ProtocolDonePress():
 	LastProtocol = GemRB.GetVar("Last Protocol Used");
 	if LastProtocol == 0:
 		GemRB.SetText(StartWindow, ProtocolButton, 15413)
+		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_DISABLED)
 	elif LastProtocol == 1:
 		GemRB.SetText(StartWindow, ProtocolButton, 13967)
+		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_ENABLED)
 	elif LastProtocol == 2:
 		GemRB.SetText(StartWindow, ProtocolButton, 13968)
+		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_ENABLED)
 	
 	GemRB.SetVisible(StartWindow, 1)
 	return
