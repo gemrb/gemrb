@@ -901,6 +901,12 @@ void GameControl::HideGUI()
 			}
 		}
 	}
+	if (dict->Lookup( "FloatWindow", index )) {
+		if (index != -1) {
+			Window* fw = core->GetWindow( index );
+			core->SetVisible( index, 0 );
+		}
+	}
 	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos,
 								( ( Window * ) Owner )->YPos, Width, Height );
 }
@@ -965,6 +971,14 @@ void GameControl::UnhideGUI()
 			if (dict->Lookup( "OtherPosition", index )) {
 				ResizeAdd( tw, index );
 			}
+		}
+	}
+	if (dict->Lookup( "FloatWindow", index )) {
+		if (index != -1) {
+			Window* fw = core->GetWindow( index );
+			core->SetVisible( index, 1 );
+			fw->Floating = true;
+			core->SetOnTop( index );
 		}
 	}
 	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos,

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.139 2004/03/20 12:29:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.140 2004/03/20 23:21:58 edheldil Exp $
  *
  */
 
@@ -1223,6 +1223,23 @@ int Interface::SetText(unsigned short WindowIndex,
 		return -1;
 	}
 	return ctrl->SetText( string );
+}
+/** Set the Tooltip text of a Control */
+int Interface::SetTooltip(unsigned short WindowIndex,
+	unsigned short ControlIndex, const char* string)
+{
+	if (WindowIndex >= windows.size()) {
+		return -1;
+	}
+	Window* win = windows[WindowIndex];
+	if (win == NULL) {
+		return -1;
+	}
+	Control* ctrl = win->GetControl( ControlIndex );
+	if (ctrl == NULL) {
+		return -1;
+	}
+	return ctrl->SetTooltip( string );
 }
 
 /** Set a Window Visible Flag */

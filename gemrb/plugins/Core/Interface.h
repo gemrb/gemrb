@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.82 2004/03/20 12:24:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.83 2004/03/20 23:21:58 edheldil Exp $
  *
  */
 
@@ -212,6 +212,8 @@ public:
 	int GetControl(unsigned short WindowIndex, unsigned long ControlID);
 	/** Set the Text of a Control */
 	int SetText(unsigned short WindowIndex, unsigned short ControlIndex, const char * string);
+	/** Set the Tooltip text of a Control */
+	int SetTooltip(unsigned short WindowIndex, unsigned short ControlIndex, const char * string);
 	/** Set a Window Visible Flag */
 	int SetVisible(unsigned short WindowIndex, int visible);
 	/** Show a Window in Modal Mode */
