@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.26 2003/12/26 20:47:07 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.27 2004/01/05 15:59:46 balrog994 Exp $
  *
  */
 
@@ -132,7 +132,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 	}*/
 	core->GetVideoDriver()->SetPalette(sprBuffer, pal);
 	Video * video = core->GetVideoDriver();
-	size_t len = mystrlen((char*)string);
+	size_t len = strlen((char*)string);
 	char * tmp = (char*)malloc(len+1);
 	memcpy(tmp, (char*)string, len+1);
 	SetupString(tmp, rgn.w);
@@ -249,7 +249,7 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	//}
 	core->GetVideoDriver()->SetPalette(sprBuffer, pal);
 	Video * video = core->GetVideoDriver();
-	size_t len = mystrlen((char*)string);
+	size_t len = strlen((char*)string);
 	char * tmp = (char*)malloc(len+1);
 	memcpy(tmp, (char*)string, len+1);
 	SetupString(tmp, rgn.w);
@@ -346,7 +346,7 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 
 int Font::CalcStringWidth(char * string)
 {
-	size_t ret = 0, len = mystrlen(string);
+	size_t ret = 0, len = strlen(string);
 	for(size_t i = 0; i < len; i++) {
 		if(((unsigned char)string[i]) == '[') {
 			i++;
@@ -368,7 +368,7 @@ int Font::CalcStringWidth(char * string)
 
 void Font::SetupString(char * string, int width)
 {
-	size_t len = mystrlen(string);
+	size_t len = strlen(string);
 	unsigned long psx = PARAGRAPH_START_X;
 	int lastpos = 0;
 	int x = psx, wx = 0;
