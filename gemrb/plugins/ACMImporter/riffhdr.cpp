@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/riffhdr.cpp,v 1.3 2004/02/24 22:20:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/riffhdr.cpp,v 1.4 2004/07/24 17:34:32 guidoj Exp $
  *
  */
 
@@ -28,7 +28,7 @@
 
 RIFF_HEADER riff = {
 	{'R', 'I', 'F', 'F'}, 0, {'W', 'A', 'V', 'E', 'f', 'm', 't', ' '}, 16, 1,
-	2, 22050, 22050 * 4, 4, 16, {'d', 'a', 't', 'a'}
+	2, 22050, 22050 * 4, 4, 16, {'d', 'a', 't', 'a'}, 0
 };
 
 void write_riff_header(void* memory, long samples, int channels,
