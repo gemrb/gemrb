@@ -954,7 +954,6 @@ int Interface::LoadTable(const char * ResRef)
 		return -1;
 	}
 	if(!tm->Open(str, true)) {
-		delete(str);
 		core->FreeInterface(tm);
 		return -1;
 	}
