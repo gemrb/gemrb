@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.10 2005/03/03 22:33:11 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.11 2005/03/04 21:05:36 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -156,6 +156,17 @@ def OpenStoreShoppingWindow ():
 	Label = GemRB.GetControl (Window, 0x1000002c)
 	GemRB.SetText (Window, Label, "0")
 
+	j = 1
+	for i in range(4):
+		Button = GemRB.GetControl (Window, i+5)
+		GemRB.SetVarAssoc (Window, Button, "LeftIndex", j)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+
+		Button = GemRB.GetControl (Window, i+13)
+		GemRB.SetVarAssoc (Window, Button, "RightIndex", j)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		j <<= 1
+
 	# Buy
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 13703)
@@ -165,7 +176,7 @@ def OpenStoreShoppingWindow ():
 	GemRB.SetText (Window, Button, 13704)
 
 	Button = GemRB.GetControl (Window, 50)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetText (Window, Button, 13707)
 	# 45374
 
@@ -174,6 +185,9 @@ def OpenStoreShoppingWindow ():
 	# 16 scrollbar
 	# 17-20, @20-@23 - slots and labels
 	# 25 encumbrance button
+
+	Button = GemRB.GetControl (Window, 44)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
 	# encumbrance
 	Label = GemRB.CreateLabel (Window, 0x10000043, 15,325,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
@@ -208,7 +222,14 @@ def OpenStoreIdentifyWindow ():
 	Label = GemRB.GetControl (Window, 0x10000003)
 	GemRB.SetText (Window, Label, str (666))
 
-	# 6-9 item slots, 0x10000009-c labels
+	# 8-11 item slots, 0x10000009-c labels
+
+	j = 1
+	for i in range(4):
+		Button = GemRB.GetControl (Window, i+8)
+		GemRB.SetVarAssoc (Window, Button, "LeftIndex", j)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		j <<= 1
 
 	SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
 	UpdateStoreIdentifyWindow ()
@@ -229,9 +250,23 @@ def OpenStoreStealWindow ():
 	StoreStealWindow = Window = GemRB.LoadWindow (6)
 	GemRB.SetVar ("TopWindow", Window)
 
+	j = 1
+	for i in range(4):
+		Button = GemRB.GetControl (Window, i+4)
+		GemRB.SetVarAssoc (Window, Button, "LeftIndex", j)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+
+		Button = GemRB.GetControl (Window, i+11)
+		GemRB.SetVarAssoc (Window, Button, "RightIndex", j)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		j <<= 1
+
 	# Steal
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetText (Window, Button, 14179)
+
+	Button = GemRB.GetControl (Window, 37)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
 	# encumbrance
 	Label = GemRB.CreateLabel (Window, 0x10000043, 15,325,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
@@ -321,6 +356,13 @@ def OpenStoreRumourWindow ():
 	#removing those pesky labels
 	for i in range(5):
 		GemRB.DeleteControl (Window, 0x10000005+i)
+
+	TextArea = GemRB.GetControl (Window, 11)
+	GemRB.SetText (Window, TextArea, 14144)
+
+	BAM = "TVRNQUL%d"% ((Store['StoreFlags']>>9)&3)
+	Button = GemRB.GetControl (Window, 12)
+	GemRB.SetButtonSprites (Window, Button, BAM, 0, 0, 0, 0, 0)
 
 	ScrollBar = GemRB.GetControl (Window, 5)
 	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "UpdateStoreRumourWindow")
