@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.37 2003/12/28 20:32:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.38 2003/12/29 16:26:22 avenger_teambg Exp $
  *
  */
 
@@ -26,23 +26,6 @@
 #include <stdlib.h>
 
 extern Interface * core;
-
-inline size_t mystrlen(const char * string) 
-{
-	if(!string)
-		return (size_t)0;
-	const char * tmp = string;
-	size_t count = 0;
-	while(*tmp != 0) {
-		if(((unsigned char)*tmp) >= 0xf0) {
-			tmp+=3;
-			count+=3;
-		}
-		count++;
-		tmp++;
-	}
-	return count;
-}
 
 TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {
@@ -89,56 +72,37 @@ void TextArea::Draw(unsigned short x, unsigned short y)
   		int len = 0;
 		int lastlen = 0;
   		for(size_t i = 0; i < lines.size(); i++) {
-			if(seltext == i) {
-				if(strnicmp("[s=", lines[i], 3) == 0) {
-					int tlen = (int)mystrlen(lines[i])+1;
-					char * tmp = (char*)malloc(tlen);
-					unsigned long idx, ar, ag, ab, br, bg, bb;
-					sscanf(lines[i], "[s=%d,%02X%02X%02X,%02X%02X%02X]%[^\0][/s]", &idx, &ar, &ag, &ab, &br, &bg, &bb, tmp);
-					tlen = 14+strlen(tmp)+8+1;
-					char * tmp1 = (char*)malloc(tlen);
-					sprintf(tmp1, "[color=%02X%02X%02X]%s[/color]", ar, ag, ab, tmp);
-					free(tmp);
-					len += tlen;
-					Buffer = (char*)realloc(Buffer, len+1);
-					memcpy(&Buffer[lastlen], tmp1, len+1-lastlen);
-					lastlen = len;
-					free(tmp1);
+			if(strnicmp("[s=", lines[i], 3) == 0) {
+				int tlen;
+				unsigned long idx, acolor, bcolor;
+				char *rest;
+				idx=strtoul(lines[i]+3,&rest,0);
+				if(*rest!=',') goto notmatched;
+				acolor=strtoul(rest+1,&rest,16);
+				if(*rest!=',') goto notmatched;
+				bcolor=strtoul(rest+1,&rest,16);
+				if(*rest!=']') goto notmatched;
+				tlen=strstr(rest+1,"[/s]")-rest-1;
+				if(tlen<0) goto notmatched;
+				len+=tlen+23;
+				Buffer = (char *)realloc(Buffer, len+2);
+				if(seltext == i) {
+					sprintf(Buffer+lastlen, "[color=%06.6X]%.*s[/color]", acolor, tlen, rest+1);
 				}
 				else {
-  					len += (int)mystrlen(lines[i])+1;
-  					Buffer = (char*)realloc(Buffer, len+1);
-  					memcpy(&Buffer[lastlen], lines[i], len+1-lastlen);
-					lastlen=len;
+					sprintf(Buffer+lastlen, "[color=%06.6X]%.*s[/color]", bcolor, tlen, rest+1);
 				}
 			}
 			else {
-  				if(strnicmp("[s=", lines[i], 3) == 0) {
-					int tlen = (int)mystrlen(lines[i])+1;
-					char * tmp = (char*)malloc(tlen);
-					unsigned long idx, ar, ag, ab, br, bg, bb;
-					sscanf(lines[i], "[s=%d,%02X%02X%02X,%02X%02X%02X]%[^\0][/s]", &idx, &ar, &ag, &ab, &br, &bg, &bb, tmp);
-					tlen = 14+strlen(tmp)+8+1;
-					char * tmp1 = (char*)malloc(tlen);
-					sprintf(tmp1, "[color=%02X%02X%02X]%s[/color]", br, bg, bb, tmp);
-					free(tmp);
-					len += tlen;
-					Buffer = (char*)realloc(Buffer, len+1);
-					memcpy(&Buffer[lastlen], tmp1, len+1-lastlen);
-					lastlen = len;
-					free(tmp1);
-				}
-				else {
-  					len += (int)mystrlen(lines[i])+1;
-  					Buffer = (char*)realloc(Buffer, len+1);
-  					memcpy(&Buffer[lastlen], lines[i], len+1-lastlen);
-					lastlen=len;
-				}
+notmatched:
+  				len += (int)strlen(lines[i])+1;
+  				Buffer = (char*)realloc(Buffer, len+2);
+  				memcpy(&Buffer[lastlen], lines[i], len+1-lastlen);
 			}
+			lastlen=len;
 			if(i != lines.size()-1) {
 				Buffer[lastlen-1] = '\n';
 				Buffer[lastlen] = 0;
-  				//strcat(Buffer, "\n");
 			}
   		}
   		ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height-5), (unsigned char*)Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
@@ -195,7 +159,7 @@ int TextArea::SetText(const char * text, int pos)
 		pos = -1;
 	if(pos >= (int)lines.size())
 		return -1;
-	int newlen = (int)mystrlen(text);
+	int newlen = (int)strlen(text);
 
 	if(pos == -1) {
 		char * str = (char*)malloc(newlen+1);
@@ -228,7 +192,7 @@ int TextArea::AppendText(const char * text, int pos)
 	int ret = 0;
 	if(pos >= (int)lines.size())
 		return -1;
-	int newlen = (int)mystrlen(text);
+	int newlen = (int)strlen(text);
 	if(pos == -1) {
 		char * str = (char*)malloc(newlen+1);
 		memcpy(str, text, newlen+1);
@@ -238,7 +202,7 @@ int TextArea::AppendText(const char * text, int pos)
 	}
 	else
 	{
-		int mylen = (int)mystrlen(lines[pos]);
+		int mylen = (int)strlen(lines[pos]);
 	
 		lines[pos] = (char*)realloc(lines[pos], mylen+newlen+1);
 		memcpy(&lines[pos][mylen], text, newlen+1);
@@ -311,7 +275,7 @@ void TextArea::CalcRowCount()
 		for(size_t i = 0; i < lines.size(); i++) {
 			rows++;
 			int tr = 0;
-			int len = (int)mystrlen(lines[i]);
+			int len = (int)strlen(lines[i]);
 			char * tmp = (char*)malloc(len+1);
 			memcpy(tmp, lines[i], len+1);
 			ftext->SetupString(tmp, Width);
