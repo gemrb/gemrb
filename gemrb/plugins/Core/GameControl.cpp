@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.146 2004/07/21 22:16:37 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.147 2004/07/25 00:29:25 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -28,6 +28,13 @@
 #include "DialogMgr.h"
 
 #define IE_CHEST_CURSOR	32
+
+#define DEBUG_SHOW_INFOPOINTS   0x01
+#define DEBUG_SHOW_CONTAINERS   0x02
+#define DEBUG_SHOW_DOORS        DEBUG_SHOW_CONTAINERS
+#define DEBUG_SHOW_SEARCHMAP    0x04
+#define DEBUG_SHOW_PALETTES     0x08
+#define DEBUG_XXX               0x10
 
 extern Interface* core;
 #ifdef WIN32
@@ -136,6 +143,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			return;
 		short GameX = lastMouseX, GameY = lastMouseY;
 		video->ConvertToGame( GameX, GameY );
+
+		// Draw selection rect
 		if (DrawSelectionRect) {
 			CalculateSelection( GameX, GameY );
 /* unused ?
@@ -161,7 +170,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			*/
 			video->DrawRect( SelectionRect, green, false, true );
 		}
-		if (DebugFlags & 4) {
+
+		// Show doors
+		if (DebugFlags & DEBUG_SHOW_DOORS) {
 			Door* d;
 			//there is a real assignment in the loop!
 			for (unsigned int idx = 0;
@@ -175,8 +186,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				}
 			}
 		}
-		//draw containers when ALT was pressed
-		if (DebugFlags & 4) {
+
+		// Show containers
+		if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
 			Container* c;
 			//there is a real assignment in the loop!
 			for (unsigned int idx = 0;
@@ -189,6 +201,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				}
 			}
 		}
+
+		// Draw spell effect
 		if (effect) {
 			if (( selected.size() == 1 )) {
 				Actor* actor = selected.at( 0 );
@@ -196,16 +210,18 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 						actor->YPos, 1, false );
 			}
 		}
-		if (DebugFlags & 5) {
+
+		// Show traps and infopoint
+		if (DebugFlags & (DEBUG_SHOW_INFOPOINTS | DEBUG_SHOW_CONTAINERS)) {
 			//draw infopoints with blue overlay
 			InfoPoint* i;
 			//there is a real assignment in the loop!
 			for (unsigned int idx = 0;
 				(i = area->tm->GetInfoPoint( idx ));
 				idx++) {
-				if (( i->TrapDetected || ( DebugFlags & 1 ) ) && i->Trapped) {
+				if (( i->TrapDetected || ( DebugFlags & DEBUG_SHOW_INFOPOINTS ) ) && i->Trapped) {
 					video->DrawPolyline( i->outline, red, true );
-				} else if (DebugFlags & 1) {
+				} else if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
 					video->DrawPolyline( i->outline, blue, true );
 				}
 			}
@@ -214,6 +230,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				video->DrawPolyline( overInfoPoint->outline, red, true );
 			}
 		}
+
+		// Draw infopoint texts for some time
 		for (size_t i = 0; i < infoTexts.size(); i++) {
 			unsigned long time;
 			GetTime( time );
@@ -241,6 +259,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			}
 		}
 
+		// Draw path
 		if (drawPath) {
 			PathNode* node = drawPath;
 			while (true) {
@@ -259,13 +278,29 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			}
 		}
 
-		if (DebugFlags & 2) {
+		// Draw searchmap
+		if (DebugFlags & DEBUG_SHOW_SEARCHMAP) {
 			Sprite2D* spr = area->SearchMap->GetImage();
 			video->BlitSprite( spr, 0, 0, true );
 			video->FreeSprite( spr );
 			Region point( GameX / 16, GameY / 12, 1, 1 );
 			video->DrawRect( point, red );
 		}
+
+		// Draw actor's palettes
+		if ((DebugFlags & DEBUG_SHOW_PALETTES) && lastActor) {
+			Color *Pal1 = lastActor->anims->OrigPalette;
+			for (int i = 0; i < 256; i++) {
+				Region rgn( 10 * (i % 64), 30 + 10 * (i / 64), 10, 10 );
+				video->DrawRect( rgn, Pal1[i], true, false);
+			}
+			Color *Pal2 = lastActor->anims->Palette;
+			for (int i = 0; i < 256; i++) {
+				Region rgn( 10 * (i % 64), 90 + 10 * (i / 64), 10, 10 );
+				video->DrawRect( rgn, Pal2[i], true, false);
+			}
+		}
+
 	} else {
 		core->GetVideoDriver()->DrawRect( vp, blue );
 	}
@@ -332,7 +367,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			break;
 		case '\t':
 			//not GEM_TAB
-			DebugFlags &= ~8;
+			DebugFlags &= ~DEBUG_XXX;
 			printf( "TAB released\n" );
 			return;
 		case 'f':
@@ -474,13 +509,43 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->AddAction( GameScript::GenerateAction(Tmp) );
 				}
 				break;
+			case 'z':
+				if (lastActor) {
+					printf( "Appearance flags: 0x%04x : 0x%04x\n", lastActor->AppearanceFlags1, lastActor->AppearanceFlags2 );
+					printf( "Unknowns: %04x %02x %02x", lastActor->unknown2F2, lastActor->unknown2F4, lastActor->unknown310 );
+					for (int i=0; i < 5; i++) {
+						printf(" %04x", lastActor->unknown2FC[i]);
+					}
+					printf("\n");
+					printf( "Num of colors: %d\n", lastActor->ColorsCount );
+					for (int i=0; i < lastActor->ColorsCount; i++) {
+						printf( "  Color: %3d  Place: %3d\n", lastActor->Colors[i], lastActor->ColorPlacements[i] );
+					}
+					printf("Skin    : %d\n", lastActor->BaseStats[IE_SKIN_COLOR], lastActor->Modified[IE_SKIN_COLOR]);
+					printf("Hair    : %d\n", lastActor->BaseStats[IE_HAIR_COLOR], lastActor->Modified[IE_HAIR_COLOR]);
+					printf("Mj Cloth: %d\n", lastActor->BaseStats[IE_MAJOR_COLOR], lastActor->Modified[IE_MAJOR_COLOR]);
+					printf("Mi Cloth: %d\n", lastActor->BaseStats[IE_MINOR_COLOR], lastActor->Modified[IE_MINOR_COLOR]);
+					printf("Armor   : %d\n", lastActor->BaseStats[IE_ARMOR_COLOR], lastActor->Modified[IE_ARMOR_COLOR]);
+					printf("Metal   : %d\n", lastActor->BaseStats[IE_METAL_COLOR], lastActor->Modified[IE_METAL_COLOR]);
+					printf("Leather : %d\n", lastActor->BaseStats[IE_LEATHER_COLOR], lastActor->Modified[IE_LEATHER_COLOR]);
+					printf( "\n" );
+					lastActor->anims->SwapPalettes();
+				}
+				break;
 			case '4':
-				// '4'  //show all traps
-				DebugFlags ^= 1;
+				//show all traps and infopoints
+				DebugFlags ^= DEBUG_SHOW_INFOPOINTS;
+				printf("Show traps and infopoints %s\n", DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
 				break;
 			case '5':
-				// '5' //show the searchmap
-				DebugFlags ^= 2;
+				//show the searchmap
+				DebugFlags ^= DEBUG_SHOW_SEARCHMAP;
+				printf("Show searchmap %s\n", DebugFlags & DEBUG_SHOW_SEARCHMAP ? "ON" : "OFF");
+				break;
+			case '6':
+				//show actor's palettes
+				DebugFlags ^= DEBUG_SHOW_PALETTES;
+				printf("Show actor's palettes %s\n", DebugFlags & DEBUG_SHOW_PALETTES ? "ON" : "OFF");
 				break;
 			default:
 				printf( "KeyRelease:%d  %d\n", Key, Mod );
@@ -797,11 +862,11 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 				Viewport.x += 64;
 			break;
 		case GEM_ALT:
-			DebugFlags ^= 4;
+			DebugFlags ^= DEBUG_SHOW_CONTAINERS;
 			printf( "ALT pressed\n" );
 			break;
 		case GEM_TAB:
-			DebugFlags |= 8;
+			DebugFlags |= DEBUG_XXX;
 			printf( "TAB pressed\n" );
 			break;
 		case GEM_MOUSEOUT:
