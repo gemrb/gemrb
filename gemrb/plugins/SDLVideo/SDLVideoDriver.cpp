@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.28 2003/11/26 13:57:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.29 2003/11/26 16:38:23 balrog994 Exp $
  *
  */
 
@@ -495,15 +495,15 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D * spr, int x, int y, Color tint)
 {
 	SDL_Surface * tmp = (SDL_Surface*)spr->vptr;
 	SDL_Color * pal = tmp->format->palette->colors;
-	SDL_Color oldPal[256], newPal[256];
+	SDL_Color oldPal[256];//, newPal[256];
 	memcpy(oldPal, pal, 256*sizeof(SDL_Color));
-	memcpy(newPal, pal, 2*sizeof(SDL_Color));
+	//memcpy(newPal, pal, 2*sizeof(SDL_Color));
 	for(int i = 2; i < 256; i++) {
-		newPal[i].r = (tint.r*oldPal[i].r) >> 8;
-		newPal[i].g = (tint.g*oldPal[i].g) >> 8;
-		newPal[i].b = (tint.b*oldPal[i].b) >> 8;
+		pal[i].r = (tint.r*oldPal[i].r) >> 8;
+		pal[i].g = (tint.g*oldPal[i].g) >> 8;
+		pal[i].b = (tint.b*oldPal[i].b) >> 8;
 	}
-	SDL_SetPalette(tmp, SDL_LOGPAL, newPal, 0, 256);
+	//SDL_SetPalette(tmp, SDL_LOGPAL, newPal, 0, 256);
 	BlitSprite(spr, x, y);
 	SDL_SetPalette(tmp, SDL_LOGPAL, oldPal, 0, 256);
 }
