@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.8 2004/01/04 00:06:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.9 2004/01/04 15:21:13 balrog994 Exp $
  *
  */
 
@@ -188,7 +188,7 @@ TileMap * WEDImp::GetTileMap()
 	return tm;
 }
 
-unsigned short * WEDImp::GetDoorIndices(char * ResRef, int *count)
+unsigned short * WEDImp::GetDoorIndices(char * ResRef, int *count, bool &BaseClosed)
 {
 	unsigned short DoorClosed, DoorTileStart, DoorTileCount, *DoorTiles;
 	unsigned short OpenPolyCount, ClosedPolyCount;
@@ -222,5 +222,9 @@ unsigned short * WEDImp::GetDoorIndices(char * ResRef, int *count)
 	memset(DoorTiles, 0, DoorTileCount*sizeof(unsigned short));
 	str->Read(DoorTiles, DoorTileCount*sizeof(unsigned short));
 	*count = DoorTileCount;
+	if(DoorClosed)
+		BaseClosed = true;
+	else
+		BaseClosed = false;
 	return DoorTiles;
 }
