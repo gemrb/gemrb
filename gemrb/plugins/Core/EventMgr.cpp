@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.19 2003/11/28 17:30:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.20 2003/12/15 09:15:37 balrog994 Exp $
  *
  */
 
@@ -57,7 +57,7 @@ void EventMgr::AddWindow(Window * win)
 		if(windows.size() == 1)
 			topwin.push_back(0);
 		else
-			SetOnTop(windows.size()-1);
+			SetOnTop((int)windows.size()-1);
 	}
 	lastW = win;
 	lastF = NULL;
