@@ -45,6 +45,7 @@ void EventMgr::DelWindow(unsigned short WindowID)
 			if(lastW == (*m))
 				lastW = NULL;
 			windows.erase(m);
+			lastF = NULL;
 			return;
 		}
 	}
