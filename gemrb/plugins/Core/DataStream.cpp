@@ -3,6 +3,8 @@
 
 DataStream::DataStream(void)
 {
+	Pos = 0;
+	Encrypted = false;
 }
 
 DataStream::~DataStream(void)
@@ -16,7 +18,14 @@ bool DataStream::CheckEncrypted()
 	Read(&two, 2);
 	Seek(0, GEM_STREAM_START);
 	if(two == 0xFFFF) {
+		Encrypted = true;
 		return true;
 	}
+	Encrypted = false;
 	return false;
+}
+/** No descriptions */
+void DataStream::ReadDecrypted(void * buf, int size)
+{
+	
 }

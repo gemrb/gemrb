@@ -21,6 +21,8 @@
 class GEM_EXPORT DataStream
 {
 public:
+	int Pos;
+	bool Encrypted;
 	DataStream(void);
 	virtual ~DataStream(void);
 	virtual int Read(void * dest, int len) = 0;
@@ -28,6 +30,8 @@ public:
 	virtual unsigned long Size() = 0;
   /** Returns true if the stream is encrypted */
   bool CheckEncrypted();
+  /** No descriptions */
+  void ReadDecrypted(void * buf, int size);
 	char filename[_MAX_PATH];
 };
 

@@ -29,6 +29,7 @@ bool FileStream::Open(const char * filename, bool autoFree)
 	size = ftell(str)+1;
 	fseek(str, 0, SEEK_SET);
 	ExtractFileFromPath(this->filename, filename);
+	Pos = 0;
 	return true;
 }
 
@@ -46,14 +47,19 @@ bool FileStream::Open(FILE * stream, int startpos, int size, bool autoFree)
 	this->size = size;
 	strcpy(filename, "");
 	fseek(str, startpos, SEEK_SET);
+	Pos = 0;
 	return true;
 }
 
 int FileStream::Read(void * dest, int length)
 {
+	if(Encrypted)
+		return ReadDecrypted(dest, lenfth);
 	if(!opened)
 		return GEM_ERROR;
 	size_t c = fread(dest, 1, length, str);
+	if(c != -1)
+		Pos+=c;
 	if(feof(str)) { /* slightly modified by brian  oct 11 2003*/
 		return GEM_EOF;
 	}
@@ -71,10 +77,12 @@ int FileStream::Seek(int pos, int startpos)
 		{
 		case GEM_CURRENT_POS:
 			fseek(str, pos, SEEK_CUR);
+			Pos+=pos;
 		break;
 
 		case GEM_STREAM_START:
 			fseek(str, this->startpos + pos, SEEK_SET);
+			Pos = pos;
 		break;
 
 		default:

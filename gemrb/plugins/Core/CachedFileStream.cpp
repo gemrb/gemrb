@@ -31,6 +31,7 @@ CachedFileStream::CachedFileStream(char * stream, bool autoFree)
 	size = ftell(str);
 	fseek(str, 0, SEEK_SET);
 	strcpy(filename, fname);
+	Pos = 0;
 	this->autoFree = autoFree;
 }
 
@@ -44,6 +45,7 @@ CachedFileStream::CachedFileStream(CachedFileStream * cfs, int startpos, int siz
 	strcat(cpath, cfs->filename);
 	str = fopen(cpath, "rb");
 	fseek(str, startpos, SEEK_SET);
+	Pos = 0;
 }
 
 CachedFileStream::~CachedFileStream(void)
@@ -56,7 +58,11 @@ CachedFileStream::~CachedFileStream(void)
 
 int CachedFileStream::Read(void * dest, int length)
 {
+	if(Encrypted)
+		return ReadDecrypted(dest, lenfth);
 	size_t c = fread(dest, 1, length, str);
+	if(c != -1)
+		Pos+=c;
 	if(c < 0) {
 		if(feof(str)) {
 			return GEM_EOF;
@@ -72,10 +78,12 @@ int CachedFileStream::Seek(int pos, int startpos)
 		{
 		case GEM_CURRENT_POS:
 			fseek(str, pos, SEEK_CUR);
+			Pos+=pos;
 		break;
 
 		case GEM_STREAM_START:
 			fseek(str, this->startpos + pos, SEEK_SET);
+			Pos=pos;
 		break;
 
 		default:
