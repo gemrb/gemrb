@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.23 2003/12/29 22:04:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.24 2003/12/30 17:51:33 balrog994 Exp $
  *
  */
 
@@ -60,9 +60,11 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		triggers[0x0d] = Exists;
 		triggers[0x0e] = General;
 		triggers[0x0f] = Globals;
+		triggers[0x18] = Range;
 		triggers[0x23] = True;
 		triggers[0x30] = False;
 		triggers[0x36] = OnCreation;
+		triggers[0x70] = Clicked;
 
 		actions[7] = CreateCreature;
 		actions[8] = Dialogue;
@@ -88,7 +90,11 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[121] = StartCutSceneMode;
 		actions[122] = EndCutSceneMode;
 		actions[127] = CutSceneId;
+<<<<<<< GameScript.cpp
+		actions[151] = DisplayString;
+=======
 		actions[137] = StartDialogue;
+>>>>>>> 1.23
 		actions[153] = ChangeAllegiance;
 		actions[154] = ChangeGeneral;
 		actions[155] = ChangeRace;
@@ -112,6 +118,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[273] = CreateVisualEffectObject;
 		actions[286] = HideGUI;
 		actions[287] = UnhideGUI;
+		actions[301] = AmbientActivate;
 		actions[307] = SG;
 		actions[311] = DisplayStringWait;
 		blocking[311] = true;
@@ -236,8 +243,11 @@ void GameScript::SetVariable(const char * VarName, const char * Context, int val
 	free(newVarName);
 }
 
-void GameScript::Update()
+void GameScript::Update(Scriptable * mySelf)
 {
+	Scriptable * oldMySelf = MySelf;
+	if(mySelf)
+		MySelf = mySelf;
 	while(programmedActions.size()) {
 		//printf("Executing Script Step\n");
 		Action * aC = programmedActions.front();
@@ -245,29 +255,21 @@ void GameScript::Update()
 		programmedActions.pop_front();
 		if(!programmedActions.size()) {
 			endReached = true;
+			if(MySelf) {
+				MySelf->Clicker = NULL;
+			}
 			return;
 		}
 		if(blocking[aC->actionID])
 			return;
 	}
+	MySelf = oldMySelf;
 	unsigned long thisTime;
 	GetTime(thisTime);
 	if((thisTime - lastRunTime) < scriptRunDelay)
 		return;
 	//printf("%s: Run Script\n", Name);
 	lastRunTime = thisTime;
-	switch(scriptType) {
-		case IE_SCRIPT_TRIGGER: 
-			{
-			//TODO: Check if a PC is in Visible Range
-
-			}
-		break;
-
-		case IE_SCRIPT_AREA:
-			//TODO: Check if something changed in the Area
-		break;
-	}
 	if(!script)
 		return;
 	for(int a = 0; a < script->responseBlocksCount; a++) {
@@ -485,6 +487,7 @@ void GameScript::ExecuteResponse(GameScript * sender, Response * rE)
 		Action * aC = rE->actions[i];
 		//ExecuteAction(sender, aC);
 		programmedActions.push_back(aC);
+		//sender->MySelf->AddAction(aC);
 	}
 }
 
@@ -514,6 +517,10 @@ Scriptable * GameScript::GetActorFromObject(GameScript * Sender, Object * oC)
 				case 21:
 					return core->GetGame()->GetPC(0);
 				break;
+			}
+		} else {
+			if(oC->genderField == 17) {
+				return Sender->MySelf->LastTrigger;
 			}
 		}
 	}
@@ -1112,6 +1119,49 @@ int GameScript::False(GameScript * /*Sender*/, Trigger * /*parameters*/)
 	return 0;
 }
 
+int GameScript::Range(GameScript * Sender, Trigger * parameters)
+{
+	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!target)
+		return 0;
+	printf("x1 = %d, y1 = %d\nx2 = %d, y2 = %d\n", target->XPos, target->YPos, Sender->MySelf->XPos, Sender->MySelf->YPos);
+	long x = (target->XPos - Sender->MySelf->XPos);
+	long y = (target->YPos - Sender->MySelf->YPos);
+	double distance = sqrt((x*x)+(y*y));
+	printf("Distance = %.3f\n", distance);
+	if(distance <= (parameters->int0Parameter*20)) {
+		if(parameters->flags&1) {
+			printf("Returning = 0\n");
+			return 0;
+		}
+		else {
+			printf("Returning = 1\n");
+			return 1;
+		}
+	}
+	if(parameters->flags&1) {
+		printf("Returning = 1\n");
+		return 1;
+	}
+	else {
+		printf("Returning = 0\n");
+		return 0;
+	}
+}
+
+int GameScript::Clicked(GameScript * Sender, Trigger * parameters)
+{
+	if(Sender->MySelf->Type != ST_TRIGGER)
+		return 0;
+	if(parameters->objectParameter->eaField == 0) {
+		return 1;
+	}
+	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
+	if(Sender->MySelf == target)
+		return 1;
+	return 0;
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -1506,6 +1556,31 @@ void GameScript::Dialogue(GameScript * Sender, Action * parameters)
 			gc->InitDialog(actor, target, dm->GetDialog());
 		core->FreeInterface(dm);
 	}
+}
+
+void GameScript::DisplayString(GameScript * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!scr)
+		return;
+	if(scr->overHeadText)
+		free(scr->overHeadText);
+	scr->overHeadText = core->GetString(parameters->int0Parameter);
+	GetTime(scr->timeStartDisplaying);
+	scr->textDisplaying = 1;
+	GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
+	if(gc->ControlType == IE_GUI_GAMECONTROL)
+		gc->DisplayString(scr);
+}
+
+void GameScript::AmbientActivate(GameScript * Sender, Action * parameters)
+{
+	Animation * anim = core->GetGame()->GetMap(0)->GetAnimation(parameters->objects[1]->objectName);
+	if(!anim) {
+		printf("Script error: No Animation Named \"%s\"\n", parameters->objects[1]->objectName);
+		return;
+	}
+	anim->Active = parameters->int0Parameter;
 }
 
 void GameScript::StartDialogue(GameScript * Sender, Action * parameters)

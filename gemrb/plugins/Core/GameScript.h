@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.15 2003/12/29 22:04:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.16 2003/12/30 17:51:33 balrog994 Exp $
  *
  */
 
@@ -132,7 +132,7 @@ public:
 	Scriptable * MySelf;
 	unsigned long scriptRunDelay;
 	bool endReached;
-	void Update();
+	void Update(Scriptable * mySelf = NULL);
 private: //Internal Functions
 	Script* CacheScript(DataStream * stream, const char * Context);
 	void FreeScript(Script * script);
@@ -147,6 +147,7 @@ private: //Internal Functions
 	void ExecuteResponseSet(GameScript * sender, ResponseSet * rS);
 	void ExecuteResponse(GameScript * sender, Response * rE);
 	void ExecuteAction(GameScript * sender, Action * aC);
+private:
 	Action * GenerateAction(char * String);
 	Trigger * GenerateTrigger(char * String);
 	static Scriptable * GetActorFromObject(GameScript * Sender, Object * oC);
@@ -176,6 +177,8 @@ private: //Script Functions
 	static int  Class(GameScript * Sender, Trigger * parameters);
 	static int  Exists(GameScript * Sender, Trigger * parameters);
 	static int  General(GameScript * Sender, Trigger * parameters);
+	static int  Range(GameScript * Sender, Trigger * parameters);
+	static int  Clicked(GameScript * Sender, Trigger * parameters);
 	//Actions
 	static void SetGlobal(GameScript * Sender, Action * parameters);
 	static void SG(GameScript * Sender, Action * parameters);
@@ -206,6 +209,7 @@ private: //Script Functions
 	static void Face(GameScript * Sender, Action * parameters);
 	static void FaceObject(GameScript * Sender, Action * parameters);
 	static void DisplayStringWait(GameScript * Sender, Action * parameters);
+	static void DisplayString(GameScript * Sender, Action * parameters);
 	static void StartSong(GameScript * Sender, Action * parameters);
 	static void Continue(GameScript * Sender, Action * parameters);
 	static void PlaySound(GameScript * Sender, Action * parameters);
@@ -216,6 +220,7 @@ private: //Script Functions
 	static void HideGUI(GameScript * Sender, Action * parameters);
 	static void UnhideGUI(GameScript * Sender, Action * parameters);
 	static void Dialogue(GameScript * Sender, Action * parameters);
+	static void AmbientActivate(GameScript * Sender, Action * parameters);
 	static void StartDialogue(GameScript * Sender, Action * parameters);
 };
 
