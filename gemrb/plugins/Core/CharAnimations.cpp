@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.14 2003/11/29 10:31:41 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.15 2003/11/29 17:11:01 balrog994 Exp $
  *
  */
 
@@ -43,12 +43,12 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 	WeaponType = 0;
 	this->RowIndex = RowIndex;
 	Avatars = core->GetTable(core->LoadTable("avatars"));
-	char * val = Avatars->QueryField(RowIndex, 21);
+	char * val = Avatars->QueryField(RowIndex, 24);
 	if(val[0] == '*')
 		UsePalette = true;
 	else
 		UsePalette = false;
-	CircleSize = atoi(Avatars->QueryField(RowIndex, 3));
+	CircleSize = atoi(Avatars->QueryField(RowIndex, 6));
 }
 
 CharAnimations::~CharAnimations(void)
@@ -197,7 +197,7 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, c
 		case IE_ANI_ONE_FILE:
 			{
 				if(OrientCount == 16) {
-					char * val = Avatars->QueryField(RowIndex, AnimID+4);
+					char * val = Avatars->QueryField(RowIndex, AnimID+7);
 					if(val[0] == '*') {
 						ResRef[0] = 0;
 						return;
@@ -231,14 +231,12 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, c
 		case IE_ANI_TWO_FILES:
 			{
 				if(OrientCount == 5) {
-					char * val = Avatars->QueryField(RowIndex, AnimID+4);
+					char * val = Avatars->QueryField(RowIndex, AnimID+7);
 					if(val[0] == '*') {
 						ResRef[0] = 0;
 						return;
 					}
 					Cycle = atoi(val) + (Orient/2);
-					if(core->HasFeature(GF_MID_RES_AVATARS))
-						sprintf(ResRef, "%s%d", ResRef, (ArmorType+1)); 
 					switch(AnimID) {
 						case IE_ANI_ATTACK:
 						case IE_ANI_ATTACK_BACKSLASH:
@@ -264,7 +262,7 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, c
 		case IE_ANI_CODE_MIRROR_2:
 			{
 				if(OrientCount == 9) {
-					char * val = Avatars->QueryField(RowIndex, AnimID+4);
+					char * val = Avatars->QueryField(RowIndex, AnimID+7);
 					if(val[0] == '*') {
 						ResRef[0] = 0;
 						return;
@@ -312,44 +310,6 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, c
 
 void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient)
 	{
-		switch(ArmorType)
-			{
-			case 0: // No Armor
-				{
-				if(stricmp(core->GameType, "bg2") == 0) {
-					if(ResRef[3] != 'W')
-						ResRef[3] = 'B';
-				}
-				else {
-					if((ResRef[3] != 'T') && (ResRef[3] != 'W'))
-						ResRef[3] = 'B';
-				}
-				strcat(ResRef, "1");
-				}
-			break;
-
-			case 1: // Light Armor
-				{
-				if((ResRef[3] != 'T') && (ResRef[3] != 'W'))
-					ResRef[3] = 'B';
-				strcat(ResRef, "2");
-				}
-			break;
-
-			case 2: // Medium Armor
-				{
-				if((ResRef[3] != 'T') && (ResRef[3] != 'W'))
-					ResRef[3] = 'B';
-				strcat(ResRef, "3");
-				}
-			break;
-
-			case 3: // Heavy Armor
-				{
-				strcat(ResRef, "4");
-				}
-			break;
-			}
 		switch(AnimID)
 			{
 			//Attack is a special case... it cycles randomly
