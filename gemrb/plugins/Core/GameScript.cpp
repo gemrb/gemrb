@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.15 2003/12/19 14:35:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.16 2003/12/19 23:07:24 balrog994 Exp $
  *
  */
 
@@ -53,16 +53,15 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		memset(triggers, 0, MAX_TRIGGERS*sizeof(TriggerFunction));
 		memset(actions, 0, MAX_ACTIONS*sizeof(ActionFunction));
 		memset(blocking, 0, MAX_ACTIONS*sizeof(bool));
-		triggers[0x400a] = Alignment;
-		triggers[0x400b] = Allegiance;
-		triggers[0x400c] = Class;
-		triggers[0x400d] = Exists;
-		triggers[0x400e] = General;
-
-		triggers[0x400f] = Globals;
-		triggers[0x0036] = OnCreation;
-		triggers[0x4023] = True;
-		triggers[0x4030] = False;
+		triggers[0x0a] = Alignment;
+		triggers[0x0b] = Allegiance;
+		triggers[0x0c] = Class;
+		triggers[0x0d] = Exists;
+		triggers[0x0e] = General;
+		triggers[0x0f] = Globals;
+		triggers[0x23] = True;
+		triggers[0x30] = False;
+		triggers[0x36] = OnCreation;
 
 		actions[7] = CreateCreature;
 		actions[10] = Enemy;
@@ -100,8 +99,10 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		//blocking[203] = true;
 		//please note that IWD and SoA are different from action #231
 		actions[242] = Ally;
-		actions[254] = ScreenShake;
-		blocking[254] = true;
+		if(strcmp(core->GameType, "bg2") == 0) {
+			actions[254] = ScreenShake;
+			blocking[254] = true;
+		}
 		actions[269] = DisplayStringHead;
 		actions[272] = CreateVisualEffect;
 		actions[273] = CreateVisualEffectObject;
@@ -417,6 +418,7 @@ Trigger * GameScript::ReadTrigger(DataStream * stream)
 		sscanf(line, "%d %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB", &tR->triggerID, &tR->int0Parameter, &tR->flags, &tR->int1Parameter, &tR->int2Parameter, &tR->XpointParameter, &tR->YpointParameter, tR->string0Parameter, tR->string1Parameter);
 	else
 		sscanf(line, "%d %d %d %d %d \"%[^\"]\" \"%[^\"]\" OB", &tR->triggerID, &tR->int0Parameter, &tR->flags, &tR->int1Parameter, &tR->int2Parameter, tR->string0Parameter, tR->string1Parameter);
+	tR->triggerID &= 0xFF;
 	stream->ReadLine(line, 1024);
 	tR->objectParameter = DecodeObject(line);
 	stream->ReadLine(line, 1024);
