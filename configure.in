@@ -85,6 +85,7 @@ AM_CONFIG_HEADER(config.h)
 
 AC_OUTPUT(./Makefile
 gemrb/Makefile 
+gemrb/Config/Makefile 
 gemrb/includes/Makefile 
 gemrb/includes/sdl/Makefile 
 gemrb/override/Makefile
