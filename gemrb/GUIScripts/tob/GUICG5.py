@@ -25,7 +25,7 @@ def OnLoad():
 	GemRB.SetEvent(NameWindow, BackButton, IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	GemRB.SetEvent(NameWindow, NameField, IE_GUI_EDIT_ON_CHANGE,"EditChange")
 	GemRB.SetVisible(NameWindow,1)
-	GemRB.SetControlStatus(NameWindow, NameField, IE_GUI_EDIT_FOCUSED)
+	GemRB.SetControlStatus(NameWindow, NameField, IE_GUI_CONTROL_FOCUSED)
 	return
 
 def BackPress():

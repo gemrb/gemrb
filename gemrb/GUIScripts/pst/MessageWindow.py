@@ -74,15 +74,9 @@ def OnIncreaseSize():
 	MessageTA = GemRB.GetVar("MessageTextArea")
 	Expand = GemRB.GetVar("MessageWindowSize")
 	
-	print "OnIncreaseSize()"
-	print "Expand ="
-	print Expand
-	
 	if Expand == 1:
 		return
 		
-	print "Executing"
-	
 	GemRB.HideGUI()
 	
 	if Expand == 0:
@@ -100,6 +94,7 @@ def OnIncreaseSize():
 	GemRB.SetVar("MessageWindowSize", Expand)
 	UpdateResizeButtons()
 	GemRB.UnhideGUI()
+	GemRB.SetControlStatus(MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED);
 	return
 	
 def OnDecreaseSize():
@@ -108,15 +103,9 @@ def OnDecreaseSize():
 	MessageTA = GemRB.GetVar("MessageTextArea")
 	Expand = GemRB.GetVar("MessageWindowSize")
 	
-	print "OnDecreaseSize()"
-	print "Expand ="
-	print Expand
-	
 	if Expand == 0:
 		return
 		
-	print "Executing"
-	
 	GemRB.HideGUI()
 	
 	if Expand == 1:
@@ -134,6 +123,10 @@ def OnDecreaseSize():
 	GemRB.SetVar("MessageWindowSize", Expand)
 	UpdateResizeButtons()
 	GemRB.UnhideGUI()
+	if Expand:
+		GemRB.SetControlStatus(MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED);
+	else:
+		GemRB.SetControlStatus(0,0,IE_GUI_CONTROL_FOCUSED);
 	return
 	
 def UpdateResizeButtons():
@@ -147,7 +140,6 @@ def PopulatePortraitWindow ():
 	size = 6
 	party_size = GemRB.GetPartySize ()
 
-	print "party_size:", party_size
 	for i in range (size):
 		#actor = GemRB.PartyGetActor ()
 		if i < party_size:
