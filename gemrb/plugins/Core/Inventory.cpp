@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.24 2004/07/24 23:07:45 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.25 2004/07/25 09:00:41 avenger_teambg Exp $
  *
  */
 
@@ -400,13 +400,13 @@ int Inventory::DelSlotItem(unsigned int index, bool autoFree)
 void Inventory::dump()
 {
 	printf( "INVENTORY:\n" );
-	for (size_t i = 0; i < Slots.size(); i++) {
+	for (unsigned int i = 0; i < Slots.size(); i++) {
 		CREItem* itm = Slots[i];
 
 		if (!itm) {
 			continue;
 		}
 
-		printf ( "%2ld: %8s   %d (%d %d %d) %x\n", i, itm->ItemResRef, itm->Unknown08, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags );
+		printf ( "%2u: %8.8s   %d (%d %d %d) %x\n", i, itm->ItemResRef, itm->Unknown08, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags );
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.52 2004/07/25 00:11:46 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.53 2004/07/25 09:00:41 avenger_teambg Exp $
  *
  */
 
@@ -391,8 +391,8 @@ void Actor::DebugDump()
 	printf( "PartySlot:  %d\n", InParty );
 	printf( "Allegiance: %d\n",(int) GetStat(IE_EA) );
 	printf( "Visualrange:%d\n", (int) GetStat(IE_VISUALRANGE) );
-	printf( "Mod[IE_EA]: %d\n", Modified[IE_EA]);
-	printf( "Mod[IE_ANIMATION_ID]: 0x%04X\n", Modified[IE_ANIMATION_ID]);
+	printf( "Mod[IE_EA]: %ld\n", Modified[IE_EA]);
+	printf( "Mod[IE_ANIMATION_ID]: 0x%04lX\n", Modified[IE_ANIMATION_ID]);
 	inventory.dump();
 	spellbook.dump();
 }
