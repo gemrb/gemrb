@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.h,v 1.9 2004/10/17 15:38:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.h,v 1.10 2004/10/17 16:39:32 avenger_teambg Exp $
  *
  */
 
@@ -38,11 +38,11 @@
 
 class GEM_EXPORT FileStream : public DataStream {
 private:
-	_FILE* str;
-	unsigned long startpos;
 	bool autoFree;
-	bool opened;
+	unsigned long startpos;
 	unsigned long size;
+	_FILE* str;
+	bool opened;
 public:
 	FileStream(void);
 	~FileStream(void);

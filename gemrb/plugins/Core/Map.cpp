@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.117 2004/10/17 09:50:44 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.118 2004/10/17 16:39:32 avenger_teambg Exp $
  *
  */
 
@@ -1164,7 +1164,7 @@ void Map::AddMapNote(Point point, int color, char *text)
 {
 	MapNote *mn = new MapNote;
 
-//printf("X: %d Y:%d  - %s\n",point.x, point.y, text);
+printf("X: %d Y:%d  - %d %s\n",point.x, point.y, color, text);
 	mn->Pos=point;
 	mn->color=color;
 	mn->text=text;

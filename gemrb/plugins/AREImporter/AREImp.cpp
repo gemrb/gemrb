@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.78 2004/10/17 07:06:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.79 2004/10/17 16:39:33 avenger_teambg Exp $
  *
  */
 
@@ -25,7 +25,7 @@
 #include "../Core/AnimationMgr.h"
 #include "../Core/Interface.h"
 #include "../Core/ActorMgr.h"
-#include "../Core/FileStream.h"
+#include "../Core/CachedFileStream.h"
 #include "../Core/ImageMgr.h"
 #include "../Core/Ambient.h"
 
@@ -541,9 +541,9 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadResRef( Scripts[3] );
 			str->ReadResRef( Scripts[4] );
 			str->ReadResRef( Scripts[5] );
-//			str->Seek( 56, GEM_CURRENT_POS );
 			str->ReadResRef( CreResRef );
 			DataStream* crefile;
+			Actor *ab;
 			ieDword CreOffset, CreSize;
 			str->ReadDword( &CreOffset );
 			str->ReadDword( &CreSize );
@@ -551,18 +551,25 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadResRef( Scripts[6] );
 			str->Seek( 120, GEM_CURRENT_POS );
 			if (CreOffset != 0) {
+				/*
 				char cpath[_MAX_PATH];
 				strcpy( cpath, core->GamePath );
 				strcat( cpath, str->filename );
 				_FILE* str = _fopen( cpath, "rb" );
 				FileStream* fs = new FileStream();
-				fs->Open( str, CreOffset, CreSize, true );
-				crefile = fs;
+				fs->Open( str, CreOffset, CreSize, false );
+				*/
+				CachedFileStream *fs = new CachedFileStream( (CachedFileStream *) str, CreOffset, CreSize, false);
+				crefile = (DataStream *) fs;
 			} else {
 				crefile = core->GetResourceMgr()->GetResource( CreResRef, IE_CRE_CLASS_ID );
 			}
-			actmgr->Open( crefile, true );
-			Actor* ab = actmgr->GetActor();
+			if(!actmgr->Open( crefile, true )) {
+				printf("Couldn't read actor!\n");
+				abort();
+				continue;
+			}
+			ab = actmgr->GetActor();
 			if(!ab)
 				continue;
 			ab->area = map;
@@ -710,12 +717,12 @@ Map* AREImp::GetMap(const char *ResRef)
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 	if (pst && !NoteCount) {
-		color = 0; //all pst notes are the same
 		if( !INInote ) {
 			ReadAutonoteINI();
 		}
 		//add autonote.ini entries
 		if( INInote ) {
+			color = 1; //read only note
 			int count = INInote->GetKeyAsInt( map->scriptName, "count", 0);
 			while (count) {
 				char key[32];
@@ -742,7 +749,6 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadDword(&py);
 			point.x=px;
 			point.y=py;
-			color=0;
 			text = (char *) malloc( 500 );
 			str->Read(text, 500 );
 			text[499] = 0;
