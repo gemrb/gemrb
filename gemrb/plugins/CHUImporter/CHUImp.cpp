@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.43 2005/03/05 15:28:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.44 2005/03/18 19:29:17 avenger_teambg Exp $
  *
  */
 
@@ -224,14 +224,22 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				pbar->Width = Width;
 				pbar->Height = Height;
 				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
+
+				Sprite2D* img = NULL;
+				Sprite2D* img2 = NULL;
+				DataStream *s;
 				ImageMgr* mos = ( ImageMgr* )
 					core->GetInterface( IE_MOS_CLASS_ID );
-				DataStream* s = core->GetResourceMgr()->GetResource( MOSFile, IE_MOS_CLASS_ID );
-				mos->Open( s, true );
-				Sprite2D* img = mos->GetImage();
-				s = core->GetResourceMgr()->GetResource( MOSFile2, IE_MOS_CLASS_ID );
-				mos->Open( s, true );
-				Sprite2D* img2 = mos->GetImage();
+				if ( MOSFile[0] ) {
+					s = core->GetResourceMgr()->GetResource( MOSFile, IE_MOS_CLASS_ID );
+					mos->Open( s, true );
+					img = mos->GetImage();
+				}
+				if ( MOSFile2[0] ) {
+					s = core->GetResourceMgr()->GetResource( MOSFile2, IE_MOS_CLASS_ID );
+					mos->Open( s, true );
+					img2 = mos->GetImage();
+				}
 				
 				pbar->SetImage( img, img2 );
 				if( KnobStepsCount ) {
