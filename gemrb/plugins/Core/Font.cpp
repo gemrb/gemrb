@@ -250,19 +250,24 @@ void Font::SetupString(char * string, int width)
 	int len = strlen(string);
 	int lastpos = 0;
 	int x = 0, wx = 0;
+	bool endword = false;
 	for(int pos = 0; pos < len; pos++) {
 		if(x+wx > width) {
+			if(!endword && (x == 0))
+				lastpos = pos;
 			string[lastpos] = 0;
 			x = 0;
 		}
-		if(string[pos] == -1) {
+		if(string[pos] == 0) {
 			continue;
 		}
+		endword = false;
 		if(string[pos] == '\n') {
 			string[pos] = 0;
 			x = 0;
 			wx = 0;
 			lastpos = pos;
+			endword = true;
 			continue;
 		}
 		wx += size[(unsigned char)string[pos]-1].w;//chars[((unsigned char)string[pos])-1]->Width;
@@ -270,6 +275,7 @@ void Font::SetupString(char * string, int width)
 			x+=wx;
 			wx = 0;
 			lastpos = pos;
+			endword = true;
 		}
 	}
 }
