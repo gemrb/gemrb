@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.235 2004/11/13 15:56:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.236 2004/11/14 00:38:04 avenger_teambg Exp $
  *
  */
 
@@ -2547,7 +2547,7 @@ bool Interface::ReadItemTable(ieResRef TableName, const char * Prefix)
 		}
 		ItemName[8]=0;
 		strupr(ItemName);
-		printf("Adding random item: %s ItemPointer:%d\n",ItemName,(int) itemlist);
+		printf("Adding random item: %s\n",ItemName);
 		RtRows->SetAt(ItemName, (const char *) itemlist);
 	}
 end:
@@ -2583,6 +2583,7 @@ bool Interface::ReadRandomItems()
 	}
 	strncpy( GoldResRef, tab->QueryField((unsigned int) 0,(unsigned int) 0), sizeof(ieResRef) ); //gold
 	if( GoldResRef[0]=='*' ) {
+		DelTable( table );
 		return false;
 	}
 	strncpy( RtResRef, tab->QueryField( 1, difflev ), sizeof(ieResRef) );
