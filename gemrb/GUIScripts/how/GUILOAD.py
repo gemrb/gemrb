@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUILOAD.py,v 1.6 2004/09/21 00:20:46 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUILOAD.py,v 1.7 2004/10/15 20:38:54 avenger_teambg Exp $
 
 
 # GUILOAD.py - Load window
@@ -62,8 +62,8 @@ def OnLoad():
 		GemRB.SetButtonFlags(LoadWindow, Button, IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 		#PC portraits
-		for j in range(0,6):
-			Button = GemRB.GetControl(LoadWindow,40+i*6+j)
+		for j in range(0,PARTY_SIZE):
+			Button = GemRB.GetControl(LoadWindow,40+i*PARTY_SIZE+j)
 			GemRB.SetButtonState (LoadWindow, Button, IE_GUI_BUTTON_LOCKED)
 			GemRB.SetButtonFlags(LoadWindow, Button, IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
@@ -109,8 +109,8 @@ def ScrollBarPress():
 			GemRB.SetSaveGamePreview(LoadWindow, Button, ActPos)
 		else:
 			GemRB.SetButtonPicture(LoadWindow, Button, "")
-		for j in range(0,6):
-			Button=GemRB.GetControl(LoadWindow, 40 + i*6 + j)
+		for j in range(0,PARTY_SIZE):
+			Button=GemRB.GetControl(LoadWindow, 40+i*PARTY_SIZE+j)
 			if ActPos<GameCount:
 				GemRB.SetSaveGamePortrait(LoadWindow, Button, ActPos,j)
 			else:

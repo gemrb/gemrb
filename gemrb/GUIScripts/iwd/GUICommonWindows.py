@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.2 2004/09/26 13:14:48 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.3 2004/10/15 20:38:55 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -116,6 +116,10 @@ def SetupMenuWindowControls (Window):
 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
 	return
 
+def ReturnToGame ():
+	print "ReturnToGame"
+	CloseOtherWindow (None)
+
 def AIPress ():
 	print "AIPress"
 
@@ -149,10 +153,10 @@ def GetActorClassTitle (actor):
 	KitTable = GemRB.LoadTable ("kitlist")
 
 	if ClassTitle==0:
-	        if KitIndex == 0:
-	                ClassTitle=GemRB.GetTableValue(ClassTable, Class, 2)
-	        else:
-	                ClassTitle=GemRB.GetTableValue(KitTable, KitIndex, 2)
+		if KitIndex == 0:
+			ClassTitle=GemRB.GetTableValue(ClassTable, Class, 2)
+		else:
+			ClassTitle=GemRB.GetTableValue(KitTable, KitIndex, 2)
 
 	GemRB.UnloadTable (ClassTable)
 	GemRB.UnloadTable (KitTable)
@@ -298,37 +302,37 @@ def GetSavingThrow (SaveName, row, level):
 	return tmp
 
 def SetupSavingThrows (pc):
-        level1 = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
-        if level1 > 20:
-                level1 = 20
-        level2 = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
-        if level2 > 20:
-                level2 = 20
-        Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-        ClassTable = GemRB.LoadTable ("classes")
-        Class = GemRB.FindTableValue (ClassTable, 5, Class)
-        Multi = GemRB.GetTableValue (ClassTable, 4, Class)
-        if Multi:
-                if Class == 7:
-                        #fighter/mage
-                        Class = GemRB.FindTableValue (ClassTable, 5, 1)
-                else:
-                        #fighter/thief
-                        Class = GemRB.FindTableValue (ClassTable, 5, 4)
-                SaveName2 = GemRB.GetTableValue (ClassTable, Class, 3)
-                Class = 0  #fighter
-                print "SaveName2", SaveName2
+	level1 = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
+	if level1 > 20:
+		level1 = 20
+	level2 = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
+	if level2 > 20:
+		level2 = 20
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	Class = GemRB.FindTableValue (ClassTable, 5, Class)
+	Multi = GemRB.GetTableValue (ClassTable, 4, Class)
+	if Multi:
+		if Class == 7:
+			#fighter/mage
+			Class = GemRB.FindTableValue (ClassTable, 5, 1)
+		else:
+			#fighter/thief
+			Class = GemRB.FindTableValue (ClassTable, 5, 4)
+		SaveName2 = GemRB.GetTableValue (ClassTable, Class, 3)
+		Class = 0  #fighter
+		print "SaveName2", SaveName2
 
-        SaveName1 = GemRB.GetTableValue (ClassTable, Class, 3)
-        print "SaveName1", SaveName1
+	SaveName1 = GemRB.GetTableValue (ClassTable, Class, 3)
+	print "SaveName1", SaveName1
 
-        for row in range(5):
-                tmp1 = GetSavingThrow (SaveName1, row, level1)
-                if Multi:
-                        tmp2 = GetSavingThrow (SaveName2, row, level2)
-                        if tmp2<tmp1:
-                                tmp1=tmp2
-                GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
-                print "Savingthrow:", tmp1
-        return
+	for row in range(5):
+		tmp1 = GetSavingThrow (SaveName1, row, level1)
+		if Multi:
+			tmp2 = GetSavingThrow (SaveName2, row, level2)
+			if tmp2<tmp1:
+				tmp1=tmp2
+		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
+		print "Savingthrow:", tmp1
+	return
 
