@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.8 2003/12/19 20:58:56 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.9 2004/01/25 18:13:47 edheldil Exp $
  *
  */
 
@@ -83,6 +83,19 @@ char * FindInDir(char * Dir, char * Filename)
         DIR * dir = opendir(Dir);
         if(dir == NULL)
                 return NULL;
+
+	// First test if there's a Filename with exactly same name
+	//   and if yes, return it and do not search in the Dir
+	char TempFilePath[_MAX_PATH];
+	strcpy (TempFilePath, Dir);
+	strcat (TempFilePath, SPathDelimiter);
+	strcat (TempFilePath, Filename);
+
+	if (! access (TempFilePath, F_OK))
+	        return strdup (Filename);
+
+	// Exact match not found, so try to search for Filename
+	//    with different case
         struct dirent * de = readdir(dir);
         if(de == NULL)
                 return NULL;
