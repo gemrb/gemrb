@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.69 2004/01/19 18:46:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.70 2004/01/19 21:24:02 avenger_teambg Exp $
  *
  */
 
@@ -638,7 +638,7 @@ void PathFinder::SetupNode(unsigned int x,unsigned int y, unsigned int Cost)
 	pos=y*Width+x;
 	if(MapSet[pos])
 		return;
-        if(!Passable[sMap->GetPixelIndex(x,y)])
+        if(!(Passable[sMap->GetPixelIndex(x,y)]&3) )
 	{
 		MapSet[pos]=65535;
                 return;
@@ -661,14 +661,14 @@ void PathFinder::AdjustPosition(unsigned int &goalX, unsigned int &goalY)
 
 		for(unsigned int scanx=minx;scanx<maxx;scanx++) {
 			if(goalY>=radius ) {
-		        	if(Passable[sMap->GetPixelIndex(scanx,goalY-radius)]) {
+		        	if(Passable[sMap->GetPixelIndex(scanx,goalY-radius)]&3) {
 					goalX=scanx;
 					goalY-=radius;
 				        return;
 				}
 		        }
 			if(goalY+radius<Height) {
-		        	if(Passable[sMap->GetPixelIndex(scanx,goalY+radius)]) {
+		        	if(Passable[sMap->GetPixelIndex(scanx,goalY+radius)]&3) {
 					goalX=scanx;
 					goalY+=radius;
 				        return;
@@ -681,14 +681,14 @@ void PathFinder::AdjustPosition(unsigned int &goalX, unsigned int &goalY)
 		if(maxy>Height) maxy=Height;
 		for(unsigned int scany=miny;scany<maxy;scany++) {
 		      if(goalX>=radius) {
-		        	if(Passable[sMap->GetPixelIndex(goalX-radius,scany)]) {
+		        	if(Passable[sMap->GetPixelIndex(goalX-radius,scany)]&3) {
 					goalX-=radius;
 					goalY=scany;
 					return;
 				}
 			}
 			if(goalX+radius<Width) {
-		        	if(Passable[sMap->GetPixelIndex(goalX-radius,scany)]) {
+		        	if(Passable[sMap->GetPixelIndex(goalX-radius,scany)]&3) {
 					goalX+=radius;
 					goalY=scany;
 					return;
