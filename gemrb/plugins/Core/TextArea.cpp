@@ -100,6 +100,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
   			pal = palette;
   		ftext->Print(Region(x+XPos, y+YPos+(yl*ftext->chars[1]->Height), Width, Height-(yl*ftext->chars[1]->Height)), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true);
   	}
+	}
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
     to this Text Area Control. */
