@@ -1,6 +1,29 @@
 #ifndef IE_STATS_H
 #define IE_STATS_H
 
+//EA values
+#define INANIMATE               1
+#define PC                      2
+#define FAMILIAR                3
+#define ALLY                    4
+#define CONTROLLED              5
+#define CHARMED                 6
+#define GOODBUTRED              28
+#define GOODBUTBLUE             29
+#define GOODCUTOFF              30
+#define NOTGOOD                 31
+#define ANYTHING                126
+#define NEUTRAL                 128
+#define NOTEVIL                 199
+#define EVILCUTOFF              200
+#define EVILBUTGREEN    201
+#define EVILBUTBLUE             202
+#define ENEMY                   255
+
+//state bits (IE_STATE)
+#define STATE_DEAD  2048
+
+//stats
 #define IE_HITPOINTS 0
 #define IE_MAXHITPOINTS	1
 #define IE_ARMORCLASS	2
@@ -197,5 +220,6 @@
 #define IE_MC_FLAGS		215
 #define IE_TALKCOUNT		216
 #define IE_ALIGNMENT		217
+#define IE_UNSELECTABLE		218
 
 #endif
