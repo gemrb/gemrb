@@ -96,7 +96,7 @@ bool KeyImp::LoadResFile(const char * resfile)
 
 DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 {
-	char path[_MAX_PATH], filename[_MAX_PATH];
+	char path[_MAX_PATH], filename[_MAX_PATH] = {0};
 	//Search it in the GemRB override Directory
 	strcpy(path, core->GemRBPath);
 	strcat(path, "override");
@@ -130,8 +130,8 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 		return fs;
 	}
 	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
-        unsigned long ResLocator;
-	if(resources.Lookup(resname,type,ResLocator) ) {                , filename[_MAX_PATH]
+	unsigned long ResLocator;
+	if(resources.Lookup(resname,type,ResLocator) ) {
 		if(!core->IsAvailable(IE_BIF_CLASS_ID)) {
 			printf("[ERROR]\nAn Archive Plug-in is not Available\n");
 			return NULL;
@@ -197,7 +197,7 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		return core->GetFactory()->GetFactoryObject(fobjindex);
 	}
 	printf("[KEYImporter]: No Factory Object Found, Loading...\n");
-	char path[_MAX_PATH], filename[_MAX_PATH];
+	char path[_MAX_PATH], filename[_MAX_PATH] = {0};
 	//Search it in the GemRB override Directory
 	strcpy(path, core->GemRBPath);
 	strcat(path, "override");
