@@ -155,15 +155,6 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 		else {
 			Pos = aftst;
 		}
-		/*
-		unsigned short mx = KnobXPos, Mx = mx + (KnobStep*KnobStepsCount);
-		if(x < mx)
-			return;
-		if(((x-mx) % KnobStep) <= ((KnobStep/2)-1)) {
-			Pos = (x-mx)/KnobStep;
-			if(Pos >= KnobStepsCount)
-				Pos = KnobStepsCount-1;
-		}*/
 	}
 }
 /** Mouse Button Up */
@@ -193,14 +184,5 @@ void Slider::OnMouseOver(unsigned short x, unsigned short y)
 		else {
 			Pos = aftst;
 		}
-		/*
-		unsigned short mx = KnobXPos, Mx = mx + (KnobStep*KnobStepsCount);
-		if(x < mx)
-			return;
-		if(((x-mx) % KnobStep) <= ((KnobStep/2)-1)) {
-			Pos = (x-mx)/KnobStep;
-			if(Pos >= KnobStepsCount)
-				Pos = KnobStepsCount-1;
-		}*/
 	}
 }
