@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.38 2004/10/16 14:26:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.39 2005/03/04 23:27:39 avenger_teambg Exp $
  *
  */
 
@@ -63,19 +63,6 @@ Font::~Font(void)
 	Video *video = core->GetVideoDriver();
 	video->FreePalette( palette );
 	video->FreeSprite( sprBuffer );
-	/*
-	Since we assume that the font was loaded from a factory Object,
-	we don't need to free the sprites, those will be freed directly
-	by the Factory Object destructor.
-	*/
-	/*
-	std::vector<Sprite2D*>::iterator m;
-	for(; chars.size() != 0; ) {
-	m = chars.begin();
-		video->FreeSprite((*m));
-		chars.erase(m);
-	}
-	*/
 }
 
 void Font::AddChar(void* spr, int w, int h, short xPos, short yPos)
@@ -109,8 +96,8 @@ void Font::AddChar(void* spr, int w, int h, short xPos, short yPos)
 }
 
 void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
-	Color* hicolor, unsigned char Alignment, bool anchor, Font* initials,
-	Color* initcolor, Sprite2D* cursor, unsigned int curpos)
+	Color* hicolor, unsigned char Alignment, Font* initials,
+	Sprite2D* cursor, unsigned int curpos)
 {
 	unsigned int psx = PARAGRAPH_START_X;
 	Color *pal = hicolor;
@@ -218,20 +205,17 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
 		}
 		unsigned char currChar = ( unsigned char ) tmp[i] - 1;
 		if (initials) {
-			x = initials->PrintInitial( x, y, rgn, currChar,
-				initcolor, anchor );
+			x = initials->PrintInitial( x, y, rgn, currChar );
 			initials = NULL;
 			continue;
 		}
-		x += xPos[currChar];
 		video->BlitSpriteRegion( sprBuffer, size[currChar],
-			x + rgn.x - xPos[currChar], y + rgn.y - yPos[currChar],
-			true, &rgn );
+			x + rgn.x, y + rgn.y - yPos[currChar], true, &rgn );
 		if (cursor && ( i == curpos )) {
-			video->BlitSprite( cursor, x - xPos[currChar] + rgn.x,
+			video->BlitSprite( cursor, x + rgn.x,
 				y + rgn.y, true, &rgn );
 		}
-		x += size[currChar].w - xPos[currChar];
+		x += size[currChar].w;
 	}
 	if (cursor && ( curpos == len )) {
 		video->BlitSprite( cursor, x - xPos[tmp[len] - 1] + rgn.x,
@@ -242,7 +226,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
 
 void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
 	unsigned char Alignment, bool anchor, Font* initials,
-	Color* initcolor, Sprite2D* cursor, unsigned int curpos)
+	Sprite2D* cursor, unsigned int curpos)
 {
 	unsigned int psx = PARAGRAPH_START_X;
 	Color* pal = hicolor;
@@ -344,18 +328,16 @@ void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
 		}
 		unsigned char currChar = ( unsigned char ) tmp[i] - 1;
 		if (initials) {
-			x = initials->PrintInitial( x, y, rgn, currChar,
-				initcolor, anchor );
+			x = initials->PrintInitial( x, y, rgn, currChar );
 			initials = NULL;
 			continue;
 		}
-		x += xPos[currChar];
 		video->BlitSpriteRegion( sprBuffer, size[currChar],
-			x + rgn.x - xPos[currChar], y + rgn.y - yPos[currChar],
+			x + rgn.x, y + rgn.y - yPos[currChar],
 			anchor, &rgn );
 		if (cursor && ( curpos == i ))
-			video->BlitSprite( cursor, x - xPos[currChar] + rgn.x, y + rgn.y, anchor, &rgn );
-		x += size[currChar].w - xPos[currChar];
+			video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &rgn );
+		x += size[currChar].w;
 	}
 	if (cursor && ( curpos == len )) {
 		video->BlitSprite( cursor, x - xPos[tmp[len] - 1] + rgn.x, y + rgn.y, anchor, &rgn );
@@ -363,18 +345,13 @@ void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
 	free( tmp );
 }
 
-int Font::PrintInitial(int x, int y, Region rgn, unsigned char currChar,
-	Color *ipal, bool anchor)
+int Font::PrintInitial(int x, int y, Region &rgn, unsigned char currChar)
 {
 	Video *video = core->GetVideoDriver();
-	if (!ipal)
-		ipal = palette;
-	video->SetPalette( sprBuffer, ipal );
-	x += xPos[currChar];
+	//video->SetPalette( sprBuffer, palette );
 	video->BlitSpriteRegion( sprBuffer, size[currChar],
-		x + rgn.x - xPos[currChar], y + rgn.y - yPos[currChar],
-		anchor, &rgn );
-	x += size[currChar].w - xPos[currChar];
+		x + rgn.x, y + rgn.y - yPos[currChar], true, &rgn );
+	x += size[currChar].w;
 	return x;
 }
 
@@ -395,7 +372,7 @@ int Font::CalcStringWidth(char* string)
 			}
 			continue;
 		}
-		ret += size[( unsigned char ) string[i] - 1].w;//chars[(unsigned char)string[i]-1]->Width;
+		ret += size[( unsigned char ) string[i] - 1].w;
 	}
 	return ( int ) ret;
 }
@@ -452,7 +429,7 @@ void Font::SetupString(char* string, unsigned int width)
 		if (string[pos] && string[pos] != ' ') 
 			string[pos] -= FirstChar;
 
-		wx += size[( unsigned char ) string[pos] - 1].w;//chars[((unsigned char)string[pos])-1]->Width;
+		wx += size[( unsigned char ) string[pos] - 1].w;
 		if (( string[pos] == ' ' ) || ( string[pos] == '-' )) {
 			x += wx;
 			wx = 0;

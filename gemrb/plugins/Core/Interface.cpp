@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.269 2005/03/03 22:33:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.270 2005/03/04 23:27:39 avenger_teambg Exp $
  *
  */
 
@@ -476,7 +476,7 @@ int Interface::Init()
 			if (needpalette) {
 				Color fore = {0xff, 0xff, 0xff, 0x00};
 				Color back = {0x00, 0x00, 0x00, 0x00};
-				if (!strncmp( TooltipFont, ResRef, 8) ) {
+				if (!strnicmp( TooltipFont, ResRef, 8) ) {
 					fore = TooltipColor;
 				}
 				Color* pal = video->CreatePalette( fore, back );
@@ -1337,7 +1337,7 @@ Font* Interface::GetFont(char* ResRef)
 {
 	//printf("Searching Font %.8s...", ResRef);
 	for (unsigned int i = 0; i < fonts.size(); i++) {
-		if (strncmp( fonts[i]->ResRef, ResRef, 8 ) == 0) {
+		if (strnicmp( fonts[i]->ResRef, ResRef, 8 ) == 0) {
 			return fonts[i];
 		}
 	}

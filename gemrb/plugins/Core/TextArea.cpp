@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.66 2005/02/22 21:16:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.67 2005/03/04 23:27:39 avenger_teambg Exp $
  *
  */
 
@@ -121,8 +121,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		ftext->PrintFromLine( startrow,
 			Region( x + XPos, y + YPos, Width, Height - 5 ),
 			( unsigned char * ) Buffer, palette,
-			IE_FONT_ALIGN_LEFT, true, 
-			finit, initpalette );
+			IE_FONT_ALIGN_LEFT, finit, NULL );
 		free( Buffer );
 	} else {
 		int rc = 0;
@@ -144,8 +143,8 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 				pal = palette;
 			ftext->PrintFromLine( sr,
 				Region( x + XPos, y + YPos, Width, Height - 5 ),
-				( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT,
-				true, finit, initpalette );
+				( unsigned char * ) lines[i], pal,
+				IE_FONT_ALIGN_LEFT, finit, NULL );
 			yl = lrows[i] - sr;
 			break;
 		}
@@ -264,7 +263,6 @@ int TextArea::AppendText(const char* text, int pos)
 			pos = rows - ( ( Height - 5 ) / ftext->maxHeight );
 		else
 			pos = 0;
-		//pos=lines.size()-((Height-5)/ftext->maxHeight);
 		if (pos < 0)
 			pos = 0;
 		bar->SetPos( pos );
@@ -433,7 +431,7 @@ void TextArea::CalcRowCount()
 /** Mouse Over Event */
 void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
-	int height = ftext->size[1].h;//ftext->chars[1]->Height;
+	int height = ftext->size[1].h;
 	int r = y / height;
 	int row = 0;
 

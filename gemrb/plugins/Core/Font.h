@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.20 2005/02/24 16:45:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.21 2005/03/04 23:27:39 avenger_teambg Exp $
  *
  */
 
@@ -57,37 +57,38 @@ typedef struct StringList {
 
 class GEM_EXPORT Font {
 private:
-	//std::vector<Sprite2D*> chars;
 	int count;
 	Color* palette;
 	Sprite2D* sprBuffer;
 	unsigned char FirstChar;
+
+	short xPos[256];
+	short yPos[256];
+public:
+	ieResRef ResRef;
+	int maxHeight;
+	Region size[256];
 public:
 	Font(int w, int h, void* palette, bool cK, int index);
 	~Font(void);
 	void AddChar(void* spr, int w, int h, short xPos, short yPos);
 	void Print(Region rgn, unsigned char* string, Color* color,
 		unsigned char Alignment, bool anchor = false,
-		Font* initials = NULL, Color* initcolor = NULL,
-		Sprite2D* cursor = NULL, unsigned int curpos = 0);
+		Font* initials = NULL, Sprite2D* cursor = NULL,
+		unsigned int curpos = 0);
 	void PrintFromLine(int startrow, Region rgn, unsigned char* string,
-		Color* color, unsigned char Alignment, bool anchor = false,
-		Font* initials = NULL, Color* initcolor = NULL,
-		Sprite2D* cursor = NULL, unsigned int curpos = 0);
-	int PrintInitial(int x, int y, Region rgn, unsigned char currChar,
-		Color *ipal=NULL, bool anchor = false);
+		Color* color, unsigned char Alignment,
+		Font* initials = NULL, Sprite2D* cursor = NULL,
+		unsigned int curpos = 0);
 	void* GetPalette();
-	ieResRef ResRef;
-	Region size[256];
-	short xPos[256];
-	short yPos[256];
-	int maxHeight;
 	int CalcStringWidth(char* string);
 public:
 	void SetupString(char* string, unsigned int width);
 	// Sets ASCII code of the first character in the font
 	//  (it allows remapping numeric fonts from \000 to '0')
 	void SetFirstChar(unsigned char first);
+private:
+	int PrintInitial(int x, int y, Region &rgn, unsigned char currChar);
 };
 
 #endif

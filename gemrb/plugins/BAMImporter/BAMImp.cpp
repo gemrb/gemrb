@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.35 2004/12/14 22:37:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.36 2005/03/04 23:27:37 avenger_teambg Exp $
  *
  */
 
@@ -268,16 +268,15 @@ void* BAMImp::GetFramePixels(unsigned short findex)
 	return pixels;
 }
 
-AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
-	unsigned char mode)
+ieWord * BAMImp::CacheFLT(unsigned int &count)
 {
-	unsigned int i;
+	int i;
 
-	AnimationFactory* af = new AnimationFactory( ResRef );
-	int count = 0;
+	count = 0;
 	for (i = 0; i < CyclesCount; i++) {
-		if (cycles[i].FirstFrame + cycles[i].FramesCount > count) {
-			count = cycles[i].FirstFrame + cycles[i].FramesCount;
+		unsigned int tmp = cycles[i].FirstFrame + cycles[i].FramesCount;
+		if (tmp > count) {
+			count = tmp;
 		}
 	}
 	ieWord * FLT = ( ieWord * ) calloc( count, sizeof(ieWord) );
@@ -287,6 +286,17 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 		//msvc likes it as char *
 		swab( (char*) FLT, (char*) FLT, count * sizeof(ieWord) );
 	}
+	return FLT;
+}
+
+AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
+	unsigned char mode)
+{
+	unsigned int i;
+	unsigned int count;
+
+	AnimationFactory* af = new AnimationFactory( ResRef );
+	ieWord *FLT = CacheFLT(count);
 	std::vector< unsigned short> indices;
 	for (i = 0; i < CyclesCount; i++) {
 		unsigned int ff = cycles[i].FirstFrame,
@@ -322,6 +332,8 @@ Font* BAMImp::GetFont()
 	int w = 0, h = 0;
 	unsigned int Count;
 
+	ieWord *FLT = CacheFLT(Count);
+
 	// Numeric fonts have all frames in single cycle
 	if (CyclesCount > 1) {
 		Count = CyclesCount;
@@ -332,24 +344,27 @@ Font* BAMImp::GetFont()
 	for (i = 0; i < Count; i++) {
 		unsigned int index;
 		if (CyclesCount > 1) {
-			index = cycles[i].FirstFrame;
+			index = FLT[cycles[i].FirstFrame];
 			if (index >= FramesCount)
 				continue;
 		} else {
 			index = i;
 		}
 
+/* probably it is enough to add up the widths, no need to get the largest and multiply with count
 		if (frames[index].Width > w)
 			w = frames[index].Width;
+*/
+		w = w + frames[index].Width;
 		if (frames[index].Height > h)
 			h = frames[index].Height;
 	}
 
-	Font* fnt = new Font( w*( int ) Count, h, Palette, true, 0 );
+	Font* fnt = new Font( w, h, Palette, true, 0 );
 	for (i = 0; i < Count; i++) {
 		unsigned int index;
 		if (CyclesCount > 1) {
-			index = cycles[i].FirstFrame;
+			index = FLT[cycles[i].FirstFrame];
 			if (index >= FramesCount) {
 				fnt->AddChar( NULL, 0, 0, 0, 0 );
 				continue;
@@ -369,6 +384,7 @@ Font* BAMImp::GetFont()
 				frames[index].YPos );
 		free( pixels );
 	}
+	free( FLT );
 	return fnt;
 }
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
