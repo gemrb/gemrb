@@ -1,35 +1,35 @@
 2DA V1.0
 -1
-              GENDER
-AJANTIS       1
-CORAN         1
-EDWIN         1
-ELDOTH        1
-GARRICK       1
-GENDWRF       1
-GENMELF       1
-GENMHLF       1
-KAGAIN        1
-KHALID        1
-KIVAN         1
-MAN1          1
-MAN2          1
-MINSC         1
-MONTAR        1
-QUAYLE        1
-TIAX          1
-XAN           1
-XZAR          1
-YESLICK       1
-ALORA         2
-BRANWE        2
-DYNAHEI       2
-FALDORN       2
-IMOEN         2
-JAHEIRA       2
-SAFANA        2
-SHARTEL       2
-SKIE          2
-VICONIA       2
-WOMAN1        2
-WOMAN2        2
+           GENDER     HAIR       SKIN       MAJOR      MINOR      
+AJANTIS    1          0          16         52         54         
+CORAN      1          0          16         52         54         
+EDWIN      1          0          16         52         54         
+ELDOTH     1          0          16         52         54         
+GARRICK    1          0          16         52         54         
+GENDWRF    1          0          16         52         54         
+GENMELF    1          0          16         52         54         
+GENMHLF    1          0          16         52         54         
+KAGAIN     1          0          16         52         54         
+KHALID     1          0          16         52         54         
+KIVAN      1          0          16         52         54         
+MAN1       1          0          16         52         54         
+MAN2       1          0          16         52         54         
+MINSC      1          0          16         52         54         
+MONTAR     1          0          16         52         54         
+QUAYLE     1          0          16         52         54         
+TIAX       1          0          16         52         54         
+XAN        1          0          16         52         54         
+XZAR       1          0          16         52         54         
+YESLICK    1          0          16         52         54         
+ALORA      2          0          16         46         47         
+BRANWE     2          0          16         46         47         
+DYNAHEI    2          0          16         46         47         
+FALDORN    2          0          16         46         47         
+IMOEN      2          0          16         46         47         
+JAHEIRA    2          0          16         46         47         
+SAFANA     2          0          16         46         47         
+SHARTEL    2          0          16         46         47         
+SKIE       2          0          16         46         47         
+VICONIA    2          0          16         46         47         
+WOMAN1     2          0          16         46         47         
+WOMAN2     2          0          16         46         47         
