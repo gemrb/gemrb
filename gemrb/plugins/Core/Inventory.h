@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.3 2004/04/03 17:10:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.4 2004/04/07 20:12:31 avenger_teambg Exp $
  *
  */
 
@@ -91,6 +91,7 @@ public:
 	** can go in and part can't. Maybe return number instead? or CRE?*/
 	int AddSlotItem(CREItem* item, int slot, CREItem** res_item);
 
+	void DestroyItem(const char *resref, int flags);
 	void SetSlotItem(CREItem* item, int slot);
 
 	/** returns weight of whole inventory, i.e. encumbrance? */

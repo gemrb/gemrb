@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.4 2004/04/04 20:22:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.5 2004/04/07 20:12:31 avenger_teambg Exp $
  *
  */
 
@@ -93,6 +93,30 @@ bool Inventory::HasItem(const char *resref, int flags)
 		}
 	}
 	return false;
+}
+
+/** if resref is NULL, then destroy ALL items */
+/** if flags == 1 then destroy only destructable items */
+void Inventory::DestroyItem(const char *resref, int flags)
+{
+	int slot = slots.size();
+	while(slot--) {
+		CREItem *item = slots[slot];
+		if(!item) {
+			continue;
+		}
+		if(flags&1) {
+			//IsDestructible(item->ItemResRef);
+		}
+		if(resref && strnicmp(item->ItemResRef, resref, 8) ) {
+			continue;
+		}
+		//we need to acknowledge that the item was destroyed
+		//use unequip stuff, decrease encumbrance etc,
+		//until that, we simply erase it
+		delete item;
+		slots[slot] = NULL;
+	}
 }
 
 void Inventory::SetSlotItem(CREItem* item, int slot)

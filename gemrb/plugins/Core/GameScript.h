@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.94 2004/04/07 19:27:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.95 2004/04/07 20:12:31 avenger_teambg Exp $
  *
  */
 
@@ -763,6 +763,7 @@ public: //Script Functions
 	static int General(Scriptable* Sender, Trigger* parameters);
 	static int Global(Scriptable* Sender, Trigger* parameters);
 	static int GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
+	static int GlobalBAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int GlobalGT(Scriptable* Sender, Trigger* parameters);
 	static int GlobalGTGlobal(Scriptable* Sender, Trigger* parameters);
@@ -907,6 +908,9 @@ public:
 	static void CutSceneID(Scriptable* Sender, Action* parameters);
 	static void Deactivate(Scriptable* Sender, Action* parameters);
 	static void Debug(Scriptable* Sender, Action* parameters);
+	static void DestroyAllDestructableEquipment(Scriptable* Sender, Action* parameters);
+	static void DestroyAllEquipment(Scriptable* Sender, Action* parameters);
+	static void DestroyItem(Scriptable* Sender, Action* parameters);
 	static void DestroyPartyGold(Scriptable* Sender, Action* parameters);
 	static void DestroySelf(Scriptable* Sender, Action* parameters);
 	static void Dialogue(Scriptable* Sender, Action* parameters);

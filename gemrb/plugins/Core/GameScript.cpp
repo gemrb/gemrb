@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.131 2004/04/07 19:27:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.132 2004/04/07 20:12:31 avenger_teambg Exp $
  *
  */
 
@@ -87,6 +87,8 @@ static TriggerLink triggernames[] = {
 	{"general", GameScript::General,0},
 	{"global", GameScript::Global,TF_MERGESTRINGS},
 	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger,TF_MERGESTRINGS},
+	{"globalband",GameScript::BitCheck,AF_MERGESTRINGS},
+	{"globalbandglobal",GameScript::GlobalBAndGlobal_Trigger,AF_MERGESTRINGS},
 	{"globalbitglobal",GameScript::GlobalBitGlobal_Trigger,TF_MERGESTRINGS},
 	{"globalequalsglobal", GameScript::GlobalsEqual,TF_MERGESTRINGS}, //this is the same
 	{"globalgt", GameScript::GlobalGT,TF_MERGESTRINGS},
@@ -234,6 +236,9 @@ static ActionLink actionnames[] = {
 	{"cutsceneid",GameScript::CutSceneID,AF_INSTANT},
 	{"deactivate",GameScript::Deactivate,0},
 	{"debug",GameScript::Debug,0},
+	{"destroyalldestructableequipment", GameScript::DestroyAllDestructableEquipment,0},
+	{"destroyallequipment", GameScript::DestroyAllEquipment,0},
+	{"destroyitem", GameScript::DestroyItem,0},
 	{"destroypartygold",GameScript::DestroyPartyGold,0},
 	{"destroyself",GameScript::DestroySelf,0},
 	{"dialogue",GameScript::Dialogue,AF_BLOCKING},
@@ -346,6 +351,7 @@ static ActionLink actionnames[] = {
 	{"screenshake",GameScript::ScreenShake,AF_BLOCKING},
 	{"setanimstate",GameScript::SetAnimState,AF_BLOCKING},
 	{"setarearestflag", GameScript::SetAreaRestFlag,0},
+	{"setdialog",GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialogue",GameScript::SetDialogue,AF_BLOCKING},
 	{"setglobal",GameScript::SetGlobal,AF_MERGESTRINGS},
 	{"setglobaltimer",GameScript::SetGlobalTimer,AF_MERGESTRINGS},
@@ -2634,6 +2640,13 @@ int GameScript::BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 			return ( value& ~parameters->int0Parameter ) !=0;
 	}
 	return 0;
+}
+
+int GameScript::GlobalBAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
+	return ( value1& value2 ) !=0;
 }
 
 int GameScript::GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
@@ -5951,3 +5964,58 @@ void GameScript::IncInternal(Scriptable* Sender, Action* parameters)
 	//start of the internal stats
 	target->NewStat(IE_INTERNAL_0+idx, parameters->int1Parameter,MOD_ADDITIVE);
 }
+
+void GameScript::DestroyAllEquipment(Scriptable* Sender, Action* parameters)
+{
+	Inventory *inv=NULL;
+
+ 	switch (Sender->Type) {
+		case ST_ACTOR:
+			inv = &(((Actor *) Sender)->inventory);
+			break;
+		case ST_CONTAINER:
+			inv = &(((Container *) Sender)->inventory);
+			break;
+		default:;
+	}
+	if(inv) {
+		inv->DestroyItem(NULL,0);
+	}
+}
+
+void GameScript::DestroyItem(Scriptable* Sender, Action* parameters)
+{
+	Inventory *inv=NULL;
+
+ 	switch (Sender->Type) {
+		case ST_ACTOR:
+			inv = &(((Actor *) Sender)->inventory);
+			break;
+		case ST_CONTAINER:
+			inv = &(((Container *) Sender)->inventory);
+			break;
+		default:;
+	}
+	if(inv) {
+		inv->DestroyItem(parameters->string0Parameter,0);
+	}
+}
+
+void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* parameters)
+{
+	Inventory *inv=NULL;
+
+ 	switch (Sender->Type) {
+		case ST_ACTOR:
+			inv = &(((Actor *) Sender)->inventory);
+			break;
+		case ST_CONTAINER:
+			inv = &(((Container *) Sender)->inventory);
+			break;
+		default:;
+	}
+	if(inv) {
+		inv->DestroyItem(NULL, 1);
+	}
+}
+
