@@ -2,9 +2,10 @@
 import GemRB
 
 NameWindow = 0
+NameField = 0
 
 def OnLoad():
-	global NameWindow
+	global NameWindow, NameField
 	
 	GemRB.LoadWindowPack("GUICG")
 	NameWindow = GemRB.LoadWindow(5)
@@ -28,6 +29,10 @@ def BackPress():
 	return
 
 def NextPress():
+	Name = GemRB.QueryText(NameWindow, NameField)
+	#check length?
+	#seems like a good idea to store it here for the time being
+	GemRB.SetToken("CHARNAME",Name) 
         GemRB.UnloadWindow(NameWindow)
 	GemRB.SetNextScript("CharGen9")
 	return
