@@ -19,12 +19,13 @@
 #define CONTROL_H
 
 
-#define IE_GUI_BUTTON    0
-#define IE_GUI_SLIDER    2
-#define IE_GUI_EDIT      3
-#define IE_GUI_TEXTAREA  5
-#define IE_GUI_LABEL     6
-#define IE_GUI_SCROLLBAR 7
+#define IE_GUI_BUTTON		0
+#define IE_GUI_SLIDER		2
+#define IE_GUI_EDIT			3
+#define IE_GUI_TEXTAREA		5
+#define IE_GUI_LABEL		6
+#define IE_GUI_SCROLLBAR	7
+#define IE_GUI_GAMECONTROL	128
 
 
 #include "../../includes/win32def.h"
