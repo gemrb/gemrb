@@ -7,7 +7,7 @@ typedef unsigned long DWORD;
 
 #define GEMRB_RELEASE 200		//GemRB Release version multiplied by 1000 (i.e. 1200 = 1.2 | 10 = 0.01 )
 #define GEMRB_API_NUM 2			//GemRB API Version
-#define GEMRB_SDK_REV 6			//GemRB SDK Revision
+#define GEMRB_SDK_REV 7			//GemRB SDK Revision
 
 #define VERSION_GEMRB ((GEMRB_RELEASE<<16)+(GEMRB_API_NUM<<8)+GEMRB_SDK_REV)
 
@@ -53,7 +53,7 @@ typedef unsigned long DWORD;
 #define GEM_ENCRYPTION_KEY "\x88\xa8\x8f\xba\x8a\xd3\xb9\xf5\xed\xb1\xcf\xea\xaa\xe4\xb5\xfb\xeb\x82\xf9\x90\xca\xc9\xb5\xe7\xdc\x8e\xb7\xac\xee\xf7\xe0\xca\x8e\xea\xca\x80\xce\xc5\xad\xb7\xc4\xd0\x84\x93\xd5\xf0\xeb\xc8\xb4\x9d\xcc\xaf\xa5\x95\xba\x99\x87\xd2\x9d\xe3\x91\xba\x90\xca"
 
 /////feature flags
-#define  GF_SCROLLBAR_PATCH		0  //bg1, pst
+//#define  GF_SCROLLBAR_PATCH		0  //bg1, pst //NOT NEEDED ANYMORE (THIS SLOT IS FREE)
 #define  GF_ALL_STRINGS_TAGGED	1  //bg1, pst, iwd1
 #define  GF_HAS_SONGLIST		2  //bg2
 #define  GF_MID_RES_AVATARS		3  //iwd1
