@@ -189,6 +189,7 @@ void Dictionary::SetAt(const char *key, unsigned int type, unsigned long value)
     delete [] pAssoc->key; 
     pAssoc->key=key;
   }
+  pAssoc->type = type;
   pAssoc->value=value;
 }
 
