@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.41 2004/02/24 22:20:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.42 2004/03/14 18:10:32 avenger_teambg Exp $
  *
  */
 
@@ -239,7 +239,8 @@ Map* AREImp::GetMap()
 		unsigned short * indices = tmm->GetDoorIndices( ShortName, &count,
 											BaseClosed );
 		Door* door;
-		door = tm->AddDoor( ShortName, ( Flags & 1 ? 0 : 1 ), BaseClosed,
+//		door = tm->AddDoor( ShortName, ( Flags & 1 ? 0 : 1 ), BaseClosed,
+		door = tm->AddDoor( ShortName, Flags, BaseClosed,
 					indices, count, open, closed );
 		door->Cursor = cursor;
 		door->toOpen[0] = toOpen[0];
