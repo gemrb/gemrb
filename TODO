@@ -7,9 +7,20 @@ Creatures are activated if they are:
 2. Run All area scripts not just the active areas.
 Area scripts are queued, master areas get on the head of the queue, non-master areas get in the tail of the queue. See also: SetMasterArea action/mastarea.2da
 
-3. Fix script compiler to group string parameters depending on opcode
+3. (DONE) Fix script compiler to group string parameters depending on opcode
+
+Items:
+1. Loading containers/items in areas
+2. Dropping of items (first create an opcode)
+3. Picking up an item (create opcode)
 
 Known Bugs:
 1. problem: Dialog options that are disabled by the trigger condition are still accessible via hotkey.
    solution: The options should be marked at evaluation time
+
+2. problem: reloading of an area doesn't check if it was already loaded, thus eating memory
+
+3. problem: actors who have joined are still loaded by the area (duplicated).
+
+4. problem: sound isn't working in movies
 
