@@ -181,27 +181,29 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		else {
 			lastActor = actor;
 			lastActor->actor->anims->DrawCircle = true;
-			switch(lastActor->actor->BaseStats[IE_EA]) {
-				case EVILCUTOFF:
-				case GOODCUTOFF:
-				break;
+			if(!lastActor->actor->Modified[IE_STATE_ID]&STATE_DEAD) {
+				switch(lastActor->actor->Modified[IE_EA]) {
+					case EVILCUTOFF:
+					case GOODCUTOFF:
+					break;
 
-				case PC:
-				case FAMILIAR:
-				case ALLY:
-				case CONTROLLED:
-				case CHARMED:
-				case EVILBUTGREEN:
-					nextCursor = 0;
-				break;
+					case PC:
+					case FAMILIAR:
+					case ALLY:
+					case CONTROLLED:
+					case CHARMED:
+					case EVILBUTGREEN:
+						nextCursor = 0;
+					break;
 
-				case ENEMY:
-				case GOODBUTRED:
-					nextCursor = 12;
-				break;
-				default:
-					nextCursor = 18;
-				break;
+					case ENEMY:
+					case GOODBUTRED:
+						nextCursor = 12;
+					break;
+					default:
+						nextCursor = 18;
+					break;
+				}
 			}
 		}
 	}
