@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.145 2004/03/28 14:19:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.146 2004/03/29 15:53:25 avenger_teambg Exp $
  *
  */
 
@@ -2989,7 +2989,7 @@ static PyMethodDef GemRBMethods[] = {
 	"Queries a stat."},
 	{"GetPlayerPortrait", GemRB_GetPlayerPortrait, METH_VARARGS,
 	"Queries the player portrait."},
-	{"GetPlayerName", GemRB_GetPlayerPortrait, METH_VARARGS,
+	{"GetPlayerName", GemRB_GetPlayerName, METH_VARARGS,
 	"Queries the player name."},
 	{"FillPlayerInfo", GemRB_FillPlayerInfo, METH_VARARGS,
 	"Fills basic character info, that is not stored in stats."},
