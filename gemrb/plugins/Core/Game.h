@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.7 2004/01/05 23:52:11 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.8 2004/01/31 15:14:55 avenger_teambg Exp $
  *
  */
 
@@ -50,7 +50,12 @@ private:
 	std::vector<Actor*> NPCs;
 	std::vector<Map*> Maps;
 public:
+	int PartySize;
+public:
 	Actor* GetPC(unsigned int slot);
+	/* finds an actor in party, returns slot, if not there, returns -1*/
+	int InParty(Actor *pc);
+	/*returns slot*/
 	int SetPC(Actor *pc);
 	int DelPC(unsigned int slot, bool autoFree = false);
 	Map * GetMap(unsigned int index);

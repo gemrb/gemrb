@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.10 2004/01/07 22:00:47 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.11 2004/01/31 15:14:55 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,7 @@ extern Interface * core;
 
 Game::Game(void)
 {
+	PartySize=6;    //this could be modified later
 }
 
 Game::~Game(void)
@@ -50,8 +51,22 @@ Actor* Game::GetPC(unsigned int slot)
 		return NULL;
 	return PCs[slot];
 }
+
+int Game::InParty(Actor *pc)
+{
+	for(int i=0;i<PCs.size();i++)
+	{
+		if(PCs[i]==pc)
+			return i;
+	}
+	return -1;
+}
+
 int Game::SetPC(Actor *pc)
 {
+	int slot=InParty(pc);
+	if(slot==-1)
+		return slot;
 	PCs.push_back(pc);
 	return (int)PCs.size()-1;
 }
