@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.223 2004/10/16 08:10:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.224 2004/10/16 09:53:25 avenger_teambg Exp $
  *
  */
 
@@ -77,7 +77,7 @@ inline PyObject* PyString_FromResRef(char* ResRef)
 /* Sets RuntimeError exception and returns NULL, so this function
  * can be called in `return'. 
  */
-PyObject* RuntimeError(char* msg)
+inline PyObject* RuntimeError(char* msg)
 {
 	printMessage( "GUIScript", "Runtime Error:\n", LIGHT_RED );
 	PyErr_SetString( PyExc_RuntimeError, msg );
@@ -89,12 +89,36 @@ PyObject* RuntimeError(char* msg)
  * can be called in `return'. The exception should be set by previous
  * call to e.g. PyArg_ParseTuple()
  */
-PyObject* AttributeError(char* doc_string)
+inline PyObject* AttributeError(char* doc_string)
 {
 	printMessage( "GUIScript", "Syntax Error:\n", LIGHT_RED );
 	printf( "%s\n\n", doc_string );
 	return NULL;
 	
+}
+
+inline Control *GetControl( int wi, int ci, int ct)
+{
+	char errorbuffer[256];
+
+	Window* win = core->GetWindow( wi );
+	if (!win) {
+		snprintf(errorbuffer, sizeof(errorbuffer), "Cannot find window #%d", wi);
+		RuntimeError(errorbuffer);
+		return NULL;
+	}
+	Control* ctrl = win->GetControl( ci );
+	if (!ctrl) {
+		snprintf(errorbuffer, sizeof(errorbuffer), "Cannot find control #%d", ci);
+		RuntimeError(errorbuffer);
+		return NULL;
+	}
+	if ((ct>=0) && (ctrl->ControlType != ct)) {
+		snprintf(errorbuffer, sizeof(errorbuffer), "Invalid control type #%d", ct);
+		RuntimeError(errorbuffer);
+		return NULL;
+	}
+	return ctrl;
 }
 
 PyDoc_STRVAR( GemRB_SetInfoTextColor__doc, 
@@ -109,9 +133,9 @@ static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iii|i", &r, &g, &b, &a)) {
 		return AttributeError( GemRB_SetInfoTextColor__doc );
 	}
-	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );
-	if (gc->ControlType != IE_GUI_GAMECONTROL) {
-		return RuntimeError( "Control #0 is not GameControl" );
+	GameControl* gc = (GameControl *) GetControl( 0, 0, IE_GUI_GAMECONTROL);
+	if (!gc) {
+		return NULL;
 	}
 	Color c={r,g,b,a};
 	gc->SetInfoTextColor( c );
@@ -125,9 +149,9 @@ PyDoc_STRVAR( GemRB_UnhideGUI__doc,
 
 static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 {
-	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );
-	if (gc->ControlType != IE_GUI_GAMECONTROL) {
-		return RuntimeError( "Control #0 is not GameControl" );
+	GameControl* gc = (GameControl *) GetControl( 0, 0, IE_GUI_GAMECONTROL);
+	if (!gc) {
+		return NULL;
 	}
 	gc->UnhideGUI();
 	gc->SetCutSceneMode( false );
@@ -141,8 +165,8 @@ PyDoc_STRVAR( GemRB_HideGUI__doc,
 
 static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 {
-	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );
-	if (gc->ControlType != IE_GUI_GAMECONTROL) {
+	GameControl* gc = (GameControl *) GetControl( 0, 0, IE_GUI_GAMECONTROL);
+	if (!gc) {
 		return NULL;
 	}
 	gc->HideGUI();
@@ -263,33 +287,13 @@ static PyObject* GemRB_MoveTAText(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_MoveTAText__doc );
 	}
 
-	Window* SrcWin = core->GetWindow( srcWin );
-	if (!SrcWin) {
-		printMessage( "GUIScript", "No source window\n",LIGHT_RED);
-		return NULL;
-	}
-	TextArea* SrcTA = ( TextArea* ) SrcWin->GetControl( srcCtrl );
+	TextArea* SrcTA = ( TextArea* ) GetControl( srcWin, srcCtrl, IE_GUI_TEXTAREA);
 	if (!SrcTA) {
-		printMessage( "GUIScript", "No source control\n",LIGHT_RED);
-		return NULL;
-	}
-	if (SrcTA->ControlType != IE_GUI_TEXTAREA) {
-		printMessage( "GUIScript", "No source textarea\n",LIGHT_RED);
 		return NULL;
 	}
 
-	Window* DstWin = core->GetWindow( dstWin );
-	if (!DstWin) {
-		printMessage( "GUIScript", "No destination window\n",LIGHT_RED);
-		return NULL;
-	}
-	TextArea* DstTA = ( TextArea* ) DstWin->GetControl( dstCtrl );
+	TextArea* DstTA = ( TextArea* ) GetControl( dstWin, dstCtrl, IE_GUI_TEXTAREA);
 	if (!DstTA) {
-		printMessage( "GUIScript", "No destination control\n",LIGHT_RED);
-		return NULL;
-	}
-	if (DstTA->ControlType != IE_GUI_TEXTAREA) {
-		printMessage( "GUIScript", "No destination textarea\n",LIGHT_RED);
 		return NULL;
 	}
 
@@ -311,15 +315,8 @@ static PyObject* GemRB_SetTAAutoScroll(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetTAAutoScroll__doc );
 	}
 
-	Window* win = core->GetWindow( wi );
-	if (!win) {
-		return NULL;
-	}
-	TextArea* ta = ( TextArea* ) win->GetControl( ci );
+	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
 	if (!ta) {
-		return NULL;
-	}
-	if (ta->ControlType != IE_GUI_TEXTAREA) {
 		return NULL;
 	}
 	ta->AutoScroll = ( state != 0 );
@@ -847,7 +844,7 @@ static PyObject* GemRB_GetControl(PyObject * /*self*/, PyObject* args)
 
 	int ret = core->GetControl( WindowIndex, ControlID );
 	if (ret == -1) {
-		return NULL;
+		return RuntimeError( "Control is not found" );
 	}
 
 	return Py_BuildValue( "i", ret );
@@ -859,27 +856,18 @@ PyDoc_STRVAR( GemRB_QueryText__doc,
 
 static PyObject* GemRB_QueryText(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex;
+	int wi, ci;
 
-	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex )) {
+	if (!PyArg_ParseTuple( args, "ii", &wi, &ci )) {
 		return AttributeError( GemRB_QueryText__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
+	TextEdit *ctrl = (TextEdit *) GetControl(wi, ci, IE_GUI_EDIT);
+	if (!ctrl) {
 		return NULL;
 	}
 
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_EDIT) {
-		return NULL;
-	}
-
-	return Py_BuildValue( "s", ( ( TextEdit * ) ctrl )->QueryText() );
+	return Py_BuildValue( "s", ctrl->QueryText() );
 }
 
 PyDoc_STRVAR( GemRB_SetText__doc,
@@ -956,15 +944,11 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 		}
 		WindowIndex = PyInt_AsLong( wi );
 		ControlIndex = PyInt_AsLong( ci );
-		Window* win = core->GetWindow( WindowIndex );
-		if (!win)
+
+		TextArea* ta = ( TextArea* ) GetControl( WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
+		if (!ta) {
 			return NULL;
-		Control* ctrl = win->GetControl( ControlIndex );
-		if (!ctrl)
-			return NULL;
-		if (ctrl->ControlType != IE_GUI_TEXTAREA)
-			return NULL;
-		TextArea* ta = ( TextArea* ) ctrl;
+		}
 		if (row) {
 			if (!PyObject_TypeCheck( row, &PyInt_Type )) {
 				printMessage( "GUIScript",
@@ -1010,15 +994,10 @@ static PyObject* GemRB_TextAreaClear(PyObject * /*self*/, PyObject* args)
 		}
 		WindowIndex = PyInt_AsLong( wi );
 		ControlIndex = PyInt_AsLong( ci );
-		Window* win = core->GetWindow( WindowIndex );
-		if (!win)
+		TextArea* ta = ( TextArea* ) GetControl( WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
+		if(!ta) {
 			return NULL;
-		Control* ctrl = win->GetControl( ControlIndex );
-		if (!ctrl)
-			return NULL;
-		if (ctrl->ControlType != IE_GUI_TEXTAREA)
-			return NULL;
-		TextArea* ta = ( TextArea* ) ctrl;
+		}
 		ta->PopLines( ta->GetRowCount() );
 	} else {
 		return NULL;
@@ -1226,13 +1205,8 @@ static PyObject* GemRB_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetVarAssoc__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return NULL;
-	}
-
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
+	Control* ctrl = GetControl( WindowIndex, ControlIndex, -1 );
+	if (!ctrl) {
 		return NULL;
 	}
 
@@ -1242,7 +1216,6 @@ static PyObject* GemRB_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 	/** it is possible to set up a default value, if Lookup returns false, use it */
 	Value = 0;
 	core->GetDictionary()->Lookup( VarName, Value );
-	win->RedrawControls( VarName, Value );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -1359,20 +1332,11 @@ static PyObject* GemRB_SetLabelTextColor(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetLabelTextColor__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return NULL;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (!ctrl) {
+	Label* lab = ( Label* ) GetControl(WindowIndex, ControlIndex, IE_GUI_LABEL);
+	if (!lab) {
 		return NULL;
 	}
 
-	if (ctrl->ControlType != IE_GUI_LABEL) {
-		return NULL;
-	}
-
-	Label* lab = ( Label* ) ctrl;
 	Color fore = {r,g, b, 0}, back = {0, 0, 0, 0};
 	lab->SetColor( fore, back );
 
@@ -1427,21 +1391,10 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetButtonSprites__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if(!btn) {
 		return NULL;
 	}
-
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (!ctrl) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != 0) {
-		return NULL;
-	}
-
-	Button* btn = ( Button* ) ctrl;
 
 	if (ResRef[0] == 0) {
 		btn->SetImage( IE_GUI_BUTTON_UNPRESSED, 0 );
@@ -1486,22 +1439,10 @@ static PyObject* GemRB_SetButtonBorder(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetButtonBorder__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if(!btn) {
 		return NULL;
 	}
-
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (!ctrl) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != 0) {
-		return NULL;
-	}
-
-	Button* btn = ( Button* ) ctrl;
-
 
 	Color color = { r, g, b, a };
 	btn->SetBorder( BorderIndex, dx1, dy1, dx2, dy2, &color, (bool)enabled, (bool)filled );
@@ -1523,21 +1464,10 @@ static PyObject* GemRB_EnableButtonBorder(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_EnableButtonBorder__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if(!btn) {
 		return NULL;
 	}
-
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (!ctrl) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != 0) {
-		return NULL;
-	}
-
-	Button* btn = ( Button* ) ctrl;
 
 	btn->EnableBorder( BorderIndex, (bool)enabled );
 
@@ -1559,21 +1489,10 @@ static PyObject* GemRB_SetButtonFont(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetButtonFont__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if(!btn) {
 		return NULL;
 	}
-
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (!ctrl) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != 0) {
-		return NULL;
-	}
-
-	Button* btn = ( Button* ) ctrl;
 
 	btn->SetFont( core->GetFont( FontResRef ));
 
@@ -1599,7 +1518,7 @@ static PyObject* GemRB_DeleteControl(PyObject * /*self*/, PyObject* args)
 	}
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex == -1) {
-		return NULL;
+		return RuntimeError( "Control is not found" );
 	}
 	win -> DelControl( CtrlIndex );
 
@@ -1760,11 +1679,7 @@ static PyObject* GemRB_SetControlPos(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetControlPos__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (!win) {
-		return NULL;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
+	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
 	if (!ctrl) {
 		return NULL;
 	}
@@ -1789,11 +1704,7 @@ static PyObject* GemRB_SetControlSize(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetControlSize__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (!win) {
-		return NULL;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
+	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
 	if (!ctrl) {
 		return NULL;
 	}
@@ -1817,18 +1728,11 @@ static PyObject* GemRB_SetLabelUseRGB(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetLabelUseRGB__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (!win) {
+	Label* lab = (Label *) GetControl(WindowIndex, ControlIndex, IE_GUI_LABEL);
+	if (!lab) {
 		return NULL;
 	}
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (!ctrl) {
-		return NULL;
-	}
-	if (ctrl->ControlType != IE_GUI_LABEL) {
-		return NULL;
-	}
-	Label* lab = ( Label* ) ctrl;
+
 	lab->useRGB = ( status != 0 );
 
 	Py_INCREF( Py_None );
@@ -1848,22 +1752,11 @@ static PyObject* GemRB_SetTextAreaSelectable(PyObject * /*self*/,
 		return AttributeError( GemRB_SetTextAreaSelectable__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
+	TextArea* ta = (TextArea *) GetControl(WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
+	if (!ta) {
 		return NULL;
 	}
 
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_TEXTAREA) //TextArea
-	{
-		return NULL;
-	}
-
-	TextArea* ta = ( TextArea* ) ctrl;
 	ta->SetSelectable( !!Flag );
 
 	Py_INCREF( Py_None );
@@ -1888,21 +1781,11 @@ static PyObject* GemRB_SetButtonFlags(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if(!btn) {
 		return NULL;
 	}
 
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_BUTTON) {
-		return NULL;
-	}
-
-	Button* btn = ( Button* ) ctrl;
 	btn->SetFlags( Flags, Operation );
 
 	Py_INCREF( Py_None );
@@ -1921,21 +1804,11 @@ static PyObject* GemRB_SetButtonState(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetButtonState__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if(!btn) {
 		return NULL;
 	}
 
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_BUTTON) {
-		return NULL;
-	}
-
-	Button* btn = ( Button* ) ctrl;
 	btn->SetState( state );
 
 	Py_INCREF( Py_None );
@@ -1955,22 +1828,12 @@ static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetButtonPicture__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return NULL;
-	}
-
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_BUTTON) {
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if(!btn) {
 		return NULL;
 	}
 
 	if (ResRef[0] == 0) {
-		Button* btn = ( Button* ) ctrl;
 		btn->SetPicture( NULL );
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -1997,7 +1860,6 @@ static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Button* btn = ( Button* ) ctrl;
 	btn->SetPicture( Picture );
 
 	core->FreeInterface( im );
@@ -2019,22 +1881,12 @@ static PyObject* GemRB_SetButtonMOS(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetButtonMOS__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return NULL;
-	}
-
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_BUTTON) {
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if(!btn) {
 		return NULL;
 	}
 
 	if (ResRef[0] == 0) {
-		Button* btn = ( Button* ) ctrl;
 		btn->SetPicture( NULL );
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -2062,7 +1914,6 @@ static PyObject* GemRB_SetButtonMOS(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Button* btn = ( Button* ) ctrl;
 	btn->SetFlags( 0x82, OP_OR );
 	btn->SetPicture( Picture );
 
@@ -2087,22 +1938,12 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetButtonPLT__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return NULL;
-	}
-
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_BUTTON) {
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if(!btn) {
 		return NULL;
 	}
 
 	if (ResRef[0] == 0) {
-		Button* btn = ( Button* ) ctrl;
 		btn->SetPicture( NULL );
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -2138,7 +1979,6 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Button* btn = ( Button* ) ctrl;
 	btn->SetPicture( Picture );
 
 	core->FreeInterface( im );
@@ -2153,37 +1993,26 @@ PyDoc_STRVAR( GemRB_SetButtonBAM__doc,
 
 static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex, CycleIndex, FrameIndex, col1;
+	int wi, ci, CycleIndex, FrameIndex, col1;
 	char* ResRef;
 
-	if (!PyArg_ParseTuple( args, "iisiii", &WindowIndex, &ControlIndex,
+	if (!PyArg_ParseTuple( args, "iisiii", &wi, &ci,
 			&ResRef, &CycleIndex, &FrameIndex, &col1 )) {
 		return AttributeError( GemRB_SetButtonBAM__doc );
 	}
 
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return NULL;
-	}
-
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_BUTTON) {
+	Button* btn = ( Button* ) GetControl(wi, ci, IE_GUI_BUTTON);
+	if (!btn) {
 		return NULL;
 	}
 
 	if (ResRef[0] == 0) {
-		Button* btn = ( Button* ) ctrl;
 		btn->SetPicture( NULL );
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
 
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
-												IE_BAM_CLASS_ID );
+	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
 	if (str == NULL) {
 		return NULL;
 	}
@@ -2212,7 +2041,6 @@ static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 	free( pal );
 	free( orgpal );
 
-	Button* btn = ( Button* ) ctrl;
 	btn->SetPicture( Picture );
 
 	core->FreeInterface( am );
@@ -2546,22 +2374,13 @@ PyDoc_STRVAR( GemRB_SetSaveGamePortrait__doc,
 
 static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex, SaveSlotCount, PCSlotCount;
+	int wi, ci, SaveSlotCount, PCSlotCount;
 
-	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex,
-			&SaveSlotCount, &PCSlotCount )) {
+	if (!PyArg_ParseTuple( args, "iiii", &wi, &ci, &SaveSlotCount, &PCSlotCount )) {
 		return AttributeError( GemRB_SetSaveGamePortrait__doc );
 	}
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return NULL;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_BUTTON) {
+	Button* btn = ( Button* ) GetControl( wi, ci, IE_GUI_BUTTON);
+	if (!btn) {
 		return NULL;
 	}
 
@@ -2571,7 +2390,6 @@ static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	if (sg->GetPortraitCount() <= PCSlotCount) {
-		Button* btn = ( Button* ) ctrl;
 		btn->SetPicture( NULL );
 		delete sg;
 		Py_INCREF( Py_None );
@@ -2596,7 +2414,6 @@ static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Button* btn = ( Button* ) ctrl;
 	btn->SetPicture( Picture );
 
 	core->FreeInterface( im );
@@ -2611,23 +2428,13 @@ PyDoc_STRVAR( GemRB_SetSaveGamePreview__doc,
 
 static PyObject* GemRB_SetSaveGamePreview(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex, SlotCount;
+	int wi, ci, SlotCount;
 
-	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex,
-			&SlotCount )) {
+	if (!PyArg_ParseTuple( args, "iii", &wi, &ci, &SlotCount )) {
 		return AttributeError( GemRB_SetSaveGamePreview__doc );
 	}
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		return NULL;
-	}
-
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_BUTTON) {
+	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
+	if (!btn) {
 		return NULL;
 	}
 
@@ -2654,7 +2461,6 @@ static PyObject* GemRB_SetSaveGamePreview(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Button* btn = ( Button* ) ctrl;
 	btn->SetPicture( Picture );
 
 	core->FreeInterface( im );
@@ -2688,15 +2494,8 @@ static PyObject* GemRB_GetCharSounds(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ii", &wi, &ci )) {
 		return AttributeError( GemRB_GetCharSounds__doc );
 	}
-	Window* win = core->GetWindow( wi );
-	if (!win) {
-		return NULL;
-	}
-	TextArea* ta = ( TextArea* ) win->GetControl( ci );
+	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
 	if (!ta) {
-		return NULL;
-	}
-	if (ta->ControlType != IE_GUI_TEXTAREA) {
 		return NULL;
 	}
 	return Py_BuildValue( "i", core->GetCharSounds( ta ) );
@@ -3319,36 +3118,19 @@ PyDoc_STRVAR( GemRB_SetSpellIcon__doc,
 
 static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex;
+	int wi, ci;
 	char* SpellResRef;
 
-	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex,
-			&SpellResRef )) {
+	if (!PyArg_ParseTuple( args, "iis", &wi, &ci, &SpellResRef )) {
 		return AttributeError( GemRB_SetSpellIcon__doc );
 	}
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		printMessage( "GUIScript", "Runtime Error: Window not found\n",
-			LIGHT_RED );
-		return NULL;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		printMessage( "GUIScript", "Runtime Error: Control not found\n",
-			LIGHT_RED );
-		return NULL;
-	}
-
-	if (ctrl->ControlType != IE_GUI_BUTTON) {
-		printMessage( "GUIScript",
-			"Runtime Error: SetSpellIcon() - control must be a button\n",
-			LIGHT_RED );
+	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
+	if (!btn) {
 		return NULL;
 	}
 
 	// FIXME!!!
-	DataStream* str = core->GetResourceMgr()->GetResource( SpellResRef,
-												IE_SPL_CLASS_ID );
+	DataStream* str = core->GetResourceMgr()->GetResource( SpellResRef, IE_SPL_CLASS_ID );
 	SpellMgr* im = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
 	if (im == NULL) {
 		printMessage( "GUIScript", "Runtime Error: core->GetInterface()\n",
@@ -3371,7 +3153,6 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Button* btn = ( Button* ) ctrl;
 	btn->SetImage( IE_GUI_BUTTON_UNPRESSED,
 			spell->SpellIconBAM->GetFrame( 0 ) );
 	btn->SetImage( IE_GUI_BUTTON_PRESSED, spell->SpellIconBAM->GetFrame( 1 ) );
@@ -3388,34 +3169,17 @@ PyDoc_STRVAR( GemRB_SetItemIcon__doc,
 
 static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlIndex, Which = 0;
+	int wi, ci, Which = 0;
 	char* ItemResRef;
 
-	if (!PyArg_ParseTuple( args, "iis|i", &WindowIndex, &ControlIndex,
-			&ItemResRef, &Which )) {
+	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &ItemResRef, &Which )) {
 		return AttributeError( GemRB_SetItemIcon__doc );
 	}
-	Window* win = core->GetWindow( WindowIndex );
-	if (win == NULL) {
-		printMessage( "GUIScript", "Runtime Error: Window not found\n",
-			LIGHT_RED );
-		return NULL;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		printMessage( "GUIScript", "Runtime Error: Control not found\n",
-			LIGHT_RED );
-		return NULL;
-	}
 
-	if (ctrl->ControlType != IE_GUI_BUTTON) {
-		printMessage( "GUIScript",
-			"Runtime Error: SetItemIcon() - control must be a button\n",
-			LIGHT_RED );
+	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
+	if (!btn) {
 		return NULL;
 	}
-
-	Button* btn = ( Button* ) ctrl;
 
 	if (ItemResRef[0]) {
 		// FIXME!!!
@@ -3482,7 +3246,6 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	//Button * btn = (Button*)ctrl;
 	//btn->SetImage(IE_GUI_BUTTON_UNPRESSED, item->ItemIconBAM->GetFrame (0));
 	//btn->SetImage(IE_GUI_BUTTON_PRESSED, item->ItemIconBAM->GetFrame (0));
 	//delete store;
