@@ -72,6 +72,7 @@
 #define  GF_HAS_DESC_ICON   			13 //bg
 #define  GF_HAS_PICK_SOUND   			14 //pst
 #define  GF_IWD_MAP_DIMENSIONS			15 //iwd, iwd2
+#define  GF_AUTOMAP_INI				16 //pst
 
 /////AI global defines
 #define AI_UPDATE_TIME	30
@@ -92,6 +93,7 @@
 class Scriptable;
 
 GEM_EXPORT unsigned char GetOrient(Point &s, Point &d);
+GEM_EXPORT unsigned int Distance(Point pos, Point pos2);
 GEM_EXPORT unsigned int Distance(Point pos, Scriptable *b);
 GEM_EXPORT unsigned int Distance(Scriptable *a, Scriptable *b);
 GEM_EXPORT bool dir_exists(const char* path);
