@@ -124,13 +124,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				}
 			}
 		}
-		/*else if(overDoor) {
-			if(overDoor->DoorClosed)
-				video->DrawPolyline(overDoor->closed,cyan,true);
-			else {
-				video->DrawPolyline(overDoor->open,cyan,true);
-			}
-		}*/
 		//draw containers when ALT was pressed
 		if(DebugFlags&4) {
 			Container *c;
@@ -143,14 +136,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				}
 			}
 		}
-		/*else if(overContainer) {
-			if(overContainer->TrapDetected && overContainer->Trapped) {
-				video->DrawPolyline(overContainer->outline, red, true);
-			}
-			else {
-				video->DrawPolyline(overContainer->outline, cyan, true);
-			}
-		}*/
 		if(effect) {
 			if((selected.size() == 1)) {
 				Actor * actor = selected.at(0);
@@ -965,7 +950,7 @@ void GameControl::DialogChoose(int choose)
 				if(tr->action) {
 					for(int i = 0; i < tr->action->count; i++) {
 						if(speaker->Scripts[0]) {
-							GameScript::ExecuteString(speaker, tr->action->strings[i]);
+							speaker->AddAction(GameScript::CreateAction(tr->action->strings[i], true));
 						}
 					}
 				}
