@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.263 2005/01/08 17:28:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.264 2005/01/15 14:26:06 avenger_teambg Exp $
  *
  */
 
@@ -4444,17 +4444,11 @@ bool GUIScript::Init(void)
 	if (!pGemRB) {
 		return false;
 	}
-	/*pGemRB is a borrowed reference */
-	//pGemRBDict = PyModule_GetDict( pGemRB );
-	/*pGemRBDict is a borrowed reference, and we don't need it*/
 	char string[256];
-	// FIXME: crashes
-	//if (PyRun_SimpleString( "import pdb" ) == -1) {
-	//	return false;
-	//}
-	if (PyRun_SimpleString( "import sys" ) == -1) {
-		PyRun_SimpleString( "pdb.pm()" );
-		PyErr_Print();
+
+	sprintf( string, "import sys" );
+	if (PyRun_SimpleString( string ) == -1) {
+		printMessage( "GUIScript", string, RED );
 		return false;
 	}
 	char path[_MAX_PATH];
@@ -4485,24 +4479,22 @@ bool GUIScript::Init(void)
 
 	sprintf( string, "sys.path.append(\"%s\")", path2 );
 	if (PyRun_SimpleString( string ) == -1) {
-		PyRun_SimpleString( "pdb.pm()" );
-		PyErr_Print();
+		printMessage( "GUIScript", string, RED );
 		return false;
 	}
 	sprintf( string, "sys.path.append(\"%s\")", path );
 	if (PyRun_SimpleString( string ) == -1) {
-		PyRun_SimpleString( "pdb.pm()" );
-		PyErr_Print();
+		printMessage( "GUIScript", string, RED );
 		return false;
 	}
+	sprintf( string, "import GemRB");
 	if (PyRun_SimpleString( "import GemRB" ) == -1) {
-		PyRun_SimpleString( "pdb.pm()" );
-		PyErr_Print();
+		printMessage( "GUIScript", string, RED );
 		return false;
 	}
+	sprintf( string, "from GUIDefines import *");
 	if (PyRun_SimpleString( "from GUIDefines import *" ) == -1) {
-		PyRun_SimpleString( "pdb.pm()" );
-		PyErr_Print();
+		printMessage( "GUIScript", string, RED );
 		return false;
 	}
 	PyObject *pMainMod = PyImport_AddModule( "__main__" );
