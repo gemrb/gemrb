@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.cpp,v 1.3 2003/12/04 23:12:11 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.cpp,v 1.4 2003/12/04 23:18:39 balrog994 Exp $
  *
  */
 
@@ -54,6 +54,7 @@ IEScript::IEScript(void)
 	blocking[63] = true;
 	actions[83]	= SmallWait;
 	blocking[83] = true;
+	actions[84] = Face;
 	actions[120] = StartCutScene;
 	actions[121] = StartCutSceneMode;
 	actions[127] = CutSceneId;
@@ -590,5 +591,13 @@ void IEScript::DisplayStringHead(Script * Sender, Action * parameters)
 #endif
 		actor->timeStartDisplaying = time;
 		actor->textDisplaying = 1;
+	}
+}
+
+void IEScript::Face(Script * Sender, Action * parameters)
+{
+	ActorBlock * actor = GetActorFromObject(parameters->objects[0]);
+	if(actor) {
+		actor->Orientation = parameters->int0Parameter;
 	}
 }
