@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.18 2003/12/15 09:16:30 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.19 2003/12/19 14:54:24 balrog994 Exp $
  *
  */
 
@@ -35,29 +35,33 @@ CachedFileStream::CachedFileStream(char * stream, bool autoFree)
 	strcat(path, fname);
 	str = fopen(path, "rb");
 	if(str == NULL) {
-		FILE * src = fopen(stream, "rb");
+		if(core->GameOnCD){
+			FILE * src = fopen(stream, "rb");
 #ifdef _DEBUG
-		core->CachedFileStreamPtrCount++;
+			core->CachedFileStreamPtrCount++;
 #endif
-		FILE * dest = fopen(path, "wb");
+			FILE * dest = fopen(path, "wb");
 #ifdef _DEBUG
-		core->CachedFileStreamPtrCount++;
+			core->CachedFileStreamPtrCount++;
 #endif
-		void * buff = malloc(1024*1000);
-		do {
-			size_t len = fread(buff, 1, 1024*1000, src);
-			fwrite(buff, 1, len, dest);
-		} while(!feof(src));
-		free(buff);
-		fclose(src);
+			void * buff = malloc(1024*1000);
+			do {
+				size_t len = fread(buff, 1, 1024*1000, src);
+				fwrite(buff, 1, len, dest);
+			} while(!feof(src));
+			free(buff);
+			fclose(src);
 #ifdef _DEBUG
-		core->CachedFileStreamPtrCount--;
+			core->CachedFileStreamPtrCount--;
 #endif
-		fclose(dest);
+			fclose(dest);
 #ifdef _DEBUG
-		core->CachedFileStreamPtrCount--;
+			core->CachedFileStreamPtrCount--;
 #endif
-		str = fopen(path, "rb");
+			str = fopen(path, "rb");
+		}else{
+			str = fopen(stream, "rb");
+		}
 	}
 #ifdef _DEBUG
 	core->CachedFileStreamPtrCount++;
@@ -67,6 +71,7 @@ CachedFileStream::CachedFileStream(char * stream, bool autoFree)
 	size = ftell(str);
 	fseek(str, 0, SEEK_SET);
 	strcpy(filename, fname);
+	strcpy(originalfile, stream);
 	Pos = 0;
 	this->autoFree = autoFree;
 }
@@ -81,7 +86,10 @@ CachedFileStream::CachedFileStream(CachedFileStream * cfs, int startpos, int siz
 	strcat(cpath, cfs->filename);
 	str = fopen(cpath, "rb");
 	if(str == NULL) {
-		printf("\nDANGER WILL ROBINSON!!! str == NULL\nI'll wait a second hoping to open the file...");
+		str = fopen(cfs->originalfile, "rb");
+		if(str == NULL){
+			printf("\nDANGER WILL ROBINSON!!! str == NULL\nI'll wait a second hoping to open the file...");
+		}
 	}
 #ifdef _DEBUG
 	core->CachedFileStreamPtrCount++;

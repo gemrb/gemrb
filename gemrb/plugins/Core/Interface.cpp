@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.98 2003/12/18 17:21:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.99 2003/12/19 14:54:24 balrog994 Exp $
  *
  */
 
@@ -60,6 +60,8 @@ Interface::Interface(void)
 	INIparty = NULL;
 	ConsolePopped = false;
 	CheatFlag = false;
+	CaseSensitive = false;
+	GameOnCD = true;
 	GUIScriptsPath[0]=0;
 	GamePath[0]=0;
 	GemRBPath[0]=0;
@@ -583,6 +585,9 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "CaseSensitive") == 0) {
 			CaseSensitive = (atoi(value) == 0) ? false : true;
+		}
+		else if(stricmp(name, "GameOnCD") == 0) {
+			GameOnCD = (atoi(value) == 0) ? false : true;
 		}
 		else if(stricmp(name, "ScrollBarPatch") == 0) {
 			SetFeature(atoi(value),GF_SCROLLBAR_PATCH);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.59 2003/12/15 13:14:56 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.60 2003/12/19 14:54:24 balrog994 Exp $
  *
  */
 
@@ -277,7 +277,7 @@ private:
 public:
 	char GameType[_MAX_PATH], GemRBPath[_MAX_PATH], CachePath[_MAX_PATH], GUIScriptsPath[_MAX_PATH], GamePath[_MAX_PATH], INIConfig[_MAX_PATH], CD1[_MAX_PATH], CD2[_MAX_PATH], CD3[_MAX_PATH], CD4[_MAX_PATH], CD5[_MAX_PATH], CD6[_MAX_PATH];
 	int Width, Height, Bpp, ForceStereo;
-	bool FullScreen, CaseSensitive;
+	bool FullScreen, CaseSensitive, GameOnCD;
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);
 	/** Sends a termination signal to the Video Driver */
