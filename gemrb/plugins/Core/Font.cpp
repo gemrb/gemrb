@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.20 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.21 2003/11/30 00:42:04 balrog994 Exp $
  *
  */
 
@@ -246,14 +246,14 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 		}
 		unsigned char currChar = (unsigned char)tmp[i]-1;
 		x+=xPos[currChar];//spr->XPos;
-		video->BlitSpriteRegion(sprBuffer, size[currChar], x+rgn.x-xPos[currChar], y+rgn.y-yPos[currChar], true, &rgn);
+		video->BlitSpriteRegion(sprBuffer, size[currChar], x+rgn.x-xPos[currChar], y+rgn.y-yPos[currChar], anchor, &rgn);
 		if(cursor &&  (curpos == i))
-			video->BlitSprite(cursor, x-xPos[currChar]+rgn.x, y+rgn.y, true, &rgn);
+			video->BlitSprite(cursor, x-xPos[currChar]+rgn.x, y+rgn.y, anchor, &rgn);
 		x+=size[currChar].w-xPos[currChar];//spr->Width-spr->XPos;
 		
 	}
 	if(cursor &&  (curpos == len))
-		video->BlitSprite(cursor, x-xPos[tmp[len]-1]+rgn.x, y+rgn.y, true, &rgn);
+		video->BlitSprite(cursor, x-xPos[tmp[len]-1]+rgn.x, y+rgn.y, anchor, &rgn);
 	free(tmp);
 }
 
