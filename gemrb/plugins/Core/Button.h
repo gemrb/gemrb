@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.20 2004/02/11 22:36:15 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.21 2004/02/11 23:25:17 avenger_teambg Exp $
  *
  */
 
@@ -92,9 +92,6 @@ public: // Public Events
   unsigned int GetFlags() { return Flags; }
   /** Refreshes the button from a radio group */
   void RedrawButton(char *VariableName, int Sum);
-  void SetAnimatedButton(bool animated);
-  /** MOS Draggable Functions */
-  void SetDraggable(bool Value);
 private: // Private attributes
   bool Clear;
   char * Text;
@@ -122,7 +119,6 @@ private: // Private attributes
   /** MOS Draggable Variables */
   unsigned short ScrollX, ScrollY;
   bool Dragging;
-  bool Draggable;
   unsigned short DragX, DragY; //Starting Dragging Positions
 };
 

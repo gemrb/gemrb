@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.50 2004/02/11 22:36:15 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.51 2004/02/11 23:25:17 avenger_teambg Exp $
  *
  */
 
@@ -67,7 +67,6 @@ Button::Button(bool Clear){
 	ToggleState = false;
 	Picture = NULL;
 	//MOS Draggable Stuff
-	Draggable = false;
 	Dragging = false;
 	ScrollX = 0;
 	ScrollY = 0;
@@ -195,7 +194,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 			font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, ppoi, align | IE_FONT_SINGLE_LINE, true);
 	}
 	if(Picture && (Flags&0x2)) {
-		if(Draggable) {
+		if(Flags&0x80) {
 			Region r(XPos, YPos, Width, Height);
 			core->GetVideoDriver()->BlitSprite(Picture, XPos+ScrollX, YPos+ScrollY, true, &r);
 		} else {
@@ -240,7 +239,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 			if(Flags & 0x04) {
 				core->GetSoundMgr()->Play(ButtonSounds[SND_BUTTON_PRESSED]);
 			}
-			if(Draggable) {
+			if(Flags&0x80) {
 				Dragging = true;
 				DragX = x;
 				DragY = y;
@@ -253,7 +252,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 {
 	if(State == IE_GUI_BUTTON_DISABLED)
 		return;
-	if(Draggable)
+	if(Flags&0x80)
 		Dragging = false;
 	if(State == IE_GUI_BUTTON_PRESSED)
 	{
@@ -399,14 +398,4 @@ void Button::SetPicture(Sprite2D * Picture)
 	this->Picture = Picture;
 	Changed = true;
 	((Window*)Owner)->Invalidate();
-}
-
-void SetAnimatedButton(bool animated)
-{
-	
-}
-
-void Button::SetDraggable(bool Value)
-{
-	Draggable = Value;
 }
