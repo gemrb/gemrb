@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.248 2005/01/15 14:55:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.249 2005/01/16 22:55:25 avenger_teambg Exp $
  *
  */
 
@@ -1181,6 +1181,7 @@ bool Interface::LoadGemRBINI()
 	SetFeature( ini->GetKeyAsInt( "resources", "HasPartyIni", 0 ), GF_HAS_PARTY_INI );
 	SetFeature( ini->GetKeyAsInt( "resources", "HasBeastsIni", 0 ), GF_HAS_BEASTS_INI );
 	SetFeature( ini->GetKeyAsInt( "resources", "TeamMovement", 0 ), GF_TEAM_MOVEMENT );
+	SetFeature( ini->GetKeyAsInt( "resources", "SmallFog", 1 ), GF_SMALL_FOG );
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
 	FreeInterface( ini );

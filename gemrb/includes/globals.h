@@ -73,6 +73,7 @@
 #define  GF_HAS_PICK_SOUND   			14 //pst
 #define  GF_IWD_MAP_DIMENSIONS			15 //iwd, iwd2
 #define  GF_AUTOMAP_INI				16 //pst
+#define  GF_SMALL_FOG                           17 //bg1, pst
 
 /////AI global defines
 #define AI_UPDATE_TIME	30
