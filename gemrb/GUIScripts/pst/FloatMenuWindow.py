@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/FloatMenuWindow.py,v 1.3 2004/06/27 19:30:07 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/FloatMenuWindow.py,v 1.4 2004/09/02 08:58:09 edheldil Exp $
 
 # FloatMenuWindow.py - display PST's floating menu window from GUIWORLD winpack
 
@@ -124,7 +124,6 @@ def UpdateFloatMenuWindow ():
 	Window = FloatMenuWindow
 	
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1; 
 
 	Button = GemRB.GetControl (Window, 0)
 	#GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
