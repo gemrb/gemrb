@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.7 2004/09/21 00:20:47 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.8 2004/09/28 14:14:00 edheldil Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -25,6 +25,14 @@
 
 import GemRB
 from GUICommonWindows import *
+
+from GUIINV import *
+from GUIJRNL import *
+from GUIREC import *
+from GUIMA import *
+from GUIMG import *
+from GUIOPT import *
+from GUIPR import *
 
 MessageWindow = 0
 PortraitWindow = 0
@@ -55,6 +63,7 @@ def OnLoad():
 	GemRB.SetVar("ActionsPosition", 4) #BottomAdded
 	GemRB.SetVar("OptionsPosition", 0) #Left
 	GemRB.SetVar("MessagePosition", 4) #BottomAdded
+	GemRB.SetVar("OtherPosition", 3) #top
 	
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)
