@@ -108,7 +108,7 @@ struct Plex     // warning variable length structure
 #define LIGHT_MAGENTA printf("\033[1m\033[35m");
 #define LIGHT_CYAN printf("\033[1m\033[36m");
 #define LIGHT_WHITE printf("\033[1m\033[37m");
-#define gotoxy(x,y) printf("\033[%d,%dH", y, x)
+#define gotoxy(x,y) printf("\033[%d;%dH", y, x)
 #endif
 
 #define printBracket(status, color) textcolor(WHITE); printf("["); textcolor(color); printf("%s", status); textcolor(WHITE); printf("]")
