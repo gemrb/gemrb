@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.64 2004/02/10 22:34:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.65 2004/02/11 22:35:23 balrog994 Exp $
  *
  */
 
@@ -1460,7 +1460,7 @@ int GameScript::Entered(Scriptable * Sender, Trigger * parameters)
 int GameScript::Dead(Scriptable * Sender, Trigger * parameters)
 {
 	if(parameters->string0Parameter) {
-		char Variable[33];
+		char Variable[40];
 		if(core->HasFeature(GF_HAS_KAPUTZ)) {
 			sprintf(Variable,"KAPUTZ%32.32s",parameters->string0Parameter);
 		}
