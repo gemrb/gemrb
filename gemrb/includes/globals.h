@@ -68,6 +68,7 @@ bool dir_exists(const char *path);
 
 #else
 char * FindInDir(char * Dir, char * Filename);
+void ResolveFilePath(char *FilePath);
 char *strupr(char *string);
 char *strlwr(char *string);
 #endif
