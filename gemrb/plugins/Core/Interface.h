@@ -108,6 +108,8 @@ public:
 	bool FullScreen;
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);
+  /** Sends a termination signal to the Video Driver */
+  bool Quit(void);
 	/** Next Script Name */
 	char NextScript[64];
 	/** Need to Load a new Script */

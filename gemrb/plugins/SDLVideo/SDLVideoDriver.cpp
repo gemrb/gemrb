@@ -495,3 +495,12 @@ void SDLVideoDriver::BlitTiled(Region rgn, Sprite2D * img, bool anchor)
 		}
 	}
 }
+/** Send a Quit Signal to the Event Queue */
+bool SDLVideoDriver::Quit()
+{
+	SDL_Event evnt;
+	evnt.type = SDL_QUIT;
+	if(SDL_PushEvent(&evnt)==-1)
+		return false;
+	return true;
+}

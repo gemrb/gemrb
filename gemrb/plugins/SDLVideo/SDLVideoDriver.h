@@ -36,6 +36,8 @@ public:
 	Color * CreatePalette(Color color, Color back);
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, Sprite2D * img, bool anchor = false);
+  /** Send a Quit Signal to the Event Queue */
+  bool Quit();
 };
 
 #endif

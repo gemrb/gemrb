@@ -677,3 +677,8 @@ SoundMgr * Interface::GetSoundMgr()
 {
 	return soundmgr;
 }
+/** Sends a termination signal to the Video Driver */
+bool Interface::Quit(void)
+{
+	return video->Quit();
+}

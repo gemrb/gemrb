@@ -297,6 +297,16 @@ static PyObject * GemRB_PlaySound(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_Quit(PyObject *self, PyObject *args)
+{
+	bool ret = core->Quit();
+	if(!ret)
+		return NULL;
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
     {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
@@ -336,6 +346,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"PlaySound", GemRB_PlaySound, METH_VARARGS,
      "Plays a Sound."},
+
+	{"Quit", GemRB_Quit, METH_NOARGS,
+     "Quits GemRB."},
 
     {NULL, NULL, 0, NULL}
 };
@@ -444,9 +457,9 @@ bool GUIScript::LoadScript(const char * filename)
 
     pModule = PyImport_Import(pName);
     Py_DECREF(pName);
-
+    
     if (pModule != NULL) {
-        pDict = PyModule_GetDict(pModule);
+			pDict = PyModule_GetDict(pModule);
 		if(PyDict_Merge(pDict, maindic, false) == -1)
 			return false;
         /* pDict is a borrowed reference */

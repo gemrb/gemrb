@@ -19,7 +19,7 @@ class GEM_EXPORT SoundMgr : public Plugin
 {
 public:
 	SoundMgr(void);
-	~SoundMgr(void);
+	virtual ~SoundMgr(void);
 	virtual bool Init(void) = 0;
 	virtual unsigned long Play(const char * ResRef) = 0;
 };
