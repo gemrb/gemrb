@@ -11,7 +11,7 @@ def RollPress():
 	GemRB.InvalidateWindow(AbilityWindow)
 	GemRB.SetVar("AbilityIncrease",0)
 	GemRB.SetVar("AbilityDecrease",0)
-	GemRB.SetVar("PointsLeft",0)
+	GemRB.SetVar("Ability -1",0)
 	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
 	GemRB.SetText(AbilityWindow, SumLabel, "0")
 	GemRB.SetLabelUseRGB(AbilityWindow, SumLabel, 1)
@@ -80,7 +80,7 @@ def RightPress():
 		return
 	GemRB.SetVar("Ability "+str(Abidx), Ability-1)
 	PointsLeft = PointsLeft + 1
-	GemRB.SetVar("PointsLeft",PointsLeft)
+	GemRB.SetVar("Ability -1",PointsLeft)
 	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
 	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
@@ -92,7 +92,7 @@ def LeftPress():
 	global PointsLeft
 
 	GemRB.InvalidateWindow(AbilityWindow)
-	PointsLeft=GemRB.GetVar("PointsLeft")
+	PointsLeft=GemRB.GetVar("Ability -1")
 	if PointsLeft == 0:
 		return
 	Abidx = GemRB.GetVar("AbilityIncrease")
@@ -101,7 +101,7 @@ def LeftPress():
 		return
 	GemRB.SetVar("Ability "+str(Abidx), Ability+1)
 	PointsLeft = PointsLeft - 1
-	GemRB.SetVar("PointsLeft",PointsLeft)
+	GemRB.SetVar("Ability -1",PointsLeft)
 	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
 	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
@@ -111,15 +111,16 @@ def LeftPress():
 	return
 
 def StorePress():
-	for i in range(0,6):
+	for i in range(-1,6):
 		GemRB.SetVar("Stored "+str(i),GemRB.GetVar("Ability "+str(i) ) )
 	return
 
 def RecallPress():
-	for i in range(0,6):
+	GemRB.InvalidateWindow(AbilityWindow)
+	for i in range(-1,6):
 		v = GemRB.GetVar("Stored "+str(i) )
 		GemRB.SetVar("Ability "+str(i), v)
-		Label = GemRB.GetControl(AbilityWindow, 0x40000002+i)
+		Label = GemRB.GetControl(AbilityWindow, 0x10000003+i)
 		GemRB.SetText(AbilityWindow, Label, str(v) )
 	return
 
