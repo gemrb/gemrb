@@ -78,6 +78,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 
 	OpenStack.push_back(MapSet[startX][startY]);
 	MapSet[startX][startY]->Parent = NULL;
+	MapSet[startX][startY]->distance = GetDistance(startX, startY, goalX, goalY);
 	ClosedSet[startX][startY] = true;
 	while(true) {
 		if(OpenStack.size() == 0) {
@@ -104,6 +105,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 					if(MapSet[x][y]->passable && (!ClosedSet[x][y])) {
 						MapSet[x][y]->Parent = topNode;
 						MapSet[x][y]->orient = GetOrient(topNode->x, topNode->y, x, y);
+						MapSet[x][y]->distance = topNode->distance;
 						OpenStack.push_back(MapSet[x][y]);
 						ClosedSet[x][y] = true;
 					}
@@ -114,7 +116,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 		std::vector<PathNode*> tmp;
 		for(int i = 0; i < OpenStack.size(); i++) {
 			PathNode * node = OpenStack.at(i);
-			node->distance = GetDistance(node->x, node->y, goalX, goalY);
+			node->distance += GetDistance(node->x, node->y, goalX, goalY);
 			if(tmp.size() == 0)
 				tmp.push_back(node);
 			else {
