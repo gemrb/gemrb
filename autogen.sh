@@ -19,7 +19,7 @@ if [[ -n $ACLOCAL ]];
 then
   my_aclocal=$ACLOCAL
 else
-  for file in aclocal aclocal-1.7 aclocal-1.8; do
+  for file in aclocal aclocal-1.7 aclocal-1.8 aclocal-1.9; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
     if ! [[ $version < 1.7 ]];
     then
@@ -47,7 +47,7 @@ then
 else
   for file in autoheader autoheader-2.57 autoheader-2.58 autoheader-2.59; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
-    if [[ $version > 2.56 ]];
+    if ! [[ $version < 2.57 ]];
     then
       my_autoheader=$file
       break
@@ -97,7 +97,7 @@ if [[ -n $AUTOMAKE ]];
 then
   my_automake=$AUTOMAKE
 else
-  for file in automake automake-1.7 automake-1.8; do
+  for file in automake automake-1.7 automake-1.8 automake-1.9; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
     if ! [[ $version < 1.7 ]];
     then
@@ -123,9 +123,9 @@ if [[ -n $AUTOCONF ]];
 then
   my_autoconf=$AUTOCONF
 else
-  for file in autoconf autoconf-2.58 autoconf-2.59; do
+  for file in autoconf autoconf-2.57 autoconf-2.58 autoconf-2.59; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
-    if [[ $version > 2.57 ]];
+    if ! [[ $version < 2.57 ]];
     then
       my_autoconf=$file
       break
