@@ -116,6 +116,18 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, GemRB.GetVar("Class") )
+	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, GemRB.GetVar("Alignment") )
+	GemRB.SetPlayerStat(MyChar, IE_HATERACE, GemRB.GetVar("HatedRace") )
+	TmpTable=GemRB.LoadTable("ability")
+	AbilityCount = GemRB.GetTableRowCount(TmpTable)
+	for i in range(0,AbilityCount):
+		GemRB.SetPlayerStat(MyChar, GemRB.GetTableValue(i,4),GemRB.GetVar("Ability "+str(i) )
+	TmpTable=GemRB.LoadTable("weapprof")
+	ProfCount = GemRB.GetTableRowCount(TmpTable)
+	for i in range(7,ProfCount):
+		ProfID=GemRB.GetTableValue(TmpTable, i, 0)
+		GemRB.SetPlayerStat(MyChar, ProfID, GemRB.GetVar("Prof "+str(i) )
+	GemRB.SetupPlayerInfo() #does all the rest
 	#LETS PLAY!!
 	GemRB.EnterGame()
 	return
