@@ -11,9 +11,9 @@ def OnLoad():
 	QuitTextArea = GemRB.GetControl(QuitWindow,0)
 	CancelButton = GemRB.GetControl(QuitWindow, 2)
 	ConfirmButton = GemRB.GetControl(QuitWindow, 1)
-	GemRB.SetText(QuitWindow, QuitTextArea, 19532)
-	GemRB.SetText(QuitWindow, CancelButton, 13727)
-	GemRB.SetText(QuitWindow, ConfirmButton, 15417)
+	GemRB.SetText(QuitWindow, QuitTextArea, 20582)
+	GemRB.SetText(QuitWindow, CancelButton, 23789)
+	GemRB.SetText(QuitWindow, ConfirmButton, 23787)
 	GemRB.SetEvent(QuitWindow, ConfirmButton, IE_GUI_BUTTON_ON_PRESS, "ExitConfirmed")
 	GemRB.SetEvent(QuitWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "ExitCancelled")
 #main window
@@ -37,6 +37,9 @@ def OnLoad():
 	return
 	
 def NewLifePress():
+	GemRB.UnloadWindow(QuitWindow)
+	GemRB.UnloadWindow(StartWindow)
+	GemRB.SetNextScript("NewLife")
 	return
 
 def ResumeLifePress():
