@@ -823,13 +823,13 @@ void GameControl::InitDialog(Actor * speaker, Actor * target, Dialog * dlg)
 	this->target = target;
 	unsigned long index;
 	core->GetDictionary()->Lookup("MessageWindowSize", index);
-	if(index < 1) {
+	if(index == 0) {
+		core->GetGUIScriptEngine()->RunFunction("OnIncreaseSize");
 		core->GetGUIScriptEngine()->RunFunction("OnIncreaseSize");
 	}
-
 	else {
-		if(index > 1) {
-			core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
+		if(index == 1) {
+			core->GetGUIScriptEngine()->RunFunction("OnIncreaseSize");
 		}
 	}
 	DialogChoose(-1);
