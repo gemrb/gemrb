@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.226 2005/02/12 10:59:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.227 2005/02/12 13:44:55 avenger_teambg Exp $
  *
  */
 
@@ -133,6 +133,7 @@ static TriggerLink triggernames[] = {
 	{"hasitemequipped", GameScript::HasItemEquipped,0},
 	{"hasitemslot", GameScript::HasItemSlot,0},
 	{"hasiteminslot", GameScript::HasItemSlot,0},
+	{"hasweaponequipped", GameScript::HasWeaponEquipped,0},
 	{"haveanyspells", GameScript::HaveAnySpells,0},
 	{"havespell", GameScript::HaveSpell,0},    //these must be the same
 	{"havespellparty", GameScript::HaveSpellParty,0}, 
@@ -5071,6 +5072,19 @@ int GameScript::InWeaponRange(Scriptable* Sender, Trigger* parameters)
 		return 1;
 	}
 	return 0;
+}
+
+int GameScript::HasWeaponEquipped(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if (actor->inventory.GetEquippedSlot() == 1000) {
+		return 0;
+	}
+	return 1;
 }
 
 //-------------------------------------------------------------

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.156 2005/02/12 10:59:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.157 2005/02/12 13:44:55 avenger_teambg Exp $
  *
  */
 
@@ -850,6 +850,7 @@ public: //Script Functions
 	static int HasItem(Scriptable* Sender, Trigger* parameters);
 	static int HasItemEquipped(Scriptable* Sender, Trigger* parameters);
 	static int HasItemSlot(Scriptable* Sender, Trigger* parameters);
+	static int HasWeaponEquipped(Scriptable* Sender, Trigger* parameters);
 	static int HaveAnySpells(Scriptable* Sender, Trigger* parameters);
 	static int HaveSpellParty(Scriptable* Sender, Trigger* parameters);
 	static int HaveSpell(Scriptable* Sender, Trigger* parameters);

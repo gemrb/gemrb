@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.26 2005/02/09 21:19:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.27 2005/02/12 13:44:55 avenger_teambg Exp $
  *
  */
 
@@ -42,6 +42,10 @@ class Map;
 #else
 #define GEM_EXPORT
 #endif
+
+//weapon slot types (1000==not equipped)
+#define IW_NO_EQUIPPED  1000
+#define IW_QUIVER        -22   // (-22, -23, -24)
 
 typedef enum ieInventoryType {
 	INVENTORY_HEAP = 0,
@@ -147,6 +151,8 @@ public:
 	// Returns equipped weapon
 	CREItem *GetUsedWeapon();
 	void dump();
+private:
+	int FindRanged();
 };
 
 #endif
