@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.178 2004/11/24 21:47:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.179 2004/11/26 18:15:09 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -200,7 +200,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (game->MapIndex == -1) {
 		return;
 	}
-	if (((int) Width) <=0 || ((int) Height) <= 0) {
+	if (((short) Width) <=0 || ((short) Height) <= 0) {
 		return;
 	}
 	if ( game->selected.size() > 0 ) {
