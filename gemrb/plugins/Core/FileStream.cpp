@@ -53,8 +53,6 @@ bool FileStream::Open(FILE * stream, int startpos, int size, bool autoFree)
 
 int FileStream::Read(void * dest, int length)
 {
-	if(Encrypted)
-		return ReadDecrypted(dest, lenfth);
 	if(!opened)
 		return GEM_ERROR;
 	size_t c = fread(dest, 1, length, str);
@@ -66,6 +64,8 @@ int FileStream::Read(void * dest, int length)
 	if(c < 0) {
 		return GEM_ERROR;
 	}
+	if(Encrypted)
+		ReadDecrypted(dest, c);
 	return (int)c;
 }
 

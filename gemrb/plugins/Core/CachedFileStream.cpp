@@ -58,8 +58,6 @@ CachedFileStream::~CachedFileStream(void)
 
 int CachedFileStream::Read(void * dest, int length)
 {
-	if(Encrypted)
-		return ReadDecrypted(dest, lenfth);
 	size_t c = fread(dest, 1, length, str);
 	if(c != -1)
 		Pos+=c;
@@ -69,6 +67,8 @@ int CachedFileStream::Read(void * dest, int length)
 		}
 		return GEM_ERROR;
 	}
+	if(Encrypted)
+		ReadDecrypted(dest, c);
 	return (int)c;
 }
 
