@@ -53,10 +53,10 @@ typedef unsigned long DWORD;
 #define GEM_ENCRYPTION_KEY "\x88\xa8\x8f\xba\x8a\xd3\xb9\xf5\xed\xb1\xcf\xea\xaa\xe4\xb5\xfb\xeb\x82\xf9\x90\xca\xc9\xb5\xe7\xdc\x8e\xb7\xac\xee\xf7\xe0\xca\x8e\xea\xca\x80\xce\xc5\xad\xb7\xc4\xd0\x84\x93\xd5\xf0\xeb\xc8\xb4\x9d\xcc\xaf\xa5\x95\xba\x99\x87\xd2\x9d\xe3\x91\xba\x90\xca"
 
 /////feature flags
-//#define  GF_SCROLLBAR_PATCH		0  //bg1, pst //NOT NEEDED ANYMORE (THIS SLOT IS FREE)
-#define  GF_ALL_STRINGS_TAGGED	1  //bg1, pst, iwd1
-#define  GF_HAS_SONGLIST		2  //bg2
-#define  GF_MID_RES_AVATARS		3  //iwd1
+#define  GF_HAS_KAPUTZ                  0 //pst
+#define  GF_ALL_STRINGS_TAGGED	        1 //bg1, pst, iwd1
+#define  GF_HAS_SONGLIST		2 //bg2
+#define  GF_MID_RES_AVATARS		3 //iwd1
 #define  GF_UPPER_BUTTON_TEXT		4 //bg2
 #define  GF_LOWER_LABEL_TEXT		5 //bg2
 #define  GF_HAS_PARTY_INI               6 //iwd2
