@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.7 2004/09/19 20:01:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.8 2004/10/17 17:44:12 avenger_teambg Exp $
  *
  */
 
@@ -137,17 +137,21 @@ Item* ITMImp::GetItem()
 	DataStream* bamfile;
 	AnimationMgr* bam;
 
-	bamfile = core->GetResourceMgr()->GetResource( s->ItemIcon, IE_BAM_CLASS_ID );
-	bam = ( AnimationMgr * ) core->GetInterface( IE_BAM_CLASS_ID );
-	bam->Open( bamfile );
-	s->ItemIconBAM = bam;
+	if (s->ItemIcon[0]) {
+		bamfile = core->GetResourceMgr()->GetResource( s->ItemIcon, IE_BAM_CLASS_ID );
+		bam = ( AnimationMgr * ) core->GetInterface( IE_BAM_CLASS_ID );
+		bam->Open( bamfile );
+		s->ItemIconBAM = bam;
+	}
 
-	bamfile = core->GetResourceMgr()->GetResource( s->GroundIcon, IE_BAM_CLASS_ID );
-	bam = ( AnimationMgr * ) core->GetInterface( IE_BAM_CLASS_ID );
-	bam->Open( bamfile );
-	s->GroundIconBAM = bam;
+	if (s->GroundIcon[0]) {
+		bamfile = core->GetResourceMgr()->GetResource( s->GroundIcon, IE_BAM_CLASS_ID );
+		bam = ( AnimationMgr * ) core->GetInterface( IE_BAM_CLASS_ID );
+		bam->Open( bamfile );
+		s->GroundIconBAM = bam;
+	}
 
-	if (core->HasFeature(GF_HAS_DESC_ICON) ) {
+	if (s->CarriedIcon[0] && core->HasFeature(GF_HAS_DESC_ICON) ) {
 		bamfile = core->GetResourceMgr()->GetResource( s->CarriedIcon, IE_BAM_CLASS_ID );
 		bam = ( AnimationMgr * ) core->GetInterface( IE_BAM_CLASS_ID );
 		bam->Open( bamfile );
