@@ -71,6 +71,27 @@ static PyObject * GemRB_LoadWindow(PyObject */*self*/, PyObject *args)
 	return Py_BuildValue("i", ret);
 }
 
+static PyObject * GemRB_SetWindowSize(PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, Width, Height;
+
+	if(!PyArg_ParseTuple(args, "iii", &WindowIndex, &Width, &Height)) {
+		printMessage("GUIScript", "Syntax Error: SetWindowSize(WindowIndex, Width, Height)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(!win)
+		return NULL;
+
+	win->Width = Width;
+	win->Height = Height;
+	win->Invalidate();
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_LoadTable(PyObject */*self*/, PyObject *args)
 {
 	char *string;
@@ -624,6 +645,103 @@ static PyObject * GemRB_CreateLabel(PyObject */*self*/, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SetLabelTextColor(PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex, r,g,b;
+
+	if(!PyArg_ParseTuple(args, "iiiii", &WindowIndex, &ControlIndex, &r, &g, &b)) {
+		printMessage("GUIScript", "Syntax Error: SetLabelTextColor(WindowIndex, ControlIndex, red, green, blue)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(!ctrl)
+		return NULL;
+
+	if(ctrl->ControlType != IE_GUI_LABEL)
+		return NULL;
+
+	Label * lab = (Label*)ctrl;
+	Color fore = {r,g,b,0}, back = {0,0,0,0};
+	lab->SetColor(fore, back);
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_CreateButton(PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, ControlID, x, y, w, h;
+
+	if(!PyArg_ParseTuple(args, "iiiiii", &WindowIndex, &ControlID, &x, &y, &w, &h)) {
+		printMessage("GUIScript", "Syntax Error: CreateButton(WindowIndex, ControlIndex, x, y, w, h)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Button * btn = new Button(false);
+	btn->XPos = x;
+	btn->YPos = y;
+	btn->Width = w;
+	btn->Height = h;
+	btn->ControlID = ControlID;
+	btn->ControlType = IE_GUI_BUTTON;
+	btn->Owner = win;
+	win->AddControl(btn);
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_SetButtonSprites(PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex, cycle, unpressed, pressed, selected, disabled;
+	char *ResRef;
+
+	if(!PyArg_ParseTuple(args, "iisiiiii", &WindowIndex, &ControlIndex, &ResRef, &cycle, &unpressed, &pressed, &selected, &disabled)) {
+		printMessage("GUIScript", "Syntax Error: SetButtonSprites(WindowIndex, ControlIndex, ResRef, Cycle, UnpressedFrame, PressedFrame, SelectedFrame, DisabledFrame)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(!ctrl)
+		return NULL;
+
+	if(ctrl->ControlType != 0)
+		return NULL;
+
+	Button * btn = (Button*)ctrl;
+
+	AnimationFactory * bam = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(ResRef, IE_BAM_CLASS_ID);
+	if(!bam) {
+		printMessage("GUIScript", "Error: %s.BAM not Found\n", LIGHT_RED);
+		return NULL;
+	}
+
+	Animation * ani = bam->GetCycle(cycle);
+
+	btn->SetImage(IE_GUI_BUTTON_UNPRESSED, ani->GetFrame(unpressed));
+	btn->SetImage(IE_GUI_BUTTON_PRESSED, ani->GetFrame(pressed));
+	btn->SetImage(IE_GUI_BUTTON_SELECTED, ani->GetFrame(selected));
+	btn->SetImage(IE_GUI_BUTTON_DISABLED, ani->GetFrame(disabled));
+	ani->free = false;
+	
+	delete(ani);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_SetLabelUseRGB(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex, status;
@@ -992,6 +1110,9 @@ static PyMethodDef GemRBMethods[] = {
 	{"LoadWindow", GemRB_LoadWindow, METH_VARARGS,
      "Returns a Window."},
 
+	{"SetWindowSize", GemRB_SetWindowSize, METH_VARARGS,
+	 "Resized a Window."},
+
  	{"LoadTable", GemRB_LoadTable, METH_VARARGS,
      "Loads a 2DA Table."},
 
@@ -1060,6 +1181,16 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"CreateLabel", GemRB_CreateLabel, METH_VARARGS,
      "Creates and Add a new Label to a Window."},
+
+	{"SetLabelTextColor", GemRB_SetLabelTextColor, METH_VARARGS,
+	 "Sets the Text Color of a Label Control."},
+
+	{"CreateButton", GemRB_CreateButton, METH_VARARGS,
+     "Creates and Add a new Button to a Window."},
+
+	{"SetButtonSprites", GemRB_SetButtonSprites, METH_VARARGS,
+	 "Sets a Button Sprites Images."},
+
 	{"SetTextAreaSelectable",GemRB_SetTextAreaSelectable, METH_VARARGS,
      "Sets the Selectable Flag of a TextArea."},
 
