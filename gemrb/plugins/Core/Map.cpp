@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.73 2004/02/09 19:20:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.74 2004/02/21 12:35:44 avenger_teambg Exp $
  *
  */
 
@@ -283,7 +283,7 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 					font->Print(rgn, (unsigned char*)actor->overHeadText, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false);
 				}
 			}
-			for(int i = 0; i < 5; i++) {
+			for(int i = 0; i < 8; i++) {
 				if(actor->Scripts[i])
 					actor->ExecuteScript(actor->Scripts[i]);
 			}
