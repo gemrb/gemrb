@@ -133,13 +133,23 @@ void Window::Invalidate()
 	Changed = true;
 }
 
-void Window::RedrawButtons(char *VarName, unsigned long Sum)
+void Window::RedrawControls(char *VarName, unsigned long Sum)
 {
 	for(int i = 0; i < Controls.size(); i++) {
-		if(Controls[i]->ControlType == IE_GUI_BUTTON)
-		{
-			Button *bt = (Button *) (Controls[i]);
-			bt->RedrawButton(VarName, Sum);
+		switch(Controls[i]->ControlType)
+                {
+			case IE_GUI_BUTTON:
+			{
+				Button *bt = (Button *) (Controls[i]);
+				bt->RedrawButton(VarName, Sum);
+				break;
+			}
+			case IE_GUI_SLIDER:
+			{
+				Slider *sl =(Slider *) (Controls[i]);
+//				sl->RedrawSlider(VarName, Sum);
+				break;
+			}
 		}
 	}
 }

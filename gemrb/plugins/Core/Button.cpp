@@ -204,7 +204,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 			SetState(IE_GUI_BUTTON_SELECTED);
 			if(VarName[0] != 0) {
 				core->GetDictionary()->SetAt(VarName, Value);
-				((Window*)Owner)->RedrawButtons(VarName, Value);
+				((Window*)Owner)->RedrawControls(VarName, Value);
 			}
 		}
 		if(Flags & 0x04) {
@@ -267,7 +267,9 @@ int Button::SetFlags(int arg_flags, int opcode)
 void Button::RedrawButton(char *VariableName, int Sum)
 {
 	if(strnicmp(VarName, VariableName, MAX_VARIABLE_LENGTH)) return;
-	ToggleState=(Sum==Value);
+	if(Flags&0x20) ToggleState=(Sum==Value);       //radio button, exact value
+	else if(Flags&0x10) ToggleState=!!(Sum&Value); //checkbox, bitvalue
+	else ToggleState=false;                        //other buttons, no value
 	if(ToggleState)
 		State = IE_GUI_BUTTON_SELECTED;
 	else

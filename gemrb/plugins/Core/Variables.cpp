@@ -7,13 +7,14 @@ inline bool Variables::MyCopyKey(char *&dest, const char * key) const
 	int i,j;
 
 	for(i=0,j=0;key[i] && i<MAX_VARIABLE_LENGTH;i++) if(key[i]!=' ') j++;
-	dest = new char[j];
+	dest = new char[j+1];
 	if(!dest)
 		return false;
 	for(i=0,j=0;i<MAX_VARIABLE_LENGTH && key[i];i++)
 	{
 		if(key[i]!=' ') dest[j++]=toupper(key[i]);
    	}
+	dest[j]=0;
 	return true;
 }
 inline unsigned int Variables::MyHashKey(const char * key) const
@@ -169,8 +170,8 @@ Variables::NewAssoc(const char *key)
 	else
 	{
 		int len;
-		len=strnlen(key,MAX_VARIABLE_LENGTH);
-		pAssoc->key=new char[len+1];
+		len=strnlen(key,MAX_VARIABLE_LENGTH)+1;
+		pAssoc->key=new char[len];
 		if(pAssoc->key) strncpy(pAssoc->key,key,len);
 	}
 	pAssoc->nValue=0xcccccccc;  //invalid value
@@ -233,7 +234,6 @@ void Variables::SetAt(const char *key, unsigned long value)
 
 		// it doesn't exist, add a new Association
 		pAssoc = NewAssoc(key);
-return;
 		// put into hash table
 		pAssoc->pNext = m_pHashTable[nHash];
 		m_pHashTable[nHash] = pAssoc;

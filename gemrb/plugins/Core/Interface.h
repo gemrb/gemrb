@@ -17,6 +17,7 @@
 #include "WindowMgr.h"
 #include "ScriptEngine.h"
 #include "Button.h"
+#include "Slider.h"
 #include "Console.h"
 #include "SoundMgr.h"
 #include "Variables.h"

@@ -209,11 +209,12 @@ static PyObject * GemRB_SetControlStatus(PyObject *self, PyObject *args)
 
 static PyObject * GemRB_SetVarAssoc(PyObject *self, PyObject *args)
 {
-	int WindowIndex, ControlIndex, Value;
+	int WindowIndex, ControlIndex;
+	unsigned long Value;
 	char* VarName;
 
-	if(!PyArg_ParseTuple(args, "iisi", &WindowIndex, &ControlIndex, &VarName, &Value)) {
-		printMessage("GUIScript", "Syntax Error: SetVarAssoc(WindowIndex, ControlIndex, VariableName)\n", LIGHT_RED);
+	if(!PyArg_ParseTuple(args, "iisl", &WindowIndex, &ControlIndex, &VarName, &Value)) {
+		printMessage("GUIScript", "Syntax Error: SetVarAssoc(WindowIndex, ControlIndex, VariableName, LongValue)\n", LIGHT_RED);
 		return NULL;
 	}
 
@@ -227,6 +228,11 @@ static PyObject * GemRB_SetVarAssoc(PyObject *self, PyObject *args)
 
 	strncpy(ctrl->VarName, VarName, MAX_VARIABLE_LENGTH);
 	ctrl->Value=Value;
+	/** setting the correct state for this control */
+	/** it is possible to set up a default value, if Lookup returns false, use it */
+	Value=0;
+	core->GetDictionary()->Lookup((const char *) VarName, Value);
+	win->RedrawControls(VarName, Value);
 
 	Py_INCREF(Py_None);
 	return Py_None;
