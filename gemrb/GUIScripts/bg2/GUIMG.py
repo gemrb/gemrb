@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMG.py,v 1.5 2004/10/02 20:54:43 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMG.py,v 1.6 2004/11/05 22:02:12 avenger_teambg Exp $
 
 
 # GUIMG.py - scripts to control mage spells windows from GUIMG winpack
@@ -107,7 +107,8 @@ def UpdateMageWindow ():
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
 
 	Label = GemRB.GetControl (Window, 0x10000032)
-	GemRB.SetText (Window, Label, GemRB.GetString(12137)+str(level+1) )
+	GemRB.SetToken("SPELLLEVEL", str(level+1) )
+	GemRB.SetText (Window, Label, 10345)
 
 	Name = GemRB.GetPlayerName (pc, 0)
 	Label = GemRB.GetControl (Window, 0x10000035)
