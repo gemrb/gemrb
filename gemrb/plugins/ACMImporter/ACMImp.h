@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.15 2004/01/04 00:29:45 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.16 2004/01/18 15:05:16 edheldil Exp $
  *
  */
 
@@ -25,20 +25,22 @@
 #include "../Core/SoundMgr.h"
 #include "../Core/FileStream.h"
 
-#include "../../includes/sdl/SDL.h"
-#include "../../includes/sdl/SDL_thread.h"
+
+#include <SDL.h>
+#include <SDL_thread.h>
 
 #ifndef WIN32
-#include "AL/al.h"
-#include "AL/alc.h"
-#include "AL/alu.h"
-#include "AL/alut.h"
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alu.h>
+#include <AL/alut.h>
 #else
-#include "al.h"
-#include "alc.h"
-#include "alu.h"
-#include "alut.h"
+#include <al.h>
+#include <alc.h>
+#include <alu.h>
+#include <alut.h>
 #endif
+
 #include "readers.h"
 
 #define MAX_STREAMS  30

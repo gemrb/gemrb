@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.h,v 1.17 2004/01/12 17:12:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.h,v 1.18 2004/01/18 15:05:15 edheldil Exp $
  *
  */
 
@@ -26,8 +26,11 @@
 #include "../../includes/globals.h"
 #include "../Core/MoviePlayer.h"
 #include "../Core/Interface.h"
-#include "../../includes/sdl/SDL.h"
-#include "../../includes/sdl/SDL_thread.h"
+
+#include <SDL.h>
+#include <SDL_thread.h>
+
+
 //#include "mvelib.h"
 #include "mve_audio.h"
 

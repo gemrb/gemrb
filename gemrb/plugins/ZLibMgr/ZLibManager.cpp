@@ -15,14 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibManager.cpp,v 1.4 2003/12/18 15:05:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibManager.cpp,v 1.5 2004/01/18 15:05:15 edheldil Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include "ZLibManager.h"
-#include "../../zlib/zlib.h"
+
+#include <zlib.h>
+
 
 ZLibManager::ZLibManager(void)
 {

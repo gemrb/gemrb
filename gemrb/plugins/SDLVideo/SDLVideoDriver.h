@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.26 2004/01/11 16:58:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.27 2004/01/18 15:05:15 edheldil Exp $
  *
  */
 
@@ -23,7 +23,9 @@
 #define SDLVIDEODRIVER_H
 
 #include "../Core/Video.h"
-#include "../../includes/sdl/SDL.h"
+
+#include <SDL.h>
+
 
 class SDLVideoDriver : public Video
 {
