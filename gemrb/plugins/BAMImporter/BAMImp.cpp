@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.34 2004/12/14 16:20:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.35 2004/12/14 22:37:47 avenger_teambg Exp $
  *
  */
 
@@ -69,7 +69,6 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "BAMCV1  ", 8 ) == 0) {
-		//printf("Compressed file found...\n");
 		//Check if Decompressed file has already been Cached
 		char cpath[_MAX_PATH];
 		strcpy( cpath, core->CachePath );
@@ -340,7 +339,6 @@ Font* BAMImp::GetFont()
 			index = i;
 		}
 
-		//printf("[index = %d, w = %d, h = %d]\n", index, frames[index].Width, frames[index].Height);
 		if (frames[index].Width > w)
 			w = frames[index].Width;
 		if (frames[index].Height > h)
@@ -442,7 +440,6 @@ Sprite2D* BAMImp::GetPaperdollImage(int *Colors, Sprite2D *&Picture2)
 	Picture2->XPos = frames[1].XPos-frames[0].XPos;
 	//this gets zeroed out, so why bother
 	//Picture2->YPos = frames[1].YPos;
-	printf("picture2 retrieved, width: %d, height: %d\n", frames[1].Width, frames[1].Height);
 
         pixels = GetFramePixels(0);
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(frames[0].Width, frames[0].Height, 8, pixels, Palette, true, 0 );

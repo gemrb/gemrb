@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.11 2004/08/19 21:14:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.12 2004/12/14 22:37:49 avenger_teambg Exp $
  *
  */
 
@@ -32,7 +32,7 @@ private:
 	ieDword Width, Height;
 	void* pixels;
 	Color* Palettes[8];
-	int palIndexes[8];
+	int palIndices[8];
 public:
 	PLTImp(void);
 	~PLTImp(void);

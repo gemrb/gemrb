@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.258 2004/12/14 16:20:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.259 2004/12/14 22:37:48 avenger_teambg Exp $
  *
  */
 
@@ -2069,8 +2069,8 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	Sprite2D *Picture;
 	Sprite2D *Picture2=NULL;
 
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
-		IE_PLT_CLASS_ID );
+	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_PLT_CLASS_ID );
+	
 	if (str == NULL ) {
 		str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
 		if (str == NULL) {
@@ -2113,6 +2113,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 		for(int i=0;i<8;i++) {
 			im->GetPalette( i, col[i], NULL );
 		}
+
 		Picture = im->GetImage();
 		core->FreeInterface( im );
 		if (Picture == NULL) {
@@ -2122,7 +2123,6 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	}
 
 	btn->SetPicture( Picture );
-	printf("Setpicture2 done?\n");
 	if( Picture2 ) {
 		btn->SetPicture2( Picture2 );
 	}
@@ -3087,7 +3087,6 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 	int PartyID, Select;
 	int Flags = SELECT_NORMAL;
 
-	printf("GemRB.GameSelectPC()\n");
 	if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &Select, &Flags )) {
 		return AttributeError( GemRB_GameSelectPC__doc );
 	}
@@ -3281,20 +3280,13 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	}
 	char *poi = mtm->QueryField( 0 );
 	int AnimID = strtoul( poi, NULL, 0 );
-	printf( "Avatar animation base: 0x%0x", AnimID );
 	for (int i = 1; i < count; i++) {
 		poi = mtm->QueryField( i );
-		printf( "Part table: %s\n", poi );
 		int table = core->LoadTable( poi );
-		printf( "Part table id:%d\n", table );
 		TableMgr* tm = core->GetTable( table );
-		printf( "Loaded part table\n" );
 		int StatID = atoi( tm->QueryField() );
-		printf( "Stat ID:%d\n", StatID );
 		StatID = MyActor->GetBase( StatID );
-		printf( "Value:%d\n", StatID );
 		poi = tm->QueryField( StatID );
-		printf( "Part: %s\n", poi );
 		AnimID += strtoul( poi, NULL, 0 );
 		core->DelTable( table );
 	}
@@ -4160,7 +4152,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	core->ResolveRandomItem(TmpItem);
 	int res = actor->inventory.AddSlotItem( TmpItem, SlotID );
 	if (res!=2) {
-		printf("Inventory is full\n");
+		printf("[GUIScript] Inventory is full\n");
 		delete TmpItem; //removal of residue
 	}
 	Py_INCREF( Py_None );

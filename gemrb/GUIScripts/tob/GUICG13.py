@@ -12,10 +12,10 @@ HairButton = 0
 SkinButton = 0
 MajorButton = 0
 MinorButton = 0
-Color1 = 0
-Color2 = 0
-Color3 = 0
-Color4 = 0
+HairColor = 0
+SkinColor = 0
+MajorColor = 0
+MinorColor = 0
 PDollButton = 0
 IE_ANIM_ID = 206
 
@@ -32,13 +32,13 @@ def RefreshPDoll():
 	ResRef = GemRB.GetTableValue(PDollTable,hex(AnimID), "LEVEL1")
 
 	GemRB.SetButtonPLT(ColorWindow, PDollButton, ResRef,
-		Color2, Color1, 0, 0, 0 ,Color3,Color4,0)
+		0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
 	return
 
 def OnLoad():
 	global ColorWindow, DoneButton, PDollButton, ColorTable
 	global HairButton, SkinButton, MajorButton, MinorButton
-	global Color1, Color2, Color3, Color4
+	global HairColor, SkinColor, MajorColor, MinorColor
 	
 	GemRB.LoadWindowPack("GUICG")
 	ColorWindow=GemRB.LoadWindow(13)
@@ -47,33 +47,33 @@ def OnLoad():
 	#set these colors to some default
 	PortraitTable = GemRB.LoadTable("pictures")
 	PortraitIndex = GemRB.GetVar("PortraitIndex")
-	Color1=GemRB.GetTableValue(PortraitTable,PortraitIndex,1)
-	Color2=GemRB.GetTableValue(PortraitTable,PortraitIndex,2)
-	Color3=GemRB.GetTableValue(PortraitTable,PortraitIndex,3)
-	Color4=GemRB.GetTableValue(PortraitTable,PortraitIndex,4)
+	HairColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,1)
+	SkinColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,2)
+	MinorColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,3)
+	MajorColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,4)
 	PDollButton = GemRB.GetControl(ColorWindow, 1)
-	print Color1, Color2, Color3, Color4
+	print HairColor, SkinColor, MajorColor, MinorColor
 	GemRB.SetButtonFlags(ColorWindow, PDollButton, IE_GUI_BUTTON_PICTURE,OP_OR)
 
 	HairButton = GemRB.GetControl(ColorWindow, 2)
 	GemRB.SetButtonFlags(ColorWindow, HairButton, IE_GUI_BUTTON_PICTURE,OP_OR)
 	GemRB.SetEvent(ColorWindow, HairButton, IE_GUI_BUTTON_ON_PRESS,"HairPress")
-	GemRB.SetButtonBAM(ColorWindow, HairButton, "COLGRAD", 1, 0, Color1)
+	GemRB.SetButtonBAM(ColorWindow, HairButton, "COLGRAD", 1, 0, HairColor)
 
 	SkinButton = GemRB.GetControl(ColorWindow, 3)
 	GemRB.SetButtonFlags(ColorWindow, SkinButton, IE_GUI_BUTTON_PICTURE,OP_OR)
 	GemRB.SetEvent(ColorWindow, SkinButton, IE_GUI_BUTTON_ON_PRESS,"SkinPress")
-	GemRB.SetButtonBAM(ColorWindow, SkinButton, "COLGRAD", 1, 0, Color2)
+	GemRB.SetButtonBAM(ColorWindow, SkinButton, "COLGRAD", 1, 0, SkinColor)
 
 	MajorButton = GemRB.GetControl(ColorWindow, 5)
 	GemRB.SetButtonFlags(ColorWindow, MajorButton, IE_GUI_BUTTON_PICTURE,OP_OR)
 	GemRB.SetEvent(ColorWindow, MajorButton, IE_GUI_BUTTON_ON_PRESS,"MajorPress")
-	GemRB.SetButtonBAM(ColorWindow, MajorButton, "COLGRAD", 1, 0, Color3)
+	GemRB.SetButtonBAM(ColorWindow, MajorButton, "COLGRAD", 1, 0, MinorColor)
 
 	MinorButton = GemRB.GetControl(ColorWindow, 4)
 	GemRB.SetButtonFlags(ColorWindow, MinorButton, IE_GUI_BUTTON_PICTURE,OP_OR)
 	GemRB.SetEvent(ColorWindow, MinorButton, IE_GUI_BUTTON_ON_PRESS,"MinorPress")
-	GemRB.SetButtonBAM(ColorWindow, MinorButton, "COLGRAD", 1, 0, Color4)
+	GemRB.SetButtonBAM(ColorWindow, MinorButton, "COLGRAD", 1, 0, MajorColor)
 
 	BackButton = GemRB.GetControl(ColorWindow,13)
 	GemRB.SetText(ColorWindow,BackButton,15416)
@@ -88,29 +88,29 @@ def OnLoad():
 	return
 
 def DonePress():
-	global Color1, Color2, Color3, Color4
+	global HairColor, SkinColor, MajorColor, MinorColor
 	GemRB.UnloadWindow(ColorPicker)
 	ColorWindow=GemRB.LoadWindow(13)
 	GemRB.SetVisible(ColorWindow,1)
 	PickedColor=GemRB.GetTableValue(ColorTable, ColorIndex, GemRB.GetVar("Selected"))
 	if ColorIndex==0:
-		Color1=PickedColor
-		GemRB.SetButtonBAM(ColorWindow, HairButton, "COLGRAD", 1, 0, Color1)
+		HairColor=PickedColor
+		GemRB.SetButtonBAM(ColorWindow, HairButton, "COLGRAD", 1, 0, HairColor)
 		RefreshPDoll()
 		return
 	if ColorIndex==1:
-		Color2=PickedColor
-		GemRB.SetButtonBAM(ColorWindow, SkinButton, "COLGRAD", 1, 0, Color2)
+		SkinColor=PickedColor
+		GemRB.SetButtonBAM(ColorWindow, SkinButton, "COLGRAD", 1, 0, SkinColor)
 		RefreshPDoll()
 		return
 	if ColorIndex==2:
-		Color3=PickedColor
-		GemRB.SetButtonBAM(ColorWindow, MajorButton, "COLGRAD", 1, 0, Color3)
+		MinorColor=PickedColor
+		GemRB.SetButtonBAM(ColorWindow, MajorButton, "COLGRAD", 1, 0, MinorColor)
 		RefreshPDoll()
 		return
 
-	Color4=PickedColor
-	GemRB.SetButtonBAM(ColorWindow, MinorButton, "COLGRAD", 1, 0, Color4)
+	MajorColor=PickedColor
+	GemRB.SetButtonBAM(ColorWindow, MinorButton, "COLGRAD", 1, 0, MajorColor)
 	RefreshPDoll()
 	return
 
@@ -146,7 +146,7 @@ def HairPress():
 
 	GemRB.SetVisible(ColorWindow,0)
 	ColorIndex = 0
-	PickedColor = Color1
+	PickedColor = HairColor
 	GetColor()
 	return
 
@@ -155,7 +155,7 @@ def SkinPress():
 
 	GemRB.SetVisible(ColorWindow,0)
 	ColorIndex = 1
-	PickedColor = Color2
+	PickedColor = SkinColor
 	GetColor()
 	return
 
@@ -164,7 +164,7 @@ def MajorPress():
 
 	GemRB.SetVisible(ColorWindow,0)
 	ColorIndex = 2
-	PickedColor = Color3
+	PickedColor = MinorColor
 	GetColor()
 	return
 
@@ -173,7 +173,7 @@ def MinorPress():
 
 	GemRB.SetVisible(ColorWindow,0)
 	ColorIndex = 3
-	PickedColor = Color4
+	PickedColor = MajorColor
 	GetColor()
 	return
 
@@ -184,9 +184,9 @@ def BackPress():
 
 def NextPress():
 	GemRB.UnloadWindow(ColorWindow)
-	GemRB.SetVar("Color1",Color1)
-	GemRB.SetVar("Color2",Color2)
-	GemRB.SetVar("Color3",Color3)
-	GemRB.SetVar("Color4",Color4)
+	GemRB.SetVar("HairColor",HairColor)
+	GemRB.SetVar("SkinColor",SkinColor)
+	GemRB.SetVar("MinorColor",MinorColor)
+	GemRB.SetVar("MajorColor",MajorColor)
 	GemRB.SetNextScript("CharGen8") #name
 	return

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.17 2004/12/04 17:35:09 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.18 2004/12/14 22:37:47 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -184,15 +184,15 @@ def UpdateInventoryWindow ():
 
 	# portrait
 	Button = GemRB.GetControl (Window, 50)
-	Color1 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-	Color2 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
+	Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
+	Color2 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
 	Color3 = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
-	Color4 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
+	Color4 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
 	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
-	Color6 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
-	Color7 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
+	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
+	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
 	GemRB.SetButtonPLT (Window, Button, GetActorPaperDoll (pc),
-		Color2, Color1, Color7, Color6, Color5, Color3, Color4, 0)
+		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0)
 
 	# encumbrance
 	# Loading tables of modifications

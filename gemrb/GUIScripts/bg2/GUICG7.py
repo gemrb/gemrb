@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.9 2004/12/09 22:08:05 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.10 2004/12/14 22:37:47 avenger_teambg Exp $
 # character generation, mage spells (GUICG7)
 
 import GemRB
@@ -138,6 +138,7 @@ def MageSpellsDonePress():
 def MageSpellsPickPress():
 	global MageSpellsSelectPointsLeft, Learnable
 
+	SpellMask = 0
 	Range = len(Learnable)
 	if MageSpellsSelectPointsLeft > Range:
 		MageSpellsSelectPointsLeft = Range

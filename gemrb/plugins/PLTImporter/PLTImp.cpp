@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.8 2004/09/14 22:11:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.9 2004/12/14 22:37:49 avenger_teambg Exp $
  *
  */
 
@@ -23,6 +23,9 @@
 #include "PLTImp.h"
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
+
+static int initial[8]={20,31,31,7,14,20,0,0};
+static int pperm[8]={2,5,6,0,4,3,1,7};
 
 PLTImp::PLTImp(void)
 {
@@ -66,17 +69,14 @@ bool PLTImp::Open(DataStream* stream, bool autoFree)
 		return false;
 	}
 
+	memset(Palettes,0,sizeof(Palettes) );
+	memcpy(palIndices,initial,sizeof(palIndices));
 	str->Read( unknown, 8 );
 	str->ReadDword( &Width );
 	str->ReadDword( &Height );
 
 	pixels = malloc( Width * Height * 2 );
 	str->Read( pixels, Width * Height * 2 );
-
-	for (int i = 0; i < 8; i++) {
-		Palettes[i] = NULL;
-		palIndexes[i] = i;
-	}
 
 	return true;
 }
@@ -86,7 +86,7 @@ Sprite2D* PLTImp::GetImage()
 	for (int i = 0; i < 8; i++) {
 		if (Palettes[i])
 			free( Palettes[i] );
-		Palettes[i] = core->GetPalette( palIndexes[i], 256 );
+		Palettes[i] = core->GetPalette( palIndices[i], 256 );
 	}
 	unsigned char * p = ( unsigned char * ) malloc( Width * Height * 4 );
 	unsigned char * dest = p;
@@ -106,9 +106,8 @@ Sprite2D* PLTImp::GetImage()
 		}
 	}
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
-												0xff000000, 0x00ff0000,
-												0x0000ff00, 0x000000ff, p,
-												true, 0x00ff0000 );
+		0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff, p,
+		true, 0x00ff0000 );
 	spr->XPos = 0;
 	spr->YPos = 0;
 	return spr;
@@ -116,5 +115,5 @@ Sprite2D* PLTImp::GetImage()
 /** Set Palette color Hack */
 void PLTImp::GetPalette(int index, int colors, Color* /*pal*/)
 {
-	palIndexes[index] = colors;
+	palIndices[pperm[index]] = colors;
 }
