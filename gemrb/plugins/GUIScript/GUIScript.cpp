@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.68 2003/11/25 13:48:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.69 2003/11/25 19:12:57 avenger_teambg Exp $
  *
  */
 
@@ -1571,7 +1571,7 @@ static PyObject *GemRB_GetPlayerStat(PyObject */*self*/, PyObject *args)
 {
 	int PlayerSlot, StatID, StatValue;
 
-	if(!PyArg_ParseTuple(args,"iii", &PlayerSlot, &StatID) ) {
+	if(!PyArg_ParseTuple(args,"ii", &PlayerSlot, &StatID) ) {
 		printMessage("GUIScript","Syntax Error: GetPlayerStat(Slot, ID)\n", LIGHT_RED);
 		return NULL;
 	}
@@ -1637,16 +1637,40 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 			strncat(resref,poi,8);
 			continue;
 		}
-		poi = mtm->QueryField(i,0);
+		poi = mtm->QueryField(i);
+		printf("Part table: %s\n",poi);
 		int table = core->LoadTable(poi);
+		printf("Part table id:%d\n",table);
 		TableMgr * tm = core->GetTable(table);
+		printf("Loaded part table\n");
 		int StatID = atoi(tm->QueryField() );
-		poi = tm->QueryField(StatID, 0);
-		strncat(resref,poi,8);
+		printf("Stat ID:%d\n",StatID);
+		StatID=MyActor->GetBase(StatID);
+		printf("Value:%d\n",StatID);
+		poi = tm->QueryField(StatID);
+		printf("Part: %s\n",poi);
 		core->DelTable(table);
+		strncat(resref,poi,8);
+	}
+	printf("Resref: %s\n",resref);
+	core->DelTable(mastertable);
+	mastertable = core->LoadTable("avatars");
+	printf("Got avatars\n");
+	mtm = core->GetTable(mastertable);
+	count = mtm->GetRowCount();
+	for(int i = 0; i < count; i++) {
+		char * ret = mtm->QueryField(i);
+		if(strnicmp(ret,resref,8) ) continue;
+		printf("Found avatar\n");
+		poi = mtm->GetRowName(i);
+		printf("Rowname: %s\n",poi);
+		MyActor->SetAnimationID(strtoul(poi,NULL,0) );
+		printf("Set animation complete\n");
+		break;
 	}
 	core->DelTable(mastertable);
 	MyActor->SetPortrait(poi);
+	MyActor->Init();
 	Py_INCREF(Py_None);
 	return Py_None;
 }
