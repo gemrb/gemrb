@@ -1,0 +1,14 @@
+
+Prototype: GemRB.SetNextScript(scriptname)
+
+Description: Instructs the GUIScript engine to load the script when this script has terminated. (Usually it is the last command before return).
+
+Parameters: scriptname	- It is the name of the python script to be executed. The name of the script may not exceed 60 characters.
+
+Return value: N/A
+
+Example:	GemRB.SetNextScript("CharGen")
+		return
+
+See also: ?
+

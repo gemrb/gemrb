@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.Quit()
 
-Description:
+Description: Quits the program immediately.
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: N/A
 
-See also:
+See also: QuitGame()
 

@@ -1,0 +1,11 @@
+
+Prototype: GemRB.EnterGame()
+
+Description: Starts new game and enters it. It destructs all existing windows, and creates a GameControl window as the 0. window. You should already load a game using LoadGame(), otherwise the engine may terminate.
+
+Parameters: N/A
+
+Return value: N/A
+
+See also: QuitGame, LoadGame
+

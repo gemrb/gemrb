@@ -1,0 +1,11 @@
+
+Prototype: GemRB.QuitGame()
+
+Description: Ends the current game session. To go back to the main screen, you must call SetNextScript.
+
+Parameters: N/A
+
+Return value: N/A
+
+See also: EnterGame, Quit, SetNextScript
+
