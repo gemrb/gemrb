@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.10 2003/12/22 21:06:13 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.11 2004/01/04 00:18:16 balrog994 Exp $
  *
  */
 
@@ -59,12 +59,12 @@ void TileOverlay::Draw(Region viewport)
 	vp.h = viewport.h;
 	if((vp.x+vp.w) > w*64)
 		vp.x = (w*64 - vp.w);
-	if(vp.x < 0)
-		vp.x=0;
+	if(vp.x < viewport.x)
+		vp.x=viewport.x;
 	if((vp.y+vp.h) > h*64)
 		vp.y = (h*64 - vp.h);
-	if(vp.y < 0)
-		vp.y=0;
+	if(vp.y < viewport.y)
+		vp.y=viewport.y;
 	vid->SetViewport(vp.x-viewport.x, vp.y-viewport.y);
 	int sx = (vp.x-viewport.x) / 64;
 	int sy = (vp.y-viewport.y) / 64;
