@@ -22,6 +22,9 @@ def RollPress():
 		GemRB.SetVar("Ability "+str(i), v )
 		Label = GemRB.GetControl(AbilityWindow, 0x10000003+i)
 		GemRB.SetText(AbilityWindow, Label, str(v) )
+	
+	GemRB.InvalidateWindow(AbilityWindow)
+	
 	return
 
 def OnLoad():
@@ -45,6 +48,12 @@ def OnLoad():
 		Button = GemRB.GetControl(AbilityWindow, i*2+16)
 		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
 		GemRB.SetVarAssoc(AbilityWindow, Button, "AbilityDecrease", i )
+		
+		Label = GemRB.GetControl(AbilityWindow, 0x10000003+i)
+		GemRB.SetLabelUseRGB(AbilityWindow, Label, 1)
+		
+	Label = GemRB.GetControl(AbilityWindow, 0x10000002)
+	GemRB.SetLabelUseRGB(AbilityWindow, Label, 1)
 
 	RerollButton = GemRB.GetControl(AbilityWindow,2)
 	GemRB.SetText(AbilityWindow,RerollButton,11982)
