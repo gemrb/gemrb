@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.217 2004/11/29 22:19:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.218 2005/01/09 22:33:09 avenger_teambg Exp $
  *
  */
 
@@ -762,7 +762,7 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 		int oT = core->LoadSymbol( "OBJECT" );
 		int iT = core->LoadTable( "SCRIPT" );
 		if (tT < 0 || aT < 0 || oT < 0 || iT < 0) {
-			printMessage( "IEScript]","A critical scripting file is missing!\n",LIGHT_RED );
+			printMessage( "IEScript","A critical scripting file is missing!\n",LIGHT_RED );
 			abort();
 		}
 		triggersTable = core->GetSymbol( tT );

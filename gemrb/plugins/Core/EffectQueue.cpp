@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.8 2005/01/09 21:03:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.9 2005/01/09 22:33:09 avenger_teambg Exp $
  *
  */
 
@@ -89,13 +89,13 @@ bool Init_EffectQueue()
 
 		int eT = core->LoadSymbol( "EFFECTS" );
 		if (eT < 0) {
-			printMessage( "IEScript]","A critical scripting file is missing!\n",LIGHT_RED );
-			abort();
+			printMessage( "IEScript","A critical scripting file is missing!\n",LIGHT_RED );
+			return false;
 		}
 		effectsTable = core->GetSymbol( eT );
 		if (!effectsTable) {
 			printMessage( "IEScript","A critical scripting file is damaged!\n",LIGHT_RED );
-			abort();
+			return false;
 		}
 
 		for (int i = 0; i < MAX_EFFECTS; i++) {
@@ -111,6 +111,7 @@ bool Init_EffectQueue()
 		}
 
 	}
+	return true;
 }
 
 
