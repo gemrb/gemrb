@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.7 2004/09/17 22:24:59 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.8 2004/09/18 17:54:49 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -132,14 +132,6 @@ def UpdateRecordsWindow ():
 	Label = GemRB.GetControl (Window, 0x1000000e)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
 
-	# level
-	#Label = GemRB.GetControl (Window, 0x10000011)
-	#Level = GemRB.GetString (48156) + ': ' + str (GemRB.GetPlayerStat (pc, IE_LEVEL))
-	#multiclass!!!
-	#GemRB.SetText (Window, Label, Level)
-
-	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
-
 	# portrait
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
@@ -234,22 +226,20 @@ def GetStatOverview (pc):
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 
 	stats = []
-	# 19672 Level <LEVEL> Spells
+	# 16480 <CLASS>: Level <LEVEL>
+	# Experience: <EXPERIENCE>
+	# Next Level: <NEXTLEVEL>
 
 	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
 
-	# 48156 Level
-	Level = GemRB.GetString (48156) + ': ' + str (GemRB.GetPlayerStat (pc, IE_LEVEL))
+	Main = GemRB.GetString (16480)
+	Main = Main.replace ("<CLASS>", ClassTitle)
+	Main = Main.replace ("<LEVEL>",  str (GemRB.GetPlayerStat (pc, IE_LEVEL)) )
+	Main = Main.replace ("<EXPERIENCE>", str (GemRB.GetPlayerStat (pc, IE_XP)) )
+	Main = Main.replace ("<NEXTLEVEL>", "??")
 
-	# 19673 Experience
-	Experience = GemRB.GetString (19673) + ': ' + str (GemRB.GetPlayerStat (pc, IE_XP))
-	# 19674 Next Level
-
-	Main = ClassTitle + "\n" + Level + "\n" + Experience + "\n\n"
-	
 	# 59856 Current State
 	CurrentState = won + GemRB.GetString (59856) + woff + "\n\n"
-
 
 	# 67049 AC Bonuses
 	stats.append (67049)
