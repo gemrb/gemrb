@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.2 2004/09/03 23:23:34 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.3 2004/09/04 12:56:56 avenger_teambg Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -200,8 +200,9 @@ def OpenPriestSpellInfoWindow ():
 	PriestSpellInfoWindow = Window = GemRB.LoadWindow (3)
         GemRB.SetVar ("FloatWindow", PriestSpellInfoWindow)
 
+	#back
 	Button = GemRB.GetControl (Window, 5)
-	GemRB.SetText (Window, Button, 1403)
+	GemRB.SetText (Window, Button, 15416)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPriestSpellInfoWindow")
 
 	index = GemRB.GetVar ("SpellButton")
@@ -243,6 +244,39 @@ def OnPriestMemorizeSpell ():
 		UpdatePriestWindow ()
 	return
 
+def OpenPriestSpellRemoveWindow ():
+	global PriestSpellUnmemorizeWindow
+	
+	GemRB.HideGUI ()
+	
+	if PriestSpellUnmemorizeWindow != None:
+		GemRB.UnloadWindow (PriestSpellUnmemorizeWindow)
+		PriestSpellUnmemorizeWindow = None
+		GemRB.SetVar ("FloatWindow", -1)
+		
+		GemRB.UnhideGUI ()
+		return
+		
+	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
+        GemRB.SetVar ("FloatWindow", PriestSpellUnmemorizeWindow)
+
+	# "Are you sure you want to ....?"
+	TextArea = GemRB.GetControl (Window, 3)
+	GemRB.SetText (Window, TextArea, 63745)
+
+	# Remove
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Button, 17507)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnPriestRemoveSpell")
+
+	# Cancel
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetText (Window, Button, 13727)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPriestSpellRemoveWindow")
+
+	GemRB.UnhideGUI ()
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+	return
 
 def OpenPriestSpellUnmemorizeWindow ():
 	global PriestSpellUnmemorizeWindow
@@ -261,23 +295,22 @@ def OpenPriestSpellUnmemorizeWindow ():
         GemRB.SetVar ("FloatWindow", PriestSpellUnmemorizeWindow)
 
 	# "Are you sure you want to ....?"
-	TextArea = GemRB.GetControl (Window, 2)
-	GemRB.SetText (Window, TextArea, 50450)
+	TextArea = GemRB.GetControl (Window, 3)
+	GemRB.SetText (Window, TextArea, 11824)
 
 	# Remove
 	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, Button, 42514)
+	GemRB.SetText (Window, Button, 17507)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnPriestUnmemorizeSpell")
 
 	# Cancel
 	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetText (Window, Button, 4196)
+	GemRB.SetText (Window, Button, 13727)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPriestSpellUnmemorizeWindow")
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
-
 
 def OnPriestUnmemorizeSpell ():
 	if PriestSpellUnmemorizeWindow:
@@ -293,6 +326,23 @@ def OnPriestUnmemorizeSpell ():
 		UpdatePriestWindow ()
 	return
 
+
+def OnPriestRemoveSpell ():
+	if PriestSpellUnmemorizeWindow:
+		OpenPriestSpellRemoveWindow ()
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	level = PriestSpellLevel
+	type = IE_SPELL_TYPE_PRIEST
+
+	index = GemRB.GetVar ("SpellButton")
+
+	#remove spell from memory
+	#GemRB.UnmemorizeSpell (pc, type, level, index);
+	#remove spell from book
+	#GemRB.RemoveSpell (pc, type, level, index);
+	UpdatePriestWindow ()
+	return
 
 ###################################################
 # End of file GUIPR.py
