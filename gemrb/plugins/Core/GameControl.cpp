@@ -56,14 +56,14 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
-	Actor * actor = area->GetActor(GameX, GameY);
+	ActorBlock * actor = area->GetActor(GameX, GameY);
 	if(lastActor)
 		lastActor->anims->DrawCircle = false;
 	if(!actor) {
 		lastActor = NULL;
 		return;
 	}
-	lastActor = actor;
+	lastActor = actor->actor;
 	lastActor->anims->DrawCircle = true;
 }
 /** Mouse Button Down */
@@ -74,7 +74,15 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char 
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	printf("MouseUp\n");
+	unsigned short GameX = x, GameY = y;
+	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
+	Game * game = core->GetGame();
+	Map * area = game->GetMap(MapIndex);
+	ActorBlock * actor = area->GetActor(GameX, GameY);
+	if(!actor)
+		return;
+	actor->Orientation = ((actor->Orientation+1) % 16);
+	printf("%d\n", actor->Orientation);
 }
 /** Special Key Press */
 void GameControl::OnSpecialKeyPress(unsigned char Key)
