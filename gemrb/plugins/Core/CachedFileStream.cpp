@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.27 2004/04/18 15:17:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.28 2004/05/15 13:08:46 avenger_teambg Exp $
  *
  */
 
@@ -147,7 +147,7 @@ int CachedFileStream::Seek(int newpos, int type)
 	}
 	//we went past the buffer
 	if(Pos>size) {
-		printf("[Streams]: Invalid seek\n");
+		printf("[Streams]: Invalid seek position: %ld (limit: %ld)\n",Pos, size);
 		return GEM_ERROR;
 	}
 	return GEM_OK;

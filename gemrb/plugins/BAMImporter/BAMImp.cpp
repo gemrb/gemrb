@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.20 2004/04/23 18:41:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.21 2004/05/15 13:08:45 avenger_teambg Exp $
  *
  */
 
@@ -142,6 +142,9 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 
 Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
 {
+	if(cycles[Cycle].FramesCount<=frame) {
+		return NULL;
+	}
 	str->Seek( FLTOffset + ( cycles[Cycle].FirstFrame * 2 ) + ( frame * 2 ),
 			GEM_STREAM_START );
 	unsigned short findex;
@@ -176,6 +179,9 @@ Animation* BAMImp::GetAnimation(unsigned char Cycle, int x, int y,
 
 Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 {
+	if (findex >= FramesCount) {
+		findex = cycles[0].FirstFrame;
+	}
 	void* pixels = GetFramePixels(findex, mode);
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(
 		frames[findex].Width, frames[findex].Height, 8,
@@ -295,8 +301,6 @@ Font* BAMImp::GetFont()
 		}
 		void* pixels = GetFramePixels( cycles[i].FirstFrame );
 		if( !pixels) {
-printf("Can't get framepixels: firstframe: %d\n",cycles[i].FirstFrame);
-abort();
 			fnt->AddChar( NULL, 0, 0, 0, 0 );
 			continue;
 		}
