@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.11 2003/11/27 23:45:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.12 2003/11/28 09:37:40 balrog994 Exp $
  *
  */
 
@@ -64,7 +64,14 @@ bool AREImp::Open(DataStream * stream, bool autoFree)
 	str->Seek(0x54+bigheader, GEM_STREAM_START);
 	str->Read(&ActorOffset, 4);
 	str->Read(&ActorCount, 2);
-	str->Seek(0xac+bigheader, GEM_STREAM_START);
+	str->Seek(0x7c+bigheader, GEM_STREAM_START);
+	str->Read(&VerticesOffset, 4);
+	str->Read(&VerticesCount, 2);
+	str->Seek(0xa4+bigheader, GEM_STREAM_START);
+	str->Read(&DoorsCount, 4);
+	str->Read(&DoorsOffset, 4);
+	//str->Seek(0xac, GEM_STREAM_START);
+	//str->Seek(0xac+bigheader, GEM_STREAM_START);
 	str->Read(&AnimCount, 4);
 	str->Read(&AnimOffset, 4);
 	str->Seek(8,GEM_CURRENT_POS); //skipping some
@@ -90,15 +97,78 @@ Map * AREImp::GetMap()
 	strcat(ResRef, "LM");
 	DataStream * lmstr = core->GetResourceMgr()->GetResource(ResRef, IE_BMP_CLASS_ID);
 	lm->Open(lmstr, true);
+	TileMap * tm = tmm->GetTileMap();
 
-	map->AddTileMap(tmm->GetTileMap(), lm);
-	core->FreeInterface(tmm);
 
 	str->Seek(SongHeader, GEM_STREAM_START);
 	//5 is the number of song indices
 	for(int i=0;i<5;i++) {
 	  str->Read(map->SongHeader.SongList+i, 4 );
 	}
+
+	//Loading Doors
+	for(int i = 0; i < DoorsCount; i++) {
+		str->Seek(DoorsOffset + (i*0xc8), GEM_STREAM_START);
+		int count;
+		unsigned long Flags, OpenFirstVertex, ClosedFirstVertex;
+		unsigned short OpenVerticesCount, ClosedVerticesCount;
+		char LongName[33], ShortName[9];
+		short minX, maxX, minY, maxY;
+		unsigned long cursor;
+		Region BBClosed, BBOpen;
+		str->Read(LongName, 32);
+		LongName[32] = 0;
+		str->Read(ShortName, 8);
+		ShortName[8] = 0;
+		str->Read(&Flags, 4);
+		str->Read(&OpenFirstVertex, 4);
+		str->Read(&OpenVerticesCount, 2);
+		str->Read(&ClosedVerticesCount, 2);
+		str->Read(&ClosedFirstVertex, 4);
+		str->Read(&minX, 2);
+		str->Read(&minY, 2);
+		str->Read(&maxX, 2);
+		str->Read(&maxY, 2);
+		BBOpen.x = minX;
+		BBOpen.y = minY;
+		BBOpen.w = maxX-minX;
+		BBOpen.h = maxY-minY;
+		str->Read(&minX, 2);
+		str->Read(&minY, 2);
+		str->Read(&maxX, 2);
+		str->Read(&maxY, 2);
+		BBClosed.x = minX;
+		BBClosed.y = minY;
+		BBClosed.w = maxX-minX;
+		BBClosed.h = maxY-minY;
+		str->Seek(0x20, GEM_CURRENT_POS);
+		str->Read(&cursor, 4);
+		//Reading Open Polygon
+		str->Seek(VerticesOffset + (OpenFirstVertex*4), GEM_STREAM_START);
+		Point * points = (Point*)malloc(OpenVerticesCount*sizeof(Point));
+		for(int x = 0; x < OpenVerticesCount; x++) {
+			str->Read(&points[x].x, 2);
+			str->Read(&points[x].y, 2);
+		}
+		Gem_Polygon * open = new Gem_Polygon(points, OpenVerticesCount);
+		open->BBox = BBOpen;
+		free(points);
+		//Reading Closed Polygon
+		str->Seek(VerticesOffset + (ClosedFirstVertex*4), GEM_STREAM_START);
+		points = (Point*)malloc(ClosedVerticesCount*sizeof(Point));
+		for(int x = 0; x < ClosedVerticesCount; x++) {
+			str->Read(&points[x].x, 2);
+			str->Read(&points[x].y, 2);
+		}
+		Gem_Polygon * closed = new Gem_Polygon(points, ClosedVerticesCount);
+		closed->BBox = BBClosed;
+		free(points);
+		//Getting Door Information fro the WED File
+		unsigned short * indices = tmm->GetDoorIndices(ShortName, &count);
+		Door * door = tm->AddDoor(ShortName, (Flags&1 ? 0 : 1), indices, count, open, closed);
+		door->Cursor = cursor;
+	}
+	//Loading Actors
 	str->Seek(ActorOffset, GEM_STREAM_START);
 	if(!core->IsAvailable(IE_CRE_CLASS_ID)) {
 		printf("[AREImporter]: No Actor Manager Available, skipping actors\n");
@@ -180,6 +250,8 @@ Map * AREImp::GetMap()
 		anim->y = animY;
 		map->AddAnimation(anim);		
 	}
+	map->AddTileMap(tm, lm);
+	core->FreeInterface(tmm);
 	//core->FreeInterface(am);
 	return map;
 }
