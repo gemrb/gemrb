@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.4 2004/10/17 20:28:25 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.5 2004/11/07 08:36:11 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -195,11 +195,14 @@ def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
 
-def PopulatePortraitWindow (Window):
+def OpenPortraitWindow ():
 	global PortraitWindow
-	PortraitWindow = Window
 
-	for i in range (6):
+	PortraitWindow = Window = GemRB.LoadWindow(26)
+	GemRB.SetVar ("PortraitWindow", PortraitWindow)
+        GemRB.SetVar ("PortraitPosition", 2)    # Right
+
+	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
@@ -210,14 +213,21 @@ def PopulatePortraitWindow (Window):
 
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
+
+	UpdatePortraitWindow ()
+	return
+
+def UpdatePortraitWindow ():
+	Window = PortraitWindow
+
+	for i in range (PARTY_SIZE):
+		Button = GemRB.GetControl (Window, i)
 		pic = GemRB.GetPlayerPortrait (i+1, 1)
 		if not pic:
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			continue
 		
-		#sel = GemRB.GameIsPCSelected (i+1)
 		sel = GemRB.GameGetSelectedPCSingle () == i + 1
-		#GemRB.SetButtonBAM (Window, Button, pic, 0, 0, 0)
 		GemRB.SetButtonPicture(Window, Button, pic)
 		
 		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
