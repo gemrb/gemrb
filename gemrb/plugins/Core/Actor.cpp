@@ -90,6 +90,8 @@ void Actor::SetAnimationID(unsigned short AnimID)
 	memcpy(&Pal[0x34], LeatherPal, 12*sizeof(Color));
 	memcpy(&Pal[0x40], ArmorPal,   12*sizeof(Color));
 	memcpy(&Pal[0x4C], HairPal,    12*sizeof(Color));
+	for(int i = 0x58; i < 0xFF; i+=0x08)
+		memcpy(&Pal[i], &MinorPal[1], 8*sizeof(Color));
 	free(MetalPal);
 	free(MinorPal);
 	free(MajorPal);
