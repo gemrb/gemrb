@@ -1,9 +1,11 @@
 CHEAT AND DEBUG KEYS
 --------------------
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.2 2004/07/24 23:57:31 edheldil Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.3 2004/08/23 19:00:52 avenger_teambg Exp $
 
 
 Following is a list of cheats you can use during development of GemRB.
+If you implement a new cheatkey, try to assign the same key as in the
+original engine (if you implement a similar function).
 This list can be incomplete and obsolete - for current status, look into
 gemrb/plugins/Core/GameControl.cpp, functions GameControl::OnKeyRelease() 
 and GameControl::Draw().
@@ -16,24 +18,30 @@ GameControl control must be focused for the keys to be recognized, so it
 might be needed to 'click' the GameControl (i.e. map) first.
 
 
-Ctrl-A - Trap or trapped container pointed w/ mouse is "untrapped"
+Ctrl-A - Alters the animation ID of the actor. You have to hover your
+         mouse over it.
 
 Ctrl-B - Inserts/Removes spell effect S056ICBL on selected actor. 
          Exactly one actor must be selected.
 
-Ctrl-P - Draws path from start point marked by Ctrl-S to current mouse 
-         position
+Ctrl-D - Trap or trapped container pointed w/ mouse is disarmed.
 
-Ctrl-S - Marks current mouse position as start point for path drawn
-         with Ctrl-P
-
-Ctrl-J - Teleports selected actors to current mouse position
+Ctrl-J - Teleports (jumps) selected actors to current mouse position.
 
 Ctrl-M - Prints (on terminal or DOS window) useful info on pointed actor, door
          container or infopoint and current map
 
+Ctrl-O - Marks current mouse position as start point (origin) for path drawn
+         with Ctrl-P
+
+Ctrl-P - Draws path from start point marked by Ctrl-S to current mouse 
+         position.
+
+Ctrl-S - Alters the stance (animation state) of the actor. You have to
+         hover your mouse over it.
+
 Ctrl-X - Prints (on terminal or DOS window) name of current area script
-         and current mouse position converted to game coordinates 
+         and current mouse position converted to game coordinates.
 
 Ctrl-Y - Kills pointed actor
 
