@@ -1,3 +1,3 @@
-howoverride_DATA = *.2da *.ini *.chu
+howoverride_DATA = *.2da *.ini *.chu *.ids
 howoverridedir = $(moddir)/override/how/
-EXTRA_DIST = *.2da *.ini *.chu
+EXTRA_DIST = *.2da *.ini *.chu *.ids
