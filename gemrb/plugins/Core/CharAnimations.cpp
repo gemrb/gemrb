@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.13 2003/11/26 16:29:34 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.14 2003/11/29 10:31:41 balrog994 Exp $
  *
  */
 
@@ -132,6 +132,12 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 			}
 		break;
 
+		case IE_ANI_ONE_FILE:
+			{
+				Anims[AnimID][Orient] = a;
+			}
+		break;
+
 		case IE_ANI_CODE_MIRROR_2:
 			{
 				switch(OrientCount) {
@@ -188,6 +194,19 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, c
 			}
 		break;
 
+		case IE_ANI_ONE_FILE:
+			{
+				if(OrientCount == 16) {
+					char * val = Avatars->QueryField(RowIndex, AnimID+4);
+					if(val[0] == '*') {
+						ResRef[0] = 0;
+						return;
+					}
+					Cycle = atoi(val) + Orient;
+				}
+			}
+		break;
+
 		case IE_ANI_TWO_FILES_2:
 			{
 				if(OrientCount == 5) {
@@ -218,6 +237,8 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, c
 						return;
 					}
 					Cycle = atoi(val) + (Orient/2);
+					if(core->HasFeature(GF_MID_RES_AVATARS))
+						sprintf(ResRef, "%s%d", ResRef, (ArmorType+1)); 
 					switch(AnimID) {
 						case IE_ANI_ATTACK:
 						case IE_ANI_ATTACK_BACKSLASH:
