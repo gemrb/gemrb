@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.3 2004/02/02 01:17:36 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.4 2004/02/24 21:14:04 edheldil Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -568,8 +568,31 @@ def SaveGame ():
 
 ###################################################
 
+key_list = [
+	('GemRB', None),
+	('Grab pointer', '^G'),
+	('Toggle fullscreen', '^F'),
+	('Enable cheats', '^T'),
+	('', None),
+	
+	('IE', None),
+	('Open Inventory', 'I'),
+	('Open Priest Spells', 'P'),
+	('Open Mage Spells', 'S'),
+	('Pause Game', 'SPC'),
+	('Select Weapon', ''),
+	('', None),
+	]
+
+
+KEYS_PAGE_SIZE = 60
+KEYS_PAGE_COUNT = ((len (key_list) - 1) / KEYS_PAGE_SIZE)+ 1
+
 def OpenKeyboardMappingsWindow ():
 	global KeysWindow
+	global last_key_action
+
+	last_key_action = None
 
 	GemRB.HideGUI()
 
@@ -586,10 +609,6 @@ def OpenKeyboardMappingsWindow ():
 	GemRB.SetVar ("OtherWindow", KeysWindow)
 
 
-	# Page n of n
-	Label = GemRB.GetControl (Window, 0x10000001)
-	GemRB.SetText (Window, Label, 49053)
-
 	# Default
 	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, Button, 49051)
@@ -605,18 +624,77 @@ def OpenKeyboardMappingsWindow ():
 	GemRB.SetText (Window, Button, 4196)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenKeyboardMappingsWindow")	
 
-	for i in range (60):
-		Label = GemRB.GetControl (Window, 0x10000005 + i)
-		GemRB.SetText (Window, Label, 'A')
-		Label = GemRB.GetControl (Window, 0x10000041 + i)
-		GemRB.SetText (Window, Label, 'Some action')
-		
+	keys_setup_page (0)
 
 
 	#GemRB.SetVisible (KeysWindow, 1)
 	GemRB.UnhideGUI ()
 
 
+def keys_setup_page (pageno):
+	Window = KeysWindow
+
+
+	# Page n of n
+	Label = GemRB.GetControl (Window, 0x10000001)
+	#txt = GemRB.ReplaceVarsInText (49053, {'PAGE': str (pageno + 1), 'NUMPAGES': str (KEYS_PAGE_COUNT)})
+	GemRB.SetToken ('PAGE', str (pageno + 1))
+	GemRB.SetToken ('NUMPAGES', str (KEYS_PAGE_COUNT))
+	GemRB.SetText (Window, Label, 49053)
+
+
+	for i in range (KEYS_PAGE_SIZE):
+		try:
+			label, key = key_list[pageno * KEYS_PAGE_SIZE + i]
+		except:
+			label = ''
+			key = None
+			
+
+		if key == None:
+			# Section header
+			Label = GemRB.GetControl (Window, 0x10000005 + i)
+			GemRB.SetText (Window, Label, '')
+
+			Label = GemRB.GetControl (Window, 0x10000041 + i)
+			GemRB.SetText (Window, Label, label)
+			GemRB.SetLabelTextColor (Window, Label, 0, 255, 255)
+
+		else:
+			Label = GemRB.GetControl (Window, 0x10000005 + i)
+			GemRB.SetText (Window, Label, key)
+			GemRB.SetEvent (Window, Label, IE_GUI_LABEL_ON_PRESS, "OnActionLabelPress")	
+			GemRB.SetVarAssoc (Window, Label, "KeyAction", i)	
+			
+			Label = GemRB.GetControl (Window, 0x10000041 + i)
+			GemRB.SetText (Window, Label, label)
+			GemRB.SetEvent (Window, Label, IE_GUI_LABEL_ON_PRESS, "OnActionLabelPress")	
+			GemRB.SetVarAssoc (Window, Label, "KeyAction", i)	
+		
+
+
+last_key_action = None
+def OnActionLabelPress ():
+	global last_key_action
+	
+	Window = KeysWindow
+	i = GemRB.GetVar ("KeyAction")
+
+	if last_key_action != None:
+		Label = GemRB.GetControl (Window, 0x10000005 + last_key_action)
+		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+		Label = GemRB.GetControl (Window, 0x10000041 + last_key_action)
+		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+		
+	Label = GemRB.GetControl (Window, 0x10000005 + i)
+	GemRB.SetLabelTextColor (Window, Label, 255, 255, 0)
+	Label = GemRB.GetControl (Window, 0x10000041 + i)
+	GemRB.SetLabelTextColor (Window, Label, 255, 255, 0)
+
+	last_key_action = i
+
+	# 49155
+	
 ###################################################
 
 def OpenMoviesWindow ():
@@ -641,7 +719,7 @@ def OpenMoviesWindow ():
 	# Play Movie
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 33034)
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")	
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnPlayMoviePress")	
 
 	# Credits
 	Button = GemRB.GetControl (Window, 3)
@@ -653,10 +731,43 @@ def OpenMoviesWindow ():
 	GemRB.SetText (Window, Button, 1403)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMoviesWindow")
 
+	# movie list
+	List = GemRB.GetControl (Window, 0)
+	GemRB.SetTextAreaSelectable (Window, List, 1)
+	GemRB.SetVarAssoc (Window, List, 'SelectedMovie', -1)
+	
+	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMoviesWindow")
+
+
+	MovieTable = GemRB.LoadTable ("MOVIDESC")
+
+	for i in range (GemRB.GetTableRowCount (MovieTable)):
+		#key = GemRB.GetTableRowName (MovieTable, i)
+		desc = GemRB.GetTableValue (MovieTable, i, 0)
+		GemRB.TextAreaAppend (Window, List, desc, i)
+
+	GemRB.UnloadTable (MovieTable)
+
+
+
 	#GemRB.SetVisible (MoviesWindow, 1)
 	GemRB.UnhideGUI ()
 
 
+###################################################
+def OnPlayMoviePress ():
+	selected = GemRB.GetVar ('SelectedMovie')
+
+	# FIXME: This should not happen, when the PlayMovie button gets
+	#   properly disabled/enabled, but it does not now
+	if selected == -1:
+		return
+	
+	MovieTable = GemRB.LoadTable ("MOVIDESC")
+	key = GemRB.GetTableRowName (MovieTable, selected)
+	GemRB.UnloadTable (MovieTable)
+	
+	GemRB.PlayMovie (key)
 
 ###################################################
 ###################################################
