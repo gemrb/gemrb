@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.101 2004/08/02 22:02:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.102 2004/08/04 20:57:16 edheldil Exp $
  *
  */
 
@@ -364,8 +364,10 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 				anim = ca->GetAnimation( actor->AnimID, actor->Orientation );
 			}
 			if (( !actor->Modified[IE_NOCIRCLE] ) &&
-				( !( actor->Modified[IE_STATE_ID] & STATE_DEAD ) ))
+			    ( !( actor->Modified[IE_STATE_ID] & STATE_DEAD ) )) {
 				actor->DrawCircle();
+				actor->DrawTargetPoint();
+			}
 			if (anim) {
 				Sprite2D* nextFrame = anim->NextFrame();
 				if (nextFrame) {

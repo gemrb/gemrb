@@ -486,6 +486,20 @@ void Moveble::ClearPath()
 	AnimID = IE_ANI_AWAKE;
 	CurrentAction = NULL;
 }
+void Moveble::DrawTargetPoint()
+{
+	if (!path || !Selected)
+		return;
+
+	unsigned long t;
+	GetTime(t);
+
+	Region vp = core->GetVideoDriver()->GetViewport();
+	core->GetVideoDriver()->DrawEllipse( XDes - vp.x, YDes - vp.y,
+		 size * 10, ( ( size * 15 ) / 2 ), selectedColor );
+
+}
+
 
 /**************
  * Door Class *

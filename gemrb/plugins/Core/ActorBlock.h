@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.41 2004/08/02 18:00:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.42 2004/08/04 20:57:16 edheldil Exp $
  *
  */
 
@@ -142,7 +142,6 @@ public:
 	virtual ~Selectable(void);
 public:
 	Region BBox;
-private:
 	bool Selected;
 	bool Over;
 	Color selectedColor;
@@ -192,6 +191,7 @@ public:
 	void WalkTo(unsigned short XDes, unsigned short YDes);
 	void MoveTo(unsigned short XDes, unsigned short YDes);
 	void ClearPath();
+	void DrawTargetPoint();
 };
 
 class GEM_EXPORT Door : public Highlightable {
