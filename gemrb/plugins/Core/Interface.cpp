@@ -57,13 +57,10 @@ Interface::~Interface(void)
 		m = fonts.begin();
 	}
 	std::vector<Window*>::iterator w = windows.begin();
-	std::vector<bool>::iterator b = freeslots.begin();
 	for(int i = 0; windows.size() != 0; ) {
-		if(!(*b)) {
+		if((*w)) {
 			delete(*w);
 		}
-		freeslots.erase(b);
-		b = freeslots.begin();
 		windows.erase(w);
 		w = windows.begin();
 	}
@@ -513,7 +510,7 @@ ScriptEngine * Interface::GetGUIScriptEngine()
 int Interface::LoadWindow(unsigned short WindowID)
 {
 	for(int i = 0; i < windows.size(); i++) {
-		if(freeslots[i])
+		if(!windows[i])
 			continue;
 		if(windows[i]->WindowID == WindowID) {
 			windows[i]->Invalidate();
@@ -524,22 +521,21 @@ int Interface::LoadWindow(unsigned short WindowID)
 	if(win == NULL)
 		return -1;
 	int slot = -1;
-	for(int i = 0; i < freeslots.size(); i++) {
-		if(freeslots[i]) {
+	for(int i = 0; i < windows.size(); i++) {
+		if(!windows[i]) {
 			slot = i;
 			break;
 		}
 	}
 	if(slot == -1) {
 		windows.push_back(win);
-		freeslots.push_back(false);
+		slot=windows.size()-1;
 	}
 	else {
 		windows[slot] = win;
-		freeslots[i] = false;
 	}
 	win->Invalidate();
-	return windows.size()-1;
+	return slot;
 }
 
 /** Get a Control on a Window */
@@ -686,9 +682,15 @@ int Interface::DelWindow(unsigned short WindowIndex)
 	if(WindowIndex >= windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
+	if(!win)
+	{
+		printf("Window deleted again: %0d",WindowIndex);
+		printStatus("ERROR", LIGHT_RED);
+		return -1;
+	}
 	evntmgr->DelWindow(win->WindowID);
 	delete(win);
-	freeslots[WindowIndex] = true;
+	windows[WindowIndex]=NULL;
 	return 0;
 }
 

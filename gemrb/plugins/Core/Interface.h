@@ -53,8 +53,6 @@ private:
 	SoundMgr * soundmgr;
 	/** Windows Array */
 	std::vector<Window*> windows;
-	/** Free Windows Array Slots */
-	std::vector<bool> freeslots;
 	Variables * vars;
 public:
 	Interface(void);
