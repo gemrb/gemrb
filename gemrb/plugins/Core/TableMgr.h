@@ -40,7 +40,7 @@
 class GEM_EXPORT TableMgr : public Plugin  {
 public: 
 	TableMgr();
-	~TableMgr();
+	virtual ~TableMgr();
   /** Returns the actual number of Rows in the Table */
   virtual int GetRowCount() = 0;
   /** Returns the actual number of Columns in the Table */
