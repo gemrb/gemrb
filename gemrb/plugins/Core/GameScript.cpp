@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.120 2004/03/27 09:22:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.121 2004/03/28 11:20:59 avenger_teambg Exp $
  *
  */
 
@@ -52,7 +52,7 @@ static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
-static int InDebug = 0;
+static int InDebug = 1;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -63,9 +63,9 @@ static TriggerLink triggernames[] = {
 	{"areacheckobject", GameScript::AreaCheck,0},
 	{"areatype", GameScript::AreaType,0},
 	{"areaflag", GameScript::AreaFlag,0},
-	{"bitcheck",GameScript::BitCheck,0},
-	{"bitcheckexact",GameScript::BitCheckExact},
-	{"bitglobal",GameScript::BitGlobal_Trigger},
+	{"bitcheck",GameScript::BitCheck,TF_MERGESTRINGS},
+	{"bitcheckexact",GameScript::BitCheckExact,TF_MERGESTRINGS},
+	{"bitglobal",GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
 	{"breakingpoint",GameScript::BreakingPoint},
 	{"checkstat",GameScript::CheckStat},
 	{"checkstatgt",GameScript::CheckStatGT},
@@ -74,89 +74,90 @@ static TriggerLink triggernames[] = {
 	{"entered", GameScript::Entered}, {"exists", GameScript::Exists},
 	{"false", GameScript::False}, {"gender", GameScript::Gender},
 	{"general", GameScript::General},
-	{"global", GameScript::Global},
-	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger},
-	{"globalbitglobal",GameScript::GlobalBitGlobal_Trigger},
-	{"globalequalsglobal", GameScript::GlobalsEqual}, //this is the same
-	{"globalgt", GameScript::GlobalGT},
-	{"globalgtglobal", GameScript::GlobalGTGlobal},
-	{"globallt", GameScript::GlobalLT},
-	{"globalltglobal", GameScript::GlobalLTGlobal},
-	{"globalsequal", GameScript::GlobalsEqual},
-	{"globaltimerexact", GameScript::GlobalTimerExact},
-	{"globaltimerexpired", GameScript::GlobalTimerExpired},
-	{"globaltimernotexpired", GameScript::GlobalTimerNotExpired},
-	{"happiness", GameScript::Happiness},
-	{"happinessgt", GameScript::HappinessGT},
-	{"happinesslt", GameScript::HappinessLT},
-	{"harmlessentered", GameScript::Entered}, //this isn't sure the same
-	{"hp", GameScript::HP},
-	{"hpgt", GameScript::HPGT}, {"hplt", GameScript::HPLT},
-	{"hppercent", GameScript::HPPercent},
-	{"hppercentgt", GameScript::HPPercentGT},
-	{"hppercentlt", GameScript::HPPercentLT},
-	{"inactivearea", GameScript::InActiveArea},
-	{"incutscenemode", GameScript::InCutSceneMode},
-	{"inmyarea", GameScript::InMyArea},
-	{"inparty", GameScript::InParty},
-	{"inpartyallowdead", GameScript::InPartyAllowDead},
-	{"inpartyslot", GameScript::InPartySlot},
-	{"isaclown", GameScript::IsAClown},
-	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog},
-	{"level", GameScript::Level},
-	{"levelgt", GameScript::LevelGT},
-	{"levellt", GameScript::LevelLT},
-	{"levelparty", GameScript::LevelParty},
-	{"levelpartygt", GameScript::LevelPartyGT},
-	{"levelpartylt", GameScript::LevelPartyLT},
-	{"los", GameScript::LOS},
-	{"morale", GameScript::Morale},
-	{"moralegt", GameScript::MoraleGT},
-	{"moralelt", GameScript::MoraleLT},
-	{"notstatecheck", GameScript::NotStateCheck},
-	{"numcreature", GameScript::NumCreatures},
-	{"numcreatureGT", GameScript::NumCreaturesGT},
-	{"numcreatureLT", GameScript::NumCreaturesLT},
-	{"numinparty", GameScript::PartyCountEQ},
-	{"numinpartyalive", GameScript::PartyCountAliveEQ},
-	{"numinpartyalivegt", GameScript::PartyCountAliveGT},
-	{"numinpartyalivelt", GameScript::PartyCountAliveLT},
-	{"numinpartygt", GameScript::PartyCountGT},
-	{"numinpartylt", GameScript::PartyCountLT},
-	{"numtimestalkedto", GameScript::NumTimesTalkedTo},
-	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT},
-	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT},
-	{"objectactionlistempty", GameScript::ObjectActionListEmpty}, //same function
+	{"global", GameScript::Global,TF_MERGESTRINGS},
+	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger,TF_MERGESTRINGS},
+	{"globalbitglobal",GameScript::GlobalBitGlobal_Trigger,TF_MERGESTRINGS},
+	{"globalequalsglobal", GameScript::GlobalsEqual,TF_MERGESTRINGS}, //this is the same
+	{"globalgt", GameScript::GlobalGT,TF_MERGESTRINGS},
+	{"globalgtglobal", GameScript::GlobalGTGlobal,TF_MERGESTRINGS},
+	{"globallt", GameScript::GlobalLT,TF_MERGESTRINGS},
+	{"globalltglobal", GameScript::GlobalLTGlobal,TF_MERGESTRINGS},
+	{"globalsequal", GameScript::GlobalsEqual,TF_MERGESTRINGS},
+	{"globaltimerexact", GameScript::GlobalTimerExact,TF_MERGESTRINGS},
+	{"globaltimerexpired", GameScript::GlobalTimerExpired,TF_MERGESTRINGS},
+	{"globaltimernotexpired", GameScript::GlobalTimerNotExpired,TF_MERGESTRINGS},
+	{"happiness", GameScript::Happiness,0},
+	{"happinessgt", GameScript::HappinessGT,0},
+	{"happinesslt", GameScript::HappinessLT,0},
+	{"harmlessentered", GameScript::Entered,0}, //this isn't sure the same
+	{"hp", GameScript::HP,0},
+	{"hpgt", GameScript::HPGT,0}, {"hplt", GameScript::HPLT,0},
+	{"hppercent", GameScript::HPPercent,0},
+	{"hppercentgt", GameScript::HPPercentGT,0},
+	{"hppercentlt", GameScript::HPPercentLT,0},
+	{"inactivearea", GameScript::InActiveArea,0},
+	{"incutscenemode", GameScript::InCutSceneMode,0},
+	{"inmyarea", GameScript::InMyArea,0},
+	{"inparty", GameScript::InParty,0},
+	{"inpartyallowdead", GameScript::InPartyAllowDead,0},
+	{"inpartyslot", GameScript::InPartySlot,0},
+	{"isaclown", GameScript::IsAClown,0},
+	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog,0},
+	{"level", GameScript::Level,0},
+	{"levelgt", GameScript::LevelGT,0},
+	{"levellt", GameScript::LevelLT,0},
+	{"levelparty", GameScript::LevelParty,0},
+	{"levelpartygt", GameScript::LevelPartyGT,0},
+	{"levelpartylt", GameScript::LevelPartyLT,0},
+	{"los", GameScript::LOS,0},
+	{"morale", GameScript::Morale,0},
+	{"moralegt", GameScript::MoraleGT,0},
+	{"moralelt", GameScript::MoraleLT,0},
+	{"notstatecheck", GameScript::NotStateCheck,0},
+	{"numcreature", GameScript::NumCreatures,0},
+	{"numcreatureGT", GameScript::NumCreaturesGT,0},
+	{"numcreatureLT", GameScript::NumCreaturesLT,0},
+	{"numinparty", GameScript::PartyCountEQ,0},
+	{"numinpartyalive", GameScript::PartyCountAliveEQ,0},
+	{"numinpartyalivegt", GameScript::PartyCountAliveGT,0},
+	{"numinpartyalivelt", GameScript::PartyCountAliveLT,0},
+	{"numinpartygt", GameScript::PartyCountGT,0},
+	{"numinpartylt", GameScript::PartyCountLT,0},
+	{"numtimestalkedto", GameScript::NumTimesTalkedTo,0},
+	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT,0},
+	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT,0},
+	{"objectactionlistempty", GameScript::ObjectActionListEmpty,0}, //same function
 	{"oncreation", GameScript::OnCreation,0},
-	{"openstate", GameScript::OpenState},
-	{"or", GameScript::Or},
-	{"ownsfloatermessage", GameScript::OwnsFloaterMessage},
-	{"nearlocation", GameScript::NearLocation},
-	{"partycounteq", GameScript::PartyCountEQ},
-	{"partycountgt", GameScript::PartyCountGT},
-	{"partycountlt", GameScript::PartyCountLT},
-	{"partygold", GameScript::PartyGold},
-	{"partygoldGT", GameScript::PartyGoldGT},
-	{"partygoldLT", GameScript::PartyGoldLT},
-	{"partyhasitem", GameScript::PartyHasItem},
-	{"race", GameScript::Race},
-	{"randomnum", GameScript::RandomNum},
-	{"randomnumgt", GameScript::RandomNumGT},
-	{"randomnumlt", GameScript::RandomNumLT},
-	{"range", GameScript::Range},
-	{"reputation", GameScript::Reputation},
-	{"reputationgt", GameScript::ReputationGT},
-	{"reputationlt", GameScript::ReputationLT},
-	{"see", GameScript::See},
-	{"specific", GameScript::Specific},
-	{"statecheck", GameScript::StateCheck},
-	{"targetunreachable", GameScript::TargetUnreachable},
-	{"true", GameScript::True}, {"xp", GameScript::XP},
-	{"unselectablevariable", GameScript::UnselectableVariable},
-	{"unselectablevariablegt", GameScript::UnselectableVariableGT},
-	{"unselectablevariablelt", GameScript::UnselectableVariableLT},
-	{"xor", GameScript::Xor},
-	{"xpgt", GameScript::XPGT}, {"xplt", GameScript::XPLT}, { NULL,NULL},
+	{"openstate", GameScript::OpenState,0},
+	{"or", GameScript::Or,0},
+	{"ownsfloatermessage", GameScript::OwnsFloaterMessage,0},
+	{"nearlocation", GameScript::NearLocation,0},
+	{"partycounteq", GameScript::PartyCountEQ,0},
+	{"partycountgt", GameScript::PartyCountGT,0},
+	{"partycountlt", GameScript::PartyCountLT,0},
+	{"partygold", GameScript::PartyGold,0},
+	{"partygoldGT", GameScript::PartyGoldGT,0},
+	{"partygoldLT", GameScript::PartyGoldLT,0},
+	{"partyhasitem", GameScript::PartyHasItem,0},
+	{"race", GameScript::Race,0},
+	{"randomnum", GameScript::RandomNum,0},
+	{"randomnumgt", GameScript::RandomNumGT,0},
+	{"randomnumlt", GameScript::RandomNumLT,0},
+	{"range", GameScript::Range,0},
+	{"reputation", GameScript::Reputation,0},
+	{"reputationgt", GameScript::ReputationGT,0},
+	{"reputationlt", GameScript::ReputationLT,0},
+	{"see", GameScript::See,0},
+	{"specific", GameScript::Specific,0},
+	{"statecheck", GameScript::StateCheck,0},
+	{"targetunreachable", GameScript::TargetUnreachable,0},
+	{"true", GameScript::True,0}, {"xp", GameScript::XP,0},
+	{"unselectablevariable", GameScript::UnselectableVariable,0},
+	{"unselectablevariablegt", GameScript::UnselectableVariableGT,0},
+	{"unselectablevariablelt", GameScript::UnselectableVariableLT,0},
+	{"xor", GameScript::Xor,TF_MERGESTRINGS},
+	{"xpgt", GameScript::XPGT,0},
+	{"xplt", GameScript::XPLT,0}, { NULL,NULL,0},
 };
 
 //Make this an ordered list, so we could use bsearch!
@@ -934,7 +935,7 @@ Trigger* GameScript::ReadTrigger(DataStream* stream)
 			&tR->int1Parameter, &tR->int2Parameter, tR->string0Parameter,
 			tR->string1Parameter );
 	}
-	tR->triggerID &= 0xFF;
+	tR->triggerID &= 0x3fff;
 	stream->ReadLine( line, 1024 );
 	tR->objectParameter = DecodeObject( line );
 	stream->ReadLine( line, 1024 );
@@ -1337,33 +1338,42 @@ bool GameScript::EvaluateString(Scriptable* Sender, char* String)
 	return ret;
 }
 
-static int GetIdsValue(const char *symbol, const char *idsname)
+//this function returns a value, symbol could be a numeric string or
+//a symbol from idsname
+static int GetIdsValue(const char *&symbol, const char *idsname)
 {
 	int idsfile=core->LoadSymbol(idsname);
 	SymbolMgr *valHook = core->GetSymbol(idsfile);
 	if(!valHook) {
 		//FIXME:missing ids file!!!
+		if(InDebug) {
+			char Tmp[256];
+
+			sprintf(Tmp,"Missing IDS file %s for symbol %s!\n",idsname, symbol);
+			printMessage("IEScript",Tmp,LIGHT_RED);
+		}
 		return -1;
 	}
-	return valHook->GetValue(symbol);
+	char *newsymbol;
+	int value=strtol(symbol, &newsymbol, 0);
+	if(symbol!=newsymbol) {
+		symbol=newsymbol;
+		return value;
+	}
+	char symbolname[64];
+	int x;
+	for(x=0;isalnum(*symbol) && x<(int) sizeof(symbolname)-1;x++) {
+		symbolname[x]=*symbol;
+		symbol++;
+	}
+	symbolname[x]=0;
+	return valHook->GetValue(symbolname);
 }
 
-static void ParseIdsTarget(char *&src, Object *&object)
+static void ParseIdsTarget(const char *&src, Object *&object)
 {
 	for(int i=0;i<ObjectFieldsCount;i++) {
-		if(isdigit(*src) || *src=='-') {
-			object->objectFields[i]=strtol(src,&src,0);
-		}
-		else {
-			int x;
-			char symbol[64];
-			for(x=0;isalnum(*src) && x<(int)sizeof(symbol)-1;x++) {
-				symbol[x]=*src;
-				src++;
-			}
-			symbol[x]=0;
-			object->objectFields[i]=GetIdsValue(symbol, ObjectIDSTableNames[i]);
-		}
+			GetIdsValue(src, ObjectIDSTableNames[i]);
 		if(*src!='.') {
 			break;
 		}
@@ -1371,13 +1381,13 @@ static void ParseIdsTarget(char *&src, Object *&object)
 	src++; //skipping ]
 }
 
-static void ParseObject(char *&str, char *&src, Object *&object)
+static void ParseObject(const char *&str,const char *&src, Object *&object)
 {
 	SKIP_ARGUMENT();
 	object = new Object();
 	switch (*src) {
 	case '"':
-		//Object Name
+		//Scriptable Name
 		src++;
 		int i;
 		for(i=0;i<(int) sizeof(object->objectName)-1 && *src!='"';i++)
@@ -1396,15 +1406,8 @@ static void ParseObject(char *&str, char *&src, Object *&object)
 		int Nesting=0;
 		
 		while(Nesting++<MaxObjectNesting) {
-			char filtername[64];
-			int x;
-			for(x=0;isalnum(*src) && x<(int) sizeof(filtername)-1;x++) {
-				filtername[x]=*src;
-				src++;
-			}
-			filtername[x]=0;
 			memmove(object->objectFilters+1, object->objectFilters, (int) sizeof(int) *(MaxObjectNesting-1) );
-			object->objectFilters[0]=GetIdsValue(filtername,"object");
+			object->objectFilters[0]=GetIdsValue(src,"object");
 			if(*src!='(') {
 				break;
 			}
@@ -1417,7 +1420,7 @@ static void ParseObject(char *&str, char *&src, Object *&object)
 }
 
 /* this function was lifted from GenerateAction, to make it clearer */
-Action *GameScript::GenerateActionCore(char *src, char *str, int acIndex)
+Action *GameScript::GenerateActionCore(const char *src, const char *str, int acIndex)
 {
 	Action *newAction = new Action();
 	newAction->actionID = (unsigned short) actionsTable->GetValueIndex( acIndex );
@@ -1437,176 +1440,156 @@ Action *GameScript::GenerateActionCore(char *src, char *str, int acIndex)
 				printf("Invalid type: %s\n",str);
 				str++;
 				break;
-			case 'p':
-				//Point
+
+			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newAction->XpointParameter = atoi( src );
-				while( *src!='.' && *src!=']') {
-					src++;
-				}
+				newAction->XpointParameter = strtol( src, &(char *) src, 10 );
 				src++; //Skip .
-				newAction->YpointParameter = atoi( src );
+				newAction->YpointParameter = strtol( src, &(char *) src, 10 );
 				src++; //Skip ]
 				break;
 
-			case 'i':
-				//Integer
-				 {
-					while (*str != '*') {
+			case 'i': //Integer
+			{
+				//going to the variable name
+				while (*str != '*' && *str !=',' && *str != ')' ) {
+					str++;
+				}
+				int value;
+				if(*str=='*') { //there may be an IDS table
+					str++;
+					char idsTabName[33];
+					char* tmp = idsTabName;
+					while (( *str != ',' ) && ( *str != ')' )) {
+						*tmp = *str;
+						tmp++;
 						str++;
 					}
-					str++;
-					SymbolMgr* valHook = NULL;
-					if (( *str != ',' ) && ( *str != ')' )) {
-						char idsTabName[33];
-						char* tmp = idsTabName;
-						while (( *str != ',' ) && ( *str != ')' )) {
-							*tmp = *str;
-							tmp++;
-							str++;
-						}
-						*tmp = 0;
-						int i = core->LoadSymbol( idsTabName );
-						valHook = core->GetSymbol( i );
+					*tmp = 0;
+					if(idsTabName[0]) {
+						value = GetIdsValue(src, idsTabName);
 					}
-					if (!valHook) {
-						char symbol[33];
-						char* tmp = symbol;
-						while (( ( *src >= '0' ) &&
-							( *src <= '9' ) ) ||
-							( *src == '-' )) {
-							*tmp = *src;
-							tmp++;
-							src++;
-						}
-						*tmp = 0;
-						if (!intCount) {
-							newAction->int0Parameter = atoi( symbol );
-						} else if (intCount == 1) {
-							newAction->int1Parameter = atoi( symbol );
-						} else {
-							newAction->int2Parameter = atoi( symbol );
-						}
-					} else {
-						char symbol[33];
-						char* tmp = symbol;
-						while (( *src != ',' ) && ( *src != ')' )) {
-							*tmp = *src;
-							tmp++;
-							src++;
-						}
-						*tmp = 0;
-						if (!intCount) {
-							newAction->int0Parameter = valHook->GetValue( symbol );
-						} else if (intCount == 1) {
-							newAction->int1Parameter = valHook->GetValue( symbol );
-						} else {
-							newAction->int2Parameter = valHook->GetValue( symbol );
-						}
+					else {
+						value = strtol( src, &(char *) src, 0);
 					}
 				}
-				break;
+				else { //no IDS table
+					value = strtol( src, &(char *) src, 0);
+				}
+				if (!intCount) {
+					newAction->int0Parameter = value;
+				} else if (intCount == 1) {
+					newAction->int1Parameter = value;
+				} else {
+					newAction->int2Parameter = value;
+				}
+			}
+			break;
 
 			case 'a':
-				//Action
-				 {
-					SKIP_ARGUMENT();
-					char action[257];
-					int i = 0;
-					int openParenthesisCount = 0;
-					while (true) {
-						if (*src == ')') {
-							if (!openParenthesisCount)
-								break;
-							openParenthesisCount--;
+			//Action
+			 {
+				SKIP_ARGUMENT();
+				char action[257];
+				int i = 0;
+				int openParenthesisCount = 0;
+				while (true) {
+					if (*src == ')') {
+						if (!openParenthesisCount)
+							break;
+						openParenthesisCount--;
+					} else {
+						if (*src == '(') {
+							openParenthesisCount++;
 						} else {
-							if (*src == '(') {
-								openParenthesisCount++;
-							} else {
-								if (( *src == ',' ) &&
-									!openParenthesisCount)
-									break;
-							}
+							if (( *src == ',' ) &&
+								!openParenthesisCount)
+								break;
 						}
-						action[i] = *src;
-						i++;
-						src++;
 					}
-					action[i] = 0;
-					Action* act = GenerateAction( action );
-					act->objects[0] = newAction->objects[0];
-					act->objects[0]->IncRef();
-					newAction->Release();
-					newAction = act;
+					action[i] = *src;
+					i++;
+					src++;
 				}
-				break;
+				action[i] = 0;
+				Action* act = GenerateAction( action );
+				act->objects[0] = newAction->objects[0];
+				act->objects[0]->IncRef();
+				newAction->Release();
+				newAction = act;
+			}
+			break;
 
-			case 'o':
+			case 'o': //Object
+				if(objectCount==2) {
+					printf("Invalid object count!\n");
+					abort();
+				}
 				ParseObject(str, src, newAction->objects[objectCount++]);
 				break;
 
-			case 's':
-				//String
-				 {
-					SKIP_ARGUMENT();
+			case 's': //String
+			{
+				SKIP_ARGUMENT();
+				src++;
+				int i;
+				char* dst;
+				if (!stringsCount) {
+					dst = newAction->string0Parameter;
+				} else {
+					dst = newAction->string1Parameter;
+				}
+				//skipping the context part, which
+				//is to be readed later
+				if(mergestrings) {
+					for(i=0;i<6;i++) {
+						*dst++='*';
+					}
+				}
+				else {
+					i=0;
+				}
+				while (*src != '"') {
+					//sizeof(context+name) = 40
+					if(i<40) {
+						*dst++ = *src;
+						i++;
+					}
 					src++;
-					int i;
-					char* dst;
+				}
+				*dst = 0;
+				//reading the context part
+				if(mergestrings) {
+					str++;
+					if(*str!='s') {
+						printf("Invalid mergestrings:%s\n",str);
+						abort();
+					}
+					SKIP_ARGUMENT();
 					if (!stringsCount) {
 						dst = newAction->string0Parameter;
 					} else {
 						dst = newAction->string1Parameter;
 					}
-					//skipping the context part, which
-					//is to be readed later
-					if(mergestrings) {
-						for(i=0;i<6;i++) {
-							*dst++='*';
-						}
+
+					//this works only if there are no spaces
+					if(*src++!='"' || *src++!=',' || *src++!='"') {
+						break;
 					}
-					else {
-						i=0;
-					}
+					//reading the context string
+					i=0;
 					while (*src != '"') {
-						if(i<40) {
+						if(i++<6) {
 							*dst++ = *src;
-							i++;
 						}
 						src++;
 					}
-					*dst = 0;
-					//reading the context part
-					if(mergestrings) {
-						str++;
-						if(*str!='s') {
-							printf("Invalid mergestrings:%s\n",str);
-							abort();
-						}
-						SKIP_ARGUMENT();
-						if (!stringsCount) {
-							dst = newAction->string0Parameter;
-						} else {
-							dst = newAction->string1Parameter;
-						}
-
-						//this works only if there are no spaces
-						if(*src++!='"' || *src++!=',' || *src++!='"') {
-							break;
-						}
-						//reading the context string
-						i=0;
-						while (*src != '"') {
-							if(i++<6) {
-								*dst++ = *src;
-							}
-							src++;
-						}
-					}
-					src++; //skipping "
-					stringsCount++;
 				}
-				break;
+				src++; //skipping "
+				stringsCount++;
+			}
+			break;
 		}
 		str++;
 		if(*src == ',' || *src==')')
@@ -1618,10 +1601,10 @@ Action *GameScript::GenerateActionCore(char *src, char *str, int acIndex)
 Action* GameScript::GenerateAction(char* String)
 {
 	strlwr( String );
-	int len = strlench(String,'(')+1; //including (
 	if(InDebug) {
 		printf("Compiling:%s\n",String);
 	}
+	int len = strlench(String,'(')+1; //including (
 	int i = actionsTable->FindString(String, len);
 	if (i<0) {
 		return NULL;
@@ -1634,161 +1617,168 @@ Action* GameScript::GenerateAction(char* String)
 	return GenerateActionCore( src, str, i);
 }
 
+/* this function was lifted from GenerateAction, to make it clearer */
+Trigger *GameScript::GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate)
+{
+	Trigger *newTrigger = new Trigger();
+	newTrigger->triggerID = (unsigned short) triggersTable->GetValueIndex( trIndex )&0x3fff;
+	newTrigger->flags = (unsigned short) negate;
+	int mergestrings = triggerflags[newTrigger->triggerID]&AF_MERGESTRINGS;
+	int stringsCount = 0;
+	int intCount = 0;
+	//Here is the Trigger; Now we need to evaluate the parameters
+	if(*str!=')') while (*str) {
+		if(*(str+1)!=':') {
+			printf("Warning, parser was sidetracked: %s\n",str);
+		}
+		switch (*str) {
+			default:
+				printf("Invalid type: %s\n",str);
+				str++;
+				break;
+
+			case 'p': //Point
+				SKIP_ARGUMENT();
+				src++; //Skip [
+				newTrigger->XpointParameter = strtol( src, &(char *) src, 10 );
+				src++; //Skip .
+				newTrigger->YpointParameter = strtol( src, &(char *) src, 10 );
+				src++; //Skip ]
+				break;
+
+			case 'i': //Integer
+			{
+				//going to the variable name
+				while (*str != '*' && *str !=',' && *str != ')' ) {
+					str++;
+				}
+				int value;
+				if(*str=='*') { //there may be an IDS table
+					str++;
+					char idsTabName[33];
+					char* tmp = idsTabName;
+					while (( *str != ',' ) && ( *str != ')' )) {
+						*tmp = *str;
+						tmp++;
+						str++;
+					}
+					*tmp = 0;
+					if(idsTabName[0]) {
+						value = GetIdsValue(src, idsTabName);
+					}
+					else {
+						value = strtol( src, &(char *) src, 0);
+					}
+				}
+				else { //no IDS table
+					value = strtol( src, &(char *) src, 0);
+				}
+				if (!intCount) {
+					newTrigger->int0Parameter = value;
+				} else if (intCount == 1) {
+					newTrigger->int1Parameter = value;
+				} else {
+					newTrigger->int2Parameter = value;
+				}
+				intCount++;
+			}
+			break;
+
+			case 'o': //Object
+				ParseObject(str, src, newTrigger->objectParameter);
+				break;
+
+			case 's': //String
+			{
+				SKIP_ARGUMENT();
+				src++;
+				int i;
+				char* dst;
+				if (!stringsCount) {
+					dst = newTrigger->string0Parameter;
+				} else {
+					dst = newTrigger->string1Parameter;
+				}
+				//skipping the context part, which
+				//is to be readed later
+				if(mergestrings) {
+					for(i=0;i<6;i++) {
+						*dst++='*';
+					}
+				}
+				else {
+					i=0;
+				}
+				while (*src != '"') {
+					//sizeof(context+name) = 40
+					if(i<40) {
+						*dst++ = *src;
+						i++;
+					}
+					src++;
+				}
+				*dst = 0;
+				//reading the context part
+				if(mergestrings) {
+					str++;
+					if(*str!='s') {
+						printf("Invalid mergestrings:%s\n",str);
+						abort();
+					}
+					SKIP_ARGUMENT();
+					if (!stringsCount) {
+						dst = newTrigger->string0Parameter;
+					} else {
+						dst = newTrigger->string1Parameter;
+					}
+
+					//this works only if there are no spaces
+					if(*src++!='"' || *src++!=',' || *src++!='"') {
+						break;
+					}
+					//reading the context string
+					i=0;
+					while (*src != '"') {
+						if(i++<6) {
+							*dst++ = *src;
+						}
+						src++;
+					}
+				}
+				src++; //skipping "
+				stringsCount++;
+			}
+			break;
+		}
+		str++;
+		if(*src == ',' || *src==')')
+			src++;
+	}
+	return newTrigger;
+}
+
 Trigger* GameScript::GenerateTrigger(char* String)
 {
 	strlwr( String );
-	Trigger* newTrigger = NULL;
-	bool negate = false;
+	if(InDebug) {
+		printf("Compiling:%s\n",String);
+	}
+	int negate = 0;
 	if (*String == '!') {
 		String++;
-		negate = true;
+		negate = 1;
 	}
-	int i = 0;
-	while (true) {
-		char* src = String;
-		char* str = triggersTable->GetStringIndex( i );
-		if (!str)
-			return newTrigger;
-		while (*str) {
-			if (*str != *src)
-				break;
-			if (*str == '(') {
-				newTrigger = new Trigger();
-				newTrigger->triggerID = ( unsigned short )
-					( triggersTable->GetValueIndex( i ) & 0xff );
-				newTrigger->flags = ( negate ) ?
-					( unsigned short ) 1 :
-					( unsigned short ) 0;
-				int stringsCount = 0;
-				int intCount = 0;
-				//Here is the Trigger; Now we need to evaluate the parameters
-				str++;
-				src++;
-				while (*str) {
-					switch (*str) {
-						default:
-							str++;
-							break;
-
-						case 'p':
-							//Point
-							 {
-								SKIP_ARGUMENT();
-								src++; //Skip [
-								char symbol[33];
-								char* tmp = symbol;
-								while (( *src >= '0' ) && ( *src <= '9' )) {
-									*tmp = *src;
-									tmp++;
-									src++;
-								}
-								*tmp = 0;
-								newTrigger->XpointParameter = atoi( symbol );
-								src++; //Skip .
-								tmp = symbol;
-								while (( *src >= '0' ) && ( *src <= '9' )) {
-									*tmp = *src;
-									tmp++;
-									src++;
-								}
-								*tmp = 0;
-								newTrigger->YpointParameter = atoi( symbol );
-								src++; //Skip ]
-							}
-							break;
-
-						case 'i':
-							//Integer
-							 {
-								while (*str != '*')
-									str++;
-								str++;
-								SymbolMgr* valHook = NULL;
-								if (( *str != ',' ) && ( *str != ')' )) {
-									char idsTabName[33];
-									char* tmp = idsTabName;
-									while (( *str != ',' ) && ( *str != ')' )) {
-										*tmp = *str;
-										tmp++;
-										str++;
-									}
-									*tmp = 0;
-									int i = core->LoadSymbol( idsTabName );
-									valHook = core->GetSymbol( i );
-								}
-								if (!valHook) {
-									char symbol[33];
-									char* tmp = symbol;
-									while (( *src >= '0' ) && ( *src <= '9' )) {
-										*tmp = *src;
-										tmp++;
-										src++;
-									}
-									*tmp = 0;
-									if (!intCount) {
-										newTrigger->int0Parameter = atoi( symbol );
-									} else if (intCount == 1) {
-										newTrigger->int1Parameter = atoi( symbol );
-									} else {
-										newTrigger->int2Parameter = atoi( symbol );
-									}
-								} else {
-									char symbol[33];
-									char* tmp = symbol;
-									while (( *src != ',' ) && ( *src != ')' )) {
-										*tmp = *src;
-										tmp++;
-										src++;
-									}
-									*tmp = 0;
-									if (!intCount) {
-										newTrigger->int0Parameter = valHook->GetValue( symbol );
-									} else if (intCount == 1) {
-										newTrigger->int1Parameter = valHook->GetValue( symbol );
-									} else {
-										newTrigger->int2Parameter = valHook->GetValue( symbol );
-									}
-								}
-								intCount++;
-							}
-							break;
-
-						case 'o':
-							ParseObject(str, src, newTrigger->objectParameter);
-							break;
-
-						case 's':
-							//String
-							 {
-								SKIP_ARGUMENT();
-								src++;
-								char* dst;
-								if (!stringsCount) {
-									dst = newTrigger->string0Parameter;
-								} else {
-									dst = newTrigger->string1Parameter;
-								}
-								while (*src != '"') {
-									*dst = *src;
-									dst++;
-									src++;
-								}
-								src++;
-								stringsCount++;
-							}
-							break;
-					}
-					while (( *src == ',' ) || ( *src == ')' ))
-						src++;
-				}
-				return newTrigger;
-			}
-			src++;
-			str++;
-		}
-		i++;
+	int len = strlench(String,'(')+1; //including (
+	int i = triggersTable->FindString(String, len);
+	if( i<0 ) {
+		return NULL;
 	}
-	return newTrigger;
+	char *src = String+len;
+	char *str = triggersTable->GetStringIndex( i )+len;
+	if(InDebug) {
+		printf("Match: %s vs. %s\n",src,str);
+	}
+	return GenerateTriggerCore(src, str, i, negate);
 }
 
 //-------------------------------------------------------------

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.87 2004/03/27 09:22:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.88 2004/03/28 11:21:00 avenger_teambg Exp $
  *
  */
 
@@ -674,8 +674,9 @@ public:
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 	static Action* CreateAction(char* string, bool autoFree = true);
 private:
-	static Action *GenerateActionCore(char *src, char *str, int acIndex);
+	static Action *GenerateActionCore(const char *src, const char *str, int acIndex);
 	static Action* GenerateAction(char* String);
+	static Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 	static Trigger* GenerateTrigger(char* String);
 	/* returns the number of actors matching the IDS targeting */
 	static int GetObjectCount(Scriptable* Sender, Object* oC);
