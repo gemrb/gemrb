@@ -58,6 +58,7 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 		stmp->Read(&declen, 4);
 		strcpy(path, core->CachePath);
 		strcat(path, fname);
+		free(fname);
 		//printf("[BifImporter]: Opening %s...", path);
 		FILE * tmp = fopen(path, "rb");
 		if(tmp) {
@@ -88,8 +89,11 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 			fwrite(outb, 1, declen, tmp);
 			//printf("[BifImporter]: Closing %s...", path);
 			fclose(tmp);
+			free(outb);
 			//printf("[OK]\n");
 			delete(stmp);
+			if(stream)
+				printf("DANGER WILL ROBINSON!!! stream != NULL in BIFImp line 96, possible File Pointer Leak...");
 			stream = new CachedFileStream(path);
 			stream->Read(Signature, 8);
 			if(strncmp(Signature, "BIFFV1  ", 8) == 0)
@@ -108,6 +112,8 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 			fclose(exist_in_cache);
 			//printf("[OK]\n");
 			delete(stmp);
+			if(stream)
+				printf("DANGER WILL ROBINSON!!! stream != NULL in BIFImp line 116, possible File Pointer Leak...");
 			stream = new CachedFileStream(cpath);
 			stream->Read(Signature, 8);
 			if(strncmp(Signature, "BIFFV1  ", 8) == 0) {
@@ -170,6 +176,8 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 		free(inbuf);
 		free(outbuf);
 		strcpy(filename, path);
+		if(stream)
+			printf("DANGER WILL ROBINSON!!! stream != NULL in BIFImp line 116, possible File Pointer Leak...");
 		stream = new CachedFileStream(filename);
 		stream->Read(Signature, 8);
 		if(strncmp(Signature, "BIFFV1  ", 8) == 0)
