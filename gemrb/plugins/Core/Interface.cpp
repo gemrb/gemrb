@@ -432,9 +432,9 @@ char * Interface::TypeExt(SClass_ID type)
 
 char * Interface::GetString(unsigned long strref)
 {
-	unsigned long flags;
+	unsigned long flags=0;
 
-	vars->Lookup("StrrefOn",flags);
+	vars->Lookup("Strref On",flags);
 	return strings->GetString(strref, flags);
 }
 
