@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.8 2003/11/26 14:03:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.9 2003/11/26 21:36:27 avenger_teambg Exp $
  *
  */
 
@@ -60,6 +60,8 @@ bool AREImp::Open(DataStream * stream, bool autoFree)
 	str->Seek(0xac, GEM_STREAM_START);
 	str->Read(&AnimCount, 4);
 	str->Read(&AnimOffset, 4);
+	str->Seek(8,GEM_CURRENT_POS); //skipping some
+	str->Read(&SongHeader,4);
 	return true;
 }
 
@@ -84,6 +86,12 @@ Map * AREImp::GetMap()
 
 	map->AddTileMap(tmm->GetTileMap(), lm);
 	core->FreeInterface(tmm);
+
+	str->Seek(SongHeader, GEM_STREAM_START);
+	//5 is the number of song indices
+	for(int i=0;i<5;i++) {
+	  str->Read(map->SongHeader.SongList+i, 4 );
+	}
 	str->Seek(ActorOffset, GEM_STREAM_START);
 	if(!core->IsAvailable(IE_CRE_CLASS_ID)) {
 		printf("[AREImporter]: No Actor Manager Available, skipping actors\n");

@@ -139,4 +139,6 @@ void GameControl::SetCurrentArea(int Index)
 	ActorBlock ab = game->GetPC(0);
 	if(ab.actor)
 		area->AddActor(ab);
+	//night or day?
+	area->PlayAreaSong(0);
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.16 2003/11/26 18:16:32 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.17 2003/11/26 21:36:27 avenger_teambg Exp $
  *
  */
 
@@ -36,8 +36,6 @@
 #define EVILBUTGREEN	201
 #define EVILBUTBLUE		202
 #define ENEMY			255
-
-#define STATE_DEAD		0x00000800
 
 #include "../../includes/win32def.h"
 #include "Map.h"
@@ -75,6 +73,7 @@ Color green_dark	= {0x00, 0x80, 0x00, 0xff};
 Color red_dark		= {0x80, 0x00, 0x00, 0xff};
 Color yellow_dark	= {0x80, 0x80, 0x00, 0xff};
 Color cyan_dark		= {0x00, 0x80, 0x80, 0xff};
+Color magenta		= {0xff, 0x00, 0xff, 0xff};
 void Map::DrawMap(Region viewport)
 {	
 	if(tm)
@@ -100,8 +99,17 @@ void Map::DrawMap(Region viewport)
 				 if(actors[i].actor->Modified[IE_STATE_ID]&STATE_DEAD) DrawCircle=false;
 			}
 		}
-		if(DrawCircle) {	
-			switch(actors[i].actor->BaseStats[IE_EA])
+		if(DrawCircle) {
+			Color *color;
+
+			if(actors[i].actor->BaseStats[IE_UNSELECTABLE]) {
+				color=&magenta;
+			}
+			if(actors[i].actor->BaseStats[IE_MORALEBREAK]<actors[i].actor->Modified[IE_MORALEBREAK])
+			{
+				if(actors[i].Selected) color=&yellow;
+				else color=&yellow_dark;
+			} else switch(actors[i].actor->BaseStats[IE_EA])
 			{
 			case EVILCUTOFF:
 			case GOODCUTOFF:
@@ -113,35 +121,23 @@ void Map::DrawMap(Region viewport)
 			case CONTROLLED:
 			case CHARMED:
 			case EVILBUTGREEN:
-				if(actors[i].Selected)
-					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), green);
-				else
-					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), green_dark);
+				if(actors[i].Selected) color=&green;
+				else color=&green_dark;
 			break;
 
 			case ENEMY:
 			case GOODBUTRED:
-				if(actors[i].Selected)
-					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), red);
-				else
-					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), red_dark);
+				if(actors[i].Selected) color=&red;
+				else color=&red_dark;
 			break;
-
-			case NEUTRAL:
-				if(actors[i].Selected)
-					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), yellow);
-				else
-					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), yellow_dark);
-			break;
-
 			default:
-				if(actors[i].Selected)
-					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), cyan);
-				else
-					video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), cyan_dark);
+				if(actors[i].Selected) color=&cyan;
+				else color=&cyan_dark;
 			break;
 			}
+			video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), *color);
 		}
+
 		if(anim) {
 			Sprite2D * nextFrame = anim->NextFrame();
 			if(actors[i].lastFrame != nextFrame) {
@@ -205,3 +201,34 @@ ActorBlock * Map::GetActor(int x, int y)
 	}
 	return NULL;
 }
+
+void Map::PlayAreaSong(int SongType)
+{
+//you can speed this up by loading the songlist once at startup
+        int column;
+        const char *tablename;
+
+        if(stricmp(core->GameType, "bg2")==0) {
+                 column=1;
+                 tablename="songlist";
+        }
+        else {
+/*since bg1 and pst has no .2da for songlist, we must supply one in
+  the gemrb/override folder.
+  It should be: music.2da, first column is a .mus filename
+*/
+                column=0;
+                tablename="music";
+        }
+        int songlist = core->LoadTable(tablename);
+        if(!songlist)
+                return;
+        TableMgr * tm = core->GetTable(songlist);
+        if(!tm)
+                return;
+        char *poi=tm->QueryField(SongHeader.SongList[SongType],column);
+        printf("Switching to playlist: %s\n",poi);
+        core->GetMusicMgr()->SwitchPlayList(poi);
+        core->DelTable(songlist);
+}
+

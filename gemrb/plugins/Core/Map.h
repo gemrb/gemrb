@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.8 2003/11/26 18:16:32 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.9 2003/11/26 21:36:27 avenger_teambg Exp $
  *
  */
 
@@ -37,6 +37,10 @@
 #else
 #define GEM_EXPORT
 #endif
+
+typedef struct SongHeaderType {
+	unsigned long SongList[5];
+} SongHeaderType;
 
 typedef struct ActorBlock {
 	unsigned short XPos, YPos;
@@ -61,9 +65,11 @@ public:
 	~Map(void);
 	void AddTileMap(TileMap * tm, ImageMgr * lm);
 	void DrawMap(Region viewport);
+	void PlayAreaSong(int);
 	void AddAnimation(Animation * anim);
 	void AddActor(ActorBlock actor);
 	ActorBlock * GetActor(int x, int y);
+	SongHeaderType SongHeader;
 };
 
 #endif
