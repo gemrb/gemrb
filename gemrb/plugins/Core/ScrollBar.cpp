@@ -36,7 +36,7 @@ void ScrollBar::SetPos(int NewPos)
 void ScrollBar::RedrawScrollBar(const char *Variable, int Sum)
 {
 	if(strnicmp(VarName, Variable, MAX_VARIABLE_LENGTH) ) return;
-	SetMax(Sum);
+	SetPos(Sum);
 }
 
 void ScrollBar::Draw(unsigned short x, unsigned short y)
