@@ -507,17 +507,17 @@ void Door::ToggleTiles(bool playsound)
 {
 	unsigned char state = ( closedIndex == 1 ) ? 0 : 1;
 	if (Flags&1) {
-		state = closedIndex;
-		if (playsound && ( CloseSound[0] != '\0' ))
-			core->GetSoundMgr()->Play( CloseSound );
-		XPos = closed->BBox.x + ( closed->BBox.w / 2 );
-		YPos = closed->BBox.y + ( closed->BBox.h / 2 );
-	} else {
 		if (playsound && ( OpenSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( OpenSound );
 		XPos = open->BBox.x + ( open->BBox.w / 2 );
 		YPos = open->BBox.y + ( open->BBox.h / 2 );
+	} else {
+		if (playsound && ( CloseSound[0] != '\0' ))
+			core->GetSoundMgr()->Play( CloseSound );
+		XPos = closed->BBox.x + ( closed->BBox.w / 2 );
+		YPos = closed->BBox.y + ( closed->BBox.h / 2 );
 	}
+	Flags ^=1;
 	for (int i = 0; i < count; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = state;
 	}
@@ -556,28 +556,25 @@ void Door::SetDoorLocked(bool Locked, bool playsound)
 
 void Door::SetDoorClosed(bool Closed, bool playsound)
 {
+	if((Flags&1)!=Closed) {
+		ToggleTiles( playsound );
+	}
 	if (Closed) {
 		outline = closed;
 	} else {
 		outline = open;
 	}
-	if ((Flags&1) == Closed) {
-		if (Closed) {
-			XPos = closed->BBox.x + ( closed->BBox.w / 2 );
-			YPos = closed->BBox.y + ( closed->BBox.h / 2 );
-		} else {
-			XPos = open->BBox.x + ( open->BBox.w / 2 );
-			YPos = open->BBox.y + ( open->BBox.h / 2 );
-		}
-		return;
+	if (Closed) {
+		XPos = closed->BBox.x + ( closed->BBox.w / 2 );
+		YPos = closed->BBox.y + ( closed->BBox.h / 2 );
+	} else {
+		XPos = open->BBox.x + ( open->BBox.w / 2 );
+		YPos = open->BBox.y + ( open->BBox.h / 2 );
 	}
-	Flags^=1;
-	ToggleTiles( playsound );
 }
 
 void Door::ToggleDoorState()
 {
-	Flags^=1;
 	ToggleTiles( true );
 	if (Flags&1) {
 		outline = closed;
@@ -608,6 +605,7 @@ void Door::SetCursor(unsigned char CursorIndex)
 {
 	Cursor = CursorIndex;
 }
+
 void Door::DebugDump()
 {
 	printf( "Debugdump of Door %s:\n", Name );

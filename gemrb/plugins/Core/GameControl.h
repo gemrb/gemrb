@@ -105,7 +105,7 @@ public:
 	void DisplayString(Scriptable* target);
 	/* Displays a string in the textarea */
 	void DisplayString(char* Text);
-
+	Actor *GetLastActor() { return lastActor; }
 private:
 	void ChangeMap();
 	/* evaluates a dialog trigger block */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.109 2004/03/20 21:01:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.110 2004/03/21 15:49:21 avenger_teambg Exp $
  *
  */
 
@@ -27,6 +27,9 @@ extern Interface* core;
 #ifdef WIN32
 extern HANDLE hConsole;
 #endif
+
+//this will skip to the next element in the prototype of an action/trigger
+#define SKIP_ARGUMENT() while(*str && ( *str != ',' ) && ( *str != ')' )) str++
 
 static int initialized = 0;
 static SymbolMgr* triggersTable;
@@ -112,7 +115,7 @@ static TriggerLink triggernames[] = {
 	{"unselectablevariable", GameScript::UnselectableVariable},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT},
 	{"unselectablevariablelt", GameScript::UnselectableVariableLT},
-	{"xpgt", GameScript::XPGT}, {"xplt", GameScript::XPLT}, { NULL,NULL}, 
+	{"xpgt", GameScript::XPGT}, {"xplt", GameScript::XPLT}, { NULL,NULL},
 };
 
 //Make this an ordered list, so we could use bsearch!
@@ -121,7 +124,7 @@ static ActionLink actionnames[] = {
 	{"addareatype", GameScript::AddAreaType},
 	{"addareaflag", GameScript::AddAreaFlag},
 	{"addexperienceparty",GameScript::AddExperienceParty},
-	{"addexperiencepartyglobal",GameScript::AddExperiencePartyGlobal},
+	{"addexperiencepartyglobal",GameScript::AddExperiencePartyGlobal,AF_MERGESTRINGS},
 	{"addglobals",GameScript::AddGlobals},
 	{"addwaypoint",GameScript::AddWayPoint,AF_BLOCKING},
 	{"addxp2da", GameScript::AddXP2DA},
@@ -173,27 +176,27 @@ static ActionLink actionnames[] = {
 	{"forcespell",GameScript::ForceSpell},
 	{"giveexperience", GameScript::AddXPObject},
 	{"givepartygold",GameScript::GivePartyGold},
-	{"givepartygoldglobal",GameScript::GivePartyGoldGlobal},
-	{"globalband",GameScript::GlobalBAnd},
-	{"globalbandglobal",GameScript::GlobalBAndGlobal},
-	{"globalbor",GameScript::GlobalBOr},
-	{"globalborglobal",GameScript::GlobalBOrGlobal},
-	{"globalmax",GameScript::GlobalMax},
-	{"globalmaxglobal",GameScript::GlobalMaxGlobal},
-	{"globalmin",GameScript::GlobalMin},
-	{"globalminglobal",GameScript::GlobalMinGlobal},
-	{"globalsetglobal",GameScript::GlobalSetGlobal},
-	{"globalshl",GameScript::GlobalShL},
-	{"globalshlglobal",GameScript::GlobalShLGlobal},
-	{"globalshr",GameScript::GlobalShR},
-	{"globalshrglobal",GameScript::GlobalShRGlobal},
-	{"globalxor",GameScript::GlobalXor},
-	{"globalxorglobal",GameScript::GlobalXorGlobal},
+	{"givepartygoldglobal",GameScript::GivePartyGoldGlobal,AF_MERGESTRINGS},
+	{"globalband",GameScript::GlobalBAnd,AF_MERGESTRINGS},
+	{"globalbandglobal",GameScript::GlobalBAndGlobal,AF_MERGESTRINGS},
+	{"globalbor",GameScript::GlobalBOr,AF_MERGESTRINGS},
+	{"globalborglobal",GameScript::GlobalBOrGlobal,AF_MERGESTRINGS},
+	{"globalmax",GameScript::GlobalMax,AF_MERGESTRINGS},
+	{"globalmaxglobal",GameScript::GlobalMaxGlobal,AF_MERGESTRINGS},
+	{"globalmin",GameScript::GlobalMin,AF_MERGESTRINGS},
+	{"globalminglobal",GameScript::GlobalMinGlobal,AF_MERGESTRINGS},
+	{"globalsetglobal",GameScript::GlobalSetGlobal,AF_MERGESTRINGS},
+	{"globalshl",GameScript::GlobalShL,AF_MERGESTRINGS},
+	{"globalshlglobal",GameScript::GlobalShLGlobal,AF_MERGESTRINGS},
+	{"globalshr",GameScript::GlobalShR,AF_MERGESTRINGS},
+	{"globalshrglobal",GameScript::GlobalShRGlobal,AF_MERGESTRINGS},
+	{"globalxor",GameScript::GlobalXor,AF_MERGESTRINGS},
+	{"globalxorglobal",GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
 	{"hidegui",GameScript::HideGUI},
 	{"incmoraleai",GameScript::IncMoraleAI},
 	{"incrementchapter",GameScript::IncrementChapter},
-	{"incrementglobal",GameScript::IncrementGlobal},
-	{"incrementglobalonce",GameScript::IncrementGlobalOnce},
+	{"incrementglobal",GameScript::IncrementGlobal,AF_MERGESTRINGS},
+	{"incrementglobalonce",GameScript::IncrementGlobalOnce,AF_MERGESTRINGS},
 	{"joinparty",GameScript::JoinParty},
 	{"jumptoobject",GameScript::JumpToObject},
 	{"jumptopoint",GameScript::JumpToPoint},
@@ -221,6 +224,8 @@ static ActionLink actionnames[] = {
 	{"recoil",GameScript::Recoil},
 	{"removeareatype", GameScript::RemoveAreaType},
 	{"removeareaflag", GameScript::RemoveAreaFlag},
+	{"savelocation", GameScript::SaveLocation},
+	{"saveobjectlocation", GameScript::SaveObjectLocation},
 	{"setbeeninpartyflags",GameScript::SetBeenInPartyFlags},
 	{"setmoraleai",GameScript::SetMoraleAI},
 	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
@@ -233,11 +238,12 @@ static ActionLink actionnames[] = {
 	{"setanimstate",GameScript::SetAnimState,AF_BLOCKING},
 	{"setarearestflag", GameScript::SetAreaRestFlag},
 	{"setdialogue",GameScript::SetDialogue,AF_BLOCKING},
-	{"setglobal",GameScript::SetGlobal},
-	{"setglobaltimer",GameScript::SetGlobalTimer},
+	{"setglobal",GameScript::SetGlobal,AF_MERGESTRINGS},
+	{"setglobaltimer",GameScript::SetGlobalTimer,AF_MERGESTRINGS},
 	{"setnumtimestalkedto",GameScript::SetNumTimesTalkedTo},
 	{"setplayersound",GameScript::SetPlayerSound},
-	{"settokenglobal",GameScript::SetTokenGlobal}, {"sg",GameScript::SG},
+	{"settokenglobal",GameScript::SetTokenGlobal,AF_MERGESTRINGS},
+	{"sg",GameScript::SG},
 	{"smallwait",GameScript::SmallWait,AF_BLOCKING},
 	{"startcutscene",GameScript::StartCutScene},
 	{"startcutscenemode",GameScript::StartCutSceneMode},
@@ -265,7 +271,7 @@ static ActionLink actionnames[] = {
 	{"unmakeglobal",GameScript::UnMakeGlobal}, //this is a GemRB extension
 	{"verbalconstant",GameScript::VerbalConstant},
 	{"wait",GameScript::Wait, AF_BLOCKING},
-	{"waitrandom",GameScript::WaitRandom, AF_BLOCKING}, { NULL,NULL}, 
+	{"waitrandom",GameScript::WaitRandom, AF_BLOCKING}, { NULL,NULL},
 };
 
 //Make this an ordered list, so we could use bsearch!
@@ -314,7 +320,7 @@ static ObjectLink objectnames[] = {
 	{"thirdnearestenemyof",GameScript::ThirdNearestEnemyOf},
 	{"weakestof",GameScript::WeakestOf},
 	{"worstac",GameScript::WorstAC},
-	{ NULL,NULL}, 
+	{ NULL,NULL},
 };
 
 static IDSLink idsnames[] = {
@@ -568,7 +574,9 @@ void GameScript::ReplaceMyArea(Scriptable* Sender, char* newVarName)
 void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 	const char* Context, int value)
 {
-	if (strnicmp( VarName, "LOCALS", 6 ) == 0) {
+	printf( "Setting variable(\"%s.%s\", %d)\n", Context,
+		VarName, value );
+	if (strnicmp( Context, "LOCALS", 6 ) == 0) {
 		Sender->locals->SetAt( VarName, value );
 		return;
 	}
@@ -584,6 +592,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 	int value)
 {
+	printf( "Setting variable(\"%s\", %d)\n", VarName, value );
 	if (strnicmp( VarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->SetAt( &VarName[6], value );
 		return;
@@ -1262,9 +1271,7 @@ static void ParseIdsTarget(char *&src, Object *&object)
 
 static void ParseObject(char *&str, char *&src, Object *&object)
 {
-	while (( *str != ',' ) && ( *str != ')' )) {
-		str++;
-	}
+	SKIP_ARGUMENT();
 	object = new Object();
 	switch (*src) {
 	case '"':
@@ -1307,11 +1314,212 @@ static void ParseObject(char *&str, char *&src, Object *&object)
 	}
 }
 
+/* this function was lifted from GenerateAction, to make it clearer */
+Action *GameScript::GenerateActionCore(char *src, char *str, int acIndex)
+{
+	Action *newAction = new Action();
+	newAction->actionID = (unsigned short) actionsTable->GetValueIndex( acIndex );
+	//this flag tells us to merge 2 consecutive strings together to get
+	//a variable (context+variablename)
+	int mergestrings = flags[newAction->actionID]&AF_MERGESTRINGS;
+	int objectCount = ( newAction->actionID == 1 ) ? 0 : 1;
+	int stringsCount = 0;
+	int intCount = 0;
+	//Here is the Action; Now we need to evaluate the parameters
+	str++;
+	src++;
+	while (*str) {
+		switch (*str) {
+			default:
+				str++;
+				break;
+
+			case 'p':
+				//Point
+				SKIP_ARGUMENT();
+				src++; //Skip [
+				newAction->XpointParameter = atoi( src );
+				while( *src!='.' && *src!=']') {
+					src++;
+				}
+				src++; //Skip .
+				newAction->YpointParameter = atoi( src );
+				src++; //Skip ]
+				break;
+
+			case 'i':
+				//Integer
+				 {
+					while (*str != '*') {
+						str++;
+					}
+					str++;
+					SymbolMgr* valHook = NULL;
+					if (( *str != ',' ) && ( *str != ')' )) {
+						char idsTabName[33];
+						char* tmp = idsTabName;
+						while (( *str != ',' ) && ( *str != ')' )) {
+							*tmp = *str;
+							tmp++;
+							str++;
+						}
+						*tmp = 0;
+						int i = core->LoadSymbol( idsTabName );
+						valHook = core->GetSymbol( i );
+					}
+					if (!valHook) {
+						char symbol[33];
+						char* tmp = symbol;
+						while (( ( *src >= '0' ) &&
+							( *src <= '9' ) ) ||
+							( *src == '-' )) {
+							*tmp = *src;
+							tmp++;
+							src++;
+						}
+						*tmp = 0;
+						if (!intCount) {
+							newAction->int0Parameter = atoi( symbol );
+						} else if (intCount == 1) {
+							newAction->int1Parameter = atoi( symbol );
+						} else {
+							newAction->int2Parameter = atoi( symbol );
+						}
+					} else {
+						char symbol[33];
+						char* tmp = symbol;
+						while (( *src != ',' ) && ( *src != ')' )) {
+							*tmp = *src;
+							tmp++;
+							src++;
+						}
+						*tmp = 0;
+						if (!intCount) {
+							newAction->int0Parameter = valHook->GetValue( symbol );
+						} else if (intCount == 1) {
+							newAction->int1Parameter = valHook->GetValue( symbol );
+						} else {
+							newAction->int2Parameter = valHook->GetValue( symbol );
+						}
+					}
+				}
+				break;
+
+			case 'a':
+				//Action
+				 {
+					SKIP_ARGUMENT();
+					char action[257];
+					int i = 0;
+					int openParenthesisCount = 0;
+					while (true) {
+						if (*src == ')') {
+							if (!openParenthesisCount)
+								break;
+							openParenthesisCount--;
+						} else {
+							if (*src == '(') {
+								openParenthesisCount++;
+							} else {
+								if (( *src == ',' ) &&
+									!openParenthesisCount)
+									break;
+							}
+						}
+						action[i] = *src;
+						i++;
+						src++;
+					}
+					action[i] = 0;
+					Action* act = GenerateAction( action );
+					act->objects[0] = newAction->objects[0];
+					act->objects[0]->IncRef();
+					newAction->Release();
+					newAction = act;
+				}
+				break;
+
+			case 'o':
+				ParseObject(str, src, newAction->objects[objectCount++]);
+				break;
+
+			case 's':
+				//String
+				 {
+					SKIP_ARGUMENT();
+					src++;
+					int i;
+					char* dst;
+					if (!stringsCount) {
+						dst = newAction->string0Parameter;
+					} else {
+						dst = newAction->string1Parameter;
+					}
+					//skipping the context part, which
+					//is to be readed later
+					if(mergestrings) {
+						for(i=0;i<6;i++) {
+							*dst++='*';
+						}
+					}
+					else {
+						i=0;
+					}
+					while (*src != '"') {
+						if(i<40) {
+							*dst++ = *src;
+							i++;
+						}
+						src++;
+					}
+					*dst = 0;
+					//reading the context part
+					if(mergestrings) {
+						str++;
+						if(*str!='s') {
+							printf("Invalid mergestrings!\n");
+							abort();
+						}
+						SKIP_ARGUMENT();
+						if (!stringsCount) {
+							dst = newAction->string0Parameter;
+						} else {
+							dst = newAction->string1Parameter;
+						}
+
+						//this works only if there are no spaces
+						if(*src++!='"' || *src++!=',' || *src++!='"') {
+							break;
+						}
+						//reading the context string
+						i=0;
+						while (*src != '"') {
+							if(i++<6) {
+								*dst++ = *src;
+							}
+							src++;
+						}
+					}
+					str++;
+					src++; //skipping " and ,
+					stringsCount++;
+				}
+				break;
+		}
+		if(*src == ',')
+			src++;
+	}
+	return newAction;
+}
+
 Action* GameScript::GenerateAction(char* String)
 {
 	strlwr( String );
 	Action* newAction = NULL;
 	int i = 0;
+	//this could be significantly optimized if we store them in a mapping
+	//or at least use bsearch
+printf("Compiling: %s\n", String);
 	while (true) {
 		char* src = String;
 		char* str = actionsTable->GetStringIndex( i );
@@ -1321,157 +1529,11 @@ Action* GameScript::GenerateAction(char* String)
 			if (*str != *src)
 				break;
 			if (*str == '(') {
-				newAction = new Action();
-				newAction->actionID = ( unsigned short )
-					actionsTable->GetValueIndex( i );
-				int objectCount = ( newAction->actionID == 1 ) ? 0 : 1;
-				int stringsCount = 0;
-				int intCount = 0;
-				//Here is the Trigger; Now we need to evaluate the parameters
-				str++;
-				src++;
-				while (*str) {
-					switch (*str) {
-						default:
-							str++;
-							break;
-
-						case 'p':
-							//Point
-							while(( *str != '.' ) && ( *str != ')' ))
-								str++;
-							src++; //Skip [
-							newAction->XpointParameter = atoi( src );
-							while( *src!='.' && *src!=']')
-								src++;
-							src++; //Skip .
-							newAction->YpointParameter = atoi( src );
-							src++; //Skip ]
-							break;
-
-						case 'i':
-							//Integer
-							 {
-								while (*str != '*')
-									str++;
-								str++;
-								SymbolMgr* valHook = NULL;
-								if (( *str != ',' ) && ( *str != ')' )) {
-									char idsTabName[33];
-									char* tmp = idsTabName;
-									while (( *str != ',' ) && ( *str != ')' )) {
-										*tmp = *str;
-										tmp++;
-										str++;
-									}
-									*tmp = 0;
-									int i = core->LoadSymbol( idsTabName );
-									valHook = core->GetSymbol( i );
-								}
-								if (!valHook) {
-									char symbol[33];
-									char* tmp = symbol;
-									while (( ( *src >= '0' ) &&
-										( *src <= '9' ) ) ||
-										( *src == '-' )) {
-										*tmp = *src;
-										tmp++;
-										src++;
-									}
-									*tmp = 0;
-									if (!intCount) {
-										newAction->int0Parameter = atoi( symbol );
-									} else if (intCount == 1) {
-										newAction->int1Parameter = atoi( symbol );
-									} else {
-										newAction->int2Parameter = atoi( symbol );
-									}
-								} else {
-									char symbol[33];
-									char* tmp = symbol;
-									while (( *src != ',' ) && ( *src != ')' )) {
-										*tmp = *src;
-										tmp++;
-										src++;
-									}
-									*tmp = 0;
-									if (!intCount) {
-										newAction->int0Parameter = valHook->GetValue( symbol );
-									} else if (intCount == 1) {
-										newAction->int1Parameter = valHook->GetValue( symbol );
-									} else {
-										newAction->int2Parameter = valHook->GetValue( symbol );
-									}
-								}
-							}
-							break;
-
-						case 'a':
-							//Action
-							 {
-								while (( *str != ',' ) && ( *str != ')' ))
-									str++;
-								char action[257];
-								int i = 0;
-								int openParentesisCount = 0;
-								while (true) {
-									if (*src == ')') {
-										if (!openParentesisCount)
-											break;
-										openParentesisCount--;
-									} else {
-										if (*src == '(') {
-											openParentesisCount++;
-										} else {
-											if (( *src == ',' ) &&
-												!openParentesisCount)
-												break;
-										}
-									}
-									action[i] = *src;
-									i++;
-									src++;
-								}
-								action[i] = 0;
-								Action* act = GenerateAction( action );
-								act->objects[0] = newAction->objects[0];
-								act->objects[0]->IncRef();
-								newAction->Release();
-								newAction = act;
-							}
-							break;
-
-						case 'o':
-							ParseObject(str, src, newAction->objects[objectCount++]);
-							break;
-
-						case 's':
-							//String
-							 {
-								while (( *str != ',' ) && ( *str != ')' ))
-									str++;
-								src++;
-								char* dst;
-								if (!stringsCount) {
-									dst = newAction->string0Parameter;
-								} else {
-									dst = newAction->string1Parameter;
-								}
-								while (*src != '"') {
-									*dst = *src;
-									dst++;
-									src++;
-								}
-								*dst = 0;
-								src++;
-								stringsCount++;
-							}
-							break;
-					}
-					while (( *src == ',' ) || ( *src == ' ' ))
-						src++;
+				newAction = GenerateActionCore(src, str, i);
+				if(newAction) {
+					return newAction;
 				}
-				return newAction;
+				break;
 			}
 			src++;
 			str++;
@@ -1520,8 +1582,7 @@ Trigger* GameScript::GenerateTrigger(char* String)
 						case 'p':
 							//Point
 							 {
-								while (( *str != ',' ) && ( *str != ')' ))
-									str++;
+								SKIP_ARGUMENT();
 								src++; //Skip [
 								char symbol[33];
 								char* tmp = symbol;
@@ -1608,8 +1669,7 @@ Trigger* GameScript::GenerateTrigger(char* String)
 						case 's':
 							//String
 							 {
-								while (( *str != ',' ) && ( *str != ')' ))
-									str++;
+								SKIP_ARGUMENT();
 								src++;
 								char* dst;
 								if (!stringsCount) {
@@ -1627,7 +1687,7 @@ Trigger* GameScript::GenerateTrigger(char* String)
 							}
 							break;
 					}
-					while (( *src == ',' ) || ( *src == ' ' ))
+					while (( *src == ',' ) || ( *src == ')' ))
 						src++;
 				}
 				return newTrigger;
@@ -2427,7 +2487,7 @@ int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 							parameters->string0Parameter );
 	unsigned long value2;
 
-	GetTime(value2);
+	GetTime(value2); //this should be game time
 	int eval = ( value1 == value2 ) ? 1 : 0;
 	return eval;
 }
@@ -3227,14 +3287,12 @@ void GameScript::NoAction(Scriptable* /*Sender*/, Action* /*parameters*/)
 
 void GameScript::SG(Scriptable* Sender, Action* parameters)
 {
-	SetVariable( Sender, "GLOBAL", parameters->string0Parameter,
+	SetVariable( Sender, parameters->string0Parameter, "GLOBAL",
 		parameters->int0Parameter );
 }
 
 void GameScript::SetGlobal(Scriptable* Sender, Action* parameters)
 {
-	printf( "SetGlobal(\"%s\", %d)\n", parameters->string0Parameter,
-		parameters->int0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		parameters->int0Parameter );
 }
@@ -3243,9 +3301,7 @@ void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
 {
 	unsigned long mytime;
 
-	printf( "SetGlobalTimer(\"%s\")\n", parameters->string0Parameter,
-		parameters->int0Parameter );
-	GetTime(mytime);
+	GetTime(mytime); //actually, this should be game time, not real time
 	SetVariable( Sender, parameters->string0Parameter,
 		parameters->int0Parameter + mytime);
 }
@@ -3603,6 +3659,7 @@ void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
 
 	*((unsigned short *) &value) = parameters->XpointParameter;
 	*(((unsigned short *) &value)+1) = (unsigned short) parameters->YpointParameter;
+	printf("SaveLocation: %s\n",parameters->string0Parameter);
 	SetVariable(Sender, parameters->string0Parameter, value);
 }
 
@@ -3613,6 +3670,7 @@ void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	*((unsigned short *) &value) = tar->XPos;
 	*(((unsigned short *) &value)+1) = (unsigned short) tar->YPos;
+	printf("SaveLocation: %s\n",parameters->string0Parameter);
 	SetVariable(Sender, parameters->string0Parameter, value);
 }
 
@@ -3763,9 +3821,9 @@ void GameScript::Face(Scriptable* Sender, Action* parameters)
 		actor->resetAction = true;
 		actor->SetWait( 1 );
 	} else {
-		/* 
+		/*
 									This action is a fast Ending OpCode. This means that this OpCode
-									is executed and finished immediately, but since we need to 
+									is executed and finished immediately, but since we need to
 									redraw the Screen to see the change, we consider it as a Blocking
 									Action. We need to NULL the CurrentAction to prevent an infinite loop
 									waiting for this 'blocking' action to terminate.
@@ -4977,6 +5035,6 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	//i think it is bit 15 
+	//i think it is bit 15
 	actor->SetStat(IE_MC_FLAGS,actor->GetStat(IE_MC_FLAGS)|32768);
 }

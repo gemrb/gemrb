@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.78 2004/03/20 21:01:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.79 2004/03/21 15:49:21 avenger_teambg Exp $
  *
  */
 
@@ -601,10 +601,11 @@ struct TriggerLink {
 #define BD_OWN  	 64 //source == target, works for player only
 
 #define AF_NONE 	 0
-#define AF_INSTANT   1
-#define AF_CONTINUE  2
+#define AF_INSTANT       1
+#define AF_CONTINUE      2
 #define AF_MASK 	 3   //none, instant or continue
-#define AF_BLOCKING  4
+#define AF_BLOCKING      4
+#define AF_MERGESTRINGS  8
 
 struct ActionLink {
 	const char* Name;
@@ -659,6 +660,7 @@ public:
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 	static Action* CreateAction(char* string, bool autoFree = true);
 private:
+	static Action *GenerateActionCore(char *src, char *str, int acIndex);
 	static Action* GenerateAction(char* String);
 	static Trigger* GenerateTrigger(char* String);
 	/* returns the number of actors matching the IDS targeting */
