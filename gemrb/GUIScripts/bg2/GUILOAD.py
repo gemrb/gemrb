@@ -93,7 +93,11 @@ def LoadGamePress():
 	return
 
 def DeleteGamePress():
-	Pos = GemRB.GetVar("TopIndex")+GemRB.GetVar("LoadIdx")
+	TopIndex = GemRB.GetVar("TopIndex")
+	Pos = TopIndex +GemRB.GetVar("LoadIdx")
+	GemRB.DeleteSaveGame(Pos)
+	GemRB.SetVar("TopIndex",TopIndex-1)
+	ScrollBarPress()
 	return
 	
 def CancelPress():
