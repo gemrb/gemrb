@@ -146,8 +146,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 				if(Pressed)
 					core->GetVideoDriver()->BlitSprite(Pressed, x+XPos, y+YPos, true);
 				//shift the writing a bit
-				x+=3;
-				y+=3;
+				x+=2;
+				y+=2;
 			}	
 			break;
 		
@@ -157,6 +157,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 					core->GetVideoDriver()->BlitSprite(Selected, x+XPos, y+YPos, true);
 				else if(Unpressed)
 					core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
+				x+=2;
+				y+=2;
 			}
 			break;
 		
