@@ -4,11 +4,11 @@
 //we need 32+6 bytes at least, because we store 'context' in the variable
 //name too
 #define MAX_VARIABLE_LENGTH  40
+#include "../plugins/Core/VFS.h"
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "../plugins/Core/VFS.h"
 
 #if _MSC_VER >= 1000
 #pragma message("Microsoft Compiler Version Greater than 1.00")
