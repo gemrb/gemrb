@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.47 2004/04/14 22:49:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.48 2004/04/14 22:53:50 avenger_teambg Exp $
  *
  */
 
@@ -269,6 +269,7 @@ void TextArea::PopLines(int count)
 		lines.pop_back();
 		free(poi);
 		lrows.pop_back();
+		count--;
 	}
 
 	int pos;

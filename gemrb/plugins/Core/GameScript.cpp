@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.135 2004/04/14 18:40:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.136 2004/04/14 22:53:50 avenger_teambg Exp $
  *
  */
 
@@ -1263,10 +1263,10 @@ Targets* GameScript::EvaluateObject(Object* oC)
 		else {
 			//we need to get a subset of actors from the large array
 			//if this gets slow, we will need some index tables
-			int i = core->GetActorCount();
+			int i = core->GetGame()->GetCurrentMap()->GetActorCount();
 			tgts = new Targets();
 			while(i--) {
-				Actor *ac=core->GetActor(i);
+				Actor *ac=core->GetGame()->GetCurrentMap()->GetActor(i);
 				if(ac && func(ac, oC->objectFields[j]) ) {
 					tgts->AddTarget(ac);
 				}
@@ -4254,7 +4254,6 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	ab->AnimID = IE_ANI_AWAKE;
 	ab->Orientation = parameters->int0Parameter;
 	Map* map = core->GetGame()->GetCurrentMap( );
-	core->AddActor( ab );
 	map->AddActor( ab );
 
 	//setting the deathvariable if it exists (iwd2)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.152 2004/04/14 18:40:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.153 2004/04/14 22:53:50 avenger_teambg Exp $
  *
  */
 
@@ -136,7 +136,7 @@ Interface::Interface(int iargc, char** iargv)
   std::vector<type>::iterator i;  \
   for(i = variable.begin(); i != variable.end(); ++i) { \
 	if(!(*i).free) {  \
-		core->FreeInterface((*i).member); \
+		FreeInterface((*i).member); \
 		(*i).free = true; \
 	} \
   } \
@@ -157,9 +157,6 @@ Interface::~Interface(void)
 {
 	if (game) {
 		delete( game );
-	}
-	if (INIparty) {
-		delete( INIparty );
 	}
 	if (music) {
 		delete( music );
@@ -229,6 +226,15 @@ Interface::~Interface(void)
 	delete( console );
 	delete( plugin );
 
+	if(INIquests) {
+		FreeInterface(INIquests);
+	}
+	if(INIbeasts) {
+		FreeInterface(INIbeasts);
+	}
+	if(INIparty) {
+		FreeInterface(INIparty);
+	}
 	//TODO: Clean the Cache and leave only .bif files
 }
 
@@ -666,6 +672,7 @@ void Interface::FreeInterface(void* ptr)
 {
 	plugin->FreePlugin( ptr );
 }
+
 Factory* Interface::GetFactory(void)
 {
 	return factory;
@@ -1060,6 +1067,7 @@ void Interface::EnterActors(const char* StartArea)
 			MyActor->MySelf = MyActor;
 		}
 	}
+	actors.clear();
 }
 
 int Interface::LoadCreature(char* ResRef, int InParty)
@@ -1543,7 +1551,7 @@ int Interface::LoadTable(const char* ResRef)
 		return -1;
 	}
 	if (!tm->Open( str, true )) {
-		core->FreeInterface( tm );
+		FreeInterface( tm );
 		return -1;
 	}
 	Table t;
@@ -1595,7 +1603,7 @@ bool Interface::DelTable(unsigned int index)
 	if (tables[index].free) {
 		return false;
 	}
-	core->FreeInterface( tables[index].tm );
+	FreeInterface( tables[index].tm );
 	tables[index].free = true;
 	return true;
 }
@@ -1616,7 +1624,7 @@ int Interface::LoadSymbol(const char* ResRef)
 		return -1;
 	}
 	if (!sm->Open( str, true )) {
-		core->FreeInterface( sm );
+		FreeInterface( sm );
 		return -1;
 	}
 	Symbol s;
@@ -1668,7 +1676,7 @@ bool Interface::DelSymbol(unsigned int index)
 	if (symbols[index].free) {
 		return false;
 	}
-	core->FreeInterface( symbols[index].sm );
+	FreeInterface( symbols[index].sm );
 	symbols[index].free = true;
 	return true;
 }
@@ -1682,16 +1690,16 @@ int Interface::PlayMovie(char* ResRef)
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
 												IE_MVE_CLASS_ID );
 	if (!str) {
-		core->FreeInterface( mp );
+		FreeInterface( mp );
 		return -1;
 	}
 	if (!mp->Open( str, true )) {
-		core->FreeInterface( mp );
+		FreeInterface( mp );
 		delete( str );
 		return -1;
 	}
 	mp->Play();
-	core->FreeInterface( mp );
+	FreeInterface( mp );
 	return 0;
 }
 

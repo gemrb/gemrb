@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.83 2004/04/14 18:40:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.84 2004/04/14 22:53:50 avenger_teambg Exp $
  *
  */
 
@@ -93,7 +93,7 @@ Map::~Map(void)
 	for (unsigned int i = 0; i < actors.size(); i++) {
 		Actor* a = actors[i];
 		if (a && !a->InParty && !a->FromGame) {
-			core->UnloadCreature( a );
+			delete ( a );
 		}
 	}
 
@@ -386,7 +386,7 @@ void Map::DeleteActor(Actor* actor)
 	for (m = actors.begin(); m != actors.end(); ++m) {
 		if (( *m ) == actor) {
 			actors.erase( m );
-			core->UnloadCreature(actor);
+			delete (actor);
 			lastActorCount[0] = 0;
 			lastActorCount[1] = 0;
 			lastActorCount[2] = 0;

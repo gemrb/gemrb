@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.32 2004/03/25 16:58:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.33 2004/04/14 22:53:50 avenger_teambg Exp $
  *
  */
 
@@ -114,6 +114,8 @@ public:
 	void AddVVCCell(ScriptedAnimation* vvc);
 	void AddEntrance(char* Name, short XPos, short YPos);
 	Entrance* GetEntrance(char* Name);
+	int GetActorCount() { return actors.size(); }
+	Actor* GetActor(int i) { return actors[i]; }
 };
 
 #endif

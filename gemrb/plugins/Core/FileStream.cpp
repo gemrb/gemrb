@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.23 2004/04/14 18:40:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.24 2004/04/14 22:53:50 avenger_teambg Exp $
  *
  */
 
@@ -95,7 +95,7 @@ bool FileStream::Open(_FILE* stream, int startpos, int size, bool autoFree)
 	return true;
 }
 
-int FileStream::Read(void* dest, int length)
+int FileStream::Read(void* dest, unsigned int length)
 {
 	if (!opened) {
 		return GEM_ERROR;
@@ -141,7 +141,7 @@ unsigned long FileStream::Size()
 	return size;
 }
 /** No descriptions */
-int FileStream::ReadLine(void* buf, int maxlen)
+int FileStream::ReadLine(void* buf, unsigned int maxlen)
 {
 	if(!maxlen) {
 		return 0;
@@ -151,7 +151,7 @@ int FileStream::ReadLine(void* buf, int maxlen)
 		p[0]=0;
 		return -1;
 	}
-	int i = 0;
+	unsigned int i = 0;
 	while (i < ( maxlen - 1 )) {
 		int ch = _fgetc( str );
 		if (_feof( str ))

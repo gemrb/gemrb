@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.32 2004/04/14 18:40:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.33 2004/04/14 22:53:50 avenger_teambg Exp $
  *
  */
 
@@ -43,10 +43,10 @@ Game::~Game(void)
 		delete( Maps[i] );
 	}
 	for (size_t i = 0; i < PCs.size(); i++) {
-		core->UnloadCreature( PCs[i] );
+		delete ( PCs[i] );
 	}
 	for (size_t i = 0; i < NPCs.size(); i++) {
-		core->UnloadCreature( NPCs[i] );
+		delete ( NPCs[i] );
 	}
 	if (globals) {
 		delete globals;

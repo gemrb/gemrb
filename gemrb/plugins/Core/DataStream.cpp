@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.9 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.10 2004/04/14 22:53:50 avenger_teambg Exp $
  *
  */
 
@@ -47,8 +47,8 @@ bool DataStream::CheckEncrypted()
 	return false;
 }
 /** No descriptions */
-void DataStream::ReadDecrypted(void* buf, int size)
+void DataStream::ReadDecrypted(void* buf, unsigned int size)
 {
-	for (int i = 0; i < size; i++)
+	for (unsigned int i = 0; i < size; i++)
 		( ( unsigned char * ) buf )[i] ^= GEM_ENCRYPTION_KEY[( Pos + i ) & 63];
 }
