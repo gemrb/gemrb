@@ -6,7 +6,6 @@
 #include <windows.h>
 
 #if _MSC_VER >= 1000
-#pragma message("Microsoft Compiler Version Greater than 1.00")
 #pragma warning( disable: 4251 521 )
 #endif
 
