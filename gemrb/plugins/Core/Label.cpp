@@ -69,7 +69,8 @@ int Label::SetText(const char * string, int pos)
 	if(Buffer != NULL) {
 		strcpy(Buffer, string);
 		if(Alignment == IE_FONT_ALIGN_CENTER)
-			strlwr(Buffer);
+			if(stricmp(core->GameType, "bg2") == 0)
+				strlwr(Buffer);
 	}
 	Changed = true;
 	return 0;
@@ -80,6 +81,7 @@ void Label::SetColor(Color col, Color bac)
 	if(palette)
 		free(palette);
 	palette = core->GetVideoDriver()->CreatePalette(col, bac);
+	useRGB = true;
 	Changed = true;
 }
 
