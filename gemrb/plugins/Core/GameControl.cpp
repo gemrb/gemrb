@@ -23,6 +23,7 @@
 #include "../../includes/win32def.h"
 #include "GameControl.h"
 #include "Interface.h"
+#include "AnimationMgr.h"
 
 #define IE_CHEST_CURSOR	32
 
@@ -34,6 +35,8 @@ static Color green = {0x00, 0xff, 0x00, 0xff};
 static Color white = {0xff, 0xff, 0xff, 0xff};
 static Color black = {0x00, 0x00, 0x00, 0xff};
 static Color blue = {0x00, 0x00,0xff,0x80};
+
+Animation * effect;
 
 GameControl::GameControl(void)
 {
@@ -53,6 +56,7 @@ GameControl::GameControl(void)
 	moveX = moveY = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
+	effect = NULL;
 	DisableMouse = false;
 }
 
@@ -118,6 +122,12 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			}
 			else {
 				video->DrawPolyline(overContainer->outline, cyan, true);
+			}
+		}
+		if(effect) {
+			if((selected.size() == 1)) {
+				ActorBlock * actor = selected.at(0);
+				video->BlitSpriteMode(effect->NextFrame(), actor->XPos, actor->YPos, 1, false);
 			}
 		}
 		if(DebugFlags&1) {
@@ -200,6 +210,23 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 						overContainer->TrapDetected = 1;
 						core->GetVideoDriver()->FreeSprite(overContainer->outline->fill);
 						overContainer->outline->fill = NULL;
+					}
+				}
+			}
+		break;
+
+		case 'b':
+			{
+				if(selected.size() == 1) {
+					if(!effect) {
+						AnimationMgr * anim = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
+						DataStream * ds = core->GetResourceMgr()->GetResource("S056ICBL", IE_BAM_CLASS_ID);
+						anim->Open(ds, true);
+						effect = anim->GetAnimation(1, 0, 0);
+					}
+					else {
+						delete(effect);
+						effect = NULL;
 					}
 				}
 			}
@@ -475,8 +502,8 @@ void GameControl::SetCurrentArea(int Index)
 	MapIndex = Index;
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
-	ActorBlock ab = game->GetPC(0);
-	if(ab.actor)
+	ActorBlock *ab = game->GetPC(0);
+	if(ab)
 		area->AddActor(ab);
 	//night or day?
 	area->PlayAreaSong(0);
