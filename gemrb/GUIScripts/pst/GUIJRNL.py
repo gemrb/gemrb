@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.7 2004/03/17 01:09:35 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.8 2004/05/21 20:44:54 edheldil Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -83,8 +83,6 @@ def OpenJournalWindow ():
 	JournalWindow = GemRB.LoadWindow (0)
 	GemRB.SetVar("OtherWindow", JournalWindow)
 
-	print "JournalWindow", JournalWindow
-	
 	# Quests
 	Button = GemRB.GetControl (JournalWindow, 0)
 	GemRB.SetText (JournalWindow, Button, 20430)
@@ -170,11 +168,19 @@ def OnJournalQuestSelect ():
 def OnJournalAssignedPress ():
 	global selected_quest_class
 
+	# Assigned Quests
+	Label = GemRB.GetControl (QuestsWindow, 0x10000005)
+	GemRB.SetText (QuestsWindow, Label, 38585)
+
 	selected_quest_class = 0
 	PopulateQuestsList ()
 	
 def OnJournalCompletedPress ():
 	global selected_quest_class
+
+	# Completed Quests
+	Label = GemRB.GetControl (QuestsWindow, 0x10000005)
+	GemRB.SetText (QuestsWindow, Label, 39527)
 
 	selected_quest_class = 1
 	PopulateQuestsList ()
@@ -418,8 +424,8 @@ def OpenLogWindow ():
 		#   orig. game. So it's probably computed since "awakening"
 		#   there instead of start of the day.
 
-		date = str (1 + int (je['Time'] / 86400))
-		time = str (je['Time'])
+		date = str (1 + int (je['GameTime'] / 86400))
+		time = str (je['GameTime'])
 		
 		GemRB.TextAreaAppend (Window, Text, "[color=FFFF00]Day " + date + '  (' + time + "):[/color]", 3*i)
 		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i + 1)
