@@ -100,14 +100,20 @@ int TextArea::AppendText(const char * text, int pos)
 {
 	if(pos >= (int)lines.size())
 		return -1;
-	if(pos == -1)
-		return -1;
-
 	int newlen = strlen(text);
-	int mylen = strlen(lines[pos]);
+
+	if(pos == -1) {
+		char * str = (char*)malloc(newlen+1);
+		strcpy(str, text);
+		lines.push_back(str);
+	}
+	else
+	{
+		int mylen = strlen(lines[pos]);
 	
-	lines[pos] = (char*)realloc(lines[pos], mylen+newlen+1);
-	strcat(lines[pos], text);
+		lines[pos] = (char*)realloc(lines[pos], mylen+newlen+1);
+		strcat(lines[pos], text);
+	}
 	CalcRowCount();
 	((Window*)Owner)->Invalidate();
 	return 0;
@@ -129,6 +135,18 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short Mod)
 void TextArea::OnSpecialKeyPress(unsigned char Key)
 {
 	
+}
+
+/** Returns Row count */
+int TextArea::GetRowCount()
+{
+	return lines.size();
+}
+
+/** Returns top index */
+int TextArea::GetTopIndex()
+{
+	return startrow;
 }
 
 /** Set Starting Row */

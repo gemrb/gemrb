@@ -119,6 +119,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 {
 	if(!Changed)
 		return;
+	if(XPos==65535)
+		return;
 	if(!(Flags & 0x1)) {
 		Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 		int align=0;
@@ -236,6 +238,11 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 				core->GetDictionary()->SetAt(VarName, Value);
 				((Window*)Owner)->RedrawControls(VarName, Value);
 			}
+		}
+		else
+		{
+			if(VarName[0] != 0) 
+				core->GetDictionary()->SetAt(VarName, Value);
 		}
 		if(Flags & 0x04) {
 			if(Flags & 0x08)

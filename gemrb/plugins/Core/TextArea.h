@@ -50,6 +50,10 @@ public:
 	int AppendText(const char * text, int pos = 0);
 	/** Sets the Fonts */
 	void SetFonts(Font * init, Font * text);
+	/** Returns Number of Rows */
+        int GetRowCount();
+	/** Returns Starting Row */
+        int GetTopIndex();
 	/** Set Starting Row */
 	void SetRow(int row);
 private: // Private attributes
