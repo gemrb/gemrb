@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.207 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.208 2004/08/27 12:12:54 avenger_teambg Exp $
  *
  */
 
@@ -1657,6 +1657,13 @@ Window* Interface::GetWindow(unsigned short WindowIndex)
 int Interface::DelWindow(unsigned short WindowIndex)
 {
 	if(WindowIndex == 0xffff) {
+		vars->SetAt("MessageWindow", ~0);
+		vars->SetAt("OptionsWindow", ~0);
+		vars->SetAt("PortraitWindow", ~0);
+		vars->SetAt("ActionsWindow", ~0);
+		vars->SetAt("TopWindow", ~0);
+		vars->SetAt("OtherWindow", ~0);
+		vars->SetAt("FloatWindow", ~0);
 		for(unsigned int WindowIndex=0; WindowIndex<windows.size();WindowIndex++) {
 			Window* win = windows[WindowIndex];
 			if(win) {
