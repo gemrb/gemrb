@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.95 2003/12/21 20:18:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.96 2003/12/21 22:05:37 balrog994 Exp $
  *
  */
 
@@ -66,15 +66,17 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 	core->AddWindow(gamewin);
 	gamewin->SetFocused(gc);
 	core->SetVisible(0, 1);
-	core->GetGUIScriptEngine()->LoadScript("MessageWindow");
-	core->GetGUIScriptEngine()->RunFunction("OnLoad");
-	unsigned long index;
-	core->GetDictionary()->Lookup("MessageWindow", index);
-	Window * win = core->GetWindow(index);
-	gc->Height -= win->Height;
-	gamewin->Height -= win->Height;
-	core->SetOnTop(index);
-	core->GetVideoDriver()->SetViewport(0,0, gc->Width, gc->Height);
+	if(core->GetGUIScriptEngine()->LoadScript("MessageWindow")) {
+		core->GetGUIScriptEngine()->RunFunction("OnLoad");
+		unsigned long index;
+		if(core->GetDictionary()->Lookup("MessageWindow", index)) {
+			Window * win = core->GetWindow(index);
+			gc->Height -= win->Height;
+			gamewin->Height -= win->Height;
+			core->SetOnTop(index);
+			core->GetVideoDriver()->SetViewport(0,0, gc->Width, gc->Height);
+		}
+	}
 	int start = core->LoadTable("STARTARE");
 	TableMgr * tm = core->GetTable(start);
 	char * StartArea = tm->QueryField();

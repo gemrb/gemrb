@@ -412,11 +412,12 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 			actor->WalkTo(GameX, GameY);
 			unsigned long WinIndex, TAIndex;
 			core->GetDictionary()->Lookup("MessageWindow", WinIndex);
-			core->GetDictionary()->Lookup("MessageTextArea", TAIndex);
-			TextArea * ta = (TextArea*)core->GetWindow(WinIndex)->GetControl(TAIndex);
-			char Text[256];
-			sprintf(Text, "Selected: %s", actor->LongName);
-			ta->AppendText(Text, -1);
+			if(core->GetDictionary()->Lookup("MessageTextArea", TAIndex)) {
+				TextArea * ta = (TextArea*)core->GetWindow(WinIndex)->GetControl(TAIndex);
+				char Text[256];
+				sprintf(Text, "Selected: %s", actor->LongName);
+				ta->AppendText(Text, -1);
+			}
 		}
 		for(size_t i = 0; i < selected.size(); i++)
 			selected[i]->Select(false);
