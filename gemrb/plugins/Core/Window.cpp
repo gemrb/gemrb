@@ -39,10 +39,14 @@ Window::~Window()
 {
 	std::vector<Control*>::iterator m = Controls.begin();
 	for(int i = 0; Controls.size() != 0;) {
-		delete(*m);
+		Control * ctrl = (*m);
+		delete(ctrl);
 		Controls.erase(m);
 		m = Controls.begin();
 	}
+	if(BackGround)
+		core->GetVideoDriver()->FreeSprite(BackGround);
+	BackGround = NULL;
 }
 /** Add a Control in the Window */
 void Window::AddControl(Control * ctrl)
