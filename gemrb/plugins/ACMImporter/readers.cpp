@@ -15,18 +15,116 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.8 2004/08/10 19:11:29 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.9 2004/10/04 22:02:59 avenger_teambg Exp $
  *
  */
 
 //#include "stdafx.h"
 // Classes for sound files.
 // Supported formats: PCM-RAW, PCM-WAV (both 8 and 16 bits),
-//   and Interplay's ACM.
+//   Ogg Vorbis and Interplay's ACM.
 
 #include <stdio.h>
 #include "readers.h"
 #include "general.h"
+
+#ifdef HAS_VORBIS_SUPPORT
+static size_t ovfd_read(void *ptr, size_t size, size_t nmemb, void *datasource)
+{
+        DataStream *vb = (DataStream *) datasource;
+        int bytesToRead = size * nmemb;
+
+	int remains = vb->Remains();
+        if(remains<=0) {
+                /* no more reading, we're at the end */
+                return 0;
+        }
+        if(bytesToRead > remains ) {
+                bytesToRead = remains;
+        }
+        vb->Read(ptr, bytesToRead);
+        return bytesToRead;
+}
+
+static int ovfd_seek(void *datasource, int64_t offset, int whence) {
+        DataStream *vb = (DataStream *) datasource;
+	switch(whence) {
+		case SEEK_SET:
+			if(vb->Seek(offset, GEM_STREAM_START)<0)
+				return -1;
+			break;
+		case SEEK_CUR:
+			if(vb->Seek(offset, GEM_CURRENT_POS)<0)
+				return -1;
+			break;
+		case SEEK_END:
+			if(vb->Seek(vb->Size()+offset, GEM_STREAM_START)<0)
+				return -1;
+			break;
+		default:
+			return -1;
+	}
+	return vb->Pos;
+}
+
+static int ovfd_close(void */*datasource*/) {
+        return 0;
+}
+
+static long ovfd_tell(void *datasource) {
+        DataStream *vb = (DataStream *) datasource;
+	return (long) vb->Pos;
+}
+
+int COGGReader::init_reader()
+{
+	vorbis_info *info;
+	int res;
+	ov_callbacks cbstruct = {
+	        ovfd_read, ovfd_seek, ovfd_close, ovfd_tell
+	};
+
+	res=ov_open_callbacks(stream, &OggStream, NULL, 0, cbstruct);
+	if(res<0) {
+		printf("Couldn't initialize vorbis!\n");
+		return 0;
+	}
+	info = ov_info(&OggStream, -1);
+	channels = info->channels;
+printf("Channels: %d\n",channels);
+	samplerate = info->rate;
+printf("Samplerate: %d\n",samplerate);
+	samples_left = ( samples = ov_pcm_total(&OggStream, -1) );
+	return 1;
+}
+
+int COGGReader::read_samples(short* buffer, int count)
+{
+	int whatisthis;
+
+	if(samples_left<count) {
+		count=samples_left;
+	}
+	int samples_got=0;
+	int samples_need=count;
+	while(samples_need) {
+		int rd=ov_read(&OggStream, (char *)buffer, samples_need<<1, 0, 2, 1, &whatisthis);
+		if(rd==OV_HOLE) {
+			continue;
+		}
+		if(rd<=0) {
+			break;
+		}
+		rd>>=1;
+		buffer+=rd;
+		samples_got+=rd;
+		samples_need-=rd;
+	}
+	samples_left-=samples_got;
+	return samples_got;
+}
+
+#endif
 
 int CACMReader::init_reader()
 {
@@ -104,6 +202,9 @@ CSoundReader* CreateSoundReader(DataStream* stream, int type, int samples,
 	CSoundReader* res = NULL;
 
 	switch (type) {
+		case SND_READER_OGG:
+			res = new COGGReader( stream, autoFree );
+			break;
 		case SND_READER_ACM:
 			res = new CACMReader( stream, autoFree );
 			break;
@@ -119,17 +220,6 @@ CSoundReader* CreateSoundReader(DataStream* stream, int type, int samples,
 	}
 	return res;
 }
-
-/*
-short CSoundReader::read_one_sample()
-{
-	short res;
-	if (!read_samples( &res, 1 )) {
-		res = 0;
-	} // no more samples left => return 0;
-	return res;
-}
-*/
 
 int CRawPCMReader::init_reader()
 {

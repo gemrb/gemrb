@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.58 2004/08/29 01:19:01 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.59 2004/10/04 22:02:59 avenger_teambg Exp $
  *
  */
 
@@ -35,43 +35,42 @@
 
 #define DisplayALError(string, error) printf("%s0x%04X", string, error);
 #define ACM_BUFFERSIZE 8192
-#define MUSICBUFERS 10
+#define MUSICBUFFERS 10
 
 static AudioStream streams[MAX_STREAMS], speech;
 static CSoundReader *MusicReader;
-static ALuint MusicSource, MusicBuffers[MUSICBUFERS];
+static ALuint MusicSource, MusicBuffers[MUSICBUFFERS];
 static SDL_mutex* musicMutex;
 static bool musicPlaying;
 static SDL_Thread* musicThread;
 static unsigned char* static_memory;
 
-bool isWAVC(DataStream* stream)
+static int isWAVC(DataStream* stream)
 {
 	if (!stream) {
-		return false;
+		return -1;
 	}
 	char Signature[4];
 	stream->Read( Signature, 4 );
 	stream->Seek( 0, GEM_STREAM_START );
+	if(strnicmp(Signature, "oggs", 4) == 0)
+		return SND_READER_OGG;
+	if(strnicmp(Signature, "RIFF", 4) == 0)
+		return SND_READER_WAV; //wav
 	/*
-		if(strnicmp(Signature, "RIFF", 4) == 0)
-			return false; //wav
-		if(strnicmp(Signature, "oggs", 4) == 0)
-			return false; //ogg
-		if( * (unsigned short *) Signature == 0xfffb)
-			return false; //mp3
-		return true;
+	if( * (unsigned short *) Signature == 0xfffb)
+		return SND_READER_MP3; //mp3
 	*/
 	if (*( unsigned int * ) Signature == IP_ACM_SIG) {
-		return true;
+		return SND_READER_ACM;
 	} //acm
 	if (memcmp( Signature, "WAVC", 4 ) == 0) {
-		return true;
+		return SND_READER_ACM;
 	} //wavc
-	return false;
+	return -1;
 }
 
-ALenum GetFormatEnum(int channels, int bits)
+static ALenum GetFormatEnum(int channels, int bits)
 {
 	switch (channels) {
 		case 1:
@@ -94,7 +93,7 @@ ALenum GetFormatEnum(int channels, int bits)
 void ACMImp::clearstreams(bool free)
 {
 	if (musicPlaying && free) {
-		for (int i = 0; i < MUSICBUFERS; i++) {
+		for (int i = 0; i < MUSICBUFFERS; i++) {
 			if (alIsBuffer( MusicBuffers[i] ))
 				alDeleteBuffers( 1, &MusicBuffers[i] );
 		}
@@ -134,13 +133,13 @@ int ACMImp::PlayListManager(void* /*data*/)
 				case AL_INITIAL:
 					 {
 						printf( "Music in INITIAL State. AutoStarting\n" );
-						for (int i = 0; i < MUSICBUFERS; i++) {
+						for (int i = 0; i < MUSICBUFFERS; i++) {
 							MusicReader->read_samples( ( short* ) static_memory, ACM_BUFFERSIZE >> 1 );
 							alBufferData( MusicBuffers[i], AL_FORMAT_STEREO16,
 								static_memory, ACM_BUFFERSIZE,
 								MusicReader->get_samplerate() );
 						}
-						alSourceQueueBuffers( MusicSource, MUSICBUFERS, MusicBuffers );
+						alSourceQueueBuffers( MusicSource, MUSICBUFFERS, MusicBuffers );
 						if (alIsSource( MusicSource )) {
 							alSourcePlay( MusicSource );
 						}
@@ -200,7 +199,7 @@ ACMImp::ACMImp(void)
 {
 	unsigned int i;
 
-	for (i = 0; i < MUSICBUFERS; i++)
+	for (i = 0; i < MUSICBUFFERS; i++)
 		MusicBuffers[i] = 0;
 	MusicSource = 0;
 	for (i = 0; i < MAX_STREAMS; i++) {
@@ -308,17 +307,19 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 	}
 	if (error != AL_NO_ERROR) {
 		DisplayALError( "Cannot Create a Buffer for this sound. Skipping", error );
+		delete( stream );
 		return 0;
 	}
-	CSoundReader* acm;
-	if (isWAVC( stream )) {
-		acm = CreateSoundReader( stream, SND_READER_ACM, stream->Size(), true );
-	} else {
-		acm = CreateSoundReader( stream, SND_READER_WAV, stream->Size(), true );
+	int type = isWAVC( stream );
+	if (type<0 ) {
+		delete( stream );
+		return 0;
 	}
+
+	CSoundReader* acm;
+	acm = CreateSoundReader( stream, type, stream->Size(), true );
 	long cnt = acm->get_length();
 	long riff_chans = acm->get_channels();	
-	//long bits = acm->get_bits();
 	long samplerate = acm->get_samplerate();
 	//multiply always by 2 because it is in 16 bits
 	long rawsize = cnt * riff_chans * 2;
@@ -331,6 +332,7 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 	alBufferData( Buffer, GetFormatEnum( riff_chans, 16 ), memory, cnt1, samplerate );
 	delete( acm );
 	free(memory);
+
 	if (( error = alGetError() ) != AL_NO_ERROR) {
 		DisplayALError( "[ACMImp::Play] alBufferData : ", error );
 		alDeleteBuffers( 1, &Buffer );
@@ -457,15 +459,14 @@ unsigned long ACMImp::StreamFile(const char* filename)
 		delete( MusicReader );
 	}
 	if (MusicBuffers[0] == 0) {
-		alGenBuffers( MUSICBUFERS, MusicBuffers );
+		alGenBuffers( MUSICBUFFERS, MusicBuffers );
 	}
-	if (isWAVC( str )) {
-		MusicReader = CreateSoundReader( str, SND_READER_ACM, str->Size(),
-						true );
-	} else {
-		MusicReader = CreateSoundReader( str, SND_READER_WAV, str->Size(),
-						true );
+	int type = isWAVC( str );
+	if (type<0 ) {
+		delete( str );
+		return 0;
 	}
+	MusicReader = CreateSoundReader( str, type, str->Size(), true );
 
 	if (MusicSource == 0) {
 		alGenSources( 1, &MusicSource );

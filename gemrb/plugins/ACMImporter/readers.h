@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.h,v 1.8 2004/08/10 19:11:29 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.h,v 1.9 2004/10/04 22:02:59 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,10 @@
 #include "general.h"
 #include "../Core/DataStream.h"
 
+#ifdef HAS_VORBIS_SUPPORT
+#include <vorbis/vorbisfile.h>
+#endif
+
 #define INIT_NO_ERROR_MSG 0
 #define INIT_NEED_ERROR_MSG 1
 
@@ -41,23 +45,20 @@ protected:
 	int samplerate;
 	int samples_left; // count of unread samples
 	int is16bit; // 1 - if 16 bit file, 0 - otherwise
-	//FILE* file; // file handle
 	DataStream* stream;
 	bool autoFree;
 
 public:
-	CSoundReader(DataStream* stream, bool autoFree = true)//int fhandle)
+	CSoundReader(DataStream* stream, bool autoFree = true)
 
 		: samples( 0 ), channels( 0 ), samples_left( 0 ), is16bit( 1 )
 	{
-		//file=fdopen(fhandle,"rb");
 		this->stream = stream;
 		this->autoFree = autoFree;
 	};
 
 	virtual ~CSoundReader()
 	{
-		//if (file) fclose (file);
 		if (stream && autoFree) {
 			delete( stream );
 		}
@@ -125,6 +126,29 @@ public:
 	};
 };
 
+#ifdef HAS_VORBIS_SUPPORT
+class COGGReader : public CSoundReader {
+private:
+	OggVorbis_File OggStream;
+public:
+	COGGReader(DataStream* stream, bool autoFree = true)
+		: CSoundReader( stream, autoFree)
+	{
+		memset(&OggStream, 0, sizeof(OggStream) );
+	};
+	virtual ~COGGReader()
+	{
+		ov_clear(&OggStream);
+	};
+	virtual int init_reader();
+	virtual const char* get_file_type()
+	{
+		return "OGG";
+	};
+	virtual int read_samples(short* buffer, int count);
+};
+#endif //HAS_VORBIS_SUPPORT
+
 // IP's ACM files
 class CACMReader : public CSoundReader {
 private:
@@ -137,7 +161,7 @@ private:
 
 	int make_new_samples();
 public:
-	CACMReader(DataStream* stream, bool autoFree = true)//int fhandle)
+	CACMReader(DataStream* stream, bool autoFree = true)
 
 		: CSoundReader( stream, autoFree ), block( NULL ), values( NULL ),
 		samples_ready( 0 ), unpacker( NULL ), decoder( NULL )
@@ -218,5 +242,6 @@ CSoundReader* CreateSoundReader(DataStream* stream, int open_mode,
 #define SND_READER_RAW16 2
 #define SND_READER_WAV 3
 #define SND_READER_ACM 4
+#define SND_READER_OGG 5
 
 #endif
