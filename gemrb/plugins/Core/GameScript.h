@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.128 2004/08/07 20:41:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.129 2004/08/18 21:18:28 avenger_teambg Exp $
  *
  */
 
@@ -1072,6 +1072,7 @@ public:
 	static void PlayDeadInterruptable(Scriptable* Sender, Action* parameters);
 	static void PlayerDialogue(Scriptable* Sender, Action* parameters);
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
+	static void PlaySong(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
 	static void PlaySoundPoint(Scriptable* Sender, Action* parameters);
 	static void RealSetGlobalTimer(Scriptable* Sender, Action* parameters);
@@ -1096,6 +1097,7 @@ public:
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
 	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
+	static void SetExtendedNight(Scriptable* Sender, Action* parameters);
 	static void SetFaction(Scriptable* Sender, Action* parameters);
 	static void SetGabber(Scriptable* Sender, Action* parameters);
 	static void SetGlobal(Scriptable* Sender, Action* parameters);
@@ -1111,6 +1113,9 @@ public:
 	static void SetPlayerSound(Scriptable* Sender, Action* parameters);
 	static void SetQuestDone(Scriptable* Sender, Action* parameters);
 	static void SetRegularName(Scriptable* Sender, Action* parameters);
+	static void SetRestEncounterChance(Scriptable* Sender, Action* parameters);
+	static void SetRestEncounterProbabilityDay(Scriptable* Sender, Action* parameters);
+	static void SetRestEncounterProbabilityNight(Scriptable* Sender, Action* parameters);
 	static void SetTeam(Scriptable* Sender, Action* parameters);
 	static void SetTextColor(Scriptable* Sender, Action* parameters);
 

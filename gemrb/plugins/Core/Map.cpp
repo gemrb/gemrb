@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.106 2004/08/08 05:11:32 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.107 2004/08/18 21:18:28 avenger_teambg Exp $
  *
  */
 
@@ -556,10 +556,10 @@ void Map::PlayAreaSong(int SongType)
 		column = 1;
 		tablename = "songlist";
 	} else {
-		/*since bg1 and pst has no .2da for songlist, we must supply one in
-			  the gemrb/override folder.
-			  It should be: music.2da, first column is a .mus filename
-			*/
+		/*since bg1 and pst has no .2da for songlist, 
+		we must supply one in the gemrb/override folder.
+		It should be: music.2da, first column is a .mus filename
+		*/
 		column = 0;
 		tablename = "music";
 	}

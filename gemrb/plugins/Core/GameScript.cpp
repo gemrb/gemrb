@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.181 2004/08/17 16:12:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.182 2004/08/18 21:18:27 avenger_teambg Exp $
  *
  */
 
@@ -395,6 +395,7 @@ static ActionLink actionnames[] = {
 	{"playdeadinterruptable", GameScript::PlayDeadInterruptable,0},
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
+	{"playsong", GameScript::PlaySong,0},
 	{"playsound", GameScript::PlaySound,0},
 	{"playsoundpoint", GameScript::PlaySoundPoint,0},
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
@@ -428,6 +429,7 @@ static ActionLink actionnames[] = {
 	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialoguerange", GameScript::SetVisualRange,0}, //same until we know better
 	{"setdoorlocked", GameScript::Lock,AF_BLOCKING},//key shouldn't be checked!
+	{"setextendednight", GameScript::SetExtendedNight,0},
 	{"setfaction", GameScript::SetFaction,0},
 	{"setgabber", GameScript::SetGabber,0},
 	{"setglobal", GameScript::SetGlobal,AF_MERGESTRINGS},
@@ -443,6 +445,9 @@ static ActionLink actionnames[] = {
 	{"setplayersound", GameScript::SetPlayerSound,0},
 	{"setquestdone", GameScript::SetQuestDone,0},
 	{"setregularnamestrref", GameScript::SetRegularName,0},
+	{"setrestencounterchance", GameScript::SetRestEncounterChance,0},
+	{"setrestencounterprobabilityday", GameScript::SetRestEncounterProbabilityDay,0},
+	{"setrestencounterprobabilitynight", GameScript::SetRestEncounterProbabilityNight,0},
 	{"setsavedlocation", GameScript::SaveObjectLocation, 0},
 	{"setsavedlocationpoint", GameScript::SaveLocation, 0},
 	{"setteam", GameScript::SetTeam,0},
@@ -4601,11 +4606,28 @@ int GameScript::HitBy(Scriptable* Sender, Trigger* parameters)
 // Action Functions
 //-------------------------------------------------------------
 
+void GameScript::SetExtendedNight(Scriptable* /*Sender*/, Action* parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	//sets the 'can rest other' bit
+	if(parameters->int0Parameter) {
+		map->AreaType|=0x40;
+	}
+	else {
+		map->AreaType&=~0x40;
+	}
+}
+
 void GameScript::SetAreaRestFlag(Scriptable* /*Sender*/, Action* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
-	//either whole number, or just the lowest bit, needs research
-	map->AreaFlags=parameters->int0Parameter;
+	//sets the 'can rest other' bit
+	if(parameters->int0Parameter) {
+		map->AreaType|=0x80;
+	}
+	else {
+		map->AreaType&=~0x80;
+	}
 }
 
 void GameScript::AddAreaFlag(Scriptable* /*Sender*/, Action* parameters)
@@ -5549,6 +5571,14 @@ void GameScript::Continue(Scriptable* Sender, Action* parameters)
 {
 }
 
+void GameScript::PlaySong(Scriptable* Sender, Action* parameters)
+{
+	//this is a kind of hack, slot 4 isn't used anyway
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->SongHeader.SongList[4]=parameters->int0Parameter;
+	map->PlayAreaSong(4);
+}
+
 //optional integer parameter (isSpeech)
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
@@ -5650,14 +5680,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		Sender->CurrentAction = NULL;
 		return;
 	}
-/*
-	if((tar==scr) && !(Flags&BD_OWN) ) {
-		printf("[IEScript]: Target is protagonist?\n");
-		parameters->objects[1]->Dump();
-		Sender->CurrentAction = NULL;
-		return;
-	}
-*/
+
 	//target could be other than Actor, we need to handle this too!
 	if (scr->Type != ST_ACTOR) {
 		Sender->CurrentAction = NULL;
@@ -6828,7 +6851,7 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	//i think it is bit 15 of the multi-class flags
+	//it is bit 15 of the multi-class flags (confirmed)
 	actor->SetStat(IE_MC_FLAGS,actor->GetStat(IE_MC_FLAGS)|32768);
 }
 
@@ -7388,3 +7411,23 @@ void GameScript::TakeItemList(Scriptable *Sender, Action *parameters)
 {
 }
 
+//bg2
+void GameScript::SetRestEncounterProbabilityDay(Scriptable *Sender, Action *parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->RestHeader.DayChance = parameters->int0Parameter;
+}
+
+void GameScript::SetRestEncounterProbabilityNight(Scriptable *Sender, Action *parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->RestHeader.NightChance = parameters->int0Parameter;
+}
+
+//iwd
+void GameScript::SetRestEncounterChance(Scriptable *Sender, Action *parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->RestHeader.DayChance = parameters->int0Parameter;
+	map->RestHeader.NightChance = parameters->int1Parameter;
+}
