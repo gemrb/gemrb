@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.118 2004/10/11 19:33:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.119 2004/10/16 08:10:45 avenger_teambg Exp $
  *
  */
 
@@ -181,7 +181,7 @@ public:
 	/** Get GUI Script Manager */
 	ScriptEngine * GetGUIScriptEngine();
 	/** Returns a PC index, by loading a creature */
-	int LoadCreature(char *ResRef, int InParty);
+	int LoadCreature(char *ResRef, int InParty, bool character=false);
 	/** Removes a creature by slot */
 //	int UnloadCreature(unsigned int Slot);
 	/** Removes a creature by pointer */

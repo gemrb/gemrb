@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.222 2004/10/15 20:22:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.223 2004/10/16 08:10:46 avenger_teambg Exp $
  *
  */
 
@@ -2885,15 +2885,16 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreatePlayer__doc,
-"CreatePlayer(CREResRef, Slot) => PlayerSlot\n\n"
-"Creates a player slot." );
+"CreatePlayer(CREResRef, Slot [,Import] ) => PlayerSlot\n\n"
+"Creates a player slot. If import is nonzero, then reads a CHR instead of a CRE." );
 
 static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 {
 	char* CreResRef;
 	int PlayerSlot, Slot;
+	int Import=0;
 
-	if (!PyArg_ParseTuple( args, "si", &CreResRef, &PlayerSlot )) {
+	if (!PyArg_ParseTuple( args, "si|i", &CreResRef, &PlayerSlot, &Import)) {
 		return AttributeError( GemRB_CreatePlayer__doc );
 	}
 	//PlayerSlot is zero based, if not, remove the +1
@@ -2902,7 +2903,7 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 	if (PlayerSlot & 0x8000) {
 		PlayerSlot = core->GetGame()->FindPlayer( Slot );
 		if (PlayerSlot < 0) {
-			PlayerSlot = core->LoadCreature( CreResRef, Slot );
+			PlayerSlot = core->LoadCreature( CreResRef, Slot, Import );
 		}
 	} else {
 		PlayerSlot = core->GetGame()->FindPlayer( PlayerSlot );
@@ -2910,7 +2911,7 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 			printMessage( "GUIScript", "Slot is already filled!\n", LIGHT_RED );
 			return NULL;
 		}
-		PlayerSlot = core->LoadCreature( CreResRef, Slot ); //inparty flag
+		PlayerSlot = core->LoadCreature( CreResRef, Slot, Import ); //inparty flag
 	}
 	if (PlayerSlot < 0) {
 		printMessage( "GUIScript", "Not found!\n", LIGHT_RED );
