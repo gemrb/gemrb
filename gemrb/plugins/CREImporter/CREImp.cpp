@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.24 2004/02/24 22:20:42 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.25 2004/03/29 23:52:29 edheldil Exp $
  *
  */
 
@@ -306,13 +306,116 @@ Actor* CREImp::GetActor()
 	str->Read( &act->BaseStats[IE_ALIGNMENT], 1 );
 	str->Seek( 4, GEM_CURRENT_POS );
 	str->Read( act->scriptName, 32 );
-	str->Seek( 44, GEM_CURRENT_POS );
+
+	str->Read( &act->KnownSpellsOffset, 4 );
+	str->Read( &act->KnownSpellsCount, 4 );
+	str->Read( &act->SpellMemorizationOffset, 4 );
+	str->Read( &act->SpellMemorizationCount, 4 );
+	str->Read( &act->MemorizedSpellsOffset, 4 );
+	str->Read( &act->MemorizedSpellsCount, 4 );
+	str->Read( &act->ItemSlotsOffset, 4 );
+	str->Read( &act->ItemsOffset, 4 );
+	str->Read( &act->ItemsCount, 4 );
+
+	str->Seek( 8, GEM_CURRENT_POS );
+
 	str->Read( act->Dialog, 8 );
 	act->BaseStats[IE_ARMOR_TYPE] = 0;
 	act->SetAnimationID( ( unsigned short ) act->BaseStats[IE_ANIMATION_ID] );
 	/*if(act->anims)
 		act->anims->DrawCircle = false;*/
 
+	// Reading inventory
+	act->inventory = new Inventory();
+
+	std::vector<CREItem*> items;
+	str->Seek( act->ItemsOffset, GEM_STREAM_START );
+	for (int i = 0; i < act->ItemsCount; i++) {
+		items.push_back( GetItem() );
+	}
+
+	str->Seek( act->ItemSlotsOffset, GEM_STREAM_START );
+	for (int i = 0; i < INVENTORY_SIZE; i++) {
+		ieWord  index;
+		str->Read( &index, 2 );
+
+		if (index != 0xFFFF)
+			act->inventory->SetSlotItem( items[index], i );
+	}
+	act->inventory->dump();
+
+
+	// Reading spellbook
+	act->spellbook = new Spellbook();
+
+	str->Seek( act->KnownSpellsOffset, GEM_STREAM_START );
+	for (int i = 0; i < act->KnownSpellsCount; i++) {
+		act->spellbook->AddKnownSpell( GetKnownSpell() );
+	}
+
+	str->Seek( act->MemorizedSpellsOffset, GEM_STREAM_START );
+	for (int i = 0; i < act->MemorizedSpellsCount; i++) {
+		act->spellbook->AddMemorizedSpell( GetMemorizedSpell() );
+	}
+
+	str->Seek( act->SpellMemorizationOffset, GEM_STREAM_START );
+	for (int i = 0; i < act->SpellMemorizationCount; i++) {
+		act->spellbook->AddSpellMemorization( GetSpellMemorization() );
+	}
+
+	act->spellbook->dump();
+
+
+
 	act->Init(); //applies effects, updates Modified
 	return act;
+}
+
+CREKnownSpell* CREImp::GetKnownSpell()
+{
+	CREKnownSpell* spl = new CREKnownSpell();
+
+	str->Read( &spl->SpellResRef, 8 );
+	str->Read( &spl->Level, 2 );
+	str->Read( &spl->Type, 2 );
+
+	return spl;
+}
+
+CRESpellMemorization* CREImp::GetSpellMemorization()
+{
+	CRESpellMemorization* spl = new CRESpellMemorization();
+
+	str->Read( &spl->Level, 2 );
+	str->Read( &spl->Number, 2 );
+	str->Read( &spl->Number2, 2 );
+	str->Read( &spl->Type, 2 );
+	str->Read( &spl->MemorizedIndex, 4 );
+	str->Read( &spl->MemorizedCount, 4 );
+
+	return spl;
+}
+
+CREMemorizedSpell* CREImp::GetMemorizedSpell()
+{
+	CREMemorizedSpell* spl = new CREMemorizedSpell();
+
+	str->Read( &spl->SpellResRef, 8 );
+	str->Read( &spl->Flags, 4 );
+
+	return spl;
+}
+
+CREItem* CREImp::GetItem()
+{
+	CREItem *itm = new CREItem();
+
+	str->Read( itm->ItemResRef, 8 );
+	str->Read( &itm->Unknown08, 2 );
+	str->Read( &itm->Usages[0], 2 );
+	str->Read( &itm->Usages[1], 2 );
+	str->Read( &itm->Usages[2], 2 );
+	str->Read( &itm->Flags, 4 );
+
+	return itm;
 }

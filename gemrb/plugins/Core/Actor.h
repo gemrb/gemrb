@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.22 2004/03/28 14:29:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.23 2004/03/29 23:52:29 edheldil Exp $
  *
  */
 
@@ -41,8 +41,14 @@
 
 /** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
 #include "../../includes/ie_stats.h"
+#include "../../includes/ie_types.h"
+
+#include "Inventory.h"
+#include "Spellbook.h"
 
 #define MAX_STATS 256
+
+
 
 class GEM_EXPORT Actor : public Moveble {
 public:
@@ -55,6 +61,16 @@ public:
 	unsigned char InParty;
 	char* LongName, * ShortName;
 	unsigned long StrRefs[100];
+
+	ieDword KnownSpellsOffset;
+	ieDword KnownSpellsCount;
+	ieDword SpellMemorizationOffset;
+	ieDword SpellMemorizationCount;
+	ieDword MemorizedSpellsOffset;
+	ieDword MemorizedSpellsCount;
+	ieDword ItemSlotsOffset;
+	ieDword ItemsOffset;
+	ieDword ItemsCount;
 
 	//this stuff don't get saved
 	CharAnimations* anims;
@@ -71,6 +87,10 @@ public:
 	Actor *LastSeen;
 	Actor *LastHeard;
 	Actor *LastSummoner;
+
+	Inventory* inventory;
+	Spellbook* spellbook;
+
 private:
 	void SetCircleSize();
 public:

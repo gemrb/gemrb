@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.5 2004/02/24 22:20:42 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.6 2004/03/29 23:52:29 edheldil Exp $
  *
  */
 
@@ -44,6 +44,10 @@ public:
 	{
 		delete this;
 	}
+	CREKnownSpell* GetKnownSpell();
+	CRESpellMemorization* GetSpellMemorization();
+	CREMemorizedSpell* GetMemorizedSpell();
+	CREItem* GetItem();
 };
 
 #endif
