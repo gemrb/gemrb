@@ -86,6 +86,9 @@ void Slider::SetPosition(unsigned int pos)
 {
 	if(pos <= KnobStepsCount)
 		Pos = pos;
+	if(VarName[0]!=0) {
+		core->GetDictionary()->SetAt(VarName,pos);
+	}	
 	Changed = true;
 }
 /** Sets the selected image */
@@ -128,7 +131,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 			unsigned short mx = KnobXPos, Mx = mx + (KnobStep*KnobStepsCount);
 			unsigned short xmx = x-mx;
 			if(x < mx) {
-				Pos = 0;
+				SetPosition(0);
 				if(oldPos != Pos) {
 					if(SliderOnChange[0] != 0)
 						core->GetGUIScriptEngine()->RunFunction(SliderOnChange);
@@ -137,7 +140,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 			}
 			unsigned short befst = xmx / KnobStep;
 			if(befst >= KnobStepsCount) {
-				Pos = KnobStepsCount-1;
+				SetPosition(KnobStepsCount-1);
 				if(oldPos != Pos) {
 					if(SliderOnChange[0] != 0)
 						core->GetGUIScriptEngine()->RunFunction(SliderOnChange);
@@ -146,10 +149,10 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 			}
 			unsigned short aftst = befst + KnobStep;
 			if((xmx-(befst*KnobStep)) < ((aftst*KnobStep)-xmx)) {
-				Pos = befst;
+				SetPosition(befst);
 			}
 			else {
-				Pos = aftst;
+				SetPosition(aftst);
 			}
 			if(oldPos != Pos) {
 				if(SliderOnChange[0] != 0)
@@ -161,7 +164,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 		unsigned short mx = KnobXPos, Mx = mx + (KnobStep*KnobStepsCount);
 		unsigned short xmx = x-mx;
 		if(x < mx) {
-			Pos = 0;
+			SetPosition(0);
 			if(oldPos != Pos) {
 				if(SliderOnChange[0] != 0)
 					core->GetGUIScriptEngine()->RunFunction(SliderOnChange);
@@ -170,7 +173,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 		}
 		unsigned short befst = xmx / KnobStep;
 		if(befst >= KnobStepsCount) {
-			Pos = KnobStepsCount-1;
+			SetPosition(KnobStepsCount-1);
 			if(oldPos != Pos) {
 				if(SliderOnChange[0] != 0)
 					core->GetGUIScriptEngine()->RunFunction(SliderOnChange);
@@ -179,10 +182,10 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned char Butto
 		}
 		unsigned short aftst = befst + KnobStep;
 		if((xmx-(befst*KnobStep)) < ((aftst*KnobStep)-xmx)) {
-			Pos = befst;
+			SetPosition(befst);
 		}
 		else {
-			Pos = aftst;
+			SetPosition(aftst);
 		}
 		if(oldPos != Pos) {
 			if(SliderOnChange[0] != 0)
@@ -206,7 +209,7 @@ void Slider::OnMouseOver(unsigned short x, unsigned short y)
 		unsigned short mx = KnobXPos; //, Mx = mx + (KnobStep*KnobStepsCount);
 		unsigned short xmx = x-mx;
 		if(x < mx) {
-			Pos = 0;
+			SetPosition(0);
 			if(oldPos != Pos) {
 				if(SliderOnChange[0] != 0)
 					core->GetGUIScriptEngine()->RunFunction(SliderOnChange);
@@ -215,7 +218,7 @@ void Slider::OnMouseOver(unsigned short x, unsigned short y)
 		}
 		unsigned short befst = xmx / KnobStep;
 		if(befst >= KnobStepsCount) {
-			Pos = KnobStepsCount-1;
+			SetPosition(KnobStepsCount-1);
 			if(oldPos != Pos) {
 				if(SliderOnChange[0] != 0)
 					core->GetGUIScriptEngine()->RunFunction(SliderOnChange);
@@ -224,10 +227,10 @@ void Slider::OnMouseOver(unsigned short x, unsigned short y)
 		}
 		unsigned short aftst = befst + KnobStep;
 		if((xmx-(befst*KnobStep)) < ((aftst*KnobStep)-xmx)) {
-			Pos = befst;
+			SetPosition(befst);
 		}
 		else {
-			Pos = aftst;
+			SetPosition(aftst);
 		}
 		if(oldPos != Pos) {
 			if(SliderOnChange[0] != 0)
