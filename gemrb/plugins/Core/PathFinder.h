@@ -2,7 +2,7 @@
 #define PATHFINDER_H
 
 #include "ImageMgr.h"
-#include <vector>
+#include <queue>
 
 #ifdef WIN32
 
@@ -16,37 +16,31 @@
 #define GEM_EXPORT
 #endif
 
-typedef struct PathNode {
-	short x,y;
-	unsigned char orient;
-	unsigned char passable;
-	unsigned long distance;
-	unsigned long cost;
-	PathNode *Next;
+struct PathNode {
 	PathNode *Parent;
-} PathNode;
+	PathNode *Next;
+	unsigned short x;
+	unsigned short y;
+	unsigned int orient;
+};
 
 class GEM_EXPORT PathFinder
 {
 private:
 	ImageMgr * sMap;
-	PathNode *** MapSet;
-	bool ** ClosedSet;
-	PathNode **OpenStack;
-	int OpenStackCount;
-	std::vector<PathNode*> FinalStack;
-	int Width, Height;
+	unsigned short *MapSet;
+	std::queue<unsigned int> InternalStack;
+	unsigned int Width, Height;
 public:
 	PathFinder(void);
 	~PathFinder(void);
-	void SetMap(ImageMgr * sMap, int Width, int Height);
+	void SetMap(ImageMgr * sMap, unsigned int Width, unsigned int Height);
 	PathNode * FindPath(short sX, short sY, short dX, short dY);
 private:
-	unsigned long GetDistance(short sX, short sY, short dX, short dY);
-	void FreeMatrices();
+	void Leveldown(unsigned int px, unsigned int py, unsigned int &level, unsigned int &nx, unsigned int &ny, unsigned int &diff);
+	void SetupNode(unsigned int x,unsigned int y, int Cost);
+//maybe this is unneeded and orientation could be calculated on the fly
 	unsigned char GetOrient(short sX, short sY, short dX, short dY);
-	PathNode * HeapRemove();
-	void HeapAdd(PathNode * node);
 };
 
 #endif
