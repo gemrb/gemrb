@@ -11,9 +11,15 @@ HANDLE hConsole;
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <vector>
+#ifndef WIN32
+#include <unistd.h>
+#else
+#include <direct.h>
+#endif
 
 FILE * config;
 bool cont = true;
+char CurrentDir[_MAX_PATH];
 
 typedef struct GameStruct {
 	char Name[_MAX_PATH];
@@ -29,7 +35,7 @@ typedef struct GameStruct {
 	int  MidResAvatars;
 	int  HasSongList;
 	int  UpperButtonText;
-	int  LowerLableText;
+	int  LowerLabelText;
 	int  HasPartyINI;
 	int  ForceStereo;
 	char CursorBAM[9];
@@ -41,12 +47,8 @@ typedef struct GameStruct {
 	char GUIScriptsPath[_MAX_PATH];
 	char GamePath[_MAX_PATH];
 	char INIConfig[_MAX_PATH];
-	char CD1[_MAX_PATH];
-	char CD2[_MAX_PATH];
-	char CD3[_MAX_PATH];
-	char CD4[_MAX_PATH];
-	char CD5[_MAX_PATH];
-	char CD6[_MAX_PATH];
+	int  CDCount;
+	char CDs[6][_MAX_PATH];
 } GameStruct;
 
 std::vector<GameStruct> games;
@@ -54,6 +56,8 @@ std::vector<GameStruct> games;
 void InitGames();
 void MainMenu();
 void NewConfig();
+void AskCDPath(GameStruct * game, int disk);
+int WriteConfig(GameStruct * game, char * file);
 void ClearScreen()
 {
 #ifdef WIN32
@@ -76,6 +80,7 @@ void ClearLine()
 
 int main(int argc, char **argv)
 {
+	getcwd(CurrentDir, _MAX_PATH);
 	InitGames();
 #ifdef WIN32
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -85,7 +90,7 @@ int main(int argc, char **argv)
 	textcolor(LIGHT_WHITE);
 	printf("GemRB v%.1f.%d.%d Configuration Utility\n\n", GEMRB_RELEASE/1000.0, GEMRB_API_NUM, GEMRB_SDK_REV);
 	printMessage("Configurer", "Opening GemRB.cfg file...", WHITE);
-	config = fopen("../GemRB.cfg", "r+");
+	config = fopen("GemRB.cfg", "r+");
 	if(!config) {
 		printStatus("ERROR", LIGHT_RED);
 		return -1;
@@ -182,7 +187,7 @@ sgt_ask:
 				if((choice <= '0') || (choice > (0x30+games.size()))) {
 					goto sgt_ask;
 				}
-				strcpy(newGame.GameType, games[choice-0x31].GameType);
+				newGame = games[choice-0x31];
 				step++;
 				goto NewConfigSteps;
 			}
@@ -243,15 +248,26 @@ gocd_ask:
 				if(Choose[0] == 0)
 					goto gocd_ask;
 
-				if((stricmp(Choose, "yes") == 0) || (stricmp(Choose, "y") == 0))
+				if((stricmp(Choose, "yes") == 0) || (stricmp(Choose, "y") == 0)) {
 					newGame.GameOnCD = 0;
+
+				}
 				else {
 					if((stricmp(Choose, "no") != 0) && (stricmp(Choose, "n") != 0))
 						goto gocd_ask;
 					newGame.GameOnCD = 1;
 				}
+				for(int i = 0; i < newGame.CDCount; i++) {
+					AskCDPath(&newGame, i+1);
+				}
 				step++;
 				goto NewConfigSteps;
+			}
+		break;
+
+		case 3: //Save
+			{
+				WriteConfig(&newGame, ".\\GemRBcfg.cfg");
 			}
 		break;
 	}
@@ -270,10 +286,10 @@ void InitGames()
 		0,					//GameOnCD
 		0,					//ScrollBarPatch
 		1,					//AllStringsTagged
-		0,					//MidResAvatars
+		1,					//MidResAvatars
 		1,					//HasSongList
 		1,					//UpperButtonText
-		0,					//LowerLabelText		
+		1,					//LowerLabelText		
 		0,					//HasPartyINI
 		1,					//ForceStereo
 		"CAROT",			//CursorBAM
@@ -284,13 +300,14 @@ void InitGames()
 		"",					//CachePath
 		"",					//GUIScriptsPath
 		"",					//GamePath
-		"",					//INIConfig
-		"",					//CD1
+		"baldur.ini",		//INIConfig
+		4,					//CDCount
+		{"",					//CD1
 		"",					//CD2
 		"",					//CD3
 		"",					//CD4
 		"",					//CD5
-		""					//CD6
+		""}					//CD6
 	};
 	games.push_back(bg1);
 	GameStruct bg2 = {
@@ -305,7 +322,7 @@ void InitGames()
 		0,					//ScrollBarPatch
 		0,					//AllStringsTagged
 		0,					//MidResAvatars
-		0,					//HasSongList
+		1,					//HasSongList
 		1,					//UpperButtonText
 		1,					//LowerLabelText		
 		0,					//HasPartyINI
@@ -318,13 +335,14 @@ void InitGames()
 		"",					//CachePath
 		"",					//GUIScriptsPath
 		"",					//GamePath
-		"",					//INIConfig
-		"",					//CD1
+		"baldur.ini",		//INIConfig
+		4,					//CDCount
+		{"",					//CD1
 		"",					//CD2
 		"",					//CD3
 		"",					//CD4
 		"",					//CD5
-		""					//CD6
+		""}					//CD6
 	};
 	games.push_back(bg2);
 	GameStruct iwd = {
@@ -338,11 +356,11 @@ void InitGames()
 		0,					//GameOnCD
 		0,					//ScrollBarPatch
 		1,					//AllStringsTagged
-		0,					//MidResAvatars
-		1,					//HasSongList
+		1,					//MidResAvatars
+		0,					//HasSongList
 		0,					//UpperButtonText
 		0,					//LowerLabelText		
-		1,					//HasPartyINI
+		0,					//HasPartyINI
 		1,					//ForceStereo
 		"CAROT",			//CursorBAM
 		"",					//GameDataPath
@@ -352,13 +370,14 @@ void InitGames()
 		"",					//CachePath
 		"",					//GUIScriptsPath
 		"",					//GamePath
-		"",					//INIConfig
-		"",					//CD1
+		"icewind.ini",		//INIConfig
+		2,					//CDCount
+		{"",					//CD1
 		"",					//CD2
 		"",					//CD3
 		"",					//CD4
 		"",					//CD5
-		""					//CD6
+		""}					//CD6
 	};
 	games.push_back(iwd);
 	GameStruct iwd2 = {
@@ -371,7 +390,7 @@ void InitGames()
 		0,					//CaseSensitive
 		0,					//GameOnCD
 		0,					//ScrollBarPatch
-		0,					//AllStringsTagged
+		1,					//AllStringsTagged
 		0,					//MidResAvatars
 		0,					//HasSongList
 		0,					//UpperButtonText
@@ -386,13 +405,14 @@ void InitGames()
 		"",					//CachePath
 		"",					//GUIScriptsPath
 		"",					//GamePath
-		"",					//INIConfig
-		"",					//CD1
+		"icewind2.ini",		//INIConfig
+		2,					//CDCount
+		{"",					//CD1
 		"",					//CD2
 		"",					//CD3
 		"",					//CD4
 		"",					//CD5
-		""					//CD6
+		""}					//CD6
 	};
 	games.push_back(iwd2);
 	GameStruct how = {
@@ -406,11 +426,11 @@ void InitGames()
 		0,					//GameOnCD
 		0,					//ScrollBarPatch
 		1,					//AllStringsTagged
-		0,					//MidResAvatars
-		1,					//HasSongList
+		1,					//MidResAvatars
+		0,					//HasSongList
 		0,					//UpperButtonText
 		0,					//LowerLabelText		
-		1,					//HasPartyINI
+		0,					//HasPartyINI
 		1,					//ForceStereo
 		"CAROT",			//CursorBAM
 		"",					//GameDataPath
@@ -420,13 +440,14 @@ void InitGames()
 		"",					//CachePath
 		"",					//GUIScriptsPath
 		"",					//GamePath
-		"",					//INIConfig
-		"",					//CD1
+		"icewind.ini",		//INIConfig
+		5,					//CDCount
+		{"",					//CD1
 		"",					//CD2
 		"",					//CD3
 		"",					//CD4
 		"",					//CD5
-		""					//CD6
+		""}					//CD6
 	};
 	games.push_back(how);
 	GameStruct pst = {
@@ -441,7 +462,7 @@ void InitGames()
 		0,					//ScrollBarPatch
 		1,					//AllStringsTagged
 		0,					//MidResAvatars
-		1,					//HasSongList
+		0,					//HasSongList
 		0,					//UpperButtonText
 		0,					//LowerLabelText		
 		0,					//HasPartyINI
@@ -449,18 +470,94 @@ void InitGames()
 		"CARET",			//CursorBAM
 		"",					//GameDataPath
 		"",					//GameOverridePath
-		"",					//ButtonFont
+		"TRMTFONT",			//ButtonFont
 		"",					//GemRBPath
 		"",					//CachePath
 		"",					//GUIScriptsPath
 		"",					//GamePath
-		"",					//INIConfig
-		"",					//CD1
+		"torment.ini",		//INIConfig
+		4,					//CDCount
+		{"",					//CD1
 		"",					//CD2
 		"",					//CD3
 		"",					//CD4
 		"",					//CD5
-		""					//CD6
+		""}					//CD6
 	};
 	games.push_back(pst);
+}
+
+void AskCDPath(GameStruct * game, int disk)
+{
+	struct stat st;
+	char CDPath[_MAX_PATH],tmp[_MAX_PATH], CDNum[_MAX_PATH];
+	sprintf(CDNum,"CD%d", disk);
+	for(int i = 4; i <= 20; i++) {
+		gotoxy(0,i);
+		ClearLine();
+	}
+	gotoxy(0,4);
+	printf("Enter the Path to the \"%s Disk %d\":", game->Name, disk);
+	
+ad_ask:
+	gotoxy(0,6);
+	ClearLine();
+	gotoxy(0,6);
+	printf("%s=", CDNum);
+	//if(!scanf("%[^]\n", GamePath))
+	//	goto gp_ask;
+	gets(CDPath);
+	if(CDPath[0] == 0)
+		goto ad_ask;
+
+	strcat(CDPath, SPathDelimiter);
+	strcpy(tmp, CDPath);
+	strcat(tmp, CDNum);
+	strcat(tmp, SPathDelimiter);
+	
+	strcpy(game->CDs[disk-1], tmp);
+}
+
+int WriteConfig(GameStruct * game, char * file)
+{
+	FILE * c = fopen(file, "w+");
+	if(!c) {
+		gotoxy(0,18);
+		textcolor(LIGHT_RED);
+		printf("Cannot Open %s\n", file);
+		textcolor(WHITE);
+		return -1;
+	}
+	fprintf(c, "#######################################\n");
+	fprintf(c, "#      GemRB Configuration File       #\n");
+	fprintf(c, "#                                     #\n");
+	fprintf(c, "#            Generated By             #\n");
+	fprintf(c, "#     GemRB Configuration Utility     #\n");
+	fprintf(c, "#######################################\n");
+	fprintf(c, "Width=%d\n", game->Width);
+	fprintf(c, "Height=%d\n", game->Height);
+	fprintf(c, "Bpp=%d\n", game->Bpp);
+	fprintf(c, "FullScreen=%d\n", game->FullScreen);
+	fprintf(c, "CaseSensitive=%d\n", game->CaseSensitive);
+	fprintf(c, "GameOnCD=%d\n", game->GameOnCD);
+	fprintf(c, "ScrollBarPatch=%d\n", game->ScrollBarPatch);
+	fprintf(c, "AllStringsTagged=%d\n", game->AllStringsTagged);
+	fprintf(c, "MidResAvatars=%d\n", game->MidResAvatars);
+	fprintf(c, "HasSongList=%d\n", game->HasSongList);
+	fprintf(c, "UpperButtonText=%d\n", game->UpperButtonText);
+	fprintf(c, "LowerLabelText=%d\n", game->LowerLabelText);
+	fprintf(c, "HasPartyINI=%d\n", game->HasPartyINI);
+	fprintf(c, "ForceStereo=%d\n", game->ForceStereo);
+	fprintf(c, "CursorBAM=%s\n", game->CursorBAM);
+	if(game->ButtonFont[0] != 0)
+		fprintf(c, "ButtonFont=%s\n", game->ButtonFont);
+	fprintf(c, "GemRBPath=%s\n", CurrentDir);
+	fprintf(c, "CachePath=%s%s%s\n", CurrentDir, SPathDelimiter, "Cache");
+	fprintf(c, "GUIScriptsPath=%s\n", CurrentDir);
+	fprintf(c, "GamePath=%s\n", game->GamePath);
+	fprintf(c, "INIConfig=%s\n", game->INIConfig);
+	for(int i = 0; i < game->CDCount; i++) {
+		fprintf(c, "CD%d=%s\n", i+1, game->CDs[i]);
+	}
+	fclose(c);
 }
