@@ -25,6 +25,7 @@ class ACMImp : public SoundMgr
 private:
 	void clearstreams(bool free);
 	static signed char __stdcall endstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param);
+	static signed char __stdcall synchstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param);
 	static void * __stdcall dspcallback(void *originalbuffer, void *newbuffer, int length, int param);
 public:
 	ACMImp(void);
