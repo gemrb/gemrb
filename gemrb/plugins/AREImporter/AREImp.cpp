@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.57 2004/08/03 23:30:33 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.58 2004/08/04 16:18:43 avenger_teambg Exp $
  *
  */
 
@@ -441,108 +441,108 @@ Map* AREImp::GetMap(const char *ResRef)
 	str->Seek( ActorOffset, GEM_STREAM_START );
 	if (!core->IsAvailable( IE_CRE_CLASS_ID )) {
 		printf( "[AREImporter]: No Actor Manager Available, skipping actors\n" );
-		return map;
+	} else {
+		ActorMgr* actmgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
+		for (i = 0; i < ActorCount; i++) {
+			char DefaultName[33];
+			char CreResRef[9];
+			ieDword TalkCount;
+			ieDword Orientation, Schedule;
+			ieWord XPos, YPos, XDes, YDes;
+			str->Read( DefaultName, 32);
+			DefaultName[32]=0;
+			str->Read( &XPos, 2 );
+			str->Read( &YPos, 2 );
+			str->Read( &XDes, 2 );
+			str->Read( &YDes, 2 );
+			str->Seek( 12, GEM_CURRENT_POS );
+			str->Read( &Orientation, 4 );
+			str->Seek( 8, GEM_CURRENT_POS );
+			str->Read( &Schedule, 4 );
+			str->Read( &TalkCount, 4 );
+			str->Seek( 56, GEM_CURRENT_POS );
+			str->Read( CreResRef, 8 );
+			CreResRef[8] = 0;
+			DataStream* crefile;
+			ieDword CreOffset, CreSize;
+			str->Read( &CreOffset, 4 );
+			str->Read( &CreSize, 4 );
+			str->Seek( 128, GEM_CURRENT_POS );
+			if (CreOffset != 0) {
+				char cpath[_MAX_PATH];
+				strcpy( cpath, core->GamePath );
+				strcat( cpath, str->filename );
+				_FILE* str = _fopen( cpath, "rb" );
+				FileStream* fs = new FileStream();
+				fs->Open( str, CreOffset, CreSize, true );
+				crefile = fs;
+			} else {
+				crefile = core->GetResourceMgr()->GetResource( CreResRef, IE_CRE_CLASS_ID );
+			}
+			actmgr->Open( crefile, true );
+			Actor* ab = actmgr->GetActor();
+			if(!ab)
+				continue;
+			ab->XPos = XPos;
+			ab->YPos = YPos;
+			ab->XDes = XDes;
+			ab->YDes = YDes;
+			ab->AnimID = IE_ANI_AWAKE;
+			//copying the area name into the actor
+			strcpy(ab->Area, map->scriptName);
+			//copying the scripting name into the actor
+			//this hack allows iwd starting cutscene to work
+			if(stricmp(ab->scriptName,"none")==0) {
+				ab->SetScriptName(DefaultName);
+			}
+	
+			if (ab->BaseStats[IE_STATE_ID] & STATE_DEAD)
+				ab->AnimID = IE_ANI_SLEEP;
+			ab->Orientation = ( unsigned char ) Orientation;
+			ab->TalkCount = TalkCount;
+			//hack to not load global actors to area
+			if(!game->FindPC(ab->scriptName) && !game->FindNPC(ab->scriptName) ) {
+				map->AddActor( ab );
+			} else {
+				delete ab;
+			}
+		}
+		core->FreeInterface( actmgr );
 	}
-	ActorMgr* actmgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
-	for (i = 0; i < ActorCount; i++) {
-		char DefaultName[33];
-		char CreResRef[9];
-		ieDword TalkCount;
-		ieDword Orientation, Schedule;
-		ieWord XPos, YPos, XDes, YDes;
-		str->Read( DefaultName, 32);
-		DefaultName[32]=0;
-		str->Read( &XPos, 2 );
-		str->Read( &YPos, 2 );
-		str->Read( &XDes, 2 );
-		str->Read( &YDes, 2 );
-		str->Seek( 12, GEM_CURRENT_POS );
-		str->Read( &Orientation, 4 );
-		str->Seek( 8, GEM_CURRENT_POS );
-		str->Read( &Schedule, 4 );
-		str->Read( &TalkCount, 4 );
-		str->Seek( 56, GEM_CURRENT_POS );
-		str->Read( CreResRef, 8 );
-		CreResRef[8] = 0;
-		DataStream* crefile;
-		ieDword CreOffset, CreSize;
-		str->Read( &CreOffset, 4 );
-		str->Read( &CreSize, 4 );
-		str->Seek( 128, GEM_CURRENT_POS );
-		if (CreOffset != 0) {
-			char cpath[_MAX_PATH];
-			strcpy( cpath, core->GamePath );
-			strcat( cpath, str->filename );
-			_FILE* str = _fopen( cpath, "rb" );
-			FileStream* fs = new FileStream();
-			fs->Open( str, CreOffset, CreSize, true );
-			crefile = fs;
-		} else {
-			crefile = core->GetResourceMgr()->GetResource( CreResRef, IE_CRE_CLASS_ID );
-		}
-		actmgr->Open( crefile, true );
-		Actor* ab = actmgr->GetActor();
-		ab->XPos = XPos;
-		ab->YPos = YPos;
-		ab->XDes = XDes;
-		ab->YDes = YDes;
-		ab->AnimID = IE_ANI_AWAKE;
-		//copying the area name into the actor
-		strcpy(ab->Area, map->scriptName);
-		//copying the scripting name into the actor
-		//this hack allows iwd starting cutscene to work
-		if(stricmp(ab->scriptName,"none")==0) {
-			ab->SetScriptName(DefaultName);
-		}
-
-		if (ab->BaseStats[IE_STATE_ID] & STATE_DEAD)
-			ab->AnimID = IE_ANI_SLEEP;
-		ab->Orientation = ( unsigned char ) Orientation;
-		ab->TalkCount = TalkCount;
-		//hack to not load global actors to area
-		if(!game->FindPC(ab->scriptName) && !game->FindNPC(ab->scriptName) ) {
-			map->AddActor( ab );
-		}
-		else {
-			delete ab;
-		}
-	}
-	core->FreeInterface( actmgr );
 	str->Seek( AnimOffset, GEM_STREAM_START );
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		printf( "[AREImporter]: No Animation Manager Available, skipping animations\n" );
-		return map;
-	}
-	for (i = 0; i < AnimCount; i++) {
-		Animation* anim;
-		str->Seek( 32, GEM_CURRENT_POS );
-		ieWord animX, animY;
-		str->Read( &animX, 2 );
-		str->Read( &animY, 2 );
-		str->Seek( 4, GEM_CURRENT_POS );
-		char animBam[9];
-		str->Read( animBam, 8 );
-		animBam[8] = 0;
-		ieWord animCycle, animFrame;
-		str->Read( &animCycle, 2 );
-		str->Read( &animFrame, 2 );
-		ieDword animFlags;
-		str->Read( &animFlags, 4 );
-		str->Seek( 20, GEM_CURRENT_POS );
-		unsigned char mode = ( ( animFlags & 2 ) != 0 ) ?
-			IE_SHADED :
-			IE_NORMAL;
-		AnimationFactory* af = ( AnimationFactory* )
+	} else {
+		for (i = 0; i < AnimCount; i++) {
+			Animation* anim;
+			str->Seek( 32, GEM_CURRENT_POS );
+			ieWord animX, animY;
+			str->Read( &animX, 2 );
+			str->Read( &animY, 2 );
+			str->Seek( 4, GEM_CURRENT_POS );
+			char animBam[9];
+			str->Read( animBam, 8 );
+			animBam[8] = 0;
+			ieWord animCycle, animFrame;
+			str->Read( &animCycle, 2 );
+			str->Read( &animFrame, 2 );
+			ieDword animFlags;
+			str->Read( &animFlags, 4 );
+			str->Seek( 20, GEM_CURRENT_POS );
+			unsigned char mode = ( ( animFlags & 2 ) != 0 ) ?
+				IE_SHADED : IE_NORMAL;
+			AnimationFactory* af = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( animBam, IE_BAM_CLASS_ID );
-		anim = af->GetCycle( ( unsigned char ) animCycle );
-		if (!anim)
-			anim = af->GetCycle( 0 );
-		anim->x = animX;
-		anim->y = animY;
-		anim->BlitMode = mode;
-		anim->autofree = false;
-		strcpy( anim->ResRef, animBam );
-		map->AddAnimation( anim );
+			anim = af->GetCycle( ( unsigned char ) animCycle );
+			if (!anim)
+				anim = af->GetCycle( 0 );
+			anim->x = animX;
+			anim->y = animY;
+			anim->BlitMode = mode;
+			anim->autofree = false;
+			strcpy( anim->ResRef, animBam );
+			map->AddAnimation( anim );
+		}
 	}
 	printf( "Loading entrances\n" );
 	//Loading Entrances
