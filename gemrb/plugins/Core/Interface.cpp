@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.282 2005/03/18 18:10:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.283 2005/03/19 15:44:53 avenger_teambg Exp $
  *
  */
 
@@ -183,18 +183,28 @@ static void ReleaseSpell(void *poi)
 
 Interface::~Interface(void)
 {
+	//destroy the highest objects in the hierarchy first!
+	if (game) {
+		delete( game );
+	}
+	if (worldmap) {
+		delete( worldmap );
+	}
 	CharAnimations::ReleaseMemory();
-	ItemCache.RemoveAll(ReleaseItem);
-	SpellCache.RemoveAll(ReleaseSpell);
-
 	if (CurrentStore) {
 		delete CurrentStore;
 	}
+	ItemCache.RemoveAll(ReleaseItem);
+	SpellCache.RemoveAll(ReleaseSpell);
+
 	unsigned int i;
 
 	for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
 		//freesprite checks for null pointer
 		video->FreeSprite(FogSprites[i]);
+	}
+	for(i=0;i<4;i++) {
+		video->FreeSprite(WindowFrames[i]);
 	}
 
 	if (TooltipBack) {
@@ -210,11 +220,6 @@ Interface::~Interface(void)
 	if (slotmatrix) {
 		free( slotmatrix );
 	}
-	if (game) {
-		delete( game );
-	}
-	if (worldmap)
-		delete( worldmap );
 	if (music) {
 		FreeInterface( music );
 	}
@@ -297,8 +302,8 @@ Interface::~Interface(void)
 		FreeInterface(INIparty);
 	}
 	delete( plugin );
-	//TODO: Clean the Cache and leave only .bif files
-	// FIXME: delete WindowFrames
+	// Removing all stuff from Cache, except bifs
+	DelTree((const char *) CachePath, true);
 }
 
 bool Interface::ReadStrrefs()
