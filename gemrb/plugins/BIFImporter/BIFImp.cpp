@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.13 2004/05/25 16:16:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.14 2004/08/01 19:13:03 guidoj Exp $
  *
  */
 
@@ -205,6 +205,7 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 	}
 	return s;
 }
+
 void BIFImp::ReadBIF(void)
 {
 	unsigned long foffset;
@@ -214,16 +215,6 @@ void BIFImp::ReadBIF(void)
 	stream->Seek( foffset, GEM_STREAM_START );
 	fentries = new FileEntry[fentcount];
 	stream->Read( fentries, fentcount * sizeof( FileEntry ) );
-	/*for(unsigned long i = 0; i < fentcount; i++) {
-		FileEntry fe;
-		stream->Read(&fe, 16);
-		fentries.push_back(fe);
-	}*/
 	tentries = new TileEntry[tentcount];
 	stream->Read( tentries, tentcount * sizeof( TileEntry ) );
-	/*for(unsigned long i = 0; i < tentcount; i++) {
-		TileEntry te;
-		stream->Read(&te, 20);
-		tentries.push_back(te);
-	}*/
 }
