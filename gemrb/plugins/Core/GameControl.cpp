@@ -175,6 +175,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				infoTexts[i]->textDisplaying = 0;
 				std::vector<Scriptable*>::iterator m;
 				m = infoTexts.begin()+i;
+				delete(*m);
 				infoTexts.erase(m);
 				i--;
 				continue;
@@ -370,7 +371,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	overInfoPoint = area->tm->GetInfoPoint(GameX, GameY);
 	if(overInfoPoint) {
-		if(overInfoPoint->ipType == ST_TRIGGER)
+		if(overInfoPoint->Type == ST_TRIGGER)
 			nextCursor = overInfoPoint->Cursor;
 	}
 
@@ -463,7 +464,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 		
 		if(!actor && (selected.size() == 1)) {
 			actor = selected.at(0);
-			if(!overInfoPoint || (overInfoPoint->ipType != ST_TRIGGER)) {
+			if(!overInfoPoint || (overInfoPoint->Type != ST_TRIGGER)) {
 				actor->WalkTo(GameX, GameY);
 				unsigned long WinIndex, TAIndex;
 				core->GetDictionary()->Lookup("MessageWindow", WinIndex);
@@ -486,7 +487,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 			actor->Select(true);
 		}
 		if(overInfoPoint) {
-			if(overInfoPoint->ipType == ST_TRIGGER) {
+			if(overInfoPoint->Type == ST_TRIGGER) {
 				if(overInfoPoint->Scripts[0] && (selected.size() == 1)) {
 					overInfoPoint->LastTrigger = selected[0];
 					overInfoPoint->Clicker = selected[0];
@@ -495,8 +496,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 					if(overInfoPoint->overHeadText) {
 						if(overInfoPoint->textDisplaying != 1) {
 							overInfoPoint->textDisplaying = 1;
-							infoTexts.push_back(overInfoPoint);
+							//infoTexts.push_back(overInfoPoint);
 							GetTime(overInfoPoint->timeStartDisplaying);
+							DisplayString(overInfoPoint);
 						}
 					}
 				}
@@ -935,9 +937,13 @@ void GameControl::DialogChoose(int choose)
 
 void GameControl::DisplayString(Scriptable * target)
 {
-	for(int i = 0; i < infoTexts.size(); i++) {
-		if(infoTexts[i] == target)
-			return;
-	}
-	infoTexts.push_back(target);
+	Scriptable * scr = new Scriptable(ST_TRIGGER);
+	int len = strlen(target->overHeadText)+1;
+	scr->overHeadText = (char*)malloc(len);
+	strcpy(scr->overHeadText, target->overHeadText);
+	scr->textDisplaying = 1;
+	scr->timeStartDisplaying = target->timeStartDisplaying;
+	scr->XPos = target->XPos;
+	scr->YPos = target->YPos;
+	infoTexts.push_back(scr);
 }
