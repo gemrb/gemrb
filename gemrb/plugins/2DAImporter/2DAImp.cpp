@@ -60,6 +60,8 @@ bool p2DAImp::Open(DataStream * stream, bool autoFree)
 		}
 		else {
 			char * str = strtok(line, " ");
+			if(str==NULL)
+				continue;
 			rowNames.push_back(str);
 			str = strtok(NULL, " ");
 			RowEntry r;
