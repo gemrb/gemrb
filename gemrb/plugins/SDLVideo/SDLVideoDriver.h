@@ -36,8 +36,10 @@ public:
 	Color * CreatePalette(Color color, Color back);
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, Sprite2D * img, bool anchor = false);
-  /** Send a Quit Signal to the Event Queue */
-  bool Quit();
+	/** Send a Quit Signal to the Event Queue */
+	bool Quit();
+	/** Get the Palette of a Sprite */
+	Color * GetPalette(Sprite2D * spr);
 };
 
 #endif

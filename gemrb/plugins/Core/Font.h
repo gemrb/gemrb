@@ -39,12 +39,14 @@ private:
 	//std::vector<Sprite2D*> chars;
 	int count;
 	int maxHeight;
+	Color * palette;
 public:
 	Font(void);
 	~Font(void);
 	void AddChar(Sprite2D * spr);
 	void Print(Region rgn, unsigned char * string, Color *color, unsigned char Alignment, bool anchor = false, Font * initials = NULL, Color *initcolor = NULL, Sprite2D * cursor = NULL, int curpos = 0);
 	void PrintFromLine(int startrow, Region rgn, unsigned char * string, Color *color, unsigned char Alignment, bool anchor = false, Font * initials = NULL, Color *initcolor = NULL, Sprite2D * cursor = NULL, int curpos = 0);
+	void * GetPalette();
 	char ResRef[9];
 	Sprite2D * chars[256];
 private: // Private methods

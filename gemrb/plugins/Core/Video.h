@@ -47,8 +47,10 @@ public:
 	virtual void BlitTiled(Region rgn, Sprite2D * img, bool anchor = false) = 0;
 	/** Set Event Manager */
 	void SetEventMgr(EventMgr * evnt);
-  /** Send a Quit Signal to the Event Queue */
-  virtual bool Quit(void) = 0;
+	/** Send a Quit Signal to the Event Queue */
+	virtual bool Quit(void) = 0;
+	/** Get the Palette of a Sprite */
+	virtual Color * GetPalette(Sprite2D * spr) = 0;
 	/** Event Manager Pointer */
 	EventMgr * Evnt;
 };

@@ -43,6 +43,13 @@ Button::Button(bool Clear){
 	Text = (char*)malloc(64);
 	hasText = false;
 	font = core->GetFont("STONEBIG");
+	palette = (Color*)malloc(256*sizeof(Color));
+	memcpy(palette, font->GetPalette(), 256*sizeof(Color));
+	for(int i = 0; i < 256; i++) {
+		palette[i].r = (palette[i].r * 2) / 3;
+		palette[i].g = (palette[i].g * 2) / 3;
+		palette[i].b = (palette[i].b * 2) / 3;
+	}
 	Flags = 0x4;
 	ToggleState = false;
 	Value = 0;
@@ -58,7 +65,8 @@ Button::~Button(){
 			video->FreeSprite(Selected);
 		if(Disabled && ((Disabled != Pressed) && (Disabled != Unpressed) && (Disabled != Selected)))
 			video->FreeSprite(Disabled);
-	}           
+	}
+	free(palette);
 }
 /** Sets the 'type' Image of the Button to 'img'.
 'type' may assume the following values:
@@ -152,8 +160,11 @@ void Button::Draw(unsigned short x, unsigned short y)
 		
 		case IE_GUI_BUTTON_DISABLED:
 		{
-			if(Disabled)
+			if(Disabled) {
 				core->GetVideoDriver()->BlitSprite(Disabled, x+XPos, y+YPos, true);
+				if(hasText)
+					font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, palette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
+			}
 			else if(Unpressed)
 				core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
 			Changed = false;

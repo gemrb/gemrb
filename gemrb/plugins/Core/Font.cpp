@@ -8,10 +8,12 @@ Font::Font(void)
 {
 	maxHeight = 0;
 	count = 0;
+	palette = NULL;
 }
 
 Font::~Font(void)
 {
+	free(palette);
 	/*
 	Since we assume that the font was loaded from a factory Object,
 	we don't need to free the sprites, those will be freed directly
@@ -29,6 +31,9 @@ Font::~Font(void)
 
 void Font::AddChar(Sprite2D * spr)
 {
+	if(count == 0) {
+		palette = core->GetVideoDriver()->GetPalette(spr);
+	}
 	if(maxHeight < spr->YPos)
 		maxHeight = spr->YPos;
 	//chars.push_back(spr);	
@@ -46,10 +51,11 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 	}
 	else
 		ipal = pal;
-	if(pal) {
-		for(int i = 0; i < 256; i++) {
-			core->GetVideoDriver()->SetPalette(chars[i], pal);
-		}
+	if(!pal) {
+		pal = palette;
+	}
+	for(int i = 0; i < 256; i++) {
+		core->GetVideoDriver()->SetPalette(chars[i], pal);
 	}
 	Video * video = core->GetVideoDriver();
 	int len = strlen((char*)string);
@@ -135,10 +141,11 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	}
 	else
 		ipal = pal;
-	if(pal) {
-		for(int i = 0; i < 256; i++) {
-			core->GetVideoDriver()->SetPalette(chars[i], pal);
-		}
+	if(!pal) {
+		pal = palette;
+	}
+	for(int i = 0; i < 256; i++) {
+		core->GetVideoDriver()->SetPalette(chars[i], pal);
 	}
 	Video * video = core->GetVideoDriver();
 	int len = strlen((char*)string);
@@ -172,6 +179,9 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 		}
 		h = h*ystep;
 		y += (rgn.h/2)-(h/2);
+	}
+	else if(Alignment & IE_FONT_ALIGN_TOP) {
+		y+=5;
 	}
 	for(int i = 0; i < len; i++) {
 		if(tmp[i] == 0) {
@@ -515,4 +525,9 @@ void Font::SetupString(char * string, int width)
 		}
 		s = strtok(NULL, " \n");
 	}*/
+}
+
+void * Font::GetPalette()
+{
+	return palette;
 }

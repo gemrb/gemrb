@@ -504,3 +504,18 @@ bool SDLVideoDriver::Quit()
 		return false;
 	return true;
 }
+/** Get the Palette of a Sprite */
+Color * SDLVideoDriver::GetPalette(Sprite2D * spr)
+{
+	SDL_Surface * s = (SDL_Surface*)spr->vptr;
+	if(s->format->BitsPerPixel != 8)
+		return NULL;
+	Color * pal = (Color*)malloc(256*sizeof(Color));
+	for(int i = 0; i < s->format->palette->ncolors; i++) {
+		pal[i].r = s->format->palette->colors[i].r;
+		pal[i].g = s->format->palette->colors[i].g;
+		pal[i].b = s->format->palette->colors[i].b;
+	}
+	return pal;
+}
+
