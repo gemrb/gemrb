@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.19 2004/03/21 13:47:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.20 2004/04/13 18:40:42 doc_wagon Exp $
  *
  */
 
@@ -24,6 +24,8 @@
 #include "../../includes/win32def.h"
 #include "Control.h"
 #include "Interface.h"
+
+extern Interface* core;
 
 Control::Control()
 {
