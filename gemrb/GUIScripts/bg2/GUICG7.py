@@ -1,14 +1,35 @@
-#character generation, mage spells (GUICG7)
+# -*-python-*-
+# GemRB - Infinity Engine Emulator
+# Copyright (C) 2003-2004 The GemRB Project
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.3 2004/12/05 13:02:10 avenger_teambg Exp $
+# character generation, mage spells (GUICG7)
+
 import GemRB
+from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells
 
 MageSpellsWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-MageSpellsTable = 0
+Learnable = []
 
 def OnLoad():
 	global MageSpellsWindow, TextAreaControl, DoneButton
-	global MageSpellsTable
+	global Learnable
 	
 	ClassTable = GemRB.LoadTable("classes")
 	ClassRow = GemRB.GetVar("Class")-1
@@ -21,8 +42,7 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG")
 	MageSpellsWindow = GemRB.LoadWindow(7)
-	MageSpellsTable = GemRB.LoadTable("MAGESP")
-	MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
+	Learnable = GetLearnableMageSpells( GemRB.GetVar("Kit"), GemRB.GetVar("Alignment"), 1)
 	GemRB.SetVar("MageSpellBook", 0)
 	GemRB.SetVar("SpellMask", 0)
 
@@ -30,12 +50,12 @@ def OnLoad():
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
 	GemRB.SetLabelUseRGB(MageSpellsWindow, PointsLeftLabel, 1)
 	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
-	for i in range (0, 24):
+	for i in range (24):
 		SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
 		GemRB.SetButtonFlags(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
-		if i < MageSpellsCount:
-			# Color is no good yet :-(
-			GemRB.SetButtonBAM(MageSpellsWindow, SpellButton, GemRB.GetTableValue(MageSpellsTable, i, 0), 0, 0, 63)
+		if i < len(Learnable):
+			Spell = GemRB.GetSpell(Learnable[i])
+			GemRB.SetSpellIcon(MageSpellsWindow, SpellButton, Learnable[i])
 			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
 			GemRB.SetVarAssoc(MageSpellsWindow, SpellButton, "SpellMask", 1 << i)
@@ -46,11 +66,11 @@ def OnLoad():
 	MageSpellsTextArea = GemRB.GetControl(MageSpellsWindow, 27)
 	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, 17250)
 
-	MageSpellsDoneButton = GemRB.GetControl(MageSpellsWindow, 0)
-	GemRB.SetButtonState(MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent(MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsDonePress")
-	GemRB.SetText(MageSpellsWindow, MageSpellsDoneButton, 11973)
-	GemRB.SetButtonFlags(MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton = GemRB.GetControl(MageSpellsWindow, 0)
+	GemRB.SetButtonState(MageSpellsWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent(MageSpellsWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsDonePress")
+	GemRB.SetText(MageSpellsWindow, DoneButton, 11973)
+	GemRB.SetButtonFlags(MageSpellsWindow, DoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	MageSpellsCancelButton = GemRB.GetControl(MageSpellsWindow, 29)
 	GemRB.SetButtonState(MageSpellsWindow, MageSpellsCancelButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent(MageSpellsWindow, MageSpellsCancelButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsCancelPress")
@@ -64,8 +84,9 @@ def OnLoad():
 	return
 
 def MageSpellsSelectPress():
-	global MageSpellsWindow, MageSpellsTable, MageSpellsTextArea, MageSpellsDoneButton, MageSpellsSelectPointsLeft
-	MageSpellsCount = GemRB.GetTableRowCount(MageSpellsTable)
+	global MageSpellsWindow, MageSpellsTextArea, DoneButton
+	global MageSpellsSelectPointsLeft, Learnable
+
 	MageSpellBook = GemRB.GetVar("MageSpellBook")
 	SpellMask = GemRB.GetVar("SpellMask")
 	Spell = abs(MageSpellBook - SpellMask)
@@ -74,22 +95,24 @@ def MageSpellsSelectPress():
 	while (Spell > 0):
 		i = i + 1
 		Spell = Spell >> 1
-	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, GemRB.GetTableValue(MageSpellsTable, i, 1))
+
+	Spell = GemRB.GetSpell(Learnable[i])
+	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, Spell["SpellDesc"])
 	if SpellMask < MageSpellBook:
 		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft + 1
-		for i in range (0, MageSpellsCount):
+		for i in range (len(Learnable)):
 			SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
 			if (((1 << i) & SpellMask) == 0):
 				GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetButtonState(MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetButtonState(MageSpellsWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
 	else:
 		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft - 1
 		if MageSpellsSelectPointsLeft == 0:
-			for i in range (0, MageSpellsCount):
+			for i in range (len(Learnable)):
 				SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
 				if ((1 << i) & SpellMask) == 0:
 					GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
-			GemRB.SetButtonState(MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_ENABLED)
+			GemRB.SetButtonState(MageSpellsWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
 
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
 	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
@@ -97,7 +120,6 @@ def MageSpellsSelectPress():
 	return
 
 def MageSpellsCancelPress():
-	print "done"
 	GemRB.UnloadWindow(MageSpellsWindow)
 	GemRB.SetNextScript("CharGen6") #haterace
 	return
