@@ -12,6 +12,7 @@ def OnLoad():
 	MultiPlayerButton = GemRB.GetControl(StartWindow, 1)
 	MoviesButton = GemRB.GetControl(StartWindow, 2)
 	DisabledButton = GemRB.GetControl(StartWindow, 5)
+	GemRB.CreateLabel(OptionsWindow, 0xffff0000, 0,450,640,30, "REALMS", "GemRB Ver 0.0.1", 1);
 	GemRB.SetControlStatus(StartWindow, DisabledButton, 0x00000003);
 	GemRB.SetControlStatus(StartWindow, SinglePlayerButton, 0x00000000);
 	GemRB.SetControlStatus(StartWindow, ExitButton, 0x00000000);
@@ -45,6 +46,7 @@ def ExitPress():
 	
 def OptionsPress():
 	global StartWindow
+	GemRB.UnloadWindow(StartWindow)
 	GemRB.SetNextScript("StartOpt")
 	return
 	

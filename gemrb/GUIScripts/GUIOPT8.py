@@ -108,11 +108,13 @@ def AutoPausePress():
 def OkPress():
 	global GamePlayWindow, TextAreaControl
 	GemRB.SetVisible(GamePlayWindow, 0)
+	GemRB.UnloadWindow(GamePlayWindow)
 	GemRB.SetNextScript("StartOpt")
 	return
 	
 def CancelPress():
 	global GamePlayWindow, TextAreaControl
 	GemRB.SetVisible(GamePlayWindow, 0)
+	GemRB.UnloadWindow(GamePlayWindow)
 	GemRB.SetNextScript("StartOpt")
 	return

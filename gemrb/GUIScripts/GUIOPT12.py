@@ -55,12 +55,12 @@ def SelectionPress():
 	
 def OkPress():
 	global SoundWindow, TextAreaControl
-	GemRB.SetVisible(SoundWindow, 0)
+	GemRB.UnloadWindow(SoundWindow)
 	GemRB.SetNextScript("GUIOPT7")
 	return
 	
 def CancelPress():
 	global SoundWindow, TextAreaControl
-	GemRB.SetVisible(SoundWindow, 0)
+	GemRB.UnloadWindow(SoundWindow)
 	GemRB.SetNextScript("GUIOPT7")
 	return

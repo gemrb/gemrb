@@ -76,12 +76,12 @@ def SoftStandBltPress():
 	
 def OkPress():
 	global OptionsWindow, TextAreaControl
-	GemRB.SetVisible(OptionsWindow, 0)
+	GemRB.UnloadWindow(OptionsWindow)
 	GemRB.SetNextScript("StartOpt")
 	return
 	
 def CancelPress():
 	global OptionsWindow, TextAreaControl
-	GemRB.SetVisible(OptionsWindow, 0)
+	GemRB.UnloadWindow(OptionsWindow)
 	GemRB.SetNextScript("StartOpt")
 	return
