@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.h,v 1.5 2003/12/07 16:24:44 idstewart Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.h,v 1.6 2003/12/09 19:00:26 balrog994 Exp $
  *
  */
 
@@ -44,6 +44,9 @@ typedef struct Object {
 	int				identifiersField;
 	int				XobjectPosition;
 	int				YobjectPosition;
+	int				WobjectPosition;
+	int             HobjectPosition;
+	char            PositionMask[32];
 	char*			objectName;
 } Object;
 
@@ -53,6 +56,8 @@ typedef struct Trigger {
 	int				flags;
 	int				int1Parameter;
 	int				int2Parameter;
+	int				XpointParameter;
+	int				YpointParameter;
 	char*			string0Parameter;
 	char*			string1Parameter;
 	Object*			objectParameter;
