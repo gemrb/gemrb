@@ -209,7 +209,7 @@ void Variables::SetAt(const char *key, unsigned long value)
 			InitHashTable(m_nHashTableSize);
 
 		// it doesn't exist, add a new Association
-		pAssoc = NewAssoc(pAssoc->key);
+		pAssoc = NewAssoc(key);
 
 		// put into hash table
 		pAssoc->pNext = m_pHashTable[nHash];
