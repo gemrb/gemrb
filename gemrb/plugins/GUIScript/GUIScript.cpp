@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.79 2003/12/04 22:38:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.80 2003/12/06 17:33:52 balrog994 Exp $
  *
  */
 
@@ -102,6 +102,13 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 		core->PopupConsole();
 	}
 
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_EndCutSceneMode(PyObject */*self*/, PyObject *args)
+{
+	core->SetCutSceneMode(false);
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -1706,6 +1713,9 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 static PyMethodDef GemRBMethods[] = {
 	{"EnterGame", GemRB_EnterGame, METH_NOARGS,
      "Enters the Game."},
+
+	{"EndCutSceneMode", GemRB_EndCutSceneMode, METH_NOARGS,
+     "Exits the CutScene Mode."},
 
     {"GetINIPartyCount", GemRB_GetINIPartyCount, METH_NOARGS,
      "Returns the Number of Party defined in Party.ini (works only on IWD2)."},
