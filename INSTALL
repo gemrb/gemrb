@@ -34,12 +34,16 @@ The simplest way to compile this package is:
      Running `configure' takes a while.  While running, it prints some
      messages telling which features it is checking for.
 
-  2. Type `make' to compile the package.
+  2. Enter the 'gemrb/plugins/Core/' Directory and type 'make'. This
+     will build the Core Module needed to build GemRB.
 
-  3. Type `make install' to install the programs and any data files and
-     documentation.
+  3. 'cd' again to the source code directory and type `make' to compile 
+     the package.
 
-  4. You can remove the program binaries and object files from the
+  4. 'cd' to the 'gemrb/' Directory and type 'plugins-prepare.sh'. This
+     script will copy each plugin to the 'plugins' Directory.
+
+  5. You can remove the program binaries and object files from the
      source code directory by typing `make clean'.  
 
 Compilers and Options
