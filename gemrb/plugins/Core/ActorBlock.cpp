@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.76 2005/03/15 12:07:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.77 2005/03/15 17:53:13 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -651,11 +651,17 @@ void Door::SetDoorLocked(bool Locked, bool playsound)
 	}
 }
 
+bool Door::IsOpen() const
+{
+  return (Flags&DOOR_OPEN) == !core->HasFeature(GF_REVERSE_DOOR);
+}
+
 void Door::SetDoorOpen(bool Open, bool playsound)
 {
 	if (Open) SetDoorLocked (false, playsound);
-	ToggleTiles (Open, playsound);
+	ToggleTiles (Open == !core->HasFeature(GF_REVERSE_DOOR), playsound);
 	UpdateDoor ();
+	area->FixAllPositions();
 }
 
 void Door::SetPolygon(bool Open, Gem_Polygon* poly)
@@ -681,7 +687,7 @@ void Door::SetCursor(unsigned char CursorIndex)
 void Door::DebugDump()
 {
 	printf( "Debugdump of Door %s:\n", Name );
-	printf( "Door Open: %s\n", YESNO(Flags&DOOR_OPEN));
+	printf( "Door Open: %s\n", YESNO(IsOpen()));
 	printf( "Door Locked: %s\n", YESNO(Flags&DOOR_LOCKED));
 	printf( "Door Trapped: %s (permanent:%s)\n", YESNO(TrapFlags), YESNO(Flags&DOOR_RESET));
 	printf( "Trap Detectable: %s\n", YESNO(Flags&DOOR_DETECTABLE) );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.245 2005/03/15 11:45:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.246 2005/03/15 17:53:13 avenger_teambg Exp $
  *
  */
 
@@ -4345,7 +4345,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		case ST_DOOR:
 		{
 			Door *door =(Door *) tar;
-			return (int) (door->Flags&DOOR_OPEN) != parameters->int0Parameter;
+			return (int) (door->IsOpen()) == parameters->int0Parameter;
 		}
 		case ST_CONTAINER:
 		{
@@ -6757,7 +6757,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	if (door->Flags&DOOR_OPEN) {
+	if (door->IsOpen()) {
 		//door is already open
 		Sender->CurrentAction = NULL;
 		return;
@@ -6810,7 +6810,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	if (!(door->Flags&DOOR_OPEN) ) {
+	if (!door->IsOpen() ) {
 		//door is already closed 
 		Sender->CurrentAction = NULL;
 		return;

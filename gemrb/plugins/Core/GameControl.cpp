@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.199 2005/03/15 11:45:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.200 2005/03/15 17:53:13 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -255,14 +255,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			(d = area->TMap->GetDoor( idx ));
 			idx++) {
 			d->DrawOutline();
-/*
-			if (d->Flags & DOOR_OPEN) {
-				video->DrawPolyline( d->open, cyan, true );
-			}
-			else {
-				video->DrawPolyline( d->closed, cyan, true );
-			}
-*/
 		}
 	}
 
@@ -752,6 +744,8 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 	char Tmp[40];
 
 	//this won't work atm, target must be honoured by Attack
+	source->ClearPath();
+	source->ClearActions();
 	strncpy(Tmp,"Attack()",sizeof(Tmp) );
 	target=tgt; //this is a hack, a deadly one
 	source->AddAction( GameScript::GenerateAction( Tmp, true ) );
@@ -765,6 +759,8 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	//(non interactive demo)
 	//i found no fitting action which would emulate this kind of
 	//dialog initation
+	source->ClearPath();
+	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial1()",sizeof(Tmp) );
 	target=tgt; //this is a hack, a deadly one
 	source->AddAction( GameScript::GenerateAction( Tmp, true ) );
@@ -774,7 +770,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 {
 	char Tmp[256];
 
-	if (door->Flags&DOOR_OPEN) {
+	if (door->IsOpen()) {
 		actor->ClearPath();
 		actor->ClearActions();
 		sprintf( Tmp, "CloseDoor(\"%s\")", door->Name );

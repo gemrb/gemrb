@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.70 2005/02/27 19:13:28 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.71 2005/03/15 17:53:15 avenger_teambg Exp $
  *
  */
 
@@ -28,7 +28,7 @@
 
 #include "ie_types.h"
 
-#define VERSION_GEMRB "0.2.3"
+#define VERSION_GEMRB "0.2.4"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
 
@@ -93,6 +93,7 @@
 #define  GF_IWD_MAP_DIMENSIONS			15 //iwd, iwd2
 #define  GF_AUTOMAP_INI				16 //pst
 #define  GF_SMALL_FOG                           17 //bg1, pst
+#define  GF_REVERSE_DOOR                        18 //pst
 
 /////AI global defines
 #define AI_UPDATE_TIME	30

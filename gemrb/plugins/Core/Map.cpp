@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.144 2005/03/13 20:22:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.145 2005/03/15 17:53:14 avenger_teambg Exp $
  *
  */
 
@@ -1016,6 +1016,19 @@ void Map::AdjustPosition(Point &goal, unsigned int radius)
 	}
 }
 
+void Map::FixAllPositions()
+{
+	for (unsigned int e = 0; e<actors.size(); e++) {
+		Actor *actor = actors[e];
+		if (actor->GetStat( IE_DONOTJUMP ) ) continue;
+		Point p;
+		p.x=actor->Pos.x/16;
+		p.y=actor->Pos.y/12;
+		AdjustPosition(p);
+		actor->Pos.x=p.x*16+8;
+		actor->Pos.y=p.y*12+6;
+	}
+}
 //run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
 PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
 {

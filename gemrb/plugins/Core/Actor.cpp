@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.91 2005/03/15 11:45:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.92 2005/03/15 17:53:12 avenger_teambg Exp $
  *
  */
 
@@ -219,6 +219,10 @@ printf("The following anim is supposed to be real colored (no recoloring)\n");
 	}
 	anims = new CharAnimations( AnimID, BaseStats[IE_ARMOR_TYPE]);
 	if (anims) {
+		//bird animations are not hindered by searchmap
+		//only animtype==7 (mirror3) uses this feature
+		//this is a hardcoded hack, but works for all engine type
+		BaseStats[IE_DONOTJUMP]=!(anims->GetAnimType()!=IE_ANI_CODE_MIRROR_3);
 		SetCircleSize();
 		anims->SetupColors(BaseStats+IE_COLORS);
 	}
