@@ -22,7 +22,7 @@ extern "C" {
 
 #include "../Core/Label.h"
 
-static PyObject * GemRB_LoadWindowPack(PyObject *self, PyObject *args)
+static PyObject * GemRB_LoadWindowPack(PyObject */*self*/, PyObject *args)
 {
 	char *string;
 
@@ -47,7 +47,7 @@ static PyObject * GemRB_LoadWindowPack(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_LoadWindow(PyObject *self, PyObject *args)
+static PyObject * GemRB_LoadWindow(PyObject */*self*/, PyObject *args)
 {
 	int WindowID;
 
@@ -63,7 +63,7 @@ static PyObject * GemRB_LoadWindow(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ret);
 }
 
-static PyObject * GemRB_LoadTable(PyObject *self, PyObject *args)
+static PyObject * GemRB_LoadTable(PyObject */*self*/, PyObject *args)
 {
 	char *string;
 
@@ -82,7 +82,7 @@ static PyObject * GemRB_LoadTable(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ind);
 }
 
-static PyObject * GemRB_UnLoadTable(PyObject *self, PyObject *args)
+static PyObject * GemRB_UnLoadTable(PyObject */*self*/, PyObject *args)
 {
 	int ti;
 
@@ -99,7 +99,7 @@ static PyObject * GemRB_UnLoadTable(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_GetTable(PyObject *self, PyObject *args)
+static PyObject * GemRB_GetTable(PyObject */*self*/, PyObject *args)
 {
 	char *string;
 
@@ -115,7 +115,7 @@ static PyObject * GemRB_GetTable(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ind);
 }
 
-static PyObject * GemRB_GetTableValue(PyObject *self, PyObject *args)
+static PyObject * GemRB_GetTableValue(PyObject */*self*/, PyObject *args)
 {
 	PyObject *ti, *row, *col;
 
@@ -144,46 +144,35 @@ static PyObject * GemRB_GetTableValue(PyObject *self, PyObject *args)
 		TableMgr * tm = core->GetTable(TableIndex);
 		if(!tm)
 			return NULL;
+		char *ret;
 		if(PyObject_TypeCheck(row, &PyString_Type)) {
 			char * rows = PyString_AsString(row);
 			char * cols = PyString_AsString(col);
-			char * ret = tm->QueryField(rows, cols);
-			if(ret == NULL)
-				return NULL;
-			if((ret[0] >= '0') && (ret[0] <= '9')) {
-				if(ret[1] == 'x') {
-					int val;
-					sscanf(ret, "0x%x", &val);
-					return Py_BuildValue("i", val);
-				}
-				else
-					return Py_BuildValue("i", atoi(ret));
-			}
-			return Py_BuildValue("s", ret);
+			ret = tm->QueryField(rows, cols);
 		}
 		else {
 			int rowi = PyInt_AsLong(row);
 			int coli = PyInt_AsLong(col);
-			char * ret = tm->QueryField(rowi, coli);
-			if(ret == NULL)
-				return NULL;
-			if((ret[0] >= '0') && (ret[0] <= '9')) {
-				if(ret[1] == 'x') {
-					unsigned long val;
-					sscanf(ret, "0x%lx", &val);
-					return Py_BuildValue("l", val);
-				}
-				else
-					return Py_BuildValue("l", atol(ret));
-			}
-			return Py_BuildValue("s", ret);
+			ret = tm->QueryField(rowi, coli);
 		}
+		if(ret == NULL)
+			return NULL;
+		if((ret[0] >= '0') && (ret[0] <= '9')) {
+			if(ret[1] == 'x') {
+				int val;
+				sscanf(ret, "0x%x", &val);
+				return Py_BuildValue("i", val);
+			}
+			else
+				return Py_BuildValue("i", atoi(ret));
+		}
+		return Py_BuildValue("s", ret);
 	}
 	
 	return NULL;
 }
 
-static PyObject * GemRB_FindTableValue(PyObject *self, PyObject *args)
+static PyObject * GemRB_FindTableValue(PyObject */*self*/, PyObject *args)
 {
 	int ti, col, row;
 	unsigned long Value, val;
@@ -210,7 +199,7 @@ static PyObject * GemRB_FindTableValue(PyObject *self, PyObject *args)
 	return Py_BuildValue("i",-1); //row not found
 }
 
-static PyObject * GemRB_GetTableRowName(PyObject *self, PyObject *args)
+static PyObject * GemRB_GetTableRowName(PyObject */*self*/, PyObject *args)
 {
 	int ti, row;
 
@@ -229,7 +218,7 @@ static PyObject * GemRB_GetTableRowName(PyObject *self, PyObject *args)
 	return Py_BuildValue("s", str);
 }
 
-static PyObject * GemRB_GetTableRowCount(PyObject *self, PyObject *args)
+static PyObject * GemRB_GetTableRowCount(PyObject */*self*/, PyObject *args)
 {
 	int ti;
 
@@ -245,7 +234,7 @@ static PyObject * GemRB_GetTableRowCount(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", tm->GetRowCount());
 }
 
-static PyObject * GemRB_LoadSymbol(PyObject *self, PyObject *args)
+static PyObject * GemRB_LoadSymbol(PyObject */*self*/, PyObject *args)
 {
 	char *string;
 
@@ -261,7 +250,7 @@ static PyObject * GemRB_LoadSymbol(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ind);
 }
 
-static PyObject * GemRB_UnLoadSymbol(PyObject *self, PyObject *args)
+static PyObject * GemRB_UnLoadSymbol(PyObject */*self*/, PyObject *args)
 {
 	int si;
 
@@ -278,7 +267,7 @@ static PyObject * GemRB_UnLoadSymbol(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_GetSymbol(PyObject *self, PyObject *args)
+static PyObject * GemRB_GetSymbol(PyObject */*self*/, PyObject *args)
 {
 	char *string;
 
@@ -294,7 +283,7 @@ static PyObject * GemRB_GetSymbol(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ind);
 }
 
-static PyObject * GemRB_GetSymbolValue(PyObject *self, PyObject *args)
+static PyObject * GemRB_GetSymbolValue(PyObject */*self*/, PyObject *args)
 {
 	PyObject *si, *sym;
 
@@ -325,7 +314,7 @@ static PyObject * GemRB_GetSymbolValue(PyObject *self, PyObject *args)
 	return NULL;
 }
 
-static PyObject * GemRB_GetControl(PyObject *self, PyObject *args)
+static PyObject * GemRB_GetControl(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlID;
 
@@ -341,7 +330,7 @@ static PyObject * GemRB_GetControl(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ret);
 }
 
-static PyObject * GemRB_SetText(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetText(PyObject */*self*/, PyObject *args)
 {
 	PyObject *wi, *ci, *str;
 	int WindowIndex, ControlIndex, StrRef;
@@ -381,7 +370,7 @@ static PyObject * GemRB_SetText(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ret);
 }
 
-static PyObject * GemRB_TextAreaAppend(PyObject *self, PyObject *args)
+static PyObject * GemRB_TextAreaAppend(PyObject */*self*/, PyObject *args)
 {
 	PyObject *wi, *ci, *str, *row=NULL;
 	int WindowIndex, ControlIndex, StrRef, Row;
@@ -434,7 +423,7 @@ static PyObject * GemRB_TextAreaAppend(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ret);
 }
 
-static PyObject * GemRB_SetVisible(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetVisible(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex;
 	int visible;
@@ -452,7 +441,7 @@ static PyObject * GemRB_SetVisible(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_ShowModal(PyObject *self, PyObject *args)
+static PyObject * GemRB_ShowModal(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex;
 
@@ -469,7 +458,7 @@ static PyObject * GemRB_ShowModal(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_SetEvent(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetEvent(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex;
 	int event;
@@ -488,7 +477,7 @@ static PyObject * GemRB_SetEvent(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_SetNextScript(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetNextScript(PyObject */*self*/, PyObject *args)
 {
 	char *funcName;
 
@@ -504,7 +493,7 @@ static PyObject * GemRB_SetNextScript(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_SetControlStatus(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetControlStatus(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex;
 	int status;
@@ -523,7 +512,7 @@ static PyObject * GemRB_SetControlStatus(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_SetVarAssoc(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetVarAssoc(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex;
 	unsigned long Value;
@@ -554,7 +543,7 @@ static PyObject * GemRB_SetVarAssoc(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_UnloadWindow(PyObject *self, PyObject *args)
+static PyObject * GemRB_UnloadWindow(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex;
 
@@ -571,7 +560,7 @@ static PyObject * GemRB_UnloadWindow(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_InvalidateWindow(PyObject *self, PyObject *args)
+static PyObject * GemRB_InvalidateWindow(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex;
 
@@ -589,7 +578,7 @@ static PyObject * GemRB_InvalidateWindow(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_CreateLabel(PyObject *self, PyObject *args)
+static PyObject * GemRB_CreateLabel(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlID, x, y, w, h, align;
 	char *font, *text;
@@ -618,7 +607,7 @@ static PyObject * GemRB_CreateLabel(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_SetLabelUseRGB(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetLabelUseRGB(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex, status;
 
@@ -642,7 +631,7 @@ static PyObject * GemRB_SetLabelUseRGB(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_SetButtonFlags(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetButtonFlags(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex, Flags, Operation;
 
@@ -674,7 +663,7 @@ static PyObject * GemRB_SetButtonFlags(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_SetButtonState(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetButtonState(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex, state;
 
@@ -701,7 +690,7 @@ static PyObject * GemRB_SetButtonState(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_SetButtonPicture(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetButtonPicture(PyObject */*self*/, PyObject *args)
 {
 	int WindowIndex, ControlIndex;
 	char * ResRef;
@@ -752,7 +741,7 @@ static PyObject * GemRB_SetButtonPicture(PyObject *self, PyObject *args)
 	Py_INCREF(Py_None);
 	return Py_None;
 }
-static PyObject * GemRB_PlaySound(PyObject *self, PyObject *args)
+static PyObject * GemRB_PlaySound(PyObject */*self*/, PyObject *args)
 {
 	char* ResRef;
 
@@ -769,7 +758,7 @@ static PyObject * GemRB_PlaySound(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_DrawWindows(PyObject *self, PyObject *args)
+static PyObject * GemRB_DrawWindows(PyObject */*self*/, PyObject */*args*/)
 {
 	core->DrawWindows();
 
@@ -777,7 +766,7 @@ static PyObject * GemRB_DrawWindows(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_Quit(PyObject *self, PyObject *args)
+static PyObject * GemRB_Quit(PyObject */*self*/, PyObject */*args*/)
 {
 	bool ret = core->Quit();
 	if(!ret)
@@ -787,7 +776,7 @@ static PyObject * GemRB_Quit(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_LoadMusicPL(PyObject *self, PyObject *args)
+static PyObject * GemRB_LoadMusicPL(PyObject */*self*/, PyObject *args)
 {
 	char* ResRef;
 
@@ -804,7 +793,7 @@ static PyObject * GemRB_LoadMusicPL(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_StartPL(PyObject *self, PyObject *args)
+static PyObject * GemRB_StartPL(PyObject */*self*/, PyObject */*args*/)
 {	
 	core->GetMusicMgr()->Start();
 
@@ -812,7 +801,7 @@ static PyObject * GemRB_StartPL(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_SoftEndPL(PyObject *self, PyObject *args)
+static PyObject * GemRB_SoftEndPL(PyObject */*self*/, PyObject */*args*/)
 {	
 	core->GetMusicMgr()->End();
 
@@ -820,7 +809,7 @@ static PyObject * GemRB_SoftEndPL(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_HardEndPL(PyObject *self, PyObject *args)
+static PyObject * GemRB_HardEndPL(PyObject */*self*/, PyObject */*args*/)
 {	
 	core->GetMusicMgr()->HardEnd();
 
@@ -828,7 +817,7 @@ static PyObject * GemRB_HardEndPL(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_SetToken(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetToken(PyObject */*self*/, PyObject *args)
 {	
 	char* Variable;
 	char* value;
@@ -846,7 +835,7 @@ static PyObject * GemRB_SetToken(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_SetVar(PyObject *self, PyObject *args)
+static PyObject * GemRB_SetVar(PyObject */*self*/, PyObject *args)
 {	
 	char* Variable;
 	unsigned long value;
@@ -862,7 +851,7 @@ static PyObject * GemRB_SetVar(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_GetToken(PyObject *self, PyObject *args)
+static PyObject * GemRB_GetToken(PyObject */*self*/, PyObject *args)
 {	
 	char* Variable;
 	char* value;
@@ -880,7 +869,7 @@ static PyObject * GemRB_GetToken(PyObject *self, PyObject *args)
 	return Py_BuildValue("s", value);
 }
 
-static PyObject * GemRB_GetVar(PyObject *self, PyObject *args)
+static PyObject * GemRB_GetVar(PyObject */*self*/, PyObject *args)
 {	
 	char* Variable;
 	unsigned long value;
@@ -896,7 +885,7 @@ static PyObject * GemRB_GetVar(PyObject *self, PyObject *args)
 	return Py_BuildValue("l", value);
 }
 
-static PyObject * GemRB_PlayMovie(PyObject *self, PyObject *args)
+static PyObject * GemRB_PlayMovie(PyObject */*self*/, PyObject *args)
 {
 	char *string;
 
@@ -912,7 +901,7 @@ static PyObject * GemRB_PlayMovie(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ind);
 }
 
-static PyObject *GemRB_Roll(PyObject *self, PyObject *args)
+static PyObject *GemRB_Roll(PyObject */*self*/, PyObject *args)
 {
 	int Dice, Size, Add;
 
@@ -1054,7 +1043,7 @@ static PyMethodDef GemRBMethods[] = {
 };
 
 void initGemRB() {
-	PyObject * m = Py_InitModule("GemRB", GemRBMethods);
+	/*PyObject * m =*/ Py_InitModule("GemRB", GemRBMethods);
 	
 }
 
