@@ -1,0 +1,266 @@
+.\"Title and section
+.TH GEMRB 1
+
+.\"###################################################
+.SH NAME 
+.B gemrb
+\- emulator for Infinity Engine-based games
+
+.\"###################################################
+.SH SYNOPSIS
+.B gemrb
+[-c config-file]
+.br
+.B torment
+.br
+
+.\"###################################################
+.SH DESCRIPTION
+.I gemrb
+is an emulator for Infinity Engine-based games, fine RPGs like Baldur's Gate,
+Icewind Dale or Planescape: Torment. 
+
+.I gemrb
+is only an engine; to actually play anything you have to have 
+data from the original games installed where they can be found by 
+.IR gemrb .
+
+.\"###################################################
+.SH OPTIONS
+.TP
+.B \-c
+.I FILE
+.br
+use other configuration file than default
+.IR gemrb.cfg .  
+
+.B Note:
+You can also use program's name as a mean to select the configuration file.
+For example, if the program's name is 
+.I torment 
+instead of
+.IR gemrb ,
+the engine first seaches for 
+.I torment.cfg 
+and only if it's not found it searches for 
+.IR gemrb.cfg .
+
+To use this feature, just create a symbolic link
+.I torment
+pointing to
+.I gemrb
+binary and run
+.IR torment .
+
+.\"###################################################
+.SH Configuration File
+.PD 0
+Configuration file consists of pairs
+.IR PARAMETER=VALUE ,
+each on its own line. The case of PARAMETER is not significant, 
+GameType is the same as GAMETYPE. If the same PARAMETER is defined 
+more than once, only the last occurence is used.
+
+Empty lines and lines starting with `#' (hash sign) are ignored.
+
+.B Parameters:
+
+.TP
+.BR GameType =(bg1|bg2|iwd|iwd2|how|pst)
+Type of the game. The value is a name of subdirectory in override/ 
+and GUIScripts/ directories
+with game type-specific files and scripts. It is at present also used
+for various tweaks hardcoded in GemRB engine.
+
+.TP
+.BR GameName =STRING
+Name of the game, as it appears in the window title-bar.
+
+.TP
+.BR GamePath =PATH
+Path to directory where the original game is installed. If you can't
+install the game under MS Windows, you can try to unpack the data files
+with 
+.I unshield
+program found at 
+.IR http://synce.sourceforge.net .
+
+.TP
+.BR CD1 =PATH
+.TP
+.BR CD2 =PATH
+.TP
+.BR CDn =....
+Path to data files from game's particular CDs.
+
+.TP
+.BR INIConfig =FILE
+Name of the game's INI file, relative to 
+.IR GamePath .
+E.g. for Baldur's Gate game it is baldur.ini.
+
+
+.TP
+.BR Width =INT
+Game window width (in pixels).
+
+.TP
+.BR Height =INT
+Game window height (in pixels).
+
+.TP
+.BR Bpp =INT
+Color depth of game window, (in bits per pixel).
+
+.TP
+.BR Fullscreen =(0|1)
+Whether the game should run in fullscreen mode. Note that fullcreen mode is
+currently buggy.
+
+.TP
+.BR ForceStereo =(0|1)
+Some older games such as BG1 and PST need this parameter to be 
+.IR 1 .
+For other game types set it to
+.IR 0 .
+
+.TP
+.BR CaseSensitive =(0|1)
+When 
+this parameter is set to 
+.IR 1 ,
+the engine will try to find files regardless of their names' case at the cost
+of a slight speed penalty. This is especially important when using
+game files on CD-ROMs, where the files can't be renamed. Like 
+many Windows programs, the original games use inconsistent mix
+of lower/upper case letters for naming and referencing their files. 
+
+Set this parameter to 
+.I 1
+on Unix-like systems.
+
+.TP
+.BR CachePath =PATH
+User-writable directory where the engine caches uncompressed and temporary
+files.
+
+.TP
+.BR GemRBPath =PATH
+Path to GemRB installation. Soon to be obsoleted.
+
+.TP
+.BR GUIScriptsPath =PATH
+Path to directory with scripts controlling game's GUI. 
+
+.TP
+.BR GameOnCD =(0|1)
+
+
+.TP
+.BR AllStringsTagged =(0|1)
+
+.TP
+.BR MidResAvatars =(0|1)
+
+.TP
+.BR HasSongList =(0|1)
+
+.TP
+.BR UpperButtonText =(0|1)
+Convert all button labels to upper case?
+
+.TP
+.BR LowerLabelText =(0|1)
+Convert all labels to lower case?
+
+.TP
+.BR HasPartyINI =(0|1)
+
+.TP
+.BR GameDataPath =PATH
+Path to original game's installed data files, relative to GamePath.
+Usually it's 
+.IR data .
+???
+
+.TP
+.BR GameOverridePath =PATH
+Path to original game's override dir, relative to GamePath.
+Usually it's 
+.IR override .
+Original games use this directory to place last-minute patches.
+
+.TP
+.BR CursorBAM =RESREF
+Name of resource with cursor pixmap.
+
+.TP
+.BR ButtonFont =RESREF
+Name of resource with font used for button labels.
+
+.\"###################################################
+.SH FILES
+.PD 0
+.TP 20
+.B /usr/local/etc/gemrb.cfg
+system-wide configuration file
+
+.TP
+.B /usr/local/share/gemrb/override/
+directory with 
+.IR gemrb -distributed
+data files. These used to be hardcoded in the original engine. The files
+are sorted into directories for specific games.
+
+.TP
+.B /usr/local/share/gemrb/GUIScripts/
+directory with Python scripts providing GUI setup and interaction. The files
+are sorted into directories for specific games.
+
+.TP
+.B ~/.gemrb/gemrb.cfg
+.TP
+.B ~/.gemrb/override/
+.TP
+.B ~/.gemrb/GUIScripts/
+user's own configuration and data files.
+.TP
+.B ~/.gemrb/cache/
+cache directory
+.PD
+
+.\"###################################################
+.SH BUGS
+Many.
+.I gemrb
+is still in an early development stage and not nearly complete. 
+
+If you stumble over something which is supposed to work, either make a bug report
+at ...... or come to IRC channel 
+.I #GemRB
+at FreeNode.
+
+.\"###################################################
+.SH AUTHOR
+The GemRB Project development team at http://gemrb.sourceforge.net
+
+.\"###################################################
+.SH COPYING
+Copyright (C) 2003 The GemRB Project
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+.\"###################################################
+.\"End of file gemrb.man
