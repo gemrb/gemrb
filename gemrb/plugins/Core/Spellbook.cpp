@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.6 2004/04/17 11:28:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.7 2004/04/18 19:20:49 avenger_teambg Exp $
  *
  */
 
@@ -52,6 +52,48 @@ void Spellbook::FreeSpellPage(CRESpellMemorization *sm)
 	delete sm;
 }
 
+int sections[]={0,0,1,2,2,1};
+
+bool Spellbook::HaveSpell(int spellid, ieDword flags)
+{
+	int type = spellid/1000;
+	type = sections[type];
+	spellid = spellid % 1000;
+
+	for (unsigned int j = 0; j < spells[type].size(); j++) {
+		CRESpellMemorization* sm = spells[type][j];
+		for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
+			CREMemorizedSpell* ms = sm->memorized_spells[k];
+			if (ms->Flags&1) {
+				if(atoi(ms->SpellResRef+4)==spellid) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+//if resref=="" then it is a haveanyspell
+bool Spellbook::HaveSpell(const char *resref, ieDword flags)
+{
+	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
+		for (unsigned int j = 0; j < spells[i].size(); j++) {
+			CRESpellMemorization* sm = spells[i][j];
+			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
+				CREMemorizedSpell* ms = sm->memorized_spells[k];
+				if (ms->Flags&1) {
+					if(resref[0] && stricmp(ms->SpellResRef, resref) ) {
+						continue;
+					}
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 {
 	std::vector<CRESpellMemorization*>* s = &spells[sm->Type];
@@ -65,7 +107,6 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 	s->push_back( sm );
 	return true;
 }
-
 
 bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
 {

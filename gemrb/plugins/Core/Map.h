@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.34 2004/04/17 11:28:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.35 2004/04/18 19:20:49 avenger_teambg Exp $
  *
  */
 
@@ -121,6 +121,7 @@ public:
 	/** prints useful information on console */
 	void DebugDump();
 	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr);
+	void CreateMovement(char *command, const char *area, const char *entrance);
 	void DrawMap(Region viewport, GameControl* gc);
 	void PlayAreaSong(int);
 	void AddAnimation(Animation* anim);
@@ -135,7 +136,8 @@ public:
 	SongHeaderType SongHeader;
 	void AddVVCCell(ScriptedAnimation* vvc);
 	void AddEntrance(char* Name, short XPos, short YPos, short Face);
-	Entrance* GetEntrance(char* Name);
+	Entrance* GetEntrance(const char* Name);
+	bool CanFree();
 	int GetActorCount() { return actors.size(); }
 	Actor* GetActor(int i) { return actors[i]; }
 };

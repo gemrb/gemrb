@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.104 2004/04/17 22:23:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.105 2004/04/18 19:20:48 avenger_teambg Exp $
  *
  */
 
@@ -805,6 +805,9 @@ public: //Script Functions
 	static int HasItem(Scriptable* Sender, Trigger* parameters);
 	static int HasItemEquipped(Scriptable* Sender, Trigger* parameters);
 	static int HasItemSlot(Scriptable* Sender, Trigger* parameters);
+	static int HaveAnySpells(Scriptable* Sender, Trigger* parameters);
+	static int HaveSpellParty(Scriptable* Sender, Trigger* parameters);
+	static int HaveSpell(Scriptable* Sender, Trigger* parameters);
 	static int HotKey(Scriptable* Sender, Trigger* parameters);
 	static int HP(Scriptable* Sender, Trigger* parameters);
 	static int HPGT(Scriptable* Sender, Trigger* parameters);
@@ -1042,7 +1045,10 @@ public:
 	static void SaveObjectLocation(Scriptable* Sender, Action* parameters);
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
 	static void SetAnimState(Scriptable* Sender, Action* parameters);
+	static void SetApparentName(Scriptable* Sender, Action* parameters);
+	static void SetRegularName(Scriptable* Sender, Action* parameters);
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
+
 	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
 	static void SetGlobal(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.89 2004/04/17 11:28:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.90 2004/04/18 19:20:49 avenger_teambg Exp $
  *
  */
 
@@ -123,6 +123,36 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr)
 	SearchMap = sr;
 }
 
+/* this command will load the target area and set the coordinates according to the entrance string*/
+void Map::CreateMovement(char *command, const char *area, const char *entrance)
+{
+//change loader MOS image here
+//check worldmap entry, if that doesn't contain anything,
+//make a random pick
+	Game* game = core->GetGame();
+	Map* map = game->GetMap(game->LoadMap(area, false));
+	if(!map) {
+		printf("Invalid map: %s\n",area);
+		command[0]=0;
+		return;
+	}
+	Entrance* ent = map->GetEntrance( entrance );
+	int X,Y, face;
+	if (!ent) {
+		textcolor( YELLOW );
+		printf( "WARNING!!! %s EntryPoint does not Exists\n", entrance );
+		textcolor( WHITE );
+		X = map->tm->XCellCount * 64;
+		Y = map->tm->YCellCount * 64;
+		face = -1;
+	} else {
+		X = ent->XPos;
+		Y = ent->YPos;
+		face = ent->Face;
+	}
+	sprintf(command, "LeaveAreaLua(\"%s\",[%d.%d],%d)", area, X, Y, face);
+}
+
 void Map::DrawMap(Region viewport, GameControl* gc)
 {
 	//Draw the Map
@@ -204,12 +234,10 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 						gc->DisplayString( Tmp );
 
 						if (ip->Destination[0] != 0) {
-							sprintf( Tmp,
-								"LeaveAreaLUA(\"%s\", \"\", [-1.-1], -1)",
-								ip->Destination );
+							CreateMovement(Tmp, ip->Destination, ip->EntranceName);
 							actor->ClearPath();
-							actor->AddActionInFront( GameScript::GenerateAction( Tmp ) );
-							strcpy( gc->EntranceName, ip->EntranceName );
+							actor->ClearActions();
+							actor->AddAction( GameScript::GenerateAction( Tmp ) );
 						} else {
 							if (ip->Scripts[0]) {
 								ip->LastTrigger = actor;
@@ -619,7 +647,7 @@ void Map::AddEntrance(char* Name, short XPos, short YPos, short Face)
 	entrances.push_back( ent );
 }
 
-Entrance* Map::GetEntrance(char* Name)
+Entrance* Map::GetEntrance(const char* Name)
 {
 	for (unsigned int i = 0; i < entrances.size(); i++) {
 		if (stricmp( entrances[i]->Name, Name ) == 0) {
@@ -638,6 +666,17 @@ void Map::RemoveActor(Actor* actor)
 			return;
 		}
 	}
+}
+
+bool Map::CanFree()
+{
+	unsigned int i=actors.size();
+	while(i--) {
+		if(actors[i]->InParty) {
+			return false;
+		}
+	}
+	return true;
 }
 
 void Map::DebugDump()

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.28 2004/04/17 22:22:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.29 2004/04/18 19:20:48 avenger_teambg Exp $
  *
  */
 
@@ -157,6 +157,8 @@ public:
 	int FindMap(const char *ResRef);
         Map * GetCurrentMap();
 	int AddMap(Map* map);
+	/* determine if area is master area*/
+	bool MasterArea(const char *area);
 	/* returns slot of the map, if it was already loaded,
 	 	don't load it again, set changepf == true,
 		if you want to change the pathfinder too. */

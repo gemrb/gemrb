@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.147 2004/04/17 22:22:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.148 2004/04/18 19:20:48 avenger_teambg Exp $
  *
  */
 
@@ -108,6 +108,9 @@ static TriggerLink triggernames[] = {
 	{"harmlessentered", GameScript::Entered,0}, //this isn't sure the same
 	{"hasitem", GameScript::HasItem,0},
 	{"hasitemslot", GameScript::HasItemSlot,0},
+	{"haveanyspells", GameScript::HaveAnySpells,0},
+	{"havespell", GameScript::HaveSpell,0},
+	{"havespellres", GameScript::HaveSpell,0},
 	{"hotkey", GameScript::HotKey,0},
 	{"hp", GameScript::HP,0},
 	{"hpgt", GameScript::HPGT,0}, {"hplt", GameScript::HPLT,0},
@@ -344,18 +347,6 @@ static ActionLink actionnames[] = {
 	{"recoil", GameScript::Recoil,0},
 	{"removeareatype", GameScript::RemoveAreaType,0},
 	{"removeareaflag", GameScript::RemoveAreaFlag,0},
-	{"savelocation", GameScript::SaveLocation,0},
-	{"saveobjectlocation", GameScript::SaveObjectLocation,0},
-	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags,0},
-	{"setdoorlocked", GameScript::Lock,AF_BLOCKING},//key shouldn't be checked!
-	{"setfaction", GameScript::SetFaction,0},
-	{"sethp", GameScript::SetHP,0},
-	{"setinternal", GameScript::SetInternal,0},
-	{"setmoraleai", GameScript::SetMoraleAI,0},
-	{"setquestdone", GameScript::SetQuestDone,0},
-	{"setteam", GameScript::SetTeam,0},
-	{"settextcolor", GameScript::SetTextColor,0},
-	{"setvisualrange", GameScript::SetVisualRange,0},
 	{"removejournalentry", GameScript::RemoveJournalEntry,0},
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
@@ -363,16 +354,30 @@ static ActionLink actionnames[] = {
 	{"runtoobject", GameScript::MoveToObject,AF_BLOCKING}, //until we know better
 	{"runtopoint", GameScript::MoveToPoint,AF_BLOCKING}, //until we know better
 	{"runtopointnorecticle", GameScript::MoveToPoint,AF_BLOCKING},//until we know better
+	{"savelocation", GameScript::SaveLocation,0},
+	{"saveobjectlocation", GameScript::SaveObjectLocation,0},
 	{"screenshake", GameScript::ScreenShake,AF_BLOCKING},
 	{"setanimstate", GameScript::SetAnimState,AF_BLOCKING},
 	{"setarearestflag", GameScript::SetAreaRestFlag,0},
+	{"setapparentnamestrref", GameScript::SetApparentName,0},
+	{"setregularnamestrref", GameScript::SetRegularName,0},
+	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags,0},
 	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
+	{"setdoorlocked", GameScript::Lock,AF_BLOCKING},//key shouldn't be checked!
+	{"setfaction", GameScript::SetFaction,0},
 	{"setglobal", GameScript::SetGlobal,AF_MERGESTRINGS},
 	{"setglobaltimer", GameScript::SetGlobalTimer,AF_MERGESTRINGS},
+	{"sethp", GameScript::SetHP,0},
+	{"setinternal", GameScript::SetInternal,0},
+	{"setmoraleai", GameScript::SetMoraleAI,0},
 	{"setnumtimestalkedto", GameScript::SetNumTimesTalkedTo,0},
 	{"setplayersound", GameScript::SetPlayerSound,0},
+	{"setquestdone", GameScript::SetQuestDone,0},
+	{"setteam", GameScript::SetTeam,0},
+	{"settextcolor", GameScript::SetTextColor,0},
 	{"settokenglobal", GameScript::SetTokenGlobal,AF_MERGESTRINGS},
+	{"setvisualrange", GameScript::SetVisualRange,0},
 	{"sg", GameScript::SG,0},
 	{"smallwait", GameScript::SmallWait,AF_BLOCKING},
 	{"startcutscene", GameScript::StartCutScene,0},
@@ -2957,6 +2962,57 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* paramet
 	}
 	return 0;
 }
+//                               0      1       2       3    4      5
+static char spellnames[6][5]={"DLPR","SPPR","SPWI","SPIN","SPCL","DLWI"};
+
+#define CreateSpellName(spellname, data) sprintf(spellname,"%s%03d",spellnames[data/1000],data%1000)
+
+int GameScript::HaveSpell(Scriptable *Sender, Trigger *parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) Sender;
+	if(parameters->string0Parameter[0]) {
+		return actor->spellbook.HaveSpell(parameters->string0Parameter, 1);
+	}
+	char tmpname[9];
+	CreateSpellName(tmpname, parameters->int0Parameter);
+	return actor->spellbook.HaveSpell(tmpname, 1);
+}
+
+int GameScript::HaveAnySpells(Scriptable *Sender, Trigger *parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) Sender;
+	return actor->spellbook.HaveSpell("", 1);
+}
+
+int GameScript::HaveSpellParty(Scriptable *Sender, Trigger *parameters)
+{
+	Actor *actor;
+	Game *game=core->GetGame();
+
+	char tmpname[9];
+	char *poi;
+
+	if(parameters->string0Parameter[0]) {
+		poi=parameters->string0Parameter;
+	}
+	else {
+		CreateSpellName(tmpname, parameters->int0Parameter);
+		poi=tmpname;
+	}
+	//there is an assignment here
+	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+		if(actor->spellbook.HaveSpell(poi, 1) ) {
+			return 1;
+		}
+	}
+	return 0;
+}
 
 int GameScript::True(Scriptable * /* Sender*/, Trigger * /*parameters*/)
 {
@@ -5265,7 +5321,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 
 void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, int X, int Y, int face, bool adjust)
 {
-	printf("MoveBetweenAreas: %s to %s [%d.%d]\n", actor->GetName(0), area,X,Y);
+	printf("MoveBetweenAreas: %s to %s [%d.%d] face: %d\n", actor->GetName(0), area,X,Y, face);
 	if(area[0]) { //do we need to switch area?
 		Game* game = core->GetGame();
 		//no need to change the pathfinder to the source area
@@ -6178,10 +6234,7 @@ void GameScript::IncInternal(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		return;
-	}
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* target = ( Actor* ) tar;
@@ -6241,5 +6294,25 @@ void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* par
 	if(inv) {
 		inv->DestroyItem(NULL, IE_ITEM_DESTRUCTIBLE);
 	}
+}
+
+void GameScript::SetApparentName(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* target = ( Actor* ) tar;
+	target->SetText(parameters->int0Parameter,1);
+}
+
+void GameScript::SetRegularName(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* target = ( Actor* ) tar;
+	target->SetText(parameters->int0Parameter,2);
 }
 

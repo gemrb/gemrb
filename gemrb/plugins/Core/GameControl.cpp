@@ -83,8 +83,6 @@ GameControl::GameControl(void)
 	TopCount = 0;
 	GUIEnabled = false;
 	Dialogue = false;
-	Destination[0] = 0;
-	EntranceName[0] = 0;
 	dlg = NULL;
 	target = NULL;
 	speaker = NULL;
@@ -119,7 +117,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (!Width || !Height) {
 		return;
 	}
-	if (( selected.size() == 1 ) && ( selected[0]->InParty )) {
+	if ( selected.size() == 1 ) {
 		ChangeMap();
 	}
 	Video* video = core->GetVideoDriver();
@@ -1381,35 +1379,9 @@ void GameControl::ChangeMap()
 		delete( infoTexts[i] );
 	}
 	infoTexts.clear();
-	selected.clear();
-	game->DelMap( game->MapIndex, true );
 	/* loading map and setting up pathfinder */
 	int mi = core->GetGame()->LoadMap( pc->Area, true );
-	Map* map = SetCurrentArea( mi );
-	selected.push_back( pc );
-	if (EntranceName[0]) {
-		Entrance* ent = map->GetEntrance( EntranceName );
-		unsigned int XPos, YPos;
-		if (!ent) {
-			textcolor( YELLOW );
-			printf( "WARNING!!! %s EntryPoint does not Exists\n",
-				EntranceName );
-			textcolor( WHITE );
-			XPos = map->tm->XCellCount * 4;
-			YPos = ( map->tm->YCellCount * 64 ) / 12;
-		} else {
-			XPos = ent->XPos / 16; 
-			YPos = ent->YPos / 12;
-		}
-		pc->SetPosition(XPos, YPos, true);
-		pc->Orientation = ent->Face;
-/*
-		core->GetPathFinder()->AdjustPosition( XPos, YPos );
-		pc->XPos = ( unsigned short ) ( XPos * 16 ) + 8;
-		pc->YPos = ( unsigned short ) ( YPos * 12 ) + 8;
-*/
-		EntranceName[0] = 0;
-	}
+	SetCurrentArea( mi );
 	Region vp = core->GetVideoDriver()->GetViewport();
 	core->GetVideoDriver()->SetViewport( pc->XPos - ( vp.w / 2 ),
 		pc->YPos - ( vp.h / 2 ) );

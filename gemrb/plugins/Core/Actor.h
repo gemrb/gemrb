@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.29 2004/04/16 18:39:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.30 2004/04/18 19:20:48 avenger_teambg Exp $
  *
  */
 
@@ -76,6 +76,9 @@ public:
 	ieDword ItemsOffset;
 	ieDword ItemsCount;
 
+	Inventory inventory;
+	Spellbook spellbook;
+public:
 	//this stuff don't get saved
 	CharAnimations* anims;
 	bool DeleteMe;
@@ -91,9 +94,6 @@ public:
 	Actor *LastSeen;
 	Actor *LastHeard;
 	Actor *LastSummoner;
-
-	Inventory inventory;
-	Spellbook spellbook;
 
 private:
 	void SetCircleSize();
@@ -193,18 +193,7 @@ public:
 	{
 		return which ? SmallPortrait : LargePortrait;
 	}
-	void SetText(char* ptr, unsigned char type)
-	{
-		if(type!=2) {
-			size_t len = strlen( ptr ) + 1;
-			LongName = ( char * ) realloc( LongName, len );
-			memcpy( LongName, ptr, len );
-		}
-		if(type!=1) {
-			size_t len = strlen( ptr ) + 1;
-			ShortName = ( char * ) realloc( ShortName, len );
-			memcpy( ShortName, ptr, len );
-		}
-	}
+	void SetText(char* ptr, unsigned char type);
+	void SetText(int strref, unsigned char type);
 };
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.3 2004/04/15 12:33:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.4 2004/04/18 19:20:49 avenger_teambg Exp $
  *
  */
 
@@ -88,6 +88,9 @@ public:
 	virtual ~Spellbook();
 
 	void FreeSpellPage(CRESpellMemorization* sm);
+	bool HaveSpell(const char *resref, ieDword flags);
+	bool HaveSpell(int spellid, ieDword flags);
+
 	//int AddKnownSpell(CREKnownSpell* spell);
 	bool AddSpellMemorization(CRESpellMemorization* sm);
 	//int AddMemorizedSpell(CREMemorizedSpell* spell);

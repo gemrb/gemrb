@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.41 2004/04/17 22:22:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.42 2004/04/18 19:20:48 avenger_teambg Exp $
  *
  */
 
@@ -231,12 +231,25 @@ int Game::FindMap(const char *ResRef)
 {
 	int index = Maps.size();
 	while (index--) {
-		if (strnicmp(ResRef, Maps[index]->scriptName, 8) == 0) {
+		Map *map=Maps[index];
+		if (strnicmp(ResRef, map->scriptName, 8) == 0) {
 			return index;
 		}
 	}
 	return -1;
 }
+
+/*  TODO, create save game
+int Game::WriteGame()
+{
+//write .gam structure
+	int index=Maps.size();
+	while (index--) {
+		Map *map = Maps[index];
+	//write map
+	}
+}
+*/
 
 Map* Game::GetMap(unsigned int index)
 {
@@ -251,32 +264,57 @@ Map *Game::GetCurrentMap()
 	return GetMap(MapIndex);
 }
 
+//TODO: master area determination
+bool Game::MasterArea(const char *area)
+{
+	return 0;
+}
+
 int Game::AddMap(Map* map)
 {
-	for (size_t i = 0; i < Maps.size(); i++) {
+/* we don't allow holes in this vector
+	unsigned int i=Maps.size();
+	while(i--) {
 		if (!Maps[i]) {
 			Maps[i] = map;
 			return ( int ) i;
 		}
 	}
+*/
+	unsigned int i = Maps.size();
+	if(MasterArea(map->scriptName) ) {
+		//no push_front, we do this ugly hack
+		Maps.push_back(NULL);
+		for(;i;i--) {
+			Maps[i]=Maps[i-1];
+		}
+		Maps[0] = map;
+		MapIndex++;
+		return 0;
+	}
 	Maps.push_back( map );
-	return ( int ) Maps.size() - 1;
+	return i;
 }
 
-int Game::DelMap(unsigned int index, bool autoFree)
+int Game::DelMap(unsigned int index, bool forced)
 {
 //this function should archive the area, and remove it only if the area
 //contains no active actors (combat, partymembers, etc)
 	if (index >= Maps.size()) {
 		return -1;
 	}
-	if (!Maps[index]) {
+	Map *map = Maps[index];
+
+	if (!map) {
 		return -1;
 	}
-	if (autoFree) {
+	if(forced || map->CanFree() )
+	{
 		delete( Maps[index] );
+		Maps.erase( Maps.begin()+index);
+		return 1;
 	}
-	Maps[index] = NULL;
+	//didn't remove the map
 	return 0;
 }
 
@@ -290,6 +328,12 @@ int Game::LoadMap(const char* ResRef, bool changepf)
 		}
 		return index;
 	}
+	//check if the current area could be removed, 
+	//don't remove it if the pathfinder is still connected to it 
+	if(changepf) {
+		DelMap( MapIndex, false );
+	}
+
 	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
 	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef, IE_ARE_CLASS_ID );
 	mM->Open( ds, true );

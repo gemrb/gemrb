@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.44 2004/04/17 11:28:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.45 2004/04/18 19:20:48 avenger_teambg Exp $
  *
  */
 
@@ -100,6 +100,32 @@ Actor::~Actor(void)
 	}
 	if (ShortName) {
 		free( ShortName );
+	}
+}
+
+void Actor::SetText(char* ptr, unsigned char type)
+{
+	if(type!=2) {
+		size_t len = strlen( ptr ) + 1;
+		LongName = ( char * ) realloc( LongName, len );
+		memcpy( LongName, ptr, len );
+	}
+	if(type!=1) {
+		size_t len = strlen( ptr ) + 1;
+		ShortName = ( char * ) realloc( ShortName, len );
+		memcpy( ShortName, ptr, len );
+	}
+}
+
+void Actor::SetText(int strref, unsigned char type)
+{
+	if(type!=2) {
+		if(LongName) free(LongName);
+		LongName = core->GetString( strref );
+	}
+	if(type!=1) {
+		if(ShortName) free(ShortName);
+		ShortName = core->GetString( strref );
 	}
 }
 
