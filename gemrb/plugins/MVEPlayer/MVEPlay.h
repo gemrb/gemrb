@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.h,v 1.15 2003/11/25 13:48:00 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.h,v 1.16 2003/12/02 17:22:52 balrog994 Exp $
  *
  */
 
@@ -28,7 +28,6 @@
 #include "../Core/Interface.h"
 #include "../../includes/sdl/SDL.h"
 #include "../../includes/sdl/SDL_thread.h"
-#include "../../includes/fmod/fmod.h"
 //#include "mvelib.h"
 #include "mve_audio.h"
 
@@ -97,7 +96,7 @@ static int g_nMapLength=0;
 
 static int stupefaction=0;
 
-static FSOUND_STREAM * stream = NULL;
+//static FSOUND_STREAM * stream = NULL;
 static unsigned short channel = 0;
 static unsigned long  frame = 0;
 
@@ -243,10 +242,10 @@ private: //Decoder Functions
 		mve_audio_playing = 0;
 		frame = 0;
 		SDL_mutexV(mve_audio_mutex);
-		FSOUND_Stream_Stop(stream);
-		FSOUND_Stream_Close(stream);
+		//FSOUND_Stream_Stop(stream);
+		//FSOUND_Stream_Close(stream);
 		SDL_DestroyMutex(mve_audio_mutex);
-		FSOUND_SetPaused(FSOUND_ALL, false);
+		//FSOUND_SetPaused(FSOUND_ALL, false);
 	}
 	static short get_short(unsigned char *data)
 	{
@@ -329,10 +328,10 @@ end:
 	*************************/
 	//static void mve_audio_callback(void *userdata, unsigned char *stream, int len); 
 
-	//static void mve_audio_callback(void *userdata, unsigned char *stream, int len)
-	static signed char __stdcall mve_audio_callback(FSOUND_STREAM * fsoundstream, void *buffer, int len1, int param)
+	static void mve_audio_callback(void *userdata, unsigned char *stream, int len)
+	//static signed char __stdcall mve_audio_callback(FSOUND_STREAM * fsoundstream, void *buffer, int len1, int param)
 	{
-		unsigned char * stream = (unsigned char*)buffer;
+		/*unsigned char * stream = (unsigned char*)buffer;
 		int len = len1;
 		int total=0;
 		int length;
@@ -362,6 +361,8 @@ end:
 
 		SDL_mutexV(mve_audio_mutex);
 		return true;
+		*/
+		return;
 	}
 
 	static int create_audiobuf_handler(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
@@ -369,24 +370,24 @@ end:
 		int sample_rate;
 		int desired_buffer;
 
-		if(stream)
-			return 1;
+		//if(stream)
+		//	return 1;
 		sample_rate = get_short(data + 4);
 		desired_buffer = get_int(data + 6);
-		stream = FSOUND_Stream_Create(mve_audio_callback, desired_buffer, FSOUND_LOOP_OFF | FSOUND_16BITS | FSOUND_STEREO | FSOUND_2D | FSOUND_STREAMABLE | FSOUND_SIGNED, sample_rate, 0);
-		if(stream)
-			{
-			mve_audio_canplay = 1;
-			mve_audio_buffer = (short*)malloc(desired_buffer*4);
-			mve_audio_buflen = 0;
-			}
-		else
+		//stream = FSOUND_Stream_Create(mve_audio_callback, desired_buffer, FSOUND_LOOP_OFF | FSOUND_16BITS | FSOUND_STEREO | FSOUND_2D | FSOUND_STREAMABLE | FSOUND_SIGNED, sample_rate, 0);
+		//if(stream)
+		//	{
+		//	mve_audio_canplay = 1;
+		//	mve_audio_buffer = (short*)malloc(desired_buffer*4);
+		//	mve_audio_buflen = 0;
+		//	}
+		//else
 			{
 			mve_audio_canplay = 0;
 			}
 		
-		if (mve_audio_canplay  &&  !mve_audio_playing)
-			FSOUND_SetPaused(FSOUND_ALL, true);
+		//if (mve_audio_canplay  &&  !mve_audio_playing)
+		//	FSOUND_SetPaused(FSOUND_ALL, true);
 		return 1;
 	}
 
@@ -395,8 +396,8 @@ end:
 		if (mve_audio_canplay  &&  !mve_audio_playing)
 			{
 			mve_audio_playing = 1;
-			channel = FSOUND_Stream_Play(FSOUND_FREE, stream);
-			FSOUND_SetPaused(channel, false);
+			//channel = FSOUND_Stream_Play(FSOUND_FREE, stream);
+			//FSOUND_SetPaused(channel, false);
 			}
 
 		return 1;
@@ -409,8 +410,8 @@ end:
 		int nsamp;
 		if (mve_audio_canplay)
 		{
-			if (mve_audio_playing)
-				FSOUND_SetPaused(channel, true);
+			//if (mve_audio_playing)
+			//	FSOUND_SetPaused(channel, true);
 
 			chan = get_short(data + 2);
 			nsamp = get_short(data + 4);
@@ -431,8 +432,8 @@ end:
 				SDL_mutexV(mve_audio_mutex);
 				}
 
-			if (mve_audio_playing)
-				FSOUND_SetPaused(channel, false);
+			//if (mve_audio_playing)
+			//	FSOUND_SetPaused(channel, false);
 			}
 
 		return 1;
@@ -545,9 +546,9 @@ end:
 		g_screenWidth = width;
 		g_screenHeight = height;
 		memset(g_palette, 0, 768);
-		if(!SDL_WasInit(SDL_INIT_AUDIO)) {
-			SDL_InitSubSystem(SDL_INIT_AUDIO);
-		}
+		//if(!SDL_WasInit(SDL_INIT_AUDIO)) {
+		//	SDL_InitSubSystem(SDL_INIT_AUDIO);
+		//}
 		SDL_FillRect(g_screen, NULL, 0);
 		SDL_Flip(g_screen);
 		return 1;
