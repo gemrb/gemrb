@@ -65,6 +65,7 @@ typedef unsigned long DWORD;
 #define  GF_LOWER_LABEL_TEXT		5 //bg2
 #define  GF_HAS_PARTY_INI               6 //iwd2
 #define  GF_SOUNDFOLDERS                7 //iwd2
+#define  GF_IGNORE_BUTTON_FRAMES        8 // pst?
 
 /////AI global defines
 #define AI_UPDATE_TIME	30
