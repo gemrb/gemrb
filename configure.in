@@ -108,7 +108,6 @@ gemrb/plugins/2DAImporter/Makefile
 gemrb/plugins/ACMImporter/Makefile 
 gemrb/plugins/AREImporter/Makefile 
 gemrb/plugins/BAMImporter/Makefile 
-gemrb/plugins/BG2HCAnim/Makefile 
 gemrb/plugins/BIFImporter/Makefile 
 gemrb/plugins/BMPImporter/Makefile 
 gemrb/plugins/CHUImporter/Makefile 
