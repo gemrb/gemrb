@@ -27,7 +27,6 @@
 #include "TableMgr.h"
 #include "SymbolMgr.h"
 #include "MoviePlayer.h"
-#include "Character.h"
 #include "DataFileMgr.h"
 
 typedef struct Table {
@@ -81,7 +80,7 @@ private:
 	MusicMgr * music;
 	std::vector<Table> tables;
 	std::vector<Symbol> symbols;
-	std::vector<Character*> sheets;
+	std::vector<Actor*> sheets;
 	DataFileMgr * INIparty;
 public:
 	Interface(void);

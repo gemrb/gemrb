@@ -3,6 +3,19 @@
 
 Actor::Actor(void)
 {
+	int i;
+
+        for(i = 0; i < MAX_STATS; i++) {
+                BaseStats[i] = 0;
+                Modified[i] = 0;
+        }
+        for(i = 0; i < MAX_SCRIPTS; i++) {
+                Scripts[i][0]=0;
+        }
+        Dialog[0] = 0;
+        ScriptName[0] = 0;
+        Icon[0] = 0;
+
 	anims = new CharAnimations();
 	LongName = NULL;
 	ShortName = NULL;
@@ -17,3 +30,65 @@ Actor::~Actor(void)
 	if(ShortName)
 		free(ShortName);
 }
+
+CharAnimations *Actor::GetAnims()
+{
+  return anims;
+}
+
+/** Returns a Stat value (Base Value + Mod) */
+long Actor::GetStat(unsigned char StatIndex)
+{
+        if(StatIndex >= MAX_STATS)
+                return 0xffff;
+        return Modified[StatIndex];
+}
+long Actor::GetMod(unsigned char StatIndex)
+{
+        if(StatIndex >= MAX_STATS)
+                return 0xffff;
+        return Modified[StatIndex]-BaseStats[StatIndex];
+}
+/** Returns a Stat Base Value */
+long Actor::GetBase(unsigned char StatIndex)
+{
+        if(StatIndex >= MAX_STATS)
+                return 0xffff;
+        return BaseStats[StatIndex];
+}
+
+/** Sets a Stat Base Value */
+bool  Actor::SetBase(unsigned char StatIndex, long Value)
+{
+        if(StatIndex >= MAX_STATS)
+                return false;
+        BaseStats[StatIndex] = Value;
+        return true;
+}
+/** call this after load, before applying effects */
+void Actor::Init()
+{
+        memcpy(Modified,BaseStats,sizeof(Modified) );
+}
+/** implements a generic opcode function, modify modifier
+    returns the change
+*/
+int Actor::NewMod(unsigned char StatIndex, long ModifierValue, long ModifierType)
+{
+        int oldmod=Modified[StatIndex];
+
+        switch(ModifierType)
+        {
+        case 0:  //flat point modifier
+                Modified[StatIndex]+=ModifierValue;
+                break;
+        case 1:  //straight stat change
+                Modified[StatIndex]=ModifierValue;
+                break;
+        case 2:  //percentile
+                Modified[StatIndex]=Modified[StatIndex]*100/ModifierValue;
+                break;
+        }
+        return Modified[StatIndex]-oldmod;
+}
+

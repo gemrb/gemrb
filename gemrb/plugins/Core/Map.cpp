@@ -37,8 +37,8 @@ void Map::DrawMap(void)
 		video->BlitSprite(animations[i]->NextFrame(), animations[i]->x, animations[i]->y);
 	}
 	for(unsigned int i = 0; i < actors.size(); i++) {
-		if(actors[i]->anims->Stands.size() != 0)
-			video->BlitSprite(actors[i]->anims->Stands[0]->NextFrame(), actors[i]->XPos, actors[i]->YPos);
+		if(actors[i]->GetAnims()->Stands.size() != 0)
+			video->BlitSprite(actors[i]->GetAnims()->Stands[0]->NextFrame(), actors[i]->XPos, actors[i]->YPos);
 	}
 }
 

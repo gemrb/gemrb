@@ -118,7 +118,7 @@ Interface::~Interface(void)
 		delete(tokens);
 	FreeInterfaceVector(Table, tables, tm);
 	FreeInterfaceVector(Symbol, symbols, sm);
-	FreeResourceVector(Character, sheets);
+	FreeResourceVector(Actor, sheets);
 	delete(console);
 	delete(plugin);
 

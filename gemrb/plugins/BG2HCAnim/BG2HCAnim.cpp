@@ -143,10 +143,10 @@ void BG2HCAnim::LoadCritter(const char * ResRef, Actor * actor, bool bow)
 	strcat(tResRef, "E");
 	AnimationFactory * ae = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->Walk.push_back(a->GetCycle(i));
+		actor->GetAnims()->Walk.push_back(a->GetCycle(i));
 	}
 	for(int i = 5; i < 8; i++) {
-		actor->anims->Walk.push_back(ae->GetCycle(i));
+		actor->GetAnims()->Walk.push_back(ae->GetCycle(i));
 	}
 	//Standing
 	strcpy(tResRef, ResRef);
@@ -155,10 +155,10 @@ void BG2HCAnim::LoadCritter(const char * ResRef, Actor * actor, bool bow)
 	strcat(tResRef, "E");
 	ae = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->Stands.push_back(a->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(a->GetCycle(i));
 	}
 	for(int i = 5; i < 8; i++) {
-		actor->anims->Stands.push_back(ae->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(ae->GetCycle(i));
 	}
 	//Unconscious
 	strcpy(tResRef, ResRef);
@@ -167,10 +167,10 @@ void BG2HCAnim::LoadCritter(const char * ResRef, Actor * actor, bool bow)
 	strcat(tResRef, "E");
 	ae = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->Stands.push_back(a->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(a->GetCycle(i));
 	}
 	for(int i = 5; i < 8; i++) {
-		actor->anims->Stands.push_back(ae->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(ae->GetCycle(i));
 	}
 	//Sleep
 	strcpy(tResRef, ResRef);
@@ -179,10 +179,10 @@ void BG2HCAnim::LoadCritter(const char * ResRef, Actor * actor, bool bow)
 	strcat(tResRef, "E");
 	ae = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->Stands.push_back(a->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(a->GetCycle(i));
 	}
 	for(int i = 5; i < 8; i++) {
-		actor->anims->Stands.push_back(ae->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(ae->GetCycle(i));
 	}
 	//Spell Cast
 	strcpy(tResRef, ResRef);
@@ -191,10 +191,10 @@ void BG2HCAnim::LoadCritter(const char * ResRef, Actor * actor, bool bow)
 	strcat(tResRef, "E");
 	ae = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->SpellCasts.push_back(a->GetCycle(i));
+		actor->GetAnims()->SpellCasts.push_back(a->GetCycle(i));
 	}
 	for(int i = 5; i < 8; i++) {
-		actor->anims->SpellCasts.push_back(ae->GetCycle(i));
+		actor->GetAnims()->SpellCasts.push_back(ae->GetCycle(i));
 	}
 	//Get Up
 	strcpy(tResRef, ResRef);
@@ -203,10 +203,10 @@ void BG2HCAnim::LoadCritter(const char * ResRef, Actor * actor, bool bow)
 	strcat(tResRef, "E");
 	ae = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->Stands.push_back(a->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(a->GetCycle(i));
 	}
 	for(int i = 5; i < 8; i++) {
-		actor->anims->Stands.push_back(ae->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(ae->GetCycle(i));
 	}
 	//Get Hit
 	strcpy(tResRef, ResRef);
@@ -215,10 +215,10 @@ void BG2HCAnim::LoadCritter(const char * ResRef, Actor * actor, bool bow)
 	strcat(tResRef, "E");
 	ae = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->Stands.push_back(a->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(a->GetCycle(i));
 	}
 	for(int i = 5; i < 8; i++) {
-		actor->anims->Stands.push_back(ae->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(ae->GetCycle(i));
 	}
 	//Death
 	strcpy(tResRef, ResRef);
@@ -227,10 +227,10 @@ void BG2HCAnim::LoadCritter(const char * ResRef, Actor * actor, bool bow)
 	strcat(tResRef, "E");
 	ae = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->Stands.push_back(a->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(a->GetCycle(i));
 	}
 	for(int i = 5; i < 8; i++) {
-		actor->anims->Stands.push_back(ae->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(ae->GetCycle(i));
 	}
 	//Attack 1
 	strcpy(tResRef, ResRef);
@@ -239,10 +239,10 @@ void BG2HCAnim::LoadCritter(const char * ResRef, Actor * actor, bool bow)
 	strcat(tResRef, "E");
 	ae = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->a1HSattack.push_back(a->GetCycle(i));
+		actor->GetAnims()->a1HSattack.push_back(a->GetCycle(i));
 	}
 	for(int i = 5; i < 8; i++) {
-		actor->anims->a1HSattack.push_back(ae->GetCycle(i));
+		actor->GetAnims()->a1HSattack.push_back(ae->GetCycle(i));
 	}
 	//Attack 2
 	strcpy(tResRef, ResRef);
@@ -254,10 +254,10 @@ void BG2HCAnim::LoadCritter(const char * ResRef, Actor * actor, bool bow)
 	strcat(tResRef, "E");
 	ae = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->a1HSattack.push_back(a->GetCycle(i));
+		actor->GetAnims()->a1HSattack.push_back(a->GetCycle(i));
 	}
 	for(int i = 5; i < 8; i++) {
-		actor->anims->a1HSattack.push_back(ae->GetCycle(i));
+		actor->GetAnims()->a1HSattack.push_back(ae->GetCycle(i));
 	}
 }
 
@@ -271,31 +271,31 @@ void BG2HCAnim::LoadMonsterMidRes(const char * ResRef, Actor * actor)
 	strcat(tResRef, "E");
 	AnimationFactory * ae = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->Walk.push_back(a->GetCycle(i));
+		actor->GetAnims()->Walk.push_back(a->GetCycle(i));
 	}
 	for(int i = 5; i < 8; i++) {
-		actor->anims->Walk.push_back(ae->GetCycle(i));
+		actor->GetAnims()->Walk.push_back(ae->GetCycle(i));
 	}
 	//Standing
 	for(int i = 8; i < 13; i++) {
-		actor->anims->Stands.push_back(a->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(a->GetCycle(i));
 	}
 	for(int i = 13; i < 16; i++) {
-		actor->anims->Stands.push_back(ae->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(ae->GetCycle(i));
 	}
 	//Standing (Looking)
 	for(int i = 16; i < 21; i++) {
-		actor->anims->Stands.push_back(a->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(a->GetCycle(i));
 	}
 	for(int i = 21; i < 24; i++) {
-		actor->anims->Stands.push_back(ae->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(ae->GetCycle(i));
 	}
 	//Armed Standing
 	for(int i = 24; i < 29; i++) {
-		actor->anims->Stands.push_back(a->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(a->GetCycle(i));
 	}
 	for(int i = 29; i < 32; i++) {
-		actor->anims->Stands.push_back(ae->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(ae->GetCycle(i));
 	}
 	//Taken Hit
 	//TODO: Try to understand others
@@ -309,18 +309,18 @@ void BG2HCAnim::LoadMonsterHiRes(const char * ResRef, Actor * actor)
 	strcat(tResRef, "G1");
 	AnimationFactory * a = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 9; i < 19; i++) {
-		actor->anims->Stands.push_back(a->GetCycle(i));
+		actor->GetAnims()->Stands.push_back(a->GetCycle(i));
 	}
 	strcat(tResRef, "1");
 	a = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 0; i < 10; i++) {
-		actor->anims->Walk.push_back(a->GetCycle(i));
+		actor->GetAnims()->Walk.push_back(a->GetCycle(i));
 	}
 	strcpy(tResRef, ResRef);
 	strcat(tResRef, "G12");
 	a = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(tResRef, IE_BAM_CLASS_ID);
 	for(int i = 18; i < 28; i++) {
-		actor->anims->Stands.push_back(a->GetCycle(i)); // TODO: Check This, I'm not sure it is a stand position, maybe an attack
+		actor->GetAnims()->Stands.push_back(a->GetCycle(i)); // TODO: Check This, I'm not sure it is a stand position, maybe an attack
 	}
 	//core->FreeInterface(a);
 	//TODO: Add more imports
@@ -331,7 +331,7 @@ void BG2HCAnim::LoadStaticAnims(const char * ResRef, Actor * actor)
 	AnimationMgr * a = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
 	a->Open(core->GetResourceMgr()->GetResource(ResRef, IE_BAM_CLASS_ID), true);
 	for(int i = 0; i < 16; i++) {
-		actor->anims->Stands.push_back(a->GetAnimation(i, 0, 0));
+		actor->GetAnims()->Stands.push_back(a->GetAnimation(i, 0, 0));
 	}
 	core->FreeInterface(a);
 }
@@ -346,40 +346,40 @@ void BG2HCAnim::LoadFullAnimLow(const char * ResRef, Actor * actor)
 	a->Open(core->GetResourceMgr()->GetResource(ResRef, IE_BAM_CLASS_ID), true);
 	a1->Open(core->GetResourceMgr()->GetResource(ResRefE, IE_BAM_CLASS_ID), true);
 	for(int i = 0; i < 5; i++) {
-		actor->anims->Stands.push_back(a->GetAnimation(i, 0, 0)); //Walk Ovest
+		actor->GetAnims()->Stands.push_back(a->GetAnimation(i, 0, 0)); //Walk Ovest
 	}
 	for(int i = 5; i < 9; i++) {
-		actor->anims->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Walk Est
+		actor->GetAnims()->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Walk Est
 	}
 	for(int i = 9; i < 13; i++) {
-		actor->anims->Stands.push_back(a->GetAnimation(i, 0, 0)); //Stand Long Ovest
+		actor->GetAnims()->Stands.push_back(a->GetAnimation(i, 0, 0)); //Stand Long Ovest
 	}
 	for(int i = 13; i < 16; i++) {
-		actor->anims->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Stand Long Est
+		actor->GetAnims()->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Stand Long Est
 	}
 	for(int i = 16; i < 21; i++) {
-		actor->anims->Stands.push_back(a->GetAnimation(i, 0, 0)); //Stand Short Ovest
+		actor->GetAnims()->Stands.push_back(a->GetAnimation(i, 0, 0)); //Stand Short Ovest
 	}
 	for(int i = 21; i < 24; i++) {
-		actor->anims->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Stand Short Est
+		actor->GetAnims()->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Stand Short Est
 	}
 	for(int i = 24; i < 29; i++) {
-		actor->anims->Stands.push_back(a->GetAnimation(i, 0, 0)); //Get Hit Ovest
+		actor->GetAnims()->Stands.push_back(a->GetAnimation(i, 0, 0)); //Get Hit Ovest
 	}
 	for(int i = 29; i < 32; i++) {
-		actor->anims->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Get Hit Est
+		actor->GetAnims()->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Get Hit Est
 	}
 	for(int i = 32; i < 37; i++) {
-		actor->anims->Stands.push_back(a->GetAnimation(i, 0, 0)); //Falling Ovest
+		actor->GetAnims()->Stands.push_back(a->GetAnimation(i, 0, 0)); //Falling Ovest
 	}
 	for(int i = 37; i < 40; i++) {
-		actor->anims->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Falling Est
+		actor->GetAnims()->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Falling Est
 	}
 	for(int i = 40; i < 45; i++) {
-		actor->anims->Stands.push_back(a->GetAnimation(i, 0, 0)); //Dead Ovest
+		actor->GetAnims()->Stands.push_back(a->GetAnimation(i, 0, 0)); //Dead Ovest
 	}
 	for(int i = 45; i < 48; i++) {
-		actor->anims->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Dead Long Est
+		actor->GetAnims()->Stands.push_back(a1->GetAnimation(i, 0, 0)); //Dead Long Est
 	}
 	core->FreeInterface(a);
 	core->FreeInterface(a1);
