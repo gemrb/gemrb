@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.90 2003/12/09 18:59:34 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.91 2003/12/09 20:54:48 balrog994 Exp $
  *
  */
 
@@ -150,7 +150,7 @@ Interface::~Interface(void)
 		delete(tokens);
 	FreeInterfaceVector(Table, tables, tm);
 	FreeInterfaceVector(Symbol, symbols, sm);
-	FreeResourceVector(Actor, actors);
+	FreeResourceVector(ActorBlock, actors);
 	delete(console);
 	delete(plugin);
 
@@ -743,7 +743,7 @@ int Interface::UnloadCreature(unsigned int Slot)
 	return 1;
 }
 
-Actor *Interface::GetActor(unsigned int Slot)
+ActorBlock *Interface::GetActor(unsigned int Slot)
 {
 	if(Slot>=actors.size())
 		return 0;
@@ -764,12 +764,23 @@ int Interface::LoadCreature(char *ResRef, int InParty)
 	Actor *actor=actormgr->GetActor();
 	FreeInterface(actormgr);
 	actor->InParty=InParty;
+	ActorBlock * ab = new ActorBlock();
+	ab->actor = actor;
+	ab->XPos = 0;
+	ab->YPos = 0;
+	ab->XDes = 0;
+	ab->YDes = 0;
+	ab->AnimID = IE_ANI_AWAKE;
+	if(ab->actor->BaseStats[IE_STATE_ID] & STATE_DEAD)
+		ab->AnimID = IE_ANI_SLEEP;
+	ab->Orientation = 0;
 	size_t index;
 	for(index=0;index<actors.size(); index++) {
-		if(!actors[index]) break;
-        }
+		if(!actors[index]) 
+			break;
+	}
 	if(index==actors.size() )
-		actors.push_back(actor);
+		actors.push_back(ab);
 	return index;
 }
 
@@ -779,7 +790,7 @@ int Interface::FindPlayer(int PartySlotCount)
 	while(index--) {
 		if(!actors[index])
 			continue;
-		if(actors[index]->InParty ) {
+		if(actors[index]->actor->InParty ) {
 			break;
 		}
 	}
@@ -793,8 +804,8 @@ int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 	if(!actors[Slot])
 		return 0xdadadada;
 	if(Mod)
-		return actors[Slot]->GetStat(StatID);
-	return actors[Slot]->GetBase(StatID);
+		return actors[Slot]->actor->GetStat(StatID);
+	return actors[Slot]->actor->GetBase(StatID);
 }
 
 int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue, int Mod)
@@ -804,9 +815,9 @@ int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatV
 	if(!actors[Slot])
 		return 0;
 	if(Mod)
-		actors[Slot]->SetStat(StatID, StatValue);
+		actors[Slot]->actor->SetStat(StatID, StatValue);
 	else
-		actors[Slot]->SetBase(StatID, StatValue);
+		actors[Slot]->actor->SetBase(StatID, StatValue);
 	return 1;
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.3 2003/12/03 18:27:05 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.4 2003/12/09 20:54:48 balrog994 Exp $
  *
  */
 
@@ -28,23 +28,21 @@ Game::Game(void)
 
 Game::~Game(void)
 {
-	for(size_t i = 0; i < PCs.size(); i++) {
+	/*for(size_t i = 0; i < PCs.size(); i++) {
 		delete(PCs[i].actor);
-	}
+	}*/
 	for(size_t i = 0; i < Maps.size(); i++) {
 		delete(Maps[i]);
 	}
 }
 
-ActorBlock Game::GetPC(int slot)
+ActorBlock* Game::GetPC(int slot)
 {
-	ActorBlock ab;
-	ab.actor = NULL;
 	if(slot >= PCs.size())
-		return ab;
+		return NULL;
 	return PCs[slot];
 }
-int Game::SetPC(ActorBlock pc)
+int Game::SetPC(ActorBlock *pc)
 {
 	PCs.push_back(pc);
 	return PCs.size()-1;
@@ -53,11 +51,11 @@ int Game::DelPC(int slot, bool autoFree)
 {
 	if(slot >= PCs.size())
 		return -1;
-	if(!PCs[slot].actor)
+	if(!PCs[slot]->actor)
 		return -1;
 	if(autoFree)
-		delete(PCs[slot].actor);
-	PCs[slot].actor = NULL;
+		delete(PCs[slot]->actor);
+	PCs[slot]->actor = NULL;
 	return 0;
 }
 Map * Game::GetMap(int index)

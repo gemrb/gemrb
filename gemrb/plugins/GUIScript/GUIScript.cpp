@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.80 2003/12/06 17:33:52 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.81 2003/12/09 20:54:49 balrog994 Exp $
  *
  */
 
@@ -97,7 +97,8 @@ static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 	gc->SetCurrentArea(areaindex);
 	core->FreeInterface(am);
 	core->DelTable(start);
-	core->GetVideoDriver()->MoveViewportTo(startX, startY);
+	//core->GetVideoDriver()->MoveViewportTo(startX, startY);
+	core->GetActor(0);
 	if(core->ConsolePopped) {
 		core->PopupConsole();
 	}
@@ -1653,7 +1654,7 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 	// here comes some code to transfer icon/name to the PC sheet
 	//
 	//
-	Actor *MyActor = core->GetActor(PlayerSlot);
+	ActorBlock *MyActor = core->GetActor(PlayerSlot);
 	if(!MyActor)
 		return NULL;
 	char *poi;
@@ -1662,7 +1663,7 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 		int table = core->LoadTable("pictures");
 		TableMgr *tm = core->GetTable(table);
 		poi = tm->GetRowName(PortraitIndex);
-		MyActor->SetPortrait(poi);
+		MyActor->actor->SetPortrait(poi);
 	}
 	int mastertable=core->LoadTable("avprefix");
 	TableMgr * mtm = core->GetTable(mastertable);
@@ -1684,7 +1685,7 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 		printf("Loaded part table\n");
 		int StatID = atoi(tm->QueryField() );
 		printf("Stat ID:%d\n",StatID);
-		StatID=MyActor->GetBase(StatID);
+		StatID=MyActor->actor->GetBase(StatID);
 		printf("Value:%d\n",StatID);
 		poi = tm->QueryField(StatID);
 		printf("Part: %s\n",poi);
@@ -1693,18 +1694,14 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 	}
 	core->DelTable(mastertable);
 	printf("Set animation complete: 0x%0x\n",AnimID);
-	MyActor->SetAnimationID(AnimID);
-	MyActor->Init();
+	MyActor->actor->SetAnimationID(AnimID);
+	MyActor->actor->Init();
 	int saindex = core->LoadTable("STARTARE");
 	TableMgr * strta = core->GetTable(saindex);
-	ActorBlock ab;
-	ab.actor = MyActor;
-	ab.AnimID = IE_ANI_AWAKE;
-	ab.Orientation = 0;
-	ab.XPos = ab.XDes = atoi(strta->QueryField(1));
-	ab.YPos = ab.YDes = atoi(strta->QueryField(2));
-	ab.actor->anims->DrawCircle = false;
-	core->GetGame()->SetPC(ab);
+	MyActor->XPos = MyActor->XDes = atoi(strta->QueryField(1));
+	MyActor->YPos = MyActor->YDes = atoi(strta->QueryField(2));
+	MyActor->actor->anims->DrawCircle = false;
+	core->GetGame()->SetPC(MyActor);
 	core->DelTable(saindex);
 	Py_INCREF(Py_None);
 	return Py_None;

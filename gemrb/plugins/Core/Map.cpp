@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.38 2003/12/06 17:31:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.39 2003/12/09 20:54:48 balrog994 Exp $
  *
  */
 
@@ -47,7 +47,8 @@ Map::~Map(void)
 		delete(animations[i]);
 	}
 	for(unsigned int i = 0; i < actors.size(); i++) {
-		delete(actors[i].actor);
+		delete(actors[i]->actor);
+		delete(actors[i]);
 	}
 	core->FreeInterface(LightMap);
 	core->FreeInterface(SearchMap);
@@ -240,6 +241,7 @@ void Map::AddAnimation(Animation * anim)
 
 void Map::AddActor(ActorBlock actor)
 {
+	ActorBlock * ab = new ActorBlock();
 	CharAnimations * ca = actor.actor->GetAnims();
 	if(ca) {
 		Animation * anim = ca->GetAnimation(actor.AnimID, actor.Orientation);
@@ -257,13 +259,54 @@ void Map::AddActor(ActorBlock actor)
 	actor.step = NULL;
 	actor.textDisplaying = 0;
 	actor.overHeadText = NULL;
+	ab->actor = actor.actor;
+	ab->AnimID = actor.AnimID;
+	ab->lastFrame = actor.lastFrame;
+	ab->MaxX = actor.MaxX;
+	ab->MaxY = actor.MaxY;
+	ab->MinX = actor.MinX;
+	ab->MinY = actor.MinY;
+	ab->Orientation = actor.Orientation;
+	ab->overHeadText = NULL;
+	ab->path = NULL;
+	ab->step = NULL;
+	ab->textDisplaying = 0;
+	ab->timeStartDisplaying = 0;
+	ab->timeStartStep = 0;
+	ab->XDes = actor.XDes;
+	ab->YDes = actor.YDes;
+	ab->XPos = actor.XPos;
+	ab->YPos = actor.YPos;
+	ab->Selected = false;
+	actors.push_back(ab);
+}
+
+void Map::AddActor(ActorBlock *actor)
+{
+	CharAnimations * ca = actor->actor->GetAnims();
+	if(ca) {
+		Animation * anim = ca->GetAnimation(actor->AnimID, actor->Orientation);
+		Sprite2D * nextFrame = anim->NextFrame();
+		if(actor->lastFrame != nextFrame) {
+			actor->MinX = actor->XPos-nextFrame->XPos;
+			actor->MaxX = actor->MinX+nextFrame->Width;
+			actor->MinY = actor->YPos-nextFrame->YPos;
+			actor->MaxY = actor->MinY+nextFrame->Width;
+			actor->lastFrame = nextFrame;
+		}
+	}
+	actor->Selected = false;
+	actor->path = NULL;
+	actor->step = NULL;
+	actor->textDisplaying = 0;
+	actor->overHeadText = NULL;
 	actors.push_back(actor);
 }
 
 ActorBlock * Map::GetActor(int x, int y)
 {
 	for(size_t i = 0; i < actors.size(); i++) {
-		ActorBlock *actor = &actors.at(i);
+		ActorBlock *actor = actors.at(i);
 		if((actor->MinX > x) || (actor->MinY > y))
 			continue;
 		if((actor->MaxX < x) || (actor->MaxY < y))
@@ -276,7 +319,7 @@ ActorBlock * Map::GetActor(int x, int y)
 ActorBlock * Map::GetActor(const char * Name)
 {
 	for(size_t i = 0; i < actors.size(); i++) {
-		ActorBlock *actor = &actors.at(i);
+		ActorBlock *actor = actors.at(i);
 		if(stricmp(actor->actor->ScriptName, Name) == 0) {
 			printf("Returning Actor %d: %s\n", i, actor->actor->ScriptName);
 			return actor;
@@ -290,7 +333,7 @@ int Map::GetActorInRect(ActorBlock ** & actors, Region &rgn)
 	actors = (ActorBlock**)malloc(this->actors.size()*sizeof(ActorBlock*));
 	int count = 0;
 	for(size_t i = 0; i < this->actors.size(); i++) {
-		ActorBlock *actor = &this->actors.at(i);
+		ActorBlock *actor = this->actors.at(i);
 		if((actor->MinX > (rgn.x+rgn.w)) || (actor->MinY > (rgn.y+rgn.h)))
 			continue;
 		if((actor->MaxX < rgn.x) || (actor->MaxY < rgn.y))
@@ -368,7 +411,7 @@ void Map::GenerateQueue()
 	}
 	Qcount = 0;
 	for(int i = 0; i < actors.size(); i++) {
-		ActorBlock * actor = &actors.at(i);
+		ActorBlock * actor = actors.at(i);
 		Qcount++;
 		queue[Qcount-1] = actor;
 		int lastPos = Qcount;
