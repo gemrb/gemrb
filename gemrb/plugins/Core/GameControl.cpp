@@ -341,18 +341,6 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	lastMouseX = x;
 	lastMouseY = y;
-	/*if(x <= 5)
-		moveX = -5;
-	else if(x >= (core->Width-5))
-		moveX = 5;
-	else
-		moveX = 0;
-	if(y <= 5)
-		moveY = -5;
-	else if(y >= (core->Height-5))
-		moveY = 5;
-	else
-		moveY = 0;*/
 	short GameX = x, GameY = y;
 	core->GetVideoDriver()->ConvertToGame(GameX, GameY);
 	if(MouseIsDown && (!DrawSelectionRect)) {
