@@ -38,6 +38,7 @@ private:
 	Region SelectionRect;
 	short StartX, StartY;
 	Door * overDoor;
+	Container * overContainer;
 	unsigned char lastCursor;
 	short moveX, moveY;
 	unsigned short lastMouseX, lastMouseY;

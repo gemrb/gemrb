@@ -12,6 +12,7 @@ GameControl::GameControl(void)
 	MouseIsDown = false;
 	DrawSelectionRect = false;
 	overDoor = NULL;
+	overContainer = NULL;
 	lastCursor = 0;
 	moveX = moveY = 0;
 }
@@ -59,6 +60,14 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				video->DrawPolyline(overDoor->closed, cyan, true);	
 			else 
 				video->DrawPolyline(overDoor->open, cyan, true);	
+		}
+		if(overContainer) {
+			Color cyan = {0x00, 0xff, 0xff, 0xff};
+			Color red  = {0xff, 0x00, 0x00, 0xff};
+			if(overContainer->TrapDetected && overContainer->Trapped)
+				video->DrawPolyline(overContainer->outline, red, true);
+			else
+				video->DrawPolyline(overContainer->outline, cyan, true);
 		}
 	}
 	else {
@@ -140,6 +149,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 		overDoor = NULL;
 	}
+	overContainer = area->tm->GetContainer(GameX, GameY);
 }
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
