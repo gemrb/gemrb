@@ -39,9 +39,9 @@ public:
 	char LargePortrait[9];
 	unsigned long StrRefs[100];
 public:
-	Actor(unsigned short AnimationID);
+	Actor(void);
 	~Actor(void);
-
+	void SetAnimationID(unsigned short AnimID);
 	/** returns the animations */
 	CharAnimations *GetAnims();
 	/** Inits the Modified vector */

@@ -8,7 +8,7 @@ extern Interface * core;
 extern HANDLE hConsole;
 #endif
 
-Actor::Actor(unsigned short AnimationID)
+Actor::Actor()
 {
 	int i;
 
@@ -23,7 +23,9 @@ Actor::Actor(unsigned short AnimationID)
 	ScriptName[0] = 0;
 	Icon[0] = 0;
 
-	char tmp[7];
+	anims = NULL;
+
+	/*char tmp[7];
 	sprintf(tmp, "0x%04X", AnimationID);
 	int AvatarTable = core->LoadTable("avatars");
 	TableMgr * at = core->GetTable(AvatarTable);
@@ -37,7 +39,7 @@ Actor::Actor(unsigned short AnimationID)
 		char * Mirror = at->QueryField(RowIndex, 1);
 		char * Orient = at->QueryField(RowIndex, 2);
 		anims = new CharAnimations(BaseResRef, atoi(Orient), atoi(Mirror));
-	}
+	}*/
 	LongName = NULL;
 	ShortName = NULL;
 }
@@ -50,6 +52,56 @@ Actor::~Actor(void)
 		free(LongName);
 	if(ShortName)
 		free(ShortName);
+}
+
+void Actor::SetAnimationID(unsigned short AnimID)
+{
+	char tmp[7];
+	sprintf(tmp, "0x%04X", AnimID);
+	int AvatarTable = core->LoadTable("avatars");
+	TableMgr * at = core->GetTable(AvatarTable);
+	int RowIndex = at->GetRowIndex(tmp);
+	if(RowIndex < 0) {
+		anims = NULL;
+		return;
+	}
+	char * BaseResRef = at->QueryField(RowIndex, 0);
+	char * Mirror = at->QueryField(RowIndex, 1);
+	char * Orient = at->QueryField(RowIndex, 2);
+	anims = new CharAnimations(BaseResRef, atoi(Orient), atoi(Mirror));
+
+	Color Pal[256];
+	Pal[0].r = 0x00; Pal[0].g = 0xff; Pal[0].b = 0x00; Pal[0].a = 0x00;
+	Pal[1].r = 0x00; Pal[1].g = 0x00; Pal[1].b = 0x00; Pal[1].a = 0x00;
+	Pal[2].r = 0xff; Pal[2].g = 0x80; Pal[2].b = 0x80; Pal[2].a = 0x00;
+	Pal[3].r = 0xff; Pal[3].g = 0x80; Pal[3].b = 0x80; Pal[3].a = 0x00;
+	Color * MetalPal   = core->GetPalette(BaseStats[IE_METAL_COLOR], 12);
+	Color * MinorPal   = core->GetPalette(BaseStats[IE_MINOR_COLOR], 12);
+	Color * MajorPal   = core->GetPalette(BaseStats[IE_MAJOR_COLOR], 12);
+	Color * SkinPal    = core->GetPalette(BaseStats[IE_SKIN_COLOR], 12);
+	Color * LeatherPal = core->GetPalette(BaseStats[IE_LEATHER_COLOR], 12);
+	Color * ArmorPal   = core->GetPalette(BaseStats[IE_ARMOR_COLOR], 12);
+	Color * HairPal    = core->GetPalette(BaseStats[IE_HAIR_COLOR], 12);
+	memcpy(&Pal[0x04], MetalPal,   12*sizeof(Color));
+	memcpy(&Pal[0x10], MinorPal,   12*sizeof(Color));
+	memcpy(&Pal[0x1C], MajorPal,   12*sizeof(Color));
+	memcpy(&Pal[0x28], SkinPal,    12*sizeof(Color));
+	memcpy(&Pal[0x34], LeatherPal, 12*sizeof(Color));
+	memcpy(&Pal[0x40], ArmorPal,   12*sizeof(Color));
+	memcpy(&Pal[0x4C], HairPal,    12*sizeof(Color));
+	free(MetalPal);
+	free(MinorPal);
+	free(MajorPal);
+	free(SkinPal);
+	free(LeatherPal);
+	free(ArmorPal);
+	free(HairPal);
+
+	/*FILE * ftmp = fopen("tmp.tmp", "wb");
+	fwrite(Pal, 256, 4, ftmp);
+	fclose(ftmp);*/
+	
+	anims->SetNewPalette(Pal);
 }
 
 CharAnimations *Actor::GetAnims()
