@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.21 2003/12/04 22:13:59 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.22 2003/12/06 17:34:41 balrog994 Exp $
  *
  */
 
@@ -374,10 +374,11 @@ Map * AREImp::GetMap()
 		unsigned char mode = ((animFlags & 2) != 0) ? IE_SHADED : IE_NORMAL;
 		//am->Open(core->GetResourceMgr()->GetResource(animBam, IE_BAM_CLASS_ID), true);
 		//anim = am->GetAnimation(animCycle, animX, animY);
-		AnimationFactory * af =  (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(animBam, IE_BAM_CLASS_ID, mode);
+		AnimationFactory * af =  (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(animBam, IE_BAM_CLASS_ID);
 		anim = af->GetCycle(animCycle);
 		anim->x = animX;
 		anim->y = animY;
+		anim->BlitMode = mode;
 		map->AddAnimation(anim);		
 	}
 	map->AddTileMap(tm, lm, sr);
