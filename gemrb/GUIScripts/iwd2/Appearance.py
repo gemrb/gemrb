@@ -25,9 +25,9 @@ def RefreshPDoll():
 	PDollTable = GemRB.LoadTable("avatars")
 	AnimID = 0x6000
 	table = GemRB.LoadTable("avprefr")
-	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("BaseRace"),0)
+	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("BaseRace")+1,0)
 	table = GemRB.LoadTable("avprefc")
-	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("BaseClass"),0)
+	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("BaseClass")+1,0)
 	table = GemRB.LoadTable("avprefg")
 	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
 	ResRef = GemRB.GetTableValue(PDollTable,hex(AnimID), "AT_1")+"G1"
@@ -219,5 +219,5 @@ def NextPress():
 	GemRB.UnloadTable(HairTable)
 	GemRB.UnloadTable(SkinTable)
 	GemRB.UnloadTable(ColorTable)
-	GemRB.SetNextScript("CharGen8") #name
+	GemRB.SetNextScript("CSound") #character sound
 	return

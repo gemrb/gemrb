@@ -105,7 +105,7 @@ def OnLoad():
 	GemRB.SetButtonFlags(FeatWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(FeatWindow, 92)
-	GemRB.SetText(FeatWindow,TextAreaControl,17248)
+	GemRB.SetText(FeatWindow,TextAreaControl,36476)
 
 	ScrollBarControl = GemRB.GetControl(FeatWindow, 104)
 	GemRB.SetEvent(FeatWindow, ScrollBarControl,IE_GUI_SCROLLBAR_ON_CHANGE,"ScrollBarPress")

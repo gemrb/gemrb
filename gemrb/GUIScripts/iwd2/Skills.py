@@ -80,10 +80,7 @@ def OnLoad():
 	ClassTable = GemRB.LoadTable("classes")
 	KitName = GemRB.GetTableRowName(ClassTable, Class)
 	#classcolumn is base class
-	ClassColumn = GemRB.GetTableValue(ClassTable, Class, 3) - 1
-	if ClassColumn < 0:  #it was already a base class
-		ClassColumn = Class
-	GemRB.SetVar("BaseClass", ClassColumn)
+	ClassColumn=GemRB.GetVar("BaseClass")
 	SkillPtsTable = GemRB.LoadTable("skillpts")
 	p = GemRB.GetTableValue(SkillPtsTable, 0, ClassColumn)
 	IntBonus = GemRB.GetVar("Ability 3")/2-5  #intelligence bonus
@@ -193,7 +190,7 @@ def LeftPress():
 	if PointsLeft < Cost:
 		return
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-	if ActPoint >= Level:
+	if Cost*ActPoint >= Level+3:
 		return
 	GemRB.SetVar("Skill "+str(Pos), ActPoint+1)
 	PointsLeft = PointsLeft - Cost

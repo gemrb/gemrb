@@ -120,7 +120,7 @@ def OnLoad():
 	
 def NextPress():
 	GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("Skills") #skills/feats
+	GemRB.SetNextScript("Enemy") #skills/feats/spells/hated race
 	return
 
 def StartOverPress():
