@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.55 2004/01/07 20:21:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.56 2004/01/09 11:41:05 balrog994 Exp $
  *
  */
 
@@ -35,6 +35,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	DisableScroll = false;
 	xCorr = 0;
 	yCorr = 0;
+	lastTime = 0;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -62,7 +63,7 @@ int SDLVideoDriver::Init(void)
 int SDLVideoDriver::CreateDisplay(int width, int height, int bpp, bool fullscreen)
 {
 	printMessage("SDLVideo", "Creating display\n", WHITE);
-	DWORD flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
+	DWORD flags = SDL_HWSURFACE;// | SDL_DOUBLEBUF;
 	if(fullscreen)
 		flags |= SDL_FULLSCREEN;
 	printMessage("SDLVideo", "SDL_SetVideoMode...", WHITE);
@@ -72,11 +73,16 @@ int SDLVideoDriver::CreateDisplay(int width, int height, int bpp, bool fullscree
 		return GEM_ERROR;
 	}
 	printStatus("OK", LIGHT_GREEN);
+	printMessage("SDLVideo", "Checking for HardWare Acceleration...", WHITE);
+	const SDL_VideoInfo * vi = SDL_GetVideoInfo();
+	if(!vi)
+		printStatus("ERROR", LIGHT_RED);
+	printStatus("OK", LIGHT_GREEN);
 	Viewport.x = Viewport.y = 0;
 	Viewport.w = width;
 	Viewport.h = height;
 	printMessage("SDLVideo", "Creating Main Surface...", WHITE);
-	SDL_Surface * tmp = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, bpp, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+	SDL_Surface * tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, bpp, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
 	printStatus("OK", LIGHT_GREEN);
 	printMessage("SDLVideo", "Creating Back Buffer...", WHITE);
 	backBuf = SDL_DisplayFormat(tmp);
@@ -253,6 +259,11 @@ int SDLVideoDriver::SwapBuffers(void)
 			break;
 			}
 		}
+		unsigned long time;
+		GetTime(time);
+		if((time - lastTime) < 17)
+			return ret;
+		lastTime = time;
 		SDL_BlitSurface(backBuf, NULL, disp, NULL);
 		if(fadePercent) {
 			//printf("Fade Percent = %d%%\n", fadePercent);
@@ -271,15 +282,6 @@ int SDLVideoDriver::SwapBuffers(void)
 		SDL_Flip(disp);
 		return ret;
 	}
-	/*SDL_BlitSurface(backBuf, NULL, disp, NULL);
-	if(Cursor[CursorIndex])
-		SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
-	if(fadePercent) {
-		//printf("Fade Percent = %d%%\n", fadePercent);
-		SDL_SetAlpha(extra, SDL_SRCALPHA, (255*fadePercent)/100);
-		SDL_BlitSurface(extra, NULL, disp, NULL);
-	}
-	SDL_Flip(disp);*/
 	int ret = GEM_OK;
 	//TODO: Implement an efficient Rectangle Merge algorithm for faster redraw
 	SDL_Event event; /* Event structure */
@@ -429,6 +431,11 @@ int SDLVideoDriver::SwapBuffers(void)
 		break;
 		}
 	}
+	unsigned long time;
+	GetTime(time);
+	if((time - lastTime) < 17)
+		return ret;
+	lastTime = time;
 	SDL_BlitSurface(backBuf, NULL, disp, NULL);
 	if(fadePercent) {
 		//printf("Fade Percent = %d%%\n", fadePercent);

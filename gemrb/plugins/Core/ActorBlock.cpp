@@ -90,12 +90,18 @@ void Scriptable::ExecuteScript(GameScript * Script)
 
 void Scriptable::AddAction(Action * aC)
 {
+	if(!aC)
+		return;
 	actionQueue.push_back(aC);
+	aC->IncRef();
 }
 
 void Scriptable::AddActionInFront(Action * aC)
 {
+	if(!aC)
+		return;
 	actionQueue.push_front(aC);
+	aC->IncRef();
 }
 
 Action * Scriptable::GetNextAction()
@@ -114,16 +120,16 @@ Action * Scriptable::PopNextAction()
 	return aC;
 }
 
-void Scriptable::ClearActions(bool force)
+void Scriptable::ClearActions()
 {
 	if(CurrentAction) {
-		DeleteAction(CurrentAction, force);
+		CurrentAction->Release();
 		CurrentAction = NULL;
 	}
 	for(int i = 0; i < actionQueue.size(); i++) {
 		Action * aC = actionQueue.front();
 		actionQueue.pop_front();
-		DeleteAction(aC, force);
+		aC->Release();
 	}
 	actionQueue.clear();
 }
@@ -178,25 +184,6 @@ void Scriptable::ProcessActions()
 void Scriptable::SetWait(unsigned long time)
 {
 	WaitCounter = time;
-}
-
-void Scriptable::DeleteAction(Action * aC, bool force)
-{
-	if(!force && !aC->autoFree)
-		return;
-	if(aC->string0Parameter)
-		free(aC->string0Parameter);
-	if(aC->string1Parameter)
-		free(aC->string1Parameter);
-	for(int c = 0; c < 3; c++) {
-		Object * oB = aC->objects[c];
-		if(oB) {
-			if(oB->objectName)
-				free(oB->objectName);
-			delete(oB);
-		}
-	}
-	delete(aC);
 }
 
 /********************
@@ -390,7 +377,7 @@ void Moveble::ClearPath()
 	step = NULL;
 	AnimID = IE_ANI_AWAKE;
 	if(CurrentAction)
-		DeleteAction(CurrentAction);
+		CurrentAction->Release();
 	CurrentAction = NULL;
 }
 

@@ -51,18 +51,21 @@ ScriptedAnimation::ScriptedAnimation(DataStream * stream, bool autoFree, long X,
 	Sounds[0][8] = 0;
 	stream->Read(Sounds[1], 8);
 	Sounds[1][8] = 0;
-	DataStream * str = core->GetResourceMgr()->GetResource(Anim1ResRef, IE_BAM_CLASS_ID);
-	AnimationMgr * am = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
-	am->Open(str, true);
-	anims[0] = am->GetAnimation((unsigned char)seq1, 0, 0);
-	anims[1] = am->GetAnimation((unsigned char)seq2, 0, 0);
-	core->FreeInterface(am);
+	//AnimationFactory * af = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(Anim1ResRef, IE_BAM_CLASS_ID);
+	AnimationMgr * aM = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
+	DataStream * dS = core->GetResourceMgr()->GetResource(Anim1ResRef, IE_BAM_CLASS_ID);
+	aM->Open(dS, true);
+	anims[0] = aM->GetAnimation((unsigned char)seq1, 0, 0);
+	//anims[0] = af->GetCycle((unsigned char)seq1);
+	//anims[1] = af->GetCycle((unsigned char)seq2);
 	XPos += X;
 	YPos += Y;
-	anims[0]->autoSwitchOnEnd = true;
-	anims[1]->autoSwitchOnEnd = true;
-	anims[0]->pos = 0;
-	anims[1]->pos = 0;
+	if(anims[0]) {
+		anims[0]->autoSwitchOnEnd = true;
+		//anims[1]->autoSwitchOnEnd = true;
+		anims[0]->pos = 0;
+		//anims[1]->pos = 0;
+	}
 	justCreated = true;
 	if(autoFree)
 		delete(stream);

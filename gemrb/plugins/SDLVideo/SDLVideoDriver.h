@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.24 2004/01/04 21:16:50 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.25 2004/01/09 11:40:58 balrog994 Exp $
  *
  */
 
@@ -38,6 +38,7 @@ private:
 	short mouseAdjustX[2], mouseAdjustY[2];
 	unsigned short CursorIndex;
 	int fadePercent;
+	unsigned long lastTime;
 public:
 	SDLVideoDriver(void);
 	~SDLVideoDriver(void);

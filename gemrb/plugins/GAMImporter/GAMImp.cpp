@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.9 2004/01/05 23:46:26 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.10 2004/01/09 11:41:13 balrog994 Exp $
  *
  */
 
@@ -182,8 +182,6 @@ Game * GAMImp::GetGame()
 		str->Seek(NPCOffset+(i*PCSize), GEM_STREAM_START);
 		PCStruct pcInfo;
 		str->Read(&pcInfo, 0xC0);
-		if(stricmp(pcInfo.Area, CurrentArea) != 0)
-			continue;
 		Actor * actor;
 		if(pcInfo.OffsetToCRE) {
 			str->Seek(pcInfo.OffsetToCRE, GEM_STREAM_START);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.40 2004/01/07 20:32:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.41 2004/01/09 11:41:12 balrog994 Exp $
  *
  */
 
@@ -156,7 +156,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 GameScript::~GameScript(void)
 {
 	if(script)
-		FreeScript(script);
+		script->Release();
 	if(freeLocals) {
 		if(locals)
 			delete(locals);
@@ -165,54 +165,7 @@ GameScript::~GameScript(void)
 
 void GameScript::FreeScript(Script * script)
 {
-	for(int i = 0; i < script->responseBlocksCount; i++) {
-		ResponseBlock * rB = script->responseBlocks[i];
-		Condition * cO = rB->condition;
-		for(int c = 0; c < cO->triggersCount; c++) {
-			Trigger * tR = cO->triggers[c];
-			if(tR->string0Parameter)
-				free(tR->string0Parameter);
-			if(tR->string1Parameter)
-				free(tR->string1Parameter);
-			if(tR->objectParameter) {
-				Object * oB = tR->objectParameter;
-				if(oB->objectName)
-					free(oB->objectName);
-				delete(oB);
-			}
-			delete(tR);
-		}
-		delete(cO->triggers);
-		delete(cO);
-		ResponseSet * rS = rB->responseSet;
-		for(int b = 0; b < rS->responsesCount; b++) {
-			Response * rP = rS->responses[b];
-			for(int c = 0; c < rP->actionsCount; c++) {
-				Action * aC = rP->actions[c];
-				if(aC->string0Parameter)
-					free(aC->string0Parameter);
-				if(aC->string1Parameter)
-					free(aC->string1Parameter);
-				for(int c = 0; c < 3; c++) {
-					Object * oB = aC->objects[c];
-					if(oB) {
-						if(oB->objectName)
-							free(oB->objectName);
-						delete(oB);
-					}
-				}
-				delete(aC);
-			}
-			delete(rP->actions);
-			delete(rP);
-		}
-		delete(rS->responses);
-		delete(rS);
-		delete(rB);
-	}
-	delete(script->responseBlocks);
-	free(script->Name);
-	delete(script);
+	script->Release();
 }
 
 Script* GameScript::CacheScript(DataStream * stream, const char * Context)
@@ -227,7 +180,7 @@ Script* GameScript::CacheScript(DataStream * stream, const char * Context)
 		free(line);
 		return NULL;
 	}
-	Script * newScript = new Script();
+	Script * newScript = new Script(Context);
 	std::vector<ResponseBlock*> rBv;
 	while(true) {
 		ResponseBlock * rB = ReadResponseBlock(stream);
@@ -237,13 +190,11 @@ Script* GameScript::CacheScript(DataStream * stream, const char * Context)
 		stream->ReadLine(line, 10);
 	}
 	free(line);
-	newScript->responseBlocksCount = (unsigned char)rBv.size();
-	newScript->responseBlocks = new ResponseBlock*[newScript->responseBlocksCount];
-	for(int i = 0; i < newScript->responseBlocksCount; i++) {
+	newScript->AllocateBlocks((unsigned int)rBv.size());
+	for(unsigned int i = 0; i < newScript->responseBlocksCount; i++) {
 		newScript->responseBlocks[i] = rBv.at(i);
+		newScript->responseBlocks[i]->IncRef();
 	}
-	newScript->Name = (char*)malloc(9);
-	strncpy(newScript->Name, Context, 8);
 	delete(stream);
 	return newScript;
 }
@@ -265,11 +216,10 @@ void GameScript::Update()
 	GetTime(thisTime);
 	if((thisTime - lastRunTime) < scriptRunDelay)
 		return;
-	//printf("%s: Run Script\n", Name);
 	lastRunTime = thisTime;
 	if(!script)
 		return;
-	for(int a = 0; a < script->responseBlocksCount; a++) {
+	for(unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock * rB = script->responseBlocks[a];
 		if(EvaluateCondition(this->MySelf, rB->condition)) {
 			ExecuteResponseSet(this->MySelf, rB->responseSet);
@@ -289,11 +239,10 @@ void GameScript::EvaluateAllBlocks()
 	GetTime(thisTime);
 	if((thisTime - lastRunTime) < scriptRunDelay)
 		return;
-	//printf("%s: Run Script\n", Name);
 	lastRunTime = thisTime;
 	if(!script)
 		return;
-	for(int a = 0; a < script->responseBlocksCount; a++) {
+	for(unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock * rB = script->responseBlocks[a];
 		if(EvaluateCondition(this->MySelf, rB->condition)) {
 			ExecuteResponseSet(this->MySelf, rB->responseSet);
@@ -313,7 +262,9 @@ ResponseBlock * GameScript::ReadResponseBlock(DataStream * stream)
 	free(line);
 	ResponseBlock * rB = new ResponseBlock();
 	rB->condition = ReadCondition(stream);
+	rB->condition->IncRef();
 	rB->responseSet = ReadResponseSet(stream);
+	rB->responseSet->IncRef();
 	return rB;
 }
 
@@ -338,6 +289,7 @@ Condition * GameScript::ReadCondition(DataStream * stream)
 	cO->triggers = new Trigger*[cO->triggersCount];
 	for(int i = 0; i < cO->triggersCount; i++) {
 		cO->triggers[i] = tRv.at(i);
+		cO->triggers[i]->IncRef();
 	}
 	return cO;
 }
@@ -363,6 +315,7 @@ ResponseSet * GameScript::ReadResponseSet(DataStream * stream)
 	rS->responses = new Response*[rS->responsesCount];
 	for(int i = 0; i < rS->responsesCount; i++) {
 		rS->responses[i] = rEv.at(i);
+		rS->responses[i]->IncRef();
 	}
 	return rS;
 }
@@ -389,10 +342,7 @@ Response * GameScript::ReadResponse(DataStream * stream)
 	std::vector<Action*> aCv;
 	while(true) {
 		Action * aC = new Action();
-		aC->autoFree = false;
-		aC->delayFree = false;
 		count = stream->ReadLine(line, 1024);
-		aC->actionID = 0;
 		for(int i = 0; i < count; i++) {
 			if((line[i] >= '0') && (line[i] <= '9')) {
 				aC->actionID *= 10;
@@ -405,14 +355,11 @@ Response * GameScript::ReadResponse(DataStream * stream)
 			stream->ReadLine(line, 1024);
 			Object * oB = DecodeObject(line);
 			aC->objects[i] = oB;
+			oB->IncRef();
 			if(i != 2)
 				stream->ReadLine(line, 1024);
 		}
 		stream->ReadLine(line, 1024);
-		aC->string0Parameter = (char*)malloc(1025);
-		aC->string0Parameter[0] = 0;
-		aC->string1Parameter = (char*)malloc(1025);
-		aC->string1Parameter[0] = 0;
 		sscanf(line, "%d %d %d %d %d\"%[^\"]\" \"%[^\"]\" AC", &aC->int0Parameter, &aC->XpointParameter, &aC->YpointParameter, &aC->int1Parameter, &aC->int2Parameter, aC->string0Parameter, aC->string1Parameter);
 		aCv.push_back(aC);
 		stream->ReadLine(line, 1024);
@@ -424,6 +371,7 @@ Response * GameScript::ReadResponse(DataStream * stream)
 	rE->actions = new Action*[rE->actionsCount];
 	for(int i = 0; i < rE->actionsCount; i++) {
 		rE->actions[i] = aCv.at(i);
+		rE->actions[i]->IncRef();
 	}
 	return rE;
 }
@@ -438,10 +386,6 @@ Trigger * GameScript::ReadTrigger(DataStream * stream)
 	}
 	stream->ReadLine(line, 1024);
 	Trigger * tR = new Trigger();
-	tR->string0Parameter = (char*)malloc(1025);
-	tR->string0Parameter[0] = 0;
-	tR->string1Parameter = (char*)malloc(1025);
-	tR->string1Parameter[0] = 0;
 	if(strcmp(core->GameType, "pst") == 0)
 		sscanf(line, "%d %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB", &tR->triggerID, &tR->int0Parameter, &tR->flags, &tR->int1Parameter, &tR->int2Parameter, &tR->XpointParameter, &tR->YpointParameter, tR->string0Parameter, tR->string1Parameter);
 	else
@@ -449,6 +393,7 @@ Trigger * GameScript::ReadTrigger(DataStream * stream)
 	tR->triggerID &= 0xFF;
 	stream->ReadLine(line, 1024);
 	tR->objectParameter = DecodeObject(line);
+	tR->objectParameter->IncRef();
 	stream->ReadLine(line, 1024);
 	free(line);
 	return tR;
@@ -457,8 +402,6 @@ Trigger * GameScript::ReadTrigger(DataStream * stream)
 Object * GameScript::DecodeObject(const char * line)
 {
 	Object * oB = new Object();
-	oB->objectName = (char*)malloc(128);
-	oB->objectName[0] = 0;
 	if(strcmp(core->GameType, "pst") == 0)
 		sscanf(line, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d [%[^]]] \"%[^\"]\"OB", &oB->eaField, &oB->factionField, &oB->teamField, &oB->generalField, &oB->raceField, &oB->classField, &oB->specificField, &oB->genderField, &oB->alignmentField, &oB->identifiersField, &oB->XobjectPosition, &oB->YobjectPosition, &oB->WobjectPosition, &oB->HobjectPosition, oB->PositionMask, oB->objectName);
 	else
@@ -485,11 +428,8 @@ bool GameScript::EvaluateTrigger(Scriptable * Sender, Trigger * trigger)
 	if(!trigger)
 		return false;
 	TriggerFunction func = triggers[trigger->triggerID];
-	if(!func) {
-		//SymbolMgr * tT = core->GetSymbol(triggersTable);
-		//printf("%s: Trigger not supported\n", tT->GetValue(trigger->triggerID));
+	if(!func) 
 		return false;
-	}
 	int ret = func(Sender, trigger);
 	if(trigger->flags&1) {
 		if(ret)
@@ -530,29 +470,15 @@ void GameScript::ExecuteResponse(Scriptable * Sender, Response * rE)
 void GameScript::ExecuteAction(Scriptable * Sender, Action * aC)
 {
 	ActionFunction func = actions[aC->actionID];
-	if(func) {
-		//printf("[%s]: Executing Action: %d\n", Sender->scriptName, aC->actionID);
+	if(func)
 		func(Sender, aC);
-	}
 	if(!blocking[aC->actionID])
 		Sender->CurrentAction = NULL;
 	if(aC->autoFree) {
 		if(aC->delayFree)
 			aC->delayFree = false;
 		else {
-			if(aC->string0Parameter)
-				free(aC->string0Parameter);
-			if(aC->string1Parameter)
-				free(aC->string1Parameter);
-			for(int c = 0; c < 3; c++) {
-				Object * oB = aC->objects[c];
-				if(oB) {
-					if(oB->objectName)
-						free(oB->objectName);
-					delete(oB);
-				}
-			}
-			delete(aC);
+			aC->Release();
 		}
 	}
 }
@@ -597,6 +523,8 @@ Scriptable * GameScript::GetActorFromObject(Scriptable * Sender, Object * oC)
 			}
 		}
 	}
+	if(Sender->CutSceneId)
+		return Sender->CutSceneId;
 	return Sender;
 }
 
@@ -638,8 +566,9 @@ void GameScript::ExecuteString(Scriptable * Sender, char * String)
 	Action * act = GenerateAction(String);
 	if(!act)
 		return;
+	act->IncRef();
 	if(Sender->CurrentAction)
-		Sender->DeleteAction(Sender->CurrentAction);
+		Sender->CurrentAction->Release();
 	Sender->CurrentAction = act;
 	ExecuteAction(Sender, act);
 	return;
@@ -650,17 +579,9 @@ bool GameScript::EvaluateString(Scriptable * Sender, char * String)
 	if(String[0] == 0)
 		return false;
 	Trigger * tri = GenerateTrigger(String);
+	tri->IncRef();
 	bool ret = EvaluateTrigger(Sender, tri);
-	if(tri->string0Parameter)
-		free(tri->string0Parameter);
-	if(tri->string1Parameter)
-		free(tri->string1Parameter);
-	if(tri->objectParameter) {
-		if(tri->objectParameter->objectName)
-			free(tri->objectParameter->objectName);
-		delete(tri->objectParameter);
-	}
-	delete(tri);
+	tri->Release();
 	return ret;
 }
 
@@ -678,14 +599,8 @@ Action * GameScript::GenerateAction(char * String)
 				break;
 			if(*str == '(') {
 				newAction = new Action();
-				newAction->actionID = actionsTable->GetValueIndex(i);
-				newAction->objects[0] = NULL;
-				newAction->objects[1] = NULL;
-				newAction->objects[2] = NULL;
-				newAction->string0Parameter = NULL;
-				newAction->string1Parameter = NULL;
+				newAction->actionID = (unsigned short)actionsTable->GetValueIndex(i);
 				newAction->autoFree = true;
-				newAction->delayFree = false;
 				int objectCount = (newAction->actionID == 1) ? 0 : 1;
 				int stringsCount = 0;
 				int intCount = 0;
@@ -808,20 +723,9 @@ Action * GameScript::GenerateAction(char * String)
 								*dst = 0;
 								Action * act = GenerateAction(action);
 								free(action);
-								act->objects[0] = new Object(*newAction->objects[0]);
-								if(newAction->string0Parameter)
-									free(newAction->string0Parameter);
-								if(newAction->string1Parameter)
-									free(newAction->string1Parameter);
-								for(int c = 1; c < 3; c++) {
-									Object * oB = newAction->objects[c];
-									if(oB) {
-										if(oB->objectName)
-											free(oB->objectName);
-										delete(oB);
-									}
-								}
-								delete(newAction);
+								act->objects[0] = newAction->objects[0];
+								act->objects[0]->IncRef();
+								newAction->Release();
 								newAction = act;
 							}
 						break;
@@ -832,7 +736,7 @@ Action * GameScript::GenerateAction(char * String)
 								if(*src == '"') { //Object Name
 									src++;
 									newAction->objects[objectCount] = new Object();
-									newAction->objects[objectCount]->objectName = (char*)malloc(128);
+									newAction->objects[objectCount]->IncRef();
 									char *dst = newAction->objects[objectCount]->objectName;
 									while(*src != '"') {
 										*dst = *src;
@@ -854,10 +758,10 @@ Action * GameScript::GenerateAction(char * String)
 								src++;
 								char * dst;
 								if(!stringsCount) {
-									newAction->string0Parameter = (char*)malloc(128);
+									//newAction->string0Parameter = (char*)malloc(128);
 									dst = newAction->string0Parameter;
 								} else {
-									newAction->string1Parameter = (char*)malloc(128);
+									//newAction->string1Parameter = (char*)malloc(128);
 									dst = newAction->string1Parameter;
 								}
 								while(*src != '"') {
@@ -903,11 +807,8 @@ Trigger * GameScript::GenerateTrigger(char * String)
 				break;
 			if(*str == '(') {
 				newTrigger = new Trigger();
-				newTrigger->triggerID = (triggersTable->GetValueIndex(i)&0xff);
-				newTrigger->objectParameter = NULL;
-				newTrigger->string0Parameter = NULL;
-				newTrigger->string1Parameter = NULL;
-				newTrigger->flags = (negate) ? 1 : 0;
+				newTrigger->triggerID = (unsigned short)(triggersTable->GetValueIndex(i)&0xff);
+				newTrigger->flags = (negate) ? (unsigned short)1 : (unsigned short)0;
 				int stringsCount = 0;
 				int intCount = 0;
 				//Here is the Trigger; Now we need to evaluate the parameters
@@ -1008,7 +909,7 @@ Trigger * GameScript::GenerateTrigger(char * String)
 								if(*src == '"') { //Object Name
 									src++;
 									newTrigger->objectParameter = new Object();
-									newTrigger->objectParameter->objectName = (char*)malloc(128);
+									newTrigger->objectParameter->IncRef();
 									char *dst = newTrigger->objectParameter->objectName;
 									while(*src != '"') {
 										*dst = *src;
@@ -1029,10 +930,8 @@ Trigger * GameScript::GenerateTrigger(char * String)
 								src++;
 								char * dst;
 								if(!stringsCount) {
-									newTrigger->string0Parameter = (char*)malloc(128);
 									dst = newTrigger->string0Parameter;
 								} else {
-									newTrigger->string1Parameter = (char*)malloc(128);
 									dst = newTrigger->string1Parameter;
 								}
 								while(*src != '"') {
@@ -1392,7 +1291,8 @@ void GameScript::StartCutScene(Scriptable * Sender, Action * parameters)
 {
 	GameScript * gs = new GameScript(parameters->string0Parameter, IE_SCRIPT_ALWAYS);
 	gs->MySelf = Sender;
-	core->timer->SetCutScene(gs);
+	gs->EvaluateAllBlocks();
+	delete(gs);
 }
 
 void GameScript::CutSceneId(Scriptable * Sender, Action * parameters)
@@ -1414,7 +1314,6 @@ void GameScript::Enemy(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1431,7 +1330,6 @@ void GameScript::Ally(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1446,7 +1344,6 @@ void GameScript::Wait(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1458,10 +1355,8 @@ void GameScript::SmallWait(Scriptable * Sender, Action * parameters)
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
-	
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1491,7 +1386,6 @@ void GameScript::MoveToPoint(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
-	Sender->CurrentAction->delayFree = true;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
 		Sender->CurrentAction = NULL;
@@ -1512,7 +1406,6 @@ void GameScript::MoveToObject(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
-	Sender->CurrentAction->delayFree = true;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
 		Sender->CurrentAction = NULL;
@@ -1532,7 +1425,6 @@ void GameScript::DisplayStringHead(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1552,7 +1444,6 @@ void GameScript::Face(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1570,7 +1461,6 @@ void GameScript::FaceObject(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1592,7 +1482,6 @@ void GameScript::DisplayStringWait(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1602,7 +1491,7 @@ void GameScript::DisplayStringWait(Scriptable * Sender, Action * parameters)
 	actor->DisplayHeadText(sb.text);
 	if(sb.Sound[0]) {
 		unsigned long len = core->GetSoundMgr()->Play(sb.Sound);
-		if(len != 0xffffffff)
+		if(len != 0)
 			//waitCounter = ((15*len)/1000);
 			//core->timer->SetWait((AI_UPDATE_TIME*len)/1000);
 			actor->SetWait((AI_UPDATE_TIME*len)/1000);
@@ -1636,7 +1525,6 @@ void GameScript::PlaySound(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1652,7 +1540,6 @@ void GameScript::CreateVisualEffectObject(Scriptable * Sender, Action * paramete
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1667,6 +1554,16 @@ void GameScript::CreateVisualEffectObject(Scriptable * Sender, Action * paramete
 
 void GameScript::CreateVisualEffect(Scriptable * Sender, Action * parameters)
 {
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_VVC_CLASS_ID);
 	ScriptedAnimation * vvc = new ScriptedAnimation(ds, true, parameters->XpointParameter, parameters->YpointParameter);
 	core->GetGame()->GetMap(0)->AddVVCCell(vvc);
@@ -1682,12 +1579,12 @@ void GameScript::DestroySelf(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	Actor * actor = (Actor*)scr;
 	actor->DeleteMe = true;
+	Sender->CurrentAction = NULL;
 }
 
 void GameScript::ScreenShake(Scriptable * Sender, Action * parameters)
@@ -1716,7 +1613,6 @@ void GameScript::Dialogue(Scriptable * Sender, Action * parameters)
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
-	Sender->CurrentAction->delayFree = true;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
 		Sender->CurrentAction = NULL;
@@ -1771,7 +1667,6 @@ void GameScript::StartDialogue(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1817,7 +1712,6 @@ void GameScript::OpenDoor(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
-	Sender->CurrentAction->delayFree = true;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
 		Sender->CurrentAction = NULL;
@@ -1854,7 +1748,6 @@ void GameScript::CloseDoor(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1889,7 +1782,6 @@ void GameScript::MoveBetweenAreas(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1955,7 +1847,6 @@ void GameScript::ForceSpell(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1976,7 +1867,6 @@ void GameScript::Deactivate(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1996,7 +1886,6 @@ void GameScript::Activate(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -2020,7 +1909,6 @@ void GameScript::LeaveAreaLUA(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -2052,7 +1940,6 @@ void GameScript::LeaveAreaLUAPanic(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}

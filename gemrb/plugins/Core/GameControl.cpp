@@ -939,7 +939,7 @@ void GameControl::DialogChoose(int choose)
 		Window * win = core->GetWindow(index);
 		if(core->GetDictionary()->Lookup("MessageTextArea", index)) {
 			TextArea * ta = (TextArea*)win->GetControl(index);
-printf("%d\n",choose);
+//printf("%d\n",choose);
 			if(choose == -1)
 				ds = dlg->GetState(0);
 			else {
@@ -947,9 +947,9 @@ printf("%d\n",choose);
 					return;
 				DialogTransition * tr = ds->transitions[choose];
 				if(tr->Flags & 8) {
-					speaker->DeleteAction(speaker->CurrentAction);
+					speaker->CurrentAction->Release();
 					speaker->CurrentAction = NULL;
-					dlg->Release();
+					//dlg->Release();
 					ds = NULL;
 					dlg = NULL;
 					core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.h,v 1.3 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.h,v 1.4 2004/01/09 11:41:13 balrog994 Exp $
  *
  */
 
@@ -47,8 +47,11 @@ class BIFImp : public ArchiveImporter
 {
 private:
 	char path[_MAX_PATH];
-	std::vector<FileEntry> fentries;
-	std::vector<TileEntry> tentries;
+	//std::vector<FileEntry> fentries;
+	//std::vector<TileEntry> tentries;
+	FileEntry * fentries;
+	TileEntry * tentries;
+	unsigned long fentcount, tentcount;
 	CachedFileStream* stream;
 public:
 	BIFImp(void);

@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.23 2004/01/07 20:32:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.24 2004/01/09 11:41:12 balrog994 Exp $
  *
  */
 
 class GameScript;
-struct Action;
+class Action;
 
 #ifndef GAMESCRIPT_H
 #define GAMESCRIPT_H
@@ -31,7 +31,29 @@ struct Action;
 #include "SymbolMgr.h"
 #include <list>
 
-typedef struct Object {
+#ifdef WIN32
+
+#ifdef GEM_BUILD_DLL
+#define GEM_EXPORT __declspec(dllexport)
+#else
+#define GEM_EXPORT __declspec(dllimport)
+#endif
+
+#else
+#define GEM_EXPORT
+#endif
+
+class GEM_EXPORT Object {
+public:
+	Object() {
+		RefCount = 0;
+		objectName[0] = 0;
+		PositionMask[0] = 0;
+	};
+	~Object() {
+		
+	}
+public:
 	int				eaField;
 	int				factionField;
 	int				teamField;
@@ -46,11 +68,35 @@ typedef struct Object {
 	int				YobjectPosition;
 	int				WobjectPosition;
 	int             HobjectPosition;
-	char            PositionMask[32];
-	char*			objectName;
-} Object;
+	char            PositionMask[33];
+	char			objectName[33];
+private:
+	int				RefCount;
+public:
+	void Release() {
+		RefCount--;
+		if(!RefCount)
+			delete this;
+	}
+	void IncRef() {
+		RefCount++;
+	}
+};
 
-typedef struct Trigger {
+class GEM_EXPORT Trigger {
+public:
+	Trigger() {
+        objectParameter = NULL;
+		RefCount = 0;
+		string0Parameter[0] = 0;
+		string1Parameter[0] = 0;
+	};
+	~Trigger() {
+		if(objectParameter) {
+			objectParameter->Release();
+		}
+	}
+public:
 	unsigned short	triggerID;
 	int				int0Parameter;
 	int				flags;
@@ -58,17 +104,73 @@ typedef struct Trigger {
 	int				int2Parameter;
 	int				XpointParameter;
 	int				YpointParameter;
-	char*			string0Parameter;
-	char*			string1Parameter;
+	char			string0Parameter[33];
+	char			string1Parameter[33];
 	Object*			objectParameter;
-} Trigger;
+private:
+	int				RefCount;
+public:
+	void Release() {
+		RefCount--;
+		if(!RefCount)
+			delete this;
+	}
+	void IncRef() {
+		RefCount++;
+	}
+};
 
-typedef struct Condition {
+class GEM_EXPORT Condition {
+public:
+	Condition() {
+		RefCount = 0;
+	};
+	~Condition() {
+		for(int c = 0; c < triggersCount; c++) {
+			if(triggers[c])
+				triggers[c]->Release();
+		}
+		delete(triggers);
+	}
+public:
 	unsigned short triggersCount;
 	Trigger ** triggers;
-} Condition;
+private:
+	int				RefCount;
+public:
+	void Release() {
+		RefCount--;
+		if(!RefCount)
+			delete this;
+	}
+	void IncRef() {
+		RefCount++;
+	}
+};
 
-typedef struct Action {
+class GEM_EXPORT Action {
+public:
+	Action() {
+		actionID = 0;
+		objects[0] = NULL;
+		objects[1] = NULL;
+		objects[2] = NULL;
+		string0Parameter[0] = 0;
+		string1Parameter[0] = 0;
+		int0Parameter = 0;
+		XpointParameter = 0;
+		YpointParameter = 0;
+		int1Parameter = 0;
+		int2Parameter = 0;
+		RefCount = 0;
+	};
+	~Action() {
+		for(int c = 0; c < 3; c++) {
+			if(objects[c])
+				objects[c]->Release();
+		}
+	}
+public:
 	unsigned short	actionID;
 	Object*			objects[3];
 	int				int0Parameter;
@@ -76,35 +178,157 @@ typedef struct Action {
 	int				YpointParameter;
 	int				int1Parameter;
 	int				int2Parameter;
-	char*			string0Parameter;
-	char*			string1Parameter;
+	char			string0Parameter[33];
+	char			string1Parameter[33];
 	bool			autoFree;
 	bool			delayFree;
-} Action;
+private:
+	int				RefCount;
+public:
+	void Release() {
+		RefCount--;
+		if(!RefCount)
+			delete this;
+	}
+	void IncRef() {
+		RefCount++;
+	}
+};
 
-typedef struct Response {
+class GEM_EXPORT Response {
+public:
+	Response() {
+		RefCount = 0;
+	};
+	~Response() {
+		for(int c = 0; c < actionsCount; c++) {
+			if(actions[c])
+				actions[c]->Release();
+		}
+		delete(actions);
+	}
+public:
 	unsigned char weight;
 	unsigned char actionsCount;
 	Action ** actions;
-} Response;
+private:
+	int				RefCount;
+public:
+	void Release() {
+		RefCount--;
+		if(!RefCount)
+			delete this;
+	}
+	void IncRef() {
+		RefCount++;
+	}
+};
 
-typedef struct ResponseSet {
+class GEM_EXPORT ResponseSet {
+public:
+	ResponseSet() {
+		RefCount = 0;
+	};
+	~ResponseSet() {
+		for(int b = 0; b < responsesCount; b++) {
+			Response * rP = responses[b];
+			rP->Release();
+		}
+		delete(responses);
+	}
+public:
 	unsigned short responsesCount;
 	Response ** responses;
-} ResponseSet;
+private:
+	int				RefCount;
+public:
+	void Release() {
+		RefCount--;
+		if(!RefCount)
+			delete this;
+	}
+	void IncRef() {
+		RefCount++;
+	}
+};
 
-typedef struct ResponseBlock {
+class GEM_EXPORT ResponseBlock {
+public:
+	ResponseBlock() {
+		RefCount = 0;
+	};
+	~ResponseBlock() {
+		if(condition)
+			condition->Release();
+		if(responseSet)
+			responseSet->Release();
+	}
+public:
 	Condition * condition;
 	ResponseSet * responseSet;
-} ResponseBlock;
+private:
+	int				RefCount;
+public:
+	void Release() {
+		RefCount--;
+		if(!RefCount)
+			delete this;
+	}
+	void IncRef() {
+		RefCount++;
+	}
+};
 
-typedef struct Script {
-	unsigned char responseBlocksCount;
+class GEM_EXPORT Script {
+public:
+	Script(const char * Name) {
+		RefCount = 0;
+		responseBlocks = NULL;
+		responseBlocksCount = 0;
+		if(!Name) {
+			this->Name[0] = 0;
+			return;
+		}
+		strncpy(this->Name, Name, 8);
+		this->Name[8] = 0;
+	};
+	~Script() {
+		FreeResponseBlocks();
+	}
+	void AllocateBlocks(unsigned int count) {
+		if(!count) {
+			FreeResponseBlocks();
+			responseBlocks = NULL;
+			responseBlocksCount = 0;
+		}
+		responseBlocks = new ResponseBlock*[count];
+		responseBlocksCount = count;
+	}
+private:
+	void FreeResponseBlocks() {
+		if(!responseBlocks)
+			return;
+		for(unsigned int i = 0; i < responseBlocksCount; i++) {
+			if(responseBlocks[i])
+				responseBlocks[i]->Release();
+		}
+	}
+public:
+	unsigned int responseBlocksCount;
 	ResponseBlock ** responseBlocks;
-	char * Name;
-} Script;
-
-class GameScript;
+	char Name[9];
+private:
+	int				RefCount;
+public:
+	void Release() {
+		RefCount--;
+		if(!RefCount)
+			delete this;
+	}
+	void IncRef() {
+		RefCount++;
+	}
+};
 
 typedef int (* TriggerFunction)(Scriptable*, Trigger*);
 typedef void (* ActionFunction)(Scriptable*, Action*);
@@ -115,18 +339,6 @@ typedef void (* ActionFunction)(Scriptable*, Action*);
 
 #define MAX_TRIGGERS			0xFF
 #define MAX_ACTIONS				325
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 class GEM_EXPORT GameScript
 {

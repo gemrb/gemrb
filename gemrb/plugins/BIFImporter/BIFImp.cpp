@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.8 2003/12/18 15:05:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.9 2004/01/09 11:41:13 balrog994 Exp $
  *
  */
 
@@ -29,6 +29,8 @@
 BIFImp::BIFImp(void)
 {
 	stream = NULL;
+	fentries = NULL;
+	tentries = NULL;
 }
 
 BIFImp::~BIFImp(void)
@@ -36,6 +38,10 @@ BIFImp::~BIFImp(void)
 	if(stream) {
 		delete(stream);
 	}
+	if(fentries)
+		delete[] fentries;
+	if(tentries)
+		delete[] tentries;
 }
 
 int BIFImp::OpenArchive(char* filename, bool cacheCheck)
@@ -185,7 +191,7 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 	DataStream * s = NULL;
 	if(Type == IE_TIS_CLASS_ID) {
 		unsigned int srcResLoc = Resource & 0xFC000;
-		for(unsigned long i = 0; i < tentries.size(); i++) {
+		for(unsigned long i = 0; i < tentcount; i++) {
 			if((tentries[i].resLocator & 0xFC000) == srcResLoc) {
 				s = new CachedFileStream(stream, tentries[i].dataOffset, tentries[i].fileSize);
 				break;
@@ -194,7 +200,7 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 	}
 	else {
 		unsigned int srcResLoc = Resource & 0x3FFF;
-		for(unsigned long i = 0; i < fentries.size(); i++) {
+		for(unsigned long i = 0; i < fentcount; i++) {
 			if((fentries[i].resLocator & 0x3FFF) == srcResLoc) {
 				s = new CachedFileStream(stream, fentries[i].dataOffset, fentries[i].fileSize);
 				break;
@@ -211,19 +217,23 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 }
 void BIFImp::ReadBIF(void)
 {
-	unsigned long fentcount, tentcount, foffset;
+	unsigned long foffset;
 	stream->Read(&fentcount, 4);
 	stream->Read(&tentcount, 4);
 	stream->Read(&foffset, 4);
 	stream->Seek(foffset, GEM_STREAM_START);
-	for(unsigned long i = 0; i < fentcount; i++) {
+	fentries = new FileEntry[fentcount];
+	stream->Read(fentries, fentcount*sizeof(FileEntry));
+	/*for(unsigned long i = 0; i < fentcount; i++) {
 		FileEntry fe;
 		stream->Read(&fe, 16);
 		fentries.push_back(fe);
-	}
-	for(unsigned long i = 0; i < tentcount; i++) {
+	}*/
+	tentries = new TileEntry[tentcount];
+	stream->Read(tentries, tentcount*sizeof(TileEntry));
+	/*for(unsigned long i = 0; i < tentcount; i++) {
 		TileEntry te;
 		stream->Read(&te, 20);
 		tentries.push_back(te);
-	}
+	}*/
 }

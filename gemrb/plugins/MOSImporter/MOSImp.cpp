@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.5 2003/12/18 15:05:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.6 2004/01/09 11:41:13 balrog994 Exp $
  *
  */
 
@@ -108,9 +108,10 @@ Sprite2D * MOSImp::GetImage()
 		for(int x = 0; x < Cols; x++) {
 			int bw = (x == Cols-1) ? ((Width%64) == 0 ? 64 : Width%64) : 64;
 			str->Seek(PalOffset+(y*Cols*1024)+(x*1024), GEM_STREAM_START);
-			for(int i = 0; i < 256; i++) {
-				str->Read(&RevCol[i], 4);
-			}
+			str->Read(&RevCol[0], 1024);
+			//for(int i = 0; i < 256; i++) {
+			//	str->Read(&RevCol[i], 4);
+			//}
 			str->Seek(PalOffset+(Rows*Cols*1024)+(y*Cols*4)+(x*4), GEM_STREAM_START);
 			str->Read(&blockoffset, 4);
 			str->Seek(PalOffset+(Rows*Cols*1024)+(Rows*Cols*4)+blockoffset, GEM_STREAM_START);
