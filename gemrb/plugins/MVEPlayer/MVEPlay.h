@@ -75,6 +75,7 @@ static int g_nMapLength=0;
 static int stupefaction=0;
 
 static FSOUND_STREAM * stream = NULL;
+static unsigned short channel = 0;
 
 class MVEPlay :	public MoviePlayer
 {
@@ -211,6 +212,7 @@ private: //Decoder Functions
 		FSOUND_Stream_Stop(stream);
 		FSOUND_Stream_Close(stream);
 		SDL_DestroyMutex(mve_audio_mutex);
+		FSOUND_SetPaused(FSOUND_ALL, false);
 		//SDL_CloseAudio();
 	}
 	static short get_short(unsigned char *data)
@@ -398,8 +400,8 @@ end:
 		memset(mve_audio_buflens, 0, sizeof(mve_audio_buflens));
 		if (mve_audio_canplay  &&  !mve_audio_playing)//  &&  mve_audio_bufhead != mve_audio_buftail)
 			{
-			FSOUND_Stream_Play(0, stream);
-			FSOUND_SetPaused(0, true);
+			channel = FSOUND_Stream_Play(FSOUND_FREE, stream);
+			FSOUND_SetPaused(FSOUND_ALL, true);
 			}
     //play_audio_handler(0, 0, NULL, 0, NULL);
 			//printf("Starting Audio Playback\n");
@@ -416,7 +418,7 @@ end:
 			{
 			//SDL_PauseAudio(0);
 			//FSOUND_Stream_Play(0, stream);
-			FSOUND_SetPaused(0, false);
+			FSOUND_SetPaused(channel, false);
 			mve_audio_playing = 1;
 			}
 
@@ -431,7 +433,7 @@ end:
 		if (mve_audio_canplay)
 		{
 			if (mve_audio_playing)
-				FSOUND_SetPaused(0, true);
+				FSOUND_SetPaused(channel, true);
 				//SDL_LockAudio();
 
 			chan = get_short(data + 2);
@@ -458,7 +460,7 @@ end:
 
 			if (mve_audio_playing)
 				//SDL_UnlockAudio();
-				FSOUND_SetPaused(0, false);
+				FSOUND_SetPaused(channel, false);
 			}
 
 		return 1;
@@ -566,6 +568,8 @@ end:
 		if(!SDL_WasInit(SDL_INIT_AUDIO)) {
 			SDL_InitSubSystem(SDL_INIT_AUDIO);
 		}
+		SDL_FillRect(g_screen, NULL, 0);
+		SDL_Flip(g_screen);
 		return 1;
 	}
 
