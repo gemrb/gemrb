@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.56 2004/08/02 18:00:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.57 2004/08/02 22:15:24 avenger_teambg Exp $
  *
  */
 
@@ -108,13 +108,14 @@ Actor::~Actor(void)
 
 void Actor::SetText(char* ptr, unsigned char type)
 {
+	size_t len = strlen( ptr ) + 1;
+	//32 is the maximum possible length of the actor name in the original games
+	if(len>32) len=33; 
 	if(type!=2) {
-		size_t len = strlen( ptr ) + 1;
 		LongName = ( char * ) realloc( LongName, len );
 		memcpy( LongName, ptr, len );
 	}
 	if(type!=1) {
-		size_t len = strlen( ptr ) + 1;
 		ShortName = ( char * ) realloc( ShortName, len );
 		memcpy( ShortName, ptr, len );
 	}
@@ -453,10 +454,9 @@ void Actor::Die(Scriptable *killer)
 		Actor *act=NULL;
 		
 		if(killer) {
-			 killer=killer->MySelf;
-		}
-		if(killer->Type==ST_ACTOR) {
-			act = (Actor *) killer;
+			if(killer->Type==ST_ACTOR) {
+				act = (Actor *) killer;
+			}
 		}
 		if(act && act->InParty) {
 			//adjust game statistics here
@@ -464,8 +464,7 @@ void Actor::Die(Scriptable *killer)
 			InternalFlags|=IF_GIVEXP;
 		}
 	}
-//
-//
+
 	if(Modified[IE_HITPOINTS]<=0) {
 		InternalFlags|=IF_REALLYDIED;
 	}
