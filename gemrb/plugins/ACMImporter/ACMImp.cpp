@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.43 2004/05/25 16:16:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.44 2004/08/07 13:24:37 divide Exp $
  *
  */
 
@@ -36,7 +36,7 @@
 #define ACM_BUFFERSIZE 8192
 #define MUSICBUFERS 10
 
-static AudioStream streams[MAX_STREAMS];
+static AudioStream streams[MAX_STREAMS], speech;
 static CSoundReader *MusicReader;
 static ALuint MusicSource, MusicBuffers[MUSICBUFERS];
 static SDL_mutex* musicMutex;
@@ -268,7 +268,7 @@ bool ACMImp::Init(void)
 	if (i == RETRY) {
 		return false;
 	}
-
+	
 	ALfloat SourcePos[] = {
 		0.0f, 0.0f, 0.0f
 	};
@@ -284,7 +284,10 @@ bool ACMImp::Init(void)
 	return true;
 }
 
-unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
+/*
+ * if IsSpeech, replace any previous sounds that were speech
+ */
+unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, bool IsSpeech)
 {
   unsigned int i;
 
@@ -342,42 +345,62 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 		return 0;
 	}
 
-	alGenSources( 1, &Source );
-	if (( error = alGetError() ) != AL_NO_ERROR) {
-		DisplayALError( "[ACMImp::Play] alGenSources : ", error );
-		return 0;
-	}
+	if (IsSpeech) {
+		if (!alIsSource( speech.Source )) {
+			alGenSources( 1, &speech.Source );
 
-	alSourcei( Source, AL_BUFFER, Buffer );
-	alSourcef( Source, AL_PITCH, 1.0f );
-	alSourcef( Source, AL_GAIN, 1.0f );
-	alSourcefv( Source, AL_POSITION, SourcePos );
-	alSourcefv( Source, AL_VELOCITY, SourceVel );
-	alSourcei( Source, AL_LOOPING, 0 );
-
-	if (alGetError() != AL_NO_ERROR) {
-		return 0;
-	}
-
-	for (i = 0; i < MAX_STREAMS; i++) {
-		if (!streams[i].free) {
-			alGetSourcei( streams[i].Source, AL_SOURCE_STATE, &state );
-			if (state == AL_STOPPED) {
-				alDeleteBuffers( 1, &streams[i].Buffer );
-				alDeleteSources( 1, &streams[i].Source );
+			alSourcef( speech.Source, AL_PITCH, 1.0f );
+			alSourcef( speech.Source, AL_GAIN, 1.0f );
+			alSourcefv( speech.Source, AL_VELOCITY, SourceVel );
+			alSourcei( speech.Source, AL_LOOPING, 0 );
+		}
+		alSourceStop( speech.Source );	// legal nop if not playing
+		if (alIsBuffer( speech.Buffer )) {
+			alDeleteBuffers( 1, &speech.Buffer );
+		}
+		alSourcefv( Source, AL_POSITION, SourcePos );
+		alSourcei( speech.Source, AL_BUFFER, Buffer );
+		speech.Buffer = Buffer;
+		alSourcePlay( speech.Source );
+		return time_length;
+	} else {
+		alGenSources( 1, &Source );
+		if (( error = alGetError() ) != AL_NO_ERROR) {
+			DisplayALError( "[ACMImp::Play] alGenSources : ", error );
+			return 0;
+		}
+	
+		alSourcei( Source, AL_BUFFER, Buffer );
+		alSourcef( Source, AL_PITCH, 1.0f );
+		alSourcef( Source, AL_GAIN, 1.0f );
+		alSourcefv( Source, AL_POSITION, SourcePos );
+		alSourcefv( Source, AL_VELOCITY, SourceVel );
+		alSourcei( Source, AL_LOOPING, 0 );
+	
+		if (alGetError() != AL_NO_ERROR) {
+			return 0;
+		}
+	
+		for (i = 0; i < MAX_STREAMS; i++) {
+			if (!streams[i].free) {
+				alGetSourcei( streams[i].Source, AL_SOURCE_STATE, &state );
+				if (state == AL_STOPPED) {
+					alDeleteBuffers( 1, &streams[i].Buffer );
+					alDeleteSources( 1, &streams[i].Source );
+					streams[i].Buffer = Buffer;
+					streams[i].Source = Source;
+					streams[i].playing = false;
+					alSourcePlay( Source );
+					return time_length;
+				}
+			} else {
 				streams[i].Buffer = Buffer;
 				streams[i].Source = Source;
+				streams[i].free = false;
 				streams[i].playing = false;
 				alSourcePlay( Source );
 				return time_length;
 			}
-		} else {
-			streams[i].Buffer = Buffer;
-			streams[i].Source = Source;
-			streams[i].free = false;
-			streams[i].playing = false;
-			alSourcePlay( Source );
-			return time_length;
 		}
 	}
 
