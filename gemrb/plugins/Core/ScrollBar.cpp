@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.22 2004/03/21 13:47:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.23 2004/03/25 17:25:58 avenger_teambg Exp $
  *
  */
 
@@ -71,78 +71,44 @@ void ScrollBar::Draw(unsigned short x, unsigned short y)
 	if (XPos == 65535) {
 		return;
 	}
-	unsigned short upmx = 0,
-	upMx = frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Width, upmy = 0,
-	upMy = frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
-	unsigned short domx = 0,
-	doMx = frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Width,
-	domy = Height - frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height,
-	doMy = Height;
-	unsigned short slmx = 0, slMx = frames[IE_GUI_SCROLLBAR_SLIDER]->Width;
+	unsigned short upMy = frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
+	unsigned short doMy = frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height;
+	unsigned short domy = Height - doMy;
 	unsigned short slmy = ( unsigned short )
 		( upMy +
 		( Pos * ( ( domy - frames[5]->Height - upMy ) /
 		( double ) ( Value == 1 ? Value : Value - 1 ) ) ) );
-	unsigned short slMy = slmy + frames[IE_GUI_SCROLLBAR_SLIDER]->Height;
 	unsigned short slx = ( Width / 2 ) -
 		( frames[IE_GUI_SCROLLBAR_SLIDER]->Width / 2 );
 
 	if (( State & UP_PRESS ) != 0) {
 		core->GetVideoDriver()->BlitSprite( frames[IE_GUI_SCROLLBAR_UP_PRESSED],
-									x +
-									XPos, y +
-									YPos, true );
+			x + XPos, y + YPos, true );
 	} else {
 		core->GetVideoDriver()->BlitSprite( frames[IE_GUI_SCROLLBAR_UP_UNPRESSED],
-									x +
-									XPos, y +
-									YPos, true );
+			x + XPos, y + YPos, true );
 	}
-	int maxy = y +
-		YPos +
-		Height -
+	int maxy = y + YPos + Height -
 		frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height;
 	int stepy = frames[IE_GUI_SCROLLBAR_TROUGH]->Height;
-	int w = frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Width;
-	Region rgn( x +
-		XPos,
-		y +
-		YPos +
-		frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height, Width,
-		Height -
-		frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height -
-		frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height );
-	for (int dy = y + YPos + frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
-		dy < maxy;
-		dy += stepy) {
+	Region rgn( x + XPos, y + YPos + upMy, Width, domy - upMy);
+	for (int dy = y + YPos + upMy; dy < maxy; dy += stepy) {
 		core->GetVideoDriver()->BlitSprite( frames[IE_GUI_SCROLLBAR_TROUGH],
-									x +
-									XPos +
-									( ( Width / 2 ) -
-			frames[IE_GUI_SCROLLBAR_TROUGH]->Width /
-			2 ),
-									dy, true, &rgn );
-		//core->GetVideoDriver()->BlitSprite(frames[IE_GUI_SCROLLBAR_TROUGH], x+XPos+(Width/8)+1, dy, true);
+			x + XPos + ( ( Width / 2 ) -
+			frames[IE_GUI_SCROLLBAR_TROUGH]->Width / 2 ),
+			dy, true, &rgn );
 	}
 	if (( State & DOWN_PRESS ) != 0) {
 		core->GetVideoDriver()->BlitSprite( frames[IE_GUI_SCROLLBAR_DOWN_PRESSED],
-									x +
-									XPos, maxy, true );
+			x + XPos, maxy, true );
 	} else {
 		core->GetVideoDriver()->BlitSprite( frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED],
-									x +
-									XPos, maxy, true );
+			x + XPos, maxy, true );
 	}
 	core->GetVideoDriver()->BlitSprite( frames[IE_GUI_SCROLLBAR_SLIDER],
-								x +
-								XPos +
-								slx +
-								frames[IE_GUI_SCROLLBAR_SLIDER]->XPos,
-								y +
-								YPos +
-								slmy +
-								frames[IE_GUI_SCROLLBAR_SLIDER]->YPos,
-								true );
+			x + XPos + slx + frames[IE_GUI_SCROLLBAR_SLIDER]->XPos,
+			y + YPos + slmy + frames[IE_GUI_SCROLLBAR_SLIDER]->YPos,
+			true );
 }
 
 void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
