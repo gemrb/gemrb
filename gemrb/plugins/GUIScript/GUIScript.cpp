@@ -280,6 +280,33 @@ static PyObject * GemRB_SetButtonFlags(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SetButtonState(PyObject *self, PyObject *args)
+{
+	int WindowIndex, ControlIndex, state;
+
+	if(!PyArg_ParseTuple(args, "iii", &WindowIndex, &ControlIndex, &state)) {
+		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return NULL;
+
+	if(ctrl->ControlType != 0)
+		return NULL;
+
+	Button * btn = (Button*)ctrl;
+	btn->SetState(state);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_PlaySound(PyObject *self, PyObject *args)
 {
 	char* ResRef;
@@ -343,6 +370,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"SetButtonFlags", GemRB_SetButtonFlags, METH_VARARGS,
      "Sets the Display Flags of a Button."},
+
+	{"SetButtonState", GemRB_SetButtonState, METH_VARARGS,
+     "Sets the state of a Button Control."},
 
 	{"PlaySound", GemRB_PlaySound, METH_VARARGS,
      "Plays a Sound."},
