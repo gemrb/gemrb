@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.63 2003/12/19 23:07:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.64 2003/12/20 19:19:40 avenger_teambg Exp $
  *
  */
 
@@ -117,6 +117,7 @@ private:
 	PathFinder * pathfinder;
 	int GameFeatures;
 	char ButtonFont[9];
+	char CursorBam[9];
 public:
 	Animation **Cursors;
 	int CursorCount;

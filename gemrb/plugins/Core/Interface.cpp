@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.104 2003/12/19 23:05:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.105 2003/12/20 19:19:41 avenger_teambg Exp $
  *
  */
 
@@ -66,6 +66,7 @@ Interface::Interface(void)
 	GamePath[0]=0;
 	GemRBPath[0]=0;
 	memcpy(ButtonFont,"STONESML",9);
+	memcpy(CursorBam,"CAROT\0\0\0",9);
 	GameFeatures=0;
 	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
@@ -298,7 +299,7 @@ int Interface::Init()
 	}
 	printStatus("OK", LIGHT_GREEN);
 	strcpy(NextScript, "Start");
-	AnimationFactory *af=(AnimationFactory*) GetResourceMgr()->GetFactoryResource("CAROT",IE_BAM_CLASS_ID);
+	AnimationFactory *af=(AnimationFactory*) GetResourceMgr()->GetFactoryResource(CursorBam,IE_BAM_CLASS_ID);
 	printMessage("Core", "Setting up the Console...", WHITE);
 	ChangeScript = true;
 	console = new Console();
@@ -622,6 +623,9 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "ForceStereo") == 0) {
 			ForceStereo = atoi(value);
+		}
+		else if(stricmp(name, "CursorBam") ==0) {
+			strncpy(CursorBam, value, 8);
 		}
 		else if(stricmp(name, "ButtonFont") ==0) {
 			strncpy(ButtonFont, value, 8);
