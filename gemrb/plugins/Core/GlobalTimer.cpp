@@ -10,8 +10,8 @@ GlobalTimer::GlobalTimer(void)
 	CutScene = NULL;
 	MovingActor = NULL;
 	fadeToCounter = 0;
-	fadeFromCounter = 0;
-	fadeFromMax = 1;
+	fadeFromCounter = 1;
+	fadeFromMax = 0;
 	waitCounter = 0;
 	shakeCounter = 0;
 	shakeX = shakeY = 0;
@@ -30,15 +30,21 @@ void GlobalTimer::Update()
 		if(fadeToCounter) {
 			core->GetVideoDriver()->SetFadePercent(((fadeToMax-fadeToCounter)*100)/fadeToMax);
 			fadeToCounter--;
-		} else if(fadeFromCounter != (fadeFromMax+1)) {
-			core->GetVideoDriver()->SetFadePercent(((fadeFromMax-fadeFromCounter)*100)/fadeFromMax);
-			fadeFromCounter++;
-		} else if(shakeCounter) {
-			if(shakeCounter != 1)
-				core->GetVideoDriver()->SetViewport((-((short)shakeX>>1)) + shakeStartVP.x + (rand()%shakeX), (-((short)shakeY>>1)) + shakeStartVP.y + (rand()%shakeY));
-			else
-				core->GetVideoDriver()->SetViewport(shakeStartVP.x, shakeStartVP.y);
-			shakeCounter--;
+			return;
+		} else {
+			if(fadeFromCounter != (fadeFromMax+1)) {
+				core->GetVideoDriver()->SetFadePercent(((fadeFromMax-fadeFromCounter)*100)/fadeFromMax);
+				fadeFromCounter++;
+				return;
+			} else {
+				if(shakeCounter) {
+					if(shakeCounter != 1)
+						core->GetVideoDriver()->SetViewport((-((short)shakeX>>1)) + shakeStartVP.x + (rand()%shakeX), (-((short)shakeY>>1)) + shakeStartVP.y + (rand()%shakeY));
+					else
+						core->GetVideoDriver()->SetViewport(shakeStartVP.x, shakeStartVP.y);
+					shakeCounter--;
+				}
+			}
 		}
 		if(MovingActor && MovingActor->path)
 			return;
@@ -67,15 +73,15 @@ void GlobalTimer::SetFadeToColor(unsigned long Count)
 {
 	fadeToCounter = Count;
 	fadeToMax = fadeToCounter;
-	/*if(fadeToMax == 1) {
+	if(fadeToMax == 1) {
 		core->GetVideoDriver()->SetFadePercent(100);
 		fadeToCounter--;
-	}*/
+	}
 }
 
 void GlobalTimer::SetFadeFromColor(unsigned long Count)
 {
-	fadeFromCounter = 0;
+	fadeFromCounter = 1;
 	fadeFromMax = Count;
 }
 
@@ -92,6 +98,11 @@ void GlobalTimer::SetMovingActor(Actor * actor)
 void GlobalTimer::SetCutScene(GameScript * script)
 {
 	CutScene = script;
+	if(CutScene) {
+		CutScene->Update(); //Caches the Script
+		CutScene->Update(); //Executes the Script
+		return;
+	}
 }
 
 void GlobalTimer::SetScreenShake(unsigned long shakeX, unsigned long shakeY, unsigned long Count)
