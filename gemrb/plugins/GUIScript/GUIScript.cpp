@@ -13,7 +13,11 @@ extern "C" {
 #endif
 #define _DEBUG
 #else
+#ifndef WIN32
+#include "/usr/local/include/python2.3/Python.h"
+#else
 #include "Python.h"
+#endif
 #endif
 
 static PyObject * GemRB_LoadWindowPack(PyObject *self, PyObject *args)
@@ -257,15 +261,29 @@ bool GUIScript::Init(void)
 	if(!pGemRB)
 		return false;
 	pGemRBDict = PyModule_GetDict(pGemRB);
-	char path[_MAX_PATH];
 	char string[256];
-	strcpy(path, core->GemRBPath);
 	if(PyRun_SimpleString("import sys")==-1) {
 		PyRun_SimpleString("pdb.pm()");
 		PyErr_Print();
 		return false;
 	}
-	sprintf(string, "sys.path.append('H:\\\\Projects\\\\gemrb\\\\gemrb\\\\GUIScripts')");
+	#ifdef WIN32
+	char path[_MAX_PATH];
+	int len = strlen(core->GemRBPath);
+	int p = 0;
+	for(int i = 0; i < len; i++) {
+		if(core->GemRBPath[i] == '\\') {
+			path[p++] = '\\';
+			path[p] = '\\';
+		}
+		else
+			path[p] = core->GemRBPath[i];
+		p++;
+	}
+	sprintf(string, "sys.path.append('%sGUIScripts')", path);
+	#else
+	sprintf(string, "sys.path.append('%sGUIScripts')", core->GemRBPath);
+	#endif
 	if(PyRun_SimpleString(string)==-1){
 		PyRun_SimpleString("pdb.pm()");
 		PyErr_Print();

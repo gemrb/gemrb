@@ -8,7 +8,11 @@
 #include "Python.h"
 #define _DEBUG
 #else
+#ifndef WIN32
+#include "/usr/local/include/python2.3/Python.h"
+#else
 #include "Python.h"
+#endif
 #endif
 
 class GUIScript : public ScriptEngine
