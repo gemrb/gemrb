@@ -92,7 +92,6 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1048,-1) # new line
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,GemRB.GetVar("Race")-1,2))
-	print "Race: ",  GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race")-1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,12136, -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	KitIndex = GemRB.GetVar("Class Kit")
@@ -133,7 +132,7 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar("Class Kit")
 	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
-	t=GemRB.GetVar("Alignment")
+	t = GemRB.GetVar("Alignment")
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
 
 	#mage spells
@@ -150,19 +149,16 @@ def NextPress():
 	TableName = GemRB.GetTableValue(TmpTable, Class, 1)
 	if TableName != "*":
 		ClassFlag = 0 #set this according to class
-		Learnable = GetLearnablePriestSpells( ClassFlag, GemRB.GetVar("Alignment"), 1)
+		Learnable = GetLearnablePriestSpells( ClassFlag, t, 1)
 		for i in range(len(Learnable) ):
 			GemRB.LearnSpell(MyChar, Learnable[i], 0)
 
 	TmpTable=GemRB.LoadTable("repstart")
+	t=GemRB.FindTableValue(AlignmentTable, 3, t)
 	t=GemRB.GetTableValue(TmpTable,t,0)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
 	GemRB.UnloadTable(TmpTable)
 	TmpTable=GemRB.LoadTable("strtgold")
-	print "count ",GemRB.GetTableValue(TmpTable,Class,1)
-	print "size ",GemRB.GetTableValue(TmpTable,Class,0)
-	print "add ",GemRB.GetTableValue(TmpTable,Class,2)
-	print "mult ",GemRB.GetTableValue(TmpTable,Class,3)
 	t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,1),GemRB.GetTableValue(TmpTable,Class,0), GemRB.GetTableValue(TmpTable,Class,2) )
 	GemRB.SetPlayerStat(MyChar, IE_GOLD, t*GemRB.GetTableValue(TmpTable,Class,3) )
 	GemRB.UnloadTable(ClassTable)
@@ -215,7 +211,6 @@ def NextPress():
 	#LETS PLAY!!
 	playmode = GemRB.GetVar("PlayMode")
 	if playmode >=0:
-		print "PlayMode: ",playmode
 		GemRB.EnterGame()
 	else:
 		#leaving multi player pregen

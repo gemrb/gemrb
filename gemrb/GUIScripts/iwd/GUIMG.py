@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIMG.py,v 1.1 2004/10/15 20:38:55 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIMG.py,v 1.2 2004/12/09 22:08:06 avenger_teambg Exp $
 
 
 # GUIMG.py - scripts to control mage spells windows from GUIMG winpack
@@ -25,6 +25,7 @@
 
 import GemRB
 from GUIDefines import *
+from ie_stats import *
 from GUICommon import CloseOtherWindow
 from GUICommonWindows import SetSelectionChangeHandler
 
@@ -170,6 +171,11 @@ i)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			GemRB.SetTooltip (Window, Button, '')
 			GemRB.EnableButtonBorder (Window, Button, 0, 0)
+	Table = GemRB.LoadTable ("clskills")
+	if (GemRB.GetTableValue (Table, GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 2)=="*"):
+		GemRB.SetVisible (Window, 2)
+	else:
+		GemRB.SetVisible (Window, 1)
 
 
 def MagePrevLevelPress ():

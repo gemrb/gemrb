@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.4 2004/12/07 18:16:09 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.5 2004/12/09 22:08:04 avenger_teambg Exp $
 
 import GemRB
 # GUICommon.py - common functions for GUIScripts of all game types
@@ -42,11 +42,12 @@ def GetLearnableMageSpells (Kit, Alignment, Level):
 	Learnable =[]
 
 	Table=GemRB.LoadTable("aligns")
+	v = GemRB.FindTableValue(Table, 3, Alignment)
+	print "%x=%x"%(Alignment,v)
 	#usability is the bitset we look for
-	Usability=Kit | GemRB.GetTableValue(Table, Alignment, 5)
-	GemRB.UnloadTable(Table)
+	Usability=Kit | GemRB.GetTableValue(Table, v, 5)
 
-	SchoolFlag = Kit | Usability
+	print "Alignment: %x, Kit:%x  Usability %x"%(Alignment, Kit, Usability)
 	for i in range(100):
 		SpellName = "SPWI%d%02d"%(Level,i)
 		ms = GemRB.GetSpell(SpellName)
@@ -61,9 +62,9 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 	Learnable =[]
 
 	Table=GemRB.LoadTable("aligns")
+	v = GemRB.FindTableValue(Table, 3, Alignment)
 	#usability is the bitset we look for
-	Usability=GemRB.GetTableValue(Table, Alignment, 5)
-	GemRB.UnloadTable(Table)
+	Usability=GemRB.GetTableValue(Table, v, 5)
 
 	for i in range(100):
 		SpellName = "SPPR%d%02d"%(Level,i)

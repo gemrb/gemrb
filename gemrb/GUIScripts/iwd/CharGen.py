@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.27 2004/12/08 21:10:59 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.28 2004/12/09 22:08:06 avenger_teambg Exp $
 
 
 #Character Generation
@@ -291,13 +291,12 @@ def AcceptPress():
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
 
-	ClassTable = GemRB.LoadTable("classes")
 	ClassIndex = GemRB.GetVar("Class")-1
 	Class = GemRB.GetTableValue(ClassTable, ClassIndex, 5)
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar("Class Kit")
 	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
-	t = GemRB.GetVar("Alignment")
+	t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment"), 3)
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
 
 	#mage spells
@@ -314,12 +313,12 @@ def AcceptPress():
 	TableName = GemRB.GetTableValue(TmpTable, Class, 1)
 	if TableName != "*":
 		ClassFlag = 0 #set this according to class
-		Learnable = GetLearnablePriestSpells( ClassFlag, GemRB.GetVar("Alignment"), 1)
+		Learnable = GetLearnablePriestSpells( ClassFlag, t, 1)
 		for i in range(len(Learnable) ):
 			GemRB.LearnSpell(MyChar, Learnable[i], 0)
 
 	TmpTable = GemRB.LoadTable("repstart")
-	t = GemRB.FindTableValue(AlignmentTable, 3, t)
+	t=GemRB.FindTableValue(AlignmentTable, 3, t)
 	t = GemRB.GetTableValue(TmpTable, t, 0)
 	GemRB.UnloadTable(TmpTable)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
@@ -352,6 +351,10 @@ def AcceptPress():
 	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability 6"))
 
 	GemRB.SetPlayerName(MyChar, GemRB.GetToken("CHARNAME"), 0)
+	TmpTable = GemRB.LoadTable ("clskills")
+	GemRB.SetPlayerStat(MyChar, IE_XP, GemRB.GetTableValue (TmpTable, Class, 3) )  #this will also set the level (automatically)
+	GemRB.UnloadTable(TmpTable)
+
 	GemRB.FillPlayerInfo(MyChar, PortraitName+"L", PortraitName+"S")
 	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("PartyFormation")
@@ -823,9 +826,9 @@ def KitPress():
 	KitTable = GemRB.LoadTable("magesch")
 	GemRB.SetVar("MAGESCHOOL",0)
 
-        for i in range(0,8):
+	for i in range(0,8):
 		Button = GemRB.GetControl(KitWindow, i+2)
-                GemRB.SetButtonFlags(KitWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		GemRB.SetButtonFlags(KitWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		GemRB.SetText(KitWindow, Button, GemRB.GetTableValue(KitTable, i+1, 0) )
 		GemRB.SetVarAssoc(KitWindow, Button, "MAGESCHOOL", i+1)
 		GemRB.SetEvent(KitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "KitHelpPress")
@@ -1576,7 +1579,9 @@ def MageSpellsSelect():
 	GemRB.SetVisible(CharGenWindow, 0)
 	MageSpellsWindow = GemRB.LoadWindow(7)
 	#kit (school), alignment, level
-	Learnable = GetLearnableMageSpells(GemRB.GetVar("Kit"), GemRB.GetVar("Alignment"),1)
+	AlignmentTable = GemRB.LoadTable("aligns")
+	t = GemRB.GetTableValue( AlignmentTable, GemRB.GetVar("Alignment"), 3)
+	Learnable = GetLearnableMageSpells(GemRB.GetVar("Kit"), t,1)
 	GemRB.SetVar("MageSpellBook", 0)
 	GemRB.SetVar("SpellMask", 0)
 
@@ -1945,13 +1950,13 @@ def AppearancePress():
 
 def ApperanceDrawAvatar():
 	global AppearanceAvatarButton, RaceTable, ClassTable
-	AppearanceAvatarTable = GemRB.LoadTable("PDOLLS")
+	AppearanceAvatarTable = GemRB.LoadTable("pdolls")
 	AvatarID = 0x5000
-	table = GemRB.LoadTable("AVPREFR")
+	table = GemRB.LoadTable("avprefr")
 	AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Race"),0)
-	table = GemRB.LoadTable("AVPREFC")
+	table = GemRB.LoadTable("avprefc")
 	AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Class"),0)
-	table = GemRB.LoadTable("AVPREFG")
+	table = GemRB.LoadTable("avprefg")
 	AvatarID = AvatarID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
 
 	AvatarRef = GemRB.GetTableValue(AppearanceAvatarTable, hex(AvatarID), "LEVEL1")
