@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.25 2004/10/17 09:50:44 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.26 2005/02/11 11:17:13 edheldil Exp $
  *
  */
 
@@ -150,8 +150,10 @@
 #define IE_REPUTATION	48
 #define IE_HATEDRACE	49
 #define IE_DAMAGEBONUS	50
-#define IE_SPELLFAILUREMAGE	51
-#define IE_SPELLFAILUREPRIEST	52
+#define IE_SPELLFAILUREMAGE	51 // In PST this stores secondary level exp
+#define IE_SPELLFAILUREPRIEST	52 // In PST this stores tertiary level exp
+#define IE_XP_MAGE	51 // In PST this stores secondary level exp
+#define IE_XP_THIEF	52 // In PST this stores tertiary level exp
 #define IE_SPELLDURATIONMODMAGE	53
 #define IE_SPELLDURATIONMODPRIEST	54
 #define IE_TURNUNDEADLEVEL	55

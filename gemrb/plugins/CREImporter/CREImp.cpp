@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.57 2005/01/29 17:59:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.58 2005/02/11 11:17:13 edheldil Exp $
  *
  */
 
@@ -408,7 +408,9 @@ void CREImp::GetActorPST(Actor *act)
 	ReadScript(act, 4);
 	ReadScript(act, 5);
 
-	str->Seek( 52, GEM_CURRENT_POS );
+	str->Seek( 44, GEM_CURRENT_POS );
+	str->ReadDword( &act->BaseStats[IE_XP_MAGE] ); // Exp for secondary class
+	str->ReadDword( &act->BaseStats[IE_XP_THIEF] ); // Exp for tertiary class
 	for(i = 0; i<10; i++) {
 		str->ReadWord( &tmpWord );
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
