@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.34 2004/01/05 12:36:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.35 2004/01/05 14:02:49 balrog994 Exp $
  *
  */
 
@@ -1429,6 +1429,7 @@ void GameScript::SmallWait(Scriptable * Sender, Action * parameters)
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
+	
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
 		Sender->CurrentAction->delayFree = true;
@@ -1683,9 +1684,9 @@ void GameScript::Dialogue(Scriptable * Sender, Action * parameters)
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
 	if(!scr)
 		return;
+	Sender->CurrentAction->delayFree = true;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1784,9 +1785,9 @@ void GameScript::OpenDoor(Scriptable * Sender, Action * parameters)
 		return;
 	if(scr->Type != ST_ACTOR)
 		return;
+	Sender->CurrentAction->delayFree = true;
 	if(scr != Sender) { //this is an Action Override
 		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction->delayFree = true;
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -1805,7 +1806,10 @@ void GameScript::OpenDoor(Scriptable * Sender, Action * parameters)
 	} else {
 		Sender->AddActionInFront(Sender->CurrentAction);
 		Sender->CurrentAction->delayFree = true;
-		actor->WalkTo(p->x, p->y);
+		char Tmp[256];
+		sprintf(Tmp, "MoveToPoint([%d,%d])", p->x, p->y);
+		actor->AddActionInFront(GameScript::CreateAction(Tmp, true));
+		Sender->CurrentAction = NULL;
 	}
 }
 
@@ -1837,6 +1841,9 @@ void GameScript::CloseDoor(Scriptable * Sender, Action * parameters)
 	} else {
 		Sender->AddActionInFront(Sender->CurrentAction);
 		Sender->CurrentAction->delayFree = true;
-		actor->WalkTo(p->x, p->y);
+		char Tmp[256];
+		sprintf(Tmp, "MoveToPoint([%d,%d])", p->x, p->y);
+		actor->AddActionInFront(GameScript::CreateAction(Tmp, true));
+		Sender->CurrentAction = NULL;
 	}
 }
