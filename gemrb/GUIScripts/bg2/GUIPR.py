@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.4 2004/09/11 13:29:37 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.5 2004/09/12 11:15:39 avenger_teambg Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -98,8 +98,7 @@ def UpdatePriestWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	type = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel
-	# FIXME: how to calculate it???
-	max_mem_cnt = 10
+	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
 
 	Label = GemRB.GetControl (Window, 0x10000032)
 	GemRB.SetText (Window, Label, GemRB.GetString(12137)+str(level+1) )
@@ -113,6 +112,7 @@ def UpdatePriestWindow ():
 		Button = GemRB.GetControl (Window, 3 + i)
 		if i < mem_cnt:
 			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
+			print ms
 			GemRB.SetSpellIcon (Window, Button, ms['SpellResRef'])
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)

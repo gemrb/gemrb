@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.114 2004/09/09 16:42:15 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.115 2004/09/12 11:15:41 avenger_teambg Exp $
  *
  */
 
@@ -285,7 +285,7 @@ public:
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
 	int LoadTable(const char * ResRef);
 	/** Gets the index of a loaded table, returns -1 on error */
-	int GetIndex(const char * ResRef);
+	int GetTableIndex(const char * ResRef);
 	/** Gets a Loaded Table by its index, returns NULL on error */
 	TableMgr * GetTable(unsigned int index);
 	/** Frees a Loaded Table, returns false on error, true on success */

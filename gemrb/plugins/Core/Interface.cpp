@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.215 2004/09/11 14:28:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.216 2004/09/12 11:15:41 avenger_teambg Exp $
  *
  */
 
@@ -1757,7 +1757,7 @@ MusicMgr* Interface::GetMusicMgr()
 /** Loads a 2DA Table, returns -1 on error or the Table Index on success */
 int Interface::LoadTable(const char* ResRef)
 {
-	int ind = GetIndex( ResRef );
+	int ind = GetTableIndex( ResRef );
 	if (ind != -1) {
 		return ind;
 	}
@@ -1794,7 +1794,7 @@ int Interface::LoadTable(const char* ResRef)
 	return ( int ) tables.size() - 1;
 }
 /** Gets the index of a loaded table, returns -1 on error */
-int Interface::GetIndex(const char* ResRef)
+int Interface::GetTableIndex(const char* ResRef)
 {
 	for (size_t i = 0; i < tables.size(); i++) {
 		if (tables[i].free)

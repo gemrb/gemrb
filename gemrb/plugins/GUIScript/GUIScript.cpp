@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.207 2004/09/11 10:18:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.208 2004/09/12 11:15:42 avenger_teambg Exp $
  *
  */
 
@@ -562,6 +562,7 @@ static PyObject* GemRB_UnloadTable(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+#if 0
 PyDoc_STRVAR( GemRB_GetTable__doc,
 "GetTable(2DAResRef) => TableIndex\n\n"
 "Returns a loaded 2DA Table." );
@@ -581,6 +582,7 @@ static PyObject* GemRB_GetTable(PyObject * /*self*/, PyObject* args)
 
 	return Py_BuildValue( "i", ind );
 }
+#endif //0
 
 PyDoc_STRVAR( GemRB_GetTableValue__doc,
 "GetTableValue(TableIndex, RowIndex/RowString, ColIndex/ColString) => value\n\n"
@@ -3568,9 +3570,30 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetMemorizableSpellsCount__doc,
+"GetMemorizableSpellsCount(PartyID, SpellType, Level)=>int\n\n"
+"Returns number of memorizable spells of given type and level in PartyID's spellbook" );
+
+static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
+{
+	int PartyID, SpellType, Level;
+
+	if (!PyArg_ParseTuple( args, "iii", &PartyID, &SpellType, &Level )) {
+		return AttributeError( GemRB_GetMemorizableSpellsCount__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+
+	//this isn't in the actor's spellbook, handles Wisdom
+	return Py_BuildValue( "i", actor->GetMemorizableSpellsCount( (ieSpellType) SpellType, Level ) );
+}
+
 PyDoc_STRVAR( GemRB_GetKnownSpellsCount__doc,
 "GetKnownSpellsCount(PartyID, SpellType, Level)=>int\n\n"
-"Returns number of known spells of given type and level in PartyID's spellbook" );
+"Returns number of known spells of given type and level in PartyID's spellbook." );
 
 static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 {
@@ -3590,7 +3613,7 @@ static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetKnownSpell__doc,
 "GetKnownSpell(PartyID, SpellType, Level, Index)=>dict\n\n"
-"Returns dict with specified known spell from PC's spellbook" );
+"Returns dict with specified known spell from PC's spellbook." );
 
 static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -3622,7 +3645,7 @@ static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetMemorizedSpellsCount__doc,
 "GetMemorizedSpellsCount(PartyID, SpellType, Level)=>int\n\n"
-"Returns number of spells of given type and level in PartyID's spellbook" );
+"Returns number of spells of given type and level in PartyID's memory." );
 
 static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* args)
 {
@@ -3999,7 +4022,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetWindowPicture, METH_VARARGS),
 	METHOD(LoadTable, METH_VARARGS),
 	METHOD(UnloadTable, METH_VARARGS),
-	METHOD(GetTable, METH_VARARGS),
+	//METHOD(GetTable, METH_VARARGS),
 	METHOD(GetTableValue, METH_VARARGS),
 	METHOD(FindTableValue, METH_VARARGS),
 	METHOD(GetTableRowIndex, METH_VARARGS),
@@ -4087,6 +4110,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
 	METHOD(GetCurrentArea, METH_NOARGS),
 	METHOD(MoveToArea, METH_VARARGS),
+	METHOD(GetMemorizableSpellsCount, METH_VARARGS),
 	METHOD(GetKnownSpellsCount, METH_VARARGS),
 	METHOD(GetKnownSpell, METH_VARARGS),
 	METHOD(GetMemorizedSpellsCount, METH_VARARGS),
