@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libBIFImporter.la
 INCLUDES = $(all_includes)
-LDFLAGS =     
+#LDFLAGS =     
 libBIFImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libBIFImporter_la_LIBADD = ../Core/libcore.la
 libBIFImporter_la_METASOURCES = AUTO

@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libMVEPlayer.la
 INCLUDES = $(all_includes)
-LDFLAGS =     
+#LDFLAGS =     
 libMVEPlayer_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libMVEPlayer_la_LIBADD = ../Core/libcore.la
 libMVEPlayer_la_METASOURCES = AUTO

@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libTISImporter.la
 INCLUDES = $(all_includes)
-LDFLAGS =     
+#LDFLAGS =     
 libTISImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libTISImporter_la_LIBADD = ../Core/libcore.la
 libTISImporter_la_METASOURCES = AUTO
