@@ -16,7 +16,6 @@ def OnLoad():
 	GemRB.SetVar("LoadIdx",0)
 	GemRB.SetVar("TopIndex",0)
 	GameCount=GemRB.GetSaveGameCount()   #count of games in save folder?
-	print "GameCount", GameCount
 
 	for i in range(0,4):
 		Button = GemRB.GetControl(LoadWindow,26+i)
@@ -44,7 +43,9 @@ def OnLoad():
 	GemRB.SetVarAssoc(LoadWindow, ScrollBar, "TopIndex", GameCount)
 	GemRB.SetEvent(LoadWindow, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
 	ScrollBarPress()
+	print "SetVisible"
 	GemRB.SetVisible(LoadWindow,1)
+	print "SetVisible done"
 	return
 
 def ScrollBarPress():
@@ -53,27 +54,39 @@ def ScrollBarPress():
 	for i in range(0,4):
 		ActPos = Pos + i
 
-		Slotname = GemRB.GetSaveGameAttrib(0,ActPos)
+		if ActPos<GameCount:
+			Button = GemRB.GetControl(LoadWindow,26+i)
+			GemRB.SetButtonState(LoadWindow, Button, IE_GUI_BUTTON_ENABLED)
+			Button = GemRB.GetControl(LoadWindow, 30+i)
+			GemRB.SetButtonState(LoadWindow, Button, IE_GUI_BUTTON_ENABLED)
+
+		if ActPos<GameCount:
+			Slotname = GemRB.GetSaveGameAttrib(0,ActPos)
+		else:
+			Slotname = ""
 		Label = GemRB.GetControl(LoadWindow, 0x10000008+i)
 		GemRB.SetText(LoadWindow, Label, Slotname)
 
-		Slotname = GemRB.GetSaveGameAttrib(1,ActPos)
+		if ActPos<GameCount:
+			Slotname = GemRB.GetSaveGameAttrib(3,ActPos)
+		else:
+			Slotname = ""
 		Label = GemRB.GetControl(LoadWindow, 0x10000010+i)
 		GemRB.SetText(LoadWindow, Label, Slotname)
 
 		Button=GemRB.GetControl(LoadWindow, 1+i)
 		if ActPos<GameCount:
-		#			Portrait=GemRB.GetAreaPortrait(ActPos)
-			Portrait=""
+			GemRB.SetSaveGamePreview(LoadWindow, Button, ActPos)
 		else:
-			Portrait=""
-		GemRB.SetButtonPicture(LoadWindow, Button, Portrait)
-		for j in range(0,8):
+			GemRB.SetButtonPicture(LoadWindow, Button, "")
+		print "ActPos:",ActPos
+		for j in range(0,6):
 			Button=GemRB.GetControl(LoadWindow, 40 + i*6 + j)
 			if ActPos<GameCount:
-		#				Portrait=GemRB.GetPCPortrait(ActPos,j+1)
-				Portrait=""
-			GemRB.SetButtonPicture(LoadWindow, Button, Portrait)
+				GemRB.SetSaveGamePortrait(LoadWindow, Button, ActPos,j)
+			else:
+				GemRB.SetButtonPicture(LoadWindow, Button, "")
+	print "All done"
 	return
 
 def LoadGamePress():
