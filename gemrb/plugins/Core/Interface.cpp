@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.175 2004/07/24 23:47:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.176 2004/07/25 00:23:16 edheldil Exp $
  *
  */
 
@@ -89,8 +89,9 @@ Interface::Interface(int iargc, char** iargv)
 	tooltip_y = 0;
 	tooltip_text = NULL;
 	
-	pal256 = NULL;
 	pal16 = NULL;
+	pal32 = NULL;
+	pal256 = NULL;
 
 	CursorCount = 0;
 	Cursors = NULL;
@@ -113,11 +114,15 @@ Interface::Interface(int iargc, char** iargv)
 	GameName[0] = 0;
 	memcpy( GameOverride, "override", 9 );
 	memcpy( GameData, "data\0\0\0\0", 9 );
+	strcpy( INIConfig, "baldur.ini" );
 	memcpy( ButtonFont, "STONESML", 9 );
 	memcpy( TooltipFont, "STONESML", 9 );
 	memcpy( CursorBam, "CAROT\0\0\0", 9 );
 	memcpy( GlobalScript, "BALDUR\0\0", 9 );
 	memcpy( GlobalMap, "WORLDMAP", 9 );
+	strcpy( Palette16, "MPALETTE" );
+	strcpy( Palette32, "PAL32" );
+	strcpy( Palette256, "MPAL256" );
 	GameFeatures = 0;
 }
 
@@ -185,6 +190,9 @@ Interface::~Interface(void)
 	}
 	if (pal256) {
 		FreeInterface( pal256 );
+	}
+	if (pal32) {
+		FreeInterface( pal32 );
 	}
 	if (pal16) {
 		FreeInterface( pal16 );
@@ -315,27 +323,38 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	strings->Open( fs, true );
+
 	printMessage( "Core", "Loading Palettes...\n", WHITE );
-	DataStream* bmppal256 = NULL, * bmppal16 = NULL;
+	DataStream* bmppal16 = NULL;
+	DataStream* bmppal32 = NULL;
+	DataStream* bmppal256 = NULL;
 	if (!IsAvailable( IE_BMP_CLASS_ID )) {
 		printf( "No BMP Importer Available.\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
-	bmppal256 = key->GetResource( "MPAL256\0", IE_BMP_CLASS_ID );
-	if (bmppal256) {
-		pal256 = ( ImageMgr * ) GetInterface( IE_BMP_CLASS_ID );
-		pal256->Open( bmppal256, true );
-	} else {
-		pal256 = NULL;
-	}
-	bmppal16 = key->GetResource( "MPALETTE", IE_BMP_CLASS_ID );
+	bmppal16 = key->GetResource( Palette16, IE_BMP_CLASS_ID );
 	if (bmppal16) {
 		pal16 = ( ImageMgr * ) GetInterface( IE_BMP_CLASS_ID );
 		pal16->Open( bmppal16, true );
 	} else {
 		pal16 = NULL;
 	}
+	bmppal32 = key->GetResource( Palette32, IE_BMP_CLASS_ID );
+	if (bmppal32) {
+		pal32 = ( ImageMgr * )this->GetInterface( IE_BMP_CLASS_ID );
+		pal32->Open( bmppal32, true );
+	} else {
+		pal32 = NULL;
+	}
+	bmppal256 = key->GetResource( Palette256, IE_BMP_CLASS_ID );
+	if (bmppal256) {
+		pal256 = ( ImageMgr * ) GetInterface( IE_BMP_CLASS_ID );
+		pal256->Open( bmppal256, true );
+	} else {
+		pal256 = NULL;
+	}
 	printMessage( "Core", "Palettes Loaded\n", WHITE );
+
 	printMessage( "Core", "Loading Fonts...\n", WHITE );
 	if (!IsAvailable( IE_BAM_CLASS_ID )) {
 		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
@@ -972,11 +991,36 @@ bool Interface::LoadGemRBINI()
 
 	printStatus( "OK", LIGHT_GREEN );
 
+	const char *s;
 
-	strcpy( CursorBam, ini->GetKeyAsString( "resources", "CursorBAM", "CAROT" ));
-	strcpy( ButtonFont, ini->GetKeyAsString( "resources", "ButtonFont", "STONESML" ));
-	strcpy( TooltipFont, ini->GetKeyAsString( "resources", "TooltipFont", "STONESML" ));
-	strcpy( INIConfig, ini->GetKeyAsString( "resources", "INIConfig", "baldur.ini" ));
+	// Resrefs are already initialized in Interface::Interface() 
+	s = ini->GetKeyAsString( "resources", "CursorBAM", NULL );
+	if (s)
+		strcpy( CursorBam, s );
+
+	s = ini->GetKeyAsString( "resources", "ButtonFont", NULL );
+	if (s)
+		strcpy( ButtonFont, s );
+
+	s = ini->GetKeyAsString( "resources", "TooltipFont", NULL );
+	if (s)
+		strcpy( TooltipFont, s );
+
+	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
+	if (s)
+		strcpy( INIConfig, s );
+	
+	s = ini->GetKeyAsString( "resources", "Palette16", NULL );
+	if (s)
+		strcpy( Palette16, s );
+
+	s = ini->GetKeyAsString( "resources", "Palette32", NULL );
+	if (s)
+		strcpy( Palette32, s );
+
+	s = ini->GetKeyAsString( "resources", "Palette256", NULL );
+	if (s)
+		strcpy( Palette256, s );
 
 
 	SetFeature( ini->GetKeyAsInt( "resources", "IgnoreButtonFrames", 1 ), GF_IGNORE_BUTTON_FRAMES );
@@ -1001,7 +1045,10 @@ bool Interface::LoadGemRBINI()
 Color* Interface::GetPalette(int index, int colors)
 {
 	Color* pal = NULL;
-	if (colors <= 32) {
+	if (colors == 32) {
+		pal = ( Color * ) malloc( colors * sizeof( Color ) );
+		pal32->GetPalette( index, colors, pal );
+	} else if (colors <= 32) {
 		pal = ( Color * ) malloc( colors * sizeof( Color ) );
 		pal16->GetPalette( index, colors, pal );
 	} else if (colors == 256) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.96 2004/07/18 08:33:40 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.97 2004/07/25 00:23:16 edheldil Exp $
  *
  */
 
@@ -95,6 +95,7 @@ public:
 private:
 	Factory * factory;
 	ImageMgr * pal256;
+	ImageMgr * pal32;
 	ImageMgr * pal16;
 	std::vector<Font*> fonts;
 	EventMgr * evntmgr;
@@ -119,6 +120,9 @@ private:
 	char ButtonFont[9];
 	char CursorBam[9];
 	char TooltipFont[9];
+	char Palette16[9];
+	char Palette32[9];
+	char Palette256[9];
 	unsigned int* slotmatrix; //itemtype vs slottype
 	unsigned int* slottypes;  //slottype vs slot mapping
 	int ItemTypes;
