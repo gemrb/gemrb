@@ -682,6 +682,8 @@ void GameControl::SetCutSceneMode(bool active)
 {
 	DisableMouse = active;
 	core->GetVideoDriver()->DisableMouse = active;
+	core->GetVideoDriver()->moveX = 0;
+	core->GetVideoDriver()->moveY = 0;
 }
 
 void GameControl::HideGUI()
