@@ -185,7 +185,9 @@ int ScrollBar::SetText(const char * string, int pos)
 void ScrollBar::SetMax(unsigned short Max)
 {
 	this->Max = Max;
-	if(Pos >= Max)
+	if(Max == 0)
+		Pos = 0;
+	else if(Pos >= Max)
 		Pos = Max-1;
 	if(ta) {
 		TextArea * t = (TextArea*)ta;
