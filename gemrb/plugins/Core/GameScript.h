@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.139 2004/09/12 21:58:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.140 2004/09/22 19:36:59 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,13 @@ class Action;
 #include "SymbolMgr.h"
 #include "Actor.h"
 #include <list>
+
+//displaystring flags
+#define DS_WAIT    1
+#define DS_HEAD    2
+#define DS_CONSOLE 4
+#define DS_CONST   8
+#define DS_NONAME  16
 
 #define BM_SET  0 //gemrb extension
 #define BM_AND  1
@@ -698,6 +705,7 @@ private: //Internal Functions
 	static Targets* EvaluateObject(Object* oC);
 	static int ParseInt(const char*& src);
 	static void ParseString(const char*& src, char* tmp);
+	static void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
 	static int ValidForDialogCore(Scriptable* Sender, Actor* target);
 private:
 	static void CreateVisualEffectCore(Point &position, const char *effect);

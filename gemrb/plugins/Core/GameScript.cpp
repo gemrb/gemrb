@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.196 2004/09/13 16:53:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.197 2004/09/22 19:36:59 avenger_teambg Exp $
  *
  */
 
@@ -1712,6 +1712,30 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 	}
 }
 
+void GameScript::DisplayStringCore(Scriptable* Sender, int Strref, int flags)
+{
+	printf( "Displaying string on: %s\n", Sender->GetScriptName() );
+	if (flags & DS_CONST ) {
+		Actor* actor = ( Actor* ) Sender;
+		Strref=actor->StrRefs[Strref];
+	}
+	StringBlock sb = core->strings->GetStringBlock( Strref );
+	if (flags & DS_HEAD) {
+		Sender->DisplayHeadText( sb.text );
+	}
+	if (flags & DS_CONSOLE) {
+		GameControl *gc=core->GetGameControl();
+		if (gc) {
+			gc->DisplayString( sb.text );
+		}
+	}
+	if (sb.Sound[0] ) {
+		ieDword len = core->GetSoundMgr()->Play( sb.Sound );
+		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
+		if ((counter != 0) && (flags &DS_WAIT) )
+			Sender->SetWait( counter );
+	}
+}
 /* this function was lifted from GenerateAction, to make it clearer */
 Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree)
 {
@@ -5421,15 +5445,7 @@ void GameScript::VerbalConstantHead(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) tar;
-	printf( "Displaying string on: %s\n", actor->GetScriptName() );
-	char *str=core->GetString( actor->StrRefs[parameters->int0Parameter], 2 );
-	GameControl *gc=core->GetGameControl();
-	if (gc) {
-		gc->DisplayString( str);
-	}
-	//this will free the string, no need of freeing it up!
-	actor->DisplayHeadText( str);
+	DisplayStringCore( tar, parameters->int0Parameter, DS_HEAD|DS_CONSOLE|DS_CONST);
 }
 
 void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
@@ -5438,14 +5454,7 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) tar;
-	printf( "Displaying string on: %s\n", actor->GetScriptName() );
-	GameControl *gc=core->GetGameControl();
-	char *str = core->GetString( actor->StrRefs[parameters->int0Parameter], 2 );
-	if (gc) {
-		gc->DisplayString(str);
-	}
-	free(str);
+	DisplayStringCore( tar, parameters->int0Parameter, DS_CONSOLE|DS_CONST);
 }
 
 /** in IWD2 this has no string parameter, saves the location into a local */
@@ -5708,28 +5717,17 @@ void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 
 void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 {
-	if (Sender) {
-		printf( "Displaying string on: %s (without name)\n", Sender->GetScriptName() );
-		//no need of freeing this string up!!!
-		Sender->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
-	}
+	DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD|DS_CONSOLE|DS_NONAME);
 }
 
 void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 {
-	if (Sender) {
-		printf( "Displaying string on: %s\n", Sender->GetScriptName() );
-		//no need of freeing this string up!!!
-		Sender->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
-	}
+	DisplayStringCore(Sender, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
 }
 
 void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
 {
-	printf( "Displaying string on: %s\n", Sender->GetScriptName() );
-	//no need of freeing this string up!!!
-	GameControl *gc = core->GetGameControl();
-	gc->DisplayString( parameters->pointParameter, core->GetString( parameters->int0Parameter, 2 ) );
+	DisplayStringCore(Sender, parameters->int0Parameter, DS_CONSOLE|DS_HEAD);
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
@@ -5791,22 +5789,10 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 	actor->SetWait( 1 );
 }
 
+
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		Sender->CurrentAction = NULL;
-		return;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	printf( "Displaying string on: %s\n", actor->GetScriptName() );
-	StringBlock sb = core->strings->GetStringBlock( parameters->int0Parameter );
-	actor->DisplayHeadText( sb.text );
-	if (sb.Sound[0]) {
-		ieDword len = core->GetSoundMgr()->Play( sb.Sound );
-		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
-		if (counter != 0)
-			actor->SetWait( counter );
-	}
+	DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD|DS_WAIT);
 }
 
 /*pst and bg2 can play a song designated by index*/
@@ -6096,13 +6082,7 @@ void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
 
 void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 {
-	//no need of freeing this string
-	Sender->DisplayHeadText( core->GetString( parameters->int0Parameter) );
-	Sender->textDisplaying = 0; //why?
-	GameControl* gc = core->GetGameControl();
-	if (gc) {
-		gc->DisplayString( Sender );
-	}
+	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE);
 }
 
 void GameScript::AmbientActivate(Scriptable* /*Sender*/, Action* parameters)

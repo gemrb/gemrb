@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.36 2004/09/19 20:01:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.37 2004/09/22 19:37:01 avenger_teambg Exp $
  *
  */
 
@@ -330,8 +330,10 @@ char* TLKImp::GetString(ieStrRef strref, unsigned long flags)
 			if(!target) {
 				target=core->GetGameControl()->speaker;
 			}
-			//IE_STR_SPEECH will stop the previous sound source
-			core->GetSoundMgr()->Play( SoundResRef, target->Pos.x, target->Pos.y, flags & IE_STR_SPEECH);
+			if(target) {
+				//IE_STR_SPEECH will stop the previous sound source
+				core->GetSoundMgr()->Play( SoundResRef, target->Pos.x, target->Pos.y, flags & IE_STR_SPEECH);
+			}
 		}
 	}
 	if (flags & IE_STR_STRREFON) {
