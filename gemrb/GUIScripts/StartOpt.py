@@ -40,7 +40,7 @@ def SoundPress():
 	
 def GamePress():
 	global OptionsWindow
-	
+	GemRB.SetNextScript("GUIOPT8")
 	return
 	
 def GraphicPress():
