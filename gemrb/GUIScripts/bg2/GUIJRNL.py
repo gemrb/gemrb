@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.4 2004/10/02 20:54:43 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.5 2004/10/23 13:01:33 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -35,12 +35,16 @@ from GUIDefines import *
 JournalWindow = None
 LogWindow = None
 QuestsWindow = None
+Section = 0
+Chapter = 0
+Order = 0
 
 ###################################################
 def OpenJournalWindow ():
-	global JournalWindow
+	global JournalWindow, Chapter
 
 	GemRB.HideGUI()
+
 
 	if JournalWindow:
 		if LogWindow: OpenLogWindow()
@@ -59,116 +63,82 @@ def OpenJournalWindow ():
 	JournalWindow = GemRB.LoadWindow (2)
 	GemRB.SetVar("OtherWindow", JournalWindow)
 
+	# prev. chapter
+	Button = GemRB.GetControl (JournalWindow, 3)
+	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "PrevChapterPress")
+
+	# next chapter
+	Button = GemRB.GetControl (JournalWindow, 4)
+	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "NextChapterPress")
+
 	# Quests
-	#Button = GemRB.GetControl (JournalWindow, 0)
-	#GemRB.SetText (JournalWindow, Button, 20430)
-	#GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
+	Button = GemRB.GetControl (JournalWindow, 6)
+	GemRB.SetVarAssoc(JournalWindow, Button, "Section", 1)
+	GemRB.SetText (JournalWindow, Button, 45485)
+	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Quests completed
-	#Button = GemRB.GetControl (JournalWindow, 1)
-	#GemRB.SetText (JournalWindow, Button, 20634)
-	#GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenCompletedWindow")
+	Button = GemRB.GetControl (JournalWindow, 7)
+	GemRB.SetVarAssoc(JournalWindow, Button, "Section", 2)
+	GemRB.SetText (JournalWindow, Button, 45486)
+	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Journal
-	#Button = GemRB.GetControl (JournalWindow, 2)
-	#GemRB.SetText (JournalWindow, Button, 20635)
-	#GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLogWindow")
+	Button = GemRB.GetControl (JournalWindow, 8)
+	GemRB.SetVarAssoc(JournalWindow, Button, "Section", 4)
+	GemRB.SetText (JournalWindow, Button, 15333)
+	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
+
+	# User
+	Button = GemRB.GetControl (JournalWindow, 9)
+	GemRB.SetVarAssoc(JournalWindow, Button, "Section", 0)
+	GemRB.SetText (JournalWindow, Button, 45487)
+	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
+
+	# Order
+	Button = GemRB.GetControl (JournalWindow, 10)
+	GemRB.SetText (JournalWindow, Button, 4627)
+	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "ToggleOrderWindow")
 
 	# Done
 	#Button = GemRB.GetControl (JournalWindow, 3)
 	#GemRB.SetText (JournalWindow, Button, 20636)
 	#GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
+	Section = 0
+	Chapter = GemRB.GetGameVar("chapter")
 	GemRB.UnhideGUI()
+	UpdateLogWindow()
+	return
 
-###################################################
-def OpenQuestsWindow ():
-	global JournalWindow, QuestsWindow, QuestsList, QuestDesc
-	
-	GemRB.HideGUI()
-	
-	if QuestsWindow:
-		GemRB.UnloadWindow(QuestsWindow)
-		QuestsWindow = None
-		
-		GemRB.SetVar("OtherWindow", JournalWindow)
-		
-		GemRB.UnhideGUI()
-		return
-	
-	QuestsWindow = Window = GemRB.LoadWindow (1)
-	GemRB.SetVar("OtherWindow", Window)
-	
-	# Assigned
-	Button = GemRB.GetControl (Window, 8)
-	GemRB.SetText (Window, Button, 39433)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnJournalAssignedPress")
+def ToggleOrderWindow ():
+	global Order
 
-	# Completed
-	Button = GemRB.GetControl (Window, 9)
-	GemRB.SetText (Window, Button, 39434)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnJournalCompletedPress")
+	if Order:
+		Order = 0
+	else:
+		Order = 1
+	UpdateLogWindow ()
+	return
 
-	# Back
-	Button = GemRB.GetControl (Window, 5)
-	GemRB.SetText (Window, Button, 46677)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
-
-	# Done
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, Button, 20636)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
-
-	QuestsList = List = GemRB.GetControl (Window, 1)
-	GemRB.SetTextAreaSelectable (Window, List, 1)
-	GemRB.SetVarAssoc (Window, List, 'SelectedQuest', -1)
-	GemRB.SetEvent (Window,List, IE_GUI_TEXTAREA_ON_CHANGE, "OnJournalQuestSelect")
-
-	QuestDesc = GemRB.GetControl (Window, 3)
-
-	#GemRB.SetVisible (QuestsWindow, 1)
-	GemRB.UnhideGUI()
-
-def OnJournalIncompletePress ():
-	print "Incomplete"
-	
-def OnJournalCompletedPress ():
-	print "Complete"
-
-###################################################
-
-def OpenLogWindow ():
-	global JournalWindow, LogWindow
-	
-	GemRB.HideGUI()
-	
-	if LogWindow:
-		GemRB.UnloadWindow(LogWindow)
-		LogWindow = None
-		
-		GemRB.SetVar("OtherWindow", JournalWindow)
-		
-		GemRB.UnhideGUI()
-		return
-	
-	LogWindow = Window = GemRB.LoadWindow (3)
-	GemRB.SetVar("OtherWindow", Window)
-
-	# Back
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetText (Window, Button, 46677)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLogWindow")
-
-	# Done
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, Button, 20636)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+def UpdateLogWindow ():
 
 	# text area
-	Text = GemRB.GetControl (Window, 2)
+	Window = JournalWindow
 
-	for i in range (GemRB.GetJournalSize (0)):
-		je = GemRB.GetJournalEntry (0, i)
+	GemRB.HideGUI()
+	Section = GemRB.GetVar("Section")
+	GemRB.SetToken("CurrentChapter", str(Chapter) )
+	# CurrentChapter
+	Label = GemRB.GetControl (JournalWindow, 0x1000000a)
+	GemRB.SetText (JournalWindow, Label, 15873)
+	print "Chapter ", Chapter, "Section ", Section
+
+	Text = GemRB.GetControl (Window, 1)
+
+	GemRB.SetText (Window, Text, "")
+	for i in range (GemRB.GetJournalSize (Chapter, Section)):
+		je = GemRB.GetJournalEntry (Chapter, i, Section)
 
 		if je == None:
 			continue
@@ -181,14 +151,31 @@ def OpenLogWindow ():
 		date = str (1 + int (je['GameTime'] / 86400))
 		time = str (je['GameTime'])
 		
-		GemRB.TextAreaAppend (Window, Text, "[color=FFFF00]Day " + date + '  (' + time + "):[/color]", 3*i)
+		GemRB.TextAreaAppend (Window, Text, "[color=808000]Day " + date + '  (' + time + "):[/color]", 3*i)
 		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i + 1)
 		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
-			
-
-	GemRB.SetVisible (Window, 1)
-	
 	GemRB.UnhideGUI()
+	return
+
+###################################################
+def PrevChapterPress ():
+	global Chapter 
+
+	if Chapter > 0:
+		Chapter = Chapter - 1
+		GemRB.SetToken("CurrentChapter", str(Chapter) )
+		UpdateLogWindow ()
+	return
+
+###################################################
+def NextChapterPress ():
+	global Chapter
+
+	if Chapter < GemRB.GetGameVar("chapter"):
+		Chapter = Chapter + 1
+		GemRB.SetToken("CurrentChapter", str(Chapter) )
+		UpdateLogWindow ()
+	return
 
 ###################################################
 # End of file GUIJRNL.py

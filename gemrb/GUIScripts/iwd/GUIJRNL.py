@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIJRNL.py,v 1.1 2004/10/15 20:38:55 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIJRNL.py,v 1.2 2004/10/23 13:01:35 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -104,7 +104,7 @@ def JournalNextSectionPress ():
 	global JournalSection
 
 	#if GemRB.GetJournalSize (JournalSection + 1) > 0:
-	if JournalSection < 7:
+	if JournalSection < GemRB.GetVar("chapter"):
 		JournalSection = JournalSection + 1
 		UpdateJournalWindow ()
 
