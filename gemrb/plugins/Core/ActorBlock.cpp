@@ -305,6 +305,7 @@ Moveble::Moveble(ScriptableType type) : Selectable(type)
 	step = NULL;
 	timeStartStep = 0;
 	lastFrame = NULL;
+	Area[0] = 0;
 }
 
 Moveble::~Moveble(void)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.12 2004/01/05 16:02:51 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.13 2004/01/05 23:53:10 balrog994 Exp $
  *
  */
 
@@ -160,6 +160,7 @@ public:
 	PathNode * step;
 	unsigned long timeStartStep;
 	Sprite2D * lastFrame;
+	char Area[9];
 public:
 	void DoStep(ImageMgr * LightMap);
 	void WalkTo(unsigned short XDes, unsigned short YDes);
