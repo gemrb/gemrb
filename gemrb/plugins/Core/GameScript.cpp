@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.236 2005/02/27 20:32:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.237 2005/02/28 17:35:13 avenger_teambg Exp $
  *
  */
 
@@ -553,6 +553,7 @@ static ActionLink actionnames[] = {
 	{"startmovie", GameScript::StartMovie,AF_BLOCKING},
 	{"startmusic", GameScript::StartMusic,0},
 	{"startsong", GameScript::StartSong,0},
+	{"startstore", GameScript::StartStore,0},
 	{"stopmoving", GameScript::StopMoving,0},
 	{"storepartylocations", GameScript::StorePartyLocation,0},
 	{"stuffglobalrandom", GameScript::SetGlobalRandom,0},
@@ -8557,3 +8558,13 @@ void GameScript::UndoExplore( Scriptable* /*Sender*/, Action* /*parameters*/)
 	core->GetGame()->GetCurrentMap( )->Explore(-1);
 }
 
+void GameScript::StartStore( Scriptable* Sender, Action* parameters)
+{
+	if(core->GetCurrentStore() ) {
+		return;
+	}
+	core->SetCurrentStore( parameters->string0Parameter );
+	core->GetGUIScriptEngine()->RunFunction( "OpenStoreWindow" );
+	//sorry, i have absolutely no idea when i should do this :)
+	Sender->CurrentAction = NULL;
+}

@@ -53,6 +53,7 @@ def OnLoad():
 	GemRB.SetVar("OptionsPosition", 0) #Left
 	GemRB.SetVar("MessagePosition", 4) #BottomAdded
 	GemRB.SetVar("OtherPosition", 3) #Top
+	GemRB.SetVar("TopPosition", 3) #Top
 	
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)

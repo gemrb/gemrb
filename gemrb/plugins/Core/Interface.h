@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.138 2005/02/27 19:13:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.139 2005/02/28 17:35:15 avenger_teambg Exp $
  *
  */
 
@@ -158,6 +158,8 @@ private:
 	Control* tooltip_ctrl;
 	// Currently dragged item or NULL
 	CREItem* DraggedItem;
+	// Current Store
+	Store* CurrentStore;
 public:
 	ieResRef GlobalScript;
 	ieResRef WorldMapName;
@@ -395,6 +397,8 @@ public:
 	void FreeITMExt(ITMExtHeader *p, Effect *e);
 	void FreeSPLExt(SPLExtHeader *p, Effect *e);
 	WorldMap *NewWorldMap();
+	Store *GetCurrentStore();
+	Store *SetCurrentStore(ieResRef resname);
 
 private:
 	bool LoadConfig(void);

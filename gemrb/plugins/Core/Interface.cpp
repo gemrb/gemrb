@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.267 2005/02/27 19:13:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.268 2005/02/28 17:35:14 avenger_teambg Exp $
  *
  */
 
@@ -43,6 +43,7 @@
 #include "AmbientMgr.h"
 #include "ItemMgr.h"
 #include "SpellMgr.h"
+#include "StoreMgr.h"
 #include "MapControl.h"
 #include "EffectQueue.h"
 
@@ -85,6 +86,7 @@ Interface::Interface(int iargc, char** iargv)
 	INIquests = NULL;
 	game = NULL;
 	worldmap = NULL;
+	CurrentStore = NULL;
 	timer = NULL;
 	evntmgr = NULL;
 	console = NULL;
@@ -182,6 +184,9 @@ Interface::~Interface(void)
 	ItemCache.RemoveAll(ReleaseItem);
 	SpellCache.RemoveAll(ReleaseSpell);
 
+	if (CurrentStore) {
+		delete CurrentStore;
+	}
 	if (TooltipBack) {
 		for(int i=0;i<3;i++) {
 			video->FreeSprite(TooltipBack[i]);
@@ -1199,8 +1204,8 @@ bool Interface::LoadConfig(const char* filename)
 
 static void upperlower(int upper, int lower)
 {
-        pl_uppercase[lower]=upper;
-        pl_lowercase[upper]=lower;
+	pl_uppercase[lower]=upper;
+	pl_lowercase[upper]=lower;
 }
 
 /** Loads gemrb.ini */
@@ -1274,19 +1279,19 @@ bool Interface::LoadGemRBINI()
 	if (s)
 		strcpy( Palette256, s );
 
-        for(int i=0;i<256;i++) {
-                pl_uppercase[i]=toupper(i);
-                pl_lowercase[i]=tolower(i);
-        }
-        upperlower(165,185);
-        upperlower(198,230);
-        upperlower(202,234);
-        upperlower(163,179);
-        upperlower(209,241);
-        upperlower(211,243);
-        upperlower(140,156);
-        upperlower(175,191);
-        upperlower(143,159);
+	for(int i=0;i<256;i++) {
+		pl_uppercase[i]=toupper(i);
+		pl_lowercase[i]=tolower(i);
+	}
+	upperlower(165,185);
+	upperlower(198,230);
+	upperlower(202,234);
+	upperlower(163,179);
+	upperlower(209,241);
+	upperlower(211,243);
+	upperlower(140,156);
+	upperlower(175,191);
+	upperlower(143,159);
 
 	SetFeature( ini->GetKeyAsInt( "resources", "AutomapIni", 0 ), GF_AUTOMAP_INI );
 	SetFeature( ini->GetKeyAsInt( "resources", "IWDMapDimensions", 0 ), GF_IWD_MAP_DIMENSIONS );
@@ -2847,5 +2852,46 @@ void Interface::FreeSPLExt(SPLExtHeader *p, Effect *e)
 WorldMap *Interface::NewWorldMap()
 {
 	return new WorldMap();
+}
+
+Store *Interface::GetCurrentStore()
+{
+	return CurrentStore;
+}
+
+Store *Interface::SetCurrentStore( ieResRef resname )
+{
+	if( CurrentStore ) {
+		if( !strnicmp(CurrentStore->Name, resname, 8) ) {
+			return CurrentStore;
+		}
+
+		delete CurrentStore;
+	}
+
+	DataStream* str = core->GetResourceMgr()->GetResource( resname, IE_STO_CLASS_ID );
+	StoreMgr* sm = ( StoreMgr* ) core->GetInterface( IE_STO_CLASS_ID );
+	if (sm == NULL) {
+		delete ( str );
+		return NULL;
+	}
+	if (!sm->Open( str, true )) {
+		core->FreeInterface( sm );
+		return NULL;
+	}
+
+	// FIXME - should use some already allocated in core
+	// not really, only one store is open at a time, then it is
+	// unloaded, we don't really have to cache it, it will be saved in
+	// Cache anyway!
+	CurrentStore = sm->GetStore();
+	if (CurrentStore == NULL) {
+		core->FreeInterface( sm );
+		return NULL;
+	}
+	core->FreeInterface( sm );
+	memcpy(CurrentStore->Name, resname, 8);
+
+	return CurrentStore;
 }
 

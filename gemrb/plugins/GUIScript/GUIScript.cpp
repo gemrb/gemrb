@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.273 2005/02/27 20:32:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.274 2005/02/28 17:35:15 avenger_teambg Exp $
  *
  */
 
@@ -26,11 +26,6 @@
 #include "../Core/Label.h"
 #include "../Core/AnimationMgr.h"
 #include "../Core/GameControl.h"
-#include "../Core/MapMgr.h"
-#include "../Core/WorldMapMgr.h"
-#include "../Core/SpellMgr.h"
-#include "../Core/ItemMgr.h"
-#include "../Core/StoreMgr.h"
 #include "../Core/WorldMapControl.h"
 #include "../Core/MapControl.h"
 #include "../Core/SoundMgr.h"
@@ -68,8 +63,8 @@ inline PyObject* PyString_FromResRef(char* ResRef)
 {
 	unsigned int i;
 
-	for(i=0;i<sizeof(ieResRef);i++) {
-		if(ResRef[i]==0) break;
+	for (i=0;i<sizeof(ieResRef);i++) {
+		if (ResRef[i]==0) break;
 	}
 	return PyString_FromStringAndSize( ResRef, i );
 }
@@ -241,7 +236,7 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 	switch(Index&0xf0) {
 	case 0: //game strings
 		Game *game = core->GetGame();
-		if(!game) {
+		if (!game) {
 			return PyString_FromString("");
 		}
 		switch(Index&15) {
@@ -278,12 +273,12 @@ PyDoc_STRVAR( GemRB_EnterGame__doc,
 static PyObject* GemRB_EnterGame(PyObject*, PyObject* /*args*/)
 {
 	Game* game = core->GetGame();
-	if(!game) {
+	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
 	GameControl* gc = StartGameControl();
 	Actor* actor = game->GetPC (0);
-	if(actor) {
+	if (actor) {
 		gc->ChangeMap(actor, true);
 	}
 	else {
@@ -369,7 +364,7 @@ static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 	}
 	char* text = core->GetString( Strref );
 	int bufflen = strlen( text ) + 12;
-	if(bufflen<12) {
+	if (bufflen<12) {
 		return AttributeError( GemRB_StatComment__doc );
 	}
 	char* newtext = ( char* ) malloc( bufflen );
@@ -1015,7 +1010,7 @@ static PyObject* GemRB_TextAreaClear(PyObject * /*self*/, PyObject* args)
 		WindowIndex = PyInt_AsLong( wi );
 		ControlIndex = PyInt_AsLong( ci );
 		TextArea* ta = ( TextArea* ) GetControl( WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
-		if(!ta) {
+		if (!ta) {
 			return NULL;
 		}
 		ta->PopLines( ta->GetRowCount() );
@@ -1455,7 +1450,7 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if(!btn) {
+	if (!btn) {
 		return NULL;
 	}
 
@@ -1503,7 +1498,7 @@ static PyObject* GemRB_SetButtonBorder(PyObject * /*self*/, PyObject* args)
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if(!btn) {
+	if (!btn) {
 		return NULL;
 	}
 
@@ -1528,7 +1523,7 @@ static PyObject* GemRB_EnableButtonBorder(PyObject * /*self*/, PyObject* args)
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if(!btn) {
+	if (!btn) {
 		return NULL;
 	}
 
@@ -1553,7 +1548,7 @@ static PyObject* GemRB_SetButtonFont(PyObject * /*self*/, PyObject* args)
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if(!btn) {
+	if (!btn) {
 		return NULL;
 	}
 
@@ -1732,11 +1727,11 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 		map->LinkedLabel = lc;
 		ImageMgr *anim = ( ImageMgr* ) core->GetInterface(IE_BMP_CLASS_ID );
 		DataStream* str = core->GetResourceMgr()->GetResource( Flag, IE_BMP_CLASS_ID );
-		if(anim -> Open(str, true) ) {
+		if (anim -> Open(str, true) ) {
 				map->Flag[0] = anim->GetImage();
 			}
 		str = core->GetResourceMgr()->GetResource( Flag2, IE_BMP_CLASS_ID );
-		if(anim -> Open(str, true) ) {
+		if (anim -> Open(str, true) ) {
 				map->Flag[1] = anim->GetImage();
 		}
 		core->FreeInterface( anim );
@@ -1748,8 +1743,8 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 		map->LinkedLabel = lc;
 		AnimationMgr *anim = ( AnimationMgr* ) core->GetInterface(IE_BAM_CLASS_ID );
 		DataStream* str = core->GetResourceMgr()->GetResource( Flag, IE_BAM_CLASS_ID );
-		if(anim -> Open(str, true) ) {
-			for(int i=0;i<8;i++) {
+		if (anim -> Open(str, true) ) {
+			for (int i=0;i<8;i++) {
 				map->Flag[i] = anim->GetFrame(0,i);
 			}
 			
@@ -1878,7 +1873,7 @@ static PyObject* GemRB_SetButtonFlags(PyObject * /*self*/, PyObject* args)
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if(!btn) {
+	if (!btn) {
 		return NULL;
 	}
 
@@ -1901,7 +1896,7 @@ static PyObject* GemRB_SetButtonState(PyObject * /*self*/, PyObject* args)
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if(!btn) {
+	if (!btn) {
 		return NULL;
 	}
 
@@ -1925,7 +1920,7 @@ static PyObject* GemRB_SetButtonPictureClipping(PyObject * /*self*/, PyObject* a
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if(!btn) {
+	if (!btn) {
 		return NULL;
 	}
 
@@ -1949,7 +1944,7 @@ static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if(!btn) {
+	if (!btn) {
 		return NULL;
 	}
 
@@ -2002,7 +1997,7 @@ static PyObject* GemRB_SetButtonMOS(PyObject * /*self*/, PyObject* args)
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if(!btn) {
+	if (!btn) {
 		return NULL;
 	}
 
@@ -2061,7 +2056,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if(!btn) {
+	if (!btn) {
 		return NULL;
 	}
 
@@ -2115,7 +2110,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 
-		for(int i=0;i<8;i++) {
+		for (int i=0;i<8;i++) {
 			im->GetPalette( i, col[i], NULL );
 		}
 
@@ -2128,7 +2123,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	}
 
 	btn->SetPicture( Picture );
-	if( Picture2 ) {
+	if (Picture2) {
 		btn->SetPicture2( Picture2 );
 	}
 
@@ -2218,9 +2213,9 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 	XPos=YPos=0;
 	flags=0;
 	Game *game=core->GetGame();
-	if(game) {
+	if (game) {
 		Scriptable *pc=game->GetPC(game->GetSelectedPCSingle());
-		if(pc) {
+		if (pc) {
 			XPos=pc->Pos.x;
 			YPos=pc->Pos.y;
 			flags |= GEM_SND_SPEECH;
@@ -2402,15 +2397,15 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_CheckVar__doc );
 	}
 	GameControl *gc = core->GetGameControl();
-	if(!gc) {
+	if (!gc) {
 		printMessage("GUIScript","No Game!\n", LIGHT_RED);
 		return NULL;
 	}
 	Scriptable *Sender = (Scriptable *) gc->GetLastActor();
-	if(!Sender) {
+	if (!Sender) {
 		Sender = (Scriptable *) core->GetGame()->GetCurrentMap();
 	}
-	if(!Sender) {
+	if (!Sender) {
 		printMessage("GUIScript","No Game!\n", LIGHT_RED);
 		return NULL;
 	}
@@ -2491,7 +2486,7 @@ static PyObject *GetGameDate(DataStream *ds)
 
 	ds->Read(inbuff, 12);
 	delete ds;
-	if(memcmp(inbuff,"GAME",4) ) {
+	if (memcmp(inbuff,"GAME",4) ) {
 		return NULL;
 	}
 	int hours = ((int) inbuff[2])/4500;
@@ -2503,21 +2498,21 @@ static PyObject *GetGameDate(DataStream *ds)
 
 	sprintf(tmpstr,"%d",days);
 	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", tmpstr);
-	if(days) {
-		if(days==1) a=core->GetString(10698);
+	if (days) {
+		if (days==1) a=core->GetString(10698);
 		else a=core->GetString(10697);
 	}
 	sprintf(tmpstr,"%d",hours);
 	core->GetTokenDictionary()->SetAtCopy("HOUR", tmpstr);
-	if(hours || !a) {
-		if(a) b=core->GetString(10699);
-		if(hours==1) c=core->GetString(10701);
+	if (hours || !a) {
+		if (a) b=core->GetString(10699);
+		if (hours==1) c=core->GetString(10701);
 		else c=core->GetString(10700);
 	}
 	retval = PyString_FromFormat("%s%s%s",a?a:"",b?b:"",c?c:"");
-	if(a) free(a);
-	if(b) free(b);
-	if(c) free(c);
+	if (a) free(a);
+	if (b) free(b);
+	if (c) free(c);
 	return retval;
 }
 
@@ -2699,7 +2694,7 @@ PyDoc_STRVAR( GemRB_GetPartySize__doc,
 static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 {
 	Game *game = core->GetGame();
-	if(!game) {
+	if (!game) {
 		return NULL;
 	}
 	return Py_BuildValue( "i", game->GetPartySize(0) );
@@ -2936,7 +2931,7 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetPlayerName__doc );
 	}
 	Game *game = core->GetGame();
-	if(!game) {
+	if (!game) {
 		return NULL;
 	}
 	Actor* MyActor = game->FindPC( PartyID );
@@ -2960,7 +2955,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetPlayerName__doc );
 	}
 	Game *game = core->GetGame();
-	if(!game) {
+	if (!game) {
 		return NULL;
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
@@ -3005,7 +3000,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetPCStats__doc );
 	}
 	Game *game = core->GetGame();
-	if(!game) {
+	if (!game) {
 		return NULL;
 	}
 	Actor* MyActor = game->FindPC( PartyID );
@@ -3092,7 +3087,7 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GameSelectPC__doc );
 	}
 	Game *game = core->GetGame();
-	if(!game) {
+	if (!game) {
 		return NULL;
 	}
 
@@ -3125,7 +3120,7 @@ static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GameIsPCSelected__doc );
 	}
 	Game *game = core->GetGame();
-	if(!game) {
+	if (!game) {
 		return NULL;
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
@@ -3195,7 +3190,7 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetPlayerPortrait__doc );
 	}
 	Game *game = core->GetGame();
-	if(!game) {
+	if (!game) {
 		return NULL;
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
@@ -3258,7 +3253,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	//
 	//
 	Game *game = core->GetGame();
-	if(!game) {
+	if (!game) {
 		return NULL;
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
@@ -3266,10 +3261,10 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	if (!MyActor) {
 		return NULL;
 	}
-	if(Portrait1) {
+	if (Portrait1) {
 		MyActor->SetPortrait( Portrait1, 1);
 	}
-	if(Portrait2) {
+	if (Portrait2) {
 		MyActor->SetPortrait( Portrait2, 2);
 	}
 	int mastertable = core->LoadTable( "avprefix" );
@@ -3401,10 +3396,7 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_EnterStore__doc,
 "EnterStore(STOResRef)\n\n"
-"FIXME: temporary Sets current store." );
-
-// FIXME: ugly, should be in core
-Store* store;
+"Loads the store referenced." );
 
 static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 {
@@ -3413,65 +3405,121 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "s", &StoreResRef )) {
 		return AttributeError( GemRB_EnterStore__doc );
 	}
-
-	// FIXME!!!
-	DataStream* str = core->GetResourceMgr()->GetResource( StoreResRef, IE_STO_CLASS_ID );
-	StoreMgr* sm = ( StoreMgr* ) core->GetInterface( IE_STO_CLASS_ID );
-	if (sm == NULL) {
-		delete ( str );
-		return NULL;
-	}
-	if (!sm->Open( str, true )) {
-		core->FreeInterface( sm );
-		return NULL;
-	}
-
-	// FIXME - should use some already allocated in core
-	store = sm->GetStore();
-	if (store == NULL) {
-		core->FreeInterface( sm );
-		return NULL;
-	}
-
-	//btn->SetImage(IE_GUI_BUTTON_UNPRESSED, item->ItemIconBAM->GetFrame (0));
-	//btn->SetImage(IE_GUI_BUTTON_PRESSED, item->ItemIconBAM->GetFrame (0));
-	//delete store;
-	core->FreeInterface( sm );
+	core->SetCurrentStore( StoreResRef );
 
 	Py_INCREF( Py_None );
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_GetStoreName__doc,
-"GetStoreName() => string\n\n"
-"FIXME: temporary Returns name of the current store" );
+PyDoc_STRVAR( GemRB_GetStore__doc,
+"GetStore() => string\n\n"
+"Returns relevant data of the current store." );
 
-static PyObject* GemRB_GetStoreName(PyObject * /*self*/, PyObject* args)
+static int storebuttons[6][4]={
+{STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_CURE|STA_OPTIONAL},
+{STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_DRINK}, 
+{STA_BUYSELL|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_ROOMRENT},
+{STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_DONATE|STA_OPTIONAL,STA_CURE},
+{STA_BUYSELL,-1,-1,-1,},{STA_BUYSELL,-1,-1,-1} };
+
+//buy/sell, identify, steal, cure, donate, drink
+static int storebits[6]={3,4,8,0x10,0x20,0x40};
+
+static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 {
 	if (!PyArg_ParseTuple( args, "" )) {
-		return AttributeError( GemRB_GetStoreName__doc );
+		return AttributeError( GemRB_GetStore__doc );
 	}
 
-	return PyString_FromString( core->GetString( store->StoreName ) );
-}
-
-PyDoc_STRVAR( GemRB_GetStoreRoomPrices__doc,
-"GetStoreRoomPrices() => tuple\n\n"
-"FIXME: temporary Returns tuple of room prices for the current store." );
-
-static PyObject* GemRB_GetStoreRoomPrices(PyObject * /*self*/, PyObject* args)
-{
-	if (!PyArg_ParseTuple( args, "" )) {
-		return AttributeError( GemRB_GetStoreRoomPrices__doc );
+	Store *store = core->GetCurrentStore();
+	if (!store) {
+		return RuntimeError("No current store!");
 	}
-
+	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "StoreType", PyInt_FromLong( store->Type ));
+	PyDict_SetItemString(dict, "StoreName", PyInt_FromLong( store->StoreName ));
+	PyDict_SetItemString(dict, "StoreDrinkCount", PyInt_FromLong( store->DrinksCount ));
+	PyDict_SetItemString(dict, "StoreCureCount", PyInt_FromLong( store->CuresCount ));
+	PyDict_SetItemString(dict, "StoreItemCount", PyInt_FromLong( store->ItemsCount ));
+	PyDict_SetItemString(dict, "StoreCapacity", PyInt_FromLong( store->Capacity ));
 	PyObject* p = PyTuple_New( 4 );
 
-	for (int i = 0; i < 4; i++) {
-		PyTuple_SetItem( p, i, PyInt_FromLong( store->RoomPrices[i] ) );
+	int i;
+	int j=1;
+	int k;
+	for (i = 0; i < 4; i++) {
+		if (store->AvailableRooms&j) {
+			k = store->RoomPrices[i];
+		}
+		else k=-1;
+		PyTuple_SetItem( p, i, PyInt_FromLong( k ) );
+		j<<=1;
 	}
+	PyDict_SetItemString(dict, "StoreRoomPrices", p);
 
-	return p;
+	p = PyTuple_New( 4 );
+	j=0;
+	for (i = 0; i < 4; i++) {
+		k = storebuttons[store->Type][i];
+		if (k&STA_OPTIONAL) {
+			k&=~STA_OPTIONAL;
+			//check if the type was disabled
+			if (!(store->Flags & storebits[k]) ) {
+				continue;
+			}
+		}
+		PyTuple_SetItem( p, j++, PyInt_FromLong( k ) );
+	}
+	for (;j<4;j++) {
+		PyTuple_SetItem( p, j, PyInt_FromLong( -1 ) );
+	}
+	PyDict_SetItemString(dict, "StoreButtons", p);
+	PyDict_SetItemString(dict, "StoreFlags", PyInt_FromLong( store->Flags ) );
+	return dict;
+}
+
+PyDoc_STRVAR( GemRB_GetStoreDrink__doc,
+"GetStoreDrink(idx) => string\n\n"
+"Returns the drink structure indexed. Returns None if the index is wrong." );
+
+static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
+{
+	int index;
+
+	if (!PyArg_ParseTuple( args, "i", &index )) {
+		return AttributeError( GemRB_GetStoreDrink__doc );
+	}
+	Store *store = core->GetCurrentStore();
+	if (!store) {
+		return RuntimeError("No current store!");
+	}
+	if (index>=(int) store->DrinksCount) {
+		return RuntimeError("Wrong index!");
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GetStoreCure__doc,
+"GetStoreCure(idx) => string\n\n"
+"Returns the cure structure indexed. Returns None if the index is wrong." );
+
+static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
+{
+	int index;
+
+	if (!PyArg_ParseTuple( args, "i", &index )) {
+		return AttributeError( GemRB_GetStoreCure__doc );
+	}
+	Store *store = core->GetCurrentStore();
+	if (!store) {
+		return RuntimeError("No current store!");
+	}
+	if (index>=(int) store->CuresCount) {
+		return RuntimeError("Wrong index!");
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_ExecuteString__doc,
@@ -3556,17 +3604,17 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	Map* map2 = game->GetMap(String);
-	if( !map2) {
+	if (!map2) {
 		return NULL;
 	}
 	int i = game->GetPartySize(true);
 	while (i--) {
 		Actor* actor = game->GetPC(i);
-		if( !actor->Selected ) {
+		if (!actor->Selected) {
 			continue;
 		}
 		Map* map1 = game->GetMap(actor->Area);
-		if( map1) {
+		if (map1) {
 			map1->RemoveActor( actor );
 		}
 		map2->AddActor( actor );
@@ -3893,15 +3941,15 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 			break;
 		case ITM_TYPE_SCROLL:
 			//determining if this is a copyable scroll
-			if(item->ExtHeaderCount<2) {
+			if (item->ExtHeaderCount<2) {
 				break;
 			}
 			eh = item->ext_headers+1;
-			if(eh->FeatureCount<1) {
+			if (eh->FeatureCount<1) {
 				break;
 			}
 			f = eh->features; //+0
-			if(f->Opcode!=147) {
+			if (f->Opcode!=147) {
 				break;
 			}
 			//maybe further checks for school exclusion?
@@ -4060,11 +4108,11 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_CreateItem__doc );
 	}
 	Game *game = core->GetGame();
-	if( !game ) {
+	if (!game) {
 		return RuntimeError( "Not in game" );
 	}
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
+	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
 
@@ -4099,17 +4147,17 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetMapnote__doc );
 	}
 	Game *game = core->GetGame();
-	if( !game ) {
+	if (!game) {
 		return RuntimeError( "Not in game" );
 	}
 	Map *map = game->GetCurrentMap();
-	if( !map ) {
+	if (!map) {
 		return RuntimeError( "No current area" );
 	}
 	Point point;
 	point.x=x;
 	point.y=y;
-	if(txt && txt[0]) {
+	if (txt && txt[0]) {
 		char* newvalue = ( char* ) malloc( strlen( txt ) + 1 ); //duplicating the string
 		strcpy( newvalue, txt );
 		map->AddMapNote(point, color, newvalue);
@@ -4135,15 +4183,15 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 	}
 
 	Game *game = core->GetGame();
-	if( !game ) {
+	if (!game) {
 		return RuntimeError( "Not in game" );
 	}
 	Actor* actor = game->FindPC( PartyID );
-	if (! actor) {
+	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
 	Map *map=game->GetCurrentMap();
-	if( !map ) {
+	if (!map) {
 		return RuntimeError( "No current area" );
 	}
 
@@ -4164,11 +4212,11 @@ static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_ExploreArea__doc );
 	}
 	Game *game = core->GetGame();
-	if( !game ) {
+	if (!game) {
 		return RuntimeError( "Not in game" );
 	}
 	Map *map=game->GetCurrentMap();
-	if( !map ) {
+	if (!map) {
 		return RuntimeError( "No current area" );
 	}
 	map->Explore( Value );
@@ -4296,8 +4344,9 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetSpellIcon, METH_VARARGS),
 	METHOD(SetItemIcon, METH_VARARGS),
 	METHOD(EnterStore, METH_VARARGS),
-	METHOD(GetStoreName, METH_VARARGS),
-	METHOD(GetStoreRoomPrices, METH_VARARGS),
+	METHOD(GetStore, METH_VARARGS),
+	METHOD(GetStoreDrink, METH_VARARGS),
+	METHOD(GetStoreCure, METH_VARARGS),
 	METHOD(InvalidateWindow, METH_VARARGS),
 	METHOD(EnableCheatKeys, METH_VARARGS), 
 	METHOD(UpdateMusicVolume, METH_NOARGS),
@@ -4343,7 +4392,7 @@ GUIScript::GUIScript(void)
 GUIScript::~GUIScript(void)
 {
 	if (Py_IsInitialized()) {
-		if(pModule) {
+		if (pModule) {
 			Py_DECREF( pModule );
 		}
 		Py_Finalize();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.161 2005/02/27 20:32:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.162 2005/02/28 17:35:14 avenger_teambg Exp $
  *
  */
 
@@ -1156,6 +1156,7 @@ public:
 	static void StartMovie(Scriptable* Sender, Action* parameters);
 	static void StartMusic(Scriptable* Sender, Action* parameters);
 	static void StartSong(Scriptable* Sender, Action* parameters);
+	static void StartStore(Scriptable* Sender, Action* parameters);
 	static void StopMoving(Scriptable* Sender, Action* parameters);
 	static void StorePartyLocation(Scriptable *Sender, Action* parameters);
 	static void Swing(Scriptable* Sender, Action* parameters);

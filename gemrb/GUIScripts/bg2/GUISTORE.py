@@ -9,14 +9,14 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.5 2004/12/04 17:35:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.6 2005/02/28 17:35:11 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -27,10 +27,9 @@ import string
 import GemRB
 from GUIDefines import *
 from GUICommonWindows import SetSelectionChangeHandler
-#import GUICommonWindows
+from GUICommon import CloseOtherWindow
 
 StoreWindow = None
-
 StoreShoppingWindow = None
 StoreIdentifyWindow = None
 StoreStealWindow = None
@@ -39,152 +38,129 @@ StoreHealWindow = None
 StoreRumourWindow = None
 StoreRentWindow = None
 
-HelpStoreRent = None
+pc = None
+character_name = None
 
-pc = 0
-character_name = ""
-store_name = ''
-store_room_prices = (0, 0, 0, 0)
-party_gold = 0
-store_buttons = {}
-store_update_functions = {}
+Store = None
+Buttons = [-1,-1,-1,-1]
+
+# 0 - Store
+# 1 - Tavern
+# 2 - Inn
+# 3 - Temple
+# 4 - Container
+# 5 - Container
+
+# 0 - buy/sell
+# 1 - identify 
+# 2 - steal
+# 3 - donate
+# 4 - heal
+# 5 - drink
+# 6 - rent
+
+storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORBAG","STORBAG")
+roomtypes=(17389,17517,17521,17519)
+
+store_funcs = ( "OpenStoreShoppingWindow", "OpenStoreIdentifyWindow",
+"OpenStoreStealWindow", "OpenStoreDonateWindow", "OpenStoreHealWindow",
+"OpenStoreRumourWindow", "OpenStoreRentWindow" )
+store_update_funcs = None
 
 def OpenStoreWindow ():
-	global StoreWindow, store_name, store_room_prices, party_gold
-	print "Open store"
-	return
+	global Store
+	global StoreWindow
+	global store_update_funcs
 
-	GemRB.HideGUI ()
-	
-	if StoreWindow != None:
+	#these are function pointers, not strings
+	#can't put this in global init, doh!
+	store_update_funcs = (OpenStoreShoppingWindow,
+	OpenStoreIdentifyWindow,OpenStoreStealWindow,
+	OpenStoreDonateWindow,OpenStoreHealWindow,
+	OpenStoreRumourWindow,OpenStoreRentWindow )
+
+	if CloseOtherWindow(StoreWindow):
+		GemRB.HideGUI ()
 		CloseStoreShoppingWindow ()
 		CloseStoreIdentifyWindow ()
+		CloseStoreStealWindow ()
+		CloseStoreDonateWindow ()
+		CloseStoreHealWindow ()
+		CloseStoreRumourWindow ()
+		CloseStoreRentWindow ()
 
 		GemRB.UnloadWindow (StoreWindow)
 		StoreWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		SetSelectionChangeHandler (None)
-		
 		GemRB.UnhideGUI ()
 		return
 
-	# FIXME: temporary
-	#GemRB.EnterStore ("FELL")
-	GemRB.EnterStore ("BROKAH")
-	store_name = string.upper (GemRB.GetStoreName ())
-	store_room_prices = GemRB.GetStoreRoomPrices ()
-	
+	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUISTORE")
 	StoreWindow = Window = GemRB.LoadWindow (3)
-	#GemRB.SetVar ("OtherWindow", StoreWindow)
-	GemRB.SetVisible (Window, 1)
+	GemRB.SetVar ("OtherWindow", StoreWindow) #this is the store button row
 
+	Store = GemRB.GetStore()
 
 	# Done
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 1403)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
 
-	# buy / sell
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreShoppingWindow")
-	store_buttons['shopping'] = Button
-	store_update_functions['shopping'] = UpdateStoreShoppingWindow
-
-	# identify
-	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreIdentifyWindow")
-	store_buttons['identify'] = Button
-	store_update_functions['identify'] = UpdateStoreIdentifyWindow
-
-	# steal
-	Button = GemRB.GetControl (Window, 3)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreStealWindow")
-	store_buttons['steal'] = Button
-	store_update_functions['steal'] = UpdateStoreStealWindow
-
-	# donate
-	Button = GemRB.GetControl (Window, 4)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreDonateWindow")
-	store_buttons['donate'] = Button
-	store_update_functions['donate'] = UpdateStoreDonateWindow
-
-	# heal / cure
+	#Store type icon
 	Button = GemRB.GetControl (Window, 5)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreHealWindow")
-	store_buttons['heal'] = Button
-	store_update_functions['heal'] = UpdateStoreHealWindow
+	print storebams[Store['StoreType']]
+	GemRB.SetButtonSprites(Window, Button,storebams[Store['StoreType']],0,0,0,0,0)
 
-	# rumour
-	Button = GemRB.GetControl (Window, 6)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreRumourWindow")
-	store_buttons['rumour'] = Button
-	store_update_functions['rumour'] = UpdateStoreRumourWindow
+	#based on shop type, these buttons will change
+	store_type = Store['StoreType']
+	store_buttons = Store['StoreButtons']
+	for i in range(4):
+		Buttons[i]=Button=GemRB.GetControl (Window, i+1)
+		Action = store_buttons[i]
+		GemRB.SetButtonSprites(Window, Button, "GUISTBBC", Action, 0,1,0,0)
+		GemRB.SetVarAssoc (Window, Button, "Action", i)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		if Action>=0:
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, store_funcs[Action])
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+		else:
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
-	# rent room
-	Button = GemRB.GetControl (Window, 7)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreRentWindow")
-	store_buttons['rent'] = Button
-	store_update_functions['rent'] = UpdateStoreRentWindow
-
-	OpenStoreShoppingWindow ()
-	
+	SetSelectionChangeHandler (store_update_funcs[store_buttons[0]])
 	GemRB.UnhideGUI()
-
-last_store_action = None
-def SelectStoreAction (action):
-	global last_store_action
-
-	Window = StoreWindow
-
-	if last_store_action != None and action != last_store_action:
-		Button = store_buttons[last_store_action]
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_UNPRESSED)
-		
-	Button = store_buttons[action]
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
-
-	SetSelectionChangeHandler (store_update_functions[action])
-	
-	last_store_action = action
-
-
+	#initializing selected variables
+	GemRB.SetVar("StoreRent",0)
+	store_update_funcs[store_buttons[0]] ()
 
 def OpenStoreShoppingWindow ():
 	global StoreShoppingWindow
-	
-	GemRB.HideGUI ()
-	SelectStoreAction ('shopping')
 
 	if StoreShoppingWindow != None:
 		Window = StoreShoppingWindow
-		GemRB.SetVar ("OtherWindow", Window)
+		GemRB.SetVar ("TopWindow", Window)
 		UpdateStoreShoppingWindow ()
-		GemRB.UnhideGUI ()
 		return
 
-	StoreShoppingWindow = Window = GemRB.LoadWindow (4)
-	GemRB.SetVar ("OtherWindow", Window)
-
-	# title ...
-	Label = GemRB.GetControl (Window, 0x10000001)
-	GemRB.SetText (Window, Label, store_name)
+	StoreShoppingWindow = Window = GemRB.LoadWindow (2)
+	GemRB.SetVar ("TopWindow", Window)
 
 	# buy price ...
-	Label = GemRB.GetControl (Window, 0x10000003)
-	GemRB.SetText (Window, Label, str (666))
+	Label = GemRB.GetControl (Window, 0x1000002b)
+	GemRB.SetText (Window, Label, 'cost')
 
 	# sell price ...
-	Label = GemRB.GetControl (Window, 0x10000004)
-	GemRB.SetText (Window, Label, str (999))
-
+	Label = GemRB.GetControl (Window, 0x1000002c)
+	GemRB.SetText (Window, Label, 'sell')
 
 	# Buy
-	Button = GemRB.GetControl (Window, 0)
+	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 45303)
 
 	# Sell
-	Button = GemRB.GetControl (Window, 1)
+	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, Button, 45304)
 
 	# 45374
@@ -195,93 +171,80 @@ def OpenStoreShoppingWindow ():
 	# 17-20, @20-@23 - slots and labels
 	# 25 encumbrance button
 
+	SetSelectionChangeHandler( UpdateStoreShoppingWindow )
 	UpdateStoreShoppingWindow ()
-	GemRB.UnhideGUI ()
 
 
 def OpenStoreIdentifyWindow ():
 	global StoreIdentifyWindow
 	
 	GemRB.HideGUI ()
-	SelectStoreAction ('identify')
 
 	if StoreIdentifyWindow != None:
 		Window = StoreIdentifyWindow
-		GemRB.SetVar ("OtherWindow", Window)
-		UpdateStoreIdentifyWindow ()
+		GemRB.SetVar ("TopWindow", Window)
 		GemRB.UnhideGUI ()
+		UpdateStoreIdentifyWindow ()
 		return
 	
-	StoreIdentifyWindow = Window = GemRB.LoadWindow (5)
-	GemRB.SetVar ("OtherWindow", Window)
-
-	# title ...
-	Label = GemRB.GetControl (Window, 0x0fffffff)
-	GemRB.SetText (Window, Label, store_name)
+	StoreIdentifyWindow = Window = GemRB.LoadWindow (4)
+	GemRB.SetVar ("TopWindow", Window)
 
 	# Identify
-	Button = GemRB.GetControl (Window, 4)
+	Button = GemRB.GetControl (Window, 5)
 	GemRB.SetText (Window, Button, 44971)
 
-	# 14 ta
+	# 23 ta
 
 	# price ...
-	Label = GemRB.GetControl (Window, 0x10000001)
+	Label = GemRB.GetControl (Window, 0x10000003)
 	GemRB.SetText (Window, Label, str (666))
 
 	# 6-9 item slots, 0x10000009-c labels
 
-	UpdateStoreIdentifyWindow ()
+	SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
 	GemRB.UnhideGUI ()
+	UpdateStoreIdentifyWindow ()
 
 
 def OpenStoreStealWindow ():
 	global StoreStealWindow
 	
 	GemRB.HideGUI ()
-	SelectStoreAction ('steal')
 
 	if StoreStealWindow != None:
 		Window = StoreStealWindow
-		GemRB.SetVar ("OtherWindow", Window)
-		UpdateStoreStealWindow ()
+		GemRB.SetVar ("TopWindow", Window)
 		GemRB.UnhideGUI ()
+		UpdateStoreStealWindow ()
 		return
 	
-	StoreStealWindow = Window = GemRB.LoadWindow (7)
-	GemRB.SetVar ("OtherWindow", Window)
-
-	# title ...
-	Label = GemRB.GetControl (Window, 0x10000000)
-	GemRB.SetText (Window, Label, store_name)
+	StoreStealWindow = Window = GemRB.LoadWindow (6)
+	GemRB.SetVar ("TopWindow", Window)
 
 	# Steal
-	Button = GemRB.GetControl (Window, 0)
+	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetText (Window, Button, 45305)
 
-	UpdateStoreStealWindow ()
+	SetSelectionChangeHandler( UpdateStoreStealWindow )
 	GemRB.UnhideGUI ()
+	UpdateStoreStealWindow ()
 
 
 def OpenStoreDonateWindow ():
 	global StoreDonateWindow
 	
 	GemRB.HideGUI ()
-	SelectStoreAction ('donate')
 
 	if StoreDonateWindow != None:
 		Window = StoreDonateWindow
-		GemRB.SetVar ("OtherWindow", Window)
-		UpdateStoreDonateWindow ()
+		GemRB.SetVar ("TopWindow", Window)
 		GemRB.UnhideGUI ()
+		UpdateStoreDonateWindow ()
 		return
 	
-	StoreDonateWindow = Window = GemRB.LoadWindow (10)
-	GemRB.SetVar ("OtherWindow", Window)
-
-	# title ...
-	Label = GemRB.GetControl (Window, 0x10000005)
-	GemRB.SetText (Window, Label, store_name)
+	StoreDonateWindow = Window = GemRB.LoadWindow (9)
+	GemRB.SetVar ("TopWindow", Window)
 
 	# Donate
 	Button = GemRB.GetControl (Window, 2)
@@ -291,29 +254,25 @@ def OpenStoreDonateWindow ():
 	# 3 donation entry
 	# 4 5 +-
 
-	UpdateStoreDonateWindow ()
+	SetSelectionChangeHandler( UpdateStoreDonateWindow )
 	GemRB.UnhideGUI ()
+	UpdateStoreDonateWindow ()
 
 
 def OpenStoreHealWindow ():
 	global StoreHealWindow
 	
 	GemRB.HideGUI ()
-	SelectStoreAction ('heal')
 
 	if StoreHealWindow != None:
 		Window = StoreHealWindow
-		GemRB.SetVar ("OtherWindow", Window)
-		UpdateStoreHealWindow ()
+		GemRB.SetVar ("TopWindow", Window)
 		GemRB.UnhideGUI ()
+		UpdateStoreHealWindow ()
 		return
 	
-	StoreHealWindow = Window = GemRB.LoadWindow (6)
-	GemRB.SetVar ("OtherWindow", Window)
-
-	# title ...
-	Label = GemRB.GetControl (Window, 0x0fffffff)
-	GemRB.SetText (Window, Label, store_name)
+	StoreHealWindow = Window = GemRB.LoadWindow (5)
+	GemRB.SetVar ("TopWindow", Window)
 
 	# price ...
 	Label = GemRB.GetControl (Window, 0x10000001)
@@ -330,242 +289,122 @@ def OpenStoreHealWindow ():
 
 	# 13 ta
 
-	UpdateStoreHealWindow ()
 	GemRB.UnhideGUI ()
+	UpdateStoreHealWindow ()
 
 
 def OpenStoreRumourWindow ():
 	global StoreRumourWindow
 	
 	GemRB.HideGUI ()
-	SelectStoreAction ('rumour')
 
 	if StoreRumourWindow != None:
 		Window = StoreRumourWindow
-		GemRB.SetVar ("OtherWindow", Window)
-		UpdateStoreRumourWindow ()
+		GemRB.SetVar ("TopWindow", Window)
 		GemRB.UnhideGUI ()
+		UpdateStoreRumourWindow ()
 		return
 	
-	StoreRumourWindow = Window = GemRB.LoadWindow (9)
-	GemRB.SetVar ("OtherWindow", Window)
-	
-	# title ...
-	Label = GemRB.GetControl (Window, 0x1000000a)
-	GemRB.SetText (Window, Label, store_name)
+	StoreRumourWindow = Window = GemRB.LoadWindow (8)
+	GemRB.SetVar ("TopWindow", Window)
 	
 	# 13 ta, 15 ta
 
-	UpdateStoreRumourWindow ()
 	GemRB.UnhideGUI ()
+	UpdateStoreRumourWindow ()
 
 
 def OpenStoreRentWindow ():
-	global StoreRentWindow, HelpStoreRent
+	global StoreRentWindow
 	
 	GemRB.HideGUI ()
-	SelectStoreAction ('rent')
 
 	if StoreRentWindow != None:
 		Window = StoreRentWindow
-		GemRB.SetVar ("OtherWindow", Window)
-		UpdateStoreRentWindow ()
+		GemRB.SetVar ("TopWindow", Window)
 		GemRB.UnhideGUI ()
+		UpdateStoreRentWindow ()
 		return
 	
-	StoreRentWindow = Window = GemRB.LoadWindow (8)
-	GemRB.SetVar ("OtherWindow", Window)
+	StoreRentWindow = Window = GemRB.LoadWindow (7)
+	GemRB.SetVar ("TopWindow", Window)
 
-	# title ...
-	Label = GemRB.GetControl (Window, 0x1000000a)
-	GemRB.SetText (Window, Label, store_name)
+	# room types
+	for i in range(4):
+		ok = Store['StoreRoomPrices'][i]
+		Button = GemRB.GetControl (Window, i)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectStoreRent")
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		GemRB.SetVarAssoc (Window, Button, "StoreRent", i)
+		if ok<0:
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+		else:
+			if StoreRent==-1:
+				StoreRent = i
 
-	# Peasant
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentPeasant")
-	Button = GemRB.GetControl (Window, 4)
-	GemRB.SetText (Window, Button, 45308)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentPeasant")
+		Button = GemRB.GetControl (Window, i+4)
+		GemRB.SetText (Window, Button, 14294+i)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectStoreRent")
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		GemRB.SetVarAssoc (Window, Button, "StoreRent", i)
 
-	# Merchant
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentMerchant")
-	Button = GemRB.GetControl (Window, 5)
-	GemRB.SetText (Window, Button, 45310)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentMerchant")
-
-	# Noble
-	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentNoble")
-	Button = GemRB.GetControl (Window, 6)
-	GemRB.SetText (Window, Button, 45313)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentNoble")
-
-	# Royal
-	Button = GemRB.GetControl (Window, 3)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentRoyal")
-	Button = GemRB.GetControl (Window, 7)
-	GemRB.SetText (Window, Button, 45316)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentRoyal")
-
-	
 	# Rent
-	Button = GemRB.GetControl (Window, 8)
-	GemRB.SetText (Window, Button, 45306)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-
-
-	# price ...
-	Label = GemRB.GetControl (Window, 0x1000000c)
-	GemRB.SetText (Window, Label, "0")
-
-	HelpStoreRent = Text = GemRB.GetControl (Window, 9)
-
+	Button = GemRB.GetControl (Window, 11)
+	GemRB.SetText (Window, Button, 14293)
+	GemRB.SetVar("StoreRent",StoreRent)
 
 	GemRB.UnhideGUI ()
 
 
-last_room = None
-def SelectStoreRent (room):
-	global last_room
-
+def SelectStoreRent ():
 	Window = StoreRentWindow
 	
-	GemRB.SetText (Window, HelpStoreRent, 66865 + room)
+	room = GemRB.GetVar("StoreRent")
+	Text = GemRB.GetControl (Window, 12)
+	GemRB.SetText (Window, Text, roomtypes[room] )
+	Label = GemRB.GetControl (Window, 0x1000000d)
+	Rent = GemRB.GetVar("StoreRent")
+	price = Store['StoreRoomPrices'][Rent]
+	GemRB.SetText (Window, Label, str(price) )
 
-	if last_room != None and room != last_room:
-		Picture = GemRB.GetControl (Window, 0 + last_room)
-		GemRB.SetButtonState (Window, Picture, IE_GUI_BUTTON_UNPRESSED)
-		Button = GemRB.GetControl (Window, 4 + last_room)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_UNPRESSED)
-		
-	Picture = GemRB.GetControl (Window, 0 + room)
-	GemRB.SetButtonState (Window, Picture, IE_GUI_BUTTON_SELECTED)
-	Button = GemRB.GetControl (Window, 4 + room)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_PRESSED)
+def UpdateStoreCommon (Window, title, name, gold):
+	GemRB.HideGUI()
 
-	Label = GemRB.GetControl (Window, 0x1000000c)
-	GemRB.SetText (Window, Label, str (store_room_prices[room]))
+	Label = GemRB.GetControl (Window, title)
+	GemRB.SetText (Window, Label, Store['StoreName'])
 
-	last_room  = room
+	if name:
+		pc = GemRB.GameGetSelectedPCSingle ()
+		Label = GemRB.GetControl (Window, name)
+		GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0) )
 
-def SelectStoreRentPeasant ():
-	SelectStoreRent (0)
-
-def SelectStoreRentMerchant ():
-	SelectStoreRent (1)
-
-def SelectStoreRentNoble ():
-	SelectStoreRent (2)
-
-def SelectStoreRentRoyal ():
-	SelectStoreRent (3)
-
-
-def UpdateStoreCommon ():
-	global party_gold, character_name, pc
-	
-	print "UpdateStoreWindow"
-	pc = GemRB.GameGetSelectedPCSingle ()
-	character_name = GemRB.GetPlayerName (pc, 0)
-
-	party_gold = GemRB.GameGetPartyGold ()
+	Label = GemRB.GetControl (Window, gold)
+	GemRB.SetText (Window, Label, str( GemRB.GameGetPartyGold () ) )
+	GemRB.UnhideGUI()
 	
 
 def UpdateStoreShoppingWindow ():
-	Window = StoreShoppingWindow
-
-	GemRB.HideGUI ()
-	UpdateStoreCommon ()
-
-	# character name ...
-	Label = GemRB.GetControl (Window, 0x10000005)
-	GemRB.SetText (Window, Label, character_name)
-
-	# party gold ...
-	Label = GemRB.GetControl (Window, 0x10000002)
-	GemRB.SetText (Window, Label, str (party_gold))
-	GemRB.UnhideGUI ()
+	UpdateStoreCommon (StoreShoppingWindow, 0x10000003, 0x1000002e, 0x1000002a)
 
 def UpdateStoreIdentifyWindow ():
-	Window = StoreIdentifyWindow
-	
-	GemRB.HideGUI ()
-	UpdateStoreCommon ()
-
-	# party gold ...
-	Label = GemRB.GetControl (Window, 0x10000000)
-	GemRB.SetText (Window, Label, str (party_gold))
-
-	# character name ...
-	Label = GemRB.GetControl (Window, 0x10000002)
-	GemRB.SetText (Window, Label, character_name)
-
-	GemRB.UnhideGUI ()
+	UpdateStoreCommon (StoreIdentifyWindow, 0x10000000, 0x10000005, 0x10000002)
 
 def UpdateStoreStealWindow ():
-	Window = StoreStealWindow
-
-	GemRB.HideGUI ()
-	UpdateStoreCommon ()
-
-	# party gold ...
-	Label = GemRB.GetControl (Window, 0x10000001)
-	GemRB.SetText (Window, Label, str (party_gold))
-
-	# character name ...
-	Label = GemRB.GetControl (Window, 0x10000002)
-	GemRB.SetText (Window, Label, character_name)
-
-	GemRB.UnhideGUI ()
+	UpdateStoreCommon (StoreStealWindow, 0x10000002, 0x10000027, 0x10000023)
 
 def UpdateStoreDonateWindow ():
-	Window = StoreDonateWindow
-
-	GemRB.HideGUI ()
-	UpdateStoreCommon ()
-
-	# party gold ...
-	Label = GemRB.GetControl (Window, 0x10000006)
-	GemRB.SetText (Window, Label, str (party_gold))
-
-	GemRB.UnhideGUI ()
+	UpdateStoreCommon (StoreDonateWindow, 0x10000007, 0, 0x10000008)
 
 def UpdateStoreHealWindow ():
-	Window = StoreHealWindow
-	
-	GemRB.HideGUI ()
-	UpdateStoreCommon ()
-
-	# party gold ...
-	Label = GemRB.GetControl (Window, 0x10000000)
-	GemRB.SetText (Window, Label, str (party_gold))
-
-	GemRB.UnhideGUI ()
+	UpdateStoreCommon (StoreHealWindow, 0x10000005, 0, 0x10000001)
 	
 def UpdateStoreRumourWindow ():
-	Window = StoreRumourWindow
-	
-	GemRB.HideGUI ()
-	UpdateStoreCommon ()
-
-	# party gold ...
-	Label = GemRB.GetControl (Window, 0x1000000b)
-	GemRB.SetText (Window, Label, str (party_gold))
-
-	GemRB.UnhideGUI ()
+	UpdateStoreCommon (StoreRumourWindow, 0x10000011, 0, 0x10000012)
 
 def UpdateStoreRentWindow ():
-	Window = StoreRentWindow
-	
-	GemRB.HideGUI ()
-	UpdateStoreCommon ()
-
-	# party gold ...
-	Label = GemRB.GetControl (Window, 0x1000000b)
-	GemRB.SetText (Window, Label, str (party_gold))
-
-	GemRB.UnhideGUI ()
+	UpdateStoreCommon (StoreRentWindow, 0x10000008, 0, 0x10000009)
+	# price ...
+	SelectStoreRent()
 
 
 def CloseStoreShoppingWindow ():
@@ -575,7 +414,6 @@ def CloseStoreShoppingWindow ():
 		GemRB.UnloadWindow (StoreShoppingWindow)
 		StoreShoppingWindow = None
 
-	
 def CloseStoreIdentifyWindow ():
 	global StoreIdentifyWindow
 	
@@ -583,6 +421,40 @@ def CloseStoreIdentifyWindow ():
 		GemRB.UnloadWindow (StoreIdentifyWindow)
 		StoreIdentifyWindow = None
 
+def CloseStoreStealWindow ():
+	global StoreStealWindow
+	
+	if StoreStealWindow != None:
+		GemRB.UnloadWindow (StoreStealWindow)
+		StoreStealWindow = None
+
+def CloseStoreDonateWindow ():
+	global StoreDonateWindow
+	
+	if StoreDonateWindow != None:
+		GemRB.UnloadWindow (StoreDonateWindow)
+		StoreDonateWindow = None
+
+def CloseStoreHealWindow ():
+	global StoreHealWindow
+	
+	if StoreHealWindow != None:
+		GemRB.UnloadWindow (StoreHealWindow)
+		StoreHealWindow = None
+
+def CloseStoreRumourWindow ():
+	global StoreRumourWindow
+	
+	if StoreRumourWindow != None:
+		GemRB.UnloadWindow (StoreRumourWindow)
+		StoreRumourWindow = None
+
+def CloseStoreRentWindow ():
+	global StoreRentWindow
+	
+	if StoreRentWindow != None:
+		GemRB.UnloadWindow (StoreRentWindow)
+		StoreRentWindow = None
 
 ###################################################
 # End of file GUISTORE.py

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.4 2004/10/09 15:27:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.5 2005/02/28 17:35:15 avenger_teambg Exp $
  *
  */
 
@@ -42,3 +42,29 @@ Store::~Store(void)
 	}
 	free( purchased_categories );
 }
+
+bool Store::AcceptableItemType(int type) const
+{
+	for (int i=0;i<PurchasedCategoriesCount;i++) {
+		if (type==purchased_categories[i]) {
+			return true;
+		}
+	}
+	return false;
+}
+
+STOCure *Store::GetCure(int idx) const
+{
+	return cures[idx];
+}
+
+STODrink *Store::GetDrink(int idx) const
+{
+        return drinks[idx];
+}
+
+STOItem *Store::GetItem(int idx) const
+{
+        return items[idx];
+}
+
