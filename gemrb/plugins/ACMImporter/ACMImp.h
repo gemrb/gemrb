@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.23 2004/08/09 18:24:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.24 2004/08/12 16:00:41 divide Exp $
  *
  */
 
@@ -85,7 +85,9 @@ public:
 		void reset();
 		void setAmbients(const std::vector<Ambient *> &a);
 		void activate(const std::string &name);
+		void activate();
 		void deactivate(const std::string &name);
+		void deactivate();
 	private:
 		class AmbientSource {
 		public:
@@ -93,6 +95,7 @@ public:
 			AmbientSource(Ambient *a);
 			~AmbientSource();
 			unsigned int tick(unsigned int ticks, Point listener, unsigned int timeslice);
+			void hardStop();
 		private:
 			ALuint source;
 			std::vector<ALuint> buffers;
@@ -108,6 +111,7 @@ public:
 		
 		static int play(void *am);
 		unsigned int tick(unsigned int ticks);
+		void hardStop();
 		
 		SDL_mutex *mutex;
 		SDL_Thread *player;
