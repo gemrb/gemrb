@@ -1,0 +1,16 @@
+
+Prototype: GemRB.LearnSpell(PartyID, SpellResRef[, Flags])
+
+Description: Tries to learn the specified spell. 
+
+Parameters:
+PartyID     - the PC's position in the party
+SpellResRef - the spell's Resource Reference
+Flags       - give xp, etc.
+ 1  - Give XP for learning  (Level * 100)
+
+Return value: integer, 0 on success, different values on failure.
+
+See also: MemorizeSpell
+
+MD5: 768a8203f408816c5294f8601a7a4b4e
