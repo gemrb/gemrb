@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.74 2004/10/10 13:03:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.75 2004/10/11 17:35:21 avenger_teambg Exp $
  *
  */
 
@@ -44,6 +44,30 @@
 static char Sounds[DEF_COUNT][9] = {
 	{-1},
 };
+
+
+DataFileMgr *INInote = NULL;
+
+//called from ~areimpcd (which is destructed at unloading of the dll)
+void ReleaseMemory()
+{
+	if(INInote) {
+		core->FreeInterface( INInote );
+		INInote = NULL;
+	}
+}
+
+void ReadAutonoteINI()
+{
+	INInote = ( DataFileMgr * )
+		core->GetInterface( IE_INI_CLASS_ID );
+	FileStream* fs = new FileStream();
+	char tINInote[_MAX_PATH];
+	PathJoin( tINInote, core->GamePath, "autonote.ini", NULL );
+	ResolveFilePath( tINInote );
+	fs->Open( tINInote, true );
+	INInote->Open( fs, true );
+}
 
 AREImp::AREImp(void)
 {
@@ -666,15 +690,37 @@ Map* AREImp::GetMap(const char *ResRef)
 	printf( "Loading automap notes\n" );
 	str->Seek( NoteOffset, GEM_STREAM_START );
 
-	int tmp = core->HasFeature( GF_AUTOMAP_INI );
-	if (tmp) {
+	Point point;
+	int color;
+	char *text;
+	int pst = core->HasFeature( GF_AUTOMAP_INI );
+	if (pst) {
+		color = 0; //all pst notes are the same
+		if( !INInote ) {
+			ReadAutonoteINI();
+		}
 		//add automap ini entries
+		if( INInote ) {
+			int count = INInote->GetKeyAsInt( map->scriptName, "count", 0);
+			while (count) {
+				char key[32];
+				int value;
+				sprintf(key, "text%d",count);
+				value = INInote->GetKeyAsInt( map->scriptName, key, 0);
+				text = core->GetString(value);
+				sprintf(key, "xPos%d",count);
+				value = INInote->GetKeyAsInt( map->scriptName, key, 0);
+				point.x = value;
+				sprintf(key, "yPos%d",count);
+				value = INInote->GetKeyAsInt( map->scriptName, key, 0);
+				point.y = value;
+				map->AddMapNote( point, color, text );
+				count--;
+			}
+		}
 	}
 	for (i = 0; i < NoteCount; i++) {
-		Point point;
-		int color;
-		char *text;
-		if (tmp) {
+		if (pst) {
 			ieDword px,py;
 
 			str->ReadDword(&px);

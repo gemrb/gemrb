@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImpCD.cpp,v 1.3 2004/02/24 22:20:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImpCD.cpp,v 1.4 2004/10/11 17:35:21 avenger_teambg Exp $
  *
  */
 
@@ -25,9 +25,10 @@
 AREImpCD::AREImpCD(void)
 {
 }
-
+extern void ReleaseMemory();
 AREImpCD::~AREImpCD(void)
 {
+	ReleaseMemory();
 }
 
 void* AREImpCD::Create(void)
