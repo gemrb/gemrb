@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.10 2004/08/02 22:14:24 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.11 2004/08/19 21:14:28 avenger_teambg Exp $
  *
  */
 
@@ -41,12 +41,12 @@ public:
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
 	/** Gets a Pixel Index from the Image */
-	unsigned int GetPixelIndex(unsigned int x, unsigned int y)
+	unsigned int GetPixelIndex(unsigned int /*x*/, unsigned int /*y*/)
 	{
 		return 0;
 	}
 	/** Gets a Pixel from the Image */
-	Color GetPixel(unsigned int x, unsigned int y)
+	Color GetPixel(unsigned int /*x*/, unsigned int /*y*/)
 	{
 		Color null = {
 			0x00, 0x00, 0x00, 0x00

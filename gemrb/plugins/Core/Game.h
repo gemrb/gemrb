@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.39 2004/08/18 21:55:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.40 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -88,6 +88,7 @@ private:
 	std::vector< Actor*> NPCs;
 	std::vector< Map*> Maps;
 	std::vector< GAMJournalEntry*> Journals;
+	std::vector< char*> mastarea;
 public:
 	Variables* globals;
 	Variables* kaputz;
@@ -193,7 +194,7 @@ public:
 	void SetBeastKnown(unsigned int Index) {
 		familiars[Index] = 1;
 	}
-	void ShareXP(int XP);
+	void ShareXP(int XP, bool divide);
 	bool EveryoneStopped();
 	bool EveryoneNearPoint(const char *area, int x, int y, bool canmove);
 	bool PartyMemberDied();

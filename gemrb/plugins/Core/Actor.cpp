@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.59 2004/08/08 08:39:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.60 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -388,9 +388,9 @@ void Actor::DebugDump()
 	printf( "Visualrange:%d\n", (int) GetStat(IE_VISUALRANGE) );
 	printf( "Mod[IE_EA]: %ld\n", Modified[IE_EA]);
 	printf( "Mod[IE_ANIMATION_ID]: 0x%04lX\n", Modified[IE_ANIMATION_ID]);
-	unsigned long tmp=0;
+	ieDword tmp=0;
 	core->GetGame()->globals->Lookup("APPEARANCE",tmp);
-	printf( "Disguise: %ld\n", tmp);
+	printf( "Disguise: %d\n", tmp);
 	inventory.dump();
 	spellbook.dump();
 }
@@ -462,7 +462,7 @@ bool Actor::CheckOnDeath()
 
 	if(InternalFlags&IF_GIVEXP) {
 		//give experience to party
-		core->GetGame()->ShareXP(GetStat(IE_XPVALUE) );
+		core->GetGame()->ShareXP(GetStat(IE_XPVALUE), true );
 		//handle reputation here
 		//
 	}

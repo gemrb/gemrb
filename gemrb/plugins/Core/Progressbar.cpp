@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.5 2004/08/18 21:18:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.6 2004/08/19 21:14:26 avenger_teambg Exp $
  *
  */
 
@@ -120,7 +120,7 @@ void Progressbar::SetImage(Sprite2D* img, Sprite2D* img2)
 	BackGround = img;
 	if (BackGround2 && Clear)
 		core->GetVideoDriver()->FreeSprite( BackGround2 );
-	BackGround2 = img;
+	BackGround2 = img2;
 	Changed = true;
 }
 
@@ -130,7 +130,7 @@ void Progressbar::SetAnimation(Animation *arg)
 }
 
 /* dummy virtual function */
-int Progressbar::SetText(const char* string, int pos)
+int Progressbar::SetText(const char* /*string*/, int /*pos*/)
 {
         return 0;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.32 2004/08/05 21:30:01 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.33 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -118,7 +118,7 @@ void Font::AddChar(void* spr, int w, int h, short xPos, short yPos)
 bool written = false;
 
 void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
-	Color* hicolor, unsigned char Alignment, bool anchor, Font* initials,
+	Color* hicolor, unsigned char Alignment, bool /*anchor*/, Font* /*initials*/,
 	Color* initcolor, Sprite2D* cursor, unsigned int curpos)
 {
 	Color* pal = NULL, * ipal = NULL;
@@ -241,7 +241,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
 }
 
 void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
-	unsigned char Alignment, bool anchor, Font* initials, Color* initcolor,
+	unsigned char Alignment, bool anchor, Font* /*initials*/, Color* initcolor,
 	Sprite2D* cursor, unsigned int curpos)
 {
 	Color* pal = NULL, * ipal = NULL;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.8 2004/08/02 22:14:24 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.9 2004/08/19 21:14:27 avenger_teambg Exp $
  *
  */
 
@@ -163,6 +163,6 @@ Sprite2D* MOSImp::GetImage()
 	return ret;
 }
 /** No descriptions */
-void MOSImp::GetPalette(int index, int colors, Color* pal)
+void MOSImp::GetPalette(int /*index*/, int /*colors*/, Color* /*pal*/)
 {
 }

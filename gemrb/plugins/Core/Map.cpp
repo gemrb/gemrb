@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.107 2004/08/18 21:18:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.108 2004/08/19 21:14:26 avenger_teambg Exp $
  *
  */
 
@@ -343,7 +343,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			actor->OnCreation = false;
 			actor->inventory.CalculateWeight();
 
-			actor->DoStep( LightMap );
+			actor->DoStep( );
 			CharAnimations* ca = actor->GetAnims();
 			if (!ca)
 				continue;

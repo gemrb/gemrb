@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.52 2004/08/12 23:26:38 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.53 2004/08/19 21:14:24 avenger_teambg Exp $
  *
  */
 
@@ -121,7 +121,7 @@ void ACMImp::clearstreams(bool free)
 }
 
 /* this stuff is in a separate thread, it is using static_memory, others shouldn't use that */
-int ACMImp::PlayListManager(void* data)
+int ACMImp::PlayListManager(void* /*data*/)
 {
 	ALuint buffersreturned = 0;
 	ALboolean bFinished = AL_FALSE;

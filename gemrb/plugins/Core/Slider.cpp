@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.23 2004/08/08 13:21:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.24 2004/08/19 21:14:26 avenger_teambg Exp $
  *
  */
 
@@ -152,7 +152,7 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 
 /** Mouse Button Down */
 void Slider::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned char /*Button*/, unsigned short /*Mod*/)
 {
 	Changed = true;
 	unsigned int oldPos = Pos;
@@ -221,8 +221,8 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 	}
 }
 /** Mouse Button Up */
-void Slider::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+void Slider::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
+	unsigned char /*Button*/, unsigned short /*Mod*/)
 {
 	if (State != IE_GUI_SLIDER_KNOB) {
 		Changed = true;
@@ -230,7 +230,7 @@ void Slider::OnMouseUp(unsigned short x, unsigned short y,
 	State = IE_GUI_SLIDER_KNOB;
 }
 /** Mouse Over Event */
-void Slider::OnMouseOver(unsigned short x, unsigned short y)
+void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 {
 	Changed = true;
 	unsigned int oldPos = Pos;
@@ -265,7 +265,7 @@ void Slider::OnMouseOver(unsigned short x, unsigned short y)
 }
 
 /** Sets the Text of the current control */
-int Slider::SetText(const char* string, int pos)
+int Slider::SetText(const char* /*string*/, int /*pos*/)
 {
 	return 0;
 }

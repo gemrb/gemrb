@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.130 2004/08/18 21:55:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.131 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -31,10 +31,11 @@ class Action;
 #include "Actor.h"
 #include <list>
 
+#define BM_SET  0 //gemrb extension
 #define BM_AND  1
 #define BM_OR   2
 #define BM_XOR  3
-#define BM_NAND 4
+#define BM_NAND 4 //gemrb extension
 
 #define MAX_OBJECT_FIELDS	10
 #define MAX_NESTING			5
@@ -713,8 +714,8 @@ private:
 	static Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
 	static int GetHappiness(Scriptable* Sender, int reputation);
 	static int GetHPPercent(Scriptable* Sender);
-	static Targets *XthNearestOf(Scriptable *Sender, Targets *parameters, int count);
-	static Targets *XthNearestEnemyOf(Scriptable *Sender, Targets *parameters, int count);
+	static Targets *XthNearestOf(Targets *parameters, int count);
+	static Targets *XthNearestEnemyOf(Targets *parameters, int count);
 
 	static unsigned char GetOrient(short sX, short sY, short dX, short dY);
 private: //Internal variables
@@ -730,13 +731,12 @@ public:
 		Variables* local = NULL);
 	~GameScript();
 	static void ReplaceMyArea(Scriptable* Sender, char* newVarName);
-	static unsigned long CheckVariable(Scriptable* Sender,
-		const char* VarName, const char* Context);
-	static unsigned long CheckVariable(Scriptable* Sender, const char* VarName);
+	static ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context);
+	static ieDword CheckVariable(Scriptable* Sender, const char* VarName);
 
 	static void SetVariable(Scriptable* Sender, const char* VarName,
-		const char* Context, int value);
-	static void SetVariable(Scriptable* Sender, const char* VarName, int value);
+		const char* Context, ieDword value);
+	static void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 	static void ExecuteString(Scriptable* Sender, char* String);
 	static bool EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
@@ -1072,7 +1072,6 @@ public:
 	static void PlayDeadInterruptable(Scriptable* Sender, Action* parameters);
 	static void PlayerDialogue(Scriptable* Sender, Action* parameters);
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
-	static void PlaySong(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
 	static void PlaySoundNotRanged(Scriptable* Sender, Action* parameters);
 	static void PlaySoundPoint(Scriptable* Sender, Action* parameters);
@@ -1096,8 +1095,10 @@ public:
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
 	static void SetAnimState(Scriptable* Sender, Action* parameters);
 	static void SetApparentName(Scriptable* Sender, Action* parameters);
+	static void SetAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
 	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
+	static void SetCreatureAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
 	static void SetExtendedNight(Scriptable* Sender, Action* parameters);
 	static void SetFaction(Scriptable* Sender, Action* parameters);
@@ -1109,6 +1110,7 @@ public:
 	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
+	static void SetMusic(Scriptable* Sender, Action* parameters);
 	static void SetNamelessClass(Scriptable* Sender, Action* parameters);
 	static void SetNamelessDisguise(Scriptable* Sender, Action* parameters);
 	static void SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters);

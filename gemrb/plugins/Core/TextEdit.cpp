@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.18 2004/05/09 17:36:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.19 2004/08/19 21:14:26 avenger_teambg Exp $
  *
  */
 
@@ -93,7 +93,7 @@ void TextEdit::SetBackGround(Sprite2D* back)
 }
 
 /** Key Press Event */
-void TextEdit::OnKeyPress(unsigned char Key, unsigned short Mod)
+void TextEdit::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	( ( Window * ) Owner )->Invalidate();
 	Changed = true;
@@ -151,7 +151,7 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 }
 
 /** Sets the Text of the current control */
-int TextEdit::SetText(const char* string, int pos)
+int TextEdit::SetText(const char* string, int /*pos*/)
 {
 	strncpy( ( char * ) Buffer, string, max );
 	( ( Window * ) Owner )->Invalidate();

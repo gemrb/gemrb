@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.15 2004/08/01 15:35:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.16 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -82,13 +82,13 @@ void Console::SetBackGround(Sprite2D* back)
 	Back = back;
 }
 /** Sets the Text of the current control */
-int Console::SetText(const char* string, int pos)
+int Console::SetText(const char* string, int /*pos*/)
 {
 	strncpy( ( char * ) Buffer, string, max );
 	return 0;
 }
 /** Key Press Event */
-void Console::OnKeyPress(unsigned char Key, unsigned short Mod)
+void Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	if (Key >= 0x20) {
 		size_t len = strlen( ( char* ) Buffer );

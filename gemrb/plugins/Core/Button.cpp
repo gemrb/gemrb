@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.68 2004/08/02 18:00:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.69 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -306,7 +306,7 @@ void Button::OnSpecialKeyPress(unsigned char Key)
 
 /** Mouse Button Down */
 void Button::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned char Button, unsigned short /*Mod*/)
 {
 	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
 		return;
@@ -328,7 +328,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 }
 /** Mouse Button Up */
 void Button::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned char /*Button*/, unsigned short Mod)
 {
 	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
 		return;
@@ -352,7 +352,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 			else
 				SetState( IE_GUI_BUTTON_UNPRESSED );
 			if (VarName[0] != 0) {
-				unsigned long tmp = 0;
+				ieDword tmp = 0;
 				core->GetDictionary()->Lookup( VarName, tmp );
 				core->GetDictionary()->SetAt( VarName, tmp ^ Value );
 			}
@@ -416,7 +416,7 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 	}
 }
 
-void Button::OnMouseEnter(unsigned short x, unsigned short y)
+void Button::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
@@ -425,7 +425,7 @@ void Button::OnMouseEnter(unsigned short x, unsigned short y)
 	RunEventHandler( MouseEnterButton );
 }
 
-void Button::OnMouseLeave(unsigned short x, unsigned short y)
+void Button::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
@@ -436,7 +436,7 @@ void Button::OnMouseLeave(unsigned short x, unsigned short y)
 
 
 /** Sets the Text of the current control */
-int Button::SetText(const char* string, int pos)
+int Button::SetText(const char* string, int /*pos*/)
 {
 	if (string == NULL) {
 		hasText = false;

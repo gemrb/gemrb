@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.22 2004/08/03 17:36:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.23 2004/08/19 21:14:26 avenger_teambg Exp $
  *
  */
 
@@ -40,7 +40,7 @@ SaveGameIterator::~SaveGameIterator(void)
 
 static const char* PlayMode()
 {
-	unsigned long playmode = 1;
+	ieDword playmode = 1;
 
 	core->GetDictionary()->Lookup( "PlayMode", playmode );
 	if (playmode == 2) {

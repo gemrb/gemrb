@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.25 2004/07/25 09:00:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.26 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -108,6 +108,10 @@ int Inventory::CountItems(const char *resref, bool stacks)
 		CREItem *item = Slots[slot];
 		if(!item) {
 			continue;
+		}
+		if(resref && resref[0]) {
+			if(!strnicmp(resref, item->ItemResRef, 8) )
+				continue;
 		}
 		if (stacks && (item->Flags&IE_ITEM_STACKED) ) {
 			count+=item->Usages[0];
@@ -229,7 +233,7 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 	Slots[slot] = item;
 }
 
-int Inventory::AddSlotItem(CREItem* item, unsigned int slot, CREItem **res_item)
+int Inventory::AddSlotItem(CREItem* item, unsigned int /*slot*/, CREItem **res_item)
 {
 	// FIXME: join items if possible
 	Changed = true;
@@ -259,7 +263,7 @@ int Inventory::AddSlotItem(CREItem* item, unsigned int slot, CREItem **res_item)
 	return -1;
 }
 
-int Inventory::AddSlotItem(STOItem* item, unsigned int slot, CREItem **res_item, int count)
+int Inventory::AddSlotItem(STOItem* item, unsigned int /*slot*/, CREItem **/*res_item*/, int count)
 {
 	CREItem *temp;
 	CREItem *remains;

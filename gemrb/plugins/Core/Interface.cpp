@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.198 2004/08/18 21:55:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.199 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -760,7 +760,7 @@ const char* Interface::TypeExt(SClass_ID type)
 
 char* Interface::GetString(ieStrRef strref, unsigned long options)
 {
-	unsigned long flags = 0;
+	ieDword flags = 0;
 
 	vars->Lookup( "Strref On", flags );
 	return strings->GetString( strref, flags | options );
@@ -1993,12 +1993,6 @@ bool Interface::LoadINI(const char* filename)
 	return true;
 }
 
-void Interface::SetGameVariable(const char* VarName, const char* Context,
-	int value)
-{
-	//script->SetVariable(VarName, Context, value);
-}
-
 /** Enables/Disables the Cut Scene Mode */
 void Interface::SetCutSceneMode(bool active)
 {
@@ -2227,7 +2221,7 @@ int Interface::CanUseItemType(int itype, int slottype)
 
 void Interface::DisplayConstantString(int stridx, unsigned int color)
 {
-        unsigned long index;
+        ieDword index;
 
         if (!core->GetDictionary()->Lookup( "MessageWindow", index )) {
                 return;

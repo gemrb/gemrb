@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.110 2004/08/18 21:55:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.111 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -302,8 +302,6 @@ public:
 	int Roll(int dice, int size, int add);
 	/** Loads a Game Compiled Script */
 	int LoadScript(const char * ResRef);
-	/** Sets a Variable in the Game Script Engine */
-	void SetGameVariable(const char * VarName, const char * Context, int value);
 	/** Enables/Disables the CutScene Mode */
 	void SetCutSceneMode(bool active);
 	/** returns true if in cutscene mode */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.24 2004/08/08 13:21:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.25 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -60,7 +60,7 @@ void Label::Draw(unsigned short x, unsigned short y)
 	}
 }
 /** This function sets the actual Label Text */
-int Label::SetText(const char* string, int pos)
+int Label::SetText(const char* string, int /*pos*/)
 {
 	if (Buffer )
 		free( Buffer );
@@ -94,7 +94,7 @@ void Label::SetAlignment(unsigned char Alignment)
 }
 
 void Label::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned char /*Button*/, unsigned short /*Mod*/)
 {
 	printf( "Label::OnMouseUp\n" );
 	if (( x <= Width ) && ( y <= Height )) {

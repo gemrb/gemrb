@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.32 2004/05/25 16:16:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.33 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -219,7 +219,7 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y,
 }
 
 /** BroadCast Mouse Idle Event */
-void EventMgr::MouseIdle(unsigned long time)
+void EventMgr::MouseIdle(unsigned long /*time*/)
 {
 	//MButtons &= ~Button;
 	if (last_ctrl_over != NULL) {

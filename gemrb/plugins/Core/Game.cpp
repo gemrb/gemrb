@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.55 2004/08/18 21:55:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.56 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -38,6 +38,18 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	globals = NULL;
 	kaputz = NULL;
 	familiars = NULL;
+	int mtab = core->LoadTable("mastarea");
+	if(mtab) {
+		TableMgr *table = core->GetTable(mtab);
+		int i = table->GetRowCount();
+		while(i--) {
+			char *tmp = (char *) malloc(9);
+			strncpy (tmp,table->QueryField(i,0),8);
+			tmp[8]=0;
+			mastarea.push_back( tmp );
+		}
+	}
+	core->DelTable(mtab);
 }
 
 Game::~Game(void)
@@ -52,6 +64,9 @@ Game::~Game(void)
 	}
 	for (i = 0; i < NPCs.size(); i++) {
 		delete ( NPCs[i] );
+	}
+	for (i = 0; i < mastarea.size(); i++) {
+		free ( mastarea[i] );
 	}
 	if (globals) {
 		delete globals;
@@ -310,7 +325,13 @@ Map *Game::GetCurrentMap()
 //TODO: master area determination
 bool Game::MasterArea(const char *area)
 {
-	return 0;
+	int i=mastarea.size();
+	while(i--) {
+		if(strnicmp(mastarea[i], area, 8) ) {
+			return true;
+		}
+	}
+	return false;
 }
 
 int Game::AddMap(Map* map)
@@ -449,7 +470,7 @@ void Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 {
 	GAMJournalEntry *je = new GAMJournalEntry;
 	je->GameTime = GameTime;
-	unsigned long chapter = 0;
+	ieDword chapter = 0;
 	globals->Lookup("CHAPTER", chapter);
 	je->Chapter = (ieByte) chapter;
 	je->Section = Section;
@@ -476,13 +497,16 @@ GAMJournalEntry* Game::GetJournalEntry(unsigned int Index)
 	return Journals[Index];
 }
 
-void Game::ShareXP(int xp)
+void Game::ShareXP(int xp, bool divide)
 {
-	int PartySize = GetPartySize(true); //party size, only alive
-	if(PartySize<1) {
-		return;
+	if(divide) {
+		int PartySize = GetPartySize(true); //party size, only alive
+		if(PartySize<1) {
+			return;
+		}
+		xp /= PartySize;
 	}
-	xp /= PartySize;
+
 	if(!xp) {
 		return;
 	}
@@ -511,12 +535,15 @@ bool Game::EveryoneNearPoint(const char *area, int x, int y, bool canmove)
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
 		}
-		//someone is uncontrollable, can't move
-		if(PCs[i]->GetStat(IE_EA)>GOODCUTOFF) {
-			return false;
-		}
-		if(PCs[i]->GetStat(IE_STATE_ID)&STATE_CANTMOVE) {
-			return false;
+		if(canmove) {
+			//someone is uncontrollable, can't move
+			if(PCs[i]->GetStat(IE_EA)>GOODCUTOFF) {
+				return false;
+			}
+
+			if(PCs[i]->GetStat(IE_STATE_ID)&STATE_CANTMOVE) {
+				return false;
+			}
 		}
 		if(stricmp(PCs[i]->Area,area) ) {
 			return false;
@@ -540,7 +567,7 @@ bool Game::PartyMemberDied()
 void Game::IncrementChapter()
 {
 	//clear statistics
-	unsigned long chapter = 0;
+	ieDword chapter = 0;
 	globals->Lookup("CHAPTER",chapter);
 	globals->SetAt("CHAPTER",chapter+1);
 }

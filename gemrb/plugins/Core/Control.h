@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.22 2004/08/10 19:11:30 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.23 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -111,7 +111,7 @@ public: //Events
 		unsigned char Button, unsigned short Mod);
 	/** Special Key Press */
 	virtual void OnSpecialKeyPress(unsigned char Key);
-	virtual bool IsPixelTransparent(unsigned short x, unsigned short y) {
+	virtual bool IsPixelTransparent(unsigned short /*x*/, unsigned short /*y*/) {
 		return false;
 	}
 };

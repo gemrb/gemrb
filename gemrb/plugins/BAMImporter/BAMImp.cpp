@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.24 2004/08/04 19:21:55 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.25 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -199,7 +199,7 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 	return spr;
 }
 
-void* BAMImp::GetFramePixels(unsigned short findex, unsigned char mode)
+void* BAMImp::GetFramePixels(unsigned short findex, unsigned char /*mode*/)
 {
 	if (findex >= FramesCount) {
 		findex = cycles[0].FirstFrame;

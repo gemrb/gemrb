@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.23 2004/07/24 23:59:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.24 2004/08/19 21:14:26 avenger_teambg Exp $
  *
  */
 
@@ -74,7 +74,7 @@ inline unsigned int Variables::MyHashKey(const char* key) const
 /////////////////////////////////////////////////////////////////////////////
 // functions
 void Variables::GetNextAssoc(POSITION& rNextPosition, const char*& rKey,
-	unsigned long& rValue) const
+	ieDword& rValue) const
 {
 	MYASSERT( m_pHashTable != NULL );  // never call on empty map
 
@@ -286,10 +286,23 @@ bool Variables::Lookup(const char* key, char* dest, int MaxLength) const
 	return true;
 }
 
-bool Variables::Lookup(const char* key, unsigned long& rValue) const
+bool Variables::Lookup(const char* key, char *&dest) const
 {
 	unsigned int nHash;
-	//	MYASSERT(m_type==GEM_VARIABLES_INT); //we could look up pointers, hey!
+	MYASSERT(m_type==GEM_VARIABLES_STRING);
+	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	if (pAssoc == NULL) {
+		return false;
+	}  // not in map
+
+	dest = pAssoc->Value.sValue;
+	return true;
+}
+
+bool Variables::Lookup(const char* key, ieDword& rValue) const
+{
+	unsigned int nHash;
+	MYASSERT(m_type==GEM_VARIABLES_INT);
 	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
 	if (pAssoc == NULL) {
 		return false;
@@ -328,7 +341,7 @@ void Variables::SetAt(const char* key, const char* value)
 	}
 }
 
-void Variables::SetAt(const char* key, unsigned long value)
+void Variables::SetAt(const char* key, ieDword value)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.183 2004/08/18 21:55:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.184 2004/08/19 21:14:25 avenger_teambg Exp $
  *
  */
 
@@ -396,7 +396,7 @@ static ActionLink actionnames[] = {
 	{"playdeadinterruptable", GameScript::PlayDeadInterruptable,0},
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
-	{"playsong", GameScript::PlaySong,0},
+	{"playsong", GameScript::StartSong,0},
 	{"playsound", GameScript::PlaySound,0},
 	{"playsoundnotranged", GameScript::PlaySoundNotRanged,0},
 	{"playsoundpoint", GameScript::PlaySoundPoint,0},
@@ -428,8 +428,10 @@ static ActionLink actionnames[] = {
 	{"screenshake", GameScript::ScreenShake,AF_BLOCKING},
 	{"setanimstate", GameScript::SetAnimState,AF_BLOCKING},
 	{"setapparentnamestrref", GameScript::SetApparentName,0},
+	{"setareaflags", GameScript::SetAreaFlags,0},
 	{"setarearestflag", GameScript::SetAreaRestFlag,0},
 	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags,0},
+	{"setcreatureareaflags", GameScript::SetCreatureAreaFlags,0},
 	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialoguerange", GameScript::SetVisualRange,0}, //same until we know better
@@ -443,6 +445,7 @@ static ActionLink actionnames[] = {
 	{"setinternal", GameScript::SetInternal,0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile,0},
 	{"setmoraleai", GameScript::SetMoraleAI,0},
+	{"setmusic", GameScript::SetMusic,0},
 	{"setname", GameScript::SetApparentName,0},
 	{"setnamelessclass", GameScript::SetNamelessClass,0},
 	{"setnamelessdisguise", GameScript::SetNamelessDisguise,0},
@@ -646,6 +649,27 @@ static void GoNearAndRetry(Scriptable *Sender, Point *p)
 	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
 }
 
+static void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
+{
+	switch(opcode) {
+		case BM_AND:
+			value1 = ( value1& value2 );
+			break;
+		case BM_OR:
+			value1 = ( value1| value2 );
+			break;
+		case BM_XOR:
+			value1 = ( value1^ value2 );
+			break;
+		case BM_NAND: //this is a GemRB extension
+			value1 = ( value1& ~value2 );
+			break;
+		case BM_SET: //this is a GemRB extension
+			value1 = value2;
+			break;
+	}
+}
+
 GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 	Variables* local)
 {
@@ -833,7 +857,7 @@ void GameScript::ReplaceMyArea(Scriptable* Sender, char* newVarName)
 }
 
 void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
-	const char* Context, int value)
+	const char* Context, ieDword value)
 {
 	char newVarName[8];
 
@@ -864,11 +888,11 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		}
 	}
 	else {
-		core->GetGame()->globals->SetAt( VarName, ( unsigned long ) value );
+		core->GetGame()->globals->SetAt( VarName, ( ieDword ) value );
 	}
 }
 
-void GameScript::SetVariable(Scriptable* Sender, const char* VarName, int value)
+void GameScript::SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 {
 	char newVarName[8];
 
@@ -898,19 +922,19 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, int value)
 		}
 	}
 	else {
-		core->GetGame()->globals->SetAt( &VarName[6], ( unsigned long ) value );
+		core->GetGame()->globals->SetAt( &VarName[6], ( ieDword ) value );
 	}
 }
 
-unsigned long GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
+ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 {
 	char newVarName[8];
-	unsigned long value = 0;
+	ieDword value = 0;
 
 	if (strnicmp( VarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( &VarName[6], value );
 		if(InDebug) {
-			printf("CheckVariable %s: %ld\n",VarName, value);
+			printf("CheckVariable %s: %d\n",VarName, value);
 		}
 		return value;
 	}
@@ -936,21 +960,20 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 		core->GetGame()->globals->Lookup( &VarName[6], value );
 	}
 	if(InDebug) {
-		printf("CheckVariable %s: %ld\n",VarName, value);
+		printf("CheckVariable %s: %d\n",VarName, value);
 	}
 	return value;
 }
 
-unsigned long GameScript::CheckVariable(Scriptable* Sender,
-	const char* VarName, const char* Context)
+ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const char* Context)
 {
 	char newVarName[8];
-	unsigned long value = 0;
+	ieDword value = 0;
 
 	if (strnicmp( Context, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( VarName, value );
 		if(InDebug) {
-			printf("CheckVariable %s%s: %ld\n",Context, VarName, value);
+			printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 		}
 		return value;
 	}
@@ -975,7 +998,7 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender,
 		core->GetGame()->globals->Lookup( VarName, value );
 	}
 	if(InDebug) {
-		printf("CheckVariable %s%s: %ld\n",Context, VarName, value);
+		printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 	}
 	return value;
 }
@@ -985,7 +1008,7 @@ void GameScript::Update()
 	if (!MySelf || !MySelf->Active) {
 		return;
 	}
-	unsigned long thisTime;
+	ieDword thisTime;
 	GetTime( thisTime ); //this should be gametime too, pause holds it
 	if (( thisTime - lastRunTime ) < scriptRunDelay) {
 		return;
@@ -1012,7 +1035,7 @@ void GameScript::EvaluateAllBlocks()
 	if (!MySelf || !MySelf->Active) {
 		return;
 	}
-	unsigned long thisTime;
+	ieDword thisTime;
 	GetTime( thisTime ); //this should be gametime too, pause holds it
 	if (( thisTime - lastRunTime ) < scriptRunDelay) {
 		return;
@@ -1129,7 +1152,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	}
 	free( line );
 	rE->actionsCount = ( unsigned char ) aCv.size();
-	rE->actions = new Action * [rE->actionsCount];
+	rE->actions = new Action* [rE->actionsCount];
 	for (int i = 0; i < rE->actionsCount; i++) {
 		rE->actions[i] = aCv.at( i );
 	}
@@ -1357,7 +1380,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	if (func) {
 		Scriptable* scr = GetActorFromObject( Sender, aC->objects[0]);
 		if(scr && scr!=Sender) {
-			//this is an Action Override
+			//this is an Action* Override
 			scr->AddAction( Sender->CurrentAction );
 			Sender->CurrentAction = NULL;
 			//maybe we should always release here???
@@ -1447,7 +1470,7 @@ Targets* GameScript::EvaluateObject(Object* oC)
 	return tgts;
 }
 
-int GameScript::GetObjectCount(Scriptable* Sender, Object* oC)
+int GameScript::GetObjectCount(Scriptable* /*Sender*/, Object* oC)
 {
 	if (!oC) {
 		return 0;
@@ -1654,9 +1677,9 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 }
 
 /* this function was lifted from GenerateAction, to make it clearer */
-Action *GameScript::GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree)
+Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree)
 {
-	Action *newAction = new Action(autoFree);
+	Action*newAction = new Action(autoFree);
 	newAction->actionID = (unsigned short) actionsTable->GetValueIndex( acIndex );
 	//this flag tells us to merge 2 consecutive strings together to get
 	//a variable (context+variablename)
@@ -2036,7 +2059,7 @@ Targets *GameScript::Myself(Scriptable* Sender, Targets* parameters)
 }
 
 //same as player1 so far
-Targets *GameScript::Protagonist(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Protagonist(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->FindPC(1));
@@ -2044,7 +2067,7 @@ Targets *GameScript::Protagonist(Scriptable *Sender, Targets *parameters)
 }
 
 //last talker
-Targets *GameScript::Gabber(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Gabber(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	GameControl* gc = core->GetGameControl();
@@ -2124,7 +2147,7 @@ Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
-Targets *GameScript::LastSummonerOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::LastSummonerOf(Scriptable* Sender, Targets *parameters)
 {
 	Actor *actor = parameters->GetTarget(0);
 	if(!actor) {
@@ -2139,119 +2162,119 @@ Targets *GameScript::LastSummonerOf(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
-Targets *GameScript::Player1(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player1(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->FindPC(1));
 	return parameters;
 }
 
-Targets *GameScript::Player1Fill(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player1Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->GetPC(0));
 	return parameters;
 }
 
-Targets *GameScript::Player2(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player2(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->FindPC(2));
 	return parameters;
 }
 
-Targets *GameScript::Player2Fill(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player2Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->GetPC(1));
 	return parameters;
 }
 
-Targets *GameScript::Player3(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player3(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->FindPC(3));
 	return parameters;
 }
 
-Targets *GameScript::Player3Fill(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player3Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->GetPC(2));
 	return parameters;
 }
 
-Targets *GameScript::Player4(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player4(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->FindPC(4));
 	return parameters;
 }
 
-Targets *GameScript::Player4Fill(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player4Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->GetPC(3));
 	return parameters;
 }
 
-Targets *GameScript::Player5(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player5(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->FindPC(5));
 	return parameters;
 }
 
-Targets *GameScript::Player5Fill(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player5Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->GetPC(5));
 	return parameters;
 }
 
-Targets *GameScript::Player6(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player6(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->FindPC(6));
 	return parameters;
 }
 
-Targets *GameScript::Player6Fill(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player6Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->GetPC(6));
 	return parameters;
 }
 
-Targets *GameScript::Player7(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player7(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->FindPC(7));
 	return parameters;
 }
 
-Targets *GameScript::Player7Fill(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player7Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->GetPC(6));
 	return parameters;
 }
 
-Targets *GameScript::Player8(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player8(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->FindPC(8));
 	return parameters;
 }
 
-Targets *GameScript::Player8Fill(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Player8Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
 	parameters->AddTarget(core->GetGame()->GetPC(7));
 	return parameters;
 }
 
-Targets *GameScript::BestAC(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::BestAC(Scriptable* /*Sender*/, Targets *parameters)
 {
 	int i=parameters->Count();
 	if(!i) {
@@ -2272,7 +2295,7 @@ Targets *GameScript::BestAC(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
-Targets *GameScript::StrongestOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::StrongestOf(Scriptable* /*Sender*/, Targets *parameters)
 {
 	int i=parameters->Count();
 	if(!i) {
@@ -2293,7 +2316,7 @@ Targets *GameScript::StrongestOf(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
-Targets *GameScript::WeakestOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::WeakestOf(Scriptable* /*Sender*/, Targets *parameters)
 {
 	int i=parameters->Count();
 	if(!i) {
@@ -2314,7 +2337,7 @@ Targets *GameScript::WeakestOf(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
-Targets *GameScript::WorstAC(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::WorstAC(Scriptable* /*Sender*/, Targets *parameters)
 {
 	int i=parameters->Count();
 	if(!i) {
@@ -2335,7 +2358,7 @@ Targets *GameScript::WorstAC(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
-Targets *GameScript::MostDamagedOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::MostDamagedOf(Scriptable* /*Sender*/, Targets *parameters)
 {
 	int i=parameters->Count();
 	if(!i) {
@@ -2357,7 +2380,7 @@ Targets *GameScript::MostDamagedOf(Scriptable *Sender, Targets *parameters)
 	parameters->AddTarget(actor);
 	return parameters;
 }
-Targets *GameScript::LeastDamagedOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::LeastDamagedOf(Scriptable* /*Sender*/, Targets *parameters)
 {
 	int i=parameters->Count();
 	if(!i) {
@@ -2380,7 +2403,7 @@ Targets *GameScript::LeastDamagedOf(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
-Targets *GameScript::XthNearestOf(Scriptable *Sender, Targets *parameters, int count)
+Targets *GameScript::XthNearestOf(Targets *parameters, int count)
 {
 	Actor *origin = parameters->GetTarget(count);
 	parameters->Clear();
@@ -2391,7 +2414,7 @@ Targets *GameScript::XthNearestOf(Scriptable *Sender, Targets *parameters, int c
 	return parameters;
 }
 
-Targets *GameScript::XthNearestEnemyOf(Scriptable *Sender, Targets *parameters, int count)
+Targets *GameScript::XthNearestEnemyOf(Targets *parameters, int count)
 {
 	Actor *origin = parameters->GetTarget(0);
 	parameters->Clear();
@@ -2437,107 +2460,107 @@ Targets *GameScript::XthNearestEnemyOf(Scriptable *Sender, Targets *parameters, 
 	return parameters;
 }
 
-Targets *GameScript::NearestEnemyOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::NearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestEnemyOf(Sender, parameters, 0);
+	return XthNearestEnemyOf(parameters, 0);
 }
 
-Targets *GameScript::SecondNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::SecondNearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestEnemyOf(Sender, parameters, 1);
+	return XthNearestEnemyOf(parameters, 1);
 }
 
-Targets *GameScript::ThirdNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::ThirdNearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestEnemyOf(Sender, parameters, 2);
+	return XthNearestEnemyOf(parameters, 2);
 }
 
-Targets *GameScript::FourthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::FourthNearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestEnemyOf(Sender, parameters, 3);
+	return XthNearestEnemyOf(parameters, 3);
 }
 
-Targets *GameScript::FifthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::FifthNearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestEnemyOf(Sender, parameters, 4);
+	return XthNearestEnemyOf(parameters, 4);
 }
 
-Targets *GameScript::SixthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::SixthNearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestEnemyOf(Sender, parameters, 5);
+	return XthNearestEnemyOf(parameters, 5);
 }
 
-Targets *GameScript::SeventhNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::SeventhNearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestEnemyOf(Sender, parameters, 6);
+	return XthNearestEnemyOf(parameters, 6);
 }
 
-Targets *GameScript::EighthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::EighthNearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestEnemyOf(Sender, parameters, 7);
+	return XthNearestEnemyOf(parameters, 7);
 }
 
-Targets *GameScript::NinthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::NinthNearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestEnemyOf(Sender, parameters, 8);
+	return XthNearestEnemyOf(parameters, 8);
 }
 
-Targets *GameScript::TenthNearestEnemyOf(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::TenthNearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestEnemyOf(Sender, parameters, 9);
+	return XthNearestEnemyOf(parameters, 9);
 }
 
-Targets *GameScript::Nearest(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::Nearest(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestOf(Sender, parameters, 0);
+	return XthNearestOf(parameters, 0);
 }
 
-Targets *GameScript::SecondNearest(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::SecondNearest(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestOf(Sender, parameters, 1);
+	return XthNearestOf(parameters, 1);
 }
 
-Targets *GameScript::ThirdNearest(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::ThirdNearest(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestOf(Sender, parameters, 2);
+	return XthNearestOf(parameters, 2);
 }
 
-Targets *GameScript::FourthNearest(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::FourthNearest(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestOf(Sender, parameters, 3);
+	return XthNearestOf(parameters, 3);
 }
 
-Targets *GameScript::FifthNearest(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::FifthNearest(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestOf(Sender, parameters, 4);
+	return XthNearestOf(parameters, 4);
 }
 
-Targets *GameScript::SixthNearest(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::SixthNearest(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestOf(Sender, parameters, 5);
+	return XthNearestOf(parameters, 5);
 }
 
-Targets *GameScript::SeventhNearest(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::SeventhNearest(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestOf(Sender, parameters, 6);
+	return XthNearestOf(parameters, 6);
 }
 
-Targets *GameScript::EighthNearest(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::EighthNearest(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestOf(Sender, parameters, 7);
+	return XthNearestOf(parameters, 7);
 }
 
-Targets *GameScript::NinthNearest(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::NinthNearest(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestOf(Sender, parameters, 8);
+	return XthNearestOf(parameters, 8);
 }
 
-Targets *GameScript::TenthNearest(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::TenthNearest(Scriptable* /*Sender*/, Targets *parameters)
 {
-	return XthNearestOf(Sender, parameters, 9);
+	return XthNearestOf(parameters, 9);
 }
 
-Targets *GameScript::SelectedCharacter(Scriptable *Sender, Targets *parameters)
+Targets *GameScript::SelectedCharacter(Scriptable* /*Sender*/, Targets* parameters)
 {
 	Map *cm = core->GetGame()->GetCurrentMap();
 	parameters->Clear();
@@ -2551,7 +2574,7 @@ Targets *GameScript::SelectedCharacter(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
-Targets *GameScript::Nothing(Scriptable* Sender, Targets* parameters)
+Targets *GameScript::Nothing(Scriptable* /*Sender*/, Targets* parameters)
 {
 	parameters->Clear();
 	return parameters;
@@ -2676,7 +2699,7 @@ int GameScript::ID_Specific(Actor *actor, int parameter)
 //-------------------------------------------------------------
 // Trigger Functions
 //-------------------------------------------------------------
-int GameScript::BreakingPoint(Scriptable* Sender, Trigger* parameters)
+int GameScript::BreakingPoint(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	int value=GetHappiness(Sender, core->GetGame()->Reputation );
 	return value < -300;
@@ -2700,17 +2723,17 @@ int GameScript::HappinessLT(Scriptable* Sender, Trigger* parameters)
 	return value < parameters->int0Parameter;
 }
 
-int GameScript::Reputation(Scriptable* Sender, Trigger* parameters)
+int GameScript::Reputation(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->Reputation == (unsigned int) parameters->int0Parameter;
 }
 
-int GameScript::ReputationGT(Scriptable* Sender, Trigger* parameters)
+int GameScript::ReputationGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->Reputation > (unsigned int) parameters->int0Parameter;
 }
 
-int GameScript::ReputationLT(Scriptable* Sender, Trigger* parameters)
+int GameScript::ReputationLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->Reputation < (unsigned int) parameters->int0Parameter;
 }
@@ -2911,62 +2934,46 @@ int GameScript::Specifics(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::BitCheck(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter );
 	return ( value& parameters->int0Parameter ) !=0;
 }
 
 int GameScript::BitCheckExact(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
-	return (value & parameters->int0Parameter ) == (unsigned long) parameters->int0Parameter;
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter );
+	return (value & parameters->int0Parameter ) == (ieDword) parameters->int0Parameter;
 }
 
 //BM_OR would make sense only if this trigger changes the value of the variable
 //should I do that???
 int GameScript::BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
-	switch(parameters->int1Parameter) {
-		case BM_AND:
-			return ( value& parameters->int0Parameter ) !=0;
-		case BM_OR:
-			return ( value| parameters->int0Parameter ) !=0;
-		case BM_XOR:
-			return ( value^ parameters->int0Parameter ) !=0;
-		case BM_NAND:
-			return ( value& ~parameters->int0Parameter ) !=0;
-	}
-	return 0;
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter );
+	HandleBitMod(value, parameters->int0Parameter, parameters->int1Parameter);
+	//set the variable here if BitGlobal_Trigger really does that
+	//SetVariable(Sender, parameters->string0Parameter, value);
+	return value!=0;
 }
 
 int GameScript::GlobalBAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
+	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter );
 	return ( value1& value2 ) != 0;
 }
 
 int GameScript::GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
-	switch(parameters->int0Parameter) {
-		case BM_AND:
-			return ( value1& value2 ) != 0;
-		case BM_OR:
-			return ( value1| value2 ) != 0;
-		case BM_XOR:
-			return ( value1^ value2 ) != 0;
-		case BM_NAND:
-			return ( value1& ~value2 ) != 0;
-	}
-	return 0;
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
+	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter );
+	HandleBitMod( value1, value2, parameters->int1Parameter);
+	return value1!=0;
 }
 
 //would this function also alter the variable?
 int GameScript::Xor(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter );
 	return ( value ^ parameters->int0Parameter ) != 0;
 }
 
@@ -3046,62 +3053,52 @@ int GameScript::LocalsLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
-	unsigned long value2;
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword value2;
 	GetTime(value2);
 	return ( value1 == value2 );
 }
 
 int GameScript::RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
-	unsigned long value2;
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword value2;
 	GetTime(value2);
 	return ( value1 < value2 );
 }
 
 int GameScript::RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
-	unsigned long value2;
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword value2;
 	GetTime(value2);
 	return ( value1 > value2 );
 }
 
 int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	return ( value1 == core->GetGame()->GameTime );
 }
 
 int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	return ( value1 < core->GetGame()->GameTime );
 }
 
 int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	return ( value1 > core->GetGame()->GameTime );
 }
 
-int GameScript::OnCreation(Scriptable* Sender, Trigger* parameters)
+int GameScript::OnCreation(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	return Sender->OnCreation; //hopefully this is always 1 or 0
-/* oncreation is about the script, not the owner area, oncreation is
-   working in ANY script */
-/*
-	Map* area = core->GetGame()->GetCurrentMap( );
-	if (area->justCreated) {
-		area->justCreated = false;
-		return 1;
-	}
-	return 0;
-*/
 }
 
-int GameScript::NumItemsParty(Scriptable* Sender, Trigger* parameters)
+int GameScript::NumItemsParty(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	int cnt = 0;
 	Actor *actor;
@@ -3114,7 +3111,7 @@ int GameScript::NumItemsParty(Scriptable* Sender, Trigger* parameters)
 	return cnt==parameters->int0Parameter;
 }
 
-int GameScript::NumItemsPartyGT(Scriptable* Sender, Trigger* parameters)
+int GameScript::NumItemsPartyGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	int cnt = 0;
 	Actor *actor;
@@ -3127,7 +3124,7 @@ int GameScript::NumItemsPartyGT(Scriptable* Sender, Trigger* parameters)
 	return cnt>parameters->int0Parameter;
 }
 
-int GameScript::NumItemsPartyLT(Scriptable* Sender, Trigger* parameters)
+int GameScript::NumItemsPartyLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	int cnt = 0;
 	Actor *actor;
@@ -3307,7 +3304,7 @@ int GameScript::HaveSpell(Scriptable *Sender, Trigger *parameters)
 	return actor->spellbook.HaveSpell(tmpname, 1);
 }
 
-int GameScript::HaveAnySpells(Scriptable *Sender, Trigger *parameters)
+int GameScript::HaveAnySpells(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	if(Sender->Type!=ST_ACTOR) {
 		return 0;
@@ -3316,7 +3313,7 @@ int GameScript::HaveAnySpells(Scriptable *Sender, Trigger *parameters)
 	return actor->spellbook.HaveSpell("", 1);
 }
 
-int GameScript::HaveSpellParty(Scriptable *Sender, Trigger *parameters)
+int GameScript::HaveSpellParty(Scriptable* /*Sender*/, Trigger *parameters)
 {
 	Actor *actor;
 	Game *game=core->GetGame();
@@ -3403,7 +3400,7 @@ int GameScript::ActionListEmpty(Scriptable* Sender, Trigger* parameters)
 	return 1;
 }
 
-int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters)
+int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return 0;
@@ -3414,7 +3411,7 @@ int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters)
 	return 1;
 }
 
-int GameScript::False(Scriptable * /*Sender*/, Trigger * /*parameters*/)
+int GameScript::False(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
 	return 0;
 }
@@ -3451,11 +3448,11 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 	if (!scr) {
 		return 0;
 	}
-	unsigned long value;
+	ieDword value;
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	value = (unsigned long) CheckVariable( scr, parameters->string0Parameter );
+	value = (ieDword) CheckVariable( scr, parameters->string0Parameter );
 	unsigned short X = *(unsigned short *) &value;
 	unsigned short Y = *(((unsigned short *) &value)+1);
 	int distance = Distance(X, Y, scr);
@@ -3465,7 +3462,7 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::Or(Scriptable* Sender, Trigger* parameters)
+int GameScript::Or(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return parameters->int0Parameter;
 }
@@ -3531,7 +3528,7 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::Die(Scriptable* Sender, Trigger* parameters)
+int GameScript::Die(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	if(!Sender || Sender->Type!=ST_ACTOR) {
 		return 0;
@@ -3543,12 +3540,12 @@ int GameScript::Die(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::PartyMemberDied(Scriptable* Sender, Trigger* parameters)
+int GameScript::PartyMemberDied(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
 	return core->GetGame()->PartyMemberDied();
 }
 
-int GameScript::NamelessBitTheDust(Scriptable* Sender, Trigger* parameters)
+int GameScript::NamelessBitTheDust(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
 	Actor* actor = core->GetGame()->FindPC(1);
 	if(actor->InternalFlags&IF_JUSTDIED) {
@@ -3867,7 +3864,7 @@ int GameScript::NotStateCheck(Scriptable* Sender, Trigger* parameters)
 	return actor->GetStat(IE_STATE_ID) & ~parameters->int0Parameter;
 }
 
-int GameScript::RandomNum(Scriptable* Sender, Trigger* parameters)
+int GameScript::RandomNum(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	if(parameters->int0Parameter<0) {
 		return 0;
@@ -3878,7 +3875,7 @@ int GameScript::RandomNum(Scriptable* Sender, Trigger* parameters)
 	return parameters->int1Parameter-1 == RandomNumValue%parameters->int0Parameter;
 }
 
-int GameScript::RandomNumGT(Scriptable* Sender, Trigger* parameters)
+int GameScript::RandomNumGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	if(parameters->int0Parameter<0) {
 		return 0;
@@ -3889,7 +3886,7 @@ int GameScript::RandomNumGT(Scriptable* Sender, Trigger* parameters)
 	return parameters->int1Parameter-1 == RandomNumValue%parameters->int0Parameter;
 }
 
-int GameScript::RandomNumLT(Scriptable* Sender, Trigger* parameters)
+int GameScript::RandomNumLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	if(parameters->int0Parameter<0) {
 		return 0;
@@ -4092,7 +4089,7 @@ int GameScript::AreaCheckObject(Scriptable* Sender, Trigger* parameters)
 	return strnicmp(actor->Area, parameters->string0Parameter, 8)==0;
 }
 
-int GameScript::EntirePartyOnMap(Scriptable* Sender, Trigger* parameters)
+int GameScript::EntirePartyOnMap(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
@@ -4103,7 +4100,7 @@ int GameScript::EntirePartyOnMap(Scriptable* Sender, Trigger* parameters)
 	return 1;
 }
 
-int GameScript::AnyPCOnMap(Scriptable* Sender, Trigger* parameters)
+int GameScript::AnyPCOnMap(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
@@ -4142,19 +4139,19 @@ int GameScript::InMyArea(Scriptable* Sender, Trigger* parameters)
 	return strnicmp(actor1->Area, actor2->Area, 8)==0;
 }
 
-int GameScript::AreaType(Scriptable* Sender, Trigger* parameters)
+int GameScript::AreaType(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	return (map->AreaType&parameters->int0Parameter)>0;
 }
 
-int GameScript::AreaFlag(Scriptable* Sender, Trigger* parameters)
+int GameScript::AreaFlag(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	return (map->AreaFlags&parameters->int0Parameter)>0;
 }
 
-int GameScript::AreaRestDisabled(Scriptable *Sender, Trigger* parameters)
+int GameScript::AreaRestDisabled(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	if(map->AreaFlags&2) {
@@ -4173,64 +4170,64 @@ int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* parameters)
 	return map->TargetUnreachable( Sender->XPos, Sender->YPos, tar->XPos, tar->YPos);
 }
 
-int GameScript::PartyCountEQ(Scriptable* Sender, Trigger* parameters)
+int GameScript::PartyCountEQ(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->GetPartySize(0)<parameters->int0Parameter;
 }
 
-int GameScript::PartyCountLT(Scriptable* Sender, Trigger* parameters)
+int GameScript::PartyCountLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->GetPartySize(0)<parameters->int0Parameter;
 }
 
-int GameScript::PartyCountGT(Scriptable* Sender, Trigger* parameters)
+int GameScript::PartyCountGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->GetPartySize(0)>parameters->int0Parameter;
 }
 
-int GameScript::PartyCountAliveEQ(Scriptable* Sender, Trigger* parameters)
+int GameScript::PartyCountAliveEQ(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->GetPartySize(1)<parameters->int0Parameter;
 }
 
-int GameScript::PartyCountAliveLT(Scriptable* Sender, Trigger* parameters)
+int GameScript::PartyCountAliveLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->GetPartySize(1)<parameters->int0Parameter;
 }
 
-int GameScript::PartyCountAliveGT(Scriptable* Sender, Trigger* parameters)
+int GameScript::PartyCountAliveGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->GetPartySize(1)>parameters->int0Parameter;
 }
 
-int GameScript::LevelParty(Scriptable* Sender, Trigger* parameters)
+int GameScript::LevelParty(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->GetPartyLevel(1)<parameters->int0Parameter;
 }
 
-int GameScript::LevelPartyLT(Scriptable* Sender, Trigger* parameters)
+int GameScript::LevelPartyLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->GetPartyLevel(1)<parameters->int0Parameter;
 }
 
-int GameScript::LevelPartyGT(Scriptable* Sender, Trigger* parameters)
+int GameScript::LevelPartyGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGame()->GetPartyLevel(1)>parameters->int0Parameter;
 }
 
-int GameScript::PartyGold(Scriptable* Sender, Trigger* parameters)
+int GameScript::PartyGold(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->PartyGold == (unsigned long) parameters->int0Parameter;
+	return core->GetGame()->PartyGold == (ieDword) parameters->int0Parameter;
 }
 
-int GameScript::PartyGoldGT(Scriptable* Sender, Trigger* parameters)
+int GameScript::PartyGoldGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->PartyGold > (unsigned long) parameters->int0Parameter;
+	return core->GetGame()->PartyGold > (ieDword) parameters->int0Parameter;
 }
 
-int GameScript::PartyGoldLT(Scriptable* Sender, Trigger* parameters)
+int GameScript::PartyGoldLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->PartyGold < (unsigned long) parameters->int0Parameter;
+	return core->GetGame()->PartyGold < (ieDword) parameters->int0Parameter;
 }
 
 int GameScript::OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters)
@@ -4244,8 +4241,8 @@ int GameScript::OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender, parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender, parameters->string1Parameter );
+	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value2 = CheckVariable( Sender, parameters->string1Parameter );
 	return (value1 && value2)!=0; //should be 1 or 0!
 }
 
@@ -4443,38 +4440,38 @@ int GameScript::AnimState(Scriptable* Sender, Trigger* parameters)
 	return actor->AnimID == parameters->int0Parameter;
 }
 
-int GameScript::Time(Scriptable* Sender, Trigger* parameters)
+int GameScript::Time(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GameTime == (unsigned long) parameters->int0Parameter;
+	return core->GetGame()->GameTime == (ieDword) parameters->int0Parameter;
 }
 
-int GameScript::TimeGT(Scriptable* Sender, Trigger* parameters)
+int GameScript::TimeGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GameTime > (unsigned long) parameters->int0Parameter;
+	return core->GetGame()->GameTime > (ieDword) parameters->int0Parameter;
 }
-int GameScript::TimeLT(Scriptable* Sender, Trigger* parameters)
+int GameScript::TimeLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GameTime < (unsigned long) parameters->int0Parameter;
+	return core->GetGame()->GameTime < (ieDword) parameters->int0Parameter;
 }
 
-int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
+int GameScript::HotKey(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return core->GetGameControl()->HotKey==parameters->int0Parameter;
 }
 
-int GameScript::CombatCounter(Scriptable* Sender, Trigger* parameters)
+int GameScript::CombatCounter(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->CombatCounter == (unsigned long) parameters->int0Parameter;
+	return core->GetGame()->CombatCounter == (ieDword) parameters->int0Parameter;
 }
 
-int GameScript::CombatCounterGT(Scriptable* Sender, Trigger* parameters)
+int GameScript::CombatCounterGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->CombatCounter > (unsigned long) parameters->int0Parameter;
+	return core->GetGame()->CombatCounter > (ieDword) parameters->int0Parameter;
 }
 
-int GameScript::CombatCounterLT(Scriptable* Sender, Trigger* parameters)
+int GameScript::CombatCounterLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->CombatCounter < (unsigned long) parameters->int0Parameter;
+	return core->GetGame()->CombatCounter < (ieDword) parameters->int0Parameter;
 }
 
 int GameScript::TrapTriggered(Scriptable* Sender, Trigger* parameters)
@@ -4528,11 +4525,11 @@ int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	unsigned long value;
+	ieDword value;
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	value = (unsigned long) CheckVariable( tar, parameters->string0Parameter );
+	value = (ieDword) CheckVariable( tar, parameters->string0Parameter );
 	unsigned short X = *(unsigned short *) &value;
 	unsigned short Y = *(((unsigned short *) &value)+1);
 	if(actor->Orientation == GetOrient( X, Y, actor->XPos, actor->YPos ) ) {
@@ -4541,7 +4538,7 @@ int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::TookDamage(Scriptable* Sender, Trigger* parameters)
+int GameScript::TookDamage(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {
 		return 0;
@@ -4609,7 +4606,7 @@ int GameScript::HitBy(Scriptable* Sender, Trigger* parameters)
 }
 
 //-------------------------------------------------------------
-// Action Functions
+// Action* Functions
 //-------------------------------------------------------------
 
 void GameScript::SetExtendedNight(Scriptable* /*Sender*/, Action* parameters)
@@ -4648,6 +4645,14 @@ void GameScript::RemoveAreaFlag(Scriptable* /*Sender*/, Action* parameters)
 	map->AreaFlags&=~parameters->int0Parameter;
 }
 
+void GameScript::SetAreaFlags(Scriptable* /*Sender*/, Action* parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	ieDword value = map->AreaFlags;
+	HandleBitMod( value, parameters->int0Parameter, parameters->int1Parameter);
+	map->AreaFlags=value;
+}
+
 void GameScript::AddAreaType(Scriptable* /*Sender*/, Action* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
@@ -4667,14 +4672,12 @@ void GameScript::NoAction(Scriptable* /*Sender*/, Action* /*parameters*/)
 
 void GameScript::SG(Scriptable* Sender, Action* parameters)
 {
-	SetVariable( Sender, parameters->string0Parameter, "GLOBAL",
-		parameters->int0Parameter );
+	SetVariable( Sender, parameters->string0Parameter, "GLOBAL", parameters->int0Parameter );
 }
 
 void GameScript::SetGlobal(Scriptable* Sender, Action* parameters)
 {
-	SetVariable( Sender, parameters->string0Parameter,
-		parameters->int0Parameter );
+	SetVariable( Sender, parameters->string0Parameter, parameters->int0Parameter );
 }
 
 void GameScript::SetGlobalRandom(Scriptable* Sender, Action* parameters)
@@ -4691,7 +4694,7 @@ void GameScript::SetGlobalRandom(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
 {
-	unsigned long mytime;
+	ieDword mytime;
 
 	mytime=core->GetGame()->GameTime; //gametime (should increase it)
 	SetVariable( Sender, parameters->string0Parameter,
@@ -4700,7 +4703,7 @@ void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
 
 void GameScript::RealSetGlobalTimer(Scriptable* Sender, Action* parameters)
 {
-	unsigned long mytime;
+	ieDword mytime;
 
 	GetTime(mytime); //this is real time
 	SetVariable( Sender, parameters->string0Parameter,
@@ -4759,7 +4762,7 @@ void GameScript::ChangeClass(Scriptable* Sender, Action* parameters)
 	actor->SetStat( IE_CLASS, parameters->int0Parameter );
 }
 
-void GameScript::SetNamelessClass(Scriptable* Sender, Action* parameters)
+void GameScript::SetNamelessClass(Scriptable* /*Sender*/, Action* parameters)
 {
 	//same as Protagonist
 	Actor* actor = core->GetGame()->FindPC(1);
@@ -4861,12 +4864,12 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 	ip->Active = ( parameters->int0Parameter != 0 );
 }
 
-void GameScript::FadeToColor(Scriptable* Sender, Action* parameters)
+void GameScript::FadeToColor(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->timer->SetFadeToColor( parameters->XpointParameter );
 }
 
-void GameScript::FadeFromColor(Scriptable* Sender, Action* parameters)
+void GameScript::FadeFromColor(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->timer->SetFadeFromColor( parameters->XpointParameter );
 }
@@ -4906,7 +4909,7 @@ void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	unsigned long value = (unsigned long) CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
 	parameters->XpointParameter = *(unsigned short *) &value;
 	parameters->YpointParameter = *(((unsigned short *) &value)+1);
 	Actor* ab = ( Actor* ) tar;
@@ -4939,7 +4942,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 	MoveBetweenAreasCore( (Actor *) Sender, Area, tar->XPos, tar->YPos, -1, true);
 }
 
-void GameScript::MoveGlobalsTo(Scriptable* Sender, Action* parameters)
+void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 {
 	Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
@@ -5132,12 +5135,12 @@ void GameScript::CreateCreatureObjectOffScreen(Scriptable* Sender, Action* param
 	CreateCreatureCore( Sender, parameters, CC_OFFSCREEN | CC_OBJECT | CC_CHECK_IMPASSABLE );
 }
 
-void GameScript::StartCutSceneMode(Scriptable* Sender, Action* parameters)
+void GameScript::StartCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	core->SetCutSceneMode( true );
 }
 
-void GameScript::EndCutSceneMode(Scriptable* Sender, Action* parameters)
+void GameScript::EndCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	core->SetCutSceneMode( false );
 }
@@ -5164,7 +5167,7 @@ void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::Enemy(Scriptable* Sender, Action* parameters)
+void GameScript::Enemy(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -5173,7 +5176,7 @@ void GameScript::Enemy(Scriptable* Sender, Action* parameters)
 	actor->SetStat( IE_EA, 255 );
 }
 
-void GameScript::Ally(Scriptable* Sender, Action* parameters)
+void GameScript::Ally(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -5311,10 +5314,10 @@ void GameScript::SmallWait(Scriptable* Sender, Action* parameters)
 	Sender->SetWait( parameters->int0Parameter );
 }
 
-void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
+void GameScript::MoveViewPoint(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetVideoDriver()->MoveViewportTo( parameters->XpointParameter,
-								parameters->YpointParameter );
+						parameters->YpointParameter );
 }
 
 void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
@@ -5357,7 +5360,7 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	unsigned long value = (unsigned long) CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
 	parameters->XpointParameter = *(unsigned short *) &value;
 	parameters->YpointParameter = *(((unsigned short *) &value)+1);
 	Actor* actor = ( Actor* ) tar;
@@ -5379,13 +5382,13 @@ void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
 	actor->WalkTo( target->XPos, target->YPos );
 }
 
-void GameScript::StorePartyLocation(Scriptable *Sender, Action* parameters)
+void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game *game = core->GetGame();
 	for (int i = 0; i < game->GetPartySize(0); i++) {
 		Actor* act = game->GetPC( i );
 		if (act) {
-			unsigned long value;
+			ieDword value;
 			*((unsigned short *) &value) = act->XPos;
 			*(((unsigned short *) &value)+1) = (unsigned short) act->YPos;
 			SetVariable( act, "LOCALSsavedlocation", value);
@@ -5394,13 +5397,13 @@ void GameScript::StorePartyLocation(Scriptable *Sender, Action* parameters)
 
 }
 
-void GameScript::RestorePartyLocation(Scriptable *Sender, Action* parameters)
+void GameScript::RestorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game *game = core->GetGame();
 	for (int i = 0; i < game->GetPartySize(0); i++) {
 		Actor* act = game->GetPC( i );
 		if (act) {
-			unsigned long value=CheckVariable( act, "LOCALSsavedlocation");
+			ieDword value=CheckVariable( act, "LOCALSsavedlocation");
 			Map *map = game->GetCurrentMap();
 			//setting position, don't put actor on another actor
 			act->SetPosition( map, 
@@ -5529,11 +5532,11 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) target;
-	unsigned long value;
+	ieDword value;
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	value = (unsigned long) CheckVariable( target, parameters->string0Parameter );
+	value = (ieDword) CheckVariable( target, parameters->string0Parameter );
 	unsigned short X = *(unsigned short *) &value;
 	unsigned short Y = *(((unsigned short *) &value)+1);
 	actor->Orientation = GetOrient( X, Y, actor->XPos, actor->YPos );
@@ -5552,14 +5555,14 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 	StringBlock sb = core->strings->GetStringBlock( parameters->int0Parameter );
 	actor->DisplayHeadText( sb.text );
 	if (sb.Sound[0]) {
-		unsigned long len = core->GetSoundMgr()->Play( sb.Sound );
-		unsigned long counter = ( AI_UPDATE_TIME * len ) / 1000;
+		ieDword len = core->GetSoundMgr()->Play( sb.Sound );
+		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 		if (counter != 0)
 			actor->SetWait( counter );
 	}
 }
 
-void GameScript::StartSong(Scriptable* Sender, Action* parameters)
+void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 {
 	int MusicTable = core->LoadTable( "music" );
 	if (MusicTable >= 0) {
@@ -5573,16 +5576,16 @@ void GameScript::StartSong(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::Continue(Scriptable* Sender, Action* parameters)
+void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 }
 
-void GameScript::PlaySong(Scriptable* Sender, Action* parameters)
+void GameScript::SetMusic(Scriptable* /*Sender*/, Action* parameters)
 {
-	//this is a kind of hack, slot 4 isn't used anyway
+	//iwd2 seems to have 10 slots, dunno if it is important
+	if(parameters->int0Parameter>4) return;
 	Map *map=core->GetGame()->GetCurrentMap();
-	map->SongHeader.SongList[4]=parameters->int0Parameter;
-	map->PlayAreaSong(4);
+	map->SongHeader.SongList[parameters->int0Parameter]=parameters->int1Parameter;
 }
 
 //optional integer parameter (isSpeech)
@@ -5593,13 +5596,13 @@ void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 				Sender->YPos, parameters->int0Parameter );
 }
 
-void GameScript::PlaySoundPoint(Scriptable* Sender, Action* parameters)
+void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
 	core->GetSoundMgr()->Play( parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter );
 }
 
-void GameScript::PlaySoundNotRanged(Scriptable* Sender, Action* parameters)
+void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
 	core->GetSoundMgr()->Play( parameters->string0Parameter, 0, 0, 0);
@@ -5621,12 +5624,12 @@ void GameScript::CreateVisualEffectObject(Scriptable* Sender, Action* parameters
 	CreateVisualEffectCore(tar->XPos, tar->YPos, parameters->string0Parameter);
 }
 
-void GameScript::CreateVisualEffect(Scriptable* Sender, Action* parameters)
+void GameScript::CreateVisualEffect(Scriptable* /*Sender*/, Action* parameters)
 {
 	CreateVisualEffectCore(parameters->XpointParameter, parameters->YpointParameter, parameters->string0Parameter);
 }
 
-void GameScript::DestroySelf(Scriptable* Sender, Action* parameters)
+void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -5648,16 +5651,16 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 	Sender->SetWait( parameters->int0Parameter );
 }
 
-void GameScript::UnhideGUI(Scriptable* Sender, Action* parameters)
+void GameScript::UnhideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
 		gc->UnhideGUI();
 	}
-	EndCutSceneMode( Sender, parameters );
+	core->SetCutSceneMode( false );
 }
 
-void GameScript::HideGUI(Scriptable* Sender, Action* parameters)
+void GameScript::HideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
@@ -5820,7 +5823,7 @@ void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::AmbientActivate(Scriptable* Sender, Action* parameters)
+void GameScript::AmbientActivate(Scriptable* /*Sender*/, Action* parameters)
 {
 	Animation* anim = core->GetGame()->GetCurrentMap( )->GetAnimation( parameters->objects[1]->objectName );
 	if (!anim) {
@@ -6165,7 +6168,7 @@ void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
 	tar->Active = false;
 }
 
-void GameScript::MakeGlobal(Scriptable* Sender, Action* parameters)
+void GameScript::MakeGlobal(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -6174,7 +6177,7 @@ void GameScript::MakeGlobal(Scriptable* Sender, Action* parameters)
 	core->GetGame()->AddNPC( act );
 }
 
-void GameScript::UnMakeGlobal(Scriptable* Sender, Action* parameters)
+void GameScript::UnMakeGlobal(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -6193,12 +6196,12 @@ void GameScript::GivePartyGoldGlobal(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	unsigned long gold = (unsigned long) CheckVariable( Sender, parameters->string0Parameter );
+	ieDword gold = (unsigned long) CheckVariable( Sender, parameters->string0Parameter );
 	act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
 	core->GetGame()->PartyGold += gold;
 }
 
-void GameScript::CreatePartyGold(Scriptable* Sender, Action* parameters)
+void GameScript::CreatePartyGold(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->PartyGold+=parameters->int0Parameter;
 }
@@ -6217,7 +6220,7 @@ void GameScript::GivePartyGold(Scriptable* Sender, Action* parameters)
 	core->GetGame()->PartyGold+=gold;
 }
 
-void GameScript::DestroyPartyGold(Scriptable* Sender, Action* parameters)
+void GameScript::DestroyPartyGold(Scriptable* /*Sender*/, Action* parameters)
 {
 	int gold = core->GetGame()->PartyGold;
 	if(gold>parameters->int0Parameter) {
@@ -6253,7 +6256,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 	actor->NewStat(IE_XP, parameters->int0Parameter, MOD_ADDITIVE);
 }
 
-void GameScript::AddXP2DA(Scriptable* Sender, Action* parameters)
+void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 {
 	int xptable;
 	
@@ -6270,24 +6273,25 @@ void GameScript::AddXP2DA(Scriptable* Sender, Action* parameters)
 	char * xpvalue = core->GetTable( xptable )->QueryField( parameters->string0Parameter, "0" ); //level is unused
 	
 	if( xpvalue[0]=='P' && xpvalue[1]=='_') {
-		core->GetGame()->ShareXP(atoi(xpvalue+2) ); //no hex value
+		//divide party xp
+		core->GetGame()->ShareXP(atoi(xpvalue+2), true );
 	}
 	else {
-		Actor* actor = ( Actor* ) core->GetGame()->GetPC(0);
-		actor->NewStat(IE_XP, strtol(xpvalue,NULL,0), MOD_ADDITIVE);
+		//give xp everyone
+		core->GetGame()->ShareXP(atoi(xpvalue+2), false );
 	}
 	core->DelTable( xptable );
 }
 
-void GameScript::AddExperienceParty(Scriptable* Sender, Action* parameters)
+void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->ShareXP(parameters->int0Parameter);
+	core->GetGame()->ShareXP(parameters->int0Parameter, true);
 }
 
 void GameScript::AddExperiencePartyGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long xp = CheckVariable( Sender, parameters->string0Parameter );
-	core->GetGame()->ShareXP(xp);
+	ieDword xp = CheckVariable( Sender, parameters->string0Parameter );
+	core->GetGame()->ShareXP(xp, true);
 }
 
 void GameScript::SetMoraleAI(Scriptable* Sender, Action* parameters)
@@ -6373,7 +6377,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	core->GetGUIScriptEngine()->RunFunction( "PopulatePortraitWindow" );
 }
 
-void GameScript::LeaveParty(Scriptable* Sender, Action* parameters)
+void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -6492,12 +6496,12 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value = CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
 	char varname[33]; //this is the Token Name
 	strncpy( varname, parameters->string1Parameter, 32 );
 	varname[32] = 0;
 	char tmpstr[10];
-	sprintf( tmpstr, "%ld", value );
+	sprintf( tmpstr, "%d", value );
 	char* newvalue = ( char* ) malloc( strlen( tmpstr ) + 1 );
 	strcpy( newvalue, tmpstr );
 	core->GetTokenDictionary()->SetAt( varname, newvalue );
@@ -6529,7 +6533,7 @@ void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 }
 
 /* this may not be correct, just a placeholder you can fix */
-void GameScript::Swing(Scriptable* Sender, Action* parameters)
+void GameScript::Swing(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -6540,7 +6544,7 @@ void GameScript::Swing(Scriptable* Sender, Action* parameters)
 }
 
 /* this may not be correct, just a placeholder you can fix */
-void GameScript::SwingOnce(Scriptable* Sender, Action* parameters)
+void GameScript::SwingOnce(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -6550,7 +6554,7 @@ void GameScript::SwingOnce(Scriptable* Sender, Action* parameters)
 	actor->SetWait( 1 );
 }
 
-void GameScript::Recoil(Scriptable* Sender, Action* parameters)
+void GameScript::Recoil(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -6562,16 +6566,16 @@ void GameScript::Recoil(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalSetGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value = CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
 	SetVariable( Sender, parameters->string1Parameter, value );
 }
 
 /* adding the second variable to the first, they must be GLOBAL */
 void GameScript::AddGlobals(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender, "GLOBAL",
+	ieDword value1 = CheckVariable( Sender, "GLOBAL",
 		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender, "GLOBAL",
+	ieDword value2 = CheckVariable( Sender, "GLOBAL",
 		parameters->string1Parameter );
 	SetVariable( Sender, "GLOBAL", parameters->string0Parameter,
 		value1 + value2 );
@@ -6580,9 +6584,9 @@ void GameScript::AddGlobals(Scriptable* Sender, Action* parameters)
 /* adding the second variable to the first, they could be area or locals */
 void GameScript::GlobalAddGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
+	ieDword value2 = CheckVariable( Sender,
 		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 + value2 );
 }
@@ -6590,7 +6594,7 @@ void GameScript::GlobalAddGlobal(Scriptable* Sender, Action* parameters)
 /* adding the number to the global, they could be area or locals */
 void GameScript::IncrementGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value = CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		value + parameters->int0Parameter );
 }
@@ -6598,7 +6602,7 @@ void GameScript::IncrementGlobal(Scriptable* Sender, Action* parameters)
 /* adding the number to the global ONLY if the first global is zero */
 void GameScript::IncrementGlobalOnce(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value = CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
 	if (value != 0) {
 		return;
 	}
@@ -6609,61 +6613,61 @@ void GameScript::IncrementGlobalOnce(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalSubGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
+	ieDword value2 = CheckVariable( Sender,
 		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 - value2 );
 }
 
 void GameScript::GlobalAndGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
+	ieDword value2 = CheckVariable( Sender,
 		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 && value2 );
 }
 
 void GameScript::GlobalOrGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
+	ieDword value2 = CheckVariable( Sender,
 		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 || value2 );
 }
 
 void GameScript::GlobalBOrGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
+	ieDword value2 = CheckVariable( Sender,
 		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 | value2 );
 }
 
 void GameScript::GlobalBAndGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
+	ieDword value2 = CheckVariable( Sender,
 		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 & value2 );
 }
 
 void GameScript::GlobalXorGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
+	ieDword value2 = CheckVariable( Sender,
 		parameters->string1Parameter );
 	SetVariable( Sender, parameters->string0Parameter, value1 ^ value2 );
 }
 
 void GameScript::GlobalBOr(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		value1 | parameters->int0Parameter );
@@ -6671,7 +6675,7 @@ void GameScript::GlobalBOr(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalBAnd(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		value1 & parameters->int0Parameter );
@@ -6679,7 +6683,7 @@ void GameScript::GlobalBAnd(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalXor(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		value1 ^ parameters->int0Parameter );
@@ -6703,7 +6707,7 @@ void GameScript::GlobalMin(Scriptable* Sender, Action* parameters)
 
 void GameScript::BitClear(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		value1 & ~parameters->int0Parameter );
@@ -6711,9 +6715,9 @@ void GameScript::BitClear(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalShL(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
-	unsigned long value2 = parameters->int0Parameter;
+	ieDword value2 = parameters->int0Parameter;
 	if (value2 > 31) {
 		value1 = 0;
 	} else {
@@ -6724,9 +6728,9 @@ void GameScript::GlobalShL(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalShR(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
-	unsigned long value2 = parameters->int0Parameter;
+	ieDword value2 = parameters->int0Parameter;
 	if (value2 > 31) {
 		value1 = 0;
 	} else {
@@ -6737,9 +6741,9 @@ void GameScript::GlobalShR(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalMaxGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
+	ieDword value1 = CheckVariable( Sender,
 		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
+	ieDword value2 = CheckVariable( Sender,
 		parameters->string1Parameter );
 	if (value1 < value2) {
 		SetVariable( Sender, parameters->string0Parameter, value1 );
@@ -6748,10 +6752,8 @@ void GameScript::GlobalMaxGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalMinGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
-		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
-		parameters->string1Parameter );
+	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value2 = CheckVariable( Sender, parameters->string1Parameter );
 	if (value1 < value2) {
 		SetVariable( Sender, parameters->string0Parameter, value1 );
 	}
@@ -6759,10 +6761,8 @@ void GameScript::GlobalMinGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalShLGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
-		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
-		parameters->string1Parameter );
+	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value2 = CheckVariable( Sender, parameters->string1Parameter );
 	if (value2 > 31) {
 		value1 = 0;
 	} else {
@@ -6772,10 +6772,8 @@ void GameScript::GlobalShLGlobal(Scriptable* Sender, Action* parameters)
 }
 void GameScript::GlobalShRGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable( Sender,
-		parameters->string0Parameter );
-	unsigned long value2 = CheckVariable( Sender,
-		parameters->string1Parameter );
+	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value2 = CheckVariable( Sender, parameters->string1Parameter );
 	if (value2 > 31) {
 		value1 = 0;
 	} else {
@@ -6784,7 +6782,7 @@ void GameScript::GlobalShRGlobal(Scriptable* Sender, Action* parameters)
 	SetVariable( Sender, parameters->string0Parameter, value1 );
 }
 
-void GameScript::ClearAllActions(Scriptable* Sender, Action* parameters)
+void GameScript::ClearAllActions(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	//just a hack
 	Game* game = core->GetGame();
@@ -6797,7 +6795,7 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
+void GameScript::ClearActions(Scriptable* Sender, Action* /*parameters*/)
 {
 	Sender->ClearActions();
 }
@@ -6811,13 +6809,12 @@ void GameScript::SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters)
 	actor->TalkCount = parameters->int0Parameter;
 }
 
-void GameScript::StartMovie(Scriptable* Sender, Action* parameters)
+void GameScript::StartMovie(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->PlayMovie( parameters->string0Parameter );
 }
 
-void GameScript::SetLeavePartyDialogFile(Scriptable* Sender,
-	Action* parameters)
+void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -6830,7 +6827,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender,
 	core->DelTable( pdtable );
 }
 
-void GameScript::TextScreen(Scriptable* Sender, Action* parameters)
+void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
 	int chapter = core->LoadTable( parameters->string0Parameter );
 	if(chapter<0) {
@@ -6857,7 +6854,7 @@ void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
 	core->GetGame()->IncrementChapter();
 }
 
-void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* parameters)
+void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -6867,7 +6864,20 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* parameters)
 	actor->SetStat(IE_MC_FLAGS,actor->GetStat(IE_MC_FLAGS)|32768);
 }
 
-void GameScript::SetTextColor(Scriptable* Sender, Action* parameters)
+/*iwd2 sets the high MC bits this way*/
+void GameScript::SetCreatureAreaFlags(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	//confirmed with the invulnerability flag (0x20000)
+	ieDword value=actor->GetStat(IE_MC_FLAGS);
+	HandleBitMod(value, parameters->int0Parameter, parameters->int1Parameter);
+	actor->SetStat(IE_MC_FLAGS,value);
+}
+
+void GameScript::SetTextColor(Scriptable* /*Sender*/, Action* parameters)
 {
 	GameControl *gc=core->GetGameControl();
 	if(gc) {
@@ -6880,34 +6890,16 @@ void GameScript::SetTextColor(Scriptable* Sender, Action* parameters)
 
 void GameScript::BitGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
-	switch(parameters->int1Parameter) {
-		case BM_AND:
-			value = ( value& parameters->int0Parameter );
-		case BM_OR:
-			value = ( value| parameters->int0Parameter );
-		case BM_XOR:
-			value = ( value^ parameters->int0Parameter );
-		case BM_NAND: //this is a GemRB extension
-			value = ( value& ~parameters->int0Parameter );
-	}
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter );
+	HandleBitMod( value, parameters->int0Parameter, parameters->int1Parameter);
 	SetVariable(Sender, parameters->string0Parameter, value);
 }
 
 void GameScript::GlobalBitGlobal(Scriptable* Sender, Action* parameters)
 {
-	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
-	switch(parameters->int1Parameter) {
-		case BM_AND:
-			value1 = ( value1& value2);
-		case BM_OR:
-			value1 = ( value1| value2);
-		case BM_XOR:
-			value1 = ( value1^ value2);
-		case BM_NAND: //this is a GemRB extension
-			value1 = ( value1& ~value2);
-	}
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
+	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter );
+	HandleBitMod( value1, value2, parameters->int1Parameter);
 	SetVariable(Sender, parameters->string0Parameter, value1);
 }
 
@@ -6929,7 +6921,7 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 	actor->SetStat(IE_UNSELECTABLE,parameters->int0Parameter);
 }
 
-void GameScript::Debug(Scriptable* Sender, Action* parameters)
+void GameScript::Debug(Scriptable* /*Sender*/, Action* parameters)
 {
 	InDebug=1;
 	printMessage("IEScript",parameters->string0Parameter,YELLOW);
@@ -6969,19 +6961,19 @@ void GameScript::IncrementExtraProficiency(Scriptable* Sender, Action* parameter
 }
 
 //the third parameter is a GemRB extension
-void GameScript::AddJournalEntry(Scriptable* Sender, Action* parameters)
+void GameScript::AddJournalEntry(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->AddJournalEntry(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
 }
 
-void GameScript::SetQuestDone(Scriptable* Sender, Action* parameters)
+void GameScript::SetQuestDone(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->DeleteJournalEntry(parameters->int0Parameter);
 	core->GetGame()->AddJournalEntry(parameters->int0Parameter, IE_GAM_QUEST_DONE, parameters->int2Parameter);
 
 }
 
-void GameScript::RemoveJournalEntry(Scriptable* Sender, Action* parameters)
+void GameScript::RemoveJournalEntry(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->DeleteJournalEntry(parameters->int0Parameter);
 }
@@ -7019,7 +7011,7 @@ void GameScript::IncInternal(Scriptable* Sender, Action* parameters)
 	target->NewStat(IE_INTERNAL_0+idx, parameters->int1Parameter,MOD_ADDITIVE);
 }
 
-void GameScript::DestroyAllEquipment(Scriptable* Sender, Action* parameters)
+void GameScript::DestroyAllEquipment(Scriptable* Sender, Action* /*parameters*/)
 {
 	Inventory *inv=NULL;
 
@@ -7055,7 +7047,7 @@ void GameScript::DestroyItem(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* parameters)
+void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* /*parameters*/)
 {
 	Inventory *inv=NULL;
 
@@ -7094,7 +7086,7 @@ void GameScript::SetRegularName(Scriptable* Sender, Action* parameters)
 }
 
 /** this is a gemrb extension */
-void GameScript::UnloadArea(Scriptable* Sender, Action* parameters)
+void GameScript::UnloadArea(Scriptable* /*Sender*/, Action* parameters)
 {
 	int map=core->GetGame()->FindMap(parameters->string0Parameter);
 	if(map>=0) {
@@ -7128,13 +7120,13 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::ReputationSet(Scriptable* Sender, Action* parameters)
+void GameScript::ReputationSet(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->Reputation = (unsigned int) parameters->int0Parameter;
 	core->GetGame()->ReputationAltered();
 }
 
-void GameScript::ReputationInc(Scriptable* Sender, Action* parameters)
+void GameScript::ReputationInc(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->Reputation += (unsigned int) parameters->int0Parameter;
 	core->GetGame()->ReputationAltered();
@@ -7150,7 +7142,7 @@ void GameScript::FullHeal(Scriptable* Sender, Action* parameters)
 	scr->SetStat(IE_HITPOINTS, scr->GetStat(IE_MAXHITPOINTS) );
 }
 
-void GameScript::RemovePaladinHood(Scriptable* Sender, Action* parameters)
+void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 {
 	if(Sender->Type!=ST_ACTOR) {
 		return;
@@ -7159,7 +7151,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* parameters)
 	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) | MC_FALLEN_PALADIN);
 }
 
-void GameScript::RemoveRangerHood(Scriptable* Sender, Action* parameters)
+void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 {
 	if(Sender->Type!=ST_ACTOR) {
 		return;
@@ -7168,7 +7160,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* parameters)
 	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) | MC_FALLEN_RANGER);
 }
 
-void GameScript::RegainPaladinHood(Scriptable* Sender, Action* parameters)
+void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
 {
 	if(Sender->Type!=ST_ACTOR) {
 		return;
@@ -7177,7 +7169,7 @@ void GameScript::RegainPaladinHood(Scriptable* Sender, Action* parameters)
 	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) & ~MC_FALLEN_PALADIN);
 }
 
-void GameScript::RegainRangerHood(Scriptable* Sender, Action* parameters)
+void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 {
 	if(Sender->Type!=ST_ACTOR) {
 		return;
@@ -7230,7 +7222,7 @@ void GameScript::GetItem(Scriptable* Sender, Action* parameters)
 }
 
 //an actor can 'give' an item to a container or another actor
-void GameScript::GiveItem(Scriptable *Sender, Action *parameters)
+void GameScript::GiveItem(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	MoveItemCore(Sender, tar, parameters->string0Parameter,0);
@@ -7253,7 +7245,7 @@ void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 //this action creates an item in a container or a creature
 //if there is an object it works as GiveItemCreate
 //otherwise it creates the item on the Sender
-void GameScript::CreateItem(Scriptable *Sender, Action *parameters)
+void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar;
 	if(parameters->objects[1]) {
@@ -7290,7 +7282,7 @@ void GameScript::CreateItem(Scriptable *Sender, Action *parameters)
 	}
 }
 
-void GameScript::TakeItemReplace(Scriptable *Sender, Action *parameters)
+void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type != ST_ACTOR) {
@@ -7314,7 +7306,7 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action *parameters)
 }
 
 //same as equipitem, but with additional slots parameter, and object to perform action
-void GameScript::XEquipItem(Scriptable *Sender, Action *parameters)
+void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 
@@ -7327,7 +7319,7 @@ void GameScript::XEquipItem(Scriptable *Sender, Action *parameters)
 	}
 }
 
-void GameScript::EquipItem(Scriptable *Sender, Action *parameters)
+void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 {
 	if(Sender->Type!=ST_ACTOR) {
 		return;
@@ -7344,7 +7336,7 @@ void GameScript::EquipItem(Scriptable *Sender, Action *parameters)
 	}
 }
 
-void GameScript::DropItem(Scriptable *Sender, Action *parameters)
+void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 {
 	if(Sender->Type!=ST_ACTOR) {
 		return;
@@ -7364,7 +7356,7 @@ void GameScript::DropItem(Scriptable *Sender, Action *parameters)
 	Sender->CurrentAction = NULL;
 }
 
-void GameScript::DropInventory(Scriptable *Sender, Action *parameters)
+void GameScript::DropInventory(Scriptable *Sender, Action* /*parameters*/)
 {
 	if(Sender->Type!=ST_ACTOR) {
 		return;
@@ -7373,7 +7365,7 @@ void GameScript::DropInventory(Scriptable *Sender, Action *parameters)
 	scr->DropItem("",0);
 }
 
-void GameScript::PickPockets(Scriptable *Sender, Action *parameters)
+void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 {
 	if(Sender->Type!=ST_ACTOR) {
 		return;
@@ -7413,37 +7405,37 @@ void GameScript::PickPockets(Scriptable *Sender, Action *parameters)
 //	MoveItemCore(tar, Sender, slot);
 }
 
-void GameScript::TakeItemList(Scriptable *Sender, Action *parameters)
+void GameScript::TakeItemList(Scriptable * /*Sender*/, Action* /*parameters*/)
 {
 }
 
 //bg2
-void GameScript::SetRestEncounterProbabilityDay(Scriptable *Sender, Action *parameters)
+void GameScript::SetRestEncounterProbabilityDay(Scriptable * /*Sender*/, Action* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	map->RestHeader.DayChance = parameters->int0Parameter;
 }
 
-void GameScript::SetRestEncounterProbabilityNight(Scriptable *Sender, Action *parameters)
+void GameScript::SetRestEncounterProbabilityNight(Scriptable * /*Sender*/, Action* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	map->RestHeader.NightChance = parameters->int0Parameter;
 }
 
 //iwd
-void GameScript::SetRestEncounterChance(Scriptable *Sender, Action *parameters)
+void GameScript::SetRestEncounterChance(Scriptable * /*Sender*/, Action* parameters)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	map->RestHeader.DayChance = parameters->int0Parameter;
 	map->RestHeader.NightChance = parameters->int1Parameter;
 }
 
-void GameScript::QuitGame(Scriptable *Sender, Action *parameters)
+void GameScript::QuitGame(Scriptable * /*Sender*/, Action* /*parameters*/)
 {
 	core->QuitGame(true);
 }
 
-void GameScript::StopMoving(Scriptable *Sender, Action *parameters)
+void GameScript::StopMoving(Scriptable *Sender, Action* /*parameters*/)
 {
 	if(Sender->Type!=ST_ACTOR) {
 		return;

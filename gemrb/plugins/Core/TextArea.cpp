@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.59 2004/08/03 08:25:36 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.60 2004/08/19 21:14:26 avenger_teambg Exp $
  *
  */
 
@@ -313,7 +313,7 @@ void TextArea::SetFonts(Font* init, Font* text)
 }
 
 /** Key Press Event */
-void TextArea::OnKeyPress(unsigned char Key, unsigned short Mod)
+void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	if (( Key >= '1' ) && ( Key <= '9' )) {
 		//Actually selectable=false for dialogs
@@ -345,7 +345,7 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short Mod)
 	}
 }
 /** Special Key Press */
-void TextArea::OnSpecialKeyPress(unsigned char Key)
+void TextArea::OnSpecialKeyPress(unsigned char /*Key*/)
 {
 }
 
@@ -423,7 +423,7 @@ void TextArea::CalcRowCount()
 	bar->SetMax( rows );
 }
 /** Mouse Over Event */
-void TextArea::OnMouseOver(unsigned short x, unsigned short y)
+void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
 	int height = ftext->size[1].h;//ftext->chars[1]->Height;
 	int r = y / height;
@@ -448,7 +448,7 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 
 /** Mouse Button Up */
 void TextArea::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned char /*Button*/, unsigned short /*Mod*/)
 {
 	if (( x <= Width ) && ( y <= ( Height - 5 ) ) && ( seltext != -1 )) {
 		selline = seltext;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.17 2004/07/25 07:32:49 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.18 2004/08/19 21:14:26 avenger_teambg Exp $
  *
  */
 
@@ -30,7 +30,7 @@
 #include "../../includes/SClassID.h"
 
 /////////////////////////////////////////////////////////////////////////////
-// Variables<unsigned long, VALUE>
+// Variables<ieDword, VALUE>
 
 #define GEM_VARIABLES_INT      0
 #define GEM_VARIABLES_STRING   1
@@ -54,7 +54,7 @@ protected:
 		MyAssoc* pNext;
 		char* key;
 		union Value {
-			unsigned long nValue;
+			ieDword nValue;
 			char* sValue;
 		} Value;
 		unsigned long nHashValue;
@@ -96,11 +96,12 @@ public:
 	// Lookup
 	int GetValueLength(const char* key) const;
 	bool Lookup(const char* key, char* dest, int MaxLength) const;
-	bool Lookup(const char* key, unsigned long& rValue) const;
+	bool Lookup(const char* key, ieDword& rValue) const;
+	bool Lookup(const char* key, char*& dest) const;
 
 	// Operations
 	void SetAt(const char* key, const char* newValue);
-	void SetAt(const char* key, unsigned long newValue);
+	void SetAt(const char* key, ieDword newValue);
 	void RemoveAll();
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
 
@@ -113,7 +114,7 @@ protected:
 	MyAssoc* m_pFreeList;
 	MemBlock* m_pBlocks;
 	int m_nBlockSize;
-	int m_type; //could be string or unsigned long
+	int m_type; //could be string or ieDword 
 
 	MyAssoc* NewAssoc(const char* key);
 	void FreeAssoc(MyAssoc*);
@@ -122,7 +123,7 @@ protected:
 	inline unsigned int MyHashKey(const char*) const;
 	//	 POSITION GetStartPosition() const;
 	void GetNextAssoc(POSITION& rNextPosition, const char*& rKey,
-		unsigned long& rValue) const;
+		ieDword& rValue) const;
 
 public:
 	~Variables();

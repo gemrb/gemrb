@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.30 2004/08/09 18:24:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.31 2004/08/19 21:14:28 avenger_teambg Exp $
  *
  */
 
@@ -173,7 +173,7 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 
 	if (!strcmp( Token, "MAGESCHOOL" )) {
 		//this should be character dependent, we don't have a character sheet yet
-		unsigned long row = 0; //default value is 0 (generalist)
+		ieDword row = 0; //default value is 0 (generalist)
 		//this is subject to change, the row number in magesch.2da
 		core->GetDictionary()->Lookup( "MAGESCHOOL", row ); 
 		int ind = core->LoadTable( "magesch" );

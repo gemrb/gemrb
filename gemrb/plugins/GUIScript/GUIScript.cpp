@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.188 2004/08/19 12:43:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.189 2004/08/19 21:14:26 avenger_teambg Exp $
  *
  */
 
@@ -61,7 +61,7 @@ inline bool valid_number(const char* string, long& val)
 /* Sets RuntimeError exception and returns NULL, so this function
  * can be called in `return'. 
  */
-PyObject* RuntimeError(char* msg, char* doc_string = NULL)
+PyObject* RuntimeError(char* msg)
 {
 	printMessage( "GUIScript", "Runtime Error:\n", LIGHT_RED );
 	PyErr_SetString( PyExc_RuntimeError, msg );
@@ -107,7 +107,7 @@ PyDoc_STRVAR( GemRB_UnhideGUI__doc,
 "UnhideGUI()\n\n"
 "Shows the Game GUI and redraws windows." );
 
-static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* args)
+static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 {
 	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );
 	if (gc->ControlType != IE_GUI_GAMECONTROL) {
@@ -123,7 +123,7 @@ PyDoc_STRVAR( GemRB_HideGUI__doc,
 "HideGUI()\n\n"
 "Hides the Game GUI." );
 
-static PyObject* GemRB_HideGUI(PyObject*, PyObject* args)
+static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 {
 	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );
 	if (gc->ControlType != IE_GUI_GAMECONTROL) {
@@ -206,7 +206,7 @@ PyDoc_STRVAR( GemRB_EnterGame__doc,
 "EnterGame()\n\n"
 "Starts new game and enters it." );
 
-static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
+static PyObject* GemRB_EnterGame(PyObject*, PyObject* /*args*/)
 {
 	Game* game = core->GetGame();
 	if(!game) {
@@ -228,7 +228,7 @@ static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
 PyDoc_STRVAR( GemRB_QuitGame__doc,
 "QuitGame()\n\n"
 "Stops the current game.");
-static PyObject* GemRB_QuitGame(PyObject*, PyObject* args)
+static PyObject* GemRB_QuitGame(PyObject*, PyObject* /*args*/)
 {
 	core->QuitGame(false);
 	Py_INCREF( Py_None );
@@ -358,7 +358,7 @@ PyDoc_STRVAR( GemRB_EndCutSceneMode__doc,
 "EndCutScreneMode()\n\n"
 "Exits the CutScene Mode." );
 
-static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
 {
 	core->SetCutSceneMode( false );
 	Py_INCREF( Py_None );
@@ -1200,7 +1200,7 @@ PyDoc_STRVAR( GemRB_SetVarAssoc__doc,
 static PyObject* GemRB_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
-	unsigned long Value;
+	ieDword Value;
 	char* VarName;
 
 	if (!PyArg_ParseTuple( args, "iisl", &WindowIndex, &ControlIndex,
@@ -2197,9 +2197,8 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetToken__doc );
 	}
 
-	//trying to cheat the pointer out from the Dictionary without allocating it
-	//BuildValue will allocate its own area anyway
-	if (!core->GetTokenDictionary()->Lookup( Variable, ( unsigned long & ) value )) {
+	//returns only the pointer
+	if (!core->GetTokenDictionary()->Lookup( Variable, value )) {
 		return Py_BuildValue( "s", "" );
 	}
 
@@ -2213,7 +2212,7 @@ PyDoc_STRVAR( GemRB_GetVar__doc,
 static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 {
 	char* Variable;
-	unsigned long value;
+	ieDword value;
 
 	if (!PyArg_ParseTuple( args, "s", &Variable )) {
 		return AttributeError( GemRB_GetVar__doc );
@@ -2265,7 +2264,7 @@ PyDoc_STRVAR( GemRB_GetGameVar__doc,
 static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 {
 	char* Variable;
-	unsigned long value;
+	ieDword value;
 
 	if (!PyArg_ParseTuple( args, "s", &Variable )) {
 		return AttributeError( GemRB_GetGameVar__doc );
@@ -2537,7 +2536,7 @@ PyDoc_STRVAR( GemRB_GameGetPartyGold__doc,
 "GameGetPartyGold() => int\n\n"
 "Returns current party gold." );
 
-static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* /*args*/)
 {
 	int Gold = core->GetGame()->PartyGold;
 	return Py_BuildValue( "i", Gold );
@@ -2547,7 +2546,7 @@ PyDoc_STRVAR( GemRB_GameGetFormation__doc,
 "GameGetFormation() => int\n\n"
 "Returns current party formation." );
 
-static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* /*args*/)
 {
 	int Formation = core->GetGame()->WhichFormation;
 	return Py_BuildValue( "i", Formation );
@@ -2996,7 +2995,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	}
 	core->DelTable( mastertable );
 	// 0 - single player, 1 - tutorial, 2 - multiplayer
-	unsigned long playmode = 0;
+	ieDword playmode = 0;
 	core->GetDictionary()->Lookup( "PlayMode", playmode );
 	playmode *= 2;
 	int saindex = core->LoadTable( "STARTPOS" );

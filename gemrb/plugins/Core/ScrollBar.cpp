@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.24 2004/04/29 04:20:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.25 2004/08/19 21:14:26 avenger_teambg Exp $
  *
  */
 
@@ -121,7 +121,7 @@ void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
 }
 /** Mouse Button Down */
 void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned char /*Button*/, unsigned short /*Mod*/)
 {
 	//((Window*)Owner)->Invalidate();
 	core->RedrawAll();
@@ -177,14 +177,14 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 	}
 }
 /** Mouse Button Up */
-void ScrollBar::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+void ScrollBar::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
+	unsigned char /*Button*/, unsigned short /*Mod*/)
 {
 	Changed = true;
 	State = 0;
 }
 /** Mouse Over Event */
-void ScrollBar::OnMouseOver(unsigned short x, unsigned short y)
+void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
 	if (( State & SLIDER_GRAB ) != 0) {
 		//((Window*)Owner)->Invalidate();
@@ -218,7 +218,7 @@ void ScrollBar::OnMouseOver(unsigned short x, unsigned short y)
 }
 
 /** Sets the Text of the current control */
-int ScrollBar::SetText(const char* string, int pos)
+int ScrollBar::SetText(const char* /*string*/, int /*pos*/)
 {
 	return 0;
 }

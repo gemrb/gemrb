@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.162 2004/08/09 13:02:08 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.163 2004/08/19 21:14:25 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -110,7 +110,7 @@ GameControl::GameControl(void)
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
 	effect = NULL;
-	unsigned long tmp=0;
+	ieDword tmp=0;
 
 	core->GetDictionary()->Lookup("Center",tmp);
 	if(tmp) {
@@ -365,13 +365,13 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		}
 	}
 }
-/** Sets the Text of the current control */
-int GameControl::SetText(const char* string, int pos)
+/** Sets the Text of the current control, unused here */
+int GameControl::SetText(const char* /*string*/, int /*pos*/)
 {
 	return 0;
 }
 /** Key Press Event */
-void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
+void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	HotKey=tolower(Key);
 }
@@ -774,7 +774,8 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	}
 }
 
-bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor *actor)
+//maybe actor is unneeded
+bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * /*actor*/)
 {
 	switch(trap->Type) {
 		case ST_TRAVEL:
@@ -812,7 +813,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor *actor)
 }
 /** Mouse Button Down */
 void GameControl::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned char Button, unsigned short /*Mod*/)
 {
 	if ((ScreenFlags&SF_DISABLEMOUSE) || (Button != GEM_MB_ACTION) ) {
 		return;
@@ -829,7 +830,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 }
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned char Button, unsigned short /*Mod*/)
 {
 	unsigned int i;
 	char Tmp[256];
@@ -1058,7 +1059,7 @@ void GameControl::HideGUI()
 	}
 	ScreenFlags &=~SF_GUIENABLED;
 	Variables* dict = core->GetDictionary();
-	unsigned long index;
+	ieDword index;
 	if (dict->Lookup( "MessageWindow", index )) {
 		if (index != (unsigned long) -1) {
 			Window* mw = core->GetWindow( index );
@@ -1132,7 +1133,7 @@ void GameControl::UnhideGUI()
 	}
 	ScreenFlags |= SF_GUIENABLED;
 	Variables* dict = core->GetDictionary();
-	unsigned long index;
+	ieDword index;
 	// Unhide the gamecontrol window
 	core->SetVisible( 0, 1 );
 
@@ -1182,7 +1183,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "OtherWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* tw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "OtherPosition", index )) {
@@ -1349,7 +1350,7 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 	this->speaker = speaker;
 	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR;
 	DialogueFlags |= DF_IN_DIALOG;
-	unsigned long index;
+	ieDword index;
 	core->GetDictionary()->Lookup( "MessageWindowSize", index );
 	if (index == 0) {
 		// FIXME: should use RunEventHandler()
@@ -1438,7 +1439,7 @@ bool GameControl::EvaluateDialogTrigger(Scriptable* target, DialogString* trigge
 void GameControl::DialogChoose(unsigned int choose)
 {
 	char Tmp[256];
-	unsigned long index;
+	ieDword index;
 
 	if (!core->GetDictionary()->Lookup( "MessageWindow", index )) {
 		return;
@@ -1604,7 +1605,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 
 void GameControl::DisplayString(const char* Text)
 {
-	unsigned long WinIndex, TAIndex;
+	ieDword WinIndex, TAIndex;
 
 	core->GetDictionary()->Lookup( "MessageWindow", WinIndex );
 	if (( WinIndex != (unsigned long) -1 ) &&
