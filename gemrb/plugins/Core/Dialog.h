@@ -15,12 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.1 2003/12/18 20:04:06 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.2 2003/12/23 23:43:50 balrog994 Exp $
  *
  */
 
 #ifndef DIALOG_H
 #define DIALOG_H
+
+#include <vector>
 
 #ifdef WIN32
 
@@ -34,11 +36,39 @@
 #define GEM_EXPORT
 #endif
 
+typedef struct DialogString {
+	char ** strings;
+	unsigned long count;
+} DialogString;
+
+typedef struct DialogTransition {
+	unsigned long Flags;
+	unsigned long textStrRef;
+	unsigned long journalStrRef;
+	DialogString * trigger;
+	DialogString * action;
+	char          Dialog[8];
+    unsigned long stateIndex;
+} DialogTransition;
+
+typedef struct DialogState {
+	unsigned long StrRef;
+	DialogTransition ** transitions;
+	unsigned long transitionsCount;
+	DialogString * trigger;
+} DialogState;
+
 class GEM_EXPORT Dialog
 {
 public:
 	Dialog(void);
 	~Dialog(void);
+private:
+	std::vector<DialogState*> initialStates;
+public:
+	void AddState(DialogState *ds);
+	DialogState* GetState(int index);
+	char ResRef[9];
 };
 
 #endif

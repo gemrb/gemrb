@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.1 2003/12/18 20:04:06 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.2 2003/12/23 23:43:50 balrog994 Exp $
  *
  */
 
@@ -28,4 +28,20 @@ Dialog::Dialog(void)
 
 Dialog::~Dialog(void)
 {
+	for(int i = 0; i < initialStates.size(); i++) {
+		if(initialStates[i])
+			delete(initialStates[i]);
+	}
+}
+
+void Dialog::AddState(DialogState *ds)
+{
+	initialStates.push_back(ds);
+}
+
+DialogState * Dialog::GetState(int index)
+{
+	if(index >= initialStates.size())
+		return NULL;
+	return initialStates.at(index);
 }
