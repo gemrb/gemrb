@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.4 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.5 2003/11/29 18:49:53 balrog994 Exp $
  *
  */
 
@@ -35,6 +35,7 @@ Animation::Animation(unsigned short * frames, int count)
 	for(int i = 0; i < count; i++)
 		indices.push_back(frames[i]);
 	pos = 0;
+	startpos = rand()%count;
 	starttime = 0;
 	x = 0;
 	y = 0;
@@ -99,6 +100,8 @@ Sprite2D * Animation::NextFrame(void)
 	if(pos >= indices.size())
 	pos = 0;*/
 #endif
+	pos += startpos;
+	pos %= frames.size();
 	return ret;
 }
 
