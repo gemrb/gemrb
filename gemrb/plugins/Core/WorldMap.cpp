@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.5 2004/05/25 16:16:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.6 2004/08/09 20:57:52 avenger_teambg Exp $
  *
  */
 
@@ -28,6 +28,16 @@ extern Interface *core;
 WorldMap::WorldMap(void)
 {
 	MapMOS = NULL;
+}
+
+void WorldMap::AddAreaEntry(WMPAreaEntry *ae)
+{
+  area_entries.push_back(ae);
+}
+
+void WorldMap::AddAreaLink(WMPAreaLink *al)
+{
+  area_links.push_back(al);
 }
 
 WorldMap::~WorldMap(void)

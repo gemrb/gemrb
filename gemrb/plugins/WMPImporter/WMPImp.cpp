@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.4 2004/05/25 16:16:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.5 2004/08/09 20:57:53 avenger_teambg Exp $
  *
  */
 
@@ -81,24 +81,25 @@ WorldMap* WMPImp::GetWorldMap(unsigned int index)
 
 	str->Seek( m->AreaEntriesOffset, GEM_STREAM_START );
 	for (i = 0; i < m->AreaEntriesCount; i++) {
-		WMPAreaEntry* ae = GetAreaEntry();
-		m->area_entries.push_back( ae );
+//		WMPAreaEntry* ae = GetAreaEntry();
+    m->AddAreaEntry(GetAreaEntry());
+//		m->area_entries.push_back( ae );
 	}
 
 	str->Seek( m->AreaLinksOffset, GEM_STREAM_START );
 	for (i = 0; i < m->AreaLinksCount; i++) {
-		WMPAreaLink* al = GetAreaLink();
-		m->area_links.push_back( al );
+//		WMPAreaLink* al = GetAreaLink();
+    m->AddAreaLink(GetAreaLink());
+//		m->area_links.push_back( al );
 	}
 
-
-	DataStream* mosfile = core->GetResourceMgr()->GetResource( m->MapResRef,
-													IE_MOS_CLASS_ID );
 	if (!core->IsAvailable( IE_MOS_CLASS_ID )) {
 		printf( "[WMPImporter]: No MOS Importer Available.\n" );
-		return NULL;
+		return m;
 	}
 	ImageMgr* mos = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
+	DataStream* mosfile = core->GetResourceMgr()->GetResource( m->MapResRef,
+													IE_MOS_CLASS_ID );
 	mos->Open( mosfile, true ); //autofree
 
 	m->MapMOS = mos->GetImage();

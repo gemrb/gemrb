@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.4 2004/08/09 20:57:52 avenger_teambg Exp $
  *
  */
 
@@ -72,9 +72,6 @@ class GEM_EXPORT WorldMap {
 public:
 	WorldMap();
 	~WorldMap();
-	std::vector< WMPAreaEntry*> area_entries;
-	std::vector< WMPAreaLink*> area_links;
-
 	ieResRef MapResRef;
 	ieDword Width;
 	ieDword Height;
@@ -90,6 +87,13 @@ public:
 	char unknown3[128];
 
 	Sprite2D* MapMOS;
+
+public:
+  void AddAreaEntry(WMPAreaEntry *ae);
+  void AddAreaLink(WMPAreaLink *al);
+private:
+	std::vector< WMPAreaEntry*> area_entries;
+	std::vector< WMPAreaLink*> area_links;
 };
 
 #endif  // ! WORLDMAP_H
