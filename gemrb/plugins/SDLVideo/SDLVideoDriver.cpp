@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.73 2004/06/30 22:18:51 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.74 2004/07/18 08:33:41 guidoj Exp $
  *
  */
 
@@ -219,6 +219,8 @@ int SDLVideoDriver::SwapBuffers(void)
 								case SDLK_RETURN:
 									key = GEM_RETURN;
 									break;
+								default:
+									break;
 							}
 							core->console->OnSpecialKeyPress( key );
 						} else if (( key != 0 ))
@@ -378,6 +380,8 @@ int SDLVideoDriver::SwapBuffers(void)
 							case SDLK_LALT:
 							case SDLK_RALT:
 								key = GEM_ALT;
+								break;
+							default:
 								break;
 						}
 						if (Evnt)
@@ -1046,7 +1050,7 @@ void SDLVideoDriver::GetPixel(short x, short y, Color* color)
 bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, short x, short y)
 {
 	SDL_Surface *surf = (SDL_Surface*)(sprite->vptr);
-	Color color;
+	//Color color;
 
 	unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
 		( ( y * surf->w + x) * surf->format->BytesPerPixel );

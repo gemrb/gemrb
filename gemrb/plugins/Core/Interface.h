@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.95 2004/05/25 16:16:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.96 2004/07/18 08:33:40 guidoj Exp $
  *
  */
 
@@ -350,7 +350,7 @@ public:
 	char CD5[_MAX_PATH];
 	char CD6[_MAX_PATH];
 	int Width, Height, Bpp, ForceStereo;
-	int TooltipDelay;
+	unsigned int TooltipDelay;
 	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos;
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);

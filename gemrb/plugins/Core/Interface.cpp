@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.173 2004/07/01 23:18:59 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.174 2004/07/18 08:33:40 guidoj Exp $
  *
  */
 
@@ -407,7 +407,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 	strcpy( NextScript, "Start" );
 	AnimationFactory* af = ( AnimationFactory* )
-		GetResourceMgr()->GetFactoryResource( CursorBam, IE_BAM_CLASS_ID );
+	GetResourceMgr()->GetFactoryResource( CursorBam, IE_BAM_CLASS_ID );
 	printMessage( "Core", "Setting up the Console...", WHITE );
 	ChangeScript = true;
 	console = new Console();
