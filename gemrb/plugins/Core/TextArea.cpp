@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.46 2004/04/04 15:49:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.47 2004/04/14 22:49:05 avenger_teambg Exp $
  *
  */
 
@@ -157,18 +157,10 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 				pal = lineselpal;
 			else
 				pal = palette;
-			ftext->Print( Region( x +
-							XPos,
-							y +
-							YPos +
-							( yl * ftext->size[1].h/*chars[1]->Height*/ ),
-							Width,
-							Height -
-							5 -
-							( yl * ftext->size[1].h/*chars[1]->Height*/ ) ),
-					( unsigned char * )
-					lines[i], pal, IE_FONT_ALIGN_LEFT,
-					true );
+			ftext->Print( Region( x + XPos, y + YPos +
+					( yl * ftext->size[1].h/*chars[1]->Height*/ ), Width,
+					Height - 5 - ( yl * ftext->size[1].h/*chars[1]->Height*/ ) ),
+					( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT, true );
 			yl += lrows[i];
 		}
 	}
@@ -245,7 +237,7 @@ int TextArea::AppendText(const char* text, int pos)
 		int mylen = ( int ) strlen( lines[pos] );
 
 		lines[pos] = ( char * ) realloc( lines[pos], mylen + newlen + 1 );
-		memcpy( &lines[pos][mylen], text, newlen + 1 );
+		memcpy( lines[pos]+mylen, text, newlen + 1 );
 		ret = pos;
 	}
 	CalcRowCount();
@@ -272,13 +264,14 @@ void TextArea::PopLines(int count)
 		count = lines.size();
 	}
 
-	for (; count > 0; count--) {
+	while (count > 0 ) {
+		char *poi=lines[0];
 		lines.pop_back();
+		free(poi);
 		lrows.pop_back();
 	}
 
 	int pos;
-
 	CalcRowCount();
 	Changed = true;
 	if (sb) {
@@ -287,9 +280,9 @@ void TextArea::PopLines(int count)
 			pos = rows - ( ( Height - 5 ) / ftext->maxHeight );
 		else
 			pos = 0;
-		//pos=lines.size()-((Height-5)/ftext->maxHeight);
-		if (pos < 0)
+		if (pos < 0) {
 			pos = 0;
+		}
 		bar->SetPos( pos );
 	}
 	core->RedrawAll();
@@ -370,15 +363,17 @@ void TextArea::CalcRowCount()
 			for (int p = 0; p <= len; p++) {
 				if (( ( unsigned char ) tmp[p] ) == '[') {
 					p++;
-					char tag[256];
+					//char tag[256];
 					int k = 0;
 					for (k = 0; k < 256; k++) {
 						if (tmp[p] == ']') {
-							tag[k] = 0;
+							//tag[k] = 0;
 							break;
 						}
-						tag[k] = tmp[p++];
+						p++;
+						//tag[k] = tmp[p++];
 					}
+					
 					continue;
 				}
 				if (tmp[p] == 0) {
