@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.17 2004/08/08 05:11:32 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.18 2004/08/09 05:30:32 divide Exp $
  *
  */
 
@@ -54,22 +54,6 @@ public:
 	}
 private:
 	CREItem* GetItem();
-	struct Ambient10 {
-		char name[32];
-		ieWord origin[2];
-		ieWord radius;
-		ieWord height;
-		char unknown0[6];
-		ieWord gain;
-		ieResRef sounds[10];
-		ieWord numsounds;
-		ieWord unknown1;
-		ieDword interval;
-		ieDword perset;
-		ieDword appearance;
-		ieDword flags;
-		char unknown2[64];
-	};
 };
 
 #endif

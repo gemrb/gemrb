@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.61 2004/08/08 05:11:32 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.62 2004/08/09 05:30:25 divide Exp $
  *
  */
 
@@ -585,16 +585,43 @@ Map* AREImp::GetMap(const char *ResRef)
 	printf( "Loading ambients\n" );
 	str->Seek( AmbiOffset, GEM_STREAM_START );
 	for (i = 0; i < AmbiCount; i++) {
-		struct Ambient10 ambi;
-		str->Read( &ambi, sizeof(ambi) );
-		Point orig;
-		orig.x = ambi.origin[0];
-		orig.y = ambi.origin[1];
-		std::vector<std::string> sounds;
-		for (int i = 0; i < ambi.numsounds; ++i) {
-			sounds.push_back(std::string(ambi.sounds[i], 8));
+		char name[32];
+		ieWord origin[2];
+		ieWord radius;
+		ieWord height;
+		char unknown0[6];
+		ieWord gain;
+		ieResRef sounds[10];
+		ieWord numsounds;
+		ieWord unknown1;
+		ieDword interval;
+		ieDword perset;
+		ieDword appearance;
+		ieDword flags;
+		char unknown2[64];
+
+		str->Read( &name, 32 );
+		str->Read( &origin, 4 );
+		str->Read( &radius, 2 );
+		str->Read( &height, 2 );
+		str->Seek( 6, GEM_CURRENT_POS );
+		str->Read( &gain, 2 );
+		str->Read( &sounds, 80 );
+		str->Read( numsounds, 2 );
+		str->Seek( 2, GEM_CURRENT_POS );
+		str->Read( &interval, 4 );
+		str->Read( &perset, 4 );
+		str->Read( &appearance, 4 );
+		str->Read( &flags, 4 );
+		str->Seek( 64, GEM_CURRENT_POS );
+		
+		orig.x = origin[0];
+		orig.y = origin[1];
+		std::vector<std::string> ssounds(numsounds);
+		for (int i = 0; i < numsounds; ++i) {
+			ssounds[i] = std::string(sounds[i], 8);
 		}
-		map->AddAmbient( new Ambient( ambi.name, orig, ambi.radius, ambi.height, ambi.gain, sounds, ambi.interval, ambi.perset, ambi.appearance, ambi.flags ) );
+		map->AddAmbient( new Ambient( std::string(name, 32), orig, radius, height, gain, ssounds, interval, perset, appearance, flags ) );
 	}
 	
 	map->AddTileMap( tm, lm, sr );
