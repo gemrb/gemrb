@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.3 2004/12/05 12:30:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.4 2004/12/07 18:16:09 avenger_teambg Exp $
 
 import GemRB
 # GUICommon.py - common functions for GUIScripts of all game types
@@ -47,7 +47,7 @@ def GetLearnableMageSpells (Kit, Alignment, Level):
 	GemRB.UnloadTable(Table)
 
 	SchoolFlag = Kit | Usability
-	for i in range(99):
+	for i in range(100):
 		SpellName = "SPWI%d%02d"%(Level,i)
 		ms = GemRB.GetSpell(SpellName)
 		if ms == None:
@@ -65,7 +65,7 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 	Usability=GemRB.GetTableValue(Table, Alignment, 5)
 	GemRB.UnloadTable(Table)
 
-	for i in range(99):
+	for i in range(100):
 		SpellName = "SPPR%d%02d"%(Level,i)
 		ms = GemRB.GetSpell(SpellName)
 		if ms == None:
