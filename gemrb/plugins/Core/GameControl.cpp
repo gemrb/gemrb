@@ -70,9 +70,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Map * area = game->GetMap(MapIndex);
 	if(area) {
 		area->DrawMap(vp);
-		if(DrawSelectionRect) {
-			short GameX = lastMouseX, GameY = lastMouseY;
-			video->ConvertToGame(GameX, GameY);
+		short GameX = lastMouseX, GameY = lastMouseY;
+		video->ConvertToGame(GameX, GameY);
+		if(DrawSelectionRect) {	
 			CalculateSelection(GameX, GameY);
 			
 			short xs[4] = {SelectionRect.x, SelectionRect.x+SelectionRect.w, SelectionRect.x+SelectionRect.w, SelectionRect.x};
@@ -123,6 +123,13 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				font->Print(rgn, (unsigned char*)infoPoints[i]->String, InfoTextPalette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, false);
 			}
 		}
+#ifdef DEBUG_SEARCH_MAP
+		Sprite2D * spr = area->SearchMap->GetImage();
+		video->BlitSprite(spr, 0, 0, true);
+		video->FreeSprite(spr);
+		Region point(GameX/16, GameY/12, 1, 1);
+		video->DrawRect(point, red);
+#endif
 	}
 	else {
 		core->GetVideoDriver()->DrawRect(vp, blue);
@@ -170,7 +177,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
-	
+
 	switch(area->GetBlocked(GameX, GameY)) {
 		case 0:
 			nextCursor = 6;
@@ -186,8 +193,10 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 
 	overInfoPoint = area->tm->GetInfoPoint(GameX, GameY);
-	if(overInfoPoint)
-		nextCursor = overInfoPoint->Cursor;
+	if(overInfoPoint) {
+		if(overInfoPoint->Type == 1)
+			nextCursor = overInfoPoint->Cursor;
+	}
 
 	overDoor = area->tm->GetDoor(GameX, GameY);
 	if(overDoor)
