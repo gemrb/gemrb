@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/test1/LoadScreen.py,v 1.2 2004/08/10 19:54:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/test1/LoadScreen.py,v 1.3 2004/08/11 22:13:43 avenger_teambg Exp $
 
 # LoadScreen.py - display Loading screen
 
@@ -31,7 +31,7 @@ ProgressBar = None
 def StartLoadScreen ():
 	global LoadScreen, ProgressBar
 
-	GemRB.LoadWindowPack ("GUILS")
+	GemRB.LoadWindowPack ("guils")
 	LoadScreen = GemRB.LoadWindow (0)
 	mosname = GemRB.GetToken ("LoadScreen")
 
