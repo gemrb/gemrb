@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.231 2004/10/23 13:02:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.232 2004/10/27 20:06:52 avenger_teambg Exp $
  *
  */
 
@@ -2833,9 +2833,29 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetSlotType__doc,
+"GetSlotType(idx) => dict\n\n"
+"Returns dictionary of an itemslot type (slottype.ids).");
+
+static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
+{
+	int idx;
+
+	if (!PyArg_ParseTuple( args, "i", &idx )) {
+		return AttributeError( GemRB_GetSlotType__doc );
+	}
+
+	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "Type", PyInt_FromLong(core->QuerySlotType(idx)));
+	PyDict_SetItemString(dict, "ID", PyInt_FromLong(core->QuerySlotID(idx)));
+	PyDict_SetItemString(dict, "Tip", PyInt_FromLong(core->QuerySlottip(idx)));
+	PyDict_SetItemString(dict, "ResRef", PyString_FromString (core->QuerySlotResRef(idx)));
+	return dict;
+}
+
 PyDoc_STRVAR( GemRB_GetPCStats__doc,
 "GetPCStats(PartyID) => dict\n\n"
-"Returns dictionary or PC's performance stats." );
+"Returns dictionary of PC's performance stats." );
 
 static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 {
@@ -4028,6 +4048,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPlayerPortrait, METH_VARARGS),
 	METHOD(GetPlayerName, METH_VARARGS),
 	METHOD(SetPlayerName, METH_VARARGS),
+	METHOD(GetSlotType, METH_VARARGS),
 	METHOD(GetPCStats, METH_VARARGS),
 	METHOD(FillPlayerInfo, METH_VARARGS),
 	METHOD(SetSpellIcon, METH_VARARGS),
