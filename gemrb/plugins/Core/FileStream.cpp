@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.19 2003/12/15 09:15:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.20 2004/02/18 15:07:09 balrog994 Exp $
  *
  */
 
@@ -40,7 +40,7 @@ FileStream::~FileStream(void)
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
-		fclose(str);
+		_fclose(str);
 	}
 }
 
@@ -50,10 +50,10 @@ bool FileStream::Open(const char * filename, bool autoFree)
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
-		fclose(str);
+		_fclose(str);
 	}
 	this->autoFree = autoFree;
-	str = fopen(filename, "rb");
+	str = _fopen(filename, "rb");
 	if(str == NULL) {
 		return false;
 	}
@@ -62,21 +62,21 @@ bool FileStream::Open(const char * filename, bool autoFree)
 #endif
 	startpos = 0;
 	opened = true;
-	fseek(str, 0, SEEK_END);
-	size = ftell(str)+1;
-	fseek(str, 0, SEEK_SET);
+	_fseek(str, 0, SEEK_END);
+	size = _ftell(str)+1;
+	_fseek(str, 0, SEEK_SET);
 	ExtractFileFromPath(this->filename, filename);
 	Pos = 0;
 	return true;
 }
 
-bool FileStream::Open(FILE * stream, int startpos, int size, bool autoFree)
+bool FileStream::Open(_FILE * stream, int startpos, int size, bool autoFree)
 {
 	if(str && this->autoFree) {
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
-		fclose(str);
+		_fclose(str);
 	}
 	this->autoFree = autoFree;
 	str = stream;
@@ -89,7 +89,7 @@ bool FileStream::Open(FILE * stream, int startpos, int size, bool autoFree)
 	opened = true;
 	this->size = size;
 	strcpy(filename, "");
-	fseek(str, startpos, SEEK_SET);
+	_fseek(str, startpos, SEEK_SET);
 	Pos = 0;
 	return true;
 }
@@ -98,7 +98,7 @@ int FileStream::Read(void * dest, int length)
 {
 	if(!opened)
 		return GEM_ERROR;
-	size_t c = fread(dest, 1, length, str);
+	size_t c = _fread(dest, 1, length, str);
 	//if(feof(str)) { /* slightly modified by brian  oct 11 2003*/
 	//	return GEM_EOF;
 	//}
@@ -118,12 +118,12 @@ int FileStream::Seek(int pos, int startpos)
 	switch(startpos) 
 		{
 		case GEM_CURRENT_POS:
-			fseek(str, pos, SEEK_CUR);
+			_fseek(str, pos, SEEK_CUR);
 			Pos+=pos;
 		break;
 
 		case GEM_STREAM_START:
-			fseek(str, this->startpos + pos, SEEK_SET);
+			_fseek(str, this->startpos + pos, SEEK_SET);
 			Pos = pos;
 		break;
 
@@ -140,13 +140,13 @@ unsigned long FileStream::Size()
 /** No descriptions */
 int FileStream::ReadLine(void * buf, int maxlen)
 {
-	if(feof(str))
+	if(_feof(str))
 		return -1;
 	unsigned char *p = (unsigned char*)buf;
 	int i = 0;
 	while(i < (maxlen-1)) {
-		int ch = fgetc(str);
-		if(feof(str))
+		int ch = _fgetc(str);
+		if(_feof(str))
 			 break;
 		if(Pos==size)
 			break;
