@@ -601,21 +601,21 @@ int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex,
 {
 	if(WindowIndex >= windows.size())
 	{
-		printf("Core","Window not found: %0x", WindowIndex);
+		printf("Core","Window not found: %d", WindowIndex);
 		printStatus("ERROR", LIGHT_RED);
 		return -1;
 	}
 	Window * win = windows[WindowIndex];
 	if(win==NULL)
 	{
-		printf("Core","Window already freed: %0x", WindowIndex);
+		printf("Core","Window already freed: %d", WindowIndex);
 		printStatus("ERROR", LIGHT_RED);
 		return -1;
 	}
 	Control * ctrl = win->GetControl(ControlIndex);
 	if(ctrl == NULL)
 	{
-		printf("Core","Control not found: %0x", ControlIndex);
+		printf("Core","Control not found: %d", ControlIndex);
 		printStatus("ERROR", LIGHT_RED);
 		return -1;
 	}
@@ -676,14 +676,23 @@ int Interface::SetControlStatus(unsigned short WindowIndex, unsigned short Contr
 int Interface::ShowModal(unsigned short WindowIndex)
 {
 	if(WindowIndex >= windows.size())
+	{
+		printf("Core","Window not found: %d", WindowIndex);
+		printStatus("ERROR", LIGHT_RED);
 		return -1;
+	}
 	Window * win = windows[WindowIndex];
 	if(win==NULL)
+	{
+		printf("Core","Window already freed: %d", WindowIndex);
+		printStatus("ERROR", LIGHT_RED);
 		return -1;
+	}
 	win->Visible = true;
 	win->Invalidate();
 	evntmgr->Clear();
 	evntmgr->AddWindow(win);
+	return 0;
 }
 
 void Interface::DrawWindows(void)
