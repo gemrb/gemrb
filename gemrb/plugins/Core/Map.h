@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.44 2004/08/07 00:46:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.45 2004/08/08 05:11:32 divide Exp $
  *
  */
 
@@ -31,6 +31,8 @@ class Map;
 #include "GameControl.h"
 #include "PathFinder.h"
 #include <queue>
+
+class Ambient;
 
 #ifdef WIN32
 
@@ -77,6 +79,7 @@ private:
 	std::vector< WallGroup*> wallGroups;
 	std::vector< ScriptedAnimation*> vvcCells;
 	std::vector< Entrance*> entrances;
+	std::vector< Ambient*> ambients;
 	Actor** queue[3];
 	int Qcount[3];
 	unsigned int lastActorCount[3];
@@ -121,6 +124,9 @@ public:
 	/* Finds the path which leads to d */
 	PathNode* FindPath(short sX, short sY, short dX, short dY);
 	bool IsVisible(short sX, short sY, short dX, short dY);
+	
+	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
+	void SetupAmbients();
 private:
 	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
 		unsigned int& nx, unsigned int& ny, unsigned int& diff);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.160 2004/08/07 13:42:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.161 2004/08/08 05:11:32 divide Exp $
  */
 
 #ifndef WIN32
@@ -989,6 +989,7 @@ Map *GameControl::SetCurrentArea(int Index)
 	//if in combat, play battlesong (or don't stop song here)
 	//if night, play night song
 	area->PlayAreaSong( 0 );
+	area->SetupAmbients();
 	return area;
 }
 

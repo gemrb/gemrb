@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.5 2004/08/07 20:54:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.6 2004/08/08 05:11:32 divide Exp $
  */
 #ifndef POLYGON_H
 #define POLYGON_H
@@ -23,10 +23,7 @@
 #include "Sprite2D.h"
 #include "Region.h"
 #include "../../includes/RGBAColor.h"
-
-typedef struct Point {
-	short x, y;
-} Point;
+#include "../../includes/globals.h"
 
 #ifdef WIN32
 

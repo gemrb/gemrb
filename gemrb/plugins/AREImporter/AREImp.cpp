@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.60 2004/08/07 00:46:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.61 2004/08/08 05:11:32 divide Exp $
  *
  */
 
@@ -27,6 +27,8 @@
 #include "../Core/ActorMgr.h"
 #include "../Core/FileStream.h"
 #include "../Core/ImageMgr.h"
+#include "../Core/Ambient.h"
+#include <vector>
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1
@@ -579,6 +581,22 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Seek( 40, GEM_CURRENT_POS );
 		map->vars->SetAt( Name, Value );
 	}
+	
+	printf( "Loading ambients\n" );
+	str->Seek( AmbiOffset, GEM_STREAM_START );
+	for (i = 0; i < AmbiCount; i++) {
+		struct Ambient10 ambi;
+		str->Read( &ambi, sizeof(ambi) );
+		Point orig;
+		orig.x = ambi.origin[0];
+		orig.y = ambi.origin[1];
+		std::vector<std::string> sounds;
+		for (int i = 0; i < ambi.numsounds; ++i) {
+			sounds.push_back(std::string(ambi.sounds[i], 8));
+		}
+		map->AddAmbient( new Ambient( ambi.name, orig, ambi.radius, ambi.height, ambi.gain, sounds, ambi.interval, ambi.perset, ambi.appearance, ambi.flags ) );
+	}
+	
 	map->AddTileMap( tm, lm, sr );
 	core->FreeInterface( tmm );
 	return map;

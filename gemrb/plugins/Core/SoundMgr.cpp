@@ -15,16 +15,48 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.cpp,v 1.2 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.cpp,v 1.3 2004/08/08 05:11:33 divide Exp $
  *
  */
 
 #include "SoundMgr.h"
+#include "Ambient.h"
 
-SoundMgr::SoundMgr(void)
+SoundMgr::SoundMgr(void) : ambim(new SoundMgr::AmbientMgr)
 {
 }
 
 SoundMgr::~SoundMgr(void)
 {
+	delete(ambim);
+}
+
+void SoundMgr::AmbientMgr::activate(const std::string &name)
+{
+	for (std::vector<Ambient *>::iterator it = ambients.begin(); it != ambients.end(); ++it) {
+		if ((*it) -> getName() == name) {
+			(*it) -> setActive();
+			break;
+		}
+	}
+}
+
+void SoundMgr::AmbientMgr::deactivate(const std::string &name)
+{
+	for (std::vector<Ambient *>::iterator it = ambients.begin(); it != ambients.end(); ++it) {
+		if ((*it) -> getName() == name) {
+			(*it) -> setInactive();
+			break;
+		}
+	}
+}
+
+bool SoundMgr::AmbientMgr::isActive(const std::string &name) const
+{
+	for (std::vector<Ambient *>::const_iterator it = ambients.begin(); it != ambients.end(); ++it) {
+		if ((*it) -> getName() == name) {
+			return (*it) -> getFlags() & IE_AMBI_ENABLED;
+		}
+	}
+	return false;
 }

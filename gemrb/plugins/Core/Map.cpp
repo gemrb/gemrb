@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.105 2004/08/07 00:46:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.106 2004/08/08 05:11:32 divide Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include "Map.h"
 #include "Interface.h"
 #include "PathFinder.h"
+#include "Ambient.h"
 #include "../../includes/strrefs.h"
 
 //#include <stdlib.h>
@@ -133,6 +134,9 @@ Map::~Map(void)
 			delete vvcCells[i];
 			vvcCells[i] = NULL;
 		}
+	}
+	for (i = 0; i < ambients.size(); i++) {
+		delete ambients[i];
 	}
 }
 
@@ -1168,4 +1172,11 @@ bool Map::IsVisible(short sX, short sY, short dX, short dY)
 		}
 	}
 	return true;
+}
+
+void Map::SetupAmbients()
+{
+	SoundMgr::AmbientMgr *ambim = core->GetSoundMgr()->GetAmbientMgr();
+	ambim->reset();
+	ambim->setAmbients( ambients );
 }

@@ -121,5 +121,10 @@ char* strlwr(char* string);
 
 struct ActorBlock;
 
+typedef struct
+{
+	short x, y;
+} Point;
+
 #endif //GLOBALS_H
 

@@ -15,15 +15,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.11 2004/08/07 17:51:27 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.12 2004/08/08 05:11:33 divide Exp $
  *
  */
 
 #ifndef SOUNDMGR_H
 #define SOUNDMGR_H
 
+#include <vector>
+#include <string>
 #include "Plugin.h"
 #include "../../includes/globals.h"
+
+class Ambient;
 
 #define GEM_SND_RELATIVE 1
 #define GEM_SND_SPEECH   IE_STR_SPEECH // 4
@@ -51,6 +55,21 @@ public:
 	virtual bool Play() = 0;
 	virtual void ResetMusics() = 0;
 	virtual void UpdateViewportPos(int XPos, int YPos) = 0;
+	class AmbientMgr {
+	public:
+		AmbientMgr() {}
+		virtual ~AmbientMgr() {}
+		virtual void reset() { ambients = std::vector<Ambient *> (); }
+		virtual void setAmbients(const std::vector<Ambient *> &a) { reset(); ambients = a; }
+		virtual void activate(const std::string &name);
+		virtual void deactivate(const std::string &name);
+		virtual bool isActive(const std::string &name) const;
+	private:
+		std::vector<Ambient *> ambients;
+	};
+	virtual AmbientMgr *GetAmbientMgr() { return ambim; }
+private:
+	AmbientMgr *ambim;
 };
 
 #endif
