@@ -17,7 +17,8 @@
 #endif
 
 /** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
-#define MAX_STATS 164
+#include "../../includes/ie_stats.h"
+#define MAX_STATS 256
 #define MAX_SCRIPTS 5   //or 8 ?
 
 class GEM_EXPORT Character
