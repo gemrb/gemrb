@@ -18,6 +18,7 @@
 #include "ScriptEngine.h"
 #include "Button.h"
 #include "Slider.h"
+#include "TextEdit.h"
 #include "Console.h"
 #include "SoundMgr.h"
 #include "SaveGameIterator.h"

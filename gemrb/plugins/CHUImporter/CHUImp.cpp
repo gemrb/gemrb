@@ -104,7 +104,6 @@ Window * CHUImp::GetWindow(unsigned long i)
 		return win;
 	}
 	for(int i = 0;i < ControlsCount; i++) {
-printf("Control Count: %d\n",i);
 		str->Seek(CTOffset+((FirstControl+i)*8), GEM_STREAM_START);
 		unsigned long COffset, CLength, ControlID;
 		unsigned short BufferLength, XPos, YPos, Width, Height;

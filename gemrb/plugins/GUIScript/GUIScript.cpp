@@ -23,7 +23,6 @@ extern "C" {
 #include "../Core/Label.h"
 #include "../Core/AnimationMgr.h"
 
-
 inline bool valid_number(const char *string, long &val)
 {
   char *endpr;
@@ -389,6 +388,29 @@ static PyObject * GemRB_GetControl(PyObject */*self*/, PyObject *args)
 		return NULL;
 	
 	return Py_BuildValue("i", ret);
+}
+
+static PyObject * GemRB_QueryText(PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex;
+
+	if(!PyArg_ParseTuple(args, "ii", &WindowIndex, &ControlIndex)) {
+		printMessage("GUIScript", "Syntax Error: QueryText(unsigned short WindowIndex, unsigned long ControlIndex)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return NULL;
+
+	if(ctrl->ControlType != IE_GUI_EDIT)
+		return NULL;
+
+	return Py_BuildValue("s",((TextEdit *) ctrl)->QueryText() );
 }
 
 static PyObject * GemRB_SetText(PyObject */*self*/, PyObject *args)
@@ -1516,6 +1538,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"SetText", GemRB_SetText, METH_VARARGS,
      "Sets the Text of a control in a Window."},
+
+	{"QueryText", GemRB_QueryText, METH_VARARGS,
+     "Returns the Text of a control in a Window."},
 
 	{"TextAreaAppend", GemRB_TextAreaAppend, METH_VARARGS,
      "Appends the Text to the TextArea Control in the Window."},

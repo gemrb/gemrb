@@ -118,3 +118,9 @@ int TextEdit::SetText(const char * string, int pos)
 	((Window*)Owner)->Invalidate();
 	return 0;
 }
+
+/** Simply returns the pointer to the text, don't modify it! */
+const char *TextEdit::QueryText()
+{
+	return (const char *) Buffer;
+}

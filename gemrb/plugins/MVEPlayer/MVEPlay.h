@@ -69,6 +69,7 @@ static SDL_Surface *g_screen;
 static int g_screenWidth, g_screenHeight;
 static int g_width, g_height;
 static unsigned char g_palette[768];
+static bool trueColor;
 static unsigned char *g_vBackBuf1, *g_vBackBuf2;
 static unsigned char *g_pCurMap=NULL;
 static int g_nMapLength=0;
@@ -423,14 +424,23 @@ end:
 	static int create_videobuf_handler(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
 	{
 		short w, h;
+
 		w = get_short(data);
 		h = get_short(data+2);
+		if(minor==2)
+			trueColor=get_short(data+4);
+		else
+			trueColor=false;
+
 		g_width = w << 3;
 		g_height = h << 3;
-		g_vBackBuf1 = (unsigned char*)malloc(g_width * g_height * 1.5);
-		g_vBackBuf2 = (unsigned char*)malloc(g_width * g_height * 1.5);
-		memset(g_vBackBuf1, 0, g_width * g_height*1.5);
-		memset(g_vBackBuf2, 0, g_width * g_height*1.5);
+		int size = (int) (g_width*g_height*1.5);
+		if(trueColor) 
+			size+=size;
+		g_vBackBuf1 = (unsigned char*)malloc(size);
+		g_vBackBuf2 = (unsigned char*)malloc(size);
+		memset(g_vBackBuf1, 0, size);
+		memset(g_vBackBuf2, 0, size);
 		return 1;
 	}
 

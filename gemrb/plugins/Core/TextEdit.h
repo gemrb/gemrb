@@ -49,6 +49,8 @@ public:
 	void SetBackGround(Sprite2D * back);
 	/** Sets the Text of the current control */
 	int SetText(const char * string, int pos = 0);
+	/** Sets the Text of the current control */
+	const char *QueryText();
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D * Cursor;
