@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.20 2004/04/11 01:11:15 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.21 2004/04/14 21:00:23 doc_wagon Exp $
  *
  */
 
@@ -65,7 +65,8 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 		version = 11;
 		if (stricmp( core->GameType, "pst" ) == 0)
 			PCSize = 0x168;
-		else if (stricmp( core->GameType, "iwd" ) == 0)
+		else if ( (stricmp( core->GameType, "iwd" ) == 0) 
+			|| (stricmp( core->GameType, "how" ) == 0) )
 			PCSize = 0x180;
 		else
 			PCSize = 0x160;
