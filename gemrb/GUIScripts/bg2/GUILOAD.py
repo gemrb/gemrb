@@ -19,16 +19,16 @@ def OnLoad():
 
 	for i in range(0,4):
 		Button = GemRB.GetControl(LoadWindow,26+i)
-		GemRB.SetButtonState(LoadWindow, Button, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetText(LoadWindow, Button, 15590)
-		GemRB.SetVarAssoc(LoadWindow, Button, "LoadIdx",i)
 		GemRB.SetEvent(LoadWindow, Button, IE_GUI_BUTTON_ON_PRESS, "LoadGamePress")
+		GemRB.SetButtonState(LoadWindow, Button, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetVarAssoc(LoadWindow, Button, "LoadIdx",i)
 
 		Button = GemRB.GetControl(LoadWindow, 30+i)
-		GemRB.SetButtonState(LoadWindow, Button, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetText(LoadWindow, Button, 13957)
-		GemRB.SetVarAssoc(LoadWindow, Button, "LoadIdx",i)
 		GemRB.SetEvent(LoadWindow, Button, IE_GUI_BUTTON_ON_PRESS, "DeleteGamePress")
+		GemRB.SetButtonState(LoadWindow, Button, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetVarAssoc(LoadWindow, Button, "LoadIdx",i)
 
 		#area previews
 		Button = GemRB.GetControl(LoadWindow, 1+i)
@@ -43,9 +43,7 @@ def OnLoad():
 	GemRB.SetVarAssoc(LoadWindow, ScrollBar, "TopIndex", GameCount)
 	GemRB.SetEvent(LoadWindow, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
 	ScrollBarPress()
-	print "SetVisible"
 	GemRB.SetVisible(LoadWindow,1)
-	print "SetVisible done"
 	return
 
 def ScrollBarPress():
@@ -79,14 +77,12 @@ def ScrollBarPress():
 			GemRB.SetSaveGamePreview(LoadWindow, Button, ActPos)
 		else:
 			GemRB.SetButtonPicture(LoadWindow, Button, "")
-		print "ActPos:",ActPos
 		for j in range(0,6):
 			Button=GemRB.GetControl(LoadWindow, 40 + i*6 + j)
 			if ActPos<GameCount:
 				GemRB.SetSaveGamePortrait(LoadWindow, Button, ActPos,j)
 			else:
 				GemRB.SetButtonPicture(LoadWindow, Button, "")
-	print "All done"
 	return
 
 def LoadGamePress():
