@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.cpp,v 1.6 2005/03/18 20:01:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.cpp,v 1.7 2005/04/01 18:48:09 avenger_teambg Exp $
  *
  */
 
@@ -24,31 +24,13 @@
 
 Sprite2D::Sprite2D()
 {
-	this->XPos = this->YPos = 0;
-	this->palette = NULL;
+	vptr = NULL;
+	pixels = NULL;
+	XPos = 0;
+	YPos = 0;
+	RefCount = 1;
 }
 
 Sprite2D::~Sprite2D(void)
 {
-}
-
-Sprite2D& Sprite2D::operator=(Sprite2D& p)
-{
-	vptr = p.vptr;
-	pixels = p.pixels;
-	XPos = p.XPos;
-	YPos = p.YPos;
-	Width = p.Width;
-	Height = p.Height;
-	return *this;
-}
-
-Sprite2D::Sprite2D(Sprite2D& p)
-{
-	vptr = p.vptr;
-	pixels = p.pixels;
-	XPos = p.XPos;
-	YPos = p.YPos;
-	Width = p.Width;
-	Height = p.Height;
 }

@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.94 2005/03/31 10:06:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.95 2005/04/01 18:48:08 avenger_teambg Exp $
  *
  */
 
@@ -223,9 +223,13 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		//bird animations are not hindered by searchmap
 		//only animtype==7 (mirror3) uses this feature
 		//this is a hardcoded hack, but works for all engine type
-		BaseStats[IE_DONOTJUMP]=!(anims->GetAnimType()!=IE_ANI_CODE_MIRROR_3);
+		if(anims->GetAnimType()!=IE_ANI_CODE_MIRROR_3) {
+			BaseStats[IE_DONOTJUMP]=0;
+		} else {
+			BaseStats[IE_DONOTJUMP]=3;
+		}
 		SetCircleSize();
-		anims->SetupColors(BaseStats+IE_COLORS);
+		anims->SetColors(BaseStats+IE_COLORS);
 	}
 }
 
@@ -329,7 +333,7 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 		case IE_LEATHER_COLOR:
 		case IE_ARMOR_COLOR:
 		case IE_HAIR_COLOR:
-			anims->SetupColors(Modified+IE_COLORS);
+			anims->SetColors(Modified+IE_COLORS);
 			break;
 		case IE_EA:
 		case IE_UNSELECTABLE:
@@ -443,12 +447,12 @@ void Actor::DebugDump()
 	printf( "Mod[IE_ANIMATION_ID]: 0x%04X\n", Modified[IE_ANIMATION_ID] );
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
 		for(i=0;i<Modified[IE_COLORCOUNT];i++) {
-			printf("Colors #%d:  %d\n",i, Modified[IE_COLORS+i]);
+			printf("Colors #%d: %d\n",i, Modified[IE_COLORS+i]);
 		}
 	}
 	else {
 		for(i=0;i<7;i++) {
-			printf("Colors #%d:  %d\n",i, Modified[IE_COLORS+i]);
+			printf("Colors #%d: %d\n",i, Modified[IE_COLORS+i]);
 		}
 	}
 	ieDword tmp=0;
@@ -464,7 +468,7 @@ void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
 	Point p;
 	p.x = position.x/16;
 	p.y = position.y/12;
-	if (jump && !GetStat( IE_DONOTJUMP ) && anims->GetCircleSize() ) {
+	if (jump && !(GetStat( IE_DONOTJUMP )&1) && anims->GetCircleSize() ) {
 		map->AdjustPosition( p, radius );
 	}
 	area = map;
@@ -526,6 +530,7 @@ bool Actor::CheckOnDeath()
 	if(Modified[IE_STATE_ID]&STATE_DEAD) return false;
 	//we need to check animID here, if it has not played the death
 	//sequence yet, then we could return now
+	ClearActions();
 
 	if(InternalFlags&IF_GIVEXP) {
 		//give experience to party
@@ -536,7 +541,6 @@ bool Actor::CheckOnDeath()
 	DropItem("",0);
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9
-	Active = false; //we deactivate its scripts here, do we need it?
 	Modified[IE_STATE_ID] |= STATE_DEAD;
 	if(Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
 	if(Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;

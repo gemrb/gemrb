@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.105 2005/03/16 17:08:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.106 2005/04/01 18:48:07 avenger_teambg Exp $
  *
  */
 
@@ -159,7 +159,7 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	str->ReadDword( &SongHeader );
 	str->ReadDword( &RestHeader );
 	if (core->HasFeature(GF_AUTOMAP_INI) ) {
-		str->ReadDword( &tmp ); //skipping crap in PST
+		str->ReadDword( &tmp ); //skipping unknown in PST
 	}
 	str->ReadDword( &NoteOffset );
 	str->ReadDword( &NoteCount );
@@ -594,13 +594,15 @@ Map* AREImp::GetMap(const char *ResRef)
 			ieWord XPos, YPos, XDes, YDes;
 			ieResRef Dialog;
 			ieResRef Scripts[8]; //the original order
+			ieDword Flags;
 			str->Read( DefaultName, 32);
 			DefaultName[32]=0;
 			str->ReadWord( &XPos );
 			str->ReadWord( &YPos );
 			str->ReadWord( &XDes );
 			str->ReadWord( &YDes );
-			str->Seek( 12, GEM_CURRENT_POS );
+			str->ReadDword( &Flags );
+			str->Seek( 8, GEM_CURRENT_POS );
 			str->ReadDword( &Orientation );
 			str->Seek( 8, GEM_CURRENT_POS );
 			str->ReadDword( &Schedule );
@@ -622,6 +624,8 @@ Map* AREImp::GetMap(const char *ResRef)
 			//TODO: iwd2 script?
 			str->ReadResRef( Scripts[6] );
 			str->Seek( 120, GEM_CURRENT_POS );
+			//actually, CreatureAreaFlag&1 signs that the creature
+			//is not loaded yet
 			if (CreOffset != 0) {
 				CachedFileStream *fs = new CachedFileStream( (CachedFileStream *) str, CreOffset, CreSize, true);
 				crefile = (DataStream *) fs;
@@ -640,11 +644,14 @@ Map* AREImp::GetMap(const char *ResRef)
 			ab->Pos.y = YPos;
 			ab->Destination.x = XDes;
 			ab->Destination.y = YDes;
+			//this is a hack until we find the location
+			//of the active bit (hidecreature!!!)
+			ab->Active=SCR_ACTIVE;
 			//copying the area name into the actor
 			strnuprcpy(ab->Area, map->GetScriptName(),8);
 			//copying the scripting name into the actor
-			//this hack allows iwd starting cutscene to work
-			if(stricmp(ab->GetScriptName(),"NONE")==0) {
+			//if the CreatureAreaFlag was set to 8
+			if (Flags&AF_NAME_OVERRIDE) {
 				ab->SetScriptName(DefaultName);
 			}
 	
@@ -660,7 +667,8 @@ Map* AREImp::GetMap(const char *ResRef)
 	} else {
 		for (i = 0; i < AnimCount; i++) {
 			Animation* anim;
-			str->Seek( 32, GEM_CURRENT_POS );
+			char animName[33];
+			str->Read(animName, 32);
 			ieWord animX, animY;
 			str->ReadWord( &animX );
 			str->ReadWord( &animY );
@@ -672,9 +680,12 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadWord( &animFrame );
 			ieDword animFlags;
 			str->ReadDword( &animFlags );
-			str->Seek( 20, GEM_CURRENT_POS );
-			unsigned char mode = ( ( animFlags & 2 ) != 0 ) ?
-				IE_SHADED : IE_NORMAL;
+			ieDword unused;
+			ieResRef animPal;
+			str->ReadDword( &unused );
+			str->ReadDword( &unused );
+			str->ReadResRef( animPal );
+			str->ReadDword( &unused );
 			AnimationFactory* af = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( animBam, IE_BAM_CLASS_ID );
 			if (!af) {
@@ -688,11 +699,26 @@ Map* AREImp::GetMap(const char *ResRef)
 				printf("Cannot load animation: %s\n", animBam);
 				continue;
 			}
+			anim->Flags=animFlags;
 			anim->x = animX;
 			anim->y = animY;
-			anim->BlitMode = mode;
 			anim->autofree = false;
-			strcpy( anim->ResRef, animBam );
+			//strcpy( anim->ResRef, animBam );
+			anim->SetScriptName(animName);
+			if (animFlags&A_ANI_MIRROR) {
+				anim->MirrorAnimation();
+			}
+			if (animFlags&A_ANI_PALETTE) {
+				Color *Palette = core->GetPalette(0, 256);
+				ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
+				if (bmp) {
+					DataStream* s = core->GetResourceMgr()->GetResource( animPal, IE_BMP_CLASS_ID );
+					bmp->Open( s, true);
+					bmp->GetPalette(0, 256, Palette);
+					core->FreeInterface( bmp );
+				}
+				anim->SetPalette( Palette, true );
+			}
 			map->AddAnimation( anim );
 		}
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.98 2005/03/22 20:52:02 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.99 2005/04/01 18:48:09 avenger_teambg Exp $
  *
  */
 
@@ -367,20 +367,20 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	} else {
 		colorcount = 16;
 	}
-	SDL_SetPalette( ( SDL_Surface * ) p, SDL_LOGPAL, ( SDL_Color * ) palette,
-		0, colorcount );
+	SDL_SetPalette( ( SDL_Surface * ) p, SDL_LOGPAL, ( SDL_Color * ) palette, 0, colorcount );
 	spr->vptr = p;
 	spr->pixels = pixels;
 	if (cK) {
-		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY | SDL_RLEACCEL,
-			index );
+		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY | SDL_RLEACCEL, index );
 	}
 	spr->Width = w;
 	spr->Height = h;
+/*
 	if (bpp == 8) {
 		spr->palette = ( Color * ) malloc( 256 * sizeof( Color ) );
 		memcpy( spr->palette, palette, 256 * sizeof( Color ) );
 	}
+*/
 	return spr;
 }
 
@@ -394,9 +394,11 @@ void SDLVideoDriver::FreeSprite(Sprite2D* spr)
 	if (spr->pixels) {
 		free( spr->pixels );
 	}
+/*
 	if (spr->palette) {
 		free( spr->palette );
 	}
+*/
 	delete( spr );
 	spr = NULL;
 }
@@ -484,6 +486,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 		drect.x = x - spr->XPos - Viewport.x;
 		drect.y = y - spr->YPos - Viewport.y;
 	}
+
 	if (clip) {
 		if (drect.x + spr->Width <= clip->x)
 			return;
@@ -533,153 +536,33 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 		SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
 	}
 }
-void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
-	Region* clip)
+
+void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint, 
+	Color *Palette, Region* clip)
 {
 	SDL_Surface* tmp = ( SDL_Surface* ) spr->vptr;
 	if(!tmp) {
 		return;
 	}
+	SDL_LockSurface( tmp );
 	SDL_Color* pal = tmp->format->palette->colors;
 	SDL_Color oldPal[256];
 	memcpy( oldPal, pal, 256 * sizeof( SDL_Color ) );
+	if (!Palette)
+		Palette = (Color *) pal; //this is the original palette
 	for (int i = 2; i < 256; i++) {
-		pal[i].r = ( tint.r * oldPal[i].r ) >> 8;
-		pal[i].g = ( tint.g * oldPal[i].g ) >> 8;
-		pal[i].b = ( tint.b * oldPal[i].b ) >> 8;
+		pal[i].r = ( tint.r * Palette[i].r ) >> 8;
+		pal[i].g = ( tint.g * Palette[i].g ) >> 8;
+		pal[i].b = ( tint.b * Palette[i].b ) >> 8;
 	}
+	SDL_UnlockSurface( tmp );
+	SDL_SetAlpha( tmp, SDL_SRCALPHA, tint.a);
 	BlitSprite( spr, x, y, false, clip );
+	//copying back the original palette
+	SDL_LockSurface( tmp );
+	pal = tmp->format->palette->colors;
 	memcpy( pal, oldPal, 256 * sizeof( SDL_Color ) );
-}
-
-void SDLVideoDriver::BlitSpriteMode(Sprite2D* spr, int x, int y,
-	int blendMode, bool anchor, Region* clip)
-{
-	if (blendMode == IE_NORMAL) {
-		BlitSprite( spr, x, y, anchor, clip );
-		return;
-	}
-	SDL_Rect drect;
-	SDL_Rect t;
-	SDL_Rect* srect = NULL;
-	if (anchor) {
-		drect.x = x - spr->XPos;
-		drect.y = y - spr->YPos;
-	} else {
-		drect.x = x - spr->XPos - Viewport.x;
-		drect.y = y - spr->YPos - Viewport.y;
-	}
-	if (clip) {
-		if (drect.x + spr->Width <= clip->x)
-			return;
-		else {
-			if (drect.x < clip->x) {
-				t.x = clip->x - drect.x;
-				t.w = spr->Width - t.x;
-				drect.x = clip->x;
-			} else {
-				if (drect.x + spr->Width <= clip->x + clip->w) {
-					t.x = 0;
-					t.w = spr->Width;
-				} else {
-					if (drect.x >= clip->x + clip->w) {
-						return;
-					} else {
-						t.x = 0;
-						t.w = ( clip->x + clip->w ) - drect.x;
-					}
-				}
-			}
-		}
-		if (drect.y + spr->Height <= clip->y)
-			return;
-		else {
-			if (drect.y < clip->y) {
-				t.y = clip->y - drect.y;
-				t.h = spr->Height - t.y;
-				drect.y = clip->y;
-			} else {
-				if (drect.y + spr->Height <= clip->y + clip->h) {
-					t.y = 0;
-					t.h = spr->Height;
-				} else {
-					if (drect.y >= clip->y + clip->h) {
-						return;
-					} else {
-						t.y = 0;
-						t.h = ( clip->y + clip->h ) - drect.y;
-					}
-				}
-			}
-		}
-		srect = &t;
-	}
-	if (!srect) {
-		srect = &t;
-		srect->x = 0;
-		srect->y = 0;
-		srect->w = spr->Width;
-		srect->h = spr->Height;
-	}
-	SDL_Surface* surf = ( SDL_Surface* ) spr->vptr;
-	if(!surf) {
-		return;
-	}
-	int destx = drect. x, desty = drect.y;
-	Region Screen = GetViewport();
-	if (( destx > ( xCorr + Screen.w ) ) || ( ( destx + srect->w ) < xCorr )) {
-		return;
-	}
-	if (( desty > ( yCorr + Screen.h ) ) || ( ( desty + srect->h ) < yCorr )) {
-		return;
-	}
-
-	SDL_LockSurface( surf );
-	SDL_LockSurface( backBuf );
-
-	unsigned char * src, * dst;
-	//reusing x and y!
-
-	for (y = srect->y; y < srect->h; y++) {
-		if (( desty < yCorr ) || ( desty >= ( yCorr + Screen.h ) )) {
-			desty++;
-			continue;
-		}
-		destx = drect.x; 
-		src = ( ( unsigned char * ) spr->pixels ) + ( y * surf->pitch );
-		dst = ( ( unsigned char * ) backBuf->pixels ) +
-			( desty * backBuf->pitch ) +
-			( destx * backBuf->format->BytesPerPixel );
-		for (x = srect->x; x < srect->w; x++) {
-			if (( destx < xCorr ) || ( destx >= ( xCorr + Screen.w ) )) {
-				src++;
-				destx++;
-				dst += 4;
-				continue;
-			}
-			if (!( *src )) {
-				src++;
-				destx++;
-				dst += 4;
-				continue;
-			}
-			SDL_Color* c1 = &surf->format->palette->colors[*src++];
-			if (c1->b > *dst)
-				*dst = c1->b;
-			dst++;
-			if (c1->g > *dst)
-				*dst = c1->g;
-			dst++;
-			if (c1->r > *dst)
-				*dst = c1->r;
-			dst += 2;
-			destx++;
-		}
-		desty++;
-	}
-
-	SDL_UnlockSurface( backBuf );
-	SDL_UnlockSurface( surf );
+	SDL_UnlockSurface( tmp );
 }
 
 void SDLVideoDriver::SetCursor(Sprite2D* up, Sprite2D* down)
@@ -1294,6 +1177,7 @@ Color* SDLVideoDriver::GetPalette(Sprite2D* spr)
 		return NULL;
 	}
 	Color* pal = ( Color* ) malloc( 256 * sizeof( Color ) );
+/*
 	if (spr->palette) {
 		for (int i = 0; i < 256; i++) {
 			pal[i].r = spr->palette[i].r;
@@ -1301,53 +1185,90 @@ Color* SDLVideoDriver::GetPalette(Sprite2D* spr)
 			pal[i].b = spr->palette[i].b;
 		}
 	} else {
+*/
 		for (int i = 0; i < s->format->palette->ncolors; i++) {
 			pal[i].r = s->format->palette->colors[i].r;
 			pal[i].g = s->format->palette->colors[i].g;
 			pal[i].b = s->format->palette->colors[i].b;
 		}
-	}
+//	}
 	return pal;
 }
 
 // Flips given sprite vertically (up-down). If MirrorAnchor=true,
-//   flips its anchor (i.e. origin//base point) as well
-void SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnchor)
+// flips its anchor (i.e. origin//base point) as well
+// returns new sprite
+
+Sprite2D *SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnchor)
 {
 	if (!sprite)
-		return;
-	for (int x = 0; x < sprite->Width; x++) {
-		unsigned char * dst = ( unsigned char * ) sprite->pixels + x;
-		unsigned char * src = dst + ( sprite->Height - 1 ) * sprite->Width;
-		for (int y = 0; y < sprite->Height / 2; y++) {
-			unsigned char tmp = *dst;
+		return NULL;
+	SDL_Surface* tmp = ( SDL_Surface* ) sprite->vptr;
+	if(!tmp) {
+		return NULL;
+	}
+	unsigned char *newpixels = (unsigned char*) malloc( sprite->Width*sprite->Height );
+
+	SDL_LockSurface( tmp );
+	memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);
+	Sprite2D *dest = CreateSprite8(sprite->Width, sprite->Height, 8,
+		newpixels, tmp->format->palette->colors, true, 0);
+
+	for (int x = 0; x < dest->Width; x++) {
+		unsigned char * dst = ( unsigned char * ) dest->pixels + x;
+		unsigned char * src = dst + ( dest->Height - 1 ) * dest->Width;
+		for (int y = 0; y < dest->Height / 2; y++) {
+			unsigned char swp = *dst;
 			*dst = *src;
-			*src = tmp;
-			dst += sprite->Width;
-			src -= sprite->Width;
+			*src = swp;
+			dst += dest->Width;
+			src -= dest->Width;
 		}
 	}
+	dest->XPos = dest->XPos;
 	if (MirrorAnchor)
-		sprite->YPos = sprite->Height - sprite->YPos;
+		dest->YPos = sprite->Height - sprite->YPos;
+	else
+		dest->YPos = sprite->YPos;
+	SDL_UnlockSurface( tmp );
+
+	return dest;
 }
 
 // Flips given sprite horizontally (left-right). If MirrorAnchor=true,
 //   flips its anchor (i.e. origin//base point) as well
-void SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAnchor)
+Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAnchor)
 {
 	if (!sprite)
-		return;
-	for (int y = 0; y < sprite->Height; y++) {
-		unsigned char * dst = (unsigned char *) sprite->pixels + ( y * sprite->Width );
-		unsigned char * src = dst + sprite->Width - 1;
-		for (int x = 0; x < sprite->Width / 2; x++) {
-			unsigned char tmp=*dst;
+		return NULL;
+	SDL_Surface* tmp = ( SDL_Surface* ) sprite->vptr;
+	if(!tmp) {
+		return NULL;
+	}
+	unsigned char *newpixels = (unsigned char*) malloc( sprite->Width*sprite->Height );
+
+	SDL_LockSurface( tmp );
+	memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);
+	Sprite2D *dest = CreateSprite8(sprite->Width, sprite->Height, 8,
+		newpixels, tmp->format->palette->colors, true, 0);
+
+	for (int y = 0; y < dest->Height; y++) {
+		unsigned char * dst = (unsigned char *) dest->pixels + ( y * dest->Width );
+		unsigned char * src = dst + dest->Width - 1;
+		for (int x = 0; x < dest->Width / 2; x++) {
+			unsigned char swp=*dst;
 			*dst++ = *src;
-			*src-- = tmp;
+			*src-- = swp;
 		}
 	}
 	if (MirrorAnchor)
-		sprite->XPos = sprite->Width - sprite->XPos;
+		dest->XPos = sprite->Width - sprite->XPos;
+	else
+		dest->XPos = sprite->XPos;
+	dest->YPos = sprite->YPos;
+	SDL_UnlockSurface( tmp );
+
+	return dest;
 }
 
 void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
@@ -1375,10 +1296,12 @@ void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 		free (sprite->pixels);
 	}
 	sprite->pixels = pixels;
+/*
 	if ( sprite->palette) {
 		free (sprite->palette);
 	}
 	sprite->palette = NULL;
+*/
 	SDL_UnlockSurface (surf);
 	SDL_FreeSurface (surf);
 	surf = SDL_CreateRGBSurfaceFrom( pixels, sprite->Width, sprite->Height, 32, sprite->Width*4, 0xff00, 0xff00, 0xff00, 255 );

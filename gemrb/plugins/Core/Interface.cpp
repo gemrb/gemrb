@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.291 2005/03/31 10:06:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.292 2005/04/01 18:48:09 avenger_teambg Exp $
  *
  */
 
@@ -741,56 +741,52 @@ int Interface::Init()
 	FogSprites[2] = anim->GetFrameFromCycle( 0, 1 );
 	FogSprites[3] = anim->GetFrameFromCycle( 0, 2 );
 
-	FogSprites[4] = anim->GetFrameFromCycle( 0, 0 );
-	video->MirrorSpriteVertical( FogSprites[4], false );
+	FogSprites[4] = video->MirrorSpriteVertical( FogSprites[1], false );
 
 	FogSprites[5] = NULL;
 
-	FogSprites[6] = anim->GetFrameFromCycle( 0, 2 );
-	video->MirrorSpriteVertical( FogSprites[6], false );
+	FogSprites[6] = video->MirrorSpriteVertical( FogSprites[3], false );
 
 	FogSprites[7] = NULL;
 
-	FogSprites[8] = anim->GetFrameFromCycle( 0, 1 );
-	video->MirrorSpriteHorizontal( FogSprites[8], false );
+	FogSprites[8] = video->MirrorSpriteHorizontal( FogSprites[2], false );
 
-	FogSprites[9] = anim->GetFrameFromCycle( 0, 2 );
-	video->MirrorSpriteHorizontal( FogSprites[9], false );
+	FogSprites[9] = video->MirrorSpriteHorizontal( FogSprites[3], false );
 
 	FogSprites[10] = NULL;
 	FogSprites[11] = NULL;
 
-	FogSprites[12] = anim->GetFrameFromCycle( 0, 2 );
-	video->MirrorSpriteVertical( FogSprites[12], false );
-	video->MirrorSpriteHorizontal( FogSprites[12], false );
+	FogSprites[12] = video->MirrorSpriteHorizontal( FogSprites[6], false );
 
 	FogSprites[16] = anim->GetFrameFromCycle( 0, 3 );
 	FogSprites[17] = anim->GetFrameFromCycle( 0, 4 );
 	FogSprites[18] = anim->GetFrameFromCycle( 0, 5 );
 	FogSprites[19] = anim->GetFrameFromCycle( 0, 6 );
 
-	FogSprites[20] = anim->GetFrameFromCycle( 0, 4 );
-	video->MirrorSpriteVertical( FogSprites[20], false );
+	FogSprites[20] = video->MirrorSpriteVertical( FogSprites[17], false );
 
 	FogSprites[21] = NULL;
 
-	FogSprites[22] = anim->GetFrameFromCycle( 0, 7 );
-	video->MirrorSpriteVertical( FogSprites[22], false );
-	video->MirrorSpriteHorizontal( FogSprites[22], false );
-
 	FogSprites[23] = NULL;
 
-	FogSprites[24] = anim->GetFrameFromCycle( 0, 5 );
-	video->MirrorSpriteHorizontal( FogSprites[24], false );
+	FogSprites[24] = video->MirrorSpriteHorizontal( FogSprites[18], false );
 
 	FogSprites[25] = anim->GetFrameFromCycle( 0, 7 );
+
+	{
+	Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[25], false );
+	FogSprites[22] = video->MirrorSpriteHorizontal( tmpsprite, false );
+	video->FreeSprite( tmpsprite );
+	}
 
 	FogSprites[26] = NULL;
 	FogSprites[27] = NULL;
 
-	FogSprites[28] = anim->GetFrameFromCycle( 0, 6 );
-	video->MirrorSpriteVertical( FogSprites[28], false );
-	video->MirrorSpriteHorizontal( FogSprites[28], false );
+	{
+	Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[19], false );
+	FogSprites[28] = video->MirrorSpriteHorizontal( tmpsprite, false );
+	video->FreeSprite( tmpsprite );
+	}
 
 	printStatus( "OK", LIGHT_GREEN );
 
@@ -1881,7 +1877,7 @@ void Interface::DrawWindows(void)
 		++t;
 	}
 	if (quitflag!=-1) {
-		QuitGame (quitflag);
+		QuitGame (quitflag!=0);
 		quitflag = -1;
 	}
 }

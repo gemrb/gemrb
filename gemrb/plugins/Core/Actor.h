@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.61 2005/03/08 19:58:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.62 2005/04/01 18:48:08 avenger_teambg Exp $
  *
  */
 
@@ -126,15 +126,6 @@ public:
 	ieWord AppearanceFlags2;
 
 	char KillVar[32]; //this second field is present in pst and iwd1
-	// for remapping palette
-//	ieByte ColorsCount;
-//	ieWord Colors[7];
-//	ieByte ColorPlacements[7];
-
-//	ieWord unknown2F2;
-//	ieByte unknown2F4;
-//	ieDword unknown2FC[5];
-//	ieByte unknown310;
 
 	ieDword KnownSpellsOffset;
 	ieDword KnownSpellsCount;
@@ -201,14 +192,6 @@ public:
 	bool SetBase(unsigned int StatIndex, ieDword Value);
 	/** Sets the modified value in different ways, returns difference */
 	int NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
-	/** Sets the Scripting Name (death variable) */
-	void SetScriptName(const char* string)
-	{
-		if (string == NULL) {
-			return;
-		}
-		strncpy( scriptName, string, 32 );
-	}
 	/** Sets the Dialog ResRef */
 	void SetDialog(const char* ResRef)
 	{

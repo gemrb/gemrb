@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.16 2005/03/31 10:06:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.17 2005/04/01 18:48:08 avenger_teambg Exp $
  *
  */
 
@@ -48,18 +48,17 @@ private:
 	unsigned long starttime;
 	bool pastLastFrame;
 public:
-	bool Active;
-	ieResRef ResRef;
-	unsigned char nextStanceID;
+	char *ScriptName;
 	bool autoSwitchOnEnd;
 	bool endReached;
 	unsigned int pos;
 	bool autofree;
 	int x, y;
-	unsigned char BlitMode;
 	unsigned char fps;
-	bool playReversed, playOnce;
+	bool playReversed;
 	Region animArea;
+	ieDword Flags;
+	Color *Palette;
 	Animation(int count);
 	~Animation(void);
 	void AddFrame(Sprite2D* frame, unsigned int index);
@@ -68,13 +67,14 @@ public:
 	/** Gets the i-th frame */
 	Sprite2D* GetFrame(unsigned int i);
 	/** Sets the Animation Palette */
-	void SetPalette(Color* Palette);
+	void SetPalette(Color* Palette, bool local);
 	/** Mirrors all the frames vertically */
 	void MirrorAnimation();
 	/** sets frame index */
 	void SetPos(unsigned int index);
+	/** Sets ScriptName for area animation */
+	void SetScriptName(const char *name);
 	unsigned int GetFrameCount() { return indicesCount; }
-	bool ChangePalette;
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.63 2005/03/19 16:15:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.64 2005/04/01 18:48:08 avenger_teambg Exp $
  *
  */
 
@@ -86,6 +86,9 @@ class Door;
 #define CONT_RESET       8
 #define CONT_DISABLED    32
 
+//scriptable (actor) flags
+#define SCR_ACTIVE        1
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -126,7 +129,11 @@ public:
 	char* overHeadText;
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
-	bool Active;
+	//actor visibility flags
+	//1 = active
+	//8 = scripting name overwritten with area actor entry label
+	//other flags are in CREAREAFL in iwd2
+	ieDword Active;
 	Scriptable* LastTrigger;
 	Scriptable* LastEntered;
 	std::list< Action*> actionQueue;

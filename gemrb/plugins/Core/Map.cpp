@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.146 2005/03/23 18:21:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.147 2005/04/01 18:48:09 avenger_teambg Exp $
  *
  */
 
@@ -72,11 +72,11 @@ void InitSpawnGroups()
 	Spawns.RemoveAll();
 	Spawns.SetType( GEM_VARIABLES_STRING );
 	
-	if(table<0) {
+	if (table<0) {
 		return;
 	}
 	tab = core->GetTable( table );
-	if(!tab) {
+	if (!tab) {
 		goto end;
 	}
 	i=tab->GetColNamesCount();
@@ -307,7 +307,7 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 //make a random pick
 	Game* game = core->GetGame();
 	Map* map = game->GetMap(area);
-	if(!map) {
+	if (!map) {
 		printf("[Map] Invalid map: %s\n",area);
 		command[0]=0;
 		return;
@@ -339,7 +339,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	switch(EveryOne) {
 	case 2:
 		core->DisplayConstantString(STR_WHOLEPARTY,0xffffff); //white
-		if(game->EveryoneStopped()) {
+		if (game->EveryoneStopped()) {
 			ip->Flags&=~TRAP_RESET; //exit triggered
 		}
 		return;
@@ -352,7 +352,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	ip->Flags&=~TRAP_RESET; //exit triggered
 	if (ip->Destination[0] != 0) {
 		CreateMovement(Tmp, ip->Destination, ip->EntranceName);
-		if(EveryOne&2) {
+		if (EveryOne&2) {
 			int i=game->GetPartySize(false);
 			while(i--) {
 				game->GetPC(i)->ClearPath();
@@ -437,7 +437,7 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 				} else {
 					//ST_TRAVEL
 					//don't move if doing something else
-					if(actor->GetNextAction())
+					if (actor->GetNextAction())
 						continue;
 					if (ip->outline->PointIn( actor->Pos )) {
 						ip->LastEntered = actor;
@@ -448,15 +448,26 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 			ip->OnCreation = false;
 		}
 	}
-	//Blit the Map Animations
+	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
 	for (i = 0; i < animations.size(); i++) {
-		if (animations[i]->Active) {
-			video->BlitSpriteMode( animations[i]->NextFrame(),
-					animations[i]->x + viewport.x,
-					animations[i]->y + viewport.y, animations[i]->BlitMode,
-					false, &viewport );
+		Animation *anim = animations[i];
+
+		if (!(anim->Flags&A_ANI_BACKGROUND)) continue; //these are drawn after actors
+		if (!(anim->Flags&A_ANI_ACTIVE)) continue;
+		
+		Point p;
+		p.x = anim->x;
+		p.y = anim->y;
+		if (!IsVisible( p, anim->Flags & A_ANI_NOT_IN_FOG) ) continue;
+		Color tint = {0,0,0,0};
+		if (!(anim->Flags&A_ANI_NO_SHADOW)) {
+			tint = LightMap->GetPixel( p.x / 16, p.y / 12);
+			tint.a = 255;
 		}
+		video->BlitSpriteTinted( anim->NextFrame(),
+			p.x + viewport.x, p.y + viewport.y,
+			tint, anim->Palette, &viewport );		
 	}
 	//Draw Selected Door Outline
 	if (gc->overDoor) {
@@ -475,8 +486,6 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 			Actor* actor = GetRoot( q );
 			if (!actor)
 				break;
-			if (!actor->Active)
-				continue;
 			if (update_scripts) {
 				actor->ProcessActions();
 				//moved scripts before display
@@ -487,7 +496,7 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 				}
 
 				//returns true if actor should be completely removed
-				if(actor->CheckOnDeath()) {
+				if (actor->CheckOnDeath()) {
 					DeleteActor( actor );
 					continue;
 				}
@@ -498,49 +507,8 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 
 				actor->DoStep( );
 			}
-			CharAnimations* ca = actor->GetAnims();
-			if (!ca)
-				continue;
-			Animation* anim = ca->GetAnimation( actor->GetStance(), actor->GetOrientation() );
-			if (anim &&
-				anim->autoSwitchOnEnd &&
-				anim->endReached &&
-				anim->nextStanceID) {
-				actor->SetStance( anim->nextStanceID );
-				anim = ca->GetAnimation( actor->GetStance(), actor->GetOrientation() );
-			}
-			if (( !actor->Modified[IE_NOCIRCLE] ) &&
-			    ( !( actor->Modified[IE_STATE_ID] & STATE_DEAD ) )) {
-				actor->DrawCircle();
-				actor->DrawTargetPoint();
-			}
-			if (anim) {
-				Sprite2D* nextFrame = anim->NextFrame();
-				if (nextFrame) {
-					if (actor->lastFrame != nextFrame) {
-						Region newBBox;
-						newBBox.x = actor->Pos.x - nextFrame->XPos;
-						newBBox.w = nextFrame->Width;
-						newBBox.y = actor->Pos.y - nextFrame->YPos;
-						newBBox.h = nextFrame->Height;
-						actor->lastFrame = nextFrame;
-						actor->SetBBox( newBBox );
-					}
-					if (!actor->BBox.InsideRegion( vp ))
-						continue;
-					Point a = actor->Pos;
-					int cx = a.x / 16;
-					int cy = a.y / 12;
-					Color tint = LightMap->GetPixel( cx, cy );
-					tint.a = 0xA0;
-					video->BlitSpriteTinted( nextFrame, a.x + viewport.x,
-							a.y + viewport.y, tint, &Screen );
-					if (anim->endReached && anim->autoSwitchOnEnd) {
-						actor->SetStance( anim->nextStanceID );
-						anim->autoSwitchOnEnd = false;
-					}
-				}
-			}
+
+			//text feedback
 			if (actor->textDisplaying) {
 				unsigned long time;
 				GetTime( time );
@@ -556,8 +524,106 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 							false );
 				}
 			}
+
+			int cx = actor->Pos.x;
+			int cy = actor->Pos.y;
+			//actor isn't visible
+			//visual feedback
+			CharAnimations* ca = actor->GetAnims();
+			if (!ca)
+				continue;
+			//explored or visibilitymap (bird animations are visible in fog)
+			int explored = actor->Modified[IE_DONOTJUMP]&2;
+			if (!IsVisible( actor->Pos, explored)) {
+				//possibly turn off actor
+				//actor->Active=false;
+				continue;
+			}
+			//0 means opaque
+			int Trans = actor->Modified[IE_TRANSLUCENT] * 255 / 100;
+			if (Trans>255) Trans=255;
+			int State = actor->Modified[IE_STATE_ID];
+			if (State&STATE_INVISIBLE) {
+				//friendlies are half transparent
+				if (actor->Modified[IE_EA]<6) {
+					Trans=128;
+				} else {
+					//enemies are fully invisible if invis flag 2 set
+					if (actor->Modified[IE_EA]>128) {
+						if (State&STATE_INVIS2)
+							Trans=256;
+						else
+							Trans=128;
+					} else {
+						Trans=256;
+					}
+				}
+			}
+			//no visual feedback
+			if (Trans>255)
+				continue;
+			if (( !actor->Modified[IE_NOCIRCLE] ) &&
+					( !( State & STATE_DEAD ) )) {
+				actor->DrawCircle();
+				actor->DrawTargetPoint();
+			}
+/*
+			if (anim &&
+				anim->autoSwitchOnEnd &&
+				anim->endReached &&
+				ca->nextStanceID) {
+				actor->SetStance( ca->nextStanceID );
+				anim = ca->GetAnimation( actor->GetStance(), actor->GetOrientation() );
+			}
+*/
+			Animation* anim = ca->GetAnimation( actor->GetStance(), actor->GetOrientation() );
+			if (anim) {
+				Sprite2D* nextFrame = anim->NextFrame();
+				if (nextFrame) {
+					if (actor->lastFrame != nextFrame) {
+						Region newBBox;
+						newBBox.x = cx - nextFrame->XPos;
+						newBBox.w = nextFrame->Width;
+						newBBox.y = cy - nextFrame->YPos;
+						newBBox.h = nextFrame->Height;
+						actor->lastFrame = nextFrame;
+						actor->SetBBox( newBBox );
+					}
+					if (!actor->BBox.InsideRegion( vp ))
+						continue;
+					Color tint = LightMap->GetPixel( cx / 16, cy / 12);
+					tint.a = 255-Trans;
+					video->BlitSpriteTinted( nextFrame, cx + viewport.x, cy + viewport.y, tint, anim->Palette, &Screen );
+					if (anim->endReached && anim->autoSwitchOnEnd && ca->nextStanceID) {
+						actor->SetStance( ca->nextStanceID );
+						anim->endReached = false;
+					}
+				}
+			}
 		}
 	}
+
+	//draw normal animations after actors
+	for (i = 0; i < animations.size(); i++) {
+		Animation *anim = animations[i];
+
+		if (anim->Flags&A_ANI_BACKGROUND) continue; //these are drawn before actors
+		if (!(anim->Flags&A_ANI_ACTIVE)) continue;
+
+		Point p;
+		p.x = anim->x;
+		p.y = anim->y;
+		if (!IsVisible( p, anim->Flags & A_ANI_NOT_IN_FOG) ) continue;
+		Color tint = {0,0,0,0};
+		if (!(anim->Flags&A_ANI_NO_SHADOW)) {
+			tint = LightMap->GetPixel( p.x / 16, p.y / 12);
+			tint.a = 0xA0;
+		}
+		video->BlitSpriteTinted( anim->NextFrame(),
+			p.x + viewport.x, p.y + viewport.y,
+			tint, anim->Palette, &viewport );
+	}
+
 	for (i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells.at( i );
 		if (!vvc)
@@ -579,8 +645,8 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 		if (!frame)
 			continue;
 		if (vvc->Transparency & IE_VVC_BRIGHTEST) {
-			video->BlitSpriteMode( frame, vvc->XPos + viewport.x,
-					vvc->YPos + viewport.y, 1, false, &viewport );
+			video->BlitSprite( frame, vvc->XPos + viewport.x,
+					vvc->YPos + viewport.y, false, &viewport );
 		} else {
 			video->BlitSprite( frame, vvc->XPos + viewport.x,
 					vvc->YPos + viewport.y, false, &viewport );
@@ -601,16 +667,15 @@ void Map::Shout(Scriptable* actor, int shoutID, unsigned int radius)
 {
 	int i=actors.size();
 	while(i--) {
-		if(radius) {
-			if(Distance(actor->Pos, actors[i]->Pos)>radius) {
+		if (radius) {
+			if (Distance(actor->Pos, actors[i]->Pos)>radius) {
 				continue;
 			}
 		}
-		if(shoutID) {
+		if (shoutID) {
 			actors[i]->LastHeard = (Actor *) actor;
 			actors[i]->LastShout = shoutID;
-		}
-		else {
+		} else {
 			actors[i]->LastHelp = (Actor *) actor;
 		}
 	}
@@ -643,7 +708,7 @@ void Map::DeleteActor(Actor* actor)
 }
 
 /** flags: GA_SELECT=1   - unselectable actors don't play
-	   GA_NO_DEAD=2	 - dead actors don't play
+		 GA_NO_DEAD=2	 - dead actors don't play
  */
 Actor* Map::GetActor(Point &p, int flags)
 {
@@ -692,7 +757,7 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 	while(i--) {
 		Actor* actor = actors[i];
 //use this function only for party?
-		if(onlyparty && !actor->InParty)
+		if (onlyparty && !actor->InParty)
 			continue;
 		if (!actor->ValidTarget(GA_SELECT|GA_NO_DEAD) )
 			continue;
@@ -749,6 +814,8 @@ void Map::AddWallGroup(WallGroup* wg)
 	wallGroups.push_back( wg );
 }
 
+//this function determines actor drawing order
+//it should be extended to wallgroups, animations, effects!
 void Map::GenerateQueue(int priority)
 {
 	if (lastActorCount[priority] != actors.size()) {
@@ -763,6 +830,10 @@ void Map::GenerateQueue(int priority)
 	unsigned int i=actors.size();
 	while(i--) {
 		Actor* actor = actors[i];
+		//don't queue inactive actors
+		if (!(actor->Active&1))
+			continue;
+
 		switch (priority) {
 			case 0:
 				//Top Priority
@@ -779,8 +850,8 @@ void Map::GenerateQueue(int priority)
 			case 2:
 				continue;
 		} 
+		queue[priority][Qcount[priority]] = actor;
 		Qcount[priority]++;
-		queue[priority][Qcount[priority] - 1] = actor;
 		int lastPos = Qcount[priority];
 		while (lastPos != 1) {
 			int parentPos = ( lastPos / 2 ) - 1;
@@ -845,8 +916,10 @@ Animation* Map::GetAnimation(const char* Name)
 {
 	unsigned int i=animations.size();
 	while(i--) {
-		if (strnicmp( animations[i]->ResRef, Name, 8 ) == 0) {
-			return animations[i];
+		Animation *anim = animations[i];
+
+		if (anim->ScriptName && (strnicmp( anim->ScriptName, Name, 32 ) == 0)) {
+			return anim;
 		}
 	}
 	return NULL;
@@ -900,7 +973,7 @@ bool Map::CanFree()
 {
 	unsigned int i=actors.size();
 	while(i--) {
-		if(actors[i]->InParty) {
+		if (actors[i]->InParty) {
 			return false;
 		}
 	}
@@ -1060,7 +1133,7 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
 		long tx = ( x - goal.x );
 		long ty = ( y - goal.y );
 		unsigned int distance = (unsigned int) sqrt( ( double ) ( tx* tx + ty* ty ) );
-		if(dist<distance) {
+		if (dist<distance) {
 			best.x=x;
 			best.y=y;
 			dist=distance;
@@ -1090,10 +1163,9 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
 	StartNode->Parent = NULL;
 	StartNode->x = best.x;
 	StartNode->y = best.y;
-	if(Backing) {
+	if (Backing) {
 		StartNode->orient = GetOrient( start, best );
-	}
-	else {
+	} else {
 		StartNode->orient = GetOrient( best, start );
 	}
 	Point p = best;
@@ -1119,10 +1191,9 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
 		StartNode->x = n.x;
 		StartNode->y = n.y;
 
-		if(Backing) {
+		if (Backing) {
 			StartNode->orient = GetOrient( p, n );
-		}
-		else {
+		} else {
 			StartNode->orient = GetOrient( n, p );
 		}
 		p = n;
@@ -1251,6 +1322,27 @@ PathNode* Map::FindPath(Point &s, Point &d)
 	return Return;
 }
 
+//single point visible or not (visible/exploredbitmap)
+//if explored = true then visible in fog
+bool Map::IsVisible(Point &pos, int explored)
+{
+	int sX=pos.x/32;
+	int sY=pos.y/32;
+	if (sX<0) return false;
+	if (sY<0) return false;
+	int w = TMap->XCellCount * 2 + LargeFog;
+	int h = TMap->YCellCount * 2 + LargeFog;
+	if (sX>=w) return false;
+	if (sY>=h) return false;
+ 	int b0 = (sY * w) + sX;
+	int by = b0/8;
+	int bi = 1<<(b0%8);
+
+	if (explored) return (ExploredBitmap[by] & bi)!=0;
+	return (VisibleBitmap[by] & bi)!=0;
+}
+
+//point a is visible from point b (searchmap)
 bool Map::IsVisible(Point &s, Point &d)
 {
 	int sX=s.x/16;
@@ -1301,14 +1393,14 @@ int Map::WhichEdge(Point &s)
 	}
 	sX*=Height;
 	sY*=Width;
-	if(sX<sY) { //north or west
-		if(Width*Height<sX+sY) { //
+	if (sX<sY) { //north or west
+		if (Width*Height<sX+sY) { //
 			return WMP_NORTH;
 		}
 		return WMP_WEST;
 	}
 	//south or east
-	if(Width*Height<sX+sY) { //
+	if (Width*Height<sX+sY) { //
 		return WMP_SOUTH; 
 	}
 	return WMP_EAST;
@@ -1338,7 +1430,7 @@ void Map::RemoveMapNote(Point point)
 {
 	int i = mapnotes.size();
 	while(i--) {
-		if((point.x==mapnotes[i]->Pos.x) &&
+		if ((point.x==mapnotes[i]->Pos.x) &&
 			(point.y==mapnotes[i]->Pos.y)) {
 			delete mapnotes[i];
 			mapnotes.erase(mapnotes.begin()+i);
@@ -1350,7 +1442,7 @@ MapNote *Map::GetMapNote(Point point)
 {
 	int i = mapnotes.size();
 	while(i--) {
-		if(Distance(point, mapnotes[i]->Pos) < 10 ) {
+		if (Distance(point, mapnotes[i]->Pos) < 10 ) {
 			return mapnotes[i];
 		}
 	}
@@ -1361,10 +1453,10 @@ void Map::SpawnCreature(Point pos, char *CreName, int radius)
 {
 	char *Spawngroup=NULL;
 	Actor *creature;
-	if( !Spawns.Lookup( CreName, Spawngroup) ) {
+	if ( !Spawns.Lookup( CreName, Spawngroup) ) {
 		DataStream *stream = core->GetResourceMgr()->GetResource( CreName, IE_CRE_CLASS_ID );
 		creature = core->GetCreature(stream); 
-		if( creature ) {
+		if ( creature ) {
 			creature->SetPosition( this, pos, true, radius );
 			AddActor(creature);
 		}
@@ -1376,7 +1468,7 @@ void Map::SpawnCreature(Point pos, char *CreName, int radius)
 	while( count-- ) {
 		DataStream *stream = core->GetResourceMgr()->GetResource( ((ieResRef *) Spawngroup)[count+1], IE_CRE_CLASS_ID );
 		creature = core->GetCreature(stream); 
-		if( creature ) {
+		if ( creature ) {
 			creature->SetPosition( this, pos, true, radius );
 			AddActor(creature);
 		}
@@ -1387,9 +1479,9 @@ void Map::SpawnCreature(Point pos, char *CreName, int radius)
 bool Map::Rest(Point pos, int hours)
 {
 	int chance=RestHeader.DayChance; //based on ingame timer
-	if( !RestHeader.CreatureNum) return false;
+	if ( !RestHeader.CreatureNum) return false;
 	for(int i=0;i<hours;i++) {
-		if( rand()%100<chance ) {
+		if ( rand()%100<chance ) {
 			int idx = rand()%RestHeader.CreatureNum;
 			char *str=core->GetString( RestHeader.Strref[idx] );
 			core->DisplayString( str );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.39 2005/03/20 15:07:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.40 2005/04/01 18:48:09 avenger_teambg Exp $
  *
  */
 
@@ -63,9 +63,7 @@ public:
 	virtual void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL) = 0;
 	virtual void BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
-		Region* clip = NULL) = 0;
-	virtual void BlitSpriteMode(Sprite2D* spr, int x, int y, int blendMode,
-		bool anchor = true, Region* clip = NULL) = 0;
+		Color *palette, Region* clip = NULL) = 0;
 	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
 	virtual void SetDragCursor(Sprite2D* drag) = 0;
 	virtual Region GetViewport(void) = 0;
@@ -99,11 +97,11 @@ public:
 	virtual bool Quit(void) = 0;
 	/** Get the Palette of a Sprite */
 	virtual Color* GetPalette(Sprite2D* spr) = 0;
-	/** Flips sprite vertically */
-	virtual void MirrorSpriteVertical(Sprite2D *sprite, bool MirrorAnchor) = 0;
-	/** Flips sprite horizontally */
-	virtual void MirrorSpriteHorizontal(Sprite2D *sprite, bool MirrorAnchor) = 0;
-	/** Creates sprite with alpha channel */
+	/** Flips sprite vertically, returns new sprite */
+	virtual Sprite2D *MirrorSpriteVertical(Sprite2D *sprite, bool MirrorAnchor) = 0;
+	/** Flips sprite horizontally, returns new sprite */
+	virtual Sprite2D *MirrorSpriteHorizontal(Sprite2D *sprite, bool MirrorAnchor) = 0;
+	/** Transforms sprite to have an alpha channel */
 	virtual void CreateAlpha(Sprite2D *sprite) = 0;
 
 	/** Convers a Screen Coordinate to a Game Coordinate */

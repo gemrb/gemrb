@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.211 2005/03/31 13:54:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.212 2005/04/01 18:48:08 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -280,8 +280,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (effect) {
 		if (( game->selected.size() > 0 )) {
 			Actor* actor = game->selected[0];
-			video->BlitSpriteMode( effect->NextFrame(), actor->Pos.x,
-					actor->Pos.y, 1, false );
+			video->BlitSprite( effect->NextFrame(), actor->Pos.x,
+					actor->Pos.y, false );
 		}
 	}
 

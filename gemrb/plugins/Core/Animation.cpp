@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.27 2005/03/31 10:06:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.28 2005/04/01 18:48:08 avenger_teambg Exp $
  *
  */
 
@@ -34,7 +34,7 @@ Animation::Animation(int count)
 {
 	frames = (Sprite2D **) calloc(count, sizeof(Sprite2D *));
 	indicesCount = count;
-	if(count) {
+	if (count) {
 		pos = rand() % count;
 	}
 	else {
@@ -44,35 +44,34 @@ Animation::Animation(int count)
 	x = 0;
 	y = 0;
 	autofree = false;
-	ChangePalette = true;
-	BlitMode = IE_NORMAL;
+	Palette = NULL;
+	Flags = A_ANI_ACTIVE;
 	fps = 15;
 	endReached = false;
-	nextStanceID = 0;
 	pastLastFrame = false;
-	ResRef[0] = 0;
-	Active = true;
+	ScriptName = NULL;
 	//behaviour flags
 	playReversed = false;
-	playOnce = false;
 	autoSwitchOnEnd = false;
 }
 
 Animation::~Animation(void)
 {
+	Video *video = core->GetVideoDriver();
+	
 	if (autofree) {
-		Video *video = core->GetVideoDriver();
-		
 		for (unsigned int i = 0; i < indicesCount; i++) {
 			video->FreeSprite( frames[i] );
 		}
 	}
 	free(frames);
+	if (Palette) video->FreePalette(Palette);
+	if (ScriptName) free(ScriptName);
 }
 
 void Animation::SetPos(unsigned int index)
 {
-	if(index<indicesCount) {
+	if (index<indicesCount) {
 		pos=index;
 	}
 }
@@ -84,7 +83,7 @@ void Animation::AddFrame(Sprite2D* frame, unsigned int index)
 		printf("You tried to write past a buffer in animation, BAD!\n");
 		abort();
 	}
-	if(autofree && frames[index]) {
+	if (autofree && frames[index]) {
 		core->GetVideoDriver()->FreeSprite(frames[index]);
 	}
 	frames[index]=frame;
@@ -109,21 +108,22 @@ void Animation::AddFrame(Sprite2D* frame, unsigned int index)
 
 Sprite2D* Animation::NextFrame(void)
 {
-	if (!Active) {
+	if (!Flags&A_ANI_ACTIVE) {
+		printf("Frame fetched while animation is inactive!\n");
 		return NULL;
 	}
 	if (starttime == 0) {
 		GetTime( starttime );
 	}
 	Sprite2D* ret;
-	if(playReversed) {
+	if (playReversed) {
 		ret = frames[indicesCount-pos-1];
 	}
 	else {
 		ret = frames[pos];
 	}
 
-	if (pastLastFrame && playOnce) {
+	if (pastLastFrame && (Flags&A_ANI_PLAYONCE) ) {
 		endReached = true;
 		return ret;
 	}
@@ -158,12 +158,19 @@ Sprite2D* Animation::GetFrame(unsigned int i)
 	return frames[i];
 }
 
-void Animation::SetPalette(Color* Palette)
+void Animation::SetPalette(Color* Pal, bool local)
 {
 	Video *video = core->GetVideoDriver();
-
-	for (size_t i = 0; i < indicesCount; i++) {
-		video->SetPalette( frames[i], Palette );
+	if (local) {
+		if (!Palette) {
+			Palette=video->GetPalette( frames[0] );
+		}
+		if (Pal)
+			memcpy( Palette, Pal, sizeof(Palette) );
+	} else {
+		for (size_t i = 0; i < indicesCount; i++) {
+			video->SetPalette( frames[i], Pal );
+		}
 	}
 }
 
@@ -172,7 +179,12 @@ void Animation::MirrorAnimation()
 	Video *video = core->GetVideoDriver();
 
 	for (size_t i = 0; i < indicesCount; i++) {
-		video->MirrorSpriteHorizontal( frames[i], true );
+		frames[i] = video->MirrorSpriteHorizontal( frames[i], true );
 	}
 }
 
+void Animation::SetScriptName(const char *name)
+{
+	if (!ScriptName) ScriptName=(char *) malloc(33);
+	strnuprcpy( ScriptName, name, 32 );
+}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.252 2005/03/31 13:54:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.253 2005/04/01 18:48:08 avenger_teambg Exp $
  *
  */
 
@@ -631,7 +631,7 @@ static ObjectLink objectnames[] = {
 	{"leastdamagedof", GameScript::LeastDamagedOf},
 	{"mostdamagedof", GameScript::MostDamagedOf},
 	{"myself", GameScript::Myself},
-	{"nearest", GameScript::Nearest},
+	{"nearest", GameScript::Nearest}, //actually this seems broken in IE and resolve as Myself
 	{"nearestenemyof", GameScript::NearestEnemyOf},
 	{"nearestpc", GameScript::NearestPC},
 	{"ninthnearest", GameScript::NinthNearest},
@@ -894,7 +894,7 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		int oT = core->LoadSymbol( "OBJECT" );
 		int iT = core->LoadTable( "SCRIPT" );
 		if (tT < 0 || aT < 0 || oT < 0 || iT < 0) {
-			printMessage( "IEScript","A critical scripting file is missing!\n",LIGHT_RED );
+			printMessage( "GameScript","A critical scripting file is missing!\n",LIGHT_RED );
 			abort();
 		}
 		triggersTable = core->GetSymbol( tT );
@@ -902,7 +902,7 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		objectsTable = core->GetSymbol( oT );
 		TableMgr* objNameTable = core->GetTable( iT );
 		if (!triggersTable || !actionsTable || !objectsTable || !objNameTable) {
-			printMessage( "IEScript","A critical scripting file is damaged!\n",LIGHT_RED );
+			printMessage( "GameScript","A critical scripting file is damaged!\n",LIGHT_RED );
 			abort();
 		}
 
@@ -912,7 +912,7 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 
 		ObjectIDSCount = atoi( objNameTable->QueryField() );
 		if(ObjectIDSCount<0 || ObjectIDSCount>MAX_OBJECT_FIELDS) {
-			printMessage("IEScript","The IDS Count shouldn't be more than 10!\n",LIGHT_RED);
+			printMessage("GameScript","The IDS Count shouldn't be more than 10!\n",LIGHT_RED);
 			abort();
 		}
 		
@@ -930,7 +930,7 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		}
 		MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 		if(MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
-			printMessage("IEScript","The Object Nesting Count shouldn't be more than 5!\n", LIGHT_RED);
+			printMessage("GameScript","The Object Nesting Count shouldn't be more than 5!\n", LIGHT_RED);
 			abort();
 		}
 		HasAdditionalRect = ( atoi( objNameTable->QueryField( 2 ) ) != 0 );
@@ -1042,7 +1042,7 @@ Script* GameScript::CacheScript(ieResRef ResRef)
 	}
 	stream->ReadLine( line, 10 );
 	if (strncmp( line, "SC", 2 ) != 0) {
-		printMessage( "IEScript","Not a Compiled Script file\n", YELLOW );
+		printMessage( "GameScript","Not a Compiled Script file\n", YELLOW );
 		delete( stream );
 		return NULL;
 	}
@@ -1374,6 +1374,10 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		Action* aC = new Action(false);
 		count = stream->ReadLine( line, 1024 );
 		aC->actionID = (unsigned short)strtoul(line, NULL,10);
+		if (aC->actionID>=MAX_ACTIONS) {
+			aC->actionID=0;
+			printMessage("GameScript","Invalid script action ID!",LIGHT_RED);
+		}
 		for (int i = 0; i < 3; i++) {
 			stream->ReadLine( line, 1024 );
 			Object* oB = DecodeObject( line );
@@ -1501,7 +1505,7 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 		if (result > 1) {
 			//we started an Or() block
 			if (ORcount) {
-				printMessage( "IEScript","Unfinished OR block encountered!\n",YELLOW );
+				printMessage( "GameScript","Unfinished OR block encountered!\n",YELLOW );
 			}
 			ORcount = result;
 			subresult = false;
@@ -1519,16 +1523,17 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 		}
 	}
 	if (ORcount) {
-		printMessage( "IEScript","Unfinished OR block encountered!\n",YELLOW );
+		printMessage( "GameScript","Unfinished OR block encountered!\n",YELLOW );
 	}
 	return 1;
 }
 
-bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
+/* this may return more than a boolean, in case of Or(x) */
+int GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 {
 	if (!trigger) {
-		printMessage( "IEScript","Trigger evaluation fails due to NULL trigger.\n",YELLOW );
-		return false;
+		printMessage( "GameScript","Trigger evaluation fails due to NULL trigger.\n",YELLOW );
+		return 0;
 	}
 	TriggerFunction func = triggers[trigger->triggerID];
 	const char *tmpstr=triggersTable->GetValue(trigger->triggerID);
@@ -1541,8 +1546,8 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 		char Tmp[256]; 
 		snprintf(Tmp,sizeof(Tmp),"Unhandled trigger code: 0x%04x %s\n",
 			trigger->triggerID, tmpstr );
-		printMessage( "IEScript",Tmp,YELLOW);
-		return false;
+		printMessage( "GameScript",Tmp,YELLOW);
+		return 0;
 	}
 	if(InDebug&1) {
 		printf( "[IEScript]: Executing trigger code: 0x%04x %s\n",
@@ -1552,7 +1557,7 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 	if (trigger->flags & 1) {
 		return !ret;
 	}
-	return ( ret != 0 );
+	return ret;
 }
 
 int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
@@ -1645,10 +1650,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		}
 	}
 	else {
-		actions[aC->actionID] = NoAction;
+		actions[aC->actionID] = NoActionAtAll;
 		char Tmp[256]; 
 		snprintf(Tmp, sizeof(Tmp), "Unhandled action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
-		printMessage("IEScript", Tmp, YELLOW);
+		printMessage("GameScript", Tmp, YELLOW);
 		Sender->CurrentAction = NULL;
 		aC->Release();
 		return;
@@ -1821,7 +1826,7 @@ bool GameScript::EvaluateString(Scriptable* Sender, char* String)
 		return false;
 	}
 	Trigger* tri = GenerateTrigger( String );
-	bool ret = EvaluateTrigger( Sender, tri );
+	bool ret = EvaluateTrigger( Sender, tri )!=0;
 	tri->Release();
 	return ret;
 }
@@ -1838,7 +1843,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 			char Tmp[256];
 
 			sprintf(Tmp,"Missing IDS file %s for symbol %s!\n",idsname, symbol);
-			printMessage("IEScript",Tmp,LIGHT_RED);
+			printMessage("GameScript",Tmp,LIGHT_RED);
 		}
 		return -1;
 	}
@@ -3270,11 +3275,12 @@ int GameScript::IsGabber(Scriptable* Sender, Trigger* parameters)
 int GameScript::IsActive(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr || scr->Type!=ST_ACTOR) {
+	if (!scr) {
 		return 0;
 	}
-	if ((Actor *) scr->Active)
+	if (scr->Active&SCR_ACTIVE) {
 		return 1;
+	}
 	return 0;
 }
 
@@ -5308,6 +5314,11 @@ void GameScript::RemoveAreaType(Scriptable* /*Sender*/, Action* parameters)
 	map->AreaType&=~parameters->int0Parameter;
 }
 
+void GameScript::NoActionAtAll(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	//thats all :)
+}
+
 void GameScript::NoAction(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	//thats all :)
@@ -5504,7 +5515,11 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 		printf("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
 		return;
 	}
-	ip->Active = ( parameters->int0Parameter != 0 );
+	if ( parameters->int0Parameter != 0 ) {
+		ip->Active |= SCR_ACTIVE;
+	} else {
+		ip->Active &=~SCR_ACTIVE;
+	}
 }
 
 void GameScript::FadeToColor(Scriptable* /*Sender*/, Action* parameters)
@@ -5819,7 +5834,7 @@ void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 		Sender->CutSceneId = GetActorFromObject( Sender, parameters->objects[1] );
 	}
 	if(!Sender->CutSceneId) {
-		printMessage("IEScript","Failed to set CutSceneID!\n",YELLOW);
+		printMessage("GameScript","Failed to set CutSceneID!\n",YELLOW);
 		if(InDebug&2) {
 			abort();
 		}
@@ -6680,7 +6695,11 @@ void GameScript::AmbientActivate(Scriptable* /*Sender*/, Action* parameters)
 			parameters->objects[1]->objectName );
 		return;
 	}
-	anim->Active = ( parameters->int0Parameter != 0 );
+	if(parameters->int0Parameter) {
+		anim->Flags |= A_ANI_ACTIVE;
+	} else {
+		anim->Flags &= ~A_ANI_ACTIVE;
+	}
 }
 
 void GameScript::StaticStart(Scriptable* /*Sender*/, Action* parameters)
@@ -6691,7 +6710,7 @@ void GameScript::StaticStart(Scriptable* /*Sender*/, Action* parameters)
 			parameters->objects[1]->objectName );
 		return;
 	}
-	anim->Active = true;
+	anim->Flags &=~A_ANI_PLAYONCE;
 }
 
 void GameScript::StaticStop(Scriptable* /*Sender*/, Action* parameters)
@@ -6702,7 +6721,7 @@ void GameScript::StaticStop(Scriptable* /*Sender*/, Action* parameters)
 			parameters->objects[1]->objectName );
 		return;
 	}
-	anim->playOnce = true;
+	anim->Flags |= A_ANI_PLAYONCE;
 }
 
 void GameScript::StaticPalette(Scriptable* /*Sender*/, Action* parameters)
@@ -6722,7 +6741,7 @@ void GameScript::StaticPalette(Scriptable* /*Sender*/, Action* parameters)
 	Color *pal = (Color *) malloc( sizeof(Color*) * 256 );
 	bmp->GetPalette( 0, 256, pal );
 	core->FreeInterface( bmp );
-	anim->SetPalette( pal );
+	anim->SetPalette( pal, true );
 }
 
 void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
@@ -7099,7 +7118,7 @@ void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
 	if (tar->Type != ST_ACTOR) {
 		return;
 	}
-	tar->Active = false;
+	tar->Active &=~SCR_ACTIVE;
 }
 
 void GameScript::MakeGlobal(Scriptable* Sender, Action* /*parameters*/)
@@ -7205,7 +7224,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 		//display string
 	}
 	if (xptable<0) {
-		printMessage("IEScript","Can't perform ADDXP2DA",LIGHT_RED);
+		printMessage("GameScript","Can't perform ADDXP2DA",LIGHT_RED);
 		return;
 	}
 	char * xpvalue = core->GetTable( xptable )->QueryField( parameters->string0Parameter, "0" ); //level is unused
@@ -7348,7 +7367,11 @@ void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	tar->Active = (bool) parameters->int0Parameter;
+	if ( parameters->int0Parameter != 0 ) {
+		tar->Active |= SCR_ACTIVE;
+	} else {
+		tar->Active &=~SCR_ACTIVE;
+	}
 }
 
 void GameScript::Activate(Scriptable* Sender, Action* parameters)
@@ -7357,7 +7380,7 @@ void GameScript::Activate(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	tar->Active = true;
+	tar->Active |= SCR_ACTIVE;
 }
 
 void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
@@ -7908,7 +7931,7 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 void GameScript::Debug(Scriptable* /*Sender*/, Action* parameters)
 {
 	InDebug=parameters->int0Parameter;
-	printMessage("IEScript",parameters->string0Parameter,YELLOW);
+	printMessage("GameScript",parameters->string0Parameter,YELLOW);
 }
 
 void GameScript::IncrementProficiency(Scriptable* Sender, Action* parameters)
@@ -8143,7 +8166,7 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 		gc->speaker = (Actor *) tar;
 	}
 	else {
-		printMessage("IEScript","Can't set gabber!",YELLOW);
+		printMessage("GameScript","Can't set gabber!",YELLOW);
 	}
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.49 2005/03/31 10:06:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.50 2005/04/01 18:48:08 avenger_teambg Exp $
  *
  */
 
@@ -70,19 +70,25 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 	ResRef[8]=0;
 }
 
-void CharAnimations::SetupColors(ieDword *arg)
+void CharAnimations::SetColors(ieDword *arg)
 {
-	if(arg) {
-		for (int i = 0; i < MAX_ANIMS; i++) {
-			for (int j = 0; j < MAX_ORIENT; j++) {
-				if (Anims[i][j]) {
-					Anims[i][j]->ChangePalette = true;
-				}
+	Colors = arg;
+	for (int StanceID = 0; StanceID < MAX_ANIMS; StanceID++) {
+		for (int Orient = 0; Orient < MAX_ORIENT; Orient++) {
+			if(Anims[StanceID][Orient]) {
+				SetupColors(Anims[StanceID][Orient]);
 			}
 		}
-		Colors = arg;
 	}
-	if(!Colors || !Palette) {
+}
+
+void CharAnimations::SetupColors(Animation *anim)
+{
+	if(!anim->Palette) {
+		//this palette must be freed using videodriver
+		anim->Palette=core->GetVideoDriver()->GetPalette(anim->GetFrame(0));
+	}
+	if(!Colors) {
 		return;
 	}
 	if (GetAnimType() >=IE_ANI_PST_ANIMATION_1) {
@@ -91,7 +97,7 @@ void CharAnimations::SetupColors(ieDword *arg)
 		int dest = 256-Colors[6]*size;
 		for (unsigned int i = 0; i < Colors[6]; i++) {
 			Color* NewPal = core->GetPalette( Colors[i], size );
-			memcpy( &Palette[dest], NewPal, size * sizeof( Color ) );
+			memcpy( &anim->Palette[dest], NewPal, size * sizeof( Color ) );
 			dest +=size;
 			free( NewPal );
 		}
@@ -109,7 +115,7 @@ void CharAnimations::SetupColors(ieDword *arg)
 		if (bmp) {
 			DataStream* s = core->GetResourceMgr()->GetResource( PaletteResRef, IE_BMP_CLASS_ID );
 			bmp->Open( s, true);
-			bmp->GetPalette(0, 256, Palette);
+			bmp->GetPalette(0, 256, anim->Palette);
 			core->FreeInterface( bmp );
 		}
 		return;
@@ -121,28 +127,28 @@ void CharAnimations::SetupColors(ieDword *arg)
 	Color* LeatherPal = core->GetPalette( Colors[4], 12 );
 	Color* ArmorPal = core->GetPalette( Colors[5], 12 );
 	Color* HairPal = core->GetPalette( Colors[6], 12 );
-	memcpy( &Palette[0x04], MetalPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x10], MinorPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x1C], MajorPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x28], SkinPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x34], LeatherPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x40], ArmorPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x4C], HairPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x58], &MinorPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x60], &MajorPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x68], &MinorPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x70], &MetalPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x88], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x04], MetalPal, 12 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x10], MinorPal, 12 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x1C], MajorPal, 12 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x28], SkinPal, 12 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x34], LeatherPal, 12 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x40], ArmorPal, 12 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x4C], HairPal, 12 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x58], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x60], &MajorPal[1], 8 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x68], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x70], &MetalPal[1], 8 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &anim->Palette[0x88], &MinorPal[1], 8 * sizeof( Color ) );
 
 	int i; //moved here to be compatible with msvc6.0
 
 	for (i = 0x90; i < 0xA8; i += 0x08)
-		memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
+		memcpy( &anim->Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &anim->Palette[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
 	for (i = 0xB8; i < 0xFF; i += 0x08)
-		memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
+		memcpy( &anim->Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
 	free( MetalPal );
 	free( MinorPal );
 	free( MajorPal );
@@ -187,8 +193,8 @@ void CharAnimations::InitAvatarsTable()
 
 CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 {
-	Palette = NULL;
 	Colors = NULL;
+	nextStanceID = 0;
 	if (!AvatarsCount) {
 		InitAvatarsTable();
 	}
@@ -222,9 +228,6 @@ CharAnimations::~CharAnimations(void)
 {
 	void *tmppoi;
 
-	if (Palette) {
-		core->GetVideoDriver()->FreePalette(Palette);
-	}
 	for (int StanceID = 0; StanceID < MAX_ANIMS; StanceID++) {
 		for (int i = 0; i < MAX_ORIENT; i++) {
 			if (Anims[StanceID][i]) {
@@ -241,7 +244,8 @@ CharAnimations::~CharAnimations(void)
 		}
 	}
 }
-/*This is a simple Idea of how the animation are coded
+/*
+This is a simple Idea of how the animation are coded
 
 There are the following animation types:
 
@@ -317,19 +321,20 @@ IE_ANI_PST_STAND:	This is a modified PST animation, it contains only a
 IE_ANI_PST_GHOST:	This is a special animation with no standard.
 
 
-	 WEST PART  	 |  	 EAST PART
-			 |
-		NW  NNW  N  NNE  NE
-	 NW 006 007 008 009 010 NE
-	WNW 005 	 |  	011 ENE
-	  W 004 	xxx 	012 E
-	WSW 003 	 |  	013 ESE
-	 SW 002 001 000 015 014 SE
-		SW  SSW  S  SSE  SE
-			 |
-			 |
+  WEST PART  |  EAST PART
+             |
+    NW  NNW  N  NNE  NE
+ NW 006 007 008 009 010 NE
+WNW 005      |      011 ENE
+  W 004     xxx     012 E
+WSW 003      |      013 ESE
+ SW 002 001 000 015 014 SE
+    SW  SSW  S  SSE  SE
+             |
+             |
 
 */
+
 Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Orient)
 {
 	if (StanceID>=MAX_ANIMS) {
@@ -362,10 +367,6 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 
 	//TODO: Implement Auto Resource Loading
 	if (Anims[StanceID][Orient]) {
-		if (Anims[StanceID][Orient]->ChangePalette) {
-			Anims[StanceID][Orient]->SetPalette( Palette );
-			Anims[StanceID][Orient]->ChangePalette = false;
-		}
 		return Anims[StanceID][Orient];
 	}
 	//newresref is based on the prefix (ResRef) and various other things
@@ -376,29 +377,27 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 	NewResRef[8]=0; //cutting right to size
 
  	AnimationFactory* af = ( AnimationFactory* )
-	core->GetResourceMgr()->GetFactoryResource( NewResRef, IE_BAM_CLASS_ID, IE_NORMAL );
+		core->GetResourceMgr()->GetFactoryResource( NewResRef, IE_BAM_CLASS_ID, IE_NORMAL );
 
 	Animation* a = af->GetCycle( Cycle );
 
 	if (!a) {
 		return NULL;
 	}
-	if (Palette) {
-		core->GetVideoDriver()->FreePalette(Palette);
-	}
-	Palette = core->GetVideoDriver()->GetPalette( a->GetFrame( 0 ) );
+	
 	a->pos = 0;
 	a->endReached = false;
+	SetupColors( a );
 
 	//setting up the sequencing of animation cycles
 	switch (StanceID) {
 		case IE_ANI_SLEEP:
 		case IE_ANI_TWITCH:
-			a->playOnce = true;
+			a->Flags |= A_ANI_PLAYONCE;
 			break;
 		case IE_ANI_DIE:
 printf("Die switch to twitch\n");
-			a->nextStanceID = IE_ANI_TWITCH;
+			nextStanceID = IE_ANI_TWITCH;
 			a->autoSwitchOnEnd = true;
 			break;
 		case IE_ANI_WALK:
@@ -409,7 +408,7 @@ printf("Die switch to twitch\n");
 		case IE_ANI_AWAKE:
 			break;
 		default:
-			a->nextStanceID = IE_ANI_AWAKE;
+			nextStanceID = IE_ANI_AWAKE;
 			a->autoSwitchOnEnd = true;
 			break;
 	}
@@ -481,14 +480,6 @@ printf("Die switch to twitch\n");
 		default:
 			printMessage("CharAnimations","Unknown animation type\n",LIGHT_RED);
 			abort();
-	}
-
-	if (Anims[StanceID][Orient]) {
-		if (Anims[StanceID][Orient]->ChangePalette) {
-			SetupColors(NULL); //we should have got the colors already
-			Anims[StanceID][Orient]->SetPalette( Palette );
-			Anims[StanceID][Orient]->ChangePalette = false;
-		}
 	}
 	return Anims[StanceID][Orient];
 }
@@ -564,34 +555,38 @@ void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 {
 	char *Prefix;
 
-	if ((StanceID==IE_ANI_WALK) || (StanceID==IE_ANI_RUN)) {
-		Cycle=SixteenToNine[Orient];
-	} else if (StanceID==IE_ANI_PST_START) Cycle=0;
-	else {
-		Cycle=SixteenToFive[Orient];
-	}
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
+			Cycle=SixteenToFive[Orient];
 			Prefix="AT1"; break;
 		case IE_ANI_DAMAGE:
+			Cycle=SixteenToFive[Orient];
 			Prefix="HIT"; break;
 		case IE_ANI_GET_UP:
+			Cycle=SixteenToFive[Orient];
 			Prefix="GUP"; break;
 		case IE_ANI_AWAKE:
+			Cycle=SixteenToFive[Orient];
 			Prefix="STD"; break;
 		case IE_ANI_READY:
+			Cycle=SixteenToFive[Orient];
 			Prefix="STC"; break;
 		case IE_ANI_DIE:
 		case IE_ANI_SLEEP:
 		case IE_ANI_TWITCH:
+			Cycle=SixteenToFive[Orient];
 			Prefix="DFB"; break;
 		case IE_ANI_RUN:
+			Cycle=SixteenToNine[Orient];
 			Prefix="RUN"; break;
 		case IE_ANI_WALK:
+			Cycle=SixteenToNine[Orient];
 			Prefix="WLK"; break;
 		case IE_ANI_PST_START:
+			Cycle=0;
 			Prefix="MS1"; break;
 		default: //just in case
+			Cycle=SixteenToFive[Orient];
 			Prefix="STC"; break;
 	}
 	sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);

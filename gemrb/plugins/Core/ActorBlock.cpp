@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.79 2005/03/19 16:15:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.80 2005/04/01 18:48:08 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -42,7 +42,7 @@ Scriptable::Scriptable(ScriptableType type)
 	scriptName[0] = 0;
 	LastTrigger = NULL;
 	LastEntered = NULL;
-	Active = true;
+	Active = SCR_ACTIVE;
 	CurrentAction = NULL;
 	startTime = 0;
 	interval = ( 1000 / AI_UPDATE_TIME );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.166 2005/03/31 13:54:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.167 2005/04/01 18:48:09 avenger_teambg Exp $
  *
  */
 
@@ -642,7 +642,7 @@ private: //Internal Functions
 	Trigger* ReadTrigger(DataStream* stream);
 	Object* DecodeObject(const char* line);
 	bool EvaluateCondition(Scriptable* Sender, Condition* condition);
-	static bool EvaluateTrigger(Scriptable* Sender, Trigger* trigger);
+	static int EvaluateTrigger(Scriptable* Sender, Trigger* trigger);
 	int ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS);
 	int ExecuteResponse(Scriptable* Sender, Response* rE);
 	static Targets* EvaluateObject(Object* oC);
@@ -1086,6 +1086,7 @@ public:
 	static void NIDSpecial1(Scriptable* Sender, Action* parameters);
 	static void NIDSpecial2(Scriptable* Sender, Action* parameters);
 	static void NoAction(Scriptable* Sender, Action* parameters);
+	static void NoActionAtAll(Scriptable* Sender, Action* parameters);
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
 	static void Panic(Scriptable* Sender, Action* parameters);
 	static void PickPockets(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.67 2005/03/31 13:54:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.68 2005/04/01 18:48:09 avenger_teambg Exp $
  *
  */
 
@@ -49,6 +49,25 @@ class Ambient;
 //area types
 #define AT_EXTENDED_NIGHT  0x40
 #define AT_CAN_REST        0x80
+
+//area animation flags
+#define A_ANI_ACTIVE          1        //if not set, animation is invisible
+#define A_ANI_NO_SHADOW       2        //lightmap doesn't affect it
+#define A_ANI_BLEND           4        //blend
+#define A_ANI_PLAYONCE        8        //stop after endframe
+#define A_ANI_SYNC            16       //synchronised draw (skip frames if needed)
+#define A_ANI_32              32
+#define A_ANI_NO_WALL         64       //draw after walls (walls don't cover it)
+#define A_ANI_NOT_IN_FOG      0x80     //not visible in fog of war
+#define A_ANI_BACKGROUND      0x100    //draw before actors (actors cover it)
+#define A_ANI_ALLCYCLES       0x200    //draw all cycles, not just the cycle specified
+#define A_ANI_PALETTE         0x400    //has own palette set
+#define A_ANI_MIRROR          0x800    //mirrored
+#define A_ANI_COMBAT          0x1000   //draw in combat too
+
+//creature area flags
+#define AF_CRE_NOT_LOADED 1
+#define AF_NAME_OVERRIDE  8
 
 typedef struct SongHeaderType {
 	ieDword SongList[5];
@@ -165,6 +184,9 @@ public:
 	bool TargetUnreachable(Point &s, Point &d);
 	/* Finds the path which leads to d */
 	PathNode* FindPath(Point &s, Point &d);
+	/* returns false if point isn't visible on visibility/explored map */
+	bool IsVisible(Point &s, int explored);
+	/* returns false if point d cannot be seen from point d due to searchmap */
 	bool IsVisible(Point &s, Point &d);
 	/* returns edge direction of map boundary, only worldmap regions */
 	int WhichEdge(Point &s);
