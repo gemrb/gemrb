@@ -2,6 +2,7 @@
 #ifdef WIN32
 #include <io.h>
 #include <windows.h>
+#include <direct.h>
 #else
 #include <unistd.h>
 #include <sys/types.h>
@@ -42,7 +43,7 @@ static void DelTree(char *Path)
 	do {
 		char dtmp[_MAX_PATH];
 #ifdef WIN32
-		if(c_file.attrib & _A_SUBDIR) {
+		if(c_file.attrib & _A_SUBDIR)
 			if(c_file.name[0] == '.')
 				continue;
 		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, c_file.name);
