@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.26 2003/12/03 18:27:06 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.27 2003/12/15 09:13:07 balrog994 Exp $
  *
  */
 
@@ -69,7 +69,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
   	Buffer[0] = 0;
   	int len = 0;
   	for(size_t i = 0; i < lines.size(); i++) {
-  		len += strlen(lines[i])+1;
+  		len += (int)strlen(lines[i])+1;
   		Buffer = (char*)realloc(Buffer, len+1);
   		strcat(Buffer, lines[i]);
   		if(i != lines.size()-1)
@@ -129,7 +129,7 @@ int TextArea::SetText(const char * text, int pos)
 		pos = -1;
 	if(pos >= (int)lines.size())
 		return -1;
-	int newlen = strlen(text);
+	int newlen = (int)strlen(text);
 
 	if(pos == -1) {
 		char * str = (char*)malloc(newlen+1);
@@ -150,7 +150,7 @@ int TextArea::AppendText(const char * text, int pos)
 {
 	if(pos >= (int)lines.size())
 		return -1;
-	int newlen = strlen(text);
+	int newlen = (int)strlen(text);
 
 	if(pos == -1) {
 		char * str = (char*)malloc(newlen+1);
@@ -160,7 +160,7 @@ int TextArea::AppendText(const char * text, int pos)
 	}
 	else
 	{
-		int mylen = strlen(lines[pos]);
+		int mylen = (int)strlen(lines[pos]);
 	
 		lines[pos] = (char*)realloc(lines[pos], mylen+newlen+1);
 		strcat(lines[pos], text);
@@ -191,7 +191,7 @@ void TextArea::OnSpecialKeyPress(unsigned char Key)
 /** Returns Row count */
 int TextArea::GetRowCount()
 {
-	return lines.size();
+	return (int)lines.size();
 }
 
 /** Returns top index */
@@ -221,7 +221,7 @@ void TextArea::CalcRowCount()
 		for(size_t i = 0; i < lines.size(); i++) {
 			rows++;
 			int tr = 0;
-			int len = strlen(lines[i]);
+			int len = (int)strlen(lines[i]);
 			char * tmp = (char*)malloc(len+1);
 			memcpy(tmp, lines[i], len+1);
 			ftext->SetupString(tmp, Width);
@@ -252,7 +252,7 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 	for(size_t i = 0; i < lines.size(); i++) {
 		row+=lrows[i];
 		if(r < (row-startrow)) {
-			seltext = i;
+			seltext = (int)i;
 			printf("CtrlId = 0x%08lx, seltext = %d, rows = %d, row = %d, r = %d\n", ControlID, i, rows, row, r);
 			return;
 		}
