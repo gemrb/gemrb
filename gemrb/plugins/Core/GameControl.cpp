@@ -1306,8 +1306,11 @@ void GameControl::DialogChoose(unsigned int choose)
 				if (action) {
 						speaker->AddAction( action );
 				} else {
-					printf( "[GameScript]: can't compile action: %s\n",
+					char Tmp[256];
+					snprintf(Tmp, sizeof(Tmp),
+						"Can't compile action: %s\n",
 						tr->action->strings[i] );
+					printMessage( "Dialog", Tmp,YELLOW);
 				}
 			}
 		}
@@ -1321,6 +1324,13 @@ void GameControl::DialogChoose(unsigned int choose)
 		//follow external linkage, if required
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
 			//target should be recalculated!
+			speaker = core->GetGame()->GetCurrentMap()->GetActorByDialog(tr->Dialog);
+			if(!speaker) {
+				printMessage("Dialog","Can't redirect dialog",YELLOW);
+				ta->SetMinRow( false );
+				EndDialog();
+				return;
+			}
 			InitDialog( speaker, target, tr->Dialog );
 		}
 		ds = dlg->GetState( si );
