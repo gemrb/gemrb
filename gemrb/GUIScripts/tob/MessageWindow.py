@@ -101,6 +101,7 @@ def OnIncreaseSize():
 			GemRB.SetVar("MessageWindow", TMessageWindow)
 			GemRB.SetVar("MessageTextArea", TMessageTA)
 			GemRB.SetTAAutoScroll(TMessageWindow, TMessageTA, 1)
+
 	if Expand!=2:
 		GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
 		GemRB.UnloadWindow(MessageWindow)	
@@ -143,7 +144,6 @@ def OnDecreaseSize():
 		GemRB.UnloadWindow(MessageWindow)
 		Expand = Expand-1
 		MessageWindow = TMessageWindow
-	
 		GemRB.SetVar("MessageWindowSize", Expand)
 		UpdateResizeButtons()
 
