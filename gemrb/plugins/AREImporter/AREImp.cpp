@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.13 2003/11/29 07:49:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.14 2003/11/29 20:33:24 balrog994 Exp $
  *
  */
 
@@ -64,13 +64,16 @@ bool AREImp::Open(DataStream * stream, bool autoFree)
 	str->Seek(0x54+bigheader, GEM_STREAM_START);
 	str->Read(&ActorOffset, 4);
 	str->Read(&ActorCount, 2);
+	str->Seek(0x5A+bigheader, GEM_STREAM_START);
+	str->Read(&InfoPointsCount, 2);
+	str->Read(&InfoPointsOffset, 4);
 	str->Seek(0x70+bigheader, GEM_STREAM_START);
 	str->Read(&ContainersOffset, 4);
 	str->Read(&ContainersCount, 2);
-	str->Seek(0x7c+bigheader, GEM_STREAM_START);
+	str->Seek(0x7C+bigheader, GEM_STREAM_START);
 	str->Read(&VerticesOffset, 4);
 	str->Read(&VerticesCount, 2);
-	str->Seek(0xa4+bigheader, GEM_STREAM_START);
+	str->Seek(0xA4+bigheader, GEM_STREAM_START);
 	str->Read(&DoorsCount, 4);
 	str->Read(&DoorsOffset, 4);
 	//str->Seek(0xac, GEM_STREAM_START);
@@ -224,6 +227,38 @@ Map * AREImp::GetMap()
 		c->TrapRemovalDiff = TrapRemDiff;
 		c->Trapped = Trapped;
 		c->TrapDetected = TrapDetected;
+	}
+	//Loading InfoPoints
+	for(int i = 0; i < InfoPointsCount; i++) {
+		str->Seek(InfoPointsOffset + (i*0xC4), GEM_STREAM_START);
+		unsigned short Type, VertexCount;
+		unsigned long FirstVertex, Cursor;
+		char Name[33];
+		str->Read(Name, 32);
+		Name[32] = 0;
+		str->Read(&Type, 2);
+		Region bbox;
+		str->Read(&bbox.x, 2);
+		str->Read(&bbox.y, 2);
+		str->Read(&bbox.w, 2);
+		str->Read(&bbox.h, 2);
+		bbox.w -= bbox.x;
+		bbox.h -= bbox.y;
+		str->Read(&VertexCount, 2);
+		str->Read(&FirstVertex, 4);
+		str->Seek(4, GEM_CURRENT_POS);
+		str->Read(&Cursor, 4);
+		str->Seek(VerticesOffset + (FirstVertex*4), GEM_STREAM_START);
+		Point * points = (Point*)malloc(VertexCount*sizeof(Point));
+		for(int x = 0; x < VertexCount; x++) {
+			str->Read(&points[x].x, 2);
+			str->Read(&points[x].y, 2);
+		}
+		Gem_Polygon * poly = new Gem_Polygon(points, VertexCount);
+		free(points);
+		poly->BBox = bbox;
+		InfoPoint * ip = tm->AddInfoPoint(Name, Type, poly);
+		ip->Cursor = Cursor;
 	}
 	//Loading Actors
 	str->Seek(ActorOffset, GEM_STREAM_START);
