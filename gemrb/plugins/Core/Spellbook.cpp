@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.14 2004/08/30 21:35:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.15 2004/09/02 09:02:57 edheldil Exp $
  *
  */
 
@@ -153,9 +153,24 @@ bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
 	return true;
 }
 
-bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* /*spell*/)
+bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 {
-	// FIXME: not yet implemented
+	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
+		std::vector< CRESpellMemorization* >::iterator sm;
+		for (sm = spells[i].begin(); sm != spells[i].end(); sm++) {
+			std::vector< CREMemorizedSpell* >::iterator s;
+			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); s++) {
+				if (*s == spell) {
+
+					delete *s;
+					(*sm)->memorized_spells.erase( s );
+					(*sm)->MemorizedCount--;
+					return true;
+				}
+			}
+		}
+	}
+
 	return false;
 }
 
