@@ -42,6 +42,7 @@ def OnLoad():
 	GemRB.SetText(StartWindow, QuitGameButton, 13731)
 	GemRB.SetEvent(StartWindow, QuitGameButton, IE_GUI_BUTTON_ON_PRESS, "QuitPress")
 	GemRB.SetEvent(StartWindow, ProtocolButton, IE_GUI_BUTTON_ON_PRESS, "ProtocolPress")
+	GemRB.SetEvent(StartWindow, OptionsButton, IE_GUI_BUTTON_ON_PRESS, "OptionsPress")
 	GemRB.SetVisible(StartWindow, 1)
 	GemRB.LoadMusicPL("Theme")
 	GemRB.StartPL()
