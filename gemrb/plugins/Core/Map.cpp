@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.77 2004/03/13 15:18:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.78 2004/03/17 20:51:06 avenger_teambg Exp $
  *
  */
 
@@ -859,6 +859,7 @@ PathNode* PathFinder::RunAway(short sX, short sY, short dX, short dY, int PathLe
 		px = nx;
 		py = ny;
 	}
+	return Return;
 }
 
 PathNode* PathFinder::FindPath(short sX, short sY, short dX, short dY)

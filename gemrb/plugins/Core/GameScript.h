@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.70 2004/03/15 15:25:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.71 2004/03/17 20:51:06 avenger_teambg Exp $
  *
  */
 
@@ -116,7 +116,7 @@ public:
 		objectName[0] = 0;
 
 		memset( objectFields, 0, MAX_OBJECT_FIELDS * sizeof( int ) );
-		memset( objectIdentifiers, 0, MAX_NESTING * sizeof( int ) );
+		memset( objectFilters, 0, MAX_NESTING * sizeof( int ) );
 		memset( objectRect, 0, 4 * sizeof( int ) );
 
 		canary = 0xdeadbeef;
@@ -126,7 +126,7 @@ public:
 	}
 public:
 	int objectFields[MAX_OBJECT_FIELDS];
-	int objectIdentifiers[MAX_NESTING];
+	int objectFilters[MAX_NESTING];
 	int objectRect[4];
 	char objectName[65];
 private:

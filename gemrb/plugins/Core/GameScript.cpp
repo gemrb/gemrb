@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.99 2004/03/17 01:07:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.100 2004/03/17 20:51:05 avenger_teambg Exp $
  *
  */
 
@@ -826,7 +826,6 @@ void GameScript::ParseString(const char*& src, char* tmp)
 	}
 	*tmp = 0;
 	src++;
-	return;
 }
 
 Object* GameScript::DecodeObject(const char* line)
@@ -836,7 +835,7 @@ Object* GameScript::DecodeObject(const char* line)
 		oB->objectFields[i] = ParseInt( line );
 	}
 	for (int i = 0; i < MaxObjectNesting; i++) {
-		oB->objectIdentifiers[i] = ParseInt( line );
+		oB->objectFilters[i] = ParseInt( line );
 	}
 	if (HasAdditionalRect) {
 		line++; //Skip [
@@ -1115,7 +1114,7 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 		tgts = new Targets();
 	}
 	for (int i = 0; i < MaxObjectNesting; i++) {
-		int filterid = oC->objectIdentifiers[i];
+		int filterid = oC->objectFilters[i];
 		if(!filterid) {
 			break;
 		}
@@ -1200,6 +1199,82 @@ bool GameScript::EvaluateString(Scriptable* Sender, char* String)
 	bool ret = EvaluateTrigger( Sender, tri );
 	tri->Release();
 	return ret;
+}
+
+static int GetIdsValue(const char *symbol, const char *idsname)
+{
+	int idsfile=core->LoadSymbol(idsname);
+	SymbolMgr *valHook = core->GetSymbol(idsfile);
+	if(!valHook) {
+		//FIXME:missing ids file!!!
+		return -1;
+	}
+	return valHook->GetValue(symbol);
+}
+
+static void ParseIdsTarget(char *&src, Object *&object)
+{
+	for(int i=0;i<ObjectFieldsCount;i++) {
+		int x;
+		
+		if(isdigit(*src) || *src=='-') {
+			object->objectFields[i]=strtol(src,&src,0);
+		}
+		else {
+			object->objectFields[i]=GetIdsValue(src, ObjectIDSTableNames[i]);
+		}
+		if(*src!='.') {
+			break;
+		}
+	}
+	src++; //skipping ]
+}
+
+static void ParseObject(char *&str, char *&src, Object *&object)
+{
+	while (( *str != ',' ) && ( *str != ')' )) {
+		str++;
+	}
+	object = new Object();
+	switch (*src) {
+	case '"':
+		//Object Name
+		src++;
+		int i;
+		for(i=0;i<sizeof(object->objectName)-1 && *src!='"';i++)
+		{
+			object->objectName[i] = *src;
+			src++;
+		}
+		object->objectName[i] = 0;
+		src++;
+		break;
+	case '[':
+		src++; //skipping [
+		ParseIdsTarget(src, object);
+		break;
+	default: //nested object filters
+		int Nesting=0;
+		
+		while(Nesting++<MaxObjectNesting) {
+			char filtername[64];
+			int x;
+			for(x=0;isalnum(*src) && x<sizeof(filtername)-1;x++) {
+				filtername[x]=*src;
+				src++;
+			}
+			filtername[x]=0;
+			memmove(object->objectFilters+1, object->objectFilters, sizeof(int) *(MaxObjectNesting-1) );
+			object->objectFilters[0]=GetIdsValue(filtername,"object");
+			if(*src!='(') {
+				break;
+			}
+		}
+		if(*src=='[') {
+			ParseIdsTarget(src, object);
+		}
+		src+=Nesting; //skipping )
+	}
 }
 
 Action* GameScript::GenerateAction(char* String)
@@ -1337,30 +1412,7 @@ Action* GameScript::GenerateAction(char* String)
 							break;
 
 						case 'o':
-							//Object
-							 {
-								while (( *str != ',' ) && ( *str != ')' ))
-									str++;
-								if (*src == '"') {
-									//Object Name
-									src++;
-									newAction->objects[objectCount] = new Object();
-									char* dst = newAction->objects[objectCount]->objectName;
-									while (*src != '"') {
-										*dst = *src;
-										dst++;
-										src++;
-									}
-									*dst = 0;
-									src++;
-								} else {
-									
-									textcolor( LIGHT_RED );
-									printf( "[GenerateAction]: OBJECT TYPE NOT SUPPORTED\n" );
-									textcolor( WHITE );
-								}
-								objectCount++;
-							}
+							ParseObject(str, src, newAction->objects[objectCount++]);
 							break;
 
 						case 's':
@@ -1520,28 +1572,7 @@ Trigger* GameScript::GenerateTrigger(char* String)
 							break;
 
 						case 'o':
-							//Object
-							 {
-								while (( *str != ',' ) && ( *str != ')' ))
-									str++;
-								if (*src == '"') {
-									//Object Name
-									src++;
-									newTrigger->objectParameter = new Object();
-									char* dst = newTrigger->objectParameter->objectName;
-									while (*src != '"') {
-										*dst = *src;
-										dst++;
-										src++;
-									}
-									*dst = 0;
-									src++;
-								} else {
-									textcolor( LIGHT_RED );
-									printf( "[GenerateTrigger]: OBJECT TYPE NOT SUPPORTED\n" );
-									textcolor( WHITE );
-								}
-							}
+							ParseObject(str, src, newTrigger->objectParameter);
 							break;
 
 						case 's':
