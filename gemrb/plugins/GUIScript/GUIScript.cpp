@@ -966,14 +966,12 @@ static PyObject * GemRB_SetButtonPicture(PyObject */*self*/, PyObject *args)
 	}
 
 	if(!im->Open(str, true)) {
-		delete(str);
 		core->FreeInterface(im);
 		return NULL;
 	}
 
 	Sprite2D * Picture = im->GetImage();
 	if(Picture == NULL) {
-		delete(str);
 		core->FreeInterface(im);
 		return NULL;
 	}
@@ -982,8 +980,6 @@ static PyObject * GemRB_SetButtonPicture(PyObject */*self*/, PyObject *args)
 	btn->SetPicture(Picture);
 
 	core->FreeInterface(im);
-
-	delete(str);
 
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -1027,7 +1023,6 @@ static PyObject * GemRB_SetButtonPLT(PyObject */*self*/, PyObject *args)
 	}
 
 	if(!im->Open(str, true)) {
-		delete(str);
 		core->FreeInterface(im);
 		return NULL;
 	}
@@ -1042,7 +1037,6 @@ static PyObject * GemRB_SetButtonPLT(PyObject */*self*/, PyObject *args)
 	im->GetPalette(7, col8, NULL);
 	Sprite2D * Picture = im->GetImage();
 	if(Picture == NULL) {
-		delete(str);
 		core->FreeInterface(im);
 		return NULL;
 	}
@@ -1051,8 +1045,6 @@ static PyObject * GemRB_SetButtonPLT(PyObject */*self*/, PyObject *args)
 	btn->SetPicture(Picture);
 
 	core->FreeInterface(im);
-
-	delete(str);
 
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -1096,7 +1088,6 @@ static PyObject * GemRB_SetButtonBAM(PyObject */*self*/, PyObject *args)
 	}
 
 	if(!am->Open(str, true)) {
-		delete(str);
 		core->FreeInterface(am);
 		return NULL;
 	}
@@ -1366,14 +1357,12 @@ static PyObject *GemRB_SetSaveGamePortrait( PyObject */*self*/, PyObject *args)
 		return NULL;
 	}
 	if(!im->Open(str, true)) {
-		delete(str);
 		core->FreeInterface(im);
 		return NULL;
 	}
 
 	Sprite2D * Picture = im->GetImage();
 	if(Picture == NULL) {
-		delete(str);
 		core->FreeInterface(im);
 		return NULL;
 	}
@@ -1382,8 +1371,6 @@ static PyObject *GemRB_SetSaveGamePortrait( PyObject */*self*/, PyObject *args)
 	btn->SetPicture(Picture);
 
 	core->FreeInterface(im);
-
-	delete(str);
 
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -1420,14 +1407,12 @@ static PyObject *GemRB_SetSaveGamePreview( PyObject */*self*/, PyObject *args)
 		return NULL;
 	}
 	if(!im->Open(str, true)) {
-		delete(str);
 		core->FreeInterface(im);
 		return NULL;
 	}
 
 	Sprite2D * Picture = im->GetImage();
 	if(Picture == NULL) {
-		delete(str);
 		core->FreeInterface(im);
 		return NULL;
 	}
@@ -1436,8 +1421,6 @@ static PyObject *GemRB_SetSaveGamePreview( PyObject */*self*/, PyObject *args)
 	btn->SetPicture(Picture);
 
 	core->FreeInterface(im);
-
-	delete(str);
 
 	Py_INCREF(Py_None);
 	return Py_None;
