@@ -175,8 +175,12 @@ int main(int argc, char *argv[])
   AC_SUBST(SDL_LIBS)
   rm -f conf.sdltest
 ])
-#Shameless ripped from dia 0.92 - I accidentally deleted the original 
-#author's name and am too lazy to find it. I apologize!
+
+
+# Shamelessly ripped from dia 0.92
+# From Andrew Dalke
+# Updated by James Henstridge
+ 
 
 AC_DEFUN([AM_PATH_PYTHON],
  [
