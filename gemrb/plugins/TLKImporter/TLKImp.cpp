@@ -191,6 +191,7 @@ char * TLKImp::GetString(unsigned long strref, int flags)
 						i++;
 						char * s = (char*)malloc(Length-i+1);
 						strcpy(s, &string[i]);
+            s[Length-i] = 0;
 						free(string);
 						string = s;
 						Length = strlen(string);
