@@ -67,7 +67,8 @@ int TextArea::SetText(const char * text)
 /** Appends a String to the current Text */
 int TextArea::AppendText(const char * text)
 {
-	strncat((char*)Buffer, text, BufferLength);
+	int len = strlen((char*)Buffer);
+	strncat((char*)Buffer, text, BufferLength-len);
 	CalcRowCount();
 	((Window*)Owner)->Invalidate();
 	return 0;
