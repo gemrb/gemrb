@@ -1,12 +1,16 @@
 import GemRB
 
 MessageWindow = 0
+PortraitWindow = 0
+OptionsWindow = 0
 ExpandButton = 0
 ContractButton = 0
 MaxExpand = 2
 
 def OnLoad():
 	global MessageWindow, ExpandButton, Expand
+	global PortraitWindow, OptionsWindow
+
 	GemRB.LoadWindowPack("GUIW")
 	ActionsWindow = GemRB.LoadWindow(3)
 	PortraitWindow = GemRB.LoadWindow(1)
@@ -14,6 +18,15 @@ def OnLoad():
 	MessageWindow = GemRB.LoadWindow(4)
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
 	GemRB.SetTAAutoScroll(MessageWindow, MessageTA, 1)
+	Button=GemRB.GetControl(OptionsWindow, 10)
+	GemRB.SetEvent(OptionsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizeOptions")
+	Button=GemRB.GetControl(PortraitWindow, 8)
+	GemRB.SetEvent(PortraitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
+	Button=GemRB.GetControl(ActionsWindow, 60)
+	GemRB.SetEvent(ActionsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MaximizeOptions")
+	Button=GemRB.GetControl(ActionsWindow, 61)
+	GemRB.SetEvent(ActionsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MaximizePortraits")
+
 	GemRB.SetVar("PortraitWindow", PortraitWindow)
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
 	GemRB.SetVar("OptionsWindow", OptionsWindow)
@@ -30,10 +43,36 @@ def OnLoad():
 	
 	GemRB.SetVisible(ActionsWindow, 1)
 	GemRB.SetVisible(PortraitWindow, 1)
-	GemRB.SetVisible(OptionsWindow, 1)
+	GemRB.SetVisible(OptionsWindow, 0)
 	GemRB.SetVisible(MessageWindow, 1)
 	return
-	
+
+def MinimizeOptions():
+	GemRB.HideGUI()
+	GemRB.SetVisible(OptionsWindow, 0)
+	GemRB.SetVar("OptionsWindow", -1)
+	GemRB.UnhideGUI()
+	return
+
+def MaximizeOptions():
+	GemRB.HideGUI()
+	GemRB.SetVar("OptionsWindow", OptionsWindow)
+	GemRB.UnhideGUI()
+	return
+
+def MinimizePortraits():
+	GemRB.HideGUI()
+	GemRB.SetVisible(PortraitWindow, 0)
+	GemRB.SetVar("PortraitWindow", -1)
+	GemRB.UnhideGUI()
+	return
+
+def MaximizePortraits():
+	GemRB.HideGUI()
+	GemRB.SetVar("PortraitWindow", PortraitWindow)
+	GemRB.UnhideGUI()
+	return
+
 def OnIncreaseSize():
 	global MessageWindow, ExpandButton
 	
