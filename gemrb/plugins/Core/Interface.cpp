@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.113 2004/01/11 16:58:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.114 2004/01/16 20:27:20 balrog994 Exp $
  *
  */
 
@@ -65,6 +65,7 @@ Interface::Interface(void)
 	GUIScriptsPath[0]=0;
 	GamePath[0]=0;
 	GemRBPath[0]=0;
+	GameName[0]=0;
 	memcpy(GameOverride,"override",9);
 	memcpy(GameData,"data\0\0\0\0",9);
 	memcpy(ButtonFont,"STONESML",9);
@@ -711,6 +712,8 @@ bool Interface::LoadConfig(void)
 	fclose(config);
 	if(!GUIScriptsPath[0])
 		memcpy(GUIScriptsPath,GemRBPath,sizeof(GUIScriptsPath));
+	if(!GameName[0])
+		sprintf(GameName, "GemRB v%.1f.%d.%d", GEMRB_RELEASE/1000.0, GEMRB_API_NUM, GEMRB_SDK_REV);
 	return true;
 }
 /** No descriptions */
