@@ -43,6 +43,7 @@ Button::Button(bool Clear){
 	Text = (char*)malloc(64);
 	hasText = false;
 	font = core->GetFont("STONEBIG");
+	Flags = 0;
 }
 Button::~Button(){
 	Video * video = core->GetVideoDriver();
@@ -104,6 +105,8 @@ void Button::SetImage(unsigned char type, Sprite2D * img)
 void Button::Draw(unsigned short x, unsigned short y)
 {
 	if(!Changed)
+		return;
+	if(Flags & 0x1)
 		return;
 	Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 	switch(State) {
@@ -200,4 +203,16 @@ void Button::SetEvent(char * funcName)
 {
 	strcpy(ButtonOnPress, funcName);
 	Changed = true;
+}
+
+/** Sets the Display Flags */
+int Button::SetFlags(bool hideImg, bool hasPicture)
+{
+	Flags = 0;
+	if(hideImg)
+		Flags = 0x01;
+	if(hasPicture)
+		Flags += 0x02;
+	Changed = true;
+	((Window*)Owner)->Invalidate();
 }

@@ -243,6 +243,33 @@ static PyObject * GemRB_CreateLabel(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SetButtonFlags(PyObject *self, PyObject *args)
+{
+	int WindowIndex, ControlIndex, hideImg, hasPicture;
+
+	if(!PyArg_ParseTuple(args, "iiii", &WindowIndex, &ControlIndex, &hideImg, &hasPicture)) {
+		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return NULL;
+
+	if(ctrl->ControlType != 0)
+		return NULL;
+
+	Button * btn = (Button*)ctrl;
+	btn->SetFlags(hideImg, hasPicture);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
     {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
@@ -276,6 +303,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"CreateLabel", GemRB_CreateLabel, METH_VARARGS,
      "Creates and Add a new Label to a Window."},
+
+	{"SetButtonFlags", GemRB_SetButtonFlags, METH_VARARGS,
+     "Sets the Display Flags of a Button."},
 
     {NULL, NULL, 0, NULL}
 };

@@ -75,6 +75,8 @@ public: // Public Events
   void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);	
   /** Button Pressed Event Script Function Name */
   char ButtonOnPress[64];
+  /** Sets the Display Flags */
+  int SetFlags(bool hideImg, bool hasPicture);
 private: // Private attributes
 	/** Button Unpressed Image */
   Sprite2D * Unpressed;
@@ -86,6 +88,8 @@ private: // Private attributes
   Sprite2D * Disabled;
 	/** The current state of the Button */
   unsigned char State;
+  /** Display Flags */
+  unsigned char Flags;
 };
 
 #endif
