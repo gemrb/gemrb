@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.5 2003/11/25 16:46:31 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.6 2003/11/26 14:02:16 balrog994 Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #define MAP_H
 
 #include "TileMap.h"
+#include "ImageMgr.h"
 #include "Actor.h"
 
 #ifdef WIN32
@@ -51,12 +52,13 @@ class GEM_EXPORT Map
 {
 private:
 	TileMap * tm;
+	ImageMgr * LightMap;
 	std::vector<Animation*> animations;
 	std::vector<ActorBlock> actors;
 public:
 	Map(void);
 	~Map(void);
-	void AddTileMap(TileMap * tm);
+	void AddTileMap(TileMap * tm, ImageMgr * lm);
 	void DrawMap(Region viewport);
 	void AddAnimation(Animation * anim);
 	void AddActor(ActorBlock actor);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.12 2003/11/26 01:12:43 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.13 2003/11/26 14:02:16 balrog994 Exp $
  *
  */
 
@@ -62,9 +62,10 @@ Map::~Map(void)
 	}
 }
 
-void Map::AddTileMap(TileMap *tm)
+void Map::AddTileMap(TileMap * tm, ImageMgr * lm)
 {
 	this->tm = tm;
+	LightMap = lm;
 }
 Color green = {0x00, 0xff, 0x00, 0xff};
 Color red   = {0xff, 0x00, 0x00, 0xff};
@@ -134,7 +135,13 @@ void Map::DrawMap(Region viewport)
 				actors[i].MaxY = actors[i].MinY+nextFrame->Height;
 				actors[i].lastFrame = nextFrame;
 			}
-			video->BlitSprite(nextFrame, actors[i].XPos, actors[i].YPos);
+			int ax = actors[i].XPos, ay = actors[i].YPos;
+			int cx = ax/16;
+			int cy = ay/16;
+			Color tint = LightMap->GetPixel(cx, cy);
+			tint.a = 0xA0;
+			//video->BlitSprite(nextFrame, actors[i].XPos, actors[i].YPos);
+			video->BlitSpriteTinted(nextFrame, ax, ay, tint);
 		}
 	}
 }
