@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.7 2004/10/09 20:00:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.8 2004/10/11 18:08:59 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -52,6 +52,9 @@ void WorldMapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 	if (!Width || !Height) {
 		return;
 	}
+	if(!Changed)
+		return;
+	Changed = false;
 	Video* video = core->GetVideoDriver();
 	Region r( XPos, YPos, Width, Height );
 	video->BlitSprite( worldmap->MapMOS, XPos - ScrollX, YPos - ScrollY, true, &r );
@@ -128,6 +131,22 @@ void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	{
 	}
 }
+void WorldMapControl::AdjustScrolling(unsigned short x, unsigned short y)
+{
+	WorldMap* worldmap = core->GetWorldMap();
+	ScrollX += x;
+	ScrollY += y;
+	if (ScrollX > worldmap->MapMOS->Width - Width)
+		ScrollX = worldmap->MapMOS->Width - Width;
+	if (ScrollY > worldmap->MapMOS->Height - Height)
+		ScrollY = worldmap->MapMOS->Height - Height;
+	if (ScrollX < 0)
+		ScrollX = 0;
+	if (ScrollY < 0)
+		ScrollY = 0;
+	Changed = true;
+}
+
 /** Mouse Over Event */
 void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 {
@@ -135,17 +154,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 	int nextCursor = 44; //this is the grabbing hand
 
 	if (MouseIsDown) {
-		ScrollX -= x - lastMouseX;
-		ScrollY -= y - lastMouseY;
-
-		if (ScrollX > worldmap->MapMOS->Width - Width)
-			ScrollX = worldmap->MapMOS->Width - Width;
-		if (ScrollY > worldmap->MapMOS->Height - Height)
-			ScrollY = worldmap->MapMOS->Height - Height;
-		if (ScrollX < 0)
-			ScrollX = 0;
-		if (ScrollY < 0)
-			ScrollY = 0;
+		AdjustScrolling(lastMouseX-x, lastMouseY-y);
 	}
 
 	lastMouseX = x;
