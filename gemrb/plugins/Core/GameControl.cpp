@@ -68,11 +68,7 @@ GameControl::GameControl(void)
 	drawPath = NULL;
 	pfsX = 0;
 	pfsY = 0;
-	if (strcmp( core->GameType, "pst" ) == 0) {
-		InfoTextPalette = core->GetVideoDriver()->CreatePalette( green, black );
-	} else {
-		InfoTextPalette = core->GetVideoDriver()->CreatePalette( white, black );
-	}
+	SetInfoTextColor(white);
 	lastCursor = 0;
 	moveX = moveY = 0;
 	DebugFlags = 0;
@@ -95,6 +91,12 @@ GameControl::~GameControl(void)
 	for (int i = 0; i < infoTexts.size(); i++) {
 		delete( infoTexts[i] );
 	}
+}
+
+/* changes the textcolor */
+void GameControl::SetInfoTextColor(Color color)
+{
+	InfoTextPalette = core->GetVideoDriver()->CreatePalette( color, black );
 }
 
 /** Draws the Control on the Output Display */

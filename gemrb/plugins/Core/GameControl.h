@@ -35,6 +35,9 @@ public:
 	int SetText(const char* string, int pos = 0);
 	/** Sets the current area to Display */
 	void SetCurrentArea(int Index);
+	/** Sets the InfoTextColor, used in PST
+	*/
+	void SetInfoTextColor(Color color);
 private:
 	int MapIndex;
 	Actor* lastActor;
