@@ -36,6 +36,9 @@ public:
 	void SetMap(ImageMgr* sMap, unsigned int Width, unsigned int Height);
 	/* Finds the nearest passable point */
 	void AdjustPosition(unsigned int& goalX, unsigned int& goalY);
+	/* Finds the path which leads the farthest from d */
+	PathNode* RunAway(short sX, short sY, short dX, short dY, int PathLen, bool Backing);
+	/* Finds the path which leads to d */
 	PathNode* FindPath(short sX, short sY, short dX, short dY);
 	bool IsVisible(short sX, short sY, short dX, short dY);
 private:

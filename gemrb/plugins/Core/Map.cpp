@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.75 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.76 2004/03/12 17:11:23 avenger_teambg Exp $
  *
  */
 
@@ -758,6 +758,105 @@ void PathFinder::AdjustPosition(unsigned int& goalX, unsigned int& goalY)
 	}
 }
 
+//run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
+PathNode* PathFinder::RunAway(short sX, short sY, short dX, short dY, int PathLen, bool Backing)
+{
+	unsigned int startX = sX / 16, startY = sY / 12;
+	unsigned int goalX = dX / 16, goalY = dY / 12;
+	unsigned int bestX, bestY, dist;
+
+	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
+	while (InternalStack.size())
+		InternalStack.pop();
+
+	if (!( Passable[sMap->GetPixelIndex( startX, startY )] & 3 )) {
+		AdjustPosition( startX, startY );
+	}
+	unsigned int pos = ( startX << 16 ) | startY;
+	InternalStack.push( pos );
+	MapSet[startY * Width + startX] = 1;
+	dist = 0;
+	bestX = startX;
+	bestY = startY;
+	while (InternalStack.size()) {
+		pos = InternalStack.front();
+		InternalStack.pop();
+		unsigned int x = pos >> 16;
+		unsigned int y = pos & 0xffff;
+		long tx = ( x - dX );
+		long ty = ( y - dY );
+		unsigned int distance = (unsigned int) sqrt( ( double ) ( tx* tx + ty* ty ) );
+		if(dist<distance) {
+			bestX=x;
+			bestY=y;
+			dist=distance;
+		}
+
+		unsigned int Cost = MapSet[y * Width + x] + 1;
+		if (Cost > PathLen) {
+			//printf("Path not found!\n");
+			break;
+		}
+		SetupNode( x - 1, y - 1, Cost );
+		SetupNode( x + 1, y - 1, Cost );
+		SetupNode( x + 1, y + 1, Cost );
+		SetupNode( x - 1, y + 1, Cost );
+
+		Cost ++;
+		SetupNode( x, y - 1, Cost );
+		SetupNode( x + 1, y, Cost );
+		SetupNode( x, y + 1, Cost );
+		SetupNode( x - 1, y, Cost );
+	}
+
+	//find path backwards from best to start
+	PathNode* StartNode = new PathNode;
+	PathNode* Return = StartNode;
+	StartNode->Next = NULL;
+	StartNode->Parent = NULL;
+	StartNode->x = bestX;
+	StartNode->y = bestY;
+	if(Backing) {
+		StartNode->orient = GetOrient( startX, startY, bestX, bestY );
+	}
+	else {
+		StartNode->orient = GetOrient( bestX, bestY, startX, startY );
+	}
+	unsigned int px = bestX;
+	unsigned int py = bestY;
+	unsigned int pos2 = startY * Width + startX;
+	while (( pos = py * Width + px ) != pos2) {
+		StartNode->Next = new PathNode;
+		StartNode->Next->Parent = StartNode;
+		StartNode = StartNode->Next;
+		StartNode->Next = NULL;
+		unsigned int level = MapSet[pos];
+		unsigned int diff = 0;
+		unsigned int nx, ny;
+		Leveldown( px, py + 1, level, nx, ny, diff );
+		Leveldown( px + 1, py, level, nx, ny, diff );
+		Leveldown( px - 1, py, level, nx, ny, diff );
+		Leveldown( px, py - 1, level, nx, ny, diff );
+		Leveldown( px - 1, py + 1, level, nx, ny, diff );
+		Leveldown( px + 1, py + 1, level, nx, ny, diff );
+		Leveldown( px + 1, py - 1, level, nx, ny, diff );
+		Leveldown( px - 1, py - 1, level, nx, ny, diff );
+		if (!diff)
+			return Return;
+		StartNode->x = nx;
+		StartNode->y = ny;
+
+		if(Backing) {
+			StartNode->orient = GetOrient( px, py, nx, ny );
+		}
+		else {
+			StartNode->orient = GetOrient( nx, ny, px, py );
+		}
+		px = nx;
+		py = ny;
+	}
+}
+
 PathNode* PathFinder::FindPath(short sX, short sY, short dX, short dY)
 {
 	unsigned int startX = sX / 16, startY = sY / 12, goalX = dX / 16,
@@ -801,6 +900,8 @@ PathNode* PathFinder::FindPath(short sX, short sY, short dX, short dY)
 		SetupNode( x, y + 1, Cost );
 		SetupNode( x - 1, y, Cost );
 	}
+
+	//find path from start to goal
 	PathNode* StartNode = new PathNode;
 	PathNode* Return = StartNode;
 	StartNode->Next = NULL;
