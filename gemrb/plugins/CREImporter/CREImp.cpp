@@ -50,7 +50,11 @@ bool CREImp::Open(DataStream * stream, bool autoFree)
 
 Actor * CREImp::GetActor()
 {
-	Actor * act = new Actor();
+	unsigned short AnimID;
+	str->Seek(32, GEM_CURRENT_POS);
+	str->Read(&AnimID, 2);
+	str->Seek(-34, GEM_CURRENT_POS);
+	Actor * act = new Actor(AnimID);
 	unsigned long strref;
 	str->Read(&strref, 4);
 	act->LongName = core->GetString(strref);
