@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.5 2003/11/28 09:26:31 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.6 2003/11/30 09:53:09 avenger_teambg Exp $
  *
  */
 
@@ -194,13 +194,21 @@ unsigned short * WEDImp::GetDoorIndices(char * ResRef, int *count)
 	unsigned short OpenPolyCount, ClosedPolyCount;
 	unsigned long OpenPolyOffset, ClosedPolyOffset;
 	char Name[9];
-	for(int i = 0; i < DoorsCount; i++) {
+	int i;
+	for(i = 0; i < DoorsCount; i++) {
 		str->Seek(DoorsOffset + (i*0x1A), GEM_STREAM_START);
 		str->Read(Name, 8);
 		Name[8] = 0;
 		if(strnicmp(Name, ResRef, 8)  == 0)
 			break;
 	}
+	//The door has no representation in the WED file
+	if(i==DoorsCount) {
+		*count=0;
+		printf("Found door without WED entry!\n");
+		return NULL;
+	}
+		
 	str->Read(&DoorClosed, 2);
 	str->Read(&DoorTileStart, 2);
 	str->Read(&DoorTileCount, 2);
