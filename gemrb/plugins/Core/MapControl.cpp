@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.7 2004/09/11 12:38:38 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.8 2004/09/11 14:28:47 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -78,8 +78,6 @@ void MapControl::Realize()
 
 	MapWidth = map->GetWidth();
 	MapHeight = map->GetHeight();
-printf("%d %d\n",MapWidth, MapHeight);
-printf("%d %d\n",MapMOS->Width, MapMOS->Height);
 
 	// FIXME: ugly hack! What is the actual viewport size?
 	Region vp = video->GetViewport();

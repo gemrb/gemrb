@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.214 2004/09/09 16:42:15 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.215 2004/09/11 14:28:47 avenger_teambg Exp $
  *
  */
 
@@ -245,12 +245,12 @@ bool Interface::ReadStrrefs()
 {
 	int i;
         TableMgr * tab;
-        int table=core->LoadTable("strings");
+        int table=LoadTable("strings");
         memset(strref_table,-1,sizeof(strref_table) );
         if(table<0) {
                 return false;
         }
-        tab = core->GetTable(table);
+        tab = GetTable(table);
         if(!tab) {
                 goto end;
         }
@@ -258,7 +258,7 @@ bool Interface::ReadStrrefs()
                 strref_table[i]=atoi(tab->QueryField(i,0));
         }
 end:
-        core->DelTable(table);
+        DelTable(table);
 	return true;
 }
 
@@ -463,7 +463,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 	strcpy( NextScript, "Start" );
 	AnimationFactory* af = ( AnimationFactory* )
-	GetResourceMgr()->GetFactoryResource( CursorBam, IE_BAM_CLASS_ID );
+	key->GetFactoryResource( CursorBam, IE_BAM_CLASS_ID );
 	printMessage( "Core", "Setting up the Console...", WHITE );
 	ChangeScript = true;
 	console = new Console();
@@ -577,7 +577,7 @@ int Interface::Init()
 		}
 	}
 	game = NULL;//new Game();
-	DataStream* str = GetResourceMgr()->GetResource( "CURSORS",
+	DataStream* str = key->GetResource( "CURSORS",
 											IE_BAM_CLASS_ID );
 	printMessage( "Core", "Loading Cursors...", WHITE );
 	anim = ( AnimationMgr * ) GetInterface( IE_BAM_CLASS_ID );
@@ -1034,12 +1034,12 @@ bool Interface::LoadGemRBINI()
 	printMessage( "Core", "Loading game type-specific GemRB setup...",
 		      WHITE );
 
-	DataStream* inifile = core->GetResourceMgr()->GetResource( "gemrb", IE_INI_CLASS_ID );
+	DataStream* inifile = key->GetResource( "gemrb", IE_INI_CLASS_ID );
 	if (! inifile) {
 		printStatus( "ERROR", LIGHT_RED );
 		return false;
 	}
-	if (!core->IsAvailable( IE_INI_CLASS_ID )) {
+	if (!IsAvailable( IE_INI_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "[Core]: No INI Importer Available.\n" );
 		return false;
@@ -1098,7 +1098,7 @@ bool Interface::LoadGemRBINI()
 	SetFeature( ini->GetKeyAsInt( "resources", "TeamMovement", 0 ), GF_TEAM_MOVEMENT );
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
-	core->FreeInterface( ini );
+	FreeInterface( ini );
 	return true;
 }
 
@@ -1164,7 +1164,7 @@ ScriptEngine* Interface::GetGUIScriptEngine()
 int Interface::LoadCreature(char* ResRef, int InParty)
 {
 	ActorMgr* actormgr = ( ActorMgr* ) GetInterface( IE_CRE_CLASS_ID );
-	DataStream* stream = GetResourceMgr()->GetResource( ResRef, IE_CRE_CLASS_ID );
+	DataStream* stream = key->GetResource( ResRef, IE_CRE_CLASS_ID );
 	if (!actormgr->Open( stream, true )) {
 		FreeInterface( actormgr );
 		return 0;
@@ -1233,7 +1233,7 @@ void Interface::RedrawAll()
 /** Loads a WindowPack (CHUI file) in the Window Manager */
 bool Interface::LoadWindowPack(const char* name)
 {
-	DataStream* stream = GetResourceMgr()->GetResource( name, IE_CHU_CLASS_ID );
+	DataStream* stream = key->GetResource( name, IE_CHU_CLASS_ID );
 	if (stream == NULL) {
 		printMessage( "Interface", "Error: Cannot find ", LIGHT_RED );
 		printf( "%s.chu\n", name );
@@ -1308,7 +1308,7 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
 	if (Background[0]) {
 		if (IsAvailable( IE_MOS_CLASS_ID )) {
-			DataStream* bkgr = GetResourceMgr()->GetResource( Background,
+			DataStream* bkgr = key->GetResource( Background,
 														IE_MOS_CLASS_ID );
 			if (bkgr != NULL) {
 				ImageMgr* mos = ( ImageMgr* )
@@ -1634,26 +1634,25 @@ void Interface::DrawTooltip ()
 
 	Font* fnt = GetFont( TooltipFont );
 
-	int Width = fnt->CalcStringWidth( tooltip_text );
-	//int Width = 200;
-	int Height = fnt->maxHeight;
+	int w = fnt->CalcStringWidth( tooltip_text );
+	int h = fnt->maxHeight;
 
-	int x = tooltip_x - Width / 2;
-	int y = tooltip_y - Height / 2;
+	int x = tooltip_x - w / 2;
+	int y = tooltip_y - h / 2;
 
 	// Ensure placement within the screen
 	if (x < 0) x = 0;
-	else if (x + Width > core->Width) 
-		x = core->Width - Width;
+	else if (x + w > Width) 
+		x = Width - w;
 	if (y < 0) y = 0;
-	else if (y + Height > core->Height) 
-		y = core->Height - Height;
+	else if (y + h > Height) 
+		y = Height - h;
 
 	Color fore = {0x00, 0xff, 0x00, 0x00};
 	Color back = {0x00, 0x00, 0x00, 0x00};
-	Color* palette = GetVideoDriver()->CreatePalette( fore, back );
+	Color* palette = video->CreatePalette( fore, back );
 	
-	fnt->Print( Region( x, y, Width, Height ),
+	fnt->Print( Region( x, y, w, h ),
 		    ( unsigned char * ) tooltip_text, palette,
 		    IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE, true );
 }
@@ -1909,7 +1908,7 @@ int Interface::PlayMovie(char* ResRef)
 	if (!mp) {
 		return 0;
 	}
-	DataStream* str = GetResourceMgr()->GetResource( ResRef,
+	DataStream* str = key->GetResource( ResRef,
 												IE_MVE_CLASS_ID );
 	if (!str) {
 		FreeInterface( mp );
@@ -1922,11 +1921,11 @@ int Interface::PlayMovie(char* ResRef)
 	}
 	//shutting down music and ambients before movie
 	if(music) music->HardEnd();
-	core->GetSoundMgr()->GetAmbientMgr()->deactivate();
+	soundmgr->GetAmbientMgr()->deactivate();
 	mp->Play();
 	//restarting music
 	if(music) music->Start();
-	core->GetSoundMgr()->GetAmbientMgr()->activate();
+	soundmgr->GetAmbientMgr()->activate();
 	FreeInterface( mp );
 	return 0;
 }
@@ -2039,7 +2038,7 @@ void Interface::QuitGame(bool BackToMain)
 	if(game) {
 		delete game;
 		game=NULL;
-		GetSoundMgr()->GetAmbientMgr()->deactivate(); // stop any ambients which are still enqueued
+		soundmgr->GetAmbientMgr()->deactivate(); // stop any ambients which are still enqueued
 	}
 	if(BackToMain) {
 		strcpy(NextScript, "Start");
@@ -2072,11 +2071,11 @@ void Interface::LoadGame(int index)
 
 	if (index == -1) {
 		//Load the Default Game
-		gam_str = GetResourceMgr()->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
+		gam_str = key->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
 		sav_str = NULL;
-		wmp_str = GetResourceMgr()->GetResource( WorldMapName, IE_WMP_CLASS_ID );
+		wmp_str = key->GetResource( WorldMapName, IE_WMP_CLASS_ID );
 	} else {
-		SaveGame* sg = GetSaveGameIterator()->GetSaveGame( index );
+		SaveGame* sg = sgiterator->GetSaveGame( index );
 		if (!sg)
 			return;
 		gam_str = sg->GetGame();
@@ -2123,7 +2122,7 @@ void Interface::LoadGame(int index)
 	LoadProgress(10);
 	// Unpack SAV (archive) file to Cache dir
 	if (sav_str) {
-		ArchiveImporter * ai = (ArchiveImporter*)core->GetInterface(IE_BIF_CLASS_ID);
+		ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
 		if(ai) {
 			ai->DecompressSaveGame(sav_str);
 			FreeInterface( ai );
@@ -2182,8 +2181,8 @@ bool Interface::InitItemTypes()
 	if (slotmatrix) {
 		free(slotmatrix);
 	}
-	int ItemTypeTable = core->LoadTable( "itemtype" );
-	TableMgr *it = core->GetTable(ItemTypeTable);
+	int ItemTypeTable = LoadTable( "itemtype" );
+	TableMgr *it = GetTable(ItemTypeTable);
 
 	ItemTypes = 0;
 	if(it) {
@@ -2208,12 +2207,12 @@ bool Interface::InitItemTypes()
 			}
 			slotmatrix[i] = value;
 		}
-		core->DelTable(ItemTypeTable);
+		DelTable(ItemTypeTable);
 	}
 
 	//slottype describes the inventory structure
-	int SlotTypeTable = core->LoadTable( "slottype" );
-	TableMgr *st = core->GetTable(SlotTypeTable);
+	int SlotTypeTable = LoadTable( "slottype" );
+	TableMgr *st = GetTable(SlotTypeTable);
 	if (slottypes) {
 		free(slottypes);
 	}
@@ -2225,7 +2224,7 @@ bool Interface::InitItemTypes()
 		for (int i=0;i<SlotTypes;i++) {
 			slottypes[i] = strtol(st->QueryField(i,0),NULL,0 );
 		}
-		core->DelTable(SlotTypeTable);
+		DelTable(SlotTypeTable);
 	}
 	return (it && st);
 }
@@ -2248,15 +2247,15 @@ void Interface::DisplayConstantString(int stridx, unsigned int color)
 {
         ieDword index;
 
-        if (!core->GetDictionary()->Lookup( "MessageWindow", index )) {
+        if (!vars->Lookup( "MessageWindow", index )) {
                 return;
         }
-        Window* win = core->GetWindow( index );
-        if (!core->GetDictionary()->Lookup( "MessageTextArea", index )) {
+        Window* win = GetWindow( index );
+        if (!vars->Lookup( "MessageTextArea", index )) {
                 return;
         }
         TextArea* ta = ( TextArea* ) win->GetControl( index );
-        char* text = core->GetString(strref_table[stridx]);
+        char* text = GetString(strref_table[stridx]);
         const char* format = "[/color][p][color=%lX]%s[/color][/p]";
         int newlen = (int)(strlen( format ) + strlen( text ) + 10);
         char* newstr = ( char* ) malloc( newlen );
@@ -2317,7 +2316,7 @@ void Interface::LoadProgress(int percent)
 	RedrawControls("Progress", percent);
 	RedrawAll();
 	DrawWindows();
-	core->GetVideoDriver()->SwapBuffers();
+	video->SwapBuffers();
 }
 
 void Interface::DragItem(CREItem *item)
