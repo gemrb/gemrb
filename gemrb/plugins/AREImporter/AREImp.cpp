@@ -96,8 +96,10 @@ Map * AREImp::GetMap()
 		ab.YPos = YPos;
 		ab.XDes = XDes;
 		ab.YDes = YDes;
-		ab.AnimID = IE_ANI_AWAKE;
 		ab.actor = actmgr->GetActor();
+		ab.AnimID = IE_ANI_AWAKE;
+		if(ab.actor->BaseStats[IE_STATE_ID] & 0x00000800)
+			ab.AnimID = IE_ANI_SLEEP;
 		ab.Orientation = (unsigned char)Orientation;
 		map->AddActor(ab);
 	}
