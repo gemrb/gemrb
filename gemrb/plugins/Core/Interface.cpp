@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.233 2004/11/12 22:20:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.234 2004/11/13 01:12:42 avenger_teambg Exp $
  *
  */
 
@@ -270,21 +270,21 @@ Interface::~Interface(void)
 bool Interface::ReadStrrefs()
 {
 	int i;
-        TableMgr * tab;
-        int table=LoadTable("strings");
-        memset(strref_table,-1,sizeof(strref_table) );
-        if(table<0) {
-                return false;
-        }
-        tab = GetTable(table);
-        if(!tab) {
-                goto end;
-        }
-        for(i=0;i<STRREFCOUNT;i++) {
-                strref_table[i]=atoi(tab->QueryField(i,0));
-        }
+	TableMgr * tab;
+	int table=LoadTable("strings");
+	memset(strref_table,-1,sizeof(strref_table) );
+	if(table<0) {
+		return false;
+	}
+	tab = GetTable(table);
+	if(!tab) {
+		goto end;
+	}
+	for(i=0;i<STRREFCOUNT;i++) {
+		strref_table[i]=atoi(tab->QueryField(i,0));
+	}
 end:
-        DelTable(table);
+	DelTable(table);
 	return true;
 }
 
@@ -1238,11 +1238,11 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	DataStream *stream;
 
 	if (character) {
-                char nPath[_MAX_PATH], fName[16];
+		char nPath[_MAX_PATH], fName[16];
 		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
 		PathJoin( nPath, GamePath, "characters", fName, NULL );
 #ifndef WIN32
-                ResolveFilePath( nPath );
+		ResolveFilePath( nPath );
 #endif
 		FileStream *fs = new FileStream();
 		fs -> Open( nPath, true );
@@ -2393,18 +2393,18 @@ int Interface::QuerySlotType(int idx) const
 
 int Interface::QuerySlotID(int idx) const
 {
-        if(idx>=SlotTypes) {
-                return 0;
-        }
-        return slottypes[idx].slotid;
+	if(idx>=SlotTypes) {
+		return 0;
+	}
+	return slottypes[idx].slotid;
 }
 
 int Interface::QuerySlottip(int idx) const
 {
-        if(idx>=SlotTypes) {
-                return 0;
-        }
-        return slottypes[idx].slottip;
+	if(idx>=SlotTypes) {
+		return 0;
+	}
+	return slottypes[idx].slottip;
 }
 
 const char *Interface::QuerySlotResRef(int idx) const
@@ -2431,25 +2431,25 @@ int Interface::CanUseItemType(int itype, int slottype) const
 
 void Interface::DisplayConstantString(int stridx, unsigned int color)
 {
-        ieDword index;
+	ieDword index;
 
-        if (!vars->Lookup( "MessageWindow", index )) {
-                return;
-        }
-        Window* win = GetWindow( index );
-        if (!vars->Lookup( "MessageTextArea", index )) {
-                return;
-        }
-        TextArea* ta = ( TextArea* ) win->GetControl( index );
-        char* text = GetString(strref_table[stridx]);
-        const char* format = "[/color][p][color=%lX]%s[/color][/p]";
-        int newlen = (int)(strlen( format ) + strlen( text ) + 10);
-        char* newstr = ( char* ) malloc( newlen );
-        snprintf( newstr, newlen, format, color, text );
-        free(text);
-        ta->AppendText( newstr, -1 );
-        ta->AppendText( "", -1 );
-        free( newstr );
+	if (!vars->Lookup( "MessageWindow", index )) {
+		return;
+	}
+	Window* win = GetWindow( index );
+	if (!vars->Lookup( "MessageTextArea", index )) {
+		return;
+	}
+	TextArea* ta = ( TextArea* ) win->GetControl( index );
+	char* text = GetString(strref_table[stridx]);
+	const char* format = "[/color][p][color=%lX]%s[/color][/p]";
+	int newlen = (int)(strlen( format ) + strlen( text ) + 10);
+	char* newstr = ( char* ) malloc( newlen );
+	snprintf( newstr, newlen, format, color, text );
+	free(text);
+	ta->AppendText( newstr, -1 );
+	ta->AppendText( "", -1 );
+	free( newstr );
 }
 
 static char *saved_extensions[]={".are",".sto",0};
@@ -2469,31 +2469,31 @@ bool Interface::SavedExtension(const char *filename)
 
 void Interface::DelTree(const char* Pt, bool onlysave)
 {
-        char Path[_MAX_PATH];
-        strcpy( Path, Pt );
-        DIR* dir = opendir( Path );
-        if (dir == NULL) {
-                return;
-        }
-        struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
-        if (de == NULL) {
-                closedir( dir );
-                return;
-        }
-        do {
-                char dtmp[_MAX_PATH];
-                struct stat fst;
-                snprintf( dtmp, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, de->d_name );
-                stat( dtmp, &fst );
-                if (S_ISDIR( fst.st_mode ))
-                        continue;
-                if (de->d_name[0] == '.')
-                        continue;
+	char Path[_MAX_PATH];
+	strcpy( Path, Pt );
+	DIR* dir = opendir( Path );
+	if (dir == NULL) {
+		return;
+	}
+	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
+	if (de == NULL) {
+		closedir( dir );
+		return;
+	}
+	do {
+		char dtmp[_MAX_PATH];
+		struct stat fst;
+		snprintf( dtmp, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, de->d_name );
+		stat( dtmp, &fst );
+		if (S_ISDIR( fst.st_mode ))
+			continue;
+		if (de->d_name[0] == '.')
+			continue;
 		if (!onlysave || SavedExtension(de->d_name) ) {
-                	unlink( dtmp );
+			unlink( dtmp );
 		}
-        } while (( de = readdir( dir ) ) != NULL);
-        closedir( dir );
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir );
 }
 
 void Interface::LoadProgress(int percent)
@@ -2535,16 +2535,18 @@ bool Interface::ReadItemTable(ieResRef TableName, const char * Prefix)
 		} else {
 			strncpy(ItemName,tab->GetRowName(j),sizeof(ieResRef) );
 		}
-		printf("Adding random item: %s\n",ItemName);
 		//Variable elements are free'd, so we have to use malloc
 		Items = (ieResRef *) malloc(sizeof(ieResRef) * 20 );
 		for(int k=0;k<20;k++) {
 			strncpy(Items[k],tab->QueryField(j,k),sizeof(ieResRef) );
 		}
+		ItemName[8]=0;
+		strupr(ItemName);
+		printf("Adding random item: %s\n",ItemName);
 		RtRows->SetAt(ItemName, (const char *) Items);
 	}
 end:
-        DelTable(table);
+	DelTable(table);
 	return true;
 }
 
@@ -2593,42 +2595,51 @@ printf("GoldResRef: %s\n",GoldResRef);
 		ReadItemTable( RtResRef,tab->GetRowName(2+i) );
 	}
 end:
-        DelTable( table );
+	DelTable( table );
 	return true;
 }
 
 CREItem *Interface::ReadItem(DataStream *str)
 {
-        CREItem *itm = new CREItem();
+	CREItem *itm = new CREItem();
 
-        str->ReadResRef( itm->ItemResRef );
-        str->ReadWord( &itm->Unknown08 );
-        str->ReadWord( &itm->Usages[0] );
-        str->ReadWord( &itm->Usages[1] );
-        str->ReadWord( &itm->Usages[2] );
-        str->ReadDword( &itm->Flags );
-	ieResRef *Items=NULL;
-	if( RtRows && RtRows->Lookup( itm->ItemResRef, (char *) Items ) ) {
-		int i,j,k;
-		char *endptr;
-		i=Roll(1,20,-1); //0-19
-		ieResRef NewItem;
-		strncpy( NewItem, Items[i], sizeof(ieResRef) );
-		i=(int) (strchr(NewItem,'*')-NewItem);
-		if(i!=-1) NewItem[i]=0;
-		j=strtol(NewItem,&endptr,10);
-		k=strtol(NewItem+i+1,NULL,10);
-		if(i!=-1) itm->Usages[0]=k;
-		else {
-			if(*endptr) strncpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
-			else {
-				strncpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
-				itm->Usages[0]=Roll(j,k,0);
-			}
-		}
-printf("Resolve random item: %s stack:%d\n",itm->ItemResRef, itm->Usages[0]);
-	}
+	str->ReadResRef( itm->ItemResRef );
+	str->ReadWord( &itm->Unknown08 );
+	str->ReadWord( &itm->Usages[0] );
+	str->ReadWord( &itm->Usages[1] );
+	str->ReadWord( &itm->Usages[2] );
+	str->ReadDword( &itm->Flags );
+	ResolveRandomItem(itm);
 	return itm;
+}
+
+void Interface::ResolveRandomItem(CREItem *itm)
+{
+	if(!RtRows) return;
+	ieResRef *Items=NULL;
+	RtRows->Lookup( itm->ItemResRef, (char *) Items );
+	if( !Items ) {
+		printf("%s [NOT FOUND]\n",itm->ItemResRef);
+		return;
+	}
+	int i,j,k;
+	char *endptr;
+	i=Roll(1,20,-1); //0-19
+	ieResRef NewItem;
+	strncpy( NewItem, Items[i], sizeof(ieResRef) );
+	i=(int) (strchr(NewItem,'*')-NewItem);
+	if(i!=-1) NewItem[i]=0;
+	j=strtol(NewItem,&endptr,10);
+	k=strtol(NewItem+i+1,NULL,10);
+	if(i!=-1) itm->Usages[0]=k;
+	else {
+		if(*endptr) strncpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
+		else {
+			strncpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
+			itm->Usages[0]=Roll(j,k,0);
+		}
+	}
+printf("Resolved item: %s stack:%d\n",itm->ItemResRef, itm->Usages[0]);
 }
 
 Item* Interface::GetItem(const char* resname)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.238 2004/11/05 16:28:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.239 2004/11/13 01:12:46 avenger_teambg Exp $
  *
  */
 
@@ -3254,14 +3254,22 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 		// FIXME - should use some already allocated in core
 		Item* item = im->GetItem();
 		if (item == NULL) {
+			btn->SetPicture(NULL);
 			core->FreeInterface( im );
-			return NULL;
+			Py_INCREF( Py_None );
+			return Py_None;
 		}
 
 		btn->SetFlags( IE_GUI_BUTTON_PICTURE, OP_OR );
-		btn->SetPicture( item->ItemIconBAM->GetFrame( Which ) );
+		if (item->ItemIconBAM) {
+			btn->SetPicture( item->ItemIconBAM->GetFrame( Which ) );
+		}
+		else {
+			btn->SetPicture(NULL);
+		}
 		core->FreeInterface( im );
 		delete item;
+
 	} else {
 		btn->SetPicture( NULL );
 	}
@@ -3928,6 +3936,8 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	TmpItem->Usages[1]=Charge1;
 	TmpItem->Usages[2]=Charge2;
 	TmpItem->Flags=IE_INV_ITEM_ACQUIRED;
+	core->ResolveRandomItem(TmpItem);
+printf("Resolved to %s\n",TmpItem->ItemResRef);
 	int res = actor->inventory.AddSlotItem( TmpItem, SlotID );
 	if (res!=2) {
 		printf("Inventory is full\n");

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.123 2004/11/12 22:20:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.124 2004/11/13 01:12:45 avenger_teambg Exp $
  *
  */
 
@@ -375,6 +375,7 @@ public:
 	CREItem* GetDraggedItem() { return DraggedItem; }
 	Item* GetItem(const char* resname);
 	CREItem *ReadItem(DataStream *str);
+	void ResolveRandomItem(CREItem *itm);
 
 private:
 	bool LoadConfig(void);
