@@ -10,18 +10,18 @@ def OnLoad():
 	GameButton = GemRB.GetControl(OptionsWindow, 9)
 	GraphicButton = GemRB.GetControl(OptionsWindow, 7)
 	BackButton = GemRB.GetControl(OptionsWindow, 11)
-	GemRB.SetControlStatus(OptionsWindow, SoundButton, 0x00000000);
-	GemRB.SetControlStatus(OptionsWindow, GameButton, 0x00000000);
-	GemRB.SetControlStatus(OptionsWindow, GraphicButton, 0x00000000);
-	GemRB.SetControlStatus(OptionsWindow, BackButton, 0x00000000);
+	GemRB.SetControlStatus(OptionsWindow, SoundButton, IE_GUI_BUTTON_ENABLED);
+	GemRB.SetControlStatus(OptionsWindow, GameButton, IE_GUI_BUTTON_ENABLED);
+	GemRB.SetControlStatus(OptionsWindow, GraphicButton, IE_GUI_BUTTON_ENABLED);
+	GemRB.SetControlStatus(OptionsWindow, BackButton, IE_GUI_BUTTON_ENABLED);
 	GemRB.SetText(OptionsWindow, SoundButton, 17164)
 	GemRB.SetText(OptionsWindow, GameButton, 17165)
 	GemRB.SetText(OptionsWindow, GraphicButton, 17162)
 	GemRB.SetText(OptionsWindow, BackButton, 10308)
-	GemRB.SetEvent(OptionsWindow, SoundButton, 0x00000000, "SoundPress")
-	GemRB.SetEvent(OptionsWindow, GameButton, 0x00000000, "GamePress")
-	GemRB.SetEvent(OptionsWindow, GraphicButton, 0x00000000, "GraphicPress")
-	GemRB.SetEvent(OptionsWindow, BackButton, 0x00000000, "BackPress")
+	GemRB.SetEvent(OptionsWindow, SoundButton, IE_GUI_BUTTON_ON_PRESS, "SoundPress")
+	GemRB.SetEvent(OptionsWindow, GameButton, IE_GUI_BUTTON_ON_PRESS, "GamePress")
+	GemRB.SetEvent(OptionsWindow, GraphicButton, IE_GUI_BUTTON_ON_PRESS, "GraphicPress")
+	GemRB.SetEvent(OptionsWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
 	GemRB.SetVisible(OptionsWindow, 1)
 	return
 	
