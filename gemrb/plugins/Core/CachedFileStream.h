@@ -32,5 +32,4 @@ public:
   /** No descriptions */
   int ReadLine(void * buf, int maxlen);
   };
-
 #endif
