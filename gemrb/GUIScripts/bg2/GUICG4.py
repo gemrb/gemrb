@@ -67,9 +67,9 @@ def RollPress():
 	GemRB.SetVar("StrExtra", e)
 	for i in range(0,6):
 		dice = 3
-		size = 6
+		size = 5
 		CalcLimits(i)
-		v = GemRB.Roll(dice, size, Add)
+		v = GemRB.Roll(dice, size, Add+3)
 		if v<Minimum:
 			v = Minimum
 		if v>Maximum:
