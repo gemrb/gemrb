@@ -9,7 +9,6 @@ ScrollBar = 0
 def OnLoad():
 	global LoadWindow, TextAreaControl, GameCount, ScrollBar
 
-	GemRB.SetVar("PlayMode",2)   #iwd is always using 'mpsave'                                             
 	GemRB.LoadWindowPack("GUILOAD")
 	LoadWindow = GemRB.LoadWindow(0)
 	CancelButton=GemRB.GetControl(LoadWindow,34)

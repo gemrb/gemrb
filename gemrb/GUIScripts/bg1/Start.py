@@ -66,34 +66,34 @@ def ConnectPress():
 	return
 
 def PregenPress():
-#GemRB.SetPlayMode(-1) #do not start game after chargen
+	GemRB.SetPlayMode(-1) #do not start game after chargen
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
-        GemRB.SetNextScript("CharGen") #temporarily
+	GemRB.SetNextScript("CharGen") #temporarily
 	return
 
 def LoadSingle():
+	GemRB.UnloadWindow(StartWindow)
+	GemRB.UnloadWindow(QuitWindow)
+	GemRB.SetVar("PlayMode",0)
+	GemRB.SetNextScript("GUILOAD")
 	return
 
 def MissionPack():
+	GemRB.UnloadWindow(StartWindow)
+	GemRB.UnloadWindow(QuitWindow)
+	GemRB.SetVar("PlayMode",2)
+	GemRB.SetNextScript("GUILOAD")
 	return
 
 def NewSingle():
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
-#main menu: -1, single player:0, tutorial mode=1, multi-player:2
-#GemRB.SetPlayMode(0)
+	GemRB.SetVar("PlayMode",0)
+	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(-1)
-        GemRB.SetNextScript("CharGen") #temporarily
+	GemRB.SetNextScript("CharGen") #temporarily
 	return
-
-def PlayPress():
-        GemRB.UnloadWindow(StartWindow)
-	GemRB.UnloadWindow(QuitWindow)
-#main menu: -1, single player:0, tutorial mode=1, multi-player:2
-#GemRB.SetPlayMode(1)
-	GemRB.SetNextScript("CharGen")
-        return
 
 def ExitPress():
 	GemRB.SetVisible(StartWindow,0)
