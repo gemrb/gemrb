@@ -84,6 +84,7 @@ GameControl::GameControl(void)
 	EntranceName[0] = 0;
 	target = NULL;
 	speaker = NULL;
+	HotKey = 0;
 }
 
 GameControl::~GameControl(void)
@@ -124,6 +125,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (area) {
 		core->GSUpdate();
 		area->DrawMap( vp, this );
+		HotKey = 0;
 		if (DisableMouse)
 			return;
 		short GameX = lastMouseX, GameY = lastMouseY;
@@ -267,6 +269,7 @@ int GameControl::SetText(const char* string, int pos)
 /** Key Press Event */
 void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
+	HotKey=tolower(Key);
 }
 
 void GameControl::SelectActor(int whom)

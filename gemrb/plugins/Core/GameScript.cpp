@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.130 2004/04/07 18:49:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.131 2004/04/07 19:27:44 avenger_teambg Exp $
  *
  */
 
@@ -103,6 +103,7 @@ static TriggerLink triggernames[] = {
 	{"harmlessentered", GameScript::Entered,0}, //this isn't sure the same
 	{"hasitem", GameScript::HasItem,0},
 	{"hasitemslot", GameScript::HasItemSlot,0},
+	{"hotkey", GameScript::HotKey,0},
 	{"hp", GameScript::HP,0},
 	{"hpgt", GameScript::HPGT,0}, {"hplt", GameScript::HPLT,0},
 	{"hppercent", GameScript::HPPercent,0},
@@ -173,10 +174,13 @@ static TriggerLink triggernames[] = {
 	{"reputationgt", GameScript::ReputationGT,0},
 	{"reputationlt", GameScript::ReputationLT,0},
 	{"see", GameScript::See,0},
-	{"specific", GameScript::Specific,0},
+	{"specifics", GameScript::Specifics,0},
 	{"statecheck", GameScript::StateCheck,0},
 	{"targetunreachable", GameScript::TargetUnreachable,0},
 	{"team", GameScript::Team,0},
+	{"time", GameScript::Time,0},
+	{"timegt", GameScript::TimeGT,0},
+	{"timelt", GameScript::TimeLT,0},
 	{"true", GameScript::True,0},
 	{"unselectablevariable", GameScript::UnselectableVariable,0},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT,0},
@@ -807,7 +811,7 @@ void GameScript::Update()
 		return;
 	}
 	unsigned long thisTime;
-	GetTime( thisTime );
+	GetTime( thisTime ); //this should be gametime too, pause holds it
 	if (( thisTime - lastRunTime ) < scriptRunDelay) {
 		return;
 	}
@@ -834,7 +838,7 @@ void GameScript::EvaluateAllBlocks()
 		return;
 	}
 	unsigned long thisTime;
-	GetTime( thisTime );
+	GetTime( thisTime ); //this should be gametime too, pause holds it
 	if (( thisTime - lastRunTime ) < scriptRunDelay) {
 		return;
 	}
@@ -2586,7 +2590,7 @@ int GameScript::General(Scriptable* Sender, Trigger* parameters)
 	return ID_General(actor, parameters->int0Parameter);
 }
 
-int GameScript::Specific(Scriptable* Sender, Trigger* parameters)
+int GameScript::Specifics(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
@@ -2698,28 +2702,19 @@ int GameScript::GlobalsEqual(Scriptable* Sender, Trigger* parameters)
 int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	unsigned long value2;
-
-	GetTime(value2); //this should be game time
-	return ( value1 == value2 );
+	return ( value1 == core->GetGame()->GameTime );
 }
 
 int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	unsigned long value2;
-
-	GetTime(value2);
-	return ( value1 < value2 );
+	return ( value1 < core->GetGame()->GameTime );
 }
 
 int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	unsigned long value2;
-
-	GetTime(value2);
-	return ( value1 > value2 );
+	return ( value1 > core->GetGame()->GameTime );
 }
 
 int GameScript::OnCreation(Scriptable* Sender, Trigger* parameters)
@@ -3435,6 +3430,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 			Container *cont = (Container *) tar;
 			return cont->Locked == parameters->int0Parameter;
 		}
+		default:; //to remove a warning
 	}
 	printf("[IEScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
 	return 0;
@@ -3458,6 +3454,7 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 			Container *cont = (Container *) tar;
 			return !!cont->Locked;
 		}
+		default:; //to remove a warning
 	}
 	printf("[IEScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
 	return 0;
@@ -3927,6 +3924,25 @@ int GameScript::AnimState(Scriptable* Sender, Trigger* parameters)
 	return actor->AnimID == parameters->int0Parameter;
 }
 
+int GameScript::Time(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GameTime==(unsigned long) parameters->int0Parameter;
+}
+
+int GameScript::TimeGT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GameTime>(unsigned long) parameters->int0Parameter;
+}
+int GameScript::TimeLT(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGame()->GameTime<(unsigned long) parameters->int0Parameter;
+}
+
+int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
+{
+	return core->GetGameControl()->HotKey==parameters->int0Parameter;
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -3983,7 +3999,8 @@ void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
 {
 	unsigned long mytime;
 
-	GetTime(mytime); //actually, this should be game time, not real time
+	//GetTime(mytime); //actually, this should be game time, not real time
+	mytime=core->GetGame()->GameTime;
 	SetVariable( Sender, parameters->string0Parameter,
 		parameters->int0Parameter + mytime);
 }

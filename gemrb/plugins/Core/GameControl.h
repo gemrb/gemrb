@@ -50,6 +50,7 @@ private:
 	Region SelectionRect;
 	short StartX, StartY;
 public:
+	char HotKey;
 	Door* overDoor;
 	Container* overContainer;
 	InfoPoint* overInfoPoint;
