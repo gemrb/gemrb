@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.165 2004/08/22 22:10:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.166 2004/08/23 18:02:41 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -459,39 +459,31 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	if (Mod & 64) //ctrl
 	{
 		switch (Key) {
-			case 'a':
-				//'a'
-				 {
-					if (overInfoPoint) {
-						overInfoPoint->DetectTrap(256);
-						core->GetVideoDriver()->FreeSprite( overInfoPoint->outline->fill );
-						overInfoPoint->outline->fill = NULL;
-					}
-					if (overContainer) {
-						if (overContainer->Trapped &&
-							!( overContainer->TrapDetected )) {
-							overContainer->TrapDetected = 1;
-							core->GetVideoDriver()->FreeSprite( overContainer->outline->fill );
-							overContainer->outline->fill = NULL;
-						}
+			case 'd': //disarm ?
+				if (overInfoPoint) {
+					overInfoPoint->DetectTrap(256);
+					core->GetVideoDriver()->FreeSprite( overInfoPoint->outline->fill );
+					overInfoPoint->outline->fill = NULL;
+				}
+				if (overContainer) {
+					if (overContainer->Trapped &&
+						!( overContainer->TrapDetected )) {
+						overContainer->TrapDetected = 1;
+						core->GetVideoDriver()->FreeSprite( overContainer->outline->fill );
+						overContainer->outline->fill = NULL;
 					}
 				}
 				break;
-
 			case 'b':
-				 {
-					if (selected.size() > 0) {
-						if (!effect) {
-							AnimationMgr* anim = ( AnimationMgr* )
-								core->GetInterface( IE_BAM_CLASS_ID );
-							DataStream* ds = core->GetResourceMgr()->GetResource( "S056ICBL",
-																		IE_BAM_CLASS_ID );
-							anim->Open( ds, true );
-							effect = anim->GetAnimation( 1, 0, 0 );
-						} else {
-							delete( effect );
-							effect = NULL;
-						}
+				if (selected.size() > 0) {
+					if (!effect) {
+						AnimationMgr* anim = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
+						DataStream* ds = core->GetResourceMgr()->GetResource( "S056ICBL", IE_BAM_CLASS_ID );
+						anim->Open( ds, true );
+						effect = anim->GetAnimation( 1, 0, 0 );
+					} else {
+						delete( effect );
+						effect = NULL;
 					}
 				}
 				break;
@@ -519,19 +511,15 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 			case 'o': 
 				// origin
-				 {
-					pfsX = lastMouseX; 
-					pfsY = lastMouseY;
-					core->GetVideoDriver()->ConvertToGame( pfsX, pfsY );
-				}
+				pfsX = lastMouseX; 
+				pfsY = lastMouseY;
+				core->GetVideoDriver()->ConvertToGame( pfsX, pfsY );
 				break;
-/*
 			case 'a':
 				//animation
 				if (lastActor)
 					lastActor->GetNextAnimation();
 				break;
-*/
 			case 's':
 				//stance
 				if (lastActor)

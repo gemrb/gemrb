@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.37 2004/08/22 22:10:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.38 2004/08/23 18:02:41 avenger_teambg Exp $
  *
  */
 
@@ -261,7 +261,8 @@ IE_ANI_TWO_FILES_3:	Animations using this type was stored using the following te
 			Each BAM File contains many animation groups, each animation group
 			stores 5 Orientments, the missing 3 are stored in East BAM Files.
 
-IE_ANI_PST_ANIMATION_1: Planescape: Torment Animations are stored in a different
+IE_ANI_PST_ANIMATION_1:
+IE_ANI_PST_ANIMATION_2: Planescape: Torment Animations are stored in a different
 			way than the other games. This format uses the following template:
 			[C/D][ACTIONTYPE][NAME][B]
 
@@ -273,6 +274,8 @@ IE_ANI_PST_ANIMATION_1: Planescape: Torment Animations are stored in a different
 			format. This Animation Type handles the PST Palette format too.
 
 			NOTE: Walking/Running animations store 9 Orientations.
+			The second variation is missing the resting stance (STD) and the transitions.
+			These creatures are always in combat stance (don't rest).
 
 IE_ANI_PST_STAND:	This is a modified PST animation, it contains only a
 			Standing image for every orientations, it follows the
@@ -300,6 +303,23 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 		printf("Illegal stance ID\n");
 		abort();
 	}
+
+	int AnimType = GetAnimType();
+
+	//alter stance here if it is missing and you know a substitute
+	//probably we should feed this result back to the actor?
+	switch (AnimType) {
+		case IE_ANI_PST_STAND:
+		case IE_ANI_PST_GHOST:
+			StanceID=IE_ANI_AWAKE;
+			break;
+		case IE_ANI_PST_ANIMATION_2: //std->stc
+			if (StanceID==IE_ANI_AWAKE) {
+				StanceID=IE_ANI_READY;
+			}
+			break;
+	}
+
 	//TODO: Implement Auto Resource Loading
 	if (Anims[StanceID][Orient]) {
 		if (Anims[StanceID][Orient]->ChangePalette) {
@@ -340,6 +360,8 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 		case IE_ANI_WALK:
 		case IE_ANI_RUN:
 		case IE_ANI_CAST: //IE_ANI_CONJURE is the ending casting anim
+		case IE_ANI_READY:
+			break;
 		case IE_ANI_AWAKE:
 			break;
 		default:
@@ -379,6 +401,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			Anims[StanceID][Orient + 1] = a;
 			break;
 
+		case IE_ANI_PST_ANIMATION_2:  //no std just stc
 		case IE_ANI_PST_ANIMATION_1:
 			if (Orient > 8) {
 				core->GetVideoDriver()->MirrorAnimation( a );
@@ -438,7 +461,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 			Cycle = StanceID * 16 + Orient;
 			break;
 
-		case IE_ANI_TWO_FILES_2:
+		case IE_ANI_TWO_FILES_2:  //8+8 animations
 			AddMHRSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
@@ -482,6 +505,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 			break;
 
 		case IE_ANI_PST_ANIMATION_1:
+		case IE_ANI_PST_ANIMATION_2:
 			AddPSTSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
@@ -518,11 +542,9 @@ void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_GET_UP:
 			Prefix="GUP"; break;
 		case IE_ANI_AWAKE:
-			if (core->GetGame() && core->GetGame()->CombatCounter)
-				Prefix="STC";
-			else
-				Prefix="STD";
-			break;
+			Prefix="STD"; break;
+		case IE_ANI_READY:
+			Prefix="STC"; break;
 		case IE_ANI_DIE:
 		case IE_ANI_SLEEP:
 			Prefix="DFB"; break;
@@ -712,6 +734,11 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)
 {
+	bool e=Orient>=8;
+	if (e) {
+		Orient -= 8;
+	}
+
 	switch (StanceID) {
 			//Attack is a special case... it cycles randomly
 			//through SLASH, BACKSLASH and JAB so we will choose
@@ -731,7 +758,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 					strcat( ResRef, "A7" );
 					break;
 			}
-			Cycle = ( Orient / 2 );
+			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
@@ -748,7 +775,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 					strcat( ResRef, "A8" );
 					break;
 			}
-			Cycle = ( Orient / 2 );
+			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_JAB:
@@ -765,45 +792,45 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 					strcat( ResRef, "A9" );
 					break;
 			}
-			Cycle = ( Orient / 2 );
+			Cycle = Orient;
 			break;
 
 		case IE_ANI_AWAKE:
 			strcat( ResRef, "G1" );
-			Cycle = 8 + ( Orient / 2 );
+			Cycle = 8 + Orient;
 			break;
 
 		case IE_ANI_CAST:
 			strcat( ResRef, "CA" );
-			Cycle = 8 + ( Orient / 2 );
+			Cycle = 8 + Orient;
 			break;
 
 		case IE_ANI_CONJURE:
 			strcat( ResRef, "CA" );
-			Cycle = ( Orient / 2 );
+			Cycle = Orient;
 			break;
 
 		case IE_ANI_DAMAGE:
 			strcat( ResRef, "G14" );
-			Cycle = 40 + ( Orient / 2 );
+			Cycle = 40 + Orient;
 			break;
 
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
 			strcat( ResRef, "G1" );
-			Cycle = 48 + ( Orient / 2 );
+			Cycle = 48 + Orient;
 			break;
 
 			//I cannot find an emerge animation...
 			//Maybe is Die reversed
 		case IE_ANI_EMERGE:
 			strcat( ResRef, "G1" );
-			Cycle = 48 + ( Orient / 2 );
+			Cycle = 48 + Orient;
 			break;
 
 		case IE_ANI_HEAD_TURN:
 			strcat( ResRef, "G1" );
-			Cycle = 16 + ( Orient / 2 );
+			Cycle = 16 + Orient;
 			break;
 
 			//Unknown... maybe only a transparency effect apply
@@ -812,7 +839,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_READY:
 			strcat( ResRef, "G1" );
-			Cycle = 24 + ( Orient / 2 );
+			Cycle = 24 + Orient;
 			break;
 
 			//This depends on the ranged weapon equipped
@@ -820,37 +847,37 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			switch (RangedType) {
 				case IE_ANI_RANGED_BOW:
 					strcat( ResRef, "SA" );
-					Cycle = ( Orient / 2 );
+					Cycle = Orient;
 					break;
 
 				case IE_ANI_RANGED_XBOW:
 					strcat( ResRef, "SX" );
-					Cycle = ( Orient / 2 );
+					Cycle = Orient;
 					break;
 
 				case IE_ANI_RANGED_THROW:
 					strcat( ResRef, "A1" );
-					Cycle = ( Orient / 2 );
+					Cycle = Orient;
 					break;
 			}
 			break;
 
 		case IE_ANI_SLEEP:
 			strcat( ResRef, "G1" );
-			Cycle = 64 + ( Orient / 2 );
+			Cycle = 64 + Orient;
 			break;
 
 		case IE_ANI_TWITCH:
 			strcat( ResRef, "G1" );
-			Cycle = 56 + ( Orient / 2 );
+			Cycle = 56 + Orient;
 			break;
 
 		case IE_ANI_WALK:
 			strcat( ResRef, "G1" );
-			Cycle = ( Orient / 2 );
+			Cycle = Orient;
 			break;
 	}
-	if (Orient > 9) {
+	if (e) {
 		strcat( ResRef, "E" );
 	}
 }

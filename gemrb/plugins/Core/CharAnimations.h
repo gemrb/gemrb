@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.25 2004/08/22 22:10:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.26 2004/08/23 18:02:41 avenger_teambg Exp $
  *
  */
 
@@ -87,6 +87,7 @@
 #define IE_ANI_PST_ANIMATION_1		16   //full animation
 #define IE_ANI_PST_GHOST		17   //no orientations
 #define IE_ANI_PST_STAND		18   //has orientations
+#define IE_ANI_PST_ANIMATION_2		19   //full animation std-->stc
 
 //armour levels
 #define IE_ANI_NO_ARMOR			0
