@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.58 2005/02/22 23:10:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.59 2005/02/23 18:59:17 avenger_teambg Exp $
  *
  */
 
@@ -88,7 +88,7 @@ class Map;
 //dead actor may not be selected
 #define GA_NO_DEAD  32
 
-typedef struct PCStatsStruct {
+class GEM_EXPORT PCStatsStruct {
 public:
 	ieStrRef  BestKilledName;
 	ieDword   BestKilledXP;
@@ -105,9 +105,7 @@ public:
 	ieWord    FavouriteWeaponsCount[4];
 public:
 	PCStatsStruct();
-} PCStatsStruct;
-
-
+};
 
 class GEM_EXPORT Actor : public Moveble {
 public:
@@ -115,9 +113,9 @@ public:
 	ieDword BaseStats[MAX_STATS];
 	ieDword Modified[MAX_STATS];
 	PCStatsStruct*  PCStats;
-	char Dialog[9];
-	char SmallPortrait[9];
-	char LargePortrait[9];
+	ieResRef Dialog;
+	ieResRef SmallPortrait;
+	ieResRef LargePortrait;
 	/** 0: NPC, 1-8 party slot */
 	unsigned char InParty;
 	char* LongName, * ShortName;
@@ -191,7 +189,7 @@ public:
 	/** Returns true if the actor is targetable */
 	bool ValidTarget(int ga_flags);
 	/** Returns a Stat value */
-	ieDword GetStat(unsigned int StatIndex);
+	ieDword GetStat(unsigned int StatIndex) const;
 	/** Sets a Stat Value (unsaved) */
 	bool SetStat(unsigned int StatIndex, ieDword Value);
 	/** Returns the difference */
@@ -243,7 +241,7 @@ public:
 		}
 	}
 	/** Gets the Character Long Name/Short Name */
-	char* GetName(int which)
+	char* GetName(int which) const
 	{
 		if(which==-1) which=!TalkCount;
 		if (which) {
@@ -252,26 +250,23 @@ public:
 		return ShortName;
 	}
 	/** Gets the DeathVariable */
-	char* GetScriptName(void)
+	const char* GetScriptName(void) const 
 	{
 		return scriptName;
 	}
 	/** Gets a Script ResRef */
-	char* GetScript(int ScriptIndex)
-	{
-		//return Scripts[ScriptIndex];
-		return NULL;
-	}
+	const char* GetScript(int ScriptIndex) const;
 	/** Gets the Character's level for XP calculations */
-	int GetXPLevel(int modified);
+	int GetXPLevel(int modified) const;
 
 	/** Gets the Dialog ResRef */
-	const char* GetDialog(bool checks=false);
+	const char* GetDialog(bool checks=false) const;
 	/** Gets the Portrait ResRef */
-	char* GetPortrait(int which)
+	const char* GetPortrait(int which) const
 	{
 		return which ? SmallPortrait : LargePortrait;
 	}
+
 	void SetText(char* ptr, unsigned char type);
 	void SetText(int strref, unsigned char type);
 	/* returns carried weight atm, could calculate with strength*/

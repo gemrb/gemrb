@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.84 2005/02/22 23:10:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.85 2005/02/23 18:59:16 avenger_teambg Exp $
  *
  */
 
@@ -209,7 +209,7 @@ CharAnimations* Actor::GetAnims()
 }
 
 /** Returns a Stat value (Base Value + Mod) */
-ieDword Actor::GetStat(unsigned int StatIndex)
+ieDword Actor::GetStat(unsigned int StatIndex) const
 {
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
@@ -420,7 +420,7 @@ void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
 /* this is returning the level of the character for xp calculations 
 	 later it could calculate with dual/multiclass, 
 	 also with iwd2's 3rd ed rules, this is why it is a separate function */
-int Actor::GetXPLevel(int modified)
+int Actor::GetXPLevel(int modified) const
 {
 	if (modified) {
 		return Modified[IE_LEVEL];
@@ -602,7 +602,7 @@ int Actor::LearnSpell(ieResRef spellname, ieDword flags)
 	return LSR_OK;
 }
 
-const char *Actor::GetDialog(bool checks)
+const char *Actor::GetDialog(bool checks) const
 {
 	if (!checks) {
 		return Dialog;
@@ -623,4 +623,9 @@ void Actor::CreateStats()
 	if (!PCStats) {
 		PCStats = new PCStatsStruct();
 	}
+}
+
+const char* Actor::GetScript(int ScriptIndex) const
+{
+	return Scripts[ScriptIndex]->GetName();
 }

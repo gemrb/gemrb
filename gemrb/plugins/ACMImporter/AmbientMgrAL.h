@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.h,v 1.2 2004/10/17 17:01:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.h,v 1.3 2005/02/23 18:59:03 avenger_teambg Exp $
  *
  */
 
@@ -59,7 +59,7 @@ private:
 		//not const, we drop invalid resources here
 		AmbientSource(Ambient *a);
 		~AmbientSource();
-		unsigned int tick(unsigned int ticks, Point listener, unsigned int timeslice);
+		unsigned int tick(unsigned int ticks, Point listener, ieDword timeslice);
 		void hardStop();
 		void SetVolume(unsigned short volume);
 	private:

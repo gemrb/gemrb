@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.232 2005/02/21 19:53:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.233 2005/02/23 18:59:27 avenger_teambg Exp $
  *
  */
 
@@ -39,6 +39,7 @@ static ObjectFunction objects[MAX_OBJECTS];
 static IDSFunction idtargets[MAX_OBJECT_FIELDS];
 static Cache SrcCache; //cache for string resources (pst)
 static Cache BcsCache; //cache for scripts
+static int happiness[3][20];
 
 static int ObjectIDSCount = 7;
 static int MaxObjectNesting = 5;
@@ -135,7 +136,7 @@ static TriggerLink triggernames[] = {
 	{"hasiteminslot", GameScript::HasItemSlot,0},
 	{"hasweaponequipped", GameScript::HasWeaponEquipped,0},
 	{"haveanyspells", GameScript::HaveAnySpells,0},
-	{"havespell", GameScript::HaveSpell,0},    //these must be the same
+	{"havespell", GameScript::HaveSpell,0}, //these must be the same
 	{"havespellparty", GameScript::HaveSpellParty,0}, 
 	{"havespellres", GameScript::HaveSpell,0}, //they share the same ID
 	{"heard", GameScript::Heard,0},
@@ -826,6 +827,21 @@ static SrcVector *LoadSrc(ieResRef resname)
 	return src;
 }
 
+void InitTables()
+{
+	//initializing the happiness table
+	int hptable = core->LoadTable( "happy" );
+	TableMgr *tab = core->GetTable( hptable );
+	for(int alignment=0;alignment<3;alignment++) {
+		for(int reputation=0;reputation<20;reputation++) {
+			happiness[alignment][reputation]=strtol(tab->QueryField(reputation,alignment), NULL, 0);
+		}
+	}
+	core->DelTable( hptable );
+
+	//
+}
+
 GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 	Variables* local)
 {
@@ -839,6 +855,7 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 	}
 	if (!initialized) {
 		initialized = 1;
+		InitTables();
 		int tT = core->LoadSymbol( "TRIGGER" );
 		int aT = core->LoadSymbol( "ACTION" );
 		int oT = core->LoadSymbol( "OBJECT" );
@@ -954,15 +971,15 @@ GameScript::~GameScript(void)
 		//set 3. parameter to true if you want instant free
 		//and possible death
 		int res = BcsCache.DecRef(script, Name, false);
-	        if (res<0) {
-	                printMessage( "GameScript", "Corrupted Script cache encountered (reference count went below zero), ", LIGHT_RED );
+		if (res<0) {
+			printMessage( "GameScript", "Corrupted Script cache encountered (reference count went below zero), ", LIGHT_RED );
 			printf( "Script name is: %.8s\n", Name);
-        	        abort();
-	        }
-	        if (!res) {
+			abort();
+		}
+		if (!res) {
 			printf("Freeing script %s because its refcount has reached 0.\n", Name);
 /* don't free scripts yet
-	        	script->Release();
+			script->Release();
 */
 		}
 		script = NULL;
@@ -1008,7 +1025,7 @@ Script* GameScript::CacheScript(ieResRef ResRef)
 }
 
 /* MYAREA is currently used in actors,
-   it could be improved to use from area scripts */
+ it could be improved to use from area scripts */
 void GameScript::ReplaceMyArea(Scriptable* Sender, char* newVarName)
 {
 	switch(Sender->Type) {
@@ -1532,7 +1549,7 @@ int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
 
 int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 {
-	int ret = 0;  // continue or not
+	int ret = 0; // continue or not
 	for (int i = 0; i < rE->actionsCount; i++) {
 		Action* aC = rE->actions[i];
 		switch (actionflags[aC->actionID] & AF_MASK) {
@@ -3648,8 +3665,8 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* paramet
 	}
 	return 0;
 }
-//			       0      1      2      3    4   
-static char spellnames[5][5]={"ITEM","SPPR","SPWI","SPIN","SPCL"};
+//				0	1	2	3	4   
+static char spellnames[5][5]={"ITEM", "SPPR", "SPWI", "SPIN", "SPCL"};
 
 #define CreateSpellName(spellname, data) sprintf(spellname,"%s%03d",spellnames[data/1000],data%1000)
 
@@ -3831,10 +3848,13 @@ int GameScript::Or(Scriptable* /*Sender*/, Trigger* parameters)
 int GameScript::Clicked(Scriptable* Sender, Trigger* parameters)
 {
 	if (parameters->objectParameter->objectFields[0] == 0) {
-		return 1;
-	Scriptable* target = GetActorFromObject( Sender,
-							parameters->objectParameter );
-	if (Sender == target)
+		if (Sender->LastTrigger) {
+			return 1;
+		}
+		return 0;
+	}
+	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
+	if (Sender->LastTrigger == target) {
 		return 1;
 	}
 	return 0;
@@ -5536,11 +5556,10 @@ int GameScript::GetHappiness(Scriptable* Sender, int reputation)
 	}
 	Actor* ab = ( Actor* ) Sender;
 	int alignment = ab->GetStat(IE_ALIGNMENT)&3; //good, neutral, evil
-	int hptable = core->LoadTable( "happy" );
-	char * repvalue = core->GetTable( hptable )->QueryField( reputation/10, alignment );
-//      don't throw this table, we will open it again
-//	core->DelTable( hptable ); 
-	return strtol(repvalue,NULL,0); //this one handles 0x values too!
+	if (reputation>19) {
+		reputation=19;
+	}
+	return happiness[alignment][reputation/10];
 }
 
 int GameScript::GetHPPercent(Scriptable* Sender)
@@ -6429,7 +6448,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		case BD_INTERACT: //using the source for the dialog
 			if( scr->Type == ST_ACTOR) {
 				int pdtable = core->LoadTable( "interdia" );
-				char* scriptingname = ((Actor *) scr)->GetScriptName();
+				const char* scriptingname = ((Actor *) scr)->GetScriptName();
 				Dialog = core->GetTable( pdtable )->QueryField( scriptingname, "FILE" );
 				core->DelTable( pdtable );
 			}
@@ -6594,26 +6613,27 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	printf("NIDSpecial2 kicked in!\n");
 	Game *game=core->GetGame();
 	if (!game->EveryoneStopped() ) {
-		printf("But not everyone stopped moving, we can't go.\n");
 		Sender->AddActionInFront( Sender->CurrentAction );
 		//wait for a while
 		Sender->SetWait( 1 * AI_UPDATE_TIME );
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-        if(!game->EveryoneNearPoint(actor->Area, actor->Pos, true) ) {
+	      if(!game->EveryoneNearPoint(actor->Area, actor->Pos, true) ) {
 		//we abort the command, everyone should be here
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	//travel direction passed to guiscript
-	unsigned int direction = game->GetCurrentMap()->WhichEdge(actor->Pos);
+	int direction = game->GetCurrentMap()->WhichEdge(actor->Pos);
 	printf("Travel direction returned: %d\n", direction);
-	core->GetDictionary()->SetAt("Travel", direction);
-	printf("Now, lets stop the game and bring up the worldmap, can we?\n");
+	if (direction==-1) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
 	core->GetGUIScriptEngine()->RunFunction( "OpenWorldMapWindow" );
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->CurrentAction = NULL;
@@ -7064,9 +7084,12 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	}
 	int pdtable = core->LoadTable( "pdialog" );
 	if( pdtable >= 0 ) {
-		char* scriptname = act->GetScriptName();
-		char* resref = core->GetTable( pdtable )->QueryField( scriptname, "JOIN_DIALOG_FILE");
-		if( resref!=core->GetTable( pdtable )->QueryField((unsigned int)-1) ) {
+		const char* scriptname = act->GetScriptName();
+		ieResRef resref;
+		TableMgr *tab=core->GetTable( pdtable );
+		//set dialog only if we got a row
+		if (tab->GetRowIndex( scriptname ) != -1) {
+			strnuprcpy(resref, tab->QueryField( scriptname, "JOIN_DIALOG_FILE"),8);
 			act->SetDialog( resref );
 		}
 		core->DelTable( pdtable );
@@ -7194,8 +7217,8 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 {
-	//i guess the string must be copied, otherwise there is a problem
-	core->GetTokenDictionary()->SetAtCopy( parameters->string1Parameter, core->GetString( parameters->int0Parameter) );
+	//SetAt takes a newly created reference (no need of free/copy)
+	core->GetTokenDictionary()->SetAt( parameters->string1Parameter, core->GetString( parameters->int0Parameter) );
 }
 
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
@@ -7525,7 +7548,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 	}
 	int pdtable = core->LoadTable( "pdialog" );
 	Actor* act = ( Actor* ) Sender;
-	char* scriptingname = act->GetScriptName();
+	const char* scriptingname = act->GetScriptName();
 	act->SetDialog( core->GetTable( pdtable )->QueryField( scriptingname,
 			"POST_DIALOG_FILE" ) );
 	core->DelTable( pdtable );

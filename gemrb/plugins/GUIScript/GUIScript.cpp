@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.269 2005/02/19 19:09:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.270 2005/02/23 18:59:38 avenger_teambg Exp $
  *
  */
 
@@ -388,12 +388,16 @@ PyDoc_STRVAR( GemRB_GetString__doc,
 static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 {
 	ieStrRef strref;
+	PyObject* ret;
 
 	if (!PyArg_ParseTuple( args, "i", &strref )) {
 		return AttributeError( GemRB_GetString__doc );
 	}
 
-	return PyString_FromString( core->GetString( strref ) );
+	char *text = core->GetString( strref );
+	ret=PyString_FromString( text );
+	free( text );
+	return ret;
 }
 
 PyDoc_STRVAR( GemRB_EndCutSceneMode__doc,
@@ -4448,7 +4452,7 @@ bool GUIScript::RunFunction(const char* fname)
 
 	PyObject* pFunc, * pArgs, * pValue;
 
-	pFunc = PyDict_GetItemString( pDict, fname );
+	pFunc = PyDict_GetItemString( pDict, (char *) fname );
 	/* pFunc: Borrowed reference */
 	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
 		return false;

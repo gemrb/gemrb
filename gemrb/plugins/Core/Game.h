@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.44 2005/02/22 23:11:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.45 2005/02/23 18:59:18 avenger_teambg Exp $
  *
  */
 
@@ -45,8 +45,8 @@ class Game;
 // Flags bits for SelectActor()
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define SELECT_NORMAL   0x00
-#define SELECT_REPLACE  0x01   // when selecting actor, deselect all others
-#define SELECT_QUIET    0x02   // do not run handler when chanfing selection
+#define SELECT_REPLACE  0x01 // when selecting actor, deselect all others
+#define SELECT_QUIET    0x02 // do not run handler when chanfing selection
 
 
 typedef struct PCStruct {
@@ -121,7 +121,7 @@ public:
 	ieDword NPCCount;
 	ieDword GLOBALOffset;
 	ieDword GLOBALCount;
-	char AREResRef[9];
+	ieResRef AREResRef;
 	ieDword Unknown48;
 	ieDword JournalCount;
 	ieDword JournalOffset;
@@ -131,9 +131,9 @@ public:
 	ieDword KillVarsOffset;
 	ieDword KillVarsCount;
 	ieDword FamiliarsOffset;  // offset to known creatures on PST
-	char AnotherArea[9];
-	char CurrentArea[9];
-	char LoadMos[9];
+	ieResRef AnotherArea;
+	ieResRef CurrentArea;
+	ieResRef LoadMos;
 public:
 	/* returns the PC's slot count for partyID*/
 	int FindPlayer(unsigned int partyID);
@@ -177,7 +177,7 @@ public:
 	Map* GetMap(const char *areaname);
 	/* returns slot of the map if found */
 	int FindMap(const char *ResRef);
-        Map * GetCurrentMap();
+	Map * GetCurrentMap();
 	int AddMap(Map* map);
 	/* determine if area is master area*/
 	bool MasterArea(const char *area);

@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.91 2005/02/21 19:52:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.92 2005/02/23 18:59:05 avenger_teambg Exp $
  *
  */
 
@@ -131,7 +131,7 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	str->ReadDword( &ActorOffset );
 	str->ReadWord( &ActorCount );
 	str->Seek( 0x5A + bigheader, GEM_STREAM_START );
-	str->ReadWord( &InfoPointsCount  );
+	str->ReadWord( &InfoPointsCount );
 	str->ReadDword( &InfoPointsOffset );
 	str->Seek( 0x68 + bigheader, GEM_STREAM_START );
 	str->ReadDword( &EntrancesOffset );
@@ -574,8 +574,7 @@ Map* AREImp::GetMap(const char *ResRef)
 				crefile = core->GetResourceMgr()->GetResource( CreResRef, IE_CRE_CLASS_ID );
 			}
 			if(!actmgr->Open( crefile, true )) {
-				printf("Couldn't read actor!\n");
-				abort();
+				printf("Couldn't read actor: %s!\n", CreResRef);
 				continue;
 			}
 			ab = actmgr->GetActor();
@@ -623,9 +622,17 @@ Map* AREImp::GetMap(const char *ResRef)
 				IE_SHADED : IE_NORMAL;
 			AnimationFactory* af = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( animBam, IE_BAM_CLASS_ID );
+			if (!af) {
+				printf("Cannot load animation: %s\n", animBam);
+				continue;
+			}
 			anim = af->GetCycle( ( unsigned char ) animCycle );
 			if (!anim)
 				anim = af->GetCycle( 0 );
+			if (!anim) {
+				printf("Cannot load animation: %s\n", animBam);
+				continue;
+			}
 			anim->x = animX;
 			anim->y = animY;
 			anim->BlitMode = mode;

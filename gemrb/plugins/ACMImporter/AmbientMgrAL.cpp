@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.cpp,v 1.2 2004/09/13 16:53:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.cpp,v 1.3 2005/02/23 18:59:03 avenger_teambg Exp $
  *
  */
 
@@ -139,7 +139,7 @@ unsigned int AmbientMgrAL::tick(unsigned int ticks)
 	listener.x = (short) listen[0];
 	listener.y = (short) listen[1];
 	
-	unsigned int timeslice = ((core->GetGame()->GameTime / 60 + 30) / 60 - 1) % 24;
+	ieDword timeslice = 1<<(((core->GetGame()->GameTime / 60 + 30) / 60 - 1) % 24);
 	
 	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
 		unsigned int newdelay = (*it)->tick(ticks, listener, timeslice);
@@ -181,8 +181,7 @@ AmbientMgrAL::AmbientSource::AmbientSource(Ambient *a)
 		} else {
 			buffers.push_back(buffer);
 			buflens.push_back(timelen);
-		}
-		
+		}		
 	}
 /*	
 	// use OpenAL to loop in this special case so we don't have to
@@ -202,7 +201,7 @@ AmbientMgrAL::AmbientSource::~AmbientSource()
 	}
 }
 
-unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listener, unsigned int timeslice)
+unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listener, ieDword timeslice)
 {
 	ALint state;
 /*	ALint queued, processed;
@@ -211,8 +210,13 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 	alGetSourcei( source, AL_BUFFERS_PROCESSED, &processed );
 	printf("ambient %s: source %x, state %x, queued %d, processed %d\n", ambient->getName().c_str(), source, state, queued, processed);
 	if (!alIsSource( source )) printf("hey, it's not a source!\n");*/
+
+	/* if we are out of sounds do nothing */
+	if(!ambient->sounds.size()) {
+		return UINT_MAX;
+	}
 	
-	if ((! (ambient->getFlags() & IE_AMBI_ENABLED)) || (! ambient->getAppearance()&(1<<timeslice))) {
+	if ((! (ambient->getFlags() & IE_AMBI_ENABLED)) || (! ambient->getAppearance()&timeslice)) {
 		// don't really stop the source, since we don't want to stop playing abruptly in the middle of
 		// a sample (do we?), and it would end playing by itself in a while (Divide)
 		//this is correct (Avenger)

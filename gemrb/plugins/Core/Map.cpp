@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.134 2005/02/21 19:54:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.135 2005/02/23 18:59:35 avenger_teambg Exp $
  *
  */
 
@@ -42,7 +42,7 @@ extern HANDLE hConsole;
 static int NormalCost = 10;
 static int AdditionalCost = 4;
 static int Passable[16] = {
-	4, 1, 1, 1, 1, 1, 1, 1, 4, 1, 0, 0, 0, 0, 2, 1
+	4, 1, 1, 1, 1, 1, 1, 1, 4, 1, 0, 0, 0, 0, 3, 1
 };
 static bool PathFinderInited = false;
 static Variables Spawns;

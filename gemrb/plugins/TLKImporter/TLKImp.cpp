@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.43 2005/02/07 19:59:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.44 2005/02/23 18:59:43 avenger_teambg Exp $
  *
  */
 
@@ -166,6 +166,7 @@ void TLKImp::GetMonthName(int dayandmonth)
 
 			tmp = GetString( monthnames[i] );
 			core->GetTokenDictionary()->SetAt("MONTHNAME",tmp);
+			//must not free tmp, SetAt doesn't copy the pointer!
 
 			sprintf(tmpstr,"%d", month);
 			core->GetTokenDictionary()->SetAtCopy("MONTH",tmpstr);
