@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.250 2004/11/29 22:19:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.251 2004/11/30 23:30:05 edheldil Exp $
  *
  */
 
@@ -118,6 +118,24 @@ inline Control *GetControl( int wi, int ci, int ct)
 		return NULL;
 	}
 	return ctrl;
+}
+
+// Return single BAM frame as a sprite. Use if you want one frame only,
+//    otherwise it's not efficient
+
+inline Sprite2D* GetBAMSprite(ieResRef ResRef, int cycle, int frame)
+{
+	AnimationMgr* bam = ( AnimationMgr* )
+		core->GetInterface( IE_BAM_CLASS_ID );
+	DataStream *str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
+	if (!bam->Open( str, true ) ) {
+		printMessage( "GUIScript", "Error: %s.BAM not found\n", LIGHT_RED );
+		return NULL;
+	}
+	Sprite2D *tspr = bam->GetFrameFromCycle( (unsigned char) cycle, frame );
+	core->FreeInterface( bam );
+
+	return tspr;
 }
 
 PyDoc_STRVAR( GemRB_SetInfoTextColor__doc, 
@@ -1340,6 +1358,44 @@ static PyObject* GemRB_SetLabelTextColor(PyObject * /*self*/, PyObject* args)
 
 	Color fore = {r,g, b, 0}, back = {0, 0, 0, 0};
 	lab->SetColor( fore, back );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_CreateTextEdit__doc,
+"CreateTextEdit(WindowIndex, ControlID, x, y, w, h, font, text) => ControlIndex\n\n"
+"Creates and adds a new TextEdit to a Window." );
+
+static PyObject* GemRB_CreateTextEdit(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlID, x, y, w, h;
+	char* font, * text;
+
+	if (!PyArg_ParseTuple( args, "iiiiiiss", &WindowIndex, &ControlID, &x,
+			&y, &w, &h, &font, &text )) {
+		return AttributeError( GemRB_CreateTextEdit__doc );
+	}
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (win == NULL) {
+		return NULL;
+	}
+	TextEdit* edit = new TextEdit( 1000 );
+	edit->SetFont( core->GetFont( font ) );
+	edit->XPos = x;
+	edit->YPos = y;
+	edit->Width = w;
+	edit->Height = h;
+	edit->ControlID = ControlID;
+	edit->ControlType = IE_GUI_EDIT;
+	edit->Owner = win;
+	edit->SetText( text );
+
+	Sprite2D* spr = GetBAMSprite( "CARET", 0, 0 );
+	if (spr) edit->SetCursor( spr );
+
+	win->AddControl( edit );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -4172,6 +4228,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UnloadWindow, METH_VARARGS),
 	METHOD(CreateLabel, METH_VARARGS),
 	METHOD(SetLabelTextColor, METH_VARARGS),
+	METHOD(CreateTextEdit, METH_VARARGS),
 	METHOD(CreateButton, METH_VARARGS),
 	METHOD(SetButtonSprites, METH_VARARGS),
 	METHOD(SetButtonBorder, METH_VARARGS),
