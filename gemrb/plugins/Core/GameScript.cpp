@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.151 2004/04/21 17:41:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.152 2004/04/21 19:52:44 balrog994 Exp $
  *
  */
 
@@ -4977,8 +4977,9 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 	actor->DisplayHeadText( sb.text );
 	if (sb.Sound[0]) {
 		unsigned long len = core->GetSoundMgr()->Play( sb.Sound );
-		if (len != 0)
-			actor->SetWait( ( AI_UPDATE_TIME * len ) / 1000 );
+		unsigned long counter = ( AI_UPDATE_TIME * len ) / 1000;
+		if (counter != 0)
+			actor->SetWait( counter );
 	}
 }
 
