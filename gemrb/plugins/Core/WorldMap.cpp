@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.6 2004/08/09 20:57:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.7 2004/10/01 19:40:38 avenger_teambg Exp $
  *
  */
 
@@ -54,3 +54,36 @@ WorldMap::~WorldMap(void)
 		core->GetVideoDriver()->FreeSprite(MapMOS);
 	}
 }
+
+void WorldMap::SetAreaStatus(char *AreaName, int Bits, int Op)
+{
+	WMPAreaEntry* ae=NULL;
+
+	int i=area_entries.size();
+	while(i--) {
+		if(!strnicmp(AreaName, area_entries[i]->AreaName,8)) {
+			ae=area_entries[i];
+			break;
+		}
+	}
+	if(!ae)
+		return;
+	switch(Op) {
+		case BM_SET:
+			ae->AreaStatus=Bits;
+			break;
+		case BM_AND:
+			ae->AreaStatus&=Bits;
+			break;
+		case BM_OR:
+			ae->AreaStatus|=Bits;
+			break;
+		case BM_XOR:
+			ae->AreaStatus^=Bits;
+			break;
+		case BM_NAND:
+			ae->AreaStatus&=~Bits;
+			break;
+	}
+}
+

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.6 2004/08/24 14:39:36 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.7 2004/10/01 19:40:38 avenger_teambg Exp $
  *
  */
 
@@ -42,7 +42,7 @@
 
 
 #define WMP_ENTRY_VISIBLE    0x1
-#define WMP_ENTRY_UNKNOWN    0x2   // unknown meaning
+#define WMP_ENTRY_ADJACENT   0x2   // visible from adjacent
 #define WMP_ENTRY_ACCESSIBLE 0x4
 #define WMP_ENTRY_VISITED    0x8
 
@@ -99,6 +99,7 @@ public:
 	void AddAreaLink(WMPAreaLink *al);
 	std::vector< WMPAreaEntry*> area_entries;
 	std::vector< WMPAreaLink*> area_links;
+	void SetAreaStatus(char *AreaName, int Bits, int Op);
 };
 
 #endif  // ! WORLDMAP_H

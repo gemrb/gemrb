@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.197 2004/09/22 19:36:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.198 2004/10/01 19:40:37 avenger_teambg Exp $
  *
  */
 
@@ -301,6 +301,7 @@ static ActionLink actionnames[] = {
 	{"deactivate", GameScript::Deactivate,0},
 	{"debug", GameScript::Debug,0},
 	{"debugoutput", GameScript::Debug,0},
+	{"deletejournalentry", GameScript::RemoveJournalEntry,0},
 	{"destroyalldestructableequipment", GameScript::DestroyAllDestructableEquipment,0},
 	{"destroyallequipment", GameScript::DestroyAllEquipment,0},
 	{"destroygold", GameScript::DestroyGold,0},
@@ -362,6 +363,7 @@ static ActionLink actionnames[] = {
 	{"globalsubglobal", GameScript::GlobalSubGlobal,AF_MERGESTRINGS},
 	{"globalxor", GameScript::GlobalXor,AF_MERGESTRINGS},
 	{"globalxorglobal", GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
+	{"hideareaonmap", GameScript::HideAreaOnMap,0},
 	{"hidecreature", GameScript::HideCreature,0},
 	{"hidegui", GameScript::HideGUI,0},
 	{"incinternal", GameScript::IncInternal,0},
@@ -440,6 +442,7 @@ static ActionLink actionnames[] = {
 	//this is in iwd2, same as movetosavedlocation, with a default variable
 	{"returntosavedlocation", GameScript::MoveToSavedLocation, AF_BLOCKING},
 	{"returntosavedplace", GameScript::MoveToSavedLocation, AF_BLOCKING},
+	{"revealareaonmap", GameScript::RevealAreaOnMap,0},
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint", GameScript::RunAwayFromPoint,AF_BLOCKING},
@@ -520,6 +523,7 @@ static ActionLink actionnames[] = {
 	{"takepartygold", GameScript::TakePartyGold,0},
 	{"takepartyitem", GameScript::TakePartyItem,0},
 	{"takepartyitemall", GameScript::TakePartyItemAll,0},
+	{"takepartyitemnum", GameScript::TakePartyItemNum,0},
 	{"textscreen", GameScript::TextScreen,0},
 	{"tomsstringdisplayer", GameScript::DisplayStringHead,0},
 	{"triggeractivation", GameScript::TriggerActivation,0},
@@ -7832,5 +7836,17 @@ void GameScript::Panic(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->NewStat(IE_STATE_ID, act->GetStat(IE_STATE_ID)|STATE_PANIC, MOD_ABSOLUTE);
+}
+
+void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
+{
+	WorldMap *worldmap = core->GetWorldMap();
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE, OP_OR);
+}
+
+void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
+{
+	WorldMap *worldmap = core->GetWorldMap();
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE, OP_NAND);
 }
 
