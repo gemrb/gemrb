@@ -41,7 +41,7 @@ public:
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(Region &rgn, Color &color) = 0;
 	/** Creates a Palette from Color */
-	virtual Color * CreatePalette(Color color) = 0;
+	virtual Color * CreatePalette(Color color, Color back) = 0;
 	/** Blits a Sprite filling the Region */
 	virtual void BlitTiled(Region rgn, Sprite2D * img, bool anchor = false) = 0;
 };
