@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.31 2004/01/17 15:45:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.32 2004/01/17 21:33:38 balrog994 Exp $
  *
  */
 
@@ -68,8 +68,8 @@ public:
 	int				YobjectPosition;
 	int				WobjectPosition;
 	int             HobjectPosition;
-	char            PositionMask[33];
-	char			objectName[33];
+	char            PositionMask[65];
+	char			objectName[65];
 private:
 	int				RefCount;
 public:
@@ -84,6 +84,7 @@ public:
 	}
 	void IncRef() {
 		RefCount++;
+		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
 		{
 			printf("Refcount increased to: %d in object\n",RefCount);
@@ -114,8 +115,8 @@ public:
 	int				int2Parameter;
 	int				XpointParameter;
 	int				YpointParameter;
-	char			string0Parameter[33];
-	char			string1Parameter[33];
+	char			string0Parameter[65];
+	char			string1Parameter[65];
 	Object*			objectParameter;
 private:
 	int				RefCount;
@@ -132,6 +133,7 @@ public:
 	}
 	void IncRef() {
 		RefCount++;
+		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
 		{
 			printf("Refcount increased to: %d in trigger\n",RefCount);
@@ -144,13 +146,18 @@ class GEM_EXPORT Condition {
 public:
 	Condition() {
 		RefCount = 1;
+		triggers = NULL;
+		triggersCount = 0;
 	};
 	~Condition() {
+		if(!triggers)
+			return;
 		for(int c = 0; c < triggersCount; c++) {
 			if(triggers[c])
 				triggers[c]->Release();
 		}
-		delete[] triggers;
+		//delete[] triggers;
+		delete triggers;
 		printf("Freeing Condition\n");
 	}
 public:
@@ -171,6 +178,7 @@ public:
 	}
 	void IncRef() {
 		RefCount++;
+		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
 		{
 			printf("Refcount increased to: %d in condition\n",RefCount);
@@ -210,8 +218,8 @@ public:
 	int				YpointParameter;
 	int				int1Parameter;
 	int				int2Parameter;
-	char			string0Parameter[33];
-	char			string1Parameter[33];
+	char			string0Parameter[65];
+	char			string1Parameter[65];
 private:
 	int				RefCount;
 public:
@@ -227,6 +235,7 @@ public:
 	}
 	void IncRef() {
 		RefCount++;
+		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
 		{
 			printf("Refcount increased to: %d in action %d\n",RefCount, actionID);
@@ -239,13 +248,19 @@ class GEM_EXPORT Response {
 public:
 	Response() {
 		RefCount = 1;
+		actions = NULL;
+		weight = 0;
+		actionsCount = 0;
 	};
 	~Response() {
+		if(!actions)
+			return;
 		for(int c = 0; c < actionsCount; c++) {
 			if(actions[c])
 				actions[c]->Release();
 		}
-		delete[] actions;
+		//delete[] actions;
+		delete actions;
 		printf("Freeing Response\n");
 	}
 public:
@@ -267,6 +282,7 @@ public:
 	}
 	void IncRef() {
 		RefCount++;
+		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
 		{
 			printf("Refcount increased to: %d in response\n",RefCount);
@@ -279,13 +295,18 @@ class GEM_EXPORT ResponseSet {
 public:
 	ResponseSet() {
 		RefCount = 1;
+		responses = NULL;
+		responsesCount = 0;
 	};
 	~ResponseSet() {
+		if(!responses)
+			return;
 		for(int b = 0; b < responsesCount; b++) {
 			Response * rP = responses[b];
 			rP->Release();
 		}
-		delete[] responses;
+		//delete[] responses;
+		delete responses;
 		printf("Freeing ResponseSet\n");
 	}
 public:
@@ -306,6 +327,7 @@ public:
 	}
 	void IncRef() {
 		RefCount++;
+		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
 		{
 			printf("Refcount increased to: %d\n",RefCount);
@@ -318,6 +340,8 @@ class GEM_EXPORT ResponseBlock {
 public:
 	ResponseBlock() {
 		RefCount = 1;
+		condition = NULL;
+		responseSet = NULL;
 	};
 	~ResponseBlock() {
 		if(condition)
@@ -344,6 +368,7 @@ public:
 	}
 	void IncRef() {
 		RefCount++;
+		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
 		{
 			printf("Refcount increased to: %d\n",RefCount);
@@ -386,7 +411,8 @@ private:
 			if(responseBlocks[i])
 				responseBlocks[i]->Release();
 		}
-		delete[] responseBlocks;
+		//delete[] responseBlocks;
+		delete responseBlocks;
 	}
 public:
 	unsigned int responseBlocksCount;
@@ -407,6 +433,7 @@ public:
 	}
 	void IncRef() {
 		RefCount++;
+		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
 		{
 			printf("Refcount increased to: %d\n",RefCount);
