@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.21 2003/11/27 22:13:28 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.22 2003/11/27 23:13:55 avenger_teambg Exp $
  *
  */
 
@@ -247,5 +247,4 @@ void Map::PlayAreaSong(int SongType)
 	}
         char *poi=tm->QueryField(SongHeader.SongList[SongType],column);
         core->GetMusicMgr()->SwitchPlayList(poi, true);
-        core->FreeInterface(tm);
 }
