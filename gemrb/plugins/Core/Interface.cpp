@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.91 2003/12/09 20:54:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.92 2003/12/09 23:09:07 avenger_teambg Exp $
  *
  */
 
@@ -644,30 +644,38 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "GUIScriptsPath") == 0) {
 			strcpy(GUIScriptsPath, value);
+			ResolveFilePath(GUIScriptsPath);
 		}
 		else if(stricmp(name, "GamePath") == 0) {
 			strcpy(GamePath, value);
+			ResolveFilePath(GamePath);
 		}
 		else if(stricmp(name, "INIConfig") == 0) {
 			strcpy(INIConfig, value);
 		}
 		else if(stricmp(name, "CD1") == 0) {
 			strcpy(CD1, value);
+			ResolveFilePath(CD1);
 		}
 		else if(stricmp(name, "CD2") == 0) {
 			strcpy(CD2, value);
+			ResolveFilePath(CD2);
 		}
 		else if(stricmp(name, "CD3") == 0) {
 			strcpy(CD3, value);
+			ResolveFilePath(CD3);
 		}
 		else if(stricmp(name, "CD4") == 0) {
 			strcpy(CD4, value);
+			ResolveFilePath(CD4);
 		}
 		else if(stricmp(name, "CD5") == 0) {
 			strcpy(CD5, value);
+			ResolveFilePath(CD5);
 		}
 		else if(stricmp(name, "CD6") == 0) {
 			strcpy(CD6, value);
+			ResolveFilePath(CD6);
 		}
 	}
 	fclose(config);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.4 2003/12/08 16:16:19 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.5 2003/12/09 23:09:07 avenger_teambg Exp $
  *
  */
 
@@ -40,6 +40,8 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserv
 	return true;
 }
 #endif
+
+#include "../../includes/globals.h"
 
 #ifndef S_ISDIR
 #define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
@@ -111,6 +113,43 @@ char *strlwr(char *string)
                         *s = tolower(*s);
         }
         return string;
+}
+
+void ResolveFilePath(char *FilePath)
+{
+        char TempFilePath[_MAX_PATH];
+        char TempFileName[_MAX_PATH];
+        int j, pos;
+
+        TempFilePath[0]=FilePath[0];
+        for(pos=1;FilePath[pos] && FilePath[pos]!='/';pos++)
+                TempFilePath[pos]=FilePath[pos];
+        TempFilePath[pos]=0;
+        while(FilePath[pos]=='/') {
+                pos++;
+                for(j=0;FilePath[pos+j] && FilePath[pos+j]!='/';j++) {
+                        TempFileName[j]=FilePath[pos+j];
+                }
+                TempFileName[j]=0;
+                pos+=j;
+                char *NewName = FindInDir(TempFilePath, TempFileName);
+                if(NewName) {
+                        strcat(TempFilePath, SPathDelimiter);
+                        strcat(TempFilePath, NewName);
+                        free(NewName);
+                }
+                else {
+			if(j)
+	                        return;
+			else {
+				strcat(TempFilePath, SPathDelimiter);
+			}	
+		}
+        }
+        //should work (same size)
+	printf("Old filepath: %s\n",FilePath);
+        strcpy(FilePath,TempFilePath);
+	printf("New filepath: %s\n",FilePath);
 }
 
 #endif
