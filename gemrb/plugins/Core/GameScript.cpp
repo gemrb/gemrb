@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.20 2003/12/23 23:32:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.21 2003/12/25 23:55:08 balrog994 Exp $
  *
  */
 
@@ -554,6 +554,8 @@ void GameScript::ExecuteString(char * String)
 	if(String[0] == 0)
 		return;
 	Action * act = GenerateAction(String);
+	if(!act)
+		return;
 	ExecuteAction(this, act);
 	if(act->string0Parameter)
 		free(act->string0Parameter);
