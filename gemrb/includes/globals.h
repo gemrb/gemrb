@@ -2,11 +2,12 @@
 #define GLOBALS_H
 
 #ifndef WIN32
-#include <config.h>
+#include "../../config.h"
 #endif
 
-typedef unsigned char Byte;
-typedef unsigned int  DWORD;
+#include "ie_types.h"
+typedef ie_uint8  Byte;
+typedef ie_uint32 DWORD;
 
 #define GEMRB_RELEASE 200		//GemRB Release version multiplied by 1000 (i.e. 1200 = 1.2 | 10 = 0.01 )
 #define GEMRB_API_NUM 2			//GemRB API Version

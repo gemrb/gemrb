@@ -1,7 +1,9 @@
 #ifndef SCLASS_ID_H
 #define SCLASS_ID_H
 
-typedef unsigned int SClass_ID;
+#include "ie_types.h"
+
+typedef ie_uint32 SClass_ID;
 
 #define IE_2DA_CLASS_ID			0x000003F4
 #define IE_ACM_CLASS_ID			0x00010000
