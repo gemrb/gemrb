@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.18 2003/11/26 22:04:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.19 2003/11/26 22:31:24 balrog994 Exp $
  *
  */
 
@@ -201,6 +201,21 @@ ActorBlock * Map::GetActor(int x, int y)
 	}
 	return NULL;
 }
+int Map::GetActorInRect(ActorBlock ** & actors, Region &rgn)
+{
+	actors = (ActorBlock**)malloc(this->actors.size()*sizeof(ActorBlock*));
+	int count = 0;
+	for(int i = 0; i < this->actors.size(); i++) {
+		ActorBlock *actor = &this->actors.at(i);
+		if((actor->MinX > (rgn.x+rgn.w)) || (actor->MinY > (rgn.y+rgn.h)))
+			continue;
+		if((actor->MaxX < rgn.x) || (actor->MaxY < rgn.y))
+			continue;
+		actors[count++] = actor;
+	}
+	actors = (ActorBlock**)realloc(actors, count*sizeof(ActorBlock*));
+	return count;
+}
 
 void Map::PlayAreaSong(int SongType)
 {
@@ -230,4 +245,3 @@ void Map::PlayAreaSong(int SongType)
         core->GetMusicMgr()->SwitchPlayList(poi, true);
         core->DelTable(songlist);
 }
-
