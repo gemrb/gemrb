@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.41 2004/11/29 22:19:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.42 2005/01/22 10:15:18 avenger_teambg Exp $
  *
  */
 
@@ -32,7 +32,9 @@ TLKImp::TLKImp(void)
 	str = NULL;
 	autoFree = false;
 	if (monthnamecount==0) {
+		int i;
 		TableMgr * tab;
+
 		int table=core->LoadTable("months");
 		if(table<0) {
 			monthnamecount=-1;
@@ -46,7 +48,7 @@ TLKImp::TLKImp(void)
 		monthnamecount = tab->GetRowCount();
 		monthnames = (int *) malloc(sizeof(int) * monthnamecount);
 		days = (int *) malloc(sizeof(int) * monthnamecount);
-		for(int i=0;i<monthnamecount;i++) {
+		for(i=0;i<monthnamecount;i++) {
 			days[i]=atoi(tab->QueryField(i,0));
 			monthnames[i]=atoi(tab->QueryField(i,1));
 		}
