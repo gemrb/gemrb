@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.83 2004/03/20 23:21:58 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.84 2004/03/23 18:25:35 avenger_teambg Exp $
  *
  */
 
@@ -266,8 +266,10 @@ public:
 	int LoadScript(const char * ResRef);
 	/** Sets a Variable in the Game Script Engine */
 	void SetGameVariable(const char * VarName, const char * Context, int value);
-	/** Enables/Disables the Cut Scene Mode */
+	/** Enables/Disables the CutScene Mode */
 	void SetCutSceneMode(bool active);
+	/** returns true if in cutscene mode */
+	bool InCutSceneMode();
 	/** Updates the Game Script Engine State */
 	void GSUpdate()
 	{

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.83 2004/03/22 18:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.84 2004/03/23 18:25:35 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,11 @@ class Action;
 #include "SymbolMgr.h"
 #include "Actor.h"
 #include <list>
+
+#define BM_AND  1
+#define BM_OR   2
+#define BM_XOR  3
+#define BM_NAND 4
 
 #define MAX_OBJECT_FIELDS	10
 #define MAX_NESTING			5
@@ -725,6 +730,8 @@ public: //Script Functions
 	static int AreaFlag(Scriptable* Sender, Trigger* parameter);
 	static int AreaType(Scriptable* Sender, Trigger* parameter);
 	static int BitCheck(Scriptable* Sender, Trigger* parameters);
+	static int BitCheckExact(Scriptable* Sender, Trigger* parameters);
+	static int BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int BreakingPoint(Scriptable* Sender, Trigger* parameters);
 	static int CheckStat(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatGT(Scriptable* Sender, Trigger* parameters);
@@ -739,6 +746,7 @@ public: //Script Functions
 	static int General(Scriptable* Sender, Trigger* parameters);
 	static int Global(Scriptable* Sender, Trigger* parameters);
 	static int GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
+	static int GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int GlobalGT(Scriptable* Sender, Trigger* parameters);
 	static int GlobalGTGlobal(Scriptable* Sender, Trigger* parameters);
 	static int GlobalLT(Scriptable* Sender, Trigger* parameters);
@@ -757,6 +765,7 @@ public: //Script Functions
 	static int HPPercentGT(Scriptable* Sender, Trigger* parameters);
 	static int HPPercentLT(Scriptable* Sender, Trigger* parameters);
 	static int InActiveArea(Scriptable* Sender, Trigger* parameter);
+	static int InCutSceneMode(Scriptable *Sender, Trigger* parameter);
 	static int InMyArea(Scriptable* Sender, Trigger* parameter);
 	static int InParty(Scriptable* Sender, Trigger* parameters);
 	static int InPartyAllowDead(Scriptable* Sender, Trigger* parameters);
@@ -773,6 +782,7 @@ public: //Script Functions
 	static int Morale(Scriptable* Sender, Trigger* parameters);
 	static int MoraleGT(Scriptable* Sender, Trigger* parameters);
 	static int MoraleLT(Scriptable* Sender, Trigger* parameters);
+	static int NearLocation(Scriptable* Sender, Trigger* parameters);
 	static int NotStateCheck(Scriptable* Sender, Trigger* parameters);
 	static int NumCreatures(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesGT(Scriptable* Sender, Trigger* parameters);
@@ -828,6 +838,7 @@ public:
 	static void AddXPObject(Scriptable *Sender, Action* parameters);
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
+	static void BitGlobal(Scriptable* Sender, Action* parameters);
 	static void BitClear(Scriptable* Sender, Action* parameters);
 	static void ChangeAIScript(Scriptable* Sender, Action* parameters);
 	static void ChangeAlignment(Scriptable* Sender, Action* parameters);
@@ -877,6 +888,7 @@ public:
 	static void GlobalAndGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalBAnd(Scriptable* Sender, Action* parameters);
 	static void GlobalBAndGlobal(Scriptable* Sender, Action* parameters);
+	static void GlobalBitGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalBOr(Scriptable* Sender, Action* parameters);
 	static void GlobalBOrGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalMax(Scriptable* Sender, Action* parameters);
@@ -908,6 +920,7 @@ public:
 	static void LeaveParty(Scriptable* Sender, Action* parameters);
 	static void Lock(Scriptable* Sender, Action* parameters);
 	static void MakeGlobal(Scriptable* Sender, Action* parameters);
+	static void MakeUnselectable(Scriptable* Sender, Action* parameters);
 	static void MoraleDec(Scriptable* Sender, Action* parameters);
 	static void MoraleInc(Scriptable* Sender, Action* parameters);
 	static void MoraleSet(Scriptable* Sender, Action* parameters);
@@ -929,6 +942,7 @@ public:
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
 	static void SetTeam(Scriptable* Sender, Action* parameters);
 	static void SetTextColor(Scriptable* Sender, Action* parameters);
+	static void SetVisualRange(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaFlag(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaType(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.141 2004/03/22 18:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.142 2004/03/23 18:25:35 avenger_teambg Exp $
  *
  */
 
@@ -323,8 +323,7 @@ int Interface::Init()
 			if (needpalette) {
 				Color fore = {0xff, 0xff, 0xff, 0x00},
 					back = {0x00, 0x00, 0x00, 0x00};
-				Color* pal = core->GetVideoDriver()->CreatePalette( fore,
-														back );
+				Color* pal = video->CreatePalette( fore, back );
 				memcpy( fnt->GetPalette(), pal, 256 * sizeof( Color ) );
 				free( pal );
 			}
@@ -1770,9 +1769,15 @@ void Interface::SetGameVariable(const char* VarName, const char* Context,
 /** Enables/Disables the Cut Scene Mode */
 void Interface::SetCutSceneMode(bool active)
 {
-	Window* win = GetWindow( 0 );
-	GameControl* gc = ( GameControl* ) win->GetControl( 0 );
-	gc->SetCutSceneMode( active );
+	GameControl *gc=GetGameControl();
+	if(gc) {
+		gc->SetCutSceneMode( active );
+	}
+}
+
+bool Interface::InCutSceneMode()
+{
+       return video->DisableMouse;
 }
 
 void Interface::LoadGame(int index)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.115 2004/03/22 18:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.116 2004/03/23 18:25:35 avenger_teambg Exp $
  *
  */
 
@@ -63,6 +63,9 @@ static TriggerLink triggernames[] = {
 	{"areatype", GameScript::AreaType},
 	{"areaflag", GameScript::AreaFlag},
 	{"bitcheck",GameScript::BitCheck},
+	{"bitcheckexact",GameScript::BitCheckExact},
+	{"bitglobal",GameScript::BitGlobal_Trigger},
+	{"globalbitglobal",GameScript::GlobalBitGlobal_Trigger},
 	{"breakingpoint",GameScript::BreakingPoint},
 	{"checkstat",GameScript::CheckStat},
 	{"checkstatgt",GameScript::CheckStatGT},
@@ -91,6 +94,7 @@ static TriggerLink triggernames[] = {
 	{"hppercentgt", GameScript::HPPercentGT},
 	{"hppercentlt", GameScript::HPPercentLT},
 	{"inactivearea", GameScript::InActiveArea},
+	{"incutscenemode", GameScript::InCutSceneMode},
 	{"inmyarea", GameScript::InMyArea},
 	{"inparty", GameScript::InParty},
 	{"inpartyallowdead", GameScript::InPartyAllowDead},
@@ -125,6 +129,7 @@ static TriggerLink triggernames[] = {
 	{"openstate", GameScript::OpenState},
 	{"or", GameScript::Or},
 	{"ownsfloatermessage", GameScript::OwnsFloaterMessage},
+	{"nearlocation", GameScript::NearLocation},
 	{"partycounteq", GameScript::PartyCountEQ},
 	{"partycountgt", GameScript::PartyCountGT},
 	{"partycountlt", GameScript::PartyCountLT},
@@ -163,8 +168,9 @@ static ActionLink actionnames[] = {
 	{"ally",GameScript::Ally,0},
 	{"ambientactivate",GameScript::AmbientActivate,0},
 	{"bashdoor",GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
-	{"bitclear",GameScript::BitClear,0},
-	{"bitset",GameScript::GlobalBOr,0}, //probably the same
+	{"bitclear",GameScript::BitClear,AF_MERGESTRINGS},
+	{"bitglobal",GameScript::BitGlobal,AF_MERGESTRINGS},
+	{"bitset",GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
 	{"changeaiscript",GameScript::ChangeAIScript,0},
 	{"changealignment",GameScript::ChangeAlignment,0},
 	{"changeallegiance",GameScript::ChangeAllegiance,0},
@@ -214,6 +220,7 @@ static ActionLink actionnames[] = {
 	{"globalandglobal",GameScript::GlobalAndGlobal,AF_MERGESTRINGS},
 	{"globalband",GameScript::GlobalBAnd,AF_MERGESTRINGS},
 	{"globalbandglobal",GameScript::GlobalBAndGlobal,AF_MERGESTRINGS},
+	{"globalbitglobal",GameScript::GlobalBitGlobal, AF_MERGESTRINGS},
 	{"globalbor",GameScript::GlobalBOr,AF_MERGESTRINGS},
 	{"globalborglobal",GameScript::GlobalBOrGlobal,AF_MERGESTRINGS},
 	{"globalmax",GameScript::GlobalMax,AF_MERGESTRINGS},
@@ -221,6 +228,7 @@ static ActionLink actionnames[] = {
 	{"globalmin",GameScript::GlobalMin,AF_MERGESTRINGS},
 	{"globalminglobal",GameScript::GlobalMinGlobal,AF_MERGESTRINGS},
 	{"globalorglobal",GameScript::GlobalOrGlobal,AF_MERGESTRINGS},
+	{"globalset",GameScript::SetGlobal,AF_MERGESTRINGS},
 	{"globalsetglobal",GameScript::GlobalSetGlobal,AF_MERGESTRINGS},
 	{"globalshl",GameScript::GlobalShL,AF_MERGESTRINGS},
 	{"globalshlglobal",GameScript::GlobalShLGlobal,AF_MERGESTRINGS},
@@ -244,6 +252,7 @@ static ActionLink actionnames[] = {
 	{"leavearealuapanicentry",GameScript::LeaveAreaLUAPanicEntry,0},
 	{"leaveparty",GameScript::LeaveParty,0},
 	{"makeglobal",GameScript::MakeGlobal,0},
+	{"makeunselectable",GameScript::MakeUnselectable,0},
 	{"moraledec",GameScript::MoraleDec,0},
 	{"moraleinc",GameScript::MoraleInc,0},
 	{"moraleset",GameScript::MoraleSet,0},
@@ -273,6 +282,7 @@ static ActionLink actionnames[] = {
 	{"setmoraleai",GameScript::SetMoraleAI,0},
 	{"setteam",GameScript::SetTeam,0},
 	{"settextcolor",GameScript::SetTextColor,0},
+	{"setvisualrange",GameScript::SetVisualRange,0},
 	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt",GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint",GameScript::RunAwayFromPoint,AF_BLOCKING},
@@ -423,6 +433,7 @@ static ObjectLink* FindObject(const char* objectname)
 		return NULL;
 	}
 	int len = strlench( objectname, '(' );
+		
 	for (int i = 0; objectnames[i].Name; i++) {
 		if (!strnicmp( objectnames[i].Name, objectname, len )) {
 			return objectnames + i;
@@ -445,6 +456,13 @@ static IDSLink* FindIdentifier(const char* idsname)
 	}
 	printf( "Warning: Couldn't assign ids target: %.*s\n", len, idsname );
 	return NULL;
+}
+
+static int Distance(int X, int Y, Scriptable *b)
+{
+	long x = ( X - b->XPos );
+	long y = ( Y - b->YPos );
+	return (int) sqrt( ( double ) ( x* x + y* y ) );
 }
 
 static int Distance(Scriptable *a, Scriptable *b)
@@ -1579,10 +1597,21 @@ Action* GameScript::GenerateAction(char* String)
 {
 	strlwr( String );
 	Action* newAction = NULL;
+/*
 	int i = 0;
 	//this could be significantly optimized if we store them in a mapping
 	//or at least use bsearch
+*/
+	int len = strlench(String,'(');
 	printf("Compiling:%s\n",String);
+	int i = actionsTable->FindString(String, len);
+	if (i<0) {
+		return newAction;
+	}
+	char *src = String+len;
+	char *str = actionsTable->GetStringIndex( i )+len;
+	newAction = GenerateActionCore( src, str, i);
+/*
 	while (true) {
 		char* src = String;
 		char* str = actionsTable->GetStringIndex( i );
@@ -1603,6 +1632,7 @@ Action* GameScript::GenerateAction(char* String)
 		}
 		i++;
 	}
+*/
 	return newAction;
 }
 
@@ -2536,30 +2566,67 @@ int GameScript::Specific(Scriptable* Sender, Trigger* parameters)
 int GameScript::BitCheck(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
-	int eval = ( value& parameters->int0Parameter ) ? 1 : 0;
-	return eval;
+	return ( value& parameters->int0Parameter ) !=0;
+}
+
+int GameScript::BitCheckExact(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
+	return (value & parameters->int0Parameter ) ==parameters->int0Parameter;
+}
+
+//BM_OR would make sense only if this trigger changes the value of the variable
+//should I do that???
+int GameScript::BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
+	switch(parameters->int1Parameter) {
+		case BM_AND:
+			return ( value& parameters->int0Parameter ) !=0;
+		case BM_OR:
+			return ( value| parameters->int0Parameter ) !=0;
+		case BM_XOR:
+			return ( value^ parameters->int0Parameter ) !=0;
+		case BM_NAND:
+			return ( value& ~parameters->int0Parameter ) !=0;
+	}
+	return 0;
+}
+
+int GameScript::GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
+	switch(parameters->int0Parameter) {
+		case BM_AND:
+			return ( value1& value2 ) !=0;
+		case BM_OR:
+			return ( value1| value2 ) !=0;
+		case BM_XOR:
+			return ( value1^ value2 ) !=0;
+		case BM_NAND:
+			return ( value1& ~value2 ) !=0;
+	}
+	return 0;
 }
 
 //would this function also alter the variable?
 int GameScript::Xor(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
-	int eval = ( value ^ parameters->int0Parameter ) ? 1 : 0;
-	return eval;
+	return ( value ^ parameters->int0Parameter ) != 0;
 }
 
 int GameScript::Global(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
-	int eval = ( value == parameters->int0Parameter ) ? 1 : 0;
-	return eval;
+	return ( value == parameters->int0Parameter );
 }
 
 int GameScript::GlobalLT(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
-	int eval = ( value < parameters->int0Parameter ) ? 1 : 0;
-	return eval;
+	return ( value < parameters->int0Parameter );
 }
 
 int GameScript::GlobalLTGlobal(Scriptable* Sender, Trigger* parameters)
@@ -2572,8 +2639,7 @@ int GameScript::GlobalLTGlobal(Scriptable* Sender, Trigger* parameters)
 int GameScript::GlobalGT(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
-	int eval = ( value > parameters->int0Parameter ) ? 1 : 0;
-	return eval;
+	return ( value > parameters->int0Parameter );
 }
 
 int GameScript::GlobalGTGlobal(Scriptable* Sender, Trigger* parameters)
@@ -2587,8 +2653,7 @@ int GameScript::GlobalsEqual(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
 	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
-	int eval = ( value1 == value2 ) ? 1 : 0;
-	return eval;
+	return ( value1 == value2 );
 }
 
 int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
@@ -2597,8 +2662,7 @@ int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 	unsigned long value2;
 
 	GetTime(value2); //this should be game time
-	int eval = ( value1 == value2 ) ? 1 : 0;
-	return eval;
+	return ( value1 == value2 );
 }
 
 int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
@@ -2607,8 +2671,7 @@ int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 	unsigned long value2;
 
 	GetTime(value2);
-	int eval = ( value1 < value2 ) ? 1 : 0;
-	return eval;
+	return ( value1 < value2 );
 }
 
 int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
@@ -2617,13 +2680,12 @@ int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 	unsigned long value2;
 
 	GetTime(value2);
-	int eval = ( value1 > value2 ) ? 1 : 0;
-	return eval;
+	return ( value1 > value2 );
 }
 
 int GameScript::OnCreation(Scriptable* Sender, Trigger* parameters)
 {
-	return Sender->OnCreation;
+	return Sender->OnCreation; //hopefully this is always 1 or 0
 /* oncreation is about the script, not the owner area, oncreation is
    working in ANY script */
 /*
@@ -2731,6 +2793,19 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	int distance = Distance(Sender, scr);
+	if (distance <= ( parameters->int0Parameter * 20 )) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		return 0;
+	}
+	int distance = Distance(parameters->XpointParameter, parameters->YpointParameter, scr);
 	if (distance <= ( parameters->int0Parameter * 20 )) {
 		return 1;
 	}
@@ -3422,9 +3497,13 @@ int GameScript::GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 							parameters->string0Parameter );
 	unsigned long value2 = CheckVariable( Sender,
 							parameters->string1Parameter );
-	return value1 && value2; //should be 1 or 0!
+	return (value1 && value2)!=0; //should be 1 or 0!
 }
 
+int GameScript::InCutSceneMode(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	return core->InCutSceneMode();
+}
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -5267,5 +5346,56 @@ void GameScript::SetTextColor(Scriptable* Sender, Action* parameters)
 		memcpy(&color,&parameters->int0Parameter,4);
 		gc->SetInfoTextColor( color );
 	}
+}
+
+void GameScript::BitGlobal(Scriptable* Sender, Action* parameters)
+{
+	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
+	switch(parameters->int1Parameter) {
+		case BM_AND:
+			value = ( value& parameters->int0Parameter );
+		case BM_OR:
+			value = ( value| parameters->int0Parameter );
+		case BM_XOR:
+			value = ( value^ parameters->int0Parameter );
+		case BM_NAND:
+			value = ( value& ~parameters->int0Parameter );
+	}
+	SetVariable(Sender, parameters->string0Parameter, value);
+}
+
+void GameScript::GlobalBitGlobal(Scriptable* Sender, Action* parameters)
+{
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value2 = CheckVariable(Sender, parameters->string1Parameter );
+	switch(parameters->int1Parameter) {
+		case BM_AND:
+			value1 = ( value1& value2);
+		case BM_OR:
+			value1 = ( value1| value2);
+		case BM_XOR:
+			value1 = ( value1^ value2);
+		case BM_NAND:
+			value1 = ( value1& ~value2);
+	}
+	SetVariable(Sender, parameters->string0Parameter, value1);
+}
+
+void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->SetStat(IE_VISUALRANGE,parameters->int0Parameter);
+}
+
+void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->SetStat(IE_UNSELECTABLE,parameters->int0Parameter);
 }
 
