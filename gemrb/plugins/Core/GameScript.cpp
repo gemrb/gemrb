@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.32 2004/01/04 21:25:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.33 2004/01/05 12:09:24 balrog994 Exp $
  *
  */
 
@@ -460,6 +460,8 @@ Object * GameScript::DecodeObject(const char * line)
 
 bool GameScript::EvaluateCondition(Scriptable * Sender, Condition * condition)
 {
+	bool ORing = false;
+	int ORcount = 0;
 	bool ret = true;
 	for(int i = 0; i < condition->triggersCount; i++) {
 		Trigger * tR = condition->triggers[i];
@@ -885,7 +887,7 @@ Trigger * GameScript::GenerateTrigger(char * String)
 				break;
 			if(*str == '(') {
 				newTrigger = new Trigger();
-				newTrigger->triggerID = triggersTable->GetValueIndex(i);
+				newTrigger->triggerID = (triggersTable->GetValueIndex(i)&0xff);
 				newTrigger->objectParameter = NULL;
 				newTrigger->string0Parameter = NULL;
 				newTrigger->string1Parameter = NULL;
