@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.7 2004/02/01 19:43:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.8 2004/02/08 11:49:55 avenger_teambg Exp $
  *
  */
 
@@ -368,7 +368,41 @@ void InitGames()
 		"",					//CD5
 		""}					//CD6
 	};
-	games.push_back(bg2);
+	GameStruct tob = {
+		"Throne of Bhaal",	//Name
+		"tob",				//GameType
+		640,				//Width
+		480,				//Height
+		32,					//Bpp
+		0,					//FullScreen
+		0,					//CaseSensitive
+		0,					//GameOnCD
+		0,					//ScrollBarPatch
+		0,					//AllStringsTagged
+		0,					//MidResAvatars
+		1,					//HasSongList
+		1,					//UpperButtonText
+		1,					//LowerLabelText		
+		0,					//HasPartyINI
+		0,					//ForceStereo
+		"CAROT",			//CursorBAM
+		"",					//GameDataPath
+		"",					//GameOverridePath
+		"",					//ButtonFont
+		"",					//GemRBPath
+		"",					//CachePath
+		"",					//GUIScriptsPath
+		"",					//GamePath
+		"baldur.ini",		//INIConfig
+		4,					//CDCount
+		{"",					//CD1
+		"",					//CD2
+		"",					//CD3
+		"",					//CD4
+		"",					//CD5
+		""}					//CD6
+	};
+	games.push_back(tob);
 	GameStruct iwd = {
 		"IceWind Dale",		//Name
 		"iwd",				//GameType
