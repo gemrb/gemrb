@@ -370,7 +370,7 @@ static PyObject * GemRB_Quit(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject * GemRB_PlayMusicPL(PyObject *self, PyObject *args)
+static PyObject * GemRB_LoadMusicPL(PyObject *self, PyObject *args)
 {
 	char* ResRef;
 
@@ -383,6 +383,12 @@ static PyObject * GemRB_PlayMusicPL(PyObject *self, PyObject *args)
 	if(!ret)
 		return NULL;
 
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_StartPL(PyObject *self, PyObject *args)
+{	
 	core->GetMusicMgr()->Start();
 
 	Py_INCREF(Py_None);
@@ -392,6 +398,14 @@ static PyObject * GemRB_PlayMusicPL(PyObject *self, PyObject *args)
 static PyObject * GemRB_SoftEndPL(PyObject *self, PyObject *args)
 {	
 	core->GetMusicMgr()->End();
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_HardEndPL(PyObject *self, PyObject *args)
+{	
+	core->GetMusicMgr()->HardEnd();
 
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -443,11 +457,17 @@ static PyMethodDef GemRBMethods[] = {
 	{"PlaySound", GemRB_PlaySound, METH_VARARGS,
      "Plays a Sound."},
 
-	{"PlayMusicPL", GemRB_PlayMusicPL, METH_VARARGS,
-     "Plays a Music PlayList."},
+	{"LoadMusicPL", GemRB_LoadMusicPL, METH_VARARGS,
+     "Loads a Music PlayList."},
+
+	{"StartPL", GemRB_StartPL, METH_NOARGS,
+     "Starts a Music Playlist."},
 
 	{"SoftEndPL", GemRB_SoftEndPL, METH_NOARGS,
      "Ends a Music Playlist softly."},
+
+ 	{"HardEndPL", GemRB_HardEndPL, METH_NOARGS,
+     "Ends a Music Playlist immediately."},
 
 	{"Quit", GemRB_Quit, METH_NOARGS,
      "Quits GemRB."},

@@ -55,6 +55,7 @@ public:
   void SwitchPlayList(const char * name);
   /** Ends the Current PlayList Execution */
   void End();
+  void HardEnd();
   /** Start the PlayList Music Execution */
   void Start();
   /** Plays the Next Entry */

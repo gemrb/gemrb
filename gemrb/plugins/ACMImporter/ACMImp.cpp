@@ -322,7 +322,7 @@ bool ACMImp::Stop(unsigned long index)
 	if(streams[index].free)
 		return true;
 	if(streams[index].playing)
-	FSOUND_Stream_Stop(streams[index].stream);
+		FSOUND_Stream_Stop(streams[index].stream);
 	//streams[index].channel = FSOUND_Stream_Play(FSOUND_FREE, streams[index].stream);
 	//FSOUND_Stream_SetTime(streams[index].stream, 0);
 	//FSOUND_SetPaused(streams[index].channel, true);

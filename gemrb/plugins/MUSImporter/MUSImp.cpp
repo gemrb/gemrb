@@ -40,10 +40,12 @@ bool MUSImp::Init()
 /** Loads a PlayList for playing */
 bool MUSImp::OpenPlaylist(const char * name)
 {
-	playlist.clear();
-	PLpos = 0;
 	if(stricmp(name, PLName) == 0)
 		return true;
+	if(Playing)
+		return false;
+	playlist.clear();
+	PLpos = 0;
 	char path[_MAX_PATH];
 	strcpy(path, core->GamePath);
 	strcat(path, "music");
@@ -138,9 +140,11 @@ bool MUSImp::OpenPlaylist(const char * name)
       		strcpy(FName, core->GamePath);
 			strcat(FName, "music");
 			strcat(FName, SPathDelimiter);
-			strcat(FName, PLName);
-			strcat(FName, SPathDelimiter);
-			strcat(FName, PLName);
+			if(stricmp(pls.PLFile, "SPC1") != 0) {
+				strcat(FName, PLName);
+				strcat(FName, SPathDelimiter);
+				strcat(FName, PLName);
+			}
 			strcat(FName, pls.PLFile);
 			strcat(FName, ".acm");
 			pls.soundID = core->GetSoundMgr()->LoadFile(FName);
@@ -197,9 +201,11 @@ void MUSImp::End()
 			strcpy(FName, core->GamePath);
 			strcat(FName, "music");
 			strcat(FName, SPathDelimiter);
-			strcat(FName, PLName);
-			strcat(FName, SPathDelimiter);
-			strcat(FName, PLName);
+			if(stricmp(pls.PLFile, "SPC1") != 0) {
+				strcat(FName, PLName);
+				strcat(FName, SPathDelimiter);
+				strcat(FName, PLName);
+			}
 			strcat(FName, playlist[PLpos].PLEnd);
 			strcat(FName, ".acm");
 			//core->GetSoundMgr()->Stop(lastSound);
@@ -209,15 +215,26 @@ void MUSImp::End()
 			PLnext = playlist.size()-1;
 		}
 		else
-			core->GetSoundMgr()->Stop(lastSound);
+			//core->GetSoundMgr()->Stop(lastSound);
+			PLnext = -1;
 	}
 }
+
+void MUSImp::HardEnd()
+{
+	core->GetSoundMgr()->Stop(lastSound);
+	Playing = false;
+	PLpos = 0;
+}
+
 /** Switches the current PlayList while playing the current one */
 void MUSImp::SwitchPlayList(const char * name){
 }
 /** Plays the Next Entry */
 void MUSImp::PlayNext()
 {
+	if(!Playing)
+		return;
 	if(PLnext != -1) {
 		lastSound = playlist[PLnext].soundID;
 		PLpos = PLnext;
@@ -239,6 +256,8 @@ void MUSImp::PlayNext()
 				PLnext=PLpos+1;
 		}
 	}
+	else
+		Playing = false;
 	/*if(playlist[PLpos].PLLoop[0] != 0) {
 		printf("Looping...\n");
 		for(int i = 0; i < playlist.size(); i++) {
