@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.58 2005/03/14 11:14:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.59 2005/03/14 16:42:30 avenger_teambg Exp $
  *
  */
 
@@ -256,12 +256,17 @@ public:
 	Gem_Polygon* open;
 	Gem_Polygon* closed;
 	Point* open_ib;   //impeded blocks stored in a Point array
+	int oibcount;
 	Point* closed_ib;
+	int cibcount;
 	Point toOpen[2];
 	ieResRef OpenSound;
 	ieResRef CloseSound;
+	ieResRef LockSound;
+	ieResRef UnLockSound;
 private:
 	void ToggleTiles(int State, bool playsound = false);
+	void UpdateDoor();
 public:
 	void SetName(const char* Name);
 	void SetScriptName(const char* Name);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.12 2004/12/14 22:37:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.13 2005/03/14 16:42:33 avenger_teambg Exp $
  *
  */
 
@@ -40,10 +40,13 @@ public:
 	Sprite2D* GetImage();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
-	/** Gets a Pixel Index from the Image */
+	/** Gets a Pixel Index from the Image (not implemented) */
 	unsigned int GetPixelIndex(unsigned int /*x*/, unsigned int /*y*/)
 	{
 		return 0;
+	}
+	void SetPixelIndex(unsigned int /*x*/, unsigned int /*y*/, int /*idx*/)
+	{
 	}
 	/** Gets a Pixel from the Image */
 	Color GetPixel(unsigned int /*x*/, unsigned int /*y*/)

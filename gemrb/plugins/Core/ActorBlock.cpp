@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.73 2005/03/14 11:14:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.74 2005/03/14 16:42:30 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -516,16 +516,20 @@ Door::Door(TileOverlay* Overlay)
 	open = NULL;
 	closed = NULL;
 	open_ib = NULL;
+	oibcount = 0;
 	closed_ib = NULL;
+	cibcount = 0;
 	Cursor = 0;
 	OpenSound[0] = 0;
 	CloseSound[0] = 0;
+	LockSound[0] = 0;
+	UnLockSound[0] = 0;
 	overlay = Overlay;
 }
 
 Door::~Door(void)
 {
-	if (Flags&1) {
+	if (Flags&DOOR_CLOSED) {
 		if (open) {
 			delete( open );
 		}
@@ -542,6 +546,42 @@ Door::~Door(void)
 	}
 	if (closed_ib) {
 		free( closed_ib );
+	}
+}
+
+void Door::UpdateDoor()
+{
+	if (Flags&DOOR_CLOSED) {
+		outline = closed;
+	} else {
+		outline = open;
+	}
+	int i;
+
+	int oidx, cidx;
+	int oval, cval;
+
+	oval = 1; //passable searchmap entry
+	if (Flags & DOOR_TRANSPARENT) {
+		cval = 8;  //transparent door searchmap entry
+	}
+	else {
+		cval = 0;  //opaque door searchmap entry
+	}
+	if (Flags &DOOR_CLOSED) {
+		oidx=cval;
+		cidx=oval;
+	}
+	else {
+		cidx=cval;
+		oidx=oval;
+	}
+
+	for(i=0;i<oibcount;i++) {
+		area->SearchMap->SetPixelIndex( open_ib[i].x, open_ib[i].y, oidx );
+	}
+	for(i=0;i<cibcount;i++) {
+		area->SearchMap->SetPixelIndex( closed_ib[i].x, closed_ib[i].y, cidx );
 	}
 }
 
@@ -597,37 +637,24 @@ void Door::SetTiles(unsigned short* Tiles, int count)
 
 void Door::SetDoorLocked(bool Locked, bool playsound)
 {
-	if(Locked) {
-		if(!(Flags&1) ) {
-			SetDoorClosed(1,playsound); // or just return?
-		}
-		Flags|=2;
+	if (Locked) {
+		if (Flags & DOOR_LOCKED) return;
+		Flags|=DOOR_LOCKED;
+		if (playsound && ( LockSound[0] != '\0' ))
+			core->GetSoundMgr()->Play( LockSound );
 	}
 	else {
-		if(Flags&1) {
-			SetDoorClosed(0,playsound); // or just return?
-		}
-		Flags&=~2;
+		if (!(Flags & DOOR_LOCKED)) return;
+		Flags&=~DOOR_LOCKED;
+		if (playsound && ( UnLockSound[0] != '\0' ))
+			core->GetSoundMgr()->Play( UnLockSound );
 	}
 }
 
 void Door::SetDoorClosed(bool Closed, bool playsound)
 {
 	ToggleTiles(Closed, playsound );
-	if (Closed) {
-		outline = closed;
-	} else {
-		outline = open;
-	}
-/* no, we don't need this
-	if (Closed) {
-		Pos.x = closed->BBox.x + ( closed->BBox.w / 2 );
-		Pos.y = closed->BBox.y + ( closed->BBox.h / 2 );
-	} else {
-		Pos.x = open->BBox.x + ( open->BBox.w / 2 );
-		Pos.y = open->BBox.y + ( open->BBox.h / 2 );
-	}
-*/
+	UpdateDoor();
 }
 
 void Door::SetPolygon(bool Open, Gem_Polygon* poly)
@@ -641,11 +668,7 @@ void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 			delete( closed );
 		closed = poly;
 	}
-	if (Flags&1) {
-		outline = closed;
-	} else {
-		outline = open;
-	}
+	UpdateDoor();
 }
 
 void Door::SetCursor(unsigned char CursorIndex)

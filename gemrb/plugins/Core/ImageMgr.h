@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.8 2004/08/02 22:14:22 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.9 2005/03/14 16:42:30 avenger_teambg Exp $
  *
  */
 
@@ -46,6 +46,8 @@ public:
 	virtual Sprite2D* GetImage() = 0;
 	/** No descriptions */
 	virtual void GetPalette(int index, int colors, Color* pal) = 0;
+	/** Sets a Pixel in the image, only for searchmaps */
+	virtual void SetPixelIndex(unsigned int x, unsigned int y, int idx) = 0;
 	/** Gets a Pixel from the Image */
 	virtual Color GetPixel(unsigned int x, unsigned int y) = 0;
 	virtual unsigned int GetPixelIndex(unsigned int x, unsigned int y) = 0;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.101 2005/03/14 11:14:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.102 2005/03/14 16:42:17 avenger_teambg Exp $
  *
  */
 
@@ -220,12 +220,13 @@ Map* AREImp::GetMap(const char *ResRef)
 	DataStream* smstr = core->GetResourceMgr()->GetResource( WEDResRef, IE_MOS_CLASS_ID );
 	sm->Open( smstr, true );
 
+	map->AddTileMap( tm, lm, sr, sm );
+
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
 	for (i = 0; i < 5; i++) {
 		str->ReadDword( map->SongHeader.SongList + i );
 	}
-
 	str->Seek( RestHeader, GEM_STREAM_START );
 	for (i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadDword( map->RestHeader.Strref + i );
@@ -355,6 +356,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			points[x].y = minY;
 		}
 		door->open_ib = points;
+		door->oibcount = OpenImpededCount;
 
 		//Reading Closed Impeded blocks
 		str->Seek( VerticesOffset + ( ClosedFirstImpeded * 4 ),
@@ -367,6 +369,9 @@ Map* AREImp::GetMap(const char *ResRef)
 			points[x].y = minY;
 		}
 		door->closed_ib = points;
+		door->cibcount = ClosedImpededCount;
+		door->SetMap(map);
+		door->SetDoorClosed(Flags&DOOR_CLOSED, false);
 
 		door->SetScriptName( LongName );
 		door->Cursor = cursor;
@@ -811,8 +816,6 @@ Map* AREImp::GetMap(const char *ResRef)
 		}
 		map->AddMapNote( point, color, text );
 	}
-	
-	map->AddTileMap( tm, lm, sr, sm );
 
 	printf( "Loading explored bitmap\n" );
 	i = map->GetExploredMapSize();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.39 2005/03/14 13:33:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.40 2005/03/14 16:42:30 avenger_teambg Exp $
  *
  */
 
@@ -70,11 +70,6 @@ Door* TileMap::AddDoor(char* Name, unsigned int Flags, int ClosedIndex,
 	door->SetTiles( indexes, count );
 	door->SetPolygon( false, open );
 	door->SetPolygon( true, closed );
-	if ( Flags&1 )  {
-		door->SetDoorClosed( true );
-	} else {
-		door->SetDoorClosed( false );
-	}
 	door->SetName( Name );
 	doors.push_back( door );
 	return doors.at( doors.size() - 1 );
