@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.30 2003/11/30 23:26:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.31 2003/12/01 00:04:55 balrog994 Exp $
  *
  */
 
@@ -144,7 +144,7 @@ void Map::DrawMap(Region viewport)
 				continue;
 			int ax = actors[i].XPos, ay = actors[i].YPos;
 			int cx = ax/16;
-			int cy = ay/16;
+			int cy = ay/12;
 			Color tint = LightMap->GetPixel(cx, cy);
 			tint.a = 0xA0;
 			//video->BlitSprite(nextFrame, actors[i].XPos, actors[i].YPos);
@@ -237,7 +237,6 @@ void Map::PlayAreaSong(int SongType)
 
 int Map::GetBlocked(int cx, int cy) {
 	int block = SearchMap->GetPixelIndex(cx/16, cy/12);
-	printf("%d\n", block);
 	switch(block) {
 		case 1:
 		case 2:
