@@ -7,6 +7,7 @@
 #include "../Core/Interface.h"
 #include "../../includes/sdl/SDL.h"
 #include "../../includes/sdl/SDL_thread.h"
+#include "../../includes/fmod/fmod.h"
 //#include "mvelib.h"
 #include "mve_audio.h"
 
@@ -72,6 +73,8 @@ static unsigned char *g_pCurMap=NULL;
 static int g_nMapLength=0;
 
 static int stupefaction=0;
+
+static FSOUND_STREAM * stream=NULL;
 
 class MVEPlay :	public MoviePlayer
 {
@@ -242,7 +245,11 @@ private: //Decoder Functions
 
 	static int create_timer_handler(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
 	{
+#ifdef WIN32		
 		unsigned __int64 temp;
+#else
+		long long temp;
+#endif
 		micro_frame_delay = get_int(data) * (int)get_short(data+4);
 		if (g_spdFactorNum != 0)
 		{
@@ -258,7 +265,7 @@ private: //Decoder Functions
 	static void timer_start(void)
 	{
 		timer_expire = SDL_GetTicks();
-		timer_expire += micro_frame_delay/1000;
+		timer_expire += (micro_frame_delay/1000)+1;
 		timer_started=1;
 	};
 
@@ -276,7 +283,7 @@ private: //Decoder Functions
 		SDL_Delay(ts);
 
 end:
-		timer_expire += micro_frame_delay/1000;
+		timer_expire += (micro_frame_delay/1000)+1;
 	};
 
 	/*************************
@@ -355,11 +362,12 @@ end:
 
 		sample_rate = get_short(data + 4);
 		desired_buffer = get_int(data + 6);
+		FSOUND_
 		mve_audio_spec = (SDL_AudioSpec *)malloc(sizeof(SDL_AudioSpec));
 		mve_audio_spec->freq = sample_rate;
 		mve_audio_spec->format = AUDIO_S16LSB;
 		mve_audio_spec->channels = 2;
-		mve_audio_spec->samples = 22070;
+		mve_audio_spec->samples = desired_buffer/4;
 		mve_audio_spec->callback = mve_audio_callback;
 		mve_audio_spec->userdata = NULL;
 		if (SDL_OpenAudio(mve_audio_spec, NULL) >= 0)
@@ -388,7 +396,7 @@ end:
 
 	static int play_audio_handler(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
 	{
-		//printf("Play Audio\n");
+		printf("Play Audio\n");
 		if (mve_audio_canplay  &&  !mve_audio_playing)//  &&  mve_audio_bufhead != mve_audio_buftail)
 			{
 			SDL_PauseAudio(0);
@@ -415,7 +423,7 @@ end:
 				SDL_mutexP(mve_audio_mutex);
 				mve_audio_buflens[mve_audio_buftail] = nsamp;
 				mve_audio_buffers[mve_audio_buftail] = (short *)malloc(nsamp*sizeof(short));
-				//printf("Allocating %d samples on position %d\n", nsamp, mve_audio_buftail);
+				printf("Allocating %d samples on position %d\n", nsamp, mve_audio_buftail);
 				if (major == 8)
 					mveaudio_uncompress(mve_audio_buffers[mve_audio_buftail], data, -1); /* XXX */
 				else
@@ -458,7 +466,7 @@ end:
 
 	static int display_video_handler(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
 	{
-		//printf("Display Video\n");
+		printf("Display Video\n");
 		int i;
 		unsigned char *pal = g_palette;
 		unsigned char *pDest;
@@ -562,6 +570,7 @@ end:
 
 	static int video_data_handler(unsigned char major, unsigned char minor, unsigned char *data, int len, void *context)
 	{
+		printf("VideoData\n");
 		short nFrameHot, nFrameCold;
 		short nXoffset, nYoffset;
 		short nXsize, nYsize;

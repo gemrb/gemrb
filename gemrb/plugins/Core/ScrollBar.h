@@ -44,7 +44,7 @@ private: //Private attributes
 	/** Scroll Bar Status */
 	unsigned short State;
 	/** Sets the Text of the current control */
-	int SetText(const char * string);
+	int SetText(const char * string, int pos = 0);
 public:
 	void SetImage(unsigned char type, Sprite2D * img);
 	/** Sets the Maximum Value of the ScrollBar */

@@ -249,7 +249,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 }
 
 /** Sets the Text of the current control */
-int Button::SetText(const char * string)
+int Button::SetText(const char * string, int pos)
 {
 	if(string == NULL)
 		hasText = false;

@@ -54,6 +54,7 @@ void Window::AddControl(Control * ctrl)
 {
 	if(ctrl != NULL)
 		Controls.push_back(ctrl);
+	ctrl->Owner = this;
 	Changed = true;
 }
 /** Set the Window's BackGround Image. If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
@@ -161,6 +162,8 @@ void Window::Link(unsigned short SBID, unsigned short TAID)
 	TextArea *ta = NULL;
 	std::vector<Control*>::iterator m;
 	for(m = Controls.begin(); m != Controls.end(); m++) {
+		if((*m)->Owner != this)
+			continue;
 		if((*m)->ControlType == IE_GUI_SCROLLBAR) {
 			if((*m)->ControlID == SBID) {
 				sb = (ScrollBar*)(*m);

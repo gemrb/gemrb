@@ -112,7 +112,7 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 }
 
 /** Sets the Text of the current control */
-int TextEdit::SetText(const char * string)
+int TextEdit::SetText(const char * string, int pos)
 {
 	strncpy((char*)Buffer, string, max);
 	((Window*)Owner)->Invalidate();

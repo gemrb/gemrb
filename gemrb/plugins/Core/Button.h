@@ -64,7 +64,7 @@ public:
   /** Sets the Button State */
   void SetState(unsigned char state);
   /** Sets the Text of the current control */
-  int SetText(const char * string);
+  int SetText(const char * string, int pos = 0);
   /** Set Event */
   void SetEvent(char * funcName);
   /** Sets the Picture */

@@ -19,7 +19,7 @@ public:
 	/** Set BackGround */
 	void SetBackGround(Sprite2D * back);
 	/** Sets the Text of the current control */
-	int SetText(const char * string);
+	int SetText(const char * string, int pos = 0);
 	/** Output for Script Messages */
 	TextArea * ta;
 private:

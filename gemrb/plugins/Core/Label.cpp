@@ -62,7 +62,7 @@ void Label::Draw(unsigned short x, unsigned short y)
 	}
 }
 /** This function sets the actual Label Text */
-int Label::SetText(const char * string)
+int Label::SetText(const char * string, int pos)
 {
 	if(Buffer != NULL) {
 		strcpy(Buffer, string);

@@ -45,16 +45,17 @@ public:
 	/** Sets the Scroll Bar Pointer */
 	void SetScrollBar(Control * ptr);
 	/** Sets the Actual Text */
-	int SetText(const char * text);
+	int SetText(const char * text, int pos = 0);
 	/** Appends a String to the current Text */
-	int AppendText(const char * text);
+	int AppendText(const char * text, int pos = 0);
 	/** Sets the Fonts */
 	void SetFonts(Font * init, Font * text);
 	/** Set Starting Row */
 	void SetRow(int row);
 private: // Private attributes
-	/** Text Buffer */
-	unsigned char * Buffer;
+	std::vector<char *> lines;
+	///** Text Buffer */
+	//unsigned char * Buffer;
 	/** Number of Text Rows */
 	int rows;
 	/** Starting Row */

@@ -15,6 +15,8 @@ typedef unsigned long DWORD;
 #define _MAX_PATH FILENAME_MAX
 #endif
 
+#ifndef GLOBALS_ONLY_DEFS
+
 #include "stdlib.h"
 #include "stdio.h"
 #include "errors.h"
@@ -28,6 +30,8 @@ typedef unsigned long DWORD;
 #include "../plugins/Core/VideoModes.h"
 #include "../plugins/Core/DataStream.h"
 #include "../plugins/Core/AnimStructures.h"
+
+#endif
 
 //Global Variables
 

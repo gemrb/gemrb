@@ -51,7 +51,7 @@ public:
 	/** Draws the Control on the Output Display */
 	virtual void Draw(unsigned short x, unsigned short y) = 0;
 	/** Sets the Text of the current control */
-	virtual int SetText(const char * string) = 0;
+	virtual int SetText(const char * string, int pos = 0) = 0;
 	/** Variables */
 	char VarName[MAX_VARIABLE_LENGTH];
 	/** the value of the button to add to the variable */

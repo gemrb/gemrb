@@ -24,9 +24,9 @@ extern Interface * core;
 
 TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {
-	BufferLength = 4096;
-	Buffer = (unsigned char*)malloc(BufferLength);
-	Buffer[0] = 0;
+	//BufferLength = 4096;
+	//Buffer = (unsigned char*)malloc(BufferLength);
+	//Buffer[0] = 0;
 	rows = 0;
 	startrow = 0;
 	sb = NULL;
@@ -38,14 +38,29 @@ TextArea::~TextArea(void)
 {
 	free(palette);
 	free(initpalette);
-	free(Buffer);
+	for(int i = 0; i < lines.size(); i++) {
+		free(lines[i]);
+	}
 }
 
 void TextArea::Draw(unsigned short x, unsigned short y)
 {
 	if(!Changed)
 		return;
-	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height), Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);		
+	if(lines.size() == 0)
+		return;
+	char * Buffer = (char*)malloc(1);
+	Buffer[0] = 0;
+	int len = 0;
+	for(int i = 0; i < lines.size(); i++) {
+		len += strlen(lines[i]);
+		Buffer = (char*)realloc(Buffer, len+1);
+		strcat(Buffer, lines[i]);
+		if(i != lines.size()-1)
+			strcat(Buffer, "\n");
+	}
+	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
+	free(Buffer);
 	Changed = false;
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
@@ -57,18 +72,42 @@ void TextArea::SetScrollBar(Control * ptr)
 	Changed = true;
 }
 /** Sets the Actual Text */
-int TextArea::SetText(const char * text)
+int TextArea::SetText(const char * text, int pos)
 {
-	strncpy((char*)Buffer, text, BufferLength);
+	if((pos == 0) && (lines.size() == 0))
+		pos = -1;
+	if(pos >= (int)lines.size())
+		return -1;
+	int newlen = strlen(text);
+
+	if(pos == -1) {
+		char * str = (char*)malloc(newlen+1);
+		strcpy(str, text);
+		lines.push_back(str);
+	}
+	else {
+		int mylen = strlen(lines[pos]);
+
+		lines[pos] = (char*)realloc(lines[pos], newlen+1);
+		strcpy(lines[pos], text);
+	}
 	CalcRowCount();
 	((Window*)Owner)->Invalidate();
 	return 0;
 }
 /** Appends a String to the current Text */
-int TextArea::AppendText(const char * text)
+int TextArea::AppendText(const char * text, int pos)
 {
-	int len = strlen((char*)Buffer);
-	strncat((char*)Buffer, text, BufferLength-len);
+	if(pos >= (int)lines.size())
+		return -1;
+	if(pos == -1)
+		return -1;
+
+	int newlen = strlen(text);
+	int mylen = strlen(lines[pos]);
+	
+	lines[pos] = (char*)realloc(lines[pos], mylen+newlen+1);
+	strcat(lines[pos], text);
 	CalcRowCount();
 	((Window*)Owner)->Invalidate();
 	return 0;
@@ -102,17 +141,20 @@ void TextArea::SetRow(int row)
 
 void TextArea::CalcRowCount()
 {
-	if(Buffer[0] != 0) {
-		int len = strlen((char*)Buffer);
-		char * tmp = (char*)malloc(BufferLength);
-		strcpy(tmp, (char*)Buffer);
-		ftext->SetupString(tmp, Width);
-		rows = 0;
-		for(int i = 0; i <= len; i++) {
-			if(tmp[i] == 0)
-				rows++;
+	if(lines.size() != 0) {
+		rows = -1;
+		for(int i = 0; i < lines.size(); i++) {
+			rows++;
+			int len = strlen(lines[i]);
+			char * tmp = (char*)malloc(len+1);
+			strcpy(tmp, lines[i]);
+			ftext->SetupString(tmp, Width);
+			for(int i = 0; i <= len; i++) {
+				if(tmp[i] == 0)
+					rows++;
+			}
+			free(tmp);
 		}
-		free(tmp);
 	}
 	if(!sb)
 		return;

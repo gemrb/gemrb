@@ -53,7 +53,7 @@ void Console::SetBackGround(Sprite2D * back)
 	Changed = true;
 }
 /** Sets the Text of the current control */
-int Console::SetText(const char * string)
+int Console::SetText(const char * string, int pos)
 {	
 	strncpy((char*)Buffer, string, max);
 	Changed = true;

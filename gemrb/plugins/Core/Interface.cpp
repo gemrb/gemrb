@@ -715,9 +715,9 @@ int Interface::ShowModal(unsigned short WindowIndex)
 		return -1;
 	}
 	win->Visible = true;
-	win->Invalidate();
 	evntmgr->Clear();
 	evntmgr->AddWindow(win);
+	win->Invalidate();
 	return 0;
 }
 
