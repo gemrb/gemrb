@@ -40,6 +40,7 @@ def OnLoad():
 	GemRB.SetText(OptionsWindow, GamePlayButton, 17165)
 	GemRB.SetEvent(OptionsWindow, GamePlayButton, IE_GUI_BUTTON_ON_PRESS, "GamePlayPress")
 	GemRB.SetText(OptionsWindow, MoviesButton, 15415)
+	GemRB.SetEvent(OptionsWindow, MoviesButton, IE_GUI_BUTTON_ON_PRESS, "MoviePress")
 	GemRB.SetText(OptionsWindow, KeyboardButton, 33468)
 	GemRB.SetText(OptionsWindow, ReturnButton, 10308)
 	GemRB.SetEvent(OptionsWindow, ReturnButton, IE_GUI_BUTTON_ON_PRESS, "ReturnPress")
@@ -70,4 +71,10 @@ def GamePlayPress():
 	global OptionsWindow
 	GemRB.UnloadWindow(OptionsWindow)
 	GemRB.SetNextScript("GamePlay")
+	return
+
+def MoviePress():
+	global OptionsWindow
+	GemRB.UnloadWindow(OptionsWindow)
+	GemRB.SetNextScript("GUIMOVIE")
 	return
