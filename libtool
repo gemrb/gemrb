@@ -40,7 +40,7 @@ available_tags=" CXX"
 # Libtool was configured as follows, on host X6K0Q2:
 #
 # AR="" AR_FLAGS="" LTCC="gcc" CC="gcc" \
-# CFLAGS="-ansi -W -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -g -O2  " CPPFLAGS="" \
+# CFLAGS=" -ansi -W -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -g" CPPFLAGS="" \
 # MAGIC_CMD="" LD="/usr//bin/ld" LDFLAGS="" LIBS="" \
 # LN_S="ln -s" NM="/usr//bin/nm -B" RANLIB="ranlib" STRIP="strip" \
 # AS="" DLLTOOL="" OBJDUMP="" \
@@ -5733,8 +5733,8 @@ build_old_libs=`case $build_libtool_libs in yes) echo no;; *) echo yes;; esac`
 ### BEGIN LIBTOOL TAG CONFIG: CXX
 # Libtool was configured as follows, on host X6K0Q2:
 #
-# AR="" AR_FLAGS="" LTCC="gcc" CC="c++" \
-# CFLAGS="-Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new" CPPFLAGS="" \
+# AR="" AR_FLAGS="" LTCC="gcc" CC="g++" \
+# CFLAGS=" -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -g3 -Wall -fno-exceptions -fno-check-new" CPPFLAGS="" \
 # MAGIC_CMD="" LD="/usr//bin/ld" LDFLAGS="" LIBS="" \
 # LN_S="ln -s" NM="/usr//bin/nm -B" RANLIB="ranlib" STRIP="strip" \
 # AS="" DLLTOOL="" OBJDUMP="" \
@@ -5779,7 +5779,7 @@ AR_FLAGS="cru"
 LTCC="gcc"
 
 # A language-specific compiler.
-CC="c++"
+CC="g++"
 
 # Is the compiler the GNU C compiler?
 with_gcc=yes

@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.8 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.9 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -77,8 +77,8 @@ AUTODIRS =
 CC = gcc
 CONF_FILES =  $(top_srcdir)/configure.in.in
 CPP = cpp
-CXX = c++
-CXXCPP = c++ -E
+CXX = g++
+CXXCPP = g++ -E
 DCOPIDL = @DCOPIDL@
 DCOPIDL2CPP = @DCOPIDL2CPP@
 DCOP_DEPENDENCIES = @DCOP_DEPENDENCIES@
@@ -187,7 +187,7 @@ USER_LDFLAGS =
 USE_EXCEPTIONS = -fexceptions
 USE_RTTI = 
 USE_THREADS = @USE_THREADS@
-VERSION = 0.1
+VERSION = 0.2.1.9
 WOVERLOADED_VIRTUAL = -Woverloaded-virtual
 XGETTEXT = @XGETTEXT@
 XPMINC = @XPMINC@
@@ -256,7 +256,7 @@ libCHUImporter_la_final_OBJECTS = libCHUImporter_la.all_cpp.lo
 libCHUImporter_la_nofinal_OBJECTS = CHUImporter.lo CHUImp.lo CHUImpCD.lo
 libCHUImporter_la_OBJECTS = $(libCHUImporter_la_nofinal_OBJECTS)
 #libCHUImporter_la_OBJECTS = $(libCHUImporter_la_final_OBJECTS)
-CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
+CXXFLAGS =  -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -g3 -Wall -fno-exceptions -fno-check-new
 #>- CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 #>+ 1
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) $(KDE_CXXFLAGS)

@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.11 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.12 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -77,8 +77,8 @@ AUTODIRS =
 CC = gcc
 CONF_FILES =  $(top_srcdir)/configure.in.in
 CPP = cpp
-CXX = c++
-CXXCPP = c++ -E
+CXX = g++
+CXXCPP = g++ -E
 DCOPIDL = @DCOPIDL@
 DCOPIDL2CPP = @DCOPIDL2CPP@
 DCOP_DEPENDENCIES = @DCOP_DEPENDENCIES@
@@ -187,7 +187,7 @@ USER_LDFLAGS =
 USE_EXCEPTIONS = -fexceptions
 USE_RTTI = 
 USE_THREADS = @USE_THREADS@
-VERSION = 0.1
+VERSION = 0.2.1.9
 WOVERLOADED_VIRTUAL = -Woverloaded-virtual
 XGETTEXT = @XGETTEXT@
 XPMINC = @XPMINC@
@@ -227,7 +227,7 @@ qt_libraries = @qt_libraries@
 x_includes = @x_includes@
 x_libraries = @x_libraries@
 
-SUBDIRS = AREImporter BAMImporter BG2HCAnim BIFImporter BMPImporter CHUImporter Core CREImporter IDSImporter KEYImporter MOSImporter MVEPlayer SDLVideo TISImporter TLKImporter WEDImporter ZLibMgr GUIScript ACMImporter MUSImporter 2DAImporter INIImporter PLTImporter 
+SUBDIRS = AREImporter BAMImporter BG2HCAnim BIFImporter BMPImporter CHUImporter Core CREImporter IDSImporter KEYImporter MOSImporter MVEPlayer SDLVideo TISImporter TLKImporter WEDImporter ZLibMgr GUIScript ACMImporter MUSImporter 2DAImporter INIImporter PLTImporter IEScript 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../config.h
 CONFIG_CLEAN_FILES = 
@@ -236,7 +236,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 #>- DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 #>+ 4
-KDE_DIST=libSDLVideo.so libCREImporter.so libACMImporter.so libBMPImporter.so libIDSImporter.so libZLibMgr.so libBIFImporter.so libPLTImporter.so libINIImporter.so libBG2HCAnim.so libTISImporter.so libMUSImporter.so libWEDImporter.so libMVEPlayer.so libCHUImporter.so libBAMImporter.so lib2DAImporter.so libMOSImporter.so libAREImporter.so libKEYImporter.so libGUIScript.so libTLKImporter.so 
+KDE_DIST=libBMPImporter.so libMVEPlayer.so libCHUImporter.so libMOSImporter.so libKEYImporter.so libBIFImporter.so libINIImporter.so libTISImporter.so libMUSImporter.so libGUIScript.so libTLKImporter.so libACMImporter.so libIDSImporter.so libZLibMgr.so libWEDImporter.so libBAMImporter.so libAREImporter.so libSDLVideo.so libCREImporter.so libPLTImporter.so libBG2HCAnim.so lib2DAImporter.so 
 
 DISTFILES= $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST) $(KDE_DIST)
 

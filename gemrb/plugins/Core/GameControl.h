@@ -17,6 +17,8 @@
 #define GEM_EXPORT
 #endif
 
+#define _DEBUG
+
 class GEM_EXPORT GameControl : public Control
 {
 public:

@@ -5,7 +5,7 @@ lib_LTLIBRARIES = lib2DAImporter.la
 INCLUDES = $(all_includes)
 
 
-LDFLAGS =     
+LDFLAGS =          
 
 
 lib2DAImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl

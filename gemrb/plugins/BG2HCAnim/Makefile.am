@@ -5,7 +5,7 @@ lib_LTLIBRARIES = libBG2HCAnim.la
 INCLUDES = $(all_includes)
 
 
-LDFLAGS =     
+LDFLAGS =          
 
 
 libBG2HCAnim_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl

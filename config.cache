@@ -22,8 +22,8 @@ ac_cv_objext=${ac_cv_objext=o}
 ac_cv_path_install=${ac_cv_path_install='/usr//bin/install -c'}
 ac_cv_prog_CC=${ac_cv_prog_CC=gcc}
 ac_cv_prog_CPP=${ac_cv_prog_CPP=cpp}
-ac_cv_prog_CXX=${ac_cv_prog_CXX=c++}
-ac_cv_prog_CXXCPP=${ac_cv_prog_CXXCPP='c++ -E'}
+ac_cv_prog_CXX=${ac_cv_prog_CXX=g++}
+ac_cv_prog_CXXCPP=${ac_cv_prog_CXXCPP='g++ -E'}
 ac_cv_prog_LN_S=${ac_cv_prog_LN_S='ln -s'}
 ac_cv_prog_RANLIB=${ac_cv_prog_RANLIB=ranlib}
 ac_cv_prog_STRIP=${ac_cv_prog_STRIP=strip}

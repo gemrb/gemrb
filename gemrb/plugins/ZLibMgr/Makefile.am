@@ -5,7 +5,7 @@ lib_LTLIBRARIES = libZLibMgr.la
 INCLUDES = $(all_includes)
 
 
-LDFLAGS =     
+LDFLAGS =          
 
 
 libZLibMgr_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -lz -ldl

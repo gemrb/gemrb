@@ -5,7 +5,7 @@ lib_LTLIBRARIES = libBIFImporter.la
 INCLUDES = $(all_includes)
 
 
-LDFLAGS =     
+LDFLAGS =          
 
 
 libBIFImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl

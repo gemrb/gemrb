@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.78 2003/12/04 22:12:27 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.79 2003/12/04 22:38:48 balrog994 Exp $
  *
  */
 
@@ -29,7 +29,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#ifndef WIN32
+#include "/usr/local/include/python2.3/Python.h"
+#else
 #include "Python.h"
+#endif
 #ifdef __cplusplus
 }
 #endif

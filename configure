@@ -855,7 +855,7 @@ fi
 
 PACKAGE=gemrb
 
-VERSION=0.1
+VERSION=0.2.1.9
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -2899,7 +2899,7 @@ fi
   
 
 
-
+CXXFLAGS="$NOOPT_CXXFLAGS" CFLAGS="$NOOPT_CFLAGS" 
 # Check whether --enable-shared or --disable-shared was given.
 if test "${enable_shared+set}" = set; then
   enableval="$enable_shared"
@@ -4277,6 +4277,7 @@ gemrb/plugins/Core/Makefile \
 gemrb/plugins/CREImporter/Makefile \
 gemrb/plugins/GUIScript/Makefile \
 gemrb/plugins/IDSImporter/Makefile \
+gemrb/plugins/IEScript/Makefile \
 gemrb/plugins/INIImporter/Makefile \
 gemrb/plugins/KEYImporter/Makefile \
 gemrb/plugins/MOSImporter/Makefile \
@@ -4438,6 +4439,7 @@ gemrb/plugins/Core/Makefile \
 gemrb/plugins/CREImporter/Makefile \
 gemrb/plugins/GUIScript/Makefile \
 gemrb/plugins/IDSImporter/Makefile \
+gemrb/plugins/IEScript/Makefile \
 gemrb/plugins/INIImporter/Makefile \
 gemrb/plugins/KEYImporter/Makefile \
 gemrb/plugins/MOSImporter/Makefile \

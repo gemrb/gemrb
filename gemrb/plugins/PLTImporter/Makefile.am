@@ -5,7 +5,7 @@ lib_LTLIBRARIES = libPLTImporter.la
 INCLUDES = $(all_includes)
 
 
-LDFLAGS =     
+LDFLAGS =          
 
 
 libPLTImporter_la_LDFLAGS = -version-info 0:0:0 -lcore -L../Core

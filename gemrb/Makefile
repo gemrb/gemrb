@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.9 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.10 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -77,8 +77,8 @@ AUTODIRS =
 CC = gcc
 CONF_FILES =  $(top_srcdir)/configure.in.in
 CPP = cpp
-CXX = c++
-CXXCPP = c++ -E
+CXX = g++
+CXXCPP = g++ -E
 DCOPIDL = @DCOPIDL@
 DCOPIDL2CPP = @DCOPIDL2CPP@
 DCOP_DEPENDENCIES = @DCOP_DEPENDENCIES@
@@ -187,7 +187,7 @@ USER_LDFLAGS =
 USE_EXCEPTIONS = -fexceptions
 USE_RTTI = 
 USE_THREADS = @USE_THREADS@
-VERSION = 0.1
+VERSION = 0.2.1.9
 WOVERLOADED_VIRTUAL = -Woverloaded-virtual
 XGETTEXT = @XGETTEXT@
 XPMINC = @XPMINC@
@@ -230,7 +230,7 @@ x_libraries = @x_libraries@
 bin_PROGRAMS = gemrb
 
 gemrb_SOURCES = GemRB.cpp 
-gemrb_LDADD = ./plugins/AREImporter/libAREImporter.la ./plugins/BAMImporter/libBAMImporter.la ./plugins/BG2HCAnim/libBG2HCAnim.la ./plugins/BIFImporter/libBIFImporter.la ./plugins/BMPImporter/libBMPImporter.la ./plugins/CHUImporter/libCHUImporter.la ./plugins/Core/libcore.la ./plugins/CREImporter/libCREImporter.la ./plugins/IDSImporter/libIDSImporter.la ./plugins/KEYImporter/libKEYImporter.la ./plugins/MOSImporter/libMOSImporter.la ./plugins/MVEPlayer/libMVEPlayer.la ./plugins/SDLVideo/libSDLVideo.la ./plugins/TISImporter/libTISImporter.la ./plugins/TLKImporter/libTLKImporter.la ./plugins/WEDImporter/libWEDImporter.la ./plugins/ZLibMgr/libZLibMgr.la ./plugins/GUIScript/libGUIScript.la ./plugins/ACMImporter/libACMImporter.la ./plugins/MUSImporter/libMUSImporter.la ./plugins/2DAImporter/lib2DAImporter.la ./plugins/INIImporter/libINIImporter.la ./plugins/PLTImporter/libPLTImporter.la 
+gemrb_LDADD = ./plugins/AREImporter/libAREImporter.la ./plugins/BAMImporter/libBAMImporter.la ./plugins/BG2HCAnim/libBG2HCAnim.la ./plugins/BIFImporter/libBIFImporter.la ./plugins/BMPImporter/libBMPImporter.la ./plugins/CHUImporter/libCHUImporter.la ./plugins/Core/libcore.la ./plugins/CREImporter/libCREImporter.la ./plugins/IDSImporter/libIDSImporter.la ./plugins/KEYImporter/libKEYImporter.la ./plugins/MOSImporter/libMOSImporter.la ./plugins/MVEPlayer/libMVEPlayer.la ./plugins/SDLVideo/libSDLVideo.la ./plugins/TISImporter/libTISImporter.la ./plugins/TLKImporter/libTLKImporter.la ./plugins/WEDImporter/libWEDImporter.la ./plugins/ZLibMgr/libZLibMgr.la ./plugins/GUIScript/libGUIScript.la ./plugins/ACMImporter/libACMImporter.la ./plugins/MUSImporter/libMUSImporter.la ./plugins/2DAImporter/lib2DAImporter.la ./plugins/INIImporter/libINIImporter.la ./plugins/PLTImporter/libPLTImporter.la ./plugins/IEScript/libIEScript.la 
 
 SUBDIRS = plugins includes zlib 
 
@@ -275,8 +275,9 @@ gemrb_DEPENDENCIES =  ./plugins/AREImporter/libAREImporter.la \
 	./plugins/MUSImporter/libMUSImporter.la \
 	./plugins/2DAImporter/lib2DAImporter.la \
 	./plugins/INIImporter/libINIImporter.la \
-	./plugins/PLTImporter/libPLTImporter.la
-CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
+	./plugins/PLTImporter/libPLTImporter.la \
+	./plugins/IEScript/libIEScript.la
+CXXFLAGS =  -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -g3 -Wall -fno-exceptions -fno-check-new
 #>- CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 #>+ 1
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) $(KDE_CXXFLAGS)

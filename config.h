@@ -5,7 +5,7 @@
 #define PACKAGE "gemrb"
 
 /* Version number of package */
-#define VERSION "0.1"
+#define VERSION "0.2.1.9"
 
 /* C++ compiler supports template repository */
 #define HAVE_TEMPLATE_REPOSITORY 1
