@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.133 2004/08/20 13:03:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.134 2004/08/20 15:55:57 avenger_teambg Exp $
  *
  */
 
@@ -705,7 +705,7 @@ private:
 	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
 		int flags);
-	static void MoveItemCore(Scriptable *Sender, Scriptable *Target, const char *resref, int flags);
+	static int MoveItemCore(Scriptable *Sender, Scriptable *Target, const char *resref, int flags);
 	static Action *GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree);
 	static Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 	static Trigger* GenerateTrigger(char* String);
@@ -1121,6 +1121,7 @@ public:
 	static void SetHP(Scriptable* Sender, Action* parameters);
 	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
+	static void SetMasterArea(Scriptable* Sender, Action* parameters);
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
 	static void SetMusic(Scriptable* Sender, Action* parameters);
 	static void SetNamelessClass(Scriptable* Sender, Action* parameters);
@@ -1150,6 +1151,7 @@ public:
 	static void StartDialogueOverrideInterrupt(Scriptable* Sender,
 		Action* parameters);
 	static void StartMovie(Scriptable* Sender, Action* parameters);
+	static void StartMusic(Scriptable* Sender, Action* parameters);
 	static void StartSong(Scriptable* Sender, Action* parameters);
 	static void StopMoving(Scriptable* Sender, Action* parameters);
 	static void StorePartyLocation(Scriptable *Sender, Action* parameters);
@@ -1158,6 +1160,9 @@ public:
 	static void TakeItemList(Scriptable* Sender, Action* parameters);
 	static void TakeItemReplace(Scriptable* Sender, Action* parameters);
 	static void TakePartyGold(Scriptable* Sender, Action* parameters);
+	static void TakePartyItem(Scriptable* Sender, Action* parameters);
+	static void TakePartyItemAll(Scriptable* Sender, Action* parameters);
+	static void TakePartyItemNum(Scriptable* Sender, Action* parameters);
 	static void TextScreen(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.187 2004/08/20 15:17:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.188 2004/08/20 15:55:57 avenger_teambg Exp $
  *
  */
 
@@ -51,6 +51,11 @@ static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
 static int InDebug = 0;
+
+#define MIC_INVALID -2
+#define MIC_FULL -1
+#define MIC_NOITEM 0
+#define MIC_GOTITEM 1
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -456,6 +461,7 @@ static ActionLink actionnames[] = {
 	{"sethp", GameScript::SetHP,0},
 	{"setinternal", GameScript::SetInternal,0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile,0},
+	{"setmasterarea", GameScript::SetMasterArea,0},
 	{"setmoraleai", GameScript::SetMoraleAI,0},
 	{"setmusic", GameScript::SetMusic,0},
 	{"setname", GameScript::SetApparentName,0},
@@ -493,6 +499,7 @@ static ActionLink actionnames[] = {
 	{"startdialogoverrideinterrupt", GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startdialogueoverrideinterrupt", GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startmovie", GameScript::StartMovie,AF_BLOCKING},
+	{"startmusic", GameScript::StartMusic,0},
 	{"startsong", GameScript::StartSong,0},
 	{"stopmoving", GameScript::StopMoving,0},
 	{"storepartylocations", GameScript::StorePartyLocation,0},
@@ -502,6 +509,8 @@ static ActionLink actionnames[] = {
 	{"takeitemlist", GameScript::TakeItemList,0},
 	{"takeitemreplace", GameScript::TakeItemReplace,0},
 	{"takepartygold", GameScript::TakePartyGold,0},
+	{"takepartyitem", GameScript::TakePartyItem,0},
+	{"takepartyitemall", GameScript::TakePartyItemAll,0},
 	{"textscreen", GameScript::TextScreen,0},
 	{"tomsstringdisplayer", GameScript::DisplayStringHead,0},
 	{"triggeractivation", GameScript::TriggerActivation,0},
@@ -5646,6 +5655,9 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 	}
 }
 
+/*pst and bg2 can play a song designated by index*/
+/*actually pst has some extra params not currently implemented*/
+/*switchplaylist could implement fade */
 void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 {
 	int MusicTable = core->LoadTable( "music" );
@@ -5660,16 +5672,21 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
+/*iwd2 can play any areasong slot at will*/
+void GameScript::StartMusic(Scriptable* /*Sender*/, Action* parameters)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->PlayAreaSong(parameters->int0Parameter);
+}
+
+/*bg2 can play only the battle song*/
 void GameScript::BattleSong(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Map *map=core->GetGame()->GetCurrentMap();
 	map->PlayAreaSong(3); //battlesong is in slot 3
 }
 
-void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
-{
-}
-
+/*iwd2 can set an areasong slot*/
 void GameScript::SetMusic(Scriptable* /*Sender*/, Action* parameters)
 {
 	//iwd2 seems to have 10 slots, dunno if it is important
@@ -5696,6 +5713,10 @@ void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
 	core->GetSoundMgr()->Play( parameters->string0Parameter, 0, 0, 0);
+}
+
+void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
 }
 
 void GameScript::CreateVisualEffectCore(int X, int Y, const char *effect)
@@ -7284,13 +7305,13 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 
 //transfering item from Sender to target, target must be an actor
 //if target can't get it, it will be dropped at its feet
-void GameScript::MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags)
+int GameScript::MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags)
 {
 	Inventory *myinv;
 	Map *map;
 
 	if(!target || target->Type!=ST_ACTOR) {
-		return;
+		return MIC_INVALID;
 	}
 	switch(Sender->Type) {
 		case ST_ACTOR:
@@ -7302,20 +7323,22 @@ void GameScript::MoveItemCore(Scriptable *Sender, Scriptable *target, const char
 			map=core->GetGame()->GetCurrentMap();
 			break;
 		default:
-			return;
+			return MIC_INVALID;
 	}
 	Actor *scr = (Actor *) target;
 	CREItem *item;
 	scr->inventory.RemoveItem(resref, flags, &item);
 	if(!item)
-		return;
+		return MIC_NOITEM;
 	myinv->AddSlotItem(item, 0, &item);
 	if( item ) {
 		// drop it at my feet
 		int x = Sender->XPos;
 		int y = Sender->YPos;
 		map->tm->AddItemToLocation(x, y, item);
+		return MIC_FULL;
 	}
+	return MIC_GOTITEM;
 }
 
 //a container or an actor can take an item from someone
@@ -7323,6 +7346,42 @@ void GameScript::GetItem(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	MoveItemCore(tar, Sender, parameters->string0Parameter,0);
+}
+
+//getting one single item
+void GameScript::TakePartyItem(Scriptable* Sender, Action* parameters)
+{
+	Game *game=core->GetGame();
+	int i=game->GetPartySize(false);
+	while(i--) {
+		int res=MoveItemCore(game->GetPC(i), Sender, parameters->string0Parameter,0);
+		if(res!=MIC_NOITEM) return;
+	}
+}
+
+//getting x single item
+void GameScript::TakePartyItemNum(Scriptable* Sender, Action* parameters)
+{
+	int count = parameters->int0Parameter;
+	Game *game=core->GetGame();
+	int i=game->GetPartySize(false);
+	while(i--) {
+		int res=MoveItemCore(game->GetPC(i), Sender, parameters->string0Parameter,0);
+		if(res == MIC_GOTITEM) {
+			i++;
+			count--;
+		}
+		if(res!=MIC_NOITEM || !count) return;
+	}
+}
+
+void GameScript::TakePartyItemAll(Scriptable* Sender, Action* parameters)
+{
+	Game *game=core->GetGame();
+	int i=game->GetPartySize(false);
+	while(i--) {
+		while(MoveItemCore(game->GetPC(i), Sender, parameters->string0Parameter,0)==MIC_GOTITEM);
+	}
 }
 
 //an actor can 'give' an item to a container or another actor
@@ -7625,5 +7684,10 @@ void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
 	movable->XDes=parameters->XpointParameter;
 	movable->YDes=parameters->YpointParameter;
 	//no movement should be started here, i think
+}
+
+void GameScript::SetMasterArea(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->GetGame()->SetMasterArea(parameters->string0Parameter);
 }
 
