@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.217 2004/10/10 13:32:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.218 2004/10/10 15:23:26 avenger_teambg Exp $
  *
  */
 
@@ -1651,17 +1651,18 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 
 
 PyDoc_STRVAR( GemRB_CreateMapControl__doc,
-"CreateMapControl(WindowIndex, ControlID, x, y, w, h, [FlagResRef, LabelIndex]) => ControlIndex\n\n"
-"Creates and adds a new Area Map Control to a Window.");
+"CreateMapControl(WindowIndex, ControlID, x, y, w, h, [FlagResRef, LabelID]) => ControlIndex\n\n"
+"Creates and adds a new Area Map Control to a Window.\n"
+"Note: LabelID is an ID, not an index.");
 
 static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID, x, y, w, h;
-	int LabelIndex;
+	int LabelID;
 	char *Flag=NULL;
 
 	if (!PyArg_ParseTuple( args, "iiiiii|si", &WindowIndex, &ControlID, &x,
-			&y, &w, &h, &Flag, &LabelIndex )) {
+			&y, &w, &h, &Flag, &LabelID )) {
 		return AttributeError( GemRB_CreateMapControl__doc );
 	}
 
@@ -1688,10 +1689,9 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 	map->ControlType = IE_GUI_MAP;
 	map->Owner = win;
 	if (Flag) {
-		Control *lc = win->GetControl( LabelIndex );
-		if (lc && (lc->ControlType == IE_GUI_LABEL) ) {
-			map->LinkedLabel = (Label *) lc;
-		}
+		CtrlIndex = core->GetControl( WindowIndex, LabelID );
+		Control *lc = win->GetControl( CtrlIndex );
+		map->LinkedLabel = lc;
 		AnimationMgr *anim = ( AnimationMgr* ) core->GetInterface(IE_BAM_CLASS_ID );
 		DataStream* str = core->GetResourceMgr()->GetResource( Flag, IE_BAM_CLASS_ID );
 		if(anim -> Open(str, true) ) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.13 2004/10/10 13:37:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.14 2004/10/10 15:23:25 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -40,15 +40,18 @@ Color colors[8]={
   { 0x00, 0x80, 0x00, 0xff }  //darkgreen
 };
 
-#define MAP_TO_SCREENX(x) XWin + XPos + XCenter - ScrollX + (x)
-#define MAP_TO_SCREENY(y) YWin + YPos + YCenter - ScrollY + (y)
+#define MAP_TO_SCREENX(x) (XWin + XPos + XCenter - ScrollX + (x))
+#define MAP_TO_SCREENY(y) (YWin + YPos + YCenter - ScrollY + (y))
 // Omit [XY]Pos, since these macros are used in OnMouseDown(x, y), and x, y is 
 //   already relative to control [XY]Pos there
-#define SCREEN_TO_MAPX(x) (x) - XCenter + ScrollX
-#define SCREEN_TO_MAPY(y) (y) - YCenter + ScrollY
+#define SCREEN_TO_MAPX(x) ((x) - XCenter + ScrollX)
+#define SCREEN_TO_MAPY(y) ((y) - YCenter + ScrollY)
 
 #define GAME_TO_SCREENX(x) MAP_TO_SCREENX((int)((x) * MAP_DIV / MAP_MULT))
 #define GAME_TO_SCREENY(y) MAP_TO_SCREENY((int)((y) * MAP_DIV / MAP_MULT))
+
+#define SCREEN_TO_GAMEX(x) (SCREEN_TO_MAPX(x) * MAP_MULT / MAP_DIV)
+#define SCREEN_TO_GAMEY(y) (SCREEN_TO_MAPY(y) * MAP_MULT / MAP_DIV)
 
 MapControl::MapControl(void)
 {
@@ -226,23 +229,25 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 	lastMouseX = x;
 	lastMouseY = y;
 
-	x = SCREEN_TO_MAPX(x);
-	y = SCREEN_TO_MAPY(y);
-
 	if (Value&1) {
-printf("Checking mouseover for: %d,%d\n",x,y);
-		Point mp = {x,y};
+		Point mp = {SCREEN_TO_GAMEX(x),SCREEN_TO_GAMEY(y) };
 		int i = MyMap -> GetMapNoteCount();
 		while (i--) {
 			MapNote * mn = MyMap -> GetMapNote(i);
-			if(Distance(mp, mn->Pos)<64) {
-				if(LinkedLabel) {
+			if (Distance(mp, mn->Pos)<64) {
+				if (LinkedLabel) {
 					LinkedLabel->SetText( mn->text );
+					printf("%s\n",mn->text);
 				}
-				printf("%s\n",mn->text);
-				break;
+				//if you ever need something else to do
+				//change this to a goto
+				return;
 			}
 		}
+	}
+	if (LinkedLabel) {
+		LinkedLabel->SetText( "" );
+        	( ( Window * ) Owner )->Invalidate();
 	}
 }
 
