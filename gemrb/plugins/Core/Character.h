@@ -18,34 +18,45 @@
 
 /** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
 #define MAX_STATS 164
+#define MAX_SCRIPTS 5   //or 8 ?
 
 class GEM_EXPORT Character
 {
 private:
-	short Stats[MAX_STATS];
-	short Mods[MAX_STATS];
+	long BaseStats[MAX_STATS];
+	long Modified[MAX_STATS];
 	char  Name[33];
+	char  Scripts[MAX_SCRIPTS][9];
 	char  Dialog[9];
 	char  Icon[9];
 public:
 	Character(void);
 	~Character(void);
-	/** Returns a Stat value (Base Value + Mod) */
-	short GetStat(unsigned char StatIndex);
-	/** Returns a Stat Modifier */
-	short GetMod(unsigned char StatIndex);
+	/** Returns a Stat value */
+	long  GetStat(unsigned char StatIndex);
+	/** Returns the difference */
+	long  GetMod(unsigned char StatIndex);
 	/** Returns a Stat Base Value */
-	short GetBase(unsigned char StatIndex);
+	long  GetBase(unsigned char StatIndex);
 	/** Sets a Stat Base Value */
-	bool  SetBase(unsigned char StatIndex, short Value);
-	/** Sets a Stat Modifier Value */
-	bool  SetMod(unsigned char StatIndex, short Mod);
+	bool  SetBase(unsigned char StatIndex, long Value);
+	/** Sets the modified value in different ways, returns difference */
+	int   NewMod(unsigned char StatIndex, long ModifierValue, long ModifierType);
 	/** Sets the Character Name */
 	void  SetName(const char * string)
 	{
 		if(string == NULL)
 			return;
 		strncpy(Name, string, 32);
+	}
+	/** Sets a Script ResRef */
+	void  SetScript(int ScriptIndex, const char * ResRef)
+	{
+		if(ResRef == NULL)
+			return;
+		if(ScriptIndex>=MAX_SCRIPTS)
+			return;
+		strncpy(Scripts[ScriptIndex], ResRef, 8);
 	}
 	/** Sets the Dialog ResRef */
 	void  SetDialog(const char * ResRef)
@@ -65,6 +76,11 @@ public:
 	char *GetName(void)
 	{
 		return Name;
+	}
+	/** Gets a Script ResRef */
+	char *GetScript(int ScriptIndex)
+	{
+		return Scripts[ScriptIndex];
 	}
 	/** Gets the Dialog ResRef */
 	char *GetDialog(void)
