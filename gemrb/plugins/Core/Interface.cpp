@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.125 2004/02/18 11:17:05 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.126 2004/02/18 20:59:22 avenger_teambg Exp $
  *
  */
 
@@ -1544,19 +1544,7 @@ int Interface::GetCharSounds(TextArea *ta)
 
 	memcpy(Path, GamePath,_MAX_PATH);
 	strcat(Path,"sounds");
-#ifdef WIN32
-	char Pt[_MAX_PATH];
-	memcpy(Pt,Path,sizeof(Path) );
-#endif
 	hasfolders=HasFeature(GF_SOUNDFOLDERS);
-#ifdef WIN32
-	struct _finddata_t c_file;
-	strcat(Path, SPathDelimiter);
-	strcat(Path, "*.*");
-	long hFile=(long)_findfirst(Path, &c_file);
-	if(!hFile)
-		return -1;
-#else
 	DIR * dir = opendir(Path);
 	if(dir==NULL)
 		return -1;
@@ -1566,33 +1554,20 @@ int Interface::GetCharSounds(TextArea *ta)
 		closedir(dir);
 		return -1;
 	}
-#endif
 	printf("Looking in %s\n",Path);
 	do {
 		char dtmp[_MAX_PATH];
-#ifdef WIN32
-		if(c_file.name[0] == '.')
-			continue;
-		sprintf(dtmp, "%s%s%s", Pt, SPathDelimiter, c_file.name);
-#else
 		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
 		if(de->d_name[0] == '.')
 			continue;
-#endif
 		struct stat fst;
 		stat(dtmp, &fst);
 		if(hasfolders==!S_ISDIR(fst.st_mode) )
 			continue;
 		count++;
-#ifdef WIN32
-		ta->AppendText(c_file.name,-1);
-	} while(_findnext(hFile, &c_file) == 0);
-	_findclose(hFile);
-#else
 		ta->AppendText(de->d_name,-1);
 	} while((de = readdir(dir)) != NULL);
 	closedir(dir);
-#endif
 	return count;
 }
 
