@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.h,v 1.5 2004/04/14 23:53:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.h,v 1.6 2004/08/05 21:30:00 guidoj Exp $
  *
  */
 
@@ -31,16 +31,16 @@ private:
 	//FILE* file;
 	DataStream* stream;
 	// Bits
-	unsigned long next_bits; // new bits
+	unsigned int next_bits; // new bits
 	int avail_bits; // count of new bits
 
 	int sb_size, block_size;
 	short* amp_buffer, * buff_middle;
-	long* block_ptr;
+	int* block_ptr;
 
 	// Reading routines
 	void prepare_bits(int bits); // request bits
-	long get_bits(int bits); // request and return next bits
+	int get_bits(int bits); // request and return next bits
 public:
 	// These functions are used to fill the buffer with the amplitude values
 	int return0(int pass, int ind);
@@ -81,7 +81,7 @@ public:
 	};
 
 	int init_unpacker();
-	int get_one_block(long* block);
+	int get_one_block(int* block);
 };
 
 typedef int (CValueUnpacker::* FillerProc) (int pass, int ind);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/decoder.cpp,v 1.5 2004/07/21 20:27:25 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/decoder.cpp,v 1.6 2004/08/05 21:30:00 guidoj Exp $
  *
  */
 
@@ -28,19 +28,19 @@ int CSubbandDecoder::init_decoder()
 {
 	int memory_size = ( levels == 0 ) ? 0 : ( 3 * ( block_size >> 1 ) - 2 );
 	if (memory_size) {
-		memory_buffer = ( long * ) calloc( memory_size, sizeof( long ) );
+		memory_buffer = ( int * ) calloc( memory_size, sizeof( int ) );
 		if (!memory_buffer)
 			return 0;
 	}
 	return 1;
 }
-void CSubbandDecoder::decode_data(long* buffer, int blocks)
+void CSubbandDecoder::decode_data(int* buffer, int blocks)
 {
 	if (!levels) {
 		return;
 	} // no levels - no work
 
-	long* buff_ptr = buffer, * mem_ptr = memory_buffer;
+	int* buff_ptr = buffer, * mem_ptr = memory_buffer;
 	int sb_size = block_size >> 1; // current subband size
 
 	blocks <<= 1;
@@ -60,10 +60,10 @@ void CSubbandDecoder::decode_data(long* buffer, int blocks)
 		blocks <<= 1;
 	}
 }
-void CSubbandDecoder::sub_4d3fcc(short* memory, long* buffer, int sb_size,
+void CSubbandDecoder::sub_4d3fcc(short* memory, int* buffer, int sb_size,
 	int blocks)
 {
-	long row_0, row_1, row_2 = 0, row_3 = 0, db_0, db_1;
+	int row_0, row_1, row_2 = 0, row_3 = 0, db_0, db_1;
 	int i;
 	int sb_size_2 = sb_size * 2, sb_size_3 = sb_size * 3;
 	if (blocks == 2) {
@@ -98,7 +98,7 @@ void CSubbandDecoder::sub_4d3fcc(short* memory, long* buffer, int sb_size,
 		}
 	} else {
 		for (i = 0; i < sb_size; i++) {
-			long* buff_ptr = buffer;
+			int* buff_ptr = buffer;
 			if (( blocks >> 1 ) & 1) {
 				row_0 = buff_ptr[0];
 				row_1 = buff_ptr[sb_size];
@@ -131,10 +131,10 @@ void CSubbandDecoder::sub_4d3fcc(short* memory, long* buffer, int sb_size,
 		}
 	}
 }
-void CSubbandDecoder::sub_4d420c(long* memory, long* buffer, int sb_size,
+void CSubbandDecoder::sub_4d420c(int* memory, int* buffer, int sb_size,
 	int blocks)
 {
-	long row_0, row_1, row_2 = 0, row_3 = 0, db_0, db_1;
+	int row_0, row_1, row_2 = 0, row_3 = 0, db_0, db_1;
 	int i;
 	int sb_size_2 = sb_size * 2, sb_size_3 = sb_size * 3;
 	if (blocks == 4) {
@@ -157,7 +157,7 @@ void CSubbandDecoder::sub_4d420c(long* memory, long* buffer, int sb_size,
 		}
 	} else {
 		for (i = 0; i < sb_size; i++) {
-			long* buff_ptr = buffer;
+			int* buff_ptr = buffer;
 			db_0 = memory[0]; db_1 = memory[1];
 			for (int j = 0; j < blocks >> 2; j++) {
 				row_0 = buff_ptr[0];  buff_ptr[0] = db_0 + 2 * db_1 + row_0;  buff_ptr += sb_size;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.6 2004/04/17 19:37:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.7 2004/08/05 21:30:00 guidoj Exp $
  *
  */
 
@@ -51,7 +51,7 @@ int CACMReader::init_reader()
 
 	block_size = ( 1 << levels ) * subblocks;
 	//using malloc for simple arrays (supposed to be faster)
-	block = (long *) malloc(sizeof(long)*block_size);
+	block = (int *) malloc(sizeof(int)*block_size);
 	if (!block) {
 		return 0;
 	}
@@ -176,17 +176,17 @@ int CWavPCMReader::init_reader()
 
 	cWAVEFORMATEX fmt;
 	RIFF_CHUNK r_hdr, fmt_hdr, data_hdr;
-	unsigned long wave;
+	unsigned int wave;
 	memset( &fmt, 0, sizeof( fmt ) );
 	stream->Read( &r_hdr, sizeof( r_hdr ) );
 	stream->Read( &wave, 4 );
-	if (r_hdr.fourcc != *( unsigned long * ) RIFF_4cc ||
-		wave != *( unsigned long * ) WAVE_4cc) {
+	if (r_hdr.fourcc != *( unsigned int * ) RIFF_4cc ||
+		wave != *( unsigned int * ) WAVE_4cc) {
 		return 0;
 	}
 
 	stream->Read( &fmt_hdr, sizeof( fmt_hdr ) );
-	if (fmt_hdr.fourcc != *( unsigned long * ) fmt_4cc ||
+	if (fmt_hdr.fourcc != *( unsigned int * ) fmt_4cc ||
 		fmt_hdr.length > sizeof( cWAVEFORMATEX )) {
 		return 0;
 	}
@@ -198,11 +198,11 @@ int CWavPCMReader::init_reader()
 
 	stream->Read( &data_hdr, sizeof( data_hdr ) );
 
-	if (data_hdr.fourcc == *( unsigned long * ) fact_4cc) {
+	if (data_hdr.fourcc == *( unsigned int * ) fact_4cc) {
 		stream->Seek( data_hdr.length, GEM_CURRENT_POS );
 		stream->Read( &data_hdr, sizeof( data_hdr ) );
 	}
-	if (data_hdr.fourcc != *( unsigned long * ) data_4cc) {
+	if (data_hdr.fourcc != *( unsigned int * ) data_4cc) {
 		return 0;
 	}
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/decoder.h,v 1.3 2004/02/24 22:20:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/decoder.h,v 1.4 2004/08/05 21:30:00 guidoj Exp $
  *
  */
 
@@ -27,9 +27,9 @@
 class CSubbandDecoder {
 private:
 	int levels, block_size;
-	long* memory_buffer;
-	void sub_4d3fcc(short* memory, long* buffer, int sb_size, int blocks);
-	void sub_4d420c(long* memory, long* buffer, int sb_size, int blocks);
+	int* memory_buffer;
+	void sub_4d3fcc(short* memory, int* buffer, int sb_size, int blocks);
+	void sub_4d420c(int* memory, int* buffer, int sb_size, int blocks);
 public:
 	CSubbandDecoder(int lev_cnt)
 		: levels( lev_cnt ), block_size( 1 << lev_cnt ), memory_buffer( NULL )
@@ -43,7 +43,7 @@ public:
 	};
 
 	int init_decoder();
-	void decode_data(long* buffer, int blocks);
+	void decode_data(int* buffer, int blocks);
 };
 
 #endif

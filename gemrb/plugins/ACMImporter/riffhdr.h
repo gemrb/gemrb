@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/riffhdr.h,v 1.3 2004/02/24 22:20:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/riffhdr.h,v 1.4 2004/08/05 21:30:00 guidoj Exp $
  *
  */
 
@@ -26,22 +26,22 @@
 
 typedef struct {
 	char riff_sig[4];
-	unsigned long total_len_m8;
+	unsigned int total_len_m8;
 	char wave_sig[8];
-	unsigned long formatex_len;
+	unsigned int formatex_len;
 	unsigned short wFormatTag, nChannels;
-	unsigned long nSamplesPerSec, nAvgBytesPerSec;
+	unsigned int nSamplesPerSec, nAvgBytesPerSec;
 	unsigned short nBlockAlign, wBitsPerSample;
 	char data_sig[4];
-	unsigned long raw_data_len;
+	unsigned int raw_data_len;
 } RIFF_HEADER;
 
 typedef struct {
 	char wavc_sig[4];
 	char wavc_ver[4];
-	long uncompressed;
-	long compressed;
-	long headersize;
+	int uncompressed;
+	int compressed;
+	int headersize;
 	short channels;
 	short bits;
 	short samplespersec;

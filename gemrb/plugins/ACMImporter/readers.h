@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.h,v 1.6 2004/04/17 19:37:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.h,v 1.7 2004/08/05 21:30:00 guidoj Exp $
  *
  */
 
@@ -131,7 +131,7 @@ class CACMReader : public CSoundReader {
 private:
 	int levels, subblocks;
 	int block_size;
-	long* block, * values;
+	int* block, * values;
 	long samples_ready;
 	CValueUnpacker* unpacker; // ACM-stream unpacker
 	CSubbandDecoder* decoder; // IP's subband decoder
@@ -179,8 +179,8 @@ public:
 typedef struct {
 	unsigned short wFormatTag;  	   /* format type */
 	unsigned short nChannels;   	   /* number of channels (i.e. mono, stereo...) */
-	unsigned long nSamplesPerSec;     /* sample rate */
-	unsigned long nAvgBytesPerSec;    /* for buffer estimation */
+	unsigned int nSamplesPerSec;     /* sample rate */
+	unsigned int nAvgBytesPerSec;    /* for buffer estimation */
 	unsigned short nBlockAlign; 	   /* block size of data */
 	unsigned short wBitsPerSample;     /* number of bits per sample of mono data */
 	unsigned short cbSize;  		   /* the count in bytes of the size of */
@@ -188,8 +188,8 @@ typedef struct {
 } cWAVEFORMATEX;
 
 typedef struct {
-	unsigned long fourcc;
-	unsigned long length;
+	unsigned int fourcc;
+	unsigned int length;
 } RIFF_CHUNK;
 
 const unsigned char RIFF_4cc[] = {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.9 2004/07/21 20:27:25 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.10 2004/08/05 21:30:00 guidoj Exp $
  *
  */
 
@@ -92,14 +92,14 @@ void CValueUnpacker::prepare_bits(int bits)
 		if (stream->Read( &one_byte, 1 )!=1) {
 			one_byte = 0;
 		}
-		next_bits |= ( ( unsigned long ) one_byte << avail_bits );
+		next_bits |= ( ( unsigned int ) one_byte << avail_bits );
 		avail_bits += 8;
 	}
 }
-long CValueUnpacker::get_bits(int bits)
+int CValueUnpacker::get_bits(int bits)
 {
 	prepare_bits( bits );
-	long res = next_bits;
+	int res = next_bits;
 	avail_bits -= bits;
 	next_bits >>= bits;
 	return res;
@@ -114,12 +114,12 @@ int CValueUnpacker::init_unpacker()
 	buff_middle = amp_buffer + 0x8000;
 	return 1;
 }
-int CValueUnpacker::get_one_block(long* block)
+int CValueUnpacker::get_one_block(int* block)
 {
 	block_ptr = block;
-	long pwr = get_bits( 4 ) & 0xF, val = get_bits( 16 ) & 0xFFFF,
+	int pwr = get_bits( 4 ) & 0xF, val = get_bits( 16 ) & 0xFFFF,
 		count = 1 << pwr, v = 0;
-	long i;
+	int i;
 	for (i = 0; i < count; i++) {
 		buff_middle[i] = ( short ) v;
 		v += val;
@@ -150,7 +150,7 @@ int CValueUnpacker::zero_fill(int pass, int /*ind*/)
 {
 	//Eng: used when the whole column #pass is zero-filled
 	//Rus: используется, когда весь столбец с номером pass заполнен нулями
-	long* sb_ptr = &block_ptr[pass], step = sb_size, i = subblocks;
+	int* sb_ptr = &block_ptr[pass], step = sb_size, i = subblocks;
 	do {
 		*sb_ptr = 0;
 		sb_ptr += step;
@@ -159,7 +159,7 @@ int CValueUnpacker::zero_fill(int pass, int /*ind*/)
 }
 int CValueUnpacker::linear_fill(int pass, int ind)
 {
-	long mask = ( 1 << ind ) - 1;
+	int mask = ( 1 << ind ) - 1;
 	short* lb_ptr = buff_middle + ( ( -1l ) << ( ind - 1 ) );
 
 	for (int i = 0; i < subblocks; i++)

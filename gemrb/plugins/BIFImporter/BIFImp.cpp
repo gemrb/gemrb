@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.16 2004/08/04 19:21:55 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.17 2004/08/05 21:30:01 guidoj Exp $
  *
  */
 
@@ -212,7 +212,7 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 	DataStream* s = NULL;
 	if (Type == IE_TIS_CLASS_ID) {
 		unsigned int srcResLoc = Resource & 0xFC000;
-		for (unsigned long i = 0; i < tentcount; i++) {
+		for (unsigned int i = 0; i < tentcount; i++) {
 			if (( tentries[i].resLocator & 0xFC000 ) == srcResLoc) {
 				s = new CachedFileStream( stream, tentries[i].dataOffset,
 							tentries[i].tileSize * tentries[i].tilesCount );
@@ -221,7 +221,7 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 		}
 	} else {
 		unsigned int srcResLoc = Resource & 0x3FFF;
-		for (unsigned long i = 0; i < fentcount; i++) {
+		for (unsigned int i = 0; i < fentcount; i++) {
 			if (( fentries[i].resLocator & 0x3FFF ) == srcResLoc) {
 				s = new CachedFileStream( stream, fentries[i].dataOffset,
 							fentries[i].fileSize );
@@ -239,7 +239,7 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 
 void BIFImp::ReadBIF(void)
 {
-	unsigned long foffset;
+	ieDword foffset;
 	stream->Read( &fentcount, 4 );
 	stream->Read( &tentcount, 4 );
 	stream->Read( &foffset, 4 );

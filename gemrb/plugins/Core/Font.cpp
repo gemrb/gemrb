@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.31 2004/07/25 13:34:30 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.32 2004/08/05 21:30:01 guidoj Exp $
  *
  */
 
@@ -24,7 +24,7 @@
 #include "Interface.h"
 
 extern Interface* core;
-unsigned long lastX = 0;
+unsigned int lastX = 0;
 
 #define PARAGRAPH_START_X 5;
 
@@ -122,7 +122,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
 	Color* initcolor, Sprite2D* cursor, unsigned int curpos)
 {
 	Color* pal = NULL, * ipal = NULL;
-	unsigned long psx = PARAGRAPH_START_X;
+	unsigned int psx = PARAGRAPH_START_X;
 	pal = hicolor;
 	if (ipal != NULL) {
 		ipal = initcolor;
@@ -245,7 +245,7 @@ void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
 	Sprite2D* cursor, unsigned int curpos)
 {
 	Color* pal = NULL, * ipal = NULL;
-	unsigned long psx = PARAGRAPH_START_X;
+	unsigned int psx = PARAGRAPH_START_X;
 	pal = hicolor;
 	if (ipal != NULL) {
 		ipal = initcolor;
