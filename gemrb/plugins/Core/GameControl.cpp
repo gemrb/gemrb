@@ -1320,8 +1320,9 @@ void GameControl::DisplayString(Scriptable* target)
 void GameControl::ChangeMap()
 {
 	Actor* pc = selected.at( 0 );
-	if (stricmp( pc->Area, core->GetGame()->GetMap( MapIndex )->scriptName ) ==
-		0) {
+	//setting the current area
+	strncpy(core->GetGame()->CurrentArea, core->GetGame()->GetMap( MapIndex )->scriptName,8);
+	if (stricmp( pc->Area, core->GetGame()->CurrentArea) == 0) {
 		return;
 	}
 	EndDialog();

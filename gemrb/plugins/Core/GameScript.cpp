@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.102 2004/03/18 21:00:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.103 2004/03/19 22:18:37 avenger_teambg Exp $
  *
  */
 
@@ -77,8 +77,10 @@ static TriggerLink triggernames[] = {
 	{"hppercent", GameScript::HPPercent},
 	{"hppercentgt", GameScript::HPPercentGT},
 	{"hppercentlt", GameScript::HPPercentLT},
+	{"inactivearea", GameScript::InActiveArea},
 	{"inmyarea", GameScript::InMyArea},
 	{"inparty", GameScript::InParty},
+	{"inpartyallowdead", GameScript::InPartyAllowDead},
 	{"inpartyslot", GameScript::InPartySlot},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog},
 	{"level", GameScript::Level},
@@ -2271,7 +2273,22 @@ int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
 	if (scr->Type != ST_ACTOR) {
 		return 0;
 	}
-	//return actor->InParty?1:0; //maybe ???
+	Actor *tar = (Actor *) scr;
+	if(core->GetGame()->InParty( tar ) <0) {
+		return 0;
+	}
+	return (tar->GetStat(IE_STATE_ID)&STATE_DEAD)!=0;
+}
+
+int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		scr = Sender;
+	}
+	if (scr->Type != ST_ACTOR) {
+		return 0;
+	}
 	return core->GetGame()->InParty( ( Actor * ) scr ) >= 0 ? 1 : 0;
 }
 
@@ -3090,6 +3107,19 @@ int GameScript::InMyArea(Scriptable* Sender, Trigger* parameters)
 	Actor* actor2 = ( Actor* ) tar;
 	
 	return strnicmp(actor1->Area, actor2->Area, 8)==0;
+}
+
+int GameScript::InActiveArea(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor2 = ( Actor* ) tar;
+	return strnicmp(core->GetGame()->CurrentArea, actor2->Area, 8) ==0;
 }
 
 //-------------------------------------------------------------
