@@ -21,6 +21,8 @@ extern "C" {
 #endif
 
 #include "../Core/Label.h"
+#include "../Core/AnimationMgr.h"
+
 
 inline bool valid_number(const char *string, long &val)
 {
@@ -981,9 +983,147 @@ static PyObject * GemRB_SetButtonPicture(PyObject */*self*/, PyObject *args)
 
 	core->FreeInterface(im);
 
+	delete(str);
+
 	Py_INCREF(Py_None);
 	return Py_None;
 }
+
+static PyObject * GemRB_SetButtonPLT(PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex, col1, col2, col3, col4, col5, col6, col7, col8;
+	char * ResRef;
+
+	if(!PyArg_ParseTuple(args, "iisiiiiiiii", &WindowIndex, &ControlIndex, &ResRef, &col1, &col2, &col3, &col4, &col5, &col6, &col7, &col8)) {
+		printMessage("GUIScript", "Syntax Error: SetButtonPLT(WindowIndex, ControlIndex, PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return NULL;
+
+	if(ctrl->ControlType != IE_GUI_BUTTON)
+		return NULL;
+
+	if(ResRef[0]==0) {
+		Button * btn = (Button*)ctrl;
+		btn->SetPicture(NULL);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
+	DataStream * str = core->GetResourceMgr()->GetResource(ResRef, IE_PLT_CLASS_ID);
+	if(str == NULL)
+		return NULL;
+	ImageMgr * im = (ImageMgr*)core->GetInterface(IE_PLT_CLASS_ID);
+	if(im == NULL) {
+		delete (str);
+		return NULL;
+	}
+
+	if(!im->Open(str, true)) {
+		delete(str);
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	im->GetPalette(0, col1, NULL);
+	im->GetPalette(1, col2, NULL);
+	im->GetPalette(2, col3, NULL);
+	im->GetPalette(3, col4, NULL);
+	im->GetPalette(4, col5, NULL);
+	im->GetPalette(5, col6, NULL);
+	im->GetPalette(6, col7, NULL);
+	im->GetPalette(7, col8, NULL);
+	Sprite2D * Picture = im->GetImage();
+	if(Picture == NULL) {
+		delete(str);
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	Button * btn = (Button*)ctrl;
+	btn->SetPicture(Picture);
+
+	core->FreeInterface(im);
+
+	delete(str);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_SetButtonBAM(PyObject */*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex, col1;
+	char * ResRef;
+
+	if(!PyArg_ParseTuple(args, "iisi", &WindowIndex, &ControlIndex, &ResRef, &col1)) {
+		printMessage("GUIScript", "Syntax Error: SetButtonPLT(WindowIndex, ControlIndex, PLTResRef, col1)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return NULL;
+
+	if(ctrl->ControlType != IE_GUI_BUTTON)
+		return NULL;
+
+	if(ResRef[0]==0) {
+		Button * btn = (Button*)ctrl;
+		btn->SetPicture(NULL);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
+	DataStream * str = core->GetResourceMgr()->GetResource(ResRef, IE_BAM_CLASS_ID);
+	if(str == NULL)
+		return NULL;
+	AnimationMgr * am = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
+	if(am == NULL) {
+		delete (str);
+		return NULL;
+	}
+
+	if(!am->Open(str, true)) {
+		delete(str);
+		core->FreeInterface(am);
+		return NULL;
+	}
+
+	Sprite2D * Picture = am->GetFrameFromCycle(0, 0);
+	if(Picture == NULL) {
+		delete(str);
+		core->FreeInterface(am);
+		return NULL;
+	}
+
+	Color * pal = core->GetPalette(col1, 12);
+	Color * orgpal = core->GetVideoDriver()->GetPalette(Picture);
+	memcpy(&orgpal[4], pal, 12*sizeof(Color));
+	core->GetVideoDriver()->SetPalette(Picture, orgpal);
+	free(pal);
+	free(orgpal);
+
+	Button * btn = (Button*)ctrl;
+	btn->SetPicture(Picture);
+
+	core->FreeInterface(am);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject * GemRB_PlaySound(PyObject */*self*/, PyObject *args)
 {
 	char* ResRef;
@@ -1423,6 +1563,12 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"SetButtonPicture", GemRB_SetButtonPicture, METH_VARARGS,
      "Sets the Picture of a Button Control."},
+
+ 	{"SetButtonPLT", GemRB_SetButtonPLT, METH_VARARGS,
+     "Sets the Picture of a Button Control from a PLT file."},
+
+  	{"SetButtonBAM", GemRB_SetButtonBAM, METH_VARARGS,
+     "Sets the Picture of a Button Control from a BAM file."},
 
  	{"SetLabelUseRGB", GemRB_SetLabelUseRGB, METH_VARARGS,
      "Tells a Label to use the RGB colors with the text."},
