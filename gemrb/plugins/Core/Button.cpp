@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.55 2004/03/21 11:17:56 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.56 2004/03/21 13:47:18 edheldil Exp $
  *
  */
 
@@ -254,9 +254,7 @@ void Button::OnSpecialKeyPress(unsigned char Key)
 	}
 	if (Flags & IE_GUI_BUTTON_DEFAULT) {
 		if (Key == GEM_RETURN) {
-			if (ButtonOnPress[0] != 0) {
-				core->GetGUIScriptEngine()->RunFunction( ButtonOnPress );
-			}
+			RunEventHandler( ButtonOnPress );
 		}
 	}
 }
@@ -329,8 +327,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 			else
 				core->GetSoundMgr()->Play( ButtonSounds[SND_BUTTON_RELEASE0] );
 		}
-		if (ButtonOnPress[0] != 0)
-			core->GetGUIScriptEngine()->RunFunction( ButtonOnPress );
+		RunEventHandler( ButtonOnPress );
 	}
 }
 
@@ -339,9 +336,7 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
-	if (MouseOverButton[0] != 0) {
-		core->GetGUIScriptEngine()->RunFunction( MouseOverButton );
-	}
+	RunEventHandler( MouseOverButton );
 	if (Dragging) {
 		ScrollX += ( x - DragX );
 		ScrollY += ( y - DragY );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.18 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.19 2004/03/21 13:47:18 edheldil Exp $
  *
  */
 
@@ -184,8 +184,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 			if (x < mx) {
 				SetPosition( 0 );
 				if (oldPos != Pos) {
-					if (SliderOnChange[0] != 0)
-						core->GetGUIScriptEngine()->RunFunction( SliderOnChange );
+					RunEventHandler( SliderOnChange );
 				}
 				return;
 			}
@@ -193,8 +192,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 			if (befst >= KnobStepsCount) {
 				SetPosition( KnobStepsCount - 1 );
 				if (oldPos != Pos) {
-					if (SliderOnChange[0] != 0)
-						core->GetGUIScriptEngine()->RunFunction( SliderOnChange );
+					RunEventHandler( SliderOnChange );
 				}
 				return;
 			}
@@ -206,8 +204,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 				SetPosition( aftst );
 			}
 			if (oldPos != Pos) {
-				if (SliderOnChange[0] != 0)
-					core->GetGUIScriptEngine()->RunFunction( SliderOnChange );
+				RunEventHandler( SliderOnChange );
 			}
 		}
 	} else {
@@ -216,8 +213,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 		if (x < mx) {
 			SetPosition( 0 );
 			if (oldPos != Pos) {
-				if (SliderOnChange[0] != 0)
-					core->GetGUIScriptEngine()->RunFunction( SliderOnChange );
+				RunEventHandler( SliderOnChange );
 			}
 			return;
 		}
@@ -225,8 +221,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 		if (befst >= KnobStepsCount) {
 			SetPosition( KnobStepsCount - 1 );
 			if (oldPos != Pos) {
-				if (SliderOnChange[0] != 0)
-					core->GetGUIScriptEngine()->RunFunction( SliderOnChange );
+				RunEventHandler( SliderOnChange );
 			}
 			return;
 		}
@@ -237,8 +232,7 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 			SetPosition( aftst );
 		}
 		if (oldPos != Pos) {
-			if (SliderOnChange[0] != 0)
-				core->GetGUIScriptEngine()->RunFunction( SliderOnChange );
+			RunEventHandler( SliderOnChange );
 		}
 	}
 }
@@ -262,8 +256,7 @@ void Slider::OnMouseOver(unsigned short x, unsigned short y)
 		if (x < mx) {
 			SetPosition( 0 );
 			if (oldPos != Pos) {
-				if (SliderOnChange[0] != 0)
-					core->GetGUIScriptEngine()->RunFunction( SliderOnChange );
+				RunEventHandler( SliderOnChange );
 			}
 			return;
 		}
@@ -271,8 +264,7 @@ void Slider::OnMouseOver(unsigned short x, unsigned short y)
 		if (befst >= KnobStepsCount) {
 			SetPosition( KnobStepsCount - 1 );
 			if (oldPos != Pos) {
-				if (SliderOnChange[0] != 0)
-					core->GetGUIScriptEngine()->RunFunction( SliderOnChange );
+				RunEventHandler( SliderOnChange );
 			}
 			return;
 		}
@@ -283,8 +275,7 @@ void Slider::OnMouseOver(unsigned short x, unsigned short y)
 			SetPosition( aftst );
 		}
 		if (oldPos != Pos) {
-			if (SliderOnChange[0] != 0)
-				core->GetGUIScriptEngine()->RunFunction( SliderOnChange );
+			RunEventHandler( SliderOnChange );
 		}
 	}
 }

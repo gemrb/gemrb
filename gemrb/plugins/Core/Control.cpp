@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.18 2004/03/20 23:02:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.19 2004/03/21 13:47:18 edheldil Exp $
  *
  */
 
@@ -54,6 +54,12 @@ int Control::SetTooltip(const char* string, int pos)
 	Changed = true;
 	return 0;
 }
+void Control::RunEventHandler(EventHandler handler)
+{
+	if (handler[0])
+		core->GetGUIScriptEngine()->RunFunction( (char*)handler );
+}
+
 /** Key Press Event */
 void Control::OnKeyPress(unsigned char Key, unsigned short Mod)
 {

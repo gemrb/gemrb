@@ -1132,10 +1132,12 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 	unsigned long index;
 	core->GetDictionary()->Lookup( "MessageWindowSize", index );
 	if (index == 0) {
+		// FIXME: should use RunEventHandler()
 		core->GetGUIScriptEngine()->RunFunction( "OnIncreaseSize" );
 		core->GetGUIScriptEngine()->RunFunction( "OnIncreaseSize" );
 	} else {
 		if (index == 1) {
+			// FIXME: should use RunEventHandler()
 			core->GetGUIScriptEngine()->RunFunction( "OnIncreaseSize" );
 		}
 	}
@@ -1173,6 +1175,7 @@ void GameControl::EndDialog()
 	target = NULL;
 	ds = NULL;
 	dlg = NULL;
+	// FIXME: should use RunEventHandler()
 	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
 	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
 	DisableMouse = false;

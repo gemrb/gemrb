@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.13 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.14 2004/03/21 13:47:18 edheldil Exp $
  *
  */
 
@@ -104,9 +104,7 @@ void TextEdit::OnKeyPress(unsigned char Key, unsigned short Mod)
 			CurPos++;
 		}
 	}
-	if (EditOnChange[0] != 0) {
-		core->GetGUIScriptEngine()->RunFunction( EditOnChange );
-	}
+	RunEventHandler( EditOnChange );
 }
 /** Special Key Press */
 void TextEdit::OnSpecialKeyPress(unsigned char Key)
@@ -145,9 +143,7 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 			}
 			break;
 	}
-	if (EditOnChange[0] != 0) {
-		core->GetGUIScriptEngine()->RunFunction( EditOnChange );
-	}
+	RunEventHandler( EditOnChange );
 }
 
 /** Sets the Text of the current control */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.15 2004/03/20 23:02:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.16 2004/03/21 13:47:17 edheldil Exp $
  *
  */
 
@@ -48,6 +48,9 @@
 #else
 #define GEM_EXPORT
 #endif
+
+typedef char EventHandler[64];
+
 
 class GEM_EXPORT Control {
 public: 
@@ -86,6 +89,8 @@ public: // Public attributes
 	/** Owner Window */
 	void* Owner;
 public: //Events
+	/** Run specified handler */
+	void RunEventHandler(EventHandler handler);
 	/** Key Press Event */
 	virtual void OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Key Release Event */
