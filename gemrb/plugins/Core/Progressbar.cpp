@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.11 2004/10/09 16:31:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.12 2004/11/04 20:57:07 avenger_teambg Exp $
  *
  */
 
@@ -76,7 +76,7 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 	if (bcksprite) {
 		Region r( x + XPos, y + YPos, Width, Height );
 		core->GetVideoDriver()->BlitSprite( bcksprite,
-			x + XPos, y + YPos, false, &r );
+			x + XPos, y + YPos, true, &r );
 		if( bcksprite==BackGround2) {
 			return; //done for animated progbar
 		}
