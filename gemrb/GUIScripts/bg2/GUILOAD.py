@@ -52,11 +52,14 @@ def ScrollBarPress():
 	for i in range(0,4):
 		ActPos = Pos + i
 
+		Button1 = GemRB.GetControl(LoadWindow,26+i)
+		Button2 = GemRB.GetControl(LoadWindow, 30+i)
 		if ActPos<GameCount:
-			Button = GemRB.GetControl(LoadWindow,26+i)
-			GemRB.SetButtonState(LoadWindow, Button, IE_GUI_BUTTON_ENABLED)
-			Button = GemRB.GetControl(LoadWindow, 30+i)
-			GemRB.SetButtonState(LoadWindow, Button, IE_GUI_BUTTON_ENABLED)
+			GemRB.SetButtonState(LoadWindow, Button1, IE_GUI_BUTTON_ENABLED)
+			GemRB.SetButtonState(LoadWindow, Button2, IE_GUI_BUTTON_ENABLED)
+		else:
+			GemRB.SetButtonState(LoadWindow, Button1, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetButtonState(LoadWindow, Button2, IE_GUI_BUTTON_DISABLED)
 
 		if ActPos<GameCount:
 			Slotname = GemRB.GetSaveGameAttrib(0,ActPos)
