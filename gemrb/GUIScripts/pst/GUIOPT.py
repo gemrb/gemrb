@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.5 2004/03/22 22:07:04 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.6 2004/03/28 11:17:16 edheldil Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -724,7 +724,7 @@ def OpenMoviesWindow ():
 	# Credits
 	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, Button, 33078)
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")	
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnCreditsPress")	
 
 	# Done
 	Button = GemRB.GetControl (Window, 4)
@@ -768,6 +768,10 @@ def OnPlayMoviePress ():
 	GemRB.UnloadTable (MovieTable)
 	
 	GemRB.PlayMovie (key)
+
+###################################################
+def OnCreditsPress ():
+	GemRB.PlayMovie ("CREDITS")
 
 ###################################################
 ###################################################
