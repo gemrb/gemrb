@@ -45,12 +45,13 @@ GameControl::GameControl(void)
 	overDoor = NULL;
 	overContainer = NULL;
 	overInfoPoint = NULL;
-#ifdef _DEBUG
 	drawPath = NULL;
-#endif
+	pfsX = 0;
+	pfsY = 0;
 	InfoTextPalette = core->GetVideoDriver()->CreatePalette(white, black);
 	lastCursor = 0;
 	moveX = moveY = 0;
+	DebugFlags = 0;
 }
 
 GameControl::~GameControl(void)
@@ -104,6 +105,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				video->DrawPolyline(overContainer->outline, cyan, true);
 			}
 		}
+		if(DebugFlags&1) {
+			//draw traps with blue overlay
+		}
 		for(int i = 0; i < infoPoints.size(); i++) {
 #ifdef WIN32
 			unsigned long time = GetTickCount();
@@ -126,7 +130,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				font->Print(rgn, (unsigned char*)infoPoints[i]->String, InfoTextPalette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, false);
 			}
 		}
-#ifdef _DEBUG
+
 		if(drawPath) {
 			PathNode * node = drawPath;
 			while(true) {
@@ -145,14 +149,14 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				node = node->Next;
 			}
 		}
-#endif
-#ifdef DEBUG_SEARCH_MAP
-		Sprite2D * spr = area->SearchMap->GetImage();
-		video->BlitSprite(spr, 0, 0, true);
-		video->FreeSprite(spr);
-		Region point(GameX/16, GameY/12, 1, 1);
-		video->DrawRect(point, red);
-#endif
+
+		if(DebugFlags&2) {
+			Sprite2D * spr = area->SearchMap->GetImage();
+			video->BlitSprite(spr, 0, 0, true);
+			video->FreeSprite(spr);
+			Region point(GameX/16, GameY/12, 1, 1);
+			video->DrawRect(point, red);
+		}
 	}
 	else {
 		core->GetVideoDriver()->DrawRect(vp, blue);
@@ -166,9 +170,15 @@ int GameControl::SetText(const char * string, int pos)
 /** Key Press Event */
 void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
-#ifdef _DEBUG
+}
+/** Key Release Event */
+void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
+{
+	if(!core->CheatEnabled() ) return;
+	if(Mod==64 ) //ctrl
+	{
 	switch(Key) {
-		case 'a': 
+		case 1:  //'a'
 			{
 				if(overContainer) {
 					if(overContainer->Trapped && !(overContainer->TrapDetected)) {
@@ -180,7 +190,7 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 			}
 		break;
 
-		case 'p':
+		case 16: //'p'
 			{
 				short GameX = lastMouseX, GameY = lastMouseY;
 				core->GetVideoDriver()->ConvertToGame(GameX, GameY);
@@ -200,20 +210,35 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 			}
 		break;
 
-		case 's':
+		case 19: // s
 			{
 				pfsX = lastMouseX; 
 				pfsY = lastMouseY;
 				core->GetVideoDriver()->ConvertToGame(pfsX, pfsY);
 			}
 		break;
+		case 24: // 'x'
+			{
+				Game * game = core->GetGame();
+				Map * area = game->GetMap(MapIndex);
+				//get the area resref, store it first!
+				short cX = lastMouseX; 
+				short cY = lastMouseY;
+				core->GetVideoDriver()->ConvertToGame(cX, cY);
+				printf("%d %d",cX, cY);
+			}
+		break;
+		case 28: // '4'  //show all traps
+				DebugFlags^=1;
+		break;
+		case 29: // '5' //show the searchmap
+				DebugFlags^=2;
+		break;
+		default:
+			printf("KeyRelease:%d  %d\n",Key, Mod);
+		break;
 	}
-#endif
-}
-/** Key Release Event */
-void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
-{
-	printf("KeyRelease\n");
+	}
 }
 /** Mouse Over Event */
 void GameControl::OnMouseOver(unsigned short x, unsigned short y)

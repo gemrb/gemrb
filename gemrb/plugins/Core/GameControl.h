@@ -46,10 +46,9 @@ private:
 	unsigned char lastCursor;
 	short moveX, moveY;
 	unsigned short lastMouseX, lastMouseY;
-#ifdef _DEBUG
+	int DebugFlags;
 	short pfsX, pfsY;
 	PathNode * drawPath;
-#endif
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.49 2003/12/01 16:34:57 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.50 2003/12/02 23:09:38 avenger_teambg Exp $
  *
  */
 
@@ -264,16 +264,30 @@ public:
 	bool FullScreen, CaseSensitive;
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);
-  /** Sends a termination signal to the Video Driver */
-  bool Quit(void);
+	/** Sends a termination signal to the Video Driver */
+	bool Quit(void);
+	/** CheatKey support */
+	void EnableCheatKeys(int Flag)
+	{
+        	CheatFlag=Flag;
+	}
+
+	bool CheatEnabled()
+	{
+        	return CheatFlag;
+	}
+
 	/** Next Script Name */
 	char NextScript[64];
 	/** Need to Load a new Script */
 	bool ChangeScript;
 	/** Console is on Screen */
 	bool ConsolePopped;
+	/** Cheats enabled? */
+	bool CheatFlag;
 	/** The Console Object */
 	Console * console;
+
 #ifdef _DEBUG
 	int FileStreamPtrCount;
 	int CachedFileStreamPtrCount;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.14 2003/11/29 17:30:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.15 2003/12/02 23:09:39 avenger_teambg Exp $
  *
  */
 
@@ -52,12 +52,13 @@ bool MUSImp::OpenPlaylist(const char * name)
 	core->GetSoundMgr()->ResetMusics();
 	playlist.clear();
 	PLpos = 0;
+	if(name[0]=='*')
+		return false;
 	char path[_MAX_PATH];
 	strcpy(path, core->GamePath);
 	strcat(path, "music");
 	strcat(path, SPathDelimiter);
 	strcat(path, name);
-//	strcat(path, ".mus");
 	if(!str->Open(path, true))
 		return false;
 	str->ReadLine(PLName, 32);
@@ -161,7 +162,6 @@ bool MUSImp::OpenPlaylist(const char * name)
 			pls.soundID = core->GetSoundMgr()->LoadFile(FName);
 		}
 		playlist.push_back(pls);
-		printf("%s.acm Added in position %d\n", pls.PLFile, pls.soundID);
 		count--;
 	}
 	return true;
@@ -171,8 +171,9 @@ void MUSImp::Start()
 {
 	if(!Playing) {
 		PLpos = 0;
+		if(playlist.size()==0)
+			return;
 		if(playlist[PLpos].PLLoop[0] != 0) {
-			//printf("Looping...\n");
 			for(int i = 0; i < playlist.size(); i++) {
 				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
 					PLnext = i;
@@ -181,7 +182,6 @@ void MUSImp::Start()
 			}
 		}
 		else {
-			//printf("Next Track...\n");
 			PLnext=PLpos+1;
 		}
 		core->GetSoundMgr()->Play(playlist[PLpos].soundID);
@@ -193,6 +193,8 @@ void MUSImp::Start()
 void MUSImp::End()
 {
 	if(Playing) {
+		if(playlist.size()==0)
+			return;
 		if(playlist[PLpos].PLEnd[0] != 0) {
 			//core->GetSoundMgr()->Stop(lastSound);
 			for(int i = 0; i < playlist.size(); i++) {
@@ -255,7 +257,6 @@ void MUSImp::PlayNext()
 		PLpos = PLnext;
 		core->GetSoundMgr()->Play(lastSound);
 		if(playlist[PLpos].PLLoop[0] != 0) {
-			//printf("Looping...\n");
 			for(int i = 0; i < playlist.size(); i++) {
 				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
 					PLnext = i;
@@ -267,27 +268,9 @@ void MUSImp::PlayNext()
 			if(playlist[PLnext].PLEnd[0] == 1)
 				PLnext = -1;
 			else
-			//printf("Next Track...\n");
 				PLnext=PLpos+1;
 		}
 	}
 	else
 		Playing = false;
-	/*if(playlist[PLpos].PLLoop[0] != 0) {
-		printf("Looping...\n");
-		for(int i = 0; i < playlist.size(); i++) {
-			if(stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
-				PLpos = i;
-				break;
-			}
-		}
-		lastSound = playlist[PLpos].soundID;
-		core->GetSoundMgr()->Play(lastSound);
-	}
-	else {
-		printf("Next Track...\n");
-		PLpos++;
-		lastSound = playlist[PLpos].soundID;
-		core->GetSoundMgr()->Play(lastSound);
-	}*/
 }
