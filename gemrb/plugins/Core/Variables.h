@@ -15,8 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#if !defined(AFX_DICTIONARY_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_)
-#define AFX_DICTIONARY_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_
+#if !defined(AFX_VARIABLES_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_)
+#define AFX_VARIABLES_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_
 
 #if _MSC_VER > 1000
 #pragma once
@@ -117,4 +117,4 @@ public:
 	~Variables();
 };
 
-#endif // !defined(AFX_DICTIONARY_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_)
+#endif // !defined(AFX_VARIABLES_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_)
