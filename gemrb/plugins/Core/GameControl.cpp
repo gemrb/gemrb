@@ -181,11 +181,11 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			}
 			if(infoTexts[i]->textDisplaying == 1) {
 				Font * font = core->GetFont(9);
-				Region rgn(infoTexts[i]->XPos-100, infoTexts[i]->YPos-100, 200, 400);
+				Region rgn(infoTexts[i]->XPos-200, infoTexts[i]->YPos-100, 400, 400);
 				//printf("Printing InfoText at [%d,%d,%d,%d]\n", rgn.x, rgn.y, rgn.w, rgn.h);
 				rgn.x+=video->xCorr;
 				rgn.y+=video->yCorr;
-				font->Print(rgn, (unsigned char*)infoTexts[i]->overHeadText, InfoTextPalette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP, false);
+				font->Print(rgn, (unsigned char*)infoTexts[i]->overHeadText, InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false);
 			}
 		}
 
@@ -487,17 +487,18 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 		}
 		if(overInfoPoint) {
 			if(overInfoPoint->ipType == ST_TRIGGER) {
-				if(overInfoPoint->overHeadText) {
-					if(overInfoPoint->textDisplaying != 1) {
-						overInfoPoint->textDisplaying = 1;
-						infoTexts.push_back(overInfoPoint);
-						GetTime(overInfoPoint->timeStartDisplaying);
-					}
-				}
 				if(overInfoPoint->Scripts[0] && (selected.size() == 1)) {
 					overInfoPoint->LastTrigger = selected[0];
 					overInfoPoint->Clicker = selected[0];
 					overInfoPoint->Scripts[0]->Update();
+				} else {
+					if(overInfoPoint->overHeadText) {
+						if(overInfoPoint->textDisplaying != 1) {
+							overInfoPoint->textDisplaying = 1;
+							infoTexts.push_back(overInfoPoint);
+							GetTime(overInfoPoint->timeStartDisplaying);
+						}
+					}
 				}
 			}
 		}
