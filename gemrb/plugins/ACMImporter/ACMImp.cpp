@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.46 2004/08/07 14:34:44 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.47 2004/08/07 15:41:51 divide Exp $
  *
  */
 
@@ -35,6 +35,9 @@
 #define DisplayALError(string, error) printf("%s0x%04X", string, error);
 #define ACM_BUFFERSIZE 8192
 #define MUSICBUFERS 10
+
+// the distance at which sound is played at full volume
+#define REFERENCE_DISTANCE 50
 
 static AudioStream streams[MAX_STREAMS], speech;
 static CSoundReader *MusicReader;
@@ -279,6 +282,7 @@ bool ACMImp::Init(void)
 	alSourcef( MusicSource, AL_PITCH, 1.0f );
 	alSourcef( MusicSource, AL_GAIN, 1.0f );
 	alSourcefv( MusicSource, AL_POSITION, SourcePos );
+	alSourcei( MusicSource, AL_SOURCE_RELATIVE, 1 );
 	alSourcefv( MusicSource, AL_VELOCITY, SourceVel );
 	alSourcei( MusicSource, AL_LOOPING, 0 );
 	return true;
@@ -353,6 +357,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, bool IsSpeech
 			alSourcef( speech.Source, AL_GAIN, 1.0f );
 			alSourcefv( speech.Source, AL_VELOCITY, SourceVel );
 			alSourcei( speech.Source, AL_LOOPING, 0 );
+			alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
 		}
 		alSourceStop( speech.Source );	// legal nop if not playing
 		alSourcefv( speech.Source, AL_POSITION, SourcePos );
@@ -376,6 +381,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos, bool IsSpeech
 		alSourcefv( Source, AL_POSITION, SourcePos );
 		alSourcefv( Source, AL_VELOCITY, SourceVel );
 		alSourcei( Source, AL_LOOPING, 0 );
+		alSourcef( Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
 	
 		if (alGetError() != AL_NO_ERROR) {
 			return 0;
@@ -494,8 +500,4 @@ void ACMImp::ResetMusics()
 void ACMImp::UpdateViewportPos(int XPos, int YPos)
 {
 	alListener3f( AL_POSITION, ( float ) XPos, ( float ) YPos, 0.0f );
-	if (alIsSource( MusicSource )) {
-		alSource3f( MusicSource, AL_POSITION, ( float ) XPos, ( float ) YPos,
-			0.0f );
-	}
 }

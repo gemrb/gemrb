@@ -1,4 +1,4 @@
-/* $Id: mve_play.cpp,v 1.5 2004/07/31 13:17:54 avenger_teambg Exp $ */
+/* $Id: mve_play.cpp,v 1.6 2004/08/07 15:41:52 divide Exp $ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -323,10 +323,9 @@ static int create_audiobuf_handler(unsigned char major, unsigned char minor,
 			fprintf( stderr, "   failure\n");
 		}
 
-		ALfloat SourcePos[3];
-		//moving the source to where the listener is
-		//so we don't have to alter listener here
-		alGetListenerfv( AL_POSITION, SourcePos );
+		ALfloat SourcePos[] = {
+			0.0f, 0.0f, 0.0f
+		};
 		ALfloat SourceVel[] = {
 			0.0f, 0.0f, 0.0f
 		};
@@ -334,6 +333,7 @@ static int create_audiobuf_handler(unsigned char major, unsigned char minor,
 		alSourcef( mve_audio_source, AL_PITCH, 1.0f );
 		alSourcef( mve_audio_source, AL_GAIN, 1.0f );
 		alSourcefv( mve_audio_source, AL_POSITION, SourcePos );
+		alSourcei( mve_audio_source, AL_SOURCE_RELATIVE, 1 );
 		alSourcefv( mve_audio_source, AL_VELOCITY, SourceVel );
 		alSourcei( mve_audio_source, AL_LOOPING, 0 );
 	}

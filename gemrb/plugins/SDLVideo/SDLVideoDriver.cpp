@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.79 2004/08/05 17:25:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.80 2004/08/07 15:41:53 divide Exp $
  *
  */
 
@@ -888,6 +888,9 @@ Region SDLVideoDriver::GetViewport()
 
 void SDLVideoDriver::SetViewport(int x, int y)
 {
+	if (x != Viewport.x || y != Viewport.y) {
+		core->GetSoundMgr()->UpdateViewportPos( x + Viewport.w / 2, y + Viewport.h / 2 );
+	}
 	Viewport.x = x;
 	Viewport.y = y;
 }
@@ -906,8 +909,7 @@ void SDLVideoDriver::SetViewport(int x, int y, int w, int h)
 
 void SDLVideoDriver::MoveViewportTo(int x, int y)
 {
-	Viewport.x = x - ( Viewport.w / 2 );
-	Viewport.y = y - ( Viewport.h / 2 );
+	SetViewport( x - ( Viewport.w / 2 ), y - ( Viewport.h / 2 ) );
 }
 /** No descriptions */
 void SDLVideoDriver::SetPalette(Sprite2D* spr, Color* pal)
