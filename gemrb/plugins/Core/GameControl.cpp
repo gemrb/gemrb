@@ -56,6 +56,9 @@ Animation* effect;
 
 GameControl::GameControl(void)
 {
+	//this is the default action, individual actors should have one too
+	//at this moment we use only this
+	action = GA_DEFAULT | GA_SELECT | GA_NO_DEAD;
 	Changed = true;
 	ChangeArea = false;
 	lastActor = NULL;
@@ -549,7 +552,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 
 	if (!DrawSelectionRect) {
-		Actor* actor = area->GetActor( GameX, GameY );
+		Actor* actor = area->GetActor( GameX, GameY, action);
 		if (lastActor)
 			lastActor->SetOver( false );
 		if (!actor) {
@@ -557,29 +560,27 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		} else {
 			lastActor = actor;
 			lastActor->SetOver( true );
-			if (( lastActor->Modified[IE_STATE_ID] & STATE_DEAD ) == 0) {
-				switch (lastActor->Modified[IE_EA]) {
-					case EVILCUTOFF:
-					case GOODCUTOFF:
-						break;
+			switch (lastActor->Modified[IE_EA]) {
+				case EVILCUTOFF:
+				case GOODCUTOFF:
+					break;
 
-					case PC:
-					case FAMILIAR:
-					case ALLY:
-					case CONTROLLED:
-					case CHARMED:
-					case EVILBUTGREEN:
-						nextCursor = 0;
-						break;
+				case PC:
+				case FAMILIAR:
+				case ALLY:
+				case CONTROLLED:
+				case CHARMED:
+				case EVILBUTGREEN:
+					nextCursor = 0;
+					break;
 
-					case ENEMY:
-					case GOODBUTRED:
-						nextCursor = 12;
-						break;
-					default:
-						nextCursor = 18;
-						break;
-				}
+				case ENEMY:
+				case GOODBUTRED:
+					nextCursor = 12;
+					break;
+				default:
+					nextCursor = 18;
+					break;
 			}
 		}
 	}
@@ -633,7 +634,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentMap( );
 	if (!DrawSelectionRect) {
-		Actor* actor = area->GetActor( GameX, GameY );
+		Actor* actor = area->GetActor( GameX, GameY, action );
 
 		if (!actor && ( selected.size() == 1 )) {
 			actor = selected.at( 0 );
@@ -791,6 +792,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 	}
 	core->GetVideoDriver()->SetViewport( Viewport.x, Viewport.y );
 }
+
 Map *GameControl::SetCurrentArea(int Index)
 {
 	Game* game = core->GetGame();
@@ -798,9 +800,9 @@ Map *GameControl::SetCurrentArea(int Index)
 	Map* area = game->GetCurrentMap( );
 	memcpy(game->CurrentArea, area->scriptName, 9);
 	//night or day?
+	//if in combat, play battlesong (or don't stop song here)
+	//if night, play night song
 	area->PlayAreaSong( 0 );
-	core->GetPathFinder()->SetMap( area->SearchMap, area->tm->XCellCount * 4,
-		( area->tm->YCellCount * 64 ) / 12 );
 	return area;
 }
 
@@ -836,7 +838,7 @@ void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 		}
 		free( ab );
 	} else {
-		Actor* actor = area->GetActor( x, y );
+		Actor* actor = area->GetActor( x, y, action );
 		if (lastActor)
 			lastActor->SetOver( false );
 		if (!actor) {
@@ -1363,12 +1365,12 @@ void GameControl::DisplayString(Scriptable* target)
 	infoTexts.push_back( scr );
 }
 
+/** changes displayed map to the currently selected PC */
 void GameControl::ChangeMap()
 {
 	Actor* pc = selected.at( 0 );
-	//setting the current area
-	strncpy(core->GetGame()->CurrentArea, core->GetGame()->GetCurrentMap()->scriptName,8);
-	if (stricmp( pc->Area, core->GetGame()->CurrentArea) == 0) {
+	Game* game = core->GetGame();
+	if (stricmp( pc->Area, game->CurrentArea) == 0) {
 		return;
 	}
 	EndDialog();
@@ -1380,8 +1382,9 @@ void GameControl::ChangeMap()
 	}
 	infoTexts.clear();
 	selected.clear();
-	core->GetGame()->DelMap( MapIndex, true );
-	int mi = core->GetGame()->LoadMap( pc->Area );
+	game->DelMap( game->MapIndex, true );
+	/* loading map and setting up pathfinder */
+	int mi = core->GetGame()->LoadMap( pc->Area, true );
 	Map* map = SetCurrentArea( mi );
 	selected.push_back( pc );
 	if (EntranceName[0]) {
@@ -1398,14 +1401,18 @@ void GameControl::ChangeMap()
 			XPos = ent->XPos / 16; 
 			YPos = ent->YPos / 12;
 		}
+		pc->SetPosition(XPos, YPos, true);
+		pc->Orientation = ent->Face;
+/*
 		core->GetPathFinder()->AdjustPosition( XPos, YPos );
 		pc->XPos = ( unsigned short ) ( XPos * 16 ) + 8;
 		pc->YPos = ( unsigned short ) ( YPos * 12 ) + 8;
+*/
 		EntranceName[0] = 0;
 	}
 	Region vp = core->GetVideoDriver()->GetViewport();
 	core->GetVideoDriver()->SetViewport( pc->XPos - ( vp.w / 2 ),
-								pc->YPos - ( vp.h / 2 ) );
+		pc->YPos - ( vp.h / 2 ) );
 	ChangeArea = false;
 }
 

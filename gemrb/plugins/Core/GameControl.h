@@ -39,7 +39,6 @@ public:
 	*/
 	void SetInfoTextColor(Color color);
 private:
-	int MapIndex;
 	Actor* lastActor;
 	std::vector< Actor*> selected;
 	std::vector< Actor*> highlighted;
@@ -49,6 +48,7 @@ private:
 	bool MouseIsDown;
 	Region SelectionRect;
 	short StartX, StartY;
+	int action;
 public:
 	char HotKey;
 	Door* overDoor;

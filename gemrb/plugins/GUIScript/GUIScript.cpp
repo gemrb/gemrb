@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.158 2004/04/16 21:30:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.159 2004/04/17 11:28:11 avenger_teambg Exp $
  *
  */
 
@@ -140,9 +140,14 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 
 static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
 {
-	GameControl* gc = StartGameControl();
 	Game* game = core->GetGame();
-	game->LoadMap(game->CurrentArea);
+	if(!game) {
+		printf("No game loaded!\n");
+		return NULL;
+	}
+	GameControl* gc = StartGameControl();
+	/* setting the pathfinder to the current area */
+	game->LoadMap(game->CurrentArea, true);
 	gc->SetCurrentArea( 0 );
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -161,25 +166,31 @@ static PyObject* GemRB_MoveTAText(PyObject * /*self*/, PyObject* args)
 
 	Window* SrcWin = core->GetWindow( srcWin );
 	if (!SrcWin) {
+		printMessage( "GUIScript", "No source window\n",LIGHT_RED);
 		return NULL;
 	}
 	TextArea* SrcTA = ( TextArea* ) SrcWin->GetControl( srcCtrl );
 	if (!SrcTA) {
+		printMessage( "GUIScript", "No source control\n",LIGHT_RED);
 		return NULL;
 	}
 	if (SrcTA->ControlType != IE_GUI_TEXTAREA) {
+		printMessage( "GUIScript", "No source textarea\n",LIGHT_RED);
 		return NULL;
 	}
 
 	Window* DstWin = core->GetWindow( dstWin );
 	if (!DstWin) {
+		printMessage( "GUIScript", "No destination window\n",LIGHT_RED);
 		return NULL;
 	}
 	TextArea* DstTA = ( TextArea* ) DstWin->GetControl( dstCtrl );
 	if (!DstTA) {
+		printMessage( "GUIScript", "No destination control\n",LIGHT_RED);
 		return NULL;
 	}
 	if (DstTA->ControlType != IE_GUI_TEXTAREA) {
+		printMessage( "GUIScript", "No destination textarea\n",LIGHT_RED);
 		return NULL;
 	}
 
@@ -3066,7 +3077,8 @@ GUIScript::~GUIScript(void)
 /** Initialization Routine */
 bool GUIScript::Init(void)
 {
-	Py_SetProgramName( "GemRB -- Python" );
+//this should be a file name to python, not a title!
+//	Py_SetProgramName( "GemRB -- Python" );
 	Py_Initialize();
 	if (!Py_IsInitialized()) {
 		return false;

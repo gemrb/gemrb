@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.31 2004/04/15 21:44:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.32 2004/04/17 11:28:09 avenger_teambg Exp $
  *
  */
 
@@ -362,7 +362,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			delete items[i];
 		}
 	}
-	act->inventory.dump();
+//	act->inventory.dump();
 
 	// Reading spellbook
 
@@ -415,7 +415,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			delete memorized_spells[i];
 		}
 	}
-	act->spellbook.dump();
+//	act->spellbook.dump();
 
 	act->Init(); //applies effects, updates Modified
 }

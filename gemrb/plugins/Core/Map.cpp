@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.88 2004/04/16 21:30:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.89 2004/04/17 11:28:10 avenger_teambg Exp $
  *
  */
 
@@ -399,14 +399,28 @@ void Map::DeleteActor(Actor* actor)
 	}
 }
 
-Actor* Map::GetActor(int x, int y)
+/** flags: GA_SELECT=1   - unselectable actors don't play
+	   GA_NO_DEAD=2	 - dead actors don't play
+ */
+Actor* Map::GetActor(unsigned int x, unsigned int y, int flags)
 {
-	for (size_t i = 0; i < actors.size(); i++) {
-		Actor* actor = actors.at( i );
-		if (actor->BaseStats[IE_UNSELECTABLE] ||
-			( actor->BaseStats[IE_STATE_ID] & STATE_DEAD ) ||
-			( !actor->Active ))
-			continue;
+	unsigned int i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+		
+		if (actor->DeleteMe) {
+			continue; //actor is already marked for removal
+		}
+		if (flags&GA_SELECT) {
+			if (actor->BaseStats[IE_UNSELECTABLE]) {
+				continue;
+			}
+		}
+		if (flags&GA_NO_DEAD) {
+			if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
+				continue;
+			}
+		}
 		if (actor->IsOver( ( unsigned short ) x, ( unsigned short ) y ))
 			return actor;
 	}
@@ -476,7 +490,7 @@ void Map::PlayAreaSong(int SongType)
 	core->GetMusicMgr()->SwitchPlayList( poi, true );
 }
 
-int Map::GetBlocked(int cx, int cy)
+int Map::GetBlocked(unsigned int cx, unsigned int cy)
 {
 	int block = SearchMap->GetPixelIndex( cx / 16, cy / 12 );
 	return Passable[block];
@@ -595,12 +609,13 @@ Animation* Map::GetAnimation(const char* Name)
 	return NULL;
 }
 
-void Map::AddEntrance(char* Name, short XPos, short YPos)
+void Map::AddEntrance(char* Name, short XPos, short YPos, short Face)
 {
 	Entrance* ent = new Entrance();
-	strcpy( ent->Name, Name );
+	strncpy( ent->Name, Name, 32 );
 	ent->XPos = XPos;
 	ent->YPos = YPos;
+	ent->Face = Face;
 	entrances.push_back( ent );
 }
 
@@ -635,7 +650,7 @@ void Map::DebugDump()
 PathFinder::PathFinder(void)
 {
 	MapSet = NULL;
-	sMap = NULL;
+	area = NULL;
 	if (!PathFinderInited) {
 		InitPathFinder();
 	}
@@ -645,21 +660,24 @@ PathFinder::PathFinder(void)
 PathFinder::~PathFinder(void)
 {
 	if (MapSet) {
-		delete[] MapSet;
+		free(MapSet);
 	}
 }
 
-void PathFinder::SetMap(ImageMgr* sMap, unsigned int Width,
-	unsigned int Height)
+void PathFinder::SetMap(Map *newarea)
 {
-	if (MapSet) {
-		delete[] MapSet;
+	if(area==newarea) {
+		return;
 	}
-	this->Width = Width;
-	this->Height = Height;
+	if (MapSet) {
+		free(MapSet);
+	}
+	area=newarea;
+	sMap=area->SearchMap;
+	Width=area->tm->XCellCount * 4;
+	Height=( area->tm->YCellCount * 64 ) / 12;
 	//Filling Matrices
-	MapSet = new unsigned short[Width * Height];
-	this->sMap = sMap;
+	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
 }
 
 void PathFinder::Leveldown(unsigned int px, unsigned int py,

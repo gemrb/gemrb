@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.26 2004/04/16 18:39:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.27 2004/04/17 11:28:10 avenger_teambg Exp $
  *
  */
 
@@ -120,8 +120,7 @@ public:
 	unsigned long FamiliarsOffset;  // offset to known creatures on PST
 	char AnotherArea[9];
 	char CurrentArea[9];
-	unsigned char Unknowns[84];
-	
+	char LoadMos[9];
 public:
 	/* returns the PC's slot count for partyID*/
 	int FindPlayer(unsigned int partyID);
@@ -137,6 +136,8 @@ public:
 	int JoinParty(Actor* pc);
 	/* return current party size */
 	int GetPartySize(bool onlyalive);
+	/* returns the npcs count */
+	int GetNPCCount() { return NPCs.size(); }
 	/* select PC for non-walking environment (shops, inventory, ...) */
 	bool SelectPCSingle(int index);
 	/* get index of selected PC for non-walking env (shops, inventory, ...) */
@@ -145,26 +146,27 @@ public:
 	int GetPartyLevel(bool onlyalive);
 	/* removes actor from party (if in there) */
 	int LeaveParty(Actor* pc);
-	/*returns slot*/
+	/* returns slot*/
 	int SetPC(Actor* pc);
 	int DelPC(unsigned int slot, bool autoFree = false);
 	int DelNPC(unsigned int slot, bool autoFree = false);
-	/** returns map in index */
+	/* returns map in index */
 	Map* GetMap(unsigned int index);
-	/** returns slot of the map if found */
+	/* returns slot of the map if found */
 	int FindMap(const char *ResRef);
         Map * GetCurrentMap();
 	int AddMap(Map* map);
-	/** returns slot of the map, if it was already loaded,
-		don't load it again */
-	int LoadMap(const char* ResRef);
+	/* returns slot of the map, if it was already loaded,
+	 	don't load it again, set changepf == true,
+		if you want to change the pathfinder too. */
+	int LoadMap(const char* ResRef, bool changepf = false);
 	int DelMap(unsigned int index, bool autoFree = false);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index);
-	/** adds a journal entry from dialog data */
-	/** time and chapter are calculated on the fly */
+	/* adds a journal entry from dialog data */
+	/* time and chapter are calculated on the fly */
 	void AddJournalEntry(ieStrRef strref, int section, int group);
-	/** adds a journal entry while loading the .gam structure */
+	/* adds a journal entry while loading the .gam structure */
 	void AddJournalEntry(GAMJournalEntry* entry);
 	int GetJournalCount();
 	GAMJournalEntry* GetJournalEntry(unsigned int Index);

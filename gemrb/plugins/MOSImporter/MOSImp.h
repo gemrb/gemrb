@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.h,v 1.7 2004/02/24 22:20:40 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.h,v 1.8 2004/04/17 11:28:12 avenger_teambg Exp $
  *
  */
 
@@ -37,13 +37,13 @@ public:
 	Sprite2D* GetImage();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
-	/** Gets a Pixel index */
-	unsigned long GetPixelIndex(int x, int y)
+	/** Gets a Pixel index, not used in MOS */
+	unsigned long GetPixelIndex(unsigned int x, unsigned int y)
 	{
 		return 0;
 	}
-	/** Gets a Pixel from the Image */
-	Color GetPixel(int x, int y)
+	/** Gets a Pixel from the Image, not used in MOS */
+	Color GetPixel(unsigned int x, unsigned int y)
 	{
 		Color null = {
 			0x00, 0x00, 0x00, 0x00

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.33 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.34 2004/04/17 11:28:10 avenger_teambg Exp $
  *
  */
 
@@ -24,6 +24,26 @@ class Map;
 #ifndef MAP_H
 #define MAP_H
 
+/** flags for GetActor */
+//default action
+#define GA_DEFAULT  0
+//actor selected for talk
+#define GA_TALK     1
+//actor selected for attack
+#define GA_ATTACK   2
+//actor selected for spell target
+#define GA_SPELL    3
+//actor selected for pick pockets
+#define GA_PICK     4
+
+//action mask
+#define GA_ACTION   15
+//unselectable actor may not be selected (can still block)
+#define GA_SELECT   16      
+//dead actor may not be selected 
+#define GA_NO_DEAD  32      
+
+/*
 #define INANIMATE		1
 #define PC				2
 #define FAMILIAR		3
@@ -41,6 +61,7 @@ class Map;
 #define EVILBUTGREEN	201
 #define EVILBUTBLUE		202
 #define ENEMY			255
+*/
 
 #include "TileMap.h"
 #include "ImageMgr.h"
@@ -72,6 +93,7 @@ typedef struct WallGroup {
 typedef struct Entrance {
 	char Name[33];
 	unsigned int XPos, YPos;
+	unsigned int Face;
 } Entrance;
 
 class GEM_EXPORT Map : public Scriptable {
@@ -105,14 +127,14 @@ public:
 	Animation* GetAnimation(const char* Name);
 	void AddActor(Actor* actor);
 	void AddWallGroup(WallGroup* wg);
-	int GetBlocked(int x, int y);
-	Actor* GetActor(int x, int y);
+	int GetBlocked(unsigned int x, unsigned int y);
+	Actor* GetActor(unsigned int x, unsigned int y, int flags);
 	Actor* GetActor(const char* Name);
 	void RemoveActor(Actor* actor);
 	int GetActorInRect(Actor**& actors, Region& rgn);
 	SongHeaderType SongHeader;
 	void AddVVCCell(ScriptedAnimation* vvc);
-	void AddEntrance(char* Name, short XPos, short YPos);
+	void AddEntrance(char* Name, short XPos, short YPos, short Face);
 	Entrance* GetEntrance(char* Name);
 	int GetActorCount() { return actors.size(); }
 	Actor* GetActor(int i) { return actors[i]; }

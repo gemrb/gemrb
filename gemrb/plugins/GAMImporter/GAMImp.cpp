@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.24 2004/04/15 20:33:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.25 2004/04/17 11:28:11 avenger_teambg Exp $
  *
  */
 
@@ -116,9 +116,7 @@ Game* GAMImp::GetGame()
 				str->Read( &newGame->KillVarsOffset, 4 );
 				str->Read( &newGame->KillVarsCount, 4 );
 				str->Read( &newGame->FamiliarsOffset, 4 );
-
-				str->Read( &newGame->Unknowns, 72 );
-				// should read 
+				str->Seek( 72, GEM_CURRENT_POS);
 			}
 			break;
 
@@ -132,9 +130,7 @@ Game* GAMImp::GetGame()
 				str->Read( &newGame->KillVarsOffset, 4 );
 				str->Read( &newGame->KillVarsCount, 4 );
 				str->Read( &newGame->FamiliarsOffset, 4 );
-				str->Read( &newGame->AnotherArea, 8 );
-				newGame->AnotherArea[8] = 0;  // FIXME: see above
-				str->Read( &newGame->Unknowns, 64 );
+				str->Seek( 72, GEM_CURRENT_POS);
 			}	
 			break;
 	}

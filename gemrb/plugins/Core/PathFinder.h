@@ -4,6 +4,8 @@
 #include "ImageMgr.h"
 #include <queue>
 
+class Map;
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -26,14 +28,16 @@ struct PathNode {
 
 class GEM_EXPORT PathFinder {
 private:
-	ImageMgr* sMap;
+	Map *area;      //don't free this
+	ImageMgr* sMap; //don't free this
 	unsigned short* MapSet;
 	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
 public:
 	PathFinder(void);
 	~PathFinder(void);
-	void SetMap(ImageMgr* sMap, unsigned int Width, unsigned int Height);
+	/* Sets map for pathfinder */
+	void SetMap(Map *area);
 	/* Finds the nearest passable point */
 	void AdjustPosition(unsigned int& goalX, unsigned int& goalY);
 	/* Finds the path which leads the farthest from d */

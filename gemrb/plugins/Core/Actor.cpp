@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.43 2004/04/16 21:30:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.44 2004/04/17 11:28:10 avenger_teambg Exp $
  *
  */
 
@@ -369,13 +369,15 @@ void Actor::DebugDump()
 
 void Actor::SetPosition(unsigned int XPos, unsigned int YPos, bool jump)
 {
+	ClearPath();
 	XPos/=16;
 	YPos/=12;
 	if (jump && !GetStat( IE_DONOTJUMP ) && anims->CircleSize) {
-		core->GetPathFinder()->AdjustPosition( XPos, YPos );
+		PathFinder *pf = core->GetPathFinder();
+///		pf->SetMap(core->GetGame()->GetCurrentArea() );
+		pf->AdjustPosition( XPos, YPos );
 	}
 	MoveTo( ( XPos * 16 ) + 8, ( YPos * 12 ) + 6 );
-	ClearPath();
 }
 
 /* this is returning the level of the character for xp calculations 

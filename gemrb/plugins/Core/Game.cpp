@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.39 2004/04/16 21:30:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.40 2004/04/17 11:28:10 avenger_teambg Exp $
  *
  */
 
@@ -261,6 +261,8 @@ int Game::AddMap(Map* map)
 
 int Game::DelMap(unsigned int index, bool autoFree)
 {
+//this function should archive the area, and remove it only if the area
+//contains no active actors (combat, partymembers, etc)
 	if (index >= Maps.size()) {
 		return -1;
 	}
@@ -274,10 +276,14 @@ int Game::DelMap(unsigned int index, bool autoFree)
 	return 0;
 }
 
-int Game::LoadMap(const char* ResRef)
+/* Loads an area, changepf == true if you want to setup the pathfinder too */
+int Game::LoadMap(const char* ResRef, bool changepf)
 {
 	int index = FindMap(ResRef);
 	if(index>=0) {
+		if (changepf) {
+			core->GetPathFinder()->SetMap( GetMap(index));
+		}
 		return index;
 	}
 	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
@@ -287,6 +293,9 @@ int Game::LoadMap(const char* ResRef)
 	core->FreeInterface( mM );
 	if (!newMap) {
 		return -1;
+	}
+	if (changepf) {
+		core->GetPathFinder()->SetMap( newMap );
 	}
 	for (unsigned int i = 0; i < PCs.size(); i++) {
 		if (stricmp( PCs[i]->Area, ResRef ) == 0) {

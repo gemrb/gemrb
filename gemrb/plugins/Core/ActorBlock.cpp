@@ -220,7 +220,6 @@ void Scriptable::ProcessActions()
 			if (actor->AnimID == IE_ANI_DIE)
 				actor->AnimID = IE_ANI_GET_UP;
 		}
-		printf( "Executing Action: %s\n", this->scriptName );
 		GameScript::ExecuteAction( this, CurrentAction );
 		neverExecuted = false;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.5 2004/04/15 12:33:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.6 2004/04/17 11:28:11 avenger_teambg Exp $
  *
  */
 
@@ -122,7 +122,7 @@ void Spellbook::dump()
 			//if (!sm || !sm->Number) continue;
 			if (!sm) continue;
 
-			printf ( "%2d: L: %d; N1: %d; N2: %d; T: %d; MI: %ld; MC: %ld\n", i, sm->Level, sm->Number, sm->Number2, sm->Type, sm->MemorizedIndex, sm->MemorizedCount );
+			printf ( "type: %d: L: %d; N1: %d; N2: %d; T: %d; MI: %ld; MC: %ld\n", i, sm->Level, sm->Number, sm->Number2, sm->Type, sm->MemorizedIndex, sm->MemorizedCount );
 
 			if (sm->known_spells.size()) 
 				printf( "  Known spells:\n" );

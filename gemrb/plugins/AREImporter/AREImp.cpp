@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.46 2004/04/16 21:30:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.47 2004/04/17 11:28:07 avenger_teambg Exp $
  *
  */
 
@@ -497,13 +497,14 @@ Map* AREImp::GetMap(const char *ResRef)
 	str->Seek( EntrancesOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < EntrancesCount; i++) {
 		char Name[33];
-		short XPos, YPos;
+		short XPos, YPos, Face;
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->Read( &XPos, 2 );
 		str->Read( &YPos, 2 );
-		str->Seek( 68, GEM_CURRENT_POS );
-		map->AddEntrance( Name, XPos, YPos );
+		str->Read( &Face, 2 );
+		str->Seek( 66, GEM_CURRENT_POS );
+		map->AddEntrance( Name, XPos, YPos, Face );
 	}
 	map->AddTileMap( tm, lm, sr );
 	core->FreeInterface( tmm );

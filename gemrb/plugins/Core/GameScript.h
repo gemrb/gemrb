@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.102 2004/04/16 18:39:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.103 2004/04/17 11:28:10 avenger_teambg Exp $
  *
  */
 
@@ -173,7 +173,6 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
 			printf( "Refcount increased to: %d in object\n", RefCount );
 			abort();
@@ -230,7 +229,6 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
 			printf( "Refcount increased to: %d in trigger\n", RefCount );
 			abort();
@@ -284,7 +282,6 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
 			printf( "Refcount increased to: %d in condition\n", RefCount );
 			abort();
@@ -355,7 +352,6 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
 			printf( "Refcount increased to: %d in action %d\n", RefCount,
 				actionID );
@@ -412,7 +408,6 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
 			printf( "Refcount increased to: %d in response\n", RefCount );
 			abort();
@@ -464,7 +459,6 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
 			printf( "Refcount increased to: %d\n", RefCount );
 			abort();
@@ -516,7 +510,6 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
 			printf( "Refcount increased to: %d\n", RefCount );
 			abort();
@@ -596,7 +589,6 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		printf( "IncRef(%d) called in Line %d\n", RefCount, __LINE__ );
 		if (RefCount >= 4) {
 			printf( "Refcount increased to: %d\n", RefCount );
 			abort();

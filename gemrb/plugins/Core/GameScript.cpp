@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.145 2004/04/16 21:30:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.146 2004/04/17 11:28:10 avenger_teambg Exp $
  *
  */
 
@@ -314,6 +314,7 @@ static ActionLink actionnames[] = {
 	{"moraleinc", GameScript::MoraleInc,0},
 	{"moraleset", GameScript::MoraleSet,0},
 	{"movebetweenareas", GameScript::MoveBetweenAreas,0},
+	{"movebetweenareaseffect", GameScript::MoveBetweenAreas,0},
 	{"moveglobal", GameScript::MoveGlobal,0}, 
 	{"moveglobalobject", GameScript::MoveGlobalObject,0}, 
 	{"moveglobalobjectoffscreen", GameScript::MoveGlobalObjectOffScreen,0},
@@ -1185,6 +1186,9 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
+	if(InDebug) {
+		printf("Sender: %s\n",Sender->scriptName);
+	}
 	ActionFunction func = actions[aC->actionID];
 	if (func) {
 		Scriptable* scr = GetActorFromObject( Sender, aC->objects[0]);
@@ -1869,7 +1873,7 @@ Targets *GameScript::Myself(Scriptable* Sender, Targets* parameters)
 Targets *GameScript::Protagonist(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(0));
+	parameters->AddTarget(core->GetGame()->FindPC(1));
 	return parameters;
 }
 
@@ -1927,7 +1931,7 @@ Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::Player1(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(0));
+	parameters->AddTarget(core->GetGame()->FindPC(1));
 	return parameters;
 }
 
@@ -1941,7 +1945,7 @@ Targets *GameScript::Player1Fill(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::Player2(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(1));
+	parameters->AddTarget(core->GetGame()->FindPC(2));
 	return parameters;
 }
 
@@ -1955,7 +1959,7 @@ Targets *GameScript::Player2Fill(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::Player3(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(2));
+	parameters->AddTarget(core->GetGame()->FindPC(3));
 	return parameters;
 }
 
@@ -1969,7 +1973,7 @@ Targets *GameScript::Player3Fill(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::Player4(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(3));
+	parameters->AddTarget(core->GetGame()->FindPC(4));
 	return parameters;
 }
 
@@ -1983,35 +1987,35 @@ Targets *GameScript::Player4Fill(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::Player5(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(4));
+	parameters->AddTarget(core->GetGame()->FindPC(5));
 	return parameters;
 }
 
 Targets *GameScript::Player5Fill(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(4));
+	parameters->AddTarget(core->GetGame()->GetPC(5));
 	return parameters;
 }
 
 Targets *GameScript::Player6(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(5));
+	parameters->AddTarget(core->GetGame()->FindPC(6));
 	return parameters;
 }
 
 Targets *GameScript::Player6Fill(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(5));
+	parameters->AddTarget(core->GetGame()->GetPC(6));
 	return parameters;
 }
 
 Targets *GameScript::Player7(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(6));
+	parameters->AddTarget(core->GetGame()->FindPC(7));
 	return parameters;
 }
 
@@ -2025,7 +2029,7 @@ Targets *GameScript::Player7Fill(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::Player8(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(7));
+	parameters->AddTarget(core->GetGame()->FindPC(8));
 	return parameters;
 }
 
@@ -4244,7 +4248,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 	else {
 		Area[0]=0;
 	}
-	if(parameters->string0Parameter) {
+	if(parameters->string0Parameter[0]) {
 		CreateVisualEffectCore(Sender->XPos, Sender->YPos, parameters->string0Parameter);
 	}
 	MoveBetweenAreasCore( (Actor *) Sender, Area, tar->XPos, tar->YPos, -1, true);
@@ -4254,8 +4258,23 @@ void GameScript::MoveGlobalsTo(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
-	while(i--) {
+	while (i--) {
 		Actor *tar = game->GetPC(i);
+		//if the actor isn't in the area, we don't care
+		if (strnicmp(tar->Area, parameters->string0Parameter,8) ) {
+			continue;
+		}
+		MoveBetweenAreasCore( tar, parameters->string1Parameter, 
+			parameters->XpointParameter,
+			parameters->YpointParameter, -1, true);
+	}
+	i = game->GetNPCCount();
+	while (i--) {
+		Actor *tar = game->GetNPC(i);
+		//if the actor isn't in the area, we don't care
+		if (strnicmp(tar->Area, parameters->string0Parameter,8) ) {
+			continue;
+		}
 		MoveBetweenAreasCore( tar, parameters->string1Parameter, 
 			parameters->XpointParameter,
 			parameters->YpointParameter, -1, true);
@@ -5192,10 +5211,14 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 
 void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, int X, int Y, int face, bool adjust)
 {
+	printf("MoveBetweenAreas: %s to %s [%d.%d]\n", actor->GetName(0), area,X,Y);
 	if(area[0]) { //do we need to switch area?
 		Game* game = core->GetGame();
+		//no need to change the pathfinder to the source area
 		Map * map1 = game->GetMap(game->LoadMap( actor->Area ));
-		Map * map2 = game->GetMap(game->LoadMap( area ));
+		//we have to change the pathfinder
+		//to the target area if adjust==true
+		Map * map2 = game->GetMap(game->LoadMap( area, adjust ));
 		if( map1!=map2 ) {
 			if(map1) {
 				map1->RemoveActor( actor );
@@ -5214,17 +5237,7 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	MoveBetweenAreasCore((Actor *) Sender, parameters->string0Parameter,
-		parameters->XpointParameter, parameters->YpointParameter,
-		parameters->int0Parameter, true);
-}
-
-void GameScript::MoveBetweenAreasEffect(Scriptable* Sender, Action* parameters)
-{
-	if (Sender->Type != ST_ACTOR) {
-		return;
-	}
-	if(parameters->string1Parameter) {
+	if(parameters->string1Parameter[0]) {
 		CreateVisualEffectCore(Sender->XPos, Sender->YPos, parameters->string1Parameter);
 	}
 	MoveBetweenAreasCore((Actor *) Sender, parameters->string0Parameter,
@@ -5545,6 +5558,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
+	strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
 	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter, true);
 }
 
@@ -5555,6 +5569,8 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	Game *game = core->GetGame();
+	strncpy(game->LoadMos, parameters->string1Parameter,8);
+	//no need to change the pathfinder just for getting the entrance
 	Map *map = game->GetMap(game->LoadMap( actor->Area ));
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
 	if (Distance(ent->XPos, ent->YPos, Sender) <= 40) {
@@ -5569,7 +5585,12 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 
 void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 {
-	LeaveAreaLUA( Sender, parameters );
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
+	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter, true);
 }
 
 void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
@@ -5579,6 +5600,8 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	Game *game = core->GetGame();
+	strncpy(game->LoadMos, parameters->string1Parameter,8);
+	//no need to change the pathfinder just for getting the entrance
 	Map *map = game->GetMap(game->LoadMap( actor->Area ));
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
 	if (Distance(ent->XPos, ent->YPos, Sender) <= 40) {
