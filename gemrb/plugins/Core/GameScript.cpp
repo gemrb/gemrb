@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.61 2004/02/09 19:20:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.62 2004/02/09 19:27:47 avenger_teambg Exp $
  *
  */
 
@@ -236,7 +236,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		}
 		triggersTable = core->GetSymbol(tT);
 		actionsTable = core->GetSymbol(aT);
-		objectsTable = core->GetSymbol(aT);
+		objectsTable = core->GetSymbol(oT);
 		if(!triggersTable || !actionsTable || !objectsTable) {
 			printf("[IEScript]: A critical scripting file is damaged!\n");
 			abort();
