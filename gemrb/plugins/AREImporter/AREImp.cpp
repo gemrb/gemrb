@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.54 2004/07/26 22:06:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.55 2004/07/27 18:27:18 avenger_teambg Exp $
  *
  */
 
@@ -392,7 +392,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Read( Key, 8 );
 		Key[8] = 0;
 		//don't even bother reading the script if it isn't trapped
-		if(Trapped) {
+		if(Trapped || Type) {
 			str->Read( Script, 8 );
 			Script[8] = 0;
 		}
