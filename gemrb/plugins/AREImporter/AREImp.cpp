@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.38 2004/01/11 16:26:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.39 2004/02/07 17:10:43 avenger_teambg Exp $
  *
  */
 
@@ -377,7 +377,8 @@ Map * AREImp::GetMap()
 	ActorMgr * actmgr = (ActorMgr*)core->GetInterface(IE_CRE_CLASS_ID);
 	for(int i = 0; i < ActorCount; i++) {
 		char		   CreResRef[9];
-		unsigned long  Orientation;
+		unsigned long TalkCount;
+		unsigned long Orientation, Schedule;
 		unsigned short XPos, YPos, XDes, YDes;
 		str->Seek(32, GEM_CURRENT_POS);
 		str->Read(&XPos, 2);
@@ -386,7 +387,10 @@ Map * AREImp::GetMap()
 		str->Read(&YDes, 2);
 		str->Seek(12, GEM_CURRENT_POS);
 		str->Read(&Orientation, 4);
-		str->Seek(72, GEM_CURRENT_POS);
+		str->Seek(8, GEM_CURRENT_POS);
+		str->Read(&Schedule,4);
+		str->Read(&TalkCount,4);
+		str->Seek(56, GEM_CURRENT_POS);
 		str->Read(CreResRef, 8);
 		CreResRef[8]=0;
 		DataStream * crefile;
@@ -416,6 +420,7 @@ Map * AREImp::GetMap()
 		if(ab->BaseStats[IE_STATE_ID] & STATE_DEAD)
 			ab->AnimID = IE_ANI_SLEEP;
 		ab->Orientation = (unsigned char)Orientation;
+		ab->TalkCount = TalkCount;
 		/*for(int i = 0; i < MAX_SCRIPTS; i++) {
 			if((stricmp(ab->actor->Scripts[i], "None") == 0) || (ab->actor->Scripts[i][0] == '\0')) {
 				ab->Scripts[i] = NULL;
