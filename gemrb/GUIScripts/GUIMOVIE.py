@@ -30,7 +30,7 @@ def OnLoad():
 	GemRB.SetEvent(MovieWindow, PlayButton, IE_GUI_BUTTON_ON_PRESS, "PlayPress")
 	GemRB.SetEvent(MovieWindow, CreditsButton, IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
 	GemRB.SetEvent(MovieWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
-	GemRB.ShowModal(MovieWindow)
+	GemRB.SetVisible(MovieWindow,1)
 	return
 	
 def PlayPress():

@@ -123,7 +123,8 @@ def NewSingle():
 
 def Tutorial():
 	GemRB.SetVisible(StartWindow,0)
-        GemRB.ShowModal(TutorialWindow)
+	GemRB.SetVisible(TutorialWindow,1)
+#        GemRB.ShowModal(TutorialWindow)
 	return
 
 def PlayPress():
@@ -142,7 +143,8 @@ def CancelTut():
 
 def ExitPress():
 	GemRB.SetVisible(StartWindow,0)
-	GemRB.ShowModal(QuitWindow)
+	GemRB.SetVisible(QuitWindow,1)
+#	GemRB.ShowModal(QuitWindow)
 	return
 	
 def ExitConfirmed():
@@ -184,5 +186,6 @@ def BackToMain():
 	GemRB.SetEvent(StartWindow, OptionsButton, IE_GUI_BUTTON_ON_PRESS, "OptionsPress")
 	GemRB.SetEvent(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_ON_PRESS, "MultiPlayerPress")
 	GemRB.SetEvent(StartWindow, MoviesButton, IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
+	GemRB.SetVisible(QuitWindow, 0)
 	GemRB.SetVisible(StartWindow, 1)
 	return

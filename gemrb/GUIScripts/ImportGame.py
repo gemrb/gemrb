@@ -25,7 +25,7 @@ def OnLoad():
 
         GemRB.SetEvent(ImportWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "Done1Press")
         GemRB.SetEvent(ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.ShowModal(ImportWindow)
+	GemRB.SetVisible(ImportWindow,1)
 	return
 
 def Done1Press():
