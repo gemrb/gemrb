@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.4 2004/04/15 16:18:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.5 2004/04/27 06:23:10 edheldil Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -103,10 +103,11 @@ def UpdateInventoryWindow ():
 	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = pc + 1; 
 	
 	# name
 	Label = GemRB.GetControl (Window, 0x10000039)
-	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 1))
+	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
 	
 
 	# portrait
@@ -124,12 +125,12 @@ def UpdateInventoryWindow ():
 
 	# hp current
 	hp = GemRB.GetPlayerStat (pc, ie_stats.IE_HITPOINTS)
-	Label = GemRB.GetControl (Window, 0x1000003b)
+	Label = GemRB.GetControl (Window, 0x1000003c)
 	GemRB.SetText (Window, Label, str (hp))
 
 	# hp max
 	hpmax = GemRB.GetPlayerStat (pc, ie_stats.IE_MAXHITPOINTS)
-	Label = GemRB.GetControl (Window, 0x1000003c)
+	Label = GemRB.GetControl (Window, 0x1000003b)
 	GemRB.SetText (Window, Label, str (hpmax))
 
 	# party gold

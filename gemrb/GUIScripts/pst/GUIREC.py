@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.7 2004/04/26 15:16:57 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.8 2004/04/27 06:23:10 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -139,9 +139,10 @@ def OpenRecordsWindow ():
 
 stats_overview = None
 faction_help = ''
+alignment_help = ''
 
 def UpdateRecordsWindow ():
-	global stats_overview, faction_help
+	global stats_overview, faction_help, alignment_help
 	
 	Window = RecordsWindow
 	if not RecordsWindow:
@@ -166,11 +167,11 @@ def UpdateRecordsWindow ():
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
 
 	# hp now
-	Label = GemRB.GetControl (Window, 0x1000000c)
+	Label = GemRB.GetControl (Window, 0x1000000d)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
 
 	# hp max
-	Label = GemRB.GetControl (Window, 0x1000000d)
+	Label = GemRB.GetControl (Window, 0x1000000c)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
 
 	# stats
@@ -225,13 +226,19 @@ def UpdateRecordsWindow ():
 	sym = GemRB.GetSymbolValue (ss, align)
 	print "ALIGN SYM:", sym
 
-	align_anim = (3 * int (align / 16) + align % 16) - 4
-	print 'ALIGN  ANIM:', align_anim
+	AlignmentTable = GemRB.LoadTable ("ALIGNS")
+	#print "ALIGN DESC:", GemRB.GetTableValue (AlignmentTable, align + 1, 0)
+	#print "ALIGN DESC2:", GemRB.GetTableValue (AlignmentTable, sym, 'DESC_REF')
+	alignment_help = GemRB.GetString (GemRB.GetTableValue (AlignmentTable, sym, 'DESC_REF'))
+	frame = (3 * int (align / 16) + align % 16) - 4
 	
 	Button = GemRB.GetControl (Window, 5)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
-	GemRB.SetButtonSprites (Window, Button, 'STALIGN', 0, align_anim, 0, 0, 0)
-	
+	GemRB.SetButtonSprites (Window, Button, 'STALIGN', 0, frame, 0, 0, 0)
+	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpAlignment")
+	GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
+
+
 	# faction
 	faction = GemRB.GetPlayerStat (pc, IE_FACTION)
 	print 'FACTION:', faction
@@ -279,9 +286,27 @@ def OnRecordsHelpFaction ():
 	# 34586 Mercykillers 2/8
 
 
-	# 33657 LG desc
+def OnRecordsHelpAlignment ():
+	Window = RecordsWindow
+	#Help = GemRB.GetVar ("ControlHelp")
+	Help = GemRB.GetString (20105) + "\n\n" + alignment_help
+	TextArea = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, TextArea, Help)
 	
-	pass
+	# 20105 alignment
+
+	# 33657 LG desc
+	# 33927 NG
+	# 33928 CG
+	# 33929 LN
+	# 33948 TN
+	# 33949 CN
+	# 33950 LE
+	# 33951 NE
+	# 33952 CE
+
+	# 33930 - attr comments
+
 
 def GetStatOverview (pc):
 	won = "[color=FFFFFF]"
