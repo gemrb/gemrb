@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.31 2003/12/01 00:04:55 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.32 2003/12/02 19:48:21 balrog994 Exp $
  *
  */
 
@@ -24,6 +24,8 @@
 #include "Interface.h"
 
 extern Interface * core;
+
+#define STEP_TIME 100
 
 Map::Map(void)
 {
@@ -71,29 +73,76 @@ void Map::DrawMap(Region viewport)
 	}
 	Region vp = video->GetViewport();
 	for(unsigned int i = 0; i < actors.size(); i++) {
-		CharAnimations * ca = actors[i].actor->GetAnims();
+		ActorBlock * actor = &actors.at(i);
+		if(actor->path) {	
+#ifndef WIN32
+			struct timeval tv;
+			gettimeofday(&tv, NULL);
+			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
+#else
+			unsigned long time = GetTickCount();
+#endif
+			if(!actor->step) {
+				actor->step = actor->path;
+				actor->timeStartStep = time;
+			}
+			if((time-actor->timeStartStep) >= STEP_TIME) {
+				printf("[New Step] : Orientation = %d\n", actor->step->orient);
+				actor->step = actor->step->Next;
+				actor->timeStartStep = time;
+			}
+			actor->Orientation = actor->step->orient;
+			actor->AnimID = IE_ANI_WALK;
+			actor->XPos = (actor->step->x*16)+8;
+			actor->YPos = (actor->step->y*12)+6;
+			if(!actor->step->Next) {
+				printf("Last Step\n");
+				PathNode * nextNode = actor->path->Next;
+				PathNode * thisNode = actor->path;
+				while(true) {
+					delete(thisNode);
+					thisNode = nextNode;
+					if(!thisNode)
+						break;
+					nextNode = thisNode->Next;
+				}
+				actor->path = NULL;
+				actor->AnimID = IE_ANI_AWAKE;
+			}
+			else {
+				if(actor->step->Next->x > actor->step->x)
+					actor->XPos += ((((actor->step->Next->x*16)+8)-actor->XPos)*(time-actor->timeStartStep))/STEP_TIME;
+				else
+					actor->XPos -= ((actor->XPos-((actor->step->Next->x*16)+8))*(time-actor->timeStartStep))/STEP_TIME;
+				if(actor->step->Next->y > actor->step->y)
+					actor->YPos += ((((actor->step->Next->y*12)+6)-actor->YPos)*(time-actor->timeStartStep))/STEP_TIME;
+				else
+					actor->YPos -= ((actor->YPos-((actor->step->Next->y*12)+6))*(time-actor->timeStartStep))/STEP_TIME;
+			}
+		}
+		CharAnimations * ca = actor->actor->GetAnims();
 		if(!ca)
 			continue;
-		Animation * anim = ca->GetAnimation(actors[i].AnimID, actors[i].Orientation);
+		Animation * anim = ca->GetAnimation(actor->AnimID, actor->Orientation);
 		bool DrawCircle=ca->DrawCircle;
-		if(actors[i].Selected)
+		if(actor->Selected)
 			DrawCircle = true;
 		if(DrawCircle && (ca->CircleSize==0) ) DrawCircle=false;
 		else {
-			if(actors[i].actor->Modified[IE_NOCIRCLE]) DrawCircle=false;
+			if(actor->actor->Modified[IE_NOCIRCLE]) DrawCircle=false;
 			else {
-				 if(actors[i].actor->Modified[IE_STATE_ID]&STATE_DEAD) DrawCircle=false;
+				 if(actor->actor->Modified[IE_STATE_ID]&STATE_DEAD) DrawCircle=false;
 			}
 		}
 		if(DrawCircle) {
 			Color *color;
 
-			if(actors[i].actor->BaseStats[IE_UNSELECTABLE]) {
+			if(actor->actor->BaseStats[IE_UNSELECTABLE]) {
 				color=&magenta;
 			}
-			if(actors[i].actor->BaseStats[IE_MORALEBREAK]<actors[i].actor->Modified[IE_MORALEBREAK])
+			if(actor->actor->BaseStats[IE_MORALEBREAK]<actor->actor->Modified[IE_MORALEBREAK])
 			{
-				if(actors[i].Selected) color=&yellow;
+				if(actor->Selected) color=&yellow;
 				else color=&yellow_dark;
 			} else switch(actors[i].actor->BaseStats[IE_EA])
 			{
@@ -107,42 +156,42 @@ void Map::DrawMap(Region viewport)
 			case CONTROLLED:
 			case CHARMED:
 			case EVILBUTGREEN:
-				if(actors[i].Selected) color=&green;
+				if(actor->Selected) color=&green;
 				else color=&green_dark;
 			break;
 
 			case ENEMY:
 			case GOODBUTRED:
-				if(actors[i].Selected) color=&red;
+				if(actor->Selected) color=&red;
 				else color=&red_dark;
 			break;
 			default:
-				if(actors[i].Selected) color=&cyan;
+				if(actor->Selected) color=&cyan;
 				else color=&cyan_dark;
 
 			break;
 			}
-			video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), *color);
+			video->DrawEllipse(actor->XPos-vp.x, actor->YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), *color);
 		}
 
 		if(anim) {
 			Sprite2D * nextFrame = anim->NextFrame();
-			if(actors[i].lastFrame != nextFrame) {
-				actors[i].MinX = actors[i].XPos-nextFrame->XPos;
-				actors[i].MaxX = actors[i].MinX+nextFrame->Width;
-				actors[i].MinY = actors[i].YPos-nextFrame->YPos;
-				actors[i].MaxY = actors[i].MinY+nextFrame->Height;
-				actors[i].lastFrame = nextFrame;
+			if(actor->lastFrame != nextFrame) {
+				actor->MinX = actor->XPos-nextFrame->XPos;
+				actor->MaxX = actor->MinX+nextFrame->Width;
+				actor->MinY = actor->YPos-nextFrame->YPos;
+				actor->MaxY = actor->MinY+nextFrame->Height;
+				actor->lastFrame = nextFrame;
 			}
-			if(actors[i].MinX > (vp.x+vp.w))
+			if(actor->MinX > (vp.x+vp.w))
 				continue;
-			if(actors[i].MaxX < vp.x)
+			if(actor->MaxX < vp.x)
 				continue;
-			if(actors[i].MinY > (vp.y+vp.h))
+			if(actor->MinY > (vp.y+vp.h))
 				continue;
-			if(actors[i].MaxY < vp.y)
+			if(actor->MaxY < vp.y)
 				continue;
-			int ax = actors[i].XPos, ay = actors[i].YPos;
+			int ax = actor->XPos, ay = actor->YPos;
 			int cx = ax/16;
 			int cy = ay/12;
 			Color tint = LightMap->GetPixel(cx, cy);
@@ -174,6 +223,8 @@ void Map::AddActor(ActorBlock actor)
 		}
 	}
 	actor.Selected = false;
+	actor.path = NULL;
+	actor.step = NULL;
 	actors.push_back(actor);
 }
 
