@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.260 2004/12/14 22:57:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.261 2005/01/04 18:37:19 avenger_teambg Exp $
  *
  */
 
@@ -3014,6 +3014,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 	PyDict_SetItemString(dict, "BestKilledName", PyInt_FromLong (ps->BestKilledName));
 	PyDict_SetItemString(dict, "BestKilledXP", PyInt_FromLong (ps->BestKilledXP));
+	PyDict_SetItemString(dict, "AwayTime", PyInt_FromLong (ps->AwayTime));
 	PyDict_SetItemString(dict, "JoinDate", PyInt_FromLong (ps->JoinDate));
 	PyDict_SetItemString(dict, "KillsChapterXP", PyInt_FromLong (ps->KillsChapterXP));
 	PyDict_SetItemString(dict, "KillsChapterCount", PyInt_FromLong (ps->KillsChapterCount));
