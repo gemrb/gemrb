@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.6 2004/09/13 20:19:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.7 2005/03/02 19:36:10 avenger_teambg Exp $
  *
  */
 
@@ -152,7 +152,7 @@ STODrink* STOImp::GetDrink()
 	str->ReadResRef( dr->RumourResRef );
 	str->ReadDword( &dr->DrinkName );
 	str->ReadDword( &dr->Price );
-	str->ReadDword( &dr->AlcoholicStrength );
+	str->ReadDword( &dr->Strength );
 
 	return dr;
 }

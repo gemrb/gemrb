@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.275 2005/02/28 19:01:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.276 2005/03/02 19:36:07 avenger_teambg Exp $
  *
  */
 
@@ -3496,8 +3496,12 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 	if (index>=(int) store->DrinksCount) {
 		return RuntimeError("Wrong index!");
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	PyObject* dict = PyDict_New();
+	STODrink *drink=store->GetDrink(index);
+	PyDict_SetItemString(dict, "DrinkName", PyInt_FromLong( drink->DrinkName ));
+	PyDict_SetItemString(dict, "Price", PyInt_FromLong( drink->Price ));
+	PyDict_SetItemString(dict, "Strength", PyInt_FromLong( drink->Strength ));
+	return dict;
 }
 
 PyDoc_STRVAR( GemRB_GetStoreCure__doc,

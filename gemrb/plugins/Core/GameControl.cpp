@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.189 2005/02/26 21:08:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.190 2005/03/02 19:36:06 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1114,18 +1114,15 @@ void GameControl::HideGUI()
 	}
 	if (dict->Lookup( "OtherWindow", index )) {
 		if (index != (ieDword) -1) {
-			Window* tw = core->GetWindow( index );
+			Window* ow = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "OtherPosition", index )) {
-				ResizeDel( tw, index );
+				ResizeDel( ow, index );
 			}
 		}
 	}
 	if (dict->Lookup( "FloatWindow", index )) {
 		if (index != (ieDword) -1) {
-/* this appears to be needless
-			Window* fw = core->GetWindow( index );
-*/
 			core->SetVisible( index, 0 );
 		}
 	}
@@ -1213,120 +1210,102 @@ void GameControl::UnhideGUI()
 void GameControl::ResizeDel(Window* win, unsigned char type)
 {
 	switch (type) {
-		case 0:
-			//Left
-			 {
-				LeftCount--;
-				if (!LeftCount) {
-					( ( Window * ) Owner )->XPos -= win->Width;
-					( ( Window * ) Owner )->Width += win->Width;
-					Width = ( ( Window * ) Owner )->Width;
-				}
-			}
-			break;
+	case 0: //Left
+		if (LeftCount!=1) {
+			printMessage("GameControl","More than one left window!\n",LIGHT_RED);
+		}
+		LeftCount--;
+		if (!LeftCount) {
+			( ( Window * ) Owner )->XPos -= win->Width;
+			( ( Window * ) Owner )->Width += win->Width;
+			Width = ( ( Window * ) Owner )->Width;
+		}
+		break;
 
-		case 1:
-			//Bottom
-			 {
-				BottomCount--;
-				if (!BottomCount) {
-					( ( Window * ) Owner )->Height += win->Height;
-					Height = ( ( Window * ) Owner )->Height;
-				}
-			}
-			break;
+	case 1: //Bottom
+		if (BottomCount!=1) {
+			printMessage("GameControl","More than one bottom window!\n",LIGHT_RED);
+		}
+		BottomCount--;
+		if (!BottomCount) {
+			( ( Window * ) Owner )->Height += win->Height;
+			Height = ( ( Window * ) Owner )->Height;
+		}
+		break;
 
-		case 2:
-			//Right
-			 {
-				RightCount--;
-				if (!RightCount) {
-					( ( Window * ) Owner )->Width += win->Width;
-					Width = ( ( Window * ) Owner )->Width;
-				}
-			}
-			break;
+	case 2: //Right
+		if (RightCount!=1) {
+			printMessage("GameControl","More than one right window!\n",LIGHT_RED);
+		}
+		RightCount--;
+		if (!RightCount) {
+			( ( Window * ) Owner )->Width += win->Width;
+			Width = ( ( Window * ) Owner )->Width;
+		}
+		break;
 
-		case 3:
-			//Top
-			 {
-				TopCount--;
-				if (!TopCount) {
-					( ( Window * ) Owner )->YPos -= win->Height;
-					( ( Window * ) Owner )->Height += win->Height;
-					Height = ( ( Window * ) Owner )->Height;
-				}
-			}
-			break;
+	case 3: //Top
+		if (TopCount!=1) {
+			printMessage("GameControl","More than one top window!\n",LIGHT_RED);
+		}
+		TopCount--;
+		if (!TopCount) {
+			( ( Window * ) Owner )->YPos -= win->Height;
+			( ( Window * ) Owner )->Height += win->Height;
+			Height = ( ( Window * ) Owner )->Height;
+		}
+		break;
 
-		case 4:
-			//BottomAdded
-			 {
-				BottomCount--;
-				( ( Window * ) Owner )->Height += win->Height;
-				Height = ( ( Window * ) Owner )->Height;
-			}
-			break;
+	case 4: //BottomAdded
+		BottomCount--;
+		( ( Window * ) Owner )->Height += win->Height;
+		Height = ( ( Window * ) Owner )->Height;
+		break;
 	}
 }
 
 void GameControl::ResizeAdd(Window* win, unsigned char type)
 {
 	switch (type) {
-		case 0:
-			//Left
-			 {
-				LeftCount++;
-				if (LeftCount == 1) {
-					( ( Window * ) Owner )->XPos += win->Width;
-					( ( Window * ) Owner )->Width -= win->Width;
-					Width = ( ( Window * ) Owner )->Width;
-				}
-			}
-			break;
+	case 0: //Left
+		LeftCount++;
+		if (LeftCount == 1) {
+			( ( Window * ) Owner )->XPos += win->Width;
+			( ( Window * ) Owner )->Width -= win->Width;
+			Width = ( ( Window * ) Owner )->Width;
+		}
+		break;
 
-		case 1:
-			//Bottom
-			 {
-				BottomCount++;
-				if (BottomCount == 1) {
-					( ( Window * ) Owner )->Height -= win->Height;
-					Height = ( ( Window * ) Owner )->Height;
-				}
-			}
-			break;
+	case 1: //Bottom
+		BottomCount++;
+		if (BottomCount == 1) {
+			( ( Window * ) Owner )->Height -= win->Height;
+			Height = ( ( Window * ) Owner )->Height;
+		}
+		break;
 
-		case 2:
-			//Right
-			 {
-				RightCount++;
-				if (RightCount == 1) {
-					( ( Window * ) Owner )->Width -= win->Width;
-					Width = ( ( Window * ) Owner )->Width;
-				}
-			}
-			break;
+	case 2: //Right
+		RightCount++;
+		if (RightCount == 1) {
+			( ( Window * ) Owner )->Width -= win->Width;
+			Width = ( ( Window * ) Owner )->Width;
+		}
+		break;
 
-		case 3:
-			//Top
-			 {
-				TopCount++;
-				if (TopCount == 1) {
-					( ( Window * ) Owner )->YPos += win->Height;
-					( ( Window * ) Owner )->Height -= win->Height;
-					Height = ( ( Window * ) Owner )->Height;
-				}
-			}
-			break;
+	case 3: //Top
+		TopCount++;
+		if (TopCount == 1) {
+			( ( Window * ) Owner )->YPos += win->Height;
+			( ( Window * ) Owner )->Height -= win->Height;
+			Height = ( ( Window * ) Owner )->Height;
+		}
+		break;
 
-		case 4:
-			//BottomAdded
-			 {
-				BottomCount++;
-				( ( Window * ) Owner )->Height -= win->Height;
-				Height = ( ( Window * ) Owner )->Height;
-			}
-			break;
+	case 4: //BottomAdded
+		BottomCount++;
+		( ( Window * ) Owner )->Height -= win->Height;
+		Height = ( ( Window * ) Owner )->Height;
+		break;
 	}
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.98 2005/02/27 21:09:48 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.99 2005/03/02 19:36:06 avenger_teambg Exp $
  *
  */
 
@@ -179,9 +179,8 @@ Map* AREImp::GetMap(const char *ResRef)
 	map->AreaType=AreaType;
 
 	//we have to set this here because the actors will receive their
-	//current area setting here
-	strncpy(map->scriptName, ResRef, 8);
-	map->scriptName[8]=0;
+	//current area setting here, areas' 'scriptname' is their name
+	strnuprcpy(map->scriptName, ResRef, 8);
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
 		printf( "[AREImporter]: No Tile Map Manager Available.\n" );
@@ -191,6 +190,10 @@ Map* AREImp::GetMap(const char *ResRef)
 	DataStream* wedfile = core->GetResourceMgr()->GetResource( WEDResRef, IE_WED_CLASS_ID );
 	tmm->Open( wedfile );
 	TileMap* tm = tmm->GetTileMap();
+	if (!tm) {
+		printf( "[AREImporter]: No Tile Map Available.\n" );
+		return false;
+	}
 
 	map->Scripts[0] = new GameScript( Script, ST_AREA );
 	map->MySelf = map;
