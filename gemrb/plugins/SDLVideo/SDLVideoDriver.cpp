@@ -108,7 +108,24 @@ int SDLVideoDriver::SwapBuffers(void)
 		case SDL_KEYDOWN:
 			{
 			unsigned char key = event.key.keysym.unicode & 0xff;
-			if(Evnt && (key != 0))
+			if(key == 0) {
+				switch(event.key.keysym.sym) {
+					case SDLK_LEFT:
+						key = GEM_LEFT;
+					break;
+
+					case SDLK_RIGHT:
+						key = GEM_RIGHT;
+					break;
+
+					case SDLK_DELETE:
+						key = GEM_DELETE;
+					break;
+				}
+				if(Evnt)
+					Evnt->OnSpecialKeyPress(key);
+			}
+			else if(Evnt && (key != 0))
 				Evnt->KeyPress(key, event.key.keysym.mod);
 			if(event.key.keysym.sym == SDLK_RIGHT) {
 				Viewport.x += 64;

@@ -57,22 +57,37 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowc
 	switch(Alignment & 0x0F) {
 		case IE_FONT_ALIGN_LEFT: 
 		{
-			for(int r = 0; r < sl.StringCount; r++) {
+			bool cursorblt = false;
+			int	i = 0;
+			int r = 0;
+			for(r = 0; r < sl.StringCount; r++) {
 				x = rgn.x+sl.strings[0][0]->XPos;
 				y += sl.heights[0];
-				int	i = 0;
+				i = 0;
 				while(true) {
 					if((ipal != NULL) && (r == 0) && (i == 0))
 						video->SetPalette(sl.strings[r][i], pal);
 					else if(pal != NULL)
 						video->SetPalette(sl.strings[r][i], pal);
 					video->BlitSprite(sl.strings[r][i], x, y, anchor);
-					if((cursor != NULL) && (sl.cury == r) && (sl.curx == i))
+					if((cursor != NULL) && (sl.cury == r) && (sl.curx == i)) {
 						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos, y, anchor);
+						cursorblt = true;
+					}
 					if(sl.strings[r][i+1] == NULL)
 						break;
 					x+=(sl.strings[r][i]->Width-sl.strings[r][i]->XPos)+sl.strings[r][i+1]->XPos;
 					i++;
+				}
+			}
+			if(!cursorblt) {
+				if(cursor) {
+					if(r != 0) {
+						r--;
+						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos+sl.strings[r][i]->Width, y, true);
+					}
+					else
+						video->BlitSprite(cursor, x, y, true);
 				}
 			}
 		}
@@ -80,10 +95,13 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowc
 
 		case IE_FONT_ALIGN_CENTER:
 		{
-			for(int r = 0; r < sl.StringCount; r++) {
+			bool cursorblt = false;
+			int	i = 0;
+			int r = 0;
+			for(r = 0; r < sl.StringCount; r++) {
 				x = rgn.x+sl.strings[r][0]->XPos+((rgn.w/2)-(sl.lengths[r]/2));
 				y += sl.heights[0];
-				int	i = 0;
+				i = 0;
 				while(true) {
 					if((ipal != NULL) && (r == 0) && (i == 0))
 						video->SetPalette(sl.strings[r][i], pal);
@@ -98,19 +116,32 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowc
 					i++;
 				}
 			}
+			if(!cursorblt) {
+				if(cursor) {
+					if(r != 0) {
+						r--;
+						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos+sl.strings[r][i]->Width, y, true);
+					}
+					else
+						video->BlitSprite(cursor, x, y, true);
+				}
+			}
 		}
 		break;
 
 		case IE_FONT_ALIGN_RIGHT:
 		{
-			for(int r = 0; r < sl.StringCount; r++) {
+			bool cursorblt = false;
+			int	i = 0;
+			int r = 0;
+			for(r = 0; r < sl.StringCount; r++) {
 				int len = 0;
 				while(sl.strings[r][len] != NULL)
 					len++;
 				len--;
 				x = rgn.x+rgn.w-(sl.strings[0][len]->Width-sl.strings[0][len]->XPos);
 				y += sl.heights[0];
-				int	i = len;
+				i = len;
 				while(i >= 0) {
 					if((ipal != NULL) && (r == 0) && (i == 0))
 						video->SetPalette(sl.strings[r][i], pal);
@@ -124,6 +155,16 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, Color *lowc
 						break;
 					x-=sl.strings[r][i]->XPos+(sl.strings[r][i-1]->Width-sl.strings[r][i-1]->XPos);
 					i--;
+				}
+			}
+			if(!cursorblt) {
+				if(cursor) {
+					if(r != 0) {
+						r--;
+						video->BlitSprite(cursor, x-sl.strings[r][i]->XPos, y, true);
+					}
+					else
+						video->BlitSprite(cursor, x, y, true);
 				}
 			}
 		}
@@ -147,7 +188,9 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 	sl.StringCount = 1;
 	sl.starty = 0;
 	int len = strlen((char*)string)+1;
-	int nslen = len, lastnsi = 0, maxHeight = 0, crowlen = 1;
+	if(len == 1)
+		len = 1;
+	int nslen = len+1, lastnsi = 0, maxHeight = 0, crowlen = 1;
 	//Allocate our char pointers list
 	Sprite2D ** newstring = (Sprite2D**)malloc(nslen*sizeof(Sprite2D*));
 	//Allocate the first string in the array
@@ -161,21 +204,29 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 	//Allocate the lengths array
 	sl.lengths = (unsigned int*)malloc(sizeof(unsigned int));
 	int x, nsi = 0, lastx = 0;
-	Sprite2D * nextimg = init->chars[string[0]-1], *oldimg = NULL;
+	Sprite2D * nextimg, *oldimg = NULL;
+	if(string[0] != 0)
+		nextimg = init->chars[string[0]-1];
+	else
+		nextimg = init->chars[0x20-1];
 	x = nextimg->XPos;
-	bool newline = true;
+	bool newline = true, curset = false;
+	if(len != 1) {
 	for(int i = 0; i < len; i++) {
 		if(i == curpos) {
 			sl.curx = nsi;
 			sl.cury = sl.StringCount-1;
+			curset = true;
 		}
 		if(x >= rgn.w) {
 			//Check for spaces at the beginning of the row
 			while(string[i] == ' ') {
 				i++;
 				if(i == curpos) {
-					sl.curx = nsi;
-					sl.cury = sl.StringCount-1;
+					if(!curset) {
+						sl.curx = nsi;
+						sl.cury = sl.StringCount-1;
+					}
 				}
 			}
 			nextimg = chars[string[i]-1];
@@ -203,7 +254,7 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 			//Now the new row will start at nsi index so copy it in the lastnsi index
             lastnsi = nsi;
 			//Now copy the maxHeight of the last row to the heights array
-			sl.heights[sl.StringCount-1] = maxHeight;
+			sl.heights[sl.StringCount-1] = this->maxHeight;
 			//Set our string length for centering text
 			sl.lengths[sl.StringCount-1] = lastx;
 			//Increment the sl.StringCount variable since we have one new Row
@@ -214,8 +265,9 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 			//newline = true;
 		}
 		//Check for new maxHeight
-		if(maxHeight < nextimg->YPos)
-			maxHeight = nextimg->YPos;
+		/*if(string[i] != 0x20)
+			if(maxHeight < nextimg->YPos)
+				maxHeight = nextimg->YPos;*/
 		//Check for end of String
 		if(string[i+1] == 0)
 			break;
@@ -238,10 +290,24 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 		//Notify continuing this line
 		newline = false;
 	}
-	newstring[nsi++] = nextimg;
-	newstring[nsi] = NULL;
+	newstring[nsi] = nextimg;
+	if(!curset) {
+		sl.curx = nsi+1;
+		sl.cury = sl.StringCount-1;
+	}
+	newstring[++nsi] = NULL;
+	}
+	else {
+		maxHeight = this->maxHeight;
+		newstring[nsi++] = nextimg;
+		newstring[nsi] = NULL;
+		if(!curset) {
+			sl.curx = 0;
+			sl.cury = sl.StringCount-1;
+		}
+	}
 	sl.strings[sl.StringCount-1] = &newstring[lastnsi];
-	sl.heights[sl.StringCount-1] = maxHeight;
+	sl.heights[sl.StringCount-1] = this->maxHeight;
 	sl.lengths[sl.StringCount-1] = x;
 	int yacc = 0;
 	for(int i = -1; i < sl.StringCount-1; i++) {

@@ -22,6 +22,10 @@
 #include "WindowMgr.h"
 #include <vector>
 
+#define GEM_LEFT   1
+#define GEM_RIGHT  2
+#define GEM_DELETE 3
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -56,6 +60,8 @@ public:
 	void KeyPress(unsigned char Key, unsigned short Mod);
 	/** BroadCast Key Release Event */
 	void KeyRelease(unsigned char Key, unsigned short Mod);
+	/** Special Ket Press Event */
+	void OnSpecialKeyPress(unsigned char Key);
 private:
 	/** Last Window under Mouse Pointer*/
 	Window * lastW;

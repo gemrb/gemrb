@@ -76,3 +76,26 @@ void TextEdit::OnKeyPress(unsigned char Key, unsigned short Mod)
 	}
 	//else if(key == '     
 }
+/** Special Key Press */
+void TextEdit::OnSpecialKeyPress(unsigned char Key)
+{
+	if(Key == GEM_LEFT) {
+		if(CurPos > 0)
+			CurPos--;
+	}
+	else if(Key == GEM_RIGHT) {
+		int len = strlen((char*)Buffer);
+		if(CurPos < len) {
+			CurPos++;
+		}
+	}
+	else if(Key == GEM_DELETE) {
+		int len = strlen((char*)Buffer);
+		if(CurPos < len) {
+			for(int i = CurPos; i < len; i++) {
+				Buffer[i] = Buffer[i+1];
+			}
+		}			
+	}
+}
+

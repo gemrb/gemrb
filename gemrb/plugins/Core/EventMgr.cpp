@@ -142,3 +142,10 @@ void EventMgr::KeyRelease(unsigned char Key, unsigned short Mod)
 	if(lastF)
 		lastF->OnKeyRelease(Key, Mod);
 }
+
+/** Special Ket Press Event */
+void EventMgr::OnSpecialKeyPress(unsigned char Key)
+{
+	if(lastF)
+		lastF->OnSpecialKeyPress(Key);
+}

@@ -53,3 +53,9 @@ void Control::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button
 {
 	printf("OnMouseUp: CtrlID = %d, x = %hd, y = %hd, Button = %d, Mos = %hd\n", ControlID, x, y, Button, Mod);
 }
+/** Special Key Press */
+void Control::OnSpecialKeyPress(unsigned char Key)
+{
+	printf("OnSpecialKeyPress: CtrlID = %d, Key = %d\n", ControlID, Key);
+}
+
