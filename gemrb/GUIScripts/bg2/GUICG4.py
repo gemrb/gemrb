@@ -47,7 +47,6 @@ def CalcLimits(Abidx):
 	if Maximum>25:
 		Maximum=25
 
-	print Minimum, Maximum
 	return
 
 def RollPress():
