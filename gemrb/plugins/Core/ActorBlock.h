@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.11 2004/01/05 12:36:16 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.12 2004/01/05 16:02:51 balrog994 Exp $
  *
  */
 
@@ -109,9 +109,9 @@ public:
 	void AddActionInFront(Action * aC);
 	Action* GetNextAction();
 	Action* PopNextAction();
-	void ClearActions();
+	void ClearActions(bool force = false);
 	virtual void ProcessActions();
-	void DeleteAction(Action * aC);
+	void DeleteAction(Action * aC, bool force = false);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {

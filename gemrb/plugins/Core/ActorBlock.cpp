@@ -39,6 +39,7 @@ Scriptable::Scriptable(ScriptableType type)
 
 Scriptable::~Scriptable(void)
 {
+	ClearActions();
 	for(int i = 0; i < MAX_SCRIPTS; i++) {
 		if(Scripts[i])
 			delete(Scripts[i]);
@@ -113,20 +114,16 @@ Action * Scriptable::PopNextAction()
 	return aC;
 }
 
-void Scriptable::ClearActions()
+void Scriptable::ClearActions(bool force)
 {
 	if(CurrentAction) {
-		if(CurrentAction->autoFree) {
-			DeleteAction(CurrentAction);
-		}
+		DeleteAction(CurrentAction, force);
 		CurrentAction = NULL;
 	}
 	for(int i = 0; i < actionQueue.size(); i++) {
 		Action * aC = actionQueue.front();
 		actionQueue.pop_front();
-		if(aC->autoFree) {
-			DeleteAction(aC);
-		}
+		DeleteAction(aC, force);
 	}
 	actionQueue.clear();
 }
@@ -183,9 +180,9 @@ void Scriptable::SetWait(unsigned long time)
 	WaitCounter = time;
 }
 
-void Scriptable::DeleteAction(Action * aC)
+void Scriptable::DeleteAction(Action * aC, bool force)
 {
-	if(!aC->autoFree)
+	if(!force && !aC->autoFree)
 		return;
 	if(aC->string0Parameter)
 		free(aC->string0Parameter);
