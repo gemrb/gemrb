@@ -50,6 +50,16 @@ Scriptable::~Scriptable(void)
 		delete(locals);
 }
 
+void Scriptable::SetScript(const char *aScript, int idx)
+{
+	if(Scripts[idx]) delete Scripts[idx];
+	Scripts[idx]=0;
+	if(aScript[0]) {
+		Scripts[idx] = new GameScript(aScript, 0, locals);
+		Scripts[idx]->MySelf = this;
+	}
+}
+
 void Scriptable::SetPosition(unsigned short XPos, unsigned short YPos)
 {
 	this->XPos = XPos;

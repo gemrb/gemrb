@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.42 2004/01/10 21:53:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.43 2004/01/11 18:57:47 avenger_teambg Exp $
  *
  */
 
@@ -72,37 +72,51 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 
 		actions[0] = NoAction;
 		actions[7] = CreateCreature;
+		instant[7] = true;
 		actions[8] = Dialogue;
 		blocking[8] = true;
 		actions[10] = Enemy;
+		instant[10] = true;
 		actions[22] = MoveToObject;
 		blocking[22] = true;
 		actions[23] = MoveToPoint;
 		blocking[23] = true;
 		actions[26] = PlaySound;
 		actions[30] = SetGlobal;
+		instant[30] = true;
 		actions[36] = Continue;
+		instant[36] = true;
 		actions[40] = PlayDead;
 		actions[49] = MoveViewPoint;
 		actions[50] = MoveViewObject;
+		actions[60] = ChangeAIScript;
 		actions[63] = Wait;
 		blocking[63] = true;
 		actions[83] = SmallWait;
 		blocking[83] = true;
 		actions[84] = Face;
 		blocking[84] = true;
+		actions[109] = IncrementGlobal;
 		actions[110] = LeaveAreaLUA;
 		actions[111] = DestroySelf;
+		instant[111] = true;
 		actions[113] = ForceSpell;
 		actions[120] = StartCutScene;
+		instant[120] = true;
 		actions[121] = StartCutSceneMode;
+		instant[121] = true;
 		actions[122] = EndCutSceneMode;
+		instant[122] = true;
+		actions[123] = ClearAllActions;
+		instant[123] = true;
 		actions[125] = Deactivate;
-		//blocking[125] = true;
+		instant[125] = true;
 		actions[126] = Activate;
-		//blocking[126] = true;
+		instant[126] = true;
 		actions[127] = CutSceneId;
 		instant[127] = true;
+		actions[133] = ClearActions;
+		instant[133] = true;
 		actions[137] = StartDialogue;
 		actions[143] = OpenDoor;
 		blocking[143] = true;
@@ -121,25 +135,45 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		if(strcmp(core->GameType, "pst") == 0) {
 			actions[215] = FaceObject;
 			actions[227] = GlobalBAnd;
+			instant[227] = true;
 			actions[228] = GlobalBOr;
+			instant[228] = true;
 			actions[229] = GlobalShr;
+			instant[229] = true;
 			actions[230] = GlobalShl;
+			instant[230] = true;
 			actions[231] = GlobalMax;
+			instant[231] = true;
 			actions[232] = GlobalMin;
+			instant[232] = true;
 			actions[233] = GlobalSetGlobal;
+			instant[233] = true;
 			actions[234] = GlobalAddGlobal;
+			instant[234] = true;
 			actions[235] = GlobalSubGlobal;
+			instant[235] = true;
 			actions[236] = GlobalAndGlobal;
+			instant[236] = true;
 			actions[237] = GlobalOrGlobal;
+			instant[237] = true;
 			actions[238] = GlobalBAndGlobal;
+			instant[238] = true;
 			actions[239] = GlobalBOrGlobal;
+			instant[239] = true;
 			actions[240] = GlobalShrGlobal;
+			instant[240] = true;
 			actions[241] = GlobalShlGlobal;
+			instant[241] = true;
 			actions[242] = GlobalMaxGlobal;
+			instant[242] = true;
 			actions[243] = GlobalMinGlobal;
+			instant[243] = true;
 			actions[244] = GlobalBOr; //BitSet
+			instant[244] = true;
 			actions[245] = BitClear; 
+			instant[245] = true;
 			actions[267] = StartSong;
+			instant[267] = true;
 		}
 		else
 		{
@@ -152,6 +186,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 				actions[242] = Ally;
 				actions[254] = ScreenShake;
 				blocking[254] = true;
+				actions[255] = AddGlobals;
 				actions[269] = DisplayStringHead;
 				actions[272] = CreateVisualEffect;
 				actions[273] = CreateVisualEffectObject;
@@ -161,6 +196,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 				actions[307] = SG;
 				actions[311] = DisplayStringWait;
 				blocking[311] = true;
+				actions[335] = SetTokenGlobal;
 			}
 			else { //iwd and iwd2
 				actions[241] = DisplayStringHead; //FloatMessage
@@ -1184,7 +1220,7 @@ void GameScript::SG(Scriptable * Sender, Action * parameters)
 
 void GameScript::SetGlobal(Scriptable * Sender, Action * parameters)
 {
-//	printf("SetGlobal(\"%s\", %d)\n", parameters->string0Parameter, parameters->int0Parameter);
+	printf("SetGlobal(\"%s\", %d)\n", parameters->string0Parameter, parameters->int0Parameter);
 	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
 		globals->SetAt(&parameters->string0Parameter[6], parameters->int0Parameter);
 	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
@@ -1374,6 +1410,21 @@ void GameScript::Ally(Scriptable * Sender, Action * parameters)
 	}
 	Actor * actor = (Actor*)scr;
 	actor->SetStat(IE_EA,4);
+}
+
+void GameScript::ChangeAIScript(Scriptable * Sender, Action *parameters)
+{
+printf("ChangeAIScript\n");
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+printf("A\n");
+	if(scr->Type != ST_ACTOR)
+		return;
+printf("B\n");
+	Actor * actor = (Actor*)scr;
+printf("E\n");
+	actor->SetScript(parameters->string0Parameter, parameters->int0Parameter);
 }
 
 void GameScript::Wait(Scriptable * Sender, Action * parameters)
@@ -2000,7 +2051,7 @@ void GameScript::SetTokenGlobal(Scriptable *Sender, Action *parameters)
 	char varname[33];
 	strncpy(varname,parameters->string1Parameter,32);
 	varname[32]=0;
-	printf("SetTokenGlobal: %d -> %s",value, varname);
+	printf("SetTokenGlobal: %d -> %s\n",value, varname);
 	core->GetTokenDictionary()->SetAt(varname, value);
 }
 
@@ -2038,6 +2089,23 @@ void GameScript::GlobalSetGlobal(Scriptable *Sender, Action *parameters)
 	}
 }
 
+/* adding the second variable to the first, they must be GLOBAL */
+void GameScript::AddGlobals(Scriptable *Sender, Action *parameters)
+{
+	unsigned long value1=0;
+	unsigned long value2=0;
+        char Variable0[6+33], Variable1[6+33];
+
+	memcpy(Variable0,"GLOBAL",6);
+	memcpy(Variable1,"GLOBAL",6);
+	strncpy(Variable0+6,parameters->string0Parameter,32);
+	strncpy(Variable1+6,parameters->string0Parameter,32);
+	globals->Lookup(Variable0, value1);
+	globals->Lookup(Variable1, value2);
+	globals->SetAt(Variable0, value1+value2);
+}
+
+/* adding the second variable to the first, they could be area or locals */
 void GameScript::GlobalAddGlobal(Scriptable *Sender, Action *parameters)
 {
 	unsigned long value1=0;
@@ -2068,6 +2136,29 @@ void GameScript::GlobalAddGlobal(Scriptable *Sender, Action *parameters)
 		Sender->locals->SetAt(&parameters->string0Parameter[6], value1+value2);
 	else {
 		globals->SetAt(parameters->string0Parameter, value1+value2);
+	}
+}
+
+/* adding the number to the global, they could be area or locals */
+void GameScript::IncrementGlobal(Scriptable *Sender, Action *parameters)
+{
+	unsigned long value1=0;
+	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0) {
+		globals->Lookup(&parameters->string0Parameter[6], value1);
+	}
+	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0) {
+		Sender->locals->Lookup(&parameters->string0Parameter[6], value1);
+	}
+	else {
+		globals->Lookup(parameters->string0Parameter, value1);
+	}
+
+	if(memcmp(parameters->string0Parameter, "GLOBAL", 6) == 0)
+		globals->SetAt(&parameters->string0Parameter[6], value1+parameters->int0Parameter);
+	else if(memcmp(parameters->string0Parameter, "LOCALS", 6) == 0)
+		Sender->locals->SetAt(&parameters->string0Parameter[6], value1+parameters->int0Parameter);
+	else {
+		globals->SetAt(parameters->string0Parameter, value1+parameters->int0Parameter);
 	}
 }
 
@@ -2522,4 +2613,21 @@ void GameScript::GlobalShrGlobal(Scriptable *Sender, Action *parameters)
 	else {
 		globals->SetAt(parameters->string0Parameter, value1);
 	}
+}
+
+void GameScript::ClearAllActions(Scriptable *Sender, Action *parameters)
+{
+//just a hack
+	for(int i=0;i<6;i++) {
+		Scriptable * scr = core->GetGame()->GetPC(i);
+		if(scr)
+			scr->ClearActions();
+	}
+}
+
+void GameScript::ClearActions(Scriptable *Sender, Action *parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(scr)
+		scr->ClearActions();
 }

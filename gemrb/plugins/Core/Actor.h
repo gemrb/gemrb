@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.14 2004/01/05 23:54:38 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.15 2004/01/11 18:57:47 avenger_teambg Exp $
  *
  */
 
@@ -89,16 +89,6 @@ public:
 		if(string == NULL)
 			return;
 		strncpy(scriptName, string, 32);
-	}
-	/** Sets a Script ResRef */
-	void  SetScript(int ScriptIndex, const char * ResRef)
-	{
-		if(ResRef == NULL)
-			return;
-		if(ScriptIndex>=MAX_SCRIPTS)
-			return;
-		//strncpy(Scripts[ScriptIndex], ResRef, 8);
-		return;
 	}
 	/** Sets the Dialog ResRef */
 	void  SetDialog(const char * ResRef)
