@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.99 2005/04/01 18:48:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.100 2005/04/03 09:05:42 avenger_teambg Exp $
  *
  */
 
@@ -559,10 +559,7 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 	SDL_SetAlpha( tmp, SDL_SRCALPHA, tint.a);
 	BlitSprite( spr, x, y, false, clip );
 	//copying back the original palette
-	SDL_LockSurface( tmp );
-	pal = tmp->format->palette->colors;
-	memcpy( pal, oldPal, 256 * sizeof( SDL_Color ) );
-	SDL_UnlockSurface( tmp );
+	SDL_SetPalette( tmp, SDL_LOGPAL, ( SDL_Color * ) oldPal, 0, 256 );
 }
 
 void SDLVideoDriver::SetCursor(Sprite2D* up, Sprite2D* down)
