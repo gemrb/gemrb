@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.129 2004/12/07 22:51:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.130 2005/01/09 14:54:57 edheldil Exp $
  *
  */
 
@@ -319,6 +319,8 @@ public:
 	int PlayMovie(char * ResRef);
 	/** Generates traditional random number xdy+z */
 	int Roll(int dice, int size, int add);
+	/** Returns true on successful saving throw */
+	bool SavingThrow(int Save, int Bonus);
 	/** Loads a Game Compiled Script */
 	int LoadScript(const char * ResRef);
 	/** Enables/Disables the CutScene Mode */
@@ -417,6 +419,7 @@ public:
 	char CD6[_MAX_PATH];
 	int Width, Height, Bpp, ForceStereo;
 	unsigned int TooltipDelay;
+	unsigned int FogOfWar;
 	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);

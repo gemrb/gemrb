@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.127 2005/01/01 20:50:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.128 2005/01/09 14:54:57 edheldil Exp $
  *
  */
 
@@ -138,6 +138,7 @@ Map::Map(void)
 		InitPathFinder();
 		InitSpawnGroups();
 	}
+	ExploredBitmap = NULL;
 }
 
 Map::~Map(void)
@@ -192,6 +193,10 @@ Map::~Map(void)
 	}
 	for (i = 0; i < mapnotes.size(); i++) {
 		delete mapnotes[i];
+	}
+
+	if (ExploredBitmap) {
+		delete ExploredBitmap;
 	}
 }
 
@@ -491,6 +496,10 @@ if(actor->Orientation>=MAX_ORIENT) {
 			video->BlitSprite( frame, vvc->XPos + viewport.x,
 					vvc->YPos + viewport.y, false, &viewport );
 		}
+	}
+
+	if (core->FogOfWar && tm) {
+		tm->DrawExploredBitmap( ExploredBitmap, viewport );
 	}
 }
 

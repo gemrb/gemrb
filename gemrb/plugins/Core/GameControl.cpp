@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.181 2004/11/29 22:19:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.182 2005/01/09 14:54:56 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -614,6 +614,11 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				//show actor's palettes
 				DebugFlags ^= DEBUG_SHOW_PALETTES;
 				printf("Show actor's palettes %s\n", DebugFlags & DEBUG_SHOW_PALETTES ? "ON" : "OFF");
+				break;
+			case '7':
+				//show fog of war
+				core->FogOfWar ^= 1;
+				printf("Show Fog-Of-War: %d\n", core->FogOfWar & 1 ? "ON" : "OFF");
 				break;
 			default:
 				printf( "KeyRelease:%d  %d\n", Key, Mod );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.246 2004/12/09 22:16:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.247 2005/01/09 14:54:56 edheldil Exp $
  *
  */
 
@@ -44,6 +44,7 @@
 #include "ItemMgr.h"
 #include "SpellMgr.h"
 #include "MapControl.h"
+#include "EffectQueue.h"
 
 GEM_EXPORT Interface* core;
 
@@ -106,6 +107,7 @@ Interface::Interface(int iargc, char** iargv)
 
 	ConsolePopped = false;
 	CheatFlag = false;
+	FogOfWar = 0;
 #ifndef WIN32
 	CaseSensitive = true;  //this is the default value, so CD1/CD2 will be resolved
 #else
@@ -644,6 +646,14 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
+
+	printMessage( "Core", "Initializing effects...", WHITE );
+	if (! Init_EffectQueue()) {
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
+	}
+	printStatus( "OK", LIGHT_GREEN );
+
 	printMessage( "Core", "Initializing Inventory Management...", WHITE );
 	bool ret = InitItemTypes();
 	if(ret) {
@@ -962,6 +972,8 @@ bool Interface::LoadConfig(const char* filename)
 			DrawFPS = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "EnableCheatKeys" ) == 0) {
 			EnableCheatKeys ( atoi( value ) );
+		} else if (stricmp( name, "FogOfWar" ) == 0) {
+			FogOfWar = atoi( value );
 		} else if (stricmp( name, "EndianSwitch" ) == 0) {
 			DataStream::SetEndianSwitch(atoi(value) );
 		} else if (stricmp( name, "CaseSensitive" ) == 0) {
@@ -1990,6 +2002,13 @@ int Interface::Roll(int dice, int size, int add)
 		add += rand() % size + 1;
 	}
 	return add;
+}
+
+bool Interface::SavingThrow(int Save, int Bonus)
+{
+	int roll = Roll(1, 20, 0);
+	// FIXME: this is 2e saving throw, it's probably different in iwd2
+	return (roll > 1) && (roll + Bonus >= Save);
 }
 
 int Interface::GetCharSounds(TextArea* ta)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.32 2004/09/12 21:58:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.33 2005/01/09 14:54:57 edheldil Exp $
  *
  */
 
@@ -84,6 +84,82 @@ void TileMap::DrawOverlay(unsigned int index, Region viewport)
 	if (index < overlays.size()) {
 		overlays[index]->Draw( viewport );
 	}
+}
+
+#define CELL_SIZE  32
+#define CELL_RATIO 2
+
+//vp: 45 480 640 407 ; viewport: 0 0 640 407 ; Xcc, Ycc: 50 43 ; wh: 200 172
+//vid->SetViewport(45 480)
+//sx, sy: 2 30 ; dx, dy: 43 56 ; vp: 0 0 640 407
+
+void TileMap::DrawExploredBitmap(ieByte* mask, Region viewport)
+{
+
+	// viewport - pos & size of the control
+	int w = XCellCount * CELL_RATIO;
+	int h = YCellCount * CELL_RATIO;
+	Color black = { 0, 0, 0, 255 };
+
+	Video* vid = core->GetVideoDriver();
+	Region vp = vid->GetViewport();
+	//printf("vp: %d %d %d %d ; viewport: %d %d %d %d ; Xcc, Ycc: %d %d ; wh: %d %d \n", vp.x, vp.y, vp.w, vp.h, viewport.x, viewport.y, viewport.w, viewport.h, XCellCount, YCellCount, w, h);
+	vp.x += viewport.x;
+	vp.y += viewport.y;
+	vp.w = viewport.w;
+	vp.h = viewport.h;
+	if (( vp.x + vp.w ) > w * CELL_SIZE) {
+		vp.x = ( w * CELL_SIZE - vp.w );
+	}
+	if (vp.x < viewport.x) {
+		vp.x = viewport.x;
+	}
+	if (( vp.y + vp.h ) > h * CELL_SIZE) {
+		vp.y = ( h * CELL_SIZE - vp.h );
+	}
+	if (vp.y < viewport.y) {
+		vp.y = viewport.y;
+	}
+	vid->SetViewport( vp.x - viewport.x, vp.y - viewport.y );
+	//printf("vid->SetViewport(%d %d)\n", vp.x - viewport.x, vp.y - viewport.y );
+	int sx = ( vp.x - viewport.x ) / CELL_SIZE;
+	int sy = ( vp.y - viewport.y ) / CELL_SIZE;
+	int dx = ( vp.x + vp.w + CELL_SIZE - 1 ) / CELL_SIZE;
+	int dy = ( vp.y + vp.h + CELL_SIZE - 1 ) / CELL_SIZE;
+	vp.x = viewport.x;
+	vp.y = viewport.y;
+	vp.w = viewport.w;
+	vp.h = viewport.h;
+	//printf("sx, sy: %d %d ; dx, dy: %d %d ; vp: %d %d %d %d\n", sx, sy, dx, dy, vp.x, vp.y, vp.w, vp.h);
+	for (int y = sy; y < dy && y < h; y++) {
+		for (int x = sx; x < dx && x < w; x++) {
+		  /*
+			Tile* tile = tiles[( y* w ) + x];
+			//this hack is for alternate tiles with a value of -1
+			if (!tile->anim[tile->tileIndex]) {
+		        	tile->tileIndex=0;
+			}
+		  */
+			int b0 = (w * y + x);
+		  int bb = b0 / 8;
+		  int bi = b0 % 8;
+
+		  
+		  if (!(mask[bb] & (1 << bi))) {
+			  Region r = Region(viewport.x + ( (x - sx) * CELL_SIZE ), viewport.y + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
+			  vid->DrawRect(r, black, true, true);
+			}
+			/*
+				vid->BlitSprite( tile->anim[tile->tileIndex]->NextFrame(),
+						viewport.x + ( x * 16 ), viewport.y + ( y * 16 ),
+						false, &vp );
+			*/
+		}
+	}
+
+
+
+
 }
 
 Door* TileMap::GetDoor(unsigned int idx)
