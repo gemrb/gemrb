@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.15 2003/12/22 23:25:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.16 2003/12/30 17:47:31 balrog994 Exp $
  *
  */
 
@@ -35,6 +35,9 @@ TileMap::~TileMap(void)
 {
 	for(size_t i = 0; i < overlays.size(); i++) {
 		delete(overlays[i]);
+	}
+	for(size_t i = 0; i < infoPoints.size(); i++) {
+		delete(infoPoints[i]);
 	}
 }
 
@@ -154,18 +157,27 @@ Container * TileMap::GetContainer(unsigned short x, unsigned short y)
 }
 InfoPoint * TileMap::AddInfoPoint(char * Name, unsigned short Type, Gem_Polygon * outline)
 {
-	InfoPoint ip;
-	strncpy(ip.Name, Name, 32);
-	ip.Type = Type;
-	ip.outline = outline;
-	ip.Active = true;
+	InfoPoint *ip = new InfoPoint();
+	strncpy(ip->Name, Name, 32);
+	switch(Type) {
+		case 0:
+			ip->ipType = ST_PROXIMITY;
+		break;
+
+		case 1:
+		case 2:
+			ip->ipType = ST_TRIGGER;
+		break;
+	}
+	ip->outline = outline;
+	ip->Active = true;
 	infoPoints.push_back(ip);
-	return &infoPoints.at(infoPoints.size()-1);
+	return infoPoints.at(infoPoints.size()-1);
 }
 InfoPoint * TileMap::GetInfoPoint(unsigned short x, unsigned short y)
 {
 	for(size_t i = 0; i < infoPoints.size(); i++) {
-		InfoPoint * ip = &infoPoints.at(i);
+		InfoPoint * ip = infoPoints.at(i);
 		if(!ip->Active)
 			continue;
 		if(ip->outline->BBox.x > x)
@@ -185,7 +197,7 @@ InfoPoint * TileMap::GetInfoPoint(unsigned short x, unsigned short y)
 InfoPoint * TileMap::GetInfoPoint(const char * Name)
 {
 	for(size_t i = 0; i < infoPoints.size(); i++) {
-		InfoPoint * ip = &infoPoints.at(i);
+		InfoPoint * ip = infoPoints.at(i);
 		int len = (int)strlen(ip->Name);
 		int p = 0;
 		for(int x = 0; x < len; x++) {
@@ -204,5 +216,5 @@ InfoPoint * TileMap::GetInfoPoint(const char * Name)
 InfoPoint * TileMap::GetInfoPoint(unsigned int idx)
 {
 	if(idx >= infoPoints.size()) return NULL;
-	return &infoPoints.at(idx);
+	return infoPoints.at(idx);
 }

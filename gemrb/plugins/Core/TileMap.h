@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.14 2003/12/22 23:25:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.15 2003/12/30 17:47:31 balrog994 Exp $
  *
  */
 
@@ -53,7 +53,7 @@ typedef struct Container {
 	Gem_Polygon * outline;
 } Container;
 
-typedef struct InfoPoint {
+/*typedef struct InfoPoint {
 	char Name[32];
 	unsigned short Type;
 	Gem_Polygon * outline;
@@ -69,7 +69,7 @@ typedef struct InfoPoint {
 	unsigned short Trapped;
 	unsigned short TrapDetected;
 	unsigned short LaunchX, LaunchY;
-} InfoPoint;
+} InfoPoint;*/
 
 #ifdef WIN32
 
@@ -89,7 +89,7 @@ private:
 	std::vector<TileOverlay *> overlays;
 	std::vector<Door*> doors;
 	std::vector<Container> containers;
-	std::vector<InfoPoint> infoPoints;
+	std::vector<InfoPoint*> infoPoints;
 public:
 	TileMap(void);
 	~TileMap(void);
