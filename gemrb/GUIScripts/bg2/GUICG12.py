@@ -63,7 +63,6 @@ def RightPress():
 	global LastPortrait
 	while True:
 		LastPortrait = LastPortrait + 1
-		print LastPortrait
 		if LastPortrait >= GemRB.GetTableRowCount(PortraitsTable)-1:
 			LastPortrait = 0
 		if GemRB.GetTableValue(PortraitsTable, LastPortrait, 3) == Gender:

@@ -82,7 +82,6 @@ def MultiClassPress():
 
 def ClassPress():
 	Class = GemRB.GetVar("Class")-1
-	print GemRB.GetTableValue(ClassTable,Class,1)
 	GemRB.SetText(ClassWindow,TextAreaControl, GemRB.GetTableValue(ClassTable,Class,1) )
 	GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
 	return

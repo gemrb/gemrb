@@ -9,8 +9,7 @@ PointsLeft = 0
 
 def RollPress():
 	GemRB.InvalidateWindow(AbilityWindow)
-	GemRB.SetVar("AbilityIncrease",0)
-	GemRB.SetVar("AbilityDecrease",0)
+	GemRB.SetVar("Ability",0)
 	GemRB.SetVar("Ability -1",0)
 	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
 	GemRB.SetText(AbilityWindow, SumLabel, "0")
@@ -38,13 +37,17 @@ def OnLoad():
 
 	RollPress()
 	for i in range(0,6):
+		Button = GemRB.GetControl(AbilityWindow, i+30)
+		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
+		GemRB.SetVarAssoc(AbilityWindow, Button, "Ability", i)
+
 		Button = GemRB.GetControl(AbilityWindow, i*2+16)
 		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "LeftPress")
-		GemRB.SetVarAssoc(AbilityWindow, Button, "AbilityIncrease", i )
+		GemRB.SetVarAssoc(AbilityWindow, Button, "Ability", i )
 
 		Button = GemRB.GetControl(AbilityWindow, i*2+17)
 		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
-		GemRB.SetVarAssoc(AbilityWindow, Button, "AbilityDecrease", i )
+		GemRB.SetVarAssoc(AbilityWindow, Button, "Ability", i )
 
 	RerollButton = GemRB.GetControl(AbilityWindow,2)
 	GemRB.SetText(AbilityWindow,RerollButton,11982)
@@ -73,7 +76,7 @@ def RightPress():
 	global PointsLeft
 
 	GemRB.InvalidateWindow(AbilityWindow)
-	Abidx = GemRB.GetVar("AbilityDecrease")
+	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	#should be more elaborate
 	Minimum=3
@@ -93,6 +96,17 @@ def RightPress():
 	GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_DISABLED)
 	return
 
+def JustPress():
+	Abidx = GemRB.GetVar("Ability")
+	Ability = GemRB.GetVar("Ability "+str(Abidx) )
+	#should be more elaborate
+	Minimum=3
+	Maximum=18
+	GemRB.SetToken("MINIMUM",str(Minimum) )
+	GemRB.SetToken("MAXIMUM",str(Maximum) )
+	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, Abidx, 1) )
+	return
+
 def LeftPress():
 	global PointsLeft
 
@@ -103,7 +117,7 @@ def LeftPress():
 	Maximum=18
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
-	Abidx = GemRB.GetVar("AbilityIncrease")
+	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, Abidx, 1) )
 	if PointsLeft == 0:
