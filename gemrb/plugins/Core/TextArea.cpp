@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.32 2003/12/23 18:05:32 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.33 2003/12/23 18:15:50 balrog994 Exp $
  *
  */
 
@@ -75,7 +75,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
   		if(i != lines.size()-1)
   			strcat(Buffer, "\n");
   	}
-  	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
+  	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height-5), (unsigned char*)Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
   	free(Buffer);
 	}
 	else {
@@ -97,7 +97,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			pal = lineselpal;
 		else
   			pal = palette;
-  		ftext->PrintFromLine(sr, Region(x+XPos, y+YPos, Width, Height), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
+  		ftext->PrintFromLine(sr, Region(x+XPos, y+YPos, Width, Height-5), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
   		yl = lrows[i]-sr;
   		break;
   	}
@@ -109,7 +109,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			pal = lineselpal;
 		else
   			pal = palette;
-  		ftext->Print(Region(x+XPos, y+YPos+(yl*ftext->size[1].h/*chars[1]->Height*/), Width, Height-(yl*ftext->size[1].h/*chars[1]->Height*/)), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true);
+  		ftext->Print(Region(x+XPos, y+YPos+(yl*ftext->size[1].h/*chars[1]->Height*/), Width, Height-5-(yl*ftext->size[1].h/*chars[1]->Height*/)), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true);
 		yl+=lrows[i];
   	}
 	}
@@ -173,7 +173,7 @@ int TextArea::AppendText(const char * text, int pos)
 	Changed = true;
 	if(sb) {
 		ScrollBar *bar = (ScrollBar*)sb;
-		pos=lines.size()-(Height/ftext->maxHeight);
+		pos=lines.size()-((Height-5)/ftext->maxHeight);
 		if(pos<0) pos=0;
 		bar->SetPos(pos);
 	}
@@ -275,7 +275,7 @@ void TextArea::OnMouseOver(unsigned short x, unsigned short y)
 /** Mouse Button Up */
 void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	if((x <= Width) && (y <= Height)) {
+	if((x <= Width) && (y <= (Height-5))) {
 		selline = seltext;
 		//((Window*)Owner)->Invalidate();
 		core->RedrawAll();
