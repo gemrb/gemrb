@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.50 2004/08/05 17:40:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.51 2004/08/05 20:41:06 guidoj Exp $
  *
  */
 
@@ -361,7 +361,7 @@ int Game::DelMap(unsigned int index, bool forced)
 //FIXME: changepf is removed now
 int Game::LoadMap(const char* ResRef)
 {
-  unsigned int i;
+	unsigned int i;
 	int index = FindMap(ResRef);
 	if(index>=0) {
 		return index;

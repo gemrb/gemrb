@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.35 2004/08/05 17:40:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.36 2004/08/05 20:41:07 guidoj Exp $
  *
  */
 
@@ -43,25 +43,25 @@ class Game;
 #include "Variables.h"
 
 typedef struct PCStruct {
-	unsigned short Selected;
-	unsigned short PartyOrder;
-	unsigned long OffsetToCRE;
-	unsigned long CRESize;
+	ieWord   Selected;
+	ieWord   PartyOrder;
+	ieDword  OffsetToCRE;
+	ieDword  CRESize;
 	ieResRef CREResRef;
-	unsigned long Orientation;
+	ieDword  Orientation;
 	ieResRef Area;
-	unsigned short XPos;
-	unsigned short YPos;
-	unsigned short ViewXPos;
-	unsigned short ViewYPos;
+	ieWord   XPos;
+	ieWord   YPos;
+	ieWord   ViewXPos;
+	ieWord   ViewYPos;
 	unsigned char Unknown28[100];
-	unsigned short QuickWeaponSlot[4];
+	ieWord   QuickWeaponSlot[4];
 	unsigned char Unknown94[8];
 	ieResRef QuickSpellResRef[3];
-	unsigned short QuickItemSlot[3];
+	ieWord   QuickItemSlot[3];
 	unsigned char UnknownBA[6];
 	char Name[32];
-	unsigned long TalkCount;
+	ieDword  TalkCount;
 } PCStruct;
 
 #define IE_GAM_JOURNAL 0
@@ -71,11 +71,11 @@ typedef struct PCStruct {
 
 typedef struct GAMJournalEntry {
 	ieStrRef Text;
-	ieDword GameTime; // in game time seconds
-	ieByte Chapter;
-	ieByte unknown09;
-	ieByte Section;
-	ieByte Group;   // this is a GemRB extension
+	ieDword  GameTime; // in game time seconds
+	ieByte   Chapter;
+	ieByte   unknown09;
+	ieByte   Section;
+	ieByte   Group;   // this is a GemRB extension
 } GAMJournalEntry;
 
 
@@ -92,35 +92,35 @@ public:
 	Variables* globals;
 	ieByte* familiars;
 	int MapIndex;
-	unsigned long CombatCounter;
+	ieDword CombatCounter;
 
 	/** index of PC selected in non-walking environment (shops, inventory...) */
 	int SelectedSingle;
 
 public:
-	unsigned int GameTime;
-	unsigned short WhichFormation;
-	unsigned short Formations[5];
-	unsigned long PartyGold;
-	unsigned long Unknown1c;
-	unsigned long PCOffset;
-	unsigned long PCCount;
-	unsigned long UnknownOffset;
-	unsigned long UnknownCount;
-	unsigned long NPCOffset;
-	unsigned long NPCCount;
-	unsigned long GLOBALOffset;
-	unsigned long GLOBALCount;
+	ieDword GameTime;
+	ieWord  WhichFormation;
+	ieWord  Formations[5];
+	ieDword PartyGold;
+	ieDword Unknown1c;
+	ieDword PCOffset;
+	ieDword PCCount;
+	ieDword UnknownOffset;
+	ieDword UnknownCount;
+	ieDword NPCOffset;
+	ieDword NPCCount;
+	ieDword GLOBALOffset;
+	ieDword GLOBALCount;
 	char AREResRef[9];
-	unsigned long Unknown48;
-	unsigned long JournalCount;
-	unsigned long JournalOffset;
-	unsigned long Reputation;
-	unsigned long UnknownOffset54;
-	unsigned long UnknownCount58;
-	unsigned long KillVarsOffset;
-	unsigned long KillVarsCount;
-	unsigned long FamiliarsOffset;  // offset to known creatures on PST
+	ieDword Unknown48;
+	ieDword JournalCount;
+	ieDword JournalOffset;
+	ieDword Reputation;
+	ieDword UnknownOffset54;
+	ieDword UnknownCount58;
+	ieDword KillVarsOffset;
+	ieDword KillVarsCount;
+	ieDword FamiliarsOffset;  // offset to known creatures on PST
 	char AnotherArea[9];
 	char CurrentArea[9];
 	char LoadMos[9];

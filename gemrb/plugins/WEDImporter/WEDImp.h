@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.8 2004/02/24 22:20:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.9 2004/08/05 20:41:10 guidoj Exp $
  *
  */
 
@@ -25,12 +25,12 @@
 #include "../Core/TileMapMgr.h"
 
 typedef struct Overlay {
-	unsigned short Width;
-	unsigned short Height;
+	ieWord  Width;
+	ieWord  Height;
 	char TilesetResRef[8];
-	unsigned long unknown;
-	unsigned long TilemapOffset;
-	unsigned long TILOffset;
+	ieDword unknown;
+	ieDword TilemapOffset;
+	ieDword TILOffset;
 } Overlay;
 
 class WEDImp : public TileMapMgr {
@@ -38,9 +38,9 @@ private:
 	std::vector< Overlay> overlays;
 	DataStream* str;
 	bool autoFree;
-	unsigned long OverlaysCount, DoorsCount, OverlaysOffset, SecHeaderOffset,
+	ieDword OverlaysCount, DoorsCount, OverlaysOffset, SecHeaderOffset,
 		DoorsOffset, DoorTilesOffset;
-	unsigned long WallPolygonsCount, PolygonsOffset, VerticesOffset,
+	ieDword WallPolygonsCount, PolygonsOffset, VerticesOffset,
 		WallGroupsOffset, PILTOffset;
 public:
 	WEDImp(void);

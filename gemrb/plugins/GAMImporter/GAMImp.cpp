@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.30 2004/08/04 22:47:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.31 2004/08/05 20:41:09 guidoj Exp $
  *
  */
 
@@ -89,8 +89,7 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 
 Game* GAMImp::GetGame()
 {
-  unsigned int i;
-
+	unsigned int i;
 	Game* newGame = new Game();
 
 	str->Read( &newGame->GameTime, 4 );
@@ -177,7 +176,7 @@ Game* GAMImp::GetGame()
 	Name[32] = 0;
 	str->Seek( newGame->GLOBALOffset, GEM_STREAM_START );
 	for (i = 0; i < newGame->GLOBALCount; i++) {
-		unsigned long Value;
+		ieDword Value;
 		str->Read( Name, 32 );
 		str->Seek( 8, GEM_CURRENT_POS );
 		str->Read( &Value, 4 );
@@ -187,7 +186,7 @@ Game* GAMImp::GetGame()
 	str->Seek( newGame->KillVarsOffset, GEM_STREAM_START );
 	memcpy(Name,"SPRITE_IS_DEAD",14);
 	for (i = 0; i < newGame->KillVarsCount; i++) {
-		unsigned long Value;
+		ieDword Value;
 		str->Read( Name+14, 18 );
 		str->Seek( 8, GEM_CURRENT_POS );
 		str->Read( &Value, 4 );
@@ -215,7 +214,7 @@ Game* GAMImp::GetGame()
 
 Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 {
-  unsigned int i;
+	unsigned int i;
 	PCStruct pcInfo;
 	Actor* actor;
 

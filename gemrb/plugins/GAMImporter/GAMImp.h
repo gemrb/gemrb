@@ -29,7 +29,7 @@ private:
 	DataStream* str;
 	bool autoFree;
 	int version;
-	unsigned long PCSize;
+	unsigned int PCSize;
 
 public:
 	GAMImp(void);

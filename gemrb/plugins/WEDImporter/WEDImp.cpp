@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.11 2004/08/05 17:25:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.12 2004/08/05 20:41:10 guidoj Exp $
  *
  */
 
@@ -100,8 +100,8 @@ TileMap* WEDImp::GetTileMap()
 					( y * overlays[0].Width * 10 ) +
 					( x * 10 ),
 					GEM_STREAM_START );
-			unsigned short	startindex, count, secondary;
-			unsigned char overlaymask;
+			ieWord startindex, count, secondary;
+			ieByte overlaymask;
 			str->Read( &startindex, 2 );
 			str->Read( &count, 2 );
 			str->Read( &secondary, 2 );
@@ -128,9 +128,9 @@ TileMap* WEDImp::GetTileMap()
 	/*
 	for(int d = 0; d < DoorsCount; d++) {
 		str->Seek(DoorsOffset + (d*0x1A), GEM_STREAM_START);
-		unsigned short DoorClosed, DoorTileStart, DoorTileCount, *DoorTiles;
-		unsigned short OpenPolyCount, ClosedPolyCount;
-		unsigned long OpenPolyOffset, ClosedPolyOffset;
+		ieWord DoorClosed, DoorTileStart, DoorTileCount, *DoorTiles;
+		ieWord OpenPolyCount, ClosedPolyCount;
+		ieDword OpenPolyOffset, ClosedPolyOffset;
 		char Name[9];
 		str->Read(Name, 8);
 		Name[8] = 0;
@@ -148,8 +148,8 @@ TileMap* WEDImp::GetTileMap()
 		str->Read(DoorTiles, DoorTileCount*sizeof(unsigned short));
 		//Reading the Open Polygon
 		str->Seek(OpenPolyOffset, GEM_STREAM_START);
-		unsigned long StartingVertex, VerticesCount;
-		unsigned short BitFlag, MinX, MaxX, MinY, MaxY;
+		ieDword StartingVertex, VerticesCount;
+		ieWordt BitFlag, MinX, MaxX, MinY, MaxY;
 		Region BBox;
 		str->Read(&StartingVertex, 4);
 		str->Read(&VerticesCount, 4);
@@ -212,9 +212,9 @@ TileMap* WEDImp::GetTileMap()
 unsigned short* WEDImp::GetDoorIndices(char* ResRef, int* count,
 	bool& BaseClosed)
 {
-	unsigned short DoorClosed, DoorTileStart, DoorTileCount, * DoorTiles;
-	unsigned short OpenPolyCount, ClosedPolyCount;
-	unsigned long OpenPolyOffset, ClosedPolyOffset;
+	ieWord DoorClosed, DoorTileStart, DoorTileCount, * DoorTiles;
+	ieWord OpenPolyCount, ClosedPolyCount;
+	ieDword OpenPolyOffset, ClosedPolyOffset;
 	char Name[9];
 	unsigned int i;
 	for (i = 0; i < DoorsCount; i++) {
@@ -252,3 +252,4 @@ unsigned short* WEDImp::GetDoorIndices(char* ResRef, int* count,
 	}
 	return DoorTiles;
 }
+

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.8 2004/05/25 16:16:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.9 2004/08/05 20:41:09 guidoj Exp $
  *
  */
 
@@ -93,7 +93,7 @@ Sprite2D* TISImp::GetTile(int index)
 		printf("Invalid tile index: %d\n",index);
 		printf("FileSize: %ld\n", str->Size() );
 		printf("Position: %ld\n", pos);
-		printf("Shift: %ld\n", headerShift);
+		printf("Shift: %d\n", headerShift);
 	}
 	str->Seek( ( index * ( 1024 + 4096 ) + headerShift ), GEM_STREAM_START );
 	str->Read( &RevCol, 1024 );
