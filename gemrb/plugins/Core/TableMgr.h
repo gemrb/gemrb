@@ -25,7 +25,19 @@
   *@author GemRB Developement Team
   */
 
-class TableMgr : public Plugin  {
+#ifdef WIN32
+
+#ifdef GEM_BUILD_DLL
+#define GEM_EXPORT __declspec(dllexport)
+#else
+#define GEM_EXPORT __declspec(dllimport)
+#endif
+
+#else
+#define GEM_EXPORT
+#endif
+
+class GEM_EXPORT TableMgr : public Plugin  {
 public: 
 	TableMgr();
 	~TableMgr();
