@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.10 2003/11/26 22:07:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.11 2003/11/27 23:45:21 avenger_teambg Exp $
  *
  */
 
@@ -50,14 +50,21 @@ bool AREImp::Open(DataStream * stream, bool autoFree)
 	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read(Signature, 8);
-	if(strncmp(Signature, "AREAV1.0", 8) != 0)
-		return false;
+	int bigheader;
+	if(strncmp(Signature, "AREAV1.0", 8) != 0) {
+		if(strncmp(Signature, "AREAV9.1", 8) != 0)
+			return false;
+		else
+			bigheader=16;
+	}
+	else
+		bigheader=0;
 	//TEST VERSION: SKIPPING VALUES
 	str->Read(WEDResRef, 8);
-	str->Seek(0x54, GEM_STREAM_START);
+	str->Seek(0x54+bigheader, GEM_STREAM_START);
 	str->Read(&ActorOffset, 4);
 	str->Read(&ActorCount, 2);
-	str->Seek(0xac, GEM_STREAM_START);
+	str->Seek(0xac+bigheader, GEM_STREAM_START);
 	str->Read(&AnimCount, 4);
 	str->Read(&AnimOffset, 4);
 	str->Seek(8,GEM_CURRENT_POS); //skipping some
