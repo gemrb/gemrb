@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.66 2005/03/13 10:45:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.67 2005/03/13 20:08:10 avenger_teambg Exp $
  *
  */
 
@@ -194,6 +194,7 @@ int Game::DelNPC(unsigned int slot, bool autoFree)
 int Game::LeaveParty(Actor* actor)
 {
 	actor->CreateStats(); //create or update stats for leaving
+	actor->SetBase(IE_EXPLORE, 0);
 	int slot = InParty( actor );
 	if (slot < 0) {
 		return slot;
@@ -207,6 +208,7 @@ int Game::LeaveParty(Actor* actor)
 int Game::JoinParty(Actor* actor, bool join)
 {
 	actor->CreateStats(); //create stats if they didn't exist yet
+	actor->SetBase(IE_EXPLORE, 1);
 	int slot = InParty( actor );
 	if (slot != -1) {
 		return slot;

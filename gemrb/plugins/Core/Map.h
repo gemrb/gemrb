@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.63 2005/03/10 23:48:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.64 2005/03/13 20:08:12 avenger_teambg Exp $
  *
  */
 
@@ -145,9 +145,9 @@ public:
 	/*fills the visible bitmap with setreset */
 	void SetMapVisibility(int setreset = 0);
 	/* set one fog tile as visible. x, y are tile coordinates */
-	void ExploreTile(int x, int y);
+	void ExploreTile(Point &Tile);
 	/* explore map from given point in map coordinates */
-	void ExploreFromPoint(int x, int y);
+	void ExploreMapChunk(Point &Pos, int range, bool los);
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
 	//PathFinder

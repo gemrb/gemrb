@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.142 2005/03/10 23:48:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.143 2005/03/13 20:08:12 avenger_teambg Exp $
  *
  */
 
@@ -39,15 +39,27 @@ extern Interface* core;
 extern HANDLE hConsole;
 #endif
 
+static int MaxVisibility = 30;
+static int Perimeter;  //calculated from MaxVisibility
 static int NormalCost = 10;
 static int AdditionalCost = 4;
 static int Passable[16] = {
-	4, 1, 1, 1, 1, 1, 1, 1, 4, 1, 0, 0, 0, 0, 3, 1
+	4, 1, 1, 1, 1, 1, 1, 1, 0, 1, 8, 0, 0, 0, 3, 1
 };
+static Point **VisibilityMasks=NULL;
+
 static bool PathFinderInited = false;
 static Variables Spawns;
+int LargeFog;
 
 #define STEP_TIME 150
+
+void ReleaseMemoryMap()
+{
+	for(int i=0;i<MaxVisibility;i++) {
+		free(VisibilityMasks[i]);
+	}
+}
 
 void InitSpawnGroups()
 {
@@ -116,6 +128,75 @@ void InitPathFinder()
 	}
 }
 
+void AddLOS(int destx, int desty, int slot)
+{
+	for(int i=0;i<MaxVisibility;i++) {
+		int x=(destx*i+MaxVisibility/2)/MaxVisibility*16;
+		int y=(desty*i+MaxVisibility/2)/MaxVisibility*16;
+		if (LargeFog) {
+			x += 16;
+			y += 16;
+		}
+		VisibilityMasks[i][slot].x=x;
+		VisibilityMasks[i][slot].y=y;
+	}
+}
+
+void InitExplore()
+{
+	LargeFog = !core->HasFeature(GF_SMALL_FOG);
+
+	//circle perimeter size for MaxVisibility
+	int x = MaxVisibility;
+	int y = 0;
+	int xc = 1 - ( 2 * MaxVisibility );
+	int yc = 1;
+	int re = 0;
+	Perimeter = 0;
+	while (x>=y) {
+		Perimeter+=8;
+		y++;
+		re += yc;
+		yc += 2;
+		if (( ( 2 * re ) + xc ) > 0) {
+			x--;
+			re += xc;
+			xc += 2;
+		}
+	}
+
+	int i;
+	VisibilityMasks = (Point **) malloc(MaxVisibility * sizeof(Point *) );
+	for (i=0;i<MaxVisibility;i++) {
+		VisibilityMasks[i] = (Point *) malloc(Perimeter*sizeof(Point) );
+	}
+
+	x = MaxVisibility;
+	y = 0;
+	xc = 1 - ( 2 * MaxVisibility );
+	yc = 1;
+	re = 0;
+	Perimeter = 0;
+	while (x>=y) {
+		AddLOS (x, y, Perimeter++);
+		AddLOS (-x, y, Perimeter++);
+		AddLOS (-x, -y, Perimeter++);
+		AddLOS (x, -y, Perimeter++);
+		AddLOS (y, x, Perimeter++);
+		AddLOS (-y, x, Perimeter++);
+		AddLOS (-y, -x, Perimeter++);
+		AddLOS (y, -x, Perimeter++);
+		y++;
+		re += yc;
+		yc += 2;
+		if (( ( 2 * re ) + xc ) > 0) {
+			x--;
+			re += xc;
+			xc += 2;
+		}
+	}
+}
+
 Map::Map(void)
 	: Scriptable( ST_AREA )
 {
@@ -137,6 +218,7 @@ Map::Map(void)
 	if (!PathFinderInited) {
 		InitPathFinder();
 		InitSpawnGroups();
+		InitExplore();
 	}
 	ExploredBitmap = NULL;
 	VisibleBitmap = NULL;
@@ -226,7 +308,7 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 	Game* game = core->GetGame();
 	Map* map = game->GetMap(area);
 	if(!map) {
-		printf("Invalid map: %s\n",area);
+		printf("[Map] Invalid map: %s\n",area);
 		command[0]=0;
 		return;
 	}
@@ -234,7 +316,7 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 	int X,Y, face;
 	if (!ent) {
 		textcolor( YELLOW );
-		printf( "WARNING!!! %s EntryPoint does not Exists\n", entrance );
+		printf( "[Map] WARNING!!! %s EntryPoint does not Exists\n", entrance );
 		textcolor( WHITE );
 		X = map->TMap->XCellCount * 64;
 		Y = map->TMap->YCellCount * 64;
@@ -1197,7 +1279,7 @@ int Map::WhichEdge(Point &s)
 	unsigned int sX=s.x/16;
 	unsigned int sY=s.y/12;
 	if (!(Passable[SearchMap->GetPixelIndex( sX, sY )]&PATH_MAP_TRAVEL)) {
-		printf("This isn't a travel region [%d.%d]?\n",sX, sY);
+		printf("[Map] This isn't a travel region [%d.%d]?\n",sX, sY);
 		return -1;
 	}
 	sX*=Height;
@@ -1307,7 +1389,7 @@ int Map::GetExploredMapSize() const
 {
 	int x = TMap->XCellCount*2;
 	int y = TMap->YCellCount*2;
-	if (!core->HasFeature(GF_SMALL_FOG) ) {
+	if (LargeFog) {
 		x++;
 		y++;
 	}
@@ -1325,84 +1407,66 @@ void Map::SetMapVisibility(int setreset)
 }
 
 // x, y are in tile coordinates
-void Map::ExploreTile(int x, int y)
+void Map::ExploreTile(Point &pos)
 {
-	// FIXME: make it into it's own fn
-	int w = (TMap->XCellCount * 2 + (core->HasFeature( GF_SMALL_FOG ) ? 0 : 1));
-	int h = (TMap->YCellCount * 2 + (core->HasFeature( GF_SMALL_FOG ) ? 0 : 1));
+	int h = TMap->YCellCount * 2 + LargeFog;
+	int y = pos.y/32;
+	if (y < 0 || y >= h)
+		return;
 
-	if (x < 0 || x >= w || y < 0 || y >= h)
+	int w = TMap->XCellCount * 2 + LargeFog;
+	int x = pos.x/32;
+	if (x < 0 || x >= w)
 		return;
 
 	int b0 = (y * w) + x;
-	int by = b0 / 8;
-	int bi = b0 % 8;
+	int by = b0/8;
+	int bi = 1<<(b0%8);
 
-	//printf("B: %d %d\n", x, y);
-	ExploredBitmap[by] |= (1 << bi);
-	VisibleBitmap[by] |= (1 << bi);
+	ExploredBitmap[by] |= bi;
+	VisibleBitmap[by] |= bi;
 }
 
-void Map::ExploreFromPoint(int x, int y)
+void Map::ExploreMapChunk(Point &Pos, int range, bool los)
 {
+	Point Tile;
 
-	if (!core->HasFeature( GF_SMALL_FOG )) {
-		x += 16;
-		y += 16;
+	if (range>MaxVisibility) {
+		range=MaxVisibility;
 	}
-	x /= 32;
-	y /= 32;
-
-	//printf("XPL: %d %d\n", x, y);
-	ExploreTile( x, y );
-	ExploreTile( x + 1, y );
-	ExploreTile( x, y + 1 );
-	ExploreTile( x - 1, y );
-	ExploreTile( x, y -1 );
+	int p=Perimeter;
+	while(p--) {
+		int Pass=2;
+		bool block=false;
+		for (int i=0;i<range;i++) {
+			Tile.x = Pos.x+VisibilityMasks[i][p].x;
+			Tile.y = Pos.y+VisibilityMasks[i][p].y;
+			
+			if (los) {
+				if (!block && (GetBlocked(Tile) & PATH_MAP_NO_SEE) ) {
+					block=true;
+				}
+				if (block) {
+					Pass--;
+					if (!Pass) break;
+				}
+			}
+			ExploreTile(Tile);
+		}
+	}
 }
 
 void Map::UpdateFog()
 {
 	SetMapVisibility( 0 );
-	Game* game = core->GetGame();
-	int cnt = game->GetPartySize( false );
 
-	Actor* explorers[255];
-	int explorer_cnt = 0;
-
-
-	// FIXME: remove dead PCs
-	for (int i = 0; i < cnt; i++) {
-		Actor* actor = game->GetPC( i );
-		
-		explorers[explorer_cnt++] = actor;
-		//if (actor->GetStat( IE_EXPLORE )) {
-		//	explorers[explorer_cnt++] = actor;
-		//}
-	}
-
-	// FIXME: make it into it's own fn
-	int w = (TMap->XCellCount * 2 + (core->HasFeature( GF_SMALL_FOG ) ? 0 : 1));
-	int h = (TMap->YCellCount * 2 + (core->HasFeature( GF_SMALL_FOG ) ? 0 : 1));
-
-	int fog_pos = core->HasFeature( GF_SMALL_FOG ) ? 16 : 0;
-
-	for (int y = 0; y < h; y++) {
-		int ym = y * 32 + fog_pos;
-		for (int x = 0; x < w; x++) {
-			int xm = x * 32 + fog_pos;
-
-			for (int e = 0; e < explorer_cnt; e++) {
-				Actor* actor = explorers[e];
-				int vis2 = actor->GetStat( IE_VISUALRANGE ) * actor->GetStat( IE_VISUALRANGE ) * 128; // 128 is an arbitrary number
-				//printf("e: %d, x: %d  y: %d  xm: %d  ym: %d  xp: %d  yp: %d  vr: %d  vis2: %d\n", e, x, y, xm, ym, actor->Pos.x, actor->Pos.y, actor->GetStat( IE_VISUALRANGE ), vis2);
-
-				if ( (((actor->Pos.x - xm) * (actor->Pos.x - xm)))
-				     + (((actor->Pos.y - ym) * (actor->Pos.y - ym))) <= vis2) {
-					ExploreTile( x, y );
-					break;
-				}
-			}
-		}
-	}
+	for (unsigned int e = 0; e<actors.size(); e++) {
+		Actor *actor = actors[e];
+		if (!actor->GetStat( IE_EXPLORE ) ) continue;
+		int state = actor->GetStat( IE_STATE_ID );
+		if (state & STATE_CANTSEE) continue;
+		int vis2 = actor->GetStat( IE_VISUALRANGE );
+		if (state&STATE_BLIND) vis2=2; //can see only themselves
+		ExploreMapChunk (actor->Pos, vis2, true);
+	}	
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.89 2005/03/08 19:58:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.90 2005/03/13 20:08:10 avenger_teambg Exp $
  *
  */
 
@@ -434,7 +434,7 @@ void Actor::DebugDump()
 	printf( "TalkCount:  %d\n", TalkCount );
 	printf( "PartySlot:  %d\n", InParty );
 	printf( "Allegiance: %d\n", BaseStats[IE_EA] );
-	printf( "Visualrange:%d\n", Modified[IE_VISUALRANGE] );
+	printf( "Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
 	printf( "Mod[IE_EA]: %d\n", Modified[IE_EA] );
 	printf( "Mod[IE_ANIMATION_ID]: 0x%04X\n", Modified[IE_ANIMATION_ID] );
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {

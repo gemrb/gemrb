@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.197 2005/03/10 23:48:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.198 2005/03/13 20:08:11 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -565,7 +565,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					short cX = lastMouseX; 
 					short cY = lastMouseY;
 					core->GetVideoDriver()->ConvertToGame( cX, cY );
-					area->ExploreFromPoint( cX, cY );
+					Point pos;
+					pos.x=cX;
+					pos.y=cY;
+					area->ExploreMapChunk( pos, 5, true );
 				}
 				break;
 			case 'x':
