@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.h,v 1.10 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.h,v 1.11 2004/04/17 12:43:07 doc_wagon Exp $
  *
  */
 
@@ -49,7 +49,7 @@ public:
 	CachedFileStream(CachedFileStream* cfs, int startpos, int size,
 		bool autoFree = true);
 	~CachedFileStream(void);
-	int Read(void* dest, unsigned int length);
+	int Read(void* dest, int length);
 	int Seek(int pos, int startpos);
 	unsigned long Size();
 	/** No descriptions */

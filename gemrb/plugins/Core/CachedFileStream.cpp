@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.24 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.25 2004/04/17 12:43:07 doc_wagon Exp $
  *
  */
 
@@ -110,7 +110,7 @@ CachedFileStream::~CachedFileStream(void)
 	autoFree = false; //File stream destructor hack
 }
 
-int CachedFileStream::Read(void* dest, unsigned int length)
+int CachedFileStream::Read(void* dest, int length)
 {
 	size_t c = _fread( dest, 1, length, str );
 	if (c != length) {
