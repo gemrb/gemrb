@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.197 2004/08/26 08:44:58 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.198 2004/08/26 13:29:55 avenger_teambg Exp $
  *
  */
 
@@ -3395,6 +3395,38 @@ static PyObject* GemRB_GetCurrentArea(PyObject * /*self*/, PyObject* /*args*/)
 	return PyString_FromString( core->GetGame()->CurrentArea );
 }
 
+PyDoc_STRVAR( GemRB_MoveToArea__doc,
+"MoveToArea(resref)\n\n"
+"Moves the selected characters to the area" );
+
+static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
+{
+	char *String;
+
+	if (!PyArg_ParseTuple( args, "s", &String )) {
+		return AttributeError( GemRB_EvaluateString__doc );
+	}
+	Game *game = core->GetGame();
+	Map* map2 = game->GetMap(String);
+	if( !map2) {
+		return NULL;
+	}
+	int i = game->GetPartySize(true);
+	while (i--) {
+		Actor* actor = game->GetPC(i);
+		if( !actor->Selected ) {
+			continue;
+		}
+		Map* map1 = game->GetMap(actor->Area);
+		if( map1) {
+			map1->RemoveActor( actor );
+		}
+		map2->AddActor( actor );
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
 
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
@@ -3515,6 +3547,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UpdateMusicVolume, METH_NOARGS),
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
 	METHOD(GetCurrentArea, METH_NOARGS),
+	METHOD(MoveToArea, METH_VARARGS),
 
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
