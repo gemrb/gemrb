@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.39 2003/12/09 20:54:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.40 2003/12/12 23:03:38 balrog994 Exp $
  *
  */
 
@@ -34,6 +34,7 @@ Map::Map(void)
 {
 	tm = NULL;
 	queue = NULL;
+	Script = NULL;
 	Qcount = 0;
 	lastActorCount = 0;
 	justCreated = true;
@@ -76,6 +77,36 @@ void Map::DrawMap(Region viewport)
 {	
 	if(tm)
 		tm->DrawOverlay(0, viewport);
+	if(Script)
+		Script->Update();
+	int ipCount = 0;
+	while(true) {
+		ActorBlock ** acts;
+		int count;
+		InfoPoint * ip = tm->GetInfoPoint(ipCount++);
+		if(!ip)
+			break;
+		if(ip->Type != 0)
+			continue;
+		Region BBox = ip->outline->BBox;
+		if(BBox.x <= 500)
+			BBox.x = 0;
+		else
+			BBox.x -= 500;
+		if(BBox.y <= 500)
+			BBox.y = 0;
+		else
+			BBox.y -= 500;
+		BBox.h += 1000;
+		BBox.w += 1000;
+		count = GetActorInRect(acts, BBox);
+		for(int x = 0; x < count; x++) {
+			if(acts[x]->actor->Modified[IE_EA] == 2) {
+				ip->Script->Update();
+				break;
+			}
+		}
+	}
 	Video * video = core->GetVideoDriver();
 	for(unsigned int i = 0; i < animations.size(); i++) {
 		//TODO: Clipping Animations off screen
@@ -212,6 +243,10 @@ void Map::DrawMap(Region viewport)
 			tint.a = 0xA0;
 			//video->BlitSprite(nextFrame, actors[i].XPos, actors[i].YPos);
 			video->BlitSpriteTinted(nextFrame, ax, ay, tint);
+			if(anim->endReached && anim->autoSwitchOnEnd) {
+				actor->AnimID = anim->nextAnimID;
+				anim->autoSwitchOnEnd = false;
+			}
 		}
 		if(actor->textDisplaying) {
 #ifdef WIN32
@@ -229,6 +264,10 @@ void Map::DrawMap(Region viewport)
 				Region rgn(actor->XPos-100, actor->YPos-100, 200, 400);
 				font->Print(rgn, (unsigned char*)actor->overHeadText, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false);
 			}
+		}
+		for(int i = 0; i < MAX_SCRIPTS; i++) {
+			if(actor->Scripts[i])
+				actor->Scripts[i]->Update();
 		}
 	}
 	//TODO: Check if here is a door

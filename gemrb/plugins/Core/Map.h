@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.18 2003/12/09 20:54:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.19 2003/12/12 23:03:38 balrog994 Exp $
  *
  */
 
@@ -42,8 +42,7 @@
 
 #include "TileMap.h"
 #include "ImageMgr.h"
-#include "Actor.h"
-#include "PathFinder.h"
+#include "ActorBlock.h"
 
 #ifdef WIN32
 
@@ -61,23 +60,6 @@ typedef struct SongHeaderType {
 	unsigned long SongList[5];
 } SongHeaderType;
 
-typedef struct ActorBlock {
-	unsigned short XPos, YPos;
-	unsigned short XDes, YDes;
-	unsigned short MinX, MaxX, MinY, MaxY;
-	unsigned char Orientation;
-	unsigned char AnimID;
-	Sprite2D * lastFrame;
-	Actor * actor;
-	bool Selected;
-	PathNode * path;
-	PathNode * step;
-	unsigned long timeStartStep;
-	char * overHeadText;
-	unsigned char textDisplaying;
-	unsigned long timeStartDisplaying;
-} ActorBlock;
-
 typedef struct WallGroup {
 	Gem_Polygon ** polys;
 	int polygons;
@@ -89,6 +71,7 @@ public:
 	TileMap * tm;
 	ImageMgr * LightMap;
 	ImageMgr * SearchMap;
+	GameScript * Script;
 	bool justCreated;
 private:
 	std::vector<Animation*> animations;
