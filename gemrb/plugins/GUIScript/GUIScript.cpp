@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.154 2004/04/15 16:20:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.155 2004/04/15 16:51:13 avenger_teambg Exp $
  *
  */
 
@@ -2319,25 +2319,6 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 			core->GetPartyINI()->GetKeyAsString( Tag, Key, Default ) );
 }
 
-static PyObject* GemRB_GetActorByPartyID(PyObject * /*self*/, PyObject* args)
-{
-	int PartyID;
-
-	if (!PyArg_ParseTuple( args, "i", &PartyID )) {
-		printMessage( "GUIScript",
-			"Syntax Error: GetActorByPartyID(order)\n", LIGHT_RED );
-		return NULL;
-	}
-
-	int ActorSlot = core->GetGame()->FindPlayer( PartyID );
-	if (ActorSlot < 0) {
-		Py_INCREF( Py_None );
-		return Py_None;
-	}
-
-	return Py_BuildValue( "i", ActorSlot );
-}
-
 static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 {
 	char* CreResRef;
@@ -2381,7 +2362,11 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
-	PlayerSlot = core->GetGame()->FindPlayer( PlayerSlot );
+	Game *game = core->GetGame();
+	if(!game) {
+		return NULL;
+	}
+	PlayerSlot = game->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
 	if (!MyActor) {
 		return Py_BuildValue( "s", "");
@@ -2399,7 +2384,11 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
-	PlayerSlot = core->GetGame()->FindPlayer( PlayerSlot );
+	Game *game = core->GetGame();
+	if(!game) {
+		return NULL;
+	}
+	PlayerSlot = game->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
 	if (!MyActor) {
 		return Py_BuildValue( "s", "");
@@ -2451,7 +2440,11 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	// here comes some code to transfer icon/name to the PC sheet
 	//
 	//
-	PlayerSlot = core->GetGame()->FindPlayer( PlayerSlot );
+	Game *game = core->GetGame();
+	if(!game) {
+		return NULL;
+	}
+	PlayerSlot = game->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
 	if (!MyActor) {
 		return NULL;

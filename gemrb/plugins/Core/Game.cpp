@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.35 2004/04/15 16:20:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.36 2004/04/15 16:51:13 avenger_teambg Exp $
  *
  */
 
@@ -64,7 +64,9 @@ Game::~Game(void)
 int Game::FindPlayer(unsigned int partyID)
 {
 	for(unsigned int slot=0; slot<PCs.size(); slot++) {
-		if(PCs[slot]->InParty==partyID) return slot;
+		if(PCs[slot]->InParty==partyID) {
+			return slot;
+		}
 	}
 	return -1;
 }
