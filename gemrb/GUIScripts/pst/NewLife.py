@@ -237,9 +237,9 @@ def UpdateLabels():
 
 	HpPoints = 20
 	if Con>14:
-		HpPoints = HpPoints + (Con-10)*2 + (Con-14)
+		HpPoints = HpPoints + (Con-9)*2 + (Con-14)
 	else:
-		HpPoints = HpPoints + (Con-10)*2
+		HpPoints = HpPoints + (Con-9)*2
 
 	GemRB.SetText(NewLifeWindow, AcLabel, str(AcPoints))
 	GemRB.SetText(NewLifeWindow, HpLabel, str(HpPoints))
@@ -299,9 +299,12 @@ def StrPress():
 	else:
 		e=0
 
-	print s, e
 	x = GemRB.GetTableValue(Table,s,0) + GemRB.GetTableValue(TableEx, e,0)
 	y = GemRB.GetTableValue(Table,s,1) + GemRB.GetTableValue(TableEx, e,1)
+	if x==0:
+		x=y
+		y=0
+
 	if e>60:
 		s=19
 	GemRB.TextAreaAppend(NewLifeWindow, TextArea,"\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,s,0),x,y) )
@@ -318,15 +321,15 @@ def WisPress():
 	return
 
 def DexPress():
-	Table = GemRB.LoadTable("strmod")
-	x = GemRB.GetTableValue(Table,Dex,2)
+	Table = GemRB.LoadTable("dexmod")
+	x = -GemRB.GetTableValue(Table,Dex,2)
 	GemRB.SetText(NewLifeWindow, TextArea, 18487)
 	GemRB.TextAreaAppend(NewLifeWindow, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,Dex,3),x,0) )
 	return
 
 def ConPress():
 	Table = GemRB.LoadTable("hpconbon")
-	x = GemRB.GetTableValue(Table,Con,1)
+	x = GemRB.GetTableValue(Table,Con-1,1)
 	GemRB.SetText(NewLifeWindow, TextArea, 18491)
 	GemRB.TextAreaAppend(NewLifeWindow, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,Con,4),x,0) )
 	return
