@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.245 2004/11/20 10:39:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.246 2004/11/21 21:20:28 avenger_teambg Exp $
  *
  */
 
@@ -2919,7 +2919,6 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->ItemName));
 
-		//delete item;
 		sm->ReleaseItem( item );
 		core->FreeInterface( sm );
 	} else {
@@ -3776,9 +3775,35 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "ItemIcon", PyString_FromResRef (item->ItemIcon));
 	PyDict_SetItemString(dict, "StackAmount", PyInt_FromLong (item->StackAmount));
 	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));
+	int function=0;
+	switch( item->ItemType ) {
+		ITMExtHeader *eh;
+		ITMFeature *f;
+
+		case ITM_TYPE_POTION:
+			function=1;
+			break;
+		case ITM_TYPE_SCROLL:
+			//determining if this is a copyable scroll
+			if(item->ext_headers.size()<2) {
+				break;
+			}
+			eh = item->ext_headers[2];
+			if(eh->features.size()<1) {
+				break;
+			}
+			f = eh->features[0];
+			if(f->Opcode!=147) {
+				break;
+			}
+			//maybe further checks for school exclusion?
+			function=2;
+			break;
+		default:;
+	}
+	PyDict_SetItemString(dict, "Function", PyInt_FromLong(function));
 	im->ReleaseItem( item );
 	core->FreeInterface( im );
-	//delete item;
 	return dict;
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.10 2004/11/13 13:03:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.11 2004/11/21 21:20:27 avenger_teambg Exp $
  *
  */
 
@@ -66,6 +66,10 @@ typedef Effect ITMFeature;
 #define IE_ITEM_IGNORESHIELD 0x10000
 #define IE_ITEM_KEEN         0x20000
 
+//special itemtypes
+#define ITM_TYPE_POTION      9
+#define ITM_TYPE_SCROLL      11
+
 class GEM_EXPORT ITMExtHeader {
 public:
         ITMExtHeader();
@@ -90,9 +94,6 @@ public:
 	ieWord Charges;
 	ieWord ChargeDepletion;
 	ieDword RechargeFlags; //this is a bitfield with many bits
-	//ieByte UseStrengthBonus;
-	//ieByte Recharge;
-	//ieWord unknown2;
 	ieWord ProjectileAnimation;
 	ieWord MeleeAnimation[3];
 	ieWord BowArrowQualifier;
