@@ -25,6 +25,7 @@ def OnLoad():
 	GenderButton = GemRB.GetControl(CharGenWindow,0)
 	GemRB.SetText(CharGenWindow,GenderButton,11956)
 	GemRB.SetButtonState(CharGenWindow,GenderButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow,GenderButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	RaceButton = GemRB.GetControl(CharGenWindow,1)
 	GemRB.SetText(CharGenWindow,RaceButton, 11957)

@@ -70,9 +70,9 @@ def OnLoad():
 			GemRB.SetVar("Class Kit",Kit)
 		GemRB.SetEvent(KitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "KitPress")
 
-	BackButton = GemRB.GetControl(KitWindow,0)
+	BackButton = GemRB.GetControl(KitWindow,12)
 	GemRB.SetText(KitWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(KitWindow,12)
+	DoneButton = GemRB.GetControl(KitWindow,0)
 	GemRB.SetText(KitWindow,DoneButton,11973)
 	GemRB.SetButtonFlags(KitWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
