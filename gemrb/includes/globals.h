@@ -96,7 +96,7 @@ GEM_EXPORT char* strndup(const char* s, int l);
 #endif
 
 #ifdef WIN32
-
+#define ResolveFilePath(p)
 #else
 char* FindInDir(char* Dir, char* Filename);
 void ResolveFilePath(char* FilePath);
