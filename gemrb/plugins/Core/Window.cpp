@@ -163,7 +163,7 @@ void Window::RedrawControls(char *VarName, unsigned long Sum)
 			{
 				ScrollBar *sb=(ScrollBar *) (Controls[i]);
 				sb->RedrawScrollBar(VarName, Sum);
-//				break;
+				break;
 			}
 		}
 	}

@@ -717,7 +717,7 @@ int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex,
 		return -1;
 	}
 	switch(ctrl->ControlType) {
-		case 0: //Button
+		case IE_GUI_BUTTON: //Button
 			{
 			Button * btn = (Button*)ctrl;
 			btn->SetEvent(funcName);
@@ -725,10 +725,18 @@ int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex,
 			}
 		break;
 
-		case 2: //Slider
+		case IE_GUI_SLIDER: //Slider
 			{
 			Slider * sld = (Slider*)ctrl;
-			strcpy(sld->SliderOnChange, funcName);
+			strncpy(sld->SliderOnChange, funcName,64);
+			return 0;
+			}
+		break;
+
+		case IE_GUI_SCROLLBAR: //ScrollBar
+			{
+			ScrollBar * sb = (ScrollBar*)ctrl;
+			strncpy(sb->ScrollBarOnChange, funcName,64);
 			return 0;
 			}
 		break;
