@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.7 2005/02/28 19:01:11 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.8 2005/02/28 22:49:48 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -308,7 +308,12 @@ def OpenStoreRumourWindow ():
 	StoreRumourWindow = Window = GemRB.LoadWindow (8)
 	GemRB.SetVar ("TopWindow", Window)
 	
-	# 13 ta, 15 ta
+	Scrollbar = GemRB.GetControl (Window, 15)
+	GemRB.SetEvent(Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RumourScrollBarPress")
+	GemRB.SetVar("TopIndex", 0)
+        Count=Store['RumourCount']
+        GemRB.SetVarAssoc(Window, ScrollBar, "TopIndex", Count)
+	RumourScrollBarPress()
 
 	GemRB.UnhideGUI ()
 	UpdateStoreRumourWindow ()
@@ -401,7 +406,20 @@ def UpdateStoreHealWindow ():
 	UpdateStoreCommon (StoreHealWindow, 0x10000005, 0, 0x10000001)
 	
 def UpdateStoreRumourWindow ():
-	UpdateStoreCommon (StoreRumourWindow, 0x10000011, 0, 0x10000012)
+	Window = StoreRumourWindow
+	UpdateStoreCommon (Window, 0x10000011, 0, 0x10000012)
+	TopIndex=GemRB.GetVar ("TopIndex")
+	for i in range(5):
+		Drink = GemRB.GetStoreDrink (i+TopIndex)
+		Button = GemRB.GetControl (Window, i+4)
+		GemRB.SetText (Window, Button, Drink['DrinkName'])
+		GemRB.SetVarAssoc (Window, Button, "Intox", Drink['Strength'])
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "GulpDrink")
+
+def GulpDrink ():
+	PlaySound("gulp")
+	print "Intox improvement: ", GemRB.GetVar("Intox")
+
 
 def UpdateStoreRentWindow ():
 	UpdateStoreCommon (StoreRentWindow, 0x10000008, 0, 0x10000009)

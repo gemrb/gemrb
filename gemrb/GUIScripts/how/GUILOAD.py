@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUILOAD.py,v 1.8 2004/11/30 17:28:57 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUILOAD.py,v 1.9 2005/02/28 22:49:46 avenger_teambg Exp $
 
 
 # GUILOAD.py - Load window
@@ -34,16 +34,15 @@ ScrollBar = 0
 def OnLoad():
 	global LoadWindow, TextAreaControl, GameCount, ScrollBar
 
-	GemRB.SetVar("PlayMode",2)   #iwd is always using 'mpsave'                                             
+	GemRB.SetVar("PlayMode",2)   #iwd is always using 'mpsave'		                             
 	GemRB.LoadWindowPack("GUILOAD")
 	LoadWindow = GemRB.LoadWindow(0)
 	CancelButton=GemRB.GetControl(LoadWindow,34)
 	GemRB.SetText(LoadWindow, CancelButton, 13727)
 	GemRB.SetEvent(LoadWindow,CancelButton,IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetVar("LoadIdx",0)
-	GemRB.SetVar("TopIndex",0)
 
-	for i in range(0,4):
+	for i in range(4):
 		Button = GemRB.GetControl(LoadWindow,26+i)
 		GemRB.SetText(LoadWindow, Button, 15590)
 		GemRB.SetEvent(LoadWindow, Button, IE_GUI_BUTTON_ON_PRESS, "LoadGamePress")
@@ -62,23 +61,28 @@ def OnLoad():
 		GemRB.SetButtonFlags(LoadWindow, Button, IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 		#PC portraits
-		for j in range(0,PARTY_SIZE):
+		for j in range(PARTY_SIZE):
 			Button = GemRB.GetControl(LoadWindow,40+i*PARTY_SIZE+j)
 			GemRB.SetButtonState (LoadWindow, Button, IE_GUI_BUTTON_LOCKED)
 			GemRB.SetButtonFlags(LoadWindow, Button, IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 	ScrollBar=GemRB.GetControl(LoadWindow, 25)
 	GemRB.SetEvent(LoadWindow, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
-	GemRB.SetVarAssoc(LoadWindow, ScrollBar, "TopIndex", GameCount)
 	GameCount=GemRB.GetSaveGameCount()   #count of games in save folder?
-	ScrollBarPress()
-	GemRB.SetVisible(LoadWindow,1)
+	if GameCount>3:
+		TopIndex = GameCount-4
+	else:
+		TopIndex = 0
+	GemRB.SetVar ("TopIndex",TopIndex)
+	GemRB.SetVarAssoc (LoadWindow, ScrollBar, "TopIndex", TopIndex+1)
+	ScrollBarPress ()
+	GemRB.SetVisible (LoadWindow,1)
 	return
 
 def ScrollBarPress():
 	#draw load game portraits
 	Pos = GemRB.GetVar("TopIndex")
-	for i in range(0,4):
+	for i in range(4):
 		ActPos = Pos + i
 
 		Button1 = GemRB.GetControl(LoadWindow,26+i)
@@ -109,7 +113,7 @@ def ScrollBarPress():
 			GemRB.SetSaveGamePreview(LoadWindow, Button, ActPos)
 		else:
 			GemRB.SetButtonPicture(LoadWindow, Button, "")
-		for j in range(0,PARTY_SIZE):
+		for j in range(PARTY_SIZE):
 			Button=GemRB.GetControl(LoadWindow, 40+i*PARTY_SIZE+j)
 			if ActPos<GameCount:
 				GemRB.SetSaveGamePortrait(LoadWindow, Button, ActPos,j)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.31 2004/11/18 23:32:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.32 2005/02/28 22:49:48 avenger_teambg Exp $
  *
  */
 
@@ -84,7 +84,7 @@ void ScrollBar::Draw(unsigned short x, unsigned short y)
 	unsigned short slmy = ( unsigned short )
 		( upMy +
 		( Pos * ( ( domy - Frames[IE_GUI_SCROLLBAR_SLIDER]->Height - upMy ) /
-		( double ) ( Value == 1 ? Value : Value - 1 ) ) ) );
+		( double ) ( Value < 2 ? 1 : Value - 1 ) ) ) );
 	unsigned short slx = ( Width / 2 ) -
 		( Frames[IE_GUI_SCROLLBAR_SLIDER]->Width / 2 );
 
@@ -140,7 +140,7 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned short domy = Height - Frames[2]->Height;
 	unsigned short slheight = domy - upMy;
 	unsigned short refheight = slheight - Frames[5]->Height;
-	double step = refheight / ( double ) ( Value == 1 ? Value : Value - 1 );
+	double step = refheight / ( double ) ( Value < 2 ? 1 : Value - 1 );
 	unsigned short yzero = upMy/* + ( Frames[5]->Height / 2 )*/;
 	unsigned short ymax = yzero + refheight;
 	unsigned short ymy = y - yzero;
@@ -158,7 +158,7 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 	}
 	if (( x >= domx ) && ( y >= domy )) {
 		if (( x <= doMx ) && ( y <= doMy )) {
-			if (Pos < ( Value - 1 ))
+			if ( (ieDword) Pos + 1 < Value )
 				SetPos( Pos + 1 );
 			State |= DOWN_PRESS;
 			return;
@@ -204,7 +204,7 @@ void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 		unsigned short slheight = domy - upMy;
 		unsigned short refheight = slheight - Frames[IE_GUI_SCROLLBAR_SLIDER]->Height;
 		double step = refheight /
-			( double ) ( Value == 1 ? Value : Value - 1 );
+			( double ) ( Value < 2 ? 1 : Value - 1 );
 		unsigned short yzero = upMy + ( Frames[IE_GUI_SCROLLBAR_SLIDER]->Height / 2 );
 		unsigned short ymax = yzero + refheight;
 		unsigned short ymy = y - yzero;
@@ -221,7 +221,7 @@ void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 		if (( ymy - ( befst * step ) ) < ( ( aftst * step ) - ymy )) {
 			SetPos( befst );
 		} else {
-			if (aftst <= ( Value - 1 ))
+			if (aftst < Value )
 				SetPos( aftst );
 		}
 	}
