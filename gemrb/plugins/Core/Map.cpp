@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.65 2004/01/11 16:06:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.66 2004/01/16 22:58:25 balrog994 Exp $
  *
  */
 
@@ -229,12 +229,20 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 				break;
 			if(!actor->Active)
 				continue;
+			if(actor->DeleteMe) {
+				DeleteActor(actor);
+				continue;
+			}
 			actor->ProcessActions();
 			actor->DoStep(LightMap);
 			CharAnimations * ca = actor->GetAnims();
 			if(!ca)
 				continue;
 			Animation * anim = ca->GetAnimation(actor->AnimID, actor->Orientation);
+			if(anim && anim->autoSwitchOnEnd && anim->endReached && anim->nextAnimID) {
+				actor->AnimID = anim->nextAnimID;
+				anim = ca->GetAnimation(actor->AnimID, actor->Orientation);
+			}
 			if((!actor->Modified[IE_NOCIRCLE]) && (!(actor->Modified[IE_STATE_ID]&STATE_DEAD)))
 				actor->DrawCircle();
 			if(anim) {
@@ -279,8 +287,6 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 				if(actor->Scripts[i])
 					actor->Scripts[i]->Update();
 			}
-			if(actor->DeleteMe)
-				DeleteActor(actor);
 		}
 	}
 	for(unsigned int i = 0; i < vvcCells.size(); i++) {
@@ -322,15 +328,17 @@ void Map::AddActor(Actor *actor)
 	CharAnimations * ca = actor->GetAnims();
 	if(ca) {
 		Animation * anim = ca->GetAnimation(actor->AnimID, actor->Orientation);
-		Sprite2D * nextFrame = anim->NextFrame();
-		if(actor->lastFrame != nextFrame) {
-			Region newBBox;
-			newBBox.x = actor->XPos-nextFrame->XPos;
-			newBBox.w = nextFrame->Width;
-			newBBox.y = actor->YPos-nextFrame->YPos;
-			newBBox.h = nextFrame->Height;
-			actor->lastFrame = nextFrame;
-			actor->SetBBox(newBBox);
+		if(anim) {
+			Sprite2D * nextFrame = anim->NextFrame();
+			if(actor->lastFrame != nextFrame) {
+				Region newBBox;
+				newBBox.x = actor->XPos-nextFrame->XPos;
+				newBBox.w = nextFrame->Width;
+				newBBox.y = actor->YPos-nextFrame->YPos;
+				newBBox.h = nextFrame->Height;
+				actor->lastFrame = nextFrame;
+				actor->SetBBox(newBBox);
+			}
 		}
 	}
 	actors.push_back(actor);
@@ -343,6 +351,9 @@ void Map::DeleteActor(Actor * actor)
 		if((*m) == actor) {
 			actors.erase(m);
 			delete(actor);
+			lastActorCount[0] = 0;
+			lastActorCount[1] = 0;
+			lastActorCount[2] = 0;
 			return;
 		}
 	}
