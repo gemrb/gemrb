@@ -41,7 +41,7 @@ def OnLoad():
 	GemRB.SetVar("MessageWindowSize", 0)
 	
 	CloseButton= GemRB.GetControl(MessageWindow, 0)
-	GemRB.SetText(MessageWindow, CloseButton, 4243)
+	GemRB.SetText(MessageWindow, CloseButton, 28082)
 	
 	OpenButton = GemRB.GetControl(OptionsWindow, 10)
 	GemRB.SetEvent(OptionsWindow, OpenButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
