@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.72 2004/02/26 16:51:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.73 2004/02/26 22:05:58 avenger_teambg Exp $
  *
  */
 
@@ -628,7 +628,7 @@ int GameScript::ParseInt(const char*& src)
 {
 	char number[33];
 	char* tmp = number;
-	while (*src != ' ') {
+	while (isdigit(*src) || *src=='-') {
 		*tmp = *src;
 		tmp++;
 		src++;
@@ -659,36 +659,23 @@ Object* GameScript::DecodeObject(const char* line)
 	for (int i = 0; i < MaxObjectNesting; i++) {
 		oB->objectIdentifiers[i] = ParseInt( line );
 	}
+printf("a\n");
 	if (HasAdditionalRect) {
 		line++; //Skip [
 		for (int i = 0; i < 4; i++) {
+printf("x\n");
 			oB->objectRect[i] = ParseInt( line );
+printf("%d\n",oB->objectRect[i]);
 		}
 		line++; //Skip ] (not really... it skips a ' ' since the ] was skipped by the ParseInt function
 	}
+printf("z\n");
 	line++; //Skip "
 	ParseString( line, oB->objectName );
 	line++; //Skip " (the same as above)
 	for (int i = 0; i < ExtraParametersCount; i++) {
 		oB->objectFields[i + ObjectFieldsCount] = ParseInt( line );
 	}
-	/*if (strcmp( core->GameType, "pst" ) == 0) {
-		sscanf( line,
-			"%d %d %d %d %d %d %d %d %d %d %d %d %d %d [%[^]]] \"%[^\"]\"OB",
-			&oB->eaField, &oB->factionField, &oB->teamField,
-			&oB->generalField, &oB->raceField, &oB->classField,
-			&oB->specificField, &oB->genderField, &oB->alignmentField,
-			&oB->identifiersField, &oB->XobjectPosition, &oB->YobjectPosition,
-			&oB->WobjectPosition, &oB->HobjectPosition, oB->PositionMask,
-			oB->objectName );
-	} else {
-		sscanf( line, "%d %d %d %d %d %d %d %d %d %d %d %d \"%[^\"]\"OB",
-			&oB->eaField, &oB->factionField, &oB->teamField,
-			&oB->generalField, &oB->raceField, &oB->classField,
-			&oB->specificField, &oB->genderField, &oB->alignmentField,
-			&oB->identifiersField, &oB->XobjectPosition, &oB->YobjectPosition,
-			oB->objectName );
-	}*/
 	return oB;
 }
 
@@ -846,7 +833,7 @@ Targets* GameScript::EvaluateObject(Scriptable* Sender, Object* oC,
 				if (oC->objectFields[i]) {
 					//If the field is set we need to evaluate it
 					Anything = false;
-					ObjectFunction func = fieldFunctions[i][oC->objectFields[i]];
+					ObjectFunction func = objects[oC->objectFields[i]];
 					if (func) {
 						//If we support that function, just _use_ it :)
 						/* This function will evaluate the parameter */
@@ -880,7 +867,7 @@ Targets* GameScript::EvaluateObject(Scriptable* Sender, Object* oC,
 	}
 }
 
-Targets* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
+Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 {
 	if (!oC) {
 		return NULL;
@@ -893,7 +880,9 @@ Targets* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 			return NULL;
 		}
 	}
-	return tgts;
+	Scriptable *object=tgts->GetTarget(0);
+	delete tgts;
+	return object;
 }
 
 unsigned char GameScript::GetOrient(short sX, short sY, short dX, short dY)
@@ -1349,40 +1338,7 @@ Trigger* GameScript::GenerateTrigger(char* String)
 
 int GameScript::Alignment(Scriptable* Sender, Trigger* parameters)
 {
-	Targets* targets = GetActorFromObject( Sender,
-						parameters->objectParameter );
-	if (!targets) {
-		return;
-	}
-	if (!targets->Count()) {
-		delete( targets );
-		return;
-	}
-	for (int i = 0; i < targets->Count(); i++) {
-		Scriptable* scr = targets->GetTarget( i );
-		if (scr->Type != ST_ACTOR) {
-			continue;
-		}
-		Actor* actor = ( Actor* ) scr;
-		int value = actor->GetStat( IE_ALIGNMENT );
-		int a = parameters->int0Parameter&15;
-		if (a) {
-			if (a != ( value & 15 )) {
-				delete( targets );
-				return 0;
-			}
-		}
-
-		a = parameters->int0Parameter & 240;
-		if (a) {
-			if (a != ( value & 240 )) {
-				delete( targets );
-				return 0;
-			}
-		}
-	}
-	return 1;
-	/*Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
 		return 0;
 	}
@@ -1403,95 +1359,67 @@ int GameScript::Alignment(Scriptable* Sender, Trigger* parameters)
 			return 0;
 		}
 	}
-	return 1;*/
+	return 1;
 }
 
 int GameScript::Allegiance(Scriptable* Sender, Trigger* parameters)
 {
-	Targets* targets = GetActorFromObject( Sender,
+	Scriptable* scr = GetActorFromObject( Sender,
 						parameters->objectParameter );
-	if (!targets) {
+	if (!scr) {
 		return false;
 	}
-	if (!targets->Count()) {
-		delete( targets );
+	if (scr->Type != ST_ACTOR) {
 		return false;
 	}
-	bool ret = true;
-	for (int i = 0; i < targets->Count(); i++) {
-		Scriptable* scr = targets->GetTarget( i );
-		if (scr->Type != ST_ACTOR) {
-			continue;
-		}
-		Actor* actor = ( Actor* ) scr;
-		int value = actor->GetStat( IE_EA );
-		switch (parameters->int0Parameter) {
-			case 30:
-				//goodcutoff
-				ret &= value <= 30;
-				break;
+	Actor* actor = ( Actor* ) scr;
+	int value = actor->GetStat( IE_EA );
+	int ret;
+	switch (parameters->int0Parameter) {
+		case 30:
+			//goodcutoff
+			ret = value <= 30;
+			break;
 
-			case 31:
-				//notgood
-				ret &= value >= 31;
-				break;
+		case 31:
+			//notgood
+			ret = value >= 31;
+			break;
 
-			case 199:
-				//notevil
-				ret &= value <= 199;
-				break;
+		case 199:
+			//notevil
+			ret = value <= 199;
+			break;
 
-			case 200:
-				//evilcutoff
-				ret &= value >= 200;
-				break;
+		case 200:
+			//evilcutoff
+			ret = value >= 200;
+			break;
 
-			case 0:
-			case 126:
-				//anything
-				ret &= true;
-				break;
+		case 0:
+		case 126:
+			//anything
+			ret = true;
+			break;
 
-			default:
-				ret &= parameters->int0Parameter == value;
-				break;
-		}
-		if (!ret) {
-			delete( targets );
-			return false;
-		}
+		default:
+			ret = parameters->int0Parameter == value;
+			break;
 	}
-	delete( targets );
-	return true;
+	return ret;
 }
 
 int GameScript::Class(Scriptable* Sender, Trigger* parameters)
 {
-	Targets* targets = GetActorFromObject( Sender,
-						parameters->objectParameter );
-	if (!targets) {
-		return false;
-	}
-	if (!targets->Count()) {
-		delete( targets );
-		return false;
-	}
-	bool ret = true;
-	for (int i = 0; i < targets->Count(); i++) {
-		Scriptable* scr = targets->GetTarget( i );
-		if (scr->Type != ST_ACTOR) {
-			continue;
-		}
-		Actor* actor = ( Actor* ) scr;
-		//TODO: if parameter >=202, it is of *_ALL type
-		ret &= ( parameters->int0Parameter == actor->GetStat( IE_CLASS ) );
-		if (!ret) {
-			delete( targets );
-			return false;
-		}
-	}
-	delete( targets );
-	return true;
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	Actor * actor = (Actor*)scr;
+	//TODO: if parameter >=202, it is of *_ALL type
+	int value = actor->GetStat(IE_CLASS);
+	return parameters->int0Parameter==value;
 }
 
 //atm this checks for InParty and See, it is unsure what is required
@@ -1718,31 +1646,13 @@ int GameScript::Or(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::Clicked(Scriptable* Sender, Trigger* parameters)
 {
-	/*
-	if (parameters->objectParameter->eaField == 0) {
+	if (parameters->objectParameter->objectFields[0] == 0) {
 		return 1;
 	Scriptable* target = GetActorFromObject( Sender,
 							parameters->objectParameter );
 	if (Sender == target)
 		return 1;
-	}*/
-	Targets* targets = GetActorFromObject( Sender,
-						parameters->objectParameter );
-	if (!targets) {
-		return 0;
 	}
-	if (!targets->Count()) {
-		//Anyone
-		delete( targets );
-		return 1;
-	}
-	//Let's check if the clicker is in the targets list
-	if (targets->Contains( Sender )) {
-		delete( targets );
-		return 1;
-	}
-
-	delete( targets );
 	return 0;
 }
 
@@ -1751,7 +1661,7 @@ int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 	if (Sender->Type != ST_PROXIMITY) {
 		return 0;
 	}
-	/*if (parameters->objectParameter->eaField == 0) {
+	if (parameters->objectParameter->objectFields[0] == 0) {
 		if (Sender->LastEntered) {
 			return 1;
 		} else {
@@ -1763,25 +1673,6 @@ int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 	if (Sender->LastEntered == target) {
 		return 1;
 	}
-	return 0;*/
-	Targets* targets = GetActorFromObject( Sender,
-						parameters->objectParameter );
-	if (!targets) {
-		return 0;
-	}
-	if (!targets->Count()) {
-		delete( targets );
-		if (Sender->LastEntered) {
-			return 1;
-		} else {
-			return 0;
-		}
-	}
-	if (targets->Contains( Sender->LastEntered )) {
-		delete( targets );
-		return 1;
-	}
-	delete( targets );
 	return 0;
 }
 
@@ -1800,21 +1691,11 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 		}
 		return CheckVariable( Sender, Variable ) > 0 ? 1 : 0;
 	}
-	Targets* targets = GetActorFromObject( Sender,
-						parameters->objectParameter );
-	if (!targets) {
-		return 0;
-	}
-	if (!targets->Count()) {
-		delete( targets );
-		return 0;
-	}
-	Scriptable* target = targets->GetTarget( 0 );
-	/*Scriptable* target = GetActorFromObject( Sender,
+	Scriptable* target = GetActorFromObject( Sender,
 							parameters->objectParameter );
 	if (!target) {
 		return 0;
-	}*/
+	}
 	if (target->Type != ST_ACTOR) {
 		return 0;
 	}
@@ -2161,28 +2042,15 @@ void GameScript::ChangeAlignment(Scriptable* Sender, Action* parameters)
 
 void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 {
-	Targets* targets = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!targets) {
-		return;
-	}
-	if (!targets->Count()) {
-		delete( targets );
-		return;
-	}
-	Scriptable* ip = targets->GetTarget( 0 );
-	delete( targets );
-	/*if (parameters->objects[1]->genderField != 0) {
-		switch (parameters->objects[1]->genderField) {
-			case 1:
-				ip = Sender;
-				break;
-		}
+	Scriptable* ip;
+
+	if(!parameters->objects[1]->objectName[0]) {
+		ip=Sender;
 	} else {
-		ip = core->GetGame()->GetMap( 0 )->tm->GetInfoPoint( parameters->objects[1]->objectName );
-	}*/
-	if (!ip) {
-		printf( "Script error: No Trigger Named \"%s\"\n",
-			parameters->objects[1]->objectName );
+		ip = core->GetGame()->GetMap(0)->tm->GetInfoPoint(parameters->objects[1]->objectName);
+	}
+	if(!ip) {
+		printf("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
 		return;
 	}
 	ip->Active = parameters->int0Parameter;
@@ -2348,23 +2216,13 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 
 void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 {
-	Targets* targets = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!targets) {
-		return;
-	}
-	if (!targets->Count()) {
-		delete( targets );
-		return;
-	}
-	Sender->CutSceneId = targets->GetTarget( 0 );
-	delete( targets );
-	/*if (parameters->objects[1]->genderField != 0) {
-		Sender->CutSceneId = GetActorFromObject( Sender,
-								parameters->objects[1] );
-	} else {
+	if(parameters->objects[1]->objectName[0]) {
 		Map* map = core->GetGame()->GetMap( 0 );
 		Sender->CutSceneId = map->GetActor( parameters->objects[1]->objectName );
-	}*/
+	} else {
+		Sender->CutSceneId = GetActorFromObject( Sender,
+								parameters->objects[1] );
+	}
 }
 
 void GameScript::Enemy(Scriptable* Sender, Action* parameters)
@@ -2798,44 +2656,18 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	Scriptable* tar, * scr;
 
 	if (Flags & BD_OWN) {
-		Targets* targets = GetActorFromObject( Sender, parameters->objects[1] );
-		if (!targets)
-			return;
-		if (!targets->Count()) {
-			delete( targets );
-			return;
-		}
-		scr = tar = targets->GetTarget( 0 );
-		delete( targets );
-		//scr = tar = GetActorFromObject( Sender, parameters->objects[1] );
+		scr = tar = GetActorFromObject( Sender, parameters->objects[1] );
 	} else {
-		Targets* targets = GetActorFromObject( Sender, parameters->objects[0] );
-		if (!targets)
+		scr = GetActorFromObject( Sender, parameters->objects[0] );
+		if (!scr)
 			return;
-		if (!targets->Count()) {
-			delete( targets );
-			return;
-		}
-		scr = targets->GetTarget( 0 );
-		delete( targets );
-		//scr = GetActorFromObject( Sender, parameters->objects[0] );
-		//if (!scr)
-		//	return;
 		if (scr != Sender) {
 			//this is an Action Override
 			scr->AddAction( Sender->CurrentAction );
 			Sender->CurrentAction = NULL;
 			return;
 		}
-		targets = GetActorFromObject( Sender, parameters->objects[0] );
-		if (!targets)
-			return;
-		if (!targets->Count()) {
-			delete( targets );
-			return;
-		}
-		tar = targets->GetTarget( 0 );
-		//tar = GetActorFromObject( Sender, parameters->objects[1] );
+		tar = GetActorFromObject( Sender, parameters->objects[1] );
 	}
 	//source could be other than Actor, we need to handle this too!
 	if (scr->Type != ST_ACTOR) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.49 2004/02/26 16:51:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.50 2004/02/26 22:05:58 avenger_teambg Exp $
  *
  */
 
@@ -105,6 +105,7 @@ public:
 		objectName[0] = 0;
 
 		memset( objectFields, 0, MAX_OBJECT_FIELDS * sizeof( int ) );
+		memset( objectIdentifiers, 0, MAX_NESTING * sizeof( int ) );
 		memset( objectRect, 0, 4 * sizeof( int ) );
 
 		canary = 0xdeadbeef;
@@ -642,7 +643,7 @@ public:
 private:
 	static Action* GenerateAction(char* String);
 	static Trigger* GenerateTrigger(char* String);
-	static Targets* GetActorFromObject(Scriptable* Sender, Object* oC);
+	static Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
 	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
 		int flags);
