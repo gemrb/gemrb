@@ -29,19 +29,46 @@ def OnLoad():
 	GemRB.SetText(SoundWindow, OkButton, 11973)
 	GemRB.SetText(SoundWindow, CancelButton, 13727)
 	GemRB.SetEvent(SoundWindow, SubtitleButton, IE_GUI_BUTTON_ON_PRESS, "SubtitlePress")
-	GemRB.SetEvent(SoundWindow, SubtitleButtonB, IE_GUI_BUTTON_ON_PRESS, "SubtitlePressB")
+	GemRB.SetEvent(SoundWindow, SubtitleButtonB, IE_GUI_BUTTON_ON_PRESS, "SubtitlePress")
+	GemRB.SetButtonFlags(SoundWindow, SubtitleButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	GemRB.SetVarAssoc(SoundWindow, SubtitleButtonB, "Subtitles",1)
+
 	GemRB.SetEvent(SoundWindow, WarCryButton, IE_GUI_BUTTON_ON_PRESS, "WarCryPress")
-	GemRB.SetEvent(SoundWindow, WarCryButtonB, IE_GUI_BUTTON_ON_PRESS, "WarCryPressB")
+	GemRB.SetEvent(SoundWindow, WarCryButtonB, IE_GUI_BUTTON_ON_PRESS, "WarCryPress")
+	GemRB.SetButtonFlags(SoundWindow, WarCryButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	GemRB.SetVarAssoc(SoundWindow, WarCryButtonB, "Attack Sounds",1)
+
 	GemRB.SetEvent(SoundWindow, StepsButton, IE_GUI_BUTTON_ON_PRESS, "StepsPress")
-	GemRB.SetEvent(SoundWindow, StepsButtonB, IE_GUI_BUTTON_ON_PRESS, "StepsPressB")
+	GemRB.SetEvent(SoundWindow, StepsButtonB, IE_GUI_BUTTON_ON_PRESS, "StepsPress")
+	GemRB.SetButtonFlags(SoundWindow, StepsButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	GemRB.SetVarAssoc(SoundWindow, StepsButtonB, "Footsteps",1)
+
 	GemRB.SetEvent(SoundWindow, ActionButton, IE_GUI_BUTTON_ON_PRESS, "ActionPress")
-	GemRB.SetEvent(SoundWindow, ActionButtonB1, IE_GUI_BUTTON_ON_PRESS, "ActionPressB1")
-	GemRB.SetEvent(SoundWindow, ActionButtonB2, IE_GUI_BUTTON_ON_PRESS, "ActionPressB2")
-	GemRB.SetEvent(SoundWindow, ActionButtonB3, IE_GUI_BUTTON_ON_PRESS, "ActionPressB3")
+	GemRB.SetEvent(SoundWindow, ActionButtonB1, IE_GUI_BUTTON_ON_PRESS, "ActionPress")
+	GemRB.SetButtonFlags(SoundWindow, ActionButtonB1, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	GemRB.SetVarAssoc(SoundWindow, ActionButtonB1, "Command Sounds Frequency",1)
+
+	GemRB.SetEvent(SoundWindow, ActionButtonB2, IE_GUI_BUTTON_ON_PRESS, "ActionPress")
+	GemRB.SetButtonFlags(SoundWindow, ActionButtonB2, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	GemRB.SetVarAssoc(SoundWindow, ActionButtonB2, "Command Sounds Frequency",2)
+
+	GemRB.SetEvent(SoundWindow, ActionButtonB3, IE_GUI_BUTTON_ON_PRESS, "ActionPress")
+	GemRB.SetButtonFlags(SoundWindow, ActionButtonB3, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	GemRB.SetVarAssoc(SoundWindow, ActionButtonB3, "Command Sounds Frequency",3)
+
 	GemRB.SetEvent(SoundWindow, SelectionButton, IE_GUI_BUTTON_ON_PRESS, "SelectionPress")
-	GemRB.SetEvent(SoundWindow, SelectionButtonB1, IE_GUI_BUTTON_ON_PRESS, "SelectionPressB1")
-	GemRB.SetEvent(SoundWindow, SelectionButtonB2, IE_GUI_BUTTON_ON_PRESS, "SelectionPressB2")
-	GemRB.SetEvent(SoundWindow, SelectionButtonB3, IE_GUI_BUTTON_ON_PRESS, "SelectionPressB3")
+	GemRB.SetEvent(SoundWindow, SelectionButtonB1, IE_GUI_BUTTON_ON_PRESS, "SelectionPress")
+	GemRB.SetButtonFlags(SoundWindow, SelectionButtonB1, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	GemRB.SetVarAssoc(SoundWindow, SelectionButtonB1, "Selection Sounds Frequency",1)
+
+	GemRB.SetEvent(SoundWindow, SelectionButtonB2, IE_GUI_BUTTON_ON_PRESS, "SelectionPress")
+	GemRB.SetButtonFlags(SoundWindow, SelectionButtonB2, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	GemRB.SetVarAssoc(SoundWindow, SelectionButtonB2, "Selection Sounds Frequency",2)
+
+	GemRB.SetEvent(SoundWindow, SelectionButtonB3, IE_GUI_BUTTON_ON_PRESS, "SelectionPress")
+	GemRB.SetButtonFlags(SoundWindow, SelectionButtonB3, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	GemRB.SetVarAssoc(SoundWindow, SelectionButtonB3, "Selection Sounds Frequency",3)
+
 	GemRB.SetEvent(SoundWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
 	GemRB.SetEvent(SoundWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.ShowModal(SoundWindow)
@@ -51,65 +78,20 @@ def SubtitlePress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18015)
 	return
 	
-def SubtitlePressB():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18015)
-#button
-	return
-	
 def WarCryPress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18013)
-	return
-	
-def WarCryPressB():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18013)
-#button
 	return
 	
 def StepsPress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18014)
 	return
 	
-def StepsPressB():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18014)
-#button
-	return
-	
 def ActionPress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18016)
 	return
 	
-def ActionPressB1():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18016)
-#action/1
-	return
-	
-def ActionPressB2():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18016)
-#action/2
-	return
-	
-def ActionPressB3():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18016)
-#action/3
-	return
-	
 def SelectionPress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 11352)
-	return
-	
-def SelectionPressB1():
-	GemRB.SetText(SoundWindow, TextAreaControl, 11352)
-#selection/1
-	return
-	
-def SelectionPressB2():
-	GemRB.SetText(SoundWindow, TextAreaControl, 11352)
-#selection/2
-	return
-	
-def SelectionPressB3():
-	GemRB.SetText(SoundWindow, TextAreaControl, 11352)
-#selection/3
 	return
 	
 def OkPress():
