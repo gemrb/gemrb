@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.16 2003/12/30 17:47:31 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.17 2003/12/30 21:49:23 balrog994 Exp $
  *
  */
 
@@ -161,12 +161,12 @@ InfoPoint * TileMap::AddInfoPoint(char * Name, unsigned short Type, Gem_Polygon 
 	strncpy(ip->Name, Name, 32);
 	switch(Type) {
 		case 0:
-			ip->ipType = ST_PROXIMITY;
+			ip->Type = ST_PROXIMITY;
 		break;
 
 		case 1:
 		case 2:
-			ip->ipType = ST_TRIGGER;
+			ip->Type = ST_TRIGGER;
 		break;
 	}
 	ip->outline = outline;
