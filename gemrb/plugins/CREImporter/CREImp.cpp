@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.43 2004/08/22 22:09:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.44 2004/08/25 12:44:08 avenger_teambg Exp $
  *
  */
 
@@ -125,7 +125,6 @@ CRESpellMemorization* CREImp::GetSpellMemorization()
 CREItem* CREImp::GetItem()
 {
 	CREItem *itm = new CREItem();
-
 	str->Read( itm->ItemResRef, 8 );
 	str->Read( &itm->Unknown08, 2 );
 	str->Read( &itm->Usages[0], 2 );
@@ -371,12 +370,14 @@ void CREImp::GetActorPST(Actor *act)
 
 void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 {
-	std::vector<CREItem*> items;
+	CREItem** items;
 	unsigned int i;
 
 	str->Seek( act->ItemsOffset, GEM_STREAM_START );
+	items = (CREItem **) calloc (act->ItemsCount, sizeof(CREItem *) );
+
 	for (i = 0; i < act->ItemsCount; i++) {
-		items.push_back( GetItem() );
+		items[i] = GetItem();
 	}
 	act->inventory.SetSlotCount(Inventory_Size);
 
@@ -386,28 +387,34 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		str->Read( &index, 2 );
 
 		if (index != 0xFFFF) {
-			if(items[index]) {
+			if (index>=act->ItemsCount) {
+				printf("[CREImp]: Invalid item index (%d) in creature!\n", index);
+				continue;
+			}
+			if (items[index]) {
 				act->inventory.SetSlotItem( items[index], i );
 				items[index] = NULL;
+				continue;
 			}
-			else {
-				printf("[CREImp]: Duplicate item (%d) in creature!\n", index);
-			}
+			printf("[CREImp]: Duplicate item (%d) in creature!\n", index);
 		}
 	}
 
-	i=items.size();
+	i = act->ItemsCount;
 	while(i--) {
-		if(items[i]) {
+		if( items[i]) {
 			printf("[CREImp]: Dangling item in creature: %s!\n", items[i]->ItemResRef);
 			delete items[i];
 		}
 	}
-	//this dword contains the equipping info (which slot is selected)
-	unsigned int Equipped;
-	str->Read(&Equipped, 4);
+	free (items);
 
-//	act->inventory.dump();
+	//this dword contains the equipping info (which slot is selected)
+	// 0,1,2,3 - weapon slots
+	// 1000 - fist
+	// weird values - quiver
+	ieDword Equipped;
+	str->Read(&Equipped, 4);
 
 	// Reading spellbook
 
