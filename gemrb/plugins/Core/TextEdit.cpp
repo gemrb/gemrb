@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.15 2004/04/14 18:26:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.16 2004/04/14 23:53:37 avenger_teambg Exp $
  *
  */
 
@@ -87,7 +87,7 @@ void TextEdit::SetBackGround(Sprite2D* back)
 {
 	//if 'back' is NULL then no BackGround will be drawn
 	if (Back)
-		delete Back;
+		core->GetVideoDriver()->FreeSprite(Back);
 	Back = back;
 	Changed = true;
 }

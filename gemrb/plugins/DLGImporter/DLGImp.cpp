@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.10 2004/03/27 13:05:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.11 2004/04/14 23:53:37 avenger_teambg Exp $
  *
  */
 
@@ -240,7 +240,7 @@ char** DLGImp::GetStrings(char* string, unsigned long& count)
 
 	count = 0;
 	while (*poi) {
-		while (*poi && MyIsSpace( *poi ))
+		while (MyIsSpace( *poi ))
 			poi++;
 		switch (*poi++) {
 			case '/':
@@ -272,6 +272,9 @@ char** DLGImp::GetStrings(char* string, unsigned long& count)
 			default:
 				break;
 		}
+	}
+	if(!count) {
+		return NULL;
 	}
 	char** strings = ( char** ) calloc( count, sizeof( char* ) );
 	if (strings == NULL) {

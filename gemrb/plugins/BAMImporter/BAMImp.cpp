@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.17 2004/03/27 11:51:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.18 2004/04/14 23:53:36 avenger_teambg Exp $
  *
  */
 
@@ -53,6 +53,12 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 	}
 	if (str && this->autoFree) {
 		delete( str );
+	}
+	if (frames) {
+		delete[] frames;
+	}
+	if (cycles) {
+		delete[] cycles;
 	}
 	str = stream;
 	this->autoFree = autoFree;
@@ -98,12 +104,6 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 	}
 	if (strncmp( Signature, "BAM V1  ", 8 ) != 0) {
 		return false;
-	}
-	if (frames) {
-		delete[] frames;
-	}
-	if (cycles) {
-		delete[] cycles;
 	}
 	//frames.clear();
 	//cycles.clear();

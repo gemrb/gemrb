@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.29 2004/04/13 22:19:28 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.30 2004/04/14 23:53:36 avenger_teambg Exp $
  *
  */
 
@@ -198,7 +198,7 @@ Actor* CREImp::GetActor()
 	str->Read( act->LargePortrait, 8 );
 	act->LargePortrait[8] = 0;
 
-	int Inventory_Size;
+	unsigned int Inventory_Size;
 
 	switch(CREVersion) {
 		case IE_CRE_V1_2:
@@ -328,29 +328,41 @@ void CREImp::GetActorPST(Actor *act)
 	act->BaseStats[IE_ARMOR_TYPE] = 0;
 }
 
-void CREImp::ReadInventory(Actor *act, int Inventory_Size)
+void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 {
 	std::vector<CREItem*> items;
 	str->Seek( act->ItemsOffset, GEM_STREAM_START );
-	for (size_t i = 0; i < act->ItemsCount; i++) {
+	for (unsigned int i = 0; i < act->ItemsCount; i++) {
 		items.push_back( GetItem() );
 	}
 	act->inventory.SetSlotCount(Inventory_Size);
 
 	str->Seek( act->ItemSlotsOffset, GEM_STREAM_START );
-	for (int i = 0; i < Inventory_Size; i++) {
-		ieWord  index;
+	for (unsigned int i = 0; i < Inventory_Size; i++) {
+		ieWord index;
 		str->Read( &index, 2 );
 
 		if (index != 0xFFFF) {
-			act->inventory.SetSlotItem( items[index], i );
+			if(items[index]) {
+				act->inventory.SetSlotItem( items[index], i );
+				items[index] = NULL;
+			}
+			else {
+				printf("[CREImp]: Duplicate item in creature!\n");
+			}
 		}
 	}
 
+	unsigned int i=items.size();
+	while(i--) {
+		if(items[i]) {
+			printf("[CREImp]: Dangling item in creature: %s!\n", items[i]->ItemResRef);
+			delete items[i];
+		}
+	}
 	act->inventory.dump();
 
 	// Reading spellbook
-	act->spellbook = new Spellbook();
 
 	std::vector<CREKnownSpell*> known_spells;
 	std::vector<CREMemorizedSpell*> memorized_spells;
@@ -358,13 +370,11 @@ void CREImp::ReadInventory(Actor *act, int Inventory_Size)
 	str->Seek( act->KnownSpellsOffset, GEM_STREAM_START );
 	for (size_t i = 0; i < act->KnownSpellsCount; i++) {
 		known_spells.push_back( GetKnownSpell() );
-		//act->spellbook->AddKnownSpell( GetKnownSpell() );
 	}
 
 	str->Seek( act->MemorizedSpellsOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < act->MemorizedSpellsCount; i++) {
 		memorized_spells.push_back( GetMemorizedSpell() );
-		//act->spellbook->AddMemorizedSpell( GetMemorizedSpell() );
 	}
 
 	str->Seek( act->SpellMemorizationOffset, GEM_STREAM_START );
@@ -373,16 +383,37 @@ void CREImp::ReadInventory(Actor *act, int Inventory_Size)
 
 		for (unsigned int j = 0; j < known_spells.size(); j++) {
 			CREKnownSpell* spl = known_spells[j];
-			if (spl->Type == sm->Type && spl->Level == sm->Level)
+			if (!spl) {
+				printf("[CREImp]: Duplicate spell in creature!\n");
+				continue;
+			}
+			if (spl->Type == sm->Type && spl->Level == sm->Level) {
 				sm->known_spells.push_back( spl );
+				known_spells[j] = NULL;
+			}
 		}
 		for (unsigned int j = 0; j < sm->MemorizedCount; j++) {
 			sm->memorized_spells.push_back( memorized_spells[sm->MemorizedIndex + j] );
+			memorized_spells[sm->MemorizedIndex + j] = NULL;
 		}
-		act->spellbook->AddSpellMemorization( sm );
+		act->spellbook.AddSpellMemorization( sm );
 	}
 
-	act->spellbook->dump();
+	i=known_spells.size();
+	while(i--) {
+		if(known_spells[i]) {
+			printf("[CREImp]: Dangling spell in creature: %s!\n", known_spells[i]->SpellResRef);
+			delete known_spells[i];
+		}
+	}
+	i=memorized_spells.size();
+	while(i--) {
+		if(memorized_spells[i]) {
+			printf("[CREImp]: Dangling spell in creature: %s!\n", memorized_spells[i]->SpellResRef);
+			delete memorized_spells[i];
+		}
+	}
+	act->spellbook.dump();
 
 	act->Init(); //applies effects, updates Modified
 }

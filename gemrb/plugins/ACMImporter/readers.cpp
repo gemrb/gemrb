@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.4 2004/02/24 22:20:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.5 2004/04/14 23:53:35 avenger_teambg Exp $
  *
  */
 
@@ -50,7 +50,8 @@ int CACMReader::init_reader()
 	subblocks = hdr.subblocks;
 
 	block_size = ( 1 << levels ) * subblocks;
-	block = new long [block_size]; 
+	//using malloc for simple arrays (supposed to be faster)
+	block = (long *) malloc(sizeof(long)*block_size);
 	if (!block) {
 		return 0;
 	}

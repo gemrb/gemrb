@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.152 2004/04/14 20:14:17 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.153 2004/04/14 23:53:37 avenger_teambg Exp $
  *
  */
 
@@ -98,12 +98,6 @@ static PyObject* GemRB_HideGUI(PyObject*, PyObject* args)
 GameControl* StartGameControl()
 {
 	//making sure that our window is the first one
-/*
-	int count = core->GetWindowMgr()->GetWindowsCount();
-	for (int i = 0; i < count; i++) {
-		core->DelWindow( i );
-	}
-*/
 	core->DelWindow(~0); //deleting ALL windows
 	Window* gamewin = new Window( 0xffff, 0, 0, core->Width, core->Height );
 	GameControl* gc = new GameControl();

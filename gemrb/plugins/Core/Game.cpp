@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.33 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.34 2004/04/14 23:53:36 avenger_teambg Exp $
  *
  */
 
@@ -35,6 +35,7 @@ Game::Game(void)
 	MapIndex = -1;
 	SelectedSingle = 0;
 	globals = NULL;
+	familiars = NULL;
 }
 
 Game::~Game(void)
@@ -50,6 +51,9 @@ Game::~Game(void)
 	}
 	if (globals) {
 		delete globals;
+	}
+	if (familiars) {
+		free (familiars);
 	}
 	size_t i=Journals.size();
 	while(i--) {

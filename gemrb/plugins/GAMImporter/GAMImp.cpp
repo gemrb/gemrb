@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.21 2004/04/14 21:00:23 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.22 2004/04/14 23:53:37 avenger_teambg Exp $
  *
  */
 
@@ -142,7 +142,6 @@ Game* GAMImp::GetGame()
 	newGame->globals = new Variables();
 	newGame->globals->SetType( GEM_VARIABLES_INT );
 
-	//Game* newGame = new Game();
 	if (!newGame->CurrentArea[0]) {
 		// 0 - single player, 1 - tutorial, 2 - multiplayer
 		unsigned long playmode = 0;

@@ -82,6 +82,7 @@ GameControl::GameControl(void)
 	Dialogue = false;
 	Destination[0] = 0;
 	EntranceName[0] = 0;
+	dlg = NULL;
 	target = NULL;
 	speaker = NULL;
 	HotKey = 0;
@@ -92,6 +93,9 @@ GameControl::~GameControl(void)
 	free( InfoTextPalette );
 	for (unsigned int i = 0; i < infoTexts.size(); i++) {
 		delete( infoTexts[i] );
+	}
+	if(dlg) {
+		delete dlg;
 	}
 }
 
@@ -1129,6 +1133,9 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 {
 	DialogMgr* dm = ( DialogMgr* ) core->GetInterface( IE_DLG_CLASS_ID );
 	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
+	if(dlg) {
+		delete dlg;
+	}
 	dlg = dm->GetDialog();
 	core->FreeInterface( dm );
 
@@ -1282,8 +1289,9 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 
 		ta->PopLines( ds->transitionsCount + 1 );
-		AddTalk( ta, target, "A0A0FF",
-			core->GetString( tr->textStrRef ), "8080FF" );
+		char *string = core->GetString( tr->textStrRef );
+		AddTalk( ta, target, "A0A0FF", string, "8080FF" );
+		free( string );
 
 		if (tr->action) {
 			for (unsigned int i = 0; i < tr->action->count; i++) {

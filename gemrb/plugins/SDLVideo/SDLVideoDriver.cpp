@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.62 2004/04/13 23:23:04 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.63 2004/04/14 23:53:38 avenger_teambg Exp $
  *
  */
 
@@ -501,10 +501,8 @@ Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, DWORD rMask,
 	Sprite2D* spr = new Sprite2D();
 	void* p = SDL_CreateRGBSurfaceFrom( pixels, w, h, bpp, w*( bpp / 8 ),
 				rMask, gMask, bMask, aMask );
-	if (p != NULL) {
-		spr->vptr = p;
-		spr->pixels = pixels;
-	}
+	spr->vptr = p;
+	spr->pixels = pixels;
 	if (cK) {
 		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			index );
@@ -527,10 +525,8 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	}
 	SDL_SetPalette( ( SDL_Surface * ) p, SDL_LOGPAL, ( SDL_Color * ) palette,
 		0, colorcount );
-	if (p != NULL) {
-		spr->vptr = p;
-		spr->pixels = pixels;
-	}
+	spr->vptr = p;
+	spr->pixels = pixels;
 	if (cK) {
 		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY | SDL_RLEACCEL,
 			index );
@@ -623,7 +619,9 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 			}
 		}
 	}
-	SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, &t, backBuf, &drect );
+	if(spr->vptr) {
+		SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, &t, backBuf, &drect );
+	}
 }
 
 void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
@@ -685,12 +683,17 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 		}
 		srect = &t;
 	}
-	SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
+	if(spr->vptr) {
+		SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
+	}
 }
 void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 	Region* clip)
 {
 	SDL_Surface* tmp = ( SDL_Surface* ) spr->vptr;
+	if(!tmp) {
+		return;
+	}
 	SDL_Color* pal = tmp->format->palette->colors;
 	SDL_Color oldPal[256];//, newPal[256];
 	memcpy( oldPal, pal, 256 * sizeof( SDL_Color ) );
@@ -700,7 +703,6 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 		pal[i].g = ( tint.g * oldPal[i].g ) >> 8;
 		pal[i].b = ( tint.b * oldPal[i].b ) >> 8;
 	}
-	//SDL_SetPalette(tmp, SDL_LOGPAL, newPal, 0, 256);
 	BlitSprite( spr, x, y, false, clip );
 	SDL_SetPalette( tmp, SDL_LOGPAL, oldPal, 0, 256 );
 }
@@ -775,6 +777,9 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D* spr, int x, int y,
 		srect->h = spr->Height;
 	}
 	SDL_Surface* surf = ( SDL_Surface* ) spr->vptr;
+	if(!surf) {
+		return;
+	}
 	int destx = drect. x, desty = drect.y;
 	Region Screen = core->GetVideoDriver()->GetViewport();
 	if (( destx > ( xCorr + Screen.w ) ) || ( ( destx + srect->w ) < xCorr )) {
@@ -1207,10 +1212,8 @@ Sprite2D* SDLVideoDriver::PrecalculatePolygon(Point* points, int count,
 				0, 0 );
 	SDL_SetPalette( ( SDL_Surface * ) p, SDL_LOGPAL, ( SDL_Color * ) palette,
 		0, 2 );
-	if (p != NULL) {
-		spr->vptr = p;
-		spr->pixels = pixels;
-	}
+	spr->vptr = p;
+	spr->pixels = pixels;
 	SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY | SDL_RLEACCEL, 0 );
 	SDL_SetAlpha( ( SDL_Surface * ) p, SDL_SRCALPHA | SDL_RLEACCEL, 128 );
 	spr->Width = width;

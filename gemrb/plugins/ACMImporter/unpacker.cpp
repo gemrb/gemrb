@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.4 2004/02/24 22:20:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/unpacker.cpp,v 1.5 2004/04/14 23:53:35 avenger_teambg Exp $
  *
  */
 
@@ -104,7 +104,8 @@ long CValueUnpacker::get_bits(int bits)
 }
 int CValueUnpacker::init_unpacker()
 {
-	amp_buffer = new short [0x10000];
+	//using malloc, supposed to be faster
+	amp_buffer =(short *) malloc(sizeof(short)*0x10000);
 	if (!amp_buffer) {
 		return 0;
 	}

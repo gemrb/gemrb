@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.38 2004/04/09 13:38:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.39 2004/04/14 23:53:35 avenger_teambg Exp $
  *
  */
 
@@ -132,7 +132,7 @@ int ACMImp::PlayListManager(void* data)
 								memory, ACM_BUFFERSIZE,
 								music.reader->get_samplerate() );
 						}
-						delete( memory );
+						delete[] memory;
 						alSourceQueueBuffers( MusicSource, MUSICBUFERS, MusicBuffers );
 						if (alIsSource( MusicSource )) {
 							alSourcePlay( MusicSource );
@@ -217,7 +217,7 @@ ACMImp::~ACMImp(void)
 	clearstreams( true );
 	SDL_KillThread( musicThread );
 	SDL_DestroyMutex( musicMutex );
-	delete( static_memory );
+	delete[] static_memory;
 	alutExit();
 }
 
@@ -315,11 +315,11 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 	if (( error = alGetError() ) != AL_NO_ERROR) {
 		DisplayALError( "[ACMImp::Play] alBufferData : ", error );
 		alDeleteBuffers( 1, &Buffer );
-		delete( memory );
+		delete[] memory;
 		delete( acm );
 		return 0;
 	}
-	delete( memory );
+	delete[] memory;
 	delete( acm );
 
 	alGenSources( 1, &Source );
