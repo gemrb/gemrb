@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.19 2004/04/18 14:25:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.20 2004/04/23 18:41:01 avenger_teambg Exp $
  *
  */
 
@@ -31,6 +31,8 @@ BAMImp::BAMImp(void)
 	autoFree = false;
 	frames = NULL;
 	cycles = NULL;
+	FramesCount = 0;
+	CyclesCount = 0;
 }
 
 BAMImp::~BAMImp(void)
@@ -211,13 +213,6 @@ void* BAMImp::GetFramePixels(unsigned short findex, unsigned char mode)
 		unsigned char * Buffer = ( unsigned char * ) pixels;
 		if (str->Read( inpix, RLESize ) == GEM_ERROR) {
 			free( inpix );
-printf("rlesize: %d remains: %d\n",RLESize, remains);
-printf("frameindex: %d\n",findex);
-printf("frame sizes: %d  %d\n",frames[findex].Width, frames[findex].Height);
-printf("rle frame size: %d\n",(unsigned long) ceil(frames[findex].Width* frames[findex].Height*1.5) );
-printf("Filesize/remains: %d/%d\n(aborting)\n",str->Size(), str->Remains() );
-
-abort();
 			return NULL;
 		}
 		unsigned int i = 0;

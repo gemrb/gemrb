@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.94 2004/04/21 17:58:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.95 2004/04/23 18:41:02 avenger_teambg Exp $
  *
  */
 
@@ -164,7 +164,8 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 		Y = ent->YPos;
 		face = ent->Face;
 	}
-	sprintf(command, "LeaveAreaLua(\"%s\",[%d.%d],%d)", area, X, Y, face);
+	//LeaveArea is the same in ALL engine versions
+	sprintf(command, "LeaveArea(\"%s\",[%d.%d],%d)", area, X, Y, face);
 }
 
 void Map::DrawMap(Region viewport, GameControl* gc)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.153 2004/04/22 20:44:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.154 2004/04/23 18:41:02 avenger_teambg Exp $
  *
  */
 
@@ -315,6 +315,7 @@ static ActionLink actionnames[] = {
 	{"jumptopoint", GameScript::JumpToPoint,0},
 	{"jumptopointinstant", GameScript::JumpToPointInstant,0},
 	{"kill", GameScript::Kill,0},
+	{"leavearea", GameScript::LeaveAreaLUA,0}, //so far the same
 	{"leavearealua", GameScript::LeaveAreaLUA,0},
 	{"leavearealuaentry", GameScript::LeaveAreaLUAEntry,0},
 	{"leavearealuapanic", GameScript::LeaveAreaLUAPanic,0},
@@ -5797,6 +5798,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
+	//the LoadMos ResRef may be empty
 	strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
 	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter, true);
 }
