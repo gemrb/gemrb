@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.8 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.9 2003/11/28 21:54:32 balrog994 Exp $
  *
  */
 
@@ -33,7 +33,6 @@ Console::Console(void)
 	Buffer = (unsigned char*)malloc(max);
 	Buffer[0] = 0;
 	CurPos = 0;
-	Changed = true;
 	if(stricmp(core->GameType, "iwd2") == 0) {
 		Color fore = {0xff, 0xff, 0xff, 0x00}, back = {0x00, 0x00, 0x00, 0x00};
 		palette = core->GetVideoDriver()->CreatePalette(fore, back);
@@ -54,46 +53,38 @@ void Console::Draw(unsigned short x, unsigned short y)
 {
 	if(ta)
 		ta->Draw(x,y-ta->Height);
-	if(!Changed)
-		return;
 	Color black = {0x00, 0x00, 0x00, 0x00};
 	Region r(x+XPos, y+YPos, Width, Height);
 	core->GetVideoDriver()->DrawRect(r, black);
 	font->Print(r, Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL, NULL, Cursor, CurPos);
-	Changed = false;
 }
 /** Set Font */
 void Console::SetFont(Font * f)
 {	
 	if(f != NULL)
 		font = f;
-	Changed = true;
 }
 /** Set Cursor */
 void Console::SetCursor(Sprite2D * cur)
 {
 	if(cur != NULL)
 		Cursor = cur;
-	Changed = true;
 }
 /** Set BackGround */
 void Console::SetBackGround(Sprite2D * back)
 {
 	//if 'back' is NULL then no BackGround will be drawn
 	Back = back;
-	Changed = true;
 }
 /** Sets the Text of the current control */
 int Console::SetText(const char * string, int pos)
 {	
 	strncpy((char*)Buffer, string, max);
-	Changed = true;
 	return 0;
 }
 /** Key Press Event */
 void Console::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
-	Changed = true;
 	if(Key >= 0x20) {
 		int len = strlen((char*)Buffer);
 		if(len+1 < max) {
@@ -110,7 +101,6 @@ void Console::OnSpecialKeyPress(unsigned char Key)
 {
 	int len;
 
-	Changed = true;
 	switch(Key)
 	{
 	case GEM_BACKSP:
