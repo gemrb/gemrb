@@ -110,7 +110,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 		str->Read(&ControlType, 1);
 		str->Read(&temp, 1);
 		switch(ControlType) {
-			case 0: {
+			case 0: { //Button
 				Button * btn = new Button(false);
 				btn->ControlID = ControlID;
 				btn->BufferLength = BufferLength;
@@ -155,7 +155,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				}
 			break;
 
-			case 2: {
+			case 2: { //Slider
 				char MOSFile[8], BAMFile[8];
 				unsigned short Cycle, Knob, GrabbedKnob;
 				short KnobXPos, KnobYPos, KnobStep, KnobStepsCount;
@@ -190,7 +190,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				win->AddControl(sldr);
 			}
 
-			case 6: {
+			case 6: { //Label
 				char FontResRef[8];
 				unsigned long StrRef;
 				RevColor fore, back;
@@ -215,12 +215,18 @@ Window * CHUImp::GetWindow(unsigned long i)
 				f.g = fore.g;
 				f.b = fore.b;
 				lab->SetColor(f);
+				if((alignment & (1<<4)) != 0)
+					lab->SetAlignment(IE_FONT_ALIGN_RIGHT);
+				else if((alignment & (1<<2)) != 0)
+					lab->SetAlignment(IE_FONT_ALIGN_CENTER);
+				else
+					lab->SetAlignment(IE_FONT_ALIGN_LEFT);
 				free(str);
 				win->AddControl(lab);
 			}
 			break;
 
-			case 7: {
+			case 7: { //ScrollBar
 				char BAMResRef[9];
 				unsigned short Cycle, UpUnPressed, UpPressed, DownUnPressed, DownPressed, Trough, Slider;
 				str->Read(BAMResRef, 8);
