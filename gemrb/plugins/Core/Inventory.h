@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.14 2004/05/05 19:13:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.15 2004/05/07 17:14:49 avenger_teambg Exp $
  *
  */
 
@@ -104,6 +104,8 @@ public:
 	/** returns CREItem in specified slot. if count !=0 it
 	** splits the item and returns only requuested amount */
 	CREItem* RemoveItem(unsigned int slot, unsigned int count = 0);
+	/** returns slot of removed item, you can delete the removed item */
+	int RemoveItem(const char* resref, bool droppable, CREItem **res_item);
 
 	/** adds CREItem to the inventory. If slot == -1, finds
 	** first eligible slot, eventually splitting the item to

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.18 2004/04/28 12:54:20 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.19 2004/05/07 17:14:49 avenger_teambg Exp $
  *
  */
 
@@ -193,6 +193,27 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	item->Usages[0]-=count;
 	returned->Usages[0]=count;
 	return returned;
+}
+
+int Inventory::RemoveItem(const char *resref, bool movable, CREItem **res_item)
+{
+	int slot = Slots.size();
+	while(slot--) {
+		CREItem *item = Slots[slot];
+		if(!item) {
+			continue;
+		}
+		if( movable && (item->Flags&IE_ITEM_UNDROPPABLE)) {
+				continue;
+		}
+		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
+			continue;
+		}
+		*res_item=RemoveItem(slot, 0);
+		return slot;
+	}
+	*res_item = NULL;
+	return -1;
 }
 
 void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
