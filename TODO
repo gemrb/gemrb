@@ -14,8 +14,10 @@ Area scripts are queued, master areas get on the head of the queue, non-master a
 Items:
 1. (DONE) Loading containers/items in areas
 2. Dropping of items (first create an opcode)
+2a. Render dropped items in area (ground icon)
 3. Picking up an item (create opcode)
 4. Equipping items
+5. Equipped weapon range (create triggers)
 
 Effects:
 1. Create base system for effect blocks (ED)
@@ -23,8 +25,9 @@ Effects:
 
 Area:
 1. Implement cover (wallgroups)
-2. Fog of war
+2. Fog of war (ED)
 3. Blocking doors (impeded blocks)
+4. Don't load scripts for pile items? (research when a script is unused)
 
 Known Bugs:
 1. problem: Dialog options that are disabled by the trigger condition are still accessible via hotkey. (FIXED)
@@ -35,3 +38,9 @@ Known Bugs:
 
 4. problem: sound isn't working in movies (FIXED)
 
+5. problem: orientation is still fuzzy. Find what makes it wrong.
+
+Ideas:
+1. Use the character sheet (Actor.cpp) itself to store attributes of the character during character generation.
+Benefits: data is already stored in the destination, data constraints and relations are easily implemented.
+How to: replace GemRB.SetVar with GemRB.SetPlayerStat. Don't forget to create the character first.
