@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.52 2004/11/07 22:56:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.53 2004/12/07 22:51:06 avenger_teambg Exp $
  *
  */
 
@@ -291,5 +291,7 @@ public:
 	void GetNextStance();
 	/* returns the count of memorizable spells of type at the given level */
 	int GetMemorizableSpellsCount(ieSpellType Type, int Level);
+	int LearnSpell(const char *resref, ieDword flags);
+
 };
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.18 2004/10/20 18:35:46 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.19 2004/12/07 22:51:07 avenger_teambg Exp $
  *
  */
 
@@ -100,6 +100,14 @@ unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level)
 	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
 		return 0;
 	return spells[type][level]->known_spells.size();
+}
+
+bool Spellbook::AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl)
+{
+	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
+		return false;
+	spells[type][level]->known_spells.push_back(spl);
+	return true;
 }
 
 CREKnownSpell* Spellbook::GetKnownSpell(int type, unsigned int level, unsigned int index)
@@ -237,7 +245,7 @@ void Spellbook::dump()
 			if (!sm) continue;
 
 			printf ( "type: %d: L: %d; N1: %d; N2: %d; T: %d; MI: %d; MC: %d\n", i,
-			         sm->Level, sm->Number, sm->Number2, sm->Type, sm->MemorizedIndex, sm->MemorizedCount );
+				 sm->Level, sm->Number, sm->Number2, sm->Type, sm->MemorizedIndex, sm->MemorizedCount );
 
 			if (sm->known_spells.size()) 
 				printf( "  Known spells:\n" );

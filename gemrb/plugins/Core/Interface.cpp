@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.244 2004/12/01 21:59:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.245 2004/12/07 22:51:06 avenger_teambg Exp $
  *
  */
 
@@ -42,6 +42,7 @@
 #include "WorldMapMgr.h"
 #include "AmbientMgr.h"
 #include "ItemMgr.h"
+#include "SpellMgr.h"
 #include "MapControl.h"
 
 GEM_EXPORT Interface* core;
@@ -2596,6 +2597,36 @@ void Interface::FreeItem(Item *itm)
 {
 	ItemMgr * sm = (ItemMgr *) GetInterface(IE_ITM_CLASS_ID);
 	sm->ReleaseItem(itm);
+	FreeInterface(sm);
+}
+
+Spell* Interface::GetSpell(const char* resname)
+{
+	DataStream* str = GetResourceMgr()->GetResource( resname, IE_SPL_CLASS_ID );
+	SpellMgr* sm = ( SpellMgr* ) GetInterface( IE_SPL_CLASS_ID );
+	if (sm == NULL) {
+		delete ( str );
+		return NULL;
+	}
+	if (!sm->Open( str, true )) {
+		FreeInterface( sm );
+		return NULL;
+	}
+
+	Spell* spell = sm->GetSpell();
+	if (spell == NULL) {
+		FreeInterface( sm );
+		return NULL;
+	}
+
+	FreeInterface( sm );
+	return spell;
+}
+
+void Interface::FreeSpell(Spell *spl)
+{
+	SpellMgr * sm = (SpellMgr *) GetInterface(IE_SPL_CLASS_ID);
+	sm->ReleaseSpell(spl);
 	FreeInterface(sm);
 }
 

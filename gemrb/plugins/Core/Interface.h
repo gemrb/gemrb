@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.128 2004/11/19 23:09:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.129 2004/12/07 22:51:06 avenger_teambg Exp $
  *
  */
 
@@ -47,6 +47,7 @@
 #include "SaveGameIterator.h"
 #include "Variables.h"
 #include "Item.h"
+#include "Spell.h"
 #include "MusicMgr.h"
 #include "TableMgr.h"
 #include "SymbolMgr.h"
@@ -377,6 +378,8 @@ public:
 	bool ResolveRandomItem(CREItem *itm);
 	Item* GetItem(const char* resname);
 	void FreeItem(Item *itm);
+	Spell* GetSpell(const char* resname);
+	void FreeSpell(Spell *spl);
 
 private:
 	bool LoadConfig(void);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.76 2004/11/07 19:21:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.77 2004/12/07 22:51:06 avenger_teambg Exp $
  *
  */
 
@@ -534,126 +534,28 @@ void Actor::GetNextStance()
 	SetStance( Stance );
 }
 
-//this should be set in a guiscript, and stored in the spellbook structure
-#if 0
-//we have to determine if the actor is able to cast priest or mage
-//spells (IWD2 has a different system)
-//-1 means the actor can't memorize that type of spells
-int Actor::GetMemorizableSpellsCount(ieSpellType Type, int Level)
+int Actor::LearnSpell(const char *spellname, ieDword flags)
 {
-	if( classcount < 0 ) {
-		InitSpellTables();
+        if(spellbook.HaveSpell(spellname, 0) ) {
+                return LSR_KNOWN;
+        }
+        Spell *spell = core->GetSpell(spellname);
+        if(!spell) {
+                return LSR_INVALID; //not existent spell
+        }
+	//from now on, you must delete spl if you don't push back it
+        CREKnownSpell *spl = new CREKnownSpell();
+        strncpy(spl->SpellResRef, spellname, 8);
+        spl->Level = spell->SpellLevel;
+        spl->Type = spell->SpellType;
+	bool ret=spellbook.AddKnownSpell(spl->Type, spl->Level, spl);
+	if(!ret) {
+		delete spl;
+		return LSR_INVALID;
 	}
-	int ActorLevel = GetStat(IE_LEVEL)-1;
-	int MCFlags = GetStat(IE_MC_FLAGS);
-	int Class = GetStat(IE_CLASS);
-	if( Class>=classcount ) {
-		//non playable class can't memorize
-		return -1;
-	}
-	char *spelltablename=NULL;
-
-	switch(Type) {
-		case IE_SPELL_TYPE_PRIEST:
-			if( MCFlags & (MC_FALLEN_PALADIN|MC_FALLEN_RANGER) ) {
-				return -1;
-			}
-			spelltablename = clericspelltables[Class];
-			break;
-		case IE_SPELL_TYPE_WIZARD:
-			spelltablename = wizardspelltables[Class];
-			break;
-		case IE_SPELL_TYPE_INNATE:  //just for completeness
-			return -1;
-	}
-	if( spelltablename==NULL ) {
-		return -1;
-	}
-	int spelltable = core->LoadTable( spelltablename );
-	if( spelltable < 0 ) {
-		//this is an error, but we don't crash
-		return -1;
-	}
-	TableMgr *tm = core->GetTable( spelltable );
-	int count = atoi(tm->QueryField( ActorLevel, Level ) );
-	//keep it cached
-	//core->DelTable( spelltable );
-	if( count <= 0 ) {
-		return 0;
-	}
-	if( Type == IE_SPELL_TYPE_PRIEST ) {
-		spelltable = core->LoadTable( "mxsplwis" );
-		if( spelltable >= 0 ) {
-			tm = core->GetTable( spelltable );
-			ActorLevel = GetStat(IE_WIS)-13;
-			if( ActorLevel >= 0 ) {
-				count += atoi(tm->QueryField( ActorLevel, Level ));
-			}
-			//we keep it cached
-			//core->DelTable( spelltable );
-		}
-	}
-	if( count <= 0 ) {
-		return 0;
-	}
-	return count;
+        if(flags&LS_ADDXP) {
+                //add xp
+        }
+        return LSR_OK;
 }
 
-//IWD2 has a more complex system, including bardsongs, druid shapes, etc
-int Actor::GetMemorizableSpellsCountIWD2(ieSpellType Type, int Level)
-{
-	if( classcount < 0 ) {
-		InitSpellTables();
-	}
-	int ActorLevel = GetStat(IE_LEVEL)-1;
-	int MCFlags = GetStat(IE_MC_FLAGS);
-	int Class = GetStat(IE_CLASS);
-	if( Class>=classcount ) {
-		//non playable class can't memorize
-		return -1;
-	}
-	char *spelltablename=NULL;
-
-	switch(Type) {
-		case IE_SPELL_TYPE_PRIEST:
-			if( MCFlags & (MC_FALLEN_PALADIN|MC_FALLEN_RANGER) ) {
-				return -1;
-			}
-			spelltablename = clericspelltables[Class];
-			break;
-		case IE_SPELL_TYPE_WIZARD:
-			spelltablename = wizardspelltables[Class];
-			break;
-		case IE_SPELL_TYPE_INNATE:  //just for completeness
-			return -1;
-	}
-	if( spelltablename==NULL ) {
-		return -1;
-	}
-	int spelltable = core->LoadTable( spelltablename );
-	if( spelltable < 0 ) {
-		//this is an error, but we don't crash
-		return -1;
-	}
-	TableMgr *tm = core->GetTable( spelltable );
-	int count = atoi(tm->QueryField( ActorLevel, Level ) );
-	//keep it cached
-	//core->DelTable( spelltable );
-	if( Type == IE_SPELL_TYPE_PRIEST ) {
-		spelltable = core->LoadTable( "mxsplbon" );
-		if( spelltable < 0 ) {
-			tm = core->GetTable( spelltable );
-			ActorLevel = GetStat(IE_WIS)-12;
-			if( ActorLevel >= 0 ) {
-				count += atoi(tm->QueryField( ActorLevel, Level ));
-			}
-			//we keep it cached
-			//core->DelTable( spelltable );
-		}
-	}
-	if( count <= 0 ) {
-		return 0;
-	}
-	return count;
-}
-#endif //0

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.254 2004/12/05 12:27:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.255 2004/12/07 22:51:08 avenger_teambg Exp $
  *
  */
 
@@ -3783,6 +3783,27 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 }
 
 
+PyDoc_STRVAR( GemRB_LearnSpell__doc,
+"LearnSpell(PartyID, SpellResRef[, Flags])=>int\n\n"
+"Learns specified spell. Returns 0 on success." );
+
+static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, Flags;
+	char *Spell;
+
+	if (!PyArg_ParseTuple( args, "is|i", &PartyID, &Spell, &Flags )) {
+		return AttributeError( GemRB_LearnSpell__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
+	}
+	return Py_BuildValue( "i", actor->LearnSpell(Spell, Flags) );
+}
+
+
 PyDoc_STRVAR( GemRB_MemorizeSpell__doc,
 "MemorizeSpell(PartyID, SpellType, Level, Index)=>bool\n\n"
 "Memorizes specified known spell. Returns 1 on success." );
@@ -4320,6 +4341,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetMemorizedSpellsCount, METH_VARARGS),
 	METHOD(GetMemorizedSpell, METH_VARARGS),
 	METHOD(GetSpell, METH_VARARGS),
+	METHOD(LearnSpell, METH_VARARGS),
 	METHOD(MemorizeSpell, METH_VARARGS),
 	METHOD(UnmemorizeSpell, METH_VARARGS),
 	METHOD(GetSlotItem, METH_VARARGS),
