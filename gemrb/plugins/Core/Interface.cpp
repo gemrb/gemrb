@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.96 2003/12/15 09:28:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.97 2003/12/18 15:05:21 balrog994 Exp $
  *
  */
 
@@ -1142,7 +1142,7 @@ int Interface::LoadTable(const char * ResRef)
 	int ind = GetIndex(ResRef);
 	if(ind != -1)
 		return ind;
-	printf("(%s) Table not found... Loading from file\n", ResRef);
+	//printf("(%s) Table not found... Loading from file\n", ResRef);
 	DataStream * str = key->GetResource(ResRef, IE_2DA_CLASS_ID);
 	if(!str)
 		return -1;

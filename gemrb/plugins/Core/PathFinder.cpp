@@ -87,12 +87,12 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 		unsigned int y = pos & 0xffff;
 
 		if(pos==pos2) {//We've found _a_ path
-			printf("GOAL!!!\n");
+			//printf("GOAL!!!\n");
 			break;
 		}
 		int Cost = MapSet[y*Width+x]+NormalCost;
 		if(Cost>65500) {
-			printf("Path not found!\n");
+			//printf("Path not found!\n");
 			break;
 		}
 		SetupNode(x-1, y-1, Cost);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.28 2003/12/07 12:19:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.29 2003/12/18 15:05:22 balrog994 Exp $
  *
  */
 
@@ -73,22 +73,29 @@ bool KeyImp::LoadResFile(const char * resfile)
 	else
 #endif
 	strcpy(fn,resfile);
-	printf("[KEY Importer]: Opening %s...", fn);
+	printMessage("KEYImporter", "Opening ", WHITE);
+	printf("%s...", fn);
 	FileStream * f = new FileStream();
 	if(!f->Open(fn)) {
-		printf("[ERROR]\nCannot open Chitin.key\n");
+		printStatus("ERROR", LIGHT_RED);
+		printMessage("KEYImporter", "Cannot open Chitin.key\n", LIGHT_RED);
+		textcolor(WHITE);
 		delete(f);
 		return false;
 	}
-	printf("[OK]\nChecking file type...");
+	printStatus("OK", LIGHT_GREEN);
+	printf("Checking file type...");
 	char Signature[8];
 	f->Read(Signature, 8);
 	if(strncmp(Signature, "KEY V1  ", 8) != 0) {
-		printf("[ERROR]\nFile has an Invalid Signature.\n");
+		printStatus("ERROR", LIGHT_RED);
+		printMessage("KEYImporter", "File has an Invalid Signature.\n", LIGHT_RED);
+		textcolor(WHITE);
 		delete(f);
 		return false;
 	}
-	printf("[OK]\nReading Resources...\n");
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("KEYImporter", "Reading Resources...\n", WHITE);
 	unsigned long BifCount, ResCount, BifOffset, ResOffset;
 	f->Read(&BifCount, 4);
 	f->Read(&ResCount, 4);
@@ -147,7 +154,8 @@ bool KeyImp::LoadResFile(const char * resfile)
 		for(int j=0;j<8;j++) key[j]=toupper(re.ResRef[j]);
 		resources.SetAt(key, re.Type, re.ResLocator);
 	}
-	printf("Resources Loaded Succesfully.\n");
+	printMessage("KEYImporter", "Resources Loaded...", WHITE);
+	printStatus("OK", LIGHT_GREEN);
 	delete(f);
 	return true;
 }
@@ -186,7 +194,8 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 	SearchIn(core->GemRBPath, path, resname, type, "[KEYImporter]: Found in GemRB Override...\n");
 	SearchIn(core->GamePath, overridesubfolder, resname, type, "[KEYImporter]: Found in Override...\n");
 	SearchIn(core->GamePath, datasubfolder, resname, type, "[KEYImporter]: Found in Local CD1 Folder...\n");
-	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
+	printMessage("KEYImporter", "Searching for ", WHITE);
+	printf("%.8s%s...", resname, core->TypeExt(type));
 	unsigned long ResLocator;
 	if(resources.Lookup(resname,type,ResLocator) ) {
 		if(!core->IsAvailable(IE_BIF_CLASS_ID)) {
@@ -232,7 +241,8 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 				strcpy(BasePath, core->CD5);
 			}
 			else {
-				printf("[KEYImporter]: Error: Cannot find %s... Resource unavailable.\n", biffiles[bifnum].name);
+				printStatus("ERROR", LIGHT_RED);
+				printf("Cannot find %s... Resource unavailable.\n", biffiles[bifnum].name);
 				return NULL;
 			}
 			strcpy(path, BasePath);
@@ -245,7 +255,8 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 				strcat(path, ".cbf");
 				exist = fopen(path, "rb");
 				if(!exist) {
-					printf("[KEYImporter]: Cannot find %s\n", path);
+					printStatus("ERROR", LIGHT_RED);
+					printf("Cannot find %s\n", path);
 					core->FreeInterface(ai);
 					return NULL;
 				}
@@ -263,24 +274,26 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 			ret->filename[8]=0;
 			strcat(ret->filename, core->TypeExt(type));
 		}
-		else
-			printf("[NOT_FOUND]\n");
 		return ret;
 	}
+	printStatus("ERROR", LIGHT_RED);
 	return NULL;
 }
 void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned char mode)
 {
 	if(type != IE_BAM_CLASS_ID) {
-		printf("[KEYImporter]: %s files are not supported.\n", core->TypeExt(type));
+		printf("\n");
+		printMessage("KEYImporter", "", WHITE);
+		printf("%s files are not supported.\n", core->TypeExt(type));
 		return NULL;
 	}
 	int fobjindex;
 	if((fobjindex = core->GetFactory()->IsLoaded(resname, type)) != -1) {
-		printf("[KEYImporter]: Factory Object Found!\n");
+		//printf("\n");
+		//printMessage("KEYImporter", "Factory Object Found!\n", WHITE);
 		return core->GetFactory()->GetFactoryObject(fobjindex);
 	}
-	printf("[KEYImporter]: No Factory Object Found, Loading...\n");
+	//printf("[KEYImporter]: No Factory Object Found, Loading...\n");
 	char path[_MAX_PATH], filename[_MAX_PATH] = {0};
 	//Search it in the GemRB override Directory
 	strcpy(path, core->GemRBPath);
@@ -295,7 +308,7 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 	strcat(path, filename);
 	FILE * exist = fopen(path, "rb");
 	if(exist) {
-		printf("[KEYImporter]: Found in GemRB Override...\n");
+		//printf("[KEYImporter]: Found in GemRB Override...\n");
 		fclose(exist);
 		FileStream * fs = new FileStream();
 		if(!fs)
@@ -310,7 +323,7 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 	strcat(path, core->TypeExt(type));
 	exist = fopen(path, "rb");
 	if(exist) {
-		printf("[KEYImporter]: Found in Override...\n");
+		//printf("[KEYImporter]: Found in Override...\n");
 		fclose(exist);
 		AnimationMgr * ani = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
 		if(!ani)

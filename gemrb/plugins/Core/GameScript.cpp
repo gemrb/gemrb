@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.13 2003/12/17 20:18:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.14 2003/12/18 15:05:21 balrog994 Exp $
  *
  */
 
@@ -245,7 +245,7 @@ void GameScript::Update()
 	GetTime(thisTime);
 	if((thisTime - lastRunTime) < scriptRunDelay)
 		return;
-	printf("%s: Run Script\n", Name);
+	//printf("%s: Run Script\n", Name);
 	lastRunTime = thisTime;
 	switch(scriptType) {
 		case IE_SCRIPT_TRIGGER: 

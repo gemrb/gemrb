@@ -185,7 +185,7 @@ void Moveble::DoStep(ImageMgr * LightMap)
 		timeStartStep = time;
 	}
 	if((time-timeStartStep) >= STEP_TIME) {
-		printf("[New Step] : Orientation = %d\n", step->orient);
+		//printf("[New Step] : Orientation = %d\n", step->orient);
 		step = step->Next;
 		timeStartStep = time;
 	}
@@ -194,7 +194,7 @@ void Moveble::DoStep(ImageMgr * LightMap)
 	XPos = (step->x*16)+8;
 	YPos = (step->y*12)+6;
 	if(!step->Next) {
-		printf("Last Step\n");
+		//printf("Last Step\n");
 		PathNode * nextNode = path->Next;
 		PathNode * thisNode = path;
 		while(true) {

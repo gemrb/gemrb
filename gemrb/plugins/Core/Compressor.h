@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Compressor.h,v 1.2 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Compressor.h,v 1.3 2003/12/18 15:05:21 balrog994 Exp $
  *
  */
 
@@ -23,6 +23,8 @@
 #define COMPRESSOR_H
 
 #include "Plugin.h"
+#include "DataStream.h"
+#include <stdio.h>
 
 #ifdef WIN32
 
@@ -44,7 +46,7 @@ public:
 	/** Initialization Function. Returns FALSE if there was an error during initialization, else returns TRUE. */
 	virtual int Init(void);
 	/** Decompress Function. 'Byte * dest' is the preallocated destination buffer, 'ulong* dlen' is a pointer to the destination buffer size, 'Byte * src' is the source buffer, 'ulong slen' is the source buffer size */
-	virtual int Decompress(void * dest, unsigned long* dlen, void * src, unsigned long slen) = 0;
+	virtual int Decompress(FILE *dest, DataStream *source) = 0;
 };
 
 #endif

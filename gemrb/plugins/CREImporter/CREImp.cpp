@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.20 2003/12/17 20:19:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.21 2003/12/18 15:05:22 balrog994 Exp $
  *
  */
 
@@ -101,13 +101,13 @@ Actor * CREImp::GetActor()
 	str->Read(&act->BaseStats[IE_LEATHER_COLOR], 1);
 	str->Read(&act->BaseStats[IE_ARMOR_COLOR], 1);
 	str->Read(&act->BaseStats[IE_HAIR_COLOR], 1);
-	printf("%d %d %d %d %d %d %d\n", act->BaseStats[IE_METAL_COLOR], 
+	/*printf("%d %d %d %d %d %d %d\n", act->BaseStats[IE_METAL_COLOR], 
 		act->BaseStats[IE_MINOR_COLOR],
 		act->BaseStats[IE_MAJOR_COLOR],
 		act->BaseStats[IE_SKIN_COLOR],
 		act->BaseStats[IE_LEATHER_COLOR],
 		act->BaseStats[IE_ARMOR_COLOR],
-		act->BaseStats[IE_HAIR_COLOR]);
+		act->BaseStats[IE_HAIR_COLOR]);*/
 	if(act->BaseStats[IE_METAL_COLOR] >= 200) {
 		act->BaseStats[IE_METAL_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_METAL_COLOR]-200));
 	}

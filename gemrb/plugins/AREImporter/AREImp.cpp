@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.24 2003/12/15 09:38:30 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.25 2003/12/18 15:05:22 balrog994 Exp $
  *
  */
 
@@ -304,7 +304,10 @@ Map * AREImp::GetMap()
 		ip->startDisplayTime = 0;
 		ip->triggered = false;
 		//strcpy(ip->Script, Script);
-		ip->Script = new GameScript(Script, IE_SCRIPT_TRIGGER);
+		if(Script[0] != 0)
+			ip->Script = new GameScript(Script, IE_SCRIPT_TRIGGER);
+		else
+			ip->Script = NULL;
 	}
 	//Loading Actors
 	str->Seek(ActorOffset, GEM_STREAM_START);

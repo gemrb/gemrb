@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.10 2003/12/15 09:38:10 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.11 2003/12/18 15:05:22 balrog994 Exp $
  *
  */
 
@@ -48,7 +48,7 @@ bool BAMImp::Open(DataStream * stream, bool autoFree)
 	char Signature[8];
 	str->Read(Signature, 8);
 	if(strncmp(Signature, "BAMCV1  ", 8) == 0) {
-printf("Compressed file found...\n");
+		//printf("Compressed file found...\n");
 		//Check if Decompressed file has already been Cached
 		char cpath[_MAX_PATH];
 		strcpy(cpath, core->CachePath);
@@ -66,25 +66,19 @@ printf("Compressed file found...\n");
 		}
 		else {
 			//No file found in Cache, Decompressing and storing for further use
-			unsigned long UnCompLength;
-			str->Read(&UnCompLength, 4);
+			str->Seek(4, GEM_CURRENT_POS);
 			//TODO: Decompress Bam File
 			if(!core->IsAvailable(IE_COMPRESSION_CLASS_ID)) {
 				printf("No Compression Manager Available.\nCannot Load Compressed Bam File.\n");
 				return false;
-			}	
+			}
+			FILE * newfile = fopen(cpath, "wb");
 			Compressor * comp = (Compressor*)core->GetInterface(IE_COMPRESSION_CLASS_ID);
-			void * inbuf = malloc(str->Size()-12);
-			void * outbuf = malloc(UnCompLength);
-			str->Read(inbuf, str->Size()-12);
-			comp->Decompress(outbuf, &UnCompLength, inbuf, str->Size()-12);
+			comp->Decompress(newfile, str);
 			core->FreeInterface(comp);
-			free(inbuf);
+			fclose(newfile);
 			if(autoFree)
 				delete(str);
-			FILE * newfile = fopen(cpath, "wb");
-			fwrite(outbuf, 1, UnCompLength, newfile);
-			fclose(newfile);
 			FileStream * s = new FileStream();
 			s->Open(cpath);
 			str = s;

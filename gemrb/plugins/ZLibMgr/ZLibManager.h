@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibManager.h,v 1.3 2003/11/25 13:47:59 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibManager.h,v 1.4 2003/12/18 15:05:21 balrog994 Exp $
  *
  */
 
@@ -31,7 +31,7 @@ public:
 	ZLibManager(void);
 	~ZLibManager(void);
 	// ZLib Decompression Routine
-	int Decompress(void * dest, unsigned long* dlen, void * src, unsigned long slen);
+	int Decompress(FILE *dest, DataStream *source);
 public:
 	void release(void)
 	{

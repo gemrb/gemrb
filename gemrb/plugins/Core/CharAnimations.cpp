@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.22 2003/12/15 22:38:54 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.23 2003/12/18 15:05:21 balrog994 Exp $
  *
  */
 
@@ -106,7 +106,7 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 	unsigned char Cycle;
 	GetAnimResRef(AnimID, Orient, ResRef, Cycle);
 	DataStream * stream = core->GetResourceMgr()->GetResource(ResRef, IE_BAM_CLASS_ID);
-	printf("Loaded %s\n", ResRef);
+	//printf("Loaded %s\n", ResRef);
 	free(ResRef);
 	AnimationMgr * anim = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
 	anim->Open(stream, true);

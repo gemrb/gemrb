@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.45 2003/12/15 22:35:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.46 2003/12/18 15:05:21 balrog994 Exp $
  *
  */
 
@@ -99,9 +99,14 @@ void Map::DrawMap(Region viewport)
 			BBox.y -= 500;
 		BBox.h += 1000;
 		BBox.w += 1000;
-		count = GetActorInRect(acts, BBox);
-		for(int x = 0; x < count; x++) {
-			if(acts[x]->Modified[IE_EA] == 2) {
+		int i = 0;
+		while(true) {
+			Actor * actor = core->GetGame()->GetPC(i++);
+			if(!actor)
+				break;
+			if(!actor->InParty)
+				break;
+			if(BBox.PointInside(actor->XPos, actor->YPos)) {
 				ip->Script->Update();
 				break;
 			}

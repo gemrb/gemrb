@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.20 2003/12/15 09:15:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.21 2003/12/18 15:05:21 balrog994 Exp $
  *
  */
 
@@ -110,24 +110,9 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 {
 	if(windows.size() == 0)
 		return;
-	/*if((lastW != NULL) && (lastW->Visible)) {
-		if((lastW->XPos <= x) && (lastW->YPos <= y)) { //Maybe we are on the window, let's check
-			if((lastW->XPos+lastW->Width >= x) && (lastW->YPos+lastW->Height >= y)) { //Yes, we are on the Window
-				//Let's check if we have a Control under the Mouse Pointer
-				Control * ctrl = lastW->GetControl(x,y);
-				if(ctrl != NULL) {
-					if(ctrl->hasFocus)
-						ctrl->OnMouseOver(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos);
-				}
-				return;
-			}	
-		}
-	}*/
 	std::vector<int>::iterator t;
 	std::vector<Window*>::iterator m;
 	for(t = topwin.begin(); t != topwin.end(); ++t) {
-	//std::vector<Window*>::iterator m;
-	//for(m = windows.begin(); m != windows.end(); ++m) {
 		m = windows.begin();
 		m+=(*t);
 		if((*m) == NULL)
@@ -139,8 +124,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				//Let's check if we have a Control under the Mouse Pointer
 				Control * ctrl = (*m)->GetControl(x,y);
 				if(ctrl != NULL) {
-					//if(ctrl->hasFocus)
-						ctrl->OnMouseOver(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos);
+					ctrl->OnMouseOver(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos);
 				}
 				lastW = *m;
 				return;
@@ -152,25 +136,9 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 /** BroadCast Mouse Move Event */
 void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	/*if((lastW != NULL) && (lastW->Visible)) {
-		if((lastW->XPos <= x) && (lastW->YPos <= y)) { //Maybe we are on the window, let's check
-			if((lastW->XPos+lastW->Width >= x) && (lastW->YPos+lastW->Height >= y)) { //Yes, we are on the Window
-				//Let's check if we have a Control under the Mouse Pointer
-				Control * ctrl = lastW->GetControl(x,y);
-				if(ctrl != NULL) {
-					lastW->SetFocused(ctrl);
-					ctrl->OnMouseDown(x-lastW->XPos-ctrl->XPos,y-lastW->YPos-ctrl->YPos, Button, Mod);
-					lastF = ctrl;
-				}
-				return;
-			}	
-		}
-	}*/
 	std::vector<int>::iterator t;
 	std::vector<Window*>::iterator m;
 	for(t = topwin.begin(); t != topwin.end(); ++t) {
-	//std::vector<Window*>::iterator m;
-	//for(m = windows.begin(); m != windows.end(); ++m) {
 		m = windows.begin();
 		m+=(*t);
 		if((*m) == NULL)
@@ -200,46 +168,6 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 /** BroadCast Mouse Move Event */
 void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	/*for(unsigned int i = 0; i < windows.size(); i++) {
-		Window * w = windows[i];
-		if(!w->Visible)
-			continue;
-		Control *ctrl = NULL;
-		int c = 0;
-		do {
-			ctrl = w->GetControl(c++);
-			if(ctrl == NULL)
-				break;
-			ctrl->OnMouseUp(x-w->XPos-ctrl->XPos,y-w->YPos-ctrl->YPos, Button, Mod);
-		} while(true);
-	}*/
-	/*int i = 0;
-	std::vector<int>::iterator t;
-	for(t = topwin.begin(); t != topwin.end(); ++t) {
-		Window * w = windows[(*t)];
-		if(w == NULL) //{
-			//printf("DANGER WILL ROBINSON!! The Top Most Window is NULL\n");
-			//return;
-		//}
-		continue;
-		if((x>=w->XPos) && (x <= (w->XPos+w->Width)) && (y>=w->YPos) && (y<=(w->YPos+w->Height))) {
-			printf("Broadcasting MouseUp Event on Window %d of %d\n", i, topwin.size());
-			Control * ctrl = NULL;
-			int c = 0;
-			do {
-				w = windows[(*t)];
-				if(w == NULL)
-					break;
-				ctrl = w->GetControl(c++);
-				if(ctrl == NULL)
-					break;
-				if(ctrl->ControlType != IE_GUI_LABEL)
-					ctrl->OnMouseUp(x-w->XPos-ctrl->XPos,y-w->YPos-ctrl->YPos, Button, Mod);
-			} while(true);
-			break;
-		}
-		i++;
-	}*/
 	if(lastF != NULL) {
 		lastF->OnMouseUp(x-lastW->XPos-lastF->XPos, y-lastW->YPos-lastF->YPos, Button, Mod);
 	}
