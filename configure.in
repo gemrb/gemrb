@@ -1,6 +1,6 @@
 #I used fluxbox's configure.in as a template of sorts, and 
-#Redhat's autotools book. Thanks to everyone involved with both of these 
-#projects!
+#Redhat's autotools book. Thanks to everyone involved with 
+#both of these projects!
 #The build system was mostly done by edheldil & subvertir
 
 dnl Initialize autoconf and automake
@@ -8,7 +8,7 @@ dnl Initialize autoconf and automake
 AC_PREREQ([2.57])
 AC_INIT
 AC_CONFIG_AUX_DIR([admin])
-AC_CONFIG_SRCDIR([gemrb/GemRB.cpp])
+AC_CONFIG_SRCDIR([gemrb/])
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE([gemrb],[0.2.2.9])
 AM_CONFIG_HEADER([config.h])
@@ -23,7 +23,6 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_LIBTOOL_DLOPEN
-AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 
 AC_LANG([C++])
@@ -61,25 +60,26 @@ CHECK_ZLIB()
 dnl Check for libSDL Version 1.2 or greater, fail if not found.
 AM_PATH_SDL(1.2.0, [], [AC_MSG_ERROR([
 
-*** You need SDL libraries version 1.2.0 or greater to compile GemRB
+*** You need LibSDL (www.libsdl.org) version 1.2.0 or greater to compile GemRB
 ])])
 
 dnl Check for OpenAL, fail if not found.
 AC_CHECK_LIB([openal], [alutInit], [ $(which true) ], [AC_MSG_ERROR([
 
-*** You need OpenAL libraries to compile GemRB
+*** You need OpenAL (www.openal.org) to compile GemRB
 ])])
 
-dnl Check for Python version >= 2.3.0
+dnl Check for Python version >= 2.3.0, fail if not found.
 AM_PATH_PYTHON(2.3.0, [], [AC_MSG_ERROR([
 
-*** You need Python version 2.3.0 or greater to compile GemRB
+*** You need Python (www.python.org) version 2.3.0 or greater to compile GemRB
 ])])
 
 dnl Check for Python headers and libraries, fail if not found.
 AM_CHECK_PYTHON_HEADERS([], [AC_MSG_ERROR([
 
-*** You need python headers to compile GemRB
+*** You need Python >=2.3.0 headers installed to compile GemRB
+*** See if your distribution offers -dev packages!
 ])])
 
 
@@ -144,6 +144,7 @@ AC_SUBST(LIBS)
 AC_CONFIG_FILES([
 Makefile
 gemrb/Makefile 
+gemrb/GemRB/Makefile
 gemrb/Config/Makefile 
 gemrb/includes/Makefile 
 gemrb/override/Makefile
@@ -173,7 +174,6 @@ gemrb/plugins/BIFImporter/Makefile
 gemrb/plugins/BMPImporter/Makefile 
 gemrb/plugins/CHUImporter/Makefile 
 gemrb/plugins/CREImporter/Makefile 
-gemrb/plugins/Core/Makefile 
 gemrb/plugins/DLGImporter/Makefile 
 gemrb/plugins/GAMImporter/Makefile 
 gemrb/plugins/GUIScript/Makefile 
