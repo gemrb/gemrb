@@ -171,6 +171,27 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
 	
+	if(area->GetBlocked(GameX, GameY) )
+		nextCursor = 6;
+	else
+		nextCursor = 4;
+
+	overInfoPoint = area->tm->GetInfoPoint(GameX, GameY);
+	if(overInfoPoint)
+		nextCursor = overInfoPoint->Cursor;
+
+	overDoor = area->tm->GetDoor(GameX, GameY);
+	if(overDoor)
+		nextCursor = overDoor->Cursor;
+
+	overContainer = area->tm->GetContainer(GameX, GameY);
+	if(overContainer) {
+		if(overContainer->TrapDetected && overContainer->Trapped)
+				nextCursor=38;
+		else
+				nextCursor=2;
+	}
+
 	if(!DrawSelectionRect) {
 		ActorBlock * actor = area->GetActor(GameX, GameY);
 		if(lastActor)
@@ -207,23 +228,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 		}
 	}
-	//CalculateSelection(GameX, GameY);
 
-	overDoor = area->tm->GetDoor(GameX, GameY);
-	if(overDoor)
-		nextCursor = overDoor->Cursor;
-	overContainer = area->tm->GetContainer(GameX, GameY);
-	if(overContainer) {
-		if(overContainer->TrapDetected && overContainer->Trapped) {
-				nextCursor=38;
-		}
-		else {
-				nextCursor=2;
-		}
-	}
-	overInfoPoint = area->tm->GetInfoPoint(GameX, GameY);
-	if(overInfoPoint)
-		nextCursor = overInfoPoint->Cursor;
 	if(lastCursor != nextCursor) {
 		core->GetVideoDriver()->SetCursor(core->Cursors[nextCursor]->GetFrame(0), core->Cursors[nextCursor+1]->GetFrame(0));
 		lastCursor = nextCursor;
