@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.27 2004/01/02 19:54:45 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.28 2004/01/02 19:57:38 balrog994 Exp $
  *
  */
 
@@ -285,5 +285,7 @@ void MUSImp::PlayMusic(char *name)
 			soundID = core->GetSoundMgr()->StreamFile(FName);
 	}
 #endif
+	if(soundID==-1)
+		core->GetSoundMgr()->Stop();
 	printf("Playing: %s\n",FName);
 }
