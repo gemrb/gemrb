@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.7 2004/11/01 17:25:12 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.8 2004/11/28 19:35:59 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -39,13 +39,20 @@ global Section
 Section = 1
 Chapter = 0
 Order = 0
+StartTime = 0
+StartYear = 0
 
 ###################################################
 def OpenJournalWindow ():
+	global StartTime, StartYear
 	global JournalWindow, Chapter
 
-	GemRB.HideGUI()
-
+	Table = GemRB.LoadTable("YEARS")
+	#StartTime is the time offset for ingame time, beginning from the startyear
+	StartTime = GemRB.GetTableValue(Table, "STARTTIME", "VALUE") / 4500
+	#StartYear is the year of the lowest ingame date to be printed
+	StartYear = GemRB.GetTableValue(Table, "STARTYEAR", "VALUE")
+	GemRB.UnloadTable(Table)
 
 	if JournalWindow:
 		if LogWindow: OpenLogWindow()
@@ -60,6 +67,7 @@ def OpenJournalWindow ():
 		GemRB.UnhideGUI()
 		return
 		
+	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIJRNL")
 	JournalWindow = GemRB.LoadWindow (2)
 	GemRB.SetVar("OtherWindow", JournalWindow)
@@ -143,18 +151,18 @@ def UpdateLogWindow ():
 
 		if je == None:
 			continue
-
-		# FIXME: the date computed here is wrong by approx. time
-		#   of the first journal entry compared to journal in
-		#   orig. game. So it's probably computed since "awakening"
-		#   there instead of start of the day.
-
-		date = str (1 + int (je['GameTime'] / 86400))
-		time = str (je['GameTime'])
-		
-		GemRB.TextAreaAppend (Window, Text, "[color=808000]Day " + date + '  (' + time + "):[/color]", 3*i)
-		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i + 1)
+		hours = je['GameTime'] / 4500
+		days = int(hours/24)
+		year = str (StartYear + int(days/365))
+		dayandmonth = StartTime + days%365
+		GemRB.SetToken("GAMEDAY", str(days) )
+		GemRB.SetToken("HOUR",str(hours%24 ) )
+		GemRB.SetVar("DAYANDMONTH",dayandmonth)
+		GemRB.SetToken("YEAR",year)
+		GemRB.TextAreaAppend (Window, Text, "[color=FFFF00]"+GemRB.GetString(15980)+"[/color]", 3*i)
+		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i+1)
 		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
+
 	GemRB.UnhideGUI()
 	return
 
