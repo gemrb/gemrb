@@ -25,6 +25,7 @@
 #include "TableMgr.h"
 #include "SymbolMgr.h"
 #include "MoviePlayer.h"
+#include "Character.h"
 
 typedef struct Table {
 	TableMgr * tm;
@@ -76,6 +77,7 @@ private:
 	MusicMgr * music;
 	std::vector<Table> tables;
 	std::vector<Symbol> symbols;
+	std::vector<Character*> sheets;
 public:
 	Interface(void);
 	~Interface(void);
@@ -172,7 +174,7 @@ private:
 	bool LoadConfig(void);
 	bool LoadINI(const char * filename);
 public:
-	char GameType[_MAX_PATH], GemRBPath[_MAX_PATH], CachePath[_MAX_PATH], GUIScriptsPath[_MAX_PATH], GamePath[_MAX_PATH], CD1[_MAX_PATH], CD2[_MAX_PATH], CD3[_MAX_PATH], CD4[_MAX_PATH], CD5[_MAX_PATH];
+	char GameType[_MAX_PATH], GemRBPath[_MAX_PATH], CachePath[_MAX_PATH], GUIScriptsPath[_MAX_PATH], GamePath[_MAX_PATH], INIConfig[_MAX_PATH], CD1[_MAX_PATH], CD2[_MAX_PATH], CD3[_MAX_PATH], CD4[_MAX_PATH], CD5[_MAX_PATH];
 	int Width, Height, Bpp;
 	bool FullScreen;
 	/** Draws the Visible windows in the Windows Array */
