@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.165 2004/07/11 11:04:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.166 2004/07/21 16:31:00 avenger_teambg Exp $
  *
  */
 
@@ -386,6 +386,7 @@ static ActionLink actionnames[] = {
 	{"removejournalentry", GameScript::RemoveJournalEntry,0},
 	{"removepaladinhood", GameScript::RemovePaladinHood,0},
 	{"removerangerhood", GameScript::RemoveRangerHood,0},
+	{"restorepartylocations", GameScript:: RestorePartyLocation,0},
 	//this is in iwd2, same as movetosavedlocation, with a default variable
 	{"returntosavedlocation", GameScript::MoveToSavedLocation, AF_BLOCKING},
 	{"returntosavedplace", GameScript::MoveToSavedLocation, AF_BLOCKING},
@@ -446,6 +447,7 @@ static ActionLink actionnames[] = {
 	{"startdialogueoverrideinterrupt", GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startmovie", GameScript::StartMovie,AF_BLOCKING},
 	{"startsong", GameScript::StartSong,0},
+	{"storepartylocations", GameScript:: StorePartyLocation,0},
 	{"swing", GameScript::Swing,0},
 	{"swingonce", GameScript::SwingOnce,0},
 	{"takeitemlist", GameScript::TakeItemList,0},
@@ -4675,7 +4677,9 @@ int GameScript::GetHappiness(Scriptable* Sender, int reputation)
 	int alignment = ab->GetStat(IE_ALIGNMENT)&3; //good, neutral, evil
 	int hptable = core->LoadTable( "happy" );
 	char * repvalue = core->GetTable( hptable )->QueryField( reputation/10, alignment );
-	core->DelTable( hptable );
+//      don't throw this table, we will open it again
+//	core->DelTable( hptable ); 
+printf("happyhandle: %d\n", hptable);
 	return strtol(repvalue,NULL,0); //this one handles 0x values too!
 }
 
@@ -5030,6 +5034,38 @@ void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->WalkTo( target->XPos, target->YPos );
+}
+
+void GameScript::StorePartyLocation(Scriptable *Sender, Action* parameters)
+{
+	Game *game = core->GetGame();
+	for (int i = 0; i < game->GetPartySize(0); i++) {
+		Actor* act = game->GetPC( i );
+		if (act) {
+			long value;
+			*((unsigned short *) &value) = act->XPos;
+			*(((unsigned short *) &value)+1) = (unsigned short) act->YPos;
+			SetVariable( act, "LOCALSsavedlocation",value);
+		}
+	}
+
+}
+
+void GameScript::RestorePartyLocation(Scriptable *Sender, Action* parameters)
+{
+	Game *game = core->GetGame();
+	for (int i = 0; i < game->GetPartySize(0); i++) {
+		Actor* act = game->GetPC( i );
+		if (act) {
+			long value=CheckVariable( act, "LOCALSsavedlocation");
+			Map *map = game->GetCurrentMap();
+			//setting position, don't put actor on another actor
+			act->SetPosition( map, 
+			*((unsigned short *) &value),
+			*(((unsigned short *) &value)+1), -1 );
+		}
+	}
+
 }
 
 void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
