@@ -162,6 +162,8 @@ public:
 	SymbolMgr * GetSymbol(int index);
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
 	bool DelSymbol(int index);
+	/** Plays a Movie */
+	int PlayMovie(char * ResRef);
 	/** Generates traditional random number xdy+z */
 	int Roll(int dice, int size, int add);
 

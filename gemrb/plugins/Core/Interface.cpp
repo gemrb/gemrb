@@ -961,6 +961,26 @@ bool Interface::DelSymbol(int index)
 	symbols[index].free = true;
 	return true;
 }
+/** Plays a Movie */
+int Interface::PlayMovie(char * ResRef)
+{
+	MoviePlayer * mp = (MoviePlayer*)core->GetInterface(IE_MVE_CLASS_ID);
+	if(!mp)
+		return 0;
+	DataStream * str = core->GetResourceMgr()->GetResource(ResRef, IE_MVE_CLASS_ID);
+	if(!str) {
+		core->FreeInterface(mp);
+		return -1;
+	}
+	if(!mp->Open(str, true)) {
+		core->FreeInterface(mp);
+		delete(str);
+		return -1;
+	}
+	mp->Play();
+	core->FreeInterface(mp);
+	return 0;
+}
 
 int Interface::Roll(int dice, int size, int add)
 {

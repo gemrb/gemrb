@@ -854,6 +854,22 @@ static PyObject * GemRB_GetVar(PyObject *self, PyObject *args)
 	return Py_BuildValue("l", value);
 }
 
+static PyObject * GemRB_PlayMovie(PyObject *self, PyObject *args)
+{
+	char *string;
+
+	if(!PyArg_ParseTuple(args, "s", &string)) {
+		printMessage("GUIScript", "Syntax Error: Expected String\n", LIGHT_RED);
+		return NULL;
+	}
+
+	int ind = core->PlayMovie(string);
+	if(ind == -1)
+		return NULL;
+
+	return Py_BuildValue("i", ind);
+}
+
 static PyObject *GemRB_Roll(PyObject *self, PyObject *args)
 {
 	int Dice, Size, Add;
@@ -979,6 +995,9 @@ static PyMethodDef GemRBMethods[] = {
 
  	{"SetToken", GemRB_SetToken, METH_VARARGS,
      "Set/Create a Variable in the Token Dictionary."},
+
+  	{"PlayMovie", GemRB_PlayMovie, METH_VARARGS,
+     "Starts the Movie Player."},
 
 	{"Roll", GemRB_Roll, METH_VARARGS,
      "Calls traditional dice roll."},
