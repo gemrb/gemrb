@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.4 2003/11/29 18:49:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.5 2003/12/06 17:26:33 balrog994 Exp $
  *
  */
 
@@ -51,6 +51,8 @@ private:
 public:
 	bool free;
 	int x,y;
+	unsigned char BlitMode;
+	unsigned char fps;
 	Region animArea;
 	Animation(unsigned short * frames, int count);
 	~Animation(void);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.6 2003/12/03 18:27:05 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.7 2003/12/06 17:26:33 balrog994 Exp $
  *
  */
 
@@ -34,13 +34,16 @@ Animation::Animation(unsigned short * frames, int count)
 {
 	for(int i = 0; i < count; i++)
 		indices.push_back(frames[i]);
-	pos = 0;
-	startpos = rand()%count;
+	//pos = 0;
+	//startpos = rand()%count;
+	pos = rand()%count;
 	starttime = 0;
 	x = 0;
 	y = 0;
 	free = true;
 	ChangePalette = true;
+	BlitMode = IE_NORMAL;
+	fps = 15;
 }
 
 Animation::~Animation(void)
@@ -89,18 +92,23 @@ Sprite2D * Animation::NextFrame(void)
 		}
 	}
 #ifdef WIN32
-	pos = (((GetTickCount() - starttime) % (132*indices.size())) / 132);
+	unsigned long time = GetTickCount();
+	//pos = (((GetTickCount() - starttime) % (132*indices.size())) / 132);
 #else
 	struct timeval tv;
 	unsigned long time;
 	gettimeofday(&tv, NULL);
 	time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
-	pos = (((time - starttime) % (132*indices.size())) / 132);
+	//pos = (((time - starttime) % (132*indices.size())) / 132);
 	/*pos++;
 	if(pos >= indices.size())
 	pos = 0;*/
 #endif
-	pos += startpos;
+	if((time - starttime) >= (1000/fps)) {
+		pos++;
+		starttime = time;
+	}
+	//pos += startpos;
 	pos %= frames.size();
 	return ret;
 }
