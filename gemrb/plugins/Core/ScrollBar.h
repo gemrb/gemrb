@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.h,v 1.12 2004/03/21 13:47:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.h,v 1.13 2004/10/09 16:31:07 avenger_teambg Exp $
  *
  */
 
@@ -61,7 +61,7 @@ public:
 	void Draw(unsigned short x, unsigned short y);
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
-	Sprite2D* frames[6];
+	Sprite2D* Frames[6];
 	/** Cursor Position */
 	unsigned short Pos;
 	/** Scroll Bar Status */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.70 2004/10/09 15:27:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.71 2004/10/09 16:31:07 avenger_teambg Exp $
  *
  */
 
@@ -111,6 +111,7 @@ Actor::Actor()
 	LastSeen = NULL;
 	LastHeard = NULL;
 	LastSummoner = NULL;
+	PCStats = NULL;
 	LastDamage = 0;
 	LastDamageType = 0;
 
@@ -128,6 +129,9 @@ Actor::~Actor(void)
 	}
 	if (ShortName) {
 		free( ShortName );
+	}
+	if (PCStats) {
+		delete PCStats;
 	}
 }
 

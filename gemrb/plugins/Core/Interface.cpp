@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.221 2004/10/09 15:27:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.222 2004/10/09 16:31:07 avenger_teambg Exp $
  *
  */
 
@@ -2161,7 +2161,7 @@ void Interface::LoadGame(int index)
 	if (!gam_mgr)
 		goto cleanup;
 
-	if (!gam_mgr->Open( gam_str ))
+	if (!gam_mgr->Open( gam_str, true ))
 		goto cleanup;
 
 	new_game = gam_mgr->GetGame();
@@ -2196,6 +2196,7 @@ void Interface::LoadGame(int index)
 			FreeInterface( ai );
 			ai = NULL;
 		}
+		delete( sav_str );
 		sav_str = NULL;
 	}
 

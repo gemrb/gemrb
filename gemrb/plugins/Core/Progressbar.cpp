@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.10 2004/10/09 15:27:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.11 2004/10/09 16:31:07 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,7 @@ Progressbar::Progressbar( unsigned short KnobStepsCount, bool Clear)
 	this->Clear = Clear;
 	this->KnobStepsCount = KnobStepsCount;
 	PBarAnim = NULL;
+	PBarCap = NULL;
 	KnobXPos = KnobYPos = 0;
 	CapXPos = CapYPos = 0;
 }
@@ -47,6 +48,9 @@ Progressbar::~Progressbar()
 	}
 	if (PBarAnim) {
 		delete( PBarAnim );
+	}
+	if (PBarCap) {
+		core->GetVideoDriver()->FreeSprite( PBarCap );
 	}
 }
 
