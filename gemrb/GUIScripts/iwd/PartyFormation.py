@@ -53,6 +53,7 @@ def CreateCharPress():
 	GemRB.SetEvent(CreateCharWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CreateCharCancelPress")
 	GemRB.SetControlStatus(CreateCharWindow, CancelButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetText(CreateCharWindow, CancelButton, 13727)
+	GemRB.SetButtonFlags(CreateCharWindow, CancelButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	
 	GemRB.SetVisible(CreateCharWindow, 1)
 	return
