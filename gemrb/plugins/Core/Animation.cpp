@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.23 2005/03/29 09:44:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.24 2005/03/29 09:48:33 avenger_teambg Exp $
  *
  */
 
@@ -99,13 +99,7 @@ Sprite2D* Animation::NextFrame(void)
 		return NULL;
 	}
 	if (starttime == 0) {
-#ifdef WIN32
-		starttime = GetTickCount();
-#else
-		struct timeval tv;
-		gettimeofday( &tv, NULL );
-		starttime = ( tv.tv_usec / 1000 ) + ( tv.tv_sec * 1000 );
-#endif
+		GetTime( starttime );
 	}
 	Sprite2D* ret = NULL;
 	if (playReversed) {
