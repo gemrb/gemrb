@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.58 2004/04/11 12:31:21 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.59 2004/04/15 22:39:48 avenger_teambg Exp $
  *
  */
 
@@ -57,7 +57,7 @@ Button::Button(bool Clear)
 	State = IE_GUI_BUTTON_UNPRESSED;
 	ButtonOnPress[0] = 0;
 	MouseOverButton[0] = 0;
-	Text = ( char * ) malloc( 64 );
+	Text = ( char * ) calloc( 64, sizeof(char) );
 	hasText = false;
 	font = core->GetButtonFont();
 	palette = ( Color * ) malloc( 256 * sizeof( Color ) );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.140 2004/04/15 16:20:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.141 2004/04/15 22:39:49 avenger_teambg Exp $
  *
  */
 
@@ -546,7 +546,7 @@ static void GoNearAndRetry(Scriptable *Sender, Point *p)
 	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%d.%d])", p->x, p->y );
-	Sender->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
+	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
 }
 
 GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
@@ -944,7 +944,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	rE->weight = strtoul(line,&poi,10);
 	std::vector< Action*> aCv;
 	if(strncmp(poi,"AC",2)==0) while (true) {
-		Action* aC = new Action();
+		Action* aC = new Action(false);
 		count = stream->ReadLine( line, 1024 );
 		aC->actionID = strtoul(line, NULL,10);
 		for (int i = 0; i < 3; i++) {
@@ -1216,11 +1216,13 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	aC->Release();
 }
 
-Action* GameScript::CreateAction(char* string, bool autoFree)
+/*
+Action* GameScript::GenerateAction(char* string, bool autoFree)
 {
-	Action* aC = GenerateAction( string );
+	Action* aC = GenerateAction( string, autoFree );
 	return aC;
 }
+*/
 
 /* returns actors that match the [x.y.z] expression */
 Targets* GameScript::EvaluateObject(Object* oC)
@@ -1485,9 +1487,9 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 }
 
 /* this function was lifted from GenerateAction, to make it clearer */
-Action *GameScript::GenerateActionCore(const char *src, const char *str, int acIndex)
+Action *GameScript::GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree)
 {
-	Action *newAction = new Action();
+	Action *newAction = new Action(autoFree);
 	newAction->actionID = (unsigned short) actionsTable->GetValueIndex( acIndex );
 	//this flag tells us to merge 2 consecutive strings together to get
 	//a variable (context+variablename)
@@ -1663,7 +1665,7 @@ Action *GameScript::GenerateActionCore(const char *src, const char *str, int acI
 	return newAction;
 }
 
-Action* GameScript::GenerateAction(char* String)
+Action* GameScript::GenerateAction(char* String, bool autoFree)
 {
 	strlwr( String );
 	if(InDebug) {
@@ -1679,7 +1681,7 @@ Action* GameScript::GenerateAction(char* String)
 	if(InDebug) {
 		printf("Match: %s vs. %s\n",src,str);
 	}
-	return GenerateActionCore( src, str, i);
+	return GenerateActionCore( src, str, i, autoFree);
 }
 
 /* this function was lifted from GenerateAction, to make it clearer */
@@ -5462,7 +5464,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%d.%d])", ent->XPos, ent->YPos );
-	Sender->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
+	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
 }
 
 void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
@@ -5488,7 +5490,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%d.%d])", ent->XPos, ent->YPos );
-	Sender->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
+	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
 }
 
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)

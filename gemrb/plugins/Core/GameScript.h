@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.99 2004/04/15 12:33:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.100 2004/04/15 22:40:00 avenger_teambg Exp $
  *
  */
 
@@ -276,7 +276,7 @@ public:
 
 class GEM_EXPORT Action {
 public:
-	Action()
+	Action(bool autoFree)
 	{
 		actionID = 0;
 		objects[0] = NULL;
@@ -289,7 +289,12 @@ public:
 		YpointParameter = 0;
 		int1Parameter = 0;
 		int2Parameter = 0;
-		RefCount = 1;
+		if(autoFree) {
+			RefCount = 0;
+		}
+		else {
+			RefCount = 1;
+		}
 		canary = (unsigned long) 0xdeadbeef;
 	};
 	~Action()
@@ -677,10 +682,9 @@ private: //Internal Functions
 
 public:
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
-	static Action* CreateAction(char* string, bool autoFree = true);
+	static Action* GenerateAction(char* String, bool autoFree=false);
 private:
-	static Action *GenerateActionCore(const char *src, const char *str, int acIndex);
-	static Action* GenerateAction(char* String);
+	static Action *GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree);
 	static Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 	static Trigger* GenerateTrigger(char* String);
 	/* returns the number of actors matching the IDS targeting */

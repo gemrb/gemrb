@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.84 2004/04/14 22:53:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.85 2004/04/15 22:40:00 avenger_teambg Exp $
  *
  */
 
@@ -208,7 +208,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 								"LeaveAreaLUA(\"%s\", \"\", [-1.-1], -1)",
 								ip->Destination );
 							actor->ClearPath();
-							actor->AddActionInFront( GameScript::CreateAction( Tmp ) );
+							actor->AddActionInFront( GameScript::GenerateAction( Tmp ) );
 							strcpy( gc->EntranceName, ip->EntranceName );
 						} else {
 							if (ip->Scripts[0]) {

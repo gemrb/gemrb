@@ -603,7 +603,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	strncpy(Tmp,"NIDSpecial1()",40);
 printf("TryTotalk\n");
 	target=tgt; //this is a hack, a deadly one
-	source->AddAction( GameScript::CreateAction( Tmp, true ) );
+	source->AddAction( GameScript::GenerateAction( Tmp, true ) );
 printf("trytotalk added\n");
 }
 
@@ -648,13 +648,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 					actor->ClearActions();
 					char Tmp[256];
 					sprintf( Tmp, "OpenDoor(\"%s\")", door->Name );
-					actor->AddAction( GameScript::CreateAction( Tmp, true ) );
+					actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 				} else {
 					actor->ClearPath();
 					actor->ClearActions();
 					char Tmp[256];
 					sprintf( Tmp, "CloseDoor(\"%s\")", door->Name );
-					actor->AddAction( GameScript::CreateAction( Tmp, true ) );
+					actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 				}
 				return;
 			}
@@ -686,7 +686,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 							char Tmp[256];
 							sprintf( Tmp, "MoveToPoint([%d.%d])",
 								overInfoPoint->XPos, overInfoPoint->YPos );
-							actor->AddAction( GameScript::CreateAction( Tmp,
+							actor->AddAction( GameScript::GenerateAction( Tmp,
 												true ) );
 						}
 						break;
@@ -700,7 +700,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 				actor->ClearActions();
 				char Tmp[256];
 				sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
-				actor->AddAction( GameScript::CreateAction( Tmp, true ) );
+				actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 			}
 		}
 		//determining the type of the clicked actor
@@ -1301,7 +1301,7 @@ void GameControl::DialogChoose(unsigned int choose)
 
 		if (tr->action) {
 			for (unsigned int i = 0; i < tr->action->count; i++) {
-				Action* action = GameScript::CreateAction( tr->action->strings[i], true );
+				Action* action = GameScript::GenerateAction( tr->action->strings[i], true );
 				if (action) {
 						speaker->AddAction( action );
 				} else {
