@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.53 2004/01/19 22:58:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.54 2004/01/19 23:12:31 balrog994 Exp $
  *
  */
 
@@ -1254,13 +1254,16 @@ int GameScript::Dead(Scriptable * Sender, Trigger * parameters)
 
 int GameScript::See(Scriptable * Sender, Trigger * parameters)
 {
+	if(Sender->Type != ST_ACTOR)
+		return 0;
+	Actor * snd = (Actor*)Sender;
 	Scriptable * target = GetActorFromObject(Sender, parameters->objectParameter);
 	if(!target)
 		return 0;
 	long x = (target->XPos - Sender->XPos);
 	long y = (target->YPos - Sender->YPos);
 	double distance = sqrt((double)(x*x+y*y));
-	if(distance > (parameters->int0Parameter*20))
+	if(distance > (snd->Modified[IE_VISUALRANGE]*20))
 		return 0;
 	if(core->GetPathFinder()->IsVisible(Sender->XPos, Sender->YPos, target->XPos, target->YPos))
 		return 1;
