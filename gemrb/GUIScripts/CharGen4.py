@@ -71,7 +71,6 @@ def OnLoad():
 	BiographyButton = GemRB.GetControl(CharGenWindow, 16)
 	GemRB.SetText(CharGenWindow, BiographyButton, 18003)
 	GemRB.SetButtonState(CharGenWindow,BiographyButton,IE_GUI_BUTTON_DISABLED)
-
 	TextAreaControl= GemRB.GetControl(CharGenWindow,9)
 	GemRB.SetText(CharGenWindow, TextAreaControl, 12135)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
@@ -84,8 +83,8 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,GemRB.GetVar("Race")-1,2))
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"xxx", -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
+	print "7"
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,2))
-
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
         GemRB.SetEvent(CharGenWindow, ClassButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
