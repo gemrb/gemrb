@@ -42,22 +42,37 @@ inline POSITION Variables::GetStartPosition() const
 
 /////////////////////////////////////////////////////////////////////////////
 // out of lines
-/*
-        ASSERT(m_pHashTable != NULL);  // never call on empty map
+void Variables::GetNextAssoc(POSITION& rNextPosition, const char*& rKey, unsigned long& rValue) const
+{
+        MYASSERT(m_pHashTable != NULL);  // never call on empty map
 
-        CAssoc* pAssocRet = (CAssoc*)rNextPosition;
-        ASSERT(pAssocRet != NULL);
+        Variables::MyAssoc* pAssocRet = (Variables::MyAssoc*)rNextPosition;
+        MYASSERT(pAssocRet != NULL);
 
-        if (pAssocRet == (CAssoc*) BEFORE_START_POSITION)
+        if (pAssocRet == (Variables::MyAssoc*) BEFORE_START_POSITION)
         {
                 // find the first association
-                for (UINT nBucket = 0; nBucket < m_nHashTableSize; nBucket++)
+                for (unsigned int nBucket = 0; nBucket < m_nHashTableSize; nBucket++)
                         if ((pAssocRet = m_pHashTable[nBucket]) != NULL)
                                 break;
-                ASSERT(pAssocRet != NULL);  // must find something
+                MYASSERT(pAssocRet != NULL);  // must find something
         }
-*/
+        Variables::MyAssoc* pAssocNext;
+        if ((pAssocNext = pAssocRet->pNext) == NULL)
+        {
+                // go to next bucket
+                for (unsigned int nBucket = pAssocRet->nHashValue + 1;
+                  nBucket < m_nHashTableSize; nBucket++)
+                        if ((pAssocNext = m_pHashTable[nBucket]) != NULL)
+                                break;
+        }
 
+        rNextPosition = (POSITION) pAssocNext;
+
+        // fill in return data
+        rKey = pAssocRet->key;
+        rValue = pAssocRet->nValue;
+}
 Variables::Variables(int nBlockSize, int nHashTableSize)
 {
 	MYASSERT(nBlockSize > 0);
@@ -89,8 +104,8 @@ void Variables::InitHashTable(unsigned int nHashSize, bool bAllocNow)
 
 	if (bAllocNow)
 	{
-		m_pHashTable = new MyAssoc* [nHashSize];
-		memset(m_pHashTable, 0, sizeof(MyAssoc*) * nHashSize);
+		m_pHashTable = new Variables::MyAssoc* [nHashSize];
+		memset(m_pHashTable, 0, sizeof(Variables::MyAssoc*) * nHashSize);
 	}
 	m_nHashTableSize = nHashSize;
 }
@@ -102,7 +117,7 @@ void Variables::RemoveAll()
 		// destroy elements (values and keys)
 		for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++)
 		{
-			MyAssoc* pAssoc;
+			Variables::MyAssoc* pAssoc;
 			for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL;
 			  pAssoc = pAssoc->pNext)
 			{
@@ -157,7 +172,8 @@ Variables::NewAssoc(const char *key)
 		pAssoc->key=new char[strnlen(key,MAX_VARIABLE_LENGTH)];
 		if(pAssoc->key) strncpy(pAssoc->key,key,MAX_VARIABLE_LENGTH);
 	}
-	pAssoc->value=0xcccccccc;  //invalid value
+	pAssoc->nValue=0xcccccccc;  //invalid value
+	pAssoc->nHashValue=0xcccccccc; //invalid value
 	return pAssoc;
 }
 
@@ -184,7 +200,7 @@ Variables::GetAssocAt(const char *key, unsigned int& nHash) const
 		return NULL;
 
 	// see if it exists
-	MyAssoc* pAssoc;
+	Variables::MyAssoc* pAssoc;
 	for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL; pAssoc = pAssoc->pNext)
 	{
 		if(!strnicmp(pAssoc->key, key,MAX_VARIABLE_LENGTH) )
@@ -196,18 +212,19 @@ Variables::GetAssocAt(const char *key, unsigned int& nHash) const
 bool Variables::Lookup(const char *key, unsigned long& rValue) const
 {
 	unsigned int nHash;
-	MyAssoc* pAssoc = GetAssocAt(key, nHash);
+	Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL)
 		return false;  // not in map
 
-	rValue = pAssoc->value;
+	rValue = pAssoc->nValue;
 	return true;
 }
 
 void Variables::SetAt(const char *key, unsigned long value)
 {
 	unsigned int nHash;
-	MyAssoc* pAssoc;
+	Variables::MyAssoc* pAssoc;
+
 	if ((pAssoc = GetAssocAt(key, nHash)) == NULL)
 	{
 		if (m_pHashTable == NULL)
@@ -221,6 +238,10 @@ void Variables::SetAt(const char *key, unsigned long value)
 		m_pHashTable[nHash] = pAssoc;
 	}
 //set value only if we have a key
-	if(pAssoc->key) pAssoc->value=value;
+	if(pAssoc->key)
+	 {
+		pAssoc->nValue=value;
+		pAssoc->nHashValue=nHash;
+	}
 }
 

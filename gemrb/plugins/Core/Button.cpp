@@ -181,7 +181,10 @@ void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 		return;
 	if(State == IE_GUI_BUTTON_PRESSED)
 	{
-		SetState(IE_GUI_BUTTON_UNPRESSED);
+		if(ToggleState)
+			SetState(IE_GUI_BUTTON_SELECTED);
+		else
+			SetState(IE_GUI_BUTTON_UNPRESSED);
 	}
 	if((x <= Width) && (y <= Height)) {
 		if(Flags & 0x10) {  //checkbox

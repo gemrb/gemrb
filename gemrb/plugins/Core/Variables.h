@@ -34,7 +34,8 @@ protected:
 	{
 		MyAssoc* pNext;
 		char *key;
-		unsigned long value;
+		unsigned long nValue;
+		unsigned long nHashValue;
 	};
 public:
 // Construction
@@ -70,7 +71,7 @@ protected:
 	inline bool MyCopyKey(char *&dest, const char * key) const;
         inline unsigned int MyHashKey(const char *) const;
         POSITION GetStartPosition() const;
-        void GetNextAssoc(POSITION& rNextPosition, char*& rKey, unsigned long& rValue) const;
+        void GetNextAssoc(POSITION& rNextPosition, const char*& rKey, unsigned long& rValue) const;
 
 public:
 	~Variables();
