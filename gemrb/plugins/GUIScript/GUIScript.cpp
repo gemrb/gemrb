@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.138 2004/03/17 01:09:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.139 2004/03/20 14:08:56 edheldil Exp $
  *
  */
 
@@ -2891,12 +2891,17 @@ bool GUIScript::Init(void)
 	}
 	pGemRBDict = PyModule_GetDict( pGemRB );
 	char string[256];
+	// FIXME: crashes
+	//if (PyRun_SimpleString( "import pdb" ) == -1) {
+	//	return false;
+	//}
 	if (PyRun_SimpleString( "import sys" ) == -1) {
 		PyRun_SimpleString( "pdb.pm()" );
 		PyErr_Print();
 		return false;
 	}
 	char path[_MAX_PATH];
+	char path2[_MAX_PATH];
 #ifdef WIN32
 	int len = ( int ) strlen( core->GUIScriptsPath );
 	int p = 0;
@@ -2908,12 +2913,21 @@ bool GUIScript::Init(void)
 		p++;
 	}
 	path[p] = 0;
-	sprintf( string, "sys.path.append('%sGUIScripts/%s')", path,
-		core->GameType );
-#else
-	sprintf( string, "sys.path.append('%sGUIScripts/%s')",
-		core->GUIScriptsPath, core->GameType );
+#else  // ! WIN32
+	strcpy (path, core->GUIScriptsPath);
 #endif
+
+	PathAppend( path, "GUIScripts" );
+	strcpy( path2, path );
+	PathAppend( path2, core->GameType );
+
+	sprintf( string, "sys.path.append('%s')", path2 );
+	if (PyRun_SimpleString( string ) == -1) {
+		PyRun_SimpleString( "pdb.pm()" );
+		PyErr_Print();
+		return false;
+	}
+	sprintf( string, "sys.path.append('%s')", path );
 	if (PyRun_SimpleString( string ) == -1) {
 		PyRun_SimpleString( "pdb.pm()" );
 		PyErr_Print();
@@ -2924,27 +2938,11 @@ bool GUIScript::Init(void)
 		PyErr_Print();
 		return false;
 	}
-	strcpy( path, core->GUIScriptsPath );
-	strcat( path, "GUIScripts" );
-	strcat( path, SPathDelimiter );
-	strcat( path, core->GameType );
-	strcat( path, SPathDelimiter );
-	strcat( path, "GUIDefines.py" );
-	FILE* config = fopen( path, "rb" );
-	if (!config) {
+	if (PyRun_SimpleString( "from GUIDefines import *" ) == -1) {
+		PyRun_SimpleString( "pdb.pm()" );
+		PyErr_Print();
 		return false;
 	}
-	while (true) {
-		int ret = fscanf( config, "%[^\r\n]\r\n", path );
-		if (ret != 1)
-			break;
-		int obj = PyRun_SimpleString( path );
-		if (obj == -1) {
-			PyErr_Print();
-			return false;
-		}
-	}
-	fclose( config );
 	PyObject* mainmod = PyImport_AddModule( "__main__" );
 	maindic = PyModule_GetDict( mainmod );
 	return true;
