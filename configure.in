@@ -36,9 +36,11 @@ else
   plugindir=$libdir/gemrb
   moddir=$datadir/gemrb
 fi
+docdir=$libdir/docs
 
 AC_SUBST(plugindir)
 AC_SUBST(moddir)
+AC_SUBST(docdir)
 
 
 dnl Check for recent STL with <vector>::at()
@@ -198,5 +200,9 @@ gemrb/plugins/TLKImporter/Makefile
 gemrb/plugins/WEDImporter/Makefile 
 gemrb/plugins/WMPImporter/Makefile 
 gemrb/plugins/ZLibMgr/Makefile 
+gemrb/docs/Makefile 
+gemrb/docs/en/Makefile 
+gemrb/docs/en/GUIScript/Makefile 
+gemrb/docs/en/Tables/Makefile 
 ])
 AC_OUTPUT
