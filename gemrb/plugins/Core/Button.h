@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.23 2004/03/21 11:17:56 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.24 2004/03/21 12:48:00 avenger_teambg Exp $
  *
  */
 
@@ -41,12 +41,15 @@
 #define IE_GUI_BUTTON_RADIOBUTTON  0x00000020   // sticks in a state
 #define IE_GUI_BUTTON_DEFAULT      0x00000040   // enter button triggers it
 #define IE_GUI_BUTTON_DRAGGABLE    0x00000080
-#define IE_GUI_BUTTON_ANIMATED     0x00000100
-#define IE_GUI_BUTTON_NO_TEXT      0x00000200   // don't draw button label
 
-#define IE_GUI_BUTTON_ALIGN_LEFT   0x00000400
-#define IE_GUI_BUTTON_ALIGN_RIGHT  0x00000800
-#define IE_GUI_BUTTON_ALIGN_TOP    0x00001000
+//these bits are hardcoded in the .chu structure
+#define IE_GUI_BUTTON_ALIGN_LEFT   0x00000100
+#define IE_GUI_BUTTON_ALIGN_RIGHT  0x00000200
+#define IE_GUI_BUTTON_ALIGN_TOP    0x00000400
+//end of hardcoded part
+
+#define IE_GUI_BUTTON_ANIMATED     0x00010000
+#define IE_GUI_BUTTON_NO_TEXT      0x00020000   // don't draw button label
 
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
 
