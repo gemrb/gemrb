@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.62 2004/08/20 13:03:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.63 2004/08/20 13:07:16 avenger_teambg Exp $
  *
  */
 
@@ -222,7 +222,7 @@ CharAnimations* Actor::GetAnims()
 }
 
 /** Returns a Stat value (Base Value + Mod) */
-long Actor::GetStat(unsigned int StatIndex)
+ieDword Actor::GetStat(unsigned int StatIndex)
 {
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
@@ -304,15 +304,15 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 	}
 	return true;
 }
-long Actor::GetMod(unsigned int StatIndex)
+int Actor::GetMod(unsigned int StatIndex)
 {
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
 	}
-	return Modified[StatIndex] - BaseStats[StatIndex];
+	return (signed) Modified[StatIndex] - (signed) BaseStats[StatIndex];
 }
 /** Returns a Stat Base Value */
-long Actor::GetBase(unsigned int StatIndex)
+ieDword Actor::GetBase(unsigned int StatIndex)
 {
 	if (StatIndex >= MAX_STATS) {
 		return 0xffff;
@@ -321,7 +321,7 @@ long Actor::GetBase(unsigned int StatIndex)
 }
 
 /** Sets a Stat Base Value */
-bool Actor::SetBase(unsigned int StatIndex, long Value)
+bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 {
 	if (StatIndex >= MAX_STATS) {
 		return false;
@@ -352,8 +352,7 @@ void Actor::Init()
 /** implements a generic opcode function, modify modifier
 	returns the change
 */
-int Actor::NewStat(unsigned int StatIndex, long ModifierValue,
-	long ModifierType)
+int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType)
 {
 	int oldmod = Modified[StatIndex];
 
