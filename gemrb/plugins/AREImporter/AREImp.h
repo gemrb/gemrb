@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.7 2003/11/29 20:33:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.8 2003/12/04 22:13:59 balrog994 Exp $
  *
  */
 
@@ -36,6 +36,7 @@ private:
 	unsigned short ActorCount, VerticesCount;
 	unsigned long ContainersOffset, InfoPointsOffset;
 	unsigned short ContainersCount, InfoPointsCount;
+	char Script[9];
 public:
 	AREImp(void);
 	~AREImp(void);

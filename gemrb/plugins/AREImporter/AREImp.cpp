@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.20 2003/12/02 19:57:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.21 2003/12/04 22:13:59 balrog994 Exp $
  *
  */
 
@@ -90,6 +90,10 @@ bool AREImp::Open(DataStream * stream, bool autoFree)
 	str->Seek(0x7C+bigheader, GEM_STREAM_START);
 	str->Read(&VerticesOffset, 4);
 	str->Read(&VerticesCount, 2);
+	str->Seek(0x94+bigheader, GEM_STREAM_START);
+	str->Read(Script, 8);
+	Script[8] = 0;
+	core->LoadScript(Script);
 	str->Seek(0xA4+bigheader, GEM_STREAM_START);
 	str->Read(&DoorsCount, 4);
 	str->Read(&DoorsOffset, 4);
