@@ -50,11 +50,9 @@ bool CREImp::Open(DataStream * stream, bool autoFree)
 
 Actor * CREImp::GetActor()
 {
-	unsigned short AnimID;
-	str->Seek(32, GEM_CURRENT_POS);
-	str->Read(&AnimID, 2);
-	str->Seek(-34, GEM_CURRENT_POS);
-	Actor * act = new Actor(AnimID);
+	int RandColor = core->LoadTable("RANDCOLR");
+	TableMgr * rndcol = core->GetTable(RandColor);
+	Actor * act = new Actor();
 	unsigned long strref;
 	str->Read(&strref, 4);
 	act->LongName = core->GetString(strref);
@@ -77,6 +75,58 @@ Actor * CREImp::GetActor()
 	str->Read(&act->BaseStats[IE_LEATHER_COLOR], 1);
 	str->Read(&act->BaseStats[IE_ARMOR_COLOR], 1);
 	str->Read(&act->BaseStats[IE_HAIR_COLOR], 1);
+	if(act->BaseStats[IE_METAL_COLOR] >= 200) {
+		act->BaseStats[IE_METAL_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_METAL_COLOR]-200));
+	}
+	if(act->BaseStats[IE_MINOR_COLOR] >= 200) {
+		act->BaseStats[IE_MINOR_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_MINOR_COLOR]-200));
+	}
+	if(act->BaseStats[IE_MAJOR_COLOR] >= 200) {
+		act->BaseStats[IE_MAJOR_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_MAJOR_COLOR]-200));
+	}
+	if(act->BaseStats[IE_SKIN_COLOR] >= 200) {
+		act->BaseStats[IE_SKIN_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_SKIN_COLOR]-200));
+	}
+	if(act->BaseStats[IE_LEATHER_COLOR] >= 200) {
+		act->BaseStats[IE_LEATHER_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_LEATHER_COLOR]-200));
+	}
+	if(act->BaseStats[IE_ARMOR_COLOR] >= 200) {
+		act->BaseStats[IE_ARMOR_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_ARMOR_COLOR]-200));
+	}
+	if(act->BaseStats[IE_HAIR_COLOR] >= 200) {
+		act->BaseStats[IE_HAIR_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_HAIR_COLOR]-200));
+	}
+
+	/*Color Pal[256];
+	Pal[0].r = 0x00; Pal[0].g = 0xff; Pal[0].b = 0x00; Pal[0].a = 0x00;
+	Pal[1].r = 0x00; Pal[1].g = 0x00; Pal[1].b = 0x00; Pal[1].a = 0x00;
+	Pal[2].r = 0xff; Pal[2].g = 0x80; Pal[2].b = 0x80; Pal[2].a = 0x00;
+	Pal[3].r = 0xff; Pal[3].g = 0x80; Pal[3].b = 0x80; Pal[3].a = 0x00;
+	Color * MetalPal   = core->GetPalette(act->BaseStats[IE_METAL_COLOR], 12);
+	Color * MinorPal   = core->GetPalette(act->BaseStats[IE_MINOR_COLOR], 12);
+	Color * MajorPal   = core->GetPalette(act->BaseStats[IE_MAJOR_COLOR], 12);
+	Color * SkinPal    = core->GetPalette(act->BaseStats[IE_SKIN_COLOR], 12);
+	Color * LeatherPal = core->GetPalette(act->BaseStats[IE_LEATHER_COLOR], 12);
+	Color * ArmorPal   = core->GetPalette(act->BaseStats[IE_ARMOR_COLOR], 12);
+	Color * HairPal    = core->GetPalette(act->BaseStats[IE_HAIR_COLOR], 12);
+	memcpy(&Pal[0x04], MetalPal,   12*sizeof(Color));
+	memcpy(&Pal[0x10], MinorPal,   12*sizeof(Color));
+	memcpy(&Pal[0x1C], MajorPal,   12*sizeof(Color));
+	memcpy(&Pal[0x28], SkinPal,    12*sizeof(Color));
+	memcpy(&Pal[0x34], LeatherPal, 12*sizeof(Color));
+	memcpy(&Pal[0x40], ArmorPal,   12*sizeof(Color));
+	memcpy(&Pal[0x4C], HairPal,    12*sizeof(Color));
+	free(MetalPal);
+	free(MinorPal);
+	free(MajorPal);
+	free(SkinPal);
+	free(LeatherPal);
+	free(ArmorPal);
+	free(HairPal);
+
+	if(act->anims)
+		act->anims->SetNewPalette(Pal);*/
+
 	unsigned char TotSCEFF;
 	str->Read(&TotSCEFF, 1);
 	str->Read(act->SmallPortrait, 8);
@@ -172,5 +222,7 @@ Actor * CREImp::GetActor()
 			}
 		break;
 	}
+	act->SetAnimationID(act->BaseStats[IE_ANIMATION_ID]);
+
 	return act;
 }
