@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.75 2003/11/28 21:54:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.76 2003/11/29 07:48:04 balrog994 Exp $
  *
  */
 
@@ -650,9 +650,9 @@ bool Interface::LoadConfig(void)
 		else if(stricmp(name, "CD5") == 0) {
 			strcpy(CD5, value);
 		}
-    else if(stricmp(name, "CD6") == 0) {
-      strcpy(CD6, value);
-    }
+		else if(stricmp(name, "CD6") == 0) {
+			strcpy(CD6, value);
+		}
 	}
 	fclose(config);
 	if(!GUIScriptsPath[0])
