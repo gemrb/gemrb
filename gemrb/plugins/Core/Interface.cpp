@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.185 2004/08/03 22:58:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.186 2004/08/05 06:42:43 edheldil Exp $
  *
  */
 
@@ -25,10 +25,6 @@
 #define INTERFACE
 #endif
 
-#include "Interface.h"
-#include "FileStream.h"
-#include "AnimationMgr.h"
-#include "ArchiveImporter.h"
 #include <stdlib.h>
 #include <time.h>
 
@@ -38,6 +34,12 @@
 #else
 #include <dirent.h>
 #endif
+
+#include "Interface.h"
+#include "FileStream.h"
+#include "AnimationMgr.h"
+#include "ArchiveImporter.h"
+#include "WorldMapMgr.h"
 
 #ifdef WIN32
 #define GEM_EXPORT __declspec(dllexport)
@@ -83,6 +85,7 @@ Interface::Interface(int iargc, char** iargv)
 	INIbeasts = NULL;
 	INIquests = NULL;
 	game = NULL;
+	worldmap = NULL;
 	timer = NULL;
   evntmgr = NULL;
 	console = NULL;
@@ -124,7 +127,7 @@ Interface::Interface(int iargc, char** iargv)
 	memcpy( TooltipFont, "STONESML", 9 );
 	memcpy( CursorBam, "CAROT\0\0\0", 9 );
 	memcpy( GlobalScript, "BALDUR\0\0", 9 );
-	memcpy( GlobalMap, "WORLDMAP", 9 );
+	memcpy( WorldMapName, "WORLDMAP", 9 );
 	strcpy( Palette16, "MPALETTE" );
 	strcpy( Palette32, "PAL32" );
 	strcpy( Palette256, "MPAL256" );
@@ -1966,45 +1969,120 @@ void Interface::QuitGame()
 
 void Interface::LoadGame(int index)
 {
-	DataStream* ds;
-	DataStream* sav;
+	// This function has rather painful error handling,
+	//   as it should swap all the objects or none at all
+	//   and the loading can fail for various reasons
+
+	// Yes, it uses goto. Other ways were too awkward for me.
+
+	DataStream* gam_str = NULL;
+	DataStream* sav_str = NULL;
+	DataStream* wmp_str = NULL;
+
+	SaveGameMgr* gam_mgr = NULL;
+	WorldMapMgr* wmp_mgr = NULL;
+
+	Game* new_game = NULL;
+	WorldMap* new_worldmap = NULL;
+
 
 	DelTree((const char *) CachePath, true);
+
 	if (index == -1) {
 		//Load the Default Game
-		ds = GetResourceMgr()->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
-		sav = NULL;
+		gam_str = GetResourceMgr()->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
+		sav_str = NULL;
+		wmp_str = GetResourceMgr()->GetResource( WorldMapName, IE_WMP_CLASS_ID );
 	} else {
 		SaveGame* sg = GetSaveGameIterator()->GetSaveGame( index );
 		if (!sg)
 			return;
-		ds = sg->GetGame();
-		sav = sg->GetSave();
+		gam_str = sg->GetGame();
+		sav_str = sg->GetSave();
+		wmp_str = sg->GetWmap();
 		delete sg;
 	}
-	if (!ds) {
-		return;
-	}
-	SaveGameMgr* sgm = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
-	if (!sgm) {
-		delete ds;
-		if(sav) delete sav;
-		return;
-	}
-	sgm->Open( ds );
 
-	if (game) {
+	if (!gam_str || !wmp_str)
+		goto cleanup;
+
+
+	// Load GAM file
+	gam_mgr = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
+	if (!gam_mgr)
+		goto cleanup;
+
+	if (!gam_mgr->Open( gam_str ))
+		goto cleanup;
+
+	new_game = gam_mgr->GetGame();
+	if (!new_game)
+		goto cleanup;
+
+	FreeInterface( gam_mgr );
+	gam_mgr = NULL;
+	gam_str = NULL;
+
+
+	// Load WMP (WorldMap) file
+	wmp_mgr = ( WorldMapMgr* ) GetInterface( IE_WMP_CLASS_ID );
+	if (! wmp_mgr)
+		goto cleanup;
+	
+	if (!wmp_mgr->Open( wmp_str, true ))
+		goto cleanup;
+
+	new_worldmap = wmp_mgr->GetWorldMap( 0 );
+
+	FreeInterface( wmp_mgr );
+	wmp_mgr = NULL;
+	wmp_str = NULL;
+
+
+	// Unpack SAV (archive) file to Cache dir
+	if (sav_str) {
+		ArchiveImporter * ai = (ArchiveImporter*)core->GetInterface(IE_BIF_CLASS_ID);
+		ai->DecompressSaveGame(sav_str);
+
+		FreeInterface( ai );
+		ai = NULL;
+		sav_str = NULL;
+	}
+
+
+	// Let's assume that now is everything loaded OK and swap the objects
+
+	if (game)
 		delete( game );
+
+	if (worldmap)
+		delete( worldmap );
+
+
+	game = new_game;
+	worldmap = new_worldmap;
+
+	return;
+
+ cleanup:
+	// Something went wrong, so try to clean after itself
+	if (new_game)
+		delete( new_game );
+	if (new_worldmap)
+		delete( new_worldmap );
+
+	if (gam_mgr) {
+		FreeInterface( gam_mgr );
+		gam_str = NULL;
 	}
-	game = sgm->GetGame();
-	FreeInterface( sgm );
-	if(sav) {
-		if(game) {
-			ArchiveImporter * ai = (ArchiveImporter*)core->GetInterface(IE_BIF_CLASS_ID);
-			ai->DecompressSaveGame(sav);
-		}
-		delete sav;
+	if (wmp_mgr) {
+		FreeInterface( wmp_mgr );
+		wmp_str = NULL;
 	}
+
+	if (gam_str) delete gam_str;
+	if (wmp_str) delete wmp_str;
+	if (sav_str) delete sav_str;
 }
 
 GameControl *Interface::GetGameControl()

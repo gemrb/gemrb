@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.14 2004/08/03 17:36:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.15 2004/08/05 06:42:44 edheldil Exp $
  *
  */
 
@@ -110,6 +110,17 @@ public:
 	{
 		char nPath[_MAX_PATH];
 		sprintf( nPath, "%s%s%s.gam", Path, SPathDelimiter, Prefix );
+#ifndef WIN32
+		ResolveFilePath( nPath );
+#endif
+		FileStream* fs = new FileStream();
+		fs->Open( nPath, true );
+		return fs;
+	};
+	DataStream* GetWmap()
+	{
+		char nPath[_MAX_PATH];
+		sprintf( nPath, "%s%s%s.wmp", Path, SPathDelimiter, "worldmap" );
 #ifndef WIN32
 		ResolveFilePath( nPath );
 #endif

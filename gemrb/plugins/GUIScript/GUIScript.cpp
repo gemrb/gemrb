@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.180 2004/08/03 22:27:30 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.181 2004/08/05 06:42:46 edheldil Exp $
  *
  */
 
@@ -1090,7 +1090,7 @@ PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetMasterScript__doc );
 	}
 	strncpy( core->GlobalScript, script, 8 );
-	strncpy( core->GlobalMap, worldmap, 8 );
+	strncpy( core->WorldMapName, worldmap, 8 );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -3016,32 +3016,10 @@ static PyObject* GemRB_SetWorldMapImage(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	// FIXME!!!
-	DataStream* str = core->GetResourceMgr()->GetResource( core->GlobalMap,
-												IE_WMP_CLASS_ID );
-	WorldMapMgr* im = ( WorldMapMgr* ) core->GetInterface( IE_WMP_CLASS_ID );
-	if (im == NULL) {
-		delete ( str );
-		return NULL;
-	}
-	if (!im->Open( str, true )) {
-		core->FreeInterface( im );
-		return NULL;
-	}
-
-	// FIXME - should use some already allocated in core
-	WorldMap* worldmap = im->GetWorldMap( 0 );
-	if (worldmap == NULL) {
-		core->FreeInterface( im );
-		return NULL;
-	}
-
 	Button* btn = ( Button* ) ctrl;
-	btn->SetFlags( 0x82, OP_OR );
-	btn->SetPicture( worldmap->MapMOS );
-	// FIXME: there's a leak, with MapMOS, I am afraid
-	delete worldmap;
-	core->FreeInterface( im );
+	btn->SetFlags( IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_DRAGGABLE, OP_OR );
+	btn->SetPicture( core->GetWorldMap()->MapMOS );
+	// FIXME: when the button is deleted, so is MapMOS. That's wrong!!!!
 
 	Py_INCREF( Py_None );
 	return Py_None;
