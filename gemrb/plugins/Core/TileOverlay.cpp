@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.7 2003/12/03 18:27:06 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.8 2003/12/21 14:05:00 balrog994 Exp $
  *
  */
 
@@ -68,11 +68,15 @@ void TileOverlay::Draw(Region viewport)
 	int sy = vp.y / 64;
 	int dx = (int)ceil((vp.x+vp.w) / 64.0);
 	int dy = (int)ceil((vp.y+vp.h) / 64.0);
+	vp.x = -64;
+	vp.y = -64;
+	vp.w = viewport.w+64;
+	vp.h = viewport.h+64;
 	for(int y = sy; y < dy && y<h; y++) {
 		for(int x = sx; x < dx && x<w; x++) {
 			Tile * tile = tiles[(y*w)+x];
 			if(tile->anim[tile->tileIndex])
-				vid->BlitSprite(tile->anim[tile->tileIndex]->NextFrame(),viewport.x+(x*64) ,viewport.y+(y*64));
+				vid->BlitSprite(tile->anim[tile->tileIndex]->NextFrame(),viewport.x+(x*64) ,viewport.y+(y*64), false, &vp);
 		}
 	}
 }
