@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.16 2003/12/09 19:01:08 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.17 2003/12/10 16:55:12 balrog994 Exp $
  *
  */
 
@@ -250,6 +250,17 @@ Actor * CREImp::GetActor()
 	{
 		str->Read(act->Scripts[i],8);
 		act->Scripts[i][8]=0;
+	}
+	switch(CREVersion) {
+		case IE_CRE_V1_2:
+			str->Seek(162, GEM_CURRENT_POS);
+			str->Read(&act->BaseStats[IE_TEAM], 1);
+			str->Read(&act->BaseStats[IE_FACTION], 1);
+		break;
+
+		default:
+
+		break;
 	}
 	str->Read(&act->BaseStats[IE_EA], 1);
 	str->Read(&act->BaseStats[IE_GENERAL], 1);
