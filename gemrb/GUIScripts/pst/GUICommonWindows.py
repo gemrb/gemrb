@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.12 2004/06/27 19:30:07 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.13 2004/07/25 00:00:02 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -204,7 +204,7 @@ def SetupActionsWindowControls (Window):
 	
 
 
-# which=0: inventory; 1: rec screen
+# which=INVENTORY|STATS|FMENU
 def GetActorPortrait (actor, which):
 	#return GemRB.GetPlayerPortrait( actor, which)
 

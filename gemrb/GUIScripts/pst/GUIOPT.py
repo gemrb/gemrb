@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.8 2004/04/29 04:20:33 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.9 2004/07/25 00:00:02 edheldil Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -482,13 +482,13 @@ def OpenLoadMsgWindow ():
 	if LoadMsgWindow:		
 		GemRB.UnloadWindow (LoadMsgWindow)
 		LoadMsgWindow = None
-		GemRB.SetVar ("OtherWindow", OptionsWindow)
+		GemRB.SetVar ("FloatWindow", -1)
 		
 		GemRB.UnhideGUI ()
 		return
 		
 	LoadMsgWindow = Window = GemRB.LoadWindow (3)
-	GemRB.SetVar ("OtherWindow", LoadMsgWindow)
+	GemRB.SetVar ("FloatWindow", LoadMsgWindow)
 	
 	# Load
 	Button = GemRB.GetControl (Window, 0)
@@ -524,14 +524,15 @@ def OpenQuitMsgWindow ():
 	if QuitMsgWindow:		
 		GemRB.UnloadWindow (QuitMsgWindow)
 		QuitMsgWindow = None
-		GemRB.SetVar ("OtherWindow", OptionsWindow)
+		GemRB.SetVar ("FloatWindow", -1)
+		GemRB.SetVisible (GemRB.GetVar ("OtherWindow"), 1)
 		
 		GemRB.UnhideGUI ()
 		return
 		
 	QuitMsgWindow = Window = GemRB.LoadWindow (4)
-	GemRB.SetVar ("OtherWindow", QuitMsgWindow)
-
+	GemRB.SetVar ("FloatWindow", QuitMsgWindow)
+	GemRB.SetVisible (GemRB.GetVar ("OtherWindow"), 0)
 	
 	# Save
 	Button = GemRB.GetControl (Window, 0)
