@@ -275,11 +275,11 @@ int Interface::Init()
 	ChangeScript = true;
 	console = new Console();
 	console->XPos = 0;
-	console->YPos = 480-25;
-	console->Width = 640;
+	console->YPos = core->Height-25;
+	console->Width = core->Width;
 	console->Height = 25;
 	console->SetFont(fonts[2]);
-	console->SetCursor(fonts[2]->chars[2]);
+	//console->SetCursor(fonts[2]->chars[2]);
 	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Starting up the Sound Manager...", WHITE);
 	soundmgr = (SoundMgr*)GetInterface(IE_WAV_CLASS_ID);
