@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.84 2004/11/18 19:42:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.85 2004/11/25 21:04:25 avenger_teambg Exp $
  *
  */
 
@@ -334,6 +334,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		Door* door;
 		door = tm->AddDoor( ShortName, Flags, BaseClosed,
 					indices, count, open, closed );
+		door->SetScriptName( LongName );
 		door->Cursor = cursor;
 		door->toOpen[0] = toOpen[0];
 		door->toOpen[1] = toOpen[1];

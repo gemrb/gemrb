@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.50 2004/10/17 18:11:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.51 2004/11/25 21:04:23 avenger_teambg Exp $
  *
  */
 
@@ -216,7 +216,8 @@ public:
 	Door(TileOverlay* Overlay);
 	~Door(void);
 public:
-	char Name[9];
+	char Name[33]; //scriptable name
+	char ID[9];    //WED ID
 	TileOverlay* overlay;
 	unsigned short* tiles;
 	unsigned char count;
@@ -231,6 +232,7 @@ private:
 	void ToggleTiles(int State, bool playsound = false);
 public:
 	void SetName(char* Name);
+	void SetScriptName(char* Name);
 	void SetTiles(unsigned short* Tiles, int count);
 	void SetDoorLocked(bool Locked, bool playsound = false);
 	void SetDoorClosed(bool Closed, bool playsound = false);

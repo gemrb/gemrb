@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.66 2004/11/24 21:47:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.67 2004/11/25 21:04:15 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -574,10 +574,17 @@ void Door::ToggleTiles(int State, bool playsound)
 	Flags = (Flags & ~1) | State;
 }
 
-void Door::SetName(char* Name)
+//this is the short name (not the scripting name)
+void Door::SetName(char* name)
 {
-	strncpy( this->Name, Name, 8 );
-	this->Name[8] = 0;
+	strncpy( ID, name, 8 );
+	ID[8] = 0;
+}
+
+void Door::SetScriptName(char* name)
+{
+	strncpy( Name, name, 32 );
+	Name[32] = 0;
 }
 
 void Door::SetTiles(unsigned short* Tiles, int count)
