@@ -29,6 +29,10 @@ public:
 	bool MouseIsDown;
 	// Small map bitmap
 	Sprite2D* MapMOS;
+	// current map
+	Map *MyMap;
+	// map flags
+	Sprite2D *Flag[8];
 	// Size of big map (area) in pixels
 	short MapWidth, MapHeight;
 	// Size of area viewport. FIXME: hack!

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.220 2004/10/07 20:06:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.221 2004/10/09 15:27:23 avenger_teambg Exp $
  *
  */
 
@@ -160,6 +160,15 @@ Interface::Interface(int iargc, char** iargv)
 
 Interface::~Interface(void)
 {
+	if (TooltipBack) {
+		for(int i=0;i<3;i++) {
+			video->FreeSprite(TooltipBack[i]);
+		}
+		delete[] TooltipBack;
+	}
+	if (slottypes) {
+		free( slottypes );
+	}
 	if (slotmatrix) {
 		free( slotmatrix );
 	}
@@ -224,7 +233,7 @@ Interface::~Interface(void)
 		delete( evntmgr );
 	}
 	if (guiscript) {
-		delete( guiscript );
+		FreeInterface( guiscript );
 	}
 	if (vars) {
 		delete( vars );

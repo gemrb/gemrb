@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.3 2004/05/25 16:16:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.4 2004/10/09 15:27:23 avenger_teambg Exp $
  *
  */
 
@@ -29,7 +29,7 @@ Store::Store(void)
 
 Store::~Store(void)
 {
-  unsigned int i;
+	unsigned int i;
 
 	for (i = 0; i < items.size(); i++) {
 		delete( items[i] );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.72 2004/10/07 20:06:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.73 2004/10/09 15:27:21 avenger_teambg Exp $
  *
  */
 
@@ -152,8 +152,8 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	if (core->HasFeature(GF_AUTOMAP_INI) ) {
 		str->ReadDword( &tmp ); //skipping crap in PST
 	}
-	str->ReadDword( &NoteCount );
 	str->ReadDword( &NoteOffset );
+	str->ReadDword( &NoteCount );
 	return true;
 }
 
@@ -374,6 +374,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		Gem_Polygon* poly = new Gem_Polygon( points, vertCount, &bbox );
 		free( points );
 		Container* c = tm->AddContainer( Name, Type, poly );
+		c->area = map;
 		c->Pos.x = XPos;
 		c->Pos.y = YPos;
 		c->LockDifficulty = LockDiff;
@@ -466,6 +467,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		ip->overHeadText = string;
 		ip->textDisplaying = 0;
 		ip->timeStartDisplaying = 0;
+		ip->area = map;
 		ip->Pos.x = bbox.x + ( bbox.w / 2 );
 		ip->Pos.y = bbox.y + ( bbox.h / 2 );
 		ip->Flags = Flags;
@@ -527,6 +529,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			Actor* ab = actmgr->GetActor();
 			if(!ab)
 				continue;
+			ab->area = map;
 			ab->Pos.x = XPos;
 			ab->Pos.y = YPos;
 			ab->Destination.x = XDes;
@@ -660,6 +663,48 @@ Map* AREImp::GetMap(const char *ResRef)
 		map->AddAmbient(ambi);
 	}
 
+	printf( "Loading automap notes\n" );
+	str->Seek( NoteOffset, GEM_STREAM_START );
+
+	int tmp = core->HasFeature( GF_AUTOMAP_INI );
+	if (tmp) {
+		//add automap ini entries
+	}
+	for (i = 0; i < NoteCount; i++) {
+		Point point;
+		int color;
+		char *text;
+		if (tmp) {
+			ieDword px,py;
+
+			str->ReadDword(&px);
+			str->ReadDword(&py);
+			point.x=px;
+			point.y=py;
+			color=0;
+			text = (char *) malloc( 524 );
+			str->Read(text, 524 );
+			text[523] = 0;
+			text = (char *) realloc( text, strlen(text) );
+		}
+		else {
+			ieWord px,py;
+			ieDword strref;
+
+			str->ReadWord(&px);
+			str->ReadWord(&py);
+			point.x=px;
+			point.y=py;
+			str->ReadWord(&px);
+			str->ReadWord(&py);
+			color=py;
+			str->ReadDword(&strref);
+			str->ReadDword(&strref);
+			text = core->GetString( strref,0 );
+		}
+		map->AddMapNote(point,color,text);
+	}
+	
 	map->AddTileMap( tm, lm, sr, sm );
 	core->FreeInterface( tmm );
 	return map;

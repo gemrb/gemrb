@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.10 2004/10/08 22:52:08 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.11 2004/10/09 15:27:23 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -27,11 +27,17 @@
 static int MAP_DIV   = 3;
 static int MAP_MULT  = 32;
 
-static Color green = {
-	0x00, 0xff, 0x00, 0xff
-};
-static Color darkgreen = {
-	0x00, 0x80, 0x00, 0xff
+typedef enum colorcode {gray=0, violet, green, orange, red, blue, darkblue, darkgreen};
+
+Color colors[8]={
+  { 0x60, 0x60, 0x60, 0xff }, //gray
+  { 0xa0, 0x00, 0xa0, 0xff }, //violet
+  { 0x00, 0xff, 0xa0, 0xff }, //green
+  { 0xff, 0xff, 0x00, 0xff }, //orange
+  { 0xff, 0x00, 0x00, 0xff }, //red
+  { 0x00, 0x00, 0xff, 0xff }, //blue
+  { 0x00, 0x00, 0x80, 0xff }, //darkblue
+  { 0x00, 0x80, 0x00, 0xff }  //darkgreen
 };
 
 #define MAP_TO_SCREENX(x) XWin + XPos + XCenter - ScrollX + (x)
@@ -59,13 +65,25 @@ MapControl::MapControl(void)
 	ScrollY = 0;
 	MouseIsDown = false;
 	Changed = true;
+	memset(Flag,0,sizeof(Flag) );
 
-	MapMOS = core->GetGame()->GetCurrentMap()->SmallMap->GetImage();
+	MyMap = core->GetGame()->GetCurrentMap();
+	MapMOS = MyMap->SmallMap->GetImage();
 }
 
 
 MapControl::~MapControl(void)
 {
+        Video *video = core->GetVideoDriver();
+
+	if(MapMOS) {
+		video->FreeSprite(MapMOS);
+	}
+	for(int i=0;i<8;i++) {
+		if(Flag[i]) {
+			video->FreeSprite(Flag[i]);
+		}
+	}
 }
 
 // To be called after changes in control's or screen geometry
@@ -117,13 +135,31 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 	vp.w = ViewWidth;
 	vp.h = ViewHeight;
 
-	video->DrawRect( vp, green, false, false );
+	video->DrawRect( vp, colors[green], false, false );
 
+	// Draw Map notes, could be turned off in bg2
+	// we use the common control value to handle it, because then we
+	// don't need another interface
+	int i;
+	if (Value&1) {
+		i = MyMap -> GetMapNoteCount();
+		while (i--) {
+			MapNote * mn = MyMap -> GetMapNote(i);
+			Sprite2D *anim = Flag[mn->color&7];
+			if (anim) {
+				video->BlitSprite( anim, MAP_TO_SCREENX(mn->Pos.x), MAP_TO_SCREENY(mn->Pos.y), true, &r );
+			}
+			else {
+				video->DrawEllipse( GAME_TO_SCREENX(mn->Pos.x), GAME_TO_SCREENY(mn->Pos.y), 6, 5, colors[mn->color&7], false );
+			}
+		}
+	}
 	// Draw PCs' ellipses
-	for (int i = 1; i < 9; i++) {
-		Actor* actor = core->GetGame()->FindPC( i );
-		if (actor) {
-			video->DrawEllipse( GAME_TO_SCREENX(actor->Pos.x), GAME_TO_SCREENY(actor->Pos.y), 3, 2, i == 1 ? green : darkgreen, false );
+	i = core->GetGame()->GetPartySize(false);
+	while (i--) {
+		Actor* actor = core->GetGame()->GetPC( i );
+		if (MyMap->HasActor(actor) ) {
+			video->DrawEllipse( GAME_TO_SCREENX(actor->Pos.x), GAME_TO_SCREENY(actor->Pos.y), 3, 2, actor->Selected ? colors[green] : colors[darkgreen], false );
 		}
 	}
 }

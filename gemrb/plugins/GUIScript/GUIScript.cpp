@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.213 2004/10/02 20:43:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.214 2004/10/09 15:27:23 avenger_teambg Exp $
  *
  */
 
@@ -64,13 +64,9 @@ inline bool valid_number(const char* string, long& val)
 }
 
 // Like PyString_FromString(), but for  ResRef
-PyObject* PyString_FromResRef(char* ResRef)
+inline PyObject* PyString_FromResRef(char* ResRef)
 {
-	char  tmp[9];
-	memcpy( tmp, ResRef, 8 );
-	tmp[8] = 0;
-
-	return PyString_FromString( tmp );
+	return PyString_FromStringAndSize( ResRef, sizeof(ieResRef) );
 }
 
 /* Sets RuntimeError exception and returns NULL, so this function
@@ -1452,8 +1448,7 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 	}
 
 	AnimationFactory* bam = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( ResRef,
-									IE_BAM_CLASS_ID );
+		core->GetResourceMgr()->GetFactoryResource( ResRef, IE_BAM_CLASS_ID );
 	if (!bam) {
 		printMessage( "GUIScript", "Error: %s.BAM not Found\n", LIGHT_RED );
 		return NULL;
@@ -1597,8 +1592,8 @@ static PyObject* GemRB_DeleteControl(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return NULL;
 	}
-        int CtrlIndex = core->GetControl( WindowIndex, ControlID );
-        if (CtrlIndex == -1) {
+	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
+	if (CtrlIndex == -1) {
 		return NULL;
 	}
 	win -> DelControl( CtrlIndex );
@@ -1624,8 +1619,8 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 	if (win == NULL) {
 		return NULL;
 	}
-        int CtrlIndex = core->GetControl( WindowIndex, ControlID );
-        if (CtrlIndex != -1) {
+	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
+	if (CtrlIndex != -1) {
 		Control *ctrl = win->GetControl( CtrlIndex );
 		x = ctrl->XPos;
 		y = ctrl->YPos;
@@ -1657,9 +1652,10 @@ PyDoc_STRVAR( GemRB_CreateMapControl__doc,
 static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID, x, y, w, h;
+	char *Flag=NULL;
 
-	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlID, &x,
-			&y, &w, &h )) {
+	if (!PyArg_ParseTuple( args, "iiiiii|s", &WindowIndex, &ControlID, &x,
+			&y, &w, &h, &Flag )) {
 		return AttributeError( GemRB_CreateMapControl__doc );
 	}
 
@@ -1685,6 +1681,15 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 	map->ControlID = ControlID;
 	map->ControlType = IE_GUI_MAP;
 	map->Owner = win;
+	if (Flag) {
+		AnimationFactory *anim = ( AnimationFactory* ) core->GetResourceMgr()->GetFactoryResource( Flag, IE_BAM_CLASS_ID );
+		if(anim) {
+			for(int i=0;i<8;i++) {
+				map->Flag[i] = anim->GetFrame(0,i);
+			}
+			
+		}
+	}
 	win->AddControl( map );
 
 	Py_INCREF( Py_None );
@@ -4153,14 +4158,17 @@ void initGemRB()
 
 GUIScript::GUIScript(void)
 {
-	pDict = NULL;
-	pModule = NULL;
-	pName = NULL;
+	pDict = NULL; //borrowed, but used outside a function
+	pModule = NULL; //should decref it
+	pMainDic = NULL; //borrowed, but used outside a function
 }
 
 GUIScript::~GUIScript(void)
 {
 	if (Py_IsInitialized()) {
+		if(pModule) {
+			Py_DECREF( pModule );
+		}
 		Py_Finalize();
 	}
 }
@@ -4180,11 +4188,13 @@ bool GUIScript::Init(void)
 	if (!Py_IsInitialized()) {
 		return false;
 	}
-	pGemRB = Py_InitModule3( "GemRB", GemRBMethods, GemRB__doc );
+	PyObject* pGemRB = Py_InitModule3( "GemRB", GemRBMethods, GemRB__doc );
 	if (!pGemRB) {
 		return false;
 	}
-	pGemRBDict = PyModule_GetDict( pGemRB );
+	/*pGemRB is a borrowed reference */
+	//pGemRBDict = PyModule_GetDict( pGemRB );
+	/*pGemRBDict is a borrowed reference, and we don't need it*/
 	char string[256];
 	// FIXME: crashes
 	//if (PyRun_SimpleString( "import pdb" ) == -1) {
@@ -4198,11 +4208,12 @@ bool GUIScript::Init(void)
 	char path[_MAX_PATH];
 	char path2[_MAX_PATH];
 
-	strcpy (path, core->GUIScriptsPath);
-
+	strncpy (path, core->GUIScriptsPath, _MAX_PATH);
 	PathAppend( path, "GUIScripts" );
-	strcpy( path2, path );
+
+	memcpy(path2, path,_MAX_PATH);
 	PathAppend( path2, core->GameType );
+
 
 #ifdef WIN32
   char *p;
@@ -4242,8 +4253,10 @@ bool GUIScript::Init(void)
 		PyErr_Print();
 		return false;
 	}
-	PyObject* mainmod = PyImport_AddModule( "__main__" );
-	maindic = PyModule_GetDict( mainmod );
+	PyObject *pMainMod = PyImport_AddModule( "__main__" );
+	/* pMainMod is a borrowed reference */
+	pMainDic = PyModule_GetDict( pMainMod );
+	/* pMainDic is a borrowed reference */
 	return true;
 }
 
@@ -4258,7 +4271,7 @@ bool GUIScript::LoadScript(const char* filename)
 	char path[_MAX_PATH];
 	strcpy( path, filename );
 
-	pName = PyString_FromString( filename );
+	PyObject *pName = PyString_FromString( filename );
 	/* Error checking of pName left out */
 	if (pName == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -4274,7 +4287,7 @@ bool GUIScript::LoadScript(const char* filename)
 
 	if (pModule != NULL) {
 		pDict = PyModule_GetDict( pModule );
-		if (PyDict_Merge( pDict, maindic, false ) == -1)
+		if (PyDict_Merge( pDict, pMainDic, false ) == -1)
 			return false;
 		/* pDict is a borrowed reference */
 	} else {
@@ -4297,9 +4310,8 @@ bool GUIScript::RunFunction(const char* fname)
 
 	PyObject* pFunc, * pArgs, * pValue;
 
-
 	pFunc = PyDict_GetItemString( pDict, fname );
-	/* pFun: Borrowed reference */
+	/* pFunc: Borrowed reference */
 	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
 		return false;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.37 2004/09/11 12:58:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.38 2004/10/09 15:27:22 avenger_teambg Exp $
  *
  */
 
@@ -62,9 +62,9 @@ bool CHUImp::Open(DataStream* stream, bool autoFree)
 		printf( "[CHUImporter]: Not a Valid CHU File\n" );
 		return false;
 	}
-	str->Read( &WindowCount, 4 );
-	str->Read( &CTOffset, 4 );
-	str->Read( &WEOffset, 4 );
+	str->ReadDword( &WindowCount );
+	str->ReadDword( &CTOffset );
+	str->ReadDword( &WEOffset );
 	return true;
 }
 
@@ -78,7 +78,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 	bool found = false;
 	for (unsigned int c = 0; c < WindowCount; c++) {
 		str->Seek( WEOffset + ( 0x1c * c ), GEM_STREAM_START );
-		str->Read( &WindowID, 2 );
+		str->ReadWord( &WindowID );
 		if (WindowID == wid) {
 			found = true;
 			break;
@@ -88,20 +88,18 @@ Window* CHUImp::GetWindow(unsigned int wid)
 		return NULL;
 	}
 	str->Seek( 2, GEM_CURRENT_POS );
-	str->Read( &XPos, 2 );
-	str->Read( &YPos, 2 );
-	str->Read( &Width, 2 );
-	str->Read( &Height, 2 );
-	str->Read( &BackGround, 2 );
-	str->Read( &ControlsCount, 2 );
+	str->ReadWord( &XPos );
+	str->ReadWord( &YPos );
+	str->ReadWord( &Width );
+	str->ReadWord( &Height );
+	str->ReadWord( &BackGround );
+	str->ReadWord( &ControlsCount );
 	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
 	if (BackGround == 1) {
-		char MosFile[9];
-		str->Read( MosFile, 8 );
-		MosFile[8] = 0;
+		ieResRef MosFile;
+		str->ReadResRef( MosFile );
 		if (core->IsAvailable( IE_MOS_CLASS_ID )) {
-			DataStream* bkgr = core->GetResourceMgr()->GetResource( MosFile,
-														IE_MOS_CLASS_ID );
+			DataStream* bkgr = core->GetResourceMgr()->GetResource( MosFile, IE_MOS_CLASS_ID );
 			if (bkgr != NULL) {
 				ImageMgr* mos = ( ImageMgr* )
 					core->GetInterface( IE_MOS_CLASS_ID );
@@ -115,7 +113,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 	} else {
 		str->Seek( 8, GEM_CURRENT_POS );
 	}
-	str->Read( &FirstControl, 2 );
+	str->ReadWord( &FirstControl );
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		printf( "[CHUImporter]: No BAM Importer Available, skipping controls\n" );
 		return win;
@@ -125,353 +123,347 @@ Window* CHUImp::GetWindow(unsigned int wid)
 		ieDword COffset, CLength, ControlID;
 		ieWord XPos, YPos, Width, Height;
 		ieByte ControlType, temp;
-		str->Read( &COffset, 4 );
-		str->Read( &CLength, 4 );
+		str->ReadDword( &COffset );
+		str->ReadDword( &CLength );
 		str->Seek( COffset, GEM_STREAM_START );
-		str->Read( &ControlID, 4 );
-		str->Read( &XPos, 2 );
-		str->Read( &YPos, 2 );
-		str->Read( &Width, 2 );
-		str->Read( &Height, 2 );
+		str->ReadDword( &ControlID );
+		str->ReadWord( &XPos );
+		str->ReadWord( &YPos );
+		str->ReadWord( &Width );
+		str->ReadWord( &Height );
 		str->Read( &ControlType, 1 );
 		str->Read( &temp, 1 );
 		switch (ControlType) {
 			case IE_GUI_BUTTON:
-				 {
-					//Button
-					Button* btn = new Button( false );
-					btn->ControlID = ControlID;
-					btn->XPos = XPos;
-					btn->YPos = YPos;
-					btn->Width = Width;
-					btn->Height = Height;
-					btn->ControlType = ControlType;
-					char BAMFile[9];
-					ieWord Cycle, UnpressedIndex, PressedIndex,
-					SelectedIndex, DisabledIndex;
-					str->Read( BAMFile, 8 );
-					BAMFile[8] = 0;
-					str->Read( &Cycle, 2 );
-					str->Read( &UnpressedIndex, 2 );
-					str->Read( &PressedIndex, 2 );
-					str->Read( &SelectedIndex, 2 );
-					str->Read( &DisabledIndex, 2 );
-					btn->Owner = win;
-					/** Justification comes from the .chu, other bits are set by script */
-					if(!Width) {
-						btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR);
-					}
-					btn->SetFlags( Cycle&0xff00, OP_OR );
-					if (strncmp( BAMFile, "GUICTRL\0", 8 ) == 0) {
-						if (UnpressedIndex == 0) {
-							printf( "Special Button Control, Skipping Image Loading\n" );
-							win->AddControl( btn );
-							break;
-						}
-					}
-					AnimationFactory* bam = ( AnimationFactory* )
-						core->GetResourceMgr()->GetFactoryResource( BAMFile,
-													IE_BAM_CLASS_ID );
-					if (bam == NULL) {
-						printf( "[CHUImporter]: Cannot Load Button Images, skipping control\n" );
-						//delete(btn);
-						/* 
-																				IceWind Dale 2 has fake BAM ResRefs for some Buttons, this will handle bad
-																				ResRefs
-																			*/
-						win->AddControl( btn );
-						continue;
-					}
-					/** Cycle is only a byte for buttons */
-					Animation* ani = bam->GetCycle( Cycle&0xff );
-					Sprite2D* tspr = ani->GetFrame( UnpressedIndex );
-					btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
-					tspr = ani->GetFrame( PressedIndex );
-					btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
-					tspr = ani->GetFrame( core->HasFeature( GF_IGNORE_BUTTON_FRAMES ) ?
-									2 :
-									SelectedIndex );
-					btn->SetImage( IE_GUI_BUTTON_SELECTED, tspr );
-					tspr = ani->GetFrame( core->HasFeature( GF_IGNORE_BUTTON_FRAMES ) ?
-									3 :
-									DisabledIndex );
-					btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
-					ani->autofree = false;
-					delete( ani );
-					win->AddControl( btn );
+			{
+			//Button
+				Button* btn = new Button( true );
+				btn->ControlID = ControlID;
+				btn->XPos = XPos;
+				btn->YPos = YPos;
+				btn->Width = Width;
+				btn->Height = Height;
+				btn->ControlType = ControlType;
+				ieResRef BAMFile;
+				ieWord Cycle, UnpressedIndex, PressedIndex,
+				SelectedIndex, DisabledIndex;
+				str->ReadResRef( BAMFile );
+				str->ReadWord( &Cycle );
+				str->ReadWord( &UnpressedIndex );
+				str->ReadWord( &PressedIndex );
+				str->ReadWord( &SelectedIndex );
+				str->ReadWord( &DisabledIndex );
+				btn->Owner = win;
+				/** Justification comes from the .chu, other bits are set by script */
+				if(!Width) {
+					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR);
 				}
-				break;
+				btn->SetFlags( Cycle&0xff00, OP_OR );
+				if (strncmp( BAMFile, "GUICTRL\0", 8 ) == 0) {
+					if (UnpressedIndex == 0) {
+						printf( "Special Button Control, Skipping Image Loading\n" );
+						win->AddControl( btn );
+						break;
+					}
+				}
+				AnimationMgr* bam = ( AnimationMgr* )
+					core->GetInterface( IE_BAM_CLASS_ID );
+				DataStream* s = core->GetResourceMgr()->GetResource( BAMFile, IE_BAM_CLASS_ID );
+				if (!s ) {
+					printf( "[CHUImporter]: Cannot Load Button Images, skipping control\n" );
+					//delete(btn);
+					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons, this will handle bad ResRefs */
+					win->AddControl( btn );
+					break;
+				}
+				bam->Open( s, true );
+				/** Cycle is only a byte for buttons */
+				Sprite2D* tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, core->HasFeature(GF_IGNORE_BUTTON_FRAMES) ? 0 : UnpressedIndex );
+				btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
+				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ? 1 : PressedIndex );
+				btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
+				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, core->HasFeature( GF_IGNORE_BUTTON_FRAMES ) ?  2 : SelectedIndex );
+				btn->SetImage( IE_GUI_BUTTON_SELECTED, tspr );
+				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, core->HasFeature( GF_IGNORE_BUTTON_FRAMES ) ?  3 : DisabledIndex );
+				btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
+				core->FreeInterface( bam );
+				win->AddControl( btn );
+			}
+			break;
 
 			case IE_GUI_PROGRESSBAR:
-				{
-					char MOSFile[9], MOSFile2[9];
-					char BAMFile[9];
-					ieWord KnobXPos, KnobYPos;
-					ieWord CapXPos, CapYPos;
-					ieWord KnobStepsCount;
-					ieWord Cycle;
-					
+			{
+				ieResRef MOSFile, MOSFile2;
+				ieResRef BAMFile;
+				ieWord KnobXPos, KnobYPos;
+				ieWord CapXPos, CapYPos;
+				ieWord KnobStepsCount;
+				ieWord Cycle;
 
-					str->Read( MOSFile, 8 );
-					str->Read( MOSFile2, 8 );
-					str->Read( BAMFile, 8 );
-					str->Read( &KnobStepsCount, 2 );
-					str->Read( &Cycle, 2 );
-					str->Read( &KnobXPos, 2 );
-					str->Read( &KnobYPos, 2 );
-					str->Read( &CapXPos, 2 );
-					str->Read( &CapYPos, 2 );
-					Progressbar* pbar = new Progressbar(KnobStepsCount, false); 
-					pbar->ControlID = ControlID;
-					pbar->XPos = XPos;
-					pbar->YPos = YPos;
-					pbar->ControlType = ControlType;
-					pbar->Width = Width;
-					pbar->Height = Height;
-					pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
-					ImageMgr* mos = ( ImageMgr* )
-						core->GetInterface( IE_MOS_CLASS_ID );
-					DataStream* s = core->GetResourceMgr()->GetResource( MOSFile, IE_MOS_CLASS_ID );
-					mos->Open( s, true );
-					Sprite2D* img = mos->GetImage();
-
-					s = core->GetResourceMgr()->GetResource( MOSFile2, IE_MOS_CLASS_ID );
-					mos->Open( s, true );
-					Sprite2D* img2 = mos->GetImage();
-					
-					pbar->SetImage( img, img2 );
-					if( KnobStepsCount ) {
-						/* getting the bam */
-						AnimationFactory* anim = ( AnimationFactory* ) core->GetResourceMgr()->GetFactoryResource( BAMFile, IE_BAM_CLASS_ID );
-						if(anim) {
-							/* Getting the Cycle of the bam */
-							pbar->SetAnimation(anim->GetCycle( ( unsigned char ) Cycle ) );
-						}
+				str->ReadResRef( MOSFile );
+				str->ReadResRef( MOSFile2 );
+				str->ReadResRef( BAMFile );
+				str->ReadWord( &KnobStepsCount );
+				str->ReadWord( &Cycle );
+				str->ReadWord( &KnobXPos );
+				str->ReadWord( &KnobYPos );
+				str->ReadWord( &CapXPos );
+				str->ReadWord( &CapYPos );
+				Progressbar* pbar = new Progressbar(KnobStepsCount, true ); 
+				pbar->ControlID = ControlID;
+				pbar->XPos = XPos;
+				pbar->YPos = YPos;
+				pbar->ControlType = ControlType;
+				pbar->Width = Width;
+				pbar->Height = Height;
+				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
+				ImageMgr* mos = ( ImageMgr* )
+					core->GetInterface( IE_MOS_CLASS_ID );
+				DataStream* s = core->GetResourceMgr()->GetResource( MOSFile, IE_MOS_CLASS_ID );
+				mos->Open( s, true );
+				Sprite2D* img = mos->GetImage();
+				s = core->GetResourceMgr()->GetResource( MOSFile2, IE_MOS_CLASS_ID );
+				mos->Open( s, true );
+				Sprite2D* img2 = mos->GetImage();
+				
+				pbar->SetImage( img, img2 );
+				if( KnobStepsCount ) {
+					/* getting the bam */
+					AnimationMgr* anim = ( AnimationMgr* )
+						core->GetInterface( IE_BAM_CLASS_ID );
+					s = core->GetResourceMgr()->GetResource( BAMFile, IE_BAM_CLASS_ID );
+					if(anim->Open( s, true )) {
+					/* Getting the Cycle of the bam */
+						pbar->SetAnimation(anim->GetAnimation( ( unsigned char ) Cycle,0,0,0 ) );
 					}
-					else {
-						s = core->GetResourceMgr()->GetResource( BAMFile, IE_MOS_CLASS_ID );
-						mos->Open( s, true );
-						Sprite2D* img3 = mos->GetImage();
-						pbar->SetBarCap( img3 );
-					}
-					core->FreeInterface( mos );
-					win->AddControl( pbar );
+					core->FreeInterface( anim );
 				}
-				break;
+				else {
+					s = core->GetResourceMgr()->GetResource( BAMFile, IE_MOS_CLASS_ID );
+					mos->Open( s, true );
+					Sprite2D* img3 = mos->GetImage();
+					pbar->SetBarCap( img3 );
+				}
+				core->FreeInterface( mos );
+				win->AddControl( pbar );
+			}
+			break;
 			case IE_GUI_SLIDER:
-				 {
-					//Slider
-					char MOSFile[9], BAMFile[9];
-					ieWord Cycle, Knob, GrabbedKnob;
-					ieWord KnobXPos, KnobYPos, KnobStep, KnobStepsCount;
-					str->Read( MOSFile, 8 );
-					str->Read( BAMFile, 8 );
-					str->Read( &Cycle, 2 );
-					str->Read( &Knob, 2 );
-					str->Read( &GrabbedKnob, 2 );
-					str->Read( &KnobXPos, 2 );
-					str->Read( &KnobYPos, 2 );
-					str->Read( &KnobStep, 2 );
-					str->Read( &KnobStepsCount, 2 );
-					Slider* sldr = new Slider( KnobXPos, KnobYPos, KnobStep,
-										KnobStepsCount, false );
-					sldr->ControlID = ControlID;
-					sldr->XPos = XPos;
-					sldr->YPos = YPos;
-					sldr->ControlType = ControlType;
-					sldr->Width = Width;
-					sldr->Height = Height;
-					ImageMgr* mos = ( ImageMgr* )
-						core->GetInterface( IE_MOS_CLASS_ID );
-					DataStream* s = core->GetResourceMgr()->GetResource( MOSFile,
-																IE_MOS_CLASS_ID );
-					mos->Open( s, true );
-					Sprite2D* img = mos->GetImage();
-					sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img );
-					core->FreeInterface( mos );
-					AnimationFactory* anim = ( AnimationFactory* )
-						core->GetResourceMgr()->GetFactoryResource( BAMFile, IE_BAM_CLASS_ID );
-					if(anim) {
-						img = anim->GetFrame( Knob );
-						sldr->SetImage( IE_GUI_SLIDER_KNOB, img );
-						img = anim->GetFrame( GrabbedKnob );
-						sldr->SetImage( IE_GUI_SLIDER_GRABBEDKNOB, img );
-					}
-					else {
-						 sldr->SetState(IE_GUI_SLIDER_BACKGROUND);
-					}
-					win->AddControl( sldr );
+			{
+				//Slider
+				ieResRef MOSFile, BAMFile;
+				ieWord Cycle, Knob, GrabbedKnob;
+				ieWord KnobXPos, KnobYPos, KnobStep, KnobStepsCount;
+				str->ReadResRef( MOSFile );
+				str->ReadResRef( BAMFile );
+				str->ReadWord( &Cycle );
+				str->ReadWord( &Knob );
+				str->ReadWord( &GrabbedKnob );
+				str->ReadWord( &KnobXPos );
+				str->ReadWord( &KnobYPos );
+				str->ReadWord( &KnobStep );
+				str->ReadWord( &KnobStepsCount );
+				Slider* sldr = new Slider( KnobXPos, KnobYPos, KnobStep, KnobStepsCount, true );
+				sldr->ControlID = ControlID;
+				sldr->XPos = XPos;
+				sldr->YPos = YPos;
+				sldr->ControlType = ControlType;
+				sldr->Width = Width;
+				sldr->Height = Height;
+				ImageMgr* mos = ( ImageMgr* )
+					core->GetInterface( IE_MOS_CLASS_ID );
+				DataStream* s = core->GetResourceMgr()->GetResource( MOSFile, IE_MOS_CLASS_ID );
+				mos->Open( s, true );
+				Sprite2D* img = mos->GetImage();
+				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
+				core->FreeInterface( mos );
+
+				AnimationMgr* bam = ( AnimationMgr* )
+					core->GetInterface( IE_BAM_CLASS_ID );
+				s = core->GetResourceMgr()->GetResource( BAMFile, IE_BAM_CLASS_ID );
+				if( bam->Open( s, true ) ) {
+					img = bam->GetFrameFromCycle(0, Knob );
+					sldr->SetImage( IE_GUI_SLIDER_KNOB, img );
+					img = bam->GetFrameFromCycle(0, GrabbedKnob );
+					sldr->SetImage( IE_GUI_SLIDER_GRABBEDKNOB, img );
 				}
-				break;
+				else {
+					 sldr->SetState(IE_GUI_SLIDER_BACKGROUND);
+				}
+				core->FreeInterface( bam );
+				win->AddControl( sldr );
+			}
+			break;
 
 			case IE_GUI_EDIT:
-				 {
-					//Text Edit
-					char FontResRef[9], CursorResRef[9], BGMos[9];
-					ieWord maxInput;
-					str->Read( BGMos, 8 );
-					str->Seek( 16, GEM_CURRENT_POS );
-					str->Read( CursorResRef, 8 );
-					str->Seek( 12, GEM_CURRENT_POS );
-					str->Read( FontResRef, 8 );
-					str->Seek( 34, GEM_CURRENT_POS );
-					str->Read( &maxInput, 2 );
-					Font* fnt = core->GetFont( FontResRef );
-					AnimationFactory* af = ( AnimationFactory* )
-						core->GetResourceMgr()->GetFactoryResource( CursorResRef, IE_BAM_CLASS_ID );
-					DataStream* ds = core->GetResourceMgr()->GetResource( BGMos, IE_MOS_CLASS_ID );
-					ImageMgr* mos = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
-					mos->Open( ds, true );
-					TextEdit* te = new TextEdit( maxInput );
-					te->ControlID = ControlID;
-					te->XPos = XPos;
-					te->YPos = YPos;
-					te->Width = Width;
-					te->Height = Height;
-					te->ControlType = ControlType;
-					te->SetFont( fnt );
-					te->SetCursor( af->GetFrame( 0 ) );
-					te->SetBackGround( mos->GetImage() );
-					core->FreeInterface( mos );
-					win->AddControl( te );
-				}
-				break;
+			{
+				//Text Edit
+				ieResRef BGMos;
+				ieResRef FontResRef, CursorResRef;
+				ieWord maxInput;
+				str->ReadResRef( BGMos );
+				str->Seek( 16, GEM_CURRENT_POS );
+				str->ReadResRef( CursorResRef );
+				str->Seek( 12, GEM_CURRENT_POS );
+				str->ReadResRef( FontResRef );
+				str->Seek( 34, GEM_CURRENT_POS );
+				str->ReadWord( &maxInput );
+				Font* fnt = core->GetFont( FontResRef );
+
+				AnimationMgr* bam = ( AnimationMgr* )
+					core->GetInterface( IE_BAM_CLASS_ID );
+				DataStream* ds = core->GetResourceMgr()->GetResource( CursorResRef, IE_MOS_CLASS_ID );
+				bam->Open( ds, true );
+				Sprite2D *cursor = bam->GetFrameFromCycle( 0,0 );
+				core->FreeInterface( bam );
+
+				ImageMgr* mos = ( ImageMgr* )
+					core->GetInterface( IE_MOS_CLASS_ID );
+				ds = core->GetResourceMgr()->GetResource( BGMos, IE_MOS_CLASS_ID );
+				mos->Open( ds, true );
+				Sprite2D *img = mos->GetImage();
+				core->FreeInterface( mos );
+
+				TextEdit* te = new TextEdit( maxInput );
+				te->ControlID = ControlID;
+				te->XPos = XPos;
+				te->YPos = YPos;
+				te->Width = Width;
+				te->Height = Height;
+				te->ControlType = ControlType;
+				te->SetFont( fnt );
+				te->SetCursor( cursor );
+				te->SetBackGround( img );
+				win->AddControl( te );
+			}
+			break;
 
 			case IE_GUI_TEXTAREA:
-				 {
-					//Text Area
-					char FontResRef[9], InitResRef[9];
-					Color fore, init, back;
-					ieWord SBID;
-					str->Read( FontResRef, 8 );
-					str->Read( InitResRef, 8 );
-					Font* fnt = core->GetFont( FontResRef );
-					Font* ini = core->GetFont( InitResRef );
-					str->Read( &fore, 4 );
-					str->Read( &init, 4 );
-					str->Read( &back, 4 );
-					str->Read( &SBID, 2 );
-					/*Color f,i,b;
-									f.r = fore.r;
-									f.g = fore.g;
-									f.b = fore.b;
-									i.r = init.r;
-									i.g = init.g;
-									i.b = init.b;
-									b.r = back.r;
-									b.g = back.g;
-									b.b = back.b;*/
-					TextArea* ta = new TextArea( fore, init, back );
-					ta->ControlID = ControlID;
-					ta->XPos = XPos;
-					ta->YPos = YPos;
-					ta->Width = Width;
-					ta->Height = Height;
-					ta->ControlType = ControlType;
-					ta->SetFonts( ini, fnt );
-					win->AddControl( ta );
-					if (SBID != 0xffff)
-						win->Link( SBID, ( unsigned short ) ControlID );
-				}
-				break;
+			{
+				//Text Area
+				ieResRef FontResRef, InitResRef;
+				Color fore, init, back;
+				ieWord SBID;
+				str->ReadResRef( FontResRef );
+				str->ReadResRef( InitResRef );
+				Font* fnt = core->GetFont( FontResRef );
+				Font* ini = core->GetFont( InitResRef );
+				str->Read( &fore, 4 );
+				str->Read( &init, 4 );
+				str->Read( &back, 4 );
+				str->ReadWord( &SBID );
+				TextArea* ta = new TextArea( fore, init, back );
+				ta->ControlID = ControlID;
+				ta->XPos = XPos;
+				ta->YPos = YPos;
+				ta->Width = Width;
+				ta->Height = Height;
+				ta->ControlType = ControlType;
+				ta->SetFonts( ini, fnt );
+				win->AddControl( ta );
+				if (SBID != 0xffff)
+					win->Link( SBID, ( unsigned short ) ControlID );
+			}
+			break;
 
 			case IE_GUI_LABEL:
-				 {
-					//Label
-					char FontResRef[9];
-					ieStrRef StrRef;
-					RevColor fore, back;
-					ieWord alignment;
-					str->Read( &StrRef, 4 );
-					str->Read( FontResRef, 8 );
-					Font* fnt = core->GetFont( FontResRef );
-					str->Read( &fore, 4 );
-					str->Read( &back, 4 );
-					str->Read( &alignment, 2 );
-					Label* lab = new Label( fnt );
-					lab->ControlID = ControlID;
-					lab->XPos = XPos;
-					lab->YPos = YPos;
-					lab->Width = Width;
-					lab->Height = Height;
-					lab->ControlType = ControlType;
-					char* str = core->GetString( StrRef );
-					lab->SetText( str );
-					if (alignment & 1) {
-						lab->useRGB = true;
-						Color f, b;
-						f.r = fore.b;
-						f.g = fore.g;
-						f.b = fore.r;
-						b.r = back.b;
-						b.g = back.g;
-						b.b = back.r;
-						lab->SetColor( f, b );
-					}
-					if (( alignment & 0x10 ) != 0) {
-						lab->SetAlignment( IE_FONT_ALIGN_RIGHT );
-						goto endalign;
-					}
-					if (( alignment & 0x04 ) != 0) {
-						lab->SetAlignment( IE_FONT_ALIGN_CENTER );
-						goto endalign;
-					}
-					if (( alignment & 0x08 ) != 0) {
-						lab->SetAlignment( IE_FONT_ALIGN_LEFT );
-						goto endalign;
-					}
-					lab->SetAlignment( IE_FONT_ALIGN_CENTER );
-endalign:
-					free( str );
-					win->AddControl( lab );
+			{
+				//Label
+				ieResRef FontResRef;
+				ieStrRef StrRef;
+				RevColor fore, back;
+				ieWord alignment;
+				str->ReadDword( &StrRef );
+				str->ReadResRef( FontResRef );
+				Font* fnt = core->GetFont( FontResRef );
+				str->Read( &fore, 4 );
+				str->Read( &back, 4 );
+				str->ReadWord( &alignment );
+				Label* lab = new Label( fnt );
+				lab->ControlID = ControlID;
+				lab->XPos = XPos;
+				lab->YPos = YPos;
+				lab->Width = Width;
+				lab->Height = Height;
+				lab->ControlType = ControlType;
+				char* str = core->GetString( StrRef );
+				lab->SetText( str );
+				if (alignment & 1) {
+					lab->useRGB = true;
+					Color f, b;
+					f.r = fore.b;
+					f.g = fore.g;
+					f.b = fore.r;
+					b.r = back.b;
+					b.g = back.g;
+					b.b = back.r;
+					lab->SetColor( f, b );
 				}
-				break;
+				if (( alignment & 0x10 ) != 0) {
+					lab->SetAlignment( IE_FONT_ALIGN_RIGHT );
+					goto endalign;
+				}
+				if (( alignment & 0x04 ) != 0) {
+					lab->SetAlignment( IE_FONT_ALIGN_CENTER );
+					goto endalign;
+				}
+				if (( alignment & 0x08 ) != 0) {
+					lab->SetAlignment( IE_FONT_ALIGN_LEFT );
+					goto endalign;
+				}
+				lab->SetAlignment( IE_FONT_ALIGN_CENTER );
+endalign:
+				free( str );
+				win->AddControl( lab );
+			}
+			break;
 
 			case IE_GUI_SCROLLBAR:
-				 {
-					//ScrollBar
-					char BAMResRef[9];
-					ieWord Cycle, UpUnPressed, UpPressed, DownUnPressed,
-					DownPressed, Trough, Slider, TAID;
-					str->Read( BAMResRef, 8 );
-					BAMResRef[8] = 0;
-					str->Read( &Cycle, 2 );
-					str->Read( &UpUnPressed, 2 );
-					str->Read( &UpPressed, 2 );
-					str->Read( &DownUnPressed, 2 );
-					str->Read( &DownPressed, 2 );
-					str->Read( &Trough, 2 );
-					str->Read( &Slider, 2 );
-					str->Read( &TAID, 2 );
-					ScrollBar* sbar = new ScrollBar();
-					sbar->ControlID = ControlID;
-					sbar->XPos = XPos;
-					sbar->YPos = YPos;
-					sbar->Width = Width;
-					sbar->Height = Height;
-					sbar->ControlType = ControlType;
-					AnimationFactory* anim = ( AnimationFactory* )
-						core->GetResourceMgr()->GetFactoryResource( BAMResRef, IE_BAM_CLASS_ID );
-					Animation* an = anim->GetCycle( ( unsigned char ) Cycle );
-					sbar->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED,
-							an->GetFrame( UpUnPressed ) );
-					sbar->SetImage( IE_GUI_SCROLLBAR_UP_PRESSED,
-							an->GetFrame( UpPressed ) );
-					sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_UNPRESSED,
-							an->GetFrame( DownUnPressed ) );
-					sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_PRESSED,
-							an->GetFrame( DownPressed ) );
-					sbar->SetImage( IE_GUI_SCROLLBAR_TROUGH,
-							an->GetFrame( Trough ) );
-					sbar->SetImage( IE_GUI_SCROLLBAR_SLIDER,
-							an->GetFrame( Slider ) );
-					an->autofree = false;
-					delete( an );
-					win->AddControl( sbar );
-					if (TAID != 0xffff)
-						win->Link( ( unsigned short ) ControlID, TAID );
-				}
-				break;
+			{
+				//ScrollBar
+				ieResRef BAMResRef;
+				ieWord Cycle, Trough, Slider, TAID;
+				ieWord UpUnPressed, UpPressed;
+				ieWord DownUnPressed, DownPressed;
+
+				str->ReadResRef( BAMResRef );
+				str->ReadWord( &Cycle );
+				str->ReadWord( &UpUnPressed );
+				str->ReadWord( &UpPressed );
+				str->ReadWord( &DownUnPressed );
+				str->ReadWord( &DownPressed );
+				str->ReadWord( &Trough );
+				str->ReadWord( &Slider );
+				str->ReadWord( &TAID );
+				ScrollBar* sbar = new ScrollBar();
+				sbar->ControlID = ControlID;
+				sbar->XPos = XPos;
+				sbar->YPos = YPos;
+				sbar->Width = Width;
+				sbar->Height = Height;
+				sbar->ControlType = ControlType;
+				AnimationMgr* bam = ( AnimationMgr* )
+					core->GetInterface( IE_BAM_CLASS_ID );
+				DataStream *ds = core->GetResourceMgr()->GetResource( BAMResRef, IE_BAM_CLASS_ID);
+				bam->Open( ds, true );
+				sbar->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED,
+					bam->GetFrameFromCycle( 0, UpUnPressed ) );
+				sbar->SetImage( IE_GUI_SCROLLBAR_UP_PRESSED,
+					bam->GetFrameFromCycle( 0, UpPressed ) );
+				sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_UNPRESSED,
+					bam->GetFrameFromCycle( 0, DownUnPressed ) );
+				sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_PRESSED,
+					bam->GetFrameFromCycle( 0, DownPressed ) );
+				sbar->SetImage( IE_GUI_SCROLLBAR_TROUGH,
+					bam->GetFrameFromCycle( 0, Trough ) );
+				sbar->SetImage( IE_GUI_SCROLLBAR_SLIDER,
+					bam->GetFrameFromCycle( 0, Slider ) );
+				core->FreeInterface( bam );
+				win->AddControl( sbar );
+				if (TAID != 0xffff)
+					win->Link( ( unsigned short ) ControlID, TAID );
+			}
+			break;
 
 			default:
 				printf( "[CHUImporter]: Control Not Supported\n" );

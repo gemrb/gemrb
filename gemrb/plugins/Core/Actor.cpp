@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.69 2004/09/12 21:58:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.70 2004/10/09 15:27:22 avenger_teambg Exp $
  *
  */
 
@@ -387,6 +387,7 @@ void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
 	if (jump && !GetStat( IE_DONOTJUMP ) && anims->GetCircleSize() ) {
 		map->AdjustPosition( p, radius );
 	}
+	area = map;
 	p.x = p.x * 16 + 8;
 	p.y = p.y * 12 + 6;
 	MoveTo( p );

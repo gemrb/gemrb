@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.199 2004/10/01 20:59:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.200 2004/10/09 15:27:23 avenger_teambg Exp $
  *
  */
 
@@ -2893,25 +2893,36 @@ int GameScript::Team(Scriptable* Sender, Trigger* parameters)
 	return ID_Team( actor, parameters->int0Parameter);
 }
 
-int GameScript::ValidForDialogCore(Scriptable* Sender, Actor *target)
+static int CanSee(Scriptable* Sender, Scriptable* target)
 {
+	Map *map;
 	unsigned int range;
 
-	if (Sender->Type != ST_ACTOR) {
-		//non actors got no visual range, needs research
-		range = 20 * 20;
-	}
-	else {
+	if (Sender->Type == ST_ACTOR) {
 		Actor* snd = ( Actor* ) Sender;
 		range = snd->Modified[IE_VISUALRANGE] * 20;
+		map = snd->area; //huh, lets hope it won't crash often
 	}
-	if (Distance(target->Pos, Sender) > range) {
+	else { //no better idea atm
+		map = core->GetGame()->GetCurrentMap();
+		range = 20 * 20;
+	}
+	if( target->area!=map ) {
 		return 0;
 	}
-	Map *map = core->GetGame()->GetCurrentMap();
-	if (!map->IsVisible( Sender->Pos, target->Pos )) {
+
+	if (Distance(target->Pos, Sender->Pos) > range) {
 		return 0;
 	}
+	return map->IsVisible(target->Pos, Sender->Pos);
+}
+
+int GameScript::ValidForDialogCore(Scriptable* Sender, Actor *target)
+{
+	if (!CanSee(Sender, target) ) {
+		return 0;
+	}
+	
 	//we should rather use STATE_SPEECHLESS_MASK
 	if(target->GetStat(IE_STATE_ID)&STATE_DEAD) {
 		return 0;
@@ -3924,12 +3935,9 @@ int GameScript::SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 	if (!tar || tar->Type !=ST_ACTOR) {
 		return 0;
 	}
-	if (Distance(Sender, tar) > ( snd->Modified[IE_VISUALRANGE] * 20 )) {
-		return 0;
-	}
-	Map *map = core->GetGame()->GetCurrentMap();
-	if (map->IsVisible( Sender->Pos, tar->Pos )) {
-		if(justlos) {
+	//both are actors
+	if (CanSee(Sender, tar) ) {
+		if (justlos) {
 			return 1;
 		}
 		//additional checks for invisibility?

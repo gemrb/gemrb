@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.12 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.13 2004/10/09 15:27:23 avenger_teambg Exp $
  *
  */
 
@@ -196,15 +196,6 @@ closedir(dir);  //No other files in the directory, close it
 
 PluginMgr::~PluginMgr(void)
 {
-/* apparently this isn't good
-	unsigned int i=plugins.size();
-	while(i--) {
-		if(plugins[i]) {
-			delete plugins[i];
-			plugins[i] = NULL;
-		}
-	}
-*/
 }
 
 bool PluginMgr::IsAvailable(SClass_ID plugintype)
@@ -219,12 +210,20 @@ bool PluginMgr::IsAvailable(SClass_ID plugintype)
 
 void* PluginMgr::GetPlugin(SClass_ID plugintype)
 {
+	int plugs = plugins.size();
+	while (plugs--) {
+		if (plugins[plugs]->SuperClassID() == plugintype) {
+			return ( plugins[plugs] )->Create();
+		}
+	}
+/*
 	std::vector< ClassDesc*>::iterator plugs;
 	for (plugs = plugins.begin(); plugs != plugins.end(); ++plugs) {
 		if (( *plugs )->SuperClassID() == plugintype) {
 			return ( *plugs )->Create();
 		}
 	}
+*/
 	return NULL;
 }
 
