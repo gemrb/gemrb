@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.223 2005/02/02 17:29:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.224 2005/02/10 22:40:54 avenger_teambg Exp $
  *
  */
 
@@ -751,20 +751,20 @@ static void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 	}
 }
 
-static void FreeSrc(SrcVector *poi)
+static void FreeSrc(SrcVector *poi, ieResRef key)
 {
-	if( SrcCache.DecRef((void *) poi, false) <0) {
+	if( SrcCache.DecRef((void *) poi, key, false) <0) {
 		printMessage( "GameScript", "Corrupted Src cache encountered (reference count went below zero)", WHITE );
-                abort();
+		abort();
 	}
 }
 
 static SrcVector *LoadSrc(ieResRef resname)
 {
-        SrcVector *src = (SrcVector *) SrcCache.GetResource(resname);
-        if (src) {
-                return src;
-        }
+	SrcVector *src = (SrcVector *) SrcCache.GetResource(resname);
+	if (src) {
+		return src;
+	}
 	DataStream* str = core->GetResourceMgr()->GetResource( resname, IE_SRC_CLASS_ID );
 	if( !str) {
 		return NULL;
@@ -6008,7 +6008,7 @@ void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 
 	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
 	DisplayStringCore(target, rndstr->at(rand()%rndstr->size()), DS_CONSOLE|DS_HEAD);
-	FreeSrc(rndstr);
+	FreeSrc(rndstr, parameters->string0Parameter);
 }
 
 void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
@@ -6021,7 +6021,7 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 
 	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
 	DisplayStringCore(target, rndstr->at(rand()%rndstr->size()), DS_CONSOLE|DS_HEAD);
-	FreeSrc(rndstr);
+	FreeSrc(rndstr, parameters->string0Parameter);
 }
 
 void GameScript::DisplayString(Scriptable* Sender, Action* parameters)

@@ -15,131 +15,266 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.4 2005/02/09 19:54:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.5 2005/02/10 22:40:54 avenger_teambg Exp $
  *
  */
 
 #include "Cache.h"
 
 // private inlines
-inline bool Cache::MyCopyKey(char*& dest, ieResRef key) const
+inline unsigned int Cache::MyHashKey(const char* key) const
 {
-	unsigned int i, j;
-
-	//use j
-	for (i = 0,j = 0; key[i] && j < sizeof(ieResRef) - 1; i++)
-		if (key[i] != ' ') {
-			j++;
-		}
-	dest = new char[j + 1];
-	if (!dest) {
-		return false;
+	int nHash = key[0];
+	for(int i=1;(i<KEYSIZE) && key[i];i++) {
+		nHash = (nHash << 5) ^ key[i];
 	}
-	for (i = 0,j = 0; key[i] && j < sizeof(ieResRef) - 1; i++) {
-		if (key[i] != ' ') {
-			dest[j++] = toupper( key[i] );
-		}
-	}
-	dest[j] = 0;
-	return true;
+	return nHash % m_nHashTableSize;
 }
 
-Cache::Cache()
+Cache::Cache(int nBlockSize, int nHashTableSize)
 {
+	MYASSERT( nBlockSize > 0 );
+	MYASSERT( nHashTableSize > 16 );
+
+	m_pHashTable = NULL;
+	m_nHashTableSize = nHashTableSize;  // default size
+	m_nCount = 0;
+	m_pFreeList = NULL;
+	m_pBlocks = NULL;
+	m_nBlockSize = nBlockSize;
+}
+
+void Cache::InitHashTable(unsigned int nHashSize, bool bAllocNow)
+	//Used to force allocation of a hash table or to override the default
+	//hash table size of (which is fairly small)
+{
+	MYASSERT( m_nCount == 0 );
+	MYASSERT( nHashSize > 16 );
+
+	if (m_pHashTable != NULL) {
+		// free hash table
+		free( m_pHashTable);
+		m_pHashTable = NULL;
+	}
+
+	if (bAllocNow) {
+		m_pHashTable = (Cache::MyAssoc **) malloc( sizeof( Cache::MyAssoc * ) * nHashSize );
+		memset( m_pHashTable, 0, sizeof( Cache::MyAssoc * ) * nHashSize );
+	}
+	m_nHashTableSize = nHashSize;
 }
 
 void Cache::RemoveAll()
 {
-/*
-	HashMapType::iterator m=hashmap.begin();
+	//removed the part about freeing values/keys
+	//because the complete value/key pair is stored in the
+	//node which is freed in the memblocks
 
-	while(m!=hashmap.end() ) {
-		delete (*m).second.data;
-		m++;
+	// free hash table
+	free( m_pHashTable );
+	m_pHashTable = NULL;
+
+	m_nCount = 0;
+	m_pFreeList = NULL;
+
+	// free memory blocks
+	MemBlock* p = m_pBlocks;
+	while (p != NULL) {
+		MemBlock* pNext = p->pNext;
+		free( p );
+		p = pNext;
 	}
-*/
-	hashmap.clear();
+
+	m_pBlocks = NULL;
 }
 
 Cache::~Cache()
 {
 	RemoveAll();
-	MYASSERT( IsEmpty() );
 }
  
-void *Cache::GetResource(ieResRef key)
+Cache::MyAssoc* Cache::NewAssoc()
 {
-	HashMapType::iterator m;
+	if (m_pFreeList == NULL) {
+		// add another block
+		Cache::MemBlock* newBlock = ( Cache::MemBlock* ) malloc(m_nBlockSize * sizeof( Cache::MyAssoc ) + sizeof( Cache::MemBlock ));
+		MYASSERT( newBlock != NULL );  // we must have something
 
-	m=hashmap.find(key);
-	if (m == hashmap.end()) {
+		newBlock->pNext = m_pBlocks;
+		m_pBlocks = newBlock;
+
+		// chain them into free list
+		Cache::MyAssoc* pAssoc = ( Cache::MyAssoc* )
+			( newBlock + 1 );		
+		for (int i = 0; i < m_nBlockSize; i++) {
+			pAssoc->pNext = m_pFreeList;
+			m_pFreeList = pAssoc++;
+		}
+	}
+	
+	Cache::MyAssoc* pAssoc = m_pFreeList;
+	m_pFreeList = m_pFreeList->pNext;
+	m_nCount++;
+	MYASSERT( m_nCount > 0 );  // make sure we don't overflow
+#ifdef _DEBUG
+	pAssoc->key[0] = 0;
+	pAssoc->data = 0;
+#endif
+	pAssoc->nRefCount=1;
+	return pAssoc;
+}
+
+void Cache::FreeAssoc(Cache::MyAssoc* pAssoc)
+{
+	pAssoc->pNext = m_pFreeList;
+	m_pFreeList = pAssoc;
+	m_nCount--;
+	MYASSERT( m_nCount >= 0 );  // make sure we don't underflow
+
+	// if no more elements, cleanup completely
+	if (m_nCount == 0) {
+		RemoveAll();
+	}
+}
+
+Cache::MyAssoc *Cache::GetNextAssoc(Cache::MyAssoc *Position) const
+{
+	if(m_pHashTable == NULL || m_nCount==0) {
 		return NULL;
 	}
-	(*m).second.nRefCount++;
-	return (*m).second.data;
+
+	Cache::MyAssoc* pAssocRet = (Cache::MyAssoc*)Position;
+
+	if (pAssocRet == NULL)
+	{
+		// find the first association
+		for (unsigned int nBucket = 0; nBucket < m_nHashTableSize; nBucket++)
+			if ((pAssocRet = m_pHashTable[nBucket]) != NULL)
+				break;
+		return pAssocRet;
+	}
+	Cache::MyAssoc* pAssocNext = pAssocRet->pNext;
+	if (pAssocNext == NULL)
+	{
+		// go to next bucket
+		for (unsigned int nBucket = MyHashKey(pAssocRet->key) + 1;
+			nBucket < m_nHashTableSize; nBucket++)
+			if ((pAssocNext = m_pHashTable[nBucket]) != NULL)
+				break;
+	}
+
+	return pAssocNext;
+}
+
+Cache::MyAssoc* Cache::GetAssocAt(const ieResRef key) const
+	// find association (or return NULL)
+{
+	if (m_pHashTable == NULL) {
+		return NULL;
+	}
+
+	unsigned int nHash = MyHashKey( key );
+
+	// see if it exists
+	Cache::MyAssoc* pAssoc;
+	for (pAssoc = m_pHashTable[nHash];
+		pAssoc != NULL;
+		pAssoc = pAssoc->pNext) {
+		if (!strnicmp( pAssoc->key, key, KEYSIZE )) {
+			return pAssoc;
+		}
+	}
+	return NULL;
+}
+
+void *Cache::GetResource(ieResRef key)
+{
+	Cache::MyAssoc* pAssoc = GetAssocAt( key );
+	if (pAssoc == NULL) {
+		return false;
+	}  // not in map
+
+	pAssoc->nRefCount++;
+	return pAssoc->data;
 }
 
 //returns true if it was successful
 bool Cache::SetAt(ieResRef key, void *rValue)
 {
-	HashMapType::iterator m;
+	int i;
 
-	m=hashmap.find(key);
-	if (m!=hashmap.end()) {
-		return (*m).second.data==rValue;
+	if (m_pHashTable == NULL) {
+		InitHashTable( m_nHashTableSize );
 	}
-	//this creates a new element
-	ValueType *ret=&hashmap[key];
-	ret->data=rValue;
-	ret->nRefCount=1;
+
+	Cache::MyAssoc* pAssoc=GetAssocAt( key );
+	
+	if (pAssoc) {
+		//already exists, but we return true if it is the same
+		return (pAssoc->data==rValue); 
+	}
+
+	// it doesn't exist, add a new Association
+	pAssoc = NewAssoc();
+	for(i=0;i<KEYSIZE && key[i];i++) {
+		pAssoc->key[i]=toupper(key[i]);
+	}
+	for(;i<KEYSIZE;i++) {
+		pAssoc->key[i]=0;
+	}
+	pAssoc->data=rValue;
+	// put into hash table
+	unsigned int nHash = MyHashKey(pAssoc->key);
+	pAssoc->pNext = m_pHashTable[nHash];
+	m_pHashTable[nHash] = pAssoc;
 	return true;
 }
 
-//returns RefCount we still have
-int Cache::DecRef(ieResRef key, bool remove)
+int Cache::DecRef(void *data, ieResRef key, bool remove)
 {
-	HashMapType::iterator m;
+	Cache::MyAssoc* pAssoc;
 
-	m=hashmap.find(key);
-	if (m == hashmap.end()) {
+	if (key) {
+		pAssoc=GetAssocAt( key );
+		if(pAssoc->data==data) {
+			if (remove) {
+				FreeAssoc(pAssoc);
+				return 0;
+			}
+			if (pAssoc->nRefCount) {
+				return --pAssoc->nRefCount;
+			}
+		}
 		return -1;
 	}
 
-	if (remove) {
-		hashmap.erase(m);
-		return 0;
-	}
-	if ((*m).second.nRefCount) {
-		return --(*m).second.nRefCount;
-	}
-	return -1;
-}
+	pAssoc=(Cache::MyAssoc *) GetNextAssoc(NULL);
 
-int Cache::DecRef(void *data, bool remove)
-{
-	HashMapType::iterator m;
-
-	for (m = hashmap.begin(); m != hashmap.end(); ++m) {
-		if((*m).second.data == data) {
+	while(pAssoc) {
+		if(pAssoc->data == data) {
 			if (remove) {
-				hashmap.erase(m);
+				FreeAssoc(pAssoc);
 				return 0;
 			}
-			if ((*m).second.nRefCount) {
-				return --(*m).second.nRefCount;
+			if (pAssoc->nRefCount) {
+				return --pAssoc->nRefCount;
 			}
+			return -1;
 		}
+		pAssoc=GetNextAssoc(pAssoc);
 	}
 	return -1;
 }
 
 void Cache::Cleanup()
 {
-	HashMapType::iterator m;
+	Cache::MyAssoc* pAssoc=(Cache::MyAssoc *) GetNextAssoc(NULL);
 
-	for (m = hashmap.begin(); m != hashmap.end(); ++m) {
-		if(!(*m).second.nRefCount) {
-			hashmap.erase(m);
+	while(pAssoc)
+	{
+		if(pAssoc->nRefCount == 0) {
+			FreeAssoc(pAssoc);
 		}
+		pAssoc=GetNextAssoc(pAssoc);
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.40 2005/02/09 21:19:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.41 2005/02/10 22:41:03 avenger_teambg Exp $
  *
  */
 
@@ -76,7 +76,7 @@ void Inventory::CalculateWeight()
 					slot->Weight = itm->Weight;
 					slot->StackAmount = itm->StackAmount;
 				}
-				core->FreeItem( itm, false );
+				core->FreeItem( itm, slot->ItemResRef, false );
 			}
 		}
 		if (slot->Weight > 0) {

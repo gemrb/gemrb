@@ -49,12 +49,16 @@ struct __POSITION {
 typedef __POSITION* POSITION;
 #define BEFORE_START_POSITION ((POSITION)-1L)
 
+#ifdef _DEBUG
 #define MYASSERT(f) \
   if(!(f))  \
   {  \
   printf("Assertion failed: %s %d",#f, __LINE__); \
 				abort(); \
   }
+#else
+#define MYASSERT(f) 
+#endif
 
 #ifdef ADV_TEXT
 

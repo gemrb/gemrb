@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.254 2005/02/07 19:58:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.255 2005/02/10 22:41:02 avenger_teambg Exp $
  *
  */
 
@@ -1382,7 +1382,7 @@ bool Interface::LoadWindowPack(const char* name)
 /** Loads a Window in the Window Manager */
 int Interface::LoadWindow(unsigned short WindowID)
 {
-  unsigned int i;
+	unsigned int i;
 
 	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == NULL)
@@ -1420,7 +1420,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 /** Creates a Window in the Window Manager */
 int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigned int Width, unsigned int Height, char* Background)
 {
-  unsigned int i;
+	unsigned int i;
 
 	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == NULL)
@@ -2107,7 +2107,7 @@ void Interface::SetCutSceneMode(bool active)
 
 bool Interface::InCutSceneMode()
 {
-       return video->DisableMouse;
+	return video->DisableMouse;
 }
 
 void Interface::QuitGame(bool BackToMain)
@@ -2630,11 +2630,12 @@ Item* Interface::GetItem(ieResRef resname)
 	return item;
 }
 
-void Interface::FreeItem(Item *itm, bool free)
+//you can supply name for faster access
+void Interface::FreeItem(Item *itm, ieResRef name, bool free)
 {
 	int res;
 
-	res=ItemCache.DecRef((void *) itm, free);
+	res=ItemCache.DecRef((void *) itm, name, free);
 	if (res<0) {
 		printMessage( "Core", "Corrupted Item cache encountered (reference count went below zero)", WHITE );
 		abort();
@@ -2671,11 +2672,11 @@ Spell* Interface::GetSpell(ieResRef resname)
 	return spell;
 }
 
-void Interface::FreeSpell(Spell *spl, bool free)
+void Interface::FreeSpell(Spell *spl, ieResRef name, bool free)
 {
 	int res;
 
-	res=SpellCache.DecRef((void *) spl, free);
+	res=SpellCache.DecRef((void *) spl, name, free);
 	if (res<0) {
 		printMessage( "Core", "Corrupted Spell cache encountered (reference count went below zero)", WHITE );
 		abort();

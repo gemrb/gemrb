@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.133 2005/02/06 11:04:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.134 2005/02/10 22:41:03 avenger_teambg Exp $
  *
  */
 
@@ -384,9 +384,9 @@ public:
 	CREItem *ReadItem(DataStream *str);
 	bool ResolveRandomItem(CREItem *itm);
 	Item* GetItem(ieResRef resname);
-	void FreeItem(Item *itm, bool free=false);
+	void FreeItem(Item *itm, ieResRef name, bool free=false);
 	Spell* GetSpell(ieResRef resname);
-	void FreeSpell(Spell *spl, bool free=false);
+	void FreeSpell(Spell *spl, ieResRef name, bool free=false);
 	//due to Win32 we have to allocate all common memory from interface
 	ITMExtHeader *GetITMExt(int count);
 	SPLExtHeader *GetSPLExt(int count);
@@ -439,12 +439,12 @@ public:
 	/** CheatKey support */
 	void EnableCheatKeys(int Flag)
 	{
-        	CheatFlag=(Flag > 0);
+		CheatFlag=(Flag > 0);
 	}
 
 	bool CheatEnabled()
 	{
-        	return CheatFlag;
+		return CheatFlag;
 	}
 
 	/** Next Script Name */

@@ -15,97 +15,80 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.3 2005/01/27 17:27:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.4 2005/02/10 22:40:54 avenger_teambg Exp $
  *
  */
 
 #ifndef CACHE_H
 #define CACHE_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 #include <ctype.h>
-#ifdef WIN32
-#include <MAP>
-#else
-#include <ext/hash_map>
-#endif
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
-#include "../../includes/SClassID.h"
+/////////////////////////////////////////////////////////////////////////////
+// Cache<ieResRef, void*>
 
-#ifndef SGI_HASH_NAMESPACE
-#if defined(__SGI_STL_HASH_MAP) || defined(_STLP_HASH_MAP)
-#define SGI_HASH_NAMESPACE std
-#elif defined(__SGI_STL_INTERNAL_HASH_MAP_H) || defined(_HASH_MAP)
-#define SGI_HASH_NAMESPACE __gnu_cxx
-#endif
-#endif // SGI_HASH_NAMESPACE
-#ifdef WIN32
+#define KEYSIZE 8
 
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
-
-class GEM_EXPORT Cache {
+class Cache
+{
 protected:
-        struct ValueType {
-                ieDword nRefCount;
-                void* data; 
-        } Value;
-
-        struct eqstr
-        {
-                bool operator()(const char* s1, const char* s2) const
-                {
-                        return !strnicmp( s1, s2, MAX_VARIABLE_LENGTH );
-                }
-        };
-        inline bool MyCopyKey(char*& dest, ieResRef key) const;
-#ifdef WIN32
-        typedef std::map<const char*, ValueType, eqstr> HashMapType;
-#else
-        typedef SGI_HASH_NAMESPACE::hash_map<const char*, ValueType, SGI_HASH_NAMESPACE::hash<const char *>, eqstr> HashMapType;
-#endif
-        HashMapType hashmap;
+	// Association
+	struct MyAssoc {
+		MyAssoc* pNext;
+		char key[KEYSIZE]; //not ieResRef!
+		ieDword nRefCount;
+		void* data;
+	};
+	struct MemBlock {
+		MemBlock* pNext;
+	};
 
 public:
-        // Construction
-        Cache();
-	~Cache();
+	// Construction
+	Cache(int nBlockSize = 10, int nHashTableSize = 129);
 
-        inline int GetCount() const
-        {
-                return hashmap.size();
-        }
-        inline bool IsEmpty() const
-        {
-                return hashmap.empty();
-        }
-        inline POSITION GetStartPosition() const
-        {
-                return ( IsEmpty() ) ? NULL : BEFORE_START_POSITION;
-        }
-        // Operations
-	// returns pointer if resource is already loaded
-        void *GetResource(ieResRef key);
-	// sets resource, returns true if it didn't exist before
+	// Attributes
+	// number of elements
+	inline int GetCount() const
+	{
+		return m_nCount;
+	}
+	inline bool IsEmpty() const
+	{
+		return m_nCount==0;
+	}
+	// Lookup
+	//	bool Lookup(const ieResRef key, unsigned int type, unsigned long& rValue) const;
+	void *GetResource(ieResRef key);
+	// Operations
+	//void SetAt(const ieResRef key, unsigned int type, unsigned long newValue);
 	bool SetAt(ieResRef key, void *rValue);
-	// decreases refcount or drops data pointed by key
-	int DecRef(ieResRef key, bool free);
+	//void RemoveAt(const ieResRef key, unsigned int type);
 	// decreases refcount or drops data
-	int DecRef(void *rValue, bool free);
-	// frees all
-	void RemoveAll();
-	// cleans up zero refcount
-	void Cleanup(); //removes only zero refcounts
+	//if name is supplied it is faster, it will use rValue to validate the request
+	int DecRef(void *rValue, ieResRef name, bool free);
+	void RemoveAll();//removes all refcounts (doesn't clear referenced data!)
+	void Cleanup();  //removes only zero refcounts
+	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
+
+	// Implementation
+protected:
+	MyAssoc** m_pHashTable;
+	unsigned int m_nHashTableSize;
+	int m_nCount;
+	MyAssoc* m_pFreeList;
+	MemBlock* m_pBlocks;
+	int m_nBlockSize;
+
+	Cache::MyAssoc* NewAssoc();
+	void FreeAssoc(Cache::MyAssoc*);
+	Cache::MyAssoc* GetAssocAt(const ieResRef) const;
+	Cache::MyAssoc *GetNextAssoc(Cache::MyAssoc * rNextPosition) const;
+	unsigned int MyHashKey(const ieResRef) const;
+
+public:
+	~Cache();
 };
 
 #endif //CACHE_H

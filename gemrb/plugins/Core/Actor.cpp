@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.80 2005/02/09 21:19:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.81 2005/02/10 22:40:54 avenger_teambg Exp $
  *
  */
 
@@ -538,8 +538,10 @@ int Actor::GetWeaponRange()
 	}
 	ITMExtHeader * which = item->GetExtHeader(0);
 	if (!which) {
+		core->FreeItem(item, wield->ItemResRef, false);
 		return 0;
 	}
+	core->FreeItem(item, wield ->ItemResRef, false);
 	return which->Range;
 }
 

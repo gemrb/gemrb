@@ -1,4 +1,4 @@
-/* $Id: mve_play.cpp,v 1.11 2004/10/17 17:06:15 avenger_teambg Exp $ */
+/* $Id: mve_play.cpp,v 1.12 2005/02/10 22:41:06 avenger_teambg Exp $ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -490,7 +490,7 @@ static int create_videobuf_handler(unsigned char /*major*/, unsigned char minor,
 
 	memset( g_vBackBuf1, 0, g_width * g_height * 4 );
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	fprintf( stderr, "DEBUG: w,h=%d,%d count=%d, tc=%d\n", w, h, count,
 		truecolor );
 #endif

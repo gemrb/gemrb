@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.27 2005/02/09 19:54:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.28 2005/02/10 22:41:03 avenger_teambg Exp $
  *
  */
 
@@ -73,15 +73,14 @@ inline unsigned int Variables::MyHashKey(const char* key) const
 }
 /////////////////////////////////////////////////////////////////////////////
 // functions
-void Variables::GetNextAssoc(POSITION& rNextPosition, const char*& rKey,
+POSITION Variables::GetNextAssoc(POSITION rNextPosition, const char*& rKey,
 	ieDword& rValue) const
 {
 	MYASSERT( m_pHashTable != NULL );  // never call on empty map
 
 	Variables::MyAssoc* pAssocRet = ( Variables::MyAssoc* ) rNextPosition;
-	MYASSERT( pAssocRet != NULL );
 
-	if (pAssocRet == ( Variables::MyAssoc * ) BEFORE_START_POSITION) {
+	if (pAssocRet == NULL) {
 		// find the first association
 		for (unsigned int nBucket = 0; nBucket < m_nHashTableSize; nBucket++)
 			if (( pAssocRet = m_pHashTable[nBucket] ) != NULL)
@@ -98,11 +97,10 @@ void Variables::GetNextAssoc(POSITION& rNextPosition, const char*& rKey,
 				break;
 	}
 
-	rNextPosition = ( POSITION ) pAssocNext;
-
 	// fill in return data
 	rKey = pAssocRet->key;
 	rValue = pAssocRet->Value.nValue;
+	return ( POSITION ) pAssocNext;
 }
 
 Variables::Variables(int nBlockSize, int nHashTableSize)
@@ -123,7 +121,7 @@ Variables::Variables(int nBlockSize, int nHashTableSize)
 void Variables::InitHashTable(unsigned int nHashSize, bool bAllocNow)
 	//
 	// Used to force allocation of a hash table or to override the default
-	//   hash table size of (which is fairly small)
+	// hash table size of (which is fairly small)
 {
 	MYASSERT( m_nCount == 0 );
 	MYASSERT( nHashSize > 16 );
@@ -195,8 +193,6 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 
 		// chain them into free list
 		Variables::MyAssoc* pAssoc = ( Variables::MyAssoc* ) ( newBlock + 1 );
-		// free in reverse order to make it easier to debug
-		//pAssoc += m_nBlockSize - 1;
 		for (int i = 0; i < m_nBlockSize; i++) {
 			pAssoc->pNext = m_pFreeList;
 			m_pFreeList = pAssoc++;
@@ -206,7 +202,7 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 	Variables::MyAssoc* pAssoc = m_pFreeList;
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
-	MYASSERT( m_nCount > 0 );    // make sure we don't overflow
+	MYASSERT( m_nCount > 0 );  // make sure we don't overflow
 	if (m_lParseKey) {
 		MyCopyKey( pAssoc->key, key );
 	} else {
@@ -218,8 +214,8 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 			pAssoc->key[len] = 0;
 		}
 	}
-#ifdef DEBUG
-	pAssoc->Value.nValue = 0xcccccccc;  //invalid value
+#ifdef _DEBUG
+	pAssoc->Value.nValue = 0xcccccccc; //invalid value
 	pAssoc->nHashValue = 0xcccccccc; //invalid value
 #endif
 	return pAssoc;
@@ -234,7 +230,7 @@ void Variables::FreeAssoc(Variables::MyAssoc* pAssoc)
 	pAssoc->pNext = m_pFreeList;
 	m_pFreeList = pAssoc;
 	m_nCount--;
-	MYASSERT( m_nCount >= 0 );  // make sure we don't underflow
+	MYASSERT( m_nCount >= 0 ); // make sure we don't underflow
 
 	// if no more elements, cleanup completely
 	if (m_nCount == 0) {

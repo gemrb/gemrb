@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.266 2005/02/06 11:07:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.267 2005/02/10 22:41:05 avenger_teambg Exp $
  *
  */
 
@@ -121,7 +121,7 @@ inline Control *GetControl( int wi, int ci, int ct)
 }
 
 // Return single BAM frame as a sprite. Use if you want one frame only,
-//    otherwise it's not efficient
+// otherwise it's not efficient
 
 inline Sprite2D* GetBAMSprite(ieResRef ResRef, int cycle, int frame)
 {
@@ -382,7 +382,7 @@ PyDoc_STRVAR( GemRB_GetString__doc,
 
 static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 {
-	ieStrRef  strref;
+	ieStrRef strref;
 
 	if (!PyArg_ParseTuple( args, "i", &strref )) {
 		return AttributeError( GemRB_GetString__doc );
@@ -1578,7 +1578,7 @@ static PyObject* GemRB_SetButtonTextColor(PyObject * /*self*/, PyObject* args)
 	Color fore = {r,g, b, 0}, back = {0, 0, 0, 0};
 
 	// FIXME: swap is a hack for fonts which apparently have swapped f & B
-	//   clors. Maybe it depends on need_palette?
+	// colors. Maybe it depends on need_palette?
 	if (! swap) 
 		but->SetTextColor( fore, back );
 	else
@@ -2314,7 +2314,7 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetToken__doc );
 	}
 /* SetAtCopy does this trick now
-	char* newvalue = ( char* ) malloc( strlen( value ) + 1 );  //duplicating the string
+	char* newvalue = ( char* ) malloc( strlen( value ) + 1 ); //duplicating the string
 	strcpy( newvalue, value );
 	core->GetTokenDictionary()->SetAt( Variable, newvalue );
 */
@@ -2763,7 +2763,7 @@ static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 	int count = 0;
 	for (int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
 		GAMJournalEntry* je = core->GetGame()->GetJournalEntry( i );
-		//printf ("JE: sec: %d;   text: %d, time: %d, chapter: %d, un09: %d, un0b: %d\n", je->Section, je->Text, je->GameTime, je->Chapter, je->unknown09, je->unknown0B);
+		//printf ("JE: sec: %d; text: %d, time: %d, chapter: %d, un09: %d, un0b: %d\n", je->Section, je->Text, je->GameTime, je->Chapter, je->unknown09, je->unknown0B);
 		if ((section == je->Section) && (chapter==je->Chapter) )
 			count++;
 	}
@@ -3032,13 +3032,13 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 		}
 		
 		Spell* spell = core->GetSpell(ps->FavouriteSpells[largest]);
-		if (spell == NULL) {      
+		if (spell == NULL) {
 			return NULL;
 		}
 
 		PyDict_SetItemString(dict, "FavouriteSpell", PyInt_FromLong (spell->SpellName));
 
-		core->FreeSpell( spell, false );
+		core->FreeSpell( spell, ps->FavouriteSpells[largest], false );
 	} else {
 		PyDict_SetItemString(dict, "FavouriteSpell", PyString_FromString (""));
 	}
@@ -3062,7 +3062,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->GetItemName(false)));
 
-		core->FreeItem( item, false );
+		core->FreeItem( item, ps->FavouriteWeapons[largest], false );
 	} else {
 		PyDict_SetItemString(dict, "FavouriteWeapon", PyString_FromString (""));
 	}
@@ -3344,7 +3344,7 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 		btn->SetImage( IE_GUI_BUTTON_SELECTED, bam->GetFrameFromCycle(0, 2));
 		btn->SetImage( IE_GUI_BUTTON_DISABLED, bam->GetFrameFromCycle(0, 3));
 	}
-	core->FreeSpell( spell, false );
+	core->FreeSpell( spell, SpellResRef, false );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3383,7 +3383,7 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 		else {
 			btn->SetPicture(NULL);
 		}
-		core->FreeItem( item, false );
+		core->FreeItem( item, ItemResRef, false );
 	} else {
 		btn->SetPicture( NULL );
 	}
@@ -3739,7 +3739,7 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "SpellbookIcon", PyString_FromResRef (spell->SpellbookIcon));
 	PyDict_SetItemString(dict, "SpellSchool", PyInt_FromLong (spell->ExclusionSchool)); //this will list school exclusions and alignment
 	PyDict_SetItemString(dict, "SpellDivine", PyInt_FromLong (spell->PriestType)); //this will tell apart a priest spell from a druid spell
-	core->FreeSpell( spell, false );
+	core->FreeSpell( spell, ResRef, false );
 	return dict;
 }
 
@@ -3902,7 +3902,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		default:;
 	}
 	PyDict_SetItemString(dict, "Function", PyInt_FromLong(function));
-	core->FreeItem( item, false );
+	core->FreeItem( item, ResRef, false );
 	return dict;
 }
 

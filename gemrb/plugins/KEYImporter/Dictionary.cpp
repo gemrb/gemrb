@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.14 2005/02/09 16:29:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.15 2005/02/10 22:41:06 avenger_teambg Exp $
  *
  */
 
@@ -131,8 +131,10 @@ Dictionary::MyAssoc* Dictionary::NewAssoc()
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
 	MYASSERT( m_nCount > 0 );  // make sure we don't overflow
+#ifdef _DEBUG
 	pAssoc->key[0] = 0;
 	pAssoc->value = 0xcccccccc;
+#endif
 	return pAssoc;
 }
 
