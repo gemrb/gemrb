@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.46 2003/12/19 20:20:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.47 2003/12/20 15:56:44 balrog994 Exp $
  *
  */
 
@@ -658,13 +658,15 @@ void SDLVideoDriver::BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode,
 	unsigned char * src, *dst;
 
 	for(int y = srect->y; y < srect->h; y++) {
-		if((desty < 0) || (desty > core->Height))
+		if((desty < 0) || (desty >= core->Height)) {
+			desty++;
 			continue;
+		}
 		destx = drect.x; 
 		src = ((unsigned char*)spr->pixels)+(y*surf->pitch);
 		dst = ((unsigned char *)backBuf->pixels)+(desty*backBuf->pitch)+(destx*backBuf->format->BytesPerPixel);
 		for(int x = srect->x; x < srect->w; x++) {
-			if((destx < 0) || (destx > core->Width)) {
+			if((destx < 0) || (destx >= core->Width)) {
 				src++;
 				destx++;
 				dst+=4;
@@ -822,7 +824,7 @@ void SDLVideoDriver::DrawRect(Region &rgn, Color &color){
 }
 void SDLVideoDriver::SetPixel(short x, short y, Color &color)
 {
-	if((x > disp->w) || (y > disp->h))
+	if((x >= disp->w) || (y >= disp->h))
 		return;
 	if((x < 0) || (y < 0))
 		return;
