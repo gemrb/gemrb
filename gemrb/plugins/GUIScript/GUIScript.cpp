@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.140 2004/03/20 23:02:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.141 2004/03/21 12:54:56 avenger_teambg Exp $
  *
  */
 
@@ -1891,6 +1891,36 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "l", value );
 }
 
+static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
+{
+	char* Variable;
+	char* Context;
+
+	if (!PyArg_ParseTuple( args, "ss", &Variable, &Context )) {
+		printMessage( "GUIScript", "Syntax Error: CheckVar(VariableName, Context)\n",
+			LIGHT_RED );
+		return NULL;
+	}
+	GameControl *gc = core->GetGameControl();
+	if(!gc) {
+		printMessage("GUIScript","No Game!\n", LIGHT_RED);
+		return NULL;
+	}
+	Scriptable *Sender = (Scriptable *) gc->GetLastActor();
+	if(!Sender) {
+		Sender = (Scriptable *) core->GetGame()->GetCurrentMap();
+	}
+	if(!Sender) {
+		printMessage("GUIScript","No Game!\n", LIGHT_RED);
+		return NULL;
+	}
+printf("a\n");
+	long value =(long) GameScript::CheckVariable(Sender, Variable, Context);
+printf("b\n");
+	printf("%s %s=%d\n",Context, Variable, value);
+	return Py_BuildValue( "l", value );
+}
+
 static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 {
 	char* Variable;
@@ -2901,9 +2931,11 @@ static PyMethodDef GemRBMethods[] = {
 	{"GetToken", GemRB_GetToken, METH_VARARGS,
 	"Get a Variable value from the Token Dictionary."},
 	{"SetToken", GemRB_SetToken, METH_VARARGS,
-	"Set/Create a Variable in the Token Dictionary."},
+	"Set/Create a Global Variable."},
 	{"GetGameVar", GemRB_GetGameVar, METH_VARARGS,
 	"Get a Variable value from the Game Global Dictionary."},
+	{"CheckVar", GemRB_CheckVar, METH_VARARGS,
+	"Display the value of a Game Variable."},
 	{"PlayMovie", GemRB_PlayMovie, METH_VARARGS,
 	"Starts the Movie Player."},
 	{"Roll", GemRB_Roll, METH_VARARGS,
