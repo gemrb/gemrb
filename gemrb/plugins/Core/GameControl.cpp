@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.153 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.154 2004/07/31 22:34:02 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -110,7 +110,15 @@ GameControl::GameControl(void)
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
 	effect = NULL;
-	ScreenFlags = 0;
+	unsigned long tmp=0;
+
+	core->GetDictionary()->Lookup("Center",tmp);
+	if(tmp) {
+		ScreenFlags=SF_ALWAYSCENTER;
+	}
+	else {
+		ScreenFlags = 0;
+	}
 	LeftCount = 0;
 	BottomCount = 0;
 	RightCount = 0;
@@ -161,7 +169,7 @@ void GameControl::MoveToPointFormation(Actor *actor, int GameX, int GameY)
 	char Tmp[256];
 
 	int formation=core->GetGame()->WhichFormation;
-	pos=actor->InParty-1; //either this or the actual cycle counter?
+	pos=actor->InParty-1; //either this or the actual # of selected actor?
 	if(pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
 	GameX+=formations[formation][pos].x*30;
 	GameY+=formations[formation][pos].y*30;
@@ -379,6 +387,7 @@ void GameControl::DeselectAll()
 
 void GameControl::SelectActor(int whom)
 {
+	ScreenFlags|=SF_CENTERONACTOR;
 	DeselectAll();
 	Game* game = core->GetGame();
 	if(whom==-1) {
@@ -1564,8 +1573,13 @@ void GameControl::ChangeMap()
 	}
 	//center on first selected actor
 	Region vp = core->GetVideoDriver()->GetViewport();
-	core->GetVideoDriver()->SetViewport( pc->XPos - ( vp.w / 2 ),
-		pc->YPos - ( vp.h / 2 ) );
+	if(ScreenFlags&SF_CENTERONACTOR) {
+		core->GetVideoDriver()->SetViewport( pc->XPos - ( vp.w / 2 ),
+			pc->YPos - ( vp.h / 2 ) );
+		if(!ScreenFlags&SF_ALWAYSCENTER) {
+			ScreenFlags&=~SF_CENTERONACTOR;
+		}
+	}
 }
 
 void GameControl::DisplayString(const char* Text)
