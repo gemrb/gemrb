@@ -298,14 +298,17 @@ Window * CHUImp::GetWindow(unsigned long i)
 				lab->ControlType = ControlType;
 				char * str = core->GetString(StrRef);
 				lab->SetText(str);
-				Color f,b;
-				f.r = fore.r;
-				f.g = fore.g;
-				f.b = fore.b;
-				b.r = back.r;
-				b.g = back.g;
-				b.b = back.b;
-				lab->SetColor(f, b);
+				if(alignment & 1) {
+					lab->useRGB = true;
+					Color f,b;
+					f.r = fore.r;
+					f.g = fore.g;
+					f.b = fore.b;
+					b.r = back.r;
+					b.g = back.g;
+					b.b = back.b;
+					lab->SetColor(f, b);
+				}
 				if((alignment & (1<<4)) != 0)
 					lab->SetAlignment(IE_FONT_ALIGN_RIGHT);
 				else if((alignment & (1<<2)) != 0)
