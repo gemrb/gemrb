@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.106 2004/03/20 12:26:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.107 2004/03/20 19:55:23 avenger_teambg Exp $
  *
  */
 
@@ -198,7 +198,9 @@ static ActionLink actionnames[] = {
 	{"jumptopoint",GameScript::JumpToPoint},
 	{"jumptopointinstant",GameScript::JumpToPointInstant},
 	{"leavearealua",GameScript::LeaveAreaLUA},
+	{"leavearealuaentry",GameScript::LeaveAreaLUAEntry},
 	{"leavearealuapanic",GameScript::LeaveAreaLUAPanic},
+	{"leavearealuapanicentry",GameScript::LeaveAreaLUAPanicEntry},
 	{"makeglobal",GameScript::MakeGlobal},
 	{"moraledec",GameScript::MoraleDec},
 	{"moraleinc",GameScript::MoraleInc},
@@ -1157,12 +1159,7 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 	}
 	if(tgts) {
 		Scriptable *object;
-		if(tgts->Count()) {
-			object=tgts->GetTarget(0);
-		}
-		else {
-			object=NULL;
-		}
+		object=tgts->GetTarget(0);
 		delete tgts;
 		return object;
 	}
@@ -1677,32 +1674,32 @@ Targets *GameScript::Gabber(Scriptable *Sender, Targets *parameters)
 
 Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters)
 {
-	Targets *tgts = new Targets();
-
-	int i = parameters->Count();
-	while(i--) {
-		Actor *actor = parameters->GetTarget(i);
-		if(!actor)
-			continue;
-		tgts->AddTarget(actor->LastSeen);
+	Actor *actor = parameters->GetTarget(0);
+	if(!actor) {
+		if(Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
 	}
-	delete parameters;
-	return tgts;
+	parameters->Clear();
+	if(actor) {
+		parameters->AddTarget(actor->LastSeen);
+	}
+	return parameters;
 }
 
 Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
 {
-	Targets *tgts = new Targets();
-
-	int i = parameters->Count();
-	while(i--) {
-		Actor *actor = parameters->GetTarget(i);
-		if(!actor)
-			continue;
-		tgts->AddTarget(actor->LastTalkedTo);
+	Actor *actor = parameters->GetTarget(0);
+	if(!actor) {
+		if(Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
 	}
-	delete parameters;
-	return tgts;
+	parameters->Clear();
+	if(actor) {
+		parameters->AddTarget(actor->LastTalkedTo);
+	}
+	return parameters;
 }
 
 Targets *GameScript::Player1(Scriptable *Sender, Targets *parameters)
@@ -1820,6 +1817,9 @@ Targets *GameScript::Player8Fill(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::BestAC(Scriptable *Sender, Targets *parameters)
 {
 	int i=parameters->Count();
+	if(!i) {
+		return parameters;
+	}
 	int worstac=parameters->GetTarget(--i)->GetStat(IE_ARMORCLASS);
 	int pos=i;
 	while(i--) {
@@ -1838,6 +1838,9 @@ Targets *GameScript::BestAC(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::StrongestOf(Scriptable *Sender, Targets *parameters)
 {
 	int i=parameters->Count();
+	if(!i) {
+		return parameters;
+	}
 	int worsthp=parameters->GetTarget(--i)->GetStat(IE_ARMORCLASS);
 	int pos=i;
 	while(i--) {
@@ -1856,6 +1859,9 @@ Targets *GameScript::StrongestOf(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::WeakestOf(Scriptable *Sender, Targets *parameters)
 {
 	int i=parameters->Count();
+	if(!i) {
+		return parameters;
+	}
 	int worsthp=parameters->GetTarget(--i)->GetStat(IE_HITPOINTS);
 	int pos=i;
 	while(i--) {
@@ -1874,6 +1880,9 @@ Targets *GameScript::WeakestOf(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::WorstAC(Scriptable *Sender, Targets *parameters)
 {
 	int i=parameters->Count();
+	if(!i) {
+		return parameters;
+	}
 	int worstac=parameters->GetTarget(--i)->GetStat(IE_ARMORCLASS);
 	int pos=i;
 	while(i--) {
@@ -4076,7 +4085,7 @@ void GameScript::StartDialogueNoSetInterrupt(Scriptable* Sender,
 	BeginDialog( Sender, parameters, BD_TALKCOUNT | BD_SOURCE | BD_INTERRUPT );
 }
 
-Point* FindNearPoint(Actor* Sender, Point* p1, Point* p2, double& distance)
+static Point* FindNearPoint(Scriptable* Sender, Point* p1, Point* p2, double& distance)
 {
 	long x1 = ( Sender->XPos - p1->x );
 	long y1 = ( Sender->YPos - p1->y );
@@ -4146,9 +4155,8 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
 	double distance;
-	Point* p = FindNearPoint( actor, &door->toOpen[0], &door->toOpen[1],
+	Point* p = FindNearPoint( Sender, &door->toOpen[0], &door->toOpen[1],
 				distance );
 	if (distance <= 12) {
 		if(door->Flags&2) {
@@ -4161,7 +4169,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		Sender->AddActionInFront( Sender->CurrentAction );
 		char Tmp[256];
 		sprintf( Tmp, "MoveToPoint([%d.%d])", p->x, p->y );
-		actor->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
+		Sender->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
 	}
 	Sender->CurrentAction = NULL;
 }
@@ -4189,9 +4197,8 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
 	double distance;
-	Point* p = FindNearPoint( actor, &door->toOpen[0], &door->toOpen[1],
+	Point* p = FindNearPoint( Sender, &door->toOpen[0], &door->toOpen[1],
 				distance );	
 	if (distance <= 12) {
 		door->SetDoorClosed( true, true );
@@ -4199,7 +4206,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		Sender->AddActionInFront( Sender->CurrentAction );
 		char Tmp[256];
 		sprintf( Tmp, "MoveToPoint([%d.%d])", p->x, p->y );
-		actor->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
+		Sender->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
 	}
 	Sender->CurrentAction = NULL;
 }
@@ -4548,12 +4555,50 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
+void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
+	Map *map;
+	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
+	long x = ( Sender->XPos - ent->XPos );
+	long y = ( Sender->YPos - ent->YPos );
+	double distance = sqrt( ( double ) ( x* x + y* y ) );
+	if (distance <= 12) {
+		LeaveAreaLUA(Sender, parameters);
+		return;
+	}
+	Sender->AddActionInFront( Sender->CurrentAction );
+	char Tmp[256];
+	sprintf( Tmp, "MoveToPoint([%d.%d])", ent->XPos, ent->YPos );
+	Sender->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
+}
+
+void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
+{
 	LeaveAreaLUA( Sender, parameters );
+}
+
+void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	
+	Map *map;
+	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
+	long x = ( Sender->XPos - ent->XPos );
+	long y = ( Sender->YPos - ent->YPos );
+	double distance = sqrt( ( double ) ( x* x + y* y ) );
+	if (distance <= 12) {
+		LeaveAreaLUAPanic(Sender, parameters);
+		return;
+	}
+	Sender->AddActionInFront( Sender->CurrentAction );
+	char Tmp[256];
+	sprintf( Tmp, "MoveToPoint([%d.%d])", ent->XPos, ent->YPos );
+	Sender->AddActionInFront( GameScript::CreateAction( Tmp, true ) );
 }
 
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)

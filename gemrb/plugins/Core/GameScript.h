@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.75 2004/03/20 12:26:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.76 2004/03/20 19:55:24 avenger_teambg Exp $
  *
  */
 
@@ -874,7 +874,9 @@ public:
 	static void JumpToPointInstant(Scriptable* Sender, Action* parameters);
 	static void JumpToObject(Scriptable* Sender, Action* parameters);
 	static void LeaveAreaLUA(Scriptable* Sender, Action* parameters);
+	static void LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters);
 	static void LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters);
+	static void LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters);
 	static void LeaveParty(Scriptable* Sender, Action* parameters);
 	static void Lock(Scriptable* Sender, Action* parameters);
 	static void MakeGlobal(Scriptable* Sender, Action* parameters);
