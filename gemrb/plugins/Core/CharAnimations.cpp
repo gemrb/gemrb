@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.18 2003/12/08 23:19:39 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.19 2003/12/09 19:01:55 balrog994 Exp $
  *
  */
 
@@ -45,11 +45,15 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 	this->RowIndex = RowIndex;
 	Avatars = core->GetTable(core->LoadTable("avatars"));
 	char * val = Avatars->QueryField(RowIndex, 24);
-	if(val[0] == '*')
+	if(val[0] != '1')
 		UsePalette = true;
 	else
 		UsePalette = false;
 	CircleSize = atoi(Avatars->QueryField(RowIndex, 6));
+	Animation * anim = GetAnimation(IE_ANI_AWAKE, 0);
+	Color * pal = core->GetVideoDriver()->GetPalette(anim->GetFrame(0));
+	memcpy(Palette, pal, 256*sizeof(Color));
+	free(pal);
 }
 
 CharAnimations::~CharAnimations(void)
@@ -183,7 +187,6 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 
 				default:
 					{
-					
 					if(Orient & 1)
 						Orient--;
 					Anims[AnimID][Orient] = a;
@@ -192,6 +195,16 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 				break;
 			}
 			
+			}
+		break;
+
+		case IE_ANI_PST_GHOST:
+			{
+			for(int i = 0; i < 18; i++) {
+				for(int j = 0; j < 16; j++) {
+					Anims[i][j] = a;
+				}
+			}
 			}
 		break;
 	}
@@ -360,6 +373,12 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, c
 						strcat(ResRef, &this->ResRef[1]);
 					break;
 				}
+			}
+		break;
+
+		case IE_ANI_PST_GHOST:
+			{
+			Cycle = 0;
 			}
 		break;
 		}
