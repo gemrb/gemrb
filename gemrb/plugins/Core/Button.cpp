@@ -42,12 +42,21 @@ Button::Button(bool Clear){
 	ButtonOnPress[0] = 0;
 	Text = (char*)malloc(64);
 	hasText = false;
+	stdpal = NULL;
 	if(stricmp(core->GameType, "bg2") == 0)
 		font = core->GetFont("STONEBIG");
 	else if(stricmp(core->GameType, "bg1") == 0)
 		font = core->GetFont("STONESML");
+	else if(stricmp(core->GameType, "iwd2") == 0) {
+		font = core->GetFont("NORMAL");
+		Color fore = {0xff, 0xff, 0xff, 0x00}, back = {0x00, 0x00, 0x00, 0x00};
+		stdpal = core->GetVideoDriver()->CreatePalette(fore, back);
+	}
 	palette = (Color*)malloc(256*sizeof(Color));
-	memcpy(palette, font->GetPalette(), 256*sizeof(Color));
+	if(!stdpal)
+		memcpy(palette, font->GetPalette(), 256*sizeof(Color));
+	else
+		memcpy(palette, stdpal, 256*sizeof(Color));
 	for(int i = 0; i < 256; i++) {
 		palette[i].r = (palette[i].r * 2) / 3;
 		palette[i].g = (palette[i].g * 2) / 3;
@@ -72,6 +81,8 @@ Button::~Button(){
 	if(Picture)
 		video->FreeSprite(Picture);
 	free(palette);
+	if(stdpal)
+		free(stdpal);
 }
 /** Sets the 'type' Image of the Button to 'img'.
 'type' may assume the following values:
@@ -135,6 +146,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 		if(Flags&0x400) align|=IE_FONT_ALIGN_TOP;
 	//	else if(Flags&0x800) align|=IE_FONT_ALIGN_BOTTOM;
 		else align|=IE_FONT_ALIGN_MIDDLE;
+		if(stdpal)
+			ppoi = stdpal;
 		switch(State) {
 			case IE_GUI_BUTTON_UNPRESSED:
 			{

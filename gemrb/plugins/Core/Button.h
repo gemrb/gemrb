@@ -87,6 +87,7 @@ private: // Private attributes
   Font * font;
   bool ToggleState;
   Color * palette;
+  Color * stdpal;
   /** Button Unpressed Image */
   Sprite2D * Unpressed;
   /** Button Pressed Image */
