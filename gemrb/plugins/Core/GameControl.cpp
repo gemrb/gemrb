@@ -1055,6 +1055,8 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
 	this->target = target;
+	speaker->LastTalkedTo=target;
+	target->LastTalkedTo=speaker;
 	if (Dialogue) {
 		return;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.19 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.20 2004/02/28 15:24:13 avenger_teambg Exp $
  *
  */
 
@@ -46,20 +46,31 @@
 
 class GEM_EXPORT Actor : public Moveble {
 public:
-	unsigned char InParty;
+	//CRE DATA FIELDS
 	long BaseStats[MAX_STATS];
 	long Modified[MAX_STATS];
-	CharAnimations* anims;
-	//char  ScriptName[33]; //death variable
-	//char  Scripts[MAX_SCRIPTS][9];
 	char Dialog[9];
-	//CRE DATA FIELDS
-	char* LongName, * ShortName;
 	char SmallPortrait[9];
 	char LargePortrait[9];
+	unsigned char InParty;
+	char* LongName, * ShortName;
 	unsigned long StrRefs[100];
+
+	//this stuff don't get saved
+	CharAnimations* anims;
 	bool DeleteMe;
 	bool FromGame;
+
+	Actor *LastTalkedTo;
+	Actor *LastAttacker;
+	Actor *LastHitter;
+	Actor *LastProtecter;
+	Actor *LastProtected;
+	Actor *LastCommander;
+	Actor *LastHelp;
+	Actor *LastSeen;
+	Actor *LastHeard;
+	Actor *LastSummoner;
 private:
 	void SetCircleSize();
 public:

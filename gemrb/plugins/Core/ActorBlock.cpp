@@ -399,7 +399,6 @@ void Moveble::DoStep(ImageMgr* LightMap)
 }
 void Moveble::WalkTo(unsigned short XDes, unsigned short YDes)
 {
-printf("walkto invoked\n");
 	this->XDes = XDes;
 	this->YDes = YDes;
 	if (path) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.77 2004/02/28 10:36:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.78 2004/02/28 15:24:13 avenger_teambg Exp $
  *
  */
 
@@ -61,7 +61,7 @@ static TriggerLink triggernames[] = {
 	{"general", GameScript::General}, {"global", GameScript::Global},
 	{"globalgt", GameScript::GlobalGT}, {"globallt", GameScript::GlobalLT},
 	{"globalsequal", GameScript::GlobalsEqual},
-	{"harmlessentered", GameScript::Entered}, //this isn't sure
+	{"harmlessentered", GameScript::Entered}, //this isn't sure the same
 	{"hp", GameScript::HP},
 	{"hpgt", GameScript::HPGT}, {"hplt", GameScript::HPLT},
 	{"inparty", GameScript::InParty},
@@ -69,6 +69,7 @@ static TriggerLink triggernames[] = {
 	{"numtimestalkedto", GameScript::NumTimesTalkedTo},
 	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT},
 	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT},
+	{"objectactionlistempty", GameScript::ActionListEmpty}, //same function
 	{"oncreation", GameScript::OnCreation}, {"or", GameScript::Or},
 	{"partyhasitem", GameScript::PartyHasItem}, {"race", GameScript::Race},
 	{"range", GameScript::Range}, {"see", GameScript::See},
@@ -171,6 +172,8 @@ static ActionLink actionnames[] = {
 
 //Make this an ordered list, so we could use bsearch!
 static ObjectLink objectnames[] = {
+	{"lastseenby",GameScript::LastSeenBy},
+	{"lasttalkedtoby",GameScript::LastTalkedToBy},
 	{"myself",GameScript::Myself},
 	{"player1",GameScript::Player1},
 	{"player1fill",GameScript::Player1Fill},
@@ -304,6 +307,10 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 		/* Loading Script Configuration Parameters */
 
 		ObjectIDSCount = atoi( objNameTable->QueryField() );
+		if(ObjectIDSCount<0 || ObjectIDSCount>MAX_OBJECT_FIELDS) {
+			printf("[IEScript]: The IDS Count shouldn't be more than 10!\n");
+			abort();
+		}
 		
 		for (i = 0; i < ObjectIDSCount; i++) {
 			char *idsname;
@@ -318,6 +325,10 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 			ObjectIDSTableNames.push_back( idsname );
 		}
 		MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
+		if(MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
+			printf("[IEScript]: The Object Nesting Count shouldn't be more than 5!\n");
+			abort();
+		}
 		HasAdditionalRect = ( bool ) atoi( objNameTable->QueryField( 2 ) );
 		ExtraParametersCount = atoi( objNameTable->QueryField( 3 ) );
 		ObjectFieldsCount = ObjectIDSCount - ExtraParametersCount;
@@ -784,11 +795,12 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 	TriggerFunction func = triggers[trigger->triggerID];
 	if (!func) {
 		triggers[trigger->triggerID] = False;
-		printf( "[IEScript]: Unhandled trigger code: 0x%04x\n",
-			trigger->triggerID );
-		const char *tmpstr=triggersTable -> GetValue(trigger->triggerID);
-		if(!tmpstr) tmpstr=triggersTable -> GetValue(trigger->triggerID|0x4000);
-		printf("IDS entry: %s\n",tmpstr);
+		const char *tmpstr=triggersTable->GetValue(trigger->triggerID);
+		if(!tmpstr) {
+			tmpstr=triggersTable->GetValue(trigger->triggerID|0x4000);
+		}
+		printf( "[IEScript]: Unhandled trigger code: 0x%04x %s\n",
+			trigger->triggerID, tmpstr );
 		return false;
 	}
 	int ret = func( Sender, trigger );
@@ -843,7 +855,6 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	ActionFunction func = actions[aC->actionID];
-	printf( "[IEScript]: %s\n", actionsTable->GetValue( aC->actionID ) );
 	if (func) {
 		Scriptable* scr = GetActorFromObject( Sender, aC->objects[0]);
 		if(scr && scr!=Sender) {
@@ -862,7 +873,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	}
 	else {
 		actions[aC->actionID] = NoAction;
-		printf( "[IEScript]: Unhandled action code: %d\n", aC->actionID );
+		printf( "[IEScript]: Unhandled action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
 		Sender->CurrentAction = NULL;
 		aC->Release();
 		return;
@@ -970,7 +981,7 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 			tgts = func( Sender, tgts);
 		}
 		else {
-			printf("[IEScript]: Unknown object filter: %d\n",filterid);
+			printf("[IEScript]: Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
 		}
 		if(!tgts->Count()) {
 			delete tgts;
@@ -1079,32 +1090,17 @@ Action* GameScript::GenerateAction(char* String)
 
 						case 'p':
 							//Point
-							 {
-								while (( *str != ',' ) && ( *str != ')' ))
-									str++;
-								src++; //Skip [
-								char symbol[33];
-								char* tmp = symbol;
-								while (( ( *src >= '0' ) && ( *src <= '9' ) ) ||
-									( *src == '-' )) {
-									*tmp = *src;
-									tmp++;
-									src++;
-								}
-								*tmp = 0;
-								newAction->XpointParameter = atoi( symbol );
-								src++; //Skip .
-								tmp = symbol;
-								while (( ( *src >= '0' ) && ( *src <= '9' ) ) ||
-									( *src == '-' )) {
-									*tmp = *src;
-									tmp++;
-									src++;
-								}
-								*tmp = 0;
-								newAction->YpointParameter = atoi( symbol );
-								src++; //Skip ]
-							}
+							while(( *str != ',' ) && ( *str != ')' ))
+								str++;
+							src++; //Skip [
+							newAction->XpointParameter = atoi( src );
+							while( *src!='.' && *src!=']')
+								src++;
+							src++; //Skip .
+							newAction->YpointParameter = atoi( src );
+							while( *src!='.' && *src!=']')
+								src++;
+							src++; //Skip ]
 							break;
 
 						case 'i':
@@ -1454,6 +1450,36 @@ Targets *GameScript::Myself(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
+Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters)
+{
+	Targets *tgts = new Targets();
+
+	int i = parameters->Count();
+	while(i--) {
+		Actor *actor = tgts->GetTarget(i);
+		if(!actor)
+			continue;
+		tgts->AddTarget(actor->LastSeen);
+	}
+	delete parameters;
+	return tgts;
+}
+
+Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
+{
+	Targets *tgts = new Targets();
+
+	int i = parameters->Count();
+	while(i--) {
+		Actor *actor = tgts->GetTarget(i);
+		if(!actor)
+			continue;
+		tgts->AddTarget(actor->LastTalkedTo);
+	}
+	delete parameters;
+	return tgts;
+}
+
 Targets *GameScript::Player1(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
@@ -1727,7 +1753,7 @@ int GameScript::Alignment(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -1738,10 +1764,9 @@ int GameScript::Alignment(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::Allegiance(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender,
-						parameters->objectParameter );
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return false;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return false;
@@ -1752,9 +1777,10 @@ int GameScript::Allegiance(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::Class(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
-	if(!scr)
-		return 0;
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if(!scr) {
+		scr = Sender;
+	}
 	if(scr->Type != ST_ACTOR)
 		return 0;
 	Actor * actor = (Actor*)scr;
@@ -1764,31 +1790,34 @@ int GameScript::Class(Scriptable* Sender, Trigger* parameters)
 //atm this checks for InParty and See, it is unsure what is required
 int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* actor = GetActorFromObject( Sender,
-							parameters->objectParameter );
-	if (actor == NULL) {
-		return 0;
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		scr = Sender;
 	}
-	//non actors got no visual range, needs research
-	if (Sender->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor* snd = ( Actor* ) Sender;
-	if (actor->Type != ST_ACTOR) {
+	if (scr->Type != ST_ACTOR) {
 		return 0;
 	}
 	//return actor->InParty?1:0; //maybe ???
-	if (!core->GetGame()->InParty( ( Actor * ) actor )) {
+	if (!core->GetGame()->InParty( ( Actor * ) scr )) {
 		return 0;
 	}
-	long x = ( actor->XPos - Sender->XPos );
-	long y = ( actor->YPos - Sender->YPos );
+	int range;
+	if (Sender->Type != ST_ACTOR) {
+		//non actors got no visual range, needs research
+		range = 20 * 20;
+	}
+	else {
+		Actor* snd = ( Actor* ) Sender;
+		range = snd->Modified[IE_VISUALRANGE] * 20;
+	}
+	long x = ( scr->XPos - Sender->XPos );
+	long y = ( scr->YPos - Sender->YPos );
 	double distance = sqrt( ( double ) ( x* x + y* y ) );
-	if (distance > ( snd->Modified[IE_VISUALRANGE] * 20 )) {
+	if (distance > range) {
 		return 0;
 	}
 	if (!core->GetPathFinder()->IsVisible( Sender->XPos, Sender->YPos,
-									actor->XPos, actor->YPos )) {
+						scr->XPos, scr->YPos )) {
 		return 0;
 	}
 	//further checks, is target alive and talkative
@@ -1797,23 +1826,21 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* actor = GetActorFromObject( Sender,
-							parameters->objectParameter );
-	if (actor == NULL) {
-		return 0;
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		scr = Sender;
 	}
-	if (actor->Type != ST_ACTOR) {
+	if (scr->Type != ST_ACTOR) {
 		return 0;
 	}
 	//return actor->InParty?1:0; //maybe ???
-	return core->GetGame()->InParty( ( Actor * ) actor ) >= 0 ? 1 : 0;
+	return core->GetGame()->InParty( ( Actor * ) scr ) >= 0 ? 1 : 0;
 }
 
 int GameScript::Exists(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* actor = GetActorFromObject( Sender,
-							parameters->objectParameter );
-	if (actor == NULL) {
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
 		return 0;
 	}
 	return 1;
@@ -1823,7 +1850,7 @@ int GameScript::General(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -1839,7 +1866,7 @@ int GameScript::Specific(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -1853,28 +1880,28 @@ int GameScript::Specific(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::BitCheck(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value = CheckVariable( Sender, parameters->string0Parameter );
+	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
 	int eval = ( value& parameters->int0Parameter ) ? 1 : 0;
 	return eval;
 }
 
 int GameScript::Global(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value = CheckVariable( Sender, parameters->string0Parameter );
+	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
 	int eval = ( value == parameters->int0Parameter ) ? 1 : 0;
 	return eval;
 }
 
 int GameScript::GlobalLT(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value = CheckVariable( Sender, parameters->string0Parameter );
+	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
 	int eval = ( value < parameters->int0Parameter ) ? 1 : 0;
 	return eval;
 }
 
 int GameScript::GlobalGT(Scriptable* Sender, Trigger* parameters)
 {
-	unsigned long value = CheckVariable( Sender, parameters->string0Parameter );
+	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
 	int eval = ( value > parameters->int0Parameter ) ? 1 : 0;
 	return eval;
 }
@@ -1920,7 +1947,7 @@ int GameScript::NumTimesTalkedTo(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -1933,7 +1960,7 @@ int GameScript::NumTimesTalkedToGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -1946,7 +1973,7 @@ int GameScript::NumTimesTalkedToLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -1955,11 +1982,12 @@ int GameScript::NumTimesTalkedToLT(Scriptable* Sender, Trigger* parameters)
 	return actor->TalkCount < parameters->int0Parameter ? 1 : 0;
 }
 
+/* this single function works for ActionListEmpty and ObjectActionListEmpty */
 int GameScript::ActionListEmpty(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -1977,15 +2005,14 @@ int GameScript::False(Scriptable * /*Sender*/, Trigger * /*parameters*/)
 
 int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* target = GetActorFromObject( Sender,
-							parameters->objectParameter );
-	if (!target) {
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
 		return 0;
 	}
-	printf( "x1 = %d, y1 = %d\nx2 = %d, y2 = %d\n", target->XPos,
-		target->YPos, Sender->XPos, Sender->YPos );
-	long x = ( target->XPos - Sender->XPos );
-	long y = ( target->YPos - Sender->YPos );
+	printf( "x1 = %d, y1 = %d\nx2 = %d, y2 = %d\n", scr->XPos,
+		scr->YPos, Sender->XPos, Sender->YPos );
+	long x = ( scr->XPos - Sender->XPos );
+	long y = ( scr->YPos - Sender->YPos );
 	double distance = sqrt( ( double ) ( x* x + y* y ) );
 	printf( "Distance = %.3f\n", distance );
 	if (distance <= ( parameters->int0Parameter * 20 )) {
@@ -2065,7 +2092,7 @@ int GameScript::Race(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2078,7 +2105,7 @@ int GameScript::Gender(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2091,7 +2118,7 @@ int GameScript::HP(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2107,7 +2134,7 @@ int GameScript::HPGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2123,7 +2150,7 @@ int GameScript::HPLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2139,7 +2166,7 @@ int GameScript::XP(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2155,7 +2182,7 @@ int GameScript::XPGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2171,7 +2198,7 @@ int GameScript::XPLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		return 0;
+		scr = Sender;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
@@ -2248,6 +2275,10 @@ int GameScript::See(Scriptable* Sender, Trigger* parameters)
 	if (!target) {
 		return 0;
 	}
+	/* don't set LastSeen if this isn't an actor */
+	if (target->Type !=ST_ACTOR) {
+		return 0;
+	}
 	long x = ( target->XPos - Sender->XPos );
 	long y = ( target->YPos - Sender->YPos );
 	double distance = sqrt( ( double ) ( x* x + y* y ) );
@@ -2256,6 +2287,7 @@ int GameScript::See(Scriptable* Sender, Trigger* parameters)
 	}
 	if (core->GetPathFinder()->IsVisible( Sender->XPos, Sender->YPos,
 								target->XPos, target->YPos )) {
+		snd->LastSeen = (Actor *) target;
 		return 1;
 	}
 	return 0;
@@ -2541,7 +2573,7 @@ void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
 
 void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 {
-	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	Scriptable * scr = GetActorFromObject( Sender, parameters->objects[1]);
 	core->GetVideoDriver()->MoveViewportTo( scr->XPos, scr->YPos );
 }
 

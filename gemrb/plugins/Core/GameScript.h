@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.53 2004/02/28 09:40:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.54 2004/02/28 15:24:13 avenger_teambg Exp $
  *
  */
 
@@ -86,7 +86,7 @@ public:
 	};
 	void AddTarget(Actor* Target)
 	{
-		if(Target) {
+		if(Target && !Target->DeleteMe) {
 			objects.push_back( Target );
 		}
 	};
@@ -843,6 +843,8 @@ public:
 	static void Wait(Scriptable* Sender, Action* parameters);
 public:
 	//Objects
+	static Targets *LastSeenBy(Scriptable *Sender, Targets *parameters);
+	static Targets *LastTalkedToBy(Scriptable *Sender, Targets *parameters);
 	static Targets *Myself(Scriptable *Sender, Targets *parameters);
 	static Targets *Player1(Scriptable *Sender, Targets *parameters);
 	static Targets *Player1Fill(Scriptable *Sender, Targets *parameters);
