@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.51 2003/12/22 21:27:25 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.52 2003/12/22 23:36:29 balrog994 Exp $
  *
  */
 
@@ -1139,8 +1139,8 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon * poly, Color &color, bool fill)
 			poly->fill = PrecalculatePolygon(poly->points, poly->count, color);
 		}
 		Region Screen = Viewport;
-		Screen.x = 0;
-		Screen.y = 0;
+		Screen.x = xCorr;
+		Screen.y = yCorr;
 		BlitSprite(poly->fill, poly->BBox.x+xCorr, poly->BBox.y+yCorr, false, &Screen);
 	}
 	short lastX = poly->points[0].x, lastY = poly->points[0].y;
