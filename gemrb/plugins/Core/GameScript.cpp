@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.28 2004/01/02 00:53:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.29 2004/01/04 00:24:55 balrog994 Exp $
  *
  */
 
@@ -107,6 +107,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[158] = ChangeGender;
 		actions[159] = ChangeAlignment;
 		actions[177] = TriggerActivation;
+		actions[198] = Dialogue;
 		actions[202] = FadeToColor;
 		//blocking[202] = true;
 		actions[203] = FadeFromColor;
@@ -1363,8 +1364,8 @@ void GameScript::StartCutScene(Scriptable * Sender, Action * parameters)
 
 void GameScript::CutSceneId(Scriptable * Sender, Action * parameters)
 {
-	if(parameters->objects[0]->genderField != 0) {
-		Sender->CutSceneId = GetActorFromObject(Sender, parameters->objects[0]);
+	if(parameters->objects[1]->genderField != 0) {
+		Sender->CutSceneId = GetActorFromObject(Sender, parameters->objects[1]);
 	} else {
 		Map * map = core->GetGame()->GetMap(0);
 		Sender->CutSceneId = map->GetActor(parameters->objects[1]->objectName);
@@ -1606,7 +1607,7 @@ void GameScript::PlaySound(Scriptable * Sender, Action * parameters)
 		return;
 	}
 	printf("PlaySound(%s)\n", parameters->string0Parameter);
-	core->GetSoundMgr()->Play(parameters->string0Parameter);
+	core->GetSoundMgr()->Play(parameters->string0Parameter, scr->XPos, scr->YPos);
 }
 
 void GameScript::CreateVisualEffectObject(Scriptable * Sender, Action * parameters)
