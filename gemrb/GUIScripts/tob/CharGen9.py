@@ -1,6 +1,7 @@
 #character generation (GUICG 0)
 import GemRB
 from ie_stats import *
+from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -117,6 +118,7 @@ def OnLoad():
 	return
 	
 def NextPress():
+
 	GemRB.UnloadWindow(CharGenWindow)
 	#set my character up
 	MyChar = GemRB.GetVar("Slot")
@@ -133,6 +135,24 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
 	t=GemRB.GetVar("Alignment")
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
+
+	#mage spells
+	Learnable = GetLearnableMageSpells( KitIndex, t, 1)
+	SpellBook = GemRB.GetVar("MageSpellBook")
+	j=1
+	for i in range(len(Learnable) ):
+		if SpellBook & j:
+			GemRB.LearnSpell(MyChar, Learnable[i], 0)
+		j=j+j
+
+	#priest spells
+	TableName = GemRB.GetTableValue(TmpTable, Class, 1)
+	if TableName != "*":
+		ClassFlag = 0 #set this according to class
+		Learnable = GetLearnablePriestSpells( ClassFlag, GemRB.GetVar("Alignment"), 1)
+		for(i in range(len(Learnable) ):
+			GemRB.LearnSpell(MyChar, Learnable[i], 0)
+
 	TmpTable=GemRB.LoadTable("repstart")
 	t=GemRB.GetTableValue(TmpTable,t,0)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)

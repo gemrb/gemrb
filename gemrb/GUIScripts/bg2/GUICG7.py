@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.7 2004/12/07 19:07:56 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.8 2004/12/07 23:07:28 avenger_teambg Exp $
 # character generation, mage spells (GUICG7)
 
 import GemRB
@@ -139,13 +139,14 @@ def MageSpellsPickPress():
 	Range = len(Learnable)
 	if MageSpellsSelectPointsLeft > Range:
 		MageSpellsSelectPointsLeft = Range
-	#make this less ugly without ruining Learnable
-	for i in range(MageSpellsSelectPointsLeft):
-		j = GemRB.Roll(1,Range,-1)
-		if SpellMask & (1<<j):
-			continue
-		SpellMask = SpellMask | (1<<j)
-
+	if MageSpellsSelectPointsLeft:
+		#make this less ugly without ruining Learnable
+		for i in range(MageSpellsSelectPointsLeft):
+			j = GemRB.Roll(1,Range,-1)
+			if SpellMask & (1<<j):
+				continue
+			SpellMask = SpellMask | (1<<j)
+		GemRB.SetVar("MageSpellBook", SpellMask)
 	MageSpellsDonePress()
 	return
 
