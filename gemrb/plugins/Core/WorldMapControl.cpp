@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.1 2004/08/20 12:48:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.2 2004/08/20 13:32:37 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -52,7 +52,7 @@ WorldMapControl::~WorldMapControl(void)
 }
 
 /** Draws the Control on the Output Display */
-void WorldMapControl::Draw(unsigned short x, unsigned short y)
+void WorldMapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 {
 	WorldMap* worldmap = core->GetWorldMap();
 	if (!Width || !Height) {
@@ -63,10 +63,9 @@ void WorldMapControl::Draw(unsigned short x, unsigned short y)
 	video->BlitSprite( worldmap->MapMOS, XPos - ScrollX, YPos - ScrollY, true, &r );
 
 
-
 	std::vector< WMPAreaEntry*>::iterator m;
-	int xm = SCREEN_TO_MAPX(lastMouseX + XPos);
-	int ym = SCREEN_TO_MAPY(lastMouseY + YPos);
+	unsigned int xm = SCREEN_TO_MAPX(lastMouseX + XPos);
+	unsigned int ym = SCREEN_TO_MAPY(lastMouseY + YPos);
 
 
 	for (m = worldmap->area_entries.begin(); m != worldmap->area_entries.end(); ++m) {
@@ -90,7 +89,7 @@ void WorldmapControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 /** Key Release Event */
 void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
-	unsigned int i;
+	//unsigned int i;
 
 	switch (Key) {
 		case '\t':
@@ -119,7 +118,7 @@ void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 {
 	WorldMap* worldmap = core->GetWorldMap();
-	int nextCursor = 0;
+	//int nextCursor = 0;
 
 	if (MouseIsDown) {
 		ScrollX -= x - lastMouseX;
@@ -255,7 +254,7 @@ bool WorldMapControl::HandleActiveRegion(InfoPoint *trap, Actor *actor)
 #endif
 /** Mouse Button Down */
 void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned char Button, unsigned short /*Mod*/)
 {
 	if ((Button != GEM_MB_ACTION) ) {
 		return;
@@ -267,8 +266,8 @@ void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
 	lastMouseY = y;
 }
 /** Mouse Button Up */
-void WorldMapControl::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+void WorldMapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
+	unsigned char Button, unsigned short /*Mod*/)
 {
 	if (Button != GEM_MB_ACTION) {
 		return;

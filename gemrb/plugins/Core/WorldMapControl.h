@@ -31,7 +31,7 @@ public:
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	/** Sets the Text of the current control */
-	int SetText(const char* string, int pos = 0) { return 0; };
+	int SetText(const char* /*string*/, int /*pos*/) { return 0; };
 	int ScrollX, ScrollY;
 	unsigned short lastMouseX, lastMouseY;
 	bool MouseIsDown;
