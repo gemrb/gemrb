@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.144 2004/03/27 16:12:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.145 2004/03/27 17:32:41 avenger_teambg Exp $
  *
  */
 
@@ -1374,7 +1374,7 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 	if(Status&0x80) {
 			evntmgr->SetFocused( win, ctrl);
 	}
-	switch (( Status & 0xff000000 ) >> 24) {
+	switch ((Status >> 24) & 0xff) {
 		case 0:
 		//Button
 		 {
@@ -1430,6 +1430,18 @@ Window* Interface::GetWindow(unsigned short WindowIndex)
 
 int Interface::DelWindow(unsigned short WindowIndex)
 {
+	if(WindowIndex == 0xffff) {
+		for(unsigned int WindowIndex=0; WindowIndex<windows.size();WindowIndex++) {
+			Window* win = windows[WindowIndex];
+			if(win) {
+				evntmgr->DelWindow( win->WindowID );
+				delete( win );
+			}
+		}
+		windows.clear();
+		topwin.clear();
+		return 0;
+	}
 	if (WindowIndex >= windows.size()) {
 		return -1;
 	}
