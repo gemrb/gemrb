@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.12 2004/10/12 16:47:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.13 2004/10/14 17:27:06 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -67,6 +67,8 @@ def OpenMapWindow ():
 	# 4 is the Label's control ID
 	GemRB.CreateMapControl (Window, 3, 24, 23, 480, 360, 4, "USERNOTE","RONOTE")
 	Map = GemRB.GetControl (Window, 3)
+	GemRB.SetVar("x",1)
+	GemRB.SetVarAssoc (Window, Map, "x", 1)
 
 
 	MapTable = GemRB.LoadTable( "MAPNAME" )
