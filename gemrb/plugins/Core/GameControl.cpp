@@ -814,7 +814,6 @@ void GameControl::ResizeAdd(Window * win, unsigned char type)
 
 void GameControl::InitDialog(Actor * speaker, Actor * target, Dialog * dlg)
 {
-	//core->GetVideoDriver()->DisableScroll = true;
 	DisableMouse = true;
 	unsigned long index;
 	core->GetDictionary()->Lookup("MessageWindowSize", index);
