@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.169 2004/06/24 17:53:16 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.170 2004/06/27 21:12:33 edheldil Exp $
  *
  */
 
@@ -185,6 +185,13 @@ static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
 	GameControl* gc = StartGameControl();
 	/* setting the pathfinder to the current area */
 	gc->SetCurrentArea(game->LoadMap(game->CurrentArea));
+
+	// Center view on the first PC
+	Actor* actor = game->GetPC (0);
+	if (actor) {
+		core->GetVideoDriver()->MoveViewportTo (actor->XPos, actor->YPos);
+	}
+
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -2708,6 +2715,7 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 	printf("Selected: %d: %d -> %d\n", PlayerSlot, MyActor->IsSelected(), Selected);
+	printf("IE_EA: %d\n", MyActor->Modified[IE_EA]);
 	MyActor->Select( (bool)Selected );
 
 	Py_INCREF( Py_None );
