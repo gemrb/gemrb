@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.30 2004/10/19 16:29:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.31 2005/03/25 22:11:15 avenger_teambg Exp $
  *
  */
 
@@ -61,12 +61,12 @@ int main(int argc, char** argv)
 	Region bg( 0, 0, 50, 20 );
 	Color* palette = core->GetVideoDriver()->CreatePalette( fpscolor, fpsblack );
 	do {
+		core->DrawWindows();
 		if (core->ChangeScript) {
 			core->GetGUIScriptEngine()->LoadScript( core->NextScript );
 			core->ChangeScript = false;
 			core->GetGUIScriptEngine()->RunFunction( "OnLoad" );
 		}
-		core->DrawWindows();
 		if (core->DrawFPS) {
 			frame++;
 			GetTime( time );
