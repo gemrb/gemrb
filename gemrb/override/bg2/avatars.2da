@@ -1,6 +1,6 @@
 2DA V1.0
 *
-           BASE_RES_REF MIRROR_TYPE ORIENT     SPACE      ATTACK     AWAKE      CAST       CONJURE    DAMAGE     DIE        HEAD_TURN  READY      SHOOT      TWITCH     WALK       SLASH      BACKSLASH  JAB        EMERGE     HIDE       SLEEP      NO_PALETTE 
+           BASE_RES_REF ANIM_TYPE   ORIENT     SPACE      ATTACK     AWAKE      CAST       CONJURE    DAMAGE     DIE        HEAD_TURN  READY      SHOOT      TWITCH     WALK       SLASH      BACKSLASH  JAB        EMERGE     HIDE       SLEEP      NO_PALETTE 
 0x2000     MSIR         2           5          2          0          8          0          8          24         32         16         *          0          *          0          *          *          *          *          *          *          *          
 0x2300     MDKN         2           5          3          0          8          0          8          24         32         16         *          0          *          0          *          *          *          *          *          *          1          
 0x4000     SNOMC        1           16         2          *          0          *          *          32         48         16         *          *          64         *          *          *          *          *          *          *          *          
