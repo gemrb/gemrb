@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.292 2005/03/18 21:53:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.293 2005/03/19 21:43:37 avenger_teambg Exp $
  *
  */
 
@@ -4386,8 +4386,9 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 	}
 
 	MaxCount = core->SlotTypes;
+	int i;
 	Count = 0;
-	for (int i=0;i<MaxCount;i++) {
+	for (i=0;i<MaxCount;i++) {
 		if ((core->QuerySlotType( i ) & SlotType) != SlotType) {
 			continue;
 		}
@@ -4400,7 +4401,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 
 	PyObject* tuple = PyTuple_New( Count );
 	Count = 0;
-	for (int i=0;i<MaxCount;i++) {
+	for (i=0;i<MaxCount;i++) {
 		if ((core->QuerySlotType( i ) & SlotType) != SlotType) {
 			continue;
 		}
