@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.67 2005/03/04 23:27:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.68 2005/03/05 17:43:01 avenger_teambg Exp $
  *
  */
 
@@ -305,13 +305,14 @@ void TextArea::PopLines(unsigned int count)
 /** Sets the Fonts */
 void TextArea::SetFonts(Font* init, Font* text)
 {
-	ieDword initials = 0;
+	ieDword initials = 1;
+	//Drop Capitals means initials on!
 	core->GetDictionary()->Lookup("Drop Capitals", initials);
 	if(initials) {
-		finit = NULL;
+		finit = init;
 	}
 	else {
-		finit = init;
+		finit = NULL;
 	}
 	ftext = text;
 	Changed = true;
