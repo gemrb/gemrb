@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.54 2003/12/31 13:45:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.55 2004/01/01 15:42:45 balrog994 Exp $
  *
  */
 
@@ -62,11 +62,10 @@ void InitPathFinder()
 	}
 }
 
-Map::Map(void)
+Map::Map(void) : Scriptable(ST_AREA)
 {
 	tm = NULL;
 	queue = NULL;
-	Script = NULL;
 	Qcount = 0;
 	lastActorCount = 0;
 	justCreated = true;
@@ -101,8 +100,9 @@ void Map::DrawMap(Region viewport)
 {	
 	if(tm)
 		tm->DrawOverlay(0, viewport);
-	if(Script)
-		Script->Update();
+	if(Scripts[0])
+		Scripts[0]->Update();
+	ProcessActions();
 	int ipCount = 0;
 	while(true) {
 		int count;
@@ -113,6 +113,7 @@ void Map::DrawMap(Region viewport)
 			continue;
 		if(!ip->Scripts[0])
 			continue;
+		ip->ProcessActions();
 		if(ip->Type == ST_TRIGGER) {
 			if(ip->Clicker)
 				ip->Scripts[0]->Update();
@@ -161,6 +162,7 @@ void Map::DrawMap(Region viewport)
 		Actor * actor = GetRoot();
 		if(!actor)
 			break;
+		actor->ProcessActions();
 		actor->DoStep(LightMap);
 		CharAnimations * ca = actor->GetAnims();
 		if(!ca)

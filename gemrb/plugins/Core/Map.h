@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.23 2003/12/30 17:48:10 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.24 2004/01/01 15:42:45 balrog994 Exp $
  *
  */
 
@@ -66,13 +66,12 @@ typedef struct WallGroup {
 	int polygons;
 } WallGroup;
 
-class GEM_EXPORT Map
+class GEM_EXPORT Map : public Scriptable
 {
 public:
 	TileMap * tm;
 	ImageMgr * LightMap;
 	ImageMgr * SearchMap;
-	GameScript * Script;
 	bool justCreated;
 private:
 	std::vector<Animation*> animations;
