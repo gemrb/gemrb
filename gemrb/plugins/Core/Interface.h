@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.105 2004/08/06 01:15:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.106 2004/08/08 20:49:20 avenger_teambg Exp $
  *
  */
 
@@ -40,6 +40,7 @@
 #include "Button.h"
 #include "Label.h"
 #include "Slider.h"
+#include "Progressbar.h"
 #include "TextEdit.h"
 #include "Console.h"
 #include "SoundMgr.h"
@@ -50,7 +51,6 @@
 #include "SymbolMgr.h"
 #include "MoviePlayer.h"
 #include "DataFileMgr.h"
-//#include "PathFinder.h"
 #include "GameScript.h"
 #include "Game.h"
 #include "WorldMap.h"

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.20 2004/08/08 13:21:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.21 2004/08/08 20:49:20 avenger_teambg Exp $
  *
  */
 
@@ -24,8 +24,9 @@
 
 
 #define IE_GUI_BUTTON		0
+#define IE_GUI_PROGRESSBAR	1 //gemrb extension
 #define IE_GUI_SLIDER		2
-#define IE_GUI_EDIT			3
+#define IE_GUI_EDIT		3
 #define IE_GUI_TEXTAREA		5
 #define IE_GUI_LABEL		6
 #define IE_GUI_SCROLLBAR	7
