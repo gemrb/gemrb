@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.21 2003/11/30 00:42:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.22 2003/12/15 09:15:05 balrog994 Exp $
  *
  */
 
@@ -112,13 +112,13 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 	}*/
 	core->GetVideoDriver()->SetPalette(sprBuffer, pal);
 	Video * video = core->GetVideoDriver();
-	int len = strlen((char*)string);
+	size_t len = strlen((char*)string);
 	char * tmp = (char*)malloc(len+1);
 	strcpy(tmp, (char*)string);
 	SetupString(tmp, rgn.w);
 	int ystep = 0;
 	if(Alignment & IE_FONT_SINGLE_LINE) {
-		for(int i = 0; i < len; i++) {
+		for(size_t i = 0; i < len; i++) {
 			if(tmp[i] != 0)
 				if(ystep < yPos[(unsigned char)tmp[i]-1])//chars[(unsigned char)tmp[i]-1]->YPos)
 					ystep = yPos[(unsigned char)tmp[i]-1];//chars[(unsigned char)tmp[i]-1]->YPos;
@@ -137,7 +137,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 	}
 	if(Alignment & IE_FONT_ALIGN_MIDDLE) {
 		int h = 0;
-		for(int i = 0; i <= len; i++) {
+		for(size_t i = 0; i <= len; i++) {
 			if((tmp[i] == 0) || (tmp[i] == '\n'))
 				h++;
 		}
@@ -145,7 +145,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 		y += (rgn.h/2)-(h/2);
 	}
 	int row = 0;
-	for(int i = 0; i < len; i++) {
+	for(size_t i = 0; i < len; i++) {
 		if(row < startrow) {
 			if(tmp[i] == 0) {
 				row++;
@@ -195,13 +195,13 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	//}
 	core->GetVideoDriver()->SetPalette(sprBuffer, pal);
 	Video * video = core->GetVideoDriver();
-	int len = strlen((char*)string);
+	size_t len = strlen((char*)string);
 	char * tmp = (char*)malloc(len+1);
 	strcpy(tmp, (char*)string);
 	SetupString(tmp, rgn.w);
 	int ystep = 0;
 	if(Alignment & IE_FONT_SINGLE_LINE) {
-		for(int i = 0; i < len; i++) {
+		for(size_t i = 0; i < len; i++) {
 			if(tmp[i] != 0)
 				if(ystep < yPos[(unsigned char)tmp[i]-1])//chars[(unsigned char)tmp[i]-1]->YPos)
 					ystep = yPos[(unsigned char)tmp[i]-1];//chars[(unsigned char)tmp[i]-1]->YPos;
@@ -220,7 +220,7 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	}
 	if(Alignment & IE_FONT_ALIGN_MIDDLE) {
 		int h = 0;
-		for(int i = 0; i <= len; i++) {
+		for(size_t i = 0; i <= len; i++) {
 			if(tmp[i] == 0)
 				h++;
 		}
@@ -230,7 +230,7 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 	else if(Alignment & IE_FONT_ALIGN_TOP) {
 		y+=5;
 	}
-	for(int i = 0; i < len; i++) {
+	for(size_t i = 0; i < len; i++) {
 		if(tmp[i] == 0) {
 			y+=ystep;
 			x=0;
@@ -259,23 +259,23 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 
 int Font::CalcStringWidth(const char * string)
 {
-	int ret = 0, len = strlen(string);
-	for(int i = 0; i < len; i++) {
+	size_t ret = 0, len = strlen(string);
+	for(size_t i = 0; i < len; i++) {
 		ret += size[(unsigned char)string[i]-1].w;//chars[(unsigned char)string[i]-1]->Width;
 	}
-	return ret;
+	return (int)ret;
 }
 
 void Font::SetupString(char * string, int width)
 {
-	int len = strlen(string);
+	size_t len = strlen(string);
 	int lastpos = 0;
 	int x = 0, wx = 0;
 	bool endword = false;
-	for(int pos = 0; pos < len; pos++) {
+	for(size_t pos = 0; pos < len; pos++) {
 		if(x+wx > width) {
 			if(!endword && (x == 0))
-				lastpos = pos;
+				lastpos = (int)pos;
 			string[lastpos] = 0;
 			x = 0;
 		}
@@ -289,7 +289,7 @@ void Font::SetupString(char * string, int width)
 			string[pos] = 0;
 			x = 0;
 			wx = 0;
-			lastpos = pos;
+			lastpos = (int)pos;
 			endword = true;
 			continue;
 		}
@@ -297,7 +297,7 @@ void Font::SetupString(char * string, int width)
 		if((string[pos] == ' ') || (string[pos] == '-')) {
 			x+=wx;
 			wx = 0;
-			lastpos = pos;
+			lastpos = (int)pos;
 			endword = true;
 		}
 	}
