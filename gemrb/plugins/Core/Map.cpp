@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.40 2003/12/12 23:03:38 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.41 2003/12/13 17:47:42 balrog994 Exp $
  *
  */
 
@@ -256,7 +256,7 @@ void Map::DrawMap(Region viewport)
 			gettimeofday(&tv, NULL);
 			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
 #endif
-			if((time - actor->timeStartDisplaying) >= 3000) {
+			if((time - actor->timeStartDisplaying) >= 6000) {
 				actor->textDisplaying = 0;
 			}
 			if(actor->textDisplaying == 1) {
@@ -270,7 +270,23 @@ void Map::DrawMap(Region viewport)
 				actor->Scripts[i]->Update();
 		}
 	}
-	//TODO: Check if here is a door
+	for(int i = 0; i < vvcCells.size(); i++) {
+		ScriptedAnimation * vvc = vvcCells.at(i);
+		if(!vvc)
+			continue;
+		if(vvc->anims[0]->endReached) {
+			vvcCells[i] = NULL;
+			delete(vvc);
+			continue;
+		}		
+		Sprite2D * frame = vvc->anims[0]->NextFrame();
+		if(vvc->Transparency & IE_VVC_BRIGHTEST) {
+			video->BlitSpriteMode(frame, vvc->XPos, vvc->YPos, 1, false);
+		}
+		else {
+			video->BlitSprite(frame, vvc->XPos, vvc->YPos, false);
+		}
+	}
 }
 
 void Map::AddAnimation(Animation * anim)
@@ -500,4 +516,15 @@ ActorBlock * Map::GetRoot()
 			break;
 	}
 	return ret;
+}
+
+void Map::AddVVCCell(ScriptedAnimation * vvc)
+{
+	for(int i = 0; i < vvcCells.size(); i++) {
+		if(vvcCells[i] == NULL) {
+			vvcCells[i] = vvc;
+			return;
+		}
+	}
+	vvcCells.push_back(vvc);
 }
