@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.56 2004/01/09 11:41:05 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.57 2004/01/09 17:44:28 avenger_teambg Exp $
  *
  */
 
@@ -406,7 +406,7 @@ int SDLVideoDriver::SwapBuffers(void)
 				CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
 				CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
 				if(Evnt)
-					Evnt->MouseDown(event.button.x, event.button.y, event.button.button, 0);
+					Evnt->MouseDown(event.button.x, event.button.y, 1<<(event.button.button-1), 0);
 			}
 		break;
 
@@ -418,7 +418,7 @@ int SDLVideoDriver::SwapBuffers(void)
 				CursorPos.x = event.button.x-mouseAdjustX[CursorIndex];
 				CursorPos.y = event.button.y-mouseAdjustY[CursorIndex];
 				if(Evnt)
-					Evnt->MouseUp(event.button.x, event.button.y, event.button.button, 0);
+					Evnt->MouseUp(event.button.x, event.button.y, 1<<(event.button.button-1), 0);
 			}
 		break;
 

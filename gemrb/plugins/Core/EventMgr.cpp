@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.25 2003/12/26 13:46:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.26 2004/01/09 17:44:28 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,7 @@ EventMgr::EventMgr(void)
 {
 	lastW = NULL;
 	lastF = NULL;
+	MButtons = 0;
 }
 
 EventMgr::~EventMgr(void)
@@ -144,6 +145,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 {
 	std::vector<int>::iterator t;
 	std::vector<Window*>::iterator m;
+	MButtons |= Button;
 	for(t = topwin.begin(); t != topwin.end(); ++t) {
 		m = windows.begin();
 		m+=(*t);
@@ -174,6 +176,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned char Butto
 /** BroadCast Mouse Move Event */
 void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
+	MButtons &= ~Button;
 	if(lastF != NULL) {
 		lastF->OnMouseUp(x-lastW->XPos-lastF->XPos, y-lastW->YPos-lastF->YPos, Button, Mod);
 	}
