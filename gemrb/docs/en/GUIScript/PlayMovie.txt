@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.PlayMovie(MOVResRef)
 
-Description:
+Description: Plays the named movie.
 
-Parameters:
+Parameters: MOVResRef - a .mve resource reference. 
 
-Return value:
+Return value: N/A
 
-See also:
+See also: N/A
 

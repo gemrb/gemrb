@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.SoftEndPL()
 
-Description:
+Description: Ends the currently playing Music Playlist softly.
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: N/A
 
-See also:
+See also: HardEndPL
 

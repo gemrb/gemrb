@@ -1,11 +1,16 @@
 
-Prototype:
+Prototype: GemRB.GetPlayerName(PartyID[, LongOrShort])
 
-Description:
+Description: Queries the player character's name.
 
 Parameters:
+PartyID - the PC's position in the party
+LongOrShort - which name to query
+-1 : default name
+ 0 : shortname
+ 1 : longname
 
-Return value:
+Return value: string, it returns ??? if the PC doesn't exist.
 
-See also:
+See also: SetPlayerName, GetPlayerStat
 

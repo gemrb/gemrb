@@ -1,11 +1,16 @@
 
-Prototype:
+Prototype: QueryText(WindowIndex, ControlIndex)
 
-Description:
+Description: Returns the Text of a TextEdit control. Only a TextEdit control could be accessed by this command.
 
-Parameters:
+Parameters: WindowIndex, ControlIndex  - the control's reference
 
-Return value:
+Return value: string
 
-See also:
+Example:
+ Name = GemRB.QueryText(NameWindow, NameField)
+ GemRB.SetToken("CHARNAME",Name)
+The above example retrieves the character's name typed into the TextEdit control and stores it in a Token (a Global Dictionary String).
+
+See also: SetText, SetToken, accessing_controls
 

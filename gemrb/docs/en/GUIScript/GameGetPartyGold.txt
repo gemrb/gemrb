@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.GameGetPartyGold()
 
-Description:
+Description: Returns current party gold.
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: numeric
 
-See also:
+See also: GetPlayerStat
 

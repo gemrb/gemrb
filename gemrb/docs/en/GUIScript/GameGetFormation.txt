@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GameGetFormation()
 
-Description:
+Description: Returns current party formation. The formations are stored in the GemRB specific formatio.2da table.
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: integer
 
-See also:
+See also: GameSetFormation
 

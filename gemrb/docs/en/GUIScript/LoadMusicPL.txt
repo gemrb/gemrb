@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: LoadMusicPL(MusicPlayListResource)
 
-Description:
+Description: Loads and starts a Music PlayList.
 
-Parameters:
+Parameters: MusicPlayListResource is a .mus resref
 
-Return value:
+Return value: N/A
 
-See also:
+See also: SoftEndPL, HardEndPL
 

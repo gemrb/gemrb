@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.HardEndPL()
 
-Description:
+Description: Ends a Music Playlist immediately.
 
-Parameters:
+Parameters: N/A
 
-Return value:
+Return value: N/A
 
-See also:
+See also: SoftEndPL
 

@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.GetControl(WindowIndex, ControlID)
 
-Description:
+Description: Returns a control in a Window.
 
-Parameters:
+Parameters: WindowIndex - the return value of a previous LoadWindow call.
+            ControlID   - a control ID, see the .chu file specification
 
-Return value:
+Return value: a control index
 
-See also:
+See also: LoadWindowPack, LoadWindow
 

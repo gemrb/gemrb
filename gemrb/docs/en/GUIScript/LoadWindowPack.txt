@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.LoadWindowPack(CHUIResRef)
 
-Description:
+Description: Loads a WindowPack into the Window Manager Module. Only one windowpack may be open at a time, but once a window was selected by LoadWindow, you can get a new windowpack.
 
-Parameters:
+Parameters: the name of the GUI set (.CHU resref)
 
-Return value:
+Return value: N/A
 
-See also:
+See also: LoadWindow
 

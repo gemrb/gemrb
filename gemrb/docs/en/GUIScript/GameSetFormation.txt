@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.GameSetFormation(Formation)
 
-Description:
+Description: Sets party formation.
 
-Parameters:
+Parameters: the row index of formatio.2da
 
-Return value:
+Return value: N/A
 
-See also:
+See also: GameGetFormation
 

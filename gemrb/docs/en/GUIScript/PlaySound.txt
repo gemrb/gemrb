@@ -1,11 +1,11 @@
 
-Prototype:
+Prototype: GemRB.PlaySound(SoundResource)
 
-Description:
+Description: Plays a Sound. If there is a single PC selected, then it will play the sound as if it was said by that PC (EAX).
 
-Parameters:
+Parameters: a .wav resref (the format could be raw pcm, wavc or ogg; 8/16 bit; mono/stereo).
 
-Return value:
+Return value: N/A
 
-See also:
+See also: LoadMusicPL
 
