@@ -185,6 +185,7 @@ char * TLKImp::GetString(unsigned long strref, int flags)
 		str->Seek(StrOffset+Offset, GEM_STREAM_START);
 		string = (char*)malloc(Length+1);
 		str->Read(string, Length);
+/* no need of this, the tag handler will do this job
 		if(isBG1) {
 			if(string[0] == '[') {
 				for(int i = 1; i < Length; i++) {
@@ -201,14 +202,15 @@ char * TLKImp::GetString(unsigned long strref, int flags)
 				}
 			}
 		}
+*/
 	}
 	else {
 		Length = 0;
 		string = (char*) malloc(1);
 	}
 	string[Length] = 0;
-//tagged text
-	if(type&4) {
+//tagged text, bg1 doesn't mark them speciafically, all entries are tagged
+	if(isBG1 || (type&4)) {
 //GetNewStringLength will look in string and return true
 //if the new Length will change due to tokens
 //if there is no new length, we are done
