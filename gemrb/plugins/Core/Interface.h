@@ -87,6 +87,8 @@ public:
 	int SetEvent(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long EventID, char * funcName);
 	/** Set the Status of a Control in a Window */
 	int SetControlStatus(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long Status);
+	/** Removes a Loaded Window */
+	int DelWindow(unsigned short WindowIndex);
 private:
 	bool LoadConfig(void);
 public:

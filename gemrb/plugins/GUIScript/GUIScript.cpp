@@ -195,6 +195,23 @@ static PyObject * GemRB_SetControlStatus(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_UnloadWindow(PyObject *self, PyObject *args)
+{
+	int WindowIndex;
+
+	if(!PyArg_ParseTuple(args, "i", &WindowIndex)) {
+		printMessage("GUIScript", "Syntax Error: SetVisible(unsigned short WindowIndex, int visible)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	int ret = core->DelWindow(WindowIndex);
+	if(ret == -1)
+		return NULL;
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
     {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
@@ -222,6 +239,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"SetControlStatus", GemRB_SetControlStatus, METH_VARARGS,
      "Sets the status of a Control."},
+
+	{"UnloadWindow", GemRB_UnloadWindow, METH_VARARGS,
+     "Unloads a previously Loaded Window."},
 
     {NULL, NULL, 0, NULL}
 };

@@ -601,3 +601,14 @@ void Interface::DrawWindows(void)
 			windows[i]->DrawWindow();
 	}
 }
+
+int Interface::DelWindow(unsigned short WindowIndex) 
+{
+	std::vector<Window*>::iterator w = windows.begin();
+	w+=WindowIndex;
+	if(!(*w))
+		return -1;
+	delete(*w);
+	windows.erase(w);
+	return 0;
+}
