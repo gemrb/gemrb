@@ -1,4 +1,4 @@
-#include "win32def.h"
+#include "../../includes/win32def.h"
 #include "SymbolMgr.h"
 
 SymbolMgr::SymbolMgr(void)

@@ -1,4 +1,4 @@
-#include "win32def.h"
+#include "../../includes/win32def.h"
 #include "MemoryStream.h"
 
 MemoryStream::MemoryStream(void * buffer, int length)

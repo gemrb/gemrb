@@ -15,6 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "../../includes/win32def.h"
 #include "TextArea.h"
 #include <stdio.h>
 

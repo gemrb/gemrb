@@ -1,4 +1,4 @@
-#include "win32def.h"
+#include "../../includes/win32def.h"
 #include "Sprite2D.h"
 
 Sprite2D::Sprite2D()

@@ -1,4 +1,4 @@
-#include "win32def.h"
+#include "../../includes/win32def.h"
 #include "AnimationFactory.h"
 
 AnimationFactory::AnimationFactory(const char * ResRef) : FactoryObject(ResRef, IE_BAM_CLASS_ID)

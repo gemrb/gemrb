@@ -1,4 +1,4 @@
-#include "win32def.h"
+#include "../../includes/win32def.h"
 #include "Animation.h"
 #include "Interface.h"
 #ifndef WIN32

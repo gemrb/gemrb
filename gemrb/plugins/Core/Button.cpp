@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "win32def.h"
+#include "../../includes/win32def.h"
 #include "Button.h"
 #include "Interface.h"
 
