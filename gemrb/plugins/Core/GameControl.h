@@ -109,6 +109,8 @@ public:
 	void DisplayString(Scriptable* target);
 	/* Displays a string in the textarea */
 	void DisplayString(char* Text);
+	/* Displays a string on screen */
+	void DisplayString(int X, int Y, const char *Text);
 	Actor *GetLastActor() { return lastActor; }
 private:
 	void ChangeMap();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.157 2004/04/26 20:51:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.158 2004/04/30 15:15:23 avenger_teambg Exp $
  *
  */
 
@@ -282,9 +282,12 @@ static ActionLink actionnames[] = {
 	{"fadetoblack", GameScript::FadeToColor,0}, //probably the same
 	{"fadetocolor", GameScript::FadeToColor,0},
 	{"floatmessage", GameScript::DisplayStringHead,0}, //probably the same
+	{"floatmessagefixed", GameScript::FloatMessageFixed,0},
 	{"forceaiscript", GameScript::ForceAIScript,0},
 	{"forcefacing", GameScript::ForceFacing,0},
+	{"forceleavearealua", GameScript::ForceLeaveAreaLUA,0},
 	{"forcespell", GameScript::ForceSpell,0},
+	{"fullheal", GameScript::FullHeal,0},
 	{"giveexperience", GameScript::AddXPObject,0},
 	{"givegoldforce", GameScript::CreatePartyGold,0}, //this is the same
 	{"givepartygold", GameScript::GivePartyGold,0},
@@ -368,6 +371,7 @@ static ActionLink actionnames[] = {
 	{"removejournalentry", GameScript::RemoveJournalEntry,0},
 	//this is in iwd2, same as movetosavedlocation, with a default variable
 	{"returntosavedlocation", GameScript::MoveToSavedLocation, AF_BLOCKING},
+	{"returntosavedplace", GameScript::MoveToSavedLocation, AF_BLOCKING},
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint", GameScript::RunAwayFromPoint,AF_BLOCKING},
@@ -375,6 +379,7 @@ static ActionLink actionnames[] = {
 	{"runtopoint", GameScript::MoveToPoint,AF_BLOCKING}, //until we know better
 	{"runtopointnorecticle", GameScript::MoveToPoint,AF_BLOCKING},//until we know better
 	{"savelocation", GameScript::SaveLocation,0},
+	{"saveplace", GameScript::SaveLocation,0},
 	{"saveobjectlocation", GameScript::SaveObjectLocation,0},
 	{"screenshake", GameScript::ScreenShake,AF_BLOCKING},
 	{"setanimstate", GameScript::SetAnimState,AF_BLOCKING},
@@ -394,6 +399,7 @@ static ActionLink actionnames[] = {
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile,0},
 	{"setmoraleai", GameScript::SetMoraleAI,0},
 	{"setname", GameScript::SetApparentName,0},
+	{"setnamelessclass", GameScript::SetNamelessClass,0},
 	{"setnumtimestalkedto", GameScript::SetNumTimesTalkedTo,0},
 	{"setplayersound", GameScript::SetPlayerSound,0},
 	{"setquestdone", GameScript::SetQuestDone,0},
@@ -4370,6 +4376,13 @@ void GameScript::ChangeClass(Scriptable* Sender, Action* parameters)
 	actor->SetStat( IE_CLASS, parameters->int0Parameter );
 }
 
+void GameScript::SetNamelessClass(Scriptable* Sender, Action* parameters)
+{
+	//same as Protagonist
+	Actor* actor = core->GetGame()->FindPC(1);
+	actor->SetStat( IE_CLASS, parameters->int0Parameter );
+}
+
 void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -4745,7 +4758,7 @@ void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 		Sender->CutSceneId = GetActorFromObject( Sender, parameters->objects[1] );
 	}
 	if(!Sender->CutSceneId) {
-		printMessage("IEScript","Failed to set CutSceneID!",YELLOW);
+		printMessage("IEScript","Failed to set CutSceneID!\n",YELLOW);
 	}
 }
 
@@ -5023,6 +5036,14 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 		//no need of freeing this string up!!!
 		Sender->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
 	}
+}
+
+void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
+{
+	printf( "Displaying string on: %s\n", Sender->GetScriptName() );
+	//no need of freeing this string up!!!
+	GameControl *gc = core->GetGameControl();
+	gc->DisplayString( parameters->XpointParameter, parameters->YpointParameter, core->GetString( parameters->int0Parameter, 2 ) );
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
@@ -5908,13 +5929,22 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* parameters)
 void GameScript::Activate(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		return;
-	}
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
 	tar->Active = true;
+}
+
+void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
+	//the LoadMos ResRef may be empty
+	strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
+	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter, true);
 }
 
 void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
@@ -6618,5 +6648,33 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 	else {
 		printMessage("IEScript","Can't set gabber",YELLOW);
 	}
+}
+
+void GameScript::ReputationSet(Scriptable* Sender, Action* parameters)
+{
+	if(Sender->Type==ST_ACTOR) {
+		Actor *scr = (Actor *) Sender;
+		scr->SetStat(IE_REPUTATION, parameters->int0Parameter);
+	}
+	core->GetGame()->Reputation = (unsigned int) parameters->int0Parameter;
+}
+
+void GameScript::ReputationInc(Scriptable* Sender, Action* parameters)
+{
+	if(Sender->Type==ST_ACTOR) {
+		Actor *scr = (Actor *) Sender;
+		scr->NewStat(IE_REPUTATION, parameters->int0Parameter, MOD_ADDITIVE);
+	}
+	core->GetGame()->Reputation += (unsigned int) parameters->int0Parameter;
+}
+
+void GameScript::FullHeal(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *) tar;
+	scr->SetStat(IE_HITPOINTS, scr->GetStat(IE_MAXHITPOINTS) );
 }
 

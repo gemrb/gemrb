@@ -91,17 +91,17 @@ void Scriptable::SetScript(int index, GameScript* script)
 	Scripts[index] = script;
 }
 
-void Scriptable::DisplayHeadText(char* text)
+void Scriptable::DisplayHeadText(const char* text)
 {
 	if (overHeadText) {
 		free( overHeadText );
 	}
-	overHeadText = text;
+	overHeadText = (char *) text;
 	GetTime( timeStartDisplaying );
 	textDisplaying = 1;
 }
 
-void Scriptable::SetScriptName(char* text)
+void Scriptable::SetScriptName(const char* text)
 {
 	strncpy( scriptName, text, 32 );
 	scriptName[32] = 0;

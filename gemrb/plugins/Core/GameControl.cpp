@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.139 2004/04/27 05:45:31 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.140 2004/04/30 15:15:22 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -758,6 +758,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 /** Special Key Press */
 void GameControl::OnSpecialKeyPress(unsigned char Key)
 {
+	if(DialogueFlags&1) {
+		return; //don't accept keys in dialog
+	}
 	Region Viewport = core->GetVideoDriver()->GetViewport();
 	switch (Key) {
 		case GEM_LEFT:
@@ -1367,6 +1370,18 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 	}
 	ta->AppendText( "", -1 );
+}
+
+void GameControl::DisplayString(int X, int Y, const char *Text)
+{
+	Scriptable* scr = new Scriptable( ST_TRIGGER );
+	scr->overHeadText = (char *) Text;
+	scr->textDisplaying = 1;
+	scr->timeStartDisplaying = 0;
+	scr->XPos = X;
+	scr->YPos = Y;
+	scr->MySelf = NULL;
+	infoTexts.push_back( scr );
 }
 
 void GameControl::DisplayString(Scriptable* target)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.112 2004/04/26 20:51:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.113 2004/04/30 15:15:24 avenger_teambg Exp $
  *
  */
 
@@ -962,9 +962,12 @@ public:
 	static void FaceSavedLocation(Scriptable* Sender, Action* parameters);
 	static void FadeFromColor(Scriptable* Sender, Action* parameters);
 	static void FadeToColor(Scriptable* Sender, Action* parameters);
+	static void FloatMessageFixed(Scriptable* Sender, Action* parameters);
 	static void ForceAIScript(Scriptable* Sender, Action* parameters);
 	static void ForceFacing(Scriptable* Sender, Action* parameters);
+	static void ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
+	static void FullHeal(Scriptable* Sender, Action* parameters);
 	static void GivePartyGold(Scriptable* Sender, Action* parameters);
 	static void GivePartyGoldGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalAddGlobal(Scriptable* Sender, Action* parameters);
@@ -1038,6 +1041,8 @@ public:
 	static void RemoveAreaFlag(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaType(Scriptable* Sender, Action* parameters);
 	static void RemoveJournalEntry(Scriptable* Sender, Action* parameters);
+	static void ReputationInc(Scriptable* Sender, Action* parameters);
+	static void ReputationSet(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
 	static void SaveLocation(Scriptable* Sender, Action* parameters);
@@ -1056,6 +1061,7 @@ public:
 	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
+	static void SetNamelessClass(Scriptable* Sender, Action* parameters);
 	static void SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters);
 	static void SetPlayerSound(Scriptable* Sender, Action* parameters);
 	static void SetQuestDone(Scriptable* Sender, Action* parameters);
