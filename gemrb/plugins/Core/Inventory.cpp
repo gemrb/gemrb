@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.7 2004/04/10 17:46:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.8 2004/04/13 19:29:48 avenger_teambg Exp $
  *
  */
 
@@ -23,34 +23,47 @@
 #include "../../includes/win32def.h"
 #include "Inventory.h"
 
+static int Inited=-1;
+
 Inventory::Inventory()
 {
+	InventoryType = INVENTORY_HEAP;
 }
 
 Inventory::~Inventory()
 {
-	for (size_t i = 0; i < slots.size(); i++) {
-		if(slots[i]) {
-			delete( slots[i] );
+	for (size_t i = 0; i < Slots.size(); i++) {
+		if(Slots[i]) {
+			delete( Slots[i] );
 		}
 	}
 }
 
+int Inventory::CalculateWeight()
+{
+//returns the weight of stored items
+}
+
+void Inventory::SetInventoryType(int arg)
+{
+	InventoryType = arg;
+}
+
 void Inventory::SetSlotCount(unsigned int size)
 {
-	if(slots.size()) {
+	if(Slots.size()) {
 		printf("Inventory size changed???\n");
 		//we don't allow reassignment,
-		//if you want this, delete the previous slots here
+		//if you want this, delete the previous Slots here
 		abort(); 
 	}
-	slots.assign((size_t) size, NULL);
+	Slots.assign((size_t) size, NULL);
 }
 
 /** if you supply a null string, then it checks if the slot is empty */
 bool Inventory::HasItemInSlot(const char *resref, int slot)
 {
-	CREItem *item = slots[slot];
+	CREItem *item = Slots[slot];
 	if(!item) {
 		return false;
 	}
@@ -60,22 +73,22 @@ bool Inventory::HasItemInSlot(const char *resref, int slot)
 	return false;
 }
 
+/** counts the items in the inventory, if stacks == 1 then stacks are 
+    accounted for their heap size */
 int Inventory::CountItems(const char *resref, bool stacks)
 {
 	int count = 0;
-	int slot = slots.size();
+	int slot = Slots.size();
 	while(slot--) {
-		CREItem *item = slots[slot];
+		CREItem *item = Slots[slot];
 		if(!item) {
 			continue;
 		}
-		if (strnicmp( item->ItemResRef, resref,8 ) == 0) {
-			if (stacks && item->Flags&IE_ITEM_STACKED) {
-				count+=item->Usages[0];
-			}
-			else {
-				count++;
-			}
+		if (stacks && (item->Flags&IE_ITEM_STACKED) ) {
+			count+=item->Usages[0];
+		}
+		else {
+			count++;
 		}
 	}
 	return count;
@@ -86,9 +99,9 @@ int Inventory::CountItems(const char *resref, bool stacks)
     specifying 1 in a bit signifies a requirement */
 bool Inventory::HasItem(const char *resref, ieDword flags)
 {
-	int slot = slots.size();
+	int slot = Slots.size();
 	while(slot--) {
-		CREItem *item = slots[slot];
+		CREItem *item = Slots[slot];
 		if(!item) {
 			continue;
 		}
@@ -109,9 +122,9 @@ bool Inventory::HasItem(const char *resref, ieDword flags)
     specifying 1 in a bit signifies a requirement */
 void Inventory::DestroyItem(const char *resref, ieDword flags)
 {
-	int slot = slots.size();
+	int slot = Slots.size();
 	while(slot--) {
-		CREItem *item = slots[slot];
+		CREItem *item = Slots[slot];
 		if(!item) {
 			continue;
 		}
@@ -127,37 +140,72 @@ void Inventory::DestroyItem(const char *resref, ieDword flags)
 		//use unequip stuff, decrease encumbrance etc,
 		//until that, we simply erase it
 		delete item;
-		slots[slot] = NULL;
+		Slots[slot] = NULL;
 	}
 }
 
 void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 {
-	if (slot>=slots.size() ) {
+	if (slot>=Slots.size() ) {
 		printf("Invalid slot!\n");
 		abort();
 	}
-	if(slots[slot]) {
-		delete slots[slot];
+	if(Slots[slot]) {
+		delete Slots[slot];
 	}
-	slots[slot] = item;
+	Slots[slot] = item;
 }
 
 int Inventory::AddSlotItem(CREItem* item, unsigned int slot, CREItem **res_item)
 {
 	// FIXME: join items if possible
-	for (size_t i = 0; i < slots.size(); i++) {
-		if (!slots[i]) {
-			slots[i] = item;
+	for (size_t i = 0; i < Slots.size(); i++) {
+		if (!Slots[i]) {
+			Slots[i] = item;
 			*res_item = NULL;
 			return ( int ) i;
 		}
-		if (ItemsAreCompatible( slots[i], item )) {
+
+		if (ItemsAreCompatible( Slots[i], item )) {
+ 			//calculate with the max movable stock
+			int chunk=item->Usages[0];
+			if(!chunk) {
+				continue;
+			}
+			Slots[i]->Usages[0]+=chunk;
+			item->Usages[0]-=chunk;
+			if(item->Usages[0]==0) {
+				*res_item = NULL;
+				return ( int ) i;
+			}
 		}
 	}
 
 	*res_item = item;
 	return -1;
+}
+
+int Inventory::AddSlotItem(STOItem* item, unsigned int slot, CREItem **res_item, int count)
+{
+	CREItem *temp;
+	CREItem *remains;
+
+	for(int i=0;i<count;i++) {
+	//the first part of a STOItem is essentially a CREItem
+		temp = new CREItem;
+		memcpy(&temp, item, sizeof(CREItem) ); 
+		if(!item->InfiniteSupply) {
+			if(!item->AmountInStock) {
+				break;
+			}
+			item->AmountInStock--;
+		}
+		AddSlotItem(temp, 0, &remains);
+		//FIXME: drop remains at feet of actor
+		if(remains) {
+			delete remains;
+		}
+	}
 }
 
 bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
@@ -166,10 +214,14 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
 		return true;
 	}
 
+	if(!(source->Flags&IE_ITEM_STACKED) ) {
+		return false;
+	}
+
 	if (!strnicmp( target->ItemResRef, source->ItemResRef,8 )) {
-		// FIXME: some magic code belongs here ....
-		// this should check if the items are stacking or not
-		return true;
+		if(target->Flags&IE_ITEM_STACKED) {
+			return true;
+		}
 	}
 	return false;
 }
@@ -177,20 +229,20 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
 #if 0
 CREItem* Inventory::GetSlotItem(int index)
 {
-	if (index >= slots.size()) {
+	if (index >= Slots.size()) {
 		return NULL;
 	}
-	return slots[index];
+	return Slots[index];
 }
 
 // Returns index of first empty slot or slot with the same
 //    item and not full stack. On fail returns -1
 int Inventory::FindCandidateSlot(CREItem* item, int first_slot)
 {
-	if (first_slot >= slots.size())
+	if (first_slot >= Slots.size())
 		return -1;
 
-	for (size_t i = first_slot; i < slots.size(); i++) {
+	for (size_t i = first_slot; i < Slots.size(); i++) {
 	}
 
 	return -1;
@@ -203,28 +255,28 @@ bool Inventory::CanTakeItem(CREItem* item)
 int Inventory::AddSlotItem(CREItem* item)
 {
 	// FIXME: join items if possible
-	for (size_t i = 0; i < slots.size(); i++) {
-		if (!slots[i]) {
-			slots[i] = item;
+	for (size_t i = 0; i < Slots.size(); i++) {
+		if (!Slots[i]) {
+			Slots[i] = item;
 			return ( int ) i;
 		}
 	}
-	slots.push_back( item );
-	return ( int ) slots.size() - 1;
+	Slots.push_back( item );
+	return ( int ) Slots.size() - 1;
 }
 
 int Inventory::DelSlotItem(unsigned int index, bool autoFree)
 {
-	if (index >= slots.size()) {
+	if (index >= Slots.size()) {
 		return -1;
 	}
-	if (!slots[index]) {
+	if (!Slots[index]) {
 		return -1;
 	}
 	if (autoFree) {
-		delete( slots[index] );
+		delete( Slots[index] );
 	}
-	slots[index] = NULL;
+	Slots[index] = NULL;
 	return 0;
 }
 
@@ -233,8 +285,8 @@ int Inventory::DelSlotItem(unsigned int index, bool autoFree)
 void Inventory::dump()
 {
 	printf( "INVENTORY:\n" );
-	for (size_t i = 0; i < slots.size(); i++) {
-		CREItem* itm = slots[i];
+	for (size_t i = 0; i < Slots.size(); i++) {
+		CREItem* itm = Slots[i];
 
 		if (!itm) {
 			continue;

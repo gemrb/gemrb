@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.6 2004/04/10 17:46:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.7 2004/04/13 19:29:53 avenger_teambg Exp $
  *
  */
 
@@ -27,6 +27,8 @@
 #include <vector>
 #include "../../includes/win32def.h"
 #include "../../includes/ie_types.h"
+
+#include "Store.h"
 
 #ifdef WIN32
 
@@ -40,7 +42,10 @@
 #define GEM_EXPORT
 #endif
 
-const int INVENTORY_SIZE = 38;
+typedef enum ieInventoryType {
+	INVENTORY_HEAP = 0,
+	INVENTORY_CREATURE = 1,
+} ieInventoryType;
 
 typedef enum ieCREItemFlagBits {
 	IE_ITEM_IDENTIFIED = 1,
@@ -66,7 +71,8 @@ typedef struct CREItem {
 
 class GEM_EXPORT Inventory {
 private:
-	std::vector<CREItem*> slots;
+	std::vector<CREItem*> Slots;
+	int InventoryType;
 
 public: 
 	Inventory();
@@ -80,8 +86,11 @@ public:
 	/** flags: see ieCREItemFlagBits */
 	bool HasItem(const char *resref, ieDword flags);
 
+	int CalculateWeight(void);
+	void SetInventoryType(int arg);
+
 	/** returns number of all slots in the inventory */
-	int GetSlotCount() { return slots.size(); };
+	int GetSlotCount() { return Slots.size(); };
 
 	/** sets inventory size, for the first time */
 	void SetSlotCount(unsigned int size);
@@ -96,6 +105,8 @@ public:
 	** FIXME: it should allow for cases when part of the item's amount
 	** can go in and part can't. Maybe return number instead? or CRE?*/
 	int AddSlotItem(CREItem* item, unsigned int slot, CREItem** res_item);
+
+	int AddSlotItem(STOItem* item, unsigned int slot, CREItem** res_item, int count);
 
 	/** flags: see ieCREItemFlagBits */
 	void DestroyItem(const char *resref, ieDword flags);
