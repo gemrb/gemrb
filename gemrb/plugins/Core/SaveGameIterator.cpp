@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.18 2004/02/29 19:32:34 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.19 2004/03/24 20:19:42 avenger_teambg Exp $
  *
  */
 
@@ -178,10 +178,14 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 		 SPathDelimiter, slotname );
 
 
-	char savegameName[_MAX_PATH];
+	char savegameName[_MAX_PATH]={0};
 	int savegameNumber = 0;
 
 	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
+	if(cnt != 2) {
+		printf( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
+		return false;
+	}
 	printf( "[Number = %d, Name = %s]\n", savegameNumber, savegameName );
 
 	DIR* ndir = opendir( Path );

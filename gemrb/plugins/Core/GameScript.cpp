@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.117 2004/03/23 19:08:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.118 2004/03/24 20:19:41 avenger_teambg Exp $
  *
  */
 
@@ -65,7 +65,6 @@ static TriggerLink triggernames[] = {
 	{"bitcheck",GameScript::BitCheck},
 	{"bitcheckexact",GameScript::BitCheckExact},
 	{"bitglobal",GameScript::BitGlobal_Trigger},
-	{"globalbitglobal",GameScript::GlobalBitGlobal_Trigger},
 	{"breakingpoint",GameScript::BreakingPoint},
 	{"checkstat",GameScript::CheckStat},
 	{"checkstatgt",GameScript::CheckStatGT},
@@ -73,8 +72,10 @@ static TriggerLink triggernames[] = {
 	{"clicked", GameScript::Clicked}, {"dead", GameScript::Dead},
 	{"entered", GameScript::Entered}, {"exists", GameScript::Exists},
 	{"false", GameScript::False}, {"gender", GameScript::Gender},
-	{"general", GameScript::General}, {"global", GameScript::Global},
+	{"general", GameScript::General},
+	{"global", GameScript::Global},
 	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger},
+	{"globalbitglobal",GameScript::GlobalBitGlobal_Trigger},
 	{"globalequalsglobal", GameScript::GlobalsEqual}, //this is the same
 	{"globalgt", GameScript::GlobalGT},
 	{"globalgtglobal", GameScript::GlobalGTGlobal},
@@ -141,7 +142,11 @@ static TriggerLink triggernames[] = {
 	{"randomnum", GameScript::RandomNum},
 	{"randomnumgt", GameScript::RandomNumGT},
 	{"randomnumlt", GameScript::RandomNumLT},
-	{"range", GameScript::Range}, {"see", GameScript::See},
+	{"range", GameScript::Range},
+	{"reputation", GameScript::Reputation},
+	{"reputationgt", GameScript::ReputationGT},
+	{"reputationlt", GameScript::ReputationLT},
+	{"see", GameScript::See},
 	{"specific", GameScript::Specific},
 	{"statecheck", GameScript::StateCheck},
 	{"targetunreachable", GameScript::TargetUnreachable},
@@ -194,6 +199,7 @@ static ActionLink actionnames[] = {
 	{"createvisualeffectobject",GameScript::CreateVisualEffectObject,0},
 	{"cutsceneid",GameScript::CutSceneID,AF_INSTANT},
 	{"deactivate",GameScript::Deactivate,0},
+	{"debug",GameScript::Debug,0},
 	{"destroypartygold",GameScript::DestroyPartyGold,0},
 	{"destroyself",GameScript::DestroySelf,0},
 	{"dialogue",GameScript::Dialogue,AF_BLOCKING},
@@ -251,6 +257,7 @@ static ActionLink actionnames[] = {
 	{"leavearealuapanic",GameScript::LeaveAreaLUAPanic,0},
 	{"leavearealuapanicentry",GameScript::LeaveAreaLUAPanicEntry,0},
 	{"leaveparty",GameScript::LeaveParty,0},
+	{"log",GameScript::Debug,0}, //the same until we know better
 	{"makeglobal",GameScript::MakeGlobal,0},
 	{"makeunselectable",GameScript::MakeUnselectable,0},
 	{"moraledec",GameScript::MoraleDec,0},
@@ -405,7 +412,9 @@ static TriggerLink* FindTrigger(const char* triggername)
 	int len = strlench( triggername, '(' );
 	for (int i = 0; triggernames[i].Name; i++) {
 		if (!strnicmp( triggernames[i].Name, triggername, len )) {
-			return triggernames + i;
+			if(!triggernames[i].Name[len]) {
+				return triggernames + i;
+			}
 		}
 	}
 	printf( "Warning: Couldn't assign trigger: %.*s\n", len, triggername );
@@ -420,7 +429,9 @@ static ActionLink* FindAction(const char* actionname)
 	int len = strlench( actionname, '(' );
 	for (int i = 0; actionnames[i].Name; i++) {
 		if (!strnicmp( actionnames[i].Name, actionname, len )) {
-			return actionnames + i;
+			if(!actionnames[i].Name[len]) {
+				return actionnames + i;
+			}
 		}
 	}
 	printf( "Warning: Couldn't assign action: %.*s\n", len, actionname );
@@ -433,10 +444,11 @@ static ObjectLink* FindObject(const char* objectname)
 		return NULL;
 	}
 	int len = strlench( objectname, '(' );
-		
 	for (int i = 0; objectnames[i].Name; i++) {
 		if (!strnicmp( objectnames[i].Name, objectname, len )) {
-			return objectnames + i;
+			if(!objectnames[i].Name[len]) {
+				return objectnames + i;
+			}
 		}
 	}
 	printf( "Warning: Couldn't assign object: %.*s\n", len, objectname );
@@ -555,8 +567,10 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 			TriggerLink* poi = FindTrigger( triggername );
 			if (poi == NULL)
 				triggers[i] = NULL;
-			else
+			else {
+				printf("Found trigger:%04x %s\n",i,triggername);
 				triggers[i] = poi->Function;
+			}
 		}
 
 		for (i = 0; i < MAX_ACTIONS; i++) {
@@ -581,7 +595,7 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 	}
 	continueExecution = false;
 	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef,
-							IE_BCS_CLASS_ID );
+		IE_BCS_CLASS_ID );
 	script = CacheScript( ds, ResRef );
 	MySelf = NULL;
 	scriptRunDelay = 1000;
@@ -692,6 +706,9 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender,
 
 	if (strnicmp( VarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( &VarName[6], value );
+		if(InDebug) {
+			printf("CheckVariable %s: %ld\n",VarName, value);
+		}
 		return value;
 	}
 	strncpy( newVarName, VarName, 40 );
@@ -699,6 +716,9 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender,
 		ReplaceMyArea( Sender, newVarName );
 	}
 	core->GetGame()->globals->Lookup( newVarName, value );
+	if(InDebug) {
+		printf("CheckVariable %s: %ld\n",VarName, value);
+	}
 	return value;
 }
 
@@ -710,6 +730,9 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender,
 
 	if (strnicmp( Context, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( VarName, value );
+		if(InDebug) {
+			printf("CheckVariable %s%s: %ld\n",Context, VarName, value);
+		}
 		return value;
 	}
 	strncpy( newVarName, Context, 6 );
@@ -718,6 +741,9 @@ unsigned long GameScript::CheckVariable(Scriptable* Sender,
 		ReplaceMyArea( Sender, newVarName );
 	}
 	core->GetGame()->globals->Lookup( VarName, value );
+	if(InDebug) {
+		printf("CheckVariable %s%s: %ld\n",Context, VarName, value);
+	}
 	return value;
 }
 
@@ -975,7 +1001,7 @@ Object* GameScript::DecodeObject(const char* line)
 bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 {
 	int ORcount = 0;
-	int result = 0;
+	unsigned int result = 0;
 	bool subresult = true;
 
 	RandomNumValue=rand();
@@ -983,24 +1009,28 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 		Trigger* tR = condition->triggers[i];
 		//do not evaluate triggers in an Or() block if one of them
 		//was already True()
-		if (!ORcount || !subresult)
+		if (!ORcount || !subresult) {
 			result = EvaluateTrigger( Sender, tR );
+		}
 		if (result > 1) {
 			//we started an Or() block
-			if (ORcount)
+			if (ORcount) {
 				printf( "[IEScript]: Unfinished OR block encountered!\n" );
+			}
 			ORcount = result;
 			subresult = false;
 			continue;
 		}
 		if (ORcount) {
 			subresult |= result;
-			if (--ORcount)
+			if (--ORcount) {
 				continue;
+			}
 			result = subresult;
 		}
-		if (!result)
+		if (!result) {
 			return 0;
+		}
 	}
 	if (ORcount) {
 		printf( "[IEScript]: Unfinished OR block encountered!\n" );
@@ -1031,11 +1061,7 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 	}
 	int ret = func( Sender, trigger );
 	if (trigger->flags & 1) {
-		if (ret) {
-			ret = 0;
-		} else {
-			ret = 1;
-		}
+		return !ret;
 	}
 	return ret;
 }
@@ -1101,9 +1127,6 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	ActionFunction func = actions[aC->actionID];
 	if (func) {
-		if(InDebug) {
-			printf("Executing action: %d %s\n", aC->actionID, actionsTable->GetValue(aC->actionID));
-		}
 		Scriptable* scr = GetActorFromObject( Sender, aC->objects[0]);
 		if(scr && scr!=Sender) {
 			//this is an Action Override
@@ -1561,7 +1584,7 @@ Action *GameScript::GenerateActionCore(char *src, char *str, int acIndex)
 					if(mergestrings) {
 						str++;
 						if(*str!='s') {
-							printf("Invalid mergestrings!\n");
+							printf("Invalid mergestrings:%s\n",str);
 							abort();
 						}
 						SKIP_ARGUMENT();
@@ -1599,44 +1622,20 @@ Action *GameScript::GenerateActionCore(char *src, char *str, int acIndex)
 Action* GameScript::GenerateAction(char* String)
 {
 	strlwr( String );
-	Action* newAction = NULL;
-/*
-	int i = 0;
-	//this could be significantly optimized if we store them in a mapping
-	//or at least use bsearch
-*/
 	int len = strlench(String,'(');
-	printf("Compiling:%s\n",String);
+	if(InDebug) {
+		printf("Compiling:%s\n",String);
+	}
 	int i = actionsTable->FindString(String, len);
 	if (i<0) {
-		return newAction;
+		return NULL;
 	}
 	char *src = String+len;
 	char *str = actionsTable->GetStringIndex( i )+len;
-	newAction = GenerateActionCore( src, str, i);
-/*
-	while (true) {
-		char* src = String;
-		char* str = actionsTable->GetStringIndex( i );
-		if (!str)
-			return newAction;
-		while (*str) {
-			if (*str != *src)
-				break;
-			if (*str == '(') {
-				newAction = GenerateActionCore(src, str, i);
-				if(newAction) {
-					return newAction;
-				}
-				break;
-			}
-			src++;
-			str++;
-		}
-		i++;
+	if(InDebug) {
+		printf("Match: %s vs. %s\n",src,str);
 	}
-*/
-	return newAction;
+	return GenerateActionCore( src, str, i);
 }
 
 Trigger* GameScript::GenerateTrigger(char* String)
@@ -3048,17 +3047,12 @@ int GameScript::CheckStat(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::CheckStatGT(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* target = GetActorFromObject( Sender,
-							parameters->objectParameter );
-	if (!target) {
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
-	if (target->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) target;
-	if (actor->GetStat( parameters->int0Parameter ) >
-		parameters->int1Parameter) {
+	Actor* actor = ( Actor* ) tar;
+	if (actor->GetStat( parameters->int0Parameter ) > parameters->int1Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3066,17 +3060,12 @@ int GameScript::CheckStatGT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::CheckStatLT(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* target = GetActorFromObject( Sender,
-							parameters->objectParameter );
-	if (!target) {
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
-	if (target->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) target;
-	if (actor->GetStat( parameters->int0Parameter ) <
-		parameters->int1Parameter) {
+	Actor* actor = ( Actor* ) tar;
+	if (actor->GetStat( parameters->int0Parameter ) < parameters->int1Parameter) {
 		return 1;
 	}
 	return 0;
@@ -5389,5 +5378,10 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStat(IE_UNSELECTABLE,parameters->int0Parameter);
+}
+
+void GameScript::Debug(Scriptable* Sender, Action* parameters)
+{
+	printMessage("IEScript",parameters->string0Parameter,YELLOW);
 }
 

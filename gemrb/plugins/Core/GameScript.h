@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.85 2004/03/23 19:08:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.86 2004/03/24 20:19:42 avenger_teambg Exp $
  *
  */
 
@@ -865,6 +865,7 @@ public:
 		Action* parameters);
 	static void CutSceneID(Scriptable* Sender, Action* parameters);
 	static void Deactivate(Scriptable* Sender, Action* parameters);
+	static void Debug(Scriptable* Sender, Action* parameters);
 	static void DestroyPartyGold(Scriptable* Sender, Action* parameters);
 	static void DestroySelf(Scriptable* Sender, Action* parameters);
 	static void Dialogue(Scriptable* Sender, Action* parameters);
