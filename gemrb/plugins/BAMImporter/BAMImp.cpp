@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.28 2004/09/13 16:53:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.29 2004/10/08 19:56:02 avenger_teambg Exp $
  *
  */
 
@@ -233,9 +233,9 @@ void* BAMImp::GetFramePixels(unsigned short findex, unsigned char /*mode*/)
 		}
 		unsigned int i = 0;
 		while (i < pixelcount) {
-			if (*p == 0) {
+			if (*p == CompressedColorIndex) {
 				p++;
-				memset( &Buffer[i], 0, ( *p ) + 1 );
+				memset( &Buffer[i], CompressedColorIndex, ( *p ) + 1 );
 				i += *p;
 			} else
 				Buffer[i] = *p;
