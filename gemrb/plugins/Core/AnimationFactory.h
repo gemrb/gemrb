@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.h,v 1.4 2004/08/26 20:53:51 avenger_teambg Exp $
  *
  */
 
@@ -52,7 +52,7 @@ public:
 	void LoadFLT(unsigned short* buffer, int count);
 	Animation* GetCycle(unsigned char cycle);
 	/** No descriptions */
-	Sprite2D* GetFrame(unsigned short index);
+	Sprite2D* GetFrame(unsigned short index, unsigned char cycle=0);
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.9 2004/08/26 16:35:21 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.10 2004/08/26 20:53:51 avenger_teambg Exp $
  *
  */
 
@@ -81,11 +81,26 @@ Animation* AnimationFactory::GetCycle(unsigned char cycle)
 	anim->autofree = false;
 	return anim;
 }
-/** No descriptions */
-Sprite2D* AnimationFactory::GetFrame(unsigned short index)
+
+/* returns the required frame of the named cycle, cycle defaults to 0 */
+Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle)
 {
-	if (index -1 >= frames.size()) {
+	if (cycle >= cycles.size()) {
 		return NULL;
 	}
-	return frames[index - 1];
+	int ff = cycles[cycle]. FirstFrame, fc = cycles[cycle].FramesCount;
+	if(index >= fc) {
+		return NULL;
+	}
+	return frames[FLTable[ff+index]];
 }
+/** No descriptions */
+/*
+Sprite2D* AnimationFactory::GetFrame(unsigned short index)
+{
+	if (index >= frames.size()) {
+		return NULL;
+	}
+	return frames[index];
+}
+*/
