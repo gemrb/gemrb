@@ -47,6 +47,8 @@ Button::Button(bool Clear){
 		font = core->GetFont("STONEBIG");
 	else if(stricmp(core->GameType, "bg1") == 0)
 		font = core->GetFont("STONESML");
+	else if(stricmp(core->GameType, "iwd") == 0)
+		font = core->GetFont("STONESML");
 	else if(stricmp(core->GameType, "iwd2") == 0) {
 		font = core->GetFont("NORMAL");
 		Color fore = {0xff, 0xff, 0xff, 0x00}, back = {0x00, 0x00, 0x00, 0x00};
