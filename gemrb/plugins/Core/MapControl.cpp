@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.6 2004/09/11 07:50:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.7 2004/09/11 12:38:38 edheldil Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -94,7 +94,7 @@ printf("%d %d\n",MapMOS->Width, MapMOS->Height);
 }
 
 /** Draws the Control on the Output Display */
-void MapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
+void MapControl::Draw(unsigned short x, unsigned short y)
 {
 	if (!Width || !Height) {
 		return;
@@ -106,14 +106,14 @@ void MapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 	}
 
 	Video* video = core->GetVideoDriver();
-	Region r( XPos, YPos, Width, Height );
+	Region r( x + XPos, y + YPos, Width, Height );
 
-	video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
+	video->BlitSprite( MapMOS, MAP_TO_SCREENX(x), MAP_TO_SCREENY(y), true, &r );
 
 	Region vp = video->GetViewport();
 
-	vp.x = GAME_TO_SCREENX(vp.x);
-	vp.y = GAME_TO_SCREENY(vp.y);
+	vp.x = x + GAME_TO_SCREENX(vp.x);
+	vp.y = y + GAME_TO_SCREENY(vp.y);
 	vp.w = ViewWidth;
 	vp.h = ViewHeight;
 
@@ -123,7 +123,7 @@ void MapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 	for (int i = 1; i < 9; i++) {
 		Actor* actor = core->GetGame()->FindPC( i );
 		if (actor) {
-			video->DrawEllipse( GAME_TO_SCREENX(actor->XPos), GAME_TO_SCREENY(actor->YPos), 3, 2, i == 1 ? green : darkgreen, false );
+			video->DrawEllipse( x + GAME_TO_SCREENX(actor->XPos), y + GAME_TO_SCREENY(actor->YPos), 3, 2, i == 1 ? green : darkgreen, false );
 		}
 	}
 }
