@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.14 2005/03/06 10:46:34 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.15 2005/03/06 14:18:34 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -526,7 +526,7 @@ def UpdateStoreHealWindow ():
 		if Cure != None:
 			GemRB.SetVarAssoc (Window, Button, "Index", TopIndex+i)
 			Spell = GemRB.GetSpell (Cure['CureResRef'])
-			GemRB.SetSpellIcon (Window,Button, Cure['CureResRef'])
+			GemRB.SetSpellIcon (Window,Button, Cure['CureResRef'],1)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
 
@@ -561,7 +561,7 @@ def InfoHealWindow ():
 	GemRB.SetText (Window, Label, Spell['SpellName'])
 
 	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetSpellIcon (Window, Button, Cure['CureResRef'])
+	GemRB.SetSpellIcon (Window, Button, Cure['CureResRef'],1)
 
 	TextArea = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, TextArea, Spell['SpellDesc'])

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.7 2005/03/02 19:36:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.8 2005/03/06 14:18:31 avenger_teambg Exp $
  *
  */
 
@@ -130,16 +130,18 @@ STOItem* STOImp::GetItem()
 
 	str->ReadResRef( it->ItemResRef );
 	str->ReadWord( &it->unknown );
-	str->ReadWord( &it->Usage1 );
-	str->ReadWord( &it->Usage2 );
-	str->ReadWord( &it->Usage3 );
+	for(int i=0;i<3;i++) {
+		str->ReadWord( it->Usages+i );
+	}
 	str->ReadDword( &it->Flags );
 	str->ReadDword( &it->AmountInStock );
 	str->ReadDword( &it->InfiniteSupply );
-
-	memset( it->unknown2, 0, 56 );
 	if (version == 11) {
+		str->ReadDword( &it->Trigger );
 		str->Read( it->unknown2, 56 );
+	} else {
+		it->Trigger = 0;
+		memset( it->unknown2, 0, 56 );
 	}
 
 	return it;

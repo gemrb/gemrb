@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.86 2005/03/05 21:07:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.87 2005/03/06 14:18:28 avenger_teambg Exp $
  *
  */
 
@@ -63,15 +63,19 @@ static Color cyan_dark = {
 static int classcount=-1;
 static char **clericspelltables=NULL;
 static char **wizardspelltables=NULL;
+static int constitution_normal[26];
+static int constitution_fighter[26];
 
-void InitSpellTables()
+static void InitActorTables()
 {
-	int skilltable = core->LoadTable( "clskills" );
-	TableMgr *tm = core->GetTable( skilltable );
+	int i;
+
+	int table = core->LoadTable( "clskills" );
+	TableMgr *tm = core->GetTable( table );
 	classcount = tm->GetRowCount();
 	clericspelltables = (char **) calloc(classcount, sizeof(char*));
 	wizardspelltables = (char **) calloc(classcount, sizeof(char*));
-	for(int i = 0; i<classcount; i++) {
+	for(i = 0; i<classcount; i++) {
 		char *spelltablename = tm->QueryField( i, 1 );
 		if(spelltablename[0]!='*') {
 			clericspelltables[i]=strdup(spelltablename);
@@ -81,7 +85,16 @@ void InitSpellTables()
 			wizardspelltables[i]=strdup(spelltablename);
 		}
 	}
-	core->DelTable( skilltable );
+	core->DelTable( table );
+
+	table = core->LoadTable( "hpconbon" );
+	tm = core->GetTable( table );
+	for(i=0;i<26;i++) {
+		constitution_normal[i] = atoi(tm->QueryField( i, 1) );
+		constitution_fighter[i] = atoi(tm->QueryField( i, 2) );
+printf("ConBon: %d  %d  %d\n",i,constitution_normal[i], constitution_fighter[i]);
+	}
+	core->DelTable( table );
 }
 
 PCStatsStruct::PCStatsStruct()
@@ -137,6 +150,9 @@ Actor::Actor()
 
 	InternalFlags = 0;
 	inventory.SetInventoryType(INVENTORY_CREATURE);
+	if (classcount<0) {
+		InitActorTables();
+	}
 }
 
 Actor::~Actor(void)
@@ -251,10 +267,39 @@ void Actor::SetCircleSize()
 	SetCircle( anims->GetCircleSize(), *color );
 }
 
+static int maximum_values[256]={
+255,255,20,100,100,100,100,25,5,25,25,25,25,25,100,100,
+100,100,100,100,100,100,100,100,100,200,200,200,200,200,100,100,
+200,200,50,255,25,100,25,25,25,25,25,999999999,999999999,999999999,25,25,
+200,255,200,100,100,200,200,25,5,100,1,1,100,1,1,1,
+1,1,1,1,50,50,1,9999,25,100,100,1,1,20,20,25,
+25,1,1,255,25,25,255,255,25,5,5,5,5,5,5,5,
+5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+5,5,5,5,5,5,100,100,100,255,5,5,255,1,1,1,
+25,25,30,1,1,1,25,-1,100,100,1,255,255,255,255,255,
+255,255,255,255,255,20,255,255,1,20,255,999999999,999999999,1,
+1,999999999,999999999,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,25,25,255,255,255,255,255,65535,-1,
+200,200,200,200,200,200,200,-1,-1,255,65535,4,255,255,255,255,
+20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,
+255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255
+};
+
 bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 {
 	if (StatIndex >= MAX_STATS) {
 		return false;
+	}
+	if( (signed) Value<-100) {
+		Value = (ieDword) -100;
+	}
+	else {
+		if( maximum_values[StatIndex]>0) {
+			if( (signed) Value>maximum_values[StatIndex]) {
+				Value = (ieDword) maximum_values[StatIndex];
+			}
+		}
 	}
 	Modified[StatIndex] = Value;
 	switch (StatIndex) {
@@ -287,7 +332,7 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 			SetCircleSize();
 			break;
 		case IE_HITPOINTS:
-			if((signed) Value<=0) {
+			if(GetHPMod()+(signed) Value<=0) {
 				Die(NULL);
 			}
 			if((signed) Value>(signed) Modified[IE_MAXHITPOINTS]) {
@@ -297,6 +342,12 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 	}
 	return true;
 }
+
+int Actor::GetHPMod()
+{
+	return constitution_normal[Modified[IE_CON]];
+}
+
 int Actor::GetMod(unsigned int StatIndex)
 {
 	if (StatIndex >= MAX_STATS) {
@@ -357,7 +408,7 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 {
 //recalculate damage based on resistances and difficulty level
 //the lower 2 bits are actually modifier types
-	NewStat(IE_HITPOINTS,-damage, damagetype&3);
+	NewStat(IE_HITPOINTS, -damage, damagetype&3);
 	LastDamageType=damagetype;
 	LastDamage=damage;
 	LastHitter=hitter;
@@ -437,11 +488,12 @@ int Actor::GetEncumbrance()
 
 void Actor::Die(Scriptable *killer)
 {
-	Selected=false;
 	int minhp=Modified[IE_MINHITPOINTS];
 	if(minhp) { //can't die
 		SetStat(IE_HITPOINTS, minhp);
+		return;
 	}
+	Selected=false;
 	InternalFlags|=IF_JUSTDIED;
 	if(!InParty) {
 		Actor *act=NULL;
@@ -458,9 +510,7 @@ void Actor::Die(Scriptable *killer)
 		}
 	}
 
-	if(Modified[IE_HITPOINTS]<=0) {
-		InternalFlags|=IF_REALLYDIED;
-	}
+	InternalFlags|=IF_REALLYDIED;
 	SetStance( IE_ANI_DIE );
 }
 

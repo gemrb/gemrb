@@ -6,10 +6,15 @@ Description: Gets the item resref, price and description of a store item referen
 Parameters: index - the number of the cure in the store list
 
 Return value: dictionary
-"ItemResRef"   - the ResRef of the item
-"Description"  - the StrRef of the item's description
-"Price"        - the price of the item (subtract this from the party gold)
-"Amount"       - the amount of item in store (-1 means infinite)
+"ItemResRef"  - the ResRef of the item
+"ItemName"    - the StrRef of the item's name (identified or not)
+"ItemDesc"    - the StrRef of the item's description (identified or not)
+"Price"       - the price of the item (subtract this from the party gold)
+"Amount"      - the amount of item in store (-1 means infinite)
+"Usages0"     - The primary charges of the item (or the item's stack amount if the item is stackable).
+"Usages1"     - The secondary charges of the item.
+"Usages2"     - The tertiary charges of the item.
+"Flags"       - Item flags.
 
-See also: EnterStore, GetStoreDrink, GetStoreCure, GetStore
+See also: EnterStore, GetStoreDrink, GetStoreCure, GetStore, GetSlotItem
 

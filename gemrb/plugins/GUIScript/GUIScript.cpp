@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.281 2005/03/06 10:33:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.282 2005/03/06 14:18:30 avenger_teambg Exp $
  *
  */
 
@@ -3331,15 +3331,16 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetSpellIcon__doc,
-"SetSpellIcon(WindowIndex, ControlIndex, SPLResRef)\n\n"
-"FIXME: temporary Sets Spell icon image on a button." );
+"SetSpellIcon(WindowIndex, ControlIndex, SPLResRef, type)\n\n"
+"Sets Spell icon image on a button. Type is the icon's type." );
 
 static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci;
 	char* SpellResRef;
+	int type=0;
 
-	if (!PyArg_ParseTuple( args, "iis", &wi, &ci, &SpellResRef )) {
+	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &SpellResRef, &type )) {
 		return AttributeError( GemRB_SetSpellIcon__doc );
 	}
 	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
@@ -3353,7 +3354,13 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 	}
 
 	AnimationMgr* bam = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
-	DataStream *str = core->GetResourceMgr()->GetResource( spell->SpellbookIcon, IE_BAM_CLASS_ID );
+	DataStream *str;
+	if (type) {
+		str = core->GetResourceMgr()->GetResource( spell->ext_headers[0].MemorisedIcon, IE_BAM_CLASS_ID );
+	}
+	else {
+		str = core->GetResourceMgr()->GetResource( spell->SpellbookIcon, IE_BAM_CLASS_ID );
+	}
 	if (!bam->Open( str, true ) ) {
 		return RuntimeError( "BAM not found" );
 	}
@@ -3509,6 +3516,48 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "StoreFlags", PyInt_FromLong( store->Flags ) );
 	PyDict_SetItemString(dict, "TavernRumour", PyString_FromResRef( store->RumoursTavern ));
 	PyDict_SetItemString(dict, "TempleRumour", PyString_FromResRef( store->RumoursTemple ));
+	return dict;
+}
+
+PyDoc_STRVAR( GemRB_GetStoreItem__doc,
+"GetStoreItem(idx) => string\n\n"
+"Returns the store item referenced by the index. " );
+
+static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
+{
+	int index;
+
+	if (!PyArg_ParseTuple( args, "i", &index )) {
+		return AttributeError( GemRB_GetStoreItem__doc );
+	}
+	Store *store = core->GetCurrentStore();
+	if (!store) {
+		return RuntimeError("No current store!");
+	}
+	if (index>=(int) store->ItemsCount) {
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+	PyObject* dict = PyDict_New();
+	STOItem *si=store->GetItem( index );
+	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef( si->ItemResRef ));
+	PyDict_SetItemString(dict, "Usages0", PyInt_FromLong (si->Usages[0]));
+	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (si->Usages[1]));
+	PyDict_SetItemString(dict, "Usages2", PyInt_FromLong (si->Usages[2]));
+	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (si->Flags));
+	if (si->InfiniteSupply) {
+		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( -1 ) );
+	} else {
+		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( si->AmountInStock ) );
+	}
+
+	Item *item = core->GetItem( si->ItemResRef );
+
+	int identified = si->Flags & IE_INV_ITEM_IDENTIFIED;
+	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( item->GetItemName( identified )) );
+	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( item->GetItemDesc( identified )) );
+
+	core->FreeItem( item, si->ItemResRef, false );
 	return dict;
 }
 
@@ -4451,6 +4500,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetStore, METH_VARARGS),
 	METHOD(GetStoreDrink, METH_VARARGS),
 	METHOD(GetStoreCure, METH_VARARGS),
+	METHOD(GetStoreItem, METH_VARARGS),
 	METHOD(InvalidateWindow, METH_VARARGS),
 	METHOD(EnableCheatKeys, METH_VARARGS), 
 	METHOD(UpdateMusicVolume, METH_NOARGS),
