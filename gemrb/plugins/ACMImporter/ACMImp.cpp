@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.41 2004/04/17 19:37:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.42 2004/04/21 19:03:11 balrog994 Exp $
  *
  */
 
@@ -326,6 +326,8 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 	unsigned char * memory = (unsigned char*) malloc(rawsize); 
 	//multiply always with 2 because it is in 16 bits
 	long cnt1 = acm->read_samples( ( short* ) memory, cnt ) * riff_chans * 2;
+	//Sound Length in milliseconds
+	int time_length = ((cnt / riff_chans) * 1000) / samplerate;
 	//it is always reading the stuff into 16 bits
 	alBufferData( Buffer, GetFormatEnum( riff_chans, 16 ), memory, cnt1, samplerate );
 	delete( acm );
@@ -363,7 +365,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 				streams[i].Source = Source;
 				streams[i].playing = false;
 				alSourcePlay( Source );
-				return 1;
+				return time_length;
 			}
 		} else {
 			streams[i].Buffer = Buffer;
@@ -371,7 +373,7 @@ unsigned long ACMImp::Play(const char* ResRef, int XPos, int YPos)
 			streams[i].free = false;
 			streams[i].playing = false;
 			alSourcePlay( Source );
-			return 1;
+			return time_length;
 		}
 	}
 
