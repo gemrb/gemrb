@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.33 2003/11/28 17:27:39 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.34 2003/11/30 00:36:55 balrog994 Exp $
  *
  */
 
@@ -347,6 +347,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y
 	//TODO: Add the destination surface and rect to the Blit Pipeline
 	SDL_Rect drect;
 	SDL_Rect t = {size.x, size.y, size.w, size.h};
+	Region c(clip->x, clip->y, clip->w, clip->h);
 	if(anchor) {
 		drect.x = x;
 		drect.y = y;
@@ -354,50 +355,54 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y
 	else {
 		drect.x = x-Viewport.x;
 		drect.y = y-Viewport.y;
+		if(clip) {
+			c.x -= Viewport.x;
+			c.y -= Viewport.y;
+		}
 	}
 	if(clip) {
-		if(drect.x+size.w <= clip->x)
+		if(drect.x+size.w <= c.x)
 			return;
 		else {
-			if(drect.x < clip->x) {
-				t.x = size.x+clip->x-drect.x;
-				t.w = size.w-(clip->x-drect.x);
+			if(drect.x < c.x) {
+				t.x = size.x+c.x-drect.x;
+				t.w = size.w-(c.x-drect.x);
 			}
 			else {
-				if(drect.x+size.w <= clip->x+clip->w) {
+				if(drect.x+size.w <= c.x+c.w) {
 					t.x = size.x;
 					t.w = size.w;
 				}
 				else {
-					if(drect.x >= clip->x+clip->w) {
+					if(drect.x >= c.x+c.w) {
 						return;
 					}
 					else {
 						t.x = size.x;
-						t.w = (clip->x+clip->w)-drect.x;
+						t.w = (c.x+c.w)-drect.x;
 					}
 				}
 			}
 		}
-		if(drect.y+size.h <= clip->y)
+		if(drect.y+size.h <= c.y)
 			return;
 		else {
-			if(drect.y < clip->y) {
-				t.y = size.y+clip->y-drect.y;
-				t.h = size.h-(clip->y-drect.y);
+			if(drect.y < c.y) {
+				t.y = size.y+c.y-drect.y;
+				t.h = size.h-(c.y-drect.y);
 			}
 			else {
-				if(drect.y+size.h <= clip->y+clip->h) {
+				if(drect.y+size.h <= c.y+c.h) {
 					t.y = 0;
 					t.h = size.h;
 				}
 				else {
-					if(drect.y >= clip->y+clip->h) {
+					if(drect.y >= c.y+c.h) {
 						return;
 					}
 					else {
 						t.y = 0;
-						t.h = (clip->y+clip->h)-drect.y;
+						t.h = (c.y+c.h)-drect.y;
 					}
 				}
 			}
