@@ -133,7 +133,7 @@ PathNode * PathFinder::FindPath(short sX, short sY, short dX, short dY)
 		}
 		//Copying tmp to OpenStack
 		OpenStack.clear();
-		int maxsize = min(8, tmp.size());
+		int maxsize = min(120, tmp.size());
 		for(int i = 0; i < maxsize; i++) {
 			OpenStack.push_back(tmp.at(i));
 		}
