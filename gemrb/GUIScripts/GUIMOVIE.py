@@ -11,6 +11,14 @@ def OnLoad():
 	GemRB.SetVar("ENDCRDIT",1)
 	GemRB.SetVar("INTRO15F",1)
 	GemRB.SetVar("WOTC",1)
+	GemRB.SetVar("DEATHAND",1)
+	GemRB.SetVar("BWDRAGON",1)
+	GemRB.SetVar("RESTCAMP",1)
+	GemRB.SetVar("DAYNITE",1)
+	GemRB.SetVar("NITEDAY",1)
+	GemRB.SetVar("RESTDUNG",1)
+	GemRB.SetVar("RESTINN",1)
+	GemRB.SetVar("POCKETZZ",1)
 
 	GemRB.LoadWindowPack("GUIMOVIE")
 	MovieWindow = GemRB.LoadWindow(0)
@@ -43,6 +51,7 @@ def PlayPress():
 			if s==0:
 				s = GemRB.GetTableRowName(MoviesTable, i)
 				GemRB.PlayMovie(s)
+				GemRB.InvalidateWindow(MovieWindow)
 				return
 			s = s - 1
 	return
