@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.11 2004/07/31 12:37:15 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.12 2004/08/06 01:20:07 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -647,9 +647,10 @@ def OpenInformationWindow ():
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 
 
-	#GemRB.SetVisible (Window, 1)
 	GemRB.UnhideGUI ()
-	
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+
+
 
 def OpenBiographyWindow ():
 	global BiographyWindow
@@ -662,6 +663,7 @@ def OpenBiographyWindow ():
 		GemRB.SetVar ("FloatWindow", InformationWindow)
 		
 		GemRB.UnhideGUI()
+		GemRB.ShowModal (InformationWindow, MODAL_SHADOW_GRAY)
 		return
 
 	BiographyWindow = Window = GemRB.LoadWindow (12)
@@ -676,8 +678,8 @@ def OpenBiographyWindow ():
 	GemRB.SetText (Window, Button, 1403)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
-	#GemRB.SetVisible (Window, 1)
 	GemRB.UnhideGUI ()
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	
 ###################################################
 # End of file GUIREC.py

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.8 2004/05/21 20:44:54 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.9 2004/08/06 01:20:07 edheldil Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -71,6 +71,8 @@ def OpenJournalWindow ():
 		if LogWindow: OpenLogWindow()
 		if BeastsWindow: OpenBeastsWindow()
 		if QuestsWindow: OpenQuestsWindow()
+		
+		GemRB.HideGUI()
 		
 		GemRB.UnloadWindow(JournalWindow)
 		JournalWindow = None

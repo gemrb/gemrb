@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.10 2004/08/03 22:00:18 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.11 2004/08/06 01:20:07 edheldil Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -504,8 +504,8 @@ def OpenLoadMsgWindow ():
 	Text = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, Text, 39432)
 
-	#GemRB.SetVisible (Window, 1)
 	GemRB.UnhideGUI ()
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 
 
 def LoadGame ():
@@ -554,9 +554,8 @@ def OpenQuitMsgWindow ():
 	Text = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, Text, 39430)  # or 39431 - cannot be saved atm
 
-	#GemRB.SetVisible (Window, 1)
 	GemRB.UnhideGUI ()
-
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 
 
 def QuitGame ():
@@ -605,6 +604,7 @@ def OpenKeyboardMappingsWindow ():
 		KeysWindow = None
 		GemRB.SetVar ("OtherWindow", OptionsWindow)
 		
+		GemRB.LoadWindowPack ("GUIOPT")
 		GemRB.UnhideGUI ()
 		return
 		
@@ -710,7 +710,8 @@ def OpenMoviesWindow ():
 		GemRB.UnloadWindow (MoviesWindow)
 		MoviesWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-		
+
+		GemRB.LoadWindowPack ("GUIOPT")
 		GemRB.UnhideGUI ()
 		return
 		
@@ -753,9 +754,8 @@ def OpenMoviesWindow ():
 	GemRB.UnloadTable (MovieTable)
 
 
-
-	#GemRB.SetVisible (MoviesWindow, 1)
 	GemRB.UnhideGUI ()
+	GemRB.ShowModal (Window, MODAL_SHADOW_BLACK)
 
 
 ###################################################
@@ -770,12 +770,16 @@ def OnPlayMoviePress ():
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
 	key = GemRB.GetTableRowName (MovieTable, selected)
 	GemRB.UnloadTable (MovieTable)
-	
+
+	GemRB.SetVisible (MoviesWindow, 0)
 	GemRB.PlayMovie (key)
+	GemRB.SetVisible (MoviesWindow, 1)
 
 ###################################################
 def OnCreditsPress ():
+	GemRB.SetVisible (MoviesWindow, 0)
 	GemRB.PlayMovie ("CREDITS")
+	GemRB.SetVisible (MoviesWindow, 1)
 
 ###################################################
 ###################################################
