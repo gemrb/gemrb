@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.16 2003/12/09 19:01:54 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.17 2003/12/12 23:11:58 balrog994 Exp $
  *
  */
 
@@ -56,6 +56,7 @@
 #define IE_ANI_EMERGE			14
 #define IE_ANI_HIDE				15
 #define IE_ANI_SLEEP			16
+#define IE_ANI_PST_START		17
 
 #define IE_ANI_CODE_MIRROR		0
 #define IE_ANI_ONE_FILE			1

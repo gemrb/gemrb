@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.19 2003/12/09 19:01:55 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.20 2003/12/12 23:11:58 balrog994 Exp $
  *
  */
 
@@ -111,6 +111,7 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 	AnimationMgr * anim = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
 	anim->Open(stream, true);
 	Animation * a = anim->GetAnimation(Cycle, 0, 0, IE_NORMAL);
+	a->pos = 0;
 	switch(MirrorType) {
 		case IE_ANI_CODE_MIRROR:
 			{
@@ -182,6 +183,17 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 				case IE_ANI_WALK:
 					{
 					Anims[AnimID][Orient] = a;
+					}
+				break;
+
+				case IE_ANI_PST_START:
+					{
+						for(int j = 0; j < 16; j++) {
+							Anims[IE_ANI_PST_START][j] = a;
+						}
+						a->autoSwitchOnEnd = true;
+						a->endReached = false;
+						a->nextAnimID = IE_ANI_AWAKE;
 					}
 				break;
 
@@ -370,6 +382,14 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, c
 						ResRef[0] = this->ResRef[0];
 						ResRef[1] = 0;
 						strcat(ResRef, "WLK");
+						strcat(ResRef, &this->ResRef[1]);
+					break;
+
+					case IE_ANI_PST_START:
+						Cycle = 0;
+						ResRef[0] = this->ResRef[0];
+						ResRef[1] = 0;
+						strcat(ResRef, "MS1");
 						strcat(ResRef, &this->ResRef[1]);
 					break;
 				}
