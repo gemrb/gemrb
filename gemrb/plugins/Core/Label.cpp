@@ -53,12 +53,14 @@ Label::~Label(){
 /** Draws the Control on the Output Display */
 void Label::Draw(unsigned short x, unsigned short y)
 {
-	if(font && Changed) {
+	Changed=false;
+	if(XPos==65535)
+		 return;
+	if(font) {
 		if(useRGB)
 			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, palette, Alignment | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
 		else
 			font->Print(Region(this->XPos+x, this->YPos+y, this->Width, this->Height), (unsigned char*)Buffer, NULL, Alignment | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
-		Changed = false;
 	}
 }
 /** This function sets the actual Label Text */

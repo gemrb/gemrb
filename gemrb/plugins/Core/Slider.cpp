@@ -52,6 +52,9 @@ void Slider::Draw(unsigned short x, unsigned short y)
 {
 	if(!Changed)
 		return;
+	Changed = false;
+	if(XPos==65535)
+		return;
 	if(BackGround) {
 		if((BackGround->Width < Width) || (BackGround->Height < Height)) {
 			core->GetVideoDriver()->BlitTiled(Region(x+XPos, y+YPos, Width, Height,1), BackGround, true);
@@ -74,7 +77,6 @@ void Slider::Draw(unsigned short x, unsigned short y)
 			}
 		break;
 	}
-	Changed = false;
 }
 /** Returns the actual Slider Position */
 unsigned int Slider::GetPosition()

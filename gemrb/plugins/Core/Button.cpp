@@ -119,9 +119,9 @@ void Button::Draw(unsigned short x, unsigned short y)
 {
 	if(!Changed)
 		return;
+	Changed = false;
 	if(XPos==65535)
 		return;
-	Changed = false;
 	if(!(Flags & 0x1)) {
 		Color *ppoi=NULL;
 //		Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};

@@ -47,6 +47,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 {
 	if(!Changed)
 		return;
+	Changed=false;
+	if(XPos==65535)
+		return;
 	if(lines.size() == 0)
 		return;
 	char * Buffer = (char*)malloc(1);
@@ -61,7 +64,6 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	}
 	ftext->PrintFromLine(startrow, Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Buffer, palette, IE_FONT_ALIGN_LEFT, true, finit, initpalette);
 	free(Buffer);
-	Changed = false;
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
     to this Text Area Control. */
