@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.23 2004/05/09 17:36:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.24 2004/08/08 13:21:03 avenger_teambg Exp $
  *
  */
 
@@ -25,13 +25,10 @@
 
 extern Interface* core;
 
-Label::Label(unsigned short bLength, Font* font)
+Label::Label(Font* font)
 {
 	this->font = font;
 	Buffer = NULL;
-	if (bLength != 0) {
-		Buffer = ( char * ) malloc( bLength );
-	}
 	useRGB = false;
 	LabelOnPress[0] = 0;
 
@@ -55,7 +52,7 @@ void Label::Draw(unsigned short x, unsigned short y)
 	if (XPos == 65535) {
 		return;
 	}
-	if (font) {
+	if (font && Buffer) {
 		font->Print( Region( this->XPos + x, this->YPos + y,
 			this->Width, this->Height ), ( unsigned char * ) Buffer,
 			useRGB?palette:NULL, Alignment | IE_FONT_ALIGN_MIDDLE |
@@ -65,12 +62,12 @@ void Label::Draw(unsigned short x, unsigned short y)
 /** This function sets the actual Label Text */
 int Label::SetText(const char* string, int pos)
 {
-	if (Buffer != NULL) {
-		strcpy( Buffer, string );
-		if (Alignment == IE_FONT_ALIGN_CENTER)
-			if (core->HasFeature( GF_LOWER_LABEL_TEXT ))
-				strlwr( Buffer );
-	}
+	if (Buffer )
+		free( Buffer );
+	Buffer = strdup( string );
+	if (Alignment == IE_FONT_ALIGN_CENTER)
+		if (core->HasFeature( GF_LOWER_LABEL_TEXT ))
+			strlwr( Buffer );
 	Changed = true;
 	return 0;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.22 2004/08/02 18:00:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.23 2004/08/08 13:21:03 avenger_teambg Exp $
  *
  */
 
@@ -74,35 +74,21 @@ void Slider::Draw(unsigned short x, unsigned short y)
 										BackGround, true );
 		} else {
 			Region r( x + XPos, y + YPos, Width, Height );
-			core->GetVideoDriver()->BlitSprite( BackGround, x + XPos,
-										y + YPos, true, &r );
+			core->GetVideoDriver()->BlitSprite( BackGround,
+				x + XPos, y + YPos, true, &r );
 		}
 	}
 	switch (State) {
 		case IE_GUI_SLIDER_KNOB:
-			 {
-				core->GetVideoDriver()->BlitSprite( Knob,
-											x +
-											XPos +
-											KnobXPos +
-											( Pos * KnobStep ),
-											y +
-											YPos +
-											KnobYPos, true );
-			}
+			core->GetVideoDriver()->BlitSprite( Knob,
+				x + XPos + KnobXPos + ( Pos * KnobStep ),
+				y + YPos + KnobYPos, true );
 			break;
 
 		case IE_GUI_SLIDER_GRABBEDKNOB:
-			 {
-				core->GetVideoDriver()->BlitSprite( GrabbedKnob,
-											x +
-											XPos +
-											KnobXPos +
-											( Pos * KnobStep ),
-											y +
-											YPos +
-											KnobYPos, true );
-			}
+			core->GetVideoDriver()->BlitSprite( GrabbedKnob,
+				x + XPos + KnobXPos + ( Pos * KnobStep ),
+				y + YPos + KnobYPos, true );
 			break;
 	}
 }

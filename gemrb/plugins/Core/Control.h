@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.19 2004/06/27 23:47:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.20 2004/08/08 13:21:03 avenger_teambg Exp $
  *
  */
 
@@ -71,8 +71,6 @@ public:
 public: // Public attributes
 	/** Defines the Control ID Number used for GUI Scripting */
 	unsigned long ControlID;
-	/** Buffer length of an attached buffer (only significant for some types of text controls) */
-	unsigned short BufferLength;
 	/** X position of control relative to containing window */
 	unsigned short XPos;
 	/** Y position of control relative to containing window */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.29 2004/08/04 00:49:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.30 2004/08/08 13:21:04 avenger_teambg Exp $
  *
  */
 
@@ -122,14 +122,12 @@ Window* CHUImp::GetWindow(unsigned int wid)
 	for (i = 0; i < ControlsCount; i++) {
 		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );
 		ieDword COffset, CLength, ControlID;
-		ieWord BufferLength, XPos, YPos, Width, Height;
+		ieWord XPos, YPos, Width, Height;
 		ieByte ControlType, temp;
 		str->Read( &COffset, 4 );
 		str->Read( &CLength, 4 );
 		str->Seek( COffset, GEM_STREAM_START );
 		str->Read( &ControlID, 4 );
-		//str->Read(&BufferLength, 2);
-		BufferLength = ( ieWord ) ( ( ControlID & 0xffff0000 ) >> 16 );
 		str->Read( &XPos, 2 );
 		str->Read( &YPos, 2 );
 		str->Read( &Width, 2 );
@@ -137,12 +135,11 @@ Window* CHUImp::GetWindow(unsigned int wid)
 		str->Read( &ControlType, 1 );
 		str->Read( &temp, 1 );
 		switch (ControlType) {
-			case 0:
+			case IE_GUI_BUTTON:
 				 {
 					//Button
 					Button* btn = new Button( false );
 					btn->ControlID = ControlID;
-					btn->BufferLength = BufferLength;
 					btn->XPos = XPos;
 					btn->YPos = YPos;
 					btn->Width = Width;
@@ -204,7 +201,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				}
 				break;
 
-			case 2:
+			case IE_GUI_SLIDER:
 				 {
 					//Slider
 					char MOSFile[9], BAMFile[9];
@@ -224,7 +221,6 @@ Window* CHUImp::GetWindow(unsigned int wid)
 					sldr->ControlID = ControlID;
 					sldr->XPos = XPos;
 					sldr->YPos = YPos;
-					sldr->BufferLength = BufferLength;
 					sldr->ControlType = ControlType;
 					sldr->Width = Width;
 					sldr->Height = Height;
@@ -239,15 +235,20 @@ Window* CHUImp::GetWindow(unsigned int wid)
 					AnimationFactory* anim = ( AnimationFactory* )
 						core->GetResourceMgr()->GetFactoryResource( BAMFile,
 													IE_BAM_CLASS_ID );
-					img = anim->GetFrame( Knob );
-					sldr->SetImage( IE_GUI_SLIDER_KNOB, img );
-					img = anim->GetFrame( GrabbedKnob );
-					sldr->SetImage( IE_GUI_SLIDER_GRABBEDKNOB, img );
+					if(anim) {
+						img = anim->GetFrame( Knob );
+						sldr->SetImage( IE_GUI_SLIDER_KNOB, img );
+						img = anim->GetFrame( GrabbedKnob );
+						sldr->SetImage( IE_GUI_SLIDER_GRABBEDKNOB, img );
+					}
+					else {
+						 sldr->SetState(IE_GUI_SLIDER_BACKGROUND);
+					}
 					win->AddControl( sldr );
 				}
 				break;
 
-			case 3:
+			case IE_GUI_EDIT:
 				 {
 					//Text Edit
 					char FontResRef[9], CursorResRef[9], BGMos[9];
@@ -280,7 +281,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				}
 				break;
 
-			case 5:
+			case IE_GUI_TEXTAREA:
 				 {
 					//Text Area
 					char FontResRef[9], InitResRef[9];
@@ -318,7 +319,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				}
 				break;
 
-			case 6:
+			case IE_GUI_LABEL:
 				 {
 					//Label
 					char FontResRef[9];
@@ -331,7 +332,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 					str->Read( &fore, 4 );
 					str->Read( &back, 4 );
 					str->Read( &alignment, 2 );
-					Label* lab = new Label( BufferLength, fnt );
+					Label* lab = new Label( 32, fnt );
 					lab->ControlID = ControlID;
 					lab->XPos = XPos;
 					lab->YPos = YPos;
@@ -362,7 +363,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				}
 				break;
 
-			case 7:
+			case IE_GUI_SCROLLBAR:
 				 {
 					//ScrollBar
 					char BAMResRef[9];

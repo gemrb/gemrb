@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.h,v 1.11 2004/03/21 13:47:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.h,v 1.12 2004/08/08 13:21:03 avenger_teambg Exp $
  *
  */
 
@@ -44,7 +44,7 @@
 
 class GEM_EXPORT Label : public Control {
 public: 
-	Label(unsigned short bLength, Font* font);
+	Label(Font* font);
 	~Label();
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);

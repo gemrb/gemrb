@@ -56,6 +56,8 @@ public:
   void SetImage(unsigned char type, Sprite2D * img);
   /** Sets the Text of the current control */
   int SetText(const char * string, int pos = 0);
+  /** Sets the State of the Slider */
+  void SetState(int arg) { State=(unsigned char) arg; }
   /** Redraws a slider which is associated with VariableName */
   void RedrawSlider(char *VariableName, int Sum);
 

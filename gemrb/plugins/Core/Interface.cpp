@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.189 2004/08/06 01:15:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.190 2004/08/08 13:21:03 avenger_teambg Exp $
  *
  */
 
@@ -248,7 +248,7 @@ Interface::~Interface(void)
 
 bool Interface::ReadStrrefs()
 {
-  int i;
+	int i;
         TableMgr * tab;
         int table=core->LoadTable("strings");
         memset(strref_table,-1,sizeof(strref_table) );
