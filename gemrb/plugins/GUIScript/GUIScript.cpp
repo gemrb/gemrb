@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.287 2005/03/09 20:06:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.288 2005/03/13 13:23:43 edheldil Exp $
  *
  */
 
@@ -533,14 +533,17 @@ static PyObject* GemRB_SetWindowPicture(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetWindowPos__doc,
-"SetWindowPos(WindowIndex, X, Y)\n\n"
-"Moves a Window." );
+"SetWindowPos(WindowIndex, X, Y, [Center=0, Bounded=1])\n\n"
+"Moves a Window.\n"
+"If Center==0, the X, Y coordinates are those of"
+"upper-left corner, else they are coordinates of window's center."
+"If Bounded==1, the window is kept within screen boundaries." );
 
 static PyObject* GemRB_SetWindowPos(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, X, Y;
+	int WindowIndex, X, Y, Center=0, Bounded=1;
 
-	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &X, &Y )) {
+	if (!PyArg_ParseTuple( args, "iii|ii", &WindowIndex, &X, &Y, &Center, &Bounded )) {
 		return AttributeError( GemRB_SetWindowPos__doc );
 	}
 
@@ -551,6 +554,27 @@ static PyObject* GemRB_SetWindowPos(PyObject * /*self*/, PyObject* args)
 
 	win->XPos = X;
 	win->YPos = Y;
+	if (Center) {
+		win->XPos -= win->Width / 2;
+		win->YPos -= win->Height / 2;
+	}
+
+	// Keep window within screen
+	// FIXME: keep it within gamecontrol
+
+	if (Bounded) {
+		// FIXME: grrrr, should be < 0!!!
+		if (win->XPos > 32767)
+			win->XPos = 0;
+		if (win->YPos > 32767)
+			win->YPos = 0;
+
+		if (win->XPos + win->Width >= core->Width)
+			win->XPos = core->Width - win->Width;
+		if (win->YPos + win->Height >= core->Height)
+			win->YPos = core->Height - win->Height;
+	}
+
 	win->Invalidate();
 
 	Py_INCREF( Py_None );
