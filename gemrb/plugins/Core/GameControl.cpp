@@ -1226,10 +1226,10 @@ bool GameControl::EvaluateDialogTrigger(Scriptable* target, DialogString* trigge
 			continue;
 		}
 		if (ORcount) {
-			subresult |= result;
+			subresult |= ( result != 0 );
 			if (--ORcount)
 				continue;
-			result = subresult;
+			result = subresult ? 1 : 0;
 		}
 		if (!result)
 			return 0;

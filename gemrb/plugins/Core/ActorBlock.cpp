@@ -441,7 +441,7 @@ void Moveble::WalkTo(unsigned short XDes, unsigned short YDes)
 //	step = NULL;
 }
 
-void Moveble::RunAwayFrom(unsigned short XDes, unsigned short YDes, int PathLength, int Backing)
+void Moveble::RunAwayFrom(unsigned short XDes, unsigned short YDes, int PathLength, bool Backing)
 {
 	ClearPath();
 	path = core->GetPathFinder()->RunAway( XPos, YPos, XDes, YDes, PathLength, Backing );

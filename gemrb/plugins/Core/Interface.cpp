@@ -15,13 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.149 2004/04/11 01:11:15 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.150 2004/04/13 19:38:22 doc_wagon Exp $
  *
  */
 
 #include <config.h>
 
+#ifndef INTERFACE
 #define INTERFACE
+#endif
+
 #include "Interface.h"
 #include "FileStream.h"
 #include "AnimationMgr.h"
@@ -1003,7 +1006,7 @@ int Interface::UnloadCreature(unsigned int Slot)
 
 int Interface::AddActor(Actor* actor)
 {
-	for (int index = 0; index < actors.size(); index++) {
+	for (unsigned int index = 0; index < actors.size(); index++) {
 		if (!actors[index]) {
 			actors[index] = actor;
 			return index;
@@ -1698,7 +1701,7 @@ int Interface::GetCharSounds(TextArea* ta)
 
 	memcpy( Path, GamePath, _MAX_PATH );
 	strcat( Path, "sounds" );
-	hasfolders = HasFeature( GF_SOUNDFOLDERS );
+	hasfolders = ( HasFeature( GF_SOUNDFOLDERS ) != 0 );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
 		return -1;

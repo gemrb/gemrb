@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.9 2004/04/06 17:55:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.10 2004/04/13 19:38:22 doc_wagon Exp $
  *
  */
 
@@ -75,7 +75,7 @@ private:
 	std::vector< DialogState*> initialStates;
 public:
 	void AddState(DialogState* ds);
-	DialogState* GetState(int index);
+	DialogState* GetState(unsigned int index);
 	char ResRef[9];
 private:
 	void FreeDialogState(DialogState* ds);

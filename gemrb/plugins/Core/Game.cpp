@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.29 2004/04/11 01:11:15 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.30 2004/04/13 19:38:22 doc_wagon Exp $
  *
  */
 
@@ -178,6 +178,7 @@ bool Game::SelectPCSingle(int index)
 		return false;
 
 	SelectedSingle = index;
+	return true;
 }
 
 int Game::GetSelectedPCSingle()

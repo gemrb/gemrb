@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.13 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.14 2004/04/13 19:38:22 doc_wagon Exp $
  *
  */
 
@@ -75,7 +75,7 @@ GEM_EXPORT bool dir_exists(const char* path)
 
 	buf.st_mode = 0;
 	stat( path, &buf );
-	return S_ISDIR( buf.st_mode );
+	return S_ISDIR( buf.st_mode ) != 0;
 }
 
 //returns the length of string (up to a delimiter)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.29 2004/04/04 20:22:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.30 2004/04/13 19:38:22 doc_wagon Exp $
  *
  */
 
@@ -176,7 +176,7 @@ public:
 public:
 	void DoStep(ImageMgr* LightMap);
 	void AddWayPoint(unsigned short XDes, unsigned short YDes);
-	void RunAwayFrom(unsigned short XDes, unsigned short YDes, int PathLength, int Backing);
+	void RunAwayFrom(unsigned short XDes, unsigned short YDes, int PathLength, bool Backing);
 	void WalkTo(unsigned short XDes, unsigned short YDes);
 	void MoveTo(unsigned short XDes, unsigned short YDes);
 	void ClearPath();
