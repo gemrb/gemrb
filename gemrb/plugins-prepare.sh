@@ -10,6 +10,7 @@ cp plugins/GUIScript/.libs/libGUIScript.so plugins/
 cp plugins/IDSImporter/.libs/libIDSImporter.so plugins/
 cp plugins/KEYImporter/.libs/libKEYImporter.so plugins/
 cp plugins/MOSImporter/.libs/libMOSImporter.so plugins/
+cp plugins/MUSImporter/.libs/libMUSImporter.so plugins/
 cp plugins/MVEPlayer/.libs/libMVEPlayer.so plugins/
 cp plugins/SDLVideo/.libs/libSDLVideo.so plugins/
 cp plugins/TISImporter/.libs/libTISImporter.so plugins/
