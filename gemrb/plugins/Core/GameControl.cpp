@@ -986,8 +986,23 @@ void GameControl::InitDialog(Actor * speaker, Actor * target, Dialog * dlg)
 	DialogChoose(-1);
 }
 
+static void AddTalk (TextArea *ta, Actor *speaker, char *speaker_color, char *text, char *text_color)
+{
+        char *format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
+	int newlen = strlen (format) + strlen (speaker->LongName) + +strlen (speaker_color) + strlen (text) + strlen (text_color) + 1;
+	char *newstr = (char*) malloc (newlen);
+	sprintf (newstr, format, speaker_color, speaker->LongName, text_color, text);
+
+
+	ta->AppendText (newstr, -1);
+	ta->AppendText ("", -1);
+
+	free (newstr);
+}
+
 void GameControl::DialogChoose(int choose)
 {
+
 	unsigned long index;
 	if(core->GetDictionary()->Lookup("MessageWindow", index)) {
 		Window * win = core->GetWindow(index);
@@ -999,8 +1014,13 @@ void GameControl::DialogChoose(int choose)
 			else {
 				if(ds->transitionsCount<=choose)
 					return;
+
 				DialogTransition * tr = ds->transitions[choose];
-				if(tr->Flags & 8) {
+
+				ta->PopLines (ds->transitionsCount + 1);
+				AddTalk (ta, target, "A0A0FF", core->GetString(tr->textStrRef), "8080FF");
+
+				if(tr->Flags & IE_DLG_TR_FINAL) {
 					//speaker->CurrentAction->Release();
 					speaker->CurrentAction = NULL;
 					//dlg->Release();
@@ -1021,16 +1041,12 @@ void GameControl::DialogChoose(int choose)
 				ds = dlg->GetState(tr->stateIndex);
 			}
 			char * string = core->GetString(ds->StrRef, 2);
-			int i = ta->AppendText("[color=FF0000]", -1);
-			ta->AppendText(speaker->LongName, i);
-			ta->AppendText("[/color]: [p]", i);
-			ta->AppendText(string, i);
-			ta->AppendText("[/p]", i);
-			ta->AppendText("", -1);
+			AddTalk (ta, speaker, "FF0000", string, "70FF70");
 			free(string);
+			int i;
 			ta->SetMinRow(true);
 			for(int x = 0; x < ds->transitionsCount; x++) {
-				if(ds->transitions[x]->Flags & 2) {
+				if(ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
 					bool ret = true;
 					for(int t = 0; t < ds->transitions[x]->trigger->count; t++) {
 						ret &= GameScript::EvaluateString(target, ds->transitions[x]->trigger->strings[t]);
