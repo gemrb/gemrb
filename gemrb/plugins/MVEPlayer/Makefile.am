@@ -1,7 +1,7 @@
 lib_LTLIBRARIES = libMVEPlayer.la
 INCLUDES = $(all_includes)
 LDFLAGS =     
-libMVEPlayer_la_LDFLAGS = -version-info 0:0:0 @LIBS@
+libMVEPlayer_la_LDFLAGS = -module -version-info 0:0:0 @LIBS@
 libMVEPlayer_la_LIBADD = ../Core/libcore.la
 libMVEPlayer_la_METASOURCES = AUTO
 libMVEPlayer_la_SOURCES = mve_audio.cpp MVEPlayerDesc.cpp MVEPlayer.cpp MVEPlay.cpp 
