@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.171 2004/08/02 22:22:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.172 2004/08/03 17:32:23 avenger_teambg Exp $
  *
  */
 
@@ -64,7 +64,7 @@ static TriggerLink triggernames[] = {
 	{"animstate", GameScript::AnimState,0},
 	{"anypconmap", GameScript::AnyPCOnMap,0},
 	{"areacheck", GameScript::AreaCheck,0},
-	{"areacheckobject", GameScript::AreaCheck,0},
+	{"areacheckobject", GameScript::AreaCheckObject,0},
 	{"areaflag", GameScript::AreaFlag,0},
 	{"areatype", GameScript::AreaType,0},
 	{"bitcheck", GameScript::BitCheck,TF_MERGESTRINGS},
@@ -84,6 +84,7 @@ static TriggerLink triggernames[] = {
 	{"combatcountergt", GameScript::CombatCounterGT,0},
 	{"combatcounterlt", GameScript::CombatCounterLT,0},
 	{"contains", GameScript::Contains,0},
+	{"creatureinarea", GameScript::AreaCheck,0}, //cannot check others
 	{"dead", GameScript::Dead,0},
 	{"die", GameScript::Die,0},
 	{"entered", GameScript::Entered,0},
@@ -155,6 +156,7 @@ static TriggerLink triggernames[] = {
 	{"namelessbitthedust", GameScript::NamelessBitTheDust,0},
 	{"nearbydialog", GameScript::NearbyDialog,0},
 	{"nearlocation", GameScript::NearLocation,0},
+	{"nearsavedlocation", GameScript::NearSavedLocation,0},
 	{"notstatecheck", GameScript::NotStateCheck,0},
 	{"partymemberdied", GameScript::PartyMemberDied,0},
 	{"nulldialog", GameScript::NullDialog,0},
@@ -456,7 +458,8 @@ static ActionLink actionnames[] = {
 	{"startdialogueoverrideinterrupt", GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startmovie", GameScript::StartMovie,AF_BLOCKING},
 	{"startsong", GameScript::StartSong,0},
-	{"storepartylocations", GameScript:: StorePartyLocation,0},
+	{"storepartylocations", GameScript::StorePartyLocation,0},
+	{"stuffglobalrandom", GameScript::SetGlobalRandom,0},
 	{"swing", GameScript::Swing,0},
 	{"swingonce", GameScript::SwingOnce,0},
 	{"takeitemlist", GameScript::TakeItemList,0},
@@ -3319,6 +3322,26 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		return 0;
+	}
+	long value;
+	if(!parameters->string0Parameter[0]) {
+		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+	}
+	value = (long) CheckVariable( scr, parameters->string0Parameter );
+	unsigned short X = *(unsigned short *) value;
+	unsigned short Y = *(((unsigned short *) value)+1);
+	int distance = Distance(X, Y, scr);
+	if (distance <= ( parameters->int0Parameter * 20 )) {
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::Or(Scriptable* Sender, Trigger* parameters)
 {
 	return parameters->int0Parameter;
@@ -4448,6 +4471,18 @@ void GameScript::SetGlobal(Scriptable* Sender, Action* parameters)
 {
 	SetVariable( Sender, parameters->string0Parameter,
 		parameters->int0Parameter );
+}
+
+void GameScript::SetGlobalRandom(Scriptable* Sender, Action* parameters)
+{
+	unsigned int max=parameters->int0Parameter+1;
+	if(max) {
+		SetVariable( Sender, parameters->string0Parameter,
+			RandomNumValue%max );
+	} else {
+		SetVariable( Sender, parameters->string0Parameter,
+			RandomNumValue );
+	}
 }
 
 void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.124 2004/08/02 18:00:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.125 2004/08/03 17:32:23 avenger_teambg Exp $
  *
  */
 
@@ -854,6 +854,7 @@ public: //Script Functions
 	static int NamelessBitTheDust(Scriptable* Sender, Trigger* parameters);
 	static int NearbyDialog(Scriptable* Sender, Trigger* parameters);
 	static int NearLocation(Scriptable* Sender, Trigger* parameters);
+	static int NearSavedLocation(Scriptable* Sender, Trigger* parameters);
 	static int NotStateCheck(Scriptable* Sender, Trigger* parameters);
 	static int NullDialog(Scriptable* Sender, Trigger* parameters);
 	static int NumCreatures(Scriptable* Sender, Trigger* parameters);
@@ -1086,6 +1087,7 @@ public:
 	static void SetFaction(Scriptable* Sender, Action* parameters);
 	static void SetGabber(Scriptable* Sender, Action* parameters);
 	static void SetGlobal(Scriptable* Sender, Action* parameters);
+	static void SetGlobalRandom(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTimer(Scriptable* Sender, Action* parameters);
 	static void SetHP(Scriptable* Sender, Action* parameters);
 	static void SetInternal(Scriptable* Sender, Action* parameters);
