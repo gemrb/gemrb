@@ -40,7 +40,7 @@ void Gem_Polygon::RecalcBBox()
 	BBox.y=points[0].y;
 	BBox.w=0;
 	BBox.h=0;
-	for(unsigned int i=1; i<count; i++) {
+	for(int i=1; i<count; i++) {
 		if(points[i].x<BBox.x) {
 			BBox.w+=BBox.x-points[i].x;
 			BBox.x=points[i].x;

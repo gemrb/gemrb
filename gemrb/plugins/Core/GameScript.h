@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.113 2004/04/30 15:15:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.114 2004/05/05 19:13:03 avenger_teambg Exp $
  *
  */
 
@@ -880,6 +880,9 @@ public: //Script Functions
 	static int RandomNumGT(Scriptable* Sender, Trigger* parameters);
 	static int RandomNumLT(Scriptable* Sender, Trigger* parameters);
 	static int Range(Scriptable* Sender, Trigger* parameters);
+	static int RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters);
+	static int RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters);
+	static int RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters);
 	static int Reputation(Scriptable* Sender, Trigger* parameters);
 	static int ReputationGT(Scriptable* Sender, Trigger* parameters);
 	static int ReputationLT(Scriptable* Sender, Trigger* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.158 2004/04/30 15:15:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.159 2004/05/05 19:13:02 avenger_teambg Exp $
  *
  */
 
@@ -190,6 +190,9 @@ static TriggerLink triggernames[] = {
 	{"randomnumgt", GameScript::RandomNumGT,0},
 	{"randomnumlt", GameScript::RandomNumLT,0},
 	{"range", GameScript::Range,0},
+	{"realglobaltimerexact", GameScript::RealGlobalTimerExact,TF_MERGESTRINGS},
+	{"realglobaltimerexpired", GameScript::RealGlobalTimerExpired,TF_MERGESTRINGS},
+	{"realglobaltimernotexpired", GameScript::RealGlobalTimerNotExpired,TF_MERGESTRINGS},
 	{"reputation", GameScript::Reputation,0},
 	{"reputationgt", GameScript::ReputationGT,0},
 	{"reputationlt", GameScript::ReputationLT,0},
@@ -2896,6 +2899,30 @@ int GameScript::GlobalsEqual(Scriptable* Sender, Trigger* parameters)
 	long value1 = CheckVariable(Sender, parameters->string0Parameter );
 	long value2 = CheckVariable(Sender, parameters->string1Parameter );
 	return ( value1 == value2 );
+}
+
+int GameScript::RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value2;
+	GetTime(value2);
+	return ( value1 == value2 );
+}
+
+int GameScript::RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value2;
+	GetTime(value2);
+	return ( value1 < value2 );
+}
+
+int GameScript::RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value1 = CheckVariable(Sender, parameters->string0Parameter );
+	unsigned long value2;
+	GetTime(value2);
+	return ( value1 > value2 );
 }
 
 int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.13 2004/04/28 12:54:20 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.14 2004/05/05 19:13:03 avenger_teambg Exp $
  *
  */
 
@@ -52,13 +52,15 @@ typedef enum ieCREItemFlagBits {
 	IE_ITEM_IDENTIFIED = 1,
 	IE_ITEM_UNSTEALABLE = 2,
 	IE_ITEM_STOLEN = 4,
-	//is this item stackable?
-	IE_ITEM_STACKED = 0x80,	 //this is a gemrb extension
+	IE_ITEM_UNDROPPABLE =8,
+	//just recently acquired
+	IE_ITEM_ACQUIRED = 0x10,	//this is a gemrb extension
+	//is this item destructible normally?
+	IE_ITEM_DESTRUCTIBLE = 0x20,    //this is a gemrb extension
 	//is this item already equipped?
 	IE_ITEM_EQUIPPED = 0x40,	//this is a gemrb extension 
-	//is this item destructible normally?
-	IE_ITEM_DESTRUCTIBLE = 0x20, //this is a gemrb extension
-	IE_ITEM_ACQUIRED = 0x10,	//this is a gemrb extension
+	//is this item stackable?
+	IE_ITEM_STACKED = 0x80,	        //this is a gemrb extension
 } ieCREItemFlagBits;
 
 typedef struct CREItem {
