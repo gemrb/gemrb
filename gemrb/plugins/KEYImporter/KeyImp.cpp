@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.48 2004/11/20 10:58:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.49 2005/02/09 16:29:52 avenger_teambg Exp $
  *
  */
 
@@ -165,10 +165,12 @@ bool KeyImp::LoadResFile(const char* resfile)
 		f->ReadResRef( re.ResRef );
 		f->ReadWord( &re.Type );
 		f->ReadDword( &re.ResLocator );
+	/* removed this part because we store the key in the node itself
 		char* key = (char *) calloc(8, sizeof(char) );
 		for (int j = 0; j < 8; j++)
 			key[j] = toupper( re.ResRef[j] );
-		resources.SetAt( key, re.Type, re.ResLocator );
+	*/
+		resources.SetAt( re.ResRef, re.Type, re.ResLocator );
 	}
 	printMessage( "KEYImporter", "Resources Loaded...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
@@ -258,10 +260,10 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 			} else if (( biffiles[bifnum].BIFLocator & ( 1 << 6 ) ) != 0) {
 				strcpy( BasePath, core->CD5 );
 			} else {
-				   	printStatus( "ERROR", LIGHT_RED );
+					printStatus( "ERROR", LIGHT_RED );
 				printf( "Cannot find %s... Resource unavailable.\n",
 					biffiles[bifnum].name );
-				   	return NULL;
+					return NULL;
 			}
 			strcpy( path, BasePath );
 			strcat( path, biffiles[bifnum].name );

@@ -15,29 +15,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.h,v 1.8 2004/09/13 21:40:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.h,v 1.9 2005/02/09 16:29:52 avenger_teambg Exp $
  *
  */
 
-/***************************************************************************
-						 |Dictionary.h|  -  stolen Map class from MFC
- ***************************************************************************/
-
-#if !defined(AFX_DICTIONARY_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_)
-#define AFX_DICTIONARY_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+#if !defined(DICTIONARY_H)
+#define DICTIONARY_H
 
 #include <ctype.h>
 #include "../../includes/win32def.h"
 #include "../../includes/SClassID.h"
 
-#define THIS_FILE "dictionary.h"
-
 /////////////////////////////////////////////////////////////////////////////
 // Dictionary<unsigned long, VALUE>
+
+#define KEYSIZE 8
 
 class Dictionary //: public CObject
 {
@@ -45,7 +37,7 @@ protected:
 	// Association
 	struct MyAssoc {
 		MyAssoc* pNext;
-		char* key;
+		char key[KEYSIZE]; //not ieResRef!
 		SClass_ID type;
 		unsigned long value;
 	};
@@ -63,10 +55,11 @@ public:
 	bool IsEmpty() const;
 
 	// Lookup
-	bool Lookup(const char* key, unsigned int type, unsigned long& rValue) const;
+	bool Lookup(const ieResRef key, unsigned int type, unsigned long& rValue) const;
 
 	// Operations
-	void SetAt(const char* key, unsigned int type, unsigned long newValue);
+	void SetAt(const ieResRef key, unsigned int type, unsigned long newValue);
+	void RemoveAt(const ieResRef key, unsigned int type);
 	void RemoveAll();
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
 
@@ -81,11 +74,11 @@ protected:
 
 	MyAssoc* NewAssoc();
 	void FreeAssoc(MyAssoc*);
-	MyAssoc* GetAssocAt(const char*, unsigned int, unsigned int&) const;
-	unsigned int MyHashKey(const char*, unsigned int) const;
+	MyAssoc* GetAssocAt(const ieResRef, unsigned int, unsigned int&) const;
+	unsigned int MyHashKey(const ieResRef, unsigned int) const;
 
 public:
 	~Dictionary();
 };
 
-#endif // !defined(AFX_DICTIONARY_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_)
+#endif // !defined(DICTIONARY_H)
