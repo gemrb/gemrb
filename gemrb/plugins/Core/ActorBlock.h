@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.8 2004/01/04 00:29:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.9 2004/01/04 15:25:23 balrog994 Exp $
  *
  */
 
@@ -182,6 +182,7 @@ public:
 	unsigned short * tiles;
 	unsigned char count;
 	bool DoorClosed;
+	int closedIndex;
 	Gem_Polygon * open;
 	Gem_Polygon * closed;
 	Point toOpen[2];

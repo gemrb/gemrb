@@ -388,9 +388,9 @@ Door::~Door(void)
 
 void Door::ToggleTiles(bool playsound) 
 {
-	unsigned char state = 0;
+	unsigned char state = (closedIndex==1)?0:1;
 	if(DoorClosed) {
-		state = 1;
+		state = closedIndex;
 		if(playsound && (CloseSound[0] != '\0'))
 			core->GetSoundMgr()->Play(CloseSound);
 		XPos = closed->BBox.x+(closed->BBox.w/2);
@@ -429,8 +429,16 @@ void Door::SetDoorClosed(bool Closed, bool playsound)
 	else {
 		outline = open;
 	}
-	if(DoorClosed == Closed)
+	if(DoorClosed == Closed) {
+		if(Closed) {
+			XPos = closed->BBox.x+(closed->BBox.w/2);
+			YPos = closed->BBox.y+(closed->BBox.h/2);
+		} else {
+			XPos = open->BBox.x+(open->BBox.w/2);
+			YPos = open->BBox.y+(open->BBox.h/2);
+		}
 		return;
+	}
 	DoorClosed = Closed;
 	ToggleTiles(playsound);
 }
