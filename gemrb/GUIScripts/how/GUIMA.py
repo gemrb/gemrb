@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIMA.py,v 1.1 2004/09/28 14:13:59 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIMA.py,v 1.2 2004/10/15 20:21:09 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -36,7 +36,7 @@ def OpenMapWindow ():
 
 	if CloseOtherWindow (OpenMapWindow):
 		if WorldMapWindow: OpenWorldMapWindowInside ()
-		
+
 		GemRB.HideGUI ()
 		GemRB.UnloadWindow (MapWindow)
 		MapWindow = None
@@ -52,15 +52,6 @@ def OpenMapWindow ():
 	# World Map
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindowInside")
-
-## 	# Hide or Show mapnotes
-## 	Button = GemRB.GetControl (Window, 3)
-## 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RefreshNoteWindow")
-## 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
-## 	GemRB.SetVarAssoc (Window, Button, "ShowMapNotes", 1)
-
-	Label = GemRB.GetControl (Window, 0x0fffffff)
-	GemRB.SetText (Window, Label, "Area Name...")
 
 	# Map Control
 	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0)
@@ -96,13 +87,13 @@ def WorldMapWindowCommon (Travel):
 	if WorldMapWindow:
 		GemRB.UnloadWindow (WorldMapWindow)
 		WorldMapWindow = None
-		GemRB.SetVar ("OtherWindow", MapWindow)
-		GemRB.LoadWindowPack ("GUIMAP")
+		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.UnhideGUI ()
 		return
 
 	GemRB.LoadWindowPack ("GUIWMAP")
 	WorldMapWindow = Window = GemRB.LoadWindow (0)
+	MapWindow = None
 	GemRB.SetVar ("OtherWindow", WorldMapWindow)
 
 	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel)
@@ -111,9 +102,9 @@ def WorldMapWindowCommon (Travel):
 	# Done
 	Button = GemRB.GetControl (Window, 0)
 	if Travel:
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
-	else:
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
+	else:
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 	GemRB.UnhideGUI ()
 
 
