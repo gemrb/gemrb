@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/decoder.cpp,v 1.3 2004/02/24 22:20:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/decoder.cpp,v 1.4 2004/04/13 21:21:02 doc_wagon Exp $
  *
  */
 
@@ -99,7 +99,7 @@ void CSubbandDecoder::sub_4d3fcc(short* memory, long* buffer, int sb_size,
 	} else {
 		for (i = 0; i < sb_size; i++) {
 			long* buff_ptr = buffer;
-			if (( blocks >> 1 ) & 1 != 0) {
+			if (( blocks >> 1 ) & 1) {
 				row_0 = buff_ptr[0];
 				row_1 = buff_ptr[sb_size];
 
