@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.119 2004/05/25 16:16:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.120 2004/07/11 11:04:48 avenger_teambg Exp $
  *
  */
 
@@ -702,6 +702,7 @@ private:
 	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
 		int flags);
+	static void MoveItemCore(Scriptable *Sender, Scriptable *Target, const char *resref, int flags);
 	static Action *GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree);
 	static Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 	static Trigger* GenerateTrigger(char* String);
@@ -965,6 +966,7 @@ public:
 	static void DropItem(Scriptable* Sender, Action* parameters);
 	static void EndCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void Enemy(Scriptable* Sender, Action* parameters);
+	static void EquipItem(Scriptable *Sender, Action *parameters);
 	static void Face(Scriptable* Sender, Action* parameters);
 	static void FaceObject(Scriptable* Sender, Action* parameters);
 	static void FaceSavedLocation(Scriptable* Sender, Action* parameters);
@@ -977,6 +979,7 @@ public:
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
 	static void FullHeal(Scriptable* Sender, Action* parameters);
 	static void GetItem(Scriptable* Sender, Action* parameters);
+	static void GiveItem(Scriptable* Sender, Action* parameters);
 	static void GivePartyGold(Scriptable* Sender, Action* parameters);
 	static void GivePartyGoldGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalAddGlobal(Scriptable* Sender, Action* parameters);
@@ -1042,6 +1045,7 @@ public:
 	static void NIDSpecial1(Scriptable* Sender, Action* parameters);
 	static void NoAction(Scriptable* Sender, Action* parameters);
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
+	static void PickPockets(Scriptable* Sender, Action* parameters);
 	static void PlayDead(Scriptable* Sender, Action* parameters);
 	static void PlayDeadInterruptable(Scriptable* Sender, Action* parameters);
 	static void PlayerDialogue(Scriptable* Sender, Action* parameters);
@@ -1102,6 +1106,7 @@ public:
 	static void StartSong(Scriptable* Sender, Action* parameters);
 	static void Swing(Scriptable* Sender, Action* parameters);
 	static void SwingOnce(Scriptable* Sender, Action* parameters);
+	static void TakeItemList(Scriptable* Sender, Action* parameters);
 	static void TakeItemReplace(Scriptable* Sender, Action* parameters);
 	static void TakePartyGold(Scriptable* Sender, Action* parameters);
 	static void TextScreen(Scriptable* Sender, Action* parameters);
@@ -1112,6 +1117,7 @@ public:
 	static void VerbalConstantHead(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);
 	static void WaitRandom(Scriptable* Sender, Action* parameters);
+	static void XEquipItem(Scriptable *Sender, Action *parameters);
 public:
 	//Objects
 	static Targets *BestAC(Scriptable *Sender, Targets *parameters);

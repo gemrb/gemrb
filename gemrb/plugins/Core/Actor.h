@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.34 2004/05/25 16:16:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.35 2004/07/11 11:04:47 avenger_teambg Exp $
  *
  */
 
@@ -138,7 +138,7 @@ public:
 			return;
 		}
 		strncpy( Dialog, ResRef, 8 );
-		printf("Setting Dialog for %s: %s\n",LongName, Dialog);
+		printf("Setting Dialog for %s: %.8s\n",LongName, Dialog);
 	}
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small

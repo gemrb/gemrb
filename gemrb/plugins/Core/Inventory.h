@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.16 2004/05/09 14:50:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.17 2004/07/11 11:04:48 avenger_teambg Exp $
  *
  */
 
-/* Class implementing creature's inventory and (maybe) item management */
+/* Class implementing creatures' and containers' inventory and item management */
 
 #ifndef INVENTORY_H
 #define INVENTORY_H
@@ -102,10 +102,10 @@ public:
 
 
 	/** returns CREItem in specified slot. if count !=0 it
-	** splits the item and returns only requuested amount */
+	** splits the item and returns only requested amount */
 	CREItem* RemoveItem(unsigned int slot, unsigned int count = 0);
 	/** returns slot of removed item, you can delete the removed item */
-	int RemoveItem(const char* resref, bool droppable, CREItem **res_item);
+	int RemoveItem(const char* resref, int flags, CREItem **res_item);
 
 	/** adds CREItem to the inventory. If slot == -1, finds
 	** first eligible slot, eventually splitting the item to
@@ -124,6 +124,8 @@ public:
 	int GetWeight() {return Weight;}
 
 	bool ItemsAreCompatible(CREItem* target, CREItem* source);
+	/*finds the first slot of named item, if resref is empty, finds the first filled! slot*/
+	int FindItem(const char *resref, unsigned int flags);
 	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, unsigned short x, unsigned short y);
 
 	void dump();

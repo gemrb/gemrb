@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.164 2004/05/25 16:16:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.165 2004/07/11 11:04:47 avenger_teambg Exp $
  *
  */
 
@@ -257,6 +257,7 @@ static ActionLink actionnames[] = {
 	{"createcreatureobject", GameScript::CreateCreatureObjectOffset,0}, //the same
 	{"createcreatureobjectoffset", GameScript::CreateCreatureObjectOffset,0}, //the same
 	{"createcreatureoffscreen", GameScript::CreateCreatureOffScreen,0},
+	{"createitem", GameScript::CreateItem,0},
 	{"createpartygold", GameScript::CreatePartyGold,0},
 	{"createvisualeffect", GameScript::CreateVisualEffect,0},
 	{"createvisualeffectobject", GameScript::CreateVisualEffectObject,0},
@@ -278,6 +279,7 @@ static ActionLink actionnames[] = {
 	{"dropitem", GameScript::DropItem, AF_BLOCKING},
 	{"endcutscenemode", GameScript::EndCutSceneMode,0},
 	{"enemy", GameScript::Enemy,0},
+	{"equipitem", GameScript::EquipItem, AF_BLOCKING},
 	{"erasejournalentry", GameScript::RemoveJournalEntry,0},
 	{"face", GameScript::Face,AF_BLOCKING},
 	{"faceobject", GameScript::FaceObject, AF_BLOCKING},
@@ -296,6 +298,8 @@ static ActionLink actionnames[] = {
 	{"getitem", GameScript::GetItem,0},
 	{"giveexperience", GameScript::AddXPObject,0},
 	{"givegoldforce", GameScript::CreatePartyGold,0}, //this is the same
+	{"giveitem", GameScript::GiveItem,0},
+	{"giveitemcreate", GameScript::CreateItem,0}, //actually this is a targeted createitem
 	{"givepartygold", GameScript::GivePartyGold,0},
 	{"givepartygoldglobal", GameScript::GivePartyGoldGlobal,AF_MERGESTRINGS},
 	{"globaladdglobal", GameScript::GlobalAddGlobal,AF_MERGESTRINGS},
@@ -367,6 +371,7 @@ static ActionLink actionnames[] = {
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"permanentstatchange", GameScript::ChangeStat,0}, //probably the same
 	{"picklock", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
+	{"pickpockets", GameScript::PickPockets, AF_BLOCKING},
 	{"playdead", GameScript::PlayDead,0},
 	{"playdeadinterruptable", GameScript::PlayDeadInterruptable,0},
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
@@ -443,6 +448,7 @@ static ActionLink actionnames[] = {
 	{"startsong", GameScript::StartSong,0},
 	{"swing", GameScript::Swing,0},
 	{"swingonce", GameScript::SwingOnce,0},
+	{"takeitemlist", GameScript::TakeItemList,0},
 	{"takeitemreplace", GameScript::TakeItemReplace,0},
 	{"takepartygold", GameScript::TakePartyGold,0},
 	{"textscreen", GameScript::TextScreen,0},
@@ -1099,7 +1105,7 @@ void GameScript::ParseString(const char*& src, char* tmp)
 
 Object* GameScript::DecodeObject(const char* line)
 {
-  int i;
+	int i;
 
 	Object* oB = new Object();
 	for (i = 0; i < ObjectFieldsCount; i++) {
@@ -1197,7 +1203,7 @@ bool GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 
 int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
 {
-  int i;
+	int i;
 
 	switch(rS->responsesCount) {
 		case 0:
@@ -6773,11 +6779,16 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* parameters)
 	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) & ~MC_FALLEN_RANGER);
 }
 
-void GameScript::GetItem(Scriptable* Sender, Action* parameters)
+//transfering item from Sender to target, target must be an actor
+//if target can't get it, it will be dropped at its feet
+void GameScript::MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags)
 {
 	Inventory *myinv;
 	Map *map;
 
+	if(!target || target->Type!=ST_ACTOR) {
+		return;
+	}
 	switch(Sender->Type) {
 		case ST_ACTOR:
 			myinv=&((Actor *) Sender)->inventory;
@@ -6790,14 +6801,11 @@ void GameScript::GetItem(Scriptable* Sender, Action* parameters)
 		default:
 			return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar || tar->Type != ST_ACTOR) {
-		return;
-	}
-	
-	Actor *scr = (Actor *) tar;
+	Actor *scr = (Actor *) target;
 	CREItem *item;
-	scr->inventory.RemoveItem(parameters->string0Parameter, false, &item);
+	scr->inventory.RemoveItem(resref, flags, &item);
+	if(!item)
+		return;
 	myinv->AddSlotItem(item, 0, &item);
 	if( item ) {
 		// drop it at my feet
@@ -6805,6 +6813,20 @@ void GameScript::GetItem(Scriptable* Sender, Action* parameters)
 		int y = Sender->YPos;
 		map->tm->AddItemToLocation(x, y, item);
 	}
+}
+
+//a container or an actor can take an item from someone
+void GameScript::GetItem(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	MoveItemCore(tar, Sender, parameters->string0Parameter,0);
+}
+
+//an actor can 'give' an item to a container or another actor
+void GameScript::GiveItem(Scriptable *Sender, Action *parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	MoveItemCore(Sender, tar, parameters->string0Parameter,0);
 }
 
 void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
@@ -6821,18 +6843,44 @@ void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 	item->Flags=IE_ITEM_ACQUIRED; //get the flags right
 }
 
+//this action creates an item in a container or a creature
+//if there is an object it works as GiveItemCreate
+//otherwise it creates the item on the Sender
 void GameScript::CreateItem(Scriptable *Sender, Action *parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar || tar->Type != ST_ACTOR) {
+	Scriptable* tar;
+	if(parameters->objects[1]) {
+		tar = GetActorFromObject( Sender, parameters->objects[1] );
+	}
+	else {
+		tar = Sender;
+	}
+	if (!tar)
 		return;
+	Inventory *myinv;
+
+	switch(tar->Type) {
+		case ST_ACTOR:
+			myinv = &((Actor *) tar)->inventory;
+			break;
+		case ST_CONTAINER:
+			myinv = &((Container *) tar)->inventory;
+			break;
+		default:
+			return;
 	}
 	
-	Actor *scr = (Actor *) tar;
 	CREItem *item = new CREItem();
 	CreateItemCore(item, parameters->string0Parameter, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
+	if(tar->Type==ST_CONTAINER) {
+		myinv->AddItem(item);
+	}
+	else {
 	//destroys previous item, slot should be inventory
-	scr->inventory.SetSlotItem(item,0);
+	//we should find a slot
+		int slot = 0;
+		myinv->SetSlotItem(item,slot);
+	}
 }
 
 void GameScript::TakeItemReplace(Scriptable *Sender, Action *parameters)
@@ -6855,6 +6903,37 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action *parameters)
 		int y = Sender->YPos;
 		Map *map=core->GetGame()->GetMap(((Actor *) scr)->Area);
 		map->tm->AddItemToLocation(x, y, item);
+	}
+}
+
+//same as equipitem, but with additional slots parameter, and object to perform action
+void GameScript::XEquipItem(Scriptable *Sender, Action *parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+
+	if(tar->Type!=ST_ACTOR) {
+		return;
+	}
+	int slot = tar->inventory.FindItem(parameters->string0Parameter, 0);
+	if(slot<0) {
+		return;
+	}
+}
+
+void GameScript::EquipItem(Scriptable *Sender, Action *parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	int slot = Sender->inventory.FindItem(parameters->string0Parameter, 0);
+	if(slot<0) {
+		return;
+	}
+	if(parameters->int0Parameter==0) { //unequip
+		//move item to inventory if possible
+	}
+	else { //equip
+		//equip item if possible
 	}
 }
 
@@ -6885,5 +6964,49 @@ void GameScript::DropInventory(Scriptable *Sender, Action *parameters)
 	}
 	Actor *scr = (Actor *) Sender;
 	scr->DropItem("",0);
+}
+
+void GameScript::PickPockets(Scriptable *Sender, Action *parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if(!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *snd = (Actor *) Sender;
+	Actor *scr = (Actor *) tar;
+	//find a candidate item for stealing (unstealable items are noticed)
+	int slot = tar->inventory.FindItem("", IE_ITEM_UNSTEALABLE | IE_ITEM_EQUIPPED);
+	int money=0;
+	if(slot<0) {
+		//go for money too
+		if(scr->GetStat(IE_GOLD)>0)
+		{
+			money=RandomNumValue%(scr->GetStat(IE_GOLD)+1);
+		}
+		if(!money) {
+			//no stuff to steal
+			return;
+		}
+	}
+	else {
+		
+	}
+	//check for success, failure sends an attackedby trigger and a
+	//pickpocket failed trigger sent to the target and sender respectively
+	//slot == -1 here means money
+	if(slot==-1) { 
+		scr->NewStat(IE_GOLD,-money,0);
+		snd->NewStat(IE_GOLD,money,0);
+		return;
+	}
+	// now this is a kind of giveitem
+//	MoveItemCore(tar, Sender, slot);
+}
+
+void GameScript::TakeItemList(Scriptable *Sender, Action *parameters)
+{
 }
 

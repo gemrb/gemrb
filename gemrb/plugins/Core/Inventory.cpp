@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.20 2004/05/09 14:34:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.21 2004/07/11 11:04:48 avenger_teambg Exp $
  *
  */
 
@@ -195,7 +195,7 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	return returned;
 }
 
-int Inventory::RemoveItem(const char *resref, bool movable, CREItem **res_item)
+int Inventory::RemoveItem(const char *resref, int flags, CREItem **res_item)
 {
 	int slot = Slots.size();
 	while(slot--) {
@@ -203,7 +203,7 @@ int Inventory::RemoveItem(const char *resref, bool movable, CREItem **res_item)
 		if(!item) {
 			continue;
 		}
-		if( movable && (item->Flags&IE_ITEM_UNDROPPABLE)) {
+		if( ((flags^IE_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 				continue;
 		}
 		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
@@ -300,6 +300,24 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
 		}
 	}
 	return false;
+}
+
+int Inventory::FindItem(const char *resref, unsigned int flags)
+{
+	for (size_t i = 0; i < Slots.size(); i++) {
+		CREItem *item = Slots[i];
+		if (!item) {
+			continue;
+		}
+		if( ((flags^IE_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
+				continue;
+		}
+		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
+			continue;
+		}
+		return i;
+	}
+	return -1;
 }
 
 void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, unsigned short x, unsigned short y)

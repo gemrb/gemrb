@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.55 2004/05/09 17:36:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.56 2004/07/11 11:04:48 avenger_teambg Exp $
  *
  */
 
@@ -102,10 +102,10 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 				len += tlen + 23;
 				Buffer = ( char * ) realloc( Buffer, len + 2 );
 				if (seltext == (int) i) {
-					sprintf( Buffer + lastlen, "[color=%06.6lX]%.*s[/color]",
+					sprintf( Buffer + lastlen, "[color=%6.6lX]%.*s[/color]",
 						acolor, tlen, rest + 1 );
 				} else {
-					sprintf( Buffer + lastlen, "[color=%06.6lX]%.*s[/color]",
+					sprintf( Buffer + lastlen, "[color=%6.6lX]%.*s[/color]",
 						bcolor, tlen, rest + 1 );
 				}
 			} else {
