@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.9 2003/11/25 19:27:42 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.10 2003/11/25 20:56:37 balrog994 Exp $
  *
  */
 
@@ -76,9 +76,13 @@ Actor * CREImp::GetActor()
 	Actor * act = new Actor();
 	unsigned long strref;
 	str->Read(&strref, 4);
-	act->LongName = core->GetString(strref);
+	char * poi = core->GetString(strref);
+	act->SetText(poi, 0);
+	free(poi);
 	str->Read(&strref, 4);
-	act->ShortName = core->GetString(strref);
+	poi = core->GetString(strref);
+	act->SetText(poi, 1);
+	free(poi);
 	str->Read(&act->BaseStats[IE_MC_FLAGS], 2);
 	str->Seek(2, GEM_CURRENT_POS);
 	str->Read(&act->BaseStats[IE_XPVALUE], 4);
