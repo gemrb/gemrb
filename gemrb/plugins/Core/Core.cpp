@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.11 2004/02/01 18:02:44 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.12 2004/02/11 22:34:33 balrog994 Exp $
  *
  */
 
@@ -46,7 +46,9 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserv
 #endif
 
 #include "../../includes/globals.h"
+#ifndef WIN32
 #include "Interface.h" 
+#endif
 
 #ifndef S_ISDIR
 #define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
@@ -84,6 +86,19 @@ GEM_EXPORT int strlench(const char *string, char ch)
 }
 
 //// Compatibility functions
+#ifndef HAVE_STRNDUP
+GEM_EXPORT char * strndup(const char * s, int l) 
+{
+	int len = strlen(s);
+	if(len < l)
+		l = len;
+	char * string = (char*)malloc(l+1);
+	strncpy(string, s, l);
+	string[l] = 0;
+	return string;
+}
+#endif
+
 #ifdef WIN32
 
 #else
