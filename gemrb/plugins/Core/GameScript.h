@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.74 2004/03/20 10:06:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.75 2004/03/20 12:26:21 avenger_teambg Exp $
  *
  */
 
@@ -865,6 +865,8 @@ public:
 	static void GlobalXor(Scriptable* Sender, Action* parameters);
 	static void GlobalXorGlobal(Scriptable* Sender, Action* parameters);
 	static void HideGUI(Scriptable* Sender, Action* parameters);
+	static void IncMoraleAI(Scriptable* Sender, Action* parameters);
+	static void IncrementChapter(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobal(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobalOnce(Scriptable* Sender, Action* parameters);
 	static void JoinParty(Scriptable* Sender, Action* parameters);
@@ -892,6 +894,7 @@ public:
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
 	static void SaveLocation(Scriptable* Sender, Action* parameters);
+	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaFlag(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaType(Scriptable* Sender, Action* parameters);
@@ -928,6 +931,7 @@ public:
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Unlock(Scriptable* Sender, Action* parameters);
 	static void VerbalConstant(Scriptable* Sender, Action* parameters);
+	static void VerbalConstantHead(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);
 	static void WaitRandom(Scriptable* Sender, Action* parameters);
 public:

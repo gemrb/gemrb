@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.105 2004/03/20 10:06:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.106 2004/03/20 12:26:21 avenger_teambg Exp $
  *
  */
 
@@ -189,6 +189,8 @@ static ActionLink actionnames[] = {
 	{"globalxor",GameScript::GlobalXor},
 	{"globalxorglobal",GameScript::GlobalXorGlobal},
 	{"hidegui",GameScript::HideGUI},
+	{"incmoraleai",GameScript::IncMoraleAI},
+	{"incrementchapter",GameScript::IncrementChapter},
 	{"incrementglobal",GameScript::IncrementGlobal},
 	{"incrementglobalonce",GameScript::IncrementGlobalOnce},
 	{"joinparty",GameScript::JoinParty},
@@ -216,6 +218,7 @@ static ActionLink actionnames[] = {
 	{"recoil",GameScript::Recoil},
 	{"removeareatype", GameScript::RemoveAreaType},
 	{"removeareaflag", GameScript::RemoveAreaFlag},
+	{"setmoraleai",GameScript::SetMoraleAI},
 	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt",GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint",GameScript::RunAwayFromPoint,AF_BLOCKING},
@@ -540,8 +543,21 @@ Script* GameScript::CacheScript(DataStream* stream, const char* Context)
 	return newScript;
 }
 
+/* MYAREA is currently used in actors,
+   it could be improved to use from area scripts */
 void GameScript::ReplaceMyArea(Scriptable* Sender, char* newVarName)
 {
+	switch(Sender->Type) {
+		case ST_ACTOR:
+		{
+			Actor *act = (Actor *) Sender;
+			memcpy(newVarName, act->Area, 6);
+			break;
+		}
+		default:
+			memcpy(newVarName, "GLOBAL", 6);
+			break;
+	}
 }
 
 void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
@@ -1652,8 +1668,10 @@ Targets *GameScript::Protagonist(Scriptable *Sender, Targets *parameters)
 Targets *GameScript::Gabber(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );	
-	parameters->AddTarget(gc->speaker);
+	GameControl* gc = core->GetGameControl();
+	if (gc) {
+		parameters->AddTarget(gc->speaker);
+	}
 	return parameters;
 }
 
@@ -3368,7 +3386,7 @@ int GameScript::GetHappiness(Scriptable* Sender, int reputation)
 	int hptable = core->LoadTable( "happy" );
 	char * repvalue = core->GetTable( hptable )->QueryField( reputation/10, alignment );
 	core->DelTable( hptable );
-	return atoi(repvalue);
+	return strtol(repvalue,NULL,0); //this one handles 0x values too!
 }
 
 int GameScript::GetHPPercent(Scriptable* Sender)
@@ -3515,22 +3533,41 @@ void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
 void GameScript::SetPlayerSound(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
 	actor->StrRefs[parameters->int0Parameter]=parameters->int1Parameter;
 }
 
-void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
+//this one works only on real actors, they got constants
+void GameScript::VerbalConstantHead(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
-	if (actor) {
-		printf( "Displaying string on: %s\n", actor->scriptName );
-		actor->DisplayHeadText( core->GetString( actor->StrRefs[parameters->int0Parameter], 2 ) );
+	Actor* actor = ( Actor* ) tar;
+	printf( "Displaying string on: %s\n", actor->scriptName );
+	char *str=core->GetString( actor->StrRefs[parameters->int0Parameter], 2 );
+	actor->DisplayHeadText( str);
+	GameControl *gc=core->GetGameControl();
+	if(gc) {
+		gc->DisplayString( str);
+	}
+}
+
+void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
+	printf( "Displaying string on: %s\n", actor->scriptName );
+	GameControl *gc=core->GetGameControl();
+	if(gc) {
+		gc->DisplayString( core->GetString( actor->StrRefs[parameters->int0Parameter], 2 ) );
 	}
 }
 
@@ -3671,27 +3708,20 @@ void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	actor->RunAwayFrom( parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter, false);
 }
+
 void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	if (actor) {
-		printf( "Displaying string on: %s (without name)\n", actor->scriptName );
-		actor->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
+	if (Sender) {
+		printf( "Displaying string on: %s (without name)\n", Sender->scriptName );
+		Sender->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
 	}
 }
 
 void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	if (actor) {
-		printf( "Displaying string on: %s\n", actor->scriptName );
-		actor->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
+	if (Sender) {
+		printf( "Displaying string on: %s\n", Sender->scriptName );
+		Sender->DisplayHeadText( core->GetString( parameters->int0Parameter, 2 ) );
 	}
 }
 
@@ -3822,8 +3852,8 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 
 void GameScript::UnhideGUI(Scriptable* Sender, Action* parameters)
 {
-	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );	
-	if (gc->ControlType == IE_GUI_GAMECONTROL) {
+	GameControl* gc = core->GetGameControl();
+	if (gc) {
 		gc->UnhideGUI();
 	}
 	EndCutSceneMode( Sender, parameters );
@@ -3831,8 +3861,8 @@ void GameScript::UnhideGUI(Scriptable* Sender, Action* parameters)
 
 void GameScript::HideGUI(Scriptable* Sender, Action* parameters)
 {
-	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );	
-	if (gc->ControlType == IE_GUI_GAMECONTROL) {
+	GameControl* gc = core->GetGameControl();
+	if (gc) {
 		gc->HideGUI();
 	}
 }
@@ -3864,8 +3894,8 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	Actor* actor = ( Actor* ) scr;
 	Actor* target = ( Actor* ) tar;
 
-	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );	
-	if (gc->ControlType != IE_GUI_GAMECONTROL) {
+	GameControl* gc = core->GetGameControl();
+	if (!gc) {
 		printf( "[IEScript]: Dialog cannot be initiated because there is no GameControl.\n" );
 		Sender->CurrentAction = NULL;
 		return;
@@ -3947,14 +3977,10 @@ void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
 
 void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->overHeadText) {
-		free( Sender->overHeadText );
-	}
-	Sender->overHeadText = core->GetString( parameters->int0Parameter );
-	GetTime( Sender->timeStartDisplaying );
-	Sender->textDisplaying = 0;
-	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );	
-	if (gc->ControlType == IE_GUI_GAMECONTROL) {
+	Sender->DisplayHeadText( core->GetString( parameters->int0Parameter) );
+	Sender->textDisplaying = 0; //why?
+	GameControl* gc = core->GetGameControl();
+	if (gc) {
 		gc->DisplayString( Sender );
 	}
 }
@@ -4369,11 +4395,11 @@ void GameScript::AddXP2DA(Scriptable* Sender, Action* parameters)
 	char * xpvalue = core->GetTable( xptable )->QueryField( parameters->string0Parameter, "0" ); //level is unused
 	
 	if( xpvalue[0]=='P' && xpvalue[1]=='_') {
-		core->GetGame()->ShareXP(atoi(xpvalue+2) );
+		core->GetGame()->ShareXP(atoi(xpvalue+2) ); //no hex value
 	}
 	else {
 		Actor* actor = ( Actor* ) core->GetGame()->GetPC(0);
-		actor->NewStat(IE_XP, atoi(xpvalue), 0);
+		actor->NewStat(IE_XP, strtol(xpvalue,NULL,0), 0);
 	}
 	core->DelTable( xptable );
 }
@@ -4389,7 +4415,7 @@ void GameScript::AddExperiencePartyGlobal(Scriptable* Sender, Action* parameters
 	core->GetGame()->ShareXP(xp);
 }
 
-void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
+void GameScript::SetMoraleAI(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -4398,7 +4424,7 @@ void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
 	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, 1);
 }
 
-void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
+void GameScript::IncMoraleAI(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
@@ -4407,12 +4433,42 @@ void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
 	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, 0);
 }
 
-void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
+void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
 		return;
 	}
-	Actor* act = ( Actor* ) Sender;
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* act = ( Actor* ) tar;
+	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, 1);
+}
+
+void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* act = ( Actor* ) tar;
+	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, 0);
+}
+
+void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* act = ( Actor* ) tar;
 	act->NewStat(IE_MORALEBREAK, -parameters->int0Parameter, 0);
 }
 
@@ -4816,3 +4872,25 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender,
 	core->DelTable( pdtable );
 }
 
+void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
+{
+	int chapter = core->LoadTable( parameters->string0Parameter );
+	if(chapter<0) {
+//add some standard way of notifying the user
+//		MissingResource(parameters->string0Parameter);
+		return;
+	}
+	GameControl *gc=core->GetGameControl();
+	if (gc) {
+		char *strref = core->GetTable(chapter)->QueryField(0);
+		char *str=core->GetString( strtol(strref,NULL,0) );
+		gc->DisplayString(str);
+		strref = core->GetTable(chapter)->QueryField(1);
+		str=core->GetString( strtol(strref,NULL,0) );
+		gc->DisplayString(str);
+	}
+	unsigned long value=0;
+
+	core->GetGame()->globals->Lookup( "GLOBALCHAPTER", value );
+	core->GetGame()->globals->SetAt( "GLOBALCHAPTER", value+1 );
+}
