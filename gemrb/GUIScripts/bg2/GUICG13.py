@@ -1,6 +1,7 @@
 #character generation, color (GUICG13)
 import GemRB
 
+global IE_ANIM_ID
 ColorTable = 0
 ColorWindow = 0
 ColorPicker = 0
@@ -17,13 +18,19 @@ Color3 = 0
 Color4 = 0
 PDollButton = 0
 IE_ANIM_ID = 206
-global IE_ANIM_ID
 
 def RefreshPDoll():
 	PDollTable = GemRB.LoadTable("pdolls")
-	AnimID = "0x6000"
-	ResRef = GemRB.GetTableValue(PDollTable, AnimID, "LEVEL4")
-	print ResRef
+	AnimID = 0x6000
+	table = GemRB.LoadTable("avprefr")
+	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Race"),0)
+	table = GemRB.LoadTable("avprefc")
+	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Class"),0)
+	table = GemRB.LoadTable("avprefg")
+	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
+	print "AnimID:",hex(AnimID)
+	ResRef = GemRB.GetTableValue(PDollTable,hex(AnimID), "LEVEL1")
+
 	GemRB.SetButtonPLT(ColorWindow, PDollButton, ResRef,
 		Color2, Color1, Color3, Color4, 0,0,0,0)
 	return
