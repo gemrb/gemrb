@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.11 2003/11/25 16:43:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.12 2003/11/25 18:59:44 balrog994 Exp $
  *
  */
 
@@ -43,11 +43,12 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 	WeaponType = 0;
 	this->RowIndex = RowIndex;
 	Avatars = core->GetTable(core->LoadTable("avatars"));
-	char * val = Avatars->QueryField(RowIndex, 20);
+	char * val = Avatars->QueryField(RowIndex, 21);
 	if(val[0] == '*')
 		UsePalette = true;
 	else
 		UsePalette = false;
+	CircleSize = atoi(Avatars->QueryField(RowIndex, 3));
 }
 
 CharAnimations::~CharAnimations(void)

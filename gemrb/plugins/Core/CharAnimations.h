@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.12 2003/11/25 16:43:52 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.13 2003/11/25 18:59:44 balrog994 Exp $
  *
  */
 
@@ -91,6 +91,8 @@ public:
 	unsigned long LoadedFlag, RowIndex;
 	unsigned char OrientCount, MirrorType;
 	unsigned char ArmorType, WeaponType, RangedType;
+	unsigned char CircleSize;
+	bool DrawCircle;
 	char * ResRef;
 	TableMgr * Avatars;
 	bool UsePalette;
@@ -152,7 +154,7 @@ private:
 			case IE_ANI_TWO_FILES:
 				{
 					if(OrientCount == 5) {
-						char * val = Avatars->QueryField(RowIndex, AnimID+3);
+						char * val = Avatars->QueryField(RowIndex, AnimID+4);
 						if(val[0] == '*') {
 							ResRef[0] = 0;
 							return;
@@ -183,7 +185,7 @@ private:
 			case IE_ANI_CODE_MIRROR_2:
 				{
 					if(OrientCount == 9) {
-						char * val = Avatars->QueryField(RowIndex, AnimID+3);
+						char * val = Avatars->QueryField(RowIndex, AnimID+4);
 						if(val[0] == '*') {
 							ResRef[0] = 0;
 							return;
