@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.17 2003/12/08 15:55:54 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.18 2003/12/08 23:19:39 balrog994 Exp $
  *
  */
 
@@ -174,10 +174,24 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 			{
 			if(Orient > 8)
 				core->GetVideoDriver()->MirrorAnimation(a);
-			if(Orient & 1)
-				Orient--;
-			Anims[AnimID][Orient] = a;
-			Anims[AnimID][Orient+1] = a;
+			switch(AnimID) {
+				case IE_ANI_WALK:
+					{
+					Anims[AnimID][Orient] = a;
+					}
+				break;
+
+				default:
+					{
+					
+					if(Orient & 1)
+						Orient--;
+					Anims[AnimID][Orient] = a;
+					Anims[AnimID][Orient+1] = a;
+					}
+				break;
+			}
+			
 			}
 		break;
 	}
@@ -320,12 +334,15 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, c
 
 		case IE_ANI_PST_ANIMATION_1:
 			{
-				if(Orient > 8)
-					Cycle = 5 - ((Orient/2) % 5);
-				else
-					Cycle = ((Orient/2) % 5);
 				switch(AnimID) {
 					case IE_ANI_AWAKE:
+						if(Orient > 9)
+							Cycle = 4 - ((Orient/2) % 5);
+						else
+							Cycle = ((Orient/2) % 5);
+						if(Cycle >= 5) {
+							printf("WARNING!!! Cycle >= 5\n");
+						}
 						ResRef[0] = this->ResRef[0];
 						ResRef[1] = 0;
 						strcat(ResRef, "STD");
@@ -333,6 +350,10 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, c
 					break;
 
 					case IE_ANI_WALK:
+						if(Orient > 8)
+							Cycle = 7 - (Orient % 9);
+						else
+							Cycle = (Orient % 9);
 						ResRef[0] = this->ResRef[0];
 						ResRef[1] = 0;
 						strcat(ResRef, "WLK");
