@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.25 2003/11/25 18:55:54 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.26 2003/11/26 01:11:52 balrog994 Exp $
  *
  */
 
@@ -479,8 +479,8 @@ void SDLVideoDriver::SetViewport(int x, int y)
 
 void SDLVideoDriver::MoveViewportTo(int x, int y)
 {
-	Viewport.x = x - Viewport.w;
-	Viewport.y = y - Viewport.h;
+	Viewport.x = x - (Viewport.w/2);
+	Viewport.y = y - (Viewport.h/2);
 }
 /** No descriptions */
 void SDLVideoDriver::SetPalette(Sprite2D * spr, Color * pal){
