@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.44 2004/08/26 14:07:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.45 2004/10/02 13:05:09 avenger_teambg Exp $
  *
  */
 
@@ -396,6 +396,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			a->playOnce = true;
 			break;
 		case IE_ANI_DIE:
+printf("Die switch to twitch\n");
 			a->nextStanceID = IE_ANI_TWITCH;
 			a->autoSwitchOnEnd = true;
 			break;
@@ -513,7 +514,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 			AddSixSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
-		case IE_ANI_TWENTYTWO:  //8+8 animations
+		case IE_ANI_TWENTYTWO:  //5+3 animations
 			AddMHRSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
@@ -841,10 +842,7 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)
 {
-	bool e=Orient>=8;
-	if (e) {
-		Orient -= 8;
-	}
+	Orient /= 2;
 
 	switch (StanceID) {
 			//Attack is a special case... it cycles randomly
@@ -984,7 +982,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			Cycle = Orient;
 			break;
 	}
-	if (e) {
+	if (Orient>=5) {
 		strcat( ResRef, "E" );
 	}
 }
