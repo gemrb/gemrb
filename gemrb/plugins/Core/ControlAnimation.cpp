@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ControlAnimation.cpp,v 1.1 2005/03/27 13:27:00 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ControlAnimation.cpp,v 1.2 2005/03/28 10:34:43 avenger_teambg Exp $
  *
  */
 
@@ -71,26 +71,38 @@ ControlAnimation::~ControlAnimation(void)
 
 void ControlAnimation::UpdateAnimation(void)
 {
-	// simple Finite-State Machine
 	unsigned long time;
-	if (anim_phase == 0) {
-		cycle = 0;
-		frame = 0;
-		anim_phase = 1;
-		time = 500 + 500 * (rand() % 20);
-	} else if (anim_phase == 1) {
-		if (rand() % 30 == 0) cycle = 1;
-		anim_phase = 2;
-		time = 100;
+
+	if (control->Flags & IE_GUI_BUTTON_PLAYRANDOM) {
+		// simple Finite-State Machine
+		if (anim_phase == 0) {
+			cycle = 0;
+			frame = 0;
+			anim_phase = 1;
+			time = 500 + 500 * (rand() % 20);
+		} else if (anim_phase == 1) {
+			if (rand() % 30 == 0) cycle = 1;
+			anim_phase = 2;
+			time = 100;
+		} else {
+			frame++;
+			time = 100;
+		}
 	} else {
-		frame++;
-		time = 100;
+		frame ++;
+		time = 15;
 	}
 
 	Sprite2D* pic = bam->GetFrame( frame, cycle );
 
 	if (pic == NULL) {
+		//stopping at end frame
+		if (control->Flags & IE_GUI_BUTTON_PLAYONCE) {
+			core->timer->RemoveAnimation( this );
+			return;
+		}
 		anim_phase = 0;
+		frame = 0;
 		pic = bam->GetFrame( 0, 0 );
 	}
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.289 2005/03/23 18:20:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.290 2005/03/28 10:34:43 avenger_teambg Exp $
  *
  */
 
@@ -1848,6 +1848,14 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 
 void Interface::DrawWindows(void)
 {
+	GameControl *gc = GetGameControl();
+	if(!gc) {
+		GSUpdate(false);
+	}
+	else {
+		GSUpdate(!(gc->DialogueFlags&DF_FREEZE_SCRIPTS));
+	}
+	
 	if (ModalWindow) {
 		ModalWindow->DrawWindow();
 		return;
