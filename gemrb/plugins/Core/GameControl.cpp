@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.167 2004/08/23 19:39:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.168 2004/08/24 19:49:55 guidoj Exp $
  */
 
 #ifndef WIN32
@@ -1037,7 +1037,7 @@ void GameControl::HideGUI()
 	Variables* dict = core->GetDictionary();
 	ieDword index;
 	if (dict->Lookup( "MessageWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* mw = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "MessagePosition", index )) {
@@ -1046,7 +1046,7 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "OptionsWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* ow = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "OptionsPosition", index )) {
@@ -1055,7 +1055,7 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "PortraitWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* pw = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "PortraitPosition", index )) {
@@ -1064,7 +1064,7 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "ActionsWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* aw = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "ActionsPosition", index )) {
@@ -1073,7 +1073,7 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "TopWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* tw = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "TopPosition", index )) {
@@ -1082,7 +1082,7 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "OtherWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* tw = core->GetWindow( index );
 			core->SetVisible( index, 0 );
 			if (dict->Lookup( "OtherPosition", index )) {
@@ -1091,7 +1091,7 @@ void GameControl::HideGUI()
 		}
 	}
 	if (dict->Lookup( "FloatWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 /* this appears to be needless
 			Window* fw = core->GetWindow( index );
 */
@@ -1114,7 +1114,7 @@ void GameControl::UnhideGUI()
 	core->SetVisible( 0, 1 );
 
 	if (dict->Lookup( "MessageWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* mw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "MessagePosition", index )) {
@@ -1123,7 +1123,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "ActionsWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* aw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "ActionsPosition", index )) {
@@ -1132,7 +1132,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "OptionsWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* ow = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "OptionsPosition", index )) {
@@ -1141,7 +1141,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "PortraitWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* pw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "PortraitPosition", index )) {
@@ -1150,7 +1150,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "TopWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* tw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "TopPosition", index )) {
@@ -1168,7 +1168,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	if (dict->Lookup( "FloatWindow", index )) {
-		if (index != (unsigned long) -1) {
+		if (index != (ieDword) -1) {
 			Window* fw = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			fw->Floating = true;
@@ -1584,7 +1584,7 @@ void GameControl::DisplayString(const char* Text)
 	ieDword WinIndex, TAIndex;
 
 	core->GetDictionary()->Lookup( "MessageWindow", WinIndex );
-	if (( WinIndex != (unsigned long) -1 ) &&
+	if (( WinIndex != (ieDword) -1 ) &&
 		( core->GetDictionary()->Lookup( "MessageTextArea", TAIndex ) )) {
 		Window* win = core->GetWindow( WinIndex );
 		if (win) {
