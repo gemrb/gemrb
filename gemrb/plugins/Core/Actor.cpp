@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.14 2003/11/27 22:18:52 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.15 2003/11/29 17:12:20 balrog994 Exp $
  *
  */
 
@@ -87,9 +87,11 @@ void Actor::SetAnimationID(unsigned short AnimID)
 		anims = NULL;
 		return;
 	}
-	char * BaseResRef = at->QueryField(RowIndex, 0);
-	char * Mirror = at->QueryField(RowIndex, 1);
-	char * Orient = at->QueryField(RowIndex, 2);
+	char * BaseResRef = at->QueryField(RowIndex, BaseStats[IE_ARMOR_TYPE]);
+	char * Mirror = at->QueryField(RowIndex, 4);
+	char * Orient = at->QueryField(RowIndex, 5);
+	if(anims)
+		delete(anims);	
 	anims = new CharAnimations(BaseResRef, atoi(Orient), atoi(Mirror), RowIndex);
 
 	Color Pal[256];
