@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.218 2004/09/21 00:13:24 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.219 2004/09/22 14:08:25 edheldil Exp $
  *
  */
 
@@ -1677,8 +1677,8 @@ void Interface::DrawTooltip ()
 
 	Font* fnt = GetFont( TooltipFont );
 
-	int w1;
-	int w2;
+	int w1 = 0;
+	int w2 = 0;
 	int w = fnt->CalcStringWidth( tooltip_text );
 	int h = fnt->maxHeight;
 
