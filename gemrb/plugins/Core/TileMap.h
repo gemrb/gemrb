@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.4 2003/11/26 13:56:38 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.5 2003/11/27 22:05:39 balrog994 Exp $
  *
  */
 
@@ -23,6 +23,16 @@
 #define TILEMAP_H
 
 #include "TileOverlay.h"
+#include "Polygon.h"
+
+typedef struct Door {
+	char Name[9];
+	unsigned short * tiles;
+	unsigned char count;
+	unsigned char DoorClosed;
+	Gem_Polygon * open;
+	Gem_Polygon * closed;
+} Door;
 
 #ifdef WIN32
 
@@ -40,10 +50,13 @@ class GEM_EXPORT TileMap
 {
 private:
 	std::vector<TileOverlay *> overlays;
+	std::vector<Door> doors;
 public:
 	TileMap(void);
 	~TileMap(void);
 	void AddOverlay(TileOverlay * overlay);
+	void AddDoor(char * Name, unsigned char DoorClosed, unsigned short * indexes, int count, Gem_Polygon * open, Gem_Polygon * closed);
+	Door * GetDoor(unsigned short x, unsigned short y);
 	void DrawOverlay(unsigned int index, Region viewport);
 public:
 	int XCellCount, YCellCount;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.5 2003/11/26 13:56:38 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.6 2003/11/27 22:05:39 balrog994 Exp $
  *
  */
 
@@ -30,6 +30,9 @@ TileMap::TileMap(void)
 
 TileMap::~TileMap(void)
 {
+	for(int i = 0; i < overlays.size(); i++) {
+		delete(overlays[i]);
+	}
 }
 
 void TileMap::AddOverlay(TileOverlay * overlay)
@@ -41,8 +44,55 @@ void TileMap::AddOverlay(TileOverlay * overlay)
 	overlays.push_back(overlay);
 }
 
+void TileMap::AddDoor(char * Name, unsigned char DoorClosed, unsigned short * indexes, int count, Gem_Polygon * open, Gem_Polygon * closed)
+{
+	Door door;
+	strncpy(door.Name, Name, 8);
+	door.tiles = indexes;
+	door.count = count;
+	door.open = open;
+	door.closed = closed;
+	door.DoorClosed = DoorClosed;
+	for(int i = 0; i < count; i++) {
+		overlays[0]->tiles[indexes[i]]->tileIndex = DoorClosed;
+	}
+	doors.push_back(door);
+}
+
 void TileMap::DrawOverlay(unsigned int index, Region viewport)
 {
 	if(index < overlays.size())
 		overlays[index]->Draw(viewport);
+}
+
+Door * TileMap::GetDoor(unsigned short x, unsigned short y)
+{
+	for(int i = 0; i < doors.size(); i++) {
+		Door * door = &doors.at(i);
+		if(door->DoorClosed) {
+			if(door->closed->BBox.x > x)
+				continue;
+			if(door->closed->BBox.y > y)
+				continue;
+			if(door->closed->BBox.x+door->closed->BBox.w < x)
+				continue;
+			if(door->closed->BBox.y+door->closed->BBox.h < y)
+				continue;
+			if(door->closed->PointIn(x,y))
+				return door;
+		}
+		else {
+			if(door->open->BBox.x > x)
+				continue;
+			if(door->open->BBox.y > y)
+				continue;
+			if(door->open->BBox.x+door->closed->BBox.w < x)
+				continue;
+			if(door->open->BBox.y+door->closed->BBox.h < y)
+				continue;
+			if(door->open->PointIn(x,y))
+				return door;
+		}
+	}
+	return NULL;
 }
