@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.120 2004/02/12 22:10:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.121 2004/02/15 14:29:53 edheldil Exp $
  *
  */
 
@@ -38,6 +38,8 @@
 #include "../Core/GameControl.h"
 #include "../Core/MapMgr.h"
 #include "../Core/WorldMapMgr.h"
+#include "../Core/SpellMgr.h"
+#include "../Core/ItemMgr.h"
 
 inline bool valid_number(const char *string, long &val)
 {
@@ -1998,6 +2000,115 @@ static PyObject *GemRB_SetWorldMapImage( PyObject * /*self*/, PyObject *args)
 }
 
 
+static PyObject *GemRB_SetSpellIcon( PyObject * /*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex;
+	char *SpellResRef;
+
+	if(!PyArg_ParseTuple(args, "iis", &WindowIndex, &ControlIndex, &SpellResRef) ) {
+		printMessage("GUIScript","Syntax Error: SetSpellIcon(WindowID, ControlID, SpellName)\n", LIGHT_RED);
+		return NULL;
+	}
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL) {
+		printMessage("GUIScript","Runtime Error: Window not found\n", LIGHT_RED);
+		return NULL;
+	}
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL) {
+		printMessage("GUIScript","Runtime Error: Control not found\n", LIGHT_RED);
+		return NULL;
+	}
+
+	if(ctrl->ControlType != IE_GUI_BUTTON) {
+		printMessage("GUIScript","Runtime Error: SetSpellIcon() - control must be a button\n", LIGHT_RED);
+		return NULL;
+	}
+
+	// FIXME!!!
+	DataStream *str = core->GetResourceMgr()->GetResource(SpellResRef, IE_SPL_CLASS_ID);
+	SpellMgr * im = (SpellMgr*)core->GetInterface(IE_SPL_CLASS_ID);
+	if(im == NULL) {
+		delete (str);
+		return NULL;
+	}
+	if(!im->Open(str, true)) {
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	// FIXME - should use some already allocated in core
+	Spell * spell = im->GetSpell ();
+	if(spell == NULL) {
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	Button * btn = (Button*)ctrl;
+	btn->SetImage(IE_GUI_BUTTON_UNPRESSED, spell->SpellIconBAM->GetFrame (0));
+	btn->SetImage(IE_GUI_BUTTON_PRESSED, spell->SpellIconBAM->GetFrame (1));
+	delete spell;
+	core->FreeInterface(im);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject *GemRB_SetItemIcon( PyObject * /*self*/, PyObject *args)
+{
+	int WindowIndex, ControlIndex;
+	char *ItemResRef;
+
+	if(!PyArg_ParseTuple(args, "iis", &WindowIndex, &ControlIndex, &ItemResRef) ) {
+		printMessage("GUIScript","Syntax Error: SetItemIcon(WindowID, ControlID, ItemName)\n", LIGHT_RED);
+		return NULL;
+	}
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL) {
+		printMessage("GUIScript","Runtime Error: Window not found\n", LIGHT_RED);
+		return NULL;
+	}
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL) {
+		printMessage("GUIScript","Runtime Error: Control not found\n", LIGHT_RED);
+		return NULL;
+	}
+
+	if(ctrl->ControlType != IE_GUI_BUTTON) {
+		printMessage("GUIScript","Runtime Error: SetItemIcon() - control must be a button\n", LIGHT_RED);
+		return NULL;
+	}
+
+	// FIXME!!!
+	DataStream *str = core->GetResourceMgr()->GetResource(ItemResRef, IE_ITM_CLASS_ID);
+	ItemMgr * im = (ItemMgr*)core->GetInterface(IE_ITM_CLASS_ID);
+	if(im == NULL) {
+		delete (str);
+		return NULL;
+	}
+	if(!im->Open(str, true)) {
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	// FIXME - should use some already allocated in core
+	Item * item = im->GetItem ();
+	if(item == NULL) {
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	Button * btn = (Button*)ctrl;
+	btn->SetImage(IE_GUI_BUTTON_UNPRESSED, item->ItemIconBAM->GetFrame (0));
+	//btn->SetImage(IE_GUI_BUTTON_PRESSED, item->ItemIconBAM->GetFrame (0));
+	delete item;
+	core->FreeInterface(im);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+
 
 
 
@@ -2264,6 +2375,12 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"SetWorldMapImage", GemRB_SetWorldMapImage, METH_VARARGS,
      "FIXME: Set WM image ...."},
+
+	{"SetSpellIcon", GemRB_SetSpellIcon, METH_VARARGS,
+     "FIXME: temporary Set Spell icon image ...."},
+
+	{"SetItemIcon", GemRB_SetItemIcon, METH_VARARGS,
+     "FIXME: temporary Set Item icon image ...."},
 
 	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
 	 "Invalidates the given Window."},
