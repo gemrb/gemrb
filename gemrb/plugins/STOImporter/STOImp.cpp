@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.4 2004/05/25 16:16:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.5 2004/09/12 16:01:59 avenger_teambg Exp $
  *
  */
 
@@ -65,34 +65,34 @@ bool STOImp::Open(DataStream* stream, bool autoFree)
 
 Store* STOImp::GetStore()
 {
-  unsigned int i;
+	unsigned int i;
 	Store* s = new Store();
 
-	str->Read( &s->Type, 4 );
-	str->Read( &s->StoreName, 4 );
-	str->Read( &s->Flags, 4 );
-	str->Read( &s->SellMarkup, 4 );
-	str->Read( &s->BuyMarkup, 4 );
-	str->Read( &s->DepreciationRate, 4 );
-	str->Read( &s->StealFailureChance, 2 );
-	str->Read( &s->Capacity, 2 );
+	str->ReadDword( &s->Type );
+	str->ReadDword( &s->StoreName );
+	str->ReadDword( &s->Flags );
+	str->ReadDword( &s->SellMarkup );
+	str->ReadDword( &s->BuyMarkup );
+	str->ReadDword( &s->DepreciationRate );
+	str->ReadWord( &s->StealFailureChance );
+	str->ReadWord( &s->Capacity );
 	str->Read( s->unknown, 8 );
-	str->Read( &s->PurchasedCategoriesOffset, 4 );
-	str->Read( &s->PurchasedCategoriesCount, 4 );
-	str->Read( &s->ItemsOffset, 4 );
-	str->Read( &s->ItemsCount, 4 );
-	str->Read( &s->Lore, 4 );
-	str->Read( &s->IDPrice, 4 );
+	str->ReadDword( &s->PurchasedCategoriesOffset );
+	str->ReadDword( &s->PurchasedCategoriesCount );
+	str->ReadDword( &s->ItemsOffset );
+	str->ReadDword( &s->ItemsCount );
+	str->ReadDword( &s->Lore );
+	str->ReadDword( &s->IDPrice );
 	str->Read( s->RumoursTavern, 8 );
-	str->Read( &s->DrinksOffset, 4 );
-	str->Read( &s->DrinksCount, 4 );
+	str->ReadDword( &s->DrinksOffset );
+	str->ReadDword( &s->DrinksCount );
 	str->Read( s->RumoursTemple, 8 );
-	str->Read( &s->AvailableRooms, 4 );
+	str->ReadDword( &s->AvailableRooms );
 	for (i = 0; i < 4; i++) {
-		str->Read( &s->RoomPrices[i], 4 );
+		str->ReadDword( &s->RoomPrices[i] );
 	}
-	str->Read( &s->CuresOffset, 4 );
-	str->Read( &s->CuresCount, 4 );
+	str->ReadDword( &s->CuresOffset );
+	str->ReadDword( &s->CuresCount );
 	str->Read( s->unknown2, 36 );
 
 	memset( s->unknown3, 0, 80 );
@@ -129,13 +129,13 @@ STOItem* STOImp::GetItem()
 	STOItem* it = new STOItem();
 
 	str->Read( it->ItemResRef, 8 );
-	str->Read( &it->unknown, 2 );
-	str->Read( &it->Usage1, 2 );
-	str->Read( &it->Usage2, 2 );
-	str->Read( &it->Usage3, 2 );
-	str->Read( &it->Flags, 4 );
-	str->Read( &it->AmountInStock, 4 );
-	str->Read( &it->InfiniteSupply, 4 );
+	str->ReadWord( &it->unknown );
+	str->ReadWord( &it->Usage1 );
+	str->ReadWord( &it->Usage2 );
+	str->ReadWord( &it->Usage3 );
+	str->ReadDword( &it->Flags );
+	str->ReadDword( &it->AmountInStock );
+	str->ReadDword( &it->InfiniteSupply );
 
 	memset( it->unknown2, 0, 56 );
 	if (version == 11) {
@@ -150,9 +150,9 @@ STODrink* STOImp::GetDrink()
 	STODrink* dr = new STODrink();
 
 	str->Read( dr->RumourResRef, 8 );
-	str->Read( &dr->DrinkName, 4 );
-	str->Read( &dr->Price, 4 );
-	str->Read( &dr->AlcoholicStrength, 4 );
+	str->ReadDword( &dr->DrinkName );
+	str->ReadDword( &dr->Price );
+	str->ReadDword( &dr->AlcoholicStrength );
 
 	return dr;
 }
@@ -162,7 +162,7 @@ STOCure* STOImp::GetCure()
 	STOCure* cu = new STOCure();
 
 	str->Read( cu->CureResRef, 8 );
-	str->Read( &cu->Price, 4 );
+	str->ReadDword( &cu->Price );
 
 	return cu;
 }
@@ -173,7 +173,7 @@ ieDword* STOImp::GetPurchasedCategories(Store* s)
 	ieDword* pc = ( ieDword* ) malloc( size );
 
 	for (unsigned int i = 0; i < s->PurchasedCategoriesCount; i++) {
-		str->Read( &pc[i], 4 );
+		str->ReadDword( &pc[i] );
 	}
 
 	return pc;
