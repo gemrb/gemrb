@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.17 2004/10/23 15:25:17 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.18 2004/11/21 18:28:25 avenger_teambg Exp $
 
 # NewLife.py - Character generation screen
 
@@ -65,6 +65,7 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG")
 	#setting up confirmation window
 	QuitWindow = GemRB.LoadWindow(1)
+	GemRB.SetVisible(QuitWindow, 0)
 
 	#setting up CG window
 	NewLifeWindow = GemRB.LoadWindow(0)
@@ -246,14 +247,12 @@ def UpdateLabels():
 
 	GemRB.SetText(NewLifeWindow, AcLabel, str(AcPoints))
 	GemRB.SetText(NewLifeWindow, HpLabel, str(HpPoints))
-	GemRB.InvalidateWindow(NewLifeWindow)
 	return
 	
 
 def OkButton():
 	GemRB.SetVisible(QuitWindow, 0)
 	GemRB.SetVisible(NewLifeWindow, 1)
-	GemRB.InvalidateWindow(NewLifeWindow)
 	return
 
 def AcceptPress():
@@ -275,6 +274,7 @@ def AcceptPress():
 		return
 
 	GemRB.UnloadWindow(NewLifeWindow)
+	GemRB.UnloadWindow(QuitWindow)
 	#set my character up
 	MyChar = GemRB.CreatePlayer("charbase", 1 ) 
 
@@ -321,6 +321,7 @@ def CancelPress():
 
 def YesButton():
 	GemRB.UnloadWindow(NewLifeWindow)
+	GemRB.UnloadWindow(QuitWindow)
 	GemRB.SetNextScript("Start")
 	return
 
