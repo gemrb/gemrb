@@ -15,10 +15,13 @@
 // inlines
 inline unsigned int Dictionary::MyHashKey(const char * key, unsigned int type) const
 {
+   int i;
    unsigned int nHash = type;
 
-   while (*key)
-	nHash = (nHash<<5) + nHash + toupper(*key++);
+   for(i=0;i<8 && key[i];i++)
+   {
+	nHash = (nHash<<5) + nHash + toupper(key[i]);
+   }
    return nHash;
 }
 inline int Dictionary::GetCount() const

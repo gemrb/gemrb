@@ -70,9 +70,8 @@ bool KeyImp::LoadResFile(const char * resfile)
 		f->Read(&re.Type, 2);
 		f->Read(&re.ResLocator, 4);
 		char *key;
-		key=new char[9];
+		key=new char[8];
 		for(int j=0;j<8;j++) key[j]=toupper(re.ResRef[j]);
-		key[8]=0;
 		resources.SetAt(key, re.Type, re.ResLocator);
 	}
 	printf("Resources Loaded Succesfully.\n");
