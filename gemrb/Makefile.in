@@ -78,6 +78,9 @@ DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
 ECHO = @ECHO@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LIBDL = @LIBDL@
+LIBPTHREAD = @LIBPTHREAD@
+LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 OBJDUMP = @OBJDUMP@
@@ -101,8 +104,11 @@ bin_PROGRAMS = gemrb
 data_DATA = GemRB.cfg
 gemrb_SOURCES = GemRB.cpp 
 
-gemrb_LDADD = ./plugins/AREImporter/libAREImporter.la ./plugins/BAMImporter/libBAMImporter.la ./plugins/BG2HCAnim/libBG2HCAnim.la ./plugins/BIFImporter/libBIFImporter.la ./plugins/BMPImporter/libBMPImporter.la ./plugins/CHUImporter/libCHUImporter.la ./plugins/Core/libcore.la ./plugins/CREImporter/libCREImporter.la ./plugins/IDSImporter/libIDSImporter.la	./plugins/KEYImporter/libKEYImporter.la ./plugins/MOSImporter/libMOSImporter.la ./plugins/MVEPlayer/libMVEPlayer.la ./plugins/SDLVideo/libSDLVideo.la ./plugins/TISImporter/libTISImporter.la ./plugins/TLKImporter/libTLKImporter.la ./plugins/WEDImporter/libWEDImporter.la ./plugins/ZLibMgr/libZLibMgr.la ./plugins/GUIScript/libGUIScript.la ./plugins/ACMImporter/libACMImporter.la ./plugins/MUSImporter/libMUSImporter.la ./plugins/2DAImporter/lib2DAImporter.la ./plugins/INIImporter/libINIImporter.la ./plugins/PLTImporter/libPLTImporter.la
-SUBDIRS = plugins GUIScripts override
+
+#gemrb_LDADD = ./plugins/AREImporter/libAREImporter.la ./plugins/BAMImporter/libBAMImporter.la ./plugins/BIFImporter/libBIFImporter.la ./plugins/BMPImporter/libBMPImporter.la ./plugins/CHUImporter/libCHUImporter.la ./plugins/Core/libcore.la ./plugins/CREImporter/libCREImporter.la ./plugins/IDSImporter/libIDSImporter.la	./plugins/KEYImporter/libKEYImporter.la ./plugins/MOSImporter/libMOSImporter.la ./plugins/MVEPlayer/libMVEPlayer.la ./plugins/SDLVideo/libSDLVideo.la ./plugins/TISImporter/libTISImporter.la ./plugins/TLKImporter/libTLKImporter.la ./plugins/WEDImporter/libWEDImporter.la ./plugins/ZLibMgr/libZLibMgr.la ./plugins/GUIScript/libGUIScript.la ./plugins/ACMImporter/libACMImporter.la ./plugins/MUSImporter/libMUSImporter.la ./plugins/2DAImporter/lib2DAImporter.la ./plugins/INIImporter/libINIImporter.la ./plugins/PLTImporter/libPLTImporter.la
+gemrb_LDADD = ./plugins/Core/libcore.la
+
+SUBDIRS = plugins includes GUIScripts override
 EXTRA_DIST = GemRB.cfg GemRB.cpp 
 INCLUDES = \
 	$(all_includes) \
@@ -119,35 +125,12 @@ PROGRAMS = $(bin_PROGRAMS)
 
 am_gemrb_OBJECTS = GemRB.$(OBJEXT)
 gemrb_OBJECTS = $(am_gemrb_OBJECTS)
-gemrb_DEPENDENCIES = ./plugins/AREImporter/libAREImporter.la \
-	./plugins/BAMImporter/libBAMImporter.la \
-	./plugins/BG2HCAnim/libBG2HCAnim.la \
-	./plugins/BIFImporter/libBIFImporter.la \
-	./plugins/BMPImporter/libBMPImporter.la \
-	./plugins/CHUImporter/libCHUImporter.la \
-	./plugins/Core/libcore.la \
-	./plugins/CREImporter/libCREImporter.la \
-	./plugins/IDSImporter/libIDSImporter.la \
-	./plugins/KEYImporter/libKEYImporter.la \
-	./plugins/MOSImporter/libMOSImporter.la \
-	./plugins/MVEPlayer/libMVEPlayer.la \
-	./plugins/SDLVideo/libSDLVideo.la \
-	./plugins/TISImporter/libTISImporter.la \
-	./plugins/TLKImporter/libTLKImporter.la \
-	./plugins/WEDImporter/libWEDImporter.la \
-	./plugins/ZLibMgr/libZLibMgr.la \
-	./plugins/GUIScript/libGUIScript.la \
-	./plugins/ACMImporter/libACMImporter.la \
-	./plugins/MUSImporter/libMUSImporter.la \
-	./plugins/2DAImporter/lib2DAImporter.la \
-	./plugins/INIImporter/libINIImporter.la \
-	./plugins/PLTImporter/libPLTImporter.la
+gemrb_DEPENDENCIES = ./plugins/Core/libcore.la
 
 DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
-LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/admin/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/GemRB.Po
@@ -497,7 +480,7 @@ uninstall-info: uninstall-info-recursive
 
 
 install-data-local:
-	$(INSTALL_DATA) GemRB.cfg $(bindir)
+	$(INSTALL_DATA) GemRB.cfg* $(bindir)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
