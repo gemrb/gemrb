@@ -12,8 +12,8 @@ def DisplayRaces():
 	global TopIndex
 
 	TopIndex=GemRB.GetVar("TopIndex")
-	for i in range(0, 9):
-                Button = GemRB.GetControl(RaceWindow,i+1)
+	for i in range(0, 11):
+                Button = GemRB.GetControl(RaceWindow,i+22)
 		Val = GemRB.GetTableValue(RaceTable, i+TopIndex,0)
 		if Val==0:
 			GemRB.SetText(RaceWindow, Button, "")
@@ -32,30 +32,31 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG")
 	RaceWindow = GemRB.LoadWindow(15)
 
-	Class = GemRB.GetVar("BaseClass")
+	Class = GemRB.GetVar("BaseClass")-1
 	TmpTable = GemRB.LoadTable("clskills")
 	TableName = GemRB.GetTableValue(TmpTable, Class, 0)
 	if TableName == "*":
 		GemRB.SetNextScript("Skills")
 		return
+	print TableName
 	RaceTable = GemRB.LoadTable(TableName)
 	RaceCount = GemRB.GetTableRowCount(RaceTable)-11
 	if RaceCount<0:
 		RaceCount=0
 
-	for i in range(0,9):
-                Button = GemRB.GetControl(RaceWindow,i+2)
+	for i in range(0,11):
+                Button = GemRB.GetControl(RaceWindow,i+22)
 		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
-	BackButton = GemRB.GetControl(RaceWindow,4)  #i=8 now (when race count is 7)
+	BackButton = GemRB.GetControl(RaceWindow,10)
 	GemRB.SetText(RaceWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(RaceWindow,5)
+	DoneButton = GemRB.GetControl(RaceWindow,11)
 	GemRB.SetText(RaceWindow,DoneButton,11973)
         GemRB.SetButtonFlags(RaceWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
         GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 
-	TextAreaControl = GemRB.GetControl(RaceWindow, 2)
-	GemRB.SetText(RaceWindow,TextAreaControl,17237)
+	TextAreaControl = GemRB.GetControl(RaceWindow, 8)
+	GemRB.SetText(RaceWindow,TextAreaControl,17256)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl = GemRB.GetControl(RaceWindow, 1)

@@ -23,7 +23,7 @@ def OnLoad():
 		Button = GemRB.GetControl(RaceWindow,i)
 		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		
-	for i in range(2, 9):
+	for i in range(2,9):
 		Button = GemRB.GetControl(RaceWindow,i)
 		GemRB.SetText(RaceWindow,Button, GemRB.GetTableValue(RaceTable,i-2,0) )
 		GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)

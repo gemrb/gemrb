@@ -23,15 +23,14 @@ IE_ANIM_ID = 206
 
 def RefreshPDoll():
 	PDollTable = GemRB.LoadTable("avatars")
-	AnimID = 0x6000
-	table = GemRB.LoadTable("avprefr")
-	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("BaseRace")+1,0)
-	table = GemRB.LoadTable("avprefc")
-	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("BaseClass")+1,0)
-	table = GemRB.LoadTable("avprefg")
-	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
-	ResRef = GemRB.GetTableValue(PDollTable,hex(AnimID), "AT_1")+"G1"
-	print hex(AnimID), ResRef
+	AnimID=0x6000
+	table=GemRB.LoadTable("avprefr")
+	AnimID=AnimID+GemRB.GetTableValue(table,GemRB.GetVar("BaseRace")+1,0)
+	table=GemRB.LoadTable("avprefc")
+	AnimID=AnimID+GemRB.GetTableValue(table,GemRB.GetVar("BaseClass")+1,0)
+	table=GemRB.LoadTable("avprefg")
+	AnimID=AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
+	ResRef=GemRB.GetTableValue(PDollTable,hex(AnimID), "AT_1")+"G1"
 	GemRB.SetButtonBAM(ColorWindow, PDollButton, ResRef,10,0,0)
 	GemRB.SetButtonFlags(ColorWindow, PDollButton, IE_GUI_BUTTON_ANIMATED,OP_OR)
 	return
@@ -49,6 +48,8 @@ def OnLoad():
 	Race = GemRB.GetVar("Race")-1
 	HairTable = GemRB.LoadTable(GemRB.GetTableValue(RaceTable, Race, 5))
 	SkinTable = GemRB.LoadTable(GemRB.GetTableValue(RaceTable, Race, 6))
+	ColorTable = GemRB.LoadTable("clowncol")
+
 	#set these colors to some default
 	PortraitTable = GemRB.LoadTable("pictures")
 	PortraitIndex = GemRB.GetVar("PortraitIndex")
@@ -110,14 +111,12 @@ def DonePress():
 		RefreshPDoll()
 		return
 	if ColorIndex==2:
-		ColorTable = GemRB.LoadTable("clowncol")
 		PickedColor=GemRB.GetTableValue(ColorTable, 0, GemRB.GetVar("Selected"))
 		Color3=PickedColor
 		GemRB.SetButtonBAM(ColorWindow, MajorButton, "COLGRAD", 1, 0, Color3)
 		RefreshPDoll()
 		return
 
-	ColorTable = GemRB.LoadTable("clowncol")
 	PickedColor=GemRB.GetTableValue(ColorTable, 1, GemRB.GetVar("Selected"))
 	Color4=PickedColor
 	GemRB.SetButtonBAM(ColorWindow, MinorButton, "COLGRAD", 1, 0, Color4)
@@ -147,6 +146,7 @@ def GetColor():
 			MyColor=GemRB.GetTableValue(t,i,0)
 		else:
 			MyColor=GemRB.GetTableValue(ColorTable, ColorIndex-2, i)
+			print i, MyColor
 		if MyColor == "*":
 			break
 		Button = GemRB.GetControl(ColorPicker, i)

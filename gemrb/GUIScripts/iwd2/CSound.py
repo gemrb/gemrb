@@ -11,9 +11,12 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG")
 	#this hack will redraw the base CG window
 	SoundWindow = GemRB.LoadWindow(52)
-	PortraitButton = GemRB.GetControl(SoundWindow, 12)
+	GemRB.SetVar("Sound",0)  #scrapping the sound value
 
-	BackButton = GemRB.GetControl(SoundWindow,6)
+	Label = GemRB.GetControl(SoundWindow, 0x1000000a)
+	GemRB.SetText(SoundWindow, Label, 17164)
+
+	BackButton = GemRB.GetControl(SoundWindow,14)
 	GemRB.SetText(SoundWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(SoundWindow,0)
 	GemRB.SetText(SoundWindow,DoneButton,36789)
@@ -30,7 +33,7 @@ def OnLoad():
 
 def BackPress():
 	GemRB.UnloadWindow(SoundWindow)
-	GemRB.SetNextScript("CharGen7")
+	GemRB.SetNextScript("Appearance")
 	GemRB.SetVar("Sound",0)  #scrapping the sound value
 	return
 
