@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.265 2005/01/22 20:28:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.266 2005/02/06 11:07:54 avenger_teambg Exp $
  *
  */
 
@@ -3021,8 +3021,6 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "KillsTotalXP", PyInt_FromLong (ps->KillsTotalXP));
 	PyDict_SetItemString(dict, "KillsTotalCount", PyInt_FromLong (ps->KillsTotalCount));
 
-
-
 	// FIXME!!!
 	if (ps->FavouriteSpells[0][0]) {
 		int largest = 0;
@@ -3033,28 +3031,14 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			}
 		}
 		
-		DataStream* str = core->GetResourceMgr()->GetResource( ps->FavouriteSpells[largest], IE_SPL_CLASS_ID );
-		SpellMgr* sm = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
-		if (sm == NULL) {
-			delete ( str );
+		Spell* spell = core->GetSpell(ps->FavouriteSpells[largest]);
+		if (spell == NULL) {      
 			return NULL;
 		}
-		if (!sm->Open( str, true )) {
-			core->FreeInterface( sm );
-			return NULL;
-		}
-
-		Spell* spell = sm->GetSpell();
-		if (spell == NULL) {
-			core->FreeInterface( sm );
-			return NULL;
-		}
-
-		core->FreeInterface( sm );
 
 		PyDict_SetItemString(dict, "FavouriteSpell", PyInt_FromLong (spell->SpellName));
 
-		delete spell;
+		core->FreeSpell( spell, false );
 	} else {
 		PyDict_SetItemString(dict, "FavouriteSpell", PyString_FromString (""));
 	}
@@ -3078,7 +3062,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->GetItemName(false)));
 
-		core->FreeItem( item );
+		core->FreeItem( item, false );
 	} else {
 		PyDict_SetItemString(dict, "FavouriteWeapon", PyString_FromString (""));
 	}
@@ -3342,27 +3326,10 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	// FIXME!!!
-	DataStream* str = core->GetResourceMgr()->GetResource( SpellResRef, IE_SPL_CLASS_ID );
-	SpellMgr* im = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
-	if (im == NULL) {
-		printMessage( "GUIScript", "Runtime Error: core->GetInterface()\n",
-			LIGHT_RED );
-		delete ( str );
-		return NULL;
-	}
-	if (!im->Open( str, true )) {
-		printMessage( "GUIScript", "Runtime Error: im->Open()\n", LIGHT_RED );
-		core->FreeInterface( im );
-		return NULL;
-	}
-
-	// FIXME - should use some already allocated in core
-	Spell* spell = im->GetSpell();
+	Spell* spell = core->GetSpell(SpellResRef);
 	if (spell == NULL) {
 		printMessage( "GUIScript", "Runtime Error: im->GetSpell()\n",
 			LIGHT_RED );
-		core->FreeInterface( im );
 		return NULL;
 	}
 
@@ -3377,8 +3344,7 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 		btn->SetImage( IE_GUI_BUTTON_SELECTED, bam->GetFrameFromCycle(0, 2));
 		btn->SetImage( IE_GUI_BUTTON_DISABLED, bam->GetFrameFromCycle(0, 3));
 	}
-	delete spell;
-	core->FreeInterface( im );
+	core->FreeSpell( spell, false );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3417,7 +3383,7 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 		else {
 			btn->SetPicture(NULL);
 		}
-		core->FreeItem( item );
+		core->FreeItem( item, false );
 	} else {
 		btn->SetPicture( NULL );
 	}
@@ -3761,29 +3727,11 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetSpell__doc );
 	}
 
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_SPL_CLASS_ID );
-	if(!str) { //the file doesn't exist, in this case we let the script decide
+	Spell* spell = core->GetSpell(ResRef);
+	if (spell == NULL) {
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	SpellMgr* sm = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
-	if (sm == NULL) {
-		delete str;
-		printf("[GUIScript] Can't get spell manager!\n");
-		return NULL;
-	}
-	if (!sm->Open( str, true )) {
-		core->FreeInterface( sm );
-		return NULL;
-	}
-
-	Spell* spell = sm->GetSpell();
-	if (spell == NULL) {
-		core->FreeInterface( sm );
-		return NULL;
-	}
-
-	core->FreeInterface( sm );
 
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "SpellName", PyInt_FromLong (spell->SpellName));
@@ -3791,7 +3739,7 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "SpellbookIcon", PyString_FromResRef (spell->SpellbookIcon));
 	PyDict_SetItemString(dict, "SpellSchool", PyInt_FromLong (spell->ExclusionSchool)); //this will list school exclusions and alignment
 	PyDict_SetItemString(dict, "SpellDivine", PyInt_FromLong (spell->PriestType)); //this will tell apart a priest spell from a druid spell
-	delete spell;
+	core->FreeSpell( spell, false );
 	return dict;
 }
 
@@ -3930,21 +3878,21 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	int function=0;
 	switch( item->ItemType ) {
 		ITMExtHeader *eh;
-		ITMFeature *f;
+		Effect *f;
 
 		case ITM_TYPE_POTION:
 			function=1;
 			break;
 		case ITM_TYPE_SCROLL:
 			//determining if this is a copyable scroll
-			if(item->ext_headers.size()<2) {
+			if(item->ExtHeaderCount<2) {
 				break;
 			}
-			eh = item->ext_headers[1];
-			if(eh->features.size()<1) {
+			eh = item->ext_headers+1;
+			if(eh->FeatureCount<1) {
 				break;
 			}
-			f = eh->features[0];
+			f = eh->features; //+0
 			if(f->Opcode!=147) {
 				break;
 			}
@@ -3954,7 +3902,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		default:;
 	}
 	PyDict_SetItemString(dict, "Function", PyInt_FromLong(function));
-	core->FreeItem( item );
+	core->FreeItem( item, false );
 	return dict;
 }
 
@@ -4411,7 +4359,7 @@ bool GUIScript::Init(void)
 
 
 #ifdef WIN32
-  char *p;
+	char *p;
 
 	for (p = path; *p != 0; p++)
 	{
