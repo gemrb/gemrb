@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.6 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.7 2004/10/09 20:00:40 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -58,8 +58,6 @@ void WorldMapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 
 
 	std::vector< WMPAreaEntry*>::iterator m;
-//	unsigned int xm = SCREEN_TO_MAPX(lastMouseX + XPos);
-//	unsigned int ym = SCREEN_TO_MAPY(lastMouseY + YPos);
 
 	for (m = worldmap->area_entries.begin(); m != worldmap->area_entries.end(); ++m) {
 		if (! (*m)->AreaStatus & WMP_ENTRY_VISIBLE) continue;
@@ -67,13 +65,11 @@ void WorldMapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 		Region r2 = Region( MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), (*m)->MapIcon->Width, (*m)->MapIcon->Height );
 		// if (xm >= (*m)->X && xm < (*m)->X + (*m)->MapIcon->Width && ym >= (*m)->Y && ym < (*m)->Y + (*m)->MapIcon->Height)
 		video->BlitSprite( (*m)->MapIcon, MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), true, &r );
-		//video->DrawRect ( r2, green, false, false );
 
 		// wmpty.bam
 	}
 
 	Font* fnt = core->GetButtonFont();
-	//Font* fnt = GetFont( WorldMapFont );
 
 	// alpha bit is unfortunately ignored
 	Color fore = {0x00, 0x00, 0x00, 0xff};
@@ -85,6 +81,7 @@ void WorldMapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 		if (! (*m)->AreaStatus & WMP_ENTRY_VISIBLE) continue;
 
 		Region r2 = Region( MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), (*m)->MapIcon->Width, (*m)->MapIcon->Height );
+		if (r2.y+r2.h<r.y) continue;
 
 		char *text = core->GetString( (*m)->LocCaptionName );
 		int tw = fnt->CalcStringWidth( text ) + 5;
