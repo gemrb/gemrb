@@ -18,6 +18,7 @@
 #define PATH_MAP_PASSABLE 1   
 #define PATH_MAP_TRAVEL   2
 #define PATH_MAP_NO_SEE   4
+#define PATH_MAP_SIDEWALL 8
 
 struct PathNode {
 	PathNode* Parent;
