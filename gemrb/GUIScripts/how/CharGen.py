@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.20 2004/12/08 20:02:15 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.21 2004/12/08 21:10:58 avenger_teambg Exp $
 
 
 #Character Generation
@@ -59,9 +59,9 @@ ClassMultiWindow = 0
 ClassMultiTextArea = 0
 ClassMultiDoneButton = 0
 
-ClassSpecialWindow = 0
-ClassSpecialTextArea = 0
-ClassSpecialDoneButton = 0
+KitWindow = 0
+KitTextArea = 0
+KitDoneButton = 0
 
 AlignmentButton = 0
 AlignmentWindow = 0
@@ -684,7 +684,8 @@ def RaceCancelPress():
 # Class Selection
 
 def ClassPress():
-	global CharGenWindow, ClassWindow, ClassTable, ClassTextArea, ClassDoneButton
+	global CharGenWindow, ClassWindow, ClassTable, KitTable, ClassTextArea, ClassDoneButton
+
 	GemRB.SetVisible(CharGenWindow, 0)
 	ClassWindow = GemRB.LoadWindow(2)
 	ClassTable = GemRB.LoadTable("classes")
@@ -723,10 +724,10 @@ def ClassPress():
 	GemRB.SetEvent(ClassWindow, ClassMultiButton, IE_GUI_BUTTON_ON_PRESS, "ClassMultiPress")
 	GemRB.SetText(ClassWindow, ClassMultiButton, 11993)
 	
-	ClassSpecialButton = GemRB.GetControl(ClassWindow, 11)
-	GemRB.SetButtonState(ClassWindow, ClassSpecialButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(ClassWindow, ClassSpecialButton, IE_GUI_BUTTON_ON_PRESS, "ClassSpecialPress")
-	GemRB.SetText(ClassWindow, ClassSpecialButton, 11994)
+	KitButton = GemRB.GetControl(ClassWindow, 11)
+	GemRB.SetButtonState(ClassWindow, KitButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(ClassWindow, KitButton, IE_GUI_BUTTON_ON_PRESS, "KitPress")
+	GemRB.SetText(ClassWindow, KitButton, 11994)
 
 	ClassTextArea = GemRB.GetControl(ClassWindow, 13)
 	GemRB.SetText(ClassWindow, ClassTextArea, 17242)
@@ -813,37 +814,58 @@ def ClassMultiCancelPress():
 	GemRB.SetVisible(ClassWindow, 1)
 	return
 
-def ClassSpecialPress():
-	global ClassWindow, ClassSpecialWindow, ClassSpecialTextArea, ClassSpecialDoneButton
+def KitPress():
+	global ClassWindow, KitWindow, KitTextArea, KitDoneButton, KitTable
+
 	GemRB.SetVisible(ClassWindow, 0)
-	ClassSpecialWindow = GemRB.LoadWindow(12)
+	KitWindow = GemRB.LoadWindow(12)
 
-	ClassSpecialTextArea = GemRB.GetControl(ClassSpecialWindow, 11)
-	GemRB.SetText(ClassSpecialWindow, ClassSpecialTextArea, 17245)
+	KitTable = GemRB.LoadTable("magesch")
+	GemRB.SetVar("MAGESCHOOL",0)
 
-	ClassSpecialDoneButton = GemRB.GetControl(ClassSpecialWindow, 0)
-	GemRB.SetButtonState(ClassSpecialWindow, ClassSpecialDoneButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent(ClassSpecialWindow, ClassSpecialDoneButton, IE_GUI_BUTTON_ON_PRESS, "ClassSpecialDonePress")
-	GemRB.SetText(ClassSpecialWindow, ClassSpecialDoneButton, 11973)
-	GemRB.SetButtonFlags(ClassSpecialWindow, ClassSpecialDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+        for i in range(0,8):
+		Button = GemRB.GetControl(KitWindow, i+2)
+                GemRB.SetButtonFlags(KitWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		GemRB.SetText(KitWindow, Button, GemRB.GetTableValue(KitTable, i+1, 0) )
+		GemRB.SetVarAssoc(KitWindow, Button, "MAGESCHOOL", i+1)
+		GemRB.SetEvent(KitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "KitHelpPress")
 
-	ClassSpecialCancelButton = GemRB.GetControl(ClassSpecialWindow, 12)
-	GemRB.SetButtonState(ClassSpecialWindow, ClassSpecialCancelButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(ClassSpecialWindow, ClassSpecialCancelButton, IE_GUI_BUTTON_ON_PRESS, "ClassSpecialCancelPress")
-	GemRB.SetText(ClassSpecialWindow, ClassSpecialCancelButton, 13727)
+	KitTextArea = GemRB.GetControl(KitWindow, 11)
+	GemRB.SetText(KitWindow, KitTextArea, 17245)
 
-	GemRB.SetVisible(ClassSpecialWindow, 1)
+	KitDoneButton = GemRB.GetControl(KitWindow, 0)
+	GemRB.SetButtonState(KitWindow, KitDoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent(KitWindow, KitDoneButton, IE_GUI_BUTTON_ON_PRESS, "KitDonePress")
+	GemRB.SetText(KitWindow, KitDoneButton, 11973)
+	GemRB.SetButtonFlags(KitWindow, KitDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	KitCancelButton = GemRB.GetControl(KitWindow, 12)
+	GemRB.SetButtonState(KitWindow, KitCancelButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(KitWindow, KitCancelButton, IE_GUI_BUTTON_ON_PRESS, "KitCancelPress")
+	GemRB.SetText(KitWindow, KitCancelButton, 13727)
+
+	GemRB.SetVisible(KitWindow, 1)
 	return
 
-def ClassSpecialDonePress():
-	global ClassSpecialWindow
-	GemRB.UnloadWindow(ClassSpecialWindow)
+def KitHelpPress():
+	global KitWindow, KitTextArea
+
+	Kit = GemRB.GetVar("MAGESCHOOL")
+	GemRB.SetText(KitWindow, KitTextArea, GemRB.GetTableValue(KitTable, Kit, 1))
+	return
+
+def KitDonePress():
+	global KitWindow
+
+	Kit = GemRB.GetTableValue(KitTable, 3, GemRB.GetVar("MAGESCHOOL") )
+	GemRB.SetVar("Class Kit", Kit)
+	GemRB.UnloadWindow(KitWindow)
 	ClassDonePress()
 	return
 
-def ClassSpecialCancelPress():
-	global ClassWindow, ClassSpecialWindow
-	GemRB.UnloadWindow(ClassSpecialWindow)
+def KitCancelPress():
+	global ClassWindow, KitWindow
+	GemRB.UnloadWindow(KitWindow)
 	GemRB.SetVisible(ClassWindow, 1)
 	return
 

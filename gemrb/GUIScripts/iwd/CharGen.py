@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.26 2004/12/08 20:02:16 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.27 2004/12/08 21:10:59 avenger_teambg Exp $
 
 
 #Character Generation
@@ -59,9 +59,9 @@ ClassMultiWindow = 0
 ClassMultiTextArea = 0
 ClassMultiDoneButton = 0
 
-ClassSpecialWindow = 0
-ClassSpecialTextArea = 0
-ClassSpecialDoneButton = 0
+KitWindow = 0
+KitTextArea = 0
+KitDoneButton = 0
 
 AlignmentButton = 0
 AlignmentWindow = 0
@@ -290,6 +290,11 @@ def AcceptPress():
 	GemRB.CreatePlayer("charbase", MyChar)
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
+
+	ClassTable = GemRB.LoadTable("classes")
+	ClassIndex = GemRB.GetVar("Class")-1
+	Class = GemRB.GetTableValue(ClassTable, ClassIndex, 5)
+	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar("Class Kit")
 	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
 	t = GemRB.GetVar("Alignment")
@@ -318,14 +323,12 @@ def AcceptPress():
 	t = GemRB.GetTableValue(TmpTable, t, 0)
 	GemRB.UnloadTable(TmpTable)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
-	t = GemRB.GetVar("Class")
-	GemRB.SetPlayerStat(MyChar, IE_CLASS, t)
 	TmpTable = GemRB.LoadTable("strtgold")
-	a = GemRB.GetTableValue(TmpTable, t, 1) #number of dice
-	b = GemRB.GetTableValue(TmpTable, t, 0) #size
-	c = GemRB.GetTableValue(TmpTable, t, 2) #adjustment
-	d = GemRB.GetTableValue(TmpTable, t, 3) #external multiplier
-	e = GemRB.GetTableValue(TmpTable, t, 4) #level bonus rate
+	a = GemRB.GetTableValue(TmpTable, Class, 1) #number of dice
+	b = GemRB.GetTableValue(TmpTable, Class, 0) #size
+	c = GemRB.GetTableValue(TmpTable, Class, 2) #adjustment
+	d = GemRB.GetTableValue(TmpTable, Class, 3) #external multiplier
+	e = GemRB.GetTableValue(TmpTable, Class, 4) #level bonus rate
 	t = GemRB.GetPlayerStat(MyChar, IE_LEVEL) #FIXME: calculate multiclass average
 	if t>1:
 		e=e*(t-1)
@@ -681,11 +684,12 @@ def RaceCancelPress():
 # Class Selection
 
 def ClassPress():
-	global CharGenWindow, ClassWindow, ClassTable, ClassTextArea, ClassDoneButton
+	global CharGenWindow, ClassWindow, ClassTable, KitTable, ClassTextArea, ClassDoneButton
+
 	GemRB.SetVisible(CharGenWindow, 0)
 	ClassWindow = GemRB.LoadWindow(2)
-	ClassTable = GemRB.LoadTable("CLASSES")
-	KitTable = GemRB.LoadTable("MAGESCH")
+	ClassTable = GemRB.LoadTable("classes")
+	KitTable = GemRB.LoadTable("magesch")
 	ClassCount = GemRB.GetTableRowCount(ClassTable)
 	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race") - 1)
 	GemRB.SetVar("Class", 0)
@@ -720,10 +724,10 @@ def ClassPress():
 	GemRB.SetEvent(ClassWindow, ClassMultiButton, IE_GUI_BUTTON_ON_PRESS, "ClassMultiPress")
 	GemRB.SetText(ClassWindow, ClassMultiButton, 11993)
 	
-	ClassSpecialButton = GemRB.GetControl(ClassWindow, 11)
-	GemRB.SetButtonState(ClassWindow, ClassSpecialButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(ClassWindow, ClassSpecialButton, IE_GUI_BUTTON_ON_PRESS, "ClassSpecialPress")
-	GemRB.SetText(ClassWindow, ClassSpecialButton, 11994)
+	KitButton = GemRB.GetControl(ClassWindow, 11)
+	GemRB.SetButtonState(ClassWindow, KitButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(ClassWindow, KitButton, IE_GUI_BUTTON_ON_PRESS, "KitPress")
+	GemRB.SetText(ClassWindow, KitButton, 11994)
 
 	ClassTextArea = GemRB.GetControl(ClassWindow, 13)
 	GemRB.SetText(ClassWindow, ClassTextArea, 17242)
@@ -810,37 +814,58 @@ def ClassMultiCancelPress():
 	GemRB.SetVisible(ClassWindow, 1)
 	return
 
-def ClassSpecialPress():
-	global ClassWindow, ClassSpecialWindow, ClassSpecialTextArea, ClassSpecialDoneButton
+def KitPress():
+	global ClassWindow, KitWindow, KitTextArea, KitDoneButton, KitTable
+
 	GemRB.SetVisible(ClassWindow, 0)
-	ClassSpecialWindow = GemRB.LoadWindow(12)
+	KitWindow = GemRB.LoadWindow(12)
 
-	ClassSpecialTextArea = GemRB.GetControl(ClassSpecialWindow, 11)
-	GemRB.SetText(ClassSpecialWindow, ClassSpecialTextArea, 17245)
+	KitTable = GemRB.LoadTable("magesch")
+	GemRB.SetVar("MAGESCHOOL",0)
 
-	ClassSpecialDoneButton = GemRB.GetControl(ClassSpecialWindow, 0)
-	GemRB.SetButtonState(ClassSpecialWindow, ClassSpecialDoneButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent(ClassSpecialWindow, ClassSpecialDoneButton, IE_GUI_BUTTON_ON_PRESS, "ClassSpecialDonePress")
-	GemRB.SetText(ClassSpecialWindow, ClassSpecialDoneButton, 11973)
-	GemRB.SetButtonFlags(ClassSpecialWindow, ClassSpecialDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+        for i in range(0,8):
+		Button = GemRB.GetControl(KitWindow, i+2)
+                GemRB.SetButtonFlags(KitWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		GemRB.SetText(KitWindow, Button, GemRB.GetTableValue(KitTable, i+1, 0) )
+		GemRB.SetVarAssoc(KitWindow, Button, "MAGESCHOOL", i+1)
+		GemRB.SetEvent(KitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "KitHelpPress")
 
-	ClassSpecialCancelButton = GemRB.GetControl(ClassSpecialWindow, 12)
-	GemRB.SetButtonState(ClassSpecialWindow, ClassSpecialCancelButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(ClassSpecialWindow, ClassSpecialCancelButton, IE_GUI_BUTTON_ON_PRESS, "ClassSpecialCancelPress")
-	GemRB.SetText(ClassSpecialWindow, ClassSpecialCancelButton, 13727)
+	KitTextArea = GemRB.GetControl(KitWindow, 11)
+	GemRB.SetText(KitWindow, KitTextArea, 17245)
 
-	GemRB.SetVisible(ClassSpecialWindow, 1)
+	KitDoneButton = GemRB.GetControl(KitWindow, 0)
+	GemRB.SetButtonState(KitWindow, KitDoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent(KitWindow, KitDoneButton, IE_GUI_BUTTON_ON_PRESS, "KitDonePress")
+	GemRB.SetText(KitWindow, KitDoneButton, 11973)
+	GemRB.SetButtonFlags(KitWindow, KitDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	KitCancelButton = GemRB.GetControl(KitWindow, 12)
+	GemRB.SetButtonState(KitWindow, KitCancelButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetEvent(KitWindow, KitCancelButton, IE_GUI_BUTTON_ON_PRESS, "KitCancelPress")
+	GemRB.SetText(KitWindow, KitCancelButton, 13727)
+
+	GemRB.SetVisible(KitWindow, 1)
 	return
 
-def ClassSpecialDonePress():
-	global ClassSpecialWindow
-	GemRB.UnloadWindow(ClassSpecialWindow)
+def KitHelpPress():
+	global KitWindow, KitTextArea
+
+	Kit = GemRB.GetVar("MAGESCHOOL")
+	GemRB.SetText(KitWindow, KitTextArea, GemRB.GetTableValue(KitTable, Kit, 1))
+	return
+
+def KitDonePress():
+	global KitWindow
+
+	Kit = GemRB.GetTableValue(KitTable, 3, GemRB.GetVar("MAGESCHOOL") )
+	GemRB.SetVar("Class Kit", Kit)
+	GemRB.UnloadWindow(KitWindow)
 	ClassDonePress()
 	return
 
-def ClassSpecialCancelPress():
-	global ClassWindow, ClassSpecialWindow
-	GemRB.UnloadWindow(ClassSpecialWindow)
+def KitCancelPress():
+	global ClassWindow, KitWindow
+	GemRB.UnloadWindow(KitWindow)
 	GemRB.SetVisible(ClassWindow, 1)
 	return
 
