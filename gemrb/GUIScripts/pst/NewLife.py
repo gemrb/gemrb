@@ -284,7 +284,6 @@ def AcceptPress():
 	GemRB.FillPlayerInfo(MyChar) #does all the rest
 	#LETS PLAY!!
 	GemRB.EnterGame()
-	GemRB.PlayMovie("OPENING")
 	return
 
 def CancelPress():

@@ -1,3 +1,28 @@
+# -*-python-*-
+# GemRB - Infinity Engine Emulator
+# Copyright (C) 2003 The GemRB Project
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/Start.py,v 1.5 2004/04/10 08:48:07 edheldil Exp $
+
+
+# Start.py - intro and main menu screens
+
+###################################################
+
 import GemRB
 
 StartWindow = 0
@@ -5,6 +30,15 @@ QuitWindow = 0
 
 def OnLoad():
 	global StartWindow, QuitWindow
+
+	skip_videos = GemRB.GetVar ("SkipIntroVideos")
+	if not skip_videos:
+		GemRB.PlayMovie ("BISLOGO")
+		GemRB.PlayMovie ("TSRLOGO")
+		GemRB.PlayMovie ("OPENING")
+
+		GemRB.SetVar ("SkipIntroVideos", 1)
+
 	GemRB.LoadWindowPack("START")
 #quit subwindow
 	QuitWindow = GemRB.LoadWindow(3)
@@ -31,7 +65,7 @@ def OnLoad():
 	
 	GemRB.SetVisible(QuitWindow, 0)
 	GemRB.SetVisible(StartWindow, 1)
-	
+
 	GemRB.LoadMusicPL("Main.mus")
 	return
 	
@@ -49,6 +83,8 @@ def ResumeLifePress():
 	#to make difference between ingame load and initial load
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetNextScript("GUILOAD")
+	#GemRB.SetNextScript("GUISAVE")
+	#GemRB.SetNextScript("pok")
 	return
 
 def ExitPress():
