@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.7 2003/12/02 17:22:50 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.8 2003/12/15 09:35:06 balrog994 Exp $
  *
  */
 
@@ -818,7 +818,7 @@ void MVEPlay::_mvefile_set_buffer_size(MVEFILE *movie, int buf_size)
     int new_len;
 
     /* check if this would be a redundant operation */
-    if (buf_size  <=  movie->buf_size)
+    if ((unsigned int)buf_size  <=  movie->buf_size)
         return;
 
     /* allocate new buffer */
