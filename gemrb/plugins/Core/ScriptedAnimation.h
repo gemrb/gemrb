@@ -28,6 +28,7 @@ class GEM_EXPORT ScriptedAnimation {
 public:
 	ScriptedAnimation(DataStream* stream, Point &position, bool autoFree = true);
 	~ScriptedAnimation(void);
+	void PrepareBAM(DataStream* stream, Point &p);
 	Animation* anims[2];
 	ieDword Transparency;
 	ieDword SequenceFlags;
