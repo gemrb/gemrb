@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.25 2004/02/24 22:20:38 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.26 2004/04/22 21:37:50 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "TLKImp.h"
 #include "../Core/Interface.h"
+//#include "ie_stats.h"
 
 TLKImp::TLKImp(void)
 {
@@ -68,15 +69,103 @@ inline char* mystrncpy(char* dest, const char* source, int maxlength,
 	return dest;
 }
 
+int TLKImp::GenderStrRef(int slot, int malestrref, int femalestrref)
+{
+	Actor *act;
+
+	if(slot==-1) {
+		act=core->GetGameControl()->speaker;
+	}
+	else {
+		act=core->GetGame()->FindPC(slot);
+	}
+	if(act && act->GetStat(IE_SEX)==2) {
+		return femalestrref;
+	}
+	return malestrref;
+}
+
 //if this function returns -1 then it is not a built in token, dest may be NULL
 int TLKImp::BuiltinToken(char* Token, char* dest)
 {
 	char* Decoded = NULL;
+	bool freeup=true;
 	int TokenLength;   //decoded token length
 
 	//this may be hardcoded, all engines are the same or don't use it
 	if (!strcmp( Token, "FIGHTERTYPE" )) {
 		Decoded = GetString( 10086, 0 );
+		goto exit_function;
+	}
+	if(!strcmp( Token, "GABBER" )) {
+		//don't free this!
+		Decoded=core->GetGameControl()->speaker->LongName;
+		freeup=false;
+		goto exit_function;
+	}
+	if (!strcmp( Token, "SIRMAAM" )) {
+		Decoded = GetString( GenderStrRef(-1,27473,27475), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "GIRLBOY" )) {
+		Decoded = GetString( GenderStrRef(-1,27477,27476), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "BROTHERSISTER" )) {
+		Decoded = GetString( GenderStrRef(-1,27478,27479), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "LADYLORD" )) {
+		Decoded = GetString( GenderStrRef(-1,27481,27480), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "MALEFEMALE" )) {
+		Decoded = GetString( GenderStrRef(-1,27483,27482), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "HESHE" )) {
+		Decoded = GetString( GenderStrRef(-1,27485,27484), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "HISHER" )) {
+		Decoded = GetString( GenderStrRef(-1,27487,27486), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "MANWOMAN" )) {
+		Decoded = GetString( GenderStrRef(-1,27489,27488), 0);
+		goto exit_function;
+	}
+
+	if (!strcmp( Token, "PRO_SIRMAAM" )) {
+		Decoded = GetString( GenderStrRef(0,27473,27475), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "PRO_GIRLBOY" )) {
+		Decoded = GetString( GenderStrRef(0,27477,27476), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "PRO_BROTHERSISTER" )) {
+		Decoded = GetString( GenderStrRef(0,27478,27479), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "PRO_LADYLORD" )) {
+		Decoded = GetString( GenderStrRef(0,27481,27480), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "PRO_MALEFEMALE" )) {
+		Decoded = GetString( GenderStrRef(0,27483,27482), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "PRO_HESHE" )) {
+		Decoded = GetString( GenderStrRef(0,27485,27484), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "PRO_HISHER" )) {
+		Decoded = GetString( GenderStrRef(0,27487,27486), 0);
+		goto exit_function;
+	}
+	if (!strcmp( Token, "PRO_MANWOMAN" )) {
+		Decoded = GetString( GenderStrRef(0,27489,27488), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "WEAPONNAME" )) {
@@ -102,9 +191,12 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 	exit_function:
 	if (Decoded) {
 		TokenLength = ( int ) strlen( Decoded );
-		if (dest)
+		if (dest) {
 			memcpy( dest, Decoded, TokenLength );
-		free( Decoded );
+		}
+		if (freeup) {
+			free( Decoded );
+		}
 		return TokenLength;
 	}
 	return -1;
@@ -127,9 +219,7 @@ bool TLKImp::ResolveTags(char* dest, char* source, int Length)
 				if (TokenLength) {
 					if (TokenLength + NewLength > Length)
 						return false;
-					core->GetTokenDictionary()->Lookup( Token,
-													dest + NewLength,
-													TokenLength );
+					core->GetTokenDictionary()->Lookup( Token, dest + NewLength, TokenLength );
 				}
 			}
 			NewLength += TokenLength;
@@ -162,9 +252,7 @@ bool TLKImp::GetNewStringLength(char* string, unsigned long& Length)
 		if (string[i] == '<') {
 			// token
 			lChange = true;
-			i += mystrncpy( Token, string + i + 1, MAX_VARIABLE_LENGTH, '>' ) -
-				Token +
-				1;
+			i += mystrncpy( Token, string + i + 1, MAX_VARIABLE_LENGTH, '>' ) - Token + 1;
 			int TokenLength = BuiltinToken( Token, NULL );
 			if (TokenLength == -1) {
 				NewLength += core->GetTokenDictionary()->GetValueLength( Token );
@@ -241,7 +329,7 @@ char* TLKImp::GetString(unsigned long strref, int flags)
 	}
 	if (flags & IE_STR_STRREFON) {
 		char* string2 = ( char* ) malloc( Length + 11 );
-		sprintf( string2, "%d: %s", strref, string );
+		sprintf( string2, "%ld: %s", strref, string );
 		free( string );
 		return string2;
 	}
