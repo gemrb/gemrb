@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.86 2004/04/11 01:11:15 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.87 2004/04/14 18:40:07 avenger_teambg Exp $
  *
  */
 
@@ -155,8 +155,10 @@ public:
 	ScriptEngine * GetGUIScriptEngine();
 	/** Returns an actor index, by loading a creature */
 	int LoadCreature(char *ResRef, int InParty);
-	/** Removes a creature */
+	/** Removes a creature by slot */
 	int UnloadCreature(unsigned int Slot);
+	/** Removes a creature by pointer */
+	int UnloadCreature(Actor *actor);
 	/** Returns the actor count */
 	int GetActorCount() { return actors.size(); };
 	/** Add the actor to the list of actors and returns its index */

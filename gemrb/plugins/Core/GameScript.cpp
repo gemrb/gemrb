@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.134 2004/04/13 18:51:22 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.135 2004/04/14 18:40:06 avenger_teambg Exp $
  *
  */
 
@@ -318,6 +318,7 @@ static ActionLink actionnames[] = {
 	{"movetopointnorecticle",GameScript::MoveToPoint,AF_BLOCKING},//the same until we know better
 	{"moveviewobject",GameScript::MoveViewPoint,0},
 	{"moveviewpoint",GameScript::MoveViewPoint,0},
+	{"nidspecial1",GameScript::NIDSpecial1,AF_BLOCKING},
 	{"noaction",GameScript::NoAction,0},
 	{"opendoor",GameScript::OpenDoor,AF_BLOCKING},
 	{"permanentstatchange",GameScript::ChangeStat,0}, //probably the same
@@ -626,7 +627,9 @@ GameScript::GameScript(const char* ResRef, unsigned char ScriptType,
 				triggerflags[i] = 0;
 			}
 			else {
-				printf("Found trigger:%04x %s\n",i,triggername);
+				if(InDebug) {
+					printf("Found trigger:%04x %s\n",i,triggername);
+				}
 				triggers[i] = poi->Function;
 				triggerflags[i] = poi->Flags;
 			}
@@ -760,6 +763,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		ReplaceMyArea( Sender, newVarName );
 	}
 	core->GetGame()->globals->SetAt( newVarName, ( unsigned long ) value );
+	free(newVarName); //freeing up the temporary area
 }
 
 unsigned long GameScript::CheckVariable(Scriptable* Sender,
@@ -4250,6 +4254,7 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	ab->AnimID = IE_ANI_AWAKE;
 	ab->Orientation = parameters->int0Parameter;
 	Map* map = core->GetGame()->GetCurrentMap( );
+	core->AddActor( ab );
 	map->AddActor( ab );
 
 	//setting the deathvariable if it exists (iwd2)
@@ -4692,11 +4697,18 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
 	Scriptable* tar, *scr;
 
-	printf("BeginDialog core\n");
+	if(InDebug) {
+		printf("BeginDialog core\n");
+	}
 	if (Flags & BD_OWN) {
 		scr = tar = GetActorFromObject( Sender, parameters->objects[1] );
 	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1] );
+		if(Flags & BD_NUMERIC) { //internal usage
+			tar = core->GetActor( parameters->int0Parameter );
+		}
+		else {
+			tar = GetActorFromObject( Sender, parameters->objects[1] );
+		}
 		scr = Sender;
 	}
 	if(!tar) {
@@ -4893,14 +4905,16 @@ void GameScript::StartDialogueOverrideInterrupt(Scriptable* Sender,
 	BeginDialog( Sender, parameters, BD_STRING0 | BD_TALKCOUNT | BD_INTERRUPT );
 }
 
-//no string, no interrupt, talkcount increased
+//start talking to oneself
 void GameScript::PlayerDialogue(Scriptable* Sender, Action* parameters)
 {
-	//i think playerdialog is when a player initiates dialog with the
-	//target, in this case, the dialog is the target's dialog
-	BeginDialog( Sender, parameters, BD_TARGET | BD_TALKCOUNT | BD_CHECKDIST );
-	//others said something else, i'm undecided
-	//BeginDialog( Sender, parameters, BD_RESERVED | BD_OWN );
+	BeginDialog( Sender, parameters, BD_RESERVED | BD_OWN );
+}
+
+//we hijack this action for the player initiated dialogue
+void GameScript::NIDSpecial1(Scriptable* Sender, Action* parameters)
+{
+	BeginDialog( Sender, parameters, BD_TARGET | BD_NUMERIC | BD_TALKCOUNT | BD_CHECKDIST );
 }
 
 void GameScript::StartDialogueInterrupt(Scriptable* Sender, Action* parameters)

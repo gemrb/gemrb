@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.151 2004/04/14 14:06:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.152 2004/04/14 18:40:07 avenger_teambg Exp $
  *
  */
 
@@ -144,13 +144,14 @@ Interface::Interface(int iargc, char** iargv)
 
 #define FreeResourceVector(type, variable)   \
 {  \
-  std::vector<type*>::iterator i=variable.begin();  \
-  while(variable.size() ) { \
-	if(*i) delete(*i); \
-	variable.erase(i); \
-	i = variable.begin(); \
+	unsigned int i=variable.size(); \
+	while(i--) { \
+		if(variable[i]) { \
+			delete variable[i]; \
+		} \
 	} \
-} 
+	variable.clear(); \
+}
 
 Interface::~Interface(void)
 {
@@ -205,10 +206,14 @@ Interface::~Interface(void)
 		delete( timer );
 	}
 
-
 	if (windowmgr) {
 		delete( windowmgr );
 	}
+
+	if (evntmgr) {
+		delete( evntmgr );
+	}
+
 	if (guiscript) {
 		delete( guiscript );
 	}
@@ -220,7 +225,7 @@ Interface::~Interface(void)
 	}
 	FreeInterfaceVector( Table, tables, tm );
 	FreeInterfaceVector( Symbol, symbols, sm );
-	//FreeResourceVector(Actor, actors);
+	FreeResourceVector(Actor, actors);
 	delete( console );
 	delete( plugin );
 
@@ -1004,6 +1009,18 @@ int Interface::UnloadCreature(unsigned int Slot)
 	delete actors[Slot];
 	actors[Slot] = NULL;
 	return 1;
+}
+
+int Interface::UnloadCreature(Actor *actor)
+{
+	for (unsigned int index = 0; index < actors.size(); index++) {
+		if(actor == actors[index]) {
+			delete actors[index];
+			actors[index] = NULL;
+			return 1;
+		}
+	}
+	return 0;
 }
 
 int Interface::AddActor(Actor* actor)
@@ -1799,6 +1816,7 @@ void Interface::LoadGame(int index)
 		if (!sg)
 			return;
 		ds = sg->GetGame();
+		delete sg;
 	}
 	if (!ds) {
 		return;

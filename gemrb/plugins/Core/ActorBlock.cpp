@@ -687,12 +687,10 @@ Container::Container(void)
 	TrapRemovalDiff = 0;
 	Trapped = 0;
 	TrapDetected = 0;
-//	inventory = new Inventory;
 }
 
 Container::~Container()
 {
-//	delete inventory;
 }
 
 void Container::DebugDump()

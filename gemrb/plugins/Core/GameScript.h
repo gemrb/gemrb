@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.96 2004/04/10 18:08:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.97 2004/04/14 18:40:07 avenger_teambg Exp $
  *
  */
 
@@ -238,8 +238,8 @@ public:
 				triggers[c]->Release();
 			}
 		}
-		//delete[] triggers;
-		delete triggers;
+		delete[] triggers;
+		//delete triggers;
 	}
 public:
 	unsigned short triggersCount;
@@ -359,7 +359,8 @@ public:
 				actions[c]->Release();
 			}
 		}
-		delete actions;
+		delete[] actions;
+		//delete actions;
 	}
 public:
 	unsigned char weight;
@@ -412,8 +413,8 @@ public:
 			Response* rP = responses[b];
 			rP->Release();
 		}
-		//delete[] responses;
-		delete responses;
+		delete[] responses;
+		//delete responses;
 	}
 public:
 	unsigned short responsesCount;
@@ -514,9 +515,7 @@ public:
 	};
 	~Script()
 	{
-		printf( "Start Freeing Script: %s\n", GetName() );
 		FreeResponseBlocks();
-		printf( "End Freeing Script: %s\n", GetName() );
 	}
 	const char* GetName()
 	{
@@ -543,8 +542,8 @@ private:
 				responseBlocks[i]->Release();
 			}
 		}
-		//delete[] responseBlocks;
-		delete responseBlocks;
+		delete[] responseBlocks;
+		//delete responseBlocks;
 	}
 public:
 	unsigned int responseBlocksCount;
@@ -611,6 +610,7 @@ struct TriggerLink {
 #define BD_CHECKDIST 32 //checks distance, if needs, walks up
 #define BD_OWN  	 64 //source == target, works for player only
 #define BD_INTERRUPT 128  //interrupts action
+#define BD_NUMERIC   256  //target is numeric
 
 #define AF_NONE 	 0
 #define AF_INSTANT       1
@@ -981,6 +981,7 @@ public:
 	static void MoveToOffset(Scriptable* Sender, Action* parameters);
 	static void MoveViewPoint(Scriptable* Sender, Action* parameters);
 	static void MoveViewObject(Scriptable* Sender, Action* parameters);
+	static void NIDSpecial1(Scriptable* Sender, Action* parameters);
 	static void NoAction(Scriptable* Sender, Action* parameters);
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
 	static void PlayDead(Scriptable* Sender, Action* parameters);

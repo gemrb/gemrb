@@ -596,7 +596,7 @@ void GameControl::TryToTalk(Actor *source, Actor *target)
 	}
 	char Tmp[256];
 
-	sprintf( Tmp, "PlayerDialog(\"%s\")", target->scriptName );
+	sprintf( Tmp, "NIDSpecial1(\"%d\")", target->scriptName );
 	source->AddAction( GameScript::CreateAction( Tmp, true ) );
 }
 
@@ -1376,7 +1376,6 @@ void GameControl::ChangeMap()
 	selected.clear();
 	core->GetGame()->DelMap( MapIndex, true );
 	int mi = core->GetGame()->LoadMap( pc->Area );
-//	Map* map = core->GetGame()->GetMap( mi );
 	Map* map = SetCurrentArea( mi );
 	selected.push_back( pc );
 	if (EntranceName[0]) {

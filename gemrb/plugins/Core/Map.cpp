@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.82 2004/04/13 18:37:05 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.83 2004/04/14 18:40:07 avenger_teambg Exp $
  *
  */
 
@@ -76,7 +76,6 @@ Map::Map(void)
 	lastActorCount[0] = 0;
 	lastActorCount[1] = 0;
 	lastActorCount[2] = 0;
-//	justCreated = true;
 	if (!PathFinderInited) {
 		InitPathFinder();
 	}
@@ -90,11 +89,14 @@ Map::~Map(void)
 	for (unsigned int i = 0; i < animations.size(); i++) {
 		delete( animations[i] );
 	}
+
 	for (unsigned int i = 0; i < actors.size(); i++) {
 		Actor* a = actors[i];
-		if (!a->InParty && !a->FromGame)
-			delete( a );
+		if (a && !a->InParty && !a->FromGame) {
+			core->UnloadCreature( a );
+		}
 	}
+
 	for (unsigned int i = 0; i < entrances.size(); i++) {
 		delete( entrances[i] );
 	}
@@ -102,11 +104,16 @@ Map::~Map(void)
 	core->FreeInterface( SearchMap );
 	for (int i = 0; i < 3; i++) {
 		if (queue[i]) {
-			delete( queue[i] );
+			delete[] queue[i];
+			queue[i] = NULL;
 		}
 	}
-	//if(this->Scripts[0])
-	//	delete(Scripts[0]);
+	for (unsigned int i = 0; i < vvcCells.size(); i++) {
+		if (vvcCells[i]) {
+			delete vvcCells[i];
+			vvcCells[i] = NULL;
+		}
+	}
 }
 
 void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr)
@@ -379,7 +386,7 @@ void Map::DeleteActor(Actor* actor)
 	for (m = actors.begin(); m != actors.end(); ++m) {
 		if (( *m ) == actor) {
 			actors.erase( m );
-			delete( actor );
+			core->UnloadCreature(actor);
 			lastActorCount[0] = 0;
 			lastActorCount[1] = 0;
 			lastActorCount[2] = 0;
@@ -414,12 +421,12 @@ Actor* Map::GetActor(const char* Name)
 	return NULL;
 }
 
-int Map::GetActorInRect(Actor**& actors, Region& rgn)
+int Map::GetActorInRect(Actor**& actorlist, Region& rgn)
 {
-	actors = ( Actor * * ) malloc( this->actors.size() * sizeof( Actor * ) );
+	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
 	int count = 0;
-	for (size_t i = 0; i < this->actors.size(); i++) {
-		Actor* actor = this->actors.at( i );
+	for (size_t i = 0; i < actors.size(); i++) {
+		Actor* actor = actors.at( i );
 		if (actor->BaseStats[IE_UNSELECTABLE] ||
 			( actor->BaseStats[IE_STATE_ID] & STATE_DEAD ) ||
 			( !actor->Active ))
@@ -430,9 +437,9 @@ int Map::GetActorInRect(Actor**& actors, Region& rgn)
 		if (( ( actor->BBox.x + actor->BBox.w ) < rgn.x ) ||
 			( ( actor->BBox.y + actor->BBox.h ) < rgn.y ))
 			continue;
-		actors[count++] = actor;
+		actorlist[count++] = actor;
 	}
-	actors = ( Actor * * ) realloc( actors, count * sizeof( Actor * ) );
+	actorlist = ( Actor * * ) realloc( actorlist, count * sizeof( Actor * ) );
 	return count;
 }
 
@@ -480,8 +487,10 @@ void Map::AddWallGroup(WallGroup* wg)
 void Map::GenerateQueue(int priority)
 {
 	if (lastActorCount[priority] != actors.size()) {
-		if (queue[priority])
+		if (queue[priority]) {
 			delete[] queue[priority];
+			queue[priority] = NULL;
+		}
 		queue[priority] = new Actor * [actors.size()];
 		lastActorCount[priority] = ( int ) actors.size();
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.11 2004/03/26 18:07:51 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.12 2004/04/14 18:40:07 avenger_teambg Exp $
  *
  */
 
@@ -86,10 +86,14 @@ unsigned long MemoryStream::Size()
 /** No descriptions */
 int MemoryStream::ReadLine(void* buf, int maxlen)
 {
-	if (Pos >= length) {
-		return -1;
+	if(!maxlen) {
+		return 0;
 	}
 	unsigned char * p = ( unsigned char * ) buf;
+	if (Pos >= length) {
+		p[0]=0;
+		return -1;
+	}
 	int i = 0;
 	while (i < ( maxlen - 1 )) {
 		Byte ch = *( ( Byte* ) ptr + Pos );

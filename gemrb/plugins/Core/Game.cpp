@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.31 2004/04/14 15:11:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.32 2004/04/14 18:40:06 avenger_teambg Exp $
  *
  */
 
@@ -43,13 +43,17 @@ Game::~Game(void)
 		delete( Maps[i] );
 	}
 	for (size_t i = 0; i < PCs.size(); i++) {
-		delete( PCs[i] );
+		core->UnloadCreature( PCs[i] );
 	}
 	for (size_t i = 0; i < NPCs.size(); i++) {
-		delete( NPCs[i] );
+		core->UnloadCreature( NPCs[i] );
 	}
 	if (globals) {
 		delete globals;
+	}
+	size_t i=Journals.size();
+	while(i--) {
+		delete Journals[i];
 	}
 }
 
@@ -295,6 +299,7 @@ void Game::DeleteJournalEntry(ieStrRef strref)
 	size_t i=Journals.size();
 	while(i--) {
 		if (Journals[i]->Text==strref) {
+			delete Journals[i];
 			Journals.erase(Journals.begin()+i);
 		}
 	}
@@ -305,6 +310,7 @@ void Game::DeleteJournalGroup(ieByte Group)
 	size_t i=Journals.size();
 	while(i--) {
 		if (Journals[i]->Group==Group) {
+			delete Journals[i];
 			Journals.erase(Journals.begin()+i);
 		}
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.26 2004/04/11 01:11:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.27 2004/04/14 18:40:06 avenger_teambg Exp $
  *
  */
 
@@ -93,7 +93,7 @@ public:
 	Actor *LastSummoner;
 
 	Inventory inventory;
-	Spellbook* spellbook;
+	Spellbook spellbook;
 
 private:
 	void SetCircleSize();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.19 2004/03/24 20:19:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.20 2004/04/14 18:40:07 avenger_teambg Exp $
  *
  */
 
@@ -32,6 +32,10 @@ SaveGameIterator::SaveGameIterator(void)
 
 SaveGameIterator::~SaveGameIterator(void)
 {
+	unsigned int i = save_slots.size();
+	while(i--) {
+		free( save_slots[i] );
+	}
 }
 
 static void DelTree(char* Pt)
@@ -128,9 +132,11 @@ bool SaveGameIterator::RescanSaveGames()
 	loaded = true;
 
 	// delete old entries
-	for (int i = save_slots.size() - 1; i >= 0; i--) {
-		delete( save_slots[i] );
+	unsigned int i = save_slots.size();
+	while(i--) {
+		free( save_slots[i] );
 	}
+	save_slots.clear();
 
 	char Path[_MAX_PATH];
 	sprintf( Path, "%s%s", core->SavePath, PlayMode() );
@@ -223,8 +229,8 @@ void SaveGameIterator::DeleteSaveGame(int index)
 	DelTree( Path );
 	rmdir( Path );
 
-	// FIXME: maybe do just: delete save_slots[index]
-	//   instead of full rescan
+	delete slotname;
+	save_slots.erase(save_slots.begin()+index);
 
 	loaded = false;
 }

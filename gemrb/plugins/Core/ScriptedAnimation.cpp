@@ -53,13 +53,11 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree,
 	Sounds[0][8] = 0;
 	stream->Read( Sounds[1], 8 );
 	Sounds[1][8] = 0;
-	//AnimationFactory * af = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(Anim1ResRef, IE_BAM_CLASS_ID);
-	AnimationMgr* aM = ( AnimationMgr* )
-		core->GetInterface( IE_BAM_CLASS_ID );
-	DataStream* dS = core->GetResourceMgr()->GetResource( Anim1ResRef,
-												IE_BAM_CLASS_ID );
+	AnimationMgr* aM = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
+	DataStream* dS = core->GetResourceMgr()->GetResource( Anim1ResRef, IE_BAM_CLASS_ID );
 	aM->Open( dS, true );
 	anims[0] = aM->GetAnimation( ( unsigned char ) seq1, 0, 0 );
+	anims[1] = aM->GetAnimation( ( unsigned char ) seq2, 0, 0 );
 	//anims[0] = af->GetCycle((unsigned char)seq1);
 	//anims[1] = af->GetCycle((unsigned char)seq2);
 	XPos += X;
