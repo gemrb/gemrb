@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.111 2004/01/05 15:56:45 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.112 2004/01/05 17:53:43 balrog994 Exp $
  *
  */
 
@@ -163,7 +163,7 @@ Interface::~Interface(void)
 		delete(tokens);
 	FreeInterfaceVector(Table, tables, tm);
 	FreeInterfaceVector(Symbol, symbols, sm);
-	FreeResourceVector(Actor, actors);
+	//FreeResourceVector(Actor, actors);
 	delete(console);
 	delete(plugin);
 
