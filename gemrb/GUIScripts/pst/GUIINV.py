@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.21 2004/11/15 00:20:54 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.22 2005/02/11 22:25:02 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -62,14 +62,12 @@ ItemHash = {}
 # Maps from ControlID to inventory Slot number
 ControlToSlotMap = [6, 7, 5, 3, 19, 0, 1, 4, 8, 2,   9, 10, 11, 12,   20, 21, 22, 23, 24,   13, 14, 15, 16, 17,   25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
 
-SlotTypeTable = GemRB.LoadTable ('SLOTTYPE')
-AvSlotsTable  = GemRB.LoadTable ('AVSLOTS')
-
-
-
 def OpenInventoryWindow ():
+	global AvSlotsTable
 	global InventoryWindow
 	
+	AvSlotsTable  = GemRB.LoadTable ('AVSLOTS')
+
 	if CloseOtherWindow (OpenInventoryWindow):
 		GemRB.HideGUI ()
 		GemRB.UnloadWindow (InventoryWindow)
@@ -216,30 +214,23 @@ def UpdateInventoryWindow ():
 
 	# get a list which maps slot number to slot type/icon/toolti
 	anim_id = GemRB.GetPlayerStat (pc, ie_stats.IE_ANIMATION_ID)
+	#anim_id = GemRB.GetPlayerStat (pc, ie_stats.IE_ANIMATION_ID) & 0x7fff
 	row = "0x%04X" %anim_id
 	slot_list = map (int, string.split (GemRB.GetTableValue (AvSlotsTable, row, 'SLOTS'), ',')[1:])
-
 	
 	# populate inventory slot controls
 	for i in range (44):
 		UpdateSlot (pc, i)
 
 
-
-
-
 def UpdateSlot (pc, ControlID):
 	Window = InventoryWindow
 	Button = GemRB.GetControl (Window, ControlID)
 	slot = ControlToSlotMap[ControlID]
-	print 'slot', slot
 	slot_item = GemRB.GetSlotItem (pc, slot)
-	print "slot_item", slot_item
 
 	slottype = slot_list[slot]
-	print 'slottype', slottype
-	ResRef = GemRB.GetTableValue (SlotTypeTable, slottype, 2)
-	tooltip = GemRB.GetTableValue (SlotTypeTable, slottype, 3)
+	slotdict = GemRB.GetSlotType (slottype)
 
 	# NOTE: there are invisible items (e.g. MORTEP) in inaccessible slots
 	#   used to assign powers and protections
@@ -250,7 +241,6 @@ def UpdateSlot (pc, ControlID):
 			
 		GemRB.SetButtonSprites (Window, Button, 'IVSLOT', 0,  0, 0, 0, 0)
 		GemRB.SetItemIcon (Window, Button, slot_item['ItemResRef'])
-		print 'StackAmount', item['StackAmount']
 		if item['StackAmount'] > 1:
 			GemRB.SetText (Window, Button, str (slot_item['Usages0']))
 		else:
@@ -270,13 +260,11 @@ def UpdateSlot (pc, ControlID):
 		GemRB.SetText (Window, Button, '')
 		
 		if slottype:
-			print 'a'
-			GemRB.SetButtonSprites (Window, Button, ResRef, 0,  0, 0, 0, 0)
-			GemRB.SetTooltip (Window, Button, tooltip)
+			GemRB.SetButtonSprites (Window, Button, slotdict['ResRef'], 0,  0, 0, 0, 0)
+			GemRB.SetTooltip (Window, Button, slotdict['Tip'])
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
 		else:
-			print 'b'
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			GemRB.SetTooltip (Window, Button, '')
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, '')
@@ -301,7 +289,6 @@ def OnDragItem ():
 
 def OnDropItemToPC ():
 	pc = GemRB.GetVar ("PressedPortrait") + 1
-	print "PC", pc
 	GemRB.DropDraggedItem (pc, -1)
 	UpdateInventoryWindow ()
 	
