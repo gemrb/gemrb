@@ -31,6 +31,7 @@ public:
 	virtual Sprite2D *CreateSprite8(int w, int h, int bpp, void* pixels, void* palette, bool cK = false, int index = 0) = 0;
 	virtual void FreeSprite(Sprite2D * spr) = 0;
 	virtual void BlitSprite(Sprite2D * spr, int x, int y, bool anchor = false, Region * clip = NULL) = 0;
+	virtual void BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y, bool anchor = true, Region * clip = NULL) = 0;
 	virtual void SetCursor(Sprite2D * spr, int x, int y) = 0;
 	virtual Region GetViewport(void) = 0;
 	virtual void SetViewport(int x, int y) = 0;

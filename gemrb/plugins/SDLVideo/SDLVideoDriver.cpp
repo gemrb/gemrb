@@ -231,12 +231,12 @@ Sprite2D *SDLVideoDriver::CreateSprite(int w, int h, int bpp, DWORD rMask, DWORD
 Sprite2D *SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels, void* palette, bool cK, int index)
 {
 	Sprite2D *spr = new Sprite2D();
-	void * p = SDL_CreateRGBSurfaceFrom(pixels, w, h, bpp, w*(bpp/8), 0,0,0,0);
+	void * p = SDL_CreateRGBSurfaceFrom(pixels, w, h, 8, w, 0,0,0,0);
+	SDL_SetPalette((SDL_Surface*)p, SDL_LOGPAL, (SDL_Color*)palette, 0, 256);
 	if(p != NULL) {
 		spr->vptr = p;
 		spr->pixels = pixels;
 	}
-	SDL_SetPalette((SDL_Surface*)p, SDL_LOGPAL, (SDL_Color*)palette, 0, 256);
 	if(cK)
 		SDL_SetColorKey((SDL_Surface*)p, SDL_SRCCOLORKEY | SDL_RLEACCEL, index);
 	spr->Width = w;
@@ -251,6 +251,70 @@ void SDLVideoDriver::FreeSprite(Sprite2D * spr)
 	if(spr->pixels)
 		free(spr->pixels);
 	delete(spr);
+}
+
+void SDLVideoDriver::BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y, bool anchor, Region * clip)
+{
+	//TODO: Add the destination surface and rect to the Blit Pipeline
+	SDL_Rect drect;
+	SDL_Rect t = {size.x, size.y, size.w, size.h};
+	if(anchor) {
+		drect.x = x;
+		drect.y = y;
+	}
+	else {
+		drect.x = x-Viewport.x;
+		drect.y = y-Viewport.y;
+	}
+	if(clip) {
+		if(drect.x+size.w <= clip->x)
+			return;
+		else {
+			if(drect.x < clip->x) {
+				t.x = size.x+clip->x-drect.x;
+				t.w = size.w-t.x;
+			}
+			else {
+				if(drect.x+size.w <= clip->x+clip->w) {
+					t.x = size.x;
+					t.w = size.w;
+				}
+				else {
+					if(drect.x >= clip->x+clip->w) {
+						return;
+					}
+					else {
+						t.x = size.x;
+						t.w = (clip->x+clip->w)-drect.x;
+					}
+				}
+			}
+		}
+		if(drect.y+size.h <= clip->y)
+			return;
+		else {
+			if(drect.y < clip->y) {
+				t.y = size.y+clip->y-drect.y;
+				t.h = size.h-t.y;
+			}
+			else {
+				if(drect.y+size.h <= clip->y+clip->h) {
+					t.y = 0;
+					t.h = size.h;
+				}
+				else {
+					if(drect.y >= clip->y+clip->h) {
+						return;
+					}
+					else {
+						t.y = 0;
+						t.h = (clip->y+clip->h)-drect.y;
+					}
+				}
+			}
+		}
+	}
+	SDL_BlitSurface((SDL_Surface*)spr->vptr, &t, disp, &drect);
 }
 
 void SDLVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Region * clip)
