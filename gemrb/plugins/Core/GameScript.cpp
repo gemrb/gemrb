@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.211 2004/10/18 18:43:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.212 2004/11/07 18:45:21 avenger_teambg Exp $
  *
  */
 
@@ -135,6 +135,8 @@ static TriggerLink triggernames[] = {
 	{"havespell", GameScript::HaveSpell,0},    //these must be the same
 	{"havespellparty", GameScript::HaveSpellParty,0}, 
 	{"havespellres", GameScript::HaveSpell,0}, //they share the same ID
+	{"heard", GameScript::Heard,0},
+	{"help", GameScript::Help_Trigger,0},
 	{"hitby", GameScript::HitBy,0},
 	{"hotkey", GameScript::HotKey,0},
 	{"hp", GameScript::HP,0},
@@ -364,11 +366,13 @@ static ActionLink actionnames[] = {
 	{"globalsetglobal", GameScript::GlobalSetGlobal,AF_MERGESTRINGS},
 	{"globalshl", GameScript::GlobalShL,AF_MERGESTRINGS},
 	{"globalshlglobal", GameScript::GlobalShLGlobal,AF_MERGESTRINGS},
+	{"globalshout", GameScript::GlobalShout,0},
 	{"globalshr", GameScript::GlobalShR,AF_MERGESTRINGS},
 	{"globalshrglobal", GameScript::GlobalShRGlobal,AF_MERGESTRINGS},
 	{"globalsubglobal", GameScript::GlobalSubGlobal,AF_MERGESTRINGS},
 	{"globalxor", GameScript::GlobalXor,AF_MERGESTRINGS},
 	{"globalxorglobal", GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
+	{"help", GameScript::Help,0},
 	{"hideareaonmap", GameScript::HideAreaOnMap,0},
 	{"hidecreature", GameScript::HideCreature,0},
 	{"hidegui", GameScript::HideGUI,0},
@@ -504,6 +508,7 @@ static ActionLink actionnames[] = {
 	{"settokenglobal", GameScript::SetTokenGlobal,AF_MERGESTRINGS},
 	{"setvisualrange", GameScript::SetVisualRange,0},
 	{"sg", GameScript::SG,0},
+	{"shout", GameScript::Shout,0},
 	{"sinisterpoof", GameScript::CreateVisualEffect,0},
 	{"smallwait", GameScript::SmallWait,AF_BLOCKING},
 	{"startcutscene", GameScript::StartCutScene,0},
@@ -562,6 +567,7 @@ static ObjectLink objectnames[] = {
 	{"fourthnearestenemyof", GameScript::FourthNearestEnemyOf},
 	{"lastattackerof", GameScript::LastHitter}, //is it important to be different?
 	{"lastheardby", GameScript::LastHeardBy},
+	{"lasthelp", GameScript::LastHelp},
 	{"lasthitter", GameScript::LastHitter},
 	{"lastseenby", GameScript::LastSeenBy},
 	{"lastsummonerof", GameScript::LastSummonerOf},
@@ -1528,6 +1534,18 @@ Targets* GameScript::EvaluateObject(Object* oC)
 	return tgts;
 }
 
+bool GameScript::MatchActor(Actor* actor, Object* oC)
+{
+	if (!actor) {
+		return false;
+	}
+	if (oC->objectName[0]) {
+		return (stricmp( actor->scriptName, oC->objectName ) == 0);
+	}
+	//TODO: the rest
+	return false;
+}
+
 int GameScript::GetObjectCount(Scriptable* /*Sender*/, Object* oC)
 {
 	if (!oC) {
@@ -2145,6 +2163,21 @@ Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters)
 	parameters->Clear();
 	if(actor) {
 		parameters->AddTarget(actor->LastSeen);
+	}
+	return parameters;
+}
+
+Targets *GameScript::LastHelp(Scriptable *Sender, Targets *parameters)
+{
+	Actor *actor = parameters->GetTarget(0);
+	if(!actor) {
+		if(Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if(actor) {
+		parameters->AddTarget(actor->LastHelp);
 	}
 	return parameters;
 }
@@ -3443,7 +3476,7 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* paramet
 	}
 	return 0;
 }
-//                               0      1      2      3    4   
+//			       0      1      2      3    4   
 static char spellnames[5][5]={"ITEM","SPPR","SPWI","SPIN","SPCL"};
 
 #define CreateSpellName(spellname, data) sprintf(spellname,"%s%03d",spellnames[data/1000],data%1000)
@@ -4783,8 +4816,30 @@ int GameScript::HitBy(Scriptable* Sender, Trigger* parameters)
 			return 0;
 		}
 	}
-	//TODO: match LastHitter with object in parameter
-	return 0;
+	return MatchActor(actor->LastHitter, parameters->objectParameter);
+}
+
+int GameScript::Heard(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if(parameters->int0Parameter) {
+		if (!(parameters->int0Parameter&actor->LastShout) ) {
+			return 0;
+		}
+	}
+	return MatchActor(actor->LastHeard, parameters->objectParameter);
+}
+
+int GameScript::Help_Trigger(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	return MatchActor(actor->LastHelp, parameters->objectParameter);
 }
 
 int GameScript::FallenPaladin(Scriptable* Sender, Trigger* /*parameters*/)
@@ -6424,7 +6479,7 @@ void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, Point &pos
 			if(map1) {
 				map1->RemoveActor( actor );
 			}
-		        map2->AddActor( actor );
+			map2->AddActor( actor );
 		}
 	}
 	else {
@@ -8001,4 +8056,33 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 	WorldMap *worldmap = core->GetWorldMap();
 	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE, OP_NAND);
 }
+
+void GameScript::Shout( Scriptable* Sender, Action* parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Map *map=core->GetGame()->GetCurrentMap();
+	//max. shouting distance
+	map->Shout(Sender, parameters->int0Parameter, 40);
+}
+
+void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->Shout(Sender, parameters->int0Parameter, 0);
+}
+
+void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->Shout(Sender, 0, 40);
+}
+
 
