@@ -58,6 +58,18 @@ KeyImp::~KeyImp(void)
 
 bool KeyImp::LoadResFile(const char * resfile)
 {
+#ifndef WIN32
+	if(core->CaseSensitive) {
+		char fn[_MAX_PATH] = {0};
+		ExtractFileFromPath(fn, resfile);
+		char * newname = FindInDir(core->GamePath, fn);
+		if(newname) {
+			strcpy(resfile, core->GamePath);
+			strcat(resfile, newname);
+			free(newname);
+		}
+	}
+#endif
 	printf("[KEY Importer]: Opening %s...", resfile);
 	FileStream * f = new FileStream();
 	if(!f->Open(resfile)) {
