@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.68 2004/09/12 21:58:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.69 2004/09/13 20:31:49 avenger_teambg Exp $
  *
  */
 
@@ -74,7 +74,7 @@ CREItem* AREImp::GetItem()
 {
 	CREItem *itm = new CREItem();
 
-	str->Read( itm->ItemResRef, 8 );
+	str->ReadResRef( itm->ItemResRef );
 	str->ReadWord( &itm->Unknown08 );
 	str->ReadWord( &itm->Usages[0] );
 	str->ReadWord( &itm->Usages[1] );
@@ -107,7 +107,7 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 		bigheader = 0;
 	}
 	//TEST VERSION: SKIPPING VALUES
-	str->Read( WEDResRef, 8 );
+	str->ReadResRef( WEDResRef );
 	str->ReadDword( &LastSave );
 	str->ReadDword( &AreaFlags );
 	str->Seek( 0x48 + bigheader, GEM_STREAM_START );
@@ -137,8 +137,7 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	str->ReadDword( &VariablesCount );
 	ieDword tmp;
 	str->ReadDword( &tmp );
-	str->Read( Script, 8 );
-	Script[8] = 0;
+	str->ReadResRef( Script );
 	str->Seek( 0xA4 + bigheader, GEM_STREAM_START );
 	str->ReadDword( &DoorsCount );
 	str->ReadDword( &DoorsOffset );
@@ -210,7 +209,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadDword( map->RestHeader.Strref + i );
 	}
 	for (i = 0; i < 10; i++) {
-		str->Read( map->RestHeader.Creature + i, 8 );
+		str->ReadResRef( map->RestHeader.CreResRef[i] );
 	}
 	str->ReadWord( &map->RestHeader.CreatureNum );
 	str->Seek( 14, GEM_CURRENT_POS );
@@ -230,8 +229,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		Region BBClosed, BBOpen;
 		str->Read( LongName, 32 );
 		LongName[32] = 0;
-		str->Read( ShortName, 8 );
-		ShortName[8] = 0;
+		str->ReadResRef( ShortName );
 		str->ReadDword( &Flags );
 		str->ReadDword( &OpenFirstVertex );
 		str->ReadWord( &OpenVerticesCount );
@@ -254,11 +252,9 @@ Map* AREImp::GetMap(const char *ResRef)
 		BBClosed.w = maxX - minX;
 		BBClosed.h = maxY - minY;
 		str->Seek( 0x10, GEM_CURRENT_POS );
-		char OpenResRef[9], CloseResRef[9];
-		str->Read( OpenResRef, 8 );
-		OpenResRef[8] = 0;
-		str->Read( CloseResRef, 8 );
-		CloseResRef[8] = 0;
+		ieResRef OpenResRef, CloseResRef;
+		str->ReadResRef( OpenResRef );
+		str->ReadResRef( CloseResRef );
 		str->ReadDword( &cursor );
 		str->Seek( 36, GEM_CURRENT_POS );
 		Point toOpen[2];
@@ -357,8 +353,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		bbox.h = tmp - bbox.y;
 		str->ReadDword( &ItemIndex );
 		str->ReadDword( &ItemCount );
-		str->Read( Script, 8 );
-		Script[8]=0;
+		str->ReadResRef( Script );
 		ieDword firstIndex, vertCount;
 		str->ReadDword( &firstIndex );
 		str->ReadDword( &vertCount );
@@ -403,8 +398,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieDword FirstVertex, Cursor, Flags;
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
 		ieWord LaunchX, LaunchY;
-		char Name[33], Script[9], Key[9], Destination[9], Entrance[33];
-		char Dialog[9];
+		char Name[33], Entrance[33];
+		ieResRef Script, DialogResRef, KeyResRef, Destination;
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->ReadWord( &Type );
@@ -423,8 +418,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieDword tmp2;
 		str->ReadDword( &tmp2 );
 		str->ReadDword( &Cursor );
-		str->Read( Destination, 8 );
-		Destination[8] = 0;
+		str->ReadResRef( Destination );
 		str->Read( Entrance, 32 );
 		Entrance[32] = 0;
 		str->ReadDword( &Flags );
@@ -436,19 +430,16 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadWord( &TrapDetected );
 		str->ReadWord( &LaunchX );
 		str->ReadWord( &LaunchY );
-		str->Read( Key, 8 );
-		Key[8] = 0;
+		str->ReadResRef( KeyResRef );
 		//don't even bother reading the script if it isn't trapped
 		if(Trapped || Type) {
-			str->Read( Script, 8 );
-			Script[8] = 0;
+			str->ReadResRef( Script );
 		}
 		else {
 			Script[0] = 0;
 		}
 		str->Seek( 56, GEM_CURRENT_POS );
-		str->Read( Dialog, 8 );
-		Dialog[8] = 0;
+		str->ReadResRef( DialogResRef );
 		char* string = core->GetString( StrRef );
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
@@ -475,8 +466,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		ip->Flags = Flags;
 		strcpy( ip->Destination, Destination );
 		strcpy( ip->EntranceName, Entrance );
-		strcpy( ip->KeyResRef, Key );
-		strcpy( ip->DialogResRef, Dialog );
+		strcpy( ip->KeyResRef, KeyResRef );
+		strcpy( ip->DialogResRef, DialogResRef );
 		if (Script[0] != 0) {
 			ip->Scripts[0] = new GameScript( Script, IE_SCRIPT_TRIGGER );
 			ip->Scripts[0]->MySelf = ip;
@@ -510,8 +501,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->Seek( 56, GEM_CURRENT_POS );
-			str->Read( CreResRef, 8 );
-			CreResRef[8] = 0;
+			str->ReadResRef( CreResRef );
 			DataStream* crefile;
 			ieDword CreOffset, CreSize;
 			str->ReadDword( &CreOffset );
@@ -571,9 +561,8 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadWord( &animX );
 			str->ReadWord( &animY );
 			str->Seek( 4, GEM_CURRENT_POS );
-			char animBam[9];
-			str->Read( animBam, 8 );
-			animBam[8] = 0;
+			ieResRef animBam;
+			str->ReadResRef( animBam );
 			ieWord animCycle, animFrame;
 			str->ReadWord( &animCycle );
 			str->ReadWord( &animFrame );

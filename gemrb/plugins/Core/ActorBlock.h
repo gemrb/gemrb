@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.46 2004/09/12 21:58:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.47 2004/09/13 20:31:50 avenger_teambg Exp $
  *
  */
 
@@ -166,7 +166,7 @@ public:
 	Color outlineColor;
 	unsigned long Cursor;
 	bool Highlight;
-	char DialogResRef[9];
+	ieResRef DialogResRef;
 	Point TrapLaunch;
 public:
 	bool IsOver(Point &Pos);
@@ -265,14 +265,14 @@ public:
 
 public:
 	char Name[33];
-	char Destination[9];
+	ieResRef Destination;
 	char EntranceName[33];
 	unsigned long Flags;
 	unsigned short TrapDetectionDifficulty;
 	unsigned short TrapRemovalDifficulty;
 //	unsigned short Trapped;
 	unsigned short TrapDetected;
-	char KeyResRef[9];
+	ieResRef KeyResRef;
 };
 
 #endif
