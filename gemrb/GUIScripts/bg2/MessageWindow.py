@@ -23,6 +23,7 @@ def OnLoad():
 	GemRB.SetVar("MessagePosition", 4) #BottomAdded
 	
 	GemRB.SetVar("MessageTextArea", MessageTA)
+	GemRB.SetVar("MessageWindowSize", 0)
 	
 	UpdateResizeButtons()
 	
