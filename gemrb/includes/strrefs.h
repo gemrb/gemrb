@@ -21,4 +21,4 @@
 #define STR_CANTSAVEDIALOG 20
 #define STR_TARGETBUSY      21
 #define STR_CANTTALKTRANS   22
-
+#define STR_GOTXP           23
