@@ -12,9 +12,18 @@ Area scripts are queued, master areas get on the head of the queue, non-master a
 4. TLK tags (easy to implement)
 
 Items:
-1. Loading containers/items in areas
+1. (DONE) Loading containers/items in areas
 2. Dropping of items (first create an opcode)
 3. Picking up an item (create opcode)
+4. Equipping items
+
+Effects:
+1. Create base system for effect blocks
+2. Implement effects
+
+Area:
+1. Implement cover (wallgroups)
+2. Fog of war
 
 Known Bugs:
 1. problem: Dialog options that are disabled by the trigger condition are still accessible via hotkey. (FIXED)
@@ -23,5 +32,5 @@ Known Bugs:
 
 3. problem: actors who have joined are still loaded by the area (duplicated). (FIXED)
 
-4. problem: sound isn't working in movies
+4. problem: sound isn't working in movies (FIXED)
 
