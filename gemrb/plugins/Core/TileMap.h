@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.16 2004/01/02 00:49:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.17 2004/01/04 15:22:53 balrog994 Exp $
  *
  */
 
@@ -93,7 +93,7 @@ private:
 public:
 	TileMap(void);
 	~TileMap(void);
-	Door * AddDoor(char * Name, bool DoorClosed, unsigned short * indexes, int count, Gem_Polygon * open, Gem_Polygon * closed);
+	Door * AddDoor(char * Name, bool DoorClosed, int ClosedIndex, unsigned short * indexes, int count, Gem_Polygon * open, Gem_Polygon * closed);
 	Door * GetDoor(unsigned short x, unsigned short y);
 	Door * GetDoor(unsigned int idx);
 	Door * GetDoor(const char * Name);
