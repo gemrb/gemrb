@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.56 2005/01/27 17:27:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.57 2005/01/29 17:59:02 avenger_teambg Exp $
  *
  */
 
@@ -160,11 +160,14 @@ CRESpellMemorization* CREImp::GetSpellMemorization()
 void CREImp::SetupColor(ieDword &stat)
 {
 	if (RandColor==-1) {
+		RandColor = 0;
 		int table = core->LoadTable( "RANDCOLR" );
 		TableMgr *rndcol = core->GetTable( table );
-		RandColor=rndcol->GetColumnCount();
-		RandRows=rndcol->GetRowCount();
-		if (RandRows>MAXCOLOR) RandRows=MAXCOLOR;
+		if (rndcol) {
+			RandColor=rndcol->GetColumnCount();
+			RandRows=rndcol->GetRowCount();
+			if (RandRows>MAXCOLOR) RandRows=MAXCOLOR;
+		}
 		if (RandRows>1 && RandColor>0) {
 			randcolors = new ColorSet[RandColor];
 			int cols = RandColor;
