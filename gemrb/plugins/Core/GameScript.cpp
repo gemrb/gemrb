@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.100 2004/03/17 20:51:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.101 2004/03/18 17:03:17 avenger_teambg Exp $
  *
  */
 
@@ -1649,7 +1649,7 @@ Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters)
 
 	int i = parameters->Count();
 	while(i--) {
-		Actor *actor = tgts->GetTarget(i);
+		Actor *actor = parameters->GetTarget(i);
 		if(!actor)
 			continue;
 		tgts->AddTarget(actor->LastSeen);
@@ -1664,7 +1664,7 @@ Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
 
 	int i = parameters->Count();
 	while(i--) {
-		Actor *actor = tgts->GetTarget(i);
+		Actor *actor = parameters->GetTarget(i);
 		if(!actor)
 			continue;
 		tgts->AddTarget(actor->LastTalkedTo);
@@ -2043,22 +2043,22 @@ int GameScript::ID_Allegiance(Actor *actor, int parameter)
 {
 	int value = actor->GetStat( IE_EA );
 	switch (parameter) {
-		case 30:
+		case GOODCUTOFF:
 			//goodcutoff
-			return value <= 30;
+			return value <= GOODCUTOFF;
 
-		case 31:
+		case NOTGOOD:
 			//notgood
-			return value >= 31;
+			return value >= NOTGOOD;
 
-		case 199:
+		case NOTEVIL:
 			//notevil
-			return value <= 199;
+			return value <= NOTEVIL;
 			break;
 
-		case 200:
+		case EVILCUTOFF:
 			//evilcutoff
-			return value >= 200;
+			return value >= EVILCUTOFF;
 
 		case 0:
 		case 126:
@@ -2067,6 +2067,7 @@ int GameScript::ID_Allegiance(Actor *actor, int parameter)
 			break;
 
 	}
+printf("EA matching: %d == %d?",parameter, value);
 	//default
 	return parameter == value;
 }
