@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.43 2004/01/11 18:57:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.44 2004/01/11 23:20:32 avenger_teambg Exp $
  *
  */
 
@@ -2052,7 +2052,9 @@ void GameScript::SetTokenGlobal(Scriptable *Sender, Action *parameters)
 	strncpy(varname,parameters->string1Parameter,32);
 	varname[32]=0;
 	printf("SetTokenGlobal: %d -> %s\n",value, varname);
-	core->GetTokenDictionary()->SetAt(varname, value);
+	char tmpstr[10];
+	sprintf(tmpstr,"%d",value);
+	core->GetTokenDictionary()->SetAt(varname, tmpstr);
 }
 
 void GameScript::PlayDead(Scriptable *Sender, Action *parameters)
