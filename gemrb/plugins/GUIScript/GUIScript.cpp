@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.251 2004/11/30 23:30:05 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.252 2004/12/05 09:48:52 avenger_teambg Exp $
  *
  */
 
@@ -3741,9 +3741,14 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	}
 
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_SPL_CLASS_ID );
+	if(!str) { //the file doesn't exist, in this case we let the script decide
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
 	SpellMgr* sm = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
 	if (sm == NULL) {
-		delete ( str );
+		delete str;
+		printf("[GUIScript] Can't get spell manager!\n");
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
@@ -3763,7 +3768,8 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "SpellName", PyInt_FromLong (spell->SpellName));
 	PyDict_SetItemString(dict, "SpellDesc", PyInt_FromLong (spell->SpellDesc));
 	PyDict_SetItemString(dict, "SpellbookIcon", PyString_FromResRef (spell->SpellbookIcon));
-
+	PyDict_SetItemString(dict, "SpellSchool", PyInt_FromLong (spell->ExclusionSchool)); //this will list school exclusions and alignment
+	PyDict_SetItemString(dict, "SpellDivine", PyInt_FromLong (spell->PriestType)); //this will tell apart a priest spell from a druid spell
 	delete spell;
 	return dict;
 }
@@ -3866,6 +3872,10 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_ITM_CLASS_ID );
+	if(!str) { //the file doesn't exist, in this case we let the script decide
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
 	ItemMgr* im = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
 	if (im == NULL) {
 		delete ( str );
