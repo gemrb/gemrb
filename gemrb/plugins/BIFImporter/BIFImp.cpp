@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.6 2003/11/29 10:34:16 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.7 2003/12/15 09:37:57 balrog994 Exp $
  *
  */
 
@@ -67,6 +67,7 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 	fclose(t);
 	//printf("[OK]\n");
 	if(cacheCheck) {
+		printf("Checking Cache\n");
 		stream = new CachedFileStream(filename);
 		stream->Read(Signature, 8);
 	}
@@ -77,10 +78,12 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 		stmp->Read(Signature, 8);
 	}
 	if(strncmp(Signature, "BIFFV1  ", 8) == 0) {
+		printf("Uncompressed File Found\n");
 		strcpy(path, filename);
 		ReadBIF();
 	}
 	else if(strncmp(Signature, "BIF V1.0", 8) == 0) {
+		printf("'BIF V1.0' File Found\n");
 		unsigned long fnlen, complen, declen;
 		stmp->Read(&fnlen, 4);
 		char * fname = (char*)malloc(fnlen);
@@ -93,6 +96,7 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 		//printf("[BifImporter]: Opening %s...", path);
 		FILE * tmp = fopen(path, "rb");
 		if(tmp) {
+			printf("Found in Cache\n");
 			//printf("[OK] -> File Exists\n[BifImporter]: Closing %s...", path);
 			fclose(tmp);
 			//printf("[OK]\n");
@@ -105,6 +109,7 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 				return GEM_ERROR;
 		}
 		else {
+			printf("Decompressing\n");
 			if(!core->IsAvailable(IE_COMPRESSION_CLASS_ID))
 				return GEM_ERROR;
 			Compressor * comp = (Compressor*)core->GetInterface(IE_COMPRESSION_CLASS_ID);
@@ -134,11 +139,13 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 		}
 	}
 	else if(strncmp(Signature, "BIFCV1.0", 8) == 0) {
+		printf("'BIFCV1.0' Compressed File Found\n");
 		char cpath[_MAX_PATH];
 		strcpy(cpath, core->CachePath);
 		strcat(cpath, stmp->filename);
 		FILE * exist_in_cache = fopen(cpath, "rb");
 		if(exist_in_cache) {
+			printf("Found in Cache\n");
 			//printf("[OK] -> File Exists\n[BifImporter]: Closing %s...", path);
 			fclose(exist_in_cache);
 			//printf("[OK]\n");
@@ -154,6 +161,7 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 			else
 				return GEM_ERROR;
 		}
+		printf("Decompressing\n");
 		if(!core->IsAvailable(IE_COMPRESSION_CLASS_ID))
 			return GEM_ERROR;
 		Compressor * comp = (Compressor*)core->GetInterface(IE_COMPRESSION_CLASS_ID);
