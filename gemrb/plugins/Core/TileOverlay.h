@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.h,v 1.4 2003/11/26 13:55:45 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.h,v 1.5 2003/11/27 22:04:40 balrog994 Exp $
  *
  */
 
@@ -41,8 +41,9 @@ class GEM_EXPORT TileOverlay
 {
 public:
 	int w,h;
-private:
-	std::vector<Tile*> tiles;
+	//std::vector<Tile*> tiles;
+	Tile ** tiles;
+	int count;
 public:
 	TileOverlay(int Width, int Height);
 	~TileOverlay(void);

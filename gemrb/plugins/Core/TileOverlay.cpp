@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.4 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.5 2003/11/27 22:04:40 balrog994 Exp $
  *
  */
 
@@ -31,18 +31,22 @@ TileOverlay::TileOverlay(int Width, int Height)
 {
 	w = Width;
 	h = Height;
+	count = 0;
+	tiles = (Tile**)malloc(w*h*sizeof(Tile*));
 }
 
 TileOverlay::~TileOverlay(void)
 {
-	for(unsigned int i = 0; i < tiles.size(); i++) {
+	for(unsigned int i = 0; i < count; i++) {
 		delete(tiles[i]);
 	}
+	free(tiles);
 }
 
 void TileOverlay::AddTile(Tile * tile)
 {
-	tiles.push_back(tile);
+	tiles[count++] = tile;
+	//tiles.push_back(tile);
 }
 
 void TileOverlay::Draw(Region viewport)
@@ -66,7 +70,9 @@ void TileOverlay::Draw(Region viewport)
 	int dy = (int)ceil((vp.y+vp.h) / 64.0);
 	for(int y = sy; y < dy; y++) {
 		for(int x = sx; x < dx; x++) {
-			vid->BlitSprite(tiles[(y*w)+x]->anim->NextFrame(),viewport.x+(x*64) ,viewport.y+(y*64));
+			Tile * tile = tiles[(y*w)+x];
+			if(tile->anim[tile->tileIndex])
+				vid->BlitSprite(tile->anim[tile->tileIndex]->NextFrame(),viewport.x+(x*64) ,viewport.y+(y*64));
 		}
 	}
 }
