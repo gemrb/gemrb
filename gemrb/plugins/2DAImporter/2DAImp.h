@@ -4,9 +4,7 @@
 #include "../Core/TableMgr.h"
 #include "../../includes/globals.h"
 
-typedef struct RowEntry {
-	std::vector<char *> entries;
-} RowEntry;
+typedef std::vector<char *> RowEntry;
 
 class p2DAImp : public TableMgr
 {
@@ -15,8 +13,8 @@ private:
 	bool autoFree;
 	std::vector<RowEntry> rows;
 public:
-	2DAImp(void);
-	~2DAImp(void);
+	p2DAImp(void);
+	~p2DAImp(void);
 	bool Open(DataStream * stream, bool autoFree = false);
 	inline int GetRowCount() { return rows.size(); }
 	inline int GetColumnCount()
