@@ -2,12 +2,15 @@ import GemRB
 
 MovieWindow = 0
 TextAreaControl = 0
+MoviesTable = 0
 
 def OnLoad():
-	global MovieWindow, TextAreaControl
+	global MovieWindow, TextAreaControl, MoviesTable
 #for testing purposes
-	GemRB.SetVar("BG2INTRO",1)
-	GemRB.SetVar("BG4LOGO",1)
+	GemRB.SetVar("BISLOGO",1)
+	GemRB.SetVar("ENDCRDIT",1)
+	GemRB.SetVar("INTRO15F",1)
+	GemRB.SetVar("WOTC",1)
 
 	GemRB.LoadWindowPack("GUIMOVIE")
 	MovieWindow = GemRB.LoadWindow(0)
@@ -15,15 +18,13 @@ def OnLoad():
 	PlayButton = GemRB.GetControl(MovieWindow, 2)
 	CreditsButton = GemRB.GetControl(MovieWindow, 3)
 	DoneButton = GemRB.GetControl(MovieWindow, 4)
-#GemRB.SetupListBoxFrom2DA(MovieWindow,TextAreaControl, "MOVIDESC")
-	#GemRB.SetText(MovieWindow, TextAreaControl,"")
 	MoviesTable = GemRB.LoadTable("MOVIDESC")
 	for i in range(0, GemRB.GetTableRowCount(MoviesTable) ):
 		t = GemRB.GetTableRowName(MoviesTable, i)
-#see if the movie is allowed to be in the list
 		if GemRB.GetVar(t)==1:
 			s = GemRB.GetTableValue(MoviesTable, i, 0)
 			GemRB.TextAreaAppend(MovieWindow, TextAreaControl, s,-1)
+	GemRB.SetVarAssoc(MovieWindow, TextAreaControl, "MovieIndex",0)
 	GemRB.SetText(MovieWindow, PlayButton, 17318)
 	GemRB.SetText(MovieWindow, CreditsButton, 15591)
 	GemRB.SetText(MovieWindow, DoneButton, 11973)
@@ -34,6 +35,10 @@ def OnLoad():
 	return
 	
 def PlayPress():
+	print "MovieIndex", GemRB.GetVar("MovieIndex")
+	s = GemRB.GetTableRowName(MoviesTable, GemRB.GetVar("MovieIndex"))
+	print "Play Movie: ",s
+	GemRB.PlayMovie(s)
 	return
 
 def CreditsPress():
