@@ -1,0 +1,24 @@
+Changes to the original engines.
+Generally the changes were designed to be compatible with the original game files. No additional fields added (so far), only previously unused parts are used.
+
+1. Items entries:
+Item entries in stores, containers, creatures will have additional flags. These flags will extend the usage of HasItem, DestroyItem, TakeItem scripting functions. The first three flags should be familiar.
+
+IE_ITEM_IDENTIFIED = 1
+IE_ITEM_UNSTEALABLE = 2
+IE_ITEM_STOLEN = 4
+//these are GemRB extensions
+IE_ITEM_DESTRUCTIBLE = 0x20
+IE_ITEM_EQUIPPED = 0x40
+IE_ITEM_STACKED = 0x80
+
+This will make possible scripts like these:
+HasAnyItem(STOLEN)
+TakeAllStolenItem()
+DropAllEquippedItem()
+HasItem("SWORD",EQUIPPED|IDENTIFIED)
+
+2. Journal entries:
+Journal entries will have an additional Group ID. This group ID will make it possible to remove a group of journal entries along with adding a new one of the same group using solely the dialog structure. This eliminates the problem of residue entries. Also, you don't have to remember the journal entry strref, just assign a unique group (quest ID).
+The quest ID byte will be stored on offset 0x0002 in the transition table entry.
+The former flags field (it was a dword) will be a word. Its highest bit will be the group flag. Unless this flag is set, the behaviour will be the same as before. If you set this flag, then all journal entries set with the same id will be removed before adding the new one. The scripting actions will also accept an additional quest ID parameter.
