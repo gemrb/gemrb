@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.5 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.6 2003/11/29 10:34:16 balrog994 Exp $
  *
  */
 
@@ -81,12 +81,12 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 		ReadBIF();
 	}
 	else if(strncmp(Signature, "BIF V1.0", 8) == 0) {
-		unsigned long fnlen, unclen, declen;
+		unsigned long fnlen, complen, declen;
 		stmp->Read(&fnlen, 4);
 		char * fname = (char*)malloc(fnlen);
 		stmp->Read(fname, fnlen);
-		stmp->Read(&unclen, 4);
 		stmp->Read(&declen, 4);
+		stmp->Read(&complen, 4);
 		strcpy(path, core->CachePath);
 		strcat(path, fname);
 		free(fname);
@@ -108,10 +108,10 @@ int BIFImp::OpenArchive(char* filename, bool cacheCheck)
 			if(!core->IsAvailable(IE_COMPRESSION_CLASS_ID))
 				return GEM_ERROR;
 			Compressor * comp = (Compressor*)core->GetInterface(IE_COMPRESSION_CLASS_ID);
-			void * inb = malloc(unclen);
-			stmp->Read(inb, unclen);
+			void * inb = malloc(complen);
+			stmp->Read(inb, complen);
 			void * outb = malloc(declen);
-			comp->Decompress(outb, &declen, inb, unclen);
+			comp->Decompress(outb, &declen, inb, complen);
 			free(inb);
 			core->FreeInterface(comp);
 			//printf("[BifImporter]: Opening %s...", path);
