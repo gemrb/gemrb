@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.10 2003/11/30 17:08:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.11 2003/12/15 09:15:53 balrog994 Exp $
  *
  */
 
@@ -89,9 +89,9 @@ int Console::SetText(const char * string, int pos)
 void Console::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
 	if(Key >= 0x20) {
-		int len = strlen((char*)Buffer);
+		size_t len = strlen((char*)Buffer);
 		if(len+1 < max) {
-			for(int i = len; i > CurPos; i--) {
+			for(size_t i = len; i > CurPos; i--) {
 				Buffer[i] = Buffer[i-1];
 			}
 			Buffer[CurPos++] = Key;
@@ -102,14 +102,14 @@ void Console::OnKeyPress(unsigned char Key, unsigned short Mod)
 /** Special Key Press */
 void Console::OnSpecialKeyPress(unsigned char Key)
 {
-	int len;
+	size_t len;
 
 	switch(Key)
 	{
 	case GEM_BACKSP:
 		if(CurPos != 0) {
-			int len = strlen((char*)Buffer);
-			for(int i = CurPos; i < len; i++) {
+			size_t len = strlen((char*)Buffer);
+			for(size_t i = CurPos; i < len; i++) {
 				Buffer[i-1] = Buffer[i];
 			}
 			Buffer[len-1] = 0;
@@ -129,7 +129,7 @@ void Console::OnSpecialKeyPress(unsigned char Key)
 	case GEM_DELETE:
 		len = strlen((char*)Buffer);
 		if(CurPos < len) {
-			for(int i = CurPos; i < len; i++) {
+			for(size_t i = CurPos; i < len; i++) {
 				Buffer[i] = Buffer[i+1];
 			}
 		}
