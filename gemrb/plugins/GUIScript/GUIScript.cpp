@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.278 2005/03/05 01:07:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.279 2005/03/05 10:50:59 guidoj Exp $
  *
  */
 
@@ -71,7 +71,7 @@ inline PyObject* PyString_FromResRef(char* ResRef)
 {
 	unsigned int i;
 
-	for (i=0;i<sizeof(ieResRef);i++) {
+	for (i = 0; i < sizeof(ieResRef); i++) {
 		if (ResRef[i]==0) break;
 	}
 	return PyString_FromStringAndSize( ResRef, i );
@@ -608,7 +608,7 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 		if (!PyObject_TypeCheck( ti, &PyInt_Type )) {
 			return AttributeError( GemRB_GetTableValue__doc );
 		}
-		int TableIndex = PyInt_AsLong( ti );
+		long TableIndex = PyInt_AsLong( ti );
 		if (( !PyObject_TypeCheck( row, &PyInt_Type ) ) &&
 			( !PyObject_TypeCheck( row, &PyString_Type ) )) {
 			return AttributeError( GemRB_GetTableValue__doc );
@@ -640,8 +640,8 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 			char* cols = PyString_AsString( col );
 			ret = tm->QueryField( rows, cols );
 		} else {
-			int rowi = PyInt_AsLong( row );
-			int coli = PyInt_AsLong( col );
+			long rowi = PyInt_AsLong( row );
+			long coli = PyInt_AsLong( col );
 			ret = tm->QueryField( rowi, coli );
 		}
 		if (ret == NULL)
@@ -803,7 +803,7 @@ static PyObject* GemRB_GetSymbolValue(PyObject * /*self*/, PyObject* args)
 		if (!PyObject_TypeCheck( si, &PyInt_Type )) {
 			return AttributeError( GemRB_GetSymbolValue__doc );
 		}
-		int SymbolIndex = PyInt_AsLong( si );
+		long SymbolIndex = PyInt_AsLong( si );
 		if (PyObject_TypeCheck( sym, &PyString_Type )) {
 			char* syms = PyString_AsString( sym );
 			SymbolMgr* sm = core->GetSymbol( SymbolIndex );
@@ -813,7 +813,7 @@ static PyObject* GemRB_GetSymbolValue(PyObject * /*self*/, PyObject* args)
 			return Py_BuildValue( "l", val );
 		}
 		if (PyObject_TypeCheck( sym, &PyInt_Type )) {
-			int symi = PyInt_AsLong( sym );
+			long symi = PyInt_AsLong( sym );
 			SymbolMgr* sm = core->GetSymbol( SymbolIndex );
 			if (!sm)
 				return NULL;
@@ -901,8 +901,7 @@ PyDoc_STRVAR( GemRB_SetText__doc,
 static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* wi, * ci, * str;
-	int WindowIndex, ControlIndex;
-	long StrRef;
+	long WindowIndex, ControlIndex, StrRef;
 	char* string;
 	int ret;
 
@@ -953,7 +952,7 @@ PyDoc_STRVAR( GemRB_TextAreaAppend__doc,
 static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* wi, * ci, * str, * row = NULL;
-	int WindowIndex, ControlIndex, StrRef, Row;
+	long WindowIndex, ControlIndex, StrRef, Row;
 	char* string;
 	int ret;
 
@@ -1007,7 +1006,7 @@ PyDoc_STRVAR( GemRB_TextAreaClear__doc,
 static PyObject* GemRB_TextAreaClear(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* wi, * ci;
-	int WindowIndex, ControlIndex;
+	long WindowIndex, ControlIndex;
 
 	if (PyArg_UnpackTuple( args, "ref", 2, 2, &wi, &ci )) {
 		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
@@ -1036,8 +1035,7 @@ PyDoc_STRVAR( GemRB_SetTooltip__doc,
 static PyObject* GemRB_SetTooltip(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* wi, * ci, * str;
-	int WindowIndex, ControlIndex;
-	long StrRef;
+	long WindowIndex, ControlIndex, StrRef;
 	char* string;
 	int ret;
 
@@ -2209,7 +2207,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
 	char* ResRef;
 	int XPos, YPos;
-	unsigned long int flags;
+	unsigned int flags;
 
 	if (!PyArg_ParseTuple( args, "s", &ResRef )) {
 		return AttributeError( GemRB_PlaySound__doc );
