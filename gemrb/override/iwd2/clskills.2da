@@ -1,14 +1,14 @@
 2DA V1.0
 *
-                    HATERACE   CLERICSPELL MAGESPELL  
-BARBARIAN           *          *           *          
-BARD                *          *           MXSPLBRD   
-CLERIC              *          MXSPLPRS    *          
-DRUID               *          MXSPLDRU    *          
-FIGHTER             *          *           *          
-MONK                *          *           *          
-PALADIN             *          MXSPLPAL    *          
-RANGER              HATERACE   MXSPLRAN    *          
-ROGUE               *          *           *          
-SORCERER            *          *           MXSPLSRC   
-WIZARD              *          *           MXSPLWIZ   
+                    HATERACE   CLERICSPELL MAGESPELL STARTXP
+BARBARIAN           *          *           *         2000
+BARD                *          *           MXSPLBRD  2000 
+CLERIC              *          MXSPLPRS    *         2000 
+DRUID               *          MXSPLDRU    *         2000 
+FIGHTER             *          *           *         2000 
+MONK                *          *           *         2000 
+PALADIN             *          MXSPLPAL    *         2000 
+RANGER              HATERACE   MXSPLRAN    *         2000 
+ROGUE               *          *           *         2000 
+SORCERER            *          *           MXSPLSRC  2000 
+WIZARD              *          *           MXSPLWIZ  2000 

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.6 2004/12/06 22:07:13 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.7 2004/12/07 19:07:56 avenger_teambg Exp $
 # character generation, mage spells (GUICG7)
 
 import GemRB
@@ -42,7 +42,7 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG")
 	MageSpellsWindow = GemRB.LoadWindow(7)
-	Learnable = GetLearnableMageSpells( GemRB.GetVar("Kit"), GemRB.GetVar("Alignment"), 1)
+	Learnable = GetLearnableMageSpells( GemRB.GetVar("Class Kit"), GemRB.GetVar("Alignment"), 1)
 	GemRB.SetVar("MageSpellBook", 0)
 	GemRB.SetVar("SpellMask", 0)
 

@@ -91,13 +91,15 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1048,-1) # new line
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,GemRB.GetVar("Race")-1,2))
+	print "Race: ",  GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race")-1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,12136, -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	KitIndex = GemRB.GetVar("Class Kit")
 	if KitIndex == 0:
-		ClassTitle=GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,2)
+		Class = GemRB.GetVar("Class")-1
+		ClassTitle=GemRB.GetTableValue(ClassTable, Class, 2)
 	else:
-		ClassTitle=GemRB.GetTableValue(KitTable, KitIndex,2)
+		ClassTitle=GemRB.GetTableValue(KitTable, KitIndex, 2)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, ClassTitle)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1049, -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
@@ -120,8 +122,12 @@ def NextPress():
 	MyChar = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer("charbase", MyChar ) 
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
-	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
-	Class=GemRB.GetVar("Class")
+	RaceTable = GemRB.LoadTable("races")
+	Race = GemRB.GetVar("Race")-1
+	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetTableValue(RaceTable, Race, 3) )
+	ClassTable = GemRB.LoadTable("classes")
+	ClassIndex = GemRB.GetVar("Class")-1
+	Class = GemRB.GetTableValue(ClassTable, ClassIndex, 5)
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar("Class Kit")
 	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
@@ -132,8 +138,14 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
 	GemRB.UnloadTable(TmpTable)
 	TmpTable=GemRB.LoadTable("strtgold")
+	print "count ",GemRB.GetTableValue(TmpTable,Class,1)
+	print "size ",GemRB.GetTableValue(TmpTable,Class,0)
+	print "add ",GemRB.GetTableValue(TmpTable,Class,2)
+	print "mult ",GemRB.GetTableValue(TmpTable,Class,3)
 	t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,1),GemRB.GetTableValue(TmpTable,Class,0), GemRB.GetTableValue(TmpTable,Class,2) )
 	GemRB.SetPlayerStat(MyChar, IE_GOLD, t*GemRB.GetTableValue(TmpTable,Class,3) )
+	GemRB.UnloadTable(ClassTable)
+	GemRB.UnloadTable(RaceTable)
 	GemRB.UnloadTable(TmpTable)
 
 	GemRB.SetPlayerStat(MyChar, IE_HATEDRACE, GemRB.GetVar("HatedRace") )
@@ -173,6 +185,10 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability 6"))
 
 	GemRB.SetPlayerName(MyChar, GemRB.GetToken("CHARNAME"), 0)
+	TmpTable = GemRB.LoadTable ("clskills")
+	GemRB.SetPlayerStat(MyChar, IE_XP, GemRB.GetTableValue (TmpTable, Class, 3) )  #this will also set the level (automatically)
+	GemRB.UnloadTable(TmpTable)
+
 	#does all the rest
 	GemRB.FillPlayerInfo(MyChar,PortraitName+"M", PortraitName+"S") 
 	#LETS PLAY!!

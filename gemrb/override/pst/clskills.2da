@@ -1,13 +1,13 @@
 2DA V1.0
 *
-                    HATERACE   CLERICSPELL MAGESPELL  
-UNUSED              *          *           *
-MAGE                *          *           MXSPLWIZ   
-FIGHTER             *          *           *          
-CLERIC              *          MXSPLPRS    *          
-THIEF               *          *           *          
-BARD                *          *           MXSPLBRD   
-PALADIN             *          MXSPLPAL    *          
-FIGHTER_MAGE        *          *           MXSPLWIZ   
-FIGHTER_CLERIC      *          MXSPLPRS    *          
-FIGHTER_THIEF       *          *           *          
+                    HATERACE   CLERICSPELL MAGESPELL  STARTXP
+UNUSED              *          *           *          *
+MAGE                *          *           MXSPLWIZ   0
+FIGHTER             *          *           *          0
+CLERIC              *          MXSPLPRS    *          0
+THIEF               *          *           *          0
+BARD                *          *           MXSPLBRD   0
+PALADIN             *          MXSPLPAL    *          0
+FIGHTER_MAGE        *          *           MXSPLWIZ   0
+FIGHTER_CLERIC      *          MXSPLPRS    *          0
+FIGHTER_THIEF       *          *           *          0
