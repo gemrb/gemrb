@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# Gentoo and Mandrake specific flags
+export WANT_AUTOMAKE="1.7"
+export WANT_AUTOCONF="2.5"
+
+# FreeBSD favourite paths
 #export CXXFLAGS="-ggdb -I/usr/local/include"
 #export LDFLAGS="-ggdb -L/usr/local/lib"
 
@@ -116,7 +121,7 @@ fi
 
 if [[ -n $AUTOCONF ]];
 then
-  my_autoheader=$AUTOCONF
+  my_autoconf=$AUTOCONF
 else
   for file in autoconf autoconf-2.57 autoconf-2.58 autoconf-2.59; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
