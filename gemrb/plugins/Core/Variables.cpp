@@ -29,7 +29,7 @@ inline bool Variables::IsEmpty() const
 	{ return m_nCount == 0; }
 /////////////////////////////////////////////////////////////////////////////
 // out of lines
-Variables::Dictionary(int nBlockSize, int nHashTableSize)
+Variables::Variables(int nBlockSize, int nHashTableSize)
 {
 	MYASSERT(nBlockSize > 0);
 	MYASSERT(nHashTableSize > 16);
@@ -91,7 +91,7 @@ void Variables::RemoveAll()
 	m_pBlocks = NULL;
 }
 
-Variables::~Dictionary()
+Variables::~Variables()
 {
 	RemoveAll();
 	MYASSERT(m_nCount == 0);
@@ -105,7 +105,7 @@ Variables::NewAssoc()
 		// add another block
 		Plex* newBlock = Plex::Create(m_pBlocks, m_nBlockSize, sizeof(Variables::MyAssoc));
 		// chain them into free list
-		Variables::MyAssoc* pAssoc = (Dictionary::MyAssoc*) newBlock->data();
+		Variables::MyAssoc* pAssoc = (Variables::MyAssoc*) newBlock->data();
 		// free in reverse order to make it easier to debug
 		pAssoc += m_nBlockSize - 1;
 		for (int i = m_nBlockSize-1; i >= 0; i--, pAssoc--)
@@ -119,12 +119,13 @@ Variables::NewAssoc()
 	Variables::MyAssoc* pAssoc = m_pFreeList;
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
-	MYASSERT(m_nCount > 0);  // make sure we don't overflow
-  pAssoc->key=NULL;
+	MYASSERT(m_nCount > 0);    // make sure we don't overflow
+	pAssoc->key=NULL;
+	pAssoc->value=0xcccccccc;  //invalid value
 	return pAssoc;
 }
 
-void Variables::FreeAssoc(Dictionary::MyAssoc* pAssoc)
+void Variables::FreeAssoc(Variables::MyAssoc* pAssoc)
 {
 	delete[] pAssoc->key;
 	pAssoc->pNext = m_pFreeList;

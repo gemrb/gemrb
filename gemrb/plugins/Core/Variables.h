@@ -28,6 +28,8 @@
 
 #define THIS_FILE "variables.h"
 
+#define MAX_VARIABLE_LENGTH  32
+
 #define MYASSERT(f) \
   if(!(f))  \
   {  \
@@ -73,7 +75,7 @@ protected:
 	struct MyAssoc
 	{
 		MyAssoc* pNext;
-		char key[32];
+		const char *key;
 		unsigned long value;
 	};
 public:
@@ -104,8 +106,8 @@ protected:
 
 	MyAssoc* NewAssoc();
 	void FreeAssoc(MyAssoc*);
-	MyAssoc* GetAssocAt(const char *, unsigned int, unsigned int&) const;
-        unsigned int MyHashKey(const char *, unsigned int) const;
+	MyAssoc* GetAssocAt(const char *, unsigned int&) const;
+        unsigned int MyHashKey(const char *) const;
 
 public:
 	~Variables();
