@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.88 2005/02/11 21:44:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.89 2005/02/19 17:34:02 avenger_teambg Exp $
  *
  */
 
@@ -341,7 +341,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	}
 	printf( "Loading explored bitmap\n" );
 	str->Seek( ExploredBitmapOffset, GEM_STREAM_START );
-	map->ExploredBitmap = new ieByte[ExploredBitmapSize];
+	map->ExploredBitmap = (ieByte *) malloc(ExploredBitmapSize);
 	str->Read( map->ExploredBitmap, ExploredBitmapSize );
 
 	printf( "Loading containers\n" );
@@ -549,15 +549,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadResRef( Scripts[6] );
 			str->Seek( 120, GEM_CURRENT_POS );
 			if (CreOffset != 0) {
-				/*
-				char cpath[_MAX_PATH];
-				strcpy( cpath, core->GamePath );
-				strcat( cpath, str->filename );
-				_FILE* str = _fopen( cpath, "rb" );
-				FileStream* fs = new FileStream();
-				fs->Open( str, CreOffset, CreSize, false );
-				*/
-				CachedFileStream *fs = new CachedFileStream( (CachedFileStream *) str, CreOffset, CreSize, false);
+				CachedFileStream *fs = new CachedFileStream( (CachedFileStream *) str, CreOffset, CreSize, true);
 				crefile = (DataStream *) fs;
 			} else {
 				crefile = core->GetResourceMgr()->GetResource( CreResRef, IE_CRE_CLASS_ID );
@@ -585,16 +577,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	
 			ab->SetOrientation( Orientation&(MAX_ORIENT-1) );
 			ab->TalkCount = TalkCount;
-			//hack to not load global actors to area
-			//most likely this is unneeded now as we
-			//load saved game areas
-			//if(!game->FindPC(ab->scriptName) && !game->FindNPC(ab->scriptName) ) {
-				map->AddActor( ab );
-/*
-			} else {
-				delete ab;
-			}
-*/
+			map->AddActor( ab );
 		}
 		core->FreeInterface( actmgr );
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.131 2005/02/12 22:58:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.132 2005/02/19 17:34:01 avenger_teambg Exp $
  *
  */
 
@@ -196,7 +196,8 @@ Map::~Map(void)
 	}
 
 	if (ExploredBitmap) {
-		delete ExploredBitmap;
+		//malloc-d in AREImp
+		free(ExploredBitmap);
 	}
 }
 
