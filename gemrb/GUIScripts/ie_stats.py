@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.2 2004/04/10 21:10:35 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.3 2004/05/08 19:50:20 avenger_teambg Exp $
 
 # ie_stats.py - definitions of creature stats codes
 
@@ -43,6 +43,9 @@ ENEMY         = 255
 
 # state bits (IE_STATE)
 STATE_DEAD    = 2048
+
+MC_FALLEN_PALADIN = 0x200
+MC_FALLEN_RANGER = 0x400
 
 # stats
 IE_HITPOINTS 			= 0
