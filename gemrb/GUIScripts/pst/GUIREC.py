@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.17 2004/08/28 15:00:39 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.18 2004/08/29 21:28:02 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -640,11 +640,27 @@ def OpenInformationWindow ():
 	Label = GemRB.GetControl (Window, 0x10000001)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc))
 
+
+	# class
+	ClassTable = GemRB.LoadTable ("CLASS")
+	text = GemRB.GetTableValue (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
+	GemRB.UnloadTable (ClassTable)
+
+	Label = GemRB.GetControl (Window, 0x1000000A)
+	GemRB.SetText (Window, Label, text)
+
+
+
 	Label = GemRB.GetControl (Window, 0x10000002)
 	GemRB.SetText (Window, Label, GemRB.GetString (stat['BestKilledName']) + '  (%d XP)' %stat['BestKilledXP'])
 
+	days = int (stat['JoinDate'] / 21600)
+	hours = int ((stat['JoinDate'] % 21600) / 900)
+	GemRB.SetToken ('GAMEDAYS', str (days))
+	GemRB.SetToken ('HOUR', str (hours))
+	
 	Label = GemRB.GetControl (Window, 0x10000003)
-	GemRB.SetText (Window, Label, str (stat['JoinDate']))
+	GemRB.SetText (Window, Label, 41277)
 
 	Label = GemRB.GetControl (Window, 0x10000004)
 	GemRB.SetText (Window, Label, stat['FavouriteSpell'])
