@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.16 2003/12/09 19:02:42 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.17 2003/12/15 09:19:11 balrog994 Exp $
  *
  */
 
@@ -29,41 +29,36 @@ extern Interface * core;
 extern HANDLE hConsole;
 #endif
 
-Actor::Actor()
+static Color green			= {0x00, 0xff, 0x00, 0xff};
+static Color red			= {0xff, 0x00, 0x00, 0xff};
+static Color yellow			= {0xff, 0xff, 0x00, 0xff};
+static Color cyan			= {0x00, 0xff, 0xff, 0xff};
+static Color green_dark		= {0x00, 0x80, 0x00, 0xff};
+static Color red_dark		= {0x80, 0x00, 0x00, 0xff};
+static Color yellow_dark	= {0x80, 0x80, 0x00, 0xff};
+static Color cyan_dark		= {0x00, 0x80, 0x80, 0xff};
+static Color magenta		= {0xff, 0x00, 0xff, 0xff};
+
+Actor::Actor() : Moveble(ST_ACTOR)
 {
 	int i;
 
+	//memset(BaseStats, 0, MAX_STATS*sizeof(*BaseStats));
+	//memset(Modified, 0, MAX_STATS*sizeof(*Modified));
 	for(i = 0; i < MAX_STATS; i++) {
 		BaseStats[i] = 0;
 		Modified[i] = 0;
 	}
-	for(i = 0; i < MAX_SCRIPTS; i++) {
-		Scripts[i][0]=0;
-	}
 	Dialog[0] = 0;
-	ScriptName[0] = 0;
 	SmallPortrait[0] = 0;
 	LargePortrait[0] = 0;
 
 	anims = NULL;
 
-	/*char tmp[7];
-	sprintf(tmp, "0x%04X", AnimationID);
-	int AvatarTable = core->LoadTable("avatars");
-	TableMgr * at = core->GetTable(AvatarTable);
-	int RowIndex = at->GetRowIndex(tmp);
-	if(RowIndex < 0) {
-		printMessage("Actor", "Avatar Animation not supported!\n", YELLOW);
-		anims = NULL;
-	}
-	else {
-		char * BaseResRef = at->QueryField(RowIndex, 0);
-		char * Mirror = at->QueryField(RowIndex, 1);
-		char * Orient = at->QueryField(RowIndex, 2);
-		anims = new CharAnimations(BaseResRef, atoi(Orient), atoi(Mirror));
-	}*/
 	LongName = NULL;
 	ShortName = NULL;
+
+	DeleteMe = false;
 }
 
 Actor::~Actor(void)
@@ -174,11 +169,7 @@ void Actor::SetAnimationID(unsigned short AnimID)
 		free(ArmorPal);
 		free(HairPal);
 	}
-
-	/*FILE * ftmp = fopen("tmp.tmp", "wb");
-	fwrite(Pal, 256, 4, ftmp);
-	fclose(ftmp);*/
-	
+	SetCircleSize();
 	anims->SetNewPalette(Pal);
 }
 
@@ -190,63 +181,114 @@ CharAnimations *Actor::GetAnims()
 /** Returns a Stat value (Base Value + Mod) */
 long Actor::GetStat(unsigned int StatIndex)
 {
-        if(StatIndex >= MAX_STATS)
-                return 0xdadadada;
-        return Modified[StatIndex];
+    if(StatIndex >= MAX_STATS)
+            return 0xdadadada;
+    return Modified[StatIndex];
 }
+
+void Actor::SetCircleSize()
+{
+	Color *color;
+	if(Modified[IE_UNSELECTABLE]) {
+		color=&magenta;
+	}
+	if(BaseStats[IE_MORALEBREAK]>=Modified[IE_MORALEBREAK]) {
+		color=&yellow;
+	} else {			
+		switch(BaseStats[IE_EA])
+			{
+			case EVILCUTOFF:
+			case GOODCUTOFF:
+			break;
+
+			case PC:
+			case FAMILIAR:
+			case ALLY:
+			case CONTROLLED:
+			case CHARMED:
+			case EVILBUTGREEN:
+				color=&green;
+			break;
+
+			case ENEMY:
+			case GOODBUTRED:
+				color=&red;
+			break;
+			default:
+				color=&cyan;
+			break;
+			}
+	}
+	SetCircle(anims->CircleSize, *color);
+}
+
 bool  Actor::SetStat(unsigned int StatIndex, long Value)
 {
-        if(StatIndex >= MAX_STATS)
-                return false;
-        Modified[StatIndex] = Value;
-        return true;
+    if(StatIndex >= MAX_STATS)
+            return false;
+    Modified[StatIndex] = Value;
+	switch(StatIndex) {
+		case IE_EA:
+		case IE_UNSELECTABLE:
+		case IE_MORALEBREAK:
+			SetCircleSize();
+		break;
+	}
+    return true;
 }
 long Actor::GetMod(unsigned int StatIndex)
 {
-        if(StatIndex >= MAX_STATS)
-                return 0xdadadada;
-        return Modified[StatIndex]-BaseStats[StatIndex];
+    if(StatIndex >= MAX_STATS)
+            return 0xdadadada;
+    return Modified[StatIndex]-BaseStats[StatIndex];
 }
 /** Returns a Stat Base Value */
 long Actor::GetBase(unsigned int StatIndex)
 {
-        if(StatIndex >= MAX_STATS)
-                return 0xffff;
-        return BaseStats[StatIndex];
+    if(StatIndex >= MAX_STATS)
+            return 0xffff;
+    return BaseStats[StatIndex];
 }
 
 /** Sets a Stat Base Value */
 bool  Actor::SetBase(unsigned int StatIndex, long Value)
 {
-        if(StatIndex >= MAX_STATS)
-                return false;
-        BaseStats[StatIndex] = Value;
-        return true;
+    if(StatIndex >= MAX_STATS)
+            return false;
+    BaseStats[StatIndex] = Value;
+	switch(StatIndex) {
+		case IE_EA:
+		case IE_UNSELECTABLE:
+		case IE_MORALEBREAK:
+			SetCircleSize();
+		break;
+	}
+    return true;
 }
 /** call this after load, before applying effects */
 void Actor::Init()
 {
-        memcpy(Modified,BaseStats,sizeof(Modified) );
+    memcpy(Modified, BaseStats, MAX_STATS*sizeof(*Modified) );
 }
 /** implements a generic opcode function, modify modifier
     returns the change
 */
 int Actor::NewStat(unsigned int StatIndex, long ModifierValue, long ModifierType)
 {
-        int oldmod=Modified[StatIndex];
+    int oldmod=Modified[StatIndex];
 
-        switch(ModifierType)
-        {
-        case 0:  //flat point modifier
-                Modified[StatIndex]+=ModifierValue;
-                break;
-        case 1:  //straight stat change
-                Modified[StatIndex]=ModifierValue;
-                break;
-        case 2:  //percentile
-                Modified[StatIndex]=Modified[StatIndex]*100/ModifierValue;
-                break;
-        }
-        return Modified[StatIndex]-oldmod;
+    switch(ModifierType)
+    {
+    case 0:  //flat point modifier
+            Modified[StatIndex]+=ModifierValue;
+            break;
+    case 1:  //straight stat change
+            Modified[StatIndex]=ModifierValue;
+            break;
+    case 2:  //percentile
+            Modified[StatIndex]=Modified[StatIndex]*100/ModifierValue;
+            break;
+    }
+    return Modified[StatIndex]-oldmod;
 }
 

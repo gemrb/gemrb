@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.10 2003/11/25 20:55:27 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.11 2003/12/15 09:19:11 balrog994 Exp $
  *
  */
 
@@ -40,24 +40,28 @@
 
 /** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
 #include "../../includes/ie_stats.h"
-#define MAX_STATS 256
-#define MAX_SCRIPTS 8
+#include "ActorBlock.h"
 
-class GEM_EXPORT Actor
+#define MAX_STATS 256
+
+class GEM_EXPORT Actor : public Moveble
 {
 public:
 	unsigned char InParty;
 	long BaseStats[MAX_STATS];
 	long Modified[MAX_STATS];
 	CharAnimations *anims;
-	char  ScriptName[33]; //death variable
-	char  Scripts[MAX_SCRIPTS][9];
+	//char  ScriptName[33]; //death variable
+	//char  Scripts[MAX_SCRIPTS][9];
 	char  Dialog[9];
 	//CRE DATA FIELDS
 	char *LongName, *ShortName;
 	char SmallPortrait[9];
 	char LargePortrait[9];
 	unsigned long StrRefs[100];
+	bool DeleteMe;
+private:
+	void SetCircleSize();
 public:
 	Actor(void);
 	~Actor(void);
@@ -83,7 +87,7 @@ public:
 	{
 		if(string == NULL)
 			return;
-		strncpy(ScriptName, string, 32);
+		strncpy(scriptName, string, 32);
 	}
 	/** Sets a Script ResRef */
 	void  SetScript(int ScriptIndex, const char * ResRef)
@@ -92,7 +96,8 @@ public:
 			return;
 		if(ScriptIndex>=MAX_SCRIPTS)
 			return;
-		strncpy(Scripts[ScriptIndex], ResRef, 8);
+		//strncpy(Scripts[ScriptIndex], ResRef, 8);
+		return;
 	}
 	/** Sets the Dialog ResRef */
 	void  SetDialog(const char * ResRef)
@@ -119,18 +124,21 @@ public:
 	/** Gets the Character Long Name/Short Name */
 	char *GetName(int which)
 	{
-	if(which) return LongName;
+		if(which) 
+			return LongName;
 		return ShortName;
 	}
 	/** Gets the DeathVariable */
 	char *GetScriptName(void)
 	{
-		return ScriptName;
+		//return ScriptName;
+		return scriptName;
 	}
     /** Gets a Script ResRef */
 	char *GetScript(int ScriptIndex)
 	{
-		return Scripts[ScriptIndex];
+		//return Scripts[ScriptIndex];
+		return NULL;
 	}
 	/** Gets the Dialog ResRef */
 	char *GetDialog(void)
@@ -148,7 +156,7 @@ public:
 		{
 		case 0:
 			{
-				int len = strlen(ptr)+1;
+				size_t len = strlen(ptr)+1;
 				LongName = (char*)realloc(LongName, len);
 				memcpy(LongName, ptr, len);			
 			}
@@ -156,7 +164,7 @@ public:
 
 		case 1:
 			{
-				int len = strlen(ptr)+1;
+				size_t len = strlen(ptr)+1;
 				ShortName = (char*)realloc(ShortName, len);
 				memcpy(ShortName, ptr, len);
 			}
