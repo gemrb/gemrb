@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.11 2004/07/24 23:07:45 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.12 2004/08/22 23:19:04 avenger_teambg Exp $
  *
  */
 
@@ -55,7 +55,7 @@ void Spellbook::FreeSpellPage(CRESpellMemorization *sm)
 //ITEM, SPPR, SPWI, SPIN, SPCL
 int sections[]={3,0,1,2,2};
 
-bool Spellbook::HaveSpell(int spellid, ieDword flags)
+bool Spellbook::HaveSpell(int spellid, ieDword /*flags*/)
 {
 	int type = spellid/1000;
 	type = sections[type];
@@ -76,7 +76,7 @@ bool Spellbook::HaveSpell(int spellid, ieDword flags)
 }
 
 //if resref=="" then it is a haveanyspell
-bool Spellbook::HaveSpell(const char *resref, ieDword flags)
+bool Spellbook::HaveSpell(const char *resref, ieDword /*flags*/)
 {
 	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
@@ -125,7 +125,7 @@ bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
 	return true;
 }
 
-bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
+bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* /*spell*/)
 {
 	// FIXME: not yet implemented
 	return false;
