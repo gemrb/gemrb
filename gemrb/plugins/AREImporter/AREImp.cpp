@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.33 2004/01/04 15:24:45 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.34 2004/01/04 18:57:50 balrog994 Exp $
  *
  */
 
@@ -116,6 +116,7 @@ bool AREImp::Open(DataStream * stream, bool autoFree)
 Map * AREImp::GetMap()
 {
 	Map * map = new Map();
+	strcpy(map->scriptName, WEDResRef);
 
 	if(!core->IsAvailable(IE_WED_CLASS_ID)) {
 		printf("[AREImporter]: No Tile Map Manager Available.\n");
