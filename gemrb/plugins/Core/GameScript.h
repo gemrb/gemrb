@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.22 2004/01/06 00:55:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.23 2004/01/07 20:32:01 balrog994 Exp $
  *
  */
 
@@ -28,6 +28,7 @@ struct Action;
 #include "DataStream.h"
 #include "Variables.h"
 #include "ActorBlock.h"
+#include "SymbolMgr.h"
 #include <list>
 
 typedef struct Object {
@@ -136,6 +137,7 @@ public:
 	unsigned long scriptRunDelay;
 	bool endReached;
 	void Update();
+	void EvaluateAllBlocks();
 private: //Internal Functions
 	Script* CacheScript(DataStream * stream, const char * Context);
 	void FreeScript(Script * script);
@@ -237,6 +239,8 @@ private:
 	static void ForceSpell(Scriptable * Sender, Action * parameters);
 	static void Deactivate(Scriptable * Sender, Action * parameters);
 	static void Activate(Scriptable * Sender, Action * parameters);
+	static void LeaveAreaLUA(Scriptable * Sender, Action * parameters);
+	static void LeaveAreaLUAPanic(Scriptable * Sender, Action * parameters);
 };
 
 #endif

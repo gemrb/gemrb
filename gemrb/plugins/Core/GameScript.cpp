@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.39 2004/01/06 00:55:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.40 2004/01/07 20:32:01 balrog994 Exp $
  *
  */
 
@@ -24,8 +24,8 @@
 #include "DialogMgr.h"
 
 extern Interface * core;
-int initialized = 0;
 
+static int initialized = 0;
 static Variables * globals;
 static SymbolMgr* triggersTable;
 static SymbolMgr* actionsTable;
@@ -89,6 +89,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		blocking[83] = true;
 		actions[84] = Face;
 		blocking[84] = true;
+		actions[110] = LeaveAreaLUA;
 		actions[111] = DestroySelf;
 		actions[113] = ForceSpell;
 		actions[120] = StartCutScene;
@@ -116,7 +117,9 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[177] = TriggerActivation;
 		actions[198] = Dialogue;
 		actions[202] = FadeToColor;
+		//blocking[202] = true;
 		actions[203] = FadeFromColor;
+		//blocking[203] = true;
 		actions[225] = MoveBetweenAreas;
 		//please note that IWD and SoA are different from action #231
 		actions[242] = Ally;
@@ -258,27 +261,6 @@ void GameScript::Update()
 {
 	if(!MySelf || !MySelf->Active)
 		return;
-	//if(MySelf->GetNextAction())
-	//	return;
-	/*while(programmedActions.size()) {
-		//printf("Executing Script Step\n");
-		Action * aC = programmedActions.front();
-		ExecuteAction(this, aC);
-		programmedActions.pop_front();
-		if(!programmedActions.size()) {
-			endReached = true;
-			if(MySelf) {
-				MySelf->Clicker = NULL;
-				if(!(MySelf->EndAction & SEA_RESET) && (MySelf->Type == ST_PROXIMITY))
-					MySelf->Active = false;
-				else
-					MySelf->Active = true;
-			}
-			return;
-		}
-		if(blocking[aC->actionID])
-			return;
-	}*/
 	unsigned long thisTime;
 	GetTime(thisTime);
 	if((thisTime - lastRunTime) < scriptRunDelay)
@@ -295,6 +277,27 @@ void GameScript::Update()
 			if(!continueExecution)
 				break;
 			continueExecution = false;	
+		}
+	}
+}
+
+void GameScript::EvaluateAllBlocks()
+{
+	if(!MySelf || !MySelf->Active)
+		return;
+	unsigned long thisTime;
+	GetTime(thisTime);
+	if((thisTime - lastRunTime) < scriptRunDelay)
+		return;
+	//printf("%s: Run Script\n", Name);
+	lastRunTime = thisTime;
+	if(!script)
+		return;
+	for(int a = 0; a < script->responseBlocksCount; a++) {
+		ResponseBlock * rB = script->responseBlocks[a];
+		if(EvaluateCondition(this->MySelf, rB->condition)) {
+			ExecuteResponseSet(this->MySelf, rB->responseSet);
+			endReached = false;
 		}
 	}
 }
@@ -479,6 +482,8 @@ bool GameScript::EvaluateCondition(Scriptable * Sender, Condition * condition)
 
 bool GameScript::EvaluateTrigger(Scriptable * Sender, Trigger * trigger)
 {
+	if(!trigger)
+		return false;
 	TriggerFunction func = triggers[trigger->triggerID];
 	if(!func) {
 		//SymbolMgr * tT = core->GetSymbol(triggersTable);
@@ -699,7 +704,7 @@ Action * GameScript::GenerateAction(char * String)
 							src++; //Skip [
 							char * symbol = (char*)malloc(32);
 							char * tmp = symbol;
-							while((*src >= '0') && (*src <= '9')) {
+							while(((*src >= '0') && (*src <= '9')) || (*src == '-')) {
 								*tmp = *src;
 								tmp++;
 								src++;
@@ -708,7 +713,7 @@ Action * GameScript::GenerateAction(char * String)
 							newAction->XpointParameter = atoi(symbol);
 							src++; //Skip .
 							tmp = symbol;
-							while((*src >= '0') && (*src <= '9')) {
+							while(((*src >= '0') && (*src <= '9')) || (*src == '-')) {
 								*tmp = *src;
 								tmp++;
 								src++;
@@ -741,7 +746,7 @@ Action * GameScript::GenerateAction(char * String)
 								if(!valHook) {
 									char * symbol = (char*)malloc(32);
 									char * tmp = symbol;
-									while((*src >= '0') && (*src <= '9')) {
+									while(((*src >= '0') && (*src <= '9')) || (*src == '-')) {
 										*tmp = *src;
 										tmp++;
 										src++;
@@ -860,7 +865,9 @@ Action * GameScript::GenerateAction(char * String)
 									dst++;
 									src++;
 								}
+								*dst = 0;
 								src++;
+								stringsCount++;
 							}
 						break;
 					}
@@ -1162,9 +1169,11 @@ int  GameScript::OnCreation(Scriptable * Sender, Trigger * parameters)
 	return 0;
 }
 
-int GameScript::PartyHasItem(Scriptable */*Sender*/, Trigger */*parameters*/)
+int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger *parameters)
 {
 /*hacked to never have the item, this requires inventory!*/
+	if(stricmp(parameters->string0Parameter, "MISC4G") == 0)
+		return 1;
 	return 0;
 }
 
@@ -1196,8 +1205,6 @@ int GameScript::Range(Scriptable * Sender, Trigger * parameters)
 
 int GameScript::Clicked(Scriptable * Sender, Trigger * parameters)
 {
-	if(Sender->Type != ST_TRIGGER)
-		return 0;
 	if(parameters->objectParameter->eaField == 0) {
 		return 1;
 	}
@@ -1348,11 +1355,13 @@ void GameScript::TriggerActivation(Scriptable * Sender, Action * parameters)
 void GameScript::FadeToColor(Scriptable * Sender, Action * parameters)
 {
 	core->timer->SetFadeToColor(parameters->XpointParameter);
+	Sender->SetWait(parameters->XpointParameter);
 }
 
 void GameScript::FadeFromColor(Scriptable * Sender, Action * parameters)
 {
 	core->timer->SetFadeFromColor(parameters->XpointParameter);
+	Sender->SetWait(parameters->XpointParameter);
 }
 
 void GameScript::CreateCreature(Scriptable * Sender, Action * parameters)
@@ -1998,4 +2007,54 @@ void GameScript::Activate(Scriptable * Sender, Action * parameters)
 		return;
 	tar->Active = true;
 	Sender->CurrentAction = NULL;
+}
+
+void GameScript::LeaveAreaLUA(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	if(scr->Type != ST_ACTOR)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor * actor = (Actor*)Sender;
+	strcpy(actor->Area, parameters->string0Parameter);
+	if(!actor->FromGame) {
+		actor->FromGame = true;
+		if(actor->InParty)
+			core->GetGame()->SetPC(actor);
+		else
+			core->GetGame()->AddNPC(actor);
+	}
+	core->GetGame()->GetMap(0)->RemoveActor(actor);
+	if(parameters->XpointParameter >= 0)
+		actor->XPos = parameters->XpointParameter;
+	if(parameters->YpointParameter >= 0)
+		actor->YPos = parameters->YpointParameter;
+	if(parameters->int0Parameter >= 0)
+		actor->Orientation = parameters->int0Parameter;
+	Sender->CurrentAction = NULL;
+}
+
+void GameScript::LeaveAreaLUAPanic(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		Sender->CurrentAction->delayFree = true;
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	LeaveAreaLUA(Sender, parameters);
 }
