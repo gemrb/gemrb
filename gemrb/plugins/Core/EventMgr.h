@@ -43,6 +43,7 @@ class GEM_EXPORT EventMgr
 {
 private:
 	std::vector<Window*> windows;
+	std::vector<int> topwin;
 
 public:
 	EventMgr(void);
@@ -70,6 +71,21 @@ private:
 	Window * lastW;
 	/** Last Focused Control */
 	Control * lastF;
+	/** Sets a Window on the Top of the Window Queue */
+	void SetOnTop(int Index)
+	{
+		std::vector<int>::iterator t;
+		for(t = topwin.begin(); t != topwin.end(); ++t) {
+			if((*t) == Index) {
+				topwin.erase(t);
+				break;
+			}
+		}
+		if(topwin.size() != 0)
+			topwin.insert(topwin.begin(), Index);
+		else
+			topwin.push_back(Index);
+	}
 };
 
 #endif

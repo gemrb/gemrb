@@ -572,6 +572,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 		if(windows[i]==NULL)
 			continue;
 		if(windows[i]->WindowID == WindowID) {
+			SetOnTop(i);
 			windows[i]->Invalidate();
 			return i;
 		}
@@ -590,9 +591,8 @@ int Interface::LoadWindow(unsigned short WindowID)
 		windows.push_back(win);
 		slot=windows.size()-1;
 	}
-	else {
+	else
 		windows[slot] = win;
-	}
 	win->Invalidate();
 	return slot;
 }
@@ -641,6 +641,7 @@ int Interface::SetVisible(unsigned short WindowIndex, bool visible)
 	if(win->Visible) {
 		evntmgr->AddWindow(win);
 		win->Invalidate();
+		SetOnTop(WindowIndex);
 	}
 	else
 		evntmgr->DelWindow(win->WindowID);
@@ -736,6 +737,7 @@ int Interface::ShowModal(unsigned short WindowIndex)
 	}
 	win->Visible = true;
 	evntmgr->Clear();
+	SetOnTop(WindowIndex);
 	evntmgr->AddWindow(win);
 	win->Invalidate();
 	return 0;
@@ -743,10 +745,15 @@ int Interface::ShowModal(unsigned short WindowIndex)
 
 void Interface::DrawWindows(void)
 {
-	for(unsigned int i = 0; i < windows.size(); i++) {
-		if(windows[i]!=NULL && windows[i]->Visible)
-			windows[i]->DrawWindow();
+	std::vector<int>::reverse_iterator t;
+	for(t = topwin.rbegin(); t != topwin.rend(); ++t) {
+		if(windows[(*t)]!=NULL && windows[(*t)]->Visible)
+			windows[(*t)]->DrawWindow();
 	}
+	//for(unsigned int i = 0; i < windows.size(); i++) {
+	//	if(windows[i]!=NULL && windows[i]->Visible)
+	//		windows[i]->DrawWindow();
+	//}
 }
 
 Window * Interface::GetWindow(unsigned short WindowIndex)
@@ -769,6 +776,13 @@ int Interface::DelWindow(unsigned short WindowIndex)
 	evntmgr->DelWindow(win->WindowID);
 	delete(win);
 	windows[WindowIndex]=NULL;
+	std::vector<int>::iterator t;
+	for(t = topwin.begin(); t != topwin.end(); ++t) {
+		if((*t) == WindowIndex) {
+			topwin.erase(t);
+			break;
+		}
+	}
 	return 0;
 }
 

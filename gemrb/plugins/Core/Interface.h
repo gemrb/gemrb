@@ -69,6 +69,7 @@ private:
 	SoundMgr * soundmgr;
 	/** Windows Array */
 	std::vector<Window*> windows;
+	std::vector<int> topwin;
 	Variables * vars;
 	Variables * tokens;
 	MusicMgr * music;
@@ -100,6 +101,21 @@ public:
 	ScriptEngine * GetGUIScriptEngine();
 	/** Loads a Window in the Window Manager */
 	int LoadWindow(unsigned short WindowID);
+	/** Sets a Window on the Top */
+	void SetOnTop(int Index)
+	{
+		std::vector<int>::iterator t;
+		for(t = topwin.begin(); t != topwin.end(); ++t) {
+			if((*t) == Index) {
+				topwin.erase(t);
+				break;
+			}
+		}
+		if(topwin.size() != 0)
+			topwin.insert(topwin.begin(), Index);
+		else
+			topwin.push_back(Index);
+	}
 	/** Get a Control on a Window */
 	int GetControl(unsigned short WindowIndex, unsigned short ControlID);
 	/** Set the Text of a Control */
