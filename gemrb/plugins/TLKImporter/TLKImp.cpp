@@ -6,6 +6,10 @@ TLKImp::TLKImp(void)
 {
 	str = NULL;
 	autoFree = false;
+	if(stricmp(core->GameType, "bg1") == 0)
+		isBG1 = true;
+	else
+		isBG1 = false;
 }
 
 TLKImp::~TLKImp(void)
@@ -180,6 +184,20 @@ char * TLKImp::GetString(unsigned long strref, int flags)
 		str->Seek(StrOffset+Offset, GEM_STREAM_START);
 		string = (char*)malloc(Length+1);
 		str->Read(string, Length);
+		if(isBG1) {
+			if(string[0] == '[') {
+				for(int i = 1; i < Length; i++) {
+					if(string[i] == ']') {
+						i+=2;
+						char * s = (char*)malloc(Length-i+1);
+						strcpy(s, &string[i]);
+						free(string);
+						string = 0;
+						break;
+					}
+				}
+			}
+		}
 	}
 	else {
 		Length = 0;

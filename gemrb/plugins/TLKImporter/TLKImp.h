@@ -14,6 +14,9 @@ private:
 
 	//Data
 	unsigned long StrRefCount, Offset;
+
+	//Baldur's Gate 1 Compatibility Flag
+	bool isBG1;
 public:
 	TLKImp(void);
 	~TLKImp(void);
