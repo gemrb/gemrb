@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.7 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.8 2003/11/28 17:30:21 balrog994 Exp $
  *
  */
 
@@ -26,11 +26,14 @@
 #include "WindowMgr.h"
 #include <vector>
 
-#define GEM_LEFT   1
-#define GEM_RIGHT  2
-#define GEM_DELETE 3
-#define GEM_RETURN 4
-#define GEM_BACKSP 5
+#define GEM_LEFT		1
+#define GEM_RIGHT		2
+#define GEM_UP			3
+#define GEM_DOWN		4
+#define GEM_DELETE		5
+#define GEM_RETURN		6
+#define GEM_BACKSP		7
+#define GEM_MOUSEOUT	128
 
 #ifdef WIN32
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.18 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.19 2003/11/28 17:30:21 balrog994 Exp $
  *
  */
 
@@ -261,6 +261,19 @@ void EventMgr::KeyRelease(unsigned char Key, unsigned short Mod)
 /** Special Ket Press Event */
 void EventMgr::OnSpecialKeyPress(unsigned char Key)
 {
+	if(lastW) {
+		Control* ctrl = lastW->GetControl(0);
+		if(!ctrl) {
+			if(lastF)
+				lastF->OnSpecialKeyPress(Key);
+		}
+		if(ctrl->ControlType != IE_GUI_GAMECONTROL) {
+			if(lastF)
+				lastF->OnSpecialKeyPress(Key);
+		}
+		ctrl->OnSpecialKeyPress(Key);
+		return;
+	}
 	if(lastF)
 		lastF->OnSpecialKeyPress(Key);
 }
