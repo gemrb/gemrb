@@ -28,6 +28,9 @@
 #define IE_CHEST_CURSOR	32
 
 extern Interface * core;
+#ifdef WIN32
+extern HANDLE hConsole;
+#endif
 
 static Color cyan = {0x00, 0xff, 0xff, 0xff};
 static Color red  = {0xff, 0x00, 0x00, 0xff};
@@ -326,10 +329,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					short cX = lastMouseX; 
 					short cY = lastMouseY;
 					core->GetVideoDriver()->ConvertToGame(cX, cY);
-					unsigned int XPos = cX, YPos = cY;
+					unsigned int XPos = cX/16, YPos = cY/12;
 					core->GetPathFinder()->AdjustPosition(XPos, YPos);
-					actor->XPos = XPos;
-					actor->YPos = YPos;
+					actor->XPos = (XPos*16)+8;
+					actor->YPos = (YPos*12)+6;
 					printf("Teleported to %d, %d\n", XPos, YPos);
 				}
 			}
@@ -343,7 +346,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				short cX = lastMouseX; 
 				short cY = lastMouseY;
 				core->GetVideoDriver()->ConvertToGame(cX, cY);
-				printf("[%d.%d]\n",cX, cY);
+				printf("%s [%d.%d]\n",area->scriptName, cX, cY);
 			}
 		break;
 		case '4': // '4'  //show all traps
@@ -927,6 +930,7 @@ void GameControl::DialogChoose(int choose)
 			else {
 				DialogTransition * tr = ds->transitions[choose];
 				if(tr->Flags & 8) {
+					speaker->CurrentAction = NULL;
 					delete(dlg);
 					ds = NULL;
 					dlg = NULL;
@@ -1003,6 +1007,8 @@ void GameControl::MoveToArea(char *Destination, char *EntranceName, bool fullPar
 	strcpy(this->Destination, Destination);
 	if(EntranceName[0] != 0)
 		strcpy(this->EntranceName, EntranceName);
+	else
+		this->EntranceName[0] = 0;
 	ChangeArea = true;
 }
 
@@ -1028,12 +1034,22 @@ void GameControl::ChangeMap()
 	selected.push_back(pc);
 	if(EntranceName[0] && pc) {
 		Entrance * ent = map->GetEntrance(EntranceName);
-		unsigned int XPos = ent->XPos, YPos = ent->YPos;
+		unsigned int XPos, YPos;
+		if(!ent) {
+			textcolor(YELLOW);
+			printf("WARNING!!! %s EntryPoint does not Exists\n", EntranceName);
+			textcolor(WHITE);
+			XPos = pc->XPos/16;
+			YPos = pc->YPos/12;
+		} else {
+			XPos = ent->XPos/16; 
+			YPos = ent->YPos/12;
+		}
 		core->GetPathFinder()->AdjustPosition(XPos, YPos);
-		pc->XPos = (unsigned short)XPos;
-		pc->YPos = (unsigned short)YPos;
+		pc->XPos = (unsigned short)(XPos*16)+8;
+		pc->YPos = (unsigned short)(YPos*12)+8;
 		Region vp = core->GetVideoDriver()->GetViewport();
-		core->GetVideoDriver()->SetViewport(XPos-(vp.w/2), YPos-(vp.h/2));
+		core->GetVideoDriver()->SetViewport(pc->XPos-(vp.w/2), pc->YPos-(vp.h/2));
 	}
 	ChangeArea = false;
 }
