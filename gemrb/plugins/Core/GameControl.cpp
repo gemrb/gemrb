@@ -576,7 +576,8 @@ void GameControl::TryToTalk(Actor *source, Actor *target)
 {
 	char Tmp[256];
 
-	sprintf( Tmp, "StartDialogNoSet([%s])", source->GetName(0) );
+	sprintf( Tmp, "StartDialogueNoSet([%s])", source->scriptName );
+printf("%s\n",Tmp);
 	if(target->GetNextAction()) {
 		DisplayString("Target is busy...");
 		return;
@@ -679,8 +680,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			}
 		}
 		//determining the type of the clicked actor
-		int type = 0;
-		if(actor) {
+		int type;
+
+		if(actor && selected.size() ) {
 			type = actor->GetStat(IE_EA);
 			if( type>=EVILCUTOFF ) {
 				type = 2;
@@ -688,8 +690,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			else if( type > GOODCUTOFF ) {
 				type = 1;
 			}
+			else {
+				type = 0;
+			}
 		}
-
+		else {
+			type = 0;
+		}
 		switch (type) {
 		case 0:
 			for (size_t i = 0; i < selected.size(); i++)
