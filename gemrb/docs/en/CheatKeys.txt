@@ -1,6 +1,6 @@
 CHEAT AND DEBUG KEYS
 --------------------
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.3 2004/08/23 19:00:52 avenger_teambg Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.4 2004/08/24 12:09:16 edheldil Exp $
 
 
 Following is a list of cheats you can use during development of GemRB.
@@ -34,7 +34,7 @@ Ctrl-M - Prints (on terminal or DOS window) useful info on pointed actor, door
 Ctrl-O - Marks current mouse position as start point (origin) for path drawn
          with Ctrl-P
 
-Ctrl-P - Draws path from start point marked by Ctrl-S to current mouse 
+Ctrl-P - Draws path from start point marked by Ctrl-O to current mouse 
          position.
 
 Ctrl-S - Alters the stance (animation state) of the actor. You have to
