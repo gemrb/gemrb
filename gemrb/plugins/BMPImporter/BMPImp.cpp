@@ -132,7 +132,7 @@ void BMPImp::GetPalette(int index, int colors, Color * pal){
 	unsigned char * p = (unsigned char*)pixels;
 	p+=PaddedRowLength*index;
 	if(BitCount == 24) {
-		for(int i = 1; i < colors; i++) {
+		for(int i = 0; i < colors; i++) {
 			pal[i].b = *p++;
 			pal[i].g = *p++;
 			pal[i].r = *p++;

@@ -578,11 +578,11 @@ bool Interface::LoadConfig(void)
 /** No descriptions */
 Color * Interface::GetPalette(int index, int colors){
 	Color * pal = NULL;
-	if(colors == 16) {
+	if(colors <= 16) {
 		pal = (Color*)malloc(colors*sizeof(Color));
 		pal16->GetPalette(index, colors, pal);
 	}
-	else if(colors == 256) {
+	else if(colors <= 256) {
 		pal = (Color*)malloc(colors*sizeof(Color));
 		pal256->GetPalette(index, colors, pal);
 	}
