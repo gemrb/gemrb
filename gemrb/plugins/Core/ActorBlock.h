@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.55 2005/02/24 16:45:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.56 2005/03/05 21:07:27 avenger_teambg Exp $
  *
  */
 
@@ -103,18 +103,19 @@ private:
 	unsigned long interval;
 	unsigned long WaitCounter;
 	bool neverExecuted;
+protected: //let Actor access this
+	Map *area;
+	char scriptName[33];
 public:
 	Variables* locals;
 	ScriptableType Type;
 	Point Pos;
-	Map *area;
 	Scriptable* MySelf;
 	Scriptable* CutSceneId;
 	GameScript* Scripts[MAX_SCRIPTS];
 	char* overHeadText;
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
-	char scriptName[33];
 	bool Active;
 	Scriptable* LastTrigger;
 	Scriptable* LastEntered;
@@ -130,6 +131,8 @@ public:
 	//void SetPosition(Point &Pos, int areaindex);
 	void SetMySelf(Scriptable* MySelf);
 	char* GetScriptName();
+	Map* GetCurrentArea();
+	void SetMap(Map *map);
 	void SetScript(int index, GameScript* script);
 	void DisplayHeadText(const char* text);
 	void SetScriptName(const char* text);

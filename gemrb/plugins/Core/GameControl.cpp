@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.193 2005/03/05 01:07:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.194 2005/03/05 21:07:27 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -565,7 +565,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					short cX = lastMouseX; 
 					short cY = lastMouseY;
 					core->GetVideoDriver()->ConvertToGame( cX, cY );
-					printf( "%s [%d.%d]\n", area->scriptName, cX, cY );
+					printf( "%s [%d.%d]\n", area->GetScriptName(), cX, cY );
 				}
 				break;
 			case 'y': //kills actor
@@ -992,7 +992,7 @@ Map *GameControl::SetCurrentArea(int Index)
 	Game* game = core->GetGame();
 	game->MapIndex = Index;
 	Map* area = game->GetCurrentMap( );
-	memcpy(game->CurrentArea, area->scriptName, 9);
+	memcpy(game->CurrentArea, area->GetScriptName(), 9);
 	area->SetupAmbients();
 	//night or day?
 	//if in combat, play battlesong (or don't stop song here)

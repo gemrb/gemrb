@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.47 2005/02/22 23:11:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.48 2005/03/05 21:07:32 avenger_teambg Exp $
  *
  */
 
@@ -107,8 +107,7 @@ Game* GAMImp::GetGame()
 	str->ReadDword( &newGame->NPCCount );
 	str->ReadDword( &newGame->GLOBALOffset );
 	str->ReadDword( &newGame->GLOBALCount );
-	str->Read( &newGame->CurrentArea, 8 );
-	newGame->CurrentArea[8] = 0;
+	str->ReadResRef( newGame->CurrentArea );
 	str->ReadDword( &newGame->Unknown48 );
 	str->ReadDword( &newGame->JournalCount );
 	str->ReadDword( &newGame->JournalOffset );
@@ -116,8 +115,7 @@ Game* GAMImp::GetGame()
 		default:
 			 {
 				str->ReadDword( &newGame->Reputation );
-				str->Read( &newGame->CurrentArea, 8 ); // FIXME: see above
-				newGame->CurrentArea[8] = 0;
+				str->ReadResRef( newGame->CurrentArea ); // FIXME: see above
 				str->ReadDword( &newGame->KillVarsOffset );
 				str->ReadDword( &newGame->KillVarsCount );
 				str->ReadDword( &newGame->FamiliarsOffset );
@@ -130,8 +128,7 @@ Game* GAMImp::GetGame()
 			 {
 				str->ReadDword( &newGame->UnknownOffset54 );
 				str->ReadDword( &newGame->UnknownCount58 );
-				str->Read( &newGame->AnotherArea, 8 );
-				newGame->AnotherArea[8] = 0;
+				str->ReadResRef( newGame->AnotherArea );
 				str->ReadDword( &newGame->KillVarsOffset );
 				str->ReadDword( &newGame->KillVarsCount );
 				str->ReadDword( &newGame->FamiliarsOffset );
@@ -151,8 +148,7 @@ Game* GAMImp::GetGame()
 		int i = core->LoadTable( "STARTARE" );
 		TableMgr* tm = core->GetTable( i );
 		char* resref = tm->QueryField( playmode );
-		strncpy( newGame->CurrentArea, resref, 8 );
-		newGame->CurrentArea[8] = 0;
+		strnuprcpy( newGame->CurrentArea, resref, 8 );
 	}
 
 	//Loading PCs
@@ -225,9 +221,9 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	str->ReadWord( &pcInfo.PartyOrder );
 	str->ReadDword( &pcInfo.OffsetToCRE );
 	str->ReadDword( &pcInfo.CRESize );
-	str->Read( &pcInfo.CREResRef, 8 );
+	str->ReadResRef( pcInfo.CREResRef );
 	str->ReadDword( &pcInfo.Orientation );
-	str->Read( &pcInfo.Area, 8 );
+	str->ReadResRef( pcInfo.Area );
 	str->ReadWord( &pcInfo.XPos );
 	str->ReadWord( &pcInfo.YPos );
 	str->ReadWord( &pcInfo.ViewXPos );
@@ -302,15 +298,13 @@ PCStatsStruct* GAMImp::GetPCStats ()
 	str->ReadDword( &ps->KillsTotalXP );
 	str->ReadDword( &ps->KillsTotalCount );
 	for (i = 0; i <= 3; i++) {
-		str->Read( &ps->FavouriteSpells[i], 8 );
-		//ps->FavouriteSpells[i][8] = 0;
+		str->ReadResRef( ps->FavouriteSpells[i] );
 	}
 	for (i = 0; i <= 3; i++)
 		str->ReadWord( &ps->FavouriteSpellsCount[i] );
 
 	for (i = 0; i <= 3; i++) {
-		str->Read( &ps->FavouriteWeapons[i], 8 );
-		//ps->FavouriteWeapons[i][8] = 0;
+		str->ReadResRef( ps->FavouriteWeapons[i] );
 	}
 	for (i = 0; i <= 3; i++)
 		str->ReadWord( &ps->FavouriteWeaponsCount[i] );

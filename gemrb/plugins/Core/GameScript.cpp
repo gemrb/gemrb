@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.237 2005/02/28 17:35:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.238 2005/03/05 21:07:27 avenger_teambg Exp $
  *
  */
 
@@ -1685,7 +1685,7 @@ bool GameScript::MatchActor(Actor* actor, Object* oC)
 		return false;
 	}
 	if (oC->objectName[0]) {
-		return (stricmp( actor->scriptName, oC->objectName ) == 0);
+		return (stricmp( actor->GetScriptName(), oC->objectName ) == 0);
 	}
 	//TODO: the rest
 	return false;
@@ -3094,13 +3094,17 @@ static int CanSee(Scriptable* Sender, Scriptable* target)
 	if (Sender->Type == ST_ACTOR) {
 		Actor* snd = ( Actor* ) Sender;
 		range = snd->Modified[IE_VISUALRANGE] * 20;
-		map = snd->area; //huh, lets hope it won't crash often
+		map = Sender->GetCurrentArea();
+		//huh, lets hope it won't crash often
+		if (!map) {
+			abort();
+		}
 	}
 	else { //no better idea atm
 		map = core->GetGame()->GetCurrentMap();
 		range = 20 * 20;
 	}
-	if( target->area!=map ) {
+	if( target->GetCurrentArea()!=map ) {
 		return 0;
 	}
 
@@ -8133,7 +8137,7 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 	}
 	else {
 		if ( 2 != myinv->AddSlotItem(item, -1)) {
-			Map *map=((Actor *) Sender)->area;
+			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
 			map->TMap->AddItemToLocation(Sender->Pos, item);
 		}
@@ -8162,7 +8166,7 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 	}
 	else {
 		if ( 2 != myinv->AddSlotItem(item, -1)) {
-			Map *map=((Actor *) Sender)->area;
+			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
 			map->TMap->AddItemToLocation(Sender->Pos, item);
 		}

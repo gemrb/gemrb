@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.71 2005/02/19 19:09:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.72 2005/03/05 21:07:26 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -49,6 +49,7 @@ Scriptable::Scriptable(ScriptableType type)
 	resetAction = false;
 	neverExecuted = true;
 	OnCreation = true;
+	area = 0;
 	Pos.x = 0;
 	Pos.y = 0;
 
@@ -78,6 +79,20 @@ char* Scriptable::GetScriptName(void)
 	 return scriptName;
 }
 
+Map* Scriptable::GetCurrentArea()
+{
+	return area;
+}
+
+void Scriptable::SetMap(Map *map)
+{
+	if (!map) {
+		printf("Null map set!\n");
+		abort();
+	}
+	area = map;
+}
+
 void Scriptable::SetScript(ieResRef aScript, int idx)
 {
 	if (Scripts[idx]) {
@@ -90,13 +105,6 @@ void Scriptable::SetScript(ieResRef aScript, int idx)
 	}
 }
 
-/* unused
-void Scriptable::SetPosition(Map *map, Point &Position)
-{
-	Pos = Position;
-	area = map;
-}
-*/
 void Scriptable::SetMySelf(Scriptable* MySelf)
 {
 	this->MySelf = MySelf;
@@ -128,8 +136,7 @@ void Scriptable::DisplayHeadText(const char* text)
 
 void Scriptable::SetScriptName(const char* text)
 {
-	strncpy( scriptName, text, 32 );
-	scriptName[32] = 0;
+	strnuprcpy( scriptName, text, 32 );
 }
 
 void Scriptable::ExecuteScript(GameScript* Script)

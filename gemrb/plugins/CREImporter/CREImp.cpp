@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.60 2005/02/21 19:52:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.61 2005/03/05 21:07:32 avenger_teambg Exp $
  *
  */
 
@@ -434,18 +434,6 @@ void CREImp::GetActorPST(Actor *act)
 	act->BaseStats[IE_COLORCOUNT] = ColorsCount; //hack
 
 	str->Seek(31, GEM_CURRENT_POS);
-/*
-	str->Read( &act->unknown2F2, 2 );
-	str->Read( &act->unknown2F4, 1 );
-
-	for (i = 0; i < 7; i++)
-		str->Read( &act->ColorPlacements[i], 1 );
-
-	for (i = 0; i < 5; i++) {
-		str->ReadDword( &act->unknown2FC[i] );
-	}
-	str->Read( &act->unknown310, 1 );
-*/
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_SPECIES]=tmpByte; // offset: 0x311
 	str->Read( &tmpByte, 1 );
@@ -468,7 +456,10 @@ void CREImp::GetActorPST(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
-	str->Read( act->scriptName, 32 );
+	char scriptname[33];
+	str->Read( scriptname, 32);
+	scriptname[32]=0;
+	act->SetScriptName(scriptname);
 
 	str->ReadDword( &act->KnownSpellsOffset );
 	str->ReadDword( &act->KnownSpellsCount );
@@ -742,7 +733,10 @@ void CREImp::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
-	str->Read( act->scriptName, 32 );
+	char scriptname[33];
+	str->Read( scriptname, 32);
+	scriptname[32]=0;
+	act->SetScriptName(scriptname);
 
 	str->ReadDword( &act->KnownSpellsOffset );
 	str->ReadDword( &act->KnownSpellsCount );
@@ -876,7 +870,10 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
-	str->Read( act->scriptName, 32 );
+	char scriptname[33];
+	str->Read( scriptname, 32);
+	scriptname[32]=0;
+	act->SetScriptName(scriptname);
 
 	act->KnownSpellsOffset = 0;
 	act->KnownSpellsCount = 0;
@@ -1035,7 +1032,10 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->Seek( 5, GEM_CURRENT_POS );
 	str->Read( &act->BaseStats[IE_ALIGNMENT], 1 );
 	str->Seek( 4, GEM_CURRENT_POS );
-	str->Read( act->scriptName, 32 );
+	char scriptname[33];
+	str->Read( scriptname, 32);
+	scriptname[32]=0;
+	act->SetScriptName(scriptname);
 
 	str->ReadDword( &act->KnownSpellsOffset );
 	str->ReadDword( &act->KnownSpellsCount );

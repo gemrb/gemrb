@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.34 2005/02/27 12:35:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.35 2005/03/05 21:07:27 avenger_teambg Exp $
  *
  */
 
@@ -63,7 +63,10 @@ void strnlwrcpy(char *dest, const char *source, int count)
 {
 	while(count--) {
 		*dest++ = pl_lowercase[(unsigned char) *source];
-		if(!*source++) return;
+		if(!*source++) {
+			while(count--) *dest++=0;
+			return;
+		}
 	}
 	*dest=0;
 }
@@ -72,7 +75,10 @@ void strnuprcpy(char* dest, const char *source, int count)
 {
 	while(count--) {
 		*dest++ = pl_uppercase[(unsigned char) *source];
-		if(!*source++) return;
+		if(!*source++) {
+			while(count--) *dest++=0;
+			return;
+		}
 	}
 	*dest=0;
 }

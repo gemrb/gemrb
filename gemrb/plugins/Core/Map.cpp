@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.140 2005/03/02 22:34:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.141 2005/03/05 21:07:27 avenger_teambg Exp $
  *
  */
 
@@ -533,7 +533,8 @@ void Map::Shout(Scriptable* actor, int shoutID, unsigned int radius)
 void Map::AddActor(Actor* actor)
 {
 	//setting the current area for the actor as this one
-	memcpy(actor->Area, scriptName, 9);
+	strnuprcpy(actor->Area, scriptName, 8);
+	actor->SetMap(this);
 	actors.push_back( actor );
 }
 
@@ -578,7 +579,7 @@ Actor* Map::GetActor(const char* Name)
 	unsigned int i = actors.size();
 	while(i--) {
 		Actor* actor = actors[i];
-		if (stricmp( actor->scriptName, Name ) == 0) {
+		if (strnicmp( actor->GetScriptName(), Name, 32 ) == 0) {
 			return actor;
 		}
 	}

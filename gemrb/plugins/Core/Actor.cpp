@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.85 2005/02/23 18:59:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.86 2005/03/05 21:07:26 avenger_teambg Exp $
  *
  */
 
@@ -492,8 +492,7 @@ bool Actor::CheckOnDeath()
 /* this will create a heap at location, and transfer the item(s) */
 void Actor::DropItem(ieResRef resref, unsigned int flags)
 {
-	Map *map = core->GetGame()->GetMap(Area);
-	inventory.DropItemAtLocation( resref, flags, map, Pos );
+	inventory.DropItemAtLocation( resref, flags, area, Pos );
 }
 
 bool Actor::ValidTarget(int ga_flags)

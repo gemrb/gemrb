@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.63 2005/02/22 23:10:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.64 2005/03/05 21:07:27 avenger_teambg Exp $
  *
  */
 
@@ -103,7 +103,7 @@ Actor* Game::FindPC(unsigned int partyID)
 Actor* Game::FindPC(const char *scriptingname)
 {
 	for(unsigned int slot=0; slot<PCs.size(); slot++) {
-		if(strnicmp(PCs[slot]->scriptName,scriptingname,32)==0 )
+		if(strnicmp(PCs[slot]->GetScriptName(),scriptingname,32)==0 )
 		{
 			return PCs[slot];
 		}
@@ -122,7 +122,7 @@ Actor* Game::FindNPC(unsigned int partyID)
 Actor* Game::FindNPC(const char *scriptingname)
 {
 	for(unsigned int slot=0; slot<NPCs.size(); slot++) {
-		if(strnicmp(NPCs[slot]->scriptName,scriptingname,32)==0 )
+		if(strnicmp(NPCs[slot]->GetScriptName(),scriptingname,32)==0 )
 		{
 			return NPCs[slot];
 		}
@@ -352,7 +352,7 @@ int Game::FindMap(const char *ResRef)
 	int index = Maps.size();
 	while (index--) {
 		Map *map=Maps[index];
-		if (strnicmp(ResRef, map->scriptName, 8) == 0) {
+		if (strnicmp(ResRef, map->GetScriptName(), 8) == 0) {
 			return index;
 		}
 	}
@@ -425,7 +425,7 @@ int Game::AddMap(Map* map)
 	}
 */
 	unsigned int i = Maps.size();
-	if(MasterArea(map->scriptName) ) {
+	if(MasterArea(map->GetScriptName()) ) {
 		//no push_front, we do this ugly hack
 		Maps.push_back(NULL);
 		for(;i;i--) {
