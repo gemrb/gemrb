@@ -16,6 +16,7 @@ static AudioStream streams[MAX_STREAMS];
 void ACMImp::clearstreams(bool free) {
 	for(int i = 0; i < MAX_STREAMS; i++) {
 		if(!streams[i].free && free) {
+			FSOUND_Stream_Stop(streams[i].stream);
 			FSOUND_Stream_Close(streams[i].stream);
 			FSOUND_DSP_Free(streams[i].dsp);
 		}
@@ -99,7 +100,9 @@ bool ACMImp::Init(void)
 	printf("[%.2f] Using DirectSound...", FSOUND_GetVersion());
 #endif
 	if(FSOUND_Init(44100, 32, 0) == false) {
-		return false;
+		FSOUND_SetOutput(FSOUND_OUTPUT_NOSOUND);
+		if(FSOUND_Init(44100, 32, 0) == false)
+			return false;
 	}
 	if(!FSOUND_Stream_SetBufferSize(100))
 		printf("Error Setting Buffer Size\n");
