@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.24 2003/11/29 10:29:23 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.25 2003/12/07 09:43:25 avenger_teambg Exp $
  *
  */
 
@@ -31,19 +31,9 @@
 #include <dirent.h>
 #endif
 
-#ifndef WIN32
-#include <ctype.h>
-char *strlwr(char *string)
-{
-	char *s;
-	if(string)
-	{
-		for(s = string; *s; ++s)
-			*s = tolower(*s);
-	}
-	return string;
-}
+static char overridesubfolder[9]="override";
 
+#ifndef WIN32
 char * FindInDir(char * Dir, char * Filename)
 { 
 	char * fn = NULL; 
@@ -63,11 +53,18 @@ char * FindInDir(char * Dir, char * Filename)
 	closedir(dir);  //No other files in the directory, close it
 	return fn;
 }
-
 #endif
 
 KeyImp::KeyImp(void)
 {
+	if(core->CaseSensitive) {
+		char path[_MAX_PATH];
+		strcpy(path, core->GamePath);
+		strcat(path, overridesubfolder);
+		if(!dir_exists(path) ) {
+			overridesubfolder[0]=toupper(overridesubfolder[0]);
+		}
+	}
 }
 
 KeyImp::~KeyImp(void)
@@ -192,11 +189,11 @@ DataStream * KeyImp::GetResource(const char * resname, SClass_ID type)
 {
 	char path[_MAX_PATH], BasePath[_MAX_PATH], filename[_MAX_PATH] = {0};
 	//Search it in the GemRB override Directory
-	strcpy(path, "override");
+	strcpy(path, overridesubfolder);
 	strcat(path, SPathDelimiter);
 	strcat(path, core->GameType);
 	SearchIn(core->GemRBPath, path, resname, type, "[KEYImporter]: Found in GemRB Override...\n");
-	SearchIn(core->GamePath, "override", resname, type, "[KEYImporter]: Found in Override...\n");
+	SearchIn(core->GamePath, overridesubfolder, resname, type, "[KEYImporter]: Found in Override...\n");
 	SearchIn(core->GamePath, "Data", resname, type, "[KEYImporter]: Found in Local CD1 Folder...\n");
 	printf("[KEYImporter]: Searching for %.8s%s...\n", resname, core->TypeExt(type));
 	unsigned long ResLocator;
@@ -288,7 +285,7 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 	char path[_MAX_PATH], filename[_MAX_PATH] = {0};
 	//Search it in the GemRB override Directory
 	strcpy(path, core->GemRBPath);
-	strcat(path, "override");
+	strcat(path, overridesubfolder);
 	strcat(path, SPathDelimiter);
 	strcat(path, core->GameType);
 	strcat(path, SPathDelimiter);
@@ -308,7 +305,7 @@ void * KeyImp::GetFactoryResource(const char * resname, SClass_ID type, unsigned
 		return fs;
 	}
 	strcpy(path, core->GamePath);
-	strcat(path, "override");
+	strcat(path, overridesubfolder);
 	strcat(path, SPathDelimiter);
 	strncat(path, resname, 8);
 	strcat(path, core->TypeExt(type));
