@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.211 2004/09/21 19:00:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.212 2004/10/02 10:51:52 avenger_teambg Exp $
  *
  */
 
@@ -3110,7 +3110,7 @@ static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*a
 	for (int i = 0; i < game->GetPartySize (false); i++) {
 		Actor* actor = game->GetPC (i);
 		if (actor->IsSelected()) {
-			return Py_BuildValue( "i", i + 1); // FIXME: or i+0 ?
+			return Py_BuildValue( "i", actor->InParty); // FIXME: or i+1 ?
 		}
 	}
 
