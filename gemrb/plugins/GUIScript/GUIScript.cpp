@@ -15,10 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.113 2004/02/02 01:14:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.114 2004/02/08 15:29:01 avenger_teambg Exp $
  *
  */
-
 
 #include "GUIScript.h"
 #include "../Core/Interface.h"
@@ -109,15 +108,11 @@ static PyObject * GemRB_LoadGame(PyObject *, PyObject *args)
 		return NULL;
 	}
 	GameControl *gc=StartGameControl();
-printf("got GameControl\n");
 	core->LoadGame(GameIndex);
-printf("loadGame done\n");
 	gc->SetCurrentArea(0);
-printf("currentarea set\n");
 	Py_INCREF(Py_None);
 	return Py_None;
 }
-
 
 static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
 {
@@ -214,6 +209,7 @@ static PyObject * GemRB_StatComment(PyObject * /*self*/, PyObject *args)
 	}
 	char *text=core->GetString(Strref);
 	char *newtext=(char *) malloc(strlen(text)+12);
+	//this could be DANGEROUS
 	sprintf(newtext,text,X,Y);
 	free(text);
 	ret=Py_BuildValue("s", newtext);
@@ -291,6 +287,33 @@ static PyObject * GemRB_EnableCheatKeys(PyObject * /*self*/, PyObject *args)
 	}
 	
 	core->EnableCheatKeys(Flag);
+	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_SetWindowPicture(PyObject * /*self*/, PyObject *args)
+{
+	int WindowIndex;
+	char *MosResRef;
+
+	if(!PyArg_ParseTuple(args, "is", &WindowIndex, &MosResRef)) {
+		printMessage("GUIScript", "Syntax Error: SetWindowPicture(WindowIndex, MosResRef)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	Window * win = core->GetWindow(WindowIndex);
+	if(!win)
+		return NULL;
+
+	DataStream * bkgr = core->GetResourceMgr()->GetResource(MosResRef, IE_MOS_CLASS_ID);
+	if(bkgr != NULL) {
+		ImageMgr * mos = (ImageMgr*)core->GetInterface(IE_MOS_CLASS_ID);
+                mos->Open(bkgr, true);
+                win->SetBackGround(mos->GetImage(), true);
+                core->FreeInterface(mos);
+	}
+	win->Invalidate();
 	
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -730,6 +753,22 @@ static PyObject * GemRB_SetVisible(PyObject * /*self*/, PyObject *args)
 	if(ret == -1)
 		return NULL;
 	
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+//useful only for ToB and HoW, sets masterscript/worldmap name
+PyObject *GemRB_SetMasterScript(PyObject * /*self*/, PyObject * args)
+{
+	char *script;
+	char *worldmap;
+
+	if(!PyArg_ParseTuple(args, "ss", &script, &worldmap)) {
+		printMessage("GUIScript", "Syntax Error: Expected 2 ResRefs\n", LIGHT_RED);
+		return NULL;
+	}
+	strncpy(core->GlobalScript,script,8);
+	strncpy(core->GlobalMap,worldmap,8);
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -1901,10 +1940,13 @@ static PyMethodDef GemRBMethods[] = {
      "Returns a Window."},
 
 	{"SetWindowSize", GemRB_SetWindowSize, METH_VARARGS,
-	 "Resized a Window."},
+	 "Resizes a Window."},
 
  	{"SetWindowPos", GemRB_SetWindowPos, METH_VARARGS,
 	 "Moves a Window."},
+
+ 	{"SetWindowPicture", GemRB_SetWindowPicture, METH_VARARGS,
+	 "Changes the background of a Window."},
 
  	{"LoadTable", GemRB_LoadTable, METH_VARARGS,
      "Loads a 2DA Table."},
@@ -1956,6 +1998,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"SetVisible", GemRB_SetVisible, METH_VARARGS,
      "Sets the Visibility Flag of a Window."},
+
+	{"SetMasterScript", GemRB_SetMasterScript, METH_VARARGS,
+     "Sets the worldmap and masterscript names."},
 
 	{"ShowModal", GemRB_ShowModal, METH_VARARGS,
      "Show a Window on Screen setting the Modal Status."},
@@ -2059,13 +2104,13 @@ static PyMethodDef GemRBMethods[] = {
 	{"DeleteSaveGame", GemRB_DeleteSaveGame, METH_VARARGS,
      "Deletes a saved game folder completely."},
 
-        {"GetSaveGameAttrib", GemRB_GetSaveGameAttrib, METH_VARARGS,
+	{"GetSaveGameAttrib", GemRB_GetSaveGameAttrib, METH_VARARGS,
      "Returns the name, path or prefix of the saved game."},
 
-        {"SetSaveGamePreview", GemRB_SetSaveGamePreview, METH_VARARGS,
+	{"SetSaveGamePreview", GemRB_SetSaveGamePreview, METH_VARARGS,
      "Sets a savegame area preview bmp onto a button as picture."},
 
-        {"SetSaveGamePortrait", GemRB_SetSaveGamePortrait, METH_VARARGS,
+	{"SetSaveGamePortrait", GemRB_SetSaveGamePortrait, METH_VARARGS,
      "Sets a savegame PC portrait bmp onto a button as picture."},
 
 	{"CreatePlayer", GemRB_CreatePlayer, METH_VARARGS,
@@ -2196,22 +2241,22 @@ bool GUIScript::LoadScript(const char * filename)
 	if(pModule)
 		Py_DECREF(pModule);
 
-    pModule = PyImport_Import(pName);
-    Py_DECREF(pName);
+	pModule = PyImport_Import(pName);
+	Py_DECREF(pName);
     
-    if (pModule != NULL) {
-			pDict = PyModule_GetDict(pModule);
+	if (pModule != NULL) {
+		pDict = PyModule_GetDict(pModule);
 		if(PyDict_Merge(pDict, maindic, false) == -1)
 			return false;
-        /* pDict is a borrowed reference */
-    }
+	/* pDict is a borrowed reference */
+	}
 	else {
 		PyErr_Print();
 		printStatus("ERROR", LIGHT_RED);
 		return false;
 	}
-    printStatus("OK", LIGHT_GREEN);
-    return true;
+	printStatus("OK", LIGHT_GREEN);
+	return true;
 }
 
 bool GUIScript::RunFunction(char * fname)
