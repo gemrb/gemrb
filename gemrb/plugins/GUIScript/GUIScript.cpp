@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.262 2005/01/06 22:09:05 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.263 2005/01/08 17:28:50 avenger_teambg Exp $
  *
  */
 
@@ -3088,13 +3088,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 
-
-		if (*core->GetString (item->ItemName) == 0) {
-			PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->ItemNameIdentified));
-		}
-		else {
-			PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->ItemName));
-		}
+		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->GetItemName(false)));
 
 		sm->ReleaseItem( item );
 		core->FreeInterface( sm );
@@ -3976,10 +3970,10 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 
 
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong (item->ItemName));
-	PyDict_SetItemString(dict, "ItemNameIdentified", PyInt_FromLong (item->ItemNameIdentified));
-	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong (item->ItemDesc));
-	PyDict_SetItemString(dict, "ItemDescIdentified", PyInt_FromLong (item->ItemDescIdentified));
+	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong (item->GetItemName(false)));
+	PyDict_SetItemString(dict, "ItemNameIdentified", PyInt_FromLong (item->GetItemName(true)));
+	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong (item->GetItemDesc(false)));
+	PyDict_SetItemString(dict, "ItemDescIdentified", PyInt_FromLong (item->GetItemDesc(true)));
 	PyDict_SetItemString(dict, "ItemIcon", PyString_FromResRef (item->ItemIcon));
 	PyDict_SetItemString(dict, "StackAmount", PyInt_FromLong (item->StackAmount));
 	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.11 2004/11/21 21:20:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.12 2005/01/08 17:28:49 avenger_teambg Exp $
  *
  */
 
@@ -64,7 +64,7 @@ typedef Effect ITMFeature;
 #define IE_ITEM_USESTRENGTH  1
 #define IE_ITEM_RECHARGE     0x800
 #define IE_ITEM_IGNORESHIELD 0x10000
-#define IE_ITEM_KEEN         0x20000
+#define IE_ITEM_KEEN	 0x20000
 
 //special itemtypes
 #define ITM_TYPE_POTION      9
@@ -72,8 +72,8 @@ typedef Effect ITMFeature;
 
 class GEM_EXPORT ITMExtHeader {
 public:
-        ITMExtHeader();
-        ~ITMExtHeader();
+	ITMExtHeader();
+	~ITMExtHeader();
 	ieByte AttackType;
 	ieByte IDReq;
 	ieByte Location;
@@ -161,6 +161,30 @@ public:
 	AnimationMgr* ItemIconBAM;
 	AnimationMgr* GroundIconBAM;
 	AnimationMgr* CarriedIconBAM;
+public:
+	ieStrRef GetItemName(bool identified)
+	{
+		if(identified) {
+			if((int) ItemNameIdentified>=0) return ItemNameIdentified;
+			return ItemName;
+		}
+		if((int) ItemName>=0) {
+			return ItemName;
+		}
+		return ItemNameIdentified;
+	};
+	ieStrRef GetItemDesc(bool identified)
+	{
+		if(identified) {
+			if((int) ItemDescIdentified>=0) return ItemDescIdentified;
+			return ItemDesc;
+		}
+		if((int) ItemDesc>=0) {
+			return ItemDesc;
+		}
+		return ItemDescIdentified;
+	}
+
 };
 
 #endif  // ! ITEM_H
