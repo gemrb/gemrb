@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.227 2005/02/12 13:44:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.228 2005/02/12 22:58:40 avenger_teambg Exp $
  *
  */
 
@@ -5221,10 +5221,7 @@ void GameScript::ChangeGeneral(Scriptable* Sender, Action* parameters)
 void GameScript::ChangeRace(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!scr) {
-		return;
-	}
-	if (scr->Type != ST_ACTOR) {
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
@@ -5234,10 +5231,7 @@ void GameScript::ChangeRace(Scriptable* Sender, Action* parameters)
 void GameScript::ChangeClass(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!scr) {
-		return;
-	}
-	if (scr->Type != ST_ACTOR) {
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
@@ -5264,10 +5258,11 @@ void GameScript::SetNamelessDisguise(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
+	Actor* actor = ( Actor* ) scr;
 	actor->SetStat( IE_SPECIFIC, parameters->int0Parameter );
 }
 
@@ -5287,46 +5282,51 @@ void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeGender(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
+	Actor* actor = ( Actor* ) scr;
 	actor->SetStat( IE_SEX, parameters->int0Parameter );
 }
 
 void GameScript::ChangeAlignment(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
+	Actor* actor = ( Actor* ) scr;
 	actor->SetStat( IE_ALIGNMENT, parameters->int0Parameter );
 }
 
 void GameScript::SetFaction(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
+	Actor* actor = ( Actor* ) scr;
 	actor->SetStat( IE_FACTION, parameters->int0Parameter );
 }
 
 void GameScript::SetHP(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
+	Actor* actor = ( Actor* ) scr;
 	actor->SetStat( IE_HITPOINTS, parameters->int0Parameter );
 }
 
 void GameScript::SetTeam(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
+	Actor* actor = ( Actor* ) scr;
 	actor->SetStat( IE_TEAM, parameters->int0Parameter );
 }
 
@@ -6028,7 +6028,7 @@ void GameScript::DisplayMessage(Scriptable* Sender, Action* parameters)
 //float message over target
 void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* target = GetActorFromObject( Sender, parameters->objects[0] );
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if(!target) {
 		target=Sender;
 		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
@@ -6039,7 +6039,7 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 
 void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* target = GetActorFromObject( Sender, parameters->objects[0] );
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if(!target) {
 		target=Sender;
 	}
@@ -6061,7 +6061,7 @@ void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* paramete
 
 void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* target = GetActorFromObject( Sender, parameters->objects[0] );
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if(!target) {
 		target=Sender;
 		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
@@ -6072,7 +6072,7 @@ void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
 
 void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* target = GetActorFromObject( Sender, parameters->objects[0] );
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if(!target) {
 		target=Sender;
 		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
@@ -6085,7 +6085,7 @@ void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 
 void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* target = GetActorFromObject( Sender, parameters->objects[0] );
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if(!target) {
 		target=Sender;
 		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
@@ -8398,7 +8398,7 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[0] );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		return;
 	}
@@ -8407,11 +8407,11 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 
 void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[0] );
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[2] );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		return;
 	}
@@ -8423,7 +8423,7 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[0] );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		return;
 	}

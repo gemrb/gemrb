@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.134 2005/02/10 22:41:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.135 2005/02/12 22:58:41 avenger_teambg Exp $
  *
  */
 
@@ -139,15 +139,15 @@ private:
 	Game * game;
 	WorldMap* worldmap;
 	int GameFeatures;
-	char ButtonFont[9];
-	char CursorBam[9];
-	char TooltipFont[9];
-	char TooltipBackResRef[9];
+	ieResRef ButtonFont;
+	ieResRef CursorBam;
+	ieResRef TooltipFont;
+	ieResRef TooltipBackResRef;
 	Color TooltipColor;
 	int TooltipMargin;
-	char Palette16[9];
-	char Palette32[9];
-	char Palette256[9];
+	ieResRef Palette16;
+	ieResRef Palette32;
+	ieResRef Palette256;
 	ieDword* slotmatrix; //itemtype vs slottype
 	SlotType* slottypes;
 	int ItemTypes;
@@ -159,8 +159,8 @@ private:
 	// Currently dragged item or NULL
 	CREItem* DraggedItem;
 public:
-	char GlobalScript[9];
-	char WorldMapName[9];
+	ieResRef GlobalScript;
+	ieResRef WorldMapName;
 	Animation **Cursors;
 	int CursorCount;
 	Sprite2D **TooltipBack;
