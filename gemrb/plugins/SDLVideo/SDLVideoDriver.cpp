@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.92 2005/03/06 09:28:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.93 2005/03/06 18:53:01 avenger_teambg Exp $
  *
  */
 
@@ -171,13 +171,20 @@ bool SDLVideoDriver::ToggleFullscreenMode()
 
 int SDLVideoDriver::SwapBuffers(void)
 {
+	int ret = GEM_OK;
+	unsigned long time;
+	GetTime( time );
+	if (( time - lastTime ) < 17) {
+		return ret;
+	}
+	lastTime = time;
+
 	unsigned char key;
 	bool ConsolePopped = core->ConsolePopped;
 
 	if (ConsolePopped) {
 		core->DrawConsole();
 	}
-	int ret = GEM_OK;
 	while (SDL_PollEvent( &event )) {
 		/* Loop until there are no events left on the queue */
 		switch (event.type) {
@@ -206,6 +213,12 @@ int SDLVideoDriver::SwapBuffers(void)
 					break;
 				case SDLK_HOME:
 					key = GEM_HOME;
+					break;
+				case SDLK_UP:
+					key = GEM_UP;
+					break;
+				case SDLK_DOWN:
+					key = GEM_DOWN;
 					break;
 				case SDLK_LEFT:
 					key = GEM_LEFT;
@@ -275,12 +288,6 @@ int SDLVideoDriver::SwapBuffers(void)
 
 		}
 	}
-	unsigned long time;
-	GetTime( time );
-	if (( time - lastTime ) < 17) {
-		return ret;
-	}
-	lastTime = time;
 	SDL_BlitSurface( backBuf, NULL, disp, NULL );
 	if (fadePercent) {
 		//printf("Fade Percent = %d%%\n", fadePercent);
@@ -1369,6 +1376,7 @@ void SDLVideoDriver::SetClipRect(Region* clip)
 
 void SDLVideoDriver::MouseMovement(int x, int y)
 {
+	GetTime( lastMouseTime );
 	if (DisableMouse)
 		return;
 	CursorPos.x = x - mouseAdjustX[CursorIndex];
