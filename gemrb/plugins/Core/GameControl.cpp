@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.214 2005/04/03 21:00:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.215 2005/04/06 21:43:41 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -63,15 +63,24 @@ typedef Point formation_type[FORMATIONSIZE];
 int formationcount;
 static formation_type *formations=NULL;
 
-static void AddTalk(TextArea* ta, Actor* speaker, const char* speaker_color,
-	char* text, const char* text_color)
+static void AddTalk(TextArea* ta, Scriptable* speaker,
+	const char* speaker_color, char* text, const char* text_color)
 {
 	const char* format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
-	int newlen = (int)(strlen( format ) + strlen( speaker->GetName(-1) ) +
+	const char* name;
+
+	//FIXME: doors or active regions may have a dialog name???
+	switch (speaker->Type) {
+		case ST_ACTOR:
+			name = ((Actor *) speaker)->GetName(-1);  break;
+		default:
+			name = ""; break;
+	}
+	int newlen = (int)(strlen( format ) + strlen( name ) +
 		strlen( speaker_color ) + strlen( text ) +
 		strlen( text_color ) + 1);
 	char* newstr = ( char* ) malloc( newlen );
-	sprintf( newstr, format, speaker_color, speaker->GetName(-1), text_color,
+	sprintf( newstr, format, speaker_color, name, text_color,
 		text );
 
 	ta->AppendText( newstr, -1 );
@@ -1283,7 +1292,7 @@ void GameControl::ResizeAdd(Window* win, unsigned char type)
 	}
 }
 
-void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
+void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlgref)
 {
 	DialogMgr* dm = ( DialogMgr* ) core->GetInterface( IE_DLG_CLASS_ID );
 	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
@@ -1302,8 +1311,10 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
 	this->target = target;
-	speaker->LastTalkedTo=target;
-	target->LastTalkedTo=speaker;
+	if (target->Type == ST_ACTOR) {
+		speaker->LastTalkedTo=(Actor *) target;
+		((Actor *) target)->LastTalkedTo=speaker;
+	}
 	if (DialogueFlags&DF_IN_DIALOG) {
 		return;
 	}
@@ -1338,9 +1349,11 @@ void GameControl::EndDialog(bool try_to_break)
 	{
 		return;
 	}
-	if(speaker && (DialogueFlags&DF_TALKCOUNT) )
+	if(target && (DialogueFlags&DF_TALKCOUNT) )
 	{
-		speaker->TalkCount++;
+		if (target->Type == ST_ACTOR) {
+			((Actor *) target)->TalkCount++;
+		}
 	}
 	if (speaker) { //this could be wrong
 		speaker->CurrentAction = NULL;
@@ -1412,7 +1425,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			for (unsigned int i = 0; i < tr->action->count; i++) {
 				Action* action = GameScript::GenerateAction( tr->action->strings[i], true );
 				if (action) {
-						speaker->AddAction( action );
+						target->AddAction( action );
 				} else {
 					snprintf(Tmp, sizeof(Tmp),
 						"Can't compile action: %s\n",
@@ -1450,7 +1463,7 @@ void GameControl::DialogChoose(unsigned int choose)
 	int idx = 0;
 	for (unsigned int x = 0; x < ds->transitionsCount; x++) {
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-			if(!dlg->EvaluateDialogTrigger(speaker, ds->transitions[x]->trigger)) {
+			if(!dlg->EvaluateDialogTrigger(target, ds->transitions[x]->trigger)) {
 				continue;
 			}
 		}

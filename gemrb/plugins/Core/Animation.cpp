@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.29 2005/04/03 21:00:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.30 2005/04/06 21:43:41 avenger_teambg Exp $
  *
  */
 
@@ -48,11 +48,9 @@ Animation::Animation(int count)
 	Flags = A_ANI_ACTIVE;
 	fps = 15;
 	endReached = false;
-	pastLastFrame = false;
 	ScriptName = NULL;
 	//behaviour flags
 	playReversed = false;
-	autoSwitchOnEnd = false;
 }
 
 Animation::~Animation(void)
@@ -123,8 +121,7 @@ Sprite2D* Animation::NextFrame(void)
 		ret = frames[pos];
 	}
 
-	if (pastLastFrame && (Flags&A_ANI_PLAYONCE) ) {
-		endReached = true;
+	if (endReached && (Flags&A_ANI_PLAYONCE) ) {
 		return ret;
 	}
 	unsigned long time;
@@ -136,9 +133,6 @@ Sprite2D* Animation::NextFrame(void)
 	}	
 	if (pos >= indicesCount ) {
 		pos = 0;
-		pastLastFrame = true;
-	}
-	if (autoSwitchOnEnd && !endReached && pastLastFrame) {
 		endReached = true;
 	}
 	return ret;

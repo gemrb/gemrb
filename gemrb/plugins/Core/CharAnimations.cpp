@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.51 2005/04/05 19:21:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.52 2005/04/06 21:43:41 avenger_teambg Exp $
  *
  */
 
@@ -195,6 +195,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 {
 	Colors = NULL;
 	nextStanceID = 0;
+	autoSwitchOnEnd = false;
 	if (!AvatarsCount) {
 		InitAvatarsTable();
 	}
@@ -322,7 +323,7 @@ IE_ANI_PST_GHOST:	This is a special animation with no standard.
 
 
   WEST PART  |  EAST PART
-             |
+	     |
     NW  NNW  N  NNE  NE
  NW 006 007 008 009 010 NE
 WNW 005      |      011 ENE
@@ -330,8 +331,8 @@ WNW 005      |      011 ENE
 WSW 003      |      013 ESE
  SW 002 001 000 015 014 SE
     SW  SSW  S  SSE  SE
-             |
-             |
+	     |
+	     |
 
 */
 
@@ -359,7 +360,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			//fallthrough
 		case IE_ANI_PST_ANIMATION_1:
 			//pst animations don't twitch on death
-			if (StanceID==IE_ANI_DIE) {
+			if (StanceID==IE_ANI_TWITCH) {
 				StanceID=IE_ANI_SLEEP;
 			}
 			break;
@@ -390,14 +391,18 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 	SetupColors( a );
 
 	//setting up the sequencing of animation cycles
+	autoSwitchOnEnd = false;
 	switch (StanceID) {
 		case IE_ANI_SLEEP:
-		case IE_ANI_TWITCH:
 			a->Flags |= A_ANI_PLAYONCE;
+			break;
+		case IE_ANI_TWITCH:
+			nextStanceID = IE_ANI_SLEEP;
+			autoSwitchOnEnd = true;
 			break;
 		case IE_ANI_DIE:
 			nextStanceID = IE_ANI_TWITCH;
-			a->autoSwitchOnEnd = true;
+			autoSwitchOnEnd = true;
 			break;
 		case IE_ANI_WALK:
 		case IE_ANI_RUN:
@@ -408,7 +413,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			break;
 		default:
 			nextStanceID = IE_ANI_AWAKE;
-			a->autoSwitchOnEnd = true;
+			autoSwitchOnEnd = true;
 			break;
 	}
 	switch (GetAnimType()) {
@@ -514,12 +519,15 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 			break;
 
 		case IE_ANI_TWO_FILES: 
+			AddTwoFileSuffix(ResRef, StanceID, Cycle, Orient );
 			//we have to fix this
+			/*
 			Cycle = StanceID * 8 + Orient / 2;
 			strcat( ResRef, "G1" );
 			if (Orient > 9) {
 				strcat( ResRef, "E" );
 			}
+			*/
 			break;
 
 		case IE_ANI_FOUR_FILES:
@@ -886,6 +894,37 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 	}
 	if (Orient>=5) {
+		strcat( ResRef, "E" );
+	}
+}
+
+void CharAnimations::AddTwoFileSuffix( char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	switch(StanceID) {
+		case IE_ANI_HEAD_TURN:
+			Cycle = 16 + Orient / 2;
+			break;
+		case IE_ANI_DAMAGE:
+			Cycle = 24 + Orient / 2;
+			break;
+		case IE_ANI_SLEEP:
+		case IE_ANI_TWITCH:
+			Cycle = 40 + Orient / 2;
+			break;
+		case IE_ANI_GET_UP:
+		case IE_ANI_DIE:
+			Cycle = 32 + Orient / 2;
+			break;
+		case IE_ANI_WALK:
+			Cycle = Orient / 2;
+			break;
+		default:
+			Cycle = 8 + Orient / 2;
+			break;
+	}
+	strcat( ResRef, "G1" );
+	if (Orient > 9) {
 		strcat( ResRef, "E" );
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.96 2005/04/03 21:00:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.97 2005/04/06 21:43:41 avenger_teambg Exp $
  *
  */
 
@@ -281,6 +281,55 @@ void Actor::SetCircleSize()
 	SetCircle( anims->GetCircleSize(), *color );
 }
 
+void pcf_animid(Actor *actor, ieDword Value)
+{
+	actor->SetAnimationID(Value);
+}
+
+void pcf_hitpoint(Actor *actor, ieDword Value)
+{
+	if ((signed) Value<=0) {
+		actor->Die(NULL);
+	}
+	if ((signed) Value>(signed) actor->Modified[IE_MAXHITPOINTS]) {
+		actor->Modified[IE_HITPOINTS]=actor->Modified[IE_MAXHITPOINTS];
+	}
+}
+
+void pcf_maxhitpoint(Actor *actor, ieDword Value)
+{
+	if ((signed) Value<=0) {
+		actor->Die(NULL);
+	}
+	if ((signed) Value<(signed) actor->Modified[IE_HITPOINTS]) {
+		actor->Modified[IE_HITPOINTS]=actor->Modified[IE_MAXHITPOINTS];
+	}
+}
+
+void pcf_stat(Actor *actor, ieDword Value)
+{
+	if ((signed) Value<=0) {
+		actor->Die(NULL);
+	}
+}
+
+void pcf_gold(Actor *actor, ieDword Value)
+{
+	if (actor->InParty) {
+		Game *game = core->GetGame();
+		game->PartyGold += Value;
+		if (game->PartyGold > 0x80000000) {
+			game->PartyGold = 0;
+		}
+		actor->Modified[IE_GOLD]=0;
+	}
+}
+
+void pcf_color(Actor *actor, ieDword /*Value*/)
+{
+	actor->GetAnims()->SetColors(actor->Modified+IE_COLORS);
+}
+
 static int maximum_values[256]={
 255,255,20,100,100,100,100,25,5,25,25,25,25,25,100,100,//0f
 100,100,100,100,100,100,100,100,100,200,200,200,200,200,100,100,//1f
@@ -300,6 +349,42 @@ static int maximum_values[256]={
 255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255//ff
 };
 
+typedef void (*PostChangeFunctionType)(Actor *actor, ieDword Value);
+static PostChangeFunctionType post_change_functions[256]={
+pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //1f
+NULL,NULL,NULL,NULL, pcf_stat, NULL, pcf_stat, pcf_stat,
+pcf_stat,pcf_stat,NULL,NULL, NULL, pcf_gold, NULL, NULL, //2f
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //3f
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //4f
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //5f
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //6f
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //7f
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //8f
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //9f
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, 
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, pcf_animid, NULL, //cf
+pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //df
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //ef
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
+};
+
 bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 {
 	if (StatIndex >= MAX_STATS) {
@@ -316,10 +401,16 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 		}
 	}
 	Modified[StatIndex] = Value;
+	PostChangeFunctionType f = post_change_functions[StatIndex];
+	if (f) (*f)(this, Value);
+/*
 	switch (StatIndex) {
 		case IE_GOLD:
 			if (InParty) {
 				core->GetGame()->PartyGold+=Modified[IE_GOLD];
+				if (core->GetGame()->PartyGold>0x80000000) {
+					core->GetGame()->PartyGold = 0;
+				}
 				Modified[IE_GOLD]=0;
 			}
 			break;
@@ -340,8 +431,11 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 		case IE_MORALEBREAK:
 			SetCircleSize();
 			break;
+		case IE_MAXHITPOINTS:
+			Modified[IE_MAXHITPOINTS]+=GetHPMod();
+			break;
 		case IE_HITPOINTS:
-			if (GetHPMod()+(signed) Value<=0) {
+			if ((signed) Value<=0) {
 				Die(NULL);
 			}
 			if ((signed) Value>(signed) Modified[IE_MAXHITPOINTS]) {
@@ -349,6 +443,7 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 			}
 			break;
 	}
+*/
 	return true;
 }
 

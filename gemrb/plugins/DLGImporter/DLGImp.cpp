@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.16 2005/03/09 22:32:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.17 2005/04/06 21:43:44 avenger_teambg Exp $
  *
  */
 
@@ -89,14 +89,17 @@ Dialog* DLGImp::GetDialog()
 	}
 	Dialog* d = new Dialog();
 	d->Flags = Flags;
+	d->TopLevelCount = StatesCount;
+	d->Order = (unsigned int *) calloc (StatesCount, sizeof(unsigned int *) );
+	d->initialStates = (DialogState **) calloc (StatesCount, sizeof(DialogState *) );
 	for (unsigned int i = 0; i < StatesCount; i++) {
-		DialogState* ds = GetDialogState( i );
-		d->AddState( ds );
+		DialogState* ds = GetDialogState( d, i );
+		d->initialStates[i] = ds;
 	}
 	return d;
 }
 
-DialogState* DLGImp::GetDialogState(unsigned int index)
+DialogState* DLGImp::GetDialogState(Dialog *d, unsigned int index)
 {
 	DialogState* ds = new DialogState();
 	//16 = sizeof(State)
@@ -109,6 +112,8 @@ DialogState* DLGImp::GetDialogState(unsigned int index)
 	str->ReadDword( &TriggerIndex );
 	ds->trigger = GetStateTrigger( TriggerIndex );
 	ds->transitions = GetTransitions( FirstTransitionIndex, ds->transitionsCount );
+	if (TriggerIndex<StatesCount)
+		d->Order[TriggerIndex] = index;
 	return ds;
 }
 

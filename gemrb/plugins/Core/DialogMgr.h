@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DialogMgr.h,v 1.4 2004/03/27 13:05:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DialogMgr.h,v 1.5 2005/04/06 21:43:41 avenger_teambg Exp $
  *
  */
 
@@ -44,7 +44,6 @@ public:
 	virtual ~DialogMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	virtual Dialog* GetDialog() = 0;
-	virtual DialogState* GetDialogState(unsigned int index) = 0;
 };
 
 #endif

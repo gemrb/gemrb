@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.10 2005/03/05 10:31:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.11 2005/04/06 21:43:41 avenger_teambg Exp $
  *
  */
 
@@ -25,28 +25,28 @@
 
 Dialog::Dialog(void)
 {
+	TopLevelCount = 0;
 }
 
 Dialog::~Dialog(void)
 {
-	for (unsigned int i = 0; i < initialStates.size(); i++) {
-		if (initialStates[i]) {
-			FreeDialogState( initialStates[i] );
+	if (initialStates) {
+		for (unsigned int i = 0; i < TopLevelCount; i++) {
+			if (initialStates[i]) {
+				FreeDialogState( initialStates[i] );
+			}
 		}
+		free(initialStates);
 	}
-}
-
-void Dialog::AddState(DialogState* ds)
-{
-	initialStates.push_back( ds );
+	if (Order) free(Order);
 }
 
 DialogState* Dialog::GetState(unsigned int index)
 {
-	if (index >= initialStates.size()) {
+	if (index >= TopLevelCount) {
 		return NULL;
 	}
-	return initialStates.at( index );
+	return initialStates[index];
 }
 
 void Dialog::FreeDialogState(DialogState* ds)
@@ -78,9 +78,9 @@ void Dialog::FreeDialogString(DialogString* ds)
 
 int Dialog::FindFirstState(Scriptable* target)
 {
-	for (unsigned int i = 0; i < initialStates.size(); i++) {
-		if (EvaluateDialogTrigger( target, GetState( i )->trigger )) {
-			return i;
+	for (unsigned int i = 0; i < TopLevelCount; i++) {
+		if (EvaluateDialogTrigger( target, GetState( Order[i] )->trigger )) {
+			return Order[i];
 		}
 	}
 	return -1;
@@ -89,7 +89,7 @@ int Dialog::FindFirstState(Scriptable* target)
 int Dialog::FindRandomState(Scriptable* target)
 {
 	unsigned int i;
-	unsigned int max = initialStates.size();
+	unsigned int max = TopLevelCount;
 	if (!max) return -1;
 	unsigned int pick = rand()%max;
 	for (i=pick; i < max; i++) {
@@ -130,10 +130,10 @@ bool Dialog::EvaluateDialogTrigger(Scriptable* target, DialogString* trigger)
 			result = subresult ? 1 : 0;
 		}
 		if (!result)
-			return 0;
+			return false;
 	}
 	if (ORcount) {
 		printf( "[Dialog]: Unfinished OR block encountered!\n" );
 	}
-	return 1;
+	return true;
 }

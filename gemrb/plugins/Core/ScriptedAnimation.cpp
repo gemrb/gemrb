@@ -69,8 +69,12 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 	anims[1] = af->GetCycle( ( unsigned char ) seq2 );
 	XPos += p.x;
 	YPos += p.y;
-	if (anims[0]) {
-		anims[0]->autoSwitchOnEnd = true;
+	if (anims[1]) {
+		autoSwitchOnEnd = true;
+	} else {
+		autoSwitchOnEnd = false;
+	}
+	if(anims[0]) {
 		anims[0]->pos = 0;
 	}
 	justCreated = true;

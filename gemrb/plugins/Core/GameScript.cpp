@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.254 2005/04/03 21:00:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.255 2005/04/06 21:43:42 avenger_teambg Exp $
  *
  */
 
@@ -6833,11 +6833,18 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			gc->DialogueFlags|=DF_TALKCOUNT;
 		}
 
-		if ( (tar->Type != ST_ACTOR) || ( ((Actor *) tar)->InParty!=1) ) {
-			gc->InitDialog( (Actor *) tar, (Actor *) scr, Dialog );
+		//making sure speaker is the protagonist, player, actor
+		bool swap = false;
+		if (scr->Type != ST_ACTOR) swap = true;
+		else if (tar->Type == ST_ACTOR) {
+			if ( ((Actor *) tar)->InParty == 1) swap = true;
+			else if ( (((Actor *) scr)->InParty !=1) && ((Actor *) tar)->InParty) swap = true;
+		}
+		if ( swap ) {
+			gc->InitDialog( (Actor *) tar, scr, Dialog );
 		}
 		else {
-			gc->InitDialog( (Actor *) scr, (Actor *) tar, Dialog );
+			gc->InitDialog( (Actor *) scr, tar, Dialog );
 		}
 	}
 }

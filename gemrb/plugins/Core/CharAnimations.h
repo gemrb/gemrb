@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.32 2005/04/01 18:48:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.33 2005/04/06 21:43:41 avenger_teambg Exp $
  *
  */
 
@@ -120,6 +120,7 @@ public:
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
 	unsigned char nextStanceID;
+	bool autoSwitchOnEnd;
 public:
 	CharAnimations(unsigned int AnimID, ieDword ArmourLevel);
 	~CharAnimations(void);
@@ -149,6 +150,8 @@ private:
 	void AddMHRSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddMMRSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void AddTwoFileSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddLRSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);

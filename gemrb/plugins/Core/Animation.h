@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.17 2005/04/01 18:48:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.18 2005/04/06 21:43:41 avenger_teambg Exp $
  *
  */
 
@@ -46,10 +46,8 @@ private:
 	unsigned int indicesCount;
 	unsigned int startpos;
 	unsigned long starttime;
-	bool pastLastFrame;
 public:
 	char *ScriptName;
-	bool autoSwitchOnEnd;
 	bool endReached;
 	unsigned int pos;
 	bool autofree;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.62 2005/04/03 21:00:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.63 2005/04/06 21:43:42 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -129,7 +129,8 @@ private:
 	DialogState* ds;
 	Dialog* dlg;
 public:
-	Actor* speaker, * target;
+	Actor* speaker;
+	Scriptable* target;
 	int DialogueFlags;
 public:
 	void DeselectAll();
@@ -143,7 +144,7 @@ public:
 	void HandleDoor(Door *door, Actor *actor);
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor);
 	void MoveToPointFormation(Actor *actor, Point p, int Orient);
-	void InitDialog(Actor* speaker, Actor* target, const char* dlgref);
+	void InitDialog(Actor* speaker, Scriptable* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
 	void DisplayString(Scriptable* target);

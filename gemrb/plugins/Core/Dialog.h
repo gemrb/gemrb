@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.16 2005/03/09 22:32:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.17 2005/04/06 21:43:41 avenger_teambg Exp $
  *
  */
 
@@ -66,6 +66,7 @@ typedef struct DialogState {
 	DialogTransition** transitions;
 	unsigned int transitionsCount;
 	DialogString* trigger;
+	unsigned int weight;
 } DialogState;
 
 class GEM_EXPORT Dialog {
@@ -73,7 +74,6 @@ public:
 	Dialog(void);
 	~Dialog(void);
 private:
-	std::vector< DialogState*> initialStates;
 
 	void FreeDialogState(DialogState* ds);
 	void FreeDialogString(DialogString* ds);
@@ -84,10 +84,6 @@ public:
 	int FindRandomState(Scriptable* target);
 	bool EvaluateDialogTrigger(Scriptable* target, DialogString* trigger);
 
-	int StateCount()
-	{
-		return (int)initialStates.size();
-	}
 	void Release()
 	{
 		delete this;
@@ -95,6 +91,9 @@ public:
 public:
 	ieResRef ResRef;
 	ieDword Flags; //freeze flags (bg2)
+	unsigned int TopLevelCount;
+	ieDword* Order;
+	DialogState** initialStates;
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.149 2005/04/05 19:21:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.150 2005/04/06 21:43:43 avenger_teambg Exp $
  *
  */
 
@@ -584,9 +584,9 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 					Color tint = LightMap->GetPixel( cx / 16, cy / 12);
 					tint.a = 255-Trans;
 					video->BlitSpriteTinted( nextFrame, cx + viewport.x, cy + viewport.y, tint, anim->Palette, &Screen );
-					if (anim->endReached && anim->autoSwitchOnEnd && ca->nextStanceID) {
-						actor->SetStance( ca->nextStanceID );
+					if (anim->endReached && ca->autoSwitchOnEnd) {
 						anim->endReached = false;
+						actor->SetStance( ca->nextStanceID );
 					}
 				}
 			}

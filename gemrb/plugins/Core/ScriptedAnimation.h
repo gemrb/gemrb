@@ -36,6 +36,7 @@ public:
 	ieDword FaceTarget;
 	ieResRef Sounds[2];
 	bool justCreated;
+	bool autoSwitchOnEnd;
 private:
 	void PrepareBAM(DataStream* stream, Point &p);
 };
