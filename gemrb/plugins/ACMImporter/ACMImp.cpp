@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.51 2004/08/12 16:00:41 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.52 2004/08/12 23:26:38 edheldil Exp $
  *
  */
 
@@ -161,13 +161,8 @@ int ACMImp::PlayListManager(void* data)
 				case AL_PLAYING:
 					break;
 			}
-			unsigned long volume;
-			if (!core->GetDictionary()->Lookup( "Volume Music", volume )) {
-				core->GetDictionary()->SetAt( "Volume Music", 100 );
-				volume = 100;
-			}
 			ALint processed;
-			alSourcef( MusicSource, AL_GAIN, ( volume / 100.0f ) );
+			alSourcef( MusicSource, AL_GAIN, ( core->VolumeMusic / 100.0f ) );
 			alGetSourcei( MusicSource, AL_BUFFERS_PROCESSED, &processed );
 			if (processed > 0) {
 				buffersreturned += processed;

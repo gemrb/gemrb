@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.196 2004/08/12 22:38:42 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.197 2004/08/12 23:26:38 edheldil Exp $
  *
  */
 
@@ -114,6 +114,11 @@ Interface::Interface(int iargc, char** iargv)
 	SkipIntroVideos = false;
 	DrawFPS = false;
 	TooltipDelay = 100;
+	VolumeAmbients = 100;
+	VolumeMovie = 100;
+	VolumeMusic = 100;
+	VolumeSFX = 100;
+	VolumeVoices = 100;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
 	SavePath[0] = 0;
@@ -900,6 +905,16 @@ bool Interface::LoadConfig(const char* filename)
 			EnableCheatKeys ( atoi( value ) );
 		} else if (stricmp( name, "CaseSensitive" ) == 0) {
 			CaseSensitive = ( atoi( value ) == 0 ) ? false : true;
+		} else if (stricmp( name, "VolumeAmbients" ) == 0) {
+			VolumeAmbients = atoi( value );
+		} else if (stricmp( name, "VolumeMovie" ) == 0) {
+			VolumeMovie = atoi( value );
+		} else if (stricmp( name, "VolumeMusic" ) == 0) {
+			VolumeMusic = atoi( value );
+		} else if (stricmp( name, "VolumeSFX" ) == 0) {
+			VolumeSFX = atoi( value );
+		} else if (stricmp( name, "VolumeVoices" ) == 0) {
+			VolumeVoices = atoi( value );
 		} else if (stricmp( name, "GameOnCD" ) == 0) {
 			GameOnCD = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "TooltipDelay" ) == 0) {

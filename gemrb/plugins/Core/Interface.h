@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.108 2004/08/10 17:13:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.109 2004/08/12 23:26:38 edheldil Exp $
  *
  */
 
@@ -384,6 +384,11 @@ public:
 	int Width, Height, Bpp, ForceStereo;
 	unsigned int TooltipDelay;
 	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
+	unsigned int VolumeAmbients;
+	unsigned int VolumeMovie;
+	unsigned int VolumeMusic;
+	unsigned int VolumeSFX;
+	unsigned int VolumeVoices;
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);
 	/** Sends a termination signal to the Video Driver */
