@@ -1455,7 +1455,32 @@ static PyObject *GemRB_Roll(PyObject */*self*/, PyObject *args)
 	return Py_BuildValue("i",core->Roll(Dice, Size, Add) );
 }
 
+static PyObject *GemRB_GetINIPartyCount(PyObject */*self*/, PyObject *args)
+{
+	if(!core->GetPartyINI())
+		return NULL;
+	return Py_BuildValue("i",core->GetPartyINI()->GetTagsCount() );
+}
+
+static PyObject *GemRB_GetINIPartyKey(PyObject */*self*/, PyObject *args)
+{
+	char * Tag, * Key, * Default;
+	if(!PyArg_ParseTuple(args, "sss", &Tag, &Key, &Default) ) {
+		printMessage("GUIScript","Syntax Error: GetINIPartyKey(Tag, Key, Default)\n", LIGHT_RED);
+		return NULL;
+	}
+	if(!core->GetPartyINI())
+		return NULL;
+	return Py_BuildValue("s",core->GetPartyINI()->GetKeyAsString(Tag, Key, Default) );
+}
+
 static PyMethodDef GemRBMethods[] = {
+    {"GetINIPartyCount", GemRB_GetINIPartyCount, METH_NOARGS,
+     "Returns the Number of Party defined in Party.ini (works only on IWD2)."},
+
+    {"GetINIPartyKey", GemRB_GetINIPartyKey, METH_VARARGS,
+     "Returns a Value from the Party.ini File (works only on IWD2)."},
+
     {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
 
