@@ -5,11 +5,11 @@
 
 dnl Initialize autoconf and automake
 
-AC_PREREQ(2.57)
+AC_PREREQ([2.57])
 AC_INIT
-AC_CONFIG_SRCDIR([gemrb/GemRB.cpp])
 AC_CONFIG_AUX_DIR([admin])
-AC_CANONICAL_TARGET([])
+AC_CONFIG_SRCDIR([gemrb/GemRB.cpp])
+AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE([gemrb],[0.2.2.9])
 AM_CONFIG_HEADER([config.h])
 
@@ -25,7 +25,6 @@ AC_PROG_INSTALL
 AC_LIBTOOL_DLOPEN
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
-#AC_PROG_RANLIB
 
 AC_LANG([C++])
 
@@ -95,6 +94,7 @@ AC_CHECK_FUNCS([gettimeofday])
 AC_CHECK_FUNCS([memchr])
 AC_CHECK_FUNCS([memmove])
 AC_CHECK_FUNCS([memset])
+AC_CHECK_FUNCS([mkdir])
 AC_CHECK_FUNCS([rmdir])
 AC_CHECK_FUNCS([sqrt])
 AC_CHECK_FUNCS([strcasecmp])
@@ -113,8 +113,6 @@ AC_CHECK_HEADERS([sys/time.h])
 AC_CHECK_HEADERS([sys/stat.h])
 AC_CHECK_LIB(dl, dlopen, [LIBDL="-ldl"], [LIBDL=""])
 AC_SUBST(LIBDL)
-#AC_CHECK_LIB(pthread, pthread_create, [LIBPTHREAD="-lpthread"], [LIBPTHREAD="-lc_r"])
-#AC_SUBST(LIBPTHREAD)
 
 AC_CHECK_PTHREADS
 
@@ -138,14 +136,13 @@ AC_STRUCT_TM
 AC_TYPE_SIZE_T
 
 CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATADIR=\\\"\$(moddir)\\\" -DPLUGINDIR=\\\"\$(plugindir)\\\""
-#CFLAGS="$CFLAGS -Werror -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wcast-qual -Wwrite-strings -Wshadow -Wcast-align -ansi -pedantic -Wbad-function-cast -Winline -Wnested-externs -Wno-format-y2k -Wno-long-long"
+#CiXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wcast-qual -Wwrite-strings -Wshadow -Wcast-align -ansi -pedantic -Wbad-function-cast -Winline -Wnested-externs -Wno-format-y2k -Wno-long-long"
 CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wcast-align -ansi -pedantic -Wno-format-y2k -Wno-long-long -Wno-unused-parameter"
-#LIBS="$LIBS"
-#LDFLAGS="$LDFLAGS $LIBS"
 
 AC_SUBST(LIBS)
 
-AC_CONFIG_FILES([Makefile
+AC_CONFIG_FILES([
+Makefile
 gemrb/Makefile 
 gemrb/Config/Makefile 
 gemrb/includes/Makefile 
