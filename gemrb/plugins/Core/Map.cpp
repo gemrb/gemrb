@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.7 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.8 2003/11/25 16:46:31 balrog994 Exp $
  *
  */
 
@@ -61,8 +61,17 @@ void Map::DrawMap(Region viewport)
 		if(!ca)
 			continue;
 		Animation * anim = ca->GetAnimation(actors[i].AnimID, actors[i].Orientation);
-		if(anim)
-			video->BlitSprite(anim->NextFrame(), actors[i].XPos, actors[i].YPos);
+		if(anim) {
+			Sprite2D * nextFrame = anim->NextFrame();
+			if(actors[i].lastFrame != nextFrame) {
+				actors[i].MinX = actors[i].XPos-nextFrame->XPos;
+				actors[i].MaxX = actors[i].MinX+nextFrame->Width;
+				actors[i].MinY = actors[i].YPos-nextFrame->YPos;
+				actors[i].MaxY = actors[i].MinY+nextFrame->Width;
+				actors[i].lastFrame = nextFrame;
+			}
+			video->BlitSprite(nextFrame, actors[i].XPos, actors[i].YPos);
+		}
 	}
 }
 
@@ -73,5 +82,30 @@ void Map::AddAnimation(Animation * anim)
 
 void Map::AddActor(ActorBlock actor)
 {
+	CharAnimations * ca = actor.actor->GetAnims();
+	if(ca) {
+		Animation * anim = ca->GetAnimation(actor.AnimID, actor.Orientation);
+		Sprite2D * nextFrame = anim->NextFrame();
+		if(actor.lastFrame != nextFrame) {
+			actor.MinX = actor.XPos-nextFrame->XPos;
+			actor.MaxX = actor.MinX+nextFrame->Width;
+			actor.MinY = actor.YPos-nextFrame->YPos;
+			actor.MaxY = actor.MinY+nextFrame->Width;
+			actor.lastFrame = nextFrame;
+		}
+	}
 	actors.push_back(actor);
+}
+
+Actor * Map::GetActor(int x, int y)
+{
+	for(int i = 0; i < actors.size(); i++) {
+		ActorBlock actor = actors[i];
+		if((actor.MinX > x) || (actor.MinY > y))
+			continue;
+		if((actor.MaxX < x) || (actor.MaxY < y))
+			continue;
+		return actor.actor;
+	}
+	return NULL;
 }

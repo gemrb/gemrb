@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.4 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.5 2003/11/25 16:46:31 balrog994 Exp $
  *
  */
 
@@ -40,8 +40,10 @@
 typedef struct ActorBlock {
 	unsigned short XPos, YPos;
 	unsigned short XDes, YDes;
+	unsigned short MinX, MaxX, MinY, MaxY;
 	unsigned char Orientation;
 	unsigned char AnimID;
+	Sprite2D * lastFrame;
 	Actor * actor;
 } ActorBlock;
 
@@ -58,6 +60,7 @@ public:
 	void DrawMap(Region viewport);
 	void AddAnimation(Animation * anim);
 	void AddActor(ActorBlock actor);
+	Actor * GetActor(int x, int y);
 };
 
 #endif
