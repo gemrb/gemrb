@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.cpp,v 1.2 2003/12/04 22:38:49 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IEScript/Attic/IEScript.cpp,v 1.3 2003/12/04 23:12:11 balrog994 Exp $
  *
  */
 
@@ -31,6 +31,7 @@ int fadeFromCounter, fadeFromMax;
 int waitCounter;
 int cutSceneIndex;
 ActorBlock * cutSceneActor;
+ActorBlock * moveToPointActor;
 
 IEScript::IEScript(void)
 {
@@ -67,6 +68,7 @@ IEScript::IEScript(void)
 	fadeFromMax = 0;
 	waitCounter = 0;
 	cutSceneActor = NULL;
+	moveToPointActor = NULL;
 	cutSceneIndex = -1;
 	Continue = false;
 }
@@ -179,7 +181,7 @@ restart:
 		core->GetVideoDriver()->SetFadePercent(((fadeFromMax-fadeFromCounter)*100)/fadeFromMax);
 		fadeFromCounter++;
 	}
-	if(cutSceneActor && cutSceneActor->path)
+	if(moveToPointActor && moveToPointActor->path)
 		return;
 	if(waitCounter) {
 		waitCounter--;
@@ -430,6 +432,7 @@ ActorBlock * IEScript::GetActorFromObject(Object * oC)
 	//TODO: Implement Object Retieval
 
 	if(oC->objectName[0] != 0) {
+		printf("ActionOverride on %s\n", oC->objectName);
 		Map * map = core->GetGame()->GetMap(0);
 		return map->GetActor(oC->objectName);
 	}
@@ -566,6 +569,7 @@ void IEScript::MoveToPoint(Script * Sender, Action * parameters)
 	if(actor) {
 		actor->path = core->GetPathFinder()->FindPath(actor->XPos, actor->YPos, parameters->XpointParameter, parameters->YpointParameter);
 		actor->step = NULL;
+		moveToPointActor = actor;
 	}
 }
 
@@ -584,7 +588,7 @@ void IEScript::DisplayStringHead(Script * Sender, Action * parameters)
 		gettimeofday(&tv, NULL);
 		unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
 #endif
-		cutSceneActor->timeStartDisplaying = time;
-		cutSceneActor->textDisplaying = 1;
+		actor->timeStartDisplaying = time;
+		actor->textDisplaying = 1;
 	}
 }
