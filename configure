@@ -4272,6 +4272,7 @@ gemrb/plugins/BAMImporter/Makefile \
 gemrb/plugins/BG2HCAnim/Makefile \
 gemrb/plugins/BIFImporter/Makefile \
 gemrb/plugins/BMPImporter/Makefile \
+gemrb/plugins/PLTImporter/Makefile \
 gemrb/plugins/CHUImporter/Makefile \
 gemrb/plugins/Core/Makefile \
 gemrb/plugins/CREImporter/Makefile \
@@ -4431,6 +4432,7 @@ gemrb/plugins/BAMImporter/Makefile \
 gemrb/plugins/BG2HCAnim/Makefile \
 gemrb/plugins/BIFImporter/Makefile \
 gemrb/plugins/BMPImporter/Makefile \
+gemrb/plugins/PLTImporter/Makefile \
 gemrb/plugins/CHUImporter/Makefile \
 gemrb/plugins/Core/Makefile \
 gemrb/plugins/CREImporter/Makefile \
