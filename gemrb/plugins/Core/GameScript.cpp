@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.200 2004/10/09 15:27:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.201 2004/10/09 16:49:43 avenger_teambg Exp $
  *
  */
 
@@ -399,6 +399,7 @@ static ActionLink actionnames[] = {
 	{"moveglobal", GameScript::MoveGlobal,0}, 
 	{"moveglobalobject", GameScript::MoveGlobalObject,0}, 
 	{"moveglobalobjectoffscreen", GameScript::MoveGlobalObjectOffScreen,0},
+	{"moveglobalsto", GameScript::MoveGlobalsTo,0}, 
 	{"movetocenterofscreen", GameScript::MoveToCenterOfScreen,AF_BLOCKING},
 	{"movetoobject", GameScript::MoveToObject,AF_BLOCKING},
 	{"movetoobjectnointerrupt", GameScript::MoveToObjectNoInterrupt,AF_BLOCKING},
@@ -526,6 +527,7 @@ static ActionLink actionnames[] = {
 	{"takepartyitem", GameScript::TakePartyItem,0},
 	{"takepartyitemall", GameScript::TakePartyItemAll,0},
 	{"takepartyitemnum", GameScript::TakePartyItemNum,0},
+	{"teleportparty", GameScript::TeleportParty,0}, 
 	{"textscreen", GameScript::TextScreen,0},
 	{"tomsstringdisplayer", GameScript::DisplayStringHead,0},
 	{"triggeractivation", GameScript::TriggerActivation,0},
@@ -5176,6 +5178,17 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 		CreateVisualEffectCore(Sender->Pos, parameters->string0Parameter);
 	}
 	MoveBetweenAreasCore( (Actor *) Sender, Area, tar->Pos, -1, true);
+}
+
+void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
+{
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *tar = game->GetPC(i);
+		MoveBetweenAreasCore( tar, parameters->string1Parameter, 
+			parameters->pointParameter, -1, true);
+	}
 }
 
 void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
