@@ -95,6 +95,6 @@ def CancelPress():
 
 def BackPress():
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("GUICG12") #appearance
+	GemRB.SetNextScript("CharGen") #appearance
 	return
 
