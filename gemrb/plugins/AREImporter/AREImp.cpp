@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.76 2004/10/12 16:47:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.77 2004/10/12 19:47:40 avenger_teambg Exp $
  *
  */
 
@@ -350,7 +350,8 @@ Map* AREImp::GetMap(const char *ResRef)
 	//Loading Containers
 	for (i = 0; i < ContainersCount; i++) {
 		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
-		ieWord Type, LockDiff, Locked, Unknown;
+		ieWord Type, LockDiff;
+		ieDword Flags;
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
 		ieWord XPos, YPos;
 		ieWord LaunchX, LaunchY;
@@ -362,8 +363,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadWord( &YPos );
 		str->ReadWord( &Type );
 		str->ReadWord( &LockDiff );
-		str->ReadWord( &Locked );
-		str->ReadWord( &Unknown );
+		str->ReadDword( &Flags );
 		str->ReadWord( &TrapDetDiff );
 		str->ReadWord( &TrapRemDiff );
 		str->ReadWord( &Trapped );
@@ -402,7 +402,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		c->Pos.x = XPos;
 		c->Pos.y = YPos;
 		c->LockDifficulty = LockDiff;
-		c->Locked = Locked;
+		c->Flags = Flags;
 		c->TrapDetectionDiff = TrapDetDiff;
 		c->TrapRemovalDiff = TrapRemDiff;
 		c->Trapped = Trapped;

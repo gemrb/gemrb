@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.205 2004/10/11 17:50:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.206 2004/10/12 19:47:39 avenger_teambg Exp $
  *
  */
 
@@ -133,6 +133,7 @@ static TriggerLink triggernames[] = {
 	{"hasiteminslot", GameScript::HasItemSlot,0},
 	{"haveanyspells", GameScript::HaveAnySpells,0},
 	{"havespell", GameScript::HaveSpell,0},    //these must be the same
+	{"havespellparty", GameScript::HaveSpellParty,0}, 
 	{"havespellres", GameScript::HaveSpell,0}, //they share the same ID
 	{"hitby", GameScript::HitBy,0},
 	{"hotkey", GameScript::HotKey,0},
@@ -285,6 +286,7 @@ static ActionLink actionnames[] = {
 	{"clearactions", GameScript::ClearActions,0},
 	{"clearallactions", GameScript::ClearAllActions,0},
 	{"closedoor", GameScript::CloseDoor,AF_BLOCKING},
+	{"containerenable", GameScript::ContainerEnable,0},
 	{"continue", GameScript::Continue,AF_INSTANT | AF_CONTINUE},
 	{"createcreature", GameScript::CreateCreature,0}, //point is relative to Sender
 	{"createcreatureatfeet", GameScript::CreateCreatureAtFeet,0}, 
@@ -4094,7 +4096,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		case ST_CONTAINER:
 		{
 			Container *cont = (Container *) tar;
-			return cont->Locked == parameters->int0Parameter;
+			return (int) (cont->Flags&CONT_LOCKED) == parameters->int0Parameter;
 		}
 		default:; //to remove a warning
 	}
@@ -4118,7 +4120,7 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 		case ST_CONTAINER:
 		{
 			Container *cont = (Container *) tar;
-			return !!cont->Locked;
+			return !!(cont->Flags&CONT_LOCKED);
 		}
 		default:; //to remove a warning
 	}
@@ -6297,7 +6299,7 @@ static Point &FindNearPoint(Scriptable* Sender, Point &p1, Point &p2, double& di
 
 void GameScript::Lock(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = core->GetGame()->GetCurrentMap( )->tm->GetDoor( parameters->objects[1]->objectName );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->CurrentAction = NULL;
 		return;
@@ -6312,7 +6314,7 @@ void GameScript::Lock(Scriptable* Sender, Action* parameters)
 
 void GameScript::Unlock(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = core->GetGame()->GetCurrentMap( )->tm->GetDoor( parameters->objects[1]->objectName );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->CurrentAction = NULL;
 		return;
@@ -6327,7 +6329,7 @@ void GameScript::Unlock(Scriptable* Sender, Action* parameters)
 
 void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = core->GetGame()->GetCurrentMap( )->tm->GetDoor( parameters->objects[1]->objectName );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->CurrentAction = NULL;
 		return;
@@ -6369,7 +6371,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 
 void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = core->GetGame()->GetCurrentMap( )->tm->GetDoor( parameters->objects[1]->objectName );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->CurrentAction = NULL;
 		return;
@@ -6408,6 +6410,21 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		GoNearAndRetry(Sender, p);
 	}
 	Sender->CurrentAction = NULL;
+}
+
+void GameScript::ContainerEnable(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if( !tar || tar->Type!=ST_CONTAINER) {
+		return;
+	}
+	Container *cnt = (Container *) tar;
+	if(parameters->int0Parameter) {
+		cnt->Flags&=~CONT_DISABLED;
+	}
+	else {
+		cnt->Flags|=CONT_DISABLED;
+	}
 }
 
 void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust)

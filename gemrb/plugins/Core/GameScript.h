@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.146 2004/10/09 18:51:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.147 2004/10/12 19:47:39 avenger_teambg Exp $
  *
  */
 
@@ -984,6 +984,7 @@ public:
 	static void ClearActions(Scriptable* Sender, Action* parameters);
 	static void ClearAllActions(Scriptable* Sender, Action* parameters);
 	static void CloseDoor(Scriptable* Sender, Action* parameters);
+	static void ContainerEnable(Scriptable* Sender, Action* parameters);
 	static void Continue(Scriptable* Sender, Action* parameters);
 	static void CreateCreature(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureAtLocation(Scriptable* Sender, Action* parameters);

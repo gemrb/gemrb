@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.48 2004/10/09 15:27:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.49 2004/10/12 19:47:39 avenger_teambg Exp $
  *
  */
 
@@ -70,6 +70,11 @@ class Door;
 //door flags
 #define DOOR_CLOSED      1
 #define DOOR_LOCKED      2
+
+//container flags
+#define CONT_LOCKED      1
+#define CONT_RESET       8
+#define CONT_DISABLED    32
 
 #ifdef WIN32
 
@@ -241,7 +246,7 @@ public:
 	Point toOpen;
 	unsigned short Type;
 	unsigned short LockDifficulty;
-	unsigned short Locked;
+	unsigned int Flags;
 	unsigned short TrapDetectionDiff;
 	unsigned short TrapRemovalDiff;
 	unsigned short Trapped;
@@ -268,7 +273,7 @@ public:
 	char Name[33];
 	ieResRef Destination;
 	char EntranceName[33];
-	unsigned long Flags;
+	unsigned int Flags;
 	unsigned short TrapDetectionDifficulty;
 	unsigned short TrapRemovalDifficulty;
 //	unsigned short Trapped;
