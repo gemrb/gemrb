@@ -1,0 +1,11 @@
+GemRB v0.2.2.0 Added Features:
+- Major Bug Fixed: Never Freeing Plugin Instances
+- A fully working BG2 Character Generation GUI
+- Basic IWD/IWD2/BG1 GUI Implementation
+- Now you can Enter the Main Area after the Character Generation
+- Colored Characters
+- Basic Character Selection
+- Basic Door Manipulation (Open/Close state)
+- Minor Bug Fixes
+- Interactive Console
+and Much More.
