@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.28 2004/04/10 10:34:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.29 2004/04/11 01:11:15 edheldil Exp $
  *
  */
 
@@ -33,6 +33,7 @@ Game::Game(void)
 	PartyGold = 0;
 	SetScript( core->GlobalScript, 0 );
 	MapIndex = -1;
+	SelectedSingle = 0;
 }
 
 Game::~Game(void)
@@ -169,6 +170,19 @@ int Game::GetPartySize(bool onlyalive)
 		return count;
 	}
 	return PCs.size();
+}
+
+bool Game::SelectPCSingle(int index)
+{
+	if (index < 0 || index >= GetPartySize (false))
+		return false;
+
+	SelectedSingle = index;
+}
+
+int Game::GetSelectedPCSingle()
+{
+	return SelectedSingle;
 }
 
 int Game::GetPartyLevel(bool onlyalive)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.148 2004/04/06 18:44:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.149 2004/04/11 01:11:16 edheldil Exp $
  *
  */
 
@@ -2331,6 +2331,25 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 			core->GetPartyINI()->GetKeyAsString( Tag, Key, Default ) );
 }
 
+static PyObject* GemRB_GetActorByPartyID(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+
+	if (!PyArg_ParseTuple( args, "i", &PartyID )) {
+		printMessage( "GUIScript",
+			"Syntax Error: GetActorByPartyID(order)\n", LIGHT_RED );
+		return NULL;
+	}
+
+	int ActorSlot = core->FindPlayer( PartyID );
+	if (ActorSlot < 0) {
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
+	return Py_BuildValue( "i", ActorSlot );
+}
+
 static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 {
 	char* CreResRef;
@@ -2764,6 +2783,33 @@ static PyObject* GemRB_GetStoreRoomPrices(PyObject * /*self*/, PyObject* args)
 	return p;
 }
 
+static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
+{
+	int index;
+
+	if (!PyArg_ParseTuple( args, "i", &index )) {
+		printMessage( "GUIScript", "Syntax Error: GameSelectPCSingle(index)\n",
+			LIGHT_RED );
+		return NULL;
+	}
+
+	core->GetGame()->SelectPCSingle( index );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* args)
+{
+	if (!PyArg_ParseTuple( args, "", &index )) {
+		printMessage( "GUIScript", "Syntax Error: GameGetSelectedPCSingle()\n",
+			LIGHT_RED );
+		return NULL;
+	}
+
+	return Py_BuildValue( "i", core->GetGame()->GetSelectedPCSingle() );
+}
+
 
 
 static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
@@ -2975,6 +3021,8 @@ static PyMethodDef GemRBMethods[] = {
 	"Sets a savegame area preview bmp onto a button as picture."},
 	{"SetSaveGamePortrait", GemRB_SetSaveGamePortrait, METH_VARARGS,
 	"Sets a savegame PC portrait bmp onto a button as picture."},
+	{"GetActorByPartyID", GemRB_GetActorByPartyID, METH_VARARGS,
+	"Returns ActorSlot for PC specified by its PartyID."},
 	{"CreatePlayer", GemRB_CreatePlayer, METH_VARARGS,
 	"Creates a player slot."},
 	{"SetPlayerStat", GemRB_SetPlayerStat, METH_VARARGS,
@@ -2999,6 +3047,10 @@ static PyMethodDef GemRBMethods[] = {
 	"FIXME: temporary GetStoreName () ...."},
 	{"GetStoreRoomPrices", GemRB_GetStoreRoomPrices, METH_VARARGS,
 	"FIXME: temporary GetStoreRoomPrices () ...."},
+	{"GameSelectPCSingle", GemRB_GameSelectPCSingle, METH_VARARGS,
+	"Selects one PC in non-walk environment (i.e. in shops, inventory,...)"},
+	{"GameGetSelectedPCSingle", GemRB_GameGetSelectedPCSingle, METH_VARARGS,
+	"Get index of selected PC in non-walk environment (i.e. in shops, inventory,...)"},
 	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
 	"Invalidates the given Window."},
 	{"EnableCheatKeys", GemRB_EnableCheatKeys, METH_VARARGS,

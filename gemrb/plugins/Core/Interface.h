@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.85 2004/04/10 09:55:58 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.86 2004/04/11 01:11:15 edheldil Exp $
  *
  */
 
@@ -159,6 +159,8 @@ public:
 	int UnloadCreature(unsigned int Slot);
 	/** Returns the actor count */
 	int GetActorCount() { return actors.size(); };
+	/** Add the actor to the list of actors and returns its index */
+	int AddActor(Actor* actor);
 	/** Returns the actor pointer for Slot */
 	Actor *GetActor(unsigned int Slot);
 	/** Enters the premade actors (chargen PC's) into the game */

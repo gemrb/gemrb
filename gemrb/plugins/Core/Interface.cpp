@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.148 2004/04/10 09:55:58 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.149 2004/04/11 01:11:15 edheldil Exp $
  *
  */
 
@@ -1001,6 +1001,18 @@ int Interface::UnloadCreature(unsigned int Slot)
 	return 1;
 }
 
+int Interface::AddActor(Actor* actor)
+{
+	for (int index = 0; index < actors.size(); index++) {
+		if (!actors[index]) {
+			actors[index] = actor;
+			return index;
+		}
+	}
+	actors.push_back( actor );
+	return actors.size() - 1;
+}
+
 Actor* Interface::GetActor(unsigned int Slot)
 {
 	if (Slot >= actors.size()) {
@@ -1045,16 +1057,8 @@ int Interface::LoadCreature(char* ResRef, int InParty)
 		actor->AnimID = IE_ANI_SLEEP;
 	}
 	actor->Orientation = 0;
-	size_t index;
-	for (index = 0; index < actors.size(); index++) {
-		if (!actors[index]) {
-			break;
-		}
-	}
-	if (index == actors.size()) {
-		actors.push_back( actor );
-	}
-	return ( int ) index;
+
+	return AddActor( actor );
 }
 
 int Interface::FindPlayer(int PartySlotCount)

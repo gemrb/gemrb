@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.25 2004/04/05 22:20:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.26 2004/04/11 01:11:14 edheldil Exp $
  *
  */
 
@@ -61,6 +61,7 @@ public:
 	char Dialog[9];
 	char SmallPortrait[9];
 	char LargePortrait[9];
+	/** 0: NPC, 1-6 party slot */
 	unsigned char InParty;
 	char* LongName, * ShortName;
 	unsigned long StrRefs[100];

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.19 2004/04/06 17:25:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.20 2004/04/11 01:11:15 edheldil Exp $
  *
  */
 
@@ -166,6 +166,7 @@ Game* GAMImp::GetGame()
 		if (stricmp( actor->Area, newGame->CurrentArea ) == 0)
 			newMap->AddActor( actor );
 		newGame->SetPC( actor );
+		core->AddActor( actor );
 	}
 
 	//Loading NPCs
@@ -176,6 +177,7 @@ Game* GAMImp::GetGame()
 		if (stricmp( actor->Area, newGame->CurrentArea ) == 0)
 			newMap->AddActor( actor );
 		newGame->AddNPC( actor );
+		core->AddActor( actor );
 	}
 	core->FreeInterface( aM );
 
@@ -257,7 +259,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	actor->XPos = pcInfo.XPos;
 	actor->YPos = pcInfo.YPos;
 	actor->Orientation = pcInfo.Orientation;
-	actor->InParty = is_in_party;
+	actor->InParty = is_in_party ? (pcInfo.PartyOrder + 1) : 0;
 	actor->FromGame = true;
 	actor->AnimID = IE_ANI_AWAKE;
 	strcpy( actor->Area, pcInfo.Area );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.23 2004/04/06 17:55:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.24 2004/04/11 01:11:15 edheldil Exp $
  *
  */
 
@@ -90,6 +90,10 @@ public:
 	Variables* globals;
 	ieByte* familiars;
 	int MapIndex;
+
+	/** index of PC selected in non-walking environment (shops, inventory...) */
+	int SelectedSingle;
+
 public:
 	unsigned int GameTime;
 	unsigned short WhichFormation;
@@ -131,6 +135,10 @@ public:
 	int JoinParty(Actor* pc);
 	/* return current party size */
 	int GetPartySize(bool onlyalive);
+	/* select PC for non-walking environment (shops, inventory, ...) */
+	bool SelectPCSingle(int index);
+	/* get index of selected PC for non-walking env (shops, inventory, ...) */
+	int GetSelectedPCSingle();
 	/* return current party level count for xp calculations */
 	int GetPartyLevel(bool onlyalive);
 	/* removes actor from party (if in there) */
