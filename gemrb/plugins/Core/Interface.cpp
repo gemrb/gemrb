@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.80 2003/11/29 23:52:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.81 2003/11/30 00:39:21 balrog994 Exp $
  *
  */
 
@@ -257,7 +257,9 @@ int Interface::Init()
 			strncpy(fnt->ResRef, ResRef, 8);
 			if(needpalette) {
 				Color fore = {0xff, 0xff, 0xff, 0x00}, back = {0x00, 0x00, 0x00, 0x00};
-		                memcpy(fnt->GetPalette(),core->GetVideoDriver()->CreatePalette(fore, back), 256*sizeof(Color));
+				Color * pal = core->GetVideoDriver()->CreatePalette(fore, back);
+		        memcpy(fnt->GetPalette(), pal, 256*sizeof(Color));
+				free(pal);
 			}
 			fonts.push_back(fnt);
 		}
@@ -680,6 +682,14 @@ Font * Interface::GetFont(char * ResRef)
 	printf("[NOT FOUND]\n");
 	return NULL;
 }
+
+Font * Interface::GetFont(int index)
+{
+	if(index >= fonts.size())
+		return NULL;
+	return fonts[index];
+}
+
 Font * Interface::GetButtonFont()
 {
 	return GetFont(ButtonFont);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.47 2003/11/29 17:59:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.48 2003/11/30 00:39:21 balrog994 Exp $
  *
  */
 
@@ -130,6 +130,7 @@ public:
 	Color * GetPalette(int index, int colors);
 	/** Returns a preloaded Font */
 	Font * GetFont(char * ResRef);
+	Font * GetFont(int index);
 	/** Returns the button font */
 	Font * GetButtonFont();
 	/** Returns the Event Manager */
