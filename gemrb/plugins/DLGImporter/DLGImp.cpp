@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.12 2004/04/15 10:21:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.13 2004/08/02 21:41:04 guidoj Exp $
  *
  */
 
@@ -105,8 +105,8 @@ DialogState* DLGImp::GetDialogState(unsigned int index)
 	return ds;
 }
 
-DialogTransition** DLGImp::GetTransitions(unsigned long firstIndex,
-	unsigned long count)
+DialogTransition** DLGImp::GetTransitions(unsigned int firstIndex,
+	unsigned int count)
 {
 	DialogTransition** trans = ( DialogTransition** )
 		malloc( count*sizeof( DialogTransition* ) );
@@ -230,7 +230,7 @@ int GetActionLength(const char* string)
 
 /* this function will break up faulty script strings that lack the CRLF
    between commands, common in PST dialog */
-char** DLGImp::GetStrings(char* string, unsigned long& count)
+char** DLGImp::GetStrings(char* string, unsigned int& count)
 {
 	int col = 0;
 	int level = 0;

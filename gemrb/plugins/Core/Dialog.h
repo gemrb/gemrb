@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.11 2004/05/09 14:50:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.12 2004/08/02 21:41:03 guidoj Exp $
  *
  */
 
 #ifndef DIALOG_H
 #define DIALOG_H
 
+#include "../../includes/globals.h"
 #include <vector>
 
 #ifdef WIN32
@@ -47,23 +48,23 @@
 
 typedef struct DialogString {
 	char** strings;
-	unsigned long count;
+	unsigned int count;
 } DialogString;
 
 typedef struct DialogTransition {
-	unsigned long Flags;
-	unsigned long textStrRef;
-	unsigned long journalStrRef;
+	ieDword Flags;
+	ieStrRef textStrRef;
+	ieStrRef journalStrRef;
 	DialogString* trigger;
 	DialogString* action;
 	char Dialog[9];
-	unsigned long stateIndex;
+	ieDword stateIndex;
 } DialogTransition;
 
 typedef struct DialogState {
-	unsigned long StrRef;
+	ieStrRef StrRef;
 	DialogTransition** transitions;
-	unsigned long transitionsCount;
+	unsigned int transitionsCount;
 	DialogString* trigger;
 } DialogState;
 

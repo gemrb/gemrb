@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.h,v 1.6 2004/08/02 21:26:54 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.h,v 1.7 2004/08/02 21:41:04 guidoj Exp $
  *
  */
 
@@ -43,25 +43,25 @@ typedef struct Transition {
 } Transition;
 
 typedef struct VarOffset {
-	unsigned long Offset;
-	unsigned long Length;
+	ieDword Offset;
+	ieDword Length;
 } VarOffset;
 
 class DLGImp : public DialogMgr {
 private:
 	DataStream* str;
 	bool autoFree;
-	unsigned long StatesCount;
-	unsigned long StatesOffset;
-	unsigned long TransitionsCount;
-	unsigned long TransitionsOffset;
-	unsigned long StateTriggersCount;
-	unsigned long StateTriggersOffset;
-	unsigned long TransitionTriggersCount;
-	unsigned long TransitionTriggersOffset;
-	unsigned long ActionsCount;
-	unsigned long ActionsOffset;
-	unsigned long Version;
+	ieDword StatesCount;
+	ieDword StatesOffset;
+	ieDword TransitionsCount;
+	ieDword TransitionsOffset;
+	ieDword StateTriggersCount;
+	ieDword StateTriggersOffset;
+	ieDword TransitionTriggersCount;
+	ieDword TransitionTriggersOffset;
+	ieDword ActionsCount;
+	ieDword ActionsOffset;
+	ieDword Version;
 
 public:
 	DLGImp(void);
@@ -74,9 +74,9 @@ private:
 	DialogString* GetStateTrigger(unsigned int index);
 	DialogString* GetTransitionTrigger(unsigned int index);
 	DialogString* GetAction(unsigned int index);
-	char** GetStrings(char* string, unsigned long& count);
-	DialogTransition** GetTransitions(unsigned long firstIndex,
-		unsigned long count);
+	char** GetStrings(char* string, unsigned int& count);
+	DialogTransition** GetTransitions(unsigned int firstIndex,
+		unsigned int count);
 public:
 	void release(void)
 	{
