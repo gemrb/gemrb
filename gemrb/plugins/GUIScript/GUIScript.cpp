@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.149 2004/04/11 01:11:16 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.150 2004/04/13 22:24:59 doc_wagon Exp $
  *
  */
 
@@ -230,7 +230,7 @@ static PyObject* GemRB_SetTAAutoScroll(PyObject * /*self*/, PyObject* args)
 	if (ta->ControlType != IE_GUI_TEXTAREA) {
 		return NULL;
 	}
-	ta->AutoScroll = state;
+	ta->AutoScroll = ( state != 0 );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -1363,7 +1363,7 @@ static PyObject* GemRB_SetLabelUseRGB(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	Label* lab = ( Label* ) ctrl;
-	lab->useRGB = status;
+	lab->useRGB = ( status != 0 );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -2801,7 +2801,7 @@ static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 
 static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* args)
 {
-	if (!PyArg_ParseTuple( args, "", &index )) {
+	if (!PyArg_ParseTuple( args, "" )) {
 		printMessage( "GUIScript", "Syntax Error: GameGetSelectedPCSingle()\n",
 			LIGHT_RED );
 		return NULL;
