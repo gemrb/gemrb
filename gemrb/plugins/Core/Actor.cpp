@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.15 2003/11/29 17:12:20 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.16 2003/12/09 19:02:42 balrog994 Exp $
  *
  */
 
@@ -94,46 +94,86 @@ void Actor::SetAnimationID(unsigned short AnimID)
 		delete(anims);	
 	anims = new CharAnimations(BaseResRef, atoi(Orient), atoi(Mirror), RowIndex);
 
+	int palType = atoi(at->QueryField(RowIndex, 4));
+	
 	Color Pal[256];
-	Pal[0].r = 0x00; Pal[0].g = 0xff; Pal[0].b = 0x00; Pal[0].a = 0xff;
-	Pal[1].r = 0x00; Pal[1].g = 0x00; Pal[1].b = 0x00; Pal[1].a = 0xff;
-	Pal[2].r = 0xff; Pal[2].g = 0x80; Pal[2].b = 0x80; Pal[2].a = 0xff;
-	Pal[3].r = 0xff; Pal[3].g = 0x80; Pal[3].b = 0x80; Pal[3].a = 0xff;
-	Color * MetalPal   = core->GetPalette(BaseStats[IE_METAL_COLOR], 12);
-	Color * MinorPal   = core->GetPalette(BaseStats[IE_MINOR_COLOR], 12);
-	Color * MajorPal   = core->GetPalette(BaseStats[IE_MAJOR_COLOR], 12);
-	Color * SkinPal    = core->GetPalette(BaseStats[IE_SKIN_COLOR], 12);
-	Color * LeatherPal = core->GetPalette(BaseStats[IE_LEATHER_COLOR], 12);
-	Color * ArmorPal   = core->GetPalette(BaseStats[IE_ARMOR_COLOR], 12);
-	Color * HairPal    = core->GetPalette(BaseStats[IE_HAIR_COLOR], 12);
-	memcpy(&Pal[0x04], MetalPal,   12*sizeof(Color));
-	memcpy(&Pal[0x10], MinorPal,   12*sizeof(Color));
-	memcpy(&Pal[0x1C], MajorPal,   12*sizeof(Color));
-	memcpy(&Pal[0x28], SkinPal,    12*sizeof(Color));
-	memcpy(&Pal[0x34], LeatherPal, 12*sizeof(Color));
-	memcpy(&Pal[0x40], ArmorPal,   12*sizeof(Color));
-	memcpy(&Pal[0x4C], HairPal,    12*sizeof(Color));
-	//for(int i = 0x58; i < 0xFF; i+=0x08)
-	//	memcpy(&Pal[i], &MinorPal[1], 8*sizeof(Color));
-	memcpy(&Pal[0x58], &MinorPal[1], 8*sizeof(Color));
-	memcpy(&Pal[0x60], &MajorPal[1], 8*sizeof(Color));
-	memcpy(&Pal[0x68], &MinorPal[1], 8*sizeof(Color));
-	memcpy(&Pal[0x70], &MetalPal[1], 8*sizeof(Color));
-	memcpy(&Pal[0x78], &LeatherPal[1], 8*sizeof(Color));
-	memcpy(&Pal[0x80], &LeatherPal[1], 8*sizeof(Color));
-	memcpy(&Pal[0x88], &MinorPal[1], 8*sizeof(Color));
-	for(int i = 0x90; i < 0xA8; i+=0x08)
-		memcpy(&Pal[i], &LeatherPal[1], 8*sizeof(Color));
-	memcpy(&Pal[0xB0], &SkinPal[1], 8*sizeof(Color));
-	for(int i = 0xB8; i < 0xFF; i+=0x08)
-		memcpy(&Pal[i], &LeatherPal[1], 8*sizeof(Color));
-	free(MetalPal);
-	free(MinorPal);
-	free(MajorPal);
-	free(SkinPal);
-	free(LeatherPal);
-	free(ArmorPal);
-	free(HairPal);
+	memcpy(Pal, anims->Palette, 256*sizeof(Color));
+	if(palType != 10) {
+		Color * MetalPal   = core->GetPalette(BaseStats[IE_METAL_COLOR], 12);
+		Color * MinorPal   = core->GetPalette(BaseStats[IE_MINOR_COLOR], 12);
+		Color * MajorPal   = core->GetPalette(BaseStats[IE_MAJOR_COLOR], 12);
+		Color * SkinPal    = core->GetPalette(BaseStats[IE_SKIN_COLOR], 12);
+		Color * LeatherPal = core->GetPalette(BaseStats[IE_LEATHER_COLOR], 12);
+		Color * ArmorPal   = core->GetPalette(BaseStats[IE_ARMOR_COLOR], 12);
+		Color * HairPal    = core->GetPalette(BaseStats[IE_HAIR_COLOR], 12);
+		memcpy(&Pal[0x04], MetalPal,   12*sizeof(Color));
+		memcpy(&Pal[0x10], MinorPal,   12*sizeof(Color));
+		memcpy(&Pal[0x1C], MajorPal,   12*sizeof(Color));
+		memcpy(&Pal[0x28], SkinPal,    12*sizeof(Color));
+		memcpy(&Pal[0x34], LeatherPal, 12*sizeof(Color));
+		memcpy(&Pal[0x40], ArmorPal,   12*sizeof(Color));
+		memcpy(&Pal[0x4C], HairPal,    12*sizeof(Color));
+		//for(int i = 0x58; i < 0xFF; i+=0x08)
+		//	memcpy(&Pal[i], &MinorPal[1], 8*sizeof(Color));
+		memcpy(&Pal[0x58], &MinorPal[1], 8*sizeof(Color));
+		memcpy(&Pal[0x60], &MajorPal[1], 8*sizeof(Color));
+		memcpy(&Pal[0x68], &MinorPal[1], 8*sizeof(Color));
+		memcpy(&Pal[0x70], &MetalPal[1], 8*sizeof(Color));
+		memcpy(&Pal[0x78], &LeatherPal[1], 8*sizeof(Color));
+		memcpy(&Pal[0x80], &LeatherPal[1], 8*sizeof(Color));
+		memcpy(&Pal[0x88], &MinorPal[1], 8*sizeof(Color));
+		for(int i = 0x90; i < 0xA8; i+=0x08)
+			memcpy(&Pal[i], &LeatherPal[1], 8*sizeof(Color));
+		memcpy(&Pal[0xB0], &SkinPal[1], 8*sizeof(Color));
+		for(int i = 0xB8; i < 0xFF; i+=0x08)
+			memcpy(&Pal[i], &LeatherPal[1], 8*sizeof(Color));
+		free(MetalPal);
+		free(MinorPal);
+		free(MajorPal);
+		free(SkinPal);
+		free(LeatherPal);
+		free(ArmorPal);
+		free(HairPal);
+	}
+	else {
+		Color * MetalPal   = core->GetPalette(7+BaseStats[IE_METAL_COLOR], 32);
+		Color * MinorPal   = core->GetPalette(7+BaseStats[IE_MINOR_COLOR], 32);
+		Color * MajorPal   = core->GetPalette(7+BaseStats[IE_MAJOR_COLOR], 32);
+		Color * SkinPal    = core->GetPalette(7+BaseStats[IE_SKIN_COLOR], 32);
+		Color * LeatherPal = core->GetPalette(7+BaseStats[IE_LEATHER_COLOR], 32);
+		Color * ArmorPal   = core->GetPalette(7+BaseStats[IE_ARMOR_COLOR], 32);
+		Color * HairPal    = core->GetPalette(7+BaseStats[IE_HAIR_COLOR], 32);
+		for(int i = 0x10; i <= 0xF0; i+=0x10) {
+			if((Pal[i].r == 0xff) && (Pal[i].g == 0x00) && (Pal[i].b == 0x00)) {
+				memcpy(&Pal[i], HairPal, 32*sizeof(Color));
+				i+=0x10;
+			} else if((Pal[i].r == 0x00) && (Pal[i].g == 0xff) && (Pal[i].b == 0xff)) {
+				memcpy(&Pal[i], MajorPal, 32*sizeof(Color));
+				i+=0x10;
+			} else if((Pal[i].r == 0xff) && (Pal[i].g == 0xff) && (Pal[i].b == 0x00)) {
+				memcpy(&Pal[i], SkinPal, 32*sizeof(Color));
+				i+=0x10;
+			} else if((Pal[i].r == 0x00) && (Pal[i].g == 0x00) && (Pal[i].b == 0xff)) {
+				memcpy(&Pal[i], MinorPal, 32*sizeof(Color));
+				i+=0x10;
+			}
+		}
+		/*memcpy(&Pal[0x10], &MetalPal[16],   16*sizeof(Color));
+		memcpy(&Pal[0xE0], MinorPal,   32*sizeof(Color));
+		memcpy(&Pal[0xA0], MajorPal,   32*sizeof(Color));
+		memcpy(&Pal[0xC0], SkinPal,    32*sizeof(Color));
+		memcpy(&Pal[0x80], LeatherPal, 32*sizeof(Color));
+		memcpy(&Pal[0x40], LeatherPal, 16*sizeof(Color));
+		memcpy(&Pal[0x40], HairPal,    16*sizeof(Color));
+		*/
+		free(MetalPal);
+		free(MinorPal);
+		free(MajorPal);
+		free(SkinPal);
+		free(LeatherPal);
+		free(ArmorPal);
+		free(HairPal);
+	}
 
 	/*FILE * ftmp = fopen("tmp.tmp", "wb");
 	fwrite(Pal, 256, 4, ftmp);
