@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.6 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.7 2003/12/15 09:14:28 balrog994 Exp $
  *
  */
 
@@ -68,7 +68,7 @@ PluginMgr::PluginMgr(char * pluginpath)
 	strcat(path, "plugins\\*.dll");
 	printMessage("PluginMgr", "Searching for plugins in: ", WHITE);
 	printf("%s\n", path);
-	if((hFile = _findfirst(path, &c_file)) == -1L) //If there is no file matching our search
+	if((hFile = (long)_findfirst(path, &c_file)) == -1L) //If there is no file matching our search
 #else
 	strcat(path, "plugins");
 	printMessage("PluginMgr", "Searching for plugins in: ", WHITE);
