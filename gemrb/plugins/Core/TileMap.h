@@ -23,7 +23,7 @@ public:
 	TileMap(void);
 	~TileMap(void);
 	void AddOverlay(TileOverlay * overlay);
-	void DrawOverlay(unsigned int index);
+	void DrawOverlay(unsigned int index, Region viewport);
 };
 
 #endif

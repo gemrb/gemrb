@@ -14,8 +14,8 @@ void TileMap::AddOverlay(TileOverlay * overlay)
 	overlays.push_back(overlay);
 }
 
-void TileMap::DrawOverlay(unsigned int index)
+void TileMap::DrawOverlay(unsigned int index, Region viewport)
 {
 	if(index < overlays.size())
-		overlays[index]->Draw();
+		overlays[index]->Draw(viewport);
 }
