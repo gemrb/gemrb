@@ -20,8 +20,6 @@ def OnLoad():
 	j = 0
 	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1,ClassCount):
-		if GemRB.GetTableValue(ClassTable,i-1,4):
-			continue
 		Button = GemRB.GetControl(ClassWindow,j+2)
 		GemRB.SetButtonFlags(ClassWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_DISABLED)
@@ -46,14 +44,14 @@ def OnLoad():
 		GemRB.SetEvent(ClassWindow, Button, IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
 		GemRB.SetVarAssoc(ClassWindow, Button , "Class", i)
 
-	BackButton = GemRB.GetControl(ClassWindow,16)
+	BackButton = GemRB.GetControl(ClassWindow,0)
 	GemRB.SetText(ClassWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(ClassWindow,17)
 	GemRB.SetText(ClassWindow,DoneButton,11973)
 
-	ScrollBarControl = GemRB.GetControl(ClassWindow, 12)
+	ScrollBarControl = GemRB.GetControl(ClassWindow, 15)
 
-	TextAreaControl = GemRB.GetControl(ClassWindow, 13)
+	TextAreaControl = GemRB.GetControl(ClassWindow, 16)
 
 	Class = GemRB.GetVar("Class")-1
 	if Class<0:
@@ -63,16 +61,9 @@ def OnLoad():
 		GemRB.SetText(ClassWindow,TextAreaControl, GemRB.GetTableValue(ClassTable,Class,1) )
 		GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
 
-	GemRB.SetEvent(ClassWindow,MultiClassButton,IE_GUI_BUTTON_ON_PRESS,"MultiClassPress")
 	GemRB.SetEvent(ClassWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(ClassWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	GemRB.SetVisible(ClassWindow,1)
-	return
-
-def MultiClassPress():
-	GemRB.SetVar("Class Kit",0)
-	GemRB.UnloadWindow(ClassWindow)
-	GemRB.SetNextScript("GUICG10")
 	return
 
 def ClassPress():
