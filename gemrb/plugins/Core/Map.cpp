@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.113 2004/09/12 21:58:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.114 2004/10/09 08:19:53 avenger_teambg Exp $
  *
  */
 
@@ -145,6 +145,9 @@ Map::~Map(void)
 	}
 	for (i = 0; i < ambients.size(); i++) {
 		delete ambients[i];
+	}
+	for (i = 0; i < mapnotes.size(); i++) {
+		delete mapnotes[i];
 	}
 }
 
@@ -729,6 +732,17 @@ Entrance* Map::GetEntrance(const char* Name)
 	return NULL;
 }
 
+bool Map::HasActor(Actor *actor)
+{
+	unsigned int i=actors.size();
+	while(i--) {
+		if (actors[i] == actor) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Map::RemoveActor(Actor* actor)
 {
 	unsigned int i=actors.size();
@@ -1114,6 +1128,7 @@ unsigned char Map::GetOrient( sX, short sY, short dX, short dY)
 */
 bool Map::IsVisible(Point &s, Point &d)
 {
+printf("IsVisible : %d.%d from %d.%d\n",s.x,s.y,d.x,d.y);
 	int sX=s.x/16;
 	int sY=s.y/12;
 	int dX=d.x/16;
@@ -1157,3 +1172,27 @@ void Map::SetupAmbients()
 	ambim->reset();
 	ambim->setAmbients( ambients );
 }
+
+//text must be a pointer we can claim ownership of
+void Map::AddMapNote(Point point, int color, char *text)
+{
+	MapNote *mn = new MapNote;
+
+//printf("X: %d Y:%d  - %s\n",point.x, point.y, text);
+	mn->Pos=point;
+	mn->color=color;
+	mn->text=text;
+	mapnotes.push_back(mn);
+}
+
+MapNote *Map::GetMapNote(Point point)
+{
+	int i = mapnotes.size();
+	while(i--) {
+		if(Distance(point, mapnotes[i]->Pos) < 10 ) {
+			return mapnotes[i];
+		}
+	}
+	return NULL;
+}
+

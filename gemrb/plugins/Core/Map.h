@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.50 2004/09/13 20:31:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.51 2004/10/09 08:19:53 avenger_teambg Exp $
  *
  */
 
@@ -69,6 +69,15 @@ typedef struct Entrance {
 	ieDword Face;
 } Entrance;
 
+typedef class MapNote {
+public:
+	Point Pos;
+	ieWord color;
+	char *text;
+	MapNote() { text=NULL; };
+	~MapNote() { if(text) free(text); };
+} MapNote;
+
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* tm;
@@ -89,6 +98,7 @@ private:
 	std::vector< ScriptedAnimation*> vvcCells;
 	std::vector< Entrance*> entrances;
 	std::vector< Ambient*> ambients;
+	std::vector< MapNote*> mapnotes;
 	Actor** queue[3];
 	int Qcount[3];
 	unsigned int lastActorCount[3];
@@ -112,6 +122,7 @@ public:
 	Actor* GetActor(Point &p, int flags);
 	Actor* GetActor(const char* Name);
 	Actor* GetActorByDialog(const char* resref);
+	bool HasActor(Actor *actor);
 	void RemoveActor(Actor* actor);
 	//returns actors in rect (onlyparty could be more sophisticated)
 	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty);
@@ -139,6 +150,10 @@ public:
 	
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
 	void SetupAmbients();
+	void AddMapNote(Point point, int color, char *text);
+	MapNote *GetMapNote(int i) { return mapnotes[i]; }
+	MapNote *GetMapNote(Point point);
+	int GetMapNoteCount() { return mapnotes.size(); }
 private:
 	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
 		Point &p, unsigned int& diff);
