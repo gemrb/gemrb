@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.3 2004/08/28 20:36:39 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.4 2004/08/28 21:11:48 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -24,7 +24,7 @@
 ###################################################
 
 from GUIDefines import *
-import ie_stats
+from ie_stats import *
 import GemRB
 from GUICommonWindows import GetActorPaperDoll, SetSelectionChangeHandler
 #import GUICommonWindows
@@ -165,12 +165,14 @@ def OpenInventoryWindow ():
 	return
 
 def ColorDonePress():
-	pc = GemRB.GameGetSelectedPCSingle ()+1
+	pc = GemRB.GameGetSelectedPCSingle ()
 
 	GemRB.UnloadWindow(ColorPicker)
 	GemRB.SetVisible(InventoryWindow,1)
+	ColorTable = GemRB.LoadTable("clowncol")
 	PickedColor=GemRB.GetTableValue(ColorTable, ColorIndex, GemRB.GetVar("Selected"))
-	if ColorIndex==0:
+	GemRB.UnloadTable(ColorTable)
+	if ColorIndex==2:
 		GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, PickedColor)
 		UpdateInventoryWindow()
 		return
@@ -181,8 +183,8 @@ def ColorDonePress():
 def MajorPress():
 	global ColorIndex, PickedColor
 
-	pc = GemRB.GameGetSelectedPCSingle ()+1
-	ColorIndex = 0
+	pc = GemRB.GameGetSelectedPCSingle ()
+	ColorIndex = 2
 	PickedColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
 	GetColor()
 	return
@@ -190,8 +192,8 @@ def MajorPress():
 def MinorPress():
 	global ColorIndex, PickedColor
 
-	pc = GemRB.GameGetSelectedPCSingle ()+1
-	ColorIndex = 1
+	pc = GemRB.GameGetSelectedPCSingle ()
+	ColorIndex = 3
 	PickedColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
 	GetColor()
 	return
@@ -199,16 +201,17 @@ def MinorPress():
 def GetColor():
 	global ColorPicker
 
+	ColorTable = GemRB.LoadTable("clowncol")
 	GemRB.SetVisible(InventoryWindow,2) #darken it
 	ColorPicker=GemRB.LoadWindow(3)
 	GemRB.SetVar("Selected",-1)
-	for i in range(0,35):
+	for i in range(0,34):
 		Button = GemRB.GetControl(ColorPicker, i)
 		GemRB.SetButtonState(ColorPicker, Button, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonFlags(ColorPicker, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
 	Selected = -1
-	for i in range(0,35):
+	for i in range(0,34):
 		MyColor = GemRB.GetTableValue(ColorTable, ColorIndex, i)
 		if MyColor == "*":
 			break
@@ -220,7 +223,7 @@ def GetColor():
 		GemRB.SetButtonState(ColorPicker, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetVarAssoc(ColorPicker, Button, "Selected",i)
 		GemRB.SetEvent(ColorPicker, Button, IE_GUI_BUTTON_ON_PRESS, "ColorDonePress")
-
+	GemRB.UnloadTable(ColorTable)
 	GemRB.SetVisible(ColorPicker,1)
 	return
 
@@ -236,10 +239,10 @@ def UpdateInventoryWindow ():
 
 	# portrait
 	Button = GemRB.GetControl (Window, 50);
-	Color1 = GemRB.GetPlayerStat (pc, ie_stats.IE_HAIR_COLOR)
-	Color2 = GemRB.GetPlayerStat (pc, ie_stats.IE_SKIN_COLOR)
-	Color3 = GemRB.GetPlayerStat (pc, ie_stats.IE_MAJOR_COLOR)
-	Color4 = GemRB.GetPlayerStat (pc, ie_stats.IE_MINOR_COLOR)
+	Color1 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
+	Color2 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
+	Color3 = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
+	Color4 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
 	GemRB.SetButtonPLT (Window, Button, GetActorPaperDoll (pc),
 		Color2, Color1, Color3, Color4, 0, 0, 0, 0)
 
@@ -248,17 +251,17 @@ def UpdateInventoryWindow ():
 	#GemRB.SetText (Window, Button, "\001\n\n\n\n\007\007\007\013")
 
 	# armor class
-	ac = GemRB.GetPlayerStat (pc, ie_stats.IE_ARMORCLASS)
+	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
 	Label = GemRB.GetControl (Window, 0x10000038)
 	GemRB.SetText (Window, Label, str (ac))
 
 	# hp current
-	hp = GemRB.GetPlayerStat (pc, ie_stats.IE_HITPOINTS)
+	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
 	Label = GemRB.GetControl (Window, 0x10000039)
 	GemRB.SetText (Window, Label, str (hp))
 
 	# hp max
-	hpmax = GemRB.GetPlayerStat (pc, ie_stats.IE_MAXHITPOINTS)
+	hpmax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
 	Label = GemRB.GetControl (Window, 0x1000003a)
 	GemRB.SetText (Window, Label, str (hpmax))
 
@@ -267,16 +270,16 @@ def UpdateInventoryWindow ():
 	GemRB.SetText (Window, Label, str (GemRB.GameGetPartyGold ()))
 
 	# class (but this is set by a stat)
-	text = GemRB.GetPlayerStat (pc, ie_stats.IE_TITLE1)
+	text = GemRB.GetPlayerStat (pc, IE_TITLE1)
 	Label = GemRB.GetControl (Window, 0x10000042)
 	GemRB.SetText (Window, Label, text)
 
 	Button = GemRB.GetControl (Window, 62);
-	Color = GemRB.GetPlayerStat (pc, ie_stats.IE_MAJOR_COLOR)
+	Color = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
 	GemRB.SetButtonBAM(Window, Button, "COLGRAD", 1, 0, Color)
 
 	Button = GemRB.GetControl (Window, 63);
-	Color = GemRB.GetPlayerStat (pc, ie_stats.IE_MINOR_COLOR)
+	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
 	GemRB.SetButtonBAM(Window, Button, "COLGRAD", 1, 0, Color)
 	return
 

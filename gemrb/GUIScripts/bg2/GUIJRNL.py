@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.2 2004/08/28 20:36:38 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.3 2004/08/28 21:11:46 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -125,9 +125,6 @@ def OpenQuestsWindow ():
 	GemRB.SetEvent (Window,List, IE_GUI_TEXTAREA_ON_CHANGE, "OnJournalQuestSelect")
 
 	QuestDesc = GemRB.GetControl (Window, 3)
-
-	EvaluateAllQuests ()
-	PopulateQuestsList ()
 
 	#GemRB.SetVisible (QuestsWindow, 1)
 	GemRB.UnhideGUI()

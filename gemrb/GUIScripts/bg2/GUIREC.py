@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.4 2004/08/28 20:36:38 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.5 2004/08/28 21:11:46 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -247,9 +247,21 @@ def GetStatOverview (pc):
 	stats = []
 	# 19672 Level <LEVEL> Spells
 
-	ClassTable = GemRB.LoadTable ("CLASS")
-	ClassName = GemRB.GetString (GemRB.GetTableValue (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0))
+	ClassTitle = GemRB.GetPlayerStat (pc, IE_TITLE1)
+	print "TITLE:", ClassTitle
+	KitIndex = GemRB.GetPlayerStat (pc, IE_KIT)
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	KitTable = GemRB.LoadTable ("kitlist")
+
+	if ClassTitle==0:
+		if KitIndex == 0:
+			ClassTitle=GemRB.GetTableValue(ClassTable,Class,2)
+		else:
+			ClassTitle=GemRB.GetTableValue(KitTable, KitIndex,2)
+
 	GemRB.UnloadTable (ClassTable)
+	GemRB.UnloadTable (KitTable)
 
 	# 48156 Level
 	Level = GemRB.GetString (48156) + ': ' + str (GemRB.GetPlayerStat (pc, IE_LEVEL))
@@ -258,7 +270,7 @@ def GetStatOverview (pc):
 	Experience = GemRB.GetString (19673) + ': ' + str (GemRB.GetPlayerStat (pc, IE_XP))
 	# 19674 Next Level
 
-	Main = ClassName + "\n" + Level + "\n" + Experience + "\n\n"
+	Main = ClassTitle + "\n" + Level + "\n" + Experience + "\n\n"
 	
 	# 59856 Current State
 	CurrentState = won + GemRB.GetString (59856) + woff + "\n\n"

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.2 2004/08/28 20:36:38 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.3 2004/08/28 21:11:46 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -27,11 +27,6 @@ from GUIDefines import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
-
-TimeWindow = None
-PortWindow = None
-MenuWindow = None
-MainWindow = None
 
 # Buttons:
 # 0 CNTREACH
@@ -45,50 +40,6 @@ MainWindow = None
 # 8 OPTION
 # 9 REST
 # 10 TXTE
-
-def OpenCommonWindows ():
-	global TimeWindow, PortWindow, MenuWindow, MainWindow
-
-	TimeWindow = GemRB.LoadWindow (0)
-	PortWindow = GemRB.LoadWindow (1)
-	MenuWindow = GemRB.LoadWindow (2)
-	MainWindow = GemRB.LoadWindow (3)
-
-	Window = MenuWindow
-
-	# Can't Reach ???
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CntReachPress")
-
-	# Message popup
-	Button = GemRB.GetControl (Window, 10)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "TxtePress")
-
-
-	SetupMenuWindowControls (Window)
-
-
-	GemRB.SetVisible (TimeWindow, 1)
-	GemRB.SetVisible (PortWindow, 1)
-	GemRB.SetVisible (MenuWindow, 1)
-	GemRB.SetVisible (MainWindow, 1)
-	
-def CloseCommonWindows ():
-	global MainWindow
-
-	if MainWindow == None:
-		return
-	#if TimeWindow == None:
-	#	return
-	
-	GemRB.UnloadWindow (MainWindow)
-	GemRB.UnloadWindow (TimeWindow)
-	GemRB.UnloadWindow (PortWindow)
-	GemRB.UnloadWindow (MenuWindow)
-
-	MainWindow = None
 
 def SetupMenuWindowControls (Window):
 
@@ -212,9 +163,9 @@ def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
 
-def PopulatePortraitWindow ():
-	Window = PortraitWindow
-
+def PopulatePortraitWindow (Window):
+	global PortraitWindow
+	PortraitWindow = Window
 	# AI
 	Button = GemRB.GetControl (Window, 6)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
@@ -224,7 +175,7 @@ def PopulatePortraitWindow ():
 	Button = GemRB.GetControl (Window, 7)
 	GemRB.SetTooltip (Window, Button, 10485)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
-	for i in range (0,5):
+	for i in range (0,6):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetVarAssoc (Window, Button, "SelectedSingle", i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")

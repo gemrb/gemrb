@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.2 2004/08/28 20:36:39 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.3 2004/08/28 21:11:48 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -164,6 +164,7 @@ def RunSelectionChangeHandler ():
 		SelectionChangeHandler ()
 
 def PopulatePortraitWindow (Window):
+	global PortraitWindow
 	PortraitWindow = Window
 	# AI
 	Button = GemRB.GetControl (Window, 6)
@@ -174,7 +175,7 @@ def PopulatePortraitWindow (Window):
 	Button = GemRB.GetControl (Window, 7)
 	GemRB.SetTooltip (Window, Button, 10485)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
-	for i in range (0,5):
+	for i in range (0,6):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetVarAssoc (Window, Button, "SelectedSingle", i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
