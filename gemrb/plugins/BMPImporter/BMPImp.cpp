@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.9 2003/11/26 14:57:45 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.10 2003/11/30 17:44:25 avenger_teambg Exp $
  *
  */
 
@@ -107,11 +107,17 @@ bool BMPImp::Open(DataStream * stream, bool autoFree)
 			PaddedRowLength = Width;
 		break;
 
+		case 4:
+			PaddedRowLength = (Width+1)/2;
+		break;
 		default:
 			printf("[BMPImporter]: BitCount not supported.\n");
 			return false;
 	}
-	if(PaddedRowLength&3) PaddedRowLength+=4-(PaddedRowLength&3);
+	if(BitCount!=4)
+	{
+	  if(PaddedRowLength&3) PaddedRowLength+=4-(PaddedRowLength&3);
+	}
 	void * rpixels = malloc(PaddedRowLength*Height);
 	str->Read(rpixels, PaddedRowLength*Height);
 	if(BitCount == 24) {
@@ -133,6 +139,18 @@ bool BMPImp::Open(DataStream * stream, bool autoFree)
 		for(int i = Height-1; i >= 0; i--) {
 			dest -= Width;
 			memcpy(dest, src, Width);
+			src+=PaddedRowLength;
+		}
+	}
+	else if(BitCount == 4) {
+		int size=PaddedRowLength*Height;
+		pixels = malloc(size);
+		unsigned char * dest = (unsigned char*)pixels;
+		dest += size;
+		unsigned char * src = (unsigned char*)rpixels;
+		for(int i = Height-1; i >= 0; i--) {
+			dest -= PaddedRowLength;
+			memcpy(dest, src, PaddedRowLength);
 			src+=PaddedRowLength;
 		}
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.6 2003/11/26 14:57:45 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.7 2003/11/30 17:44:25 avenger_teambg Exp $
  *
  */
 
@@ -50,6 +50,25 @@ public:
 	Sprite2D * GetImage();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color * pal);
+	long int GetPixelIndex(int x, int y)
+	{
+		unsigned char *p=(unsigned char *)pixels;
+		p+=(PaddedRowLength*y)+(x*(BitCount/8));
+		if(BitCount == 24) {
+			int ret = *(unsigned long *) p;
+			return ret|0xff000000;
+		}
+		else if(BitCount == 8) {
+			return (unsigned long) *p;
+		}
+		else if(BitCount == 4) {
+			int ret=(unsigned long) *p;
+			if(x&1)
+				return ret&15;
+			else
+				return (ret>>4)&15;
+		}
+	}
 	/** Gets a Pixel from the Image */
 	Color GetPixel(int x, int y)
 	{
@@ -63,9 +82,20 @@ public:
 			ret.a = 0xff;
 		}
 		else if(BitCount == 8) {
-			ret.r = Palette[*p++].r;
-			ret.g = Palette[*p++].g;
-			ret.b = Palette[*p++].b;
+			ret.r = Palette[*p].r;
+			ret.g = Palette[*p].g;
+			ret.b = Palette[*p].b;
+			ret.a = 0xff;
+		}
+		else if(BitCount == 4) {
+			int tmp=(unsigned long) *p;
+			if(x&1)
+				tmp&=15;
+			else
+				tmp=(tmp>>4)&15;
+			ret.r = Palette[tmp].r;
+			ret.g = Palette[tmp].g;
+			ret.b = Palette[tmp].b;
 			ret.a = 0xff;
 		}
 		return ret;
