@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.148 2004/10/17 09:30:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.149 2004/11/07 19:12:28 avenger_teambg Exp $
  *
  */
 
@@ -719,6 +719,8 @@ private:
 	static Action *GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree);
 	static Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 	static Trigger* GenerateTrigger(char* String);
+	/* returns true if actor matches the object specs. */
+	static bool MatchActor(Actor* actor, Object* oC);
 	/* returns the number of actors matching the IDS targeting */
 	static int GetObjectCount(Scriptable* Sender, Object* oC);
 	static Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
@@ -845,6 +847,8 @@ public: //Script Functions
 	static int HaveAnySpells(Scriptable* Sender, Trigger* parameters);
 	static int HaveSpellParty(Scriptable* Sender, Trigger* parameters);
 	static int HaveSpell(Scriptable* Sender, Trigger* parameters);
+	static int Heard(Scriptable* Sender, Trigger* parameters);
+	static int Help_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int HitBy(Scriptable* Sender, Trigger* parameters);
 	static int HotKey(Scriptable* Sender, Trigger* parameters);
 	static int HP(Scriptable* Sender, Trigger* parameters);
@@ -1055,11 +1059,13 @@ public:
 	static void GlobalSetGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalShL(Scriptable* Sender, Action* parameters);
 	static void GlobalShLGlobal(Scriptable* Sender, Action* parameters);
+	static void GlobalShout(Scriptable* Sender, Action* parameters);
 	static void GlobalShR(Scriptable* Sender, Action* parameters);
 	static void GlobalShRGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalSubGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalXor(Scriptable* Sender, Action* parameters);
 	static void GlobalXorGlobal(Scriptable* Sender, Action* parameters);
+	static void Help(Scriptable* Sender, Action* parameters);
 	static void HideAreaOnMap(Scriptable* Sender, Action* parameters);
 	static void HideCreature(Scriptable* Sender, Action* parameters);
 	static void HideGUI(Scriptable* Sender, Action* parameters);
@@ -1173,6 +1179,7 @@ public:
 	static void SetTokenGlobal(Scriptable* Sender, Action* parameters);
 	static void SetVisualRange(Scriptable* Sender, Action* parameters);
 	static void SG(Scriptable* Sender, Action* parameters);
+	static void Shout(Scriptable* Sender, Action* parameters);
 	static void SmallWait(Scriptable* Sender, Action* parameters);
 	static void StartCutScene(Scriptable* Sender, Action* parameters);
 	static void StartCutSceneMode(Scriptable* Sender, Action* parameters);
@@ -1219,6 +1226,7 @@ public:
 	static Targets *FourthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *Gabber(Scriptable *Sender, Targets *parameters);
 	static Targets *LastHeardBy(Scriptable *Sender, Targets *parameters);
+	static Targets *LastHelp(Scriptable *Sender, Targets *parameters);
 	static Targets *LastHitter(Scriptable *Sender, Targets *parameters);
 	static Targets *LastSeenBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastSummonerOf(Scriptable *Sender, Targets *parameters);
