@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.39 2004/10/09 22:33:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.40 2004/10/11 17:52:12 avenger_teambg Exp $
  *
  */
 
@@ -312,7 +312,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 
 				AnimationMgr* bam = ( AnimationMgr* )
 					core->GetInterface( IE_BAM_CLASS_ID );
-				DataStream* ds = core->GetResourceMgr()->GetResource( CursorResRef, IE_MOS_CLASS_ID );
+				DataStream* ds = core->GetResourceMgr()->GetResource( CursorResRef, IE_BAM_CLASS_ID );
 				bam->Open( ds, true );
 				Sprite2D *cursor = bam->GetFrameFromCycle( 0,0 );
 				core->FreeInterface( bam );
