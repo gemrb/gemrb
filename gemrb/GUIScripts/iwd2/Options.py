@@ -76,5 +76,5 @@ def GamePlayPress():
 def MoviePress():
 	global OptionsWindow
 	GemRB.UnloadWindow(OptionsWindow)
-	GemRB.SetNextScript("GUIMOVIE")
+	GemRB.SetNextScript("Movies")
 	return
