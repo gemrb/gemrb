@@ -85,7 +85,7 @@ def OnLoad():
 	
 def NextPress():
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("GUICG2") #race
+	GemRB.SetNextScript("GUICG8") #race
 	return
 
 def CancelPress():
