@@ -1,3 +1,7 @@
+GemRB v0.2.2.6 Added Features:
+- New Plugins:
+  - GAM Importer
+
 GemRB v0.2.2.5 Added Features:
 - Added some In-Game Script OpCodes:
   - PlaySound
