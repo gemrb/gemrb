@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.100 2003/12/28 20:34:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.101 2003/12/29 20:09:28 balrog994 Exp $
  *
  */
 
@@ -45,6 +45,28 @@ inline bool valid_number(const char *string, long &val)
 
   val = strtol(string, &endpr, 0);
   return (const char *) endpr!=string;
+}
+
+static PyObject * GemRB_UnhideGUI(PyObject *, PyObject *args)
+{
+	GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);
+	if(gc->ControlType != IE_GUI_GAMECONTROL)
+		return NULL;
+	gc->UnhideGUI();
+	gc->SetCutSceneMode(false);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_HideGUI(PyObject *, PyObject *args)
+{
+	GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);
+	if(gc->ControlType != IE_GUI_GAMECONTROL)
+		return NULL;
+	gc->HideGUI();
+
+	Py_INCREF(Py_None);
+	return Py_None;
 }
 
 static PyObject * GemRB_EnterGame(PyObject *, PyObject *args)
@@ -1813,6 +1835,12 @@ static PyObject * GemRB_EvaluateString(PyObject * /*self*/, PyObject *args)
 }
 
 static PyMethodDef GemRBMethods[] = {
+	{"HideGUI", GemRB_HideGUI, METH_NOARGS,
+     "Hides the Game GUI."},
+
+	 {"UnhideGUI", GemRB_UnhideGUI, METH_NOARGS,
+     "Shows the Game GUI."},
+
 	{"SetTAAutoScroll", GemRB_SetTAAutoScroll, METH_VARARGS,
 	 "Sets the TextArea auto-scroll feature status."},
 
