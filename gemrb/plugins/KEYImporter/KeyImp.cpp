@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.43 2004/09/19 20:01:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.44 2004/10/17 15:37:18 avenger_teambg Exp $
  *
  */
 
@@ -207,6 +207,8 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 	strcpy( path, "override" ); //this shouldn't change
 	strcat( path, SPathDelimiter );
 	strcat( path, core->GameType );
+	SearchIn( core->CachePath, "", resname, type,
+		"[KEYImporter]: Found in Cache...\n" );
 	SearchIn( core->GemRBPath, path, resname, type,
 		"[KEYImporter]: Found in GemRB Override...\n" );
 	SearchIn( core->GamePath, core->GameOverride, resname, type,
