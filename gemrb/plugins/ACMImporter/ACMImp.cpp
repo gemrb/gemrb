@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.35 2004/02/11 20:42:22 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.36 2004/02/13 19:32:40 avenger_teambg Exp $
  *
  */
 
@@ -52,9 +52,20 @@ bool isWAVC(DataStream * stream) {
 	char Signature[4];
 	stream->Read(Signature, 4);
 	stream->Seek(0, GEM_STREAM_START);
+/*
 	if(strnicmp(Signature, "RIFF", 4) == 0)
-		return false;
+		return false; //wav
+	if(strnicmp(Signature, "oggs", 4) == 0)
+		return false; //ogg
+	if( * (unsigned short *) Signature == 0xfffb)
+		return false; //mp3
 	return true;
+*/
+	if( *(unsigned int *) Signature==IP_ACM_SIG)
+		return true; //acm
+	if(memcmp(Signature, "WAVC", 4) == 0)
+		return true; //wavc
+	return false;
 }
 
 ALenum GetFormatEnum(int channels, int bits) {
@@ -224,8 +235,7 @@ bool ACMImp::Init(void)
 			break;
 		}
 		printf("Retrying to open sound, last error:(%d)\n",alGetError());
-		//sleep(15);
-		SDL_Delay(15);
+		SDL_Delay(15*1000); //it is given in milliseconds
 		alutInit(0,NULL);
 	}
 	if(i==RETRY)
