@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.230 2004/10/30 12:45:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.231 2004/10/31 14:50:38 avenger_teambg Exp $
  *
  */
 
@@ -86,16 +86,11 @@ Interface::Interface(int iargc, char** iargv)
 	evntmgr = NULL;
 	console = NULL;
 	slottypes = NULL;
-/*
-	slotids = NULL;
-	slottips = NULL;
-	slotresrefs = NULL;
-*/
 	slotmatrix = NULL;
 	ModalWindow = NULL;
 	tooltip_x = 0;
 	tooltip_y = 0;
-	tooltip_text = NULL;
+	tooltip_ctrl = NULL;
 	
 	pal16 = NULL;
 	pal32 = NULL;
@@ -1507,11 +1502,11 @@ int Interface::SetTooltip(unsigned short WindowIndex,
 	return ctrl->SetTooltip( string );
 }
 
-void Interface::DisplayTooltip(int x, int y, char* text)
+void Interface::DisplayTooltip(int x, int y, Control *ctrl)
 {
 	tooltip_x = x;
 	tooltip_y = y;
-	tooltip_text = text;
+	tooltip_ctrl = ctrl;
 }
 
 /** Set a Window Visible Flag */
@@ -1740,10 +1735,11 @@ void Interface::DrawWindows(void)
 
 void Interface::DrawTooltip ()
 {	
-	if (! tooltip_text || !tooltip_text[0]) 
+	if (! tooltip_ctrl || !tooltip_ctrl->Tooltip) 
 		return;
 
 	Font* fnt = GetFont( TooltipFont );
+	char *tooltip_text = tooltip_ctrl->Tooltip;
 
 	int w1 = 0;
 	int w2 = 0;
@@ -1782,8 +1778,7 @@ void Interface::DrawTooltip ()
 	Color back = {0x00, 0x00, 0x00, 0x00};
 	Color* palette = video->CreatePalette( TooltipColor, back );
 	
-	fnt->Print( Region( x, y, w, h ),
-		    ( unsigned char * ) tooltip_text, palette,
+	fnt->Print( Region( x, y, w, h ), (ieByte *) tooltip_text, palette,
 		    IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true );
 }
 
@@ -2507,6 +2502,8 @@ void Interface::LoadProgress(int percent)
 void Interface::DragItem(CREItem *item)
 {
 	// FIXME: what if we already drag st.?
+	// Avenger: We should drop the dragged item and pick this up
+	// We shouldn't have a valid DraggedItem at this point
 	DraggedItem = item;
 }
 

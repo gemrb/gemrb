@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.27 2004/10/17 08:20:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.28 2004/10/31 14:50:39 avenger_teambg Exp $
  *
  */
 
@@ -63,7 +63,7 @@ int Control::SetTooltip(const char* string, int /*pos*/)
 void Control::DisplayTooltip()
 {
 	if (Tooltip)
-		core->DisplayTooltip( (( Window* )Owner)->XPos + XPos + Width / 2, (( Window* )Owner)->YPos + YPos + Height / 2, Tooltip );
+		core->DisplayTooltip( (( Window* )Owner)->XPos + XPos + Width / 2, (( Window* )Owner)->YPos + YPos + Height / 2, this );
 	else
 		core->DisplayTooltip( 0, 0, NULL );
 }
