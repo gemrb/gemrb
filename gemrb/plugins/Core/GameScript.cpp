@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.80 2004/02/29 17:33:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.81 2004/02/29 22:39:59 avenger_teambg Exp $
  *
  */
 
@@ -1102,11 +1102,11 @@ Action* GameScript::GenerateAction(char* String)
 								str++;
 							src++; //Skip [
 							newAction->XpointParameter = atoi( src );
-							while( *src!='.' && *src!=']')
+							while( *src!=',' && *src!=']')
 								src++;
 							src++; //Skip .
 							newAction->YpointParameter = atoi( src );
-							while( *src!='.' && *src!=']')
+							while( *src!=',' && *src!=']')
 								src++;
 							src++; //Skip ]
 							break;
@@ -3080,7 +3080,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	double distance;
 	Point* p = FindNearPoint( actor, &door->toOpen[0], &door->toOpen[1],
-				distance );	
+				distance );
 	if (distance <= 12) {
 		door->SetDoorClosed( false, true );
 	} else {
