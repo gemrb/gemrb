@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.GameSelectPCSingle(PartyID)
 
-Description:
+Description: Selects one PC in non-walk environment (i.e. in shops, inventory,...).
 
 Parameters:
+PartyID   - the PC's position in the party
 
-Return value:
+Return value: N/A
 
-See also:
+See also: GameSelectPC
 

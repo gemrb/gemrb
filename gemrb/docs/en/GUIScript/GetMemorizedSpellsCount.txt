@@ -10,5 +10,5 @@ Level     - the memorized spell's level
 
 Return value: numeric
 
-See also: GetMemorizedSpell
+See also: GetMemorizedSpell, GetKnownSpellsCount
 

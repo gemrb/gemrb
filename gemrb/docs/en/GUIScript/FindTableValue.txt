@@ -1,11 +1,13 @@
 
-Prototype:
+Prototype: GemRB.FindTableValue(TableIndex, ColumnIndex, Value)
 
-Description:
+Description: Returns the first rowcount of a field of a 2DA Table.
 
 Parameters:
+TableIndex  - returned by a previous LoadTable command.
+ColumnIndex - the index of the column in which you look for the value.
 
-Return value:
+Return value: numeric, -1 if the value isn't to be found
 
-See also:
+See also: LoadTable, GetTableValue
 

@@ -1,11 +1,13 @@
 
-Prototype:
+Prototype: GemRB.GetTableValue(TableIndex, RowIndex/RowString, ColIndex/ColString)
 
-Description:
+Description: Returns a field of a 2DA Table. The row and column indices must be of same type (either string or numeric), the return value will be of the same type.
 
-Parameters:
+Parameters: TableIndex - returned by a previous LoadTable command.
+RowIndex, ColIndex     - numeric row/column indices
+RowString,ColString    - the row/column names as written in the 2da file
 
-Return value:
+Return value: numeric or string, based on the indices
 
-See also:
+See also: GetSymbolValue, FindTableValue, LoadTable
 

@@ -1,11 +1,12 @@
 
-Prototype:
+Prototype: GemRB.GetTableRowName(TableIndex, RowIndex)
 
-Description:
+Description: Returns the Name of a Row in a 2DA Table.
 
-Parameters:
+Parameters: TableIndex - returned by a previous LoadTable command.
+RowIndex - the numeric index of the row.
 
-Return value:
+Return value: string
 
-See also:
+See also: LoadTable
 

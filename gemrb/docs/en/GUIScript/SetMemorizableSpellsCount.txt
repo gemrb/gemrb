@@ -1,11 +1,16 @@
 
-Prototype:
+Prototype: GemRB.SetMemorizableSpellsCount(PartyID, Value, SpellType, Level, [Bonus])
 
-Description:
+Description: Sets number of memorizable spells of given type and level in a player character's spellbook.
 
 Parameters:
+PartyID   - the PC's position in the party
+Value     - number of memorizable spells
+SpellType - 0 - priest, 1 - wizard, 2 - innate
+Level     - the memorized spell's level
+Bonus     - whether setting the modified or the base values (if you set the base value, it will also set the modified value)
 
-Return value:
+Return value: N/A
 
-See also:
+See also: GetMemorizableSpellsCount
 
