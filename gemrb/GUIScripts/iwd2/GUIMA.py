@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIMA.py,v 1.4 2004/11/22 21:06:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIMA.py,v 1.5 2004/11/22 21:41:28 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -109,7 +109,8 @@ def AddNoteWindow ():
 	Text = GemRB.QueryText (MapWindow, Label)
 	NoteWindow = GemRB.LoadWindow (5)
 	Label = GemRB.GetControl (NoteWindow, 1)
-	GemRB.SetText (NoteWindow, Label, Text )
+	GemRB.SetBufferLength (NoteWindow, Label, 100)
+	GemRB.SetText (NoteWindow, Label, Text)
 	GemRB.SetControlStatus (NoteWindow, Label, IE_GUI_CONTROL_FOCUSED)
 	for i in range(8):
 		Label = GemRB.GetControl (NoteWindow, 4+i)
@@ -121,12 +122,17 @@ def AddNoteWindow ():
 	Label = GemRB.GetControl (NoteWindow, 0)
 	GemRB.SetEvent (NoteWindow, Label, IE_GUI_BUTTON_ON_PRESS,"SetMapNote")
 	GemRB.SetButtonFlags (NoteWindow, Label, IE_GUI_BUTTON_DEFAULT, OP_OR)
-	#remove
-	Label = GemRB.GetControl (NoteWindow, 2)
-	GemRB.SetEvent (NoteWindow, Label, IE_GUI_BUTTON_ON_PRESS,"RemoveMapNote")
+	GemRB.SetText (NoteWindow, Label, 11973)
+
 	#cancel
-	Label = GemRB.GetControl (NoteWindow, 3)
+	Label = GemRB.GetControl (NoteWindow, 2)
 	GemRB.SetEvent (NoteWindow, Label, IE_GUI_BUTTON_ON_PRESS,"CloseNoteWindow")
+	GemRB.SetText (NoteWindow, Label, 13727)
+
+	#remove
+	Label = GemRB.GetControl (NoteWindow, 3)
+	GemRB.SetEvent (NoteWindow, Label, IE_GUI_BUTTON_ON_PRESS,"RemoveMapNote")
+	GemRB.SetText (NoteWindow, Label, 13957)
 
 	GemRB.SetVisible (MapWindow, 2)
 	GemRB.SetVisible (NoteWindow, 1)

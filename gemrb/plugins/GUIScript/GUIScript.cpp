@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.247 2004/11/21 23:00:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.248 2004/11/22 21:41:29 avenger_teambg Exp $
  *
  */
 
@@ -840,6 +840,28 @@ static PyObject* GemRB_QueryText(PyObject * /*self*/, PyObject* args)
 		RuntimeError("Invalid control type");
 		return NULL;
 	}
+}
+
+PyDoc_STRVAR( GemRB_SetBufferLength__doc,
+"SetBufferLength(WindowIndex, ControlIndex, Length)\n\n"
+"Sets the maximum text length of a TextEdit Control." );
+
+static PyObject* GemRB_SetBufferLength(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, Length;
+
+	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &Length)) {
+		return AttributeError( GemRB_SetBufferLength__doc );
+	}
+
+	TextEdit* te = (TextEdit *) GetControl( WindowIndex, ControlIndex, IE_GUI_EDIT );
+	if (!te)
+		return NULL;
+
+	te->SetBufferLength( Length );
+
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_SetText__doc,
@@ -4093,6 +4115,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UnloadSymbol, METH_VARARGS),
 	METHOD(GetSymbolValue, METH_VARARGS),
 	METHOD(GetControl, METH_VARARGS),
+	METHOD(SetBufferLength, METH_VARARGS),
 	METHOD(SetText, METH_VARARGS),
 	METHOD(QueryText, METH_VARARGS),
 	METHOD(TextAreaAppend, METH_VARARGS),

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.6 2004/11/07 08:36:12 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.7 2004/11/22 21:41:28 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -43,19 +43,19 @@ FRAME_PC_TARGET   = 1
 
 def SetupMenuWindowControls (Window):
 
-	# Return to Game
+	# Spellbook
 	Button = GemRB.GetControl (Window, 4)
-	GemRB.SetTooltip (Window, Button, 16313)
+	GemRB.SetTooltip (Window, Button, 16309)
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 0)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "ReturnToGame")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookWindow")
 
-	# Map
+	# Inventory
 	Button = GemRB.GetControl (Window, 5)
-	GemRB.SetTooltip (Window, Button, 16310)
+	GemRB.SetTooltip (Window, Button, 16307)
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 1)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
 
 	# Journal
 	Button = GemRB.GetControl (Window, 6)
@@ -63,12 +63,12 @@ def SetupMenuWindowControls (Window):
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 2)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
-	# Inventory
+	# Map
 	Button = GemRB.GetControl (Window, 7)
-	GemRB.SetTooltip (Window, Button, 16307)
+	GemRB.SetTooltip (Window, Button, 16310)
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 3)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 
 	# Records
 	Button = GemRB.GetControl (Window, 8)
@@ -84,15 +84,21 @@ def SetupMenuWindowControls (Window):
 	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 7)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
 
+	# Select All
+	Button = GemRB.GetControl (Window, 11)
+	GemRB.SetTooltip (Window, Button, 10485)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+
 	# Rest
-	Button = GemRB.GetControl (Window, 8)
+	Button = GemRB.GetControl (Window, 12)
 	GemRB.SetTooltip (Window, Button, 11942)
 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
 
-	# AI
-	#Button = GemRB.GetControl (Window, 9)
-	#GemRB.SetTooltip (Window, Button, 41631) # or 41646 Activate ...
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
+	# Character Arbitration
+	Button = GemRB.GetControl (Window, 13)
+	GemRB.SetTooltip (Window, Button, 16312)
+	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "CharacterWindow")
+
 	return
 
 def AIPress ():
