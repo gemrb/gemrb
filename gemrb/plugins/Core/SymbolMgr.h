@@ -23,10 +23,10 @@ public:
 	SymbolMgr(void);
 	virtual ~SymbolMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
-	virtual long GetValue(const char* text) = 0;
+	virtual int GetValue(const char* text) = 0;
 	virtual char* GetValue(int val) = 0;
 	virtual char* GetStringIndex(unsigned int Index) = 0;
-	virtual long GetValueIndex(unsigned int Index) = 0;
+	virtual int GetValueIndex(unsigned int Index) = 0;
 	virtual int FindValue(int val) = 0;
 	virtual int FindString(char *str, int len) = 0;
 };

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.cpp,v 1.13 2004/04/13 22:53:50 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.cpp,v 1.14 2004/08/07 21:00:34 guidoj Exp $
  *
  */
 
@@ -91,7 +91,7 @@ bool IDSImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-long IDSImp::GetValue(const char* txt)
+int IDSImp::GetValue(const char* txt)
 {
 	for (unsigned int i = 0; i < pairs.size(); i++) {
 		if (stricmp( pairs[i].str, txt ) == 0) {
@@ -119,7 +119,7 @@ char* IDSImp::GetStringIndex(unsigned int Index)
 	return pairs[Index].str;
 }
 
-long IDSImp::GetValueIndex(unsigned int Index)
+int IDSImp::GetValueIndex(unsigned int Index)
 {
 	if (Index >= pairs.size()) {
 		return 0;
