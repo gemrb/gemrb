@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.8 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.9 2003/12/02 14:56:22 balrog994 Exp $
  *
  */
 
@@ -24,14 +24,18 @@
 
 #include "../Core/SoundMgr.h"
 #include "../Core/FileStream.h"
-//#ifndef WIN32
-#include "../../includes/fmod/fmod.h"
-//#else
-//#include "../../includes/fmodwin32/fmod.h"
-//#endif
+
+#include "../../includes/sdl/SDL.h"
+#include "../../includes/sdl/SDL_thread.h"
+
+#include "al.h"
+#include "alc.h"
+#include "alu.h"
+#include "alut.h"
 
 #define MAX_STREAMS  30
 
+/*
 typedef struct AudioStream {
 	FSOUND_STREAM * stream;
 	FSOUND_DSPUNIT * dsp;
@@ -40,14 +44,30 @@ typedef struct AudioStream {
 	bool free;
 	int channel;
 } AudioStream;
+*/
+
+static ALfloat ListenerPos[3];
+static ALfloat ListenerVel[3];
+static ALfloat ListenerOri[6];
+
+typedef struct AudioStream {
+	ALuint Buffer;
+	ALuint Source;
+	int Duration;
+	bool free;
+	bool playing;
+} AudioStream;
 
 class ACMImp : public SoundMgr
 {
 private:
 	void clearstreams(bool free);
+	/*
 	static signed char __stdcall endstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param);
 	static signed char __stdcall synchstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param);
 	static void * __stdcall dspcallback(void *originalbuffer, void *newbuffer, int length, int param);
+	*/
+	static int PlayListManager(void * data);
 public:
 	ACMImp(void);
 	~ACMImp(void);

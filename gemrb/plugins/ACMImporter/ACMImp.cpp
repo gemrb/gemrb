@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.17 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.18 2003/12/02 14:56:22 balrog994 Exp $
  *
  */
 
@@ -32,101 +32,77 @@
 #include <unistd.h>
 #endif
 
+#define DisplayALError(string, error) printf("%s0x%04X", string, error);
+
 static AudioStream streams[MAX_STREAMS];
+static AudioStream musics[MAX_STREAMS];
+static int BufferDuration, BufferStartPlayTime;
+static SDL_mutex *musicMutex;
+static bool musicPlaying;
+static int musicIndex;
+static SDL_Thread * musicThread;
 
 void ACMImp::clearstreams(bool free) {
 	for(int i = 0; i < MAX_STREAMS; i++) {
-		if(!streams[i].free && free) {
-			FSOUND_Stream_Stop(streams[i].stream);
-			FSOUND_Stream_Close(streams[i].stream);
-			FSOUND_DSP_Free(streams[i].dsp);
+		if(!musics[i].free && free) {
+			alDeleteBuffers(1, &musics[i].Buffer);
+			alDeleteSources(1, &musics[i].Source);
 		}
 		streams[i].free = true;
 	}
 }
 
-signed char __stdcall ACMImp::endstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param) 
+int ACMImp::PlayListManager(void * data)
 {
-	//printf("End Callback\n");
-	FSOUND_Stream_Close(stream);
-	return 0;
-}
-
-signed char __stdcall ACMImp::synchstreamcallback(FSOUND_STREAM *stream, void *buff, int len, int param)
-{
-	//printf("Synch Callback\n");
-	if(stream) {
-		for(int i = 0; i < MAX_STREAMS; i++) {
-			if(streams[i].stream == stream) {
-				streams[i].playing = false;
-				streams[i].end = false;
-				streams[i].free = false;
-				core->GetMusicMgr()->PlayNext();
-				return 1;
+	while(true) {
+		SDL_mutexP(musicMutex);
+		if(musicPlaying) {
+			unsigned long volume;
+			if(!core->GetDictionary()->Lookup("Volume Music", volume)) {
+				core->GetDictionary()->SetAt("Volume Music", 100);
+				volume = 100;
 			}
+			alSourcef(musics[musicIndex].Source, AL_GAIN, volume/100.0);
+#ifdef WIN32
+			unsigned long time = GetTickCount();
+#else
+			struct timeval tv;
+			gettimeofday(&tv, NULL);
+			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
+#endif
+			if((time - BufferStartPlayTime) > (BufferDuration-100))
+				core->GetMusicMgr()->PlayNext();
 		}
+		SDL_mutexV(musicMutex);
+		SDL_Delay(1);
 	}
-	else
-		return 1;
 	return 0;
-}
-
-void * __stdcall ACMImp::dspcallback(void *originalbuffer, void *newbuffer, int length, int param)
-{
-	//printf("DSP CallBack\n");
-	if(!streams[param].end) {
-#ifdef WIN32
-		int curtime = FSOUND_Stream_GetTime(streams[param].stream);
-		int tottime = FSOUND_Stream_GetLengthMs(streams[param].stream);
-#endif
-		unsigned long volume;
-		if(!core->GetDictionary()->Lookup("Volume Music", volume)) {
-			core->GetDictionary()->SetAt("Volume Music", 100);
-			volume = 100;
-		}
-		FSOUND_SetVolume(streams[param].channel, (volume*255)/100);
-#ifdef WIN32
-		//printf("curtime = %d, tottime = %d, delta = %d\n", curtime, tottime, tottime-curtime);
-		if(curtime > tottime-125) {
-			streams[param].playing = false;
-			streams[param].end = true;
-			core->GetMusicMgr()->PlayNext();
-			//printf("Playing Next Track\n");
-		}
-#endif
-	}
-	return newbuffer;
 }
 
 ACMImp::ACMImp(void)
 {
 	for(int i = 0; i < MAX_STREAMS; i++) {
 		streams[i].free = true;
+		musics[i].free = true;
 	}
+	musicMutex = SDL_CreateMutex();
+	musicPlaying = false;
+	musicThread = SDL_CreateThread(PlayListManager, NULL);
 }
 
 ACMImp::~ACMImp(void)
 {
 	clearstreams(true);
-	FSOUND_Close();
+	SDL_KillThread(musicThread);
+	SDL_DestroyMutex(musicMutex);
 }
 
 bool ACMImp::Init(void)
 {
-#ifndef WIN32
-	FSOUND_SetOutput(FSOUND_OUTPUT_OSS);
-	printf("[%.2f] Using OSS Driver...", FSOUND_GetVersion());
-#else
-	FSOUND_SetOutput(FSOUND_OUTPUT_DSOUND);
-	printf("[%.2f] Using DirectSound...", FSOUND_GetVersion());
-#endif
-	if(FSOUND_Init(44100, 32, 0) == false) {
-		FSOUND_SetOutput(FSOUND_OUTPUT_NOSOUND);
-		if(FSOUND_Init(44100, 32, 0) == false)
-			return false;
-	}
-	if(!FSOUND_Stream_SetBufferSize(100))
-		printf("Error Setting Buffer Size\n");
+	alutInit(0, NULL);
+	ALenum error = alGetError();
+	if(error != AL_NO_ERROR)
+		return false;
 	return true;
 }
 
@@ -139,13 +115,73 @@ unsigned long ACMImp::Play(const char * ResRef)
 	FILE * str = fopen(path, "rb");
 	if(str != NULL) {
 		fclose(str);
-		FSOUND_STREAM * sound = FSOUND_Stream_Open(path, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
-		if(sound) {
-			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
-				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
+
+		ALuint Buffer;
+		ALuint Source;
+		ALfloat SourcePos[] = {0.0f, 0.0f, 0.0f};
+		ALfloat SourceVel[] = {0.0f, 0.0f, 0.0f};
+		ALsizei size, freq;
+		ALenum format;
+		ALboolean loop;
+		ALvoid *data;
+		ALenum error;
+		alGenBuffers(1, &Buffer);
+		if((error = alGetError()) != AL_NO_ERROR) {
+			DisplayALError("[ACMImp::Play] alGenBuffers : ", error);
+		}
+		{
+			alutLoadWAVFile(path, &format, &data, &size, &freq, &loop);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::Play] alutLoadWAVFile : ", error);
 			}
-			FSOUND_Stream_Play(FSOUND_FREE, sound);
-			return 0;
+			alBufferData(Buffer, format, data, size, freq);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::Play] alBufferData : ", error);
+			}
+			alutUnloadWAV(format, data, size, freq);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::Play] alutUnloadWAV : ", error);
+			}
+			alGenSources(1, &Source);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::Play] alGenSources : ", error);
+			}
+
+			alSourcei (Source, AL_BUFFER,   Buffer   );
+			alSourcef (Source, AL_PITCH,    1.0f     );
+			alSourcef (Source, AL_GAIN,     1.0f     );
+			alSourcefv(Source, AL_POSITION, SourcePos);
+			alSourcefv(Source, AL_VELOCITY, SourceVel);
+			alSourcei (Source, AL_LOOPING,  loop     );
+
+			if (alGetError() != AL_NO_ERROR)
+				return 0xffffffff;
+
+			for(int i = 0; i < MAX_STREAMS; i++) {
+				if(!streams[i].free) {
+					ALint state;
+					alGetSourcei(streams[i].Source, AL_SOURCE_STATE, &state);
+					if(state == AL_STOPPED) {
+						alDeleteBuffers(1, &streams[i].Buffer);
+						alDeleteSources(1, &streams[i].Source);
+						streams[i].Buffer = Buffer;
+						streams[i].Source = Source;
+						streams[i].playing = false;
+						alSourcePlay(Source);
+						return 0;
+					}
+				} else {
+					streams[i].Buffer = Buffer;
+					streams[i].Source = Source;
+					streams[i].free = false;
+					streams[i].playing = false;
+					alSourcePlay(Source);
+					return 0;
+				}
+			}
+
+			alDeleteBuffers(1, &Buffer);
+			alDeleteSources(1, &Source);
 		}
 		return 0xffffffff;
 	}
@@ -162,13 +198,73 @@ unsigned long ACMImp::Play(const char * ResRef)
 	str = fopen(path, "rb");
 	if(str != NULL) {
 		fclose(str);
-		FSOUND_STREAM * sound = FSOUND_Stream_Open(path, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
-		if(sound) {
-			if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
-				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
+		ALuint Buffer;
+		ALuint Source;
+		ALfloat SourcePos[] = {0.0f, 0.0f, 0.0f};
+		ALfloat SourceVel[] = {0.0f, 0.0f, 0.0f};
+		ALsizei size, freq;
+		ALenum format;
+		ALboolean loop;
+		ALvoid *data;
+		ALenum error;
+		alGenBuffers(1, &Buffer);
+		if((error = alGetError()) != AL_NO_ERROR) {
+			DisplayALError("[ACMImp::Play] alGenBuffers : ", error);
+		}
+		{
+			alutLoadWAVFile(path, &format, &data, &size, &freq, &loop);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::Play] alutLoadWAVFile : ", error);
 			}
-			FSOUND_Stream_Play(FSOUND_FREE, sound);
-			return 0;
+			alBufferData(Buffer, format, data, size, freq);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::Play] alBufferData : ", error);
+			}
+			alutUnloadWAV(format, data, size, freq);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::Play] alutUnloadWAV : ", error);
+			}
+			alGenSources(1, &Source);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::Play] alGenSources : ", error);
+			}
+
+
+			alSourcei (Source, AL_BUFFER,   Buffer   );
+			alSourcef (Source, AL_PITCH,    1.0f     );
+			alSourcef (Source, AL_GAIN,     1.0f     );
+			alSourcefv(Source, AL_POSITION, SourcePos);
+			alSourcefv(Source, AL_VELOCITY, SourceVel);
+			alSourcei (Source, AL_LOOPING,  loop     );
+
+			if (alGetError() != AL_NO_ERROR)
+				return 0xffffffff;
+
+			for(int i = 0; i < MAX_STREAMS; i++) {
+				if(!streams[i].free) {
+					ALint state;
+					alGetSourcei(streams[i].Source, AL_SOURCE_STATE, &state);
+					if(state == AL_STOPPED) {
+						alDeleteBuffers(1, &streams[i].Buffer);
+						alDeleteSources(1, &streams[i].Source);
+						streams[i].Buffer = Buffer;
+						streams[i].Source = Source;
+						streams[i].playing = false;
+						alSourcePlay(Source);
+						return 0;
+					}
+				} else {
+					streams[i].Buffer = Buffer;
+					streams[i].Source = Source;
+					streams[i].free = false;
+					streams[i].playing = false;
+					alSourcePlay(Source);
+					return 0;
+				}
+			}
+
+			alDeleteBuffers(1, &Buffer);
+			alDeleteSources(1, &Source);
 		}
 		return 0xffffffff;
 	}
@@ -188,43 +284,63 @@ unsigned long ACMImp::LoadFile(const char * filename)
 	FILE * str = fopen(outFile, "rb");
 	if(str != NULL) {
 		fclose(str);
-		FSOUND_STREAM * sound = FSOUND_Stream_Open(outFile, FSOUND_LOOP_OFF | FSOUND_2D, 0, 0);
-		if(sound) {
-#ifndef WIN32
-			if(!FSOUND_Stream_SetSyncCallback(sound, synchstreamcallback, 0)) {
-				printMessage("ACMImporter", "SetSychCallback Failed\n", YELLOW);
+		
+		ALuint Buffer;
+		ALuint Source;
+		ALfloat SourcePos[] = {0.0f, 0.0f, 0.0f};
+		ALfloat SourceVel[] = {0.0f, 0.0f, 0.0f};
+		ALsizei size, freq;
+		ALenum format;
+		ALboolean loop;
+		ALvoid *data;
+		ALenum error;
+		alGenBuffers(1, &Buffer);
+		if((error = alGetError()) != AL_NO_ERROR) {
+			DisplayALError("[ACMImp::LoadFile] alGenBuffers : ", error);
+		}
+		{
+			alutLoadWAVFile(outFile, &format, &data, &size, &freq, &loop);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::LoadFile] alutLoadWAVFile : ", error);
 			}
-#endif
-			/*if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
-				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
-			}*/
-			int ret = -1;
+			alBufferData(Buffer, format, data, size, freq);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::LoadFile] alBufferData : ", error);
+			}
+			alutUnloadWAV(format, data, size, freq);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::LoadFile] alutUnloadWAV : ", error);
+			}
+			alGenSources(1, &Source);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::LoadFile] alGenSources : ", error);
+			}
+
+			alSourcei (Source, AL_BUFFER,   Buffer   );
+			alSourcef (Source, AL_PITCH,    1.0f     );
+			alSourcef (Source, AL_GAIN,     1.0f     );
+			alSourcefv(Source, AL_POSITION, SourcePos);
+			alSourcefv(Source, AL_VELOCITY, SourceVel);
+			alSourcei (Source, AL_LOOPING,  loop     );
+
+			if (alGetError() != AL_NO_ERROR)
+				return 0xffffffff;
+
 			for(int i = 0; i < MAX_STREAMS; i++) {
-				if(streams[i].free) {
-					streams[i].stream = sound;
-					streams[i].playing = false;
-					streams[i].end = false;
-					streams[i].free = false;
-					streams[i].channel = -1;
-					streams[i].dsp = FSOUND_Stream_CreateDSP(sound, dspcallback, 1, i);
-					FSOUND_DSP_SetActive(streams[i].dsp, true);
-					ret = i;
-					break;
+				if(musics[i].free) {
+					musics[i].Buffer = Buffer;
+					musics[i].Source = Source;
+					musics[i].Duration = (size/(double)(freq*4))*1000;
+					musics[i].free = false;
+					musics[i].playing = false;
+					return i;
 				}
 			}
-			if(ret == -1) {
-				FSOUND_Stream_Close(sound);
-				printf("Too many streams loaded\n");
-				return 0xffffffff;
-			}
-			FSOUND_SAMPLE * smp = FSOUND_Stream_GetSample(sound);
-			int freq;
-			FSOUND_Sample_GetDefaults(smp, &freq, NULL, NULL, NULL);
-			unsigned int lastsample = FSOUND_Stream_GetLengthMs(sound)*(freq / 1000.0);
-			if(!FSOUND_Stream_AddSyncPoint(sound, lastsample-800, "End"))
-				printf("Error setting the Synch Point: %d\n", FSOUND_GetError());
-			return ret;
+
+			alDeleteBuffers(1, &Buffer);
+			alDeleteSources(1, &Source);
 		}
+
 		return 0xffffffff;
 	}
 	char tmpFile[_MAX_PATH];
@@ -245,42 +361,62 @@ unsigned long ACMImp::LoadFile(const char * filename)
 	str = fopen(outFile, "rb");
 	if(str != NULL) {
 		fclose(str);
-		FSOUND_STREAM * sound = FSOUND_Stream_Open(outFile, FSOUND_LOOP_OFF, 0, 0);
-		if(sound) {
-#ifndef WIN32
-			if(!FSOUND_Stream_SetSyncCallback(sound, synchstreamcallback, 0)) {
-				printMessage("ACMImporter", "SetSychCallback Failed\n", YELLOW);
+		
+		ALuint Buffer;
+		ALuint Source;
+		ALfloat SourcePos[] = {0.0f, 0.0f, 0.0f};
+		ALfloat SourceVel[] = {0.0f, 0.0f, 0.0f};
+		ALsizei size, freq;
+		ALenum format;
+		ALboolean loop;
+		ALvoid *data;
+		ALenum error;
+		alGenBuffers(1, &Buffer);
+		if((error = alGetError()) != AL_NO_ERROR) {
+			DisplayALError("[ACMImp::LoadFile] alGenBuffers : ", error);
+		}
+		{
+			alutLoadWAVFile(outFile, &format, &data, &size, &freq, &loop);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::LoadFile] alutLoadWAVFile : ", error);
 			}
-#endif
-			/*if(!FSOUND_Stream_SetEndCallback(sound, endstreamcallback, 0)) {
-				printMessage("ACMImporter", "SetEndCallback Failed\n", YELLOW);
-			}*/
-			int ret = -1;
+			alBufferData(Buffer, format, data, size, freq);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::LoadFile] alBufferData : ", error);
+			}
+			alutUnloadWAV(format, data, size, freq);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::LoadFile] alutUnloadWAV : ", error);
+			}
+			alGenSources(1, &Source);
+			if((error = alGetError()) != AL_NO_ERROR) {
+				DisplayALError("[ACMImp::LoadFile] alGenSources : ", error);
+			}
+
+			alSourcei (Source, AL_BUFFER,   Buffer   );
+			alSourcef (Source, AL_PITCH,    1.0f     );
+			alSourcef (Source, AL_GAIN,     1.0f     );
+			alSourcefv(Source, AL_POSITION, SourcePos);
+			alSourcefv(Source, AL_VELOCITY, SourceVel);
+			alSourcei (Source, AL_LOOPING,  loop     );
+
+			if (alGetError() != AL_NO_ERROR)
+				return 0xffffffff;
+
 			for(int i = 0; i < MAX_STREAMS; i++) {
-				if(streams[i].free) {
-					streams[i].stream = sound;
-					streams[i].playing = false;
-					streams[i].end = false;
-					streams[i].free = false;
-					streams[i].channel = -1;
-					streams[i].dsp = FSOUND_Stream_CreateDSP(sound, dspcallback, 1, i);
-					ret = i;
-					break;
+				if(musics[i].free) {
+					musics[i].Buffer = Buffer;
+					musics[i].Source = Source;
+					musics[i].free = false;
+					musics[i].playing = false;
+					return i;
 				}
 			}
-			if(ret == -1) {
-				FSOUND_Stream_Close(sound);
-				printf("Too many streams loaded\n");
-				return 0xffffffff;
-			}
-			FSOUND_SAMPLE * smp = FSOUND_Stream_GetSample(sound);
-			int freq;
-			FSOUND_Sample_GetDefaults(smp, &freq, NULL, NULL, NULL);
-			unsigned int lastsample = FSOUND_Stream_GetLengthMs(sound)*(freq / 1000.0);
-			if(!FSOUND_Stream_AddSyncPoint(sound, lastsample-800, "End"))
-				printf("Error setting the Synch Point\n");
-			return ret;
+
+			alDeleteBuffers(1, &Buffer);
+			alDeleteSources(1, &Source);
 		}
+
 		return 0xffffffff;
 	}
 	printMessage("ACMImporter", "Cannot find decompressed file in Cache\n", LIGHT_RED);
@@ -343,14 +479,15 @@ bool ACMImp::Stop(unsigned long index)
 {
 	if(index >= MAX_STREAMS)
 		return false;
-	if(streams[index].free)
+	if(musics[index].free)
 		return true;
-	if(streams[index].playing)
-		FSOUND_Stream_Stop(streams[index].stream);
-	//streams[index].channel = FSOUND_Stream_Play(FSOUND_FREE, streams[index].stream);
-	//FSOUND_Stream_SetTime(streams[index].stream, 0);
-	//FSOUND_SetPaused(streams[index].channel, true);
-	streams[index].playing = false;
+	if(musics[index].playing)
+		alSourceStop(musics[index].Source);
+	SDL_mutexP(musicMutex);
+	musics[index].playing = false;
+	if(musicPlaying)
+		musicPlaying = false;
+	SDL_mutexV(musicMutex);
 	return true;
 }
 
@@ -358,16 +495,33 @@ bool ACMImp::Play(unsigned long index)
 {
 	if(index >= MAX_STREAMS)
 		return false;
-	if(streams[index].free)
+	if(musics[index].free)
 		return false;
-	if(streams[index].playing)
+	if(musics[index].playing)
 		return true;
+	SDL_mutexP(musicMutex);
+	unsigned long volume;
+	if(!core->GetDictionary()->Lookup("Volume Music", volume)) {
+		core->GetDictionary()->SetAt("Volume Music", 100);
+		volume = 100;
+	}
+	alSourcef(musics[musicIndex].Source, AL_GAIN, volume/100.0);
+	alSourceRewind(musics[index].Source);
+	alSourcePlay(musics[index].Source);
 #ifdef WIN32
-	FSOUND_DSP_SetActive(streams[index].dsp, true);
+	unsigned long time = GetTickCount();
+#else
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
 #endif
-	streams[index].channel = FSOUND_Stream_Play(FSOUND_FREE, streams[index].stream);
-	streams[index].playing = true;
-	streams[index].end = false;
+	BufferStartPlayTime = time;
+	BufferDuration = musics[index].Duration;
+	musics[index].playing = true;
+	if(!musicPlaying)
+		musicPlaying = true;
+	musicIndex = index;
+	SDL_mutexV(musicMutex);
 	return true;
 }
 
