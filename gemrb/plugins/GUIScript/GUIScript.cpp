@@ -854,6 +854,17 @@ static PyObject * GemRB_GetVar(PyObject *self, PyObject *args)
 	return Py_BuildValue("l", value);
 }
 
+static PyObject *GemRB_Roll(PyObject *self, PyObject *args)
+{
+	int Dice, Size, Add;
+
+	if(!PyArg_ParseTuple(args, "iii", &Dice, &Size, &Add) {
+		printMessage("GUIScript","Syntax Error: Roll(Dice, Size, Add)\n", LIGHT_RED);
+		return NULL;
+	}
+	return Py_BuildValue("i",core->Roll(Dice, Size, Add) );
+}
+
 static PyMethodDef GemRBMethods[] = {
     {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
@@ -968,6 +979,9 @@ static PyMethodDef GemRBMethods[] = {
 
  	{"SetToken", GemRB_SetToken, METH_VARARGS,
      "Set/Create a Variable in the Token Dictionary."},
+
+	{"Roll", GemRB_Roll, METH_VARARGS,
+     "Calls traditional dice roll."},
 
     {NULL, NULL, 0, NULL}
 };
