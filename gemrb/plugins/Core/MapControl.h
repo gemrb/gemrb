@@ -38,7 +38,7 @@ public:
 	MapControl(void);
 	~MapControl(void);
 	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
+	void Draw(unsigned short XWin, unsigned short YWin);
 	/** Compute parameters after changes in control's or screen geometry */
 	void Realize();
 	/** Sets the Text of the current control */

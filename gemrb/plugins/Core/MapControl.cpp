@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.9 2004/09/12 21:58:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.10 2004/10/08 22:52:08 edheldil Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -34,8 +34,8 @@ static Color darkgreen = {
 	0x00, 0x80, 0x00, 0xff
 };
 
-#define MAP_TO_SCREENX(x) XPos + XCenter - ScrollX + (x)
-#define MAP_TO_SCREENY(y) YPos + YCenter - ScrollY + (y)
+#define MAP_TO_SCREENX(x) XWin + XPos + XCenter - ScrollX + (x)
+#define MAP_TO_SCREENY(y) YWin + YPos + YCenter - ScrollY + (y)
 // Omit [XY]Pos, since these macros are used in OnMouseDown(x, y), and x, y is 
 //   already relative to control [XY]Pos there
 #define SCREEN_TO_MAPX(x) (x) - XCenter + ScrollX
@@ -74,10 +74,12 @@ void MapControl::Realize()
 	Video* video = core->GetVideoDriver();
 
 	// FIXME: ugly!! How to get area size in pixels?
-	Map *map = core->GetGame()->GetCurrentMap();
+	//Map *map = core->GetGame()->GetCurrentMap();
+	//MapWidth = map->GetWidth();
+	//MapHeight = map->GetHeight();
 
-	MapWidth = map->GetWidth();
-	MapHeight = map->GetHeight();
+	MapWidth = MapMOS->Width;
+	MapHeight = MapMOS->Height;
 
 	// FIXME: ugly hack! What is the actual viewport size?
 	Region vp = video->GetViewport();
@@ -92,7 +94,7 @@ void MapControl::Realize()
 }
 
 /** Draws the Control on the Output Display */
-void MapControl::Draw(unsigned short x, unsigned short y)
+void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 {
 	if (!Width || !Height) {
 		return;
@@ -104,14 +106,14 @@ void MapControl::Draw(unsigned short x, unsigned short y)
 	}
 
 	Video* video = core->GetVideoDriver();
-	Region r( x + XPos, y + YPos, Width, Height );
+	Region r( XWin + XPos, YWin + YPos, Width, Height );
 
-	video->BlitSprite( MapMOS, MAP_TO_SCREENX(x), MAP_TO_SCREENY(y), true, &r );
+	video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
 
 	Region vp = video->GetViewport();
 
-	vp.x = x + GAME_TO_SCREENX(vp.x);
-	vp.y = y + GAME_TO_SCREENY(vp.y);
+	vp.x = GAME_TO_SCREENX(vp.x);
+	vp.y = GAME_TO_SCREENY(vp.y);
 	vp.w = ViewWidth;
 	vp.h = ViewHeight;
 
@@ -121,7 +123,7 @@ void MapControl::Draw(unsigned short x, unsigned short y)
 	for (int i = 1; i < 9; i++) {
 		Actor* actor = core->GetGame()->FindPC( i );
 		if (actor) {
-			video->DrawEllipse( x + GAME_TO_SCREENX(actor->Pos.x), y + GAME_TO_SCREENY(actor->Pos.y), 3, 2, i == 1 ? green : darkgreen, false );
+			video->DrawEllipse( GAME_TO_SCREENX(actor->Pos.x), GAME_TO_SCREENY(actor->Pos.y), 3, 2, i == 1 ? green : darkgreen, false );
 		}
 	}
 }
