@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.93 2005/03/06 18:53:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.94 2005/03/06 20:48:13 edheldil Exp $
  *
  */
 
@@ -175,6 +175,7 @@ int SDLVideoDriver::SwapBuffers(void)
 	unsigned long time;
 	GetTime( time );
 	if (( time - lastTime ) < 17) {
+		SDL_Delay( 17 - (time - lastTime) );
 		return ret;
 	}
 	lastTime = time;
