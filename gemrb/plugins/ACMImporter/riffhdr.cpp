@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/riffhdr.cpp,v 1.2 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/riffhdr.cpp,v 1.3 2004/02/24 22:20:37 balrog994 Exp $
  *
  */
 
@@ -27,36 +27,32 @@
 #include "riffhdr.h"
 
 RIFF_HEADER riff = {
-	{'R', 'I', 'F', 'F'},
-	0,
-	{'W', 'A', 'V', 'E', 'f', 'm', 't', ' '},
-	16, 1, 2,
-	22050, 22050*4,
-	4, 16,
-	{'d', 'a', 't', 'a'}
+	{'R', 'I', 'F', 'F'}, 0, {'W', 'A', 'V', 'E', 'f', 'm', 't', ' '}, 16, 1,
+	2, 22050, 22050 * 4, 4, 16, {'d', 'a', 't', 'a'}
 };
 
-void write_riff_header (void *memory, long samples, int channels, int samplerate) {
-	riff.raw_data_len = samples * sizeof(short);
-	riff.total_len_m8 = riff.raw_data_len + sizeof(RIFF_HEADER) - 8;
-  riff.nChannels=(unsigned short) channels;  
-  riff.nSamplesPerSec=samplerate;
-  riff.nAvgBytesPerSec=channels*sizeof(short)*samplerate;
-	memcpy(memory, &riff, sizeof(RIFF_HEADER) );
+void write_riff_header(void* memory, long samples, int channels,
+	int samplerate)
+{
+	riff.raw_data_len = samples * sizeof( short );
+	riff.total_len_m8 = riff.raw_data_len + sizeof( RIFF_HEADER ) - 8;
+	riff.nChannels = ( unsigned short ) channels;  
+	riff.nSamplesPerSec = samplerate;
+	riff.nAvgBytesPerSec = channels * sizeof( short ) * samplerate;
+	memcpy( memory, &riff, sizeof( RIFF_HEADER ) );
 }
 
-WAVC_HEADER wavc={
-  {'W','A','V','C'},
-  {'V','1','.','0'},
-  0,0,28,
-  2,16,22050,0x9ffdu
+WAVC_HEADER wavc = {
+	{'W','A','V','C'}, {'V','1','.','0'}, 0, 0, 28, 2, 16, 22050, 0x9ffdu
 };
 
-void write_wavc_header (FILE *fpoi, long samples, int channels, int compressed, int samplerate) {
-  wavc.uncompressed=samples*sizeof(short);
-  wavc.compressed=compressed;
-	wavc.channels=(short) channels;
-  wavc.samplespersec=(short) samplerate;
-  rewind(fpoi);
-	fwrite(&wavc, 1, sizeof(WAVC_HEADER) ,fpoi );
+void write_wavc_header(FILE* fpoi, long samples, int channels, int compressed,
+	int samplerate)
+{
+	wavc.uncompressed = samples * sizeof( short );
+	wavc.compressed = compressed;
+	wavc.channels = ( short ) channels;
+	wavc.samplespersec = ( short ) samplerate;
+	rewind( fpoi );
+	fwrite( &wavc, 1, sizeof( WAVC_HEADER ), fpoi );
 }

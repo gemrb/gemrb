@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.16 2003/12/21 18:36:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.17 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -26,14 +26,16 @@
 #include <string.h>
 #endif
 
-Control::Control(){
+Control::Control()
+{
 	hasFocus = false;
 	Changed = true;
 	VarName[0] = 0;
 	Value = 0;
 }
 
-Control::~Control(){
+Control::~Control()
+{
 }
 
 /** Key Press Event */
@@ -44,7 +46,8 @@ void Control::OnKeyPress(unsigned char Key, unsigned short Mod)
 /** Key Release Event */
 void Control::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
-	printf("OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", ControlID, Key, Key);
+	printf( "OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", ControlID,
+		Key, Key );
 }
 /** Mouse Over Event */
 void Control::OnMouseOver(unsigned short x, unsigned short y)
@@ -52,12 +55,14 @@ void Control::OnMouseOver(unsigned short x, unsigned short y)
 	//printf("OnMouseOver: CtrlID = 0x%08X, x = %hd, y = %hd\n", ControlID, x, y);
 }
 /** Mouse Button Down */
-void Control::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
+void Control::OnMouseDown(unsigned short x, unsigned short y,
+	unsigned char Button, unsigned short Mod)
 {
 	//printf("OnMouseDown: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", ControlID, x, y, Button, Mod);
 }
 /** Mouse Button Up */
-void Control::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
+void Control::OnMouseUp(unsigned short x, unsigned short y,
+	unsigned char Button, unsigned short Mod)
 {
 	//printf("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", ControlID, x, y, Button, Mod);
 }

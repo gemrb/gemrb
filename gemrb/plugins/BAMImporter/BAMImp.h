@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.9 2004/01/11 16:14:13 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.10 2004/02/24 22:20:44 balrog994 Exp $
  *
  */
 
@@ -27,50 +27,53 @@
 #include "../../includes/RGBAColor.h"
 
 typedef struct FrameEntry {
-	unsigned short	Width;
-	unsigned short	Height;
-	short	XPos;
-	short	YPos;
-	unsigned long	FrameData;
+	unsigned short Width;
+	unsigned short Height;
+	short XPos;
+	short YPos;
+	unsigned long FrameData;
 } FrameEntry;
 
-class BAMImp : public AnimationMgr
-{
+class BAMImp : public AnimationMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
-	FrameEntry *frames;
-	CycleEntry *cycles;
-	unsigned short	FramesCount;
-	unsigned char	CyclesCount;
+	FrameEntry* frames;
+	CycleEntry* cycles;
+	unsigned short FramesCount;
+	unsigned char CyclesCount;
 	//std::vector<FrameEntry> frames;
 	//std::vector<CycleEntry> cycles;
 	Color Palette[256];
-	unsigned char	CompressedColorIndex;
-	unsigned long	FramesOffset, PaletteOffset, FLTOffset;
+	unsigned char CompressedColorIndex;
+	unsigned long FramesOffset, PaletteOffset, FLTOffset;
 public:
 	BAMImp(void);
 	~BAMImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
-	Sprite2D * GetFrameFromCycle(unsigned char Cycle, unsigned short frame);
-	Animation * GetAnimation(unsigned char Cycle, int x, int y, unsigned char mode = IE_NORMAL);
-	AnimationFactory * GetAnimationFactory(const char * ResRef, unsigned char mode = IE_NORMAL);
-	Sprite2D * GetFrame(unsigned short findex, unsigned char mode = IE_NORMAL);
-	void * GetFramePixels(unsigned short findex, unsigned char mode = IE_NORMAL);
+	bool Open(DataStream* stream, bool autoFree = true);
+	Sprite2D* GetFrameFromCycle(unsigned char Cycle, unsigned short frame);
+	Animation* GetAnimation(unsigned char Cycle, int x, int y,
+		unsigned char mode = IE_NORMAL);
+	AnimationFactory* GetAnimationFactory(const char* ResRef,
+		unsigned char mode = IE_NORMAL);
+	Sprite2D* GetFrame(unsigned short findex, unsigned char mode = IE_NORMAL);
+	void* GetFramePixels(unsigned short findex, unsigned char mode = IE_NORMAL);
 	/** This function will load the Animation as a Font */
-	Font * GetFont();
+	Font* GetFont();
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
-	Sprite2D * GetPalette();
+	Sprite2D* GetPalette();
 	/** Gets a Pixel Index from the Image */
-        unsigned long GetPixelIndex(int x, int y)
-        {
-                return 0;
-        }
+	unsigned long GetPixelIndex(int x, int y)
+	{
+		return 0;
+	}
 	/** Gets a Pixel from the Image */
 	Color GetPixel(int x, int y)
 	{
-		Color null = {0x00, 0x00, 0x00, 0x00};
+		Color null = {
+			0x00, 0x00, 0x00, 0x00
+		};
 		return null;
 	}
 public:
@@ -78,8 +81,10 @@ public:
 	{
 		delete this;
 	}
-        int GetCycleCount() { return CyclesCount; }
-
+	int GetCycleCount()
+	{
+		return CyclesCount;
+	}
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.20 2004/02/18 15:07:31 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.21 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -23,124 +23,125 @@
 #include "CachedFileStream.h"
 #include "Interface.h"
 
-extern Interface * core;
+extern Interface* core;
 
-CachedFileStream::CachedFileStream(char * stream, bool autoFree)
+CachedFileStream::CachedFileStream(char* stream, bool autoFree)
 {
 	char fname[_MAX_PATH];
-	ExtractFileFromPath(fname, stream);
+	ExtractFileFromPath( fname, stream );
 
 	char path[_MAX_PATH];
-	strcpy(path, core->CachePath);
-	strcat(path, fname);
-	str = _fopen(path, "rb");
-	if(str == NULL) {
-		if(core->GameOnCD){
-			_FILE * src = _fopen(stream, "rb");
+	strcpy( path, core->CachePath );
+	strcat( path, fname );
+	str = _fopen( path, "rb" );
+	if (str == NULL) {
+		if (core->GameOnCD) {
+			_FILE* src = _fopen( stream, "rb" );
 #ifdef _DEBUG
 			core->CachedFileStreamPtrCount++;
 #endif
-			_FILE * dest = _fopen(path, "wb");
+			_FILE* dest = _fopen( path, "wb" );
 #ifdef _DEBUG
 			core->CachedFileStreamPtrCount++;
 #endif
-			void * buff = malloc(1024*1000);
+			void* buff = malloc( 1024 * 1000 );
 			do {
-				size_t len = _fread(buff, 1, 1024*1000, src);
-				_fwrite(buff, 1, len, dest);
-			} while(!_feof(src));
-			free(buff);
-			_fclose(src);
+				size_t len = _fread( buff, 1, 1024 * 1000, src );
+				_fwrite( buff, 1, len, dest );
+			} while (!_feof( src ));
+			free( buff );
+			_fclose( src );
 #ifdef _DEBUG
 			core->CachedFileStreamPtrCount--;
 #endif
-			_fclose(dest);
+			_fclose( dest );
 #ifdef _DEBUG
 			core->CachedFileStreamPtrCount--;
 #endif
-			str = _fopen(path, "rb");
-		}else{
-			str = _fopen(stream, "rb");
+			str = _fopen( path, "rb" );
+		} else {
+			str = _fopen( stream, "rb" );
 		}
 	}
 #ifdef _DEBUG
 	core->CachedFileStreamPtrCount++;
 #endif
 	startpos = 0;
-	_fseek(str, 0, SEEK_END);
-	size = _ftell(str);
-	_fseek(str, 0, SEEK_SET);
-	strcpy(filename, fname);
-	strcpy(originalfile, stream);
+	_fseek( str, 0, SEEK_END );
+	size = _ftell( str );
+	_fseek( str, 0, SEEK_SET );
+	strcpy( filename, fname );
+	strcpy( originalfile, stream );
 	Pos = 0;
 	this->autoFree = autoFree;
 }
 
-CachedFileStream::CachedFileStream(CachedFileStream * cfs, int startpos, int size, bool autoFree)
+CachedFileStream::CachedFileStream(CachedFileStream* cfs, int startpos,
+	int size, bool autoFree)
 {
 	this->size = size;
 	this->startpos = startpos;
 	this->autoFree = autoFree;
 	char cpath[_MAX_PATH];
-	strcpy(cpath, core->CachePath);
-	strcat(cpath, cfs->filename);
-	str = _fopen(cpath, "rb");
-	if(str == NULL) {
-		str = _fopen(cfs->originalfile, "rb");
-		if(str == NULL){
-			printf("\nDANGER WILL ROBINSON!!! str == NULL\nI'll wait a second hoping to open the file...");
+	strcpy( cpath, core->CachePath );
+	strcat( cpath, cfs->filename );
+	str = _fopen( cpath, "rb" );
+	if (str == NULL) {
+		str = _fopen( cfs->originalfile, "rb" );
+		if (str == NULL) {
+			printf( "\nDANGER WILL ROBINSON!!! str == NULL\nI'll wait a second hoping to open the file..." );
 		}
 	}
 #ifdef _DEBUG
 	core->CachedFileStreamPtrCount++;
 #endif
-	_fseek(str, startpos, SEEK_SET);
+	_fseek( str, startpos, SEEK_SET );
 	Pos = 0;
 }
 
 CachedFileStream::~CachedFileStream(void)
 {
-	if(autoFree && str) {
+	if (autoFree && str) {
 #ifdef _DEBUG
 		core->CachedFileStreamPtrCount--;
 #endif
-		_fclose(str);
+		_fclose( str );
 	}
 	autoFree = false; //File stream destructor hack
 }
 
-int CachedFileStream::Read(void * dest, int length)
+int CachedFileStream::Read(void* dest, int length)
 {
-	size_t c = _fread(dest, 1, length, str);
-	if(c < 0) {
-		if(_feof(str)) {
+	size_t c = _fread( dest, 1, length, str );
+	if (c < 0) {
+		if (_feof( str )) {
 			return GEM_EOF;
 		}
 		return GEM_ERROR;
 	}
-	if(Encrypted)
-		ReadDecrypted(dest, c);
-	Pos+=c;
+	if (Encrypted) {
+		ReadDecrypted( dest, c );
+	}
+	Pos += c;
 	return c;
 }
 
 int CachedFileStream::Seek(int pos, int startpos)
 {
-	switch(startpos) 
-		{
+	switch (startpos) {
 		case GEM_CURRENT_POS:
-			_fseek(str, pos, SEEK_CUR);
-			Pos+=pos;
-		break;
+			_fseek( str, pos, SEEK_CUR );
+			Pos += pos;
+			break;
 
 		case GEM_STREAM_START:
-			_fseek(str, this->startpos + pos, SEEK_SET);
-			Pos=pos;
-		break;
+			_fseek( str, this->startpos + pos, SEEK_SET );
+			Pos = pos;
+			break;
 
 		default:
 			return GEM_ERROR;
-		}
+	}
 	return GEM_OK;
 }
 
@@ -149,28 +150,30 @@ unsigned long CachedFileStream::Size()
 	return size;
 }
 /** No descriptions */
-int CachedFileStream::ReadLine(void * buf, int maxlen)
+int CachedFileStream::ReadLine(void* buf, int maxlen)
 {
-	if(_feof(str))
+	if (_feof( str )) {
 		return -1;
-	if(Pos >= size)
+	}
+	if (Pos >= size) {
 		return -1;
-	unsigned char *p = (unsigned char*)buf;
+	}
+	unsigned char * p = ( unsigned char * ) buf;
 	int i = 0;
-	while(i < (maxlen-1)) {
-		int ch = _fgetc(str);
-		if(_feof(str))
+	while (i < ( maxlen - 1 )) {
+		int ch = _fgetc( str );
+		if (_feof( str ))
 			break;
-		if(Pos==size)
+		if (Pos == size)
 			break;
-		if(Encrypted)
-			ch^=GEM_ENCRYPTION_KEY[Pos&63];
+		if (Encrypted)
+			ch ^= GEM_ENCRYPTION_KEY[Pos & 63];
 		Pos++;
-		if(((char)ch) == '\n')
+		if (( ( char ) ch ) == '\n')
 			break;
-		if(((char)ch) == '\t')
+		if (( ( char ) ch ) == '\t')
 			ch = ' ';
-		if(((char)ch) != '\r')
+		if (( ( char ) ch ) != '\r')
 			p[i++] = ch;
 	}
 	p[i] = 0;

@@ -26,25 +26,24 @@
 typedef struct PCStruct {
 	unsigned short Unknown0;
 	unsigned short PartyOrder;
-	unsigned long  OffsetToCRE;
-	unsigned long  CRESize;
-	char           CREResRef[8];
-	unsigned long  Orientation;
-	char           Area[8];
+	unsigned long OffsetToCRE;
+	unsigned long CRESize;
+	char CREResRef[8];
+	unsigned long Orientation;
+	char Area[8];
 	unsigned short XPos;
 	unsigned short YPos;
 	unsigned short ViewXPos;
 	unsigned short ViewYPos;
-	unsigned char  Unknown28[100];
-	unsigned char  Unknown8C[16];
-	char           ResRef[8][3];
-	unsigned char  UnknownB4[12];
+	unsigned char Unknown28[100];
+	unsigned char Unknown8C[16];
+	char ResRef[8][3];
+	unsigned char UnknownB4[12];
 } PCStruct;
 
-class GAMImp : public SaveGameMgr
-{
+class GAMImp : public SaveGameMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
 	int version;
 	unsigned long PCSize;
@@ -79,8 +78,8 @@ public:
 public:
 	GAMImp(void);
 	~GAMImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
-	Game * GetGame();
+	bool Open(DataStream* stream, bool autoFree = true);
+	Game* GetGame();
 public:
 	void release(void)
 	{

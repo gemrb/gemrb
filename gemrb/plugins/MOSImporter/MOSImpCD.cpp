@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImpCD.cpp,v 1.2 2003/11/25 13:48:00 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImpCD.cpp,v 1.3 2004/02/24 22:20:40 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ MOSImpCD::~MOSImpCD(void)
 {
 }
 
-void * MOSImpCD::Create(void)
+void* MOSImpCD::Create(void)
 {
 	return new MOSImp();
 }
@@ -48,7 +48,7 @@ SClass_ID MOSImpCD::SuperClassID(void)
 
 Class_ID MOSImpCD::ClassID(void)
 {
-	return Class_ID(0x763abc16, 0x19a65410);
+	return Class_ID( 0x763abc16, 0x19a65410 );
 }
 
 const char* MOSImpCD::InternalName(void)

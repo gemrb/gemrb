@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImpCD.cpp,v 1.2 2003/11/25 13:48:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImpCD.cpp,v 1.3 2004/02/24 22:20:42 balrog994 Exp $
  *
  */
 
@@ -30,12 +30,12 @@ IDSImpCD::~IDSImpCD(void)
 {
 }
 
-void * IDSImpCD::Create(void)
+void* IDSImpCD::Create(void)
 {
 	return new IDSImp();
 }
 
-const char * IDSImpCD::ClassName(void)
+const char* IDSImpCD::ClassName(void)
 {
 	return "IDSImporter";
 }
@@ -47,5 +47,5 @@ SClass_ID IDSImpCD::SuperClassID(void)
 
 Class_ID IDSImpCD::ClassID(void)
 {
-	return Class_ID(0x2a537210, 0xca573a46);
+	return Class_ID( 0x2a537210, 0xca573a46 );
 }

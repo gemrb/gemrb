@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.20 2004/02/18 15:07:09 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.21 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -24,7 +24,7 @@
 
 #ifdef _DEBUG
 #include "Interface.h"
-extern Interface * core;
+extern Interface* core;
 #endif
 
 FileStream::FileStream(void)
@@ -36,25 +36,25 @@ FileStream::FileStream(void)
 
 FileStream::~FileStream(void)
 {
-	if(autoFree && str) {
+	if (autoFree && str) {
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
-		_fclose(str);
+		_fclose( str );
 	}
 }
 
-bool FileStream::Open(const char * filename, bool autoFree)
+bool FileStream::Open(const char* filename, bool autoFree)
 {
-	if(str && this->autoFree) {
+	if (str && this->autoFree) {
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
-		_fclose(str);
+		_fclose( str );
 	}
 	this->autoFree = autoFree;
-	str = _fopen(filename, "rb");
-	if(str == NULL) {
+	str = _fopen( filename, "rb" );
+	if (str == NULL) {
 		return false;
 	}
 #ifdef _DEBUG
@@ -62,103 +62,107 @@ bool FileStream::Open(const char * filename, bool autoFree)
 #endif
 	startpos = 0;
 	opened = true;
-	_fseek(str, 0, SEEK_END);
-	size = _ftell(str)+1;
-	_fseek(str, 0, SEEK_SET);
-	ExtractFileFromPath(this->filename, filename);
+	_fseek( str, 0, SEEK_END );
+	size = _ftell( str ) + 1;
+	_fseek( str, 0, SEEK_SET );
+	ExtractFileFromPath( this->filename, filename );
 	Pos = 0;
 	return true;
 }
 
-bool FileStream::Open(_FILE * stream, int startpos, int size, bool autoFree)
+bool FileStream::Open(_FILE* stream, int startpos, int size, bool autoFree)
 {
-	if(str && this->autoFree) {
+	if (str && this->autoFree) {
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
-		_fclose(str);
+		_fclose( str );
 	}
 	this->autoFree = autoFree;
 	str = stream;
-	if(str == NULL)
+	if (str == NULL) {
 		return false;
+	}
 #ifdef _DEBUG
 	core->FileStreamPtrCount++;
 #endif
 	this->startpos = startpos;
 	opened = true;
 	this->size = size;
-	strcpy(filename, "");
-	_fseek(str, startpos, SEEK_SET);
+	strcpy( filename, "" );
+	_fseek( str, startpos, SEEK_SET );
 	Pos = 0;
 	return true;
 }
 
-int FileStream::Read(void * dest, int length)
+int FileStream::Read(void* dest, int length)
 {
-	if(!opened)
+	if (!opened) {
 		return GEM_ERROR;
-	size_t c = _fread(dest, 1, length, str);
+	}
+	size_t c = _fread( dest, 1, length, str );
 	//if(feof(str)) { /* slightly modified by brian  oct 11 2003*/
 	//	return GEM_EOF;
 	//}
-	if(c < 0) {
+	if (c < 0) {
 		return GEM_ERROR;
 	}
-	if(Encrypted)
-		ReadDecrypted(dest, c);
-	Pos+=c;
+	if (Encrypted) {
+		ReadDecrypted( dest, c );
+	}
+	Pos += c;
 	return c;
 }
 
 int FileStream::Seek(int pos, int startpos)
 {
-	if(!opened)
+	if (!opened) {
 		return GEM_ERROR;
-	switch(startpos) 
-		{
+	}
+	switch (startpos) {
 		case GEM_CURRENT_POS:
-			_fseek(str, pos, SEEK_CUR);
-			Pos+=pos;
-		break;
+			_fseek( str, pos, SEEK_CUR );
+			Pos += pos;
+			break;
 
 		case GEM_STREAM_START:
-			_fseek(str, this->startpos + pos, SEEK_SET);
+			_fseek( str, this->startpos + pos, SEEK_SET );
 			Pos = pos;
-		break;
+			break;
 
 		default:
 			return GEM_ERROR;
-		}
+	}
 	return GEM_OK;
 }
 
 unsigned long FileStream::Size()
 {
-	return size;	
+	return size;
 }
 /** No descriptions */
-int FileStream::ReadLine(void * buf, int maxlen)
+int FileStream::ReadLine(void* buf, int maxlen)
 {
-	if(_feof(str))
+	if (_feof( str )) {
 		return -1;
-	unsigned char *p = (unsigned char*)buf;
+	}
+	unsigned char * p = ( unsigned char * ) buf;
 	int i = 0;
-	while(i < (maxlen-1)) {
-		int ch = _fgetc(str);
-		if(_feof(str))
-			 break;
-		if(Pos==size)
+	while (i < ( maxlen - 1 )) {
+		int ch = _fgetc( str );
+		if (_feof( str ))
 			break;
-		if(Encrypted) {
-			ch^=GEM_ENCRYPTION_KEY[Pos&63];
+		if (Pos == size)
+			break;
+		if (Encrypted) {
+			ch ^= GEM_ENCRYPTION_KEY[Pos & 63];
 		}
 		Pos++;
-		if(((char)ch) == '\n')
+		if (( ( char ) ch ) == '\n')
 			break;
-		if(((char)ch) == '\t')
+		if (( ( char ) ch ) == '\t')
 			ch = ' ';
-		if(((char)ch) != '\r')
+		if (( ( char ) ch ) != '\r')
 			p[i++] = ch;
 	}
 	p[i] = 0;

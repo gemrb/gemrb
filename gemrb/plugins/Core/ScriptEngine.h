@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptEngine.h,v 1.5 2003/12/20 15:55:58 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptEngine.h,v 1.6 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -36,19 +36,18 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT ScriptEngine : public Plugin
-{
+class GEM_EXPORT ScriptEngine : public Plugin {
 public:
 	ScriptEngine(void);
 	virtual ~ScriptEngine(void);
 	/** Initialization Routine */
 	virtual bool Init(void) = 0;
 	/** Load Script */
-	virtual bool LoadScript(const char * filename) = 0;
+	virtual bool LoadScript(const char* filename) = 0;
 	/** Run Function */
-	virtual bool RunFunction(char * fname) = 0;
+	virtual bool RunFunction(char* fname) = 0;
 	/** Exec a single String */
-	virtual char * ExecString(char * string) = 0;
+	virtual char* ExecString(char* string) = 0;
 };
 
 #endif

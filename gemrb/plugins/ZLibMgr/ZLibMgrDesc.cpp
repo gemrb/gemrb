@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibMgrDesc.cpp,v 1.2 2003/11/25 13:47:59 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibMgrDesc.cpp,v 1.3 2004/02/24 22:20:35 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ ZLibMgrDesc::~ZLibMgrDesc(void)
 {
 }
 
-void * ZLibMgrDesc::Create(void)
+void* ZLibMgrDesc::Create(void)
 {
 	return new ZLibManager();
 }
@@ -47,5 +47,5 @@ SClass_ID ZLibMgrDesc::SuperClassID(void)
 
 Class_ID ZLibMgrDesc::ClassID(void)
 {
-	return Class_ID(0xA1C8E1D1, 0xE7AA2BE5);
+	return Class_ID( 0xA1C8E1D1, 0xE7AA2BE5 );
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.16 2004/01/19 20:04:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.17 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -28,16 +28,16 @@
 #include <windows.h>
 #endif
 
-extern Interface * core;
+extern Interface* core;
 
-Animation::Animation(unsigned short * frames, int count)
+Animation::Animation(unsigned short* frames, int count)
 {
 	indices = new unsigned short[count];
 	indicesCount = count;
-	memcpy(indices, frames, count*sizeof(unsigned short));
+	memcpy( indices, frames, count * sizeof( unsigned short ) );
 	//for(int i = 0; i < count; i++)
 	//	indices.push_back(frames[i]);
-	pos = rand()%count;
+	pos = rand() % count;
 	starttime = 0;
 	x = 0;
 	y = 0;
@@ -58,62 +58,68 @@ Animation::Animation(unsigned short * frames, int count)
 Animation::~Animation(void)
 {
 	delete[] indices;
-	if(!free)
+	if (!free) {
 		return;
-	for(unsigned int i = 0; i < frames.size(); i++) {
-		core->GetVideoDriver()->FreeSprite(frames[i]);
+	}
+	for (unsigned int i = 0; i < frames.size(); i++) {
+		core->GetVideoDriver()->FreeSprite( frames[i] );
 	}
 }
 
-void Animation::AddFrame(Sprite2D * frame, int index)
+void Animation::AddFrame(Sprite2D* frame, int index)
 {
-	frames.push_back(frame);
-	link.push_back(index);
+	frames.push_back( frame );
+	link.push_back( index );
 	int x = -frame->XPos;
 	int y = -frame->YPos;
-	int w = frame->Width-frame->XPos;
-	int h = frame->Height-frame->YPos;
-	if(x < animArea.x)
+	int w = frame->Width - frame->XPos;
+	int h = frame->Height - frame->YPos;
+	if (x < animArea.x) {
 		animArea.x = x;
-	if(y < animArea.y)
+	}
+	if (y < animArea.y) {
 		animArea.y = y;
-	if(w > animArea.w)
+	}
+	if (w > animArea.w) {
 		animArea.w = w;
-	if(h > animArea.h)
+	}
+	if (h > animArea.h) {
 		animArea.h = h;
+	}
 }
 
-Sprite2D * Animation::NextFrame(void)
+Sprite2D* Animation::NextFrame(void)
 {
-	if(!Active)
+	if (!Active) {
 		return NULL;
-	if(starttime == 0) {
+	}
+	if (starttime == 0) {
 #ifdef WIN32
 		starttime = GetTickCount();
 #else
 		struct timeval tv;
-		gettimeofday(&tv, NULL);
-		starttime = (tv.tv_usec/1000) + (tv.tv_sec*1000);
+		gettimeofday( &tv, NULL );
+		starttime = ( tv.tv_usec / 1000 ) + ( tv.tv_sec * 1000 );
 #endif
 	}
-	Sprite2D * ret = NULL;
-	if(playReversed) {
-		int max = (int)link.size()-1;
-		for(unsigned int i = 0; i < link.size(); i++) {
-			if(link[i] == indices[max-pos]) {
+	Sprite2D* ret = NULL;
+	if (playReversed) {
+		int max = ( int ) link.size() - 1;
+		for (unsigned int i = 0; i < link.size(); i++) {
+			if (link[i] == indices[max - pos]) {
 				ret = frames[i];
 				break;
 			}
 		}
 	} else {
-		for(unsigned int i = 0; i < link.size(); i++) {
-			if(link[i] == indices[pos]) {
+		for (unsigned int i = 0; i < link.size(); i++) {
+			if (link[i] == indices[pos]) {
 				ret = frames[i];
 				break;
 			}
 		}
 	}
-	if(pastLastFrame && playOnce) {
+	if (pastLastFrame && playOnce) {
 		endReached = true;
 		return ret;
 	}
@@ -122,18 +128,19 @@ Sprite2D * Animation::NextFrame(void)
 #else
 	struct timeval tv;
 	unsigned long time;
-	gettimeofday(&tv, NULL);
-	time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
+	gettimeofday( &tv, NULL );
+	time = ( tv.tv_usec / 1000 ) + ( tv.tv_sec * 1000 );
 #endif
-	if((time - starttime) >= (unsigned long)(1000/fps)) {
+	if (( time - starttime ) >= ( unsigned long ) ( 1000 / fps )) {
 		pos++;
 		starttime = time;
 	}
 	pos %= frames.size();
-	if(pos == (frames.size()-1))
+	if (pos == ( frames.size() - 1 )) {
 		pastLastFrame = true;
-	if(autoSwitchOnEnd && (!endReached)) {
-		if(pastLastFrame && (pos == 0)) {
+	}
+	if (autoSwitchOnEnd && ( !endReached )) {
+		if (pastLastFrame && ( pos == 0 )) {
 			endReached = true;
 		}
 	}
@@ -146,16 +153,17 @@ void Animation::release(void)
 	delete this;
 }
 /** Gets the i-th frame */
-Sprite2D * Animation::GetFrame(unsigned long i)
+Sprite2D* Animation::GetFrame(unsigned long i)
 {
-	if(i >= frames.size())
+	if (i >= frames.size()) {
 		return NULL;
+	}
 	return frames[i];
 }
 
-void Animation::SetPalette(Color * Palette)
+void Animation::SetPalette(Color* Palette)
 {
-	for(size_t i = 0; i < frames.size(); i++) {
-		core->GetVideoDriver()->SetPalette(frames[i], Palette);
+	for (size_t i = 0; i < frames.size(); i++) {
+		core->GetVideoDriver()->SetPalette( frames[i], Palette );
 	}
 }

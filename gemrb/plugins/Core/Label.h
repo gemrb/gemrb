@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.h,v 1.9 2004/02/24 21:20:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.h,v 1.10 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -42,35 +42,36 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT Label : public Control  {
+class GEM_EXPORT Label : public Control {
 public: 
-	Label(unsigned short bLength, Font * font);
+	Label(unsigned short bLength, Font* font);
 	~Label();
-  /** Draws the Control on the Output Display */
-  void Draw(unsigned short x, unsigned short y);
-  /** This function sets the actual Label Text */
-  int SetText(const char * string, int pos = 0);
-  /** Sets the Foreground Font Color */
-  void SetColor(Color col, Color bac);
-  /** Sets the Alignment of Text */
-  void SetAlignment(unsigned char Alignment);
+	/** Draws the Control on the Output Display */
+	void Draw(unsigned short x, unsigned short y);
+	/** This function sets the actual Label Text */
+	int SetText(const char* string, int pos = 0);
+	/** Sets the Foreground Font Color */
+	void SetColor(Color col, Color bac);
+	/** Sets the Alignment of Text */
+	void SetAlignment(unsigned char Alignment);
 
-  /** Mouse Button Down */
-  void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
-  /** Use the RGB Color for the Font */
-  bool useRGB;
-  /** OnPress Scripted Event Function Name */
-  char LabelOnPress[64];
+	/** Mouse Button Down */
+	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
+		unsigned short Mod);
+	/** Use the RGB Color for the Font */
+	bool useRGB;
+	/** OnPress Scripted Event Function Name */
+	char LabelOnPress[64];
 private: // Private attributes
-  /** Text String Buffer */
-  char * Buffer;
-  /** Font for Text Writing */
-  Font * font;
-  /** Foreground & Background Colors */
-  Color *palette;
-  
-  /** Alignment Variable */
-  unsigned char Alignment;
+	/** Text String Buffer */
+	char* Buffer;
+	/** Font for Text Writing */
+	Font* font;
+	/** Foreground & Background Colors */
+	Color* palette;
+
+	/** Alignment Variable */
+	unsigned char Alignment;
 };
 
 #endif

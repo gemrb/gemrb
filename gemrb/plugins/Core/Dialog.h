@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.7 2004/02/23 20:46:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.h,v 1.8 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -43,7 +43,7 @@
 #define IE_DLG_TR_JOURNAL  0x10
 
 typedef struct DialogString {
-	char ** strings;
+	char** strings;
 	unsigned long count;
 } DialogString;
 
@@ -51,36 +51,39 @@ typedef struct DialogTransition {
 	unsigned long Flags;
 	unsigned long textStrRef;
 	unsigned long journalStrRef;
-	DialogString * trigger;
-	DialogString * action;
-	char          Dialog[9];
-    unsigned long stateIndex;
+	DialogString* trigger;
+	DialogString* action;
+	char Dialog[9];
+	unsigned long stateIndex;
 } DialogTransition;
 
 typedef struct DialogState {
 	unsigned long StrRef;
-	DialogTransition ** transitions;
+	DialogTransition** transitions;
 	unsigned long transitionsCount;
-	DialogString * trigger;
+	DialogString* trigger;
 } DialogState;
 
-class GEM_EXPORT Dialog
-{
+class GEM_EXPORT Dialog {
 public:
 	Dialog(void);
 	~Dialog(void);
 private:
-	std::vector<DialogState*> initialStates;
+	std::vector< DialogState*> initialStates;
 public:
-	void AddState(DialogState *ds);
+	void AddState(DialogState* ds);
 	DialogState* GetState(int index);
 	char ResRef[9];
 private:
-	void FreeDialogState(DialogState *ds);
-	void FreeDialogString(DialogString *ds);
+	void FreeDialogState(DialogState* ds);
+	void FreeDialogString(DialogString* ds);
 public:
-	int StateCount() { return initialStates.size(); }
-	void Release() {
+	int StateCount()
+	{
+		return initialStates.size();
+	}
+	void Release()
+	{
 		delete this;
 	}
 };

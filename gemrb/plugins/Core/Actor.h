@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.18 2004/02/22 18:15:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.19 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -44,18 +44,17 @@
 
 #define MAX_STATS 256
 
-class GEM_EXPORT Actor : public Moveble
-{
+class GEM_EXPORT Actor : public Moveble {
 public:
 	unsigned char InParty;
 	long BaseStats[MAX_STATS];
 	long Modified[MAX_STATS];
-	CharAnimations *anims;
+	CharAnimations* anims;
 	//char  ScriptName[33]; //death variable
 	//char  Scripts[MAX_SCRIPTS][9];
-	char  Dialog[9];
+	char Dialog[9];
 	//CRE DATA FIELDS
-	char *LongName, *ShortName;
+	char* LongName, * ShortName;
 	char SmallPortrait[9];
 	char LargePortrait[9];
 	unsigned long StrRefs[100];
@@ -72,98 +71,102 @@ public:
 	void SetPosition(unsigned int XPos, unsigned int YPos);
 	void SetAnimationID(unsigned short AnimID);
 	/** returns the animations */
-	CharAnimations *GetAnims();
+	CharAnimations* GetAnims();
 	/** Inits the Modified vector */
 	void Init();
 	/** Returns a Stat value */
-	long  GetStat(unsigned int StatIndex);
+	long GetStat(unsigned int StatIndex);
 	/** Sets a Stat Value (unsaved) */
-	bool  SetStat(unsigned int StatIndex, long Value);
+	bool SetStat(unsigned int StatIndex, long Value);
 	/** Returns the difference */
-	long  GetMod(unsigned int StatIndex);
+	long GetMod(unsigned int StatIndex);
 	/** Returns a Stat Base Value */
-	long  GetBase(unsigned int StatIndex);
+	long GetBase(unsigned int StatIndex);
 	/** Sets a Stat Base Value */
-	bool  SetBase(unsigned int StatIndex, long Value);
+	bool SetBase(unsigned int StatIndex, long Value);
 	/** Sets the modified value in different ways, returns difference */
-	int   NewStat(unsigned int StatIndex, long ModifierValue, long ModifierType);
+	int NewStat(unsigned int StatIndex, long ModifierValue, long ModifierType);
 	/** Sets the Scripting Name (death variable) */
-	void  SetScriptName(const char * string)
+	void SetScriptName(const char* string)
 	{
-		if(string == NULL)
+		if (string == NULL) {
 			return;
-		strncpy(scriptName, string, 32);
+		}
+		strncpy( scriptName, string, 32 );
 	}
 	/** Sets the Dialog ResRef */
-	void  SetDialog(const char * ResRef)
+	void SetDialog(const char* ResRef)
 	{
-		if(ResRef == NULL)
+		if (ResRef == NULL) {
 			return;
-		strncpy(Dialog, ResRef, 8);
+		}
+		strncpy( Dialog, ResRef, 8 );
 	}
 	/** Sets the Icon ResRef */
-	void  SetPortrait(const char * ResRef)
+	void SetPortrait(const char* ResRef)
 	{
 		int i;
 
-		if(ResRef == NULL)
+		if (ResRef == NULL) {
 			return;
-		for(i=0;i<8 && ResRef[i];i++);
-		memset(SmallPortrait,0,8);
-		memset(LargePortrait,0,8);
-		strncpy(SmallPortrait, ResRef, 8);
-		strncpy(LargePortrait, ResRef, 8);
-		SmallPortrait[i]='S';
-		LargePortrait[i]='M';
+		}
+		for (i = 0; i < 8 && ResRef[i]; i++)
+			;
+		memset( SmallPortrait, 0, 8 );
+		memset( LargePortrait, 0, 8 );
+		strncpy( SmallPortrait, ResRef, 8 );
+		strncpy( LargePortrait, ResRef, 8 );
+		SmallPortrait[i] = 'S';
+		LargePortrait[i] = 'M';
 	}
 	/** Gets the Character Long Name/Short Name */
-	char *GetName(int which)
+	char* GetName(int which)
 	{
-		if(which) 
+		if (which) {
 			return LongName;
+		}
 		return ShortName;
 	}
 	/** Gets the DeathVariable */
-	char *GetScriptName(void)
+	char* GetScriptName(void)
 	{
 		//return ScriptName;
 		return scriptName;
 	}
-    /** Gets a Script ResRef */
-	char *GetScript(int ScriptIndex)
+	/** Gets a Script ResRef */
+	char* GetScript(int ScriptIndex)
 	{
 		//return Scripts[ScriptIndex];
 		return NULL;
 	}
 	/** Gets the Dialog ResRef */
-	char *GetDialog(void)
+	char* GetDialog(void)
 	{
 		return Dialog;
 	}
 	/** Gets the Portrait ResRef */
-	char *GetPortrait(int which)
+	char* GetPortrait(int which)
 	{
-		return which?SmallPortrait:LargePortrait;
+		return which ? SmallPortrait : LargePortrait;
 	}
-	void SetText(char * ptr, unsigned char type)
+	void SetText(char* ptr, unsigned char type)
 	{
-		switch(type)
-		{
-		case 0:
-			{
-				size_t len = strlen(ptr)+1;
-				LongName = (char*)realloc(LongName, len);
-				memcpy(LongName, ptr, len);			
-			}
-		break;
+		switch (type) {
+			case 0:
+				 {
+					size_t len = strlen( ptr ) + 1;
+					LongName = ( char * ) realloc( LongName, len );
+					memcpy( LongName, ptr, len );
+				}
+				break;
 
-		case 1:
-			{
-				size_t len = strlen(ptr)+1;
-				ShortName = (char*)realloc(ShortName, len);
-				memcpy(ShortName, ptr, len);
-			}
-		break;
+			case 1:
+				 {
+					size_t len = strlen( ptr ) + 1;
+					ShortName = ( char * ) realloc( ShortName, len );
+					memcpy( ShortName, ptr, len );
+				}
+				break;
 		}
 	}
 };

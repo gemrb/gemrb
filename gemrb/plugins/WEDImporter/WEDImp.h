@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.7 2004/01/04 15:21:13 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.8 2004/02/24 22:20:37 balrog994 Exp $
  *
  */
 
@@ -25,28 +25,29 @@
 #include "../Core/TileMapMgr.h"
 
 typedef struct Overlay {
-	unsigned short	Width;
-	unsigned short	Height;
-	char			TilesetResRef[8];
-	unsigned long	unknown;
-	unsigned long	TilemapOffset;
-	unsigned long	TILOffset;
+	unsigned short Width;
+	unsigned short Height;
+	char TilesetResRef[8];
+	unsigned long unknown;
+	unsigned long TilemapOffset;
+	unsigned long TILOffset;
 } Overlay;
 
-class WEDImp : public TileMapMgr
-{
+class WEDImp : public TileMapMgr {
 private:
-	std::vector<Overlay> overlays;
-	DataStream * str;
+	std::vector< Overlay> overlays;
+	DataStream* str;
 	bool autoFree;
-	unsigned long OverlaysCount, DoorsCount, OverlaysOffset, SecHeaderOffset, DoorsOffset, DoorTilesOffset;
-	unsigned long WallPolygonsCount, PolygonsOffset, VerticesOffset, WallGroupsOffset, PILTOffset;
+	unsigned long OverlaysCount, DoorsCount, OverlaysOffset, SecHeaderOffset,
+		DoorsOffset, DoorTilesOffset;
+	unsigned long WallPolygonsCount, PolygonsOffset, VerticesOffset,
+		WallGroupsOffset, PILTOffset;
 public:
 	WEDImp(void);
 	~WEDImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
-	TileMap * GetTileMap();
-	unsigned short * GetDoorIndices(char * ResRef, int *count, bool &BaseClosed);
+	bool Open(DataStream* stream, bool autoFree = true);
+	TileMap* GetTileMap();
+	unsigned short* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed);
 public:
 	void release(void)
 	{

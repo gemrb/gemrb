@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.1 2004/02/16 02:10:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.2 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -42,41 +42,41 @@
 
 
 typedef struct STOItem {
-        ieResRef ItemResRef;
-        ieWord unknown;
-        ieWord Usage1;
-        ieWord Usage2;
-        ieWord Usage3;
-        ieDword Flags;
-        ieDword AmountInStock;
-        ieDword InfiniteSupply;
-        // V1.1
+	ieResRef ItemResRef;
+	ieWord unknown;
+	ieWord Usage1;
+	ieWord Usage2;
+	ieWord Usage3;
+	ieDword Flags;
+	ieDword AmountInStock;
+	ieDword InfiniteSupply;
+	// V1.1
 	char unknown2[56];
 } STOItem;
 
 typedef struct STODrink {
-        ieResRef RumourResRef;
-        ieStrRef DrinkName;
-        ieDword Price;
-        ieDword AlcoholicStrength;
+	ieResRef RumourResRef;
+	ieStrRef DrinkName;
+	ieDword Price;
+	ieDword AlcoholicStrength;
 } STODrink;
 
 typedef struct STOCure {
-        ieResRef CureResRef;
-        ieDword Price;
+	ieResRef CureResRef;
+	ieDword Price;
 } STOCure;
 
 
 class GEM_EXPORT Store {
 public:
-        Store ();
-	~Store ();
+	Store();
+	~Store();
 
-	std::vector<STOItem *> items;
-	std::vector<STODrink *> drinks;
-	std::vector<STOCure *> cures;
+	std::vector< STOItem*> items;
+	std::vector< STODrink*> drinks;
+	std::vector< STOCure*> cures;
 
-	ieDword *purchased_categories;
+	ieDword* purchased_categories;
 
 	ieDword Type;
 	ieStrRef StoreName;
@@ -102,7 +102,7 @@ public:
 	ieDword CuresOffset;
 	ieDword CuresCount;
 	char unknown2[36];
-	
+
 	// IWD2 only
 	char unknown3[80];
 };

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.h,v 1.2 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -38,22 +38,21 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT AnimationFactory : public FactoryObject
-{
+class GEM_EXPORT AnimationFactory : public FactoryObject {
 private:
-	std::vector<unsigned short> links;
-	std::vector<Sprite2D*> frames;
-	std::vector<CycleEntry> cycles;
-	unsigned short * FLTable;	// Frame Lookup Table
+	std::vector< unsigned short> links;
+	std::vector< Sprite2D*> frames;
+	std::vector< CycleEntry> cycles;
+	unsigned short* FLTable;	// Frame Lookup Table
 public:
-	AnimationFactory(const char * ResRef);
+	AnimationFactory(const char* ResRef);
 	~AnimationFactory(void);
-	void AddFrame(Sprite2D * frame, unsigned short index);
+	void AddFrame(Sprite2D* frame, unsigned short index);
 	void AddCycle(CycleEntry cycle);
-	void LoadFLT(unsigned short * buffer, int count);
-	Animation * GetCycle(unsigned char cycle);
-  /** No descriptions */
-  Sprite2D * GetFrame(unsigned short index);
+	void LoadFLT(unsigned short* buffer, int count);
+	Animation* GetCycle(unsigned char cycle);
+	/** No descriptions */
+	Sprite2D* GetFrame(unsigned short index);
 };
 
 #endif

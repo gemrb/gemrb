@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.10 2004/02/11 22:22:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.11 2004/02/24 22:20:38 balrog994 Exp $
  *
  */
 
@@ -24,10 +24,9 @@
 
 #include "../Core/StringMgr.h"
 
-class TLKImp : public StringMgr
-{
+class TLKImp : public StringMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
 
 	//Data
@@ -35,19 +34,19 @@ private:
 public:
 	TLKImp(void);
 	~TLKImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
-	char * GetString(unsigned long strref, int flags=0);
-	StringBlock GetStringBlock(unsigned long strref, int flag=0);
+	bool Open(DataStream* stream, bool autoFree = true);
+	char* GetString(unsigned long strref, int flags = 0);
+	StringBlock GetStringBlock(unsigned long strref, int flag = 0);
 private:
 	/** replaces tags in dest, don't exceed Length */
-	bool ResolveTags(char *dest, char *source, int Length);
+	bool ResolveTags(char* dest, char* source, int Length);
 	/** returns the needed length in Length, 
-	    if there was no token, returns false */
-	bool GetNewStringLength(char *string, unsigned long &Length);
+		if there was no token, returns false */
+	bool GetNewStringLength(char* string, unsigned long& Length);
 	/**returns the decoded length of the built-in token
 	   if dest is not NULL it also returns the decoded value
 	   */
-	int BuiltinToken(char *Token, char *dest);
+	int BuiltinToken(char* Token, char* dest);
 public:
 	void release(void)
 	{

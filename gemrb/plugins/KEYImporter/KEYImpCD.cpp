@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KEYImpCD.cpp,v 1.2 2003/11/25 13:48:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KEYImpCD.cpp,v 1.3 2004/02/24 22:20:40 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ KEYImpCD::~KEYImpCD(void)
 {
 }
 
-void * KEYImpCD::Create()
+void* KEYImpCD::Create()
 {
 	return new KeyImp();
 }
@@ -47,7 +47,7 @@ SClass_ID KEYImpCD::SuperClassID(void)
 
 Class_ID KEYImpCD::ClassID(void)
 {
-	return Class_ID(0x982da6f8, 0x47a4128f);
+	return Class_ID( 0x982da6f8, 0x47a4128f );
 }
 
 const char* KEYImpCD::InternalName(void)

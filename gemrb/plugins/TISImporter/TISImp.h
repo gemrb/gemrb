@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.h,v 1.4 2003/11/27 22:00:43 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.h,v 1.5 2004/02/24 22:20:38 balrog994 Exp $
  *
  */
 
@@ -24,20 +24,19 @@
 
 #include "../Core/TileSetMgr.h"
 
-class TISImp :
-	public TileSetMgr
-{
+class TISImp : public TileSetMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
 	unsigned long headerShift;
 	unsigned long TilesCount, TilesSectionLen, TileSize;
 public:
 	TISImp(void);
 	~TISImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
-	Tile * GetTile(unsigned short * indexes, int count, unsigned short * secondary = NULL);
-	Sprite2D * GetTile(int index);
+	bool Open(DataStream* stream, bool autoFree = true);
+	Tile* GetTile(unsigned short* indexes, int count,
+		unsigned short* secondary = NULL);
+	Sprite2D* GetTile(int index);
 public:
 	void release(void)
 	{

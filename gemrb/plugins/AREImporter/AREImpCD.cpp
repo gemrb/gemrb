@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImpCD.cpp,v 1.2 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImpCD.cpp,v 1.3 2004/02/24 22:20:44 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ AREImpCD::~AREImpCD(void)
 {
 }
 
-void * AREImpCD::Create(void)
+void* AREImpCD::Create(void)
 {
 	return new AREImp();
 }
@@ -47,7 +47,7 @@ SClass_ID AREImpCD::SuperClassID(void)
 
 Class_ID AREImpCD::ClassID(void)
 {
-	return Class_ID(0x7a520471, 0xacb2417c);
+	return Class_ID( 0x7a520471, 0xacb2417c );
 }
 
 const char* AREImpCD::InternalName(void)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImpCD.cpp,v 1.2 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImpCD.cpp,v 1.3 2004/02/24 22:20:42 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ CREImpCD::~CREImpCD(void)
 {
 }
 
-void * CREImpCD::Create(void)
+void* CREImpCD::Create(void)
 {
 	return new CREImp();
 }
@@ -48,7 +48,7 @@ SClass_ID CREImpCD::SuperClassID(void)
 
 Class_ID CREImpCD::ClassID(void)
 {
-	return Class_ID(0xd006381a, 0x192affd2);
+	return Class_ID( 0xd006381a, 0x192affd2 );
 }
 
 const char* CREImpCD::InternalName(void)

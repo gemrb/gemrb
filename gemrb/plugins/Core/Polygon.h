@@ -6,7 +6,7 @@
 #include "../../includes/RGBAColor.h"
 
 typedef struct Point {
-	short x,y;
+	short x, y;
 } Point;
 
 #ifdef WIN32
@@ -21,15 +21,15 @@ typedef struct Point {
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT Gem_Polygon
-{
+class GEM_EXPORT Gem_Polygon {
 public:
-	Gem_Polygon(Point * points, int count, bool precalculate = false, Color * color = NULL);
+	Gem_Polygon(Point* points, int count, bool precalculate = false,
+		Color* color = NULL);
 	~Gem_Polygon(void);
 	Region BBox;
-	Point *points;
+	Point* points;
 	int count;
-	Sprite2D * fill;
+	Sprite2D* fill;
 	bool PointIn(unsigned short x, unsigned short y);
 };
 

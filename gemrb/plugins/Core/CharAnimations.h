@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.18 2003/12/15 22:38:53 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.19 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -88,10 +88,9 @@
 #define IE_ANI_RANGED_THROW		2
 
 
-class GEM_EXPORT CharAnimations
-{
+class GEM_EXPORT CharAnimations {
 private:
-	Animation * Anims[MAX_ANIMS][16];
+	Animation* Anims[MAX_ANIMS][16];
 public:
 	Color Palette[256];
 	unsigned long LoadedFlag, RowIndex;
@@ -99,28 +98,34 @@ public:
 	unsigned char ArmorType, WeaponType, RangedType;
 	unsigned char CircleSize;
 	bool DrawCircle;
-	char * ResRef;
-	TableMgr * Avatars;
+	char* ResRef;
+	TableMgr* Avatars;
 	bool UsePalette;
 public:
-	CharAnimations(char * BaseResRef, unsigned char OrientCount, unsigned char MirrorType, int RowIndex);
+	CharAnimations(char* BaseResRef, unsigned char OrientCount,
+		unsigned char MirrorType, int RowIndex);
 	~CharAnimations(void);
-	Animation * GetAnimation(unsigned char AnimID, unsigned char Orient);
-	void SetNewPalette(Color * Pal)
+	Animation* GetAnimation(unsigned char AnimID, unsigned char Orient);
+	void SetNewPalette(Color* Pal)
 	{
-		memcpy(Palette, Pal, 256*sizeof(Color));
-		for(int i = 0; i < MAX_ANIMS; i++) {
-			for(int j = 0; j < 16; j++) {
-				if(Anims[i][j])
+		memcpy( Palette, Pal, 256 * sizeof( Color ) );
+		for (int i = 0; i < MAX_ANIMS; i++) {
+			for (int j = 0; j < 16; j++) {
+				if (Anims[i][j]) {
 					Anims[i][j]->ChangePalette = true;
+				}
 			}
 		}
 	}
 private:
-	void AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient);
-	void AddMHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient);
-	void AddMMRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient);
-	void GetAnimResRef(unsigned char AnimID, unsigned char Orient, char * ResRef, unsigned char & Cycle);
+	void AddVHRSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void AddMHRSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void AddMMRSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void GetAnimResRef(unsigned char AnimID, unsigned char Orient,
+		char* ResRef, unsigned char& Cycle);
 };
 
 #endif

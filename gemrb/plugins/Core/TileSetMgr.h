@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileSetMgr.h,v 1.3 2003/11/27 22:03:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileSetMgr.h,v 1.4 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -38,13 +38,13 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT TileSetMgr : public Plugin
-{
+class GEM_EXPORT TileSetMgr : public Plugin {
 public:
 	TileSetMgr(void);
 	virtual ~TileSetMgr(void);
-	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
-	virtual Tile * GetTile(unsigned short * indexes, int count, unsigned short * secondary = NULL) = 0;
+	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual Tile* GetTile(unsigned short* indexes, int count,
+		unsigned short* secondary = NULL) = 0;
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.27 2004/01/05 15:59:46 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.28 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -23,21 +23,22 @@
 #include "Font.h"
 #include "Interface.h"
 
-extern Interface * core;
+extern Interface* core;
 unsigned long lastX = 0;
 
 #define PARAGRAPH_START_X 5;
 
-inline size_t mystrlen(const char * string) 
+inline size_t mystrlen(const char* string)
 {
-	if(!string)
-		return (size_t)0;
-	const char * tmp = string;
+	if (!string) {
+		return ( size_t ) 0;
+	}
+	const char* tmp = string;
 	size_t count = 0;
-	while(*tmp != 0) {
-		if(((unsigned char)*tmp) >= 0xf0) {
-			tmp+=3;
-			count+=3;
+	while (*tmp != 0) {
+		if (( ( unsigned char ) * tmp ) >= 0xf0) {
+			tmp += 3;
+			count += 3;
 		}
 		count++;
 		tmp++;
@@ -45,20 +46,21 @@ inline size_t mystrlen(const char * string)
 	return count;
 }
 
-Font::Font(int w, int h, void * palette, bool cK, int index)
+Font::Font(int w, int h, void* palette, bool cK, int index)
 {
 	lastX = 0;
 	count = 0;
-	void * pixels = malloc(w*h);
-	sprBuffer = core->GetVideoDriver()->CreateSprite8(w, h, 8, pixels, palette, cK, index);
-	this->palette = core->GetVideoDriver()->GetPalette(sprBuffer);
+	void* pixels = malloc( w* h );
+	sprBuffer = core->GetVideoDriver()->CreateSprite8( w, h, 8, pixels,
+											palette, cK, index );
+	this->palette = core->GetVideoDriver()->GetPalette( sprBuffer );
 	maxHeight = h;
 }
 
 Font::~Font(void)
 {
-	free(palette);
-	core->GetVideoDriver()->FreeSprite(sprBuffer);
+	free( palette );
+	core->GetVideoDriver()->FreeSprite( sprBuffer );
 	/*
 	Since we assume that the font was loaded from a factory Object,
 	we don't need to free the sprites, those will be freed directly
@@ -74,9 +76,9 @@ Font::~Font(void)
 	*/
 }
 
-void Font::AddChar(void * spr, int w, int h, short xPos, short yPos)
+void Font::AddChar(void* spr, int w, int h, short xPos, short yPos)
 {
-	if(!spr) {
+	if (!spr) {
 		size[count].x = 0;
 		size[count].y = 0;
 		size[count].w = 0;
@@ -86,13 +88,13 @@ void Font::AddChar(void * spr, int w, int h, short xPos, short yPos)
 		count++;
 		return;
 	}
-	unsigned char * startPtr = (unsigned char*)sprBuffer->pixels;
+	unsigned char * startPtr = ( unsigned char * ) sprBuffer->pixels;
 	unsigned char * currPtr;
-	unsigned char * srcPtr = (unsigned char*)spr;
-	for(int y = 0; y < h; y++) {
-		currPtr = startPtr + (y*sprBuffer->Width) + lastX;
-		memcpy(currPtr, srcPtr, w);
-		srcPtr += w;		
+	unsigned char * srcPtr = ( unsigned char * ) spr;
+	for (int y = 0; y < h; y++) {
+		currPtr = startPtr + ( y * sprBuffer->Width ) + lastX;
+		memcpy( currPtr, srcPtr, w );
+		srcPtr += w;
 	}
 	size[count].x = lastX;
 	size[count].y = 0;
@@ -101,7 +103,7 @@ void Font::AddChar(void * spr, int w, int h, short xPos, short yPos)
 	this->xPos[count] = xPos;
 	this->yPos[count] = yPos;
 	count++;
-	lastX+=w;
+	lastX += w;
 	/*if(count == 0) {
 		palette = core->GetVideoDriver()->GetPalette(spr);
 	}
@@ -109,90 +111,91 @@ void Font::AddChar(void * spr, int w, int h, short xPos, short yPos)
 		maxHeight = spr->YPos;
 	//chars.push_back(spr);	
 	chars[count++] = spr;*/
-
 }
 
 bool written = false;
 
-void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color *hicolor, unsigned char Alignment, bool anchor, Font * initials, Color *initcolor, Sprite2D * cursor, int curpos)
+void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
+	Color* hicolor, unsigned char Alignment, bool anchor, Font* initials,
+	Color* initcolor, Sprite2D* cursor, int curpos)
 {
-	Color * pal = NULL, *ipal = NULL;
+	Color* pal = NULL, * ipal = NULL;
 	unsigned long psx = PARAGRAPH_START_X;
 	pal = hicolor;
-	if(ipal != NULL) {
+	if (ipal != NULL) {
 		ipal = initcolor;
-	}
-	else
+	} else {
 		ipal = pal;
-	if(!pal) {
+	}
+	if (!pal) {
 		pal = palette;
 	}
 	/*for(int i = 0; i < 255; i++) {
 		core->GetVideoDriver()->SetPalette(chars[i], pal);
 	}*/
-	core->GetVideoDriver()->SetPalette(sprBuffer, pal);
-	Video * video = core->GetVideoDriver();
-	size_t len = strlen((char*)string);
-	char * tmp = (char*)malloc(len+1);
-	memcpy(tmp, (char*)string, len+1);
-	SetupString(tmp, rgn.w);
+	core->GetVideoDriver()->SetPalette( sprBuffer, pal );
+	Video* video = core->GetVideoDriver();
+	size_t len = strlen( ( char* ) string );
+	char* tmp = ( char* ) malloc( len + 1 );
+	memcpy( tmp, ( char * ) string, len + 1 );
+	SetupString( tmp, rgn.w );
 	int ystep = 0;
-	if(Alignment & IE_FONT_SINGLE_LINE) {
-		for(size_t i = 0; i < len; i++) {
-			if(tmp[i] != 0)
-				if(ystep < yPos[(unsigned char)tmp[i]-1])//chars[(unsigned char)tmp[i]-1]->YPos)
-					ystep = yPos[(unsigned char)tmp[i]-1];//chars[(unsigned char)tmp[i]-1]->YPos;
+	if (Alignment & IE_FONT_SINGLE_LINE) {
+		for (size_t i = 0; i < len; i++) {
+			if (tmp[i] != 0)
+				if (ystep < yPos[( unsigned char ) tmp[i] - 1])//chars[(unsigned char)tmp[i]-1]->YPos)
+					ystep = yPos[( unsigned char ) tmp[i] - 1];//chars[(unsigned char)tmp[i]-1]->YPos;
 		}
-	}
-	else
-		ystep = size[1].h;//chars[1]->Height;
+	} else {
+		ystep = size[1].h;
+	}//chars[1]->Height;
 	int x = psx, y = ystep;
-	if(Alignment & IE_FONT_ALIGN_CENTER) {
-		int w = CalcStringWidth(tmp);
-		x = (rgn.w / 2)-(w/2);
+	if (Alignment & IE_FONT_ALIGN_CENTER) {
+		int w = CalcStringWidth( tmp );
+		x = ( rgn.w / 2 ) - ( w / 2 );
+	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
+		int w = CalcStringWidth( tmp );
+		x = ( rgn.w - w );
 	}
-	else if(Alignment & IE_FONT_ALIGN_RIGHT) {
-		int w = CalcStringWidth(tmp);
-		x = (rgn.w-w);
-	}
-	if(Alignment & IE_FONT_ALIGN_MIDDLE) {
+	if (Alignment & IE_FONT_ALIGN_MIDDLE) {
 		int h = 0;
-		for(size_t i = 0; i <= len; i++) {
-			if((tmp[i] == 0) || (tmp[i] == '\n'))
+		for (size_t i = 0; i <= len; i++) {
+			if (( tmp[i] == 0 ) || ( tmp[i] == '\n' ))
 				h++;
 		}
-		h = h*ystep;
-		y += (rgn.h/2)-(h/2);
+		h = h * ystep;
+		y += ( rgn.h / 2 ) - ( h / 2 );
 	}
 	int row = 0;
-	for(size_t i = 0; i < len; i++) {
-		if(((unsigned char)tmp[i]) == '[') {
+	for (size_t i = 0; i < len; i++) {
+		if (( ( unsigned char ) tmp[i] ) == '[') {
 			i++;
 			char tag[256];
 			int k = 0;
-			for(k = 0; k < 256; k++) {
-				if(tmp[i] == ']') {
+			for (k = 0; k < 256; k++) {
+				if (tmp[i] == ']') {
 					tag[k] = 0;
 					break;
 				}
 				tag[k] = tmp[i++];
 			}
-			if(strnicmp(tag, "color=", 6) == 0) {
+			if (strnicmp( tag, "color=", 6 ) == 0) {
 				unsigned int r,g,b;
-				if(sscanf(tag, "color=%02X%02X%02X", &r, &g, &b) != 3)
+				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				Color c = {r,g,b,0}, back = {0,0,0,0};
-				Color *newPal = core->GetVideoDriver()->CreatePalette(c, back);
-				core->GetVideoDriver()->SetPalette(sprBuffer, newPal);
-				free(newPal);
+				Color c = {r,g, b, 0}, back = {0, 0, 0, 0};
+				Color* newPal = core->GetVideoDriver()->CreatePalette( c,
+															back );
+				core->GetVideoDriver()->SetPalette( sprBuffer, newPal );
+				free( newPal );
 			} else {
-				if(stricmp(tag, "/color") == 0) {
-					core->GetVideoDriver()->SetPalette(sprBuffer, pal);
+				if (stricmp( tag, "/color" ) == 0) {
+					core->GetVideoDriver()->SetPalette( sprBuffer, pal );
 				} else {
-					if(stricmp("p", tag) == 0) {
+					if (stricmp( "p", tag ) == 0) {
 						psx = x;
 					} else {
-						if(stricmp("/p", tag) == 0) {
+						if (stricmp( "/p", tag ) == 0) {
 							psx = PARAGRAPH_START_X;
 						}
 					}
@@ -200,117 +203,122 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 			}
 			continue;
 		}
-		if(row < startrow) {
-			if(tmp[i] == 0) {
+		if (row < startrow) {
+			if (tmp[i] == 0) {
 				row++;
 			}
 			continue;
 		}
-		if((tmp[i] == 0) || (tmp[i] == '\n')) {
-			y+=ystep;
-			x=psx;
-			if(Alignment & IE_FONT_ALIGN_CENTER) {
-				int w = CalcStringWidth(&tmp[i+1]);
-				x = (rgn.w / 2)-(w/2);
-			}
-			else if(Alignment & IE_FONT_ALIGN_RIGHT) {
-				int w = CalcStringWidth(&tmp[i+1]);
-				x = (rgn.w-w);
+		if (( tmp[i] == 0 ) || ( tmp[i] == '\n' )) {
+			y += ystep;
+			x = psx;
+			if (Alignment & IE_FONT_ALIGN_CENTER) {
+				int w = CalcStringWidth( &tmp[i + 1] );
+				x = ( rgn.w / 2 ) - ( w / 2 );
+			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
+				int w = CalcStringWidth( &tmp[i + 1] );
+				x = ( rgn.w - w );
 			}
 			continue;
 		}
-		unsigned char currChar = (unsigned char)tmp[i]-1;
-		x+=xPos[currChar];//spr->XPos;
-		video->BlitSpriteRegion(sprBuffer, size[currChar], x+rgn.x-xPos[currChar], y+rgn.y-yPos[currChar], true, &rgn);
-		if(cursor &&  (curpos == i))
-			video->BlitSprite(cursor, x-xPos[currChar]+rgn.x, y+rgn.y, true, &rgn);
-		x+=size[currChar].w-xPos[currChar];		
+		unsigned char currChar = ( unsigned char ) tmp[i] - 1;
+		x += xPos[currChar];//spr->XPos;
+		video->BlitSpriteRegion( sprBuffer, size[currChar],
+				x + rgn.x - xPos[currChar], y + rgn.y - yPos[currChar], true,
+				&rgn );
+		if (cursor && ( curpos == i ))
+			video->BlitSprite( cursor, x - xPos[currChar] + rgn.x, y + rgn.y,
+					true, &rgn );
+		x += size[currChar].w - xPos[currChar];
 	}
-	if(cursor &&  (curpos == len))
-		video->BlitSprite(cursor, x-xPos[tmp[len]-1]+rgn.x, y+rgn.y, true, &rgn);
-	free(tmp);
+	if (cursor && ( curpos == len )) {
+		video->BlitSprite( cursor, x - xPos[tmp[len] - 1] + rgn.x, y + rgn.y,
+				true, &rgn );
+	}
+	free( tmp );
 }
 
-void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned char Alignment, bool anchor, Font * initials, Color *initcolor, Sprite2D * cursor, int curpos)
+void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
+	unsigned char Alignment, bool anchor, Font* initials, Color* initcolor,
+	Sprite2D* cursor, int curpos)
 {
-	Color * pal = NULL, *ipal = NULL;
+	Color* pal = NULL, * ipal = NULL;
 	unsigned long psx = PARAGRAPH_START_X;
 	pal = hicolor;
-	if(ipal != NULL) {
+	if (ipal != NULL) {
 		ipal = initcolor;
-	}
-	else
+	} else {
 		ipal = pal;
-	if(!pal) {
+	}
+	if (!pal) {
 		pal = palette;
 	}
 	//for(int i = 0; i < 255; i++) {
 	//	core->GetVideoDriver()->SetPalette(chars[i], pal);
 	//}
-	core->GetVideoDriver()->SetPalette(sprBuffer, pal);
-	Video * video = core->GetVideoDriver();
-	size_t len = strlen((char*)string);
-	char * tmp = (char*)malloc(len+1);
-	memcpy(tmp, (char*)string, len+1);
-	SetupString(tmp, rgn.w);
+	core->GetVideoDriver()->SetPalette( sprBuffer, pal );
+	Video* video = core->GetVideoDriver();
+	size_t len = strlen( ( char* ) string );
+	char* tmp = ( char* ) malloc( len + 1 );
+	memcpy( tmp, ( char * ) string, len + 1 );
+	SetupString( tmp, rgn.w );
 	int ystep = 0;
-	if(Alignment & IE_FONT_SINGLE_LINE) {
-		for(size_t i = 0; i < len; i++) {
-			if(tmp[i] != 0)
-				if(ystep < yPos[(unsigned char)tmp[i]-1])//chars[(unsigned char)tmp[i]-1]->YPos)
-					ystep = yPos[(unsigned char)tmp[i]-1];//chars[(unsigned char)tmp[i]-1]->YPos;
+	if (Alignment & IE_FONT_SINGLE_LINE) {
+		for (size_t i = 0; i < len; i++) {
+			if (tmp[i] != 0)
+				if (ystep < yPos[( unsigned char ) tmp[i] - 1])//chars[(unsigned char)tmp[i]-1]->YPos)
+					ystep = yPos[( unsigned char ) tmp[i] - 1];//chars[(unsigned char)tmp[i]-1]->YPos;
 		}
-	}
-	else
-		ystep = size[1].h;//chars[1]->Height;
+	} else {
+		ystep = size[1].h;
+	}//chars[1]->Height;
 	int x = psx, y = ystep;
-	if(Alignment & IE_FONT_ALIGN_CENTER) {
-		int w = CalcStringWidth(tmp);
-		x = (rgn.w / 2)-(w/2);
+	if (Alignment & IE_FONT_ALIGN_CENTER) {
+		int w = CalcStringWidth( tmp );
+		x = ( rgn.w / 2 ) - ( w / 2 );
+	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
+		int w = CalcStringWidth( tmp );
+		x = ( rgn.w - w );
 	}
-	else if(Alignment & IE_FONT_ALIGN_RIGHT) {
-		int w = CalcStringWidth(tmp);
-		x = (rgn.w-w);
-	}
-	if(Alignment & IE_FONT_ALIGN_MIDDLE) {
+	if (Alignment & IE_FONT_ALIGN_MIDDLE) {
 		int h = 0;
-		for(size_t i = 0; i <= len; i++) {
-			if(tmp[i] == 0)
+		for (size_t i = 0; i <= len; i++) {
+			if (tmp[i] == 0)
 				h++;
 		}
-		h = h*ystep;
-		y += (rgn.h/2)-(h/2);
+		h = h * ystep;
+		y += ( rgn.h / 2 ) - ( h / 2 );
+	} else if (Alignment & IE_FONT_ALIGN_TOP) {
+		y += 5;
 	}
-	else if(Alignment & IE_FONT_ALIGN_TOP) {
-		y+=5;
-	}
-	for(size_t i = 0; i < len; i++) {
-		if(((unsigned char)tmp[i]) == '[') {
+	for (size_t i = 0; i < len; i++) {
+		if (( ( unsigned char ) tmp[i] ) == '[') {
 			i++;
 			char tag[256];
-			for(int k = 0; k < 256; k++) {
-				if(tmp[i] == ']') {
+			for (int k = 0; k < 256; k++) {
+				if (tmp[i] == ']') {
 					tag[k] = 0;
 					break;
 				}
 				tag[k] = tmp[i++];
 			}
-			if(strnicmp(tag, "color=", 6) == 0) {
+			if (strnicmp( tag, "color=", 6 ) == 0) {
 				unsigned int r,g,b;
-				if(sscanf(tag, "color=%02X%02X%02X", &r, &g, &b) != 3)
+				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				Color c = {r,g,b,0}, back = {0,0,0,0};
-				Color *newPal = core->GetVideoDriver()->CreatePalette(c, back);
-				core->GetVideoDriver()->SetPalette(sprBuffer, newPal);
-				free(newPal);
+				Color c = {r,g, b, 0}, back = {0, 0, 0, 0};
+				Color* newPal = core->GetVideoDriver()->CreatePalette( c,
+															back );
+				core->GetVideoDriver()->SetPalette( sprBuffer, newPal );
+				free( newPal );
 			} else {
-				if(stricmp(tag, "/color") == 0) {
-					core->GetVideoDriver()->SetPalette(sprBuffer, pal);
+				if (stricmp( tag, "/color" ) == 0) {
+					core->GetVideoDriver()->SetPalette( sprBuffer, pal );
 				} else {
-					if(stricmp("p", tag) == 0) {
+					if (stricmp( "p", tag ) == 0) {
 						psx = x;
 					} else {
-						if(stricmp("/p", tag) == 0) {
+						if (stricmp( "/p", tag ) == 0) {
 							psx = PARAGRAPH_START_X;
 						}
 					}
@@ -318,42 +326,45 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 			}
 			continue;
 		}
-		if(tmp[i] == 0) {
-			y+=ystep;
-			x=psx;
-			if(Alignment & IE_FONT_ALIGN_CENTER) {
-				int w = CalcStringWidth(&tmp[i+1]);
-				x = (rgn.w / 2)-(w/2);
-			}
-			else if(Alignment & IE_FONT_ALIGN_RIGHT) {
-				int w = CalcStringWidth(&tmp[i+1]);
-				x = (rgn.w-w);
+		if (tmp[i] == 0) {
+			y += ystep;
+			x = psx;
+			if (Alignment & IE_FONT_ALIGN_CENTER) {
+				int w = CalcStringWidth( &tmp[i + 1] );
+				x = ( rgn.w / 2 ) - ( w / 2 );
+			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
+				int w = CalcStringWidth( &tmp[i + 1] );
+				x = ( rgn.w - w );
 			}
 			continue;
 		}
-		unsigned char currChar = (unsigned char)tmp[i]-1;
-		x+=xPos[currChar];//spr->XPos;
-		video->BlitSpriteRegion(sprBuffer, size[currChar], x+rgn.x-xPos[currChar], y+rgn.y-yPos[currChar], anchor, &rgn);
-		if(cursor &&  (curpos == i))
-			video->BlitSprite(cursor, x-xPos[currChar]+rgn.x, y+rgn.y, anchor, &rgn);
-		x+=size[currChar].w-xPos[currChar];//spr->Width-spr->XPos;
-		
+		unsigned char currChar = ( unsigned char ) tmp[i] - 1;
+		x += xPos[currChar];//spr->XPos;
+		video->BlitSpriteRegion( sprBuffer, size[currChar],
+				x + rgn.x - xPos[currChar], y + rgn.y - yPos[currChar],
+				anchor, &rgn );
+		if (cursor && ( curpos == i ))
+			video->BlitSprite( cursor, x - xPos[currChar] + rgn.x, y + rgn.y,
+					anchor, &rgn );
+		x += size[currChar].w - xPos[currChar];//spr->Width-spr->XPos;
 	}
-	if(cursor &&  (curpos == len))
-		video->BlitSprite(cursor, x-xPos[tmp[len]-1]+rgn.x, y+rgn.y, anchor, &rgn);
-	free(tmp);
+	if (cursor && ( curpos == len )) {
+		video->BlitSprite( cursor, x - xPos[tmp[len] - 1] + rgn.x, y + rgn.y,
+				anchor, &rgn );
+	}
+	free( tmp );
 }
 
-int Font::CalcStringWidth(char * string)
+int Font::CalcStringWidth(char* string)
 {
-	size_t ret = 0, len = strlen(string);
-	for(size_t i = 0; i < len; i++) {
-		if(((unsigned char)string[i]) == '[') {
+	size_t ret = 0, len = strlen( string );
+	for (size_t i = 0; i < len; i++) {
+		if (( ( unsigned char ) string[i] ) == '[') {
 			i++;
 			char tag[256];
 			int k = 0;
-			for(k = 0; k < 256; k++) {
-				if(string[i] == ']') {
+			for (k = 0; k < 256; k++) {
+				if (string[i] == ']') {
 					tag[k] = 0;
 					break;
 				}
@@ -361,70 +372,70 @@ int Font::CalcStringWidth(char * string)
 			}
 			continue;
 		}
-		ret += size[(unsigned char)string[i]-1].w;//chars[(unsigned char)string[i]-1]->Width;
+		ret += size[( unsigned char ) string[i] - 1].w;//chars[(unsigned char)string[i]-1]->Width;
 	}
-	return (int)ret;
+	return ( int ) ret;
 }
 
-void Font::SetupString(char * string, int width)
+void Font::SetupString(char* string, int width)
 {
-	size_t len = strlen(string);
+	size_t len = strlen( string );
 	unsigned long psx = PARAGRAPH_START_X;
 	int lastpos = 0;
 	int x = psx, wx = 0;
 	bool endword = false;
-	for(size_t pos = 0; pos < len; pos++) {
-		if(x+wx > width) {
-			if(!endword && (x == psx))
-				lastpos = (int)pos;
+	for (size_t pos = 0; pos < len; pos++) {
+		if (x + wx > width) {
+			if (!endword && ( x == psx ))
+				lastpos = ( int ) pos;
 			string[lastpos] = 0;
 			x = psx;
 		}
-		if(string[pos] == 0) {
+		if (string[pos] == 0) {
 			continue;
 		}
 		endword = false;
-		if(string[pos] == '\r')
+		if (string[pos] == '\r')
 			string[pos] = ' ';
-		if(string[pos] == '\n') {
+		if (string[pos] == '\n') {
 			string[pos] = 0;
 			x = psx;
 			wx = 0;
-			lastpos = (int)pos;
+			lastpos = ( int ) pos;
 			endword = true;
 			continue;
 		}
-		if(((unsigned char)string[pos]) == '[') {
+		if (( ( unsigned char ) string[pos] ) == '[') {
 			pos++;
 			char tag[256];
 			int k = 0;
-			for(k = 0; k < 256; k++) {
-				if(string[pos] == ']') {
+			for (k = 0; k < 256; k++) {
+				if (string[pos] == ']') {
 					tag[k] = 0;
 					break;
 				}
 				tag[k] = string[pos++];
 			}
-			if(stricmp("p", tag) == 0) {
+			if (stricmp( "p", tag ) == 0) {
 				psx = x;
 			} else {
-				if(stricmp("/p", tag) == 0) {
+				if (stricmp( "/p", tag ) == 0) {
 					psx = PARAGRAPH_START_X;
 				}
 			}
 			continue;
 		}
-		wx += size[(unsigned char)string[pos]-1].w;//chars[((unsigned char)string[pos])-1]->Width;
-		if((string[pos] == ' ') || (string[pos] == '-')) {
-			x+=wx;
+		wx += size[( unsigned char ) string[pos] - 1].w;//chars[((unsigned char)string[pos])-1]->Width;
+		if (( string[pos] == ' ' ) || ( string[pos] == '-' )) {
+			x += wx;
 			wx = 0;
-			lastpos = (int)pos;
+			lastpos = ( int ) pos;
 			endword = true;
 		}
 	}
 }
 
-void * Font::GetPalette()
+void* Font::GetPalette()
 {
 	return palette;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.2 2004/02/15 23:56:05 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -42,54 +42,54 @@
 
 
 typedef struct SPLFeature {
-        ieWord Opcode;
-        ieByte Target;
-        ieByte Power;
-        ieDword Parameter1;
-        ieDword Parameter2;
-        ieByte TimingMode;
-        ieByte Resistance;
-        ieDword Duration;
-        ieByte Probability1;
-        ieByte Probability2;
-        ieResRef Resource;
-        ieDword DiceThrown;
-        ieWord DiceSides;
-        ieDword SavingThrowType;
-        ieDword SavingThrowBonus;
-        ieDword unknown;
+	ieWord Opcode;
+	ieByte Target;
+	ieByte Power;
+	ieDword Parameter1;
+	ieDword Parameter2;
+	ieByte TimingMode;
+	ieByte Resistance;
+	ieDword Duration;
+	ieByte Probability1;
+	ieByte Probability2;
+	ieResRef Resource;
+	ieDword DiceThrown;
+	ieWord DiceSides;
+	ieDword SavingThrowType;
+	ieDword SavingThrowBonus;
+	ieDword unknown;
 } SPLFeature;
 
 typedef struct SPLExtHeader {
-        ieByte SpellForm;
-        ieByte unknown1;
-        ieByte Location;
-        ieByte unknown2;
-        ieResRef MemorisedIcon;
-        ieByte Target;
-        ieByte TargetNumber;
-        ieWord Range;
-        ieWord RequiredLevel;
-        ieDword CastingTime;
-        ieWord DiceSides;
-        ieWord DiceThrown;
-        ieWord Enchanted;
-        ieWord FeatureCount;
-        ieWord FeatureOffset;
-        ieWord Charges;
-        ieWord ChargeDepletion;
-        ieWord Projectile;
-	std::vector<SPLFeature *> features;
+	ieByte SpellForm;
+	ieByte unknown1;
+	ieByte Location;
+	ieByte unknown2;
+	ieResRef MemorisedIcon;
+	ieByte Target;
+	ieByte TargetNumber;
+	ieWord Range;
+	ieWord RequiredLevel;
+	ieDword CastingTime;
+	ieWord DiceSides;
+	ieWord DiceThrown;
+	ieWord Enchanted;
+	ieWord FeatureCount;
+	ieWord FeatureOffset;
+	ieWord Charges;
+	ieWord ChargeDepletion;
+	ieWord Projectile;
+	std::vector< SPLFeature*> features;
 } SPLExtHeader;
 
 
 class GEM_EXPORT Spell {
 public:
-        Spell ();
-	~Spell ();
+	Spell();
+	~Spell();
 
-	std::vector<SPLExtHeader *> ext_headers;
-	std::vector<SPLFeature *> casting_features;
+	std::vector< SPLExtHeader*> ext_headers;
+	std::vector< SPLFeature*> casting_features;
 
 	ieStrRef SpellName;
 	ieStrRef SpellNameIdentified;
@@ -126,7 +126,7 @@ public:
 	// IWD2 only
 	char unknown13[16];
 
-	AnimationMgr *SpellIconBAM;
+	AnimationMgr* SpellIconBAM;
 };
 
 #endif  // ! SPELL_H

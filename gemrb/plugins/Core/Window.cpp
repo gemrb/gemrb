@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.24 2004/02/24 21:20:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.25 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -24,9 +24,10 @@
 #include "Control.h"
 #include "Interface.h"
 
-extern Interface * core;
+extern Interface* core;
 
-Window::Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos, unsigned short Width, unsigned short Height)
+Window::Window(unsigned short WindowID, unsigned short XPos,
+	unsigned short YPos, unsigned short Width, unsigned short Height)
 {
 	this->WindowID = WindowID;
 	this->XPos = XPos;
@@ -44,38 +45,40 @@ Window::Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos
 
 Window::~Window()
 {
-	std::vector<Control*>::iterator m = Controls.begin();
-	while(Controls.size() != 0) {
-		Control * ctrl = (*m);
-		delete(ctrl);
-		Controls.erase(m);
+	std::vector< Control*>::iterator m = Controls.begin();
+	while (Controls.size() != 0) {
+		Control* ctrl = ( *m );
+		delete( ctrl );
+		Controls.erase( m );
 		m = Controls.begin();
 	}
-	if(BackGround)
-		core->GetVideoDriver()->FreeSprite(BackGround);
+	if (BackGround) {
+		core->GetVideoDriver()->FreeSprite( BackGround );
+	}
 	BackGround = NULL;
 }
 /** Add a Control in the Window */
-void Window::AddControl(Control * ctrl)
+void Window::AddControl(Control* ctrl)
 {
-	if(ctrl == NULL)
+	if (ctrl == NULL) {
 		return;
-	for(size_t i = 0; i < Controls.size(); i++) {
-		if(Controls[i]->ControlID == ctrl->ControlID) {
-			delete(Controls[i]);
+	}
+	for (size_t i = 0; i < Controls.size(); i++) {
+		if (Controls[i]->ControlID == ctrl->ControlID) {
+			delete( Controls[i] );
 			Controls[i] = ctrl;
 			return;
 		}
 	}
-	Controls.push_back(ctrl);
+	Controls.push_back( ctrl );
 	ctrl->Owner = this;
 	Changed = true;
 }
 /** Set the Window's BackGround Image. If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
-void Window::SetBackGround(Sprite2D * img, bool clean)
+void Window::SetBackGround(Sprite2D* img, bool clean)
 {
-	if(clean && BackGround) {
-		core->GetVideoDriver()->FreeSprite(this->BackGround);
+	if (clean && BackGround) {
+		core->GetVideoDriver()->FreeSprite( this->BackGround );
 	}
 	BackGround = img;
 	Changed = true;
@@ -83,39 +86,46 @@ void Window::SetBackGround(Sprite2D * img, bool clean)
 /** This function Draws the Window on the Output Screen */
 void Window::DrawWindow()
 {
-	Video * video = core->GetVideoDriver();
-	Region clip(XPos, YPos, Width, Height);
-	video->SetClipRect(&clip);
-	if(BackGround && Changed)
-		video->BlitSprite(BackGround, XPos, YPos, true);
-	std::vector<Control*>::iterator m;
-	for(m = Controls.begin(); m != Controls.end(); ++m) {
-		(*m)->Draw(XPos, YPos);
+	Video* video = core->GetVideoDriver();
+	Region clip( XPos, YPos, Width, Height );
+	video->SetClipRect( &clip );
+	if (BackGround && Changed) {
+		video->BlitSprite( BackGround, XPos, YPos, true );
 	}
-	video->SetClipRect(NULL);
+	std::vector< Control*>::iterator m;
+	for (m = Controls.begin(); m != Controls.end(); ++m) {
+		( *m )->Draw( XPos, YPos );
+	}
+	video->SetClipRect( NULL );
 	Changed = false;
 }
 
 /** Returns the Control at X,Y Coordinates */
-Control * Window::GetControl(unsigned short x, unsigned short y)
+Control* Window::GetControl(unsigned short x, unsigned short y)
 {
-	Control * ctrl = NULL;
+	Control* ctrl = NULL;
 	//Check if we are always on the last control
-	if((lastC != NULL) /*&& (lastC->ControlType != IE_GUI_LABEL)*/) {
-		if((XPos+lastC->XPos <= x) && (YPos+lastC->YPos <= y)) { //Maybe we are always there
-			if((XPos+lastC->XPos+lastC->Width >= x) && (YPos+lastC->YPos+lastC->Height >= y)) { //Yes, we are on the last returned Control
+	if (( lastC != NULL ) /*&& (lastC->ControlType != IE_GUI_LABEL)*/) {
+		if (( XPos + lastC->XPos <= x ) && ( YPos + lastC->YPos <= y )) {
+			//Maybe we are always there
+			if (( XPos + lastC->XPos + lastC->Width >= x ) &&
+				( YPos + lastC->YPos + lastC->Height >= y )) {
+				//Yes, we are on the last returned Control
 				return lastC;
 			}
 		}
 	}
-	std::vector<Control*>::iterator m;
-	for(m = Controls.begin(); m != Controls.end(); m++) {
-	  /*
-		if((*m)->ControlType == IE_GUI_LABEL)
-			continue;
-	  */
-		if((XPos+(*m)->XPos <= x) && (YPos+(*m)->YPos <= y)) { //Maybe we are on this control
-			if((XPos+(*m)->XPos+(*m)->Width >= x) && (YPos+(*m)->YPos+(*m)->Height >= y)) { //Yes, we are here
+	std::vector< Control*>::iterator m;
+	for (m = Controls.begin(); m != Controls.end(); m++) {
+		/*
+						if((*m)->ControlType == IE_GUI_LABEL)
+							continue;
+					  */
+		if (( XPos + ( *m )->XPos <= x ) && ( YPos + ( *m )->YPos <= y )) {
+			//Maybe we are on this control
+			if (( XPos + ( *m )->XPos + ( *m )->Width >= x ) &&
+				( YPos + ( *m )->YPos + ( *m )->Height >= y )) {
+				//Yes, we are here
 				ctrl = *m;
 				break;
 			}
@@ -126,26 +136,29 @@ Control * Window::GetControl(unsigned short x, unsigned short y)
 }
 
 /** Sets 'ctrl' as Focused */
-void Window::SetFocused(Control * ctrl)
+void Window::SetFocused(Control* ctrl)
 {
-	if(lastFocus != NULL)
+	if (lastFocus != NULL) {
 		lastFocus->hasFocus = false;
+	}
 	lastFocus = ctrl;
 	lastFocus->hasFocus = true;
 }
 
-Control * Window::GetControl(unsigned short i)
+Control* Window::GetControl(unsigned short i)
 {
-	if(i < Controls.size())
+	if (i < Controls.size()) {
 		return Controls[i];
+	}
 	return NULL;
 }
 
-Control * Window::GetDefaultControl()
+Control* Window::GetDefaultControl()
 {
-	if(!Controls.size())
+	if (!Controls.size()) {
 		return NULL;
-	return GetControl(DefaultControl);
+	}
+	return GetControl( DefaultControl );
 }
 
 void Window::release(void)
@@ -156,47 +169,47 @@ void Window::release(void)
 /** Redraw all the Window */
 void Window::Invalidate()
 {
-	DefaultControl=-1;
-	for(unsigned int i = 0; i < Controls.size(); i++) {
+	DefaultControl = -1;
+	for (unsigned int i = 0; i < Controls.size(); i++) {
 		Controls[i]->Changed = true;
-		switch(Controls[i]->ControlType)
-		{
-		case IE_GUI_BUTTON:
-			if( !(((Button *) Controls[i])->GetFlags()&0x40))
+		switch (Controls[i]->ControlType) {
+			case IE_GUI_BUTTON:
+				if (!( ( ( Button * ) Controls[i] )->GetFlags() & 0x40 ))
+					break;
+				//falling through
+			case IE_GUI_GAMECONTROL:
+				DefaultControl = i;
 				break;
-			//falling through
-		case IE_GUI_GAMECONTROL:
-			DefaultControl=i;
-			break;
-		default:;
+			default:
+
+				;
 		}
 	}
 	Changed = true;
 }
 
-void Window::RedrawControls(char *VarName, unsigned long Sum)
+void Window::RedrawControls(char* VarName, unsigned long Sum)
 {
-	for(unsigned int i = 0; i < Controls.size(); i++) {
-		switch(Controls[i]->ControlType)
-                {
+	for (unsigned int i = 0; i < Controls.size(); i++) {
+		switch (Controls[i]->ControlType) {
 			case IE_GUI_BUTTON:
-			{
-				Button *bt = (Button *) (Controls[i]);
-				bt->RedrawButton(VarName, Sum);
-				break;
-			}
+				 {
+					Button* bt = ( Button* ) ( Controls[i] );
+					bt->RedrawButton( VarName, Sum );
+					break;
+				}
 			case IE_GUI_SLIDER:
-			{
-				Slider *sl =(Slider *) (Controls[i]);
-				sl->RedrawSlider(VarName, Sum);
-				break;
-			}
+				 {
+					Slider* sl = ( Slider* ) ( Controls[i] );
+					sl->RedrawSlider( VarName, Sum );
+					break;
+				}
 			case IE_GUI_SCROLLBAR:
-			{
-				ScrollBar *sb=(ScrollBar *) (Controls[i]);
-				sb->RedrawScrollBar(VarName, Sum);
-				break;
-			}
+				 {
+					ScrollBar* sb = ( ScrollBar* ) ( Controls[i] );
+					sb->RedrawScrollBar( VarName, Sum );
+					break;
+				}
 		}
 	}
 }
@@ -204,29 +217,28 @@ void Window::RedrawControls(char *VarName, unsigned long Sum)
 /** Searches for a ScrollBar and a TextArea to link them */
 void Window::Link(unsigned short SBID, unsigned short TAID)
 {
-	ScrollBar *sb = NULL;
-	TextArea *ta = NULL;
-	std::vector<Control*>::iterator m;
-	for(m = Controls.begin(); m != Controls.end(); m++) {
-		if((*m)->Owner != this)
+	ScrollBar* sb = NULL;
+	TextArea* ta = NULL;
+	std::vector< Control*>::iterator m;
+	for (m = Controls.begin(); m != Controls.end(); m++) {
+		if (( *m )->Owner != this)
 			continue;
-		if((*m)->ControlType == IE_GUI_SCROLLBAR) {
-			if((*m)->ControlID == SBID) {
-				sb = (ScrollBar*)(*m);
-				if(ta != NULL)
+		if (( *m )->ControlType == IE_GUI_SCROLLBAR) {
+			if (( *m )->ControlID == SBID) {
+				sb = ( ScrollBar * ) ( *m );
+				if (ta != NULL)
 					break;
 			}
-		}
-		else if((*m)->ControlType == IE_GUI_TEXTAREA) {
-			if((*m)->ControlID == TAID) {
-				ta = (TextArea*)(*m);
-				if(sb != NULL)
+		} else if (( *m )->ControlType == IE_GUI_TEXTAREA) {
+			if (( *m )->ControlID == TAID) {
+				ta = ( TextArea * ) ( *m );
+				if (sb != NULL)
 					break;
 			}
 		}
 	}
-	if(sb && ta) {
+	if (sb && ta) {
 		sb->ta = ta;
-		ta->SetScrollBar(sb);
+		ta->SetScrollBar( sb );
 	}
 }

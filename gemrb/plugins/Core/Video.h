@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.23 2004/01/11 16:58:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.24 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -40,70 +40,80 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT Video : public Plugin
-{
+class GEM_EXPORT Video : public Plugin {
 public:
 	Video(void);
 	virtual ~Video(void);
 	virtual int Init(void) = 0;
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen) = 0;
-	virtual void SetDisplayTitle (char *title, char *icon) = 0;
+	virtual void SetDisplayTitle(char* title, char* icon) = 0;
 	virtual VideoModes GetVideoModes(bool fullscreen = false) = 0;
-	virtual bool TestVideoMode(VideoMode & vm) = 0;
+	virtual bool TestVideoMode(VideoMode& vm) = 0;
 	virtual int SwapBuffers(void) = 0;
-	virtual Sprite2D *CreateSprite(int w, int h, int bpp, DWORD rMask, DWORD gMask, DWORD bMask, DWORD aMask, void* pixels, bool cK = false, int index = 0) = 0;
-	virtual Sprite2D *CreateSprite8(int w, int h, int bpp, void* pixels, void* palette, bool cK = false, int index = 0) = 0;
-	virtual void FreeSprite(Sprite2D * spr) = 0;
-	virtual void BlitSprite(Sprite2D * spr, int x, int y, bool anchor = false, Region * clip = NULL) = 0;
-	virtual void BlitSpriteRegion(Sprite2D * spr, Region &size, int x, int y, bool anchor = true, Region * clip = NULL) = 0;
-	virtual void BlitSpriteTinted(Sprite2D * spr, int x, int y, Color tint, Region * clip = NULL) = 0;
-	virtual void BlitSpriteMode(Sprite2D * spr, int x, int y, int blendMode, bool anchor = true, Region * clip = NULL) = 0;
-	virtual void SetCursor(Sprite2D * up, Sprite2D * down) = 0;
+	virtual Sprite2D* CreateSprite(int w, int h, int bpp, DWORD rMask,
+		DWORD gMask, DWORD bMask, DWORD aMask, void* pixels, bool cK = false,
+		int index = 0) = 0;
+	virtual Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
+		void* palette, bool cK = false, int index = 0) = 0;
+	virtual void FreeSprite(Sprite2D* spr) = 0;
+	virtual void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
+		Region* clip = NULL) = 0;
+	virtual void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
+		bool anchor = true, Region* clip = NULL) = 0;
+	virtual void BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
+		Region* clip = NULL) = 0;
+	virtual void BlitSpriteMode(Sprite2D* spr, int x, int y, int blendMode,
+		bool anchor = true, Region* clip = NULL) = 0;
+	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
 	virtual Region GetViewport(void) = 0;
 	virtual void SetViewport(int x, int y) = 0;
 	virtual void SetViewport(int x, int y, int w, int h) = 0;
 	virtual void MoveViewportTo(int x, int y) = 0;
-	virtual void ConvertToVideoFormat(Sprite2D * sprite) = 0;
-	virtual void CalculateAlpha(Sprite2D * sprite) = 0;
+	virtual void ConvertToVideoFormat(Sprite2D* sprite) = 0;
+	virtual void CalculateAlpha(Sprite2D* sprite) = 0;
 	/** No descriptions */
-	virtual void SetPalette(Sprite2D * spr, Color * pal) = 0;
+	virtual void SetPalette(Sprite2D* spr, Color* pal) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	virtual void DrawRect(Region &rgn, Color &color) = 0;
+	virtual void DrawRect(Region& rgn, Color& color) = 0;
 	/** This functions Draws a Circle */
-	virtual void DrawCircle(short cx, short cy, unsigned short r, Color &color) = 0;
+	virtual void DrawCircle(short cx, short cy, unsigned short r, Color& color) = 0;
 	/** This functions Draws an Ellipse */
-	virtual void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr, Color &color) = 0;
+	virtual void DrawEllipse(short cx, short cy, unsigned short xr,
+		unsigned short yr, Color& color) = 0;
 	/** This function Draws a Polygon on the Screen */
-	virtual void DrawPolyline(Gem_Polygon * poly, Color &color, bool fill = false) = 0;
-	virtual inline void DrawLine(short x1, short y1, short x2, short y2, Color &color) = 0;
+	virtual void DrawPolyline(Gem_Polygon* poly, Color& color,
+		bool fill = false) = 0;
+	virtual inline void DrawLine(short x1, short y1, short x2, short y2,
+		Color& color) = 0;
 	/** Creates a Palette from Color */
-	virtual Color * CreatePalette(Color color, Color back) = 0;
+	virtual Color* CreatePalette(Color color, Color back) = 0;
 	/** Blits a Sprite filling the Region */
-	virtual void BlitTiled(Region rgn, Sprite2D * img, bool anchor = false) = 0;
+	virtual void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false) = 0;
 	/** Set Event Manager */
-	void SetEventMgr(EventMgr * evnt);
+	void SetEventMgr(EventMgr* evnt);
 	/** Send a Quit Signal to the Event Queue */
 	virtual bool Quit(void) = 0;
 	/** Get the Palette of a Sprite */
-	virtual Color * GetPalette(Sprite2D * spr) = 0;
+	virtual Color* GetPalette(Sprite2D* spr) = 0;
 	/** Mirrors an Animation Horizontally */
-	virtual void MirrorAnimation(Animation * anim) = 0;
+	virtual void MirrorAnimation(Animation* anim) = 0;
 	/** Convers a Screen Coordinate to a Game Coordinate */
-	virtual void ConvertToGame(short &x, short &y) = 0;
+	virtual void ConvertToGame(short& x, short& y) = 0;
 	/** */
-	virtual Sprite2D * PrecalculatePolygon(Point * points, int count, Color &color) = 0;
+	virtual Sprite2D* PrecalculatePolygon(Point* points, int count,
+		Color& color) = 0;
 	/** Sets the Fading to Black Percentage */
 	virtual void SetFadePercent(int percent) = 0;
 	/** Set Clip Rect */
-	virtual void SetClipRect(Region * clip) = 0;
+	virtual void SetClipRect(Region* clip) = 0;
 public:
 	/** Event Manager Pointer */
-	EventMgr * Evnt;
+	EventMgr* Evnt;
 	short moveX, moveY;
 	bool DisableMouse, DisableScroll;
 	short xCorr, yCorr;
 public:
-	virtual void * GetVideoSurface() = 0;
+	virtual void* GetVideoSurface() = 0;
 };
 
 #endif

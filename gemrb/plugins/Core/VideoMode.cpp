@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VideoMode.cpp,v 1.3 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VideoMode.cpp,v 1.4 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -23,10 +23,7 @@
 #include "VideoMode.h"
 
 VideoMode::VideoMode(void)
-: Width(0)
-, Height(0)
-, bpp(0)
-, fullscreen(false)
+	: Width( 0 ), Height( 0 ), bpp( 0 ), fullscreen( false )
 {
 }
 
@@ -34,7 +31,7 @@ VideoMode::~VideoMode(void)
 {
 }
 
-VideoMode::VideoMode(const VideoMode & vm)
+VideoMode::VideoMode(const VideoMode& vm)
 {
 	Width = vm.GetWidth();
 	Height = vm.GetHeight();
@@ -90,14 +87,18 @@ bool VideoMode::GetFullScreen(void) const
 	return fullscreen;
 }
 
-bool VideoMode::operator==(const VideoMode & cpt) const
+bool VideoMode::operator==(const VideoMode& cpt) const
 {
-	if((Width == cpt.GetWidth()) && (Height == cpt.GetHeight()) && (bpp == cpt.GetBPP()) && (fullscreen == cpt.GetFullScreen()))
+	if (( Width == cpt.GetWidth() ) &&
+		( Height == cpt.GetHeight() ) &&
+		( bpp == cpt.GetBPP() ) &&
+		( fullscreen == cpt.GetFullScreen() )) {
 		return true;
+	}
 	return false;
 }
 
-VideoMode & VideoMode::operator=(const VideoMode & vm)
+VideoMode& VideoMode::operator=(const VideoMode& vm)
 {
 	Width = vm.GetWidth();
 	Height = vm.GetHeight();

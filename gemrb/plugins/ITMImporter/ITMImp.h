@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.h,v 1.1 2004/02/15 14:26:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.h,v 1.2 2004/02/24 22:20:41 balrog994 Exp $
  *
  */
 
@@ -27,26 +27,25 @@
 #include "../Core/ItemMgr.h"
 
 
-class ITMImp : public ItemMgr
-{
+class ITMImp : public ItemMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
 	int version;
 
 public:
 	ITMImp(void);
 	~ITMImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
-	Item * GetItem ();
+	bool Open(DataStream* stream, bool autoFree = true);
+	Item* GetItem();
 
 	void release(void)
 	{
 		delete this;
 	}
 private:
-	ITMExtHeader * GetExtHeader (Item *s);
-	ITMFeature * GetFeature ();
+	ITMExtHeader* GetExtHeader(Item* s);
+	ITMFeature* GetFeature();
 };
 
 

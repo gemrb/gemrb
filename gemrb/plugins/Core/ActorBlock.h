@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.21 2004/02/09 19:20:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.22 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -43,11 +43,11 @@ class Door;
 #define MAX_SCRIPTS		8
 
 #define SCR_OVERRIDE 0
-#define SCR_AREA     1
+#define SCR_AREA	 1
 #define SCR_SPECIFICS 2
 #define SCR_CLASS    3
 #define SCR_UNKNOWN  4
-#define SCR_RACE     5
+#define SCR_RACE	 5
 #define SCR_GENERAL  6
 #define SCR_DEFAULT  7
 
@@ -63,16 +63,8 @@ class Door;
 #define GEM_EXPORT
 #endif
 
-typedef enum ScriptableType {
-	ST_ACTOR = 0,
-	ST_PROXIMITY = 1,
-	ST_TRIGGER = 2,
-	ST_TRAVEL = 3,
-	ST_DOOR = 4,
-	ST_CONTAINER = 5,
-	ST_AREA = 6,
-	ST_GLOBAL = 7
-} ScriptableType;
+typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
+ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
 
 /*
 typedef struct ActionStep {
@@ -94,37 +86,37 @@ private:
 	unsigned long WaitCounter;
 	bool neverExecuted;
 public:
-	Variables * locals;
+	Variables* locals;
 	ScriptableType Type;
 	unsigned short XPos, YPos;
-	Scriptable * MySelf;
-	Scriptable * CutSceneId;
-    	GameScript * Scripts[MAX_SCRIPTS];
-	char * overHeadText;
+	Scriptable* MySelf;
+	Scriptable* CutSceneId;
+	GameScript* Scripts[MAX_SCRIPTS];
+	char* overHeadText;
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
 	char scriptName[33];
 	bool Active;
-	Scriptable * LastTrigger;
-	Scriptable * Clicker;
-	Scriptable * LastEntered;
+	Scriptable* LastTrigger;
+	Scriptable* Clicker;
+	Scriptable* LastEntered;
 	unsigned long EndAction;
-	std::list<Action*> actionQueue;
-	Action * CurrentAction;
+	std::list< Action*> actionQueue;
+	Action* CurrentAction;
 	bool resetAction;
 	bool Terminate; //Used only in CutScenes
 	unsigned long playDeadCounter;
 public:
-	void SetScript(const char *aScript, int idx);
+	void SetScript(const char* aScript, int idx);
 	void SetWait(unsigned long time);
 	void SetPosition(unsigned short XPos, unsigned short YPos);
-	void SetMySelf(Scriptable * MySelf);
-	void SetScript(int index, GameScript * script);
-	void DisplayHeadText(char * text);
-	void SetScriptName(char * text);
-	void ExecuteScript(GameScript * Script);
-	void AddAction(Action * aC);
-	void AddActionInFront(Action * aC);
+	void SetMySelf(Scriptable* MySelf);
+	void SetScript(int index, GameScript* script);
+	void DisplayHeadText(char* text);
+	void SetScriptName(char* text);
+	void ExecuteScript(GameScript* Script);
+	void AddAction(Action* aC);
+	void AddActionInFront(Action* aC);
 	Action* GetNextAction();
 	Action* PopNextAction();
 	void ClearActions();
@@ -157,7 +149,7 @@ public:
 	Highlightable(ScriptableType type);
 	virtual ~Highlightable(void);
 public:
-	Gem_Polygon * outline;
+	Gem_Polygon* outline;
 	Color outlineColor;
 	unsigned long Cursor;
 	bool Highlight;
@@ -173,14 +165,14 @@ public:
 	unsigned short XDes, YDes;
 	unsigned char Orientation;
 	unsigned char AnimID;
-	PathNode * path;
-	PathNode * step;
+	PathNode* path;
+	PathNode* step;
 	unsigned long timeStartStep;
-	Sprite2D * lastFrame;
+	Sprite2D* lastFrame;
 	char Area[9];
 	long TalkCount;
 public:
-	void DoStep(ImageMgr * LightMap);
+	void DoStep(ImageMgr* LightMap);
 	void WalkTo(unsigned short XDes, unsigned short YDes);
 	void MoveTo(unsigned short XDes, unsigned short YDes);
 	void ClearPath();
@@ -196,28 +188,28 @@ public:
 
 class GEM_EXPORT Door : public Highlightable {
 public:
-	Door(TileOverlay * Overlay);
+	Door(TileOverlay* Overlay);
 	~Door(void);
 public:
 	char Name[9];
-	TileOverlay * overlay;
-	unsigned short * tiles;
+	TileOverlay* overlay;
+	unsigned short* tiles;
 	unsigned char count;
 	bool DoorClosed;
 	int closedIndex;
-	Gem_Polygon * open;
-	Gem_Polygon * closed;
+	Gem_Polygon* open;
+	Gem_Polygon* closed;
 	Point toOpen[2];
 	char OpenSound[9];
 	char CloseSound[9];
 private:
 	void ToggleTiles(bool playsound = false);
 public:
-	void SetName(char * Name);
-	void SetTiles(unsigned short * Tiles, int count);
+	void SetName(char* Name);
+	void SetTiles(unsigned short* Tiles, int count);
 	void SetDoorClosed(bool Closed, bool playsound = false);
 	void ToggleDoorState();
-	void SetPolygon(bool Open, Gem_Polygon * poly);
+	void SetPolygon(bool Open, Gem_Polygon* poly);
 	void SetCursor(unsigned char CursorIndex);
 	void DebugDump();
 };

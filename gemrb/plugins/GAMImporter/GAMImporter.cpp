@@ -33,34 +33,35 @@
 #ifdef WIN32
 #include <windows.h>
 
-BOOL APIENTRY DllMain( HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved )
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD  ul_reason_for_call,
+	LPVOID lpReserved)
 {
-    return TRUE;
+	return TRUE;
 }
 
 #endif
 
 GEM_EXPORT_DLL int LibNumberClasses()
-{ 
-	return 1; 
+{
+	return 1;
 }
 
-GEM_EXPORT_DLL ClassDesc *LibClassDesc(int i)
+GEM_EXPORT_DLL ClassDesc* LibClassDesc(int i)
 {
-	switch(i) {
-		case 0: 
+	switch (i) {
+		case 0:
 			return &GAMImpCD;
-		default: 
+		default:
 			return 0;
 	}
 }
 
-GEM_EXPORT_DLL const char *LibDescription()
+GEM_EXPORT_DLL const char* LibDescription()
 {
 	return "GAM File Importer";
 }
 
 GEM_EXPORT_DLL unsigned long LibVersion()
-{ 
-	return VERSION_GEMRB; 
+{
+	return VERSION_GEMRB;
 }

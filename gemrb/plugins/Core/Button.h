@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.21 2004/02/11 23:25:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.22 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -52,74 +52,78 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT Button : public Control
-{
+class GEM_EXPORT Button : public Control {
 public: 
 	Button(bool Clear = false);
 	~Button();
-  /** Sets the 'type' Image of the Button to 'img'.
-'type' may assume the following values:
-- IE_GUI_BUTTON_UNPRESSED
-- IE_GUI_BUTTON_PRESSED
-- IE_GUI_BUTTON_SELECTED
-- IE_GUI_BUTTON_DISABLED */
-  void SetImage(unsigned char type, Sprite2D * img);
-  /** Draws the Control on the Output Display */
-  void Draw(unsigned short x, unsigned short y);
-  /** Sets the Button State */
-  void SetState(unsigned char state);
-  /** Sets the Text of the current control */
-  int SetText(const char * string, int pos = 0);
-  /** Set Event */
-  void SetEvent(char * funcName, int eventType);
-  /** Sets the Picture */
-  void SetPicture(Sprite2D * Picture);
+	/** Sets the 'type' Image of the Button to 'img'.
+	'type' may assume the following values:
+	- IE_GUI_BUTTON_UNPRESSED
+	- IE_GUI_BUTTON_PRESSED
+	- IE_GUI_BUTTON_SELECTED
+	- IE_GUI_BUTTON_DISABLED */
+	void SetImage(unsigned char type, Sprite2D* img);
+	/** Draws the Control on the Output Display */
+	void Draw(unsigned short x, unsigned short y);
+	/** Sets the Button State */
+	void SetState(unsigned char state);
+	/** Sets the Text of the current control */
+	int SetText(const char* string, int pos = 0);
+	/** Set Event */
+	void SetEvent(char* funcName, int eventType);
+	/** Sets the Picture */
+	void SetPicture(Sprite2D* Picture);
 public: // Public Events
-  /** Mouse Over */
-  void OnMouseOver(unsigned short x, unsigned short y);
-  /** Mouse Button Down */
-  void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
-  /** Mouse Button Up */
-  void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);	
-  /** A special key has been pressed */
-  void OnSpecialKeyPress(unsigned char Key);
-  /** Button Pressed Event Script Function Name */
-  char ButtonOnPress[64];
-  char MouseOverButton[64];
-  /** Sets the Display Flags */
-  int SetFlags(int Flags, int Operation);
-  /** Returns the Display Flags */
-  unsigned int GetFlags() { return Flags; }
-  /** Refreshes the button from a radio group */
-  void RedrawButton(char *VariableName, int Sum);
+	/** Mouse Over */
+	void OnMouseOver(unsigned short x, unsigned short y);
+	/** Mouse Button Down */
+	void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button,
+		unsigned short Mod);
+	/** Mouse Button Up */
+	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
+		unsigned short Mod);	
+	/** A special key has been pressed */
+	void OnSpecialKeyPress(unsigned char Key);
+	/** Button Pressed Event Script Function Name */
+	char ButtonOnPress[64];
+	char MouseOverButton[64];
+	/** Sets the Display Flags */
+	int SetFlags(int Flags, int Operation);
+	/** Returns the Display Flags */
+	unsigned int GetFlags()
+	{
+		return Flags;
+	}
+	/** Refreshes the button from a radio group */
+	void RedrawButton(char* VariableName, int Sum);
 private: // Private attributes
-  bool Clear;
-  char * Text;
-  bool hasText;
-  Font * font;
-  bool ToggleState;
-  Color * palette;
-  Color * stdpal;
-  /** Button Unpressed Image */
-  Sprite2D * Unpressed;
-  /** Button Pressed Image */
-  Sprite2D * Pressed;
-  /** Button Selected Image */
-  Sprite2D * Selected;
-  /** Button Disabled Image */
-  Sprite2D * Disabled;
-  /** Picture to Apply when the hasPicture flag is set */
-  Sprite2D * Picture;
-  /** Animated Button */
-  Animation * anim;
-  /** The current state of the Button */
-  unsigned char State;
-  /** Display Flags, justification */
-  unsigned long Flags;
-  /** MOS Draggable Variables */
-  unsigned short ScrollX, ScrollY;
-  bool Dragging;
-  unsigned short DragX, DragY; //Starting Dragging Positions
+	bool Clear;
+	char* Text;
+	bool hasText;
+	Font* font;
+	bool ToggleState;
+	Color* palette;
+	Color* stdpal;
+	/** Button Unpressed Image */
+	Sprite2D* Unpressed;
+	/** Button Pressed Image */
+	Sprite2D* Pressed;
+	/** Button Selected Image */
+	Sprite2D* Selected;
+	/** Button Disabled Image */
+	Sprite2D* Disabled;
+	/** Picture to Apply when the hasPicture flag is set */
+	Sprite2D* Picture;
+	/** Animated Button */
+	Animation* anim;
+	/** The current state of the Button */
+	unsigned char State;
+	/** Display Flags, justification */
+	unsigned long Flags;
+	/** MOS Draggable Variables */
+	unsigned short ScrollX, ScrollY;
+	bool Dragging;
+	unsigned short DragX, DragY; //Starting Dragging Positions
 };
 
 #endif

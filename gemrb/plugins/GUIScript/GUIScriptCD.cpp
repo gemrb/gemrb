@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScriptCD.cpp,v 1.2 2003/11/25 13:48:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScriptCD.cpp,v 1.3 2004/02/24 22:20:42 balrog994 Exp $
  *
  */
 
@@ -30,12 +30,12 @@ GUIScriptCD::~GUIScriptCD(void)
 {
 }
 
-void * GUIScriptCD::Create(void)
+void* GUIScriptCD::Create(void)
 {
 	return new GUIScript();
 }
 
-const char * GUIScriptCD::ClassName(void)
+const char* GUIScriptCD::ClassName(void)
 {
 	return "GUIScript";
 }
@@ -47,5 +47,5 @@ SClass_ID GUIScriptCD::SuperClassID(void)
 
 Class_ID GUIScriptCD::ClassID(void)
 {
-	return Class_ID(0x715adf34, 0x110641ad);
+	return Class_ID( 0x715adf34, 0x110641ad );
 }

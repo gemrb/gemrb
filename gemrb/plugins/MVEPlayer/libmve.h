@@ -3,7 +3,7 @@
 
 #define MVE_ERR_EOF 1
 
-typedef struct{
+typedef struct {
 	int screenWidth;
 	int screenHeight;
 	int width;
@@ -11,30 +11,27 @@ typedef struct{
 	int truecolor;
 } MVE_videoSpec;
 
-int  MVE_rmPrepMovie(void *stream, int x, int y, int track);
-int  MVE_rmStepMovie();
+int MVE_rmPrepMovie(void* stream, int x, int y, int track);
+int MVE_rmStepMovie();
 void MVE_rmHoldMovie();
 void MVE_rmEndMovie();
 
-void MVE_getVideoSpec(MVE_videoSpec *vSpec);
+void MVE_getVideoSpec(MVE_videoSpec* vSpec);
 
 void MVE_sndInit(int x);
 
-typedef unsigned int (*mve_cb_Read)(void *stream,
-                                    void *buffer,
-                                    unsigned int count);
+typedef unsigned int (*mve_cb_Read)(void* stream, void* buffer,
+	unsigned int count);
 
-typedef void *(*mve_cb_Alloc)(unsigned int size);
-typedef void (*mve_cb_Free)(void *ptr);
+typedef void*(*mve_cb_Alloc)(unsigned int size);
+typedef void (*mve_cb_Free)(void* ptr);
 
-typedef void (*mve_cb_ShowFrame)(unsigned char *buffer,
-                                 unsigned int bufw, unsigned int bufh,
-                                 unsigned int sx, unsigned int sy,
-                                 unsigned int w, unsigned int h,
-                                 unsigned int dstx, unsigned int dsty);
+typedef void (*mve_cb_ShowFrame)(unsigned char* buffer, unsigned int bufw,
+	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
+	unsigned int h, unsigned int dstx, unsigned int dsty);
 
-typedef void (*mve_cb_SetPalette)(unsigned char *p,
-                                  unsigned int start, unsigned int count);
+typedef void (*mve_cb_SetPalette)(unsigned char* p, unsigned int start,
+	unsigned int count);
 
 void MVE_ioCallbacks(mve_cb_Read io_read);
 void MVE_memCallbacks(mve_cb_Alloc mem_alloc, mve_cb_Free mem_free);

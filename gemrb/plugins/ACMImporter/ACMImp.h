@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.16 2004/01/18 15:05:16 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.17 2004/02/24 22:20:37 balrog994 Exp $
  *
  */
 
@@ -66,20 +66,19 @@ typedef struct AudioStream {
 	int Duration;
 	bool free;
 	bool playing;
-	CSoundReader *reader;
+	CSoundReader* reader;
 } AudioStream;
 
-class ACMImp : public SoundMgr
-{
+class ACMImp : public SoundMgr {
 private:
 	void clearstreams(bool free);
-	static int PlayListManager(void * data);
+	static int PlayListManager(void* data);
 public:
 	ACMImp(void);
 	~ACMImp(void);
 	bool Init(void);
-	unsigned long Play(const char * ResRef, int XPos = 0, int YPos = 0);
-	unsigned long StreamFile(const char * filename);
+	unsigned long Play(const char* ResRef, int XPos = 0, int YPos = 0);
+	unsigned long StreamFile(const char* filename);
 	bool Play();
 	bool Stop();
 	void ResetMusics();

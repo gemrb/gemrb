@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimStructures.h,v 1.3 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimStructures.h,v 1.4 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
 #ifndef ANIMSTRUCTURES_H
 #define ANIMSTRUCTURES_H
 typedef struct CycleEntry {
-	unsigned short	FramesCount;
-	unsigned short	FirstFrame;
+	unsigned short FramesCount;
+	unsigned short FirstFrame;
 } CycleEntry;
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibManager.h,v 1.4 2003/12/18 15:05:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibManager.h,v 1.5 2004/02/24 22:20:35 balrog994 Exp $
  *
  */
 
@@ -24,14 +24,12 @@
 
 #include "../Core/Compressor.h"
 
-class ZLibManager :
-	public Compressor
-{
+class ZLibManager : public Compressor {
 public:
 	ZLibManager(void);
 	~ZLibManager(void);
 	// ZLib Decompression Routine
-	int Decompress(FILE *dest, DataStream *source);
+	int Decompress(FILE* dest, DataStream* source);
 public:
 	void release(void)
 	{

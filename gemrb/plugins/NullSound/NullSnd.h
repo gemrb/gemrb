@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSnd.h,v 1.1 2004/01/11 14:25:27 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSnd.h,v 1.2 2004/02/24 22:20:39 balrog994 Exp $
  *
  */
 
@@ -24,14 +24,13 @@
 
 #include "../Core/SoundMgr.h"
 
-class NullSnd : public SoundMgr
-{
+class NullSnd : public SoundMgr {
 public:
 	NullSnd(void);
 	~NullSnd(void);
 	bool Init(void);
-	unsigned long Play(const char * ResRef, int XPos = 0, int YPos = 0);
-	unsigned long StreamFile(const char * filename);
+	unsigned long Play(const char* ResRef, int XPos = 0, int YPos = 0);
+	unsigned long StreamFile(const char* filename);
 	bool Play();
 	bool Stop();
 	void ResetMusics();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.11 2003/12/19 23:05:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.12 2004/02/24 22:20:43 balrog994 Exp $
  *
  */
 
@@ -24,53 +24,51 @@
 
 #include "../Core/ImageMgr.h"
 
-class BMPImp : public ImageMgr
-{
+class BMPImp : public ImageMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
 
 	//BITMAPINFOHEADER
-	unsigned long Size, Width, Height, Compression, ImageSize, ColorsUsed, ColorsImportant;
+	unsigned long Size, Width, Height, Compression, ImageSize, ColorsUsed,
+		ColorsImportant;
 	unsigned short Planes, BitCount;
 
 	//COLORTABLE
 	unsigned long NumColors;
-	Color * Palette;
+	Color* Palette;
 
 	//RASTERDATA
-	void * pixels;
+	void* pixels;
 
 	//OTHER
 	unsigned short PaddedRowLength;
 public:
 	BMPImp(void);
 	~BMPImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
-	Sprite2D * GetImage();
+	bool Open(DataStream* stream, bool autoFree = true);
+	Sprite2D* GetImage();
 	/** No descriptions */
-	void GetPalette(int index, int colors, Color * pal);
+	void GetPalette(int index, int colors, Color* pal);
 	unsigned long GetPixelIndex(int x, int y)
 	{
-		unsigned char *p=(unsigned char *)pixels;
-		if(BitCount == 4)
-			p+=(PaddedRowLength*y)+(x>>1);
-		else
-			p+=(PaddedRowLength*y)+(x*(BitCount/8));
-		if(BitCount == 24) {
-			int ret = *(unsigned long *) p;
-			return ret|0xff000000;
+		unsigned char * p = ( unsigned char * ) pixels;
+		if (BitCount == 4) {
+			p += ( PaddedRowLength * y ) + ( x >> 1 );
+		} else {
+			p += ( PaddedRowLength * y ) + ( x * ( BitCount / 8 ) );
 		}
-		else if(BitCount == 8) {
-			return (unsigned long) *p;
-		}
-		else if(BitCount == 4) {
-			unsigned char ret=*p;
-			if(x&1) {
-				return ret&15;
-			}
-			else {
-				return (ret>>4)&15;
+		if (BitCount == 24) {
+			int ret = *( unsigned long* ) p;
+			return ret | 0xff000000;
+		} else if (BitCount == 8) {
+			return ( unsigned long ) * p;
+		} else if (BitCount == 4) {
+			unsigned char ret = *p;
+			if (x & 1) {
+				return ret & 15;
+			} else {
+				return ( ret >> 4 ) & 15;
 			}
 		}
 		return 0;
@@ -79,29 +77,28 @@ public:
 	Color GetPixel(int x, int y)
 	{
 		Color ret;
-		unsigned char * p = (unsigned char*)pixels;
-		if(BitCount == 4)
-			p+=(PaddedRowLength*y)+(x>>1);
-		else
-			p+=(PaddedRowLength*y)+(x*(BitCount/8));
-		if(BitCount == 24) {
+		unsigned char * p = ( unsigned char * ) pixels;
+		if (BitCount == 4) {
+			p += ( PaddedRowLength * y ) + ( x >> 1 );
+		} else {
+			p += ( PaddedRowLength * y ) + ( x * ( BitCount / 8 ) );
+		}
+		if (BitCount == 24) {
 			ret.b = *p++;
 			ret.g = *p++;
 			ret.r = *p++;
 			ret.a = 0xff;
-		}
-		else if(BitCount == 8) {
+		} else if (BitCount == 8) {
 			ret.r = Palette[*p].r;
 			ret.g = Palette[*p].g;
 			ret.b = Palette[*p].b;
 			ret.a = 0xff;
-		}
-		else if(BitCount == 4) {
-			int tmp=(unsigned long) *p;
-			if(x&1)
-				tmp&=15;
+		} else if (BitCount == 4) {
+			int tmp = ( unsigned long ) * p;
+			if (x & 1)
+				tmp &= 15;
 			else
-				tmp=(tmp>>4)&15;
+				tmp = ( tmp >> 4 ) & 15;
 			ret.r = Palette[tmp].r;
 			ret.g = Palette[tmp].g;
 			ret.b = Palette[tmp].b;
@@ -114,7 +111,10 @@ public:
 	{
 		delete this;
 	}
-        int GetCycleCount() { return 1; }
+	int GetCycleCount()
+	{
+		return 1;
+	}
 };
 
 #endif

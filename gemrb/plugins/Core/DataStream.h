@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.6 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.7 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -39,22 +39,21 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT DataStream
-{
+class GEM_EXPORT DataStream {
 public:
 	int Pos;
 	bool Encrypted;
 	DataStream(void);
 	virtual ~DataStream(void);
-	virtual int Read(void * dest, int len) = 0;
+	virtual int Read(void* dest, int len) = 0;
 	virtual int Seek(int pos, int startpos) = 0;
 	virtual unsigned long Size() = 0;
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
 	/** No descriptions */
-	void ReadDecrypted(void * buf, int size);
+	void ReadDecrypted(void* buf, int size);
 	/** No descriptions */
-	virtual int ReadLine(void * buf, int maxlen) = 0;
+	virtual int ReadLine(void* buf, int maxlen) = 0;
 	char filename[_MAX_PATH];
 };
 

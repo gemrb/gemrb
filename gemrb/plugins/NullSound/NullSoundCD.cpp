@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSoundCD.cpp,v 1.1 2004/01/11 14:25:27 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSoundCD.cpp,v 1.2 2004/02/24 22:20:39 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ NullSoundCD::~NullSoundCD(void)
 {
 }
 
-void * NullSoundCD::Create(void)
+void* NullSoundCD::Create(void)
 {
 	return new NullSnd();
 }
@@ -47,7 +47,7 @@ SClass_ID NullSoundCD::SuperClassID(void)
 
 Class_ID NullSoundCD::ClassID(void)
 {
-	return Class_ID(0x00000000, 0x00000001);
+	return Class_ID( 0x00000000, 0x00000001 );
 }
 
 const char* NullSoundCD::InternalName(void)

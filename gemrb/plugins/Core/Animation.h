@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.10 2004/01/11 16:15:56 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.11 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -39,13 +39,12 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT Animation
-{
+class GEM_EXPORT Animation {
 private:
 	//std::vector<unsigned short> indices;
-	std::vector<Sprite2D*> frames;
-	std::vector<int> link;
-	unsigned short *indices;
+	std::vector< Sprite2D*> frames;
+	std::vector< int> link;
+	unsigned short* indices;
 	unsigned long indicesCount;
 	unsigned int startpos;
 	unsigned long starttime;
@@ -58,20 +57,20 @@ public:
 	bool endReached;
 	unsigned int pos;
 	bool free;
-	int x,y;
+	int x, y;
 	unsigned char BlitMode;
 	unsigned char fps;
 	bool playReversed, playOnce;
 	Region animArea;
-	Animation(unsigned short * frames, int count);
+	Animation(unsigned short* frames, int count);
 	~Animation(void);
-	void AddFrame(Sprite2D * frame, int index);
-	Sprite2D * NextFrame(void);
+	void AddFrame(Sprite2D* frame, int index);
+	Sprite2D* NextFrame(void);
 	void release(void);
 	/** Gets the i-th frame */
-	Sprite2D * GetFrame(unsigned long i);
+	Sprite2D* GetFrame(unsigned long i);
 	/** Sets the Animation Palette */
-	void SetPalette(Color * Palette);
+	void SetPalette(Color* Palette);
 	bool ChangePalette;
 };
 

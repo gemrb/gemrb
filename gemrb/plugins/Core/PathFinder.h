@@ -17,32 +17,32 @@
 #endif
 
 struct PathNode {
-	PathNode *Parent;
-	PathNode *Next;
+	PathNode* Parent;
+	PathNode* Next;
 	unsigned short x;
 	unsigned short y;
 	unsigned int orient;
 };
 
-class GEM_EXPORT PathFinder
-{
+class GEM_EXPORT PathFinder {
 private:
-	ImageMgr * sMap;
-	unsigned short *MapSet;
-	std::queue<unsigned int> InternalStack;
+	ImageMgr* sMap;
+	unsigned short* MapSet;
+	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
 public:
 	PathFinder(void);
 	~PathFinder(void);
-	void SetMap(ImageMgr * sMap, unsigned int Width, unsigned int Height);
+	void SetMap(ImageMgr* sMap, unsigned int Width, unsigned int Height);
 	/* Finds the nearest passable point */
-	void AdjustPosition(unsigned int &goalX, unsigned int &goalY);
-	PathNode * FindPath(short sX, short sY, short dX, short dY);
+	void AdjustPosition(unsigned int& goalX, unsigned int& goalY);
+	PathNode* FindPath(short sX, short sY, short dX, short dY);
 	bool IsVisible(short sX, short sY, short dX, short dY);
 private:
-	void Leveldown(unsigned int px, unsigned int py, unsigned int &level, unsigned int &nx, unsigned int &ny, unsigned int &diff);
-	void SetupNode(unsigned int x,unsigned int y, unsigned int Cost);
-//maybe this is unneeded and orientation could be calculated on the fly
+	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
+		unsigned int& nx, unsigned int& ny, unsigned int& diff);
+	void SetupNode(unsigned int x, unsigned int y, unsigned int Cost);
+	//maybe this is unneeded and orientation could be calculated on the fly
 	unsigned char GetOrient(short sX, short sY, short dX, short dY);
 };
 

@@ -23,13 +23,12 @@
 
 #include "../Core/ClassDesc.h"
 
-class GAMImpCD : public ClassDesc
-{
+class GAMImpCD : public ClassDesc {
 public:
 	GAMImpCD(void);
 	~GAMImpCD(void);
-	void * Create(void);
-	const char * ClassName(void);
+	void* Create(void);
+	const char* ClassName(void);
 	SClass_ID SuperClassID(void);
 	Class_ID ClassID(void);
 };

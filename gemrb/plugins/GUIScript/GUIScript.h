@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.h,v 1.9 2003/12/20 15:55:58 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.h,v 1.10 2004/02/24 22:20:42 balrog994 Exp $
  *
  */
 
@@ -35,23 +35,22 @@
 #include "Python.h"
 #endif
 
-class GUIScript : public ScriptEngine
-{
+class GUIScript : public ScriptEngine {
 private:
-	PyObject *pName, *pModule, *pDict;
-	PyObject *pGemRB, *pGemRBDict;
-	PyObject * maindic;
+	PyObject* pName, * pModule, * pDict;
+	PyObject* pGemRB, * pGemRBDict;
+	PyObject* maindic;
 public:
 	GUIScript(void);
 	~GUIScript(void);
 	/** Initialization Routine */
 	bool Init(void);
 	/** Load Script */
-	bool LoadScript(const char * filename);
+	bool LoadScript(const char* filename);
 	/** Run Function */
-	bool RunFunction(char * fname);
+	bool RunFunction(char* fname);
 	/** Exec a single String */
-	char * ExecString(char * string);
+	char* ExecString(char* string);
 public:
 	void release(void)
 	{

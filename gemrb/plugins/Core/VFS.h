@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.6 2004/02/18 15:57:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.7 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -61,32 +61,33 @@
 #ifdef WIN32
 
 typedef struct DIR {
-  char path[_MAX_PATH];
-  bool is_first;
-  struct _finddata_t c_file;
-  long hFile;
+	char path[_MAX_PATH];
+	bool is_first;
+	struct _finddata_t c_file;
+	long hFile;
 } DIR;
 
 typedef struct dirent {
-  char d_name[_MAX_PATH];
+	char d_name[_MAX_PATH];
 } dirent;
 
-DIR * opendir (const char *filename);
-dirent * readdir (DIR *dirp);
-void closedir (DIR *dirp);
+DIR* opendir(const char* filename);
+dirent* readdir(DIR* dirp);
+void closedir(DIR* dirp);
 
 typedef struct _FILE {
 	HANDLE hFile;
 } _FILE;
 
-GEM_EXPORT _FILE * _fopen(const char * filename, const char * mode);
-GEM_EXPORT size_t _fread(void * ptr, size_t size, size_t n, _FILE * stream);
-GEM_EXPORT size_t _fwrite(const void *ptr, size_t size, size_t n, _FILE * stream);
-GEM_EXPORT size_t _fseek(_FILE * stream, long offset, int whence);
-GEM_EXPORT int _fgetc(_FILE * stream);
-GEM_EXPORT long int _ftell(_FILE * stream);
-GEM_EXPORT int _feof(_FILE * stream);
-GEM_EXPORT int _fclose(_FILE * stream);
+GEM_EXPORT _FILE* _fopen(const char* filename, const char* mode);
+GEM_EXPORT size_t _fread(void* ptr, size_t size, size_t n, _FILE* stream);
+GEM_EXPORT size_t _fwrite(const void* ptr, size_t size, size_t n,
+	_FILE* stream);
+GEM_EXPORT size_t _fseek(_FILE* stream, long offset, int whence);
+GEM_EXPORT int _fgetc(_FILE* stream);
+GEM_EXPORT long int _ftell(_FILE* stream);
+GEM_EXPORT int _feof(_FILE* stream);
+GEM_EXPORT int _fclose(_FILE* stream);
 
 #else  // ! WIN32
 

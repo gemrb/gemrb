@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImpCD.cpp,v 1.2 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImpCD.cpp,v 1.3 2004/02/24 22:20:43 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ BMPImpCD::~BMPImpCD(void)
 {
 }
 
-void * BMPImpCD::Create(void)
+void* BMPImpCD::Create(void)
 {
 	return new BMPImp();
 }
@@ -48,7 +48,7 @@ SClass_ID BMPImpCD::SuperClassID(void)
 
 Class_ID BMPImpCD::ClassID(void)
 {
-	return Class_ID(0x5183026a, 0xf09871a3);
+	return Class_ID( 0x5183026a, 0xf09871a3 );
 }
 
 const char* BMPImpCD::InternalName(void)

@@ -15,27 +15,30 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Tile.cpp,v 1.4 2003/11/27 22:07:09 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Tile.cpp,v 1.5 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "Tile.h"
 
-Tile::Tile(Animation * anim, Animation * sec)
+Tile::Tile(Animation* anim, Animation* sec)
 {
 	tileIndex = 0;
 	this->anim[0] = anim;
-	if(sec)
+	if (sec) {
 		this->anim[1] = sec;
-	else
+	} else {
 		this->anim[1] = NULL;
+	}
 }
 
 Tile::~Tile(void)
 {
-	if(anim[0])
-		delete(anim[0]);
-	if(anim[1])
-		delete(anim[1]);
+	if (anim[0]) {
+		delete( anim[0] );
+	}
+	if (anim[1]) {
+		delete( anim[1] );
+	}
 }

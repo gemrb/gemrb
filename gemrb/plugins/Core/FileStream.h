@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.h,v 1.4 2004/02/18 15:07:09 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.h,v 1.5 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -36,10 +36,9 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT FileStream : public DataStream
-{
+class GEM_EXPORT FileStream : public DataStream {
 private:
-	_FILE * str;
+	_FILE* str;
 	ulong startpos;
 	bool autoFree;
 	bool opened;
@@ -48,13 +47,13 @@ public:
 	FileStream(void);
 	~FileStream(void);
 
-	bool Open(const char * filename, bool autoFree = true);
-	bool Open(_FILE * stream, int startpos, int size, bool autoFree = false);
-	int Read(void * dest, int length);
+	bool Open(const char* filename, bool autoFree = true);
+	bool Open(_FILE* stream, int startpos, int size, bool autoFree = false);
+	int Read(void* dest, int length);
 	int Seek(int pos, int startpos);
 	unsigned long Size();
-  /** No descriptions */
-  int ReadLine(void * buf, int maxlen);
+	/** No descriptions */
+	int ReadLine(void* buf, int maxlen);
 };
 
 #endif

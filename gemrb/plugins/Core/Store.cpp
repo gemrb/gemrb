@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.1 2004/02/16 02:10:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.2 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -29,14 +29,14 @@ Store::Store(void)
 
 Store::~Store(void)
 {
-	for(size_t i = 0; i < items.size(); i++) {
-		delete(items[i]);
+	for (size_t i = 0; i < items.size(); i++) {
+		delete( items[i] );
 	}
-	for(size_t i = 0; i < drinks.size(); i++) {
-		delete(drinks[i]);
+	for (size_t i = 0; i < drinks.size(); i++) {
+		delete( drinks[i] );
 	}
-	for(size_t i = 0; i < cures.size(); i++) {
-		delete(cures[i]);
+	for (size_t i = 0; i < cures.size(); i++) {
+		delete( cures[i] );
 	}
-	free (purchased_categories);
+	free( purchased_categories );
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.h,v 1.4 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.h,v 1.5 2004/02/24 22:20:43 balrog994 Exp $
  *
  */
 
@@ -29,9 +29,9 @@
   *@author GemRB Developement Team
   */
 
-class CHUImp : public WindowMgr  {
+class CHUImp : public WindowMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
 	unsigned long WindowCount, CTOffset, WEOffset;
 public: 
@@ -40,9 +40,9 @@ public:
 	/** Returns the number of available windows */
 	unsigned long GetWindowsCount();
 	/** Returns the i-th window in the Previously Loaded Stream */
-	Window * GetWindow(unsigned long i);
+	Window* GetWindow(unsigned long i);
 	/** This function loads all available windows from the 'stream' parameter. */
-	bool Open(DataStream * stream, bool autoFree = true);
+	bool Open(DataStream* stream, bool autoFree = true);
 public:
 	void release(void)
 	{

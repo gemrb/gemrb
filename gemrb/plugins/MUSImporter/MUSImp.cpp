@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.30 2004/01/05 21:36:24 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.31 2004/02/24 22:20:40 balrog994 Exp $
  *
  */
 
@@ -23,7 +23,7 @@
 #include "MUSImp.h"
 #include "../Core/Interface.h"
 
-static char musicsubfolder[6]="music";
+static char musicsubfolder[6] = "music";
 
 MUSImp::MUSImp()
 {
@@ -31,23 +31,25 @@ MUSImp::MUSImp()
 	Playing = false;
 	str = new FileStream();
 	PLpos = 0;
-	PLName[0]='\0';
+	PLName[0] = '\0';
 	lastSound = 0xffffffff;
 #ifndef WIN32
-	if(core->CaseSensitive) {
+	if (core->CaseSensitive) {
 		//TODO: a better, generalised function 
 		char path[_MAX_PATH];
-		strcpy(path, core->GamePath);
-		strcat(path, musicsubfolder);
-		if(!dir_exists(path) ) {
-			 musicsubfolder[0]=toupper(musicsubfolder[0]);
+		strcpy( path, core->GamePath );
+		strcat( path, musicsubfolder );
+		if (!dir_exists( path )) {
+			musicsubfolder[0] = toupper( musicsubfolder[0] );
 		}
 	}
 #endif
 }
-MUSImp::~MUSImp(){
-	if(str)
-		delete(str);
+MUSImp::~MUSImp()
+{
+	if (str) {
+		delete( str );
+	}
 }
 /** Initializes the PlayList Manager */
 bool MUSImp::Init()
@@ -56,108 +58,108 @@ bool MUSImp::Init()
 	return true;
 }
 /** Loads a PlayList for playing */
-bool MUSImp::OpenPlaylist(const char * name)
+bool MUSImp::OpenPlaylist(const char* name)
 {
-	if (PLName[0] != '\0')
-	{
-		int len=(int)strlen(PLName);
-		if(strnicmp(name, PLName, len) == 0)
+	if (PLName[0] != '\0') {
+		int len = ( int ) strlen( PLName );
+		if (strnicmp( name, PLName, len ) == 0)
 			return true;
 	}
-	if(Playing)
+	if (Playing) {
 		return false;
+	}
 	core->GetSoundMgr()->ResetMusics();
 	playlist.clear();
 	PLpos = 0;
-	if(name[0]=='*')
-		return false;
-	char path[_MAX_PATH];
-	strcpy(path, core->GamePath);
-	strcat(path, musicsubfolder);
-	strcat(path, SPathDelimiter);
-	strcat(path, name);
-	if(!str->Open(path, true)) {
-		printf("%s [NOT FOUND]\n",path);
+	if (name[0] == '*') {
 		return false;
 	}
-	printf("Loading %s\n",name);
-	int c = str->ReadLine(PLName, 32);
-	while(c > 0) {
-		if((PLName[c-1]==' ') || (PLName[c-1]=='\t'))
-			PLName[c-1] = 0;
+	char path[_MAX_PATH];
+	strcpy( path, core->GamePath );
+	strcat( path, musicsubfolder );
+	strcat( path, SPathDelimiter );
+	strcat( path, name );
+	if (!str->Open( path, true )) {
+		printf( "%s [NOT FOUND]\n", path );
+		return false;
+	}
+	printf( "Loading %s\n", name );
+	int c = str->ReadLine( PLName, 32 );
+	while (c > 0) {
+		if (( PLName[c - 1] == ' ' ) || ( PLName[c - 1] == '\t' ))
+			PLName[c - 1] = 0;
 		else
 			break;
 		c--;
 	}
 	char counts[5];
-	str->ReadLine(counts, 5);
-	int count = atoi(counts);
-	while(count != 0) {
+	str->ReadLine( counts, 5 );
+	int count = atoi( counts );
+	while (count != 0) {
 		char line[64];
-		int len = str->ReadLine(line, 64);
+		int len = str->ReadLine( line, 64 );
 		int i = 0;
 		int p = 0;
 		PLString pls;
-		while(i < len) {
-			if((line[i]!=' ') && (line[i]!='\t'))
+		while (i < len) {
+			if (( line[i] != ' ' ) && ( line[i] != '\t' ))
 				pls.PLFile[p++] = line[i++];
 			else {
-				while(i < len) {
-					if((line[i]==' ') || (line[i]=='\t'))
+				while (i < len) {
+					if (( line[i] == ' ' ) || ( line[i] == '\t' ))
 						i++;
 					else
 						break;
 				}
 				break;
-			}		
+			}
 		}
-		pls.PLFile[p]=0;
-		p=0;
-		if(line[i]!='@' && (i < len)) {
-			while(i < len) {
-				if((line[i]!=' ') && (line[i]!='\t'))
+		pls.PLFile[p] = 0;
+		p = 0;
+		if (line[i] != '@' && ( i < len )) {
+			while (i < len) {
+				if (( line[i] != ' ' ) && ( line[i] != '\t' ))
 					pls.PLTag[p++] = line[i++];
 				else
 					break;
 			}
-			pls.PLTag[p]=0;
-			p=0;
-			while(i < len) {
-				if((line[i]==' ') || (line[i]=='\t'))
+			pls.PLTag[p] = 0;
+			p = 0;
+			while (i < len) {
+				if (( line[i] == ' ' ) || ( line[i] == '\t' ))
 					i++;
 				else {
 					break;
 				}
 			}
-			if(line[i]=='@')
-				strcpy(pls.PLLoop, pls.PLTag);
+			if (line[i] == '@')
+				strcpy( pls.PLLoop, pls.PLTag );
 			else {
-				while(i < len) {
-					if((line[i]!=' ') && (line[i]!='\t'))
+				while (i < len) {
+					if (( line[i] != ' ' ) && ( line[i] != '\t' ))
 						pls.PLLoop[p++] = line[i++];
 					else
 						break;
 				}
-			pls.PLLoop[p]=0;
+				pls.PLLoop[p] = 0;
 			}
-			while(i < len) {
-				if((line[i]==' ') || (line[i]=='\t'))
+			while (i < len) {
+				if (( line[i] == ' ' ) || ( line[i] == '\t' ))
 					i++;
 				else
 					break;
 			}
-			p=0;
+			p = 0;
+		} else {
+			pls.PLTag[0] = 0;
+			pls.PLLoop[0] = 0;
 		}
-		else {
-			pls.PLTag[0]=0;
-			pls.PLLoop[0]=0;
-		}
-		while(i < len) {
-			if((line[i]!=' ') && (line[i]!='\t'))
+		while (i < len) {
+			if (( line[i] != ' ' ) && ( line[i] != '\t' ))
 				i++;
 			else {
-				while(i < len) {
-					if((line[i]==' ') || (line[i]=='\t'))
+				while (i < len) {
+					if (( line[i] == ' ' ) || ( line[i] == '\t' ))
 						i++;
 					else
 						break;
@@ -165,14 +167,14 @@ bool MUSImp::OpenPlaylist(const char * name)
 				break;
 			}
 		}
-		while(i < len) {
-			if((line[i]!=' ') && (line[i]!='\t'))
+		while (i < len) {
+			if (( line[i] != ' ' ) && ( line[i] != '\t' ))
 				pls.PLEnd[p++] = line[i++];
 			else
 				break;
 		}
-		pls.PLEnd[p]=0;
-		playlist.push_back(pls);
+		pls.PLEnd[p] = 0;
+		playlist.push_back( pls );
 		count--;
 	}
 	return true;
@@ -180,24 +182,23 @@ bool MUSImp::OpenPlaylist(const char * name)
 /** Start the PlayList Music Execution */
 void MUSImp::Start()
 {
-	if(!Playing) {
+	if (!Playing) {
 		PLpos = 0;
-		if(playlist.size()==0)
+		if (playlist.size() == 0)
 			return;
-		if(playlist[PLpos].PLLoop[0] != 0) {
-			for(unsigned int i = 0; i < playlist.size(); i++) {
-				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
+		if (playlist[PLpos].PLLoop[0] != 0) {
+			for (unsigned int i = 0; i < playlist.size(); i++) {
+				if (stricmp( playlist[i].PLFile, playlist[PLpos].PLLoop ) == 0) {
 					PLnext = i;
 					break;
 				}
 			}
-		}
-		else {
-			PLnext=PLpos+1;
-			if(PLnext >= playlist.size())
+		} else {
+			PLnext = PLpos + 1;
+			if (PLnext >= playlist.size())
 				PLnext = -1;
 		}
-		PlayMusic(PLpos);
+		PlayMusic( PLpos );
 		core->GetSoundMgr()->Play();
 		lastSound = playlist[PLpos].soundID;
 		Playing = true;
@@ -206,12 +207,12 @@ void MUSImp::Start()
 /** Ends the Current PlayList Execution */
 void MUSImp::End()
 {
-	if(Playing) {
-		if(playlist.size()==0)
+	if (Playing) {
+		if (playlist.size() == 0)
 			return;
-		if(playlist[PLpos].PLEnd[0] != 0) {
-			if(stricmp(playlist[PLpos].PLEnd, "end") != 0)
-				PlayMusic(playlist[PLpos].PLEnd);
+		if (playlist[PLpos].PLEnd[0] != 0) {
+			if (stricmp( playlist[PLpos].PLEnd, "end" ) != 0)
+				PlayMusic( playlist[PLpos].PLEnd );
 		}
 		PLnext = -1;
 	}
@@ -225,36 +226,40 @@ void MUSImp::HardEnd()
 }
 
 /** Switches the current PlayList while playing the current one */
-void MUSImp::SwitchPlayList(const char * name, bool Hard) {
-	if(Hard) HardEnd();
-	else End();
-	if(OpenPlaylist(name))
+void MUSImp::SwitchPlayList(const char* name, bool Hard)
+{
+	if (Hard) {
+		HardEnd();
+	} else {
+		End();
+	}
+	if (OpenPlaylist( name )) {
 		Start();
+	}
 }
 /** Plays the Next Entry */
 void MUSImp::PlayNext()
 {
-	if(!Playing)
+	if (!Playing) {
 		return;
-	if(PLnext != -1) {
-		PlayMusic(PLnext);
+	}
+	if (PLnext != -1) {
+		PlayMusic( PLnext );
 		PLpos = PLnext;
-		if(playlist[PLpos].PLLoop[0] != 0) {
-			for(unsigned int i = 0; i < playlist.size(); i++) {
-				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
+		if (playlist[PLpos].PLLoop[0] != 0) {
+			for (unsigned int i = 0; i < playlist.size(); i++) {
+				if (stricmp( playlist[i].PLFile, playlist[PLpos].PLLoop ) == 0) {
 					PLnext = i;
 					break;
 				}
 			}
-		}
-		else {
-			if(stricmp(playlist[PLnext].PLEnd,"end")==0)
+		} else {
+			if (stricmp( playlist[PLnext].PLEnd, "end" ) == 0)
 				PLnext = -1;
 			else
-				PLnext=PLpos+1;
+				PLnext = PLpos + 1;
 		}
-	}
-	else {
+	} else {
 		Playing = false;
 		core->GetSoundMgr()->Stop();
 	}
@@ -262,34 +267,35 @@ void MUSImp::PlayNext()
 
 void MUSImp::PlayMusic(int pos)
 {
-	PlayMusic(playlist[pos].PLFile);	
+	PlayMusic( playlist[pos].PLFile );
 }
 
-void MUSImp::PlayMusic(char *name)
+void MUSImp::PlayMusic(char* name)
 {
 	char FName[_MAX_PATH], tmp[32];
-	strcpy(FName, core->GamePath);
-	strcat(FName, musicsubfolder);
-	strcat(FName, SPathDelimiter);
+	strcpy( FName, core->GamePath );
+	strcat( FName, musicsubfolder );
+	strcat( FName, SPathDelimiter );
 	//this is in IWD2
-	if(strnicmp(name, "mx0000",6)==0) {
-		strcat(FName, "mx0000");
-		strcat(FName, SPathDelimiter);
-	} else if(strnicmp(name, "SPC",3) != 0) {
-		strcat(FName, PLName);
-		strcat(FName, SPathDelimiter);
-		strcat(FName, PLName);
+	if (strnicmp( name, "mx0000", 6 ) == 0) {
+		strcat( FName, "mx0000" );
+		strcat( FName, SPathDelimiter );
+	} else if (strnicmp( name, "SPC", 3 ) != 0) {
+		strcat( FName, PLName );
+		strcat( FName, SPathDelimiter );
+		strcat( FName, PLName );
 	}
-	strcat(FName, name);
-	strcat(FName, ".acm");
-	int soundID = core->GetSoundMgr()->StreamFile(FName);
+	strcat( FName, name );
+	strcat( FName, ".acm" );
+	int soundID = core->GetSoundMgr()->StreamFile( FName );
 #ifndef WIN32
-	if((soundID==-1) && core->CaseSensitive) {
-			ResolveFilePath(FName);
-			soundID = core->GetSoundMgr()->StreamFile(FName);
+	if (( soundID == -1 ) && core->CaseSensitive) {
+		ResolveFilePath( FName );
+		soundID = core->GetSoundMgr()->StreamFile( FName );
 	}
 #endif
-	if(soundID==-1)
+	if (soundID == -1) {
 		core->GetSoundMgr()->Stop();
-	printf("Playing: %s\n",FName);
+	}
+	printf( "Playing: %s\n", FName );
 }

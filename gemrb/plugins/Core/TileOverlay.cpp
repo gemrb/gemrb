@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.12 2004/01/05 19:32:57 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.13 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -25,25 +25,25 @@
 #include "Video.h"
 #include <math.h>
 
-extern Interface * core;
+extern Interface* core;
 
 TileOverlay::TileOverlay(int Width, int Height)
 {
 	w = Width;
 	h = Height;
 	count = 0;
-	tiles = (Tile**)malloc(w*h*sizeof(Tile*));
+	tiles = ( Tile * * ) malloc( w * h * sizeof( Tile * ) );
 }
 
 TileOverlay::~TileOverlay(void)
 {
-	for(int i = 0; i < count; i++) {
-		delete(tiles[i]);
+	for (int i = 0; i < count; i++) {
+		delete( tiles[i] );
 	}
-	free(tiles);
+	free( tiles );
 }
 
-void TileOverlay::AddTile(Tile * tile)
+void TileOverlay::AddTile(Tile* tile)
 {
 	tiles[count++] = tile;
 	//tiles.push_back(tile);
@@ -51,34 +51,40 @@ void TileOverlay::AddTile(Tile * tile)
 
 void TileOverlay::Draw(Region viewport)
 {
-	Video * vid = core->GetVideoDriver();
+	Video* vid = core->GetVideoDriver();
 	Region vp = vid->GetViewport();
 	vp.x += viewport.x;
 	vp.y += viewport.y;
 	vp.w = viewport.w;
 	vp.h = viewport.h;
-	if((vp.x+vp.w) > w*64)
-		vp.x = (w*64 - vp.w);
-	if(vp.x < viewport.x)
-		vp.x=viewport.x;
-	if((vp.y+vp.h) > h*64)
-		vp.y = (h*64 - vp.h);
-	if(vp.y < viewport.y)
-		vp.y=viewport.y;
-	vid->SetViewport(vp.x-viewport.x, vp.y-viewport.y);
-	int sx = (vp.x-viewport.x) / 64;
-	int sy = (vp.y-viewport.y) / 64;
-	int dx = (vp.x + vp.w + 63) / 64;
-	int dy = (vp.y + vp.h + 63) / 64;
+	if (( vp.x + vp.w ) > w * 64) {
+		vp.x = ( w * 64 - vp.w );
+	}
+	if (vp.x < viewport.x) {
+		vp.x = viewport.x;
+	}
+	if (( vp.y + vp.h ) > h * 64) {
+		vp.y = ( h * 64 - vp.h );
+	}
+	if (vp.y < viewport.y) {
+		vp.y = viewport.y;
+	}
+	vid->SetViewport( vp.x - viewport.x, vp.y - viewport.y );
+	int sx = ( vp.x - viewport.x ) / 64;
+	int sy = ( vp.y - viewport.y ) / 64;
+	int dx = ( vp.x + vp.w + 63 ) / 64;
+	int dy = ( vp.y + vp.h + 63 ) / 64;
 	vp.x = viewport.x;
 	vp.y = viewport.y;
 	vp.w = viewport.w;
 	vp.h = viewport.h;
-	for(int y = sy; y < dy && y<h; y++) {
-		for(int x = sx; x < dx && x<w; x++) {
-			Tile * tile = tiles[(y*w)+x];
-			if(tile->anim[tile->tileIndex])
-				vid->BlitSprite(tile->anim[tile->tileIndex]->NextFrame(),viewport.x+(x*64) ,viewport.y+(y*64), false, &vp);
+	for (int y = sy; y < dy && y < h; y++) {
+		for (int x = sx; x < dx && x < w; x++) {
+			Tile* tile = tiles[( y* w ) + x];
+			if (tile->anim[tile->tileIndex])
+				vid->BlitSprite( tile->anim[tile->tileIndex]->NextFrame(),
+						viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
+						false, &vp );
 		}
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.h,v 1.11 2004/01/02 15:51:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.h,v 1.12 2004/02/24 22:20:40 balrog994 Exp $
  *
  */
 
@@ -37,29 +37,28 @@ typedef struct PLString {
 	char PLEnd[10];
 	unsigned long soundID;
 } PLString;
-  
-class MUSImp : public MusicMgr
-{
+
+class MUSImp : public MusicMgr {
 private:
 	bool Initialized;
 	bool Playing;
 	char PLName[32];
 	int PLpos, PLnext;
-	FileStream * str;
-	std::vector<PLString> playlist;
+	FileStream* str;
+	std::vector< PLString> playlist;
 	unsigned long lastSound;
 private:
 	void PlayMusic(int pos);
-	void PlayMusic(char *name);
+	void PlayMusic(char* name);
 public: 
 	MUSImp();
 	~MUSImp();
 	/** Loads a PlayList for playing */
-	bool OpenPlaylist(const char * name);
+	bool OpenPlaylist(const char* name);
 	/** Initializes the PlayList Manager */
 	bool Init();
 	/** Switches the current PlayList while playing the current one */
-	void SwitchPlayList(const char * name, bool Hard);
+	void SwitchPlayList(const char* name, bool Hard);
 	/** Ends the Current PlayList Execution */
 	void End();
 	void HardEnd();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.4 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.5 2004/02/24 22:20:42 balrog994 Exp $
  *
  */
 
@@ -29,17 +29,16 @@
 #define IE_CRE_V2_2		2
 #define IE_CRE_V9_0		3
 
-class CREImp : public ActorMgr
-{
+class CREImp : public ActorMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
 	unsigned char CREVersion;
 public:
 	CREImp(void);
 	~CREImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
-	Actor * GetActor();
+	bool Open(DataStream* stream, bool autoFree = true);
+	Actor* GetActor();
 public:
 	void release(void)
 	{

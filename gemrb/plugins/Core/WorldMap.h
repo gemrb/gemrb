@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.2 2004/02/15 14:18:29 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -42,40 +42,40 @@
 
 
 typedef struct WMPAreaEntry {
-        ieResRef AreaName;
-        ieResRef AreaResRef;
-        char AreaLongName[32];
-        ieDword AreaStatus;
-        ieDword IconSeq;
-        ieDword X;
-        ieDword Y;
-        ieStrRef LocCaptionName;
-        ieStrRef LocTooltipName;
-        ieResRef LoadScreenResRef;
-        ieDword AreaLinksIndex[4];
-        ieDword AreaLinksCount[4];
-        char unknown[128];
+	ieResRef AreaName;
+	ieResRef AreaResRef;
+	char AreaLongName[32];
+	ieDword AreaStatus;
+	ieDword IconSeq;
+	ieDword X;
+	ieDword Y;
+	ieStrRef LocCaptionName;
+	ieStrRef LocTooltipName;
+	ieResRef LoadScreenResRef;
+	ieDword AreaLinksIndex[4];
+	ieDword AreaLinksCount[4];
+	char unknown[128];
 } WMPAreaEntry;
 
 
 typedef struct WMPAreaLink {
-        ieDword AreaIndex;
-        char DestEntryPoint[32];
-        ieDword DistanceScale;
-        ieDword Flags;
-        ieResRef EncounterAreaResRef[5];
-        ieDword EncounterChance;
-        char unknown[128];
+	ieDword AreaIndex;
+	char DestEntryPoint[32];
+	ieDword DistanceScale;
+	ieDword Flags;
+	ieResRef EncounterAreaResRef[5];
+	ieDword EncounterChance;
+	char unknown[128];
 } WMPAreaLink;
 
 class GEM_EXPORT WorldMap {
 public:
-        WorldMap ();
-	~WorldMap ();
-	std::vector<WMPAreaEntry *> area_entries;
-	std::vector<WMPAreaLink *> area_links;
+	WorldMap();
+	~WorldMap();
+	std::vector< WMPAreaEntry*> area_entries;
+	std::vector< WMPAreaLink*> area_links;
 
-        ieResRef MapResRef;
+	ieResRef MapResRef;
 	ieDword Width;
 	ieDword Height;
 	ieDword MapNumber;
@@ -89,7 +89,7 @@ public:
 	ieResRef MapIconResRef;
 	char unknown3[128];
 
-	Sprite2D *MapMOS;
+	Sprite2D* MapMOS;
 };
 
 #endif  // ! WORLDMAP_H

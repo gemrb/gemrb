@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.9 2004/02/24 15:24:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.10 2004/02/24 22:20:40 balrog994 Exp $
  *
  */
 
@@ -24,11 +24,11 @@
 #include "MVEPlay.h"
 #include "libmve.h"
 
-static const char  MVESignature[]  = "Interplay MVE File\x1A";
-static const int   MVE_SIGNATURE_LEN = 19;
+static const char MVESignature[] = "Interplay MVE File\x1A";
+static const int MVE_SIGNATURE_LEN = 19;
 
 
-static SDL_Surface *g_screen;
+static SDL_Surface* g_screen;
 static unsigned char g_palette[768];
 static int g_truecolor;
 
@@ -40,79 +40,83 @@ MVEPlay::MVEPlay(void)
 
 MVEPlay::~MVEPlay(void)
 {
-	if(str && autoFree)
-		delete(str);
+	if (str && autoFree) {
+		delete( str );
+	}
 }
 
-bool MVEPlay::Open(DataStream * stream, bool autoFree)
+bool MVEPlay::Open(DataStream* stream, bool autoFree)
 {
 	validVideo = false;
-	if(stream == NULL)
+	if (stream == NULL) {
 		return false;
-	if(str && this->autoFree)
-		delete(str);
+	}
+	if (str && this->autoFree) {
+		delete( str );
+	}
 	str = stream;
 	this->autoFree = autoFree;
 	char Signature[MVE_SIGNATURE_LEN];
-	str->Read(Signature, MVE_SIGNATURE_LEN);
-	if(memcmp(Signature, MVESignature, MVE_SIGNATURE_LEN) != 0) {
-		if(memcmp(Signature, "BIK", 3) == 0) {
-			printf("Warning!!! This is a Bink Video File...\nUnfortunately we cannot provide a Bink Video Player\nWe are sorry!\n");
+	str->Read( Signature, MVE_SIGNATURE_LEN );
+	if (memcmp( Signature, MVESignature, MVE_SIGNATURE_LEN ) != 0) {
+		if (memcmp( Signature, "BIK", 3 ) == 0) {
+			printf( "Warning!!! This is a Bink Video File...\nUnfortunately we cannot provide a Bink Video Player\nWe are sorry!\n" );
 			return true;
 		}
 		return false;
 	}
-	
-	str->Seek(0, GEM_STREAM_START);
+
+	str->Seek( 0, GEM_STREAM_START );
 	validVideo = true;
 	return true;
 }
 
 int MVEPlay::Play()
 {
-	if(!validVideo)
+	if (!validVideo) {
 		return 0;
+	}
 	//Start Movie Playback
-	doPlay(str);
-    return 0;
+	doPlay( str );
+	return 0;
 }
 
-int MVEPlay::doPlay(const DataStream *mve)
+int MVEPlay::doPlay(const DataStream* mve)
 {
 	int result;
 	int done = 0;
 	int bpp = 0;
 	MVE_videoSpec vSpec;
 
-	if (SDL_Init(SDL_INIT_AUDIO) < 0)
-	{
-		fprintf(stderr, "Couldn't initialize SDL Audio: %s\n",SDL_GetError());
+	if (SDL_Init( SDL_INIT_AUDIO ) < 0) {
+		fprintf( stderr, "Couldn't initialize SDL Audio: %s\n",
+			SDL_GetError() );
 	}
 
-	memset(g_palette, 0, 768);
+	memset( g_palette, 0, 768 );
 
-	MVE_sndInit(1);
-	MVE_memCallbacks(malloc, free);
-	MVE_ioCallbacks(fileRead);
-	MVE_sfCallbacks(showFrame);
-	MVE_palCallbacks(setPalette);
+	MVE_sndInit( 1 );
+	MVE_memCallbacks( malloc, free );
+	MVE_ioCallbacks( fileRead );
+	MVE_sfCallbacks( showFrame );
+	MVE_palCallbacks( setPalette );
 
-	MVE_rmPrepMovie((void*)mve, -1, -1, 1);
+	MVE_rmPrepMovie( ( void * ) mve, -1, -1, 1 );
 
-	MVE_getVideoSpec(&vSpec);
+	MVE_getVideoSpec( &vSpec );
 
-	bpp = vSpec.truecolor?16:8;
+	bpp = vSpec.truecolor ? 16 : 8;
 
-	g_screen = (SDL_Surface*)core->GetVideoDriver()->GetVideoSurface();
-	SDL_LockSurface(g_screen);
-	memset(g_screen->pixels, 0, g_screen->w*g_screen->h*g_screen->format->BytesPerPixel);
-	SDL_UnlockSurface(g_screen);
-	SDL_Flip(g_screen);
+	g_screen = ( SDL_Surface * ) core->GetVideoDriver()->GetVideoSurface();
+	SDL_LockSurface( g_screen );
+	memset( g_screen->pixels, 0,
+		g_screen->w * g_screen->h * g_screen->format->BytesPerPixel );
+	SDL_UnlockSurface( g_screen );
+	SDL_Flip( g_screen );
 
 	g_truecolor = vSpec.truecolor;
 
-	while (!done && (result = MVE_rmStepMovie()) == 0)
-	{
+	while (!done && ( result = MVE_rmStepMovie() ) == 0) {
 		done = pollEvents();
 	}
 
@@ -123,38 +127,37 @@ int MVEPlay::doPlay(const DataStream *mve)
 	return 0;
 }
 
-unsigned int MVEPlay::fileRead(void *handle, void *buf, unsigned int count)
+unsigned int MVEPlay::fileRead(void* handle, void* buf, unsigned int count)
 {
 	unsigned numread;
 
-	numread = ((DataStream*)handle)->Read(buf, count);//fread(buf, 1, count, (FILE *)handle);
-	return (numread == count);
+	numread = ( ( DataStream * ) handle )->Read( buf, count );//fread(buf, 1, count, (FILE *)handle);
+	return ( numread == count );
 }
 
-void MVEPlay::showFrame(unsigned char *buf, unsigned int bufw, unsigned int bufh,
-					  unsigned int sx, unsigned int sy,
-					  unsigned int w, unsigned int h,
-					  unsigned int dstx, unsigned int dsty)
+void MVEPlay::showFrame(unsigned char* buf, unsigned int bufw,
+	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
+	unsigned int h, unsigned int dstx, unsigned int dsty)
 {
 	int i;
-	unsigned char *pal;
-	SDL_Surface *sprite;
+	unsigned char * pal;
+	SDL_Surface* sprite;
 	SDL_Rect srcRect, destRect;
 
-	assert(bufw == w && bufh == h);
+	assert( bufw == w && bufh == h );
 
-	if (g_truecolor)
-		sprite = SDL_CreateRGBSurfaceFrom(buf, bufw, bufh, 16, 2 * bufw, 0x7C00, 0x03E0, 0x001F, 0);
-	else
-	{
-		sprite = SDL_CreateRGBSurfaceFrom(buf, bufw, bufh, 8, bufw, 0x7C00, 0x03E0, 0x001F, 0);
+	if (g_truecolor) {
+		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 16, 2 * bufw,
+					0x7C00, 0x03E0, 0x001F, 0 );
+	} else {
+		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 8, bufw, 0x7C00,
+					0x03E0, 0x001F, 0 );
 
 		pal = g_palette;
-		for(i = 0; i < 256; i++)
-		{
-			sprite->format->palette->colors[i].r = (*pal++) << 2;
-			sprite->format->palette->colors[i].g = (*pal++) << 2;
-			sprite->format->palette->colors[i].b = (*pal++) << 2;
+		for (i = 0; i < 256; i++) {
+			sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
+			sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
+			sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
 			sprite->format->palette->colors[i].unused = 0;
 		}
 	}
@@ -168,15 +171,16 @@ void MVEPlay::showFrame(unsigned char *buf, unsigned int bufw, unsigned int bufh
 	destRect.w = w;
 	destRect.h = h;
 
-	SDL_BlitSurface(sprite, &srcRect, g_screen, &destRect);
-	if ( (g_screen->flags & SDL_DOUBLEBUF) == SDL_DOUBLEBUF )
-		SDL_Flip(g_screen);
-	else
-		SDL_UpdateRects(g_screen, 1, &destRect);
-	SDL_FreeSurface(sprite);
+	SDL_BlitSurface( sprite, &srcRect, g_screen, &destRect );
+	if (( g_screen->flags & SDL_DOUBLEBUF ) == SDL_DOUBLEBUF) {
+		SDL_Flip( g_screen );
+	} else {
+		SDL_UpdateRects( g_screen, 1, &destRect );
+	}
+	SDL_FreeSurface( sprite );
 }
 
-void MVEPlay::setPalette(unsigned char *p, unsigned start, unsigned count)
+void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)
 {
 	//Set color 0 to be black
 	g_palette[0] = g_palette[1] = g_palette[2] = 0;
@@ -185,36 +189,33 @@ void MVEPlay::setPalette(unsigned char *p, unsigned start, unsigned count)
 	g_palette[765] = g_palette[766] = g_palette[767] = 50;
 
 	//movie libs palette into our array
-	memcpy(g_palette + start*3, p+start*3, count*3);
+	memcpy( g_palette + start * 3, p + start * 3, count * 3 );
 }
 
 int MVEPlay::pollEvents()
 {
 	SDL_Event event;
 
-	while (SDL_PollEvent(&event))
-	{
-		switch(event.type)
-		{
-		case SDL_QUIT:
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
-			return 1;
-		case SDL_KEYDOWN:
-			switch (event.key.keysym.sym)
-			{
-			case SDLK_ESCAPE:
-			case SDLK_q:
+	while (SDL_PollEvent( &event )) {
+		switch (event.type) {
+			case SDL_QUIT:
+			case SDL_MOUSEBUTTONDOWN:
+			case SDL_MOUSEBUTTONUP:
 				return 1;
-			case SDLK_f:
-				SDL_WM_ToggleFullScreen(g_screen);
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym) {
+					case SDLK_ESCAPE:
+					case SDLK_q:
+						return 1;
+					case SDLK_f:
+						SDL_WM_ToggleFullScreen( g_screen );
+						break;
+					default:
+						break;
+				}
 				break;
 			default:
 				break;
-			}
-			break;
-		default:
-			break;
 		}
 	}
 

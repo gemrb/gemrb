@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MusicMgr.h,v 1.6 2003/11/26 22:04:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MusicMgr.h,v 1.7 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -40,24 +40,23 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT MusicMgr : public Plugin
-{
+class GEM_EXPORT MusicMgr : public Plugin {
 public: 
 	MusicMgr();
 	virtual ~MusicMgr();
-  /** Ends the Current PlayList Execution */
-  virtual void End(void) = 0;
-  virtual void HardEnd(void) = 0;
-  /** Start the PlayList Music Execution */
-  virtual void Start(void) = 0;
-  /** Initializes the PlayList Manager */
-  virtual bool Init();
-  /** Loads a PlayList for playing */
-  virtual bool OpenPlaylist(const char *name) = 0;
-  /** Switches the current PlayList while playing the current one */
-  virtual void SwitchPlayList(const char * name, bool Hard) = 0;
-  /** Plays the Next Entry */
-  virtual void PlayNext() = 0;
+	/** Ends the Current PlayList Execution */
+	virtual void End(void) = 0;
+	virtual void HardEnd(void) = 0;
+	/** Start the PlayList Music Execution */
+	virtual void Start(void) = 0;
+	/** Initializes the PlayList Manager */
+	virtual bool Init();
+	/** Loads a PlayList for playing */
+	virtual bool OpenPlaylist(const char* name) = 0;
+	/** Switches the current PlayList while playing the current one */
+	virtual void SwitchPlayList(const char* name, bool Hard) = 0;
+	/** Plays the Next Entry */
+	virtual void PlayNext() = 0;
 };
 
 #endif

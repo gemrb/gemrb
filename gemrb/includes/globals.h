@@ -50,22 +50,22 @@ typedef unsigned long DWORD;
 #define IE_SHADED 1
 
 #define IE_STR_STRREFON 1
-#define IE_STR_SOUND    2
+#define IE_STR_SOUND	2
 
 //IDS Importer Defines
 #define IDS_VALUE_NOT_LOCATED -65535 // GetValue returns this if text is not found in arrays ... this needs to be a unique number that does not exist in the value[] array
 #define GEM_ENCRYPTION_KEY "\x88\xa8\x8f\xba\x8a\xd3\xb9\xf5\xed\xb1\xcf\xea\xaa\xe4\xb5\xfb\xeb\x82\xf9\x90\xca\xc9\xb5\xe7\xdc\x8e\xb7\xac\xee\xf7\xe0\xca\x8e\xea\xca\x80\xce\xc5\xad\xb7\xc4\xd0\x84\x93\xd5\xf0\xeb\xc8\xb4\x9d\xcc\xaf\xa5\x95\xba\x99\x87\xd2\x9d\xe3\x91\xba\x90\xca"
 
 /////feature flags
-#define  GF_HAS_KAPUTZ                  0 //pst
-#define  GF_ALL_STRINGS_TAGGED	        1 //bg1, pst, iwd1
+#define  GF_HAS_KAPUTZ  				0 //pst
+#define  GF_ALL_STRINGS_TAGGED			1 //bg1, pst, iwd1
 #define  GF_HAS_SONGLIST		2 //bg2
 #define  GF_MID_RES_AVATARS		3 //iwd1
 #define  GF_UPPER_BUTTON_TEXT		4 //bg2
 #define  GF_LOWER_LABEL_TEXT		5 //bg2
-#define  GF_HAS_PARTY_INI               6 //iwd2
-#define  GF_SOUNDFOLDERS                7 //iwd2
-#define  GF_IGNORE_BUTTON_FRAMES        8 // pst?
+#define  GF_HAS_PARTY_INI   			6 //iwd2
+#define  GF_SOUNDFOLDERS				7 //iwd2
+#define  GF_IGNORE_BUTTON_FRAMES		8 // pst?
 
 /////AI global defines
 #define AI_UPDATE_TIME	30
@@ -83,19 +83,19 @@ typedef unsigned long DWORD;
 #define GEM_EXPORT
 #endif
 
-GEM_EXPORT bool dir_exists(const char *path);
-GEM_EXPORT int strlench(const char *string, char ch);
+GEM_EXPORT bool dir_exists(const char* path);
+GEM_EXPORT int strlench(const char* string, char ch);
 #ifndef HAVE_STRNDUP
-GEM_EXPORT char * strndup(const char * s, int l);
+GEM_EXPORT char* strndup(const char* s, int l);
 #endif
 
 #ifdef WIN32
 
 #else
-char * FindInDir(char * Dir, char * Filename);
-void ResolveFilePath(char *FilePath);
-char *strupr(char *string);
-char *strlwr(char *string);
+char* FindInDir(char* Dir, char* Filename);
+void ResolveFilePath(char* FilePath);
+char* strupr(char* string);
+char* strlwr(char* string);
 #endif
 
 #ifdef WIN32

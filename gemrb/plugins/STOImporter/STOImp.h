@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.h,v 1.1 2004/02/16 02:10:15 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.h,v 1.2 2004/02/24 22:20:38 balrog994 Exp $
  *
  */
 
@@ -27,28 +27,27 @@
 #include "../Core/StoreMgr.h"
 
 
-class STOImp : public StoreMgr
-{
+class STOImp : public StoreMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
 	int version;
 
 public:
 	STOImp(void);
 	~STOImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
-	Store * GetStore ();
+	bool Open(DataStream* stream, bool autoFree = true);
+	Store* GetStore();
 
 	void release(void)
 	{
 		delete this;
 	}
 private:
-	STOItem * GetItem ();
-	STODrink * GetDrink ();
-	STOCure * GetCure ();
-	ieDword *GetPurchasedCategories (Store *s);
+	STOItem* GetItem();
+	STODrink* GetDrink();
+	STOCure* GetCure();
+	ieDword* GetPurchasedCategories(Store* s);
 };
 
 

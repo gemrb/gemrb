@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DirectXVideo/DirectXVideo.cpp,v 1.2 2003/11/25 13:48:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DirectXVideo/DirectXVideo.cpp,v 1.3 2004/02/24 22:20:38 balrog994 Exp $
  *
  */
 
@@ -39,33 +39,36 @@
 
 extern HINSTANCE hInst;
 
-BOOL APIENTRY DllMain( HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved )
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD  ul_reason_for_call,
+	LPVOID lpReserved)
 {
-	hInst = (HINSTANCE)hModule;
-    return TRUE;
+	hInst = ( HINSTANCE ) hModule;
+	return TRUE;
 }
 
 #endif
 
-GEM_EXPORT_DLL int LibNumberClasses() 
-{ 
-	return 1; 
+GEM_EXPORT_DLL int LibNumberClasses()
+{
+	return 1;
 }
 
-GEM_EXPORT_DLL ClassDesc *LibClassDesc(int i) {
-	switch(i) {
-		case 0: 
+GEM_EXPORT_DLL ClassDesc* LibClassDesc(int i)
+{
+	switch (i) {
+		case 0:
 			return &DirectXVideoCD;
-		default: 
+		default:
 			return 0;
 	}
 }
 
-GEM_EXPORT_DLL const char *LibDescription() {
+GEM_EXPORT_DLL const char* LibDescription()
+{
 	return "DirectX Video Driver";
 }
 
-GEM_EXPORT_DLL unsigned long LibVersion() 
-{ 
-	return VERSION_GEMRB; 
+GEM_EXPORT_DLL unsigned long LibVersion()
+{
+	return VERSION_GEMRB;
 }

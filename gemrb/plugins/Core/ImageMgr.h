@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.5 2003/11/30 18:32:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.6 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -38,15 +38,14 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT ImageMgr : public Plugin
-{
+class GEM_EXPORT ImageMgr : public Plugin {
 public:
 	ImageMgr(void);
 	virtual ~ImageMgr(void);
-	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
-	virtual Sprite2D * GetImage() = 0;
+	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual Sprite2D* GetImage() = 0;
 	/** No descriptions */
-	virtual void GetPalette(int index, int colors, Color * pal) = 0;
+	virtual void GetPalette(int index, int colors, Color* pal) = 0;
 	/** Gets a Pixel from the Image */
 	virtual Color GetPixel(int x, int y) = 0;
 	virtual unsigned long GetPixelIndex(int x, int y) = 0;

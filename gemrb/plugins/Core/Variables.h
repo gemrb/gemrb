@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.14 2004/02/14 15:08:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.15 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -47,55 +47,61 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT Variables
-{
+class GEM_EXPORT Variables {
 protected:
 	// Association
-	struct MyAssoc
-	{
+	struct MyAssoc {
 		MyAssoc* pNext;
-		char *key;
+		char* key;
 		unsigned long nValue;
 		unsigned long nHashValue;
 	};
-	struct MemBlock
-	{
-		MemBlock *pNext;
+	struct MemBlock {
+		MemBlock* pNext;
 	};
 public:
-// Construction
-	Variables(int nBlockSize = 10, int nHashTableSize=2049);
+	// Construction
+	Variables(int nBlockSize = 10, int nHashTableSize = 2049);
 
-// Attributes
-//sets the way we handle keys, no parsing for .ini file entries, parsing for game variables
-//you should set this only on an empty mapping
-inline int ParseKey(int arg) {
-        MYASSERT(m_nCount==0);
-        m_lParseKey=(arg > 0);
-        return 0;
-}
-//sets the way we handle values
-inline void SetType(int type)
-        { m_type=type; }
-inline int GetCount() const
-        { return m_nCount; }
-inline bool IsEmpty() const
-        { return m_nCount == 0; }
-inline POSITION GetStartPosition() const
-        { return (m_nCount == 0) ? NULL : BEFORE_START_POSITION; }
+	// Attributes
+	//sets the way we handle keys, no parsing for .ini file entries, parsing for game variables
+	//you should set this only on an empty mapping
+	inline int ParseKey(int arg)
+	{
+		MYASSERT( m_nCount == 0 );
+		m_lParseKey = ( arg > 0 );
+		return 0;
+	}
+	//sets the way we handle values
+	inline void SetType(int type)
+	{
+		m_type = type;
+	}
+	inline int GetCount() const
+	{
+		return m_nCount;
+	}
+	inline bool IsEmpty() const
+	{
+		return m_nCount == 0;
+	}
+	inline POSITION GetStartPosition() const
+	{
+		return ( m_nCount == 0 ) ? NULL : BEFORE_START_POSITION;
+	}
 
 	// Lookup
-	int GetValueLength(const char *key) const;
-        bool Lookup(const char *key, char *dest, int MaxLength) const;
-	bool Lookup(const char *key, unsigned long& rValue) const;
+	int GetValueLength(const char* key) const;
+	bool Lookup(const char* key, char* dest, int MaxLength) const;
+	bool Lookup(const char* key, unsigned long& rValue) const;
 
-// Operations
-	void SetAt(const char *key, const char *newValue);
-	void SetAt(const char *key, unsigned long newValue);
+	// Operations
+	void SetAt(const char* key, const char* newValue);
+	void SetAt(const char* key, unsigned long newValue);
 	void RemoveAll();
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
 
-// Implementation
+	// Implementation
 protected:
 	MyAssoc** m_pHashTable;
 	unsigned int m_nHashTableSize;
@@ -106,13 +112,14 @@ protected:
 	int m_nBlockSize;
 	int m_type; //could be string or unsigned long
 
-	MyAssoc* NewAssoc(const char *key);
+	MyAssoc* NewAssoc(const char* key);
 	void FreeAssoc(MyAssoc*);
-	MyAssoc* GetAssocAt(const char *, unsigned int&) const;
-	inline bool MyCopyKey(char *&dest, const char * key) const;
-        inline unsigned int MyHashKey(const char *) const;
-//	 POSITION GetStartPosition() const;
-        void GetNextAssoc(POSITION& rNextPosition, const char*& rKey, unsigned long& rValue) const;
+	MyAssoc* GetAssocAt(const char*, unsigned int&) const;
+	inline bool MyCopyKey(char*& dest, const char* key) const;
+	inline unsigned int MyHashKey(const char*) const;
+	//	 POSITION GetStartPosition() const;
+	void GetNextAssoc(POSITION& rNextPosition, const char*& rKey,
+		unsigned long& rValue) const;
 
 public:
 	~Variables();

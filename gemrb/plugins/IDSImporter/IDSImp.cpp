@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.cpp,v 1.10 2004/02/10 22:12:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.cpp,v 1.11 2004/02/24 22:20:42 balrog994 Exp $
  *
  */
 
@@ -33,92 +33,96 @@ IDSImp::IDSImp(void)
 
 IDSImp::~IDSImp(void)
 {
+	if (str && autoFree) {
+		delete( str );
+	}
 
-	if(str && autoFree)
-		delete(str);
-
-	for(int i = 0; i < ptrs.size(); i++) {
-		free(ptrs[i]);
+	for (int i = 0; i < ptrs.size(); i++) {
+		free( ptrs[i] );
 	}
 }
 
-bool IDSImp::Open(DataStream * stream, bool autoFree)
+bool IDSImp::Open(DataStream* stream, bool autoFree)
 {
-	if(stream == NULL)
+	if (stream == NULL) {
 		return false;
-	if(str)
+	}
+	if (str) {
 		return false;
+	}
 	str = stream;
 	this->autoFree = autoFree;
 
-	bool Encrypted=str->CheckEncrypted();
+	bool Encrypted = str->CheckEncrypted();
 	char tmp[11];
-	str->ReadLine(tmp, 10);
-	tmp[10]=0;
-	if(tmp[0]!='I') {
-		str->Seek(Encrypted?2:0,GEM_STREAM_START);
-		str->Pos=0;
+	str->ReadLine( tmp, 10 );
+	tmp[10] = 0;
+	if (tmp[0] != 'I') {
+		str->Seek( Encrypted ? 2 : 0, GEM_STREAM_START );
+		str->Pos = 0;
 	}
-	while(true) {
-		char * line = (char*)malloc(256);
-		int len = str->ReadLine(line, 256);
-		strlwr(line);
-		if(len == -1) {
-			free(line);
+	while (true) {
+		char* line = ( char* ) malloc( 256 );
+		int len = str->ReadLine( line, 256 );
+		strlwr( line );
+		if (len == -1) {
+			free( line );
 			break;
 		}
-		if(len == 0) {
-			free(line);
+		if (len == 0) {
+			free( line );
 			continue;
 		}
-		if(len < 256)
-			line = (char*)realloc(line, len+1);
-		char * str = strtok(line, " ");
+		if (len < 256)
+			line = ( char * ) realloc( line, len + 1 );
+		char* str = strtok( line, " " );
 		Pair p;
-		p.val=strtoul(str,NULL,0);
-		str = strtok(NULL, " ");
+		p.val = strtoul( str, NULL, 0 );
+		str = strtok( NULL, " " );
 		p.str = str;
-		if(str!=NULL) {
-			ptrs.push_back(line);
-			pairs.push_back(p);
-		}
-		else {
-			free(line);
+		if (str != NULL) {
+			ptrs.push_back( line );
+			pairs.push_back( p );
+		} else {
+			free( line );
 		}
 	}
 
 	return true;
-
 }
 
-long IDSImp::GetValue(const char * txt)
+long IDSImp::GetValue(const char* txt)
 {
-	for(unsigned int i = 0; i < pairs.size(); i++) {
-		if(stricmp(pairs[i].str, txt) == 0)
+	for (unsigned int i = 0; i < pairs.size(); i++) {
+		if (stricmp( pairs[i].str, txt ) == 0) {
 			return pairs[i].val;
+		}
 	}
 	return -1;
 }
 
-char * IDSImp::GetValue(int val)
+char* IDSImp::GetValue(int val)
 {
-	for(unsigned int i = 0; i < pairs.size(); i++) {
-		if(pairs[i].val == val)
+	for (unsigned int i = 0; i < pairs.size(); i++) {
+		if (pairs[i].val == val) {
 			return pairs[i].str;
+		}
 	}
 	return NULL;
 }
 
-char * IDSImp::GetStringIndex(int Index)
+char* IDSImp::GetStringIndex(int Index)
 {
-	if(Index >= pairs.size())
+	if (Index >= pairs.size()) {
 		return NULL;
+	}
 	return pairs[Index].str;
 }
 
 long IDSImp::GetValueIndex(int Index)
 {
-	if(Index >= pairs.size())
+	if (Index >= pairs.size()) {
 		return 0;
+	}
 	return pairs[Index].val;
 }

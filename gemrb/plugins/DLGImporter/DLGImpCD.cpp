@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImpCD.cpp,v 1.1 2003/12/18 20:20:52 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImpCD.cpp,v 1.2 2004/02/24 22:20:42 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ DLGImpCD::~DLGImpCD(void)
 {
 }
 
-void * DLGImpCD::Create(void)
+void* DLGImpCD::Create(void)
 {
 	return new DLGImp();
 }
@@ -47,7 +47,7 @@ SClass_ID DLGImpCD::SuperClassID(void)
 
 Class_ID DLGImpCD::ClassID(void)
 {
-	return Class_ID(0x76adef24, 0x17adc342);
+	return Class_ID( 0x76adef24, 0x17adc342 );
 }
 
 const char* DLGImpCD::InternalName(void)

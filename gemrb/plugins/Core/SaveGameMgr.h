@@ -17,13 +17,12 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT SaveGameMgr : public Plugin
-{
+class GEM_EXPORT SaveGameMgr : public Plugin {
 public:
 	SaveGameMgr(void);
 	virtual ~SaveGameMgr(void);
-	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
-	virtual Game * GetGame() = 0;
+	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual Game* GetGame() = 0;
 };
 
 #endif

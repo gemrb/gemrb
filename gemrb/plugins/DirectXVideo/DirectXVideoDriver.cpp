@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DirectXVideo/DirectXVideoDriver.cpp,v 1.6 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DirectXVideo/DirectXVideoDriver.cpp,v 1.7 2004/02/24 22:20:38 balrog994 Exp $
  *
  */
 
@@ -28,171 +28,177 @@
 #include "Poly.h"
 
 HINSTANCE hInst;
-LPDIRECT3D9				lpD3D;
-LPDIRECT3DDEVICE9		lpD3DDevice;
-int						ScreenWidth, 
-						ScreenHeight;
+LPDIRECT3D9 lpD3D;
+LPDIRECT3DDEVICE9 lpD3DDevice;
+int ScreenWidth, ScreenHeight;
 
-HWND					hWnd;
+HWND hWnd;
 
 /* The main Win32 event handler
 DJM: This is no longer static as (DX5/DIB)_CreateWindow needs it
 */
 LONG CALLBACK WinMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch(msg) {
+	switch (msg) {
 		case WM_SYSKEYUP:
-		case WM_SYSKEYDOWN:{
-
-		}
-	    break;
-
-		case WM_KEYUP: {
-
-		}
-	    break;
-
-		case WM_KEYDOWN: {
-			if((lParam & (1<<32)) == 1)
-				break;
-			int key = -1;
-			switch((int)wParam) {
-				case VK_ESCAPE:
-					core->PopupConsole();
-				break;
-
-				case VK_BACKSPACE:
-					key = GEM_BACKSP;
-				break;
-
-				case VK_RETURN:
-					key = GEM_RETURN;
-				break;
-
-				case VK_DELETE:
-					key = GEM_DELETE;
-				break;
-
-				case VK_LEFT:
-					key = GEM_LEFT;
-				break;
-
-				case VK_RIGHT:
-					key = GEM_RIGHT;
-				break;
+		case WM_SYSKEYDOWN:
+			 {
 			}
 			break;
-			if(key != -1) {
-				if(!core->ConsolePopped)
-					core->GetEventMgr()->OnSpecialKeyPress(key);
-				else
-					core->console->OnSpecialKeyPress(key);
+
+		case WM_KEYUP:
+			 {
 			}
-		}
-		break;
+			break;
 
-		case WM_ACTIVATEAPP: {
-			bool fActive = (BOOL) wParam;        // activation flag 
-			if(fActive)
-				SetCapture(hWnd);
-			else
-				ReleaseCapture();
-		}
-	    break;
-
-		case WM_CHAR: {
-			unsigned char key = (unsigned char)wParam;
-			if((key == 0) || (key == 13)){
-				switch(key) {
-					case VK_DELETE:
-						key = GEM_DELETE;
+		case WM_KEYDOWN:
+			 {
+				if (( lParam & ( 1 << 32 ) ) == 1)
 					break;
+				int key = -1;
+				switch (( int ) wParam) {
+					case VK_ESCAPE:
+						core->PopupConsole();
+						break;
+
+					case VK_BACKSPACE:
+						key = GEM_BACKSP;
+						break;
 
 					case VK_RETURN:
 						key = GEM_RETURN;
+						break;
+
+					case VK_DELETE:
+						key = GEM_DELETE;
+						break;
+
+					case VK_LEFT:
+						key = GEM_LEFT;
+						break;
+
+					case VK_RIGHT:
+						key = GEM_RIGHT;
+						break;
+				}
+				break;
+				if (key != -1) {
+					if (!core->ConsolePopped)
+						core->GetEventMgr()->OnSpecialKeyPress( key );
+					else
+						core->console->OnSpecialKeyPress( key );
+				}
+			}
+			break;
+
+		case WM_ACTIVATEAPP:
+			 {
+				bool fActive = ( BOOL ) wParam;   	 // activation flag 
+				if (fActive)
+					SetCapture( hWnd );
+				else
+					ReleaseCapture();
+			}
+			break;
+
+		case WM_CHAR:
+			 {
+				unsigned char key = ( unsigned char ) wParam;
+				if (( key == 0 ) || ( key == 13 )) {
+					switch (key) {
+						case VK_DELETE:
+							key = GEM_DELETE;
+							break;
+
+						case VK_RETURN:
+							key = GEM_RETURN;
+							break;
+					}
+					if (!core->ConsolePopped)
+						core->GetEventMgr()->OnSpecialKeyPress( key );
+					else
+						core->console->OnSpecialKeyPress( key );
 					break;
 				}
-				if(!core->ConsolePopped)
-					core->GetEventMgr()->OnSpecialKeyPress(key);
+				if (!core->ConsolePopped)
+					core->GetEventMgr()->KeyPress( key, 0 );
 				else
-					core->console->OnSpecialKeyPress(key);
-				break;
+					core->console->OnKeyPress( key, 0 );
 			}
-			if(!core->ConsolePopped)
-				core->GetEventMgr()->KeyPress(key, 0);
-			else
-				core->console->OnKeyPress(key, 0);
-		}
-		return 0;
+			return 0;
 
-		case WM_MOUSEMOVE: {
-			unsigned short xPos = LOWORD(lParam);  // horizontal position of cursor 
-			unsigned short yPos = HIWORD(lParam);  // vertical position of cursor
-			if(!core->ConsolePopped)
-				core->GetEventMgr()->MouseMove(xPos, yPos);
-		}
-	    return 0;
+		case WM_MOUSEMOVE:
+			 {
+				unsigned short xPos = LOWORD( lParam );  // horizontal position of cursor 
+				unsigned short yPos = HIWORD( lParam );  // vertical position of cursor
+				if (!core->ConsolePopped)
+					core->GetEventMgr()->MouseMove( xPos, yPos );
+			}
+			return 0;
 
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
-		case WM_MBUTTONDOWN: {
-			unsigned long  fwKeys = wParam;        // key flags 
-			unsigned short xPos = LOWORD(lParam);  // horizontal position of cursor 
-			unsigned short yPos = HIWORD(lParam);  // vertical position of cursor
-			unsigned char button = 0;
-			unsigned short Mod = 0;
-			if(fwKeys & MK_LBUTTON)
-				button |= 0x01;
-			if(fwKeys & MK_MBUTTON)
-				button |= 0x02;
-			if(fwKeys & MK_RBUTTON)
-				button |= 0x04;
-			if(fwKeys & MK_SHIFT)
-				Mod |= 0x01;
-			if(fwKeys & MK_CONTROL)
-				Mod |= 0x02;
-			if(!core->ConsolePopped)
-				core->GetEventMgr()->MouseDown(xPos, yPos, button, Mod);
-		}
-	    return 0;
+		case WM_MBUTTONDOWN:
+			 {
+				unsigned long  fwKeys = wParam; 	   // key flags 
+				unsigned short xPos = LOWORD( lParam );  // horizontal position of cursor 
+				unsigned short yPos = HIWORD( lParam );  // vertical position of cursor
+				unsigned char button = 0;
+				unsigned short Mod = 0;
+				if (fwKeys & MK_LBUTTON)
+					button |= 0x01;
+				if (fwKeys & MK_MBUTTON)
+					button |= 0x02;
+				if (fwKeys & MK_RBUTTON)
+					button |= 0x04;
+				if (fwKeys & MK_SHIFT)
+					Mod |= 0x01;
+				if (fwKeys & MK_CONTROL)
+					Mod |= 0x02;
+				if (!core->ConsolePopped)
+					core->GetEventMgr()->MouseDown( xPos, yPos, button, Mod );
+			}
+			return 0;
 
 		case WM_LBUTTONUP:
 		case WM_RBUTTONUP:
-		case WM_MBUTTONUP: {
-			unsigned long  fwKeys = wParam;        // key flags 
-			unsigned short xPos = LOWORD(lParam);  // horizontal position of cursor 
-			unsigned short yPos = HIWORD(lParam);  // vertical position of cursor
-			unsigned char button = 0;
-			unsigned short Mod = 0;
-			if(fwKeys & MK_LBUTTON)
-				button |= 0x01;
-			if(fwKeys & MK_MBUTTON)
-				button |= 0x02;
-			if(fwKeys & MK_RBUTTON)
-				button |= 0x04;
-			if(fwKeys & MK_SHIFT)
-				Mod |= 0x01;
-			if(fwKeys & MK_CONTROL)
-				Mod |= 0x02;
-			if(!core->ConsolePopped)
-				core->GetEventMgr()->MouseUp(xPos, yPos, button, Mod);
-		}
-	    return 0;
+		case WM_MBUTTONUP:
+			 {
+				unsigned long  fwKeys = wParam; 	   // key flags 
+				unsigned short xPos = LOWORD( lParam );  // horizontal position of cursor 
+				unsigned short yPos = HIWORD( lParam );  // vertical position of cursor
+				unsigned char button = 0;
+				unsigned short Mod = 0;
+				if (fwKeys & MK_LBUTTON)
+					button |= 0x01;
+				if (fwKeys & MK_MBUTTON)
+					button |= 0x02;
+				if (fwKeys & MK_RBUTTON)
+					button |= 0x04;
+				if (fwKeys & MK_SHIFT)
+					Mod |= 0x01;
+				if (fwKeys & MK_CONTROL)
+					Mod |= 0x02;
+				if (!core->ConsolePopped)
+					core->GetEventMgr()->MouseUp( xPos, yPos, button, Mod );
+			}
+			return 0;
 
-		/* Don't allow screen savers or monitor power downs.
-		   This is because they quietly clear DirectX surfaces.
-		   It would be better to allow the application to
-		   decide whether or not to blow these off, but the
-		   semantics of SDL_PrivateSysWMEvent() don't allow
-		   the application that choice.
-		 */
-		case WM_SYSCOMMAND: {
-			if ((wParam&0xFFF0)==SC_SCREENSAVE || 
-			    (wParam&0xFFF0)==SC_MONITORPOWER)
-				return(0);
-		}
+			/* Don't allow screen savers or monitor power downs.
+								   This is because they quietly clear DirectX surfaces.
+								   It would be better to allow the application to
+								   decide whether or not to blow these off, but the
+								   semantics of SDL_PrivateSysWMEvent() don't allow
+								   the application that choice.
+								 */
+		case WM_SYSCOMMAND:
+			 {
+				if (( wParam & 0xFFF0 ) == SC_SCREENSAVE ||
+					( wParam & 0xFFF0 ) == SC_MONITORPOWER)
+					return( 0 );
+			}
 	}
-	return(DefWindowProc(hwnd, msg, wParam, lParam));
+	return( DefWindowProc( hwnd, msg, wParam, lParam ) );
 }
 
 DirectXVideoDriver::DirectXVideoDriver(void)
@@ -203,10 +209,12 @@ DirectXVideoDriver::DirectXVideoDriver(void)
 
 DirectXVideoDriver::~DirectXVideoDriver(void)
 {
-	if( lpD3DDevice )
+	if (lpD3DDevice) {
 		lpD3DDevice->Release();
-	if( lpD3D )
+	}
+	if (lpD3D) {
 		lpD3D->Release();
+	}
 }
 
 int DirectXVideoDriver::Init(void)
@@ -216,23 +224,23 @@ int DirectXVideoDriver::Init(void)
 	HMODULE handle;
 #endif
 
-	winClassName = (char*)malloc(6);
-	strcpy(winClassName, "GemRB");
+	winClassName = ( char * ) malloc( 6 );
+	strcpy( winClassName, "GemRB" );
 
 	/* Register the application class */
-	classe.hCursor		 = NULL;
-	classe.hIcon		 = (HICON)LoadImage(hInst, winClassName, IMAGE_ICON,
-	                                    0, 0, LR_DEFAULTCOLOR);
-	classe.lpszMenuName	 = NULL;
+	classe.hCursor = NULL;
+	classe.hIcon = ( HICON ) LoadImage( hInst, winClassName, IMAGE_ICON, 0, 0,
+								LR_DEFAULTCOLOR );
+	classe.lpszMenuName = NULL;
 	classe.lpszClassName = winClassName;
 	classe.hbrBackground = NULL;
-	classe.hInstance	 = hInst;
-	classe.style		 = CS_BYTEALIGNCLIENT;
-	classe.lpfnWndProc	 = WinMessage;
-	classe.cbWndExtra	 = 0;
-	classe.cbClsExtra	 = 0;
-	if ( ! RegisterClass(&classe) ) {
-		printf("Couldn't register application class");
+	classe.hInstance = hInst;
+	classe.style = CS_BYTEALIGNCLIENT;
+	classe.lpfnWndProc = WinMessage;
+	classe.cbWndExtra = 0;
+	classe.cbClsExtra = 0;
+	if (!RegisterClass( &classe )) {
+		printf( "Couldn't register application class" );
 		return GEM_ERROR;
 	}
 
@@ -248,24 +256,24 @@ int DirectXVideoDriver::Init(void)
 	}*/
 #endif /* WM_MOUSELEAVE */
 
-	hWnd = CreateWindow(winClassName, winClassName,
-		(WS_OVERLAPPED),//|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX),
-		0, 0, 0, 0, NULL, NULL, hInst, NULL);
-	if ( hWnd == NULL ) {
-		printf("Couldn't create window");
+	hWnd = CreateWindow( winClassName, winClassName, ( WS_OVERLAPPED ),//|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX),
+			0, 0, 0, 0, NULL, NULL, hInst, NULL );
+	if (hWnd == NULL) {
+		printf( "Couldn't create window" );
 		return GEM_ERROR;
 	}
-	ShowWindow(hWnd, SW_HIDE);
+	ShowWindow( hWnd, SW_HIDE );
 
 	RECT bounds;
 
-	bounds.top    = 0;
+	bounds.top = 0;
 	bounds.bottom = core->Height;
-	bounds.left   = 0;
-	bounds.right  = core->Width;
-	AdjustWindowRectEx(&bounds, GetWindowLong(hWnd, GWL_STYLE), FALSE, 0);
+	bounds.left = 0;
+	bounds.right = core->Width;
+	AdjustWindowRectEx( &bounds, GetWindowLong( hWnd, GWL_STYLE ), FALSE, 0 );
 
-	MoveWindow(hWnd, 0, 0, bounds.right-bounds.left-1, bounds.bottom-bounds.top-1, true);
+	MoveWindow( hWnd, 0, 0, bounds.right - bounds.left - 1,
+		bounds.bottom - bounds.top - 1, true );
 
 	lpD3D = Direct3DCreate9( D3D_SDK_VERSION );
 
@@ -273,7 +281,7 @@ int DirectXVideoDriver::Init(void)
 	lpD3D->GetAdapterDisplayMode( D3DADAPTER_DEFAULT, &d3ddm );
 
 	D3DPRESENT_PARAMETERS d3dpp;
-	memset(&d3dpp, 0, sizeof(d3dpp));
+	memset( &d3dpp, 0, sizeof( d3dpp ) );
 	d3dpp.Windowed = true;
 	d3dpp.SwapEffect = D3DSWAPEFFECT_COPY;
 	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
@@ -283,7 +291,7 @@ int DirectXVideoDriver::Init(void)
 	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 
 	lpD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
-		D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &lpD3DDevice);
+			D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &lpD3DDevice );
 
 	lpD3DDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
 	lpD3DDevice->SetRenderState( D3DRS_LIGHTING, false );
@@ -298,23 +306,27 @@ int DirectXVideoDriver::Init(void)
 	return GEM_OK;
 }
 
-int DirectXVideoDriver::CreateDisplay(int width, int height, int bpp, bool fullscreen)
+int DirectXVideoDriver::CreateDisplay(int width, int height, int bpp,
+	bool fullscreen)
 {
 	HWND hDesktop = GetDesktopWindow();
 	RECT rect;
-	GetWindowRect(hDesktop, &rect);
-	
+	GetWindowRect( hDesktop, &rect );
+
 	RECT bounds;
 
-	bounds.top    = 0;
+	bounds.top = 0;
 	bounds.bottom = core->Height;
-	bounds.left   = 0;
-	bounds.right  = core->Width;
-	AdjustWindowRectEx(&bounds, GetWindowLong(hWnd, GWL_STYLE), FALSE, 0);
+	bounds.left = 0;
+	bounds.right = core->Width;
+	AdjustWindowRectEx( &bounds, GetWindowLong( hWnd, GWL_STYLE ), FALSE, 0 );
 
-	MoveWindow(hWnd, (rect.right/2)-((bounds.right-bounds.left)/2), (rect.bottom/2)-((bounds.bottom-bounds.top)/2), bounds.right-bounds.left-1, bounds.bottom-bounds.top-1, true);
+	MoveWindow( hWnd,
+		( rect.right / 2 ) - ( ( bounds.right - bounds.left ) / 2 ),
+		( rect.bottom / 2 ) - ( ( bounds.bottom - bounds.top ) / 2 ),
+		bounds.right - bounds.left - 1, bounds.bottom - bounds.top - 1, true );
 
-	ShowWindow(hWnd, SW_SHOW);
+	ShowWindow( hWnd, SW_SHOW );
 
 	ScreenWidth = width;
 	ScreenHeight = height;
@@ -322,7 +334,8 @@ int DirectXVideoDriver::CreateDisplay(int width, int height, int bpp, bool fulls
 	Viewport.w = width;
 	Viewport.h = height;
 
-	lpD3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0,0,0), 0.0f, 0L);
+	lpD3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
+					D3DCOLOR_XRGB( 0, 0, 0 ), 0.0f, 0L );
 
 	return GEM_OK;
 }
@@ -333,28 +346,29 @@ VideoModes DirectXVideoDriver::GetVideoModes(bool fullscreen)
 	return vm;
 }
 
-bool DirectXVideoDriver::TestVideoMode(VideoMode & vm)
+bool DirectXVideoDriver::TestVideoMode(VideoMode& vm)
 {
 	return false;
 }
 
 int DirectXVideoDriver::SwapBuffers(void)
 {
-	if(!sceneBegin) {
+	if (!sceneBegin) {
 		lpD3DDevice->BeginScene();
 		sceneBegin = true;
 	}
 
-	if(core->ConsolePopped)
+	if (core->ConsolePopped) {
 		core->DrawConsole();
+	}
 
 	lpD3DDevice->EndScene();
 	sceneBegin = false;
 
-	lpD3DDevice->Present(NULL, NULL, NULL, NULL);
+	lpD3DDevice->Present( NULL, NULL, NULL, NULL );
 
 	MSG msg; 
-	while( PeekMessage( &msg, hWnd, 0, 0, PM_REMOVE ) ) {
+	while (PeekMessage( &msg, hWnd, 0, 0, PM_REMOVE )) {
 		TranslateMessage( &msg );
 		DispatchMessage( &msg );
 	}
@@ -362,12 +376,13 @@ int DirectXVideoDriver::SwapBuffers(void)
 	return quit;
 }
 
-Sprite2D *DirectXVideoDriver::CreateSprite(int w, int h, int bpp, DWORD rMask, DWORD gMask, DWORD bMask, DWORD aMask, void* pixels, bool cK, int index)
+Sprite2D* DirectXVideoDriver::CreateSprite(int w, int h, int bpp, DWORD rMask,
+	DWORD gMask, DWORD bMask, DWORD aMask, void* pixels, bool cK, int index)
 {
-	Sprite2D * spr = new Sprite2D();
+	Sprite2D* spr = new Sprite2D();
 
-	Poly * p = new Poly();
-	Texture * t = new Texture(pixels, w, h, 32, NULL, cK, index);
+	Poly* p = new Poly();
+	Texture* t = new Texture( pixels, w, h, 32, NULL, cK, index );
 	p->m_Texture = t;
 	spr->vptr = p;
 	spr->pixels = pixels;
@@ -377,12 +392,13 @@ Sprite2D *DirectXVideoDriver::CreateSprite(int w, int h, int bpp, DWORD rMask, D
 	return spr;
 }
 
-Sprite2D *DirectXVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels, void* palette, bool cK, int index)
+Sprite2D* DirectXVideoDriver::CreateSprite8(int w, int h, int bpp,
+	void* pixels, void* palette, bool cK, int index)
 {
- 	Sprite2D * spr = new Sprite2D();
+	Sprite2D* spr = new Sprite2D();
 
-	Poly * p = new Poly();
-	Texture * t = new Texture(pixels, w, h, 8, palette, cK, index);
+	Poly* p = new Poly();
+	Texture* t = new Texture( pixels, w, h, 8, palette, cK, index );
 	p->m_Texture = t;
 	spr->vptr = p;
 	spr->pixels = pixels;
@@ -392,52 +408,58 @@ Sprite2D *DirectXVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	return spr;
 }
 
-void DirectXVideoDriver::FreeSprite(Sprite2D * spr)
+void DirectXVideoDriver::FreeSprite(Sprite2D* spr)
 {
-	if(spr->vptr)
-		delete(spr->vptr);
-	if(spr->pixels)
-		delete(spr->pixels);
+	if (spr->vptr) {
+		delete( spr->vptr );
+	}
+	if (spr->pixels) {
+		delete( spr->pixels );
+	}
 }
 
-void DirectXVideoDriver::BlitSprite(Sprite2D * spr, int x, int y, bool anchor, Region * clip)
+void DirectXVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
+	Region* clip)
 {
-	
-	if(!sceneBegin) {
+	if (!sceneBegin) {
 		lpD3DDevice->BeginScene();
 		sceneBegin = true;
 	}
-	Poly * p = (Poly*)spr->vptr;
+	Poly* p = ( Poly* ) spr->vptr;
 
-	Region rgn(x-spr->XPos, y-spr->YPos, spr->Width, spr->Height);
-	if(!anchor) {
+	Region rgn( x - spr->XPos, y - spr->YPos, spr->Width, spr->Height );
+	if (!anchor) {
 		rgn.x -= Viewport.x;
 		rgn.y -= Viewport.y;
 	}
 
-	if(clip) {
-		if(rgn.x >= clip->x+clip->w)
+	if (clip) {
+		if (rgn.x >= clip->x + clip->w)
 			return;
-		if(rgn.y >= clip->y+clip->h)
+		if (rgn.y >= clip->y + clip->h)
 			return;
-		if(rgn.x+rgn.w <= clip->x)
+		if (rgn.x + rgn.w <= clip->x)
 			return;
-		if(rgn.y+rgn.h <= clip->y)
+		if (rgn.y + rgn.h <= clip->y)
 			return;
 	}
 
-	if(anchor)
-		p->SetVertRect(x-spr->XPos,y-spr->YPos,spr->Width, spr->Height, 0.0f);
-	else
-		p->SetVertRect(x-spr->XPos-Viewport.x, y-spr->YPos-Viewport.y, spr->Width, spr->Height, 0.0f);
+	if (anchor) {
+		p->SetVertRect( x - spr->XPos, y - spr->YPos, spr->Width, spr->Height,
+			0.0f );
+	} else {
+		p->SetVertRect( x - spr->XPos - Viewport.x,
+			y - spr->YPos - Viewport.y, spr->Width, spr->Height, 0.0f );
+	}
 
 	lpD3DDevice->SetTexture( 0, p->m_Texture->pTexture );
-	lpD3DDevice->SetStreamSource( 0, p->m_VertexBuffer, 0, sizeof(CUSTOMVERTEX) );
+	lpD3DDevice->SetStreamSource( 0, p->m_VertexBuffer, 0,
+					sizeof( CUSTOMVERTEX ) );
 	lpD3DDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2 );
 	//p->m_VertexBuffer->Unlock();
 }
 
-void DirectXVideoDriver::SetCursor(Sprite2D * spr, int x, int y)
+void DirectXVideoDriver::SetCursor(Sprite2D* spr, int x, int y)
 {
 	//TODO: Implement Cursor
 	return;
@@ -460,14 +482,16 @@ void DirectXVideoDriver::MoveViewportTo(int x, int y)
 	Viewport.y = y - Viewport.h;
 }
 /** No descriptions */
-void DirectXVideoDriver::SetPalette(Sprite2D * spr, Color * pal)
+void DirectXVideoDriver::SetPalette(Sprite2D* spr, Color* pal)
 {
-	Poly * p = (Poly*)spr->vptr;
-	p->m_Texture->Init(spr->pixels, spr->Width, spr->Height, 8, (void*)pal, p->m_Texture->hasCK, p->m_Texture->colorKey);
+	Poly* p = ( Poly* ) spr->vptr;
+	p->m_Texture->Init( spr->pixels, spr->Width, spr->Height, 8,
+					( void * ) pal, p->m_Texture->hasCK,
+					p->m_Texture->colorKey );
 	//lpD3DDevice->SetPaletteEntries(p->m_Texture->paletteIndex, (PALETTEENTRY*)pal);
 }
 
-void DirectXVideoDriver::ConvertToVideoFormat(Sprite2D * sprite)
+void DirectXVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
 {
 	return;
 }
@@ -475,77 +499,85 @@ void DirectXVideoDriver::ConvertToVideoFormat(Sprite2D * sprite)
 #define MINCOL 2
 #define MUL    2
 
-void DirectXVideoDriver::CalculateAlpha(Sprite2D * sprite)
+void DirectXVideoDriver::CalculateAlpha(Sprite2D* sprite)
 {
-	
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-void DirectXVideoDriver::DrawRect(Region &rgn, Color &color)
+void DirectXVideoDriver::DrawRect(Region& rgn, Color& color)
 {
 	CUSTOMVERTEX pVertices[4];
 
 	float left, top, right, bottom, d = 0.0f;
-	left	= ((float)rgn.x / (float)ScreenWidth) * 2.0f - 1.0f;
-	right	= ((float)(rgn.x + rgn.w) / (float)ScreenWidth) * 2.0f - 1.0f;
-	bottom 	= ((float)rgn.y / (float)ScreenHeight) * 2.0f - 1.0f;
-	top 	= ((float)(rgn.y + rgn.h) / (float)ScreenHeight) * 2.0f - 1.0f;
+	left = ( ( float ) rgn.x / ( float ) ScreenWidth ) * 2.0f - 1.0f;
+	right = ( ( float ) ( rgn.x + rgn.w ) / ( float ) ScreenWidth ) * 2.0f -
+		1.0f;
+	bottom = ( ( float ) rgn.y / ( float ) ScreenHeight ) * 2.0f - 1.0f;
+	top = ( ( float ) ( rgn.y + rgn.h ) / ( float ) ScreenHeight ) * 2.0f -
+		1.0f;
 	top = -top;
 	bottom = -bottom;
-	
+
 	pVertices[0].x = left;
 	pVertices[0].y = bottom;
 	pVertices[0].z = d;
-	pVertices[0].color=D3DCOLOR_ARGB(255-color.a, color.r, color.b, color.g);
-	pVertices[0].tu=0.0;
-	pVertices[0].tv=0.0;
+	pVertices[0].color = D3DCOLOR_ARGB( 255 - color.a, color.r, color.b,
+							color.g );
+	pVertices[0].tu = 0.0;
+	pVertices[0].tv = 0.0;
 	pVertices[1].x = right;
 	pVertices[1].y = bottom;
 	pVertices[1].z = d;
-	pVertices[1].color=D3DCOLOR_ARGB(255-color.a, color.r, color.b, color.g);
-	pVertices[1].tu=1.0;
-	pVertices[1].tv=0.0;
+	pVertices[1].color = D3DCOLOR_ARGB( 255 - color.a, color.r, color.b,
+							color.g );
+	pVertices[1].tu = 1.0;
+	pVertices[1].tv = 0.0;
 	pVertices[2].x = left;
 	pVertices[2].y = top;
 	pVertices[2].z = d;
-	pVertices[2].color=D3DCOLOR_ARGB(255-color.a, color.r, color.b, color.g);
-	pVertices[2].tu=0.0;
-	pVertices[2].tv=1.0;
+	pVertices[2].color = D3DCOLOR_ARGB( 255 - color.a, color.r, color.b,
+							color.g );
+	pVertices[2].tu = 0.0;
+	pVertices[2].tv = 1.0;
 	pVertices[3].x = right;
 	pVertices[3].y = top;
 	pVertices[3].z = d;
-	pVertices[3].color=D3DCOLOR_ARGB(255-color.a, color.r, color.b, color.g);
-	pVertices[3].tu=1.0;
-	pVertices[3].tv=1.0;
+	pVertices[3].color = D3DCOLOR_ARGB( 255 - color.a, color.r, color.b,
+							color.g );
+	pVertices[3].tu = 1.0;
+	pVertices[3].tv = 1.0;
 
-	if(!sceneBegin) {
+	if (!sceneBegin) {
 		lpD3DDevice->BeginScene();
 		sceneBegin = true;
 	}
 
 	lpD3DDevice->SetTexture( 0, NULL );
-	lpD3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, (void*)pVertices, sizeof(CUSTOMVERTEX) );
+	lpD3DDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2,
+					( void * ) pVertices, sizeof( CUSTOMVERTEX ) );
 }
 /** Creates a Palette from Color */
-Color * DirectXVideoDriver::CreatePalette(Color color, Color back)
+Color* DirectXVideoDriver::CreatePalette(Color color, Color back)
 {
-	Color * pal = (Color*)malloc(256*sizeof(Color));
+	Color* pal = ( Color* ) malloc( 256 * sizeof( Color ) );
 	pal[0].r = 0;
 	pal[0].g = 0xff;
 	pal[0].b = 0;
 	pal[0].a = 0;
-	for(int i = 1; i < 256; i++) {
-		pal[i].r = back.r+(unsigned char)(((color.r-back.r)*(i))/255.0);
-		pal[i].g = back.g+(unsigned char)(((color.g-back.g)*(i))/255.0);
-		pal[i].b = back.b+(unsigned char)(((color.b-back.b)*(i))/255.0);
+	for (int i = 1; i < 256; i++) {
+		pal[i].r = back.r +
+			( unsigned char ) ( ( ( color.r - back.r ) * ( i ) ) / 255.0 );
+		pal[i].g = back.g +
+			( unsigned char ) ( ( ( color.g - back.g ) * ( i ) ) / 255.0 );
+		pal[i].b = back.b +
+			( unsigned char ) ( ( ( color.b - back.b ) * ( i ) ) / 255.0 );
 		pal[i].a = 0;
 	}
 	return pal;
 }
 /** Blits a Sprite filling the Region */
-void DirectXVideoDriver::BlitTiled(Region rgn, Sprite2D * img, bool anchor)
+void DirectXVideoDriver::BlitTiled(Region rgn, Sprite2D* img, bool anchor)
 {
-	
 }
 /** Send a Quit Signal to the Event Queue */
 bool DirectXVideoDriver::Quit()
@@ -554,10 +586,11 @@ bool DirectXVideoDriver::Quit()
 	return true;
 }
 /** Get the Palette of a Sprite */
-Color * DirectXVideoDriver::GetPalette(Sprite2D * spr)
+Color* DirectXVideoDriver::GetPalette(Sprite2D* spr)
 {
-	Color * pal = (Color*)malloc(256*sizeof(Color));
-	memcpy(pal, (((Poly*)spr->vptr)->m_Texture->palette), 256*sizeof(Color));
+	Color* pal = ( Color* ) malloc( 256 * sizeof( Color ) );
+	memcpy( pal, ( ( ( Poly * ) spr->vptr )->m_Texture->palette ),
+		256 * sizeof( Color ) );
 	return pal;
 }
 

@@ -18,15 +18,14 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT SymbolMgr : public Plugin
-{
+class GEM_EXPORT SymbolMgr : public Plugin {
 public:
 	SymbolMgr(void);
 	virtual ~SymbolMgr(void);
-	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
-	virtual long GetValue(const char * text) = 0;
-	virtual char * GetValue(int val) = 0;
-	virtual char * GetStringIndex(int Index) = 0;
+	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual long GetValue(const char* text) = 0;
+	virtual char* GetValue(int val) = 0;
+	virtual char* GetStringIndex(int Index) = 0;
 	virtual long GetValueIndex(int Index) = 0;
 };
 

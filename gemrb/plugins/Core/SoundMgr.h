@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.8 2004/01/04 00:19:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.9 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -36,14 +36,13 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT SoundMgr : public Plugin
-{
+class GEM_EXPORT SoundMgr : public Plugin {
 public:
 	SoundMgr(void);
 	virtual ~SoundMgr(void);
 	virtual bool Init(void) = 0;
-	virtual unsigned long Play(const char * ResRef, int XPos = 0, int YPos = 0) = 0;
-	virtual unsigned long StreamFile(const char * filename) = 0;
+	virtual unsigned long Play(const char* ResRef, int XPos = 0, int YPos = 0) = 0;
+	virtual unsigned long StreamFile(const char* filename) = 0;
 	virtual bool Stop() = 0;
 	virtual bool Play() = 0;
 	virtual void ResetMusics() = 0;

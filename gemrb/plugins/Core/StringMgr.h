@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/StringMgr.h,v 1.4 2003/12/06 17:30:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/StringMgr.h,v 1.5 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -26,7 +26,7 @@
 #include "DataStream.h"
 
 typedef struct StringBlock {
-	char * text;
+	char* text;
 	char Sound[9];
 } StringBlock;
 
@@ -42,14 +42,13 @@ typedef struct StringBlock {
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT StringMgr : public Plugin
-{
+class GEM_EXPORT StringMgr : public Plugin {
 public:
 	StringMgr(void);
 	virtual ~StringMgr(void);
-	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
-	virtual char * GetString(unsigned long strref, int flag=0) = 0;
-	virtual StringBlock GetStringBlock(unsigned long strref, int flag=0) = 0;
+	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual char* GetString(unsigned long strref, int flag = 0) = 0;
+	virtual StringBlock GetStringBlock(unsigned long strref, int flag = 0) = 0;
 };
 
 #endif

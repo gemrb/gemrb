@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImpCD.cpp,v 1.2 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImpCD.cpp,v 1.3 2004/02/24 22:20:44 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ BAMImpCD::~BAMImpCD(void)
 {
 }
 
-void * BAMImpCD::Create(void)
+void* BAMImpCD::Create(void)
 {
 	return new BAMImp();
 }
@@ -47,7 +47,7 @@ SClass_ID BAMImpCD::SuperClassID(void)
 
 Class_ID BAMImpCD::ClassID(void)
 {
-	return Class_ID(0xa2b510c6, 0x037a5db3);
+	return Class_ID( 0xa2b510c6, 0x037a5db3 );
 }
 
 const char* BAMImpCD::InternalName(void)

@@ -15,60 +15,63 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.9 2003/12/19 17:25:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.10 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "MemoryStream.h"
 
-MemoryStream::MemoryStream(void * buffer, int length, bool autoFree)
+MemoryStream::MemoryStream(void* buffer, int length, bool autoFree)
 {
 	ptr = buffer;
 	this->length = length;
 	Pos = 0;
-	strcpy(filename, "");
+	strcpy( filename, "" );
 	this->autoFree = autoFree;
 }
 
 MemoryStream::~MemoryStream(void)
 {
-	if(autoFree)
-		free(ptr);
+	if (autoFree) {
+		free( ptr );
+	}
 }
 
-int MemoryStream::Read(void * dest, int length)
+int MemoryStream::Read(void* dest, int length)
 {
-	if(length+Pos > this->length)
+	if (length + Pos > this->length) {
 		return GEM_ERROR;
-	Byte * p = (Byte*)ptr + Pos;
-	memcpy(dest, p, length);
-	if(Encrypted)
-		ReadDecrypted(dest,length);
-	Pos+=length;
+	}
+	Byte* p = ( Byte* ) ptr + Pos;
+	memcpy( dest, p, length );
+	if (Encrypted) {
+		ReadDecrypted( dest, length );
+	}
+	Pos += length;
 	return GEM_OK;
 }
 
 int MemoryStream::Seek(int arg_pos, int startpos)
 {
-	switch(startpos) {
+	switch (startpos) {
 		case GEM_CURRENT_POS:
-			{
-			if((Pos + arg_pos) < 0)
-				return GEM_ERROR;
-			if((Pos + arg_pos) >= length)
-				return GEM_ERROR;
-			Pos+=arg_pos;
+			 {
+				if (( Pos + arg_pos ) < 0)
+					return GEM_ERROR;
+				if (( Pos + arg_pos ) >= length)
+					return GEM_ERROR;
+				Pos += arg_pos;
 			}
-		break;
+			break;
 
 		case GEM_STREAM_START:
-			{
-			if(arg_pos >= length)
-				return GEM_ERROR;
-			Pos = length;
+			 {
+				if (arg_pos >= length)
+					return GEM_ERROR;
+				Pos = length;
 			}
-		break;
+			break;
 
 		default:
 			return GEM_ERROR;
@@ -81,26 +84,27 @@ unsigned long MemoryStream::Size()
 	return length;
 }
 /** No descriptions */
-int MemoryStream::ReadLine(void * buf, int maxlen)
+int MemoryStream::ReadLine(void* buf, int maxlen)
 {
-	if(Pos>=length)
+	if (Pos >= length) {
 		return -1;
-	unsigned char *p = (unsigned char*)buf;
+	}
+	unsigned char * p = ( unsigned char * ) buf;
 	int i = 0;
-	while(i < (maxlen-1)) {
-		Byte ch = *((Byte*)ptr + Pos);
-		if(Pos==length)
+	while (i < ( maxlen - 1 )) {
+		Byte ch = *( ( Byte* ) ptr + Pos );
+		if (Pos == length)
 			break;
-		if(Encrypted)
-			p[i]^=GEM_ENCRYPTION_KEY[Pos&63];
+		if (Encrypted)
+			p[i] ^= GEM_ENCRYPTION_KEY[Pos & 63];
 		Pos++;
-		if(((char)ch) == '\n')
+		if (( ( char ) ch ) == '\n')
 			break;
-		if(((char)ch) == '\t')
+		if (( ( char ) ch ) == '\t')
 			ch = ' ';
-		if(((char)ch) != '\r')
+		if (( ( char ) ch ) != '\r')
 			p[i++] = ch;
 	}
 	p[i] = 0;
-	return i-1;
+	return i - 1;
 }

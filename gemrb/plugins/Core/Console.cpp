@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.12 2003/12/19 21:29:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.13 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -23,7 +23,7 @@
 #include "Interface.h"
 #include "Console.h"
 
-extern Interface * core;
+extern Interface* core;
 
 Console::Console(void)
 {
@@ -31,7 +31,7 @@ Console::Console(void)
 	Cursor = NULL;
 	Back = NULL;
 	max = 128;
-	Buffer = (unsigned char*)malloc(max);
+	Buffer = ( unsigned char * ) malloc( max );
 	Buffer[0] = 0;
 	CurPos = 0;
 	palette = NULL;
@@ -39,58 +39,67 @@ Console::Console(void)
 
 Console::~Console(void)
 {
-	free(Buffer);
-	if(palette)
-		free(palette);
+	free( Buffer );
+	if (palette) {
+		free( palette );
+	}
 }
 
 /** Draws the Console on the Output Display */
 void Console::Draw(unsigned short x, unsigned short y)
 {
-	if(ta)
-		ta->Draw(x,y-ta->Height);
-	if(Back)
-		core->GetVideoDriver()->BlitSprite(Back, 0, y, true);
-	Color black = {0x00, 0x00, 0x00, 0x00};
-	Region r(x+XPos, y+YPos, Width, Height);
-	core->GetVideoDriver()->DrawRect(r, black);
-	font->Print(r, Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL, NULL, Cursor, CurPos);
+	if (ta) {
+		ta->Draw( x, y - ta->Height );
+	}
+	if (Back) {
+		core->GetVideoDriver()->BlitSprite( Back, 0, y, true );
+	}
+	Color black = {
+		0x00, 0x00, 0x00, 0x00
+	};
+	Region r( x + XPos, y + YPos, Width, Height );
+	core->GetVideoDriver()->DrawRect( r, black );
+	font->Print( r, Buffer, palette,
+			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL, NULL,
+			Cursor, CurPos );
 }
 /** Set Font */
-void Console::SetFont(Font * f)
-{	
-	if(f != NULL)
+void Console::SetFont(Font* f)
+{
+	if (f != NULL) {
 		font = f;
+	}
 }
 /** Set Cursor */
-void Console::SetCursor(Sprite2D * cur)
+void Console::SetCursor(Sprite2D* cur)
 {
-	if(cur != NULL)
+	if (cur != NULL) {
 		Cursor = cur;
+	}
 }
 /** Set BackGround */
-void Console::SetBackGround(Sprite2D * back)
+void Console::SetBackGround(Sprite2D* back)
 {
 	//if 'back' is NULL then no BackGround will be drawn
 	Back = back;
 }
 /** Sets the Text of the current control */
-int Console::SetText(const char * string, int pos)
-{	
-	strncpy((char*)Buffer, string, max);
+int Console::SetText(const char* string, int pos)
+{
+	strncpy( ( char * ) Buffer, string, max );
 	return 0;
 }
 /** Key Press Event */
 void Console::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
-	if(Key >= 0x20) {
-		size_t len = strlen((char*)Buffer);
-		if(len+1 < max) {
-			for(size_t i = len; i > CurPos; i--) {
-				Buffer[i] = Buffer[i-1];
+	if (Key >= 0x20) {
+		size_t len = strlen( ( char* ) Buffer );
+		if (len + 1 < max) {
+			for (size_t i = len; i > CurPos; i--) {
+				Buffer[i] = Buffer[i - 1];
 			}
 			Buffer[CurPos++] = Key;
-			Buffer[len+1] = 0;
+			Buffer[len + 1] = 0;
 		}
 	}
 }
@@ -99,44 +108,44 @@ void Console::OnSpecialKeyPress(unsigned char Key)
 {
 	size_t len;
 
-	switch(Key)
-	{
-	case GEM_BACKSP:
-		if(CurPos != 0) {
-			size_t len = strlen((char*)Buffer);
-			for(size_t i = CurPos; i < len; i++) {
-				Buffer[i-1] = Buffer[i];
+	switch (Key) {
+		case GEM_BACKSP:
+			if (CurPos != 0) {
+				size_t len = strlen( ( char* ) Buffer );
+				for (size_t i = CurPos; i < len; i++) {
+					Buffer[i - 1] = Buffer[i];
+				}
+				Buffer[len - 1] = 0;
+				CurPos--;
 			}
-			Buffer[len-1] = 0;
-			CurPos--;
-		}
-		break;
-	case GEM_LEFT:
-		if(CurPos > 0)
-			CurPos--;
-		break;
-	case GEM_RIGHT:
-		len = strlen((char*)Buffer);
-		if(CurPos < len) {
-			CurPos++;
-		}
-		break;
-	case GEM_DELETE:
-		len = strlen((char*)Buffer);
-		if(CurPos < len) {
-			for(size_t i = CurPos; i < len; i++) {
-				Buffer[i] = Buffer[i+1];
+			break;
+		case GEM_LEFT:
+			if (CurPos > 0)
+				CurPos--;
+			break;
+		case GEM_RIGHT:
+			len = strlen( ( char * ) Buffer );
+			if (CurPos < len) {
+				CurPos++;
 			}
-		}
-		break;			
-	case GEM_RETURN:
-		char * msg = core->GetGUIScriptEngine()->ExecString((char*)Buffer);
-		if(ta)
-			ta->SetText(msg);
-		free(msg);
-		Buffer[0] = 0;
-		CurPos = 0;
-		Changed = true;
-		break;
+			break;
+		case GEM_DELETE:
+			len = strlen( ( char * ) Buffer );
+			if (CurPos < len) {
+				for (size_t i = CurPos; i < len; i++) {
+					Buffer[i] = Buffer[i + 1];
+				}
+			}
+			break;			
+		case GEM_RETURN:
+			char* msg = core->GetGUIScriptEngine()->ExecString( ( char* )
+														Buffer );
+			if (ta)
+				ta->SetText( msg );
+			free( msg );
+			Buffer[0] = 0;
+			CurPos = 0;
+			Changed = true;
+			break;
 	}
 }

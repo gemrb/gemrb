@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.h,v 1.3 2004/01/02 15:56:47 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.h,v 1.4 2004/02/24 22:20:37 balrog994 Exp $
  *
  */
 
@@ -42,105 +42,149 @@ protected:
 	long samples_left; // count of unread samples
 	int is16bit; // 1 - if 16 bit file, 0 - otherwise
 	//FILE* file; // file handle
-	DataStream * stream;
+	DataStream* stream;
 	bool autoFree;
 
 public:
-	CSoundReader (DataStream * stream, bool autoFree = true)//int fhandle)
-    : samples (0), channels(0), samples_left (0), is16bit (1)
-  { //file=fdopen(fhandle,"rb");
-	  this->stream = stream;
-	  this->autoFree = autoFree;
-  };
+	CSoundReader(DataStream* stream, bool autoFree = true)//int fhandle)
 
-	virtual ~CSoundReader() {
-		//if (file) fclose (file);
-		if(stream && autoFree) delete(stream);
+		: samples( 0 ), channels( 0 ), samples_left( 0 ), is16bit( 1 )
+	{
+		//file=fdopen(fhandle,"rb");
+		this->stream = stream;
+		this->autoFree = autoFree;
 	};
 
-  long get_channels()
-  {
-    return channels;
-  }
-  long get_samplerate() { return samplerate; }
-	virtual int init_reader () = 0; // initializes the sound reader
+	virtual ~CSoundReader()
+	{
+		//if (file) fclose (file);
+		if (stream && autoFree) {
+			delete( stream );
+		}
+	};
 
-	long get_length() { return samples; }; // returns the total samples count
-	long get_samples_left() { return samples_left; };
-	int get_bits() { return (is16bit)?16:8; };
+	long get_channels()
+	{
+		return channels;
+	}
+	long get_samplerate()
+	{
+		return samplerate;
+	}
+	virtual int init_reader() = 0; // initializes the sound reader
+
+	long get_length()
+	{
+		return samples;
+	}; // returns the total samples count
+	long get_samples_left()
+	{
+		return samples_left;
+	};
+	int get_bits()
+	{
+		return ( is16bit ) ? 16 : 8;
+	};
 
 	virtual const char* get_file_type() = 0;
 
-	virtual long read_samples (short* buffer, long count) = 0; // returns actual count of read samples
+	virtual long read_samples(short* buffer, long count) = 0; // returns actual count of read samples
 	virtual short read_one_sample(); // returns next sound sample
 };
 
 // RAW file reader
-class CRawPCMReader: public CSoundReader {
+class CRawPCMReader : public CSoundReader {
 public:
-	CRawPCMReader (DataStream * stream, int bits, int len, bool autoFree = true)//int fhandle, int bits, int len)
-		: CSoundReader (stream, autoFree) {
-			is16bit = (bits == 16);
-			samples=len;
-		};
+	CRawPCMReader(DataStream* stream, int bits, int len, bool autoFree = true)//int fhandle, int bits, int len)
 
-	virtual int init_reader ();
-	virtual long read_samples (short* buffer, long count);
-	virtual const char* get_file_type() { return (is16bit? "RAW16": "RAW8"); };
+		: CSoundReader( stream, autoFree )
+	{
+		is16bit = ( bits == 16 );
+		samples = len;
+	};
+
+	virtual int init_reader();
+	virtual long read_samples(short* buffer, long count);
+	virtual const char* get_file_type()
+	{
+		return ( is16bit ? "RAW16" : "RAW8" );
+	};
 };
 
 // WAV files
-class CWavPCMReader: public CRawPCMReader {
+class CWavPCMReader : public CRawPCMReader {
 public:
-	CWavPCMReader (DataStream * stream, long len, bool autoFree = true)//int fhandle,long len)
-		: CRawPCMReader (stream, 16, len, autoFree) {};
-	virtual int init_reader ();
-	virtual const char* get_file_type() { return "WAV"; };
+	CWavPCMReader(DataStream* stream, long len, bool autoFree = true)//int fhandle,long len)
+
+		: CRawPCMReader( stream, 16, len, autoFree )
+	{
+	};
+	virtual int init_reader();
+	virtual const char* get_file_type()
+	{
+		return "WAV";
+	};
 };
 
 // IP's ACM files
-class CACMReader: public CSoundReader {
+class CACMReader : public CSoundReader {
 private:
 	int levels, subblocks;
 	int block_size;
-	long *block, *values;
+	long* block, * values;
 	long samples_ready;
 	CValueUnpacker* unpacker; // ACM-stream unpacker
 	CSubbandDecoder* decoder; // IP's subband decoder
 
 	int make_new_samples();
 public:
-	CACMReader (DataStream *stream, bool autoFree = true)//int fhandle)
-		: CSoundReader (stream, autoFree),
-		block (NULL), values (NULL),
-		samples_ready (0),
-		unpacker (NULL), decoder (NULL) {};
-	virtual ~CACMReader() {
-		if (block) delete block;
-		if (unpacker) delete unpacker;
-		if (decoder) delete decoder;
+	CACMReader(DataStream* stream, bool autoFree = true)//int fhandle)
+
+		: CSoundReader( stream, autoFree ), block( NULL ), values( NULL ),
+		samples_ready( 0 ), unpacker( NULL ), decoder( NULL )
+	{
+	};
+	virtual ~CACMReader()
+	{
+		if (block) {
+			delete block;
+		}
+		if (unpacker) {
+			delete unpacker;
+		}
+		if (decoder) {
+			delete decoder;
+		}
 	};
 
-	virtual int init_reader ();
-	virtual const char* get_file_type() { return "ACM"; };
-	virtual long read_samples (short* buffer, long count);
+	virtual int init_reader();
+	virtual const char* get_file_type()
+	{
+		return "ACM";
+	};
+	virtual long read_samples(short* buffer, long count);
 
-	int get_levels() { return levels; };
-	int get_subblocks() { return subblocks; }
+	int get_levels()
+	{
+		return levels;
+	};
+	int get_subblocks()
+	{
+		return subblocks;
+	}
 };
 
 
 // WAVEFORMATEX structure (from MS SDK)
-typedef struct
-{
-	unsigned short wFormatTag;         /* format type */
-	unsigned short nChannels;          /* number of channels (i.e. mono, stereo...) */
-	unsigned long  nSamplesPerSec;     /* sample rate */
-	unsigned long  nAvgBytesPerSec;    /* for buffer estimation */
-	unsigned short nBlockAlign;        /* block size of data */
+typedef struct {
+	unsigned short wFormatTag;  	   /* format type */
+	unsigned short nChannels;   	   /* number of channels (i.e. mono, stereo...) */
+	unsigned long nSamplesPerSec;     /* sample rate */
+	unsigned long nAvgBytesPerSec;    /* for buffer estimation */
+	unsigned short nBlockAlign; 	   /* block size of data */
 	unsigned short wBitsPerSample;     /* number of bits per sample of mono data */
-	unsigned short cbSize;             /* the count in bytes of the size of */
-					   /* extra information (after cbSize) */
+	unsigned short cbSize;  		   /* the count in bytes of the size of */
+	/* extra information (after cbSize) */
 } cWAVEFORMATEX;
 
 typedef struct {
@@ -148,15 +192,26 @@ typedef struct {
 	unsigned long length;
 } RIFF_CHUNK;
 
-const unsigned char RIFF_4cc[] = { 'R', 'I', 'F', 'F' };
-const unsigned char WAVE_4cc[] = { 'W', 'A', 'V', 'E' };
-const unsigned char fmt_4cc[]  = { 'f', 'm', 't', ' ' };
-const unsigned char fact_4cc[] = { 'f', 'a', 'c', 't' };
-const unsigned char data_4cc[] = { 'd', 'a', 't', 'a' };
+const unsigned char RIFF_4cc[] = {
+	'R', 'I', 'F', 'F'
+};
+const unsigned char WAVE_4cc[] = {
+	'W', 'A', 'V', 'E'
+};
+const unsigned char fmt_4cc[] = {
+	'f', 'm', 't', ' '
+};
+const unsigned char fact_4cc[] = {
+	'f', 'a', 'c', 't'
+};
+const unsigned char data_4cc[] = {
+	'd', 'a', 't', 'a'
+};
 
 
 // File open routine.
-CSoundReader* CreateSoundReader (DataStream * stream, int open_mode, long samples, bool autoFree = true);
+CSoundReader* CreateSoundReader(DataStream* stream, int open_mode,
+	long samples, bool autoFree = true);
 
 // Open modes:
 #define SND_READER_AUTO 0

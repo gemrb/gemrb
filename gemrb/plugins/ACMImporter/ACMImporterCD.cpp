@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImporterCD.cpp,v 1.2 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImporterCD.cpp,v 1.3 2004/02/24 22:20:37 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ ACMImporterCD::~ACMImporterCD(void)
 {
 }
 
-void * ACMImporterCD::Create(void)
+void* ACMImporterCD::Create(void)
 {
 	return new ACMImp();
 }
@@ -47,7 +47,7 @@ SClass_ID ACMImporterCD::SuperClassID(void)
 
 Class_ID ACMImporterCD::ClassID(void)
 {
-	return Class_ID(0x905a0ac1, 0xf817af6c);
+	return Class_ID( 0x905a0ac1, 0xf817af6c );
 }
 
 const char* ACMImporterCD::InternalName(void)

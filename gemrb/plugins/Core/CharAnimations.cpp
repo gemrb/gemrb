@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.28 2004/01/16 22:54:41 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.29 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -24,18 +24,19 @@
 #include "CharAnimations.h"
 #include "Interface.h"
 
-extern Interface * core;
+extern Interface* core;
 
-CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, unsigned char MirrorType, int RowIndex)
+CharAnimations::CharAnimations(char* BaseResRef, unsigned char OrientCount,
+	unsigned char MirrorType, int RowIndex)
 {
-	size_t len = strlen(BaseResRef);
-	ResRef = (char*)malloc(len+1);
-	memcpy(ResRef, BaseResRef, len+1);
+	size_t len = strlen( BaseResRef );
+	ResRef = ( char * ) malloc( len + 1 );
+	memcpy( ResRef, BaseResRef, len + 1 );
 	this->OrientCount = OrientCount;
 	this->MirrorType = MirrorType;
 	LoadedFlag = 0;
-	for(int i = 0; i < MAX_ANIMS; i++) {
-		for(int j = 0; j < 16; j++) {
+	for (int i = 0; i < MAX_ANIMS; i++) {
+		for (int j = 0; j < 16; j++) {
 			Anims[i][j] = NULL;
 		}
 	}
@@ -43,140 +44,149 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 	RangedType = 0;
 	WeaponType = 0;
 	this->RowIndex = RowIndex;
-	Avatars = core->GetTable(core->LoadTable("avatars"));
-	char * val = Avatars->QueryField(RowIndex, 24);
-	if(val[0] != '1')
+	Avatars = core->GetTable( core->LoadTable( "avatars" ) );
+	char* val = Avatars->QueryField( RowIndex, 24 );
+	if (val[0] != '1') {
 		UsePalette = true;
-	else
+	} else {
 		UsePalette = false;
-	CircleSize = atoi(Avatars->QueryField(RowIndex, 6));
-	Animation * anim = GetAnimation(IE_ANI_AWAKE, 0);
-	if(!anim)
+	}
+	CircleSize = atoi( Avatars->QueryField( RowIndex, 6 ) );
+	Animation* anim = GetAnimation( IE_ANI_AWAKE, 0 );
+	if (!anim) {
 		return;
-	Color * pal = core->GetVideoDriver()->GetPalette(anim->GetFrame(0));
-	memcpy(Palette, pal, 256*sizeof(Color));
-	free(pal);
+	}
+	Color* pal = core->GetVideoDriver()->GetPalette( anim->GetFrame( 0 ) );
+	memcpy( Palette, pal, 256 * sizeof( Color ) );
+	free( pal );
 }
 
 CharAnimations::~CharAnimations(void)
 {
-	free(ResRef);
-	switch(MirrorType) {
+	free( ResRef );
+	switch (MirrorType) {
 		case IE_ANI_CODE_MIRROR:
-			{
-				switch(OrientCount) {
+			 {
+				switch (OrientCount) {
 					case 5:
-						{
-							for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-								for(int i = 0; i < 16; i+=2) {
-									if(Anims[AnimID][i])
-										delete(Anims[AnimID][i]);
+						 {
+							for (int AnimID = 0;
+								AnimID < MAX_ANIMS;
+								AnimID++) {
+								for (int i = 0; i < 16; i += 2) {
+									if (Anims[AnimID][i])
+										delete( Anims[AnimID][i] );
 								}
 							}
 						}
-					break;
+						break;
 
 					case 9:
-						{
-							for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-								for(int i = 0; i < 16; i++) {
-									if(Anims[AnimID][i])
-										delete(Anims[AnimID][i]);
+						 {
+							for (int AnimID = 0;
+								AnimID < MAX_ANIMS;
+								AnimID++) {
+								for (int i = 0; i < 16; i++) {
+									if (Anims[AnimID][i])
+										delete( Anims[AnimID][i] );
 								}
 							}
 						}
-					break;
+						break;
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_ONE_FILE:
-			{
-				for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-					for(int i = 0; i < 16; i++) {
-						if(Anims[AnimID][i])
-							delete(Anims[AnimID][i]);
+			 {
+				for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
+					for (int i = 0; i < 16; i++) {
+						if (Anims[AnimID][i])
+							delete( Anims[AnimID][i] );
 					}
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_CODE_MIRROR_2:
-			{
-				switch(OrientCount) {
+			 {
+				switch (OrientCount) {
 					case 9:
-						{
-							for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-								for(int i = 0; i < 16; i++) {
-									if(Anims[AnimID][i])
-										delete(Anims[AnimID][i]);
+						 {
+							for (int AnimID = 0;
+								AnimID < MAX_ANIMS;
+								AnimID++) {
+								for (int i = 0; i < 16; i++) {
+									if (Anims[AnimID][i])
+										delete( Anims[AnimID][i] );
 								}
 							}
 						}
-					break;
+						break;
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_TWO_FILES:
 		case IE_ANI_TWO_FILES_2:
 		case IE_ANI_TWO_FILES_3:
-			{
-				switch(OrientCount) {
+			 {
+				switch (OrientCount) {
 					case 5:
-						{
-							for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-								for(int i = 0; i < 16; i+=2) {
-									if(Anims[AnimID][i])
-										delete(Anims[AnimID][i]);
+						 {
+							for (int AnimID = 0;
+								AnimID < MAX_ANIMS;
+								AnimID++) {
+								for (int i = 0; i < 16; i += 2) {
+									if (Anims[AnimID][i])
+										delete( Anims[AnimID][i] );
 								}
 							}
 						}
-					break;
+						break;
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_PST_ANIMATION_1:
-			{
-				for(int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
-					switch(AnimID) {
+			 {
+				for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
+					switch (AnimID) {
 						case IE_ANI_WALK:
-							{
-								for(int i = 0; i < 16; i++) {
-									if(Anims[AnimID][i])
-										delete(Anims[AnimID][i]);
+							 {
+								for (int i = 0; i < 16; i++) {
+									if (Anims[AnimID][i])
+										delete( Anims[AnimID][i] );
 								}
 							}
-						break;
-						
+							break;
+
 						case IE_ANI_PST_START:
-							{
-								if(Anims[AnimID][0])
-									delete(Anims[AnimID][0]);
+							 {
+								if (Anims[AnimID][0])
+									delete( Anims[AnimID][0] );
 							}
-						break;
+							break;
 
 						default:
-							{
-								for(int i = 0; i < 16; i+=2) {
-									if(Anims[AnimID][i])
-										delete(Anims[AnimID][i]);
+							 {
+								for (int i = 0; i < 16; i += 2) {
+									if (Anims[AnimID][i])
+										delete( Anims[AnimID][i] );
 								}
 							}
-						break;
+							break;
 					}
-					
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_PST_GHOST:
-			{
-				if(Anims[0][0])
-					delete(Anims[0][0]);
+			 {
+				if (Anims[0][0])
+					delete( Anims[0][0] );
 			}
-		break;
+			break;
 	}
 }
 /*This is a simple Idea of how the animation are coded
@@ -238,233 +248,233 @@ IE_ANI_PST_ANIMATION_1: Planescape: Torment Animations are stored in a different
 					NOTE: Walking/Running animations stores 9 Orientations.
 
 
- WEST PART       |       EAST PART
-                 |
-        NW  NNW  N  NNE  NE
-     NW 006 007 008 009 010 NE
-    WNW 005      |      011 ENE
-      W 004     xxx     012 E
-    WSW 003      |      013 ESE
-     SW 002 001 000 015 014 SE
-	    SW  SSW  S  SSE  SE
-                 |
-                 |
+ WEST PART  	 |  	 EAST PART
+				 |
+		NW  NNW  N  NNE  NE
+	 NW 006 007 008 009 010 NE
+	WNW 005 	 |  	011 ENE
+	  W 004 	xxx 	012 E
+	WSW 003 	 |  	013 ESE
+	 SW 002 001 000 015 014 SE
+		SW  SSW  S  SSE  SE
+				 |
+				 |
 
 */
-Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Orient)
+Animation* CharAnimations::GetAnimation(unsigned char AnimID,
+	unsigned char Orient)
 {
 	//TODO: Implement Auto Resource Loading
-	if(Anims[AnimID][Orient]) {
-		if(Anims[AnimID][Orient]->ChangePalette && UsePalette) {
-			Anims[AnimID][Orient]->SetPalette(Palette);
+	if (Anims[AnimID][Orient]) {
+		if (Anims[AnimID][Orient]->ChangePalette && UsePalette) {
+			Anims[AnimID][Orient]->SetPalette( Palette );
 			Anims[AnimID][Orient]->ChangePalette = false;
 		}
 		return Anims[AnimID][Orient];
 	}
-	char *ResRef = (char*)malloc(9);
-	strcpy(ResRef, this->ResRef);
+	char* ResRef = ( char* ) malloc( 9 );
+	strcpy( ResRef, this->ResRef );
 	unsigned char Cycle;
-	GetAnimResRef(AnimID, Orient, ResRef, Cycle);
-	DataStream * stream = core->GetResourceMgr()->GetResource(ResRef, IE_BAM_CLASS_ID);
+	GetAnimResRef( AnimID, Orient, ResRef, Cycle );
+	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef,
+													IE_BAM_CLASS_ID );
 	//printf("Loaded %s\n", ResRef);
-	free(ResRef);
-	AnimationMgr * anim = (AnimationMgr*)core->GetInterface(IE_BAM_CLASS_ID);
-	anim->Open(stream, true);
-	Animation * a = anim->GetAnimation(Cycle, 0, 0, IE_NORMAL);
+	free( ResRef );
+	AnimationMgr* anim = ( AnimationMgr* )
+		core->GetInterface( IE_BAM_CLASS_ID );
+	anim->Open( stream, true );
+	Animation* a = anim->GetAnimation( Cycle, 0, 0, IE_NORMAL );
 	a->pos = 0;
-	core->FreeInterface(anim);
+	core->FreeInterface( anim );
 	a->pos = 0;
 	a->endReached = false;
-	if((AnimID==IE_ANI_SLEEP) || (AnimID==IE_ANI_DIE) || (AnimID==IE_ANI_GET_UP)) {
+	if (( AnimID == IE_ANI_SLEEP ) ||
+		( AnimID == IE_ANI_DIE ) ||
+		( AnimID == IE_ANI_GET_UP )) {
 		a->playOnce = true;
-		if(AnimID == IE_ANI_GET_UP) {
+		if (AnimID == IE_ANI_GET_UP) {
 			a->playReversed = true;
 			a->autoSwitchOnEnd = true;
 			a->nextAnimID = IE_ANI_AWAKE;
 		}
 	}
-	switch(MirrorType) {
+	switch (MirrorType) {
 		case IE_ANI_CODE_MIRROR:
-			{
-				switch(OrientCount) {
+			 {
+				switch (OrientCount) {
 					case 5:
-						{
-						if(Orient > 8)
-							core->GetVideoDriver()->MirrorAnimation(a);
-						if(Orient & 1)
-							Orient--;
-						Anims[AnimID][Orient] = a;
-						Anims[AnimID][Orient+1] = a;
+						 {
+							if (Orient > 8)
+								core->GetVideoDriver()->MirrorAnimation( a );
+							if (Orient & 1)
+								Orient--;
+							Anims[AnimID][Orient] = a;
+							Anims[AnimID][Orient + 1] = a;
 						}
-					break;
+						break;
 
 					case 9:
-						{
-						if(Orient > 8)
-							core->GetVideoDriver()->MirrorAnimation(a);
-						Anims[AnimID][Orient] = a;
-						if(AnimID == IE_ANI_EMERGE) {
-							a->playReversed = true;
-							a->autoSwitchOnEnd = true;
-							a->nextAnimID = IE_ANI_AWAKE;
+						 {
+							if (Orient > 8)
+								core->GetVideoDriver()->MirrorAnimation( a );
+							Anims[AnimID][Orient] = a;
+							if (AnimID == IE_ANI_EMERGE) {
+								a->playReversed = true;
+								a->autoSwitchOnEnd = true;
+								a->nextAnimID = IE_ANI_AWAKE;
+							}
 						}
-						}
-					break;
+						break;
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_ONE_FILE:
-			{
+			 {
 				Anims[AnimID][Orient] = a;
 			}
-		break;
+			break;
 
 		case IE_ANI_CODE_MIRROR_2:
-			{
-				switch(OrientCount) {
+			 {
+				switch (OrientCount) {
 					case 9:
-						{
-						if(Orient > 8)
-							core->GetVideoDriver()->MirrorAnimation(a);
-						Anims[AnimID][Orient] = a;
+						 {
+							if (Orient > 8)
+								core->GetVideoDriver()->MirrorAnimation( a );
+							Anims[AnimID][Orient] = a;
 						}
-					break;
+						break;
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_TWO_FILES:
 		case IE_ANI_TWO_FILES_2:
 		case IE_ANI_TWO_FILES_3:
-			{
-				switch(OrientCount) {
+			 {
+				switch (OrientCount) {
 					case 5:
-						{
-						if(Orient & 1)
-							Orient--;
-						Anims[AnimID][Orient] = a;
-						Anims[AnimID][Orient+1] = a;
+						 {
+							if (Orient & 1)
+								Orient--;
+							Anims[AnimID][Orient] = a;
+							Anims[AnimID][Orient + 1] = a;
 						}
-					break;
+						break;
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_PST_ANIMATION_1:
-			{
-			if(Orient > 8)
-				core->GetVideoDriver()->MirrorAnimation(a);
-			switch(AnimID) {
-				case IE_ANI_WALK:
-					{
-					Anims[AnimID][Orient] = a;
-					}
-				break;
-
-				case IE_ANI_PST_START:
-					{
-						for(int j = 0; j < 16; j++) {
-							Anims[IE_ANI_PST_START][j] = a;
+			 {
+				if (Orient > 8)
+					core->GetVideoDriver()->MirrorAnimation( a );
+				switch (AnimID) {
+					case IE_ANI_WALK:
+						 {
+							Anims[AnimID][Orient] = a;
 						}
-						a->autoSwitchOnEnd = true;
-						a->endReached = false;
-						a->nextAnimID = IE_ANI_AWAKE;
-					}
-				break;
+						break;
 
-				default:
-					{
-					if(Orient & 1)
-						Orient--;
-					Anims[AnimID][Orient] = a;
-					Anims[AnimID][Orient+1] = a;
-					}
-				break;
-			}
-			
-			}
-		break;
+					case IE_ANI_PST_START:
+						 {
+							for (int j = 0; j < 16; j++) {
+								Anims[IE_ANI_PST_START][j] = a;
+							}
+							a->autoSwitchOnEnd = true;
+							a->endReached = false;
+							a->nextAnimID = IE_ANI_AWAKE;
+						}
+						break;
 
-		case IE_ANI_PST_GHOST:
-			{
-			for(int i = 0; i < 18; i++) {
-				for(int j = 0; j < 16; j++) {
-					Anims[i][j] = NULL;
+					default:
+						 {
+							if (Orient & 1)
+								Orient--;
+							Anims[AnimID][Orient] = a;
+							Anims[AnimID][Orient + 1] = a;
+						}
+						break;
 				}
 			}
+			break;
+
+		case IE_ANI_PST_GHOST:
+			 {
+				for (int i = 0; i < 18; i++) {
+					for (int j = 0; j < 16; j++) {
+						Anims[i][j] = NULL;
+					}
+				}
 			}
-		break;
+			break;
 	}
-	if(Anims[AnimID][Orient]) {
-		if(Anims[AnimID][Orient]->ChangePalette && UsePalette) {
-			Anims[AnimID][Orient]->SetPalette(Palette);
+	if (Anims[AnimID][Orient]) {
+		if (Anims[AnimID][Orient]->ChangePalette && UsePalette) {
+			Anims[AnimID][Orient]->SetPalette( Palette );
 			Anims[AnimID][Orient]->ChangePalette = false;
 		}
 	}
 	return Anims[AnimID][Orient];
 }
 
-void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, char * ResRef, unsigned char & Cycle)
+void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient,
+	char* ResRef, unsigned char& Cycle)
 {
-	switch(MirrorType) 
-		{
+	switch (MirrorType) {
 		case IE_ANI_CODE_MIRROR:
-			{
-				if(OrientCount == 9) {
-					AddVHRSuffix(ResRef, AnimID, Cycle, Orient);
+			 {
+				if (OrientCount == 9) {
+					AddVHRSuffix( ResRef, AnimID, Cycle, Orient );
 					ResRef[8] = 0;
-				}
-				else {
-					
+				} else {
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_ONE_FILE:
-			{
-				if(OrientCount == 16) {
-					char * val = Avatars->QueryField(RowIndex, AnimID+7);
-					if(val[0] == '*') {
+			 {
+				if (OrientCount == 16) {
+					char* val = Avatars->QueryField( RowIndex, AnimID + 7 );
+					if (val[0] == '*') {
 						ResRef[0] = 0;
 						return;
 					}
-					Cycle = atoi(val) + Orient;
+					Cycle = atoi( val ) + Orient;
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_TWO_FILES_2:
-			{
-				if(OrientCount == 5) {
-					AddMHRSuffix(ResRef, AnimID, Cycle, Orient);
+			 {
+				if (OrientCount == 5) {
+					AddMHRSuffix( ResRef, AnimID, Cycle, Orient );
 					ResRef[8] = 0;
-				}
-				else {
-					
+				} else {
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_TWO_FILES_3:
-			{
-				if(OrientCount == 5) {
-					AddMMRSuffix(ResRef, AnimID, Cycle, Orient);
+			 {
+				if (OrientCount == 5) {
+					AddMMRSuffix( ResRef, AnimID, Cycle, Orient );
 					ResRef[8] = 0;
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_TWO_FILES:
-			{
-				if(OrientCount == 5) {
-					char * val = Avatars->QueryField(RowIndex, AnimID+7);
-					if(val[0] == '*') {
+			 {
+				if (OrientCount == 5) {
+					char* val = Avatars->QueryField( RowIndex, AnimID + 7 );
+					if (val[0] == '*') {
 						ResRef[0] = 0;
 						return;
 					}
-					Cycle = atoi(val) + (Orient/2);
-					switch(AnimID) {
+					Cycle = atoi( val ) + ( Orient / 2 );
+					switch (AnimID) {
 						case IE_ANI_ATTACK:
 						case IE_ANI_ATTACK_BACKSLASH:
 						case IE_ANI_ATTACK_SLASH:
@@ -472,638 +482,629 @@ void CharAnimations::GetAnimResRef(unsigned char AnimID, unsigned char Orient, c
 						case IE_ANI_CAST:
 						case IE_ANI_CONJURE:
 						case IE_ANI_SHOOT:
-							strcat(ResRef, "G2");
-						break;
+							strcat( ResRef, "G2" );
+							break;
 
 						default:
-							strcat(ResRef, "G1");
-						break;
+							strcat( ResRef, "G1" );
+							break;
 					}
-					if(Orient > 9) {
-						strcat(ResRef, "E");
+					if (Orient > 9) {
+						strcat( ResRef, "E" );
 					}
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_CODE_MIRROR_2:
-			{
-				if(OrientCount == 9) {
-					char * val = Avatars->QueryField(RowIndex, AnimID+7);
-					if(val[0] == '*') {
+			 {
+				if (OrientCount == 9) {
+					char* val = Avatars->QueryField( RowIndex, AnimID + 7 );
+					if (val[0] == '*') {
 						ResRef[0] = 0;
 						return;
 					}
-					if(Orient > 8)
-						Cycle = 7 - (Orient % 9);
+					if (Orient > 8)
+						Cycle = 7 - ( Orient % 9 );
 					else
-						Cycle = (Orient % 9);
-					Cycle += atoi(val);
-					switch(AnimID) {
+						Cycle = ( Orient % 9 );
+					Cycle += atoi( val );
+					switch (AnimID) {
 						case IE_ANI_ATTACK_BACKSLASH:
-							strcat(ResRef, "G21");
-						break;
+							strcat( ResRef, "G21" );
+							break;
 
 						case IE_ANI_ATTACK_SLASH:
-							strcat(ResRef, "G2");
-						break;
+							strcat( ResRef, "G2" );
+							break;
 
 						case IE_ANI_ATTACK_JAB:
-							strcat(ResRef, "G22");
-						break;
+							strcat( ResRef, "G22" );
+							break;
 
 						case IE_ANI_AWAKE:
-							strcat(ResRef, "G12");
-						break;
+							strcat( ResRef, "G12" );
+							break;
 
 						case IE_ANI_DIE:
 						case IE_ANI_DAMAGE:
-							strcat(ResRef, "G14");
-						break;
+							strcat( ResRef, "G14" );
+							break;
 
 						case IE_ANI_READY:
-							strcat(ResRef, "G1");
-						break;
+							strcat( ResRef, "G1" );
+							break;
 
 						case IE_ANI_WALK:
-							strcat(ResRef, "G11");
-						break;
+							strcat( ResRef, "G11" );
+							break;
 					}
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_PST_ANIMATION_1:
-			{
-				switch(AnimID) {
+			 {
+				switch (AnimID) {
 					case IE_ANI_AWAKE:
-						if(Orient > 9)
-							Cycle = 4 - ((Orient/2) % 5);
+						if (Orient > 9)
+							Cycle = 4 - ( ( Orient / 2 ) % 5 );
 						else
-							Cycle = ((Orient/2) % 5);
-						if(Cycle >= 5) {
-							printf("WARNING!!! Cycle >= 5\n");
+							Cycle = ( ( Orient / 2 ) % 5 );
+						if (Cycle >= 5) {
+							printf( "WARNING!!! Cycle >= 5\n" );
 						}
 						ResRef[0] = this->ResRef[0];
 						ResRef[1] = 0;
-						strcat(ResRef, "STD");
-						strcat(ResRef, &this->ResRef[1]);
-					break;
+						strcat( ResRef, "STD" );
+						strcat( ResRef, &this->ResRef[1] );
+						break;
 
 					case IE_ANI_WALK:
-						if(Orient > 8)
-							Cycle = 7 - (Orient % 9);
+						if (Orient > 8)
+							Cycle = 7 - ( Orient % 9 );
 						else
-							Cycle = (Orient % 9);
+							Cycle = ( Orient % 9 );
 						ResRef[0] = this->ResRef[0];
 						ResRef[1] = 0;
-						strcat(ResRef, "WLK");
-						strcat(ResRef, &this->ResRef[1]);
-					break;
+						strcat( ResRef, "WLK" );
+						strcat( ResRef, &this->ResRef[1] );
+						break;
 
 					case IE_ANI_PST_START:
 						Cycle = 0;
 						ResRef[0] = this->ResRef[0];
 						ResRef[1] = 0;
-						strcat(ResRef, "MS1");
-						strcat(ResRef, &this->ResRef[1]);
-					break;
+						strcat( ResRef, "MS1" );
+						strcat( ResRef, &this->ResRef[1] );
+						break;
 				}
 			}
-		break;
+			break;
 
 		case IE_ANI_PST_GHOST:
-			{
-			Cycle = 0;
+			 {
+				Cycle = 0;
 			}
-		break;
-		}
+			break;
+	}
 }
 
-void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient)
-	{
-		switch(AnimID)
-			{
+void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char AnimID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	switch (AnimID) {
 			//Attack is a special case... it cycles randomly
 			//through SLASH, BACKSLASH and JAB so we will choose
 			//which animation return randomly
-			case IE_ANI_ATTACK:
-			case IE_ANI_ATTACK_SLASH:
-				{
-				switch(WeaponType)
-					{
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_SLASH:
+			 {
+				switch (WeaponType) {
 					case IE_ANI_WEAPON_1H:
-                        strcat(ResRef, "A1");
-					break;
+						strcat( ResRef, "A1" );
+						break;
 
 					case IE_ANI_WEAPON_2H:
-						strcat(ResRef, "A4");
-					break;
+						strcat( ResRef, "A4" );
+						break;
 
 					case IE_ANI_WEAPON_2W:
-						strcat(ResRef, "A7");
-					break;
-					}
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
-				else
-					Cycle = (Orient % 9);
+						strcat( ResRef, "A7" );
+						break;
 				}
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
+				else
+					Cycle = ( Orient % 9 );
+			}
 			break;
 
-			case IE_ANI_ATTACK_BACKSLASH:
-				{
-				switch(WeaponType)
-					{
+		case IE_ANI_ATTACK_BACKSLASH:
+			 {
+				switch (WeaponType) {
 					case IE_ANI_WEAPON_1H:
-                        strcat(ResRef, "A2");
-					break;
+						strcat( ResRef, "A2" );
+						break;
 
 					case IE_ANI_WEAPON_2H:
-						strcat(ResRef, "A5");
-					break;
+						strcat( ResRef, "A5" );
+						break;
 
 					case IE_ANI_WEAPON_2W:
-						strcat(ResRef, "A8");
-					break;
-					}
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
-				else
-					Cycle = (Orient % 9);
+						strcat( ResRef, "A8" );
+						break;
 				}
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
+				else
+					Cycle = ( Orient % 9 );
+			}
 			break;
 
-			case IE_ANI_ATTACK_JAB:
-				{
-				switch(WeaponType)
-					{
+		case IE_ANI_ATTACK_JAB:
+			 {
+				switch (WeaponType) {
 					case IE_ANI_WEAPON_1H:
-                        strcat(ResRef, "A3");
-					break;
+						strcat( ResRef, "A3" );
+						break;
 
 					case IE_ANI_WEAPON_2H:
-						strcat(ResRef, "A6");
-					break;
+						strcat( ResRef, "A6" );
+						break;
 
 					case IE_ANI_WEAPON_2W:
-						strcat(ResRef, "A9");
-					break;
-					}
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
-				else
-					Cycle = (Orient % 9);
+						strcat( ResRef, "A9" );
+						break;
 				}
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
+				else
+					Cycle = ( Orient % 9 );
+			}
 			break;
 
-			case IE_ANI_AWAKE:
-				{
-				strcat(ResRef, "G1");
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
+		case IE_ANI_AWAKE:
+			 {
+				strcat( ResRef, "G1" );
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
 				else
-					Cycle = (Orient % 9);
-				Cycle+=9;
-				}
+					Cycle = ( Orient % 9 );
+				Cycle += 9;
+			}
 			break;
 
-			case IE_ANI_CAST:
-				{
-				strcat(ResRef, "CA");
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
+		case IE_ANI_CAST:
+			 {
+				strcat( ResRef, "CA" );
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
 				else
-					Cycle = (Orient % 9);
-				Cycle+=9;
-				}
+					Cycle = ( Orient % 9 );
+				Cycle += 9;
+			}
 			break;
 
-			case IE_ANI_CONJURE:
-				{
-				strcat(ResRef, "CA");
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
+		case IE_ANI_CONJURE:
+			 {
+				strcat( ResRef, "CA" );
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
 				else
-					Cycle = (Orient % 9);
-				}
+					Cycle = ( Orient % 9 );
+			}
 			break;
 
-			case IE_ANI_DAMAGE:
-				{
-				strcat(ResRef, "G14");
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
+		case IE_ANI_DAMAGE:
+			 {
+				strcat( ResRef, "G14" );
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
 				else
-					Cycle = (Orient % 9);
-				Cycle+=36;
-				}
+					Cycle = ( Orient % 9 );
+				Cycle += 36;
+			}
 			break;
 
-			case IE_ANI_DIE:
-				{
-				strcat(ResRef, "G15");
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
+		case IE_ANI_DIE:
+			 {
+				strcat( ResRef, "G15" );
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
 				else
-					Cycle = (Orient % 9);
-				Cycle+=45;
-				}
+					Cycle = ( Orient % 9 );
+				Cycle += 45;
+			}
 			break;
 
 			//I cannot find an emerge animation...
 			//Maybe is Die reversed
-			case IE_ANI_GET_UP:
-			case IE_ANI_EMERGE:
-				{
-				strcat(ResRef, "G19");
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
+		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
+			 {
+				strcat( ResRef, "G19" );
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
 				else
-					Cycle = (Orient % 9);
-				Cycle+=81;
-				}
+					Cycle = ( Orient % 9 );
+				Cycle += 81;
+			}
 			break;
 
-			case IE_ANI_HEAD_TURN:
-				{
-				strcat(ResRef, "G12");
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
+		case IE_ANI_HEAD_TURN:
+			 {
+				strcat( ResRef, "G12" );
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
 				else
-					Cycle = (Orient % 9);
-				Cycle+=18;
-				}
+					Cycle = ( Orient % 9 );
+				Cycle += 18;
+			}
 			break;
 
 			//Unknown... maybe only a transparency effect apply
-			case IE_ANI_HIDE:
-				{
-
-				}
+		case IE_ANI_HIDE:
+			 {
+			}
 			break;
 
-			case IE_ANI_READY:
-				{
-				strcat(ResRef, "G13");
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
+		case IE_ANI_READY:
+			 {
+				strcat( ResRef, "G13" );
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
 				else
-					Cycle = (Orient % 9);
-				Cycle+=27;
-				}
+					Cycle = ( Orient % 9 );
+				Cycle += 27;
+			}
 			break;
 
 			//This depends on the ranged weapon equipped
-			case IE_ANI_SHOOT:
-				{
-				switch(RangedType)
-					{
+		case IE_ANI_SHOOT:
+			 {
+				switch (RangedType) {
 					case IE_ANI_RANGED_BOW:
-						{
-						strcat(ResRef, "SA");
+						 {
+							strcat( ResRef, "SA" );
 						}
-					break;
+						break;
 
 					case IE_ANI_RANGED_XBOW:
-						{
-						strcat(ResRef, "SX");
+						 {
+							strcat( ResRef, "SX" );
 						}
-					break;
-					
+						break;
+
 					case IE_ANI_RANGED_THROW:
-						{
-						strcat(ResRef, "SS");
+						 {
+							strcat( ResRef, "SS" );
 						}
-					break;
-					}
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
-				else
-					Cycle = (Orient % 9);
+						break;
 				}
-			break;
-
-			case IE_ANI_SLEEP:
-				{
-				strcat(ResRef, "G16");
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
 				else
-					Cycle = (Orient % 9);
-				Cycle+=54;
-				}
-			break;
-
-			case IE_ANI_TWITCH:
-				{
-				strcat(ResRef, "G17");
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
-				else
-					Cycle = (Orient % 9);
-				Cycle+=72;
-				}
-			break;
-
-			case IE_ANI_WALK:
-				{
-				strcat(ResRef, "G11");
-				if(Orient > 8)
-					Cycle = 7 - (Orient % 9);
-				else
-					Cycle = (Orient % 9);
-				}
-			break;
+					Cycle = ( Orient % 9 );
 			}
-	}
+			break;
 
-void CharAnimations::AddMHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient)
-	{
-		switch(AnimID)
-			{
+		case IE_ANI_SLEEP:
+			 {
+				strcat( ResRef, "G16" );
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
+				else
+					Cycle = ( Orient % 9 );
+				Cycle += 54;
+			}
+			break;
+
+		case IE_ANI_TWITCH:
+			 {
+				strcat( ResRef, "G17" );
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
+				else
+					Cycle = ( Orient % 9 );
+				Cycle += 72;
+			}
+			break;
+
+		case IE_ANI_WALK:
+			 {
+				strcat( ResRef, "G11" );
+				if (Orient > 8)
+					Cycle = 7 - ( Orient % 9 );
+				else
+					Cycle = ( Orient % 9 );
+			}
+			break;
+	}
+}
+
+void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char AnimID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	switch (AnimID) {
 			//Attack is a special case... it cycles randomly
 			//through SLASH, BACKSLASH and JAB so we will choose
 			//which animation return randomly
-			case IE_ANI_ATTACK:
-			case IE_ANI_ATTACK_SLASH:
-				{
-				switch(WeaponType)
-					{
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_SLASH:
+			 {
+				switch (WeaponType) {
 					case IE_ANI_WEAPON_1H:
-                        strcat(ResRef, "A1");
-					break;
+						strcat( ResRef, "A1" );
+						break;
 
 					case IE_ANI_WEAPON_2H:
-						strcat(ResRef, "A4");
-					break;
+						strcat( ResRef, "A4" );
+						break;
 
 					case IE_ANI_WEAPON_2W:
-						strcat(ResRef, "A7");
-					break;
-					}
-				Cycle = (Orient/2);
+						strcat( ResRef, "A7" );
+						break;
 				}
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_ATTACK_BACKSLASH:
-				{
-				switch(WeaponType)
-					{
+		case IE_ANI_ATTACK_BACKSLASH:
+			 {
+				switch (WeaponType) {
 					case IE_ANI_WEAPON_1H:
-                        strcat(ResRef, "A2");
-					break;
+						strcat( ResRef, "A2" );
+						break;
 
 					case IE_ANI_WEAPON_2H:
-						strcat(ResRef, "A5");
-					break;
+						strcat( ResRef, "A5" );
+						break;
 
 					case IE_ANI_WEAPON_2W:
-						strcat(ResRef, "A8");
-					break;
-					}
-				Cycle = (Orient/2);
+						strcat( ResRef, "A8" );
+						break;
 				}
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_ATTACK_JAB:
-				{
-				switch(WeaponType)
-					{
+		case IE_ANI_ATTACK_JAB:
+			 {
+				switch (WeaponType) {
 					case IE_ANI_WEAPON_1H:
-                        strcat(ResRef, "A3");
-					break;
+						strcat( ResRef, "A3" );
+						break;
 
 					case IE_ANI_WEAPON_2H:
-						strcat(ResRef, "A6");
-					break;
+						strcat( ResRef, "A6" );
+						break;
 
 					case IE_ANI_WEAPON_2W:
-						strcat(ResRef, "A9");
-					break;
-					}
-				Cycle = (Orient/2);
+						strcat( ResRef, "A9" );
+						break;
 				}
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_AWAKE:
-				{
-				strcat(ResRef, "G1");
-				Cycle = 8 + (Orient/2);
-				}
+		case IE_ANI_AWAKE:
+			 {
+				strcat( ResRef, "G1" );
+				Cycle = 8 + ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_CAST:
-				{
-				strcat(ResRef, "CA");
-				Cycle = 9 + (Orient/2);
-				}
+		case IE_ANI_CAST:
+			 {
+				strcat( ResRef, "CA" );
+				Cycle = 9 + ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_CONJURE:
-				{
-				strcat(ResRef, "CA");
-				Cycle = (Orient/2);
-				}
+		case IE_ANI_CONJURE:
+			 {
+				strcat( ResRef, "CA" );
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_DAMAGE:
-				{
-				strcat(ResRef, "G14");
-				Cycle = 40 + (Orient/2);
-				}
+		case IE_ANI_DAMAGE:
+			 {
+				strcat( ResRef, "G14" );
+				Cycle = 40 + ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_DIE:
-			case IE_ANI_GET_UP:
-				{
-				strcat(ResRef, "G1");
-				Cycle = 48 + (Orient/2);
-				}
+		case IE_ANI_DIE:
+		case IE_ANI_GET_UP:
+			 {
+				strcat( ResRef, "G1" );
+				Cycle = 48 + ( Orient / 2 );
+			}
 			break;
 
 			//I cannot find an emerge animation...
 			//Maybe is Die reversed
-			case IE_ANI_EMERGE:
-				{
-				strcat(ResRef, "G1");
-				Cycle = 48 + (Orient/2);
-				}
+		case IE_ANI_EMERGE:
+			 {
+				strcat( ResRef, "G1" );
+				Cycle = 48 + ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_HEAD_TURN:
-				{
-				strcat(ResRef, "G1");
-				Cycle = 16 + (Orient/2);
-				}
+		case IE_ANI_HEAD_TURN:
+			 {
+				strcat( ResRef, "G1" );
+				Cycle = 16 + ( Orient / 2 );
+			}
 			break;
 
 			//Unknown... maybe only a transparency effect apply
-			case IE_ANI_HIDE:
-				{
-
-				}
+		case IE_ANI_HIDE:
+			 {
+			}
 			break;
 
-			case IE_ANI_READY:
-				{
-				strcat(ResRef, "G1");
-				Cycle = 24 + (Orient/2);
-				}
+		case IE_ANI_READY:
+			 {
+				strcat( ResRef, "G1" );
+				Cycle = 24 + ( Orient / 2 );
+			}
 			break;
 
 			//This depends on the ranged weapon equipped
-			case IE_ANI_SHOOT:
-				{
-				switch(RangedType)
-					{
+		case IE_ANI_SHOOT:
+			 {
+				switch (RangedType) {
 					case IE_ANI_RANGED_BOW:
-						{
-						strcat(ResRef, "SA");
-						Cycle = (Orient/2);
+						 {
+							strcat( ResRef, "SA" );
+							Cycle = ( Orient / 2 );
 						}
-					break;
+						break;
 
 					case IE_ANI_RANGED_XBOW:
-						{
-						strcat(ResRef, "SX");
-						Cycle = (Orient/2);
+						 {
+							strcat( ResRef, "SX" );
+							Cycle = ( Orient / 2 );
 						}
-					break;
-					
+						break;
+
 					case IE_ANI_RANGED_THROW:
-						{
-						strcat(ResRef, "A1");
-						Cycle = (Orient/2);
+						 {
+							strcat( ResRef, "A1" );
+							Cycle = ( Orient / 2 );
 						}
-					break;
-					}
+						break;
 				}
-			break;
-
-			case IE_ANI_SLEEP:
-				{
-				strcat(ResRef, "G1");
-				Cycle = 64 + (Orient/2);
-				}
-			break;
-
-			case IE_ANI_TWITCH:
-				{
-				strcat(ResRef, "G1");
-				Cycle = 56 + (Orient/2);
-				}
-			break;
-
-			case IE_ANI_WALK:
-				{
-				strcat(ResRef, "G1");
-				Cycle = (Orient/2);
-				}
-			break;
 			}
-		if(Orient > 9)
-			strcat(ResRef, "E");
-	}
+			break;
 
-void CharAnimations::AddMMRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient)
-	{
-		switch(AnimID)
-			{
+		case IE_ANI_SLEEP:
+			 {
+				strcat( ResRef, "G1" );
+				Cycle = 64 + ( Orient / 2 );
+			}
+			break;
+
+		case IE_ANI_TWITCH:
+			 {
+				strcat( ResRef, "G1" );
+				Cycle = 56 + ( Orient / 2 );
+			}
+			break;
+
+		case IE_ANI_WALK:
+			 {
+				strcat( ResRef, "G1" );
+				Cycle = ( Orient / 2 );
+			}
+			break;
+	}
+	if (Orient > 9) {
+		strcat( ResRef, "E" );
+	}
+}
+
+void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char AnimID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	switch (AnimID) {
 			//Attack is a special case... it cycles randomly
 			//through SLASH, BACKSLASH and JAB so we will choose
 			//which animation return randomly
-			case IE_ANI_ATTACK:
-			case IE_ANI_ATTACK_SLASH:
-			case IE_ANI_ATTACK_BACKSLASH:
-				{
-                strcat(ResRef, "A1");
-				Cycle = (Orient/2);
-				}
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_ATTACK_BACKSLASH:
+			 {
+				strcat( ResRef, "A1" );
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_SHOOT:
-				{
-				strcat(ResRef, "A4");
-				Cycle = (Orient/2);
-				}
+		case IE_ANI_SHOOT:
+			 {
+				strcat( ResRef, "A4" );
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_ATTACK_JAB:
-				{
-                strcat(ResRef, "A2");
-				Cycle = (Orient/2);
-				}
+		case IE_ANI_ATTACK_JAB:
+			 {
+				strcat( ResRef, "A2" );
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_AWAKE:
-			case IE_ANI_HEAD_TURN:
-			case IE_ANI_READY:
-				{
-				strcat(ResRef, "SD");
-				Cycle = (Orient/2);
-				}
+		case IE_ANI_AWAKE:
+		case IE_ANI_HEAD_TURN:
+		case IE_ANI_READY:
+			 {
+				strcat( ResRef, "SD" );
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_CAST:
-			case IE_ANI_CONJURE:
-				{
-				strcat(ResRef, "SC");
-				Cycle = (Orient/2);
-				}
+		case IE_ANI_CAST:
+		case IE_ANI_CONJURE:
+			 {
+				strcat( ResRef, "SC" );
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_DAMAGE:
-				{
-				strcat(ResRef, "GH");
-				Cycle = (Orient/2);
-				}
+		case IE_ANI_DAMAGE:
+			 {
+				strcat( ResRef, "GH" );
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_DIE:
-			case IE_ANI_GET_UP:
-				{
-				strcat(ResRef, "DE");
-				Cycle = (Orient/2);
-				}
+		case IE_ANI_DIE:
+		case IE_ANI_GET_UP:
+			 {
+				strcat( ResRef, "DE" );
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
-			case IE_ANI_EMERGE:
-				{
-				strcat(ResRef, "GU");
-				Cycle = (Orient/2);
-				}
+		case IE_ANI_EMERGE:
+			 {
+				strcat( ResRef, "GU" );
+				Cycle = ( Orient / 2 );
+			}
 			break;
 
 			//Unknown... maybe only a transparency effect apply
-			case IE_ANI_HIDE:
-				{
-
-				}
-			break;
-
-			case IE_ANI_SLEEP:
-				{
-				strcat(ResRef, "TW");
-				Cycle = (Orient/2);
-				}
-			break;
-
-			case IE_ANI_TWITCH:
-				{
-				strcat(ResRef, "TW");
-				Cycle = (Orient/2);
-				}
-			break;
-
-			case IE_ANI_WALK:
-				{
-				strcat(ResRef, "WK");
-				Cycle = (Orient/2);
-				}
-			break;
+		case IE_ANI_HIDE:
+			 {
 			}
-		if(Orient > 9)
-			strcat(ResRef, "E");
+			break;
+
+		case IE_ANI_SLEEP:
+			 {
+				strcat( ResRef, "TW" );
+				Cycle = ( Orient / 2 );
+			}
+			break;
+
+		case IE_ANI_TWITCH:
+			 {
+				strcat( ResRef, "TW" );
+				Cycle = ( Orient / 2 );
+			}
+			break;
+
+		case IE_ANI_WALK:
+			 {
+				strcat( ResRef, "WK" );
+				Cycle = ( Orient / 2 );
+			}
+			break;
 	}
+	if (Orient > 9) {
+		strcat( ResRef, "E" );
+	}
+}
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DirectXVideo/DirectXVideoDriver.h,v 1.6 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DirectXVideo/DirectXVideoDriver.h,v 1.7 2004/02/24 22:20:38 balrog994 Exp $
  *
  */
 
@@ -28,20 +28,19 @@
 #include "d3dx9.h"
 
 typedef struct CUSTOMVERTEX {
-		float x,y,z;
-		D3DCOLOR color;
-		float tu,tv;
+	float x, y, z;
+	D3DCOLOR color;
+	float tu, tv;
 } CUSTOMVERTEX;
 
-const DWORD D3DFVF_CUSTOMVERTEX = (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1 );
+const DWORD D3DFVF_CUSTOMVERTEX = ( D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1 );
 
-class DirectXVideoDriver : public Video
-{
+class DirectXVideoDriver : public Video {
 private:	
 	bool sceneBegin;
-	char * winClassName;
+	char* winClassName;
 	int quit;
-	std::vector<Region> upd;	//Regions of the Screen to Update in the next SwapBuffer operation.
+	std::vector< Region> upd;	//Regions of the Screen to Update in the next SwapBuffer operation.
 	Region Viewport;
 public:
 	DirectXVideoDriver(void);
@@ -49,31 +48,34 @@ public:
 	int Init(void);
 	int CreateDisplay(int width, int height, int bpp, bool fullscreen);
 	VideoModes GetVideoModes(bool fullscreen = false);
-	bool TestVideoMode(VideoMode & vm);
+	bool TestVideoMode(VideoMode& vm);
 	int SwapBuffers(void);
-	Sprite2D *CreateSprite(int w, int h, int bpp, DWORD rMask, DWORD gMask, DWORD bMask, DWORD aMask, void* pixels, bool cK = false, int index = 0);
-	Sprite2D *CreateSprite8(int w, int h, int bpp, void* pixels, void* palette, bool cK = false, int index = 0);
-	void FreeSprite(Sprite2D * spr);
-	void BlitSprite(Sprite2D * spr, int x, int y, bool anchor = false, Region * clip = NULL);
-	void SetCursor(Sprite2D * spr, int x, int y);
+	Sprite2D* CreateSprite(int w, int h, int bpp, DWORD rMask, DWORD gMask,
+		DWORD bMask, DWORD aMask, void* pixels, bool cK = false, int index = 0);
+	Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
+		void* palette, bool cK = false, int index = 0);
+	void FreeSprite(Sprite2D* spr);
+	void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
+		Region* clip = NULL);
+	void SetCursor(Sprite2D* spr, int x, int y);
 	Region GetViewport(void);
 	void SetViewport(int x, int y);
 	void MoveViewportTo(int x, int y);
-	void ConvertToVideoFormat(Sprite2D * sprite);
-	void CalculateAlpha(Sprite2D * sprite);
+	void ConvertToVideoFormat(Sprite2D* sprite);
+	void CalculateAlpha(Sprite2D* sprite);
 	/** No descriptions */
-	void SetPalette(Sprite2D * spr, Color * pal);
+	void SetPalette(Sprite2D* spr, Color* pal);
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	void DrawRect(Region &rgn, Color &color);
+	void DrawRect(Region& rgn, Color& color);
 	/** Creates a Palette from Color */
-	Color * CreatePalette(Color color, Color back);
+	Color* CreatePalette(Color color, Color back);
 	/** Blits a Sprite filling the Region */
-	void BlitTiled(Region rgn, Sprite2D * img, bool anchor = false);
+	void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false);
 	/** Send a Quit Signal to the Event Queue */
 	bool Quit();
 	/** Get the Palette of a Sprite */
-	Color * GetPalette(Sprite2D * spr);
-	void * GetVideoSurface()
+	Color* GetPalette(Sprite2D* spr);
+	void* GetVideoSurface()
 	{
 		return NULL;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.12 2004/02/02 01:14:43 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.13 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -46,56 +46,57 @@
 
 class GEM_EXPORT Window {
 public: 
-	Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos, unsigned short Width, unsigned short Height);
+	Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos,
+		unsigned short Width, unsigned short Height);
 	~Window();
-  /** Set the Window's BackGround Image. If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
-  void SetBackGround(Sprite2D * img, bool clean = false);
-  /** Add a Control in the Window */
-  void AddControl(Control * ctrl);
-  /** This function Draws the Window on the Output Screen */
-  void DrawWindow();
-  /** Returns the Control at X,Y Coordinates */
-  Control * GetControl(unsigned short x, unsigned short y);
-  /** Returns the Control by Index */
-  Control * GetControl(unsigned short i);
-  /** Returns the Default Control which is a button atm */
-  Control * GetDefaultControl();
-  /** Sets 'ctrl' as Focused */
-  void SetFocused(Control * ctrl);
-  /** Redraw all the Window */
-  void Invalidate();
-  /** Redraw controls of the same group */
-  void RedrawControls(char *VarName, unsigned long tmp);
-  /** Links a scrollbar to a text area */
-  void Link(unsigned short SBID, unsigned short TAID);
+	/** Set the Window's BackGround Image. If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
+	void SetBackGround(Sprite2D* img, bool clean = false);
+	/** Add a Control in the Window */
+	void AddControl(Control* ctrl);
+	/** This function Draws the Window on the Output Screen */
+	void DrawWindow();
+	/** Returns the Control at X,Y Coordinates */
+	Control* GetControl(unsigned short x, unsigned short y);
+	/** Returns the Control by Index */
+	Control* GetControl(unsigned short i);
+	/** Returns the Default Control which is a button atm */
+	Control* GetDefaultControl();
+	/** Sets 'ctrl' as Focused */
+	void SetFocused(Control* ctrl);
+	/** Redraw all the Window */
+	void Invalidate();
+	/** Redraw controls of the same group */
+	void RedrawControls(char* VarName, unsigned long tmp);
+	/** Links a scrollbar to a text area */
+	void Link(unsigned short SBID, unsigned short TAID);
 public: //Public attributes
-  /** WinPack */
-  char WindowPack[10];
-  /** Window ID */
-  unsigned short WindowID;
-  /** X Position */
-  unsigned short XPos;
-  /** Y Position */
-  unsigned short YPos;
-  /** Width */
-  unsigned short Width;
-  /** Height */
-  unsigned short Height;
-  /** Visible */
-  bool Visible;
-  /** Changed Flag */
-  bool Changed;
-  int Cursor;
-  int DefaultControl;
+	/** WinPack */
+	char WindowPack[10];
+	/** Window ID */
+	unsigned short WindowID;
+	/** X Position */
+	unsigned short XPos;
+	/** Y Position */
+	unsigned short YPos;
+	/** Width */
+	unsigned short Width;
+	/** Height */
+	unsigned short Height;
+	/** Visible */
+	bool Visible;
+	/** Changed Flag */
+	bool Changed;
+	int Cursor;
+	int DefaultControl;
 private: // Private attributes
-  /** BackGround Image. No BackGround if this variable is NULL. */
-  Sprite2D * BackGround;
-  /** Controls Array */
-  std::vector<Control*> Controls;
-  /** Last Control returned by GetControl */
-  Control * lastC;
-  /** Last Focused Control */
-  Control * lastFocus;
+	/** BackGround Image. No BackGround if this variable is NULL. */
+	Sprite2D* BackGround;
+	/** Controls Array */
+	std::vector< Control*> Controls;
+	/** Last Control returned by GetControl */
+	Control* lastC;
+	/** Last Focused Control */
+	Control* lastFocus;
 public:
 	void release(void);
 };

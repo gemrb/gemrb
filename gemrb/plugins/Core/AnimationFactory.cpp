@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.6 2004/01/09 11:41:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.7 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -23,51 +23,55 @@
 #include "AnimationFactory.h"
 #include "Interface.h"
 
-extern Interface * core;
+extern Interface* core;
 
-AnimationFactory::AnimationFactory(const char * ResRef) : FactoryObject(ResRef, IE_BAM_CLASS_ID)
+AnimationFactory::AnimationFactory(const char* ResRef)
+	: FactoryObject( ResRef, IE_BAM_CLASS_ID )
 {
 	FLTable = NULL;
 }
 
 AnimationFactory::~AnimationFactory(void)
 {
-	for(unsigned int i = 0; i < frames.size(); i++) {
-		core->GetVideoDriver()->FreeSprite(frames[i]);
+	for (unsigned int i = 0; i < frames.size(); i++) {
+		core->GetVideoDriver()->FreeSprite( frames[i] );
 	}
-	if(FLTable)
-		free(FLTable);
+	if (FLTable) {
+		free( FLTable );
+	}
 }
 
-void AnimationFactory::AddFrame(Sprite2D * frame, unsigned short index)
+void AnimationFactory::AddFrame(Sprite2D* frame, unsigned short index)
 {
-	frames.push_back(frame);
-	links.push_back(index);
+	frames.push_back( frame );
+	links.push_back( index );
 }
 
 void AnimationFactory::AddCycle(CycleEntry cycle)
 {
-	cycles.push_back(cycle);
+	cycles.push_back( cycle );
 }
 
-void AnimationFactory::LoadFLT(unsigned short * buffer, int count)
+void AnimationFactory::LoadFLT(unsigned short* buffer, int count)
 {
-	if(FLTable)
-		free(FLTable);
-	FLTable = (unsigned short*)malloc(count*sizeof(unsigned short));
-	memcpy(FLTable, buffer, count*sizeof(unsigned short));
+	if (FLTable) {
+		free( FLTable );
+	}
+	FLTable = ( unsigned short * ) malloc( count * sizeof( unsigned short ) );
+	memcpy( FLTable, buffer, count * sizeof( unsigned short ) );
 }
 
-Animation * AnimationFactory::GetCycle(unsigned char cycle)
+Animation* AnimationFactory::GetCycle(unsigned char cycle)
 {
-	if(cycle >= cycles.size())
+	if (cycle >= cycles.size()) {
 		return NULL;
-	int ff = cycles[cycle].FirstFrame, lf = ff + cycles[cycle].FramesCount;
-	Animation * anim = new Animation(&FLTable[ff], cycles[cycle].FramesCount);
-	for(int i = ff; i < lf; i++) {
-		for(unsigned int l = 0; l < frames.size(); l++) {
-			if(links[l] == FLTable[i]) {
-				anim->AddFrame(frames[l], FLTable[i]);
+	}
+	int ff = cycles[cycle]. FirstFrame, lf = ff + cycles[cycle].FramesCount;
+	Animation* anim = new Animation( &FLTable[ff], cycles[cycle].FramesCount );
+	for (int i = ff; i < lf; i++) {
+		for (unsigned int l = 0; l < frames.size(); l++) {
+			if (links[l] == FLTable[i]) {
+				anim->AddFrame( frames[l], FLTable[i] );
 				break;
 			}
 		}
@@ -78,9 +82,10 @@ Animation * AnimationFactory::GetCycle(unsigned char cycle)
 	return anim;
 }
 /** No descriptions */
-Sprite2D * AnimationFactory::GetFrame(unsigned short index)
+Sprite2D* AnimationFactory::GetFrame(unsigned short index)
 {
-	if(index >= frames.size())
+	if (index >= frames.size()) {
 		return NULL;
+	}
 	return frames[index];
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.h,v 1.10 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.h,v 1.11 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -27,13 +27,13 @@
 #include "Sprite2D.h"
 
 #define IE_GUI_SCROLLBAR_UP_UNPRESSED   0
-#define IE_GUI_SCROLLBAR_UP_PRESSED     1
+#define IE_GUI_SCROLLBAR_UP_PRESSED 	1
 #define IE_GUI_SCROLLBAR_DOWN_UNPRESSED 2
 #define IE_GUI_SCROLLBAR_DOWN_PRESSED   3
-#define IE_GUI_SCROLLBAR_TROUGH         4
-#define IE_GUI_SCROLLBAR_SLIDER         5
+#define IE_GUI_SCROLLBAR_TROUGH 		4
+#define IE_GUI_SCROLLBAR_SLIDER 		5
 
-#define UP_PRESS     0x0001
+#define UP_PRESS	 0x0001
 #define DOWN_PRESS   0x0010
 #define SLIDER_GRAB  0x0100
 
@@ -49,41 +49,42 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT ScrollBar : public Control
-{
+class GEM_EXPORT ScrollBar : public Control {
 public:
 	ScrollBar(void);
 	~ScrollBar(void);
 	/**sets position, updates associated stuff */
 	void SetPos(int NewPos);
 	/**redraws scrollbar if associated with VarName */
-	void RedrawScrollBar(const char *VarName, int Sum);
+	void RedrawScrollBar(const char* VarName, int Sum);
 	/**/
 	void Draw(unsigned short x, unsigned short y);
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
-	Sprite2D * frames[6];
+	Sprite2D* frames[6];
 	/** Cursor Position */
 	unsigned short Pos;
 	/** Scroll Bar Status */
 	unsigned short State;
 	/** Sets the Text of the current control */
-	int SetText(const char * string, int pos = 0);
+	int SetText(const char* string, int pos = 0);
 public:
-	void SetImage(unsigned char type, Sprite2D * img);
+	void SetImage(unsigned char type, Sprite2D* img);
 	/** Sets the Maximum Value of the ScrollBar */
 	void SetMax(unsigned short Max);
 	/** TextArea Associated Control */
-	Control * ta;
+	Control* ta;
 public: // Public Events
-  /** Mouse Button Down */
-  void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
-  /** Mouse Button Up */
-  void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
-  /** Mouse Over Event */
-  void OnMouseOver(unsigned short x, unsigned short y);
-  /** OnChange Scripted Event Function Name */
-  char ScrollBarOnChange[64];
+	/** Mouse Button Down */
+	void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button,
+		unsigned short Mod);
+	/** Mouse Button Up */
+	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
+		unsigned short Mod);
+	/** Mouse Over Event */
+	void OnMouseOver(unsigned short x, unsigned short y);
+	/** OnChange Scripted Event Function Name */
+	char ScrollBarOnChange[64];
 };
 
 #endif

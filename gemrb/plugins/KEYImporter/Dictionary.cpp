@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.9 2004/02/14 15:08:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.10 2004/02/24 22:20:40 balrog994 Exp $
  *
  */
 
@@ -34,25 +34,28 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // inlines
-inline unsigned int Dictionary::MyHashKey(const char * key, unsigned int type) const
+inline unsigned int Dictionary::MyHashKey(const char* key, unsigned int type) const
 {
-   unsigned int nHash = type;
-   for(int i=0;i<8 && key[i];i++)
-   {
-	nHash = (nHash<<5) + nHash + toupper(key[i]);
-   }
-   return nHash;
+	unsigned int nHash = type;
+	for (int i = 0; i < 8 && key[i]; i++) {
+		nHash = ( nHash << 5 ) + nHash + toupper( key[i] );
+	}
+	return nHash;
 }
 inline int Dictionary::GetCount() const
-	{ return m_nCount; }
+{
+	return m_nCount;
+}
 inline bool Dictionary::IsEmpty() const
-	{ return m_nCount == 0; }
+{
+	return m_nCount == 0;
+}
 /////////////////////////////////////////////////////////////////////////////
 // out of lines
 Dictionary::Dictionary(int nBlockSize, int nHashTableSize)
 {
-	MYASSERT(nBlockSize > 0);
-	MYASSERT(nHashTableSize > 16);
+	MYASSERT( nBlockSize > 0 );
+	MYASSERT( nHashTableSize > 16 );
 
 	m_pHashTable = NULL;
 	m_nHashTableSize = nHashTableSize;  // default size
@@ -63,40 +66,36 @@ Dictionary::Dictionary(int nBlockSize, int nHashTableSize)
 }
 
 void Dictionary::InitHashTable(unsigned int nHashSize, bool bAllocNow)
-//
-// Used to force allocation of a hash table or to override the default
-//   hash table size of (which is fairly small)
+	//
+	// Used to force allocation of a hash table or to override the default
+	//   hash table size of (which is fairly small)
 {
-	MYASSERT(m_nCount == 0);
-	MYASSERT(nHashSize > 16);
+	MYASSERT( m_nCount == 0 );
+	MYASSERT( nHashSize > 16 );
 
-	if (m_pHashTable != NULL)
-	{
+	if (m_pHashTable != NULL) {
 		// free hash table
 		delete[] m_pHashTable;
 		m_pHashTable = NULL;
 	}
 
-	if (bAllocNow)
-	{
-		m_pHashTable = new MyAssoc* [nHashSize];
-		memset(m_pHashTable, 0, sizeof(MyAssoc*) * nHashSize);
+	if (bAllocNow) {
+		m_pHashTable = new MyAssoc * [nHashSize];
+		memset( m_pHashTable, 0, sizeof( MyAssoc * ) * nHashSize );
 	}
 	m_nHashTableSize = nHashSize;
 }
 
 void Dictionary::RemoveAll()
 {
-	if (m_pHashTable != NULL)
-	{
+	if (m_pHashTable != NULL) {
 		// destroy elements (values and keys)
-		for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++)
-		{
+		for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++) {
 			MyAssoc* pAssoc;
-			for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL;
-			  pAssoc = pAssoc->pNext)
-			{
-				delete [] pAssoc->key;	  
+			for (pAssoc = m_pHashTable[nHash];
+				pAssoc != NULL;
+				pAssoc = pAssoc->pNext) {
+				delete[] pAssoc->key;
 			}
 		}
 	}
@@ -108,8 +107,7 @@ void Dictionary::RemoveAll()
 	m_nCount = 0;
 	m_pFreeList = NULL;
 	MemBlock* p = m_pBlocks;
-	while (p != NULL)
-	{
+	while (p != NULL) {
 		MemBlock* pNext = p->pNext;
 		delete[] p;
 		p = pNext;
@@ -121,38 +119,35 @@ void Dictionary::RemoveAll()
 Dictionary::~Dictionary()
 {
 	RemoveAll();
-	MYASSERT(m_nCount == 0);
+	MYASSERT( m_nCount == 0 );
 }
 
-Dictionary::MyAssoc *
-Dictionary::NewAssoc()
+Dictionary::MyAssoc* Dictionary::NewAssoc()
 {
-	if (m_pFreeList == NULL)
-	{
+	if (m_pFreeList == NULL) {
 		// add another block
-                Dictionary::MemBlock *newBlock=
-                        (Dictionary::MemBlock *) new char[m_nBlockSize*sizeof(Dictionary::MyAssoc)+sizeof(Dictionary::MemBlock) ];
+		Dictionary::MemBlock* newBlock = ( Dictionary::MemBlock* ) new char[m_nBlockSize*sizeof( Dictionary::MyAssoc ) + sizeof( Dictionary::MemBlock )];
 
-		newBlock->pNext=m_pBlocks;
-		m_pBlocks=newBlock;
+		newBlock->pNext = m_pBlocks;
+		m_pBlocks = newBlock;
 
 		// chain them into free list
-		Dictionary::MyAssoc* pAssoc = (Dictionary::MyAssoc*) (newBlock+1);
+		Dictionary::MyAssoc* pAssoc = ( Dictionary::MyAssoc* )
+			( newBlock + 1 );
 		// free in reverse order to make it easier to debug
 		pAssoc += m_nBlockSize - 1;
-		for (int i = m_nBlockSize-1; i >= 0; i--, pAssoc--)
-		{
+		for (int i = m_nBlockSize - 1; i >= 0; i--, pAssoc--) {
 			pAssoc->pNext = m_pFreeList;
 			m_pFreeList = pAssoc;
 		}
 	}
-	MYASSERT(m_pFreeList != NULL);  // we must have something
+	MYASSERT( m_pFreeList != NULL );  // we must have something
 
 	Dictionary::MyAssoc* pAssoc = m_pFreeList;
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
-	MYASSERT(m_nCount > 0);  // make sure we don't overflow
-  pAssoc->key=NULL;
+	MYASSERT( m_nCount > 0 );  // make sure we don't overflow
+	pAssoc->key = NULL;
 	return pAssoc;
 }
 
@@ -162,52 +157,58 @@ void Dictionary::FreeAssoc(Dictionary::MyAssoc* pAssoc)
 	pAssoc->pNext = m_pFreeList;
 	m_pFreeList = pAssoc;
 	m_nCount--;
-	MYASSERT(m_nCount >= 0);  // make sure we don't underflow
+	MYASSERT( m_nCount >= 0 );  // make sure we don't underflow
 
 	// if no more elements, cleanup completely
-	if (m_nCount == 0)
+	if (m_nCount == 0) {
 		RemoveAll();
+	}
 }
 
-Dictionary::MyAssoc*
-Dictionary::GetAssocAt(const char *key, unsigned int type, unsigned int& nHash) const
-// find association (or return NULL)
+Dictionary::MyAssoc* Dictionary::GetAssocAt(const char* key,
+	unsigned int type, unsigned int& nHash) const
+	// find association (or return NULL)
 {
-	nHash = MyHashKey(key,type) % m_nHashTableSize;
+	nHash = MyHashKey( key, type ) % m_nHashTableSize;
 
-	if (m_pHashTable == NULL)
+	if (m_pHashTable == NULL) {
 		return NULL;
+	}
 
 	// see if it exists
 	MyAssoc* pAssoc;
-	for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL; pAssoc = pAssoc->pNext)
-	{
-		if(type==pAssoc->type)
-			if(!strnicmp(pAssoc->key, key,8) )
+	for (pAssoc = m_pHashTable[nHash];
+		pAssoc != NULL;
+		pAssoc = pAssoc->pNext) {
+		if (type == pAssoc->type) {
+			if (!strnicmp( pAssoc->key, key, 8 )) {
 				return pAssoc;
+			}
+		}
 	}
 	return NULL;
 }
 
-bool Dictionary::Lookup(const char *key, unsigned int type, unsigned long& rValue) const
+bool Dictionary::Lookup(const char* key, unsigned int type,
+	unsigned long& rValue) const
 {
 	unsigned int nHash;
-	MyAssoc* pAssoc = GetAssocAt(key, type, nHash);
-	if (pAssoc == NULL)
-		return false;  // not in map
+	MyAssoc* pAssoc = GetAssocAt( key, type, nHash );
+	if (pAssoc == NULL) {
+		return false;
+	}  // not in map
 
 	rValue = pAssoc->value;
 	return true;
 }
 
-void Dictionary::SetAt(const char *key, unsigned int type, unsigned long value)
+void Dictionary::SetAt(const char* key, unsigned int type, unsigned long value)
 {
 	unsigned int nHash;
 	MyAssoc* pAssoc;
-	if ((pAssoc = GetAssocAt(key, type, nHash)) == NULL)
-	{
+	if (( pAssoc = GetAssocAt( key, type, nHash ) ) == NULL) {
 		if (m_pHashTable == NULL)
-			InitHashTable(m_nHashTableSize);
+			InitHashTable( m_nHashTableSize );
 
 		// it doesn't exist, add a new Association
 		pAssoc = NewAssoc();
@@ -216,13 +217,12 @@ void Dictionary::SetAt(const char *key, unsigned int type, unsigned long value)
 		// put into hash table
 		pAssoc->pNext = m_pHashTable[nHash];
 		m_pHashTable[nHash] = pAssoc;
+	} else {
+		//keep the stuff consistent (we need only one key in case of duplications)
+		delete[] pAssoc->key; 
+		pAssoc->key = key;
 	}
-  else
-  {//keep the stuff consistent (we need only one key in case of duplications)
-    delete [] pAssoc->key; 
-    pAssoc->key=key;
-  }
-  pAssoc->type = type;
-  pAssoc->value=value;
+	pAssoc->type = type;
+	pAssoc->value = value;
 }
 

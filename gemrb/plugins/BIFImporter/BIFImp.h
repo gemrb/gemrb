@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.h,v 1.4 2004/01/09 11:41:13 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.h,v 1.5 2004/02/24 22:20:43 balrog994 Exp $
  *
  */
 
@@ -27,30 +27,29 @@
 #include "../Core/CachedFileStream.h"
 
 typedef struct FileEntry {
-	unsigned long	resLocator;
-	unsigned long	dataOffset;
-	unsigned long	fileSize;
-	unsigned short	type;
-	unsigned short  u1; //Unknown Field
+	unsigned long resLocator;
+	unsigned long dataOffset;
+	unsigned long fileSize;
+	unsigned short type;
+	unsigned short u1; //Unknown Field
 } FileEntry;
 
 typedef struct TileEntry {
-	unsigned long	resLocator;
-	unsigned long	dataOffset;
-	unsigned long	tilesCount;
-	unsigned long	fileSize;
-	unsigned short	type;
-	unsigned short	u1; //Unknown Field
+	unsigned long resLocator;
+	unsigned long dataOffset;
+	unsigned long tilesCount;
+	unsigned long fileSize;
+	unsigned short type;
+	unsigned short u1; //Unknown Field
 } TileEntry;
 
-class BIFImp : public ArchiveImporter
-{
+class BIFImp : public ArchiveImporter {
 private:
 	char path[_MAX_PATH];
 	//std::vector<FileEntry> fentries;
 	//std::vector<TileEntry> tentries;
-	FileEntry * fentries;
-	TileEntry * tentries;
+	FileEntry* fentries;
+	TileEntry* tentries;
 	unsigned long fentcount, tentcount;
 	CachedFileStream* stream;
 public:

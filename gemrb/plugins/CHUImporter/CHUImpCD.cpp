@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImpCD.cpp,v 1.2 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImpCD.cpp,v 1.3 2004/02/24 22:20:43 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ CHUImpCD::~CHUImpCD(void)
 {
 }
 
-void * CHUImpCD::Create(void)
+void* CHUImpCD::Create(void)
 {
 	return new CHUImp();
 }
@@ -47,7 +47,7 @@ SClass_ID CHUImpCD::SuperClassID(void)
 
 Class_ID CHUImpCD::ClassID(void)
 {
-	return Class_ID(0xc018af34, 0x10a63725);
+	return Class_ID( 0xc018af34, 0x10a63725 );
 }
 
 const char* CHUImpCD::InternalName(void)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.7 2003/12/19 23:05:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.8 2004/02/24 22:20:39 balrog994 Exp $
  *
  */
 
@@ -24,35 +24,39 @@
 
 #include "../Core/ImageMgr.h"
 
-class PLTImp : public ImageMgr
-{
+class PLTImp : public ImageMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
 
 	unsigned long Width, Height;
-	void * pixels;
-	Color * Palettes[8];
+	void* pixels;
+	Color* Palettes[8];
 	int palIndexes[8];
 public:
 	PLTImp(void);
 	~PLTImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
-	Sprite2D * GetImage();
+	bool Open(DataStream* stream, bool autoFree = true);
+	Sprite2D* GetImage();
 	/** No descriptions */
-	void GetPalette(int index, int colors, Color * pal);
+	void GetPalette(int index, int colors, Color* pal);
 	/** Gets a Pixel Index from the Image */
-        unsigned long GetPixelIndex(int x, int y)
-        {
-                return 0;
-        }
+	unsigned long GetPixelIndex(int x, int y)
+	{
+		return 0;
+	}
 	/** Gets a Pixel from the Image */
 	Color GetPixel(int x, int y)
 	{
-		Color null = {0x00, 0x00, 0x00, 0x00};
+		Color null = {
+			0x00, 0x00, 0x00, 0x00
+		};
 		return null;
 	}
-	int GetCycleCount() { return 1; }
+	int GetCycleCount()
+	{
+		return 1;
+	}
 public:
 	void release(void)
 	{

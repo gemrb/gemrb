@@ -2,7 +2,7 @@
 #include "ActorBlock.h"
 #include "Interface.h"
 
-extern Interface * core;
+extern Interface* core;
 
 /***********************
  *	Scriptable Class   *
@@ -12,7 +12,7 @@ Scriptable::Scriptable(ScriptableType type)
 	Type = type;
 	MySelf = NULL;
 	CutSceneId = NULL;
-	for(int i = 0; i < MAX_SCRIPTS; i++) {
+	for (int i = 0; i < MAX_SCRIPTS; i++) {
 		Scripts[i] = NULL;
 	}
 	overHeadText = NULL;
@@ -26,7 +26,7 @@ Scriptable::Scriptable(ScriptableType type)
 	EndAction = 2;
 	CurrentAction = NULL;
 	startTime = 0;
-	interval = (1000/AI_UPDATE_TIME);
+	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
 	playDeadCounter = 0;
 	resetAction = false;
@@ -34,28 +34,33 @@ Scriptable::Scriptable(ScriptableType type)
 	Terminate = false;
 
 	locals = new Variables();
-	locals->SetType(GEM_VARIABLES_INT);
+	locals->SetType( GEM_VARIABLES_INT );
 }
 
 Scriptable::~Scriptable(void)
 {
 	ClearActions();
-	for(int i = 0; i < MAX_SCRIPTS; i++) {
-		if(Scripts[i])
-			delete(Scripts[i]);
+	for (int i = 0; i < MAX_SCRIPTS; i++) {
+		if (Scripts[i]) {
+			delete( Scripts[i] );
+		}
 	}
-	if(overHeadText)
-		free(overHeadText);
-	if(locals)
-		delete(locals);
+	if (overHeadText) {
+		free( overHeadText );
+	}
+	if (locals) {
+		delete( locals );
+	}
 }
 
-void Scriptable::SetScript(const char *aScript, int idx)
+void Scriptable::SetScript(const char* aScript, int idx)
 {
-	if(Scripts[idx]) delete Scripts[idx];
-	Scripts[idx]=0;
-	if(aScript[0]) {
-		Scripts[idx] = new GameScript(aScript, 0, locals);
+	if (Scripts[idx]) {
+		delete Scripts[idx];
+	}
+	Scripts[idx] = 0;
+	if (aScript[0]) {
+		Scripts[idx] = new GameScript( aScript, 0, locals );
 		Scripts[idx]->MySelf = this;
 	}
 }
@@ -66,85 +71,91 @@ void Scriptable::SetPosition(unsigned short XPos, unsigned short YPos)
 	this->YPos = YPos;
 }
 
-void Scriptable::SetMySelf(Scriptable * MySelf)
+void Scriptable::SetMySelf(Scriptable* MySelf)
 {
 	this->MySelf = MySelf;
 }
 
-void Scriptable::SetScript(int index, GameScript * script)
+void Scriptable::SetScript(int index, GameScript* script)
 {
-	if(index >= MAX_SCRIPTS)
+	if (index >= MAX_SCRIPTS) {
 		return;
+	}
 	Scripts[index] = script;
 }
 
-void Scriptable::DisplayHeadText(char * text)
+void Scriptable::DisplayHeadText(char* text)
 {
-	if(overHeadText)
-		free(overHeadText);
+	if (overHeadText) {
+		free( overHeadText );
+	}
 	overHeadText = text;
-	GetTime(timeStartDisplaying);
+	GetTime( timeStartDisplaying );
 	textDisplaying = 1;
 }
 
-void Scriptable::SetScriptName(char * text) 
+void Scriptable::SetScriptName(char* text)
 {
-	strncpy(scriptName, text, 32);
+	strncpy( scriptName, text, 32 );
 	scriptName[32] = 0;
 }
 
-void Scriptable::ExecuteScript(GameScript * Script)
+void Scriptable::ExecuteScript(GameScript* Script)
 {
-	if(actionQueue.size())
+	if (actionQueue.size()) {
 		return;
-	if(Script)
+	}
+	if (Script) {
 		Script->Update();
+	}
 }
 
-void Scriptable::AddAction(Action * aC)
+void Scriptable::AddAction(Action* aC)
 {
-	if(!aC) {
-		printf("[IEScript]: NULL action encountered!\n");
+	if (!aC) {
+		printf( "[IEScript]: NULL action encountered!\n" );
 		return;
 	}
-	actionQueue.push_back(aC);
+	actionQueue.push_back( aC );
 	aC->IncRef();
 }
 
-void Scriptable::AddActionInFront(Action * aC)
+void Scriptable::AddActionInFront(Action* aC)
 {
-	if(!aC) {
-		printf("[IEScript]: NULL action encountered!\n");
+	if (!aC) {
+		printf( "[IEScript]: NULL action encountered!\n" );
 		return;
 	}
-	actionQueue.push_front(aC);
+	actionQueue.push_front( aC );
 	aC->IncRef();
 }
 
-Action * Scriptable::GetNextAction()
+Action* Scriptable::GetNextAction()
 {
-	if(actionQueue.size() == 0)
+	if (actionQueue.size() == 0) {
 		return NULL;
+	}
 	return actionQueue.front();
 }
 
-Action * Scriptable::PopNextAction()
+Action* Scriptable::PopNextAction()
 {
-	if(actionQueue.size() == 0)
+	if (actionQueue.size() == 0) {
 		return NULL;
-	Action * aC = actionQueue.front();
+	}
+	Action* aC = actionQueue.front();
 	actionQueue.pop_front();
 	return aC;
 }
 
 void Scriptable::ClearActions()
 {
-	if(CurrentAction) {
+	if (CurrentAction) {
 		//CurrentAction->Release();
 		CurrentAction = NULL;
 	}
-	for(int i = 0; i < actionQueue.size(); i++) {
-		Action * aC = actionQueue.front();
+	for (int i = 0; i < actionQueue.size(); i++) {
+		Action* aC = actionQueue.front();
 		actionQueue.pop_front();
 		aC->Release();
 	}
@@ -154,59 +165,60 @@ void Scriptable::ClearActions()
 void Scriptable::ProcessActions()
 {
 	unsigned long thisTime;
-	GetTime(thisTime);
-	if((thisTime-startTime) < interval)
+	GetTime( thisTime );
+	if (( thisTime - startTime ) < interval) {
 		return;
+	}
 	startTime = thisTime;
-	if(playDeadCounter) {
+	if (playDeadCounter) {
 		playDeadCounter--;
-		if(!playDeadCounter) {
-			Moveble * mov = (Moveble*)MySelf;
+		if (!playDeadCounter) {
+			Moveble* mov = ( Moveble* ) MySelf;
 			mov->AnimID = IE_ANI_GET_UP;
 		}
 	}
-	if(WaitCounter) {
+	if (WaitCounter) {
 		WaitCounter--;
-		if(!WaitCounter)
+		if (!WaitCounter)
 			CurrentAction = NULL;
 		return;
 	}
-	if(resetAction) {
+	if (resetAction) {
 		CurrentAction = NULL;
 		resetAction = false;
 	}
-	while(!CurrentAction) {
+	while (!CurrentAction) {
 		CurrentAction = PopNextAction();
-		if(!CurrentAction) {
-			if(!neverExecuted) {
-				switch(Type) {
+		if (!CurrentAction) {
+			if (!neverExecuted) {
+				switch (Type) {
 					case ST_PROXIMITY:
-						{
-						if(!(EndAction & SEA_RESET))
-							Active = false;
+						 {
+							if (!( EndAction & SEA_RESET ))
+								Active = false;
 						}
-					break;
+						break;
 
 					case ST_TRIGGER:
-						{
+						 {
 							Clicker = NULL;
 							neverExecuted = true;
 						}
-					break;
+						break;
 				}
 			}
-			if(CutSceneId)
+			if (CutSceneId)
 				CutSceneId = NULL;
-			
+
 			break;
 		}
-		if(Type == ST_ACTOR) {
-			Moveble * actor = (Moveble*)this;
-			if(actor->AnimID == IE_ANI_DIE)
+		if (Type == ST_ACTOR) {
+			Moveble* actor = ( Moveble* )this;
+			if (actor->AnimID == IE_ANI_DIE)
 				actor->AnimID = IE_ANI_GET_UP;
 		}
-		printf("Executing Action: %s\n", this->scriptName);
-		GameScript::ExecuteAction(this, CurrentAction);
+		printf( "Executing Action: %s\n", this->scriptName );
+		GameScript::ExecuteAction( this, CurrentAction );
 		neverExecuted = false;
 	}
 }
@@ -220,8 +232,9 @@ void Scriptable::SetWait(unsigned long time)
  * Selectable Class *
  ********************/
 
-Selectable::Selectable(ScriptableType type) : Scriptable(type) 
-{ 
+Selectable::Selectable(ScriptableType type)
+	: Scriptable( type )
+{
 	Selected = false;
 	Over = false;
 	size = 0;
@@ -229,7 +242,6 @@ Selectable::Selectable(ScriptableType type) : Scriptable(type)
 
 Selectable::~Selectable(void)
 {
-	
 }
 
 void Selectable::SetBBox(Region newBBox)
@@ -238,23 +250,26 @@ void Selectable::SetBBox(Region newBBox)
 }
 
 void Selectable::DrawCircle()
-{	
-	if(!size)
+{
+	if (!size) {
 		return;
-	Color *col = NULL;
-	if(Selected) {
+	}
+	Color* col = NULL;
+	if (Selected) {
 		col = &selectedColor;
-	} else if(Over) {
+	} else if (Over) {
 		col = &overColor;
-	} else
+	} else {
 		return;
+	}
 	Region vp = core->GetVideoDriver()->GetViewport();
-	core->GetVideoDriver()->DrawEllipse(XPos-vp.x, YPos-vp.y, size*10, ((size*15)/2), *col);
+	core->GetVideoDriver()->DrawEllipse( XPos - vp.x, YPos - vp.y, size * 10,
+								( ( size * 15 ) / 2 ), *col );
 }
 
 bool Selectable::IsOver(unsigned short XPos, unsigned short YPos)
 {
-	return BBox.PointInside(XPos, YPos);
+	return BBox.PointInside( XPos, YPos );
 }
 
 void Selectable::SetOver(bool over)
@@ -271,48 +286,54 @@ void Selectable::SetCircle(int size, Color color)
 {
 	this->size = size;
 	selectedColor = color;
-    	overColor.r = color.r>>1;
-	overColor.g = color.g>>1;
-	overColor.b = color.b>>1;
+	overColor.r = color.r >> 1;
+	overColor.g = color.g >> 1;
+	overColor.b = color.b >> 1;
 }
 
 /***********************
  * Highlightable Class *
  ***********************/
 
-Highlightable::Highlightable(ScriptableType type) : Scriptable(type) 
-{ 
+Highlightable::Highlightable(ScriptableType type)
+	: Scriptable( type )
+{
 	outline = NULL;
 	Highlight = false;
 }
 
 Highlightable::~Highlightable(void)
 {
-	if(outline)
-		delete(outline);
+	if (outline) {
+		delete( outline );
+	}
 }
 
 bool Highlightable::IsOver(unsigned short XPos, unsigned short YPos)
 {
-	if(!outline)
+	if (!outline) {
 		return false;
-	if(outline->BBox.PointInside(XPos, YPos))
-		return outline->PointIn(XPos, YPos);
+	}
+	if (outline->BBox.PointInside( XPos, YPos )) {
+		return outline->PointIn( XPos, YPos );
+	}
 	return false;
 }
 
 void Highlightable::DrawOutline()
 {
-	if(!outline)
+	if (!outline) {
 		return;
-	core->GetVideoDriver()->DrawPolyline(outline, outlineColor, true);
+	}
+	core->GetVideoDriver()->DrawPolyline( outline, outlineColor, true );
 }
 
 /*****************
  * Moveble Class *
  *****************/
 
-Moveble::Moveble(ScriptableType type) : Selectable(type) 
+Moveble::Moveble(ScriptableType type)
+	: Selectable( type )
 {
 	XDes = XPos;
 	YDes = YPos;
@@ -328,59 +349,70 @@ Moveble::Moveble(ScriptableType type) : Selectable(type)
 
 Moveble::~Moveble(void)
 {
-
 }
 
-void Moveble::DoStep(ImageMgr * LightMap)
-{	
-	if(!path)
+void Moveble::DoStep(ImageMgr* LightMap)
+{
+	if (!path) {
 		return;
+	}
 	unsigned long time;
-	GetTime(time);
-	if(!step) {
+	GetTime( time );
+	if (!step) {
 		step = path;
 		timeStartStep = time;
 	}
-	if((time-timeStartStep) >= STEP_TIME) {
+	if (( time - timeStartStep ) >= STEP_TIME) {
 		//printf("[New Step] : Orientation = %d\n", step->orient);
 		step = step->Next;
 		timeStartStep = time;
 	}
 	Orientation = step->orient;
 	AnimID = IE_ANI_WALK;
-	XPos = (step->x*16)+8;
-	YPos = (step->y*12)+6;
-	if(!step->Next) {
+	XPos = ( step->x * 16 ) + 8;
+	YPos = ( step->y * 12 ) + 6;
+	if (!step->Next) {
 		//printf("Last Step\n");
 		ClearPath();
-	}
-	else {
-		if(step->Next->x > step->x)
-			XPos += (unsigned short)(((((step->Next->x*16)+8)-XPos)*(time-timeStartStep))/STEP_TIME);
+	} else {
+		if (step->Next->x > step->x)
+			XPos += ( unsigned short )
+				( ( ( ( ( step->Next->x * 16 ) + 8 ) - XPos ) * ( time -
+				timeStartStep ) ) /
+				STEP_TIME );
 		else
-			XPos -= (unsigned short)(((XPos-((step->Next->x*16)+8))*(time-timeStartStep))/STEP_TIME);
-		if(step->Next->y > step->y)
-			YPos += (unsigned short)(((((step->Next->y*12)+6)-YPos)*(time-timeStartStep))/STEP_TIME);
+			XPos -= ( unsigned short )
+				( ( ( XPos - ( ( step->Next->x * 16 ) + 8 ) ) * ( time -
+				timeStartStep ) ) /
+				STEP_TIME );
+		if (step->Next->y > step->y)
+			YPos += ( unsigned short )
+				( ( ( ( ( step->Next->y * 12 ) + 6 ) - YPos ) * ( time -
+				timeStartStep ) ) /
+				STEP_TIME );
 		else
-			YPos -= (unsigned short)(((YPos-((step->Next->y*12)+6))*(time-timeStartStep))/STEP_TIME);
+			YPos -= ( unsigned short )
+				( ( ( YPos - ( ( step->Next->y * 12 ) + 6 ) ) * ( time -
+				timeStartStep ) ) /
+				STEP_TIME );
 	}
 }
 void Moveble::WalkTo(unsigned short XDes, unsigned short YDes)
 {
 	this->XDes = XDes;
 	this->YDes = YDes;
-	if(path) {
-		PathNode * nextNode = path->Next;
-		PathNode * thisNode = path;
-		while(true) {
-			delete(thisNode);
+	if (path) {
+		PathNode* nextNode = path->Next;
+		PathNode* thisNode = path;
+		while (true) {
+			delete( thisNode );
 			thisNode = nextNode;
-			if(!thisNode)
+			if (!thisNode)
 				break;
 			nextNode = thisNode->Next;
 		}
 	}
-	path = core->GetPathFinder()->FindPath(XPos, YPos, XDes, YDes);
+	path = core->GetPathFinder()->FindPath( XPos, YPos, XDes, YDes );
 	step = NULL;
 }
 void Moveble::MoveTo(unsigned short XDes, unsigned short YDes)
@@ -393,14 +425,15 @@ void Moveble::MoveTo(unsigned short XDes, unsigned short YDes)
 
 void Moveble::ClearPath()
 {
-	if(!path)
+	if (!path) {
 		return;
-	PathNode * nextNode = path->Next;
-	PathNode * thisNode = path;
-	while(true) {
-		delete(thisNode);
+	}
+	PathNode* nextNode = path->Next;
+	PathNode* thisNode = path;
+	while (true) {
+		delete( thisNode );
 		thisNode = nextNode;
-		if(!thisNode)
+		if (!thisNode)
 			break;
 		nextNode = thisNode->Next;
 	}
@@ -416,7 +449,8 @@ void Moveble::ClearPath()
  * Door Class *
  **************/
 
-Door::Door(TileOverlay * Overlay) : Highlightable(ST_DOOR) 
+Door::Door(TileOverlay* Overlay)
+	: Highlightable( ST_DOOR )
 {
 	Name[0] = 0;
 	tiles = NULL;
@@ -432,101 +466,103 @@ Door::Door(TileOverlay * Overlay) : Highlightable(ST_DOOR)
 
 Door::~Door(void)
 {
-	if(DoorClosed) {
-		if(open)
-			delete(open);
+	if (DoorClosed) {
+		if (open) {
+			delete( open );
+		}
+	} else {
+		if (closed) {
+			delete( closed );
+		}
 	}
-	else {
-		if(closed)
-			delete(closed);
+	if (tiles) {
+		free( tiles );
 	}
-	if(tiles)
-		free(tiles);
 }
 
-void Door::ToggleTiles(bool playsound) 
+void Door::ToggleTiles(bool playsound)
 {
-	unsigned char state = (closedIndex==1)?0:1;
-	if(DoorClosed) {
+	unsigned char state = ( closedIndex == 1 ) ? 0 : 1;
+	if (DoorClosed) {
 		state = closedIndex;
-		if(playsound && (CloseSound[0] != '\0'))
-			core->GetSoundMgr()->Play(CloseSound);
-		XPos = closed->BBox.x+(closed->BBox.w/2);
-		YPos = closed->BBox.y+(closed->BBox.h/2);
+		if (playsound && ( CloseSound[0] != '\0' ))
+			core->GetSoundMgr()->Play( CloseSound );
+		XPos = closed->BBox.x + ( closed->BBox.w / 2 );
+		YPos = closed->BBox.y + ( closed->BBox.h / 2 );
+	} else {
+		if (playsound && ( OpenSound[0] != '\0' ))
+			core->GetSoundMgr()->Play( OpenSound );
+		XPos = open->BBox.x + ( open->BBox.w / 2 );
+		YPos = open->BBox.y + ( open->BBox.h / 2 );
 	}
-	else {
-		if(playsound && (OpenSound[0] != '\0'))
-			core->GetSoundMgr()->Play(OpenSound);
-		XPos = open->BBox.x+(open->BBox.w/2);
-		YPos = open->BBox.y+(open->BBox.h/2);
-	}
-	for(int i = 0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = state;
 	}
 }
 
-void Door::SetName(char * Name)
+void Door::SetName(char* Name)
 {
-	strncpy(this->Name, Name, 8);
+	strncpy( this->Name, Name, 8 );
 	this->Name[8] = 0;
 }
 
-void Door::SetTiles(unsigned short * Tiles, int count)
+void Door::SetTiles(unsigned short* Tiles, int count)
 {
-	if(tiles)
-		free(tiles);
+	if (tiles) {
+		free( tiles );
+	}
 	tiles = Tiles;
 	this->count = count;
 }
 
 void Door::SetDoorClosed(bool Closed, bool playsound)
 {
-	if(Closed) {
+	if (Closed) {
 		outline = closed;
-	}
-	else {
+	} else {
 		outline = open;
 	}
-	if(DoorClosed == Closed) {
-		if(Closed) {
-			XPos = closed->BBox.x+(closed->BBox.w/2);
-			YPos = closed->BBox.y+(closed->BBox.h/2);
+	if (DoorClosed == Closed) {
+		if (Closed) {
+			XPos = closed->BBox.x + ( closed->BBox.w / 2 );
+			YPos = closed->BBox.y + ( closed->BBox.h / 2 );
 		} else {
-			XPos = open->BBox.x+(open->BBox.w/2);
-			YPos = open->BBox.y+(open->BBox.h/2);
+			XPos = open->BBox.x + ( open->BBox.w / 2 );
+			YPos = open->BBox.y + ( open->BBox.h / 2 );
 		}
 		return;
 	}
 	DoorClosed = Closed;
-	ToggleTiles(playsound);
+	ToggleTiles( playsound );
 }
 
 void Door::ToggleDoorState()
 {
 	DoorClosed = !DoorClosed;
-	ToggleTiles(true);
-	if(DoorClosed)
+	ToggleTiles( true );
+	if (DoorClosed) {
 		outline = closed;
-	else
+	} else {
 		outline = open;
+	}
 }
 
-void Door::SetPolygon(bool Open, Gem_Polygon * poly)
+void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 {
-	if(Open) {
-		if(open)
-			delete(open);
+	if (Open) {
+		if (open)
+			delete( open );
 		open = poly;
-	}
-	else {
-		if(closed)
-			delete(closed);
+	} else {
+		if (closed)
+			delete( closed );
 		closed = poly;
 	}
-	if(DoorClosed)
+	if (DoorClosed) {
 		outline = closed;
-	else
+	} else {
 		outline = open;
+	}
 }
 
 void Door::SetCursor(unsigned char CursorIndex)
@@ -535,15 +571,16 @@ void Door::SetCursor(unsigned char CursorIndex)
 }
 void Door::DebugDump()
 {
-	printf("Debugdump of Door %s:\n",Name);
-	printf("DoorClosed: %d\n",DoorClosed);
+	printf( "Debugdump of Door %s:\n", Name );
+	printf( "DoorClosed: %d\n", DoorClosed );
 }
 
 /*******************
  * InfoPoint Class *
  *******************/
 
-InfoPoint::InfoPoint(void) : Highlightable(ST_TRIGGER) 
+InfoPoint::InfoPoint(void)
+	: Highlightable( ST_TRIGGER )
 {
 	Name[0] = 0;
 	Destination[0] = 0;
@@ -561,35 +598,36 @@ InfoPoint::InfoPoint(void) : Highlightable(ST_TRIGGER)
 
 InfoPoint::~InfoPoint(void)
 {
-	
 }
 
 void InfoPoint::DebugDump()
 {
-	switch(Type) {
-	case ST_TRIGGER:
-		printf("Debugdump of InfoPoint Region %s:\n", Name);
-	break;
-	case ST_PROXIMITY:
-		printf("Debugdump of Trap Region %s:\n", Name);
-	break;
-	case ST_TRAVEL:
-		printf("Debugdump of Travel Region %s:\n", Name);
-	break;
-	default:
-		printf("Debugdump of Unsupported Region %s:\n", Name);
-	break;
+	switch (Type) {
+		case ST_TRIGGER:
+			printf( "Debugdump of InfoPoint Region %s:\n", Name );
+			break;
+		case ST_PROXIMITY:
+			printf( "Debugdump of Trap Region %s:\n", Name );
+			break;
+		case ST_TRAVEL:
+			printf( "Debugdump of Travel Region %s:\n", Name );
+			break;
+		default:
+			printf( "Debugdump of Unsupported Region %s:\n", Name );
+			break;
 	}
-	printf("TrapDetected: %d  Trapped: %d\n",TrapDetected, Trapped);
-	printf("Trap detection: %d  Trap removal: %d\n",TrapDetectionDifficulty, TrapRemovalDifficulty);
-	printf("Key: %s  Dialog: %s\n",KeyResRef, DialogResRef);
+	printf( "TrapDetected: %d  Trapped: %d\n", TrapDetected, Trapped );
+	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDifficulty,
+		TrapRemovalDifficulty );
+	printf( "Key: %s  Dialog: %s\n", KeyResRef, DialogResRef );
 }
 
 /*******************
  * Container Class *
  *******************/
 
-Container::Container(void) : Highlightable(ST_CONTAINER)
+Container::Container(void)
+	: Highlightable( ST_CONTAINER )
 {
 	Name[0] = 0;
 	Type = 0;
@@ -603,14 +641,14 @@ Container::Container(void) : Highlightable(ST_CONTAINER)
 
 Container::~Container()
 {
-	
 }
 
 void Container::DebugDump()
 {
-	printf("Debugdump of Container %s\n", Name);
-	printf("Type: %d   LockDifficulty: %d\n",Type, LockDifficulty);
-	printf("Locked: %d  Trapped: %d\n",Locked, Trapped);
-	printf("Trap detection: %d  Trap removal: %d\n",TrapDetectionDiff, TrapRemovalDiff);
+	printf( "Debugdump of Container %s\n", Name );
+	printf( "Type: %d   LockDifficulty: %d\n", Type, LockDifficulty );
+	printf( "Locked: %d  Trapped: %d\n", Locked, Trapped );
+	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDiff,
+		TrapRemovalDiff );
 }
 

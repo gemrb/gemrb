@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.cpp,v 1.8 2004/01/01 15:41:37 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.cpp,v 1.9 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -25,7 +25,7 @@
 Region::Region(void)
 {
 	x = y = w = h = 0;
-DEBUG=0;
+	DEBUG = 0;
 }
 
 Region::~Region(void)
@@ -41,36 +41,38 @@ Region::~Region(void)
 DEBUG=rgn.DEBUG;
 }*/
 
-Region::Region(const Region & rgn)
-{
-  x = rgn.x;
-  y = rgn.y;
-  w = rgn.w;
-  h = rgn.h;
-DEBUG=rgn.DEBUG;
-}
-
-Region & Region::operator=(const Region & rgn)
+Region::Region(const Region& rgn)
 {
 	x = rgn.x;
 	y = rgn.y;
 	w = rgn.w;
 	h = rgn.h;
-DEBUG=rgn.DEBUG;
+	DEBUG = rgn.DEBUG;
+}
+
+Region& Region::operator=(const Region& rgn)
+{
+	x = rgn.x;
+	y = rgn.y;
+	w = rgn.w;
+	h = rgn.h;
+	DEBUG = rgn.DEBUG;
 	return *this;
 }
 
-bool Region::operator==(const Region & rgn)
+bool Region::operator==(const Region& rgn)
 {
-	if((x == rgn.x) && (y == rgn.y) && (w == rgn.w) && (h == rgn.h))
+	if (( x == rgn.x ) && ( y == rgn.y ) && ( w == rgn.w ) && ( h == rgn.h )) {
 		return true;
+	}
 	return false;
 }
 
-bool Region::operator!=(const Region & rgn)
+bool Region::operator!=(const Region& rgn)
 {
-	if((x != rgn.x) || (y != rgn.y) || (w != rgn.w) || (h != rgn.h))
+	if (( x != rgn.x ) || ( y != rgn.y ) || ( w != rgn.w ) || ( h != rgn.h )) {
 		return true;
+	}
 	return false;
 }
 
@@ -80,44 +82,50 @@ Region::Region(int x, int y, int w, int h, int debug)
 	this->y = y;
 	this->w = w;
 	this->h = h;
-this->DEBUG=DEBUG;
+	this->DEBUG = DEBUG;
 }
 
 bool Region::PointInside(unsigned short XPos, unsigned short YPos)
 {
-	if((XPos < x)||(XPos > (x+w)))
+	if (( XPos < x ) || ( XPos > ( x + w ) )) {
 		return false;
-	if((YPos < y)||(YPos > (y+h)))
+	}
+	if (( YPos < y ) || ( YPos > ( y + h ) )) {
 		return false;
+	}
 	return true;
 }
 
-bool Region::InsideRegion(Region &rgn)
+bool Region::InsideRegion(Region& rgn)
 {
-	if(x > (rgn.x+rgn.w))
+	if (x > ( rgn.x + rgn.w )) {
 		return false;
-	if((x+w) < rgn.x)
+	}
+	if (( x + w ) < rgn.x) {
 		return false;
-	if(y > (rgn.y+rgn.h))
+	}
+	if (y > ( rgn.y + rgn.h )) {
 		return false;
-	if((y+h) < rgn.y)
+	}
+	if (( y + h ) < rgn.y) {
 		return false;
+	}
 	return true;
 }
 
 void Region::Normalize()
 {
-	if(x > w) {
+	if (x > w) {
 		int tmp = x;
 		x = w;
-		w = tmp-x;
+		w = tmp - x;
 	} else {
 		w -= x;
 	}
-	if(y > h) {
+	if (y > h) {
 		int tmp = y;
 		y = h;
-		h = tmp-y;
+		h = tmp - y;
 	} else {
 		h -= y;
 	}

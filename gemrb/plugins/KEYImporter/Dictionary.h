@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.h,v 1.6 2004/02/14 15:08:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.h,v 1.7 2004/02/24 22:20:40 balrog994 Exp $
  *
  */
 
 /***************************************************************************
-                         |Dictionary.h|  -  stolen Map class from MFC
+						 |Dictionary.h|  -  stolen Map class from MFC
  ***************************************************************************/
 
 #if !defined(AFX_DICTIONARY_H__4EAE07B5_C375_4191_85AC_E5E15DBCD07B__INCLUDED_)
@@ -43,36 +43,34 @@ class Dictionary //: public CObject
 {
 protected:
 	// Association
-	struct MyAssoc
-	{
+	struct MyAssoc {
 		MyAssoc* pNext;
-		const char *key;
+		const char* key;
 		SClass_ID type;
 		unsigned long value;
 	};
-        struct MemBlock
-        {
-                MemBlock *pNext;
-        };
+	struct MemBlock {
+		MemBlock* pNext;
+	};
 
 public:
-// Construction
-	Dictionary(int nBlockSize = 10, int nHashTableSize=32769);
+	// Construction
+	Dictionary(int nBlockSize = 10, int nHashTableSize = 32769);
 
-// Attributes
+	// Attributes
 	// number of elements
 	int GetCount() const;
 	bool IsEmpty() const;
 
 	// Lookup
-	bool Lookup(const char *key, unsigned int type, unsigned long& rValue) const;
+	bool Lookup(const char* key, unsigned int type, unsigned long& rValue) const;
 
-// Operations
-	void SetAt(const char *key, unsigned int type, unsigned long newValue);
+	// Operations
+	void SetAt(const char* key, unsigned int type, unsigned long newValue);
 	void RemoveAll();
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
 
-// Implementation
+	// Implementation
 protected:
 	MyAssoc** m_pHashTable;
 	unsigned int m_nHashTableSize;
@@ -83,8 +81,8 @@ protected:
 
 	MyAssoc* NewAssoc();
 	void FreeAssoc(MyAssoc*);
-	MyAssoc* GetAssocAt(const char *, unsigned int, unsigned int&) const;
-        unsigned int MyHashKey(const char *, unsigned int) const;
+	MyAssoc* GetAssocAt(const char*, unsigned int, unsigned int&) const;
+	unsigned int MyHashKey(const char*, unsigned int) const;
 
 public:
 	~Dictionary();

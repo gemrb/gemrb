@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImpCD.cpp,v 1.1 2004/02/15 14:26:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImpCD.cpp,v 1.2 2004/02/24 22:20:39 balrog994 Exp $
  *
  */
 
@@ -30,12 +30,12 @@ SPLImpCD::~SPLImpCD(void)
 {
 }
 
-void * SPLImpCD::Create(void)
+void* SPLImpCD::Create(void)
 {
 	return new SPLImp();
 }
 
-const char * SPLImpCD::ClassName(void)
+const char* SPLImpCD::ClassName(void)
 {
 	return "SPLImp";
 }
@@ -47,6 +47,6 @@ SClass_ID SPLImpCD::SuperClassID(void)
 
 Class_ID SPLImpCD::ClassID(void)
 {
-  // FIXME?????
-	return Class_ID(0x098a4123, 0xcfc417de);
+	// FIXME?????
+	return Class_ID( 0x098a4123, 0xcfc417de );
 }

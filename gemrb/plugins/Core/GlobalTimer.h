@@ -16,21 +16,20 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT GlobalTimer
-{
+class GEM_EXPORT GlobalTimer {
 private:
 	unsigned long startTime;
 	unsigned long interval;
 
-	GameScript * CutScene;
-	Actor * MovingActor;
+	GameScript* CutScene;
+	Actor* MovingActor;
 
 	unsigned long fadeToCounter, fadeToMax;
 	unsigned long fadeFromCounter, fadeFromMax;
 	unsigned long waitCounter;
 	unsigned long shakeCounter;
 	unsigned long shakeX, shakeY;
-	Region		  shakeStartVP;
+	Region shakeStartVP;
 public:
 	GlobalTimer(void);
 	~GlobalTimer(void);
@@ -39,9 +38,10 @@ public:
 	void SetFadeToColor(unsigned long Count);
 	void SetFadeFromColor(unsigned long Count);
 	void SetWait(unsigned long Count);
-	void SetMovingActor(Actor * actor);
-	void SetCutScene(GameScript * script);
-	void SetScreenShake(unsigned long shakeX, unsigned long shakeY, unsigned long Count);
+	void SetMovingActor(Actor* actor);
+	void SetCutScene(GameScript* script);
+	void SetScreenShake(unsigned long shakeX, unsigned long shakeY,
+		unsigned long Count);
 public:
 	bool CutSceneMode;
 };

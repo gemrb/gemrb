@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.15 2004/02/18 11:15:34 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.16 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -23,7 +23,7 @@
 #include "SaveGameIterator.h"
 #include "Interface.h"
 
-extern Interface * core;
+extern Interface* core;
 
 SaveGameIterator::SaveGameIterator(void)
 {
@@ -33,38 +33,41 @@ SaveGameIterator::~SaveGameIterator(void)
 {
 }
 
-static void DelTree(char *Pt)
+static void DelTree(char* Pt)
 {
 	char Path[_MAX_PATH];
-	strcpy(Path, Pt);
-	DIR * dir = opendir(Path);
-	if(dir==NULL)
+	strcpy( Path, Pt );
+	DIR* dir = opendir( Path );
+	if (dir == NULL) {
 		return;
-	struct dirent * de = readdir(dir);  //Lookup the first entry in the Directory
-	if(de == NULL) {
-		closedir(dir);
+	}
+	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
+	if (de == NULL) {
+		closedir( dir );
 		return;
 	}
 	do {
 		char dtmp[_MAX_PATH];
 		struct stat fst;
-		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
-		stat(dtmp, &fst);
-		if(S_ISDIR(fst.st_mode))
+		sprintf( dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name );
+		stat( dtmp, &fst );
+		if (S_ISDIR( fst.st_mode ))
 			continue;
-		if(de->d_name[0] == '.')
+		if (de->d_name[0] == '.')
 			continue;
-		unlink(dtmp);
-	} while((de = readdir(dir)) != NULL);
-	closedir(dir);
+		unlink( dtmp );
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir );
 }
 
-static const char *PlayMode()
+static const char* PlayMode()
 {
-	unsigned long playmode=1;
+	unsigned long playmode = 1;
 
-	core->GetDictionary()->Lookup("PlayMode",playmode);
-	if(playmode==2) return "mpsave";
+	core->GetDictionary()->Lookup( "PlayMode", playmode );
+	if (playmode == 2) {
+		return "mpsave";
+	}
 	return "save";
 }
 
@@ -72,121 +75,135 @@ int SaveGameIterator::GetSaveGameCount()
 {
 	int count = 0;
 	char Path[_MAX_PATH];
-	const char *SaveFolder=PlayMode();
-	sprintf(Path, "%s%s", core->GamePath,SaveFolder);
-	DIR * dir = opendir(Path);
-	if(dir == NULL) //If we cannot open the Directory
-		return -1;
-	struct dirent * de = readdir(dir);  //Lookup the first entry in the Directory
-	if(de == NULL) {
-		closedir(dir);
+	const char* SaveFolder = PlayMode();
+	sprintf( Path, "%s%s", core->GamePath, SaveFolder );
+	DIR* dir = opendir( Path );
+	if (dir == NULL) //If we cannot open the Directory
+	{
 		return -1;
 	}
-	do { //Iterate through all the available modules to load
+	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
+	if (de == NULL) {
+		closedir( dir );
+		return -1;
+	}
+	do {
+		//Iterate through all the available modules to load
 		char dtmp[_MAX_PATH];
 		struct stat fst;
-		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
-		stat(dtmp, &fst);
-		if(S_ISDIR(fst.st_mode)) {
-			if(de->d_name[0] == '.')
+		sprintf( dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name );
+		stat( dtmp, &fst );
+		if (S_ISDIR( fst.st_mode )) {
+			if (de->d_name[0] == '.')
 				continue;
 			char ftmp[_MAX_PATH];
-			sprintf(ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter, core->GameNameResRef);
+			sprintf( ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter,
+				core->GameNameResRef );
 #ifndef WIN32
-			ResolveFilePath (ftmp);
+			ResolveFilePath( ftmp );
 #endif
-			FILE * exist = fopen(ftmp, "rb");
-			if(!exist)
+			FILE* exist = fopen( ftmp, "rb" );
+			if (!exist)
 				continue;
-			fclose(exist);
+			fclose( exist );
 			char Name[_MAX_PATH], Text[_MAX_PATH];
-			int cnt = sscanf(de->d_name, "%*d-%s - %s", Name, Text);
-			if(cnt == 2) {
-				printf("[Name = %s, Text = %s]\n", Name, Text);
+			int cnt = sscanf( de->d_name, "%*d-%s - %s", Name, Text );
+			if (cnt == 2) {
+				printf( "[Name = %s, Text = %s]\n", Name, Text );
 				count++;
 			}
-			if(cnt == 1) {
-				printf("[Name = %s, No Description]\n", Name);
+			if (cnt == 1) {
+				printf( "[Name = %s, No Description]\n", Name );
 				count++;
 			}
 		}
-	} while((de = readdir(dir)) != NULL);
-	closedir(dir);  //No other files in the directory, close it
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir );  //No other files in the directory, close it
 	return count;
 }
 
-SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
+SaveGame* SaveGameIterator::GetSaveGame(int index, bool Remove)
 {
 	int count = -1, prtrt = 0;
 	char Path[_MAX_PATH];
 	char dtmp[_MAX_PATH];
-	const char *SaveFolder=PlayMode();
-	sprintf(Path, "%s%s", core->GamePath, SaveFolder);
-	DIR * dir = opendir(Path);
-	if(dir == NULL) //If we cannot open the Directory
+	const char* SaveFolder = PlayMode();
+	sprintf( Path, "%s%s", core->GamePath, SaveFolder );
+	DIR* dir = opendir( Path );
+	if (dir == NULL) //If we cannot open the Directory
+	{
 		return NULL;
-	struct dirent * de = readdir(dir);  //Lookup the first entry in the Directory
-	if(de == NULL) //If no entry exists just return
+	}
+	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
+	if (de == NULL) //If no entry exists just return
+	{
 		return NULL;
+	}
 	char Name[_MAX_PATH], Text[_MAX_PATH];
-	do { //Iterate through all the available modules to load
+	do {
+		//Iterate through all the available modules to load
 		struct stat fst;
-		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
-		stat(dtmp, &fst);
-		if(S_ISDIR(fst.st_mode)) {
-			if(de->d_name[0] == '.')
+		sprintf( dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name );
+		stat( dtmp, &fst );
+		if (S_ISDIR( fst.st_mode )) {
+			if (de->d_name[0] == '.')
 				continue;
 			char ftmp[_MAX_PATH];
-			sprintf(ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter, core->GameNameResRef);
+			sprintf( ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter,
+				core->GameNameResRef );
 #ifndef WIN32
-			ResolveFilePath (ftmp);
+			ResolveFilePath( ftmp );
 #endif
-			FILE * exist = fopen(ftmp, "rb");
-			if(!exist)
+			FILE* exist = fopen( ftmp, "rb" );
+			if (!exist)
 				continue;
-			fclose(exist);
-			int cnt = sscanf(de->d_name, "%*d-%s - %s", Name, Text);
-			if(cnt == 2) {
-				printf("[Name = %s, Text = %s]\n", Name, Text);
+			fclose( exist );
+			int cnt = sscanf( de->d_name, "%*d-%s - %s", Name, Text );
+			if (cnt == 2) {
+				printf( "[Name = %s, Text = %s]\n", Name, Text );
 				count++;
 			}
-			if(cnt == 1) {
-				Text[0]=0;
-				printf("[Name = %s, No Description]\n", Name);
+			if (cnt == 1) {
+				Text[0] = 0;
+				printf( "[Name = %s, No Description]\n", Name );
 				count++;
 			}
-			if(count == index) {
-				if(Remove) {
-					sprintf(Path, "%s%s%s%s", core->GamePath, SaveFolder, SPathDelimiter, de->d_name);
-					DelTree(Path);
-					rmdir(Path);
+			if (count == index) {
+				if (Remove) {
+					sprintf( Path, "%s%s%s%s", core->GamePath, SaveFolder,
+						SPathDelimiter, de->d_name );
+					DelTree( Path );
+					rmdir( Path );
 					break;
 				}
-				sprintf(Path, "%s%s%s%s", core->GamePath, SaveFolder, SPathDelimiter, de->d_name);
-				DIR * ndir = opendir(Path);
+				sprintf( Path, "%s%s%s%s", core->GamePath, SaveFolder,
+					SPathDelimiter, de->d_name );
+				DIR* ndir = opendir( Path );
 				//If we cannot open the Directory
-				if(ndir == NULL) {
-					closedir(dir);
+				if (ndir == NULL) {
+					closedir( dir );
 					return NULL;
 				}
-				struct dirent * de2 = readdir(ndir);  //Lookup the first entry in the Directory
-				if(de2 == NULL) {  // No first entry!!!
-					closedir(dir);
-					closedir(ndir);
+				struct dirent* de2 = readdir( ndir );  //Lookup the first entry in the Directory
+				if (de2 == NULL) {
+					// No first entry!!!
+					closedir( dir );
+					closedir( ndir );
 					return NULL;
 				}
 				do {
-					if(strnicmp(de2->d_name, "PORTRT", 6) == 0)
+					if (strnicmp( de2->d_name, "PORTRT", 6 ) == 0)
 						prtrt++;
-				} while((de2 = readdir(ndir)) != NULL);
-				closedir(ndir);  //No other files in the directory, close it
+				} while (( de2 = readdir( ndir ) ) != NULL);
+				closedir( ndir );  //No other files in the directory, close it
 				break;
 			}
 		}
-	} while((de = readdir(dir)) != NULL);
-	closedir(dir);  //No other files in the directory, close it
-	if(Remove || (de == NULL) )
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir );  //No other files in the directory, close it
+	if (Remove || ( de == NULL )) {
 		return NULL;
-	SaveGame * sg = new SaveGame(dtmp, Name, core->GameNameResRef, prtrt);
+	}
+	SaveGame* sg = new SaveGame( dtmp, Name, core->GameNameResRef, prtrt );
 	return sg;
 }

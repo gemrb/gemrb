@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.15 2004/01/19 17:33:58 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.16 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -39,23 +39,22 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT TextArea : public Control
-{
+class GEM_EXPORT TextArea : public Control {
 public:
 	TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	/** Sets the Scroll Bar Pointer */
-	void SetScrollBar(Control * ptr);
+	void SetScrollBar(Control* ptr);
 	/** Sets the Actual Text */
-	int SetText(const char * text, int pos = 0);
+	int SetText(const char* text, int pos = 0);
 	/** Appends a String to the current Text */
-	int AppendText(const char * text, int pos = 0);
+	int AppendText(const char* text, int pos = 0);
 	/** Deletes last `count' lines */ 
-	void PopLines (int count);
+	void PopLines(int count);
 	/** Sets the Fonts */
-	void SetFonts(Font * init, Font * text);
+	void SetFonts(Font* init, Font* text);
 	/** Returns Number of Rows */
 	int GetRowCount();
 	/** Returns Starting Row */
@@ -67,13 +66,13 @@ public:
 	/** Set Minimum Selectable Row (to the current ceiling) */
 	void SetMinRow(bool enable);
 	/** Copies the current TextArea content to another TextArea control */
-	void CopyTo(TextArea * ta);
+	void CopyTo(TextArea* ta);
 	/** Scrolls automatically to the bottom when the text changes */
 	bool AutoScroll;
 private: // Private attributes
 	bool Selectable;
-	std::vector<char *> lines;
-	std::vector<int> lrows;
+	std::vector< char*> lines;
+	std::vector< int> lrows;
 	int seltext;
 	int selline;
 	/** minimum selectable row */
@@ -85,14 +84,14 @@ private: // Private attributes
 	/** Starting Row */
 	int startrow;
 	/** Attached Scroll Bar Pointer*/
-	Control * sb;
+	Control* sb;
 	/** Text Colors */
-	Color * palette;
-	Color * initpalette;
-	Color * selected;
-	Color * lineselpal;
+	Color* palette;
+	Color* initpalette;
+	Color* selected;
+	Color* lineselpal;
 	/** Fonts */
-	Font *finit, *ftext;
+	Font* finit, * ftext;
 	void CalcRowCount();
 public: //Events
 	/** Key Press Event */
@@ -102,7 +101,8 @@ public: //Events
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
+		unsigned short Mod);
 };
 
 #endif

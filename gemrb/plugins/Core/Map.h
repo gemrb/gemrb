@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.28 2004/01/18 17:23:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.29 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -65,7 +65,7 @@ typedef struct SongHeaderType {
 } SongHeaderType;
 
 typedef struct WallGroup {
-	Gem_Polygon ** polys;
+	Gem_Polygon** polys;
 	int polygons;
 } WallGroup;
 
@@ -74,46 +74,45 @@ typedef struct Entrance {
 	unsigned int XPos, YPos;
 } Entrance;
 
-class GEM_EXPORT Map : public Scriptable
-{
+class GEM_EXPORT Map : public Scriptable {
 public:
-	TileMap * tm;
-	ImageMgr * LightMap;
-	ImageMgr * SearchMap;
+	TileMap* tm;
+	ImageMgr* LightMap;
+	ImageMgr* SearchMap;
 	bool justCreated;
 private:
-	std::vector<Animation*> animations;
-	std::vector<Actor*> actors;
-	std::vector<WallGroup*> wallGroups;
-	std::vector<ScriptedAnimation*> vvcCells;
-	std::vector<Entrance*> entrances;
-	Actor ** queue[3];
+	std::vector< Animation*> animations;
+	std::vector< Actor*> actors;
+	std::vector< WallGroup*> wallGroups;
+	std::vector< ScriptedAnimation*> vvcCells;
+	std::vector< Entrance*> entrances;
+	Actor** queue[3];
 	int Qcount[3];
 	int lastActorCount[3];
 	void GenerateQueue(int priority);
-	Actor * GetRoot(int priority);
-	void DeleteActor(Actor * actor);
+	Actor* GetRoot(int priority);
+	void DeleteActor(Actor* actor);
 public:
 	Map(void);
 	~Map(void);
 	/** prints useful information on console */
 	void DebugDump();
-	void AddTileMap(TileMap * tm, ImageMgr * lm, ImageMgr * sr);
-	void DrawMap(Region viewport, GameControl * gc);
+	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr);
+	void DrawMap(Region viewport, GameControl* gc);
 	void PlayAreaSong(int);
-	void AddAnimation(Animation * anim);
-	Animation* GetAnimation(const char * Name);
-	void AddActor(Actor *actor);
-	void AddWallGroup(WallGroup * wg);
+	void AddAnimation(Animation* anim);
+	Animation* GetAnimation(const char* Name);
+	void AddActor(Actor* actor);
+	void AddWallGroup(WallGroup* wg);
 	int GetBlocked(int x, int y);
-	Actor * GetActor(int x, int y);
-	Actor * GetActor(const char * Name);
-	void RemoveActor(Actor * actor);
-	int GetActorInRect(Actor ** & actors, Region &rgn);
+	Actor* GetActor(int x, int y);
+	Actor* GetActor(const char* Name);
+	void RemoveActor(Actor* actor);
+	int GetActorInRect(Actor**& actors, Region& rgn);
 	SongHeaderType SongHeader;
-	void AddVVCCell(ScriptedAnimation * vvc);
-	void AddEntrance(char *Name, short XPos, short YPos);
-	Entrance * GetEntrance(char *Name);
+	void AddVVCCell(ScriptedAnimation* vvc);
+	void AddEntrance(char* Name, short XPos, short YPos);
+	Entrance* GetEntrance(char* Name);
 };
 
 #endif

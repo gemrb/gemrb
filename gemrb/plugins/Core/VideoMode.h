@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VideoMode.h,v 1.2 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VideoMode.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -34,12 +34,11 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT VideoMode
-{
+class GEM_EXPORT VideoMode {
 public:
 	VideoMode(void);
 	~VideoMode(void);
-	VideoMode(const VideoMode & vm);
+	VideoMode(const VideoMode& vm);
 	VideoMode(int w, int h, int bpp, bool fs);
 
 private:
@@ -56,8 +55,8 @@ public:
 	int GetBPP(void) const ;
 	void SetFullScreen(bool fs);
 	bool GetFullScreen(void) const;
-	bool operator==(const VideoMode & cpt) const;
-	VideoMode & operator=(const VideoMode & vm);
+	bool operator==(const VideoMode& cpt) const;
+	VideoMode& operator=(const VideoMode& vm);
 };
 
 #endif

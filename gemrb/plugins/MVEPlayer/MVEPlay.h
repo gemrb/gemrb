@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.h,v 1.19 2004/02/24 15:24:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.h,v 1.20 2004/02/24 22:20:40 balrog994 Exp $
  *
  */
 
@@ -30,24 +30,22 @@
 #include <SDL.h>
 #include <SDL_thread.h>
 
-class MVEPlay :	public MoviePlayer
-{
+class MVEPlay : public MoviePlayer {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
 	bool validVideo;
-	static int doPlay(const DataStream *mve);
-	static unsigned int fileRead(void *handle, void *buf, unsigned int count);
-	static void showFrame(unsigned char *buf, unsigned int bufw, unsigned int bufh,
-					  unsigned int sx, unsigned int sy,
-					  unsigned int w, unsigned int h,
-					  unsigned int dstx, unsigned int dsty);
-	static void setPalette(unsigned char *p, unsigned start, unsigned count);
+	static int doPlay(const DataStream* mve);
+	static unsigned int fileRead(void* handle, void* buf, unsigned int count);
+	static void showFrame(unsigned char* buf, unsigned int bufw,
+		unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
+		unsigned int h, unsigned int dstx, unsigned int dsty);
+	static void setPalette(unsigned char* p, unsigned start, unsigned count);
 	static int pollEvents();
 public:
 	MVEPlay(void);
 	~MVEPlay(void);
-	bool Open(DataStream * stream, bool autoFree = true);
+	bool Open(DataStream* stream, bool autoFree = true);
 	int Play();
 public:
 	void release(void)

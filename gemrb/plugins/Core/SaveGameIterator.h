@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.10 2004/02/11 20:39:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.11 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -40,72 +40,90 @@
 
 class GEM_EXPORT SaveGame {
 public:
-	SaveGame(char * path, char * name, char * prefix, int pCount)
+	SaveGame(char* path, char* name, char* prefix, int pCount)
 	{
-		strncpy(Prefix, prefix, sizeof(Prefix) );
-		strncpy(Path, path, sizeof(Path) );
-		strncpy(Name, name, sizeof(Name) );
+		strncpy( Prefix, prefix, sizeof( Prefix ) );
+		strncpy( Path, path, sizeof( Path ) );
+		strncpy( Name, name, sizeof( Name ) );
 		PortraitCount = pCount;
 		char nPath[_MAX_PATH];
 		struct stat my_stat;
-		sprintf(nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix);
+		sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
 #ifndef WIN32
-		ResolveFilePath (nPath);
+		ResolveFilePath( nPath );
 #endif
-		stat(nPath, &my_stat);
-		strftime(Date, _MAX_PATH, "%c",localtime(&my_stat.st_mtime));
+		stat( nPath, &my_stat );
+		strftime( Date, _MAX_PATH, "%c", localtime( &my_stat.st_mtime ) );
 	};
-	~SaveGame() {};
-	int GetPortraitCount() { return PortraitCount; };
-	const char *GetName() { return Name; };
-	const char *GetPrefix() { return Prefix; };
-	const char *GetPath() { return Path; };
-	const char *GetDate() { return Date; };
+	~SaveGame()
+	{
+	};
+	int GetPortraitCount()
+	{
+		return PortraitCount;
+	};
+	const char* GetName()
+	{
+		return Name;
+	};
+	const char* GetPrefix()
+	{
+		return Prefix;
+	};
+	const char* GetPath()
+	{
+		return Path;
+	};
+	const char* GetDate()
+	{
+		return Date;
+	};
 
-	DataStream * GetPortrait(int index)
+	DataStream* GetPortrait(int index)
 	{
-		if(index > PortraitCount)
+		if (index > PortraitCount) {
 			return NULL;
+		}
 		char nPath[_MAX_PATH];
-		sprintf(nPath, "%s%sPORTRT%d.bmp", Path, SPathDelimiter, index);
+		sprintf( nPath, "%s%sPORTRT%d.bmp", Path, SPathDelimiter, index );
 #ifndef WIN32
-		ResolveFilePath (nPath);
+		ResolveFilePath( nPath );
 #endif
-		FileStream * fs = new FileStream();
-		fs->Open(nPath, true);
+		FileStream* fs = new FileStream();
+		fs->Open( nPath, true );
 		return fs;
 	};
-	DataStream * GetScreen()
+	DataStream* GetScreen()
 	{
 		char nPath[_MAX_PATH];
-		sprintf(nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix);
+		sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
 #ifndef WIN32
-		ResolveFilePath (nPath);
+		ResolveFilePath( nPath );
 #endif
-		FileStream * fs = new FileStream();
-		fs->Open(nPath, true);
+		FileStream* fs = new FileStream();
+		fs->Open( nPath, true );
 		return fs;
 	};
-	DataStream * GetGame()
+	DataStream* GetGame()
 	{
 		char nPath[_MAX_PATH];
-		sprintf(nPath, "%s%s%s.gam", Path, SPathDelimiter, Prefix);
+		sprintf( nPath, "%s%s%s.gam", Path, SPathDelimiter, Prefix );
 #ifndef WIN32
-		ResolveFilePath (nPath);
+		ResolveFilePath( nPath );
 #endif
-		FileStream * fs = new FileStream();
-		fs->Open(nPath, true);
+		FileStream* fs = new FileStream();
+		fs->Open( nPath, true );
 		return fs;
 	};
-	DataStream * GetSave()
+	DataStream* GetSave()
 	{
 		char nPath[_MAX_PATH];
-		sprintf(nPath, "%s%s%s.sav", Path, SPathDelimiter, Prefix);
+		sprintf( nPath, "%s%s%s.sav", Path, SPathDelimiter, Prefix );
 #ifndef WIN32
-		ResolveFilePath (nPath);
+		ResolveFilePath( nPath );
 #endif
-		FileStream * fs = new FileStream();
-		fs->Open(nPath, true);
+		FileStream* fs = new FileStream();
+		fs->Open( nPath, true );
 		return fs;
 	};
 private:
@@ -113,16 +131,15 @@ private:
 	char Prefix[10];
 	char Name[_MAX_PATH];
 	char Date[_MAX_PATH];
-	int  PortraitCount;
+	int PortraitCount;
 };
 
-class GEM_EXPORT SaveGameIterator
-{
+class GEM_EXPORT SaveGameIterator {
 public:
 	SaveGameIterator(void);
 	~SaveGameIterator(void);
 	int GetSaveGameCount();
-	SaveGame * GetSaveGame(int index, bool Remove=false);
+	SaveGame* GetSaveGame(int index, bool Remove = false);
 };
 
 #endif

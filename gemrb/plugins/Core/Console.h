@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.h,v 1.3 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.h,v 1.4 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -25,40 +25,38 @@
 #include "Control.h"
 #include "TextArea.h"
 
-class Console :
-	public Control
-{
+class Console : public Control {
 public:
 	Console(void);
 	~Console(void);
 	/** Draws the Console on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	/** Set Font */
-	void SetFont(Font * f);
+	void SetFont(Font* f);
 	/** Set Cursor */
-	void SetCursor(Sprite2D * cur);
+	void SetCursor(Sprite2D* cur);
 	/** Set BackGround */
-	void SetBackGround(Sprite2D * back);
+	void SetBackGround(Sprite2D* back);
 	/** Sets the Text of the current control */
-	int SetText(const char * string, int pos = 0);
+	int SetText(const char* string, int pos = 0);
 	/** Output for Script Messages */
-	TextArea * ta;
+	TextArea* ta;
 private:
 	/** Text Editing Cursor Sprite */
-	Sprite2D * Cursor;
+	Sprite2D* Cursor;
 	/** Text Font */
-	Font * font;
+	Font* font;
 	/** Background */
-	Sprite2D * Back;
+	Sprite2D* Back;
 	/** Max Edit Text Length */
 	unsigned short max;
 	/** Text Buffer */
-	unsigned char * Buffer;
+	unsigned char* Buffer;
 	/** Cursor Position */
 	unsigned short CurPos;
 	/** Color Palette */
-	Color * palette;
-	
+	Color* palette;
+
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

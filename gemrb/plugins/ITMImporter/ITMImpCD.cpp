@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImpCD.cpp,v 1.1 2004/02/15 14:26:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImpCD.cpp,v 1.2 2004/02/24 22:20:41 balrog994 Exp $
  *
  */
 
@@ -30,12 +30,12 @@ ITMImpCD::~ITMImpCD(void)
 {
 }
 
-void * ITMImpCD::Create(void)
+void* ITMImpCD::Create(void)
 {
 	return new ITMImp();
 }
 
-const char * ITMImpCD::ClassName(void)
+const char* ITMImpCD::ClassName(void)
 {
 	return "ITMImp";
 }
@@ -47,6 +47,6 @@ SClass_ID ITMImpCD::SuperClassID(void)
 
 Class_ID ITMImpCD::ClassID(void)
 {
-  // FIXME?????
-	return Class_ID(0x0a8a4123, 0xdfc417de);
+	// FIXME?????
+	return Class_ID( 0x0a8a4123, 0xdfc417de );
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.h,v 1.7 2003/12/19 14:37:56 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.h,v 1.8 2004/02/24 22:20:42 balrog994 Exp $
  *
  */
 
@@ -26,25 +26,24 @@
 
 typedef struct Pair {
 	int val;
-	char * str;
+	char* str;
 } Pair;
 
-class IDSImp : public SymbolMgr
-{
+class IDSImp : public SymbolMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
 
-	std::vector<Pair> pairs;
-	std::vector<char*> ptrs;
+	std::vector< Pair> pairs;
+	std::vector< char*> ptrs;
 
 public:
 	IDSImp(void);
 	~IDSImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
-	long GetValue(const char * txt);
-	char * GetValue(int val);
-	char * GetStringIndex(int Index);
+	bool Open(DataStream* stream, bool autoFree = true);
+	long GetValue(const char* txt);
+	char* GetValue(int val);
+	char* GetStringIndex(int Index);
 	long GetValueIndex(int Index);
 public:
 	void release(void)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImp.cpp,v 1.4 2003/12/15 09:35:41 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImp.cpp,v 1.5 2004/02/24 22:20:41 balrog994 Exp $
  *
  */
 
@@ -31,71 +31,77 @@ INIImp::INIImp(void)
 
 INIImp::~INIImp(void)
 {
-	if(str && autoFree)
-		delete(str);
-	for(unsigned int i = 0; i < tags.size(); i++)
-		delete(tags[i]);
+	if (str && autoFree) {
+		delete( str );
+	}
+	for (unsigned int i = 0; i < tags.size(); i++)
+		delete( tags[i] );
 }
 
-bool INIImp::Open(DataStream * stream, bool autoFree)
+bool INIImp::Open(DataStream* stream, bool autoFree)
 {
-	if(stream == NULL)
+	if (stream == NULL) {
 		return false;
-	if(str && this->autoFree)
-		delete(str);
+	}
+	if (str && this->autoFree) {
+		delete( str );
+	}
 	str = stream;
 	this->autoFree = autoFree;
 	int cnt = 0;
-	char * strbuf = (char*)malloc(4097);
-	INITag * lastTag = NULL;
+	char* strbuf = ( char* ) malloc( 4097 );
+	INITag* lastTag = NULL;
 	do {
-		cnt = str->ReadLine(strbuf, 4096);
-		if(cnt == -1)
+		cnt = str->ReadLine( strbuf, 4096 );
+		if (cnt == -1)
 			break;
-		if(cnt == 0)
+		if (cnt == 0)
 			continue;
-		if(strbuf[0] == ';') //Rem
+		if (strbuf[0] == ';') //Rem
 			continue;
-		if(strbuf[0] == '[') { // this is a tag
-			char * sbptr = strbuf+1;
-			char * TagName = sbptr;
-			while(*sbptr != '\0') {
-				if(*sbptr == ']') {
+		if (strbuf[0] == '[') {
+			// this is a tag
+			char* sbptr = strbuf + 1;
+			char* TagName = sbptr;
+			while (*sbptr != '\0') {
+				if (*sbptr == ']') {
 					*sbptr = 0;
 					break;
 				}
 				sbptr++;
 			}
-			INITag * it = new INITag(TagName);
-			tags.push_back(it);
+			INITag* it = new INITag( TagName );
+			tags.push_back( it );
 			lastTag = it;
 			continue;
 		}
-		if(lastTag == NULL)
+		if (lastTag == NULL)
 			continue;
-		lastTag->AddLine(strbuf);
-	} while(true);
-	free(strbuf);
+		lastTag->AddLine( strbuf );
+	} while (true);
+	free( strbuf );
 	return true;
 }
 
-const char * INIImp::GetKeyAsString(const char * Tag, const char * Key, const char * Default)
+const char* INIImp::GetKeyAsString(const char* Tag, const char* Key,
+	const char* Default)
 {
-	for(unsigned int i = 0; i < tags.size(); i++) {
-		const char * TagName = tags[i]->GetTagName();
-		if(stricmp(TagName, Tag) == 0) {
-			return tags[i]->GetKeyAsString(Key, Default);
+	for (unsigned int i = 0; i < tags.size(); i++) {
+		const char* TagName = tags[i]->GetTagName();
+		if (stricmp( TagName, Tag ) == 0) {
+			return tags[i]->GetKeyAsString( Key, Default );
 		}
 	}
 	return Default;
 }
 
-const int INIImp::GetKetAsInt(const char * Tag, const char * Key, const int Default)
+const int INIImp::GetKetAsInt(const char* Tag, const char* Key,
+	const int Default)
 {
-	for(unsigned int i = 0; i < tags.size(); i++) {
-		const char * TagName = tags[i]->GetTagName();
-		if(stricmp(TagName, Tag) == 0) {
-			return tags[i]->GetKeyAsInt(Key, Default);
+	for (unsigned int i = 0; i < tags.size(); i++) {
+		const char* TagName = tags[i]->GetTagName();
+		if (stricmp( TagName, Tag ) == 0) {
+			return tags[i]->GetKeyAsInt( Key, Default );
 		}
 	}
 	return Default;

@@ -29,12 +29,12 @@ GAMImpCD::~GAMImpCD(void)
 {
 }
 
-void * GAMImpCD::Create(void)
+void* GAMImpCD::Create(void)
 {
 	return new GAMImp();
 }
 
-const char * GAMImpCD::ClassName(void)
+const char* GAMImpCD::ClassName(void)
 {
 	return "GAMImporter";
 }
@@ -46,5 +46,5 @@ SClass_ID GAMImpCD::SuperClassID(void)
 
 Class_ID GAMImpCD::ClassID(void)
 {
-	return Class_ID(0x9a5d7c10, 0xca5a7a43);
+	return Class_ID( 0x9a5d7c10, 0xca5a7a43 );
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.12 2004/02/11 22:34:33 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.13 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -39,7 +39,8 @@
 #include <crtdbg.h>
 #endif
 
-BOOL WINAPI DllEntryPoint( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
+BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD fdwReason,
+	LPVOID lpvReserved)
 {
 	return true;
 }
@@ -68,32 +69,34 @@ BOOL WINAPI DllEntryPoint( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserv
 
 //// Globally used functions
 //returns true if path is an existing directory
-GEM_EXPORT bool dir_exists(const char *path)
+GEM_EXPORT bool dir_exists(const char* path)
 {
-        struct stat buf;
+	struct stat buf;
 
-        buf.st_mode=0;
-        stat(path, &buf);
-        return S_ISDIR(buf.st_mode);
+	buf.st_mode = 0;
+	stat( path, &buf );
+	return S_ISDIR( buf.st_mode );
 }
 
 //returns the length of string (up to a delimiter)
-GEM_EXPORT int strlench(const char *string, char ch)
+GEM_EXPORT int strlench(const char* string, char ch)
 {
 	int i;
-	for(i=0;string[i] && string[i]!=ch;i++);
+	for (i = 0; string[i] && string[i] != ch; i++)
+		;
 	return i;
 }
 
 //// Compatibility functions
 #ifndef HAVE_STRNDUP
-GEM_EXPORT char * strndup(const char * s, int l) 
+GEM_EXPORT char* strndup(const char* s, int l)
 {
-	int len = strlen(s);
-	if(len < l)
+	int len = strlen( s );
+	if (len < l) {
 		l = len;
-	char * string = (char*)malloc(l+1);
-	strncpy(string, s, l);
+	}
+	char* string = ( char* ) malloc( l + 1 );
+	strncpy( string, s, l );
 	string[l] = 0;
 	return string;
 }
@@ -102,98 +105,100 @@ GEM_EXPORT char * strndup(const char * s, int l)
 #ifdef WIN32
 
 #else
-char * FindInDir(char * Dir, char * Filename)
+char* FindInDir(char* Dir, char* Filename)
 {
-        char * fn = NULL;
-        DIR * dir = opendir(Dir);
-        if(dir == NULL)
-                return NULL;
+	char* fn = NULL;
+	DIR* dir = opendir( Dir );
+	if (dir == NULL) {
+		return NULL;
+	}
 
 	// First test if there's a Filename with exactly same name
 	//   and if yes, return it and do not search in the Dir
 	char TempFilePath[_MAX_PATH];
-	strcpy (TempFilePath, Dir);
-	strcat (TempFilePath, SPathDelimiter);
-	strcat (TempFilePath, Filename);
+	strcpy( TempFilePath, Dir );
+	strcat( TempFilePath, SPathDelimiter );
+	strcat( TempFilePath, Filename );
 
-	if (! access (TempFilePath, F_OK))
-	        return strdup (Filename);
+	if (!access( TempFilePath, F_OK )) {
+		return strdup( Filename );
+	}
 
 	// Exact match not found, so try to search for Filename
 	//    with different case
-        struct dirent * de = readdir(dir);
-        if(de == NULL)
-                return NULL;
-        do {
-                if(strcasecmp(de->d_name, Filename ) == 0) {
-                        fn = (char*)malloc(strlen(de->d_name)+1);
-                        strcpy(fn, de->d_name);
-                        break;
-                }
-        } while((de = readdir(dir)) != NULL);
-        closedir(dir);  //No other files in the directory, close it
-        return fn;
+	struct dirent* de = readdir( dir );
+	if (de == NULL) {
+		return NULL;
+	}
+	do {
+		if (strcasecmp( de->d_name, Filename ) == 0) {
+			fn = ( char * ) malloc( strlen( de->d_name ) + 1 );
+			strcpy( fn, de->d_name );
+			break;
+		}
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir );  //No other files in the directory, close it
+	return fn;
 }
 
-char *strupr(char *string)
+char* strupr(char* string)
 {
-        char *s;
-        if(string)
-        {
-                for(s = string; *s; ++s)
-                        *s = toupper(*s);
-        }
-        return string;
+	char* s;
+	if (string) {
+		for (s = string; *s; ++s)
+			*s = toupper( *s );
+	}
+	return string;
 }
 
-char *strlwr(char *string)
+char* strlwr(char* string)
 {
-        char *s;
-        if(string)
-        {
-                for(s = string; *s; ++s)
-                        *s = tolower(*s);
-        }
-        return string;
+	char* s;
+	if (string) {
+		for (s = string; *s; ++s)
+			*s = tolower( *s );
+	}
+	return string;
 }
 
-void ResolveFilePath(char *FilePath)
+void ResolveFilePath(char* FilePath)
 {
 #ifndef WIN32
-        char TempFilePath[_MAX_PATH];
-        char TempFileName[_MAX_PATH];
-        int j, pos;
+	char TempFilePath[_MAX_PATH];
+	char TempFileName[_MAX_PATH];
+	int j, pos;
 
-	if (!core || !core->CaseSensitive) return;
+	if (!core || !core->CaseSensitive) {
+		return;
+	}
 
 
-        TempFilePath[0]=FilePath[0];
-        for(pos=1;FilePath[pos] && FilePath[pos]!='/';pos++)
-                TempFilePath[pos]=FilePath[pos];
-        TempFilePath[pos]=0;
-        while(FilePath[pos]=='/') {
-                pos++;
-                for(j=0;FilePath[pos+j] && FilePath[pos+j]!='/';j++) {
-                        TempFileName[j]=FilePath[pos+j];
-                }
-                TempFileName[j]=0;
-                pos+=j;
-                char *NewName = FindInDir(TempFilePath, TempFileName);
-                if(NewName) {
-                        strcat(TempFilePath, SPathDelimiter);
-                        strcat(TempFilePath, NewName);
-                        free(NewName);
-                }
-                else {
-			if(j)
-	                        return;
-			else {
-				strcat(TempFilePath, SPathDelimiter);
-			}	
+	TempFilePath[0] = FilePath[0];
+	for (pos = 1; FilePath[pos] && FilePath[pos] != '/'; pos++)
+		TempFilePath[pos] = FilePath[pos];
+	TempFilePath[pos] = 0;
+	while (FilePath[pos] == '/') {
+		pos++;
+		for (j = 0; FilePath[pos + j] && FilePath[pos + j] != '/'; j++) {
+			TempFileName[j] = FilePath[pos + j];
 		}
-        }
-        //should work (same size)
-        strcpy(FilePath,TempFilePath);
+		TempFileName[j] = 0;
+		pos += j;
+		char* NewName = FindInDir( TempFilePath, TempFileName );
+		if (NewName) {
+			strcat( TempFilePath, SPathDelimiter );
+			strcat( TempFilePath, NewName );
+			free( NewName );
+		} else {
+			if (j)
+				return;
+			else {
+				strcat( TempFilePath, SPathDelimiter );
+			}
+		}
+	}
+	//should work (same size)
+	strcpy( FilePath, TempFilePath );
 #endif  //! WIN32
 }
 

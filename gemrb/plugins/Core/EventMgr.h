@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.11 2004/01/09 17:44:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.12 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -49,17 +49,16 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT EventMgr
-{
+class GEM_EXPORT EventMgr {
 private:
-	std::vector<Window*> windows;
-	std::vector<int> topwin;
+	std::vector< Window*> windows;
+	std::vector< int> topwin;
 
 public:
 	EventMgr(void);
 	~EventMgr(void);
 	/** Adds a Window to the Event Manager */
-	void AddWindow(Window * win);
+	void AddWindow(Window* win);
 	/** Removes a Window from the Array */
 	void DelWindow(unsigned short WindowID);
 	/** Frees and Removes all the Windows in the Array */
@@ -67,9 +66,11 @@ public:
 	/** BroadCast Mouse Move Event */
 	void MouseMove(unsigned short x, unsigned short y);
 	/** BroadCast Mouse Move Event */
-	void MouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+	void MouseDown(unsigned short x, unsigned short y, unsigned char Button,
+		unsigned short Mod);
 	/** BroadCast Mouse Move Event */
-	void MouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+	void MouseUp(unsigned short x, unsigned short y, unsigned char Button,
+		unsigned short Mod);
 	/** BroadCast Key Press Event */
 	void KeyPress(unsigned char Key, unsigned short Mod);
 	/** BroadCast Key Release Event */
@@ -80,23 +81,24 @@ public:
 	unsigned char MButtons;
 private:
 	/** Last Window under Mouse Pointer*/
-	Window * lastW;
+	Window* lastW;
 	/** Last Focused Control */
-	Control * lastF;
+	Control* lastF;
 	/** Sets a Window on the Top of the Window Queue */
 	void SetOnTop(int Index)
 	{
-		std::vector<int>::iterator t;
-		for(t = topwin.begin(); t != topwin.end(); ++t) {
-			if((*t) == Index) {
-				topwin.erase(t);
+		std::vector< int>::iterator t;
+		for (t = topwin.begin(); t != topwin.end(); ++t) {
+			if (( *t ) == Index) {
+				topwin.erase( t );
 				break;
 			}
 		}
-		if(topwin.size() != 0)
-			topwin.insert(topwin.begin(), Index);
-		else
-			topwin.push_back(Index);
+		if (topwin.size() != 0) {
+			topwin.insert( topwin.begin(), Index );
+		} else {
+			topwin.push_back( Index );
+		}
 	}
 };
 

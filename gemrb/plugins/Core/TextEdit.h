@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.8 2003/11/25 13:48:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.9 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -38,38 +38,37 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT TextEdit : public Control
-{
+class GEM_EXPORT TextEdit : public Control {
 public:
 	TextEdit(unsigned short maxLength);
 	~TextEdit(void);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	/** Set Font */
-	void SetFont(Font * f);
+	void SetFont(Font* f);
 	/** Set Cursor */
-	void SetCursor(Sprite2D * cur);
+	void SetCursor(Sprite2D* cur);
 	/** Set BackGround */
-	void SetBackGround(Sprite2D * back);
+	void SetBackGround(Sprite2D* back);
 	/** Sets the Text of the current control */
-	int SetText(const char * string, int pos = 0);
+	int SetText(const char* string, int pos = 0);
 	/** Sets the Text of the current control */
-	const char *QueryText();
+	const char* QueryText();
 private:
 	/** Text Editing Cursor Sprite */
-	Sprite2D * Cursor;
+	Sprite2D* Cursor;
 	/** Text Font */
-	Font * font;
+	Font* font;
 	/** Background */
-	Sprite2D * Back;
+	Sprite2D* Back;
 	/** Max Edit Text Length */
 	unsigned short max;
 	/** Text Buffer */
-	unsigned char * Buffer;
+	unsigned char* Buffer;
 	/** Cursor Position */
 	unsigned short CurPos;
 	/** Color Palette */
-	Color * palette;
+	Color* palette;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

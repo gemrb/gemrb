@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImpCD.cpp,v 1.2 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImpCD.cpp,v 1.3 2004/02/24 22:20:44 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ p2DAImpCD::~p2DAImpCD(void)
 {
 }
 
-void * p2DAImpCD::Create(void)
+void* p2DAImpCD::Create(void)
 {
 	return new p2DAImp();
 }
@@ -47,7 +47,7 @@ SClass_ID p2DAImpCD::SuperClassID(void)
 
 Class_ID p2DAImpCD::ClassID(void)
 {
-	return Class_ID(0xa36513c6, 0x23755d73);
+	return Class_ID( 0xa36513c6, 0x23755d73 );
 }
 
 const char* p2DAImpCD::InternalName(void)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.2 2004/02/15 23:56:04 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -42,64 +42,64 @@
 
 // the same as SPLFeature
 typedef struct ITMFeature {
-        ieWord Opcode;
-        ieByte Target;
-        ieByte Power;
-        ieDword Parameter1;
-        ieDword Parameter2;
-        ieByte TimingMode;
-        ieByte Resistance;
-        ieDword Duration;
-        ieByte Probability1;
-        ieByte Probability2;
-        ieResRef Resource;
-        ieDword DiceThrown;
-        ieWord DiceSides;
-        ieDword SavingThrowType;
-        ieDword SavingThrowBonus;
-        ieDword unknown;
+	ieWord Opcode;
+	ieByte Target;
+	ieByte Power;
+	ieDword Parameter1;
+	ieDword Parameter2;
+	ieByte TimingMode;
+	ieByte Resistance;
+	ieDword Duration;
+	ieByte Probability1;
+	ieByte Probability2;
+	ieResRef Resource;
+	ieDword DiceThrown;
+	ieWord DiceSides;
+	ieDword SavingThrowType;
+	ieDword SavingThrowBonus;
+	ieDword unknown;
 } ITMFeature;
 
 typedef struct ITMExtHeader {
-        ieByte AttackType;
-        ieByte IDReq;
-        ieByte Location;
-        ieByte unknown1;
-        ieResRef UseIcon;
-        ieByte Target;
-        ieByte TargetNumber;
-        ieWord Range;
-        ieWord ProjectileType;
-        ieWord Speed;
-        ieWord THAC0Bonus;
-        ieWord DiceSides;
-        ieWord DiceThrown;
-        ieWord DamageBonus;
-        ieWord DamageType;
-        ieWord FeatureCount;
-        ieWord FeatureOffset;
-        ieWord Charges;
-        ieWord ChargeDepletion;
-        ieByte UseStrengthBonus;
-        ieByte Recharge;
-        ieWord unknown2;
-        ieWord ProjectileAnimation;
-        ieWord MeleeAnimation[3];
-        ieWord BowArrowQualifier;
-        ieWord CrossbowBoltQualifier;
-        ieWord MiscProjectileQualifier;
+	ieByte AttackType;
+	ieByte IDReq;
+	ieByte Location;
+	ieByte unknown1;
+	ieResRef UseIcon;
+	ieByte Target;
+	ieByte TargetNumber;
+	ieWord Range;
+	ieWord ProjectileType;
+	ieWord Speed;
+	ieWord THAC0Bonus;
+	ieWord DiceSides;
+	ieWord DiceThrown;
+	ieWord DamageBonus;
+	ieWord DamageType;
+	ieWord FeatureCount;
+	ieWord FeatureOffset;
+	ieWord Charges;
+	ieWord ChargeDepletion;
+	ieByte UseStrengthBonus;
+	ieByte Recharge;
+	ieWord unknown2;
+	ieWord ProjectileAnimation;
+	ieWord MeleeAnimation[3];
+	ieWord BowArrowQualifier;
+	ieWord CrossbowBoltQualifier;
+	ieWord MiscProjectileQualifier;
 
-	std::vector<ITMFeature *> features;
+	std::vector< ITMFeature*> features;
 } ITMExtHeader;
 
 
 class GEM_EXPORT Item {
 public:
-        Item ();
-	~Item ();
+	Item();
+	~Item();
 
-	std::vector<ITMExtHeader *> ext_headers;
-	std::vector<ITMFeature *> equipping_features;
+	std::vector< ITMExtHeader*> ext_headers;
+	std::vector< ITMFeature*> equipping_features;
 
 	ieStrRef ItemName;
 	ieStrRef ItemNameIdentified;
@@ -140,9 +140,9 @@ public:
 	// PST and IWD2 only
 	char unknown[26];
 
-	AnimationMgr *ItemIconBAM;
-	AnimationMgr *GroundIconBAM;
-	AnimationMgr *CarriedIconBAM;
+	AnimationMgr* ItemIconBAM;
+	AnimationMgr* GroundIconBAM;
+	AnimationMgr* CarriedIconBAM;
 };
 
 #endif  // ! ITEM_H

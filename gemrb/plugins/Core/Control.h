@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.13 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.14 2004/02/24 22:20:36 balrog994 Exp $
  *
  */
 
@@ -56,7 +56,7 @@ public:
 	/** Draws the Control on the Output Display */
 	virtual void Draw(unsigned short x, unsigned short y) = 0;
 	/** Sets the Text of the current control */
-	virtual int SetText(const char * string, int pos = 0) = 0;
+	virtual int SetText(const char* string, int pos = 0) = 0;
 	/** Variables */
 	char VarName[MAX_VARIABLE_LENGTH];
 	/** the value of the button to add to the variable */
@@ -81,7 +81,7 @@ public: // Public attributes
 	/** Changed Flag */
 	bool Changed;
 	/** Owner Window */
-	void * Owner;
+	void* Owner;
 public: //Events
 	/** Key Press Event */
 	virtual void OnKeyPress(unsigned char Key, unsigned short Mod);
@@ -90,9 +90,11 @@ public: //Events
 	/** Mouse Over Event */
 	virtual void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Button Down */
-	virtual void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+	virtual void OnMouseDown(unsigned short x, unsigned short y,
+		unsigned char Button, unsigned short Mod);
 	/** Mouse Button Up */
-	virtual void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+	virtual void OnMouseUp(unsigned short x, unsigned short y,
+		unsigned char Button, unsigned short Mod);
 	/** Special Key Press */
 	virtual void OnSpecialKeyPress(unsigned char Key);
 };

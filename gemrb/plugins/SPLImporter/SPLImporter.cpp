@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImporter.cpp,v 1.1 2004/02/15 14:26:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImporter.cpp,v 1.2 2004/02/24 22:20:39 balrog994 Exp $
  *
  */
 
@@ -34,32 +34,35 @@
 #ifdef WIN32
 #include <windows.h>
 
-BOOL APIENTRY DllMain( HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved )
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD  ul_reason_for_call,
+	LPVOID lpReserved)
 {
-    return TRUE;
+	return TRUE;
 }
 
 #endif
 
-GEM_EXPORT_DLL int LibNumberClasses() 
-{ 
-	return 1; 
+GEM_EXPORT_DLL int LibNumberClasses()
+{
+	return 1;
 }
 
-GEM_EXPORT_DLL ClassDesc *LibClassDesc(int i) {
-	switch(i) {
-		case 0: 
+GEM_EXPORT_DLL ClassDesc* LibClassDesc(int i)
+{
+	switch (i) {
+		case 0:
 			return &SplImpCD;
-		default: 
+		default:
 			return 0;
 	}
 }
 
-GEM_EXPORT_DLL const char *LibDescription() {
+GEM_EXPORT_DLL const char* LibDescription()
+{
 	return "SPL File Importer";
 }
 
-GEM_EXPORT_DLL unsigned long LibVersion() 
-{ 
-	return VERSION_GEMRB; 
+GEM_EXPORT_DLL unsigned long LibVersion()
+{
+	return VERSION_GEMRB;
 }

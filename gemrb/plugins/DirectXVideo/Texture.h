@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DirectXVideo/Texture.h,v 1.3 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DirectXVideo/Texture.h,v 1.4 2004/02/24 22:20:38 balrog994 Exp $
  *
  */
 
@@ -26,25 +26,35 @@
 #include "../../includes/RGBAColor.h"
 #include "d3d9.h"
 
-class Texture
-{
-	
+class Texture {
 public:
-	Texture() : pTexture(NULL) { Clear(); }
-	Texture(void * pixels, int w, int h, int bpp, void * palette = NULL, bool cK = false, int index = 0) : pTexture(NULL) { Init(pixels, w, h, bpp, palette, cK, index); }
-	~Texture() { Clear(); }
-	void Init (void * pixels, int w, int h, int bpp, void * palette = NULL, bool cK = false, int index = 0);
+	Texture()
+		: pTexture( NULL )
+	{
+		Clear();
+	}
+	Texture(void* pixels, int w, int h, int bpp, void* palette = NULL,
+		bool cK = false, int index = 0)
+		: pTexture( NULL )
+	{
+		Init( pixels, w, h, bpp, palette, cK, index );
+	}
+	~Texture()
+	{
+		Clear();
+	}
+	void Init(void* pixels, int w, int h, int bpp, void* palette = NULL,
+		bool cK = false, int index = 0);
 	void Clear();
 
-	LPDIRECT3DTEXTURE9	pTexture;
+	LPDIRECT3DTEXTURE9 pTexture;
 	int m_Width;
 	int m_Height;
 	int m_Pitch;
-	void * palette;
+	void* palette;
 	bool hasCK;
 	int colorKey;
 	int paletteIndex;
-
 };
 
 #endif

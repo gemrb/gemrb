@@ -32,7 +32,8 @@
 #endif
 
 // abstract iteration position
-struct __POSITION { };
+struct __POSITION {
+};
 typedef __POSITION* POSITION;
 #define BEFORE_START_POSITION ((POSITION)-1L)
 
@@ -40,7 +41,7 @@ typedef __POSITION* POSITION;
   if(!(f))  \
   {  \
   printf("Assertion failed: %s %d",#f, __LINE__); \
-                abort(); \
+				abort(); \
   }
 
 #ifndef WIN32

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.23 2004/01/05 16:00:57 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.24 2004/02/24 22:20:42 balrog994 Exp $
  *
  */
 
@@ -32,35 +32,36 @@ CREImp::CREImp(void)
 
 CREImp::~CREImp(void)
 {
-	if(str && autoFree)
-		delete(str);
+	if (str && autoFree) {
+		delete( str );
+	}
 }
 
-bool CREImp::Open(DataStream * stream, bool autoFree)
+bool CREImp::Open(DataStream* stream, bool autoFree)
 {
-	if(stream == NULL)
+	if (stream == NULL) {
 		return false;
-	if(str && this->autoFree)
-		delete(str);
+	}
+	if (str && this->autoFree) {
+		delete( str );
+	}
 	str = stream;
 	this->autoFree = autoFree;
 	char Signature[8];
-	str->Read(Signature, 8);
-	if(strncmp(Signature, "CRE V1.0", 8) != 0) {
-		if(strncmp(Signature, "CRE V1.2", 8) != 0) {
-			if(strncmp(Signature, "CRE V2.2", 8) != 0) {
-				if(strncmp(Signature, "CRE V9.0", 8) != 0) {
-					printf("[CREImporter]: Not a CRE File or File Version not supported: %8s\n", Signature);
-				}
-				else
+	str->Read( Signature, 8 );
+	if (strncmp( Signature, "CRE V1.0", 8 ) != 0) {
+		if (strncmp( Signature, "CRE V1.2", 8 ) != 0) {
+			if (strncmp( Signature, "CRE V2.2", 8 ) != 0) {
+				if (strncmp( Signature, "CRE V9.0", 8 ) != 0) {
+					printf( "[CREImporter]: Not a CRE File or File Version not supported: %8s\n",
+						Signature );
+				} else
 					CREVersion = IE_CRE_V9_0;
 				return true;
-			}
-			else
+			} else
 				CREVersion = IE_CRE_V2_2;
 			return true;
-		}
-		else
+		} else
 			CREVersion = IE_CRE_V1_2;
 		return true;
 	}
@@ -68,40 +69,40 @@ bool CREImp::Open(DataStream * stream, bool autoFree)
 	return true;
 }
 
-Actor * CREImp::GetActor()
+Actor* CREImp::GetActor()
 {
-	int RandColor = core->LoadTable("RANDCOLR");
-	TableMgr * rndcol = core->GetTable(RandColor);
-	Actor * act = new Actor();
+	int RandColor = core->LoadTable( "RANDCOLR" );
+	TableMgr* rndcol = core->GetTable( RandColor );
+	Actor* act = new Actor();
 	act->InParty = false;
 	unsigned long strref;
-	str->Read(&strref, 4);
-	char * poi = core->GetString(strref);
-	act->SetText(poi, 0);
-	free(poi);
-	str->Read(&strref, 4);
-	poi = core->GetString(strref);
-	act->SetText(poi, 1);
-	free(poi);
-	str->Read(&act->BaseStats[IE_MC_FLAGS], 2);
-	str->Seek(2, GEM_CURRENT_POS);
-	str->Read(&act->BaseStats[IE_XPVALUE], 4);
-	str->Read(&act->BaseStats[IE_XP], 4);
-	str->Read(&act->BaseStats[IE_GOLD], 4);
-	str->Read(&act->BaseStats[IE_STATE_ID], 4);
-	str->Read(&act->BaseStats[IE_HITPOINTS], 2);
-	str->Read(&act->BaseStats[IE_MAXHITPOINTS], 2);
-	str->Read(&act->BaseStats[IE_ANIMATION_ID], 2);
+	str->Read( &strref, 4 );
+	char* poi = core->GetString( strref );
+	act->SetText( poi, 0 );
+	free( poi );
+	str->Read( &strref, 4 );
+	poi = core->GetString( strref );
+	act->SetText( poi, 1 );
+	free( poi );
+	str->Read( &act->BaseStats[IE_MC_FLAGS], 2 );
+	str->Seek( 2, GEM_CURRENT_POS );
+	str->Read( &act->BaseStats[IE_XPVALUE], 4 );
+	str->Read( &act->BaseStats[IE_XP], 4 );
+	str->Read( &act->BaseStats[IE_GOLD], 4 );
+	str->Read( &act->BaseStats[IE_STATE_ID], 4 );
+	str->Read( &act->BaseStats[IE_HITPOINTS], 2 );
+	str->Read( &act->BaseStats[IE_MAXHITPOINTS], 2 );
+	str->Read( &act->BaseStats[IE_ANIMATION_ID], 2 );
 	//str->Seek(2, GEM_CURRENT_POS);
 	unsigned short tmp;
-	str->Read(&tmp, 2);
-	str->Read(&act->BaseStats[IE_METAL_COLOR], 1);
-	str->Read(&act->BaseStats[IE_MINOR_COLOR], 1);
-	str->Read(&act->BaseStats[IE_MAJOR_COLOR], 1);
-	str->Read(&act->BaseStats[IE_SKIN_COLOR], 1);
-	str->Read(&act->BaseStats[IE_LEATHER_COLOR], 1);
-	str->Read(&act->BaseStats[IE_ARMOR_COLOR], 1);
-	str->Read(&act->BaseStats[IE_HAIR_COLOR], 1);
+	str->Read( &tmp, 2 );
+	str->Read( &act->BaseStats[IE_METAL_COLOR], 1 );
+	str->Read( &act->BaseStats[IE_MINOR_COLOR], 1 );
+	str->Read( &act->BaseStats[IE_MAJOR_COLOR], 1 );
+	str->Read( &act->BaseStats[IE_SKIN_COLOR], 1 );
+	str->Read( &act->BaseStats[IE_LEATHER_COLOR], 1 );
+	str->Read( &act->BaseStats[IE_ARMOR_COLOR], 1 );
+	str->Read( &act->BaseStats[IE_HAIR_COLOR], 1 );
 	/*printf("%d %d %d %d %d %d %d\n", act->BaseStats[IE_METAL_COLOR], 
 		act->BaseStats[IE_MINOR_COLOR],
 		act->BaseStats[IE_MAJOR_COLOR],
@@ -109,179 +110,206 @@ Actor * CREImp::GetActor()
 		act->BaseStats[IE_LEATHER_COLOR],
 		act->BaseStats[IE_ARMOR_COLOR],
 		act->BaseStats[IE_HAIR_COLOR]);*/
-	if(act->BaseStats[IE_METAL_COLOR] >= 200) {
-		act->BaseStats[IE_METAL_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_METAL_COLOR]-200));
+	if (act->BaseStats[IE_METAL_COLOR] >= 200) {
+		act->BaseStats[IE_METAL_COLOR] = atoi( rndcol->QueryField( ( rand() %
+			10 ) +
+														1,
+														act->BaseStats[IE_METAL_COLOR] -
+														200 ) );
 	}
-	if(act->BaseStats[IE_MINOR_COLOR] >= 200) {
-		act->BaseStats[IE_MINOR_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_MINOR_COLOR]-200));
+	if (act->BaseStats[IE_MINOR_COLOR] >= 200) {
+		act->BaseStats[IE_MINOR_COLOR] = atoi( rndcol->QueryField( ( rand() %
+			10 ) +
+														1,
+														act->BaseStats[IE_MINOR_COLOR] -
+														200 ) );
 	}
-	if(act->BaseStats[IE_MAJOR_COLOR] >= 200) {
-		act->BaseStats[IE_MAJOR_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_MAJOR_COLOR]-200));
+	if (act->BaseStats[IE_MAJOR_COLOR] >= 200) {
+		act->BaseStats[IE_MAJOR_COLOR] = atoi( rndcol->QueryField( ( rand() %
+			10 ) +
+														1,
+														act->BaseStats[IE_MAJOR_COLOR] -
+														200 ) );
 	}
-	if(act->BaseStats[IE_SKIN_COLOR] >= 200) {
-		act->BaseStats[IE_SKIN_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_SKIN_COLOR]-200));
+	if (act->BaseStats[IE_SKIN_COLOR] >= 200) {
+		act->BaseStats[IE_SKIN_COLOR] = atoi( rndcol->QueryField( ( rand() %
+			10 ) +
+														1,
+														act->BaseStats[IE_SKIN_COLOR] -
+														200 ) );
 	}
-	if(act->BaseStats[IE_LEATHER_COLOR] >= 200) {
-		act->BaseStats[IE_LEATHER_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_LEATHER_COLOR]-200));
+	if (act->BaseStats[IE_LEATHER_COLOR] >= 200) {
+		act->BaseStats[IE_LEATHER_COLOR] = atoi( rndcol->QueryField( ( rand() %
+			10 ) +
+															1,
+															act->BaseStats[IE_LEATHER_COLOR] -
+															200 ) );
 	}
-	if(act->BaseStats[IE_ARMOR_COLOR] >= 200) {
-		act->BaseStats[IE_ARMOR_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_ARMOR_COLOR]-200));
+	if (act->BaseStats[IE_ARMOR_COLOR] >= 200) {
+		act->BaseStats[IE_ARMOR_COLOR] = atoi( rndcol->QueryField( ( rand() %
+			10 ) +
+														1,
+														act->BaseStats[IE_ARMOR_COLOR] -
+														200 ) );
 	}
-	if(act->BaseStats[IE_HAIR_COLOR] >= 200) {
-		act->BaseStats[IE_HAIR_COLOR] = atoi(rndcol->QueryField((rand()%10)+1, act->BaseStats[IE_HAIR_COLOR]-200));
+	if (act->BaseStats[IE_HAIR_COLOR] >= 200) {
+		act->BaseStats[IE_HAIR_COLOR] = atoi( rndcol->QueryField( ( rand() %
+			10 ) +
+														1,
+														act->BaseStats[IE_HAIR_COLOR] -
+														200 ) );
 	}
 
 	unsigned char TotSCEFF;
-	str->Read(&TotSCEFF, 1);
-	str->Read(act->SmallPortrait, 8);
+	str->Read( &TotSCEFF, 1 );
+	str->Read( act->SmallPortrait, 8 );
 	act->SmallPortrait[8] = 0;
-	str->Read(act->LargePortrait, 8);
+	str->Read( act->LargePortrait, 8 );
 	act->LargePortrait[8] = 0;
-	str->Read(&act->BaseStats[IE_REPUTATION], 1);
-	str->Read(&act->BaseStats[IE_HIDEINSHADOWS], 1);
-	str->Read(&act->BaseStats[IE_ARMORCLASS], 2);
-	str->Read(&act->Modified[IE_ARMORCLASS], 2);
-	str->Read(&act->BaseStats[IE_ACCRUSHINGMOD], 2);
-	str->Read(&act->BaseStats[IE_ACMISSILEMOD], 2);
-	str->Read(&act->BaseStats[IE_ACPIERCINGMOD], 2);
-	str->Read(&act->BaseStats[IE_ACSLASHINGMOD], 2);
-	str->Read(&act->BaseStats[IE_THAC0], 1);			//Unknown in CRE V2.2
-	str->Read(&act->BaseStats[IE_NUMBEROFATTACKS], 1);	//Unknown in CRE V2.2
-	str->Read(&act->BaseStats[IE_SAVEVSDEATH], 1);		//Fortitude Save in V2.2
-	str->Read(&act->BaseStats[IE_SAVEVSWANDS], 1);		//Reflex Save in V2.2
-	str->Read(&act->BaseStats[IE_SAVEVSPOLY], 1);		//Will Save in V2.2
-	str->Read(&act->BaseStats[IE_SAVEVSBREATH], 1);		//Unused in V2.2
-	str->Read(&act->BaseStats[IE_SAVEVSSPELL], 1);		//Unused in V2.2
-	str->Read(&act->BaseStats[IE_RESISTFIRE], 1);		
-	str->Read(&act->BaseStats[IE_RESISTCOLD], 1);
-	str->Read(&act->BaseStats[IE_RESISTELECTRICITY], 1);
-	str->Read(&act->BaseStats[IE_RESISTACID], 1);
-	str->Read(&act->BaseStats[IE_RESISTMAGIC], 1);
-	str->Read(&act->BaseStats[IE_RESISTMAGICFIRE], 1);
-	str->Read(&act->BaseStats[IE_RESISTMAGICCOLD], 1);
-	str->Read(&act->BaseStats[IE_RESISTSLASHING], 1);
-	str->Read(&act->BaseStats[IE_RESISTCRUSHING], 1);
-	str->Read(&act->BaseStats[IE_RESISTPIERCING], 1);
-	str->Read(&act->BaseStats[IE_RESISTMISSILE], 1);
-	str->Read(&act->BaseStats[IE_DETECTILLUSIONS], 1);
-	str->Read(&act->BaseStats[IE_SETTRAPS], 1);
-	str->Read(&act->BaseStats[IE_LORE], 1);
-	str->Read(&act->BaseStats[IE_LOCKPICKING], 1);
-	str->Read(&act->BaseStats[IE_STEALTH], 1);
-	str->Read(&act->BaseStats[IE_TRAPS], 1);
-	str->Read(&act->BaseStats[IE_PICKPOCKET], 1);
-	str->Read(&act->BaseStats[IE_FATIGUE], 1);
-	str->Read(&act->BaseStats[IE_INTOXICATION], 1);
-	str->Read(&act->BaseStats[IE_LUCK], 1);
-	switch(CREVersion) {
+	str->Read( &act->BaseStats[IE_REPUTATION], 1 );
+	str->Read( &act->BaseStats[IE_HIDEINSHADOWS], 1 );
+	str->Read( &act->BaseStats[IE_ARMORCLASS], 2 );
+	str->Read( &act->Modified[IE_ARMORCLASS], 2 );
+	str->Read( &act->BaseStats[IE_ACCRUSHINGMOD], 2 );
+	str->Read( &act->BaseStats[IE_ACMISSILEMOD], 2 );
+	str->Read( &act->BaseStats[IE_ACPIERCINGMOD], 2 );
+	str->Read( &act->BaseStats[IE_ACSLASHINGMOD], 2 );
+	str->Read( &act->BaseStats[IE_THAC0], 1 );			//Unknown in CRE V2.2
+	str->Read( &act->BaseStats[IE_NUMBEROFATTACKS], 1 );	//Unknown in CRE V2.2
+	str->Read( &act->BaseStats[IE_SAVEVSDEATH], 1 );		//Fortitude Save in V2.2
+	str->Read( &act->BaseStats[IE_SAVEVSWANDS], 1 );		//Reflex Save in V2.2
+	str->Read( &act->BaseStats[IE_SAVEVSPOLY], 1 );		//Will Save in V2.2
+	str->Read( &act->BaseStats[IE_SAVEVSBREATH], 1 );		//Unused in V2.2
+	str->Read( &act->BaseStats[IE_SAVEVSSPELL], 1 );		//Unused in V2.2
+	str->Read( &act->BaseStats[IE_RESISTFIRE], 1 );		
+	str->Read( &act->BaseStats[IE_RESISTCOLD], 1 );
+	str->Read( &act->BaseStats[IE_RESISTELECTRICITY], 1 );
+	str->Read( &act->BaseStats[IE_RESISTACID], 1 );
+	str->Read( &act->BaseStats[IE_RESISTMAGIC], 1 );
+	str->Read( &act->BaseStats[IE_RESISTMAGICFIRE], 1 );
+	str->Read( &act->BaseStats[IE_RESISTMAGICCOLD], 1 );
+	str->Read( &act->BaseStats[IE_RESISTSLASHING], 1 );
+	str->Read( &act->BaseStats[IE_RESISTCRUSHING], 1 );
+	str->Read( &act->BaseStats[IE_RESISTPIERCING], 1 );
+	str->Read( &act->BaseStats[IE_RESISTMISSILE], 1 );
+	str->Read( &act->BaseStats[IE_DETECTILLUSIONS], 1 );
+	str->Read( &act->BaseStats[IE_SETTRAPS], 1 );
+	str->Read( &act->BaseStats[IE_LORE], 1 );
+	str->Read( &act->BaseStats[IE_LOCKPICKING], 1 );
+	str->Read( &act->BaseStats[IE_STEALTH], 1 );
+	str->Read( &act->BaseStats[IE_TRAPS], 1 );
+	str->Read( &act->BaseStats[IE_PICKPOCKET], 1 );
+	str->Read( &act->BaseStats[IE_FATIGUE], 1 );
+	str->Read( &act->BaseStats[IE_INTOXICATION], 1 );
+	str->Read( &act->BaseStats[IE_LUCK], 1 );
+	switch (CREVersion) {
 		case IE_CRE_V1_0:
-			{
-			str->Read(&act->BaseStats[IE_PROFICIENCYLONGSWORD], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYSHORTSWORD], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYLONGBOW], 1);	//Generic Bow
-			str->Read(&act->BaseStats[IE_PROFICIENCYSPEAR], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYMACE], 1);		//Blunt Weapons
-			str->Read(&act->BaseStats[IE_PROFICIENCYFLAILMORNINGSTAR], 1);	//Spiked Weapons
-			str->Read(&act->BaseStats[IE_PROFICIENCYAXE], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYDART], 1);		//Missile Weapons
-			str->Seek(13, GEM_CURRENT_POS);
+			 {
+				str->Read( &act->BaseStats[IE_PROFICIENCYLONGSWORD], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYSHORTSWORD], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYLONGBOW], 1 );	//Generic Bow
+				str->Read( &act->BaseStats[IE_PROFICIENCYSPEAR], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYMACE], 1 );		//Blunt Weapons
+				str->Read( &act->BaseStats[IE_PROFICIENCYFLAILMORNINGSTAR], 1 );	//Spiked Weapons
+				str->Read( &act->BaseStats[IE_PROFICIENCYAXE], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYDART], 1 );		//Missile Weapons
+				str->Seek( 13, GEM_CURRENT_POS );
 			}
-		break;
+			break;
 
 		case IE_CRE_V1_2:
-			{
-			str->Read(&act->BaseStats[IE_PROFICIENCYMARTIALARTS], 1);	//Fist
-			str->Read(&act->BaseStats[IE_PROFICIENCYLONGSWORD], 1);		//Edged
-			str->Read(&act->BaseStats[IE_PROFICIENCYWARHAMMER], 1);		//Hammer
-			str->Read(&act->BaseStats[IE_PROFICIENCYAXE], 1);			//Axe
-			str->Read(&act->BaseStats[IE_PROFICIENCYQUARTERSTAFF], 1);	//Club
-			str->Read(&act->BaseStats[IE_PROFICIENCYLONGBOW], 1);		//Bow
-			str->Seek(15, GEM_CURRENT_POS);
+			 {
+				str->Read( &act->BaseStats[IE_PROFICIENCYMARTIALARTS], 1 );	//Fist
+				str->Read( &act->BaseStats[IE_PROFICIENCYLONGSWORD], 1 );		//Edged
+				str->Read( &act->BaseStats[IE_PROFICIENCYWARHAMMER], 1 );		//Hammer
+				str->Read( &act->BaseStats[IE_PROFICIENCYAXE], 1 );			//Axe
+				str->Read( &act->BaseStats[IE_PROFICIENCYQUARTERSTAFF], 1 );	//Club
+				str->Read( &act->BaseStats[IE_PROFICIENCYLONGBOW], 1 );		//Bow
+				str->Seek( 15, GEM_CURRENT_POS );
 			}
-		break;
+			break;
 
 		case IE_CRE_V2_2:
-			{
-				str->Seek(13,GEM_CURRENT_POS);
+			 {
+				str->Seek( 13, GEM_CURRENT_POS );
 			}
-		break;
+			break;
 
 		case IE_CRE_V9_0:
-			{
-			str->Read(&act->BaseStats[IE_PROFICIENCYLONGSWORD], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYSHORTSWORD], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYLONGBOW], 1);		//Bows
-			str->Read(&act->BaseStats[IE_PROFICIENCYSPEAR], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYAXE], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYDART], 1);			//Missile
-			str->Read(&act->BaseStats[IE_PROFICIENCYBASTARDSWORD], 1);  //Great Sword
-			str->Read(&act->BaseStats[IE_PROFICIENCYDAGGER], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYHALBERD], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYMACE], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYFLAILMORNINGSTAR], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYWARHAMMER], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYQUARTERSTAFF], 1);
-			str->Read(&act->BaseStats[IE_PROFICIENCYCROSSBOW], 1);
-			str->Seek(6, GEM_CURRENT_POS);
+			 {
+				str->Read( &act->BaseStats[IE_PROFICIENCYLONGSWORD], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYSHORTSWORD], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYLONGBOW], 1 );		//Bows
+				str->Read( &act->BaseStats[IE_PROFICIENCYSPEAR], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYAXE], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYDART], 1 );			//Missile
+				str->Read( &act->BaseStats[IE_PROFICIENCYBASTARDSWORD], 1 );  //Great Sword
+				str->Read( &act->BaseStats[IE_PROFICIENCYDAGGER], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYHALBERD], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYMACE], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYFLAILMORNINGSTAR], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYWARHAMMER], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYQUARTERSTAFF], 1 );
+				str->Read( &act->BaseStats[IE_PROFICIENCYCROSSBOW], 1 );
+				str->Seek( 6, GEM_CURRENT_POS );
 			}
-		break;
+			break;
 	}
-	str->Read(&act->BaseStats[IE_TRACKING],1);
-	str->Seek(32,GEM_CURRENT_POS);
-	str->Read(&act->StrRefs[0],100*4);
-	str->Read(&act->BaseStats[IE_LEVEL],1);
-	str->Read(&act->BaseStats[IE_LEVEL2],1);
-	str->Read(&act->BaseStats[IE_LEVEL3],1);
-	str->Seek(1,GEM_CURRENT_POS);
-	str->Read(&act->BaseStats[IE_STR],1);
-	str->Read(&act->BaseStats[IE_STREXTRA],1);
-	str->Read(&act->BaseStats[IE_INT],1);
-	str->Read(&act->BaseStats[IE_WIS],1);
-	str->Read(&act->BaseStats[IE_DEX],1);
-	str->Read(&act->BaseStats[IE_CON],1);
-	str->Read(&act->BaseStats[IE_CHR],1);
-	str->Read(&act->Modified[IE_MORALEBREAK],1);
-	str->Read(&act->BaseStats[IE_MORALEBREAK],1);
-	str->Read(&act->BaseStats[IE_HATEDRACE],1);
-	str->Read(&act->BaseStats[IE_MORALERECOVERYTIME],1);
-	str->Seek(1,GEM_CURRENT_POS);
-	str->Read(&act->BaseStats[IE_KIT],4);
-	for(int i = 0; i < 5; i++) {
+	str->Read( &act->BaseStats[IE_TRACKING], 1 );
+	str->Seek( 32, GEM_CURRENT_POS );
+	str->Read( &act->StrRefs[0], 100 * 4 );
+	str->Read( &act->BaseStats[IE_LEVEL], 1 );
+	str->Read( &act->BaseStats[IE_LEVEL2], 1 );
+	str->Read( &act->BaseStats[IE_LEVEL3], 1 );
+	str->Seek( 1, GEM_CURRENT_POS );
+	str->Read( &act->BaseStats[IE_STR], 1 );
+	str->Read( &act->BaseStats[IE_STREXTRA], 1 );
+	str->Read( &act->BaseStats[IE_INT], 1 );
+	str->Read( &act->BaseStats[IE_WIS], 1 );
+	str->Read( &act->BaseStats[IE_DEX], 1 );
+	str->Read( &act->BaseStats[IE_CON], 1 );
+	str->Read( &act->BaseStats[IE_CHR], 1 );
+	str->Read( &act->Modified[IE_MORALEBREAK], 1 );
+	str->Read( &act->BaseStats[IE_MORALEBREAK], 1 );
+	str->Read( &act->BaseStats[IE_HATEDRACE], 1 );
+	str->Read( &act->BaseStats[IE_MORALERECOVERYTIME], 1 );
+	str->Seek( 1, GEM_CURRENT_POS );
+	str->Read( &act->BaseStats[IE_KIT], 4 );
+	for (int i = 0; i < 5; i++) {
 		char aScript[9];
-		str->Read(aScript,8);
+		str->Read( aScript, 8 );
 		aScript[8] = 0;
-		if((stricmp(aScript, "None") == 0) || (aScript[0] == '\0')) {
+		if (( stricmp( aScript, "None" ) == 0 ) || ( aScript[0] == '\0' )) {
 			act->Scripts[i] = NULL;
 			continue;
 		}
-		act->Scripts[i] = new GameScript(aScript, 0, act->locals);
+		act->Scripts[i] = new GameScript( aScript, 0, act->locals );
 		act->Scripts[i]->MySelf = act;
 	}
-	switch(CREVersion) {
+	switch (CREVersion) {
 		case IE_CRE_V1_2:
-			str->Seek(162, GEM_CURRENT_POS);
-			str->Read(&act->BaseStats[IE_TEAM], 1);
-			str->Read(&act->BaseStats[IE_FACTION], 1);
-		break;
+			str->Seek( 162, GEM_CURRENT_POS );
+			str->Read( &act->BaseStats[IE_TEAM], 1 );
+			str->Read( &act->BaseStats[IE_FACTION], 1 );
+			break;
 
 		default:
-
-		break;
+			break;
 	}
-	str->Read(&act->BaseStats[IE_EA], 1);
-	str->Read(&act->BaseStats[IE_GENERAL], 1);
-	str->Read(&act->BaseStats[IE_RACE], 1);
-	str->Read(&act->BaseStats[IE_CLASS], 1);
-	str->Read(&act->BaseStats[IE_SPECIFIC], 1);
-	str->Read(&act->BaseStats[IE_SEX], 1);
-	str->Seek(5,GEM_CURRENT_POS);
-	str->Read(&act->BaseStats[IE_ALIGNMENT], 1);
-	str->Seek(4,GEM_CURRENT_POS);
-	str->Read(act->scriptName, 32);
-	str->Seek(44,GEM_CURRENT_POS);
-	str->Read(act->Dialog, 8);
+	str->Read( &act->BaseStats[IE_EA], 1 );
+	str->Read( &act->BaseStats[IE_GENERAL], 1 );
+	str->Read( &act->BaseStats[IE_RACE], 1 );
+	str->Read( &act->BaseStats[IE_CLASS], 1 );
+	str->Read( &act->BaseStats[IE_SPECIFIC], 1 );
+	str->Read( &act->BaseStats[IE_SEX], 1 );
+	str->Seek( 5, GEM_CURRENT_POS );
+	str->Read( &act->BaseStats[IE_ALIGNMENT], 1 );
+	str->Seek( 4, GEM_CURRENT_POS );
+	str->Read( act->scriptName, 32 );
+	str->Seek( 44, GEM_CURRENT_POS );
+	str->Read( act->Dialog, 8 );
 	act->BaseStats[IE_ARMOR_TYPE] = 0;
-	act->SetAnimationID((unsigned short)act->BaseStats[IE_ANIMATION_ID]);
+	act->SetAnimationID( ( unsigned short ) act->BaseStats[IE_ANIMATION_ID] );
 	/*if(act->anims)
 		act->anims->DrawCircle = false;*/
 

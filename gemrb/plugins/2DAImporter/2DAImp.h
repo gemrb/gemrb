@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.14 2003/12/15 09:38:59 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.15 2004/02/24 22:20:44 balrog994 Exp $
  *
  */
 
@@ -25,79 +25,91 @@
 #include "../Core/TableMgr.h"
 #include "../../includes/globals.h"
 
-typedef std::vector<char *> RowEntry;
+typedef std::vector< char*> RowEntry;
 
-class p2DAImp : public TableMgr
-{
+class p2DAImp : public TableMgr {
 private:
-	DataStream * str;
+	DataStream* str;
 	bool autoFree;
-	std::vector<char *> colNames;
-	std::vector<char *> rowNames;
-	std::vector<char *> ptrs;
-	std::vector<RowEntry> rows;
+	std::vector< char*> colNames;
+	std::vector< char*> rowNames;
+	std::vector< char*> ptrs;
+	std::vector< RowEntry> rows;
 	char defVal[32];
 public:
 	p2DAImp(void);
 	~p2DAImp(void);
-	bool Open(DataStream * stream, bool autoFree = true);
+	bool Open(DataStream* stream, bool autoFree = true);
 	/** Returns the actual number of Rows in the Table */
-	inline int GetRowCount() { return (int)rows.size(); }
+	inline int GetRowCount()
+	{
+		return ( int ) rows.size();
+	}
 	/** Returns the actual number of Columns in the Table */
 	inline int GetColumnCount()
-        {
-        	if(rows.size()<=0) return 0;
-			return (int)rows[0].size();
-        }
-	/** Returns a pointer to a zero terminated 2da element,
-        0,0 returns the default value, it may return NULL */
-    inline char *QueryField(unsigned int row = 0, unsigned int column = 0) const
 	{
-		if(rows.size()<=row) return (char*)defVal;
-		if(rows[row].size()<=column) return (char*)defVal;
+		if (rows.size() <= 0) {
+			return 0;
+		}
+		return ( int ) rows[0].size();
+	}
+	/** Returns a pointer to a zero terminated 2da element,
+		   0,0 returns the default value, it may return NULL */
+	inline char* QueryField(unsigned int row = 0, unsigned int column = 0) const
+	{
+		if (rows.size() <= row) {
+			return ( char * ) defVal;
+		}
+		if (rows[row].size() <= column) {
+			return ( char * ) defVal;
+		}
 		return rows[row][column];
 	};
 	/** Returns a pointer to a zero terminated 2da element,
-      uses column name and row name to search the field,
+		 uses column name and row name to search the field,
 	  may return NULL */
-	inline char *QueryField(const char* row, const char* column) const
+	inline char* QueryField(const char* row, const char* column) const
 	{
 		int rowi = -1, coli = -1;
-		for(unsigned int i = 0; i < rowNames.size(); i++) {
-			if(stricmp(rowNames[i], row) == 0) {
+		for (unsigned int i = 0; i < rowNames.size(); i++) {
+			if (stricmp( rowNames[i], row ) == 0) {
 				rowi = i;
 				break;
 			}
 		}
-		if(rowi == -1)
-			return (char*)defVal;
-		for(unsigned int i = 0; i < colNames.size(); i++) {
-			if(stricmp(colNames[i], column) == 0) {
+		if (rowi == -1) {
+			return ( char * ) defVal;
+		}
+		for (unsigned int i = 0; i < colNames.size(); i++) {
+			if (stricmp( colNames[i], column ) == 0) {
 				coli = i;
 				break;
 			}
 		}
-		if(coli == -1)
-			return (char*)defVal;
-		if(rows[rowi].size() <= (unsigned int)coli)
-			return (char*)defVal;
+		if (coli == -1) {
+			return ( char * ) defVal;
+		}
+		if (rows[rowi].size() <= ( unsigned int ) coli) {
+			return ( char * ) defVal;
+		}
 		return rows[rowi][coli];
 	};
 
-	inline int GetRowIndex(const char *string) const
+	inline int GetRowIndex(const char* string) const
 	{
-		for(unsigned int index = 0; index<rowNames.size(); index++) {
-			if(stricmp(rowNames[index],string) == 0) {
+		for (unsigned int index = 0; index < rowNames.size(); index++) {
+			if (stricmp( rowNames[index], string ) == 0) {
 				return index;
 			}
 		}
 		return -1;
 	};
 
-	inline char *GetRowName(unsigned int index) const
+	inline char* GetRowName(unsigned int index) const
 	{
-		if(index < rowNames.size())
+		if (index < rowNames.size()) {
 			return rowNames[index];
+		}
 		return NULL;
 	};
 public:

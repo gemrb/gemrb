@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImpCD.cpp,v 1.2 2003/11/25 13:48:01 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/INIImporter/INIImpCD.cpp,v 1.3 2004/02/24 22:20:41 balrog994 Exp $
  *
  */
 
@@ -30,7 +30,7 @@ INIImpCD::~INIImpCD(void)
 {
 }
 
-void * INIImpCD::Create(void)
+void* INIImpCD::Create(void)
 {
 	return new INIImp();
 }
@@ -47,7 +47,7 @@ SClass_ID INIImpCD::SuperClassID(void)
 
 Class_ID INIImpCD::ClassID(void)
 {
-	return Class_ID(0x581ad362, 0x770acd3e);
+	return Class_ID( 0x581ad362, 0x770acd3e );
 }
 
 const char* INIImpCD::InternalName(void)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlayerDesc.h,v 1.2 2003/11/25 13:48:00 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlayerDesc.h,v 1.3 2004/02/24 22:20:40 balrog994 Exp $
  *
  */
 
@@ -25,12 +25,11 @@
 #include "../../includes/globals.h"
 #include "../Core/ClassDesc.h"
 
-class MVEPlayerDesc : public ClassDesc
-{
+class MVEPlayerDesc : public ClassDesc {
 public:
 	MVEPlayerDesc(void);
 	~MVEPlayerDesc(void);
-	void * Create(void);
+	void* Create(void);
 	const char* ClassName(void);
 	SClass_ID SuperClassID(void);
 	Class_ID ClassID(void);
