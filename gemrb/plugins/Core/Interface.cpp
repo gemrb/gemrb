@@ -117,6 +117,9 @@ Interface::~Interface(void)
 	FreeResourceVector(Character, sheets);
 	delete(console);
 	delete(plugin);
+
+	//TODO: Clean the Cache and leave only .bif files
+
 }
 
 
@@ -710,24 +713,38 @@ int Interface::SetText(unsigned short WindowIndex, unsigned short ControlIndex, 
 }
 
 /** Set a Window Visible Flag */
-int Interface::SetVisible(unsigned short WindowIndex, bool visible)
+int Interface::SetVisible(unsigned short WindowIndex, int visible)
 {
 	if(WindowIndex >= windows.size())
 		return -1;
 	Window * win = windows[WindowIndex];
 	if(win==NULL)
 		return -1;
-	win->Visible = visible;
-	if(win->Visible) {
-		evntmgr->AddWindow(win);
-		win->Invalidate();
-		SetOnTop(WindowIndex);
-	}
-	else {
-		Region r(win->XPos, win->YPos, win->Width, win->Height);
-		Color black = {0, 0, 0, 128};
-		evntmgr->DelWindow(win->WindowID);
-		video->DrawRect(r, black);
+	switch(visible) {
+		case 0:
+		case 2:
+			{
+			win->Visible = false;
+			Region r(win->XPos, win->YPos, win->Width, win->Height);
+			Color black = {0, 0, 0, 128};
+			evntmgr->DelWindow(win->WindowID);
+			if(visible == 2)
+				video->DrawRect(r, black);
+			}
+		break;
+
+		case 1:
+			{
+			win->Visible = true;
+			evntmgr->AddWindow(win);
+			win->Invalidate();
+			SetOnTop(WindowIndex);
+			}
+		break;
+
+		default:
+			win->Visible = visible;
+		break;
 	}
 	return 0;
 }
