@@ -14,6 +14,7 @@ TotLabel = 0
 AcLabel = 0
 HpLabel = 0
 
+StatTable = 0
 Str = 0
 Dex = 0
 Con = 0
@@ -27,7 +28,6 @@ strings = ("30","60","90","99","00")
 extras = (30,60,90,99,100)
 
 IE_HITPOINTS =		0
-IE_SEX =        	35
 IE_STR =                36
 IE_STREXTRA =           37
 IE_INT =                38
@@ -35,12 +35,6 @@ IE_WIS =                39
 IE_DEX =                40
 IE_CON =                41
 IE_CHR =                42
-IE_XP =                 44
-IE_GOLD =               45
-IE_HATEDRACE =  	49
-IE_KIT =        	152
-IE_RACE =       	201
-IE_CLASS =		202
 IE_METAL_COLOR =	208
 IE_MINOR_COLOR =	209
 IE_MAJOR_COLOR =	210
@@ -48,16 +42,16 @@ IE_SKIN_COLOR = 	211
 IE_LEATHER_COLOR = 	212
 IE_ARMOR_COLOR = 	213
 IE_HAIR_COLOR =		214
-IE_ALIGNMENT =  	217
 
 def OnLoad():
-	global NewLifeWindow, QuitWindow
+	global NewLifeWindow, QuitWindow, StatTable
 	global TotPoints, AcPoints, HpPoints
 	global Str, Dex, Con, Wis, Int, Cha
 	global TotLabel, AcLabel, HpLabel
 	global StrLabel, DexLabel, ConLabel, WisLabel, IntLabel, ChaLabel
 	global TextArea
 
+	StatTable = GemRB.LoadTable("abcomm")
 	GemRB.LoadWindowPack("GUICG")
 	#setting up confirmation window
 	QuitWindow = GemRB.LoadWindow(1)
@@ -250,7 +244,6 @@ def UpdateLabels():
 	GemRB.SetText(NewLifeWindow, AcLabel, str(AcPoints))
 	GemRB.SetText(NewLifeWindow, HpLabel, str(HpPoints))
 	GemRB.InvalidateWindow(NewLifeWindow)
-	#GemRB.DrawWindows()
 	return
 	
 def OkButton():
@@ -274,7 +267,7 @@ def AcceptPress():
 		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,0)
 	else:
 		GemRB.SetPlayerStat(MyChar, IE_STR, 18)
-		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,extras[Str-18])
+		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,extras[Str-19])
 
 	GemRB.SetPlayerStat(MyChar, IE_INT, Int)
 	GemRB.SetPlayerStat(MyChar, IE_WIS, Wis)
@@ -297,26 +290,50 @@ def CancelPress():
 
 def StrPress():
 	GemRB.SetText(NewLifeWindow, TextArea, 18489)
+	Table = GemRB.LoadTable("strmod")
+	TableEx = GemRB.LoadTable("strmodex")
+	s = Str;
+	if s>18:
+		e=extras[s-19]
+		s=18
+	else:
+		e=0
+
+	print s, e
+	x = GemRB.GetTableValue(Table,s,0) + GemRB.GetTableValue(TableEx, e,0)
+	y = GemRB.GetTableValue(Table,s,1) + GemRB.GetTableValue(TableEx, e,1)
+	if e>60:
+		s=19
+	GemRB.TextAreaAppend(NewLifeWindow, TextArea,"\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,s,0),x,y) )
 	return
 
 def IntPress():
 	GemRB.SetText(NewLifeWindow, TextArea, 18488)
+	GemRB.TextAreaAppend(NewLifeWindow, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,Int,1),0,0) )
 	return
 
 def WisPress():
 	GemRB.SetText(NewLifeWindow, TextArea, 18490)
+	GemRB.TextAreaAppend(NewLifeWindow, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,Wis,2),0,0) )
 	return
 
 def DexPress():
+	Table = GemRB.LoadTable("strmod")
+	x = GemRB.GetTableValue(Table,Dex,2)
 	GemRB.SetText(NewLifeWindow, TextArea, 18487)
+	GemRB.TextAreaAppend(NewLifeWindow, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,Dex,3),x,0) )
 	return
 
 def ConPress():
+	Table = GemRB.LoadTable("hpconbon")
+	x = GemRB.GetTableValue(Table,Con,1)
 	GemRB.SetText(NewLifeWindow, TextArea, 18491)
+	GemRB.TextAreaAppend(NewLifeWindow, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,Con,4),x,0) )
 	return
 
 def ChaPress():
 	GemRB.SetText(NewLifeWindow, TextArea, 1903)
+	GemRB.TextAreaAppend(NewLifeWindow, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(Cha,5),0,0) )
 	return
 
 def PointPress():
@@ -354,16 +371,22 @@ def DecreasePress():
 	Sum = Sum-1
 	if Pressed == 0:
 		Str = Sum
+		StrPress()
 	if Pressed == 1:
 		Int = Sum
+		IntPress()
 	if Pressed == 2:
 		Wis = Sum
+		WisPress()
 	if Pressed == 3:
 		Dex = Sum
+		DexPress()
 	if Pressed == 4:
 		Con = Sum
+		ConPress()
 	if Pressed == 5:
 		Cha = Sum
+		ChaPress()
 	UpdateLabels()
 	return
 
@@ -402,16 +425,22 @@ def IncreasePress():
 	Sum = Sum+1
 	if Pressed == 0:
 		Str = Sum
+		StrPress()
 	if Pressed == 1:
 		Int = Sum
+		IntPress()
 	if Pressed == 2:
 		Wis = Sum
+		WisPress()
 	if Pressed == 3:
 		Dex = Sum
+		DexPress()
 	if Pressed == 4:
 		Con = Sum
+		ConPress()
 	if Pressed == 5:
 		Cha = Sum
+		ChaPress()
 	UpdateLabels()
 	return
 
