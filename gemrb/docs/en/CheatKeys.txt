@@ -1,6 +1,6 @@
 CHEAT AND DEBUG KEYS
 --------------------
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.1 2004/06/30 22:15:24 edheldil Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.2 2004/07/24 23:57:31 edheldil Exp $
 
 
 Following is a list of cheats you can use during development of GemRB.
@@ -33,7 +33,7 @@ Ctrl-M - Prints (on terminal or DOS window) useful info on pointed actor, door
          container or infopoint and current map
 
 Ctrl-X - Prints (on terminal or DOS window) name of current area script
-         and current mouse pocition converted to game coordinates 
+         and current mouse position converted to game coordinates 
 
 Ctrl-Y - Kills pointed actor
 
