@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.160 2004/04/21 17:41:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.161 2004/04/26 12:55:27 edheldil Exp $
  *
  */
 
@@ -245,6 +245,19 @@ static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 	ret = Py_BuildValue( "s", newtext );
 	free( newtext );
 	return ret;
+}
+
+static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
+{
+	ieStrRef  strref;
+
+	if (!PyArg_ParseTuple( args, "i", &strref )) {
+		printMessage( "GUIScript", "Syntax Error: GetString(strref)\n",
+			LIGHT_RED );
+		return NULL;
+	}
+
+	return PyString_FromString( core->GetString( strref ) );
 }
 
 static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* args)
@@ -2864,6 +2877,8 @@ static PyMethodDef GemRBMethods[] = {
 	"Starts new game and enters it."},
 	{"StatComment", GemRB_StatComment, METH_VARARGS,
 	"Replaces values into an strref."},
+	{"GetString", GemRB_GetString, METH_VARARGS,
+	"Returns string for given strref."},
 	{"EndCutSceneMode", GemRB_EndCutSceneMode, METH_NOARGS,
 	"Exits the CutScene Mode."},
 	{"GetPartySize", GemRB_GetPartySize, METH_NOARGS,
