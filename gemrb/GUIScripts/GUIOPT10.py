@@ -26,18 +26,31 @@ def OnLoad():
 
 	WeaponUnusable = GemRB.GetControl(AutoPauseWindow, 21)
 	WeaponUnusableB = GemRB.GetControl(AutoPauseWindow, 5)
+	GemRB.SetVarAssoc(AutoPauseWindow, 1, "Weapon Unusable")
+
 	TargetDestroyed = GemRB.GetControl(AutoPauseWindow, 22)
 	TargetDestroyedB = GemRB.GetControl(AutoPauseWindow, 13)
+	GemRB.SetVarAssoc(AutoPauseWindow, 1, "Target Destroyed")
+
 	EndOfRound = GemRB.GetControl(AutoPauseWindow, 24)
 	EndOfRoundB = GemRB.GetControl(AutoPauseWindow, 25)
+	GemRB.SetVarAssoc(AutoPauseWindow, 1, "End Of Round")
+
 	EnemySighted = GemRB.GetControl(AutoPauseWindow, 27)
 	EnemySightedB = GemRB.GetControl(AutoPauseWindow, 26)
+	GemRB.SetVarAssoc(AutoPauseWindow, 1, "Enemy Sighted")
+
 	SpellCast = GemRB.GetControl(AutoPauseWindow, 30)
 	SpellCastB = GemRB.GetControl(AutoPauseWindow, 34)
+	GemRB.SetVarAssoc(AutoPauseWindow, 1, "Spell Cast")
+
 	TrapFound = GemRB.GetControl(AutoPauseWindow, 33)
 	TrapFoundB = GemRB.GetControl(AutoPauseWindow, 31)
+	GemRB.SetVarAssoc(AutoPauseWindow, 1, "Trap Found")
+
 	AutopauseCenter = GemRB.GetControl(AutoPauseWindow, 36)
 	AutopauseCenterB = GemRB.GetControl(AutoPauseWindow, 37)
+	GemRB.SetVarAssoc(AutoPauseWindow, 1, "Autopause Center")
 
 	OkButton = GemRB.GetControl(AutoPauseWindow, 11)
 	CancelButton = GemRB.GetControl(AutoPauseWindow, 14)
