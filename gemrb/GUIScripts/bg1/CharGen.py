@@ -52,7 +52,7 @@ def OnLoad():
 	GemRB.SetButtonState(CharGenWindow,NameButton,IE_GUI_BUTTON_DISABLED)
 
 	BackButton = GemRB.GetControl(CharGenWindow, 11)
-	GemRB.SetText(CharGenWindow, BackButton, 15416)
+	#GemRB.SetText(CharGenWindow, BackButton, 15416)
 	GemRB.SetButtonState(CharGenWindow,BackButton,IE_GUI_BUTTON_ENABLED)
 
 	AcceptButton = GemRB.GetControl(CharGenWindow, 8)
