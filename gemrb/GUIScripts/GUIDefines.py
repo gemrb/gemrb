@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.31 2005/03/18 20:01:02 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.32 2005/03/20 20:49:30 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -41,6 +41,11 @@ IE_GUI_BUTTON_ALIGN_BOTTOM = 0x00000800
 IE_GUI_BUTTON_ANIMATED   = 0x00010000   # the button is animated
 IE_GUI_BUTTON_NO_TEXT    = 0x00020000   # don't draw button label
 IE_GUI_BUTTON_PLAYONCE   = 0x00040000   # the button animation won't restart
+
+#textarea flags
+IE_GUI_TEXTAREA_SELECTABLE = 0x05000001
+IE_GUI_TEXTAREA_AUTOSCROLL = 0x05000002
+IE_GUI_TEXTAREA_SMOOTHSCROLL = 0x05000004
 
 #events
 IE_GUI_BUTTON_ON_PRESS    = 0x00000000
