@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.17 2003/12/12 23:11:58 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.18 2003/12/15 22:38:53 balrog994 Exp $
  *
  */
 
@@ -39,6 +39,8 @@
 #define GEM_EXPORT
 #endif
 
+#define MAX_ANIMS				19
+
 #define IE_ANI_ATTACK			0
 #define IE_ANI_AWAKE			1
 #define IE_ANI_CAST				2
@@ -56,7 +58,8 @@
 #define IE_ANI_EMERGE			14
 #define IE_ANI_HIDE				15
 #define IE_ANI_SLEEP			16
-#define IE_ANI_PST_START		17
+#define IE_ANI_GET_UP			17
+#define IE_ANI_PST_START		18
 
 #define IE_ANI_CODE_MIRROR		0
 #define IE_ANI_ONE_FILE			1
@@ -88,7 +91,7 @@
 class GEM_EXPORT CharAnimations
 {
 private:
-	Animation * Anims[18][16];
+	Animation * Anims[MAX_ANIMS][16];
 public:
 	Color Palette[256];
 	unsigned long LoadedFlag, RowIndex;
@@ -106,7 +109,7 @@ public:
 	void SetNewPalette(Color * Pal)
 	{
 		memcpy(Palette, Pal, 256*sizeof(Color));
-		for(int i = 0; i < 18; i++) {
+		for(int i = 0; i < MAX_ANIMS; i++) {
 			for(int j = 0; j < 16; j++) {
 				if(Anims[i][j])
 					Anims[i][j]->ChangePalette = true;

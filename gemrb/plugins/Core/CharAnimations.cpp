@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.21 2003/12/15 09:16:14 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.22 2003/12/15 22:38:54 balrog994 Exp $
  *
  */
 
@@ -34,7 +34,7 @@ CharAnimations::CharAnimations(char * BaseResRef, unsigned char OrientCount, uns
 	this->OrientCount = OrientCount;
 	this->MirrorType = MirrorType;
 	LoadedFlag = 0;
-	for(int i = 0; i < 18; i++) {
+	for(int i = 0; i < MAX_ANIMS; i++) {
 		for(int j = 0; j < 16; j++) {
 			Anims[i][j] = NULL;
 		}
@@ -132,6 +132,11 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 						if(Orient > 8)
 							core->GetVideoDriver()->MirrorAnimation(a);
 						Anims[AnimID][Orient] = a;
+						if(AnimID == IE_ANI_EMERGE) {
+							a->playReversed = true;
+							a->autoSwitchOnEnd = true;
+							a->nextAnimID = IE_ANI_AWAKE;
+						}
 						}
 					break;
 				}
@@ -539,12 +544,12 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 			//Maybe is Die reversed
 			case IE_ANI_EMERGE:
 				{
-				strcat(ResRef, "G15");
+				strcat(ResRef, "G19");
 				if(Orient > 8)
 					Cycle = 7 - (Orient % 9);
 				else
 					Cycle = (Orient % 9);
-				Cycle+=45;
+				Cycle+=81;
 				}
 			break;
 
