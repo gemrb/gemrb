@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.25 2004/03/29 23:52:29 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.26 2004/04/04 20:27:05 avenger_teambg Exp $
  *
  */
 
@@ -326,11 +326,11 @@ Actor* CREImp::GetActor()
 		act->anims->DrawCircle = false;*/
 
 	// Reading inventory
-	act->inventory = new Inventory();
+//	act->inventory = new Inventory();
 
 	std::vector<CREItem*> items;
 	str->Seek( act->ItemsOffset, GEM_STREAM_START );
-	for (int i = 0; i < act->ItemsCount; i++) {
+	for (size_t i = 0; i < act->ItemsCount; i++) {
 		items.push_back( GetItem() );
 	}
 
@@ -340,26 +340,26 @@ Actor* CREImp::GetActor()
 		str->Read( &index, 2 );
 
 		if (index != 0xFFFF)
-			act->inventory->SetSlotItem( items[index], i );
+			act->inventory.SetSlotItem( items[index], i );
 	}
-	act->inventory->dump();
+	act->inventory.dump();
 
 
 	// Reading spellbook
 	act->spellbook = new Spellbook();
 
 	str->Seek( act->KnownSpellsOffset, GEM_STREAM_START );
-	for (int i = 0; i < act->KnownSpellsCount; i++) {
+	for (size_t i = 0; i < act->KnownSpellsCount; i++) {
 		act->spellbook->AddKnownSpell( GetKnownSpell() );
 	}
 
 	str->Seek( act->MemorizedSpellsOffset, GEM_STREAM_START );
-	for (int i = 0; i < act->MemorizedSpellsCount; i++) {
+	for (size_t i = 0; i < act->MemorizedSpellsCount; i++) {
 		act->spellbook->AddMemorizedSpell( GetMemorizedSpell() );
 	}
 
 	str->Seek( act->SpellMemorizationOffset, GEM_STREAM_START );
-	for (int i = 0; i < act->SpellMemorizationCount; i++) {
+	for (size_t i = 0; i < act->SpellMemorizationCount; i++) {
 		act->spellbook->AddSpellMemorization( GetSpellMemorization() );
 	}
 
