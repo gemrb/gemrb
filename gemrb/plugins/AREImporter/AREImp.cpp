@@ -96,7 +96,7 @@ Map * AREImp::GetMap()
 		actor->XDes = XDes;
 		actor->YPos = YPos;
 		actor->YDes = YDes;
-		actor->Orientation = Orientation;
+		actor->Orientation = (unsigned char)Orientation;
 		map->AddActor(actor);
 	}
 	str->Seek(AnimOffset, GEM_STREAM_START);

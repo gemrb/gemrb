@@ -99,3 +99,9 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 	}
 }
 
+/** Sets the Text of the current control */
+int TextEdit::SetText(const char * string)
+{
+	strncpy((char*)Buffer, string, max);
+	return 0;
+}

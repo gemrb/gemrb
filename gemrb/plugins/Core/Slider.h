@@ -54,6 +54,8 @@ public:
   void SetPosition(unsigned int pos);
   /** Sets the selected image */
   void SetImage(unsigned char type, Sprite2D * img);
+  /** Sets the Text of the current control */
+  int SetText(const char * string);
 private: // Private attributes
   /** BackGround Image. If smaller than the Control Size, the image will be tiled. */
   Sprite2D * BackGround;

@@ -48,6 +48,8 @@ public:
 	~EventMgr(void);
 	/** Adds a Window to the Event Manager */
 	void AddWindow(Window * win);
+	/** Removes a Window from the Array */
+	void DelWindow(unsigned short WindowID);
 	/** Frees and Removes all the Windows in the Array */
 	void Clear();
 	/** BroadCast Mouse Move Event */

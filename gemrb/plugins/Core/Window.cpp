@@ -31,6 +31,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos
 	this->BackGround = NULL;
 	lastC = NULL;
 	lastFocus = NULL;
+	Visible = false;
 }
 
 Window::~Window()

@@ -28,6 +28,8 @@ Interface::Interface(void)
 	key = NULL;
 	strings = NULL;
 	hcanims = NULL;
+	guiscript = NULL;
+	windowmgr = NULL;
 	printMessage("Core", "Loading Configuration File...", WHITE);
 	if(!LoadConfig()) {
 		printStatus("ERROR", LIGHT_RED);
@@ -57,11 +59,21 @@ Interface::~Interface(void)
 		plugin->FreePlugin(pal256);
 	if(pal16)
 		plugin->FreePlugin(pal16);
+	if(windowmgr)
+		delete(windowmgr);
+	if(guiscript)
+		delete(guiscript);
 	std::vector<Font*>::iterator m = fonts.begin();
 	for(int i = 0; fonts.size() != 0; ) {
 		delete(*m);
 		fonts.erase(m);
 		m = fonts.begin();
+	}
+	std::vector<Window*>::iterator w = windows.begin();
+	for(int i = 0; windows.size() != 0; ) {
+		delete(*w);
+		windows.erase(w);
+		w = windows.begin();
 	}
 	delete(plugin);
 }
@@ -180,6 +192,26 @@ int Interface::Init()
 	printMessage("Core", "BroadCasting Event Manager...", WHITE);
 	video->SetEventMgr(evntmgr);
 	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Initializing Window Manager...", YELLOW);
+	windowmgr = (WindowMgr*)GetInterface(IE_CHU_CLASS_ID);
+	if(windowmgr == NULL) {
+		printStatus("ERROR", LIGHT_RED);
+		return GEM_ERROR;
+	}
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Initializing GUI Script Engine...", YELLOW);
+	guiscript = (ScriptEngine*)GetInterface(IE_GUI_SCRIPT_CLASS_ID);
+	if(guiscript == NULL) {
+		printStatus("ERROR", LIGHT_RED);
+		return GEM_ERROR;
+	}
+	if(!guiscript->Init()) {
+		printStatus("ERROR", LIGHT_RED);
+		return GEM_ERROR;
+	}
+	printStatus("OK", LIGHT_GREEN);
+	strcpy(NextScript, "Start");
+	ChangeScript = true;
 	printMessage("Core", "Core Initialization Complete!\n", LIGHT_GREEN);
 	return GEM_OK;
 }
@@ -428,3 +460,135 @@ EventMgr * Interface::GetEventMgr()
 	return evntmgr;
 }
 
+/** Returns the Window Manager */
+WindowMgr * Interface::GetWindowMgr()
+{
+	return windowmgr;
+}
+
+/** Get GUI Script Manager */
+ScriptEngine * Interface::GetGUIScriptEngine()
+{
+	return guiscript;
+}
+
+/** Loads a Window in the Window Manager */
+int Interface::LoadWindow(unsigned short WindowID)
+{
+	for(int i = 0; i < windows.size(); i++) {
+		if(windows[i]->WindowID == WindowID)
+			return i;
+	}
+	Window * win = windowmgr->GetWindow(WindowID);
+	if(win == NULL)
+		return -1;
+	windows.push_back(win);
+	return windows.size()-1;
+}
+
+/** Get a Control on a Window */
+int Interface::GetControl(unsigned short WindowIndex, unsigned short ControlID)
+{
+	if(WindowIndex > windows.size())
+		return -1;
+	Window * win = windows[WindowIndex];
+	int i = 0;
+	while(true) {
+		Control * ctrl = win->GetControl(i);
+		if(ctrl == NULL)
+			return -1;
+		if(ctrl->ControlID == ControlID)
+			return i;
+		i++;
+	}
+}
+/** Set the Text of a Control */
+int Interface::SetText(unsigned short WindowIndex, unsigned short ControlIndex, const char * string)
+{
+	if(WindowIndex > windows.size())
+		return -1;
+	Window * win = windows[WindowIndex];
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return -1;
+	return ctrl->SetText(string);
+}
+
+/** Set a Window Visible Flag */
+int Interface::SetVisible(unsigned short WindowIndex, bool visible)
+{
+	if(WindowIndex > windows.size())
+		return -1;
+	Window * win = windows[WindowIndex];
+	win->Visible = visible;
+	if(win->Visible)
+		evntmgr->AddWindow(win);
+	else
+		evntmgr->DelWindow(win->WindowID);
+	return 0;
+}
+
+/** Set an Event of a Control */
+int Interface::SetEvent(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long EventID, char * funcName)
+{
+	if(WindowIndex > windows.size())
+		return -1;
+	Window * win = windows[WindowIndex];
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return -1;
+	switch((EventID & 0xff000000) >> 24) {
+		case 0: //Button
+		{
+			if(ctrl->ControlType != 0)
+				return -1;
+			Button * btn = (Button*)ctrl;
+			btn->SetEvent(funcName);
+			return 0;
+		}
+		break;
+	}
+	return -1;
+}
+
+/** Set the Status of a Control in a Window */
+int Interface::SetControlStatus(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long Status)
+{
+	if(WindowIndex > windows.size())
+		return -1;
+	Window * win = windows[WindowIndex];
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return -1;
+	switch((Status & 0xff000000) >> 24) {
+		case 0: //Button
+		{
+			if(ctrl->ControlType != 0)
+				return -1;
+			Button * btn = (Button*)ctrl;
+			btn->SetState(Status & 0xff);
+			return 0;
+		}
+		break;
+	}
+	return -1;
+}
+
+/** Show a Window in Modal Mode */
+int Interface::ShowModal(unsigned short WindowIndex)
+{
+	if(WindowIndex > windows.size())
+		return -1;
+	Window * win = windows[WindowIndex];
+	win->Visible = true;
+	evntmgr->Clear();
+	evntmgr->AddWindow(win);
+}
+
+void Interface::DrawWindows(void)
+{
+	for(int i = 0; i < windows.size(); i++) {
+		if(windows[i]->Visible)
+			windows[i]->DrawWindow();
+	}
+}

@@ -47,6 +47,8 @@ public:
 	void SetCursor(Sprite2D * cur);
 	/** Set BackGround */
 	void SetBackGround(Sprite2D * back);
+	/** Sets the Text of the current control */
+	int SetText(const char * string);
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D * Cursor;

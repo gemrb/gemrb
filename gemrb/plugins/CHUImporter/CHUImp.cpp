@@ -226,7 +226,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 
 			case 5: { //Text Area
 				char FontResRef[8], InitResRef[8];
-				RevColor fore, init, back;
+				Color fore, init, back;
 				str->Read(FontResRef, 8);
 				str->Read(InitResRef, 8);
 				Font * fnt = core->GetFont(FontResRef);
@@ -234,7 +234,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				str->Read(&fore, 4);
 				str->Read(&init, 4);
 				str->Read(&back, 4);
-				Color f,i,b;
+				/*Color f,i,b;
 				f.r = fore.r;
 				f.g = fore.g;
 				f.b = fore.b;
@@ -243,8 +243,8 @@ Window * CHUImp::GetWindow(unsigned long i)
 				i.b = init.b;
 				b.r = back.r;
 				b.g = back.g;
-				b.b = back.b;
-				TextArea * ta = new TextArea(f, i, b);
+				b.b = back.b;*/
+				TextArea * ta = new TextArea(fore, init, back);
 				ta->ControlID = ControlID;
 				ta->XPos = XPos;
 				ta->YPos = YPos;
@@ -252,7 +252,7 @@ Window * CHUImp::GetWindow(unsigned long i)
 				ta->Height = Height;
 				ta->ControlType = ControlType;
 				ta->SetFonts(ini, fnt);
-				ta->SetText((unsigned char*)("Text Area (Temp Value)"));				
+				ta->SetText("Text Area (Temp Value)");				
 				win->AddControl(ta);
 			}
 			break;

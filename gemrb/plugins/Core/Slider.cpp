@@ -188,3 +188,9 @@ void Slider::OnMouseOver(unsigned short x, unsigned short y)
 		}
 	}
 }
+
+/** Sets the Text of the current control */
+int Slider::SetText(const char * string)
+{
+	return 0;
+}

@@ -50,6 +50,8 @@ public:
 	virtual ~Control();
 	/** Draws the Control on the Output Display */
 	virtual void Draw(unsigned short x, unsigned short y) = 0;
+	/** Sets the Text of the current control */
+	virtual int SetText(const char * string) = 0;
 public: // Public attributes
 	/** Defines the Control ID Number used for GUI Scripting */
 	unsigned short ControlID;

@@ -45,9 +45,10 @@ void TextArea::SetScrollBar(ScrollBar * ptr)
 	sb = ptr;
 }
 /** Sets the Actual Text */
-void TextArea::SetText(unsigned char * text)
+int TextArea::SetText(const char * text)
 {
-	strncpy((char*)Buffer, (char*)text, BufferLength);
+	strncpy((char*)Buffer, text, BufferLength);
+	return 0;
 }
 /** Sets the Fonts */
 void TextArea::SetFonts(Font * init, Font * text)

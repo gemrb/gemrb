@@ -41,10 +41,11 @@ void Label::Draw(unsigned short x, unsigned short y)
 	}
 }
 /** This function sets the actual Label Text */
-void Label::SetText(char * string)
+int Label::SetText(const char * string)
 {
 	if(Buffer != NULL)
 		strcpy(Buffer, string);
+	return 0;
 }
 /** Sets the Foreground Font Color */
 void Label::SetColor(Color col, Color bac)

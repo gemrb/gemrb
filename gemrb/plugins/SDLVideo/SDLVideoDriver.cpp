@@ -88,6 +88,7 @@ bool SDLVideoDriver::TestVideoMode(VideoMode & vm)
 
 int SDLVideoDriver::SwapBuffers(void)
 {
+	SDL_Flip(disp);
 	int ret = GEM_OK;
 	//TODO: Implement an efficient Rectangle Merge algorithm for faster redraw
 	SDL_Event event; /* Event structure */
@@ -158,7 +159,6 @@ int SDLVideoDriver::SwapBuffers(void)
 		break;
 		}
 	}
-	SDL_Flip(disp);
 	return ret;
 }
 

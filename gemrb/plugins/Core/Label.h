@@ -45,7 +45,7 @@ public:
   /** Draws the Control on the Output Display */
   void Draw(unsigned short x, unsigned short y);
   /** This function sets the actual Label Text */
-  void SetText(char * string);
+  int SetText(const char * string);
   /** Sets the Foreground Font Color */
   void SetColor(Color col, Color bac);
   /** Sets the Alignment of Text */

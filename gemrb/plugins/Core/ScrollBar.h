@@ -42,6 +42,8 @@ private: //Private attributes
 	unsigned short Max;
 	/** Scroll Bar Status */
 	unsigned short State;
+	/** Sets the Text of the current control */
+	int SetText(const char * string);
 public:
 	void SetImage(unsigned char type, Sprite2D * img);
 public: // Public Events

@@ -45,7 +45,7 @@ public:
 	/** Sets the Scroll Bar Pointer */
 	void SetScrollBar(ScrollBar * ptr);
 	/** Sets the Actual Text */
-	void SetText(unsigned char * text);
+	int SetText(const char * text);
 	/** Sets the Fonts */
 	void SetFonts(Font * init, Font * text);
 private: // Private attributes

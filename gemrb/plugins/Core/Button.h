@@ -20,6 +20,7 @@
 
 #include "Control.h"
 #include "Sprite2D.h"
+#include "Font.h"
 
 #define IE_GUI_BUTTON_UNPRESSED 0
 #define IE_GUI_BUTTON_PRESSED   1
@@ -46,6 +47,9 @@ class GEM_EXPORT Button : public Control
 {
 private:
 	bool Clear;
+	char * Text;
+	bool hasText;
+	Font * font;
 public: 
 	Button(bool Clear = false);
 	~Button();
@@ -60,11 +64,17 @@ public:
   void Draw(unsigned short x, unsigned short y);
   /** Sets the Button State */
   void SetState(unsigned char state);
+  /** Sets the Text of the current control */
+  int SetText(const char * string);
+  /** Set Event */
+  void SetEvent(char * funcName);
 public: // Public Events
   /** Mouse Button Down */
   void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
   /** Mouse Button Up */
   void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);	
+  /** Button Pressed Event Script Function Name */
+  char ButtonOnPress[64];
 private: // Private attributes
 	/** Button Unpressed Image */
   Sprite2D * Unpressed;

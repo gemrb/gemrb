@@ -25,6 +25,10 @@ Button::Button(bool Clear){
 	Unpressed = Pressed = Selected = Disabled = NULL;
 	this->Clear = Clear;
 	State = IE_GUI_BUTTON_UNPRESSED;
+	memset(ButtonOnPress, 0, 64);
+	Text = (char*)malloc(64);
+	hasText = false;
+	font = core->GetFont("STONEBIG");
 }
 Button::~Button(){
 	Video * video = core->GetVideoDriver();
@@ -84,11 +88,14 @@ void Button::SetImage(unsigned char type, Sprite2D * img)
 /** Draws the Control on the Output Display */
 void Button::Draw(unsigned short x, unsigned short y)
 {
+	Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 	switch(State) {
 		case IE_GUI_BUTTON_UNPRESSED:
 		{
 			if(Unpressed)
 				core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
+			if(hasText)
+				font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, NULL, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
 		}
 		break;
 		
@@ -96,6 +103,8 @@ void Button::Draw(unsigned short x, unsigned short y)
     {
 			if(Pressed)
 				core->GetVideoDriver()->BlitSprite(Pressed, x+XPos, y+YPos, true);
+			if(hasText)
+				font->Print(Region(x+XPos+2, y+YPos+2, Width, Height), (unsigned char*)Text, NULL, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
 		}
 		break;
 		
@@ -103,6 +112,8 @@ void Button::Draw(unsigned short x, unsigned short y)
     {
 			if(Selected)
 				core->GetVideoDriver()->BlitSprite(Selected, x+XPos, y+YPos, true);
+			else if(Unpressed)
+				core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
 		}
 		break;
 		
@@ -110,6 +121,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 		{
 			if(Disabled)
 				core->GetVideoDriver()->BlitSprite(Disabled, x+XPos, y+YPos, true);
+			else if(Unpressed)
+				core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
 		}
 		break;
 	}
@@ -125,12 +138,39 @@ void Button::SetState(unsigned char state)
 /** Mouse Button Down */
 void Button::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
-	if(Button == 1) {
+	if((Button == 1) && (State != IE_GUI_BUTTON_DISABLED)) {
 		State = IE_GUI_BUTTON_PRESSED;
 	}
 }
 /** Mouse Button Up */
 void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
 {
+	if(State == IE_GUI_BUTTON_DISABLED)
+		return;
 	State = IE_GUI_BUTTON_UNPRESSED;
+	if((x >= 0) && (x <= Width))
+		if((y >= 0) && (y <= Height))
+			if(strlen(ButtonOnPress) != 0)
+				core->GetGUIScriptEngine()->RunFunction(ButtonOnPress);
+}
+
+/** Sets the Text of the current control */
+int Button::SetText(const char * string)
+{
+	if(string == NULL)
+		hasText = false;
+	else if(string[0] == 0)
+		hasText = false;
+	else {
+		strncpy(Text, string, 63);
+		hasText = true;
+		Text = strupr(Text);
+	}
+	return 0;
+}
+
+/** Set Event */
+void Button::SetEvent(char * funcName)
+{
+	strcpy(ButtonOnPress, funcName);
 }

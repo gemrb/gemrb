@@ -65,6 +65,8 @@ public: //Public attributes
   unsigned short Width;
   /** Height */
   unsigned short Height;
+  /** Visible */
+  bool Visible;
 private: // Private attributes
   /** BackGround Image. No BackGround if this variable is NULL. */
   Sprite2D * BackGround;
