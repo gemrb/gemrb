@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.12 2003/12/18 17:21:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.13 2003/12/19 20:20:15 balrog994 Exp $
  *
  */
 
@@ -146,6 +146,7 @@ Animation * BAMImp::GetAnimation(unsigned char Cycle, int x, int y, unsigned cha
 	for(int i = 0; i < cycles[Cycle].FramesCount; i++) {
 		anim->AddFrame(GetFrame(findex[i], mode), findex[i]);
 	}
+	free(findex);
 	return anim;
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.101 2003/12/19 18:53:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.102 2003/12/19 20:20:14 balrog994 Exp $
  *
  */
 
@@ -39,6 +39,9 @@ GEM_EXPORT HANDLE hConsole;
 #endif
 
 #include "../../includes/win32def.h"
+#ifdef _DEBUG
+#include <crtdbg.h>
+#endif
 
 Interface::Interface(void)
 {
@@ -123,6 +126,12 @@ Interface::~Interface(void)
 		delete(sgiterator);
 	if(pathfinder)
 		delete(pathfinder);
+	if(factory)
+		delete(factory);
+	for(int i = 0; i < 48; i++) {
+		if(Cursors[i])
+			delete(Cursors[i]);
+	}
 
 	FreeResourceVector(Font, fonts);
 	FreeResourceVector(Window, windows);
@@ -139,6 +148,7 @@ Interface::~Interface(void)
 		plugin->FreePlugin(pal16);
 	if(timer)
 		delete(timer);
+	
 
 	if(windowmgr)
 		delete(windowmgr);
@@ -1384,5 +1394,6 @@ void Interface::LoadGame(int index) {
 		if(game)
 			delete(game);
 		game = sgm->GetGame();
+		FreeInterface(sgm);
 	}
 }

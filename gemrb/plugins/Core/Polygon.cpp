@@ -6,7 +6,10 @@ extern Interface * core;
 
 Gem_Polygon::Gem_Polygon(Point * points, int count, bool precalculate, Color * color)
 {
-	this->points = (Point*)malloc(count*sizeof(Point));
+	if(count)
+		this->points = (Point*)malloc(count*sizeof(Point));
+	else
+		this->points = NULL;
 	memcpy(this->points, points, count*sizeof(Point));
 	this->count = count;
 	if(precalculate) {

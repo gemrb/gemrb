@@ -15,12 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.3 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.4 2003/12/19 20:20:14 balrog994 Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "AnimationFactory.h"
+#include "Interface.h"
+
+extern Interface * core;
 
 AnimationFactory::AnimationFactory(const char * ResRef) : FactoryObject(ResRef, IE_BAM_CLASS_ID)
 {
@@ -29,6 +32,9 @@ AnimationFactory::AnimationFactory(const char * ResRef) : FactoryObject(ResRef, 
 
 AnimationFactory::~AnimationFactory(void)
 {
+	for(unsigned int i = 0; i < frames.size(); i++) {
+		core->GetVideoDriver()->FreeSprite(frames[i]);
+	}
 	if(FLTable)
 		free(FLTable);
 }
