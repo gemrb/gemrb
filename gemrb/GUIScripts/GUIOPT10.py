@@ -2,21 +2,17 @@
 import GemRB
 
 def OnLoad():
-	global fuxor, B2BState, B3BState, B4BState
 	global AutoPauseWindow, TextAreaControl
-	global B1B, B2B, B3B,B4B,B5B
+	global ChHitButtonB, B2B, B3B,B4B,B5B
 
 	GemRB.LoadWindowPack("GUIOPT")
 	AutoPauseWindow = GemRB.LoadWindow(10)
 
-	fuxor = GemRB.GetControl(AutoPauseWindow,17)
-	B2BState = 1
-	B3BState = 1
-	B4BState = 1
+	GemRB.SetVarAssoc(AutoPauseWindow, 1, "ChHitButton")
 
 	TextAreaControl = GemRB.GetControl(AutoPauseWindow, 15)
-	B1 = GemRB.GetControl(AutoPauseWindow, 17)
-	B1B = GemRB.GetControl(AutoPauseWindow, 1)
+	ChHitButton = GemRB.GetControl(AutoPauseWindow, 17)
+	ChHitButtonB = GemRB.GetControl(AutoPauseWindow, 1)
 	B2 = GemRB.GetControl(AutoPauseWindow, 18)
 	B2B = GemRB.GetControl(AutoPauseWindow, 2)
 	B3 = GemRB.GetControl(AutoPauseWindow, 19)
@@ -44,8 +40,9 @@ def OnLoad():
         GemRB.SetText(AutoPauseWindow, OkButton, 11973)
         GemRB.SetText(AutoPauseWindow, CancelButton, 13727)
 
-	GemRB.SetEvent(AutoPauseWindow, B1, IE_GUI_BUTTON_ON_PRESS, "B1Press")
-	GemRB.SetEvent(AutoPauseWindow, B1B, IE_GUI_BUTTON_ON_PRESS, "B1BPress")
+	GemRB.SetEvent(AutoPauseWindow, ChHitButton, IE_GUI_BUTTON_ON_PRESS, "B1Press")
+	GemRB.SetButtonFlags(AutoPauseWindow, ChHitButtonB,IE_GUI_BUTTON_CHECKBOX, OP_SET)
+	GemRB.SetEvent(AutoPauseWindow, ChHitButtonB, IE_GUI_BUTTON_ON_PRESS, "B1BPress")
 
 	GemRB.SetEvent(AutoPauseWindow, B2, IE_GUI_BUTTON_ON_PRESS, "B2Press")
 	GemRB.SetEvent(AutoPauseWindow, B2B, IE_GUI_BUTTON_ON_PRESS, "B2BPress")
@@ -82,17 +79,17 @@ def OnLoad():
         GemRB.ShowModal(AutoPauseWindow)
 	return
 
-def B1Press():
+def ChHitButtonPress():
         GemRB.SetText(AutoPauseWindow, TextAreaControl, 18032)
 	return
 
-def B1BPress():
+def ChHitButtonBPress():
 	GemRB.SetText(AutoPauseWindow, TextAreaControl, 18032)
 	if fuxor == IE_GUI_BUTTON_UNPRESSED:
 		fuxor = IE_GUI_BUTTON_SELECTED
 	else:
 		fuxor = IE_GUI_BUTTON_UNPRESSED
-	GemRB.SetButtonState(AutoPauseWindow, B1B, fuxor)
+	GemRB.SetButtonState(AutoPauseWindow, ChHitButtonB, fuxor)
 	return
 
 def B2Press():
