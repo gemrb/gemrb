@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.37 2004/11/21 16:12:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.38 2004/12/01 21:59:30 avenger_teambg Exp $
  *
  */
 
@@ -38,7 +38,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 	this->BackGround = NULL;
 	lastC = NULL;
 	lastFocus = NULL;
-	Visible = false;
+	Visible = 0;
 	Changed = true;
 	Floating = false;
 	Cursor = 0;
@@ -98,6 +98,10 @@ void Window::DrawWindow()
 	std::vector< Control*>::iterator m;
 	for (m = Controls.begin(); m != Controls.end(); ++m) {
 		( *m )->Draw( XPos, YPos );
+	}
+	if (Changed && (Visible==2) ) {
+		Color black = { 0, 0, 0, 128 };
+		video->DrawRect(clip, black);
 	}
 	video->SetClipRect( NULL );
 	Changed = false;
@@ -241,7 +245,6 @@ void Window::RedrawControls(char* VarName, unsigned int Sum)
 				break;
 			}
 		}
-		//if(Controls[i]->Changed) Changed = true;
 	}
 }
 

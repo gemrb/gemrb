@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.243 2004/11/27 14:51:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.244 2004/12/01 21:59:30 avenger_teambg Exp $
  *
  */
 
@@ -1539,32 +1539,18 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 	if (win == NULL) {
 		return -1;
 	}
+	win->Visible = visible;
 	switch (visible) {
-		case 0:
 		case 2:
-			 {
-				win->Visible = false;
-				Region r( win->XPos, win->YPos, win->Width, win->Height );
-				Color black = {
-					0, 0, 0, 128
-				};
-				evntmgr->DelWindow( win->WindowID );
-				if (visible == 2)
-					video->DrawRect( r, black );
-			}
+			win->Invalidate();
+		case 0:
+			evntmgr->DelWindow( win->WindowID );
 			break;
 
 		case 1:
-			 {
-				win->Visible = true;
-				evntmgr->AddWindow( win );
-				win->Invalidate();
-				SetOnTop( WindowIndex );
-			}
-			break;
-		
-		default:
-			win->Visible = ( visible != 0 );
+			evntmgr->AddWindow( win );
+			win->Invalidate();
+			SetOnTop( WindowIndex );
 			break;
 	}
 	return 0;
@@ -1615,7 +1601,7 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 		printMessage( "Core", "Window already freed", LIGHT_RED );
 		return -1;
 	}
-	win->Visible = true;
+	win->Visible = 1;
 	evntmgr->Clear();
 	SetOnTop( WindowIndex );
 	evntmgr->AddWindow( win );
@@ -1653,6 +1639,7 @@ void Interface::DrawWindows(void)
 	for (unsigned int i = 0; i < topwin.size(); i++) {
 		if ( (unsigned int) ( *t ) >=windows.size() )
 			continue;
+		//visible ==1 or 2 will be drawn
 		if (windows[( *t )] != NULL && windows[( *t )]->Visible)
 			windows[( *t )]->DrawWindow();
 		++t;

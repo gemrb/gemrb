@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.16 2004/08/27 13:22:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.17 2004/12/01 21:59:30 avenger_teambg Exp $
  *
  */
 
@@ -85,7 +85,7 @@ public: //Public attributes
 	/** Height */
 	unsigned short Height;
 	/** Visible */
-	bool Visible;
+	char Visible;  //0,1,2
 	/** Changed Flag */
 	bool Changed;
 	/** Floating Flag */
