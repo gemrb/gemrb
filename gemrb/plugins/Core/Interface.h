@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.119 2004/10/16 08:10:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.120 2004/10/27 20:06:08 avenger_teambg Exp $
  *
  */
 
@@ -137,8 +137,11 @@ private:
 	char Palette16[9];
 	char Palette32[9];
 	char Palette256[9];
-	unsigned int* slotmatrix; //itemtype vs slottype
-	unsigned int* slottypes;  //slottype vs slot mapping
+	ieDword* slotmatrix; //itemtype vs slottype
+	ieDword* slottypes;  //slottype vs slot mapping
+	ieDword* slottips;
+	ieDword* slotids;
+	ieResRef* slotresrefs;
 	int ItemTypes;
 	int SlotTypes; //this is the same as the inventory size
 	int tooltip_x;
@@ -350,8 +353,12 @@ public:
 	void LoadGame(int index);
 	/*reads the filenames of the sounds folder into a list */
 	int GetCharSounds(TextArea *ta);
+	int QuerySlotType(int idx) const;
+	int QuerySlottip(int idx) const;
+	int QuerySlotID(int idx) const;
+	const char * QuerySlotResRef(int idx) const;
 	/*returns true if an itemtype is acceptable for a slottype */
-	int CanUseItemType(int itype, int slottype);
+	int CanUseItemType(int itype, int slottype) const;
 	/*removes all files from directory*/
 	void DelTree(const char *path, bool onlysaved);
 	/*returns true if the file should be saved */

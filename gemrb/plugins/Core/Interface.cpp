@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.228 2004/10/17 18:11:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.229 2004/10/27 20:06:07 avenger_teambg Exp $
  *
  */
 
@@ -85,8 +85,11 @@ Interface::Interface(int iargc, char** iargv)
 	timer = NULL;
 	evntmgr = NULL;
 	console = NULL;
-	slotmatrix = NULL;
 	slottypes = NULL;
+	slotids = NULL;
+	slottips = NULL;
+	slotresrefs = NULL;
+	slotmatrix = NULL;
 	ModalWindow = NULL;
 	tooltip_x = 0;
 	tooltip_y = 0;
@@ -170,6 +173,15 @@ Interface::~Interface(void)
 	}
 	if (slottypes) {
 		free( slottypes );
+	}
+	if (slotids) {
+		free( slotids );
+	}
+	if (slottips) {
+		free( slottips );
+	}
+	if (slotresrefs) {
+		free( slotresrefs );
 	}
 	if (slotmatrix) {
 		free( slotmatrix );
@@ -2310,7 +2322,7 @@ bool Interface::InitItemTypes()
 			InvSlotTypes = 32;
 		}
 		//make sure unsigned int is 32 bits
-		slotmatrix = (unsigned int *) malloc(ItemTypes * sizeof(unsigned int) );
+		slotmatrix = (ieDword *) malloc(ItemTypes * sizeof(ieDword) );
 		for (int i=0;i<ItemTypes;i++) {
 			unsigned int value = 0;
 			unsigned int k = 1;
@@ -2320,7 +2332,7 @@ bool Interface::InitItemTypes()
 				}
 				k <<= 1;
 			}
-			slotmatrix[i] = value;
+			slotmatrix[i] = (ieDword) value;
 		}
 		DelTable(ItemTypeTable);
 	}
@@ -2331,20 +2343,70 @@ bool Interface::InitItemTypes()
 	if (slottypes) {
 		free(slottypes);
 	}
+	if (slottips) {
+		free(slottips);
+	}
+	if (slotids) {
+		free(slotids);
+	}
+	if (slotresrefs) {
+		free(slotresrefs);
+	}
 	SlotTypes = 0;
 	if(st) {
 		SlotTypes = st->GetRowCount();
 		//make sure unsigned int is 32 bits
-		slottypes = (unsigned int *) malloc(SlotTypes * sizeof(unsigned int) );
+		slottypes = (ieDword *) malloc(SlotTypes * sizeof(ieDword) );
+		slotids = (ieDword *) malloc(SlotTypes * sizeof(ieDword) );
+		slottips = (ieDword *) malloc(SlotTypes * sizeof(ieDword) );
+		slotresrefs = (ieResRef *) malloc(SlotTypes * sizeof(ieResRef) );
 		for (int i=0;i<SlotTypes;i++) {
-			slottypes[i] = strtol(st->QueryField(i,0),NULL,0 );
+			slottypes[i] = (ieDword) strtol(st->QueryField(i,0),NULL,0 );
+			slotids[i] = (ieDword) strtol(st->QueryField(i,1),NULL,0 );
+			slottips[i] = (ieDword) strtol(st->QueryField(i,3),NULL,0 );
+			//make a macro for this?
+			strncpy(slotresrefs[i], st->QueryField(i,2), 8 );
+			slotresrefs[i][8]=0;
+			strupr(slotresrefs[i]);
 		}
 		DelTable(SlotTypeTable);
 	}
 	return (it && st);
 }
 
-int Interface::CanUseItemType(int itype, int slottype)
+int Interface::QuerySlotType(int idx) const
+{
+	if(idx>=SlotTypes) {
+		return 0;
+	}
+	return slottypes[idx];
+}
+
+int Interface::QuerySlotID(int idx) const
+{
+        if(idx>=SlotTypes) {
+                return 0;
+        }
+        return slotids[idx];
+}
+
+int Interface::QuerySlottip(int idx) const
+{
+        if(idx>=SlotTypes) {
+                return 0;
+        }
+        return slottips[idx];
+}
+
+const char *Interface::QuerySlotResRef(int idx) const
+{
+	if(idx>=SlotTypes) {
+		return "";
+	}
+	return slotresrefs[idx];
+}
+
+int Interface::CanUseItemType(int itype, int slottype) const
 {
 	if( !slottype ) { 
 		//inventory slot, can hold any item, including invalid
