@@ -5,7 +5,9 @@
 #include "../Core/Interface.h"
 #include "../Core/ArchiveImporter.h"
 #include "../Core/AnimationMgr.h"
+#ifndef WIN32
 #include <unistd.h>
+#endif
 
 #ifndef WIN32
 #include <ctype.h>
