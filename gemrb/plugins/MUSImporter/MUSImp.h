@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.h,v 1.10 2003/11/26 22:04:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.h,v 1.11 2004/01/02 15:51:14 balrog994 Exp $
  *
  */
 
@@ -48,6 +48,9 @@ private:
 	FileStream * str;
 	std::vector<PLString> playlist;
 	unsigned long lastSound;
+private:
+	void PlayMusic(int pos);
+	void PlayMusic(char *name);
 public: 
 	MUSImp();
 	~MUSImp();

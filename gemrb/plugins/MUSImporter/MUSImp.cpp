@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.22 2003/12/18 21:32:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.23 2004/01/02 15:51:14 balrog994 Exp $
  *
  */
 
@@ -150,7 +150,7 @@ bool MUSImp::OpenPlaylist(const char * name)
 				break;
 		}
 		pls.PLEnd[p]=0;
-		bool found = false;
+		/*bool found = false;
 		for(unsigned int i = 0; i < playlist.size(); i++) {
 			if(stricmp(pls.PLFile, playlist[i].PLFile) == 0) {
 				pls.soundID = playlist[i].soundID;
@@ -175,15 +175,15 @@ bool MUSImp::OpenPlaylist(const char * name)
 			}
 			strcat(FName, pls.PLFile);
 			strcat(FName, ".acm");
-			pls.soundID = core->GetSoundMgr()->LoadFile(FName);
+			pls.soundID = core->GetSoundMgr()->StreamFile(FName);
 #ifndef WIN32
 			if((pls.soundID==-1) && core->CaseSensitive) {
 					ResolveFilePath(FName);
-					pls.soundID = core->GetSoundMgr()->LoadFile(FName);
+					pls.soundID = core->GetSoundMgr()->StreamFile(FName);
 			}
 #endif
 			printf("Loading: %s / %d\n",FName,pls.soundID);
-		}
+		}*/
 		playlist.push_back(pls);
 		count--;
 	}
@@ -207,7 +207,9 @@ void MUSImp::Start()
 		else {
 			PLnext=PLpos+1;
 		}
-		core->GetSoundMgr()->Play(playlist[PLpos].soundID);
+		PlayMusic(PLpos);
+		core->GetSoundMgr()->Play((int)0);
+		//core->GetSoundMgr()->Play(playlist[PLpos].soundID);
 		lastSound = playlist[PLpos].soundID;
 		Playing = true;
 	}
@@ -219,46 +221,15 @@ void MUSImp::End()
 		if(playlist.size()==0)
 			return;
 		if(playlist[PLpos].PLEnd[0] != 0) {
-			//core->GetSoundMgr()->Stop(lastSound);
-			for(unsigned int i = 0; i < playlist.size(); i++) {
-				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLEnd) == 0) {
-					core->GetSoundMgr()->Play(playlist[i].soundID);
-					PLnext = i;
-					return;
-				}
-			}
-			PLString pls;
-			strcpy(pls.PLFile, playlist[PLpos].PLEnd);
-			pls.PLEnd[0] = 1;
-			pls.PLEnd[1] = 0;
-			pls.PLLoop[0] = 0;
-			pls.PLTag[0] = 0;
-			char FName[_MAX_PATH];
-			strcpy(FName, core->GamePath);
-			strcat(FName, musicsubfolder);
-			strcat(FName, SPathDelimiter);
-			if(stricmp(pls.PLFile, "SPC1") != 0) {
-				strcat(FName, PLName);
-				strcat(FName, SPathDelimiter);
-				strcat(FName, PLName);
-			}
-			strcat(FName, playlist[PLpos].PLEnd);
-			strcat(FName, ".acm");
-			//core->GetSoundMgr()->Stop(lastSound);
-			pls.soundID = core->GetSoundMgr()->LoadFile(FName);
-			//core->GetSoundMgr()->Play(lastSound);
-			playlist.push_back(pls);
-			PLnext = (int)playlist.size()-1;
+			PlayMusic(playlist[PLpos].PLEnd);
 		}
-		else
-			//core->GetSoundMgr()->Stop(lastSound);
-			PLnext = -1;
+		PLnext = -1;
 	}
 }
 
 void MUSImp::HardEnd()
 {
-	core->GetSoundMgr()->Stop(lastSound);
+	core->GetSoundMgr()->Stop(0);
 	Playing = false;
 	PLpos = 0;
 }
@@ -276,9 +247,8 @@ void MUSImp::PlayNext()
 	if(!Playing)
 		return;
 	if(PLnext != -1) {
-		lastSound = playlist[PLnext].soundID;
+		PlayMusic(PLnext);
 		PLpos = PLnext;
-		core->GetSoundMgr()->Play(lastSound);
 		if(playlist[PLpos].PLLoop[0] != 0) {
 			for(unsigned int i = 0; i < playlist.size(); i++) {
 				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
@@ -294,6 +264,41 @@ void MUSImp::PlayNext()
 				PLnext=PLpos+1;
 		}
 	}
-	else
+	else {
 		Playing = false;
+		core->GetSoundMgr()->Stop(0);
+	}
+}
+
+void MUSImp::PlayMusic(int pos)
+{
+	PlayMusic(playlist[pos].PLFile);
+}
+
+void MUSImp::PlayMusic(char *name)
+{
+	char FName[_MAX_PATH];
+	strcpy(FName, core->GamePath);
+	strcat(FName, musicsubfolder);
+	strcat(FName, SPathDelimiter);
+	//this is in IWD2
+	if(strnicmp(name, "mx0000",6)==0) {
+		strcat(FName, "mx0000");
+		strcat(FName, SPathDelimiter);
+	}
+	else if(strnicmp(name, "SPC",3) != 0) {
+		strcat(FName, PLName);
+		strcat(FName, SPathDelimiter);
+		strcat(FName, PLName);
+	}
+	strcat(FName, name);
+	strcat(FName, ".acm");
+	int soundID = core->GetSoundMgr()->StreamFile(FName);
+#ifndef WIN32
+	if((soundID==-1) && core->CaseSensitive) {
+			ResolveFilePath(FName);
+			soundID = core->GetSoundMgr()->StreamFile(FName);
+	}
+#endif
+	printf("Playing: %s\n",FName);
 }
