@@ -4,4 +4,4 @@ libMUSImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libMUSImporter_la_LIBADD = ../Core/libcore.la
 libMUSImporter_la_METASOURCES = AUTO
 libMUSImporter_la_SOURCES = MUSImporter.cpp MUSImpCD.cpp MUSImp.cpp 
-EXTRA_DIST = MUSImp.cpp MUSImp.h MUSImpCD.cpp MUSImpCD.h MUSImporter.cpp 
+noinst_HEADERS = MUSImp.h MUSImpCD.h

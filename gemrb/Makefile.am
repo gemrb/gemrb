@@ -5,7 +5,7 @@ gemrb_SOURCES = GemRB.cpp
 gemrb_LDADD =  ./plugins/Core/libcore.la
 
 SUBDIRS = plugins includes GUIScripts override Config
-EXTRA_DIST = GemRB.cfg GemRB.cpp 
+EXTRA_DIST = GemRB.cfg plugins-prepare.sh
 INCLUDES= \
 	$(all_includes) \
 	$(PYTHON_INCLUDES)

@@ -8,7 +8,8 @@ dnl Initialize autoconf and automake
 AC_INIT(gemrb/GemRB.cpp)
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE(gemrb,0.1,no-define)
+AM_INIT_AUTOMAKE(gemrb, 0.2.2.8)
+AM_CONFIG_HEADER(config.h)
 
 for top_builddir in . .. ../.. $ac_auxdir $ac_auxdir/..; do
   test -f $top_builddir/configure && break
@@ -20,6 +21,7 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_LIBTOOL_DLOPEN
+AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 AC_LANG_CPLUSPLUS
 
@@ -77,17 +79,14 @@ AC_TYPE_SIZE_T
 #CFLAGS="$CFLAGS $PYTHON_HEADERS"
 #CXXFLAGS="$CXXFLAGS $PYTHON_HEADERS"
 LIBS="$LIBS"
-LDFLAGS="$LDFLAGS $LIBS"
+#LDFLAGS="$LDFLAGS $LIBS"
 
 AC_SUBST(LIBS)
-
-AM_CONFIG_HEADER(config.h)
 
 AC_OUTPUT(./Makefile
 gemrb/Makefile 
 gemrb/Config/Makefile 
 gemrb/includes/Makefile 
-gemrb/includes/sdl/Makefile 
 gemrb/override/Makefile
 gemrb/override/bg1/Makefile
 gemrb/override/bg2/Makefile

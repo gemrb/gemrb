@@ -4,4 +4,4 @@ libAREImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libAREImporter_la_LIBADD = ../Core/libcore.la
 libAREImporter_la_METASOURCES = AUTO
 libAREImporter_la_SOURCES = AREImporter.cpp AREImp.cpp AREImpCD.cpp 
-EXTRA_DIST = AREImpCD.cpp AREImpCD.h AREImp.cpp AREImp.h AREImporter.cpp 
+noinst_HEADERS = AREImpCD.h AREImp.h

@@ -4,4 +4,4 @@ libACMImporter_la_LDFLAGS = -module -version-info 0:0:0 -lopenal -lSDL @LIBPTHRE
 libACMImporter_la_LIBADD = ../Core/libcore.la
 libACMImporter_la_METASOURCES = AUTO
 libACMImporter_la_SOURCES = unpacker.cpp riffhdr.cpp readers.cpp decoder.cpp ACMImporterCD.cpp ACMImporter.cpp ACMImp.cpp 
-EXTRA_DIST = ACMImp.cpp ACMImp.h ACMImporter.cpp ACMImporterCD.cpp ACMImporterCD.h decoder.cpp decoder.h general.h Makefile.am readers.cpp readers.h riffhdr.cpp riffhdr.h unpacker.cpp unpacker.h 
+noinst_HEADERS = ACMImp.h ACMImporterCD.h decoder.h general.h readers.h riffhdr.h unpacker.h 

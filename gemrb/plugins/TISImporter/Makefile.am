@@ -4,4 +4,4 @@ libTISImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libTISImporter_la_LIBADD = ../Core/libcore.la
 libTISImporter_la_METASOURCES = AUTO
 libTISImporter_la_SOURCES = TISImporter.cpp TISImp.cpp TISImpCD.cpp 
-EXTRA_DIST = TISImpCD.cpp TISImpCD.h TISImp.cpp TISImp.h TISImporter.cpp 
+noinst_HEADERS = TISImpCD.h TISImp.h
