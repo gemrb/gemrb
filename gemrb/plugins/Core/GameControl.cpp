@@ -83,7 +83,7 @@ GameControl::GameControl(void)
 	Dialogue = false;
 	Destination[0] = 0;
 	EntranceName[0] = 0;
-
+	target = NULL;
 	speaker = NULL;
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.101 2004/03/18 17:03:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.102 2004/03/18 21:00:16 avenger_teambg Exp $
  *
  */
 
@@ -1215,13 +1215,18 @@ static int GetIdsValue(const char *symbol, const char *idsname)
 static void ParseIdsTarget(char *&src, Object *&object)
 {
 	for(int i=0;i<ObjectFieldsCount;i++) {
-		int x;
-		
 		if(isdigit(*src) || *src=='-') {
 			object->objectFields[i]=strtol(src,&src,0);
 		}
 		else {
-			object->objectFields[i]=GetIdsValue(src, ObjectIDSTableNames[i]);
+			int x;
+			char symbol[64];
+			for(x=0;isalnum(*src) && x<sizeof(symbol)-1;x++) {
+				symbol[x]=*src;
+				src++;
+			}
+			symbol[x]=0;
+			object->objectFields[i]=GetIdsValue(symbol, ObjectIDSTableNames[i]);
 		}
 		if(*src!='.') {
 			break;
@@ -2067,7 +2072,6 @@ int GameScript::ID_Allegiance(Actor *actor, int parameter)
 			break;
 
 	}
-printf("EA matching: %d == %d?",parameter, value);
 	//default
 	return parameter == value;
 }
