@@ -16,19 +16,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.10 2004/12/14 22:37:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICG7.py,v 1.11 2004/12/16 19:12:44 avenger_teambg Exp $
 # character generation, mage spells (GUICG7)
 
 import GemRB
 from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells
 
 MageSpellsWindow = 0
-TextAreaControl = 0
+MageSpellsTextArea = 0
 DoneButton = 0
 Learnable = []
 
 def OnLoad():
-	global MageSpellsWindow, TextAreaControl, DoneButton
+	global MageSpellsWindow, MageSpellsTextArea, DoneButton
 	global MageSpellsSelectPointsLeft, Learnable
 	
 	AlignmentTable = GemRB.LoadTable("aligns")

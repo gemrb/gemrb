@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICG7.py,v 1.11 2004/12/16 19:12:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICG7.py,v 1.1 2004/12/16 19:12:43 avenger_teambg Exp $
 # character generation, mage spells (GUICG7)
 
 import GemRB
@@ -81,11 +81,6 @@ def OnLoad():
 	GemRB.SetEvent(MageSpellsWindow, MageSpellsCancelButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsCancelPress")
 	GemRB.SetText(MageSpellsWindow, MageSpellsCancelButton, 13727)
 
-	MageSpellsPickButton = GemRB.GetControl(MageSpellsWindow, 30)
-	GemRB.SetButtonState(MageSpellsWindow, MageSpellsPickButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(MageSpellsWindow, MageSpellsPickButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsPickPress")
-	GemRB.SetText(MageSpellsWindow, MageSpellsPickButton, 34210)
-
 	GemRB.SetVisible(MageSpellsWindow,1)
 	return
 
@@ -133,23 +128,5 @@ def MageSpellsCancelPress():
 def MageSpellsDonePress():
 	GemRB.UnloadWindow(MageSpellsWindow)
 	GemRB.SetNextScript("GUICG6") #abilities
-	return
-
-def MageSpellsPickPress():
-	global MageSpellsSelectPointsLeft, Learnable
-
-	SpellMask = 0
-	Range = len(Learnable)
-	if MageSpellsSelectPointsLeft > Range:
-		MageSpellsSelectPointsLeft = Range
-	if MageSpellsSelectPointsLeft:
-		#make this less ugly without ruining Learnable
-		for i in range(MageSpellsSelectPointsLeft):
-			j = GemRB.Roll(1,Range,-1)
-			if SpellMask & (1<<j):
-				continue
-			SpellMask = SpellMask | (1<<j)
-		GemRB.SetVar("MageSpellBook", SpellMask)
-	MageSpellsDonePress()
 	return
 
