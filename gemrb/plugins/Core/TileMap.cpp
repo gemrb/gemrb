@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.13 2003/12/12 23:02:19 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.14 2003/12/15 09:31:03 balrog994 Exp $
  *
  */
 
@@ -47,20 +47,16 @@ void TileMap::AddOverlay(TileOverlay * overlay)
 	overlays.push_back(overlay);
 }
 
-Door * TileMap::AddDoor(char * Name, unsigned char DoorClosed, unsigned short * indexes, int count, Gem_Polygon * open, Gem_Polygon * closed)
+Door * TileMap::AddDoor(char * Name, bool DoorClosed, unsigned short * indexes, int count, Gem_Polygon * open, Gem_Polygon * closed)
 {
-	Door door;
-	strncpy(door.Name, Name, 8);
-	door.tiles = indexes;
-	door.count = count;
-	door.open = open;
-	door.closed = closed;
-	door.DoorClosed = DoorClosed;
-	for(int i = 0; i < count; i++) {
-		overlays[0]->tiles[indexes[i]]->tileIndex = DoorClosed;
-	}
+	Door *door = new Door(overlays[0]);
+	door->SetTiles(indexes, count);
+	door->SetPolygon(true, open);
+	door->SetPolygon(false, closed);
+	door->SetDoorClosed(DoorClosed);
+	door->SetName(Name);
 	doors.push_back(door);
-	return &doors.at(doors.size()-1);
+	return doors.at(doors.size()-1);
 }
 
 void TileMap::ToggleDoor(Door * door)
@@ -90,7 +86,7 @@ void TileMap::DrawOverlay(unsigned int index, Region viewport)
 Door * TileMap::GetDoor(unsigned short x, unsigned short y)
 {
   for(size_t i = 0; i < doors.size(); i++) {
-		Door * door = &doors.at(i);
+		Door * door = doors.at(i);
 		if(door->DoorClosed) {
 			if(door->closed->BBox.x > x)
 				continue;
@@ -178,7 +174,7 @@ InfoPoint * TileMap::GetInfoPoint(const char * Name)
 {
 	for(size_t i = 0; i < infoPoints.size(); i++) {
 		InfoPoint * ip = &infoPoints.at(i);
-		int len = strlen(ip->Name);
+		int len = (int)strlen(ip->Name);
 		int p = 0;
 		for(int x = 0; x < len; x++) {
 			if(ip->Name[x] == ' ')
@@ -195,7 +191,7 @@ InfoPoint * TileMap::GetInfoPoint(const char * Name)
 
 InfoPoint * TileMap::GetInfoPoint(int index)
 {
-	if(index >= infoPoints.size())
+	if((unsigned int)index >= infoPoints.size())
 		return NULL;
 	return &infoPoints.at(index);
 }
