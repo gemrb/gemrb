@@ -152,10 +152,15 @@ Window * CHUImp::GetWindow(unsigned long i)
 				AnimationFactory * bam = (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
 				if(bam == NULL) {
 					printf("[CHUImporter]: Cannot Load Button Images, skipping control\n");
-					delete(btn);
+					//delete(btn);
+					/* 
+						IceWind Dale 2 has fake BAM ResRefs for some Buttons, this will handle bad
+						ResRefs
+					*/
+					win->AddControl(btn);
 					continue;
 					}
-/** Cycle is only a byte for buttons */
+				/** Cycle is only a byte for buttons */
 				Animation * ani = bam->GetCycle(Cycle&0xff);
 				Sprite2D * tspr = ani->GetFrame(UnpressedIndex);
 				btn->SetImage(IE_GUI_BUTTON_UNPRESSED, tspr);
