@@ -113,6 +113,11 @@ def PregenPress():
 	return
 
 def LoadSingle():
+	GemRB.UnloadWindow(StartWindow)
+	GemRB.UnloadWindow(QuitWindow)
+	GemRB.UnloadWindow(TutorialWindow)
+	GemRB.SetVar("PlayMode",0)
+        GemRB.SetNextScript("GUILOAD")
 	return
 
 def NewSingle():
