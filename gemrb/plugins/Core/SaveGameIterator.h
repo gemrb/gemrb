@@ -14,6 +14,10 @@ public:
 	};
 	~SaveGame() {};
 	int GetPortraitCount() { return PortraitCount; };
+	const char *GetName() { return Name; };
+	const char *GetPrefix() { return Prefix; };
+	const char *GetPath() { return Path; };
+
 	DataStream * GetPortrait(int index)
 	{
 		if(index > PortraitCount)
