@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.46 2004/01/16 22:56:35 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.47 2004/01/16 23:05:34 avenger_teambg Exp $
  *
  */
 
@@ -63,6 +63,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		triggers[0x0f] = Globals;
 		triggers[0x18] = Range;
 		triggers[0x23] = True;
+		triggers[0x2b] = ActionListEmpty;
 		triggers[0x30] = False;
 		triggers[0x36] = OnCreation;
 		triggers[0x42] = PartyHasItem;
@@ -1146,6 +1147,18 @@ int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger *parameters)
 
 int GameScript::True(Scriptable * /* Sender*/, Trigger * /*parameters*/)
 {
+	return 1;
+}
+
+int GameScript::ActionListEmpty(Scriptable * Sender, Trigger * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objectParameter);
+	if(!scr)
+		return 0;
+	if(scr->Type != ST_ACTOR)
+		return 0;
+	if(scr->GetNextAction())
+		return 0;
 	return 1;
 }
 

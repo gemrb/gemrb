@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.29 2004/01/16 22:56:35 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.30 2004/01/16 23:05:34 avenger_teambg Exp $
  *
  */
 
@@ -429,6 +429,7 @@ private: //Script Functions
 	static int  OnCreation(Scriptable * Sender, Trigger * parameters);
 	static int  PartyHasItem(Scriptable * Sender, Trigger * parameters);
 	static int  True(Scriptable * Sender, Trigger * parameters);
+	static int  ActionListEmpty(Scriptable * Sender, Trigger * parameters);
 	static int  False(Scriptable * Sender, Trigger * parameters);
 	static int  Alignment(Scriptable * Sender, Trigger * parameters);
 	static int  Allegiance(Scriptable * Sender, Trigger * parameters);
