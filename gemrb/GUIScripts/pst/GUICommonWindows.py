@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.21 2004/10/02 11:05:49 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.22 2004/10/17 01:21:34 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -226,7 +226,7 @@ def PopulatePortraitWindow (Window):
 	for i in range (0,PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
 		ButtonHP = GemRB.GetControl (Window, 6 + i)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+		#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
 		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "PortraitButtonOnDragDrop")
