@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.h,v 1.8 2004/02/24 22:20:42 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.h,v 1.9 2004/03/22 22:40:54 avenger_teambg Exp $
  *
  */
 
@@ -45,6 +45,9 @@ public:
 	char* GetValue(int val);
 	char* GetStringIndex(int Index);
 	long GetValueIndex(int Index);
+	int FindString(char *str, int len);
+	int FindValue(int val);
+
 public:
 	void release(void)
 	{

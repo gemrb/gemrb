@@ -27,6 +27,8 @@ public:
 	virtual char* GetValue(int val) = 0;
 	virtual char* GetStringIndex(int Index) = 0;
 	virtual long GetValueIndex(int Index) = 0;
+	virtual int FindValue(int val) = 0;
+	virtual int FindString(char *str, int len) = 0;
 };
 
 #endif
