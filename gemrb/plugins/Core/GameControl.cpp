@@ -65,6 +65,7 @@ GameControl::GameControl(void)
 	BottomCount = 0;
 	RightCount = 0;
 	TopCount = 0;
+	GUIEnabled = false;
 }
 
 GameControl::~GameControl(void)
@@ -603,44 +604,42 @@ void GameControl::SetCutSceneMode(bool active)
 
 void GameControl::HideGUI()
 {
+	if(!GUIEnabled)
+		return;
+	GUIEnabled = false;
 	Variables * dict = core->GetDictionary();
 	unsigned long index;
 	if(dict->Lookup("MessageWindow", index)) {
 		Window * mw = core->GetWindow(index);
-		mw->Visible = false;
-		mw->Invalidate();
+		core->SetVisible(index, 0);
 		if(dict->Lookup("MessagePosition", index)) {
 			ResizeDel(mw, index);
 		}
 	}
 	if(dict->Lookup("OptionsWindow", index)) {
 		Window * ow = core->GetWindow(index);
-		ow->Visible = false;
-		ow->Invalidate();
+		core->SetVisible(index, 0);
 		if(dict->Lookup("OptionsPosition", index)) {
 			ResizeDel(ow, index);
 		}
 	}
 	if(dict->Lookup("PortraitWindow", index)) {
 		Window * pw = core->GetWindow(index);
-		pw->Visible = false;
-		pw->Invalidate();
+		core->SetVisible(index, 0);
 		if(dict->Lookup("PortraitPosition", index)) {
 			ResizeDel(pw, index);
 		}
 	}
 	if(dict->Lookup("ActionsWindow", index)) {
 		Window * aw = core->GetWindow(index);
-		aw->Visible = false;
-		aw->Invalidate();
+		core->SetVisible(index, 0);
 		if(dict->Lookup("ActionsPosition", index)) {
 			ResizeDel(aw, index);
 		}
 	}
 	if(dict->Lookup("TopWindow", index)) {
 		Window * tw = core->GetWindow(index);
-		tw->Visible = false;
-		tw->Invalidate();
+		core->SetVisible(index, 0);
 		if(dict->Lookup("TopPosition", index)) {
 			ResizeDel(tw, index);
 		}
@@ -650,49 +649,42 @@ void GameControl::HideGUI()
 
 void GameControl::UnhideGUI()
 {
+	if(GUIEnabled)
+		return;
+	GUIEnabled = true;
 	Variables * dict = core->GetDictionary();
 	unsigned long index;
 	if(dict->Lookup("MessageWindow", index)) {
 		Window * mw = core->GetWindow(index);
-		mw->Visible = true;
-		mw->Invalidate();
-		core->SetOnTop(index);
+		core->SetVisible(index, 1);
 		if(dict->Lookup("MessagePosition", index)) {
 			ResizeAdd(mw, index);
 		}
 	}
 	if(dict->Lookup("ActionsWindow", index)) {
 		Window * aw = core->GetWindow(index);
-		aw->Visible = true;
-		aw->Invalidate();
-		core->SetOnTop(index);
+		core->SetVisible(index, 1);
 		if(dict->Lookup("ActionsPosition", index)) {
 			ResizeAdd(aw, index);
 		}
 	}
 	if(dict->Lookup("OptionsWindow", index)) {
 		Window * ow = core->GetWindow(index);
-		ow->Visible = true;
-		ow->Invalidate();
-		core->SetOnTop(index);
+		core->SetVisible(index, 1);
 		if(dict->Lookup("OptionsPosition", index)) {
 			ResizeAdd(ow, index);
 		}
 	}
 	if(dict->Lookup("PortraitWindow", index)) {
 		Window * pw = core->GetWindow(index);
-		pw->Visible = true;
-		pw->Invalidate();
-		core->SetOnTop(index);
+		core->SetVisible(index, 1);
 		if(dict->Lookup("PortraitPosition", index)) {
 			ResizeAdd(pw, index);
 		}
 	}
 	if(dict->Lookup("TopWindow", index)) {
 		Window * tw = core->GetWindow(index);
-		tw->Visible = true;
-		tw->Invalidate();
-		core->SetOnTop(index);
+		core->SetVisible(index, 1);
 		if(dict->Lookup("TopPosition", index)) {
 			ResizeAdd(tw, index);
 		}

@@ -55,6 +55,7 @@ private:
 	PathNode * drawPath;
 	unsigned long AIUpdateCounter;
 	bool DisableMouse;
+	bool GUIEnabled;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
