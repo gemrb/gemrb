@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.5 2004/10/17 15:09:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.6 2004/11/07 19:19:12 edheldil Exp $
  *
  */
 
@@ -72,7 +72,7 @@ typedef struct ITMFeature {
 	ieByte Probability2;
 	ieResRef Resource;
 	ieDword DiceThrown;
-	ieWord DiceSides;
+	ieDword DiceSides;
 	ieDword SavingThrowType;
 	ieDword SavingThrowBonus;
 	ieDword unknown;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.8 2004/10/17 17:44:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.9 2004/11/07 19:19:12 edheldil Exp $
  *
  */
 
@@ -223,7 +223,7 @@ ITMFeature* ITMImp::GetFeature()
 	str->Read( &f->Probability2, 1 );
 	str->Read( f->Resource, 8 );
 	str->Read( &f->DiceThrown, 4 );
-	str->Read( &f->DiceSides, 2 );
+	str->Read( &f->DiceSides, 4 );
 	str->Read( &f->SavingThrowType, 4 );
 	str->Read( &f->SavingThrowBonus, 4 );
 	str->Read( &f->unknown, 4 );
