@@ -27,6 +27,7 @@
 #include "SymbolMgr.h"
 #include "MoviePlayer.h"
 #include "Character.h"
+#include "DataFileMgr.h"
 
 typedef struct Table {
 	TableMgr * tm;
@@ -80,6 +81,7 @@ private:
 	std::vector<Table> tables;
 	std::vector<Symbol> symbols;
 	std::vector<Character*> sheets;
+	DataFileMgr * INIparty;
 public:
 	Interface(void);
 	~Interface(void);
@@ -173,6 +175,11 @@ public:
 	int PlayMovie(char * ResRef);
 	/** Generates traditional random number xdy+z */
 	int Roll(int dice, int size, int add);
+	/** Get the Party INI Interpreter */
+	DataFileMgr * GetPartyINI()
+	{
+		return INIparty;
+	}
 
 private:
 	bool LoadConfig(void);
