@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.39 2004/11/01 16:29:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.40 2004/11/28 19:36:39 avenger_teambg Exp $
  *
  */
 
@@ -23,14 +23,43 @@
 #include "TLKImp.h"
 #include "../Core/Interface.h"
 
+static int *monthnames=NULL;
+static int *days=NULL;
+static int monthnamecount=0;
+
 TLKImp::TLKImp(void)
 {
 	str = NULL;
 	autoFree = false;
+	if (monthnamecount==0) {
+		TableMgr * tab;
+		int table=core->LoadTable("months");
+		if(table<0) {
+			monthnamecount=-1;
+			return;
+		}
+		tab = core->GetTable(table);
+		if(!tab) {
+			monthnamecount=-1;
+			goto end;
+		}
+		monthnamecount = tab->GetRowCount();
+		monthnames = (int *) malloc(sizeof(int) * monthnamecount);
+		days = (int *) malloc(sizeof(int) * monthnamecount);
+		for(int i=0;i<monthnamecount;i++) {
+			days[i]=atoi(tab->QueryField(i,0));
+			monthnames[i]=atoi(tab->QueryField(i,1));
+		}
+end:
+		core->DelTable(table);
+	}
 }
 
 TLKImp::~TLKImp(void)
 {
+	if (monthnames) free(monthnames);
+	if (days) free(days);
+	monthnamecount=0;
 	if (str && autoFree) {
 		delete( str );
 	}
@@ -121,6 +150,35 @@ int TLKImp::GenderStrRef(int slot, int malestrref, int femalestrref)
 	return malestrref;
 }
 
+void TLKImp::GetMonthName(int dayandmonth)
+{
+	int month=1;
+
+	for(int i=0;i<monthnamecount;i++) {
+		if(dayandmonth<days[i]) {
+			char *tmp;
+			char tmpstr[10];
+			
+			sprintf(tmpstr,"%d", dayandmonth+1);
+		        tmp = ( char* ) malloc( strlen( tmpstr ) + 1 );
+			strcpy( tmp, tmpstr );
+			core->GetTokenDictionary()->SetAt("DAY", tmp);
+
+			tmp = GetString( monthnames[i] );
+			core->GetTokenDictionary()->SetAt("MONTHNAME",tmp);
+
+			sprintf(tmpstr,"%d", month);
+		        tmp = ( char* ) malloc( strlen( tmpstr ) + 1 );
+			strcpy( tmp, tmpstr );
+			core->GetTokenDictionary()->SetAt("MONTH",tmp);
+			return;
+		}
+		dayandmonth-=days[i];
+		//ignoring single days (they are not months)
+		if(days[i]!=1) month++;
+	}
+}
+
 //if this function returns -1 then it is not a built in token, dest may be NULL
 int TLKImp::BuiltinToken(char* Token, char* dest)
 {
@@ -128,7 +186,16 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 	bool freeup=true;
 	int TokenLength;   //decoded token length
 
-	//this may be hardcoded, all engines are the same or don't use it
+	//these are hardcoded, all engines are the same or don't use them
+	if (!strcmp( Token, "DAYANDMONTH")) {
+		ieDword dayandmonth=0;
+		core->GetDictionary()->Lookup("DAYANDMONTH",dayandmonth);
+		//preparing sub-tokens
+		GetMonthName((int) dayandmonth);
+		Decoded = GetString( 15981, 0 );
+		goto exit_function;
+	}
+
 	if (!strcmp( Token, "FIGHTERTYPE" )) {
 		Decoded = GetString( 10086, 0 );
 		goto exit_function;
