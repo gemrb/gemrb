@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.233 2004/10/31 21:36:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.234 2004/11/01 09:16:09 avenger_teambg Exp $
  *
  */
 
@@ -205,10 +205,8 @@ GameControl* StartGameControl()
 }
 
 PyDoc_STRVAR( GemRB_GetGameString__doc,
-"GetGameVariable(Index\n\n"
-"Returns various game strings, known values for index are:\n"
-"0 - Loading Mos picture\n"
-"1 and above - undefined.");
+"GetGameString(Index)\n\n"
+"Returns various string attributes of the Game object, see the docs.\n");
 
 static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 {
@@ -217,10 +215,18 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 	if (!PyArg_ParseTuple( args, "i", &Index )) {
 		return AttributeError( GemRB_GetGameString__doc );
 	}
-	if(Index==0) {
+	switch(Index&0xf0) {
+	case 0: //game strings
 		Game *game = core->GetGame();
-		if(game) return Py_BuildValue("s", core->GetGame()->LoadMos);
-		return Py_BuildValue("s", "");
+		if(!game) {
+			return PyString_FromString("");
+		}
+		switch(Index&15) {
+		case 0:
+			return PyString_FromString( game->LoadMos );
+		case 1:
+			return PyString_FromString( game->CurrentArea );
+		}
 	}
 
 	return NULL;
@@ -368,7 +374,7 @@ static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_EndCutSceneMode__doc,
-"EndCutScreneMode()\n\n"
+"EndCutSceneMode()\n\n"
 "Exits the CutScene Mode." );
 
 static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
