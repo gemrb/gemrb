@@ -13,6 +13,9 @@ ProfColumn = 0
 def RedrawSkills():
 	global TopIndex
 
+	if PointsLeft == 0:
+		GemRB.SetButtonState(SkillWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+
 	SumLabel = GemRB.GetControl(SkillWindow, 0x10000009)
 	GemRB.SetText(SkillWindow, SumLabel, str(PointsLeft) )  #points to distribute
 
@@ -27,7 +30,6 @@ def RedrawSkills():
 			GemRB.SetVarAssoc(SkillWindow, ScrollBarControl,"TopIndex",Pos-7)
 			break
 
-		Label=GemRB.GetControl(SkillWindow, i+69)
 		Button1=GemRB.GetControl(SkillWindow, i*2+11)
 		Button2=GemRB.GetControl(SkillWindow, i*2+12)
 		if MaxProf == 0:
