@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.28 2004/08/03 22:27:29 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.29 2004/08/04 00:49:25 edheldil Exp $
  *
  */
 
@@ -149,7 +149,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 					btn->Height = Height;
 					btn->ControlType = ControlType;
 					char BAMFile[9];
-					ieDword Cycle, UnpressedIndex, PressedIndex,
+					ieWord Cycle, UnpressedIndex, PressedIndex,
 					SelectedIndex, DisabledIndex;
 					str->Read( BAMFile, 8 );
 					BAMFile[8] = 0;
