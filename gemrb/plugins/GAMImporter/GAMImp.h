@@ -22,24 +22,7 @@
 #define GAMIMP_H
 
 #include "../Core/SaveGameMgr.h"
-
-typedef struct PCStruct {
-	unsigned short Unknown0;
-	unsigned short PartyOrder;
-	unsigned long OffsetToCRE;
-	unsigned long CRESize;
-	char CREResRef[8];
-	unsigned long Orientation;
-	char Area[8];
-	unsigned short XPos;
-	unsigned short YPos;
-	unsigned short ViewXPos;
-	unsigned short ViewYPos;
-	unsigned char Unknown28[100];
-	unsigned char Unknown8C[16];
-	char ResRef[8][3];
-	unsigned char UnknownB4[12];
-} PCStruct;
+#include "../Core/ActorMgr.h"
 
 class GAMImp : public SaveGameMgr {
 private:
@@ -48,33 +31,6 @@ private:
 	int version;
 	unsigned long PCSize;
 
-public:
-	unsigned int GameTime;
-	unsigned short WhichFormation;
-	unsigned short Formations[5];
-	unsigned long PartyGold;
-	unsigned long Unknown1c;
-	unsigned long PCOffset;
-	unsigned long PCCount;
-	unsigned long UnknownOffset;
-	unsigned long UnknownCount;
-	unsigned long NPCOffset;
-	unsigned long NPCCount;
-	unsigned long GLOBALOffset;
-	unsigned long GLOBALCount;
-	char AREResRef[9];
-	unsigned long Unknown48;
-	unsigned long JournalCount;
-	unsigned long JournalOffset;
-	unsigned long Unknown54;
-	unsigned long UnknownOffset54;
-	unsigned long UnknownCount58;
-	unsigned long KillVarsOffset;
-	unsigned long KillVarsCount;
-	unsigned long SomeBytesArrayOffset;
-	char AnotherArea[9];
-	char CurrentArea[9];
-	unsigned char Unknowns[84];
 public:
 	GAMImp(void);
 	~GAMImp(void);
@@ -85,6 +41,9 @@ public:
 	{
 		delete this;
 	}
+private:
+	Actor* GetActor( ActorMgr* aM, bool is_in_party );
+	GAMJournalEntry* GetJournalEntry();
 };
 
 #endif

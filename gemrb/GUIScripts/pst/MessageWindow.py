@@ -25,6 +25,7 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUIWORLD")
 	ActionsWindow = GemRB.LoadWindow(0)
 	PortraitWindow = GemRB.LoadWindow(1)
+	PopulatePortraitWindow ()
 	OptionsWindow = GemRB.LoadWindow(2)
 	MessageWindow = GemRB.LoadWindow(7)
 	MessageTA = GemRB.GetControl(MessageWindow, 1)
@@ -133,3 +134,20 @@ def UpdateResizeButtons():
 	
 	GemRB.SetEvent(MessageWindow, CloseButton, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 	return
+
+def PopulatePortraitWindow ():
+	Window = PortraitWindow
+	size = 6
+	party_size = GemRB.GetPartySize ()
+
+	print "party_size:", party_size
+	for i in range (size):
+		#actor = GemRB.PartyGetActor ()
+		if i < party_size:
+			pic = GemRB.ActorGetSmallPortrait (i)
+			Button = GemRB.GetControl (Window, i)
+			#GemRB.SetButtonSprites (Window, Button, pic, 0, 0, 1, 0, 0)
+			GemRB.SetButtonBAM (Window, Button, pic, 0, 0, 0)
+			GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE, OP_SET)
+		else:
+			pass

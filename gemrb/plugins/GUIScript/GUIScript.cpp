@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.129 2004/02/29 17:36:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.130 2004/02/29 19:32:35 edheldil Exp $
  *
  */
 
@@ -114,8 +114,8 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
-	GameControl* gc = StartGameControl();
 	core->LoadGame( GameIndex );
+	GameControl* gc = StartGameControl();
 	gc->SetCurrentArea( 0 );
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -123,6 +123,7 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 
 static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
 {
+	core->LoadGame( -1 );
 	GameControl* gc = StartGameControl();
 	// 0 - single player, 1 - tutorial, 2 - multiplayer
 	unsigned long playmode = 0;
@@ -133,7 +134,6 @@ static PyObject* GemRB_EnterGame(PyObject*, PyObject* args)
 	char* StartArea = tm->QueryField( playmode );
 	int startX = atoi( tm->QueryField( playmode + 1 ) );
 	int startY = atoi( tm->QueryField( playmode + 2 ) );
-	core->LoadGame( -1 );
 	gc->SetCurrentArea( 0 );
 	core->GetVideoDriver()->MoveViewportTo( startX, startY );
 	core->EnterActors( StartArea );
@@ -1576,7 +1576,7 @@ static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iisiii", &WindowIndex, &ControlIndex,
 			&ResRef, &CycleIndex, &FrameIndex, &col1 )) {
 		printMessage( "GUIScript",
-			"Syntax Error: SetButtonBAM(WindowIndex, ControlIndex, BAMResRef, col1)\n",
+			"Syntax Error: SetButtonBAM(WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)\n",
 			LIGHT_RED );
 		return NULL;
 	}
@@ -1787,6 +1787,76 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 	return Py_BuildValue( "l", value );
 }
 
+static PyObject * GemRB_ReplaceVarsInText (PyObject * /*self*/, PyObject *args)
+{
+        ieStrRef  Strref;
+	char* Variable;
+	unsigned long value;
+	//PyDict_Type reqtype;
+	PyObject  *dict;
+
+	//char newtext[4096];
+
+	if(!PyArg_ParseTuple(args, "iO!", &Strref, &PyDict_Type, &dict)) {
+		printMessage("GUIScript", "Syntax Error: ReplaceVarsInText(StrRef)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	char newtext[4096] = "";
+	char *src = core->GetString (Strref);
+	//char *src = "Page <PAGE> in <NUMPAGES> of <jshd> kjj <<ok> on <<XYX>> fif <ABC";
+	char *dest = newtext;
+	char *next;
+	int  len;
+
+	while (1) {
+	  next = strchr (src, '<');
+	  if (! next) {
+	    strcpy (dest, src);
+	    break;
+	  }
+
+	  len = next - src;
+	  memcpy (dest, src, len);
+	  src += len;
+	  dest += len;
+
+	  len = strspn (src + 1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ_");
+
+	  if (len == 0 || *(src + len + 1) != '>') {
+	    memcpy (dest, src, len + 1);
+	    src += len + 1;
+	    dest += len + 1;
+	    continue;
+	  }
+
+	  // do replace
+	  memcpy (dest, src + 1, len);
+	  dest[len] = 0;
+
+	  //printf ("REPLACE: %s\n", dest);
+
+	  /*
+	    if(!core->GetDictionary()->Lookup(Variable, value))
+	    return Py_BuildValue("l", (unsigned long) 0);
+	  */
+
+	  PyObject *res = PyDict_GetItemString(dict, dest);
+	  if (! res) {
+	    dest += len;
+	  }
+	  else {
+	    strcpy (dest, PyString_AsString (res));
+	    dest += strlen (dest);
+	  }
+	  src += len + 2;
+	}
+
+	//printf ("RES: %s\n", newtext);
+
+	return Py_BuildValue("s", newtext);
+}
+
 static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 {
 	char* string;
@@ -1821,7 +1891,7 @@ static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 			"Syntax Error: DeleteSaveGame(SlotCount)\n", LIGHT_RED );
 		return NULL;
 	}
-	core->GetSaveGameIterator()->GetSaveGame( SlotCount, true );
+	core->GetSaveGameIterator()->DeleteSaveGame( SlotCount );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -2011,6 +2081,22 @@ static PyObject* GemRB_GetCharSounds(PyObject * /*self*/, PyObject* args)
 	}
 	return Py_BuildValue( "i", core->GetCharSounds( ta ) );
 }
+
+static PyObject* GemRB_ActorGetSmallPortrait(PyObject * /*self*/, PyObject* args)
+{
+	int index;
+
+	if (!PyArg_ParseTuple( args, "i", &index )) {
+		printMessage( "GUIScript",
+			"Syntax Error: ActorGetSmallPortrait(index)\n", LIGHT_RED );
+	}
+
+	printf ("game: %p\n", core->GetGame ());
+	Actor * actor = core->GetGame ()->GetPC (index);
+	printf ("actor: %p\n", actor);
+	return Py_BuildValue( "s", actor->GetPortrait (0));
+}
+
 
 static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 {
@@ -2509,6 +2595,12 @@ static PyMethodDef GemRBMethods[] = {
 	"Starts new game and enters it."},
 	{"StatComment", GemRB_StatComment, METH_VARARGS,
 	"Replaces values into an strref."},
+
+	{"ReplaceVarsInText", GemRB_ReplaceVarsInText, METH_VARARGS,
+	 "Replaces named vars into an strref."},
+	{"ActorGetSmallPortrait", GemRB_ActorGetSmallPortrait, METH_VARARGS,
+	 "Returns actor's small portrait resref."},
+
 	{"EndCutSceneMode", GemRB_EndCutSceneMode, METH_NOARGS,
 	"Exits the CutScene Mode."},
 	{"GetPartySize", GemRB_GetPartySize, METH_NOARGS,

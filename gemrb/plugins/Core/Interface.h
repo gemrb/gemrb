@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.79 2004/02/28 01:36:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.80 2004/02/29 19:32:34 edheldil Exp $
  *
  */
 
@@ -298,7 +298,21 @@ public:
 	char UserDir[_MAX_PATH];
 	int argc;
 	char **argv;	  
-	char GameName[_MAX_PATH], GameType[_MAX_PATH], GemRBPath[_MAX_PATH], PluginsPath[_MAX_PATH], CachePath[_MAX_PATH], GUIScriptsPath[_MAX_PATH], GamePath[_MAX_PATH], INIConfig[_MAX_PATH], CD1[_MAX_PATH], CD2[_MAX_PATH], CD3[_MAX_PATH], CD4[_MAX_PATH], CD5[_MAX_PATH], CD6[_MAX_PATH];
+	char GameName[_MAX_PATH];
+	char GameType[_MAX_PATH];
+	char GemRBPath[_MAX_PATH];
+	char PluginsPath[_MAX_PATH];
+	char CachePath[_MAX_PATH];
+	char GUIScriptsPath[_MAX_PATH];
+	char GamePath[_MAX_PATH];
+	char SavePath[_MAX_PATH];
+	char INIConfig[_MAX_PATH];
+	char CD1[_MAX_PATH];
+	char CD2[_MAX_PATH];
+	char CD3[_MAX_PATH];
+	char CD4[_MAX_PATH];
+	char CD5[_MAX_PATH];
+	char CD6[_MAX_PATH];
 	int Width, Height, Bpp, ForceStereo;
 	bool FullScreen, CaseSensitive, GameOnCD;
 	/** Draws the Visible windows in the Windows Array */

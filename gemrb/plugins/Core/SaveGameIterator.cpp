@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.17 2004/02/29 15:24:59 hrk Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.18 2004/02/29 19:32:34 edheldil Exp $
  *
  */
 
@@ -27,6 +27,7 @@ extern Interface* core;
 
 SaveGameIterator::SaveGameIterator(void)
 {
+	loaded = false;
 }
 
 SaveGameIterator::~SaveGameIterator(void)
@@ -71,138 +72,155 @@ static const char* PlayMode()
 	return "save";
 }
 
-int SaveGameIterator::GetSaveGameCount()
+/*
+ * Return true if directory Path/slotname is a potential save game
+ *   slot, otherwise return false.
+ */
+static bool IsSaveGameSlot(const char* Path, const char* slotname)
 {
-	int count = 0;
+	char savegameName[_MAX_PATH];
+	int savegameNumber = 0;
+
+	if (slotname[0] == '.')
+		return false;
+
+	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
+	if (cnt != 2) { 
+		//The matcher didn't match: either this is not a valid dir
+		//   or the SAVEGAME_DIRECTORY_MATCHER needs updating.
+		printf( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
+		return false;
+	}
+
+	//The matcher got matched correctly.
+	printf( "[Number = %d, Name = %s]\n", savegameNumber, savegameName );
+
+
+	char dtmp[_MAX_PATH];
+	sprintf( dtmp, "%s%s%s", Path, SPathDelimiter, slotname );
+
+	struct stat  fst;
+	if (stat( dtmp, &fst ))
+		return false;
+
+	if (! S_ISDIR( fst.st_mode ))
+		return false;
+
+	char ftmp[_MAX_PATH];
+	sprintf( ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter,
+		 core->GameNameResRef );
+
+#ifndef WIN32
+	ResolveFilePath( ftmp );
+#endif
+	//FILE* exist = fopen( ftmp, "rb" );
+	//if (!exist)
+	//	return false;
+	//fclose( exist );
+	if (access( ftmp, R_OK ))
+		return false;
+
+	return true;
+}
+
+bool SaveGameIterator::RescanSaveGames()
+{
+	loaded = true;
+
+	// delete old entries
+	for (int i = save_slots.size() - 1; i >= 0; i--) {
+		delete( save_slots[i] );
+	}
+
 	char Path[_MAX_PATH];
-	const char* SaveFolder = PlayMode();
-	sprintf( Path, "%s%s", core->GamePath, SaveFolder );
+	sprintf( Path, "%s%s", core->SavePath, PlayMode() );
+
 	DIR* dir = opendir( Path );
 	if (dir == NULL) //If we cannot open the Directory
 	{
-		return -1;
+		return false;
 	}
 	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
 	if (de == NULL) {
 		closedir( dir );
-		return -1;
+		return false;
 	}
 	do {
-		//Iterate through all the available modules to load
-		char dtmp[_MAX_PATH];
-		struct stat fst;
-		sprintf( dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name );
-		stat( dtmp, &fst );
-		if (S_ISDIR( fst.st_mode )) {
-			if (de->d_name[0] == '.')
-				continue;
-			char ftmp[_MAX_PATH];
-			sprintf( ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter,
-				core->GameNameResRef );
-#ifndef WIN32
-			ResolveFilePath( ftmp );
-#endif
-			FILE* exist = fopen( ftmp, "rb" );
-			if (!exist)
-				continue;
-			fclose( exist );
-			char savegameName[_MAX_PATH];
-			int savegameNumber = 0;
-			int cnt = sscanf( de->d_name, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
-			if (cnt == 2) { //The matcher got matched correctly.
-				printf( "[Number = %d, Name = %s]\n", savegameNumber, savegameName );
-				count++;
-			}
-			else { //The matcher didn't match: either this is not a valid directory or the SAVEGAME_DIRECTORY_MATCHER needs updating.
-				printf( "[Invalid savegame directory '%s' in %s.\n", de->d_name, Path);
-			}
+		if (IsSaveGameSlot( Path, de->d_name )) {
+			save_slots.push_back( strdup( de->d_name ) );
 		}
+
 	} while (( de = readdir( dir ) ) != NULL);
 	closedir( dir );  //No other files in the directory, close it
-	return count;
+
+	return true;
 }
 
-SaveGame* SaveGameIterator::GetSaveGame(int index, bool Remove)
+int SaveGameIterator::GetSaveGameCount()
 {
-	int count = -1, prtrt = 0;
+	if (! loaded && ! RescanSaveGames())
+		return -1;
+
+	return save_slots.size();
+}
+
+SaveGame* SaveGameIterator::GetSaveGame(int index)
+{
+	if (index < 0 || index >= GetSaveGameCount())
+		return NULL;
+
+	char* slotname  = save_slots[index];
+
+
+	int prtrt = 0;
 	char Path[_MAX_PATH];
-	char dtmp[_MAX_PATH];
-	const char* SaveFolder = PlayMode();
-	sprintf( Path, "%s%s", core->GamePath, SaveFolder );
-	DIR* dir = opendir( Path );
-	if (dir == NULL) //If we cannot open the Directory
-	{
-		return NULL;
-	}
-	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
-	if (de == NULL) //If no entry exists just return
-	{
-		return NULL;
-	}
+	sprintf( Path, "%s%s%s%s", core->SavePath, PlayMode(),
+		 SPathDelimiter, slotname );
+
+
 	char savegameName[_MAX_PATH];
 	int savegameNumber = 0;
-	do {
-		//Iterate through all the available modules to load
-		struct stat fst;
-		sprintf( dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name );
-		stat( dtmp, &fst );
-		if (S_ISDIR( fst.st_mode )) {
-			if (de->d_name[0] == '.')
-				continue;
-			char ftmp[_MAX_PATH];
-			sprintf( ftmp, "%s%s%s.bmp", dtmp, SPathDelimiter,
-				core->GameNameResRef );
-#ifndef WIN32
-			ResolveFilePath( ftmp );
-#endif
-			FILE* exist = fopen( ftmp, "rb" );
-			if (!exist)
-				continue;
-			fclose( exist );
-			int cnt = sscanf( de->d_name, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
-			if (cnt == 2) {
-				printf( "[Number = %d, Name = %s]\n", savegameNumber, savegameName );
-				count++;
-			}
-			else {
-				printf( "[Invalid savegame directory '%s' in %s.\n", de->d_name, Path);
-			}
-			if (count == index) {
-				if (Remove) {
-					sprintf( Path, "%s%s%s%s", core->GamePath, SaveFolder,
-						SPathDelimiter, de->d_name );
-					DelTree( Path );
-					rmdir( Path );
-					break;
-				}
-				sprintf( Path, "%s%s%s%s", core->GamePath, SaveFolder,
-					SPathDelimiter, de->d_name );
-				DIR* ndir = opendir( Path );
-				//If we cannot open the Directory
-				if (ndir == NULL) {
-					closedir( dir );
-					return NULL;
-				}
-				struct dirent* de2 = readdir( ndir );  //Lookup the first entry in the Directory
-				if (de2 == NULL) {
-					// No first entry!!!
-					closedir( dir );
-					closedir( ndir );
-					return NULL;
-				}
-				do {
-					if (strnicmp( de2->d_name, "PORTRT", 6 ) == 0)
-						prtrt++;
-				} while (( de2 = readdir( ndir ) ) != NULL);
-				closedir( ndir );  //No other files in the directory, close it
-				break;
-			}
-		}
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir );  //No other files in the directory, close it
-	if (Remove || ( de == NULL )) {
+
+	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
+	printf( "[Number = %d, Name = %s]\n", savegameNumber, savegameName );
+
+	DIR* ndir = opendir( Path );
+	//If we cannot open the Directory
+	if (ndir == NULL) {
 		return NULL;
 	}
-	SaveGame* sg = new SaveGame( dtmp, savegameName, core->GameNameResRef, prtrt );
+	struct dirent* de2 = readdir( ndir );  //Lookup the first entry in the Directory
+	if (de2 == NULL) {
+		// No first entry!!!
+		closedir( ndir );
+		return NULL;
+	}
+	do {
+		if (strnicmp( de2->d_name, "PORTRT", 6 ) == 0)
+			prtrt++;
+	} while (( de2 = readdir( ndir ) ) != NULL);
+	closedir( ndir );  //No other files in the directory, close it
+
+	SaveGame* sg = new SaveGame( Path, savegameName, core->GameNameResRef, prtrt );
 	return sg;
+}
+
+void SaveGameIterator::DeleteSaveGame(int index)
+{
+	if (index < 0 || index >= GetSaveGameCount())
+		return;
+
+	char* slotname  = save_slots[index];
+
+
+	char Path[_MAX_PATH];
+	sprintf( Path, "%s%s%s%s", core->SavePath, PlayMode(), 
+		 SPathDelimiter, slotname );
+	DelTree( Path );
+	rmdir( Path );
+
+	// FIXME: maybe do just: delete save_slots[index]
+	//   instead of full rescan
+
+	loaded = false;
 }

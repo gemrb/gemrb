@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.14 2004/02/27 19:46:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.15 2004/02/29 19:32:34 edheldil Exp $
  *
  */
 
@@ -37,8 +37,40 @@ class Game;
 #endif
 
 #include <vector>
+#include "../../includes/ie_types.h"
 #include "Actor.h"
 #include "Map.h"
+
+typedef struct PCStruct {
+	unsigned short Unknown0;
+	unsigned short PartyOrder;
+	unsigned long OffsetToCRE;
+	unsigned long CRESize;
+	ieResRef CREResRef;
+	unsigned long Orientation;
+	ieResRef Area;
+	unsigned short XPos;
+	unsigned short YPos;
+	unsigned short ViewXPos;
+	unsigned short ViewYPos;
+	unsigned char Unknown28[100];
+	unsigned short QuickWeaponSlot[4];
+	unsigned char Unknown94[8];
+	ieResRef QuickSpellResRef[3];
+	unsigned short QuickItemSlot[3];
+	unsigned char UnknownBA[6];
+} PCStruct;
+
+
+typedef struct GAMJournalEntry {
+	ieStrRef JournalText;
+	ieDword Time; // in seconds
+	ieDword ChapterNumber;
+	ieByte Unknown0C;
+	ieByte Section;
+	ieByte ChapterNumber2;
+} GAMJournalEntry;
+
 
 class GEM_EXPORT Game : public Scriptable {
 public:
@@ -48,8 +80,37 @@ private:
 	std::vector< Actor*> PCs;
 	std::vector< Actor*> NPCs;
 	std::vector< Map*> Maps;
+	std::vector< GAMJournalEntry*> Journals;
 public:
 	int PartySize;
+
+	unsigned int GameTime;
+	unsigned short WhichFormation;
+	unsigned short Formations[5];
+	unsigned long PartyGold;
+	unsigned long Unknown1c;
+	unsigned long PCOffset;
+	unsigned long PCCount;
+	unsigned long UnknownOffset;
+	unsigned long UnknownCount;
+	unsigned long NPCOffset;
+	unsigned long NPCCount;
+	unsigned long GLOBALOffset;
+	unsigned long GLOBALCount;
+	char AREResRef[9];
+	unsigned long Unknown48;
+	unsigned long JournalCount;
+	unsigned long JournalOffset;
+	unsigned long Unknown54;
+	unsigned long UnknownOffset54;
+	unsigned long UnknownCount58;
+	unsigned long KillVarsOffset;
+	unsigned long KillVarsCount;
+	unsigned long SomeBytesArrayOffset;
+	char AnotherArea[9];
+	char CurrentArea[9];
+	unsigned char Unknowns[84];
+	
 public:
 	/* returns actor by slot */
 	Actor* GetPC(unsigned int slot);
@@ -75,6 +136,9 @@ public:
 	int DelMap(unsigned int index, bool autoFree = false);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index);
+	void AddJournalEntry(GAMJournalEntry* entry);
+	int GetJournalCount();
+	GAMJournalEntry* GetJournalEntry(unsigned int Index);
 };
 
 #endif

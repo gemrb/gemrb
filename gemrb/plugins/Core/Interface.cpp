@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.132 2004/02/29 17:31:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.133 2004/02/29 19:32:34 edheldil Exp $
  *
  */
 
@@ -90,6 +90,7 @@ Interface::Interface(int iargc, char** iargv)
 	GameOnCD = false;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
+	SavePath[0] = 0;
 	GemRBPath[0] = 0;
 	PluginsPath[0] = 0;
 	GameName[0] = 0;
@@ -815,6 +816,11 @@ bool Interface::LoadConfig(const char* filename)
 #ifndef WIN32
 			ResolveFilePath( GamePath );
 #endif
+		} else if (stricmp( name, "SavePath" ) == 0) {
+			strcpy( SavePath, value );
+#ifndef WIN32
+			ResolveFilePath( SavePath );
+#endif
 		} else if (stricmp( name, "INIConfig" ) == 0) {
 			strcpy( INIConfig, value );
 		} else if (stricmp( name, "CD1" ) == 0) {
@@ -872,6 +878,10 @@ bool Interface::LoadConfig(const char* filename)
 	if (!GameName[0]) {
 		sprintf( GameName, "GemRB v%.1f.%d.%d", GEMRB_RELEASE / 1000.0,
 			GEMRB_API_NUM, GEMRB_SDK_REV );
+	}
+	if (!SavePath[0]) {
+		// FIXME: maybe should use UserDir instead of GamePath
+		memcpy( SavePath, GamePath, sizeof( GamePath ) );
 	}
 
 	printf( "Loaded config file %s\n", filename );
@@ -961,6 +971,8 @@ Actor* Interface::GetActor(unsigned int Slot)
 
 int Interface::GetPartySize()
 {
+	return game->GetPartySize();
+#if 0
 	int count = 0;
 	int i = actors.size();
 	while (i--) {
@@ -969,6 +981,7 @@ int Interface::GetPartySize()
 			count++;
 	}
 	return count;
+#endif
 }
 
 void Interface::EnterActors(const char* StartArea)
@@ -1711,6 +1724,7 @@ void Interface::LoadGame(int index)
 {
 	DataStream* ds;
 
+	printf("XXXXXXXX: Interface::LoadGame: %d\n", index);
 	if (index == -1) {
 		//Load the Default Game
 		ds = GetResourceMgr()->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
@@ -1734,5 +1748,6 @@ void Interface::LoadGame(int index)
 		delete( game );
 	}
 	game = sgm->GetGame();
+	printf ("XXXXX: GAME: %p\n", game);
 	FreeInterface( sgm );
 }

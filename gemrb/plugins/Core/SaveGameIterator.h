@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.12 2004/02/29 15:24:59 hrk Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.13 2004/02/29 19:32:34 edheldil Exp $
  *
  */
 
@@ -137,11 +137,17 @@ private:
 };
 
 class GEM_EXPORT SaveGameIterator {
+private:
+	bool loaded;
+	std::vector<char*> save_slots;
+
 public:
 	SaveGameIterator(void);
 	~SaveGameIterator(void);
+	bool RescanSaveGames();
 	int GetSaveGameCount();
-	SaveGame* GetSaveGame(int index, bool Remove = false);
+	SaveGame* GetSaveGame(int index);
+	void DeleteSaveGame(int index);
 };
 
 #endif

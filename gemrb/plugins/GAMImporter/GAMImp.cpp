@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.13 2004/02/24 22:20:42 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.14 2004/02/29 19:32:35 edheldil Exp $
  *
  */
 
@@ -79,65 +79,71 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 		return false;
 	}
 
-	str->Read( &GameTime, 4 );
-	str->Read( &WhichFormation, 2 );
+	return true;
+}
+
+Game* GAMImp::GetGame()
+{
+	Game* newGame = new Game();
+
+
+	str->Read( &newGame->GameTime, 4 );
+	str->Read( &newGame->WhichFormation, 2 );
 	for (int i = 0; i < 5; i++) {
-		str->Read( Formations + i, 2 );
+		str->Read( &newGame->Formations[i], 2 );
 	}
-	str->Read( &PartyGold, 4 );
-	str->Read( &Unknown1c, 4 ); //this is unknown yet
-	str->Read( &PCOffset, 4 );
-	str->Read( &PCCount, 4 );
-	str->Read( &UnknownOffset, 4 );
-	str->Read( &UnknownCount, 4 );
-	str->Read( &NPCOffset, 4 );
-	str->Read( &NPCCount, 4 );
-	str->Read( &GLOBALOffset, 4 );
-	str->Read( &GLOBALCount, 4 );
-	str->Read( &CurrentArea, 8 );
-	CurrentArea[8] = 0;
-	str->Read( &Unknown48, 4 );
-	str->Read( &JournalCount, 4 );
-	str->Read( &JournalOffset, 4 );
+	str->Read( &newGame->PartyGold, 4 );
+	str->Read( &newGame->Unknown1c, 4 ); //this is unknown yet
+	str->Read( &newGame->PCOffset, 4 );
+	str->Read( &newGame->PCCount, 4 );
+	str->Read( &newGame->UnknownOffset, 4 );
+	str->Read( &newGame->UnknownCount, 4 );
+	str->Read( &newGame->NPCOffset, 4 );
+	str->Read( &newGame->NPCCount, 4 );
+	str->Read( &newGame->GLOBALOffset, 4 );
+	str->Read( &newGame->GLOBALCount, 4 );
+	str->Read( &newGame->CurrentArea, 8 );
+	newGame->CurrentArea[8] = 0;
+	str->Read( &newGame->Unknown48, 4 );
+	str->Read( &newGame->JournalCount, 4 );
+	str->Read( &newGame->JournalOffset, 4 );
 	switch (version) {
 		default:
 			 {
-				str->Read( &Unknown54, 4 );
-				str->Read( &CurrentArea, 8 );
-				CurrentArea[8] = 0;
-				str->Read( &Unknowns, 84 );
+				str->Read( &newGame->Unknown54, 4 );
+				str->Read( &newGame->CurrentArea, 8 ); // FIXME: see above
+				newGame->CurrentArea[8] = 0;
+				str->Read( &newGame->Unknowns, 84 );
 			}
 			break;
 
 		case 11:
 			//iwd, torment, totsc
 			 {
-				str->Read( &UnknownOffset54, 4 );
-				str->Read( &UnknownCount58, 4 );
-				str->Read( &AnotherArea, 8 );
-				AnotherArea[8] = 0;
-				str->Read( &KillVarsOffset, 4 );
-				str->Read( &KillVarsCount, 4 );
-				str->Read( &SomeBytesArrayOffset, 4 );
-				str->Read( &AnotherArea, 8 );
-				AnotherArea[8] = 0;
-				str->Read( &Unknowns, 64 );
+				str->Read( &newGame->UnknownOffset54, 4 );
+				str->Read( &newGame->UnknownCount58, 4 );
+				str->Read( &newGame->AnotherArea, 8 );
+				newGame->AnotherArea[8] = 0;
+				str->Read( &newGame->KillVarsOffset, 4 );
+				str->Read( &newGame->KillVarsCount, 4 );
+				str->Read( &newGame->SomeBytesArrayOffset, 4 );
+				str->Read( &newGame->AnotherArea, 8 );
+				newGame->AnotherArea[8] = 0;  // FIXME: see above
+				str->Read( &newGame->Unknowns, 64 );
 			}	
 			break;
 	}
-	return true;
-}
 
-Game* GAMImp::GetGame()
-{
+
 	if (globals) {
 		globals->RemoveAll();
 	} else {
 		globals = new Variables();
 		globals->SetType( GEM_VARIABLES_INT );
 	}
-	Game* newGame = new Game();
-	if (!CurrentArea[0]) {
+
+	//Game* newGame = new Game();
+	if (!newGame->CurrentArea[0]) {
 		// 0 - single player, 1 - tutorial, 2 - multiplayer
 		unsigned long playmode = 0;
 		core->GetDictionary()->Lookup( "PlayMode", playmode );
@@ -145,76 +151,38 @@ Game* GAMImp::GetGame()
 		int i = core->LoadTable( "STARTARE" );
 		TableMgr* tm = core->GetTable( i );
 		char* resref = tm->QueryField( playmode );
-		strncpy( CurrentArea, resref, 8 );
-		CurrentArea[8] = 0;
+		strncpy( newGame->CurrentArea, resref, 8 );
+		newGame->CurrentArea[8] = 0;
 	}
-	int mi = newGame->LoadMap( CurrentArea );
+
+	int mi = newGame->LoadMap( newGame->CurrentArea );
 	Map* newMap = newGame->GetMap( mi );
+
 	//Loading PCs
 	ActorMgr* aM = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
-	for (unsigned int i = 0; i < PCCount; i++) {
-		str->Seek( PCOffset + ( i * PCSize ), GEM_STREAM_START );
-		PCStruct pcInfo;
-		str->Read( &pcInfo, 0xC0 );
-		Actor* actor;
-		if (pcInfo.OffsetToCRE) {
-			str->Seek( pcInfo.OffsetToCRE, GEM_STREAM_START );
-			void* Buffer = malloc( pcInfo.CRESize );
-			str->Read( Buffer, pcInfo.CRESize );
-			MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize );
-			aM->Open( ms );
-			actor = aM->GetActor();
-		} else {
-			DataStream* ds = core->GetResourceMgr()->GetResource( pcInfo.CREResRef,
-														IE_CRE_CLASS_ID );
-			aM->Open( ds );
-			actor = aM->GetActor();
-		}
-		actor->XPos = pcInfo.XPos;
-		actor->YPos = pcInfo.YPos;
-		actor->Orientation = pcInfo.Orientation;
-		actor->InParty = true;
-		actor->FromGame = true;
-		actor->AnimID = IE_ANI_AWAKE;
-		strcpy( actor->Area, pcInfo.Area );
-		if (stricmp( pcInfo.Area, CurrentArea ) == 0)
+	for (unsigned int i = 0; i < newGame->PCCount; i++) {
+		str->Seek( newGame->PCOffset + ( i * PCSize ), GEM_STREAM_START );
+		Actor *actor = GetActor( aM, true );
+
+		if (stricmp( actor->Area, newGame->CurrentArea ) == 0)
 			newMap->AddActor( actor );
 		newGame->SetPC( actor );
 	}
+
 	//Loading NPCs
-	for (unsigned int i = 0; i < NPCCount; i++) {
-		str->Seek( NPCOffset + ( i * PCSize ), GEM_STREAM_START );
-		PCStruct pcInfo;
-		str->Read( &pcInfo, 0xC0 );
-		Actor* actor;
-		if (pcInfo.OffsetToCRE) {
-			str->Seek( pcInfo.OffsetToCRE, GEM_STREAM_START );
-			void* Buffer = malloc( pcInfo.CRESize );
-			str->Read( Buffer, pcInfo.CRESize );
-			MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize );
-			aM->Open( ms );
-			actor = aM->GetActor();
-		} else {
-			DataStream* ds = core->GetResourceMgr()->GetResource( pcInfo.CREResRef,
-														IE_CRE_CLASS_ID );
-			aM->Open( ds );
-			actor = aM->GetActor();
-		}
-		actor->XPos = pcInfo.XPos;
-		actor->YPos = pcInfo.YPos;
-		actor->Orientation = pcInfo.Orientation;
-		actor->InParty = false;
-		actor->FromGame = true;
-		actor->AnimID = IE_ANI_AWAKE;
-		strcpy( actor->Area, pcInfo.Area );
-		if (stricmp( pcInfo.Area, CurrentArea ) == 0)
+	for (unsigned int i = 0; i < newGame->NPCCount; i++) {
+		str->Seek( newGame->NPCOffset + ( i * PCSize ), GEM_STREAM_START );
+		Actor *actor = GetActor( aM, false );
+
+		if (stricmp( actor->Area, newGame->CurrentArea ) == 0)
 			newMap->AddActor( actor );
 		newGame->AddNPC( actor );
 	}
 	core->FreeInterface( aM );
+
 	//Loading GLOBALS
-	str->Seek( GLOBALOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < GLOBALCount; i++) {
+	str->Seek( newGame->GLOBALOffset, GEM_STREAM_START );
+	for (unsigned int i = 0; i < newGame->GLOBALCount; i++) {
 		char Name[33];
 		unsigned long Value;
 		str->Read( Name, 32 );
@@ -224,6 +192,83 @@ Game* GAMImp::GetGame()
 		str->Seek( 40, GEM_CURRENT_POS );
 		globals->SetAt( Name, Value );
 	}
+
+	//Loading Journal entries
+	str->Seek( newGame->JournalOffset, GEM_STREAM_START );
+	for (unsigned int i = 0; i < newGame->JournalCount; i++) {
+		GAMJournalEntry* je = GetJournalEntry();
+		newGame->AddJournalEntry( je );
+	}
+
 	//newGame->AddMap(newMap);
 	return newGame;
+}
+
+Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
+{
+	PCStruct pcInfo;
+	Actor* actor;
+
+
+	str->Read( &pcInfo.Unknown0, 2 );
+	str->Read( &pcInfo.PartyOrder, 2 );
+	str->Read( &pcInfo.OffsetToCRE, 4 );
+	str->Read( &pcInfo.CRESize, 4 );
+	str->Read( &pcInfo.CREResRef, 8 );
+	str->Read( &pcInfo.Orientation, 4 );
+	str->Read( &pcInfo.Area, 8 );
+	str->Read( &pcInfo.XPos, 2 );
+	str->Read( &pcInfo.YPos, 2 );
+	str->Read( &pcInfo.ViewXPos, 2 );
+	str->Read( &pcInfo.ViewYPos, 2 );
+	str->Read( &pcInfo.Unknown28, 100 );
+	for (int i = 0; i < 4; i++) {
+		str->Read( &pcInfo.QuickWeaponSlot[i], 2 );
+	}
+	str->Read( &pcInfo.Unknown94, 8 );
+	for (int i = 0; i < 3; i++) {
+		str->Read( &pcInfo.QuickSpellResRef[i], 8 );
+	}
+	for (int i = 0; i < 3; i++) {
+		str->Read( &pcInfo.QuickItemSlot[i], 2 );
+	}
+	str->Read( &pcInfo.UnknownBA, 6 );
+
+	if (pcInfo.OffsetToCRE) {
+		str->Seek( pcInfo.OffsetToCRE, GEM_STREAM_START );
+		void* Buffer = malloc( pcInfo.CRESize );
+		str->Read( Buffer, pcInfo.CRESize );
+		MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize );
+		aM->Open( ms );
+		actor = aM->GetActor();
+	} else {
+		DataStream* ds = core->GetResourceMgr()->GetResource( pcInfo.CREResRef,
+								      IE_CRE_CLASS_ID );
+		aM->Open( ds );
+		actor = aM->GetActor();
+	}
+
+	actor->XPos = pcInfo.XPos;
+	actor->YPos = pcInfo.YPos;
+	actor->Orientation = pcInfo.Orientation;
+	actor->InParty = is_in_party;
+	actor->FromGame = true;
+	actor->AnimID = IE_ANI_AWAKE;
+	strcpy( actor->Area, pcInfo.Area );
+
+	return actor;
+}
+
+GAMJournalEntry* GAMImp::GetJournalEntry()
+{
+	GAMJournalEntry* j = new GAMJournalEntry();
+
+	str->Read( &j->JournalText, 4 );
+	str->Read( &j->Time, 4 );
+	str->Read( &j->ChapterNumber, 4 );
+	str->Read( &j->Unknown0C, 1 );
+	str->Read( &j->Section, 1 );
+	str->Read( &j->ChapterNumber2, 1 );
+
+	return j;
 }
