@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.95 2003/12/12 23:51:26 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.96 2003/12/15 09:28:53 balrog994 Exp $
  *
  */
 
@@ -50,7 +50,6 @@ Interface::Interface(void)
 	video = NULL;
 	key = NULL;
 	strings = NULL;
-	hcanims = NULL;
 	guiscript = NULL;
 	windowmgr = NULL;
 	vars = NULL;
@@ -81,7 +80,7 @@ Interface::Interface(void)
 	printStatus("OK", LIGHT_GREEN);
 	time_t t;
 	t = time(NULL);
-	srand(t);
+	srand((unsigned int)t);
 #ifdef _DEBUG
 	FileStreamPtrCount = 0;
 	CachedFileStreamPtrCount = 0;
@@ -131,8 +130,6 @@ Interface::~Interface(void)
 		plugin->FreePlugin(video);
 	if(strings)
 		plugin->FreePlugin(strings);
-	if(hcanims)
-		plugin->FreePlugin(hcanims);
 	if(pal256)
 		plugin->FreePlugin(pal256);
 	if(pal16)
@@ -150,7 +147,7 @@ Interface::~Interface(void)
 		delete(tokens);
 	FreeInterfaceVector(Table, tables, tm);
 	FreeInterfaceVector(Symbol, symbols, sm);
-	FreeResourceVector(ActorBlock, actors);
+	FreeResourceVector(Actor, actors);
 	delete(console);
 	delete(plugin);
 
@@ -194,16 +191,6 @@ int Interface::Init()
 		printf("Cannot Load Chitin.key\nTermination in Progress...\n");
 		return GEM_ERROR;
 	}
-	printStatus("OK", LIGHT_GREEN);
-	printMessage("Core", "Checking for Hard Coded Animations...", WHITE);
-	if(!IsAvailable(IE_HCANIMS_CLASS_ID)) {
-		printStatus("ERROR", LIGHT_RED);
-		printf("No Hard Coded Animations Available.\nTermination in Progress...\n");
-		return GEM_ERROR;
-	}
-	printStatus("OK", LIGHT_GREEN);
-	printMessage("Core", "Initializing Hard Coded Animations...", WHITE);
-	hcanims = (HCAnimationSeq*)GetInterface(IE_HCANIMS_CLASS_ID);
 	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Checking for Dialogue Manager...", WHITE);
 	if(!IsAvailable(IE_TLK_CLASS_ID)) {
@@ -543,11 +530,6 @@ char * Interface::GetString(unsigned long strref, unsigned long options)
 	return strings->GetString(strref, flags|options);
 }
 
-void Interface::GetHCAnim(Actor * act)
-{
-	hcanims->GetCharAnimations(act);
-}
-
 void Interface::FreeInterface(void * ptr)
 {
 	plugin->FreePlugin(ptr);
@@ -767,7 +749,7 @@ int Interface::UnloadCreature(unsigned int Slot)
 	return 1;
 }
 
-ActorBlock *Interface::GetActor(unsigned int Slot)
+Actor *Interface::GetActor(unsigned int Slot)
 {
 	if(Slot>=actors.size())
 		return 0;
@@ -788,41 +770,35 @@ int Interface::LoadCreature(char *ResRef, int InParty)
 	Actor *actor=actormgr->GetActor();
 	FreeInterface(actormgr);
 	actor->InParty=InParty;
-	ActorBlock * ab = new ActorBlock();
-	ab->actor = actor;
-	ab->XPos = 0;
-	ab->YPos = 0;
-	ab->XDes = 0;
-	ab->YDes = 0;
-	ab->AnimID = IE_ANI_AWAKE;
-	if(ab->actor->BaseStats[IE_STATE_ID] & STATE_DEAD)
-		ab->AnimID = IE_ANI_SLEEP;
-	ab->Orientation = 0;
-	for(int i = 0; i < MAX_SCRIPTS; i++) {
+	actor->AnimID = IE_ANI_AWAKE;
+	if(actor->BaseStats[IE_STATE_ID] & STATE_DEAD)
+		actor->AnimID = IE_ANI_SLEEP;
+	actor->Orientation = 0;
+	/*for(int i = 0; i < MAX_SCRIPTS; i++) {
 		if((stricmp(ab->actor->Scripts[i], "None") == 0) || (ab->actor->Scripts[i][0] == '\0')) {
 			ab->Scripts[i] = NULL;
 			continue;
 		}
 		ab->Scripts[i] = new GameScript(ab->actor->Scripts[i], 0);
 		ab->Scripts[i]->MySelf = ab;
-	}
+	}*/
 	size_t index;
 	for(index=0;index<actors.size(); index++) {
 		if(!actors[index]) 
 			break;
 	}
 	if(index==actors.size() )
-		actors.push_back(ab);
-	return index;
+		actors.push_back(actor);
+	return (int)index;
 }
 
 int Interface::FindPlayer(int PartySlotCount)
 {
-	int index=actors.size();
+	int index=(int)actors.size();
 	while(index--) {
 		if(!actors[index])
 			continue;
-		if(actors[index]->actor->InParty ) {
+		if(actors[index]->InParty ) {
 			break;
 		}
 	}
@@ -836,8 +812,8 @@ int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 	if(!actors[Slot])
 		return 0xdadadada;
 	if(Mod)
-		return actors[Slot]->actor->GetStat(StatID);
-	return actors[Slot]->actor->GetBase(StatID);
+		return actors[Slot]->GetStat(StatID);
+	return actors[Slot]->GetBase(StatID);
 }
 
 int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue, int Mod)
@@ -847,9 +823,9 @@ int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatV
 	if(!actors[Slot])
 		return 0;
 	if(Mod)
-		actors[Slot]->actor->SetStat(StatID, StatValue);
+		actors[Slot]->SetStat(StatID, StatValue);
 	else
-		actors[Slot]->actor->SetBase(StatID, StatValue);
+		actors[Slot]->SetBase(StatID, StatValue);
 	return 1;
 }
 
@@ -885,7 +861,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 	}
 	if(slot == -1) {
 		windows.push_back(win);
-		slot=windows.size()-1;
+		slot=(int)windows.size()-1;
 	}
 	else
 		windows[slot] = win;
@@ -1043,7 +1019,7 @@ int Interface::SetControlStatus(unsigned short WindowIndex, unsigned short Contr
 			if(ctrl->ControlType != 0)
 				return -1;
 			Button * btn = (Button*)ctrl;
-			btn->SetState(Status & 0xff);
+			btn->SetState((unsigned char)(Status & 0xff));
 			return 0;
 		}
 		break;
@@ -1186,7 +1162,7 @@ int Interface::LoadTable(const char * ResRef)
 	ind = -1;
 	for(size_t i = 0; i < tables.size(); i++) {
 		if(tables[i].free) {
-			ind = i;
+			ind = (int)i;
 			break;
 		}
 	}
@@ -1195,7 +1171,7 @@ int Interface::LoadTable(const char * ResRef)
 		return ind;
 	}
 	tables.push_back(t);
-	return tables.size()-1;
+	return (int)tables.size()-1;
 }
 /** Gets the index of a loaded table, returns -1 on error */
 int Interface::GetIndex(const char * ResRef)
@@ -1204,7 +1180,7 @@ int Interface::GetIndex(const char * ResRef)
 		if(tables[i].free)
 			continue;
 		if(strnicmp(tables[i].ResRef, ResRef, 8) == 0)
-			return i;
+			return (int)i;
 	}
 	return -1;
 }
@@ -1253,7 +1229,7 @@ int Interface::LoadSymbol(const char * ResRef)
 	ind = -1;
 	for(size_t i = 0; i < symbols.size(); i++) {
 		if(symbols[i].free) {
-			ind = i;
+			ind = (int)i;
 			break;
 		}
 	}
@@ -1262,7 +1238,7 @@ int Interface::LoadSymbol(const char * ResRef)
 		return ind;
 	}
 	symbols.push_back(s);
-	return symbols.size()-1;	
+	return (int)symbols.size()-1;	
 }
 /** Gets the index of a loaded Symbol Table, returns -1 on error */
 int Interface::GetSymbolIndex(const char * ResRef)
@@ -1271,7 +1247,7 @@ int Interface::GetSymbolIndex(const char * ResRef)
 		if(symbols[i].free)
 			continue;
 		if(strnicmp(symbols[i].ResRef, ResRef, 8) == 0)
-			return i;
+			return (int)i;
 	}
 	return -1;
 }

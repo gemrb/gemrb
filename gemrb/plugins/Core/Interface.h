@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.57 2003/12/12 23:05:08 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.58 2003/12/15 09:28:53 balrog994 Exp $
  *
  */
 
+class Interface;
+
 #ifndef INTERFACE_H
 #define INTERFACE_H
-
-struct ActorBlock;
 
 #include "Compressor.h"
 #include "InterfaceDesc.h"
@@ -32,7 +32,6 @@ struct ActorBlock;
 #include "../../includes/SClassID.h"
 #include "StringMgr.h"
 #include "Actor.h"
-#include "HCAnimationSeq.h"
 #include "Factory.h"
 #include "ImageMgr.h"
 #include "ActorMgr.h"
@@ -94,7 +93,6 @@ public:
 	StringMgr *strings;
 	GlobalTimer * timer;
 private:
-	HCAnimationSeq * hcanims;
 	Factory * factory;
 	ImageMgr * pal256;
 	ImageMgr * pal16;
@@ -104,7 +102,7 @@ private:
 	ScriptEngine * guiscript;
 	SoundMgr * soundmgr;
 	SaveGameIterator *sgiterator;
-	std::vector<ActorBlock*> actors;
+	std::vector<Actor*> actors;
 	/** Windows Array */
 	std::vector<Window*> windows;
 	std::vector<int> topwin;
@@ -133,7 +131,6 @@ public:
 	Video * GetVideoDriver();
 	ResourceMgr * GetResourceMgr();
 	char * GetString(unsigned long strref, unsigned long options=0);
-	void GetHCAnim(Actor * act);
 	void FreeInterface(void * ptr);
 	Factory * GetFactory(void);
 	/** No descriptions */
@@ -154,7 +151,7 @@ public:
 	/** Removes a creature */
 	int UnloadCreature(unsigned int Slot);
 	/** Returns the actor pointer for Slot */
-	ActorBlock *GetActor(unsigned int Slot);
+	Actor *GetActor(unsigned int Slot);
 	/** Returns actor index for partyslot PartySlotCount */
 	int FindPlayer(int PartySlotCount);
 	/** Sets a stat for the creature in actor index Slot */
@@ -181,7 +178,7 @@ public:
 	/** Add a window to the Window List */
 	void AddWindow(Window * win)
 	{
-		int slot = -1;
+		size_t slot = -1;
 		for(unsigned int i = 0; i < windows.size(); i++) {
 			if(windows[i]==NULL) {
 				slot = i;
@@ -312,6 +309,7 @@ public:
 	int CachedFileStreamPtrCount;
 #endif
 };
+
 #ifndef GEM_BUILD_DLL
 #ifdef WIN32
 __declspec(dllimport) Interface * core;
