@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.3 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.4 2003/11/26 13:58:43 balrog994 Exp $
  *
  */
 
@@ -45,8 +45,10 @@ public:
 	virtual ~ImageMgr(void);
 	virtual bool Open(DataStream * stream, bool autoFree = true) = 0;
 	virtual Sprite2D * GetImage() = 0;
-  /** No descriptions */
-  virtual void GetPalette(int index, int colors, Color * pal) = 0;
+	/** No descriptions */
+	virtual void GetPalette(int index, int colors, Color * pal) = 0;
+	/** Gets a Pixel from the Image */
+	virtual Color GetPixel(int x, int y) = 0;
 };
 
 #endif
