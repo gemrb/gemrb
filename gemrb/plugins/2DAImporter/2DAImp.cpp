@@ -26,7 +26,10 @@ bool p2DAImp::Open(DataStream * stream, bool autoFree)
 	char Signature[10];
 	str->CheckEncrypted();
 	str->ReadLine(Signature,10);
-	if(strncmp(Signature, "2DA V1.0", 8) != 0) {
+	char * strp = Signature;
+	while(*strp == ' ')
+		strp++;
+	if(strncmp(strp, "2DA V1.0", 8) != 0) {
 		str = olds;
 		return false;
 	}

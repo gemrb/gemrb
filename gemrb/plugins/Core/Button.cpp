@@ -53,6 +53,7 @@ Button::Button(bool Clear){
 	Flags = 0x4;
 	ToggleState = false;
 	Value = 0;
+	Picture = NULL;
 }
 Button::~Button(){
 	Video * video = core->GetVideoDriver();
@@ -66,6 +67,8 @@ Button::~Button(){
 		if(Disabled && ((Disabled != Pressed) && (Disabled != Unpressed) && (Disabled != Selected)))
 			video->FreeSprite(Disabled);
 	}
+	if(Picture)
+		video->FreeSprite(Picture);
 	free(palette);
 }
 /** Sets the 'type' Image of the Button to 'img'.
@@ -116,63 +119,68 @@ void Button::Draw(unsigned short x, unsigned short y)
 {
 	if(!Changed)
 		return;
-	if(Flags & 0x1)
-		return;
-	Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
-	int align=0;
+	if(!(Flags & 0x1)) {
+		Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
+		int align=0;
 
-	if(Flags&0x100) align|=IE_FONT_ALIGN_LEFT;
-	else if(Flags&0x200) align|=IE_FONT_ALIGN_RIGHT;
-	else align|=IE_FONT_ALIGN_CENTER;
-	if(Flags&0x400) align|=IE_FONT_ALIGN_TOP;
-//	else if(Flags&0x800) align|=IE_FONT_ALIGN_BOTTOM;
-	else align|=IE_FONT_ALIGN_MIDDLE;
-	switch(State) {
-		case IE_GUI_BUTTON_UNPRESSED:
-		{
-			if(Unpressed)
-				core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
-			if(hasText)
-				font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, NULL, align | IE_FONT_SINGLE_LINE, true);
-			Changed = false;
-		}
-		break;
-		
-		case IE_GUI_BUTTON_PRESSED:
-    {
-			if(Pressed)
-				core->GetVideoDriver()->BlitSprite(Pressed, x+XPos, y+YPos, true);
-			if(hasText)
-				font->Print(Region(x+XPos+2, y+YPos+2, Width, Height), (unsigned char*)Text, NULL, align | IE_FONT_SINGLE_LINE, true);
-			Changed = false;
-		}
-		break;
-		
-		case IE_GUI_BUTTON_SELECTED:
-    {
-			if(Selected)
-				core->GetVideoDriver()->BlitSprite(Selected, x+XPos, y+YPos, true);
-			else if(Unpressed)
-				core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
-			Changed = false;
-		}
-		break;
-		
-		case IE_GUI_BUTTON_DISABLED:
-		{
-			if(Disabled) {
-				core->GetVideoDriver()->BlitSprite(Disabled, x+XPos, y+YPos, true);
+		if(Flags&0x100) align|=IE_FONT_ALIGN_LEFT;
+		else if(Flags&0x200) align|=IE_FONT_ALIGN_RIGHT;
+		else align|=IE_FONT_ALIGN_CENTER;
+		if(Flags&0x400) align|=IE_FONT_ALIGN_TOP;
+	//	else if(Flags&0x800) align|=IE_FONT_ALIGN_BOTTOM;
+		else align|=IE_FONT_ALIGN_MIDDLE;
+		switch(State) {
+			case IE_GUI_BUTTON_UNPRESSED:
+			{
+				if(Unpressed)
+					core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
 				if(hasText)
-					font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, palette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
+					font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, NULL, align | IE_FONT_SINGLE_LINE, true);
+				Changed = false;
 			}
-			else if(Unpressed) {
-				core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
+			break;
+		
+			case IE_GUI_BUTTON_PRESSED:
+			{
+				if(Pressed)
+					core->GetVideoDriver()->BlitSprite(Pressed, x+XPos, y+YPos, true);
 				if(hasText)
-					font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, palette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
+					font->Print(Region(x+XPos+2, y+YPos+2, Width, Height), (unsigned char*)Text, NULL, align | IE_FONT_SINGLE_LINE, true);
+				Changed = false;
+			}	
+			break;
+		
+			case IE_GUI_BUTTON_SELECTED:
+			{
+				if(Selected)
+					core->GetVideoDriver()->BlitSprite(Selected, x+XPos, y+YPos, true);
+				else if(Unpressed)
+					core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
+				Changed = false;
 			}
-			Changed = false;
+			break;
+		
+			case IE_GUI_BUTTON_DISABLED:
+			{
+				if(Disabled) {
+					core->GetVideoDriver()->BlitSprite(Disabled, x+XPos, y+YPos, true);
+					if(hasText)
+						font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, palette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
+				}
+				else if(Unpressed) {
+					core->GetVideoDriver()->BlitSprite(Unpressed, x+XPos, y+YPos, true);
+					if(hasText)
+						font->Print(Region(x+XPos, y+YPos, Width, Height), (unsigned char*)Text, palette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true);
+				}
+				Changed = false;
+			}
+			break;
 		}
-		break;
+	}
+	if(Picture && (Flags&0x2)) {
+		short xOffs = (Width / 2) - (Picture->Width / 2);
+		short yOffs = (Height / 2) - (Picture->Height / 2);
+		core->GetVideoDriver()->BlitSprite(Picture, x+XPos+xOffs, y+YPos+yOffs, true);
 	}
 }
 /** Sets the Button State */
@@ -297,4 +305,13 @@ void Button::RedrawButton(char *VariableName, int Sum)
 	else
 		State = IE_GUI_BUTTON_UNPRESSED;
 	Changed = true;
+}
+/** Sets the Picture */
+void Button::SetPicture(Sprite2D * Picture)
+{
+	if(this->Picture)
+		core->GetVideoDriver()->FreeSprite(this->Picture);
+	this->Picture = Picture;
+	Changed = true;
+	((Window*)Owner)->Invalidate();
 }

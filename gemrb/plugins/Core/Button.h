@@ -67,6 +67,8 @@ public:
   int SetText(const char * string);
   /** Set Event */
   void SetEvent(char * funcName);
+  /** Sets the Picture */
+  void SetPicture(Sprite2D * Picture);
 public: // Public Events
   /** Mouse Button Down */
   void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
@@ -93,7 +95,9 @@ private: // Private attributes
   Sprite2D * Selected;
   /** Button Disabled Image */
   Sprite2D * Disabled;
-	/** The current state of the Button */
+  /** Picture to Apply when the hasPicture flag is set */
+  Sprite2D * Picture;
+  /** The current state of the Button */
   unsigned char State;
   /** Display Flags, justification */
   unsigned long Flags;

@@ -179,6 +179,41 @@ static PyObject * GemRB_GetTableValue(PyObject *self, PyObject *args)
 	return NULL;
 }
 
+static PyObject * GemRB_GetTableRowName(PyObject *self, PyObject *args)
+{
+	int ti, row;
+
+	if(!PyArg_ParseTuple(args, "ii", &ti, &row)) {
+		printMessage("GUIScript", "Syntax Error: GetTableRowName(TableIndex, RowIndex)\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	TableMgr * tm = core->GetTable(ti);
+	if(tm == NULL)
+		return NULL;
+	const char * str = tm->GetRowName(row);
+	if(str == NULL)
+		return NULL;
+
+	return Py_BuildValue("s", str);
+}
+
+static PyObject * GemRB_GetTableRowCount(PyObject *self, PyObject *args)
+{
+	int ti;
+
+	if(!PyArg_ParseTuple(args, "i", &ti)) {
+		printMessage("GUIScript", "Syntax Error: Expected Integer\n", LIGHT_RED);
+		return NULL;
+	}
+	
+	TableMgr * tm = core->GetTable(ti);
+	if(tm == NULL)
+		return NULL;
+
+	return Py_BuildValue("i", tm->GetRowCount());
+}
+
 static PyObject * GemRB_LoadSymbol(PyObject *self, PyObject *args)
 {
 	char *string;
@@ -590,6 +625,52 @@ static PyObject * GemRB_SetButtonState(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SetButtonPicture(PyObject *self, PyObject *args)
+{
+	int WindowIndex, ControlIndex;
+	char * ResRef;
+
+	if(!PyArg_ParseTuple(args, "iis", &WindowIndex, &ControlIndex, &ResRef)) {
+		printMessage("GUIScript", "Syntax Error: SetButtonPicture(WindowIndex, ControlIndex, PictureResRef)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	Window * win = core->GetWindow(WindowIndex);
+	if(win == NULL)
+		return NULL;
+
+	Control * ctrl = win->GetControl(ControlIndex);
+	if(ctrl == NULL)
+		return NULL;
+
+	if(ctrl->ControlType != 0)
+		return NULL;
+
+	DataStream * str = core->GetResourceMgr()->GetResource(ResRef, IE_BMP_CLASS_ID);
+	if(str == NULL)
+		return NULL;
+	ImageMgr * im = (ImageMgr*)core->GetInterface(IE_BMP_CLASS_ID);
+	if(im == NULL)
+		return NULL;
+
+	if(!im->Open(str, true)) {
+		delete(str);
+		core->FreeInterface(im);
+		return NULL;
+	}
+
+	Sprite2D * Picture = im->GetImage();
+	if(Picture == NULL)
+		return NULL;
+
+	Button * btn = (Button*)ctrl;
+	btn->SetPicture(Picture);
+
+	core->FreeInterface(im);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
 static PyObject * GemRB_PlaySound(PyObject *self, PyObject *args)
 {
 	char* ResRef;
@@ -709,6 +790,12 @@ static PyMethodDef GemRBMethods[] = {
 	{"GetTableValue", GemRB_GetTableValue, METH_VARARGS,
      "Returns a field of a 2DA Table."},
 
+	{"GetTableRowName", GemRB_GetTableRowName, METH_VARARGS,
+     "Returns the Name of a Row in a 2DA Table."},
+
+ 	{"GetTableRowCount", GemRB_GetTableRowCount, METH_VARARGS,
+     "Returns the number of rows in a 2DA Table."},
+
   	{"LoadSymbol", GemRB_LoadSymbol, METH_VARARGS,
      "Loads a IDS Symbol Table."},
 
@@ -759,6 +846,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"SetButtonState", GemRB_SetButtonState, METH_VARARGS,
      "Sets the state of a Button Control."},
+
+	{"SetButtonPicture", GemRB_SetButtonPicture, METH_VARARGS,
+     "Sets the Picture of a Button Control."},
 
 	{"PlaySound", GemRB_PlaySound, METH_VARARGS,
      "Plays a Sound."},

@@ -60,6 +60,13 @@ public:
 			return NULL;
 		return rows[rowi][coli];
 	};
+
+	inline char *GetRowName(int index) const
+	{
+		if(index < rowNames.size())
+			return rowNames[index];
+		return NULL;
+	};
 };
 
 #endif

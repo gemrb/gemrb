@@ -52,9 +52,10 @@ public:
       uses column name and row name to search the field,
 	  may return NULL */
   virtual char *QueryField(const char* row, const char* column) const = 0;
-
   /** Opens a Table File */
   virtual bool Open(DataStream * stream, bool autoFree = false) = 0;
+  /** Returns a Row Name, returns NULL on error */
+  virtual inline char *GetRowName(int index) const = 0;
 };
 
 #endif
