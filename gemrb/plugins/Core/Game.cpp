@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.51 2004/08/05 20:41:06 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.52 2004/08/06 16:39:06 avenger_teambg Exp $
  *
  */
 
@@ -36,6 +36,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	Reputation = 0;
 	CombatCounter = 0; //stored here until we know better
 	globals = NULL;
+	kaputz = NULL;
 	familiars = NULL;
 }
 
@@ -54,6 +55,9 @@ Game::~Game(void)
 	}
 	if (globals) {
 		delete globals;
+	}
+	if (kaputz) {
+		delete kaputz;
 	}
 	if (familiars) {
 		free (familiars);

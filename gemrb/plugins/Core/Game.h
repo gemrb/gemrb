@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.36 2004/08/05 20:41:07 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.37 2004/08/06 16:39:06 avenger_teambg Exp $
  *
  */
 
@@ -90,6 +90,7 @@ private:
 	std::vector< GAMJournalEntry*> Journals;
 public:
 	Variables* globals;
+	Variables* kaputz;
 	ieByte* familiars;
 	int MapIndex;
 	ieDword CombatCounter;

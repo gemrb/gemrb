@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.31 2004/08/05 20:41:09 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.32 2004/08/06 16:39:07 avenger_teambg Exp $
  *
  */
 
@@ -183,15 +183,18 @@ Game* GAMImp::GetGame()
 		str->Seek( 40, GEM_CURRENT_POS );
 		newGame->globals->SetAt( Name, Value );
 	}
-	str->Seek( newGame->KillVarsOffset, GEM_STREAM_START );
-	memcpy(Name,"SPRITE_IS_DEAD",14);
-	for (i = 0; i < newGame->KillVarsCount; i++) {
-		ieDword Value;
-		str->Read( Name+14, 18 );
-		str->Seek( 8, GEM_CURRENT_POS );
-		str->Read( &Value, 4 );
-		str->Seek( 40, GEM_CURRENT_POS );
-		newGame->globals->SetAt( Name, Value );
+	if(core->HasFeature(GF_HAS_KAPUTZ) ) {
+		newGame->globals = new Variables();
+		newGame->globals->SetType( GEM_VARIABLES_INT );
+		str->Seek( newGame->KillVarsOffset, GEM_STREAM_START );
+		for (i = 0; i < newGame->KillVarsCount; i++) {
+			ieDword Value;
+			str->Read( Name, 32 );
+			str->Seek( 8, GEM_CURRENT_POS );
+			str->Read( &Value, 4 );
+			str->Seek( 40, GEM_CURRENT_POS );
+			newGame->globals->SetAt( Name, Value );
+		}
 	}
 
 	//Loading Journal entries
