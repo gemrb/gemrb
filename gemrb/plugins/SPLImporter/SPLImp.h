@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.h,v 1.5 2004/12/07 22:51:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.h,v 1.6 2005/02/06 11:04:42 avenger_teambg Exp $
  *
  */
 
@@ -41,15 +41,14 @@ public:
 	SPLImp(void);
 	~SPLImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	Spell* GetSpell();
-	void ReleaseSpell(Spell *spl) { delete spl; }
+	Spell* GetSpell(Spell *spl);
 	void release(void)
 	{
 		delete this;
 	}
 private:
-	SPLExtHeader* GetExtHeader(Spell* s);
-	SPLFeature* GetFeature();
+	void GetExtHeader(Spell *s, SPLExtHeader* eh);
+	void GetFeature(Effect *f);
 };
 
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.8 2004/12/17 23:23:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.9 2005/02/06 11:04:42 avenger_teambg Exp $
  *
  */
 
@@ -61,64 +61,62 @@ bool SPLImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Spell* SPLImp::GetSpell()
+Spell* SPLImp::GetSpell(Spell *s)
 {
 	unsigned int i;
-	Spell* s = new Spell();
 
-	str->Read( &s->SpellName, 4 );
-	str->Read( &s->SpellNameIdentified, 4 );
-	str->Read( s->CompletionSound, 8 );
-	str->Read( &s->Flags, 4 );
-	str->Read( &s->SpellType, 2 );
-	str->Read( &s->ExclusionSchool, 2 );
-	str->Read( &s->PriestType, 2 );
-	str->Read( &s->CastingGraphics, 2 );
+	str->ReadDword( &s->SpellName );
+	str->ReadDword( &s->SpellNameIdentified );
+	str->ReadResRef( s->CompletionSound );
+	str->ReadDword( &s->Flags );
+	str->ReadWord( &s->SpellType );
+	str->ReadWord( &s->ExclusionSchool );
+	str->ReadWord( &s->PriestType );
+	str->ReadWord( &s->CastingGraphics );
 	str->Read( &s->unknown1, 1 );
-	str->Read( &s->PrimaryType, 2 );
+	str->ReadWord( &s->PrimaryType );
 	str->Read( &s->SecondaryType, 1 );
-	str->Read( &s->unknown2, 4 );
-	str->Read( &s->unknown3, 4 );
-	str->Read( &s->unknown4, 4 );
-	str->Read( &s->SpellLevel, 4 );
-	str->Read( &s->unknown5, 2 );
-	str->Read( &s->SpellbookIcon, 8 );
-	str->Read( &s->unknown6, 2 );
-	str->Read( &s->unknown7, 4 );
-	str->Read( &s->unknown8, 4 );
-	str->Read( &s->unknown9, 4 );
-	str->Read( &s->SpellDesc, 4 );
-	str->Read( &s->SpellDescIdentified, 4 );
-	str->Read( &s->unknown10, 4 );
-	str->Read( &s->unknown11, 4 );
-	str->Read( &s->unknown12, 4 );
-	str->Read( &s->ExtHeaderOffset, 4 );
-	str->Read( &s->ExtHeaderCount, 2 );
-	str->Read( &s->FeatureBlockOffset, 4 );
-	str->Read( &s->CastingFeatureOffset, 2 );
-	str->Read( &s->CastingFeatureCount, 2 );
+	str->ReadDword( &s->unknown2 );
+	str->ReadDword( &s->unknown3 );
+	str->ReadDword( &s->unknown4 );
+	str->ReadDword( &s->SpellLevel );
+	str->ReadWord( &s->unknown5 );
+	str->ReadResRef( s->SpellbookIcon );
+	str->ReadWord( &s->unknown6 );
+	str->ReadDword( &s->unknown7 );
+	str->ReadDword( &s->unknown8 );
+	str->ReadDword( &s->unknown9 );
+	str->ReadDword( &s->SpellDesc );
+	str->ReadDword( &s->SpellDescIdentified );
+	str->ReadDword( &s->unknown10 );
+	str->ReadDword( &s->unknown11 );
+	str->ReadDword( &s->unknown12 );
+	str->ReadDword( &s->ExtHeaderOffset );
+	str->ReadWord( &s->ExtHeaderCount );
+	str->ReadDword( &s->FeatureBlockOffset );
+	str->ReadWord( &s->CastingFeatureOffset );
+	str->ReadWord( &s->CastingFeatureCount );
 
 	memset( s->unknown13, 0, 16 );
 	if (version == 20) {
 		str->Read( s->unknown13, 16 );
 	}
 
+	s->ext_headers = core->GetSPLExt(s->ExtHeaderCount);
 
 	for (i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 40, GEM_STREAM_START );
-		SPLExtHeader* eh = GetExtHeader( s );
-		s->ext_headers.push_back( eh );
+		GetExtHeader( s, s->ext_headers+i );
 	}
 
+	s->casting_features = core->GetFeatures(s->CastingFeatureCount);
 	str->Seek( s->FeatureBlockOffset + 48*s->CastingFeatureOffset,
 			GEM_STREAM_START );
 	for (i = 0; i < s->CastingFeatureCount; i++) {
-		SPLFeature* f = GetFeature();
-		s->casting_features.push_back( f );
+		GetFeature( s->casting_features+i);
 	}
 
-	DataStream* bamfile = core->GetResourceMgr()->GetResource( s->SpellbookIcon,
-													IE_BAM_CLASS_ID );
+	DataStream* bamfile = core->GetResourceMgr()->GetResource( s->SpellbookIcon, IE_BAM_CLASS_ID );
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		printf( "[SPLImporter]: No BAM Importer Available.\n" );
 		return NULL;
@@ -133,58 +131,50 @@ Spell* SPLImp::GetSpell()
 	return s;
 }
 
-SPLExtHeader* SPLImp::GetExtHeader(Spell* s)
+void SPLImp::GetExtHeader(Spell *s, SPLExtHeader* eh)
 {
-	SPLExtHeader* eh = new SPLExtHeader();
-
 	str->Read( &eh->SpellForm, 1 );
 	str->Read( &eh->unknown1, 1 );
 	str->Read( &eh->Location, 1 );
 	str->Read( &eh->unknown2, 1 );
-	str->Read( eh->MemorisedIcon, 8 );
+	str->ReadResRef( eh->MemorisedIcon );
 	str->Read( &eh->Target, 1 );
 	str->Read( &eh->TargetNumber, 1 );
-	str->Read( &eh->Range, 2 );
-	str->Read( &eh->RequiredLevel, 2 );
-	str->Read( &eh->CastingTime, 4 );
-	str->Read( &eh->DiceSides, 2 );
-	str->Read( &eh->DiceThrown, 2 );
-	str->Read( &eh->Enchanted, 2 );
-	str->Read( &eh->FeatureCount, 2 );
-	str->Read( &eh->FeatureOffset, 2 );
-	str->Read( &eh->Charges, 2 );
-	str->Read( &eh->ChargeDepletion, 2 );
-	str->Read( &eh->Projectile, 2 );
+	str->ReadWord( &eh->Range );
+	str->ReadWord( &eh->RequiredLevel );
+	str->ReadDword( &eh->CastingTime );
+	str->ReadWord( &eh->DiceSides );
+	str->ReadWord( &eh->DiceThrown );
+	str->ReadWord( &eh->Enchanted );
+	str->ReadWord( &eh->FeatureCount );
+	str->ReadWord( &eh->FeatureOffset );
+	str->ReadWord( &eh->Charges );
+	str->ReadWord( &eh->ChargeDepletion );
+	str->ReadWord( &eh->Projectile );
 
+	eh->features = core->GetFeatures( eh->FeatureCount );
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
-		SPLFeature* f = GetFeature();
-		eh->features.push_back( f );
+		GetFeature(eh->features+i);
 	}
-
-	return eh;
 }
 
-SPLFeature* SPLImp::GetFeature()
+void SPLImp::GetFeature(SPLFeature *f)
 {
-	SPLFeature* f = new SPLFeature();
-
-	str->Read( &f->Opcode, 2 );
+	str->ReadWord( &f->Opcode );
 	str->Read( &f->Target, 1 );
 	str->Read( &f->Power, 1 );
-	str->Read( &f->Parameter1, 4 );
-	str->Read( &f->Parameter2, 4 );
+	str->ReadDword( &f->Parameter1 );
+	str->ReadDword( &f->Parameter2 );
 	str->Read( &f->TimingMode, 1 );
 	str->Read( &f->Resistance, 1 );
-	str->Read( &f->Duration, 4 );
+	str->ReadDword( &f->Duration );
 	str->Read( &f->Probability1, 1 );
 	str->Read( &f->Probability2, 1 );
-	str->Read( f->Resource, 8 );
-	str->Read( &f->DiceThrown, 4 );
-	str->Read( &f->DiceSides, 4 );
-	str->Read( &f->SavingThrowType, 4 );
-	str->Read( &f->SavingThrowBonus, 4 );
-	str->Read( &f->unknown, 4 );
-
-	return f;
+	str->ReadResRef( f->Resource );
+	str->ReadDword( &f->DiceThrown );
+	str->ReadDword( &f->DiceSides );
+	str->ReadDword( &f->SavingThrowType );
+	str->ReadDword( &f->SavingThrowBonus );
+	str->ReadDword( &f->unknown );
 }

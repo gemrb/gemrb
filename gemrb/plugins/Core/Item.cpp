@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.cpp,v 1.5 2004/10/17 15:09:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.cpp,v 1.6 2005/02/06 11:04:39 avenger_teambg Exp $
  *
  */
 
@@ -29,9 +29,7 @@ ITMExtHeader::ITMExtHeader(void)
 
 ITMExtHeader::~ITMExtHeader(void)
 {
-	for (unsigned i = 0; i < features.size(); i++) {
-		delete( features[i] );
-	}
+  delete [] features;
 }
 
 Item::Item(void)
@@ -43,15 +41,8 @@ Item::Item(void)
 
 Item::~Item(void)
 {
-	unsigned int i;
-
-	for (i = 0; i < ext_headers.size(); i++) {
-		delete( ext_headers[i] );
-	}
-	// FIXME: release eh->features too
-	for (i = 0; i < equipping_features.size(); i++) {
-		delete( equipping_features[i] );
-	}
+  core->FreeITMExt( ext_headers, equipping_features );
+	
 	if (GroundIconBAM) {
 		core->FreeInterface( GroundIconBAM );
 		GroundIconBAM = NULL;

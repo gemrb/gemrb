@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.78 2004/12/17 23:23:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.79 2005/02/06 11:04:38 avenger_teambg Exp $
  *
  */
 
@@ -472,7 +472,7 @@ bool Actor::CheckOnDeath()
 }
 
 /* this will create a heap at location, and transfer the item(s) */
-void Actor::DropItem(const char *resref, unsigned int flags)
+void Actor::DropItem(ieResRef resref, unsigned int flags)
 {
 	Map *map = core->GetGame()->GetMap(Area);
 	inventory.DropItemAtLocation( resref, flags, map, Pos );
@@ -534,7 +534,7 @@ void Actor::GetNextStance()
 	SetStance( Stance );
 }
 
-int Actor::LearnSpell(const char *spellname, ieDword flags)
+int Actor::LearnSpell(ieResRef spellname, ieDword flags)
 {
 	if(spellbook.HaveSpell(spellname, 0) ) {
 		return LSR_KNOWN;

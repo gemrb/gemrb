@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.h,v 1.6 2005/01/22 20:36:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.h,v 1.7 2005/02/06 11:04:41 avenger_teambg Exp $
  *
  */
 
@@ -47,8 +47,8 @@ public:
 		delete this;
 	}
 private:
-	ITMExtHeader* GetExtHeader(Item* s);
-	ITMFeature* GetFeature();
+	void GetExtHeader(Item *s, ITMExtHeader* eh);
+	void GetFeature(Effect *f);
 };
 
 

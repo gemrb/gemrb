@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.38 2004/11/23 21:47:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.39 2005/02/06 11:04:39 avenger_teambg Exp $
  *
  */
 
@@ -63,8 +63,6 @@ void Inventory::CalculateWeight()
 			continue;
 		}
 		slot->Flags &= ~IE_INV_ITEM_ACQUIRED;
-		// This is a lame attempt to cache the item weights, so
-		// it is not SO slow until we get proper object caching
 		printf ("%2d: %8s : %d x %d\n", (int) i, slot->ItemResRef, slot->Weight, slot->Usages[0]);
 		if (slot->Weight == 0) {
 			Item *itm = core->GetItem( slot->ItemResRef );
@@ -74,8 +72,7 @@ void Inventory::CalculateWeight()
 					slot->Weight = itm->Weight;
 					slot->StackAmount = itm->StackAmount;
 				}
-				//delete itm;
-				core->FreeItem( itm );
+				core->FreeItem( itm, false );
 			}
 		}
 		if (slot->Weight > 0) {

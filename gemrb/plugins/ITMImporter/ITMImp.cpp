@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.12 2005/01/22 20:36:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.13 2005/02/06 11:04:41 avenger_teambg Exp $
  *
  */
 
@@ -78,7 +78,7 @@ Item* ITMImp::GetItem(Item *s)
 	str->ReadDword( &s->Flags );
 	str->ReadWord( &s->ItemType );
 	str->ReadDword( &s->UsabilityBitmask );
-	str->Read( s->InventoryIconType,2 );
+	str->Read( s->InventoryIconType,2 ); //intentionally not reading word!
 	str->ReadWord( &s->MinLevel );
 	str->Read( &s->MinStrength,1 );
 	str->Read( &s->unknown2,1 );
@@ -125,18 +125,20 @@ Item* ITMImp::GetItem(Item *s)
 		str->Read( s->unknown, 26 );
 	}
 
+	core->GetITMExt( s->ExtHeaderCount );
+
 	for (i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 56, GEM_STREAM_START );
-		ITMExtHeader* eh = GetExtHeader( s );
-		s->ext_headers.push_back( eh );
+		GetExtHeader( s, s->ext_headers + i );
 	}
 
 	//48 is the size of the feature block
+	core->GetFeatures( s->EquippingFeatureCount);
+
 	str->Seek( s->FeatureBlockOffset + 48*s->EquippingFeatureOffset,
 			GEM_STREAM_START );
 	for (i = 0; i < s->EquippingFeatureCount; i++) {
-		ITMFeature* f = GetFeature();
-		s->equipping_features.push_back( f );
+		GetFeature(s->equipping_features+i);
 	}
 
 
@@ -172,11 +174,8 @@ Item* ITMImp::GetItem(Item *s)
 	return s;
 }
 
-ITMExtHeader* ITMImp::GetExtHeader(Item* s)
+void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
 {
-	unsigned int i;
-	ITMExtHeader* eh = new ITMExtHeader();
-
 	str->Read( &eh->AttackType,1 );
 	str->Read( &eh->IDReq,1 );
 	str->Read( &eh->Location,1 );
@@ -197,10 +196,9 @@ ITMExtHeader* ITMImp::GetExtHeader(Item* s)
 	str->ReadWord( &eh->Charges );
 	str->ReadWord( &eh->ChargeDepletion );
 	str->ReadDword( &eh->RechargeFlags );
-	//str->Read( &eh->UseStrengthBonus,1 );
-	//str->Read( &eh->Recharge,1 );
-	//str->ReadWord( &eh->unknown2 );
 	str->ReadWord( &eh->ProjectileAnimation );
+	unsigned int i; //msvc6.0 can't cope with index variable scope
+
 	for (i = 0; i < 3; i++) {
 		str->ReadWord( &eh->MeleeAnimation[i] );
 	}
@@ -209,20 +207,15 @@ ITMExtHeader* ITMImp::GetExtHeader(Item* s)
 	str->ReadWord( &eh->MiscProjectileQualifier );
 
 	//48 is the size of the feature block
+	eh->features = core->GetFeatures(eh->FeatureCount);
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
 	for (i = 0; i < eh->FeatureCount; i++) {
-		ITMFeature* f = GetFeature();
-		eh->features.push_back( f );
+		GetFeature(eh->features+i);
 	}
-
-
-	return eh;
 }
 
-ITMFeature* ITMImp::GetFeature()
+void ITMImp::GetFeature(Effect *f)
 {
-	ITMFeature* f = new ITMFeature();
-
 	str->ReadWord( &f->Opcode );
 	str->Read( &f->Target,1 );
 	str->Read( &f->Power,1 );
@@ -239,6 +232,4 @@ ITMFeature* ITMImp::GetFeature()
 	str->ReadDword( &f->SavingThrowType );
 	str->ReadDword( &f->SavingThrowBonus );
 	str->ReadDword( &f->unknown );
-
-	return f;
 }

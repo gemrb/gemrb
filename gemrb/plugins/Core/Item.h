@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.12 2005/01/08 17:28:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.13 2005/02/06 11:04:39 avenger_teambg Exp $
  *
  */
 
@@ -57,9 +57,6 @@
 #define IE_ITEM_PULSATING    0x00001000
 #define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN )
 
-// FIXME: drop it eventually and just use Effect
-typedef Effect ITMFeature;
-
 //Extended header recharge flags
 #define IE_ITEM_USESTRENGTH  1
 #define IE_ITEM_RECHARGE     0x800
@@ -99,7 +96,7 @@ public:
 	ieWord BowArrowQualifier;
 	ieWord CrossbowBoltQualifier;
 	ieWord MiscProjectileQualifier;
-	std::vector< ITMFeature*> features;
+  Effect *features;
 };
 
 
@@ -108,8 +105,10 @@ public:
 	Item();
 	~Item();
 
-	std::vector< ITMExtHeader*> ext_headers;
-	std::vector< ITMFeature*> equipping_features;
+  ITMExtHeader *ext_headers;
+  Effect *equipping_features;
+	//std::vector< ITMExtHeader*> ext_headers;
+	//std::vector< ITMFeature*> equipping_features;
 
 	ieStrRef ItemName;
 	ieStrRef ItemNameIdentified;

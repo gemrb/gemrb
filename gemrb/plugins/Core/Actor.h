@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.54 2005/01/04 18:37:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.55 2005/02/06 11:04:38 avenger_teambg Exp $
  *
  */
 
@@ -280,7 +280,7 @@ public:
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Actor *hitter);
 	/* drops items from inventory to current spot */
-	void DropItem(const char *resref, unsigned int flags);
+	void DropItem(ieResRef resref, unsigned int flags);
 	/* returns true if the actor is PC/joinable*/
 	bool Persistent();
 	/* schedules actor to die*/
@@ -291,7 +291,7 @@ public:
 	void GetNextStance();
 	/* returns the count of memorizable spells of type at the given level */
 	int GetMemorizableSpellsCount(ieSpellType Type, int Level);
-	int LearnSpell(const char *resref, ieDword flags);
+	int LearnSpell(ieResRef resref, ieDword flags);
 
 };
 #endif

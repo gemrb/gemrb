@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SpellMgr.h,v 1.3 2004/12/07 22:51:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SpellMgr.h,v 1.4 2005/02/06 11:04:39 avenger_teambg Exp $
  *
  */
 
@@ -43,8 +43,7 @@ public:
 	SpellMgr(void);
 	virtual ~SpellMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
-	virtual Spell* GetSpell() = 0;
-        virtual void ReleaseSpell(Spell *spl) = 0;
+	virtual Spell* GetSpell(Spell *spl) = 0;
 };
 
 #endif

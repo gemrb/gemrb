@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.252 2005/02/02 17:29:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.253 2005/02/06 11:04:39 avenger_teambg Exp $
  *
  */
 
@@ -171,6 +171,7 @@ Interface::~Interface(void)
 {
 	CharAnimations::ReleaseMemory();
 	ItemCache.RemoveAll();
+	SpellCache.RemoveAll();
 
 	if (TooltipBack) {
 		for(int i=0;i<3;i++) {
@@ -1251,12 +1252,12 @@ ScriptEngine* Interface::GetGUIScriptEngine()
 Actor *Interface::GetCreature(DataStream *stream)
 {
 	ActorMgr* actormgr = ( ActorMgr* ) GetInterface( IE_CRE_CLASS_ID );
-        if (!actormgr->Open( stream, true )) {
-                FreeInterface( actormgr );
-                return NULL;
-        }
-        Actor* actor = actormgr->GetActor();
-        FreeInterface( actormgr );
+	if (!actormgr->Open( stream, true )) {
+		FreeInterface( actormgr );
+		return NULL;
+	}
+	Actor* actor = actormgr->GetActor();
+	FreeInterface( actormgr );
 	return actor;
 }
 
@@ -2361,16 +2362,17 @@ int Interface::CanUseItemType(int itype, int slottype) const
 
 void Interface::DisplayString(const char* Text)
 {
-        ieDword WinIndex, TAIndex;
+	ieDword WinIndex, TAIndex;
 
-        core->GetDictionary()->Lookup( "MessageWindow", WinIndex );
-        if (( WinIndex != (ieDword) -1 ) &&
-                ( core->GetDictionary()->Lookup( "MessageTextArea", TAIndex ) )) {
-                Window* win = core->GetWindow( WinIndex );
-                if (win) {
-                        TextArea* ta = ( TextArea* ) win->GetControl( TAIndex );                        ta->AppendText( Text, -1 );
-                }
-        }
+	core->GetDictionary()->Lookup( "MessageWindow", WinIndex );
+	if (( WinIndex != (ieDword) -1 ) &&
+		( core->GetDictionary()->Lookup( "MessageTextArea", TAIndex ) )) {
+		Window* win = core->GetWindow( WinIndex );
+		if (win) {
+			TextArea* ta = ( TextArea* ) win->GetControl( TAIndex );
+			ta->AppendText( Text, -1 );
+		}
+	}
 }
 
 static const char* DisplayFormat = "[/color][p][color=%lX]%s[/color][/p]";
@@ -2628,16 +2630,25 @@ Item* Interface::GetItem(ieResRef resname)
 	return item;
 }
 
-void Interface::FreeItem(Item *itm)
+void Interface::FreeItem(Item *itm, bool free)
 {
-	if( ItemCache.DecRef((void *) itm, false) <0) {
+	int res;
+
+	res=ItemCache.DecRef((void *) itm, free);
+	if (res<0) {
 		printMessage( "Core", "Corrupted Item cache encountered (reference count went below zero)", WHITE );
 		abort();
 	}
+	if (res) return;
+	if (free) delete itm;
 }
 
-Spell* Interface::GetSpell(const char* resname)
+Spell* Interface::GetSpell(ieResRef resname)
 {
+	Spell *spell = (Spell *) SpellCache.GetResource(resname);
+	if (spell) {
+		return spell;
+	}
 	DataStream* str = key->GetResource( resname, IE_SPL_CLASS_ID );
 	SpellMgr* sm = ( SpellMgr* ) GetInterface( IE_SPL_CLASS_ID );
 	if (sm == NULL) {
@@ -2649,20 +2660,55 @@ Spell* Interface::GetSpell(const char* resname)
 		return NULL;
 	}
 
-	Spell* spell = sm->GetSpell();
+	spell = sm->GetSpell(new Spell() );
 	if (spell == NULL) {
 		FreeInterface( sm );
 		return NULL;
 	}
 
 	FreeInterface( sm );
+	SpellCache.SetAt(resname, (void *) spell);
 	return spell;
 }
 
-void Interface::FreeSpell(Spell *spl)
+void Interface::FreeSpell(Spell *spl, bool free)
 {
-	SpellMgr * sm = (SpellMgr *) GetInterface(IE_SPL_CLASS_ID);
-	sm->ReleaseSpell(spl);
-	FreeInterface(sm);
+	int res;
+
+	res=SpellCache.DecRef((void *) spl, free);
+	if (res<0) {
+		printMessage( "Core", "Corrupted Spell cache encountered (reference count went below zero)", WHITE );
+		abort();
+	}
+	if (res) return;
+	if (free) delete spl;
 }
 
+//these functions are needed because Win32 doesn't allow freeing memory from
+//another dll. So we allocate all commonly used memories from core
+ITMExtHeader *Interface::GetITMExt(int count)
+{
+	return new ITMExtHeader[count];
+}
+
+SPLExtHeader *Interface::GetSPLExt(int count)
+{
+	return new SPLExtHeader[count];
+}
+
+Effect *Interface::GetFeatures(int count)
+{
+	return new Effect[count];
+}
+
+void Interface::FreeITMExt(ITMExtHeader *p, Effect *e)
+{
+	delete [] p;
+	delete [] e;
+}
+
+void Interface::FreeSPLExt(SPLExtHeader *p, Effect *e)
+{
+	delete [] p;
+	delete [] e;
+}

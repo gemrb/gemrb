@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.185 2005/01/22 20:28:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.186 2005/02/06 11:04:38 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -589,10 +589,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 					Item* item = core->GetItem(ci->ItemResRef);
 					if (item) {
-						for (std::vector< ITMFeature* >::iterator f = item->equipping_features.begin(); f != item->equipping_features.end(); f++) {
-							AddEffect( *f, lastActor, lastActor );
+						for (int f = 0; f < item->EquippingFeatureCount; f++) {
+							AddEffect( item->equipping_features+f, lastActor, lastActor );
 						}
-						core->FreeItem( item );
+						core->FreeItem( item, false );
 					}
 				}
 				lastActor->fxqueue.ApplyAllEffects( lastActor );
@@ -1602,22 +1602,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
 }
-/*
-void GameControl::DisplayString(const char* Text)
-{
-	ieDword WinIndex, TAIndex;
 
-	core->GetDictionary()->Lookup( "MessageWindow", WinIndex );
-	if (( WinIndex != (ieDword) -1 ) &&
-		( core->GetDictionary()->Lookup( "MessageTextArea", TAIndex ) )) {
-		Window* win = core->GetWindow( WinIndex );
-		if (win) {
-			TextArea* ta = ( TextArea* ) win->GetControl( TAIndex );
-			ta->AppendText( Text, -1 );
-		}
-	}
-}
-*/
 void GameControl::SetScreenFlags(int value, int mode)
 {
 	switch(mode) {
