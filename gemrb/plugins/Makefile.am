@@ -1,13 +1,11 @@
 SUBDIRS = \
 	Core \
-	\
 	GUIScript \
-	NullSound \
 	SDLVideo \
 	ZLibMgr \
-	\
 	2DAImporter \
 	ACMImporter \
+	NullSound \
 	AREImporter \
 	BAMImporter \
 	BIFImporter \
