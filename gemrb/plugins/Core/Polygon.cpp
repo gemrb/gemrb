@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.11 2004/09/12 21:58:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.12 2004/11/13 00:33:39 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
@@ -83,6 +83,9 @@ bool Gem_Polygon::PointIn(int tx, int ty)
 	bool inside_flag = false;
 	Point* vtx0, * vtx1;
 
+	if (count<3) {
+		return false;
+	}
 	index = 0;
 
 	vtx0 = &points[count - 1];
