@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.17 2003/12/09 23:10:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.18 2003/12/24 00:52:22 balrog994 Exp $
  *
  */
 
@@ -31,7 +31,7 @@
 #include "plugins/Core/ResourceMgr.h"
 #include "plugins/Core/MapMgr.h"
 #include "plugins/Core/ImageMgr.h"
-#include "plugins/Core/AnimationMgr.h"
+#include "plugins/Core/DialogMgr.h"
 #include "plugins/Core/WindowMgr.h"
 
 #ifndef WIN32
