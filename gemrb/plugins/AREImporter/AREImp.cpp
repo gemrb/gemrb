@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.77 2004/10/12 19:47:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.78 2004/10/17 07:06:51 avenger_teambg Exp $
  *
  */
 
@@ -520,6 +520,8 @@ Map* AREImp::GetMap(const char *ResRef)
 			ieDword TalkCount;
 			ieDword Orientation, Schedule;
 			ieWord XPos, YPos, XDes, YDes;
+			ieResRef Dialog;
+			ieResRef Scripts[8]; //the original order
 			str->Read( DefaultName, 32);
 			DefaultName[32]=0;
 			str->ReadWord( &XPos );
@@ -531,13 +533,23 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->Seek( 8, GEM_CURRENT_POS );
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
-			str->Seek( 56, GEM_CURRENT_POS );
+			str->ReadResRef( Dialog );
+			//TODO: script order			
+			str->ReadResRef( Scripts[0] );
+			str->ReadResRef( Scripts[1] );
+			str->ReadResRef( Scripts[2] );
+			str->ReadResRef( Scripts[3] );
+			str->ReadResRef( Scripts[4] );
+			str->ReadResRef( Scripts[5] );
+//			str->Seek( 56, GEM_CURRENT_POS );
 			str->ReadResRef( CreResRef );
 			DataStream* crefile;
 			ieDword CreOffset, CreSize;
 			str->ReadDword( &CreOffset );
 			str->ReadDword( &CreSize );
-			str->Seek( 128, GEM_CURRENT_POS );
+			//TODO: iwd2 script?
+			str->ReadResRef( Scripts[6] );
+			str->Seek( 120, GEM_CURRENT_POS );
 			if (CreOffset != 0) {
 				char cpath[_MAX_PATH];
 				strcpy( cpath, core->GamePath );
@@ -571,9 +583,11 @@ Map* AREImp::GetMap(const char *ResRef)
 			else
 				ab->StanceID = IE_ANI_AWAKE;
 			
-			ab->Orientation = ( unsigned char ) Orientation;
+			ab->Orientation = Orientation%MAX_ORIENT;
 			ab->TalkCount = TalkCount;
 			//hack to not load global actors to area
+			//most likely this is unneeded now as we
+			//load saved game areas
 			if(!game->FindPC(ab->scriptName) && !game->FindNPC(ab->scriptName) ) {
 				map->AddActor( ab );
 			} else {
@@ -693,13 +707,14 @@ Map* AREImp::GetMap(const char *ResRef)
 	Point point;
 	ieDword color;
 	char *text;
+	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
-	if (pst) {
+	if (pst && !NoteCount) {
 		color = 0; //all pst notes are the same
 		if( !INInote ) {
 			ReadAutonoteINI();
 		}
-		//add automap ini entries
+		//add autonote.ini entries
 		if( INInote ) {
 			int count = INInote->GetKeyAsInt( map->scriptName, "count", 0);
 			while (count) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.15 2004/10/14 17:31:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.16 2004/10/17 07:06:52 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -69,6 +69,7 @@ MapControl::MapControl(void)
 	ScrollY = 0;
 	MouseIsDown = false;
 	Changed = true;
+	ConvertToGame = true;
 	memset(Flag,0,sizeof(Flag) );
 
 	MyMap = core->GetGame()->GetCurrentMap();
@@ -162,8 +163,14 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 		while (i--) {
 			MapNote * mn = MyMap -> GetMapNote(i);
 			Sprite2D *anim = Flag[mn->color&7];
-			vp.x = GAME_TO_SCREENX(mn->Pos.x);
-			vp.y = GAME_TO_SCREENY(mn->Pos.y);
+			if(ConvertToGame) {
+				vp.x = GAME_TO_SCREENX(mn->Pos.x);
+				vp.y = GAME_TO_SCREENY(mn->Pos.y);
+			}
+			else { //pst style
+				vp.x = MAP_TO_SCREENX(mn->Pos.x);
+				vp.y = MAP_TO_SCREENY(mn->Pos.y);
+			}
 			if (anim) {
 				video->BlitSprite( anim, vp.x, vp.y, true, &r );
 			}
@@ -232,23 +239,37 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 	lastMouseY = y;
 
 	if (Value&1) {
-		Point mp = {SCREEN_TO_GAMEX(x),SCREEN_TO_GAMEY(y) };
+		Point mp;
+		unsigned int dist;
+
+		if(ConvertToGame) {
+			mp.x = SCREEN_TO_GAMEX(x);
+			mp.y = SCREEN_TO_GAMEY(y);
+			dist = 100;
+		}
+		else {
+			mp.x = SCREEN_TO_MAPX(x);
+			mp.y = SCREEN_TO_MAPY(y);
+			dist = 16;
+		}
 		int i = MyMap -> GetMapNoteCount();
 		while (i--) {
 			MapNote * mn = MyMap -> GetMapNote(i);
-			if (Distance(mp, mn->Pos)<64) {
+			if (Distance(mp, mn->Pos)<dist) {
 				if (LinkedLabel) {
 					LinkedLabel->SetText( mn->text );
 					printf("%s\n",mn->text);
 				}
 				//if you ever need something else to do
-				//change this to a goto
+				//(like erasing the label before redrawing)
+				//change this return
 				return;
 			}
 		}
 	}
 	if (LinkedLabel) {
 		LinkedLabel->SetText( "" );
+		//this will erase the label (no idea why is it needed)
         	( ( Window * ) Owner )->Invalidate();
 	}
 }

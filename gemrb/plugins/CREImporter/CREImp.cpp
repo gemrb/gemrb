@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.48 2004/09/17 17:26:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.49 2004/10/17 07:06:52 avenger_teambg Exp $
  *
  */
 
@@ -52,6 +52,12 @@ bool CREImp::Open(DataStream* stream, bool autoFree)
 	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
+	if (strncmp( Signature, "CHR ",4) == 0) {
+		//skips chr signature, reads cre signature
+		if(!SeekCreHeader(Signature)) {
+			return false;
+		}
+	}
 	if (strncmp( Signature, "CRE V1.0", 8 ) == 0) {
 		CREVersion = IE_CRE_V1_0;
 		return true;
@@ -70,6 +76,22 @@ bool CREImp::Open(DataStream* stream, bool autoFree)
 	}
 	printf( "[CREImporter]: Not a CRE File or File Version not supported: %8.8s\n", Signature );
 	return false;
+}
+
+bool CREImp::SeekCreHeader(char *Signature)
+{
+	if(strncmp( Signature, "CHR V1.0", 8) == 0) {
+		str->Seek(0x5c, GEM_CURRENT_POS);
+		goto done;
+	}
+	if(strncmp( Signature, "CHR V2.2", 8) == 0) {
+		str->Seek(0x21c, GEM_CURRENT_POS);
+		goto done;
+	}
+	return false;
+done:
+	str->Read( Signature, 8);
+	return true;
 }
 
 CREMemorizedSpell* CREImp::GetMemorizedSpell()
@@ -494,12 +516,12 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		while(j--) {
 			CREKnownSpell* spl = known_spells[j];
 			if (!spl) {
-				printf("[CREImp]: Duplicate known spell (%d) in creature!\n", j);
 				continue;
 			}
-			if (spl->Type == sm->Type && spl->Level == sm->Level) {
+			if ((spl->Type == sm->Type) && (spl->Level == sm->Level)) {
 				sm->known_spells.push_back( spl );
 				known_spells[j] = NULL;
+				continue;
 			}
 		}
 		for (j = 0; j < sm->MemorizedCount; j++) {

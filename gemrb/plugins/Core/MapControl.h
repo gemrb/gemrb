@@ -27,6 +27,7 @@ public:
 	int ScrollX, ScrollY;
 	unsigned short lastMouseX, lastMouseY;
 	bool MouseIsDown;
+	bool ConvertToGame;
 	// Small map bitmap
 	Sprite2D* MapMOS;
 	// current map

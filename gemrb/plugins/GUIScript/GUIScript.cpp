@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.224 2004/10/16 09:53:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.225 2004/10/17 07:06:53 avenger_teambg Exp $
  *
  */
 
@@ -1631,6 +1631,7 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 	map->ControlType = IE_GUI_MAP;
 	map->Owner = win;
 	if (Flag2) { //pst flavour
+		map->ConvertToGame = false;
 		CtrlIndex = core->GetControl( WindowIndex, LabelID );
 		Control *lc = win->GetControl( CtrlIndex );
 		map->LinkedLabel = lc;
