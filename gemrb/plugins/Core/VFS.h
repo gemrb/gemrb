@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.7 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.8 2004/03/10 20:09:38 balrog994 Exp $
  *
  */
 
@@ -59,6 +59,8 @@
 #endif
 
 #ifdef WIN32
+
+#define R_OK 04
 
 typedef struct DIR {
 	char path[_MAX_PATH];
