@@ -15,11 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.10 2004/02/24 22:20:40 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.11 2004/04/04 17:08:08 avenger_teambg Exp $
  *
  */
 
 #include <assert.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #include "../Core/Interface.h"
 #include "MVEPlay.h"
 #include "libmve.h"
@@ -45,6 +47,39 @@ MVEPlay::~MVEPlay(void)
 	}
 }
 
+/** the crudest hack ever been made :), we should really beg for a */
+/** BIK player, miracles happen */
+bool MVEPlay::PlayBik(DataStream *stream)
+{
+	char Tmp[256];
+
+	sprintf(Tmp,"%stmp.bik",core->CachePath);
+	unlink(Tmp);
+	int fhandle = open(Tmp,O_CREAT|O_TRUNC|O_RDWR, S_IWRITE|S_IREAD);
+	if (fhandle<1) {
+		return false;
+	}
+	stream->Seek(0,GEM_STREAM_START);
+	int size=stream->Size();
+	printf("Copying %d bytes... to %s\n",size, Tmp);
+	while(size) {
+		int chunk = size>256?256:size;
+		stream->Read(Tmp, chunk);
+		write(fhandle,Tmp, chunk);
+		size -= chunk;
+	}
+	close(fhandle);
+#ifdef WIN32
+	sprintf(Tmp,"BinkPlayer.exe %stmp.bik",core->CachePath);
+#else
+	sprintf(Tmp,"BinkPlayer %stmp.bik",core->CachePath);
+#endif
+	int ret=system(Tmp);
+	sprintf(Tmp,"%stmp.bik",core->CachePath);
+	unlink(Tmp);
+	return ret!=0;
+}
+
 bool MVEPlay::Open(DataStream* stream, bool autoFree)
 {
 	validVideo = false;
@@ -60,7 +95,9 @@ bool MVEPlay::Open(DataStream* stream, bool autoFree)
 	str->Read( Signature, MVE_SIGNATURE_LEN );
 	if (memcmp( Signature, MVESignature, MVE_SIGNATURE_LEN ) != 0) {
 		if (memcmp( Signature, "BIK", 3 ) == 0) {
-			printf( "Warning!!! This is a Bink Video File...\nUnfortunately we cannot provide a Bink Video Player\nWe are sorry!\n" );
+			if( PlayBik(stream) ) {
+				printf( "Warning!!! This is a Bink Video File...\nUnfortunately we cannot provide a Bink Video Player\nWe are sorry!\n" );
+			}
 			return true;
 		}
 		return false;
