@@ -33,6 +33,8 @@ private:
 	ActorBlock * lastActor;
 	std::vector<ActorBlock*> selected;
 	std::vector<ActorBlock*> highlighted;
+	std::vector<InfoPoint*> infoPoints;
+	Color * InfoTextPalette;
 	bool DrawSelectionRect;
 	bool MouseIsDown;
 	Region SelectionRect;

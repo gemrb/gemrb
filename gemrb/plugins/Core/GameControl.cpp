@@ -2,6 +2,8 @@
 #include "GameControl.h"
 #include "Interface.h"
 
+#define IE_CHEST_CURSOR	32
+
 extern Interface * core;
 
 GameControl::GameControl(void)
@@ -14,12 +16,15 @@ GameControl::GameControl(void)
 	overDoor = NULL;
 	overContainer = NULL;
 	overInfoPoint = NULL;
+	Color white = {0xff, 0xff, 0xff, 0xff}, black = {0x00, 0x00, 0x00, 0xff};
+	InfoTextPalette = core->GetVideoDriver()->CreatePalette(white, black);
 	lastCursor = 0;
 	moveX = moveY = 0;
 }
 
 GameControl::~GameControl(void)
 {
+	free(InfoTextPalette);
 }
 
 /** Draws the Control on the Output Display */
@@ -72,6 +77,28 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			else {
 				video->DrawPolyline(overContainer->outline, cyan, true);
 				core->GetVideoDriver()->SetCursor(core->Cursors[2]->GetFrame(0),core->Cursors[3]->GetFrame(0));
+			}
+		}
+		for(int i = 0; i < infoPoints.size(); i++) {
+#ifdef WIN32
+			unsigned long time = GetTickCount();
+#else
+			struct timeval tv;
+			gettimeofday(&tv, NULL);
+			unsigned long time = (tv.tv_usec/1000) + (tv.tv_sec*1000);
+#endif
+			if((time - infoPoints[i]->startDisplayTime) >= 10000) {
+				infoPoints[i]->textDisplaying = 0;
+				std::vector<InfoPoint*>::iterator m;
+				m = infoPoints.begin()+i;
+				infoPoints.erase(m);
+				i--;
+				continue;
+			}
+			if(infoPoints[i]->textDisplaying == 1) {
+				Font * font = core->GetFont(9);
+				Region rgn(infoPoints[i]->outline->BBox.x+(infoPoints[i]->outline->BBox.w/2)-100, infoPoints[i]->outline->BBox.y, 200, 400);
+				font->Print(rgn, (unsigned char*)infoPoints[i]->String, InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false);
 			}
 		}
 	}
@@ -155,6 +182,12 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		overDoor = NULL;
 	}
 	overContainer = area->tm->GetContainer(GameX, GameY);
+	if(overContainer) {
+		if(lastCursor != IE_CHEST_CURSOR) {
+			core->GetVideoDriver()->SetCursor(core->Cursors[IE_CHEST_CURSOR]->GetFrame(0), core->Cursors[IE_CHEST_CURSOR+1]->GetFrame(0));
+			lastCursor = IE_CHEST_CURSOR;
+		}
+	}
 	overInfoPoint = area->tm->GetInfoPoint(GameX, GameY);
 	if(overInfoPoint) {
 		if(overInfoPoint->Cursor != lastCursor) {
@@ -193,10 +226,25 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned char Bu
 		for(int i = 0; i < selected.size(); i++)
 			selected[i]->Selected = false;
 		selected.clear();
-		if(!actor)
-			return;
-		selected.push_back(actor);
-		actor->Selected = true;
+		if(actor) {
+			selected.push_back(actor);
+			actor->Selected = true;
+		}
+		if(overInfoPoint) {
+			if(overInfoPoint->Type == 1) {
+				if(overInfoPoint->textDisplaying != 1) {
+					overInfoPoint->textDisplaying = 1;
+					infoPoints.push_back(overInfoPoint);
+#ifdef WIN32
+					overInfoPoint->startDisplayTime = GetTickCount();
+#else
+					struct timeval tv;
+					gettimeofday(&tv, NULL);
+					overInfoPoint->startDisplayTime = (tv.tv_usec/1000) + (tv.tv_sec*1000);
+#endif
+				}
+			}
+		}
 	}
 	else {
 		ActorBlock ** ab;
