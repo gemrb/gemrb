@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.51 2004/05/07 16:45:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.52 2004/05/11 17:11:16 avenger_teambg Exp $
  *
  */
 
@@ -424,6 +424,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		} else
 			ip->Scripts[0] = NULL;
 	}
+	//we need this so we can filter global actors
+	Game *game=core->GetGame();
 	printf( "Loading actors\n" );
 	//Loading Actors
 	str->Seek( ActorOffset, GEM_STREAM_START );
@@ -487,7 +489,13 @@ Map* AREImp::GetMap(const char *ResRef)
 			ab->AnimID = IE_ANI_SLEEP;
 		ab->Orientation = ( unsigned char ) Orientation;
 		ab->TalkCount = TalkCount;
-		map->AddActor( ab );
+		//hack to not load global actors to area
+		if(!game->FindPC(ab->scriptName) && !game->FindNPC(ab->scriptName) ) {
+			map->AddActor( ab );
+		}
+		else {
+			delete ab;
+		}
 	}
 	core->FreeInterface( actmgr );
 	str->Seek( AnimOffset, GEM_STREAM_START );
