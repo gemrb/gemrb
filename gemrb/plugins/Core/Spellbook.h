@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.1 2004/03/29 23:52:29 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.2 2004/04/07 09:54:53 edheldil Exp $
  *
  */
 
@@ -40,7 +40,7 @@
 #define GEM_EXPORT
 #endif
 
-//const int INVENTORY_SIZE = 38;
+const int NUM_SPELL_TYPES = 3;
 
 typedef enum ieSpellType {
 	IE_SPELL_TYPE_PRIEST = 0,
@@ -74,7 +74,8 @@ typedef struct CRESpellMemorization {
 	ieDword MemorizedIndex;
 	ieDword MemorizedCount;
 
-	//CREMemorizedSpell* MemorizedPtr;
+	std::vector<CREKnownSpell*> known_spells;
+	std::vector<CREMemorizedSpell*> memorized_spells;
 } CRESpellMemorization;
 
 
@@ -82,39 +83,38 @@ typedef struct CRESpellMemorization {
 
 class GEM_EXPORT Spellbook {
 private:
-	std::vector<CREKnownSpell*> known_spells;
-	std::vector<CRESpellMemorization*> spell_memorization;
-	std::vector<CREMemorizedSpell*> memorized_spells;
-	std::vector<CRECastSpell*> cast_spells;
+	std::vector<CRESpellMemorization*> spells[3];
 
 public: 
 	Spellbook();
 	virtual ~Spellbook();
 
-	int AddKnownSpell(CREKnownSpell* spell);
-	int AddSpellMemorization(CRESpellMemorization* sm);
-	int AddMemorizedSpell(CREMemorizedSpell* spell);
+	//int AddKnownSpell(CREKnownSpell* spell);
+	bool AddSpellMemorization(CRESpellMemorization* sm);
+	//int AddMemorizedSpell(CREMemorizedSpell* spell);
 
-	int GetKnownSpellsCount() { return known_spells.size(); };
-	int GetMemorizedSpellsCount() { return memorized_spells.size(); };
+	int GetKnownSpellsCount(int type, int level);
+	int GetMemorizedSpellsCount(int type, int level);
 
-	int GetKnownSpellsCountOnLevel( int level );
-	int GetMemorizedSpellsCountOnLevel( int level );
+	//int GetKnownSpellsCountOnLevel( int level );
+	//int GetMemorizedSpellsCountOnLevel( int level );
 
-	CREKnownSpell* GetKnownSpell(int index) { return known_spells[index]; };
-	CREMemorizedSpell* GetMemorizedSpell(int index) { return memorized_spells[index]; };
+	//CREKnownSpell* GetKnownSpell(int index) { return known_spells[index]; };
+	//CREMemorizedSpell* GetMemorizedSpell(int type, int level, int index) { return memorized_spells[index]; };
 
-	/** Adds index'th spell from known to memorized */
-	bool MemorizeSpell(int index, bool usable);
+	/** Adds spell from known to memorized */
+	bool MemorizeSpell(CREKnownSpell* spl, bool usable);
 
-	/** Removes index'th memorized spell */
-	bool UnmemorizeSpell(int index);
+	/** Removes memorized spell */
+	bool UnmemorizeSpell(CREMemorizedSpell* spl);
 
 	/** Sets index'th spell from memorized as 'not-yet-cast' */
-	bool ChargeSpell(int index);
+	bool ChargeSpell(CREMemorizedSpell* spl);
 
 	/** Sets index'th spell from memorized as 'already-cast' */
-	bool DepleteSpell(int index);
+	bool DepleteSpell(CREMemorizedSpell* spl);
+
+	void ChargeAllSpells();
 
 	/** Dumps spellbook to stdout */
 	void dump();

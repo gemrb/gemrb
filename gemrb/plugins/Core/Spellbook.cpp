@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.1 2004/03/29 23:52:29 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.2 2004/04/07 09:54:53 edheldil Exp $
  *
  */
 
@@ -33,157 +33,102 @@ Spellbook::Spellbook()
 
 Spellbook::~Spellbook()
 {
-	for (size_t i = 0; i < known_spells.size(); i++) {
-		delete( known_spells[i] );
-	}
-	for (size_t i = 0; i < spell_memorization.size(); i++) {
-		delete( spell_memorization[i] );
-	}
-	for (size_t i = 0; i < memorized_spells.size(); i++) {
-		delete( memorized_spells[i] );
-	}
-	for (size_t i = 0; i < cast_spells.size(); i++) {
-		delete( cast_spells[i] );
+	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
+		for (int j = 0; j < spells[i].size(); j++) {
+			delete( spells[i][j] );
+		}
 	}
 }
 
-int Spellbook::AddKnownSpell(CREKnownSpell* spell)
+bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 {
-	for (size_t i = 0; i < known_spells.size(); i++) {
-		if (!known_spells[i]) {
-			known_spells[i] = spell;
-			return ( int ) i;
+	std::vector<CRESpellMemorization*>* s = &spells[sm->Type];
+
+	for (size_t i = 0; i < s->size(); i++) {
+		if (!(*s)[i]) {
+			(*s)[i] = sm;
+			return true;
 		}
 	}
-	known_spells.push_back( spell );
-	return known_spells.size() - 1;
+	s->push_back( sm );
+	return true;
 }
 
-int Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
+
+bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
 {
-	for (size_t i = 0; i < spell_memorization.size(); i++) {
-		if (!spell_memorization[i]) {
-			spell_memorization[i] = sm;
-			return ( int ) i;
-		}
-	}
-	spell_memorization.push_back( sm );
-	return spell_memorization.size() - 1;
+	CRESpellMemorization* sm = spells[spell->Type][spell->Level];
+	if (sm->Number <= sm->MemorizedCount)
+		return false;
+
+	CREMemorizedSpell* mem_spl = new CREMemorizedSpell();
+	strncpy( mem_spl->SpellResRef, spell->SpellResRef, 8 );
+	mem_spl->Flags = usable ? 1 : 0; // FIXME: is it all it's used for?
+
+	sm->memorized_spells.push_back( mem_spl );
+	sm->MemorizedCount++;
+
+	return true;
 }
 
-int Spellbook::AddMemorizedSpell(CREMemorizedSpell* spell)
-{
-	//spell->MemorizedPtr = memorized_spells[spell->MemorizedIndex];
-	//spell->MemorizedIndex = 0;
-
-	for (size_t i = 0; i < memorized_spells.size(); i++) {
-		if (!memorized_spells[i]) {
-			memorized_spells[i] = spell;
-			return ( int ) i;
-		}
-	}
-	memorized_spells.push_back( spell );
-	return memorized_spells.size() - 1;
-}
-
-bool Spellbook::MemorizeSpell(int index, bool usable)
-{
-	// assert index >= 0
-	if (index >= known_spells.size()) return false; // FIXME: or -1?
-
-	CREKnownSpell *spl = known_spells[index];
-	CRESpellMemorization *sm = NULL;
-
-	int cnt = spell_memorization.size();
-
-	// Find match in spell memorization
-	for (int i = 0; i < cnt; i++) {
-		sm = spell_memorization[i];
-
-		if (spl->Level != sm->Level || spl->Type != sm->Type)
-			continue;
-
-		// ok, we found a match
-
-		// is there still room?
-		if (sm->Number <= sm->MemorizedCount)
-			return false;
-
-		CREMemorizedSpell* mem_spl = new CREMemorizedSpell();
-		strncpy( mem_spl->SpellResRef, spl->SpellResRef, 8 );
-		mem_spl->Flags = usable ? 1 : 0; // FIXME: is it all it's used for?
-
-		if (sm->MemorizedCount > 0) {
-			int pos = sm->MemorizedIndex;
-			//memorized_spells.insert( memorized_spells[pos], mem_spl );
-			memorized_spells.insert( memorized_spells.begin() + pos, mem_spl );
-			for (int j = 0; j < cnt; j++)
-				if (spell_memorization[j]->MemorizedIndex > pos)
-					spell_memorization[j]->MemorizedIndex++;
-		}
-		else {
-			memorized_spells.push_back( mem_spl );
-			sm->MemorizedIndex = memorized_spells.size() - 1;
-		}
-		sm->MemorizedCount++;
-
-		return true;
-	}
-
-	return false;
-}
-
-bool Spellbook::UnmemorizeSpell(int index)
+bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 {
 	// FIXME: not yet implemented
 	return false;
 }
 
-
-bool Spellbook::ChargeSpell(int index)
+void Spellbook::ChargeAllSpells()
 {
-	if (index < 0 || index >= memorized_spells.size())
-		return false;
+	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
+		for (int j = 0; j < spells[i].size(); j++) {
+			CRESpellMemorization* sm = spells[i][j];
 
-	memorized_spells[index]->Flags = 1;
+			for (int k = 0; k < sm->memorized_spells.size(); k++)
+				ChargeSpell( sm->memorized_spells[k] );
+		}
+	}
+}
+
+bool Spellbook::ChargeSpell(CREMemorizedSpell* spl)
+{
+	spl->Flags = 1;
 	return true;
 }
 
-bool Spellbook::DepleteSpell(int index)
+bool Spellbook::DepleteSpell(CREMemorizedSpell* spl)
 {
-	if (index < 0 || index >= memorized_spells.size())
-		return false;
-
-	memorized_spells[index]->Flags = 0;
+	spl->Flags = 0;
 	return true;
 }
 
 void Spellbook::dump()
 {
 	printf( "SPELLBOOK:\n" );
+	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
+		for (int j = 0; j < spells[i].size(); j++) {
+			CRESpellMemorization* sm = spells[i][j];
+			//if (!sm || !sm->Number) continue;
+			if (!sm) continue;
 
-	printf( "Known spells:\n" );
-	for (size_t i = 0; i < known_spells.size(); i++) {
-		CREKnownSpell* spl = known_spells[i];
-		if (!spl) continue;
+			printf ( "%2d: L: %d; N1: %d; N2: %d; T: %d; MI: %ld; MC: %ld\n", i, sm->Level, sm->Number, sm->Number2, sm->Type, sm->MemorizedIndex, sm->MemorizedCount );
 
-		printf ( "%2d: %8s  L: %d  T: %d\n", i, spl->SpellResRef, spl->Level, spl->Type );
-	}
+			if (sm->known_spells.size()) 
+				printf( "  Known spells:\n" );
+			for (int k = 0; k < sm->known_spells.size(); k++) {
+				CREKnownSpell* spl = sm->known_spells[k];
+				if (!spl) continue;
 
-	printf( "Spell memorization:\n" );
-	for (size_t i = 0; i < spell_memorization.size(); i++) {
-		CRESpellMemorization* spl = spell_memorization[i];
-		//if (!spl || !spl->Number) continue;
-		if (!spl) continue;
+				printf ( "  %2d: %8s  L: %d  T: %d\n", k, spl->SpellResRef, spl->Level, spl->Type );
+			}
 
-		printf ( "%2d: L: %d; N1: %d; N2: %d; T: %d; MI: %ld; MC: %ld\n", i, spl->Level, spl->Number, spl->Number2, spl->Type, spl->MemorizedIndex, spl->MemorizedCount );
-	}
+			if (sm->memorized_spells.size()) 
+				printf( "  Memorized spells:\n" );
+			for (int k = 0; k < sm->memorized_spells.size (); k++) {
+				CREMemorizedSpell* spl = sm->memorized_spells[k];
+				if (!spl) continue;
 
-	printf( "Memorized spells:\n" );
-	for (size_t i = 0; i < memorized_spells.size(); i++) {
-		CREMemorizedSpell* spl = memorized_spells[i];
-		if (!spl) continue;
-
-		printf ( "%2d: %8s  %x\n", i, spl->SpellResRef, spl->Flags );
+				printf ( "  %2d: %8s  %x\n", k, spl->SpellResRef, spl->Flags );
+			}
+		}
 	}
 }
