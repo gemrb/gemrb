@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.32 2004/01/17 21:33:38 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.33 2004/01/18 14:51:04 balrog994 Exp $
  *
  */
 
@@ -30,6 +30,13 @@ class Action;
 #include "ActorBlock.h"
 #include "SymbolMgr.h"
 #include <list>
+
+#define GSASSERT(f,c) \
+  if(!(f))  \
+  {  \
+  printf("Assertion failed: %s [0x%08X] Line %d",#f, c, __LINE__); \
+                abort(); \
+  }
 
 #ifdef WIN32
 
@@ -49,6 +56,23 @@ public:
 		RefCount = 1;
 		objectName[0] = 0;
 		PositionMask[0] = 0;
+
+		eaField = 0;
+		factionField = 0;
+		teamField = 0;
+		generalField = 0;
+		raceField = 0;
+		classField = 0;
+		specificField = 0;
+		genderField = 0;
+		alignmentField = 0;
+		identifiersField = 0;
+		XobjectPosition = 0;
+		YobjectPosition = 0;
+		WobjectPosition = 0;
+		HobjectPosition = 0;
+
+		canary = 0xdeadbeef;
 	};
 	~Object() {
 		printf("Freeing Object\n");
@@ -72,17 +96,21 @@ public:
 	char			objectName[65];
 private:
 	int				RefCount;
+	volatile unsigned long canary;
 public:
 	void Release() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		if(!RefCount) {
 			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
 			abort();
 		}
 		RefCount--;
+		printf("Refcount decreased to: %d\n",RefCount);
 		if(!RefCount)
 			delete this;
 	}
 	void IncRef() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		RefCount++;
 		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
@@ -100,6 +128,7 @@ public:
 		RefCount = 1;
 		string0Parameter[0] = 0;
 		string1Parameter[0] = 0;
+		canary = 0xdeadbeef;
 	};
 	~Trigger() {
 		if(objectParameter) {
@@ -120,8 +149,10 @@ public:
 	Object*			objectParameter;
 private:
 	int				RefCount;
+	volatile unsigned long canary;
 public:
 	void Release() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		if(!RefCount) {
 			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
 			abort();
@@ -132,6 +163,7 @@ public:
 			delete this;
 	}
 	void IncRef() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		RefCount++;
 		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
@@ -148,6 +180,7 @@ public:
 		RefCount = 1;
 		triggers = NULL;
 		triggersCount = 0;
+		canary = 0xdeadbeef;
 	};
 	~Condition() {
 		if(!triggers)
@@ -165,8 +198,10 @@ public:
 	Trigger ** triggers;
 private:
 	int				RefCount;
+	volatile unsigned long canary;
 public:
 	void Release() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		if(!RefCount) {
 			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
 			abort();
@@ -177,6 +212,7 @@ public:
 			delete this;
 	}
 	void IncRef() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		RefCount++;
 		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
@@ -202,6 +238,7 @@ public:
 		int1Parameter = 0;
 		int2Parameter = 0;
 		RefCount = 1;
+		canary = 0xdeadbeef;
 	};
 	~Action() {
 		for(int c = 0; c < 3; c++) {
@@ -222,8 +259,10 @@ public:
 	char			string1Parameter[65];
 private:
 	int				RefCount;
+	volatile unsigned long canary;
 public:
 	void Release() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		if(!RefCount) {
 			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
 			abort();
@@ -234,6 +273,7 @@ public:
 			delete this;
 	}
 	void IncRef() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		RefCount++;
 		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
@@ -251,6 +291,7 @@ public:
 		actions = NULL;
 		weight = 0;
 		actionsCount = 0;
+		canary = 0xdeadbeef;
 	};
 	~Response() {
 		if(!actions)
@@ -269,8 +310,10 @@ public:
 	Action ** actions;
 private:
 	int				RefCount;
+	volatile unsigned long canary;
 public:
 	void Release() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		if(!RefCount) {
 			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
 			abort();
@@ -281,6 +324,7 @@ public:
 			delete this;
 	}
 	void IncRef() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		RefCount++;
 		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
@@ -297,6 +341,7 @@ public:
 		RefCount = 1;
 		responses = NULL;
 		responsesCount = 0;
+		canary = 0xdeadbeef;
 	};
 	~ResponseSet() {
 		if(!responses)
@@ -314,8 +359,10 @@ public:
 	Response ** responses;
 private:
 	int				RefCount;
+	volatile unsigned long canary;
 public:
 	void Release() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		if(!RefCount) {
 			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
 			abort();
@@ -326,6 +373,7 @@ public:
 			delete this;
 	}
 	void IncRef() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		RefCount++;
 		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
@@ -342,6 +390,7 @@ public:
 		RefCount = 1;
 		condition = NULL;
 		responseSet = NULL;
+		canary = 0xdeadbeef;
 	};
 	~ResponseBlock() {
 		if(condition)
@@ -355,8 +404,10 @@ public:
 	ResponseSet * responseSet;
 private:
 	int				RefCount;
+	volatile unsigned long canary;
 public:
 	void Release() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		if(!RefCount) {
 			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
 			abort();
@@ -367,6 +418,7 @@ public:
 			delete this;
 	}
 	void IncRef() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		RefCount++;
 		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)
@@ -380,6 +432,7 @@ public:
 class GEM_EXPORT Script {
 public:
 	Script(const char * Name) {
+		canary = 0xdeadbeef;
 		RefCount = 1;
 		responseBlocks = NULL;
 		responseBlocksCount = 0;
@@ -420,8 +473,10 @@ public:
 	char Name[9];
 private:
 	int				RefCount;
+	volatile unsigned long canary;
 public:
 	void Release() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		if(!RefCount) {
 			printf("WARNING!!! Double Freeing in %s: Line %d\n", __FILE__, __LINE__);
 			abort();
@@ -432,6 +487,7 @@ public:
 			delete this;
 	}
 	void IncRef() {
+		GSASSERT(canary == 0xdeadbeef, canary);
 		RefCount++;
 		printf("IncRef(%d) called in Line %d\n", RefCount, __LINE__);
 		if(RefCount>=4)

@@ -15,15 +15,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.48 2004/01/17 15:45:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.49 2004/01/18 14:51:04 balrog994 Exp $
  *
  */
 
+#include "../../includes/win32def.h"
 #include "GameScript.h"
 #include "Interface.h"
 #include "DialogMgr.h"
 
 extern Interface * core;
+#ifdef WIN32
+extern HANDLE hConsole;
+#endif
 
 static int initialized = 0;
 static Variables * globals;
@@ -715,7 +719,7 @@ Action * GameScript::GenerateAction(char * String)
 							{
 							while((*str != ',') && (*str != ')')) str++;
 							src++; //Skip [
-							char * symbol = (char*)malloc(32);
+							char symbol[33];
 							char * tmp = symbol;
 							while(((*src >= '0') && (*src <= '9')) || (*src == '-')) {
 								*tmp = *src;
@@ -733,7 +737,6 @@ Action * GameScript::GenerateAction(char * String)
 							}
 							*tmp = 0;
 							newAction->YpointParameter = atoi(symbol);
-							free(symbol);
 							src++; //Skip ]
 							}
 						break;
@@ -744,7 +747,7 @@ Action * GameScript::GenerateAction(char * String)
 								str++;
 								SymbolMgr * valHook = NULL;
 								if((*str != ',') && (*str != ')')) {
-									char * idsTabName = (char*)malloc(32);
+									char idsTabName[33];
 									char * tmp = idsTabName;
 									while((*str != ',') && (*str != ')')) {
 										*tmp = *str;
@@ -754,10 +757,9 @@ Action * GameScript::GenerateAction(char * String)
 									*tmp = 0;
 									int i = core->LoadSymbol(idsTabName);
 									valHook = core->GetSymbol(i);
-									free(idsTabName);
 								}
 								if(!valHook) {
-									char * symbol = (char*)malloc(32);
+									char symbol[33];
 									char * tmp = symbol;
 									while(((*src >= '0') && (*src <= '9')) || (*src == '-')) {
 										*tmp = *src;
@@ -772,9 +774,8 @@ Action * GameScript::GenerateAction(char * String)
 									} else {
 										newAction->int2Parameter = atoi(symbol);
 									}
-									free(symbol);
 								} else {
-									char * symbol = (char*)malloc(32);
+									char symbol[33];
 									char * tmp = symbol;
 									while((*src != ',') && (*src != ')')) {
 										*tmp = *src;
@@ -789,7 +790,6 @@ Action * GameScript::GenerateAction(char * String)
 									} else {
 										newAction->int2Parameter = valHook->GetValue(symbol);
 									}
-									free(symbol);
 								}
 							}
 						break;
@@ -797,8 +797,8 @@ Action * GameScript::GenerateAction(char * String)
 						case 'A': //Action
 							{
 								while((*str != ',') && (*str != ')')) str++;
-								char *action = (char*)malloc(128);
-								char *dst = action;
+								char action[257];
+								int i = 0;
 								int openParentesisCount = 0;
 								while(true) {
 									if(*src == ')') {
@@ -814,13 +814,12 @@ Action * GameScript::GenerateAction(char * String)
 												break;
 										}
 									}
-									*dst = *src;
-									dst++;
+									action[i] = *src;
+									i++;
 									src++;
 								}
-								*dst = 0;
+								action[i] = 0;
 								Action * act = GenerateAction(action);
-								free(action);
 								act->objects[0] = newAction->objects[0];
 								act->objects[0]->IncRef();
 								printf("Releasing Action %d [0x%08X] in %s Line: %d\n", newAction->actionID, newAction, __FILE__, __LINE__);
@@ -856,10 +855,8 @@ Action * GameScript::GenerateAction(char * String)
 								src++;
 								char * dst;
 								if(!stringsCount) {
-									//newAction->string0Parameter = (char*)malloc(128);
 									dst = newAction->string0Parameter;
 								} else {
-									//newAction->string1Parameter = (char*)malloc(128);
 									dst = newAction->string1Parameter;
 								}
 								while(*src != '"') {
@@ -922,7 +919,7 @@ Trigger * GameScript::GenerateTrigger(char * String)
 							{
 							while((*str != ',') && (*str != ')')) str++;
 							src++; //Skip [
-							char * symbol = (char*)malloc(32);
+							char symbol[33];
 							char * tmp = symbol;
 							while((*src >= '0') && (*src <= '9')) {
 								*tmp = *src;
@@ -950,7 +947,7 @@ Trigger * GameScript::GenerateTrigger(char * String)
 								str++;
 								SymbolMgr * valHook = NULL;
 								if((*str != ',') && (*str != ')')) {
-									char * idsTabName = (char*)malloc(32);
+									char idsTabName[33];
 									char * tmp = idsTabName;
 									while((*str != ',') && (*str != ')')) {
 										*tmp = *str;
@@ -960,10 +957,9 @@ Trigger * GameScript::GenerateTrigger(char * String)
 									*tmp = 0;
 									int i = core->LoadSymbol(idsTabName);
 									valHook = core->GetSymbol(i);
-									free(idsTabName);
 								}
 								if(!valHook) {
-									char * symbol = (char*)malloc(32);
+									char symbol[33];
 									char * tmp = symbol;
 									while((*src >= '0') && (*src <= '9')) {
 										*tmp = *src;
@@ -978,9 +974,8 @@ Trigger * GameScript::GenerateTrigger(char * String)
 									} else {
 										newTrigger->int2Parameter = atoi(symbol);
 									}
-									free(symbol);
 								} else {
-									char * symbol = (char*)malloc(32);
+									char symbol[33];
 									char * tmp = symbol;
 									while((*src != ',') && (*src != ')')) {
 										*tmp = *src;
@@ -995,7 +990,6 @@ Trigger * GameScript::GenerateTrigger(char * String)
 									} else {
 										newTrigger->int2Parameter = valHook->GetValue(symbol);
 									}
-									free(symbol);
 								}
 								intCount++;
 							}
@@ -1016,7 +1010,9 @@ Trigger * GameScript::GenerateTrigger(char * String)
 									*dst = 0;
 									src++;
 								} else {
-									
+									textcolor(LIGHT_RED);
+									printf("[GenerateTrigger]: OBJECT TYPE NOT SUPPORTED\n");
+									textcolor(WHITE);
 								}
 							}
 						break;
