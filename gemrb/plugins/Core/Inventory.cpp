@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.29 2004/09/11 07:50:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.30 2004/09/12 21:58:48 avenger_teambg Exp $
  *
  */
 
@@ -341,7 +341,7 @@ int Inventory::FindItem(const char *resref, unsigned int flags)
 	return -1;
 }
 
-void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, unsigned short x, unsigned short y)
+void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc)
 {
 	//this loop is going from start
 	for (size_t i = 0; i < Slots.size(); i++) {
@@ -355,7 +355,7 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
-		map->tm->AddItemToLocation(x, y, item);
+		map->tm->AddItemToLocation(loc, item);
 		Slots[i]=NULL;
 		//if it isn't all items then we stop here
 		if(resref[0])

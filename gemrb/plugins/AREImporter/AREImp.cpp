@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.67 2004/08/22 22:09:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.68 2004/09/12 21:58:45 avenger_teambg Exp $
  *
  */
 
@@ -75,11 +75,11 @@ CREItem* AREImp::GetItem()
 	CREItem *itm = new CREItem();
 
 	str->Read( itm->ItemResRef, 8 );
-	str->Read( &itm->Unknown08, 2 );
-	str->Read( &itm->Usages[0], 2 );
-	str->Read( &itm->Usages[1], 2 );
-	str->Read( &itm->Usages[2], 2 );
-	str->Read( &itm->Flags, 4 );
+	str->ReadWord( &itm->Unknown08 );
+	str->ReadWord( &itm->Usages[0] );
+	str->ReadWord( &itm->Usages[1] );
+	str->ReadWord( &itm->Usages[2] );
+	str->ReadDword( &itm->Flags );
 
 	return itm;
 }
@@ -108,45 +108,45 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	}
 	//TEST VERSION: SKIPPING VALUES
 	str->Read( WEDResRef, 8 );
-	str->Read( &LastSave, 4);
-	str->Read( &AreaFlags, 4);
+	str->ReadDword( &LastSave );
+	str->ReadDword( &AreaFlags );
 	str->Seek( 0x48 + bigheader, GEM_STREAM_START );
-	str->Read( &AreaType, 2);
-	str->Read( &WRain, 2);
-	str->Read( &WSnow, 2);
-	str->Read( &WFog, 2);
-	str->Read( &WLightning, 2);
-	str->Read( &WUnknown, 2);
-	str->Read( &ActorOffset, 4 );
-	str->Read( &ActorCount, 2 );
+	str->ReadWord( &AreaType );
+	str->ReadWord( &WRain );
+	str->ReadWord( &WSnow );
+	str->ReadWord( &WFog );
+	str->ReadWord( &WLightning );
+	str->ReadWord( &WUnknown );
+	str->ReadDword( &ActorOffset );
+	str->ReadWord( &ActorCount );
 	str->Seek( 0x5A + bigheader, GEM_STREAM_START );
-	str->Read( &InfoPointsCount, 2 );
-	str->Read( &InfoPointsOffset, 4 );
+	str->ReadWord( &InfoPointsCount  );
+	str->ReadDword( &InfoPointsOffset );
 	str->Seek( 0x68 + bigheader, GEM_STREAM_START );
-	str->Read( &EntrancesOffset, 4 );
-	str->Read( &EntrancesCount, 4 );
-	str->Read( &ContainersOffset, 4 );
-	str->Read( &ContainersCount, 2 );
-	str->Read( &ItemsCount, 2 );
-	str->Read( &ItemsOffset, 4 );
-	str->Read( &VerticesOffset, 4 );
-	str->Read( &VerticesCount, 2 );
-	str->Read( &AmbiCount, 2 );
-	str->Read( &AmbiOffset, 4 );
-	str->Read( &VariablesOffset, 4 );
-	str->Read( &VariablesCount, 4 );
+	str->ReadDword( &EntrancesOffset );
+	str->ReadDword( &EntrancesCount );
+	str->ReadDword( &ContainersOffset );
+	str->ReadWord( &ContainersCount );
+	str->ReadWord( &ItemsCount );
+	str->ReadDword( &ItemsOffset );
+	str->ReadDword( &VerticesOffset );
+	str->ReadWord( &VerticesCount );
+	str->ReadWord( &AmbiCount );
+	str->ReadDword( &AmbiOffset );
+	str->ReadDword( &VariablesOffset );
+	str->ReadDword( &VariablesCount );
 	ieDword tmp;
-	str->Read( &tmp, 4 );
+	str->ReadDword( &tmp );
 	str->Read( Script, 8 );
 	Script[8] = 0;
 	str->Seek( 0xA4 + bigheader, GEM_STREAM_START );
-	str->Read( &DoorsCount, 4 );
-	str->Read( &DoorsOffset, 4 );
-	str->Read( &AnimCount, 4 );
-	str->Read( &AnimOffset, 4 );
+	str->ReadDword( &DoorsCount );
+	str->ReadDword( &DoorsOffset );
+	str->ReadDword( &AnimCount );
+	str->ReadDword( &AnimOffset );
 	str->Seek( 8, GEM_CURRENT_POS ); //skipping some
-	str->Read( &SongHeader, 4 );
-	str->Read( &RestHeader, 4 );
+	str->ReadDword( &SongHeader );
+	str->ReadDword( &RestHeader );
 	return true;
 }
 
@@ -202,20 +202,20 @@ Map* AREImp::GetMap(const char *ResRef)
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
 	for (i = 0; i < 5; i++) {
-		str->Read( map->SongHeader.SongList + i, 4 );
+		str->ReadDword( map->SongHeader.SongList + i );
 	}
 
 	str->Seek( RestHeader, GEM_STREAM_START );
 	for (i = 0; i < 10; i++) {
-		str->Read( map->RestHeader.Strref + i, 4 );
+		str->ReadDword( map->RestHeader.Strref + i );
 	}
 	for (i = 0; i < 10; i++) {
 		str->Read( map->RestHeader.Creature + i, 8 );
 	}
-	str->Read( &map->RestHeader.CreatureNum, 2 );
+	str->ReadWord( &map->RestHeader.CreatureNum );
 	str->Seek( 14, GEM_CURRENT_POS );
-	str->Read( &map->RestHeader.DayChance, 2 );
-	str->Read( &map->RestHeader.NightChance, 2 );
+	str->ReadWord( &map->RestHeader.DayChance );
+	str->ReadWord( &map->RestHeader.NightChance );
 
 	printf( "Loading doors\n" );
 	//Loading Doors
@@ -232,23 +232,23 @@ Map* AREImp::GetMap(const char *ResRef)
 		LongName[32] = 0;
 		str->Read( ShortName, 8 );
 		ShortName[8] = 0;
-		str->Read( &Flags, 4 );
-		str->Read( &OpenFirstVertex, 4 );
-		str->Read( &OpenVerticesCount, 2 );
-		str->Read( &ClosedVerticesCount, 2 );
-		str->Read( &ClosedFirstVertex, 4 );
-		str->Read( &minX, 2 );
-		str->Read( &minY, 2 );
-		str->Read( &maxX, 2 );
-		str->Read( &maxY, 2 );
+		str->ReadDword( &Flags );
+		str->ReadDword( &OpenFirstVertex );
+		str->ReadWord( &OpenVerticesCount );
+		str->ReadWord( &ClosedVerticesCount );
+		str->ReadDword( &ClosedFirstVertex );
+		str->ReadWord( &minX );
+		str->ReadWord( &minY );
+		str->ReadWord( &maxX );
+		str->ReadWord( &maxY );
 		BBOpen.x = minX;
 		BBOpen.y = minY;
 		BBOpen.w = maxX - minX;
 		BBOpen.h = maxY - minY;
-		str->Read( &minX, 2 );
-		str->Read( &minY, 2 );
-		str->Read( &maxX, 2 );
-		str->Read( &maxY, 2 );
+		str->ReadWord( &minX );
+		str->ReadWord( &minY );
+		str->ReadWord( &maxX );
+		str->ReadWord( &maxY );
 		BBClosed.x = minX;
 		BBClosed.y = minY;
 		BBClosed.w = maxX - minX;
@@ -259,34 +259,40 @@ Map* AREImp::GetMap(const char *ResRef)
 		OpenResRef[8] = 0;
 		str->Read( CloseResRef, 8 );
 		CloseResRef[8] = 0;
-		str->Read( &cursor, 4 );
+		str->ReadDword( &cursor );
 		str->Seek( 36, GEM_CURRENT_POS );
 		Point toOpen[2];
-		str->Read( &toOpen[0].x, 2 );
-		str->Read( &toOpen[0].y, 2 );
-		str->Read( &toOpen[1].x, 2 );
-		str->Read( &toOpen[1].y, 2 );
+		str->ReadWord( &minX );
+		toOpen[0].x = minX;
+		str->ReadWord( &minY );
+		toOpen[0].y = minY;
+		str->ReadWord( &maxX );
+		toOpen[1].x = maxX;
+		str->ReadWord( &maxY );
+		toOpen[1].y = maxY;
 		//Reading Open Polygon
 		str->Seek( VerticesOffset + ( OpenFirstVertex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* )
 			malloc( OpenVerticesCount*sizeof( Point ) );
 		for (x = 0; x < OpenVerticesCount; x++) {
-			str->Read( &points[x].x, 2 );
-			str->Read( &points[x].y, 2 );
+			str->ReadWord( &minX );
+			points[x].x = minX;
+			str->ReadWord( &minY );
+			points[x].y = minY;
 		}
 		Gem_Polygon* open = new Gem_Polygon( points, OpenVerticesCount, &BBOpen );
-//		open->BBox = BBOpen;
 		free( points );
 		//Reading Closed Polygon
 		str->Seek( VerticesOffset + ( ClosedFirstVertex * 4 ),
 				GEM_STREAM_START );
 		points = ( Point * ) malloc( ClosedVerticesCount * sizeof( Point ) );
 		for (x = 0; x < ClosedVerticesCount; x++) {
-			str->Read( &points[x].x, 2 );
-			str->Read( &points[x].y, 2 );
+			str->ReadWord( &minX );
+			points[x].x = minX;
+			str->ReadWord( &minY );
+			points[x].y = minY;
 		}
 		Gem_Polygon* closed = new Gem_Polygon( points, ClosedVerticesCount, &BBClosed );
-//		closed->BBox = BBClosed;
 		free( points );
 		//Getting Door Information from the WED File
 		bool BaseClosed;
@@ -321,52 +327,63 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
 		ieWord Type, LockDiff, Locked, Unknown;
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
+		ieWord XPos, YPos;
+		ieWord LaunchX, LaunchY;
 		ieDword ItemIndex, ItemCount;
 		char Name[33];
-		Point p;
 		str->Read( Name, 32 );
 		Name[32] = 0;
-		str->Read( &p.x, 2 );
-		str->Read( &p.y, 2 );
-		str->Read( &Type, 2 );
-		str->Read( &LockDiff, 2 );
-		str->Read( &Locked, 2 );
-		str->Read( &Unknown, 2 );
-		str->Read( &TrapDetDiff, 2 );
-		str->Read( &TrapRemDiff, 2 );
-		str->Read( &Trapped, 2 );
-		str->Read( &TrapDetected, 2 );
-		str->Seek( 4, GEM_CURRENT_POS );
+		str->ReadWord( &XPos );
+		str->ReadWord( &YPos );
+		str->ReadWord( &Type );
+		str->ReadWord( &LockDiff );
+		str->ReadWord( &Locked );
+		str->ReadWord( &Unknown );
+		str->ReadWord( &TrapDetDiff );
+		str->ReadWord( &TrapRemDiff );
+		str->ReadWord( &Trapped );
+		str->ReadWord( &TrapDetected );
+		str->ReadWord( &LaunchX );
+		str->ReadWord( &LaunchY );
 		Region bbox;
-		str->Read( &bbox.x, 2 );
-		str->Read( &bbox.y, 2 );
-		str->Read( &bbox.w, 2 );
-		str->Read( &bbox.h, 2 );
-		bbox.w -= bbox.x;
-		bbox.h -= bbox.y;
-		str->Read( &ItemIndex, 4 );
-		str->Read( &ItemCount, 4 );
+		ieWord tmp;
+		str->ReadWord( &tmp );
+		bbox.x = tmp;
+		str->ReadWord( &tmp );
+		bbox.y = tmp;
+		str->ReadWord( &tmp );
+		bbox.w = tmp - bbox.x;
+		str->ReadWord( &tmp );
+		bbox.h = tmp - bbox.y;
+		str->ReadDword( &ItemIndex );
+		str->ReadDword( &ItemCount );
 		str->Read( Script, 8 );
 		Script[8]=0;
 		ieDword firstIndex, vertCount;
-		str->Read( &firstIndex, 4 );
-		str->Read( &vertCount, 4 );
+		str->ReadDword( &firstIndex );
+		str->ReadDword( &vertCount );
 		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( vertCount*sizeof( Point ) );
 		for (unsigned int x = 0; x < vertCount; x++) {
-			str->Read( &points[x].x, 2 );
-			str->Read( &points[x].y, 2 );
+			ieWord tmp;
+			str->ReadWord( &tmp );
+			points[x].x = tmp;
+			str->ReadWord( &tmp );
+			points[x].y = tmp;
 		}
 		Gem_Polygon* poly = new Gem_Polygon( points, vertCount, &bbox );
 		free( points );
-//		poly->BBox = bbox;
 		Container* c = tm->AddContainer( Name, Type, poly );
+		c->Pos.x = XPos;
+		c->Pos.y = YPos;
 		c->LockDifficulty = LockDiff;
 		c->Locked = Locked;
 		c->TrapDetectionDiff = TrapDetDiff;
 		c->TrapRemovalDiff = TrapRemDiff;
 		c->Trapped = Trapped;
 		c->TrapDetected = TrapDetected;
+		c->TrapLaunch.x = LaunchX;
+		c->TrapLaunch.y = LaunchY;
 		//reading items into a container
 		str->Seek( ItemsOffset+( ItemIndex * 0x14 ), GEM_STREAM_START);
 		while(ItemCount--) {
@@ -387,33 +404,38 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
 		ieWord LaunchX, LaunchY;
 		char Name[33], Script[9], Key[9], Destination[9], Entrance[33];
+		char Dialog[9];
 		str->Read( Name, 32 );
 		Name[32] = 0;
-		str->Read( &Type, 2 );
+		str->ReadWord( &Type );
 		Region bbox;
-		str->Read( &bbox.x, 2 );
-		str->Read( &bbox.y, 2 );
-		str->Read( &bbox.w, 2 );
-		str->Read( &bbox.h, 2 );
-		bbox.w -= bbox.x;
-		bbox.h -= bbox.y;
-		str->Read( &VertexCount, 2 );
-		str->Read( &FirstVertex, 4 );
-		str->Seek( 4, GEM_CURRENT_POS );
-		str->Read( &Cursor, 4 );
+		ieWord tmp;
+		str->ReadWord( &tmp );
+		bbox.x = tmp;
+		str->ReadWord( &tmp );
+		bbox.y = tmp;
+		str->ReadWord( &tmp );
+		bbox.w = tmp - bbox.x;
+		str->ReadWord( &tmp );
+		bbox.h = tmp - bbox.y;
+		str->ReadWord( &VertexCount );
+		str->ReadDword( &FirstVertex );
+		ieDword tmp2;
+		str->ReadDword( &tmp2 );
+		str->ReadDword( &Cursor );
 		str->Read( Destination, 8 );
 		Destination[8] = 0;
 		str->Read( Entrance, 32 );
 		Entrance[32] = 0;
-		str->Read( &Flags, 4 );
+		str->ReadDword( &Flags );
 		ieStrRef StrRef;
-		str->Read( &StrRef, 4 );
-		str->Read( &TrapDetDiff, 2 );
-		str->Read( &TrapRemDiff, 2 );
-		str->Read( &Trapped, 2 );
-		str->Read( &TrapDetected, 2 );
-		str->Read( &LaunchX, 2 );
-		str->Read( &LaunchY, 2 );
+		str->ReadDword( &StrRef );
+		str->ReadWord( &TrapDetDiff );
+		str->ReadWord( &TrapRemDiff );
+		str->ReadWord( &Trapped );
+		str->ReadWord( &TrapDetected );
+		str->ReadWord( &LaunchX );
+		str->ReadWord( &LaunchY );
 		str->Read( Key, 8 );
 		Key[8] = 0;
 		//don't even bother reading the script if it isn't trapped
@@ -424,35 +446,37 @@ Map* AREImp::GetMap(const char *ResRef)
 		else {
 			Script[0] = 0;
 		}
+		str->Seek( 56, GEM_CURRENT_POS );
+		str->Read( Dialog, 8 );
+		Dialog[8] = 0;
 		char* string = core->GetString( StrRef );
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
 		for (x = 0; x < VertexCount; x++) {
-			str->Read( &points[x].x, 2 );
-			str->Read( &points[x].y, 2 );
+			str->ReadWord( (ieWord*) &points[x].x );
+			str->ReadWord( (ieWord*) &points[x].y );
 		}
 		Gem_Polygon* poly = new Gem_Polygon( points, VertexCount, &bbox);
 		free( points );
-//		poly->BBox = bbox;
 		InfoPoint* ip = tm->AddInfoPoint( Name, Type, poly );
 		ip->TrapDetectionDifficulty = TrapDetDiff;
 		ip->TrapRemovalDifficulty = TrapRemDiff;
 		//we don't need this flag, because the script is loaded
 		//only if it exists
 		ip->TrapDetected = TrapDetected;
-		ip->TrapLaunchX = LaunchX;
-		ip->TrapLaunchY = LaunchY;
+		ip->TrapLaunch.x = LaunchX;
+		ip->TrapLaunch.y = LaunchY;
 		ip->Cursor = Cursor;
 		ip->overHeadText = string;
 		ip->textDisplaying = 0;
 		ip->timeStartDisplaying = 0;
-		ip->XPos = bbox.x + ( bbox.w / 2 );
-		ip->YPos = bbox.y + ( bbox.h / 2 );
+		ip->Pos.x = bbox.x + ( bbox.w / 2 );
+		ip->Pos.y = bbox.y + ( bbox.h / 2 );
 		ip->Flags = Flags;
 		strcpy( ip->Destination, Destination );
 		strcpy( ip->EntranceName, Entrance );
-		//ip->triggered = false;
-		//strcpy(ip->Script, Script);
+		strcpy( ip->KeyResRef, Key );
+		strcpy( ip->DialogResRef, Dialog );
 		if (Script[0] != 0) {
 			ip->Scripts[0] = new GameScript( Script, IE_SCRIPT_TRIGGER );
 			ip->Scripts[0]->MySelf = ip;
@@ -476,22 +500,22 @@ Map* AREImp::GetMap(const char *ResRef)
 			ieWord XPos, YPos, XDes, YDes;
 			str->Read( DefaultName, 32);
 			DefaultName[32]=0;
-			str->Read( &XPos, 2 );
-			str->Read( &YPos, 2 );
-			str->Read( &XDes, 2 );
-			str->Read( &YDes, 2 );
+			str->ReadWord( &XPos );
+			str->ReadWord( &YPos );
+			str->ReadWord( &XDes );
+			str->ReadWord( &YDes );
 			str->Seek( 12, GEM_CURRENT_POS );
-			str->Read( &Orientation, 4 );
+			str->ReadDword( &Orientation );
 			str->Seek( 8, GEM_CURRENT_POS );
-			str->Read( &Schedule, 4 );
-			str->Read( &TalkCount, 4 );
+			str->ReadDword( &Schedule );
+			str->ReadDword( &TalkCount );
 			str->Seek( 56, GEM_CURRENT_POS );
 			str->Read( CreResRef, 8 );
 			CreResRef[8] = 0;
 			DataStream* crefile;
 			ieDword CreOffset, CreSize;
-			str->Read( &CreOffset, 4 );
-			str->Read( &CreSize, 4 );
+			str->ReadDword( &CreOffset );
+			str->ReadDword( &CreSize );
 			str->Seek( 128, GEM_CURRENT_POS );
 			if (CreOffset != 0) {
 				char cpath[_MAX_PATH];
@@ -508,10 +532,10 @@ Map* AREImp::GetMap(const char *ResRef)
 			Actor* ab = actmgr->GetActor();
 			if(!ab)
 				continue;
-			ab->XPos = XPos;
-			ab->YPos = YPos;
-			ab->XDes = XDes;
-			ab->YDes = YDes;
+			ab->Pos.x = XPos;
+			ab->Pos.y = YPos;
+			ab->Destination.x = XDes;
+			ab->Destination.y = YDes;
 			//copying the area name into the actor
 			strcpy(ab->Area, map->scriptName);
 			//copying the scripting name into the actor
@@ -544,17 +568,17 @@ Map* AREImp::GetMap(const char *ResRef)
 			Animation* anim;
 			str->Seek( 32, GEM_CURRENT_POS );
 			ieWord animX, animY;
-			str->Read( &animX, 2 );
-			str->Read( &animY, 2 );
+			str->ReadWord( &animX );
+			str->ReadWord( &animY );
 			str->Seek( 4, GEM_CURRENT_POS );
 			char animBam[9];
 			str->Read( animBam, 8 );
 			animBam[8] = 0;
 			ieWord animCycle, animFrame;
-			str->Read( &animCycle, 2 );
-			str->Read( &animFrame, 2 );
+			str->ReadWord( &animCycle );
+			str->ReadWord( &animFrame );
 			ieDword animFlags;
-			str->Read( &animFlags, 4 );
+			str->ReadDword( &animFlags );
 			str->Seek( 20, GEM_CURRENT_POS );
 			unsigned char mode = ( ( animFlags & 2 ) != 0 ) ?
 				IE_SHADED : IE_NORMAL;
@@ -579,9 +603,9 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieWord XPos, YPos, Face;
 		str->Read( Name, 32 );
 		Name[32] = 0;
-		str->Read( &XPos, 2 );
-		str->Read( &YPos, 2 );
-		str->Read( &Face, 2 );
+		str->ReadWord( &XPos );
+		str->ReadWord( &YPos );
+		str->ReadWord( &Face );
 		str->Seek( 66, GEM_CURRENT_POS );
 		map->AddEntrance( Name, XPos, YPos, Face );
 	}
@@ -598,7 +622,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->Seek( 8, GEM_CURRENT_POS );
-		str->Read( &Value, 4 );
+		str->ReadDword( &Value );
 		str->Seek( 40, GEM_CURRENT_POS );
 		map->vars->SetAt( Name, Value );
 	}
@@ -611,19 +635,19 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieWord numsounds;
 
 		str->Read( &ambi->name, 32 );
-		str->Read( &ambi->origin.x, 2 );
-		str->Read( &ambi->origin.y, 2 );
-		str->Read( &ambi->radius, 2 );
-		str->Read( &ambi->height, 2 );
+		str->ReadWord( (ieWord *) &ambi->origin.x );
+		str->ReadWord( (ieWord *) &ambi->origin.y );
+		str->ReadWord( &ambi->radius );
+		str->ReadWord( &ambi->height );
 		str->Seek( 6, GEM_CURRENT_POS );
-		str->Read( &ambi->gain, 2 );
+		str->ReadWord( &ambi->gain );
 		str->Read( &sounds, 80 );
-		str->Read( &numsounds, 2 );
+		str->ReadWord( &numsounds );
 		str->Seek( 2, GEM_CURRENT_POS );
-		str->Read( &ambi->interval, 4 );
-		str->Read( &ambi->perset, 4 );
-		str->Read( &ambi->appearance, 4 );
-		str->Read( &ambi->flags, 4 );
+		str->ReadDword( &ambi->interval );
+		str->ReadDword( &ambi->perset );
+		str->ReadDword( &ambi->appearance );
+		str->ReadDword( &ambi->flags );
 		str->Seek( 64, GEM_CURRENT_POS );
 		
 		for (int i = 0; i < numsounds; ++i) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.59 2004/08/22 22:10:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.60 2004/09/12 21:58:47 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -49,8 +49,8 @@ Scriptable::Scriptable(ScriptableType type)
 	resetAction = false;
 	neverExecuted = true;
 	OnCreation = true;
-	XPos = 0;
-	YPos = 0;
+	Pos.x = 0;
+	Pos.y = 0;
 
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
@@ -90,10 +90,9 @@ void Scriptable::SetScript(const char* aScript, int idx)
 	}
 }
 
-void Scriptable::SetPosition(unsigned short XPos, unsigned short YPos)
+void Scriptable::SetPosition(Point &Position)
 {
-	this->XPos = XPos;
-	this->YPos = YPos;
+	Pos = Position;
 }
 
 void Scriptable::SetMySelf(Scriptable* MySelf)
@@ -271,7 +270,7 @@ Selectable::~Selectable(void)
 {
 }
 
-void Selectable::SetBBox(Region newBBox)
+void Selectable::SetBBox(Region &newBBox)
 {
 	BBox = newBBox;
 }
@@ -290,13 +289,13 @@ void Selectable::DrawCircle()
 		return;
 	}
 	Region vp = core->GetVideoDriver()->GetViewport();
-	core->GetVideoDriver()->DrawEllipse( XPos - vp.x, YPos - vp.y,
+	core->GetVideoDriver()->DrawEllipse( Pos.x - vp.x, Pos.y - vp.y,
 		 size * 10, ( ( size * 15 ) / 2 ), *col );
 }
 
-bool Selectable::IsOver(unsigned short XPos, unsigned short YPos)
+bool Selectable::IsOver(Point &Pos)
 {
-	return BBox.PointInside( XPos, YPos );
+	return BBox.PointInside( Pos );
 }
 
 bool Selectable::IsSelected()
@@ -341,12 +340,12 @@ Highlightable::~Highlightable(void)
 	}
 }
 
-bool Highlightable::IsOver(unsigned short XPos, unsigned short YPos)
+bool Highlightable::IsOver(Point &Pos)
 {
 	if (!outline) {
 		return false;
 	}
-	return outline->PointIn(XPos, YPos);
+	return outline->PointIn( Pos );
 }
 
 void Highlightable::DrawOutline()
@@ -364,8 +363,7 @@ void Highlightable::DrawOutline()
 Moveble::Moveble(ScriptableType type)
 	: Selectable( type )
 {
-	XDes = XPos;
-	YDes = YPos;
+	Destination = Pos;
 	Orientation = 0;
 	StanceID = 0;
 	path = NULL;
@@ -398,39 +396,31 @@ void Moveble::DoStep()
 	}
 	Orientation = step->orient;
 	StanceID = IE_ANI_WALK;
-	XPos = ( step->x * 16 ) + 8;
-	YPos = ( step->y * 12 ) + 6;
+	Pos.x = ( step->x * 16 ) + 8;
+	Pos.y = ( step->y * 12 ) + 6;
 	if (!step->Next) {
 		//printf("Last Step\n");
 		ClearPath();
 	} else {
 		if (step->Next->x > step->x)
-			XPos += ( unsigned short )
-				( ( ( ( ( step->Next->x * 16 ) + 8 ) - XPos ) * ( time -
-				timeStartStep ) ) /
-				STEP_TIME );
+			Pos.x += ( unsigned short )
+				( ( ( ( ( step->Next->x * 16 ) + 8 ) - Pos.x ) * ( time - timeStartStep ) ) / STEP_TIME );
 		else
-			XPos -= ( unsigned short )
-				( ( ( XPos - ( ( step->Next->x * 16 ) + 8 ) ) * ( time -
-				timeStartStep ) ) /
-				STEP_TIME );
+			Pos.x -= ( unsigned short )
+				( ( ( Pos.x - ( ( step->Next->x * 16 ) + 8 ) ) * ( time - timeStartStep ) ) / STEP_TIME );
 		if (step->Next->y > step->y)
-			YPos += ( unsigned short )
-				( ( ( ( ( step->Next->y * 12 ) + 6 ) - YPos ) * ( time -
-				timeStartStep ) ) /
-				STEP_TIME );
+			Pos.y += ( unsigned short )
+				( ( ( ( ( step->Next->y * 12 ) + 6 ) - Pos.y ) * ( time - timeStartStep ) ) / STEP_TIME );
 		else
-			YPos -= ( unsigned short )
-				( ( ( YPos - ( ( step->Next->y * 12 ) + 6 ) ) * ( time -
-				timeStartStep ) ) /
-				STEP_TIME );
+			Pos.y -= ( unsigned short )
+				( ( ( Pos.y - ( ( step->Next->y * 12 ) + 6 ) ) * ( time - timeStartStep ) ) / STEP_TIME );
 	}
 }
 
-void Moveble::AddWayPoint(unsigned short XDes, unsigned short YDes)
+void Moveble::AddWayPoint(Point &Des)
 {
 	if(!path) {
-		WalkTo(XDes, YDes);
+		WalkTo(Des);
 		return;
 	}
 	PathNode *endNode=path;
@@ -439,34 +429,32 @@ void Moveble::AddWayPoint(unsigned short XDes, unsigned short YDes)
 	}
 	Game* game = core->GetGame();
 	Map* map = game->GetMap(Area);
-	PathNode *path2 = map->FindPath( endNode->x, endNode->y, XDes, YDes );
+	Point p = {endNode->x, endNode->y};
+	PathNode *path2 = map->FindPath( p, Des );
 	endNode->Next=path2;
 }
 
-void Moveble::WalkTo(unsigned short XDes, unsigned short YDes)
+void Moveble::WalkTo(Point &Des)
 {
-	this->XDes = XDes;
-	this->YDes = YDes;
+	Destination = Des;
 	ClearPath();
 	Game* game = core->GetGame();
 	Map* map = game->GetMap(Area);
-	path = map->FindPath( XPos, YPos, XDes, YDes );
+	path = map->FindPath( Pos, Destination );
 }
 
-void Moveble::RunAwayFrom(unsigned short XDes, unsigned short YDes, int PathLength, bool Backing)
+void Moveble::RunAwayFrom(Point &Des, int PathLength, bool Backing)
 {
 	ClearPath();
 	Game* game = core->GetGame();
 	Map* map = game->GetMap(Area);
-	path = map->RunAway( XPos, YPos, XDes, YDes, PathLength, Backing );
+	path = map->RunAway( Pos, Des, PathLength, Backing );
 }
 
-void Moveble::MoveTo(unsigned short XDes, unsigned short YDes)
+void Moveble::MoveTo(Point &Des)
 {
-	XPos = XDes;
-	YPos = YDes;
-	this->XDes = XDes;
-	this->YDes = YDes;
+	Pos = Des;
+	Destination = Des;
 }
 
 void Moveble::ClearPath()
@@ -501,7 +489,7 @@ void Moveble::DrawTargetPoint()
 	step = abs (((step >> 6) % 8) - 3);
 
 	Region vp = core->GetVideoDriver()->GetViewport();
-	core->GetVideoDriver()->DrawEllipse( XDes - vp.x, YDes - vp.y,
+	core->GetVideoDriver()->DrawEllipse( Destination.x - vp.x, Destination.y - vp.y,
 		 size * 10 - step, ( ( size * 15 ) / 2 ) - step, selectedColor );
 
 }
@@ -551,14 +539,14 @@ void Door::ToggleTiles(int State, bool playsound)
 		state = !closedIndex;
 		if (playsound && ( OpenSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( OpenSound );
-		XPos = open->BBox.x + ( open->BBox.w / 2 );
-		YPos = open->BBox.y + ( open->BBox.h / 2 );
+		Pos.x = open->BBox.x + ( open->BBox.w / 2 );
+		Pos.y = open->BBox.y + ( open->BBox.h / 2 );
 	} else {
 		state = closedIndex;
 		if (playsound && ( CloseSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( CloseSound );
-		XPos = closed->BBox.x + ( closed->BBox.w / 2 );
-		YPos = closed->BBox.y + ( closed->BBox.h / 2 );
+		Pos.x = closed->BBox.x + ( closed->BBox.w / 2 );
+		Pos.y = closed->BBox.y + ( closed->BBox.h / 2 );
 	}
 	for (i = 0; i < count; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = state;
@@ -606,11 +594,11 @@ void Door::SetDoorClosed(bool Closed, bool playsound)
 		outline = open;
 	}
 	if (Closed) {
-		XPos = closed->BBox.x + ( closed->BBox.w / 2 );
-		YPos = closed->BBox.y + ( closed->BBox.h / 2 );
+		Pos.x = closed->BBox.x + ( closed->BBox.w / 2 );
+		Pos.y = closed->BBox.y + ( closed->BBox.h / 2 );
 	} else {
-		XPos = open->BBox.x + ( open->BBox.w / 2 );
-		YPos = open->BBox.y + ( open->BBox.h / 2 );
+		Pos.x = open->BBox.x + ( open->BBox.w / 2 );
+		Pos.y = open->BBox.y + ( open->BBox.h / 2 );
 	}
 }
 
@@ -660,8 +648,8 @@ InfoPoint::InfoPoint(void)
 	TrapDetectionDifficulty = 0;
 	TrapRemovalDifficulty = 0;
 	TrapDetected = 0;
-	TrapLaunchX = 0; 
-	TrapLaunchY = 0;
+	TrapLaunch.x = 0; 
+	TrapLaunch.y = 0;
 	KeyResRef[0] = 0;
 	DialogResRef[0] = 0;
 }
@@ -679,7 +667,7 @@ int InfoPoint::CheckTravel(Actor *actor)
 	if(Flags&TRAP_DEACTIVATED) return 0;
 	if(!actor->InParty && (Flags&TRAVEL_NONPC) ) return 0;
 	if(Flags&TRAVEL_PARTY) {
-		if(core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->Area, actor->XPos, actor->YPos, true) ) {
+		if(core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->Area, actor->Pos, true) ) {
 			return 3;
 		}
 		return 2;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.8 2004/09/11 14:28:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.9 2004/09/12 21:58:48 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -121,7 +121,7 @@ void MapControl::Draw(unsigned short x, unsigned short y)
 	for (int i = 1; i < 9; i++) {
 		Actor* actor = core->GetGame()->FindPC( i );
 		if (actor) {
-			video->DrawEllipse( x + GAME_TO_SCREENX(actor->XPos), y + GAME_TO_SCREENY(actor->YPos), 3, 2, i == 1 ? green : darkgreen, false );
+			video->DrawEllipse( x + GAME_TO_SCREENX(actor->Pos.x), y + GAME_TO_SCREENY(actor->Pos.y), 3, 2, i == 1 ? green : darkgreen, false );
 		}
 	}
 }

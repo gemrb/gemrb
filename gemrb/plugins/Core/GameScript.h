@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.138 2004/08/27 13:24:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.139 2004/09/12 21:58:48 avenger_teambg Exp $
  *
  */
 
@@ -193,6 +193,8 @@ public:
 		RefCount = 1;
 		string0Parameter[0] = 0;
 		string1Parameter[0] = 0;
+		pointParameter.x = 0;
+		pointParameter.y = 0;
 		canary = (unsigned long) 0xdeadbeef;
 	};
 	~Trigger()
@@ -208,8 +210,7 @@ public:
 	int flags;
 	int int1Parameter;
 	int int2Parameter;
-	int XpointParameter;
-	int YpointParameter;
+	Point pointParameter;
 	char string0Parameter[65];
 	char string1Parameter[65];
 	Object* objectParameter;
@@ -305,8 +306,8 @@ public:
 		string0Parameter[0] = 0;
 		string1Parameter[0] = 0;
 		int0Parameter = 0;
-		XpointParameter = 0;
-		YpointParameter = 0;
+		pointParameter.x = 0;
+		pointParameter.y = 0;
 		int1Parameter = 0;
 		int2Parameter = 0;
 		if(autoFree) {
@@ -330,8 +331,7 @@ public:
 	unsigned short actionID;
 	Object* objects[3];
 	int int0Parameter;
-	int XpointParameter;
-	int YpointParameter;
+	Point pointParameter;
 	int int1Parameter;
 	int int2Parameter;
 	char string0Parameter[65];
@@ -700,7 +700,7 @@ private: //Internal Functions
 	static void ParseString(const char*& src, char* tmp);
 	static int ValidForDialogCore(Scriptable* Sender, Actor* target);
 private:
-	static void CreateVisualEffectCore(int X, int Y, const char *effect);
+	static void CreateVisualEffectCore(Point &position, const char *effect);
 	static int SeeCore(Scriptable* Sender, Trigger* parameters, int flags);
 	static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 	static void CreateCreatureCore(Scriptable* Sender, Action* parameters,
@@ -717,7 +717,7 @@ private:
 	static Targets *XthNearestOf(Targets *parameters, int count);
 	static Targets *XthNearestEnemyOf(Targets *parameters, int count);
 
-	static unsigned char GetOrient(short sX, short sY, short dX, short dY);
+	//static unsigned char GetOrient(Point &s, Point &d);
 private: //Internal variables
 	unsigned long lastRunTime;
 	unsigned long scriptType;
@@ -741,7 +741,7 @@ public:
 	static bool EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 	static Action* GenerateAction(char* String, bool autoFree=false);
-	static void MoveBetweenAreasCore(Actor* actor, const char *area, int X, int Y, int face, bool adjust);
+	static void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust);
 public: //Script Functions
 	static int ID_Alignment(Actor *actor, int parameter);
 	static int ID_Allegiance(Actor *actor, int parameter);

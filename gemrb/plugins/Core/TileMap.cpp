@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.31 2004/05/25 16:16:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.32 2004/09/12 21:58:48 avenger_teambg Exp $
  *
  */
 
@@ -94,31 +94,31 @@ Door* TileMap::GetDoor(unsigned int idx)
 	return doors[idx];
 }
 
-Door* TileMap::GetDoor(unsigned short x, unsigned short y)
+Door* TileMap::GetDoor(Point &p)
 {
 	for (size_t i = 0; i < doors.size(); i++) {
 		Door* door = doors[i];
 		if (door->Flags&1) {
-			if (door->closed->BBox.x > x)
+			if (door->closed->BBox.x > p.x)
 				continue;
-			if (door->closed->BBox.y > y)
+			if (door->closed->BBox.y > p.y)
 				continue;
-			if (door->closed->BBox.x + door->closed->BBox.w < x)
+			if (door->closed->BBox.x + door->closed->BBox.w < p.x)
 				continue;
-			if (door->closed->BBox.y + door->closed->BBox.h < y)
+			if (door->closed->BBox.y + door->closed->BBox.h < p.y)
 				continue;
-			if (door->closed->PointIn( x, y ))
+			if (door->closed->PointIn( p ))
 				return door;
 		} else {
-			if (door->open->BBox.x > x)
+			if (door->open->BBox.x > p.x)
 				continue;
-			if (door->open->BBox.y > y)
+			if (door->open->BBox.y > p.y)
 				continue;
-			if (door->open->BBox.x + door->open->BBox.w < x)
+			if (door->open->BBox.x + door->open->BBox.w < p.x)
 				continue;
-			if (door->open->BBox.y + door->open->BBox.h < y)
+			if (door->open->BBox.y + door->open->BBox.h < p.y)
 				continue;
-			if (door->open->PointIn( x, y ))
+			if (door->open->PointIn( p ))
 				return door;
 		}
 	}
@@ -175,7 +175,7 @@ Container* TileMap::GetContainer(const char* Name)
 	return NULL;
 }
 
-Container* TileMap::GetContainer(unsigned short x, unsigned short y, int type)
+Container* TileMap::GetContainer(Point &position, int type)
 {
 	for (size_t i = 0; i < containers.size(); i++) {
 		Container* c = containers[i];
@@ -183,39 +183,38 @@ Container* TileMap::GetContainer(unsigned short x, unsigned short y, int type)
 			if(c->Type!=type)
 				continue;
 		}
-		if (c->outline->BBox.x > x)
+		if (c->outline->BBox.x > position.x)
 			continue;
-		if (c->outline->BBox.y > y)
+		if (c->outline->BBox.y > position.y)
 			continue;
-		if (c->outline->BBox.x + c->outline->BBox.w < x)
+		if (c->outline->BBox.x + c->outline->BBox.w < position.x)
 			continue;
-		if (c->outline->BBox.y + c->outline->BBox.h < y)
+		if (c->outline->BBox.y + c->outline->BBox.h < position.y)
 			continue;
-		if (c->outline->PointIn( x, y ))
+		if (c->outline->PointIn( position ))
 			return c;
 	}
 	return NULL;
 }
 
-void TileMap::AddItemToLocation(unsigned short x, unsigned short y, CREItem *item)
+void TileMap::AddItemToLocation(Point &position, CREItem *item)
 {
 	Point tmp[4];
 	char heapname[32];
-	sprintf(heapname,"heap_%d.%d",x,y);
-	Container *container = GetContainer(x,y,CN_PILE);
+	sprintf(heapname,"heap_%hd.%hd",position.x,position.y);
+	Container *container = GetContainer(position,CN_PILE);
 	if(!container) {
-		tmp[0].x=x-5;
-		tmp[0].y=y-5;
-		tmp[1].x=x+5;
-		tmp[1].y=y-5;
-		tmp[2].x=x+5;
-		tmp[2].y=y+5;
-		tmp[3].x=x-5;
-		tmp[3].y=y+5;
+		tmp[0].x=position.x-5;
+		tmp[0].y=position.y-5;
+		tmp[1].x=position.x+5;
+		tmp[1].y=position.y-5;
+		tmp[2].x=position.x+5;
+		tmp[2].y=position.y+5;
+		tmp[3].x=position.x-5;
+		tmp[3].y=position.y+5;
                 Gem_Polygon* outline = new Gem_Polygon( tmp, 4 );
 	        container = AddContainer(heapname,CN_HEAP, outline);
-		container->XPos=x;
-		container->YPos=y;
+		container->Pos=position;
 	}
 	container->inventory.AddItem(item);
 }
@@ -243,21 +242,21 @@ InfoPoint* TileMap::AddInfoPoint(char* Name, unsigned short Type,
 	infoPoints.push_back( ip );
 	return infoPoints.at( infoPoints.size() - 1 );
 }
-InfoPoint* TileMap::GetInfoPoint(unsigned short x, unsigned short y)
+InfoPoint* TileMap::GetInfoPoint(Point &p)
 {
 	for (size_t i = 0; i < infoPoints.size(); i++) {
 		InfoPoint* ip = infoPoints[i];
 		if (!ip->Active)
 			continue;
-		if (ip->outline->BBox.x > x)
+		if (ip->outline->BBox.x > p.x)
 			continue;
-		if (ip->outline->BBox.y > y)
+		if (ip->outline->BBox.y > p.y)
 			continue;
-		if (ip->outline->BBox.x + ip->outline->BBox.w < x)
+		if (ip->outline->BBox.x + ip->outline->BBox.w < p.x)
 			continue;
-		if (ip->outline->BBox.y + ip->outline->BBox.h < y)
+		if (ip->outline->BBox.y + ip->outline->BBox.h < p.y)
 			continue;
-		if (ip->outline->PointIn( x, y ))
+		if (ip->outline->PointIn( p ))
 			return ip;
 	}
 	return NULL;

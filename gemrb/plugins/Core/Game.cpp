@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.60 2004/08/28 15:00:38 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.61 2004/09/12 21:58:47 avenger_teambg Exp $
  *
  */
 
@@ -613,7 +613,7 @@ bool Game::EveryoneStopped()
 }
 
 //canmove=true: if some PC can't move (or hostile), then this returns false 
-bool Game::EveryoneNearPoint(const char *area, int x, int y, bool canmove)
+bool Game::EveryoneNearPoint(const char *area, Point &p, bool canmove)
 {
 	for(unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
@@ -632,7 +632,7 @@ bool Game::EveryoneNearPoint(const char *area, int x, int y, bool canmove)
 		if(stricmp(PCs[i]->Area,area) ) {
 			return false;
 		}
-		if(Distance(x,y,PCs[i])>MAX_OPERATING_DISTANCE) {
+		if(Distance(p,PCs[i])>MAX_OPERATING_DISTANCE) {
 			return false;
 		}
 	}

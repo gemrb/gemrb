@@ -91,7 +91,8 @@
 
 class Scriptable;
 
-GEM_EXPORT unsigned int Distance(int X, int Y, Scriptable *b);
+GEM_EXPORT unsigned char GetOrient(Point &s, Point &d);
+GEM_EXPORT unsigned int Distance(Point pos, Scriptable *b);
 GEM_EXPORT unsigned int Distance(Scriptable *a, Scriptable *b);
 GEM_EXPORT bool dir_exists(const char* path);
 GEM_EXPORT int strlench(const char* string, char ch);
@@ -121,11 +122,6 @@ char* strlwr(char* string);
 #endif
 
 struct ActorBlock;
-
-typedef struct
-{
-	short x, y;
-} Point;
 
 #endif //GLOBALS_H
 

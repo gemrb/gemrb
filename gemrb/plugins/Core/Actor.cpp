@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.68 2004/09/12 15:52:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.69 2004/09/12 21:58:47 avenger_teambg Exp $
  *
  */
 
@@ -378,15 +378,18 @@ void Actor::DebugDump()
 	spellbook.dump();
 }
 
-void Actor::SetPosition(Map *map, unsigned int XPos, unsigned int YPos, int jump, int radius)
+void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
 {
 	ClearPath();
-	XPos/=16;
-	YPos/=12;
+	Point p;
+	p.x = position.x/16;
+	p.y = position.y/12;
 	if (jump && !GetStat( IE_DONOTJUMP ) && anims->GetCircleSize() ) {
-		map->AdjustPosition( XPos, YPos, radius );
+		map->AdjustPosition( p, radius );
 	}
-	MoveTo( ( XPos * 16 ) + 8, ( YPos * 12 ) + 6 );
+	p.x = p.x * 16 + 8;
+	p.y = p.y * 12 + 6;
+	MoveTo( p );
 }
 
 /* this is returning the level of the character for xp calculations 
@@ -465,7 +468,7 @@ bool Actor::CheckOnDeath()
 void Actor::DropItem(const char *resref, unsigned int flags)
 {
 	Map *map = core->GetGame()->GetMap(Area);
-	inventory.DropItemAtLocation(resref, flags, map, XPos, YPos);
+	inventory.DropItemAtLocation( resref, flags, map, Pos );
 }
 
 bool Actor::ValidTarget(int ga_flags)

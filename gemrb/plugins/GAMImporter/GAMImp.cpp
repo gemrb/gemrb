@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.39 2004/09/12 15:53:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.40 2004/09/12 21:58:48 avenger_teambg Exp $
  *
  */
 
@@ -273,8 +273,8 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		actor = aM->GetActor();
 	}
 
-	actor->XPos = pcInfo.XPos;
-	actor->YPos = pcInfo.YPos;
+	actor->Pos.x = pcInfo.XPos;
+	actor->Pos.y = pcInfo.YPos;
 	actor->Orientation = pcInfo.Orientation;
 	actor->InParty = is_in_party ? (pcInfo.PartyOrder + 1) : 0;
 	actor->InternalFlags |= IF_FROMGAME;

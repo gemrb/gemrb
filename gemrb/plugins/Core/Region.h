@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.9 2004/08/02 18:00:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.10 2004/09/12 21:58:48 avenger_teambg Exp $
  *
  */
 
@@ -34,6 +34,10 @@
 #define GEM_EXPORT
 #endif
 
+typedef struct {
+	short x,y;
+} Point;
+
 class GEM_EXPORT Region {
 public:
 	Region(void);
@@ -43,12 +47,13 @@ public:
 	int w;
 	int h;
 	Region(const Region& rgn);
-	//Region(Region & rgn);
+	Region(const Point& p, int w, int h);
 	Region& operator=(const Region& rgn);
 	bool operator==(const Region& rgn);
 	bool operator!=(const Region& rgn);
 	Region(int x, int y, int w, int h);
 	bool PointInside(unsigned short XPos, unsigned short YPos);
+	bool PointInside(Point &p);
 	bool InsideRegion(Region& rgn);
 	void Normalize();
 };

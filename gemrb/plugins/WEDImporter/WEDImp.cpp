@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.12 2004/08/05 20:41:10 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.13 2004/09/12 21:58:51 avenger_teambg Exp $
  *
  */
 
@@ -53,30 +53,30 @@ bool WEDImp::Open(DataStream* stream, bool autoFree)
 		printf( "[WEDImporter]: This file is not a valid WED File\n" );
 		return false;
 	}
-	str->Read( &OverlaysCount, 4 );
-	str->Read( &DoorsCount, 4 );
-	str->Read( &OverlaysOffset, 4 );
-	str->Read( &SecHeaderOffset, 4 );
-	str->Read( &DoorsOffset, 4 );
-	str->Read( &DoorTilesOffset, 4 );
+	str->ReadDword( &OverlaysCount );
+	str->ReadDword( &DoorsCount );
+	str->ReadDword( &OverlaysOffset );
+	str->ReadDword( &SecHeaderOffset );
+	str->ReadDword( &DoorsOffset );
+	str->ReadDword( &DoorTilesOffset );
 	str->Seek( OverlaysOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < OverlaysCount; i++) {
 		Overlay o;
-		str->Read( &o.Width, 2 );
-		str->Read( &o.Height, 2 );
+		str->ReadWord( &o.Width );
+		str->ReadWord( &o.Height );
 		str->Read( o.TilesetResRef, 8 );
-		str->Read( &o.unknown, 4 );
-		str->Read( &o.TilemapOffset, 4 );
-		str->Read( &o.TILOffset, 4 );
+		str->ReadDword( &o.unknown );
+		str->ReadDword( &o.TilemapOffset );
+		str->ReadDword( &o.TILOffset );
 		overlays.push_back( o );
 	}
 	//Reading the Secondary Header
 	str->Seek( SecHeaderOffset, GEM_STREAM_START );
-	str->Read( &WallPolygonsCount, 4 );
-	str->Read( &PolygonsOffset, 4 );
-	str->Read( &VerticesOffset, 4 );
-	str->Read( &WallGroupsOffset, 4 );
-	str->Read( &PILTOffset, 4 );
+	str->ReadDword( &WallPolygonsCount );
+	str->ReadDword( &PolygonsOffset );
+	str->ReadDword( &VerticesOffset );
+	str->ReadDword( &WallGroupsOffset );
+	str->ReadDword( &PILTOffset );
 	return true;
 }
 
@@ -102,16 +102,20 @@ TileMap* WEDImp::GetTileMap()
 					GEM_STREAM_START );
 			ieWord startindex, count, secondary;
 			ieByte overlaymask;
-			str->Read( &startindex, 2 );
-			str->Read( &count, 2 );
-			str->Read( &secondary, 2 );
+			str->ReadWord( &startindex );
+			str->ReadWord( &count );
+			str->ReadWord( &secondary );
+			//now we are not sure if this is a real byte
+			//could be a dword, so endian problems may happen!!!
 			str->Read( &overlaymask, 1 );
 			//TODO: Consider Alternative Tile and Overlay Mask
 			str->Seek( overlays[0].TILOffset + ( startindex * 2 ),
 					GEM_STREAM_START );
-			unsigned short * indexes = ( unsigned short * )
-				malloc( count * 2 );
-			str->Read( indexes, count * 2 );
+			ieWord* indexes = ( ieWord* ) calloc( count, sizeof(ieWord) );
+			str->Read( indexes, count * sizeof(ieWord) );
+			if( DataStream::IsEndianSwitch()) {
+				swab( indexes, indexes, count * sizeof(ieWord) );
+			}
 			Tile* tile;
 			if (secondary == 0xffff)
 				tile = tis->GetTile( indexes, count );
@@ -134,30 +138,32 @@ TileMap* WEDImp::GetTileMap()
 		char Name[9];
 		str->Read(Name, 8);
 		Name[8] = 0;
-		str->Read(&DoorClosed, 2);
-		str->Read(&DoorTileStart, 2);
-		str->Read(&DoorTileCount, 2);
-		str->Read(&OpenPolyCount, 2);
-		str->Read(&ClosedPolyCount, 2);
-		str->Read(&OpenPolyOffset, 4);
-		str->Read(&ClosedPolyOffset, 4);
+		str->ReadWord( &DoorClosed );
+		str->ReadWord( &DoorTileStart );
+		str->ReadWord( &DoorTileCount );
+		str->ReadWord( &OpenPolyCount );
+		str->ReadWord( &ClosedPolyCount );
+		str->ReadDword( &OpenPolyOffset );
+		str->ReadDword( &ClosedPolyOffset );
 		//Reading Door Tile Cells
 		str->Seek(DoorTilesOffset + (DoorTileStart*2), GEM_STREAM_START);
-		DoorTiles = (unsigned short*)malloc(DoorTileCount*sizeof(unsigned short));
-		memset(DoorTiles, 0, DoorTileCount*sizeof(unsigned short));
-		str->Read(DoorTiles, DoorTileCount*sizeof(unsigned short));
+		DoorTiles = (ieWord*)calloc(DoorTileCount,sizeof(ieWord));
+		str->Read(DoorTiles, DoorTileCount*sizeof(ieWord));
+		if( DataStream::IsEndianSwitch()) {
+			swab( DoorTiles, DoorTiles, DoorTileCount * sizeof( ieWord) );
+		}
 		//Reading the Open Polygon
 		str->Seek(OpenPolyOffset, GEM_STREAM_START);
 		ieDword StartingVertex, VerticesCount;
 		ieWordt BitFlag, MinX, MaxX, MinY, MaxY;
 		Region BBox;
-		str->Read(&StartingVertex, 4);
-		str->Read(&VerticesCount, 4);
-		str->Read(&BitFlag, 2);
-		str->Read(&MinX, 2);
-		str->Read(&MaxX, 2);
-		str->Read(&MinY, 2);
-		str->Read(&MaxY, 2);
+		str->ReadDword( &StartingVertex );
+		str->ReadDword( &VerticesCount );
+		str->ReadWord( &BitFlag );
+		str->ReadWord( &MinX );
+		str->ReadWord( &MaxX );
+		str->ReadWord( &MinY );
+		str->ReadWord( &MaxY );
 		BBox.x = minX;
 		BBox.y = minY;
 		BBox.w = maxX - minX;
@@ -167,24 +173,20 @@ TileMap* WEDImp::GetTileMap()
 		str->Seek(VerticesOffset + (StartingVertex*4), GEM_STREAM_START);
 		Point * points = (Point*)malloc(VerticesCount*sizeof(Point));
 		for(int i = 0; i < VerticesCount; i++) {
-			str->Read(&points[i].x, 2);
-			str->Read(&points[i].y, 2);
+			str->ReadWord( &points[i].x );
+			str->ReadWord( &points[i].y );
 		}
 		Gem_Polygon * open = new Gem_Polygon(points, VerticesCount, BBox);
 		free(points);
-//		open->BBox.x = MinX;
-//		open->BBox.y = MinY;
-//		open->BBox.w = MaxX-MinX;
-//		open->BBox.h = MaxY-MinY;
 		//Reading the closed Polygon
 		str->Seek(ClosedPolyOffset, GEM_STREAM_START);
-		str->Read(&StartingVertex, 4);
-		str->Read(&VerticesCount, 4);
-		str->Read(&BitFlag, 2);
-		str->Read(&MinX, 2);
-		str->Read(&MaxX, 2);
-		str->Read(&MinY, 2);
-		str->Read(&MaxY, 2);
+		str->ReadDword( &StartingVertex );
+		str->ReadDword( &VerticesCount );
+		str->ReadWord( &BitFlag );
+		str->ReadWord( &MinX );
+		str->ReadWord( &MaxX );
+		str->ReadWord( &MinY );
+		str->ReadWord( &MaxY );
 		BBox.x = minX;
 		BBox.y = minY;
 		BBox.w = maxX - minX;
@@ -194,23 +196,18 @@ TileMap* WEDImp::GetTileMap()
 		str->Seek(VerticesOffset + (StartingVertex*4), GEM_STREAM_START);
 		points = (Point*)malloc(VerticesCount*sizeof(Point));
 		for(int i = 0; i < VerticesCount; i++) {
-			str->Read(&points[i].x, 2);
-			str->Read(&points[i].y, 2);
+			str->ReadWord( &points[i].x );
+			str->ReadWord( &points[i].y );
 		}
 		Gem_Polygon * closed = new Gem_Polygon(points, VerticesCount, BBox);
 		free(points);
-//		closed->BBox.x = MinX;
-//		closed->BBox.y = MinY;
-//		closed->BBox.w = MaxX-MinX;
-//		closed->BBox.h = MaxY-MinY;
 		tm->AddDoor(Name, DoorClosed, DoorTiles, DoorTileCount, open, closed);
 	}*/
 	core->FreeInterface( tis );
 	return tm;
 }
 
-unsigned short* WEDImp::GetDoorIndices(char* ResRef, int* count,
-	bool& BaseClosed)
+ieWord* WEDImp::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 {
 	ieWord DoorClosed, DoorTileStart, DoorTileCount, * DoorTiles;
 	ieWord OpenPolyCount, ClosedPolyCount;
@@ -231,19 +228,20 @@ unsigned short* WEDImp::GetDoorIndices(char* ResRef, int* count,
 		return NULL;
 	}
 
-	str->Read( &DoorClosed, 2 );
-	str->Read( &DoorTileStart, 2 );
-	str->Read( &DoorTileCount, 2 );
-	str->Read( &OpenPolyCount, 2 );
-	str->Read( &ClosedPolyCount, 2 );
-	str->Read( &OpenPolyOffset, 4 );
-	str->Read( &ClosedPolyOffset, 4 );
+	str->ReadWord( &DoorClosed );
+	str->ReadWord( &DoorTileStart );
+	str->ReadWord( &DoorTileCount );
+	str->ReadWord( &OpenPolyCount );
+	str->ReadWord( &ClosedPolyCount );
+	str->ReadDword( &OpenPolyOffset );
+	str->ReadDword( &ClosedPolyOffset );
 	//Reading Door Tile Cells
 	str->Seek( DoorTilesOffset + ( DoorTileStart * 2 ), GEM_STREAM_START );
-	DoorTiles = ( unsigned short * )
-		malloc( DoorTileCount * sizeof( unsigned short ) );
-	memset( DoorTiles, 0, DoorTileCount * sizeof( unsigned short ) );
-	str->Read( DoorTiles, DoorTileCount * sizeof( unsigned short ) );
+	DoorTiles = ( ieWord* ) calloc( DoorTileCount, sizeof( ieWord) );
+	str->Read( DoorTiles, DoorTileCount * sizeof( ieWord ) );
+	if( DataStream::IsEndianSwitch()) {
+		swab( DoorTiles, DoorTiles, DoorTileCount * sizeof( ieWord) );
+	}
 	*count = DoorTileCount;
 	if (DoorClosed) {
 		BaseClosed = true;

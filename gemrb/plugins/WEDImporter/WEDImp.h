@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.9 2004/08/05 20:41:10 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.10 2004/09/12 21:58:51 avenger_teambg Exp $
  *
  */
 
@@ -47,7 +47,7 @@ public:
 	~WEDImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	TileMap* GetTileMap();
-	unsigned short* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed);
+	ieWord* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed);
 public:
 	void release(void)
 	{

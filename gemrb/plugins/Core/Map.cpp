@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.112 2004/08/29 01:19:02 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.113 2004/09/12 21:58:48 avenger_teambg Exp $
  *
  */
 
@@ -183,8 +183,8 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 		Y = map->tm->YCellCount * 64;
 		face = -1;
 	} else {
-		X = ent->XPos;
-		Y = ent->YPos;
+		X = ent->Pos.x;
+		Y = ent->Pos.y;
 		face = ent->Face;
 	}
 	//LeaveArea is the same in ALL engine versions
@@ -288,7 +288,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			if (!actor)
 				break;
 			if (ip->Type == ST_PROXIMITY) {
-				if (ip->outline->PointIn( actor->XPos, actor->YPos )) {
+				if (ip->outline->PointIn( actor->Pos )) {
 					ip->LastEntered = actor;
 					ip->LastTrigger = actor;
 				}
@@ -299,7 +299,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 				//don't move if doing something else
 				if(actor->GetNextAction())
 					break;
-				if (ip->outline->PointIn( actor->XPos, actor->YPos )) {
+				if (ip->outline->PointIn( actor->Pos )) {
 					UseExit(actor, ip);
 				}
 			}
@@ -374,22 +374,22 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 				if (nextFrame) {
 					if (actor->lastFrame != nextFrame) {
 						Region newBBox;
-						newBBox.x = actor->XPos - nextFrame->XPos;
+						newBBox.x = actor->Pos.x - nextFrame->XPos;
 						newBBox.w = nextFrame->Width;
-						newBBox.y = actor->YPos - nextFrame->YPos;
+						newBBox.y = actor->Pos.y - nextFrame->YPos;
 						newBBox.h = nextFrame->Height;
 						actor->lastFrame = nextFrame;
 						actor->SetBBox( newBBox );
 					}
 					if (!actor->BBox.InsideRegion( vp ))
 						continue;
-					int ax = actor-> XPos, ay = actor->YPos;
-					int cx = ax / 16;
-					int cy = ay / 12;
+					Point a = actor->Pos;
+					int cx = a.x / 16;
+					int cy = a.y / 12;
 					Color tint = LightMap->GetPixel( cx, cy );
 					tint.a = 0xA0;
-					video->BlitSpriteTinted( nextFrame, ax + viewport.x,
-							ay + viewport.y, tint, &Screen );
+					video->BlitSpriteTinted( nextFrame, a.x + viewport.x,
+							a.y + viewport.y, tint, &Screen );
 					if (anim->endReached && anim->autoSwitchOnEnd) {
 						actor->StanceID = anim->nextStanceID;
 						anim->autoSwitchOnEnd = false;
@@ -404,8 +404,8 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 				}
 				if (actor->textDisplaying == 1) {
 					Font* font = core->GetFont( 9 );
-					Region rgn( actor->XPos - 100 + viewport.x,
-						actor->YPos - 100 + viewport.y, 200, 400 );
+					Region rgn( actor->Pos.x - 100 + viewport.x,
+						actor->Pos.y - 100 + viewport.y, 200, 400 );
 					font->Print( rgn, ( unsigned char * ) actor->overHeadText,
 							NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP,
 							false );
@@ -458,9 +458,9 @@ void Map::AddActor(Actor* actor)
 			Sprite2D* nextFrame = anim->NextFrame();
 			if (actor->lastFrame != nextFrame) {
 				Region newBBox;
-				newBBox.x = actor->XPos - nextFrame->XPos;
+				newBBox.x = actor->Pos.x - nextFrame->XPos;
 				newBBox.w = nextFrame->Width;
-				newBBox.y = actor->YPos - nextFrame->YPos;
+				newBBox.y = actor->Pos.y - nextFrame->YPos;
 				newBBox.h = nextFrame->Height;
 				actor->lastFrame = nextFrame;
 				actor->SetBBox( newBBox );
@@ -494,7 +494,7 @@ void Map::DeleteActor(Actor* actor)
 /** flags: GA_SELECT=1   - unselectable actors don't play
 	   GA_NO_DEAD=2	 - dead actors don't play
  */
-Actor* Map::GetActor(unsigned int x, unsigned int y, int flags)
+Actor* Map::GetActor(Point &p, int flags)
 {
 	unsigned int i = actors.size();
 	while (i--) {
@@ -503,7 +503,7 @@ Actor* Map::GetActor(unsigned int x, unsigned int y, int flags)
 		if (!actor->ValidTarget(flags) ) {
 			continue; 
 		}
-		if (actor->IsOver( ( unsigned short ) x, ( unsigned short ) y ))
+		if (actor->IsOver( p ))
 			return actor;
 	}
 	return NULL;
@@ -587,9 +587,9 @@ void Map::PlayAreaSong(int SongType)
 	core->GetMusicMgr()->SwitchPlayList( poi, true );
 }
 
-int Map::GetBlocked(unsigned int cx, unsigned int cy)
+int Map::GetBlocked(Point &c)
 {
-	int block = SearchMap->GetPixelIndex( cx / 16, cy / 12 );
+	int block = SearchMap->GetPixelIndex( c.x / 16, c.y / 12 );
 	return Passable[block];
 }
 
@@ -641,7 +641,7 @@ void Map::GenerateQueue(int priority)
 		while (lastPos != 1) {
 			int parentPos = ( lastPos / 2 ) - 1;
 			Actor* parent = queue[priority][parentPos];
-			if (actor->YPos < parent->YPos) {
+			if (actor->Pos.y < parent->Pos.y) {
 				queue[priority][parentPos] = actor;
 				queue[priority][lastPos - 1] = parent;
 				lastPos = parentPos + 1;
@@ -670,13 +670,12 @@ Actor* Map::GetRoot(int priority)
 		if (rightChildPos < Qcount[priority]) {
 			//If both Child Exist
 			Actor* rightChild = queue[priority][lastPos*2];
-			if (rightChild->YPos < child->YPos) {
+			if (rightChild->Pos.y < child->Pos.y) {
 				childPos = rightChildPos;
 				child = rightChild;
 			}
 		}
-		//if((node->YPos > child->YPos) || (child->StanceID == IE_ANI_SLEEP)) {
-		if (node->YPos > child->YPos) {
+		if (node->Pos.y > child->Pos.y) {
 			queue[priority][lastPos - 1] = child;
 			queue[priority][childPos] = node;
 			lastPos = childPos + 1;
@@ -709,12 +708,12 @@ Animation* Map::GetAnimation(const char* Name)
 	return NULL;
 }
 
-void Map::AddEntrance(char* Name, short XPos, short YPos, short Face)
+void Map::AddEntrance(char* Name, int XPos, int YPos, short Face)
 {
 	Entrance* ent = new Entrance();
 	strncpy( ent->Name, Name, 32 );
-	ent->XPos = XPos;
-	ent->YPos = YPos;
+	ent->Pos.x = XPos;
+	ent->Pos.y = YPos;
 	ent->Face = Face;
 	entrances.push_back( ent );
 }
@@ -761,8 +760,7 @@ void Map::DebugDump()
 /******************************************************************************/
 
 void Map::Leveldown(unsigned int px, unsigned int py,
-	unsigned int& level, unsigned int& nx, unsigned int& ny,
-	unsigned int& diff)
+	unsigned int& level, Point &n, unsigned int& diff)
 {
 	int pos;
 	unsigned int nlevel;
@@ -782,8 +780,8 @@ void Map::Leveldown(unsigned int px, unsigned int py,
 	if (ndiff > diff) {
 		level = nlevel;
 		diff = ndiff;
-		nx = px;
-		ny = py;
+		n.x = px;
+		n.y = py;
 	}
 }
 
@@ -806,60 +804,60 @@ void Map::SetupNode(unsigned int x, unsigned int y, unsigned int Cost)
 	InternalStack.push( ( x << 16 ) | y );
 }
 
-void Map::AdjustPosition(unsigned int& goalX, unsigned int& goalY, unsigned int radius)
+void Map::AdjustPosition(Point &goal, unsigned int radius)
 {
 	unsigned int maxr = Width;
 	if (maxr < Height) {
 		maxr = Height;
 	}
-	if (goalX > Width) {
-		goalX = Width;
+	if ((unsigned int) goal.x > Width) {
+		goal.x = Width;
 	}
-	if (goalY > Height) {
-		goalY = Height;
+	if ((unsigned int) goal.y > Height) {
+		goal.y = Height;
 	}
 	for (; radius < maxr; radius++) {
 		unsigned int minx = 0;
-		if (goalX > radius)
-			minx = goalX - radius;
-		unsigned int maxx = goalX + radius + 1;
+		if ((unsigned int) goal.x > radius)
+			minx = goal.x - radius;
+		unsigned int maxx = goal.x + radius + 1;
 		if (maxx > Width)
 			maxx = Width;
 
 		for (unsigned int scanx = minx; scanx < maxx; scanx++) {
-			if (goalY >= radius) {
-				if (Passable[SearchMap->GetPixelIndex( scanx, goalY - radius )] & PATH_MAP_PASSABLE) {
-					goalX = scanx;
-					goalY -= radius;
+			if ((unsigned int) goal.y >= radius) {
+				if (Passable[SearchMap->GetPixelIndex( scanx, goal.y - radius )] & PATH_MAP_PASSABLE) {
+					goal.x = scanx;
+					goal.y -= radius;
 					return;
 				}
 			}
-			if (goalY + radius < Height) {
-				if (Passable[SearchMap->GetPixelIndex( scanx, goalY + radius )] & PATH_MAP_PASSABLE) {
-					goalX = scanx;
-					goalY += radius;
+			if (goal.y + radius < Height) {
+				if (Passable[SearchMap->GetPixelIndex( scanx, goal.y + radius )] & PATH_MAP_PASSABLE) {
+					goal.x = scanx;
+					goal.y += radius;
 					return;
 				}
 			}
 		}
 		unsigned int miny = 0;
-		if (goalY > radius)
-			miny = goalY - radius;
-		unsigned int maxy = goalY + radius + 1;
+		if ((unsigned int) goal.y > radius)
+			miny = goal.y - radius;
+		unsigned int maxy = goal.y + radius + 1;
 		if (maxy > Height)
 			maxy = Height;
 		for (unsigned int scany = miny; scany < maxy; scany++) {
-			if (goalX >= radius) {
-				if (Passable[SearchMap->GetPixelIndex( goalX - radius, scany )] & PATH_MAP_PASSABLE) {
-					goalX -= radius;
-					goalY = scany;
+			if ((unsigned int) goal.x >= radius) {
+				if (Passable[SearchMap->GetPixelIndex( goal.x - radius, scany )] & PATH_MAP_PASSABLE) {
+					goal.x -= radius;
+					goal.y = scany;
 					return;
 				}
 			}
-			if (goalX + radius < Width) {
-				if (Passable[SearchMap->GetPixelIndex( goalX - radius, scany )] & PATH_MAP_PASSABLE) {
-					goalX += radius;
-					goalY = scany;
+			if (goal.x + radius < Width) {
+				if (Passable[SearchMap->GetPixelIndex( goal.x - radius, scany )] & PATH_MAP_PASSABLE) {
+					goal.x += radius;
+					goal.y = scany;
 					return;
 				}
 			}
@@ -868,36 +866,35 @@ void Map::AdjustPosition(unsigned int& goalX, unsigned int& goalY, unsigned int 
 }
 
 //run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
-PathNode* Map::RunAway(short sX, short sY, short dX, short dY, unsigned int PathLen, bool Backing)
+PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
 {
-	unsigned int startX = sX / 16, startY = sY / 12;
-	unsigned int goalX = dX / 16, goalY = dY / 12;
-	unsigned int bestX, bestY, dist;
+	Point start = {s.x/16, s.y/12};
+	Point goal = {d.x/16, d.y/12};
+	unsigned int dist;
 
 	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[SearchMap->GetPixelIndex( startX, startY )] & PATH_MAP_PASSABLE )) {
-		AdjustPosition( startX, startY );
+	if (!( Passable[SearchMap->GetPixelIndex( start.x, start.y )] & PATH_MAP_PASSABLE )) {
+		AdjustPosition( start );
 	}
-	unsigned int pos = ( startX << 16 ) | startY;
+	unsigned int pos = ( start.x << 16 ) | start.y;
 	InternalStack.push( pos );
-	MapSet[startY * Width + startX] = 1;
+	MapSet[start.y * Width + start.x] = 1;
 	dist = 0;
-	bestX = startX;
-	bestY = startY;
+	Point best = start;
 	while (InternalStack.size()) {
 		pos = InternalStack.front();
 		InternalStack.pop();
 		unsigned int x = pos >> 16;
 		unsigned int y = pos & 0xffff;
-		long tx = ( x - goalX );
-		long ty = ( y - goalY );
+		long tx = ( x - goal.x );
+		long ty = ( y - goal.y );
 		unsigned int distance = (unsigned int) sqrt( ( double ) ( tx* tx + ty* ty ) );
 		if(dist<distance) {
-			bestX=x;
-			bestY=y;
+			best.x=x;
+			best.y=y;
 			dist=distance;
 		}
 
@@ -923,69 +920,67 @@ PathNode* Map::RunAway(short sX, short sY, short dX, short dY, unsigned int Path
 	PathNode* Return = StartNode;
 	StartNode->Next = NULL;
 	StartNode->Parent = NULL;
-	StartNode->x = bestX;
-	StartNode->y = bestY;
+	StartNode->x = best.x;
+	StartNode->y = best.y;
 	if(Backing) {
-		StartNode->orient = GetOrient( startX, startY, bestX, bestY );
+		StartNode->orient = GetOrient( start, best );
 	}
 	else {
-		StartNode->orient = GetOrient( bestX, bestY, startX, startY );
+		StartNode->orient = GetOrient( best, start );
 	}
-	unsigned int px = bestX;
-	unsigned int py = bestY;
-	unsigned int pos2 = startY * Width + startX;
-	while (( pos = py * Width + px ) != pos2) {
+	Point p = best;
+	unsigned int pos2 = start.y * Width + start.x;
+	while (( pos = p.y * Width + p.x ) != pos2) {
 		StartNode->Next = new PathNode;
 		StartNode->Next->Parent = StartNode;
 		StartNode = StartNode->Next;
 		StartNode->Next = NULL;
 		unsigned int level = MapSet[pos];
 		unsigned int diff = 0;
-		unsigned int nx, ny;
-		Leveldown( px, py + 1, level, nx, ny, diff );
-		Leveldown( px + 1, py, level, nx, ny, diff );
-		Leveldown( px - 1, py, level, nx, ny, diff );
-		Leveldown( px, py - 1, level, nx, ny, diff );
-		Leveldown( px - 1, py + 1, level, nx, ny, diff );
-		Leveldown( px + 1, py + 1, level, nx, ny, diff );
-		Leveldown( px + 1, py - 1, level, nx, ny, diff );
-		Leveldown( px - 1, py - 1, level, nx, ny, diff );
+		Point n;
+		Leveldown( p.x, p.y + 1, level, n, diff );
+		Leveldown( p.x + 1, p.y, level, n, diff );
+		Leveldown( p.x - 1, p.y, level, n, diff );
+		Leveldown( p.x, p.y - 1, level, n, diff );
+		Leveldown( p.x - 1, p.y + 1, level, n, diff );
+		Leveldown( p.x + 1, p.y + 1, level, n, diff );
+		Leveldown( p.x + 1, p.y - 1, level, n, diff );
+		Leveldown( p.x - 1, p.y - 1, level, n, diff );
 		if (!diff)
 			return Return;
-		StartNode->x = nx;
-		StartNode->y = ny;
+		StartNode->x = n.x;
+		StartNode->y = n.y;
 
 		if(Backing) {
-			StartNode->orient = GetOrient( px, py, nx, ny );
+			StartNode->orient = GetOrient( p, n );
 		}
 		else {
-			StartNode->orient = GetOrient( nx, ny, px, py );
+			StartNode->orient = GetOrient( n, p );
 		}
-		px = nx;
-		py = ny;
+		p = n;
 	}
 	return Return;
 }
 
-bool Map::TargetUnreachable(short sX, short sY, short dX, short dY)
+bool Map::TargetUnreachable(Point &s, Point &d)
 {
-	unsigned int startX = sX / 16, startY = sY / 12, goalX = dX / 16,
-	goalY = dY / 12;
+	Point start = { s.x/16, s.y/12 };
+	Point goal = { d.x/16, d.y/12 };
 	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[SearchMap->GetPixelIndex( goalX, goalY )] & PATH_MAP_PASSABLE )) {
+	if (!( Passable[SearchMap->GetPixelIndex( goal.x, goal.y )] & PATH_MAP_PASSABLE )) {
 		return true;
 	}
-	if (!( Passable[SearchMap->GetPixelIndex( startX, startY )] & PATH_MAP_PASSABLE )) {
+	if (!( Passable[SearchMap->GetPixelIndex( start.x, start.y )] & PATH_MAP_PASSABLE )) {
 		return true;
 	}
 
-	unsigned int pos = ( goalX << 16 ) | goalY;
-	unsigned int pos2 = ( startX << 16 ) | startY;
+	unsigned int pos = ( goal.x << 16 ) | goal.y;
+	unsigned int pos2 = ( start.x << 16 ) | start.y;
 	InternalStack.push( pos );
-	MapSet[goalY * Width + goalX] = 1;
+	MapSet[goal.y * Width + goal.x] = 1;
 
 	while (InternalStack.size() && pos!=pos2) {
 		pos = InternalStack.front();
@@ -1005,21 +1000,21 @@ bool Map::TargetUnreachable(short sX, short sY, short dX, short dY)
 	return pos!=pos2;
 }
 
-PathNode* Map::FindPath(short sX, short sY, short dX, short dY)
+PathNode* Map::FindPath(Point &s, Point &d)
 {
-	unsigned int startX = sX / 16, startY = sY / 12, goalX = dX / 16,
-	goalY = dY / 12;
+	Point start = { s.x/16, s.y/12 };
+	Point goal = { d.x/16, d.y/12 };
 	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[SearchMap->GetPixelIndex( goalX, goalY )] & PATH_MAP_PASSABLE )) {
-		AdjustPosition( goalX, goalY );
+	if (!( Passable[SearchMap->GetPixelIndex( goal.x, goal.y )] & PATH_MAP_PASSABLE )) {
+		AdjustPosition( goal );
 	}
-	unsigned int pos = ( goalX << 16 ) | goalY;
-	unsigned int pos2 = ( startX << 16 ) | startY;
+	unsigned int pos = ( goal.x << 16 ) | goal.y;
+	unsigned int pos2 = ( start.x << 16 ) | start.y;
 	InternalStack.push( pos );
-	MapSet[goalY * Width + goalX] = 1;
+	MapSet[goal.y * Width + goal.x] = 1;
 
 	while (InternalStack.size()) {
 		pos = InternalStack.front();
@@ -1054,43 +1049,41 @@ PathNode* Map::FindPath(short sX, short sY, short dX, short dY)
 	PathNode* Return = StartNode;
 	StartNode->Next = NULL;
 	StartNode->Parent = NULL;
-	StartNode->x = startX;
-	StartNode->y = startY;
-	StartNode->orient = GetOrient( goalX, goalY, startX, startY );
+	StartNode->x = start.x;
+	StartNode->y = start.y;
+	StartNode->orient = GetOrient( goal, start );
 	if (pos != pos2) {
 		return Return;
 	}
-	unsigned int px = startX;
-	unsigned int py = startY;
-	pos2 = goalY * Width + goalX;
-	while (( pos = py * Width + px ) != pos2) {
+	Point p = start;
+	pos2 = goal.y * Width + goal.x;
+	while (( pos = p.y * Width + p.x ) != pos2) {
 		StartNode->Next = new PathNode;
 		StartNode->Next->Parent = StartNode;
 		StartNode = StartNode->Next;
 		StartNode->Next = NULL;
 		unsigned int level = MapSet[pos];
 		unsigned int diff = 0;
-		unsigned int nx, ny;
-		Leveldown( px, py + 1, level, nx, ny, diff );
-		Leveldown( px + 1, py, level, nx, ny, diff );
-		Leveldown( px - 1, py, level, nx, ny, diff );
-		Leveldown( px, py - 1, level, nx, ny, diff );
-		Leveldown( px - 1, py + 1, level, nx, ny, diff );
-		Leveldown( px + 1, py + 1, level, nx, ny, diff );
-		Leveldown( px + 1, py - 1, level, nx, ny, diff );
-		Leveldown( px - 1, py - 1, level, nx, ny, diff );
+		Point n;
+		Leveldown( p.x, p.y + 1, level, n, diff );
+		Leveldown( p.x + 1, p.y, level, n, diff );
+		Leveldown( p.x - 1, p.y, level, n, diff );
+		Leveldown( p.x, p.y - 1, level, n, diff );
+		Leveldown( p.x - 1, p.y + 1, level, n, diff );
+		Leveldown( p.x + 1, p.y + 1, level, n, diff );
+		Leveldown( p.x + 1, p.y - 1, level, n, diff );
+		Leveldown( p.x - 1, p.y - 1, level, n, diff );
 		if (!diff)
 			return Return;
-		StartNode->x = nx;
-		StartNode->y = ny;
-		StartNode->orient = GetOrient( nx, ny, px, py );
-		px = nx;
-		py = ny;
+		StartNode->x = n.x;
+		StartNode->y = n.y;
+		StartNode->orient = GetOrient( n, p );
+		p = n;
 	}
 	return Return;
 }
-
-unsigned char Map::GetOrient(short sX, short sY, short dX, short dY)
+/*
+unsigned char Map::GetOrient( sX, short sY, short dX, short dY)
 {
 	short deltaX = ( dX- sX), deltaY = ( dY - sY );
 	if (deltaX > 0) {
@@ -1118,10 +1111,13 @@ unsigned char Map::GetOrient(short sX, short sY, short dX, short dY)
 	}
 	return 0;
 }
-
-bool Map::IsVisible(short sX, short sY, short dX, short dY)
+*/
+bool Map::IsVisible(Point &s, Point &d)
 {
-	sX/=16; sY/=12; dX/=16; dY/=12;
+	int sX=s.x/16;
+	int sY=s.y/12;
+	int dX=d.x/16;
+	int dY=d.y/12;
 	int diffx = sX - dX;
 	int diffy = sY - dY;
 	if (abs( diffx ) >= abs( diffy )) {

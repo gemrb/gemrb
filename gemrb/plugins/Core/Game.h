@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.42 2004/08/28 15:00:38 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.43 2004/09/12 21:58:47 avenger_teambg Exp $
  *
  */
 
@@ -209,7 +209,7 @@ public:
 	}
 	void ShareXP(int XP, bool divide);
 	bool EveryoneStopped();
-	bool EveryoneNearPoint(const char *area, int x, int y, bool canmove);
+	bool EveryoneNearPoint(const char *area, Point &p, bool canmove);
 	bool PartyMemberDied();
 	void IncrementChapter();
 	void ReputationAltered();

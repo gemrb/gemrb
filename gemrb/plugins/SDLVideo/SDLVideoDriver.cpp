@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.84 2004/09/09 16:42:13 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.85 2004/09/12 21:58:50 avenger_teambg Exp $
  *
  */
 
@@ -922,14 +922,10 @@ void SDLVideoDriver::SetViewport(int x, int y)
 
 void SDLVideoDriver::SetViewport(int x, int y, int w, int h)
 {
-	//Viewport.x = x;
-	//Viewport.y = y;
 	xCorr = x;
 	yCorr = y;
 	Viewport.w = w;
 	Viewport.h = h;
-	//core->Width = w;
-	//core->Height = h;
 }
 
 void SDLVideoDriver::MoveViewportTo(int x, int y)
@@ -1317,28 +1313,10 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 Sprite2D* SDLVideoDriver::PrecalculatePolygon(Gem_Polygon *poly, Color &color)
 //Point* points, int count, Color& color, Region& BBox)
 {
-/* we don't need this, the BBox is already stored in the area
-	short minX = 20000, maxX = 0, minY = 20000, maxY = 0;
-	for (int i = 0; i < count; i++) {
-		if (points[i].x < minX)
-			minX = points[i].x;
-		if (points[i].y < minY)
-			minY = points[i].y;
-		if (points[i].x > maxX)
-			maxX = points[i].x;
-		if (points[i].y > maxY)
-			maxY = points[i].y;
-	}
-	short width = maxX - minX;
-	short height = maxY - minY;
-*/
-
 	void* pixels = malloc( poly->BBox.w * poly->BBox.h );
 	memset( pixels, 0, poly->BBox.w * poly->BBox.h );
 
 	unsigned char * ptr = ( unsigned char * ) pixels;
-
-//	Gem_Polygon* poly = new Gem_Polygon( points, count, BBox );
 
 	for (int y = 0; y < poly->BBox.h; y++) {
 		for (int x = 0; x < poly->BBox.w; x++) {
@@ -1347,8 +1325,6 @@ Sprite2D* SDLVideoDriver::PrecalculatePolygon(Gem_Polygon *poly, Color &color)
 			ptr++;
 		}
 	}
-
-//	delete( poly );
 
 	Color palette[2];
 	memset( palette, 0, 2 * sizeof( Color ) );

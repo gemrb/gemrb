@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.26 2004/09/11 10:06:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.27 2004/09/12 21:58:47 avenger_teambg Exp $
  *
  */
 
@@ -110,27 +110,28 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 	if (strncmp( Signature, "BAM V1  ", 8 ) != 0) {
 		return false;
 	}
-	str->Read( &FramesCount, 2 );
+	str->ReadWord( &FramesCount );
 	str->Read( &CyclesCount, 1 );
 	str->Read( &CompressedColorIndex, 1 );
-	str->Read( &FramesOffset, 4 );
-	str->Read( &PaletteOffset, 4 );
-	str->Read( &FLTOffset, 4 );
+	str->ReadDword( &FramesOffset );
+	str->ReadDword( &PaletteOffset );
+	str->ReadDword( &FLTOffset );
 	str->Seek( FramesOffset, GEM_STREAM_START );
 	frames = new FrameEntry[FramesCount];
 	for (i = 0; i < FramesCount; i++) {
-		str->Read( &frames[i].Width, 2 );
-		str->Read( &frames[i].Height, 2 );
-		str->Read( &frames[i].XPos, 2 );
-		str->Read( &frames[i].YPos, 2 );
-		str->Read( &frames[i].FrameData, 4 );
+		str->ReadWord( &frames[i].Width );
+		str->ReadWord( &frames[i].Height );
+		str->ReadWord( &frames[i].XPos );
+		str->ReadWord( &frames[i].YPos );
+		str->ReadDword( &frames[i].FrameData );
 	}
 	cycles = new CycleEntry[CyclesCount];
 	for (i = 0; i < CyclesCount; i++) {
-		str->Read( &cycles[i].FramesCount, 2 );
-		str->Read( &cycles[i].FirstFrame, 2 );
+		str->ReadWord( &cycles[i].FramesCount );
+		str->ReadWord( &cycles[i].FirstFrame );
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
+	//no idea if we have to switch this
 	for (i = 0; i < 256; i++) {
 		RevColor rc;
 		str->Read( &rc, 4 );
@@ -155,7 +156,7 @@ Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
 	str->Seek( FLTOffset + ( cycles[Cycle].FirstFrame * 2 ) + ( frame * 2 ),
 			GEM_STREAM_START );
 	ieWord findex;
-	str->Read( &findex, 2 );
+	str->ReadWord( &findex );
 	return GetFrame( findex );
 }
 
@@ -174,7 +175,7 @@ Animation* BAMImp::GetAnimation(unsigned char Cycle, int x, int y,
 	unsigned short * findex = ( unsigned short * )
 		malloc( cycles[Cycle].FramesCount * sizeof(unsigned short) );
 	for (i = 0; i < cycles[Cycle].FramesCount; i++) {
-		str->Read( &findex[i], 2 );
+		str->ReadWord( &findex[i] );
 	}
 	Animation* anim = new Animation( findex, cycles[Cycle].FramesCount );
 	anim->x = x;
@@ -260,9 +261,12 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 			count = cycles[i].FirstFrame + cycles[i].FramesCount;
 		}
 	}
-	unsigned short * FLT = ( unsigned short * ) malloc( count * 2 );
+	ieWord * FLT = ( ieWord * ) calloc( count, sizeof(ieWord) );
 	str->Seek( FLTOffset, GEM_STREAM_START );
-	str->Read( FLT, count * 2 );
+	str->Read( FLT, count * sizeof(ieWord) );
+	if( DataStream::IsEndianSwitch() ) {
+		swab( FLT, FLT, count * sizeof(ieWord) );
+	}
 	std::vector< unsigned short> indices;
 	for (i = 0; i < CyclesCount; i++) {
 		unsigned int ff = cycles[i].FirstFrame,

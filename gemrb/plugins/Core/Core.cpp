@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.23 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.24 2004/09/12 21:58:47 avenger_teambg Exp $
  *
  */
 
@@ -55,18 +55,47 @@ BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD fdwReason,
 
 //// Globally used functions
 
-unsigned int Distance(int X, int Y, Scriptable *b)
+unsigned char GetOrient(Point &s, Point &d)
 {
-        long x = ( X - b->XPos );
-        long y = ( Y - b->YPos );
-        return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
+	short deltaX = ( d.x- s.x), deltaY = ( d.y - s.y );
+	if (deltaX > 0) {
+		if (deltaY > 0) {
+			return 6;
+		} else if (deltaY == 0) {
+			return 4;
+		} else {
+			return 2;
+		}
+	} else if (deltaX == 0) {
+		if (deltaY > 0) {
+			return 8;
+		} else {
+			return 0;
+		}
+	} else {
+		if (deltaY > 0) {
+			return 10;
+		} else if (deltaY == 0) {
+			return 12;
+		} else {
+			return 14;
+		}
+	}
+	return 0;
+}
+
+unsigned int Distance(Point p, Scriptable *b)
+{
+	long x = ( p.x - b->Pos.x );
+	long y = ( p.y - b->Pos.y );
+	return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
 }
 
 unsigned int Distance(Scriptable *a, Scriptable *b)
 {
-        long x = ( a->XPos - b->XPos );
-        long y = ( a->YPos - b->YPos );
-        return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
+	long x = ( a->Pos.x - b->Pos.x );
+	long y = ( a->Pos.y - b->Pos.y );
+	return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
 }
 
 //returns true if path is an existing directory

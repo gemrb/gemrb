@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.170 2004/08/28 15:00:38 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.171 2004/09/12 21:58:47 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -97,8 +97,8 @@ GameControl::GameControl(void)
 	overContainer = NULL;
 	overInfoPoint = NULL;
 	drawPath = NULL;
-	pfsX = 0;
-	pfsY = 0;
+	pfs.x = 0;
+	pfs.y = 0;
 	InfoTextPalette = core->GetVideoDriver()->CreatePalette( white, black );
 	lastCursor = 0;
 	moveX = moveY = 0;
@@ -159,7 +159,7 @@ fallback:
 	formations = (formation_type *) calloc(1,sizeof(formation_type) );
 }
 
-void GameControl::MoveToPointFormation(Actor *actor, int GameX, int GameY)
+void GameControl::MoveToPointFormation(Actor *actor, Point &p)
 {
 	unsigned int pos;
 	char Tmp[256];
@@ -167,9 +167,9 @@ void GameControl::MoveToPointFormation(Actor *actor, int GameX, int GameY)
 	int formation=core->GetGame()->WhichFormation;
 	pos=actor->InParty-1; //either this or the actual # of selected actor?
 	if(pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
-	GameX+=formations[formation][pos].x*30;
-	GameY+=formations[formation][pos].y*30;
-	sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
+	p.x+=formations[formation][pos].x*30;
+	p.y+=formations[formation][pos].y*30;
+	sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
 	actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 }
 
@@ -220,12 +220,12 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	HotKey = 0;
 	if (ScreenFlags & SF_DISABLEMOUSE)
 		return;
-	short GameX = lastMouseX, GameY = lastMouseY;
-	video->ConvertToGame( GameX, GameY );
+	Point p = {lastMouseX,  lastMouseY};
+	video->ConvertToGame( p.x, p.y );
 
 	// Draw selection rect
 	if (DrawSelectionRect) {
-		CalculateSelection( GameX, GameY );
+		CalculateSelection( p );
 		video->DrawRect( SelectionRect, green, false, true );
 	}
 
@@ -265,8 +265,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (effect) {
 		if (( game->selected.size() > 0 )) {
 			Actor* actor = game->selected[0];
-			video->BlitSpriteMode( effect->NextFrame(), actor->XPos,
-					actor->YPos, 1, false );
+			video->BlitSpriteMode( effect->NextFrame(), actor->Pos.x,
+					actor->Pos.y, 1, false );
 		}
 	}
 
@@ -304,8 +304,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		}
 		if (infoTexts[i]->textDisplaying == 1) {
 			Font* font = core->GetFont( 9 );
-			Region rgn( infoTexts[i]->XPos - 200,
-				infoTexts[i]->YPos - 100, 400, 400 );
+			Region rgn( infoTexts[i]->Pos.x - 200,
+				infoTexts[i]->Pos.y - 100, 400, 400 );
 			//printf("Printing InfoText at [%d,%d,%d,%d]\n", rgn.x, rgn.y, rgn.w, rgn.h);
 			rgn.x += video->xCorr;
 			rgn.y += video->yCorr;
@@ -320,15 +320,15 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (drawPath) {
 		PathNode* node = drawPath;
 		while (true) {
-			short GameX = ( node-> x*16) + 8, GameY = ( node->y*12 ) + 6;
+			Point p = { ( node-> x*16) + 8, ( node->y*12 ) + 6 };
 			if (!node->Parent) {
-				video->DrawCircle( GameX, GameY, 2, red );
+				video->DrawCircle( p.x, p.y, 2, red );
 			} else {
 				short oldX = ( node->Parent-> x*16) + 8, oldY = ( node->Parent->y*12 ) + 6;
-				video->DrawLine( oldX, oldY, GameX, GameY, green );
+				video->DrawLine( oldX, oldY, p.x, p.y, green );
 			}
 			if (!node->Next) {
-				video->DrawCircle( GameX, GameY, 2, green );
+				video->DrawCircle( p.x, p.y, 2, green );
 				break;
 			}
 			node = node->Next;
@@ -340,7 +340,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		Sprite2D* spr = area->SearchMap->GetImage();
 		video->BlitSprite( spr, 0, 0, true );
 		video->FreeSprite( spr );
-		Region point( GameX / 16, GameY / 12, 1, 1 );
+		Region point( p.x / 16, p.y / 12, 1, 1 );
 		video->DrawRect( point, red );
 	}
 
@@ -474,8 +474,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'p':
 				//path
 				 {
-					short GameX = lastMouseX, GameY = lastMouseY;
-					core->GetVideoDriver()->ConvertToGame( GameX, GameY );
+					Point p = {lastMouseX, lastMouseY};
+					core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 					if (drawPath) {
 						PathNode* nextNode = drawPath->Next;
 						PathNode* thisNode = drawPath;
@@ -487,16 +487,16 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 							nextNode = thisNode->Next;
 						}
 					}
-					drawPath = core->GetGame()->GetCurrentMap()->FindPath( pfsX, pfsY, GameX, GameY );
+					drawPath = core->GetGame()->GetCurrentMap()->FindPath( pfs, p );
 
 				}
 				break;
 
 			case 'o': 
 				// origin
-				pfsX = lastMouseX; 
-				pfsY = lastMouseY;
-				core->GetVideoDriver()->ConvertToGame( pfsX, pfsY );
+				pfs.x = lastMouseX; 
+				pfs.y = lastMouseY;
+				core->GetVideoDriver()->ConvertToGame( pfs.x, pfs.y );
 				break;
 			case 'a':
 				//animation
@@ -512,11 +512,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				// jump
 					for (i = 0; i < game->selected.size(); i++) {
 						Actor* actor = game->selected[i];
-						short cX = lastMouseX; 
-						short cY = lastMouseY;
-						core->GetVideoDriver()->ConvertToGame( cX, cY );
-						GameScript::MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, cX, cY, -1, true);
-						printf( "Teleported to %d, %d\n", cX, cY );
+						Point c = {lastMouseX, lastMouseY};
+						core->GetVideoDriver()->ConvertToGame( c.x, c.y );
+						GameScript::MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, c, -1, true);
+						printf( "Teleported to %d, %d\n", c.x, c.y );
 					}
 				break;
 
@@ -592,17 +591,17 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	lastMouseX = x;
 	lastMouseY = y;
-	short GameX = x, GameY = y;
-	core->GetVideoDriver()->ConvertToGame( GameX, GameY );
+	Point p = { x,y };
+	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 	if (MouseIsDown && ( !DrawSelectionRect )) {
-		if (( abs( GameX - StartX ) > 5 ) || ( abs( GameY - StartY ) > 5 )) {
+		if (( abs( p.x - StartX ) > 5 ) || ( abs( p.y - StartY ) > 5 )) {
 			DrawSelectionRect = true;
 		}
 	}
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentMap( );
 
-	switch (area->GetBlocked( GameX, GameY ) & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL)) {
+	switch (area->GetBlocked( p ) & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL)) {
 		case 0:
 			nextCursor = 6;
 			break;
@@ -617,7 +616,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			break;
 	}
 
-	overInfoPoint = area->tm->GetInfoPoint( GameX, GameY );
+	overInfoPoint = area->tm->GetInfoPoint( p );
 	if (overInfoPoint) {
 		if (overInfoPoint->Type != ST_PROXIMITY) {
 			nextCursor = overInfoPoint->Cursor;
@@ -627,7 +626,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (overDoor) {
 		overDoor->Highlight = false;
 	}
-	overDoor = area->tm->GetDoor( GameX, GameY );
+	overDoor = area->tm->GetDoor( p );
 	if (overDoor) {
 		overDoor->Highlight = true;
 		nextCursor = overDoor->Cursor;
@@ -637,7 +636,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (overContainer) {
 		overContainer->Highlight = false;
 	}
-	overContainer = area->tm->GetContainer( GameX, GameY );
+	overContainer = area->tm->GetContainer( p );
 	if (overContainer) {
 		overContainer->Highlight = true;
 		if (overContainer->TrapDetected && overContainer->Trapped) {
@@ -650,7 +649,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 
 	if (!DrawSelectionRect) {
-		Actor* actor = area->GetActor( GameX, GameY, action);
+		Actor* actor = area->GetActor( p, action);
 		if (lastActor)
 			lastActor->SetOver( false );
 		if (!actor) {
@@ -778,13 +777,13 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 	if ((ScreenFlags&SF_DISABLEMOUSE) || (Button != GEM_MB_ACTION) ) {
 		return;
 	}
-	short GameX = x, GameY = y;
-	core->GetVideoDriver()->ConvertToGame( GameX, GameY );
+	Point p = {x,y};
+	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 	MouseIsDown = true;
-	SelectionRect.x = GameX;
-	SelectionRect.y = GameY;
-	StartX = GameX;
-	StartY = GameY;
+	SelectionRect.x = p.x;
+	SelectionRect.y = p.y;
+	StartX = p.x;
+	StartY = p.y;
 	SelectionRect.w = 0;
 	SelectionRect.h = 0;
 }
@@ -809,8 +808,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	}
 
 	MouseIsDown = false;
-	short GameX = x, GameY = y;
-	core->GetVideoDriver()->ConvertToGame( GameX, GameY );
+	Point p = {x,y};
+	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentMap( );
 	if (DrawSelectionRect) {
@@ -830,7 +829,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		DrawSelectionRect = false;
 		return;
 	}
-	Actor* actor = area->GetActor( GameX, GameY, action );
+	Actor* actor = area->GetActor( p, action );
 
 	if (!actor && ( game->selected.size() > 0 )) {
 		if (overDoor) {
@@ -847,7 +846,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			actor=game->selected[0];
 			actor->ClearPath();
 			actor->ClearActions();
-			sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
+			sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
 			actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 			return;
 		}
@@ -858,7 +857,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			actor->ClearActions();
 			//formations should be rotated based on starting point
 			//of the leader? and destination
-			MoveToPointFormation(actor,GameX,GameY);
+			MoveToPointFormation(actor,p);
 		}
 		return;
 	}
@@ -953,25 +952,25 @@ Map *GameControl::SetCurrentArea(int Index)
 	return area;
 }
 
-void GameControl::CalculateSelection(unsigned short x, unsigned short y)
+void GameControl::CalculateSelection(Point &p)
 {
 	unsigned int i;
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentMap( );
 	if (DrawSelectionRect) {
-		if (x < StartX) {
-			SelectionRect.w = StartX - x;
-			SelectionRect.x = x;
+		if (p.x < StartX) {
+			SelectionRect.w = StartX - p.x;
+			SelectionRect.x = p.x;
 		} else {
 			SelectionRect.x = StartX;
-			SelectionRect.w = x - StartX;
+			SelectionRect.w = p.x - StartX;
 		}
-		if (y < StartY) {
-			SelectionRect.h = StartY - y;
-			SelectionRect.y = y;
+		if (p.y < StartY) {
+			SelectionRect.h = StartY - p.y;
+			SelectionRect.y = p.y;
 		} else {
 			SelectionRect.y = StartY;
-			SelectionRect.h = y - StartY;
+			SelectionRect.h = p.y - StartY;
 		}
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
@@ -986,7 +985,7 @@ void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 		}
 		free( ab );
 	} else {
-		Actor* actor = area->GetActor( x, y, action );
+		Actor* actor = area->GetActor( p, action );
 		if (lastActor)
 			lastActor->SetOver( false );
 		if (!actor) {
@@ -1159,7 +1158,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos,
-								( ( Window * ) Owner )->YPos, Width, Height );
+		( ( Window * ) Owner )->YPos, Width, Height );
 }
 
 void GameControl::ResizeDel(Window* win, unsigned char type)
@@ -1509,14 +1508,13 @@ void GameControl::DialogChoose(unsigned int choose)
 	ta->AppendText( "", -1 );
 }
 
-void GameControl::DisplayString(int X, int Y, const char *Text)
+void GameControl::DisplayString(Point &p, const char *Text)
 {
 	Scriptable* scr = new Scriptable( ST_TRIGGER );
 	scr->overHeadText = (char *) Text;
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = 0;
-	scr->XPos = X;
-	scr->YPos = Y;
+	scr->Pos = p;
 	scr->MySelf = NULL;
 	infoTexts.push_back( scr );
 }
@@ -1529,8 +1527,7 @@ void GameControl::DisplayString(Scriptable* target)
 	strcpy( scr->overHeadText, target->overHeadText );
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = target->timeStartDisplaying;
-	scr->XPos = target->XPos;
-	scr->YPos = target->YPos;
+	scr->Pos = target->Pos;
 	scr->MySelf = target;
 	infoTexts.push_back( scr );
 }
@@ -1556,8 +1553,8 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	//center on first selected actor
 	Region vp = core->GetVideoDriver()->GetViewport();
 	if(ScreenFlags&SF_CENTERONACTOR) {
-		core->GetVideoDriver()->SetViewport( pc->XPos - ( vp.w / 2 ),
-			pc->YPos - ( vp.h / 2 ) );
+		core->GetVideoDriver()->SetViewport( pc->Pos.x - ( vp.w / 2 ),
+			pc->Pos.y - ( vp.h / 2 ) );
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
 }

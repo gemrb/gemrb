@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.48 2004/08/28 17:21:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.49 2004/09/12 21:58:48 avenger_teambg Exp $
  *
  */
 
@@ -65,7 +65,7 @@ typedef struct WallGroup {
 
 typedef struct Entrance {
 	char Name[33];
-	ieDword XPos, YPos;
+	Point Pos;
 	ieDword Face;
 } Entrance;
 
@@ -108,8 +108,8 @@ public:
 	Animation* GetAnimation(const char* Name);
 	void AddActor(Actor* actor);
 	void AddWallGroup(WallGroup* wg);
-	int GetBlocked(unsigned int x, unsigned int y);
-	Actor* GetActor(unsigned int x, unsigned int y, int flags);
+	int GetBlocked(Point &p);
+	Actor* GetActor(Point &p, int flags);
 	Actor* GetActor(const char* Name);
 	Actor* GetActorByDialog(const char* resref);
 	void RemoveActor(Actor* actor);
@@ -118,7 +118,7 @@ public:
 	SongHeaderType SongHeader;
 	RestHeaderType RestHeader;
 	void AddVVCCell(ScriptedAnimation* vvc);
-	void AddEntrance(char* Name, short XPos, short YPos, short Face);
+	void AddEntrance(char* Name, int XPos, int YPos, short Face);
 	Entrance* GetEntrance(const char* Name);
 	bool CanFree();
 	int GetActorCount() { return (int)actors.size(); }
@@ -128,23 +128,22 @@ public:
 
 	//PathFinder
 	/* Finds the nearest passable point */
-	void AdjustPosition(unsigned int& goalX, unsigned int& goalY, unsigned int radius=0);
+	void AdjustPosition(Point &goal, unsigned int radius=0);
 	/* Finds the path which leads the farthest from d */
-	PathNode* RunAway(short sX, short sY, short dX, short dY, unsigned int PathLen, bool Backing);
+	PathNode* RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing);
 	/* Returns true if there is no path to d */
-	bool TargetUnreachable(short sX, short sY, short dX, short dY);
+	bool TargetUnreachable(Point &s, Point &d);
 	/* Finds the path which leads to d */
-	PathNode* FindPath(short sX, short sY, short dX, short dY);
-	bool IsVisible(short sX, short sY, short dX, short dY);
+	PathNode* FindPath(Point &s, Point &d);
+	bool IsVisible(Point &s, Point &d);
 	
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
 	void SetupAmbients();
 private:
 	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
-		unsigned int& nx, unsigned int& ny, unsigned int& diff);
+		Point &p, unsigned int& diff);
 	void SetupNode(unsigned int x, unsigned int y, unsigned int Cost);
 	//maybe this is unneeded and orientation could be calculated on the fly
-	unsigned char GetOrient(short sX, short sY, short dX, short dY);
 	void UseExit(Actor *pc, InfoPoint *ip);
 };
 

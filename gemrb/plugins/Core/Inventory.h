@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.20 2004/09/11 07:50:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.21 2004/09/12 21:58:48 avenger_teambg Exp $
  *
  */
 
@@ -125,7 +125,7 @@ public:
 	bool ItemsAreCompatible(CREItem* target, CREItem* source);
 	/*finds the first slot of named item, if resref is empty, finds the first filled! slot*/
 	int FindItem(const char *resref, unsigned int flags);
-	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, unsigned short x, unsigned short y);
+	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
 	// Returns item in specified slot. Does NOT change inventory
 	CREItem* GetSlotItem(unsigned int slot);
 	void dump();

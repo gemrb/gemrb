@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.194 2004/09/11 07:50:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.195 2004/09/12 21:58:47 avenger_teambg Exp $
  *
  */
 
@@ -234,6 +234,7 @@ static TriggerLink triggernames[] = {
 	{"timelt", GameScript::TimeLT,0},
 	{"tookdamage", GameScript::TookDamage,0},
 	{"traptriggered", GameScript::TrapTriggered,0},
+	{"triggerclick", GameScript::Clicked,0}, //not sure
 	{"true", GameScript::True,0},
 	{"unselectablevariable", GameScript::UnselectableVariable,0},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT,0},
@@ -675,11 +676,11 @@ static IDSLink* FindIdentifier(const char* idsname)
 	return NULL;
 }
 
-static void GoNearAndRetry(Scriptable *Sender, Point *p)
+static void GoNearAndRetry(Scriptable *Sender, Point &p)
 {
 	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
-	sprintf( Tmp, "MoveToPoint([%d.%d])", p->x, p->y );
+	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
 	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
 }
 
@@ -1175,8 +1176,8 @@ Response* GameScript::ReadResponse(DataStream* stream)
 				stream->ReadLine( line, 1024 );
 		}
 		stream->ReadLine( line, 1024 );
-		sscanf( line, "%d %d %d %d %d\"%[^\"]\" \"%[^\"]\" AC",
-			&aC->int0Parameter, &aC->XpointParameter, &aC->YpointParameter,
+		sscanf( line, "%d %hd %hd %d %d\"%[^\"]\" \"%[^\"]\" AC",
+			&aC->int0Parameter, &aC->pointParameter.x, &aC->pointParameter.y,
 			&aC->int1Parameter, &aC->int2Parameter, aC->string0Parameter,
 			aC->string1Parameter );
 		aCv.push_back( aC );
@@ -1204,10 +1205,10 @@ Trigger* GameScript::ReadTrigger(DataStream* stream)
 	stream->ReadLine( line, 1024 );
 	Trigger* tR = new Trigger();
 	if (strcmp( core->GameType, "pst" ) == 0) {
-		sscanf( line, "%hu %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB",
+		sscanf( line, "%hu %d %d %d %d [%hd,%hd] \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
-			&tR->int1Parameter, &tR->int2Parameter, &tR->XpointParameter,
-			&tR->YpointParameter, tR->string0Parameter, tR->string1Parameter );
+			&tR->int1Parameter, &tR->int2Parameter, &tR->pointParameter.x,
+			&tR->pointParameter.y, tR->string0Parameter, tR->string1Parameter );
 	} else {
 		sscanf( line, "%hu %d %d %d %d \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
@@ -1572,9 +1573,10 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 	return NULL;
 }
 
-unsigned char GameScript::GetOrient(short sX, short sY, short dX, short dY)
+#if 0
+unsigned char GameScript::GetOrient(Point &s, Point &d)
 {
-	short deltaX = ( dX- sX), deltaY = ( dY - sY );
+	short deltaX = ( d.x- s.x), deltaY = ( d.y - s.y );
 	if (deltaX > 0) {
 		if (deltaY > 0) {
 			return 6;
@@ -1600,7 +1602,7 @@ unsigned char GameScript::GetOrient(short sX, short sY, short dX, short dY)
 	}
 	return 0;
 }
-
+#endif
 void GameScript::ExecuteString(Scriptable* Sender, char* String)
 {
 	if (String[0] == 0) {
@@ -1735,9 +1737,9 @@ Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIn
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newAction->XpointParameter = strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.x = strtol( src, (char **) &src, 10 );
 				src++; //Skip .
-				newAction->YpointParameter = strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.y = strtol( src, (char **) &src, 10 );
 				src++; //Skip ]
 				break;
 
@@ -1935,9 +1937,9 @@ Trigger *GameScript::GenerateTriggerCore(const char *src, const char *str, int t
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newTrigger->XpointParameter = strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.x = strtol( src, (char **) &src, 10 );
 				src++; //Skip .
-				newTrigger->YpointParameter = strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.y = strtol( src, (char **) &src, 10 );
 				src++; //Skip ]
 				break;
 
@@ -2871,11 +2873,11 @@ int GameScript::ValidForDialogCore(Scriptable* Sender, Actor *target)
 		Actor* snd = ( Actor* ) Sender;
 		range = snd->Modified[IE_VISUALRANGE] * 20;
 	}
-	if (Distance(target->XPos, target->YPos, Sender) > range) {
+	if (Distance(target->Pos, Sender) > range) {
 		return 0;
 	}
 	Map *map = core->GetGame()->GetCurrentMap();
-	if (!map->IsVisible( Sender->XPos, Sender->YPos, target->XPos, target->YPos )) {
+	if (!map->IsVisible( Sender->Pos, target->Pos )) {
 		return 0;
 	}
 	//we should rather use STATE_SPEECHLESS_MASK
@@ -3560,7 +3562,7 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 	if (!scr) {
 		return 0;
 	}
-	int distance = Distance(parameters->XpointParameter, parameters->YpointParameter, scr);
+	int distance = Distance(parameters->pointParameter, scr);
 	if (distance <= ( parameters->int0Parameter * 20 )) {
 		return 1;
 	}
@@ -3578,9 +3580,8 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	value = (ieDword) CheckVariable( scr, parameters->string0Parameter );
-	unsigned short X = *(unsigned short *) &value;
-	unsigned short Y = *(((unsigned short *) &value)+1);
-	int distance = Distance(X, Y, scr);
+	Point p = { *(unsigned short *) &value, *(((unsigned short *) &value)+1)};
+	int distance = Distance(p, scr);
 	if (distance <= ( parameters->int0Parameter * 20 )) {
 		return 1;
 	}
@@ -3895,7 +3896,7 @@ int GameScript::SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 		return 0;
 	}
 	Map *map = core->GetGame()->GetCurrentMap();
-	if (map->IsVisible( Sender->XPos, Sender->YPos, tar->XPos, tar->YPos )) {
+	if (map->IsVisible( Sender->Pos, tar->Pos )) {
 		if(justlos) {
 			return 1;
 		}
@@ -4289,7 +4290,7 @@ int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* parameters)
 		return 1; //well, if it doesn't exist it is unreachable
 	}
 	Map* map=core->GetGame()->GetCurrentMap();
-	return map->TargetUnreachable( Sender->XPos, Sender->YPos, tar->XPos, tar->YPos);
+	return map->TargetUnreachable( Sender->Pos, tar->Pos );
 }
 
 int GameScript::PartyCountEQ(Scriptable* /*Sender*/, Trigger* parameters)
@@ -4526,7 +4527,7 @@ int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) tar;
-	char *poi=actor->GetDialog();
+	const char *poi=actor->GetDialog();
 	if(!poi[0]) {
 		return 1;
 	}
@@ -4684,9 +4685,8 @@ int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	value = (ieDword) CheckVariable( tar, parameters->string0Parameter );
-	unsigned short X = *(unsigned short *) &value;
-	unsigned short Y = *(((unsigned short *) &value)+1);
-	if(actor->Orientation == GetOrient( X, Y, actor->XPos, actor->YPos ) ) {
+	Point p = { *(unsigned short *) &value, *(((unsigned short *) &value)+1) };
+	if(actor->Orientation == GetOrient( p, actor->Pos ) ) {
 		return 1;
 	}
 	return 0;
@@ -5062,12 +5062,12 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 
 void GameScript::FadeToColor(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->timer->SetFadeToColor( parameters->XpointParameter );
+	core->timer->SetFadeToColor( parameters->pointParameter.x );
 }
 
 void GameScript::FadeFromColor(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->timer->SetFadeFromColor( parameters->XpointParameter );
+	core->timer->SetFadeFromColor( parameters->pointParameter.x );
 }
 
 void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
@@ -5077,7 +5077,7 @@ void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
 	}
 	Actor* ab = ( Actor* ) Sender;
 	Map *map = core->GetGame()->GetCurrentMap();
-	ab->SetPosition( map, parameters->XpointParameter, parameters->YpointParameter, true );
+	ab->SetPosition( map, parameters->pointParameter, true );
 }
 
 void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
@@ -5088,7 +5088,7 @@ void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
 	}
 	Actor* ab = ( Actor* ) tar;
 	Map *map = core->GetGame()->GetCurrentMap();
-	ab->SetPosition( map, parameters->XpointParameter, parameters->YpointParameter, true );
+	ab->SetPosition( map, parameters->pointParameter, true );
 }
 
 /** instant jump to location saved in variable, default: savedlocation */
@@ -5106,11 +5106,11 @@ void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
-	parameters->XpointParameter = *(unsigned short *) &value;
-	parameters->YpointParameter = *(((unsigned short *) &value)+1);
+	parameters->pointParameter.x = *(unsigned short *) &value;
+	parameters->pointParameter.y = *(((unsigned short *) &value)+1);
 	Actor* ab = ( Actor* ) tar;
 	Map *map = core->GetGame()->GetCurrentMap();
-	ab->SetPosition( map, parameters->XpointParameter, parameters->YpointParameter, true );
+	ab->SetPosition( map, parameters->pointParameter, true );
 }
 
 void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
@@ -5133,9 +5133,9 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 		Area[0]=0;
 	}
 	if(parameters->string0Parameter[0]) {
-		CreateVisualEffectCore(Sender->XPos, Sender->YPos, parameters->string0Parameter);
+		CreateVisualEffectCore(Sender->Pos, parameters->string0Parameter);
 	}
-	MoveBetweenAreasCore( (Actor *) Sender, Area, tar->XPos, tar->YPos, -1, true);
+	MoveBetweenAreasCore( (Actor *) Sender, Area, tar->Pos, -1, true);
 }
 
 void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
@@ -5149,8 +5149,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 			continue;
 		}
 		MoveBetweenAreasCore( tar, parameters->string1Parameter, 
-			parameters->XpointParameter,
-			parameters->YpointParameter, -1, true);
+			parameters->pointParameter, -1, true);
 	}
 	i = game->GetNPCCount();
 	while (i--) {
@@ -5160,8 +5159,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 			continue;
 		}
 		MoveBetweenAreasCore( tar, parameters->string1Parameter, 
-			parameters->XpointParameter,
-			parameters->YpointParameter, -1, true);
+			parameters->pointParameter, -1, true);
 	}
 }
 
@@ -5172,7 +5170,7 @@ void GameScript::MoveGlobal(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	MoveBetweenAreasCore( (Actor *) tar, parameters->string0Parameter,
-		parameters->XpointParameter, parameters->YpointParameter, -1, true);
+		parameters->pointParameter, -1, true);
 }
 
 //we also allow moving to door, container
@@ -5187,7 +5185,7 @@ void GameScript::MoveGlobalObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	MoveBetweenAreasCore( (Actor *) tar, parameters->string0Parameter,
-		to->XPos, to->YPos, -1, true);
+		to->Pos, -1, true);
 }
 
 void GameScript::MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameters)
@@ -5201,7 +5199,7 @@ void GameScript::MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameter
 		return;
 	}
 	MoveBetweenAreasCore( (Actor *) tar, parameters->string0Parameter,
-		to->XPos, to->YPos, -1, false);
+		to->Pos, -1, false);
 }
 
 int GameScript::GetHappiness(Scriptable* Sender, int reputation)
@@ -5250,7 +5248,8 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	aM->Open( ds, true );
 	Actor* ab = aM->GetActor();
 	core->FreeInterface( aM );
-	int x,y,radius;
+	int radius;
+	Point pnt;
 
 	radius=0;
 	switch (flags & CC_MASK) {
@@ -5267,19 +5266,19 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 			}
 			//falling through
 		case CC_OFFSET://use sender + offset
-			x = parameters->XpointParameter+Sender->XPos;
-			y = parameters->YpointParameter+Sender->YPos;
+			pnt.x = parameters->pointParameter.x+Sender->Pos.x;
+			pnt.y = parameters->pointParameter.y+Sender->Pos.y;
 			break;
 		default: //absolute point, but -1,-1 means AtFeet
-			x = parameters->XpointParameter;
-			y = parameters->YpointParameter;
-			if(x==-1 && y==-1) {
-				x = Sender->XPos;
-				y = Sender->YPos;
+			pnt.x = parameters->pointParameter.x;
+			pnt.y = parameters->pointParameter.y;
+			if((pnt.x==-1) && (pnt.y==-1)) {
+				pnt.x = Sender->Pos.x;
+				pnt.y = Sender->Pos.y;
 			}
 			break;
 	}
-	printf("CreateCreature: %s at [%d.%d] face:%d\n",parameters->string0Parameter, x,y,parameters->int0Parameter);
+	printf("CreateCreature: %s at [%d.%d] face:%d\n",parameters->string0Parameter, pnt.x,pnt.y,parameters->int0Parameter);
 	Map* map;
 	Game* game=core->GetGame();
 	if(Sender->Type==ST_AREA) {
@@ -5288,7 +5287,7 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	else {
 		map = game->GetCurrentMap( );
 	}
-	ab->SetPosition(map, x, y, flags&CC_CHECK_IMPASSABLE, radius );
+	ab->SetPosition(map, pnt, flags&CC_CHECK_IMPASSABLE, radius );
 	ab->StanceID = IE_ANI_AWAKE;
 	ab->Orientation = parameters->int0Parameter;
 	map->AddActor( ab );
@@ -5454,8 +5453,8 @@ void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
 {
 	unsigned int value;
 
-	*((unsigned short *) &value) = parameters->XpointParameter;
-	*(((unsigned short *) &value)+1) = (unsigned short) parameters->YpointParameter;
+	*((unsigned short *) &value) = parameters->pointParameter.x;
+	*(((unsigned short *) &value)+1) = (unsigned short) parameters->pointParameter.y;
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
@@ -5469,8 +5468,8 @@ void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 	unsigned int value;
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	*((unsigned short *) &value) = tar->XPos;
-	*(((unsigned short *) &value)+1) = (unsigned short) tar->YPos;
+	*((unsigned short *) &value) = tar->Pos.x;
+	*(((unsigned short *) &value)+1) = (unsigned short) tar->Pos.y;
 	if(!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
@@ -5486,8 +5485,8 @@ void GameScript::CreateCreatureAtLocation(Scriptable* Sender, Action* parameters
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	unsigned int value = CheckVariable(Sender, parameters->string0Parameter);
-	parameters->XpointParameter = value & 0xffff;
-	parameters->YpointParameter = value >> 16;
+	parameters->pointParameter.y = value & 0xffff;
+	parameters->pointParameter.x = value >> 16;
 	CreateCreatureCore(Sender, parameters, CC_CHECK_IMPASSABLE|CC_STRING1);
 }
 
@@ -5515,14 +5514,14 @@ void GameScript::SmallWait(Scriptable* Sender, Action* parameters)
 
 void GameScript::MoveViewPoint(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetVideoDriver()->MoveViewportTo( parameters->XpointParameter,
-						parameters->YpointParameter );
+	core->GetVideoDriver()->MoveViewportTo( parameters->pointParameter.x,
+		parameters->pointParameter.y );
 }
 
 void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 {
 	Scriptable * scr = GetActorFromObject( Sender, parameters->objects[1]);
-	core->GetVideoDriver()->MoveViewportTo( scr->XPos, scr->YPos );
+	core->GetVideoDriver()->MoveViewportTo( scr->Pos.x, scr->Pos.y );
 }
 
 void GameScript::AddWayPoint(Scriptable* Sender, Action* parameters)
@@ -5531,7 +5530,7 @@ void GameScript::AddWayPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->AddWayPoint( parameters->XpointParameter, parameters->YpointParameter );
+	actor->AddWayPoint( parameters->pointParameter );
 }
 
 void GameScript::MoveToPointNoRecticle(Scriptable* Sender, Action* parameters)
@@ -5542,7 +5541,7 @@ void GameScript::MoveToPointNoRecticle(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->InternalFlags|=IF_NORECTICLE;
-	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
+	actor->WalkTo( parameters->pointParameter );
 }
 
 void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
@@ -5553,7 +5552,7 @@ void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	//actor->SetNoInterrupt(); // TODO
-	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
+	actor->WalkTo( parameters->pointParameter );
 }
 
 void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
@@ -5563,7 +5562,7 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
+	actor->WalkTo( parameters->pointParameter );
 }
 /** this function extends bg2: movetosavedlocationn (sic), */
 /** iwd2 returntosavedlocation (with default variable) */
@@ -5582,10 +5581,10 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
-	parameters->XpointParameter = *(unsigned short *) &value;
-	parameters->YpointParameter = *(((unsigned short *) &value)+1);
+	parameters->pointParameter.x = *(unsigned short *) &value;
+	parameters->pointParameter.y = *(((unsigned short *) &value)+1);
 	Actor* actor = ( Actor* ) tar;
-	actor->WalkTo( parameters->XpointParameter, parameters->YpointParameter );
+	actor->WalkTo( parameters->pointParameter );
 }
 
 void GameScript::MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters)
@@ -5601,7 +5600,7 @@ void GameScript::MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	//actor->SetNoInterrupt(); //something along these lines
-	actor->WalkTo( target->XPos, target->YPos );
+	actor->WalkTo( target->Pos );
 }
 
 void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
@@ -5616,7 +5615,7 @@ void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->WalkTo( target->XPos, target->YPos );
+	actor->WalkTo( target->Pos );
 }
 
 void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -5626,8 +5625,8 @@ void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters
 		Actor* act = game->GetPC( i );
 		if (act) {
 			ieDword value;
-			*((unsigned short *) &value) = act->XPos;
-			*(((unsigned short *) &value)+1) = (unsigned short) act->YPos;
+			*((unsigned short *) &value) = act->Pos.x;
+			*(((unsigned short *) &value)+1) = act->Pos.y;
 			SetVariable( act, "LOCALSsavedlocation", value);
 		}
 	}
@@ -5643,9 +5642,9 @@ void GameScript::RestorePartyLocation(Scriptable* /*Sender*/, Action* /*paramete
 			ieDword value=CheckVariable( act, "LOCALSsavedlocation");
 			Map *map = game->GetCurrentMap();
 			//setting position, don't put actor on another actor
-			act->SetPosition( map, 
-				*((unsigned short *) &value),
-				*(((unsigned short *) &value)+1), -1 );
+			Point p = { *((unsigned short *) &value),
+				*(((unsigned short *) &value)+1) };
+			act->SetPosition( map, p , -1 );
 		}
 	}
 
@@ -5659,7 +5658,8 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	}
 	Region vp = core->GetVideoDriver()->GetViewport();
 	Actor* actor = ( Actor* ) Sender;
-	actor->WalkTo( vp.x+vp.w/2, vp.y+vp.h/2 );
+	Point p = {vp.x+vp.w/2, vp.y+vp.h/2};
+	actor->WalkTo( p );
 }
 
 void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
@@ -5669,7 +5669,8 @@ void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->WalkTo( Sender->XPos+parameters->XpointParameter, Sender->YPos+parameters->YpointParameter );
+	Point p = {Sender->Pos.x+parameters->pointParameter.x, Sender->Pos.y+parameters->pointParameter.y};
+	actor->WalkTo( p );
 }
 
 void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
@@ -5680,7 +5681,7 @@ void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	actor->RunAwayFrom( tar->XPos, tar->YPos, parameters->int0Parameter, false);
+	actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
 }
 
 void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
@@ -5692,7 +5693,7 @@ void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	//nointerrupt???
-	actor->RunAwayFrom( tar->XPos, tar->YPos, parameters->int0Parameter, false);
+	actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
 }
 
 void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
@@ -5702,7 +5703,7 @@ void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->RunAwayFrom( parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter, false);
+	actor->RunAwayFrom( parameters->pointParameter, parameters->int0Parameter, false);
 }
 
 void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
@@ -5728,7 +5729,7 @@ void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
 	printf( "Displaying string on: %s\n", Sender->GetScriptName() );
 	//no need of freeing this string up!!!
 	GameControl *gc = core->GetGameControl();
-	gc->DisplayString( parameters->XpointParameter, parameters->YpointParameter, core->GetString( parameters->int0Parameter, 2 ) );
+	gc->DisplayString( parameters->pointParameter, core->GetString( parameters->int0Parameter, 2 ) );
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
@@ -5766,8 +5767,7 @@ void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->Orientation = GetOrient( target->XPos, target->YPos,
-					actor->XPos, actor->YPos );
+	actor->Orientation = GetOrient( target->Pos, actor->Pos );
 	actor->resetAction = true;
 	actor->SetWait( 1 );
 }
@@ -5785,9 +5785,8 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	value = (ieDword) CheckVariable( target, parameters->string0Parameter );
-	unsigned short X = *(unsigned short *) &value;
-	unsigned short Y = *(((unsigned short *) &value)+1);
-	actor->Orientation = GetOrient( X, Y, actor->XPos, actor->YPos );
+	Point p = { *(unsigned short *) &value, *(((unsigned short *) &value)+1)};
+	actor->Orientation = GetOrient( p, actor->Pos );
 	actor->resetAction = true;
 	actor->SetWait( 1 );
 }
@@ -5854,14 +5853,14 @@ void GameScript::SetMusic(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
-	core->GetSoundMgr()->Play( parameters->string0Parameter, Sender->XPos,
-				Sender->YPos, parameters->int0Parameter );
+	core->GetSoundMgr()->Play( parameters->string0Parameter, Sender->Pos.x,
+				Sender->Pos.y, parameters->int0Parameter );
 }
 
 void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
-	core->GetSoundMgr()->Play( parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter );
+	core->GetSoundMgr()->Play( parameters->string0Parameter, parameters->pointParameter.x, parameters->pointParameter.y );
 }
 
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
@@ -5874,10 +5873,10 @@ void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 }
 
-void GameScript::CreateVisualEffectCore(int X, int Y, const char *effect)
+void GameScript::CreateVisualEffectCore(Point &position, const char *effect)
 {
 	DataStream* ds = core->GetResourceMgr()->GetResource( effect, IE_VVC_CLASS_ID );
-	ScriptedAnimation* vvc = new ScriptedAnimation( ds, true, X, Y );
+	ScriptedAnimation* vvc = new ScriptedAnimation( ds, position, true);
 	core->GetGame()->GetCurrentMap( )->AddVVCCell( vvc );
 }
 
@@ -5887,12 +5886,12 @@ void GameScript::CreateVisualEffectObject(Scriptable* Sender, Action* parameters
 	if (!tar) {
 		return;
 	}
-	CreateVisualEffectCore(tar->XPos, tar->YPos, parameters->string0Parameter);
+	CreateVisualEffectCore(tar->Pos, parameters->string0Parameter);
 }
 
 void GameScript::CreateVisualEffect(Scriptable* /*Sender*/, Action* parameters)
 {
-	CreateVisualEffectCore(parameters->XpointParameter, parameters->YpointParameter, parameters->string0Parameter);
+	CreateVisualEffectCore(parameters->pointParameter, parameters->string0Parameter);
 }
 
 void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
@@ -5911,8 +5910,8 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 			parameters->int2Parameter, parameters->int0Parameter );
 	}
 	else {
-		core->timer->SetScreenShake( parameters->XpointParameter,
-			parameters->YpointParameter, parameters->int0Parameter );
+		core->timer->SetScreenShake( parameters->pointParameter.x,
+			parameters->pointParameter.y, parameters->int0Parameter );
 	}
 	Sender->SetWait( parameters->int0Parameter );
 }
@@ -5932,6 +5931,20 @@ void GameScript::HideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 	if (gc) {
 		gc->HideGUI();
 	}
+}
+
+static const char *GetDialog(Scriptable* scr)
+{
+	switch(scr->Type) {
+		case ST_CONTAINER: case ST_DOOR:
+		case ST_PROXIMITY: case ST_TRAVEL: case ST_TRIGGER:
+			return ((Highlightable *) scr)->GetDialog();
+		case ST_ACTOR:
+			return ((Actor *) scr)->GetDialog();
+		case ST_GLOBAL:case ST_AREA:
+			return NULL;
+	}
+	return NULL;
 }
 
 static char PlayerDialogRes[9] = "PLAYERx\0";
@@ -5963,21 +5976,17 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 
 	//target could be other than Actor, we need to handle this too!
-	if (scr->Type != ST_ACTOR) {
-		Sender->CurrentAction = NULL;
-		return;
-	}
+	//if (scr->Type != ST_ACTOR) {
+	//	Sender->CurrentAction = NULL;
+	//	return;
+	//}
 	if(Flags&BD_CHECKDIST) {
 		if(Distance(Sender, tar)>40) {
-			Point p={tar->XPos, tar->YPos};
-			GoNearAndRetry(Sender, &p);
+			GoNearAndRetry(Sender, tar->Pos);
 			Sender->CurrentAction = NULL;
 			return;
 		}
 	}
-
-	Actor* actor = ( Actor* ) scr;
-	Actor* target = ( Actor* ) tar;
 
 	GameControl* gc = core->GetGameControl();
 	if (!gc) {
@@ -6004,24 +6013,30 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	switch (Flags & BD_LOCMASK) {
 		case BD_STRING0:
 			Dialog = parameters->string0Parameter;
-			if (Flags & BD_SETDIALOG)
-				actor->SetDialog( Dialog );
+			if (Flags & BD_SETDIALOG) {
+				if( scr->Type == ST_ACTOR) {
+					Actor* actor = ( Actor* ) scr;
+					actor->SetDialog( Dialog );
+				}
+			}
 			break;
 		case BD_SOURCE:
-			Dialog = actor->Dialog;
+			Dialog = GetDialog(scr); //actor->Dialog;
 			break;
 		case BD_TARGET:
-			Dialog = target->Dialog;
+			Dialog = GetDialog(tar);//target->Dialog;
 			break;
 		case BD_RESERVED:
 			PlayerDialogRes[5] = '1';
 			Dialog = ( const char * ) PlayerDialogRes;
 			break;
 		case BD_INTERACT: //using the source for the dialog
-			int pdtable = core->LoadTable( "interdia" );
-			char* scriptingname = actor->GetScriptName();
-			Dialog = core->GetTable( pdtable )->QueryField( scriptingname, "FILE" );
-			core->DelTable( pdtable );
+			if( scr->Type == ST_ACTOR) {
+				int pdtable = core->LoadTable( "interdia" );
+				char* scriptingname = ((Actor *) scr)->GetScriptName();
+				Dialog = core->GetTable( pdtable )->QueryField( scriptingname, "FILE" );
+				core->DelTable( pdtable );
+			}
 			break;
 	}
 
@@ -6033,23 +6048,25 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 
 	//we also need to freeze active scripts during a dialog!
-	if(Sender!=target) {
+	if(Sender!=tar) {
 		if (( Flags & BD_INTERRUPT )) {
-			target->ClearActions();
+			tar->ClearActions();
 		} else {
-			if (target->GetNextAction()) {
+			if (tar->GetNextAction()) {
 				core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 				return;
 			}
 		}
 	}
 
-	actor->Orientation = GetOrient( target->XPos, target->YPos, actor->XPos,
-							actor->YPos );
-	actor->resetAction = true; //im not sure this is needed
-	target->Orientation = GetOrient( actor->XPos, actor->YPos, target->XPos,
-							target->YPos );
-	target->resetAction = true;//nor this
+	if(scr->Type==ST_ACTOR) {
+		((Actor *)scr)->Orientation = GetOrient( tar->Pos, scr->Pos );
+		//scr->resetAction = true; //im not sure this is needed
+	}
+	if(tar->Type==ST_ACTOR) {
+		((Actor *)tar)->Orientation = GetOrient( scr->Pos, tar->Pos );
+		//tar->resetAction = true;//nor this
+	}
 
 	if (Dialog[0]) {
 		//increasing NumTimesTalkedTo
@@ -6057,12 +6074,11 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			gc->DialogueFlags|=DF_TALKCOUNT;
 		}
 
-	//	if(Flags & BD_TARGET) {
-		if( target->InParty!=1) {
-			gc->InitDialog( target, actor, Dialog );
+		if( (tar->Type != ST_ACTOR) || ( ((Actor *) tar)->InParty!=1) ) {
+			gc->InitDialog( (Actor *) tar, (Actor *) scr, Dialog );
 		}
 		else {
-			gc->InitDialog( actor, target, Dialog );
+			gc->InitDialog( (Actor *) scr, (Actor *) tar, Dialog );
 		}
 	}
 }
@@ -6211,10 +6227,10 @@ void GameScript::Interact(Scriptable* Sender, Action* parameters)
 	BeginDialog( Sender, parameters, BD_INTERACT | BD_SOURCE );
 }
 
-static Point* FindNearPoint(Scriptable* Sender, Point* p1, Point* p2, double& distance)
+static Point &FindNearPoint(Scriptable* Sender, Point &p1, Point &p2, double& distance)
 {
-	int distance1 = Distance(p1->x, p1->y, Sender);
-	int distance2 = Distance(p2->x, p2->y, Sender);
+	int distance1 = Distance(p1, Sender);
+	int distance2 = Distance(p2, Sender);
 	if (distance1 < distance2) {
 		distance = distance1;
 		return p1;
@@ -6278,7 +6294,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	double distance;
-	Point* p = FindNearPoint( Sender, &door->toOpen[0], &door->toOpen[1],
+	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
 				distance );
 	if (distance <= 40) {
 		//actually if we got the key, we could still open it
@@ -6320,7 +6336,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	double distance;
-	Point* p = FindNearPoint( Sender, &door->toOpen[0], &door->toOpen[1],
+	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
 				distance );	
 	if (distance <= 40) {
 		//actually if we got the key, we could still open it
@@ -6339,9 +6355,9 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 	Sender->CurrentAction = NULL;
 }
 
-void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, int X, int Y, int face, bool adjust)
+void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust)
 {
-	printf("MoveBetweenAreas: %s to %s [%d.%d] face: %d\n", actor->GetName(0), area,X,Y, face);
+	printf("MoveBetweenAreas: %s to %s [%d.%d] face: %d\n", actor->GetName(0), area,position.x,position.y, face);
 	Map* map2;
 	Game* game = core->GetGame();
 	if(area[0]) { //do we need to switch area?
@@ -6359,7 +6375,7 @@ void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, int X, int
 	else {
 		map2=game->GetMap(actor->Area);
 	}
-	actor->SetPosition(map2, X, Y, adjust);
+	actor->SetPosition(map2, position, adjust);
 	if (face !=-1) {
 		actor->Orientation = face;
 	}
@@ -6371,54 +6387,25 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if(parameters->string1Parameter[0]) {
-		CreateVisualEffectCore(Sender->XPos, Sender->YPos, parameters->string1Parameter);
+		CreateVisualEffectCore(Sender->Pos, parameters->string1Parameter);
 	}
 	MoveBetweenAreasCore((Actor *) Sender, parameters->string0Parameter,
-		parameters->XpointParameter, parameters->YpointParameter,
-		parameters->int0Parameter, true);
+		parameters->pointParameter, parameters->int0Parameter, true);
 }
 
-void GetPositionFromScriptable(Scriptable* scr, unsigned short& X,
-	unsigned short& Y)
+void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap)
 {
+	if(!trap) {
+		position = scr->Pos;
+		return;
+	}
 	switch (scr->Type) {
-		case ST_AREA:
-		case ST_GLOBAL:
-			X = Y = 0;
+		case ST_AREA: case ST_GLOBAL: case ST_ACTOR:
+			position = scr->Pos;
 			break;
-		case ST_TRIGGER:
-		case ST_PROXIMITY:
-		case ST_TRAVEL:
-			 {
-				InfoPoint* ip = ( InfoPoint* ) scr;
-				X = ip->TrapLaunchX;
-				Y = ip->TrapLaunchY;
-			}
-			break;
-
-		case ST_ACTOR:
-			 {
-				Actor* ac = ( Actor* ) scr;
-				X = ac->XPos;
-				Y = ac->YPos;
-			}
-			break;
-
-		case ST_DOOR:
-			 {
-				Door* door = ( Door* ) scr;
-				X = door->XPos;
-				Y = door->YPos;
-			}
-			break;
-
-		case ST_CONTAINER:
-			 {
-				Container* cont = ( Container* ) scr;
-				X = cont->trapTarget.x;
-				Y = cont->trapTarget.y;
-			}
-			break;
+		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
+		case ST_DOOR: case ST_CONTAINER:
+			position=((Highlightable *) scr)->TrapLaunch;
 	}
 }
 
@@ -6428,10 +6415,10 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	unsigned short sX,sY, dX,dY;
-	GetPositionFromScriptable( Sender, sX, sY );
-	GetPositionFromScriptable( tar, dX, dY );
-	printf( "ForceSpell from [%d,%d] to [%d,%d]\n", sX, sY, dX, dY );
+	Point s,d;
+	GetPositionFromScriptable( Sender, s, true );
+	GetPositionFromScriptable( tar, d, true );
+	printf( "ForceSpell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
 }
 
 void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
@@ -6706,7 +6693,7 @@ void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) tar;
 	//the LoadMos ResRef may be empty
 	strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
-	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter, true);
+	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 }
 
 void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
@@ -6717,7 +6704,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	//the LoadMos ResRef may be empty
 	strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
-	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter, true);
+	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 }
 
 void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
@@ -6731,13 +6718,13 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	//no need to change the pathfinder just for getting the entrance
 	Map *map = game->GetMap(actor->Area);
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
-	if (Distance(ent->XPos, ent->YPos, Sender) <= 40) {
+	if (Distance(ent->Pos, Sender) <= 40) {
 		LeaveAreaLUA(Sender, parameters);
 		return;
 	}
 	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
-	sprintf( Tmp, "MoveToPoint([%d.%d])", ent->XPos, ent->YPos );
+	sprintf( Tmp, "MoveToPoint([%d.%d])", ent->Pos.x, ent->Pos.y );
 	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
 }
 
@@ -6748,7 +6735,7 @@ void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	strncpy(core->GetGame()->LoadMos, parameters->string1Parameter,8);
-	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter, true);
+	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 }
 
 void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
@@ -6762,13 +6749,13 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	//no need to change the pathfinder just for getting the entrance
 	Map *map = game->GetMap( actor->Area );
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
-	if (Distance(ent->XPos, ent->YPos, Sender) <= 40) {
+	if (Distance(ent->Pos, Sender) <= 40) {
 		LeaveAreaLUAPanic(Sender, parameters);
 		return;
 	}
 	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
-	sprintf( Tmp, "MoveToPoint([%d.%d])", ent->XPos, ent->YPos );
+	sprintf( Tmp, "MoveToPoint([%d.%d])", ent->Pos.x, ent->Pos.y );
 	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
 }
 
@@ -7408,7 +7395,7 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 		gc->speaker = (Actor *) tar;
 	}
 	else {
-		printMessage("IEScript","Can't set gabber",YELLOW);
+		printMessage("IEScript","Can't set gabber!",YELLOW);
 	}
 }
 
@@ -7499,9 +7486,7 @@ int GameScript::MoveItemCore(Scriptable *Sender, Scriptable *target, const char 
 		return MIC_NOITEM;
 	if ( 2 != myinv->AddSlotItem(item, -1)) {
 		// drop it at my feet
-		int x = Sender->XPos;
-		int y = Sender->YPos;
-		map->tm->AddItemToLocation(x, y, item);
+		map->tm->AddItemToLocation(Sender->Pos, item);
 		return MIC_FULL;
 	}
 	return MIC_GOTITEM;
@@ -7626,10 +7611,8 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 	}
 	CreateItemCore(item, parameters->string0Parameter, -1, 0, 0);
 	if (2 != scr->inventory.AddSlotItem(item,slot)) {
-		int x = Sender->XPos;
-		int y = Sender->YPos;
 		Map *map=core->GetGame()->GetMap(((Actor *) scr)->Area);
-		map->tm->AddItemToLocation(x, y, item);
+		map->tm->AddItemToLocation(Sender->Pos, item);
 	}
 }
 
@@ -7669,18 +7652,16 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 	if(Sender->Type!=ST_ACTOR) {
 		return;
 	}
-	if (Distance(Sender->XPos, Sender->YPos, Sender) > 10) {
-		Point p={parameters->XpointParameter, parameters->YpointParameter};
-		GoNearAndRetry(Sender, &p);
+	if (Distance(parameters->pointParameter, Sender) > 10) {
+		GoNearAndRetry(Sender, parameters->pointParameter);
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	Actor *scr = (Actor *) Sender;
 	Map *map = core->GetGame()->GetMap(scr->Area);
 	//dropping location isn't exactly our place, this is why i didn't use
-	//scr->DropItem(parameters->string0Parameter,0);
 	scr->inventory.DropItemAtLocation(parameters->string0Parameter, 0, map,
-		parameters->XpointParameter, parameters->YpointParameter);
+		parameters->pointParameter);
 	Sender->CurrentAction = NULL;
 }
 
@@ -7846,8 +7827,7 @@ void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Moveble *movable = (Moveble *) tar; //not actor, though it is the only moveable
-	movable->XDes=parameters->XpointParameter;
-	movable->YDes=parameters->YpointParameter;
+	movable->Destination = parameters->pointParameter;
 	//no movement should be started here, i think
 }
 

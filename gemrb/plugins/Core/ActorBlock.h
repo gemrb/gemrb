@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.45 2004/08/22 22:10:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.46 2004/09/12 21:58:47 avenger_teambg Exp $
  *
  */
 
@@ -58,14 +58,14 @@ class Door;
 #define TRAP_RESET      2
 #define TRAVEL_PARTY    4
 #define TRAP_DETECTABLE 8
-//#define TRAP_16         16
-//#define TRAP_32         32
-#define TRAP_NPC        64
-//#define TRAP_128        128
+//#define TRAP_16	 16
+//#define TRAP_32	 32
+#define TRAP_NPC	64
+//#define TRAP_128	128
 #define TRAP_DEACTIVATED  256
 #define TRAVEL_NONPC      512
 //#define TRAP_1024       1024 //override?
-#define INFO_DOOR         2048 //info trigger linked to door
+#define INFO_DOOR	 2048 //info trigger linked to door
 
 //door flags
 #define DOOR_CLOSED      1
@@ -101,7 +101,7 @@ private:
 public:
 	Variables* locals;
 	ScriptableType Type;
-	unsigned short XPos, YPos;
+	Point Pos;
 	Scriptable* MySelf;
 	Scriptable* CutSceneId;
 	GameScript* Scripts[MAX_SCRIPTS];
@@ -121,7 +121,7 @@ public:
 public:
 	void SetScript(const char* aScript, int idx);
 	void SetWait(unsigned long time);
-	void SetPosition(unsigned short XPos, unsigned short YPos);
+	void SetPosition(Point &Pos);
 	void SetMySelf(Scriptable* MySelf);
 	char* GetScriptName();
 	void SetScript(int index, GameScript* script);
@@ -148,9 +148,9 @@ public:
 	Color overColor;
 	int size;
 public:
-	void SetBBox(Region newBBox);
+	void SetBBox(Region &newBBox);
 	void DrawCircle();
-	bool IsOver(unsigned short XPos, unsigned short YPos);
+	bool IsOver(Point &Pos);
 	void SetOver(bool over);
 	bool IsSelected();
 	void Select(bool Value);
@@ -166,16 +166,23 @@ public:
 	Color outlineColor;
 	unsigned long Cursor;
 	bool Highlight;
+	char DialogResRef[9];
+	Point TrapLaunch;
 public:
-	bool IsOver(unsigned short XPos, unsigned short YPos);
+	bool IsOver(Point &Pos);
 	void DrawOutline();
+	/** Gets the Dialog ResRef */
+	const char* GetDialog(void)
+	{
+		return DialogResRef;
+	}
 };
 
 class GEM_EXPORT Moveble : public Selectable {
 public:
 	Moveble(ScriptableType type);
 	virtual ~Moveble(void);
-	unsigned short XDes, YDes;
+	Point Destination;
 	unsigned char Orientation;
 	unsigned char StanceID;
 	PathNode* path;
@@ -187,10 +194,10 @@ public:
 	int InternalFlags;
 public:
 	void DoStep();
-	void AddWayPoint(unsigned short XDes, unsigned short YDes);
-	void RunAwayFrom(unsigned short XDes, unsigned short YDes, int PathLength, bool Backing);
-	void WalkTo(unsigned short XDes, unsigned short YDes);
-	void MoveTo(unsigned short XDes, unsigned short YDes);
+	void AddWayPoint(Point &Des);
+	void RunAwayFrom(Point &Des, int PathLength, bool Backing);
+	void WalkTo(Point &Des);
+	void MoveTo(Point &Des);
 	void ClearPath();
 	void DrawTargetPoint();
 };
@@ -238,7 +245,6 @@ public:
 	unsigned short TrapRemovalDiff;
 	unsigned short Trapped;
 	unsigned short TrapDetected;
-	Point trapTarget;
 	Inventory inventory;
 };
 
@@ -256,6 +262,7 @@ public:
 	//checks if the actor may use this travel trigger
 	int CheckTravel(Actor *actor);
 	void DebugDump();
+
 public:
 	char Name[33];
 	char Destination[9];
@@ -265,9 +272,7 @@ public:
 	unsigned short TrapRemovalDifficulty;
 //	unsigned short Trapped;
 	unsigned short TrapDetected;
-	unsigned short TrapLaunchX, TrapLaunchY;
 	char KeyResRef[9];
-	char DialogResRef[9];
 };
 
 #endif

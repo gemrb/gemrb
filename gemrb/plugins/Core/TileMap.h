@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.24 2004/05/01 00:07:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.25 2004/09/12 21:58:48 avenger_teambg Exp $
  *
  */
 
@@ -101,21 +101,20 @@ public:
 	Door* AddDoor(char* Name, unsigned long Flags, int ClosedIndex,
 		unsigned short* indexes, int count, Gem_Polygon* open,
 		Gem_Polygon* closed);
-	Door* GetDoor(unsigned short x, unsigned short y);
+	Door* GetDoor(Point &position);
 	Door* GetDoor(unsigned int idx);
 	Door* GetDoor(const char* Name);
 
 	Container* AddContainer(char* Name, unsigned short Type,
 		Gem_Polygon* outline);
 	/* type is an optional filter for container type*/
-	Container* GetContainer(unsigned short x, unsigned short y, int type=-1);
+	Container* GetContainer(Point &position, int type=-1);
 	Container* GetContainer(const char* Name);
 	Container* GetContainer(unsigned int idx);
-	void AddItemToLocation(unsigned short x, unsigned short y, CREItem *item);
-
+	void AddItemToLocation(Point &position, CREItem *item);
 	InfoPoint* AddInfoPoint(char* Name, unsigned short Type,
 		Gem_Polygon* outline);
-	InfoPoint* GetInfoPoint(unsigned short x, unsigned short y);
+	InfoPoint* GetInfoPoint(Point &position);
 	InfoPoint* GetInfoPoint(const char* Name);
 	InfoPoint* GetInfoPoint(unsigned int idx);
 

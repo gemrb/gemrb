@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.cpp,v 1.10 2004/08/02 18:00:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.cpp,v 1.11 2004/09/12 21:58:48 avenger_teambg Exp $
  *
  */
 
@@ -70,6 +70,25 @@ Region::Region(int x, int y, int w, int h)
 	this->y = y;
 	this->w = w;
 	this->h = h;
+}
+
+Region::Region(const Point &p, int w, int h)
+{
+	this->x = p.x;
+	this->y = p.y;
+	this->w = w;
+	this->h = h;
+}
+
+bool Region::PointInside(Point &p)
+{
+	if (( p.x < x ) || ( p.x > ( x + w ) )) {
+		return false;
+	}
+	if (( p.y < y ) || ( p.y > ( y + h ) )) {
+		return false;
+	}
+	return true;
 }
 
 bool Region::PointInside(unsigned short XPos, unsigned short YPos)

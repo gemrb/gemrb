@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.6 2004/08/08 05:11:32 divide Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.7 2004/09/12 21:58:48 avenger_teambg Exp $
  */
 #ifndef POLYGON_H
 #define POLYGON_H
@@ -46,7 +46,8 @@ public:
 	Point* points;
 	int count;
 	Sprite2D* fill;
-	bool PointIn(unsigned short x, unsigned short y);
+	bool PointIn(Point &p);
+	bool PointIn(int x, int y);
 	void RecalcBBox();
 };
 

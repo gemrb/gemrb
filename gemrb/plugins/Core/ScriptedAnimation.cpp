@@ -3,8 +3,7 @@
 #include "AnimationMgr.h"
 #include "Interface.h"
 
-ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree,
-	long X, long Y)
+ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree)
 {
 	anims[0] = NULL;
 	anims[1] = NULL;
@@ -58,8 +57,8 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree,
 	anims[1] = aM->GetAnimation( ( unsigned char ) seq2, 0, 0 );
 	//anims[0] = af->GetCycle((unsigned char)seq1);
 	//anims[1] = af->GetCycle((unsigned char)seq2);
-	XPos += X;
-	YPos += Y;
+	XPos += p.x;
+	YPos += p.y;
 	if (anims[0]) {
 		anims[0]->autoSwitchOnEnd = true;
 		//anims[1]->autoSwitchOnEnd = true;

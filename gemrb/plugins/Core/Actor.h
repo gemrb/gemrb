@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.48 2004/09/12 11:15:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.49 2004/09/12 21:58:47 avenger_teambg Exp $
  *
  */
 
@@ -169,7 +169,7 @@ public:
 	/** prints useful information on console */
 	void DebugDump();
 	/** sets the actor's position, calculating with the nojump flag*/
-	void SetPosition(Map *map, unsigned int XPos, unsigned int YPos, int jump, int radius=0);
+	void SetPosition(Map *map, Point &position, int jump, int radius=0);
 	/* you better use SetStat, this stuff is only for special cases*/
 	void SetAnimationID(unsigned int AnimID);
 	/** returns the animations */
@@ -254,7 +254,7 @@ public:
 	int GetXPLevel(int modified);
 
 	/** Gets the Dialog ResRef */
-	char* GetDialog(void)
+	const char* GetDialog(void)
 	{
 		return Dialog;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.208 2004/09/12 11:15:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.209 2004/09/12 21:58:49 avenger_teambg Exp $
  *
  */
 
@@ -2186,8 +2186,8 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 	if(game) {
 		Scriptable *pc=game->GetPC(game->GetSelectedPCSingle());
 		if(pc) {
-			XPos=pc->XPos;
-			YPos=pc->YPos;
+			XPos=pc->Pos.x;
+			YPos=pc->Pos.y;
 			flags |= GEM_SND_SPEECH;
 		}
 	}
@@ -3246,10 +3246,8 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	playmode *= 2;
 	int saindex = core->LoadTable( "STARTPOS" );
 	TableMgr* strta = core->GetTable( saindex );
-	MyActor->XPos = MyActor->XDes = atoi( strta->QueryField( playmode,
-													PlayerSlot ) );
-	MyActor->YPos = MyActor->YDes = atoi( strta->QueryField( playmode + 1,
-													PlayerSlot ) );
+	MyActor->Pos.x = MyActor->Destination.x = atoi( strta->QueryField( playmode, PlayerSlot ) );
+	MyActor->Pos.y = MyActor->Destination.y = atoi( strta->QueryField( playmode + 1, PlayerSlot ) );
 	MyActor->SetOver( false );
 	//core->GetGame()->SetPC(MyActor);
 	core->DelTable( saindex );
