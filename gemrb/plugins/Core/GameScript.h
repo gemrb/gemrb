@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.131 2004/08/19 21:14:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.132 2004/08/20 11:37:55 avenger_teambg Exp $
  *
  */
 
@@ -797,6 +797,8 @@ public: //Script Functions
 	static int ExtraProficiencyGT(Scriptable* Sender, Trigger* parameters);
 	static int ExtraProficiencyLT(Scriptable* Sender, Trigger* parameters);
 	static int Faction(Scriptable* Sender, Trigger* parameters);
+	static int FallenPaladin(Scriptable* Sender, Trigger* parameters);
+	static int FallenRanger(Scriptable* Sender, Trigger* parameters);
 	static int False(Scriptable* Sender, Trigger* parameters);
 	static int Gender(Scriptable* Sender, Trigger* parameters);
 	static int General(Scriptable* Sender, Trigger* parameters);
@@ -941,6 +943,9 @@ public:
 	static void AddXPObject(Scriptable *Sender, Action* parameters);
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
+	static void ApplyDamage(Scriptable* Sender, Action* parameters);
+	static void ApplyDamagePercent(Scriptable* Sender, Action* parameters);
+	static void BattleSong(Scriptable* Sender, Action* parameters);
 	static void BitClear(Scriptable* Sender, Action* parameters);
 	static void BitGlobal(Scriptable* Sender, Action* parameters);
 	static void ChangeAIScript(Scriptable* Sender, Action* parameters);
@@ -971,6 +976,7 @@ public:
 	static void CreateVisualEffectObject(Scriptable* Sender,
 		Action* parameters);
 	static void CutSceneID(Scriptable* Sender, Action* parameters);
+	static void Damage(Scriptable* Sender, Action* parameters);
 	static void Deactivate(Scriptable* Sender, Action* parameters);
 	static void Debug(Scriptable* Sender, Action* parameters);
 	static void DestroyAllDestructableEquipment(Scriptable* Sender, Action* parameters);
@@ -1122,7 +1128,7 @@ public:
 	static void SetRestEncounterProbabilityNight(Scriptable* Sender, Action* parameters);
 	static void SetTeam(Scriptable* Sender, Action* parameters);
 	static void SetTextColor(Scriptable* Sender, Action* parameters);
-
+	static void SetToken(Scriptable* Sender, Action* parameters);
 	static void SetTokenGlobal(Scriptable* Sender, Action* parameters);
 	static void SetVisualRange(Scriptable* Sender, Action* parameters);
 	static void SG(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.60 2004/08/19 21:14:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.61 2004/08/20 11:37:50 avenger_teambg Exp $
  *
  */
 
@@ -362,7 +362,8 @@ int Actor::NewStat(unsigned int StatIndex, long ModifierValue,
 int Actor::Damage(int damage, int damagetype, Actor *hitter)
 {
 //recalculate damage based on resistances and difficulty level
-	NewStat(IE_HITPOINTS,-damage, MOD_ADDITIVE);
+//the lower 2 bits are actually modifier types
+	NewStat(IE_HITPOINTS,-damage, damagetype&3);
 	LastDamageType=damagetype;
 	LastDamage=damage;
 	LastHitter=hitter;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.184 2004/08/19 21:14:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.185 2004/08/20 11:37:51 avenger_teambg Exp $
  *
  */
 
@@ -94,6 +94,8 @@ static TriggerLink triggernames[] = {
 	{"extraproficiencygt", GameScript::ExtraProficiencyGT,0},
 	{"extraproficiencylt", GameScript::ExtraProficiencyLT,0},
 	{"faction", GameScript::Faction,0},
+	{"fallenpaladin", GameScript::FallenPaladin,0},
+	{"fallenranger", GameScript::FallenRanger,0},
 	{"false", GameScript::False,0},
 	{"gender", GameScript::Gender,0},
 	{"general", GameScript::General,0},
@@ -247,7 +249,10 @@ static ActionLink actionnames[] = {
 	{"addxpvar", GameScript::AddXP2DA,0},
 	{"ally", GameScript::Ally,0},
 	{"ambientactivate", GameScript::AmbientActivate,0},
+	{"applydamage", GameScript::ApplyDamage,0},
+	{"applydamagepercent", GameScript::ApplyDamagePercent,0},
 	{"bashdoor", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
+	{"battlesong", GameScript::BattleSong,0},
 	{"bitclear", GameScript::BitClear,AF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal,AF_MERGESTRINGS},
 	{"bitset", GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
@@ -280,6 +285,7 @@ static ActionLink actionnames[] = {
 	{"createvisualeffect", GameScript::CreateVisualEffect,0},
 	{"createvisualeffectobject", GameScript::CreateVisualEffectObject,0},
 	{"cutsceneid", GameScript::CutSceneID,AF_INSTANT},
+	{"damage", GameScript::Damage,0},
 	{"deactivate", GameScript::Deactivate,0},
 	{"debug", GameScript::Debug,0},
 	{"debugoutput", GameScript::Debug,0},
@@ -460,6 +466,7 @@ static ActionLink actionnames[] = {
 	{"setsavedlocationpoint", GameScript::SaveLocation, 0},
 	{"setteam", GameScript::SetTeam,0},
 	{"settextcolor", GameScript::SetTextColor,0},
+	{"settoken", GameScript::SetToken,0},
 	{"settokenglobal", GameScript::SetTokenGlobal,AF_MERGESTRINGS},
 	{"setvisualrange", GameScript::SetVisualRange,0},
 	{"sg", GameScript::SG,0},
@@ -4605,8 +4612,26 @@ int GameScript::HitBy(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::FallenPaladin(Scriptable* Sender, Trigger* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* act = ( Actor* ) Sender;
+	return (act->GetStat(IE_MC_FLAGS) & MC_FALLEN_PALADIN)!=0;
+}
+
+int GameScript::FallenRanger(Scriptable* Sender, Trigger* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* act = ( Actor* ) Sender;
+	return (act->GetStat(IE_MC_FLAGS) & MC_FALLEN_RANGER)!=0;
+}
+
 //-------------------------------------------------------------
-// Action* Functions
+// Action Functions
 //-------------------------------------------------------------
 
 void GameScript::SetExtendedNight(Scriptable* /*Sender*/, Action* parameters)
@@ -5576,6 +5601,12 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
+void GameScript::BattleSong(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	Map *map=core->GetGame()->GetCurrentMap();
+	map->PlayAreaSong(3); //battlesong is in slot 3
+}
+
 void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 }
@@ -6494,17 +6525,19 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
 }
 
+void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->GetTokenDictionary()->SetAt( parameters->string1Parameter, core->GetString( parameters->int0Parameter) );
+}
+
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
-	char varname[33]; //this is the Token Name
-	strncpy( varname, parameters->string1Parameter, 32 );
-	varname[32] = 0;
 	char tmpstr[10];
 	sprintf( tmpstr, "%d", value );
 	char* newvalue = ( char* ) malloc( strlen( tmpstr ) + 1 );
 	strcpy( newvalue, tmpstr );
-	core->GetTokenDictionary()->SetAt( varname, newvalue );
+	core->GetTokenDictionary()->SetAt( parameters->string1Parameter, newvalue );
 }
 
 void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
@@ -7430,17 +7463,84 @@ void GameScript::SetRestEncounterChance(Scriptable * /*Sender*/, Action* paramet
 	map->RestHeader.NightChance = parameters->int1Parameter;
 }
 
-void GameScript::QuitGame(Scriptable * /*Sender*/, Action* /*parameters*/)
+void GameScript::QuitGame(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	core->QuitGame(true);
 }
 
-void GameScript::StopMoving(Scriptable *Sender, Action* /*parameters*/)
+void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)
 {
 	if(Sender->Type!=ST_ACTOR) {
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
 	actor->ClearPath();
+}
+
+void GameScript::ApplyDamage(Scriptable* Sender, Action* parameters)
+{
+	Actor *damagee;
+	Actor *damager;
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if(!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	damagee = (Actor *) tar;
+	if(Sender->Type==ST_ACTOR) {
+		damager=(Actor *) Sender;
+	}
+	else {
+		damager=damagee;
+	}
+	damagee->Damage(parameters->int0Parameter, parameters->int1Parameter, damager);
+}
+
+void GameScript::ApplyDamagePercent(Scriptable* Sender, Action* parameters)
+{
+	Actor *damagee;
+	Actor *damager;
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if(!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	damagee = (Actor *) tar;
+	if(Sender->Type==ST_ACTOR) {
+		damager=(Actor *) Sender;
+	}
+	else {
+		damager=damagee;
+	}
+	damagee->Damage(damagee->GetStat(IE_HITPOINTS)*parameters->int0Parameter/100, parameters->int1Parameter, damager);
+}
+
+void GameScript::Damage(Scriptable* Sender, Action* parameters)
+{
+	Actor *damagee;
+	Actor *damager;
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if(!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	damagee = (Actor *) tar;
+	if(Sender->Type==ST_ACTOR) {
+		damager=(Actor *) Sender;
+	}
+	else {
+		damager=damagee;
+	}
+	int damage = core->Roll( (parameters->int1Parameter>>12)&15, (parameters->int1Parameter>>4)&255, parameters->int1Parameter&15 );
+	int type=MOD_ADDITIVE;
+	switch(parameters->int0Parameter) {
+	case 2: //raise
+		damage=-damage;
+		break;
+	case 3: //set
+		type=MOD_ABSOLUTE;
+		break;
+	case 4: //
+		type=MOD_PERCENT;
+		break;
+	}
+	damagee->Damage( damage, type, damager );
 }
 
