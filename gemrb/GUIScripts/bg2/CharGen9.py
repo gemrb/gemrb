@@ -158,7 +158,7 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_METAL_COLOR, 0x1B )
 	GemRB.SetPlayerStat(MyChar, IE_LEATHER_COLOR, 0x16 )
 	GemRB.SetPlayerStat(MyChar, IE_ARMOR_COLOR, 0x17 )
-	GemRB.SetPlayerStat(MyChar, IE_STR, GemRB.GetVar("Ability 1")
+	GemRB.SetPlayerStat(MyChar, IE_STR, GemRB.GetVar("Ability 1"))
 	if Str==18:
 		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,GemRb.GetVar("StrExtra")
 	else

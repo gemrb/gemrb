@@ -276,7 +276,7 @@ def AcceptPress():
 	GemRB.SetPlayerStat(MyChar, IE_CHR, Cha)
 
 	#don't add con bonus, it will be calculated by the game
-	GemRB.SetPlayerStat(MyChar, IE_HP, 20 + (Con-10)*2)
+	GemRB.SetPlayerStat(MyChar, IE_HITPOINTS, 20 + (Con-10)*2)
 
 	GemRB.FillPlayerInfo(MyChar) #does all the rest
 	#LETS PLAY!!
