@@ -1,6 +1,7 @@
 import GemRB
 
 from GUICommonWindows import *
+import GUICommonWindows
 from GUIJRNL import *
 from GUIMA import *
 from GUIMG import *
@@ -21,7 +22,10 @@ def OnLoad():
 	MessageTA = GemRB.GetControl(MessageWindow, 1)
 	GemRB.SetTAAutoScroll(MessageWindow, MessageTA, 1)
 
-	ActionsWindow = PortraitWindow = GemRB.LoadWindow(1)
+	OpenPortraitWindow()
+	ActionsWindow = PortraitWindow = GUICommonWindows.PortraitWindow
+
+	#ActionsWindow = PortraitWindow = GemRB.LoadWindow(1)
 	
 	GemRB.SetVar("MessageWindow", MessageWindow)
 	GemRB.SetVar("PortraitWindow", PortraitWindow)
@@ -32,11 +36,9 @@ def OnLoad():
 	GemRB.SetVar("OptionsPosition", -1) #already handled in messagewindow
 	GemRB.SetVar("OtherPosition", 3) #Top
 	GemRB.SetVar("MessagePosition", 4)
-	GemRB.SetVar("PortraitPosition", 4)
 
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	
-	PopulatePortraitWindow(PortraitWindow)
 	SetupActionsWindowControls (ActionsWindow)
 	SetupMenuWindowControls (OptionsWindow)
 
