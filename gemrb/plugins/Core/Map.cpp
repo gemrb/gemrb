@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.58 2004/01/04 22:25:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.59 2004/01/05 12:07:10 balrog994 Exp $
  *
  */
 
@@ -64,9 +64,15 @@ void InitPathFinder()
 Map::Map(void) : Scriptable(ST_AREA)
 {
 	tm = NULL;
-	queue = NULL;
-	Qcount = 0;
-	lastActorCount = 0;
+	queue[0] = NULL;
+	queue[1] = NULL;
+	queue[2] = NULL;
+	Qcount[0] = 0;
+	Qcount[1] = 0;
+	Qcount[2] = 0;
+	lastActorCount[0] = 0;
+	lastActorCount[1] = 0;
+	lastActorCount[2] = 0;
 	justCreated = true;
 	if(!PathFinderInited) 
 		InitPathFinder();
@@ -88,8 +94,10 @@ Map::~Map(void)
 	}
 	core->FreeInterface(LightMap);
 	core->FreeInterface(SearchMap);
-	if(queue)
-		delete(queue);
+	for(int i = 0; i < 3; i++) {
+		if(queue[i])
+			delete(queue[i]);
+	}
 }
 
 void Map::AddTileMap(TileMap * tm, ImageMgr * lm, ImageMgr * sr)
@@ -99,26 +107,36 @@ void Map::AddTileMap(TileMap * tm, ImageMgr * lm, ImageMgr * sr)
 	SearchMap = sr;
 }
 
-void Map::DrawMap(Region viewport)
+void Map::DrawMap(Region viewport, GameControl * gc)
 {	
+	//Draw the Map
 	if(tm)
 		tm->DrawOverlay(0, viewport);
+	//Run the Map Script
 	if(Scripts[0])
 		Scripts[0]->Update();
+	//Execute Pending Actions
 	ProcessActions();
+	//Check if we need to start some trigger scripts
 	int ipCount = 0;
 	while(true) {
 		int count;
+		//For each InfoPoint in the map
 		InfoPoint * ip = tm->GetInfoPoint(ipCount++);
 		if(!ip)
 			break;
 		if(!ip->Active)
 			continue;
+		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
 		if(!ip->Scripts[0] && (ip->Type != ST_TRAVEL))
 			continue;
+		//Execute Pending Actions
 		ip->ProcessActions();
+		//If this InfoPoint is a Switch Trigger
 		if(ip->Type == ST_TRIGGER) {
+			//Check if this InfoPoint was activated
 			if(ip->Clicker)
+				//Run the InfoPoint script
 				ip->Scripts[0]->Update();
 			continue;
 		}
@@ -172,73 +190,80 @@ void Map::DrawMap(Region viewport)
 			}
 		}
 	}
+	//Blit the Map Animations
 	Video * video = core->GetVideoDriver();
 	for(unsigned int i = 0; i < animations.size(); i++) {
-		//TODO: Clipping Animations off screen
 		if(animations[i]->Active)
 			video->BlitSpriteMode(animations[i]->NextFrame(), animations[i]->x+viewport.x, animations[i]->y+viewport.y, animations[i]->BlitMode, false, &viewport);
 	}
+	//Draw Selected Door Outline
+	if(gc->overDoor)
+		gc->overDoor->DrawOutline();
+	if(gc->overContainer)
+		gc->overContainer->DrawOutline();
 	Region vp = video->GetViewport();
 	Region Screen = vp;
 	Screen.x = viewport.x;
 	Screen.y = viewport.y;
-	GenerateQueue();
-	while(true) {
-		Actor * actor = GetRoot();
-		if(!actor)
-			break;
-		actor->ProcessActions();
-		actor->DoStep(LightMap);
-		CharAnimations * ca = actor->GetAnims();
-		if(!ca)
-			continue;
-		Animation * anim = ca->GetAnimation(actor->AnimID, actor->Orientation);
-		if((!actor->Modified[IE_NOCIRCLE]) && (!(actor->Modified[IE_STATE_ID]&STATE_DEAD)))
-			actor->DrawCircle();
-		if(anim) {
-			Sprite2D * nextFrame = anim->NextFrame();
-			if(nextFrame) {
-				if(actor->lastFrame != nextFrame) {
-					Region newBBox;
-					newBBox.x = actor->XPos-nextFrame->XPos;
-					newBBox.w = nextFrame->Width;
-					newBBox.y = actor->YPos-nextFrame->YPos;
-					newBBox.h = nextFrame->Height;
-					actor->lastFrame = nextFrame;
-					actor->SetBBox(newBBox);
+	for(int q = 0; q < 3; q++) {
+		GenerateQueue(q);
+		while(true) {
+			Actor * actor = GetRoot(q);
+			if(!actor)
+				break;
+			actor->ProcessActions();
+			actor->DoStep(LightMap);
+			CharAnimations * ca = actor->GetAnims();
+			if(!ca)
+				continue;
+			Animation * anim = ca->GetAnimation(actor->AnimID, actor->Orientation);
+			if((!actor->Modified[IE_NOCIRCLE]) && (!(actor->Modified[IE_STATE_ID]&STATE_DEAD)))
+				actor->DrawCircle();
+			if(anim) {
+				Sprite2D * nextFrame = anim->NextFrame();
+				if(nextFrame) {
+					if(actor->lastFrame != nextFrame) {
+						Region newBBox;
+						newBBox.x = actor->XPos-nextFrame->XPos;
+						newBBox.w = nextFrame->Width;
+						newBBox.y = actor->YPos-nextFrame->YPos;
+						newBBox.h = nextFrame->Height;
+						actor->lastFrame = nextFrame;
+						actor->SetBBox(newBBox);
+					}
+					if(!actor->BBox.InsideRegion(vp))
+						continue;
+					int ax = actor->XPos, ay = actor->YPos;
+					int cx = ax/16;
+					int cy = ay/12;
+					Color tint = LightMap->GetPixel(cx, cy);
+					tint.a = 0xA0;
+					video->BlitSpriteTinted(nextFrame, ax+viewport.x, ay+viewport.y, tint, &Screen);
+					if(anim->endReached && anim->autoSwitchOnEnd) {
+						actor->AnimID = anim->nextAnimID;
+						anim->autoSwitchOnEnd = false;
+					}
 				}
-				if(!actor->BBox.InsideRegion(vp))
-					continue;
-				int ax = actor->XPos, ay = actor->YPos;
-				int cx = ax/16;
-				int cy = ay/12;
-				Color tint = LightMap->GetPixel(cx, cy);
-				tint.a = 0xA0;
-				video->BlitSpriteTinted(nextFrame, ax+viewport.x, ay+viewport.y, tint, &Screen);
-				if(anim->endReached && anim->autoSwitchOnEnd) {
-					actor->AnimID = anim->nextAnimID;
-					anim->autoSwitchOnEnd = false;
+			}
+			if(actor->textDisplaying) {
+				unsigned long time;
+				GetTime(time);
+				if((time - actor->timeStartDisplaying) >= 6000) {
+					actor->textDisplaying = 0;
+				}
+				if(actor->textDisplaying == 1) {
+					Font * font = core->GetFont(9);
+					Region rgn(actor->XPos-100+viewport.x, actor->YPos-100+viewport.y, 200, 400);
+					font->Print(rgn, (unsigned char*)actor->overHeadText, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false);
 				}
 			}
-		}
-		if(actor->textDisplaying) {
-			unsigned long time;
-			GetTime(time);
-			if((time - actor->timeStartDisplaying) >= 6000) {
-				actor->textDisplaying = 0;
+			for(int i = 0; i < 5; i++) {
+				if(actor->Scripts[i])
+					actor->Scripts[i]->Update();
 			}
-			if(actor->textDisplaying == 1) {
-				Font * font = core->GetFont(9);
-				Region rgn(actor->XPos-100+viewport.x, actor->YPos-100+viewport.y, 200, 400);
-				font->Print(rgn, (unsigned char*)actor->overHeadText, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false);
-			}
+			if(actor->DeleteMe)
+				DeleteActor(actor);
 		}
-		for(int i = 0; i < 5; i++) {
-			if(actor->Scripts[i])
-				actor->Scripts[i]->Update();
-		}
-		if(actor->DeleteMe)
-			DeleteActor(actor);
 	}
 	for(unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation * vvc = vvcCells.at(i);
@@ -383,77 +408,81 @@ void Map::AddWallGroup(WallGroup * wg)
 	wallGroups.push_back(wg);
 }
 
-void Map::GenerateQueue()
+void Map::GenerateQueue(int priority)
 {
-	if(lastActorCount != actors.size()) {
-		if(queue)
-			delete(queue);
-		queue = new Actor*[actors.size()];
-		lastActorCount = (int)actors.size();
+	if(lastActorCount[priority] != actors.size()) {
+		if(queue[priority])
+			delete(queue[priority]);
+		queue[priority] = new Actor*[actors.size()];
+		lastActorCount[priority] = (int)actors.size();
 	}
-	Qcount = 0;
+	Qcount[priority] = 0;
 	for(unsigned int i = 0; i < actors.size(); i++) {
 		Actor * actor = actors.at(i);
-		Qcount++;
-		queue[Qcount-1] = actor;
-		int lastPos = Qcount;
+		switch(priority) {
+			case 0: //Top Priority
+				{
+					if(actor->AnimID != IE_ANI_SLEEP)
+						continue;
+				}
+			break;
+
+			case 1: //Normal Priority
+				{
+					if(actor->AnimID == IE_ANI_SLEEP)
+						continue;
+				}
+			break;
+			
+			case 2:
+				{
+					continue;
+				}
+			break;
+		} 
+		Qcount[priority]++;
+		queue[priority][Qcount[priority]-1] = actor;
+		int lastPos = Qcount[priority];
 		while(lastPos != 1) {
 			int parentPos = (lastPos/2)-1;
-			Actor * parent = queue[parentPos];
-			if(actor->AnimID == IE_ANI_SLEEP) {
-				queue[parentPos] = actor;
-				queue[lastPos-1] = parent;
+			Actor * parent = queue[priority][parentPos];
+			if(actor->YPos < parent->YPos) {
+				queue[priority][parentPos] = actor;
+				queue[priority][lastPos-1] = parent;
 				lastPos = parentPos+1;
-			} else {
-				if(parent->AnimID == IE_ANI_SLEEP)
-					break;
-				if(actor->YPos < parent->YPos) {
-				queue[parentPos] = actor;
-				queue[lastPos-1] = parent;
-				lastPos = parentPos+1;
-				}
-				else
-					break;
 			}
+			else
+				break;
 		}
 	}
 }
 
-Actor * Map::GetRoot()
+Actor * Map::GetRoot(int priority)
 {
-	if(Qcount==0)
+	if(Qcount[priority]==0)
 		return NULL;
-	Actor * ret = queue[0];
-	Actor * node = queue[0] = queue[Qcount-1];
-	Qcount--;
+	Actor * ret = queue[priority][0];
+	Actor * node = queue[priority][0] = queue[priority][Qcount[priority]-1];
+	Qcount[priority]--;
 	int lastPos = 1;
 	while(true) {
 		int leftChildPos = (lastPos*2)-1;
 		int rightChildPos = lastPos*2;
-		if(leftChildPos >= Qcount)
+		if(leftChildPos >= Qcount[priority])
 			break;
-		Actor * child  = queue[leftChildPos];
+		Actor * child  = queue[priority][leftChildPos];
 		int childPos = leftChildPos;
-		if(rightChildPos < Qcount) { //If both Child Exist
-			Actor * rightChild = queue[lastPos*2];
-			if(rightChild->AnimID == IE_ANI_SLEEP) {
+		if(rightChildPos < Qcount[priority]) { //If both Child Exist
+			Actor * rightChild = queue[priority][lastPos*2];
+			if(rightChild->YPos < child->YPos) {
 				childPos = rightChildPos;
 				child = rightChild;
-			} else {
-				if(child->AnimID != IE_ANI_SLEEP) {	
-					if(rightChild->YPos < child->YPos) {
-						childPos = rightChildPos;
-						child = rightChild;
-					}
-				}
-			}			
+			}	
 		}
 		//if((node->YPos > child->YPos) || (child->AnimID == IE_ANI_SLEEP)) {
 		if(node->YPos > child->YPos) {
-			if(node->AnimID == IE_ANI_SLEEP)
-				break;
-			queue[lastPos-1] = child;
-			queue[childPos] = node;
+			queue[priority][lastPos-1] = child;
+			queue[priority][childPos] = node;
 			lastPos = childPos+1;
 		}
 		else
