@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.11 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.12 2003/11/25 16:43:52 balrog994 Exp $
  *
  */
 
@@ -62,6 +62,11 @@
 #define IE_ANI_TWO_FILES		2
 #define IE_ANI_FOUR_FILES		3
 #define IE_ANI_CODE_MIRROR_2	4
+#define IE_ANI_ONE_FILE_2		5
+#define IE_ANI_TWO_FILES_2		6
+#define IE_ANI_CODE_MIRROR_3	7
+#define IE_ANI_ONE_FILE_3		8
+#define IE_ANI_TWO_FILES_3		9
 
 #define IE_ANI_NO_ARMOR			0
 #define IE_ANI_LIGHT_ARMOR		1
@@ -105,6 +110,8 @@ public:
 	}
 private:
 	void AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient);
+	void AddMHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient);
+	void AddMMRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient);
 	void GetAnimResRef(unsigned char AnimID, unsigned char Orient, char * ResRef, unsigned char & Cycle)
 	{
 		switch(MirrorType) 
@@ -117,6 +124,27 @@ private:
 					}
 					else {
 						
+					}
+				}
+			break;
+
+			case IE_ANI_TWO_FILES_2:
+				{
+					if(OrientCount == 5) {
+						AddMHRSuffix(ResRef, AnimID, Cycle, Orient);
+						ResRef[8] = 0;
+					}
+					else {
+						
+					}
+				}
+			break;
+
+			case IE_ANI_TWO_FILES_3:
+				{
+					if(OrientCount == 5) {
+						AddMMRSuffix(ResRef, AnimID, Cycle, Orient);
+						ResRef[8] = 0;
 					}
 				}
 			break;

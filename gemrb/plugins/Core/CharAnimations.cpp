@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.10 2003/11/25 13:48:02 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.11 2003/11/25 16:43:53 balrog994 Exp $
  *
  */
 
@@ -88,10 +88,12 @@ additional frames added in a second time.
 Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Orient)
 {
 	//TODO: Implement Auto Resource Loading
-	if(Anims[AnimID][Orient]) {
-		if(Anims[AnimID][Orient]->ChangePalette && UsePalette) {
-			Anims[AnimID][Orient]->SetPalette(Palette);
-			Anims[AnimID][Orient]->ChangePalette = false;
+	if((LoadedFlag & (1 << AnimID))) {
+		if(Anims[AnimID][Orient]) {
+			if(Anims[AnimID][Orient]->ChangePalette && UsePalette) {
+				Anims[AnimID][Orient]->SetPalette(Palette);
+				Anims[AnimID][Orient]->ChangePalette = false;
+			}
 		}
 		return Anims[AnimID][Orient];
 	}
@@ -145,6 +147,8 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 		break;
 
 		case IE_ANI_TWO_FILES:
+		case IE_ANI_TWO_FILES_2:
+		case IE_ANI_TWO_FILES_3:
 			{
 				switch(OrientCount) {
 					case 5:
@@ -153,15 +157,18 @@ Animation * CharAnimations::GetAnimation(unsigned char AnimID, unsigned char Ori
 							Orient--;
 						Anims[AnimID][Orient] = a;
 						Anims[AnimID][Orient+1] = a;
-						}		
+						}
 					break;
 				}
 			}
 		break;
 	}
-	if(Anims[AnimID][Orient]->ChangePalette && UsePalette) {
-		Anims[AnimID][Orient]->SetPalette(Palette);
-		Anims[AnimID][Orient]->ChangePalette = false;
+	LoadedFlag |= (1 << AnimID);
+	if(Anims[AnimID][Orient]) {
+		if(Anims[AnimID][Orient]->ChangePalette && UsePalette) {
+			Anims[AnimID][Orient]->SetPalette(Palette);
+			Anims[AnimID][Orient]->ChangePalette = false;
+		}
 	}
 	return Anims[AnimID][Orient];
 }
@@ -221,7 +228,7 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 					break;
 
 					case IE_ANI_WEAPON_2H:
-						strcat(ResRef, "A3");
+						strcat(ResRef, "A4");
 					break;
 
 					case IE_ANI_WEAPON_2W:
@@ -241,7 +248,7 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 					break;
 
 					case IE_ANI_WEAPON_2H:
-						strcat(ResRef, "A4");
+						strcat(ResRef, "A5");
 					break;
 
 					case IE_ANI_WEAPON_2W:
@@ -261,7 +268,7 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 					break;
 
 					case IE_ANI_WEAPON_2H:
-						strcat(ResRef, "A5");
+						strcat(ResRef, "A6");
 					break;
 
 					case IE_ANI_WEAPON_2W:
@@ -388,3 +395,291 @@ void CharAnimations::AddVHRSuffix(char * ResRef, unsigned char AnimID, unsigned 
 			break;
 			}
 	}
+
+void CharAnimations::AddMHRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient)
+	{
+		switch(AnimID)
+			{
+			//Attack is a special case... it cycles randomly
+			//through SLASH, BACKSLASH and JAB so we will choose
+			//which animation return randomly
+			case IE_ANI_ATTACK:
+			case IE_ANI_ATTACK_SLASH:
+				{
+				switch(WeaponType)
+					{
+					case IE_ANI_WEAPON_1H:
+                        strcat(ResRef, "A1");
+					break;
+
+					case IE_ANI_WEAPON_2H:
+						strcat(ResRef, "A4");
+					break;
+
+					case IE_ANI_WEAPON_2W:
+						strcat(ResRef, "A7");
+					break;
+					}
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_ATTACK_BACKSLASH:
+				{
+				switch(WeaponType)
+					{
+					case IE_ANI_WEAPON_1H:
+                        strcat(ResRef, "A2");
+					break;
+
+					case IE_ANI_WEAPON_2H:
+						strcat(ResRef, "A5");
+					break;
+
+					case IE_ANI_WEAPON_2W:
+						strcat(ResRef, "A8");
+					break;
+					}
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_ATTACK_JAB:
+				{
+				switch(WeaponType)
+					{
+					case IE_ANI_WEAPON_1H:
+                        strcat(ResRef, "A3");
+					break;
+
+					case IE_ANI_WEAPON_2H:
+						strcat(ResRef, "A6");
+					break;
+
+					case IE_ANI_WEAPON_2W:
+						strcat(ResRef, "A9");
+					break;
+					}
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_AWAKE:
+				{
+				strcat(ResRef, "G1");
+				Cycle = 8 + (Orient/2);
+				}
+			break;
+
+			case IE_ANI_CAST:
+				{
+				strcat(ResRef, "CA");
+				Cycle = 9 + (Orient/2);
+				}
+			break;
+
+			case IE_ANI_CONJURE:
+				{
+				strcat(ResRef, "CA");
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_DAMAGE:
+				{
+				strcat(ResRef, "G14");
+				Cycle = 40 + (Orient/2);
+				}
+			break;
+
+			case IE_ANI_DIE:
+				{
+				strcat(ResRef, "G1");
+				Cycle = 48 + (Orient/2);
+				}
+			break;
+
+			//I cannot find an emerge animation...
+			//Maybe is Die reversed
+			case IE_ANI_EMERGE:
+				{
+				strcat(ResRef, "G1");
+				Cycle = 48 + (Orient/2);
+				}
+			break;
+
+			case IE_ANI_HEAD_TURN:
+				{
+				strcat(ResRef, "G1");
+				Cycle = 16 + (Orient/2);
+				}
+			break;
+
+			//Unknown... maybe only a transparency effect apply
+			case IE_ANI_HIDE:
+				{
+
+				}
+			break;
+
+			case IE_ANI_READY:
+				{
+				strcat(ResRef, "G1");
+				Cycle = 24 + (Orient/2);
+				}
+			break;
+
+			//This depends on the ranged weapon equipped
+			case IE_ANI_SHOOT:
+				{
+				switch(RangedType)
+					{
+					case IE_ANI_RANGED_BOW:
+						{
+						strcat(ResRef, "SA");
+						Cycle = (Orient/2);
+						}
+					break;
+
+					case IE_ANI_RANGED_XBOW:
+						{
+						strcat(ResRef, "SX");
+						Cycle = (Orient/2);
+						}
+					break;
+					
+					case IE_ANI_RANGED_THROW:
+						{
+						strcat(ResRef, "A1");
+						Cycle = (Orient/2);
+						}
+					break;
+					}
+				}
+			break;
+
+			case IE_ANI_SLEEP:
+				{
+				strcat(ResRef, "G1");
+				Cycle = 64 + (Orient/2);
+				}
+			break;
+
+			case IE_ANI_TWITCH:
+				{
+				strcat(ResRef, "G1");
+				Cycle = 56 + (Orient/2);
+				}
+			break;
+
+			case IE_ANI_WALK:
+				{
+				strcat(ResRef, "G1");
+				Cycle = (Orient/2);
+				}
+			break;
+			}
+		if(Orient > 10)
+			strcat(ResRef, "E");
+	}
+
+void CharAnimations::AddMMRSuffix(char * ResRef, unsigned char AnimID, unsigned char &Cycle, unsigned char Orient)
+	{
+		switch(AnimID)
+			{
+			//Attack is a special case... it cycles randomly
+			//through SLASH, BACKSLASH and JAB so we will choose
+			//which animation return randomly
+			case IE_ANI_ATTACK:
+			case IE_ANI_ATTACK_SLASH:
+			case IE_ANI_ATTACK_BACKSLASH:
+				{
+                strcat(ResRef, "A1");
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_SHOOT:
+				{
+				strcat(ResRef, "A4");
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_ATTACK_JAB:
+				{
+                strcat(ResRef, "A2");
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_AWAKE:
+			case IE_ANI_HEAD_TURN:
+			case IE_ANI_READY:
+				{
+				strcat(ResRef, "SD");
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_CAST:
+			case IE_ANI_CONJURE:
+				{
+				strcat(ResRef, "SC");
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_DAMAGE:
+				{
+				strcat(ResRef, "GH");
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_DIE:
+				{
+				strcat(ResRef, "DE");
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_EMERGE:
+				{
+				strcat(ResRef, "GU");
+				Cycle = (Orient/2);
+				}
+			break;
+
+			//Unknown... maybe only a transparency effect apply
+			case IE_ANI_HIDE:
+				{
+
+				}
+			break;
+
+			case IE_ANI_SLEEP:
+				{
+				strcat(ResRef, "TW");
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_TWITCH:
+				{
+				strcat(ResRef, "TW");
+				Cycle = (Orient/2);
+				}
+			break;
+
+			case IE_ANI_WALK:
+				{
+				strcat(ResRef, "WK");
+				Cycle = (Orient/2);
+				}
+			break;
+			}
+		if(Orient > 10)
+			strcat(ResRef, "E");
+	}
+
