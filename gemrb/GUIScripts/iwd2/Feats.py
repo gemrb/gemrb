@@ -1,46 +1,42 @@
 #character generation, skills (GUICG6)
 import GemRB
 
-SkillWindow = 0
+FeatWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-SkillTable = 0
+FeatTable = 0
 TopIndex = 0
+Level = 0
+ClassColumn = 0
 PointsLeft = 0
 
-def RedrawSkills():
+def RedrawFeats():
 	global TopIndex
 
-	if PointsLeft == 0:
-		GemRB.SetButtonState(SkillWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+	SumLabel = GemRB.GetControl(FeatWindow, 0x1000000c)
+	GemRB.SetText(FeatWindow, SumLabel, str(PointsLeft) )
 
-	SumLabel = GemRB.GetControl(SkillWindow, 0x1000000c)
-	GemRB.SetText(SkillWindow, SumLabel, str(PointsLeft) )
+	for i in range(0,10):
+		Pos=TopIndex+i+1
+		FeatName = GemRB.GetTableValue(FeatTable, Pos, 1)
+		Label = GemRB.GetControl(FeatWindow, 0x10000001+i)
+		GemRB.SetText(FeatWindow, Label, FeatName)
 
-	for i in range(0,9):
-		Pos=TopIndex+i
-		SkillName = GemRB.GetTableValue(SkillTable, Pos+2,1)
-		Label = GemRB.GetControl(SkillWindow, 0x10000006+i)
-		GemRB.SetText(SkillWindow, Label, SkillName)
-
-		SkillName=GemRB.GetTableRowName(SkillTable, Pos+2)
-		Ok=GemRB.GetTableValue(SkillTable,SkillName, KitName)
-		Button1 = GemRB.GetControl(SkillWindow, i*2+14)
-		Button2 = GemRB.GetControl(SkillWindow, i*2+15)
+		FeatName=GemRB.GetTableRowName(FeatTable, Pos) #row name
+		
+		Button1 = GemRB.GetControl(FeatWindow, i*2+14)
+		Button2 = GemRB.GetControl(FeatWindow, i*2+15)
+		Ok = 1
 		if Ok == 0:
-			GemRB.SetButtonState(SkillWindow, Button1, IE_GUI_BUTTON_DISABLED)
-			GemRB.SetButtonState(SkillWindow, Button2, IE_GUI_BUTTON_DISABLED)
-			GemRB.SetButtonFlags(SkillWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			GemRB.SetButtonFlags(SkillWindow, Button2, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+			GemRB.SetButtonState(FeatWindow, Button1, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetButtonState(FeatWindow, Button2, IE_GUI_BUTTON_DISABLED)
+#			GemRB.SetButtonFlags(FeatWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+#			GemRB.SetButtonFlags(FeatWindow, Button2, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 		else:
-			GemRB.SetButtonState(SkillWindow, Button1, IE_GUI_BUTTON_ENABLED)
-			GemRB.SetButtonState(SkillWindow, Button2, IE_GUI_BUTTON_ENABLED)
-			GemRB.SetButtonFlags(SkillWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-			GemRB.SetButtonFlags(SkillWindow, Button2, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-
-		Label = GemRB.GetControl(SkillWindow, 0x10000001+i)
-		ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-		GemRB.SetText(SkillWindow, Label, str(ActPoint) )
+			GemRB.SetButtonState(FeatWindow, Button1, IE_GUI_BUTTON_ENABLED)
+			GemRB.SetButtonState(FeatWindow, Button2, IE_GUI_BUTTON_ENABLED)
+#			GemRB.SetButtonFlags(FeatWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
+#			GemRB.SetButtonFlags(FeatWindow, Button2, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
 
 	return
 
@@ -48,131 +44,127 @@ def ScrollBarPress():
 	global TopIndex
 
 	TopIndex = GemRB.GetVar("TopIndex")
-	RedrawSkills()
+	RedrawFeats()
 	return
 
 def OnLoad():
-	global SkillWindow, TextAreaControl, DoneButton, TopIndex
-	global SkillTable, PointsLeft, KitName
+	global FeatWindow, TextAreaControl, DoneButton, TopIndex
+	global FeatTable, CostTable
+	global KitName, Level, ClassColumn
 	
-        SkillTable = GemRB.LoadTable("skills")
-	RowCount = GemRB.GetTableRowCount(SkillTable)-2
+	GemRB.SetVar("Level",1) #for simplicity
+	Class = GemRB.GetVar("Class") - 1
+	ClassTable = GemRB.LoadTable("classes")
+	KitName = GemRB.GetTableRowName(ClassTable, Class)
+	#classcolumn is base class
+	ClassColumn = GemRB.GetTableValue(ClassTable, Class, 3) - 1
+	if ClassColumn < 0:  #it was already a base class
+		ClassColumn = Class
 
-	Kit = GemRB.GetVar("Class Kit")
-	if Kit != 0:
-		KitList = GemRB.LoadTable("kitlist")
-		KitName = GemRB.GetTableValue(KitList, Kit, 0) #rowname is just a number
-		PointsLeft = GemRB.GetTableValue(SkillTable,"FIRST_LEVEL",KitName)
-		if PointsLeft < 0:
-			Kit = 0
-		
-	if Kit == 0:
-		ClassTable = GemRB.LoadTable("classes")
-		Class = GemRB.GetVar("Class")-1
-		KitName = GemRB.GetTableRowName(ClassTable, Class)
-	else:
-		KitList = GemRB.LoadTable("kitlist")
-		KitName = GemRB.GetTableValue(KitList, Kit, 0) #rowname is just a number
-
-	SkillRacTable = GemRB.LoadTable("SKILLRAC")
-	RaceTable = GemRB.LoadTable("RACES")
-	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race")-1)
+	FeatTable = GemRB.LoadTable("feats")
+	RowCount = GemRB.GetTableRowCount(FeatTable)
 
 	for i in range(0,RowCount):
-		SkillName = GemRB.GetTableRowName(SkillTable,i+2)
-		if GemRB.GetTableValue(SkillTable,SkillName, KitName)==1:
-			b=GemRB.GetTableValue(SkillRacTable, RaceName, SkillName)
-			GemRB.SetVar("Skill "+str(i),b)
-		else:
-			GemRB.SetVar("Skill "+str(i),0)
+			GemRB.SetVar("Feat "+str(i),0)
 
-	Level = GemRB.GetVar("Level")
-	PointsLeft = GemRB.GetTableValue(SkillTable,"FIRST_LEVEL",KitName)
-	if Level>1:
-		PointsLeft = PointsLeft + GemRB.GetTableValue(SkillTable,"RATE",KitName)*(Level-1)
-
+	FeatClassTable = GemRB.LoadTable("featclas")
+	#calculating the number of new feats
+	for l in (1,Level+1):
+		PointsLeft = GemRB.GetTableValue(FeatTable, l, ClassColumn)
+		print "Pl:", PointsLeft
+		print "a", GemRB.GetTableValue(FeatTable, l, ClassColumn)
+		print "b", GemRB.GetTableValue(FeatClassTable, l, ClassColumn)
+		PointsLeft += GemRB.GetTableValue(FeatClassTable, l, ClassColumn)
+	
 	GemRB.SetToken("number",str(PointsLeft) )
 
 	GemRB.LoadWindowPack("GUICG")
-        SkillTable = GemRB.LoadTable("feats")
-	SkillWindow = GemRB.LoadWindow(55)
+	FeatWindow = GemRB.LoadWindow(55)
 
-	for i in range(0,9):
-		Button = GemRB.GetControl(SkillWindow, i+21)
-		GemRB.SetVarAssoc(SkillWindow, Button, "Skill",i)
-		GemRB.SetEvent(SkillWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
+	for i in range(0,10):
+		Button = GemRB.GetControl(FeatWindow, i+93)
+		GemRB.SetVarAssoc(FeatWindow, Button, "Feat",i)
+		GemRB.SetEvent(FeatWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
 
-		Button = GemRB.GetControl(SkillWindow, i*2+14)
-		GemRB.SetVarAssoc(SkillWindow, Button, "Skill",i)
-		GemRB.SetEvent(SkillWindow, Button, IE_GUI_BUTTON_ON_PRESS, "LeftPress")
+		Button = GemRB.GetControl(FeatWindow, i*2+14)
+		GemRB.SetVarAssoc(FeatWindow, Button, "Feat",i)
+		GemRB.SetEvent(FeatWindow, Button, IE_GUI_BUTTON_ON_PRESS, "LeftPress")
 
-		Button = GemRB.GetControl(SkillWindow, i*2+15)
-		GemRB.SetVarAssoc(SkillWindow, Button, "Skill",i)
-		GemRB.SetEvent(SkillWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
+		Button = GemRB.GetControl(FeatWindow, i*2+15)
+		GemRB.SetVarAssoc(FeatWindow, Button, "Feat",i)
+		GemRB.SetEvent(FeatWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
 
-	BackButton = GemRB.GetControl(SkillWindow,25)
-	GemRB.SetText(SkillWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(SkillWindow,0)
-	GemRB.SetText(SkillWindow,DoneButton,36789)
-        GemRB.SetButtonFlags(SkillWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	BackButton = GemRB.GetControl(FeatWindow,105)
+	GemRB.SetText(FeatWindow,BackButton,15416)
+	DoneButton = GemRB.GetControl(FeatWindow,0)
+	GemRB.SetText(FeatWindow,DoneButton,36789)
+	GemRB.SetButtonFlags(FeatWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	TextAreaControl = GemRB.GetControl(SkillWindow, 92)
-	GemRB.SetText(SkillWindow,TextAreaControl,17248)
+	TextAreaControl = GemRB.GetControl(FeatWindow, 92)
+	GemRB.SetText(FeatWindow,TextAreaControl,17248)
 
-	GemRB.SetVar("TopIndex",0)
-	ScrollBarControl = GemRB.GetControl(SkillWindow, 91)
-	GemRB.SetEvent(SkillWindow, ScrollBarControl,IE_GUI_SCROLLBAR_ON_CHANGE,"ScrollBarPress")
-	GemRB.SetVarAssoc(SkillWindow, ScrollBarControl, "TopIndex",RowCount-4) #decrease it with the number of controls on screen (list size)
-
-	GemRB.SetEvent(SkillWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	GemRB.SetEvent(SkillWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	GemRB.SetButtonState(SkillWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
+	ScrollBarControl = GemRB.GetControl(FeatWindow, 104)
+	GemRB.SetEvent(FeatWindow, ScrollBarControl,IE_GUI_SCROLLBAR_ON_CHANGE,"ScrollBarPress")
+	#decrease it with the number of controls on screen (list size)
 	TopIndex = 0
-	RedrawSkills()
-	GemRB.SetVisible(SkillWindow,1)
+	GemRB.SetVar("TopIndex",0)
+	GemRB.SetVarAssoc(FeatWindow, ScrollBarControl, "TopIndex",RowCount-10)
+
+	GemRB.SetEvent(FeatWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	GemRB.SetEvent(FeatWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	GemRB.SetButtonState(FeatWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
+	RedrawFeats()
+	GemRB.SetVisible(FeatWindow,1)
 	return
 
 
 def JustPress():
-	Pos = GemRB.GetVar("Skill")+TopIndex
-	GemRB.SetText(SkillWindow, TextAreaControl, GemRB.GetTableValue(SkillTable,Pos+2,0) )
+	Pos = GemRB.GetVar("Feat")+TopIndex+1
+	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
 	return
 
 def RightPress():
 	global PointsLeft
 
-	Pos = GemRB.GetVar("Skill")+TopIndex
-	GemRB.SetText(SkillWindow, TextAreaControl, GemRB.GetTableValue(SkillTable,Pos+2,0) )
-	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
+	Pos = GemRB.GetVar("Feat")+TopIndex+1
+	Cost = GemRB.GetTableValue(CostTable, Pos, ClassColumn)
+	if Cost==0:
+		return
+
+	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
+	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
 	if ActPoint <= 0:
 		return
-	GemRB.SetVar("Skill "+str(Pos),ActPoint-1)
-	PointsLeft = PointsLeft + 1
-	RedrawSkills()
+	GemRB.SetVar("Feat "+str(Pos),ActPoint-1)
+	PointsLeft = PointsLeft + Cost
+	RedrawFeats()
 	return
 
 def LeftPress():
 	global PointsLeft
 
-	Pos = GemRB.GetVar("Skill")+TopIndex
-	GemRB.SetText(SkillWindow, TextAreaControl, GemRB.GetTableValue(SkillTable,Pos+2,0) )
-	if PointsLeft == 0:
+	Pos = GemRB.GetVar("Feat")+TopIndex+1
+	Cost = GemRB.GetTableValue(CostTable, Pos, ClassColumn)
+	if Cost==0:
 		return
-	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-	if ActPoint >= 200:
+
+	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
+	if PointsLeft < Cost:
 		return
-	GemRB.SetVar("Skill "+str(Pos), ActPoint+1)
-	PointsLeft = PointsLeft - 1
-	RedrawSkills()
+	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
+	if ActPoint >= Level:
+		return
+	GemRB.SetVar("Feat "+str(Pos), ActPoint+1)
+	PointsLeft = PointsLeft - Cost
+	RedrawFeats()
 	return
 
 def BackPress():
-	GemRB.UnloadWindow(SkillWindow)
+	GemRB.UnloadWindow(FeatWindow)
 	GemRB.SetNextScript("Skills")
-	#scrap skills
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(SkillWindow)
-	GemRB.SetNextScript("Feats") #feats
+	GemRB.UnloadWindow(FeatWindow)
+	GemRB.SetNextScript("CharGen7")
 	return

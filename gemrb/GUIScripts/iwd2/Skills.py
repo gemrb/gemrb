@@ -80,10 +80,19 @@ def OnLoad():
 	if ClassColumn < 0:  #it was already a base class
 		ClassColumn = Class
 	SkillPtsTable = GemRB.LoadTable("skillpts")
-	PointsLeft = GemRB.GetTableValue(SkillPtsTable, 0, ClassColumn)
+	p = GemRB.GetTableValue(SkillPtsTable, 0, ClassColumn)
+	IntBonus = GemRB.GetVar("Ability 3")/2-5  #intelligence bonus
+	p = p + IntBonus
+	#at least 1 skillpoint / level advanced
+	if p <1:
+		p=1
 
-	Level = GemRB.GetVar("Level")
-	PointsLeft = PointsLeft * Level
+	Level = GemRB.GetVar("Level")  #this is the level increase
+	if Level < 2:
+		PointsLeft = p * 4
+	else:
+		PointsLeft = p * 4 + (Level-1) * p
+	
 	GemRB.UnloadTable(SkillPtsTable)
 
 	SkillTable = GemRB.LoadTable("skills")
@@ -106,7 +115,6 @@ def OnLoad():
 	GemRB.SetToken("number",str(PointsLeft) )
 
 	GemRB.LoadWindowPack("GUICG")
-	SkillTable = GemRB.LoadTable("skills")
 	SkillWindow = GemRB.LoadWindow(6)
 
 	for i in range(0,10):
