@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.79 2003/11/29 17:59:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.80 2003/11/29 23:52:07 avenger_teambg Exp $
  *
  */
 
@@ -613,6 +613,13 @@ bool Interface::LoadConfig(void)
 		}
 		else if(stricmp(name, "CachePath") == 0) {
 			strcpy(CachePath, value);
+			struct stat mystat;
+			stat(CachePath, &mystat);
+			if(!(mystat.st_mode&S_IFDIR) ) {
+				printf("%s folder doesn't exist!",CachePath);
+				fclose(config);
+				return false;
+			}
 		}
 		else if(stricmp(name, "GUIScriptsPath") == 0) {
 			strcpy(GUIScriptsPath, value);

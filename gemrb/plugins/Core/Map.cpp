@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.24 2003/11/28 21:54:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.25 2003/11/29 23:52:07 avenger_teambg Exp $
  *
  */
 
@@ -123,16 +123,20 @@ void Map::DrawMap(Region viewport)
 			case EVILBUTGREEN:
 				if(actors[i].Selected) color=&green;
 				else color=&green_dark;
+	 	                core->GetVideoDriver()->SetCursor(core->Cursors[0]->GetFrame(0), core->Cursors[1]->GetFrame(0));
 			break;
 
 			case ENEMY:
 			case GOODBUTRED:
 				if(actors[i].Selected) color=&red;
 				else color=&red_dark;
+	 	                core->GetVideoDriver()->SetCursor(core->Cursors[12]->GetFrame(0), core->Cursors[13]->GetFrame(0));
 			break;
 			default:
 				if(actors[i].Selected) color=&cyan;
 				else color=&cyan_dark;
+	 	                core->GetVideoDriver()->SetCursor(core->Cursors[18]->GetFrame(0), core->Cursors[19]->GetFrame(0));
+
 			break;
 			}
 			video->DrawEllipse(actors[i].XPos-vp.x, actors[i].YPos-vp.y, ca->CircleSize*10, ((ca->CircleSize*15)/2), *color);

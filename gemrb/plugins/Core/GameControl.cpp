@@ -65,10 +65,14 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		if(overContainer) {
 			Color cyan = {0x00, 0xff, 0xff, 0xff};
 			Color red  = {0xff, 0x00, 0x00, 0xff};
-			if(overContainer->TrapDetected && overContainer->Trapped)
+			if(overContainer->TrapDetected && overContainer->Trapped) {
 				video->DrawPolyline(overContainer->outline, red, true);
-			else
+				core->GetVideoDriver()->SetCursor(core->Cursors[39]->GetFrame(0),core->Cursors[40]->GetFrame(0));
+			}
+			else {
 				video->DrawPolyline(overContainer->outline, cyan, true);
+				core->GetVideoDriver()->SetCursor(core->Cursors[2]->GetFrame(0),core->Cursors[3]->GetFrame(0));
+			}
 		}
 	}
 	else {
