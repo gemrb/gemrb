@@ -40,7 +40,7 @@ private:
 	bool Initialized;
 	bool Playing;
 	char PLName[32];
-	int PLpos;
+	int PLpos, PLnext;
 	FileStream * str;
 	std::vector<PLString> playlist;
 	unsigned long lastSound;

@@ -389,6 +389,14 @@ static PyObject * GemRB_PlayMusicPL(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SoftEndPL(PyObject *self, PyObject *args)
+{	
+	core->GetMusicMgr()->End();
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
     {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
@@ -437,6 +445,9 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"PlayMusicPL", GemRB_PlayMusicPL, METH_VARARGS,
      "Plays a Music PlayList."},
+
+	{"SoftEndPL", GemRB_SoftEndPL, METH_NOARGS,
+     "Ends a Music Playlist softly."},
 
 	{"Quit", GemRB_Quit, METH_NOARGS,
      "Quits GemRB."},

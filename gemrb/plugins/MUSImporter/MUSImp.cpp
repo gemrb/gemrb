@@ -125,16 +125,26 @@ bool MUSImp::OpenPlaylist(const char * name)
 				break;
 		}
 		pls.PLEnd[p]=0;
-		char FName[_MAX_PATH];
-      	strcpy(FName, core->GamePath);
-		strcat(FName, "music");
-		strcat(FName, SPathDelimiter);
-		strcat(FName, PLName);
-		strcat(FName, SPathDelimiter);
-		strcat(FName, PLName);
-		strcat(FName, pls.PLFile);
-		strcat(FName, ".acm");
-		pls.soundID = core->GetSoundMgr()->LoadFile(FName);
+		bool found = false;
+		for(int i = 0; i < playlist.size(); i++) {
+			if(stricmp(pls.PLFile, playlist[i].PLFile) == 0) {
+				pls.soundID = playlist[i].soundID;
+				found = true;
+				break;
+			}
+		}
+		if(!found) {
+			char FName[_MAX_PATH];
+      		strcpy(FName, core->GamePath);
+			strcat(FName, "music");
+			strcat(FName, SPathDelimiter);
+			strcat(FName, PLName);
+			strcat(FName, SPathDelimiter);
+			strcat(FName, PLName);
+			strcat(FName, pls.PLFile);
+			strcat(FName, ".acm");
+			pls.soundID = core->GetSoundMgr()->LoadFile(FName);
+		}
 		playlist.push_back(pls);
 		printf("%s.acm Added in position %d\n", pls.PLFile, pls.soundID);
 		count--;
@@ -146,6 +156,19 @@ void MUSImp::Start()
 {
 	if(!Playing) {
 		PLpos = 0;
+		if(playlist[PLpos].PLLoop[0] != 0) {
+			//printf("Looping...\n");
+			for(int i = 0; i < playlist.size(); i++) {
+				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
+					PLnext = i;
+					break;
+				}
+			}
+		}
+		else {
+			//printf("Next Track...\n");
+			PLnext=PLpos+1;
+		}
 		core->GetSoundMgr()->Play(playlist[PLpos].soundID);
 		lastSound = playlist[PLpos].soundID;
 		Playing = true;
@@ -156,14 +179,20 @@ void MUSImp::End()
 {
 	if(Playing) {
 		if(playlist[PLpos].PLEnd[0] != 0) {
-			core->GetSoundMgr()->Stop(lastSound);
+			//core->GetSoundMgr()->Stop(lastSound);
 			for(int i = 0; i < playlist.size(); i++) {
 				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLEnd) == 0) {
 					core->GetSoundMgr()->Play(playlist[i].soundID);
-					PLpos = i;
+					PLnext = i;
 					return;
 				}
 			}
+			PLString pls;
+			strcpy(pls.PLFile, playlist[PLpos].PLEnd);
+			pls.PLEnd[0] = 1;
+			pls.PLEnd[1] = 0;
+			pls.PLLoop[0] = 0;
+			pls.PLTag[0] = 0;
 			char FName[_MAX_PATH];
 			strcpy(FName, core->GamePath);
 			strcat(FName, "music");
@@ -173,9 +202,11 @@ void MUSImp::End()
 			strcat(FName, PLName);
 			strcat(FName, playlist[PLpos].PLEnd);
 			strcat(FName, ".acm");
-			core->GetSoundMgr()->Stop(lastSound);
-			lastSound = core->GetSoundMgr()->LoadFile(FName);
-			core->GetSoundMgr()->Play(lastSound);
+			//core->GetSoundMgr()->Stop(lastSound);
+			pls.soundID = core->GetSoundMgr()->LoadFile(FName);
+			//core->GetSoundMgr()->Play(lastSound);
+			playlist.push_back(pls);
+			PLnext = playlist.size()-1;
 		}
 		else
 			core->GetSoundMgr()->Stop(lastSound);
@@ -187,7 +218,28 @@ void MUSImp::SwitchPlayList(const char * name){
 /** Plays the Next Entry */
 void MUSImp::PlayNext()
 {
-	if(playlist[PLpos].PLLoop[0] != 0) {
+	if(PLnext != -1) {
+		lastSound = playlist[PLnext].soundID;
+		PLpos = PLnext;
+		core->GetSoundMgr()->Play(lastSound);
+		if(playlist[PLpos].PLLoop[0] != 0) {
+			//printf("Looping...\n");
+			for(int i = 0; i < playlist.size(); i++) {
+				if(stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
+					PLnext = i;
+					break;
+				}
+			}
+		}
+		else {
+			if(playlist[PLnext].PLEnd[0] == 1)
+				PLnext = -1;
+			else
+			//printf("Next Track...\n");
+				PLnext=PLpos+1;
+		}
+	}
+	/*if(playlist[PLpos].PLLoop[0] != 0) {
 		printf("Looping...\n");
 		for(int i = 0; i < playlist.size(); i++) {
 			if(stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
@@ -203,5 +255,5 @@ void MUSImp::PlayNext()
 		PLpos++;
 		lastSound = playlist[PLpos].soundID;
 		core->GetSoundMgr()->Play(lastSound);
-	}
+	}*/
 }
