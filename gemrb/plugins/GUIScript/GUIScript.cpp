@@ -1508,6 +1508,22 @@ static PyObject *GemRB_CreatePlayer(PyObject */*self*/, PyObject *args)
 	return Py_BuildValue("i",PlayerSlot);
 }
 
+static PyObject *GemRB_GetPlayerStat(PyObject */*self*/, PyObject *args)
+{
+	int PlayerSlot, StatID, StatValue;
+
+	if(!PyArg_ParseTuple(args,"iii", &PlayerSlot, &StatID) ) {
+		printMessage("GUIScript","Syntax Error: GetPlayerStat(Slot, ID)\n", LIGHT_RED);
+		return NULL;
+	}
+	PlayerSlot = core->FindPlayer(PlayerSlot);
+	if(PlayerSlot<0)
+		return NULL;
+	//returning the modified stat
+	StatValue=core->GetCreatureStat(PlayerSlot, StatID,1);
+	return Py_BuildValue("i",StatValue);
+}
+
 static PyObject *GemRB_SetPlayerStat(PyObject */*self*/, PyObject *args)
 {
 	int PlayerSlot, StatID, StatValue;
@@ -1519,8 +1535,27 @@ static PyObject *GemRB_SetPlayerStat(PyObject */*self*/, PyObject *args)
 	PlayerSlot = core->FindPlayer(PlayerSlot);
 	if(PlayerSlot<0)
 		return NULL;
-	if(!core->SetCreatureStat(PlayerSlot, StatID, StatValue))
+	//Setting the creature's base stat, which gets saved (0)
+	if(!core->SetCreatureStat(PlayerSlot, StatID, StatValue,0))
 		return NULL;
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
+{
+	int PlayerSlot;
+
+	if(!PyArg_ParseTuple(args,"i", &PlayerSlot) ) {
+		printMessage("GUIScript","Syntax Error: FillPlayerInfo(Slot)\n", LIGHT_RED);
+		return NULL;
+	}
+	PlayerSlot = core->FindPlayer(PlayerSlot);
+	if(PlayerSlot<0)
+		return NULL;
+	// here comes some code to transfer icon/name to the PC sheet
+	//
+	//
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -1709,8 +1744,11 @@ static PyMethodDef GemRBMethods[] = {
 	{"CreatePlayer", GemRB_CreatePlayer, METH_VARARGS,
      "Creates a player slot."},
 
-	{"SetPlayerStat", GemRB_CreatePlayer, METH_VARARGS,
+	{"SetPlayerStat", GemRB_SetPlayerStat, METH_VARARGS,
      "Changes a stat."},
+
+	{"GetPlayerStat", GemRB_GetPlayerStat, METH_VARARGS,
+     "Queries a stat."},
 
 	{"FillPlayerInfo", GemRB_FillPlayerInfo, METH_VARARGS,
      "Fills basic character info, that is not stored in stats."},

@@ -115,6 +115,8 @@ public:
 	int FindPlayer(int PartySlotCount);
 	/** Sets a stat for the creature in actor index Slot */
 	int SetCreatureStat(int Slot, unsigned int StatID, int StatValue, int Mod);
+	/** returns the stat of a creature (mod:1-modified, 0-base) */
+	int Interface::GetCreatureStat(int Slot, unsigned int StatID, int Mod);
 	/** Loads a Window in the Window Manager */
 	int LoadWindow(unsigned short WindowID);
 	/** Sets a Window on the Top */

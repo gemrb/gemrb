@@ -691,6 +691,17 @@ int Interface::FindPlayer(int PartySlotCount)
 	return index;
 }
 
+int Interface::GetCreatureStat(int Slot, unsigned int StatID, int Mod)
+{
+	if(Slot>=actors.size())
+		return 0xdadadada;
+	if(!actors[Slot])
+		return 0xdadadada;
+	if(Mod)
+		return actors[Slot]->GetStat(StatID);
+	return actors[Slot]->GetBase(StatID);
+}
+
 int Interface::SetCreatureStat(int Slot, unsigned int StatID, int StatValue, int Mod)
 {
 	if(Slot>=actors.size())
