@@ -16,14 +16,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.21 2004/06/24 17:53:18 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.22 2004/08/28 15:00:39 edheldil Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
 import GemRB
 
-import GUICommonWindows
 from GUICommonWindows import *
 
 from FloatMenuWindow import *
@@ -53,7 +52,7 @@ def OnLoad():
 	GemRB.SetInfoTextColor(0,255,0,255)
 	ActionsWindow = GemRB.LoadWindow(0)
 	PortraitWindow = GemRB.LoadWindow(1)
-	PopulatePortraitWindow ()
+	PopulatePortraitWindow (PortraitWindow)
 	OptionsWindow = GemRB.LoadWindow(2)
 	MessageWindow = GemRB.LoadWindow(7)
 	MessageTA = GemRB.GetControl(MessageWindow, 1)
@@ -77,6 +76,10 @@ def OnLoad():
 	
 	OpenButton = GemRB.GetControl(OptionsWindow, 10)
 	GemRB.SetEvent(OptionsWindow, OpenButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+
+	# Select all
+	Button = GemRB.GetControl (ActionsWindow, 1)
+	GemRB.SetEvent (ActionsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 
 	FormationButton = GemRB.GetControl(ActionsWindow, 4)
 	GemRB.SetEvent(ActionsWindow, FormationButton, IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
@@ -160,66 +163,3 @@ def UpdateResizeButtons():
 	GemRB.SetEvent(MessageWindow, CloseButton, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 	return
 
-def PopulatePortraitWindow ():
-	Window = PortraitWindow
-
-	for i in range (0,6):
-		Button = GemRB.GetControl (Window, i)
-		ButtonHP = GemRB.GetControl (Window, 6 + i)
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
-
-		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
-		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
-		pic = GemRB.GetPlayerPortrait (i+1, 0)
-		if not pic:
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			GemRB.SetButtonFlags (Window, ButtonHP, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			continue
-		
-		#sel = GemRB.GameIsPCSelected (i+1)
-		sel = GemRB.GameGetSelectedPCSingle () == i
-		GemRB.SetButtonBAM (Window, Button, pic, 0, 0, 0)
-		
-		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-		GemRB.SetButtonFlags(Window, ButtonHP, IE_GUI_BUTTON_PICTURE, OP_SET)
-		GemRB.SetVarAssoc (Window, Button, 'SelectedSingle', i)
-
-		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
-		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
-
-		GemRB.SetText (Window, ButtonHP, "%d / %d" %(hp, hp_max))
-		# FILLBAR.BAM
-		if sel:
-			#GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_SELECTED)
-			GemRB.EnableButtonBorder(Window, Button, FRAME_PC_SELECTED, 1)
-		else:
-			GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_UNPRESSED)
-			GemRB.EnableButtonBorder(Window, Button, FRAME_PC_SELECTED, 0)
-
-def PortraitButtonOnPress ():
-	var = GemRB.GetVar ("SelectedSingle")
-	#print "SELECTED:", var
-
-	for i in range (0, 6):
-		Button = GemRB.GetControl (PortraitWindow, i)
-		GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, i == var)
-
-	#if var < GemRB.GetPartySize ():
-	GemRB.GameSelectPCSingle (var)
-	RunSelectionChangeHandler ()
-
-def PortraitButtonOnShiftPress ():
-	i = GemRB.GetVar ("SelectedSingle")
-	#print "SELECTED:", var
-
-	sel = GemRB.GameIsPCSelected (i + 1)
-	sel = not sel
-	GemRB.GameSelectPC (i + 1, sel)
-
-	Button = GemRB.GetControl (PortraitWindow, i)
-	GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, sel)
-
-	#if var < GemRB.GetPartySize ():
-	#GemRB.GameSelectPCSingle (var)
-	#RunSelectionChangeHandler ()

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.19 2004/08/10 19:54:37 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.20 2004/08/28 15:00:40 edheldil Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -75,6 +75,12 @@ OP_NAND = 2
 MODAL_SHADOW_NONE = 0
 MODAL_SHADOW_GRAY = 1
 MODAL_SHADOW_BLACK = 2
+
+# Flags for GameSelectPC()
+# !!! Keep these synchronized with Game.h !!!
+SELECT_NORMAL  = 0x00
+SELECT_REPLACE = 0x01
+SELECT_QUIET   = 0x02
 
 #game strings
 STR_LOADMOS  = 0

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.16 2004/08/28 10:23:18 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.17 2004/08/28 15:00:39 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -162,7 +162,6 @@ def UpdateRecordsWindow ():
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1; 
 	
 	# name
 	Label = GemRB.GetControl (Window, 0x1000000a)
@@ -345,7 +344,6 @@ def OnRecordsHelpStrength ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's strength
 	s = GemRB.GetPlayerStat (pc, IE_STR)
@@ -375,7 +373,6 @@ def OnRecordsHelpDexterity ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's dexterity
 	Dex = GemRB.GetPlayerStat (pc, IE_DEX)
@@ -393,7 +390,6 @@ def OnRecordsHelpIntelligence ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's intelligence
 	Int = GemRB.GetPlayerStat (pc, IE_INT)
@@ -408,7 +404,6 @@ def OnRecordsHelpWisdom ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's wisdom
 	Wis = GemRB.GetPlayerStat (pc, IE_WIS)
@@ -426,7 +421,6 @@ def OnRecordsHelpConstitution ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's constitution
 	Con = GemRB.GetPlayerStat (pc, IE_CON)
@@ -444,7 +438,6 @@ def OnRecordsHelpCharisma ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	# Getting the character's charisma
 	Cha = GemRB.GetPlayerStat (pc, IE_CHR)
@@ -641,7 +634,6 @@ def OpenInformationWindow ():
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	stat = GemRB.GetPCStats (pc);
 
@@ -734,7 +726,6 @@ def OpenBiographyWindow ():
 
 	# These are used to get the bio
 	pc = GemRB.GameGetSelectedPCSingle ()
-	pc = pc + 1;
 
 	BioTable = GemRB.LoadTable ("BIOS")
 	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)

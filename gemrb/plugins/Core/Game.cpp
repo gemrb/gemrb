@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.59 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.60 2004/08/28 15:00:38 edheldil Exp $
  *
  */
 
@@ -27,7 +27,7 @@
 
 Game::Game(void) : Scriptable( ST_GLOBAL )
 {
-	SelectedSingle = 0; //the PC we are looking at (inventory, shop)
+	SelectedSingle = 1; //the PC we are looking at (inventory, shop)
 	PartyGold = 0;
 	SetScript( core->GlobalScript, 0 );
 	MapIndex = -1;
@@ -248,7 +248,8 @@ int Game::GetPartySize(bool onlyalive)
 
 bool Game::SelectPCSingle(int index)
 {
-	if (index < 0 || index >= GetPartySize (false))
+	Actor* actor = FindPC( index );
+	if (!actor || ! actor->ValidTarget( GA_SELECT | GA_NO_DEAD ))
 		return false;
 
 	SelectedSingle = index;
@@ -258,6 +259,83 @@ bool Game::SelectPCSingle(int index)
 int Game::GetSelectedPCSingle()
 {
 	return SelectedSingle;
+}
+
+/*
+ * SelectActor() - handle (de)selecting actors.
+ *     If selection was changed, runs "SelectionChanged" handler
+ *
+ * actor - either specific actor, or NULL for all
+ * select - whether actor(s) should be selected or deselected
+ * flags:
+ * SELECT_ONE   - if true, deselect all other actors when selecting one
+ * SELECT_QUIET - do not run handler if selection was changed. Used for
+ *                nested calls to SelectActor()
+ */
+
+bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
+{
+	std::vector< Actor*>::iterator m;
+
+	// actor was not specified, which means all PCs should be (de)selected
+	if (! actor) {
+		if (select) {
+			SelectActor( NULL, false, SELECT_QUIET );
+			for ( m = PCs.begin(); m != PCs.end(); ++m) {
+				if (! *m) {
+					continue;
+				}
+				SelectActor( *m, true, SELECT_QUIET );
+			}
+		}
+		else {
+			for ( m = selected.begin(); m != selected.end(); ++m) {
+				(*m)->Select( false );
+				(*m)->SetOver( false );
+			}
+
+			selected.clear();
+		}
+
+		if (! (flags & SELECT_QUIET)) { 
+			core->GetGUIScriptEngine()->RunFunction( "SelectionChanged" );
+		}
+		return true;
+	}
+
+	// actor was specified, so we will work with him
+
+	// If actor is already (de)selected, report success, but do nothing
+	//if (actor->IsSelected() == select)
+	//	return true;
+
+	
+	if (select) {
+		if (! actor->ValidTarget( GA_SELECT | GA_NO_DEAD ))
+			return false;
+
+		// deselect all actors first when exclusive
+		if (flags & SELECT_REPLACE) {
+			SelectActor( NULL, false, SELECT_QUIET );
+		}
+
+		actor->Select( true );
+		selected.push_back( actor );
+	}
+	else {
+		for ( m = selected.begin(); m != selected.end(); ++m) {
+			if ((*m) == actor) {
+				selected.erase( m );
+				break;
+			}
+		}
+		actor->Select( false );
+	}
+
+	if (! (flags & SELECT_QUIET)) { 
+		core->GetGUIScriptEngine()->RunFunction( "SelectionChanged" );
+	}
+	return true;
 }
 
 int Game::GetPartyLevel(bool onlyalive)

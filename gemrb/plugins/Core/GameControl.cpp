@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.169 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.170 2004/08/28 15:00:38 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -201,8 +201,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (!Width || !Height) {
 		return;
 	}
-	if ( selected.size() > 0 ) {
-		ChangeMap(selected[0], false);
+	if ( game->selected.size() > 0 ) {
+		ChangeMap(game->selected[0], false);
 	}
 	Video* video = core->GetVideoDriver();
 	Region viewport = core->GetVideoDriver()->GetViewport();
@@ -263,8 +263,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	//Draw spell effect, this must be stored in the actors
 	//not like this
 	if (effect) {
-		if (( selected.size() > 0 )) {
-			Actor* actor = selected[0];
+		if (( game->selected.size() > 0 )) {
+			Actor* actor = game->selected[0];
 			video->BlitSpriteMode( effect->NextFrame(), actor->XPos,
 					actor->YPos, 1, false );
 		}
@@ -375,47 +375,35 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 
 void GameControl::DeselectAll()
 {
-	for (unsigned int i = 0; i < selected.size(); i++) {
-		selected[i]->Select( false );
-		selected[i]->SetOver( false );
-	}
-
-	selected.clear();
+	core->GetGame()->SelectActor( NULL, false, SELECT_NORMAL );
 }
 
 void GameControl::SelectActor(int whom)
 {
 	Game* game = core->GetGame();
-	if(whom==-1) {
-		DeselectAll();
-		for(int i = 0; i < game->GetPartySize(0); i++) {
-			Actor* actor = game->GetPC( i );
-			if (!actor) {
-				continue;
-			}
-			if (!actor->ValidTarget(GA_SELECT|GA_NO_DEAD) ) {
-				continue;
-			}
-			selected.push_back( actor );
-			actor->Select( true );
-		}
+	if (whom==-1) {
+		game->SelectActor( NULL, true, SELECT_NORMAL );
 		return;
 	}
+
 	/* doesn't fall through here */
 	Actor* actor = game->GetPC( whom );
-	if (actor && actor->ValidTarget(GA_SELECT|GA_NO_DEAD) ) {
-		if((ScreenFlags&SF_ALWAYSCENTER) || actor->IsSelected()) 
-			ScreenFlags|=SF_CENTERONACTOR;
-		DeselectAll();
-		selected.push_back( actor );
-		actor->Select( true );
-	}
+	if (!actor) 
+		return;
+
+	bool was_selected = actor->IsSelected();
+	if (game->SelectActor( actor, true, SELECT_REPLACE ))
+		if (was_selected || (ScreenFlags & SF_ALWAYSCENTER)) {
+			ScreenFlags |= SF_CENTERONACTOR;
+		}
 }
 
 /** Key Release Event */
 void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
 	unsigned int i;
+
+	Game* game = core->GetGame();
 
 	switch (Key) {
 		case '=':
@@ -470,7 +458,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				}
 				break;
 			case 'b':
-				if (selected.size() > 0) {
+				if (game->selected.size() > 0) {
 					if (!effect) {
 						AnimationMgr* anim = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
 						DataStream* ds = core->GetResourceMgr()->GetResource( "S056ICBL", IE_BAM_CLASS_ID );
@@ -522,8 +510,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'j':
 				// jump
-					for (i = 0; i < selected.size(); i++) {
-						Actor* actor = selected[i];
+					for (i = 0; i < game->selected.size(); i++) {
+						Actor* actor = game->selected[i];
 						short cX = lastMouseX; 
 						short cY = lastMouseY;
 						core->GetVideoDriver()->ConvertToGame( cX, cY );
@@ -748,6 +736,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 //maybe actor is unneeded
 bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * /*actor*/)
 {
+	Game* game = core->GetGame();
 	switch(trap->Type) {
 		case ST_TRAVEL:
 			trap->Flags|=TRAP_RESET;
@@ -761,7 +750,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * /*actor*/)
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
 				if(!(trap->Flags&TRAP_DEACTIVATED) ) {
-					trap->LastTrigger = selected[0];
+					trap->LastTrigger = game->selected[0];
 					trap->Scripts[0]->Update();
 					//if reset trap flag not set, deactivate it
 					if(!(trap->Flags&TRAP_RESET)) {
@@ -833,8 +822,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		DeselectAll();
 		if (count != 0) {
 			for (i = 0; i < count; i++) {
-				ab[i]->Select( true );
-				selected.push_back( ab[i] );
+				// FIXME: should call handler only once
+				game->SelectActor( ab[i], true, SELECT_NORMAL );
 			}
 		}
 		free( ab );
@@ -843,19 +832,19 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	}
 	Actor* actor = area->GetActor( GameX, GameY, action );
 
-	if (!actor && ( selected.size() > 0 )) {
+	if (!actor && ( game->selected.size() > 0 )) {
 		if (overDoor) {
-			HandleDoor(overDoor, selected[0]);
+			HandleDoor(overDoor, game->selected[0]);
 			return;
 		}
 		if(overInfoPoint) {
-			if(HandleActiveRegion(overInfoPoint, selected[0])) {
+			if(HandleActiveRegion(overInfoPoint, game->selected[0])) {
 				return;
 			}
 		}
 		//just a single actor, no formation
-		if(selected.size()==1) {
-			actor=selected[0];
+		if(game->selected.size()==1) {
+			actor=game->selected[0];
 			actor->ClearPath();
 			actor->ClearActions();
 			sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
@@ -863,8 +852,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			return;
 		}
 		//party formation movement
-		for(unsigned int i = 0; i < selected.size(); i++) {
-			actor=selected[i];
+		for(unsigned int i = 0; i < game->selected.size(); i++) {
+			actor=game->selected[i];
 			actor->ClearPath();
 			actor->ClearActions();
 			//formations should be rotated based on starting point
@@ -893,20 +882,19 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	switch (type) {
 		case 0:
 			//clicked on a new party member
-			DeselectAll();
-			selected.push_back( actor );
-			actor->Select( true );
+			// FIXME: call GameControl::SelectActor() instead
+			game->SelectActor( actor, true, SELECT_REPLACE );
 			break;
 		case 1:
 			//talk (first selected talks)
-			if(selected.size()) {
-				TryToTalk(selected[0], actor);
+			if(game->selected.size()) {
+				TryToTalk(game->selected[0], actor);
 			}
 			break;
 		case 2:
 			//all of them attacks the red circled actor
-			for(i=0;i<selected.size();i++) {
-				TryToAttack(selected[i], actor);
+			for(i=0;i<game->selected.size();i++) {
+				TryToAttack(game->selected[i], actor);
 			}
 			break;
 	}

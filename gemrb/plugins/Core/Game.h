@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.41 2004/08/20 15:54:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.42 2004/08/28 15:00:38 edheldil Exp $
  *
  */
 
@@ -41,6 +41,13 @@ class Game;
 #include "Actor.h"
 #include "Map.h"
 #include "Variables.h"
+
+// Flags bits for SelectActor()
+// !!! Keep these synchronized with GUIDefines.py !!!
+#define SELECT_NORMAL   0x00
+#define SELECT_REPLACE  0x01   // when selecting actor, deselect all others
+#define SELECT_QUIET    0x02   // do not run handler when chanfing selection
+
 
 typedef struct PCStruct {
 	ieWord   Selected;
@@ -90,6 +97,7 @@ private:
 	std::vector< GAMJournalEntry*> Journals;
 	std::vector< char*> mastarea;
 public:
+	std::vector< Actor*> selected;
 	Variables* globals;
 	Variables* kaputz;
 	ieByte* familiars;
@@ -152,6 +160,9 @@ public:
 	bool SelectPCSingle(int index);
 	/* get index of selected PC for non-walking env (shops, inventory, ...) */
 	int GetSelectedPCSingle();
+	/* (De)selects actor. */
+	bool SelectActor( Actor* actor, bool select, unsigned flags );
+
 	/* return current party level count for xp calculations */
 	int GetPartyLevel(bool onlyalive);
 	/* removes actor from party (if in there) */

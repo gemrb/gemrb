@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.201 2004/08/27 15:40:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.202 2004/08/28 15:00:36 edheldil Exp $
  *
  */
 
@@ -2999,29 +2999,38 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GameSelectPC__doc,
-"GameSelectPC(Slot, Selected)\n\n"
-"Selects or deselects PC. Does not influence other party members." );
+"GameSelectPC(PartyID, Selected, [Flags = SELECT_NORMAL])\n\n"
+"Selects or deselects PC."
+"if PartyID=0, (De)selects all PC."
+"Flags is combination of SELECT_REPLACE and SELECT_QUIET."
+"SELECT_REPLACE: when selecting other party members, unselect the others." );
 
 static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 {
-	int PlayerSlot, Selected;
+	int PartyID, Select;
+	int Flags = SELECT_NORMAL;
 
-	if (!PyArg_ParseTuple( args, "ii", &PlayerSlot, &Selected )) {
+	printf("GemRB.GameSelectPC()\n");
+	if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &Select, &Flags )) {
 		return AttributeError( GemRB_GameSelectPC__doc );
 	}
 	Game *game = core->GetGame();
 	if(!game) {
 		return NULL;
 	}
-	PlayerSlot = game->FindPlayer( PlayerSlot );
-	Actor* MyActor = game->GetPC( PlayerSlot );
-	if (!MyActor) {
-		Py_INCREF( Py_None );
-		return Py_None;
+
+	Actor* actor;
+	if (PartyID > 0) {
+		actor = game->FindPC( PartyID );
+		if (! actor) {
+			Py_INCREF( Py_None );
+			return Py_None;
+		}
+	} else {
+		actor = NULL;
 	}
-	printf("Selected: %d: %d -> %d\n", PlayerSlot, MyActor->IsSelected(), Selected);
-	printf("IE_EA: %d\n", MyActor->Modified[IE_EA]);
-	MyActor->Select( (bool)Selected );
+
+	game->SelectActor( actor, Select, Flags );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3045,14 +3054,16 @@ static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 	PlayerSlot = game->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
 	if (!MyActor) {
-		return Py_BuildValue( "s", "");
+		return Py_BuildValue( "i", 0 );
 	}
 	return Py_BuildValue("i", MyActor->IsSelected() );
 }
 
+
 PyDoc_STRVAR( GemRB_GameSelectPCSingle__doc,
 "GameSelectPCSingle(index)\n\n"
-"Selects one PC in non-walk environment (i.e. in shops, inventory,...)" );
+"Selects one PC in non-walk environment (i.e. in shops, inventory,...)"
+"Index must be greater than zero." );
 
 static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 {
@@ -3070,15 +3081,28 @@ static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
 "GameGetSelectedPCSingle() => int\n\n"
-"Returns index of the selected PC in non-walk environment (i.e. in shops, inventory,...)" );
+"Returns index of the selected PC in non-walk environment (i.e. in shops, inventory,...). Index should be greater than zero." );
 
-static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* /*args*/)
 {
-	if (!PyArg_ParseTuple( args, "" )) {
-		return AttributeError( GemRB_GameGetSelectedPCSingle__doc );
+	return Py_BuildValue( "i", core->GetGame()->GetSelectedPCSingle() );
+}
+
+PyDoc_STRVAR( GemRB_GameGetFirstSelectedPC__doc,
+"GameGetFirstSelectedPC() => int\n\n"
+"Returns index of the first selected PC or 0 if none." );
+
+static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*args*/)
+{
+	Game* game = core->GetGame();
+	for (int i = 0; i < game->GetPartySize (false); i++) {
+		Actor* actor = game->GetPC (i);
+		if (actor->IsSelected()) {
+			return Py_BuildValue( "i", i + 1); // FIXME: or i+0 ?
+		}
 	}
 
-	return Py_BuildValue( "i", core->GetGame()->GetSelectedPCSingle() );
+	return Py_BuildValue( "i", 0 );
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerPortrait__doc,
@@ -3634,7 +3658,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameSelectPC, METH_VARARGS),
 	METHOD(GameIsPCSelected, METH_VARARGS),
 	METHOD(GameSelectPCSingle, METH_VARARGS),
-	METHOD(GameGetSelectedPCSingle, METH_VARARGS),
+	METHOD(GameGetSelectedPCSingle, METH_NOARGS),
+	METHOD(GameGetFirstSelectedPC, METH_NOARGS),
 	METHOD(GetPlayerPortrait, METH_VARARGS),
 	METHOD(GetPlayerName, METH_VARARGS),
 	METHOD(SetPlayerName, METH_VARARGS),

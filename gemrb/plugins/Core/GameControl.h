@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.50 2004/08/07 20:54:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.51 2004/08/28 15:00:38 edheldil Exp $
  */
 
 class GameControl;
@@ -74,7 +74,6 @@ public:
 	void SetInfoTextColor(Color color);
 private:
 	Actor* lastActor;
-	std::vector< Actor*> selected;
 	std::vector< Actor*> highlighted;
 	std::vector< Scriptable*> infoTexts;
 	Color* InfoTextPalette;
