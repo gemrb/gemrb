@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.23 2003/12/12 23:13:39 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.24 2003/12/15 09:38:30 balrog994 Exp $
  *
  */
 
@@ -143,7 +143,7 @@ Map * AREImp::GetMap()
 	}
 
 	//Loading Doors
-	for(int i = 0; i < DoorsCount; i++) {
+	for(unsigned long i = 0; i < DoorsCount; i++) {
 		str->Seek(DoorsOffset + (i*0xc8), GEM_STREAM_START);
 		int count;
 		unsigned long Flags, OpenFirstVertex, ClosedFirstVertex;
@@ -246,7 +246,7 @@ Map * AREImp::GetMap()
 		str->Read(&vertCount, 4);
 		str->Seek(VerticesOffset + (firstIndex*4), GEM_STREAM_START);
 		Point * points = (Point*)malloc(vertCount*sizeof(Point));
-		for(int x = 0; x < vertCount; x++) {
+		for(unsigned long x = 0; x < vertCount; x++) {
 			str->Read(&points[x].x, 2);
 			str->Read(&points[x].y, 2);
 		}
@@ -344,24 +344,23 @@ Map * AREImp::GetMap()
 			crefile = core->GetResourceMgr()->GetResource(CreResRef, IE_CRE_CLASS_ID);
 		}
 		actmgr->Open(crefile, true);
-		ActorBlock *ab = new ActorBlock();
+		Actor * ab = actmgr->GetActor();
 		ab->XPos = XPos;
 		ab->YPos = YPos;
 		ab->XDes = XDes;
 		ab->YDes = YDes;
-		ab->actor = actmgr->GetActor();
 		ab->AnimID = IE_ANI_AWAKE;
-		if(ab->actor->BaseStats[IE_STATE_ID] & STATE_DEAD)
+		if(ab->BaseStats[IE_STATE_ID] & STATE_DEAD)
 			ab->AnimID = IE_ANI_SLEEP;
 		ab->Orientation = (unsigned char)Orientation;
-		for(int i = 0; i < MAX_SCRIPTS; i++) {
+		/*for(int i = 0; i < MAX_SCRIPTS; i++) {
 			if((stricmp(ab->actor->Scripts[i], "None") == 0) || (ab->actor->Scripts[i][0] == '\0')) {
 				ab->Scripts[i] = NULL;
 				continue;
 			}
 			ab->Scripts[i] = new GameScript(ab->actor->Scripts[i], 0);
 			ab->Scripts[i]->MySelf = ab;
-		}
+		}*/
 		map->AddActor(ab);
 	}
 	core->FreeInterface(actmgr);
@@ -391,7 +390,7 @@ Map * AREImp::GetMap()
 		//am->Open(core->GetResourceMgr()->GetResource(animBam, IE_BAM_CLASS_ID), true);
 		//anim = am->GetAnimation(animCycle, animX, animY);
 		AnimationFactory * af =  (AnimationFactory*)core->GetResourceMgr()->GetFactoryResource(animBam, IE_BAM_CLASS_ID);
-		anim = af->GetCycle(animCycle);
+		anim = af->GetCycle((unsigned char)animCycle);
 		anim->x = animX;
 		anim->y = animY;
 		anim->BlitMode = mode;
