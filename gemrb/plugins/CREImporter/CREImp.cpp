@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.44 2004/08/25 12:44:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.45 2004/08/30 21:36:51 avenger_teambg Exp $
  *
  */
 
@@ -418,24 +418,24 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 	// Reading spellbook
 
-	std::vector<CREKnownSpell*> known_spells;
-	std::vector<CREMemorizedSpell*> memorized_spells;
+	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(act->KnownSpellsCount, sizeof(CREKnownSpell *) );
+	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(act->KnownSpellsCount, sizeof(CREKnownSpell *) );
 
 	str->Seek( act->KnownSpellsOffset, GEM_STREAM_START );
 	for (i = 0; i < act->KnownSpellsCount; i++) {
-		known_spells.push_back( GetKnownSpell() );
+		known_spells[i]=GetKnownSpell();
 	}
 
 	str->Seek( act->MemorizedSpellsOffset, GEM_STREAM_START );
 	for (i = 0; i < act->MemorizedSpellsCount; i++) {
-		memorized_spells.push_back( GetMemorizedSpell() );
+		memorized_spells[i]=GetMemorizedSpell();
 	}
 
 	str->Seek( act->SpellMemorizationOffset, GEM_STREAM_START );
 	for (i = 0; i < act->SpellMemorizationCount; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization();
 
-		unsigned int j=known_spells.size();
+		unsigned int j=act->KnownSpellsCount;
 		while(j--) {
 			CREKnownSpell* spl = known_spells[j];
 			if (!spl) {
@@ -453,21 +453,23 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		act->spellbook.AddSpellMemorization( sm );
 	}
 
-	i=known_spells.size();
+	i=act->KnownSpellsCount;
 	while(i--) {
 		if(known_spells[i]) {
 			printf("[CREImp]: Dangling spell in creature: %s!\n", known_spells[i]->SpellResRef);
 			delete known_spells[i];
 		}
 	}
-	i=memorized_spells.size();
+	free(known_spells);
+
+	i=act->MemorizedSpellsCount;
 	while(i--) {
 		if(memorized_spells[i]) {
 			printf("[CREImp]: Dangling spell in creature: %s!\n", memorized_spells[i]->SpellResRef);
 			delete memorized_spells[i];
 		}
 	}
-//	act->spellbook.dump();
+	free(memorized_spells);
 
 	act->Init(); //applies effects, updates Modified
 }
