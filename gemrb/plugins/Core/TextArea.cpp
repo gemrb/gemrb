@@ -99,6 +99,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
   		else
   			pal = palette;
   		ftext->Print(Region(x+XPos, y+YPos+(yl*ftext->chars[1]->Height), Width, Height-(yl*ftext->chars[1]->Height)), (unsigned char*)lines[i], pal, IE_FONT_ALIGN_LEFT, true);
+		yl+=lrows[i];
   	}
 	}
 }
