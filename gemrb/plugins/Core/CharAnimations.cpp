@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.45 2004/10/02 13:05:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.46 2004/10/11 17:50:00 avenger_teambg Exp $
  *
  */
 
@@ -24,12 +24,18 @@
 #include "CharAnimations.h"
 #include "Interface.h"
 
-extern Interface* core;
-
 static int AvatarsCount = 0;
 static AvatarStruct *AvatarTable = NULL;
 static int SixteenToNine[16]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static int SixteenToFive[16]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
+
+void CharAnimations::ReleaseMemory()
+{
+	if (AvatarTable) {
+		free(AvatarTable);
+		AvatarTable=NULL;
+	}
+}
 
 int CharAnimations::GetAvatarsCount()
 {
@@ -202,17 +208,13 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 
 	while (AvatarsRowNum--) {
 		if (AvatarTable[AvatarsRowNum].AnimID==AnimID) {
-			break;
+			SetArmourLevel( ArmourLevel );
+			return;
 		}
 	}
-	if (AvatarsRowNum == ~0u) {
-		char tmp[256];
-		sprintf(tmp, "Invalid or nonexistent avatar entry:%04X\n", AnimID);
-		printMessage("CharAnimations",tmp, LIGHT_RED);
-		return;
-	}
-
-	SetArmourLevel( ArmourLevel );
+	char tmp[256];
+	sprintf(tmp, "Invalid or nonexistent avatar entry:%04X\n", AnimID);
+	printMessage("CharAnimations",tmp, LIGHT_RED);
 }
 
 //freeing the bitmaps only once, but using an intelligent algorithm
