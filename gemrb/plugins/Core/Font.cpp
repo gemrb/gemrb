@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.24 2003/12/25 23:51:16 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.25 2003/12/26 15:03:27 balrog994 Exp $
  *
  */
 
@@ -163,26 +163,30 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char * string, Color
 	}
 	int row = 0;
 	for(size_t i = 0; i < len; i++) {
-		if(((unsigned char)tmp[i]) >= 0xf0) {
-			switch((unsigned char)tmp[i]) {
-				case 0xf0: //Normal Text Color
-					{
-						unsigned char r,g,b;
-						i++;
-						r = (unsigned char)tmp[i++];
-						g = (unsigned char)tmp[i++];
-						b = (unsigned char)tmp[i++];
-						if(!r && !b && !g)
-							core->GetVideoDriver()->SetPalette(sprBuffer, pal);
-						else {
-							Color c = {r,g,b,0}, b = {0,0,0,0};
-							Color *newPal = core->GetVideoDriver()->CreatePalette(c, b);
-							core->GetVideoDriver()->SetPalette(sprBuffer, newPal);
-							free(newPal);
-						}
-					}
-				break;
+		if(((unsigned char)tmp[i]) == '[') {
+			i++;
+			char tag[256];
+			for(int k = 0; k < 256; k++) {
+				if(tmp[i] == ']') {
+					tag[k] = 0;
+					break;
+				}
+				tag[k] = tmp[i++];
 			}
+			if(strnicmp(tag, "color=", 6) == 0) {
+				unsigned int r,g,b;
+				if(sscanf(tag, "color=%02X%02X%02X", &r, &g, &b) != 3)
+					continue;
+				Color c = {r,g,b,0}, back = {0,0,0,0};
+				Color *newPal = core->GetVideoDriver()->CreatePalette(c, back);
+				core->GetVideoDriver()->SetPalette(sprBuffer, newPal);
+				free(newPal);
+			} else {
+				if(stricmp(tag, "/color") == 0) {
+					core->GetVideoDriver()->SetPalette(sprBuffer, pal);
+				}
+			}
+			continue;
 		}
 		if(row < startrow) {
 			if(tmp[i] == 0) {
@@ -268,26 +272,30 @@ void Font::Print(Region rgn, unsigned char * string, Color *hicolor, unsigned ch
 		y+=5;
 	}
 	for(size_t i = 0; i < len; i++) {
-		if(tmp[i] >= 0xf0) {
-			switch(tmp[i]) {
-				case 0xf0: //Normal Text Color
-					{
-						unsigned char r,g,b;
-						i++;
-						r = tmp[i++];
-						g = tmp[i++];
-						b = tmp[i++];
-						if(!r && !b && !g)
-							core->GetVideoDriver()->SetPalette(sprBuffer, pal);
-						else {
-							Color c = {r,g,b,0}, b = {0,0,0,0};
-							Color *newPal = core->GetVideoDriver()->CreatePalette(c, b);
-							core->GetVideoDriver()->SetPalette(sprBuffer, newPal);
-							free(newPal);
-						}
-					}
-				break;
+		if(((unsigned char)tmp[i]) == '[') {
+			i++;
+			char tag[256];
+			for(int k = 0; k < 256; k++) {
+				if(tmp[i] == ']') {
+					tag[k] = 0;
+					break;
+				}
+				tag[k] = tmp[i++];
 			}
+			if(strnicmp(tag, "color=", 6) == 0) {
+				unsigned int r,g,b;
+				if(sscanf(tag, "color=%02X%02X%02X", &r, &g, &b) != 3)
+					continue;
+				Color c = {r,g,b,0}, back = {0,0,0,0};
+				Color *newPal = core->GetVideoDriver()->CreatePalette(c, back);
+				core->GetVideoDriver()->SetPalette(sprBuffer, newPal);
+				free(newPal);
+			} else {
+				if(stricmp(tag, "/color") == 0) {
+					core->GetVideoDriver()->SetPalette(sprBuffer, pal);
+				}
+			}
+			continue;
 		}
 		if(tmp[i] == 0) {
 			y+=ystep;
