@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.3 2003/12/29 19:50:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/Config/Config.cpp,v 1.4 2004/01/04 00:27:08 balrog994 Exp $
  *
  */
 
@@ -104,6 +104,7 @@ void ClearLine()
 int main(int argc, char **argv)
 {
 	getcwd(CurrentDir, _MAX_PATH);
+	strcat(CurrentDir, SPathDelimiter);
 	InitGames();
 #ifdef WIN32
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
