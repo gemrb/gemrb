@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.17 2003/12/15 09:19:11 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.18 2003/12/17 20:18:56 balrog994 Exp $
  *
  */
 
@@ -59,6 +59,9 @@ Actor::Actor() : Moveble(ST_ACTOR)
 	ShortName = NULL;
 
 	DeleteMe = false;
+
+	locals = new Variables();
+	locals->SetType(GEM_VARIABLES_INT);
 }
 
 Actor::~Actor(void)
@@ -69,6 +72,8 @@ Actor::~Actor(void)
 		free(LongName);
 	if(ShortName)
 		free(ShortName);
+	if(locals)
+		delete(locals);
 }
 
 void Actor::SetAnimationID(unsigned short AnimID)
