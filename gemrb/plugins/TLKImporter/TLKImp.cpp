@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.38 2004/10/06 20:37:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.39 2004/11/01 16:29:39 avenger_teambg Exp $
  *
  */
 
@@ -137,6 +137,10 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		//don't free this!
 		Decoded=core->GetGameControl()->speaker->LongName;
 		freeup=false;
+		goto exit_function;
+	}
+	if (!strcmp( Token, "RACE" )) {
+		Decoded = GetString( RaceStrRef(-1), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "SIRMAAM" )) {
