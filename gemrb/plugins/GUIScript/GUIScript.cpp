@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.143 2004/03/25 22:14:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.144 2004/03/27 17:33:56 avenger_teambg Exp $
  *
  */
 
@@ -97,10 +97,14 @@ static PyObject* GemRB_HideGUI(PyObject*, PyObject* args)
 
 GameControl* StartGameControl()
 {
+	//making sure that our window is the first one
+/*
 	int count = core->GetWindowMgr()->GetWindowsCount();
 	for (int i = 0; i < count; i++) {
 		core->DelWindow( i );
 	}
+*/
+	core->DelWindow(~0); //deleting ALL windows
 	Window* gamewin = new Window( 0xffff, 0, 0, core->Width, core->Height );
 	GameControl* gc = new GameControl();
 	gc->XPos = 0;
@@ -112,8 +116,9 @@ GameControl* StartGameControl()
 	gc->ControlType = IE_GUI_GAMECONTROL;
 	gamewin->AddControl( gc );
 	core->AddWindow( gamewin );
-	gamewin->SetFocused( gc );
 	core->SetVisible( 0, 1 );
+	//setting the focus to the game control 
+	core->GetEventMgr()->SetFocused(gamewin, gc); 
 	if (core->GetGUIScriptEngine()->LoadScript( "MessageWindow" )) {
 		core->GetGUIScriptEngine()->RunFunction( "OnLoad" );
 		gc->UnhideGUI();
@@ -1038,7 +1043,6 @@ static PyObject* GemRB_SetControlStatus(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
-
 
 	int ret = core->SetControlStatus( WindowIndex, ControlIndex, status );
 	if (ret == -1) {
