@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.86 2003/12/04 02:00:12 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.87 2003/12/04 22:11:30 balrog994 Exp $
  *
  */
 
@@ -119,6 +119,8 @@ Interface::~Interface(void)
 		delete(soundmgr);
 	if(sgiterator)
 		delete(sgiterator);
+	if(pathfinder)
+		delete(pathfinder);
 
 	FreeResourceVector(Font, fonts);
 	FreeResourceVector(Window, windows);
@@ -135,6 +137,9 @@ Interface::~Interface(void)
 		plugin->FreePlugin(pal256);
 	if(pal16)
 		plugin->FreePlugin(pal16);
+	if(script)
+		plugin->FreePlugin(script);
+
 	if(windowmgr)
 		delete(windowmgr);
 	if(guiscript)
@@ -382,8 +387,15 @@ int Interface::Init()
 	}
 	FreeInterface(anim);
 	video->SetCursor(Cursors[0]->GetFrame(0), Cursors[1]->GetFrame(0));
-	printMessage("Core", "Initializing A* PathFinder...\n", WHITE);
+	printMessage("Core", "Initializing A* PathFinder...", WHITE);
 	pathfinder = new PathFinder();
+	printStatus("OK", LIGHT_GREEN);
+	printMessage("Core", "Bringing up the Game Script Engine...", WHITE);
+	script = (GameScript*)core->GetInterface(IE_SCRIPT_CLASS_ID);
+	if(!script) {
+		printStatus("ERROR", LIGHT_RED);
+		return GEM_ERROR;
+	}
 	printStatus("OK", LIGHT_GREEN);
 	printMessage("Core", "Core Initialization Complete!\n", LIGHT_GREEN);
 	return GEM_OK;
@@ -1302,4 +1314,24 @@ bool Interface::LoadINI(const char * filename)
 	}
 	fclose(config);
 	return true;
+}
+
+int Interface::LoadScript(const char *ResRef)
+{
+	DataStream * dS = core->GetResourceMgr()->GetResource(ResRef, IE_BCS_CLASS_ID);
+	return script->CacheScript(dS, ResRef);
+	//The DataStream is automatically freed by the Script Engine
+}
+
+void Interface::SetGameVariable(const char * VarName, const char * Context, int value)
+{
+	script->SetVariable(VarName, Context, value);
+}
+
+/** Enables/Disables the Cut Scene Mode */
+void Interface::SetCutSceneMode(bool active)
+{
+	Window * win = GetWindow(0);
+	GameControl * gc = (GameControl*)win->GetControl(0);
+	gc->SetCutSceneMode(active);
 }

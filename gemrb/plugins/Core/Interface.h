@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.52 2003/12/04 02:00:19 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.53 2003/12/04 22:11:30 balrog994 Exp $
  *
  */
 
@@ -52,6 +52,8 @@
 #include "DataFileMgr.h"
 #include "Game.h"
 #include "PathFinder.h"
+#include "GameScript.h"
+#include "GameControl.h"
 
 typedef struct Table {
 	TableMgr * tm;
@@ -108,6 +110,7 @@ private:
 	DataFileMgr * INIparty;
 	Game * game;
 	PathFinder * pathfinder;
+	GameScript * script;
 	int GameFeatures;
 	char ButtonFont[9];
 public:
@@ -240,6 +243,17 @@ public:
 	int PlayMovie(char * ResRef);
 	/** Generates traditional random number xdy+z */
 	int Roll(int dice, int size, int add);
+	/** Loads a Game Compiled Script */
+	int LoadScript(const char * ResRef);
+	/** Sets a Variable in the Game Script Engine */
+	void SetGameVariable(const char * VarName, const char * Context, int value);
+	/** Enables/Disables the Cut Scene Mode */
+	void SetCutSceneMode(bool active);
+	/** Updates the Game Script Engine State */
+	void GSUpdate()
+	{
+		script->Update();
+	}
 	/** Get the Party INI Interpreter */
 	DataFileMgr * GetPartyINI()
 	{
