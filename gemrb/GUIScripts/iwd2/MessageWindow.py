@@ -25,16 +25,21 @@ def OnLoad():
 	
 	GemRB.SetVar("MessageWindow", MessageWindow)
 	GemRB.SetVar("PortraitWindow", PortraitWindow)
+	GemRB.SetVar("TopWindow", -1)
+	GemRB.SetVar("OtherWindow", -1)
+	GemRB.SetVar("FloatWindow", -1)
+	GemRB.SetVar("ActionsPosition", -1) #already handled in portraitwindow
+	GemRB.SetVar("OptionsPosition", -1) #already handled in messagewindow
+	GemRB.SetVar("OtherPosition", 3) #Top
+	GemRB.SetVar("MessagePosition", 4)
+	GemRB.SetVar("PortraitPosition", 4)
+
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	
 	PopulatePortraitWindow(PortraitWindow)
 	SetupActionsWindowControls (ActionsWindow)
 	SetupMenuWindowControls (OptionsWindow)
 
-
-	GemRB.SetVar("MessagePosition", 4)
-	GemRB.SetVar("PortraitPosition", 4)
-	
 	GemRB.SetVisible(MessageWindow, 1)
 	GemRB.SetVisible(PortraitWindow, 1)
 	return

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.12 2004/10/11 19:33:41 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.13 2004/10/16 10:47:56 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -60,7 +60,6 @@ def OpenMapWindow ():
 
 	# Hide or Show mapnotes
 	Button = GemRB.GetControl (Window, 3)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RefreshNoteWindow")
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	GemRB.SetVarAssoc (Window, Button, "ShowMapNotes", 1)
 
@@ -68,7 +67,6 @@ def OpenMapWindow ():
 	GemRB.SetText (Window, Label, "")
 
 	# Map Control
-	print "Label", Label
 	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0, 0x10000003, "FLAG1")
 	Map = GemRB.GetControl (Window, 2)
 	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", 1)

@@ -121,8 +121,8 @@ def DeleteGameConfirm():
 	ScrollBarPress()
 	GemRB.UnloadWindow(ConfirmWindow)
 	GemRB.SetVisible(LoadWindow,1)
-	return          
-                
+	return	  
+
 def DeleteGameCancel(): 
 	GemRB.UnloadWindow(ConfirmWindow)
 	GemRB.SetVisible(LoadWindow,1)
