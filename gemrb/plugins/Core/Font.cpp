@@ -211,7 +211,7 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 		nextimg = init->chars[0x20-1];
 	x = nextimg->XPos;
 	bool newline = true, curset = false;
-	if(len != 1) {
+	if(len != 1) { //Skip if we have an empty string
 	for(int i = 0; i < len; i++) {
 		if(i == curpos) {
 			sl.curx = nsi;
@@ -297,10 +297,10 @@ StringList Font::Prepare(Region &rgn, unsigned char * string, Font * init, int c
 	}
 	newstring[++nsi] = NULL;
 	}
-	else {
-		maxHeight = this->maxHeight;
-		newstring[nsi++] = nextimg;
-		newstring[nsi] = NULL;
+	else { //We have an empty String
+		maxHeight = this->maxHeight; //Use the maxHeight precalculated parameter
+		newstring[nsi++] = nextimg;  //Add an image placeholder using the 'space' character
+		newstring[nsi] = NULL; //End the String
 		if(!curset) {
 			sl.curx = 0;
 			sl.cury = sl.StringCount-1;
