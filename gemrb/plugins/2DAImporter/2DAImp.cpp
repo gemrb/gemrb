@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.cpp,v 1.16 2004/02/24 22:20:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.cpp,v 1.17 2004/03/22 22:34:59 edheldil Exp $
  *
  */
 
@@ -67,7 +67,7 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 	while (true) {
 		char* line = ( char* ) malloc( 1024 );
 		int len = str->ReadLine( line, 1023 );
-		if (len <= 0) {
+		if (len <= 0 || line[0] == '#') {
 			free( line );
 			break;
 		}
