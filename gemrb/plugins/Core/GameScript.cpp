@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.58 2004/02/07 23:52:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.59 2004/02/08 07:52:53 avenger_teambg Exp $
  *
  */
 
@@ -147,6 +147,7 @@ static ActionLink actionnames[]={
 {"startcutscene",GameScript::StartCutScene},
 {"startcutscenemode",GameScript::StartCutSceneMode},
 {"startdialogue",GameScript::StartDialogue,AF_BLOCKING},
+{"startdialogueinterrupt",GameScript::StartDialogueInterrupt,AF_BLOCKING},
 {"startdialoguenoset",GameScript::StartDialogueNoSet,AF_BLOCKING},
 {"startdialoguenosetinterrupt",GameScript::StartDialogueNoSetInterrupt,AF_BLOCKING},
 {"startmovie",GameScript::StartMovie},
@@ -2002,11 +2003,49 @@ void GameScript::HideGUI(Scriptable * Sender, Action * parameters)
 		gc->HideGUI();
 }
 
-void GameScript::BeginDialog(Actor *actor, Actor *target, const char *Dialog, int Set)
+void GameScript::BeginDialog(Scriptable *Sender, Action * parameters, int Flags)
 {
-	if(!actor || !target)
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
 		return;
-	if((Set&BD_INTERRUPT) ) target->ClearActions();
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		return;
+	}
+	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!tar)
+		return;
+	//source could be other than Actor, we need to handle this too!
+	if(scr->Type != ST_ACTOR) {
+		return;
+	}
+	//no need to check these for NULL
+	Actor * actor = (Actor*)scr;
+	Actor * target = (Actor*)tar;
+
+	GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
+	if(gc->ControlType != IE_GUI_GAMECONTROL) {
+		printf("[IEScript]: Dialog cannot be initiated because there is no GameControl.\n");
+		return;
+	}
+	//can't initiate dialog, because it is already there
+	if(gc->Dialogue) {
+		printf("[IEScript]: Dialog cannot be initiated because there is already one.\n");
+		return;
+	}
+
+	const char *Dialog;
+	switch(Flags&BD_LOCMASK)
+	{
+	case BD_STRING0:  Dialog=parameters->string0Parameter; break;
+	case BD_SOURCE: Dialog=actor->Dialog; break;
+	case BD_TARGET: Dialog=target->Dialog; break;
+	}
+	if(!Dialog)
+		return;
+
+	//we also need to freeze active scripts during a dialog!
+	if((Flags&BD_INTERRUPT) ) target->ClearActions();
 	else
 	{
 		if(target->GetNextAction())
@@ -2017,20 +2056,18 @@ void GameScript::BeginDialog(Actor *actor, Actor *target, const char *Dialog, in
 	}
 
 	actor->Orientation = GetOrient(target->XPos, target->YPos, actor->XPos, actor->YPos);
-	actor->resetAction = true;
+	actor->resetAction = true; //im not sure this is needed
 	target->Orientation = GetOrient(actor->XPos, actor->YPos, target->XPos, target->YPos);
-	target->resetAction = true;
+	target->resetAction = true;//nor this
 
 	if(Dialog[0]) {
 		//increasing NumTimesTalkedTo
-	        if(Set)
+	        if(Flags&BD_TALKCOUNT)
         	        actor->TalkCount++;
 
 		DialogMgr * dm = (DialogMgr*)core->GetInterface(IE_DLG_CLASS_ID);
 		dm->Open(core->GetResourceMgr()->GetResource(Dialog, IE_DLG_CLASS_ID), true);
-		GameControl * gc = (GameControl*)core->GetWindow(0)->GetControl(0);	
-		if(gc->ControlType == IE_GUI_GAMECONTROL)
-			gc->InitDialog(actor, target, dm->GetDialog());
+		gc->InitDialog(actor, target, dm->GetDialog());
 		core->FreeInterface(dm);
 	}
 }
@@ -2038,43 +2075,12 @@ void GameScript::BeginDialog(Actor *actor, Actor *target, const char *Dialog, in
 //no string, increase talkcount, no interrupt
 void GameScript::Dialogue(Scriptable * Sender, Action * parameters)
 {
-	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(!scr)
-		return;
-	if(scr != Sender) { //this is an Action Override
-		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction = NULL;
-		return;
-	}
-	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
-	if(!tar)
-		return;
-	if(scr->Type != ST_ACTOR)
-		return;
-	Actor * actor = (Actor*)scr;
-	Actor * target = (Actor*)tar;
-	BeginDialog(actor, target,actor->Dialog,BD_TALKCOUNT);
+	BeginDialog(Sender, parameters, BD_SOURCE|BD_TALKCOUNT);
 }
 
 void GameScript::DialogueForceInterrupt(Scriptable *Sender, Action *parameters)
 {
-	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(!scr)
-		return;
-	if(scr != Sender) { //this is an Action Override
-		scr->AddAction(Sender->CurrentAction);
-		Sender->CurrentAction = NULL;
-		return;
-	}
-	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
-	if(!tar)
-		return;
-	if(scr->Type != ST_ACTOR)
-		return;
-	tar->ClearActions();
-	Actor * actor = (Actor*)scr;
-	Actor * target = (Actor*)tar;
-	BeginDialog(actor, target, actor->Dialog, BD_INTERRUPT);
+	BeginDialog(Sender, parameters, BD_SOURCE|BD_TALKCOUNT|BD_INTERRUPT);
 }
 
 void GameScript::DisplayString(Scriptable * Sender, Action * parameters)
@@ -2123,99 +2129,31 @@ void GameScript::SetDialogue(Scriptable * Sender, Action * parameters)
 //string0, no interrupt, talkcount increased
 void GameScript::StartDialogue(Scriptable * Sender, Action * parameters)
 {
-	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(!scr)
-		return;
-	if(scr != Sender) { //this is an Action Override
-		scr->AddAction(Sender->CurrentAction);
-		return;
-	}
-	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
-	if(!tar)
-		return;
-	if(scr->Type != ST_ACTOR)
-		return;
-	Actor * actor = (Actor*)scr;
-	Actor * target = (Actor*)tar;
-	BeginDialog(actor, target, parameters->string0Parameter,BD_TALKCOUNT);
+	BeginDialog(Sender, parameters, BD_STRING0|BD_TALKCOUNT);
 }
 
 //no string, no interrupt, talkcount increased
 void GameScript::PlayerDialogue(Scriptable * Sender, Action * parameters)
 {
-	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(!scr)
-		return;
-	if(scr != Sender) { //this is an Action Override
-		scr->AddAction(Sender->CurrentAction);
-		return;
-	}
-	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
-	if(!tar)
-		return;
-	if(scr->Type != ST_ACTOR)
-		return;
-	Actor * actor = (Actor*)scr;
-	Actor * target = (Actor*)tar;
-	BeginDialog(actor, target, actor->Dialog,0);
+	//i think playerdialog is when a player initiates dialog with the
+	//target, in this case, the dialog is the target's dialog
+	BeginDialog(Sender, parameters, BD_TARGET);
 }
 
 void GameScript::StartDialogueInterrupt(Scriptable * Sender, Action * parameters)
 {
-	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(!scr)
-		return;
-	if(scr != Sender) { //this is an Action Override
-		scr->AddAction(Sender->CurrentAction);
-		return;
-	}
-	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
-	if(!tar)
-		return;
-	if(scr->Type != ST_ACTOR)
-		return;
-	Actor * actor = (Actor*)scr;
-	Actor * target = (Actor*)tar;
-	BeginDialog(actor, target, parameters->string0Parameter,BD_INTERRUPT|BD_TALKCOUNT);
+	BeginDialog(Sender, parameters, BD_STRING0|BD_INTERRUPT|BD_TALKCOUNT);
 }
 
 //No string, flags:0
 void GameScript::StartDialogueNoSet(Scriptable * Sender, Action * parameters)
 {
-	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(!scr)
-		return;
-	if(scr != Sender) { //this is an Action Override
-		scr->AddAction(Sender->CurrentAction);
-		return;
-	}
-	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
-	if(!tar)
-		return;
-	if(scr->Type != ST_ACTOR)
-		return;
-	Actor * actor = (Actor*)scr;
-	Actor * target = (Actor*)tar;
-	BeginDialog(actor, target, actor->Dialog,0);
+	BeginDialog(Sender, parameters, BD_SOURCE);
 }
 
 void GameScript::StartDialogueNoSetInterrupt(Scriptable * Sender, Action * parameters)
 {
-	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-	if(!scr)
-		return;
-	if(scr != Sender) { //this is an Action Override
-		scr->AddAction(Sender->CurrentAction);
-		return;
-	}
-	Scriptable * tar = GetActorFromObject(Sender, parameters->objects[1]);
-	if(!tar)
-		return;
-	if(scr->Type != ST_ACTOR)
-		return;
-	Actor * actor = (Actor*)scr;
-	Actor * target = (Actor*)tar;
-	BeginDialog(actor, target, actor->Dialog,BD_INTERRUPT);
+	BeginDialog(Sender, parameters, BD_SOURCE|BD_INTERRUPT);
 }
 
 Point* FindNearPoint(Actor* Sender, Point *p1, Point *p2, double &distance)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.38 2004/02/07 23:52:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.39 2004/02/08 07:52:54 avenger_teambg Exp $
  *
  */
 
@@ -495,8 +495,13 @@ struct TriggerLink {
 	TriggerFunction Function;
 };
 
-#define BD_INTERRUPT 1  //interrupts action
-#define BD_TALKCOUNT 2  //increases talkcount
+#define BD_STRING0   0
+#define BD_TARGET    1
+#define BD_SOURCE    2
+#define BD_RESERVED  3
+#define BD_LOCMASK   3  //where is the dialog resref
+#define BD_INTERRUPT 4  //interrupts action
+#define BD_TALKCOUNT 8  //increases talkcount
 
 #define AF_NONE      0
 #define AF_INSTANT   1
@@ -553,7 +558,7 @@ private:
 	static Action * GenerateAction(char * String);
 	static Trigger * GenerateTrigger(char * String);
 	static Scriptable * GetActorFromObject(Scriptable * Sender, Object * oC);
-	static void BeginDialog(Actor *actor, Actor *target, const char *dialog, int flags);
+	static void BeginDialog(Scriptable *Sender, Action *parameters, int flags);
 	static unsigned char GetOrient(short sX, short sY, short dX, short dY);
 private: //Internal variables
 	unsigned long lastRunTime;
