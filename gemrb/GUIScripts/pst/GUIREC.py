@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.25 2004/11/06 10:47:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.26 2004/11/15 00:20:54 edheldil Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -165,7 +165,7 @@ def UpdateRecordsWindow ():
 	
 	# name
 	Label = GemRB.GetControl (Window, 0x1000000a)
-	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
+	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 1))
 
 	# portrait
 	Image = GemRB.GetControl (Window, 2)
@@ -703,7 +703,7 @@ def OpenInformationWindow ():
 	stat = GemRB.GetPCStats (pc)
 
 	Label = GemRB.GetControl (Window, 0x10000001)
-	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc))
+	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 1))
 
 
 	# class

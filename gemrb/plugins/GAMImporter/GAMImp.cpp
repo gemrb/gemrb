@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.42 2004/10/24 17:11:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.43 2004/11/15 00:20:53 edheldil Exp $
  *
  */
 
@@ -262,7 +262,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize );
 		aM->Open( ms );
 		actor = aM->GetActor();
-		if(pcInfo.Name[0]!=0) { //torment has them as 0
+		if(pcInfo.Name[0]!=0 && pcInfo.Name[0]!=-1) { //torment has them as 0 or -1
 			actor->SetText(pcInfo.Name,0); //setting both names
 		}
 		actor->TalkCount = pcInfo.TalkCount;

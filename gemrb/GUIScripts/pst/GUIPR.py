@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIPR.py,v 1.8 2004/09/28 14:25:25 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIPR.py,v 1.9 2004/11/15 00:20:54 edheldil Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -82,7 +82,7 @@ def UpdatePriestWindow ():
 	level = PriestSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
 
-	Name = GemRB.GetPlayerName (pc, 0)
+	Name = GemRB.GetPlayerName (pc, 1)
 	Label = GemRB.GetControl (Window, 0x10000027)
 	GemRB.SetText (Window, Label, Name)
 
