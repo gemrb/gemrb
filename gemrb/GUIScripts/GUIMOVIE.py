@@ -15,9 +15,9 @@ def OnLoad():
 	GemRB.SetText(MovieWindow, PlayButton, 17318)
 	GemRB.SetText(MovieWindow, CreditsButton, 15591)
 	GemRB.SetText(MovieWindow, DoneButton, 11973)
-	GemRB.SetEvent(MovieWindow, PlayButton, 0x00000000, "PlayPress")
-	GemRB.SetEvent(MovieWindow, CreditsButton, 0x00000000, "CreditsPress")
-	GemRB.SetEvent(MovieWindow, DoneButton, 0x00000000, "DonePress")
+	GemRB.SetEvent(MovieWindow, PlayButton, IE_GUI_BUTTON_ON_PRESS, "PlayPress")
+	GemRB.SetEvent(MovieWindow, CreditsButton, IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
+	GemRB.SetEvent(MovieWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	GemRB.ShowModal(MovieWindow)
 	return
 	

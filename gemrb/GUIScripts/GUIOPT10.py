@@ -3,9 +3,11 @@ import GemRB
 
 GamePlayWindow = 0
 TextAreaControl = 0
+B1B = 0
+B1BState = 0
 
 def OnLoad():
-	global GamePlayWindow, TextAreaControl
+	global GamePlayWindow, TextAreaControl, B1B, B1BState
 	GemRB.LoadWindowPack("GUIOPT")
 	GamePlayWindow = GemRB.LoadWindow(10)
 	TextAreaControl = GemRB.GetControl(GamePlayWindow, 15)
@@ -38,41 +40,41 @@ def OnLoad():
         GemRB.SetText(GamePlayWindow, OkButton, 11973)
         GemRB.SetText(GamePlayWindow, CancelButton, 13727)
 
-	GemRB.SetEvent(GamePlayWindow, B1, 0x00000000, "B1Press")
-	GemRB.SetEvent(GamePlayWindow, B1B, 0x00000000, "B1BPress")
+	GemRB.SetEvent(GamePlayWindow, B1, IE_GUI_BUTTON_ON_PRESS, "B1Press")
+	GemRB.SetEvent(GamePlayWindow, B1B, IE_GUI_BUTTON_ON_PRESS, "B1BPress")
 
-	GemRB.SetEvent(GamePlayWindow, B2, 0x00000000, "B2Press")
-	GemRB.SetEvent(GamePlayWindow, B2B, 0x00000000, "B2BPress")
+	GemRB.SetEvent(GamePlayWindow, B2, IE_GUI_BUTTON_ON_PRESS, "B2Press")
+	GemRB.SetEvent(GamePlayWindow, B2B, IE_GUI_BUTTON_ON_PRESS, "B2BPress")
 
-	GemRB.SetEvent(GamePlayWindow, B3, 0x00000000, "B3Press")
-	GemRB.SetEvent(GamePlayWindow, B3B, 0x00000000, "B3BPress")
+	GemRB.SetEvent(GamePlayWindow, B3, IE_GUI_BUTTON_ON_PRESS, "B3Press")
+	GemRB.SetEvent(GamePlayWindow, B3B, IE_GUI_BUTTON_ON_PRESS, "B3BPress")
 
-	GemRB.SetEvent(GamePlayWindow, B4, 0x00000000, "B4Press")
-	GemRB.SetEvent(GamePlayWindow, B4B, 0x00000000, "B4BPress")
+	GemRB.SetEvent(GamePlayWindow, B4, IE_GUI_BUTTON_ON_PRESS, "B4Press")
+	GemRB.SetEvent(GamePlayWindow, B4B, IE_GUI_BUTTON_ON_PRESS, "B4BPress")
 
-	GemRB.SetEvent(GamePlayWindow, B5, 0x00000000, "B5Press")
-	GemRB.SetEvent(GamePlayWindow, B5B, 0x00000000, "B5BPress")
+	GemRB.SetEvent(GamePlayWindow, B5, IE_GUI_BUTTON_ON_PRESS, "B5Press")
+	GemRB.SetEvent(GamePlayWindow, B5B, IE_GUI_BUTTON_ON_PRESS, "B5BPress")
 
-	GemRB.SetEvent(GamePlayWindow, B6, 0x00000000, "B6Press")
-	GemRB.SetEvent(GamePlayWindow, B6B, 0x00000000, "B6BPress")
+	GemRB.SetEvent(GamePlayWindow, B6, IE_GUI_BUTTON_ON_PRESS, "B6Press")
+	GemRB.SetEvent(GamePlayWindow, B6B, IE_GUI_BUTTON_ON_PRESS, "B6BPress")
 
-	GemRB.SetEvent(GamePlayWindow, B7, 0x00000000, "B7Press")
-	GemRB.SetEvent(GamePlayWindow, B7B, 0x00000000, "B7BPress")
+	GemRB.SetEvent(GamePlayWindow, B7, IE_GUI_BUTTON_ON_PRESS, "B7Press")
+	GemRB.SetEvent(GamePlayWindow, B7B, IE_GUI_BUTTON_ON_PRESS, "B7BPress")
 
-	GemRB.SetEvent(GamePlayWindow, B8, 0x00000000, "B8Press")
-	GemRB.SetEvent(GamePlayWindow, B8B, 0x00000000, "B8BPress")
+	GemRB.SetEvent(GamePlayWindow, B8, IE_GUI_BUTTON_ON_PRESS, "B8Press")
+	GemRB.SetEvent(GamePlayWindow, B8B, IE_GUI_BUTTON_ON_PRESS, "B8BPress")
 
-	GemRB.SetEvent(GamePlayWindow, B9, 0x00000000, "B9Press")
-	GemRB.SetEvent(GamePlayWindow, B9B, 0x00000000, "B9BPress")
+	GemRB.SetEvent(GamePlayWindow, B9, IE_GUI_BUTTON_ON_PRESS, "B9Press")
+	GemRB.SetEvent(GamePlayWindow, B9B, IE_GUI_BUTTON_ON_PRESS, "B9BPress")
 
-	GemRB.SetEvent(GamePlayWindow, B10, 0x00000000, "B10Press")
-	GemRB.SetEvent(GamePlayWindow, B10B, 0x00000000, "B10BPress")
+	GemRB.SetEvent(GamePlayWindow, B10, IE_GUI_BUTTON_ON_PRESS, "B10Press")
+	GemRB.SetEvent(GamePlayWindow, B10B, IE_GUI_BUTTON_ON_PRESS, "B10BPress")
 
-	GemRB.SetEvent(GamePlayWindow, B11, 0x00000000, "B11Press")
-	GemRB.SetEvent(GamePlayWindow, B11B, 0x00000000, "B11BPress")
+	GemRB.SetEvent(GamePlayWindow, B11, IE_GUI_BUTTON_ON_PRESS, "B11Press")
+	GemRB.SetEvent(GamePlayWindow, B11B, IE_GUI_BUTTON_ON_PRESS, "B11BPress")
 
-        GemRB.SetEvent(GamePlayWindow, OkButton, 0x00000000, "OkPress")
-        GemRB.SetEvent(GamePlayWindow, CancelButton, 0x00000000, "CancelPress")
+        GemRB.SetEvent(GamePlayWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
+        GemRB.SetEvent(GamePlayWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.ShowModal(GamePlayWindow)
 	return
 
@@ -82,9 +84,14 @@ def B1Press():
 	return
 
 def B1BPress():
-        global GamePlayWindow, TextAreaControl
+        global GamePlayWindow, TextAreaControl, B1B, B1BState
         GemRB.SetText(GamePlayWindow, TextAreaControl, 18032)
 #also toggle character hit autopause variable
+	if B1BState == IE_GUI_BUTTON_UNPRESSED:
+		B1BState = IE_GUI_BUTTON_SELECTED
+	else:
+		B1BState = IE_GUI_BUTTON_UNPRESSED
+	GemRB.SetButtonState(GamePlayWindow, B1B, B1BState)
 	return
 
 def B2Press():
