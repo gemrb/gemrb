@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.11 2003/12/19 22:47:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.12 2003/12/30 17:54:51 balrog994 Exp $
  *
  */
 
@@ -48,6 +48,8 @@ Animation::Animation(unsigned short * frames, int count)
 	pastLastFrame = false;
 	playReversed = false;
 	playOnce = false;
+	ResRef[0] = 0;
+	Active = true;
 }
 
 Animation::~Animation(void)
@@ -79,6 +81,8 @@ void Animation::AddFrame(Sprite2D * frame, int index)
 
 Sprite2D * Animation::NextFrame(void)
 {
+	if(!Active)
+		return NULL;
 	if(starttime == 0) {
 #ifdef WIN32
 		starttime = GetTickCount();
