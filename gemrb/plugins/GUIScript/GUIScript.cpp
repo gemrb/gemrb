@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.69 2003/11/25 19:12:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.70 2003/11/25 20:54:28 balrog994 Exp $
  *
  */
 
@@ -1619,7 +1619,11 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 	if(!MyActor)
 		return NULL;
 	char *poi;
-	core->GetTokenDictionary()->Lookup("Portrait", (unsigned long &) poi);
+	unsigned long PortraitIndex;
+	if(core->GetDictionary()->Lookup("PortraitIndex", PortraitIndex)) {
+		//TODO: Fix that Value
+		//MyActor->SetPortrait(poi);
+	}
 	char resref[9];
 	memset(resref,0,sizeof(resref));
 	int mastertable=core->LoadTable("avprefix");
@@ -1649,8 +1653,8 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 		printf("Value:%d\n",StatID);
 		poi = tm->QueryField(StatID);
 		printf("Part: %s\n",poi);
-		core->DelTable(table);
 		strncat(resref,poi,8);
+		core->DelTable(table);
 	}
 	printf("Resref: %s\n",resref);
 	core->DelTable(mastertable);
@@ -1669,7 +1673,6 @@ static PyObject *GemRB_FillPlayerInfo(PyObject */*self*/, PyObject *args)
 		break;
 	}
 	core->DelTable(mastertable);
-	MyActor->SetPortrait(poi);
 	MyActor->Init();
 	Py_INCREF(Py_None);
 	return Py_None;
