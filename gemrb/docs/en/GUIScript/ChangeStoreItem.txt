@@ -1,0 +1,18 @@
+
+Prototype: ChangeStoreItem( PartyID, slot, action )
+
+Description: Performs a buy, sell, identify or steal action. Action has the same bit values as IsValidStoreItem.
+
+Parameters:
+PartyID   - the PC's position in the party
+slot      - the item's inventory or store slot
+action    - bitfield
+1 - buy
+2 - sell
+4 - identify
+8 - steal
+
+Return value: None
+
+See also: EnterStore, GetSlotItem, GetStoreItem, IsValidStoreItem
+

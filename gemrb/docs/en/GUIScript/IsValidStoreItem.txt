@@ -13,5 +13,5 @@ Return value: bitfield
 4 - valid for identify
 8 - valid for steal
 
-See also: EnterStore, GetSlotItem, GetStoreItem
+See also: EnterStore, GetSlotItem, GetStoreItem, ChangeStoreItem
 
