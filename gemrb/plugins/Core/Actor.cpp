@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.46 2004/04/21 17:41:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.47 2004/04/22 20:44:06 avenger_teambg Exp $
  *
  */
 
@@ -308,6 +308,11 @@ bool Actor::SetStat(unsigned int StatIndex, long Value)
 		case IE_MORALEBREAK:
 			SetCircleSize();
 			break;
+		case IE_HITPOINTS:
+			if(Value<=0) {
+				Die(true);
+			}
+			break;
 	}
 	return true;
 }
@@ -342,6 +347,11 @@ bool Actor::SetBase(unsigned int StatIndex, long Value)
 		case IE_UNSELECTABLE:
 		case IE_MORALEBREAK:
 			SetCircleSize();
+			break;
+		case IE_HITPOINTS:
+			if(Value<=0) {
+				Die(true);
+			}
 			break;
 	}
 	return true;
@@ -421,5 +431,25 @@ int Actor::GetXPLevel(int modified)
 int Actor::GetEncumbrance()
 {
 	return inventory.GetWeight();
+}
+
+void Actor::Die(bool xp_allowed)
+{
+	if(InParty) {
+		//trigger namelessonebitthedust
+		//partymemberdied, etc
+	}
+	else {
+		if(xp_allowed) {
+			//give experience to party
+			core->GetGame()->ShareXP(GetStat(IE_XPVALUE) );
+		}
+	}
+	//handle reputation???
+	//if chunked death, then set DeleteMe
+	//DeleteMe = true;
+        AnimID = IE_ANI_DIE;
+	Active = false; //do we need it?
+	SetStat(IE_STATE_ID, GetStat(IE_STATE_ID)|STATE_DEAD);
 }
 

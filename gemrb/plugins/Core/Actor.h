@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.31 2004/04/21 17:41:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.32 2004/04/22 20:44:06 avenger_teambg Exp $
  *
  */
 
@@ -138,6 +138,7 @@ public:
 			return;
 		}
 		strncpy( Dialog, ResRef, 8 );
+		printf("Setting Dialog for %s: %s\n",LongName, Dialog);
 	}
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small
@@ -199,5 +200,6 @@ public:
 	void SetText(int strref, unsigned char type);
 	/* returns carried weight atm, could calculate with strength*/
 	int GetEncumbrance();
+	void Die(bool xp_allowed);
 };
 #endif

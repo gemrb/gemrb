@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.43 2004/04/21 17:41:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.44 2004/04/22 20:44:06 avenger_teambg Exp $
  *
  */
 
@@ -454,10 +454,14 @@ void Game::ShareXP(int xp)
 		return;
 	}
 	xp /= PartySize;
+	if(!xp) {
+		return;
+	}
 	for(int i=0; i<PartySize; i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
 		}
 		PCs[i]->NewStat(IE_XP,xp,0);
 	}
+	//DisplayString(); //you have gained ... xp
 }

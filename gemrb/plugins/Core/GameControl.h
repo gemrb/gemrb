@@ -24,6 +24,10 @@ class GameControl;
 #define _DEBUG
 #endif
 
+#define DF_IN_DIALOG   1
+#define DF_TALKCOUNT   2
+#define DF_UNBREAKABLE 4
+
 class GEM_EXPORT GameControl : public Control {
 public:
 	GameControl(void);
@@ -89,7 +93,7 @@ private:
 	bool ChangeArea;
 public:
 	Actor* speaker, * target;
-	bool Dialogue;
+	int DialogueFlags;
 public:
 	/* Selects one or all PC */
 	void SelectActor(int whom);
@@ -98,7 +102,7 @@ public:
 	void UnhideGUI();
 	void TryToTalk(Actor *source, Actor *target);
 	void InitDialog(Actor* speaker, Actor* target, const char* dlgref);
-	void EndDialog();
+	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
 	/** finds the first true condition in a dialog */
 	int FindFirstState(Scriptable* target, Dialog* dlg);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.152 2004/04/21 19:52:44 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.153 2004/04/22 20:44:07 avenger_teambg Exp $
  *
  */
 
@@ -314,6 +314,7 @@ static ActionLink actionnames[] = {
 	{"jumptoobject", GameScript::JumpToObject,0},
 	{"jumptopoint", GameScript::JumpToPoint,0},
 	{"jumptopointinstant", GameScript::JumpToPointInstant,0},
+	{"kill", GameScript::Kill,0},
 	{"leavearealua", GameScript::LeaveAreaLUA,0},
 	{"leavearealuaentry", GameScript::LeaveAreaLUAEntry,0},
 	{"leavearealuapanic", GameScript::LeaveAreaLUAPanic,0},
@@ -362,6 +363,7 @@ static ActionLink actionnames[] = {
 	{"setanimstate", GameScript::SetAnimState,AF_BLOCKING},
 	{"setarearestflag", GameScript::SetAreaRestFlag,0},
 	{"setapparentnamestrref", GameScript::SetApparentName,0},
+	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile,0},
 	{"setregularnamestrref", GameScript::SetRegularName,0},
 	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags,0},
 	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},
@@ -2674,7 +2676,8 @@ int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
 	if(core->GetGame()->InParty( tar ) <0) {
 		return 0;
 	}
-	return (tar->GetStat(IE_STATE_ID)&STATE_DEAD)!=0;
+	//don't allow dead
+	return (tar->GetStat(IE_STATE_ID)&STATE_DEAD)!=STATE_DEAD;
 }
 
 int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
@@ -5113,13 +5116,13 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		return;
 	}
 	//can't initiate dialog, because it is already there
-	if (gc->Dialogue) {
+	if (gc->DialogueFlags&DF_IN_DIALOG) {
 		if (Flags & BD_INTERRUPT) {
 			//break the current dialog if possible
-			gc->EndDialog();
+			gc->EndDialog(true);
 		}
 		//check if we could manage to break it, not all dialogs are breakable!
-		if (gc->Dialogue) {
+		if (gc->DialogueFlags&DF_IN_DIALOG) {
 			printf( "[IEScript]: Dialog cannot be initiated because there is already one.\n" );
 			Sender->CurrentAction = NULL;
 			return;
@@ -5176,8 +5179,9 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	if (Dialog[0]) {
 		//increasing NumTimesTalkedTo
-		if (Flags & BD_TALKCOUNT)
-			actor->TalkCount++;
+		if (Flags & BD_TALKCOUNT) {
+			gc->DialogueFlags|=DF_TALKCOUNT;
+		}
 
 		if(Flags & BD_TARGET) {
 			gc->InitDialog( target, actor, Dialog );
@@ -5397,8 +5401,6 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		if(door->Flags&2) {
 			//playsound unsuccessful opening of door
 			core->GetSoundMgr()->Play("AMB_D06");
-			//temp. hack
-			door->SetDoorClosed( false, true );
 		}
 		else {
 			door->SetDoorClosed( false, true );
@@ -6450,5 +6452,15 @@ void GameScript::UnloadArea(Scriptable* Sender, Action* parameters)
 	if(map>=0) {
 		core->GetGame()->DelMap(map, parameters->int0Parameter);
 	}
+}
+
+void GameScript::Kill(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* target = ( Actor* ) tar;
+	target->Die(false); //die, no XP
 }
 

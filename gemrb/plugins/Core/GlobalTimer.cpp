@@ -68,7 +68,7 @@ void GlobalTimer::Update()
 		GameControl* gc = ( GameControl* )
 			core->GetWindow( 0 )->GetControl( 0 );
 		if (gc->ControlType == IE_GUI_GAMECONTROL) {
-			if (gc->Dialogue)
+			if (gc->DialogueFlags&DF_IN_DIALOG)
 				return;
 		}
 		//MovingActor = NULL;

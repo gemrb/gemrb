@@ -82,7 +82,7 @@ GameControl::GameControl(void)
 	RightCount = 0;
 	TopCount = 0;
 	GUIEnabled = false;
-	Dialogue = false;
+	DialogueFlags = 0;
 	dlg = NULL;
 	target = NULL;
 	speaker = NULL;
@@ -1143,12 +1143,12 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 	this->target = target;
 	speaker->LastTalkedTo=target;
 	target->LastTalkedTo=speaker;
-	if (Dialogue) {
+	if (DialogueFlags&DF_IN_DIALOG) {
 		return;
 	}
 	this->speaker = speaker;
 	DisableMouse = true;
-	Dialogue = true;
+	DialogueFlags |= DF_IN_DIALOG;
 	unsigned long index;
 	core->GetDictionary()->Lookup( "MessageWindowSize", index );
 	if (index == 0) {
@@ -1181,9 +1181,18 @@ static void AddTalk(TextArea* ta, Actor* speaker, char* speaker_color,
 	free( newstr );
 }
 
-void GameControl::EndDialog()
+/*try to break will only try to break it, false means unconditional stop*/
+void GameControl::EndDialog(bool try_to_break)
 {
-	if (speaker) {
+	if(try_to_break && (DialogueFlags&DF_UNBREAKABLE) )
+	{
+		return;
+	}
+	if(speaker && (DialogueFlags&DF_TALKCOUNT) )
+	{
+		speaker->TalkCount++;
+	}
+	if (speaker) { //this could be wrong
 		speaker->CurrentAction = NULL;
 	}
 	speaker = NULL;
@@ -1197,7 +1206,7 @@ void GameControl::EndDialog()
 	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
 	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
 	DisableMouse = false;
-	Dialogue = false;
+	DialogueFlags = 0;
 }
 
 int GameControl::FindFirstState(Scriptable* target, Dialog* dlg)
