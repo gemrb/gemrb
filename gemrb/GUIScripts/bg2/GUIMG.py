@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMG.py,v 1.6 2004/11/05 22:02:12 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMG.py,v 1.7 2004/12/02 21:47:49 avenger_teambg Exp $
 
 
 # GUIMG.py - scripts to control mage spells windows from GUIMG winpack
@@ -25,7 +25,7 @@
 
 import GemRB
 from GUIDefines import *
-
+from ie_stats import *
 from GUICommonWindows import SetSelectionChangeHandler
 
 MageWindow = None
@@ -89,9 +89,8 @@ def OpenMageWindow ():
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	SetSelectionChangeHandler (UpdateMageWindow)
-	UpdateMageWindow ()
-
 	GemRB.UnhideGUI ()	
+	UpdateMageWindow ()
 	return
 
 def UpdateMageWindow ():
@@ -169,6 +168,11 @@ i)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			GemRB.SetTooltip (Window, Button, '')
 			GemRB.EnableButtonBorder (Window, Button, 0, 0)
+	Table = GemRB.LoadTable ("clskills")
+	if (GemRB.GetTableValue (Table, GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 2)=="*"):
+		GemRB.SetVisible (Window, 2)
+	else:
+		GemRB.SetVisible (Window, 1)
 	return
 
 

@@ -32,7 +32,9 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG")
 	RaceWindow = GemRB.LoadWindow(15)
 
-	Class = GemRB.GetVar("Class")-1
+	ClassTable = GemRB.LoadTable("classes")
+	ClassRow = GemRB.GetVar("Class")-1
+	Class = GemRB.GetTableValue(ClassTable, ClassRow, 5)
 	TmpTable = GemRB.LoadTable("clskills")
 	TableName = GemRB.GetTableValue(TmpTable, Class, 0)
 	if TableName == "*":

@@ -28,16 +28,17 @@ def DisplayRaces():
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global RaceTable, RaceCount, TopIndex
-	
-	GemRB.LoadWindowPack("GUICG")
-	RaceWindow = GemRB.LoadWindow(15)
 
-	Class = GemRB.GetVar("Class")-1
+	ClassTable = GemRB.LoadTable("classes")
+	ClassRow = GemRB.GetVar("Class")-1
+	Class = GemRB.GetTableValue(ClassTable, ClassRow, 5)
 	TmpTable = GemRB.LoadTable("clskills")
 	TableName = GemRB.GetTableValue(TmpTable, Class, 0)
 	if TableName == "*":
-		GemRB.SetNextScript("GUICG6")
+		GemRB.SetNextScript("GUICG7")
 		return
+	GemRB.LoadWindowPack("GUICG")
+	RaceWindow = GemRB.LoadWindow(15)
 	RaceTable = GemRB.LoadTable(TableName)
 	RaceCount = GemRB.GetTableRowCount(RaceTable)-11
 	if RaceCount<0:
@@ -83,5 +84,5 @@ def BackPress():
 
 def NextPress():
         GemRB.UnloadWindow(RaceWindow)
-	GemRB.SetNextScript("GUICG6")
+	GemRB.SetNextScript("GUICG7") #mage spells
 	return
