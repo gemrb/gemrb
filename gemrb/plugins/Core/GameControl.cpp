@@ -412,7 +412,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	Game * game = core->GetGame();
 	Map * area = game->GetMap(MapIndex);
 
-	switch(area->GetBlocked(GameX, GameY)) {
+	switch(area->GetBlocked(GameX, GameY)&3) {
 		case 0:
 			nextCursor = 6;
 		break;
@@ -421,7 +421,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			nextCursor = 4;
 		break;
 
-		case 2:
+		case 2: case 3:
 			nextCursor = 34;
 		break;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.68 2004/01/18 17:23:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.69 2004/01/19 18:46:08 avenger_teambg Exp $
  *
  */
 
@@ -31,7 +31,7 @@
 extern Interface * core;
 static int NormalCost=10;
 static int AdditionalCost=4;
-static int Passable[16]={0,1,1,1,1,1,1,1,0,1,0,0,0,0,2,1};
+static int Passable[16]={4,1,1,1,1,1,1,1,4,1,0,0,0,0,2,1};
 static bool PathFinderInited=false;
 
 #define STEP_TIME 150
@@ -806,4 +806,48 @@ unsigned char PathFinder::GetOrient(short sX, short sY, short dX, short dY)
 		}
 	}
 	return 0;
+}
+
+bool PathFinder::IsVisible(short sX, short sY, short dX, short dY)
+{
+	int diffx=sX-dX;
+	int diffy=sY-dY;
+	if(abs(diffx)>=abs(diffy))
+	{
+	 //vertical
+		double elevationy =fabs(diffx)/diffy;
+		if(sX>dX)
+		{
+			for(int startx=sX;startx>dX;startx--)
+			{
+				if(Passable[sMap->GetPixelIndex(startx,sY-(int) ((sX-startx)/elevationy) ) ]&4 ) return false;
+			}
+		}
+		else
+		{
+			for(int startx=sX;startx<dX;sX++)
+			{
+				if(Passable[sMap->GetPixelIndex(startx,sY+(int) ((sX-startx)/elevationy) ) ]&4 ) return false;
+			}
+		}
+	}
+	else
+	{
+		double elevationx = fabs(diffy)/diffx;
+		if(sY>dY)
+		{
+			for(int starty=sY;starty>dY;starty--)
+			{
+				if(Passable[sMap->GetPixelIndex(sX-(int) ((sY-starty)/elevationx),starty)]&4 ) return false;
+			}
+		}
+		else
+		{
+			for(int starty=sY;starty<dY;starty++)
+			{
+				if(Passable[sMap->GetPixelIndex(sX+(int) ((sY-starty)/elevationx),starty)]&4 ) return false;
+			}
+		}
+	}
+	return true;
 }

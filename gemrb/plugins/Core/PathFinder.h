@@ -43,6 +43,7 @@ private:
 	void SetupNode(unsigned int x,unsigned int y, unsigned int Cost);
 //maybe this is unneeded and orientation could be calculated on the fly
 	unsigned char GetOrient(short sX, short sY, short dX, short dY);
+	bool IsVisible(short sX, short sY, short dX, short dY);
 };
 
 #endif

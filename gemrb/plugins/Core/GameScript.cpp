@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.51 2004/01/18 16:25:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.52 2004/01/19 18:46:06 avenger_teambg Exp $
  *
  */
 
@@ -541,6 +541,7 @@ int GameScript::ExecuteResponseSet(Scriptable * Sender, ResponseSet * rS)
 			break;
 		}
 	}
+	return 0;
 }
 
 int GameScript::ExecuteResponse(Scriptable * Sender, Response * rE)
