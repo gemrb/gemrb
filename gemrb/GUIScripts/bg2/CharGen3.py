@@ -8,6 +8,7 @@ def OnLoad():
 	global CharGenWindow, TextAreaControl
 
 	GemRB.SetVar("Class",0) #class
+	GemRB.SetVar("Class Kit",0) #class kit
 
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)

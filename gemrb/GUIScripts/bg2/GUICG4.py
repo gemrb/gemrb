@@ -6,8 +6,35 @@ TextAreaControl = 0
 DoneButton = 0
 AbilityTable = 0
 PointsLeft = 0
+Minimum = 0
+Maximum = 0
+KitIndex = 0
+
+def CalcLimits(Abidx):
+	Race = GemRB.GetVar("Race")-1
+	Minimum = 3
+	Maximum = 18
+
+	Abclasrq = GemRB.LoadTable("ABCLASRQ")
+	tmp = GemRB.GetTableValue(Abclasrq, KitIndex, Abidx)
+	if tmp!=0 and tmp>Minimum:
+		Minimum = tmp
+
+	Abracecq = GemRB.LoadTable("ABRACERQ")
+	tmp = GemRB.GetTableValue(Abracerq, Race, Abidx)
+
+	if Minimum<1:
+		Minimum=1
+	if Maximum>25:
+		Maximum=25
+	return
 
 def RollPress():
+	RaceTable = GemRB.LoadTable("races")
+	Abracead = GemRB.LoadTable("ABRACEAD")
+	Abclsmod = GemRB.LoadTable("ABCLSMOD")
+	Race = GemRB.GetVar("Race")-1
+
 	GemRB.InvalidateWindow(AbilityWindow)
 	GemRB.SetVar("Ability",0)
 	GemRB.SetVar("Ability -1",0)
@@ -16,10 +43,15 @@ def RollPress():
 	GemRB.SetLabelUseRGB(AbilityWindow, SumLabel, 1)
 
 	for i in range(0,6):
-		add = 0
+		add = GemRB.GetTableValue(Abracead, Race, i) + GemRB.GetTableValue(Abclsmod, KitIndex, i)
 		dice = 3
 		size = 6
+		CalcLimits(i)
 		v = GemRB.Roll(dice, size, add)
+		if v<Minimum:
+			v = Minimum
+		if v>Maximum:
+			v = Maximum
 		GemRB.SetVar("Ability "+str(i), v )
 		Label = GemRB.GetControl(AbilityWindow, 0x10000003+i)
 		GemRB.SetText(AbilityWindow, Label, str(v) )
@@ -30,7 +62,21 @@ def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
 	global PointsLeft
 	global AbilityTable
+	global KitIndex, Minimum, Maximum
 	
+	Kit = GemRB.GetVar("Class Kit")
+	if Kit == 0:
+		ClassTable = GemRB.LoadTable("classes")
+		Class = GemRB.GetVar("Class")-1
+		KitName = GemRB.GetTableRowName(ClassTable, Class)
+	else:
+		KitList = GemRB.LoadTable("kitlist")
+		#rowname is just a number, first value row what we need here
+		KitName = GemRB.GetTableValue(KitList, Kit, 0) 
+
+	Abclasrq = GemRB.LoadTable("ABCLASRQ")
+	KitIndex = GemRB.GetTableRowIndex(Abclasrq, KitName)
+
 	GemRB.LoadWindowPack("GUICG")
         AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindow(4)
@@ -79,8 +125,7 @@ def RightPress():
 	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	#should be more elaborate
-	Minimum=3
-	Maximum=18
+	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
 	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, Abidx, 1) )
@@ -100,8 +145,7 @@ def JustPress():
 	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	#should be more elaborate
-	Minimum=3
-	Maximum=18
+	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
 	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, Abidx, 1) )

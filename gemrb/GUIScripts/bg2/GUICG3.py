@@ -10,6 +10,17 @@ def OnLoad():
 	global AlignmentWindow, TextAreaControl, DoneButton
 	global AlignmentTable
 	
+	Kit = GemRB.GetVar("Class Kit")
+	if Kit == 0:
+		ClassTable = GemRB.LoadTable("classes")
+		Class = GemRB.GetVar("Class")-1
+		KitName = GemRB.GetTableRowName(ClassTable, Class)
+	else:
+		KitList = GemRB.LoadTable("kitlist")
+		KitName = GemRB.GetTableValue(KitList, Kit, 0) #rowname is just a number
+
+        AlignmentOk = GemRB.LoadTable("ALIGNMNT")
+
 	GemRB.LoadWindowPack("GUICG")
         AlignmentTable = GemRB.LoadTable("aligns")
 	AlignmentWindow = GemRB.LoadWindow(3)
@@ -17,11 +28,16 @@ def OnLoad():
 	for i in range(0,9):
 		Button = GemRB.GetControl(AlignmentWindow, i+2)
 		GemRB.SetButtonFlags(AlignmentWindow, Button, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+		GemRB.SetButtonState(AlignmentWindow, Button, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetText(AlignmentWindow, Button, GemRB.GetTableValue(AlignmentTable,i,0) )
+
 	for i in range(0,9):
 		Button = GemRB.GetControl(AlignmentWindow, i+2)
-		GemRB.SetText(AlignmentWindow, Button, GemRB.GetTableValue(AlignmentTable,i,0) )
-		GemRB.SetEvent(AlignmentWindow, Button, IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
-		GemRB.SetVarAssoc(AlignmentWindow, Button, "Alignment", i)
+		if GemRB.GetTableValue(AlignmentOk, KitName, GemRB.GetTableValue(AlignmentTable, i, 4) ) != 0:
+			print "Enabled",i
+			GemRB.SetButtonState(AlignmentWindow, Button, IE_GUI_BUTTON_ENABLED)
+			GemRB.SetEvent(AlignmentWindow, Button, IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
+			GemRB.SetVarAssoc(AlignmentWindow, Button, "Alignment", i)
 
 	BackButton = GemRB.GetControl(AlignmentWindow,13)
 	GemRB.SetText(AlignmentWindow,BackButton,15416)

@@ -82,6 +82,7 @@ def OnLoad():
 	return
 
 def MultiClassPress():
+	GemRB.SetVar("Class Kit",0)
 	GemRB.UnloadWindow(ClassWindow)
 	GemRB.SetNextScript("GUICG10")
 	return
