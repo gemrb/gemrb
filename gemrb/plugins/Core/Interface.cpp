@@ -529,6 +529,9 @@ bool Interface::LoadConfig(void)
 		else if(stricmp(name, "FullScreen") == 0) {
 			FullScreen = (atoi(value) == 0) ? false : true;
 		}
+		else if(stricmp(name, "CaseSensitive") == 0) {
+			CaseSensitive = (atoi(value) == 0) ? false : true;
+		}
 		else if(stricmp(name, "GameType") == 0) {
 			strcpy(GameType, value);
 		}

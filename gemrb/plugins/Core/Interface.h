@@ -180,7 +180,7 @@ private:
 public:
 	char GameType[_MAX_PATH], GemRBPath[_MAX_PATH], CachePath[_MAX_PATH], GUIScriptsPath[_MAX_PATH], GamePath[_MAX_PATH], INIConfig[_MAX_PATH], CD1[_MAX_PATH], CD2[_MAX_PATH], CD3[_MAX_PATH], CD4[_MAX_PATH], CD5[_MAX_PATH], CD6[_MAX_PATH];
 	int Width, Height, Bpp;
-	bool FullScreen;
+	bool FullScreen, CaseSensitive;
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);
   /** Sends a termination signal to the Video Driver */
