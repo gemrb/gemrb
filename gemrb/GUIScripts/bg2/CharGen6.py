@@ -7,8 +7,10 @@ TextAreaControl = 0
 def OnLoad():
 	global CharGenWindow, TextAreaControl
 
-	for i in range(1,32):
-		GemRB.SetVar("Skill "+str(i),0) #skills
+	for i in range(0,6):
+		GemRB.SetVar("Skill "+str(i),0) #thieving skills
+	for i in range(0,32):
+		GemRB.SetVar("Prof "+str(i),0)  #proficiencies
 
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)

@@ -65,7 +65,7 @@ def OnLoad():
 	Kit = GemRB.GetVar("Class Kit")
 	if Kit == 0:
 		KitName = ClassName
-		ProfColumn = Class + 3
+		ProfColumn = GemRB.GetTableValue(ClassTable,Class,5)+2
 	else:
 		KitList = GemRB.LoadTable("kitlist")
 		#rowname is just a number, the kitname is the first data column
