@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.31 2004/06/27 23:47:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.32 2004/07/25 13:36:39 edheldil Exp $
  *
  */
 
@@ -112,6 +112,8 @@ public:
 	void SetPicture(Sprite2D* Picture);
 	/** Sets border/frame parameters */
 	void SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled = false);
+	/** Sets font used for drawing button label */
+	void SetFont(Font* newfont);
 	/** Enables or disables specified border/frame */
 	void EnableBorder(int index, bool enabled);
 public: // Public Events

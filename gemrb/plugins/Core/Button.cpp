@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.66 2004/07/24 23:47:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.67 2004/07/25 13:36:39 edheldil Exp $
  *
  */
 
@@ -287,7 +287,10 @@ void Button::EnableBorder(int index, bool enabled)
 	}
 }
 
-
+void Button::SetFont(Font* newfont)
+{
+	font = newfont;
+}
 /** Handling The default button (enter) */
 void Button::OnSpecialKeyPress(unsigned char Key)
 {

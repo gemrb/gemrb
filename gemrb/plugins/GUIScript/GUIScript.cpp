@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.172 2004/07/24 17:20:24 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.173 2004/07/25 13:36:40 edheldil Exp $
  *
  */
 
@@ -1409,6 +1409,7 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 	Py_INCREF( Py_None );
 	return Py_None;
 }
+
 PyDoc_STRVAR( GemRB_SetButtonBorder__doc,
 "SetButtonBorder(WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, R, G, B, A, [enabled])\n\n"
 "Sets border/frame parameters for a button" );
@@ -1476,6 +1477,42 @@ static PyObject* GemRB_EnableButtonBorder(PyObject * /*self*/, PyObject* args)
 	Button* btn = ( Button* ) ctrl;
 
 	btn->EnableBorder( BorderIndex, (bool)enabled );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetButtonFont__doc,
+"SetButtonFont(WindowIndex, ControlIndex, FontResRef)\n\n"
+"Sets font used for drawing button label" );
+
+static PyObject* GemRB_SetButtonFont(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+	char* FontResRef;
+
+	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex,
+			&FontResRef)) {
+		return AttributeError( GemRB_SetButtonFont__doc );
+	}
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (win == NULL) {
+		return NULL;
+	}
+
+	Control* ctrl = win->GetControl( ControlIndex );
+	if (!ctrl) {
+		return NULL;
+	}
+
+	if (ctrl->ControlType != 0) {
+		return NULL;
+	}
+
+	Button* btn = ( Button* ) ctrl;
+
+	btn->SetFont( core->GetFont( FontResRef ));
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3345,6 +3382,8 @@ static PyMethodDef GemRBMethods[] = {
 	GemRB_SetButtonBorder__doc},
 	{"EnableButtonBorder", GemRB_EnableButtonBorder, METH_VARARGS,
 	GemRB_EnableButtonBorder__doc},
+	{"SetButtonFont", GemRB_SetButtonFont, METH_VARARGS,
+	GemRB_SetButtonFont__doc},
 	{"SetControlPos", GemRB_SetControlPos, METH_VARARGS,
 	GemRB_SetControlPos__doc},
 	{"SetControlSize", GemRB_SetControlSize, METH_VARARGS,
