@@ -34,8 +34,9 @@ def OnLoad():
 	GemRB.SetVar("FloatWindow", -1)
 	GemRB.SetVar("ActionsPosition", -1) #already handled in portraitwindow
 	GemRB.SetVar("OptionsPosition", -1) #already handled in messagewindow
-	GemRB.SetVar("OtherPosition", 3) #Top
 	GemRB.SetVar("MessagePosition", 4)
+	GemRB.SetVar("OtherPosition", 5) #Inactivating
+	GemRB.SetVar("TopPosition", 5) #Inactivating
 
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	

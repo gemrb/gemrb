@@ -123,9 +123,9 @@ def OnIncreaseSize():
 
 	if Expand!=2:
 		GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
-		GemRB.UnloadWindow(MessageWindow)	
+		GemRB.UnloadWindow(MessageWindow)
 		Expand = Expand+1
-		MessageWindow = TMessageWindow	
+		MessageWindow = TMessageWindow
 		GemRB.SetVar("MessageWindowSize", Expand)
 		UpdateResizeButtons()
 

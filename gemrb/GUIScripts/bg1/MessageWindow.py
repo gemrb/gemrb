@@ -28,8 +28,8 @@ def OnLoad():
 	#PopulatePortraitWindow()
 	OptionsWindow = GemRB.LoadWindow(0)
 	MessageWindow = GemRB.LoadWindow(4)
-        #fixme ugly
-        OpenPortraitWindow()
+	#fixme ugly
+	OpenPortraitWindow()
 	PortraitWindow = GUICommonWindows.PortraitWindow
 	MessageTA = GemRB.GetControl(MessageWindow, 3)
 	GemRB.SetTAAutoScroll(MessageWindow, MessageTA, 1)
@@ -44,11 +44,14 @@ def OnLoad():
 	GemRB.SetVar("ActionsPosition", 4) #BottomAdded
 	GemRB.SetVar("OptionsPosition", 0) #Left
 	GemRB.SetVar("MessagePosition", 4) #BottomAdded
-	GemRB.SetVar("OtherPosition", 0) #Left
+	GemRB.SetVar("OtherPosition", 5) #Inactivating
+	GemRB.SetVar("TopPosition", 5) #Inactivating
+
 	
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)
 	
+	SetupMenuWindowControls (OptionsWindow)
 	UpdateResizeButtons()
 	
 	GemRB.SetVisible(PortraitWindow, 2) #right
@@ -131,9 +134,9 @@ def OnDecreaseSize():
 	GemRB.UnhideGUI()
 	if Expand:
 		GemRB.SetControlStatus(TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED)
-	else:	   
+	else:
 		GemRB.SetControlStatus(0,0,IE_GUI_CONTROL_FOCUSED)
-	return	  
+	return
 	
 def UpdateResizeButtons():
 	global MessageWindow, ExpandButton, ContractButton

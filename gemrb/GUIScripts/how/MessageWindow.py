@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.13 2005/03/02 20:04:12 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.14 2005/03/03 22:44:13 avenger_teambg Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -68,7 +68,8 @@ def OnLoad():
 	GemRB.SetVar("ActionsPosition", 4) #BottomAdded
 	GemRB.SetVar("OptionsPosition", 0) #Left
 	GemRB.SetVar("MessagePosition", 4) #BottomAdded
-	GemRB.SetVar("OtherPosition", 3) #top
+	GemRB.SetVar("OtherPosition", 5) #Inactivating
+	GemRB.SetVar("TopPosition", 5) #Inactivating
 	
 	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("MessageWindowSize", 0)
@@ -156,7 +157,7 @@ def OnDecreaseSize():
 	GemRB.UnhideGUI()
 	if Expand:
 		GemRB.SetControlStatus(TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED)
-	else:	   
+	else:
 		GemRB.SetControlStatus(0,0,IE_GUI_CONTROL_FOCUSED)
 	return
 	
