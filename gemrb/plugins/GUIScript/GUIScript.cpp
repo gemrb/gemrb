@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.186 2004/08/08 13:22:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.187 2004/08/10 19:55:47 avenger_teambg Exp $
  *
  */
 
@@ -162,6 +162,28 @@ GameControl* StartGameControl()
 	}
 
 	return gc;
+}
+
+PyDoc_STRVAR( GemRB_GetGameString__doc,
+"GetGameVariable(Index\n\n"
+"Returns various game strings, known values for index are:\n"
+"0 - Loading Mos picture\n"
+"1 and above - undefined.");
+
+static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
+{
+	int Index;
+
+	if (!PyArg_ParseTuple( args, "i", &Index )) {
+		return AttributeError( GemRB_GetGameString__doc );
+	}
+	if(Index==0) {
+		Game *game = core->GetGame();
+		if(game) return Py_BuildValue("s", core->GetGame()->LoadMos);
+		return Py_BuildValue("s", "");
+	}
+
+	return NULL;
 }
 
 PyDoc_STRVAR( GemRB_LoadGame__doc,
@@ -3288,6 +3310,8 @@ static PyMethodDef GemRBMethods[] = {
 	GemRB_ExecuteString__doc},
 	{"EvaluateString", GemRB_EvaluateString, METH_VARARGS,
 	GemRB_EvaluateString__doc},
+	{"GetGameString", GemRB_GetGameString, METH_VARARGS,
+	GemRB_GetGameString__doc},
 	{"LoadGame", GemRB_LoadGame, METH_VARARGS,
 	GemRB_LoadGame__doc},
 	{"EnterGame", GemRB_EnterGame, METH_NOARGS,
