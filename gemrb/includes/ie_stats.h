@@ -176,7 +176,7 @@
 #define IE_THRULLCHARM  			  149
 #define IE_SUMMONDISABLE			  150
 #define IE_HITBONUS 				  151    
-#define IE_KIT  					  152 
+#define IE_KIT  				  152 
 #define IE_FORCESURGE   			  153
 #define IE_SURGEMOD 				  154
 #define IE_IMPROVEDHASTE			  155
@@ -226,4 +226,21 @@
 #define IE_FACTION		221
 #define IE_SUBRACE		222
 
+//These are in original PST, IWD, IWD2, but not as stats
+#define IE_INTERNAL_0            240
+#define IE_INTERNAL_1            241
+#define IE_INTERNAL_2            242
+#define IE_INTERNAL_3            243
+#define IE_INTERNAL_4            244
+#define IE_INTERNAL_5            245
+#define IE_INTERNAL_6            246
+#define IE_INTERNAL_7            247
+#define IE_INTERNAL_8            248
+#define IE_INTERNAL_9            249
+#define IE_INTERNAL_A            250
+#define IE_INTERNAL_B            251
+#define IE_INTERNAL_C            252
+#define IE_INTERNAL_D            253
+#define IE_INTERNAL_E            254
+#define IE_INTERNAL_F            255
 #endif
