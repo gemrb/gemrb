@@ -1,9 +1,6 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-//temp hack
-#define HAS_VORBIS_SUPPORT 1
-
 #ifndef WIN32
 #include "../../config.h"
 #endif

@@ -113,6 +113,9 @@ AC_CHECK_HEADERS([sys/time.h])
 AC_CHECK_HEADERS([sys/stat.h])
 AC_CHECK_LIB(dl, dlopen, [LIBDL="-ldl"], [LIBDL=""])
 AC_SUBST(LIBDL)
+AC_CHECK_LIB(vorbisfile, ov_info, 
+	AC_DEFINE( HAS_VORBIS_SUPPORT, 1, [Handling of .ogg soundfiles])
+	LIBS="$LIBS -lvorbis -lvorbisfile",, -lvorbis )
 
 AC_CHECK_PTHREADS
 
