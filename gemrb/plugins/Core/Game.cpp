@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.64 2005/03/05 21:07:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.65 2005/03/08 19:58:13 avenger_teambg Exp $
  *
  */
 
@@ -646,14 +646,22 @@ bool Game::PartyMemberDied()
 void Game::IncrementChapter()
 {
 	//clear statistics
+	
+	for(unsigned int i=0; i<PCs.size(); i++) {
+		//all PCs must have this!
+		PCs[i]->PCStats->IncrementChapter();
+	}
 	ieDword chapter = 0;
 	globals->Lookup("CHAPTER",chapter);
 	globals->SetAt("CHAPTER",chapter+1);
 }
 
-void Game::ReputationAltered()
+void Game::SetReputation(int r)
 {
+	if (r<10) r=10;
+	else if (r>200) r=200;
+	Reputation = (ieDword) r;
 	for(unsigned int i=0; i<PCs.size(); i++) {
-		PCs[i]->NewStat(IE_REPUTATION, Reputation, MOD_ABSOLUTE);
+		PCs[i]->SetStat(IE_REPUTATION, Reputation);
 	}
 }

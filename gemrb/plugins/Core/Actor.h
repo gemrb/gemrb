@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.60 2005/03/06 14:18:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.61 2005/03/08 19:58:13 avenger_teambg Exp $
  *
  */
 
@@ -105,6 +105,7 @@ public:
 	ieWord    FavouriteWeaponsCount[4];
 public:
 	PCStatsStruct();
+	void IncrementChapter();
 };
 
 class GEM_EXPORT Actor : public Moveble {

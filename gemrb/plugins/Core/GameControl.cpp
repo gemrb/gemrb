@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.194 2005/03/05 21:07:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.195 2005/03/08 19:58:14 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1394,6 +1394,7 @@ void GameControl::DialogChoose(unsigned int choose)
 	char Tmp[256];
 	ieDword index;
 
+printf("Chosen Dialog: %u\n", choose);
 	if (!core->GetDictionary()->Lookup( "MessageWindow", index )) {
 		return;
 	}

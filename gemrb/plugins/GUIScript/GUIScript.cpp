@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.284 2005/03/07 18:05:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.285 2005/03/08 19:58:19 avenger_teambg Exp $
  *
  */
 
@@ -57,6 +57,9 @@ typedef struct SpellDescType {
 } SpellDescType;
 
 static SpellDescType *StoreSpells = NULL;
+
+static int ReputationIncrease[20]={0xcccccccc};
+static int ReputationDonation[20]={0xcccccccc};
 
 inline bool valid_number(const char* string, long& val)
 {
@@ -2696,7 +2699,7 @@ static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 {
 	Game *game = core->GetGame();
 	if (!game) {
-		return NULL;
+		return RuntimeError( "No game loaded!" );
 	}
 	return PyInt_FromLong( game->GetPartySize(0) );
 }
@@ -2717,12 +2720,12 @@ PyDoc_STRVAR( GemRB_GameGetReputation__doc,
 
 static PyObject* GemRB_GameGetReputation(PyObject * /*self*/, PyObject* /*args*/)
 {
-	int Reputation = core->GetGame()->Reputation;
+	int Reputation = (int) core->GetGame()->Reputation;
 	return PyInt_FromLong( Reputation );
 }
 
 PyDoc_STRVAR( GemRB_GameSetReputation__doc,
-"GameSetReputation() => int\n\n"
+"GameSetReputation(Reputation)\n\n"
 "Sets current party reputation." );
 
 static PyObject* GemRB_GameSetReputation(PyObject * /*self*/, PyObject* args)
@@ -2732,10 +2735,60 @@ static PyObject* GemRB_GameSetReputation(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "i", &Reputation )) {
 		return AttributeError( GemRB_GameSetReputation__doc );
 	}
-	core->GetGame()->Reputation=Reputation;
+	core->GetGame()->SetReputation( Reputation );
 
 	Py_INCREF( Py_None );
 	return Py_None;
+}
+
+void ReadReputation()
+{
+	int table = core->LoadTable( "reputati" );
+	if (table<0) {
+		memset(ReputationIncrease,0,sizeof(ReputationIncrease) );
+		memset(ReputationDonation,0,sizeof(ReputationDonation) );
+		return;
+	}
+	TableMgr *tab = core->GetTable( table );
+	for (int i = 0; i < 20; i++) {
+		ReputationIncrease[i] = atoi( tab->QueryField(i,4) );
+		ReputationDonation[i] = atoi( tab->QueryField(i,8) );
+	}
+	core->DelTable( table );
+}
+
+PyDoc_STRVAR( GemRB_IncreaseReputation__doc,
+"IncreaseReputation( donation ) => int\n\n"
+"Increases party reputation according to the donation. (See reputati.2da)" );
+
+static PyObject* GemRB_IncreaseReputation(PyObject * /*self*/, PyObject* args)
+{
+	int Donation;
+	int Increase = 0;
+
+	if (!PyArg_ParseTuple( args, "i", &Donation )) {
+		return AttributeError( GemRB_IncreaseReputation__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	int Row = (game->Reputation-9)/10;
+	if (Row>19) {
+		Row = 19;
+	}
+	if (ReputationDonation[0]==(int) 0xcccccccc) {
+		ReadReputation();
+	}
+	int Limit = ReputationDonation[Row];
+	if (Limit<=Donation) {
+		Increase = ReputationIncrease[Row];
+		if (Increase) {
+			game->SetReputation( game->Reputation + Increase );
+		}
+	}
+	return PyInt_FromLong ( Increase );
 }
 
 PyDoc_STRVAR( GemRB_GameGetPartyGold__doc,
@@ -2749,7 +2802,7 @@ static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GameSetPartyGold__doc,
-"GameSetPartyGold() => int\n\n"
+"GameSetPartyGold(Gold)\n\n"
 "Sets current party gold." );
 
 static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
@@ -2977,7 +3030,7 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	if (!game) {
-		return NULL;
+		return RuntimeError( "No game loaded!" );
 	}
 	Actor* MyActor = game->FindPC( PartyID );
 	if (!MyActor) {
@@ -3001,7 +3054,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	if (!game) {
-		return NULL;
+		return RuntimeError( "No game loaded!" );
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
@@ -3046,7 +3099,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	if (!game) {
-		return NULL;
+		return RuntimeError( "No game loaded!" );
 	}
 	Actor* MyActor = game->FindPC( PartyID );
 	if (!MyActor || !MyActor->PCStats) {
@@ -3133,7 +3186,7 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	if (!game) {
-		return NULL;
+		return RuntimeError( "No game loaded!" );
 	}
 
 	Actor* actor;
@@ -3166,7 +3219,7 @@ static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	if (!game) {
-		return NULL;
+		return RuntimeError( "No game loaded!" );
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
@@ -3236,7 +3289,7 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	if (!game) {
-		return NULL;
+		return RuntimeError( "No game loaded!" );
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
@@ -3299,7 +3352,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	//
 	Game *game = core->GetGame();
 	if (!game) {
-		return NULL;
+		return RuntimeError( "No game loaded!" );
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
 	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
@@ -3580,10 +3633,16 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 
 	if (type) {
 		STOItem* si = store->GetItem( Slot );
+		if (!si) {
+			return NULL;
+		}
 		ItemResRef = si->ItemResRef;
 		Flags = si->Flags;
 	} else {
 		CREItem* si = actor->inventory.GetSlotItem( Slot );
+		if (!si) {
+			return NULL;
+		}
 		ItemResRef = si->ItemResRef;
 		Flags = si->Flags;
 	}
@@ -4110,29 +4169,44 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSlots__doc,
-"GetSlots(SlotType)=>dict\n\n"
-"Returns a tuple of slot items matching the slot type criteria." );
+"GetSlots(PartyID, SlotType)=>dict\n\n"
+"Returns a tuple of slots of the inventory of a PC matching the slot type criteria." );
 
 static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 {
-	int SlotType, Count, MaxCount;
+	int SlotType, Count, MaxCount, PartyID;
 
-	if (!PyArg_ParseTuple( args, "i", &SlotType)) {
+	if (!PyArg_ParseTuple( args, "ii", &PartyID, &SlotType)) {
 		return AttributeError( GemRB_GetSlots__doc );
+	}
+
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (! actor) {
+		return NULL;
 	}
 
 	MaxCount = core->SlotTypes;
 	Count = 0;
 	for (int i=0;i<MaxCount;i++) {
-		if ((core->QuerySlotType(i) & SlotType) == SlotType) {
-			Count++;
+		if ((core->QuerySlotType( i ) & SlotType) != SlotType) {
+			continue;
 		}
+		CREItem *slot = actor->inventory.GetSlotItem( i );
+		if (!slot) {
+			continue;
+		}
+		Count++;
 	}
 
 	PyObject* tuple = PyTuple_New( Count );
 	Count = 0;
 	for (int i=0;i<MaxCount;i++) {
-		if ((core->QuerySlotType( i ) & SlotType) == SlotType) {
+		if ((core->QuerySlotType( i ) & SlotType) != SlotType) {
+			continue;
+		}
+		CREItem *slot = actor->inventory.GetSlotItem( i );
+		if (!slot) {
 			PyTuple_SetItem( tuple, Count++, PyInt_FromLong( i ) );
 		}
 	}
@@ -4166,6 +4240,8 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "ItemIcon", PyString_FromResRef (item->ItemIcon));
 	PyDict_SetItemString(dict, "StackAmount", PyInt_FromLong (item->StackAmount));
 	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));
+	PyDict_SetItemString(dict, "Price", PyInt_FromLong (item->Price));
+
 	int function=0;
 	switch( item->ItemType ) {
 		ITMExtHeader *eh;
@@ -4323,7 +4399,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	if (!game) {
-		return RuntimeError( "Not in game" );
+		return RuntimeError( "No game loaded!" );
 	}
 	Actor* actor = game->FindPC( PartyID );
 	if (!actor) {
@@ -4362,7 +4438,7 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	if (!game) {
-		return RuntimeError( "Not in game" );
+		return RuntimeError( "No game loaded!" );
 	}
 	Map *map = game->GetCurrentMap();
 	if (!map) {
@@ -4398,7 +4474,7 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 
 	Game *game = core->GetGame();
 	if (!game) {
-		return RuntimeError( "Not in game" );
+		return RuntimeError( "No game loaded!" );
 	}
 	Actor* actor = game->FindPC( PartyID );
 	if (!actor) {
@@ -4427,7 +4503,7 @@ static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	if (!game) {
-		return RuntimeError( "Not in game" );
+		return RuntimeError( "No game loaded!" );
 	}
 	Map *map=game->GetCurrentMap();
 	if (!map) {
@@ -4479,6 +4555,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetGameTime, METH_NOARGS),
 	METHOD(GameGetReputation, METH_NOARGS),
 	METHOD(GameSetReputation, METH_VARARGS),
+	METHOD(IncreaseReputation, METH_VARARGS),
 	METHOD(GameGetPartyGold, METH_NOARGS),
 	METHOD(GameSetPartyGold, METH_VARARGS),
 	METHOD(GameGetFormation, METH_NOARGS),

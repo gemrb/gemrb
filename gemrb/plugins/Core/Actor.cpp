@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.88 2005/03/07 18:23:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.89 2005/03/08 19:58:12 avenger_teambg Exp $
  *
  */
 
@@ -112,6 +112,12 @@ PCStatsStruct::PCStatsStruct()
 	memset( FavouriteSpellsCount, 0, sizeof(FavouriteSpellsCount) );
 	memset( FavouriteWeapons, 0, sizeof(FavouriteWeapons) );
 	memset( FavouriteWeaponsCount, 0, sizeof(FavouriteWeaponsCount) );
+}
+
+void PCStatsStruct::IncrementChapter()
+{
+	KillsChapterXP = 0;
+	KillsChapterCount = 0;
 }
 
 Actor::Actor()
@@ -303,11 +309,6 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 	}
 	Modified[StatIndex] = Value;
 	switch (StatIndex) {
-		case IE_REPUTATION:
-			if(InParty==1) {
-				core->GetGame()->Reputation=Modified[IE_REPUTATION];
-			}
-			break;
 		case IE_GOLD:
 			if(InParty) {
 				core->GetGame()->PartyGold+=Modified[IE_GOLD];

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.239 2005/03/06 14:18:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.240 2005/03/08 19:58:14 avenger_teambg Exp $
  *
  */
 
@@ -3010,17 +3010,17 @@ int GameScript::HappinessLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::Reputation(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->Reputation == (unsigned int) parameters->int0Parameter;
+	return core->GetGame()->Reputation == (ieDword) parameters->int0Parameter;
 }
 
 int GameScript::ReputationGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->Reputation > (unsigned int) parameters->int0Parameter;
+	return core->GetGame()->Reputation > (ieDword) parameters->int0Parameter;
 }
 
 int GameScript::ReputationLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->Reputation < (unsigned int) parameters->int0Parameter;
+	return core->GetGame()->Reputation < (ieDword) parameters->int0Parameter;
 }
 
 int GameScript::Alignment(Scriptable* Sender, Trigger* parameters)
@@ -7947,14 +7947,13 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 
 void GameScript::ReputationSet(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->Reputation = (unsigned int) parameters->int0Parameter;
-	core->GetGame()->ReputationAltered();
+	core->GetGame()->SetReputation(parameters->int0Parameter);
 }
 
 void GameScript::ReputationInc(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->Reputation += (unsigned int) parameters->int0Parameter;
-	core->GetGame()->ReputationAltered();
+	Game *game = core->GetGame();
+	game->SetReputation( (int) game->Reputation + parameters->int0Parameter);
 }
 
 void GameScript::FullHeal(Scriptable* Sender, Action* parameters)
