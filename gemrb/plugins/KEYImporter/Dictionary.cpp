@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.10 2004/02/24 22:20:40 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.11 2004/04/13 23:06:41 doc_wagon Exp $
  *
  */
 
@@ -23,7 +23,7 @@
 #include "../../includes/globals.h"
 #include "Dictionary.h"
 
-#define THIS_FILE "dictionary.cpp"
+//#define THIS_FILE "dictionary.cpp"
 
 /*#define MYASSERT(f) \
   if(!(f))  \
