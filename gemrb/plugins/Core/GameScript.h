@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.43 2004/02/16 21:12:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.44 2004/02/21 18:36:06 avenger_teambg Exp $
  *
  */
 
@@ -495,6 +495,10 @@ struct TriggerLink {
 	TriggerFunction Function;
 };
 
+//createcreature flags
+#define CC_OFFSET    1  //add the position of Sender to the coordinates
+
+//begindialog flags
 #define BD_STRING0   0
 #define BD_TARGET    1
 #define BD_SOURCE    2
@@ -561,6 +565,8 @@ private:
 	static Trigger * GenerateTrigger(char * String);
 	static Scriptable * GetActorFromObject(Scriptable * Sender, Object * oC);
 	static void BeginDialog(Scriptable *Sender, Action *parameters, int flags);
+	static void CreateCreatureCore(Scriptable *Sender, Action *parameters, int flags);
+
 	static unsigned char GetOrient(short sX, short sY, short dX, short dY);
 private: //Internal variables
 	unsigned long lastRunTime;
@@ -621,6 +627,7 @@ public:
 	static void FadeToColor(Scriptable * Sender, Action * parameters);
 	static void FadeFromColor(Scriptable * Sender, Action * parameters);
 	static void CreateCreature(Scriptable * Sender, Action * parameters);
+	static void CreateCreatureObject(Scriptable * Sender, Action * parameters);
 	static void Enemy(Scriptable * Sender, Action * parameters);
 	static void Ally(Scriptable * Sender, Action * parameters);
 	static void ChangeAIScript(Scriptable * Sender, Action * parameters);
@@ -706,6 +713,7 @@ public:
 	static void StartDialogueOverride(Scriptable * Sender, Action * parameters);
 	static void StartDialogueOverrideInterrupt(Scriptable * Sender, Action * parameters);
 	static void PlayerDialogue(Scriptable * Sender, Action * parameters);
+	static void ChangeStat(Scriptable * Sender, Action * parameters);
 };
 
 #endif

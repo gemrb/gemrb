@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.66 2004/02/16 21:12:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.67 2004/02/21 18:36:06 avenger_teambg Exp $
  *
  */
 
@@ -91,6 +91,7 @@ static ActionLink actionnames[]={
 {"changeenemyally",GameScript::ChangeAllegiance}, //this is the same
 {"changerace",GameScript::ChangeRace},
 {"changespecifics",GameScript::ChangeSpecifics},
+{"changestat",GameScript::ChangeStat},
 {"clearactions",GameScript::ClearActions},
 {"clearallactions",GameScript::ClearAllActions},
 {"closedoor",GameScript::CloseDoor,AF_BLOCKING},
@@ -1614,6 +1615,17 @@ void GameScript::ChangeSpecifics(Scriptable * Sender, Action * parameters)
 	actor->SetStat(IE_SPECIFIC,parameters->int0Parameter);
 }
 
+void GameScript::ChangeStat(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
+	if(!scr)
+		return;
+	if(scr->Type != ST_ACTOR)
+		return;
+	Actor * actor = (Actor*)scr;
+	actor->NewStat(parameters->int0Parameter,parameters->int1Parameter, parameters->int2Parameter);
+}
+
 void GameScript::ChangeGender(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[1]);
@@ -1681,6 +1693,26 @@ void GameScript::FadeFromColor(Scriptable * Sender, Action * parameters)
 	//Sender->SetWait(parameters->XpointParameter);
 }
 
+void GameScript::CreateCreatureCore(Scriptable *Sender, Action *parameters, int flags)
+{
+	ActorMgr * aM = (ActorMgr*)core->GetInterface(IE_CRE_CLASS_ID);
+	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_CRE_CLASS_ID);
+	aM->Open(ds, true);
+	Actor *ab = aM->GetActor();
+	int x=parameters->XpointParameter;
+	int y=parameters->YpointParameter;
+	if(flags&CC_OFFSET) {
+		x+=Sender->XPos;
+		y+=Sender->YPos;
+	}
+	ab->MoveTo(parameters->XpointParameter, parameters->YpointParameter);
+	ab->AnimID = IE_ANI_AWAKE;
+	ab->Orientation = parameters->int0Parameter;
+	Map * map = core->GetGame()->GetMap(0);
+	map->AddActor(ab);
+	core->FreeInterface(aM);
+}
+
 void GameScript::CreateCreature(Scriptable * Sender, Action * parameters)
 {
 	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
@@ -1690,16 +1722,19 @@ void GameScript::CreateCreature(Scriptable * Sender, Action * parameters)
 		scr->AddAction(Sender->CurrentAction);
 		return;
 	}
-	ActorMgr * aM = (ActorMgr*)core->GetInterface(IE_CRE_CLASS_ID);
-	DataStream * ds = core->GetResourceMgr()->GetResource(parameters->string0Parameter, IE_CRE_CLASS_ID);
-	aM->Open(ds, true);
-	Actor *ab = aM->GetActor();
-	ab->MoveTo(parameters->XpointParameter, parameters->YpointParameter);
-	ab->AnimID = IE_ANI_AWAKE;
-	ab->Orientation = parameters->int0Parameter;
-	Map * map = core->GetGame()->GetMap(0);
-	map->AddActor(ab);
-	core->FreeInterface(aM);
+	CreateCreatureCore(Sender, parameters, 0);
+}
+
+void GameScript::CreateCreatureObject(Scriptable * Sender, Action * parameters)
+{
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(!scr)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		return;
+	}
+	CreateCreatureCore(Sender, parameters, CC_OFFSET);
 }
 
 void GameScript::StartCutSceneMode(Scriptable * Sender, Action * parameters)
@@ -2190,14 +2225,10 @@ void GameScript::BeginDialog(Scriptable *Sender, Action * parameters, int Flags)
 
 	if(Dialog[0]) {
 		//increasing NumTimesTalkedTo
-	        if(Flags&BD_TALKCOUNT)
-        	        actor->TalkCount++;
+		if(Flags&BD_TALKCOUNT)
+			actor->TalkCount++;
 
-//		DialogMgr * dm = (DialogMgr*)core->GetInterface(IE_DLG_CLASS_ID);
-//		dm->Open(core->GetResourceMgr()->GetResource(Dialog, IE_DLG_CLASS_ID), true);
-//		gc->InitDialog(actor, target, dm->GetDialog());
 		gc->InitDialog(actor, target, Dialog);
-//		core->FreeInterface(dm);
 	}
 }
 
@@ -2509,18 +2540,18 @@ void GameScript::MakeGlobal(Scriptable *Sender, Action * parameters)
 
 void GameScript::UnMakeGlobal(Scriptable *Sender, Action * parameters)
 {
-        Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
-        if(scr->Type != ST_ACTOR)
-                return;
-        if(scr != Sender) { //this is an Action Override
-                scr->AddAction(Sender->CurrentAction);
-                return;
-        }
-        Actor *act = (Actor *) scr;
+	Scriptable * scr = GetActorFromObject(Sender, parameters->objects[0]);
+	if(scr->Type != ST_ACTOR)
+		return;
+	if(scr != Sender) { //this is an Action Override
+		scr->AddAction(Sender->CurrentAction);
+		return;
+	}
+	Actor *act = (Actor *) scr;
 	int slot;
 	slot=core->GetGame()->InStore(act);
 	if(slot>=0)
-        	core->GetGame()->DelNPC(slot);
+		core->GetGame()->DelNPC(slot);
 }
 
 void GameScript::JoinParty(Scriptable * Sender, Action * parameters)

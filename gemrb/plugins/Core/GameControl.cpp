@@ -1081,6 +1081,7 @@ void GameControl::DialogChoose(int choose)
 				if(ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
 					bool ret = true;
 					for(int t = 0; t < ds->transitions[x]->trigger->count; t++) {
+
 						ret &= GameScript::EvaluateString(target, ds->transitions[x]->trigger->strings[t]);
 					}
 					if(!ret)
@@ -1093,15 +1094,15 @@ void GameControl::DialogChoose(int choose)
 					ta->AppendText("[/s]", i);
 					free(string);
 				} else {
-					char * s = core->GetString(ds->transitions[x]->textStrRef);
-					string = (char*)malloc(30);
+					string = (char*)malloc(40);
 					idx++;
 					sprintf(string, "[s=%d,ffffff,ff0000]%d - [p]", x, idx);
 					i = ta->AppendText(string, -1);
-					ta->AppendText(s, i);
-					ta->AppendText("[/p][/s]", i);
 					free(string);
+					char * s = core->GetString(ds->transitions[x]->textStrRef);
+					ta->AppendText(s, i);
 					free(s);
+					ta->AppendText("[/p][/s]", i);
 				}
 			}
 			ta->AppendText("", -1);
