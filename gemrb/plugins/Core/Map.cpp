@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.10 2003/11/25 19:28:27 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.11 2003/11/25 22:50:09 avenger_teambg Exp $
  *
  */
 
@@ -82,7 +82,16 @@ void Map::DrawMap(Region viewport)
 		if(!ca)
 			continue;
 		Animation * anim = ca->GetAnimation(actors[i].AnimID, actors[i].Orientation);
-		if((ca->CircleSize != 0) && ca->DrawCircle) {
+		bool DrawCircle=ca->DrawCircle;
+		if(DrawCircle && (ca->CircleSize==0) ) DrawCircle=false;
+		else {
+			if(actors[i].actor->Modified[IE_NOCIRCLE]) DrawCircle=false;
+			else {
+				 if(actors[i].actor->Modified[IE_STATE_ID]&STATE_DEAD) DrawCircle=false;
+			}
+		}
+	
+		if(DrawCircle) {
 			Region vp = video->GetViewport();
 			switch(actors[i].actor->BaseStats[IE_EA])
 			{
