@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.135 2004/03/15 12:03:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.136 2004/03/16 14:00:09 guidoj Exp $
  *
  */
 
@@ -1841,24 +1841,18 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 static PyObject * GemRB_ReplaceVarsInText (PyObject * /*self*/, PyObject *args)
 {
         ieStrRef  Strref;
-	char* Variable;
-	unsigned long value;
-	//PyDict_Type reqtype;
-	PyObject  *dict;
 
-	//char newtext[4096];
-
-	if(!PyArg_ParseTuple(args, "iO!", &Strref, &PyDict_Type, &dict)) {
+	if(!PyArg_ParseTuple(args, "i", &Strref )) {
 		printMessage("GUIScript", "Syntax Error: ReplaceVarsInText(StrRef)\n", LIGHT_RED);
 		return NULL;
 	}
 
 	char newtext[4096] = "";
 	char *src = core->GetString (Strref);
-	//char *src = "Page <PAGE> in <NUMPAGES> of <jshd> kjj <<ok> on <<XYX>> fif <ABC";
 	char *dest = newtext;
 	char *next;
 	int  len;
+	char *value;
 
 	while (1) {
 	  next = strchr (src, '<');
@@ -1872,7 +1866,7 @@ static PyObject * GemRB_ReplaceVarsInText (PyObject * /*self*/, PyObject *args)
 	  src += len;
 	  dest += len;
 
-	  len = strspn (src + 1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ_");
+	  len = strspn (src + 1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_");
 
 	  if (len == 0 || *(src + len + 1) != '>') {
 	    memcpy (dest, src, len + 1);
@@ -1885,25 +1879,15 @@ static PyObject * GemRB_ReplaceVarsInText (PyObject * /*self*/, PyObject *args)
 	  memcpy (dest, src + 1, len);
 	  dest[len] = 0;
 
-	  //printf ("REPLACE: %s\n", dest);
-
-	  /*
-	    if(!core->GetDictionary()->Lookup(Variable, value))
-	    return Py_BuildValue("l", (unsigned long) 0);
-	  */
-
-	  PyObject *res = PyDict_GetItemString(dict, dest);
-	  if (! res) {
+	  if (!core->GetTokenDictionary()->Lookup(dest, (unsigned long &) value)) {
 	    dest += len;
 	  }
 	  else {
-	    strcpy (dest, PyString_AsString (res));
+	    strcpy (dest, value);
 	    dest += strlen (dest);
 	  }
 	  src += len + 2;
 	}
-
-	//printf ("RES: %s\n", newtext);
 
 	return Py_BuildValue("s", newtext);
 }
