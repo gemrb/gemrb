@@ -23,10 +23,14 @@ SaveGameIterator::~SaveGameIterator(void)
 {
 }
 
-static void DelTree(char *Path)
+static void DelTree(char *Pt)
 {
+	char Path[_MAX_PATH];
+	strcpy(Path, Pt);
 #ifdef WIN32
 	struct _finddata_t c_file;
+	strcat(Path, SPathDelimiter);
+	strcat(Path, "*.*");
 	long hFile=_findfirst(Path, &c_file);
 	if(!hFile)
 		return;
@@ -46,7 +50,7 @@ static void DelTree(char *Path)
 		if(c_file.attrib & _A_SUBDIR)
 			if(c_file.name[0] == '.')
 				continue;
-		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, c_file.name);
+		sprintf(dtmp, "%s%s%s", Pt, SPathDelimiter, c_file.name);
 #else
 		struct stat fst;
 		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
