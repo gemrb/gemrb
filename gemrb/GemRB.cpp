@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.16 2003/12/08 15:53:48 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.17 2003/12/09 23:10:08 avenger_teambg Exp $
  *
  */
 
@@ -86,65 +86,3 @@ int main(int argc, char ** argv)
 	delete(core);
 	return 0;
 }
-/*
-#ifndef S_ISDIR
-#define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
-#endif
-//// Globally used functions
-bool dir_exists(const char *path)
-{
-        struct stat buf;
-
-        buf.st_mode=0;
-        stat(path, &buf);
-        return S_ISDIR(buf.st_mode);
-}
-
-//// Compatibility functions
-#ifdef WIN32
-
-#else
-char * FindInDir(char * Dir, char * Filename)
-{
-        char * fn = NULL;
-        DIR * dir = opendir(Dir);
-        if(dir == NULL)
-                return NULL;
-        struct dirent * de = readdir(dir);
-        if(de == NULL)
-                return NULL;
-        do {
-                if(stricmp(de->d_name, Filename ) == 0) {
-                        fn = (char*)malloc(strlen(de->d_name)+1);
-                        strcpy(fn, de->d_name);
-                        break;
-                }
-        } while((de = readdir(dir)) != NULL);
-        closedir(dir);  //No other files in the directory, close it
-        return fn;
-}
-
-char *strupr(char *string)
-{
-        char *s;
-        if(string)
-        {
-                for(s = string; *s; ++s)
-                        *s = toupper(*s);
-        }
-        return string;
-}
-
-char *strlwr(char *string)
-{
-        char *s;
-        if(string)
-        {
-                for(s = string; *s; ++s)
-                        *s = tolower(*s);
-        }
-        return string;
-}
-
-#endif
-*/
