@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.16 2004/05/08 12:55:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.17 2004/07/25 00:11:45 edheldil Exp $
  *
  */
 
@@ -252,6 +252,7 @@
 #define IE_TEAM			220
 #define IE_FACTION		221
 #define IE_SUBRACE		222
+#define IE_SPECIES              223
 
 //These are in original PST, IWD, IWD2, but not as stats
 #define IE_INTERNAL_0            240

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.35 2004/07/11 11:04:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.36 2004/07/25 00:11:46 edheldil Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #define ACTOR_H
 
 #include <vector>
+#include "../../includes/ie_types.h"
 #include "Animation.h"
 #include "CharAnimations.h"
 #include "ActorBlock.h"
@@ -67,6 +68,20 @@ public:
 	unsigned char InParty;
 	char* LongName, * ShortName;
 	unsigned long StrRefs[100];
+
+	// for remapping palette
+	ieByte ColorsCount;
+
+	ieWord AppearanceFlags1;
+	ieWord AppearanceFlags2;
+
+	ieWord Colors[7];
+	ieByte ColorPlacements[7];
+
+	ieWord unknown2F2;
+	ieByte unknown2F4;
+	ieDword unknown2FC[5];
+	ieByte unknown310;
 
 	ieDword KnownSpellsOffset;
 	ieDword KnownSpellsCount;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.51 2004/07/21 20:27:26 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.52 2004/07/25 00:11:46 edheldil Exp $
  *
  */
 
@@ -134,7 +134,7 @@ void Actor::SetText(int strref, unsigned char type)
 
 void Actor::SetAnimationID(unsigned short AnimID)
 {
-  int i;
+	int i;
 	char tmp[7];
 	sprintf( tmp, "0x%04X", AnimID );
 
@@ -162,7 +162,7 @@ void Actor::SetAnimationID(unsigned short AnimID)
 
 	Color Pal[256];
 	memcpy( Pal, anims->Palette, 256 * sizeof( Color ) );
-	if (palType != 10) {
+	if (palType < 10) {
 		Color* MetalPal = core->GetPalette( BaseStats[IE_METAL_COLOR], 12 );
 		Color* MinorPal = core->GetPalette( BaseStats[IE_MINOR_COLOR], 12 );
 		Color* MajorPal = core->GetPalette( BaseStats[IE_MAJOR_COLOR], 12 );
@@ -196,54 +196,41 @@ void Actor::SetAnimationID(unsigned short AnimID)
 		free( LeatherPal );
 		free( ArmorPal );
 		free( HairPal );
-	} else {
-		Color* MetalPal = core->GetPalette( 7 + BaseStats[IE_METAL_COLOR], 32 );
-		Color* MinorPal = core->GetPalette( 7 + BaseStats[IE_MINOR_COLOR], 32 );
-		Color* MajorPal = core->GetPalette( 7 + BaseStats[IE_MAJOR_COLOR], 32 );
-		Color* SkinPal = core->GetPalette( 7 + BaseStats[IE_SKIN_COLOR], 32 );
-		Color* LeatherPal = core->GetPalette( 7 + BaseStats[IE_LEATHER_COLOR],
-									32 );
-		Color* ArmorPal = core->GetPalette( 7 + BaseStats[IE_ARMOR_COLOR], 32 );
-		Color* HairPal = core->GetPalette( 7 + BaseStats[IE_HAIR_COLOR], 32 );
-		for (int i = 0x10; i <= 0xF0; i += 0x10) {
-			if (( Pal[i].r == 0xff ) &&
-				( Pal[i].g == 0x00 ) &&
-				( Pal[i].b == 0x00 )) {
-				memcpy( &Pal[i], HairPal, 32 * sizeof( Color ) );
-				i += 0x10;
-			} else if (( Pal[i].r == 0x00 ) &&
-				( Pal[i].g == 0xff ) &&
-				( Pal[i].b == 0xff )) {
-				memcpy( &Pal[i], MajorPal, 32 * sizeof( Color ) );
-				i += 0x10;
-			} else if (( Pal[i].r == 0xff ) &&
-				( Pal[i].g == 0xff ) &&
-				( Pal[i].b == 0x00 )) {
-				memcpy( &Pal[i], SkinPal, 32 * sizeof( Color ) );
-				i += 0x10;
-			} else if (( Pal[i].r == 0x00 ) &&
-				( Pal[i].g == 0x00 ) &&
-				( Pal[i].b == 0xff )) {
-				memcpy( &Pal[i], MinorPal, 32 * sizeof( Color ) );
-				i += 0x10;
-			}
-		}
-		/*memcpy(&Pal[0x10], &MetalPal[16],   16*sizeof(Color));
-						memcpy(&Pal[0xE0], MinorPal,   32*sizeof(Color));
-						memcpy(&Pal[0xA0], MajorPal,   32*sizeof(Color));
-						memcpy(&Pal[0xC0], SkinPal,    32*sizeof(Color));
-						memcpy(&Pal[0x80], LeatherPal, 32*sizeof(Color));
-						memcpy(&Pal[0x40], LeatherPal, 16*sizeof(Color));
-						memcpy(&Pal[0x40], HairPal,    16*sizeof(Color));
-						*/
-		free( MetalPal );
-		free( MinorPal );
-		free( MajorPal );
-		free( SkinPal );
-		free( LeatherPal );
-		free( ArmorPal );
-		free( HairPal );
 	}
+	else if (palType == 10) {   // Avatars in PS:T
+		for (int i = 0; i < ColorsCount; i++) {
+			int dest = ColorPlacements[i];
+			int size = 32;
+
+			if (!(AppearanceFlags1 & 0x40)) {  // Ash-Mantle
+				if (dest == 176) dest = 192;
+			}
+			else if (AppearanceFlags1 & 0x100) {
+				if (dest == 144) dest = 224; // minor cloth
+				else if (dest == 176) dest = 192; // skin
+				else if (dest == 128) dest = 160; //hair ??
+				else if (dest == 160) dest = 128; //hair ??
+				else if (dest == 224) dest = 160; //hair ??
+				else if (dest == 208) dest = 160; //metal
+			}
+			else {
+				if (dest == 144) dest = 160; // minor cloth
+				else if (dest == 160) dest = 224; 
+				else if (dest == 176) dest = 192; // skin
+				else if (dest == 224) dest = 128; //hair ??
+			}
+
+			
+
+			Color* NewPal = core->GetPalette( Colors[i], size );
+
+			memcpy( &Pal[dest], NewPal, size * sizeof( Color ) );
+			free( NewPal );
+		}
+	} else {		       
+		printf( "Unknown palType %d\n", palType );
+	}
+
 	SetCircleSize();
 	anims->SetNewPalette( Pal );
 }
@@ -404,6 +391,8 @@ void Actor::DebugDump()
 	printf( "PartySlot:  %d\n", InParty );
 	printf( "Allegiance: %d\n",(int) GetStat(IE_EA) );
 	printf( "Visualrange:%d\n", (int) GetStat(IE_VISUALRANGE) );
+	printf( "Mod[IE_EA]: %d\n", Modified[IE_EA]);
+	printf( "Mod[IE_ANIMATION_ID]: 0x%04X\n", Modified[IE_ANIMATION_ID]);
 	inventory.dump();
 	spellbook.dump();
 }

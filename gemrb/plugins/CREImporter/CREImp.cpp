@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.34 2004/05/09 14:34:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.35 2004/07/25 00:11:45 edheldil Exp $
  *
  */
 
@@ -297,7 +297,28 @@ void CREImp::GetActorPST(Actor *act)
 	ReadScript(act, 4);
 	ReadScript(act, 5);
 
-	str->Seek( 162, GEM_CURRENT_POS );
+	//str->Seek( 162, GEM_CURRENT_POS );
+	str->Seek( 111, GEM_CURRENT_POS );
+	str->Read( &act->ColorsCount, 1 );
+	str->Read( &act->AppearanceFlags1, 2 );
+	str->Read( &act->AppearanceFlags2, 2 );
+
+	for (int i = 0; i < 7; i++)
+		str->Read( &act->Colors[i], 2 );
+
+	str->Read( &act->unknown2F2, 2 );
+	str->Read( &act->unknown2F4, 1 );
+
+	for (int i = 0; i < 7; i++)
+		str->Read( &act->ColorPlacements[i], 1 );
+
+	for (int i = 0; i < 5; i++) {
+		str->Read( &act->unknown2FC[i], 4 );
+	}
+	str->Read( &act->unknown310, 1 );
+
+
+	str->Read( &act->BaseStats[IE_SPECIES], 1 ); // offset: 0x311
 	str->Read( &act->BaseStats[IE_TEAM], 1 );
 	str->Read( &act->BaseStats[IE_FACTION], 1 );
 	 
