@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.30 2004/01/02 18:07:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.31 2004/01/04 00:29:45 balrog994 Exp $
  *
  */
 
@@ -113,6 +113,10 @@ int ACMImp::PlayListManager(void * data)
 				alSourceQueueBuffers(MusicSource, MUSICBUFERS, MusicBuffers);
 				if(alIsSource(MusicSource))
 					alSourcePlay(MusicSource);
+			} else if(state == AL_STOPPED) {
+				printf("WARNING: Buffer Underrun. AutoRestarting Stream Playback\n");
+				if(alIsSource(MusicSource))
+					alSourcePlay(MusicSource);
 			}
 			unsigned long volume;
 			if(!core->GetDictionary()->Lookup("Volume Music", volume)) {
@@ -192,7 +196,7 @@ bool ACMImp::Init(void)
 	return true;
 }
 
-unsigned long ACMImp::Play(const char * ResRef)
+unsigned long ACMImp::Play(const char * ResRef, int XPos, int YPos)
 {
 	DataStream * stream = core->GetResourceMgr()->GetResource(ResRef, IE_WAV_CLASS_ID);
 	if(!stream)
@@ -340,4 +344,11 @@ bool ACMImp::Play()
 void ACMImp::ResetMusics()
 {
 	clearstreams(true);
+}
+
+void ACMImp::UpdateViewportPos(int XPos, int YPos)
+{
+	alListener3f(AL_POSITION, (float)XPos, (float)YPos, 0.0f);
+	if(alIsSource(MusicSource))
+		alSource3f(MusicSource, AL_POSITION, (float)XPos, (float)YPos, 0.0f);
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.14 2004/01/02 16:18:06 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.15 2004/01/04 00:29:45 balrog994 Exp $
  *
  */
 
@@ -76,11 +76,12 @@ public:
 	ACMImp(void);
 	~ACMImp(void);
 	bool Init(void);
-	unsigned long Play(const char * ResRef);
+	unsigned long Play(const char * ResRef, int XPos = 0, int YPos = 0);
 	unsigned long StreamFile(const char * filename);
 	bool Play();
 	bool Stop();
 	void ResetMusics();
+	void UpdateViewportPos(int XPos, int YPos);
 public:
 	void release(void)
 	{
