@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.209 2004/10/17 18:11:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.210 2004/10/17 19:09:40 avenger_teambg Exp $
  *
  */
 
@@ -6687,7 +6687,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		core->DelTable( pdtable );
 	}
 	core->GetGame()->JoinParty( act );
-	core->GetGUIScriptEngine()->RunFunction( "PopulatePortraitWindow" );
+	core->GetGUIScriptEngine()->RunFunction( "UpdatePortraitWindow" );
 }
 
 void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
@@ -6710,7 +6710,7 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 		core->DelTable( pdtable );
 	}
 */
-	core->GetGUIScriptEngine()->RunFunction( "PopulatePortraitWindow" );
+	core->GetGUIScriptEngine()->RunFunction( "UpdatePortraitWindow" );
 }
 
 //no idea why we would need this  if we have activate/deactivate
