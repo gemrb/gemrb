@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.16 2004/04/15 16:18:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.17 2004/04/26 12:50:42 edheldil Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -161,7 +161,7 @@ def UpdateResizeButtons():
 def PopulatePortraitWindow ():
 	Window = PortraitWindow
 
-	for i in range (0,5):
+	for i in range (0,6):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetVarAssoc (Window, Button, 'SelectedSingle', i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
