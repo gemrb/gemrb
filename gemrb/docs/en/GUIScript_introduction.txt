@@ -1,6 +1,6 @@
 GUISCRIPT INTRODUCTION
 **********************
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GUIScript_introduction.txt,v 1.1 2005/02/22 23:35:52 edheldil Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GUIScript_introduction.txt,v 1.2 2005/03/06 22:54:30 edheldil Exp $
 
 This file is intended as a brief overview for one of two scripting systems
 in GemRB - GUIScript. You should read it if you want to hack on GemRB's GUI.
@@ -58,17 +58,17 @@ file they mostly use.
        gemrb/GUIScripts/bg2/GUIINV.py
 
 GemRB API is provided to the scripts by means of GemRB module. The
-module is implemented together with Python interpreted glue in
+module is implemented together with Python interpreter glue in
 GUIScript plugin in gemrb/plugins/GUIScript/GUIScript.cpp.
 
   Example:
     import GemRB
     GemRB.LoadTable ("RACES")
 
-Description of all functions in huge GemRB module is in
-gemrb/docs/en/GUIScript directory, GUIScript.cpp file itself by typing
-help(GemRB) in GemRB console (type ESC to open console). In this case
-the help is dumped to stdout.
+Description of all functions in the huge GemRB module is in
+gemrb/docs/en/GUIScript directory, GUIScript.cpp file itself or obtained
+by typing help(GemRB) in GemRB console (type ESC to open console). In 
+that case the help is dumped to stdout.
 
 All scripts to be run have to define OnLoad() function, which is
 called by GemRB each time the script is loaded. Those python files
@@ -114,7 +114,7 @@ an example
     # GemRB - Infinity Engine Emulator
     # Copyright (C) 2003 The GemRB Project
     .....
-    # $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GUIScript_introduction.txt,v 1.1 2005/02/22 23:35:52 edheldil Exp $
+    # $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GUIScript_introduction.txt,v 1.2 2005/03/06 22:54:30 edheldil Exp $
 
 
     ## Since this is only a module, GemRB and GUIDefines have to be explicitly 
@@ -138,7 +138,7 @@ an example
         ## This is a common way of closing another window before opening
 	## our own one (here Journal window). If Journal window already
 	## exists, it's closed and the control is returned to the caller
-	## (which implements toggling of a window)
+	## (this implements toggling of a window)
   
 	if CloseOtherWindow (OpenJournalWindow):
 	        ## this part is called if we are closing Journal window
@@ -188,7 +188,7 @@ an example
 	## Now access some buttons in the new window and assign 
 	## labels and callbacks to them
 
-	## Prefix the button processing with the label of the button for
+	## Comment the button processing with the label of the button for
 	## easy maintenance
 
 	# Quests
@@ -236,14 +236,14 @@ GUIScripter's Workflow
 - Find ID of the window to be implemented in the CHU file, usually
   with DLTCEP or NearInfinity.
 
-- Copy & paste common parts of the script from another one opening the
+- Copy & paste common parts of the script from another one opening
   similar windows.
 
 - Using CHU viewer find control IDs for the controls you need to
   configure in the script and add their setting into the script, again
   copy & pasting from another script. Usually start with magic trinity
   of GetControl, SetText, SetEvent for each button. Use dummy numbers
-  for now. Beware, NearInfinity displays wrong IDs for labels. You
+  for now. Beware, NearInfinity displays wrong IDs for labels. You will
   have to add the label's control ID to "buffer size" << 32 to get the
   right control ID.
 
