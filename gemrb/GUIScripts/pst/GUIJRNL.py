@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.11 2004/10/11 19:33:40 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.12 2004/11/27 00:19:31 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -46,8 +46,6 @@ quests = [ [], [] ]
 global selected_quest_class
 selected_quest_class = 0
 
-
-
 # list of all PC (0) or NPC (1) beasts/creatures
 global beasts
 beasts = [ [], [] ]
@@ -58,12 +56,16 @@ selected_beast_class = 0
 
 global BeastImage
 BeastImage = None
-
+StartTime = 0
 
 ###################################################
 def OpenJournalWindow ():
-	global JournalWindow
+	global JournalWindow, StartTime
 
+	Table = GemRB.LoadTable("YEARS")
+	StartTime = GemRB.GetTableValue(Table, "STARTTIME", "VALUE")
+	GemRB.UnloadTable(Table)
+	
 	if CloseOtherWindow (OpenJournalWindow):
 		if LogWindow: OpenLogWindow()
 		if BeastsWindow: OpenBeastsWindow()
@@ -204,6 +206,8 @@ def EvaluateCondition (var, value, condition):
 	#print cur_value, condition, value
 	if condition == 'EQ':
 		return cur_value == int (value)
+	if condition == 'NE':
+		return cur_value != int (value)
 	elif condition == 'GT':
 		return cur_value > int (value)
 	elif condition == 'LT':
@@ -326,8 +330,8 @@ def OpenBeastsWindow ():
 	EvaluateAllBeasts ()
 	PopulateBeastsList ()
 	
-	#GemRB.SetVisible (BeastsWindow, 1)
 	GemRB.UnhideGUI()
+	return
 
 def OnJournalBeastSelect ():
 	row = GemRB.GetVar ('SelectedBeast')
@@ -424,14 +428,15 @@ def OpenLogWindow ():
 		#   orig. game. So it's probably computed since "awakening"
 		#   there instead of start of the day.
 
-		date = str (1 + int (je['GameTime'] / 86400))
-		time = str (je['GameTime'])
+		gt = StartTime + je["GameTime"]
+		dt = int (gt/86400)
+		date = str (1 + dt)
+		#time = str (gt - dt*86400)
 		
-		GemRB.TextAreaAppend (Window, Text, "[color=FFFF00]Day " + date + '  (' + time + "):[/color]", 3*i)
+		GemRB.TextAreaAppend (Window, Text, "[color=FFFF00]"+GemRB.GetString(19310)+" "+date+"[/color]", 3*i)
 		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i + 1)
 		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
 			
-
 	GemRB.SetVisible (Window, 1)
 	
 	GemRB.UnhideGUI()
