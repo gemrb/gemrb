@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.18 2003/12/01 16:33:21 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.19 2003/12/04 22:05:22 balrog994 Exp $
  *
  */
 
@@ -30,12 +30,14 @@ class SDLVideoDriver : public Video
 private:
 	SDL_Surface * disp;
 	SDL_Surface * backBuf;
+	SDL_Surface * extra;
 	std::vector<Region> upd;	//Regions of the Screen to Update in the next SwapBuffer operation.
 	Region Viewport;
 	SDL_Surface *Cursor[2];
 	SDL_Rect CursorPos;
 	short mouseAdjustX[2], mouseAdjustY[2];
 	unsigned short CursorIndex;
+	int fadePercent;
 public:
 	SDLVideoDriver(void);
 	~SDLVideoDriver(void);
@@ -85,6 +87,8 @@ public:
 	}
 	/** */
 	Sprite2D * PrecalculatePolygon(Point * points, int count, Color &color);
+
+	void SetFadePercent(int percent);
 
 	void * GetVideoSurface()
 	{

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.38 2003/12/03 00:04:10 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.39 2003/12/04 22:05:22 balrog994 Exp $
  *
  */
 
@@ -33,6 +33,8 @@ SDLVideoDriver::SDLVideoDriver(void)
 
 SDLVideoDriver::~SDLVideoDriver(void)
 {
+	SDL_FreeSurface(backBuf);
+	SDL_FreeSurface(extra);
 	SDL_Quit();
 }
 
@@ -47,6 +49,7 @@ int SDLVideoDriver::Init(void)
   SDL_EnableUNICODE(1);
   SDL_EnableKeyRepeat(500, 50);
   SDL_ShowCursor(SDL_DISABLE);
+  fadePercent = 0;
   return GEM_OK;
 }
 
@@ -61,8 +64,13 @@ int SDLVideoDriver::CreateDisplay(int width, int height, int bpp, bool fullscree
 	Viewport.x = Viewport.y = 0;
 	Viewport.w = width;
 	Viewport.h = height;
-	SDL_Surface * tmp = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, bpp, 0xff000000, 0x00ff0000, 0x0000ff00, 0x00000000);
+	SDL_Surface * tmp = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, bpp, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
 	backBuf = SDL_DisplayFormat(tmp);
+	
+	extra = SDL_DisplayFormat(tmp);
+	SDL_LockSurface(extra);
+	memset(extra->pixels, 0, extra->pitch*extra->h);
+	SDL_UnlockSurface(extra);
 	SDL_FreeSurface(tmp);
 	return GEM_OK;
 }
@@ -197,12 +205,22 @@ int SDLVideoDriver::SwapBuffers(void)
 		if(Cursor[CursorIndex]) {
 			SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
 		}
+		if(fadePercent) {
+			//printf("Fade Percent = %d%%\n", fadePercent);
+			SDL_SetAlpha(extra, SDL_SRCALPHA, (255*fadePercent)/100);
+			SDL_BlitSurface(extra, NULL, disp, NULL);
+		}
 		SDL_Flip(disp);
 		return ret;
 	}
 	SDL_BlitSurface(backBuf, NULL, disp, NULL);
 	if(Cursor[CursorIndex])
-			SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
+		SDL_BlitSurface(Cursor[CursorIndex], NULL, disp, &CursorPos);
+	if(fadePercent) {
+		//printf("Fade Percent = %d%%\n", fadePercent);
+		SDL_SetAlpha(extra, SDL_SRCALPHA, (255*fadePercent)/100);
+		SDL_BlitSurface(extra, NULL, disp, NULL);
+	}
 	SDL_Flip(disp);
 	int ret = GEM_OK;
 	//TODO: Implement an efficient Rectangle Merge algorithm for faster redraw
@@ -1000,4 +1018,9 @@ void SDLVideoDriver::MirrorAnimation(Animation * anim)
 		free(buffer);
 		frame->XPos = frame->Width-frame->XPos;
 	} while(true);
+}
+
+void SDLVideoDriver::SetFadePercent(int percent)
+{
+	fadePercent = percent;
 }
