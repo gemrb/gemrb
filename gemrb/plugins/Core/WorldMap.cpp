@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.13 2005/02/25 15:12:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.14 2005/03/15 14:31:01 avenger_teambg Exp $
  *
  */
 
@@ -198,12 +198,13 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 		for(;j<k;j++) {
 			WMPAreaLink* al = area_links[j];
 			WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
-			int mydistance = Distances[i];
+			unsigned int mydistance = (unsigned int) Distances[i];
 			if ( ( (ae->AreaStatus & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
 			( (ae2->AreaStatus & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
 			) {
 				mydistance += al->DistanceScale * al->Flags;
-				if (Distances[al->AreaIndex] > mydistance) {
+				//nonexisting distance is the biggest!
+				if ((unsigned) Distances[al->AreaIndex] > mydistance) {
 					Distances[al->AreaIndex] = mydistance;
 					GotHereFrom[al->AreaIndex] = j;
 					pending.push_back(al->AreaIndex);
@@ -297,6 +298,7 @@ void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 	WMPAreaEntry* ae=GetArea(AreaName,i);
 	if (!ae)
 		return;
+	ae->AreaStatus|=WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE; //we are here, so we visited and it is visible too (i guess)
 	i=ae->AreaLinksCount[direction];
 	while (i--) {
 		WMPAreaLink* al = area_links[ae->AreaLinksIndex[direction]+i];
