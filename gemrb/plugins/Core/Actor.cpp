@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.34 2004/03/21 19:00:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.35 2004/03/21 20:24:53 avenger_teambg Exp $
  *
  */
 
@@ -238,22 +238,20 @@ void Actor::SetCircleSize()
 	} else if (Modified[IE_MORALEBREAK] < 0) {
 		color = &yellow;
 	} else {
-		switch (BaseStats[IE_EA]) {
-			case EVILCUTOFF:
-			case GOODCUTOFF:
-				break;
-
+		switch (Modified[IE_EA]) {
 			case PC:
 			case FAMILIAR:
 			case ALLY:
 			case CONTROLLED:
 			case CHARMED:
 			case EVILBUTGREEN:
+			case GOODCUTOFF:
 				color = &green;
 				break;
 
 			case ENEMY:
 			case GOODBUTRED:
+			case EVILCUTOFF:
 				color = &red;
 				break;
 			default:

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.112 2004/03/21 19:43:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.113 2004/03/21 20:24:53 avenger_teambg Exp $
  *
  */
 
@@ -92,6 +92,7 @@ static TriggerLink triggernames[] = {
 	{"inparty", GameScript::InParty},
 	{"inpartyallowdead", GameScript::InPartyAllowDead},
 	{"inpartyslot", GameScript::InPartySlot},
+	{"isaclown", GameScript::IsAClown},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog},
 	{"level", GameScript::Level},
 	{"levelgt", GameScript::LevelGT},
@@ -128,6 +129,7 @@ static TriggerLink triggernames[] = {
 	{"unselectablevariable", GameScript::UnselectableVariable},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT},
 	{"unselectablevariablelt", GameScript::UnselectableVariableLT},
+	{"xor", GameScript::Xor},
 	{"xpgt", GameScript::XPGT}, {"xplt", GameScript::XPLT}, { NULL,NULL},
 };
 
@@ -193,6 +195,8 @@ static ActionLink actionnames[] = {
 	{"giveexperience", GameScript::AddXPObject,0},
 	{"givepartygold",GameScript::GivePartyGold,0},
 	{"givepartygoldglobal",GameScript::GivePartyGoldGlobal,AF_MERGESTRINGS},
+	{"globaladdglobal",GameScript::GlobalAddGlobal,AF_MERGESTRINGS},
+	{"globalandglobal",GameScript::GlobalAndGlobal,AF_MERGESTRINGS},
 	{"globalband",GameScript::GlobalBAnd,AF_MERGESTRINGS},
 	{"globalbandglobal",GameScript::GlobalBAndGlobal,AF_MERGESTRINGS},
 	{"globalbor",GameScript::GlobalBOr,AF_MERGESTRINGS},
@@ -201,11 +205,13 @@ static ActionLink actionnames[] = {
 	{"globalmaxglobal",GameScript::GlobalMaxGlobal,AF_MERGESTRINGS},
 	{"globalmin",GameScript::GlobalMin,AF_MERGESTRINGS},
 	{"globalminglobal",GameScript::GlobalMinGlobal,AF_MERGESTRINGS},
+	{"globalorglobal",GameScript::GlobalOrGlobal,AF_MERGESTRINGS},
 	{"globalsetglobal",GameScript::GlobalSetGlobal,AF_MERGESTRINGS},
 	{"globalshl",GameScript::GlobalShL,AF_MERGESTRINGS},
 	{"globalshlglobal",GameScript::GlobalShLGlobal,AF_MERGESTRINGS},
 	{"globalshr",GameScript::GlobalShR,AF_MERGESTRINGS},
 	{"globalshrglobal",GameScript::GlobalShRGlobal,AF_MERGESTRINGS},
+	{"globalsubglobal",GameScript::GlobalSubGlobal,AF_MERGESTRINGS},
 	{"globalxor",GameScript::GlobalXor,AF_MERGESTRINGS},
 	{"globalxorglobal",GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
 	{"hidegui",GameScript::HideGUI,0},
@@ -250,6 +256,7 @@ static ActionLink actionnames[] = {
 	{"setfaction",GameScript::SetFaction,0},
 	{"setmoraleai",GameScript::SetMoraleAI,0},
 	{"setteam",GameScript::SetTeam,0},
+	{"settextcolor",GameScript::SetTextColor,0},
 	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt",GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint",GameScript::RunAwayFromPoint,AF_BLOCKING},
@@ -1559,6 +1566,7 @@ Action* GameScript::GenerateAction(char* String)
 	int i = 0;
 	//this could be significantly optimized if we store them in a mapping
 	//or at least use bsearch
+	printf("Compiling:%s\n",String);
 	while (true) {
 		char* src = String;
 		char* str = actionsTable->GetStringIndex( i );
@@ -2468,6 +2476,15 @@ int GameScript::Exists(Scriptable* Sender, Trigger* parameters)
 	return 1;
 }
 
+int GameScript::IsAClown(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr || scr->Type!=ST_ACTOR) {
+		return 0;
+	}
+	return 1;
+}
+
 int GameScript::General(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -2504,6 +2521,14 @@ int GameScript::BitCheck(Scriptable* Sender, Trigger* parameters)
 {
 	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
 	int eval = ( value& parameters->int0Parameter ) ? 1 : 0;
+	return eval;
+}
+
+//would this function also alter the variable?
+int GameScript::Xor(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value = CheckVariable(Sender, parameters->string0Parameter );
+	int eval = ( value ^ parameters->int0Parameter ) ? 1 : 0;
 	return eval;
 }
 
@@ -5177,3 +5202,15 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* parameters)
 	//i think it is bit 15
 	actor->SetStat(IE_MC_FLAGS,actor->GetStat(IE_MC_FLAGS)|32768);
 }
+
+void GameScript::SetTextColor(Scriptable* Sender, Action* parameters)
+{
+	GameControl *gc=core->GetGameControl();
+	if(gc) {
+		Color color;
+
+		memcpy(&color,&parameters->int0Parameter,4);
+		gc->SetInfoTextColor( color );
+	}
+}
+
