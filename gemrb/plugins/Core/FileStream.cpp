@@ -15,20 +15,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.32 2004/10/17 15:38:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.33 2005/03/05 16:24:27 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "FileStream.h"
-
-#ifdef _DEBUG
 #include "Interface.h"
-#endif
+
+extern Interface* core;
 
 FileStream::FileStream(void)
 {
 	opened = false;
+	created = false;
 	str = NULL;
 	autoFree = false;
 }
@@ -44,16 +44,16 @@ FileStream::~FileStream(void)
 	str = NULL;
 }
 
-bool FileStream::Open(const char* filename, bool autoFree)
+bool FileStream::Open(const char* fname, bool aF)
 {
-	if (str && this->autoFree) {
+	if (str && autoFree) {
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
 		_fclose( str );
 	}
-	this->autoFree = autoFree;
-	str = _fopen( filename, "rb" );
+	autoFree = aF;
+	str = _fopen( fname, "rb" );
 	if (str == NULL) {
 		return false;
 	}
@@ -62,23 +62,24 @@ bool FileStream::Open(const char* filename, bool autoFree)
 #endif
 	startpos = 0;
 	opened = true;
+	created = false;
 	_fseek( str, 0, SEEK_END );
 	size = _ftell( str );
 	_fseek( str, 0, SEEK_SET );
-	ExtractFileFromPath( this->filename, filename );
+	ExtractFileFromPath( filename, fname );
 	Pos = 0;
 	return true;
 }
 
-bool FileStream::Open(_FILE* stream, int startpos, int size, bool autoFree)
+bool FileStream::Open(_FILE* stream, int spos, int maxsize, bool aF)
 {
-	if (str && this->autoFree) {
+	if (str && autoFree) {
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
 		_fclose( str );
 	}
-	this->autoFree = autoFree;
+	autoFree = aF;
 	str = stream;
 	if (str == NULL) {
 		return false;
@@ -86,12 +87,39 @@ bool FileStream::Open(_FILE* stream, int startpos, int size, bool autoFree)
 #ifdef _DEBUG
 	core->FileStreamPtrCount++;
 #endif
-	this->startpos = startpos;
+	startpos = spos;
 	opened = true;
-	this->size = size;
+	created = false;
+	size = maxsize;
 	strcpy( filename, "" );
-	_fseek( str, startpos, SEEK_SET );
+	_fseek( str, spos, SEEK_SET );
 	Pos = 0;
+	return true;
+}
+
+//Create is ALWAYS autofree
+bool FileStream::Create(const char* fname)
+{
+	char path[_MAX_PATH];
+
+	if (str && autoFree) {
+#ifdef _DEBUG
+		core->FileStreamPtrCount--;
+#endif
+		_fclose( str );
+	}
+	autoFree = true;
+	ExtractFileFromPath( filename, fname );
+	strcpy( path, core->CachePath );
+	strcat( path, filename );
+	str = _fopen( path, "wb" );
+	if (str == NULL) {
+		return false;
+	}
+	opened = false;
+	created = true;
+	Pos = 0;
+	size = 0;
 	return true;
 }
 
@@ -102,7 +130,7 @@ int FileStream::Read(void* dest, unsigned int length)
 	}
 	//we don't allow partial reads anyway, so it isn't a problem that
 	//i don't adjust length here (partial reads are evil)
-	if(Pos+length>size ) {
+	if (Pos+length>size ) {
 		return GEM_ERROR;
 	}
 	size_t c = _fread( dest, 1, length, str );
@@ -116,8 +144,28 @@ int FileStream::Read(void* dest, unsigned int length)
 	return c;
 }
 
+int FileStream::Write(void* src, unsigned int length)
+{
+	if (!created) {
+		return GEM_ERROR;
+	}
+	// do encryption here if needed
+
+	size_t c = _fwrite( src, 1, length, str );
+	if (c != length) {
+		return GEM_ERROR;
+	}
+	Pos += c;
+	//this is needed only if you want to Seek in a written file
+	if (Pos>size) {
+		size = Pos;
+	}
+	return c;
+}
+
 int FileStream::Seek(int newpos, int type)
 {
+	//change this to !opened & !created if you want to Seek in written file
 	if (!opened) {
 		return GEM_ERROR;
 	}
@@ -136,13 +184,13 @@ int FileStream::Seek(int newpos, int type)
 			return GEM_ERROR;
 	}
 	if (Pos>size) {
-                printf("[Streams]: Invalid seek position: %ld (limit: %ld)\n",Pos, size);
+		printf("[Streams]: Invalid seek position: %ld (limit: %ld)\n",Pos, size);
 		return GEM_ERROR;
 	}
 	return GEM_OK;
 }
 
-unsigned long FileStream::Size()
+unsigned long FileStream::Size() const
 {
 	return size;
 }
@@ -183,7 +231,7 @@ int FileStream::ReadLine(void* buf, unsigned int maxlen)
 	return i;
 }
 
-unsigned long FileStream::GetStartPos()
+unsigned long FileStream::GetStartPos() const
 {
 	return startpos;
 }

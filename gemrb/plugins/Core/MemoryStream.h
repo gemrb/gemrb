@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.h,v 1.9 2004/04/18 14:26:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.h,v 1.10 2005/03/05 16:24:27 avenger_teambg Exp $
  *
  */
 
@@ -45,8 +45,12 @@ public:
 	MemoryStream(void* buffer, int length, bool autoFree = true);
 	~MemoryStream(void);
 	int Read(void* dest, unsigned int length);
+	int Write(void * /*src*/, unsigned int /*length*/)
+	{
+		return GEM_ERROR;
+	}
 	int Seek(int pos, int startpos);
-	unsigned long Size();
+	unsigned long Size() const;
 	/** No descriptions */
 	int ReadLine(void* buf, unsigned int maxlen);
 };

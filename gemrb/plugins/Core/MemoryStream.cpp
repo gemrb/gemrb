@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.19 2004/08/03 20:21:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.20 2005/03/05 16:24:27 avenger_teambg Exp $
  *
  */
 
@@ -77,7 +77,7 @@ int MemoryStream::Seek(int newpos, int type)
 	return GEM_OK;
 }
 
-unsigned long MemoryStream::Size()
+unsigned long MemoryStream::Size() const
 {
 	return length;
 }

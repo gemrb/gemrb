@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.h,v 1.13 2004/10/17 16:39:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.h,v 1.14 2005/03/05 16:24:26 avenger_teambg Exp $
  *
  */
 
@@ -50,8 +50,9 @@ public:
 		bool autoFree = true);
 	~CachedFileStream(void);
 	int Read(void* dest, unsigned int length);
+	int Write(void* src, unsigned int length);
 	int Seek(int pos, int startpos);
-	unsigned long Size();
+	unsigned long Size() const;
 	/** No descriptions */
 	int ReadLine(void* buf, unsigned int maxlen);
 };

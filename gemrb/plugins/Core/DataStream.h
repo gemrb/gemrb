@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.12 2004/09/13 20:19:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.13 2005/03/05 16:24:27 avenger_teambg Exp $
  *
  */
 
@@ -49,9 +49,13 @@ public:
 	int ReadWord(ieWord* dest);
 	int ReadDword(ieDword* dest);
 	int ReadResRef(ieResRef dest);
+	virtual int Write(void* src, unsigned int len) = 0;
+	int WriteWord(ieWord* src);
+	int WriteDword(ieDword* src);
+	int WriteResRef(ieResRef src);
 	virtual int Seek(int pos, int startpos) = 0;
-	virtual unsigned long Size() = 0;
-	unsigned long Remains();
+	virtual unsigned long Size() const = 0;
+	unsigned long Remains() const;
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
 	/** No descriptions */

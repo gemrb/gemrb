@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.29 2004/09/19 20:01:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.30 2005/03/05 16:24:25 avenger_teambg Exp $
  *
  */
 
@@ -131,6 +131,22 @@ int CachedFileStream::Read(void* dest, unsigned int length)
 	return c;
 }
 
+int CachedFileStream::Write(void* src, unsigned int length)
+{
+	// do encryption here if needed
+
+	size_t c = _fwrite( src, 1, length, str );
+	if (c != length) {
+		return GEM_ERROR;
+	}
+	Pos += c;
+	//this is needed only if you want to Seek in a written file
+	if (Pos>size) {
+		size = Pos;
+	}
+	return c;
+}
+
 int CachedFileStream::Seek(int newpos, int type)
 {
 	switch (type) {
@@ -155,7 +171,7 @@ int CachedFileStream::Seek(int newpos, int type)
 	return GEM_OK;
 }
 
-unsigned long CachedFileStream::Size()
+unsigned long CachedFileStream::Size() const
 {
 	return size;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.15 2005/02/21 19:53:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.16 2005/03/05 16:24:27 avenger_teambg Exp $
  *
  */
 
@@ -66,7 +66,7 @@ void DataStream::ReadDecrypted(void* buf, unsigned int size)
 	for (unsigned int i = 0; i < size; i++)
 		( ( unsigned char * ) buf )[i] ^= GEM_ENCRYPTION_KEY[( Pos + i ) & 63];
 }
-unsigned long DataStream::Remains()
+unsigned long DataStream::Remains() const
 {
 	return Size()-Pos;
 }
@@ -79,6 +79,21 @@ int DataStream::ReadWord(ieWord *dest)
 		tmp=((unsigned char *) dest)[0];
 		((unsigned char *) dest)[0]=((unsigned char *) dest)[1];
 		((unsigned char *) dest)[1]=tmp;
+	}
+	return len;
+}
+
+int DataStream::WriteWord(ieWord *src)
+{
+	int len;
+	if (EndianSwitch) {
+		char tmp[2];
+		tmp[0]=((unsigned char *) src)[1];
+		tmp[1]=((unsigned char *) src)[0];
+		len = Write( tmp, 2 );
+	}
+	else {
+		len = Write( src, 2 );
 	}
 	return len;
 }
@@ -98,6 +113,23 @@ int DataStream::ReadDword(ieDword *dest)
 	return len;
 }
 
+int DataStream::WriteDword(ieDword *src)
+{
+	int len;
+	if (EndianSwitch) {
+		char tmp[4];
+		tmp[0]=((unsigned char *) src)[3];
+		tmp[1]=((unsigned char *) src)[2];
+		tmp[2]=((unsigned char *) src)[1];
+		tmp[3]=((unsigned char *) src)[0];
+		len = Write( tmp, 4 );
+	}
+	else {
+		len = Write( src, 4 );
+	}
+	return len;
+}
+
 int DataStream::ReadResRef(ieResRef dest)
 {
 	int len = Read(dest, 8);
@@ -109,3 +141,7 @@ int DataStream::ReadResRef(ieResRef dest)
 	return len;
 }
 
+int DataStream::WriteResRef(ieResRef src)
+{
+	return Write( src, 8);
+}

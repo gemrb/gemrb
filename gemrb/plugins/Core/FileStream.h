@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.h,v 1.10 2004/10/17 16:39:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.h,v 1.11 2005/03/05 16:24:27 avenger_teambg Exp $
  *
  */
 
@@ -42,17 +42,19 @@ private:
 	unsigned long startpos;
 	unsigned long size;
 	_FILE* str;
-	bool opened;
+	bool opened, created;
 public:
 	FileStream(void);
 	~FileStream(void);
 
 	bool Open(const char* filename, bool autoFree = true);
 	bool Open(_FILE* stream, int startpos, int size, bool autoFree = false);
+	bool Create(const char* filename);
 	int Read(void* dest, unsigned int length);
+	int Write(void* src, unsigned int length);
 	int Seek(int pos, int startpos);
-	unsigned long GetStartPos();
-	unsigned long Size();
+	unsigned long GetStartPos() const;
+	unsigned long Size() const;
 	/** No descriptions */
 	int ReadLine(void* buf, unsigned int maxlen);
 };
