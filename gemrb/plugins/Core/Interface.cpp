@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.165 2004/05/04 20:40:31 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.166 2004/05/07 20:58:11 edheldil Exp $
  *
  */
 
@@ -823,48 +823,12 @@ bool Interface::LoadConfig(const char* filename)
 			CaseSensitive = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "GameOnCD" ) == 0) {
 			GameOnCD = ( atoi( value ) == 0 ) ? false : true;
-		} else if (stricmp( name, "AllStringsTagged" ) == 0) {
-			SetFeature( atoi( value ), GF_ALL_STRINGS_TAGGED );
-		} else if (stricmp( name, "HasDPLAYER" ) == 0) {
-			SetFeature( atoi( value ), GF_HAS_DPLAYER );
-		} else if (stricmp( name, "HasPickSound" ) == 0) {
-			SetFeature( atoi( value ), GF_HAS_PICK_SOUND );
-		} else if (stricmp( name, "HasDescIcon" ) == 0) {
-			SetFeature( atoi( value ), GF_HAS_DESC_ICON );
-		} else if (stricmp( name, "HasEXPTABLE" ) == 0) {
-			SetFeature( atoi( value ), GF_HAS_EXPTABLE );
-		} else if (stricmp( name, "SoundFolders" ) == 0) {
-			SetFeature( atoi( value ), GF_SOUNDFOLDERS );
-			/*
-		} else if (stricmp( name, "HasSonglist" ) == 0) {
-			SetFeature( atoi( value ), GF_HAS_SONGLIST );
-		} else if (stricmp( name, "UpperButtonText" ) == 0) {
-			SetFeature( atoi( value ), GF_UPPER_BUTTON_TEXT );
-		} else if (stricmp( name, "LowerLabelText" ) == 0) {
-			SetFeature( atoi( value ), GF_LOWER_LABEL_TEXT );
-		} else if (stricmp( name, "HasPartyIni" ) == 0) {
-			SetFeature( atoi( value ), GF_HAS_PARTY_INI );
-		} else if (stricmp( name, "HasBeastsIni" ) == 0) {
-			SetFeature( atoi( value ), GF_HAS_BEASTS_INI );
-			*/
-		} else if (stricmp( name, "IgnoreButtonFrames" ) == 0) {
-			SetFeature( atoi( value ), GF_IGNORE_BUTTON_FRAMES );
-		} else if (stricmp( name, "ForceStereo" ) == 0) {
-			ForceStereo = atoi( value );
 		} else if (stricmp( name, "TooltipDelay" ) == 0) {
 			TooltipDelay = atoi( value );
-			/*
-		} else if (stricmp( name, "CursorBam" ) == 0) {
-			strncpy( CursorBam, value, 8 );
-			*/
 		} else if (stricmp( name, "GameDataPath" ) == 0) {
 			strncpy( GameData, value, 8 );
 		} else if (stricmp( name, "GameOverridePath" ) == 0) {
 			strncpy( GameOverride, value, 8 );
-			/*
-		} else if (stricmp( name, "ButtonFont" ) == 0) {
-			strncpy( ButtonFont, value, 8 );
-			*/
 		} else if (stricmp( name, "GameName" ) == 0) {
 			strcpy( GameName, value );
 		} else if (stricmp( name, "GameType" ) == 0) {
@@ -995,11 +959,19 @@ bool Interface::LoadGemRBINI()
 	strcpy( INIConfig, ini->GetKeyAsString( "resources", "INIConfig", "baldur.ini" ));
 
 
+	SetFeature( ini->GetKeyAsInt( "resources", "IgnoreButtonFrames", 1 ), GF_IGNORE_BUTTON_FRAMES );
+	SetFeature( ini->GetKeyAsInt( "resources", "AllStringsTagged", 1 ), GF_ALL_STRINGS_TAGGED );
+	SetFeature( ini->GetKeyAsInt( "resources", "HasDPLAYER", 0 ), GF_HAS_DPLAYER );
+	SetFeature( ini->GetKeyAsInt( "resources", "HasPickSound", 0 ), GF_HAS_PICK_SOUND );
+	SetFeature( ini->GetKeyAsInt( "resources", "HasDescIcon", 0 ), GF_HAS_DESC_ICON );
+	SetFeature( ini->GetKeyAsInt( "resources", "HasEXPTABLE", 0 ), GF_HAS_EXPTABLE );
+	SetFeature( ini->GetKeyAsInt( "resources", "SoundFolders", 0 ), GF_SOUNDFOLDERS );
 	SetFeature( ini->GetKeyAsInt( "resources", "HasSongList", 0 ), GF_HAS_SONGLIST );
 	SetFeature( ini->GetKeyAsInt( "resources", "UpperButtonText", 0 ), GF_UPPER_BUTTON_TEXT );
 	SetFeature( ini->GetKeyAsInt( "resources", "LowerLabelText", 0 ), GF_LOWER_LABEL_TEXT );
 	SetFeature( ini->GetKeyAsInt( "resources", "HasPartyIni", 0 ), GF_HAS_PARTY_INI );
-	SetFeature( ini->GetKeyAsInt( "resources", "HasBeastsIni", 0 ), GF_HAS_BEASTS_INI );	
+	SetFeature( ini->GetKeyAsInt( "resources", "HasBeastsIni", 0 ), GF_HAS_BEASTS_INI );
+	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
 	core->FreeInterface( ini );
 	return true;
