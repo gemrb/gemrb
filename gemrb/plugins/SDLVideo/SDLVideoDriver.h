@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.38 2004/09/18 15:24:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.39 2005/02/19 16:22:04 edheldil Exp $
  *
  */
 
@@ -97,6 +97,10 @@ public:
 	bool Quit();
 	/** Get the Palette of a Sprite */
 	Color* GetPalette(Sprite2D* spr);
+	/** Flips sprite vertically */
+	void MirrorSpriteVertical(Sprite2D *sprite, bool MirrorAnchor);
+	/** Flips sprite horizontally */
+	void MirrorSpriteHorizontal(Sprite2D *sprite, bool MirrorAnchor);
 	/** Mirrors an Animation Horizontally */
 	void MirrorAnimation(Animation* anim);
 	/** Set Clip Rect */

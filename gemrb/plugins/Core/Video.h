@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.34 2004/09/18 15:24:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.35 2005/02/19 16:22:03 edheldil Exp $
  *
  */
 
@@ -100,6 +100,10 @@ public:
 	virtual bool Quit(void) = 0;
 	/** Get the Palette of a Sprite */
 	virtual Color* GetPalette(Sprite2D* spr) = 0;
+	/** Flips sprite vertically */
+	virtual void MirrorSpriteVertical(Sprite2D *sprite, bool MirrorAnchor) = 0;
+	/** Flips sprite horizontally */
+	virtual void MirrorSpriteHorizontal(Sprite2D *sprite, bool MirrorAnchor) = 0;
 	/** Mirrors an Animation Horizontally */
 	virtual void MirrorAnimation(Animation* anim) = 0;
 	/** Convers a Screen Coordinate to a Game Coordinate */

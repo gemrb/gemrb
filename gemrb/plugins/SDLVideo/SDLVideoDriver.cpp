@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.87 2004/11/08 19:09:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.88 2005/02/19 16:22:04 edheldil Exp $
  *
  */
 
@@ -1468,6 +1468,54 @@ Color* SDLVideoDriver::GetPalette(Sprite2D* spr)
 	return pal;
 }
 
+// Flips given sprite vertically (up-down). If MirrorAnchor=true,
+//   flips its anchor (i.e. origin//base point) as well
+void SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnchor)
+{
+	if (!sprite)
+		return;
+	unsigned char * buffer = ( unsigned char * )
+		malloc( sprite->Width * sprite->Height );
+	unsigned char * dst = buffer;
+	for (int y = sprite->Height - 1; y >= 0; y--) {
+		unsigned char * src = ( ( unsigned char * ) sprite->pixels ) +
+			( y * sprite->Width );
+		memcpy( dst, src, sprite->Width );
+		dst += sprite->Width;
+	}
+	memcpy( sprite->pixels, buffer, sprite->Width * sprite->Height );
+	free( buffer );
+	if (MirrorAnchor)
+		sprite->YPos = sprite->Height - sprite->YPos;
+}
+
+// Flips given sprite horizontally (left-right). If MirrorAnchor=true,
+//   flips its anchor (i.e. origin//base point) as well
+void SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAnchor)
+{
+	if (!sprite)
+		return;
+	unsigned char * buffer = ( unsigned char * )
+		malloc( sprite->Width * sprite->Height );
+	unsigned char * dst = buffer;
+	for (int y = 0; y < sprite->Height; y++) {
+		unsigned char * src = ( ( unsigned char * ) sprite->pixels ) +
+			( y * sprite->Width ) +
+			sprite->Width -
+			1;
+		for (int x = 0; x < sprite->Width; x++) {
+			*dst = *src;
+			dst++;
+			src--;
+		}
+	}
+	memcpy( sprite->pixels, buffer, sprite->Width * sprite->Height );
+	free( buffer );
+	if (MirrorAnchor)
+		sprite->XPos = sprite->Width - sprite->XPos;
+}
+
+
 void SDLVideoDriver::MirrorAnimation(Animation* anim)
 {
 	Sprite2D* frame = NULL;
@@ -1476,23 +1524,7 @@ void SDLVideoDriver::MirrorAnimation(Animation* anim)
 		frame = anim->GetFrame( i++ );
 		if (!frame)
 			break;
-		unsigned char * buffer = ( unsigned char * )
-			malloc( frame->Width * frame->Height );
-		unsigned char * dst = buffer;
-		for (int y = 0; y < frame->Height; y++) {
-			unsigned char * src = ( ( unsigned char * ) frame->pixels ) +
-				( y * frame->Width ) +
-				frame->Width -
-				1;
-			for (int x = 0; x < frame->Width; x++) {
-				*dst = *src;
-				dst++;
-				src--;
-			}
-		}
-		memcpy( frame->pixels, buffer, frame->Width * frame->Height );
-		free( buffer );
-		frame->XPos = frame->Width - frame->XPos;
+		MirrorSpriteHorizontal( frame, true );
 	} while (true);
 }
 
