@@ -1,9 +1,8 @@
 #ifndef 2DAIMP_H
 #define 2DAIMP_H
 
-#include "../Core/AnimationMgr.h"
+#include "../Core/TableMgr.h"
 #include "../../includes/globals.h"
-#include "../../includes/RGBAColor.h"
 
 typedef struct RowEntry {
 	std::vector<char *> entries;
