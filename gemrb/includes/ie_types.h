@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.4 2004/08/02 21:26:52 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.5 2004/08/06 16:32:47 avenger_teambg Exp $
  *
  */
 
@@ -26,6 +26,12 @@
 
 #if HAVE_CONFIG
 #include "../../config.h"
+#endif
+
+//we need this for Windows
+#ifdef WIN32
+#define SIZEOF_INT 4
+#define SIZEOF_LONG_INT 4
 #endif
 
 typedef unsigned char ieByte;
