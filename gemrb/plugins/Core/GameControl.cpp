@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.212 2005/04/01 18:48:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.213 2005/04/03 09:03:41 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -33,7 +33,7 @@
 #define DEBUG_SHOW_CONTAINERS   0x02
 #define DEBUG_SHOW_DOORS	DEBUG_SHOW_CONTAINERS
 #define DEBUG_SHOW_SEARCHMAP    0x04
-#define DEBUG_SHOW_PALETTES     0x08
+#define DEBUG_SHOW_LIGHTMAP     0x08
 #define DEBUG_XXX	        0x10
 
 static Color cyan = {
@@ -355,27 +355,16 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		Sprite2D* spr = area->SearchMap->GetImage();
 		video->BlitSprite( spr, 0, 0, true );
 		video->FreeSprite( spr );
-		Region point( p.x / 16, p.y / 12, 1, 1 );
+		Region point( p.x / 16, p.y / 12, 2, 2 );
+		video->DrawRect( point, red );
+	} else if (DebugFlags & DEBUG_SHOW_LIGHTMAP) {
+		Sprite2D* spr = area->LightMap->GetImage();
+		video->BlitSprite( spr, 0, 0, true );
+		video->FreeSprite( spr );
+		Region point( p.x / 16, p.y / 12, 2, 2 );
 		video->DrawRect( point, red );
 	}
 
-/*
-	// Draw actor's palettes
-	if ((DebugFlags & DEBUG_SHOW_PALETTES) && lastActor) {
-		int i;
-
-		Color *Pal1 = lastActor->anims->OrigPalette;
-		for (i = 0; i < 256; i++) {
-			Region rgn( 10 * (i % 64), 30 + 10 * (i / 64), 10, 10 );
-			video->DrawRect( rgn, Pal1[i], true, false);
-		}
-		Color *Pal2 = lastActor->anims->Palette;
-		for (i = 0; i < 256; i++) {
-			Region rgn( 10 * (i % 64), 90 + 10 * (i / 64), 10, 10 );
-			video->DrawRect( rgn, Pal2[i], true, false);
-		}
-	}
-*/
 }
 /** Sets the Text of the current control, unused here */
 int GameControl::SetText(const char* /*string*/, int /*pos*/)
@@ -613,9 +602,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				printf("Show searchmap %s\n", DebugFlags & DEBUG_SHOW_SEARCHMAP ? "ON" : "OFF");
 				break;
 			case '6':
-				//show actor's palettes
-				DebugFlags ^= DEBUG_SHOW_PALETTES;
-				printf("Show actor's palettes %s\n", DebugFlags & DEBUG_SHOW_PALETTES ? "ON" : "OFF");
+				//show the lightmap 
+				DebugFlags ^= DEBUG_SHOW_LIGHTMAP;
+				printf("Show lightmap %s\n", DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
 				break;
 			case '7':
 				//show fog of war
@@ -936,10 +925,12 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	int type;
 
 	type = actor->GetStat(IE_EA);
-	if( type>=EVILCUTOFF ) {
+	if( type >= EVILCUTOFF ) {
 		type = 2; //hostile
 	}
-	else if( type > GOODCUTOFF ) {
+	//can't control GOODBUTBLUE, so: CHARMED
+	//else if( type > GOODCUTOFF ) {
+	else if( type > CHARMED ) {
 		type = 1; //neutral
 	}
 	else {
