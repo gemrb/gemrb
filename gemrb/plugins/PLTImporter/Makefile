@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.1 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.2 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -49,9 +49,9 @@ pkgincludedir = $(includedir)/gemrb
 top_builddir = ../../..
 
 ACLOCAL = aclocal-1.4
-AUTOCONF = /home/mud/bg2/gemrb/admin/missing autoconf
+AUTOCONF = autoconf
 AUTOMAKE = automake-1.4
-AUTOHEADER = /home/mud/bg2/gemrb/admin/missing autoheader
+AUTOHEADER = autoheader
 
 INSTALL = /usr//bin/install -c -p
 INSTALL_PROGRAM = ${INSTALL} $(INSTALL_STRIP_FLAG) $(AM_INSTALL_PROGRAM_FLAGS)
@@ -65,12 +65,12 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_alias = i686-pc-linux-gnu
-build_triplet = i686-pc-linux-gnu
-host_alias = i686-pc-linux-gnu
-host_triplet = i686-pc-linux-gnu
-target_alias = i686-pc-linux-gnu
-target_triplet = i686-pc-linux-gnu
+build_alias = i386-linux
+build_triplet = i386-pc-linux-gnu
+host_alias = i386-linux
+host_triplet = i386-pc-linux-gnu
+target_alias = i386-linux
+target_triplet = i386-pc-linux-gnu
 ARTSCCONFIG = @ARTSCCONFIG@
 AS = @AS@
 AUTODIRS = 
@@ -160,8 +160,8 @@ MICO_INCLUDES = @MICO_INCLUDES@
 MICO_LDFLAGS = @MICO_LDFLAGS@
 MOC = @MOC@
 MSGFMT = @MSGFMT@
-NOOPT_CFLAGS = 
-NOOPT_CXXFLAGS =  -fno-exceptions -fno-check-new
+NOOPT_CFLAGS =  -ansi -W -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -g
+NOOPT_CXXFLAGS =  -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -g3 -Wall -fno-exceptions -fno-check-new
 NOREPO = -fno-repo
 OBJDUMP = @OBJDUMP@
 OBJEXT = o
@@ -188,7 +188,7 @@ USE_EXCEPTIONS = -fexceptions
 USE_RTTI = 
 USE_THREADS = @USE_THREADS@
 VERSION = 0.1
-WOVERLOADED_VIRTUAL = 
+WOVERLOADED_VIRTUAL = -Woverloaded-virtual
 XGETTEXT = @XGETTEXT@
 XPMINC = @XPMINC@
 XPMLIB = @XPMLIB@
@@ -233,13 +233,13 @@ INCLUDES = $(all_includes)
 
 LDFLAGS = 
 
-libPLTImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl
+libPLTImporter_la_LDFLAGS = -version-info 0:0:0 -lcore -L../Core
 
 #>- libPLTImporter_la_METASOURCES = AUTO
 
-libPLTImporter_la_SOURCES = PLTImporter.cpp PLTImp.cpp PLTImpCD.cpp 
+libPLTImporter_la_SOURCES = PLTImp.cpp PLTImpCD.cpp PLTImporter.cpp 
 
-EXTRA_DIST = PLTImpCD.cpp PLTImpCD.h PLTImp.cpp PLTImp.h PLTImporter.cpp 
+EXTRA_DIST = PLTImporter.cpp PLTImpCD.h PLTImpCD.cpp PLTImp.h PLTImp.cpp 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -250,13 +250,13 @@ DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I../../..
 CPPFLAGS = 
 LIBS = 
 libPLTImporter_la_LIBADD = 
-#>- libPLTImporter_la_OBJECTS =  PLTImporter.lo PLTImp.lo PLTImpCD.lo
+#>- libPLTImporter_la_OBJECTS =  PLTImp.lo PLTImpCD.lo PLTImporter.lo
 #>+ 4
 libPLTImporter_la_final_OBJECTS = libPLTImporter_la.all_cpp.lo 
-libPLTImporter_la_nofinal_OBJECTS = PLTImporter.lo PLTImp.lo PLTImpCD.lo
+libPLTImporter_la_nofinal_OBJECTS = PLTImp.lo PLTImpCD.lo PLTImporter.lo
 libPLTImporter_la_OBJECTS = $(libPLTImporter_la_nofinal_OBJECTS)
 #libPLTImporter_la_OBJECTS = $(libPLTImporter_la_final_OBJECTS)
-CXXFLAGS = -O2 -fno-exceptions -fno-check-new
+CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
 #>- CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 #>+ 1
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) $(KDE_CXXFLAGS)
@@ -570,11 +570,11 @@ force-reedit:
 
 
 #>+ 11
-libPLTImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/PLTImporter.cpp $(srcdir)/PLTImp.cpp $(srcdir)/PLTImpCD.cpp  
+libPLTImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/PLTImp.cpp $(srcdir)/PLTImpCD.cpp $(srcdir)/PLTImporter.cpp  
 	@echo 'creating libPLTImporter_la.all_cpp.cpp ...'; \
 	rm -f libPLTImporter_la.all_cpp.files libPLTImporter_la.all_cpp.final; \
 	echo "#define KDE_USE_FINAL 1" >> libPLTImporter_la.all_cpp.final; \
-	for file in PLTImporter.cpp PLTImp.cpp PLTImpCD.cpp ; do \
+	for file in PLTImp.cpp PLTImpCD.cpp PLTImporter.cpp ; do \
 	  echo "#include \"$$file\"" >> libPLTImporter_la.all_cpp.files; \
 	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libPLTImporter_la.all_cpp.final; \
 	done; \

@@ -1,5 +1,5 @@
-# KDE tags expanded automatically by am_edit - $Revision: 1.1 $ 
-# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
+# KDE tags expanded automatically by am_edit - $Revision: 1.2 $ 
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -232,13 +232,13 @@ INCLUDES = $(all_includes)
 
 LDFLAGS = 
 
-libINIImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl
+libINIImporter_la_LDFLAGS = -version-info 0:0:0 -lcore -L../Core
 
 #>- libINIImporter_la_METASOURCES = AUTO
 
-libINIImporter_la_SOURCES = INIImporter.cpp INIImp.cpp INIImpCD.cpp 
+libINIImporter_la_SOURCES = INIImp.cpp INIImpCD.cpp INIImporter.cpp 
 
-EXTRA_DIST = INIImpCD.cpp INIImpCD.h INIImp.cpp INIImp.h INIImporter.cpp 
+EXTRA_DIST = INIImporter.cpp INIImpCD.h INIImpCD.cpp INIImp.h INIImp.cpp 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -249,10 +249,10 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../..
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 libINIImporter_la_LIBADD = 
-#>- libINIImporter_la_OBJECTS =  INIImporter.lo INIImp.lo INIImpCD.lo
+#>- libINIImporter_la_OBJECTS =  INIImp.lo INIImpCD.lo INIImporter.lo
 #>+ 4
 libINIImporter_la_final_OBJECTS = libINIImporter_la.all_cpp.lo 
-libINIImporter_la_nofinal_OBJECTS = INIImporter.lo INIImp.lo INIImpCD.lo
+libINIImporter_la_nofinal_OBJECTS = INIImp.lo INIImpCD.lo INIImporter.lo
 @KDE_USE_FINAL_FALSE@libINIImporter_la_OBJECTS = $(libINIImporter_la_nofinal_OBJECTS)
 @KDE_USE_FINAL_TRUE@libINIImporter_la_OBJECTS = $(libINIImporter_la_final_OBJECTS)
 CXXFLAGS = @CXXFLAGS@
@@ -569,11 +569,11 @@ force-reedit:
 
 
 #>+ 11
-libINIImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/INIImporter.cpp $(srcdir)/INIImp.cpp $(srcdir)/INIImpCD.cpp  
+libINIImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/INIImp.cpp $(srcdir)/INIImpCD.cpp $(srcdir)/INIImporter.cpp  
 	@echo 'creating libINIImporter_la.all_cpp.cpp ...'; \
 	rm -f libINIImporter_la.all_cpp.files libINIImporter_la.all_cpp.final; \
 	echo "#define KDE_USE_FINAL 1" >> libINIImporter_la.all_cpp.final; \
-	for file in INIImporter.cpp INIImp.cpp INIImpCD.cpp ; do \
+	for file in INIImp.cpp INIImpCD.cpp INIImporter.cpp ; do \
 	  echo "#include \"$$file\"" >> libINIImporter_la.all_cpp.files; \
 	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libINIImporter_la.all_cpp.final; \
 	done; \

@@ -1,5 +1,5 @@
-# KDE tags expanded automatically by am_edit - $Revision: 1.9 $ 
-# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
+# KDE tags expanded automatically by am_edit - $Revision: 1.10 $ 
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -226,19 +226,14 @@ qt_libraries = @qt_libraries@
 x_includes = @x_includes@
 x_libraries = @x_libraries@
 
-SUBDIRS = AREImporter BAMImporter BG2HCAnim BIFImporter BMPImporter PLTImporter INIImporter CHUImporter Core CREImporter IDSImporter KEYImporter MOSImporter MVEPlayer SDLVideo TISImporter TLKImporter WEDImporter ZLibMgr GUIScript ACMImporter MUSImporter 2DAImporter 
+SUBDIRS = AREImporter BAMImporter BG2HCAnim BIFImporter BMPImporter CHUImporter Core CREImporter IDSImporter KEYImporter MOSImporter MVEPlayer SDLVideo TISImporter TLKImporter WEDImporter ZLibMgr GUIScript ACMImporter MUSImporter 2DAImporter INIImporter PLTImporter 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../config.h
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  Makefile.am Makefile.in
 
 
-#>- DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
-#>+ 4
-KDE_DIST=libSDLVideo.so libCREImporter.so libACMImporter.so libBMPImporter.so libIDSImporter.so libZLibMgr.so libBIFImporter.so libBG2HCAnim.so libTISImporter.so libMUSImporter.so libWEDImporter.so libMVEPlayer.so libCHUImporter.so libBAMImporter.so lib2DAImporter.so libMOSImporter.so libAREImporter.so libKEYImporter.so libGUIScript.so libTLKImporter.so 
-
-DISTFILES= $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST) $(KDE_DIST)
-
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best

@@ -1,5 +1,5 @@
 # Generated automatically from Makefile.in by config.pl.
-# KDE tags expanded automatically by am_edit - $Revision: 1.6 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.7 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -237,9 +237,9 @@ libMVEPlayer_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl
 
 #>- libMVEPlayer_la_METASOURCES = AUTO
 
-libMVEPlayer_la_SOURCES = MVEPlayerDesc.cpp MVEPlayer.cpp MVEPlay.cpp 
+libMVEPlayer_la_SOURCES = mve_audio.cpp MVEPlayerDesc.cpp MVEPlayer.cpp MVEPlay.cpp 
 
-EXTRA_DIST = MVEPlay.cpp MVEPlayer.cpp MVEPlayerDesc.cpp MVEPlayerDesc.h MVEPlay.h 
+EXTRA_DIST = MVEPlay.cpp MVEPlayer.cpp MVEPlayerDesc.cpp MVEPlayerDesc.h MVEPlay.h mve_audio.cpp mve_audio.h 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -250,10 +250,12 @@ DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I../../..
 CPPFLAGS = 
 LIBS = 
 libMVEPlayer_la_LIBADD = 
-#>- libMVEPlayer_la_OBJECTS =  MVEPlayerDesc.lo MVEPlayer.lo MVEPlay.lo
-#>+ 4
+#>- libMVEPlayer_la_OBJECTS =  mve_audio.lo MVEPlayerDesc.lo MVEPlayer.lo \
+#>- MVEPlay.lo
+#>+ 5
 libMVEPlayer_la_final_OBJECTS = libMVEPlayer_la.all_cpp.lo 
-libMVEPlayer_la_nofinal_OBJECTS = MVEPlayerDesc.lo MVEPlayer.lo MVEPlay.lo
+libMVEPlayer_la_nofinal_OBJECTS = mve_audio.lo MVEPlayerDesc.lo MVEPlayer.lo \
+	MVEPlay.lo
 libMVEPlayer_la_OBJECTS = $(libMVEPlayer_la_nofinal_OBJECTS)
 #libMVEPlayer_la_OBJECTS = $(libMVEPlayer_la_final_OBJECTS)
 CXXFLAGS = -Wnon-virtual-dtor -Wno-long-long -Wbad-function-cast -Wundef -Wall -pedantic -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -ansi -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -Wcast-align -Wconversion -fno-builtin -g -O2 -O0 -g3 -Wall -fno-exceptions -fno-check-new
@@ -274,11 +276,14 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-#>- DEP_FILES =  .deps/MVEPlay.P .deps/MVEPlayer.P .deps/MVEPlayerDesc.P
-#>+ 4
+#>- DEP_FILES =  .deps/MVEPlay.P .deps/MVEPlayer.P .deps/MVEPlayerDesc.P \
+#>- .deps/mve_audio.P
+#>+ 6
 #DEP_FILES =   $(DEPDIR)/libMVEPlayer_la.all_cpp.P \
-		  .deps/MVEPlay.P .deps/MVEPlayer.P .deps/MVEPlayerDesc.P
-DEP_FILES =    .deps/MVEPlay.P .deps/MVEPlayer.P .deps/MVEPlayerDesc.P
+		  .deps/MVEPlay.P .deps/MVEPlayer.P .deps/MVEPlayerDesc.P \
+	.deps/mve_audio.P
+DEP_FILES =    .deps/MVEPlay.P .deps/MVEPlayer.P .deps/MVEPlayerDesc.P \
+	.deps/mve_audio.P
 
 SOURCES = $(libMVEPlayer_la_SOURCES)
 OBJECTS = $(libMVEPlayer_la_OBJECTS)
@@ -570,11 +575,11 @@ force-reedit:
 
 
 #>+ 11
-libMVEPlayer_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/MVEPlayerDesc.cpp $(srcdir)/MVEPlayer.cpp $(srcdir)/MVEPlay.cpp  
+libMVEPlayer_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/mve_audio.cpp $(srcdir)/MVEPlayerDesc.cpp $(srcdir)/MVEPlayer.cpp $(srcdir)/MVEPlay.cpp  
 	@echo 'creating libMVEPlayer_la.all_cpp.cpp ...'; \
 	rm -f libMVEPlayer_la.all_cpp.files libMVEPlayer_la.all_cpp.final; \
 	echo "#define KDE_USE_FINAL 1" >> libMVEPlayer_la.all_cpp.final; \
-	for file in MVEPlayerDesc.cpp MVEPlayer.cpp MVEPlay.cpp ; do \
+	for file in mve_audio.cpp MVEPlayerDesc.cpp MVEPlayer.cpp MVEPlay.cpp ; do \
 	  echo "#include \"$$file\"" >> libMVEPlayer_la.all_cpp.files; \
 	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libMVEPlayer_la.all_cpp.final; \
 	done; \

@@ -1,4 +1,4 @@
-# KDE tags expanded automatically by am_edit - $Revision: 1.1 $ 
+# KDE tags expanded automatically by am_edit - $Revision: 1.2 $ 
 # Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
@@ -232,13 +232,13 @@ INCLUDES = $(all_includes)
 
 LDFLAGS = 
 
-libPLTImporter_la_LDFLAGS = -version-info 0:0:0 -L../Core -lcore -ldl
+libPLTImporter_la_LDFLAGS = -version-info 0:0:0 -lcore -L../Core
 
 #>- libPLTImporter_la_METASOURCES = AUTO
 
-libPLTImporter_la_SOURCES = PLTImporter.cpp PLTImp.cpp PLTImpCD.cpp 
+libPLTImporter_la_SOURCES = PLTImp.cpp PLTImpCD.cpp PLTImporter.cpp 
 
-EXTRA_DIST = PLTImpCD.cpp PLTImpCD.h PLTImp.cpp PLTImp.h PLTImporter.cpp 
+EXTRA_DIST = PLTImporter.cpp PLTImpCD.h PLTImpCD.cpp PLTImp.h PLTImp.cpp 
 mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
 CONFIG_HEADER = ../../../config.h
 CONFIG_CLEAN_FILES = 
@@ -249,10 +249,10 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I../../..
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 libPLTImporter_la_LIBADD = 
-#>- libPLTImporter_la_OBJECTS =  PLTImporter.lo PLTImp.lo PLTImpCD.lo
+#>- libPLTImporter_la_OBJECTS =  PLTImp.lo PLTImpCD.lo PLTImporter.lo
 #>+ 4
 libPLTImporter_la_final_OBJECTS = libPLTImporter_la.all_cpp.lo 
-libPLTImporter_la_nofinal_OBJECTS = PLTImporter.lo PLTImp.lo PLTImpCD.lo
+libPLTImporter_la_nofinal_OBJECTS = PLTImp.lo PLTImpCD.lo PLTImporter.lo
 @KDE_USE_FINAL_FALSE@libPLTImporter_la_OBJECTS = $(libPLTImporter_la_nofinal_OBJECTS)
 @KDE_USE_FINAL_TRUE@libPLTImporter_la_OBJECTS = $(libPLTImporter_la_final_OBJECTS)
 CXXFLAGS = @CXXFLAGS@
@@ -569,11 +569,11 @@ force-reedit:
 
 
 #>+ 11
-libPLTImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/PLTImporter.cpp $(srcdir)/PLTImp.cpp $(srcdir)/PLTImpCD.cpp  
+libPLTImporter_la.all_cpp.cpp: $(srcdir)/Makefile.in $(srcdir)/PLTImp.cpp $(srcdir)/PLTImpCD.cpp $(srcdir)/PLTImporter.cpp  
 	@echo 'creating libPLTImporter_la.all_cpp.cpp ...'; \
 	rm -f libPLTImporter_la.all_cpp.files libPLTImporter_la.all_cpp.final; \
 	echo "#define KDE_USE_FINAL 1" >> libPLTImporter_la.all_cpp.final; \
-	for file in PLTImporter.cpp PLTImp.cpp PLTImpCD.cpp ; do \
+	for file in PLTImp.cpp PLTImpCD.cpp PLTImporter.cpp ; do \
 	  echo "#include \"$$file\"" >> libPLTImporter_la.all_cpp.files; \
 	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libPLTImporter_la.all_cpp.final; \
 	done; \
