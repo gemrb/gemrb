@@ -54,5 +54,5 @@ def BackPress():
 
 def NextPress():
         GemRB.UnloadWindow(AbilityWindow)
-	GemRB.SetNextScript("GUICG12") #appearance
+	GemRB.SetNextScript("CharGen5") #appearance
 	return

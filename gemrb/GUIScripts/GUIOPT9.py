@@ -6,6 +6,7 @@ TextAreaControl = 0
 
 def OnLoad():
 	global FeedbackWindow, TextAreaControl
+
 	GemRB.LoadWindowPack("GUIOPT")
 	FeedbackWindow = GemRB.LoadWindow(9)
 
@@ -80,59 +81,47 @@ def OnLoad():
 
         GemRB.SetEvent(FeedbackWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
         GemRB.SetEvent(FeedbackWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-        GemRB.ShowModal(FeedbackWindow)
+        GemRB.SetVisible(FeedbackWindow,1)
 	return
 
 def MarkerSliderPress():
-        global FeedbackWindow, TextAreaControl
 	GemRB.SetText(FeedbackWindow, TextAreaControl, 18024)
 	return
 
 def LocatorSliderPress():
-        global FeedbackWindow, TextAreaControl
 	GemRB.SetText(FeedbackWindow, TextAreaControl, 18025)
 	return
 
 def THac0RollsPress():
-        global FeedbackWindow, TextAreaControl
 	GemRB.SetText(FeedbackWindow, TextAreaControl, 18026)
 	return
 
 def CombatInfoPress():
-        global FeedbackWindow, TextAreaControl
 	GemRB.SetText(FeedbackWindow, TextAreaControl, 18027)
 	return
 
 def ActionsPress():
-        global FeedbackWindow, TextAreaControl
 	GemRB.SetText(FeedbackWindow, TextAreaControl, 18028)
 	return
 
 def StateChangesPress():
-        global FeedbackWindow, TextAreaControl
 	GemRB.SetText(FeedbackWindow, TextAreaControl, 18029)
 	return
 
 def SelectionTextPress():
-        global FeedbackWindow, TextAreaControl
 	GemRB.SetText(FeedbackWindow, TextAreaControl, 18030)
 	return
 
 def MiscellaneousPress():
-        global FeedbackWindow, TextAreaControl
 	GemRB.SetText(FeedbackWindow, TextAreaControl, 18031)
 	return
 
 def OkPress():
-        global FeedbackWindow, TextAreaControl
-        GemRB.SetVisible(FeedbackWindow, 0)
         GemRB.UnloadWindow(FeedbackWindow)
         GemRB.SetNextScript("GUIOPT8")
         return
 
 def CancelPress():
-        global FeedbackWindow, TextAreaControl
-        GemRB.SetVisible(FeedbackWindow, 0)
         GemRB.UnloadWindow(FeedbackWindow)
         GemRB.SetNextScript("GUIOPT8")
         return

@@ -107,7 +107,7 @@ def OnLoad():
 	GemRB.SetVarAssoc(AutoPauseWindow, SpellCastB, "Auto Pause Status",256)
 	GemRB.SetVarAssoc(AutoPauseWindow, TrapFoundB, "Auto Pause Status",512)
 
-        GemRB.ShowModal(AutoPauseWindow)
+        GemRB.SetVisible(AutoPauseWindow,1)
 	return
 
 def ChHitButtonPress():
@@ -155,13 +155,11 @@ def AutopauseCenterPress():
 	return
 
 def OkPress():
-        GemRB.SetVisible(AutoPauseWindow, 0)
         GemRB.UnloadWindow(AutoPauseWindow)
         GemRB.SetNextScript("GUIOPT8")
         return
 
 def CancelPress():
-        GemRB.SetVisible(AutoPauseWindow, 0)
         GemRB.UnloadWindow(AutoPauseWindow)
         GemRB.SetNextScript("GUIOPT8")
         return

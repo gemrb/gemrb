@@ -29,88 +29,58 @@ def OnLoad():
 	GemRB.SetText(SoundWindow, OkButton, 11973)
 	GemRB.SetText(SoundWindow, CancelButton, 13727)
 	GemRB.SetEvent(SoundWindow, AmbientButton, IE_GUI_BUTTON_ON_PRESS, "AmbientPress")
-	GemRB.SetEvent(SoundWindow, AmbientSlider, IE_GUI_SLIDER_ON_CHANGE, "AmbientPressB")
+	GemRB.SetEvent(SoundWindow, AmbientSlider, IE_GUI_SLIDER_ON_CHANGE, "AmbientPress")
 	GemRB.SetVarAssoc(SoundWindow, AmbientSlider, "Volume Ambients",0);
 
 	GemRB.SetEvent(SoundWindow, SoundEffectsButton, IE_GUI_BUTTON_ON_PRESS, "SoundEffectsPress")
-	GemRB.SetEvent(SoundWindow, SoundEffectsSlider, IE_GUI_SLIDER_ON_CHANGE, "SoundEffectsPressB")
+	GemRB.SetEvent(SoundWindow, SoundEffectsSlider, IE_GUI_SLIDER_ON_CHANGE, "SoundEffectsPress")
 	GemRB.SetVarAssoc(SoundWindow, SoundEffectsSlider, "Volume SFX",0);
 	
 	GemRB.SetEvent(SoundWindow, DialogueButton, IE_GUI_BUTTON_ON_PRESS, "DialoguePress")
-	GemRB.SetEvent(SoundWindow, DialogueSlider, IE_GUI_SLIDER_ON_CHANGE, "DialoguePressB")
+	GemRB.SetEvent(SoundWindow, DialogueSlider, IE_GUI_SLIDER_ON_CHANGE, "DialoguePress")
 	GemRB.SetVarAssoc(SoundWindow, DialogueSlider, "Volume Voices",0);
 
 	GemRB.SetEvent(SoundWindow, MusicButton, IE_GUI_BUTTON_ON_PRESS, "MusicPress")
-	GemRB.SetEvent(SoundWindow, MusicSlider, IE_GUI_SLIDER_ON_CHANGE, "MusicPressB")
+	GemRB.SetEvent(SoundWindow, MusicSlider, IE_GUI_SLIDER_ON_CHANGE, "MusicPress")
 	GemRB.SetVarAssoc(SoundWindow, MusicSlider, "Volume Music",0);
 
 	GemRB.SetEvent(SoundWindow, MoviesButton, IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
-	GemRB.SetEvent(SoundWindow, MoviesSlider, IE_GUI_SLIDER_ON_CHANGE, "MoviesPressB")
+	GemRB.SetEvent(SoundWindow, MoviesSlider, IE_GUI_SLIDER_ON_CHANGE, "MoviesPress")
 	GemRB.SetVarAssoc(SoundWindow, MoviesSlider, "Volume Movie",0);
 
 	GemRB.SetEvent(SoundWindow, EnvironmentalButton, IE_GUI_BUTTON_ON_PRESS, "EnvironmentalPress")
-	GemRB.SetEvent(SoundWindow, EnvironmentalButtonB, IE_GUI_BUTTON_ON_PRESS, "EnvironmentalPressB")
+	GemRB.SetEvent(SoundWindow, EnvironmentalButtonB, IE_GUI_BUTTON_ON_PRESS, "EnvironmentalPress")
 	GemRB.SetButtonFlags(SoundWindow, EnvironmentalButtonB,IE_GUI_BUTTON_CHECKBOX,OP_OR)
 	GemRB.SetVarAssoc(SoundWindow, EnvironmentalButtonB,"Environmental Audio",1)
 
 	GemRB.SetEvent(SoundWindow, CharacterSoundButton, IE_GUI_BUTTON_ON_PRESS, "CharacterSoundPress")
 	GemRB.SetEvent(SoundWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
 	GemRB.SetEvent(SoundWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.ShowModal(SoundWindow)
+	GemRB.SetVisible(SoundWindow,1)
 	return
 	
 def AmbientPress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18008)
 	return
 	
-def AmbientPressB():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18008)
-#retrieve slider data
-	return
-	
 def SoundEffectsPress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18009)
-	return
-	
-def SoundEffectsPressB():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18009)
-#retrieve slider data
 	return
 	
 def DialoguePress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18010)
 	return
 	
-def DialoguePressB():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18010)
-#retrieve slider data
-	return
-	
 def MusicPress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18011)
-	return
-	
-def MusicPressB():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18011)
-#retrieve slider data
 	return
 	
 def MoviesPress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18012)
 	return
 	
-def MoviesPressB():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18012)
-#retrieve slider data
-	return
-	
 def EnvironmentalPress():
 	GemRB.SetText(SoundWindow, TextAreaControl, 18022)
-	return
-	
-def EnvironmentalPressB():
-	GemRB.SetText(SoundWindow, TextAreaControl, 18022)
-#retrieve EAX button state
 	return
 	
 def CharacterSoundPress():

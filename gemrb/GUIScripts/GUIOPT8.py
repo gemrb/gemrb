@@ -84,7 +84,7 @@ def OnLoad():
 	GemRB.SetEvent(GamePlayWindow, AutoPauseButton, IE_GUI_BUTTON_ON_PRESS, "AutoPausePress")
 	GemRB.SetEvent(GamePlayWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
 	GemRB.SetEvent(GamePlayWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.ShowModal(GamePlayWindow)
+	GemRB.SetVisible(GamePlayWindow,1)
 	return
 	
 def DelayPress():

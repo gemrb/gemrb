@@ -71,7 +71,7 @@ def OnLoad():
 
 	GemRB.SetEvent(SoundWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
 	GemRB.SetEvent(SoundWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.ShowModal(SoundWindow)
+	GemRB.SetVisible(SoundWindow,1)
 	return
 	
 def SubtitlePress():

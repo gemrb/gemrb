@@ -48,7 +48,7 @@ def RacePress():
 
 def BackPress():
 	GemRB.UnloadWindow(RaceWindow)
-	GemRB.SetNextScript("GUICG12")
+	GemRB.SetNextScript("CharGen2")
 	GemRB.SetVar("Race",0)  #scrapping the race value
 	return
 

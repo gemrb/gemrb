@@ -4,16 +4,17 @@ import GemRB
 CharGenWindow = 0
 TextAreaControl = 0
 ImportButton = 0
+CancelButton = 0
 
 def OnLoad():
-	global CharGenWindow, TextAreaControl, ImportButton
+	global CharGenWindow, TextAreaControl, ImportButton, CancelButton
 
 	GemRB.SetVar("Gender",0) #gender
 	GemRB.SetVar("Race",0) #race
 	GemRB.SetVar("Class",0) #class
+	GemRB.SetVar("Alignment",0) #alignment
 
 	#these are here only for testing purposes
-	GemRB.SetToken("FIGHTERTYPE", "FIGHTER");
 	GemRB.SetToken("MAGESCHOOL", "MAGE");
 
 	GemRB.LoadWindowPack("GUICG")
@@ -90,7 +91,9 @@ def BiographyPress():
 	return
 
 def NextPress():
-	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(CharGenWindow, ImportButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(CharGenWindow, CancelButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.DrawWindows()   #needed to redraw the windows NOW
         GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("GUICG1") #gender
 	return

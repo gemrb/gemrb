@@ -21,7 +21,7 @@ def OnLoad():
 		Button = GemRB.GetControl(AlignmentWindow, i+2)
 		GemRB.SetText(AlignmentWindow, Button, GemRB.GetTableValue(AlignmentTable,i,0) )
 		GemRB.SetEvent(AlignmentWindow, Button, IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
-		GemRB.SetVarAssoc(AlignmentWindow, Button, "Alignment", GemRB.GetTableValue(AlignmentTable,i,3) )
+		GemRB.SetVarAssoc(AlignmentWindow, Button, "Alignment", i)
 
 	BackButton = GemRB.GetControl(AlignmentWindow,13)
 	GemRB.SetText(AlignmentWindow,BackButton,15416)
@@ -38,9 +38,10 @@ def OnLoad():
 	return
 
 def AlignmentPress():
-	Alignment = GemRB.GetVar("Alignment")-1
+	Alignment = GemRB.GetVar("Alignment")
 	GemRB.SetText(AlignmentWindow, TextAreaControl, GemRB.GetTableValue(AlignmentTable,Alignment,1) )
-	GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(AlignmentWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+        GemRB.SetVar("Alignment",GemRB.GetTableValue(AlignmentTable,Alignment,3) )
 	return
 
 def BackPress():
@@ -51,5 +52,5 @@ def BackPress():
 
 def NextPress():
         GemRB.UnloadWindow(AlignmentWindow)
-	GemRB.SetNextScript("GUICG12") #appearance
+	GemRB.SetNextScript("CharGen5") #appearance
 	return
