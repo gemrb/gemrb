@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.3 2003/12/25 23:50:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.4 2003/12/28 20:37:43 balrog994 Exp $
  *
  */
 
@@ -56,7 +56,8 @@ void Dialog::FreeDialogState(DialogState *ds)
 		delete(ds->transitions[i]);
 	}
 	delete(ds->transitions);
-	FreeDialogString(ds->trigger);
+	if(ds->trigger)
+		FreeDialogString(ds->trigger);
 	delete(ds);
 }
 
