@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.11 2004/04/04 17:08:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.12 2004/07/31 10:22:53 avenger_teambg Exp $
  *
  */
 
@@ -125,11 +125,12 @@ int MVEPlay::doPlay(const DataStream* mve)
 	int bpp = 0;
 	MVE_videoSpec vSpec;
 
+/*
 	if (SDL_Init( SDL_INIT_AUDIO ) < 0) {
 		fprintf( stderr, "Couldn't initialize SDL Audio: %s\n",
 			SDL_GetError() );
 	}
-
+*/
 	memset( g_palette, 0, 768 );
 
 	MVE_sndInit( 1 );
