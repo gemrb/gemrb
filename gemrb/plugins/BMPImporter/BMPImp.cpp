@@ -8,14 +8,17 @@ BMPImp::BMPImp(void)
 	str = NULL;
 	autoFree = false;
 	Palette = NULL;
+	pixels = NULL;
 }
 
 BMPImp::~BMPImp(void)
 {
 	if(str && autoFree)
 		delete(str);
-	if(this->Palette)
+	if(Palette)
 		free(Palette);
+	if(pixels)
+		free(pixels);
 }
 
 bool BMPImp::Open(DataStream * stream, bool autoFree)
@@ -108,6 +111,7 @@ bool BMPImp::Open(DataStream * stream, bool autoFree)
 			src+=PaddedRowLength;
 		}
 	}
+	free(rpixels);
 	return true;
 }
 
