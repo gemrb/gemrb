@@ -1,5 +1,16 @@
 import GemRB
 
+from GUICommonWindows import *
+
+from GUIJRNL import *
+from GUIMA import *
+from GUIMG import *
+from GUIINV import *
+from GUIOPT import *
+from GUIPR import *
+from GUIREC import *
+
+
 MessageWindow = 0
 ActionsWindow = 0
 PortraitWindow = 0
@@ -34,6 +45,9 @@ def OnLoad():
 	
 	OpenButton = GemRB.GetControl(OptionsWindow, 10)
 	GemRB.SetEvent(OptionsWindow, OpenButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+
+
+	SetupMenuWindowControls (OptionsWindow)
 
 	UpdateResizeButtons()
 	
