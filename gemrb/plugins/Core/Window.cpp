@@ -52,8 +52,16 @@ Window::~Window()
 /** Add a Control in the Window */
 void Window::AddControl(Control * ctrl)
 {
-	if(ctrl != NULL)
-		Controls.push_back(ctrl);
+	if(ctrl == NULL)
+		return;
+	for(int i = 0; i < Controls.size(); i++) {
+		if(Controls[i]->ControlID == ctrl->ControlID) {
+			delete(Controls[i]);
+			Controls[i] = ctrl;
+			return;
+		}
+	}
+	Controls.push_back(ctrl);
 	ctrl->Owner = this;
 	Changed = true;
 }
