@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.1 2004/08/08 20:50:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.2 2004/08/10 17:13:54 avenger_teambg Exp $
  *
  */
 
@@ -67,7 +67,6 @@ private: // Private attributes
   Sprite2D * BackGround;
   Sprite2D * BackGround2;
   /** Knob Steps Count */
-  unsigned short KnobStepsCount;
   /** If true, on deletion the Progressbar will destroy the associated images */
   bool Clear;
   /** The bam cycle whose frames work as a progressbar */

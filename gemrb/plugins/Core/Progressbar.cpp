@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.2 2004/08/09 18:20:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.3 2004/08/10 17:13:54 avenger_teambg Exp $
  *
  */
 
@@ -27,11 +27,10 @@ extern Interface* core;
 
 Progressbar::Progressbar( unsigned short KnobStepsCount, bool Clear)
 {
-	this->KnobStepsCount = KnobStepsCount;
+	Value = KnobStepsCount;
 	BackGround = NULL;
 	this->Clear = Clear;
 	Pos = 0;
-	Value = 1;
 	PBarAnim = NULL;
 }
 
@@ -54,6 +53,7 @@ Progressbar::~Progressbar()
 /** Draws the Control on the Output Display */
 void Progressbar::Draw(unsigned short x, unsigned short y)
 {
+
 	if (!Changed && !((Window*)Owner)->Floating) {
 		return;
 	}
@@ -63,18 +63,18 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 	}
 	Sprite2D *bcksprite;
 
-	if(Pos == KnobStepsCount) bcksprite=BackGround2;
+	if(Pos >= 100) bcksprite=BackGround2;
 	else bcksprite=BackGround;
 	if (bcksprite) {
 		Region r( x + XPos, y + YPos, Width, Height );
 		core->GetVideoDriver()->BlitSprite( bcksprite,
 			x + XPos, y + YPos, true, &r );
 	}
-	if(!PBarAnim)
+	if(!PBarAnim || Pos>=100)
 		return;
 	//blitting all the sprites
-	for(unsigned int i=0; i<Pos ;i++ ) {
-printf("%u\n",Pos);
+	unsigned int Count=Value*Pos/100;
+	for(unsigned int i=0; i<Count ;i++ ) {
 		Sprite2D *Knob = PBarAnim->GetFrame(i);
 		core->GetVideoDriver()->BlitSprite( Knob, x + XPos, y + YPos, true );
 	}
@@ -89,9 +89,8 @@ unsigned int Progressbar::GetPosition()
 /** Sets the actual Progressbar Position trimming to the Max and Min Values */
 void Progressbar::SetPosition(unsigned int pos)
 {
-	if (pos <= KnobStepsCount) {
-		Pos = pos;
-	}
+	if(pos>100) pos=100;
+	Pos = pos;
 	Changed = true;
 }
 
@@ -100,14 +99,7 @@ void Progressbar::RedrawProgressbar(char* VariableName, int Sum)
         if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
                 return;
         }
-        if (!Value) {
-                Value = 1;
-        }
-        Sum /= Value;
-        if (Sum <= KnobStepsCount) {
-                Pos = Sum;
-        }
-        Changed = true;
+	SetPosition(Sum);
 }
 
 /** Sets the selected image */

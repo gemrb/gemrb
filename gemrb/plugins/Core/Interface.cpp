@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.191 2004/08/09 18:20:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.192 2004/08/10 17:13:54 avenger_teambg Exp $
  *
  */
 
@@ -1187,6 +1187,15 @@ int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID,
 	return 1;
 }
 
+void Interface::RedrawControls(char *varname, unsigned int value)
+{
+	for (unsigned int i = 0; i < windows.size(); i++) {
+		if (windows[i] != NULL) {
+			windows[i]->RedrawControls(varname, value);
+		}
+	}
+}
+
 void Interface::RedrawAll()
 {
 	for (unsigned int i = 0; i < windows.size(); i++) {
@@ -2013,8 +2022,9 @@ void Interface::LoadGame(int index)
 	Game* new_game = NULL;
 	WorldMap* new_worldmap = NULL;
 
-
+	LoadProgress(0);
 	DelTree((const char *) CachePath, true);
+	LoadProgress(5);
 
 	if (index == -1) {
 		//Load the Default Game
@@ -2066,7 +2076,7 @@ void Interface::LoadGame(int index)
 	wmp_mgr = NULL;
 	wmp_str = NULL;
 
-
+	LoadProgress(10);
 	// Unpack SAV (archive) file to Cache dir
 	if (sav_str) {
 		ArchiveImporter * ai = (ArchiveImporter*)core->GetInterface(IE_BIF_CLASS_ID);
@@ -2077,7 +2087,6 @@ void Interface::LoadGame(int index)
 		}
 		sav_str = NULL;
 	}
-
 
 	// Let's assume that now is everything loaded OK and swap the objects
 
@@ -2091,8 +2100,10 @@ void Interface::LoadGame(int index)
 	game = new_game;
 	worldmap = new_worldmap;
 
+	LoadProgress(50);  //setting it up to 100 (halfway)
 	return;
 
+	LoadProgress(100); //dropping the screen
  cleanup:
 	// Something went wrong, so try to clean after itself
 	if (new_game)
@@ -2261,14 +2272,8 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 void Interface::LoadProgress(int percent)
 {
 	vars->SetAt("Progress", percent);
-	if(percent<1) {
-		guiscript->RunFunction("StartLoadScreen");
-		return;
-	}
-	if(percent>99) {
-		guiscript->RunFunction("CloseLoadScreen");
-		return;
-	}
-	guiscript->RunFunction("UpdateLoadScreen");
+	RedrawControls("Progress", percent);
+	DrawWindows();
+	core->GetVideoDriver()->SwapBuffers();
 }
 
