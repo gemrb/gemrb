@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.16 2003/12/19 23:07:24 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.17 2003/12/19 23:27:09 balrog994 Exp $
  *
  */
 
@@ -106,6 +106,7 @@ GameScript::GameScript(const char * ResRef, unsigned char ScriptType, Variables 
 		actions[269] = DisplayStringHead;
 		actions[272] = CreateVisualEffect;
 		actions[273] = CreateVisualEffectObject;
+		actions[287] = UnhideGUI;
 		actions[307] = SG;
 		actions[311] = DisplayStringWait;
 		blocking[311] = true;
@@ -1461,4 +1462,9 @@ void GameScript::DestroySelf(GameScript * Sender, Action * parameters)
 void GameScript::ScreenShake(GameScript * Sender, Action * parameters)
 {
 	core->timer->SetScreenShake(parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter);
+}
+
+void GameScript::UnhideGUI(GameScript * Sender, Action * parameters)
+{
+	EndCutSceneMode(Sender, parameters);
 }
