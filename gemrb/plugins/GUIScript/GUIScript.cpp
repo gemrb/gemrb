@@ -1744,6 +1744,9 @@ bool GUIScript::LoadScript(const char * filename)
 		return false;
 	}
 
+	if(pModule)
+		Py_DECREF(pModule);
+
     pModule = PyImport_Import(pName);
     Py_DECREF(pName);
     
