@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIMOVIE.py,v 1.3 2004/09/21 00:20:46 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIMOVIE.py,v 1.4 2004/10/08 20:44:22 edheldil Exp $
 
 
 # GUIMOVIE.py - Play Movies window
@@ -53,8 +53,8 @@ def OnLoad():
 	GemRB.SetEvent(MovieWindow, CreditsButton, IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
 	GemRB.SetEvent(MovieWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	GemRB.SetVisible(MovieWindow,1)
-	return
-	
+
+
 def PlayPress():
 	s = GemRB.GetVar("MovieIndex")
 	for i in range(0, GemRB.GetTableRowCount(MoviesTable) ):
@@ -62,17 +62,21 @@ def PlayPress():
 		if GemRB.GetVar(t)==1:
 			if s==0:
 				s = GemRB.GetTableRowName(MoviesTable, i)
+				GemRB.SetVisible (MovieWindow, 0)
 				GemRB.PlayMovie(s)
-				GemRB.InvalidateWindow(MovieWindow)
+				GemRB.SetVisible (MovieWindow, 1)
 				return
+
 			s = s - 1
-	return
+
 
 def CreditsPress():
+	GemRB.SetVisible (MovieWindow, 0)
 	GemRB.PlayMovie("CREDITS")
-	return
+	GemRB.SetVisible (MovieWindow, 1)
+
 
 def DonePress():
 	GemRB.UnloadWindow(MovieWindow)
 	GemRB.SetNextScript("Start")
-	return
+
