@@ -12,6 +12,8 @@ GemRB v0.2.2.5 Added Features:
   - Face: is now a Blocking OpCode
   - Global: Added support for GLOBALS & LOCALS Contexts
   - SetGlobal: Added support for GLOBALS & LOCALS Contexts
+- Optimizations:
+  - Little Speedup in the BlitSpriteMode function
 
 GemRB v0.2.2.4 Added Features:
 - Planescape: Torment support Added
