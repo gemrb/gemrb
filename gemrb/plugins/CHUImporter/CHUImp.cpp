@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.42 2005/02/23 18:59:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.43 2005/03/05 15:28:47 avenger_teambg Exp $
  *
  */
 
@@ -182,9 +182,16 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
 				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, PressedIndex );
 				btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
-				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, core->HasFeature( GF_IGNORE_BUTTON_FRAMES ) ?  2 : SelectedIndex );
+				//ignorebuttonframes is a terrible hack
+				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
+					if (bam->GetCycleSize( (unsigned char) Cycle) == 4 ) SelectedIndex=2;
+				}
+				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, SelectedIndex );
 				btn->SetImage( IE_GUI_BUTTON_SELECTED, tspr );
-				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, core->HasFeature( GF_IGNORE_BUTTON_FRAMES ) ?  3 : DisabledIndex );
+				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
+					if (bam->GetCycleSize( (unsigned char) Cycle) == 4 ) DisabledIndex=3;
+				}
+				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, DisabledIndex );
 				btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
 				core->FreeInterface( bam );
 				win->AddControl( btn );
