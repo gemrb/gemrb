@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.60 2004/02/29 09:43:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.61 2004/02/29 21:50:36 edheldil Exp $
  *
  */
 
@@ -158,6 +158,11 @@ bool SDLVideoDriver::TestVideoMode(VideoMode& vm)
 		return true;
 	}
 	return false;
+}
+
+bool SDLVideoDriver::ToggleFullscreenMode()
+{
+	return (bool)SDL_WM_ToggleFullScreen(disp);
 }
 
 int SDLVideoDriver::SwapBuffers(void)
@@ -476,6 +481,18 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 	SDL_Flip( disp );
 	return ret;
+}
+
+bool SDLVideoDriver::ToggleGrabInput()
+{
+	if (SDL_GRAB_OFF == SDL_WM_GrabInput( SDL_GRAB_QUERY )) {
+		SDL_WM_GrabInput( SDL_GRAB_ON );
+		return true;
+	}
+	else {
+		SDL_WM_GrabInput( SDL_GRAB_OFF );
+		return false;
+	}
 }
 
 Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, DWORD rMask,

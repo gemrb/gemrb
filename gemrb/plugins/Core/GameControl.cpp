@@ -284,6 +284,14 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			DebugFlags &= ~8;
 			printf( "TAB released\n" );
 			return;
+		case 'f':
+			if (Mod & 64)
+				core->GetVideoDriver()->ToggleFullscreenMode();
+			break;
+		case 'g':
+			if (Mod & 64)
+				core->GetVideoDriver()->ToggleGrabInput();
+			break;
 		default:
 			break;
 	}

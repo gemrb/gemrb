@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.28 2004/02/24 22:20:39 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.29 2004/02/29 21:50:36 edheldil Exp $
  *
  */
 
@@ -48,7 +48,9 @@ public:
 	void SetDisplayTitle(char* title, char* icon);
 	VideoModes GetVideoModes(bool fullscreen = false);
 	bool TestVideoMode(VideoMode& vm);
+	bool ToggleFullscreenMode();
 	int SwapBuffers(void);
+	bool ToggleGrabInput();
 	Sprite2D* CreateSprite(int w, int h, int bpp, DWORD rMask, DWORD gMask,
 		DWORD bMask, DWORD aMask, void* pixels, bool cK = false, int index = 0);
 	Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.24 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.25 2004/02/29 21:50:35 edheldil Exp $
  *
  */
 
@@ -49,7 +49,9 @@ public:
 	virtual void SetDisplayTitle(char* title, char* icon) = 0;
 	virtual VideoModes GetVideoModes(bool fullscreen = false) = 0;
 	virtual bool TestVideoMode(VideoMode& vm) = 0;
+	virtual bool ToggleFullscreenMode() = 0;
 	virtual int SwapBuffers(void) = 0;
+	virtual bool ToggleGrabInput() = 0;
 	virtual Sprite2D* CreateSprite(int w, int h, int bpp, DWORD rMask,
 		DWORD gMask, DWORD bMask, DWORD aMask, void* pixels, bool cK = false,
 		int index = 0) = 0;
