@@ -1,7 +1,7 @@
 //#include "stdafx.h"
 //acm2snd.cpp
 // Acm to Wav conversion
-#include <iostream.h>
+#include <iostream>
 #include <stdio.h>
 #ifdef WIN32
 #include <io.h>
@@ -36,7 +36,7 @@ int ConvertAcmWav(int fhandle,long maxlen, unsigned char *&memory, long &samples
   #else
   if(maxlen==-1) {
 		struct stat st;
-		stat(fhandle, &st);
+		fstat(fhandle, &st);
 		maxlen=st.st_size;
   }
   #endif
