@@ -20,8 +20,10 @@ bool BAMImp::Open(DataStream * stream, bool autoFree)
 {
 	if(stream == NULL)
 		return false;
-	DataStream * olds = str;
+	if(str && this->autoFree)
+		delete(str);
 	str = stream;
+	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read(Signature, 8);
 	if(strncmp(Signature, "BAMCV1  ", 8) == 0) {
@@ -48,7 +50,6 @@ printf("Compressed file found...\n");
 			//TODO: Decompress Bam File
 			if(!core->IsAvailable(IE_COMPRESSION_CLASS_ID)) {
 				printf("No Compression Manager Available.\nCannot Load Compressed Bam File.\n");
-				str = olds;
 				return false;
 			}	
 			Compressor * comp = (Compressor*)core->GetInterface(IE_COMPRESSION_CLASS_ID);
@@ -70,14 +71,10 @@ printf("Compressed file found...\n");
 		}
 	}
 	if(strncmp(Signature, "BAM V1  ", 8) != 0) {
-		str = olds;
 		return false;
 	}
 	frames.clear();
 	cycles.clear();
-	this->autoFree = autoFree;
-	if(olds && this->autoFree)
-		delete(olds);
 	unsigned short	FramesCount;
 	unsigned char	CyclesCount;
 	str->Read(&FramesCount, 2);
