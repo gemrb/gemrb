@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.9 2004/08/05 20:41:09 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.10 2004/09/12 15:53:17 avenger_teambg Exp $
  *
  */
 
@@ -57,10 +57,10 @@ bool TISImp::Open(DataStream* stream, bool autoFree)
 			printf( "[TISImporter]: Not a Valid TIS File.\n" );
 			return false;
 		}
-		str->Read( &TilesCount, 4 );
-		str->Read( &TilesSectionLen, 4 );
-		str->Read( &headerShift, 4 );
-		str->Read( &TileSize, 4 );
+		str->ReadDword( &TilesCount );
+		str->ReadDword( &TilesSectionLen );
+		str->ReadDword( &headerShift );
+		str->ReadDword( &TileSize );
 	}
 	return true;
 }
