@@ -86,6 +86,6 @@ def BackPress():
 def NextPress():
         GemRB.UnloadWindow(AppearanceWindow)
 	GemRB.SetVar("PortraitIndex",LastPortrait)
-	GemRB.SetNextScript("GUICG2") #appearance
+	GemRB.SetNextScript("CharGen2") #Before race
 	return
 

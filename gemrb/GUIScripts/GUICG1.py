@@ -4,13 +4,11 @@ import GemRB
 CharGenWindow = 0
 GenderWindow = 0
 TextAreaControl = 0
-CharGenPhase = 1
 DoneButton = 0
 
 def OnLoad():
-	global CharGenWindow, GenderWindow, TextAreaControl, CharGenPhase, DoneButton
+	global CharGenWindow, GenderWindow, TextAreaControl, DoneButton
 	
-	CharGenPhase = 1
 	GemRB.LoadWindowPack("GUICG")
 	CharGenWindow = GemRB.LoadWindow(0)
 	GenderWindow = GemRB.LoadWindow(1)

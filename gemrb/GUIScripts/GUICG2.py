@@ -5,9 +5,12 @@ CharGenWindow = 0
 RaceWindow = 0
 TextAreaControl = 0
 DoneButton = 0
+RaceCount = 0
+RaceTable = 0
 
 def OnLoad():
 	global CharGenWindow, RaceWindow, TextAreaControl, DoneButton
+	global RaceCount, RaceTable
 	
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)
@@ -17,7 +20,10 @@ def OnLoad():
                 Button = GemRB.GetControl(CharGenWindow,i)
                 GemRB.SetButtonState(CharGenWindow,Button,IE_GUI_BUTTON_DISABLED)
 
-	for i in range(2,9):
+	RaceTable = GemRB.LoadTable("races")
+	RaceCount = GemRB.GetRowCount(RaceTable)
+
+	for i in range(2,RaceCount+2):
                 Button = GemRB.GetControl(RaceWindow,i)
                 GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_DISABLED)
 

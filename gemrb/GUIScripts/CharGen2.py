@@ -8,21 +8,23 @@ ImportButton = 0
 def OnLoad():
 	global CharGenWindow, TextAreaControl, ImportButton
 
-	GemRB.SetVar("Gender",0) #gender
 	GemRB.SetVar("Race",0) #race
 
 	GemRB.LoadWindowPack("GUICG")
         CharGenWindow = GemRB.LoadWindow(0)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	PortraitTable = GemRB.LoadTable("pictures")
+	PortraitName = GemRB.GetTableRowName(PortraitTable,GemRB.GetVar("PortraitIndex") )
+	GemRB.SetButtonPicture(CharGenWindow,PortraitButton, PortraitName+"M")
 
 	GenderButton = GemRB.GetControl(CharGenWindow,0)
 	GemRB.SetText(CharGenWindow,GenderButton,11956)
-	GemRB.SetButtonState(CharGenWindow,GenderButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonState(CharGenWindow,GenderButton,IE_GUI_BUTTON_DISABLED)
 
 	RaceButton = GemRB.GetControl(CharGenWindow,1)
 	GemRB.SetText(CharGenWindow,RaceButton, 11957)
-	GemRB.SetButtonState(CharGenWindow,RaceButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(CharGenWindow,RaceButton,IE_GUI_BUTTON_ENABLED)
 
 	ClassButton = GemRB.GetControl(CharGenWindow,2)
 	GemRB.SetText(CharGenWindow,ClassButton, 11959)
@@ -69,7 +71,12 @@ def OnLoad():
 	GemRB.SetButtonState(CharGenWindow,BiographyButton,IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl= GemRB.GetControl(CharGenWindow,9)
-	GemRB.SetText(CharGenWindow, TextAreaControl, 16575)
+	GemRB.SetText(CharGenWindow, TextAreaControl, 12135)
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
+	if GemRB.GetVar("Gender") == 1:
+		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 1050)
+	else:
+		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 1051)
 
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
