@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.11 2004/04/17 11:28:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.12 2004/08/04 19:21:55 guidoj Exp $
  *
  */
 
@@ -27,11 +27,11 @@
 #include "../../includes/RGBAColor.h"
 
 typedef struct FrameEntry {
-	unsigned short Width;
-	unsigned short Height;
-	short XPos;
-	short YPos;
-	unsigned long FrameData;
+	ieWord Width;
+	ieWord  Height;
+	ieWord  XPos;
+	ieWord  YPos;
+	ieDword FrameData;
 } FrameEntry;
 
 class BAMImp : public AnimationMgr {
@@ -40,13 +40,13 @@ private:
 	bool autoFree;
 	FrameEntry* frames;
 	CycleEntry* cycles;
-	unsigned short FramesCount;
-	unsigned char CyclesCount;
+	ieWord FramesCount;
+	ieByte CyclesCount;
 	//std::vector<FrameEntry> frames;
 	//std::vector<CycleEntry> cycles;
 	Color Palette[256];
-	unsigned char CompressedColorIndex;
-	unsigned long FramesOffset, PaletteOffset, FLTOffset;
+	ieByte CompressedColorIndex;
+	ieDword FramesOffset, PaletteOffset, FLTOffset;
 public:
 	BAMImp(void);
 	~BAMImp(void);
@@ -64,7 +64,7 @@ public:
 	If the Global Animation Palette is NULL, returns NULL. */
 	Sprite2D* GetPalette();
 	/** Gets a Pixel Index from the Image, unused */
-	unsigned long GetPixelIndex(unsigned int x, unsigned int y)
+	unsigned int GetPixelIndex(unsigned int x, unsigned int y)
 	{
 		return 0;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.15 2004/08/02 15:52:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.16 2004/08/04 19:21:55 guidoj Exp $
  *
  */
 
@@ -54,7 +54,7 @@ int BIFImp::DecompressSaveGame(DataStream *compressed)
 		return GEM_ERROR;
 	}
 	do {
-		unsigned long fnlen, complen, declen;
+		ieDword fnlen, complen, declen;
 		compressed->Read( &fnlen, 4 );
 		char* fname = ( char* ) malloc( fnlen );
 		compressed->Read( fname, fnlen );
@@ -104,7 +104,7 @@ int BIFImp::OpenArchive(char* filename)
 	compressed->Open( filename, true );
 	compressed->Read( Signature, 8 );
 	if (strncmp( Signature, "BIF V1.0", 8 ) == 0) {
-		unsigned long fnlen, complen, declen;
+		ieDword fnlen, complen, declen;
 		compressed->Read( &fnlen, 4 );
 		char* fname = ( char* ) malloc( fnlen );
 		compressed->Read( fname, fnlen );

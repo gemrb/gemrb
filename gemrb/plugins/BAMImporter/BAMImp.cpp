@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.23 2004/07/25 13:34:29 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.24 2004/08/04 19:21:55 guidoj Exp $
  *
  */
 
@@ -50,7 +50,7 @@ BAMImp::~BAMImp(void)
 
 bool BAMImp::Open(DataStream* stream, bool autoFree)
 {
-  unsigned int i;
+	unsigned int i;
 
 	if (stream == NULL) {
 		return false;
@@ -149,7 +149,7 @@ Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
 	}
 	str->Seek( FLTOffset + ( cycles[Cycle].FirstFrame * 2 ) + ( frame * 2 ),
 			GEM_STREAM_START );
-	unsigned short findex;
+	ieWord findex;
 	str->Read( &findex, 2 );
 	return GetFrame( findex );
 }
@@ -157,7 +157,7 @@ Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
 Animation* BAMImp::GetAnimation(unsigned char Cycle, int x, int y,
 	unsigned char mode)
 {
-  unsigned int i;
+	unsigned int i;
 
 	if(Cycle >=CyclesCount ) {
 		return NULL;
@@ -246,7 +246,7 @@ void* BAMImp::GetFramePixels(unsigned short findex, unsigned char mode)
 AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 	unsigned char mode)
 {
-  unsigned int i;
+	unsigned int i;
 
 	AnimationFactory* af = new AnimationFactory( ResRef );
 	int count = 0;
@@ -288,7 +288,7 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef,
 /** This function will load the Animation as a Font */
 Font* BAMImp::GetFont()
 {
-  unsigned int i;
+	unsigned int i;
 
 	int w = 0, h = 0;
 	unsigned int Count;
@@ -354,3 +354,4 @@ Sprite2D* BAMImp::GetPalette()
 	}
 	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, Palette, false );
 }
+
