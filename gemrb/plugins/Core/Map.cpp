@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.64 2004/01/09 11:41:12 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.65 2004/01/11 16:06:04 balrog994 Exp $
  *
  */
 
@@ -99,6 +99,8 @@ Map::~Map(void)
 		if(queue[i])
 			delete(queue[i]);
 	}
+	//if(this->Scripts[0])
+	//	delete(Scripts[0]);
 }
 
 void Map::AddTileMap(TileMap * tm, ImageMgr * lm, ImageMgr * sr)
@@ -432,7 +434,7 @@ void Map::GenerateQueue(int priority)
 {
 	if(lastActorCount[priority] != actors.size()) {
 		if(queue[priority])
-			delete(queue[priority]);
+			delete[] queue[priority];
 		queue[priority] = new Actor*[actors.size()];
 		lastActorCount[priority] = (int)actors.size();
 	}
