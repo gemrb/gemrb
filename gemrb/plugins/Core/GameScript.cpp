@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.132 2004/04/07 20:12:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.133 2004/04/08 17:06:02 avenger_teambg Exp $
  *
  */
 
@@ -2865,7 +2865,7 @@ int GameScript::HasItemEquipped(Scriptable * Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	Actor *actor = (Actor *) scr;
-	if (actor->inventory.HasItem(parameters->string0Parameter, 1) ) {
+	if (actor->inventory.HasItem(parameters->string0Parameter, IE_ITEM_EQUIPPED) ) {
 		return 1;
 	}
 	return 0;
@@ -2900,7 +2900,7 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* paramet
 
 	//there is an assignment here
 	for(int i=0; (actor = game->GetPC(i)) ; i++) {
-		if (actor->inventory.HasItem(parameters->string0Parameter,2) ) {
+		if (actor->inventory.HasItem(parameters->string0Parameter, IE_ITEM_IDENTIFIED) ) {
 			return 1;
 		}
 	}
@@ -6015,7 +6015,7 @@ void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* par
 		default:;
 	}
 	if(inv) {
-		inv->DestroyItem(NULL, 1);
+		inv->DestroyItem(NULL, IE_ITEM_DESTRUCTIBLE);
 	}
 }
 

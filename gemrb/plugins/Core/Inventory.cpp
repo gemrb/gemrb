@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.5 2004/04/07 20:12:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.6 2004/04/08 17:06:02 avenger_teambg Exp $
  *
  */
 
@@ -74,7 +74,10 @@ int Inventory::CountItems(const char *resref, bool stacks)
 	return count;
 }
 
-bool Inventory::HasItem(const char *resref, int flags)
+/** this function can look for stolen, equipped, identified, destructible
+    etc, items. You just have to specify the flags in the bitmask
+    specifying 1 in a bit signifies a requirement */
+bool Inventory::HasItem(const char *resref, ieDword flags)
 {
 	int slot = slots.size();
 	while(slot--) {
@@ -82,22 +85,22 @@ bool Inventory::HasItem(const char *resref, int flags)
 		if(!item) {
 			continue;
 		}
-		if (strnicmp(item->ItemResRef, resref,8) == 0) {
-			if(flags&2) { //identified?
-				if(item->Flags&IE_ITEM_IDENTIFIED) {
-					return true;
-				}
-				continue; //not identified
-			}
-			return true;
+		if( (flags&item->Flags)!=flags) {
+				continue;
 		}
+		if (strnicmp(item->ItemResRef, resref,8) ) {
+			continue;
+		}
+		return true;
 	}
 	return false;
 }
 
-/** if resref is NULL, then destroy ALL items */
-/** if flags == 1 then destroy only destructable items */
-void Inventory::DestroyItem(const char *resref, int flags)
+/** if resref is NULL, then destroy ALL items
+    this function can look for stolen, equipped, identified, destructible
+    etc, items. You just have to specify the flags in the bitmask
+    specifying 1 in a bit signifies a requirement */
+void Inventory::DestroyItem(const char *resref, ieDword flags)
 {
 	int slot = slots.size();
 	while(slot--) {
@@ -105,8 +108,10 @@ void Inventory::DestroyItem(const char *resref, int flags)
 		if(!item) {
 			continue;
 		}
-		if(flags&1) {
-			//IsDestructible(item->ItemResRef);
+		// here you can simply destroy all items of a specific
+                // type
+		if( (flags&item->Flags)!=flags) {
+				continue;
 		}
 		if(resref && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;

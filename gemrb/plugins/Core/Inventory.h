@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.4 2004/04/07 20:12:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.5 2004/04/08 17:06:02 avenger_teambg Exp $
  *
  */
 
@@ -42,12 +42,16 @@
 
 const int INVENTORY_SIZE = 38;
 
-
 typedef enum ieCREItemFlagBits {
 	IE_ITEM_IDENTIFIED = 1,
 	IE_ITEM_UNSTEALABLE = 2,
 	IE_ITEM_STOLEN = 4,
-	IE_ITEM_STACKED = 0x100, //this is a hack, refresh it for stacked items
+	//is this item stackable?
+	IE_ITEM_STACKED = 0x80,      //this is a gemrb extension
+	//is this item already equipped?
+	IE_ITEM_EQUIPPED = 0x40,     //this is a gemrb extension 
+	//is this item destructible normally?
+	IE_ITEM_DESTRUCTIBLE = 0x20, //this is a gemrb extension
 } ieCREItemFlagBits;
 
 
@@ -74,8 +78,8 @@ public:
 	/** looks for a particular item in a slot */
 	bool HasItemInSlot(const char *resref, int slot);
 	/** looks for a particular item in the inventory */
-	/** flags: 1 - equipped, 2 - identified */
-	bool HasItem(const char *resref, int flags);
+	/** flags: see ieCREItemFlagBits */
+	bool HasItem(const char *resref, ieDword flags);
 
 	/** returns number of all slots in the inventory */
 	int GetSlotCount() { return slots.size(); };
@@ -91,7 +95,8 @@ public:
 	** can go in and part can't. Maybe return number instead? or CRE?*/
 	int AddSlotItem(CREItem* item, int slot, CREItem** res_item);
 
-	void DestroyItem(const char *resref, int flags);
+	/** flags: see ieCREItemFlagBits */
+	void DestroyItem(const char *resref, ieDword flags);
 	void SetSlotItem(CREItem* item, int slot);
 
 	/** returns weight of whole inventory, i.e. encumbrance? */
