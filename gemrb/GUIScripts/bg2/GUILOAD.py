@@ -10,9 +10,8 @@ ScrollBar = 0
 def OnLoad():
 	global LoadWindow, TextAreaControl, GameCount, ScrollBar
 
-	GemRB.LoadWindowPack("GUILOAD")
+	GemRB.LoadWindowPack("GUILOAD", 640, 480)
 	LoadWindow = GemRB.LoadWindow(0)
-	GemRB.SetWindowPos (LoadWindow, 640, 480, WINDOW_SCALE)
 	GemRB.SetWindowFrame (LoadWindow)
 	CancelButton=GemRB.GetControl(LoadWindow,34)
 	GemRB.SetText(LoadWindow, CancelButton, 13727)

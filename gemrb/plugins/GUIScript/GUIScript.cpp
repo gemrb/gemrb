@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.289 2005/03/16 01:42:58 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.290 2005/03/16 07:14:49 edheldil Exp $
  *
  */
 
@@ -60,6 +60,10 @@ static SpellDescType *StoreSpells = NULL;
 
 static int ReputationIncrease[20]={0xcccccccc};
 static int ReputationDonation[20]={0xcccccccc};
+
+// Natural screen size of currently loaded winpack
+static int CHUWidth = 0;
+static int CHUHeight = 0;
 
 inline bool valid_number(const char* string, long& val)
 {
@@ -418,20 +422,24 @@ static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_LoadWindowPack__doc,
-"LoadWindowPack(CHUIResRef)\n\n"
+"LoadWindowPack(CHUIResRef, [Width, Height])\n\n"
 "Loads a WindowPack into the Window Manager Module." );
 
 static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 {
 	char* string;
+	int width = 0, height = 0;
 
-	if (!PyArg_ParseTuple( args, "s", &string )) {
+	if (!PyArg_ParseTuple( args, "s|ii", &string, &width, &height )) {
 		return AttributeError( GemRB_LoadWindowPack__doc );
 	}
 
 	if (!core->LoadWindowPack( string )) {
 		return NULL;
 	}
+
+	CHUWidth = width;
+	CHUHeight = height;
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -453,6 +461,14 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	if (ret == -1) {
 		return NULL;
 	}
+
+	// If the current winpack windows are placed for screen resolution
+	//   other than the current one, reposition them
+	Window* win = core->GetWindow( ret );
+	if (CHUWidth && CHUWidth != core->Width)
+		win->XPos += (core->Width - CHUWidth) / 2;
+	if (CHUHeight && CHUHeight != core->Height)
+		win->YPos += (core->Height - CHUHeight) / 2;
 
 	return PyInt_FromLong( ret );
 }

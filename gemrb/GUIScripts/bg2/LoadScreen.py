@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/LoadScreen.py,v 1.8 2005/03/16 01:42:54 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/LoadScreen.py,v 1.9 2005/03/16 07:14:46 edheldil Exp $
 
 # LoadScreen.py - display Loading screen
 
@@ -30,9 +30,8 @@ LoadScreen = None
 def StartLoadScreen ():
 	global LoadScreen
 
-	GemRB.LoadWindowPack ("guils")
+	GemRB.LoadWindowPack ("guils", 640, 480)
 	LoadScreen = GemRB.LoadWindow (0)
-	GemRB.SetWindowPos (LoadScreen, 640, 480, WINDOW_SCALE)
 	GemRB.SetWindowFrame (LoadScreen)
 	Middle = GemRB.GetControl (LoadScreen, 3)
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)

@@ -4,9 +4,8 @@ OptionsWindow = 0
 
 def OnLoad():
 	global OptionsWindow
-	GemRB.LoadWindowPack("GUIOPT")
+	GemRB.LoadWindowPack("GUIOPT", 640, 480)
 	OptionsWindow = GemRB.LoadWindow(13)
-	GemRB.SetWindowPos (OptionsWindow, 640, 480, WINDOW_SCALE)
 	GemRB.SetWindowFrame (OptionsWindow)
 	SoundButton = GemRB.GetControl(OptionsWindow, 8)
 	GameButton = GemRB.GetControl(OptionsWindow, 9)

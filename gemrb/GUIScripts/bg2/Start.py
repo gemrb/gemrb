@@ -28,7 +28,7 @@ def OnLoad():
 	elif screen_width == 1024:
 		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
 		
-	GemRB.LoadWindowPack("START")
+	GemRB.LoadWindowPack("START", 640, 480)
 #tutorial subwindow
 	TutorialWindow = GemRB.LoadWindow(5)
 	TextAreaControl = GemRB.GetControl(TutorialWindow, 1)
@@ -41,7 +41,6 @@ def OnLoad():
 	GemRB.SetEvent(TutorialWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelTut")
 #quit subwindow
 	QuitWindow = GemRB.LoadWindow(3)
-	GemRB.SetWindowPos (QuitWindow, 640, 480, WINDOW_SCALE)
 	QuitTextArea = GemRB.GetControl(QuitWindow,0)
 	CancelButton = GemRB.GetControl(QuitWindow, 2)
 	ConfirmButton = GemRB.GetControl(QuitWindow, 1)
@@ -52,7 +51,6 @@ def OnLoad():
 	GemRB.SetEvent(QuitWindow, CancelButton, 0, "ExitCancelled")
 #main window
 	StartWindow = GemRB.LoadWindow(0)
-	GemRB.SetWindowPos (StartWindow, 640, 480, WINDOW_SCALE)
 	GemRB.SetWindowFrame (StartWindow)
 	
 	SinglePlayerButton = GemRB.GetControl(StartWindow, 0)

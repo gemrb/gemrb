@@ -6,9 +6,8 @@ TextAreaControl = 0
 
 def OnLoad():
 	global GamePlayWindow, TextAreaControl
-	GemRB.LoadWindowPack("GUIOPT")
+	GemRB.LoadWindowPack("GUIOPT", 640, 480)
 	GamePlayWindow = GemRB.LoadWindow(8)
-	GemRB.SetWindowPos (GamePlayWindow, 640, 480, WINDOW_SCALE)
 	TextAreaControl = GemRB.GetControl(GamePlayWindow, 40)
 	DelayButton = GemRB.GetControl(GamePlayWindow, 21)
 	DelaySlider = GemRB.GetControl(GamePlayWindow, 1)
