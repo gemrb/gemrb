@@ -15,27 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.26 2003/11/30 09:54:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.27 2003/11/30 13:03:39 balrog994 Exp $
  *
  */
-
-#define INANIMATE		1
-#define PC				2
-#define FAMILIAR		3
-#define ALLY			4
-#define CONTROLLED		5
-#define CHARMED			6
-#define GOODBUTRED		28
-#define GOODBUTBLUE		29
-#define GOODCUTOFF		30
-#define NOTGOOD			31
-#define ANYTHING		126
-#define NEUTRAL			128
-#define NOTEVIL			199
-#define EVILCUTOFF		200
-#define EVILBUTGREEN	201
-#define EVILBUTBLUE		202
-#define ENEMY			255
 
 #include "../../includes/win32def.h"
 #include "Map.h"
@@ -124,19 +106,19 @@ void Map::DrawMap(Region viewport)
 			case EVILBUTGREEN:
 				if(actors[i].Selected) color=&green;
 				else color=&green_dark;
-	 	                core->GetVideoDriver()->SetCursor(core->Cursors[0]->GetFrame(0), core->Cursors[1]->GetFrame(0));
+	 	                //core->GetVideoDriver()->SetCursor(core->Cursors[0]->GetFrame(0), core->Cursors[1]->GetFrame(0));
 			break;
 
 			case ENEMY:
 			case GOODBUTRED:
 				if(actors[i].Selected) color=&red;
 				else color=&red_dark;
-	 	                core->GetVideoDriver()->SetCursor(core->Cursors[12]->GetFrame(0), core->Cursors[13]->GetFrame(0));
+	 	                //core->GetVideoDriver()->SetCursor(core->Cursors[12]->GetFrame(0), core->Cursors[13]->GetFrame(0));
 			break;
 			default:
 				if(actors[i].Selected) color=&cyan;
 				else color=&cyan_dark;
-	 	                core->GetVideoDriver()->SetCursor(core->Cursors[18]->GetFrame(0), core->Cursors[19]->GetFrame(0));
+	 	                //core->GetVideoDriver()->SetCursor(core->Cursors[18]->GetFrame(0), core->Cursors[19]->GetFrame(0));
 
 			break;
 			}
