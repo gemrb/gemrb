@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.33 2004/10/09 21:51:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.34 2004/10/23 17:47:30 avenger_teambg Exp $
  *
  */
 
@@ -106,7 +106,8 @@ void Window::DrawWindow()
 Control* Window::GetControl(unsigned short x, unsigned short y)
 {
 	Control* ctrl = NULL;
-	//Check if we are always on the last control
+
+	//Check if we are still on the last control
 	if (( lastC != NULL )) {
 		if (( XPos + lastC->XPos <= x ) 
 		    && ( YPos + lastC->YPos <= y )
@@ -157,6 +158,7 @@ void Window::DelControl(unsigned short i)
 		delete Controls[i];
 		Controls.erase(Controls.begin()+i);
 	}
+	lastC=NULL;
 	Invalidate();
 }
 

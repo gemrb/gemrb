@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.34 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.35 2004/10/23 17:47:30 avenger_teambg Exp $
  *
  */
 
@@ -40,12 +40,16 @@ EventMgr::~EventMgr(void)
 void EventMgr::AddWindow(Window* win)
 {
 	unsigned int i;
+
 	if (win == NULL) {
 		return;
 	}
 	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == win) {
 			SetOnTop( i );
+			lastW = win;
+			lastF = NULL;
+			last_ctrl_over = NULL;
 			return;
 		}
 	}
@@ -97,7 +101,6 @@ void EventMgr::DelWindow(unsigned short WindowID)
 		if (( *m )->WindowID == WindowID) {
 			if (lastW == ( *m ))
 				lastW = NULL;
-			//windows.erase(m);
 			( *m ) = NULL;
 			lastF = NULL;
 			last_ctrl_over = NULL;
