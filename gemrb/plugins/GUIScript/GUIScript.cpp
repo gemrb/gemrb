@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.236 2004/11/01 16:28:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.237 2004/11/01 18:54:04 avenger_teambg Exp $
  *
  */
 
@@ -565,28 +565,6 @@ static PyObject* GemRB_UnloadTable(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-#if 0
-PyDoc_STRVAR( GemRB_GetTable__doc,
-"GetTable(2DAResRef) => TableIndex\n\n"
-"Returns a loaded 2DA Table." );
-
-static PyObject* GemRB_GetTable(PyObject * /*self*/, PyObject* args)
-{
-	char* string;
-
-	if (!PyArg_ParseTuple( args, "s", &string )) {
-		return AttributeError( GemRB_GetTable__doc );
-	}
-
-	int ind = core->GetIndex( string );
-	if (ind == -1) {
-		return NULL;
-	}
-
-	return Py_BuildValue( "i", ind );
-}
-#endif //0
-
 PyDoc_STRVAR( GemRB_GetTableValue__doc,
 "GetTableValue(TableIndex, RowIndex/RowString, ColIndex/ColString) => value\n\n"
 "Returns a field of a 2DA Table." );
@@ -779,26 +757,6 @@ static PyObject* GemRB_UnloadSymbol(PyObject * /*self*/, PyObject* args)
 
 	Py_INCREF( Py_None );
 	return Py_None;
-}
-
-PyDoc_STRVAR( GemRB_GetSymbol__doc,
-"GetSymbol(string) => int\n\n"
-"Returns a Loaded IDS Symbol Table." );
-
-static PyObject* GemRB_GetSymbol(PyObject * /*self*/, PyObject* args)
-{
-	char* string;
-
-	if (!PyArg_ParseTuple( args, "s", &string )) {
-		return AttributeError( GemRB_GetSymbol__doc );
-	}
-
-	int ind = core->GetSymbolIndex( string );
-	if (ind == -1) {
-		return NULL;
-	}
-
-	return Py_BuildValue( "i", ind );
 }
 
 PyDoc_STRVAR( GemRB_GetSymbolValue__doc,
@@ -1572,17 +1530,18 @@ static PyObject* GemRB_DeleteControl(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_AdjustScrolling__doc,
-"AdjustScrolling(WindowIndex, ControlID, x, y)\n\n");
+"AdjustScrolling(WindowIndex, ControlIndex, x, y)\n\n"
+"Sets the scrolling offset of a WorldMapControl.");
 
 static PyObject* GemRB_AdjustScrolling(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y;
+	int WindowIndex, ControlIndex, x, y;
 
-	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlID, &x, &y )) {
+	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &x, &y )) {
 		return AttributeError( GemRB_AdjustScrolling__doc );
 	}
 
-	core->AdjustScrolling( WindowIndex, ControlID, x, y );
+	core->AdjustScrolling( WindowIndex, ControlIndex, x, y );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -2445,7 +2404,7 @@ static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetSaveGamePortrait__doc,
-"SetSaveGameAreaPortrait(WindowIndex, ControlIndex, SaveSlotCount, PCSlotCount)\n\n"
+"SetSaveGamePortrait(WindowIndex, ControlIndex, SaveSlotCount, PCSlotCount)\n\n"
 "Sets a savegame PC portrait bmp onto a button as picture." );
 
 static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
@@ -2499,7 +2458,7 @@ static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetSaveGamePreview__doc,
-"SetSaveGameAreaPreview(WindowIndex, ControlIndex, SaveSlotCount)\n\n"
+"SetSaveGamePreview(WindowIndex, ControlIndex, SaveSlotCount)\n\n"
 "Sets a savegame area preview bmp onto a button as picture." );
 
 static PyObject* GemRB_SetSaveGamePreview(PyObject * /*self*/, PyObject* args)
@@ -3982,7 +3941,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetTableRowCount, METH_VARARGS),
 	METHOD(LoadSymbol, METH_VARARGS),
 	METHOD(UnloadSymbol, METH_VARARGS),
-	METHOD(GetSymbol, METH_VARARGS),
 	METHOD(GetSymbolValue, METH_VARARGS),
 	METHOD(GetControl, METH_VARARGS),
 	METHOD(SetText, METH_VARARGS),
