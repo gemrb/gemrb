@@ -17,6 +17,13 @@ def OnLoad():
 	BppButtonB1 = GemRB.GetControl(GraphicsWindow, 5)
 	BppButtonB2 = GemRB.GetControl(GraphicsWindow, 6)
 	BppButtonB3 = GemRB.GetControl(GraphicsWindow, 7)
+	GemRB.SetVarAssoc(GraphicsWindow, BppButtonB1, "BPP",16)
+	GemRB.SetVarAssoc(GraphicsWindow, BppButtonB2, "BPP",24)
+	GemRB.SetVarAssoc(GraphicsWindow, BppButtonB3, "BPP",32)
+	GemRB.SetButtonFlags(GraphicsWindow, BppButtonB1, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	GemRB.SetButtonFlags(GraphicsWindow, BppButtonB2, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	GemRB.SetButtonFlags(GraphicsWindow, BppButtonB3, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+
 	FullScreenButton = GemRB.GetControl(GraphicsWindow, 38)
 	FullScreenButtonB = GemRB.GetControl(GraphicsWindow, 9)
 	SoftMirrBltButton = GemRB.GetControl(GraphicsWindow, 44)
