@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.253 2004/12/05 11:11:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.254 2004/12/05 12:27:49 avenger_teambg Exp $
  *
  */
 
@@ -3337,14 +3337,15 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 	}
 
 	AnimationMgr *bam = spell->SpellIconBAM;
-	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, bam->GetFrameFromCycle(0, 0));
 	//small difference between pst and others
-	if (bam->GetCycleCount()==2) {
-		btn->SetImage( IE_GUI_BUTTON_PRESSED, bam->GetFrameFromCycle(1, 0));
+	if (bam->GetCycleSize(0)!=4) { //non-pst
+		btn->SetPicture( bam->GetFrameFromCycle(0, 0));
 	}
-	else {
+	else { //pst
+		btn->SetImage( IE_GUI_BUTTON_UNPRESSED, bam->GetFrameFromCycle(0, 0));
 		btn->SetImage( IE_GUI_BUTTON_PRESSED, bam->GetFrameFromCycle(0, 1));
-		
+		btn->SetImage( IE_GUI_BUTTON_SELECTED, bam->GetFrameFromCycle(0, 2));
+		btn->SetImage( IE_GUI_BUTTON_DISABLED, bam->GetFrameFromCycle(0, 3));
 	}
 	delete spell;
 	core->FreeInterface( im );

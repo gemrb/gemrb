@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.31 2004/10/09 22:33:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.32 2004/12/05 12:27:48 avenger_teambg Exp $
  *
  */
 
@@ -141,6 +141,14 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 		Palette[i].a = rc.a;
 	}
 	return true;
+}
+
+int BAMImp::GetCycleSize(unsigned char Cycle)
+{
+	if(Cycle >= CyclesCount ) {
+		return -1;
+	}
+	return cycles[Cycle].FramesCount;
 }
 
 Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
