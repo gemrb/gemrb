@@ -12,7 +12,7 @@ def OnLoad():
 	
 	GemRB.LoadWindowPack("GUICG")
 	ClassTable = GemRB.LoadTable("classes")
-	ClassCount = GemRB.GetTableRowCount(ClassTable)-1
+	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
 	ClassWindow = GemRB.LoadWindow(10)
 	RaceColumn = GemRB.GetVar("Race")+3
 
@@ -20,6 +20,7 @@ def OnLoad():
 	for i in range(1,ClassCount):
 		if GemRB.GetTableValue(ClassTable,i-1,3)==0:
 			continue
+		print j, GemRB.GetTableValue(ClassTable, i-1,0), GemRB.GetTableRowName(ClassTable,i-1)
 		if j>11:
 			Button = GemRB.GetControl(ClassWindow,j+7)
 		else:
@@ -67,6 +68,7 @@ def ClassPress():
 	return
 
 def BackPress():
+	GemRB.SetVar("Class",0)  # scrapping it
 	GemRB.UnloadWindow(ClassWindow)
 	GemRB.SetNextScript("GUICG2")
 	return

@@ -16,10 +16,10 @@ def OnLoad():
 	RaceTable = GemRB.LoadTable("races")
 	RaceCount = GemRB.GetTableRowCount(RaceTable)
 
-	for i in range(2,RaceCount+1):
+	for i in range(2,RaceCount+2):
                 Button = GemRB.GetControl(RaceWindow,i)
 		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	for i in range(2, RaceCount+1):
+	for i in range(2, RaceCount+2):
                 Button = GemRB.GetControl(RaceWindow,i)
 		GemRB.SetText(RaceWindow,Button, GemRB.GetTableValue(RaceTable,i-2,0) )
                 GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)

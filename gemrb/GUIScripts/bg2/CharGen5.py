@@ -7,7 +7,7 @@ TextAreaControl = 0
 def OnLoad():
 	global CharGenWindow, TextAreaControl
 
-	for i in range(1,6):
+	for i in range(-1,6):
 		GemRB.SetVar("Ability "+str(i),0) #abilities
 
 	GemRB.LoadWindowPack("GUICG")

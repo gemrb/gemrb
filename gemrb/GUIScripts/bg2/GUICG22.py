@@ -42,22 +42,25 @@ def OnLoad():
 	if KitTable == -1:
 		RowCount = 1
 	else:
-		RowCount = GemRB.GetTableRowCount(KitTable)-1
+		RowCount = GemRB.GetTableRowCount(KitTable)
 
+	print "RowCount: ", RowCount
 	for i in range(0, RowCount ):
 		if i<4:
 			Button = i+1
 		else:
 			Button = i+5
-		GemRB.SetButtonState(KitWindow, Button, IE_GUI_BUTTON_ENABLED)
 		if KitTable == -1:
 			Kit = 0
 		else:
 			Kit = GemRB.GetTableValue(KitTable,i,0)
+		print "Kitlist",i, Button, Kit
+		print GemRB.GetTableRowName(KitTable,i)
 		if Kit == 0:
 			KitName = GemRB.GetTableValue(ClassList, GemRB.GetVar("Class")-1, 0)
 		else:
 			KitName = GemRB.GetTableValue(KitList, Kit, 1)
+		GemRB.SetButtonState(KitWindow, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetText(KitWindow, Button, KitName)
 		GemRB.SetVarAssoc(KitWindow, Button, "Class Kit",Kit)
 		GemRB.SetEvent(KitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "KitPress")

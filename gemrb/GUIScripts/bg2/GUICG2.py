@@ -12,7 +12,7 @@ def OnLoad():
 	
 	GemRB.LoadWindowPack("GUICG")
 	ClassTable = GemRB.LoadTable("classes")
-	ClassCount = GemRB.GetTableRowCount(ClassTable)-1
+	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
 	ClassWindow = GemRB.LoadWindow(2)
 	RaceColumn = GemRB.GetVar("Race")+3
 
@@ -66,12 +66,18 @@ def OnLoad():
 	GemRB.SetText(ClassWindow,DoneButton,11973)
 
 	TextAreaControl = GemRB.GetControl(ClassWindow, 13)
-	GemRB.SetText(ClassWindow,TextAreaControl,17242)
+
+	Class = GemRB.GetVar("Class")-1
+	if Class<0:
+		GemRB.SetText(ClassWindow,TextAreaControl,17242)
+		GemRB.SetButtonState(ClassWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
+	else:
+		GemRB.SetText(ClassWindow,TextAreaControl, GemRB.GetTableValue(ClassTable,Class,1) )
+		GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
 
 	GemRB.SetEvent(ClassWindow,MultiClassButton,IE_GUI_BUTTON_ON_PRESS,"MultiClassPress")
 	GemRB.SetEvent(ClassWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(ClassWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	GemRB.SetButtonState(ClassWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 	GemRB.SetVisible(ClassWindow,1)
 	return
 
