@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.38 2004/08/23 18:02:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.39 2004/08/23 18:26:15 avenger_teambg Exp $
  *
  */
 
@@ -329,11 +329,11 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 		return Anims[StanceID][Orient];
 	}
 	//newresref is based on the prefix (ResRef) and various other things
-	char NewResRef[9];
-	strncpy( NewResRef, ResRef, 6 );
+	char NewResRef[12]; //this is longer than expected so it won't overflow
+	strncpy( NewResRef, ResRef, 7 ); //we need this long for special anims
 	unsigned char Cycle;
 	GetAnimResRef( StanceID, Orient, NewResRef, Cycle );
-	NewResRef[8]=0;
+	NewResRef[8]=0; //cutting right to size
 	DataStream* stream = core->GetResourceMgr()->GetResource( NewResRef,
 		IE_BAM_CLASS_ID );
 	AnimationMgr* animgr = ( AnimationMgr* )
@@ -514,7 +514,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 			Cycle = SixteenToFive[Orient];
 			break;
 		case IE_ANI_PST_GHOST: // pst static animations
-			Cycle = (Orient /2);
+			Cycle = SixteenToFive[Orient];
 			break;
 		default:
 			sprintf (tmp,"Unknown animation type in avatars.2da row: %d\n", AvatarsRowNum);
