@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.17 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.18 2004/03/27 11:49:05 avenger_teambg Exp $
  *
  */
 
@@ -35,9 +35,12 @@ Animation::Animation(unsigned short* frames, int count)
 	indices = new unsigned short[count];
 	indicesCount = count;
 	memcpy( indices, frames, count * sizeof( unsigned short ) );
-	//for(int i = 0; i < count; i++)
-	//	indices.push_back(frames[i]);
-	pos = rand() % count;
+	if(count) {
+		pos = rand() % count;
+	}
+	else {
+		pos = 0;
+	}
 	starttime = 0;
 	x = 0;
 	y = 0;
