@@ -22,6 +22,7 @@
 #define printf cprintf
 
 #else
+#include <stdio.h>
 #include <stdlib.h>
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
