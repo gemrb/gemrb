@@ -64,84 +64,107 @@ def OnLoad():
 	
 	Button = GemRB.GetControl(NewLifeWindow, 2)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "StrPress")
+
 	Button = GemRB.GetControl(NewLifeWindow, 3)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "IntPress")
+
 	Button = GemRB.GetControl(NewLifeWindow, 4)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "WisPress")
+
 	Button = GemRB.GetControl(NewLifeWindow, 5)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "DexPress")
+
 	Button = GemRB.GetControl(NewLifeWindow, 6)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "ConPress")
+
 	Button = GemRB.GetControl(NewLifeWindow, 7)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "ChaPress")
 
 	Button = GemRB.GetControl(NewLifeWindow, 8)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_SELECTED)
 	GemRB.SetButtonSprites(NewLifeWindow, Button, "", 0, 0, 0, 0, 0)
 	GemRB.SetText(NewLifeWindow, Button, 5025)
-	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_BUTTON_ON_PRESS, "PointPress")
+	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "PointPress")
 
 	Button = GemRB.GetControl(NewLifeWindow, 9)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_SELECTED)
 	GemRB.SetButtonSprites(NewLifeWindow, Button, "", 0, 0, 0, 0, 0)
 	GemRB.SetText(NewLifeWindow, Button, 5026)
-	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_BUTTON_ON_PRESS, "AcPress")
+	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "AcPress")
 
 	Button = GemRB.GetControl(NewLifeWindow, 10)
 	GemRB.SetButtonFlags(NewLifeWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	GemRB.SetButtonState(NewLifeWindow, Button, IE_GUI_BUTTON_SELECTED)
 	GemRB.SetButtonSprites(NewLifeWindow, Button, "", 0, 0, 0, 0, 0)
 	GemRB.SetText(NewLifeWindow, Button, 5027)
-	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_BUTTON_ON_PRESS, "HpPress")
+	GemRB.SetEvent(NewLifeWindow,Button, IE_GUI_MOUSE_OVER_BUTTON, "HpPress")
 
 	Button = GemRB.GetControl(NewLifeWindow, 11) #str +
 	GemRB.SetEvent(NewLifeWindow, Button, IE_GUI_BUTTON_ON_PRESS, "IncreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "StrPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 0)
 	
 	Button = GemRB.GetControl(NewLifeWindow, 13) #int +
 	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_BUTTON_ON_PRESS,  "IncreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "IntPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 1)
 	
 	Button = GemRB.GetControl(NewLifeWindow, 15) #wis +
 	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_BUTTON_ON_PRESS,  "IncreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "WisPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 2)
 	
 	Button = GemRB.GetControl(NewLifeWindow, 17) #dex +
 	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_BUTTON_ON_PRESS,  "IncreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "DexPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 3)
 	
 	Button = GemRB.GetControl(NewLifeWindow, 19) #con +
 	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_BUTTON_ON_PRESS, "IncreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "ConPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 4)
 	
 	Button = GemRB.GetControl(NewLifeWindow, 21) #chr +
 	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_BUTTON_ON_PRESS, "IncreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "ChaPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 5)
 	
-	Button = GemRB.GetControl(NewLifeWindow, 12) #str +
+	Button = GemRB.GetControl(NewLifeWindow, 12) #str -
 	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "StrPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 0)
 	
-	Button = GemRB.GetControl(NewLifeWindow, 14) #int +
+	Button = GemRB.GetControl(NewLifeWindow, 14) #int -
 	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "IntPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 1)
 	
-	Button = GemRB.GetControl(NewLifeWindow, 16) #wis +
+	Button = GemRB.GetControl(NewLifeWindow, 16) #wis -
 	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "WisPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 2)
 	
-	Button = GemRB.GetControl(NewLifeWindow, 18) #dex +
+	Button = GemRB.GetControl(NewLifeWindow, 18) #dex -
 	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "DexPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 3)
 	
-	Button = GemRB.GetControl(NewLifeWindow,  20) #con +
+	Button = GemRB.GetControl(NewLifeWindow,  20) #con -
 	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "ConPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 4)
 	
-	Button = GemRB.GetControl(NewLifeWindow,  22) #chr +
+	Button = GemRB.GetControl(NewLifeWindow,  22) #chr -
 	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
+	GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "ChaPress")
 	GemRB.SetVarAssoc(NewLifeWindow, Button, "Pressed", 5)
 	
 	NewLifeLabel = GemRB.GetControl(NewLifeWindow, 0x10000023)
@@ -195,6 +218,8 @@ def UpdateLabels():
 
 	GemRB.SetText(NewLifeWindow, AcLabel, str(AcPoints))
 	GemRB.SetText(NewLifeWindow, HpLabel, str(HpPoints))
+	GemRB.InvalidateWindow(NewLifeWindow)
+	#GemRB.DrawWindows()
 	return
 	
 def AcceptPress():
@@ -211,6 +236,30 @@ def CancelPress():
 	GemRB.SetNextScript("Start")
 	return
 
+def StrPress():
+	GemRB.SetText(NewLifeWindow, TextArea, 18489)
+	return
+
+def IntPress():
+	GemRB.SetText(NewLifeWindow, TextArea, 18488)
+	return
+
+def WisPress():
+	GemRB.SetText(NewLifeWindow, TextArea, 18490)
+	return
+
+def DexPress():
+	GemRB.SetText(NewLifeWindow, TextArea, 18487)
+	return
+
+def ConPress():
+	GemRB.SetText(NewLifeWindow, TextArea, 18491)
+	return
+
+def ChaPress():
+	GemRB.SetText(NewLifeWindow, TextArea, 1903)
+	return
+
 def PointPress():
 	GemRB.SetText(NewLifeWindow, TextArea, 18492)
 	return
@@ -225,7 +274,7 @@ def HpPress():
 
 def DecreasePress():
 	global TotPoints
-	global Str, Int, Wis, Dex, Con, Chr
+	global Sum, Str, Int, Wis, Dex, Con, Cha
 
 	Pressed = GemRB.GetVar("Pressed")
 	if Pressed == 0:
@@ -239,7 +288,7 @@ def DecreasePress():
 	if Pressed == 4:
 		Sum = Con
 	if Pressed == 5:
-		Sum = Chr
+		Sum = Cha
 	if Sum<=9:
 		return
 	TotPoints = TotPoints+1
@@ -255,13 +304,13 @@ def DecreasePress():
 	if Pressed == 4:
 		Con = Sum
 	if Pressed == 5:
-		Chr = Sum
+		Cha = Sum
 	UpdateLabels()
 	return
 
 def IncreasePress():
 	global TotPoints
-	global Str, Int, Wis, Dex, Con, Chr
+	global Sum, Str, Int, Wis, Dex, Con, Cha
 
 	if TotPoints<=0:
 		return
@@ -277,7 +326,7 @@ def IncreasePress():
 	if Pressed == 4:
 		Sum = Con
 	if Pressed == 5:
-		Sum = Chr
+		Sum = Cha
 	if Sum>=18:
 		return
 	TotPoints = TotPoints-1
@@ -293,7 +342,7 @@ def IncreasePress():
 	if Pressed == 4:
 		Con = Sum
 	if Pressed == 5:
-		Chr = Sum
+		Cha = Sum
 	UpdateLabels()
 	return
 
