@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.93 2004/04/21 17:41:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.94 2004/04/21 17:58:37 balrog994 Exp $
  *
  */
 
@@ -26,6 +26,8 @@
 //#include <stdlib.h>
 #ifndef WIN32
 #include <sys/time.h>
+#else
+extern HANDLE hConsole;
 #endif
 
 extern Interface* core;
