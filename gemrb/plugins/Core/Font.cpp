@@ -46,59 +46,74 @@ void Font::Print(Region rgn, unsigned char * string, Color *color, unsigned char
 	StringList sl = Prepare(rgn, string);
 	int x = 0;
 	int y = rgn.y+sl.starty;
-	for(int r = 0; r < sl.StringCount; r++) {
-		x = rgn.x+sl.strings[0][0]->XPos;
-		y += sl.heights[0];
-		int i = 0;
-		while(true) {
-			if(pal != NULL)
-				video->SetPalette(sl.strings[r][i], pal);
-			video->BlitSprite(sl.strings[r][i], x, y, anchor);
-			if(sl.strings[r][i+1] == NULL)
-				break;
-			x+=(sl.strings[r][i]->Width-sl.strings[r][i]->XPos)+sl.strings[r][i+1]->XPos;
-			i++;
+	switch(Alignment) {
+		case IE_FONT_ALIGN_LEFT: 
+		{
+			for(int r = 0; r < sl.StringCount; r++) {
+				x = rgn.x+sl.strings[0][0]->XPos;
+				y += sl.heights[0];
+				int	i = 0;
+				while(true) {
+					if(pal != NULL)
+						video->SetPalette(sl.strings[r][i], pal);
+					video->BlitSprite(sl.strings[r][i], x, y, anchor);
+					if(sl.strings[r][i+1] == NULL)
+						break;
+					x+=(sl.strings[r][i]->Width-sl.strings[r][i]->XPos)+sl.strings[r][i+1]->XPos;
+					i++;
+				}
+			}
 		}
+		break;
+
+		case IE_FONT_ALIGN_CENTER:
+		{
+			for(int r = 0; r < sl.StringCount; r++) {
+				x = rgn.x+sl.strings[r][0]->XPos+((rgn.w/2)-(sl.lengths[r]/2));
+				y += sl.heights[0];
+				int	i = 0;
+				while(true) {
+					if(pal != NULL)
+						video->SetPalette(sl.strings[r][i], pal);
+					video->BlitSprite(sl.strings[r][i], x, y, anchor);
+					if(sl.strings[r][i+1] == NULL)
+						break;
+					x+=(sl.strings[r][i]->Width-sl.strings[r][i]->XPos)+sl.strings[r][i+1]->XPos;
+					i++;
+				}
+			}
+		}
+		break;
+
+		case IE_FONT_ALIGN_RIGHT:
+		{
+			for(int r = 0; r < sl.StringCount; r++) {
+				int len = 0;
+				while(sl.strings[r][len] != NULL)
+					len++;
+				len--;
+				x = rgn.x+rgn.w-(sl.strings[0][len]->Width-sl.strings[0][len]->XPos);
+				y += sl.heights[0];
+				int	i = len;
+				while(i >= 0) {
+					if(pal != NULL)
+						video->SetPalette(sl.strings[r][i], pal);
+					video->BlitSprite(sl.strings[r][i], x, y, anchor);
+					if(i == 0)
+						break;
+					x-=sl.strings[r][i]->XPos+(sl.strings[r][i-1]->Width-sl.strings[r][i-1]->XPos);
+					i--;
+				}
+			}
+		}
+		break;
 	}
-	/*int x = rgn.x+chars[string[0]-1]->XPos;
-	int y = rgn.y+PreCalcLineHeight(rgn, string);
-	int len = strlen((char*)string);
-	for(int i = 0;; i++) {
-		if(x >= rgn.x+rgn.w) {
-			if(i == (len-1))
-				break;
-			x = rgn.x+chars[string[i]-1]->XPos;
-			y += PreCalcLineHeight(rgn, &string[i]);
-		}
-		//printf("Writing Character: 0x%02hX, w=%d, h=%d, xpos=%d, ypos=%d\n", string[i]-1, chars[string[i]-1]->Width, chars[string[i]-1]->Height, chars[string[i]-1]->XPos, chars[string[i]-1]->YPos);
-		if(pal != NULL)
-			video->SetPalette(chars[string[i]-1], pal);
-		video->BlitSprite(chars[string[i]-1], x, y, anchor);
-		if(i == (len-1))
-			break;
-		x+=(chars[string[i]-1]->Width-chars[string[i]-1]->XPos+chars[string[i+1]-1]->XPos);
-	}*/
 	if(pal)
 		free(pal);
 	free(sl.strings[0]);
 	free(sl.strings);
 	free(sl.heights);
-}
-/** Calculated the Maximum Height of a Text Line */
-int Font::PreCalcLineHeight(Region &rgn, unsigned char * string)
-{
-	int i = 0;
-	int ret = 0, x = chars[string[i]-1]->XPos;
-	while(x < rgn.w) {
-		Sprite2D * c = chars[string[i]-1];
-		if(ret < c->YPos)
-			ret = c->YPos;
-		if(string[i+1] == 0)
-			break;
-		x+=(c->Width-c->XPos)+chars[string[i+1]-1]->XPos;
-		i++;
-	}
-	return ret;
+	free(sl.lengths);
 }
 /** PreCalculate for Printing */
 StringList Font::Prepare(Region &rgn, unsigned char * string)
@@ -118,7 +133,9 @@ StringList Font::Prepare(Region &rgn, unsigned char * string)
 	*/
 	//Allocate the heights array
 	sl.heights = (unsigned int*)malloc(sizeof(unsigned int));
-	int x, nsi = 0;
+	//Allocate the lengths array
+	sl.lengths = (unsigned int*)malloc(sizeof(unsigned int));
+	int x, nsi = 0, lastx = 0;
 	Sprite2D * nextimg = chars[string[0]-1], *oldimg = NULL;
 	x = nextimg->XPos;
 	for(int i = 0; i < len; i++) {
@@ -141,6 +158,8 @@ StringList Font::Prepare(Region &rgn, unsigned char * string)
 			*/
 			//Allocate one extra space in the heights array
 			sl.heights = (unsigned int*)realloc(sl.heights, (sl.StringCount+1)*sizeof(unsigned int));
+			//Allocate one extra space in the lengths array
+			sl.lengths = (unsigned int*)realloc(sl.lengths, (sl.StringCount+1)*sizeof(unsigned int));
 			//Let's add the '\0' at the end of the current row
 			newstring[nsi] = NULL;
 			//Set the pointer of our new row to the lastnsi index
@@ -151,6 +170,8 @@ StringList Font::Prepare(Region &rgn, unsigned char * string)
             lastnsi = nsi;
 			//Now copy the maxHeight of the last row to the heights array
 			sl.heights[sl.StringCount-1] = maxHeight;
+			//Set our string length for centering text
+			sl.lengths[sl.StringCount-1] = lastx;
 			//Increment the sl.StringCount variable since we have one new Row
 			sl.StringCount++;
 			//Reset our maxHeight variable
@@ -166,6 +187,7 @@ StringList Font::Prepare(Region &rgn, unsigned char * string)
 		//Let's move our pointer to the next char Position
 		oldimg = nextimg;
 		nextimg = chars[string[i+1]-1];
+		lastx = x;
 		x+=(oldimg->Width-oldimg->XPos)+(nextimg->XPos);
 		//Set our string char value
 		newstring[nsi] = oldimg;
@@ -176,6 +198,7 @@ StringList Font::Prepare(Region &rgn, unsigned char * string)
 	newstring[nsi] = NULL;
 	sl.strings[sl.StringCount-1] = &newstring[lastnsi];
 	sl.heights[sl.StringCount-1] = maxHeight;
+	sl.lengths[sl.StringCount-1] = x;
 	int yacc = 0;
 	for(int i = -1; i < sl.StringCount-1; i++) {
 		if(yacc+sl.heights[i+1] > rgn.h) {

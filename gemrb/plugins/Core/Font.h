@@ -5,8 +5,9 @@
 #include <vector>
 
 typedef struct StringList {
-	Sprite2D *** strings;
-	unsigned int  *  heights;
+	Sprite2D     *** strings;
+	unsigned int   * heights;
+	unsigned int   * lengths;
 	int StringCount;
 	int starty;
 } StringList;
@@ -23,6 +24,10 @@ typedef struct StringList {
 #define GEM_EXPORT
 #endif
 
+#define IE_FONT_ALIGN_LEFT   0
+#define IE_FONT_ALIGN_CENTER 1
+#define IE_FONT_ALIGN_RIGHT  2
+
 class GEM_EXPORT Font
 {
 private:
@@ -35,8 +40,6 @@ public:
 	void Print(Region rgn, unsigned char * string, Color *color, unsigned char Alignment, bool anchor = false);
 	char ResRef[9];
 private: // Private methods
-  /** Calculate the Maximum Height of a Text Line */
-  int PreCalcLineHeight(Region &rgn, unsigned char * string);
   /** PreCalculate for Printing */
   StringList Prepare(Region &rgn, unsigned char * string);
 };
