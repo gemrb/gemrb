@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.66 2004/01/16 22:58:25 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.67 2004/01/17 21:32:39 balrog994 Exp $
  *
  */
 
@@ -117,7 +117,7 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 		tm->DrawOverlay(0, viewport);
 	//Run the Map Script
 	if(Scripts[0])
-		Scripts[0]->Update();
+		ExecuteScript(Scripts[0]);
 	//Execute Pending Actions
 	ProcessActions();
 	//Check if we need to start some trigger scripts
@@ -140,7 +140,8 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 			//Check if this InfoPoint was activated
 			if(ip->Clicker)
 				//Run the InfoPoint script
-				ip->Scripts[0]->Update();
+				//ip->Scripts[0]->Update();
+				ip->ExecuteScript(ip->Scripts[0]);
 			continue;
 		}
 		Region BBox = ip->outline->BBox;
@@ -171,7 +172,8 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 							ip->LastTrigger = actor;
 						}
 					}
-					ip->Scripts[0]->Update();
+					//ip->Scripts[0]->Update();
+					ip->ExecuteScript(ip->Scripts[0]);
 				} else { //ST_TRAVEL
 					if(ip->outline->PointIn(actor->XPos, actor->YPos)) {
 						unsigned long WinIndex, TAIndex;
@@ -196,7 +198,8 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 							if(ip->Scripts[0]) {
 								ip->Clicker = actor;
 								ip->LastTrigger = actor;
-								ip->Scripts[0]->Update();
+								//ip->Scripts[0]->Update();
+								ip->ExecuteScript(ip->Scripts[0]);
 								ip->ProcessActions();
 							}
 						}
@@ -285,7 +288,7 @@ void Map::DrawMap(Region viewport, GameControl * gc)
 			}
 			for(int i = 0; i < 5; i++) {
 				if(actor->Scripts[i])
-					actor->Scripts[i]->Update();
+					actor->ExecuteScript(actor->Scripts[i]);
 			}
 		}
 	}
