@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.37 2004/07/26 22:06:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.38 2004/07/31 22:37:01 avenger_teambg Exp $
  *
  */
 
@@ -299,9 +299,11 @@ void CREImp::GetActorPST(Actor *act)
 	ReadScript(act, 4);
 	ReadScript(act, 5);
 
-	str->Seek( 24, GEM_CURRENT_POS );
-	str->Read( &act->ZombieDisguise, 4 );
-	str->Seek( 83, GEM_CURRENT_POS );
+//      this is a misinformation in iesdp/NI, the zombie and dustman disguises
+//      are stored in a variable 'appearance'
+//	str->Seek( 24, GEM_CURRENT_POS );
+//	str->Read( &act->ZombieDisguise, 4 );
+	str->Seek( 111, GEM_CURRENT_POS );
 	str->Read( &act->ColorsCount, 1 );
 	str->Read( &act->AppearanceFlags1, 2 );
 	str->Read( &act->AppearanceFlags2, 2 );

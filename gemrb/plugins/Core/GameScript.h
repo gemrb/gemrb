@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.122 2004/07/21 22:16:37 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.123 2004/07/31 22:37:02 avenger_teambg Exp $
  *
  */
 
@@ -1082,6 +1082,7 @@ public:
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
 	static void SetNamelessClass(Scriptable* Sender, Action* parameters);
+	static void SetNamelessDisguise(Scriptable* Sender, Action* parameters);
 	static void SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters);
 	static void SetPlayerSound(Scriptable* Sender, Action* parameters);
 	static void SetQuestDone(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.38 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.39 2004/07/31 22:37:01 avenger_teambg Exp $
  *
  */
 
@@ -68,8 +68,6 @@ public:
 	unsigned char InParty;
 	char* LongName, * ShortName;
 	unsigned long StrRefs[100];
-
-	ieDword ZombieDisguise;  // PST
 
 	ieWord AppearanceFlags1;
 	ieWord AppearanceFlags2;

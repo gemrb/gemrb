@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.168 2004/07/31 09:24:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.169 2004/07/31 22:37:01 avenger_teambg Exp $
  *
  */
 
@@ -419,6 +419,7 @@ static ActionLink actionnames[] = {
 	{"setmoraleai", GameScript::SetMoraleAI,0},
 	{"setname", GameScript::SetApparentName,0},
 	{"setnamelessclass", GameScript::SetNamelessClass,0},
+	{"setnamelessdisguise", GameScript::SetNamelessDisguise,0},
 	{"setnumtimestalkedto", GameScript::SetNumTimesTalkedTo,0},
 	{"setplayersound", GameScript::SetPlayerSound,0},
 	{"setquestdone", GameScript::SetQuestDone,0},
@@ -4425,6 +4426,17 @@ void GameScript::SetNamelessClass(Scriptable* Sender, Action* parameters)
 	//same as Protagonist
 	Actor* actor = core->GetGame()->FindPC(1);
 	actor->SetStat( IE_CLASS, parameters->int0Parameter );
+}
+
+void GameScript::SetNamelessDisguise(Scriptable* Sender, Action* parameters)
+{
+	Actor *actor = core->GetGame()->FindPC(1);
+	SetVariable(actor, "APPEARANCE", parameters->int0Parameter);
+	if(parameters->int0Parameter) {
+	}
+	else {
+		
+	}
 }
 
 void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)

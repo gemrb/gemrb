@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.54 2004/07/25 13:39:24 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.55 2004/07/31 22:37:01 avenger_teambg Exp $
  *
  */
 
@@ -87,8 +87,6 @@ Actor::Actor()
 	LastSeen = NULL;
 	LastHeard = NULL;
 	LastSummoner = NULL;
-
-	ZombieDisguise = 0;   // PST only
 
 	DeleteMe = false;
 	FromGame = false;
@@ -395,7 +393,9 @@ void Actor::DebugDump()
 	printf( "Visualrange:%d\n", (int) GetStat(IE_VISUALRANGE) );
 	printf( "Mod[IE_EA]: %ld\n", Modified[IE_EA]);
 	printf( "Mod[IE_ANIMATION_ID]: 0x%04lX\n", Modified[IE_ANIMATION_ID]);
-	printf( "ZombieDisguise: 0x%08x\n", ZombieDisguise);
+	unsigned long tmp=0;
+	locals->Lookup("APPEARANCE",tmp);
+	printf( "Disguise: %ld\n", tmp);
 	inventory.dump();
 	spellbook.dump();
 }
