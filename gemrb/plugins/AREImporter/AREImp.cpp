@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.53 2004/05/25 16:16:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.54 2004/07/26 22:06:05 avenger_teambg Exp $
  *
  */
 
@@ -391,8 +391,14 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Read( &LaunchY, 2 );
 		str->Read( Key, 8 );
 		Key[8] = 0;
-		str->Read( Script, 8 );
-		Script[8] = 0;
+		//don't even bother reading the script if it isn't trapped
+		if(Trapped) {
+			str->Read( Script, 8 );
+			Script[8] = 0;
+		}
+		else {
+			Script[0] = 0;
+		}
 		char* string = core->GetString( StrRef );
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
@@ -406,7 +412,9 @@ Map* AREImp::GetMap(const char *ResRef)
 		InfoPoint* ip = tm->AddInfoPoint( Name, Type, poly );
 		ip->TrapDetectionDifficulty = TrapDetDiff;
 		ip->TrapRemovalDifficulty = TrapRemDiff;
-		ip->Trapped = Trapped;
+		//we don't need this flag, because the script is loaded
+		//only if it exists
+//		ip->Trapped = Trapped;
 		ip->TrapDetected = TrapDetected;
 		ip->TrapLaunchX = LaunchX;
 		ip->TrapLaunchY = LaunchY;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.150 2004/07/25 18:19:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.151 2004/07/26 22:06:08 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -227,7 +227,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				}
 			}
 		} else if (overInfoPoint) {
-			if (overInfoPoint->TrapDetected && overInfoPoint->Trapped) {
+			if (overInfoPoint->VisibleTrap(0) ) {
 				video->DrawPolyline( overInfoPoint->outline, red, true );
 			}
 		}
@@ -290,13 +290,15 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 
 		// Draw actor's palettes
 		if ((DebugFlags & DEBUG_SHOW_PALETTES) && lastActor) {
+			int i;
+
 			Color *Pal1 = lastActor->anims->OrigPalette;
-			for (int i = 0; i < 256; i++) {
+			for (i = 0; i < 256; i++) {
 				Region rgn( 10 * (i % 64), 30 + 10 * (i / 64), 10, 10 );
 				video->DrawRect( rgn, Pal1[i], true, false);
 			}
 			Color *Pal2 = lastActor->anims->Palette;
-			for (int i = 0; i < 256; i++) {
+			for (i = 0; i < 256; i++) {
 				Region rgn( 10 * (i % 64), 90 + 10 * (i / 64), 10, 10 );
 				video->DrawRect( rgn, Pal2[i], true, false);
 			}
@@ -392,12 +394,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				//'a'
 				 {
 					if (overInfoPoint) {
-						if (overInfoPoint->Trapped &&
-							!( overInfoPoint->TrapDetected )) {
-							overInfoPoint->TrapDetected = 1;
-							core->GetVideoDriver()->FreeSprite( overInfoPoint->outline->fill );
-							overInfoPoint->outline->fill = NULL;
-						}
+						overInfoPoint->DetectTrap(256);
+						core->GetVideoDriver()->FreeSprite( overInfoPoint->outline->fill );
+						overInfoPoint->outline->fill = NULL;
 					}
 					if (overContainer) {
 						if (overContainer->Trapped &&
@@ -512,14 +511,16 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'z':
 				if (lastActor) {
+					int i;
+
 					printf( "Appearance flags: 0x%04x : 0x%04x\n", lastActor->AppearanceFlags1, lastActor->AppearanceFlags2 );
 					printf( "Unknowns: %04x %02x %02x", lastActor->unknown2F2, lastActor->unknown2F4, lastActor->unknown310 );
-					for (int i=0; i < 5; i++) {
+					for (i=0; i < 5; i++) {
 						printf(" %04x", lastActor->unknown2FC[i]);
 					}
 					printf("\n");
 					printf( "Num of colors: %d\n", lastActor->ColorsCount );
-					for (int i=0; i < lastActor->ColorsCount; i++) {
+					for (i=0; i < lastActor->ColorsCount; i++) {
 						printf( "  Color: %3d  Place: %3d\n", lastActor->Colors[i], lastActor->ColorPlacements[i] );
 					}
 					printf("Skin    : %ld/%ld\n", lastActor->BaseStats[IE_SKIN_COLOR], lastActor->Modified[IE_SKIN_COLOR]);

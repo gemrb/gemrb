@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.38 2004/07/25 18:19:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.39 2004/07/26 22:06:08 avenger_teambg Exp $
  *
  */
 
@@ -256,7 +256,7 @@ public:
 	unsigned long Flags;
 	unsigned short TrapDetectionDifficulty;
 	unsigned short TrapRemovalDifficulty;
-	unsigned short Trapped;
+//	unsigned short Trapped;
 	unsigned short TrapDetected;
 	unsigned short TrapLaunchX, TrapLaunchY;
 	char KeyResRef[9];

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.74 2004/07/18 08:33:41 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.75 2004/07/26 22:06:08 avenger_teambg Exp $
  *
  */
 
@@ -563,6 +563,8 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 
 void SDLVideoDriver::FreeSprite(Sprite2D* spr)
 {
+	if(!spr)
+		return;
 	if (spr->vptr) {
 		SDL_FreeSurface( ( SDL_Surface * ) spr->vptr );
 	}

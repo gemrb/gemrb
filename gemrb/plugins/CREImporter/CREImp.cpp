@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.36 2004/07/25 13:39:24 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.37 2004/07/26 22:06:06 avenger_teambg Exp $
  *
  */
 
@@ -230,6 +230,8 @@ Actor* CREImp::GetActor()
 
 void CREImp::GetActorPST(Actor *act)
 {
+	int i;
+
 	str->Read( &act->BaseStats[IE_REPUTATION], 1 );
 	str->Read( &act->BaseStats[IE_HIDEINSHADOWS], 1 );
 	str->Read( &act->BaseStats[IE_ARMORCLASS], 2 );
@@ -267,7 +269,7 @@ void CREImp::GetActorPST(Actor *act)
 	str->Read( &act->BaseStats[IE_FATIGUE], 1 );
 	str->Read( &act->BaseStats[IE_INTOXICATION], 1 );
 	str->Read( &act->BaseStats[IE_LUCK], 1 );
-	for(int i=0;i<21;i++) {
+	for(i=0;i<21;i++) {
 		str->Read( &act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i], 1 );
 	}
 	str->Read( &act->BaseStats[IE_TRACKING], 1 );
@@ -304,16 +306,16 @@ void CREImp::GetActorPST(Actor *act)
 	str->Read( &act->AppearanceFlags1, 2 );
 	str->Read( &act->AppearanceFlags2, 2 );
 
-	for (int i = 0; i < 7; i++)
+	for (i = 0; i < 7; i++)
 		str->Read( &act->Colors[i], 2 );
 
 	str->Read( &act->unknown2F2, 2 );
 	str->Read( &act->unknown2F4, 1 );
 
-	for (int i = 0; i < 7; i++)
+	for (i = 0; i < 7; i++)
 		str->Read( &act->ColorPlacements[i], 1 );
 
-	for (int i = 0; i < 5; i++) {
+	for (i = 0; i < 5; i++) {
 		str->Read( &act->unknown2FC[i], 4 );
 	}
 	str->Read( &act->unknown310, 1 );

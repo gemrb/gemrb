@@ -639,7 +639,7 @@ InfoPoint::InfoPoint(void)
 	Flags = 0;
 	TrapDetectionDifficulty = 0;
 	TrapRemovalDifficulty = 0;
-	Trapped = 0;
+//	Trapped = 0;
 	TrapDetected = 0;
 	TrapLaunchX = 0; 
 	TrapLaunchY = 0;
@@ -657,7 +657,7 @@ InfoPoint::~InfoPoint(void)
 void InfoPoint::DetectTrap(int skill)
 {
 	if(Type!=ST_TRIGGER) return;
-	if(!Trapped) return;
+	if(!Scripts[0]) return;
 	if(Flags&(TRAP_DEACTIVATED|TRAP_INVISIBLE) ) return;
 	if((skill>=100) && (skill!=256) ) skill=100;
 	if(skill/2+core->Roll(1,skill/2,0)>TrapDetectionDifficulty) {
@@ -671,7 +671,7 @@ void InfoPoint::DetectTrap(int skill)
 bool InfoPoint::VisibleTrap(bool see_all)
 {
 	if(Type!=ST_TRIGGER) return false;
-	if(!Trapped) return false;
+	if(!Scripts[0]) return false;
 	if(Flags&(TRAP_DEACTIVATED|TRAP_INVISIBLE) ) return false;
 	if(see_all) return true;
 	if(TrapDetected ) return true;
@@ -683,7 +683,7 @@ bool InfoPoint::TriggerTrap(int skill)
 {
 	if(Type!=ST_TRIGGER) return false;
 	//actually this could be script name[0]
-	if(!Trapped) return false;
+	if(!Scripts[0]) return false;
 	if(Flags&TRAP_DEACTIVATED) return false;
 	TrapDetected=1; //probably too late :)
 	if((skill>=100) && (skill!=256) ) skill=100;
@@ -712,7 +712,7 @@ void InfoPoint::DebugDump()
 			printf( "Debugdump of Unsupported Region %s:\n", Name );
 			break;
 	}
-	printf( "TrapDetected: %d  Trapped: %d\n", TrapDetected, Trapped );
+	printf( "TrapDetected: %d  Trapped: %s\n", TrapDetected, Scripts[0]?"Yes":"No" );
 	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDifficulty,
 		TrapRemovalDifficulty );
 	printf( "Key: %s  Dialog: %s\n", KeyResRef, DialogResRef );
