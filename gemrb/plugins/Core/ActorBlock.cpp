@@ -639,7 +639,6 @@ InfoPoint::InfoPoint(void)
 	Flags = 0;
 	TrapDetectionDifficulty = 0;
 	TrapRemovalDifficulty = 0;
-//	Trapped = 0;
 	TrapDetected = 0;
 	TrapLaunchX = 0; 
 	TrapLaunchY = 0;
@@ -649,6 +648,22 @@ InfoPoint::InfoPoint(void)
 
 InfoPoint::~InfoPoint(void)
 {
+}
+
+//checks if the actor may use this travel trigger
+//bit 1 : can use
+//bit 2 : whole team
+int InfoPoint::CheckTravel(Actor *actor)
+{
+	if(Flags&TRAP_DEACTIVATED) return 0;
+	if(!actor->InParty && (Flags&TRAVEL_NONPC) ) return 0;
+	if(Flags&TRAVEL_PARTY) {
+		if(!core->GetGame()->EveryoneNearPoint(actor->Area, actor->XPos, actor->YPos, true) ) {
+			return 2;
+		}
+		return 3;
+	}
+	return 1;
 }
 
 //detect this trap, using a skill, skill could be set to 256 for 'sure'

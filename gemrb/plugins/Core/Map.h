@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.39 2004/07/25 17:26:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.40 2004/07/31 09:24:10 avenger_teambg Exp $
  *
  */
 
@@ -85,11 +85,11 @@ public:
 	ImageMgr* SearchMap;
 	unsigned long AreaFlags;
 	unsigned short AreaType;
+	bool ChangeArea; //set true if movement is allowed between areas
 private:
 	unsigned short* MapSet;
 	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
-
 private:
 	std::vector< Animation*> animations;
 	std::vector< Actor*> actors;
@@ -120,7 +120,8 @@ public:
 	Actor* GetActor(const char* Name);
 	Actor* GetActorByDialog(const char* resref);
 	void RemoveActor(Actor* actor);
-	int GetActorInRect(Actor**& actors, Region& rgn);
+	//returns actors in rect (onlyparty could be more sophisticated)
+	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty);
 	SongHeaderType SongHeader;
 	void AddVVCCell(ScriptedAnimation* vvc);
 	void AddEntrance(char* Name, short XPos, short YPos, short Face);
@@ -145,7 +146,7 @@ private:
 	void SetupNode(unsigned int x, unsigned int y, unsigned int Cost);
 	//maybe this is unneeded and orientation could be calculated on the fly
 	unsigned char GetOrient(short sX, short sY, short dX, short dY);
-
+	void UseExit(Actor *pc, InfoPoint *ip);
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.47 2004/05/25 16:16:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.48 2004/07/31 09:24:10 avenger_teambg Exp $
  *
  */
 
@@ -477,11 +477,38 @@ void Game::ShareXP(int xp)
 	if(!xp) {
 		return;
 	}
-	for(int i=0; i<PartySize; i++) {
+	
+	for(unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
 		}
 		PCs[i]->NewStat(IE_XP,xp,0);
 	}
-	//DisplayString(); //you have gained ... xp
+	//core->DisplayConstantString(); //you have gained ... xp
 }
+
+//canmove=true: if some PC can't move (or hostile), then this returns false 
+bool Game::EveryoneNearPoint(const char *area, int x, int y, bool canmove)
+{
+	for(unsigned int i=0; i<PCs.size(); i++) {
+		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
+			continue;
+		}
+		//someone is uncontrollable, can't move
+		if(PCs[i]->GetStat(IE_EA)>GOODCUTOFF) {
+			return false;
+		}
+		if(PCs[i]->GetStat(IE_STATE_ID)&STATE_CANTMOVE) {
+			return false;
+		}
+		if(stricmp(PCs[i]->Area,area) ) {
+			return false;
+		}
+printf("Checking distance %d\n",i);
+		if(Distance(x,y,PCs[i])>25) {
+			return false;
+		}
+	}
+	return true;
+}
+

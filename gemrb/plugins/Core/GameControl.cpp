@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.152 2004/07/27 21:28:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.153 2004/07/31 09:24:10 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -26,6 +26,7 @@
 #include "Interface.h"
 #include "AnimationMgr.h"
 #include "DialogMgr.h"
+#include "../../includes/strrefs.h"
 
 #define IE_CHEST_CURSOR	32
 
@@ -63,11 +64,27 @@ static Color blue = {
 Animation* effect;
 
 #define FORMATIONSIZE 10
-
 typedef Point formation_type[FORMATIONSIZE];
 
 int formationcount;
 static formation_type *formations=NULL;
+
+static void AddTalk(TextArea* ta, Actor* speaker, const char* speaker_color,
+	char* text, const char* text_color)
+{
+	const char* format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
+	int newlen = (int)(strlen( format ) + strlen( speaker->LongName ) +
+		strlen( speaker_color ) + strlen( text ) +
+		strlen( text_color ) + 1);
+	char* newstr = ( char* ) malloc( newlen );
+	sprintf( newstr, format, speaker_color, speaker->LongName, text_color,
+		text );
+
+	ta->AppendText( newstr, -1 );
+	ta->AppendText( "", -1 );
+
+	free( newstr );
+}
 
 GameControl::GameControl(void)
 {
@@ -78,7 +95,6 @@ GameControl::GameControl(void)
 	//at this moment we use only this
 	action = GA_DEFAULT | GA_SELECT | GA_NO_DEAD;
 	Changed = true;
-	ChangeArea = false;
 	lastActor = NULL;
 	MouseIsDown = false;
 	DrawSelectionRect = false;
@@ -94,12 +110,11 @@ GameControl::GameControl(void)
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
 	effect = NULL;
-	DisableMouse = false;
+	ScreenFlags = 0;
 	LeftCount = 0;
 	BottomCount = 0;
 	RightCount = 0;
 	TopCount = 0;
-	GUIEnabled = false;
 	DialogueFlags = 0;
 	dlg = NULL;
 	target = NULL;
@@ -140,10 +155,13 @@ fallback:
 	formations = (formation_type *) calloc(1,sizeof(formation_type) );
 }
 
-void GameControl::MoveToPointFormation(Actor *actor, int pos, int GameX, int GameY)
+void GameControl::MoveToPointFormation(Actor *actor, int GameX, int GameY)
 {
+	unsigned int pos;
 	char Tmp[256];
+
 	int formation=core->GetGame()->WhichFormation;
+	pos=actor->InParty-1; //either this or the actual cycle counter?
 	if(pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
 	GameX+=formations[formation][pos].x*30;
 	GameY+=formations[formation][pos].y*30;
@@ -189,177 +207,153 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	video->SetViewport( viewport.x, viewport.y );
 	Region vp( x + XPos, y + YPos, Width, Height );
 	Map* area = game->GetCurrentMap( );
-	if (area) {
-		core->GSUpdate();
-		area->DrawMap( vp, this );
-		HotKey = 0;
-		if (DisableMouse)
-			return;
-		short GameX = lastMouseX, GameY = lastMouseY;
-		video->ConvertToGame( GameX, GameY );
-
-		// Draw selection rect
-		if (DrawSelectionRect) {
-			CalculateSelection( GameX, GameY );
-/* unused ?
-			short xs[4] = {
-				SelectionRect.x, SelectionRect.x + SelectionRect.w,
-				SelectionRect.x + SelectionRect.w, SelectionRect.x
-			};
-			short ys[4] = {
-				SelectionRect.y, SelectionRect.y,
-				SelectionRect.y + SelectionRect.h,
-				SelectionRect.y + SelectionRect.h
-			};
-*/
-/*
-			Point points[4] = {
-				{SelectionRect.x, SelectionRect.y},
-				{SelectionRect.x + SelectionRect.w, SelectionRect.y},
-				{SelectionRect.x + SelectionRect.w, SelectionRect.y + SelectionRect.h},
-				{SelectionRect.x, SelectionRect.y + SelectionRect.h}
-			};
-			Gem_Polygon poly( points, 4 );
-			//video->DrawPolyline( &poly, green, false );
-			*/
-			video->DrawRect( SelectionRect, green, false, true );
-		}
-
-		// Show doors
-		if (DebugFlags & DEBUG_SHOW_DOORS) {
-			Door* d;
-			//there is a real assignment in the loop!
-			for (unsigned int idx = 0;
-				(d = area->tm->GetDoor( idx ));
-				idx++) {
-				if (d->Flags & 1) {
-					video->DrawPolyline( d->closed, cyan, true );
-				}
-				else {
-					video->DrawPolyline( d->open, cyan, true );
-				}
-			}
-		}
-
-		// Show containers
-		if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
-			Container* c;
-			//there is a real assignment in the loop!
-			for (unsigned int idx = 0;
-				(c = area->tm->GetContainer( idx ));
-				idx++) {
-				if (c->TrapDetected && c->Trapped) {
-					video->DrawPolyline( c->outline, red, true );
-				} else {
-					video->DrawPolyline( c->outline, cyan, true );
-				}
-			}
-		}
-
-		//Draw spell effect, this must be stored in the actors
-		//not like this
-		if (effect) {
-			if (( selected.size() > 0 )) {
-				Actor* actor = selected[0];
-				video->BlitSpriteMode( effect->NextFrame(), actor->XPos,
-						actor->YPos, 1, false );
-			}
-		}
-
-		// Show traps and containers
-		if (DebugFlags & (DEBUG_SHOW_INFOPOINTS | DEBUG_SHOW_CONTAINERS)) {
-			//draw infopoints with blue overlay
-			InfoPoint* i;
-			//there is a real assignment in the loop!
-			for (unsigned int idx = 0;
-				(i = area->tm->GetInfoPoint( idx ));
-				idx++) {
-				if (i->VisibleTrap( DebugFlags & DEBUG_SHOW_INFOPOINTS ) ) {
-					video->DrawPolyline( i->outline, red, true );
-				} else if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
-					video->DrawPolyline( i->outline, blue, true );
-				}
-			}
-		} else if (overInfoPoint) {
-			if (overInfoPoint->VisibleTrap(0) ) {
-				video->DrawPolyline( overInfoPoint->outline, red, true );
-			}
-		}
-
-		// Draw infopoint texts for some time
-		for (size_t i = 0; i < infoTexts.size(); i++) {
-			unsigned long time;
-			GetTime( time );
-			if (( time - infoTexts[i]->timeStartDisplaying ) >= 10000) {
-				infoTexts[i]->textDisplaying = 0;
-				std::vector< Scriptable*>::iterator m;
-				m = infoTexts.begin() + i;
-				( *m )->MySelf->textDisplaying = 0;
-				delete( *m );
-				infoTexts.erase( m );
-				i--;
-				continue;
-			}
-			if (infoTexts[i]->textDisplaying == 1) {
-				Font* font = core->GetFont( 9 );
-				Region rgn( infoTexts[i]->XPos - 200,
-					infoTexts[i]->YPos - 100, 400, 400 );
-				//printf("Printing InfoText at [%d,%d,%d,%d]\n", rgn.x, rgn.y, rgn.w, rgn.h);
-				rgn.x += video->xCorr;
-				rgn.y += video->yCorr;
-				font->Print( rgn,
-						( unsigned char * ) infoTexts[i]->overHeadText,
-						InfoTextPalette,
-						IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
-			}
-		}
-
-		// Draw path
-		if (drawPath) {
-			PathNode* node = drawPath;
-			while (true) {
-				short GameX = ( node-> x*16) + 8, GameY = ( node->y*12 ) + 6;
-				if (!node->Parent) {
-					video->DrawCircle( GameX, GameY, 2, green );
-				} else {
-					short oldX = ( node->Parent-> x*16) + 8, oldY = ( node->Parent->y*12 ) + 6;
-					video->DrawLine( oldX, oldY, GameX, GameY, green );
-				}
-				if (!node->Next) {
-					video->DrawCircle( GameX, GameY, 2, green );
-					break;
-				}
-				node = node->Next;
-			}
-		}
-
-		// Draw searchmap
-		if (DebugFlags & DEBUG_SHOW_SEARCHMAP) {
-			Sprite2D* spr = area->SearchMap->GetImage();
-			video->BlitSprite( spr, 0, 0, true );
-			video->FreeSprite( spr );
-			Region point( GameX / 16, GameY / 12, 1, 1 );
-			video->DrawRect( point, red );
-		}
-
-		// Draw actor's palettes
-		if ((DebugFlags & DEBUG_SHOW_PALETTES) && lastActor) {
-			int i;
-
-			Color *Pal1 = lastActor->anims->OrigPalette;
-			for (i = 0; i < 256; i++) {
-				Region rgn( 10 * (i % 64), 30 + 10 * (i / 64), 10, 10 );
-				video->DrawRect( rgn, Pal1[i], true, false);
-			}
-			Color *Pal2 = lastActor->anims->Palette;
-			for (i = 0; i < 256; i++) {
-				Region rgn( 10 * (i % 64), 90 + 10 * (i / 64), 10, 10 );
-				video->DrawRect( rgn, Pal2[i], true, false);
-			}
-		}
-
-	} else {
+	if (!area) {
 		core->GetVideoDriver()->DrawRect( vp, blue );
+		return;
+	}
+	core->GSUpdate();
+	area->DrawMap( vp, this );
+	HotKey = 0;
+	if (ScreenFlags & SF_DISABLEMOUSE)
+		return;
+	short GameX = lastMouseX, GameY = lastMouseY;
+	video->ConvertToGame( GameX, GameY );
+
+	// Draw selection rect
+	if (DrawSelectionRect) {
+		CalculateSelection( GameX, GameY );
+		video->DrawRect( SelectionRect, green, false, true );
+	}
+
+	// Show doors
+	if (DebugFlags & DEBUG_SHOW_DOORS) {
+		Door* d;
+		//there is a real assignment in the loop!
+		for (unsigned int idx = 0;
+			(d = area->tm->GetDoor( idx ));
+			idx++) {
+			if (d->Flags & DOOR_CLOSED) {
+				video->DrawPolyline( d->closed, cyan, true );
+			}
+			else {
+				video->DrawPolyline( d->open, cyan, true );
+			}
+		}
+	}
+
+	// Show containers
+	if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
+		Container* c;
+		//there is a real assignment in the loop!
+		for (unsigned int idx = 0;
+			(c = area->tm->GetContainer( idx ));
+			idx++) {
+			if (c->TrapDetected && c->Trapped) {
+				video->DrawPolyline( c->outline, red, true );
+			} else {
+				video->DrawPolyline( c->outline, cyan, true );
+			}
+		}
+	}
+
+	//Draw spell effect, this must be stored in the actors
+	//not like this
+	if (effect) {
+		if (( selected.size() > 0 )) {
+			Actor* actor = selected[0];
+			video->BlitSpriteMode( effect->NextFrame(), actor->XPos,
+					actor->YPos, 1, false );
+		}
+	}
+
+	// Show traps and containers
+	if (DebugFlags & (DEBUG_SHOW_INFOPOINTS | DEBUG_SHOW_CONTAINERS)) {
+		//draw infopoints with blue overlay
+		InfoPoint* i;
+		//there is a real assignment in the loop!
+		for (unsigned int idx = 0; (i = area->tm->GetInfoPoint( idx )); idx++) {
+			if (i->VisibleTrap( DebugFlags & DEBUG_SHOW_INFOPOINTS ) ) {
+				video->DrawPolyline( i->outline, red, true );
+			} else if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
+				video->DrawPolyline( i->outline, blue, true );
+			}
+		}
+	} else if (overInfoPoint) {
+		if (overInfoPoint->VisibleTrap(0) ) {
+			video->DrawPolyline( overInfoPoint->outline, red, true );
+		}
+	}
+
+	// Draw infopoint texts for some time
+	for (size_t i = 0; i < infoTexts.size(); i++) {
+		unsigned long time;
+		GetTime( time );
+		if (( time - infoTexts[i]->timeStartDisplaying ) >= 10000) {
+			infoTexts[i]->textDisplaying = 0;
+			std::vector< Scriptable*>::iterator m;
+			m = infoTexts.begin() + i;
+			( *m )->MySelf->textDisplaying = 0;
+			delete( *m );
+			infoTexts.erase( m );
+			i--;
+			continue;
+		}
+		if (infoTexts[i]->textDisplaying == 1) {
+			Font* font = core->GetFont( 9 );
+			Region rgn( infoTexts[i]->XPos - 200,
+				infoTexts[i]->YPos - 100, 400, 400 );
+			//printf("Printing InfoText at [%d,%d,%d,%d]\n", rgn.x, rgn.y, rgn.w, rgn.h);
+			rgn.x += video->xCorr;
+			rgn.y += video->yCorr;
+			font->Print( rgn,
+					( unsigned char * ) infoTexts[i]->overHeadText,
+					InfoTextPalette,
+					IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
+		}
+	}
+
+	// Draw path
+	if (drawPath) {
+		PathNode* node = drawPath;
+		while (true) {
+			short GameX = ( node-> x*16) + 8, GameY = ( node->y*12 ) + 6;
+			if (!node->Parent) {
+				video->DrawCircle( GameX, GameY, 2, red );
+			} else {
+				short oldX = ( node->Parent-> x*16) + 8, oldY = ( node->Parent->y*12 ) + 6;
+				video->DrawLine( oldX, oldY, GameX, GameY, green );
+			}
+			if (!node->Next) {
+				video->DrawCircle( GameX, GameY, 2, green );
+				break;
+			}
+			node = node->Next;
+		}
+	}
+
+	// Draw searchmap
+	if (DebugFlags & DEBUG_SHOW_SEARCHMAP) {
+		Sprite2D* spr = area->SearchMap->GetImage();
+		video->BlitSprite( spr, 0, 0, true );
+		video->FreeSprite( spr );
+		Region point( GameX / 16, GameY / 12, 1, 1 );
+		video->DrawRect( point, red );
+	}
+
+	// Draw actor's palettes
+	if ((DebugFlags & DEBUG_SHOW_PALETTES) && lastActor) {
+		int i;
+
+		Color *Pal1 = lastActor->anims->OrigPalette;
+		for (i = 0; i < 256; i++) {
+			Region rgn( 10 * (i % 64), 30 + 10 * (i / 64), 10, 10 );
+			video->DrawRect( rgn, Pal1[i], true, false);
+		}
+		Color *Pal2 = lastActor->anims->Palette;
+		for (i = 0; i < 256; i++) {
+			Region rgn( 10 * (i % 64), 90 + 10 * (i / 64), 10, 10 );
+			video->DrawRect( rgn, Pal2[i], true, false);
+		}
 	}
 }
 /** Sets the Text of the current control */
@@ -373,12 +367,19 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 	HotKey=tolower(Key);
 }
 
+void GameControl::DeselectAll()
+{
+	for (unsigned int i = 0; i < selected.size(); i++) {
+		selected[i]->Select( false );
+		selected[i]->SetOver( false );
+	}
+
+	selected.clear();
+}
+
 void GameControl::SelectActor(int whom)
 {
-	for (size_t i = 0; i < selected.size(); i++) {
-		selected[i]->Select( false );
-	}
-	selected.clear();
+	DeselectAll();
 	Game* game = core->GetGame();
 	if(whom==-1) {
 		for(int i = 0; i < game->GetPartySize(0); i++) {
@@ -557,6 +558,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'y':
 				if (lastActor) {
+					//using action so the actor is killed
+					//correctly (synchronisation)
 					lastActor->ClearActions();
 					char Tmp[40];
 					strncpy(Tmp,"Kill(Myself)",sizeof(Tmp) );
@@ -612,7 +615,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 /** Mouse Over Event */
 void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 {
-	if (DisableMouse) {
+	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
 	int nextCursor = 0;
@@ -716,10 +719,20 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 }
 
+void GameControl::TryToAttack(Actor *source, Actor *tgt)
+{
+	char Tmp[40];
+
+	//this won't work atm, target must be honoured by Attack
+	strncpy(Tmp,"Attack()",sizeof(Tmp) );
+	target=tgt; //this is a hack, a deadly one
+	source->AddAction( GameScript::GenerateAction( Tmp, true ) );
+}
+
 void GameControl::TryToTalk(Actor *source, Actor *tgt)
 {
 	if(tgt->GetNextAction()) {
-		DisplayString("Target is busy...");
+		core->DisplayConstantString(STR_TARGETBUSY, 0xff0000);
 		return;
 	}
 	char Tmp[40];
@@ -737,7 +750,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
-	if (DisableMouse || Button != GEM_MB_ACTION) {
+	if ((ScreenFlags&SF_DISABLEMOUSE) || (Button != GEM_MB_ACTION) ) {
 		return;
 	}
 	short GameX = x, GameY = y;
@@ -754,9 +767,10 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
-  unsigned int i;
+	unsigned int i;
+	char Tmp[256];
 
-	if (DisableMouse) {
+	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
 	if (Button == GEM_MB_MENU) {
@@ -774,163 +788,14 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	core->GetVideoDriver()->ConvertToGame( GameX, GameY );
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentMap( );
-	if (!DrawSelectionRect) {
-		Actor* actor = area->GetActor( GameX, GameY, action );
-
-		if (!actor && ( selected.size() > 0 )) {
-			Door* door = area->tm->GetDoor( GameX, GameY );
-			if (door) {
-				//we are sure we got one element
-				actor = selected[0];
-				if (door->Flags&1) {
-					actor->ClearPath();
-					actor->ClearActions();
-					char Tmp[256];
-					sprintf( Tmp, "OpenDoor(\"%s\")", door->Name );
-					actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
-				} else {
-					actor->ClearPath();
-					actor->ClearActions();
-					char Tmp[256];
-					sprintf( Tmp, "CloseDoor(\"%s\")", door->Name );
-					actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
-				}
-				return;
-			}
-			if(overInfoPoint && (overInfoPoint->Type==ST_TRIGGER) ) {
-				//the importer shouldn't load the script
-				//if it is unallowed anyway (though 
-				//deactivated scripts could be reactivated)
-				//only the 'trapped' flag should be honoured
-				//there. Here we have to check on the 
-				//reset trap and deactivated flags
-				if (overInfoPoint->Scripts[0]) {
-					if(!(overInfoPoint->Flags&TRAP_DEACTIVATED) ) {
-						overInfoPoint->LastTrigger = selected[0];
-						overInfoPoint->Scripts[0]->Update();
-						//if reset trap flag not set, deactivate it
-						if(!(overInfoPoint->Flags&TRAP_RESET)) {
-							overInfoPoint->Flags|=TRAP_DEACTIVATED;
-						}
-					}
-				} else {
-					if (overInfoPoint->overHeadText) {
-						if (overInfoPoint->textDisplaying != 1) {
-							overInfoPoint->textDisplaying = 1;
-							GetTime( overInfoPoint->timeStartDisplaying );
-							DisplayString( overInfoPoint );
-						}
-					}
-				}
-			} else {
-				for(unsigned int i = 0;i < selected.size(); i++) {
-					actor=selected[i];
-					actor->ClearPath();
-					actor->ClearActions();
-					//formations should be honoured here
-					//generally a formation pattern is
-					//an array of offsets which alter the
-					//target coordinates based on 'i'
-					MoveToPointFormation(actor,i,GameX,GameY);
-/*
-					char Tmp[256];
-					sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
-					actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
-*/
-				}
-			}
-/*
-			if (overInfoPoint) {
-				switch (overInfoPoint->Type) {
-					case ST_TRIGGER:
-						 {
-							if (overInfoPoint->Scripts[0]) {
-								overInfoPoint->LastTrigger = selected[0];
-								overInfoPoint->Scripts[0]->Update();
-							} else {
-								if (overInfoPoint->overHeadText) {
-									if (overInfoPoint->textDisplaying != 1) {
-										overInfoPoint->textDisplaying = 1;
-										//infoTexts.push_back(overInfoPoint);
-										GetTime( overInfoPoint->timeStartDisplaying );
-										DisplayString( overInfoPoint );
-									}
-								}
-							}
-						}
-						break;
-
-					case ST_TRAVEL:
-						 {
-							actor->ClearPath();
-							actor->ClearActions();
-							char Tmp[256];
-							sprintf( Tmp, "MoveToPoint([%d.%d])",
-								overInfoPoint->XPos, overInfoPoint->YPos );
-							actor->AddAction( GameScript::GenerateAction( Tmp,
-												true ) );
-						}
-						break;
-					default: //all other types are ignored
-						break;
-				}
-			}
-			if (!overInfoPoint || ( overInfoPoint->Type != ST_TRIGGER )) {
-				actor->ClearPath();
-				actor->ClearActions();
-				char Tmp[256];
-				sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
-				actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
-			}
-*/
-		}
-		//determining the type of the clicked actor
-		int type;
-
-		if(actor && selected.size() ) {
-			type = actor->GetStat(IE_EA);
-			if( type>=EVILCUTOFF ) {
-				type = 2;
-			}
-			else if( type > GOODCUTOFF ) {
-				type = 1;
-			}
-			else {
-				type = 0;
-			}
-		}
-		else {
-			type = 0;
-		}
-		switch (type) {
-		case 0:
-			for (i = 0; i < selected.size(); i++)
-				selected[i]->Select( false );
-			selected.clear();
-			if (actor) {
-				selected.push_back( actor );
-				actor->Select( true );
-			}
-			break;
-		case 1:
-			//talk
-			TryToTalk(selected[0], actor);
-			break;
-		case 2:
-			//attack
-			break;
-		}
-	} else {
+	area->ChangeArea = true; //allow movement
+	if (DrawSelectionRect) {
 		Actor** ab;
-		unsigned int count = area->GetActorInRect( ab, SelectionRect );
+		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
 		for (i = 0; i < highlighted.size(); i++)
 			highlighted[i]->SetOver( false );
 		highlighted.clear();
-		for (i = 0; i < selected.size(); i++) {
-			selected[i]->Select( false );
-			selected[i]->SetOver( false );
-		}
-		selected.clear();
+		DeselectAll();
 		if (count != 0) {
 			for (i = 0; i < count; i++) {
 				ab[i]->Select( true );
@@ -938,8 +803,113 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			}
 		}
 		free( ab );
+		DrawSelectionRect = false;
+		return;
 	}
-	DrawSelectionRect = false;
+	Actor* actor = area->GetActor( GameX, GameY, action );
+
+	if (!actor && ( selected.size() > 0 )) {
+		Door* door = area->tm->GetDoor( GameX, GameY );
+		if (door) {
+			//we are sure we got one element
+			actor = selected[0];
+			if (door->Flags&DOOR_CLOSED) {
+				actor->ClearPath();
+				actor->ClearActions();
+				sprintf( Tmp, "OpenDoor(\"%s\")", door->Name );
+				actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+			} else {
+				actor->ClearPath();
+				actor->ClearActions();
+				sprintf( Tmp, "CloseDoor(\"%s\")", door->Name );
+				actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+			}
+			return;
+		}
+		if(overInfoPoint && (overInfoPoint->Type==ST_TRIGGER) ) {
+			//the importer shouldn't load the script
+			//if it is unallowed anyway (though 
+			//deactivated scripts could be reactivated)
+			//only the 'trapped' flag should be honoured
+			//there. Here we have to check on the 
+			//reset trap and deactivated flags
+			if (overInfoPoint->Scripts[0]) {
+				if(!(overInfoPoint->Flags&TRAP_DEACTIVATED) ) {
+					overInfoPoint->LastTrigger = selected[0];
+					overInfoPoint->Scripts[0]->Update();
+					//if reset trap flag not set, deactivate it
+					if(!(overInfoPoint->Flags&TRAP_RESET)) {
+						overInfoPoint->Flags|=TRAP_DEACTIVATED;
+					}
+				}
+			} else {
+				if (overInfoPoint->overHeadText) {
+					if (overInfoPoint->textDisplaying != 1) {
+						overInfoPoint->textDisplaying = 1;
+						GetTime( overInfoPoint->timeStartDisplaying );
+						DisplayString( overInfoPoint );
+					}
+				}
+			}
+			return;
+		}
+		//just a single actor, no formation
+		if(selected.size()==1) {
+			actor=selected[0];
+			actor->ClearPath();
+			actor->ClearActions();
+			sprintf( Tmp, "MoveToPoint([%d.%d])", GameX, GameY );
+			actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+			return;
+		}
+		//party formation movement
+		for(unsigned int i = 0; i < selected.size(); i++) {
+			actor=selected[i];
+			actor->ClearPath();
+			actor->ClearActions();
+			//formations should be rotated based on starting point
+			//of the leader? and destination
+			MoveToPointFormation(actor,GameX,GameY);
+		}
+		return;
+	}
+	if(!actor) return;
+	//we got an actor past this point
+
+	//determining the type of the clicked actor
+	int type;
+
+	type = actor->GetStat(IE_EA);
+	if( type>=EVILCUTOFF ) {
+		type = 2; //hostile
+	}
+	else if( type > GOODCUTOFF ) {
+		type = 1; //neutral
+	}
+	else {
+		type = 0; //party
+	}
+	
+	switch (type) {
+		case 0:
+			//clicked on a new party member
+			DeselectAll();
+			selected.push_back( actor );
+			actor->Select( true );
+			break;
+		case 1:
+			//talk (first selected talks)
+			if(selected.size()) {
+				TryToTalk(selected[0], actor);
+			}
+			break;
+		case 2:
+			//all of them attacks the red circled actor
+			for(i=0;i<selected.size();i++) {
+				TryToAttack(selected[i], actor);
+			}
+			break;
+	}
 }
 /** Special Key Press */
 void GameControl::OnSpecialKeyPress(unsigned char Key)
@@ -996,7 +966,7 @@ Map *GameControl::SetCurrentArea(int Index)
 
 void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 {
-  unsigned int i;
+	unsigned int i;
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentMap( );
 	if (DrawSelectionRect) {
@@ -1015,7 +985,7 @@ void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 			SelectionRect.h = y - StartY;
 		}
 		Actor** ab;
-		unsigned int count = area->GetActorInRect( ab, SelectionRect );
+		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
 		if (count != 0) {
 			for (i = 0; i < highlighted.size(); i++)
 				highlighted[i]->SetOver( false );
@@ -1041,7 +1011,12 @@ void GameControl::CalculateSelection(unsigned short x, unsigned short y)
 
 void GameControl::SetCutSceneMode(bool active)
 {
-	DisableMouse = active;
+	if(active) {
+		ScreenFlags |= SF_DISABLEMOUSE;
+	}
+	else {
+		ScreenFlags &= ~SF_DISABLEMOUSE;
+	}
 	core->GetVideoDriver()->DisableMouse = active;
 	core->GetVideoDriver()->moveX = 0;
 	core->GetVideoDriver()->moveY = 0;
@@ -1049,10 +1024,10 @@ void GameControl::SetCutSceneMode(bool active)
 
 void GameControl::HideGUI()
 {
-	if (!GUIEnabled) {
+	if (!(ScreenFlags&SF_GUIENABLED) ) {
 		return;
 	}
-	GUIEnabled = false;
+	ScreenFlags &=~SF_GUIENABLED;
 	Variables* dict = core->GetDictionary();
 	unsigned long index;
 	if (dict->Lookup( "MessageWindow", index )) {
@@ -1123,10 +1098,10 @@ void GameControl::HideGUI()
 
 void GameControl::UnhideGUI()
 {
-	if (GUIEnabled) {
+	if (ScreenFlags&SF_GUIENABLED) {
 		return;
 	}
-	GUIEnabled = true;
+	ScreenFlags |= SF_GUIENABLED;
 	Variables* dict = core->GetDictionary();
 	unsigned long index;
 	if (dict->Lookup( "MessageWindow", index )) {
@@ -1340,7 +1315,7 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 		return;
 	}
 	this->speaker = speaker;
-	DisableMouse = true;
+	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR;
 	DialogueFlags |= DF_IN_DIALOG;
 	unsigned long index;
 	core->GetDictionary()->Lookup( "MessageWindowSize", index );
@@ -1355,23 +1330,6 @@ void GameControl::InitDialog(Actor* speaker, Actor* target, const char* dlgref)
 		}
 	}
 	DialogChoose( (unsigned int) -1 );
-}
-
-static void AddTalk(TextArea* ta, Actor* speaker, const char* speaker_color,
-	char* text, const char* text_color)
-{
-	const char* format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
-	int newlen = (int)(strlen( format ) + strlen( speaker->LongName ) +
-		strlen( speaker_color ) + strlen( text ) +
-		strlen( text_color ) + 1);
-	char* newstr = ( char* ) malloc( newlen );
-	sprintf( newstr, format, speaker_color, speaker->LongName, text_color,
-		text );
-
-	ta->AppendText( newstr, -1 );
-	ta->AppendText( "", -1 );
-
-	free( newstr );
 }
 
 /*try to break will only try to break it, false means unconditional stop*/
@@ -1398,7 +1356,7 @@ void GameControl::EndDialog(bool try_to_break)
 	// FIXME: should use RunEventHandler()
 	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
 	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
-	DisableMouse = false;
+	ScreenFlags &=~SF_DISABLEMOUSE;
 	DialogueFlags = 0;
 }
 
@@ -1447,6 +1405,7 @@ bool GameControl::EvaluateDialogTrigger(Scriptable* target, DialogString* trigge
 
 void GameControl::DialogChoose(unsigned int choose)
 {
+	char Tmp[256];
 	unsigned long index;
 
 	if (!core->GetDictionary()->Lookup( "MessageWindow", index )) {
@@ -1497,7 +1456,6 @@ void GameControl::DialogChoose(unsigned int choose)
 				if (action) {
 						speaker->AddAction( action );
 				} else {
-					char Tmp[256];
 					snprintf(Tmp, sizeof(Tmp),
 						"Can't compile action: %s\n",
 						tr->action->strings[i] );
@@ -1589,25 +1547,25 @@ void GameControl::DisplayString(Scriptable* target)
 void GameControl::ChangeMap()
 {
 	Actor* pc = selected.at( 0 );
+	//swap in the area of the first selected actor
 	Game* game = core->GetGame();
-	if (stricmp( pc->Area, game->CurrentArea) == 0) {
-		return;
+	if (stricmp( pc->Area, game->CurrentArea) != 0) {
+		EndDialog();
+		overInfoPoint = NULL;
+		overContainer = NULL;
+		overDoor = NULL;
+		for (unsigned int i = 0; i < infoTexts.size(); i++) {
+			delete( infoTexts[i] );
+		}
+		infoTexts.clear();
+		/*this is loadmap, because we need the index, not the pointer*/
+		int mi = core->GetGame()->LoadMap( pc->Area );
+		SetCurrentArea( mi );
 	}
-	EndDialog();
-	overInfoPoint = NULL;
-	overContainer = NULL;
-	overDoor = NULL;
-	for (unsigned int i = 0; i < infoTexts.size(); i++) {
-		delete( infoTexts[i] );
-	}
-	infoTexts.clear();
-	/*this is loadmap, because we need the index, not the pointer*/
-	int mi = core->GetGame()->LoadMap( pc->Area );
-	SetCurrentArea( mi );
+	//center on first selected actor
 	Region vp = core->GetVideoDriver()->GetViewport();
 	core->GetVideoDriver()->SetViewport( pc->XPos - ( vp.w / 2 ),
 		pc->YPos - ( vp.h / 2 ) );
-	ChangeArea = false;
 }
 
 void GameControl::DisplayString(const char* Text)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.32 2004/04/10 17:46:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.33 2004/07/31 09:24:10 avenger_teambg Exp $
  *
  */
 
@@ -60,8 +60,28 @@ CharAnimations::CharAnimations(char* BaseResRef, unsigned char OrientCount,
 	free( pal );
 }
 
+//freeing the bitmaps only once, but using an intelligent algorithm
 CharAnimations::~CharAnimations(void)
 {
+	void *tmppoi;
+
+	for (int AnimID = 0; AnimID < MAX_ANIMS; AnimID++) {
+		for (int i = 0; i < MAX_ORIENT; i++) {
+			if (Anims[AnimID][i]) {
+				tmppoi = Anims[AnimID][i];
+				delete( Anims[AnimID][i] );
+				for(int AnimIDb=AnimID;AnimIDb < MAX_ANIMS; AnimIDb++) {
+					for(int ib = i; ib<MAX_ORIENT; ib++) {
+						if(Anims[AnimIDb][ib]==tmppoi) {
+							Anims[AnimIDb][ib]=NULL;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+/* this stuff is horrible
 	switch (MirrorType) {
 		case IE_ANI_CODE_MIRROR:
 		{
@@ -179,6 +199,7 @@ CharAnimations::~CharAnimations(void)
 		}
 		break;
 	}
+*/
 }
 /*This is a simple Idea of how the animation are coded
 

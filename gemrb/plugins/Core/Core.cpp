@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.17 2004/07/01 06:34:48 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.18 2004/07/31 09:24:10 avenger_teambg Exp $
  *
  */
 
@@ -68,6 +68,21 @@ BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD fdwReason,
 #endif
 
 //// Globally used functions
+
+int Distance(int X, int Y, Scriptable *b)
+{
+        long x = ( X - b->XPos );
+        long y = ( Y - b->YPos );
+        return (int) sqrt( ( double ) ( x* x + y* y ) );
+}
+
+int Distance(Scriptable *a, Scriptable *b)
+{
+        long x = ( a->XPos - b->XPos );
+        long y = ( a->YPos - b->YPos );
+        return (int) sqrt( ( double ) ( x* x + y* y ) );
+}
+
 //returns true if path is an existing directory
 GEM_EXPORT bool dir_exists(const char* path)
 {

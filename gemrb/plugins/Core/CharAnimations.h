@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.22 2004/07/25 00:29:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.23 2004/07/31 09:24:10 avenger_teambg Exp $
  *
  */
 
@@ -91,7 +91,7 @@
 
 class GEM_EXPORT CharAnimations {
 private:
-	Animation* Anims[MAX_ANIMS][16];
+	Animation* Anims[MAX_ANIMS][MAX_ORIENT];
 public:
 	// DEBUG: palette before replacing personalized/random colors
 	Color OrigPalette[256];

@@ -24,9 +24,16 @@ class GameControl;
 #define _DEBUG
 #endif
 
+//dialog flags
 #define DF_IN_DIALOG   1
 #define DF_TALKCOUNT   2
 #define DF_UNBREAKABLE 4
+
+//screen flags
+#define SF_DISABLEMOUSE  1
+#define SF_CENTERONACTOR 2
+#define SF_ALWAYSCENTER  4
+#define SF_GUIENABLED    8
 
 class GEM_EXPORT GameControl : public Control {
 public:
@@ -66,8 +73,8 @@ private:
 	short pfsX, pfsY;
 	PathNode* drawPath;
 	unsigned long AIUpdateCounter;
-	bool DisableMouse;
-	bool GUIEnabled;
+	int ScreenFlags;
+//	bool GUIEnabled;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
@@ -91,18 +98,19 @@ private:
 	unsigned char LeftCount, BottomCount, RightCount, TopCount;
 	DialogState* ds;
 	Dialog* dlg;
-	bool ChangeArea;
 public:
 	Actor* speaker, * target;
 	int DialogueFlags;
 public:
+	void DeselectAll();
 	/* Selects one or all PC */
 	void SelectActor(int whom);
 	void SetCutSceneMode(bool active);
 	void HideGUI();
 	void UnhideGUI();
+	void TryToAttack(Actor *source, Actor *target);
 	void TryToTalk(Actor *source, Actor *target);
-	void MoveToPointFormation(Actor *actor, int pos, int GameX, int GameY);
+	void MoveToPointFormation(Actor *actor, int GameX, int GameY);
 	void InitDialog(Actor* speaker, Actor* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);

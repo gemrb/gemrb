@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.39 2004/07/26 22:06:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.40 2004/07/31 09:24:10 avenger_teambg Exp $
  *
  */
 
@@ -24,6 +24,7 @@ class Action;
 class Scriptable;
 class Selectable;
 class Highlightable;
+class Actor;
 class Moveble;
 class Door;
 
@@ -65,6 +66,10 @@ class Door;
 #define TRAVEL_NONPC      512
 //#define TRAP_1024       1024 //override?
 #define INFO_DOOR         2048 //info trigger linked to door
+
+//door flags
+#define DOOR_CLOSED      1
+#define DOOR_LOCKED      2
 
 #ifdef WIN32
 
@@ -248,6 +253,8 @@ public:
 	bool VisibleTrap(bool only_detected);
 	//returns true if trap has been triggered, tumble skill???
 	bool TriggerTrap(int skill);
+	//checks if the actor may use this travel trigger
+	int CheckTravel(Actor *actor);
 	void DebugDump();
 public:
 	char Name[33];

@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.167 2004/07/21 22:16:37 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.168 2004/07/31 09:24:10 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "GameScript.h"
 #include "Interface.h"
+#include "../../includes/strrefs.h"
 
 extern Interface* core;
 #ifdef WIN32
@@ -602,20 +603,6 @@ static IDSLink* FindIdentifier(const char* idsname)
 	}
 	printf( "Warning: Couldn't assign ids target: %.*s\n", len, idsname );
 	return NULL;
-}
-
-static int Distance(int X, int Y, Scriptable *b)
-{
-	long x = ( X - b->XPos );
-	long y = ( Y - b->YPos );
-	return (int) sqrt( ( double ) ( x* x + y* y ) );
-}
-
-static int Distance(Scriptable *a, Scriptable *b)
-{
-	long x = ( a->XPos - b->XPos );
-	long y = ( a->YPos - b->YPos );
-	return (int) sqrt( ( double ) ( x* x + y* y ) );
 }
 
 static void GoNearAndRetry(Scriptable *Sender, Point *p)
@@ -3745,7 +3732,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		case ST_DOOR:
 		{
 			Door *door =(Door *) tar;
-			return (int) (door->Flags&1) == parameters->int0Parameter;
+			return (int) (door->Flags&DOOR_CLOSED) == parameters->int0Parameter;
 		}
 		case ST_CONTAINER:
 		{
@@ -3769,7 +3756,7 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 		case ST_DOOR:
 		{
 			Door *door =(Door *) tar;
-			return !!(door->Flags&2);
+			return !!(door->Flags&DOOR_LOCKED);
 		}
 		case ST_CONTAINER:
 		{
@@ -5400,7 +5387,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		target->ClearActions();
 	} else {
 		if (target->GetNextAction()) {
-			printf( "[IEScript]: Target appears busy!\n" );
+			core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 			Sender->CurrentAction = NULL;
 			return;
 		}
@@ -5615,7 +5602,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	if(!(door->Flags&1) ) {
+	if(!(door->Flags&DOOR_CLOSED) ) {
 		//door is already open
 		Sender->CurrentAction = NULL;
 		return;
@@ -5630,7 +5617,9 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 	Point* p = FindNearPoint( Sender, &door->toOpen[0], &door->toOpen[1],
 				distance );
 	if (distance <= 40) {
-		if(door->Flags&2) {
+		//actually if we got the key, we could still open it
+		//we need a more sophisticated check here
+		if(door->Flags&DOOR_LOCKED) {
 			//playsound unsuccessful opening of door
 			core->GetSoundMgr()->Play("AMB_D06");
 		}
@@ -5655,8 +5644,8 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	if(door->Flags&1) {
-		//door is already open
+	if(door->Flags&DOOR_CLOSED ) {
+		//door is already closed 
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -5670,7 +5659,16 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 	Point* p = FindNearPoint( Sender, &door->toOpen[0], &door->toOpen[1],
 				distance );	
 	if (distance <= 40) {
-		door->SetDoorClosed( true, true );
+		//actually if we got the key, we could still open it
+		//we need a more sophisticated check here
+		//doors could be locked but open, and unable to close
+		if(door->Flags&DOOR_LOCKED) {
+			//playsound unsuccessful closing of door
+			core->GetSoundMgr()->Play("AMB_D06");
+		}
+		else {
+			door->SetDoorClosed( true, true );
+		}
 	} else {
 		GoNearAndRetry(Sender, p);
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.37 2004/07/25 13:39:24 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.38 2004/07/31 09:24:10 avenger_teambg Exp $
  *
  */
 
@@ -64,19 +64,18 @@ public:
 	char Dialog[9];
 	char SmallPortrait[9];
 	char LargePortrait[9];
-	/** 0: NPC, 1-6 party slot */
+	/** 0: NPC, 1-8 party slot */
 	unsigned char InParty;
 	char* LongName, * ShortName;
 	unsigned long StrRefs[100];
 
 	ieDword ZombieDisguise;  // PST
 
-	// for remapping palette
-	ieByte ColorsCount;
-
 	ieWord AppearanceFlags1;
 	ieWord AppearanceFlags2;
 
+	// for remapping palette
+	ieByte ColorsCount;
 	ieWord Colors[7];
 	ieByte ColorPlacements[7];
 

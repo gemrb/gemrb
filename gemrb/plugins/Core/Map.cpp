@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.98 2004/05/25 16:37:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.99 2004/07/31 09:24:10 avenger_teambg Exp $
  *
  */
 
@@ -23,6 +23,8 @@
 #include "Map.h"
 #include "Interface.h"
 #include "PathFinder.h"
+#include "../../includes/strrefs.h"
+
 //#include <stdlib.h>
 #ifndef WIN32
 #include <sys/time.h>
@@ -86,11 +88,12 @@ Map::Map(void)
 	if (!PathFinderInited) {
 		InitPathFinder();
 	}
+	ChangeArea=false;
 }
 
 Map::~Map(void)
 {
-  unsigned int i;
+	unsigned int i;
 
 	if (MapSet) {
 		free(MapSet);
@@ -105,6 +108,9 @@ Map::~Map(void)
 	for (i = 0; i < actors.size(); i++) {
 		Actor* a = actors[i];
 		if (a && !a->InParty && !a->FromGame) {
+			//don't delete NPC/PC
+			//deleted PC's should also be saved with the
+			//area
 			delete ( a );
 		}
 	}
@@ -170,9 +176,54 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 	sprintf(command, "LeaveArea(\"%s\",[%d.%d],%d)", area, X, Y, face);
 }
 
+void Map::UseExit(Actor *actor, InfoPoint *ip)
+{
+	char Tmp[256];
+
+	if(!ChangeArea)
+		return;
+	int EveryOne = ip->CheckTravel(actor);
+printf("Checktravel returned %d\n",EveryOne);
+	switch(EveryOne) {
+	case 2:
+		core->DisplayConstantString(STR_WHOLEPARTY,0xffffff); //white
+		return;
+	case 0:
+		return;
+	case 1: case 3:
+		break;
+	}
+
+	if (ip->Destination[0] != 0) {
+		CreateMovement(Tmp, ip->Destination, ip->EntranceName);
+		if(EveryOne&2) {
+			Game *game=core->GetGame();
+			int i=game->GetPartySize(false);
+			while(i--) {
+	        	        game->GetPC(i)->ClearPath();
+        	        	game->GetPC(i)->ClearActions();
+	                	game->GetPC(i)->AddAction( GameScript::GenerateAction( Tmp ) );
+        		}
+			return;
+		}
+		actor->ClearPath();
+		actor->ClearActions();
+		actor->AddAction( GameScript::GenerateAction( Tmp ) );
+	} else {
+		if (ip->Scripts[0]) {
+			ip->LastTrigger = actor;
+			ip->ExecuteScript( ip->Scripts[0] );
+			ip->ProcessActions();
+			//this isn't a continuously running script
+			//turning oncreation to false on first run
+			ip->OnCreation = false;
+		}
+	}
+}
+
 void Map::DrawMap(Region viewport, GameControl* gc)
 {
-  unsigned int i;
+	unsigned int i;
 	//Draw the Map
 	if (tm) {
 		tm->DrawOverlay( 0, viewport );
@@ -205,10 +256,13 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 		//If this InfoPoint is a Switch Trigger
 		if (ip->Type == ST_TRIGGER) {
 			//Check if this InfoPoint was activated
-			if (ip->LastTrigger)
+			if (ip->LastTrigger) {
 				//Run the InfoPoint script
 				ip->ExecuteScript( ip->Scripts[0] );
+				//OnCreation won't trigger the INFO point
+				//If it does, alter the condition above
 				ip->OnCreation = false;
+			}
 			continue;
 		}
 		Region BBox = ip->outline->BBox;
@@ -224,7 +278,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			BBox.h += 1000;
 			BBox.w += 1000;
 		}
-    i=0;
+		i=0;
 		while (true) {
 			Actor* actor = core->GetGame()->GetPC( i++ );
 			if (!actor)
@@ -233,8 +287,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 				break;
 			if (BBox.PointInside( actor->XPos, actor->YPos )) {
 				if (ip->Type == ST_PROXIMITY) {
-					if (ip->outline->BBox.PointInside( actor->XPos,
-											actor->YPos )) {
+					if (ip->outline->BBox.PointInside( actor->XPos, actor->YPos )) {
 						if (ip->outline->PointIn( actor->XPos, actor->YPos )) {
 							ip->LastEntered = actor;
 							ip->LastTrigger = actor;
@@ -244,27 +297,11 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 					ip->OnCreation = false;
 				} else {
 					//ST_TRAVEL
+					//don't move if doing something else
+					if(actor->GetNextAction())
+						break;
 					if (ip->outline->PointIn( actor->XPos, actor->YPos )) {
-						char Tmp[256];
-						sprintf( Tmp,
-							"[color=00FF00]%s TravelTrigger Activated: [/color]Should Move to Area %s near %s",
-							ip->Name, ip->Destination, ip->EntranceName );
-						gc->DisplayString( Tmp );
-
-						if (ip->Destination[0] != 0) {
-							CreateMovement(Tmp, ip->Destination, ip->EntranceName);
-							actor->ClearPath();
-							actor->ClearActions();
-							actor->AddAction( GameScript::GenerateAction( Tmp ) );
-						} else {
-							if (ip->Scripts[0]) {
-								ip->LastTrigger = actor;
-								//ip->Scripts[0]->Update();
-								ip->ExecuteScript( ip->Scripts[0] );
-								ip->ProcessActions();
-								ip->OnCreation = false;
-							}
-						}
+						UseExit(actor, ip);
 					}
 				}
 				break;
@@ -300,11 +337,22 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 				break;
 			if (!actor->Active)
 				continue;
+			actor->ProcessActions();
+			//moved scripts before display
+			//this should enable scripts for offscreen actors
+			for (i = 0; i < 8; i++) {
+				if (actor->Scripts[i])
+					actor->ExecuteScript( actor->Scripts[i] );
+			}
+
 			if (actor->DeleteMe) {
 				DeleteActor( actor );
 				continue;
 			}
-			actor->ProcessActions();
+
+			actor->OnCreation = false;
+			actor->inventory.CalculateWeight();
+
 			actor->DoStep( LightMap );
 			CharAnimations* ca = actor->GetAnims();
 			if (!ca)
@@ -362,12 +410,6 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 							false );
 				}
 			}
-			for (i = 0; i < 8; i++) {
-				if (actor->Scripts[i])
-					actor->ExecuteScript( actor->Scripts[i] );
-			}
-			actor->OnCreation = false;
-			actor->inventory.CalculateWeight();
 		}
 	}
 	for (i = 0; i < vvcCells.size(); i++) {
@@ -459,12 +501,12 @@ Actor* Map::GetActor(unsigned int x, unsigned int y, int flags)
 			continue; //actor is already marked for removal
 		}
 		if (flags&GA_SELECT) {
-			if (actor->BaseStats[IE_UNSELECTABLE]) {
+			if (actor->GetStat(IE_UNSELECTABLE) ) {
 				continue;
 			}
 		}
 		if (flags&GA_NO_DEAD) {
-			if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
+			if (actor->GetStat(IE_STATE_ID) & STATE_DEAD) {
 				continue;
 			}
 		}
@@ -498,13 +540,16 @@ Actor* Map::GetActorByDialog(const char *resref)
 	return NULL;
 }
 
-int Map::GetActorInRect(Actor**& actorlist, Region& rgn)
+int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 {
 	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
 	int count = 0;
 	unsigned int i = actors.size();
 	while(i--) {
 		Actor* actor = actors[i];
+//use this function only for party?
+		if(onlyparty && !actor->InParty)
+			continue;
 		if (actor->BaseStats[IE_UNSELECTABLE] ||
 			( actor->BaseStats[IE_STATE_ID] & STATE_DEAD ) ||
 			( !actor->Active ))
@@ -705,6 +750,7 @@ void Map::RemoveActor(Actor* actor)
 	}
 }
 
+//returns true if none of the partymembers are on the map
 bool Map::CanFree()
 {
 	unsigned int i=actors.size();

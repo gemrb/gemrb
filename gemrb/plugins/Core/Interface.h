@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.98 2004/07/25 11:38:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.99 2004/07/31 09:24:10 avenger_teambg Exp $
  *
  */
 
@@ -239,6 +239,8 @@ public:
 	void DisplayTooltip(int x, int y, char* text);
 	/** Actually draws tooltip on the screen. Called from SDLVideoDriver */
 	void DrawTooltip();
+	/** displays a string in the textarea */
+	void DisplayConstantString(int stridx, unsigned int color);
 	/** Set a Window Visible Flag */
 	int SetVisible(unsigned short WindowIndex, int visible);
 	/** Show a Window in Modal Mode */
@@ -331,6 +333,8 @@ private:
 	bool LoadGemRBINI();
 	bool LoadINI(const char * filename);
 	bool InitItemTypes();
+	bool ReadStrrefs();
+
 public:
 	char GameData[9];
 	char GameOverride[9];

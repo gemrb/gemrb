@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.177 2004/07/25 11:38:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.178 2004/07/31 09:24:10 avenger_teambg Exp $
  *
  */
 
@@ -55,6 +55,8 @@ GEM_EXPORT HANDLE hConsole;
 
 //use DialogF.tlk if the protagonist is female, that's why we leave space
 static char dialogtlk[] = "dialog.tlk\0";
+#define STRREFCOUNT 100
+static int strref_table[STRREFCOUNT];
 
 Interface::Interface(int iargc, char** iargv)
 {
@@ -239,6 +241,25 @@ Interface::~Interface(void)
 	//TODO: Clean the Cache and leave only .bif files
 }
 
+bool Interface::ReadStrrefs()
+{
+        TableMgr * tab;
+        int table=core->LoadTable("strings");
+        memset(strref_table,-1,sizeof(strref_table) );
+        if(table<0) {
+                return false;
+        }
+        tab = core->GetTable(table);
+        if(!tab) {
+                goto end;
+        }
+        for(int i=0;i<STRREFCOUNT;i++) {
+                strref_table[i]=atoi(tab->QueryField(i,0));
+        }
+end:
+        core->DelTable(table);
+	return true;
+}
 
 int Interface::Init()
 {
@@ -570,8 +591,16 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-	bool ret = InitItemTypes();
 	printMessage( "Core", "Initializing Inventory Management...", WHITE );
+	bool ret = InitItemTypes();
+	if(ret) {
+		printStatus( "OK", LIGHT_GREEN );
+	}
+	else {
+		printStatus( "ERROR", LIGHT_RED );
+	}
+	printMessage( "Core", "Initializing string constants...", WHITE );
+	ret = ReadStrrefs();
 	if(ret) {
 		printStatus( "OK", LIGHT_GREEN );
 	}
@@ -2025,5 +2054,28 @@ bool Interface::CanUseItemType(int itype, int slottype)
 	}
 	//if any bit is true, we return true (int->bool conversion)
 	return (bool) (slotmatrix[itype]&slottype);
+}
+
+void Interface::DisplayConstantString(int stridx, unsigned int color)
+{
+        unsigned long index;
+
+        if (!core->GetDictionary()->Lookup( "MessageWindow", index )) {
+                return;
+        }
+        Window* win = core->GetWindow( index );
+        if (!core->GetDictionary()->Lookup( "MessageTextArea", index )) {
+                return;
+        }
+        TextArea* ta = ( TextArea* ) win->GetControl( index );
+        char* text = core->GetString(strref_table[stridx]);
+        const char* format = "[/color][p][color=%lX]%s[/color][/p]";
+        int newlen = (int)(strlen( format ) + strlen( text ) + 10);
+        char* newstr = ( char* ) malloc( newlen );
+        sprintf( newstr, format, color, text );
+        free(text);
+        ta->AppendText( newstr, -1 );
+        ta->AppendText( "", -1 );
+        free( newstr );
 }
 
