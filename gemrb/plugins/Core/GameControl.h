@@ -81,10 +81,10 @@ private:
 	void ResizeAdd(Window* win, unsigned char type);
 	unsigned char LeftCount, BottomCount, RightCount, TopCount;
 	DialogState* ds;
-	Actor* speaker, * target;
 	Dialog* dlg;
 	bool ChangeArea;
 public:
+	Actor* speaker, * target;
 	char Destination[33], EntranceName[33];
 	bool Dialogue;
 public:

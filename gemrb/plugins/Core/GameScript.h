@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.54 2004/02/28 15:24:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.55 2004/02/28 18:39:51 avenger_teambg Exp $
  *
  */
 
@@ -721,6 +721,9 @@ public: //Script Functions
 	static int GlobalLT(Scriptable* Sender, Trigger* parameters);
 	static int GlobalGT(Scriptable* Sender, Trigger* parameters);
 	static int GlobalsEqual(Scriptable* Sender, Trigger* parameters);
+	static int GlobalTimerExact(Scriptable* Sender, Trigger* parameters);
+	static int GlobalTimerExpired(Scriptable* Sender, Trigger* parameters);
+	static int GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters);
 	static int HP(Scriptable* Sender, Trigger* parameters);
 	static int HPGT(Scriptable* Sender, Trigger* parameters);
 	static int HPLT(Scriptable* Sender, Trigger* parameters);
@@ -821,6 +824,7 @@ public:
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
 	static void SetGlobal(Scriptable* Sender, Action* parameters);
+	static void SetGlobalTimer(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
 	static void SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters);
 	static void SetTokenGlobal(Scriptable* Sender, Action* parameters);
@@ -843,6 +847,8 @@ public:
 	static void Wait(Scriptable* Sender, Action* parameters);
 public:
 	//Objects
+	static Targets *BestAC(Scriptable *Sender, Targets *parameters);
+	static Targets *Gabber(Scriptable *Sender, Targets *parameters);
 	static Targets *LastSeenBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastTalkedToBy(Scriptable *Sender, Targets *parameters);
 	static Targets *Myself(Scriptable *Sender, Targets *parameters);
@@ -858,8 +864,10 @@ public:
 	static Targets *Player5Fill(Scriptable *Sender, Targets *parameters);
 	static Targets *Player6(Scriptable *Sender, Targets *parameters);
 	static Targets *Player6Fill(Scriptable *Sender, Targets *parameters);
+	static Targets *Protagonist(Scriptable *Sender, Targets *parameters);
+	static Targets *StrongestOf(Scriptable *Sender, Targets *parameters);
+	static Targets *WeakestOf(Scriptable *Sender, Targets *parameters);
 	static Targets *WorstAC(Scriptable *Sender, Targets *parameters);
-	static Targets *BestAC(Scriptable *Sender, Targets *parameters);
 
 public:
 	/*GemRB extensions/actions*/

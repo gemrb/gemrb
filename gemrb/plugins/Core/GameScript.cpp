@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.78 2004/02/28 15:24:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.79 2004/02/28 18:39:51 avenger_teambg Exp $
  *
  */
 
@@ -61,6 +61,9 @@ static TriggerLink triggernames[] = {
 	{"general", GameScript::General}, {"global", GameScript::Global},
 	{"globalgt", GameScript::GlobalGT}, {"globallt", GameScript::GlobalLT},
 	{"globalsequal", GameScript::GlobalsEqual},
+	{"globaltimerexact", GameScript::GlobalTimerExact},
+	{"globaltimerexpired", GameScript::GlobalTimerExpired},
+	{"globaltimernotexpired", GameScript::GlobalTimerNotExpired},
 	{"harmlessentered", GameScript::Entered}, //this isn't sure the same
 	{"hp", GameScript::HP},
 	{"hpgt", GameScript::HPGT}, {"hplt", GameScript::HPLT},
@@ -151,6 +154,7 @@ static ActionLink actionnames[] = {
 	{"screenshake",GameScript::ScreenShake,AF_BLOCKING},
 	{"setdialogue",GameScript::SetDialogue,AF_BLOCKING},
 	{"setglobal",GameScript::SetGlobal},
+	{"setglobaltimer",GameScript::SetGlobalTimer},
 	{"setnumtimestalkedto",GameScript::SetNumTimesTalkedTo},
 	{"settokenglobal",GameScript::SetTokenGlobal}, {"sg",GameScript::SG},
 	{"smallwait",GameScript::SmallWait,AF_BLOCKING},
@@ -172,6 +176,7 @@ static ActionLink actionnames[] = {
 
 //Make this an ordered list, so we could use bsearch!
 static ObjectLink objectnames[] = {
+	{"bestac",GameScript::BestAC},
 	{"lastseenby",GameScript::LastSeenBy},
 	{"lasttalkedtoby",GameScript::LastTalkedToBy},
 	{"myself",GameScript::Myself},
@@ -191,6 +196,9 @@ static ObjectLink objectnames[] = {
 	{"player7fill",GameScript::Player7Fill},
 	{"player8",GameScript::Player8},
 	{"player8fill",GameScript::Player8Fill},
+	{"protagonist",GameScript::Protagonist},
+	{"strongestof",GameScript::StrongestOf},
+	{"weakestof",GameScript::WeakestOf},
 	{"worstac",GameScript::WorstAC},
 	{ NULL,NULL}, 
 };
@@ -1450,6 +1458,23 @@ Targets *GameScript::Myself(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
+//same as player1 so far
+Targets *GameScript::Protagonist(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	parameters->AddTarget(core->GetGame()->GetPC(0));
+	return parameters;
+}
+
+//last talker
+Targets *GameScript::Gabber(Scriptable *Sender, Targets *parameters)
+{
+	parameters->Clear();
+	GameControl* gc = ( GameControl* ) core->GetWindow( 0 )->GetControl( 0 );	
+	parameters->AddTarget(gc->speaker);
+	return parameters;
+}
+
 Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters)
 {
 	Targets *tgts = new Targets();
@@ -1601,6 +1626,42 @@ Targets *GameScript::BestAC(Scriptable *Sender, Targets *parameters)
 		int ac=parameters->GetTarget(pos)->GetStat(IE_ARMORCLASS);
 		if(worstac>ac) {
 			worstac=ac;
+			pos=i;
+		}
+	}
+	Actor *ac=parameters->GetTarget(pos);
+	parameters->Clear();
+	parameters->AddTarget(ac);
+	return parameters;
+}
+
+Targets *GameScript::StrongestOf(Scriptable *Sender, Targets *parameters)
+{
+	int i=parameters->Count();
+	int worsthp=parameters->GetTarget(--i)->GetStat(IE_ARMORCLASS);
+	int pos=i;
+	while(i--) {
+		int hp=parameters->GetTarget(pos)->GetStat(IE_ARMORCLASS);
+		if(worsthp<hp) {
+			worsthp=hp;
+			pos=i;
+		}
+	}
+	Actor *ac=parameters->GetTarget(pos);
+	parameters->Clear();
+	parameters->AddTarget(ac);
+	return parameters;
+}
+
+Targets *GameScript::WeakestOf(Scriptable *Sender, Targets *parameters)
+{
+	int i=parameters->Count();
+	int worsthp=parameters->GetTarget(--i)->GetStat(IE_HITPOINTS);
+	int pos=i;
+	while(i--) {
+		int ac=parameters->GetTarget(pos)->GetStat(IE_HITPOINTS);
+		if(worsthp>ac) {
+			worsthp=ac;
 			pos=i;
 		}
 	}
@@ -1913,6 +1974,39 @@ int GameScript::GlobalsEqual(Scriptable* Sender, Trigger* parameters)
 	unsigned long value2 = CheckVariable( Sender,
 							parameters->string1Parameter );
 	int eval = ( value1 == value2 ) ? 1 : 0;
+	return eval;
+}
+
+int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value1 = CheckVariable( Sender,
+							parameters->string0Parameter );
+	unsigned long value2;
+
+	GetTime(value2);
+	int eval = ( value1 == value2 ) ? 1 : 0;
+	return eval;
+}
+
+int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value1 = CheckVariable( Sender,
+							parameters->string0Parameter );
+	unsigned long value2;
+
+	GetTime(value2);
+	int eval = ( value1 < value2 ) ? 1 : 0;
+	return eval;
+}
+
+int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
+{
+	unsigned long value1 = CheckVariable( Sender,
+							parameters->string0Parameter );
+	unsigned long value2;
+
+	GetTime(value2);
+	int eval = ( value1 > value2 ) ? 1 : 0;
 	return eval;
 }
 
@@ -2314,6 +2408,17 @@ void GameScript::SetGlobal(Scriptable* Sender, Action* parameters)
 		parameters->int0Parameter );
 	SetVariable( Sender, parameters->string0Parameter,
 		parameters->int0Parameter );
+}
+
+void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
+{
+	unsigned long mytime;
+
+	printf( "SetGlobalTimer(\"%s\")\n", parameters->string0Parameter,
+		parameters->int0Parameter );
+	GetTime(mytime);
+	SetVariable( Sender, parameters->string0Parameter,
+		parameters->int0Parameter + mytime);
 }
 
 void GameScript::ChangeAllegiance(Scriptable* Sender, Action* parameters)
