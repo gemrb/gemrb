@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.18 2004/03/17 01:07:26 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.19 2004/04/06 17:25:36 avenger_teambg Exp $
  *
  */
 
@@ -270,11 +270,11 @@ GAMJournalEntry* GAMImp::GetJournalEntry()
 	GAMJournalEntry* j = new GAMJournalEntry();
 
 	str->Read( &j->Text, 4 );
-	str->Read( &j->Time, 4 );
+	str->Read( &j->GameTime, 4 ); 
 	str->Read( &j->Chapter, 1 );
 	str->Read( &j->unknown09, 1 );
 	str->Read( &j->Section, 1 );
-	str->Read( &j->unknown0B, 1 );
+	str->Read( &j->Group, 1 );  // this is a GemRB extension
 
 	return j;
 }
