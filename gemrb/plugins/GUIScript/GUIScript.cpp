@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.215 2004/10/09 19:07:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.216 2004/10/09 19:29:50 avenger_teambg Exp $
  *
  */
 
@@ -63,10 +63,15 @@ inline bool valid_number(const char* string, long& val)
 	return ( const char * ) endpr != string;
 }
 
-// Like PyString_FromString(), but for  ResRef
+// Like PyString_FromString(), but for ResRef
 inline PyObject* PyString_FromResRef(char* ResRef)
 {
-	return PyString_FromStringAndSize( ResRef, sizeof(ieResRef) );
+	unsigned int i;
+
+	for(i=0;i<sizeof(ieResRef);i++) {
+		if(ResRef[i]==0) break;
+	}
+	return PyString_FromStringAndSize( ResRef, i );
 }
 
 /* Sets RuntimeError exception and returns NULL, so this function
@@ -3839,16 +3844,19 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	ItemMgr* im = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
 	if (im == NULL) {
 		delete ( str );
+		printf("[GUIScript] Can't get item manager!\n");
 		return NULL;
 	}
 	if (!im->Open( str, true )) {
 		core->FreeInterface( im );
+		printf("[GUIScript] Can't read item header!\n");
 		return NULL;
 	}
 
 	Item* item = im->GetItem();
 	if (item == NULL) {
 		core->FreeInterface( im );
+		printf("[GUIScript] Can't create item!\n");
 		return NULL;
 	}
 
