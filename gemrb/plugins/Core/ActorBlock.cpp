@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.74 2005/03/14 16:42:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.75 2005/03/15 11:45:23 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -529,7 +529,7 @@ Door::Door(TileOverlay* Overlay)
 
 Door::~Door(void)
 {
-	if (Flags&DOOR_CLOSED) {
+	if (Flags&DOOR_OPEN) {
 		if (open) {
 			delete( open );
 		}
@@ -551,7 +551,7 @@ Door::~Door(void)
 
 void Door::UpdateDoor()
 {
-	if (Flags&DOOR_CLOSED) {
+	if (Flags&DOOR_OPEN) {
 		outline = closed;
 	} else {
 		outline = open;
@@ -568,7 +568,7 @@ void Door::UpdateDoor()
 	else {
 		cval = 0;  //opaque door searchmap entry
 	}
-	if (Flags &DOOR_CLOSED) {
+	if (Flags &DOOR_OPEN) {
 		oidx=cval;
 		cidx=oval;
 	}
@@ -651,9 +651,9 @@ void Door::SetDoorLocked(bool Locked, bool playsound)
 	}
 }
 
-void Door::SetDoorClosed(bool Closed, bool playsound)
+void Door::SetDoorOpen(bool Open, bool playsound)
 {
-	ToggleTiles(Closed, playsound );
+	ToggleTiles(Open, playsound );
 	UpdateDoor();
 }
 
@@ -676,13 +676,17 @@ void Door::SetCursor(unsigned char CursorIndex)
 	Cursor = CursorIndex;
 }
 
+#define YESNO(x) ( (x)?"Yes":"No")
 void Door::DebugDump()
 {
 	printf( "Debugdump of Door %s:\n", Name );
-	printf( "Door Closed: %s\n", Flags&1 ? "Yes":"No");
-	printf( "Door Locked: %s\n", Flags&2 ? "Yes":"No");
-	printf( "Door Trapped: %s\n", Flags&4 ? "Yes":"No");
-	printf( "Trap removable: %s\n", Flags&8 ? "Yes":"No");
+	printf( "Door Open: %s\n", YESNO(Flags&DOOR_OPEN));
+	printf( "Door Locked: %s\n", YESNO(Flags&DOOR_LOCKED));
+	printf( "Door Trapped: %s (permanent:%s)\n", YESNO(TrapFlags), YESNO(Flags&DOOR_RESET));
+	printf( "Trap Detectable: %s\n", YESNO(Flags&DOOR_DETECTABLE) );
+	printf( "Secret door: %s (Found: %s)\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
+	const char *Key = GetKey();
+	printf( "Key (%s) removed: %s\n", Key?Key:"NONE", YESNO(Flags&DOOR_KEY) );
 }
 
 /*******************

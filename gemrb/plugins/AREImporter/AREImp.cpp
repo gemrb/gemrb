@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.102 2005/03/14 16:42:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.103 2005/03/15 11:45:19 avenger_teambg Exp $
  *
  */
 
@@ -371,7 +371,13 @@ Map* AREImp::GetMap(const char *ResRef)
 		door->closed_ib = points;
 		door->cibcount = ClosedImpededCount;
 		door->SetMap(map);
-		door->SetDoorClosed(Flags&DOOR_CLOSED, false);
+		door->SetDoorOpen(Flags&DOOR_OPEN, false);
+
+		door->TrapDetectionDiff = TrapDetect;
+		door->TrapRemovalDiff = TrapRemoval;
+		door->TrapFlags = TrapFlags;
+		door->TrapLaunch.x = LaunchX;
+		door->TrapLaunch.y = LaunchY;
 
 		door->SetScriptName( LongName );
 		door->Cursor = cursor;

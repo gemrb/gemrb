@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.90 2005/03/13 20:08:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.91 2005/03/15 11:45:23 avenger_teambg Exp $
  *
  */
 
@@ -92,7 +92,6 @@ static void InitActorTables()
 	for(i=0;i<26;i++) {
 		constitution_normal[i] = atoi(tm->QueryField( i, 1) );
 		constitution_fighter[i] = atoi(tm->QueryField( i, 2) );
-printf("ConBon: %d  %d  %d\n",i,constitution_normal[i], constitution_fighter[i]);
 	}
 	core->DelTable( table );
 }

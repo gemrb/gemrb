@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.244 2005/03/14 09:08:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.245 2005/03/15 11:45:23 avenger_teambg Exp $
  *
  */
 
@@ -4345,7 +4345,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		case ST_DOOR:
 		{
 			Door *door =(Door *) tar;
-			return (int) (door->Flags&DOOR_CLOSED) == parameters->int0Parameter;
+			return (int) (door->Flags&DOOR_OPEN) != parameters->int0Parameter;
 		}
 		case ST_CONTAINER:
 		{
@@ -6435,7 +6435,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	//	return;
 	//}
 	if(Flags&BD_CHECKDIST) {
-		if(Distance(Sender, tar)>40) {
+		if(Distance(Sender, tar)>MAX_OPERATING_DISTANCE) {
 			GoNearAndRetry(Sender, tar);
 			Sender->CurrentAction = NULL;
 			return;
@@ -6757,30 +6757,41 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	if(!(door->Flags&DOOR_CLOSED) ) {
+	if (door->Flags&DOOR_OPEN) {
 		//door is already open
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	if (Sender->Type != ST_ACTOR) {
 		//if not an actor opens, it don't play sound
-		door->SetDoorClosed( false, false );		
+		door->SetDoorOpen( true, false );		
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	double distance;
 	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
 				distance );
-	if (distance <= 40) {
-		//actually if we got the key, we could still open it
-		//we need a more sophisticated check here
-		if(door->Flags&DOOR_LOCKED) {
-			//playsound unsuccessful opening of door
-			core->GetSoundMgr()->Play("AMB_D06");
+	if (distance <= MAX_OPERATING_DISTANCE) {
+		if (door->Flags&DOOR_LOCKED) {
+			const char *Key = door->GetKey();
+			Actor *actor = (Actor *) Sender;
+			if (!Key || !actor->inventory.HasItem(Key,0) ) {
+				//playsound unsuccessful opening of door
+				core->GetSoundMgr()->Play("AMB_D06");
+				return;
+			}
+
+			//remove the key
+			if (door->Flags&DOOR_KEY) {
+				CREItem *item = NULL;
+				actor->inventory.RemoveItem(Key,0,&item);
+				//the item should always be existing!!!
+				if (item) {
+					delete item;
+				}
+			}
 		}
-		else {
-			door->SetDoorClosed( false, true );
-		}
+		door->SetDoorOpen( true, true );
 	} else {
 		GoNearAndRetry(Sender, p);
 	}
@@ -6799,30 +6810,30 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	if(door->Flags&DOOR_CLOSED ) {
+	if (!(door->Flags&DOOR_OPEN) ) {
 		//door is already closed 
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	if (Sender->Type != ST_ACTOR) {
 		//if not an actor opens, it don't play sound
-		door->SetDoorClosed( true, false );
+		door->SetDoorOpen( false, false );
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	double distance;
 	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
 				distance );	
-	if (distance <= 40) {
+	if (distance <= MAX_OPERATING_DISTANCE) {
 		//actually if we got the key, we could still open it
 		//we need a more sophisticated check here
 		//doors could be locked but open, and unable to close
-		if(door->Flags&DOOR_LOCKED) {
+		if (door->Flags&DOOR_LOCKED) {
 			//playsound unsuccessful closing of door
 			core->GetSoundMgr()->Play("AMB_D06");
 		}
 		else {
-			door->SetDoorClosed( true, true );
+			door->SetDoorOpen( false, true );
 		}
 	} else {
 		GoNearAndRetry(Sender, p);
@@ -6833,11 +6844,11 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 void GameScript::ContainerEnable(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if( !tar || tar->Type!=ST_CONTAINER) {
+	if (!tar || tar->Type!=ST_CONTAINER) {
 		return;
 	}
 	Container *cnt = (Container *) tar;
-	if(parameters->int0Parameter) {
+	if (parameters->int0Parameter) {
 		cnt->Flags&=~CONT_DISABLED;
 	}
 	else {
@@ -7217,7 +7228,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	//no need to change the pathfinder just for getting the entrance
 	Map *map = game->GetMap(actor->Area);
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
-	if (Distance(ent->Pos, Sender) <= 40) {
+	if (Distance(ent->Pos, Sender) <= MAX_OPERATING_DISTANCE) {
 		LeaveAreaLUA(Sender, parameters);
 		return;
 	}
@@ -7248,7 +7259,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	//no need to change the pathfinder just for getting the entrance
 	Map *map = game->GetMap( actor->Area );
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
-	if (Distance(ent->Pos, Sender) <= 40) {
+	if (Distance(ent->Pos, Sender) <= MAX_OPERATING_DISTANCE) {
 		LeaveAreaLUAPanic(Sender, parameters);
 		return;
 	}

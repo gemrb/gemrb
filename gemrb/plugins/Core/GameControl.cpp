@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.198 2005/03/13 20:08:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.199 2005/03/15 11:45:23 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -254,12 +254,15 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		for (unsigned int idx = 0;
 			(d = area->TMap->GetDoor( idx ));
 			idx++) {
-			if (d->Flags & DOOR_CLOSED) {
-				video->DrawPolyline( d->closed, cyan, true );
-			}
-			else {
+			d->DrawOutline();
+/*
+			if (d->Flags & DOOR_OPEN) {
 				video->DrawPolyline( d->open, cyan, true );
 			}
+			else {
+				video->DrawPolyline( d->closed, cyan, true );
+			}
+*/
 		}
 	}
 
@@ -771,15 +774,15 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 {
 	char Tmp[256];
 
-	if (door->Flags&DOOR_CLOSED) {
+	if (door->Flags&DOOR_OPEN) {
 		actor->ClearPath();
 		actor->ClearActions();
-		sprintf( Tmp, "OpenDoor(\"%s\")", door->Name );
+		sprintf( Tmp, "CloseDoor(\"%s\")", door->Name );
 		actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 	} else {
 		actor->ClearPath();
 		actor->ClearActions();
-		sprintf( Tmp, "CloseDoor(\"%s\")", door->Name );
+		sprintf( Tmp, "OpenDoor(\"%s\")", door->Name );
 		actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 	}
 }

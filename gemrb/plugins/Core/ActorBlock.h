@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.59 2005/03/14 16:42:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.60 2005/03/15 11:45:23 avenger_teambg Exp $
  *
  */
 
@@ -68,7 +68,7 @@ class Door;
 #define INFO_DOOR	 2048 //info trigger linked to a door
 
 //door flags
-#define DOOR_CLOSED      1
+#define DOOR_OPEN        1
 #define DOOR_LOCKED      2
 #define DOOR_RESET       4   //reset trap
 #define DOOR_DETECTABLE  8   //trap detectable
@@ -191,9 +191,14 @@ public:
 	bool IsOver(Point &Pos);
 	void DrawOutline();
 	/** Gets the Dialog ResRef */
-	const char* GetDialog(void)
+	const char* GetDialog(void) const
 	{
 		return DialogResRef;
+	}
+	const char* GetKey(void) const
+	{
+		if (KeyResRef[0]) return KeyResRef;
+		return NULL;
 	}
 };
 
@@ -251,7 +256,7 @@ public:
 	TileOverlay* overlay;
 	unsigned short* tiles;
 	unsigned char count;
-	unsigned int Flags;
+	ieDword Flags;
 	int closedIndex;
 	Gem_Polygon* open;
 	Gem_Polygon* closed;
@@ -264,6 +269,9 @@ public:
 	ieResRef CloseSound;
 	ieResRef LockSound;
 	ieResRef UnLockSound;
+        ieWord TrapDetectionDiff;
+        ieWord TrapRemovalDiff;
+	ieDword TrapFlags;
 private:
 	void ToggleTiles(int State, bool playsound = false);
 	void UpdateDoor();
@@ -272,7 +280,7 @@ public:
 	void SetScriptName(const char* Name);
 	void SetTiles(unsigned short* Tiles, int count);
 	void SetDoorLocked(bool Locked, bool playsound = false);
-	void SetDoorClosed(bool Closed, bool playsound = false);
+	void SetDoorOpen(bool Open, bool playsound = false);
 	void SetPolygon(bool Open, Gem_Polygon* poly);
 	void SetCursor(unsigned char CursorIndex);
 	void DebugDump();
