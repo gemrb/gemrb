@@ -7,5 +7,5 @@ Parameters: StoreResRef - the store's resource name
 
 Return value: None
 
-See also: GetStore, GetStoreCure, GetStoreDrink
+See also: GetStore, GetStoreCure, GetStoreDrink, LeaveStore
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.191 2005/03/02 22:34:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.192 2005/03/03 22:33:12 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1188,10 +1188,10 @@ void GameControl::UnhideGUI()
 	}
 	if (dict->Lookup( "OtherWindow", index )) {
 		if (index != (ieDword) -1) {
-			Window* tw = core->GetWindow( index );
+			Window* ow = core->GetWindow( index );
 			core->SetVisible( index, 1 );
 			if (dict->Lookup( "OtherPosition", index )) {
-				ResizeAdd( tw, index );
+				ResizeAdd( ow, index );
 			}
 		}
 	}
@@ -1261,6 +1261,11 @@ void GameControl::ResizeDel(Window* win, unsigned char type)
 		( ( Window * ) Owner )->Height += win->Height;
 		Height = ( ( Window * ) Owner )->Height;
 		break;
+	case 5: //Inactivating
+		BottomCount--;
+		( ( Window * ) Owner )->Height += win->Height;
+		Height = ( ( Window * ) Owner )->Height;
+		break;
 	}
 }
 
@@ -1306,6 +1311,11 @@ void GameControl::ResizeAdd(Window* win, unsigned char type)
 		( ( Window * ) Owner )->Height -= win->Height;
 		Height = ( ( Window * ) Owner )->Height;
 		break;
+
+	case 5: //Inactivating
+		BottomCount++;
+		( ( Window * ) Owner )->Height -= win->Height;
+		Height = 0;
 	}
 }
 

@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.276 2005/03/02 19:36:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.277 2005/03/03 22:33:13 avenger_teambg Exp $
  *
  */
 
@@ -49,6 +49,14 @@
 
 // a shorthand for declaring methods in method table
 #define METHOD(name, args) {#name, GemRB_ ## name, args, GemRB_ ## name ## __doc}
+
+static int StoreSpellsCount = -1;
+typedef struct SpellDescType {
+	ieResRef resref;
+	ieStrRef value;
+} SpellDescType;
+
+static SpellDescType *StoreSpells = NULL;
 
 inline bool valid_number(const char* string, long& val)
 {
@@ -123,7 +131,7 @@ inline Sprite2D* GetBAMSprite(ieResRef ResRef, int cycle, int frame)
 	AnimationMgr* bam = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
 	DataStream *str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
 	if (!bam->Open( str, true ) ) {
-		printMessage( "GUIScript", "Error: %s.BAM not found\n", LIGHT_RED );
+		RuntimeError( "BAM not found" );
 		return NULL;
 	}
 	Sprite2D *tspr;
@@ -860,8 +868,7 @@ static PyObject* GemRB_QueryText(PyObject * /*self*/, PyObject* args)
 	case IE_GUI_TEXTAREA:
 		return PyString_FromString(((TextArea *) ctrl)->QueryText() );
 	default:
-		RuntimeError("Invalid control type");
-		return NULL;
+		return RuntimeError("Invalid control type");
 	}
 }
 
@@ -1467,8 +1474,7 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 		core->GetInterface( IE_BAM_CLASS_ID );
 	DataStream *str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
 	if (!bam->Open(str, true) ) {
-		printMessage( "GUIScript", "Error: %s.BAM not Found\n", LIGHT_RED );
-		return NULL;
+		return RuntimeError( "BAM not found" );
 	}
 	Sprite2D *tspr = bam->GetFrameFromCycle( (unsigned char) cycle, unpressed);
 	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
@@ -3328,16 +3334,13 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 
 	Spell* spell = core->GetSpell(SpellResRef);
 	if (spell == NULL) {
-		printMessage( "GUIScript", "Runtime Error: im->GetSpell()\n",
-			LIGHT_RED );
-		return NULL;
+		return RuntimeError( "Spell not found" );
 	}
 
 	AnimationMgr* bam = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
 	DataStream *str = core->GetResourceMgr()->GetResource( spell->SpellbookIcon, IE_BAM_CLASS_ID );
 	if (!bam->Open( str, true ) ) {
-		printMessage( "GUIScript", "Error: %s.BAM not found\n", LIGHT_RED );
-		return NULL;
+		return RuntimeError( "BAM not found" );
 	}
 	//AnimationMgr *bam = spell->SpellIconBAM;
 	//small difference between pst and others
@@ -3411,15 +3414,28 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_LeaveStore__doc,
+"LeaveStore(STOResRef)\n\n"
+"Saves the current store to the Cache folder and frees it from memory." );
+
+static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
+{
+	if (core->CloseCurrentStore() ) {
+		return RuntimeError("Cannot save store!");
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_GetStore__doc,
 "GetStore() => string\n\n"
 "Returns relevant data of the current store." );
 
 static int storebuttons[6][4]={
 {STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_CURE|STA_OPTIONAL},
-{STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_DRINK}, 
-{STA_BUYSELL|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_ROOMRENT},
-{STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_DONATE|STA_OPTIONAL,STA_CURE},
+{STA_DRINK,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL}, 
+{STA_ROOMRENT,STA_BUYSELL|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL},
+{STA_CURE, STA_DONATE|STA_OPTIONAL,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL},
 {STA_BUYSELL,-1,-1,-1,},{STA_BUYSELL,-1,-1,-1} };
 
 //buy/sell, identify, steal, cure, donate, drink
@@ -3504,6 +3520,43 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 	return dict;
 }
 
+static ieStrRef GetSpellDesc(ieResRef CureResRef)
+{
+	int i;
+
+	if (StoreSpellsCount==-1) {
+		StoreSpellsCount = 0;
+		int table = core->LoadTable("speldesc");
+		if (table>=0) {
+			TableMgr *tab = core->GetTable(table);
+			if(!tab) goto table_loaded;
+			StoreSpellsCount = tab->GetRowCount();
+			StoreSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * StoreSpellsCount);
+			for (i=0;i<StoreSpellsCount;i++) {
+				strnuprcpy(StoreSpells[i].resref, tab->QueryField(i,0),8 );
+				StoreSpells[i].value = atoi(tab->QueryField(i,1) );
+			}
+table_loaded:
+			core->DelTable(table);
+		}
+	}
+	if (StoreSpellsCount==0) {
+		Spell *spell = core->GetSpell(CureResRef);
+		if (!spell) {
+			return (ieStrRef) -1;
+		}
+		int ret = spell->SpellDescIdentified;
+		core->FreeSpell(spell, CureResRef, 0);
+		return ret;
+	}
+	for (i=0;i<StoreSpellsCount;i++) {
+		if (!strnicmp(StoreSpells[i].resref, CureResRef, 8) ) {
+			return StoreSpells[i].value;
+		}
+	}
+	return (ieStrRef) -1;
+}
+
 PyDoc_STRVAR( GemRB_GetStoreCure__doc,
 "GetStoreCure(idx) => string\n\n"
 "Returns the cure structure indexed. Returns None if the index is wrong." );
@@ -3522,6 +3575,11 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 	if (index>=(int) store->CuresCount) {
 		return RuntimeError("Wrong index!");
 	}
+	PyObject* dict = PyDict_New();
+	STOCure *cure=store->GetCure(index);
+	PyDict_SetItemString(dict, "CureResRef", PyString_FromResRef( cure->CureResRef ));
+	PyDict_SetItemString(dict, "Price", PyInt_FromLong( cure->Price ));
+	PyDict_SetItemString(dict, "Description", PyInt_FromLong( GetSpellDesc(cure->CureResRef) ) );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -4348,6 +4406,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetSpellIcon, METH_VARARGS),
 	METHOD(SetItemIcon, METH_VARARGS),
 	METHOD(EnterStore, METH_VARARGS),
+	METHOD(LeaveStore, METH_VARARGS),
 	METHOD(GetStore, METH_VARARGS),
 	METHOD(GetStoreDrink, METH_VARARGS),
 	METHOD(GetStoreCure, METH_VARARGS),
@@ -4401,6 +4460,11 @@ GUIScript::~GUIScript(void)
 		}
 		Py_Finalize();
 	}
+	if (StoreSpells) {
+		free(StoreSpells);
+		StoreSpells=NULL;
+	}
+	StoreSpellsCount=-1;
 }
 
 PyDoc_STRVAR( GemRB__doc,
@@ -4538,7 +4602,9 @@ bool GUIScript::RunFunction(const char* fname)
 	pArgs = NULL;
 	pValue = PyObject_CallObject( pFunc, pArgs );
 	if (pValue == NULL) {
-		PyErr_Print();
+		if(PyErr_Occurred()) {
+			PyErr_Print();
+		}
 		return false;
 	}
 	Py_DECREF( pValue );
@@ -4549,13 +4615,17 @@ bool GUIScript::RunFunction(const char* fname)
 char* GUIScript::ExecString(const char* string)
 {
 	if (PyRun_SimpleString( (char *) string ) == -1) {
-		PyErr_Print();
+		if(PyErr_Occurred()) {
+			PyErr_Print();
+		}
 		// try with GemRB. prefix
 		char * newstr = (char *) malloc( strlen(string) + 7 );
 		strncpy(newstr, "GemRB.", 6);
 		strcpy(newstr + 6, string);
 		if (PyRun_SimpleString( newstr ) == -1) {
-			PyErr_Print();
+			if(PyErr_Occurred()) {
+				PyErr_Print();
+			}
 		}
 		free( newstr );
 	}

@@ -47,9 +47,9 @@ def OnLoad():
 	if GameCount>4:
 		TopIndex = GameCount-4
 	else:
-		TopIndex = 1
+		TopIndex = 0
 	GemRB.SetVar ("TopIndex",TopIndex)
-	GemRB.SetVarAssoc (LoadWindow, ScrollBar, "TopIndex", TopIndex)
+	GemRB.SetVarAssoc (LoadWindow, ScrollBar, "TopIndex", TopIndex+1)
 	ScrollBarPress ()
 	GemRB.SetVisible (LoadWindow,1)
 	return

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.7 2005/03/02 19:36:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.8 2005/03/03 22:33:12 avenger_teambg Exp $
  *
  */
 
@@ -44,7 +44,7 @@ typedef enum StoreType { STT_STORE=0, STT_TAVERN=1, STT_INN=2, STT_TEMPLE=3,
 STT_BG2CONT=4, STT_IWD2CONT=5 } StoreType;
 
 typedef enum StoreActionType { STA_BUYSELL=0, STA_IDENTIFY=1, STA_STEAL=2,
-STA_DONATE=3, STA_CURE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreActionType;
+STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreActionType;
 
 #define IE_STORE_BUY     1
 #define IE_STORE_SELL    2

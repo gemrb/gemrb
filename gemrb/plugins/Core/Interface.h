@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.139 2005/02/28 17:35:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.140 2005/03/03 22:33:12 avenger_teambg Exp $
  *
  */
 
@@ -398,6 +398,7 @@ public:
 	void FreeSPLExt(SPLExtHeader *p, Effect *e);
 	WorldMap *NewWorldMap();
 	Store *GetCurrentStore();
+	int CloseCurrentStore();
 	Store *SetCurrentStore(ieResRef resname);
 
 private:

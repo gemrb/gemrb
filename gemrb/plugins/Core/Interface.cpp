@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.268 2005/02/28 17:35:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.269 2005/03/03 22:33:12 avenger_teambg Exp $
  *
  */
 
@@ -2857,6 +2857,18 @@ WorldMap *Interface::NewWorldMap()
 Store *Interface::GetCurrentStore()
 {
 	return CurrentStore;
+}
+
+int Interface::CloseCurrentStore()
+{
+	if( !CurrentStore ) {
+		return -1;
+	}
+	// save current store to cache!
+	//
+	delete CurrentStore;
+	CurrentStore = NULL;
+	return 0;
 }
 
 Store *Interface::SetCurrentStore( ieResRef resname )

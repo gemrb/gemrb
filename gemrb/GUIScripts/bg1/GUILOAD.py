@@ -18,7 +18,7 @@ def OnLoad():
 	GemRB.SetVar("LoadIdx",0)
 	GemRB.SetVar("TopIndex",0)
 
-	for i in range(0,4):
+	for i in range(4):
 		Button = GemRB.GetControl(LoadWindow,26+i)
 		GemRB.SetText(LoadWindow, Button, 15590)
 		GemRB.SetEvent(LoadWindow, Button, IE_GUI_BUTTON_ON_PRESS, "LoadGamePress")
@@ -45,7 +45,12 @@ def OnLoad():
 	ScrollBar=GemRB.GetControl(LoadWindow, 25)
 	GemRB.SetEvent(LoadWindow, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
 	GameCount=GemRB.GetSaveGameCount()   #count of games in save folder?
-	GemRB.SetVarAssoc(LoadWindow, ScrollBar, "TopIndex", GameCount)
+	if GameCount>4:
+		TopIndex = GameCount-4
+	else:
+		TopIndex = 0
+	GemRB.SetVar ("TopIndex",TopIndex)
+	GemRB.SetVarAssoc (LoadWindow, ScrollBar, "TopIndex", TopIndex+1)
 	ScrollBarPress()
 	GemRB.SetVisible(LoadWindow,1)
 	return
@@ -53,7 +58,7 @@ def OnLoad():
 def ScrollBarPress():
 	#draw load game portraits
 	Pos = GemRB.GetVar("TopIndex")
-	for i in range(0,4):
+	for i in range(4):
 		ActPos = Pos + i
 
 		Button1 = GemRB.GetControl(LoadWindow,26+i)

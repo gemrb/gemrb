@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.9 2005/02/19 19:09:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.10 2005/03/03 22:33:12 avenger_teambg Exp $
  *
  */
 
@@ -67,7 +67,7 @@ public:
 	ieWord Charges;
 	ieWord ChargeDepletion;
 	ieWord Projectile;
-  SPLFeature* features;
+	SPLFeature* features;
 };
 
 
@@ -76,10 +76,8 @@ public:
 	Spell();
 	~Spell();
 
-  SPLExtHeader *ext_headers;
-  SPLFeature* casting_features;
-	//std::vector< SPLExtHeader*> ext_headers;
-	//std::vector< SPLFeature*> casting_features;
+	SPLExtHeader *ext_headers;
+	SPLFeature* casting_features;
 
 	ieStrRef SpellName;
 	ieStrRef SpellNameIdentified;
