@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.31 2004/02/24 22:20:40 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.32 2004/04/13 23:13:12 doc_wagon Exp $
  *
  */
 
@@ -272,7 +272,7 @@ void MUSImp::PlayMusic(int pos)
 
 void MUSImp::PlayMusic(char* name)
 {
-	char FName[_MAX_PATH], tmp[32];
+	char FName[_MAX_PATH];
 	strcpy( FName, core->GamePath );
 	strcat( FName, musicsubfolder );
 	strcat( FName, SPathDelimiter );
