@@ -16,7 +16,7 @@ then
 else
   for file in aclocal aclocal-1.7 aclocal-1.8; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
-    if [[ $version > 1.6.99 ]];
+    if [[ $version > 1.7 ]];
     then
       my_aclocal=$file
       break
@@ -68,7 +68,7 @@ then
 else
   for file in libtoolize; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
-    if [[ $version > 1.4.99 ]];
+    if [[ $version > 1.5 ]];
     then
       my_libtoolize=$file
       break
@@ -94,7 +94,7 @@ then
 else
   for file in automake automake-1.7 automake-1.8; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
-    if [[ $version > 1.6.99 ]];
+    if [[ $version > 1.7 ]];
     then
       my_automake=$file
       break
