@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.7 2004/09/12 15:54:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.8 2004/09/13 20:19:48 avenger_teambg Exp $
  *
  */
 
@@ -65,7 +65,7 @@ WorldMap* WMPImp::GetWorldMap(unsigned int index)
 
 	str->Seek( WorldMapsOffset + index * 184, GEM_STREAM_START );
 
-	str->Read( m->MapResRef, 8 );
+	str->ReadResRef( m->MapResRef );
 	str->ReadDword( &m->Width );
 	str->ReadDword( &m->Height );
 	str->ReadDword( &m->MapNumber );
@@ -76,7 +76,7 @@ WorldMap* WMPImp::GetWorldMap(unsigned int index)
 	str->ReadDword( &m->AreaEntriesOffset );
 	str->ReadDword( &m->AreaLinksOffset );
 	str->ReadDword( &m->AreaLinksCount );
-	str->Read( m->MapIconResRef, 8 );
+	str->ReadResRef( m->MapIconResRef );
 	str->Read( m->unknown3, 128 );
 
 	str->Seek( m->AreaEntriesOffset, GEM_STREAM_START );
@@ -125,8 +125,8 @@ WMPAreaEntry* WMPImp::GetAreaEntry()
 {
 	WMPAreaEntry* ae = new WMPAreaEntry();
 
-	str->Read( ae->AreaName, 8 );
-	str->Read( ae->AreaResRef, 8 );
+	str->ReadResRef( ae->AreaName );
+	str->ReadResRef( ae->AreaResRef );
 	str->Read( ae->AreaLongName, 32 );
 	str->ReadDword( &ae->AreaStatus );
 	str->ReadDword( &ae->IconSeq );
@@ -134,7 +134,7 @@ WMPAreaEntry* WMPImp::GetAreaEntry()
 	str->ReadDword( &ae->Y );
 	str->ReadDword( &ae->LocCaptionName );
 	str->ReadDword( &ae->LocTooltipName );
-	str->Read( ae->LoadScreenResRef, 8 );
+	str->ReadResRef( ae->LoadScreenResRef );
 
 	for (unsigned int dir = 0; dir < 4; dir++) {
 		str->ReadDword( &ae->AreaLinksIndex[dir] );
@@ -155,7 +155,7 @@ WMPAreaLink* WMPImp::GetAreaLink()
 	str->ReadDword( &al->DistanceScale );
 	str->ReadDword( &al->Flags );
 	for (unsigned k = 0; k < 5; k++) {
-		str->Read( al->EncounterAreaResRef[k], 8 );
+		str->ReadResRef( al->EncounterAreaResRef[k] );
 	}
 	str->ReadDword( &al->EncounterChance );
 	str->Read( al->unknown, 128 );

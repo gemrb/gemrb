@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.46 2004/08/31 18:57:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.47 2004/09/13 20:19:45 avenger_teambg Exp $
  *
  */
 
@@ -76,8 +76,8 @@ CREMemorizedSpell* CREImp::GetMemorizedSpell()
 {
 	CREMemorizedSpell* spl = new CREMemorizedSpell();
 
-	str->Read( &spl->SpellResRef, 8 );
-	str->Read( &spl->Flags, 4 );
+	str->ReadResRef( spl->SpellResRef );
+	str->ReadDword( &spl->Flags );
 
 	return spl;
 }
@@ -86,18 +86,17 @@ CREKnownSpell* CREImp::GetKnownSpell()
 {
 	CREKnownSpell* spl = new CREKnownSpell();
 
-	str->Read( &spl->SpellResRef, 8 );
-	str->Read( &spl->Level, 2 );
-	str->Read( &spl->Type, 2 );
+	str->ReadResRef( spl->SpellResRef );
+	str->ReadWord( &spl->Level );
+	str->ReadWord( &spl->Type );
 
 	return spl;
 }
 
 void CREImp::ReadScript(Actor *act, int ScriptLevel)
 {
-	char aScript[9];
-	str->Read( aScript, 8 );
-	aScript[8] = 0;
+	ieResRef aScript;
+	str->ReadResRef( aScript );
 	if (( stricmp( aScript, "NONE" ) == 0 ) || ( aScript[0] == '\0' )) {
 		act->Scripts[ScriptLevel] = NULL;
 		return;
@@ -112,12 +111,12 @@ CRESpellMemorization* CREImp::GetSpellMemorization()
 {
 	CRESpellMemorization* spl = new CRESpellMemorization();
 
-	str->Read( &spl->Level, 2 );
-	str->Read( &spl->Number, 2 );
-	str->Read( &spl->Number2, 2 );
-	str->Read( &spl->Type, 2 );
-	str->Read( &spl->MemorizedIndex, 4 );
-	str->Read( &spl->MemorizedCount, 4 );
+	str->ReadWord( &spl->Level );
+	str->ReadWord( &spl->Number );
+	str->ReadWord( &spl->Number2 );
+	str->ReadWord( &spl->Type );
+	str->ReadDword( &spl->MemorizedIndex );
+	str->ReadDword( &spl->MemorizedCount );
 
 	return spl;
 }
@@ -125,12 +124,12 @@ CRESpellMemorization* CREImp::GetSpellMemorization()
 CREItem* CREImp::GetItem()
 {
 	CREItem *itm = new CREItem();
-	str->Read( itm->ItemResRef, 8 );
-	str->Read( &itm->Unknown08, 2 );
-	str->Read( &itm->Usages[0], 2 );
-	str->Read( &itm->Usages[1], 2 );
-	str->Read( &itm->Usages[2], 2 );
-	str->Read( &itm->Flags, 4 );
+	str->ReadResRef( itm->ItemResRef );
+	str->ReadWord( &itm->Unknown08 );
+	str->ReadWord( &itm->Usages[0] );
+	str->ReadWord( &itm->Usages[1] );
+	str->ReadWord( &itm->Usages[2] );
+	str->ReadDword( &itm->Flags );
 
 	return itm;
 }
@@ -159,45 +158,37 @@ Actor* CREImp::GetActor()
 	Actor* act = new Actor();
 	act->InParty = 0;
 	ieDword strref;
-	str->Read( &strref, 4 );
+	str->ReadDword( &strref );
 	char* poi = core->GetString( strref );
 	act->SetText( poi, 0 );
 	free( poi );
-	str->Read( &strref, 4 );
+	str->ReadDword( &strref );
 	poi = core->GetString( strref );
 	act->SetText( poi, 1 );
 	free( poi );
 	act->BaseStats[IE_VISUALRANGE] = 30; //this is just a hack
-	str->Read( &act->BaseStats[IE_MC_FLAGS], 4 );
-	str->Read( &act->BaseStats[IE_XPVALUE], 4 );
-	str->Read( &act->BaseStats[IE_XP], 4 );
-	str->Read( &act->BaseStats[IE_GOLD], 4 );
-	str->Read( &act->BaseStats[IE_STATE_ID], 4 );
-	str->Read( &act->BaseStats[IE_HITPOINTS], 2 );
-	str->Read( &act->BaseStats[IE_MAXHITPOINTS], 2 );
-	str->Read( &act->BaseStats[IE_ANIMATION_ID], 4 );//animID is a dword 
-	str->Read( &act->BaseStats[IE_METAL_COLOR], 1 );
-	str->Read( &act->BaseStats[IE_MINOR_COLOR], 1 );
-	str->Read( &act->BaseStats[IE_MAJOR_COLOR], 1 );
-	str->Read( &act->BaseStats[IE_SKIN_COLOR], 1 );
-	str->Read( &act->BaseStats[IE_LEATHER_COLOR], 1 );
-	str->Read( &act->BaseStats[IE_ARMOR_COLOR], 1 );
-	str->Read( &act->BaseStats[IE_HAIR_COLOR], 1 );
-	
-        SetupColor(act->BaseStats[IE_METAL_COLOR]);
-        SetupColor(act->BaseStats[IE_MINOR_COLOR]);
-        SetupColor(act->BaseStats[IE_MAJOR_COLOR]);
-        SetupColor(act->BaseStats[IE_SKIN_COLOR]);
-        SetupColor(act->BaseStats[IE_LEATHER_COLOR]);
-        SetupColor(act->BaseStats[IE_ARMOR_COLOR]);
-        SetupColor(act->BaseStats[IE_HAIR_COLOR]);
+	str->ReadDword( &act->BaseStats[IE_MC_FLAGS] );
+	str->ReadDword( &act->BaseStats[IE_XPVALUE] );
+	str->ReadDword( &act->BaseStats[IE_XP] );
+	str->ReadDword( &act->BaseStats[IE_GOLD] );
+	str->ReadDword( &act->BaseStats[IE_STATE_ID] );
+	ieWord tmp;
+	str->ReadWord( &tmp );
+	act->BaseStats[IE_HITPOINTS]=tmp;
+	str->ReadWord( &tmp );
+	act->BaseStats[IE_MAXHITPOINTS]=tmp;
+	str->ReadDword( &act->BaseStats[IE_ANIMATION_ID] );//animID is a dword 
+	ieByte tmp2[7];
+	str->Read( tmp2, 7);
+	for(int i=0;i<7;i++) {
+		act->BaseStats[IE_METAL_COLOR+i]=tmp2[i];
+		SetupColor(act->BaseStats[IE_METAL_COLOR+i]);
+	}
 
 	ieByte TotSCEFF;
 	str->Read( &TotSCEFF, 1 );
-	str->Read( act->SmallPortrait, 8 );
-	act->SmallPortrait[8] = 0;
-	str->Read( act->LargePortrait, 8 );
-	act->LargePortrait[8] = 0;
+	str->ReadResRef( act->SmallPortrait );
+	str->ReadResRef( act->LargePortrait );
 
 	unsigned int Inventory_Size;
 
@@ -231,68 +222,125 @@ Actor* CREImp::GetActor()
 void CREImp::GetActorPST(Actor *act)
 {
 	int i;
+	ieByte tmpByte;
+	ieWord tmpWord;
 
-	str->Read( &act->BaseStats[IE_REPUTATION], 1 );
-	str->Read( &act->BaseStats[IE_HIDEINSHADOWS], 1 );
-	str->Read( &act->BaseStats[IE_ARMORCLASS], 2 );
-	str->Read( &act->Modified[IE_ARMORCLASS], 2 );
-	str->Read( &act->BaseStats[IE_ACCRUSHINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACMISSILEMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACPIERCINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACSLASHINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_THAC0], 1 );
-	str->Read( &act->BaseStats[IE_NUMBEROFATTACKS], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSDEATH], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSWANDS], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSPOLY], 1 );	
-	str->Read( &act->BaseStats[IE_SAVEVSBREATH], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSSPELL], 1 );
-	str->Read( &act->BaseStats[IE_RESISTFIRE], 1 );		
-	str->Read( &act->BaseStats[IE_RESISTCOLD], 1 );
-	str->Read( &act->BaseStats[IE_RESISTELECTRICITY], 1 );
-	str->Read( &act->BaseStats[IE_RESISTACID], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGIC], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGICFIRE], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGICCOLD], 1 );
-	str->Read( &act->BaseStats[IE_RESISTSLASHING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTCRUSHING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTPIERCING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMISSILE], 1 );
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_REPUTATION]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ARMORCLASS]=tmpWord;
+	str->ReadWord( &tmpWord );
+	//skipping a word
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACCRUSHINGMOD]=tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACMISSILEMOD]=tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACPIERCINGMOD]=tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACSLASHINGMOD]=tmpWord;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_THAC0]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSDEATH]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSWANDS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSPOLY]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSBREATH]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSSPELL]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTFIRE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTCOLD]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTELECTRICITY]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTACID]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGIC]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGICFIRE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGICCOLD]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTSLASHING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTCRUSHING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTPIERCING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMISSILE]=tmpByte;
 	//this is used for unused prof points count
-	str->Read( &act->BaseStats[IE_DETECTILLUSIONS], 1 );
-	str->Read( &act->BaseStats[IE_SETTRAPS], 1 ); //this is unused in pst
-	str->Read( &act->BaseStats[IE_LORE], 1 );
-	str->Read( &act->BaseStats[IE_LOCKPICKING], 1 );
-	str->Read( &act->BaseStats[IE_STEALTH], 1 );
-	str->Read( &act->BaseStats[IE_TRAPS], 1 );
-	str->Read( &act->BaseStats[IE_PICKPOCKET], 1 );
-	str->Read( &act->BaseStats[IE_FATIGUE], 1 );
-	str->Read( &act->BaseStats[IE_INTOXICATION], 1 );
-	str->Read( &act->BaseStats[IE_LUCK], 1 );
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_FREESLOTS]=tmpByte; //using another field than usually
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SETTRAPS]=tmpByte; //this is unused in pst
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LORE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LOCKPICKING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_STEALTH]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_TRAPS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_PICKPOCKET]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_FATIGUE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_INTOXICATION]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LUCK]=tmpByte;
 	for(i=0;i<21;i++) {
-		str->Read( &act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i], 1 );
+		str->Read( &tmpByte, 1 );
+		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
 	}
-	str->Read( &act->BaseStats[IE_TRACKING], 1 );
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	str->Read( &act->StrRefs[0], 100 * 4 );
-	str->Read( &act->BaseStats[IE_LEVEL], 1 );
-	str->Read( &act->BaseStats[IE_LEVEL2], 1 );
-	str->Read( &act->BaseStats[IE_LEVEL3], 1 );
-	int tmp=0;
-	str->Read( &tmp, 1 );
-	str->Read( &act->BaseStats[IE_STR], 1 );
-	str->Read( &act->BaseStats[IE_STREXTRA], 1 );
-	str->Read( &act->BaseStats[IE_INT], 1 );
-	str->Read( &act->BaseStats[IE_WIS], 1 );
-	str->Read( &act->BaseStats[IE_DEX], 1 );
-	str->Read( &act->BaseStats[IE_CON], 1 );
-	str->Read( &act->BaseStats[IE_CHR], 1 );
-	str->Read( &act->Modified[IE_MORALEBREAK], 1 );
-	str->Read( &act->BaseStats[IE_MORALEBREAK], 1 );
-	str->Read( &act->BaseStats[IE_HATEDRACE], 1 );
-	str->Read( &act->BaseStats[IE_MORALERECOVERYTIME], 1 );
-	str->Read( &tmp, 1 );
-	str->Read( &act->BaseStats[IE_KIT], 4 );
+	for(i=0;i<100;i++) {
+		str->ReadDword( &act->StrRefs[i] );
+	}
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LEVEL]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LEVEL2]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LEVEL3]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	//skipping a byte
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_STR]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_STREXTRA]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_INT]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_WIS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_DEX]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_CON]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_CHR]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	//skipping a byte
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_MORALEBREAK]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_HATEDRACE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	//skipping a byte
+	str->ReadDword( &act->BaseStats[IE_KIT] );
 	ReadScript(act, 0);
 	ReadScript(act, 2);
 	ReadScript(act, 3);
@@ -301,25 +349,24 @@ void CREImp::GetActorPST(Actor *act)
 
 	str->Seek( 52, GEM_CURRENT_POS );
 	for(i = 0; i<10; i++) {
-		str->Read(&tmp, 2 );
-		act->BaseStats[IE_INTERNAL_0+i]=(int) *(unsigned short *) &tmp;
+		str->ReadWord( &tmpWord );
+		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
-	str->Read(&tmp,4);
+	str->Seek( 4, GEM_CURRENT_POS );
 	char KillVar[32]; //use this as needed
 	str->Read(KillVar,32);
-	str->Read(&tmp,3); // dialog radius, feet circle size???
+	str->Seek( 3, GEM_CURRENT_POS ); // dialog radius, feet circle size???
 
 	ieByte ColorsCount;
 
 	str->Read( &ColorsCount, 1 );
 
-	str->Read( &act->AppearanceFlags1, 2 );
-	str->Read( &act->AppearanceFlags2, 2 );
+	str->ReadWord( &act->AppearanceFlags1 );
+	str->ReadWord( &act->AppearanceFlags2 );
 
 	for (i = 0; i < 7; i++) {
-		ieWord tmp;
-		str->Read( &tmp, 2 );
-		act->BaseStats[IE_COLORS+i] = tmp;
+		str->ReadWord( &tmpWord );
+		act->BaseStats[IE_COLORS+i] = tmpWord;
 	}
 	act->BaseStats[IE_COLORCOUNT] = ColorsCount; //hack
 
@@ -332,40 +379,48 @@ void CREImp::GetActorPST(Actor *act)
 		str->Read( &act->ColorPlacements[i], 1 );
 
 	for (i = 0; i < 5; i++) {
-		str->Read( &act->unknown2FC[i], 4 );
+		str->ReadDword( &act->unknown2FC[i] );
 	}
 	str->Read( &act->unknown310, 1 );
 */
-	str->Read( &act->BaseStats[IE_SPECIES], 1 ); // offset: 0x311
-	str->Read( &act->BaseStats[IE_TEAM], 1 );
-	str->Read( &act->BaseStats[IE_FACTION], 1 );
-	 
-	str->Read( &act->BaseStats[IE_EA], 1 );
-	str->Read( &act->BaseStats[IE_GENERAL], 1 );
-	str->Read( &act->BaseStats[IE_RACE], 1 );
-	str->Read( &act->BaseStats[IE_CLASS], 1 );
-	str->Read( &act->BaseStats[IE_SPECIFIC], 1 );
-	str->Read( &act->BaseStats[IE_SEX], 1 );
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SPECIES]=tmpByte; // offset: 0x311
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_TEAM]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_FACTION]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_EA]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_GENERAL]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RACE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_CLASS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SPECIFIC]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SEX]=tmpByte;
 	str->Seek( 5, GEM_CURRENT_POS );
-	str->Read( &act->BaseStats[IE_ALIGNMENT], 1 );
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
 	str->Read( act->scriptName, 32 );
 
-	str->Read( &act->KnownSpellsOffset, 4 );
-	str->Read( &act->KnownSpellsCount, 4 );
-	str->Read( &act->SpellMemorizationOffset, 4 );
-	str->Read( &act->SpellMemorizationCount, 4 );
-	str->Read( &act->MemorizedSpellsOffset, 4 );
-	str->Read( &act->MemorizedSpellsCount, 4 );
+	str->ReadDword( &act->KnownSpellsOffset );
+	str->ReadDword( &act->KnownSpellsCount );
+	str->ReadDword( &act->SpellMemorizationOffset );
+	str->ReadDword( &act->SpellMemorizationCount );
+	str->ReadDword( &act->MemorizedSpellsOffset );
+	str->ReadDword( &act->MemorizedSpellsCount );
 
-	str->Read( &act->ItemSlotsOffset, 4 );
-	str->Read( &act->ItemsOffset, 4 );
-	str->Read( &act->ItemsCount, 4 );
+	str->ReadDword( &act->ItemSlotsOffset );
+	str->ReadDword( &act->ItemsOffset );
+	str->ReadDword( &act->ItemsCount );
 
 	str->Seek( 8, GEM_CURRENT_POS );
 
-	str->Read( act->Dialog, 8 );
-	act->BaseStats[IE_ARMOR_TYPE] = 0;
+	str->ReadResRef( act->Dialog );
 }
 
 void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
@@ -414,7 +469,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	// 1000 - fist
 	// weird values - quiver
 	ieDword Equipped;
-	str->Read(&Equipped, 4);
+	str->ReadDword( &Equipped );
 
 	// Reading spellbook
 
@@ -482,152 +537,259 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 void CREImp::GetActorBG(Actor *act)
 {
-	str->Read( &act->BaseStats[IE_REPUTATION], 1 );
-	str->Read( &act->BaseStats[IE_HIDEINSHADOWS], 1 );
-	str->Read( &act->BaseStats[IE_ARMORCLASS], 2 );
-	str->Read( &act->Modified[IE_ARMORCLASS], 2 );
-	str->Read( &act->BaseStats[IE_ACCRUSHINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACMISSILEMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACPIERCINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACSLASHINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_THAC0], 1 );	
-	str->Read( &act->BaseStats[IE_NUMBEROFATTACKS], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSDEATH], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSWANDS], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSPOLY], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSBREATH], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSSPELL], 1 );
-	str->Read( &act->BaseStats[IE_RESISTFIRE], 1 );		
-	str->Read( &act->BaseStats[IE_RESISTCOLD], 1 );
-	str->Read( &act->BaseStats[IE_RESISTELECTRICITY], 1 );
-	str->Read( &act->BaseStats[IE_RESISTACID], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGIC], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGICFIRE], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGICCOLD], 1 );
-	str->Read( &act->BaseStats[IE_RESISTSLASHING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTCRUSHING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTPIERCING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMISSILE], 1 );
-	str->Read( &act->BaseStats[IE_DETECTILLUSIONS], 1 );
-	str->Read( &act->BaseStats[IE_SETTRAPS], 1 );
-	str->Read( &act->BaseStats[IE_LORE], 1 );
-	str->Read( &act->BaseStats[IE_LOCKPICKING], 1 );
-	str->Read( &act->BaseStats[IE_STEALTH], 1 );
-	str->Read( &act->BaseStats[IE_TRAPS], 1 );
-	str->Read( &act->BaseStats[IE_PICKPOCKET], 1 );
-	str->Read( &act->BaseStats[IE_FATIGUE], 1 );
-	str->Read( &act->BaseStats[IE_INTOXICATION], 1 );
-	str->Read( &act->BaseStats[IE_LUCK], 1 );
-	for(int i=0;i<21;i++) {
-		str->Read( &act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i], 1 );
+	int i;
+	ieByte tmpByte;
+	ieWord tmpWord;
+
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_REPUTATION]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ARMORCLASS]=tmpWord;
+	str->ReadWord( &tmpWord );
+	//skipping a word
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACCRUSHINGMOD]=tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACMISSILEMOD]=tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACPIERCINGMOD]=tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACSLASHINGMOD]=tmpWord;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_THAC0]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSDEATH]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSWANDS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSPOLY]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSBREATH]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSSPELL]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTFIRE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTCOLD]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTELECTRICITY]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTACID]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGIC]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGICFIRE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGICCOLD]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTSLASHING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTCRUSHING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTPIERCING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMISSILE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_DETECTILLUSIONS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SETTRAPS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LORE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LOCKPICKING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_STEALTH]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_TRAPS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_PICKPOCKET]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_FATIGUE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_INTOXICATION]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LUCK]=tmpByte;
+	for(i=0;i<21;i++) {
+		str->Read( &tmpByte, 1 );
+		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
 	}
 
-	str->Read( &act->BaseStats[IE_TRACKING], 1 );
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	str->Read( &act->StrRefs[0], 100 * 4 );
-	str->Read( &act->BaseStats[IE_LEVEL], 1 );
-	str->Read( &act->BaseStats[IE_LEVEL2], 1 );
-	str->Read( &act->BaseStats[IE_LEVEL3], 1 );
-	int tmp;
-	str->Read( &tmp, 1);
-	str->Read( &act->BaseStats[IE_STR], 1 );
-	str->Read( &act->BaseStats[IE_STREXTRA], 1 );
-	str->Read( &act->BaseStats[IE_INT], 1 );
-	str->Read( &act->BaseStats[IE_WIS], 1 );
-	str->Read( &act->BaseStats[IE_DEX], 1 );
-	str->Read( &act->BaseStats[IE_CON], 1 );
-	str->Read( &act->BaseStats[IE_CHR], 1 );
-	str->Read( &act->Modified[IE_MORALEBREAK], 1 );
-	str->Read( &act->BaseStats[IE_MORALEBREAK], 1 );
-	str->Read( &act->BaseStats[IE_HATEDRACE], 1 );
-	str->Read( &act->BaseStats[IE_MORALERECOVERYTIME], 1 );
-	str->Read( &tmp, 1);
-	str->Read( &act->BaseStats[IE_KIT], 4 );
+	for(i=0;i<100;i++) {
+		str->ReadDword( &act->StrRefs[i] );
+	}
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LEVEL]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LEVEL2]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LEVEL3]=tmpByte;
+	str->Read( &tmpByte, 1);
+	//skipping a byte
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_STR]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_STREXTRA]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_INT]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_WIS]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_DEX]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_CON]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_CHR]=tmpByte;
+	str->Read( &tmpByte, 1);
+	//skipping a byte
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_MORALEBREAK]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_HATEDRACE]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
+	str->Read( &tmpByte, 1);
+	//skipping a byte
+	str->ReadDword( &act->BaseStats[IE_KIT] );
 	ReadScript(act, 0);
 	ReadScript(act, 2);
 	ReadScript(act, 3);
 	ReadScript(act, 4);
 	ReadScript(act, 5);
 	 
-	str->Read( &act->BaseStats[IE_EA], 1 );
-	str->Read( &act->BaseStats[IE_GENERAL], 1 );
-	str->Read( &act->BaseStats[IE_RACE], 1 );
-	str->Read( &act->BaseStats[IE_CLASS], 1 );
-	str->Read( &act->BaseStats[IE_SPECIFIC], 1 );
-	str->Read( &act->BaseStats[IE_SEX], 1 );
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_EA]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_GENERAL]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_RACE]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_CLASS]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_SPECIFIC]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_SEX]=tmpByte;
 	str->Seek( 5, GEM_CURRENT_POS );
-	str->Read( &act->BaseStats[IE_ALIGNMENT], 1 );
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
 	str->Read( act->scriptName, 32 );
 
-	str->Read( &act->KnownSpellsOffset, 4 );
-	str->Read( &act->KnownSpellsCount, 4 );
-	str->Read( &act->SpellMemorizationOffset, 4 );
-	str->Read( &act->SpellMemorizationCount, 4 );
-	str->Read( &act->MemorizedSpellsOffset, 4 );
-	str->Read( &act->MemorizedSpellsCount, 4 );
+	str->ReadDword( &act->KnownSpellsOffset );
+	str->ReadDword( &act->KnownSpellsCount );
+	str->ReadDword( &act->SpellMemorizationOffset );
+	str->ReadDword( &act->SpellMemorizationCount );
+	str->ReadDword( &act->MemorizedSpellsOffset );
+	str->ReadDword( &act->MemorizedSpellsCount );
 	 
-	str->Read( &act->ItemSlotsOffset, 4 );
-	str->Read( &act->ItemsOffset, 4 );
-	str->Read( &act->ItemsCount, 4 );
+	str->ReadDword( &act->ItemSlotsOffset );
+	str->ReadDword( &act->ItemsOffset );
+	str->ReadDword( &act->ItemsCount );
 
 	str->Seek( 8, GEM_CURRENT_POS );
 
-	str->Read( act->Dialog, 8 );
-	act->BaseStats[IE_ARMOR_TYPE] = 0;
+	str->ReadResRef( act->Dialog );
 }
 
 void CREImp::GetActorIWD2(Actor *act)
 {
-	str->Read( &act->BaseStats[IE_REPUTATION], 1 );
-	str->Read( &act->BaseStats[IE_HIDEINSHADOWS], 1 );
-	str->Read( &act->BaseStats[IE_ARMORCLASS], 2 );
-	str->Read( &act->BaseStats[IE_ACCRUSHINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACMISSILEMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACPIERCINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACSLASHINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_THAC0], 1 );//Unknown in CRE V2.2
-	str->Read( &act->BaseStats[IE_NUMBEROFATTACKS], 1 );//Unknown in CRE V2.2
-	str->Read( &act->BaseStats[IE_SAVEVSDEATH], 1 );//Fortitude Save in V2.2
-	str->Read( &act->BaseStats[IE_SAVEVSWANDS], 1 );//Reflex Save in V2.2
-	str->Read( &act->BaseStats[IE_SAVEVSPOLY], 1 );//Will Save in V2.2
-	str->Read( &act->BaseStats[IE_RESISTFIRE], 1 );		
-	str->Read( &act->BaseStats[IE_RESISTCOLD], 1 );
-	str->Read( &act->BaseStats[IE_RESISTELECTRICITY], 1 );
-	str->Read( &act->BaseStats[IE_RESISTACID], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGIC], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGICFIRE], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGICCOLD], 1 );
-	str->Read( &act->BaseStats[IE_RESISTSLASHING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTCRUSHING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTPIERCING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMISSILE], 1 );
-	str->Read( &act->BaseStats[IE_MAGICDAMAGERESISTANCE], 1 ); 
+	int i;
+	ieByte tmpByte;
+	ieWord tmpWord;
+
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_REPUTATION]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ARMORCLASS]=tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACCRUSHINGMOD]=tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACMISSILEMOD]=tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACPIERCINGMOD]=tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACSLASHINGMOD]=tmpWord;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_THAC0]=tmpByte;//Unknown in CRE V2.2
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;//Unknown in CRE V2.2
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSDEATH]=tmpByte;//Fortitude Save in V2.2
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSWANDS]=tmpByte;//Reflex Save in V2.2
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSPOLY]=tmpByte;// will Save in V2.2
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTFIRE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTCOLD]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTELECTRICITY]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTACID]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGIC]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGICFIRE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGICCOLD]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTSLASHING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTCRUSHING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTPIERCING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMISSILE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_MAGICDAMAGERESISTANCE]=tmpByte;
 	str->Seek( 6, GEM_CURRENT_POS );
-	str->Read( &act->BaseStats[IE_LUCK], 1 );
-	str->Seek( 34, GEM_CURRENT_POS );
-	str->Seek( 34, GEM_CURRENT_POS ); //levels
-	str->Read( &act->StrRefs[0], 64 * 4 );
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LUCK]=tmpByte;
+	str->Seek( 34, GEM_CURRENT_POS ); //unknowns
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LEVEL]=tmpByte; //total levels
+	str->Seek( 33, GEM_CURRENT_POS ); //levels for classes
+	for(i=0;i<64;i++) {
+		str->ReadDword( &act->StrRefs[i] );
+	}
 	ReadScript( act, 1);
-	ReadScript( act, 2);
+	ReadScript( act, 6);
 	str->Seek( 159, GEM_CURRENT_POS );
-	str->Read( &act->BaseStats[IE_HATEDRACE], 1);
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_HATEDRACE]=tmpByte;
 	str->Seek( 7, GEM_CURRENT_POS ); //actually we got 7 more hated races
-	str->Read( &act->BaseStats[IE_SUBRACE], 1 );
-	int tmp;
-	str->Read( &tmp, 2);
-	str->Read( &act->BaseStats[IE_STR], 1 );
-	str->Read( &act->BaseStats[IE_INT], 1 );
-	str->Read( &act->BaseStats[IE_WIS], 1 );
-	str->Read( &act->BaseStats[IE_DEX], 1 );
-	str->Read( &act->BaseStats[IE_CON], 1 );
-	str->Read( &act->BaseStats[IE_CHR], 1 );
-	str->Read( &act->Modified[IE_MORALEBREAK], 1 );
-	str->Read( &act->BaseStats[IE_MORALEBREAK], 1 );
-	//str->Read( &act->BaseStats[IE_HATEDRACE], 1 );
-	str->Read( &tmp, 1);
-	str->Read( &act->BaseStats[IE_MORALERECOVERYTIME], 1 );
-	str->Read( &act->BaseStats[IE_KIT], 4 );
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SUBRACE]=tmpByte;
+	str->ReadWord( &tmpWord );
+	//skipping 2 bytes
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_STR]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_INT]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_WIS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_DEX]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_CON]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_CHR]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_MORALEBREAK]=tmpByte;
+	str->ReadWord( &tmpWord );
+	//Skipping 2 bytes
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
+	str->ReadDword( &act->BaseStats[IE_KIT] );
 	ReadScript(act, 0);
 	ReadScript(act, 2);
 	ReadScript(act, 3);
@@ -635,14 +797,21 @@ void CREImp::GetActorIWD2(Actor *act)
 	ReadScript(act, 5);
 
 	str->Seek( 232, GEM_CURRENT_POS );
-	str->Read( &act->BaseStats[IE_EA], 1 );
-	str->Read( &act->BaseStats[IE_GENERAL], 1 );
-	str->Read( &act->BaseStats[IE_RACE], 1 );
-	str->Read( &act->BaseStats[IE_CLASS], 1 );
-	str->Read( &act->BaseStats[IE_SPECIFIC], 1 );
-	str->Read( &act->BaseStats[IE_SEX], 1 );
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_EA]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_GENERAL]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_RACE]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_CLASS]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_SPECIFIC]=tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_SEX]=tmpByte;
 	str->Seek( 5, GEM_CURRENT_POS );
-	str->Read( &act->BaseStats[IE_ALIGNMENT], 1 );
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
 	str->Read( act->scriptName, 32 );
 
@@ -655,79 +824,137 @@ void CREImp::GetActorIWD2(Actor *act)
 	//skipping spellbook offsets
 	str->Seek( 606, GEM_CURRENT_POS);
 
-	str->Read( &act->ItemSlotsOffset, 4 );
-	str->Read( &act->ItemsOffset, 4 );
-	str->Read( &act->ItemsCount, 4 );
+	str->ReadDword( &act->ItemSlotsOffset );
+	str->ReadDword( &act->ItemsOffset );
+	str->ReadDword( &act->ItemsCount );
 
 	str->Seek( 8, GEM_CURRENT_POS );
 
-	str->Read( act->Dialog, 8 );
-	act->BaseStats[IE_ARMOR_TYPE] = 0;
+	str->ReadResRef( act->Dialog );
 }
 
 void CREImp::GetActorIWD1(Actor *act) //9.0
 {
-	str->Read( &act->BaseStats[IE_REPUTATION], 1 );
-	str->Read( &act->BaseStats[IE_HIDEINSHADOWS], 1 );
-	str->Read( &act->BaseStats[IE_ARMORCLASS], 2 );
-	str->Read( &act->Modified[IE_ARMORCLASS], 2 );
-	str->Read( &act->BaseStats[IE_ACCRUSHINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACMISSILEMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACPIERCINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_ACSLASHINGMOD], 2 );
-	str->Read( &act->BaseStats[IE_THAC0], 1 );
-	str->Read( &act->BaseStats[IE_NUMBEROFATTACKS], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSDEATH], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSWANDS], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSPOLY], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSBREATH], 1 );
-	str->Read( &act->BaseStats[IE_SAVEVSSPELL], 1 );
-	str->Read( &act->BaseStats[IE_RESISTFIRE], 1 );		
-	str->Read( &act->BaseStats[IE_RESISTCOLD], 1 );
-	str->Read( &act->BaseStats[IE_RESISTELECTRICITY], 1 );
-	str->Read( &act->BaseStats[IE_RESISTACID], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGIC], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGICFIRE], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMAGICCOLD], 1 );
-	str->Read( &act->BaseStats[IE_RESISTSLASHING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTCRUSHING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTPIERCING], 1 );
-	str->Read( &act->BaseStats[IE_RESISTMISSILE], 1 );
-	str->Read( &act->BaseStats[IE_DETECTILLUSIONS], 1 );
-	str->Read( &act->BaseStats[IE_SETTRAPS], 1 );
-	str->Read( &act->BaseStats[IE_LORE], 1 );
-	str->Read( &act->BaseStats[IE_LOCKPICKING], 1 );
-	str->Read( &act->BaseStats[IE_STEALTH], 1 );
-	str->Read( &act->BaseStats[IE_TRAPS], 1 );
-	str->Read( &act->BaseStats[IE_PICKPOCKET], 1 );
-	str->Read( &act->BaseStats[IE_FATIGUE], 1 );
-	str->Read( &act->BaseStats[IE_INTOXICATION], 1 );
-	str->Read( &act->BaseStats[IE_LUCK], 1 );
-	for(int i=0;i<21;i++) {
-		str->Read( &act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i], 1 );
+	int i;
+	ieByte tmpByte;
+	ieWord tmpWord;
+
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_REPUTATION]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
+	str->ReadWord( &tmpWord ); 
+	act->BaseStats[IE_ARMORCLASS]=tmpWord;
+	str->ReadWord( &tmpWord ); 
+	//skipping a word
+	str->ReadWord( &tmpWord ); 
+	act->BaseStats[IE_ACCRUSHINGMOD]=tmpWord;
+	str->ReadWord( &tmpWord ); 
+	act->BaseStats[IE_ACMISSILEMOD]=tmpWord;
+	str->ReadWord( &tmpWord ); 
+	act->BaseStats[IE_ACPIERCINGMOD]=tmpWord;
+	str->ReadWord( &tmpWord ); 
+	act->BaseStats[IE_ACSLASHINGMOD]=tmpWord;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_THAC0]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_SAVEVSDEATH]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_SAVEVSWANDS]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_SAVEVSPOLY]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_SAVEVSBREATH]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_SAVEVSSPELL]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_RESISTFIRE]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_RESISTCOLD]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_RESISTELECTRICITY]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_RESISTACID]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_RESISTMAGIC]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_RESISTMAGICFIRE]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_RESISTMAGICCOLD]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_RESISTSLASHING]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_RESISTCRUSHING]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_RESISTPIERCING]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_RESISTMISSILE]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_DETECTILLUSIONS]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_SETTRAPS]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_LORE]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_LOCKPICKING]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_STEALTH]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_TRAPS]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_PICKPOCKET]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_FATIGUE]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_INTOXICATION]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_LUCK]=tmpByte;
+	for(i=0;i<21;i++) {
+		str->Read( &tmpByte, 1 ); 
+		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
 	}
-	str->Read( &act->BaseStats[IE_TRACKING], 1 );
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	str->Read( &act->StrRefs[0], 100 * 4 );
-	str->Read( &act->BaseStats[IE_LEVEL], 1 );
-	str->Read( &act->BaseStats[IE_LEVEL2], 1 );
-	str->Read( &act->BaseStats[IE_LEVEL3], 1 );
-	int tmp=0;
+	for(i=0;i<100;i++) {
+		str->ReadDword( &act->StrRefs[i] );
+	}
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_LEVEL]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_LEVEL2]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_LEVEL3]=tmpByte;
 	//this is rumoured to be IE_SEX, but we use the gender field for this
-	str->Read( &tmp, 1 ); 
-	str->Read( &act->BaseStats[IE_STR], 1 );
-	str->Read( &act->BaseStats[IE_STREXTRA], 1 );
-	str->Read( &act->BaseStats[IE_INT], 1 );
-	str->Read( &act->BaseStats[IE_WIS], 1 );
-	str->Read( &act->BaseStats[IE_DEX], 1 );
-	str->Read( &act->BaseStats[IE_CON], 1 );
-	str->Read( &act->BaseStats[IE_CHR], 1 );
-	str->Read( &act->Modified[IE_MORALEBREAK], 1 );
-	str->Read( &act->BaseStats[IE_MORALEBREAK], 1 );
-	str->Read( &act->BaseStats[IE_HATEDRACE], 1 );
-	str->Read( &act->BaseStats[IE_MORALERECOVERYTIME], 1 );
-	str->Read( &tmp, 1 );
-	str->Read( &act->BaseStats[IE_KIT], 4 );
+	str->Read( &tmpByte, 1 ); 
+	//skipping a byte
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_STR]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_STREXTRA]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_INT]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_WIS]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_DEX]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_CON]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_CHR]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	//skipping a byte
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_MORALEBREAK]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_HATEDRACE]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	//skipping a byte
+	str->ReadDword( &act->BaseStats[IE_KIT] );
 	ReadScript(act, 0);
 	ReadScript(act, 2);
 	ReadScript(act, 3);
@@ -747,19 +974,18 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->Seek( 4, GEM_CURRENT_POS );
 	str->Read( act->scriptName, 32 );
 
-	str->Read( &act->KnownSpellsOffset, 4 );
-	str->Read( &act->KnownSpellsCount, 4 );
-	str->Read( &act->SpellMemorizationOffset, 4 );
-	str->Read( &act->SpellMemorizationCount, 4 );
-	str->Read( &act->MemorizedSpellsOffset, 4 );
-	str->Read( &act->MemorizedSpellsCount, 4 );
+	str->ReadDword( &act->KnownSpellsOffset );
+	str->ReadDword( &act->KnownSpellsCount );
+	str->ReadDword( &act->SpellMemorizationOffset );
+	str->ReadDword( &act->SpellMemorizationCount );
+	str->ReadDword( &act->MemorizedSpellsOffset );
+	str->ReadDword( &act->MemorizedSpellsCount );
 
-	str->Read( &act->ItemSlotsOffset, 4 );
-	str->Read( &act->ItemsOffset, 4 );
-	str->Read( &act->ItemsCount, 4 );
+	str->ReadDword( &act->ItemSlotsOffset );
+	str->ReadDword( &act->ItemsOffset );
+	str->ReadDword( &act->ItemsCount );
 
 	str->Seek( 8, GEM_CURRENT_POS );
 
-	str->Read( act->Dialog, 8 );
-	act->BaseStats[IE_ARMOR_TYPE] = 0;
+	str->ReadResRef( act->Dialog );
 }

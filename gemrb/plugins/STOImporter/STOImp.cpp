@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.5 2004/09/12 16:01:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.6 2004/09/13 20:19:46 avenger_teambg Exp $
  *
  */
 
@@ -83,10 +83,10 @@ Store* STOImp::GetStore()
 	str->ReadDword( &s->ItemsCount );
 	str->ReadDword( &s->Lore );
 	str->ReadDword( &s->IDPrice );
-	str->Read( s->RumoursTavern, 8 );
+	str->ReadResRef( s->RumoursTavern );
 	str->ReadDword( &s->DrinksOffset );
 	str->ReadDword( &s->DrinksCount );
-	str->Read( s->RumoursTemple, 8 );
+	str->ReadResRef( s->RumoursTemple );
 	str->ReadDword( &s->AvailableRooms );
 	for (i = 0; i < 4; i++) {
 		str->ReadDword( &s->RoomPrices[i] );
@@ -128,7 +128,7 @@ STOItem* STOImp::GetItem()
 {
 	STOItem* it = new STOItem();
 
-	str->Read( it->ItemResRef, 8 );
+	str->ReadResRef( it->ItemResRef );
 	str->ReadWord( &it->unknown );
 	str->ReadWord( &it->Usage1 );
 	str->ReadWord( &it->Usage2 );
@@ -149,7 +149,7 @@ STODrink* STOImp::GetDrink()
 {
 	STODrink* dr = new STODrink();
 
-	str->Read( dr->RumourResRef, 8 );
+	str->ReadResRef( dr->RumourResRef );
 	str->ReadDword( &dr->DrinkName );
 	str->ReadDword( &dr->Price );
 	str->ReadDword( &dr->AlcoholicStrength );
@@ -161,7 +161,7 @@ STOCure* STOImp::GetCure()
 {
 	STOCure* cu = new STOCure();
 
-	str->Read( cu->CureResRef, 8 );
+	str->ReadResRef( cu->CureResRef );
 	str->ReadDword( &cu->Price );
 
 	return cu;

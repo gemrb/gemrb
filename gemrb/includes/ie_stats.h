@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.22 2004/09/11 19:32:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.23 2004/09/13 20:19:48 avenger_teambg Exp $
  *
  */
 
@@ -232,6 +232,7 @@
 #define IE_EXTRAPROFICIENCY18 		 132
 #define IE_EXTRAPROFICIENCY19 		 133
 #define IE_EXTRAPROFICIENCY20 		 134
+#define IE_FREESLOTS	 		 134 //same as above
 #define IE_HIDEINSHADOWS			  135
 #define IE_DETECTILLUSIONS  		  136
 #define IE_SETTRAPS 				  137

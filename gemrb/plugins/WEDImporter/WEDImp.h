@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.10 2004/09/12 21:58:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.11 2004/09/13 20:19:47 avenger_teambg Exp $
  *
  */
 
@@ -27,7 +27,7 @@
 typedef struct Overlay {
 	ieWord  Width;
 	ieWord  Height;
-	char TilesetResRef[8];
+	ieResRef TilesetResRef;
 	ieDword unknown;
 	ieDword TilemapOffset;
 	ieDword TILOffset;

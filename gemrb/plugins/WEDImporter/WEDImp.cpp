@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.14 2004/09/13 16:53:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.15 2004/09/13 20:19:47 avenger_teambg Exp $
  *
  */
 
@@ -64,7 +64,7 @@ bool WEDImp::Open(DataStream* stream, bool autoFree)
 		Overlay o;
 		str->ReadWord( &o.Width );
 		str->ReadWord( &o.Height );
-		str->Read( o.TilesetResRef, 8 );
+		str->ReadResRef( o.TilesetResRef );
 		str->ReadDword( &o.unknown );
 		str->ReadDword( &o.TilemapOffset );
 		str->ReadDword( &o.TILOffset );
@@ -86,8 +86,7 @@ TileMap* WEDImp::GetTileMap()
 	//TODO: Implement Multi Overlay
 	TileOverlay* over = new TileOverlay( overlays[0].Width,
 								overlays[0].Height );
-	DataStream* tisfile = core->GetResourceMgr()->GetResource( overlays[0].TilesetResRef,
-													IE_TIS_CLASS_ID );
+	DataStream* tisfile = core->GetResourceMgr()->GetResource( overlays[0].TilesetResRef, IE_TIS_CLASS_ID );
 	if (!core->IsAvailable( IE_TIS_CLASS_ID )) {
 		printf( "[WEDImporter]: No TileSet Importer Available.\n" );
 		return NULL;
@@ -135,9 +134,8 @@ TileMap* WEDImp::GetTileMap()
 		ieWord DoorClosed, DoorTileStart, DoorTileCount, *DoorTiles;
 		ieWord OpenPolyCount, ClosedPolyCount;
 		ieDword OpenPolyOffset, ClosedPolyOffset;
-		char Name[9];
-		str->Read(Name, 8);
-		Name[8] = 0;
+		ieResRef Name;
+		str->ReadResRef( Name );
 		str->ReadWord( &DoorClosed );
 		str->ReadWord( &DoorTileStart );
 		str->ReadWord( &DoorTileCount );
@@ -212,12 +210,12 @@ ieWord* WEDImp::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	ieWord DoorClosed, DoorTileStart, DoorTileCount, * DoorTiles;
 	ieWord OpenPolyCount, ClosedPolyCount;
 	ieDword OpenPolyOffset, ClosedPolyOffset;
-	char Name[9];
+	ieResRef Name;
 	unsigned int i;
+
 	for (i = 0; i < DoorsCount; i++) {
 		str->Seek( DoorsOffset + ( i * 0x1A ), GEM_STREAM_START );
-		str->Read( Name, 8 );
-		Name[8] = 0;
+		str->ReadResRef( Name );
 		if (strnicmp( Name, ResRef, 8 ) == 0)
 			break;
 	}

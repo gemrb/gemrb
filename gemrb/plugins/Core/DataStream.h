@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.11 2004/09/12 15:52:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.12 2004/09/13 20:19:46 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,7 @@ public:
 	virtual int Read(void* dest, unsigned int len) = 0;
 	int ReadWord(ieWord* dest);
 	int ReadDword(ieDword* dest);
+	int ReadResRef(ieResRef dest);
 	virtual int Seek(int pos, int startpos) = 0;
 	virtual unsigned long Size() = 0;
 	unsigned long Remains();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.34 2004/09/13 16:53:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.35 2004/09/13 20:19:47 avenger_teambg Exp $
  *
  */
 
@@ -284,11 +284,10 @@ char* TLKImp::GetString(ieStrRef strref, unsigned long flags)
 	ieDword Volume, Pitch, StrOffset;
 	ieDword l;
 	ieWord type;
-	char SoundResRef[9];
+	ieResRef SoundResRef;
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
 	str->ReadWord( &type );
-	str->Read( SoundResRef, 8 );
-	SoundResRef[8] = 0;
+	str->ReadResRef( SoundResRef );
 	str->ReadDword( &Volume );
 	str->ReadDword( &Pitch );
 	str->ReadDword( &StrOffset );
@@ -357,7 +356,6 @@ StringBlock TLKImp::GetStringBlock(ieStrRef strref, unsigned long flags)
 	ieWord type;
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
 	str->ReadWord( &type );
-	str->Read( sb.Sound, 8 );
-	sb.Sound[8] = 0;
+	str->ReadResRef( sb.Sound );
 	return sb;
 }
