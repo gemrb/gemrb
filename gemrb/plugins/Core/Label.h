@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.h,v 1.13 2004/11/18 23:32:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.h,v 1.14 2004/11/20 10:39:58 avenger_teambg Exp $
  *
  */
 
@@ -57,6 +57,8 @@ public:
 	void SetColor(Color col, Color bac);
 	/** Sets the Alignment of Text */
 	void SetAlignment(unsigned char Alignment);
+	/** Simply returns the pointer to the text, don't modify it! */
+	const char* QueryText();
 
 	/** Mouse Button Down */
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,

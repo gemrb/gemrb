@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.28 2004/11/18 23:32:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.29 2004/11/20 10:39:58 avenger_teambg Exp $
  *
  */
 
@@ -122,4 +122,10 @@ bool Label::SetEvent(int eventType, EventHandler handler)
 	}
 
 	return true;
+}
+
+/** Simply returns the pointer to the text, don't modify it! */
+const char* Label::QueryText()
+{
+        return ( const char * ) Buffer;
 }

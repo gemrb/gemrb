@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.46 2004/11/19 23:09:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.47 2004/11/20 10:39:59 avenger_teambg Exp $
  *
  */
 
@@ -193,7 +193,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 		FileStream * fs = new FileStream(); \
 		if(!fs) return NULL; \
 		fs->Open(p, true); \
-		printf(foundMessage); \
+		printBracket(foundMessage, LIGHT_GREEN); printf("\n"); \
 		return fs; \
 	} \
 }
@@ -211,13 +211,13 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 	strcat( path, SPathDelimiter );
 	strcat( path, core->GameType );
 	SearchIn( core->CachePath, "", resname, type,
-		"[Found in Cache]\n" );
+		"Found in Cache\n" );
 	SearchIn( core->GemRBPath, path, resname, type,
-		"[Found in GemRB Override]\n" );
+		"Found in GemRB Override\n" );
 	SearchIn( core->GamePath, core->GameOverride, resname, type,
-		"[Found in Override]\n" );
+		"Found in Override\n" );
 	SearchIn( core->GamePath, core->GameData, resname, type,
-		"[Found in Local Folder]\n" );
+		"Found in Data\n" );
 	unsigned long ResLocator;
 	if (resources.Lookup( resname, type, ResLocator )) {
 		if (!core->IsAvailable( IE_BIF_CLASS_ID )) {

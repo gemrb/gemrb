@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.244 2004/11/19 23:09:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.245 2004/11/20 10:39:59 avenger_teambg Exp $
  *
  */
 
@@ -830,6 +830,8 @@ static PyObject* GemRB_QueryText(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	switch(ctrl->ControlType) {
+	case IE_GUI_LABEL:
+		return Py_BuildValue( "s",((Label *) ctrl)->QueryText() );
 	case IE_GUI_EDIT:
 		return Py_BuildValue( "s",((TextEdit *) ctrl)->QueryText() );
 	case IE_GUI_TEXTAREA:

@@ -1,7 +1,7 @@
 
 Prototype: QueryText(WindowIndex, ControlIndex)
 
-Description: Returns the Text of a TextEdit/TextArea control. In case of a TextArea, it will return the selected row, not the entire textarea.
+Description: Returns the Text of a TextEdit/TextArea/Label control. In case of a TextArea, it will return the selected row, not the entire textarea.
 
 Parameters: WindowIndex, ControlIndex  - the control's reference
 

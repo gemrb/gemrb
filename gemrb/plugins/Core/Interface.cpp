@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.240 2004/11/19 23:09:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.241 2004/11/20 10:39:58 avenger_teambg Exp $
  *
  */
 
@@ -2468,7 +2468,6 @@ bool Interface::ReadItemTable(ieResRef TableName, const char * Prefix)
 		}
 		ItemName[8]=0;
 		strupr(ItemName);
-		printf("Adding random item: %s\n",ItemName);
 		RtRows->SetAt(ItemName, (const char *) itemlist);
 	}
 end:
