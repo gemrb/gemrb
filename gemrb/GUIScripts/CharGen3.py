@@ -80,7 +80,7 @@ def OnLoad():
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 1051)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1048,-1) # new line
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,GemRB.GetVar("Race")-1,0))
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,GemRB.GetVar("Race")-1,2))
 
         GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
         GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")

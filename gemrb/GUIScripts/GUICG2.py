@@ -5,11 +5,15 @@ CharGenWindow = 0
 ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
+ClassTable = 0
 
 def OnLoad():
 	global CharGenWindow, ClassWindow, TextAreaControl, DoneButton
+	global ClassTable
 	
 	GemRB.LoadWindowPack("GUICG")
+	ClassTable = GemRB.LoadTable("classes")
+	ClassCount = GemRB.GetTableRowCount(ClassTable)-1
 	CharGenWindow = GemRB.LoadWindow(0)
 	ClassWindow = GemRB.LoadWindow(2)
 
@@ -17,8 +21,22 @@ def OnLoad():
         	Button = GemRB.GetControl(CharGenWindow,i)
         	GemRB.SetButtonState(CharGenWindow,Button,IE_GUI_BUTTON_DISABLED)
 
-	for i in range(2,10):
-		Button = GemRB.GetControl(ClassWindow,i)
+	j=0
+	for i in range(1,ClassCount):
+		if GemRB.GetTableValue(ClassTable,i-1,3)==0:
+			continue
+		if j>7:
+			r=j+7
+		else:
+			r=j+2
+
+		Button = GemRB.GetControl(ClassWindow,r)
+		t = GemRB.GetTableValue(ClassTable, i-1, 0)
+		print "Control:",r,"Text:",t
+		GemRB.SetText(ClassWindow, r, t )
+		GemRB.SetEvent(ClassWindow, r, IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
+		GemRB.SetVarAssoc(ClassWindow, r, "Class", i)
+		j=j+1
 
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
         GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -39,12 +57,12 @@ def OnLoad():
         GemRB.SetText(CharGenWindow, BiographyButton, 18003)
         GemRB.SetButtonState(CharGenWindow,BiographyButton,IE_GUI_BUTTON_DISABLED)
 
-	BackButton = GemRB.GetControl(ClassWindow,6)
+	BackButton = GemRB.GetControl(ClassWindow,13)
 	GemRB.SetText(ClassWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(ClassWindow,0)
 	GemRB.SetText(ClassWindow,DoneButton,11973)
 
-	TextAreaControl = GemRB.GetControl(ClassWindow, 5)
+	TextAreaControl = GemRB.GetControl(ClassWindow, 11)
 	GemRB.SetText(ClassWindow,TextAreaControl,17236)
 
 	MaleButton = GemRB.GetControl(ClassWindow,2)
@@ -61,6 +79,12 @@ def OnLoad():
 	GemRB.SetButtonState(ClassWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 	GemRB.SetVisible(CharGenWindow,1)
 	GemRB.SetVisible(ClassWindow,1)
+	return
+
+def ClassPress():
+	Class = GemRB.GetVar("Class")-1
+	GemRB.SetText(ClassWindow,TextAreaControl, GemRB.GetTableValue(ClassTable,Class,1) )
+	GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
 	return
 
 def BackPress():

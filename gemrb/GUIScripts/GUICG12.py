@@ -11,7 +11,6 @@ def SetPicture():
 	global PortraitsTable, LastPortrait
 
 	PortraitName = GemRB.GetTableRowName(PortraitsTable, LastPortrait)+"L"
-	print "Loading",PortraitName
 	GemRB.SetButtonPicture(AppearanceWindow, PortraitButton, PortraitName)
 	return
 

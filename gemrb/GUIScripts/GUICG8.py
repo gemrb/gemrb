@@ -26,7 +26,7 @@ def OnLoad():
                 Button = GemRB.GetControl(RaceWindow,i)
 		GemRB.SetText(RaceWindow,Button, GemRB.GetTableValue(RaceTable,i-2,0) )
                 GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
-		GemRB.SetEvent(RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"RacePressed")
+		GemRB.SetEvent(RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"RacePress")
 	for i in range(2, RaceCount+1):
                 Button = GemRB.GetControl(RaceWindow,i)
 		GemRB.SetVarAssoc(RaceWindow,Button,"Race",i-1)
@@ -71,7 +71,7 @@ def OnLoad():
 	GemRB.SetVisible(RaceWindow,1)
 	return
 
-def RacePressed():
+def RacePress():
 	Race = GemRB.GetVar("Race")-1
 	GemRB.SetText(RaceWindow,TextAreaControl, GemRB.GetTableValue(RaceTable,Race,1) )
 	GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_ENABLED)
