@@ -24,7 +24,7 @@ def OnLoad():
 		GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
 	else:
 		GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent(PartyFormationWindow,ModifyCharactersButton, IE_GUI_BUTTON_ON_PRESS,"EnterGamePress")
+	GemRB.SetEvent(PartyFormationWindow,DoneButton, IE_GUI_BUTTON_ON_PRESS,"EnterGamePress")
 	
 	for i in range(18,24):
 		Button = GemRB.GetControl(PartyFormationWindow,i)
