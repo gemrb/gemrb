@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.122 2004/11/15 21:54:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.123 2004/11/16 20:55:16 avenger_teambg Exp $
  *
  */
 
@@ -1202,12 +1202,12 @@ void Map::RemoveMapNote(Point point)
 {
 	int i = mapnotes.size();
 	while(i--) {
-		if(point.x==mapnotes[i]->Pos.x && point.y==mapnotes[i]->Pos.y) {
+		if((point.x==mapnotes[i]->Pos.x) &&
+			(point.y==mapnotes[i]->Pos.y)) {
 			delete mapnotes[i];
 			mapnotes.erase(mapnotes.begin()+i);
 		}
 	}
-	
 }
 
 MapNote *Map::GetMapNote(Point point)

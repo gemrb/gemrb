@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.241 2004/11/15 21:54:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.242 2004/11/16 20:55:20 avenger_teambg Exp $
  *
  */
 
@@ -3974,7 +3974,9 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	point.x=x;
 	point.y=y;
 	if(txt && txt[0]) {
-		map->AddMapNote(point, color, txt);
+		char* newvalue = ( char* ) malloc( strlen( txt ) + 1 ); //duplicating the string
+		strcpy( newvalue, txt );
+		map->AddMapNote(point, color, newvalue);
 	}
 	else {
 		map->RemoveMapNote(point);
