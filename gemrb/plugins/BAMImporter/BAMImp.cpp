@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.9 2003/11/25 13:48:04 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.10 2003/12/15 09:38:10 balrog994 Exp $
  *
  */
 
@@ -282,8 +282,8 @@ Font * BAMImp::GetFont()
 	printf("Start Getting Font\n");
 	//printf("Calculating Font Buffer Max Size...");
 	int w = 0,h = 0;
-	for(int i = 0; i < cycles.size(); i++) {
-		int index = cycles[i].FirstFrame;
+	for(unsigned int i = 0; i < cycles.size(); i++) {
+		unsigned int index = cycles[i].FirstFrame;
 		if(index >= frames.size())
 			continue;
 		//printf("[index = %d, w = %d, h = %d]\n", index, frames[index].Width, frames[index].Height);
@@ -293,8 +293,8 @@ Font * BAMImp::GetFont()
 			h = frames[index].Height;
 	}
 	//printf("[maxW = %d, maxH = %d]\n", w, h);
-	Font * fnt = new Font(w*cycles.size(), h, Palette, true, 0);
-	for(int i = 0; i < cycles.size(); i++) {
+	Font * fnt = new Font(w*(int)cycles.size(), h, Palette, true, 0);
+	for(unsigned int i = 0; i < cycles.size(); i++) {
 		if(cycles[i].FirstFrame >= frames.size()) {
 			fnt->AddChar(NULL, 0, 0, 0, 0);
 			continue;
