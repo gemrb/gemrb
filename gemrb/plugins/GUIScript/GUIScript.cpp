@@ -578,6 +578,38 @@ static PyObject * GemRB_HardEndPL(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject * GemRB_SetVar(PyObject *self, PyObject *args)
+{	
+	char* Variable;
+	int value;
+
+	if(!PyArg_ParseTuple(args, "si", &Variable, &value)) {
+		printMessage("GUIScript", "Syntax Error: SetVar(VariableName, Value)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	core->GetDictionary()->SetAt(Variable, value);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject * GemRB_GetVar(PyObject *self, PyObject *args)
+{	
+	char* Variable;
+	unsigned long value;
+
+	if(!PyArg_ParseTuple(args, "s", &Variable)) {
+		printMessage("GUIScript", "Syntax Error: SetVar(VariableName, Value)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	if(!core->GetDictionary()->Lookup(Variable, value))
+		return NULL;
+
+	return Py_BuildValue("l", value);
+}
+
 static PyMethodDef GemRBMethods[] = {
     {"LoadWindowPack", GemRB_LoadWindowPack, METH_VARARGS,
      "Loads a WindowPack into the Window Manager Module."},
@@ -653,6 +685,12 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"Quit", GemRB_Quit, METH_NOARGS,
      "Quits GemRB."},
+
+ 	{"GetVar", GemRB_GetVar, METH_VARARGS,
+     "Get a Variable value from the Global Dictionary."},
+
+ 	{"SetVar", GemRB_SetVar, METH_VARARGS,
+     "Set/Create a Variable in the Global Dictionary."},
 
     {NULL, NULL, 0, NULL}
 };
