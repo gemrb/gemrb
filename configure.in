@@ -20,6 +20,7 @@ AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
+AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_LANG_CPLUSPLUS
 
@@ -49,8 +50,13 @@ AC_CHECK_FUNCS([strchr])
 AC_CHECK_FUNCS([strrchr])
 AC_CHECK_FUNCS([strtol])
 AC_CHECK_FUNCS([strtoul])
+AC_CHECK_FUNCS([strnlen])
 AC_CHECK_HEADERS([fcntl.h])
 AC_CHECK_HEADERS([sys/time.h])
+AC_CHECK_HEADERS([sys/stat.h])
+AC_CHECK_LIB(dl, dlopen)
+AC_CHECK_LIB(pthread, main)
+
 AC_C_CONST
 AC_C_INLINE
 AC_FUNC_CLOSEDIR_VOID
@@ -72,24 +78,28 @@ AC_TYPE_SIZE_T
 LIBS="$LIBS"
 LDFLAGS="$LDFLAGS $LIBS"
 
+AC_SUBST(LIBS)
+
 AM_CONFIG_HEADER(config.h)
 
 AC_OUTPUT(./Makefile
 gemrb/Makefile 
 gemrb/includes/Makefile 
 gemrb/includes/sdl/Makefile 
-gemrb/override/Makefile 
-gemrb/override/bg1/Makefile 
-gemrb/override/bg2/Makefile 
-gemrb/override/how/Makefile 
-gemrb/override/iwd/Makefile 
-gemrb/override/iwd2/Makefile 
-gemrb/override/pst/Makefile  
-gemrb/GUIScripts/Makefile 
-gemrb/GUIScripts/bg1/Makefile 
-gemrb/GUIScripts/bg2/Makefile 
-gemrb/GUIScripts/iwd/Makefile 
-gemrb/GUIScripts/iwd2/Makefile 
+gemrb/override/Makefile
+gemrb/override/bg1/Makefile
+gemrb/override/bg2/Makefile
+gemrb/override/how/Makefile
+gemrb/override/iwd/Makefile
+gemrb/override/iwd2/Makefile
+gemrb/override/pst/Makefile
+gemrb/GUIScripts/Makefile
+gemrb/GUIScripts/bg1/Makefile
+gemrb/GUIScripts/bg2/Makefile
+gemrb/GUIScripts/how/Makefile
+gemrb/GUIScripts/iwd/Makefile
+gemrb/GUIScripts/iwd2/Makefile
+gemrb/GUIScripts/pst/Makefile
 gemrb/plugins/Makefile 
 gemrb/plugins/2DAImporter/Makefile 
 gemrb/plugins/ACMImporter/Makefile 
