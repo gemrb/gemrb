@@ -1,51 +1,51 @@
 2DA V1.0
 MAN2S
-           SMALL      MEDIUM     LARGE      GENDER     
-NCERND     NCERNDS    NCERNDM    NCERNDL    1          
-NKELDOR    NKELDORS   NKELDORM   NKELDORL   1          
-NANOMEN    NANOMENS   NANOMENM   NANOMENL   1          
-NEDWIN     NEDWINS    NEDWINM    NEDWINL    1          
-NHAER      NHAERS     NHAERM     NHAERL     1          
-NHORC      NHORCS     NHORCM     NHORCL     1          
-NJAN       NJANS      NJANM      NJANL      1          
-NMINSC     NMINSCS    NMINSCM    NMINSCL    1          
-NVALYGA    NVALYGAS   NVALYGAM   NVALYGAL   1          
-NYOSHIM    NYOSHIMS   NYOSHIMM   NYOSHIML   1          
-NKORGAN    NKORGANS   NKORGANM   NKORGANL   1          
-MAN1       MAN1S      MAN1M      MAN1L      1          
-MAN2       MAN2S      MAN2M      MAN2L      1          
-GENDWRF    GENDWRFS   GENDWRFM   GENDWRFL   1          
-GENMELF    GENMELFS   GENMELFM   GENMELFL   1          
-GENMHLF    GENMHLFS   GENMHLFM   GENMHLFL   1          
-AJANTIS    AJANTISS   AJANTISM   AJANTISL   1          
-CORAN      CORANS     CORANM     CORANL     1          
-EDWIN      EDWINS     EDWINM     EDWINL     1          
-ELDOTH     ELDOTHS    ELDOTHM    ELDOTHL    1          
-GARRICK    GARRICKS   GARRICKM   GARRICKL   1          
-KAGAIN     KAGAINS    KAGAINM    KAGAINL    1          
-KHALID     KHALIDS    KHALIDM    KHALIDL    1          
-KIVAN      KIVANS     KIVANM     KIVANL     1          
-MINSC      MINSCS     MINSCM     MINSCL     1          
-MONTAR     MONTARS    MONTARM    MONTARL    1          
-QUAYLE     QUAYLES    QUAYLEM    QUAYLEL    1          
-TIAX       TIAXS      TIAXM      TIAXL      1          
-XAN        XANS       XANM       XANL       1          
-XZAR       XZARS      XZARM      XZARL      1          
-YESLICK    YESLICKS   YESLICKM   YESLICKL   1          
-NNALIA     NNALIAS    NNALIAM    NNALIAL    2          
-NMAZZY     NMAZZYS    NMAZZYM    NMAZZYL    2          
-NAERIE     NAERIES    NAERIEM    NAERIEL    2          
-NJAHEIR    NJAHEIRS   NJAHEIRM   NJAHEIRL   2          
-NVICON     NVICONS    NVICONM    NVICONL    2          
-WOMAN1     WOMAN1S    WOMAN1M    WOMAN1L    2          
-WOMAN2     WOMAN2S    WOMAN2M    WOMAN2L    2          
-ALORA      ALORAS     ALORAM     ALORAL     2          
-BRANWE     BRANWES    BRANWEM    BRANWEL    2          
-DYNAHEI    DYNAHEIS   DYNAHEIM   DYNAHEIL   2          
-FALDORN    FALDORNS   FALDORNM   FALDORNL   2          
-IMOEN      IMOENS     IMOENM     IMOENL     2          
-JAHEIRA    JAHEIRAS   JAHEIRAM   JAHEIRAL   2          
-SAFANA     SAFANAS    SAFANAM    SAFANAL    2          
-SHARTEL    SHARTELS   SHARTELM   SHARTELL   2          
-SKIE       SKIES      SKIEM      SKIEL      2          
-VICONIA    VICONIAS   VICONIAM   VICONIAL   2          
+              GENDER     
+NCERND        1          
+NKELDOR       1          
+NANOMEN       1          
+NEDWIN        1          
+NHAER         1          
+NHORC         1          
+NJAN          1          
+NMINSC        1          
+NVALYGA       1          
+NYOSHIM       1          
+NKORGAN       1          
+MAN1          1          
+MAN2          1          
+GENDWRF       1          
+GENMELF       1          
+GENMHLF       1          
+AJANTIS       1          
+CORAN         1          
+EDWIN         1          
+ELDOTH        1          
+GARRICK       1          
+KAGAIN        1          
+KHALID        1          
+KIVAN         1          
+MINSC         1          
+MONTAR        1          
+QUAYLE        1          
+TIAX          1          
+XAN           1          
+XZAR          1          
+YESLICK       1          
+NNALIA        2          
+NMAZZY        2          
+NAERIE        2          
+NJAHEIR       2          
+NVICON        2          
+WOMAN1        2          
+WOMAN2        2          
+ALORA         2          
+BRANWE        2          
+DYNAHEI       2          
+FALDORN       2          
+IMOEN         2          
+JAHEIRA       2          
+SAFANA        2          
+SHARTEL       2          
+SKIE          2          
+VICONIA       2          

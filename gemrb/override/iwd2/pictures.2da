@@ -1,86 +1,86 @@
 2DA V1.0
 MAN2S
-           SMALL      MEDIUM     LARGE      GENDER     
-2MELF1_    2MELF1_S   2MELF1_S   2MELF1_L   1          
-2MAAS1_    2MAAS1_S   2MAAS1_S   2MAAS1_L   1
-2MBAR1_    2MBAR1_S   2MBAR1_S   2MBAR1_L   1
-2MDEF1_    2MDEF1_S   2MDEF1_S   2MDEF1_L   1
-2MDEF2_    2MDEF2_S   2MDEF2_S   2MDEF2_L   1
-2MGNM1_    2MGNM1_S   2MGNM1_S   2MGNM1_L   1
-2MHAF1_    2MHAF1_S   2MHAF1_S   2MHAF1_L   1
-2MHUM1_    2MHUM1_S   2MHUM1_S   2MHUM1_L   1
-2MHUM2_    2MHUM2_S   2MHUM2_S   2MHUM2_L   1
-2MHUM3_    2MHUM3_S   2MHUM3_S   2MHUM3_L   1
-2MHUM4_    2MHUM4_S   2MHUM4_S   2MHUM4_L   1
-2MHUM5_    2MHUM5_S   2MHUM5_S   2MHUM5_L   1
-2MHUM6_    2MHUM6_S   2MHUM6_S   2MHUM6_L   1
-2MHUM7_    2MHUM7_S   2MHUM7_S   2MHUM7_L   1
-2MPAL1_    2MPAL1_S   2MPAL1_S   2MPAL1_L   1
-2MORC1_    2MORC1_S   2MORC1_S   2MORC1_L   1
-2MDWF1_    2MDWF1_S   2MDWF1_S   2MDWF1_L   1
-2MDWF2_    2MDWF2_S   2MDWF2_S   2MDWF2_L   1
-DMC_       DMC_S      DMC_S      DMC_L      1
-DMF_       DMF_S      DMF_S      DMF_L      1
-DMF2_      DMF2_S     DMF2_S     DMF2_L     1
-DMT_       DMT_S      DMT_S      DMT_L      1
-EMC_       EMC_S      EMC_S      EMC_L      1
-EMF_       EMF_S      EMF_S      EMF_L      1
-EMF2_      EMF2_S     EMF2_S     EMF2_L     1
-EMT_       EMT_S      EMT_S      EMT_L      1
-EMW_       EMW_S      EMW_S      EMW_L      1
-GMT_       GMT_S      GMT_S      GMT_L      1
-GMW_       GMW_S      GMW_S      GMW_L      1
-HAMF_      HAMF_S     HAMF_S     HAMF_L     1
-HAMT_      HAMT_S     HAMT_S     HAMT_L     1
-HEMF_      HEMF_S     HEMF_S     HEMF_L     1
-HEMT_      HEMT_S     HEMT_S     HEMT_L     1
-HEMW_      HEMW_S     HEMW_S     HEMW_L     1
-HMC_       HMC_S      HMC_S      HMC_L      1
-HMC2_      HMC2_S     HMC2_S     HMC2_L     1
-HMC3_      HMC3_S     HMC3_S     HMC3_L     1
-HMC4_      HMC4_S     HMC4_S     HMC4_L     1
-HMF_       HMF_S      HMF_S      HMF_L      1
-HMF2_      HMF2_S     HMF2_S     HMF2_L     1
-HMF3_      HMF3_S     HMF3_S     HMF3_L     1
-HMF4_      HMF4_S     HMF4_S     HMF4_L     1
-HMF5_      HMF5_S     HMF5_S     HMF5_L     1
-HMF6_      HMF6_S     HMF6_S     HMF6_L     1
-HMF7_      HMF7_S     HMF7_S     HMF7_L     1
-HMW_       HMW_S      HMW_S      HMW_L      1
-HMW2_      HMW2_S     HMW2_S     HMW2_L     1
-HMW3_      HMW3_S     HMW3_S     HMW3_L     1
-HMW4_      HMW4_S     HMW4_S     HMW4_L     1
-HMB_       HMB_S      HMB_S      HMB_L      1
-HMB2_      HMB2_S     HMB2_S     HMB2_L     1
-2FBAR1_    2FBAR1_S   2FBAR1_S   2FBAR1_L   2          
-2FDEF1_    2FDEF1_S   2FDEF1_S   2FDEF1_L   2
-2FELF1_    2FELF1_S   2FELF1_S   2FELF1_L   2
-2FELF2_    2FELF2_S   2FELF2_S   2FELF2_L   2
-2FELF3_    2FELF3_S   2FELF3_S   2FELF3_L   2
-2FGNM1_    2FGNM1_S   2FGNM1_S   2FGNM1_L   2
-2FHUM1_    2FHUM1_S   2FHUM1_S   2FHUM1_L   2
-2FHUM2_    2FHUM2_S   2FHUM2_S   2FHUM2_L   2
-2FHUM3_    2FHUM3_S   2FHUM3_S   2FHUM3_L   2
-2FHUM4_    2FHUM4_S   2FHUM4_S   2FHUM4_L   2
-2FTIF1_    2FTIF1_S   2FTIF1_S   2FTIF1_L   2          
-2FORC1_    2FORC1_S   2FORC1_S   2FORC1_L   2
-DFF_       DFF_S      DFF_S      DFF_L      2
-EFC_       EFC_S      EFC_S      EFC_L      2
-EFF_       EFF_S      EFF_S      EFF_L      2
-EFW_       EFW_S      EFW_S      EFW_L      2
-EFW2_      EFW2_S     EFW2_S     EFW2_L     2
-GFW_       GFW_S      GFW_S      GFW_L      2
-HAFF_      HAFF_S     HAFF_S     HAFF_L     2
-HEFC_      HEFC_S     HEFC_S     HEFC_L     2
-HAFT_      HAFT_S     HAFT_S     HAFT_L     2
-HEFB_      HEFB_S     HEFB_S     HEFB_L     2
-HEFF_      HEFF_S     HEFF_S     HEFF_L     2
-HEFW_      HEFW_S     HEFW_S     HEFW_L     2
-HFD_       HFD_S      HFD_S      HFD_L      2
-HFF_       HFF_S      HFF_S      HFF_L      2
-HFF2_      HFF2_S     HFF2_S     HFF2_L     2
-HFT_       HFT_S      HFT_S      HFT_L      2
-HFT2_      HFT2_S     HFT2_S     HFT2_L     2
-HFW_       HFW_S      HFW_S      HFW_L      2
-HFW2_      HFW2_S     HFW2_S     HFW2_L     2
-HFW3_      HFW3_S     HFW3_S     HFW3_L     2
+              GENDER     
+2MELF1_       1          
+2MAAS1_       1
+2MBAR1_       1
+2MDEF1_       1
+2MDEF2_       1
+2MGNM1_       1
+2MHAF1_       1
+2MHUM1_       1
+2MHUM2_       1
+2MHUM3_       1
+2MHUM4_       1
+2MHUM5_       1
+2MHUM6_       1
+2MHUM7_       1
+2MPAL1_       1
+2MORC1_       1
+2MDWF1_       1
+2MDWF2_       1
+DMC_          1
+DMF_          1
+DMF2_         1
+DMT_          1
+EMC_          1
+EMF_          1
+EMF2_         1
+EMT_          1
+EMW_          1
+GMT_          1
+GMW_          1
+HAMF_         1
+HAMT_         1
+HEMF_         1
+HEMT_         1
+HEMW_         1
+HMC_          1
+HMC2_         1
+HMC3_         1
+HMC4_         1
+HMF_          1
+HMF2_         1
+HMF3_         1
+HMF4_         1
+HMF5_         1
+HMF6_         1
+HMF7_         1
+HMW_          1
+HMW2_         1
+HMW3_         1
+HMW4_         1
+HMB_          1
+HMB2_         1
+2FBAR1_       2          
+2FDEF1_       2
+2FELF1_       2
+2FELF2_       2
+2FELF3_       2
+2FGNM1_       2
+2FHUM1_       2
+2FHUM2_       2
+2FHUM3_       2
+2FHUM4_       2
+2FTIF1_       2          
+2FORC1_       2
+DFF_          2
+EFC_          2
+EFF_          2
+EFW_          2
+EFW2_         2
+GFW_          2
+HAFF_         2
+HEFC_         2
+HAFT_         2
+HEFB_         2
+HEFF_         2
+HEFW_         2
+HFD_          2
+HFF_          2
+HFF2_         2
+HFT_          2
+HFT2_         2
+HFW_          2
+HFW2_         2
+HFW3_         2
