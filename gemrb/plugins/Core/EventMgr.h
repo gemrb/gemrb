@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.9 2003/12/22 21:27:25 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.10 2003/12/22 23:25:28 avenger_teambg Exp $
  *
  */
 
@@ -34,6 +34,7 @@
 #define GEM_RETURN		6
 #define GEM_BACKSP		7
 #define GEM_TAB			8
+#define GEM_ALT			9
 #define GEM_MOUSEOUT	128
 
 #ifdef WIN32

@@ -106,14 +106,36 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			Gem_Polygon poly(points, 4);
 			video->DrawPolyline(&poly, green, false);
 		}
-		if(overDoor) {
+		if(DebugFlags&4) {
+			Door *d;
+			for(unsigned int idx=0; d=area->tm->GetDoor(idx); idx++) {
+				if(d->DoorClosed)
+					video->DrawPolyline(d->closed,blue,true);
+				else {
+					video->DrawPolyline(d->open,blue,true);
+				}
+			}
+		}
+		else if(overDoor) {
 			if(overDoor->DoorClosed)
 				video->DrawPolyline(overDoor->closed,cyan,true);
 			else {
 				video->DrawPolyline(overDoor->open,cyan,true);
 			}
 		}
-		if(overContainer) {
+		//draw containers when TAB is held
+		if(DebugFlags&4) {
+			Container *c;
+			for(unsigned int idx=0; c=area->tm->GetContainer(idx); idx++) {
+				if(c->TrapDetected && c->Trapped) {
+					video->DrawPolyline(c->outline, red, true);
+				}
+				else {
+					video->DrawPolyline(c->outline, cyan, true);
+				}
+			}
+		}
+		else if(overContainer) {
 			if(overContainer->TrapDetected && overContainer->Trapped) {
 				video->DrawPolyline(overContainer->outline, red, true);
 			}
@@ -127,8 +149,19 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				video->BlitSpriteMode(effect->NextFrame(), actor->XPos, actor->YPos, 1, false);
 			}
 		}
-		if(DebugFlags&1) {
-			//draw traps with blue overlay
+		if(DebugFlags&5) {
+			//draw infopoints with blue overlay
+			InfoPoint *i;
+			for(unsigned int idx=0; i=area->tm->GetInfoPoint(idx); idx++) {
+				if(i->TrapDetected && i->Trapped) {
+					video->DrawPolyline(i->outline, red, true);
+				}
+				else if(DebugFlags&4) {
+					video->DrawPolyline(i->outline, blue, true);
+				}
+			}
+		}
+		else { //overInfoPoint
 		}
 		for(size_t i = 0; i < infoPoints.size(); i++) {
 			unsigned long time;
@@ -191,6 +224,20 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short Mod)
 /** Key Release Event */
 void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
+	switch(Key) {
+/* no way to catch a released ALT ?
+		case GEM_ALT:
+			DebugFlags^=4;
+			printf("ALT released\n");
+			break;
+*/
+		case '\t': //not GEM_TAB
+			DebugFlags&=~8;
+			printf("TAB released\n");
+			return;
+		default:
+			break;
+	}
 	if(!core->CheatEnabled() ) return;
 	if(Mod&64 ) //ctrl
 	{
@@ -472,6 +519,14 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 {	
 	Region Viewport = core->GetVideoDriver()->GetViewport();
 	switch(Key) {
+		case GEM_ALT:
+			DebugFlags^=4;
+			printf("ALT pressed\n");
+			break;
+		case GEM_TAB:
+			DebugFlags|=8;
+			printf("TAB pressed\n");
+			break;
 		case GEM_MOUSEOUT:
 			moveX = 0;
 			moveY = 0;

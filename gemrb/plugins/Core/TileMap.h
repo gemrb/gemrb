@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.13 2003/12/15 09:31:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.14 2003/12/22 23:25:29 avenger_teambg Exp $
  *
  */
 
@@ -64,6 +64,11 @@ typedef struct InfoPoint {
 	unsigned char Active;
 	bool triggered;
 	GameScript * Script;
+	unsigned short TrapDetectionDiff;
+	unsigned short TrapRemovalDiff;
+	unsigned short Trapped;
+	unsigned short TrapDetected;
+	unsigned short LaunchX, LaunchY;
 } InfoPoint;
 
 #ifdef WIN32
@@ -88,16 +93,21 @@ private:
 public:
 	TileMap(void);
 	~TileMap(void);
-	void AddOverlay(TileOverlay * overlay);
 	Door * AddDoor(char * Name, bool DoorClosed, unsigned short * indexes, int count, Gem_Polygon * open, Gem_Polygon * closed);
 	Door * GetDoor(unsigned short x, unsigned short y);
+	Door * GetDoor(unsigned int idx);
+	void ToggleDoor(Door * door);
+
 	Container * AddContainer(char * Name, unsigned short Type, Gem_Polygon * outline);
 	Container * GetContainer(unsigned short x, unsigned short y);
+	Container * GetContainer(unsigned int idx);
+
 	InfoPoint * AddInfoPoint(char * Name, unsigned short Type, Gem_Polygon * outline);
 	InfoPoint * GetInfoPoint(unsigned short x, unsigned short y);
 	InfoPoint * GetInfoPoint(const char * Name);
-	InfoPoint * GetInfoPoint(int index);
-	void ToggleDoor(Door * door);
+	InfoPoint * GetInfoPoint(unsigned int idx);
+
+	void AddOverlay(TileOverlay * overlay);
 	void DrawOverlay(unsigned int index, Region viewport);
 public:
 	int XCellCount, YCellCount;

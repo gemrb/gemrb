@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.14 2003/12/15 09:31:03 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.15 2003/12/22 23:25:28 avenger_teambg Exp $
  *
  */
 
@@ -83,6 +83,12 @@ void TileMap::DrawOverlay(unsigned int index, Region viewport)
 		overlays[index]->Draw(viewport);
 }
 
+Door * TileMap::GetDoor(unsigned int idx)
+{
+	if(idx>=doors.size() ) return NULL;
+	return doors.at(idx);
+}
+
 Door * TileMap::GetDoor(unsigned short x, unsigned short y)
 {
   for(size_t i = 0; i < doors.size(); i++) {
@@ -123,6 +129,12 @@ Container * TileMap::AddContainer(char * Name, unsigned short Type, Gem_Polygon 
 	containers.push_back(c);
 	return &containers.at(containers.size()-1);
 }
+Container *TileMap::GetContainer(unsigned int idx)
+{
+	if(idx>=containers.size()) return NULL;
+	return &containers.at(idx);
+}
+
 Container * TileMap::GetContainer(unsigned short x, unsigned short y)
 {
 	for(size_t i = 0; i < containers.size(); i++) {
@@ -189,9 +201,8 @@ InfoPoint * TileMap::GetInfoPoint(const char * Name)
 	return NULL;
 }
 
-InfoPoint * TileMap::GetInfoPoint(int index)
+InfoPoint * TileMap::GetInfoPoint(unsigned int idx)
 {
-	if((unsigned int)index >= infoPoints.size())
-		return NULL;
-	return &infoPoints.at(index);
+	if(idx >= infoPoints.size()) return NULL;
+	return &infoPoints.at(idx);
 }
