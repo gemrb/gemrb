@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.111 2004/01/29 20:38:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.112 2004/02/01 18:34:18 avenger_teambg Exp $
  *
  */
 
@@ -346,7 +346,7 @@ static PyObject * GemRB_LoadTable(PyObject * /*self*/, PyObject *args)
 	return Py_BuildValue("i", ind);
 }
 
-static PyObject * GemRB_UnLoadTable(PyObject * /*self*/, PyObject *args)
+static PyObject * GemRB_UnloadTable(PyObject * /*self*/, PyObject *args)
 {
 	int ti;
 
@@ -522,7 +522,7 @@ static PyObject * GemRB_LoadSymbol(PyObject * /*self*/, PyObject *args)
 	return Py_BuildValue("i", ind);
 }
 
-static PyObject * GemRB_UnLoadSymbol(PyObject * /*self*/, PyObject *args)
+static PyObject * GemRB_UnloadSymbol(PyObject * /*self*/, PyObject *args)
 {
 	int si;
 
@@ -1918,8 +1918,8 @@ static PyMethodDef GemRBMethods[] = {
  	{"LoadTable", GemRB_LoadTable, METH_VARARGS,
      "Loads a 2DA Table."},
 
-	{"UnLoadTable", GemRB_UnLoadTable, METH_VARARGS,
-     "UnLoads a 2DA Table."},
+	{"UnloadTable", GemRB_UnloadTable, METH_VARARGS,
+     "Unloads a 2DA Table."},
 
 	{"GetTable", GemRB_GetTable, METH_VARARGS,
      "Returns a Loaded 2DA Table."},
@@ -1942,8 +1942,8 @@ static PyMethodDef GemRBMethods[] = {
   	{"LoadSymbol", GemRB_LoadSymbol, METH_VARARGS,
      "Loads a IDS Symbol Table."},
 
-	{"UnLoadSymbol", GemRB_UnLoadSymbol, METH_VARARGS,
-     "UnLoads a IDS Symbol Table."},
+	{"UnloadSymbol", GemRB_UnloadSymbol, METH_VARARGS,
+     "Unloads a IDS Symbol Table."},
 
 	{"GetSymbol", GemRB_GetSymbol, METH_VARARGS,
      "Returns a Loaded IDS Symbol Table."},
