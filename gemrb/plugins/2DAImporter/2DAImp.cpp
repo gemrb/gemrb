@@ -21,8 +21,10 @@ bool p2DAImp::Open(DataStream * stream, bool autoFree)
 {
 	if(stream == NULL)
 		return false;
-	DataStream * olds = str;
+	if(str && this->autoFree)
+		delete(str);
 	str = stream;
+	this->autoFree = autoFree;
 	char Signature[20];
 	str->CheckEncrypted();
 	str->ReadLine(Signature,20);
@@ -30,12 +32,8 @@ bool p2DAImp::Open(DataStream * stream, bool autoFree)
 	while(*strp == ' ')
 		strp++;
 	if(strncmp(strp, "2DA V1.0", 8) != 0) {
-		str = olds;
 		return false;
 	}
-	if(olds && this->autoFree)
-		delete(olds);
-	this->autoFree = autoFree;
 	defVal[0] = 0;
 	str->ReadLine(defVal, 32);
 	bool colHead = true;
