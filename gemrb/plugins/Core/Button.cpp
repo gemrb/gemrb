@@ -42,7 +42,10 @@ Button::Button(bool Clear){
 	ButtonOnPress[0] = 0;
 	Text = (char*)malloc(64);
 	hasText = false;
-	font = core->GetFont("STONEBIG");
+	if(stricmp(core->GameType, "bg2") == 0)
+		font = core->GetFont("STONEBIG");
+	else if(stricmp(core->GameType, "bg1") == 0)
+		font = core->GetFonr("STONESML");
 	palette = (Color*)malloc(256*sizeof(Color));
 	memcpy(palette, font->GetPalette(), 256*sizeof(Color));
 	for(int i = 0; i < 256; i++) {
