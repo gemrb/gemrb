@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.18 2003/12/07 13:13:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MUSImporter/MUSImp.cpp,v 1.19 2003/12/07 13:15:50 avenger_teambg Exp $
  *
  */
 
@@ -25,6 +25,7 @@
 
 static char musicsubfolder[6]="music";
 
+#ifndef WIN32
 void ResolveFilePath(char *FilePath)
 {
 	char TempFilePath[_MAX_PATH];
@@ -56,6 +57,7 @@ void ResolveFilePath(char *FilePath)
 	//should work (same size)
 	strcpy(FilePath,TempFilePath);
 }
+#endif
 
 MUSImp::MUSImp()
 {
