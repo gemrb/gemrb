@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.17 2003/12/13 07:40:18 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.18 2003/12/15 09:12:02 balrog994 Exp $
  *
  */
 
@@ -244,7 +244,7 @@ int Variables::GetValueLength(const char *key) const
 		return 0;  // not in map
 	}
 
-	return strlen((char *) pAssoc->nValue);
+	return (int)strlen((char *) pAssoc->nValue);
 }
 
 bool Variables::Lookup(const char *key, char *dest, int MaxLength) const
