@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.44 2004/10/17 15:37:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.45 2004/10/18 18:42:07 avenger_teambg Exp $
  *
  */
 
@@ -325,33 +325,19 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 	//printf("[KEYImporter]: No Factory Object Found, Loading...\n");
 	char path[_MAX_PATH], filename[_MAX_PATH] = {0};
 	//Search it in the GemRB override Directory
-	strcpy( path, core->GemRBPath );
-	strcat( path, "override" ); //this shouldn't change!
-	strcat( path, SPathDelimiter );
-	strcat( path, core->GameType );
-	strcat( path, SPathDelimiter );
 	strncpy( filename, resname, 8 );
 	filename[8] = 0;
 	strcat( filename, core->TypeExt( type ) );
 	strlwr( filename );
-	strcat( path, filename );
+	PathJoin(path, core->GemRBPath,"override",core->GameType,filename,NULL);
 	FILE* exist = fopen( path, "rb" );
 	if (exist) {
-		//printf("[KEYImporter]: Found in GemRB Override...\n");
-		fclose( exist );
-		FileStream* fs = new FileStream();
-		if (!fs)
-			return NULL;
-		fs->Open( path, true );
-		return fs;
+		goto found;
 	}
-	strcpy( path, core->GamePath );
-	strcat( path, core->GameOverride );
-	strcat( path, SPathDelimiter );
-	strncat( path, resname, 8 );
-	strcat( path, core->TypeExt( type ) );
+	PathJoin(path, core->GamePath, core->GameOverride, filename,NULL);
 	exist = fopen( path, "rb" );
 	if (exist) {
+found:
 		//printf("[KEYImporter]: Found in Override...\n");
 		fclose( exist );
 		AnimationMgr* ani = ( AnimationMgr* )
