@@ -70,7 +70,7 @@ public:
 	SaveGameIterator(void);
 	~SaveGameIterator(void);
 	int GetSaveGameCount();
-	SaveGame * GetSaveGame(int index);
+	SaveGame * GetSaveGame(int index, bool Remove=false);
 };
 
 #endif

@@ -3,6 +3,7 @@
 #include <io.h>
 #include <windows.h>
 #else
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -19,6 +20,49 @@ SaveGameIterator::SaveGameIterator(void)
 
 SaveGameIterator::~SaveGameIterator(void)
 {
+}
+
+static void DelTree(char *Path)
+{
+#ifdef WIN32
+	struct _finddata_t c_file;
+	long hFile=_findfirst(Path, &c_file);
+	if(!hFile)
+		return;
+#else
+	DIR * dir = opendir(Path);
+	if(dir==NULL)
+		return;
+	struct dirent * de = readdir(dir);  //Lookup the first entry in the Directory
+	if(de == NULL) {
+		closedir(dir);
+		return;
+	}
+#endif
+	do {
+		char dtmp[_MAX_PATH];
+#ifdef WIN32
+		if(c_file.attrib & _A_SUBDIR) {
+			if(c_file.name[0] == '.')
+				continue;
+		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, c_file.name);
+#else
+		struct stat fst;
+		sprintf(dtmp, "%s%s%s", Path, SPathDelimiter, de->d_name);
+		stat(dtmp, &fst);
+		if(S_ISDIR(fst.st_mode))
+			continue;
+		if(de->d_name[0] == '.')
+			continue;
+#endif
+		unlink(dtmp);
+#ifdef WIN32
+	} while(_findnext(hFile, &c_file) == 0);
+	_findclose(hFile);
+#else
+	} while((de = readdir(dir)) != NULL);
+	closedir(dir);
+#endif
 }
 
 static const char *PlayMode()
@@ -49,11 +93,11 @@ int SaveGameIterator::GetSaveGameCount()
 	DIR * dir = opendir(Path);
 	if(dir == NULL) //If we cannot open the Directory
 		return -1;
-#endif
-#ifndef WIN32  //Linux Statement
 	struct dirent * de = readdir(dir);  //Lookup the first entry in the Directory
-	if(de == NULL) //If no entry exists just return
+	if(de == NULL) {
+		closedir(dir);
 		return -1;
+	}
 #endif
 	do { //Iterate through all the available modules to load
 #ifdef WIN32
@@ -92,12 +136,13 @@ int SaveGameIterator::GetSaveGameCount()
 	return count;
 }
 
-SaveGame * SaveGameIterator::GetSaveGame(int index)
+SaveGame * SaveGameIterator::GetSaveGame(int index, bool Remove)
 {
 #ifdef WIN32
 	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
 	struct _finddata_t c_file;
 	long hFile;
+	int flg;
 #endif
 	int count = -1, prtrt = 0;
 	char Path[_MAX_PATH];
@@ -145,12 +190,21 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 				count++;
 			}
 			if(count == index) {
-				char tmp[_MAX_PATH];
+				if(Remove) {
+#ifdef WIN32
+					sprintf(Path, "%s%s%s%s", core->GamePath, SaveFolder, SPathDelimiter, c_file.name);
+#else
+					sprintf(Path, "%s%s%s%s", core->GamePath, SaveFolder, SPathDelimiter, de->d_name);
+#endif
+					DelTree(Path);
+					rmdir(Path);
+					break;
+				}
 #ifdef WIN32
 				long file;
 				struct _finddata_t bmpf;
-				sprintf(tmp, "%s%s%s%s%s*.bmp", core->GamePath, SaveFolder, SPathDelimiter, c_file.name, SPathDelimiter);
-				file = _findfirst(tmp, &bmpf);
+				sprintf(Path, "%s%s%s%s%s*.bmp", core->GamePath, SaveFolder, SPathDelimiter, c_file.name, SPathDelimiter);
+				file = _findfirst(Path, &bmpf);
 				if(file == NULL) {
 					_findclose(hFile);
 					return NULL;
@@ -188,11 +242,15 @@ SaveGame * SaveGameIterator::GetSaveGame(int index)
 			}
 		}
 #ifdef WIN32
-	} while(_findnext(hFile, &c_file) == 0);
+	} while((flg=_findnext(hFile, &c_file)) == 0);
 	_findclose(hFile);
+	if(Remove || !flg)
+		return NULL;
 #else
 	} while((de = readdir(dir)) != NULL);
 	closedir(dir);  //No other files in the directory, close it
+	if(Remove || (de == NULL) )
+		return NULL;
 #endif
 	char Prefix[10];
 	int i;
