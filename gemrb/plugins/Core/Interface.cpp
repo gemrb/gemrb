@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.93 2003/12/10 00:10:11 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.94 2003/12/12 23:05:08 balrog994 Exp $
  *
  */
 
@@ -137,8 +137,8 @@ Interface::~Interface(void)
 		plugin->FreePlugin(pal256);
 	if(pal16)
 		plugin->FreePlugin(pal16);
-	if(script)
-		plugin->FreePlugin(script);
+	if(timer)
+		delete(timer);
 
 	if(windowmgr)
 		delete(windowmgr);
@@ -390,9 +390,9 @@ int Interface::Init()
 	printMessage("Core", "Initializing A* PathFinder...", WHITE);
 	pathfinder = new PathFinder();
 	printStatus("OK", LIGHT_GREEN);
-	printMessage("Core", "Bringing up the Game Script Engine...", WHITE);
-	script = (GameScript*)core->GetInterface(IE_SCRIPT_CLASS_ID);
-	if(!script) {
+	printMessage("Core", "Bringing up the Global Timer...", WHITE);
+	timer = new GlobalTimer();
+	if(!timer) {
 		printStatus("ERROR", LIGHT_RED);
 		return GEM_ERROR;
 	}
@@ -798,6 +798,9 @@ int Interface::LoadCreature(char *ResRef, int InParty)
 	if(ab->actor->BaseStats[IE_STATE_ID] & STATE_DEAD)
 		ab->AnimID = IE_ANI_SLEEP;
 	ab->Orientation = 0;
+	for(int i = 0; i < MAX_SCRIPTS; i++) {
+		ab->Scripts[i] = NULL;
+	}
 	size_t index;
 	for(index=0;index<actors.size(); index++) {
 		if(!actors[index]) 
@@ -1356,14 +1359,15 @@ bool Interface::LoadINI(const char * filename)
 
 int Interface::LoadScript(const char *ResRef)
 {
-	DataStream * dS = core->GetResourceMgr()->GetResource(ResRef, IE_BCS_CLASS_ID);
-	return script->CacheScript(dS, ResRef);
+	//DataStream * dS = core->GetResourceMgr()->GetResource(ResRef, IE_BCS_CLASS_ID);
+	//return script->CacheScript(dS, ResRef);
+	return -1;
 	//The DataStream is automatically freed by the Script Engine
 }
 
 void Interface::SetGameVariable(const char * VarName, const char * Context, int value)
 {
-	script->SetVariable(VarName, Context, value);
+	//script->SetVariable(VarName, Context, value);
 }
 
 /** Enables/Disables the Cut Scene Mode */
