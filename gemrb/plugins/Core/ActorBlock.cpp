@@ -416,6 +416,7 @@ void Moveble::WalkTo(unsigned short XDes, unsigned short YDes)
 {
 	this->XDes = XDes;
 	this->YDes = YDes;
+/*
 	if (path) {
 		PathNode* nextNode = path->Next;
 		PathNode* thisNode = path;
@@ -427,9 +428,18 @@ void Moveble::WalkTo(unsigned short XDes, unsigned short YDes)
 			nextNode = thisNode->Next;
 		}
 	}
+*/
+	ClearPath();
 	path = core->GetPathFinder()->FindPath( XPos, YPos, XDes, YDes );
-	step = NULL;
+//	step = NULL;
 }
+
+void Moveble::RunAwayFrom(unsigned short XDes, unsigned short YDes, int PathLength, int Backing)
+{
+	ClearPath();
+	path = core->GetPathFinder()->RunAway( XPos, YPos, XDes, YDes, PathLength, Backing );
+}
+
 void Moveble::MoveTo(unsigned short XDes, unsigned short YDes)
 {
 	XPos = XDes;
@@ -455,8 +465,6 @@ void Moveble::ClearPath()
 	path = NULL;
 	step = NULL;
 	AnimID = IE_ANI_AWAKE;
-	//if(CurrentAction)
-	//	CurrentAction->Release();
 	CurrentAction = NULL;
 }
 

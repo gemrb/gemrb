@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.87 2004/03/12 16:35:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.88 2004/03/12 17:32:43 avenger_teambg Exp $
  *
  */
 
@@ -176,6 +176,9 @@ static ActionLink actionnames[] = {
 	{"opendoor",GameScript::OpenDoor,AF_BLOCKING},
 	{"permanentstatchange",GameScript::ChangeStat}, //probably the same
 	{"playdead",GameScript::PlayDead}, {"playsound",GameScript::PlaySound},
+	{"runawayfrom",GameScript::RunAwayFrom,AF_BLOCKING},
+	{"runawayfromnointerrupt",GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
+	{"runawayfrompoint",GameScript::RunAwayFromPoint,AF_BLOCKING},
 	{"runtoobject",GameScript::MoveToObject,AF_BLOCKING}, //until we know better
 	{"runtopoint",GameScript::MoveToPoint,AF_BLOCKING}, //until we know better
 	{"runtopointnorecticle",GameScript::MoveToPoint,AF_BLOCKING},//until we know better
@@ -2842,6 +2845,38 @@ void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
 	actor->WalkTo( Sender->XPos+parameters->XpointParameter, Sender->YPos+parameters->YpointParameter );
 }
 
+void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	actor->RunAwayFrom( tar->XPos, tar->YPos, parameters->int0Parameter, false);
+}
+
+void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	//nointerrupt???
+	actor->RunAwayFrom( tar->XPos, tar->YPos, parameters->int0Parameter, false);
+}
+
+void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->RunAwayFrom( parameters->XpointParameter, parameters->YpointParameter, parameters->int0Parameter, false);
+}
 void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.60 2004/03/12 16:35:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.61 2004/03/12 17:32:43 avenger_teambg Exp $
  *
  */
 
@@ -845,6 +845,8 @@ public:
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
 	static void SaveLocation(Scriptable* Sender, Action* parameters);
+	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
+	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
 	static void SaveObjectLocation(Scriptable* Sender, Action* parameters);
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
 	static void SetAnimState(Scriptable* Sender, Action* parameters);
@@ -900,6 +902,7 @@ public:
 
 public:
 	/*GemRB extensions/actions*/
+	static void RunAwayFromPoint(Scriptable* Sender, Action* parameters);
 	static void UnMakeGlobal(Scriptable* Sender, Action* parameters);
 	/*GemRB extensions/objects*/
 	static Targets *Player7(Scriptable *Sender, Targets *parameters);
