@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.2 2004/12/14 20:58:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.3 2005/02/19 17:13:42 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -28,6 +28,7 @@ import string
 from GUIDefines import *
 from ie_stats import *
 import GemRB
+from GUICommon import CloseOtherWindow
 from GUICommonWindows import GetActorClassTitle, GetActorPaperDoll
 from GUICommonWindows import SetSelectionChangeHandler
 
@@ -39,17 +40,17 @@ ItemIdentifyWindow = None
 def OpenInventoryWindow ():
 	global InventoryWindow
 	
-	GemRB.HideGUI()
-	
-	if InventoryWindow != None:
-		
-		GemRB.UnloadWindow(InventoryWindow)
+	if CloseOtherWindow (OpenInventoryWindow):
+		GemRB.HideGUI ()
+		GemRB.UnloadWindow (InventoryWindow)
 		InventoryWindow = None
-		GemRB.SetVar("OtherWindow", -1)
+		GemRB.SetVar ("OtherWindow", -1)
 		SetSelectionChangeHandler (None)
-		GemRB.UnhideGUI()
+		GemRB.UnhideGUI ()
 		return
-		
+
+	GemRB.HideGUI ()
+
 	GemRB.LoadWindowPack ("GUIINV")
 	InventoryWindow = Window = GemRB.LoadWindow(2)
 	GemRB.SetVar("OtherWindow", InventoryWindow)
@@ -101,8 +102,9 @@ def OpenInventoryWindow ():
 		SlotType = GemRB.GetSlotType(slot)
 		if SlotType["Type"]:
 			Button = GemRB.GetControl (Window, SlotType["ID"]) 
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot)
+			GemRB.SetButtonFont (Window, Button, "NUMBER")
 
 	GemRB.UnhideGUI()
 	UpdateInventoryWindow ()
@@ -209,7 +211,7 @@ def UpdateInventoryWindow ():
 	GemRB.SetText (Window, Label, str(encumbrance) + ":")
 
 	Label2 = GemRB.GetControl (Window, 0x10000044)
-	GemRB.SetText (Window, Label2, str(max_encumb) +":")
+	GemRB.SetText (Window, Label2, str(max_encumb) + ":")
 
 	ratio = (0.0 + encumbrance) / max_encumb
 	if ratio > 1.0:
