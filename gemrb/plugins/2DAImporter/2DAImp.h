@@ -61,6 +61,16 @@ public:
 		return rows[rowi][coli];
 	};
 
+	inline int GetRowIndex(const char *string) const
+	{
+		for(int index = 0; index<rowNames.size(); index++) {
+			if(stricmp(rowNames[index],string) == 0) {
+				return index;
+			}
+		}
+		return -1;
+	};
+
 	inline char *GetRowName(int index) const
 	{
 		if(index < rowNames.size())
