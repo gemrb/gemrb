@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.18 2004/10/17 09:50:43 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.19 2004/10/17 16:19:20 edheldil Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -89,12 +89,15 @@ def OpenInventoryWindow ():
 	for i in range (44):
 		Button = GemRB.GetControl (Window, i);
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR);
+		#GemRB.SetButtonFont (Window, Button, 'NUMBER');
 		GemRB.SetVarAssoc (Window, Button, 'ItemButton', i)
 
 	# Ground Item
 	for i in range (47, 57):
 		Button = GemRB.GetControl (Window, i);
 		GemRB.SetTooltip (Window, Button, 4273)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR);
+		#GemRB.SetButtonFont (Window, Button, 'NUMBER');
 	
 	for i in range (57, 64):
 		Label = GemRB.GetControl (Window, 0x10000000 + i);
@@ -162,16 +165,17 @@ def UpdateInventoryWindow ():
 	ext_str = GemRB.GetPlayerStat (pc, ie_stats.IE_STREXTRA)
 
 	max_encumb = GemRB.GetTableValue(Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
+	# FIXME: there should be a space before LB symbol
 	GemRB.SetText (Window, Button, str (encumbrance) + ":\n\n\n\n" + str (max_encumb) + ":")
 
-	# SetButtonTextColor() does not exist yet :(
-## 	ratio = encumbrance / max_encumb
-## 	if ratio >= 1.0:
-## 		GemRB.SetButtonTextColor (Window, Button, 255, 0, 0)
-## 	elif ratio >= 0.8:
-## 		GemRB.SetButtonTextColor (Window, Button, 255, 255, 0)
-## 	else:
-## 		GemRB.SetButtonTextColor (Window, Button, 255, 255, 255)
+ 	ratio = (0.0 + encumbrance) / max_encumb
+ 	if ratio > 1.0:
+ 		GemRB.SetButtonTextColor (Window, Button, 255, 0, 0, True)
+ 	elif ratio > 0.8:
+ 		GemRB.SetButtonTextColor (Window, Button, 255, 255, 0, True)
+ 	else:
+ 		GemRB.SetButtonTextColor (Window, Button, 255, 255, 255, True)
+
 		
 	# FIXME: Current encumbrance is hardcoded
 	# Unloading tables is not necessary, i think (they will stay cached)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.74 2004/10/10 13:37:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.75 2004/10/17 16:19:21 edheldil Exp $
  *
  */
 
@@ -63,12 +63,13 @@ Button::Button(bool Clear)
 	Text = ( char * ) calloc( 64, sizeof(char) );
 	hasText = false;
 	font = core->GetButtonFont();
-	palette = ( Color * ) malloc( 256 * sizeof( Color ) );
-	memcpy( palette, font->GetPalette(), 256 * sizeof( Color ) );
+	normal_palette = NULL;
+	disabled_palette = ( Color * ) malloc( 256 * sizeof( Color ) );
+	memcpy( disabled_palette, font->GetPalette(), 256 * sizeof( Color ) );
 	for (int i = 0; i < 256; i++) {
-		palette[i].r = ( palette[i].r * 2 ) / 3;
-		palette[i].g = ( palette[i].g * 2 ) / 3;
-		palette[i].b = ( palette[i].b * 2 ) / 3;
+		disabled_palette[i].r = ( disabled_palette[i].r * 2 ) / 3;
+		disabled_palette[i].g = ( disabled_palette[i].g * 2 ) / 3;
+		disabled_palette[i].b = ( disabled_palette[i].b * 2 ) / 3;
 	}
 	Flags = IE_GUI_BUTTON_NORMAL;
 	ToggleState = false;
@@ -102,7 +103,9 @@ Button::~Button()
 	if (Text) {
 		free( Text );
 	}
-	video->FreePalette( palette );
+	if (normal_palette)
+		video->FreePalette( normal_palette );
+	video->FreePalette( disabled_palette );
 }
 /** Sets the 'type' Image of the Button to 'img'.
 'type' may assume the following values:
@@ -218,11 +221,11 @@ void Button::Draw(unsigned short x, unsigned short y)
 
 	// Button label
 	if (hasText && ! ( Flags & IE_GUI_BUTTON_NO_TEXT )) {
-		Color* ppoi = NULL;
+		Color* ppoi = normal_palette;
 		int align = 0;
 
 		if (State == IE_GUI_BUTTON_DISABLED)
-			ppoi = palette;
+			ppoi = disabled_palette;
 		// FIXME: hopefully there's no button which sunks when selected
 		//   AND has text label
 		//else if (State == IE_GUI_BUTTON_PRESSED || State == IE_GUI_BUTTON_SELECTED) {
@@ -568,4 +571,16 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 	// some buttons in BG2 are text only (if BAM == 'GUICTRL')
 	if (Picture || ! Unpressed) return false;
 	return core->GetVideoDriver()->IsSpritePixelTransparent(Unpressed, x, y);
+}
+
+// Set palette used for drawing button label in normal state
+void Button::SetTextColor(Color fore, Color back)
+{
+
+	if (normal_palette)
+		core->GetVideoDriver()->FreePalette( normal_palette );
+
+	normal_palette = core->GetVideoDriver()->CreatePalette( fore, back );
+
+	Changed = true;
 }

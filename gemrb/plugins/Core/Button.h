@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.35 2004/09/11 07:43:55 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.36 2004/10/17 16:19:21 edheldil Exp $
  *
  */
 
@@ -160,14 +160,16 @@ public: // Public Events
 	}
 	/** Refreshes the button from a radio group */
 	void RedrawButton(char* VariableName, unsigned int Sum);
+        /** Set palette used for drawing button label in normal state.  */
+	void SetTextColor(Color fore, Color back);
 private: // Private attributes
 	bool Clear;
 	char* Text;
 	bool hasText;
 	Font* font;
 	bool ToggleState;
-	Color* palette;
-	Color* stdpal;
+	Color* normal_palette;
+	Color* disabled_palette;
 	/** Button Unpressed Image */
 	Sprite2D* Unpressed;
 	/** Button Pressed Image */

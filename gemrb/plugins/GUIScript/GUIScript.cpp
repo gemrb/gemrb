@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.226 2004/10/17 10:14:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.227 2004/10/17 16:19:21 edheldil Exp $
  *
  */
 
@@ -1500,6 +1500,37 @@ static PyObject* GemRB_SetButtonFont(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetButtonTextColor__doc,
+"SetButtonTextColor(WindowIndex, ControlIndex, red, green, blue)\n\n"
+"Sets the Text Color of a Button Control." );
+
+static PyObject* GemRB_SetButtonTextColor(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, r, g, b, swap = 0;
+
+	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlIndex, &r, &g, &b, &swap )) {
+		return AttributeError( GemRB_SetButtonTextColor__doc );
+	}
+
+	Button* but = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if (!but) {
+		return NULL;
+	}
+
+	Color fore = {r,g, b, 0}, back = {0, 0, 0, 0};
+
+	// FIXME: swap is a hack for fonts which apparently have swapped f & B
+	//   clors. Maybe it depends on need_palette?
+	if (! swap) 
+		but->SetTextColor( fore, back );
+	else
+		but->SetTextColor( back, fore );
+
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_DeleteControl__doc,
 "DeleteControl(WindowIndex, ControlID)\n\n"
 "Deletes a control from a Window." );
@@ -1953,15 +1984,18 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
 												IE_PLT_CLASS_ID );
 	if (str == NULL) {
+		printf ("No stream\n");
 		return NULL;
 	}
 	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_PLT_CLASS_ID );
 	if (im == NULL) {
+		printf ("No image\n");
 		delete ( str );
 		return NULL;
 	}
 
 	if (!im->Open( str, true )) {
+		printf ("Can't open image\n");
 		core->FreeInterface( im );
 		return NULL;
 	}
@@ -1976,6 +2010,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	im->GetPalette( 7, col8, NULL );
 	Sprite2D* Picture = im->GetImage();
 	if (Picture == NULL) {
+		printf ("Picture == NULL\n");
 		core->FreeInterface( im );
 		return NULL;
 	}
@@ -3918,6 +3953,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetButtonBorder, METH_VARARGS),
 	METHOD(EnableButtonBorder, METH_VARARGS),
 	METHOD(SetButtonFont, METH_VARARGS),
+	METHOD(SetButtonTextColor, METH_VARARGS),
 	METHOD(AdjustScrolling, METH_VARARGS),
 	METHOD(CreateWorldMapControl, METH_VARARGS),
 	METHOD(CreateMapControl, METH_VARARGS),
