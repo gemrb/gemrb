@@ -65,7 +65,7 @@ def AmbientalPress():
 	
 def CharacterSoundPress():
 	global SoundWindow, TextAreaControl
-	GemRB.SetText(SoundWindow, TextAreaControl, 17778)
+	GemRB.SetNextScript("GUIOPT12")
 	return
 	
 def OkPress():
