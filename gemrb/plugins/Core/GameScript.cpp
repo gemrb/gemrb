@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.206 2004/10/12 19:47:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.207 2004/10/14 19:20:46 avenger_teambg Exp $
  *
  */
 
@@ -1590,36 +1590,6 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 	return NULL;
 }
 
-#if 0
-unsigned char GameScript::GetOrient(Point &s, Point &d)
-{
-	short deltaX = ( d.x- s.x), deltaY = ( d.y - s.y );
-	if (deltaX > 0) {
-		if (deltaY > 0) {
-			return 6;
-		} else if (deltaY == 0) {
-			return 4;
-		} else {
-			return 2;
-		}
-	} else if (deltaX == 0) {
-		if (deltaY > 0) {
-			return 8;
-		} else {
-			return 0;
-		}
-	} else {
-		if (deltaY > 0) {
-			return 10;
-		} else if (deltaY == 0) {
-			return 12;
-		} else {
-			return 14;
-		}
-	}
-	return 0;
-}
-#endif
 void GameScript::ExecuteString(Scriptable* Sender, char* String)
 {
 	if (String[0] == 0) {
@@ -5368,7 +5338,7 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	}
 	ab->SetPosition(map, pnt, flags&CC_CHECK_IMPASSABLE, radius );
 	ab->StanceID = IE_ANI_AWAKE;
-	ab->Orientation = parameters->int0Parameter;
+	ab->Orientation = parameters->int0Parameter&(MAX_ORIENT-1);
 	map->AddActor( ab );
 
 	//setting the deathvariable if it exists (iwd2)
@@ -5815,9 +5785,10 @@ void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) tar;
-	actor->Orientation = parameters->int0Parameter;
+	actor->Orientation = parameters->int0Parameter&(MAX_ORIENT-1);
 }
 
+/* A -1 means random facing? */
 void GameScript::Face(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -5825,7 +5796,11 @@ void GameScript::Face(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->Orientation = parameters->int0Parameter;
+	if (parameters->int0Parameter==-1) {
+		actor->Orientation = core->Roll(1,MAX_ORIENT,-1);
+	} else {
+		actor->Orientation = parameters->int0Parameter&(MAX_ORIENT-1);
+	}
 	actor->resetAction = true;
 	actor->SetWait( 1 );
 }
@@ -6449,7 +6424,7 @@ void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, Point &pos
 	}
 	actor->SetPosition(map2, position, adjust);
 	if (face !=-1) {
-		actor->Orientation = face;
+		actor->Orientation = face&(MAX_ORIENT-1);
 	}
 }
 
