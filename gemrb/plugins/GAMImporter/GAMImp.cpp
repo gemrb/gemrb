@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.38 2004/08/26 22:39:59 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.39 2004/09/12 15:53:40 avenger_teambg Exp $
  *
  */
 
@@ -92,35 +92,35 @@ Game* GAMImp::GetGame()
 	unsigned int i;
 	Game* newGame = new Game();
 
-	str->Read( &newGame->GameTime, 4 );
-	str->Read( &newGame->WhichFormation, 2 );
+	str->ReadDword( &newGame->GameTime );
+	str->ReadWord( &newGame->WhichFormation );
 	for (i = 0; i < 5; i++) {
-		str->Read( &newGame->Formations[i], 2 );
+		str->ReadWord( &newGame->Formations[i] );
 	}
-	str->Read( &newGame->PartyGold, 4 );
-	str->Read( &newGame->Unknown1c, 4 ); //this is unknown yet
-	str->Read( &newGame->PCOffset, 4 );
-	str->Read( &newGame->PCCount, 4 );
-	str->Read( &newGame->UnknownOffset, 4 );
-	str->Read( &newGame->UnknownCount, 4 );
-	str->Read( &newGame->NPCOffset, 4 );
-	str->Read( &newGame->NPCCount, 4 );
-	str->Read( &newGame->GLOBALOffset, 4 );
-	str->Read( &newGame->GLOBALCount, 4 );
+	str->ReadDword( &newGame->PartyGold );
+	str->ReadDword( &newGame->Unknown1c ); //this is unknown yet
+	str->ReadDword( &newGame->PCOffset );
+	str->ReadDword( &newGame->PCCount );
+	str->ReadDword( &newGame->UnknownOffset );
+	str->ReadDword( &newGame->UnknownCount );
+	str->ReadDword( &newGame->NPCOffset );
+	str->ReadDword( &newGame->NPCCount );
+	str->ReadDword( &newGame->GLOBALOffset );
+	str->ReadDword( &newGame->GLOBALCount );
 	str->Read( &newGame->CurrentArea, 8 );
 	newGame->CurrentArea[8] = 0;
-	str->Read( &newGame->Unknown48, 4 );
-	str->Read( &newGame->JournalCount, 4 );
-	str->Read( &newGame->JournalOffset, 4 );
+	str->ReadDword( &newGame->Unknown48 );
+	str->ReadDword( &newGame->JournalCount );
+	str->ReadDword( &newGame->JournalOffset );
 	switch (version) {
 		default:
 			 {
-				str->Read( &newGame->Reputation, 4 );
+				str->ReadDword( &newGame->Reputation );
 				str->Read( &newGame->CurrentArea, 8 ); // FIXME: see above
 				newGame->CurrentArea[8] = 0;
-				str->Read( &newGame->KillVarsOffset, 4 );
-				str->Read( &newGame->KillVarsCount, 4 );
-				str->Read( &newGame->FamiliarsOffset, 4 );
+				str->ReadDword( &newGame->KillVarsOffset );
+				str->ReadDword( &newGame->KillVarsCount );
+				str->ReadDword( &newGame->FamiliarsOffset );
 				str->Seek( 72, GEM_CURRENT_POS);
 			}
 			break;
@@ -128,13 +128,13 @@ Game* GAMImp::GetGame()
 		case 12:
 			//torment
 			 {
-				str->Read( &newGame->UnknownOffset54, 4 );
-				str->Read( &newGame->UnknownCount58, 4 );
+				str->ReadDword( &newGame->UnknownOffset54 );
+				str->ReadDword( &newGame->UnknownCount58 );
 				str->Read( &newGame->AnotherArea, 8 );
 				newGame->AnotherArea[8] = 0;
-				str->Read( &newGame->KillVarsOffset, 4 );
-				str->Read( &newGame->KillVarsCount, 4 );
-				str->Read( &newGame->FamiliarsOffset, 4 );
+				str->ReadDword( &newGame->KillVarsOffset );
+				str->ReadDword( &newGame->KillVarsCount );
+				str->ReadDword( &newGame->FamiliarsOffset );
 				str->Seek( 72, GEM_CURRENT_POS);
 			}	
 			break;
@@ -179,7 +179,7 @@ Game* GAMImp::GetGame()
 		ieDword Value;
 		str->Read( Name, 32 );
 		str->Seek( 8, GEM_CURRENT_POS );
-		str->Read( &Value, 4 );
+		str->ReadDword( &Value );
 		str->Seek( 40, GEM_CURRENT_POS );
 		newGame->globals->SetAt( Name, Value );
 	}
@@ -191,7 +191,7 @@ Game* GAMImp::GetGame()
 			ieDword Value;
 			str->Read( Name, 32 );
 			str->Seek( 8, GEM_CURRENT_POS );
-			str->Read( &Value, 4 );
+			str->ReadDword( &Value );
 			str->Seek( 40, GEM_CURRENT_POS );
 			newGame->kaputz->SetAt( Name, Value );
 		}
@@ -221,27 +221,27 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	PCStruct pcInfo;
 	Actor* actor;
 
-	str->Read( &pcInfo.Selected, 2 );
-	str->Read( &pcInfo.PartyOrder, 2 );
-	str->Read( &pcInfo.OffsetToCRE, 4 );
-	str->Read( &pcInfo.CRESize, 4 );
+	str->ReadWord( &pcInfo.Selected );
+	str->ReadWord( &pcInfo.PartyOrder );
+	str->ReadDword( &pcInfo.OffsetToCRE );
+	str->ReadDword( &pcInfo.CRESize );
 	str->Read( &pcInfo.CREResRef, 8 );
-	str->Read( &pcInfo.Orientation, 4 );
+	str->ReadDword( &pcInfo.Orientation );
 	str->Read( &pcInfo.Area, 8 );
-	str->Read( &pcInfo.XPos, 2 );
-	str->Read( &pcInfo.YPos, 2 );
-	str->Read( &pcInfo.ViewXPos, 2 );
-	str->Read( &pcInfo.ViewYPos, 2 );
+	str->ReadWord( &pcInfo.XPos );
+	str->ReadWord( &pcInfo.YPos );
+	str->ReadWord( &pcInfo.ViewXPos );
+	str->ReadWord( &pcInfo.ViewYPos );
 	str->Read( &pcInfo.Unknown28, 100 );
 	for (i = 0; i < 4; i++) {
-		str->Read( &pcInfo.QuickWeaponSlot[i], 2 );
+		str->ReadWord( &pcInfo.QuickWeaponSlot[i] );
 	}
 	str->Read( &pcInfo.Unknown94, 8 );
 	for (i = 0; i < 3; i++) {
 		str->Read( &pcInfo.QuickSpellResRef[i], 8 );
 	}
 	for (i = 0; i < 3; i++) {
-		str->Read( &pcInfo.QuickItemSlot[i], 2 );
+		str->ReadWord( &pcInfo.QuickItemSlot[i] );
 	}
 	str->Read( &pcInfo.UnknownBA, 6 );
 	if (version==22) { //skipping some bytes for iwd2
@@ -251,7 +251,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	if (version==12) { //Torment
 		str->Seek( 8, GEM_CURRENT_POS);
 	}
-	str->Read( &pcInfo.TalkCount, 4 );
+	str->ReadDword( &pcInfo.TalkCount );
 
 	PCStatsStruct* ps = GetPCStats();
 
@@ -267,8 +267,8 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		}
 		actor->TalkCount = pcInfo.TalkCount;
 	} else {
-		DataStream* ds = core->GetResourceMgr()->GetResource( pcInfo.CREResRef,
-								      IE_CRE_CLASS_ID );
+		DataStream* ds = core->GetResourceMgr()->GetResource(
+				pcInfo.CREResRef, IE_CRE_CLASS_ID );
 		aM->Open( ds );
 		actor = aM->GetActor();
 	}
@@ -291,28 +291,28 @@ PCStatsStruct* GAMImp::GetPCStats ()
 	PCStatsStruct* ps = new PCStatsStruct();
 	int i;
 
-	str->Read( &ps->BestKilledName, 4 );
-	str->Read( &ps->BestKilledXP, 4 );
-	str->Read( &ps->unknown08, 4 );
-	str->Read( &ps->JoinDate, 4 );
-	str->Read( &ps->unknown10, 4 );
-	str->Read( &ps->KillsChapterXP, 4 );
-	str->Read( &ps->KillsChapterCount, 4 );
-	str->Read( &ps->KillsTotalXP, 4 );
-	str->Read( &ps->KillsTotalCount, 4 );
+	str->ReadDword( &ps->BestKilledName );
+	str->ReadDword( &ps->BestKilledXP );
+	str->ReadDword( &ps->unknown08 );
+	str->ReadDword( &ps->JoinDate );
+	str->ReadDword( &ps->unknown10 );
+	str->ReadDword( &ps->KillsChapterXP );
+	str->ReadDword( &ps->KillsChapterCount );
+	str->ReadDword( &ps->KillsTotalXP );
+	str->ReadDword( &ps->KillsTotalCount );
 	for (i = 0; i <= 3; i++) {
 		str->Read( &ps->FavouriteSpells[i], 8 );
 		//ps->FavouriteSpells[i][8] = 0;
 	}
 	for (i = 0; i <= 3; i++)
-		str->Read( &ps->FavouriteSpellsCount[i], 2 );
+		str->ReadWord( &ps->FavouriteSpellsCount[i] );
 
 	for (i = 0; i <= 3; i++) {
 		str->Read( &ps->FavouriteWeapons[i], 8 );
 		//ps->FavouriteWeapons[i][8] = 0;
 	}
 	for (i = 0; i <= 3; i++)
-		str->Read( &ps->FavouriteWeaponsCount[i],2 );
+		str->ReadWord( &ps->FavouriteWeaponsCount[i] );
 
 	return ps;
 }
@@ -321,8 +321,9 @@ GAMJournalEntry* GAMImp::GetJournalEntry()
 {
 	GAMJournalEntry* j = new GAMJournalEntry();
 
-	str->Read( &j->Text, 4 );
-	str->Read( &j->GameTime, 4 ); 
+	str->ReadDword( &j->Text );
+	str->ReadDword( &j->GameTime ); 
+	//this could be wrong, most likely these are 2 words, or a dword
 	str->Read( &j->Chapter, 1 );
 	str->Read( &j->unknown09, 1 );
 	str->Read( &j->Section, 1 );
