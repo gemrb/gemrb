@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.137 2004/04/15 10:21:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.138 2004/04/15 12:33:11 avenger_teambg Exp $
  *
  */
 
@@ -1302,6 +1302,12 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 		}
 		//No... it was not a door... maybe an InfoPoint?
 		aC = core->GetGame()->GetCurrentMap( )->tm->GetInfoPoint( oC->objectName );
+		if (aC) {
+			return aC;
+		}
+
+		//No... it was not an infopoint... maybe a Container?
+		aC = core->GetGame()->GetCurrentMap( )->tm->GetContainer( oC->objectName );
 		if (aC) {
 			return aC;
 		}

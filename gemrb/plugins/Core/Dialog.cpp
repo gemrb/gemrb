@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.7 2004/04/13 19:38:22 doc_wagon Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.8 2004/04/15 12:33:11 avenger_teambg Exp $
  *
  */
 
@@ -57,7 +57,7 @@ void Dialog::FreeDialogState(DialogState* ds)
 			FreeDialogString( ds->transitions[i]->trigger );
 		delete( ds->transitions[i] );
 	}
-	delete( ds->transitions );
+	free( ds->transitions );
 	if (ds->trigger) {
 		FreeDialogString( ds->trigger );
 	}
@@ -68,7 +68,6 @@ void Dialog::FreeDialogString(DialogString* ds)
 {
 	for (unsigned int i = 0; i < ds->count; i++) {
 		if (ds->strings[i]) {
-			printf( "Freeing String 0x%08X\n", ds->strings[i] );
 			free( ds->strings[i] );
 		}
 	}

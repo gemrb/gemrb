@@ -72,6 +72,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree,
 	if (autoFree) {
 		delete( stream );
 	}
+	core->FreeInterface( aM );
 }
 
 ScriptedAnimation::~ScriptedAnimation(void)

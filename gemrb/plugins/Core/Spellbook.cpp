@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.4 2004/04/15 10:21:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.5 2004/04/15 12:33:11 avenger_teambg Exp $
  *
  */
 
@@ -32,11 +32,24 @@ Spellbook::~Spellbook()
 	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			if(spells[i][j]) {
-				delete( spells[i][j] );
+				FreeSpellPage( spells[i][j] );
 				spells[i][j] = NULL;
 			}
 		}
 	}
+}
+
+void Spellbook::FreeSpellPage(CRESpellMemorization *sm)
+{
+	unsigned int i = sm->known_spells.size();
+	while(i--) {
+		delete sm->known_spells[i];
+	}
+	i = sm->memorized_spells.size();
+	while(i--) {
+		delete sm->memorized_spells[i];
+	}
+	delete sm;
 }
 
 bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
@@ -126,7 +139,7 @@ void Spellbook::dump()
 				CREMemorizedSpell* spl = sm->memorized_spells[k];
 				if (!spl) continue;
 
-				printf ( "  %2d: %8s  %x\n", k, spl->SpellResRef, spl->Flags );
+				printf ( "  %2u: %8s  %lx\n", k, spl->SpellResRef, spl->Flags );
 			}
 		}
 	}

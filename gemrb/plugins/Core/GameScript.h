@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.98 2004/04/15 10:21:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.99 2004/04/15 12:33:11 avenger_teambg Exp $
  *
  */
 
@@ -177,6 +177,7 @@ public:
 	{
 		if (objectParameter) {
 			objectParameter->Release();
+			objectParameter = NULL;
 		}
 	}
 public:
@@ -236,10 +237,10 @@ public:
 		for (int c = 0; c < triggersCount; c++) {
 			if (triggers[c]) {
 				triggers[c]->Release();
+				triggers[c] = NULL;
 			}
 		}
 		delete[] triggers;
-		//delete triggers;
 	}
 public:
 	unsigned short triggersCount;
@@ -296,6 +297,7 @@ public:
 		for (int c = 0; c < 3; c++) {
 			if (objects[c]) {
 				objects[c]->Release();
+				objects[c] = NULL;
 			}
 		}
 	}
@@ -357,10 +359,10 @@ public:
 		for (int c = 0; c < actionsCount; c++) {
 			if (actions[c]) {
 				actions[c]->Release();
+				actions[c] = NULL;
 			}
 		}
 		delete[] actions;
-		//delete actions;
 	}
 public:
 	unsigned char weight;
@@ -410,11 +412,10 @@ public:
 			return;
 		}
 		for (int b = 0; b < responsesCount; b++) {
-			Response* rP = responses[b];
-			rP->Release();
+			responses[b] -> Release();
+			responses[b] = NULL;
 		}
 		delete[] responses;
-		//delete responses;
 	}
 public:
 	unsigned short responsesCount;
@@ -461,9 +462,11 @@ public:
 	{
 		if (condition) {
 			condition->Release();
+			condition = NULL;
 		}
 		if (responseSet) {
 			responseSet->Release();
+			responseSet = NULL;
 		}
 	}
 public:
@@ -540,10 +543,10 @@ private:
 		for (unsigned int i = 0; i < responseBlocksCount; i++) {
 			if (responseBlocks[i]) {
 				responseBlocks[i]->Release();
+				responseBlocks[i] = NULL;
 			}
 		}
 		delete[] responseBlocks;
-		//delete responseBlocks;
 	}
 public:
 	unsigned int responseBlocksCount;

@@ -1196,7 +1196,10 @@ void GameControl::EndDialog()
 	speaker = NULL;
 	target = NULL;
 	ds = NULL;
-	dlg = NULL;
+	if (dlg) {
+		delete dlg;
+		dlg = NULL;
+	}
 	// FIXME: should use RunEventHandler()
 	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
 	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
@@ -1264,8 +1267,8 @@ void GameControl::DialogChoose(unsigned int choose)
 		int si = FindFirstState( target, dlg );
 		if (si < 0) {
 			printf( "[Dialog]: No top level condition evaluated for true.\n" );
-			EndDialog();
 			ta->SetMinRow( false );
+			EndDialog();
 			return;
 		}
 		ds = dlg->GetState( si );
@@ -1306,8 +1309,8 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 
 		if (tr->Flags & IE_DLG_TR_FINAL) {
-			EndDialog();
 			ta->SetMinRow( false );
+			EndDialog();
 			return;
 		}
 		int si = tr->stateIndex;

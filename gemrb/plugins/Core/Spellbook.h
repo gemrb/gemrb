@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.2 2004/04/07 09:54:53 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.3 2004/04/15 12:33:11 avenger_teambg Exp $
  *
  */
 
@@ -79,8 +79,6 @@ typedef struct CRESpellMemorization {
 } CRESpellMemorization;
 
 
-
-
 class GEM_EXPORT Spellbook {
 private:
 	std::vector<CRESpellMemorization*> spells[3];
@@ -89,6 +87,7 @@ public:
 	Spellbook();
 	virtual ~Spellbook();
 
+	void FreeSpellPage(CRESpellMemorization* sm);
 	//int AddKnownSpell(CREKnownSpell* spell);
 	bool AddSpellMemorization(CRESpellMemorization* sm);
 	//int AddMemorizedSpell(CREMemorizedSpell* spell);
