@@ -25,6 +25,14 @@ AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 AC_LANG_CPLUSPLUS
 
+dnl Check for recent STL with <vector>::at()
+AC_CHECK_STL_CONTAINER_AT([], [AC_MSG_ERROR([
+
+*** Your STL library does not define method container::at().
+*** It probably means that its version is too old.
+*** Please upgrade your standard C++ library to version 3.x.
+])])
+
 dnl Determine prefix.
 if test "x$prefix" = "xNONE"; then
   prefix=$ac_default_prefix
@@ -35,13 +43,29 @@ dnl Check for zlib.
 CHECK_ZLIB()
 
 dnl Check for libSDL Version 1.2 or greater, fail if not found.
-AM_PATH_SDL(1.2.0, [], [AC_MSG_ERROR("You need SDL libraries version > 1.2.0 or greater to compile GemRB")])
+AM_PATH_SDL(1.2.0, [], [AC_MSG_ERROR([
+
+*** You need SDL libraries version 1.2.0 or greater to compile GemRB
+])])
 
 dnl Check for OpenAL, fail if not found.
-AC_CHECK_LIB([openal], [alutInit], [ $(which true) ], [AC_MSG_ERROR("You need OpenAL libraries to compile GemRB")])
+AC_CHECK_LIB([openal], [alutInit], [ $(which true) ], [AC_MSG_ERROR([
+
+*** You need OpenAL libraries to compile GemRB
+])])
+
+dnl Check for Python version >= 2.3.0
+AM_PATH_PYTHON(2.3.0, [], [AC_MSG_ERROR([
+
+*** You need Python version 2.3.0 or greater to compile GemRB
+])])
 
 dnl Check for Python headers and libraries, fail if not found.
-AM_CHECK_PYTHON_HEADERS([], [AC_MSG_ERROR("You need python headers to compile GemRB")])
+AM_CHECK_PYTHON_HEADERS([], [AC_MSG_ERROR([
+
+*** You need python headers to compile GemRB
+])])
+
 
 dnl Check various functions.
 AC_CHECK_FUNCS([gettimeofday])

@@ -190,7 +190,7 @@ AC_DEFUN([AM_PATH_PYTHON],
   dnl in 1.5, and I don't want to maintain that logic.
 
   if test -z "$PYTHON"; then
-     AC_PATH_PROGS(PYTHON, python python2.1 python2.0 python1.6 python1.5)
+     AC_PATH_PROGS(PYTHON, python python2.3 python2.2 python2.1 python2.0 python1.6 python1.5)
   fi
 
   dnl should we do the version check?
@@ -208,7 +208,7 @@ if hasattr(sys, 'version_info'):
 else:
     pyver = map(string.atoi, string.split(pyver, '.'))
 # we can now do comparisons on the two lists:
-if pyver >= minver:
+if tuple(pyver) >= tuple(minver):
         sys.exit(0)
 else:
         sys.exit(1)"
@@ -216,12 +216,15 @@ else:
     if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC
     then
       AC_MSG_RESULT(okay)
+      $2
     else
-      AC_MSG_ERROR(too old)
+      AC_MSG_RESULT(too old)
+      $3
     fi
   ])
 
   AC_MSG_CHECKING([local Python configuration])
+  echo
 
   dnl Query Python for its version number.  Getting [:3] seems to be
   dnl the best way to do this; it's what "site.py" does in the standard
@@ -332,4 +335,34 @@ then
         fi
 fi
 
+])
+
+
+dnl Test whether STL library defines method container::at().
+dnl Older versions (e.g. 2.95.x on Debian) don't and newer (3.x) do
+dnl Syntax: AC_CHECK_STL_CONTAINER_AT([ACTION-IF-YES], [ACTION-IF-NO])
+AC_DEFUN(AC_CHECK_STL_CONTAINER_AT,
+[
+AC_MSG_CHECKING(for container::at)
+AC_TRY_COMPILE(
+[
+#include <vector>
+#include <deque>
+#include <string>
+
+using namespace std;
+],
+[
+deque<int> test_deque(3);
+test_deque.at(2);
+vector<int> test_vector(2);
+test_vector.at(1);
+string test_string("test_string");
+test_string.at(3);
+],
+[AC_MSG_RESULT(yes)
+dnl AC_DEFINE(HAVE_CONTAINER_AT)
+$1],
+[AC_MSG_RESULT(no)
+$2])
 ])
