@@ -36,22 +36,25 @@ bool TLKImp::Open(DataStream * stream, bool autoFree)
 
 inline char *mystrncpy(char *dest, const char *source, int maxlength, char delim)
 {
-  while(*dest && *dest!=delim && maxlength--)
+  while(*source && (*source!=delim) && maxlength--)
   {
     *dest++=*source++;
   }
+  *dest=0;
   return dest;
 }
 
 static bool ResolveTags(char *dest, char *source, int Length)
 {
   int NewLength;
-  char Token[MAX_VARIABLE_LENGTH];
+  char Token[MAX_VARIABLE_LENGTH+1];
 
+printf("ResolveTags: %s into %d\n",source,Length);
   NewLength=0;
   for(int i=0; source[i];i++) {
 	if(source[i]=='<') {
-		i+=mystrncpy(Token, source+i+1, sizeof(Token), '>' )-Token;
+		i+=mystrncpy(Token, source+i+1, MAX_VARIABLE_LENGTH, '>' )-Token+2;
+printf("TOKEN: %.32s\n",Token);
 		int TokenLength=core->GetTokenDictionary()->GetValueLength(Token);
 		if(TokenLength+NewLength>=Length)
 			return false;
@@ -81,12 +84,13 @@ static bool ResolveTags(char *dest, char *source, int Length)
 static bool GetNewStringLength(char *string, unsigned long &Length)
 {
   int NewLength;
-  char Token[MAX_VARIABLE_LENGTH];
+  char Token[MAX_VARIABLE_LENGTH+1];
 
   NewLength=0;
   for(int i=0;i<Length;i++) {
 	if(string[i]=='<') {
-		i+=mystrncpy(Token, string+i+1, sizeof(Token), '>' )-Token;
+		i+=mystrncpy(Token, string+i+1, MAX_VARIABLE_LENGTH, '>' )-Token+2;
+printf("TOKEN: %.32s\n",Token);
 		NewLength+=core->GetTokenDictionary()->GetValueLength(Token);
 	}
 	else {
@@ -100,6 +104,7 @@ static bool GetNewStringLength(char *string, unsigned long &Length)
 		else NewLength++;
 	}
   }
+printf("NewStringLength: %d\n",NewLength);
   if(NewLength!=Length)
   {
 	Length=NewLength;
@@ -140,6 +145,7 @@ char * TLKImp::GetString(unsigned long strref, int flags)
 //GetNewStringLength will look in string and return true
 //if the new Length will change due to tokens
 //if there is no new length, we are done
+printf("Resolve: %s\n",string);
 		while(GetNewStringLength(string, Length) ) {
 			char *string2 = (char *) malloc(Length+1);
 //ResolveTags will copy string to string2
