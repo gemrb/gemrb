@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.33 2005/02/25 15:07:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.34 2005/02/27 12:35:17 avenger_teambg Exp $
  *
  */
 
@@ -58,7 +58,16 @@ BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
 unsigned char pl_uppercase[256];
 unsigned char pl_lowercase[256];
 
-/* this function will copy a string to a zero terminated string with a maximum length */
+// these 2 functions will copy a string to a zero terminated string with a maximum length
+void strnlwrcpy(char *dest, const char *source, int count)
+{
+	while(count--) {
+		*dest++ = pl_lowercase[(unsigned char) *source];
+		if(!*source++) return;
+	}
+	*dest=0;
+}
+
 void strnuprcpy(char* dest, const char *source, int count)
 {
 	while(count--) {
@@ -68,6 +77,7 @@ void strnuprcpy(char* dest, const char *source, int count)
 	*dest=0;
 }
 
+// this function calculates the orientation of a character (or projectile) facing a point 
 static unsigned char orientations[25]={
 6,7,8,9,10,
 5,6,8,10,11,
@@ -88,6 +98,7 @@ unsigned char GetOrient(Point &s, Point &d)
 	return orientations[(aY+2)*5+aX+2];
 }
 
+// these functions calculate distance between 2 points
 unsigned int Distance(Point p, Point q)
 {
 	long x = ( p.x - q.x );
