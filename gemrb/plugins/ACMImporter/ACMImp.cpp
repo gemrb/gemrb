@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.23 2003/12/15 09:38:46 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.24 2003/12/23 18:46:43 avenger_teambg Exp $
  *
  */
 
@@ -195,7 +195,7 @@ unsigned long ACMImp::Play(const char * ResRef)
 	strcat(tmpFile, ResRef);
 	strcat(tmpFile, ".tmp");
 	DataStream * dstr = core->GetResourceMgr()->GetResource(ResRef, IE_WAV_CLASS_ID);
-	if(!AcmToWav(dstr, tmpFile, path)) {
+	if(!AcmToWav(dstr, tmpFile, path,0)) {
 		printMessage("ACMImporter", "ACM Decompression Failed\n", LIGHT_RED);
 		return 0xffffffff;
 	}
@@ -358,7 +358,7 @@ unsigned long ACMImp::LoadFile(const char * filename)
 		delete(dstr);
 		return 0xffffffff;
 	}
-	if(!AcmToWav(dstr, tmpFile, outFile)) {
+	if(!AcmToWav(dstr, tmpFile, outFile, core->ForceStereo)) {
 		printMessage("ACMImporter", "ACM Decompression Failed\n", LIGHT_RED);
 		delete(dstr);
 		return 0xffffffff;
@@ -430,7 +430,7 @@ unsigned long ACMImp::LoadFile(const char * filename)
 	return 0xffffffff;
 }
 
-bool ACMImp::AcmToWav(DataStream *inFile, const char * tmpFile, const char * outFile)
+bool ACMImp::AcmToWav(DataStream *inFile, const char * tmpFile, const char * outFile, int forcestereo)
 {
 	//DataStream * str = core->GetResourceMgr()->GetResource(ResRef, IE_WAV_CLASS_ID);
 	if(inFile == NULL)
@@ -463,7 +463,7 @@ bool ACMImp::AcmToWav(DataStream *inFile, const char * tmpFile, const char * out
 		return false;
 	unsigned char *buffer = NULL;
 	long samples_written;
-	int ret = ConvertAcmWav(fhandle, -1L, buffer, samples_written, core->ForceStereo);
+	int ret = ConvertAcmWav(fhandle, -1L, buffer, samples_written, forcestereo);
 	if(ret != 0) {
 		if(buffer)
 			delete buffer;

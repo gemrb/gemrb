@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.11 2003/12/02 17:12:09 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.12 2003/12/23 18:46:43 avenger_teambg Exp $
  *
  */
 
@@ -80,7 +80,7 @@ public:
 	~ACMImp(void);
 	bool Init(void);
 	unsigned long Play(const char * ResRef);
-	bool AcmToWav(DataStream *inFile, const char * tmpFile, const char * outFile);
+	bool AcmToWav(DataStream *inFile, const char * tmpFile, const char * outFile, int forcestereo);
 	unsigned long LoadFile(const char * filename);
 	bool Play(unsigned long index);
 	bool Stop(unsigned long index);
