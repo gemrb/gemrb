@@ -1,86 +1,86 @@
 2DA V1.0
 MAN2S
-              GENDER     
-2MELF1_       1          
-2MAAS1_       1
-2MBAR1_       1
-2MDEF1_       1
-2MDEF2_       1
-2MGNM1_       1
-2MHAF1_       1
-2MHUM1_       1
-2MHUM2_       1
-2MHUM3_       1
-2MHUM4_       1
-2MHUM5_       1
-2MHUM6_       1
-2MHUM7_       1
-2MPAL1_       1
-2MORC1_       1
-2MDWF1_       1
-2MDWF2_       1
-DMC_          1
-DMF_          1
-DMF2_         1
-DMT_          1
-EMC_          1
-EMF_          1
-EMF2_         1
-EMT_          1
-EMW_          1
-GMT_          1
-GMW_          1
-HAMF_         1
-HAMT_         1
-HEMF_         1
-HEMT_         1
-HEMW_         1
-HMC_          1
-HMC2_         1
-HMC3_         1
-HMC4_         1
-HMF_          1
-HMF2_         1
-HMF3_         1
-HMF4_         1
-HMF5_         1
-HMF6_         1
-HMF7_         1
-HMW_          1
-HMW2_         1
-HMW3_         1
-HMW4_         1
-HMB_          1
-HMB2_         1
-2FBAR1_       2          
-2FDEF1_       2
-2FELF1_       2
-2FELF2_       2
-2FELF3_       2
-2FGNM1_       2
-2FHUM1_       2
-2FHUM2_       2
-2FHUM3_       2
-2FHUM4_       2
-2FTIF1_       2          
-2FORC1_       2
-DFF_          2
-EFC_          2
-EFF_          2
-EFW_          2
-EFW2_         2
-GFW_          2
-HAFF_         2
-HEFC_         2
-HAFT_         2
-HEFB_         2
-HEFF_         2
-HEFW_         2
-HFD_          2
-HFF_          2
-HFF2_         2
-HFT_          2
-HFT2_         2
-HFW_          2
-HFW2_         2
-HFW3_         2
+              GENDER     HAIR	SKIN	MAJOR	MINOR
+2MELF1_       1          0	0	0	0
+2MAAS1_       1		 0	0	0	0
+2MBAR1_       1		 0	0	0	0
+2MDEF1_       1		 0	0	0	0
+2MDEF2_       1		 0	0	0	0
+2MGNM1_       1		 0	0	0	0
+2MHAF1_       1		 0	0	0	0
+2MHUM1_       1		 0	0	0	0
+2MHUM2_       1		 0	0	0	0
+2MHUM3_       1		 0	0	0	0
+2MHUM4_       1		 0	0	0	0
+2MHUM5_       1		 0	0	0	0
+2MHUM6_       1		 0	0	0	0
+2MHUM7_       1		 0	0	0	0
+2MPAL1_       1		 0	0	0	0
+2MORC1_       1		 0	0	0	0
+2MDWF1_       1		 0	0	0	0
+2MDWF2_       1		 0	0	0	0
+DMC_          1		 0	0	0	0
+DMF_          1		 0	0	0	0
+DMF2_         1		 0	0	0	0
+DMT_          1		 0	0	0	0
+EMC_          1		 0	0	0	0
+EMF_          1		 0	0	0	0
+EMF2_         1		 0	0	0	0
+EMT_          1		 0	0	0	0
+EMW_          1		 0	0	0	0
+GMT_          1		 0	0	0	0
+GMW_          1		 0	0	0	0
+HAMF_         1		 0	0	0	0
+HAMT_         1		 0	0	0	0
+HEMF_         1		 0	0	0	0
+HEMT_         1		 0	0	0	0
+HEMW_         1		 0	0	0	0
+HMC_          1		 0	0	0	0
+HMC2_         1		 0	0	0	0
+HMC3_         1		 0	0	0	0
+HMC4_         1		 0	0	0	0
+HMF_          1		 0	0	0	0
+HMF2_         1		 0	0	0	0
+HMF3_         1		 0	0	0	0
+HMF4_         1		 0	0	0	0
+HMF5_         1		 0	0	0	0
+HMF6_         1		 0	0	0	0
+HMF7_         1		 0	0	0	0
+HMW_          1		 0	0	0	0
+HMW2_         1		 0	0	0	0
+HMW3_         1		 0	0	0	0
+HMW4_         1		 0	0	0	0
+HMB_          1		 0	0	0	0
+HMB2_         1		 0	0	0	0
+2FBAR1_       2        	 0	0	0	0
+2FDEF1_       2		 0	0	0	0
+2FELF1_       2		 0	0	0	0
+2FELF2_       2		 0	0	0	0
+2FELF3_       2		 0	0	0	0
+2FGNM1_       2		 0	0	0	0
+2FHUM1_       2		 0	0	0	0
+2FHUM2_       2		 0	0	0	0
+2FHUM3_       2		 0	0	0	0
+2FHUM4_       2		 0	0	0	0
+2FTIF1_       2    	 0	0	0	0
+2FORC1_       2		 0	0	0	0
+DFF_          2		 0	0	0	0
+EFC_          2		 0	0	0	0
+EFF_          2		 0	0	0	0
+EFW_          2		 0	0	0	0
+EFW2_         2		 0	0	0	0
+GFW_          2		 0	0	0	0
+HAFF_         2		 0	0	0	0
+HEFC_         2		 0	0	0	0
+HAFT_         2		 0	0	0	0
+HEFB_         2		 0	0	0	0
+HEFF_         2		 0	0	0	0
+HEFW_         2		 0	0	0	0
+HFD_          2		 0	0	0	0
+HFF_          2		 0	0	0	0
+HFF2_         2		 0	0	0	0
+HFT_          2		 0	0	0	0
+HFT2_         2		 0	0	0	0
+HFW_          2		 0	0	0	0
+HFW2_         2		 0	0	0	0
+HFW3_         2		 0	0	0	0

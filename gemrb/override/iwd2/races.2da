@@ -1,20 +1,19 @@
 2DA V1.0
 -1
-            NAME_REF   DESC_REF   CAP_REF    ID  USABILITY
-HUMAN       7193       9550       1096       1	 0x08000000
-DWARF       7182       9551       1100       2	 0x01000000
-ELF         7194       9552       1097       3	 0x00800000
-GNOME       7196       9553       1099       4	 0x10000000
-HALF_ELF    7197       9555       1098       5	 0x02000000
-HALF_ORC    22         25         23         6	 0x80000000
-HALFLING    7195       9554       5374       7	 0x04000000
-HUMAN_AASIMAR     5377       5386       5377       8   0x00000000
-HUMAN_TIEFLING    5378       5388       5378       9   0x00000000
-ELF_DROW        5379       5394       5379       10  0x00000000
-ELF_WILD        5380       5397       5380       11  0x00000000
-DWARF_GOLD        5381       5413       5381       12  0x00000000
-DWARF_GRAY        5382       5416       5382       13  0x00000000
-HALFLING_STRONGHEART 5383       5660       5383       14  0x00000000
-HALFLING_GHOSTWISE   5384       5661       5384       15  0x00000000
-GNOME_DEEP        5385       5662       5385       16  0x00000000
-
+                     NAME_REF   DESC_REF   CAP_REF    ID         USABILITY  HAIR       SKIN       
+HUMAN                7193       9550       1096       1          0x08000000 HAIRNORM   SKINNORM   
+DWARF                7182       9551       1100       2          0x01000000 HAIRNORM   SKINNORM   
+ELF                  7194       9552       1097       3          0x00800000 HAIRNORM   SKINNORM   
+GNOME                7196       9553       1099       4          0x10000000 HAIRNORM   SKINNORM   
+HALF_ELF             7197       9555       1098       5          0x02000000 HAIRNORM   SKINNORM   
+HALF_ORC             22         25         23         6          0x80000000 HAIRNORM   SKINNORM   
+HALFLING             7195       9554       5374       7          0x04000000 HAIRNORM   SKINNORM   
+HUMAN_AASIMAR        5377       5386       5377       8          0x00000000 HAIRAASM   SKINAASM   
+HUMAN_TIEFLING       5378       5388       5378       9          0x00000000 HAIRTIEF   SKINTIEF   
+ELF_DROW             5379       5394       5379       10         0x00000000 HAIRDARK   SKINDARK   
+ELF_WILD             5380       5397       5380       11         0x00000000 HAIRWOOD   SKINWOOD   
+DWARF_GOLD           5381       5413       5381       12         0x00000000 HAIRGOLD   SKINGOLD   
+DWARF_GRAY           5382       5416       5382       13         0x00000000 HAIRGRAY   SKINGRAY   
+HALFLING_STRONGHEART 5383       5660       5383       14         0x00000000 HAIRNORM   SKINNORM   
+HALFLING_GHOSTWISE   5384       5661       5384       15         0x00000000 HAIRNORM   SKINNORM   
+GNOME_DEEP           5385       5662       5385       16         0x00000000 HAIRNORM   SKINNORM   

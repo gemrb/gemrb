@@ -1,0 +1,14 @@
+2DA V1.0
+*
+                    HATERACE   CLERICSPELL MAGESPELL  
+BARBARIAN           *          *           *          
+BARD                *          *           MXSPLBRD   
+CLERIC              *          MXSPLPRS    *          
+DRUID               *          MXSPLDRU    *          
+FIGHTER             *          *           *          
+MONK                *          *           *          
+PALADIN             *          MXSPLPAL    *          
+RANGER              HATERACE   MXSPLRAN    *          
+ROGUE               *          *           *          
+SORCERER            *          *           MXSPLSRC   
+WIZARD              *          *           MXSPLWIZ   
