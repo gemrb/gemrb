@@ -26,7 +26,7 @@ class GEM_EXPORT Actor
 {
 public:
 	unsigned short XPos, YPos, XDes, YDes, Animation;
-	unsigned char Orientation;
+	unsigned char Orientation, InParty;
         long BaseStats[MAX_STATS];
         long Modified[MAX_STATS];
 	CharAnimations *anims;
@@ -45,15 +45,19 @@ public:
         /** Inits the Modified vector */
         void Init();
         /** Returns a Stat value */
-        long  GetStat(unsigned char StatIndex);
+        long  GetStat(unsigned int StatIndex);
+	/** Sets a Stat Value (unsaved) */
+	bool  SetStat(unsigned int StatIndex, long Value);
         /** Returns the difference */
-        long  GetMod(unsigned char StatIndex);
+        long  GetMod(unsigned int StatIndex);
+	/** Sets a Stat Value (unsaved) */
+	bool  SetMod(unsigned int StatIndex, long Value);
         /** Returns a Stat Base Value */
-        long  GetBase(unsigned char StatIndex);
+        long  GetBase(unsigned int StatIndex);
         /** Sets a Stat Base Value */
-        bool  SetBase(unsigned char StatIndex, long Value);
+        bool  SetBase(unsigned int StatIndex, long Value);
         /** Sets the modified value in different ways, returns difference */
-        int   NewMod(unsigned char StatIndex, long ModifierValue, long ModifierType);
+        int   NewStat(unsigned int StatIndex, long ModifierValue, long ModifierType);
         /** Sets the Scripting Name (death variable) */
         void  SetScriptName(const char * string)
         {

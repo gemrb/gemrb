@@ -118,7 +118,7 @@ Interface::~Interface(void)
 		delete(tokens);
 	FreeInterfaceVector(Table, tables, tm);
 	FreeInterfaceVector(Symbol, symbols, sm);
-	FreeResourceVector(Actor, sheets);
+	FreeResourceVector(Actor, actors);
 	delete(console);
 	delete(plugin);
 
@@ -646,7 +646,18 @@ ScriptEngine * Interface::GetGUIScriptEngine()
 	return guiscript;
 }
 
-int Interface::LoadCreature(char *ResRef)
+int Interface::UnloadCreature(int Slot)
+{
+	if(Slot>=actors.size())
+		return 0;
+	if(!actors[Slot])
+		return 0;
+	delete actors[Slot];
+	actors[Slot]=NULL;
+	return 1;
+}
+
+int Interface::LoadCreature(char *ResRef, int InParty)
 {
 	ActorMgr *actormgr=(ActorMgr *) GetInterface(IE_CRE_CLASS_ID);
 	DataStream *stream=GetResourceMgr()->GetResource(ResRef,IE_CRE_CLASS_ID);
@@ -657,8 +668,40 @@ int Interface::LoadCreature(char *ResRef)
 	}
 	Actor *actor=actormgr->GetActor();
 	FreeInterface(actormgr);
-	actors.push_back(actor);
-	return actors.size()-1;
+	actor->InParty=InParty;
+	int index;
+	for(index=0;index<actors.size(); index++) {
+		if(!actors[index]) break;
+        }
+	if(index==actors.size() )
+		actors.push_back(actor);
+	return index;
+}
+
+int Interface::FindPlayer(int PartySlotCount)
+{
+	int index=actors.size();
+	while(index--) {
+		if(!actors[index])
+			continue;
+		if(actors[index]->InParty ) {
+			break;
+		}
+	}
+	return index;
+}
+
+int Interface::SetCreatureStat(int Slot, unsigned int StatID, int StatValue, int Mod)
+{
+	if(Slot>=actors.size())
+		return 0;
+	if(!actors[Slot])
+		return 0;
+	if(Mod)
+		actors[Slot]->SetMod(StatID, StatValue);
+	else
+		actors[Slot]->SetBase(StatID, StatValue);
+	return 1;
 }
 
 void Interface::RedrawAll()

@@ -1176,7 +1176,7 @@ static PyObject * GemRB_LoadMusicPL(PyObject */*self*/, PyObject *args)
 	char* ResRef;
 
 	if(!PyArg_ParseTuple(args, "s", &ResRef)) {
-		printMessage("GUIScript", "Syntax Error: PlayMusicPL(MusicPlayListResource)\n", LIGHT_RED);
+		printMessage("GUIScript", "Syntax Error: LoadMusicPL(MusicPlayListResource)\n", LIGHT_RED);
 		return NULL;
 	}
 	
@@ -1478,6 +1478,53 @@ static PyObject *GemRB_GetINIPartyKey(PyObject */*self*/, PyObject *args)
 	return Py_BuildValue("s",core->GetPartyINI()->GetKeyAsString(Tag, Key, Default) );
 }
 
+static PyObject *GemRB_CreatePlayer(PyObject */*self*/, PyObject *args)
+{
+	char *CreResRef;
+	int PlayerSlot;
+
+	if(!PyArg_ParseTuple(args,"si", &CreResRef, &PlayerSlot) ) {
+		printMessage("GUIScript","Syntax Error: CreatePlayer(ResRef, Slot)\n", LIGHT_RED);
+		return NULL;
+	}
+	if(PlayerSlot&0x8000) {
+		PlayerSlot=core->FindPlayer(PlayerSlot&0x7fff);
+		if(PlayerSlot<0) {
+			PlayerSlot=core->LoadCreature(CreResRef,1);
+		}
+	}
+	else {
+		PlayerSlot=core->FindPlayer(PlayerSlot);
+		if(PlayerSlot>=0) {
+			printMessage("GUIScript","Slot is already filled!\n",LIGHT_RED);
+			return NULL;
+		}
+		PlayerSlot=core->LoadCreature(CreResRef, 1); //inparty flag
+	}
+	if(PlayerSlot<0) {
+		printMessage("GUIScript","Not found!\n",LIGHT_RED);
+		return NULL;
+	}
+	return Py_BuildValue("i",PlayerSlot);
+}
+
+static PyObject *GemRB_SetPlayerStat(PyObject */*self*/, PyObject *args)
+{
+	int PlayerSlot, StatID, StatValue;
+
+	if(!PyArg_ParseTuple(args,"iii", &PlayerSlot, &StatID, &StatValue) ) {
+		printMessage("GUIScript","Syntax Error: SetPlayerStat(Slot, ID, Value)\n", LIGHT_RED);
+		return NULL;
+	}
+	PlayerSlot = core->FindPlayer(PlayerSlot);
+	if(PlayerSlot<0)
+		return NULL;
+	if(!core->SetCreatureStat(PlayerSlot, StatID, StatValue))
+		return NULL;
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
     {"GetINIPartyCount", GemRB_GetINIPartyCount, METH_NOARGS,
      "Returns the Number of Party defined in Party.ini (works only on IWD2)."},
@@ -1659,8 +1706,17 @@ static PyMethodDef GemRBMethods[] = {
         {"SetSaveGamePortrait", GemRB_SetSaveGamePortrait, METH_VARARGS,
      "Sets a savegame PC portrait bmp onto a button as picture."},
 
+	{"CreatePlayer", GemRB_CreatePlayer, METH_VARARGS,
+     "Creates a player slot."},
+
+	{"SetPlayerStat", GemRB_CreatePlayer, METH_VARARGS,
+     "Changes a stat."},
+
+	{"FillPlayerInfo", GemRB_FillPlayerInfo, METH_VARARGS,
+     "Fills basic character info, that is not stored in stats."},
+
 	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
-	 "Invalidated the given Window."},
+	 "Invalidates the given Window."},
 
     {NULL, NULL, 0, NULL}
 };

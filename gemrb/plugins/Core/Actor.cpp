@@ -37,20 +37,27 @@ CharAnimations *Actor::GetAnims()
 }
 
 /** Returns a Stat value (Base Value + Mod) */
-long Actor::GetStat(unsigned char StatIndex)
+long Actor::GetStat(unsigned int StatIndex)
 {
         if(StatIndex >= MAX_STATS)
-                return 0xffff;
+                return 0xdadadadada;
         return Modified[StatIndex];
 }
-long Actor::GetMod(unsigned char StatIndex)
+bool  Actor::SetStat(unsigned int StatIndex, long Value)
 {
         if(StatIndex >= MAX_STATS)
-                return 0xffff;
+                return false;
+        Modified[StatIndex] = Value;
+        return true;
+}
+long Actor::GetMod(unsigned int StatIndex)
+{
+        if(StatIndex >= MAX_STATS)
+                return 0xdadadadada;
         return Modified[StatIndex]-BaseStats[StatIndex];
 }
 /** Returns a Stat Base Value */
-long Actor::GetBase(unsigned char StatIndex)
+long Actor::GetBase(unsigned int StatIndex)
 {
         if(StatIndex >= MAX_STATS)
                 return 0xffff;
@@ -58,7 +65,7 @@ long Actor::GetBase(unsigned char StatIndex)
 }
 
 /** Sets a Stat Base Value */
-bool  Actor::SetBase(unsigned char StatIndex, long Value)
+bool  Actor::SetBase(unsigned int StatIndex, long Value)
 {
         if(StatIndex >= MAX_STATS)
                 return false;
@@ -73,7 +80,7 @@ void Actor::Init()
 /** implements a generic opcode function, modify modifier
     returns the change
 */
-int Actor::NewMod(unsigned char StatIndex, long ModifierValue, long ModifierType)
+int Actor::NewStat(unsigned int StatIndex, long ModifierValue, long ModifierType)
 {
         int oldmod=Modified[StatIndex];
 

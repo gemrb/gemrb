@@ -82,7 +82,6 @@ private:
 	MusicMgr * music;
 	std::vector<Table> tables;
 	std::vector<Symbol> symbols;
-	std::vector<Actor*> sheets;
 	DataFileMgr * INIparty;
 public:
 	Interface(void);
@@ -109,7 +108,13 @@ public:
 	/** Get GUI Script Manager */
 	ScriptEngine * GetGUIScriptEngine();
 	/** Returns an actor index, by loading a creature */
-	int LoadCreature(char *ResRef);
+	int LoadCreature(char *ResRef, int InParty);
+	/** Removes a creature */
+	int UnloadCreature(int Slot);
+	/** Returns actor index for partyslot PartySlotCount */
+	int FindPlayer(int PartySlotCount);
+	/** Sets a stat for the creature in actor index Slot */
+	int SetCreatureStat(int Slot, unsigned int StatID, int StatValue, int Mod);
 	/** Loads a Window in the Window Manager */
 	int LoadWindow(unsigned short WindowID);
 	/** Sets a Window on the Top */
