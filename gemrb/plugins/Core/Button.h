@@ -60,8 +60,11 @@ public:
   void Draw(unsigned short x, unsigned short y);
   /** Sets the Button State */
   void SetState(unsigned char state);
-public: // Public attributes
-
+public: // Public Events
+  /** Mouse Button Down */
+  virtual void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+  /** Mouse Button Up */
+  virtual void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);	
 private: // Private attributes
 	/** Button Unpressed Image */
   Sprite2D * Unpressed;

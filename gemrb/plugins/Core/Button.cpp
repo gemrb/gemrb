@@ -121,3 +121,16 @@ void Button::SetState(unsigned char state)
 		return;
 	State = state;
 }
+
+/** Mouse Button Down */
+void Button::OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
+{
+	if(Button == 1) {
+		State = IE_GUI_BUTTON_PRESSED;
+	}
+}
+/** Mouse Button Up */
+void Button::OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod)
+{
+	State = IE_GUI_BUTTON_UNPRESSED;
+}
