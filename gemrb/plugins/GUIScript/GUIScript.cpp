@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.126 2004/02/18 20:57:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.127 2004/02/19 01:08:10 edheldil Exp $
  *
  */
 
@@ -40,6 +40,7 @@
 #include "../Core/WorldMapMgr.h"
 #include "../Core/SpellMgr.h"
 #include "../Core/ItemMgr.h"
+#include "../Core/StoreMgr.h"
 
 inline bool valid_number(const char *string, long &val)
 {
@@ -2028,10 +2029,12 @@ static PyObject *GemRB_SetSpellIcon( PyObject * /*self*/, PyObject *args)
 	DataStream *str = core->GetResourceMgr()->GetResource(SpellResRef, IE_SPL_CLASS_ID);
 	SpellMgr * im = (SpellMgr*)core->GetInterface(IE_SPL_CLASS_ID);
 	if(im == NULL) {
+		printMessage("GUIScript","Runtime Error: core->GetInterface()\n", LIGHT_RED);
 		delete (str);
 		return NULL;
 	}
 	if(!im->Open(str, true)) {
+		printMessage("GUIScript","Runtime Error: im->Open()\n", LIGHT_RED);
 		core->FreeInterface(im);
 		return NULL;
 	}
@@ -2039,6 +2042,7 @@ static PyObject *GemRB_SetSpellIcon( PyObject * /*self*/, PyObject *args)
 	// FIXME - should use some already allocated in core
 	Spell * spell = im->GetSpell ();
 	if(spell == NULL) {
+		printMessage("GUIScript","Runtime Error: im->GetSpell()\n", LIGHT_RED);
 		core->FreeInterface(im);
 		return NULL;
 	}
@@ -2105,6 +2109,75 @@ static PyObject *GemRB_SetItemIcon( PyObject * /*self*/, PyObject *args)
 	Py_INCREF(Py_None);
 	return Py_None;
 }
+
+// FIXME: ugly, should be in core
+Store * store;
+
+static PyObject *GemRB_EnterStore( PyObject * /*self*/, PyObject *args)
+{
+	char *StoreResRef;
+
+	if(!PyArg_ParseTuple(args, "s", &StoreResRef) ) {
+		printMessage("GUIScript","Syntax Error: EnterStore(StoreName)\n", LIGHT_RED);
+		return NULL;
+	}
+
+	// FIXME!!!
+	DataStream *str = core->GetResourceMgr()->GetResource(StoreResRef, IE_STO_CLASS_ID);
+	StoreMgr * sm = (StoreMgr*)core->GetInterface(IE_STO_CLASS_ID);
+	if(sm == NULL) {
+		delete (str);
+		return NULL;
+	}
+	if(!sm->Open(str, true)) {
+		core->FreeInterface(sm);
+		return NULL;
+	}
+
+	// FIXME - should use some already allocated in core
+	store = sm->GetStore ();
+	if(store == NULL) {
+		core->FreeInterface(sm);
+		return NULL;
+	}
+
+	//Button * btn = (Button*)ctrl;
+	//btn->SetImage(IE_GUI_BUTTON_UNPRESSED, item->ItemIconBAM->GetFrame (0));
+	//btn->SetImage(IE_GUI_BUTTON_PRESSED, item->ItemIconBAM->GetFrame (0));
+	//delete store;
+	core->FreeInterface(sm);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject *GemRB_GetStoreName ( PyObject * /*self*/, PyObject *args)
+{
+	if(!PyArg_ParseTuple(args, "") ) {
+		printMessage("GUIScript","Syntax Error: GetStoreName()\n", LIGHT_RED);
+		return NULL;
+	}
+
+	return PyString_FromString (core->GetString (store->StoreName));
+}
+
+static PyObject *GemRB_GetStoreRoomPrices ( PyObject * /*self*/, PyObject *args)
+{
+	if(!PyArg_ParseTuple(args, "") ) {
+		printMessage("GUIScript","Syntax Error: GetStoreRoomPrices()\n", LIGHT_RED);
+		return NULL;
+	}
+
+	PyObject *p = PyTuple_New (4);
+
+	for (int i = 0; i < 4; i++) {
+	  PyTuple_SetItem (p, i, PyInt_FromLong (store->RoomPrices[i]));
+	}
+
+	return p;
+}
+
+
 
 static PyObject * GemRB_ExecuteString(PyObject * /*self*/, PyObject *args)
 {
@@ -2378,6 +2451,15 @@ static PyMethodDef GemRBMethods[] = {
 
 	{"SetItemIcon", GemRB_SetItemIcon, METH_VARARGS,
      "FIXME: temporary Set Item icon image ...."},
+
+	{"EnterStore", GemRB_EnterStore, METH_VARARGS,
+     "FIXME: temporary EnterStore (StoreName) ...."},
+
+	{"GetStoreName", GemRB_GetStoreName, METH_VARARGS,
+     "FIXME: temporary GetStoreName () ...."},
+
+	{"GetStoreRoomPrices", GemRB_GetStoreRoomPrices, METH_VARARGS,
+     "FIXME: temporary GetStoreRoomPrices () ...."},
 
 	{"InvalidateWindow", GemRB_InvalidateWindow, METH_VARARGS,
 	 "Invalidates the given Window."},
