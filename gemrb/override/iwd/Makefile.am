@@ -1,3 +1,3 @@
-howoverride_DATA = *.2da
-howoverridedir = $(moddir)/override/iwd/
-EXTRA_DIST = *.2da
+iwdoverride_DATA = *.2da *.bmp
+iwdoverridedir = $(moddir)/override/iwd/
+EXTRA_DIST = *.2da *.bmp
