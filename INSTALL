@@ -1,8 +1,6 @@
 Basic Installation
 ==================
 
-   These are generic installation instructions.
-
    The `configure' shell script attempts to guess correct values for
 various system-dependent variables used during compilation.  It uses
 those values to create a `Makefile' in each directory of the package.
@@ -34,14 +32,13 @@ The simplest way to compile this package is:
      Running `configure' takes a while.  While running, it prints some
      messages telling which features it is checking for.
 
-  2. Enter the 'gemrb/plugins/Core/' Directory and type 'make'. This
-     will build the Core Module needed to build GemRB.
+  2. type `make' to compile the package.
 
-  3. 'cd' again to the source code directory and type `make' to compile 
-     the package.
+  3. type `make install' to install the package.
 
-  4. 'cd' to the 'gemrb/' Directory and type 'plugins-prepare.sh'. This
-     script will copy each plugin to the 'plugins' Directory.
+  4. If you want to avoid installation, just 'cd' to the 'gemrb/'
+     directory and type 'plugins-prepare.sh'. This
+     script will link each plugin to the 'plugins' directory.
 
   5. You can remove the program binaries and object files from the
      source code directory by typing `make clean'.  
