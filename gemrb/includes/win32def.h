@@ -20,6 +20,10 @@
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
 
+// abstract iteration position
+struct __POSITION { };
+typedef __POSITION* POSITION;
+
 #define ADV_TEXT
 #define textcolor(i) i
 
