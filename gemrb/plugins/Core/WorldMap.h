@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.5 2004/08/20 12:48:25 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.6 2004/08/24 14:39:36 edheldil Exp $
  *
  */
 
@@ -40,6 +40,11 @@
 #define GEM_EXPORT
 #endif
 
+
+#define WMP_ENTRY_VISIBLE    0x1
+#define WMP_ENTRY_UNKNOWN    0x2   // unknown meaning
+#define WMP_ENTRY_ACCESSIBLE 0x4
+#define WMP_ENTRY_VISITED    0x8
 
 typedef struct WMPAreaEntry {
 	ieResRef AreaName;
