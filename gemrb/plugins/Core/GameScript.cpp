@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.11 2003/12/15 11:08:47 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.12 2003/12/15 22:36:51 balrog994 Exp $
  *
  */
 
@@ -429,6 +429,8 @@ bool GameScript::EvaluateCondition(GameScript * sender, Condition * condition)
 	for(int i = 0; i < condition->triggersCount; i++) {
 		Trigger * tR = condition->triggers[i];
 		ret &= EvaluateTrigger(sender, tR);
+		if(!ret)
+			return ret;
 	}
 	return ret;
 }
