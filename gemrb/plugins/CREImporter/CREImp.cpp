@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.8 2003/11/25 18:58:39 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.9 2003/11/25 19:27:42 balrog994 Exp $
  *
  */
 
@@ -242,6 +242,9 @@ Actor * CREImp::GetActor()
 			str->Seek(6, GEM_CURRENT_POS);
 			}
 		break;
+
+		str->Seek(0x1ED, GEM_CURRENT_POS);
+		str->Read(&act->BaseStats[IE_EA], 1);
 	}
 	act->SetAnimationID(act->BaseStats[IE_ANIMATION_ID]);
 	if(act->anims)
