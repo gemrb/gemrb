@@ -506,6 +506,14 @@ ScriptEngine * Interface::GetGUIScriptEngine()
 	return guiscript;
 }
 
+void Interface::RedrawAll()
+{
+	for(int i = 0; i < windows.size(); i++) {
+		if(windows[i]!=NULL)
+			windows[i]->Invalidate();
+	}
+}
+
 /** Loads a Window in the Window Manager */
 int Interface::LoadWindow(unsigned short WindowID)
 {
@@ -714,8 +722,7 @@ int Interface::DelWindow(unsigned short WindowIndex)
 void Interface::PopupConsole()
 {
 	ConsolePopped = !ConsolePopped;
-	if(windows.size() != 0)
-		windows[0]->Invalidate();
+	RedrawAll();
 	console->Changed = true;
 }
 

@@ -96,6 +96,8 @@ public:
 	Window * GetWindow(unsigned short WindowIndex);
 	/** Removes a Loaded Window */
 	int DelWindow(unsigned short WindowIndex);
+	/** Redraws all window */
+	void RedrawAll();
 	/** Popup the Console */
 	void PopupConsole();
 	/** Draws the Console */
