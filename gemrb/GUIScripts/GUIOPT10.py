@@ -10,47 +10,47 @@ def OnLoad():
 
 	ChHitButton = GemRB.GetControl(AutoPauseWindow, 17)
 	ChHitButtonB = GemRB.GetControl(AutoPauseWindow, 1)
-#	GemRB.SetVarAssoc(AutoPauseWindow, ChHitButtonB, "Autopause Status",1)
+	GemRB.SetVarAssoc(AutoPauseWindow, ChHitButtonB, "Autopause Status",1)
 
 	ChInjured = GemRB.GetControl(AutoPauseWindow, 18)
 	ChInjuredB = GemRB.GetControl(AutoPauseWindow, 2)
-#	GemRB.SetVarAssoc(AutoPauseWindow, ChInjuredB, "Autopause Status",2)
+	GemRB.SetVarAssoc(AutoPauseWindow, ChInjuredB, "Autopause Status",2)
 
 	ChDeath = GemRB.GetControl(AutoPauseWindow, 19)
 	ChDeathB = GemRB.GetControl(AutoPauseWindow, 3)
-#	GemRB.SetVarAssoc(AutoPauseWindow, ChDeathB, "Autopause Status",4)
+	GemRB.SetVarAssoc(AutoPauseWindow, ChDeathB, "Autopause Status",4)
 
 	ChAttacked = GemRB.GetControl(AutoPauseWindow, 20)
 	ChAttackedB = GemRB.GetControl(AutoPauseWindow, 4)
-#	GemRB.SetVarAssoc(AutoPauseWindow, ChAttackedB, "Autopause Status",8)
+	GemRB.SetVarAssoc(AutoPauseWindow, ChAttackedB, "Autopause Status",8)
 
 	WeaponUnusable = GemRB.GetControl(AutoPauseWindow, 21)
 	WeaponUnusableB = GemRB.GetControl(AutoPauseWindow, 5)
-#	GemRB.SetVarAssoc(AutoPauseWindow, WeaponUnusableB, "Autopause Status",16)
+	GemRB.SetVarAssoc(AutoPauseWindow, WeaponUnusableB, "Autopause Status",16)
 
 	TargetDestroyed = GemRB.GetControl(AutoPauseWindow, 22)
 	TargetDestroyedB = GemRB.GetControl(AutoPauseWindow, 13)
-#	GemRB.SetVarAssoc(AutoPauseWindow, TargetDestroyedB, "Autopause Status",32)
+	GemRB.SetVarAssoc(AutoPauseWindow, TargetDestroyedB, "Autopause Status",32)
 
 	EndOfRound = GemRB.GetControl(AutoPauseWindow, 24)
 	EndOfRoundB = GemRB.GetControl(AutoPauseWindow, 25)
-#	GemRB.SetVarAssoc(AutoPauseWindow, EndOfRoundB, "Autopause Status",64)
+	GemRB.SetVarAssoc(AutoPauseWindow, EndOfRoundB, "Autopause Status",64)
 
 	EnemySighted = GemRB.GetControl(AutoPauseWindow, 27)
 	EnemySightedB = GemRB.GetControl(AutoPauseWindow, 26)
-#	GemRB.SetVarAssoc(AutoPauseWindow, EnemySightedB, "Autopause Status",128)
+	GemRB.SetVarAssoc(AutoPauseWindow, EnemySightedB, "Autopause Status",128)
 
 	SpellCast = GemRB.GetControl(AutoPauseWindow, 30)
 	SpellCastB = GemRB.GetControl(AutoPauseWindow, 34)
-#	GemRB.SetVarAssoc(AutoPauseWindow, SpellCastB, "Autopause Status",256)
+	GemRB.SetVarAssoc(AutoPauseWindow, SpellCastB, "Autopause Status",256)
 
 	TrapFound = GemRB.GetControl(AutoPauseWindow, 33)
 	TrapFoundB = GemRB.GetControl(AutoPauseWindow, 31)
-#	GemRB.SetVarAssoc(AutoPauseWindow, TrapFoundB, "Autopause Status",512)
+	GemRB.SetVarAssoc(AutoPauseWindow, TrapFoundB, "Autopause Status",512)
 
 	AutopauseCenter = GemRB.GetControl(AutoPauseWindow, 36)
 	AutopauseCenterB = GemRB.GetControl(AutoPauseWindow, 37)
-#	GemRB.SetVarAssoc(AutoPauseWindow, AutopauseCenterB, "Autopause Center",1)
+	GemRB.SetVarAssoc(AutoPauseWindow, AutopauseCenterB, "Autopause Center",1)
 
 	OkButton = GemRB.GetControl(AutoPauseWindow, 11)
 	CancelButton = GemRB.GetControl(AutoPauseWindow, 14)
