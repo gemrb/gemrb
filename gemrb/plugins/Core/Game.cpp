@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.8 2004/01/05 23:52:11 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.9 2004/01/07 20:37:32 balrog994 Exp $
  *
  */
 
@@ -104,6 +104,10 @@ int Game::LoadMap(char *ResRef)
 	core->FreeInterface(mM);
 	if(!newMap)
 		return -1;
+	for(int i = 0; i < PCs.size(); i++) {
+		if(stricmp(NPCs[i]->Area, ResRef) == 0)
+			newMap->AddActor(PCs[i]);
+	}
 	for(int i = 0; i < NPCs.size(); i++) {
 		if(stricmp(NPCs[i]->Area, ResRef) == 0)
 			newMap->AddActor(NPCs[i]);
