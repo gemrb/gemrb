@@ -81,7 +81,7 @@ def OnLoad():
 	if Level>0:
 		PointsLeft=PointsLeft + Level/GemRB.GetTableValue(SkillTable, ClassName, "RATE")
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 640, 480)
 	SkillTable = GemRB.LoadTable("weapprof")
 	RowCount = GemRB.GetTableRowCount(SkillTable)-7  #we decrease it with the bg1 skills
 	SkillWindow = GemRB.LoadWindow(9)

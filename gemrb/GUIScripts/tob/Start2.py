@@ -14,7 +14,7 @@ def OnLoad():
 	global StartWindow, TutorialWindow, QuitWindow
 	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton
 
-	GemRB.LoadWindowPack("START")
+	GemRB.LoadWindowPack("START", 640, 480)
 #tutorial subwindow
 	TutorialWindow = GemRB.LoadWindow(5)
 	TextAreaControl = GemRB.GetControl(TutorialWindow, 1)
@@ -37,6 +37,7 @@ def OnLoad():
 	GemRB.SetEvent(QuitWindow, CancelButton, 0, "ExitCancelled")
 #main window
 	StartWindow = GemRB.LoadWindow(0)
+	GemRB.SetWindowFrame (StartWindow)
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:
 		GemRB.SetWindowPicture(StartWindow,"STARTOLD")

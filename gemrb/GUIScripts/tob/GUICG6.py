@@ -99,7 +99,7 @@ def OnLoad():
 
 	GemRB.SetToken("number",str(PointsLeft) )
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 640, 480)
 	SkillTable = GemRB.LoadTable("skills")
 	SkillWindow = GemRB.LoadWindow(6)
 

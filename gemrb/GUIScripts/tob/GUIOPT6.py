@@ -6,7 +6,7 @@ TextAreaControl = 0
 
 def OnLoad():
 	global GraphicsWindow, TextAreaControl
-	GemRB.LoadWindowPack("GUIOPT")
+	GemRB.LoadWindowPack("GUIOPT", 640, 480)
 	GraphicsWindow = GemRB.LoadWindow(6)
 	TextAreaControl = GemRB.GetControl(GraphicsWindow, 33)
 	BrightnessButton = GemRB.GetControl(GraphicsWindow, 35)

@@ -37,7 +37,7 @@ def OnLoad():
 	if TableName == "*":
 		GemRB.SetNextScript("GUICG7")
 		return
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 640, 480)
 	RaceWindow = GemRB.LoadWindow(15)
 	RaceTable = GemRB.LoadTable(TableName)
 	RaceCount = GemRB.GetTableRowCount(RaceTable)-11

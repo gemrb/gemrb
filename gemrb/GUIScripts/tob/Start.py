@@ -6,8 +6,24 @@ StartWindow = 0
 def OnLoad():
 	global StartWindow
 
-	GemRB.LoadWindowPack("START")
+	skip_videos = GemRB.GetVar ("SkipIntroVideos")
+	if not skip_videos:
+		GemRB.PlayMovie ("BISLOGO")
+		GemRB.PlayMovie ("BWDRAGON")
+		GemRB.PlayMovie ("WOTC")
+		GemRB.PlayMovie ("INTRO15F")
+
+	# Find proper window border for higher resolutions
+	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
+	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
+	if screen_width == 800:
+		GemRB.LoadWindowFrame("STON08L", "STON08R", "STON08T", "STON08B")
+	elif screen_width == 1024:
+		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
+
+	GemRB.LoadWindowPack("START", 640, 480)
 	StartWindow = GemRB.LoadWindow(7)
+	GemRB.SetWindowFrame (StartWindow)
 	GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,0,640,30, "REALMS", "", 1)
 	Label=GemRB.GetControl(StartWindow, 0x0fff0000)
 	GemRB.SetText(StartWindow, Label,GEMRB_VERSION)
