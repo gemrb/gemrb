@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.25 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.26 2004/03/20 23:02:35 edheldil Exp $
  *
  */
 
@@ -39,6 +39,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 	lastFocus = NULL;
 	Visible = false;
 	Changed = true;
+	Floating = false;
 	Cursor = 0;
 	DefaultControl = -1;
 }
@@ -89,7 +90,7 @@ void Window::DrawWindow()
 	Video* video = core->GetVideoDriver();
 	Region clip( XPos, YPos, Width, Height );
 	video->SetClipRect( &clip );
-	if (BackGround && Changed) {
+	if (BackGround && (Changed || Floating)) {
 		video->BlitSprite( BackGround, XPos, YPos, true );
 	}
 	std::vector< Control*>::iterator m;

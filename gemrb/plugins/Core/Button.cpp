@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.53 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.54 2004/03/20 23:02:35 edheldil Exp $
  *
  */
 
@@ -146,7 +146,7 @@ void Button::SetImage(unsigned char type, Sprite2D* img)
 /** Draws the Control on the Output Display */
 void Button::Draw(unsigned short x, unsigned short y)
 {
-	if (!Changed) {
+	if (!Changed && !((Window*)Owner)->Floating) {
 		return;
 	}
 	Changed = false;

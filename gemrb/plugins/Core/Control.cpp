@@ -15,16 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.17 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.18 2004/03/20 23:02:35 edheldil Exp $
  *
  */
 
-#include "../../includes/win32def.h"
-#include "Control.h"
-#ifndef WIN32
 #include <stdio.h>
 #include <string.h>
-#endif
+#include "../../includes/win32def.h"
+#include "Control.h"
+#include "Interface.h"
 
 Control::Control()
 {
@@ -32,12 +31,29 @@ Control::Control()
 	Changed = true;
 	VarName[0] = 0;
 	Value = 0;
+	Tooltip = NULL;
+
+	XPos = 0;
+	YPos = 0;
 }
 
 Control::~Control()
 {
+	if (Tooltip)
+		free (Tooltip);
 }
 
+/** Sets the Tooltip text of the current control */
+int Control::SetTooltip(const char* string, int pos)
+{
+	if (Tooltip && (string == NULL || string[0] == 0)) {
+		free (Tooltip);
+	} else {
+		Tooltip = strdup (string);
+	}
+	Changed = true;
+	return 0;
+}
 /** Key Press Event */
 void Control::OnKeyPress(unsigned char Key, unsigned short Mod)
 {
@@ -46,8 +62,7 @@ void Control::OnKeyPress(unsigned char Key, unsigned short Mod)
 /** Key Release Event */
 void Control::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
-	printf( "OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", ControlID,
-		Key, Key );
+	  //printf( "OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", ControlID, Key, Key );
 }
 /** Mouse Over Event */
 void Control::OnMouseOver(unsigned short x, unsigned short y)

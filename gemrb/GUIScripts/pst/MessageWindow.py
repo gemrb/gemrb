@@ -2,6 +2,8 @@ import GemRB
 
 from GUICommonWindows import *
 
+from FloatMenuWindow import *
+
 from GUIJRNL import *
 from GUIMA import *
 from GUIMG import *
@@ -10,6 +12,7 @@ from GUIOPT import *
 from GUIPR import *
 from GUIREC import *
 from GUISTORE import *
+from GUIWORLD import *
 
 
 MessageWindow = 0
@@ -50,6 +53,9 @@ def OnLoad():
 	
 	OpenButton = GemRB.GetControl(OptionsWindow, 10)
 	GemRB.SetEvent(OptionsWindow, OpenButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+
+	FormationButton = GemRB.GetControl(ActionsWindow, 4)
+	GemRB.SetEvent(ActionsWindow, FormationButton, IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
 
 
 	SetupMenuWindowControls (OptionsWindow)

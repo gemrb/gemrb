@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.139 2004/03/20 14:08:56 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.140 2004/03/20 23:02:35 edheldil Exp $
  *
  */
 
@@ -876,6 +876,59 @@ static PyObject* GemRB_TextAreaClear(PyObject * /*self*/, PyObject* args)
 
 	Py_INCREF( Py_None );
 	return Py_None;
+}
+
+static PyObject* GemRB_SetTooltip(PyObject * /*self*/, PyObject* args)
+{
+	PyObject* wi, * ci, * str;
+	int WindowIndex, ControlIndex;
+	long StrRef;
+	char* string;
+	int ret;
+
+	if (PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str )) {
+		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
+			!PyObject_TypeCheck( ci,
+														&PyInt_Type ) ||
+			( !PyObject_TypeCheck( str, &PyString_Type ) &&
+			!PyObject_TypeCheck( str,
+																&PyInt_Type ) )) {
+			printMessage( "GUIScript",
+				"Syntax Error: SetTooltip(WindowIndex, ControlIndex, String|Strref)\n",
+				LIGHT_RED );
+			return NULL;
+		}
+
+		WindowIndex = PyInt_AsLong( wi );
+		ControlIndex = PyInt_AsLong( ci );
+		if (PyObject_TypeCheck( str, &PyString_Type )) {
+			string = PyString_AsString( str );
+			if (string == NULL)
+				return NULL;
+			ret = core->SetTooltip( WindowIndex, ControlIndex, string );
+			if (ret == -1)
+				return NULL;
+		} else {
+			StrRef = PyInt_AsLong( str );
+			char* str = NULL;
+			if (StrRef == -1) {
+				str = ( char * ) malloc( 20 );
+				sprintf( str, "GemRB v%.1f.%d.%d", GEMRB_RELEASE / 1000.0,
+					GEMRB_API_NUM, GEMRB_SDK_REV );
+			} else
+				str = core->GetString( StrRef );
+			ret = core->SetTooltip( WindowIndex, ControlIndex, str );
+			if (ret == -1) {
+				free( str );
+				return NULL;
+			}
+			free( str );
+		}
+	} else {
+		return NULL;
+	}
+
+	return Py_BuildValue( "i", ret );
 }
 
 static PyObject* GemRB_SetVisible(PyObject * /*self*/, PyObject* args)
@@ -2101,6 +2154,33 @@ static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 	return Py_BuildValue( "i", core->GetPartySize() );
 }
 
+static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* args)
+{
+	int Gold = core->GetGame()->PartyGold;
+	return Py_BuildValue( "i", Gold );
+}
+
+static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* args)
+{
+	int Formation = core->GetGame()->WhichFormation;
+	return Py_BuildValue( "i", Formation );
+}
+
+static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
+{
+	int Formation;
+
+	if (!PyArg_ParseTuple( args, "i", &Formation )) {
+		printMessage( "GUIScript",
+			"Syntax Error: GameSetFormation(Formation)\n", LIGHT_RED );
+		return NULL;
+	}
+	core->GetGame()->WhichFormation = Formation;
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 {
 	int section;
@@ -2692,6 +2772,12 @@ static PyMethodDef GemRBMethods[] = {
 	"Exits the CutScene Mode."},
 	{"GetPartySize", GemRB_GetPartySize, METH_NOARGS,
 	"Returns the number of PCs."},
+	{"GameGetPartyGold", GemRB_GameGetPartyGold, METH_NOARGS,
+	"Returns current party gold."},
+	{"GameGetFormation", GemRB_GameGetFormation, METH_NOARGS,
+	"Returns current party formation."},
+	{"GameSetFormation", GemRB_GameSetFormation, METH_VARARGS,
+	"Sets party formation."},
 	{"GetJournalSize", GemRB_GetJournalSize, METH_VARARGS,
 	"Returns the number of entries in the given section of journal."},
 	{"GetJournalEntry", GemRB_GetJournalEntry, METH_VARARGS,
@@ -2750,6 +2836,8 @@ static PyMethodDef GemRBMethods[] = {
 	"Appends the Text to the TextArea Control in the Window."},
 	{"TextAreaClear", GemRB_TextAreaClear, METH_VARARGS,
 	"Clears the Text from the TextArea Control in the Window."},
+	{"SetTooltip", GemRB_SetTooltip, METH_VARARGS,
+	"Sets control's tooltip."},
 	{"SetVisible", GemRB_SetVisible, METH_VARARGS,
 	"Sets the Visibility Flag of a Window."},
 	{"SetMasterScript", GemRB_SetMasterScript, METH_VARARGS,
