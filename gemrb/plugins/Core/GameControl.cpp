@@ -846,6 +846,12 @@ void GameControl::DialogChoose(int choose)
 				ds = dlg->GetState(0);
 			else {
 				DialogTransition * tr = ds->transitions[choose];
+				if(tr->Flags & 8) {
+					delete(dlg);
+					ds = NULL;
+					dlg = NULL;
+					return;
+				}					
 				if(tr->action) {
 					for(int i = 0; i < tr->action->count; i++) {
 						if(speaker->Scripts[0]) {
@@ -865,18 +871,18 @@ void GameControl::DialogChoose(int choose)
 			free(string);
 			for(int x = 0; x < ds->transitionsCount; x++) {
 				if(ds->transitions[x]->textStrRef == 0) {
-					string = (char*)malloc(29);
+					string = (char*)malloc(30);
 					sprintf(string, "[s=%d,ffffff,ff0000]Continue", x);
 					i = ta->AppendText(string, -1);
 					ta->AppendText("[/s]", i);
 					free(string);
 				} else {
 					char * s = core->GetString(ds->transitions[x]->textStrRef);
-					string = (char*)malloc(25);
-					sprintf(string, "[s=%d,ffffff,ff0000]%d - ", x, x+1);
+					string = (char*)malloc(30);
+					sprintf(string, "[s=%d,ffffff,ff0000]%d - [p]", x, x+1);
 					i = ta->AppendText(string, -1);
 					ta->AppendText(s, i);
-					ta->AppendText("[/s]", i);
+					ta->AppendText("[/p][/s]", i);
 					free(string);
 					free(s);
 				}
