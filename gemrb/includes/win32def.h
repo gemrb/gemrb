@@ -31,7 +31,11 @@
 #endif
 
 #ifndef HAVE_SNPRINTF
+#ifdef WIN32
+#define snprintf _snprintf
+#else
 #include "../plugins/Core/snprintf.h"
+#endif
 #endif
 
 //we need 32+6 bytes at least, because we store 'context' in the variable
