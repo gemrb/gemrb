@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.35 2005/02/27 19:13:24 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.36 2005/03/01 23:14:45 edheldil Exp $
  *
  */
 
@@ -87,10 +87,11 @@ void TileMap::DrawOverlay(unsigned int index, Region viewport)
 	}
 }
 
+// Size of Fog-Of-War shadow tile (and bitmap)
 #define CELL_SIZE  32
+
+// Ratio of bg tile size and fog tile size
 #define CELL_RATIO 2
-
-
 
 // Returns 1 if map at (x;y) was explored, else 0. Points outside map are
 //   always considered as explored
@@ -100,11 +101,6 @@ void TileMap::DrawOverlay(unsigned int index, Region viewport)
 
 #define FOG(i)  vid->BlitSprite( core->FogSprites[i], r.x, r.y, true, &r )
 
-
-
-//vp: 45 480 640 407 ; viewport: 0 0 640 407 ; Xcc, Ycc: 50 43 ; wh: 200 172
-//vid->SetViewport(45 480)
-//sx, sy: 2 30 ; dx, dy: 43 56 ; vp: 0 0 640 407
 
 void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region viewport)
 {
@@ -119,7 +115,7 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 
 	Video* vid = core->GetVideoDriver();
 	Region vp = vid->GetViewport();
-	//printf("vp: %d %d %d %d ; viewport: %d %d %d %d ; Xcc, Ycc: %d %d ; wh: %d %d \n", vp.x, vp.y, vp.w, vp.h, viewport.x, viewport.y, viewport.w, viewport.h, XCellCount, YCellCount, w, h);
+
 	vp.x += viewport.x;
 	vp.y += viewport.y;
 	vp.w = viewport.w;
@@ -136,32 +132,21 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 	if (vp.y < viewport.y) {
 		vp.y = viewport.y;
 	}
-	vid->SetViewport( vp.x - viewport.x, vp.y - viewport.y );
-	//printf("vid->SetViewport(%d %d)\n", vp.x - viewport.x, vp.y - viewport.y );
-	int sx = ( vp.x - viewport.x ) / CELL_SIZE;
-	int sy = ( vp.y - viewport.y ) / CELL_SIZE;
-	int dx = ( vp.x + vp.w + CELL_SIZE - 1 ) / CELL_SIZE;
-	int dy = ( vp.y + vp.h + CELL_SIZE - 1 ) / CELL_SIZE;
+	int sx = ( vp.x ) / CELL_SIZE;
+	int sy = ( vp.y ) / CELL_SIZE;
+	int dx = sx + vp.w / CELL_SIZE + 2;
+	int dy = sy + vp.h / CELL_SIZE + 2;
+	int x0 = sx * CELL_SIZE - vp.x;
+	int y0 = sy * CELL_SIZE - vp.y;
 	if (LargeMap) {
+		x0 -= CELL_SIZE / 2;
+		y0 -= CELL_SIZE / 2;
 		dx++;
 		dy++;
 	}
-	vp.x = viewport.x;
-	vp.y = viewport.y;
-	vp.w = viewport.w;
-	vp.h = viewport.h;
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
-			//int b0 = (w * y + x);
-			//int bb = b0 / 8;
-			//int bi = b0 % 8;
-
-		  
-			Region r = Region(viewport.x + ( (x - sx) * CELL_SIZE ), viewport.y + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
-			if (LargeMap) {
-				r.x-=16;
-				r.y-=16;
-			}
+			Region r = Region(x0 + viewport.x + ( (x - sx) * CELL_SIZE ), y0 + viewport.y + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
 			if (! IS_EXPLORED( x, y )) {
 				// Unexplored tiles are all black
 				vid->DrawRect(r, black, true, true);
