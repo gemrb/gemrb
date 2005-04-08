@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ResourceMgr.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ResourceMgr.h,v 1.4 2005/04/08 20:45:50 avenger_teambg Exp $
  *
  */
 
@@ -44,6 +44,7 @@ public:
 	ResourceMgr(void);
 	virtual ~ResourceMgr(void);
 	virtual bool LoadResFile(const char* resfile) = 0;
+	virtual bool HasResource(const char* resname, SClass_ID type) = 0;
 	virtual DataStream* GetResource(const char* resname, SClass_ID type) = 0;
 	virtual void* GetFactoryResource(const char* resname, SClass_ID type,
 		unsigned char mode = IE_NORMAL) = 0;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.65 2005/04/08 16:54:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.66 2005/04/08 20:45:47 avenger_teambg Exp $
  *
  */
 
@@ -162,8 +162,6 @@ private:
 	//this stuff don't get saved
 	CharAnimations* anims;
 
-	/* fixes the feet circle */
-	void SetCircleSize();
 	/* fixes the palette */
 	void SetupColors();
 
@@ -172,6 +170,8 @@ public:
 	~Actor(void);
 	/** prints useful information on console */
 	void DebugDump();
+	/* fixes the feet circle */
+	void SetCircleSize();
 	/** sets the actor's position, calculating with the nojump flag*/
 	void SetPosition(Map *map, Point &position, int jump, int radius=0);
 	/* you better use SetStat, this stuff is only for special cases*/

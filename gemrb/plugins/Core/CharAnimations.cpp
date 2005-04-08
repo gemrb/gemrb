@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.53 2005/04/08 16:54:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.54 2005/04/08 20:45:47 avenger_teambg Exp $
  *
  */
 
@@ -75,7 +75,7 @@ void CharAnimations::SetColors(ieDword *arg)
 	Colors = arg;
 	for (int StanceID = 0; StanceID < MAX_ANIMS; StanceID++) {
 		for (int Orient = 0; Orient < MAX_ORIENT; Orient++) {
-			if(Anims[StanceID][Orient]) {
+			if (Anims[StanceID][Orient]) {
 				SetupColors(Anims[StanceID][Orient]);
 			}
 		}
@@ -84,14 +84,14 @@ void CharAnimations::SetColors(ieDword *arg)
 
 void CharAnimations::SetupColors(Animation *anim)
 {
-	if(!anim->Palette) {
+	if (!anim->Palette) {
 		//this palette must be freed using videodriver
 		anim->Palette=core->GetVideoDriver()->GetPalette(anim->GetFrame(0));
 	}
-	if(!Colors) {
+	if (!Colors) {
 		return;
 	}
-	if (GetAnimType() >=IE_ANI_PST_ANIMATION_1) {
+	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
 		// Avatars in PS:T
 		int size = 32;
 		int dest = 256-Colors[6]*size;
@@ -105,7 +105,7 @@ void CharAnimations::SetupColors(Animation *anim)
 	}
 
 	int PType = NoPalette();
-	if( PType) {
+	if ( PType) {
 		//handling special palettes like MBER_BL (black bear)
 		if (PType==1) 
 			return;
@@ -179,7 +179,7 @@ void CharAnimations::InitAvatarsTable()
 		char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
 		//QueryField will always return a zero terminated string
 		//so tmp[0] must exist
-		if( isalpha (tmp[0]) ) {
+		if ( isalpha (tmp[0]) ) {
 			//this is a hack, we store 2 letters on an integer
 			//it was allocated with calloc, so don't bother erasing it
 			strncpy( (char *) &AvatarTable[i].PaletteType, tmp, 3);
@@ -301,7 +301,9 @@ IE_ANI_TWO_FILES_3:	Animations using this type was stored using the following te
 			See MMR
 
 IE_ANI_PST_ANIMATION_1:
-IE_ANI_PST_ANIMATION_2: Planescape: Torment Animations are stored in a different
+IE_ANI_PST_ANIMATION_2:
+IE_ANI_PST_ANIMATION_3:
+			Planescape: Torment Animations are stored in a different
 			way than the other games. This format uses the following template:
 			[C/D][ACTIONTYPE][NAME][B]
 
@@ -315,6 +317,7 @@ IE_ANI_PST_ANIMATION_2: Planescape: Torment Animations are stored in a different
 			NOTE: Walking/Running animations store 9 Orientations.
 			The second variation is missing the resting stance (STD) and the transitions.
 			These creatures are always in combat stance (don't rest).
+			Animation_3 is without STC  (combat stance), they are always standing
 
 IE_ANI_PST_STAND:	This is a modified PST animation, it contains only a
 			Standing image for every orientations, it follows the
@@ -356,18 +359,22 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 		case IE_ANI_PST_GHOST:
 			StanceID=IE_ANI_AWAKE;
 			break;
+		case IE_ANI_PST_ANIMATION_3: //stc->std
+			if (StanceID==IE_ANI_READY) {
+				StanceID=IE_ANI_AWAKE;
+			}
+			break;
 		case IE_ANI_PST_ANIMATION_2: //std->stc
 			if (StanceID==IE_ANI_AWAKE) {
 				StanceID=IE_ANI_READY;
-				break;
-			}
-			//fallthrough
-		case IE_ANI_PST_ANIMATION_1:
-			//pst animations don't twitch on death
-			if (StanceID==IE_ANI_TWITCH) {
-				StanceID=IE_ANI_SLEEP;
 			}
 			break;
+	}
+	//pst animations and iwd don't twitch on death
+	if ((AnimType >= IE_ANI_PST_ANIMATION_1) || (AnimType == IE_ANI_TWO_FILES_3)) {
+		if (StanceID==IE_ANI_TWITCH) {
+			StanceID=IE_ANI_SLEEP;
+		}
 	}
 
 	//TODO: Implement Auto Resource Loading
@@ -467,6 +474,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			Anims[StanceID][Orient + 1] = a;
 			break;
 
+		case IE_ANI_PST_ANIMATION_3:  //no stc just std
 		case IE_ANI_PST_ANIMATION_2:  //no std just stc
 		case IE_ANI_PST_ANIMATION_1:
 			if (Orient > 8) {
@@ -517,6 +525,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 		case IE_ANI_ONE_FILE:
 			Cycle = StanceID * 16 + Orient;
 			break;
+
 		case IE_ANI_SIX_FILES:
 			AddSixSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
@@ -543,6 +552,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 
 		case IE_ANI_PST_ANIMATION_1:
 		case IE_ANI_PST_ANIMATION_2:
+		case IE_ANI_PST_ANIMATION_3:
 			AddPSTSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
@@ -592,6 +602,24 @@ void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_WALK:
 			Cycle=SixteenToNine[Orient];
 			Prefix="WLK"; break;
+		case IE_ANI_HEAD_TURN:
+			Cycle=SixteenToFive[Orient];
+			if (rand()&1) {
+				Prefix="SF2";
+			} else {
+				Prefix="SF1";
+			}
+			sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);
+			if (core->Exists(ResRef, IE_BAM_CLASS_ID) ) {
+				return;
+			}
+			Prefix = "STD";
+			sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);
+			if (core->Exists(ResRef, IE_BAM_CLASS_ID) ) {
+				return;
+			}
+			Prefix = "STC";
+			break;
 		case IE_ANI_PST_START:
 			Cycle=0;
 			Prefix="MS1"; break;
@@ -1082,4 +1110,3 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 		strcat( ResRef, "E" );
 	}
 }
-

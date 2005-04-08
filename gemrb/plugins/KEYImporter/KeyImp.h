@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.h,v 1.7 2004/08/02 21:53:45 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.h,v 1.8 2005/04/08 20:45:51 avenger_teambg Exp $
  *
  */
 
@@ -45,7 +45,11 @@ public:
 	KeyImp(void);
 	~KeyImp(void);
 	bool LoadResFile(const char* resfile);
+	/* predicts the availability of a resource */
+	bool HasResource(const char* resname, SClass_ID type);
+	/* returns resource */
 	DataStream* GetResource(const char* resname, SClass_ID type);
+	/* returns factory resource, currently works only with animations */
 	void* GetFactoryResource(const char* resname, SClass_ID type,
 		unsigned char mode = IE_NORMAL);
 public:

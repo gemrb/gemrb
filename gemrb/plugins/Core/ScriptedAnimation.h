@@ -2,7 +2,7 @@
 #define SCRIPTEDANIMATION_H
 
 #include "DataStream.h"
-#include "Animation.h"
+#include "AnimationFactory.h"
 
 #ifdef WIN32
 
@@ -26,6 +26,7 @@
 
 class GEM_EXPORT ScriptedAnimation {
 public:
+	ScriptedAnimation(AnimationFactory *af, Point &position);
 	ScriptedAnimation(DataStream* stream, Point &position, bool autoFree = true);
 	~ScriptedAnimation(void);
 	Animation* anims[2];
@@ -37,8 +38,6 @@ public:
 	ieResRef Sounds[2];
 	bool justCreated;
 	bool autoSwitchOnEnd;
-private:
-	void PrepareBAM(DataStream* stream, Point &p);
 };
 
 #endif

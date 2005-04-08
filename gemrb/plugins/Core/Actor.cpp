@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.98 2005/04/08 16:54:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.99 2005/04/08 20:45:47 avenger_teambg Exp $
  *
  */
 
@@ -283,6 +283,11 @@ void Actor::SetCircleSize()
 	SetCircle( anims->GetCircleSize(), *color );
 }
 
+void pcf_ea(Actor *actor, ieDword /*Value*/)
+{
+	actor->SetCircleSize();
+}
+
 void pcf_animid(Actor *actor, ieDword Value)
 {
 	actor->SetAnimationID(Value);
@@ -378,7 +383,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, 
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, pcf_animid, NULL, //cf
+NULL,NULL,NULL,NULL, pcf_ea, NULL, pcf_animid, NULL, //cf
 pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
@@ -405,47 +410,6 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 	Modified[StatIndex] = Value;
 	PostChangeFunctionType f = post_change_functions[StatIndex];
 	if (f) (*f)(this, Value);
-/*
-	switch (StatIndex) {
-		case IE_GOLD:
-			if (InParty) {
-				core->GetGame()->PartyGold+=Modified[IE_GOLD];
-				if (core->GetGame()->PartyGold>0x80000000) {
-					core->GetGame()->PartyGold = 0;
-				}
-				Modified[IE_GOLD]=0;
-			}
-			break;
-		case IE_ANIMATION_ID:
-			SetAnimationID( (ieWord) Value );
-			break;
-		case IE_METAL_COLOR:
-		case IE_MINOR_COLOR:
-		case IE_MAJOR_COLOR:
-		case IE_SKIN_COLOR:
-		case IE_LEATHER_COLOR:
-		case IE_ARMOR_COLOR:
-		case IE_HAIR_COLOR:
-			anims->SetColors(Modified+IE_COLORS);
-			break;
-		case IE_EA:
-		case IE_UNSELECTABLE:
-		case IE_MORALEBREAK:
-			SetCircleSize();
-			break;
-		case IE_MAXHITPOINTS:
-			Modified[IE_MAXHITPOINTS]+=GetHPMod();
-			break;
-		case IE_HITPOINTS:
-			if ((signed) Value<=0) {
-				Die(NULL);
-			}
-			if ((signed) Value>(signed) Modified[IE_MAXHITPOINTS]) {
-				Modified[IE_HITPOINTS]=Modified[IE_MAXHITPOINTS];
-			}
-			break;
-	}
-*/
 	return true;
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.53 2005/03/31 10:06:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.54 2005/04/08 20:45:50 avenger_teambg Exp $
  *
  */
 
@@ -173,6 +173,25 @@ bool KeyImp::LoadResFile(const char* resfile)
 	return true;
 }
 
+#define FindIn(BasePath, Path, ResRef, Type, foundMessage) \
+{ \
+	char p[_MAX_PATH], f[_MAX_PATH] = {0}; \
+	strcpy(p, BasePath); \
+	strcat(p, Path); \
+	strcat(p, SPathDelimiter); \
+	strncpy(f, ResRef, 8); \
+	f[8] = 0; \
+	strcat(f, core->TypeExt(Type)); \
+	strlwr(f); \
+	strcat(p, f); \
+	FILE * exist = fopen(p, "rb"); \
+	if(exist) { \
+		fclose(exist); \
+		printBracket(foundMessage, LIGHT_GREEN); printf("\n"); \
+		return true; \
+	} \
+}
+
 #define SearchIn(BasePath, Path, ResRef, Type, foundMessage) \
 { \
 	char p[_MAX_PATH], f[_MAX_PATH] = {0}; \
@@ -193,6 +212,30 @@ bool KeyImp::LoadResFile(const char* resfile)
 		printBracket(foundMessage, LIGHT_GREEN); printf("\n"); \
 		return fs; \
 	} \
+}
+
+bool KeyImp::HasResource(const char* resname, SClass_ID type)
+{
+	char path[_MAX_PATH];
+	printMessage( "KEYImporter", "Searching for ", WHITE );
+	printf( "%.8s%s...", resname, core->TypeExt( type ) );
+	//Search it in the GemRB override Directory
+	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
+	FindIn( core->CachePath, "", resname, type,
+		"Found in Cache" );
+	FindIn( core->GemRBPath, path, resname, type,
+		"Found in GemRB Override" );
+	FindIn( core->GamePath, core->GameOverride, resname, type,
+		"Found in Override" );
+	FindIn( core->GamePath, core->GameData, resname, type,
+		"Found in Data" );
+	unsigned int ResLocator;
+	if (resources.Lookup( resname, type, ResLocator )) {
+		printStatus( "FOUND", LIGHT_GREEN );
+		return true;
+	}
+	printStatus( "ERROR", LIGHT_RED );
+	return false;
 }
 
 DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
@@ -306,6 +349,7 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 	printStatus( "ERROR", LIGHT_RED );
 	return NULL;
 }
+
 void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 	unsigned char mode)
 {
@@ -321,40 +365,7 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 		//printMessage("KEYImporter", "Factory Object Found!\n", WHITE);
 		return core->GetFactory()->GetFactoryObject( fobjindex );
 	}
-/*
-	//printf("[KEYImporter]: No Factory Object Found, Loading...\n");
-	char path[_MAX_PATH], filename[_MAX_PATH] = {0};
-	//Search it in the GemRB override Directory
-	strncpy( filename, resname, 8 );
-	filename[8] = 0;
-	strcat( filename, core->TypeExt( type ) );
-	strlwr( filename );
-	PathJoin(path, core->GemRBPath,"override",core->GameType,filename,NULL);
-	FILE* exist = fopen( path, "rb" );
-	if (exist) {
-		goto found;
-	}
-	PathJoin(path, core->GamePath, core->GameOverride, filename,NULL);
-	exist = fopen( path, "rb" );
-	if (exist) {
-found:
-		//printf("[KEYImporter]: Found in Override...\n");
-		fclose( exist );
-		AnimationMgr* ani = ( AnimationMgr* )
-			core->GetInterface( IE_BAM_CLASS_ID );
-		if (!ani)
-			return NULL;
-		FileStream* fs = new FileStream();
-		if (!fs)
-			return NULL;
-		fs->Open( path, true );
-		ani->Open( fs, true );
-		AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
-		core->FreeInterface( ani );
-		core->GetFactory()->AddFactoryObject( af );
-		return af;
-	}
-*/
+
 	DataStream* ret = GetResource( resname, type );
 	if (ret) {
 		AnimationMgr* ani = ( AnimationMgr* )

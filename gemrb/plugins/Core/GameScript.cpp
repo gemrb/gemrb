@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.256 2005/04/08 16:54:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.257 2005/04/08 20:45:48 avenger_teambg Exp $
  *
  */
 
@@ -6612,14 +6612,7 @@ void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
 
 void GameScript::CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect)
 {
-	DataStream* ds = core->GetResourceMgr()->GetResource( effect, IE_VVC_CLASS_ID );
-	if (!ds) {
-		ds = core->GetResourceMgr()->GetResource( effect, IE_BAM_CLASS_ID );
-	}
-	if (!ds) {
-		return;
-	}
-	ScriptedAnimation* vvc = new ScriptedAnimation( ds, position, true);
+	ScriptedAnimation* vvc = core->GetScriptedAnimation(effect, position);
 	Sender->GetCurrentArea( )->AddVVCCell( vvc );
 }
 

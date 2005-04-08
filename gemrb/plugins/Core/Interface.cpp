@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.293 2005/04/08 16:54:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.294 2005/04/08 20:45:48 avenger_teambg Exp $
  *
  */
 
@@ -3139,3 +3139,18 @@ void Interface::PlaySound(int index)
 	}
 }
 
+bool Interface::Exists(const char *ResRef, SClass_ID type)
+{
+	return key->HasResource( ResRef, type );
+}
+
+ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, Point &position )
+{
+	if (Exists( effect, IE_VVC_CLASS_ID ) ) {
+	        DataStream *ds = key->GetResource( effect, IE_VVC_CLASS_ID );
+		return new ScriptedAnimation( ds, position, true);
+	}
+	AnimationFactory *af = (AnimationFactory *)
+		key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
+	return new ScriptedAnimation( af, position);
+}

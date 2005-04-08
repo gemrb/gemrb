@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.149 2005/04/08 16:54:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.150 2005/04/08 20:45:50 avenger_teambg Exp $
  *
  */
 
@@ -403,6 +403,10 @@ public:
 	void MoveViewportTo(int x, int y, bool center);
 	/** plays stock gui sound referenced by index */
 	void PlaySound(int idx);
+	/** returns true if resource exists */
+	bool Exists(const char *ResRef, SClass_ID type);
+	/** creates a vvc/bam animation object at point */
+	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, Point &p);
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

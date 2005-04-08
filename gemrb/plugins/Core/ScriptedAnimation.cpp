@@ -3,18 +3,24 @@
 #include "AnimationMgr.h"
 #include "Interface.h"
 
-void ScriptedAnimation::PrepareBAM(DataStream* /*stream*/, Point &p)
+/* Creating animation from BAM */
+ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p)
 {
-  /*
-  AnimationFactory* af = ( AnimationFactory* )
-	  core->GetResourceMgr()->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
 	anims[0] = af->GetCycle( 0 );
-  */
+	anims[1] = NULL;
+	Transparency = 0;
+	SequenceFlags = 0;
+	XPos = YPos = ZPos = 0;
+	FrameRate = 15;
+	FaceTarget = 0;
+	Sounds[0][0] = 0;
+	Sounds[1][0] = 0;
 	XPos += p.x;
 	YPos += p.y;
 	justCreated = true;
 }
 
+/* Creating animation from VVC */
 ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree)
 {
 	anims[0] = NULL;
@@ -29,12 +35,8 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 	if (!stream) {
 		return;
 	}
+
 	char Signature[8];
-	stream->Read( Signature, 8 );
-	if (strncmp( Signature, "BAM", 3 ) == 0) {
-		PrepareBAM(stream, p);
-		return;
-	}
 
 	if (strncmp( Signature, "VVC V1.0", 8 ) != 0) {
 		printf( "Not a valid VVC File\n" );
