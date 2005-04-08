@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.44 2005/03/28 08:44:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.45 2005/04/08 16:54:33 avenger_teambg Exp $
  *
  */
 
@@ -55,11 +55,6 @@
 #define IE_GUI_BUTTON_PLAYONCE     0x00040000
 
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
-
-
-#define OP_SET  0  //set
-#define OP_OR   1  //turn on
-#define OP_NAND 2  //turn off
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_BUTTON_ON_PRESS       0x00000000

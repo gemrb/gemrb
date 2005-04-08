@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.52 2005/04/06 21:43:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.53 2005/04/08 16:54:33 avenger_teambg Exp $
  *
  */
 
@@ -49,17 +49,17 @@ AvatarStruct *CharAnimations::GetAvatarStruct(int RowNum)
 
 int CharAnimations::GetCircleSize() const
 {
-	if (AvatarsRowNum==~0u) return 0;
+	if (AvatarsRowNum==~0u) return -1;
 	return AvatarTable[AvatarsRowNum].CircleSize;
 }
 int CharAnimations::NoPalette() const
 {
-	if (AvatarsRowNum==~0u) return 0;
+	if (AvatarsRowNum==~0u) return -1;
 	return AvatarTable[AvatarsRowNum].PaletteType;
 }
 int CharAnimations::GetAnimType() const
 {
-	if (AvatarsRowNum==~0u) return 0;
+	if (AvatarsRowNum==~0u) return -1;
 	return AvatarTable[AvatarsRowNum].AnimationType;
 }
 
@@ -219,6 +219,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 			return;
 		}
 	}
+	ResRef[0]=0;
 	char tmp[256];
 	sprintf(tmp, "Invalid or nonexistent avatar entry:%04X\n", AnimID);
 	printMessage("CharAnimations",tmp, LIGHT_RED);
@@ -348,6 +349,9 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 	//alter stance here if it is missing and you know a substitute
 	//probably we should feed this result back to the actor?
 	switch (AnimType) {
+		case -1: //invalid animation
+			return NULL;
+
 		case IE_ANI_PST_STAND:
 		case IE_ANI_PST_GHOST:
 			StanceID=IE_ANI_AWAKE;
@@ -367,6 +371,33 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 	}
 
 	//TODO: Implement Auto Resource Loading
+	//setting up the sequencing of animation cycles
+	autoSwitchOnEnd = false;
+	switch (StanceID) {
+		case IE_ANI_SLEEP:
+			break;
+		case IE_ANI_TWITCH:
+			nextStanceID = IE_ANI_SLEEP;
+			autoSwitchOnEnd = true;
+			break;
+		case IE_ANI_DIE:
+			nextStanceID = IE_ANI_TWITCH;
+			autoSwitchOnEnd = true;
+			break;
+		case IE_ANI_WALK:
+		case IE_ANI_RUN:
+		case IE_ANI_CAST: //IE_ANI_CONJURE is the ending casting anim
+		case IE_ANI_READY:
+			break;
+		case IE_ANI_AWAKE:
+			break;
+		case IE_ANI_EMERGE:
+		case IE_ANI_GET_UP:
+		default:
+			nextStanceID = IE_ANI_AWAKE;
+			autoSwitchOnEnd = true;
+			break;
+	}
 	if (Anims[StanceID][Orient]) {
 		return Anims[StanceID][Orient];
 	}
@@ -395,25 +426,9 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 	switch (StanceID) {
 		case IE_ANI_SLEEP:
 			a->Flags |= A_ANI_PLAYONCE;
-			break;
-		case IE_ANI_TWITCH:
-			nextStanceID = IE_ANI_SLEEP;
-			autoSwitchOnEnd = true;
-			break;
-		case IE_ANI_DIE:
-			nextStanceID = IE_ANI_TWITCH;
-			autoSwitchOnEnd = true;
-			break;
-		case IE_ANI_WALK:
-		case IE_ANI_RUN:
-		case IE_ANI_CAST: //IE_ANI_CONJURE is the ending casting anim
-		case IE_ANI_READY:
-			break;
-		case IE_ANI_AWAKE:
-			break;
-		default:
-			nextStanceID = IE_ANI_AWAKE;
-			autoSwitchOnEnd = true;
+		case IE_ANI_EMERGE:
+		case IE_ANI_GET_UP:
+			a->playReversed = true;
 			break;
 	}
 	switch (GetAnimType()) {
@@ -429,10 +444,6 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 				a->MirrorAnimation( );
 			}
 			Anims[StanceID][Orient] = a;
-			if ((StanceID == IE_ANI_EMERGE) ||
-				(StanceID == IE_ANI_GET_UP)) {
-				a->playReversed = true;
-			}
 			break;
 
 		case IE_ANI_SIX_FILES: //16 anims some are stored elsewhere
@@ -520,14 +531,6 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 
 		case IE_ANI_TWO_FILES: 
 			AddTwoFileSuffix(ResRef, StanceID, Cycle, Orient );
-			//we have to fix this
-			/*
-			Cycle = StanceID * 8 + Orient / 2;
-			strcat( ResRef, "G1" );
-			if (Orient > 9) {
-				strcat( ResRef, "E" );
-			}
-			*/
 			break;
 
 		case IE_ANI_FOUR_FILES:
@@ -618,9 +621,25 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			Cycle+=45;
 			break;
 
+		case IE_ANI_CAST:
+			strcat( ResRef, "G25" );
+			Cycle+=45;
+			break;
+
+		case IE_ANI_CONJURE:
+			strcat( ResRef, "G26" );
+			Cycle+=54;
+			break;
+
+		case IE_ANI_HEAD_TURN:
 		case IE_ANI_AWAKE:
 			strcat( ResRef, "G12" );
 			Cycle+=18;
+			break;
+
+		case IE_ANI_SLEEP:
+			strcat( ResRef, "G15" );
+			Cycle+=45;
 			break;
 
 		case IE_ANI_TWITCH:
@@ -634,7 +653,7 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_DAMAGE:
-			strcat( ResRef, "G14" );
+			strcat( ResRef, "G13" );
 			Cycle+=27;
 			break;
 
@@ -645,6 +664,10 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_WALK:
 			strcat( ResRef, "G11" );
+			break;
+		default:
+			printf("Unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
 			break;
 	}
 }

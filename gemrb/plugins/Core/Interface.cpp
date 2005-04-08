@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.292 2005/04/01 18:48:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.293 2005/04/08 16:54:36 avenger_teambg Exp $
  *
  */
 
@@ -1860,7 +1860,7 @@ void Interface::DrawWindows(void)
 		GSUpdate(false);
 	}
 	else {
-		GSUpdate(!(gc->DialogueFlags&DF_FREEZE_SCRIPTS));
+		GSUpdate(!(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS));
 	}
 	
 	if (ModalWindow) {
@@ -2623,6 +2623,7 @@ void Interface::DisplayString(const char* Text)
 	}
 }
 
+static const char* DisplayFormatName = "[color=%lX]%s -  [/color][p][color=%lX]%s[/color][/p]";
 static const char* DisplayFormat = "[/color][p][color=%lX]%s[/color][/p]";
 
 void Interface::DisplayConstantString(int stridx, unsigned int color)
@@ -2631,6 +2632,66 @@ void Interface::DisplayConstantString(int stridx, unsigned int color)
 	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 10);
 	char* newstr = ( char* ) malloc( newlen );
 	snprintf( newstr, newlen, DisplayFormat, color, text );
+	free( text );
+	DisplayString( newstr );
+	free( newstr );
+}
+
+void Interface::DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker)
+{
+	unsigned int speaker_color;
+	char *name;
+	Color *tmp;
+
+	switch (speaker->Type) {
+		case ST_ACTOR:
+			name = ((Actor *) speaker)->GetName(-1);
+			tmp = GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),1 );
+			speaker_color = (tmp[0].r<<16) | (tmp[0].g<<8) | tmp[0].b;
+			free(tmp);
+			break;
+		default:
+			name = "";
+			speaker_color = 0x800000;
+			break;
+	}
+
+	char* text = GetString( strref_table[stridx] );
+	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
+		+ strlen( text ) + 18);
+	char* newstr = ( char* ) malloc( newlen );
+	sprintf( newstr, DisplayFormatName, speaker_color, name, color,
+		text );
+	free( text );
+	DisplayString( newstr );
+	free( newstr );
+}
+
+void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *speaker)
+{
+	unsigned int speaker_color;
+	char *name;
+	Color *tmp;
+
+	switch (speaker->Type) {
+		case ST_ACTOR:
+			name = ((Actor *) speaker)->GetName(-1);
+			tmp = GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),1 );
+			speaker_color = (tmp[0].r<<16) | (tmp[0].g<<8) | tmp[0].b;
+			free(tmp);
+			break;
+		default:
+			name = "";
+			speaker_color = 0x800000;
+			break;
+	}
+
+	char* text = GetString( stridx );
+	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
+		+ strlen( text ) + 10);
+	char* newstr = ( char* ) malloc( newlen );
+	sprintf( newstr, DisplayFormatName, speaker_color, name, color,
+		text );
 	free( text );
 	DisplayString( newstr );
 	free( newstr );

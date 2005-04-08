@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.34 2005/03/28 10:36:18 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.35 2005/04/08 16:54:38 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -93,10 +93,11 @@ IE_FONT_ALIGN_TOP        = 0x10   # Single-Line and Multi-Line Text
 IE_FONT_ALIGN_MIDDLE     = 0x20   #Only for single line Text
 IE_FONT_SINGLE_LINE      = 0x40
 
-global OP_SET, OP_OR, OP_NAND
 OP_SET = 0
-OP_OR = 1
-OP_NAND = 2
+OP_AND = 1
+OP_OR = 2
+OP_XOR = 3
+OP_NAND = 4
 
 # Window position anchors/alignments
 # !!! Keep these synchronized with Window.h !!!

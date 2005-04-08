@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.11 2005/04/06 21:43:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Dialog.cpp,v 1.12 2005/04/08 16:54:34 avenger_teambg Exp $
  *
  */
 
@@ -116,6 +116,9 @@ bool Dialog::EvaluateDialogTrigger(Scriptable* target, DialogString* trigger)
 	}
 	for (unsigned int t = 0; t < trigger->count; t++) {
 		result = GameScript::EvaluateString( target, trigger->strings[t] );
+if(result) {
+	printf("%s returned true\n", trigger->strings[t]);
+}
 		if (result > 1) {
 			if (ORcount)
 				printf( "[Dialog]: Unfinished OR block encountered!\n" );

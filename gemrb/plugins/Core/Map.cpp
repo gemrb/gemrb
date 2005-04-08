@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.150 2005/04/06 21:43:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.151 2005/04/08 16:54:37 avenger_teambg Exp $
  *
  */
 
@@ -566,7 +566,8 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 				actor->DrawTargetPoint();
 			}
 
-			Animation* anim = ca->GetAnimation( actor->GetStance(), actor->GetOrientation() );
+			unsigned char StanceID = actor->GetStance();
+			Animation* anim = ca->GetAnimation( StanceID, actor->GetOrientation() );
 			if (anim) {
 				Sprite2D* nextFrame = anim->NextFrame();
 				if (nextFrame) {
@@ -584,9 +585,15 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 					Color tint = LightMap->GetPixel( cx / 16, cy / 12);
 					tint.a = 255-Trans;
 					video->BlitSpriteTinted( nextFrame, cx + viewport.x, cy + viewport.y, tint, anim->Palette, &Screen );
-					if (anim->endReached && ca->autoSwitchOnEnd) {
-						anim->endReached = false;
-						actor->SetStance( ca->nextStanceID );
+					if (anim->endReached) {
+						int x = rand()%1000;
+						if (ca->autoSwitchOnEnd) {
+							anim->endReached = false;
+							actor->SetStance( ca->nextStanceID );
+						} else if ((StanceID==IE_ANI_AWAKE) && !x ) {
+							anim->endReached = false;
+							actor->SetStance( IE_ANI_HEAD_TURN);
+						}
 					}
 				}
 			}

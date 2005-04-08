@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.215 2005/04/06 21:43:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.216 2005/04/08 16:54:34 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -34,7 +34,7 @@
 #define DEBUG_SHOW_DOORS	DEBUG_SHOW_CONTAINERS
 #define DEBUG_SHOW_SEARCHMAP    0x04
 #define DEBUG_SHOW_LIGHTMAP     0x08
-#define DEBUG_XXX	        0x10
+#define DEBUG_XXX		0x10
 
 static Color cyan = {
 	0x00, 0xff, 0xff, 0xff
@@ -62,32 +62,6 @@ typedef Point formation_type[FORMATIONSIZE];
 
 int formationcount;
 static formation_type *formations=NULL;
-
-static void AddTalk(TextArea* ta, Scriptable* speaker,
-	const char* speaker_color, char* text, const char* text_color)
-{
-	const char* format = "[color=%s]%s -  [/color][p][color=%s]%s[/color][/p]";
-	const char* name;
-
-	//FIXME: doors or active regions may have a dialog name???
-	switch (speaker->Type) {
-		case ST_ACTOR:
-			name = ((Actor *) speaker)->GetName(-1);  break;
-		default:
-			name = ""; break;
-	}
-	int newlen = (int)(strlen( format ) + strlen( name ) +
-		strlen( speaker_color ) + strlen( text ) +
-		strlen( text_color ) + 1);
-	char* newstr = ( char* ) malloc( newlen );
-	sprintf( newstr, format, speaker_color, name, text_color,
-		text );
-
-	ta->AppendText( newstr, -1 );
-	ta->AppendText( "", -1 );
-
-	free( newstr );
-}
 
 GameControl::GameControl(void)
 {
@@ -573,6 +547,17 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					printf( "%s [%d.%d]\n", area->GetScriptName(), cX, cY );
 				}
 				break;
+			case 'r':
+				if (!lastActor) {
+					Point p={lastMouseX,lastMouseY};
+					Map* area = game->GetCurrentArea( );
+					lastActor = area->GetActor( p, GA_DEFAULT);
+				}
+				if (lastActor) {
+					lastActor->Resurrect();
+				}
+				break;
+
 			case 'y': //kills actor
 				if (lastActor) {
 					//using action so the actor is killed
@@ -1076,10 +1061,10 @@ void GameControl::CalculateSelection(Point &p)
 void GameControl::SetCutSceneMode(bool active)
 {
 	if(active) {
-		ScreenFlags |= SF_DISABLEMOUSE;
+		ScreenFlags |= (SF_DISABLEMOUSE | SF_LOCKSCROLL);
 	}
 	else {
-		ScreenFlags &= ~SF_DISABLEMOUSE;
+		ScreenFlags &= ~(SF_DISABLEMOUSE | SF_LOCKSCROLL);
 	}
 }
 
@@ -1294,6 +1279,11 @@ void GameControl::ResizeAdd(Window* win, unsigned char type)
 
 void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlgref)
 {
+	if ((target->Type == ST_ACTOR) && (((Actor *) target)->InternalFlags&IF_NOINT) ) {
+		core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+		return;
+	}
+
 	DialogMgr* dm = ( DialogMgr* ) core->GetInterface( IE_DLG_CLASS_ID );
 	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
 	if(dlg) {
@@ -1319,7 +1309,7 @@ void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlg
 		return;
 	}
 	this->speaker = speaker;
-	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR;
+	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR|SF_LOCKSCROLL;
 	DialogueFlags |= DF_IN_DIALOG;
 	//allow mouse selection from dialog (even though screen is locked)
 	core->GetVideoDriver()->DisableMouse = false;
@@ -1349,11 +1339,17 @@ void GameControl::EndDialog(bool try_to_break)
 	{
 		return;
 	}
-	if(target && (DialogueFlags&DF_TALKCOUNT) )
-	{
-		if (target->Type == ST_ACTOR) {
-			((Actor *) target)->TalkCount++;
-		}
+
+	if(target) {
+		if (DialogueFlags&DF_TALKCOUNT) {
+			if (target->Type == ST_ACTOR) {
+				((Actor *) target)->TalkCount++;
+			}
+		} else {
+printf("Ending dialog with target %s but no talkcount increase*****\n", ((Actor *) target)->LongName);
+}
+		//this could be wrong
+		target->CurrentAction = NULL;
 	}
 	if (speaker) { //this could be wrong
 		speaker->CurrentAction = NULL;
@@ -1368,7 +1364,7 @@ void GameControl::EndDialog(bool try_to_break)
 	// FIXME: should use RunEventHandler()
 	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
 	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
-	ScreenFlags &=~SF_DISABLEMOUSE;
+	ScreenFlags &=~(SF_DISABLEMOUSE|SF_LOCKSCROLL);
 	DialogueFlags = 0;
 }
 
@@ -1389,7 +1385,7 @@ void GameControl::DialogChoose(unsigned int choose)
 	if (choose == (unsigned int) -1) {
 		int si = dlg->FindFirstState( target );
 		if (si < 0) {
-			printf( "[Dialog]: No top level condition evaluated for true.\n" );
+			core->DisplayConstantStringName(STR_NOTHINGTOSAY,0xff0000,target);
 			ta->SetMinRow( false );
 			EndDialog();
 			return;
@@ -1416,9 +1412,12 @@ void GameControl::DialogChoose(unsigned int choose)
 
 		ta->PopLines( ds->transitionsCount + 1 );
 		if (tr->textStrRef != 0xffffffff) {
+/*
 			char *string = core->GetString( tr->textStrRef );
-			AddTalk( ta, target, "A0A0FF", string, "8080FF" );
+			AddTalk( ta, speaker, "A0A0FF", string, "8080FF" );
 			free( string );
+*/
+			core->DisplayStringName( tr->textStrRef, 0x8080FF, speaker);
 		}
 
 		if (tr->action) {
@@ -1443,21 +1442,34 @@ void GameControl::DialogChoose(unsigned int choose)
 		int si = tr->stateIndex;
 		//follow external linkage, if required
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
+			//increasing talkcount here if we switched talker
+			if (DialogueFlags&DF_TALKCOUNT) {
+printf("Increasing talkcount\n");
+				if (target->Type == ST_ACTOR) {
+					((Actor *) target)->TalkCount++;
+				}
+			}
 			//target should be recalculated!
-			speaker = core->GetGame()->GetCurrentArea()->GetActorByDialog(tr->Dialog);
-			if(!speaker) {
+			target = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
+			if(!target) {
 				printMessage("Dialog","Can't redirect dialog",YELLOW);
 				ta->SetMinRow( false );
 				EndDialog();
 				return;
 			}
-			InitDialog( speaker, target, tr->Dialog );
+			// we have to make a backup, tr->Dialog is freed
+			char tmpresref[9];
+			strnuprcpy(tmpresref,tr->Dialog, 8);
+			InitDialog( speaker, target, tmpresref );
 		}
 		ds = dlg->GetState( si );
 	}
+/*
 	char* string = core->GetString( ds->StrRef, IE_STR_SOUND|IE_STR_SPEECH);
-	AddTalk( ta, speaker, "FF0000", string, "70FF70" );
+	AddTalk( ta, target, "FF0000", string, "70FF70" );
 	free( string );
+*/
+	core->DisplayStringName( ds->StrRef, 0x70FF70, target );
 	int i;
 	ta->SetMinRow( true );
 	int idx = 0;
@@ -1467,14 +1479,13 @@ void GameControl::DialogChoose(unsigned int choose)
 				continue;
 			}
 		}
+		char *string = ( char * ) malloc( 40 );
 		if (ds->transitions[x]->textStrRef == 0xffffffff) {
-			string = ( char * ) malloc( 40 );
 			sprintf( string, "[s=%d,ffffff,ff0000]Continue", x );
 			i = ta->AppendText( string, -1 );
 			free( string );
 			ta->AppendText( "[/s]", i );
 		} else {
-			string = ( char * ) malloc( 40 );
 			idx++;
 			sprintf( string, "[s=%d,ffffff,ff0000]%d - [p]", x, idx );
 			i = ta->AppendText( string, -1 );
@@ -1488,7 +1499,7 @@ void GameControl::DialogChoose(unsigned int choose)
 	ta->AppendText( "", -1 );
 	// is this correct?
 	if (DialogueFlags & DF_FREEZE_SCRIPTS) {
-		speaker->ProcessActions();
+		target->ProcessActions();
 	}
 }
 
@@ -1560,5 +1571,16 @@ void GameControl::SetScreenFlags(int value, int mode)
 		case BM_SET: ScreenFlags=value; break;
 		case BM_AND: ScreenFlags&=value; break;
 		case BM_XOR: ScreenFlags^=value; break;
+	}
+}
+
+void GameControl::SetDialogueFlags(int value, int mode)
+{
+	switch(mode) {
+		case BM_OR: DialogueFlags|=value; break;
+		case BM_NAND: DialogueFlags&=~value; break;
+		case BM_SET: DialogueFlags=value; break;
+		case BM_AND: DialogueFlags&=value; break;
+		case BM_XOR: DialogueFlags^=value; break;
 	}
 }

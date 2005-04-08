@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.45 2005/03/31 10:06:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.46 2005/04/08 16:54:32 avenger_teambg Exp $
  *
  */
 
@@ -156,9 +156,9 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				btn->Owner = win;
 				/** Justification comes from the .chu, other bits are set by script */
 				if(!Width) {
-					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR);
+					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_OR);
 				}
-				btn->SetFlags( Cycle&0xff00, OP_OR );
+				btn->SetFlags( Cycle&0xff00, BM_OR );
 				if (strncmp( BAMFile, "GUICTRL\0", 8 ) == 0) {
 					if (UnpressedIndex == 0) {
 						printf( "Special Button Control, Skipping Image Loading\n" );

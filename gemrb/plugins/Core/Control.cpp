@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.33 2005/03/27 13:27:00 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.34 2005/04/08 16:54:34 avenger_teambg Exp $
  *
  */
 
@@ -156,13 +156,19 @@ int Control::SetFlags(int arg_flags, int opcode)
 	if ((arg_flags >>24) != ControlType)
 		return -2;
 	switch (opcode) {
-		case OP_SET:
+		case BM_SET:
 			Flags = arg_flags;  //set
 			break;
-		case OP_OR:
+		case BM_AND:
+			Flags &= arg_flags;
+			break;
+		case BM_OR:
 			Flags |= arg_flags; //turn on
 			break;
-		case OP_NAND:
+		case BM_XOR:
+			Flags ^= arg_flags;
+			break;
+		case BM_NAND:
 			Flags &= ~arg_flags;//turn off
 			break;
 		default:

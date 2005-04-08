@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.81 2005/04/03 21:00:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.82 2005/04/08 16:54:33 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -85,16 +85,8 @@ Map* Scriptable::GetCurrentArea()
 {
 	if (area)
 		return area;
-/*	if (Type!=ST_GLOBAL) { */
-		printMessage("Map","Scriptable object has no area!!!\n", LIGHT_RED);
-		abort();
-/*
-	}
-	// FIXME:
-	// actually this is the same object but a higher layer
-	// probably it is possible to merge GetCurrentMap and GetCurrentArea
-	return core->GetGame()->GetCurrentMap();
-*/
+	printMessage("Map","Scriptable object has no area!!!\n", LIGHT_RED);
+	abort();
 }
 
 void Scriptable::SetMap(Map *map)
@@ -117,12 +109,12 @@ void Scriptable::SetScript(ieResRef aScript, int idx)
 		Scripts[idx]->MySelf = this;
 	}
 }
-
+/*
 void Scriptable::SetMySelf(Scriptable* MySelf)
 {
 	this->MySelf = MySelf;
 }
-
+*/
 void Scriptable::SetScript(int index, GameScript* script)
 {
 	if (index >= MAX_SCRIPTS) {
@@ -225,7 +217,8 @@ void Scriptable::ProcessActions()
 	if (playDeadCounter) {
 		playDeadCounter--;
 		if (!playDeadCounter) {
-			Moveble* mov = ( Moveble* ) MySelf;
+			//Moveble* mov = ( Moveble* ) MySelf;
+			Moveble* mov = ( Moveble* ) this;
 			mov->SetStance( IE_ANI_GET_UP );
 		}
 	}
@@ -450,8 +443,6 @@ void Moveble::AddWayPoint(Point &Des)
 	while(endNode->Next) {
 		endNode=endNode->Next;
 	}
-	//Game* game = core->GetGame();
-	//Map* map = game->GetMap(Area, false);
 	Point p = {endNode->x, endNode->y};
 	PathNode *path2 = area->FindPath( p, Des );
 	endNode->Next=path2;
@@ -461,16 +452,12 @@ void Moveble::WalkTo(Point &Des)
 {
 	Destination = Des;
 	ClearPath();
-	//Game* game = core->GetGame();
-	//Map* map = game->GetMap(Area, false);
 	path = area->FindPath( Pos, Destination );
 }
 
 void Moveble::RunAwayFrom(Point &Des, int PathLength, bool Backing)
 {
 	ClearPath();
-	//Game* game = core->GetGame();
-	//Map* map = game->GetMap(Area, false);
 	path = area->RunAway( Pos, Des, PathLength, Backing );
 }
 
@@ -482,6 +469,9 @@ void Moveble::MoveTo(Point &Des)
 
 void Moveble::ClearPath()
 {
+	if (StanceID==IE_ANI_WALK) {
+		StanceID = IE_ANI_AWAKE;
+	}
 	if (!path) {
 		return;
 	}
@@ -497,7 +487,6 @@ void Moveble::ClearPath()
 	}
 	path = NULL;
 	step = NULL;
-	StanceID = IE_ANI_AWAKE;
 	CurrentAction = NULL;
 }
 

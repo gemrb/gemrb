@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.71 2005/03/15 17:53:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.72 2005/04/08 16:54:31 avenger_teambg Exp $
  *
  */
 
@@ -69,6 +69,13 @@
 #define IE_STR_STRREFON 1
 #define IE_STR_SOUND	2
 #define IE_STR_SPEECH   4
+
+// bitflag operations
+#define BM_SET  0 //gemrb extension
+#define BM_AND  1
+#define BM_OR   2
+#define BM_XOR  3
+#define BM_NAND 4 //gemrb extension
 
 //IDS Importer Defines
 #define IDS_VALUE_NOT_LOCATED -65535 // GetValue returns this if text is not found in arrays ... this needs to be a unique number that does not exist in the value[] array

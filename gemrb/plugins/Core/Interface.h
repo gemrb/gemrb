@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.148 2005/03/31 10:06:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.149 2005/04/08 16:54:36 avenger_teambg Exp $
  *
  */
 
@@ -267,6 +267,10 @@ public:
 	void DisplayString(const char *txt);
 	/** displays a string constant in the textarea */
 	void DisplayConstantString(int stridx, unsigned int color);
+	/** displays a string constant in the textarea, starting with speaker's name */
+	void DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker);
+	/** displays a string in the textarea, starting with speaker's name */
+	void DisplayStringName(int stridx, unsigned int color, Scriptable *speaker);
 	/** Set a Window Visible Flag */
 	int SetVisible(unsigned short WindowIndex, int visible);
 	/** Show a Window in Modal Mode */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.65 2005/04/03 21:00:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.66 2005/04/08 16:54:33 avenger_teambg Exp $
  *
  */
 
@@ -151,7 +151,7 @@ public:
 public:
 	void SetScript(ieResRef aScript, int idx);
 	void SetWait(unsigned long time);
-	void SetMySelf(Scriptable* MySelf);
+	//void SetMySelf(Scriptable* MySelf);
 	char* GetScriptName();
 	Map* GetCurrentArea();
 	void SetMap(Map *map);

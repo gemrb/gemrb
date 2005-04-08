@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.65 2005/04/05 19:21:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.66 2005/04/08 16:54:33 avenger_teambg Exp $
  *
  */
 
@@ -417,8 +417,9 @@ void CREImp::GetActorPST(Actor *act)
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
 	str->Seek( 4, GEM_CURRENT_POS );
-	char KillVar[32]; //use this as needed
+	char KillVar[33]; //use this as needed
 	str->Read(KillVar,32);
+	KillVar[32]=0;
 	str->Seek( 3, GEM_CURRENT_POS ); // dialog radius, feet circle size???
 
 	ieByte ColorsCount;
@@ -461,6 +462,7 @@ void CREImp::GetActorPST(Actor *act)
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
+	strnuprcpy(act->KillVar, KillVar, 32);
 
 	str->ReadDword( &act->KnownSpellsOffset );
 	str->ReadDword( &act->KnownSpellsCount );
@@ -738,6 +740,7 @@ void CREImp::GetActorBG(Actor *act)
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
+	act->KillVar[0]=0;
 
 	str->ReadDword( &act->KnownSpellsOffset );
 	str->ReadDword( &act->KnownSpellsCount );
@@ -875,6 +878,8 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
+	//not sure
+	act->KillVar[0]=0;
 
 	act->KnownSpellsOffset = 0;
 	act->KnownSpellsCount = 0;
@@ -1037,6 +1042,8 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
+	//not sure
+	act->KillVar[0]=0;
 
 	str->ReadDword( &act->KnownSpellsOffset );
 	str->ReadDword( &act->KnownSpellsCount );

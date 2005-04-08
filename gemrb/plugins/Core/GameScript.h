@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.168 2005/04/03 21:00:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.169 2005/04/08 16:54:35 avenger_teambg Exp $
  *
  */
 
@@ -39,12 +39,6 @@ class Action;
 
 //attack core flags
 #define AC_REEVALUATE 1
-
-#define BM_SET  0 //gemrb extension
-#define BM_AND  1
-#define BM_OR   2
-#define BM_XOR  3
-#define BM_NAND 4 //gemrb extension
 
 #define MAX_OBJECT_FIELDS	10
 #define MAX_NESTING			5
@@ -308,6 +302,22 @@ private:
 	int RefCount;
 	volatile unsigned long canary;
 public:
+	void Dump()
+	{
+		int i;
+
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
+		printf("String1: %s, String2: %s\n", string0Parameter?string0Parameter:"<NULL>", string1Parameter?string1Parameter:"<NULL>");
+		for (i=0;i<3;i++) {
+			if (objects[i]) {
+				printf( "%d. ",i+1);
+				objects[i]->Dump();
+			} else {
+				printf( "%d. Object - NULL\n",i+1);
+			}
+		}
+	}
+
 	void Release()
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );

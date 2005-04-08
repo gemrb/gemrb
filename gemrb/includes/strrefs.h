@@ -24,11 +24,13 @@
 #define STR_CANTSAVE       18
 #define STR_NODIALOG       19
 #define STR_CANTSAVEDIALOG 20
-#define STR_TARGETBUSY      21
-#define STR_CANTTALKTRANS   22
-#define STR_GOTXP           23
-#define STR_GOTABILITY      24
-#define STR_GOTSPELL        25
-#define STR_GOTSONG         26
-
+#define STR_CANTSAVEDIALOG2 21
+#define STR_CANTSAVEMOVIE   22
+#define STR_TARGETBUSY      23
+#define STR_CANTTALKTRANS   24
+#define STR_GOTXP           25
+#define STR_GOTABILITY      26
+#define STR_GOTSPELL        27
+#define STR_GOTSONG         28
+#define STR_NOTHINGTOSAY    29
 #endif //IE_STRINGS_H

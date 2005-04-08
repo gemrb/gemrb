@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.299 2005/04/06 17:39:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.300 2005/04/08 16:54:37 avenger_teambg Exp $
  *
  */
 
@@ -1952,9 +1952,9 @@ static PyObject* GemRB_SetButtonFlags(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iiii", &WindowIndex, &ControlIndex, &Flags, &Operation )) {
 		return AttributeError( GemRB_SetButtonFlags__doc );
 	}
-	if (Operation< 0 || Operation>2) {
+	if (Operation < BM_SET || Operation > BM_NAND) {
 		printMessage( "GUIScript",
-			"Syntax Error: operation must be 0-2\n", LIGHT_RED );
+			"Syntax Error: operation must be 0-4\n", LIGHT_RED );
 		return NULL;
 	}
 
@@ -1984,9 +1984,9 @@ static PyObject* GemRB_SetTextAreaFlags(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iii|i", &WindowIndex, &ControlIndex, &Flags, &Operation )) {
 		return AttributeError( GemRB_SetTextAreaFlags__doc );
 	}
-	if (Operation< 0 || Operation>2) {
+	if (Operation < BM_SET || Operation > BM_NAND) {
 		printMessage( "GUIScript",
-			"Syntax Error: operation must be 0-2\n", LIGHT_RED );
+			"Syntax Error: operation must be 0-4\n", LIGHT_RED );
 		return NULL;
 	}
 
@@ -3646,7 +3646,7 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 			return Py_None;
 		}
 
-		btn->SetFlags( IE_GUI_BUTTON_PICTURE, OP_OR );
+		btn->SetFlags( IE_GUI_BUTTON_PICTURE, BM_OR );
 		Sprite2D* Picture;
 		if (Which==2) {
 			Picture = GetBAMSprite(item->CarriedIcon, -1, 0);

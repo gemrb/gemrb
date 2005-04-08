@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.63 2005/04/06 21:43:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.64 2005/04/08 16:54:34 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -71,12 +71,7 @@ public:
 	void Draw(unsigned short x, unsigned short y);
 	/** Sets the Text of the current control */
 	int SetText(const char* string, int pos = 0);
-	/** Sets the current area to Display */
-/*
-	Map *SetCurrentArea(int Index);
-*/
-	/** Sets the InfoTextColor, used in PST
-	*/
+	/** Sets the InfoTextColor, used in PST */
 	void SetInfoTextColor(Color color);
 private:
 	Actor* lastActor;
@@ -102,6 +97,7 @@ private:
 	PathNode* drawPath;
 	unsigned long AIUpdateCounter;
 	int ScreenFlags;
+	int DialogueFlags;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
@@ -118,6 +114,9 @@ public: //Events
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
 	void SetScreenFlags(int value, int mode);
+	void SetDialogueFlags(int value, int mode);
+	int GetScreenFlags() { return ScreenFlags; }
+	int GetDialogueFlags() { return DialogueFlags; }
 private:
 	void CalculateSelection(Point &p);
 	void ResizeDel(Window* win, unsigned char type);
@@ -131,7 +130,6 @@ private:
 public:
 	Actor* speaker;
 	Scriptable* target;
-	int DialogueFlags;
 public:
 	void DeselectAll();
 	/* Selects one or all PC */
@@ -147,13 +145,12 @@ public:
 	void InitDialog(Actor* speaker, Scriptable* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
+	/* Displays a string over an object */
 	void DisplayString(Scriptable* target);
-	/* Displays a string in the textarea */
-	//void DisplayString(const char* Text);
 	/* Displays a string on screen */
 	void DisplayString(Point &p, const char *Text);
 	Actor *GetLastActor() { return lastActor; }
-	//changes map to the current PC
+	/* changes map to the current PC */
 	void ChangeMap(Actor *pc, bool forced);
 };
 

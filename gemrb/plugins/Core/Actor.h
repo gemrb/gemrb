@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.64 2005/04/06 21:43:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.65 2005/04/08 16:54:33 avenger_teambg Exp $
  *
  */
 
@@ -126,7 +126,7 @@ public:
 	ieWord AppearanceFlags1;
 	ieWord AppearanceFlags2;
 
-	char KillVar[32]; //this second field is present in pst and iwd1
+	char KillVar[33]; //this second field is present in pst and iwd1
 
 	ieDword KnownSpellsOffset;
 	ieDword KnownSpellsCount;
@@ -265,7 +265,9 @@ public:
 	void DropItem(ieResRef resref, unsigned int flags);
 	/* returns true if the actor is PC/joinable*/
 	bool Persistent();
-	/* schedules actor to die*/
+	/* resurrects actor */
+	void Resurrect();
+	/* schedules actor to die */
 	void Die(Scriptable *killer);
 	/* debug function */
 	void GetNextAnimation();

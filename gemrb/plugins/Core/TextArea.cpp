@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.70 2005/03/20 23:36:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.71 2005/04/08 16:54:37 avenger_teambg Exp $
  *
  */
 
@@ -304,7 +304,7 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	if ((Flags & IE_GUI_TEXTAREA_SELECTABLE) || ( Key < '1' ) || ( Key > '9' )) 
 		return;
 	GameControl *gc = core->GetGameControl();
-	if (gc && (gc->DialogueFlags&DF_IN_DIALOG) ) {
+	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
 		Changed = true;
 		seltext=minrow-1;
 		if((unsigned int) seltext>=lines.size()) {
@@ -429,7 +429,7 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y,
 			unsigned long idx;
 			sscanf( lines[seltext], "[s=%lu,", &idx );
 			GameControl* gc = core->GetGameControl();
-			if (gc && (gc->DialogueFlags&DF_IN_DIALOG) ) {
+			if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
 				gc->DialogChoose( idx );
 			}
 		}

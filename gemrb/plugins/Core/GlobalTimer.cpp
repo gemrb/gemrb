@@ -64,7 +64,7 @@ void GlobalTimer::Update()
 		}
 		GameControl* gc = core->GetGameControl();
 		if (gc) {
-			if (gc->DialogueFlags&DF_IN_DIALOG)
+			if (gc->GetDialogueFlags()&DF_IN_DIALOG)
 				return;
 		}
 		Game* game = core->GetGame();

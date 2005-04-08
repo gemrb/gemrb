@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.255 2005/04/06 21:43:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.256 2005/04/08 16:54:34 avenger_teambg Exp $
  *
  */
 
@@ -1184,7 +1184,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		if (map) {
 			map->vars->SetAt( VarName, value);
 		}
-		else {
+		else if (InDebug&1) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s %s in checkvariable\n",Context, VarName);
 		}
@@ -1204,7 +1204,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, ieDword va
 	strncpy( newVarName, VarName, 6 );
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
-		Sender->GetCurrentArea()->locals->SetAt( VarName, value );
+		Sender->GetCurrentArea()->locals->SetAt( &VarName[6], value );
 		return;
 	}
 	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
@@ -1221,13 +1221,13 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, ieDword va
 		if (map) {
 			map->vars->SetAt( &VarName[6], value);
 		}
-		else {
+		else if (InDebug&1) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s in setvariable\n",VarName);
 		}
 	}
 	else {
-		game->globals->SetAt( VarName, ( ieDword ) value );
+		game->globals->SetAt( &VarName[6], ( ieDword ) value );
 	}
 }
 
@@ -1265,7 +1265,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 		if (map) {
 			map->vars->Lookup( &VarName[6], value);
 		}
-		else {
+		else if (InDebug&1) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s in checkvariable\n",VarName);
 		}
@@ -1313,7 +1313,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 		if (map) {
 			map->vars->Lookup( VarName, value);
 		}
-		else {
+		else if (InDebug&1) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s %s in checkvariable\n",Context, VarName);
 		}
@@ -1632,7 +1632,7 @@ int GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 		return 0;
 	}
 	if (InDebug&1) {
-		printf( "[IEScript]: Executing trigger code: 0x%04x %s\n",
+		printf( "[GameScript]: Executing trigger code: 0x%04x %s\n",
 				trigger->triggerID, tmpstr );
 	}
 	int ret = func( Sender, trigger );
@@ -1721,7 +1721,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		}
 		else {
 			if (InDebug&1) {
-				printf( "[IEScript]: Executing action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
+				printf( "[GameScript]: Executing action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
 			}
 			//turning off interruptable flag
 			//uninterruptable actions will set it back
@@ -1875,7 +1875,7 @@ Scriptable* GameScript::GetActorFromObject(Scriptable* Sender, Object* oC)
 			tgts = func( Sender, tgts);
 		}
 		else {
-			printf("[IEScript]: Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
+			printf("[GameScript]: Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
 		}
 		if (!tgts->Count()) {
 			delete tgts;
@@ -3709,6 +3709,7 @@ int GameScript::LocalsLT(Scriptable* Sender, Trigger* parameters)
 int GameScript::RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	if (!value1) return 0;
 	ieDword value2;
 	GetTime(value2);
 	return ( value1 == value2 );
@@ -3717,6 +3718,7 @@ int GameScript::RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 int GameScript::RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	if (!value1) return 0;
 	ieDword value2;
 	GetTime(value2);
 	return ( value1 < value2 );
@@ -3725,6 +3727,7 @@ int GameScript::RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 int GameScript::RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	if (!value1) return 0;
 	ieDword value2;
 	GetTime(value2);
 	return ( value1 > value2 );
@@ -3733,18 +3736,21 @@ int GameScript::RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameter
 int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	if (!value1) return 0;
 	return ( value1 == core->GetGame()->GameTime );
 }
 
 int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	if (!value1) return 0;
 	return ( value1 < core->GetGame()->GameTime );
 }
 
 int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	if (!value1) return 0;
 	return ( value1 > core->GetGame()->GameTime );
 }
 
@@ -4568,7 +4574,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
-		printf("[IEScript]: couldn't find door/container:%s\n",parameters->objectParameter->objectName);
+		printf("[GameScript]: couldn't find door/container:%s\n",parameters->objectParameter->objectName);
 		return 0;
 	}
 	switch(tar->Type) {
@@ -4584,7 +4590,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		}
 		default:; //to remove a warning
 	}
-	printf("[IEScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
+	printf("[GameScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
 	return 0;
 }
 
@@ -4592,7 +4598,7 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
-		printf("[IEScript]: couldn't find door/container:%s\n",parameters->objectParameter->objectName);
+		printf("[GameScript]: couldn't find door/container:%s\n",parameters->objectParameter->objectName);
 		return 0;
 	}
 	switch(tar->Type) {
@@ -4608,7 +4614,7 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 		}
 		default:; //to remove a warning
 	}
-	printf("[IEScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
+	printf("[GameScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
 	return 0;
 }
 
@@ -6675,7 +6681,7 @@ void GameScript::LockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_LOCKSCROLL, OP_OR);
+		gc->SetScreenFlags(SF_LOCKSCROLL, BM_OR);
 	}
 }
 
@@ -6683,7 +6689,7 @@ void GameScript::UnlockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_LOCKSCROLL, OP_NAND);
+		gc->SetScreenFlags(SF_LOCKSCROLL, BM_NAND);
 	}
 }
 
@@ -6723,7 +6729,8 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		scr = Sender;
 	}
 	if (!tar) {
-		printf("[IEScript]: Target for dialog couldn't be found (Sender: %s).\n", Sender->GetScriptName());
+		printf("[GameScript]: Target for dialog couldn't be found (Sender: %s, Type: %d).\n", Sender->GetScriptName(), Sender->Type);
+		parameters->Dump();
 		if (Sender->Type == ST_ACTOR) {
 			((Actor *) Sender)->DebugDump();
 		}
@@ -6749,25 +6756,33 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	GameControl* gc = core->GetGameControl();
 	if (!gc) {
-		printf( "[IEScript]: Dialog cannot be initiated because there is no GameControl.\n" );
+		printMessage( "GameScript","Dialog cannot be initiated because there is no GameControl.", YELLOW );
 		Sender->CurrentAction = NULL;
 		return;
 	}
 	//can't initiate dialog, because it is already there
-	if (gc->DialogueFlags&DF_IN_DIALOG) {
+	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 		if (Flags & BD_INTERRUPT) {
 			//break the current dialog if possible
 			gc->EndDialog(true);
 		}
 		//check if we could manage to break it, not all dialogs are breakable!
-		if (gc->DialogueFlags&DF_IN_DIALOG) {
-			printf( "[IEScript]: Dialog cannot be initiated because there is already one.\n" );
+		if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
+			printMessage( "GameScript","Dialog cannot be initiated because there is already one.", YELLOW );
 			Sender->CurrentAction = NULL;
 			return;
 		}
 	}
 
 	const char* Dialog = NULL;
+	int pdtable = -1;
+	//making sure speaker is the protagonist, player, actor
+	bool swap = false;
+	if (scr->Type != ST_ACTOR) swap = true;
+	else if (tar->Type == ST_ACTOR) {
+		if ( ((Actor *) tar)->InParty == 1) swap = true;
+		else if ( (((Actor *) scr)->InParty !=1) && ((Actor *) tar)->InParty) swap = true;
+	}
 
 	switch (Flags & BD_LOCMASK) {
 		case BD_STRING0:
@@ -6780,21 +6795,23 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			}
 			break;
 		case BD_SOURCE:
-			Dialog = GetDialog(scr); //actor->Dialog;
-			break;
+//			Dialog = GetDialog(scr); //actor->Dialog;
+//			break;
 		case BD_TARGET:
-			Dialog = GetDialog(tar);//target->Dialog;
+			if (swap) Dialog = GetDialog(scr);
+			else Dialog = GetDialog(tar);//target->Dialog;
 			break;
 		case BD_RESERVED:
+			//what if playerdialog was initiated from Player2?
 			PlayerDialogRes[5] = '1';
 			Dialog = ( const char * ) PlayerDialogRes;
 			break;
 		case BD_INTERACT: //using the source for the dialog
 			if ( scr->Type == ST_ACTOR) {
-				int pdtable = core->LoadTable( "interdia" );
+				pdtable = core->LoadTable( "interdia" );
 				const char* scriptingname = ((Actor *) scr)->GetScriptName();
+				//Dialog is a borrowed reference, we cannot free pdtable while it is being used
 				Dialog = core->GetTable( pdtable )->QueryField( scriptingname, "FILE" );
-				core->DelTable( pdtable );
 			}
 			break;
 	}
@@ -6802,8 +6819,9 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	//maybe we should remove the action queue, but i'm unsure
 	Sender->CurrentAction = NULL;
 
-	if (!Dialog) {
-		return;
+	//dialog is not meaningful
+	if (!Dialog || Dialog[0]=='*') {
+			goto end_of_quest;
 	}
 
 	//we also need to freeze active scripts during a dialog!
@@ -6813,7 +6831,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		} else {
 			if (tar->GetNextAction()) {
 				core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
-				return;
+				goto end_of_quest;
 			}
 		}
 	}
@@ -6830,22 +6848,20 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	if (Dialog[0]) {
 		//increasing NumTimesTalkedTo
 		if (Flags & BD_TALKCOUNT) {
-			gc->DialogueFlags|=DF_TALKCOUNT;
+			gc->SetDialogueFlags(DF_TALKCOUNT, BM_OR);
 		}
 
-		//making sure speaker is the protagonist, player, actor
-		bool swap = false;
-		if (scr->Type != ST_ACTOR) swap = true;
-		else if (tar->Type == ST_ACTOR) {
-			if ( ((Actor *) tar)->InParty == 1) swap = true;
-			else if ( (((Actor *) scr)->InParty !=1) && ((Actor *) tar)->InParty) swap = true;
-		}
 		if ( swap ) {
 			gc->InitDialog( (Actor *) tar, scr, Dialog );
 		}
 		else {
 			gc->InitDialog( (Actor *) scr, tar, Dialog );
 		}
+	}
+//if pdtable was allocated, free it now, it will release Dialog
+end_of_quest:
+	if (pdtable!=-1) {
+		core->DelTable( pdtable );
 	}
 }
 
@@ -7069,7 +7085,7 @@ void GameScript::StartDialogueNoSetInterrupt(Scriptable* Sender,
 //no talkcount, using banter scripts
 void GameScript::Interact(Scriptable* Sender, Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_INTERACT | BD_SOURCE );
+	BeginDialog( Sender, parameters, BD_INTERACT );
 }
 
 static Point &FindNearPoint(Scriptable* Sender, Point &p1, Point &p2, double& distance)
@@ -8347,7 +8363,7 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	GameControl* gc = core->GetGameControl();
-	if (gc->DialogueFlags&DF_IN_DIALOG) {
+	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 		gc->speaker = (Actor *) tar;
 	}
 	else {
@@ -8868,13 +8884,13 @@ void GameScript::Panic(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 {
 	WorldMap *worldmap = core->GetWorldMap();
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE, OP_OR);
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE, BM_OR);
 }
 
 void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 {
 	WorldMap *worldmap = core->GetWorldMap();
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE, OP_NAND);
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE, BM_NAND);
 }
 
 void GameScript::Shout( Scriptable* Sender, Action* parameters)

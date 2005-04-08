@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.97 2005/04/06 21:43:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.98 2005/04/08 16:54:33 avenger_teambg Exp $
  *
  */
 
@@ -230,6 +230,8 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		}
 		SetCircleSize();
 		anims->SetColors(BaseStats+IE_COLORS);
+	} else {
+		printf("[Actor] Missing animation for %s\n",LongName);
 	}
 }
 
@@ -588,6 +590,16 @@ int Actor::GetXPLevel(int modified) const
 int Actor::GetEncumbrance()
 {
 	return inventory.GetWeight();
+}
+
+void Actor::Resurrect()
+{
+	InternalFlags=0;
+	SetStat(IE_STATE_ID,0);
+	SetStat(IE_HITPOINTS, 255);
+	ClearActions();
+	ClearPath();
+	//clear effects?
 }
 
 void Actor::Die(Scriptable *killer)
