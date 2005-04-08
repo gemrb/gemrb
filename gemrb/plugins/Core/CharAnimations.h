@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.34 2005/04/08 20:45:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.35 2005/04/08 22:27:53 avenger_teambg Exp $
  *
  */
 
@@ -82,6 +82,7 @@
 #define IE_ANI_CODE_MIRROR_3		7
 #define IE_ANI_SIX_FILES		8    //MCAR/MWYV
 #define IE_ANI_TWO_FILES_3		9    //iwd animations
+#define IE_ANI_TWO_FILES_2		10   //low res bg1 anim
 
 //PST animation types
 #define IE_ANI_PST_ANIMATION_1		16   //full animation
@@ -155,6 +156,8 @@ private:
 	void AddTwoFileSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddLRSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void AddLR2Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void GetAnimResRef(unsigned char AnimID, unsigned char Orient,
 		char* ResRef, unsigned char& Cycle);

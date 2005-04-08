@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.54 2005/04/08 20:45:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.55 2005/04/08 22:27:53 avenger_teambg Exp $
  *
  */
 
@@ -280,6 +280,7 @@ IE_ANI_TWENTYTWO:	This Animation Type stores the Animation in the following form
 			ACTIONCODE=A1-6, CA, SX, SA (sling is A1)
 			The G1 file contains several animation states. See MHR
 			Probably it could use A7-9 files too, bringing the file numbers to 28.
+			This is the original bg1 format.
 
 IE_ANI_SIX_FILES:	The layout for these files is:
 			[NAME][G1-3][/E]
@@ -467,6 +468,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 
 		case IE_ANI_TWO_FILES:
 		case IE_ANI_TWENTYTWO:
+		case IE_ANI_TWO_FILES_2:
 		case IE_ANI_TWO_FILES_3:
 		case IE_ANI_FOUR_FILES:
 			Orient&=~1;
@@ -532,6 +534,10 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 
 		case IE_ANI_TWENTYTWO:  //5+3 animations
 			AddMHRSuffix( ResRef, StanceID, Cycle, Orient );
+			break;
+
+		case IE_ANI_TWO_FILES_2:  //4+4 animations
+			AddLR2Suffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_TWO_FILES_3: //IWD style anims
@@ -760,8 +766,13 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_HEAD_TURN:
-			strcat( ResRef, "G12" );
-			Cycle += 18;
+			if (rand()&1) {
+				strcat( ResRef, "G12" );
+				Cycle += 18;
+			} else {
+				strcat( ResRef, "G18" );
+				Cycle += 72;
+			}
 			break;
 
 			//Unknown... maybe only a transparency effect apply
@@ -851,6 +862,55 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 	}
 }
 
+void CharAnimations::AddLR2Suffix(char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	Orient /= 2;
+
+	switch (StanceID) {
+			//Attack is a special case... it cycles randomly
+			//through SLASH, BACKSLASH and JAB so we will choose
+			//which animation return randomly
+		case IE_ANI_READY:
+		case IE_ANI_CAST:
+		case IE_ANI_CONJURE:
+		case IE_ANI_HIDE:
+		case IE_ANI_WALK:
+		case IE_ANI_AWAKE:
+			Cycle = 0 + Orient;
+			break;
+
+		case IE_ANI_SHOOT:
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_ATTACK_BACKSLASH:
+		case IE_ANI_ATTACK_JAB:
+		case IE_ANI_HEAD_TURN:
+			Cycle = 8 + Orient;
+			break;
+
+		case IE_ANI_DIE:
+		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
+			Cycle = 24 + Orient;
+			break;
+
+		case IE_ANI_DAMAGE:
+			Cycle = 16 + Orient;
+			break;
+
+		case IE_ANI_SLEEP:
+		case IE_ANI_TWITCH:
+			Cycle = 32 + Orient;
+			break;
+	}
+	if (Orient>=5) {
+		strcat( ResRef, "G1E" );
+	} else {
+		strcat( ResRef, "G1" );
+	}
+}
+
 void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)
 {
@@ -876,7 +936,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			Cycle = Orient;
 			break;
 
-		case IE_ANI_AWAKE:
+		case IE_ANI_READY:
 			strcat( ResRef, "G1" );
 			Cycle = 8 + Orient;
 			break;
@@ -918,7 +978,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_HIDE:
 			break;
 
-		case IE_ANI_READY:
+		case IE_ANI_AWAKE:
 			strcat( ResRef, "G1" );
 			Cycle = 24 + Orient;
 			break;

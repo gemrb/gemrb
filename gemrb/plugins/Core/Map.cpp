@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.151 2005/04/08 16:54:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.152 2005/04/08 22:27:53 avenger_teambg Exp $
  *
  */
 
@@ -1540,9 +1540,9 @@ void Map::ExploreMapChunk(Point &Pos, int range, bool los)
 	}
 	int p=Perimeter;
 	while(p--) {
-		int Pass=2;
-		bool block=false;
-		bool sidewall=false;
+		int Pass = 2;
+		bool block = false;
+		bool sidewall = false;
 		for (int i=0;i<range;i++) {
 			Tile.x = Pos.x+VisibilityMasks[i][p].x;
 			Tile.y = Pos.y+VisibilityMasks[i][p].y;
