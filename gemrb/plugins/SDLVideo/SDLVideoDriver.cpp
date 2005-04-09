@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.101 2005/04/03 21:00:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.102 2005/04/09 19:13:43 avenger_teambg Exp $
  *
  */
 
@@ -291,8 +291,7 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 	SDL_BlitSurface( backBuf, NULL, disp, NULL );
 	if (fadePercent) {
-		//printf("Fade Percent = %d%%\n", fadePercent);
-		SDL_SetAlpha( extra, SDL_SRCALPHA, ( 255 * fadePercent ) / 100 );
+		SDL_SetAlpha( extra, SDL_SRCALPHA, fadePercent );
 		SDL_Rect src = {
 			0, 0, Viewport.w, Viewport.h
 		};
@@ -375,12 +374,6 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	}
 	spr->Width = w;
 	spr->Height = h;
-/*
-	if (bpp == 8) {
-		spr->palette = ( Color * ) malloc( 256 * sizeof( Color ) );
-		memcpy( spr->palette, palette, 256 * sizeof( Color ) );
-	}
-*/
 	return spr;
 }
 
@@ -394,11 +387,6 @@ void SDLVideoDriver::FreeSprite(Sprite2D* spr)
 	if (spr->pixels) {
 		free( spr->pixels );
 	}
-/*
-	if (spr->palette) {
-		free( spr->palette );
-	}
-*/
 	delete( spr );
 	spr = NULL;
 }
@@ -705,31 +693,10 @@ void SDLVideoDriver::CalculateAlpha(Sprite2D* sprite)
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 void SDLVideoDriver::DrawRect(Region& rgn, Color& color, bool fill, bool clipped)
 {
-	/*SDL_Surface * rectsurf = SDL_CreateRGBSurface(SDL_HWSURFACE, rgn.w, rgn.h, 8, 0,0,0,0);
-	SDL_Color pal[2];
-	pal[0].r = color.r;
-	pal[0].g = color.g;
-	pal[0].b = color.b;
-	pal[0].unused = color.a;
-	pal[1].r = 0;
-	pal[1].g = 0;
-	pal[1].b = 0;
-	pal[1].unused = 0;
-	SDL_SetPalette(rectsurf, SDL_LOGPAL, pal, 0, 2);
-	SDL_Rect drect = {0,0,rgn.w, rgn.h};
-	SDL_FillRect(rectsurf, &drect, 1);
-	drect.x = rgn.x;
-	drect.y = rgn.y;
-	if(color.a != 0)
-		SDL_SetAlpha(rectsurf, SDL_SRCALPHA | SDL_RLEACCEL, 128);
-	SDL_BlitSurface(rectsurf, NULL, disp, &drect);
-	SDL_FreeSurface(rectsurf);*/
 	SDL_Rect drect = {
 		rgn.x, rgn.y, rgn.w, rgn.h
 	};
 	if (fill) {
-//		long val = SDL_MapRGBA( backBuf->format, color.r, color.g, color.b, color.a );
-//		SDL_FillRect( backBuf, &drect, val );
 		if ( SDL_ALPHA_TRANSPARENT == color.a ) {
 			return;
 		} else if ( SDL_ALPHA_OPAQUE == color.a ) {
@@ -1174,21 +1141,11 @@ Color* SDLVideoDriver::GetPalette(Sprite2D* spr)
 		return NULL;
 	}
 	Color* pal = ( Color* ) malloc( 256 * sizeof( Color ) );
-/*
-	if (spr->palette) {
-		for (int i = 0; i < 256; i++) {
-			pal[i].r = spr->palette[i].r;
-			pal[i].g = spr->palette[i].g;
-			pal[i].b = spr->palette[i].b;
-		}
-	} else {
-*/
-		for (int i = 0; i < s->format->palette->ncolors; i++) {
-			pal[i].r = s->format->palette->colors[i].r;
-			pal[i].g = s->format->palette->colors[i].g;
-			pal[i].b = s->format->palette->colors[i].b;
-		}
-//	}
+	for (int i = 0; i < s->format->palette->ncolors; i++) {
+		pal[i].r = s->format->palette->colors[i].r;
+		pal[i].g = s->format->palette->colors[i].g;
+		pal[i].b = s->format->palette->colors[i].b;
+	}
 	return pal;
 }
 
@@ -1295,21 +1252,30 @@ void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 		free (sprite->pixels);
 	}
 	sprite->pixels = pixels;
-/*
-	if ( sprite->palette) {
-		free (sprite->palette);
-	}
-	sprite->palette = NULL;
-*/
 	SDL_UnlockSurface (surf);
 	SDL_FreeSurface (surf);
 	surf = SDL_CreateRGBSurfaceFrom( pixels, sprite->Width, sprite->Height, 32, sprite->Width*4, 0xff00, 0xff00, 0xff00, 255 );
 	sprite->vptr = surf;
 }
 
+void SDLVideoDriver::SetFadeColor(int r, int g, int b)
+{
+	if (r>255) r=255;
+	else if(r<0) r=0;
+	fadeColor.r=r;
+	if (g>255) g=255;
+	else if(g<0) g=0;
+	fadeColor.g=g;
+	if (b>255) b=255;
+	else if(b<0) b=0;
+	fadeColor.b=b;
+}
+
 void SDLVideoDriver::SetFadePercent(int percent)
 {
-	fadePercent = percent;
+	if (percent>100) percent = 100;
+	else if (percent<0) percent = 0;
+	fadePercent = (255 * percent ) / 100;
 }
 
 void SDLVideoDriver::SetClipRect(Region* clip)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.82 2005/04/08 16:54:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.83 2005/04/09 19:13:39 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -160,6 +160,7 @@ void Scriptable::AddAction(Action* aC)
 		printf( "[IEScript]: NULL action encountered for %s!\n",scriptName );
 		return;
 	}
+	Active|=SCR_ACTIVE;
 	actionQueue.push_back( aC );
 	aC->IncRef();
 }
@@ -239,11 +240,13 @@ void Scriptable::ProcessActions()
 				CutSceneId = NULL;
 			break;
 		}
+/*
 		if (Type == ST_ACTOR) {
 			Moveble* actor = ( Moveble* )this;
 			if (actor->GetStance() == IE_ANI_SLEEP )
 				actor->SetStance( IE_ANI_GET_UP );
 		}
+*/
 		GameScript::ExecuteAction( this, CurrentAction );
 		neverExecuted = false;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.69 2005/04/03 21:00:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.70 2005/04/09 19:13:43 avenger_teambg Exp $
  *
  */
 
@@ -127,9 +127,6 @@ private:
 	Actor** queue[3];
 	int Qcount[3];
 	unsigned int lastActorCount[3];
-	void GenerateQueue(int priority);
-	Actor* GetRoot(int priority);
-	void DeleteActor(int i);
 public:
 	Map(void);
 	~Map(void);
@@ -137,7 +134,8 @@ public:
 	void DebugDump();
 	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm);
 	void CreateMovement(char *command, const char *area, const char *entrance);
-	void DrawMap(Region viewport, GameControl* gc, bool update_scripts);
+	void UpdateScripts();
+	void DrawMap(Region viewport, GameControl* gc);
 	void PlayAreaSong(int);
 	void AddAnimation(Animation* anim);
 	Animation* GetAnimation(const char* Name);
@@ -207,11 +205,15 @@ public:
 	/* Spawns creature(s) in radius of position */
 	void SpawnCreature(Point pos, char *CreName, int radius = 0);
 private:
+	void GenerateQueues();
+	Actor* GetRoot(int priority, int &index);
+	void DeleteActor(int i);
 	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
 		Point &p, unsigned int& diff);
 	void SetupNode(unsigned int x, unsigned int y, unsigned int Cost);
 	//maybe this is unneeded and orientation could be calculated on the fly
 	void UseExit(Actor *pc, InfoPoint *ip);
+	bool HandleActorStance(Actor *actor, CharAnimations *ca, int StanceID);
 };
 
 #endif

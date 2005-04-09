@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.99 2005/04/08 20:45:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.100 2005/04/09 19:13:38 avenger_teambg Exp $
  *
  */
 
@@ -482,6 +482,7 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	LastDamageType=damagetype;
 	LastDamage=damage;
 	LastHitter=hitter;
+	Active|=SCR_ACTIVE;
 	return damage;
 }
 
@@ -563,6 +564,7 @@ void Actor::Resurrect()
 	SetStat(IE_HITPOINTS, 255);
 	ClearActions();
 	ClearPath();
+	SetStance(IE_ANI_EMERGE);
 	//clear effects?
 }
 

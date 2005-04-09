@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.29 2005/03/31 13:54:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.30 2005/04/09 19:13:44 avenger_teambg Exp $
  *
  */
 
@@ -279,6 +279,9 @@
 #define IE_XP_MAGE              176 // XP2 
 #define IE_XP_THIEF             177 // XP3
 #define IE_DIALOGRANGE          178 // iwd2
+#define IE_MOVEMENTRATE         179
+//
+#define IE_ENABLEOFFSCREENAI    184 // bg2 has this on this spot
 //
 #define IE_STONESKINSGOLEM	199
 #define IE_LEVELDRAIN		200

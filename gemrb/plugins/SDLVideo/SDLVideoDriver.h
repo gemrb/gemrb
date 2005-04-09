@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.45 2005/04/01 18:48:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.46 2005/04/09 19:13:44 avenger_teambg Exp $
  *
  */
 
@@ -38,6 +38,7 @@ private:
 	SDL_Rect CursorPos;
 	short mouseAdjustX[3], mouseAdjustY[3];
 	unsigned short CursorIndex;
+	Color fadeColor;
 	int fadePercent;
 	unsigned long lastTime;
 	unsigned long lastMouseTime;
@@ -115,6 +116,7 @@ public:
 	Sprite2D* PrecalculatePolygon(Gem_Polygon *poly, Color& color);
 //Point* points, int count, Color& color, Region& BBox);
 
+	void SetFadeColor(int r, int g, int b);
 	void SetFadePercent(int percent);
 
 	void* GetVideoSurface()

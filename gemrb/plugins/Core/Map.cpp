@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.152 2005/04/08 22:27:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.153 2005/04/09 19:13:42 avenger_teambg Exp $
  *
  */
 
@@ -56,7 +56,7 @@ int LargeFog;
 
 void ReleaseMemoryMap()
 {
-	for(int i=0;i<MaxVisibility;i++) {
+	for (int i=0;i<MaxVisibility;i++) {
 		free(VisibilityMasks[i]);
 	}
 }
@@ -92,7 +92,7 @@ void InitSpawnGroups()
 			*(ieDword *) creatures = (ieDword) j;
 			//difficulty
 			*(((ieDword *) creatures)+1) = (ieDword) atoi( tab->QueryField(i,0) );
-			for(;j;j--) {
+			for (;j;j--) {
 				strnuprcpy( creatures[j], tab->QueryField(j,i), sizeof( ieResRef ) );
 			}
 			strnuprcpy( GroupName, tab->GetColumnName( i ), 8);
@@ -130,7 +130,7 @@ void InitPathFinder()
 
 void AddLOS(int destx, int desty, int slot)
 {
-	for(int i=0;i<MaxVisibility;i++) {
+	for (int i=0;i<MaxVisibility;i++) {
 		int x=(destx*i+MaxVisibility/2)/MaxVisibility*16;
 		int y=(desty*i+MaxVisibility/2)/MaxVisibility*16;
 		if (LargeFog) {
@@ -346,16 +346,16 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		return;
 	case CT_CANTMOVE:
 		return;
-	case 1: case 3:
+	case CT_ACTIVE: case CT_WHOLE:
 		break;
 	}
 
 	ip->Flags&=~TRAP_RESET; //exit triggered
 	if (ip->Destination[0] != 0) {
 		CreateMovement(Tmp, ip->Destination, ip->EntranceName);
-		if (EveryOne&2) {
+		if (EveryOne&CT_GO_CLOSER) {
 			int i=game->GetPartySize(false);
-			while(i--) {
+			while (i--) {
 				game->GetPC(i)->ClearPath();
 				game->GetPC(i)->ClearActions();
 				game->GetPC(i)->AddAction( GameScript::GenerateAction( Tmp ) );
@@ -378,78 +378,116 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	}
 }
 
-void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
+void Map::UpdateScripts()
+{
+	//Run the Global Script
+	Game* game = core->GetGame();
+	game->ExecuteScript( game->Scripts[0] );
+	game->OnCreation = false;
+	game->ProcessActions();
+	//Run the Map Script
+	if (Scripts[0]) {
+		ExecuteScript( Scripts[0] );
+	}
+	OnCreation = false;
+	//Execute Pending Actions
+	ProcessActions();
+
+	//Run actor scripts (only for 0 priority)
+	int q=Qcount[0];
+
+	while (q--) {
+		Actor* actor = queue[0][q];
+		actor->ProcessActions();
+		for (unsigned int i = 0; i < 8; i++) {
+		if (actor->Scripts[i]) {
+			if(actor->GetNextAction()) break;
+				actor->ExecuteScript( actor->Scripts[i] );
+			}
+		}
+
+		//returns true if actor should be completely removed
+		actor->OnCreation = false;
+		actor->inventory.CalculateWeight();
+		actor->SetStat( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
+		actor->DoStep( );
+	}
+	//Check if we need to start some trigger scripts
+	int ipCount = 0;
+	while (true) {
+		//For each InfoPoint in the map
+		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
+		if (!ip)
+			break;
+		if (!(ip->Active&SCR_ACTIVE) )
+			continue;
+		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
+		if (!ip->Scripts[0] && ( ip->Type != ST_TRAVEL ))
+			continue;
+		//Execute Pending Actions
+		ip->ProcessActions();
+		//If this InfoPoint is a Switch Trigger
+		if (ip->Type == ST_TRIGGER) {
+			//Check if this InfoPoint was activated
+			if (ip->LastTrigger) {
+				//Run the InfoPoint script
+				ip->ExecuteScript( ip->Scripts[0] );
+				//OnCreation won't trigger the INFO point
+				//If it does, alter the condition above
+				ip->OnCreation = false;
+			}
+			continue;
+		}
+		
+		q=Qcount[0];
+		while (q--) {
+			Actor* actor = queue[0][q];
+			if (ip->Type == ST_PROXIMITY) {
+				if (ip->outline->PointIn( actor->Pos )) {
+					ip->Entered(actor);
+				}
+				ip->ExecuteScript( ip->Scripts[0] );
+			} else {
+				//ST_TRAVEL
+				//don't move if doing something else
+				if (actor->GetNextAction())
+					continue;
+				if (ip->outline->PointIn( actor->Pos )) {
+					UseExit(actor, ip);
+				}
+			}
+		}
+		ip->OnCreation = false;
+	}
+}
+
+/* Handling automatic stance changes */
+bool Map::HandleActorStance(Actor *actor, CharAnimations *ca, int StanceID)
+{
+	int x = rand()%1000;
+	if (ca->autoSwitchOnEnd) {
+		actor->SetStance( ca->nextStanceID );
+		return true;
+	}
+	if ((StanceID==IE_ANI_AWAKE) && !x ) {
+		actor->SetStance( IE_ANI_HEAD_TURN );
+		return true;
+	}
+	if ((StanceID==IE_ANI_READY) && !actor->GetNextAction()) {
+		if (!actor->GetNextAction()) {
+			actor->SetStance( IE_ANI_AWAKE );
+			return true;
+		}
+	}
+	return false;
+}
+
+void Map::DrawMap(Region viewport, GameControl* gc)
 {
 	unsigned int i;
 	//Draw the Map
 	if (TMap) {
 		TMap->DrawOverlay( 0, viewport );
-	}
-	if (update_scripts) {
-		//Run the Global Script
-		Game* game = core->GetGame();
-		game->ExecuteScript( game->Scripts[0] );
-		game->OnCreation = false;
-		game->ProcessActions();
-		//Run the Map Script
-		if (Scripts[0]) {
-			ExecuteScript( Scripts[0] );
-		}
-		OnCreation = false;
-		//Execute Pending Actions
-		ProcessActions();
-		//Check if we need to start some trigger scripts
-		int ipCount = 0;
-		while (true) {
-			//For each InfoPoint in the map
-			InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
-			if (!ip)
-				break;
-			if (!ip->Active)
-				continue;
-			//If this InfoPoint has no script and it is not a Travel Trigger, skip it
-			if (!ip->Scripts[0] && ( ip->Type != ST_TRAVEL ))
-				continue;
-			//Execute Pending Actions
-			ip->ProcessActions();
-			//If this InfoPoint is a Switch Trigger
-			if (ip->Type == ST_TRIGGER) {
-				//Check if this InfoPoint was activated
-				if (ip->LastTrigger) {
-					//Run the InfoPoint script
-					ip->ExecuteScript( ip->Scripts[0] );
-					//OnCreation won't trigger the INFO point
-					//If it does, alter the condition above
-					ip->OnCreation = false;
-				}
-				continue;
-			}
-			i=actors.size();
-			while (i--) {
-				Actor* actor = actors[i];
-				if (!actor)
-					continue;
-				if (ip->Type == ST_PROXIMITY) {
-					if (ip->outline->PointIn( actor->Pos )) {
-						ip->Entered(actor);
-/*
-						ip->LastEntered = actor;
-						ip->LastTrigger = actor;
-*/
-					}
-					ip->ExecuteScript( ip->Scripts[0] );
-				} else {
-					//ST_TRAVEL
-					//don't move if doing something else
-					if (actor->GetNextAction())
-						continue;
-					if (ip->outline->PointIn( actor->Pos )) {
-						UseExit(actor, ip);
-					}
-				}
-			}
-			ip->OnCreation = false;
-		}
 	}
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
@@ -483,29 +521,15 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 	Region Screen = vp;
 	Screen.x = viewport.x;
 	Screen.y = viewport.y;
-	for (int q = 0; q < 3; q++) {
-		GenerateQueue( q );
+	// starting with lowest priority (so they are drawn over)
+	GenerateQueues();
+	int q = 3;
+	while (q--) {
+		int index = Qcount[q];
 		while (true) {
-			Actor* actor = GetRoot( q );
-			if (!actor)
+			Actor* actor = GetRoot( q, index );
+			if(!actor)
 				break;
-			if (update_scripts) {
-				actor->ProcessActions();
-				//moved scripts before display
-				//this should enable scripts for offscreen actors
-				for (i = 0; i < 8; i++) {
-					if (actor->Scripts[i])
-						actor->ExecuteScript( actor->Scripts[i] );
-				}
-
-				//returns true if actor should be completely removed
-				actor->OnCreation = false;
-				actor->inventory.CalculateWeight();
-				actor->SetStat( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
-
-				actor->DoStep( );
-			}
-
 			//text feedback
 			if (actor->textDisplaying) {
 				unsigned long time;
@@ -533,8 +557,12 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 			//explored or visibilitymap (bird animations are visible in fog)
 			int explored = actor->Modified[IE_DONOTJUMP]&2;
 			if (!IsVisible( actor->Pos, explored)) {
-				//possibly turn off actor
-				//actor->Active=false;
+				if (actor->Modified[IE_ENABLEOFFSCREENAI])
+					continue;
+				if (!actor->GetNextAction())
+					continue;
+				//turning actor inactive
+				actor->Active&=~SCR_ACTIVE;
 				continue;
 			}
 			//0 means opaque
@@ -586,13 +614,8 @@ void Map::DrawMap(Region viewport, GameControl* gc, bool update_scripts)
 					tint.a = 255-Trans;
 					video->BlitSpriteTinted( nextFrame, cx + viewport.x, cy + viewport.y, tint, anim->Palette, &Screen );
 					if (anim->endReached) {
-						int x = rand()%1000;
-						if (ca->autoSwitchOnEnd) {
+						if (HandleActorStance(actor, ca, StanceID) ) {
 							anim->endReached = false;
-							actor->SetStance( ca->nextStanceID );
-						} else if ((StanceID==IE_ANI_AWAKE) && !x ) {
-							anim->endReached = false;
-							actor->SetStance( IE_ANI_HEAD_TURN);
 						}
 					}
 				}
@@ -663,7 +686,7 @@ void Map::AddAnimation(Animation* anim)
 void Map::Shout(Scriptable* actor, int shoutID, unsigned int radius)
 {
 	int i=actors.size();
-	while(i--) {
+	while (i--) {
 		if (radius) {
 			if (Distance(actor->Pos, actors[i]->Pos)>radius) {
 				continue;
@@ -717,7 +740,7 @@ Actor* Map::GetActor(Point &p, int flags)
 Actor* Map::GetActor(const char* Name)
 {
 	unsigned int i = actors.size();
-	while(i--) {
+	while (i--) {
 		Actor* actor = actors[i];
 		if (strnicmp( actor->GetScriptName(), Name, 32 ) == 0) {
 			return actor;
@@ -729,7 +752,7 @@ Actor* Map::GetActor(const char* Name)
 Actor* Map::GetActorByDialog(const char *resref)
 {
 	unsigned int i = actors.size();
-	while(i--) {
+	while (i--) {
 		Actor* actor = actors[i];
 		if (strnicmp( actor->Dialog, resref, 8 ) == 0) {
 			return actor;
@@ -743,7 +766,7 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
 	int count = 0;
 	unsigned int i = actors.size();
-	while(i--) {
+	while (i--) {
 		Actor* actor = actors[i];
 //use this function only for party?
 		if (onlyparty && !actor->InParty)
@@ -805,19 +828,23 @@ void Map::AddWallGroup(WallGroup* wg)
 
 //this function determines actor drawing order
 //it should be extended to wallgroups, animations, effects!
-void Map::GenerateQueue(int priority)
+void Map::GenerateQueues()
 {
-	if (lastActorCount[priority] != actors.size()) {
-		if (queue[priority]) {
-			free(queue[priority]);
-			queue[priority] = NULL;
+	int priority;
+
+	for (priority=0;priority<3;priority++) {
+		if (lastActorCount[priority] != actors.size()) {
+			if (queue[priority]) {
+				free(queue[priority]);
+				queue[priority] = NULL;
+			}
+			queue[priority] = (Actor **) calloc( actors.size(), sizeof(Actor *) );
+			lastActorCount[priority] = ( int ) actors.size();
 		}
-		queue[priority] = (Actor **) calloc( actors.size(), sizeof(Actor *) );
-		lastActorCount[priority] = ( int ) actors.size();
+		Qcount[priority] = 0;
 	}
-	Qcount[priority] = 0;
 	unsigned int i=actors.size();
-	while(i--) {
+	while (i--) {
 		Actor* actor = actors[i];
 
 		if (actor->CheckOnDeath()) {
@@ -825,26 +852,16 @@ void Map::GenerateQueue(int priority)
 			continue;
 		}
 
-		//don't queue inactive actors
-		if (!(actor->Active&1))
-			continue;
+		if (actor->Active&SCR_ACTIVE) {
+			if (actor->GetStance() == IE_ANI_TWITCH) {
+				priority=1;
+			} else {
+				priority=0;
+			}
+		} else {
+			priority=2;
+		}
 
-		switch (priority) {
-			case 0:
-				//Top Priority
-				if (actor->GetStance() != IE_ANI_SLEEP)
-					continue;
-				break;
-
-			case 1:
-				//Normal Priority
-				if (actor->GetStance() == IE_ANI_SLEEP)
-					continue;
-				break;
-
-			case 2:
-				continue;
-		} 
 		queue[priority][Qcount[priority]] = actor;
 		Qcount[priority]++;
 		int lastPos = Qcount[priority];
@@ -861,33 +878,35 @@ void Map::GenerateQueue(int priority)
 	}
 }
 
-Actor* Map::GetRoot(int priority)
+Actor* Map::GetRoot(int priority, int &index)
 {
-	if (Qcount[priority] == 0) {
+	if (index == 0) {
 		return NULL;
 	}
-	Actor* ret = queue[priority][0];
-	Actor* node = queue[priority][0] = queue[priority][Qcount[priority] - 1];
-	Qcount[priority]--;
+
+	Actor* ret = queue[priority][Qcount[priority]-index];
+  index--;
+  Actor **baseline=queue[priority]+(Qcount[priority]-index);
 	int lastPos = 1;
+	Actor* node = baseline[0];
 	while (true) {
 		int leftChildPos = ( lastPos*2 ) - 1;
 		int rightChildPos = lastPos*2;
-		if (leftChildPos >= Qcount[priority])
+		if (leftChildPos >= index)
 			break;
-		Actor* child = queue[priority][leftChildPos];
+		Actor* child = baseline[leftChildPos];
 		int childPos = leftChildPos;
-		if (rightChildPos < Qcount[priority]) {
+		if (rightChildPos < index) {
 			//If both Child Exist
-			Actor* rightChild = queue[priority][lastPos*2];
+			Actor* rightChild = baseline[rightChildPos];
 			if (rightChild->Pos.y < child->Pos.y) {
 				childPos = rightChildPos;
 				child = rightChild;
 			}
 		}
 		if (node->Pos.y > child->Pos.y) {
-			queue[priority][lastPos - 1] = child;
-			queue[priority][childPos] = node;
+			baseline[lastPos-1] = child;
+			baseline[childPos] = node;
 			lastPos = childPos + 1;
 		} else
 			break;
@@ -898,7 +917,7 @@ Actor* Map::GetRoot(int priority)
 void Map::AddVVCCell(ScriptedAnimation* vvc)
 {
 	unsigned int i=vvcCells.size();
-	while(i--) {
+	while (i--) {
 		if (vvcCells[i] == NULL) {
 			vvcCells[i] = vvc;
 			return;
@@ -910,7 +929,7 @@ void Map::AddVVCCell(ScriptedAnimation* vvc)
 Animation* Map::GetAnimation(const char* Name)
 {
 	unsigned int i=animations.size();
-	while(i--) {
+	while (i--) {
 		Animation *anim = animations[i];
 
 		if (anim->ScriptName && (strnicmp( anim->ScriptName, Name, 32 ) == 0)) {
@@ -933,7 +952,7 @@ void Map::AddEntrance(char* Name, int XPos, int YPos, short Face)
 Entrance* Map::GetEntrance(const char* Name)
 {
 	unsigned int i=entrances.size();
-	while(i--) {
+	while (i--) {
 		if (stricmp( entrances[i]->Name, Name ) == 0) {
 			return entrances[i];
 		}
@@ -944,7 +963,7 @@ Entrance* Map::GetEntrance(const char* Name)
 bool Map::HasActor(Actor *actor)
 {
 	unsigned int i=actors.size();
-	while(i--) {
+	while (i--) {
 		if (actors[i] == actor) {
 			return true;
 		}
@@ -955,7 +974,7 @@ bool Map::HasActor(Actor *actor)
 void Map::RemoveActor(Actor* actor)
 {
 	unsigned int i=actors.size();
-	while(i--) {
+	while (i--) {
 		if (actors[i] == actor) {
 			actors.erase( actors.begin()+i );
 			return;
@@ -967,7 +986,7 @@ void Map::RemoveActor(Actor* actor)
 bool Map::CanFree()
 {
 	unsigned int i=actors.size();
-	while(i--) {
+	while (i--) {
 		if (actors[i]->InParty) {
 			return false;
 		}
@@ -1424,7 +1443,7 @@ void Map::AddMapNote(Point point, int color, char *text)
 void Map::RemoveMapNote(Point point)
 {
 	int i = mapnotes.size();
-	while(i--) {
+	while (i--) {
 		if ((point.x==mapnotes[i]->Pos.x) &&
 			(point.y==mapnotes[i]->Pos.y)) {
 			delete mapnotes[i];
@@ -1436,7 +1455,7 @@ void Map::RemoveMapNote(Point point)
 MapNote *Map::GetMapNote(Point point)
 {
 	int i = mapnotes.size();
-	while(i--) {
+	while (i--) {
 		if (Distance(point, mapnotes[i]->Pos) < 10 ) {
 			return mapnotes[i];
 		}
@@ -1460,7 +1479,7 @@ void Map::SpawnCreature(Point pos, char *CreName, int radius)
 	//adjust this with difflev too
 	int count = *(ieDword *) Spawngroup;
 	//int difficulty = *(((ieDword *) Spawngroup)+1);
-	while( count-- ) {
+	while ( count-- ) {
 		DataStream *stream = core->GetResourceMgr()->GetResource( ((ieResRef *) Spawngroup)[count+1], IE_CRE_CLASS_ID );
 		creature = core->GetCreature(stream); 
 		if ( creature ) {
@@ -1475,7 +1494,7 @@ bool Map::Rest(Point pos, int hours)
 {
 	int chance=RestHeader.DayChance; //based on ingame timer
 	if ( !RestHeader.CreatureNum) return false;
-	for(int i=0;i<hours;i++) {
+	for (int i=0;i<hours;i++) {
 		if ( rand()%100<chance ) {
 			int idx = rand()%RestHeader.CreatureNum;
 			char *str=core->GetString( RestHeader.Strref[idx] );
@@ -1539,7 +1558,7 @@ void Map::ExploreMapChunk(Point &Pos, int range, bool los)
 		range=MaxVisibility;
 	}
 	int p=Perimeter;
-	while(p--) {
+	while (p--) {
 		int Pass = 2;
 		bool block = false;
 		bool sidewall = false;
@@ -1568,8 +1587,12 @@ void Map::ExploreMapChunk(Point &Pos, int range, bool los)
 
 void Map::UpdateFog()
 {
-	SetMapVisibility( 0 );
+	if(!core->FogOfWar) {
+		SetMapVisibility( -1 );
+		return;
+	}
 
+	SetMapVisibility( 0 );
 	for (unsigned int e = 0; e<actors.size(); e++) {
 		Actor *actor = actors[e];
 		if (!actor->GetStat( IE_EXPLORE ) ) continue;

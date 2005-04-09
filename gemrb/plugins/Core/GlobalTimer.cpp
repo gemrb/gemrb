@@ -68,7 +68,7 @@ void GlobalTimer::Update()
 				return;
 		}
 		Game* game = core->GetGame();
-		if (core->FogOfWar && game) {
+		if (game) {
 			Map* map = game->GetCurrentArea();
 			if (map) map->UpdateFog();
 		}

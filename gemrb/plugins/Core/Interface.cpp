@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.294 2005/04/08 20:45:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.295 2005/04/09 19:13:42 avenger_teambg Exp $
  *
  */
 
@@ -109,7 +109,7 @@ Interface::Interface(int iargc, char** iargv)
 
 	ConsolePopped = false;
 	CheatFlag = false;
-	FogOfWar = 0;
+	FogOfWar = 1;
 	quitflag = -1;
 #ifndef WIN32
 	CaseSensitive = true; //this is the default value, so CD1/CD2 will be resolved
@@ -660,7 +660,7 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	if (HasFeature( GF_HAS_PARTY_INI )) {
-		printMessage( "Core", "Loading IceWind Dale 2 Extension Files...",
+		printMessage( "Core", "Loading precreated teams setup...",
 			WHITE );
 		INIparty = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
 		FileStream* fs = new FileStream();
@@ -1494,7 +1494,7 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	//both fields are of length 9, make this sure!
 	memcpy(actor->Area, GetGame()->CurrentArea, sizeof(actor->Area) );
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
-		actor->SetStance( IE_ANI_SLEEP );
+		actor->SetStance( IE_ANI_TWITCH );
 	} else {
 		actor->SetStance( IE_ANI_AWAKE );
 	}

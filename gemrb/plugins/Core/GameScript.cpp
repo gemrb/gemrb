@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.257 2005/04/08 20:45:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.258 2005/04/09 19:13:39 avenger_teambg Exp $
  *
  */
 
@@ -520,12 +520,13 @@ static ActionLink actionnames[] = {
 	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialoguerange", GameScript::SetDialogueRange,0},
-	{"setdoorlocked", GameScript::Lock,AF_BLOCKING},//key shouldn't be checked!
+	{"setdoorlocked", GameScript::SetDoorLocked,AF_BLOCKING},
 	{"setextendednight", GameScript::SetExtendedNight,0},
 	{"setfaction", GameScript::SetFaction,0},
 	{"setgabber", GameScript::SetGabber,0},
 	{"setglobal", GameScript::SetGlobal,AF_MERGESTRINGS},
 	{"setglobaltimer", GameScript::SetGlobalTimer,AF_MERGESTRINGS},
+	{"setglobaltint", GameScript::SetGlobalTint,0},
 	{"sethomelocation", GameScript::SetHomeLocation,0},
 	{"sethp", GameScript::SetHP,0},
 	{"setinternal", GameScript::SetInternal,0},
@@ -580,6 +581,7 @@ static ActionLink actionnames[] = {
 	{"staticpalette", GameScript::StaticPalette,0},
 	{"staticstart", GameScript::StaticStart,0},
 	{"staticstop", GameScript::StaticStop,0},
+	{"stickysinisterpoof", GameScript::CreateVisualEffectObject,0},
 	{"stopmoving", GameScript::StopMoving,0},
 	{"storepartylocations", GameScript::StorePartyLocation,0},
 	{"stuffglobalrandom", GameScript::SetGlobalRandom,0},
@@ -1328,7 +1330,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 
 void GameScript::Update()
 {
-	if (!MySelf || !MySelf->Active) {
+	if (!MySelf || !(MySelf->Active&SCR_ACTIVE) ) {
 		return;
 	}
 	ieDword thisTime;
@@ -1355,7 +1357,7 @@ void GameScript::Update()
 
 void GameScript::EvaluateAllBlocks()
 {
-	if (!MySelf || !MySelf->Active) {
+	if (!MySelf || !(MySelf->Active&SCR_ACTIVE) ) {
 		return;
 	}
 	ieDword thisTime;
@@ -4994,7 +4996,7 @@ int GameScript::ExtraProficiency(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return (signed) actor->GetStat(IE_EXTRAPROFICIENCY20) == parameters->int0Parameter;
+	return (signed) actor->GetStat(IE_FREESLOTS) == parameters->int0Parameter;
 }
 
 int GameScript::ExtraProficiencyGT(Scriptable* Sender, Trigger* parameters)
@@ -5007,7 +5009,7 @@ int GameScript::ExtraProficiencyGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return (signed) actor->GetStat(IE_EXTRAPROFICIENCY20) > parameters->int0Parameter;
+	return (signed) actor->GetStat(IE_FREESLOTS) > parameters->int0Parameter;
 }
 
 int GameScript::ExtraProficiencyLT(Scriptable* Sender, Trigger* parameters)
@@ -5020,7 +5022,7 @@ int GameScript::ExtraProficiencyLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return (signed) actor->GetStat(IE_EXTRAPROFICIENCY20) < parameters->int0Parameter;
+	return (signed) actor->GetStat(IE_FREESLOTS) < parameters->int0Parameter;
 }
 
 int GameScript::Internal(Scriptable* Sender, Trigger* parameters)
@@ -6612,6 +6614,8 @@ void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
 
 void GameScript::CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect)
 {
+//TODO: add engine specific VVC replacement methods
+//stick to object flag, sounds, iterations etc.
 	ScriptedAnimation* vvc = core->GetScriptedAnimation(effect, position);
 	Sender->GetCurrentArea( )->AddVVCCell( vvc );
 }
@@ -7106,7 +7110,7 @@ void GameScript::Lock(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	door->SetDoorLocked( false, false);
+	door->SetDoorLocked( true, true);
 }
 
 void GameScript::Unlock(Scriptable* Sender, Action* parameters)
@@ -7122,6 +7126,21 @@ void GameScript::Unlock(Scriptable* Sender, Action* parameters)
 	}
 	Door* door = ( Door* ) tar;
 	door->SetDoorLocked( false, true);
+}
+
+void GameScript::SetDoorLocked(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	if (tar->Type != ST_DOOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Door* door = ( Door* ) tar;
+	door->SetDoorLocked( parameters->int0Parameter!=0, false);
 }
 
 void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
@@ -8147,7 +8166,6 @@ void GameScript::IncrementProficiency(Scriptable* Sender, Action* parameters)
 		parameters->int1Parameter,MOD_ADDITIVE);
 }
 
-// i'm unsure why this exists
 void GameScript::IncrementExtraProficiency(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -8158,7 +8176,7 @@ void GameScript::IncrementExtraProficiency(Scriptable* Sender, Action* parameter
 		return;
 	}
 	Actor* target = ( Actor* ) tar;
-	target->NewStat(IE_EXTRAPROFICIENCY1, parameters->int0Parameter,MOD_ADDITIVE);
+	target->NewStat(IE_FREESLOTS, parameters->int0Parameter,MOD_ADDITIVE);
 }
 
 //the third parameter is a GemRB extension
@@ -8516,7 +8534,8 @@ void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 		item->Usages[1]=b;
 		item->Usages[2]=c;
 	}
-	item->Flags=IE_INV_ITEM_ACQUIRED; //get the flags right
+	//no need, when Inventory receives it, it will be set
+	//item->Flags=IE_INV_ITEM_ACQUIRED; //get the flags right
 }
 
 //this action creates an item in a container or a creature
@@ -9074,5 +9093,10 @@ void GameScript::SetDialogueRange(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	actor->SetStat( IE_DIALOGRANGE, parameters->int0Parameter );
+}
+
+void GameScript::SetGlobalTint(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->GetVideoDriver()->SetFadeColor(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.55 2005/04/08 22:27:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.56 2005/04/09 19:13:39 avenger_teambg Exp $
  *
  */
 
@@ -289,7 +289,12 @@ IE_ANI_SIX_FILES:	The layout for these files is:
 			G2 contains stand, ready, get hit, die and twitch.
 			G3 contains 3 attacks.
 
-IE_ANI_TWO_FILES_3:	Animations using this type was stored using the following template:
+IE_ANI_TWO_FILES_2:	Animations using this type are stored using the following template:
+			[NAME]G1[/E]
+			Each state contains 8 Orientations, but the second 4 are stored in the East file.
+			From the standard animations, only AHRS and ACOW belong to this type.
+
+IE_ANI_TWO_FILES_3:	Animations using this type are stored using the following template:
 			[NAME][ACTIONTYPE][/E]
 
 			Example:
@@ -371,9 +376,9 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			}
 			break;
 	}
-	//pst animations and iwd don't twitch on death
-	if ((AnimType >= IE_ANI_PST_ANIMATION_1) || (AnimType == IE_ANI_TWO_FILES_3)) {
-		if (StanceID==IE_ANI_TWITCH) {
+	//pst animations don't have separate animation for sleep/die
+	if (AnimType >= IE_ANI_PST_ANIMATION_1) {
+		if (StanceID==IE_ANI_DIE) {
 			StanceID=IE_ANI_SLEEP;
 		}
 	}
@@ -382,13 +387,13 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 	//setting up the sequencing of animation cycles
 	autoSwitchOnEnd = false;
 	switch (StanceID) {
-		case IE_ANI_SLEEP:
-			break;
-		case IE_ANI_TWITCH:
-			nextStanceID = IE_ANI_SLEEP;
+		case IE_ANI_SLEEP: //going to sleep
+			nextStanceID = IE_ANI_TWITCH;
 			autoSwitchOnEnd = true;
 			break;
-		case IE_ANI_DIE:
+		case IE_ANI_TWITCH: //dead, sleeping
+			break;
+		case IE_ANI_DIE: //going to die
 			nextStanceID = IE_ANI_TWITCH;
 			autoSwitchOnEnd = true;
 			break;
@@ -433,10 +438,14 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 	autoSwitchOnEnd = false;
 	switch (StanceID) {
 		case IE_ANI_SLEEP:
+		case IE_ANI_DIE:
+		case IE_ANI_TWITCH:
 			a->Flags |= A_ANI_PLAYONCE;
+			break;
 		case IE_ANI_EMERGE:
 		case IE_ANI_GET_UP:
 			a->playReversed = true;
+			a->Flags |= A_ANI_PLAYONCE;
 			break;
 	}
 	switch (GetAnimType()) {
@@ -904,7 +913,7 @@ void CharAnimations::AddLR2Suffix(char* ResRef, unsigned char StanceID,
 			Cycle = 32 + Orient;
 			break;
 	}
-	if (Orient>=5) {
+	if (Orient>=4) {
 		strcat( ResRef, "G1E" );
 	} else {
 		strcat( ResRef, "G1" );
@@ -1119,14 +1128,22 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_AWAKE:
-		case IE_ANI_HEAD_TURN:
 		case IE_ANI_READY:
 			strcat( ResRef, "SD" );
 			Cycle = ( Orient / 2 );
 			break;
 
-		case IE_ANI_CAST:
 		case IE_ANI_CONJURE:
+			strcat( ResRef, "CA" );
+			Cycle = ( Orient / 2 );
+			break;
+
+		case IE_ANI_CAST:
+			strcat( ResRef, "SP" );
+			Cycle = ( Orient / 2 );
+			break;
+
+		case IE_ANI_HEAD_TURN:
 			strcat( ResRef, "SC" );
 			Cycle = ( Orient / 2 );
 			break;
