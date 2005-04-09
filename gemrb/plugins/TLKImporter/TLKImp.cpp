@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.45 2005/02/23 20:59:38 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.46 2005/04/09 10:57:25 avenger_teambg Exp $
  *
  */
 
@@ -99,23 +99,38 @@ inline char* mystrncpy(char* dest, const char* source, int maxlength,
 	return dest;
 }
 
+/* -1   - GABBER
+    0   - PROTAGONIST
+    1-9 - PLAYERx
+*/
 inline Actor *GetActorFromSlot(int slot)
 {
-	Actor *act=NULL;
-
 	if(slot==-1) {
 		GameControl *gc = core->GetGameControl();
 		if(gc) {
-			act=gc->speaker;
+			return gc->speaker;
 		}
+		return NULL;
 	}
-	else {
-		Game *game = core->GetGame();
-		if(game) {
-			act=game->FindPC(slot);
-		}
+	Game *game = core->GetGame();
+	if (!game) {
+		return NULL;
 	}
-	return act;
+	if(slot==0) {
+		return game->GetPC(0); //protagonist
+	}
+	return game->FindPC(slot);
+}
+
+char *TLKImp::CharName(int slot)
+{
+	Actor *act;
+
+	act=GetActorFromSlot(slot);
+	if (act) {
+		return act->LongName;
+	}
+	return "?";
 }
 
 int TLKImp::RaceStrRef(int slot)
@@ -182,7 +197,7 @@ void TLKImp::GetMonthName(int dayandmonth)
 int TLKImp::BuiltinToken(char* Token, char* dest)
 {
 	char* Decoded = NULL;
-	bool freeup=true;
+	bool freeup = true;
 	int TokenLength;   //decoded token length
 
 	//these are hardcoded, all engines are the same or don't use them
@@ -202,7 +217,7 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 	if(!strcmp( Token, "GABBER" )) {
 		//don't free this!
 		Decoded=core->GetGameControl()->speaker->LongName;
-		freeup=false;
+		freeup = false;
 		goto exit_function;
 	}
 	if (!strcmp( Token, "RACE" )) {
@@ -245,7 +260,17 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( GenderStrRef(-1,27490,27489), 0);
 		goto exit_function;
 	}
+	if (!strncmp( Token, "PLAYER",6 )) {
+		Decoded = CharName(Token[6]-'1');
+		freeup = false;
+		goto exit_function;
+	}
 
+	if (!strcmp( Token, "CHARNAME" )) {
+		Decoded = CharName(0);
+		freeup = false;
+		goto exit_function;
+	}
 	if (!strcmp( Token, "PRO_RACE" )) {
 		Decoded = GetString( RaceStrRef(0), 0);
 		goto exit_function;

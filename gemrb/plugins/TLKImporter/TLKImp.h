@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.17 2005/02/23 20:59:38 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.18 2005/04/09 10:57:25 avenger_teambg Exp $
  *
  */
 
@@ -51,7 +51,7 @@ private:
 	int BuiltinToken(char* Token, char* dest);
 	int RaceStrRef(int slot);
  	int GenderStrRef(int slot, int malestrref, int femalestrref);
-
+	char *CharName(int slot);
 public:
 	void release(void)
 	{
