@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.66 2005/04/08 16:54:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.67 2005/04/09 19:04:23 avenger_teambg Exp $
  *
  */
 
@@ -32,7 +32,7 @@ static ColorSet* randcolors=NULL;
 
 void ReleaseMemoryCRE()
 {
-        if(randcolors) {
+        if (randcolors) {
 		delete [] randcolors;
                 randcolors = NULL;
         }
@@ -65,7 +65,7 @@ bool CREImp::Open(DataStream* stream, bool autoFree)
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "CHR ",4) == 0) {
 		//skips chr signature, reads cre signature
-		if(!SeekCreHeader(Signature)) {
+		if (!SeekCreHeader(Signature)) {
 			return false;
 		}
 	}
@@ -91,11 +91,11 @@ bool CREImp::Open(DataStream* stream, bool autoFree)
 
 bool CREImp::SeekCreHeader(char *Signature)
 {
-	if(strncmp( Signature, "CHR V1.0", 8) == 0) {
+	if (strncmp( Signature, "CHR V1.0", 8) == 0) {
 		str->Seek(0x5c, GEM_CURRENT_POS);
 		goto done;
 	}
-	if(strncmp( Signature, "CHR V2.2", 8) == 0) {
+	if (strncmp( Signature, "CHR V2.2", 8) == 0) {
 		str->Seek(0x21c, GEM_CURRENT_POS);
 		goto done;
 	}
@@ -135,7 +135,7 @@ void CREImp::ReadScript(Actor *act, int ScriptLevel)
 		return;
 	}
 	act->Scripts[ScriptLevel] = new GameScript( aScript, ST_ACTOR, act->locals );
-	if(act->Scripts[ScriptLevel]) {
+	if (act->Scripts[ScriptLevel]) {
 		act->Scripts[ScriptLevel]->MySelf = act;
 	}
 }
@@ -204,10 +204,10 @@ void CREImp::SetupColor(ieDword &stat)
 
 Actor* CREImp::GetActor()
 {
-	if(!str)
+	if (!str)
 		return NULL;
 	Actor* act = new Actor();
-	if(!act)
+	if (!act)
 		return NULL;
 	act->InParty = 0;
 	ieDword strref;
@@ -270,6 +270,12 @@ printf("STATE: %d\n",act->BaseStats[IE_STATE_ID]);
 			Inventory_Size=0;
 			printf("Unknown creature signature!\n");
 	}
+
+	//Hacking NONE to no error
+	if (stricmp(act->Dialog,"NONE") == 0) {
+		act->Dialog[0]=0;
+	}
+
 	// Reading inventory, spellbook, etc
 	ReadInventory(act, Inventory_Size);
 	// Setting up derived stats
@@ -514,7 +520,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 	i = act->ItemsCount;
 	while(i--) {
-		if( items[i]) {
+		if ( items[i]) {
 			printf("[CREImp]: Dangling item in creature: %s!\n", items[i]->ItemResRef);
 			delete items[i];
 		}
@@ -573,7 +579,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 	i=act->KnownSpellsCount;
 	while(i--) {
-		if(known_spells[i]) {
+		if (known_spells[i]) {
 			printf("[CREImp]: Dangling spell in creature: %s!\n", known_spells[i]->SpellResRef);
 			delete known_spells[i];
 		}
@@ -582,7 +588,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 	i=act->MemorizedSpellsCount;
 	while(i--) {
-		if(memorized_spells[i]) {
+		if (memorized_spells[i]) {
 			printf("[CREImp]: Dangling spell in creature: %s!\n", memorized_spells[i]->SpellResRef);
 			delete memorized_spells[i];
 		}
