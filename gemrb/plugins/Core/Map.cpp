@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.153 2005/04/09 19:13:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.154 2005/04/09 21:58:02 avenger_teambg Exp $
  *
  */
 
@@ -561,8 +561,10 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 					continue;
 				if (!actor->GetNextAction())
 					continue;
-				//turning actor inactive
+				//turning actor inactive, clearing path
 				actor->Active&=~SCR_ACTIVE;
+				actor->SetStance(IE_ANI_READY);
+				actor->ClearPath();
 				continue;
 			}
 			//0 means opaque
@@ -854,12 +856,18 @@ void Map::GenerateQueues()
 
 		if (actor->Active&SCR_ACTIVE) {
 			if (actor->GetStance() == IE_ANI_TWITCH) {
-				priority=1;
+				priority = 1;
 			} else {
-				priority=0;
+				priority = 0;
 			}
 		} else {
-			priority=2;
+			if (IsVisible(actor->Pos, true) && (actor->GetStance() !=IE_ANI_TWITCH) ) {
+				priority = 0;
+				actor->Active|=SCR_ACTIVE;
+				//here you can flag for autopause if actor->Modified[IE_EA] is enemy, coz we just revealed it!
+			} else {
+				priority = 2;
+			}
 		}
 
 		queue[priority][Qcount[priority]] = actor;
