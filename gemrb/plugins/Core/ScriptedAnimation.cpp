@@ -38,6 +38,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 
 	char Signature[8];
 
+	stream->Read( Signature, 8);
 	if (strncmp( Signature, "VVC V1.0", 8 ) != 0) {
 		printf( "Not a valid VVC File\n" );
 		if (autoFree)
