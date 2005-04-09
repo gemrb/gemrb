@@ -1,6 +1,6 @@
 2DA V1.0
 *
-           AT_1       AT_2       AT_3       AR_4       TYPE       SPACE      PALETTE    
+           AT_1       AT_2       AT_3       AT_4       TYPE       SPACE      PALETTE    
 0x1000     MWYV       MWYV       MWYV       MWYV       2          5          1          
 0x1100     MTAN       MTAN       MTAN       MTAN       2          5          1          
 0x1200     MDR1       MDR1       MDR1       MDR1       4          5          1          
@@ -215,8 +215,8 @@
 0x9000     MOGR       MOGR       MOGR       MOGR       2          2          0          
 0xA000     MWYV       MWYV       MWYV       MWYV       8          3          1          
 0xA100     MCAR       MCAR       MCAR       MCAR       8          3          1          
-0xB000     ACOW       ACOW       ACOW       ACOW       6          3          1          
-0xB100     AHRS       AHRS       AHRS       AHRS       6          3          1          
+0xB000     ACOW       ACOW       ACOW       ACOW       10         3          1          
+0xB100     AHRS       AHRS       AHRS       AHRS       10         3          1          
 0xB200     NBEGL      NBEGL      NBEGL      NBEGL      3          2          0          
 0xB210     NPROL      NPROL      NPROL      NPROL      3          2          0          
 0xB300     NBOYL      NBOYL      NBOYL      NBOYL      3          2          0          

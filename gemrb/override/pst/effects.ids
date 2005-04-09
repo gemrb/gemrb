@@ -142,7 +142,7 @@
 0x99	Overlay:Sanctuary
 0x9A	Overlay:Entangle
 0x9B	Overlay:MinorGlobe
-0x9C	Overlay:ProtectionFromNormalMissilesCylinder
+0x9C	Overlay:ProtectionFromProjectile
 0x9D	State:WebEffect
 0x9E	Overlay:Grease
 0x9F	MirrorImageRun
