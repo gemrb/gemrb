@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.34 2005/04/08 16:54:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.35 2005/04/10 19:08:50 avenger_teambg Exp $
  *
  */
 
@@ -33,6 +33,7 @@ Control::Control()
 	Changed = true;
 	VarName[0] = 0;
 	Value = 0;
+	Flags = 0;
 	Tooltip = NULL;
 	Owner = 0;
 	XPos = 0;
