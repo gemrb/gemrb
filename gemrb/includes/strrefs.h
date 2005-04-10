@@ -33,4 +33,6 @@
 #define STR_GOTSPELL        27
 #define STR_GOTSONG         28
 #define STR_NOTHINGTOSAY    29
+#define STR_JOURNALCHANGE   30
+#define STR_WORLDMAPCHANGE  31
 #endif //IE_STRINGS_H
