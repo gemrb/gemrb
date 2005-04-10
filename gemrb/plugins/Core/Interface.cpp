@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.295 2005/04/09 19:13:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.296 2005/04/10 19:04:26 avenger_teambg Exp $
  *
  */
 
@@ -156,7 +156,7 @@ Interface::Interface(int iargc, char** iargv)
 { \
 	std::vector<type>::iterator i; \
 	for(i = variable.begin(); i != variable.end(); ++i) { \
-	if(!(*i).free) { \
+	if (!(*i).free) { \
 		FreeInterface((*i).member); \
 		(*i).free = true; \
 	} \
@@ -167,7 +167,7 @@ Interface::Interface(int iargc, char** iargv)
 { \
 	unsigned int i=variable.size(); \
 	while(i--) { \
-		if(variable[i]) { \
+		if (variable[i]) { \
 			delete variable[i]; \
 		} \
 	} \
@@ -242,8 +242,8 @@ Interface::~Interface(void)
 	}
 	if (Cursors) {
 		for (int i = 0; i < CursorCount; i++) {
-			if (Cursors[i])
-				delete( Cursors[i] );
+			//freesprite doesn't free NULL
+			video->FreeSprite( Cursors[i] );
 		}
 		delete[] Cursors;
 	}
@@ -300,13 +300,13 @@ Interface::~Interface(void)
 	FreeInterfaceVector( Table, tables, tm );
 	FreeInterfaceVector( Symbol, symbols, sm );
 
-	if(INIquests) {
+	if (INIquests) {
 		FreeInterface(INIquests);
 	}
-	if(INIbeasts) {
+	if (INIbeasts) {
 		FreeInterface(INIbeasts);
 	}
-	if(INIparty) {
+	if (INIparty) {
 		FreeInterface(INIparty);
 	}
 	delete( plugin );
@@ -320,11 +320,11 @@ bool Interface::ReadStrrefs()
 	TableMgr * tab;
 	int table=LoadTable("strings");
 	memset(strref_table,-1,sizeof(strref_table) );
-	if(table<0) {
+	if (table<0) {
 		return false;
 	}
 	tab = GetTable(table);
-	if(!tab) {
+	if (!tab) {
 		goto end;
 	}
 	for(i=0;i<STRREFCOUNT;i++) {
@@ -406,7 +406,7 @@ int Interface::Init()
 		printf( "Cannot Load Chitin.key\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
-	if(!LoadGemRBINI())
+	if (!LoadGemRBINI())
 	{
 		printf( "Cannot Load INI\nTermination in Progress...\n" );
 		return GEM_ERROR;
@@ -549,7 +549,7 @@ int Interface::Init()
 	if (TooltipBackResRef[0]) {
 		printMessage( "Core", "Initializing Tooltips...", WHITE );
 		str = key->GetResource( TooltipBackResRef, IE_BAM_CLASS_ID );
-		if(!anim->Open( str, true )) {
+		if (!anim->Open( str, true )) {
 			printStatus( "ERROR", LIGHT_RED );
 			goto end_of_init;
 		}
@@ -597,7 +597,7 @@ int Interface::Init()
 	console->Height = 25;
 	console->SetFont( fonts[0] );
 	str = key->GetResource( CursorBam, IE_BAM_CLASS_ID );
-	if(anim->Open(str, true) ) {
+	if (anim->Open(str, true) ) {
 		console->SetCursor( anim->GetFrameFromCycle( 0,0 ) );
 		printStatus( "OK", LIGHT_GREEN );
 	}
@@ -709,7 +709,7 @@ int Interface::Init()
 	printMessage( "Core", "Loading Cursors...", WHITE );
 
 	str = key->GetResource( "CURSORS", IE_BAM_CLASS_ID );
-	if(anim->Open( str, true ))
+	if (anim->Open( str, true ))
 	{
 		CursorCount = anim->GetCycleCount();
 		Cursors = new Sprite2D * [CursorCount];
@@ -817,7 +817,7 @@ int Interface::Init()
 
 	printMessage( "Core", "Initializing Inventory Management...", WHITE );
 	ret = InitItemTypes();
-	if(ret) {
+	if (ret) {
 		printStatus( "OK", LIGHT_GREEN );
 	}
 	else {
@@ -826,7 +826,7 @@ int Interface::Init()
 
 	printMessage( "Core", "Initializing string constants...", WHITE );
 	ret = ReadStrrefs();
-	if(ret) {
+	if (ret) {
 		printStatus( "OK", LIGHT_GREEN );
 	}
 	else {
@@ -835,7 +835,7 @@ int Interface::Init()
 
 	printMessage( "Core", "Initializing random treasure...", WHITE );
 	ret = ReadRandomItems();
-	if(ret) {
+	if (ret) {
 		printStatus( "OK", LIGHT_GREEN );
 	}
 	else {
@@ -1166,6 +1166,8 @@ bool Interface::LoadConfig(const char* filename)
 			strcpy( GameType, value );
 		} else if (stricmp( name, "GemRBPath" ) == 0) {
 			strcpy( GemRBPath, value );
+		} else if (stricmp( name, "ScriptDebugMode" ) == 0) {
+			SetScriptDebugMode(atoi(value));
 		} else if (stricmp( name, "CachePath" ) == 0) {
 			strcpy( CachePath, value );
 			FixPath( CachePath, false );
@@ -1321,7 +1323,6 @@ bool Interface::LoadGemRBINI()
 		}
 	}
 
-	SetScriptDebugMode(ini->GetKeyAsInt( "resources", "ScriptDebugMode", 0));
 	TooltipMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", TooltipMargin );
 
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
@@ -1354,7 +1355,7 @@ bool Interface::LoadGemRBINI()
 		s = ini->GetKeyAsString( "charset", key, NULL );
 		if (s) {
 			char *s2 = strchr(s,',');
-			if(s2) {
+			if (s2) {
 				upperlower(atoi(s), atoi(s2+1) );
 				printMessage("Core"," ",WHITE);
 				printf("Upperlower %d %d\n",atoi(s), atoi(s2+1) );
@@ -1487,7 +1488,7 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 		stream = key->GetResource( ResRef, IE_CRE_CLASS_ID );
 	}
 	Actor* actor = GetCreature(stream);
-	if( !actor ) {
+	if ( !actor ) {
 		return -1;
 	}
 	actor->InParty = InParty;
@@ -1500,7 +1501,7 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	}
 	actor->SetOrientation( 0 );
 
-	if( InParty ) {
+	if ( InParty ) {
 		return game->JoinParty( actor );
 	}
 	else {
@@ -1795,10 +1796,13 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 	if (ctrl == NULL) {
 		return -1;
 	}
-	if(Status&0x80) {
+	if (Status&IE_GUI_CONTROL_FOCUSED) {
 			evntmgr->SetFocused( win, ctrl);
 	}
-	switch ((Status >> 24) & 0xff) {
+	if (ctrl->ControlType != ((Status >> 24) & 0xff) ) {
+		return -2;
+	}
+	switch (ctrl->ControlType) {
 		case IE_GUI_BUTTON:
 		//Button
 		 {
@@ -1856,11 +1860,21 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 void Interface::DrawWindows(void)
 {
 	GameControl *gc = GetGameControl();
-	if(!gc) {
+	if (!gc) {
 		GSUpdate(false);
 	}
 	else {
 		GSUpdate(!(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS));
+
+		//updating panes according to the saved game
+		ieDword index;
+		
+		if (!vars->Lookup( "MessageWindowSize", index ) || (index!=game->ControlStatus) ) {
+			vars->SetAt( "MessageWindowSize", game->ControlStatus);
+			guiscript->RunFunction( "UpdateControlStatus" );
+			//giving control back to GameControl
+			SetControlStatus(0,0,0xff000000|IE_GUI_CONTROL_FOCUSED);
+		}
 	}
 	
 	if (ModalWindow) {
@@ -1941,7 +1955,7 @@ Window* Interface::GetWindow(unsigned short WindowIndex)
 
 int Interface::DelWindow(unsigned short WindowIndex)
 {
-	if(WindowIndex == 0xffff) {
+	if (WindowIndex == 0xffff) {
 		vars->SetAt("MessageWindow", (ieDword) ~0);
 		vars->SetAt("OptionsWindow", (ieDword) ~0);
 		vars->SetAt("PortraitWindow", (ieDword) ~0);
@@ -1951,7 +1965,7 @@ int Interface::DelWindow(unsigned short WindowIndex)
 		vars->SetAt("FloatWindow", (ieDword) ~0);
 		for(unsigned int WindowIndex=0; WindowIndex<windows.size();WindowIndex++) {
 			Window* win = windows[WindowIndex];
-			if(win) {
+			if (win) {
 				evntmgr->DelWindow( win->WindowID );
 				delete( win );
 			}
@@ -2092,7 +2106,7 @@ TableMgr* Interface::GetTable(unsigned int index)
 /** Frees a Loaded Table, returns false on error, true on success */
 bool Interface::DelTable(unsigned int index)
 {
-	if(index==0xffffffff) {
+	if (index==0xffffffff) {
 		FreeInterfaceVector( Table, tables, tm );
 		tables.clear();
 		return true;
@@ -2206,11 +2220,11 @@ int Interface::PlayMovie(char* ResRef)
 	else SetVisible (0, 0);
 
 	//shutting down music and ambients before movie
-	if(music) music->HardEnd();
+	if (music) music->HardEnd();
 	soundmgr->GetAmbientMgr()->deactivate();
 	mp->Play();
 	//restarting music
-	if(music) music->Start();
+	if (music) music->Start();
 	soundmgr->GetAmbientMgr()->activate();
 	if (gc) gc->UnhideGUI();
 	else SetVisible (0, 1);
@@ -2323,7 +2337,7 @@ void Interface::SetCutSceneMode(bool active)
 		timer->SetCutScene( NULL );
 	}
 	GameControl *gc=GetGameControl();
-	if(gc) {
+	if (gc) {
 		gc->SetCutSceneMode( active );
 	}
 	video->DisableMouse = active;
@@ -2347,19 +2361,19 @@ void Interface::QuitGame(bool BackToMain)
 	DelWindow(0xffff); //delete all windows, including GameControl
 
 	//delete game, worldmap
-	if(game) {
+	if (game) {
 		delete game;
 		game=NULL;
 	}
-	if(worldmap) {
+	if (worldmap) {
 		delete worldmap;
 		worldmap=NULL;
 	}
 	//shutting down ingame music
-	if(music) music->HardEnd();
+	if (music) music->HardEnd();
 	// stop any ambients which are still enqueued
 	soundmgr->GetAmbientMgr()->deactivate(); 
-	if(BackToMain) {
+	if (BackToMain) {
 		strcpy(NextScript, "Start");
 		ChangeScript = true;
 	}
@@ -2443,7 +2457,7 @@ void Interface::LoadGame(int index)
 	// Unpack SAV (archive) file to Cache dir
 	if (sav_str) {
 		ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
-		if(ai) {
+		if (ai) {
 			ai->DecompressSaveGame(sav_str);
 			FreeInterface( ai );
 			ai = NULL;
@@ -2494,7 +2508,7 @@ GameControl *Interface::GetGameControl()
 		return NULL;
 
 	Control* gc = window->GetControl(0);
-	if(gc->ControlType!=IE_GUI_GAMECONTROL) {
+	if (gc->ControlType!=IE_GUI_GAMECONTROL) {
 		return NULL;
 	}
 	return (GameControl *) gc;
@@ -2509,7 +2523,7 @@ bool Interface::InitItemTypes()
 	TableMgr *it = GetTable(ItemTypeTable);
 
 	ItemTypes = 0;
-	if(it) {
+	if (it) {
 		ItemTypes = it->GetRowCount(); //number of itemtypes
 		if (ItemTypes<0) {
 			ItemTypes = 0;
@@ -2541,7 +2555,7 @@ bool Interface::InitItemTypes()
 		free(slottypes);
 	}
 	SlotTypes = 0;
-	if(st) {
+	if (st) {
 		SlotTypes = st->GetRowCount();
 		//make sure unsigned int is 32 bits
 		slottypes = (SlotType *) malloc(SlotTypes * sizeof(SlotType) );
@@ -2564,7 +2578,7 @@ bool Interface::InitItemTypes()
 
 int Interface::QuerySlotType(int idx) const
 {
-	if(idx>=SlotTypes) {
+	if (idx>=SlotTypes) {
 		return 0;
 	}
 	return slottypes[idx].slottype;
@@ -2572,7 +2586,7 @@ int Interface::QuerySlotType(int idx) const
 
 int Interface::QuerySlotID(int idx) const
 {
-	if(idx>=SlotTypes) {
+	if (idx>=SlotTypes) {
 		return 0;
 	}
 	return slottypes[idx].slotid;
@@ -2580,7 +2594,7 @@ int Interface::QuerySlotID(int idx) const
 
 int Interface::QuerySlottip(int idx) const
 {
-	if(idx>=SlotTypes) {
+	if (idx>=SlotTypes) {
 		return 0;
 	}
 	return slottypes[idx].slottip;
@@ -2588,7 +2602,7 @@ int Interface::QuerySlottip(int idx) const
 
 const char *Interface::QuerySlotResRef(int idx) const
 {
-	if(idx>=SlotTypes) {
+	if (idx>=SlotTypes) {
 		return "";
 	}
 	return slottypes[idx].slotresref;
@@ -2596,11 +2610,11 @@ const char *Interface::QuerySlotResRef(int idx) const
 
 int Interface::CanUseItemType(int itype, int slottype) const
 {
-	if( !slottype ) { 
+	if ( !slottype ) { 
 		//inventory slot, can hold any item, including invalid
 		return 1;
 	}
-	if( itype>=ItemTypes ) {
+	if ( itype>=ItemTypes ) {
 		//invalid itemtype
 		return 0;
 	}
@@ -2608,7 +2622,7 @@ int Interface::CanUseItemType(int itype, int slottype) const
 	return (slotmatrix[itype]&slottype);
 }
 
-void Interface::DisplayString(const char* Text)
+TextArea *Interface::GetMessageTextArea()
 {
 	ieDword WinIndex, TAIndex;
 
@@ -2617,18 +2631,27 @@ void Interface::DisplayString(const char* Text)
 		( vars->Lookup( "MessageTextArea", TAIndex ) )) {
 		Window* win = GetWindow( WinIndex );
 		if (win) {
-			TextArea* ta = ( TextArea* ) win->GetControl( TAIndex );
-			ta->AppendText( Text, -1 );
+			Control *ctrl = win->GetControl( TAIndex );
+			if (ctrl->ControlType==IE_GUI_TEXTAREA)
+				return (TextArea *) ctrl;
 		}
 	}
+	return NULL;
 }
 
-static const char* DisplayFormatName = "[color=%lX]%s -  [/color][p][color=%lX]%s[/color][/p]";
+void Interface::DisplayString(const char* Text)
+{
+	TextArea *ta = GetMessageTextArea();
+	if (ta)
+		ta->AppendText( Text, -1 );
+}
+
+static const char* DisplayFormatName = "[color=%lX]%s - [/color][p][color=%lX]%s[/color][/p]";
 static const char* DisplayFormat = "[/color][p][color=%lX]%s[/color][/p]";
 
 void Interface::DisplayConstantString(int stridx, unsigned int color)
 {
-	char* text = GetString( strref_table[stridx] );
+	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
 	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 10);
 	char* newstr = ( char* ) malloc( newlen );
 	snprintf( newstr, newlen, DisplayFormat, color, text );
@@ -2656,7 +2679,7 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 			break;
 	}
 
-	char* text = GetString( strref_table[stridx] );
+	char* text = GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
 		+ strlen( text ) + 18);
 	char* newstr = ( char* ) malloc( newlen );
@@ -2703,10 +2726,10 @@ static char *saved_extensions[]={".are",".sto",0};
 bool Interface::SavedExtension(const char *filename)
 {
 	char *str=strchr(filename,'.');
-	if(!str) return false;
+	if (!str) return false;
 	int i=0;
 	while(saved_extensions[i]) {
-		if(!stricmp(saved_extensions[i], str) ) return true;
+		if (!stricmp(saved_extensions[i], str) ) return true;
 		i++;
 	}
 	return false;
@@ -2766,16 +2789,16 @@ bool Interface::ReadItemTable(ieResRef TableName, const char * Prefix)
 	int i,j;
 
 	int table=LoadTable(TableName);
-	if(table<0) {
+	if (table<0) {
 		return false;
 	}
 	tab = GetTable(table);
-	if(!tab) {
+	if (!tab) {
 		goto end;
 	}
 	i=tab->GetRowCount();
 	for(j=0;j<i;j++) {
-		if(Prefix) {
+		if (Prefix) {
 			snprintf(ItemName,sizeof(ItemName),"%s%02d",Prefix, j+1);
 		} else {
 			strncpy(ItemName,tab->GetRowName(j),sizeof(ieResRef) );
@@ -2808,35 +2831,35 @@ bool Interface::ReadRandomItems()
 	int table=LoadTable( "randitem" );
 	int difflev=0; //rt norm or rt fury
 
-	if(RtRows) {
+	if (RtRows) {
 		RtRows->RemoveAll();
 	}
 	else {
 		RtRows=new Variables(10, 17); //block size, hash table size
-		if(!RtRows) {
+		if (!RtRows) {
 			return false;
 		}
 		RtRows->SetType( GEM_VARIABLES_STRING );
 	}
-	if(table<0) {
+	if (table<0) {
 		return false;
 	}
 	tab = GetTable( table );
-	if(!tab) {
+	if (!tab) {
 		goto end;
 	}
 	strncpy( GoldResRef, tab->QueryField((unsigned int) 0,(unsigned int) 0), sizeof(ieResRef) ); //gold
-	if( GoldResRef[0]=='*' ) {
+	if ( GoldResRef[0]=='*' ) {
 		DelTable( table );
 		return false;
 	}
 	strncpy( RtResRef, tab->QueryField( 1, difflev ), sizeof(ieResRef) );
 	i=atoi( RtResRef );
-	if(i<1) {
+	if (i<1) {
 		ReadItemTable( RtResRef, 0 ); //reading the table itself
 		goto end;
 	}
-	if(i>5) {
+	if (i>5) {
 		i=5;
 	}
 	while(i--) {
@@ -2858,7 +2881,7 @@ CREItem *Interface::ReadItem(DataStream *str)
 	str->ReadWord( &itm->Usages[1] );
 	str->ReadWord( &itm->Usages[2] );
 	str->ReadDword( &itm->Flags );
-	if(ResolveRandomItem(itm) )
+	if (ResolveRandomItem(itm) )
 	{
 		return itm;
 	}
@@ -2872,7 +2895,7 @@ CREItem *Interface::ReadItem(DataStream *str)
 //there could be a loop, but we don't want to freeze, so there is a limit
 bool Interface::ResolveRandomItem(CREItem *itm)
 {
-	if(!RtRows) return true;
+	if (!RtRows) return true;
 	for(int loop=0;loop<MAX_LOOP;loop++)
 	{
 		int i,j,k;
@@ -2880,14 +2903,14 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		ieResRef NewItem;
 
 		char *itemlist=NULL;
-		if( (!RtRows->Lookup( itm->ItemResRef, itemlist )) )
+		if ( (!RtRows->Lookup( itm->ItemResRef, itemlist )) )
 		{
 			return true;
 		}
 		i=Roll(1,*(int *) itemlist,0);
 		strncpy( NewItem, ((ieResRef *) itemlist)[i], sizeof(ieResRef) );
 		char *p=(char *) strchr(NewItem,'*');
-		if(p)
+		if (p)
 		{
 			*p=0; //doing this so endptr is ok
 			k=strtol(p+1,NULL,10);
@@ -2896,15 +2919,15 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 			k=1;
 		}
 		j=strtol(NewItem,&endptr,10);
-		if(*endptr) strnuprcpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
+		if (*endptr) strnuprcpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
 		else {
 			strnuprcpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
 			itm->Usages[0]=Roll(j,k,0);
 		}
-		if( !memcmp( itm->ItemResRef,"NO_DROP",8 ) ) {
+		if ( !memcmp( itm->ItemResRef,"NO_DROP",8 ) ) {
 			itm->ItemResRef[0]=0;
 		}
-		if(!itm->ItemResRef[0]) return false;
+		if (!itm->ItemResRef[0]) return false;
 	}
 	printf("Loop detected while generating random item:%s",itm->ItemResRef);
 	printStatus("ERROR", LIGHT_RED);
@@ -3037,7 +3060,7 @@ Store *Interface::GetCurrentStore()
 
 int Interface::CloseCurrentStore()
 {
-	if( !CurrentStore ) {
+	if ( !CurrentStore ) {
 		return -1;
 	}
 	StoreMgr* sm = ( StoreMgr* ) GetInterface( IE_STO_CLASS_ID );
@@ -3054,8 +3077,8 @@ int Interface::CloseCurrentStore()
 
 Store *Interface::SetCurrentStore( ieResRef resname )
 {
-	if( CurrentStore ) {
-		if( !strnicmp(CurrentStore->Name, resname, 8) ) {
+	if ( CurrentStore ) {
+		if ( !strnicmp(CurrentStore->Name, resname, 8) ) {
 			return CurrentStore;
 		}
 
@@ -3147,7 +3170,7 @@ bool Interface::Exists(const char *ResRef, SClass_ID type)
 ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, Point &position )
 {
 	if (Exists( effect, IE_VVC_CLASS_ID ) ) {
-	        DataStream *ds = key->GetResource( effect, IE_VVC_CLASS_ID );
+		DataStream *ds = key->GetResource( effect, IE_VVC_CLASS_ID );
 		return new ScriptedAnimation( ds, position, true);
 	}
 	AnimationFactory *af = (AnimationFactory *)

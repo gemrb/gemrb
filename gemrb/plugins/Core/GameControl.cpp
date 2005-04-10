@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.217 2005/04/09 19:13:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.218 2005/04/10 19:04:27 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -174,6 +174,10 @@ void GameControl::MoveToPointFormation(Actor *actor, Point p, int Orient)
 
 GameControl::~GameControl(void)
 {
+	if (formations)	{
+		free( formations );
+		formations = NULL;
+	}
 	free( InfoTextPalette );
 	for (unsigned int i = 0; i < infoTexts.size(); i++) {
 		delete( infoTexts[i] );
@@ -294,7 +298,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			infoTexts[i]->textDisplaying = 0;
 			std::vector< Scriptable*>::iterator m;
 			m = infoTexts.begin() + i;
-			( *m )->MySelf->textDisplaying = 0;
+			( *m )->CutSceneId->textDisplaying = 0;
 			delete( *m );
 			infoTexts.erase( m );
 			i--;
@@ -1093,12 +1097,12 @@ void GameControl::HideGUI()
 		return;
 	}
 	ScreenFlags &=~SF_GUIENABLED;
-	HandleWindowHide("MessageWindow", "MessagePosition");
 	HandleWindowHide("OptionsWindow", "OptionsPosition");
 	HandleWindowHide("PortraitWindow", "PortraitPosition");
 	HandleWindowHide("ActionsWindow", "ActionsPosition");
 	HandleWindowHide("TopWindow", "TopPosition");
 	HandleWindowHide("OtherWindow", "OtherPosition");
+	HandleWindowHide("MessageWindow", "MessagePosition");
 	//FloatWindow doesn't affect gamecontrol, so it is special
 	Variables* dict = core->GetDictionary();
 	ieDword index;
@@ -1143,9 +1147,9 @@ void GameControl::UnhideGUI()
 	core->SetVisible( 0, 1 );
 
 	HandleWindowReveal("MessageWindow", "MessagePosition");
+	HandleWindowReveal("ActionsWindow", "ActionsPosition");
 	HandleWindowReveal("OptionsWindow", "OptionsPosition");
 	HandleWindowReveal("PortraitWindow", "PortraitPosition");
-	HandleWindowReveal("ActionsWindow", "ActionsPosition");
 	HandleWindowReveal("TopWindow", "TopPosition");
 	HandleWindowReveal("OtherWindow", "OtherPosition");
 	//the floatwindow is a special case
@@ -1315,18 +1319,9 @@ void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlg
 	if (!(dlg->Flags&7) ) {
 		DialogueFlags |= DF_FREEZE_SCRIPTS;
 	}
-	ieDword index;
-	core->GetDictionary()->Lookup( "MessageWindowSize", index );
-	if (index == 0) {
-		// FIXME: should use RunEventHandler()
-		core->GetGUIScriptEngine()->RunFunction( "OnIncreaseSize" );
-		core->GetGUIScriptEngine()->RunFunction( "OnIncreaseSize" );
-	} else {
-		if (index == 1) {
-			// FIXME: should use RunEventHandler()
-			core->GetGUIScriptEngine()->RunFunction( "OnIncreaseSize" );
-		}
-	}
+	//opening control size to maximum
+	ieDword index = core->GetGame()->ControlStatus&~3;
+	core->GetGame()->SetControlStatus(index + 2, BM_SET);
 	DialogChoose( (unsigned int) -1 );
 }
 
@@ -1343,9 +1338,7 @@ void GameControl::EndDialog(bool try_to_break)
 			if (target->Type == ST_ACTOR) {
 				((Actor *) target)->TalkCount++;
 			}
-		} else {
-printf("Ending dialog with target %s but no talkcount increase*****\n", ((Actor *) target)->LongName);
-}
+		}
 		//this could be wrong
 		target->CurrentAction = NULL;
 	}
@@ -1359,9 +1352,9 @@ printf("Ending dialog with target %s but no talkcount increase*****\n", ((Actor 
 		delete dlg;
 		dlg = NULL;
 	}
-	// FIXME: should use RunEventHandler()
-	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
-	core->GetGUIScriptEngine()->RunFunction( "OnDecreaseSize" );
+	//minimizing size
+	ieDword index = core->GetGame()->ControlStatus&~3;
+	core->GetGame()->SetControlStatus(index, BM_SET);
 	ScreenFlags &=~(SF_DISABLEMOUSE|SF_LOCKSCROLL);
 	DialogueFlags = 0;
 }
@@ -1369,16 +1362,11 @@ printf("Ending dialog with target %s but no talkcount increase*****\n", ((Actor 
 void GameControl::DialogChoose(unsigned int choose)
 {
 	char Tmp[256];
-	ieDword index;
 
-	if (!core->GetDictionary()->Lookup( "MessageWindow", index )) {
+	TextArea* ta = core->GetMessageTextArea();
+	if (!ta)
 		return;
-	}
-	Window* win = core->GetWindow( index );
-	if (!core->GetDictionary()->Lookup( "MessageTextArea", index )) {
-		return;
-	}
-	TextArea* ta = ( TextArea* ) win->GetControl( index );
+
 	//get the first state with true triggers!
 	if (choose == (unsigned int) -1) {
 		int si = dlg->FindFirstState( target );
@@ -1404,17 +1392,20 @@ void GameControl::DialogChoose(unsigned int choose)
 				Section |= 2;
 			}
 			core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16);
+/* is this
+			char *string = core->GetString( tr->journalStrRef );
+			core->DisplayString( string );
+			free( string );
+*/
+/* or this
+			core->DisplayConstantString(STR_JOURNALCHANGE,0xffff00);
+*/
 //			your journal has changed...
 //			JournalChanged = true;
 		}
 
 		ta->PopLines( ds->transitionsCount + 1 );
 		if (tr->textStrRef != 0xffffffff) {
-/*
-			char *string = core->GetString( tr->textStrRef );
-			AddTalk( ta, speaker, "A0A0FF", string, "8080FF" );
-			free( string );
-*/
 			core->DisplayStringName( tr->textStrRef, 0x8080FF, speaker);
 		}
 
@@ -1442,7 +1433,7 @@ void GameControl::DialogChoose(unsigned int choose)
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
 			//increasing talkcount here if we switched talker
 			if (DialogueFlags&DF_TALKCOUNT) {
-printf("Increasing talkcount\n");
+				DialogueFlags&=~DF_TALKCOUNT;
 				if (target->Type == ST_ACTOR) {
 					((Actor *) target)->TalkCount++;
 				}
@@ -1456,17 +1447,12 @@ printf("Increasing talkcount\n");
 				return;
 			}
 			// we have to make a backup, tr->Dialog is freed
-			char tmpresref[9];
+			ieResRef tmpresref;
 			strnuprcpy(tmpresref,tr->Dialog, 8);
 			InitDialog( speaker, target, tmpresref );
 		}
 		ds = dlg->GetState( si );
 	}
-/*
-	char* string = core->GetString( ds->StrRef, IE_STR_SOUND|IE_STR_SPEECH);
-	AddTalk( ta, target, "FF0000", string, "70FF70" );
-	free( string );
-*/
 	core->DisplayStringName( ds->StrRef, 0x70FF70, target );
 	int i;
 	ta->SetMinRow( true );
@@ -1508,7 +1494,7 @@ void GameControl::DisplayString(Point &p, const char *Text)
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = 0;
 	scr->Pos = p;
-	scr->MySelf = NULL;
+	scr->CutSceneId = NULL;
 	infoTexts.push_back( scr );
 }
 
@@ -1521,7 +1507,7 @@ void GameControl::DisplayString(Scriptable* target)
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = target->timeStartDisplaying;
 	scr->Pos = target->Pos;
-	scr->MySelf = target;
+	scr->CutSceneId = target;
 	infoTexts.push_back( scr );
 }
 
