@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.6 2005/02/19 19:09:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.7 2005/04/10 16:04:48 avenger_teambg Exp $
  *
  */
 
@@ -239,6 +239,15 @@ bool Cache::SetAt(ieResRef key, void *rValue)
 	return true;
 }
 
+int Cache::RefCount(ieResRef key)
+{
+	Cache::MyAssoc* pAssoc=GetAssocAt( key );
+	if (pAssoc) {
+		return pAssoc->nRefCount;
+	}
+	return -1;
+}
+
 int Cache::DecRef(void *data, ieResRef key, bool remove)
 {
 	Cache::MyAssoc* pAssoc;
@@ -246,13 +255,15 @@ int Cache::DecRef(void *data, ieResRef key, bool remove)
 	if (key) {
 		pAssoc=GetAssocAt( key );
 		if (pAssoc && (pAssoc->data==data) ) {
-			if (remove) {
+			if (!pAssoc->nRefCount) {
+				return -1;
+			}
+			--pAssoc->nRefCount;
+			if (remove && !pAssoc->nRefCount) {
 				FreeAssoc(pAssoc);
 				return 0;
 			}
-			if (pAssoc->nRefCount) {
-				return --pAssoc->nRefCount;
-			}
+			return pAssoc->nRefCount;
 		}
 		return -1;
 	}
@@ -261,14 +272,15 @@ int Cache::DecRef(void *data, ieResRef key, bool remove)
 
 	while (pAssoc) {
 		if (pAssoc->data == data) {
-			if (remove) {
+			if (!pAssoc->nRefCount) {
+				return -1;
+			}
+			--pAssoc->nRefCount;
+			if (remove && !pAssoc->nRefCount) {
 				FreeAssoc(pAssoc);
 				return 0;
 			}
-			if (pAssoc->nRefCount) {
-				return --pAssoc->nRefCount;
-			}
-			return -1;
+			return pAssoc->nRefCount;
 		}
 		pAssoc=GetNextAssoc(pAssoc);
 	}

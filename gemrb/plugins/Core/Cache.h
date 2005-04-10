@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.5 2005/02/19 19:09:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.6 2005/04/10 16:04:48 avenger_teambg Exp $
  *
  */
 
@@ -71,6 +71,7 @@ public:
 	// decreases refcount or drops data
 	//if name is supplied it is faster, it will use rValue to validate the request
 	int DecRef(void *rValue, ieResRef name, bool free);
+	int RefCount(ieResRef key);
 	void RemoveAll(ReleaseFun fun);//removes all refcounts
 	void Cleanup();  //removes only zero refcounts
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
