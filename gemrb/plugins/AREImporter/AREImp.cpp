@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.107 2005/04/03 21:00:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.108 2005/04/10 17:25:06 avenger_teambg Exp $
  *
  */
 
@@ -196,7 +196,6 @@ Map* AREImp::GetMap(const char *ResRef)
 	}
 
 	map->Scripts[0] = new GameScript( Script, ST_AREA );
-	map->MySelf = map;
 	if (map->Scripts[0]) {
 		map->Scripts[0]->MySelf = map;
 	}
@@ -712,7 +711,7 @@ Map* AREImp::GetMap(const char *ResRef)
 				anim->MirrorAnimation();
 			}
 			if (animFlags&A_ANI_PALETTE) {
-				Color *Palette = core->GetPalette(0, 256);
+				Color *Palette = (Color *) malloc(sizeof(Color) * 256);
 				ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
 				if (bmp) {
 					DataStream* s = core->GetResourceMgr()->GetResource( animPal, IE_BMP_CLASS_ID );
@@ -722,6 +721,7 @@ Map* AREImp::GetMap(const char *ResRef)
 				}
 printf("Setting palette: %s\n",animPal);
 				anim->SetPalette( Palette, true );
+				free (Palette);
 			}
 			map->AddAnimation( anim );
 		}
