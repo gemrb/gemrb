@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.71 2005/04/08 16:54:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.72 2005/04/10 19:11:24 avenger_teambg Exp $
  *
  */
 
@@ -33,7 +33,6 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	seltext = -1;
 	Value = 0xffffffff;
 	sb = NULL;
-	Flags = 0;
 	ResetEventHandler( TextAreaOnChange );
 
 	palette = core->GetVideoDriver()->CreatePalette( hitextcolor,
@@ -433,7 +432,7 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y,
 				gc->DialogChoose( idx );
 			}
 		}
-		core->RedrawAll();
+		//core->RedrawAll();
 	}
 	if (VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Value );
@@ -451,9 +450,9 @@ void TextArea::CopyTo(TextArea* ta)
 
 void TextArea::RedrawTextArea(char* VariableName, unsigned int Sum)
 {
-        if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
-                return;
-        }
+	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
+	        return;
+	}
 	Value = Sum;
 	Changed = true;
 }

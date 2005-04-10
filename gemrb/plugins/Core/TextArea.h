@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.22 2005/03/20 23:36:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.23 2005/04/10 19:11:24 avenger_teambg Exp $
  *
  */
 
@@ -80,8 +80,6 @@ public:
 	const char* QueryText();
 	/** Redraws the textarea with a new value */
 	void RedrawTextArea(char*, unsigned int);
-	/** Scrolls automatically to the bottom when the text changes */
-	bool AutoScroll;
 private: // Private attributes
 	std::vector< char*> lines;
 	std::vector< int> lrows;

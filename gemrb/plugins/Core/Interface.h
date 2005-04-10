@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.150 2005/04/08 20:45:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.151 2005/04/10 19:11:24 avenger_teambg Exp $
  *
  */
 
@@ -263,6 +263,8 @@ public:
 	void DisplayTooltip(int x, int y, Control* ctrl);
 	/** Actually draws tooltip on the screen. Called from SDLVideoDriver */
 	void DrawTooltip();
+	/** returns the textarea of the main game screen */
+	TextArea *GetMessageTextArea();
 	/** displays any string in the textarea */
 	void DisplayString(const char *txt);
 	/** displays a string constant in the textarea */
