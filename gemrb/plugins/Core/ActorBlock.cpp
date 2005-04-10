@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.83 2005/04/09 19:13:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.84 2005/04/10 18:49:08 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -26,12 +26,11 @@ extern Interface* core;
 #define YESNO(x) ( (x)?"Yes":"No")
 
 /***********************
- *	Scriptable Class   *
+ *  Scriptable Class   *
  ***********************/
 Scriptable::Scriptable(ScriptableType type)
 {
 	Type = type;
-	MySelf = NULL;
 	CutSceneId = NULL;
 	for (int i = 0; i < MAX_SCRIPTS; i++) {
 		Scripts[i] = NULL;
@@ -104,17 +103,14 @@ void Scriptable::SetScript(ieResRef aScript, int idx)
 		delete Scripts[idx];
 	}
 	Scripts[idx] = 0;
-	if (aScript[0]) {
+	// NONE is an 'invalid' script name, never used seriously
+	// This hack is to prevent flooding of the console
+	if (aScript[0] && stricmp(aScript, "NONE") ) {
 		Scripts[idx] = new GameScript( aScript, Type, locals );
 		Scripts[idx]->MySelf = this;
 	}
 }
-/*
-void Scriptable::SetMySelf(Scriptable* MySelf)
-{
-	this->MySelf = MySelf;
-}
-*/
+
 void Scriptable::SetScript(int index, GameScript* script)
 {
 	if (index >= MAX_SCRIPTS) {
@@ -218,7 +214,6 @@ void Scriptable::ProcessActions()
 	if (playDeadCounter) {
 		playDeadCounter--;
 		if (!playDeadCounter) {
-			//Moveble* mov = ( Moveble* ) MySelf;
 			Moveble* mov = ( Moveble* ) this;
 			mov->SetStance( IE_ANI_GET_UP );
 		}
@@ -655,7 +650,7 @@ void Door::SetDoorLocked(bool Locked, bool playsound)
 
 bool Door::IsOpen() const
 {
-  return (Flags&DOOR_OPEN) == !core->HasFeature(GF_REVERSE_DOOR);
+	return (Flags&DOOR_OPEN) == !core->HasFeature(GF_REVERSE_DOOR);
 }
 
 void Door::SetDoorOpen(bool Open, bool playsound)
@@ -722,10 +717,18 @@ int InfoPoint::CheckTravel(Actor *actor)
 	if (Flags&TRAP_DEACTIVATED) return CT_CANTMOVE;
 	if (!actor->InParty && (Flags&TRAVEL_NONPC) ) return CT_CANTMOVE;
 	if (Flags&TRAVEL_PARTY) {
-		if (core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->Area, actor->Pos, true) ) {
+		if (core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->Area, actor->Pos, ENP_CANMOVE) ) {
 			return CT_WHOLE;
 		}
 		return CT_GO_CLOSER;
+	}
+	if(actor->IsSelected() )
+	{
+		if(core->GetGame()->EveryoneNearPoint(actor->Area, actor->Pos, ENP_CANMOVE|ENP_ONLYSELECT) )
+		{
+			return CT_MOVE_SELECTED;
+		}
+		return CT_SELECTED;
 	}
 	return CT_ACTIVE;
 }
