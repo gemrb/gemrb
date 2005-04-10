@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.66 2005/04/08 16:54:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.67 2005/04/10 18:47:34 avenger_teambg Exp $
  *
  */
 
@@ -94,6 +94,8 @@ class Door;
 #define CT_ACTIVE         1 //actor can move
 #define CT_GO_CLOSER      2 //entire team would move, but not close enough
 #define CT_WHOLE          3 //team can move
+#define CT_SELECTED       4 //not all selected actors are there
+#define CT_MOVE_SELECTED  5 //all selected can move
 
 #ifdef WIN32
 
@@ -129,7 +131,6 @@ public:
 	Variables* locals;
 	ScriptableType Type;
 	Point Pos;
-	Scriptable* MySelf;
 	Scriptable* CutSceneId;
 	GameScript* Scripts[MAX_SCRIPTS];
 	char* overHeadText;
@@ -283,8 +284,8 @@ public:
 	ieResRef CloseSound;
 	ieResRef LockSound;
 	ieResRef UnLockSound;
-        ieWord TrapDetectionDiff;
-        ieWord TrapRemovalDiff;
+	ieWord TrapDetectionDiff;
+	ieWord TrapRemovalDiff;
 	ieDword TrapFlags;
 	ieDword OpenStrRef;
 private:
