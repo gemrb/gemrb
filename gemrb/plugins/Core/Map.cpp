@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.154 2005/04/09 21:58:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.155 2005/04/10 17:34:33 avenger_teambg Exp $
  *
  */
 
@@ -40,7 +40,7 @@ extern HANDLE hConsole;
 #endif
 
 static int MaxVisibility = 30;
-static int Perimeter;  //calculated from MaxVisibility
+static int Perimeter; //calculated from MaxVisibility
 static int NormalCost = 10;
 static int AdditionalCost = 4;
 static int Passable[16] = {
@@ -344,9 +344,10 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 			ip->Flags&=~TRAP_RESET; //exit triggered
 		}
 		return;
-	case CT_CANTMOVE:
+		//no ingame message for these events
+	case CT_CANTMOVE: case CT_SELECTED:
 		return;
-	case CT_ACTIVE: case CT_WHOLE:
+	case CT_ACTIVE: case CT_WHOLE: case CT_MOVE_SELECTED:
 		break;
 	}
 
@@ -356,12 +357,26 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		if (EveryOne&CT_GO_CLOSER) {
 			int i=game->GetPartySize(false);
 			while (i--) {
-				game->GetPC(i)->ClearPath();
-				game->GetPC(i)->ClearActions();
-				game->GetPC(i)->AddAction( GameScript::GenerateAction( Tmp ) );
+				Actor *pc = game->GetPC(i);
+
+				pc->ClearPath();
+				pc->ClearActions();
+				pc->AddAction( GameScript::GenerateAction( Tmp ) );
 			}
 			return;
 		}
+		if (EveryOne&CT_SELECTED) {
+			int i=game->GetPartySize(false);
+			while (i--) {
+				Actor *pc = game->GetPC(i);
+				
+				if (!pc->IsSelected()) continue;
+				pc->ClearPath();
+				pc->ClearActions();
+				pc->AddAction( GameScript::GenerateAction( Tmp ) );
+			}
+		}
+
 		actor->ClearPath();
 		actor->ClearActions();
 		actor->AddAction( GameScript::GenerateAction( Tmp ) );
@@ -721,9 +736,10 @@ void Map::DeleteActor(int i)
 	delete (actor);
 }
 
-/** flags: GA_SELECT=1   - unselectable actors don't play
-		 GA_NO_DEAD=2	 - dead actors don't play
- */
+/** flags:
+ GA_SELECT  1 - unselectable actors don't play
+ GA_NO_DEAD 2 - dead actors don't play
+*/
 Actor* Map::GetActor(Point &p, int flags)
 {
 	unsigned int i = actors.size();
@@ -893,8 +909,11 @@ Actor* Map::GetRoot(int priority, int &index)
 	}
 
 	Actor* ret = queue[priority][Qcount[priority]-index];
-  index--;
-  Actor **baseline=queue[priority]+(Qcount[priority]-index);
+	index--;
+	if (index == 0) {
+		return ret;
+	}
+	Actor **baseline=queue[priority]+(Qcount[priority]-index);
 	int lastPos = 1;
 	Actor* node = baseline[0];
 	while (true) {
@@ -1444,7 +1463,7 @@ void Map::AddMapNote(Point point, int color, char *text)
 	mn->Pos=point;
 	mn->color=color;
 	mn->text=text;
-	RemoveMapNote(point);    //delete previous mapnote
+	RemoveMapNote(point); //delete previous mapnote
 	mapnotes.push_back(mn);
 }
 
