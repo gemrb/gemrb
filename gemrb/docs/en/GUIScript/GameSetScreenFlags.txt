@@ -1,0 +1,12 @@
+
+Prototype: GemRB.GameSetScreenFlags(Bits)
+
+Description: Stores the portrait/options/message window size value in the game object.
+
+Parameters:
+ Bits - the lowest 2 bits are the message window size
+
+Return value: N/A
+
+See also: SetVisible
+

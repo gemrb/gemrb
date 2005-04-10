@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.300 2005/04/08 16:54:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.301 2005/04/10 18:59:27 avenger_teambg Exp $
  *
  */
 
@@ -1936,6 +1936,35 @@ static PyObject* GemRB_SetLabelUseRGB(PyObject * /*self*/, PyObject* args)
 	}
 
 	lab->useRGB = ( status != 0 );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GameSetScreenFlags__doc,
+"GameSetScreenFlags(Flags, Operation)\n\n"
+"Sets the Display Flags of the main game screen (pane status, dialog textarea size)." );
+
+static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
+{
+	int Flags, Operation;
+
+	if (!PyArg_ParseTuple( args, "ii", &Flags, &Operation )) {
+		return AttributeError( GemRB_GameSetScreenFlags__doc );
+	}
+	if (Operation < BM_SET || Operation > BM_NAND) {
+		printMessage( "GUIScript",
+			"Syntax Error: operation must be 0-4\n", LIGHT_RED );
+		return NULL;
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		printMessage ("GUIScript", "Flag cannot be set!",LIGHT_RED);
+		return NULL;
+	}
+
+	game->SetControlStatus( Flags, Operation );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -4846,6 +4875,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetControlSize, METH_VARARGS),
 	METHOD(DeleteControl, METH_VARARGS),
 	METHOD(SetTextAreaFlags, METH_VARARGS),
+	METHOD(GameSetScreenFlags, METH_VARARGS),
 	METHOD(SetButtonFlags, METH_VARARGS),
 	METHOD(SetButtonState, METH_VARARGS),
 	METHOD(SetButtonPictureClipping, METH_VARARGS),
