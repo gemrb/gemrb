@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.70 2005/04/03 21:00:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.71 2005/04/10 17:31:48 avenger_teambg Exp $
  *
  */
 
@@ -36,10 +36,11 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	SetScript( core->GlobalScript, 0 );
 	MapIndex = -1;
 	Reputation = 0;
+	ControlStatus = 0;
 	CombatCounter = 0; //stored here until we know better
 	globals = NULL;
 	kaputz = NULL;
-	familiars = NULL;
+	beasts = NULL;
 	int mtab = core->LoadTable("mastarea");
 	if (mtab) {
 		TableMgr *table = core->GetTable(mtab);
@@ -76,8 +77,8 @@ Game::~Game(void)
 	if (kaputz) {
 		delete kaputz;
 	}
-	if (familiars) {
-		free (familiars);
+	if (beasts) {
+		free (beasts);
 	}
 	i=Journals.size();
 	while(i--) {
@@ -614,6 +615,7 @@ void Game::ShareXP(int xp, bool divide)
 	char value[10];
 
 	sprintf( value, "%d", xp );
+	//value is a string and must be copied because it is not on heap
 	core->GetTokenDictionary()->SetAtCopy( "XP", value );
 	core->DisplayConstantString( STR_GOTXP, 0xc0c000); //you have gained ... xp
 }
@@ -627,13 +629,18 @@ bool Game::EveryoneStopped()
 }
 
 //canmove=true: if some PC can't move (or hostile), then this returns false 
-bool Game::EveryoneNearPoint(const char *area, Point &p, bool canmove)
+bool Game::EveryoneNearPoint(const char *area, Point &p, int flags)
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
+		if (flags&ENP_ONLYSELECT) {
+			if(!PCs[i]->Selected) {
+				continue;
+			}
+		}
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
 		}
-		if (canmove) {
+		if (flags&ENP_CANMOVE) {
 			//someone is uncontrollable, can't move
 			if (PCs[i]->GetStat(IE_EA)>GOODCUTOFF) {
 				return false;
@@ -682,5 +689,16 @@ void Game::SetReputation(int r)
 	Reputation = (ieDword) r;
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		PCs[i]->SetStat(IE_REPUTATION, Reputation);
+	}
+}
+
+void Game::SetControlStatus(int value, int mode)
+{
+	switch(mode) {
+		case BM_OR: ControlStatus|=value; break;
+		case BM_NAND: ControlStatus&=~value; break;
+		case BM_SET: ControlStatus=value; break;
+		case BM_AND: ControlStatus&=value; break;
+		case BM_XOR: ControlStatus^=value; break;
 	}
 }

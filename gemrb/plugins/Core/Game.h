@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.47 2005/04/03 21:00:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.48 2005/04/10 17:31:48 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,9 @@ class Game;
 #define SELECT_REPLACE  0x01 // when selecting actor, deselect all others
 #define SELECT_QUIET    0x02 // do not run handler when chanfing selection
 
+// Flags bits for EveryoneNearPoint()
+#define ENP_CANMOVE     1    // also check if the PC can move
+#define ENP_ONLYSELECT  2    // check only selected PC
 
 typedef struct PCStruct {
 	ieWord   Selected;
@@ -101,7 +104,7 @@ public:
 	std::vector< Actor*> selected;
 	Variables* globals;
 	Variables* kaputz;
-	ieByte* familiars;
+	ieByte* beasts;
 	ieDword CombatCounter;
 
 	/** index of PC selected in non-walking environment (shops, inventory...) */
@@ -112,25 +115,10 @@ public:
 	ieWord  WhichFormation;
 	ieWord  Formations[5];
 	ieDword PartyGold;
-	ieDword Unknown1c;
-	ieDword PCOffset;
-	ieDword PCCount;
-	ieDword UnknownOffset;
-	ieDword UnknownCount;
-	ieDword NPCOffset;
-	ieDword NPCCount;
-	ieDword GLOBALOffset;
-	ieDword GLOBALCount;
-	ieResRef AREResRef;
+	ieDword WeatherBits;
 	ieDword Unknown48;
-	ieDword JournalCount;
-	ieDword JournalOffset;
 	ieDword Reputation;
-	ieDword UnknownOffset54;
-	ieDword UnknownCount58;
-	ieDword KillVarsOffset;
-	ieDword KillVarsCount;
-	ieDword FamiliarsOffset;  // offset to known creatures on PST
+	ieDword ControlStatus;    // used in bg2, iwd (where you can switch panes off)
 	ieResRef AnotherArea;
 	ieResRef CurrentArea;
 	ieResRef LoadMos;
@@ -202,17 +190,21 @@ public:
 	void DeleteJournalEntry(ieStrRef strref);
 
 	bool IsBeastKnown(unsigned int Index) {
-		return familiars[Index] != 0;
+		return beasts[Index] != 0;
 	}
 	void SetBeastKnown(unsigned int Index) {
-		familiars[Index] = 1;
+		beasts[Index] = 1;
 	}
 	void ShareXP(int XP, bool divide);
 	bool EveryoneStopped();
-	bool EveryoneNearPoint(const char *area, Point &p, bool canmove);
+	bool EveryoneNearPoint(const char *area, Point &p, int flags);
 	bool PartyMemberDied();
+	/* increments chapter variable and refreshes kill stats */
 	void IncrementChapter();
+	/* sets party reputation */
 	void SetReputation(int r);
+	/* sets the gamescreen control status (pane states, dialog textarea size) */
+	void SetControlStatus(int value, int operation);
 };
 
 #endif

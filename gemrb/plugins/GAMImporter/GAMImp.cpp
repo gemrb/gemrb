@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.48 2005/03/05 21:07:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.49 2005/04/10 17:31:49 avenger_teambg Exp $
  *
  */
 
@@ -98,42 +98,46 @@ Game* GAMImp::GetGame()
 		str->ReadWord( &newGame->Formations[i] );
 	}
 	str->ReadDword( &newGame->PartyGold );
-	str->ReadDword( &newGame->Unknown1c ); //this is unknown yet
-	str->ReadDword( &newGame->PCOffset );
-	str->ReadDword( &newGame->PCCount );
-	str->ReadDword( &newGame->UnknownOffset );
-	str->ReadDword( &newGame->UnknownCount );
-	str->ReadDword( &newGame->NPCOffset );
-	str->ReadDword( &newGame->NPCCount );
-	str->ReadDword( &newGame->GLOBALOffset );
-	str->ReadDword( &newGame->GLOBALCount );
+	str->ReadDword( &newGame->WeatherBits ); 
+	ieDword PCOffset, PCCount;
+	ieDword UnknownOffset, UnknownCount;
+	ieDword NPCOffset, NPCCount;
+	ieDword GlobalOffset, GlobalCount;
+	ieDword JournalOffset, JournalCount;
+	ieDword KillVarsOffset, KillVarsCount;
+	ieDword FamiliarsOffset;
+
+	str->ReadDword( &PCOffset );
+	str->ReadDword( &PCCount );
+	str->ReadDword( &UnknownOffset );
+	str->ReadDword( &UnknownCount );
+	str->ReadDword( &NPCOffset );
+	str->ReadDword( &NPCCount );
+	str->ReadDword( &GlobalOffset );
+	str->ReadDword( &GlobalCount );
 	str->ReadResRef( newGame->CurrentArea );
 	str->ReadDword( &newGame->Unknown48 );
-	str->ReadDword( &newGame->JournalCount );
-	str->ReadDword( &newGame->JournalOffset );
+	str->ReadDword( &JournalCount );
+	str->ReadDword( &JournalOffset );
 	switch (version) {
 		default:
-			 {
-				str->ReadDword( &newGame->Reputation );
-				str->ReadResRef( newGame->CurrentArea ); // FIXME: see above
-				str->ReadDword( &newGame->KillVarsOffset );
-				str->ReadDword( &newGame->KillVarsCount );
-				str->ReadDword( &newGame->FamiliarsOffset );
-				str->Seek( 72, GEM_CURRENT_POS);
-			}
+			str->ReadDword( &newGame->Reputation );
+			str->ReadResRef( newGame->CurrentArea ); // FIXME: see above
+			str->ReadDword( &newGame->ControlStatus );
+			str->ReadDword( &KillVarsCount ); //this is still unknown
+			str->ReadDword( &FamiliarsOffset );
+			str->Seek( 72, GEM_CURRENT_POS);
 			break;
 
 		case 12:
-			//torment
-			 {
-				str->ReadDword( &newGame->UnknownOffset54 );
-				str->ReadDword( &newGame->UnknownCount58 );
-				str->ReadResRef( newGame->AnotherArea );
-				str->ReadDword( &newGame->KillVarsOffset );
-				str->ReadDword( &newGame->KillVarsCount );
-				str->ReadDword( &newGame->FamiliarsOffset );
-				str->Seek( 72, GEM_CURRENT_POS);
-			}	
+			//this is another unknown offset/count, but who cares
+			str->ReadDword( &UnknownOffset );
+			str->ReadDword( &UnknownCount );
+			str->ReadResRef( newGame->AnotherArea );
+			str->ReadDword( &KillVarsOffset );
+			str->ReadDword( &KillVarsCount );
+			str->ReadDword( &FamiliarsOffset );
+			str->Seek( 72, GEM_CURRENT_POS);
 			break;
 	}
 
@@ -153,25 +157,25 @@ Game* GAMImp::GetGame()
 
 	//Loading PCs
 	ActorMgr* aM = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
-	for (i = 0; i < newGame->PCCount; i++) {
-		str->Seek( newGame->PCOffset + ( i * PCSize ), GEM_STREAM_START );
+	for (i = 0; i < PCCount; i++) {
+		str->Seek( PCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, true );
 		newGame->JoinParty( actor, false );
 	}
 
 	//Loading NPCs
-	for (i = 0; i < newGame->NPCCount; i++) {
-		str->Seek( newGame->NPCOffset + ( i * PCSize ), GEM_STREAM_START );
+	for (i = 0; i < NPCCount; i++) {
+		str->Seek( NPCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, false );
 		newGame->AddNPC( actor );
 	}
 	core->FreeInterface( aM );
 
-	//Loading GLOBALS
+	//Loading Global Variables
 	char Name[33];
 	Name[32] = 0;
-	str->Seek( newGame->GLOBALOffset, GEM_STREAM_START );
-	for (i = 0; i < newGame->GLOBALCount; i++) {
+	str->Seek( GlobalOffset, GEM_STREAM_START );
+	for (i = 0; i < GlobalCount; i++) {
 		ieDword Value;
 		str->Read( Name, 32 );
 		str->Seek( 8, GEM_CURRENT_POS );
@@ -182,8 +186,8 @@ Game* GAMImp::GetGame()
 	if(core->HasFeature(GF_HAS_KAPUTZ) ) {
 		newGame->kaputz = new Variables();
 		newGame->kaputz->SetType( GEM_VARIABLES_INT );
-		str->Seek( newGame->KillVarsOffset, GEM_STREAM_START );
-		for (i = 0; i < newGame->KillVarsCount; i++) {
+		str->Seek( KillVarsOffset, GEM_STREAM_START );
+		for (i = 0; i < KillVarsCount; i++) {
 			ieDword Value;
 			str->Read( Name, 32 );
 			str->Seek( 8, GEM_CURRENT_POS );
@@ -194,18 +198,18 @@ Game* GAMImp::GetGame()
 	}
 
 	//Loading Journal entries
-	str->Seek( newGame->JournalOffset, GEM_STREAM_START );
-	for (i = 0; i < newGame->JournalCount; i++) {
+	str->Seek( JournalOffset, GEM_STREAM_START );
+	for (i = 0; i < JournalCount; i++) {
 		GAMJournalEntry* je = GetJournalEntry();
 		newGame->AddJournalEntry( je );
 	}
 
-	// Loading known creatures array (familiars)
+	// Loading known creatures array (beasts)
 	if (version == 12 && core->GetBeastsINI() != NULL) {
 		int beasts_count = core->GetBeastsINI()->GetTagsCount();
-		newGame->familiars = (ieByte*)malloc(beasts_count);
-		str->Seek( newGame->FamiliarsOffset, GEM_STREAM_START );
-		str->Read( newGame->familiars, beasts_count );
+		newGame->beasts = (ieByte*)malloc(beasts_count);
+		str->Seek( FamiliarsOffset, GEM_STREAM_START );
+		str->Read( newGame->beasts, beasts_count );
 	}
 
 	return newGame;
@@ -322,7 +326,7 @@ GAMJournalEntry* GAMImp::GetJournalEntry()
 	str->Read( &j->Chapter, 1 );
 	str->Read( &j->unknown09, 1 );
 	str->Read( &j->Section, 1 );
-	str->Read( &j->Group, 1 );  // this is a GemRB extension
+	str->Read( &j->Group, 1 ); // this is a GemRB extension
 
 	return j;
 }
