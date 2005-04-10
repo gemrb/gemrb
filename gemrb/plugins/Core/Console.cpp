@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.19 2005/03/04 23:27:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.20 2005/04/10 16:40:00 avenger_teambg Exp $
  *
  */
 
@@ -38,7 +38,10 @@ Console::Console(void)
 Console::~Console(void)
 {
 	free( Buffer );
-	core->GetVideoDriver()->FreePalette( palette );
+	Video *video = core->GetVideoDriver();
+
+	video->FreePalette( palette );
+	video->FreeSprite( Cursor );
 }
 
 /** Draws the Console on the Output Display */
