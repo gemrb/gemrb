@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.56 2005/04/09 19:13:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.57 2005/04/10 20:54:31 avenger_teambg Exp $
  *
  */
 
@@ -621,14 +621,12 @@ void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 			Cycle=SixteenToFive[Orient];
 			if (rand()&1) {
 				Prefix="SF2";
-			} else {
-				Prefix="SF1";
+				sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);
+				if (core->Exists(ResRef, IE_BAM_CLASS_ID) ) {
+					return;
+				}
 			}
-			sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);
-			if (core->Exists(ResRef, IE_BAM_CLASS_ID) ) {
-				return;
-			}
-			Prefix = "STD";
+			Prefix="SF1";
 			sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);
 			if (core->Exists(ResRef, IE_BAM_CLASS_ID) ) {
 				return;
