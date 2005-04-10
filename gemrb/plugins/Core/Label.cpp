@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.31 2005/02/27 12:35:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.32 2005/04/10 16:06:04 avenger_teambg Exp $
  *
  */
 
@@ -65,7 +65,7 @@ int Label::SetText(const char* string, int /*pos*/)
 	if (Alignment == IE_FONT_ALIGN_CENTER) {
 		if (core->HasFeature( GF_LOWER_LABEL_TEXT )) {
 			Buffer = (char *) malloc( 64 );
-			strnlwrcpy( Buffer, string, 64 );
+			strnlwrcpy( Buffer, string, 63 );
 		}
 		else {
 			Buffer = strdup( string );
