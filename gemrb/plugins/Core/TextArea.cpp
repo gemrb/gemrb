@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.72 2005/04/10 19:11:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.73 2005/04/11 17:40:16 avenger_teambg Exp $
  *
  */
 
@@ -318,8 +318,13 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			}
 			while(strnicmp( lines[seltext], "[s=", 3 ) != 0 );
 		}
-		unsigned long idx=0;
-		sscanf( lines[seltext], "[s=%lu,", &idx);
+		int idx=-1;
+		sscanf( lines[seltext], "[s=%d,", &idx);
+		if (idx==-1) {
+			//this kills this object, don't use any more data!
+			gc->EndDialog();
+			return;
+		}
 		gc->DialogChoose( idx );
 	}
 }
@@ -425,14 +430,19 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y,
 		if (strnicmp( lines[seltext], "[s=", 3 ) == 0) {
 			if (minrow > seltext)
 				return;
-			unsigned long idx;
-			sscanf( lines[seltext], "[s=%lu,", &idx );
+			int idx;
+			sscanf( lines[seltext], "[s=%d,", &idx );
 			GameControl* gc = core->GetGameControl();
 			if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
+				if (idx==-1) {
+					//this kills this object, don't use any more data!
+					gc->EndDialog();
+					return;
+				}
 				gc->DialogChoose( idx );
+				return;
 			}
 		}
-		//core->RedrawAll();
 	}
 	if (VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Value );

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.26 2005/03/20 21:28:26 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.27 2005/04/11 17:40:19 avenger_teambg Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -45,21 +45,17 @@ MessageWindow = 0
 ActionsWindow = 0
 PortraitWindow = 0
 OptionsWindow = 0
-CloseButton = 0
-OpenButton = 0
-MaxExpand = 1
 
 def OnLoad():
-	global MessageWindow, ActionsWindow, PortraitWindow, OptionsWindow, CloseButton
+	global MessageWindow, ActionsWindow, PortraitWindow, OptionsWindow
+
 	GemRB.LoadWindowPack("GUIWORLD")
 	GemRB.SetInfoTextColor(0,255,0,255)
 	ActionsWindow = GemRB.LoadWindow(0)
-	# FIXME: ugly
-	OpenPortraitWindow ()
-	PortraitWindow = GUICommonWindows.PortraitWindow
-
 	OptionsWindow = GemRB.LoadWindow(2)
 	MessageWindow = GemRB.LoadWindow(7)
+	PortraitWindow = OpenPortraitWindow (1)
+
 	MessageTA = GemRB.GetControl(MessageWindow, 1)
 	GemRB.SetTextAreaFlags(MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
@@ -72,10 +68,11 @@ def OnLoad():
 	GemRB.SetVar("OtherPosition", 0) #Left
 	
 	GemRB.SetVar("MessageTextArea", MessageTA)
-	GemRB.SetVar("MessageWindowSize", 0)
+	GemRB.GameSetScreenFlags(0, OP_SET)
 	
 	CloseButton= GemRB.GetControl(MessageWindow, 0)
 	GemRB.SetText(MessageWindow, CloseButton, 28082)
+	GemRB.SetEvent(MessageWindow, CloseButton, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 	
 	OpenButton = GemRB.GetControl(OptionsWindow, 10)
 	GemRB.SetEvent(OptionsWindow, OpenButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
@@ -87,81 +84,37 @@ def OnLoad():
 	FormationButton = GemRB.GetControl(ActionsWindow, 4)
 	GemRB.SetEvent(ActionsWindow, FormationButton, IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
 
-
 	SetupActionsWindowControls (ActionsWindow)
 	SetupMenuWindowControls (OptionsWindow)
 
-	UpdateResizeButtons()
-	
-	GemRB.SetVisible(ActionsWindow, 1)
-	GemRB.SetVisible(OptionsWindow, 1)
-	GemRB.SetVisible(MessageWindow, 0)
-	return
+	UpdateControlStatus()
+
 	
 def OnIncreaseSize():
+	GemRB.GameSetScreenFlags(2, OP_SET)
+
+
+def OnDecreaseSize():
+	GemRB.GameSetScreenFlags(0, OP_SET)
+
+
+def UpdateControlStatus():
 	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow
-	
-	MessageTA = GemRB.GetVar("MessageTextArea")
+
 	Expand = GemRB.GetVar("MessageWindowSize")
-	
-	if Expand == 1:
-		return
-		
 	GemRB.HideGUI()
-	
-	if Expand == 0:
+	if Expand:
 		GemRB.SetVar("MessageWindow", MessageWindow)
 		GemRB.SetVar("PortraitWindow", -1)
 		GemRB.SetVar("ActionsWindow", -1)
 		GemRB.SetVar("OptionsWindow", -1)
-		GemRB.SetVisible(MessageWindow, 1)
-		GemRB.SetVisible(PortraitWindow, 0)
-		GemRB.SetVisible(ActionsWindow, 0)
-		GemRB.SetVisible(OptionsWindow, 0)
-			
-	Expand = 1
-	
-	GemRB.SetVar("MessageWindowSize", Expand)
-	UpdateResizeButtons()
-	GemRB.UnhideGUI()
-	GemRB.SetControlStatus(MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
-	return
-	
-def OnDecreaseSize():
-	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow
-	
-	MessageTA = GemRB.GetVar("MessageTextArea")
-	Expand = GemRB.GetVar("MessageWindowSize")
-	
-	if Expand == 0:
-		return
-		
-	GemRB.HideGUI()
-	
-	if Expand == 1:
+		MessageTA = GemRB.GetVar("MessageTextArea")
+		GemRB.SetControlStatus(MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
+	else:
 		GemRB.SetVar("MessageWindow", -1)
 		GemRB.SetVar("PortraitWindow", PortraitWindow)
 		GemRB.SetVar("ActionsWindow", ActionsWindow)
 		GemRB.SetVar("OptionsWindow", OptionsWindow)
-		GemRB.SetVisible(MessageWindow, 0)
-		GemRB.SetVisible(PortraitWindow, 1)
-		GemRB.SetVisible(ActionsWindow, 1)
-		GemRB.SetVisible(OptionsWindow, 1)
-			
-	Expand = 0
-	
-	GemRB.SetVar("MessageWindowSize", Expand)
-	UpdateResizeButtons()
-	GemRB.UnhideGUI()
-	if Expand:
-		GemRB.SetControlStatus(MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
-	else:
 		GemRB.SetControlStatus(0,0,IE_GUI_CONTROL_FOCUSED)
-	return
-	
-def UpdateResizeButtons():
-	global MessageWindow, CloseButton
-	
-	GemRB.SetEvent(MessageWindow, CloseButton, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
-	return
+	GemRB.UnhideGUI()
 

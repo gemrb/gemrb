@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.19 2005/04/10 19:04:29 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.20 2005/04/11 17:40:19 avenger_teambg Exp $
 
 import GemRB
 
@@ -39,7 +39,6 @@ ExpandButton = 0
 ContractButton = 0
 
 def OnLoad():
-	global MessageWindow, ExpandButton, Expand
 	global PortraitWindow, OptionsWindow
 
 	GemRB.LoadWindowPack(GetWindowPack())
@@ -73,27 +72,18 @@ def OnLoad():
 	SetupMenuWindowControls (OptionsWindow)
 
 	UpdateControlStatus()
-	
+
 def MinimizeOptions():
-	print "SetScreenFlags"
 	GemRB.GameSetScreenFlags(GS_OPTIONPANE, OP_OR)
-	print "SetScreenFlags done"
 
 def MaximizeOptions():
-	print "SetScreenFlags"
 	GemRB.GameSetScreenFlags(GS_OPTIONPANE, OP_NAND)
-	print "SetScreenFlags done"
 
 def MinimizePortraits():
-	print "SetScreenFlags"
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
-	print "SetScreenFlags done"
 
 def MaximizePortraits():
-	print "SetScreenFlags"
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_NAND)
-	print "SetScreenFlags done"
-
 
 def OnIncreaseSize():
 	GSFlags = GemRB.GetVar("MessageWindowSize")
@@ -115,14 +105,12 @@ def OnDecreaseSize():
 
 def UpdateControlStatus():
 	global MessageWindow, ExpandButton, ContractButton
-	
+
 	TMessageWindow = 0
 	TMessageTA = 0
 	GSFlags = GemRB.GetVar("MessageWindowSize")
 	Expand = GSFlags&GS_DIALOGMASK
 	GSFlags = GSFlags-Expand
-
-	print "UpdateControlStatus", Expand, GSFlags
 
 	MessageWindow = GemRB.GetVar("MessageWindow")
 

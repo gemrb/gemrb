@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.28 2005/04/01 16:57:05 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.29 2005/04/11 17:40:19 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -228,24 +228,17 @@ def RunSelectionChangeHandler ():
 portrait_hp_numeric = [0, 0, 0, 0, 0, 0]
 
 
-def OpenPortraitWindow ():
+def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
 	PortraitWindow = Window = GemRB.LoadWindow (1)
-	GemRB.SetVar ("PortraitWindow", PortraitWindow)
-	GemRB.SetVar ("PortraitPosition", 1)    # Bottom
-
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
-		#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 		GemRB.SetVarAssoc (Window, Button, 'PressedPortrait', i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
-		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "PortraitButtonOnDragDrop")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
-		#GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseOver")
-		#GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
 
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
@@ -256,11 +249,8 @@ def OpenPortraitWindow ():
 
 		portrait_hp_numeric[i] = 0
 
-
-
 	UpdatePortraitWindow ()
-	GemRB.SetVisible (PortraitWindow, 1)
-
+	return Window
 
 def UpdatePortraitWindow ():
 	Window = PortraitWindow

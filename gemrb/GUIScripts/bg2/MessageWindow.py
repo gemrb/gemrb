@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/MessageWindow.py,v 1.25 2005/04/10 19:04:28 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/MessageWindow.py,v 1.26 2005/04/11 17:40:18 avenger_teambg Exp $
 
 import GemRB
 
@@ -39,7 +39,6 @@ ExpandButton = 0
 ContractButton = 0
 
 def OnLoad():
-	global MessageWindow, ExpandButton, Expand
 	global PortraitWindow, OptionsWindow
 
 	GemRB.LoadWindowPack(GetWindowPack())

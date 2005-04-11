@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.218 2005/04/10 19:04:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.219 2005/04/11 17:40:16 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1364,8 +1364,11 @@ void GameControl::DialogChoose(unsigned int choose)
 	char Tmp[256];
 
 	TextArea* ta = core->GetMessageTextArea();
-	if (!ta)
+	if (!ta) {
+		printMessage("GameControl","Dialog aborted???",LIGHT_RED);
+		EndDialog();
 		return;
+	}
 
 	//get the first state with true triggers!
 	if (choose == (unsigned int) -1) {
@@ -1479,6 +1482,15 @@ void GameControl::DialogChoose(unsigned int choose)
 			free( string );
 			ta->AppendText( "[/p][/s]", i );
 		}
+	}
+	// this happens if a trigger isn't implemented or the dialog is wrong
+	if (!idx) {
+		//adding -1 as invalid dialog option to end the dialog
+		char *string = ( char * ) malloc( 60 );
+		sprintf( string, "[s=%d,ffffff,ff0000]No valid dialog option", -1);
+		i = ta->AppendText( string, -1 );
+		free( string );
+		ta->AppendText( "[/s]", i );
 	}
 	ta->AppendText( "", -1 );
 	// is this correct?

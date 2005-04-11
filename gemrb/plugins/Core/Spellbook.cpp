@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.20 2004/12/17 23:23:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.21 2005/04/11 17:40:16 avenger_teambg Exp $
  *
  */
 
@@ -31,7 +31,7 @@ Spellbook::~Spellbook()
 {
 	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
-			if(spells[i][j]) {
+			if (spells[i][j]) {
 				FreeSpellPage( spells[i][j] );
 				spells[i][j] = NULL;
 			}
@@ -66,7 +66,7 @@ bool Spellbook::HaveSpell(int spellid, ieDword /*flags*/)
 		for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
 			CREMemorizedSpell* ms = sm->memorized_spells[k];
 			if (ms->Flags&1) {
-				if(atoi(ms->SpellResRef+4)==spellid) {
+				if (atoi(ms->SpellResRef+4)==spellid) {
 					return true;
 				}
 			}
@@ -84,7 +84,7 @@ bool Spellbook::HaveSpell(const char *resref, ieDword /*flags*/)
 			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
 				CREMemorizedSpell* ms = sm->memorized_spells[k];
 				if (ms->Flags&1) {
-					if(resref[0] && stricmp(ms->SpellResRef, resref) ) {
+					if (resref[0] && stricmp(ms->SpellResRef, resref) ) {
 						continue;
 					}
 					return true;
@@ -107,12 +107,12 @@ bool Spellbook::AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl)
 	if (type >= NUM_SPELL_TYPES) {
 		return false;
 	}
-	if( level >= spells[type].size() ) {
+	if ( level >= spells[type].size() ) {
 		CRESpellMemorization *sm = new CRESpellMemorization();
 		sm->Type = type;
 		sm->Level = level+1;
 		sm->Number = sm->Number2 = 0;
-		if( !AddSpellMemorization(sm) ) {
+		if ( !AddSpellMemorization(sm) ) {
 			delete sm;
 			return false;
 		}
@@ -146,7 +146,7 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 {
 	std::vector<CRESpellMemorization*>* s = &spells[sm->Type];
 	unsigned int level = sm->Level-1;
-	if (level > 9 ) {
+	if (level > 8 ) {
 		return false;
 	}
 
@@ -168,18 +168,18 @@ void Spellbook::SetMemorizableSpellsCount(int Value, ieSpellType type, unsigned 
 	if (type >= NUM_SPELL_TYPES) {
 		return;
 	}
-	if( level >= spells[type].size() ) {
+	if ( level >= spells[type].size() ) {
 		CRESpellMemorization *sm = new CRESpellMemorization();
 		sm->Type = type;
 		sm->Level = level+1;
 		sm->Number = sm->Number2 = 0;
-		if( !AddSpellMemorization(sm) ) {
+		if ( !AddSpellMemorization(sm) ) {
 			delete sm;
 			return;
 		}
 	}
 	CRESpellMemorization* sm = spells[type][level];
-	if(bonus) {
+	if (bonus) {
 		sm->Number2=Value;
 	}
 	else {
@@ -194,7 +194,7 @@ int Spellbook::GetMemorizableSpellsCount(ieSpellType type, unsigned int level, b
 	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
 		return 0;
 	CRESpellMemorization* sm = spells[type][level];
-	if(bonus)
+	if (bonus)
 		return sm->Number2;
 	return sm->Number;
 }
