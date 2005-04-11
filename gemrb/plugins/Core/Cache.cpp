@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.7 2005/04/10 16:04:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.8 2005/04/11 17:37:37 avenger_teambg Exp $
  *
  */
 
@@ -37,7 +37,7 @@ Cache::Cache(int nBlockSize, int nHashTableSize)
 	MYASSERT( nHashTableSize > 16 );
 
 	m_pHashTable = NULL;
-	m_nHashTableSize = nHashTableSize;  // default size
+	m_nHashTableSize = nHashTableSize; // default size
 	m_nCount = 0;
 	m_pFreeList = NULL;
 	m_pBlocks = NULL;
@@ -78,7 +78,7 @@ void Cache::RemoveAll(ReleaseFun fun)
 				pAssoc->MyAssoc::~MyAssoc();
 			}
 		}
-	// free hash table
+		// free hash table
 		free( m_pHashTable );
 		m_pHashTable = NULL;
 	}
@@ -107,7 +107,7 @@ Cache::MyAssoc* Cache::NewAssoc()
 	if (m_pFreeList == NULL) {
 		// add another block
 		Cache::MemBlock* newBlock = ( Cache::MemBlock* ) malloc(m_nBlockSize * sizeof( Cache::MyAssoc ) + sizeof( Cache::MemBlock ));
-		MYASSERT( newBlock != NULL );  // we must have something
+		MYASSERT( newBlock != NULL ); // we must have something
 
 		newBlock->pNext = m_pBlocks;
 		m_pBlocks = newBlock;
@@ -124,7 +124,7 @@ Cache::MyAssoc* Cache::NewAssoc()
 	Cache::MyAssoc* pAssoc = m_pFreeList;
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
-	MYASSERT( m_nCount > 0 );  // make sure we don't overflow
+	MYASSERT( m_nCount > 0 ); // make sure we don't overflow
 #ifdef _DEBUG
 	pAssoc->key[0] = 0;
 	pAssoc->data = 0;
@@ -135,10 +135,14 @@ Cache::MyAssoc* Cache::NewAssoc()
 
 void Cache::FreeAssoc(Cache::MyAssoc* pAssoc)
 {
+	if(pAssoc->pNext) {
+		pAssoc->pNext->pPrev=pAssoc->pPrev;
+	}
+	*pAssoc->pPrev = pAssoc->pNext;
 	pAssoc->pNext = m_pFreeList;
 	m_pFreeList = pAssoc;
 	m_nCount--;
-	MYASSERT( m_nCount >= 0 );  // make sure we don't underflow
+	MYASSERT( m_nCount >= 0 ); // make sure we don't underflow
 
 	// if no more elements, cleanup completely
 	if (m_nCount == 0) {
@@ -201,7 +205,7 @@ void *Cache::GetResource(ieResRef key)
 	Cache::MyAssoc* pAssoc = GetAssocAt( key );
 	if (pAssoc == NULL) {
 		return false;
-	}  // not in map
+	} // not in map
 
 	pAssoc->nRefCount++;
 	return pAssoc->data;
@@ -235,6 +239,10 @@ bool Cache::SetAt(ieResRef key, void *rValue)
 	// put into hash table
 	unsigned int nHash = MyHashKey(pAssoc->key);
 	pAssoc->pNext = m_pHashTable[nHash];
+	pAssoc->pPrev = &m_pHashTable[nHash];
+	if (pAssoc->pNext) {
+		pAssoc->pNext->pPrev = &pAssoc->pNext;
+	}
 	m_pHashTable[nHash] = pAssoc;
 	return true;
 }
@@ -293,9 +301,10 @@ void Cache::Cleanup()
 
 	while (pAssoc)
 	{
+		Cache::MyAssoc* nextAssoc = GetNextAssoc(pAssoc);
 		if (pAssoc->nRefCount == 0) {
 			FreeAssoc(pAssoc);
 		}
-		pAssoc=GetNextAssoc(pAssoc);
+		pAssoc=nextAssoc;
 	}
 }

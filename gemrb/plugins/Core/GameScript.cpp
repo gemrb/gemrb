@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.258 2005/04/09 19:13:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.259 2005/04/11 17:37:37 avenger_teambg Exp $
  *
  */
 
@@ -49,6 +49,13 @@ static std::vector< char*> ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
+
+//debug flags
+// 1 - cache
+// 2 - cutscene ID
+// 4 - globals
+// 8 - script/trigger execution
+
 static int InDebug = 0;
 
 #define MIC_INVALID -2
@@ -842,10 +849,14 @@ static void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 
 static void FreeSrc(SrcVector *poi, ieResRef key)
 {
-	if ( SrcCache.DecRef((void *) poi, key, false) <0) {
+	int res = SrcCache.DecRef((void *) poi, key, true);
+	if (res<0) {
 		printMessage( "GameScript", "Corrupted Src cache encountered (reference count went below zero), ", LIGHT_RED );
 		printf( "Src name is: %.8s\n", key);
 		abort();
+	}
+	if (!res) {
+		delete poi;	
 	}
 }
 
@@ -935,7 +946,7 @@ Actor *Targets::GetTarget(unsigned int index)
 {
 	targetlist::iterator m = objects.begin();
 	while(m!=objects.end() ) {
-		if(!index) {
+		if (!index) {
 			return (*m).actor;
 		}
 		index--;
@@ -1102,7 +1113,11 @@ GameScript::~GameScript(void)
 	if (script) {
 		//set 3. parameter to true if you want instant free
 		//and possible death
-		int res = BcsCache.DecRef(script, Name, false);
+		if (InDebug&1) {
+			printf("One instance of %s is dropped from %d.\n", Name, BcsCache.RefCount(Name) );
+		}
+		int res = BcsCache.DecRef(script, Name, true);
+		
 		if (res<0) {
 			printMessage( "GameScript", "Corrupted Script cache encountered (reference count went below zero), ", LIGHT_RED );
 			printf( "Script name is: %.8s\n", Name);
@@ -1110,9 +1125,7 @@ GameScript::~GameScript(void)
 		}
 		if (!res) {
 			printf("Freeing script %s because its refcount has reached 0.\n", Name);
-/* don't free scripts yet
 			script->Release();
-*/
 		}
 		script = NULL;
 	}
@@ -1123,8 +1136,12 @@ Script* GameScript::CacheScript(ieResRef ResRef)
 	char line[10];
 
 	Script *newScript = (Script *) BcsCache.GetResource(ResRef);
-	if ( newScript )
+	if ( newScript ) {
+		if (InDebug&1) {
+			printf("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
+		}
 		return newScript;
+}
 
 	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef,
 		IE_BCS_CLASS_ID );
@@ -1139,6 +1156,9 @@ Script* GameScript::CacheScript(ieResRef ResRef)
 	}
 	newScript = new Script( );
 	BcsCache.SetAt( ResRef, (void *) newScript );
+	if (InDebug&1) {
+		printf("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
+	}
 	
 	std::vector< ResponseBlock*> rBv;
 	while (true) {
@@ -1161,7 +1181,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 {
 	char newVarName[8+33];
 
-	if (InDebug&1) {
+	if (InDebug&4) {
 		printf( "Setting variable(\"%s%s\", %d)\n", Context,
 			VarName, value );
 	}
@@ -1186,7 +1206,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		if (map) {
 			map->vars->SetAt( VarName, value);
 		}
-		else if (InDebug&1) {
+		else if (InDebug&4) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s %s in checkvariable\n",Context, VarName);
 		}
@@ -1200,7 +1220,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, ieDword va
 {
 	char newVarName[8];
 
-	if (InDebug&1) {
+	if (InDebug&4) {
 		printf( "Setting variable(\"%s\", %d)\n", VarName, value );
 	}
 	strncpy( newVarName, VarName, 6 );
@@ -1223,7 +1243,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, ieDword va
 		if (map) {
 			map->vars->SetAt( &VarName[6], value);
 		}
-		else if (InDebug&1) {
+		else if (InDebug&4) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s in setvariable\n",VarName);
 		}
@@ -1242,14 +1262,14 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		Sender->GetCurrentArea()->locals->SetAt( VarName, value );
-		if (InDebug&1) {
+		if (InDebug&4) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
 		return value;
 	}
 	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( &VarName[6], value );
-		if (InDebug&1) {
+		if (InDebug&4) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
 		return value;
@@ -1257,7 +1277,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 	Game *game = core->GetGame();
 	if (!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
 		game->kaputz->Lookup( &VarName[6], value );
-		if (InDebug&1) {
+		if (InDebug&4) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
 		return value;
@@ -1267,7 +1287,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 		if (map) {
 			map->vars->Lookup( &VarName[6], value);
 		}
-		else if (InDebug&1) {
+		else if (InDebug&4) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s in checkvariable\n",VarName);
 		}
@@ -1275,7 +1295,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 	else {
 		game->globals->Lookup( &VarName[6], value );
 	}
-	if (InDebug&1) {
+	if (InDebug&4) {
 		printf("CheckVariable %s: %d\n",VarName, value);
 	}
 	return value;
@@ -1290,14 +1310,14 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		Sender->GetCurrentArea()->locals->SetAt( VarName, value );
-		if (InDebug&1) {
+		if (InDebug&4) {
 			printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 		}
 		return value;
 	}
 	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( VarName, value );
-		if (InDebug&1) {
+		if (InDebug&4) {
 			printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 		}
 		return value;
@@ -1305,7 +1325,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 	Game *game = core->GetGame();
 	if (!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
 		game->kaputz->Lookup( VarName, value );
-		if (InDebug&1) {
+		if (InDebug&4) {
 			printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 		}
 		return value;
@@ -1315,14 +1335,14 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 		if (map) {
 			map->vars->Lookup( VarName, value);
 		}
-		else if (InDebug&1) {
+		else if (InDebug&4) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s %s in checkvariable\n",Context, VarName);
 		}
 	} else {
 		game->globals->Lookup( VarName, value );
 	}
-	if (InDebug&1) {
+	if (InDebug&4) {
 		printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 	}
 	return value;
@@ -1633,7 +1653,7 @@ int GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 		printMessage( "GameScript",Tmp,YELLOW);
 		return 0;
 	}
-	if (InDebug&1) {
+	if (InDebug&8) {
 		printf( "[GameScript]: Executing trigger code: 0x%04x %s\n",
 				trigger->triggerID, tmpstr );
 	}
@@ -1705,7 +1725,7 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
-	if (InDebug&1) {
+	if (InDebug&8) {
 		printf("Sender: %s\n",Sender->GetScriptName() );
 	}
 	ActionFunction func = actions[aC->actionID];
@@ -1722,7 +1742,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			return;
 		}
 		else {
-			if (InDebug&1) {
+			if (InDebug&8) {
 				printf( "[GameScript]: Executing action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
 			}
 			//turning off interruptable flag
@@ -1929,7 +1949,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	SymbolMgr *valHook = core->GetSymbol(idsfile);
 	if (!valHook) {
 		//FIXME:missing ids file!!!
-		if (InDebug&1) {
+		if (InDebug&16) {
 			char Tmp[256];
 
 			sprintf(Tmp,"Missing IDS file %s for symbol %s!\n",idsname, symbol);
@@ -2207,7 +2227,7 @@ Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIn
 Action* GameScript::GenerateAction(char* String, bool autoFree)
 {
 	strlwr( String );
-	if (InDebug&1) {
+	if (InDebug&8) {
 		printf("Compiling:%s\n",String);
 	}
 	int len = strlench(String,'(')+1; //including (
@@ -2365,7 +2385,7 @@ Trigger *GameScript::GenerateTriggerCore(const char *src, const char *str, int t
 Trigger* GameScript::GenerateTrigger(char* String)
 {
 	strlwr( String );
-	if (InDebug&1) {
+	if (InDebug&8) {
 		printf("Compiling:%s\n",String);
 	}
 	int negate = 0;
@@ -6018,10 +6038,9 @@ void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 	} else {
 		Sender->CutSceneId = GetActorFromObject( Sender, parameters->objects[1] );
 	}
-	if (!Sender->CutSceneId) {
-		printMessage("GameScript","Failed to set CutSceneID!\n",YELLOW);
-		if (InDebug&2) {
-			abort();
+	if (InDebug&2) {
+		if (!Sender->CutSceneId) {
+			printMessage("GameScript","Failed to set CutSceneID!\n",YELLOW);
 		}
 	}
 }
@@ -6710,7 +6729,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
 	Scriptable* tar, *scr;
 
-	if (InDebug&1) {
+	if (InDebug&4) {
 		printf("BeginDialog core\n");
 	}
 	if (Flags & BD_OWN) {
@@ -6936,10 +6955,11 @@ void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)
 	}
 	DataStream* s = core->GetResourceMgr()->GetResource( parameters->string0Parameter, IE_BMP_CLASS_ID );
 	bmp->Open( s, true );
-	Color *pal = (Color *) malloc( sizeof(Color*) * 256 );
+	Color *pal = (Color *) malloc( sizeof(Color) * 256 );
 	bmp->GetPalette( 0, 256, pal );
 	core->FreeInterface( bmp );
 	anim->SetPalette( pal, true );
+	free (pal);
 }
 
 void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
@@ -8954,6 +8974,9 @@ void GameScript::AttackCore(Scriptable *Sender, Scriptable *target, Action *para
 	unsigned int wrange = actor->GetWeaponRange() * 10;
 	if ( wrange == 0) {
 		printMessage("[GameScript]","Zero weapon range!\n",LIGHT_RED);
+		if (flags&AC_REEVALUATE) {
+			delete parameters;
+		}
 		return;
 	}
 	if ( Distance(Sender, target) > wrange ) {
@@ -8961,10 +8984,14 @@ void GameScript::AttackCore(Scriptable *Sender, Scriptable *target, Action *para
 
 		sprintf( Tmp, "MoveToPoint([%d.%d])", target->Pos.x, target->Pos.y );
 		Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
+		if (flags&AC_REEVALUATE) {
+			delete parameters;
+		}
 		return;
 	}
 	//TODO:
 	//send Attack trigger to attacked
+	//calculate attack/damage
 	actor->SetStance( IE_ANI_ATTACK );
 	actor->SetWait( 1 );
 	//attackreevaluate
@@ -9010,7 +9037,7 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 	}
 	//pumping parameters back for AttackReevaluate
 	//FIXME: we should make a copy of parameters here
-	Action *newAction = ParamCopy( parameters);
+	Action *newAction = ParamCopy( parameters );
 	AttackCore(Sender, tar, newAction, AC_REEVALUATE);
 }
 
