@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.259 2005/04/11 17:37:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.260 2005/04/11 21:41:11 avenger_teambg Exp $
  *
  */
 
@@ -223,6 +223,7 @@ static TriggerLink triggernames[] = {
 	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT,0},
 	{"objectactionlistempty", GameScript::ObjectActionListEmpty,0}, //same function
 	{"oncreation", GameScript::OnCreation,0},
+	{"onscreen", GameScript::OnScreen,0},
 	{"openstate", GameScript::OpenState,0},
 	{"or", GameScript::Or,0},
 	{"ownsfloatermessage", GameScript::OwnsFloaterMessage,0},
@@ -613,7 +614,7 @@ static ActionLink actionnames[] = {
 	{"verbalconstant", GameScript::VerbalConstant,0},
 	{"verbalconstanthead", GameScript::VerbalConstantHead,0},
 	{"wait", GameScript::Wait, AF_BLOCKING},
-	{"waitanimation", GameScript::WaitAnimation,0},
+	{"waitanimation", GameScript::WaitAnimation,AF_BLOCKING},
 	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING}, { NULL,NULL,0},
 };
 
@@ -820,7 +821,7 @@ static Action *ParamCopy(Action *parameters)
 	newAction->pointParameter = parameters->pointParameter;
 	MEMCPY( newAction->string0Parameter, parameters->string0Parameter );
 	MEMCPY( newAction->string1Parameter, parameters->string1Parameter );
-	for(int c=0;c<3;c++) {
+	for (int c=0;c<3;c++) {
 		newAction->objects[c]= ObjectCopy( parameters->objects[c] );
 	}
 	return newAction;
@@ -889,8 +890,8 @@ static void InitScriptTables()
 	//initializing the happiness table
 	int hptable = core->LoadTable( "happy" );
 	TableMgr *tab = core->GetTable( hptable );
-	for(int alignment=0;alignment<3;alignment++) {
-		for(int reputation=0;reputation<20;reputation++) {
+	for (int alignment=0;alignment<3;alignment++) {
+		for (int reputation=0;reputation<20;reputation++) {
 			happiness[alignment][reputation]=strtol(tab->QueryField(reputation,alignment), NULL, 0);
 		}
 	}
@@ -961,7 +962,7 @@ void Targets::AddTarget(Actor* actor, unsigned int distance)
 	if (actor && actor->ValidTarget(GA_SELECT|GA_NO_DEAD) ) {
 		targettype Target = {actor, distance};
 		targetlist::iterator m;
-		for(m = objects.begin(); m != objects.end(); ++m) {
+		for (m = objects.begin(); m != objects.end(); ++m) {
 			if ( (*m).distance>distance) {
 				objects.insert( m, Target);
 				return;
@@ -1653,7 +1654,7 @@ int GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 		printMessage( "GameScript",Tmp,YELLOW);
 		return 0;
 	}
-	if (InDebug&8) {
+	if (InDebug&16) {
 		printf( "[GameScript]: Executing trigger code: 0x%04x %s\n",
 				trigger->triggerID, tmpstr );
 	}
@@ -1748,6 +1749,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			//turning off interruptable flag
 			//uninterruptable actions will set it back
 			if (Sender->Type==ST_ACTOR) {
+				Sender->Active|=SCR_ACTIVE;
 				((Actor *)Sender)->InternalFlags&=~IF_NOINT;
 			}
 			func( Sender, aC );
@@ -1790,7 +1792,7 @@ Targets* GameScript::EvaluateObject(Scriptable* Sender, Object* oC)
 		return tgts;
 	}
 	//else branch, IDS targeting
-	for(int j = 0; j < ObjectIDSCount; j++) {
+	for (int j = 0; j < ObjectIDSCount; j++) {
 		if (!oC->objectFields[j]) {
 			continue;
 		}
@@ -1965,7 +1967,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	}
 	char symbolname[64];
 	int x;
-	for(x=0;isalnum(*symbol) && x<(int) sizeof(symbolname)-1;x++) {
+	for (x=0;isalnum(*symbol) && x<(int) sizeof(symbolname)-1;x++) {
 		symbolname[x]=*symbol;
 		symbol++;
 	}
@@ -1975,7 +1977,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 
 static void ParseIdsTarget(const char *&src, Object *&object)
 {
-	for(int i=0;i<ObjectFieldsCount;i++) {
+	for (int i=0;i<ObjectFieldsCount;i++) {
 			object->objectFields[i]=GetIdsValue(src, ObjectIDSTableNames[i]);
 		if (*src!='.') {
 			break;
@@ -1993,7 +1995,7 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 		//Scriptable Name
 		src++;
 		int i;
-		for(i=0;i<(int) sizeof(object->objectName)-1 && *src!='"';i++)
+		for (i=0;i<(int) sizeof(object->objectName)-1 && *src!='"';i++)
 		{
 			object->objectName[i] = *src;
 			src++;
@@ -2169,7 +2171,7 @@ Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIn
 				//skipping the context part, which
 				//is to be readed later
 				if (mergestrings) {
-					for(i=0;i<6;i++) {
+					for (i=0;i<6;i++) {
 						*dst++='*';
 					}
 				}
@@ -2327,7 +2329,7 @@ Trigger *GameScript::GenerateTriggerCore(const char *src, const char *str, int t
 				//skipping the context part, which
 				//is to be readed later
 				if (mergestrings) {
-					for(i=0;i<6;i++) {
+					for (i=0;i<6;i++) {
 						*dst++='*';
 					}
 				}
@@ -2385,7 +2387,7 @@ Trigger *GameScript::GenerateTriggerCore(const char *src, const char *str, int t
 Trigger* GameScript::GenerateTrigger(char* String)
 {
 	strlwr( String );
-	if (InDebug&8) {
+	if (InDebug&16) {
 		printf("Compiling:%s\n",String);
 	}
 	int negate = 0;
@@ -3788,7 +3790,7 @@ int GameScript::NumItemsParty(Scriptable* /*Sender*/, Trigger* parameters)
 	Game *game=core->GetGame();
 
 	//there is an assignment here
-	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+	for (int i=0; (actor = game->GetPC(i)) ; i++) {
 		cnt+=actor->inventory.CountItems(parameters->string0Parameter,1);
 	}
 	return cnt==parameters->int0Parameter;
@@ -3801,7 +3803,7 @@ int GameScript::NumItemsPartyGT(Scriptable* /*Sender*/, Trigger* parameters)
 	Game *game=core->GetGame();
 
 	//there is an assignment here
-	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+	for (int i=0; (actor = game->GetPC(i)) ; i++) {
 		cnt+=actor->inventory.CountItems(parameters->string0Parameter,1);
 	}
 	return cnt>parameters->int0Parameter;
@@ -3814,7 +3816,7 @@ int GameScript::NumItemsPartyLT(Scriptable* /*Sender*/, Trigger* parameters)
 	Game *game=core->GetGame();
 
 	//there is an assignment here
-	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+	for (int i=0; (actor = game->GetPC(i)) ; i++) {
 		cnt+=actor->inventory.CountItems(parameters->string0Parameter,1);
 	}
 	return cnt<parameters->int0Parameter;
@@ -3942,7 +3944,7 @@ int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger* parameters)
 	Game *game=core->GetGame();
 
 	//there is an assignment here
-	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+	for (int i=0; (actor = game->GetPC(i)) ; i++) {
 		if (actor->inventory.HasItem(parameters->string0Parameter,parameters->int0Parameter) ) {
 			return 1;
 		}
@@ -3956,14 +3958,14 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* paramet
 	Game *game=core->GetGame();
 
 	//there is an assignment here
-	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+	for (int i=0; (actor = game->GetPC(i)) ; i++) {
 		if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
 			return 1;
 		}
 	}
 	return 0;
 }
-//				0	1	2	3	4   
+//				0	1	2	3	4
 static char spellnames[5][5]={"ITEM", "SPPR", "SPWI", "SPIN", "SPCL"};
 
 #define CreateSpellName(spellname, data) sprintf(spellname,"%s%03d",spellnames[data/1000],data%1000)
@@ -4006,7 +4008,7 @@ int GameScript::HaveSpellParty(Scriptable* /*Sender*/, Trigger *parameters)
 		poi=tmpname;
 	}
 	//there is an assignment here
-	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+	for (int i=0; (actor = game->GetPC(i)) ; i++) {
 		if (actor->spellbook.HaveSpell(poi, 1) ) {
 			return 1;
 		}
@@ -5466,6 +5468,18 @@ int GameScript::PCInStore( Scriptable* /*Sender*/, Trigger* /*parameters*/)
 	return 0;
 }
 
+//this checks if the launch point is onscreen, a more elaborate check
+//would see if any piece of the Scriptable is onscreen, what is the original
+//behaviour?
+int GameScript::OnScreen( Scriptable* Sender, Trigger* /*parameters*/)
+{
+	Region vp = core->GetVideoDriver()->GetViewport();
+	if (vp.PointInside(Sender->Pos) ) {
+		return 1;
+	}
+	return 0;
+}
+
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -5965,7 +5979,7 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 	printf("CreateCreature: %s at [%d.%d] face:%d\n",parameters->string0Parameter, pnt.x,pnt.y,parameters->int0Parameter);
 	Map *map = Sender->GetCurrentArea();
 	ab->SetPosition(map, pnt, flags&CC_CHECK_IMPASSABLE, radius );
-	//i think  this isn't needed, the creature's stance should be set in
+	//i think this isn't needed, the creature's stance should be set in
 	//the creature, GetActor sets it correctly
 	//ab->SetStance( IE_ANI_AWAKE );
 	ab->SetOrientation(parameters->int0Parameter&(MAX_ORIENT-1) );
@@ -6443,7 +6457,7 @@ void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* paramete
 	Game *game=core->GetGame();
 
 	//there is an assignment here
-	for(int i=0; (actor = game->GetPC(i)) ; i++) {
+	for (int i=0; (actor = game->GetPC(i)) ; i++) {
 		if (actor->inventory.HasItem(parameters->string0Parameter,parameters->int0Parameter) ) {
 			DisplayStringCore(actor, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
 		}
@@ -6769,6 +6783,13 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			return;
 		}
 	}
+	//making sure speaker is the protagonist, player, actor
+	bool swap = false;
+	if (scr->Type != ST_ACTOR) swap = true;
+	else if (tar->Type == ST_ACTOR) {
+		if ( ((Actor *) tar)->InParty == 1) swap = true;
+		else if ( (((Actor *) scr)->InParty !=1) && ((Actor *) tar)->InParty) swap = true;
+	}
 
 	GameControl* gc = core->GetGameControl();
 	if (!gc) {
@@ -6792,13 +6813,6 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	const char* Dialog = NULL;
 	int pdtable = -1;
-	//making sure speaker is the protagonist, player, actor
-	bool swap = false;
-	if (scr->Type != ST_ACTOR) swap = true;
-	else if (tar->Type == ST_ACTOR) {
-		if ( ((Actor *) tar)->InParty == 1) swap = true;
-		else if ( (((Actor *) scr)->InParty !=1) && ((Actor *) tar)->InParty) swap = true;
-	}
 
 	switch (Flags & BD_LOCMASK) {
 		case BD_STRING0:
@@ -6837,17 +6851,25 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	//dialog is not meaningful
 	if (!Dialog || Dialog[0]=='*') {
-			goto end_of_quest;
+		goto end_of_quest;
 	}
 
 	//we also need to freeze active scripts during a dialog!
-	if (Sender!=tar) {
-		if (( Flags & BD_INTERRUPT )) {
-			tar->ClearActions();
-		} else {
-			if (tar->GetNextAction()) {
-				core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
-				goto end_of_quest;
+	if (scr!=tar) {
+		if (swap) {
+			Scriptable *tmp = tar;
+			tar = scr;
+			scr = tmp;
+		}
+		
+		if (Sender!=tar) {
+			if (Flags & BD_INTERRUPT) {
+				tar->ClearActions();
+			} else {
+				if (tar->GetNextAction()) {
+					core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+					goto end_of_quest;
+				}
 			}
 		}
 	}
@@ -6867,12 +6889,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			gc->SetDialogueFlags(DF_TALKCOUNT, BM_OR);
 		}
 
-		if ( swap ) {
-			gc->InitDialog( (Actor *) tar, scr, Dialog );
-		}
-		else {
-			gc->InitDialog( (Actor *) scr, tar, Dialog );
-		}
+		gc->InitDialog( (Actor *) scr, tar, Dialog );
 	}
 //if pdtable was allocated, free it now, it will release Dialog
 end_of_quest:
@@ -7063,7 +7080,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	      if (!game->EveryoneNearPoint(actor->Area, actor->Pos, true) ) {
+	if (!game->EveryoneNearPoint(actor->Area, actor->Pos, true) ) {
 		//we abort the command, everyone should be here
 		Sender->CurrentAction = NULL;
 		return;
@@ -7336,6 +7353,10 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
+	if (Sender->Type == ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->SetStance (IE_ANI_CAST);
+	}
 	Point s,d;
 	GetPositionFromScriptable( Sender, s, true );
 	GetPositionFromScriptable( tar, d, true );
@@ -7551,7 +7572,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	SetBeenInPartyFlags(Sender, parameters);
 	Actor* act = ( Actor* ) Sender;
 	act->SetStat( IE_EA, PC );
-	if (core->HasFeature( GF_HAS_DPLAYER ))  {
+	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		act->SetScript( "DPLAYER2", SCR_DEFAULT );
 	}
 	int pdtable = core->LoadTable( "pdialog" );
@@ -7578,7 +7599,7 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 	Actor* act = ( Actor* ) Sender;
 	act->SetStat( IE_EA, NEUTRAL );
 	core->GetGame()->LeaveParty( act );
-	if (core->HasFeature( GF_HAS_DPLAYER ))  {
+	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		act->SetScript( "", SCR_DEFAULT );
 	}
 /* apparently this is handled by script in dplayer3 (or2)
@@ -7593,7 +7614,7 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 	core->GetGUIScriptEngine()->RunFunction( "UpdatePortraitWindow" );
 }
 
-//no idea why we would need this  if we have activate/deactivate
+//no idea why we would need this if we have activate/deactivate
 void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -7718,6 +7739,7 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_DIE );
 	actor->InternalFlags|=IF_NOINT;
+	actor->playDeadCounter = parameters->int0Parameter;
 	actor->SetWait( parameters->int0Parameter );
 }
 
@@ -7732,6 +7754,7 @@ void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_DIE );
 	//also set time for playdead!
+	actor->playDeadCounter = parameters->int0Parameter;
 	actor->SetWait( parameters->int0Parameter );
 }
 
@@ -8969,7 +8992,7 @@ void GameScript::RemoveMapnote( Scriptable* Sender, Action* parameters)
 //It is possible to attack CONTAINERS/DOORS as well!!!
 void GameScript::AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int flags)
 {
-	//this is a dangerous cast, make sure actor is Actor *  !!!
+	//this is a dangerous cast, make sure actor is Actor * !!!
 	Actor *actor = (Actor *) Sender;
 	unsigned int wrange = actor->GetWeaponRange() * 10;
 	if ( wrange == 0) {

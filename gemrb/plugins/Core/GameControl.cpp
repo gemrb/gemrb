@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.219 2005/04/11 17:40:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.220 2005/04/11 21:41:11 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1467,13 +1467,13 @@ void GameControl::DialogChoose(unsigned int choose)
 			}
 		}
 		char *string = ( char * ) malloc( 40 );
+		idx++;
 		if (ds->transitions[x]->textStrRef == 0xffffffff) {
 			sprintf( string, "[s=%d,ffffff,ff0000]Continue", x );
 			i = ta->AppendText( string, -1 );
 			free( string );
 			ta->AppendText( "[/s]", i );
 		} else {
-			idx++;
 			sprintf( string, "[s=%d,ffffff,ff0000]%d - [p]", x, idx );
 			i = ta->AppendText( string, -1 );
 			free( string );

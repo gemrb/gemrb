@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.170 2005/04/09 19:13:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.171 2005/04/11 21:41:13 avenger_teambg Exp $
  *
  */
 
@@ -844,6 +844,7 @@ public: //Script Functions
 	static int NumTimesTalkedToLT(Scriptable* Sender, Trigger* parameters);
 	static int ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters);
 	static int OnCreation(Scriptable* Sender, Trigger* parameters);
+	static int OnScreen(Scriptable* Sender, Trigger* parameters);
 	static int OpenState(Scriptable* Sender, Trigger* parameters);
 	static int Or(Scriptable* Sender, Trigger* parameters);
 	static int OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.155 2005/04/10 17:34:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.156 2005/04/11 21:41:13 avenger_teambg Exp $
  *
  */
 
@@ -416,7 +416,7 @@ void Map::UpdateScripts()
 		actor->ProcessActions();
 		for (unsigned int i = 0; i < 8; i++) {
 		if (actor->Scripts[i]) {
-			if(actor->GetNextAction()) break;
+			if (actor->GetNextAction()) break;
 				actor->ExecuteScript( actor->Scripts[i] );
 			}
 		}
@@ -538,12 +538,12 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 	Screen.y = viewport.y;
 	// starting with lowest priority (so they are drawn over)
 	GenerateQueues();
-	int q = 3;
+	int q = 2; //skip inactive actors, don't even sort them
 	while (q--) {
 		int index = Qcount[q];
 		while (true) {
 			Actor* actor = GetRoot( q, index );
-			if(!actor)
+			if (!actor)
 				break;
 			//text feedback
 			if (actor->textDisplaying) {
@@ -572,14 +572,20 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			//explored or visibilitymap (bird animations are visible in fog)
 			int explored = actor->Modified[IE_DONOTJUMP]&2;
 			if (!IsVisible( actor->Pos, explored)) {
+				//finding an excuse why we don't hybernate the actor
 				if (actor->Modified[IE_ENABLEOFFSCREENAI])
 					continue;
-				if (!actor->GetNextAction())
+				if (actor->CurrentAction)
 					continue;
-				//turning actor inactive, clearing path
+				if (actor->path)
+					continue;
+				if (actor->GetNextAction())
+					continue;
+				if (actor->GetWait()) //would never stop waiting
+					continue;
+				//turning actor inactive
 				actor->Active&=~SCR_ACTIVE;
 				actor->SetStance(IE_ANI_READY);
-				actor->ClearPath();
 				continue;
 			}
 			//0 means opaque
@@ -1614,7 +1620,7 @@ void Map::ExploreMapChunk(Point &Pos, int range, bool los)
 
 void Map::UpdateFog()
 {
-	if(!core->FogOfWar) {
+	if (!core->FogOfWar) {
 		SetMapVisibility( -1 );
 		return;
 	}

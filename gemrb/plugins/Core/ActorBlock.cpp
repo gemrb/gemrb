@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.84 2005/04/10 18:49:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.85 2005/04/11 21:41:11 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -167,6 +167,7 @@ void Scriptable::AddActionInFront(Action* aC)
 		printf( "[IEScript]: NULL action encountered for %s!\n",scriptName );
 		return;
 	}
+	Active|=SCR_ACTIVE;
 	actionQueue.push_front( aC );
 	aC->IncRef();
 }
@@ -220,8 +221,9 @@ void Scriptable::ProcessActions()
 	}
 	if (WaitCounter) {
 		WaitCounter--;
-		if (!WaitCounter)
+		if (!WaitCounter) {
 			CurrentAction = NULL;
+		}
 		return;
 	}
 	if (resetAction) {
@@ -250,6 +252,11 @@ void Scriptable::ProcessActions()
 void Scriptable::SetWait(unsigned long time)
 {
 	WaitCounter = time;
+}
+
+unsigned long Scriptable::GetWait()
+{
+	return WaitCounter;
 }
 
 /********************
