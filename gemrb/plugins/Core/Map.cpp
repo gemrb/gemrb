@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.156 2005/04/11 21:41:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.157 2005/04/12 18:42:38 avenger_teambg Exp $
  *
  */
 
@@ -515,7 +515,8 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 		Point p;
 		p.x = anim->x;
 		p.y = anim->y;
-		if (!IsVisible( p, anim->Flags & A_ANI_NOT_IN_FOG) ) continue;
+		if (!IsVisible( p, !(anim->Flags & A_ANI_NOT_IN_FOG)) )
+			continue;
 		Color tint = {0,0,0,0};
 		if (!(anim->Flags&A_ANI_NO_SHADOW)) {
 			tint = LightMap->GetPixel( p.x / 16, p.y / 12);
@@ -656,7 +657,8 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 		Point p;
 		p.x = anim->x;
 		p.y = anim->y;
-		if (!IsVisible( p, anim->Flags & A_ANI_NOT_IN_FOG) ) continue;
+		if (!IsVisible( p, !(anim->Flags & A_ANI_NOT_IN_FOG)) )
+			continue;
 		Color tint = {0,0,0,0};
 		if (!(anim->Flags&A_ANI_NO_SHADOW)) {
 			tint = LightMap->GetPixel( p.x / 16, p.y / 12);
@@ -1186,7 +1188,7 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
 			dist=distance;
 		}
 
-		unsigned int Cost = MapSet[y * Width + x] + 1;
+		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
 		if (Cost > PathLen) {
 			//printf("Path not found!\n");
 			break;
@@ -1196,7 +1198,7 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
 		SetupNode( x + 1, y + 1, Cost );
 		SetupNode( x - 1, y + 1, Cost );
 
-		Cost ++;
+		Cost += AdditionalCost;
 		SetupNode( x, y - 1, Cost );
 		SetupNode( x + 1, y, Cost );
 		SetupNode( x, y + 1, Cost );
@@ -1218,10 +1220,9 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
 	Point p = best;
 	unsigned int pos2 = start.y * Width + start.x;
 	while (( pos = p.y * Width + p.x ) != pos2) {
-		StartNode->Next = new PathNode;
-		StartNode->Next->Parent = StartNode;
-		StartNode = StartNode->Next;
-		StartNode->Next = NULL;
+		Return = new PathNode;
+		StartNode->Parent = Return;
+		Return->Next = StartNode;
 		unsigned int level = MapSet[pos];
 		unsigned int diff = 0;
 		Point n;
@@ -1235,13 +1236,13 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
 		Leveldown( p.x - 1, p.y - 1, level, n, diff );
 		if (!diff)
 			return Return;
-		StartNode->x = n.x;
-		StartNode->y = n.y;
+		Return->x = n.x;
+		Return->y = n.y;
 
 		if (Backing) {
-			StartNode->orient = GetOrient( p, n );
+			Return->orient = GetOrient( p, n );
 		} else {
-			StartNode->orient = GetOrient( n, p );
+			Return->orient = GetOrient( n, p );
 		}
 		p = n;
 	}

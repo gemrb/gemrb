@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.102 2005/04/09 19:13:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.103 2005/04/12 18:42:41 avenger_teambg Exp $
  *
  */
 
@@ -60,7 +60,10 @@ int SDLVideoDriver::Init(void)
 	SDL_EnableUNICODE( 1 );
 	SDL_EnableKeyRepeat( 500, 50 );
 	SDL_ShowCursor( SDL_DISABLE );
-	fadePercent = 0;
+	fadeColor.a=0; //fadePercent
+	fadeColor.r=0;
+	fadeColor.b=0;
+	fadeColor.g=0;
 	return GEM_OK;
 }
 
@@ -99,7 +102,8 @@ int SDLVideoDriver::CreateDisplay(int width, int height, int bpp,
 	extra = SDL_DisplayFormat( tmp );
 	printStatus( "OK", LIGHT_GREEN );
 	SDL_LockSurface( extra );
-	memset( extra->pixels, 0, extra->pitch * extra->h );
+	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, 0 );
+	SDL_FillRect( extra, NULL, val );	
 	SDL_UnlockSurface( extra );
 	SDL_FreeSurface( tmp );
 	printMessage( "SDLVideo", "CreateDisplay...", WHITE );
@@ -290,8 +294,8 @@ int SDLVideoDriver::SwapBuffers(void)
 		}
 	}
 	SDL_BlitSurface( backBuf, NULL, disp, NULL );
-	if (fadePercent) {
-		SDL_SetAlpha( extra, SDL_SRCALPHA, fadePercent );
+	if (fadeColor.a) {
+		SDL_SetAlpha( extra, SDL_SRCALPHA, fadeColor.a );
 		SDL_Rect src = {
 			0, 0, Viewport.w, Viewport.h
 		};
@@ -1269,13 +1273,15 @@ void SDLVideoDriver::SetFadeColor(int r, int g, int b)
 	if (b>255) b=255;
 	else if(b<0) b=0;
 	fadeColor.b=b;
+	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a );
+	SDL_FillRect( extra, NULL, val );	
 }
 
 void SDLVideoDriver::SetFadePercent(int percent)
 {
 	if (percent>100) percent = 100;
 	else if (percent<0) percent = 0;
-	fadePercent = (255 * percent ) / 100;
+	fadeColor.a = (255 * percent ) / 100;
 }
 
 void SDLVideoDriver::SetClipRect(Region* clip)
