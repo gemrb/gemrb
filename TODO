@@ -1,8 +1,5 @@
 Scripts:
-1. Run All creature scripts when the creatures are 'activated'.
-Creatures are activated if they are:
- a. in visibility range of a player (or object that was marked as a clear fog of war).
- b. affected by the 'aifast' flag (which effectively disables deactivation). The creatures always start activated (except if this flag is saved in the area?), thus the OnCreation trigger always fires on creation. This means, deactivation must be checked at the end of script Update() of the actor.
+1. (DONE) Run All creature scripts when the creatures are 'activated'. 
 
 2. Run All area scripts not just the active areas.
 Area scripts are queued, master areas get on the head of the queue, non-master areas get in the tail of the queue. See also: SetMasterArea action/mastarea.2da
@@ -25,9 +22,13 @@ Effects:
 
 Area:
 1. Implement cover (wallgroups)
-2. Fog of war (ED)
-3. Blocking doors (impeded blocks)
+2. (DONE) Fog of war
+3. (DONE) Blocking doors
 4. Don't load scripts for pile items? (research when a script is unused)
+
+Animation:
+1. (PARTLY) fix char animation sequences
+2. (DONE) animationfactory->one single palette
 
 Known Bugs:
 1. problem: Dialog options that are disabled by the trigger condition are still accessible via hotkey. (FIXED)
@@ -38,14 +39,14 @@ Known Bugs:
 
 4. problem: sound isn't working in movies (FIXED)
 
-5. problem: orientation is still fuzzy. Find what makes it wrong.
+5. problem: stanceID is still fuzzy. Fix it. (FIXED?)
 
 Ideas:
 1. Use the character sheet (Actor.cpp) itself to store attributes of the character during character generation.
 Benefits: data is already stored in the destination, data constraints and relations are easily implemented.
 How to: replace GemRB.SetVar with GemRB.SetPlayerStat. Don't forget to create the character first.
 
-- make tool to scan GUIScript.cpp and parse function comments. compute hashes of them and compare them to hashes stored in gemrb/docs/en/GUIScript/*.txt - if hashes differ, the description in GUIScript.cpp has been updated and the *.txt should be updated as well
+- make tool to scan GUIScript.cpp and parse function comments. compute hashes of them and compare them to hashes stored in gemrb/docs/en/GUIScript/*.txt - if hashes differ, the description in GUIScript.cpp has been updated and the *.txt should be updated as well (ED, DONE)
 
 - fix include paths during compilation, so the files do not use #include "../../Core/something.h" etc.
 
