@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.220 2005/04/11 21:41:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.221 2005/04/17 13:00:02 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1334,11 +1334,13 @@ void GameControl::EndDialog(bool try_to_break)
 	}
 
 	if(target) {
+/* talkcount increases after the top level condition was evaluated
 		if (DialogueFlags&DF_TALKCOUNT) {
 			if (target->Type == ST_ACTOR) {
 				((Actor *) target)->TalkCount++;
 			}
 		}
+*/
 		//this could be wrong
 		target->CurrentAction = NULL;
 	}
@@ -1379,6 +1381,14 @@ void GameControl::DialogChoose(unsigned int choose)
 			EndDialog();
 			return;
 		}
+		//increasing talkcount after top level condition was determined
+		if (DialogueFlags&DF_TALKCOUNT) {
+			DialogueFlags&=~DF_TALKCOUNT; //turning it off just in case
+			if (target->Type == ST_ACTOR) {
+				((Actor *) target)->TalkCount++;
+			}
+		}
+
 		ds = dlg->GetState( si );
 	} else {
 		if (ds->transitionsCount <= choose)
@@ -1434,13 +1444,6 @@ void GameControl::DialogChoose(unsigned int choose)
 		int si = tr->stateIndex;
 		//follow external linkage, if required
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
-			//increasing talkcount here if we switched talker
-			if (DialogueFlags&DF_TALKCOUNT) {
-				DialogueFlags&=~DF_TALKCOUNT;
-				if (target->Type == ST_ACTOR) {
-					((Actor *) target)->TalkCount++;
-				}
-			}
 			//target should be recalculated!
 			target = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
 			if(!target) {
