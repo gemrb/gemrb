@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.57 2005/04/10 20:54:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.58 2005/04/18 19:11:25 avenger_teambg Exp $
  *
  */
 
@@ -392,6 +392,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			autoSwitchOnEnd = true;
 			break;
 		case IE_ANI_TWITCH: //dead, sleeping
+			autoSwitchOnEnd = false;
 			break;
 		case IE_ANI_DIE: //going to die
 			nextStanceID = IE_ANI_TWITCH;
@@ -406,9 +407,18 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			break;
 		case IE_ANI_EMERGE:
 		case IE_ANI_GET_UP:
-		default:
+		case IE_ANI_HEAD_TURN:
 			nextStanceID = IE_ANI_AWAKE;
 			autoSwitchOnEnd = true;
+			break;
+		case IE_ANI_CONJURE:
+		case IE_ANI_SHOOT:
+		case IE_ANI_ATTACK:
+			nextStanceID = IE_ANI_READY;
+			autoSwitchOnEnd = true;
+			break;
+		default:
+			printf ("Invalid Stance: %d\n", StanceID);
 			break;
 	}
 	if (Anims[StanceID][Orient]) {
