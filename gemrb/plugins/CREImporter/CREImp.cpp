@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.67 2005/04/09 19:04:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.68 2005/04/18 19:14:58 avenger_teambg Exp $
  *
  */
 
@@ -280,10 +280,12 @@ printf("STATE: %d\n",act->BaseStats[IE_STATE_ID]);
 	ReadInventory(act, Inventory_Size);
 	// Setting up derived stats
 	act->SetAnimationID( ( ieWord ) act->BaseStats[IE_ANIMATION_ID] );
-	if (act->BaseStats[IE_STATE_ID] & STATE_DEAD)
+	if (act->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		act->SetStance( IE_ANI_TWITCH );
-	else
+		act->Active=0;
+	} else {
 		act->SetStance( IE_ANI_AWAKE );
+	}
 	return act;
 }
 

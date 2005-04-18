@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.86 2005/04/12 18:42:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.87 2005/04/18 19:14:59 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -399,6 +399,16 @@ void Moveble::SetStance(unsigned int arg)
 	}
 }
 
+//this could be used for WingBuffet as well
+void Moveble::MoveLine(int steps, int Pass)
+{
+	//remove previous path
+	ClearPath();
+	if (!steps)
+		return;
+	path = area->GetLine( Pos, steps, Orientation, Pass );
+}
+
 void Moveble::DoStep()
 {
 	if (!path) {
@@ -461,10 +471,16 @@ void Moveble::WalkTo(Point &Des)
 	path = area->FindPath( Pos, Destination );
 }
 
-void Moveble::RunAwayFrom(Point &Des, int PathLength, bool Backing)
+void Moveble::RunAwayFrom(Point &Des, int PathLength, int flags)
 {
 	ClearPath();
-	path = area->RunAway( Pos, Des, PathLength, Backing );
+	path = area->RunAway( Pos, Des, PathLength, flags );
+}
+
+void Moveble::RandomWalk()
+{
+	ClearPath();
+	path = area->RunAway( Pos, Pos, 10, 0 );
 }
 
 void Moveble::MoveTo(Point &Des)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.157 2005/04/12 18:42:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.158 2005/04/18 19:15:03 avenger_teambg Exp $
  *
  */
 
@@ -1156,7 +1156,7 @@ void Map::FixAllPositions()
 	}
 }
 //run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
-PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
+PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 {
 	Point start = {s.x/16, s.y/12};
 	Point goal = {d.x/16, d.y/12};
@@ -1212,7 +1212,7 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
 	StartNode->Parent = NULL;
 	StartNode->x = best.x;
 	StartNode->y = best.y;
-	if (Backing) {
+	if (flags) {
 		StartNode->orient = GetOrient( start, best );
 	} else {
 		StartNode->orient = GetOrient( best, start );
@@ -1239,7 +1239,7 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing)
 		Return->x = n.x;
 		Return->y = n.y;
 
-		if (Backing) {
+		if (flags) {
 			Return->orient = GetOrient( p, n );
 		} else {
 			Return->orient = GetOrient( n, p );
@@ -1285,6 +1285,62 @@ bool Map::TargetUnreachable(Point &s, Point &d)
 		SetupNode( x - 1, y, 1 );
 	}
 	return pos!=pos2;
+}
+
+/* Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
+*/
+PathNode* Map::GetLine(Point &start, Point &dest, int flags)
+{
+	int Orientation = GetOrient(start, dest);
+	int Steps = Distance(start, dest);
+
+	return GetLine(start, dest, Steps, Orientation, flags);
+}
+
+PathNode* Map::GetLine(Point &start, int Steps, int Orientation, int flags)
+{
+	Point dest;
+
+	//FIXME: calculate dest based on distance and orientation
+	return GetLine(start, dest, Steps, Orientation, flags);
+}
+
+PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, int flags)
+{
+	PathNode* StartNode = new PathNode;
+        PathNode *Return = StartNode;
+	StartNode->Next = NULL;
+	StartNode->Parent = NULL;
+	StartNode->x = start.x;
+	StartNode->y = start.y;
+	StartNode->orient = Orientation;
+
+	int Max = Steps;
+        while(Steps--) {
+		int x,y;
+
+		StartNode->Next = new PathNode;
+		StartNode->Next->Parent = StartNode;
+		StartNode = StartNode->Next;
+                StartNode->Next = NULL;
+		x = (start.x + dest.x) * Steps / Max;
+		y = (start.y + dest.y) * Steps / Max;
+                StartNode->x = x;
+                StartNode->y = y;
+                StartNode->orient = Orientation;
+		bool wall = (!( Passable[SearchMap->GetPixelIndex( x, y )] & PATH_MAP_PASSABLE ));
+		if (wall) switch (flags) {
+			case GL_REBOUND:
+				Orientation = (Orientation + 8) &15;
+				break;
+			case GL_PASS:
+				break;
+			default:  //premature end
+				return Return;
+		}
+        }
+
+	return Return;
 }
 
 PathNode* Map::FindPath(Point &s, Point &d)

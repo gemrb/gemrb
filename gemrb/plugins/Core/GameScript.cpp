@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.260 2005/04/11 21:41:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.261 2005/04/18 19:14:59 avenger_teambg Exp $
  *
  */
 
@@ -139,6 +139,7 @@ static TriggerLink triggernames[] = {
 	{"happinesslt", GameScript::HappinessLT,0},
 	{"harmlessentered", GameScript::Entered,0}, //this isn't sure the same
 	{"hasitem", GameScript::HasItem,0},
+	{"hasitemequiped", GameScript::HasItemEquipped,0}, //typo in bg2
 	{"hasitemequipped", GameScript::HasItemEquipped,0},
 	{"hasitemslot", GameScript::HasItemSlot,0},
 	{"hasiteminslot", GameScript::HasItemSlot,0},
@@ -488,6 +489,8 @@ static ActionLink actionnames[] = {
 	{"playsoundnotranged", GameScript::PlaySoundNotRanged,0},
 	{"playsoundpoint", GameScript::PlaySoundPoint,0},
 	{"quitgame", GameScript::QuitGame, 0},
+	{"randomfly", GameScript::RandomFly, AF_BLOCKING},
+	{"randomwalk", GameScript::RandomWalk, AF_BLOCKING},
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
 	{"recoil", GameScript::Recoil,0},
 	{"regainpaladinhood", GameScript::RegainPaladinHood,0},
@@ -611,6 +614,7 @@ static ActionLink actionnames[] = {
 	{"unlock", GameScript::Unlock,0},
 	{"unlockscroll", GameScript::UnlockScroll,0},
 	{"unmakeglobal", GameScript::UnMakeGlobal,0}, //this is a GemRB extension
+	{"vequip",GameScript::SetArmourLevel,0},
 	{"verbalconstant", GameScript::VerbalConstant,0},
 	{"verbalconstanthead", GameScript::VerbalConstantHead,0},
 	{"wait", GameScript::Wait, AF_BLOCKING},
@@ -1835,7 +1839,7 @@ Targets* GameScript::EvaluateObject(Scriptable* Sender, Object* oC)
 	return tgts;
 }
 
-bool GameScript::MatchActor(Actor* actor, Object* oC)
+bool GameScript::MatchActor(Scriptable *Sender, Actor* actor, Object* oC)
 {
 	if (!actor) {
 		return false;
@@ -1843,8 +1847,38 @@ bool GameScript::MatchActor(Actor* actor, Object* oC)
 	if (oC->objectName[0]) {
 		return (stricmp( actor->GetScriptName(), oC->objectName ) == 0);
 	}
-	//TODO: the rest
-	return false;
+	Targets *tgts = new Targets();
+	for (int i = 0; i < MaxObjectNesting; i++) {
+		int filterid = oC->objectFilters[i];
+		if (!filterid) {
+			break;
+		}
+		ObjectFunction func = objects[filterid];
+		if (func) {
+			tgts = func( Sender, tgts);
+		}
+		else {
+			printf("[GameScript]: Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
+		}
+		if (!tgts->Count()) {
+			delete tgts;
+			return false;
+		}
+	}
+	bool ret = false;
+
+	if (tgts) {
+		targetlist::iterator m;
+		targettype *tt = tgts->GetFirstTarget(m);
+		while (tt) {
+			if (tt->actor == actor) {
+				ret = true;
+			}
+			tt = tgts->GetNextTarget(m);
+		}
+	}
+	delete tgts;
+	return ret;
 }
 
 int GameScript::GetObjectCount(Scriptable* Sender, Object* oC)
@@ -3441,15 +3475,8 @@ int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::InPartySlot(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr) {
-		scr = Sender;
-	}
-	if (scr->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) scr;
-	return actor->InParty == parameters->int0Parameter;
+	Actor *actor = core->GetGame()->GetPC(parameters->int0Parameter);
+	return MatchActor(Sender, actor, parameters->objectParameter);
 }
 
 int GameScript::Exists(Scriptable* Sender, Trigger* parameters)
@@ -5343,7 +5370,7 @@ int GameScript::HitBy(Scriptable* Sender, Trigger* parameters)
 			return 0;
 		}
 	}
-	return MatchActor(actor->LastHitter, parameters->objectParameter);
+	return MatchActor(Sender, actor->LastHitter, parameters->objectParameter);
 }
 
 int GameScript::Heard(Scriptable* Sender, Trigger* parameters)
@@ -5357,7 +5384,7 @@ int GameScript::Heard(Scriptable* Sender, Trigger* parameters)
 			return 0;
 		}
 	}
-	return MatchActor(actor->LastHeard, parameters->objectParameter);
+	return MatchActor(Sender, actor->LastHeard, parameters->objectParameter);
 }
 
 int GameScript::LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters)
@@ -5366,7 +5393,7 @@ int GameScript::LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	return MatchActor(actor->LastSeen, parameters->objectParameter);
+	return MatchActor(Sender, actor->LastSeen, parameters->objectParameter);
 }
 
 int GameScript::Help_Trigger(Scriptable* Sender, Trigger* parameters)
@@ -5375,7 +5402,7 @@ int GameScript::Help_Trigger(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	return MatchActor(actor->LastHelp, parameters->objectParameter);
+	return MatchActor(Sender, actor->LastHelp, parameters->objectParameter);
 }
 
 int GameScript::FallenPaladin(Scriptable* Sender, Trigger* /*parameters*/)
@@ -8933,7 +8960,8 @@ void GameScript::Panic(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->NewStat(IE_STATE_ID, act->GetStat(IE_STATE_ID)|STATE_PANIC, MOD_ABSOLUTE);
+	act->NewStat(IE_MORALEBREAK, 0, MOD_ABSOLUTE); //this will modify state?
+	//act->NewStat(IE_STATE_ID, act->GetStat(IE_STATE_ID)|STATE_PANIC, MOD_ABSOLUTE);
 }
 
 void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
@@ -9150,3 +9178,40 @@ void GameScript::SetGlobalTint(Scriptable* /*Sender*/, Action* parameters)
 	core->GetVideoDriver()->SetFadeColor(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
 }
 
+void GameScript::SetArmourLevel(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->NewStat( IE_ARMOR_TYPE, parameters->int0Parameter, MOD_ABSOLUTE );
+}
+
+void GameScript::RandomWalk(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->RandomWalk( );
+}
+
+void GameScript::RandomFly(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	int x = rand()&31;
+	if (x<10) {
+		actor->SetOrientation((actor->GetOrientation()-1)&15 );
+	} else if (x>20) {
+		actor->SetOrientation((actor->GetOrientation()+1)&15 );
+	}
+	//fly in this direction for 2 steps
+	actor->MoveLine(2, GL_PASS);
+	Sender->AddAction( parameters );
+}

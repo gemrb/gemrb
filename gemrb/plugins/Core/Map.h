@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.70 2005/04/09 19:13:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.71 2005/04/18 19:15:03 avenger_teambg Exp $
  *
  */
 
@@ -68,6 +68,11 @@ class Ambient;
 //creature area flags
 #define AF_CRE_NOT_LOADED 1
 #define AF_NAME_OVERRIDE  8
+
+//getline flags
+#define GL_NORMAL         0
+#define GL_PASS           1
+#define GL_REBOUND        2
 
 typedef struct SongHeaderType {
 	ieDword SongList[5];
@@ -177,9 +182,12 @@ public:
 	/* Jumps actors out of impassable areas, call this after a searchmap change */
 	void FixAllPositions();
 	/* Finds the path which leads the farthest from d */
-	PathNode* RunAway(Point &s, Point &d, unsigned int PathLen, bool Backing);
+	PathNode* RunAway(Point &s, Point &d, unsigned int PathLen, int flags);
 	/* Returns true if there is no path to d */
 	bool TargetUnreachable(Point &s, Point &d);
+	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
+	PathNode* GetLine(Point &start, int Steps, int Orientation, int flags);
+	PathNode* GetLine(Point &start, Point &dest, int flags);
 	/* Finds the path which leads to d */
 	PathNode* FindPath(Point &s, Point &d);
 	/* returns false if point isn't visible on visibility/explored map */
@@ -214,6 +222,7 @@ private:
 	//maybe this is unneeded and orientation could be calculated on the fly
 	void UseExit(Actor *pc, InfoPoint *ip);
 	bool HandleActorStance(Actor *actor, CharAnimations *ca, int StanceID);
+	PathNode* GetLine(Point &start, Point &dest, int Steps, int Orientation, int flags);
 };
 
 #endif

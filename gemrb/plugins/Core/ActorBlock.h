@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.68 2005/04/11 21:41:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.69 2005/04/18 19:14:59 avenger_teambg Exp $
  *
  */
 
@@ -254,7 +254,9 @@ public:
 	void SetStance(unsigned int arg);
 	void DoStep();
 	void AddWayPoint(Point &Des);
-	void RunAwayFrom(Point &Des, int PathLength, bool Backing);
+	void RunAwayFrom(Point &Des, int PathLength, int flags);
+	void RandomWalk();
+	void MoveLine(int steps, int Pass);
 	void WalkTo(Point &Des);
 	void MoveTo(Point &Des);
 	void ClearPath();

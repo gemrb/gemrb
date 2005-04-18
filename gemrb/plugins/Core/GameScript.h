@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.171 2005/04/11 21:41:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.172 2005/04/18 19:15:02 avenger_teambg Exp $
  *
  */
 
@@ -644,7 +644,7 @@ private:
 	static Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 	static Trigger* GenerateTrigger(char* String);
 	/* returns true if actor matches the object specs. */
-	static bool MatchActor(Actor* actor, Object* oC);
+	static bool MatchActor(Scriptable *Sender, Actor* actor, Object* oC);
 	/* returns the number of actors matching the IDS targeting */
 	static int GetObjectCount(Scriptable* Sender, Object* oC);
 	static Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
@@ -1082,6 +1082,8 @@ public:
 	static void PlaySoundNotRanged(Scriptable* Sender, Action* parameters);
 	static void PlaySoundPoint(Scriptable* Sender, Action* parameters);
 	static void QuitGame(Scriptable* Sender, Action* parameters);
+	static void RandomWalk(Scriptable* Sender, Action* parameters);
+	static void RandomFly(Scriptable* Sender, Action* parameters);
 	static void RealSetGlobalTimer(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
 	static void RegainPaladinHood(Scriptable* Sender, Action* parameters);
@@ -1105,6 +1107,7 @@ public:
 	static void SetApparentName(Scriptable* Sender, Action* parameters);
 	static void SetAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
+	static void SetArmourLevel(Scriptable* Sender, Action* parameters);
 	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
 	static void SetCorpseEnabled(Scriptable* Sender, Action* parameters);
 	static void SetCreatureAreaFlags(Scriptable* Sender, Action* parameters);
