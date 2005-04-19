@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.58 2005/04/18 19:11:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.59 2005/04/19 16:00:12 avenger_teambg Exp $
  *
  */
 
@@ -408,6 +408,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 		case IE_ANI_EMERGE:
 		case IE_ANI_GET_UP:
 		case IE_ANI_HEAD_TURN:
+		case IE_ANI_PST_START:
 			nextStanceID = IE_ANI_AWAKE;
 			autoSwitchOnEnd = true;
 			break;
