@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.221 2005/04/17 13:00:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.222 2005/04/19 20:11:49 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1312,7 +1312,7 @@ void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlg
 	}
 	this->speaker = speaker;
 	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR|SF_LOCKSCROLL;
-	DialogueFlags |= DF_IN_DIALOG;
+	DialogueFlags |= DF_IN_DIALOG|DF_START_DIALOG;
 	//allow mouse selection from dialog (even though screen is locked)
 	core->GetVideoDriver()->DisableMouse = false;
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
@@ -1322,7 +1322,7 @@ void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlg
 	//opening control size to maximum
 	ieDword index = core->GetGame()->ControlStatus&~3;
 	core->GetGame()->SetControlStatus(index + 2, BM_SET);
-	DialogChoose( (unsigned int) -1 );
+	//DialogChoose( (unsigned int) -1 );
 }
 
 /*try to break will only try to break it, false means unconditional stop*/
@@ -1365,6 +1365,7 @@ void GameControl::DialogChoose(unsigned int choose)
 {
 	char Tmp[256];
 
+	DialogueFlags&=~DF_START_DIALOG;
 	TextArea* ta = core->GetMessageTextArea();
 	if (!ta) {
 		printMessage("GameControl","Dialog aborted???",LIGHT_RED);

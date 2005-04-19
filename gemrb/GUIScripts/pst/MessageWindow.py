@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.27 2005/04/11 17:40:19 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.28 2005/04/19 20:11:47 avenger_teambg Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -58,6 +58,7 @@ def OnLoad():
 
 	MessageTA = GemRB.GetControl(MessageWindow, 1)
 	GemRB.SetTextAreaFlags(MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
+	GemRB.SetVar("MessageTextArea", MessageTA)
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
 	GemRB.SetVar("OptionsWindow", OptionsWindow)
 	GemRB.SetVar("MessageWindow", -1)
@@ -102,6 +103,7 @@ def UpdateControlStatus():
 	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow
 
 	Expand = GemRB.GetVar("MessageWindowSize")
+
 	GemRB.HideGUI()
 	if Expand:
 		GemRB.SetVar("MessageWindow", MessageWindow)

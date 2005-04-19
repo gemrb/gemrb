@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.296 2005/04/10 19:04:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.297 2005/04/19 20:11:53 avenger_teambg Exp $
  *
  */
 
@@ -1873,7 +1873,11 @@ void Interface::DrawWindows(void)
 			vars->SetAt( "MessageWindowSize", game->ControlStatus);
 			guiscript->RunFunction( "UpdateControlStatus" );
 			//giving control back to GameControl
-			SetControlStatus(0,0,0xff000000|IE_GUI_CONTROL_FOCUSED);
+			SetControlStatus(0,0,0x7f000000|IE_GUI_CONTROL_FOCUSED);
+			GameControl *gc = GetGameControl();
+			if (gc->GetDialogueFlags()&DF_START_DIALOG) {
+				gc->DialogChoose( (unsigned int) -1);
+			}
 		}
 	}
 	

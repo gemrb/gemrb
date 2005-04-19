@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.64 2005/04/08 16:54:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.65 2005/04/19 20:11:52 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -49,6 +49,7 @@ class GameControl;
 #define DF_TALKCOUNT      2
 #define DF_UNBREAKABLE    4
 #define DF_FREEZE_SCRIPTS 8
+#define DF_START_DIALOG   16
 
 //screen flags
 #define SF_DISABLEMOUSE  1
