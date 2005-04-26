@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.172 2005/04/18 19:15:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.173 2005/04/26 21:02:48 avenger_teambg Exp $
  *
  */
 
@@ -1081,6 +1081,7 @@ public:
 	static void PlaySound(Scriptable* Sender, Action* parameters);
 	static void PlaySoundNotRanged(Scriptable* Sender, Action* parameters);
 	static void PlaySoundPoint(Scriptable* Sender, Action* parameters);
+	static void Plunder(Scriptable* Sender, Action* parameters);
 	static void QuitGame(Scriptable* Sender, Action* parameters);
 	static void RandomWalk(Scriptable* Sender, Action* parameters);
 	static void RandomFly(Scriptable* Sender, Action* parameters);
@@ -1094,6 +1095,7 @@ public:
 	static void RemoveMapnote(Scriptable* Sender, Action* parameters);
 	static void RemovePaladinHood(Scriptable* Sender, Action* parameters);
 	static void RemoveRangerHood(Scriptable* Sender, Action* parameters);
+	static void RemoveSpell(Scriptable* Sender, Action* parameters);
 	static void ReputationInc(Scriptable* Sender, Action* parameters);
 	static void ReputationSet(Scriptable* Sender, Action* parameters);
 	static void RestorePartyLocation(Scriptable *Sender, Action* parameters);

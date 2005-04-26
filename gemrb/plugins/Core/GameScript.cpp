@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.261 2005/04/18 19:14:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.262 2005/04/26 21:02:46 avenger_teambg Exp $
  *
  */
 
@@ -488,6 +488,7 @@ static ActionLink actionnames[] = {
 	{"playsound", GameScript::PlaySound,0},
 	{"playsoundnotranged", GameScript::PlaySoundNotRanged,0},
 	{"playsoundpoint", GameScript::PlaySoundPoint,0},
+	{"plunder", GameScript::Plunder,AF_BLOCKING},
 	{"quitgame", GameScript::QuitGame, 0},
 	{"randomfly", GameScript::RandomFly, AF_BLOCKING},
 	{"randomwalk", GameScript::RandomWalk, AF_BLOCKING},
@@ -501,6 +502,7 @@ static ActionLink actionnames[] = {
 	{"removemapnote", GameScript::RemoveMapnote,0},
 	{"removepaladinhood", GameScript::RemovePaladinHood,0},
 	{"removerangerhood", GameScript::RemoveRangerHood,0},
+	{"removespell", GameScript::RemoveSpell,0},
 	{"reputationinc", GameScript::ReputationInc,0},
 	{"reputationset", GameScript::ReputationSet,0},
 	{"resetfogofwar", GameScript::UndoExplore,0}, //pst
@@ -3992,10 +3994,12 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* paramet
 	}
 	return 0;
 }
+/*
 //				0	1	2	3	4
 static char spellnames[5][5]={"ITEM", "SPPR", "SPWI", "SPIN", "SPCL"};
 
 #define CreateSpellName(spellname, data) sprintf(spellname,"%s%03d",spellnames[data/1000],data%1000)
+*/
 
 int GameScript::HaveSpell(Scriptable *Sender, Trigger *parameters)
 {
@@ -4004,11 +4008,14 @@ int GameScript::HaveSpell(Scriptable *Sender, Trigger *parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	if (parameters->string0Parameter[0]) {
-		return actor->spellbook.HaveSpell(parameters->string0Parameter, 1);
+		return actor->spellbook.HaveSpell(parameters->string0Parameter, 0);
 	}
+	return actor->spellbook.HaveSpell(parameters->int0Parameter, 0);
+/*
 	ieResRef tmpname;
 	CreateSpellName(tmpname, parameters->int0Parameter);
-	return actor->spellbook.HaveSpell(tmpname, 1);
+	return actor->spellbook.HaveSpell(tmpname, 0);
+*/
 }
 
 int GameScript::HaveAnySpells(Scriptable* Sender, Trigger* /*parameters*/)
@@ -4017,28 +4024,33 @@ int GameScript::HaveAnySpells(Scriptable* Sender, Trigger* /*parameters*/)
 		return 0;
 	}
 	Actor *actor = (Actor *) Sender;
-	return actor->spellbook.HaveSpell("", 1);
+	return actor->spellbook.HaveSpell("", 0);
 }
 
 int GameScript::HaveSpellParty(Scriptable* /*Sender*/, Trigger *parameters)
 {
 	Actor *actor;
-	char *poi;
-	ieResRef tmpname;
+	//char *poi;
+	//ieResRef tmpname;
 	Game *game=core->GetGame();
 
 	if (parameters->string0Parameter[0]) {
-		poi=parameters->string0Parameter;
+		//poi=parameters->string0Parameter;
+		//there is an assignment here
+		for (int i=0; (actor = game->GetPC(i)) ; i++) {
+			if (actor->spellbook.HaveSpell(parameters->string0Parameter, 0) ) {
+				return 1;
+			}
+		}
 	}
 	else {
-		CreateSpellName(tmpname, parameters->int0Parameter);
-		poi=tmpname;
-	}
-	//there is an assignment here
-	for (int i=0; (actor = game->GetPC(i)) ; i++) {
-		if (actor->spellbook.HaveSpell(poi, 1) ) {
-			return 1;
+		for (int i=0; (actor = game->GetPC(i)) ; i++) {
+			if (actor->spellbook.HaveSpell(parameters->int0Parameter, 0) ) {
+				return 1;
+			}
 		}
+		//CreateSpellName(tmpname, parameters->int0Parameter);
+		//poi=tmpname;
 	}
 	return 0;
 }
@@ -7424,14 +7436,17 @@ void GameScript::UnMakeGlobal(Scriptable* Sender, Action* /*parameters*/)
 	}
 }
 
+//this apparently doesn't check the gold, thus could be used from non actors
 void GameScript::GivePartyGoldGlobal(Scriptable* Sender, Action* parameters)
 {
+/*
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
+*/
 	ieDword gold = (unsigned long) CheckVariable( Sender, parameters->string0Parameter );
-	act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
+	//act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
 	core->GetGame()->PartyGold += gold;
 }
 
@@ -8756,6 +8771,33 @@ void GameScript::DropInventory(Scriptable *Sender, Action* /*parameters*/)
 	scr->DropItem("",0);
 }
 
+void GameScript::Plunder(Scriptable *Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor *scr = (Actor *) tar;
+	//can plunder only dead actors
+	if (! (scr->GetStat(IE_STATE_ID)&STATE_DEAD) ) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	if (Distance(Sender, tar)>MAX_OPERATING_DISTANCE*20 ) {
+		GoNearAndRetry(Sender, tar);
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	//move all movable item from the target to the Sender
+	//the rest will be dropped at the feet of Sender
+	while(MoveItemCore(tar, Sender, "",0)!=MIC_NOITEM);
+}
+
 void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -8767,6 +8809,12 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 	Actor *snd = (Actor *) Sender;
 	Actor *scr = (Actor *) tar;
+	//for PP one must go REALLY close
+	if (Distance(Sender, tar)>10 ) {
+		GoNearAndRetry(Sender, tar);
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	//find a candidate item for stealing (unstealable items are noticed)
 	int slot = tar->inventory.FindItem("", IE_INV_ITEM_UNSTEALABLE | IE_INV_ITEM_EQUIPPED);
 	int money=0;
@@ -9134,6 +9182,24 @@ void GameScript::AddSpecialAbility( Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	actor->LearnSpell (parameters->string0Parameter, parameters->int0Parameter);
+}
+
+void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	if (parameters->string0Parameter[0]) {
+		actor->spellbook.HaveSpell(parameters->string0Parameter, HS_DEPLETE);
+		return;
+	}
+	actor->spellbook.HaveSpell(parameters->int0Parameter, HS_DEPLETE);
+/*
+	ieResRef tmpname;
+	CreateSpellName(tmpname, parameters->int0Parameter);
+	actor->spellbook.HaveSpell(tmpname, HS_DEPLETE);
+*/
 }
 
 void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)

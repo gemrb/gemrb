@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.10 2004/12/17 23:23:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.11 2005/04/26 21:02:48 avenger_teambg Exp $
  *
  */
 
@@ -39,6 +39,9 @@
 #else
 #define GEM_EXPORT
 #endif
+
+//HaveSpell flags
+#define HS_DEPLETE 1
 
 //LearnSpell flags
 #define LS_ADDXP  1

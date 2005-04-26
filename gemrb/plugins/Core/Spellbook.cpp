@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.21 2005/04/11 17:40:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.22 2005/04/26 21:02:48 avenger_teambg Exp $
  *
  */
 
@@ -55,7 +55,9 @@ void Spellbook::FreeSpellPage(CRESpellMemorization *sm)
 //ITEM, SPPR, SPWI, SPIN, SPCL
 int sections[]={3,0,1,2,2};
 
-bool Spellbook::HaveSpell(int spellid, ieDword /*flags*/)
+//flags bits
+// 1 - unmemorize it
+bool Spellbook::HaveSpell(int spellid, ieDword flags)
 {
 	int type = spellid/1000;
 	type = sections[type];
@@ -65,8 +67,11 @@ bool Spellbook::HaveSpell(int spellid, ieDword /*flags*/)
 		CRESpellMemorization* sm = spells[type][j];
 		for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
 			CREMemorizedSpell* ms = sm->memorized_spells[k];
-			if (ms->Flags&1) {
+			if (ms->Flags) {
 				if (atoi(ms->SpellResRef+4)==spellid) {
+					if (flags&HS_DEPLETE) {
+						ms->Flags=0;
+					}
 					return true;
 				}
 			}
@@ -76,16 +81,19 @@ bool Spellbook::HaveSpell(int spellid, ieDword /*flags*/)
 }
 
 //if resref=="" then it is a haveanyspell
-bool Spellbook::HaveSpell(const char *resref, ieDword /*flags*/)
+bool Spellbook::HaveSpell(const char *resref, ieDword flags)
 {
 	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
 			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
 				CREMemorizedSpell* ms = sm->memorized_spells[k];
-				if (ms->Flags&1) {
+				if (ms->Flags) {
 					if (resref[0] && stricmp(ms->SpellResRef, resref) ) {
 						continue;
+					}
+					if (flags&HS_DEPLETE) {
+						ms->Flags=0;
 					}
 					return true;
 				}
