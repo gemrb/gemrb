@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.29 2005/04/11 17:40:19 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.30 2005/04/28 22:12:15 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -168,7 +168,15 @@ def RestPress ():
 	print "RestPress"
 
 def SetupActionsWindowControls (Window):
+	# time button
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetAnimation (Window, Button, "WMTIME")
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+
 	# 41627 - Return to the Game World
+	Button = GemRB.GetControl (Window, 2)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetTooltip (Window, Button, 41627)
 
 	# Select all characters
 	Button = GemRB.GetControl (Window, 1)
