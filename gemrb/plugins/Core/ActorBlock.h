@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.69 2005/04/18 19:14:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.70 2005/04/29 21:53:01 avenger_teambg Exp $
  *
  */
 
@@ -220,7 +220,7 @@ public:
 class GEM_EXPORT Moveble : public Selectable {
 private: //these seem to be sensitive, so get protection
 	unsigned char StanceID;
-	unsigned char Orientation;
+	unsigned char Orientation, NewOrientation;
 public:
 	Moveble(ScriptableType type);
 	virtual ~Moveble(void);
@@ -237,18 +237,29 @@ public:
 	inline unsigned char GetOrientation() {
 		return Orientation;
 	}
+	inline unsigned char GetNextFace() {
+		//slow turning
+		if (Orientation != NewOrientation) {
+			if ( ( (NewOrientation-Orientation) & (MAX_ORIENT-1) ) <= MAX_ORIENT/2) {
+				Orientation++;
+			} else {
+				Orientation--;
+			}
+			Orientation = Orientation&(MAX_ORIENT-1);
+		}
+
+		return Orientation;
+	}
 	inline unsigned char GetStance() {
 		return StanceID;
 	}
 
-	inline void SetOrientation(int value) {
-		Orientation=(unsigned char) value;
-#ifdef _DEBUG
-		if (Orientation>=MAX_ORIENT) {
-			printf("We are badly oriented!\n");
-			abort();
+	inline void SetOrientation(int value, bool slow) {
+		//MAX_ORIENT == 16, so we can do this
+		NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
+		if (!slow) {
+			Orientation = NewOrientation;
 		}
-#endif
 	}
 
 	void SetStance(unsigned int arg);

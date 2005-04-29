@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.158 2005/04/18 19:15:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.159 2005/04/29 21:53:01 avenger_teambg Exp $
  *
  */
 
@@ -619,7 +619,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			}
 
 			unsigned char StanceID = actor->GetStance();
-			Animation* anim = ca->GetAnimation( StanceID, actor->GetOrientation() );
+			Animation* anim = ca->GetAnimation( StanceID, actor->GetNextFace() );
 			if (anim) {
 				Sprite2D* nextFrame = anim->NextFrame();
 				if (nextFrame) {

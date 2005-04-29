@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.87 2005/04/18 19:14:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.88 2005/04/29 21:53:01 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -430,22 +430,22 @@ void Moveble::DoStep()
 	Pos.x = ( step->x * 16 ) + 8;
 	Pos.y = ( step->y * 12 ) + 6;
 	if (!step->Next) {
-		//printf("Last Step\n");
 		ClearPath();
-	} else {
-		if (step->Next->x > step->x)
-			Pos.x += ( unsigned short )
-				( ( ( ( ( step->Next->x * 16 ) + 8 ) - Pos.x ) * ( time - timeStartStep ) ) / STEP_TIME );
-		else
-			Pos.x -= ( unsigned short )
-				( ( ( Pos.x - ( ( step->Next->x * 16 ) + 8 ) ) * ( time - timeStartStep ) ) / STEP_TIME );
-		if (step->Next->y > step->y)
-			Pos.y += ( unsigned short )
-				( ( ( ( ( step->Next->y * 12 ) + 6 ) - Pos.y ) * ( time - timeStartStep ) ) / STEP_TIME );
-		else
-			Pos.y -= ( unsigned short )
-				( ( ( Pos.y - ( ( step->Next->y * 12 ) + 6 ) ) * ( time - timeStartStep ) ) / STEP_TIME );
+		NewOrientation = Orientation;
+		return;
 	}
+	if (step->Next->x > step->x)
+		Pos.x += ( unsigned short )
+			( ( ( ( ( step->Next->x * 16 ) + 8 ) - Pos.x ) * ( time - timeStartStep ) ) / STEP_TIME );
+	else
+		Pos.x -= ( unsigned short )
+			( ( ( Pos.x - ( ( step->Next->x * 16 ) + 8 ) ) * ( time - timeStartStep ) ) / STEP_TIME );
+	if (step->Next->y > step->y)
+		Pos.y += ( unsigned short )
+			( ( ( ( ( step->Next->y * 12 ) + 6 ) - Pos.y ) * ( time - timeStartStep ) ) / STEP_TIME );
+	else
+		Pos.y -= ( unsigned short )
+			( ( ( Pos.y - ( ( step->Next->y * 12 ) + 6 ) ) * ( time - timeStartStep ) ) / STEP_TIME );
 }
 
 void Moveble::AddWayPoint(Point &Des)
