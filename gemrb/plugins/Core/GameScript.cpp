@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.264 2005/04/30 18:59:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.265 2005/04/30 19:36:16 avenger_teambg Exp $
  *
  */
 
@@ -45,7 +45,7 @@ static int happiness[3][20];
 static int ObjectIDSCount = 7;
 static int MaxObjectNesting = 5;
 static bool HasAdditionalRect = false;
-static std::vector< char*> ObjectIDSTableNames;
+static ieResRef *ObjectIDSTableNames;
 static int ObjectFieldsCount = 7;
 static int ExtraParametersCount = 0;
 static int RandomNumValue;
@@ -1025,6 +1025,7 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 			abort();
 		}
 		
+		ObjectIDSTableNames = (ieResRef *) malloc( sizeof(ieResRef) * ObjectIDSCount );
 		for (i = 0; i < ObjectIDSCount; i++) {
 			char *idsname;
 			idsname=objNameTable->QueryField( 0, i + 1 );
@@ -1035,7 +1036,8 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 			else {
 				idtargets[i]=poi->Function;
 			}
-			ObjectIDSTableNames.push_back( idsname );
+			strnuprcpy(ObjectIDSTableNames[i], idsname, 8 );
+			//ObjectIDSTableNames.push_back( idsname );
 		}
 		MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 		if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
@@ -2078,7 +2080,7 @@ void GameScript::DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 			core->DisplayString( sb.text );
 	}
 	if (sb.Sound[0] ) {
-		ieDword len = core->GetSoundMgr()->Play( sb.Sound, Sender->Pos.x, Sender->Pos.y );
+		ieDword len = core->GetSoundMgr()->Play( sb.Sound );
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 		if ((counter != 0) && (flags &DS_WAIT) )
 			Sender->SetWait( counter );
