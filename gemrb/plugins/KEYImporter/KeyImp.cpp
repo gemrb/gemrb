@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.54 2005/04/08 20:45:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.55 2005/04/30 18:59:02 avenger_teambg Exp $
  *
  */
 
@@ -227,6 +227,10 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type)
 		"Found in GemRB Override" );
 	FindIn( core->GamePath, core->GameOverride, resname, type,
 		"Found in Override" );
+	FindIn( core->GamePath, core->GameSounds, resname, type,
+		"Found in Sounds" );
+	FindIn( core->GamePath, core->GameScripts, resname, type,
+		"Found in Scripts" );
 	FindIn( core->GamePath, core->GameData, resname, type,
 		"Found in Data" );
 	unsigned int ResLocator;

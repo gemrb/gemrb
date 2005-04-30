@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.263 2005/04/29 21:53:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.264 2005/04/30 18:59:00 avenger_teambg Exp $
  *
  */
 
@@ -1968,13 +1968,14 @@ void GameScript::ExecuteString(Scriptable* Sender, char* String)
 	return;
 }
 
-bool GameScript::EvaluateString(Scriptable* Sender, char* String)
+//This must return integer because Or(3) returns 3
+int GameScript::EvaluateString(Scriptable* Sender, char* String)
 {
 	if (String[0] == 0) {
-		return false;
+		return 0;
 	}
 	Trigger* tri = GenerateTrigger( String );
-	bool ret = EvaluateTrigger( Sender, tri )!=0;
+	int ret = EvaluateTrigger( Sender, tri );
 	tri->Release();
 	return ret;
 }
@@ -2077,7 +2078,7 @@ void GameScript::DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 			core->DisplayString( sb.text );
 	}
 	if (sb.Sound[0] ) {
-		ieDword len = core->GetSoundMgr()->Play( sb.Sound );
+		ieDword len = core->GetSoundMgr()->Play( sb.Sound, Sender->Pos.x, Sender->Pos.y );
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 		if ((counter != 0) && (flags &DS_WAIT) )
 			Sender->SetWait( counter );

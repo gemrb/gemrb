@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.298 2005/04/29 21:53:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.299 2005/04/30 18:59:00 avenger_teambg Exp $
  *
  */
 
@@ -126,17 +126,19 @@ Interface::Interface(int iargc, char** iargv)
 	GemRBPath[0] = 0;
 	PluginsPath[0] = 0;
 	GameName[0] = 0;
-	memcpy( GameOverride, "override", 9 );
-	memcpy( GameData, "data\0\0\0\0", 9 );
-	strcpy( INIConfig, "baldur.ini" );
-	memcpy( ButtonFont, "STONESML", 9 );
-	memcpy( TooltipFont, "STONESML", 9 );
-	memcpy( CursorBam, "CAROT\0\0\0", 9 );
-	memcpy( GlobalScript, "BALDUR\0\0", 9 );
-	memcpy( WorldMapName, "WORLDMAP", 9 );
-	strcpy( Palette16, "MPALETTE" );
-	strcpy( Palette32, "PAL32" );
-	strcpy( Palette256, "MPAL256" );
+	strncpy( GameOverride, "override", sizeof(GameOverride) );
+	strncpy( GameSounds, "sounds", sizeof(GameSounds) );
+	strncpy( GameScripts, "scripts", sizeof(GameScripts) );
+	strncpy( GameData, "data", sizeof(GameData) );
+	strncpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
+	strncpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
+	strncpy( TooltipFont, "STONESML", sizeof(TooltipFont) );
+	strncpy( CursorBam, "CAROT", sizeof(CursorBam) );
+	strncpy( GlobalScript, "BALDUR", sizeof(GlobalScript) );
+	strncpy( WorldMapName, "WORLDMAP", sizeof(WorldMapName) );
+	strncpy( Palette16, "MPALETTE", sizeof(Palette16) );
+	strncpy( Palette32, "PAL32", sizeof(Palette32) );
+	strncpy( Palette256, "MPAL256", sizeof(Palette256) );
 	strcpy( TooltipBackResRef, "\0" );
 	TooltipColor.r = 0;
 	TooltipColor.g = 255;
@@ -1157,9 +1159,13 @@ bool Interface::LoadConfig(const char* filename)
 		} else if (stricmp( name, "TooltipDelay" ) == 0) {
 			TooltipDelay = atoi( value );
 		} else if (stricmp( name, "GameDataPath" ) == 0) {
-			strncpy( GameData, value, 8 );
+			strncpy( GameData, value, sizeof(GameData) );
 		} else if (stricmp( name, "GameOverridePath" ) == 0) {
-			strncpy( GameOverride, value, 8 );
+			strncpy( GameOverride, value, sizeof(GameOverride) );
+		} else if (stricmp( name, "GameScriptsPath" ) == 0) {
+			strncpy( GameScripts, value, sizeof(GameScripts) );
+		} else if (stricmp( name, "GameSoundsPath" ) == 0) {
+			strncpy( GameSounds, value, sizeof(GameSounds) );
 		} else if (stricmp( name, "GameName" ) == 0) {
 			strcpy( GameName, value );
 		} else if (stricmp( name, "GameType" ) == 0) {
@@ -2269,7 +2275,7 @@ int Interface::GetCharSounds(TextArea* ta)
 	int count = 0;
 	char Path[_MAX_PATH];
 
-	PathJoin( Path, GamePath, "sounds", NULL );
+	PathJoin( Path, GamePath, GameSounds, NULL );
 	hasfolders = ( HasFeature( GF_SOUNDFOLDERS ) != 0 );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
@@ -2713,7 +2719,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 			break;
 	}
 
-	char* text = GetString( stridx );
+	char* text = GetString( stridx, IE_STR_SOUND|IE_STR_SPEECH );
 	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
 		+ strlen( text ) + 10);
 	char* newstr = ( char* ) malloc( newlen );

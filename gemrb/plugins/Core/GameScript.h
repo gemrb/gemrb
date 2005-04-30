@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.173 2005/04/26 21:02:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.174 2005/04/30 18:59:00 avenger_teambg Exp $
  *
  */
 
@@ -675,7 +675,7 @@ public:
 		const char* Context, ieDword value);
 	static void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 	static void ExecuteString(Scriptable* Sender, char* String);
-	static bool EvaluateString(Scriptable* Sender, char* String);
+	static int EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 	static Action* GenerateAction(char* String, bool autoFree=false);
 	static void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust);

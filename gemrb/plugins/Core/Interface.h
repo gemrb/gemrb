@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.151 2005/04/10 19:11:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.152 2005/04/30 18:59:01 avenger_teambg Exp $
  *
  */
 
@@ -420,8 +420,10 @@ private:
 	bool ReadItemTable(ieResRef item, const char *Prefix);
 
 public:
-	char GameData[9];
-	char GameOverride[9];
+	char GameData[12];
+	char GameOverride[12];
+	char GameSounds[12];
+	char GameScripts[12];
 	ieResRef GameNameResRef;
 	ieResRef GoldResRef; //MISC07.itm
 	Variables *RtRows;
