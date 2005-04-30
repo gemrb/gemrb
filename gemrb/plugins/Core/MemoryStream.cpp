@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.20 2005/03/05 16:24:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.cpp,v 1.21 2005/04/30 22:48:20 avenger_teambg Exp $
  *
  */
 
@@ -25,7 +25,7 @@
 MemoryStream::MemoryStream(void* buffer, int length, bool autoFree)
 {
 	ptr = buffer;
-	this->length = length;
+	size = length;
 	Pos = 0;
 	strcpy( filename, "" );
 	this->autoFree = autoFree;
@@ -40,7 +40,7 @@ MemoryStream::~MemoryStream(void)
 
 int MemoryStream::Read(void* dest, unsigned int length)
 {
-	if (length + Pos > this->length) {
+	if (length + Pos > size) {
 		return GEM_ERROR;
 	}
 	ieByte* p = ( ieByte* ) ptr + Pos;
@@ -56,7 +56,7 @@ int MemoryStream::Seek(int newpos, int type)
 {
 	switch (type) {
 		case GEM_CURRENT_POS:
-			if (( Pos + newpos ) > length) {
+			if (( Pos + newpos ) > size) {
 				printf("[Streams]: Invalid seek\n");
 				return GEM_ERROR;
 			}
@@ -64,7 +64,7 @@ int MemoryStream::Seek(int newpos, int type)
 			break;
 
 		case GEM_STREAM_START:
-			if ((unsigned long) newpos > length) {
+			if ((unsigned long) newpos > size) {
 				printf("[Streams]: Invalid seek\n");
 				return GEM_ERROR;
 			}
@@ -77,10 +77,6 @@ int MemoryStream::Seek(int newpos, int type)
 	return GEM_OK;
 }
 
-unsigned long MemoryStream::Size() const
-{
-	return length;
-}
 /** No descriptions */
 int MemoryStream::ReadLine(void* buf, unsigned int maxlen)
 {
@@ -88,14 +84,14 @@ int MemoryStream::ReadLine(void* buf, unsigned int maxlen)
 		return 0;
 	}
 	unsigned char * p = ( unsigned char * ) buf;
-	if (Pos >= length) {
+	if (Pos >= size) {
 		p[0]=0;
 		return -1;
 	}
 	unsigned int i = 0;
 	while (i < ( maxlen - 1 )) {
 		ieByte ch = *( ( ieByte* ) ptr + Pos );
-		if (Pos == length)
+		if (Pos == size)
 			break;
 		if (Encrypted)
 			p[i] ^= GEM_ENCRYPTION_KEY[Pos & 63];

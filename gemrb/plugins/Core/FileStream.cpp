@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.33 2005/03/05 16:24:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.34 2005/04/30 22:48:19 avenger_teambg Exp $
  *
  */
 
@@ -190,10 +190,6 @@ int FileStream::Seek(int newpos, int type)
 	return GEM_OK;
 }
 
-unsigned long FileStream::Size() const
-{
-	return size;
-}
 /** No descriptions */
 int FileStream::ReadLine(void* buf, unsigned int maxlen)
 {

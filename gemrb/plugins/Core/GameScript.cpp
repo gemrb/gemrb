@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.265 2005/04/30 19:36:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.266 2005/04/30 22:48:20 avenger_teambg Exp $
  *
  */
 
@@ -3306,17 +3306,17 @@ int GameScript::HappinessLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::Reputation(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->Reputation == (ieDword) parameters->int0Parameter;
+	return core->GetGame()->Reputation/10 == (ieDword) parameters->int0Parameter;
 }
 
 int GameScript::ReputationGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->Reputation > (ieDword) parameters->int0Parameter;
+	return core->GetGame()->Reputation/10 > (ieDword) parameters->int0Parameter;
 }
 
 int GameScript::ReputationLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->Reputation < (ieDword) parameters->int0Parameter;
+	return core->GetGame()->Reputation/10 < (ieDword) parameters->int0Parameter;
 }
 
 int GameScript::Alignment(Scriptable* Sender, Trigger* parameters)
@@ -4647,12 +4647,12 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		case ST_DOOR:
 		{
 			Door *door =(Door *) tar;
-			return (int) (door->IsOpen()) == parameters->int0Parameter;
+			return !door->IsOpen() == !parameters->int0Parameter;
 		}
 		case ST_CONTAINER:
 		{
 			Container *cont = (Container *) tar;
-			return (int) (cont->Flags&CONT_LOCKED) == parameters->int0Parameter;
+			return !(cont->Flags&CONT_LOCKED) == !parameters->int0Parameter;
 		}
 		default:; //to remove a warning
 	}

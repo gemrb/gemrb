@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.h,v 1.10 2005/03/05 16:24:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MemoryStream.h,v 1.11 2005/04/30 22:48:20 avenger_teambg Exp $
  *
  */
 
@@ -39,7 +39,7 @@
 class GEM_EXPORT MemoryStream : public DataStream {
 private:
 	void* ptr;
-	unsigned long length;
+	//unsigned long length;
 	bool autoFree;
 public:
 	MemoryStream(void* buffer, int length, bool autoFree = true);
@@ -50,7 +50,6 @@ public:
 		return GEM_ERROR;
 	}
 	int Seek(int pos, int startpos);
-	unsigned long Size() const;
 	/** No descriptions */
 	int ReadLine(void* buf, unsigned int maxlen);
 };
