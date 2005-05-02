@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.46 2005/04/09 10:57:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.47 2005/05/02 17:26:25 avenger_teambg Exp $
  *
  */
 
@@ -161,7 +161,7 @@ int TLKImp::GenderStrRef(int slot, int malestrref, int femalestrref)
 	Actor *act;
 
 	act = GetActorFromSlot(slot);
-	if(act && act->GetStat(IE_SEX)==2) {
+	if(act && (act->GetStat(IE_SEX)==2) ) {
 		return femalestrref;
 	}
 	return malestrref;
@@ -241,23 +241,23 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		goto exit_function;
 	}
 	if (!strcmp( Token, "MALEFEMALE" )) {
-		Decoded = GetString( GenderStrRef(-1,27483,27482), 0);
+		Decoded = GetString( GenderStrRef(-1,27482,27483), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "HESHE" )) {
-		Decoded = GetString( GenderStrRef(-1,27485,27484), 0);
+		Decoded = GetString( GenderStrRef(-1,27484,27485), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "HISHER" )) {
-		Decoded = GetString( GenderStrRef(-1,27487,27486), 0);
+		Decoded = GetString( GenderStrRef(-1,27486,27487), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "HIMHER" )) {
-		Decoded = GetString( GenderStrRef(-1,27487,27488), 0);
+		Decoded = GetString( GenderStrRef(-1,27488,27487), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "MANWOMAN" )) {
-		Decoded = GetString( GenderStrRef(-1,27490,27489), 0);
+		Decoded = GetString( GenderStrRef(-1,27489,27490), 0);
 		goto exit_function;
 	}
 	if (!strncmp( Token, "PLAYER",6 )) {
@@ -292,23 +292,23 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		goto exit_function;
 	}
 	if (!strcmp( Token, "PRO_MALEFEMALE" )) {
-		Decoded = GetString( GenderStrRef(0,27483,27482), 0);
+		Decoded = GetString( GenderStrRef(0,27482,27483), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "PRO_HESHE" )) {
-		Decoded = GetString( GenderStrRef(0,27485,27484), 0);
+		Decoded = GetString( GenderStrRef(0,27484,27485), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "PRO_HISHER" )) {
-		Decoded = GetString( GenderStrRef(0,27487,27486), 0);
+		Decoded = GetString( GenderStrRef(0,27486,27487), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "PRO_HIMHER" )) {
-		Decoded = GetString( GenderStrRef(0,27487,27488), 0);
+		Decoded = GetString( GenderStrRef(0,27488,27487), 0);
 		goto exit_function;
 	}
 	if (!strcmp( Token, "PRO_MANWOMAN" )) {
-		Decoded = GetString( GenderStrRef(0,27490,27489), 0);
+		Decoded = GetString( GenderStrRef(0,27489,27490), 0);
 		goto exit_function;
 	}
 
