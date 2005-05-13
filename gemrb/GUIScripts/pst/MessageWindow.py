@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.28 2005/04/19 20:11:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.29 2005/05/13 16:40:10 avenger_teambg Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -92,17 +92,17 @@ def OnLoad():
 
 	
 def OnIncreaseSize():
-	GemRB.GameSetScreenFlags(2, OP_SET)
+	GemRB.GameSetScreenFlags(GS_LARGEDIALOG, OP_OR)
 
 
 def OnDecreaseSize():
-	GemRB.GameSetScreenFlags(0, OP_SET)
+	GemRB.GameSetScreenFlags(GS_LARGEDIALOG, OP_NAND)
 
 
 def UpdateControlStatus():
 	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow
 
-	Expand = GemRB.GetVar("MessageWindowSize")
+	Expand = GemRB.GetVar("MessageWindowSize") & GS_DIALOGMASK
 
 	GemRB.HideGUI()
 	if Expand:

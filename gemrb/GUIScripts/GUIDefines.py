@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.37 2005/04/19 16:04:08 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.38 2005/05/13 16:40:09 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -109,9 +109,14 @@ WINDOW_SCALE         = 0x08
 WINDOW_BOUNDED       = 0x10
 
 # GameScreen flags
-GS_DIALOGMASK        = 3
-GS_OPTIONPANE        = 4
-GS_PORTRAITPANE      = 8
+GS_PARTYAI           = 1
+GS_SMALLDIALOG       = 0
+GS_MEDIUMDIALOG      = 2
+GS_LARGEDIALOG       = 6
+GS_DIALOGMASK        = 6
+GS_HIDEGUI           = 16
+GS_OPTIONPANE        = 32
+GS_PORTRAITPANE      = 64
 
 # Shadow color for ShowModal()
 # !!! Keep these synchronized with Interface.h !!!
