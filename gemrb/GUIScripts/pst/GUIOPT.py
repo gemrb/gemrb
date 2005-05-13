@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.15 2005/03/20 21:28:26 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.16 2005/05/13 17:07:49 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -51,11 +51,13 @@ LoadMsgWindow = None
 QuitMsgWindow = None
 MoviesWindow = None
 KeysWindow = None
+PortraitWindow = None
+ActionsWindow = None
 
 ###################################################
 def OpenOptionsWindow ():
 	"""Open main options window (peacock tail)"""
-	global OptionsWindow
+	global OptionsWindow, PortraitWindow, ActionsWindow
 
 	if CloseOtherWindow (OpenOptionsWindow):
 		if VideoOptionsWindow: OpenVideoOptionsWindow ()
@@ -70,8 +72,12 @@ def OpenOptionsWindow ():
 		
 		GemRB.HideGUI ()
 		GemRB.UnloadWindow (OptionsWindow)
-		OptionsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
+		GemRB.SetVar ("PortraitWindow", PortraitWindow)
+		GemRB.SetVar ("ActionsWindow", ActionsWindow)
+		OptionsWindow = None
+		PortraitWindow = None
+		ActionsWindow = None
 		
 		GemRB.UnhideGUI ()
 		return
@@ -80,6 +86,10 @@ def OpenOptionsWindow ():
 	GemRB.LoadWindowPack ("GUIOPT")
 	OptionsWindow = Window = GemRB.LoadWindow (0)
 	GemRB.SetVar ("OtherWindow", OptionsWindow)
+	PortraitWindow = GemRB.GetVar ("PortraitWindow")
+	GemRB.SetVar ("PortraitWindow", -1)
+	ActionsWindow = GemRB.GetVar ("ActionsWindow")
+	GemRB.SetVar ("ActionsWindow", -1)
 	
 	# Return to Game
 	Button = GemRB.GetControl (Window, 0)
