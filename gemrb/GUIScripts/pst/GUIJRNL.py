@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.13 2005/03/20 21:28:26 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.14 2005/05/13 16:34:20 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -37,6 +37,8 @@ JournalWindow = None
 LogWindow = None
 BeastsWindow = None
 QuestsWindow = None
+PortraitWindow = None
+ActionsWindow = None
 
 # list of all assigned (0) or completed (1) quests
 global quests
@@ -60,7 +62,8 @@ StartTime = 0
 
 ###################################################
 def OpenJournalWindow ():
-	global JournalWindow, StartTime
+	global JournalWindow, PortraitWindow, ActionsWindow
+	global StartTime
 
 	Table = GemRB.LoadTable("YEARS")
 	StartTime = GemRB.GetTableValue(Table, "STARTTIME", "VALUE")
@@ -74,8 +77,13 @@ def OpenJournalWindow ():
 		GemRB.HideGUI ()
 		
 		GemRB.UnloadWindow(JournalWindow)
+		#making the portraitwindow visible again
+		GemRB.SetVar ("PortraitWindow", PortraitWindow)
+		GemRB.SetVar ("ActionsWindow", ActionsWindow)
+		GemRB.SetVar ("OtherWindow", -1)
+		PortraitWindow = None
+		ActionsWindow = None
 		JournalWindow = None
-		GemRB.SetVar("OtherWindow", -1)
 		
 		GemRB.UnhideGUI ()
 		return
@@ -83,7 +91,11 @@ def OpenJournalWindow ():
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIJRNL")
 	JournalWindow = GemRB.LoadWindow (0)
-	GemRB.SetVar("OtherWindow", JournalWindow)
+	GemRB.SetVar ("OtherWindow", JournalWindow)
+	PortraitWindow = GemRB.GetVar ("PortraitWindow")
+	GemRB.SetVar ("PortraitWindow", -1)
+	ActionsWindow = GemRB.GetVar ("ActionsWindow")
+	GemRB.SetVar ("ActionsWindow", -1)
 
 	# Quests
 	Button = GemRB.GetControl (JournalWindow, 0)
@@ -120,13 +132,13 @@ def OpenQuestsWindow ():
 		GemRB.UnloadWindow(QuestsWindow)
 		QuestsWindow = None
 		
-		GemRB.SetVar("OtherWindow", JournalWindow)
+		GemRB.SetVar ("OtherWindow", JournalWindow)
 		
 		GemRB.UnhideGUI()
 		return
 	
 	QuestsWindow = Window = GemRB.LoadWindow (1)
-	GemRB.SetVar("OtherWindow", Window)
+	GemRB.SetVar ("OtherWindow", Window)
 	
 	# Assigned
 	Button = GemRB.GetControl (Window, 8)
@@ -288,13 +300,13 @@ def OpenBeastsWindow ():
 		GemRB.UnloadWindow(BeastsWindow)
 		BeastsWindow = None
 		
-		GemRB.SetVar("OtherWindow", JournalWindow)
+		GemRB.SetVar ("OtherWindow", JournalWindow)
 		
 		GemRB.UnhideGUI()
 		return
 	
 	BeastsWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar("OtherWindow", BeastsWindow)
+	GemRB.SetVar ("OtherWindow", BeastsWindow)
 
 	# PC
 	Button = GemRB.GetControl (BeastsWindow, 5)
@@ -396,13 +408,13 @@ def OpenLogWindow ():
 		GemRB.UnloadWindow(LogWindow)
 		LogWindow = None
 		
-		GemRB.SetVar("OtherWindow", JournalWindow)
+		GemRB.SetVar ("OtherWindow", JournalWindow)
 		
 		GemRB.UnhideGUI()
 		return
 	
 	LogWindow = Window = GemRB.LoadWindow (3)
-	GemRB.SetVar("OtherWindow", Window)
+	GemRB.SetVar ("OtherWindow", Window)
 
 	# Back
 	Button = GemRB.GetControl (Window, 1)
