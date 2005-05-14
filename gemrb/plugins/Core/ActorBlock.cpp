@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.88 2005/04/29 21:53:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.89 2005/05/14 11:18:07 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -637,8 +637,8 @@ void Door::ToggleTiles(int State, bool playsound)
 	for (i = 0; i < count; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = state;
 	}
-	//clear the locked flag and set door_open as state
-	Flags = (Flags & ~(DOOR_OPEN|DOOR_LOCKED) ) | State;
+	//set door_open as state
+	Flags = (Flags & ~DOOR_OPEN) | (State==!core->HasFeature(GF_REVERSE_DOOR) );
 }
 
 //this is the short name (not the scripting name)
@@ -679,7 +679,8 @@ bool Door::IsOpen() const
 
 void Door::SetDoorOpen(bool Open, bool playsound)
 {
-	ToggleTiles (Open == !core->HasFeature(GF_REVERSE_DOOR), playsound);
+	if (Open) SetDoorLocked(false,playsound);
+	ToggleTiles (Open, playsound);
 	UpdateDoor ();
 	area->FixAllPositions();
 }

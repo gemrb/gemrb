@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.61 2005/03/25 21:30:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.62 2005/05/14 11:18:05 avenger_teambg Exp $
  *
  */
 
@@ -38,12 +38,12 @@
 #define MUSICBUFFERS 10
 
 static AudioStream streams[MAX_STREAMS], speech;
-static CSoundReader *MusicReader;
 static ALuint MusicSource, MusicBuffers[MUSICBUFFERS];
-static SDL_mutex* musicMutex;
-static bool musicPlaying;
-static SDL_Thread* musicThread;
-static unsigned char* static_memory;
+static bool musicPlaying, stayAlive;
+static CSoundReader *MusicReader = NULL;
+static SDL_mutex* musicMutex = NULL;
+static SDL_Thread* musicThread = NULL;
+static unsigned char* static_memory = NULL;
 
 static int isWAVC(DataStream* stream)
 {
@@ -118,7 +118,7 @@ int ACMImp::PlayListManager(void* /*data*/)
 {
 	ALuint buffersreturned = 0;
 	ALboolean bFinished = AL_FALSE;
-	while (true) {
+	while (stayAlive) {
 		SDL_mutexP( musicMutex );
 		if (musicPlaying) {
 			ALint state;
@@ -209,12 +209,16 @@ ACMImp::ACMImp(void)
 	musicPlaying = false;
 	musicMutex = SDL_CreateMutex();
 	static_memory = (unsigned char *) malloc(ACM_BUFFERSIZE);
+	stayAlive = true;
 	musicThread = SDL_CreateThread( PlayListManager, NULL );
 	ambim = new AmbientMgrAL();
 }
 
 ACMImp::~ACMImp(void)
 {
+	//signal the thread to quit on its own
+	stayAlive = false;
+	SDL_Delay( 30 );
 	//locking the mutex so we could gracefully kill the thread
 	SDL_mutexP( musicMutex );
 	//the thread is safely killable now
@@ -226,6 +230,7 @@ ACMImp::~ACMImp(void)
 	clearstreams( true );
 	if(MusicReader) {
 		delete MusicReader;
+		MusicReader = NULL;
 	}
 	//freeing the memory of the music thread
 	free(static_memory);
@@ -456,7 +461,8 @@ unsigned int ACMImp::StreamFile(const char* filename)
 	}
 	SDL_mutexP( musicMutex );
 	if (MusicReader) {
-		delete( MusicReader );
+		delete MusicReader;
+		MusicReader = NULL;
 	}
 	if (MusicBuffers[0] == 0) {
 		alGenBuffers( MUSICBUFFERS, MusicBuffers );

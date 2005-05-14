@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.15 2005/03/25 21:30:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.16 2005/05/14 11:18:08 avenger_teambg Exp $
  *
  */
 
@@ -36,10 +36,8 @@
 #include <dlfcn.h>
 #endif
 
-typedef unsigned long (* ulongvoid)(void);
 typedef char*(* charvoid)(void);
-typedef int (* intvoid)(void);
-typedef ClassDesc*(* cdint)(int);
+typedef ClassDesc*(* cdint)(void);
 
 PluginMgr::PluginMgr(char* pluginpath)
 {
@@ -82,7 +80,6 @@ PluginMgr::PluginMgr(char* pluginpath)
 #endif
 	charvoid LibVersion;
 	charvoid LibDescription;
-	intvoid LibNumberClasses;
 	cdint LibClassDesc;
 	do {
 		//Iterate through all the available modules to load
@@ -106,8 +103,6 @@ PluginMgr::PluginMgr(char* pluginpath)
 		LibVersion = ( charvoid ) GetProcAddress( hMod, "LibVersion" );
 		LibDescription = ( charvoid )
 			GetProcAddress( hMod, "LibDescription" );
-		LibNumberClasses = ( intvoid ) GetProcAddress( hMod,
-										"LibNumberClasses" );
 		LibClassDesc = ( cdint ) GetProcAddress( hMod, "LibClassDesc" );
 #else
 		if (fnmatch( "*.so", de->d_name, 0 ) != 0) //If the current file has no ".so" extension, skip it
@@ -128,25 +123,28 @@ PluginMgr::PluginMgr(char* pluginpath)
 		}
 		printStatus( "OK", LIGHT_GREEN );
 		/*
-						GCC Version 3.2.x has changed the Export Names of the DLLs this statement is a simple
-						hack to make GemRB run on every version.
-						*/
+		GCC Version 3.2.x has changed the Export Names of the DLLs this statement is a simple
+		hack to make GemRB run on every version.
+		*/
 #ifdef GCC_OLD
 		LibVersion = ( charvoid ) dlsym( hMod, "LibVersion__Fv" );
 		LibDescription = ( charvoid ) dlsym( hMod, "LibDescription__Fv" );
-		LibNumberClasses = ( intvoid ) dlsym( hMod, "LibNumberClasses__Fv" );
-		LibClassDesc = ( cdint ) dlsym( hMod, "LibClassDesc__Fi" );
+		LibClassDesc = ( cdint ) dlsym( hMod, "LibClassDesc__Fv" );
 #else
 		LibVersion = ( charvoid ) dlsym( hMod, "_Z10LibVersionv" );
 		LibDescription = ( charvoid ) dlsym( hMod, "_Z14LibDescriptionv" );
-		LibNumberClasses = ( intvoid ) dlsym( hMod, "_Z16LibNumberClassesv" );
-		LibClassDesc = ( cdint ) dlsym( hMod, "_Z12LibClassDesci" );
+		LibClassDesc = ( cdint ) dlsym( hMod, "_Z12LibClassDescv" );
 #endif
 #endif
 		printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
 		if (strcmp(LibVersion(), VERSION_GEMRB) ) {
 			printStatus( "ERROR", LIGHT_RED );
 			printf( "Plug-in Version not valid, Skipping...\n" );
+#ifdef WIN32
+			FreeLibrary(hMod);
+#else
+			dlclose(hMod);
+#endif
 			continue;
 		}
 		printStatus( "OK", LIGHT_GREEN );
@@ -155,16 +153,13 @@ PluginMgr::PluginMgr(char* pluginpath)
 		printf( "%s", LibDescription() );
 		textcolor( WHITE );
 		printf( "..." );
-		int count = LibNumberClasses();
 		printStatus( "OK", LIGHT_GREEN );
 		bool error = false;
-		for (int i = 0; i < count; i++) {
-			ClassDesc* plug = LibClassDesc( i );
-			if (plug == NULL) {
-				printStatus( "ERROR", LIGHT_RED );
-				printf( "Plug-in Exports Error\n" );			
-				continue;
-			}
+		ClassDesc* plug = LibClassDesc();
+		if (plug == NULL) {
+			printStatus( "ERROR", LIGHT_RED );
+			printf( "Plug-in Exports Error\n" );
+		} else {
 			for (unsigned int x = 0; x < plugins.size(); x++) {
 				if (plugins[x]->ClassID() == plug->ClassID()) {
 					printStatus( "SKIPPING", YELLOW );
@@ -179,21 +174,38 @@ PluginMgr::PluginMgr(char* pluginpath)
 					break;
 				}
 			}
-			if (error)
-				break;
+			if (error) {
+#ifdef WIN32
+				FreeLibrary(hMod);
+#else
+				dlclose(hMod);
+#endif
+				continue;
+			}
 			plugins.push_back( plug );
+			libs.push_back( hMod );
 		}
-#ifdef WIN32  //Win32 while condition uses the _findnext function
+#ifdef WIN32 //Win32 while condition uses the _findnext function
 	} while (_findnext( hFile, &c_file ) == 0);
 	_findclose( hFile );
-#else  //Linux uses the readdir function
+#else //Linux uses the readdir function
 } while (( de = readdir( dir ) ) != NULL);
-closedir(dir);  //No other files in the directory, close it
+closedir(dir); //No other files in the directory, close it
 #endif
 }
 
 PluginMgr::~PluginMgr(void)
 {
+//don't free the shared libraries in debug mode, so valgrind can resolve the stack trace
+#ifndef _DEBUG
+	for (unsigned int i = 0; i < libs.size(); i++) {
+#ifdef WIN32
+		FreeLibrary(libs[i]);
+#else
+		dlclose(libs[i]);
+#endif
+	}
+#endif
 }
 
 bool PluginMgr::IsAvailable(SClass_ID plugintype)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.299 2005/04/30 18:59:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.300 2005/05/14 11:18:08 avenger_teambg Exp $
  *
  */
 
@@ -201,29 +201,11 @@ Interface::~Interface(void)
 	}
 	ItemCache.RemoveAll(ReleaseItem);
 	SpellCache.RemoveAll(ReleaseSpell);
-
-	unsigned int i;
-
-	for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-		//freesprite checks for null pointer
-		video->FreeSprite(FogSprites[i]);
-	}
-	for(i=0;i<4;i++) {
-		video->FreeSprite(WindowFrames[i]);
-	}
-
 	if (DefSound) {
 		free( DefSound );
 		DSCount = -1;
 	}
 
-	if (TooltipBack) {
-		for(i=0;i<3;i++) {
-			//freesprite checks for null pointer
-			video->FreeSprite(TooltipBack[i]);
-		}
-		delete[] TooltipBack;
-	}
 	if (slottypes) {
 		free( slottypes );
 	}
@@ -281,6 +263,23 @@ Interface::~Interface(void)
 	}
 
 	if (video) {
+		unsigned int i;
+		
+		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
+			//freesprite checks for null pointer
+			video->FreeSprite(FogSprites[i]);
+		}
+		for(i=0;i<4;i++) {
+			video->FreeSprite(WindowFrames[i]);
+		}
+		
+		if (TooltipBack) {
+			for(i=0;i<3;i++) {
+				//freesprite checks for null pointer
+				video->FreeSprite(TooltipBack[i]);
+			}
+			delete[] TooltipBack;
+		}
 		FreeInterface( video );
 	}
 
@@ -1881,6 +1880,8 @@ void Interface::DrawWindows(void)
 			//giving control back to GameControl
 			SetControlStatus(0,0,0x7f000000|IE_GUI_CONTROL_FOCUSED);
 			GameControl *gc = GetGameControl();
+			if (index & CS_HIDEGUI) gc->HideGUI();
+			else gc->UnhideGUI();
 			if (gc->GetDialogueFlags()&DF_START_DIALOG) {
 				gc->DialogChoose( (unsigned int) -1);
 			}

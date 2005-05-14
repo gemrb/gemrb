@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.48 2005/04/10 17:31:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.49 2005/05/14 11:18:07 avenger_teambg Exp $
  *
  */
 
@@ -51,6 +51,15 @@ class Game;
 // Flags bits for EveryoneNearPoint()
 #define ENP_CANMOVE     1    // also check if the PC can move
 #define ENP_ONLYSELECT  2    // check only selected PC
+
+// GUI Control Status flags (saved in game)
+#define CS_PARTY_AI  1   //enable party AI
+#define CS_MEDIUM    2   //medium dialog
+#define CS_LARGE     6   //large dialog, both bits set
+#define CS_DIALOGSIZEMASK 6
+#define CS_HIDEGUI   16  //hide all gui
+#define CS_ACTION    32  //hide action pane
+#define CS_PORTRAIT  64  //hide portrait pane
 
 typedef struct PCStruct {
 	ieWord   Selected;

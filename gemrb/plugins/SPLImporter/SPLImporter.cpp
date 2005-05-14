@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImporter.cpp,v 1.3 2005/02/14 19:53:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImporter.cpp,v 1.4 2005/05/14 11:18:12 avenger_teambg Exp $
  *
  */
 
@@ -42,19 +42,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD  ul_reason_for_call,
 
 #endif
 
-GEM_EXPORT_DLL int LibNumberClasses()
+GEM_EXPORT_DLL ClassDesc* LibClassDesc()
 {
-	return 1;
-}
-
-GEM_EXPORT_DLL ClassDesc* LibClassDesc(int i)
-{
-	switch (i) {
-		case 0:
-			return &SplImpCD;
-		default:
-			return 0;
-	}
+	return &SplImpCD;
 }
 
 GEM_EXPORT_DLL const char* LibDescription()

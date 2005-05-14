@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.13 2005/01/16 22:53:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.14 2005/05/14 11:18:07 avenger_teambg Exp $
  *
  */
 
@@ -37,6 +37,7 @@ int fx_cure_berserk_state (Actor* target, Effect* fx);
 int fx_set_charmed_state (Actor* target, Effect* fx);
 int fx_charisma_modifier (Actor* target, Effect* fx);
 int fx_constitution_modifier (Actor* target, Effect* fx);
+int fx_wisdom_modifier (Actor* target, Effect* fx);
 int fx_cure_poisoned_state (Actor* target, Effect* fx);
 int fx_damage (Actor* target, Effect* fx);
 int fx_death (Actor* target, Effect* fx);
@@ -71,6 +72,7 @@ static EffectLink effectnames[] = {
 	{ "HP:MaximumHPModifier", fx_maximum_hp_modifier },
 	{ "Stat:ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier },
 	{ "Stat:AttacksPerRoundModifier", fx_attacks_per_round_modifier },
+	{ "Stat:CharismaModifier", fx_charisma_modifier },
 	{ "Stat:ConstitutionModifier", fx_constitution_modifier },
 	{ "Stat:IntelligenceModifier", fx_intelligence_modifier },
 	{ "Stat:SaveVsBreathModifier", fx_save_vs_breath_modifier },
@@ -79,6 +81,7 @@ static EffectLink effectnames[] = {
 	{ "Stat:SaveVsSpellsModifier", fx_save_vs_spell_modifier },
 	{ "Stat:SaveVsWandsModifier", fx_save_vs_wands_modifier },
 	{ "Stat:StrengthModifier", fx_strength_modifier },
+	{ "Stat:WisdomModifier", fx_wisdom_modifier },
 	{ "State:Berserk", fx_set_berserk_state },
 	{ "State:Charmed", fx_set_charmed_state },
 	{ "State:Sleep", fx_set_sleep_state },
@@ -488,6 +491,15 @@ int fx_strength_modifier (Actor* target, Effect* fx)
 	printf( "fx_strength_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	target->NewStat( IE_STR, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x31
+int fx_wisdom_modifier (Actor* target, Effect* fx)
+{
+	printf( "fx_wisdom_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_WIS, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 

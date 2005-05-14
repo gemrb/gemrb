@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.223 2005/04/30 18:59:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.224 2005/05/14 11:18:07 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1064,9 +1064,11 @@ void GameControl::SetCutSceneMode(bool active)
 {
 	if(active) {
 		ScreenFlags |= (SF_DISABLEMOUSE | SF_LOCKSCROLL);
+		HideGUI();
 	}
 	else {
 		ScreenFlags &= ~(SF_DISABLEMOUSE | SF_LOCKSCROLL);
+		UnhideGUI();
 	}
 }
 
@@ -1320,8 +1322,8 @@ void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlg
 		DialogueFlags |= DF_FREEZE_SCRIPTS;
 	}
 	//opening control size to maximum
-	ieDword index = core->GetGame()->ControlStatus&~3;
-	core->GetGame()->SetControlStatus(index + 2, BM_SET);
+	ieDword index = core->GetGame()->ControlStatus&~CS_DIALOGSIZEMASK;
+	core->GetGame()->SetControlStatus(index | CS_LARGE, BM_SET);
 }
 
 /*try to break will only try to break it, false means unconditional stop*/
@@ -1354,7 +1356,7 @@ void GameControl::EndDialog(bool try_to_break)
 		dlg = NULL;
 	}
 	//minimizing size
-	ieDword index = core->GetGame()->ControlStatus&~3;
+	ieDword index = core->GetGame()->ControlStatus&~CS_DIALOGSIZEMASK;
 	core->GetGame()->SetControlStatus(index, BM_SET);
 	ScreenFlags &=~(SF_DISABLEMOUSE|SF_LOCKSCROLL);
 	DialogueFlags = 0;

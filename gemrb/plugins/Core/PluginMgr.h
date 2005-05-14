@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.h,v 1.4 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.h,v 1.5 2005/05/14 11:18:08 avenger_teambg Exp $
  *
  */
 
@@ -38,12 +38,19 @@
 #define GEM_EXPORT
 #endif
 
+#ifdef WIN32
+typedef HINSTANCE LibHandle;
+#else
+typedef void *LibHandle;
+#endif
+
 class GEM_EXPORT PluginMgr {
 public:
 	PluginMgr(char* pluginpath);
 	~PluginMgr(void);
 private:
 	std::vector< ClassDesc*> plugins;
+	std::vector< LibHandle> libs;
 public:
 	bool IsAvailable(SClass_ID plugintype);
 	void* GetPlugin(SClass_ID plugintype);

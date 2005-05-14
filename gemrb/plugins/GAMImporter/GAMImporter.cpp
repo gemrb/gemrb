@@ -41,19 +41,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD  ul_reason_for_call,
 
 #endif
 
-GEM_EXPORT_DLL int LibNumberClasses()
+GEM_EXPORT_DLL ClassDesc* LibClassDesc()
 {
-	return 1;
-}
-
-GEM_EXPORT_DLL ClassDesc* LibClassDesc(int i)
-{
-	switch (i) {
-		case 0:
-			return &GAMImpCD;
-		default:
-			return 0;
-	}
+	return &GAMImpCD;
 }
 
 GEM_EXPORT_DLL const char* LibDescription()

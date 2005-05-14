@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.266 2005/04/30 22:48:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.267 2005/05/14 11:18:07 avenger_teambg Exp $
  *
  */
 
@@ -79,7 +79,8 @@ static TriggerLink triggernames[] = {
 	{"bitcheckexact", GameScript::BitCheckExact,TF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
 	{"breakingpoint", GameScript::BreakingPoint,0},
-	{"calledbyname", GameScript::CalledByName,0},
+	{"calledbyname", GameScript::CalledByName,0}, //this is still a question
+	{"charname", GameScript::CharName,0}, //not scripting name
 	{"checkstat", GameScript::CheckStat,0},
 	{"checkstatgt", GameScript::CheckStatGT,0},
 	{"checkstatlt", GameScript::CheckStatLT,0},
@@ -192,6 +193,7 @@ static TriggerLink triggernames[] = {
 	{"morale", GameScript::Morale,0},
 	{"moralegt", GameScript::MoraleGT,0},
 	{"moralelt", GameScript::MoraleLT,0},
+	{"name", GameScript::CalledByName,0}, //this is the same too?
 	{"namelessbitthedust", GameScript::NamelessBitTheDust,0},
 	{"nearbydialog", GameScript::NearbyDialog,0},
 	{"nearlocation", GameScript::NearLocation,0},
@@ -5160,7 +5162,7 @@ int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
 
 //this one checks scriptname (deathvar), i hope it is right
 //IsScriptName depends on this too
-//CharName is another (similar function)
+//Name is another (similar function)
 int GameScript::CalledByName(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -5177,6 +5179,7 @@ int GameScript::CalledByName(Scriptable* Sender, Trigger* parameters)
 	return 1;
 }
 
+//This is checking on the character's name as it was typed in
 int GameScript::CharName(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -6734,19 +6737,15 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 
 void GameScript::UnhideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	GameControl* gc = core->GetGameControl();
-	if (gc) {
-		gc->UnhideGUI();
-	}
+	Game* game = core->GetGame();
+	game->SetControlStatus(CS_HIDEGUI, BM_NAND);
 	core->SetCutSceneMode( false );
 }
 
 void GameScript::HideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	GameControl* gc = core->GetGameControl();
-	if (gc) {
-		gc->HideGUI();
-	}
+	Game* game = core->GetGame();
+	game->SetControlStatus(CS_HIDEGUI, BM_OR);
 }
 
 void GameScript::LockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -6903,17 +6902,17 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			tar = scr;
 			scr = tmp;
 		}
-		
 		if (Sender!=tar) {
 			if (Flags & BD_INTERRUPT) {
-				tar->ClearActions();
+				scr->ClearActions();
 			} else {
-				if (tar->GetNextAction()) {
+				if (scr->GetNextAction()) {
 					core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 					goto end_of_quest;
 				}
 			}
 		}
+		
 	}
 
 	if (scr->Type==ST_ACTOR) {
