@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.16 2005/03/21 23:09:34 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.17 2005/05/14 12:44:02 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -96,16 +96,20 @@ def SetupMenuWindowControls (Window):
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 7)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
+	# Multi player team setup?
+	Button = GemRB.GetControl (Window, 8)
+	GemRB.SetTooltip (Window, Button, 13902)
+	
+	# Gears (time)
+	Button = GemRB.GetControl (Window, 9)
+	GemRB.SetAnimation (Window, Button, "CGEAR")
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	# Rest
-	Button = GemRB.GetControl (Window, 8)
+	Button = GemRB.GetControl (Window, 11)
 	GemRB.SetTooltip (Window, Button, 11942)
-	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
 
-	# AI
-	#Button = GemRB.GetControl (Window, 9)
-	#GemRB.SetTooltip (Window, Button, 41631) # or 41646 Activate ...
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
 	return
 
 def AIPress ():
@@ -117,7 +121,11 @@ def RestPress ():
 	return
 
 def SetupActionsWindowControls (Window):
-	# 41627 - Return to the Game World
+	# Gears (time) when options pane is down
+	Button = GemRB.GetControl (Window, 62)
+	GemRB.SetAnimation (Window, Button, "CGEAR")
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	# Select all characters
 	Button = GemRB.GetControl (Window, 1)
