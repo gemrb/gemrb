@@ -4,7 +4,7 @@
 0x00       CABSB      CABSB      CABSB      CABSB      16          2          
 0x01       CADVB      CADVB      CADVB      CADVB      16          2          
 0x02       DANNB      DANNB      DANNB      DANNB      16          2          
-0x03       CBAUB      CBAUB      CBAUB      CBAUB      16          2          
+0x03       DBAUB      DBAUB      DBAUB      DBAUB      16          2          
 0x04       CCAMB      CCAMB      CCAMB      CCAMB      19          2          
 0x05       CCOLB      CCOLB      CCOLB      CCOLB      16          2          
 0x06       DCTHB      DCTHB      DCTHB      DCTHB      16          2          
@@ -38,7 +38,7 @@
 0x22       CGRKB      CGRKB      CGRKB      CGRKB      19          2          
 0x23	   CHRSB      CHRSB      CHRSB      CHRSB      19          2
 0x24       CIGYB      CIGYB      CIGYB      CIGYB      16          2          
-0x25       CJBRB      CJBRB      CJBRB      CJBRB      16          2          
+0x25       CJBRB      CJBRB      CJBRB      CJBRB      20          2          
 0x26       CJFTB      CJFTB      CJFTB      CJFTB      19          2          
 0x27       CLOPB      CLOPB      CLOPB      CLOPB      16          2          
 0x28       CLEMB      CLEMB      CLEMB      CLEMB      19          2          
