@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.30 2005/04/28 22:12:15 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.31 2005/05/14 16:47:54 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -197,8 +197,9 @@ def GetActorPortrait (actor, which):
 	#return GemRB.GetPlayerPortrait( actor, which)
 
 	PortraitTable = GemRB.LoadTable ("PDOLLS")
-	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
-	row = "0x%04X" %anim_id
+	# only the lowest byte is meaningful here (OneByteAnimID)
+	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID) & 255
+	row = "0x%02X" %anim_id
 
 	return GemRB.GetTableValue (PortraitTable, row, which)
 	
