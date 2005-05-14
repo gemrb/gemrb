@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.87 2005/03/27 13:27:00 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.88 2005/05/14 15:01:29 edheldil Exp $
  *
  */
 
@@ -302,7 +302,7 @@ void Button::OnSpecialKeyPress(unsigned char Key)
 }
 
 /** Mouse Button Down */
-void Button::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/,
+void Button::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short /*Mod*/)
 {
 	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
@@ -319,6 +319,10 @@ void Button::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/,
 		if (Flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
 		}
+		// We use absolute screen position here, so drag_start
+		//   remains valid even after window/control is moved
+		drag_start.x = ((Window*)Owner)->XPos + XPos + x;
+		drag_start.y = ((Window*)Owner)->YPos + YPos + y;
 	}
 }
 /** Mouse Button Up */
@@ -378,7 +382,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	}
 }
 
-void Button::OnMouseOver(unsigned short /*x*/, unsigned short /*y*/)
+void Button::OnMouseOver(unsigned short x, unsigned short y)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
@@ -391,6 +395,18 @@ void Button::OnMouseOver(unsigned short /*x*/, unsigned short /*y*/)
 	}
 
 	( ( Window * ) Owner )->Cursor = IE_CURSOR_NORMAL;
+
+	if ((Flags & IE_GUI_BUTTON_DRAGGABLE) && (State == IE_GUI_BUTTON_PRESSED)) {
+		// We use absolute screen position here, so drag_start
+		//   remains valid even after window/control is moved
+		int dx = ((Window*)Owner)->XPos + XPos + x - drag_start.x;
+		int dy = ((Window*)Owner)->YPos + YPos + y - drag_start.y;
+		core->GetDictionary()->SetAt( "DragX", dx );
+		core->GetDictionary()->SetAt( "DragY", dy );
+		drag_start.x += dx;
+		drag_start.y += dy;
+		RunEventHandler( ButtonOnDrag );
+	}
 }
 
 void Button::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
@@ -456,6 +472,9 @@ bool Button::SetEvent(int eventType, EventHandler handler)
 			break;
 		case IE_GUI_BUTTON_ON_DRAG_DROP:
 			SetEventHandler( ButtonOnDragDrop, handler );
+			break;
+		case IE_GUI_BUTTON_ON_DRAG:
+			SetEventHandler( ButtonOnDrag, handler );
 			break;
 	default:
 		return Control::SetEvent( eventType, handler );

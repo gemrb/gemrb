@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.45 2005/04/08 16:54:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.46 2005/05/14 15:01:29 edheldil Exp $
  *
  */
 
@@ -50,6 +50,8 @@
 //end of hardcoded part
 #define IE_GUI_BUTTON_ALIGN_BOTTOM 0x00000800
 
+#define IE_GUI_BUTTON_DRAGGABLE    0x00001000
+
 #define IE_GUI_BUTTON_NO_TEXT      0x00010000   // don't draw button label
 #define IE_GUI_BUTTON_PLAYRANDOM   0x00020000
 #define IE_GUI_BUTTON_PLAYONCE     0x00040000
@@ -64,6 +66,7 @@
 #define IE_GUI_BUTTON_ON_SHIFT_PRESS 0x00000004
 #define IE_GUI_BUTTON_ON_RIGHT_PRESS 0x00000005
 #define IE_GUI_BUTTON_ON_DRAG_DROP   0x00000006
+#define IE_GUI_BUTTON_ON_DRAG        0x00000007
 
 
 /**Button Class. Used also for PixMaps (static images) or for Toggle Buttons.
@@ -145,6 +148,7 @@ public: // Public Events
 	EventHandler ButtonOnShiftPress;
 	EventHandler ButtonOnRightPress;
 	EventHandler ButtonOnDragDrop;
+	EventHandler ButtonOnDrag;
 	EventHandler MouseEnterButton;
 	EventHandler MouseLeaveButton;
 	EventHandler MouseOverButton;
@@ -176,6 +180,7 @@ private: // Private attributes
 	/** The current state of the Button */
 	unsigned char State;
 	double Clipping;
+	Point drag_start;
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
 	bool IsPixelTransparent (unsigned short x, unsigned short y);

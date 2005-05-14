@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/FloatMenuWindow.py,v 1.7 2005/03/16 01:42:55 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/FloatMenuWindow.py,v 1.8 2005/05/14 15:01:29 edheldil Exp $
 
 # FloatMenuWindow.py - display PST's floating menu window from GUIWORLD winpack
 
@@ -103,8 +103,12 @@ def OpenFloatMenuWindow ():
 	# Menu Anchors
 	Button = GemRB.GetControl (Window, 11)
 	GemRB.SetTooltip (Window, Button, 8199)
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_DRAGGABLE, OP_OR)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG, "FloatMenuDrag")
 	Button = GemRB.GetControl (Window, 12)
 	GemRB.SetTooltip (Window, Button, 8199)
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_DRAGGABLE, OP_OR)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG, "FloatMenuDrag")
 
 	# Rotate Items left & right
 	Button = GemRB.GetControl (Window, 13)
@@ -289,3 +293,7 @@ def FloatMenuSelectSpells ():
 	global float_menu_mode
 	float_menu_mode = MENU_MODE_SPELLS
 	UpdateFloatMenuWindow ()
+
+def FloatMenuDrag ():
+	dx, dy = GemRB.GetVar ("DragX"), GemRB.GetVar ("DragY")
+	GemRB.SetWindowPos (FloatMenuWindow, dx, dy, WINDOW_RELATIVE | WINDOW_BOUNDED)

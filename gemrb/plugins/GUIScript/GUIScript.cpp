@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.301 2005/04/10 18:59:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.302 2005/05/14 15:01:27 edheldil Exp $
  *
  */
 
@@ -600,7 +600,7 @@ static PyObject* GemRB_SetWindowPicture(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SetWindowPos__doc,
 "SetWindowPos(WindowIndex, X, Y, [Flags=WINDOW_TOPLEFT])\n\n"
 "Moves a Window to pos. (X, Y).\n"
-"Flags is a bitmask of WINDOW_(TOPLEFT|CENTER|ABSCENTER|BOUNDED) and "
+"Flags is a bitmask of WINDOW_(TOPLEFT|CENTER|ABSCENTER|RELATIVE|SCALE|BOUNDED) and "
 "they are used to modify the meaning of X and Y.\n"
 "TOPLEFT: X, Y are coordinates of upper-left corner.\n"
 "CENTER: X, Y are coordinates of window's center.\n"

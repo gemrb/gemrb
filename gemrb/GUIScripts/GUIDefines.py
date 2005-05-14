@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.38 2005/05/13 16:40:09 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.39 2005/05/14 15:01:30 edheldil Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -39,6 +39,8 @@ IE_GUI_BUTTON_ALIGN_TOP  = 0x00000400
 #end of hardcoded section
 IE_GUI_BUTTON_ALIGN_BOTTOM = 0x00000800
 
+IE_GUI_BUTTON_DRAGGABLE    = 0x00001000
+
 IE_GUI_BUTTON_NO_TEXT    = 0x00010000   # don't draw button label
 IE_GUI_BUTTON_PLAYRANDOM = 0x00020000   # the button animation is random
 IE_GUI_BUTTON_PLAYONCE   = 0x00040000   # the button animation won't restart
@@ -56,6 +58,7 @@ IE_GUI_MOUSE_LEAVE_BUTTON = 0x00000003
 IE_GUI_BUTTON_ON_SHIFT_PRESS = 0x00000004
 IE_GUI_BUTTON_ON_RIGHT_PRESS = 0x00000005
 IE_GUI_BUTTON_ON_DRAG_DROP   = 0x00000006
+IE_GUI_BUTTON_ON_DRAG       = 0x00000007
 IE_GUI_PROGRESS_END_REACHED = 0x01000000
 IE_GUI_SLIDER_ON_CHANGE   = 0x02000000
 IE_GUI_EDIT_ON_CHANGE     = 0x03000000
