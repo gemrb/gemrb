@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUISTORE.py,v 1.8 2005/05/13 17:07:50 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUISTORE.py,v 1.9 2005/05/15 19:56:22 edheldil Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -42,6 +42,7 @@ StoreRentWindow = None
 
 HelpStoreRent = None
 
+store_name = ""
 pc = 0
 character_name = ""
 party_gold = 0
@@ -49,7 +50,7 @@ store_buttons = {}
 store_update_functions = {}
 
 def OpenStoreWindow ():
-	global StoreWindow, party_gold, Store
+	global StoreWindow, party_gold, store_name, Store
 	
 	GemRB.HideGUI ()
 	
@@ -66,6 +67,8 @@ def OpenStoreWindow ():
 		return
 
 	Store = GemRB.GetStore ()
+	# font used for store name has only uppercase chars
+	store_name = GemRB.GetString (Store['StoreName']).upper ()
 	
 	GemRB.LoadWindowPack ("GUISTORE")
 	StoreWindow = Window = GemRB.LoadWindow (3)
@@ -161,7 +164,7 @@ def OpenStoreShoppingWindow ():
 
 	# title ...
 	Label = GemRB.GetControl (Window, 0x10000001)
-	GemRB.SetText (Window, Label, Store['StoreName'])
+	GemRB.SetText (Window, Label, store_name)
 
 	# buy price ...
 	Label = GemRB.GetControl (Window, 0x10000003)
@@ -210,7 +213,7 @@ def OpenStoreIdentifyWindow ():
 
 	# title ...
 	Label = GemRB.GetControl (Window, 0x0fffffff)
-	GemRB.SetText (Window, Label, Store['StoreName'])
+	GemRB.SetText (Window, Label, store_name)
 
 	# Identify
 	Button = GemRB.GetControl (Window, 4)
@@ -246,7 +249,7 @@ def OpenStoreStealWindow ():
 
 	# title ...
 	Label = GemRB.GetControl (Window, 0x10000000)
-	GemRB.SetText (Window, Label, Store['StoreName'])
+	GemRB.SetText (Window, Label, store_name)
 
 	# Steal
 	Button = GemRB.GetControl (Window, 0)
@@ -274,7 +277,7 @@ def OpenStoreDonateWindow ():
 
 	# title ...
 	Label = GemRB.GetControl (Window, 0x10000005)
-	GemRB.SetText (Window, Label, Store['StoreName'])
+	GemRB.SetText (Window, Label, store_name)
 
 	# Donate
 	Button = GemRB.GetControl (Window, 2)
@@ -306,7 +309,7 @@ def OpenStoreHealWindow ():
 
 	# title ...
 	Label = GemRB.GetControl (Window, 0x0fffffff)
-	GemRB.SetText (Window, Label, Store['StoreName'])
+	GemRB.SetText (Window, Label, store_name)
 
 	# price ...
 	Label = GemRB.GetControl (Window, 0x10000001)
@@ -345,7 +348,7 @@ def OpenStoreRumourWindow ():
 	
 	# title ...
 	Label = GemRB.GetControl (Window, 0x1000000a)
-	GemRB.SetText (Window, Label, Store['StoreName'])
+	GemRB.SetText (Window, Label, store_name)
 	
 	# 13 ta, 15 ta
 
@@ -371,7 +374,7 @@ def OpenStoreRentWindow ():
 
 	# title ...
 	Label = GemRB.GetControl (Window, 0x1000000a)
-	GemRB.SetText (Window, Label, Store['StoreName'])
+	GemRB.SetText (Window, Label, store_name)
 
 	# Peasant
 	Button = GemRB.GetControl (Window, 0)
