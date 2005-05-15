@@ -30,6 +30,9 @@ Animation:
 1. (PARTLY) fix char animation sequences
 2. (DONE) animationfactory->one single palette
 
+Window/Widget management:
+- implement grabbing mouse pointer by a control to fix dragging of Float menu window
+
 Known Bugs:
 1. problem: Dialog options that are disabled by the trigger condition are still accessible via hotkey. (FIXED)
 
