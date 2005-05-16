@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.4 2004/12/04 18:01:48 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.5 2005/05/16 14:26:18 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -31,9 +31,57 @@ from GUICommon import CloseOtherWindow
 ContainerWindow = None
 FormationWindow = None
 ReformPartyWindow = None
+Container = None
+
+def OpenEndDialogWindow ():
+	global ContinueWindow
+	GemRB.HideGUI ()
+
+	if ContinueWindow:
+		GemRB.UnloadWindow (ContinueWindow)
+		ContinueWindow = None
+
+		GemRB.SetVar ("OtherWindow", -1)
+		GemRB.UnhideGUI ()
+		return
+
+	GemRB.LoadWindowPack (GetWindowPack())
+	ContainerWindow = Window = GemRB.LoadWindow (9)
+	GemRB.SetVar ("OtherWindow", Window)
+
+	#end dialog
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Button, 9371)
+	GemRB.SetVarAssoc (Window, Button, "DialogChoose", -1)
+	
+	GemRB.UnhideGUI ()
+
+def OpenContinueDialogWindow ():
+	global ContinueWindow
+	GemRB.HideGUI ()
+
+	if ContinueWindow:
+		GemRB.UnloadWindow (ContinueWindow)
+		ContinueWindow = None
+
+		GemRB.SetVar ("OtherWindow", -1)
+		GemRB.UnhideGUI ()
+		return
+
+	GemRB.LoadWindowPack (GetWindowPack())
+	ContainerWindow = Window = GemRB.LoadWindow (9)
+	GemRB.SetVar ("OtherWindow", Window)
+
+	#continue
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Button, 9372)
+	GemRB.SetVarAssoc (Window, Button, "DialogChoose", 0)
+	
+	GemRB.UnhideGUI ()
+
 
 def OpenContainerWindow ():
-	global ContainerWindow
+	global ContainerWindow, Container
 	GemRB.HideGUI ()
 
 	if ContainerWindow:
@@ -47,6 +95,14 @@ def OpenContainerWindow ():
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindow (8)
 	GemRB.SetVar ("OtherWindow", Window)
+
+	Container = GemRB.GetContainer()
+
+	# Gears (time) when options pane is down
+	Button = GemRB.GetControl (Window, 62)
+	GemRB.SetAnimation (Window, Button, "CGEAR")
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	# 0 - 5 - Ground Item
 	# 10 - 13 - Personal Item
@@ -62,6 +118,17 @@ def OpenContainerWindow ():
 	party_gold = GemRB.GameGetPartyGold ()
 	Text = GemRB.GetControl (Window, 0x10000036)
 	GemRB.SetText (Window, Text, str (party_gold))
+
+	Button = GemRB.GetControl (Window, 50)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	Table = GemRB.LoadTable ("containr")
+	row = Container['Type']
+	tmp = GemRB.GetTableValue (Table, row, 0)
+	if tmp!='*':
+		GemRB.PlaySound (tmp)
+	tmp = GemRB.GetTableValue (Table, row, 1)
+	if tmp!='*':
+		GemRB.SetButtonSprites (Window, Button, tmp, 0, 0, 0, 0, 0 )
 
 	# Done
 	Button = GemRB.GetControl (Window, 51)

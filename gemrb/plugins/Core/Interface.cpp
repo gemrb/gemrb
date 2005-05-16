@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.301 2005/05/16 12:01:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.302 2005/05/16 14:26:20 avenger_teambg Exp $
  *
  */
 
@@ -1870,7 +1870,18 @@ void Interface::DrawWindows(void)
 		GSUpdate(false);
 	}
 	else {
-		int flg = gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS;
+		int flg = gc->GetDialogueFlags();
+		if (flg & DF_IN_DIALOG) {
+			ieDword var = 1;
+			vars->Lookup("DialogChoose", var);
+			//end or continue
+			if ((var == 0) || (var == (ieDword) ~0)) {
+printf("Using button option: %d\n", var);
+				gc->DialogChoose(var);
+			}
+			vars->SetAt("DialogChoose",1);
+		}
+		flg &= DF_FREEZE_SCRIPTS;
 		GSUpdate(!flg);
 		if (CurrentContainer) {
 			if (!flg) {
