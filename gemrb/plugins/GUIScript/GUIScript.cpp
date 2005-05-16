@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.302 2005/05/14 15:01:27 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.303 2005/05/16 12:01:23 avenger_teambg Exp $
  *
  */
 
@@ -3454,12 +3454,9 @@ PyDoc_STRVAR( GemRB_GameGetFirstSelectedPC__doc,
 
 static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*args*/)
 {
-	Game* game = core->GetGame();
-	for (int i = 0; i < game->GetPartySize (false); i++) {
-		Actor* actor = game->GetPC (i);
-		if (actor->IsSelected()) {
-			return PyInt_FromLong( actor->InParty);
-		}
+	Actor *actor = core->GetFirstSelectedPC();
+	if (actor) {
+		return PyInt_FromLong( actor->InParty);
 	}
 
 	return PyInt_FromLong( 0 );
@@ -3719,6 +3716,41 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 	}
 	Py_INCREF( Py_None );
 	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GetContainer__doc,
+"GetContainer( bool autoselect ) => string\n\n"
+"Returns relevant data of the container used by the selected actor. Use autoselect if the container is an item pile at the feet of the actor." );
+
+static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
+{
+	int autoselect=0;
+
+	if (!PyArg_ParseTuple( args, "|i", &autoselect )) {
+		return AttributeError( GemRB_GetContainer__doc );
+	}
+
+	Actor *actor = core->GetFirstSelectedPC();
+	if (!actor) {
+		return RuntimeError("No current actor!");
+	}
+	Map *map = actor->GetCurrentArea();
+	Container *container = NULL;
+	if (autoselect) { //autoselect works only with piles
+		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
+		core->SetCurrentContainer(actor, container);
+	} else {
+		container = core->GetCurrentContainer();
+	}
+	if (!container) {
+		return RuntimeError("No current container!");
+	}
+
+	PyObject* dict = PyDict_New();
+	PyDict_SetItemString(dict, "Type", PyInt_FromLong( container->Type ));
+	PyDict_SetItemString(dict, "ItemCount", PyInt_FromLong( container->inventory.GetSlotCount() ));
+
+	return dict;
 }
 
 PyDoc_STRVAR( GemRB_GetStore__doc,
@@ -4921,6 +4953,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(FillPlayerInfo, METH_VARARGS),
 	METHOD(SetSpellIcon, METH_VARARGS),
 	METHOD(SetItemIcon, METH_VARARGS),
+	METHOD(GetContainer, METH_VARARGS),
 	METHOD(EnterStore, METH_VARARGS),
 	METHOD(LeaveStore, METH_VARARGS),
 	METHOD(GetStore, METH_VARARGS),
@@ -5118,6 +5151,8 @@ bool GUIScript::RunFunction(const char* fname)
 	pFunc = PyDict_GetItemString( pDict, (char *) fname );
 	/* pFunc: Borrowed reference */
 	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
+		printMessage( "GUIScript", "Missing function:", LIGHT_RED );
+		printf("%s\n", fname);
 		return false;
 	}
 	pArgs = NULL;

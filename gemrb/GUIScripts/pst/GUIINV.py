@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.22 2005/02/11 22:25:02 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.23 2005/05/16 12:01:16 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -213,9 +213,8 @@ def UpdateInventoryWindow ():
 	ItemHash = {}
 
 	# get a list which maps slot number to slot type/icon/toolti
-	anim_id = GemRB.GetPlayerStat (pc, ie_stats.IE_ANIMATION_ID)
-	#anim_id = GemRB.GetPlayerStat (pc, ie_stats.IE_ANIMATION_ID) & 0x7fff
-	row = "0x%04X" %anim_id
+	anim_id = GemRB.GetPlayerStat (pc, ie_stats.IE_ANIMATION_ID) & 255
+	row = "0x%02X" %anim_id
 	slot_list = map (int, string.split (GemRB.GetTableValue (AvSlotsTable, row, 'SLOTS'), ',')[1:])
 	
 	# populate inventory slot controls

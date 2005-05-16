@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.159 2005/04/29 21:53:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.160 2005/05/16 12:01:22 avenger_teambg Exp $
  *
  */
 
@@ -879,7 +879,7 @@ void Map::GenerateQueues()
 		}
 
 		if (actor->Active&SCR_ACTIVE) {
-			if (actor->GetStance() == IE_ANI_TWITCH) {
+			if ((actor->GetStance() == IE_ANI_TWITCH) && !actor->playDeadCounter) {
 				priority = 1;
 			} else {
 				priority = 0;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.300 2005/05/14 11:18:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.301 2005/05/16 12:01:21 avenger_teambg Exp $
  *
  */
 
@@ -88,6 +88,7 @@ Interface::Interface(int iargc, char** iargv)
 	game = NULL;
 	worldmap = NULL;
 	CurrentStore = NULL;
+	CurrentContainer = NULL;
 	timer = NULL;
 	evntmgr = NULL;
 	console = NULL;
@@ -1498,7 +1499,7 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	}
 	actor->InParty = InParty;
 	//both fields are of length 9, make this sure!
-	memcpy(actor->Area, GetGame()->CurrentArea, sizeof(actor->Area) );
+	memcpy(actor->Area, game->CurrentArea, sizeof(actor->Area) );
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		actor->SetStance( IE_ANI_TWITCH );
 	} else {
@@ -1516,7 +1517,7 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 
 int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 {
-	Actor * actor = GetGame()->FindPC(Slot);
+	Actor * actor = game->FindPC(Slot);
 	if (!actor) {
 		return 0xdadadada;
 	}
@@ -1530,7 +1531,7 @@ int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID,
 	int StatValue, int Mod)
 {
-	Actor * actor = GetGame()->FindPC(Slot);
+	Actor * actor = game->FindPC(Slot);
 	if (!actor) {
 		return 0;
 	}
@@ -1869,7 +1870,15 @@ void Interface::DrawWindows(void)
 		GSUpdate(false);
 	}
 	else {
-		GSUpdate(!(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS));
+		int flg = gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS;
+		GSUpdate(!flg);
+		if (CurrentContainer) {
+			if (!flg) {
+printf("Opening container subwindow\n");
+				gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+				guiscript->RunFunction( "OpenContainerWindow" );
+			}
+		}
 
 		//updating panes according to the saved game
 		ieDword index;
@@ -2347,7 +2356,7 @@ void Interface::SetCutSceneMode(bool active)
 	if (!active) {
 		timer->SetCutScene( NULL );
 	}
-	GameControl *gc=GetGameControl();
+	GameControl *gc = GetGameControl();
 	if (gc) {
 		gc->SetCutSceneMode( active );
 	}
@@ -3064,6 +3073,30 @@ WorldMap *Interface::NewWorldMap()
 	return new WorldMap();
 }
 
+Container *Interface::GetCurrentContainer()
+{
+	return CurrentContainer;
+}
+
+int Interface::CloseCurrentContainer()
+{
+	if ( !CurrentContainer) {
+		return -1;
+	}
+	CurrentContainer = NULL;
+	return 0;
+}
+
+void Interface::SetCurrentContainer(Actor *actor, Container *arg)
+{
+	//abort action if the first selected PC isn't the original actor
+	if (actor!=GetFirstSelectedPC()) {
+		CurrentContainer = NULL;
+		return;
+	}
+	CurrentContainer = arg;
+}
+
 Store *Interface::GetCurrentStore()
 {
 	return CurrentStore;
@@ -3188,3 +3221,15 @@ ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, Point &p
 		key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
 	return new ScriptedAnimation( af, position);
 }
+
+Actor *Interface::GetFirstSelectedPC()
+{
+        for (int i = 0; i < game->GetPartySize( false ); i++) {
+                Actor* actor = game->GetPC( i );
+                if (actor->IsSelected()) {
+                        return actor;
+                }
+        }
+        return NULL;
+}
+

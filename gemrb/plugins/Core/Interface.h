@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.152 2005/04/30 18:59:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.153 2005/05/16 12:01:21 avenger_teambg Exp $
  *
  */
 
@@ -161,6 +161,8 @@ private:
 	CREItem* DraggedItem;
 	// Current Store
 	Store* CurrentStore;
+	// Index of current container
+	Container* CurrentContainer;
 public:
 	int quitflag; // Quit Signal, set it to 0 or 1
 	int SlotTypes; //this is the same as the inventory size
@@ -390,6 +392,9 @@ public:
 	Spell* GetSpell(ieResRef resname);
 	void FreeSpell(Spell *spl, ieResRef name, bool free=false);
 	ieStrRef GetRumour(ieResRef resname);
+	Container *GetCurrentContainer();
+	int CloseCurrentContainer();
+	void SetCurrentContainer(Actor *actor, Container *arg);
 	Store *GetCurrentStore();
 	int CloseCurrentStore();
 	Store *SetCurrentStore(ieResRef resname);
@@ -409,6 +414,8 @@ public:
 	bool Exists(const char *ResRef, SClass_ID type);
 	/** creates a vvc/bam animation object at point */
 	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, Point &p);
+	/** returns the first selected PC */
+	Actor *GetFirstSelectedPC();
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

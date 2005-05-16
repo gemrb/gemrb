@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.37 2005/03/27 19:51:47 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.38 2005/05/16 12:01:17 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -499,8 +499,9 @@ def GetCharacterHeader (pc):
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
 	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
-	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
-	row = "0x%04X" %anim_id
+	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID) & 255
+	#using one byte animid
+	row = "0x%02X" %anim_id
 
 	# Nameless is a special case (dual class)
 	if GemRB.GetTableValue (AnimIdsTable, row, "PC") == "NAMELESS_ONE":
@@ -917,9 +918,9 @@ def OpenBiographyWindow ():
 	# These are used to get the bio
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	BioTable = GemRB.LoadTable ("BIOS")
-	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
-	row = "0x%04X" %anim_id
+	BioTable = GemRB.LoadTable ("bios")
+	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID) & 255
+	row = "0x%02X" %anim_id
 	BioText = int (GemRB.GetTableValue (BioTable, row, 'BIO'))
 	GemRB.UnloadTable (BioTable)
 
@@ -958,9 +959,209 @@ def OpenLevelUpWindow ():
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLevelUpWindow")
 
 	pc = GemRB.GameGetSelectedPCSingle ()
+	ClassTable = GemRB.LoadTable ("classes")
+
+	# These are used to identify Nameless One
+	AnimIdsTable = GemRB.LoadTable ("avslots")
+	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID) & 255
+	#using one byte animid
+	row = "0x%02X" %anim_id
+
+	# These will be used for saving throws
+	SavThrUpdated = false
+	DeaSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH)
+	WanSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSWANDS)
+	PolSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSPOLY)
+	BreSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSBREATH)
+	SpeSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSSPELL)
+
 	# name
 	Label = GemRB.GetControl (Window, 0x10000000)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 1))
+
+	# class
+	Label = GemRB.GetControl (Window, 0x10000001)
+	GemRB.SetText (Window, Label, GemRB.GetTableValue (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0))
+
+	# Thief Skills
+	# For now we shall set them to the current levels and disable the increment buttons
+	# Points Left
+	Label = GemRB.GetControl (Window, 0x10000006)
+	GemRB.SetText (Window, Label, '0')
+	# Stealth
+	Label = GemRB.GetControl (Window, 0x10000008)
+	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_STEALTH)) + '%')
+	# Detect Traps
+	Label = GemRB.GetControl (Window, 0x1000000A)
+	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_TRAPS)) + '%')
+	# Pick Pockets
+	Label = GemRB.GetControl (Window, 0x1000000C)
+	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_PICKPOCKET)) + '%')
+	# Open Doors
+	Label = GemRB.GetControl (Window, 0x1000000E)
+	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_LOCKPICKING)) + '%')
+	# Plus and Minus buttons
+	for i in range (8):
+		Button = GemRB.GetControl (Window, 16 + i)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+
+	# Is avatar multi-class?
+	if avatar_header['SecoLevel'] == 0:
+		# avatar is single class
+		# What is the avatar's class (Which we can use to lookup XP)
+		Class = GemRB.GetTableRowName (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1)
+		# What will be avatar's next level?
+		NextLevel = avatar_header['PrimLevel'] + 1
+		while avatar_header['XP'] > GetNextLevelExp (NextLevel, Class):
+			NextLevel = NextLevel + 1
+		NumOfLevUp = NextLevel - avatar_header['PrimLevel'] # How many levels did we go up?
+		# Is avatar Nameless One?
+		if GemRB.GetTableValue (AnimIdsTable, row, "PC") == "NAMELESS_ONE":
+			# Saving Throws
+			# Nameless One gets the best possible throws from all the classes except Priest
+			FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
+			MagSavThrTable = GemRB.LoadTable ("SAVEWIZ")
+			ThiSavThrTable = GemRB.LoadTable ("SAVEROG")
+			# For Nameless, we also need to know his levels in every class, so that we pick
+			# the right values from the corresponding tables. Also we substract one, so
+			# that we may use them as column indices in tables.
+			FighterLevel = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
+			MageLevel = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
+			ThiefLevel = GemRB.GetPlayerStat (pc, IE_LEVEL3) - 1
+			# We are leveling up one of those levels. Therefore, one of them has to be updated.
+			if avatar_header['PrimClass'] == "Fighter":
+				FighterLevel = NextLevel - 1
+			elif avatar_header['PrimClass'] == "Mage":
+				MageLevel = NextLevel - 1
+			else:
+				ThiefLevel = NextLevel - 1
+			# Now we need to update the saving throws with the best values from those tables.
+			# The smaller the number, the better saving throw it is.
+			# We also need to check if any of the levels are larger than 21, since
+			# after that point the table runs out, and the throws remain the
+			# same (WARNING: This is an assumption. We need to check what happens after 21
+			# in the IE version!).
+			if FighterLevel < 21:
+				# Death
+				if GemRB.GetTableValue (FigSavThrTable, 0, FighterLevel) < DeaSavThr:
+					DeaSavThr = GemRB.GetTableValue (FigSavThrTable, 0, FighterLevel)
+					SavThrUpdated = True
+				# Wand
+				if GemRB.GetTableValue (FigSavThrTable, 1, FighterLevel) < WanSavThr:
+					WanSavThr = GemRB.GetTableValue (FigSavThrTable, 1, FighterLevel)
+					SavThrUpdated = True
+				# Polymorph
+				if GemRB.GetTableValue (FigSavThrTable, 2, FighterLevel) < PolSavThr:
+					PolSavThr = GemRB.GetTableValue (FigSavThrTable, 2, FighterLevel)
+					SavThrUpdated = True
+				# Breath
+				if GemRB.GetTableValue (FigSavThrTable, 3, FighterLevel) < BreSavThr:
+					BreSavThr = GemRB.GetTableValue (FigSavThrTable, 3, FighterLevel)
+					SavThrUpdated = True
+				# Spell
+				if GemRB.GetTableValue (FigSavThrTable, 4, FighterLevel) < SpeSavThr:
+					SpeSavThr = GemRB.GetTableValue (FigSavThrTable, 4, FighterLevel)
+					SavThrUpdated = True
+			if MageLevel < 21:
+				# Death
+				if GemRB.GetTableValue (MagSavThrTable, 0, MageLevel) < DeaSavThr:
+					DeaSavThr = GemRB.GetTableValue (MagSavThrTable, 0, MageLevel)
+					SavThrUpdated = True
+				# Wand
+				if GemRB.GetTableValue (MagSavThrTable, 1, MageLevel) < WanSavThr:
+					WanSavThr = GemRB.GetTableValue (MagSavThrTable, 1, MageLevel)
+					SavThrUpdated = True
+				# Polymorph
+				if GemRB.GetTableValue (MagSavThrTable, 2, MageLevel) < PolSavThr:
+					PolSavThr = GemRB.GetTableValue (MagSavThrTable, 2, MageLevel)
+					SavThrUpdated = True
+				# Breath
+				if GemRB.GetTableValue (MagSavThrTable, 3, MageLevel) < BreSavThr:
+					BreSavThr = GemRB.GetTableValue (MagSavThrTable, 3, MageLevel)
+					SavThrUpdated = True
+				# Spell
+				if GemRB.GetTableValue (MagSavThrTable, 4, MageLevel) < SpeSavThr:
+					SpeSavThr = GemRB.GetTableValue (MagSavThrTable, 4, MageLevel)
+					SavThrUpdated = True
+			if ThiefLevel < 21:
+				# Death
+				if GemRB.GetTableValue (ThiSavThrTable, 0, ThiefLevel) < DeaSavThr:
+					DeaSavThr = GemRB.GetTableValue (ThiSavThrTable, 0, ThiefLevel)
+					SavThrUpdated = True
+				# Wand
+				if GemRB.GetTableValue (ThiSavThrTable, 1, ThiefLevel) < WanSavThr:
+					WanSavThr = GemRB.GetTableValue (ThiSavThrTable, 1, ThiefLevel)
+					SavThrUpdated = True
+				# Polymorph
+				if GemRB.GetTableValue (ThiSavThrTable, 2, ThiefLevel) < PolSavThr:
+					PolSavThr = GemRB.GetTableValue (ThiSavThrTable, 2, ThiefLevel)
+					SavThrUpdated = True
+				# Breath
+				if GemRB.GetTableValue (ThiSavThrTable, 3, ThiefLevel) < BreSavThr:
+					BreSavThr = GemRB.GetTableValue (ThiSavThrTable, 3, ThiefLevel)
+					SavThrUpdated = True
+				# Spell
+				if GemRB.GetTableValue (ThiSavThrTable, 4, ThiefLevel) < SpeSavThr:
+					SpeSavThr = GemRB.GetTableValue (ThiSavThrTable, 4, ThiefLevel)
+					SavThrUpdated = True
+			# Cleaning up
+			GemRB.UnloadTable (FigSavThrTable)
+			GemRB.UnloadTable (MagSavThrTable)
+			GemRB.UnloadTable (ThiSavThrTable)
+		else:
+			# Saving Throws
+			# Loading the right saving throw table
+			SavThrTable = GemRB.LoadTable (GemRB.GetTableValue (ClassTable, Class, "SAVE"))
+			# Updating the current saving throws. They are changed only if the the
+			# new ones are better than current. The smaller the number, the better.
+			# We need to substract one from the NextLevel, so that we get right values.
+			# We also need to check if NextLevel is larger than 21, since after that point
+			# the table runs out, and the throws remain the same (WARNING: This is an
+			# assumption. We need to check what happens after 21 in the IE version!).
+			if NextLevel < 22:
+				# Death
+				if GemRB.GetTableValue (SavThrTable, 0, NextLevel - 1) < DeaSavThr:
+					DeaSavThr = GemRB.GetTableValue (SavThrTable, 0, NextLevel - 1)
+					SavThrUpdated = True
+				# Wand
+				if GemRB.GetTableValue (SavThrTable, 1, NextLevel - 1) < WanSavThr:
+					WanSavThr = GemRB.GetTableValue (SavThrTable, 1, NextLevel - 1)
+					SavThrUpdated = True
+				# Polymorph
+				if GemRB.GetTableValue (SavThrTable, 2, NextLevel - 1) < PolSavThr:
+					PolSavThr = GemRB.GetTableValue (SavThrTable, 2, NextLevel - 1)
+					SavThrUpdated = True
+				# Breath
+				if GemRB.GetTableValue (SavThrTable, 3, NextLevel - 1) < BreSavThr:
+					BreSavThr = GemRB.GetTableValue (SavThrTable, 3, NextLevel - 1)
+					SavThrUpdated = True
+				# Spell
+				if GemRB.GetTableValue (SavThrTable, 4, NextLevel - 1) < SpeSavThr:
+					SpeSavThr = GemRB.GetTableValue (SavThrTable, 4, NextLevel - 1)
+					SavThrUpdated = True
+			# Cleaning Up
+			GemRB.UnloadTable (SavThrTable)
+	else:
+		# avatar is multi class
+		print "TODO: implement Multi-Class."
+
+	# Displaying the saving throws
+	# Death
+	Label = GemRB.GetControl (Window, 0x10000019)
+	GemRB.SetText (Window, Label, str (DeaSavThr))
+	# Wand
+	Label = GemRB.GetControl (Window, 0x1000001B)
+	GemRB.SetText (Window, Label, str (WanSavThr))
+	# Polymorph
+	Label = GemRB.GetControl (Window, 0x1000001D)
+	GemRB.SetText (Window, Label, str (PolSavThr))
+	# Breath
+	Label = GemRB.GetControl (Window, 0x1000001F)
+	GemRB.SetText (Window, Label, str (BreSavThr))
+	# Spell
+	Label = GemRB.GetControl (Window, 0x10000021)
+	GemRB.SetText (Window, Label, str (SpeSavThr))
+
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)

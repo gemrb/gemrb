@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.100 2005/04/09 19:13:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.101 2005/05/16 12:01:19 avenger_teambg Exp $
  *
  */
 
@@ -253,8 +253,8 @@ void Actor::SetCircleSize()
 {
 	Color* color;
 	if (Modified[IE_UNSELECTABLE]) {
-		color = &magenta;
-	} else if (GetMod(IE_MORALEBREAK)<0) {
+		color = &magenta;    
+	} else if (GetMod(IE_MORALE)<0) {//if current morale < the max morale ?
 		color = &yellow;
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
 		color = &yellow;
@@ -473,12 +473,22 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	return Modified[StatIndex] - oldmod;
 }
 
+void Actor::Panic()
+{
+	SetStat(IE_MORALE,0);
+	SetStat(IE_STATE_ID,GetStat(IE_STATE_ID)|STATE_PANIC);
+}
+
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Actor *hitter)
 {
-//recalculate damage based on resistances and difficulty level
-//the lower 2 bits are actually modifier types
+	//recalculate damage based on resistances and difficulty level
+	//the lower 2 bits are actually modifier types
 	NewStat(IE_HITPOINTS, -damage, damagetype&3);
+	//this is just a guess, probably morale is much more complex
+	if(GetStat(IE_HITPOINTS)<GetStat(IE_MORALEBREAK) ) {
+		Panic();
+	}
 	LastDamageType=damagetype;
 	LastDamage=damage;
 	LastHitter=hitter;
@@ -503,23 +513,25 @@ void Actor::DebugDump()
 	printf( "Script name:%.32s\n", scriptName );
 	printf( "TalkCount:  %d\n", TalkCount );
 	printf( "PartySlot:  %d\n", InParty );
-	printf( "Allegiance: %d\n", BaseStats[IE_EA] );
+	printf( "Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
+	printf( "Morale:     %d   current morale:%d\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
+	printf( "Moralebreak:%d   Morale recovery:%d\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
 	printf( "Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
-	printf( "Mod[IE_EA]: %d\n", Modified[IE_EA] );
 	printf( "Mod[IE_ANIMATION_ID]: 0x%04X\n", Modified[IE_ANIMATION_ID] );
+	printf( "Colors:    ");
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
 		for(i=0;i<Modified[IE_COLORCOUNT];i++) {
-			printf("Colors #%d: %d\n",i, Modified[IE_COLORS+i]);
+			printf("   %d", Modified[IE_COLORS+i]);
 		}
 	}
 	else {
 		for(i=0;i<7;i++) {
-			printf("Colors #%d: %d\n",i, Modified[IE_COLORS+i]);
+			printf("   %d", Modified[IE_COLORS+i]);
 		}
 	}
 	ieDword tmp=0;
 	core->GetGame()->globals->Lookup("APPEARANCE",tmp);
-	printf( "Disguise: %d\n", tmp);
+	printf( "\nDisguise: %d\n", tmp);
 	inventory.dump();
 	spellbook.dump();
 }

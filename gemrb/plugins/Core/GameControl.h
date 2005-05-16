@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.65 2005/04/19 20:11:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.66 2005/05/16 12:01:20 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -140,6 +140,7 @@ public:
 	void UnhideGUI();
 	void TryToAttack(Actor *source, Actor *target);
 	void TryToTalk(Actor *source, Actor *target);
+	void HandleContainer(Container *container, Actor *actor);
 	void HandleDoor(Door *door, Actor *actor);
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor);
 	void MoveToPointFormation(Actor *actor, Point p, int Orient);

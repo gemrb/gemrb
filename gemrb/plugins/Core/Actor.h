@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.66 2005/04/08 20:45:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.67 2005/05/16 12:01:20 avenger_teambg Exp $
  *
  */
 
@@ -259,6 +259,8 @@ public:
 	int GetEncumbrance();
 	/* checks on death of actor, returns true if it should be removed*/
 	bool CheckOnDeath();
+	/* sets the actor in panic (turn/morale break) */
+	void Panic();
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Actor *hitter);
 	/* drops items from inventory to current spot */

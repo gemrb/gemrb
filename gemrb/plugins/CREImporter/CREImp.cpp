@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.68 2005/04/18 19:14:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.69 2005/05/16 12:01:18 avenger_teambg Exp $
  *
  */
 
@@ -32,10 +32,10 @@ static ColorSet* randcolors=NULL;
 
 void ReleaseMemoryCRE()
 {
-        if (randcolors) {
+	if (randcolors) {
 		delete [] randcolors;
-                randcolors = NULL;
-        }
+		randcolors = NULL;
+	}
 }
 
 CREImp::CREImp(void)
@@ -401,7 +401,7 @@ void CREImp::GetActorPST(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_CHR]=tmpByte;
 	str->Read( &tmpByte, 1 );
-	//skipping a byte
+  act->BaseStats[IE_MORALE]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_MORALEBREAK]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -712,7 +712,7 @@ void CREImp::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_CHR]=tmpByte;
 	str->Read( &tmpByte, 1);
-	//skipping a byte
+	act->BaseStats[IE_MORALE]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_MORALEBREAK]=tmpByte;
 	str->Read( &tmpByte, 1);
@@ -852,12 +852,16 @@ void CREImp::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_CON]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_CHR]=tmpByte;
-	str->Read( &tmpByte, 1 );
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_MORALE]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_MORALEBREAK]=tmpByte;
-	str->ReadWord( &tmpWord );
-	//Skipping 2 bytes
-	str->Read( &tmpByte, 1);
+	str->Read( &tmpByte, 1 ); 
+	act->BaseStats[IE_HATEDRACE]=tmpByte;
+	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	//skipping a byte
 	str->ReadDword( &act->BaseStats[IE_KIT] );
 	ReadScript(act, 0);
 	ReadScript(act, 2);
@@ -1019,7 +1023,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_CHR]=tmpByte;
 	str->Read( &tmpByte, 1 ); 
-	//skipping a byte
+	act->BaseStats[IE_MORALE]=tmpByte;
 	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_MORALEBREAK]=tmpByte;
 	str->Read( &tmpByte, 1 ); 

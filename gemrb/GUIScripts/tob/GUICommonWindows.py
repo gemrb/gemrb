@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.17 2005/05/14 12:44:02 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.18 2005/05/16 12:01:18 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -119,6 +119,38 @@ def AIPress ():
 def RestPress ():
 	print "RestPress"
 	return
+
+def SetupContainerWindowControls (Window):
+	Container = GemRB.GetContainer()
+
+	# Gears (time) when options pane is down
+	Button = GemRB.GetControl (Window, 62)
+	GemRB.SetAnimation (Window, Button, "CGEAR")
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
+
+	#0-5 container items
+
+	#10-13 inventory items
+
+	#54 encumbrance
+
+	#0x10000036 party gold
+	Label = GemRB.GetControl (Window, 0x10000036)
+	GemRB.SetText (Window, Label, str(GemRB.GameGetPartyGold()))
+
+	#50 container icon
+	Button = GemRB.GetControl (Window, 50)
+	Table = GemRB.LoadTable ("containr")
+	row = Container['Type']
+	tmp = GemRB.GetTableValue (row, 1)
+	if tmp!='*':
+		GemRB.PlaySound (GemRB.GetTableValue (row, 1) )
+	tmp = GemRB.GetTableValue (row, 2)
+	if tmp!='*':
+		GemRB.SetPicture (Window, Button, GemRB.GetTableValue (row,2) )
+	return
+
 
 def SetupActionsWindowControls (Window):
 	# Gears (time) when options pane is down

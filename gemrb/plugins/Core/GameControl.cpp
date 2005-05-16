@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.224 2005/05/14 11:18:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.225 2005/05/16 12:01:20 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -759,6 +759,18 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	source->AddAction( GameScript::GenerateAction( Tmp, true ) );
 }
 
+void GameControl::HandleContainer(Container *container, Actor *actor)
+{
+	char Tmp[256];
+
+printf("Generating action to UseContainer\n");
+	actor->ClearPath();
+	actor->ClearActions();
+	strncpy(Tmp,"UseContainer()",sizeof(Tmp) );
+	target=container; //this is another hack, even more deadly
+	actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+}
+
 void GameControl::HandleDoor(Door *door, Actor *actor)
 {
 	char Tmp[256];
@@ -880,13 +892,18 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			HandleDoor(overDoor, game->selected[0]);
 			return;
 		}
-		if(overInfoPoint) {
-			if(HandleActiveRegion(overInfoPoint, game->selected[0])) {
+		if (overInfoPoint) {
+			if (HandleActiveRegion(overInfoPoint, game->selected[0])) {
 				return;
 			}
 		}
+		if (overContainer) {
+			HandleContainer(overContainer, game->selected[0]);
+			return;
+		}
+
 		//just a single actor, no formation
-		if(game->selected.size()==1) {
+		if (game->selected.size()==1) {
 			actor=game->selected[0];
 			actor->ClearPath();
 			actor->ClearActions();

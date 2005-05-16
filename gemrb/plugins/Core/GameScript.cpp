@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.267 2005/05/14 11:18:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.268 2005/05/16 12:01:20 avenger_teambg Exp $
  *
  */
 
@@ -618,6 +618,7 @@ static ActionLink actionnames[] = {
 	{"unlock", GameScript::Unlock,0},
 	{"unlockscroll", GameScript::UnlockScroll,0},
 	{"unmakeglobal", GameScript::UnMakeGlobal,0}, //this is a GemRB extension
+	{"usecontainer", GameScript::UseContainer,AF_BLOCKING},
 	{"vequip",GameScript::SetArmourLevel,0},
 	{"verbalconstant", GameScript::VerbalConstant,0},
 	{"verbalconstanthead", GameScript::VerbalConstantHead,0},
@@ -2893,10 +2894,10 @@ Targets *GameScript::XthNearestEnemyOfType(Scriptable *origin, Targets *paramete
 	//determining the allegiance of the origin
 	int type = 2; //neutral, has no enemies
 	if (actor->GetStat(IE_EA) <= GOODCUTOFF) {
-		type=0; //PC
+		type = 1; //PC
 	}
 	if (actor->GetStat(IE_EA) >= EVILCUTOFF) {
-		type=1;
+		type = 0;
 	}
 	if (type==2) {
 		parameters->Clear();
@@ -2931,10 +2932,10 @@ Targets *GameScript::XthNearestEnemyOf(Targets *parameters, int count)
 	//determining the allegiance of the origin
 	int type = 2; //neutral, has no enemies
 	if (origin->GetStat(IE_EA) <= GOODCUTOFF) {
-		type=0; //PC
+		type = 1; //PC
 	}
 	if (origin->GetStat(IE_EA) >= EVILCUTOFF) {
-		type=1;
+		type = 0;
 	}
 	if (type==2) {
 		return parameters;
@@ -7719,10 +7720,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 		LeaveAreaLUA(Sender, parameters);
 		return;
 	}
-	Sender->AddActionInFront( Sender->CurrentAction );
-	char Tmp[256];
-	sprintf( Tmp, "MoveToPoint([%d.%d])", ent->Pos.x, ent->Pos.y );
-	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
+	GoNearAndRetry( Sender, ent->Pos);
 }
 
 void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
@@ -7750,10 +7748,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 		LeaveAreaLUAPanic(Sender, parameters);
 		return;
 	}
-	Sender->AddActionInFront( Sender->CurrentAction );
-	char Tmp[256];
-	sprintf( Tmp, "MoveToPoint([%d.%d])", ent->Pos.x, ent->Pos.y );
-	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
+	GoNearAndRetry( Sender, ent->Pos);
 }
 
 void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
@@ -9010,8 +9005,7 @@ void GameScript::Panic(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->NewStat(IE_MORALEBREAK, 0, MOD_ABSOLUTE); //this will modify state?
-	//act->NewStat(IE_STATE_ID, act->GetStat(IE_STATE_ID)|STATE_PANIC, MOD_ABSOLUTE);
+	act->Panic();
 }
 
 void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
@@ -9081,10 +9075,7 @@ void GameScript::AttackCore(Scriptable *Sender, Scriptable *target, Action *para
 		return;
 	}
 	if ( Distance(Sender, target) > wrange ) {
-		char Tmp[256];
-
-		sprintf( Tmp, "MoveToPoint([%d.%d])", target->Pos.x, target->Pos.y );
-		Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
+		GoNearAndRetry(Sender, target);
 		if (flags&AC_REEVALUATE) {
 			delete parameters;
 		}
@@ -9282,4 +9273,26 @@ void GameScript::RandomFly(Scriptable* Sender, Action* parameters)
 	//fly in this direction for 2 steps
 	actor->MoveLine(2, GL_PASS);
 	Sender->AddAction( parameters );
+}
+
+//UseContainer uses the predefined target (like Nidspecial1 dialog hack)
+void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
+{
+	GameControl* gc = core->GetGameControl();
+	if (!gc || !gc->target || (gc->target->Type!=ST_CONTAINER) ) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	double distance = Distance(Sender, gc->target);
+	if (distance<=MAX_OPERATING_DISTANCE)
+	{
+		//both are legitimate casts, we assured their type above
+		core->SetCurrentContainer((Actor *) Sender, (Container *) (gc->target) );
+		return;
+	}
+	GoNearAndRetry(Sender, gc->target);
 }
