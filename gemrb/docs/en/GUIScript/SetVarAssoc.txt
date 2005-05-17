@@ -10,5 +10,7 @@ LongValue                  - numeric, a value associated with the control
 
 Return value: N/A
 
+Special: If the 'DialogChoose' variable was set to -1 or 0 during a dialog session, it will terminate (-1) or pick the first available option (0) from the dialog automatically. (0 is used for 'continue', -1 is used for 'end dialogue').
+
 See also: SetButtonFlags, SetVar, GetVar, data_exchange, accessing_gui_controls
 
