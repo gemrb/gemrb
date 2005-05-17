@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.304 2005/05/17 11:16:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.305 2005/05/17 17:13:57 avenger_teambg Exp $
  *
  */
 
@@ -2364,17 +2364,14 @@ static PyObject* GemRB_SetAnimation(PyObject * /*self*/, PyObject* args)
 
 	if (ResRef[0] == 0) {
 		ctl->SetAnimPicture( NULL );
+		//who knows, there might have been lurking an active animation
+		core->timer->RemoveAnimation(ctl->animation);
 		ctl->animation = NULL;
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
 
 	ControlAnimation* anim = new ControlAnimation( ctl, ResRef );
-	//if (! anim->bam) {
-	//	delete anim;
-	//	return NULL;
-	//}
-
 
 	anim->UpdateAnimation();
 
@@ -3749,7 +3746,8 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 	Container *container = NULL;
 	if (autoselect) { //autoselect works only with piles
 		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
-		core->SetCurrentContainer(actor, container);
+		//this isn't ok
+		//core->SetCurrentContainer(actor, container);
 	} else {
 		container = core->GetCurrentContainer();
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.269 2005/05/17 13:52:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.270 2005/05/17 17:13:55 avenger_teambg Exp $
  *
  */
 
@@ -796,7 +796,6 @@ static void GoNearAndRetry(Scriptable *Sender, Scriptable *target)
 	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", target->Pos.x, target->Pos.y );
-printf("%s issued\n", Tmp);
 	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
 }
 
@@ -9284,26 +9283,31 @@ void GameScript::RandomFly(Scriptable* Sender, Action* parameters)
 //UseContainer uses the predefined target (like Nidspecial1 dialog hack)
 void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 {
-printf("UseContainer entered\n");
 	GameControl* gc = core->GetGameControl();
 	if (!gc || !gc->target || (gc->target->Type!=ST_CONTAINER) ) {
 		Sender->CurrentAction = NULL;
-printf("No gamecontrol, or no target, or target isn't container\n");
 		return;
 	}
+	Container *container = (Container *) gc->target;
 	if (Sender->Type != ST_ACTOR) {
 		Sender->CurrentAction = NULL;
-printf("Sender isn't actor\n");
 		return;
 	}
 	double distance = Distance(Sender, gc->target);
 	if (distance<=MAX_OPERATING_DISTANCE)
 	{
-printf("Current container is set when we are close enough\n");
-		//both are legitimate casts, we assured their type above
-		core->SetCurrentContainer((Actor *) Sender, (Container *) (gc->target) );
+		//check if the container is unlocked
+		if (container->Flags & CONT_LOCKED) {
+			//playsound can't open container
+			//display string, etc
+			core->DisplayConstantString(STR_CONTLOCKED,0xff0000);
+			Sender->CurrentAction = NULL;
+			return;
+		}
+		core->SetCurrentContainer((Actor *) Sender, container);
+		Sender->CurrentAction = NULL;
 		return;
 	}
-printf("We are not close enough\n");
 	GoNearAndRetry(Sender, gc->target);
+	Sender->CurrentAction = NULL;
 }

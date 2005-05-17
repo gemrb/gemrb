@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ControlAnimation.cpp,v 1.3 2005/04/01 18:48:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ControlAnimation.cpp,v 1.4 2005/05/17 17:13:54 avenger_teambg Exp $
  *
  */
 
@@ -57,16 +57,16 @@ ControlAnimation::ControlAnimation(Control* ctl, ieResRef ResRef)
 	}
 
 	control = ctl;
+	control->animation = this;
 }
 
 //freeing the bitmaps only once, but using an intelligent algorithm
 ControlAnimation::~ControlAnimation(void)
 {
+	//removing from timer first
+	core->timer->RemoveAnimation( this );
+	//destructing ourselves
 	if (bam) delete bam;
-
-	if (Palette) {
-		core->GetVideoDriver()->FreePalette(Palette);
-	}
 }
 
 void ControlAnimation::UpdateAnimation(void)

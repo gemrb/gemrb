@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.21 2005/05/13 16:40:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.22 2005/05/17 17:13:54 avenger_teambg Exp $
 
 import GemRB
 
@@ -169,4 +169,5 @@ def UpdateControlStatus():
 	else:
 		GemRB.SetVar("PortraitWindow", PortraitWindow)
 
+	print "Unhidegui"
 	GemRB.UnhideGUI()

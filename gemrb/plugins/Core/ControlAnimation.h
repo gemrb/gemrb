@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ControlAnimation.h,v 1.1 2005/03/27 13:27:00 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ControlAnimation.h,v 1.2 2005/05/17 17:13:55 avenger_teambg Exp $
  *
  */
 
@@ -53,10 +53,6 @@ private:
 	unsigned int cycle;
 	unsigned int frame;
 	unsigned int anim_phase;
-
-	Color *Palette;   //this is the palette
-	ieResRef ResRef;
-
 public:
 	ControlAnimation(Control* ctl, ieResRef ResRef);
 	~ControlAnimation(void);

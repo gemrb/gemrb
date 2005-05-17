@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.225 2005/05/16 12:01:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.226 2005/05/17 17:13:55 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -763,7 +763,6 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 {
 	char Tmp[256];
 
-printf("Generating action to UseContainer\n");
 	actor->ClearPath();
 	actor->ClearActions();
 	strncpy(Tmp,"UseContainer()",sizeof(Tmp) );
@@ -842,6 +841,8 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 	StartY = p.y;
 	SelectionRect.w = 0;
 	SelectionRect.h = 0;
+	//heh, i found no better place
+	core->CloseCurrentContainer();
 }
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y,
@@ -1116,12 +1117,12 @@ void GameControl::HideGUI()
 		return;
 	}
 	ScreenFlags &=~SF_GUIENABLED;
-	HandleWindowHide("OptionsWindow", "OptionsPosition");
 	HandleWindowHide("PortraitWindow", "PortraitPosition");
-	HandleWindowHide("ActionsWindow", "ActionsPosition");
-	HandleWindowHide("TopWindow", "TopPosition");
 	HandleWindowHide("OtherWindow", "OtherPosition");
+	HandleWindowHide("TopWindow", "TopPosition");
+	HandleWindowHide("OptionsWindow", "OptionsPosition");
 	HandleWindowHide("MessageWindow", "MessagePosition");
+	HandleWindowHide("ActionsWindow", "ActionsPosition");
 	//FloatWindow doesn't affect gamecontrol, so it is special
 	Variables* dict = core->GetDictionary();
 	ieDword index;
@@ -1165,12 +1166,12 @@ void GameControl::UnhideGUI()
 	// Unhide the gamecontrol window
 	core->SetVisible( 0, 1 );
 
-	HandleWindowReveal("MessageWindow", "MessagePosition");
 	HandleWindowReveal("ActionsWindow", "ActionsPosition");
+	HandleWindowReveal("MessageWindow", "MessagePosition");
 	HandleWindowReveal("OptionsWindow", "OptionsPosition");
-	HandleWindowReveal("PortraitWindow", "PortraitPosition");
 	HandleWindowReveal("TopWindow", "TopPosition");
 	HandleWindowReveal("OtherWindow", "OtherPosition");
+	HandleWindowReveal("PortraitWindow", "PortraitPosition");
 	//the floatwindow is a special case
 	Variables* dict = core->GetDictionary();
 	ieDword index;

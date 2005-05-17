@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.5 2005/05/16 14:26:19 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.6 2005/05/17 17:13:54 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -29,74 +29,99 @@ from GUIDefines import *
 from GUICommon import CloseOtherWindow
 
 ContainerWindow = None
+ContinueWindow = None
 FormationWindow = None
 ReformPartyWindow = None
+OldActionsWindow = None
 Container = None
 
+def CloseContinueWindow ():
+	global ContinueWindow, OldActionsWindow
+
+	GemRB.UnloadWindow (ContinueWindow)
+	GemRB.SetVar ("ActionsWindow", OldActionsWindow)
+	ContinueWindow = None
+	OldActionsWindow = None
+	GemRB.UnhideGUI ()
+
+
 def OpenEndDialogWindow ():
-	global ContinueWindow
+	global ContinueWindow, OldActionsWindow
+
 	GemRB.HideGUI ()
 
 	if ContinueWindow:
-		GemRB.UnloadWindow (ContinueWindow)
-		ContinueWindow = None
-
-		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		return
 
 	GemRB.LoadWindowPack (GetWindowPack())
-	ContainerWindow = Window = GemRB.LoadWindow (9)
-	GemRB.SetVar ("OtherWindow", Window)
+	ContinueWindow = Window = GemRB.LoadWindow (9)
+	OldActionsWindow = GemRB.GetVar("ActionsWindow")
+	GemRB.SetVar ("ActionsWindow", Window)
 
 	#end dialog
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 9371)
 	GemRB.SetVarAssoc (Window, Button, "DialogChoose", -1)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 	
 	GemRB.UnhideGUI ()
 
 def OpenContinueDialogWindow ():
-	global ContinueWindow
+	global ContinueWindow, OldActionsWindow
+
 	GemRB.HideGUI ()
 
 	if ContinueWindow:
-		GemRB.UnloadWindow (ContinueWindow)
-		ContinueWindow = None
-
-		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
 		return
 
 	GemRB.LoadWindowPack (GetWindowPack())
-	ContainerWindow = Window = GemRB.LoadWindow (9)
-	GemRB.SetVar ("OtherWindow", Window)
+	ContinueWindow = Window = GemRB.LoadWindow (9)
+	OldActionsWindow = GemRB.GetVar("ActionsWindow")
+	GemRB.SetVar ("ActionsWindow", Window)
 
 	#continue
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 9372)
 	GemRB.SetVarAssoc (Window, Button, "DialogChoose", 0)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 	
 	GemRB.UnhideGUI ()
 
 
-def OpenContainerWindow ():
-	global ContainerWindow, Container
+def CloseContainerWindow ():
+	global OldActionsWindow, ContainerWindow
+
 	GemRB.HideGUI ()
 
-	if ContainerWindow:
-		GemRB.UnloadWindow (ContainerWindow)
-		ContainerWindow = None
+	GemRB.UnloadWindow (ContainerWindow)
+	ContainerWindow = None
+	GemRB.SetVar ("ActionsWindow", OldActionsWindow)
+	Table = GemRB.LoadTable ("containr")
+	row = Container['Type']
+	tmp = GemRB.GetTableValue (Table, row, 2)
+	#play closing sound if applicable
+	if tmp!='*':
+		GemRB.PlaySound (tmp)
 
-		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
+	#it is enough to close here
+	GemRB.UnloadTable (Table)
+	GemRB.UnhideGUI ()
+
+
+def OpenContainerWindow ():
+	global OldActionsWindow, ContainerWindow, Container
+
+	if ContainerWindow:
 		return
+
+	GemRB.HideGUI ()
 
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindow (8)
-	GemRB.SetVar ("OtherWindow", Window)
+	OldActionsWindow = GemRB.GetVar ("ActionsWindow")
+	GemRB.SetVar ("ActionsWindow", Window)
 
-	Container = GemRB.GetContainer()
+	Container = GemRB.GetContainer(GemRB.GameGetFirstSelectedPC())
 
 	# Gears (time) when options pane is down
 	Button = GemRB.GetControl (Window, 62)
@@ -225,7 +250,6 @@ def SelectFormation ():
 	Window = FormationWindow
 	
 	formation = GemRB.GetVar ("SelectedFormation")
-	print "FORMATION:", formation
 	if last_formation != None and last_formation != formation:
 		Button = GemRB.GetControl (Window, last_formation)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_UNPRESSED)

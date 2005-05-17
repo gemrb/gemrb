@@ -163,7 +163,6 @@ void GlobalTimer::RemoveAnimation(ControlAnimation* ctlanim)
 			(*it)->ctlanim = NULL;
 		}
 	}
-	
 }
 
 void GlobalTimer::UpdateAnimations()

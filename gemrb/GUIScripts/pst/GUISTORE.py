@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUISTORE.py,v 1.9 2005/05/15 19:56:22 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUISTORE.py,v 1.10 2005/05/17 17:13:53 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -49,37 +49,44 @@ party_gold = 0
 store_buttons = {}
 store_update_functions = {}
 
+def CloseStoreWindow ():
+	global StoreWindow 
+
+	CloseStoreShoppingWindow ()
+	CloseStoreIdentifyWindow ()
+	CloseStoreStealWindow ()
+	CloseStoreDonateWindow ()
+	CloseStoreHealWindow ()
+	CloseStoreRumourWindow ()
+	CloseStoreRentWindow ()
+
+	GemRB.SetVar ("OtherWindow", -1)
+	GemRB.UnloadWindow (StoreWindow)
+	StoreWindow = None
+	GemRB.LeaveStore ()
+	GemRB.SetVisible (0,1) #enabling the game control screen
+	GemRB.UnhideGUI () #enabling the other windows
+	SetSelectionChangeHandler (None)
+	
+
 def OpenStoreWindow ():
 	global StoreWindow, party_gold, store_name, Store
 	
 	GemRB.HideGUI ()
+	GemRB.SetVisible (0,0) #removing the game control screen
 	
-	if StoreWindow != None:
-		CloseStoreShoppingWindow ()
-		CloseStoreIdentifyWindow ()
-
-		GemRB.UnloadWindow (StoreWindow)
-		StoreWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		SetSelectionChangeHandler (None)
-		
-		GemRB.UnhideGUI ()
-		return
+	GemRB.LoadWindowPack ("GUISTORE")
+	StoreWindow = Window = GemRB.LoadWindow (3)
+	GemRB.SetVisible (Window, 1)
 
 	Store = GemRB.GetStore ()
 	# font used for store name has only uppercase chars
 	store_name = GemRB.GetString (Store['StoreName']).upper ()
 	
-	GemRB.LoadWindowPack ("GUISTORE")
-	StoreWindow = Window = GemRB.LoadWindow (3)
-        #GemRB.SetVar ("OtherWindow", StoreWindow)
-	GemRB.SetVisible (Window, 1)
-
-
 	# Done
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 1403)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseStoreWindow")
 
 	# buy / sell
 	Button = GemRB.GetControl (Window, 1)
@@ -245,7 +252,7 @@ def OpenStoreStealWindow ():
 		return
 	
 	StoreStealWindow = Window = GemRB.LoadWindow (7)
-        GemRB.SetVar ("OtherWindow", Window)
+	GemRB.SetVar ("OtherWindow", Window)
 
 	# title ...
 	Label = GemRB.GetControl (Window, 0x10000000)
@@ -273,7 +280,7 @@ def OpenStoreDonateWindow ():
 		return
 	
 	StoreDonateWindow = Window = GemRB.LoadWindow (10)
-        GemRB.SetVar ("OtherWindow", Window)
+	GemRB.SetVar ("OtherWindow", Window)
 
 	# title ...
 	Label = GemRB.GetControl (Window, 0x10000005)
@@ -578,6 +585,46 @@ def CloseStoreIdentifyWindow ():
 	if StoreIdentifyWindow != None:
 		GemRB.UnloadWindow (StoreIdentifyWindow)
 		StoreIdentifyWindow = None
+
+
+def CloseStoreStealWindow ():
+	global StoreStealWindow
+	
+	if StoreStealWindow != None:
+		GemRB.UnloadWindow (StoreStealWindow)
+		StoreStealWindow = None
+
+
+def CloseStoreDonateWindow ():
+	global StoreDonateWindow
+	
+	if StoreDonateWindow != None:
+		GemRB.UnloadWindow (StoreDonateWindow)
+		StoreDonateWindow = None
+
+
+def CloseStoreHealWindow ():
+	global StoreHealWindow
+	
+	if StoreHealWindow != None:
+		GemRB.UnloadWindow (StoreHealWindow)
+		StoreHealWindow = None
+
+
+def CloseStoreRumourWindow ():
+	global StoreRumourWindow
+	
+	if StoreRumourWindow != None:
+		GemRB.UnloadWindow (StoreRumourWindow)
+		StoreRumourWindow = None
+
+
+def CloseStoreRentWindow ():
+	global StoreRentWindow
+	
+	if StoreRentWindow != None:
+		GemRB.UnloadWindow (StoreRentWindow)
+		StoreRentWindow = None
 
 
 ###################################################

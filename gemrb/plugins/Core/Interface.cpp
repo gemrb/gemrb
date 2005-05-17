@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.303 2005/05/17 13:52:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.304 2005/05/17 17:13:56 avenger_teambg Exp $
  *
  */
 
@@ -1880,14 +1880,12 @@ void Interface::DrawWindows(void)
 			vars->Lookup("DialogChoose", var);
 			//end or continue
 			if ((var == 0) || (var == (ieDword) ~0)) {
-printf("Using button option: %d\n", var);
 				gc->DialogChoose(var);
 			}
 			vars->SetAt("DialogChoose",1);
 		}
 		if (CurrentContainer) {
 			if (!(flg & DF_IN_CONTAINER) ) {
-printf("Opening container subwindow\n");
 				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_OR);
 				guiscript->RunFunction( "OpenContainerWindow" );
 			}
@@ -1895,7 +1893,6 @@ printf("Opening container subwindow\n");
 			if (flg & DF_IN_CONTAINER) {
 				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_NAND);
 				guiscript->RunFunction( "CloseContainerWindow" );
-				CloseCurrentContainer();
 			}
 		}
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.35 2005/04/10 19:08:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.36 2005/05/17 17:13:54 avenger_teambg Exp $
  *
  */
 
@@ -51,7 +51,6 @@ Control::~Control()
 	}
 
 	if (animation) {
-		core->timer->RemoveAnimation( animation );
 		delete animation;
 	}
 }
