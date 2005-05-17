@@ -1,0 +1,14 @@
+
+Prototype: GetContainer( PartyID, autoselect )
+
+Description: Gets the current container's type and other basic header information. The player is always the first selected player. If PartyID is 0 then the default PC is the first multiselected PC.
+ 
+Parameters:
+ PartyID    - the PC's position in the party
+ autoselect - is 1 if you call this function from a player inventory (so you select the current container)
+
+Return value: dictionary
+"Type"       - the container's type, numeric (see IESDP)
+
+See also: GetStore, GameGetFirstSelectedPC
+

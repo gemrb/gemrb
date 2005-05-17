@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.303 2005/05/16 12:01:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.304 2005/05/17 11:16:40 avenger_teambg Exp $
  *
  */
 
@@ -3719,20 +3719,31 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GetContainer__doc,
-"GetContainer( bool autoselect ) => string\n\n"
+"GetContainer( PartyID, autoselect ) => string\n\n"
 "Returns relevant data of the container used by the selected actor. Use autoselect if the container is an item pile at the feet of the actor." );
 
 static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 {
+	int PartyID;
 	int autoselect=0;
 
-	if (!PyArg_ParseTuple( args, "|i", &autoselect )) {
+	if (!PyArg_ParseTuple( args, "i|i", &PartyID, &autoselect )) {
 		return AttributeError( GemRB_GetContainer__doc );
 	}
 
-	Actor *actor = core->GetFirstSelectedPC();
+	Actor *actor;
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError("No current game!");
+	}
+	if (PartyID) {
+		actor = game->FindPC( PartyID );
+	} else {
+		actor = core->GetFirstSelectedPC();
+	}
 	if (!actor) {
-		return RuntimeError("No current actor!");
+		return RuntimeError("No selected actor!");
 	}
 	Map *map = actor->GetCurrentArea();
 	Container *container = NULL;
