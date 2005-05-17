@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.38 2005/05/16 12:01:17 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.39 2005/05/17 09:50:14 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -968,7 +968,7 @@ def OpenLevelUpWindow ():
 	row = "0x%02X" %anim_id
 
 	# These will be used for saving throws
-	SavThrUpdated = false
+	SavThrUpdated = False
 	DeaSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH)
 	WanSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSWANDS)
 	PolSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSPOLY)
