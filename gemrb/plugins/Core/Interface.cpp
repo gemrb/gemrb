@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.302 2005/05/16 14:26:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.303 2005/05/17 13:52:10 avenger_teambg Exp $
  *
  */
 
@@ -1870,7 +1870,11 @@ void Interface::DrawWindows(void)
 		GSUpdate(false);
 	}
 	else {
+		//this variable is used all over in the following hacks
 		int flg = gc->GetDialogueFlags();
+		GSUpdate(!(flg & DF_FREEZE_SCRIPTS) );
+
+		//the following part is a series of hardcoded gui behaviour
 		if (flg & DF_IN_DIALOG) {
 			ieDword var = 1;
 			vars->Lookup("DialogChoose", var);
@@ -1881,13 +1885,17 @@ printf("Using button option: %d\n", var);
 			}
 			vars->SetAt("DialogChoose",1);
 		}
-		flg &= DF_FREEZE_SCRIPTS;
-		GSUpdate(!flg);
 		if (CurrentContainer) {
-			if (!flg) {
+			if (!(flg & DF_IN_CONTAINER) ) {
 printf("Opening container subwindow\n");
-				gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_OR);
 				guiscript->RunFunction( "OpenContainerWindow" );
+			}
+		} else {
+			if (flg & DF_IN_CONTAINER) {
+				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_NAND);
+				guiscript->RunFunction( "CloseContainerWindow" );
+				CloseCurrentContainer();
 			}
 		}
 
@@ -1902,10 +1910,11 @@ printf("Opening container subwindow\n");
 			GameControl *gc = GetGameControl();
 			if (index & CS_HIDEGUI) gc->HideGUI();
 			else gc->UnhideGUI();
-			if (gc->GetDialogueFlags()&DF_START_DIALOG) {
+			if (flg & DF_START_DIALOG) {
 				gc->DialogChoose( (unsigned int) -1);
 			}
 		}
+		//end of gui hacks
 	}
 	
 	if (ModalWindow) {

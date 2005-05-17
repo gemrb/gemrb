@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.1 2004/11/13 13:03:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.2 2005/05/17 13:52:01 avenger_teambg Exp $
  *
  */
 
@@ -67,7 +67,12 @@ typedef struct Effect {
 	ieDword Duration;
 	ieByte Probability1;
 	ieByte Probability2;
+	//keep these four in one bunch, VariableName will
+	//spread across them
 	ieResRef Resource;
+	ieResRef Resource2;
+	ieResRef Resource3;
+	ieResRef Resource4;
 	ieDword DiceThrown;
 	ieDword DiceSides;
 	ieDword SavingThrowType;

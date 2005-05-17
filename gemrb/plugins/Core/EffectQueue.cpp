@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.14 2005/05/14 11:18:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.15 2005/05/17 13:52:01 avenger_teambg Exp $
  *
  */
 
@@ -56,7 +56,7 @@ int fx_stealth_bonus (Actor* target, Effect* fx);
 int fx_damage_bonus (Actor* target, Effect* fx);
 int fx_open_locks_modifier (Actor* target, Effect* fx);
 int fx_resistance_to_magic_damage (Actor* target, Effect* fx);
-
+int fx_local_variable (Actor* target, Effect* fx);
 
 static int initialized = 0;
 static EffectFunction effect_fns[MAX_EFFECTS];
@@ -547,3 +547,13 @@ int fx_resistance_to_magic_damage (Actor* target, Effect* fx)
 	target->NewStat( IE_MAGICDAMAGERESISTANCE, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
+
+// 0xBB
+int fx_local_variable (Actor* target, Effect* fx)
+{
+	//this is a hack, the variable name spreads across the resources
+	printf( "fx_local_variable (%s=%d", fx->Resource, fx->Parameter2);
+	target->locals->SetAt(fx->Resource, fx->Parameter2);
+	return FX_APPLIED;
+}
+

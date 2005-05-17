@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.268 2005/05/16 12:01:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.269 2005/05/17 13:52:01 avenger_teambg Exp $
  *
  */
 
@@ -442,9 +442,9 @@ static ActionLink actionnames[] = {
 	{"killfloatmessage", GameScript::KillFloatMessage,0},
 	{"leavearea", GameScript::LeaveAreaLUA,0}, //so far the same
 	{"leavearealua", GameScript::LeaveAreaLUA,0},
-	{"leavearealuaentry", GameScript::LeaveAreaLUAEntry,0},
+	{"leavearealuaentry", GameScript::LeaveAreaLUAEntry,AF_BLOCKING},
 	{"leavearealuapanic", GameScript::LeaveAreaLUAPanic,0},
-	{"leavearealuapanicentry", GameScript::LeaveAreaLUAPanicEntry,0},
+	{"leavearealuapanicentry", GameScript::LeaveAreaLUAPanicEntry,AF_BLOCKING},
 	{"leaveparty", GameScript::LeaveParty,0},
 	{"lock", GameScript::Lock,AF_BLOCKING},//key not checked at this time!
 	{"lockscroll", GameScript::LockScroll,0},
@@ -481,8 +481,8 @@ static ActionLink actionnames[] = {
 	{"permanentstatchange", GameScript::ChangeStat,0}, //probably the same
 	{"picklock", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
 	{"pickpockets", GameScript::PickPockets, AF_BLOCKING},
-	{"playdead", GameScript::PlayDead,0},
-	{"playdeadinterruptable", GameScript::PlayDeadInterruptable,0},
+	{"playdead", GameScript::PlayDead,AF_BLOCKING},
+	{"playdeadinterruptable", GameScript::PlayDeadInterruptable,AF_BLOCKING},
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playsequence", GameScript::PlaySequence,0},
@@ -796,6 +796,7 @@ static void GoNearAndRetry(Scriptable *Sender, Scriptable *target)
 	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", target->Pos.x, target->Pos.y );
+printf("%s issued\n", Tmp);
 	Sender->AddActionInFront( GameScript::GenerateAction( Tmp, true ) );
 }
 
@@ -6740,7 +6741,7 @@ void GameScript::UnhideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game* game = core->GetGame();
 	game->SetControlStatus(CS_HIDEGUI, BM_NAND);
-	core->SetCutSceneMode( false );
+	//core->SetCutSceneMode( false );
 }
 
 void GameScript::HideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -7705,9 +7706,11 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 }
 
+//this is a blocking action, because we have to move to the Entry
 void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
@@ -7718,9 +7721,11 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
 	if (Distance(ent->Pos, Sender) <= MAX_OPERATING_DISTANCE) {
 		LeaveAreaLUA(Sender, parameters);
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	GoNearAndRetry( Sender, ent->Pos);
+	Sender->CurrentAction = NULL;
 }
 
 void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
@@ -7733,9 +7738,11 @@ void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 	MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 }
 
+//this is a blocking action, because we have to move to the Entry
 void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
@@ -7746,9 +7753,11 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
 	if (Distance(ent->Pos, Sender) <= MAX_OPERATING_DISTANCE) {
 		LeaveAreaLUAPanic(Sender, parameters);
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	GoNearAndRetry( Sender, ent->Pos);
+	Sender->CurrentAction = NULL;
 }
 
 void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
@@ -7760,19 +7769,16 @@ void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
+	//using SetAtCopy because we need a copy of the value
 	char tmpstr[10];
 	sprintf( tmpstr, "%d", value );
-/*
-	char* newvalue = ( char* ) malloc( strlen( tmpstr ) + 1 );
-	strcpy( newvalue, tmpstr );
-	core->GetTokenDictionary()->SetAt( parameters->string1Parameter, newvalue );
-*/
 	core->GetTokenDictionary()->SetAtCopy( parameters->string1Parameter, tmpstr );
 }
 
 void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
@@ -9278,21 +9284,26 @@ void GameScript::RandomFly(Scriptable* Sender, Action* parameters)
 //UseContainer uses the predefined target (like Nidspecial1 dialog hack)
 void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 {
+printf("UseContainer entered\n");
 	GameControl* gc = core->GetGameControl();
 	if (!gc || !gc->target || (gc->target->Type!=ST_CONTAINER) ) {
 		Sender->CurrentAction = NULL;
+printf("No gamecontrol, or no target, or target isn't container\n");
 		return;
 	}
 	if (Sender->Type != ST_ACTOR) {
 		Sender->CurrentAction = NULL;
+printf("Sender isn't actor\n");
 		return;
 	}
 	double distance = Distance(Sender, gc->target);
 	if (distance<=MAX_OPERATING_DISTANCE)
 	{
+printf("Current container is set when we are close enough\n");
 		//both are legitimate casts, we assured their type above
 		core->SetCurrentContainer((Actor *) Sender, (Container *) (gc->target) );
 		return;
 	}
+printf("We are not close enough\n");
 	GoNearAndRetry(Sender, gc->target);
 }
