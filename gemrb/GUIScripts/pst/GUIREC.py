@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.39 2005/05/17 09:50:14 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.40 2005/05/17 10:20:24 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -174,13 +174,13 @@ def UpdateRecordsWindow ():
 	# Checking whether character has leveled up.
 	Button = GemRB.GetControl (Window, 9)
 	if avatar_header['SecoLevel'] == 0:
-		if avatar_header['XP'] > avatar_header['PrimNextLevXP']:
+		if avatar_header['XP'] >= avatar_header['PrimNextLevXP']:
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		else:
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 	else:
 		# Character is Multi-Class
-		if avatar_header['XP'] > avatar_header['PrimNextLevXP'] or avatar_header['XP'] > avatar_header['SecoNextLevXP']:
+		if avatar_header['XP'] >= avatar_header['PrimNextLevXP'] or avatar_header['XP'] >= avatar_header['SecoNextLevXP']:
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		else:
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
@@ -1012,7 +1012,7 @@ def OpenLevelUpWindow ():
 		Class = GemRB.GetTableRowName (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1)
 		# What will be avatar's next level?
 		NextLevel = avatar_header['PrimLevel'] + 1
-		while avatar_header['XP'] > GetNextLevelExp (NextLevel, Class):
+		while avatar_header['XP'] >= GetNextLevelExp (NextLevel, Class):
 			NextLevel = NextLevel + 1
 		NumOfLevUp = NextLevel - avatar_header['PrimLevel'] # How many levels did we go up?
 		# Is avatar Nameless One?
