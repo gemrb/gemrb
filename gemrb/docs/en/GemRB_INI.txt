@@ -1,0 +1,186 @@
+GAME-SPECIFIC CONFIGURATION FILE GEMRB.INI
+******************************************
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GemRB_INI.txt,v 1.1 2005/05/18 20:00:57 edheldil Exp $
+
+Contents
+--------
+  - Introduction
+  - INI File Format
+  - Options Values Types
+  - List of Options
+
+
+Introduction
+------------ 
+
+gemrb.ini is a file containing game-specific configuration for GemRB
+engine.  It's used for options with simple value types which are
+specific to GemRB and which are not intended to be usually changed by
+a user. More complicated configuration data (tables, etc.) are kept in
+their own files. User specific configuration is in other file (GemRB.cfg).
+
+[FIXME: eventually, this file could be searched for in user's config directory too]
+
+This file's path can be 
+  <source_dir>/gemrb/override/<game_type>/gemrb.ini
+  <install_share_dir>/gemrb/override/<game_type>/gemrb.ini
+  <install_dir>/override/<game_type>/gemrb.ini
+
+
+INI File Format
+---------------
+
+gemrb.ini file is in Windows *.INI format. That means it's line
+oriented, consisting of a list of options, each on its own
+line. Options are grouped into sections, each section labeled with
+section name in [brackets]. [FIXME: case sensitive??]. Comments have
+to be on their own line, they start with semicolon (;) and last to the
+end of the line.
+
+Options are in this file described in the format optionname = <type>.
+For the moment all the options have to be in [resources] section.
+
+
+Options Values Types
+--------------------
+These are types of values used in description of particular options.
+
+  resref - resource identifier as defined in KEY file, string of at most
+      8 characters. The case is not important, but is usually written in
+      all upper-case to be easily distinguished.
+
+  string
+
+  rgba_color - hexadecimal RGBA quadruplet written as #rrggbbaa, 
+      e.g. #00ff00ff is opaque bright green.
+
+  number - unsigned integer number
+
+  bool - boolean value, for now either 0 (false) or 1 (true)
+
+
+List of Options
+---------------
+
+CursorBAM = <resref>
+- - - - - - - - - - -
+Name of bitmap resource with cursor images (e.g. PST: CARET)
+
+
+ButtonFont = <resref>
+- - - - - - - - - - - 
+Name of bitmap resource used for button font in dialog windows
+(e.g. BG1: STONESML)
+
+
+TooltipFont = <resref>
+- - - - - - - - - - - -
+Name of bitmap resource with font used to display tooltips 
+(e.g. PST: TRMTFONT)
+
+
+TooltipBack = <resref>
+- - - - - - - - - - - -
+Sprite displayed behind the tooltip text, if any. Leave undefined when
+tooltips don't use background bitmap.
+(e.g. BG1: TOOLTIP)
+
+
+TooltipColor = <rgba_color>
+- - - - - - - - - - - - - -
+Tooltip text color. Default is #ffffffff, i.e. opaque white.
+
+
+TooltipMargin = <number>
+- - - - - - - - - - - - -
+Space between tooltip text and sides of TooltipBack (x2)
+
+
+INIConfig = <filename>
+- - - - - - - - - - - -
+Name of INI file from the original game. This file is searched for in
+the game root directory.
+
+
+Palette16 = <resref>
+Palette32 = <resref>
+Palette256 = <resref>
+- - - - - - - - - - -
+Palette bitmap resources for various number of colors in a gradient.
+Each pixel line in these files is for one base color. Pixels in the
+row then define the gradient of that color.
+
+
+IgnoreButtonFrames = <bool>
+- - - - - - - - - - - - - -
+If set to 1, buttons will ignore frame numbers as set in button CHU
+resource, and always use frames 0, 1, 2, 3 from thir associated
+BAM. (PST, ...)
+
+
+AllStringsTagged = 1
+- - - - - - - - - - -
+
+HasDPLAYER = <bool>
+- - - - - - - - - - 
+
+HasPickSound = <bool>
+- - - - - - - - - - -
+
+HasDescIcon = <bool>
+- - - - - - - - - - -
+
+HasEXPTABLE = <bool>
+- - - - - - - - - - -
+
+SoundFolders = <bool>
+- - - - - - - - - - -
+
+HasSongList = <bool>
+- - - - - - - - - - -
+
+UpperButtonText = <bool>
+- - - - - - - - - - - - -
+Set to 1 if button labels should be converted to upper-case (e.g. BG2)
+
+
+LowerLabelText = <bool>
+- - - - - - - - - - - -
+
+HasPartyINI = <bool>
+- - - - - - - - - - -
+
+
+HasBeastsINI = <bool>
+- - - - - - - - - - -
+Whether original game data contains beasts.ini and quests.ini files
+with descriptions of monsters and quests (PST only).
+
+
+ForceStereo = <bool>
+- - - - - - - - - - -
+
+TeamMovement = <bool>
+- - - - - - - - - - -
+
+OneByteAnimationID = <bool>
+- - - - - - - - - - - - - -
+
+AutomapINI = <bool>
+- - - - - - - - - -
+
+
+SmallFog = <bool>
+- - - - - - - - - - -
+Whether fog-of-war maintained in Map::ExploredBitmap is aligned with
+map boundary (SmallFog=1, like in PST) or the fog is half a tile
+larger in each of four cardinal directions (SmallFog=0, e.g. in BG2)
+
+
+ReverseDoor = <bool>
+- - - - - - - - - - -
+
+
+ProtagonistTalks = <bool>
+- - - - - - - - - - - - -
+If set to 1, only protagonist speaks with stranger for the whole party (PST).
