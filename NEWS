@@ -1,16 +1,19 @@
-GemRB V0.2.4 (2005-03-29):
+GemRB V0.2.4 (2005-05-18):
   New features:
     - Store dialogs (Temple, Inn, Container, Tavern, Store)
     - Fog of war with line of sight
     - Doors block path and line of sight
     - Window frames at higher resolutions
     - Animated buttons (PST portraits, Donation window)
+    - Window frames in high resolution
     - Store opens when appropriate
 
   Improved features:
     - Fixed dialogs
     - new GUIScript functions with documentation
     - Fog of war/door/store related gamescript actions
+    - fixed object distance and area variable handling in gamescript
+    - other new gamescript actions/triggers
     - Implemented PCs fidget animations
 
   Documentation:
