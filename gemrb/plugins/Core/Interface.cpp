@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.304 2005/05/17 17:13:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.305 2005/05/18 11:31:27 avenger_teambg Exp $
  *
  */
 
@@ -1900,6 +1900,7 @@ void Interface::DrawWindows(void)
 		ieDword index;
 		
 		if (!vars->Lookup( "MessageWindowSize", index ) || (index!=game->ControlStatus) ) {
+printf("****************Set new windowsize: %d\n", game->ControlStatus);
 			vars->SetAt( "MessageWindowSize", game->ControlStatus);
 			guiscript->RunFunction( "UpdateControlStatus" );
 			//giving control back to GameControl

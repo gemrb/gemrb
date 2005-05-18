@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.270 2005/05/17 17:13:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.271 2005/05/18 11:31:27 avenger_teambg Exp $
  *
  */
 
@@ -641,7 +641,7 @@ static ObjectLink objectnames[] = {
 	{"fourthnearest", GameScript::FourthNearest},
 	{"fourthnearestenemyof", GameScript::FourthNearestEnemyOf},
 	{"fourthnearestenemyoftype", GameScript::FourthNearestEnemyOfType},
-	{"lastattackerof", GameScript::LastHitter}, //is it important to be different?
+	{"lastattackerof", GameScript::LastAttackerOf},
 	{"lastcommandedby", GameScript::LastCommandedBy},
 	{"lastheardby", GameScript::LastHeardBy},
 	{"lasthelp", GameScript::LastHelp},
@@ -650,6 +650,7 @@ static ObjectLink objectnames[] = {
 	{"lastseenby", GameScript::LastSeenBy},
 	{"lastsummonerof", GameScript::LastSummonerOf},
 	{"lasttalkedtoby", GameScript::LastTalkedToBy},
+	{"lasttargetedby", GameScript::LastTargetedBy},
 	{"lasttrigger", GameScript::LastTrigger},
 	{"leastdamagedof", GameScript::LeastDamagedOf},
 	{"mostdamagedof", GameScript::MostDamagedOf},
@@ -2548,6 +2549,35 @@ Targets *GameScript::LastCommandedBy(Scriptable *Sender, Targets *parameters)
 	parameters->Clear();
 	if (actor) {
 		parameters->AddTarget(actor->LastCommander, 0);
+	}
+	return parameters;
+}
+
+Targets *GameScript::LastTargetedBy(Scriptable *Sender, Targets *parameters)
+{
+	Actor *actor = parameters->GetTarget(0);
+	if (!actor) {
+		if (Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if (actor) {
+		parameters->AddTarget(actor->LastTarget, 0);
+	}
+	return parameters;
+}
+Targets *GameScript::LastAttackerOf(Scriptable *Sender, Targets *parameters)
+{
+	Actor *actor = parameters->GetTarget(0);
+	if (!actor) {
+		if (Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if (actor) {
+		parameters->AddTarget(actor->LastAttacker, 0);
 	}
 	return parameters;
 }

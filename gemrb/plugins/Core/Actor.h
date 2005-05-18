@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.67 2005/05/16 12:01:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.68 2005/05/18 11:31:27 avenger_teambg Exp $
  *
  */
 
@@ -142,6 +142,7 @@ public:
 	Spellbook spellbook;
 public:
 
+	Actor *LastTarget;
 	Actor *LastTalkedTo;
 	Actor *LastAttacker;
 	Actor *LastHitter;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.226 2005/05/17 17:13:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.227 2005/05/18 11:31:27 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -205,7 +205,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 	if ( game->selected.size() > 0 ) {
-		ChangeMap(game->selected[0], false);
+		ChangeMap(core->GetFirstSelectedPC(), false);
 	}
 	Video* video = core->GetVideoDriver();
 	Region viewport = core->GetVideoDriver()->GetViewport();
@@ -266,7 +266,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	//not like this
 	if (effect) {
 		if (( game->selected.size() > 0 )) {
-			Actor* actor = game->selected[0];
+			Actor* actor = core->GetFirstSelectedPC();
 			video->BlitSprite( effect->NextFrame(), actor->Pos.x,
 					actor->Pos.y, false );
 		}
@@ -787,10 +787,8 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	}
 }
 
-//maybe actor is unneeded
-bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * /*actor*/)
+bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor)
 {
-	Game* game = core->GetGame();
 	switch(trap->Type) {
 		case ST_TRAVEL:
 			trap->Flags|=TRAP_RESET;
@@ -804,7 +802,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * /*actor*/)
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
 				if(!(trap->Flags&TRAP_DEACTIVATED) ) {
-					trap->LastTrigger = game->selected[0];
+					trap->LastTrigger = actor;
 					trap->Scripts[0]->Update();
 					//if reset trap flag not set, deactivate it
 					if(!(trap->Flags&TRAP_RESET)) {
@@ -841,8 +839,6 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 	StartY = p.y;
 	SelectionRect.w = 0;
 	SelectionRect.h = 0;
-	//heh, i found no better place
-	core->CloseCurrentContainer();
 }
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y,
@@ -854,6 +850,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
+	//heh, i found no better place
+	core->CloseCurrentContainer();
 	if (Button == GEM_MB_MENU) {
 		core->GetDictionary()->SetAt( "MenuX", x );
 		core->GetDictionary()->SetAt( "MenuY", y );
@@ -890,16 +888,16 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 
 	if (!actor && ( game->selected.size() > 0 )) {
 		if (overDoor) {
-			HandleDoor(overDoor, game->selected[0]);
+			HandleDoor(overDoor, core->GetFirstSelectedPC());
 			return;
 		}
 		if (overInfoPoint) {
-			if (HandleActiveRegion(overInfoPoint, game->selected[0])) {
+			if (HandleActiveRegion(overInfoPoint, core->GetFirstSelectedPC())) {
 				return;
 			}
 		}
 		if (overContainer) {
-			HandleContainer(overContainer, game->selected[0]);
+			HandleContainer(overContainer, core->GetFirstSelectedPC());
 			return;
 		}
 
@@ -962,7 +960,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		case 1:
 			//talk (first selected talks)
 			if(game->selected.size()) {
-				TryToTalk(game->selected[0], actor);
+				//if we are in PST modify this to NO!
+				TryToTalk(core->GetFirstSelectedPC(), actor);
 			}
 			break;
 		case 2:

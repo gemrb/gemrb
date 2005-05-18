@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.175 2005/05/16 12:01:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.176 2005/05/18 11:31:27 avenger_teambg Exp $
  *
  */
 
@@ -1205,6 +1205,7 @@ public:
 	static Targets *FourthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *FourthNearestEnemyOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *Gabber(Scriptable *Sender, Targets *parameters);
+	static Targets *LastAttackerOf(Scriptable *Sender, Targets *parameters);
 	static Targets *LastCommandedBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastHeardBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastHelp(Scriptable *Sender, Targets *parameters);
@@ -1212,6 +1213,7 @@ public:
 	static Targets *LastSeenBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastSummonerOf(Scriptable *Sender, Targets *parameters);
 	static Targets *LastTalkedToBy(Scriptable *Sender, Targets *parameters);
+	static Targets *LastTargetedBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastTrigger(Scriptable *Sender, Targets *parameters);
 	static Targets *LeastDamagedOf(Scriptable *Sender, Targets *parameters);
 	static Targets *MostDamagedOf(Scriptable *Sender, Targets *parameters);
