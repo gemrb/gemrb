@@ -8,6 +8,8 @@ Area scripts are queued, master areas get on the head of the queue, non-master a
 
 4. (DONE) TLK tags
 
+5. fix loading of local variables of creatures (needs effect framework)
+
 Items:
 1. (DONE) Loading containers/items in areas
 2. Dropping of items (first create an opcode)
