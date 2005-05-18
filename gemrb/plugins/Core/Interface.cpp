@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.305 2005/05/18 11:31:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.306 2005/05/18 12:28:38 avenger_teambg Exp $
  *
  */
 
@@ -1381,6 +1381,7 @@ bool Interface::LoadGemRBINI()
 	upperlower(143,159);
 */
 
+	SetFeature( ini->GetKeyAsInt( "resources", "ProtagonistTalks", 0 ), GF_PROTAGONIST_TALKS );
 	SetFeature( ini->GetKeyAsInt( "resources", "AutomapIni", 0 ), GF_AUTOMAP_INI );
 	SetFeature( ini->GetKeyAsInt( "resources", "IWDMapDimensions", 0 ), GF_IWD_MAP_DIMENSIONS );
 	SetFeature( ini->GetKeyAsInt( "resources", "OneByteAnimationID", 0 ), GF_ONE_BYTE_ANIMID );

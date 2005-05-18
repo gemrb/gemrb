@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.227 2005/05/18 11:31:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.228 2005/05/18 12:28:37 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -65,7 +65,7 @@ static formation_type *formations=NULL;
 
 GameControl::GameControl(void)
 {
-	if(!formations) {
+	if (!formations) {
 		ReadFormations();
 	}
 	//this is the default action, individual actors should have one too
@@ -90,7 +90,7 @@ GameControl::GameControl(void)
 	ieDword tmp=0;
 
 	core->GetDictionary()->Lookup("Center",tmp);
-	if(tmp) {
+	if (tmp) {
 		ScreenFlags=SF_ALWAYSCENTER|SF_CENTERONACTOR;
 	}
 	else {
@@ -113,11 +113,11 @@ void GameControl::ReadFormations()
 	int i,j;
 	TableMgr * tab;
 	int table=core->LoadTable("formatio");
-	if(table<0) {
+	if (table<0) {
 		goto fallback;
 	}
  	tab = core->GetTable( table);
-	if(!tab) {
+	if (!tab) {
 		core->DelTable(table);
 		goto fallback;
 	}
@@ -149,7 +149,7 @@ void GameControl::MoveToPointFormation(Actor *actor, Point p, int Orient)
 
 	int formation=core->GetGame()->WhichFormation;
 	pos=actor->InParty-1; //either this or the actual # of selected actor?
-	if(pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
+	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
 	switch(Orient) {
 	case 11: case 12: case 13://east
 		p.x-=formations[formation][pos].y*30;
@@ -182,7 +182,7 @@ GameControl::~GameControl(void)
 	for (unsigned int i = 0; i < infoTexts.size(); i++) {
 		delete( infoTexts[i] );
 	}
-	if(dlg) {
+	if (dlg) {
 		delete dlg;
 	}
 }
@@ -801,11 +801,11 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor)
 			//there. Here we have to check on the 
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
-				if(!(trap->Flags&TRAP_DEACTIVATED) ) {
+				if (!(trap->Flags&TRAP_DEACTIVATED) ) {
 					trap->LastTrigger = actor;
 					trap->Scripts[0]->Update();
 					//if reset trap flag not set, deactivate it
-					if(!(trap->Flags&TRAP_RESET)) {
+					if (!(trap->Flags&TRAP_RESET)) {
 						trap->Flags|=TRAP_DEACTIVATED;
 					}
 				}
@@ -909,7 +909,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
 			actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 			//we clicked over a searchmap travel region
-				if( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
+				if ( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
 				sprintf( Tmp, "NIDSpecial2()" );
 				actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 			}
@@ -926,25 +926,25 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			MoveToPointFormation(actor,p,orient);
 		}
 		//we clicked over a searchmap travel region
-		if( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
+		if ( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
 			sprintf( Tmp, "NIDSpecial2()" );
 			actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
 		}
 		return;
 	}
-	if(!actor) return;
+	if (!actor) return;
 	//we got an actor past this point
 
 	//determining the type of the clicked actor
 	int type;
 
 	type = actor->GetStat(IE_EA);
-	if( type >= EVILCUTOFF ) {
+	if ( type >= EVILCUTOFF ) {
 		type = 2; //hostile
 	}
 	//can't control GOODBUTBLUE, so: CHARMED
-	//else if( type > GOODCUTOFF ) {
-	else if( type > CHARMED ) {
+	//else if ( type > GOODCUTOFF ) {
+	else if ( type > CHARMED ) {
 		type = 1; //neutral
 	}
 	else {
@@ -959,9 +959,15 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			break;
 		case 1:
 			//talk (first selected talks)
-			if(game->selected.size()) {
+			if (game->selected.size()) {
 				//if we are in PST modify this to NO!
-				TryToTalk(core->GetFirstSelectedPC(), actor);
+				Actor *source;
+				if (core->HasFeature(GF_PROTAGONIST_TALKS) ) {
+					source = game->FindPC(1); //protagonist
+				} else {
+					source = core->GetFirstSelectedPC();
+				}
+				TryToTalk(source, actor);
 			}
 			break;
 		case 2:
@@ -975,7 +981,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 /** Special Key Press */
 void GameControl::OnSpecialKeyPress(unsigned char Key)
 {
-	if(DialogueFlags&DF_IN_DIALOG) {
+	if (DialogueFlags&DF_IN_DIALOG) {
 		return; //don't accept keys in dialog
 	}
 	Region Viewport = core->GetVideoDriver()->GetViewport();
@@ -1079,7 +1085,7 @@ void GameControl::CalculateSelection(Point &p)
 
 void GameControl::SetCutSceneMode(bool active)
 {
-	if(active) {
+	if (active) {
 		ScreenFlags |= (SF_DISABLEMOUSE | SF_LOCKSCROLL);
 		HideGUI();
 	}
@@ -1307,7 +1313,7 @@ void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlg
 
 	DialogMgr* dm = ( DialogMgr* ) core->GetInterface( IE_DLG_CLASS_ID );
 	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
-	if(dlg) {
+	if (dlg) {
 		delete dlg;
 	}
 	dlg = dm->GetDialog();
@@ -1346,12 +1352,12 @@ void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlg
 /*try to break will only try to break it, false means unconditional stop*/
 void GameControl::EndDialog(bool try_to_break)
 {
-	if(try_to_break && (DialogueFlags&DF_UNBREAKABLE) )
+	if (try_to_break && (DialogueFlags&DF_UNBREAKABLE) )
 	{
 		return;
 	}
 
-	if(target) {
+	if (target) {
 /* talkcount increases after the top level condition was evaluated
 		if (DialogueFlags&DF_TALKCOUNT) {
 			if (target->Type == ST_ACTOR) {
@@ -1465,7 +1471,7 @@ void GameControl::DialogChoose(unsigned int choose)
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
 			//target should be recalculated!
 			target = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
-			if(!target) {
+			if (!target) {
 				printMessage("Dialog","Can't redirect dialog",YELLOW);
 				ta->SetMinRow( false );
 				EndDialog();
@@ -1484,7 +1490,7 @@ void GameControl::DialogChoose(unsigned int choose)
 	int idx = 0;
 	for (unsigned int x = 0; x < ds->transitionsCount; x++) {
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-			if(!dlg->EvaluateDialogTrigger(target, ds->transitions[x]->trigger)) {
+			if (!dlg->EvaluateDialogTrigger(target, ds->transitions[x]->trigger)) {
 				continue;
 			}
 		}
@@ -1575,7 +1581,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	}
 	//center on first selected actor
 	Region vp = core->GetVideoDriver()->GetViewport();
-	if(ScreenFlags&SF_CENTERONACTOR) {
+	if (ScreenFlags&SF_CENTERONACTOR) {
 		core->MoveViewportTo( pc->Pos.x, pc->Pos.y, true );
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
