@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.306 2005/05/18 12:28:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.307 2005/05/18 22:48:13 edheldil Exp $
  *
  */
 
@@ -1898,8 +1898,8 @@ void Interface::DrawWindows(void)
 		}
 
 		//updating panes according to the saved game
-		ieDword index;
-		
+		ieDword index = 0;
+
 		if (!vars->Lookup( "MessageWindowSize", index ) || (index!=game->ControlStatus) ) {
 printf("****************Set new windowsize: %d\n", game->ControlStatus);
 			vars->SetAt( "MessageWindowSize", game->ControlStatus);
