@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.13 2005/03/19 16:15:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.14 2005/05/18 14:20:16 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -57,7 +57,7 @@ WorldMapControl::~WorldMapControl(void)
 }
 
 /** Draws the Control on the Output Display */
-void WorldMapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
+void WorldMapControl::Draw(unsigned short x, unsigned short y)
 {
 	WorldMap* worldmap = core->GetWorldMap();
 	if (!Width || !Height) {
@@ -67,7 +67,7 @@ void WorldMapControl::Draw(unsigned short /*x*/, unsigned short /*y*/)
 		return;
 	Changed = false;
 	Video* video = core->GetVideoDriver();
-	Region r( XPos, YPos, Width, Height );
+	Region r( x+XPos, y+YPos, Width, Height );
 	video->BlitSprite( worldmap->MapMOS, XPos - ScrollX, YPos - ScrollY, true, &r );
 
 	std::vector< WMPAreaEntry*>::iterator m;
