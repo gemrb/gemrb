@@ -16,26 +16,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIJRNL.py,v 1.9 2004/12/04 17:35:12 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIJRNL.py,v 1.10 2005/05/18 15:37:10 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
 
-# GUIJRNL:
-# 0 - main journal window
-# 1 - quests window
-# 2 - beasts window
-# 3 - log/diary window
-
-###################################################
-from GUIDefines import *
 import GemRB
+import GUICommonWindows
+from GUIDefines import *
 from GUICommon import CloseOtherWindow
+from GUICommonWindows import *
 
 ###################################################
 JournalWindow = None
 LogWindow = None
 QuestsWindow = None
+PortraitWindow = None
+OldPortraitWindow = None
+
 global Section
 Section = 1
 Chapter = 0
@@ -45,33 +43,44 @@ StartYear = 0
 
 ###################################################
 def OpenJournalWindow ():
+        global JournalWindow, OptionsWindow, PortraitWindow
+        global OldPortraitWindow
 	global StartTime, StartYear
-	global JournalWindow, Chapter
+	global Chapter
 
+	if CloseOtherWindow (OpenJournalWindow):
+		if LogWindow: OpenLogWindow ()
+		if QuestsWindow: OpenQuestsWindow ()
+		
+		GemRB.UnloadWindow (JournalWindow)
+                GemRB.UnloadWindow (OptionsWindow)
+                GemRB.UnloadWindow (PortraitWindow)
+
+		JournalWindow = None
+		GemRB.SetVar ("OtherWindow", -1)
+                GemRB.SetVisible (0,1)
+                GemRB.UnhideGUI ()
+                GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		return
+		
 	Table = GemRB.LoadTable("YEARS")
-	#StartTime is the time offset for ingame time, beginning from the startyear
 	StartTime = GemRB.GetTableValue(Table, "STARTTIME", "VALUE") / 4500
-	#StartYear is the year of the lowest ingame date to be printed
 	StartYear = GemRB.GetTableValue(Table, "STARTYEAR", "VALUE")
 	GemRB.UnloadTable(Table)
 
-	if CloseOtherWindow (OpenJournalWindow):
-		if LogWindow: OpenLogWindow()
-		if QuestsWindow: OpenQuestsWindow()
-		
-		GemRB.HideGUI ()
-		
-		GemRB.UnloadWindow(JournalWindow)
-		JournalWindow = None
-		GemRB.SetVar("OtherWindow", -1)
-		
-		GemRB.UnhideGUI ()
-		return
-		
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIJRNL")
-	JournalWindow = GemRB.LoadWindow (2)
-	GemRB.SetVar("OtherWindow", JournalWindow)
+        GemRB.SetVisible (0,0)
+
+	GemRB.LoadWindowPack ("GUIJRNL", 640, 480)
+	JournalWindow = Window = GemRB.LoadWindow (2)
+	GemRB.SetVar ("OtherWindow", JournalWindow)
+        #saving the original portrait window
+        OldPortraitWindow = GUICommonWindows.PortraitWindow
+        PortraitWindow = OpenPortraitWindow (0)
+        OptionsWindow = GemRB.LoadWindow (0)
+        SetupMenuWindowControls (OptionsWindow, 0)
+        GemRB.SetWindowFrame (OptionsWindow)
 
 	# prev. chapter
 	Button = GemRB.GetControl (JournalWindow, 3)
@@ -81,28 +90,28 @@ def OpenJournalWindow ():
 	Button = GemRB.GetControl (JournalWindow, 4)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "NextChapterPress")
 
-	GemRB.SetVar("Section", Section)
+	GemRB.SetVar ("Section", Section)
 	# Quests
 	Button = GemRB.GetControl (JournalWindow, 6)
-	GemRB.SetVarAssoc(JournalWindow, Button, "Section", 1)
+	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 1)
 	GemRB.SetText (JournalWindow, Button, 45485)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Quests completed
 	Button = GemRB.GetControl (JournalWindow, 7)
-	GemRB.SetVarAssoc(JournalWindow, Button, "Section", 2)
+	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 2)
 	GemRB.SetText (JournalWindow, Button, 45486)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Journal
 	Button = GemRB.GetControl (JournalWindow, 8)
-	GemRB.SetVarAssoc(JournalWindow, Button, "Section", 4)
+	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 4)
 	GemRB.SetText (JournalWindow, Button, 15333)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# User
 	Button = GemRB.GetControl (JournalWindow, 9)
-	GemRB.SetVarAssoc(JournalWindow, Button, "Section", 0)
+	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 0)
 	GemRB.SetText (JournalWindow, Button, 45487)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
@@ -117,8 +126,10 @@ def OpenJournalWindow ():
 	#GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	Chapter = GemRB.GetGameVar("chapter")
-	GemRB.UnhideGUI()
-	UpdateLogWindow()
+	UpdateLogWindow ()
+        GemRB.SetVisible (OptionsWindow, 1)
+        GemRB.SetVisible (Window, 1)
+        GemRB.SetVisible (PortraitWindow, 1)
 	return
 
 def ToggleOrderWindow ():
@@ -136,9 +147,8 @@ def UpdateLogWindow ():
 	# text area
 	Window = JournalWindow
 
-	GemRB.HideGUI()
 	Section = GemRB.GetVar("Section")
-	GemRB.SetToken("CurrentChapter", str(Chapter) )
+	GemRB.SetToken ("CurrentChapter", str(Chapter) )
 	# CurrentChapter
 	Label = GemRB.GetControl (JournalWindow, 0x1000000a)
 	GemRB.SetText (JournalWindow, Label, 15873)
@@ -156,15 +166,14 @@ def UpdateLogWindow ():
 		days = int(hours/24)
 		year = str (StartYear + int(days/365))
 		dayandmonth = StartTime + days%365
-		GemRB.SetToken("GAMEDAY", str(days) )
-		GemRB.SetToken("HOUR",str(hours%24 ) )
-		GemRB.SetVar("DAYANDMONTH",dayandmonth)
-		GemRB.SetToken("YEAR",year)
+		GemRB.SetToken ("GAMEDAY", str(days) )
+		GemRB.SetToken ("HOUR",str(hours%24 ) )
+		GemRB.SetVar ("DAYANDMONTH",dayandmonth)
+		GemRB.SetToken ("YEAR",year)
 		GemRB.TextAreaAppend (Window, Text, "[color=FFFF00]"+GemRB.GetString(15980)+"[/color]", 3*i)
 		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i+1)
 		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
 
-	GemRB.UnhideGUI()
 	return
 
 ###################################################
@@ -173,7 +182,7 @@ def PrevChapterPress ():
 
 	if Chapter > 0:
 		Chapter = Chapter - 1
-		GemRB.SetToken("CurrentChapter", str(Chapter) )
+		GemRB.SetToken ("CurrentChapter", str(Chapter) )
 		UpdateLogWindow ()
 	return
 
@@ -183,7 +192,7 @@ def NextChapterPress ():
 
 	if Chapter < GemRB.GetGameVar("chapter"):
 		Chapter = Chapter + 1
-		GemRB.SetToken("CurrentChapter", str(Chapter) )
+		GemRB.SetToken ("CurrentChapter", str(Chapter) )
 		UpdateLogWindow ()
 	return
 

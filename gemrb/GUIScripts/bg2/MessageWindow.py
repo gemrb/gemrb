@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/MessageWindow.py,v 1.28 2005/05/17 17:13:53 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/MessageWindow.py,v 1.29 2005/05/18 15:37:09 avenger_teambg Exp $
 
 import GemRB
 
@@ -69,7 +69,7 @@ def OnLoad():
 	GemRB.SetVar("TopPosition", 5) #Inactivating
 	
 	SetupActionsWindowControls (ActionsWindow)
-	SetupMenuWindowControls (OptionsWindow)
+	SetupMenuWindowControls (OptionsWindow, 1)
 
 	UpdateControlStatus()
 	

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.6 2005/05/17 17:13:54 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.7 2005/05/18 15:37:11 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -27,6 +27,7 @@
 import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
+from GUICommonWindows import SetEncumbranceLabels
 
 ContainerWindow = None
 ContinueWindow = None
@@ -121,7 +122,8 @@ def OpenContainerWindow ():
 	OldActionsWindow = GemRB.GetVar ("ActionsWindow")
 	GemRB.SetVar ("ActionsWindow", Window)
 
-	Container = GemRB.GetContainer(GemRB.GameGetFirstSelectedPC())
+	pc = GemRB.GameGetFirstSelectedPC()
+	Container = GemRB.GetContainer(pc)
 
 	# Gears (time) when options pane is down
 	Button = GemRB.GetControl (Window, 62)
@@ -132,13 +134,13 @@ def OpenContainerWindow ():
 	# 0 - 5 - Ground Item
 	# 10 - 13 - Personal Item
 	# 50 hand
-	# 52, 53 scroller groound, scroller personal
+	# 52, 53 scroller ground, scroller personal
 	# 54 - encumbrance
 
-	encumbrance = '10\n255'
-	Button = GemRB.GetControl (Window, 54)
-	GemRB.SetText (Window, Button, encumbrance)
-	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	Label = GemRB.CreateLabel (Window, 0x10000043, 323,14,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
+	Label = GemRB.CreateLabel (Window, 0x10000044, 323,20,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
+
+	SetEncumbranceLabels( Window, 0x10000043, 0x10000044, pc)
 
 	party_gold = GemRB.GameGetPartyGold ()
 	Text = GemRB.GetControl (Window, 0x10000036)

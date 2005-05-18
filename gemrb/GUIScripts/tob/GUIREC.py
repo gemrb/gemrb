@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.11 2004/12/04 17:35:12 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.12 2005/05/18 15:37:10 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -43,11 +43,11 @@
 ###################################################
 import string
 import GemRB
+import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import SetSelectionChangeHandler
-from GUICommonWindows import GetActorClassTitle
+from GUICommonWindows import *
 from GUIWORLD import OpenReformPartyWindow
 
 ###################################################
@@ -57,24 +57,37 @@ BiographyWindow = None
 
 ###################################################
 def OpenRecordsWindow ():
-	global RecordsWindow
+	global RecordsWindow, OptionsWindow, PortraitWindow
+	global OldPortraitWindow
 
 	if CloseOtherWindow (OpenRecordsWindow):
-		GemRB.HideGUI ()
 		if InformationWindow: OpenInformationWindow ()
 		
 		GemRB.UnloadWindow (RecordsWindow)
+                GemRB.UnloadWindow (OptionsWindow)
+                GemRB.UnloadWindow (PortraitWindow)
+
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
+                GemRB.SetVisible (0,1)
+                GemRB.UnhideGUI ()
+                GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
 		SetSelectionChangeHandler (None)
-		
-		GemRB.UnhideGUI ()
 		return	
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIREC")
+        GemRB.SetVisible (0,0)
+
+	GemRB.LoadWindowPack ("GUIREC", 640, 480)
 	RecordsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", RecordsWindow)
+        #saving the original portrait window
+        OldPortraitWindow = GUICommonWindows.PortraitWindow
+        PortraitWindow = OpenPortraitWindow(0)
+        OptionsWindow = GemRB.LoadWindow(0)
+        SetupMenuWindowControls (OptionsWindow, 0)
+        GemRB.SetWindowFrame (OptionsWindow)
 
 	# dual class
 	Button = GemRB.GetControl (Window, 0)
@@ -113,9 +126,9 @@ def OpenRecordsWindow ():
 
 	SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
-
-	#GemRB.SetVisible (Window, 1)
-	GemRB.UnhideGUI ()
+        GemRB.SetVisible (OptionsWindow, 1)
+        GemRB.SetVisible (Window, 1)
+        GemRB.SetVisible (PortraitWindow, 1)
 	return
 
 def UpdateRecordsWindow ():
@@ -382,52 +395,40 @@ def GetStatOverview (pc):
 def OpenInformationWindow ():
 	global InformationWindow
 	
-	GemRB.HideGUI ()
-	
 	if InformationWindow != None:
 		if BiographyWindow: OpenBiographyWindow ()
 
 		GemRB.UnloadWindow (InformationWindow)
 		InformationWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 		
-		GemRB.UnhideGUI()
 		return
 
-	InformationWindow = Window = GemRB.LoadWindow (5)
-	GemRB.SetVar ("FloatWindow", InformationWindow)
-
+	InformationWindow = Window = GemRB.LoadWindow (4)
 
 	# Biography
-	Button = GemRB.GetControl (Window, 1)
+	Button = GemRB.GetControl (Window, 26)
 	GemRB.SetText (Window, Button, 4247)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
 	# Done
-	Button = GemRB.GetControl (Window, 0)
+	Button = GemRB.GetControl (Window, 24)
 	GemRB.SetText (Window, Button, 1403)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 
-	GemRB.UnhideGUI ()
+	GemRB.SetVisible (Window, 1)
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 
 def OpenBiographyWindow ():
 	global BiographyWindow
 
-	GemRB.HideGUI ()
-	
 	if BiographyWindow != None:
 		GemRB.UnloadWindow (BiographyWindow)
 		BiographyWindow = None
-		GemRB.SetVar ("FloatWindow", InformationWindow)
-		
-		GemRB.UnhideGUI()
 		GemRB.ShowModal (InformationWindow, MODAL_SHADOW_GRAY)
 		return
 
 	BiographyWindow = Window = GemRB.LoadWindow (12)
-	GemRB.SetVar ("FloatWindow", BiographyWindow)
 
 	TextArea = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, TextArea, 39424)
@@ -438,7 +439,6 @@ def OpenBiographyWindow ():
 	GemRB.SetText (Window, Button, 1403)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
-	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	
 ###################################################

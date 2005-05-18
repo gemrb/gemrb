@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.19 2005/02/19 17:15:27 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.20 2005/05/18 15:37:10 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -28,31 +28,47 @@ import string
 from GUIDefines import *
 from ie_stats import *
 import GemRB
+import GUICommonWindows
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import GetActorClassTitle, GetActorPaperDoll
-from GUICommonWindows import SetSelectionChangeHandler
+from GUICommonWindows import *
 
 InventoryWindow = None
 ItemInfoWindow = None
 ItemAmountWindow = None
 ItemIdentifyWindow = None
+PortraitWindow = None
+OldPortraitWindow = None
 
 def OpenInventoryWindow ():
-	global InventoryWindow
+	global InventoryWindow, OptionsWindow, PortraitWindow
+	global OldPortraitWindow
 	
 	if CloseOtherWindow (OpenInventoryWindow):
-		GemRB.HideGUI ()
 		GemRB.UnloadWindow (InventoryWindow)
+        	GemRB.UnloadWindow (OptionsWindow)
+	        GemRB.UnloadWindow (PortraitWindow)
+
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		SetSelectionChangeHandler (None)
+		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		SetSelectionChangeHandler (None)
 		return
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIINV")
+	GemRB.SetVisible (0,0)
+
+	GemRB.LoadWindowPack ("GUIINV", 640, 480)
 	InventoryWindow = Window = GemRB.LoadWindow(2)
 	GemRB.SetVar("OtherWindow", InventoryWindow)
+	#saving the original portrait window
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow(0)
+	OptionsWindow = GemRB.LoadWindow(0)
+	SetupMenuWindowControls (OptionsWindow, 0)
+	GemRB.SetWindowFrame (OptionsWindow)
 
 	# Ground Item
 	for i in range (68, 72):
@@ -95,8 +111,6 @@ def OpenInventoryWindow ():
 	Label = GemRB.GetControl (Window, 0x1000003f)
 	GemRB.SetText (Window, Label, "")
 
-	SetSelectionChangeHandler (UpdateInventoryWindow)
-	
 	for slot in range(38):
 		SlotType = GemRB.GetSlotType(slot)
 		if SlotType["Type"]:
@@ -105,8 +119,11 @@ def OpenInventoryWindow ():
 			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot)
 			GemRB.SetButtonFont (Window, Button, "NUMBER")
 
-	GemRB.UnhideGUI()
+	SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
+	GemRB.SetVisible (OptionsWindow, 1)
+	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
 def ColorDonePress():
@@ -174,7 +191,6 @@ def GetColor():
 
 
 def UpdateInventoryWindow ():
-	GemRB.HideGUI()
 	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -196,32 +212,7 @@ def UpdateInventoryWindow ():
 		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0)
 
 	# encumbrance
-	# Loading tables of modifications
-	Table = GemRB.LoadTable("strmod")
-	TableEx = GemRB.LoadTable("strmodex")
-	# Getting the character's strength
-	sstr = GemRB.GetPlayerStat (pc, IE_STR)
-	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-
-	max_encumb = GemRB.GetTableValue(Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
-	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
-
-	Label = GemRB.GetControl (Window, 0x10000043)
-	GemRB.SetText (Window, Label, str(encumbrance) + ":")
-
-	Label2 = GemRB.GetControl (Window, 0x10000044)
-	GemRB.SetText (Window, Label2, str(max_encumb) + ":")
-
-	ratio = (0.0 + encumbrance) / max_encumb
-	if ratio > 1.0:
-		GemRB.SetLabelTextColor (Window, Label, 255, 0, 0)
-		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
-	elif ratio > 0.8:
-		GemRB.SetLabelTextColor (Window, Label, 255, 255, 0)
-		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
-	else:
-		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
-		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
+	SetEncumbranceLabels( Window, 0x10000043, 0x10000044, pc)
 
 	# armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
@@ -259,8 +250,6 @@ def UpdateInventoryWindow ():
 	for i in range (38):
 		UpdateSlot (pc, i)
 
-	GemRB.UnhideGUI()
-	return
 
 def UpdateSlot (pc, slot):
 

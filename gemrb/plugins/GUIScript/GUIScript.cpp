@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.305 2005/05/17 17:13:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.306 2005/05/18 15:37:11 avenger_teambg Exp $
  *
  */
 
@@ -3716,8 +3716,8 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GetContainer__doc,
-"GetContainer( PartyID, autoselect ) => string\n\n"
-"Returns relevant data of the container used by the selected actor. Use autoselect if the container is an item pile at the feet of the actor." );
+"GetContainer( PartyID, autoselect ) => dictionary\n\n"
+"Returns relevant data of the container used by the selected actor. Use autoselect if the container is an item pile at the feet of the actor. It will create the container if required. " );
 
 static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 {
@@ -3742,12 +3742,11 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError("No selected actor!");
 	}
-	Map *map = actor->GetCurrentArea();
 	Container *container = NULL;
 	if (autoselect) { //autoselect works only with piles
+		Map *map = actor->GetCurrentArea();
+		//GetContainer should create an empty container
 		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
-		//this isn't ok
-		//core->SetCurrentContainer(actor, container);
 	} else {
 		container = core->GetCurrentContainer();
 	}
@@ -3762,8 +3761,56 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 	return dict;
 }
 
+PyDoc_STRVAR( GemRB_GetContainerItem__doc,
+"GetContainerItem(PartyID, idx) => dictionary\n\n"
+"Returns the container item referenced by the index. If PartyID is 0 then the container was opened manually and should be the current container. If PartyID is not 0 then the container is autoselected and should be at the feet of the player. " );
+
+static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+	int index;
+
+	if (!PyArg_ParseTuple( args, "ii", &PartyID, &index )) {
+		return AttributeError( GemRB_GetContainerItem__doc );
+	}
+	Container *container;
+	if (PartyID) {
+		Game *game = core->GetGame();
+		Actor *actor = game->FindPC( PartyID );
+		if (!actor) {
+			return RuntimeError( "Actor not found" );
+		}
+		Map *map = actor->GetCurrentArea();
+		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
+	} else {
+		container = core->GetCurrentContainer();
+	}
+	if (!container) {
+		return RuntimeError("No current container!");
+	}
+	if (index>=(int) container->inventory.GetSlotCount()) {
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+	PyObject* dict = PyDict_New();
+	CREItem *ci=container->inventory.GetSlotItem( index );
+	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef( ci->ItemResRef ));
+	PyDict_SetItemString(dict, "Usages0", PyInt_FromLong (ci->Usages[0]));
+	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (ci->Usages[1]));
+	PyDict_SetItemString(dict, "Usages2", PyInt_FromLong (ci->Usages[2]));
+	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (ci->Flags));
+
+	Item *item = core->GetItem( ci->ItemResRef );
+
+	int identified = !(ci->Flags & IE_INV_ITEM_IDENTIFIED);
+	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( item->GetItemName( identified )) );
+	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( item->GetItemDesc( identified )) );
+	core->FreeItem( item, ci->ItemResRef, false );
+	return dict;
+}
+
 PyDoc_STRVAR( GemRB_GetStore__doc,
-"GetStore() => string\n\n"
+"GetStore() => dictionary\n\n"
 "Returns relevant data of the current store." );
 
 static int storebuttons[6][4]={
@@ -3935,7 +3982,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetStoreItem__doc,
-"GetStoreItem(idx) => string\n\n"
+"GetStoreItem(idx) => dictionary\n\n"
 "Returns the store item referenced by the index. " );
 
 static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
@@ -3994,7 +4041,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetStoreDrink__doc,
-"GetStoreDrink(idx) => string\n\n"
+"GetStoreDrink(idx) => dictionary\n\n"
 "Returns the drink structure indexed. Returns None if the index is wrong." );
 
 static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
@@ -4058,7 +4105,7 @@ table_loaded:
 }
 
 PyDoc_STRVAR( GemRB_GetStoreCure__doc,
-"GetStoreCure(idx) => string\n\n"
+"GetStoreCure(idx) => dictionary\n\n"
 "Returns the cure structure indexed. Returns None if the index is wrong." );
 
 static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
@@ -4963,6 +5010,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetSpellIcon, METH_VARARGS),
 	METHOD(SetItemIcon, METH_VARARGS),
 	METHOD(GetContainer, METH_VARARGS),
+	METHOD(GetContainerItem, METH_VARARGS),
 	METHOD(EnterStore, METH_VARARGS),
 	METHOD(LeaveStore, METH_VARARGS),
 	METHOD(GetStore, METH_VARARGS),

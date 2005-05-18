@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.14 2005/05/18 14:20:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.15 2005/05/18 15:37:11 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -25,11 +25,8 @@
 #include "WorldMapControl.h"
 #include "Interface.h"
 
-#define MAP_TO_SCREENX(x) XPos - ScrollX + (x)
-#define MAP_TO_SCREENY(y) YPos - ScrollY + (y)
-
-#define SCREEN_TO_MAPX(x) (x) - XPos + ScrollX
-#define SCREEN_TO_MAPY(y) (y) - YPos + ScrollY
+#define MAP_TO_SCREENX(x) XWin + XPos - ScrollX + (x)
+#define MAP_TO_SCREENY(y) YWin + YPos - ScrollY + (y)
 
 WorldMapControl::WorldMapControl(void)
 {
@@ -57,7 +54,7 @@ WorldMapControl::~WorldMapControl(void)
 }
 
 /** Draws the Control on the Output Display */
-void WorldMapControl::Draw(unsigned short x, unsigned short y)
+void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 {
 	WorldMap* worldmap = core->GetWorldMap();
 	if (!Width || !Height) {
@@ -67,8 +64,8 @@ void WorldMapControl::Draw(unsigned short x, unsigned short y)
 		return;
 	Changed = false;
 	Video* video = core->GetVideoDriver();
-	Region r( x+XPos, y+YPos, Width, Height );
-	video->BlitSprite( worldmap->MapMOS, XPos - ScrollX, YPos - ScrollY, true, &r );
+	Region r( XWin+XPos, YWin+YPos, Width, Height );
+	video->BlitSprite( worldmap->MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
 
 	std::vector< WMPAreaEntry*>::iterator m;
 
@@ -76,7 +73,6 @@ void WorldMapControl::Draw(unsigned short x, unsigned short y)
 		if (! ((*m)->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
 
 		if( (*m)->MapIcon) {
-			Region r2 = Region( MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), (*m)->MapIcon->Width, (*m)->MapIcon->Height );
 			video->BlitSprite( (*m)->MapIcon, MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), true, &r );
 		}
 

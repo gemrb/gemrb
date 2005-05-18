@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.22 2005/03/28 10:36:19 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.23 2005/05/18 15:37:09 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -29,9 +29,9 @@ import GUICommonWindows
 from GUIDefines import *
 from GUICommonWindows import *
 from ie_stats import *
-from GUICommonWindows import SetSelectionChangeHandler
 
 StoreWindow = None
+MessageWindow = None
 ActionWindow = None
 PortraitWindow = None
 StoreShoppingWindow = None
@@ -645,6 +645,8 @@ def RedrawStoreIdentifyWindow ():
 
 
 def InfoIdentifyWindow ():
+	global MessageWindow
+
 	UpdateStoreIdentifyWindow ()
 	Index = GemRB.GetVar ("Index")
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -660,7 +662,7 @@ def InfoIdentifyWindow ():
 	IDPrice = Store['IDPrice']
 	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold()-IDPrice)
 
-	Window = GemRB.LoadWindow (12)
+	MessageWindow = Window = GemRB.LoadWindow (12)
 
 	#description bam
 	Button = GemRB.GetControl (Window, 7)
@@ -869,12 +871,14 @@ def UpdateStoreHealWindow ():
 
 
 def InfoHealWindow ():
+	global MessageWindow
+
 	UpdateStoreHealWindow ()
 	Index = GemRB.GetVar ("Index")
 	Cure = GemRB.GetStoreCure (Index)
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 
-	Window = GemRB.LoadWindow (14)
+	MessageWindow = Window = GemRB.LoadWindow (14)
 
 	Label = GemRB.GetControl (Window, 0x10000000)
 	GemRB.SetText (Window, Label, Spell['SpellName'])
@@ -1039,7 +1043,9 @@ def CloseStoreRentWindow ():
 
 
 def ErrorWindow (strref):
-	Window = GemRB.LoadWindow (10)
+	global MessageWindow
+
+	MessageWindow = Window = GemRB.LoadWindow (10)
 
 	TextArea = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, TextArea, strref)
@@ -1053,8 +1059,7 @@ def ErrorWindow (strref):
 
 
 def ErrorDone ():
-	Window = GemRB.GetVar ("FloatWindow")
-	GemRB.UnloadWindow (Window)
+	GemRB.UnloadWindow (MessageWindow)
 
 
 ###################################################

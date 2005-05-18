@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.13 2004/12/04 17:35:09 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.14 2005/05/18 15:37:09 avenger_teambg Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -26,31 +26,47 @@
 from GUIDefines import *
 from ie_stats import *
 import GemRB
+import GUICommonWindows
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import SetSelectionChangeHandler
+from GUICommonWindows import *
 
 PriestWindow = None
 PriestSpellInfoWindow = None
 PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
-
+PortraitWindow = None
+OldPortraitWindow = None
 
 def OpenPriestWindow ():
-	global PriestWindow
+	global PriestWindow, OptionsWindow, PortraitWindow
+        global OldPortraitWindow
 
 	if CloseOtherWindow (OpenPriestWindow):
-		GemRB.HideGUI ()
 		GemRB.UnloadWindow (PriestWindow)
+                GemRB.UnloadWindow (OptionsWindow)
+                GemRB.UnloadWindow (PortraitWindow)
+
 		PriestWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		SetSelectionChangeHandler (None)
+                GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
+                GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		SetSelectionChangeHandler (None)
 		return
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIPR")
+        GemRB.SetVisible (0,0)
+
+	GemRB.LoadWindowPack ("GUIPR", 640, 480)
 	PriestWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", PriestWindow)
+        #saving the original portrait window
+        OldPortraitWindow = GUICommonWindows.PortraitWindow
+        PortraitWindow = OpenPortraitWindow (0)
+        OptionsWindow = GemRB.LoadWindow (0)
+        SetupMenuWindowControls (OptionsWindow, 0)
+        GemRB.SetWindowFrame (OptionsWindow)
 
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PriestPrevLevelPress")
@@ -82,8 +98,10 @@ def OpenPriestWindow ():
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	SetSelectionChangeHandler (UpdatePriestWindow)
-	GemRB.UnhideGUI ()
 	UpdatePriestWindow ()
+        GemRB.SetVisible (OptionsWindow, 1)
+        GemRB.SetVisible (Window, 1)
+        GemRB.SetVisible (PortraitWindow, 1)
 
 
 def UpdatePriestWindow ():
@@ -193,18 +211,12 @@ def RefreshPriestLevel ():
 def OpenPriestSpellInfoWindow ():
 	global PriestSpellInfoWindow
 
-	GemRB.HideGUI ()
-	
 	if PriestSpellInfoWindow != None:
 		GemRB.UnloadWindow (PriestSpellInfoWindow)
 		PriestSpellInfoWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-		
-		GemRB.UnhideGUI ()
 		return
 		
 	PriestSpellInfoWindow = Window = GemRB.LoadWindow (3)
-	GemRB.SetVar ("FloatWindow", PriestSpellInfoWindow)
 
 	#back
 	Button = GemRB.GetControl (Window, 5)
@@ -233,8 +245,6 @@ def OpenPriestSpellInfoWindow ():
 	#Button = GemRB.GetControl (Window, 5)
 	#GemRB.SetButtonSprites (Window, Button, IconResRef, 0, 0, 0, 0, 0)
 
-
-	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 
@@ -253,18 +263,13 @@ def OnPriestMemorizeSpell ():
 def OpenPriestSpellRemoveWindow ():
 	global PriestSpellUnmemorizeWindow
 	
-	GemRB.HideGUI ()
-	
 	if PriestSpellUnmemorizeWindow != None:
 		GemRB.UnloadWindow (PriestSpellUnmemorizeWindow)
 		PriestSpellUnmemorizeWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 		
-		GemRB.UnhideGUI ()
 		return
 		
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
-	GemRB.SetVar ("FloatWindow", PriestSpellUnmemorizeWindow)
 
 	# "Are you sure you want to ....?"
 	TextArea = GemRB.GetControl (Window, 3)
@@ -280,25 +285,19 @@ def OpenPriestSpellRemoveWindow ():
 	GemRB.SetText (Window, Button, 13727)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPriestSpellRemoveWindow")
 
-	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 
 def OpenPriestSpellUnmemorizeWindow ():
 	global PriestSpellUnmemorizeWindow
 	
-	GemRB.HideGUI ()
-	
 	if PriestSpellUnmemorizeWindow != None:
 		GemRB.UnloadWindow (PriestSpellUnmemorizeWindow)
 		PriestSpellUnmemorizeWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 		
-		GemRB.UnhideGUI ()
 		return
 		
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
-	GemRB.SetVar ("FloatWindow", PriestSpellUnmemorizeWindow)
 
 	# "Are you sure you want to ....?"
 	TextArea = GemRB.GetControl (Window, 3)
@@ -314,7 +313,6 @@ def OpenPriestSpellUnmemorizeWindow ():
 	GemRB.SetText (Window, Button, 13727)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPriestSpellUnmemorizeWindow")
 
-	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 

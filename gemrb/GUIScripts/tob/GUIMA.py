@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.20 2005/02/25 15:12:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.21 2005/05/18 15:37:10 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -24,8 +24,10 @@
 ###################################################
 
 import GemRB
+import GUICommonWindows
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
+from GUICommonWindows import *
 
 MapWindow = None
 NoteWindow = None
@@ -34,22 +36,34 @@ WorldMapControl = None
 
 ###################################################
 def OpenMapWindow ():
-	global MapWindow
-	if CloseOtherWindow (OpenMapWindow):
-		GemRB.HideGUI ()
-		if WorldMapWindow: OpenWorldMapWindowInside ()
+	global MapWindow, OptionsWindow, PortraitWindow
+	global OldPortraitWindow
 
+	if CloseOtherWindow (OpenMapWindow):
 		GemRB.UnloadWindow (MapWindow)
+		GemRB.UnloadWindow (OptionsWindow)
+		GemRB.UnloadWindow (PortraitWindow)
+
 		MapWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-
+		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
 		return
 
-	GemRB.HideGUI()
-	GemRB.LoadWindowPack ("GUIMAP")
+	GemRB.HideGUI ()
+	GemRB.SetVisible (0,0)
+
+	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", MapWindow)
+	#saving the original portrait window
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
+	OptionsWindow = GemRB.LoadWindow (0)
+	SetupMenuWindowControls (OptionsWindow, 0)
+	GemRB.SetWindowFrame (OptionsWindow)
 
 	# World Map
 	Button = GemRB.GetControl (Window, 1)
@@ -70,7 +84,10 @@ def OpenMapWindow ():
 	Map = GemRB.GetControl (Window, 2)
 	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "AddNoteWindow")
-	GemRB.UnhideGUI ()
+	GemRB.SetVisible (OptionsWindow, 1)
+	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (PortraitWindow, 1)
+
 
 def LeftDoublePressMap ():
 	print "MoveToPoint"
@@ -135,6 +152,7 @@ def AddNoteWindow ():
 	return
 
 def OpenWorldMapWindowInside ():
+	OpenMapWindow() #closes mapwindow
 	WorldMapWindowCommon (-1)
 	return
 
@@ -145,19 +163,21 @@ def OpenWorldMapWindow ():
 def WorldMapWindowCommon(Travel):
 	global WorldMapWindow, WorldMapControl
 
-	GemRB.HideGUI()
-
 	if WorldMapWindow:
 		GemRB.UnloadWindow (WorldMapWindow)
+
 		WorldMapWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
+                GemRB.SetVisible (0,1)
+                GemRB.UnhideGUI ()
 		return
 
-	GemRB.LoadWindowPack ("GUIWMAP")
+        GemRB.HideGUI ()
+        GemRB.SetVisible (0,0)
+
+	GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
 	WorldMapWindow = Window = GemRB.LoadWindow (0)
-	MapWindow = None
-	GemRB.SetVar ("OtherWindow", WorldMapWindow)
+        #saving the original portrait window
+        GemRB.SetWindowFrame (Window)
 
 	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel)
 	WorldMapControl = GemRB.GetControl (Window, 4)
@@ -200,11 +220,8 @@ def WorldMapWindowCommon(Travel):
 
 	# Done
 	Button = GemRB.GetControl (Window, 0)
-	if Travel>=0:
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
-	else:
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
-	GemRB.UnhideGUI ()
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
+        GemRB.SetVisible (Window, 1)
 	return
 
 def MapN():

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.18 2005/05/14 12:44:02 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.19 2005/05/18 15:37:09 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -41,7 +41,7 @@ FRAME_PC_TARGET   = 1
 # 9 REST
 # 10 TXTE
 
-def SetupMenuWindowControls (Window):
+def SetupMenuWindowControls (Window, Gears):
 
 	# Return to Game
 	Button = GemRB.GetControl (Window, 0)
@@ -100,17 +100,20 @@ def SetupMenuWindowControls (Window):
 	Button = GemRB.GetControl (Window, 8)
 	GemRB.SetTooltip (Window, Button, 13902)
 	
-	# Gears (time)
-	Button = GemRB.GetControl (Window, 9)
-	GemRB.SetAnimation (Window, Button, "CGEAR")
-	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-	GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
+	if Gears:
+		# Gears (time)
+		Button = GemRB.GetControl (Window, 9)
+		GemRB.SetAnimation (Window, Button, "CGEAR")
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+		GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
+		rb = 11
+	else:
+		rb = 9
 
 	# Rest
-	Button = GemRB.GetControl (Window, 11)
+	Button = GemRB.GetControl (Window, rb)
 	GemRB.SetTooltip (Window, Button, 11942)
 
-	return
 
 def AIPress ():
 	print "AIPress"
@@ -322,4 +325,34 @@ def SetupSavingThrows (pc):
 				tmp1=tmp2
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
 	return
+
+def SetEncumbranceLabels (Window, Label, Label2, pc):
+	# encumbrance
+	# Loading tables of modifications
+	Table = GemRB.LoadTable("strmod")
+	TableEx = GemRB.LoadTable("strmodex")
+	# Getting the character's strength
+	sstr = GemRB.GetPlayerStat (pc, IE_STR)
+	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
+
+	max_encumb = GemRB.GetTableValue(Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
+	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
+
+	Label = GemRB.GetControl (Window, 0x10000043)
+	GemRB.SetText (Window, Label, str(encumbrance) + ":")
+
+	Label2 = GemRB.GetControl (Window, 0x10000044)
+	GemRB.SetText (Window, Label2, str(max_encumb) + ":")
+	ratio = (0.0 + encumbrance) / max_encumb
+	if ratio > 1.0:
+		GemRB.SetLabelTextColor (Window, Label, 255, 0, 0)
+		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
+	elif ratio > 0.8:
+		GemRB.SetLabelTextColor (Window, Label, 255, 255, 0)
+		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
+	else:
+		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
+	return
+
 
