@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.67 2005/05/17 13:52:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.68 2005/05/19 16:36:38 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -60,7 +60,7 @@ class GameControl;
 #define SF_LOCKSCROLL    16
 
 //the distance of operating a trigger, container, etc.
-#define MAX_OPERATING_DISTANCE      40
+#define MAX_OPERATING_DISTANCE      40 //a search square is 16x12
 //the distance between PC's who are about to enter a new area 
 #define MAX_TRAVELING_DISTANCE      400
 

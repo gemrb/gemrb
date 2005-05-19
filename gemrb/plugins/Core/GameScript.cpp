@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.271 2005/05/18 11:31:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.272 2005/05/19 16:36:39 avenger_teambg Exp $
  *
  */
 
@@ -9324,7 +9324,11 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	double distance = Distance(Sender, gc->target);
-	if (distance<=MAX_OPERATING_DISTANCE)
+	double needed = MAX_OPERATING_DISTANCE;
+	if (container->Type==IE_CONTAINER_PILE) {
+		needed = 15; // less than a search square (width)
+	}
+	if (distance<=needed)
 	{
 		//check if the container is unlocked
 		if (container->Flags & CONT_LOCKED) {

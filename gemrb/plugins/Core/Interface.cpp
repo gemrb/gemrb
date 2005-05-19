@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.308 2005/05/19 14:56:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.309 2005/05/19 16:36:39 avenger_teambg Exp $
  *
  */
 
@@ -1910,13 +1910,13 @@ void Interface::DrawWindows(void)
 		ieDword index = 0;
 
 		if (!vars->Lookup( "MessageWindowSize", index ) || (index!=game->ControlStatus) ) {
-printf("****************Set new windowsize: %d\n", game->ControlStatus);
 			vars->SetAt( "MessageWindowSize", game->ControlStatus);
 			guiscript->RunFunction( "UpdateControlStatus" );
 			//giving control back to GameControl
 			SetControlStatus(0,0,0x7f000000|IE_GUI_CONTROL_FOCUSED);
 			GameControl *gc = GetGameControl();
-			if (index & CS_HIDEGUI) gc->HideGUI();
+			//this is the only value we can use here
+			if (game->ControlStatus & CS_HIDEGUI) gc->HideGUI();
 			else gc->UnhideGUI();
 			if (flg & DF_START_DIALOG) {
 				gc->DialogChoose( (unsigned int) -1);
