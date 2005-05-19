@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.47 2005/04/12 18:42:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.48 2005/05/19 14:56:20 avenger_teambg Exp $
  *
  */
 
@@ -54,8 +54,9 @@ public:
 	int SwapBuffers(void);
 	bool ToggleGrabInput();
 	void MouseMovement(int x, int y);
-	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask, ieDword gMask,
-		ieDword bMask, ieDword aMask, void* pixels, bool cK = false, int index = 0);
+	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
+		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
+		bool cK = false, int index = 0);
 	Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
 		void* palette, bool cK = false, int index = 0);
 	void FreeSprite(Sprite2D* spr);
@@ -63,8 +64,10 @@ public:
 		Region* clip = NULL);
 	void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL);
+	void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
+		Region *clip = NULL);
 	void BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
-		Color *Palette, Region* clip = NULL);
+		Color *Palette = NULL, Region* clip = NULL);
 	void SetCursor(Sprite2D* up, Sprite2D* down);
 	void SetDragCursor(Sprite2D* drag);
 	Region GetViewport(void);

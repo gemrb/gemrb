@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.12 2004/11/13 00:33:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.13 2005/05/19 14:56:18 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
@@ -57,18 +57,24 @@ void Gem_Polygon::RecalcBBox()
 	}
 	BBox.x=points[0].x;
 	BBox.y=points[0].y;
-	BBox.w=0;
-	BBox.h=0;
+	BBox.w=points[0].x;
+	BBox.h=points[0].y;
 	for(int i=1; i<count; i++) {
 		if(points[i].x<BBox.x) {
-			BBox.w+=BBox.x-points[i].x;
 			BBox.x=points[i].x;
 		}
+		if(points[i].x>BBox.w) {
+			BBox.w=points[i].x;
+		}
 		if(points[i].y<BBox.y) {
-			BBox.h+=BBox.y-points[i].y;
 			BBox.y=points[i].y;
 		}
+		if(points[i].y>BBox.h) {
+			BBox.h=points[i].y;
+		}
 	}
+	BBox.w-=BBox.x;
+	BBox.h-=BBox.y;
 }
 
 bool Gem_Polygon::PointIn(Point &p)

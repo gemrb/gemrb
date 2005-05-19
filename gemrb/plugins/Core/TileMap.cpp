@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.42 2005/03/19 16:15:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.43 2005/05/19 14:56:18 avenger_teambg Exp $
  *
  */
 
@@ -77,10 +77,10 @@ Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
 	return doors.at( doors.size() - 1 );
 }
 
-void TileMap::DrawOverlay(unsigned int index, Region viewport)
+void TileMap::DrawOverlay(unsigned int index, Region screen)
 {
 	if (index < overlays.size()) {
-		overlays[index]->Draw( viewport );
+		overlays[index]->Draw( screen );
 	}
 }
 
@@ -167,9 +167,9 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				//   drawing two or more tiles
 
 				int e = ! IS_EXPLORED( x, y - 1);
-				if(! IS_EXPLORED( x - 1, y )) e |= 2;
-				if(! IS_EXPLORED( x, y + 1 )) e |= 4;
-				if(! IS_EXPLORED( x + 1, y )) e |= 8;
+				if (! IS_EXPLORED( x - 1, y )) e |= 2;
+				if (! IS_EXPLORED( x, y + 1 )) e |= 4;
+				if (! IS_EXPLORED( x + 1, y )) e |= 8;
 
 				switch (e) {
 				case 1:
@@ -235,9 +235,9 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				//   drawing two or more tiles
 
 				int e = ! IS_VISIBLE( x, y - 1);
-				if(! IS_VISIBLE( x - 1, y )) e |= 2;
-				if(! IS_VISIBLE( x, y + 1 )) e |= 4;
-				if(! IS_VISIBLE( x + 1, y )) e |= 8;
+				if (! IS_VISIBLE( x - 1, y )) e |= 2;
+				if (! IS_VISIBLE( x, y + 1 )) e |= 4;
+				if (! IS_VISIBLE( x + 1, y )) e |= 8;
 
 				switch (e) {
 				case 1:
@@ -367,18 +367,22 @@ Container* TileMap::GetContainer(Point &position, int type)
 {
 	for (size_t i = 0; i < containers.size(); i++) {
 		Container* c = containers[i];
-		if(type!=-1) {
-			if(c->Type!=type)
+		if (type!=-1) {
+			if (c->Type!=type)
 				continue;
-		}
-		if (c->outline->BBox.x > position.x)
-			continue;
-		if (c->outline->BBox.y > position.y)
-			continue;
-		if (c->outline->BBox.x + c->outline->BBox.w < position.x)
-			continue;
-		if (c->outline->BBox.y + c->outline->BBox.h < position.y)
-			continue;
+	  }
+	  if (c->outline->BBox.x > position.x)
+	    continue;
+	  if (c->outline->BBox.y > position.y)
+	    continue;
+	  if (c->outline->BBox.x + c->outline->BBox.w < position.x)
+	    continue;
+	  if (c->outline->BBox.y + c->outline->BBox.h < position.y)
+	    continue;
+	
+	  //IE piles don't have polygons, the bounding box is enough for them
+	  if (c->Type==IE_CONTAINER_PILE)
+	    return c;
 		if (c->outline->PointIn( position ))
 			return c;
 	}
@@ -389,22 +393,30 @@ void TileMap::AddItemToLocation(Point &position, CREItem *item)
 {
 	Point tmp[4];
 	char heapname[32];
+
+	//converting to search square
+	position.x/=16;
+	position.y/=12;
 	sprintf(heapname,"heap_%hd.%hd",position.x,position.y);
+	//pixel position is centered on search square
+	position.x=position.x*16+8;
+	position.y=position.y*12+6;
 	Container *container = GetContainer(position,IE_CONTAINER_PILE);
-	if(!container) {
-		tmp[0].x=position.x-5;
-		tmp[0].y=position.y-5;
-		tmp[1].x=position.x+5;
-		tmp[1].y=position.y-5;
-		tmp[2].x=position.x+5;
-		tmp[2].y=position.y+5;
-		tmp[3].x=position.x-5;
-		tmp[3].y=position.y+5;
+	if (!container) {
+		//bounding box covers the search square
+		tmp[0].x=position.x-8;
+		tmp[0].y=position.y-6;
+		tmp[1].x=position.x+8;
+		tmp[1].y=position.y-6;
+		tmp[2].x=position.x+8;
+		tmp[2].y=position.y+6;
+		tmp[3].x=position.x-8;
+		tmp[3].y=position.y+6;
 		Gem_Polygon* outline = new Gem_Polygon( tmp, 4 );
-		container = AddContainer(heapname,IE_CONTAINER_PILE, outline);
+		container = AddContainer(heapname, IE_CONTAINER_PILE, outline);
 		container->Pos=position;
 	}
-	container->inventory.AddItem(item);
+	container->AddItem(item);
 }
 
 InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,

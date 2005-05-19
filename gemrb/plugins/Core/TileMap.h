@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.31 2005/03/19 16:15:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.32 2005/05/19 14:56:18 avenger_teambg Exp $
  *
  */
 
@@ -72,7 +72,7 @@ public:
 	InfoPoint* GetInfoPoint(unsigned int idx);
 
 	void AddOverlay(TileOverlay* overlay);
-	void DrawOverlay(unsigned int index, Region viewport);
+	void DrawOverlay(unsigned int index, Region screen);
 	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region viewport);
 public:
 	int XCellCount, YCellCount;

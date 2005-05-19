@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.70 2005/04/29 21:53:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.71 2005/05/19 14:56:16 avenger_teambg Exp $
  *
  */
 
@@ -43,6 +43,7 @@ class Door;
 
 #define STEP_TIME		150
 #define MAX_SCRIPTS		8
+#define MAX_GROUND_ICON_DRAWN   3
 
 #define SCR_OVERRIDE 0
 #define SCR_AREA	 1
@@ -319,6 +320,18 @@ public:
 	Container(void);
 	~Container(void);
 	void DebugDump();
+	//turns the container to a pile
+	void DestroyContainer();
+	//removes an item from the container's inventory
+	CREItem *RemoveItem(int idx);
+	//adds an item to the container's inventory
+	void AddItem(CREItem *item);
+	//draws the ground icons
+	void DrawPile(bool highlight, Region screen, Color tint);
+private:
+	//updates the ground icons for a pile
+	void RefreshGroundIcons();
+	void FreeGroundIcons();
 public:
 	Point toOpen;
 	unsigned short Type;
@@ -329,6 +342,8 @@ public:
 	unsigned short Trapped;
 	unsigned short TrapDetected;
 	Inventory inventory;
+	//these are not saved
+	Sprite2D *groundicons[3];
 };
 
 class GEM_EXPORT InfoPoint : public Highlightable {

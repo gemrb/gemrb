@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2003-2005 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.89 2005/05/14 11:18:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.90 2005/05/19 14:56:16 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -850,10 +850,88 @@ Container::Container(void)
 	Trapped = 0;
 	TrapDetected = 0;
 	inventory.SetInventoryType(INVENTORY_HEAP);
+	// NULL should be 0 for this 
+	memset (groundicons, 0, sizeof(groundicons) );
+}
+
+void Container::FreeGroundIcons()
+{
+	Video* video = core->GetVideoDriver();
+
+	for (int i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
+		if (groundicons[i]) {
+			video->FreeSprite( groundicons[i] );
+			groundicons[i]=NULL;
+		}
+	}
 }
 
 Container::~Container()
 {
+	FreeGroundIcons();
+}
+
+void Container::DrawPile(bool highlight, Region screen, Color tint)
+{
+	Video* video = core->GetVideoDriver();
+	for (int i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
+		if (groundicons[i]) {
+			//draw it with highlight
+			if (highlight) {
+				video->BlitSpriteTinted (groundicons[i], screen.x + Pos.x, screen.y + Pos.y, tint);
+			} else {
+				//draw with second color transparent too
+				video->BlitSpriteNoShadow (groundicons[i], screen.x + Pos.x, screen.y + Pos.y, tint);
+			}
+		}
+	}
+}
+
+//This function doesn't exist in the original IE, destroys a container
+//turning it to a ground pile
+void Container::DestroyContainer()
+{
+	//it is already a groundpile?
+	if (Type==IE_CONTAINER_PILE)
+		return;
+	Type = IE_CONTAINER_PILE;
+	RefreshGroundIcons();
+	//probably we should stop the script or trigger it, whatever
+}
+
+//Takes an item from the container's inventory and returns its pointer
+CREItem *Container::RemoveItem(int idx)
+{
+	CREItem *ret = inventory.RemoveItem(idx, 0);
+	//we just took the 3. or less item, groundpile changed
+	if ((Type==IE_CONTAINER_PILE) && (inventory.GetSlotCount()<3)) {
+		RefreshGroundIcons();
+	}
+	return ret;
+}
+
+//Adds an item to the container's inventory
+void Container::AddItem(CREItem *item)
+{
+	inventory.AddItem(item);
+	//we just added a 3. or less item, groundpile changed
+	if ((Type==IE_CONTAINER_PILE) && (inventory.GetSlotCount()<4)) {
+		RefreshGroundIcons();
+	}
+}
+
+void Container::RefreshGroundIcons()
+{
+	int i = inventory.GetSlotCount();
+	if (i>MAX_GROUND_ICON_DRAWN)
+		i=MAX_GROUND_ICON_DRAWN;
+	FreeGroundIcons();
+	while (i--) {
+		CREItem *slot = inventory.GetSlotItem(i); //borrowed reference
+		Item *itm = core->GetItem( slot->ItemResRef ); //cached reference
+		groundicons[i] = core->GetBAMSprite( itm->GroundIcon, -1, 0 );
+		core->FreeItem( itm, slot->ItemResRef ); //decref
+	}
 }
 
 void Container::DebugDump()

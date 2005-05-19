@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.109 2005/04/29 21:53:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.110 2005/05/19 14:56:02 avenger_teambg Exp $
  *
  */
 
@@ -483,7 +483,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		//reading items into a container
 		str->Seek( ItemsOffset+( ItemIndex * 0x14 ), GEM_STREAM_START);
 		while(ItemCount--) {
-			c->inventory.AddItem( core->ReadItem(str));
+			//cannot add directly to inventory (ground piles)
+			c->AddItem( core->ReadItem(str));
 		}
 		if (Script[0] != 0) {
 			c->Scripts[0] = new GameScript( Script, ST_CONTAINER );

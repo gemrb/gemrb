@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.153 2005/05/16 12:01:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.154 2005/05/19 14:56:17 avenger_teambg Exp $
  *
  */
 
@@ -416,6 +416,10 @@ public:
 	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, Point &p);
 	/** returns the first selected PC */
 	Actor *GetFirstSelectedPC();
+	/** returns a single sprite (not cached) from a BAM resource */
+	Sprite2D* GetBAMSprite(ieResRef ResRef, int cycle, int frame);
+	/** returns a cursor sprite (not cached) */
+	Sprite2D *GetCursorSprite();
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

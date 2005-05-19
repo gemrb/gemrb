@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.160 2005/05/16 12:01:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.161 2005/05/19 14:56:17 avenger_teambg Exp $
  *
  */
 
@@ -497,15 +497,45 @@ bool Map::HandleActorStance(Actor *actor, CharAnimations *ca, int StanceID)
 	return false;
 }
 
-void Map::DrawMap(Region viewport, GameControl* gc)
+void Map::DrawContainers( Region screen, Container *overContainer)
+{
+	Region vp = core->GetVideoDriver()->GetViewport();
+	unsigned int i = 0;
+	Container *c;
+
+	while ( (c = TMap->GetContainer(i++))!=NULL ) {
+		Color tint = LightMap->GetPixel( c->Pos.x / 16, c->Pos.y / 12);
+		tint.a = 255;
+
+		if ((c != overContainer) && (c->Type==IE_CONTAINER_PILE) ) {
+			if (c->outline->BBox.InsideRegion( vp )) {
+				c->DrawPile(false, screen, tint);
+			}
+		}
+	}
+	//draw overcontainer with highlight
+	if (overContainer) {
+		if (overContainer->Type==IE_CONTAINER_PILE) {
+			Color tint = LightMap->GetPixel( overContainer->Pos.x / 16, overContainer->Pos.y / 12);
+			tint.a = 255;
+			overContainer->DrawPile(true, screen, tint);
+		} else {
+			overContainer->DrawOutline();
+		}
+	}
+}
+
+void Map::DrawMap(Region screen, GameControl* gc)
 {
 	unsigned int i;
 	//Draw the Map
-	if (TMap) {
-		TMap->DrawOverlay( 0, viewport );
+
+	if (!TMap) {
+		return;
 	}
+	TMap->DrawOverlay( 0, screen );
 	//Blit the Background Map Animations (before actors)
-	Video* video = core->GetVideoDriver();
+	Video* video = core->GetVideoDriver();  
 	for (i = 0; i < animations.size(); i++) {
 		Animation *anim = animations[i];
 
@@ -523,20 +553,15 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			tint.a = 255;
 		}
 		video->BlitSpriteTinted( anim->NextFrame(),
-			p.x + viewport.x, p.y + viewport.y,
-			tint, anim->Palette, &viewport );		
+			p.x + screen.x, p.y + screen.y,
+			tint, anim->Palette, &screen );		
 	}
 	//Draw Selected Door Outline
 	if (gc->overDoor) {
 		gc->overDoor->DrawOutline();
 	}
-	if (gc->overContainer) {
-		gc->overContainer->DrawOutline();
-	}
+	DrawContainers( screen, gc->overContainer );
 	Region vp = video->GetViewport();
-	Region Screen = vp;
-	Screen.x = viewport.x;
-	Screen.y = viewport.y;
 	// starting with lowest priority (so they are drawn over)
 	GenerateQueues();
 	int q = 2; //skip inactive actors, don't even sort them
@@ -555,8 +580,9 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 				}
 				if (actor->textDisplaying == 1) {
 					Font* font = core->GetFont( 1 );
-					Region rgn( actor->Pos.x - 100 + viewport.x,
-						actor->Pos.y - 100 + viewport.y, 200, 400 );
+					Region rgn( actor->Pos.x-100+screen.x,
+						actor->Pos.y - 100 + screen.y,
+						200, 400 );
 					font->Print( rgn, ( unsigned char * ) actor->overHeadText,
 							NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP,
 							false );
@@ -636,7 +662,7 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 						continue;
 					Color tint = LightMap->GetPixel( cx / 16, cy / 12);
 					tint.a = 255-Trans;
-					video->BlitSpriteTinted( nextFrame, cx + viewport.x, cy + viewport.y, tint, anim->Palette, &Screen );
+					video->BlitSpriteTinted( nextFrame, cx + screen.x, cy + screen.y, tint, anim->Palette, &screen );
 					if (anim->endReached) {
 						if (HandleActorStance(actor, ca, StanceID) ) {
 							anim->endReached = false;
@@ -665,8 +691,8 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 			tint.a = 0xA0;
 		}
 		video->BlitSpriteTinted( anim->NextFrame(),
-			p.x + viewport.x, p.y + viewport.y,
-			tint, anim->Palette, &viewport );
+			p.x + screen.x, p.y + screen.y,
+			tint, anim->Palette, &screen );
 	}
 
 	for (i = 0; i < vvcCells.size(); i++) {
@@ -690,16 +716,16 @@ void Map::DrawMap(Region viewport, GameControl* gc)
 		if (!frame)
 			continue;
 		if (vvc->Transparency & IE_VVC_BRIGHTEST) {
-			video->BlitSprite( frame, vvc->XPos + viewport.x,
-					vvc->YPos + viewport.y, false, &viewport );
+			video->BlitSprite( frame, vvc->XPos + screen.x,
+					vvc->YPos + screen.y, false, &screen );
 		} else {
-			video->BlitSprite( frame, vvc->XPos + viewport.x,
-					vvc->YPos + viewport.y, false, &viewport );
+			video->BlitSprite( frame, vvc->XPos + screen.x,
+					vvc->YPos + screen.y, false, &screen );
 		}
 	}
 
 	if (core->FogOfWar && TMap) {
-		TMap->DrawFogOfWar( ExploredBitmap, VisibleBitmap, viewport );
+		TMap->DrawFogOfWar( ExploredBitmap, VisibleBitmap, screen );
 	}
 }
 
@@ -738,7 +764,9 @@ void Map::DeleteActor(int i)
 {
 	Actor *actor = actors[i];
 	Game *game = core->GetGame();
+printf("Leaveparty\n");
 	game->LeaveParty( actor );
+printf("DelNPC\n");
 	game->DelNPC( game->InStore(actor) );
 	actors.erase( actors.begin()+i );
 	delete (actor);
@@ -1308,7 +1336,7 @@ PathNode* Map::GetLine(Point &start, int Steps, int Orientation, int flags)
 PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, int flags)
 {
 	PathNode* StartNode = new PathNode;
-        PathNode *Return = StartNode;
+			  PathNode *Return = StartNode;
 	StartNode->Next = NULL;
 	StartNode->Parent = NULL;
 	StartNode->x = start.x;
@@ -1316,18 +1344,18 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, in
 	StartNode->orient = Orientation;
 
 	int Max = Steps;
-        while(Steps--) {
+			  while(Steps--) {
 		int x,y;
 
 		StartNode->Next = new PathNode;
 		StartNode->Next->Parent = StartNode;
 		StartNode = StartNode->Next;
-                StartNode->Next = NULL;
+			          StartNode->Next = NULL;
 		x = (start.x + dest.x) * Steps / Max;
 		y = (start.y + dest.y) * Steps / Max;
-                StartNode->x = x;
-                StartNode->y = y;
-                StartNode->orient = Orientation;
+			          StartNode->x = x;
+			          StartNode->y = y;
+			          StartNode->orient = Orientation;
 		bool wall = (!( Passable[SearchMap->GetPixelIndex( x, y )] & PATH_MAP_PASSABLE ));
 		if (wall) switch (flags) {
 			case GL_REBOUND:
@@ -1338,7 +1366,7 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, in
 			default:  //premature end
 				return Return;
 		}
-        }
+	}
 
 	return Return;
 }

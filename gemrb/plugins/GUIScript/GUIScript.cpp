@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.306 2005/05/18 15:37:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.307 2005/05/19 14:56:18 avenger_teambg Exp $
  *
  */
 
@@ -128,29 +128,6 @@ inline Control *GetControl( int wi, int ci, int ct)
 		return NULL;
 	}
 	return ctrl;
-}
-
-// Return single BAM frame as a sprite. Use if you want one frame only,
-// otherwise it's not efficient
-
-inline Sprite2D* GetBAMSprite(ieResRef ResRef, int cycle, int frame)
-{
-	AnimationMgr* bam = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
-	DataStream *str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
-	if (!bam->Open( str, true ) ) {
-		RuntimeError( "BAM not found" );
-		return NULL;
-	}
-	Sprite2D *tspr;
-	if (cycle==-1) {
-		tspr = bam->GetFrame( frame );
-	}
-	else {
-		tspr = bam->GetFrameFromCycle( (unsigned char) cycle, frame );
-	}
-	core->FreeInterface( bam );
-
-	return tspr;
 }
 
 PyDoc_STRVAR( GemRB_SetInfoTextColor__doc, 
@@ -1505,8 +1482,11 @@ static PyObject* GemRB_CreateTextEdit(PyObject * /*self*/, PyObject* args)
 	edit->Owner = win;
 	edit->SetText( text );
 
-	Sprite2D* spr = GetBAMSprite( "CARET", 0, 0 );
-	if (spr) edit->SetCursor( spr );
+	Sprite2D* spr = core->GetCursorSprite();
+	if (spr)
+		edit->SetCursor( spr );
+	else
+		return RuntimeError( "BAM not found" );
 
 	win->AddControl( edit );
 
@@ -3672,10 +3652,12 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 		btn->SetFlags( IE_GUI_BUTTON_PICTURE, BM_OR );
 		Sprite2D* Picture;
 		if (Which==2) {
-			Picture = GetBAMSprite(item->CarriedIcon, -1, 0);
+			Picture = core->GetBAMSprite(item->CarriedIcon, -1, 0);
 		} else {
-			Picture = GetBAMSprite(item->ItemIcon, -1, Which);
+			Picture = core->GetBAMSprite(item->ItemIcon, -1, Which);
 		}
+		if (!Picture)
+			return RuntimeError( "BAM not found");
 		btn->SetPicture( Picture );
 		core->FreeItem( item, ItemResRef, false );
 	} else {
@@ -4655,9 +4637,9 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	core->DragItem (si);
-	Sprite2D *Picture = GetBAMSprite( ResRef, CycleIndex, FrameIndex );
+	Sprite2D *Picture = core->GetBAMSprite( ResRef, CycleIndex, FrameIndex );
 	if (Picture == NULL) {
-		return NULL;
+		return RuntimeError( "BAM not found");
 	}
 
 	core->GetVideoDriver()->SetDragCursor (Picture);

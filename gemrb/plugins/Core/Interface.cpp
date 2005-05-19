@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.307 2005/05/18 22:48:13 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.308 2005/05/19 14:56:17 avenger_teambg Exp $
  *
  */
 
@@ -489,20 +489,20 @@ int Interface::Init()
 	}
 
 	printMessage( "Core", "Initializing stock sounds...", WHITE );
-	table = core->LoadTable( "defsound" );
+	table = LoadTable( "defsound" );
 	if (table < 0) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find defsound.2da.\nTermination in Progress...\n" );
 		goto end_of_init;
 	} else {
-		TableMgr* tm = core->GetTable( table );
+		TableMgr* tm = GetTable( table );
 		if (tm) {
 			DSCount = tm->GetRowCount();
 			DefSound = (ieResRef *) calloc( DSCount, sizeof(ieResRef) );
 			for (int i = 0; i < DSCount; i++) {
 				strnuprcpy( DefSound[i], tm->QueryField( i, 0 ), 8 );
 			}
-			core->DelTable( table );
+			DelTable( table );
 		}
 	}
 
@@ -598,14 +598,23 @@ int Interface::Init()
 	console->Width = Width;
 	console->Height = 25;
 	console->SetFont( fonts[0] );
+	{
+		Sprite2D *tmpsprite = GetCursorSprite();
+		if (tmpsprite) {
+			console->SetCursor (tmpsprite);
+			printStatus( "OK", LIGHT_GREEN );
+		} else {
+			printStatus( "ERROR", LIGHT_GREEN );
+		}
+	}
+/*
 	str = key->GetResource( CursorBam, IE_BAM_CLASS_ID );
 	if (anim->Open(str, true) ) {
 		console->SetCursor( anim->GetFrameFromCycle( 0,0 ) );
-		printStatus( "OK", LIGHT_GREEN );
 	}
 	else {
-		printStatus( "ERROR", LIGHT_GREEN );
 	}
+*/
 	printMessage( "Core", "Starting up the Sound Manager...", WHITE );
 	soundmgr = ( SoundMgr * ) GetInterface( IE_WAV_CLASS_ID );
 	if (soundmgr == NULL) {
@@ -3250,5 +3259,31 @@ Actor *Interface::GetFirstSelectedPC()
                 }
         }
         return NULL;
+}
+
+// Return single BAM frame as a sprite. Use if you want one frame only,
+// otherwise it's not efficient
+Sprite2D* Interface::GetBAMSprite(ieResRef ResRef, int cycle, int frame)
+{
+        AnimationMgr* bam = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
+        DataStream *str = key->GetResource( ResRef, IE_BAM_CLASS_ID );
+        if (!bam->Open( str, true ) ) {
+                return NULL;
+        }
+        Sprite2D *tspr;
+        if (cycle==-1) {
+                tspr = bam->GetFrame( frame );
+        }
+        else {
+                tspr = bam->GetFrameFromCycle( (unsigned char) cycle, frame );
+        }
+        FreeInterface( bam );
+
+        return tspr;
+}
+
+Sprite2D *Interface::GetCursorSprite()
+{
+	return GetBAMSprite(CursorBam, 0, 0);
 }
 

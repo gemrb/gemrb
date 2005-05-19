@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.41 2005/04/09 19:13:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.42 2005/05/19 14:56:18 avenger_teambg Exp $
  *
  */
 
@@ -62,8 +62,10 @@ public:
 		Region* clip = NULL) = 0;
 	virtual void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL) = 0;
+	virtual void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
+		Region* clip = NULL) = 0;
 	virtual void BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
-		Color *palette, Region* clip = NULL) = 0;
+		Color *palette = NULL, Region* clip = NULL) = 0;
 	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
 	virtual void SetDragCursor(Sprite2D* drag) = 0;
 	virtual Region GetViewport(void) = 0;
