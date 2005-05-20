@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.7 2005/05/18 15:37:09 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.8 2005/05/20 12:43:07 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -109,6 +109,70 @@ def CloseContainerWindow ():
 	GemRB.UnhideGUI ()
 
 
+def UpdateContainerWindow ():
+	Window = ContainerWindow
+
+	Container = GemRB.GetContainer(0) #will use first selected pc anyway
+	LeftCount = Container['ItemCount']
+	ScrollBar = GemRB.GetControl (Window, 52)
+	GemRB.SetVarAssoc (Window, ScrollBar, "LeftTopIndex", LeftCount/3-1)
+	
+	pc = GemRB.GameGetFirstSelectedPC ()
+	inventory_slots = GemRB.GetSlots (pc, -1)
+	RightCount = len(inventory_slots)
+	ScrollBar = GemRB.GetControl (Window, 53)
+	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", RightCount/2-1)
+	RedrawContainerWindow ()
+
+
+def RedrawContainerWindow ():
+	Window = ContainerWindow
+	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
+	LeftIndex = GemRB.GetVar ("LeftIndex")
+	RightTopIndex = GemRB.GetVar ("RightTopIndex")
+	RightIndex = GemRB.GetVar ("RightIndex")
+	LeftCount = Container['ItemCount']
+	pc = GemRB.GameGetFirstSelectedPC ()
+	inventory_slots = GemRB.GetSlots (pc, -1)
+	RightCount = len(inventory_slots)
+
+	for i in range(6):
+		#this is an autoselected container, but we could use PC too
+		Slot = GemRB.GetContainerItem (0, i+LeftTopIndex)
+		Button = GemRB.GetControl (Window, i)
+		if Slot != None:
+			Item = GemRB.GetItem (Slot['ItemResRef'])
+			GemRB.SetVarAssoc (Window, Button, "LeftIndex", LeftTopIndex+i)
+			GemRB.SetItemIcon (Window, Button, Slot['ItemResRef'],0)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
+			GemRB.SetTooltip (Window, Button, Slot['ItemName'])
+		else:
+			GemRB.SetVarAssoc (Window, Button, "LeftIndex", -1)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
+			GemRB.SetTooltip (Window, Button, "")
+
+
+	for i in range(4):
+		if i+RightTopIndex<RightCount:
+			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
+		else:
+			Slot = None
+		Button = GemRB.GetControl (Window, i+10)
+		if Slot!=None:
+			Item = GemRB.GetItem (Slot['ItemResRef'])
+			GemRB.SetVarAssoc (Window, Button, "RightIndex", RightTopIndex+i)
+			GemRB.SetItemIcon (Window,Button, Slot['ItemResRef'],0)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
+			#is this needed?
+			#Slot = GemRB.GetItem(Slot['ItemResRef'])
+			#GemRB.SetTooltip (Window, Button, Slot['ItemName'])
+		else:
+			GemRB.SetVarAssoc (Window, Button, "RightIndex", -1)
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
+			GemRB.SetTooltip (Window, Button, "")
+
+
 def OpenContainerWindow ():
 	global OldActionsWindow, ContainerWindow, Container
 
@@ -137,6 +201,26 @@ def OpenContainerWindow ():
 	# 52, 53 scroller ground, scroller personal
 	# 54 - encumbrance
 
+	for i in range(6):
+		Button = GemRB.GetControl (Window, i)
+		GemRB.SetVarAssoc (Window, Button, "LeftIndex", i)
+		#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "TakeItemContainer")
+
+	for i in range(4):
+		Button = GemRB.GetControl (Window, i+10)
+		GemRB.SetVarAssoc (Window, Button, "RightIndex", i)
+		#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "DropItemContainer")
+
+	# left scrollbar
+	ScrollBar = GemRB.GetControl (Window, 52)
+	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
+
+	# right scrollbar
+	ScrollBar = GemRB.GetControl (Window, 53)
+	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
+
 	Label = GemRB.CreateLabel (Window, 0x10000043, 323,14,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
 	Label = GemRB.CreateLabel (Window, 0x10000044, 323,20,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
 
@@ -160,8 +244,9 @@ def OpenContainerWindow ():
 	# Done
 	Button = GemRB.GetControl (Window, 51)
 	GemRB.SetText (Window, Button, 1403)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenContainerWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContainerWindow")
 
+	UpdateContainerWindow ()
 	GemRB.UnhideGUI ()
 
 	
