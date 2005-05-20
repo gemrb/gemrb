@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.50 2005/04/29 21:53:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.51 2005/05/20 13:28:27 avenger_teambg Exp $
  *
  */
 
@@ -232,7 +232,9 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	str->ReadWord( &pcInfo.YPos );
 	str->ReadWord( &pcInfo.ViewXPos );
 	str->ReadWord( &pcInfo.ViewYPos );
-	str->Read( &pcInfo.Unknown28, 100 );
+	str->ReadWord( &pcInfo.ModalState );  //see Modal.ids
+	str->ReadWord( &pcInfo.Happiness );   //
+	str->Read( &pcInfo.Unknown2c, 96 );
 	for (i = 0; i < 4; i++) {
 		str->ReadWord( &pcInfo.QuickWeaponSlot[i] );
 	}

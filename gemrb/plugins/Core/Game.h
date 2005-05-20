@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.50 2005/05/19 14:56:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.51 2005/05/20 13:28:26 avenger_teambg Exp $
  *
  */
 
@@ -73,7 +73,9 @@ typedef struct PCStruct {
 	ieWord   YPos;
 	ieWord   ViewXPos;
 	ieWord   ViewYPos;
-	unsigned char Unknown28[100];
+	ieWord   ModalState;
+	ieWord   Happiness;
+	unsigned char Unknown2c[96];
 	ieWord   QuickWeaponSlot[4];
 	unsigned char Unknown94[8];
 	ieResRef QuickSpellResRef[3];
