@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.176 2005/05/18 11:31:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.177 2005/05/20 16:41:03 avenger_teambg Exp $
  *
  */
 
@@ -793,6 +793,7 @@ public: //Script Functions
 	static int Internal(Scriptable* Sender, Trigger* parameters);
 	static int InternalGT(Scriptable* Sender, Trigger* parameters);
 	static int InternalLT(Scriptable* Sender, Trigger* parameters);
+	static int InventoryFull(Scriptable* Sender, Trigger* parameter);
 	static int InWeaponRange(Scriptable* Sender, Trigger* parameter);
 	static int IsAClown(Scriptable* Sender, Trigger* parameters);
 	static int IsActive(Scriptable* Sender, Trigger* parameters);

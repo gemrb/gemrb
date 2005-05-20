@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.272 2005/05/19 16:36:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.273 2005/05/20 16:41:03 avenger_teambg Exp $
  *
  */
 
@@ -168,6 +168,7 @@ static TriggerLink triggernames[] = {
 	{"internalgt", GameScript::InternalGT,0},
 	{"internallt", GameScript::InternalLT,0},
 	{"interactingwith", GameScript::InteractingWith,0},
+	{"inventoryfull", GameScript::InventoryFull,0},
 	{"inweaponrange", GameScript::InWeaponRange,0},
 	{"isaclown", GameScript::IsAClown,0},
 	{"isactive", GameScript::IsActive,0},
@@ -4030,12 +4031,19 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* paramet
 	}
 	return 0;
 }
-/*
-//				0	1	2	3	4
-static char spellnames[5][5]={"ITEM", "SPPR", "SPWI", "SPIN", "SPCL"};
 
-#define CreateSpellName(spellname, data) sprintf(spellname,"%s%03d",spellnames[data/1000],data%1000)
-*/
+int GameScript::InventoryFull( Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	if (actor->inventory.FindCandidateSlot( SLOT_INVENTORY, 0 )==-1) {
+		return 1;
+	}
+	return 0;
+}
 
 int GameScript::HaveSpell(Scriptable *Sender, Trigger *parameters)
 {
@@ -8753,7 +8761,8 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 	if (tar->Type!=ST_ACTOR) {
 		return;
 	}
-	int slot = tar->inventory.FindItem(parameters->string0Parameter, 0);
+	Actor *actor = (Actor *) tar;
+	int slot = actor->inventory.FindItem(parameters->string0Parameter, 0);
 	if (slot<0) {
 		return;
 	}
@@ -8764,7 +8773,8 @@ void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
-	int slot = Sender->inventory.FindItem(parameters->string0Parameter, 0);
+	Actor *actor = (Actor *) Sender;
+	int slot = actor->inventory.FindItem(parameters->string0Parameter, 0);
 	if (slot<0) {
 		return;
 	}
@@ -8848,7 +8858,8 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	//find a candidate item for stealing (unstealable items are noticed)
-	int slot = tar->inventory.FindItem("", IE_INV_ITEM_UNSTEALABLE | IE_INV_ITEM_EQUIPPED);
+	Actor *actor = (Actor *) tar;
+	int slot = actor->inventory.FindItem("", IE_INV_ITEM_UNSTEALABLE | IE_INV_ITEM_EQUIPPED);
 	int money=0;
 	if (slot<0) {
 		//go for money too

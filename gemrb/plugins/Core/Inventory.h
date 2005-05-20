@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.28 2005/03/09 20:06:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.29 2005/05/20 16:41:03 avenger_teambg Exp $
  *
  */
 
@@ -42,6 +42,23 @@ class Map;
 #else
 #define GEM_EXPORT
 #endif
+
+//slottypes
+#define SLOT_HELM      1
+#define SLOT_ARMOUR    2
+#define SLOT_SHIELD    4
+#define SLOT_GLOVE     8
+#define SLOT_RING      16
+#define SLOT_AMULET    32
+#define SLOT_BELT      64
+#define SLOT_BOOT      128
+#define SLOT_WEAPON    256
+#define SLOT_QUIVER    512
+#define SLOT_CLOAK     1024
+#define SLOT_ITEM      2048  //quick item
+//
+#define SLOT_INVENTORY 0x8000
+#define SLOT_ANY       -1
 
 //weapon slot types (1000==not equipped)
 #define IW_NO_EQUIPPED  1000
@@ -151,6 +168,9 @@ public:
 	CREItem* GetSlotItem(unsigned int slot);
 	// Returns equipped weapon
 	CREItem *GetUsedWeapon();
+	// Returns a slot which might be empty, or capable of holding item (or part of it)
+	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL);
+
 	void dump();
 private:
 	int FindRanged();

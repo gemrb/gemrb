@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.47 2005/05/17 13:52:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.48 2005/05/20 16:41:03 avenger_teambg Exp $
  *
  */
 
@@ -27,7 +27,7 @@
 
 static int SLOT_MAGIC = 12;
 static int SLOT_FIST = 12;
-static int SLOT_WEAPON = 12;
+static int SLOT_MELEE = 12;
 
 Inventory::Inventory()
 {
@@ -40,7 +40,7 @@ Inventory::Inventory()
 Inventory::~Inventory()
 {
 	for (size_t i = 0; i < Slots.size(); i++) {
-		if(Slots[i]) {
+		if (Slots[i]) {
 			delete( Slots[i] );
 			Slots[i] = NULL;
 		}
@@ -49,7 +49,7 @@ Inventory::~Inventory()
 
 void Inventory::AddItem(CREItem *item)
 {
-	if(!item) return; //invalid items get no slot
+	if (!item) return; //invalid items get no slot
 	Slots.push_back(item);
 	//Changed=true; //probably not needed, chests got no encumbrance
 }
@@ -62,7 +62,7 @@ void Inventory::CalculateWeight()
 	Weight = 0;
 	for (size_t i = 0; i < Slots.size(); i++) {
 		CREItem *slot = Slots[i];
-		if(!slot) {
+		if (!slot) {
 			continue;
 		}
 		slot->Flags &= ~IE_INV_ITEM_ACQUIRED;
@@ -92,7 +92,7 @@ void Inventory::SetInventoryType(int arg)
 
 void Inventory::SetSlotCount(unsigned int size)
 {
-	if(Slots.size()) {
+	if (Slots.size()) {
 		printf("Inventory size changed???\n");
 		//we don't allow reassignment,
 		//if you want this, delete the previous Slots here
@@ -105,8 +105,8 @@ void Inventory::SetSlotCount(unsigned int size)
 bool Inventory::HasItemInSlot(const char *resref, int slot)
 {
 	CREItem *item = Slots[slot];
-	if(!item) {
-		if(resref[0]) {
+	if (!item) {
+		if (resref[0]) {
 			return false;
 		}
 		return true;
@@ -125,11 +125,11 @@ int Inventory::CountItems(const char *resref, bool stacks)
 	int slot = Slots.size();
 	while(slot--) {
 		CREItem *item = Slots[slot];
-		if(!item) {
+		if (!item) {
 			continue;
 		}
-		if(resref && resref[0]) {
-			if(!strnicmp(resref, item->ItemResRef, 8) )
+		if (resref && resref[0]) {
+			if (!strnicmp(resref, item->ItemResRef, 8) )
 				continue;
 		}
 		if (stacks && (item->Flags&IE_INV_ITEM_STACKED) ) {
@@ -150,10 +150,10 @@ bool Inventory::HasItem(const char *resref, ieDword flags)
 	int slot = Slots.size();
 	while(slot--) {
 		CREItem *item = Slots[slot];
-		if(!item) {
+		if (!item) {
 			continue;
 		}
-		if( (flags&item->Flags)!=flags) {
+		if ( (flags&item->Flags)!=flags) {
 				continue;
 		}
 		if (resref[0] && strnicmp(item->ItemResRef, resref,8) ) {
@@ -174,15 +174,15 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 	unsigned int slot = Slots.size();
 	while(slot--) {
 		CREItem *item = Slots[slot];
-		if(!item) {
+		if (!item) {
 			continue;
 		}
 		// here you can simply destroy all items of a specific
                 // type
-		if( (flags&item->Flags)!=flags) {
+		if ( (flags&item->Flags)!=flags) {
 				continue;
 		}
-		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
+		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
 		//we need to acknowledge that the item was destroyed
@@ -207,7 +207,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 		delete item;
 		Changed = true;
 		destructed+=removed;
-		if((count!=(unsigned int) ~0) && (destructed==count) ) break;
+		if ((count!=(unsigned int) ~0) && (destructed==count) ) break;
 	}
 
 	return destructed;
@@ -223,11 +223,11 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	}
 	Changed = true;
 	item = Slots[slot];
-	if(!count || !(item->Flags&IE_INV_ITEM_STACKED) ) {
+	if (!count || !(item->Flags&IE_INV_ITEM_STACKED) ) {
 		Slots[slot] = NULL;
 		return item;
 	}
-	if(count >= item->Usages[0]) {
+	if (count >= item->Usages[0]) {
 		Slots[slot] = NULL;
 		return item;
 	}
@@ -243,13 +243,13 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 	int slot = Slots.size();
 	while(slot--) {
 		CREItem *item = Slots[slot];
-		if(!item) {
+		if (!item) {
 			continue;
 		}
-		if( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
+		if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 				continue;
 		}
-		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
+		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
 		*res_item=RemoveItem(slot, 0);
@@ -266,7 +266,7 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 		abort();
 	}
 	Changed = true;
-	if(Slots[slot]) {
+	if (Slots[slot]) {
 		delete Slots[slot];
 	}
 	Slots[slot] = item;
@@ -328,6 +328,8 @@ int Inventory::AddSlotItem(STOItem* item, int action, int count)
 	int ret = -1;
 
 	// FIXME:  Why the loop? Copy whole amount in single step.
+	// Because: count is the number of items bought (you can still add
+	// grouped objects in a single step, just set up STOItem)
 	for (int i = 0; i < count; i++) {
 		if (!item->InfiniteSupply) {
 			if (!item->AmountInStock) {
@@ -358,12 +360,12 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
 		return true;
 	}
 
-	if(!(source->Flags&IE_INV_ITEM_STACKED) ) {
+	if (!(source->Flags&IE_INV_ITEM_STACKED) ) {
 		return false;
 	}
 
 	if (!strnicmp( target->ItemResRef, source->ItemResRef,8 )) {
-		if(target->Flags&IE_INV_ITEM_STACKED) {
+		if (target->Flags&IE_INV_ITEM_STACKED) {
 			return true;
 		}
 	}
@@ -377,10 +379,10 @@ int Inventory::FindItem(const char *resref, unsigned int flags)
 		if (!item) {
 			continue;
 		}
-		if( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
+		if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 				continue;
 		}
-		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
+		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
 		return i;
@@ -396,17 +398,17 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		if (!item) {
 			continue;
 		}
-		if( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
+		if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 				continue;
 		}
-		if(resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
+		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
 		map->TMap->AddItemToLocation(loc, item);
 		Changed = true;
 		Slots[i]=NULL;
 		//if it isn't all items then we stop here
-		if(resref[0])
+		if (resref[0])
 			break;
 	}
 }
@@ -423,7 +425,7 @@ CREItem *Inventory::GetSlotItem(unsigned int slot)
 // find which bow is attached to the projectile marked by 'Equipped'
 int Inventory::FindRanged()
 {
-	return SLOT_WEAPON;
+	return SLOT_MELEE;
 }
 
 CREItem *Inventory::GetUsedWeapon()
@@ -439,64 +441,45 @@ CREItem *Inventory::GetUsedWeapon()
 	else if (Equipped > IW_NO_EQUIPPED) {
 		slot = FindRanged();
 	}
-	else slot = SLOT_WEAPON+Equipped;
+	else slot = SLOT_MELEE+Equipped;
 	return GetSlotItem(slot);
 }
 
-#if 0
-
 // Returns index of first empty slot or slot with the same
 //    item and not full stack. On fail returns -1
-int Inventory::FindCandidateSlot(CREItem* item, int first_slot)
+// Can be used to check for full inventory
+int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *resref)
 {
 	if (first_slot >= Slots.size())
 		return -1;
 
 	for (size_t i = first_slot; i < Slots.size(); i++) {
-		if(!Slots[i]) {
+		CREItem *item = Slots[i];
+
+		if (!(core->QuerySlotType(i)&slottype) ) {
 			continue;
 		}
-		if(!(Slots[i]->Flags&IE_INV_ITEM_STACKED) ) {
+
+		if (!item) {
+			return i; //this is a good empty slot
+		}
+		if (!resref) {
 			continue;
 		}
+		if (!(item->Flags&IE_INV_ITEM_STACKED) ) {
+			continue;
+		}
+		if (strnicmp( item->ItemResRef, resref, 8 )!=0) {
+			continue;
+		}
+		// check if the item fits in this slot, we use the cached
+		// stackamount value
+		if (item->Usages[0]<item->StackAmount)
+			return i;
 	}
 
 	return -1;
 }
-
-bool Inventory::CanTakeItem(CREItem* item)
-{
-}
-
-int Inventory::AddSlotItem(CREItem* item)
-{
-	// FIXME: join items if possible
-	for (size_t i = 0; i < Slots.size(); i++) {
-		if (!Slots[i]) {
-			Slots[i] = item;
-			return ( int ) i;
-		}
-	}
-	Slots.push_back( item );
-	return ( int ) Slots.size() - 1;
-}
-
-int Inventory::DelSlotItem(unsigned int index, bool autoFree)
-{
-	if (index >= Slots.size()) {
-		return -1;
-	}
-	if (!Slots[index]) {
-		return -1;
-	}
-	if (autoFree) {
-		delete( Slots[index] );
-	}
-	Slots[index] = NULL;
-	return 0;
-}
-
-#endif
 
 void Inventory::dump()
 {

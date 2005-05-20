@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.71 2005/05/19 14:56:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.72 2005/05/20 16:41:03 avenger_teambg Exp $
  *
  */
 
@@ -149,7 +149,6 @@ public:
 	bool resetAction;
 	bool OnCreation;
 	unsigned long playDeadCounter;
-	Inventory inventory;
 public:
 	void SetScript(ieResRef aScript, int idx);
 	void SetWait(unsigned long time);

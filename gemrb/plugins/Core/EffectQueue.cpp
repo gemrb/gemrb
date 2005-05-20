@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.15 2005/05/17 13:52:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.16 2005/05/20 16:41:03 avenger_teambg Exp $
  *
  */
 
@@ -57,6 +57,7 @@ int fx_damage_bonus (Actor* target, Effect* fx);
 int fx_open_locks_modifier (Actor* target, Effect* fx);
 int fx_resistance_to_magic_damage (Actor* target, Effect* fx);
 int fx_local_variable (Actor* target, Effect* fx);
+int fx_playsound (Actor* target, Effect* fx);
 
 static int initialized = 0;
 static EffectFunction effect_fns[MAX_EFFECTS];
@@ -70,6 +71,7 @@ static EffectLink effectnames[] = {
 	{ "Cure:Poison", fx_cure_poisoned_state },
 	{ "Cure:Sleep", fx_cure_sleep_state },
 	{ "HP:MaximumHPModifier", fx_maximum_hp_modifier },
+	{ "PlaySound", fx_playsound },
 	{ "Stat:ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier },
 	{ "Stat:AttacksPerRoundModifier", fx_attacks_per_round_modifier },
 	{ "Stat:CharismaModifier", fx_charisma_modifier },
@@ -85,6 +87,7 @@ static EffectLink effectnames[] = {
 	{ "State:Berserk", fx_set_berserk_state },
 	{ "State:Charmed", fx_set_charmed_state },
 	{ "State:Sleep", fx_set_sleep_state },
+	{ "Variable:StoreLocalVariable", fx_local_variable },
 	{ NULL, NULL },
 };
 
@@ -552,8 +555,20 @@ int fx_resistance_to_magic_damage (Actor* target, Effect* fx)
 int fx_local_variable (Actor* target, Effect* fx)
 {
 	//this is a hack, the variable name spreads across the resources
-	printf( "fx_local_variable (%s=%d", fx->Resource, fx->Parameter2);
+	printf( "fx_local_variable (%s=%d)", fx->Resource, fx->Parameter2);
 	target->locals->SetAt(fx->Resource, fx->Parameter2);
+	return FX_APPLIED;
+}
+
+int fx_playsound (Actor* target, Effect* fx)
+{
+	printf( "fx_playsound (%s)", fx->Resource);
+	//this is probably inaccurate
+	if (target) {
+		core->GetSoundMgr()->Play(fx->Resource, target->Pos.x, target->Pos.y);
+	} else {
+		core->GetSoundMgr()->Play(fx->Resource);
+	}
 	return FX_APPLIED;
 }
 
