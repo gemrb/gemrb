@@ -9,6 +9,7 @@ Parameters:
 
 Return value: dictionary
 "Type"       - the container's type, numeric (see IESDP)
+"ItemCount"  - the number of items in the container
 
-See also: GetStore, GameGetFirstSelectedPC
+See also: GetStore, GameGetFirstSelectedPC, GetContainerItem
 
