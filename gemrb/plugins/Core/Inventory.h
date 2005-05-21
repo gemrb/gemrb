@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.29 2005/05/20 16:41:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.30 2005/05/21 14:17:40 avenger_teambg Exp $
  *
  */
 
@@ -114,7 +114,10 @@ private:
 public: 
 	Inventory();
 	virtual ~Inventory();
-
+	
+	/** removes an item from the inventory, destroys slot
+	    use it only for containers */
+	CREItem *GetItem(size_t idx);
 	/** adds an item to the inventory */
 	void AddItem(CREItem *item);
 	/** returns the count items in the inventory */

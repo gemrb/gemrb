@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.308 2005/05/20 12:46:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.309 2005/05/21 14:17:40 avenger_teambg Exp $
  *
  */
 
@@ -3697,6 +3697,17 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_LeaveContainer__doc,
+"LeaveContainer()\n\n"
+"Clears the current container variable and initiates the 'CloseContainerWindow' guiscript call in the next window update cycle.");
+
+static PyObject* GemRB_LeaveContainer(PyObject * /*self*/, PyObject* /*args*/)
+{
+	core->CloseCurrentContainer();
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_GetContainer__doc,
 "GetContainer( PartyID, autoselect ) => dictionary\n\n"
 "Returns relevant data of the container used by the selected actor. Use autoselect if the container is an item pile at the feet of the actor. It will create the container if required. " );
@@ -3789,6 +3800,65 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( item->GetItemDesc( identified )) );
 	core->FreeItem( item, ci->ItemResRef, false );
 	return dict;
+}
+
+PyDoc_STRVAR( GemRB_ChangeContainerItem__doc,
+"ChangeContainerItem(pc, idx, action) => int\n\n"
+"Takes an item from a container, or puts it there. If PC is 0 then it uses the first selected PC and the current container, if it is not 0 then it autoselects the container.\n\n");
+
+
+static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, Slot;
+	int action;
+
+	if (!PyArg_ParseTuple( args, "iii", &PartyID, &Slot, &action)) {
+		return AttributeError( GemRB_ChangeContainerItem__doc );
+	}
+	Game *game = core->GetGame();
+	Actor* actor;
+	Container *container;
+	if (PartyID) {
+		actor = game->FindPC( PartyID );
+		if (!actor) {
+			return RuntimeError( "Actor not found" );
+		}
+		Map *map = actor->GetCurrentArea();
+		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
+	} else {
+		actor = core->GetFirstSelectedPC();
+		if (!actor) {
+			return RuntimeError( "Actor not found" );
+		}
+		container = core->GetCurrentContainer();
+	}
+	if (!container) {
+		return RuntimeError("No current container!");
+	}
+
+	if (action) { //get stuff from container
+		int slot = actor->inventory.FindCandidateSlot( SLOT_INVENTORY, 0);
+		if (slot<0) { //actually we should return something here!
+			Py_INCREF( Py_None );
+			return Py_None;
+		}
+		CREItem *item = container->inventory.GetItem(Slot);
+		if (!item) {
+			Py_INCREF( Py_None );
+			return Py_None;
+		}
+		actor->inventory.SetSlotItem(item, slot);
+	} else { //put stuff in container, simple!
+		CREItem *item = actor->inventory.RemoveItem(Slot);
+		if (!item) {
+			Py_INCREF( Py_None );
+			return Py_None;
+		}
+		container->AddItem(item);
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_GetStore__doc,
@@ -5000,6 +5070,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetItemIcon, METH_VARARGS),
 	METHOD(GetContainer, METH_VARARGS),
 	METHOD(GetContainerItem, METH_VARARGS),
+	METHOD(LeaveContainer, METH_VARARGS),
 	METHOD(EnterStore, METH_VARARGS),
 	METHOD(LeaveStore, METH_VARARGS),
 	METHOD(GetStore, METH_VARARGS),
@@ -5036,6 +5107,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetRumour, METH_VARARGS),
 	METHOD(IsValidStoreItem, METH_VARARGS),
 	METHOD(ChangeStoreItem, METH_VARARGS),
+	METHOD(ChangeContainerItem, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };
