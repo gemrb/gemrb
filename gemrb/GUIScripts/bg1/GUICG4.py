@@ -50,20 +50,22 @@ def CalcLimits(Abidx):
 	return
 
 def RollPress():
-	global Minimum, Maximum, Add
+	global Minimum, Maximum, Add, PointsLeft
 
 	GemRB.InvalidateWindow(AbilityWindow)
 	GemRB.SetVar("Ability",0)
 	GemRB.SetVar("Ability -1",0)
+	PointsLeft = 0
+	GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_ENABLED)
 	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
 	GemRB.SetText(AbilityWindow, SumLabel, "0")
 	GemRB.SetLabelUseRGB(AbilityWindow, SumLabel, 1)
 
-	for i in range(0,6):
+	for i in range(6):
 		dice = 3
-		size = 6
+		size = 5
 		CalcLimits(i)
-		v = GemRB.Roll(dice, size, Add)
+		v = GemRB.Roll(dice, size, Add+3)
 		if v<Minimum:
 			v = Minimum
 		if v>Maximum:
@@ -99,7 +101,7 @@ def OnLoad():
 
 	RollPress()
 	StorePress()
-	for i in range(0,6):
+	for i in range(6):
 		Button = GemRB.GetControl(AbilityWindow, i+30)
 		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
 		GemRB.SetVarAssoc(AbilityWindow, Button, "Ability", i)
@@ -214,7 +216,7 @@ def RecallPress():
 def BackPress():
 	GemRB.UnloadWindow(AbilityWindow)
 	GemRB.SetNextScript("CharGen5")
-	for i in range(1,6):
+	for i in range(6):
 		GemRB.SetVar("Ability "+str(i),0)  #scrapping the abilities
 	return
 

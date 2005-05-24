@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICG7.py,v 1.1 2004/12/16 19:12:43 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICG7.py,v 1.2 2005/05/24 17:36:10 avenger_teambg Exp $
 # character generation, mage spells (GUICG7)
 
 import GemRB
@@ -56,9 +56,10 @@ def OnLoad():
 	for i in range (24):
 		SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
 		GemRB.SetButtonFlags(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		GemRB.SetButtonSprites(MageSpellsWindow, SpellButton, "GUIBTBUT", 0, (i % 12) * 2, (i % 12) * 2 + 1, (i % 12) * 2 + 24, (i % 12) * 2 + 25)
 		if i < len(Learnable):
 			Spell = GemRB.GetSpell(Learnable[i])
-			GemRB.SetSpellIcon(MageSpellsWindow, SpellButton, Learnable[i])
+			GemRB.SetSpellIcon(MageSpellsWindow, SpellButton, Learnable[i], 1)
 			GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
 			GemRB.SetVarAssoc(MageSpellsWindow, SpellButton, "SpellMask", 1 << i)

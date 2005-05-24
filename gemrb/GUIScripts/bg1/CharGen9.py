@@ -98,7 +98,7 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	v = GemRB.FindTableValue(AlignmentTable,3,GemRB.GetVar("Alignment"))
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(AlignmentTable,v,2))
-	for i in range(0,6):
+	for i in range(6):
 		v = GemRB.GetTableValue(AbilityTable, i,2)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": "+str(GemRB.GetVar("Ability "+str(i))))
@@ -133,7 +133,7 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_HATEDRACE, GemRB.GetVar("HatedRace") )
 	TmpTable=GemRB.LoadTable("ability")
 	AbilityCount = GemRB.GetTableRowCount(TmpTable)
-	for i in range(0,AbilityCount):
+	for i in range(AbilityCount):
 		StatID=GemRB.GetTableValue(TmpTable, i,4)
 		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Ability "+str(i) ) )
 	GemRB.UnloadTable(TmpTable)
@@ -168,7 +168,7 @@ def NextPress():
 
 	GemRB.SetPlayerName(MyChar, GemRB.GetToken("CHARNAME"), 0)
 	#does all the rest
-	GemRB.FillPlayerInfo(MyChar,PortraitName+"M", PortraitName+"S") 
+	GemRB.FillPlayerInfo(MyChar,PortraitName+"L", PortraitName+"S") 
 	#LETS PLAY!!
 	playmode = GemRB.GetVar("PlayMode")
 	if playmode >=0:

@@ -41,10 +41,10 @@ def OnLoad():
 		t = GemRB.GetTableValue(ClassTable, i-1, 0)
 		GemRB.SetText(ClassWindow, Button, t )
 
-		if Allowed==0:
-			continue
 		if Allowed==2:
 			GemRB.SetVar("MAGESCHOOL",5) #illusionist
+		if Allowed!=1:
+			continue
 		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetEvent(ClassWindow, Button, IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
 		GemRB.SetVarAssoc(ClassWindow, Button , "Class", i)
@@ -81,12 +81,13 @@ def OnLoad():
 	return
 
 def MultiClassPress():
-	GemRB.SetVar("Class Kit",0)
 	GemRB.UnloadWindow(ClassWindow)
+	GemRB.SetVar("Class Kit",0)
 	GemRB.SetNextScript("GUICG10")
 	return
 
 def SpecialistPress():
+	GemRB.UnloadWindow(ClassWindow)
 	GemRB.SetVar("Class Kit", 0)
 	GemRB.SetVar("Class", 6)
 	GemRB.SetNextScript("GUICG22")

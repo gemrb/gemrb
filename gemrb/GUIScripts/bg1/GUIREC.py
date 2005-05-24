@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIREC.py,v 1.1 2004/12/04 12:33:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIREC.py,v 1.2 2005/05/24 17:36:10 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -141,17 +141,17 @@ def UpdateRecordsWindow ():
 	# armorclass
 	Label = GemRB.GetControl (Window, 0x10000028)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
-	GemRB.SetTooltip (Window, Label, 4197)
+	GemRB.SetTooltip (Window, Label, 17183)
 
 	# hp now
 	Label = GemRB.GetControl (Window, 0x10000029)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
-	GemRB.SetTooltip (Window, Label, 4198)
+	GemRB.SetTooltip (Window, Label, 17184)
 
 	# hp max
 	Label = GemRB.GetControl (Window, 0x1000002a)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
-	GemRB.SetTooltip (Window, Label, 4199)
+	GemRB.SetTooltip (Window, Label, 17378)
 
 	# stats
 
