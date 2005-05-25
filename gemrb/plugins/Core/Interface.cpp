@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.309 2005/05/19 16:36:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.310 2005/05/25 18:55:55 avenger_teambg Exp $
  *
  */
 
@@ -3111,6 +3111,8 @@ int Interface::CloseCurrentContainer()
 	if ( !CurrentContainer) {
 		return -1;
 	}
+	//remove empty ground piles on closeup
+	CurrentContainer->GetCurrentArea()->TMap->CleanupContainer(CurrentContainer);
 	CurrentContainer = NULL;
 	return 0;
 }

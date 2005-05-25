@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.43 2005/05/19 14:56:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.44 2005/05/25 18:55:55 avenger_teambg Exp $
  *
  */
 
@@ -294,30 +294,24 @@ Door* TileMap::GetDoor(unsigned int idx)
 Door* TileMap::GetDoor(Point &p)
 {
 	for (size_t i = 0; i < doors.size(); i++) {
+		Gem_Polygon *doorpoly;
+
 		Door* door = doors[i];
-		if (door->Flags&1) {
-			if (door->closed->BBox.x > p.x)
-				continue;
-			if (door->closed->BBox.y > p.y)
-				continue;
-			if (door->closed->BBox.x + door->closed->BBox.w < p.x)
-				continue;
-			if (door->closed->BBox.y + door->closed->BBox.h < p.y)
-				continue;
-			if (door->closed->PointIn( p ))
-				return door;
-		} else {
-			if (door->open->BBox.x > p.x)
-				continue;
-			if (door->open->BBox.y > p.y)
-				continue;
-			if (door->open->BBox.x + door->open->BBox.w < p.x)
-				continue;
-			if (door->open->BBox.y + door->open->BBox.h < p.y)
-				continue;
-			if (door->open->PointIn( p ))
-				return door;
-		}
+		if (door->Flags&DOOR_OPEN)
+			doorpoly = door->closed;
+		else
+			doorpoly = door->open;
+
+		if (doorpoly->BBox.x > p.x)
+			continue;
+		if (doorpoly->BBox.y > p.y)
+			continue;
+		if (doorpoly->BBox.x + doorpoly->BBox.w < p.x)
+			continue;
+		if (doorpoly->BBox.y + doorpoly->BBox.h < p.y)
+			continue;
+		if (doorpoly->PointIn( p ))
+			return door;
 	}
 	return NULL;
 }
@@ -389,7 +383,25 @@ Container* TileMap::GetContainer(Point &position, int type)
 	return NULL;
 }
 
-void TileMap::AddItemToLocation(Point &position, CREItem *item)
+void TileMap::CleanupContainer(Container *container)
+{
+	if (container->Type!=IE_CONTAINER_PILE)
+		return;
+	if (container->inventory.GetSlotCount())
+		return;
+	
+	for (size_t i = 0; i < containers.size(); i++) {
+		if (containers[i]==container) {
+			containers.erase(containers.begin()+i);
+			delete container;
+			return;
+		}
+	}
+	printMessage("TileMap", " ", LIGHT_RED);
+	printf("Invalid container cleanup: %s\n", container->GetScriptName());
+}
+
+Container *TileMap::GetPile(Point &position)
 {
 	Point tmp[4];
 	char heapname[32];
@@ -416,6 +428,12 @@ void TileMap::AddItemToLocation(Point &position, CREItem *item)
 		container = AddContainer(heapname, IE_CONTAINER_PILE, outline);
 		container->Pos=position;
 	}
+	return container;
+}
+
+void TileMap::AddItemToLocation(Point &position, CREItem *item)
+{
+	Container *container = GetPile(position);
 	container->AddItem(item);
 }
 

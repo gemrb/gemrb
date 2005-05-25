@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.309 2005/05/21 14:17:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.310 2005/05/25 18:55:55 avenger_teambg Exp $
  *
  */
 
@@ -3739,7 +3739,7 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 	if (autoselect) { //autoselect works only with piles
 		Map *map = actor->GetCurrentArea();
 		//GetContainer should create an empty container
-		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
+		container = map->TMap->GetPile(actor->Pos);
 	} else {
 		container = core->GetCurrentContainer();
 	}

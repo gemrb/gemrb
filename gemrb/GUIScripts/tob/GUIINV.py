@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.20 2005/05/18 15:37:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.21 2005/05/25 18:55:54 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -74,7 +74,11 @@ def OpenInventoryWindow ():
 	for i in range (68, 72):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetTooltip (Window, Button, 12011)
-	
+
+	# ground items scrollbar
+	ScrollBar = GemRB.GetControl (Window, 66)
+	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
+
 	#major & minor clothing color
 	Button = GemRB.GetControl (Window, 62)
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE,OP_OR)
@@ -104,9 +108,6 @@ def OpenInventoryWindow ():
 	# hp max
 	Label = GemRB.GetControl (Window, 0x1000003a)
 
-	#ground icons scrollbar
-	ScrollBar = GemRB.GetControl (Window, 66)
-	
 	#info label, game paused, etc
 	Label = GemRB.GetControl (Window, 0x1000003f)
 	GemRB.SetText (Window, Label, "")
@@ -189,8 +190,18 @@ def GetColor():
 	GemRB.SetVisible(ColorPicker,1)
 	return
 
-
+#complete update
 def UpdateInventoryWindow ():
+	Window = InventoryWindow
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Container = GemRB.GetContainer (pc, 1)
+	ScrollBar = GemRB.GetControl (Window, 66)
+	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", Container['ItemCount'])
+	RefreshInventoryWindow()
+
+#partial update without altering TopIndex
+def RefreshInventoryWindow ():
 	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -245,6 +256,19 @@ def UpdateInventoryWindow ():
 	Button = GemRB.GetControl (Window, 63)
 	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
 	GemRB.SetButtonBAM(Window, Button, "COLGRAD", 0, 0, Color)
+
+	# update ground inventory slots
+	Container = GemRB.GetContainer(pc, 1)
+	TopIndex = GemRB.GetVar("TopIndex")
+	for i in range (5):
+		Button = GemRB.GetControl (Window, i+68)
+		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
+		if Slot != None:
+			Item = GemRB.GetItem (Slot['ItemResRef'])
+			GemRB.SetItemIcon (Window, Button, Slot['ItemResRef'],0)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
+		else:
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
 
 	# populate inventory slot controls
 	for i in range (38):

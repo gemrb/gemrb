@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.8 2005/05/20 12:43:07 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.9 2005/05/25 18:55:53 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -34,11 +34,14 @@ ContinueWindow = None
 FormationWindow = None
 ReformPartyWindow = None
 OldActionsWindow = None
+OldMessageWindow = None
 Container = None
 
 def CloseContinueWindow ():
 	global ContinueWindow, OldActionsWindow
 
+	if ContinueWindow == None:
+		return
 	GemRB.UnloadWindow (ContinueWindow)
 	GemRB.SetVar ("ActionsWindow", OldActionsWindow)
 	ContinueWindow = None
@@ -46,7 +49,7 @@ def CloseContinueWindow ():
 	GemRB.UnhideGUI ()
 
 
-def OpenEndDialogWindow ():
+def OpenEndMessageWindow ():
 	global ContinueWindow, OldActionsWindow
 
 	GemRB.HideGUI ()
@@ -56,7 +59,7 @@ def OpenEndDialogWindow ():
 
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContinueWindow = Window = GemRB.LoadWindow (9)
-	OldActionsWindow = GemRB.GetVar("ActionsWindow")
+	OldActionsWindow = GemRB.GetVar ("ActionsWindow")
 	GemRB.SetVar ("ActionsWindow", Window)
 
 	#end dialog
@@ -67,7 +70,7 @@ def OpenEndDialogWindow ():
 	
 	GemRB.UnhideGUI ()
 
-def OpenContinueDialogWindow ():
+def OpenContinueMessageWindow ():
 	global ContinueWindow, OldActionsWindow
 
 	GemRB.HideGUI ()
@@ -77,7 +80,7 @@ def OpenContinueDialogWindow ():
 
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContinueWindow = Window = GemRB.LoadWindow (9)
-	OldActionsWindow = GemRB.GetVar("ActionsWindow")
+	OldActionsWindow = GemRB.GetVar ("ActionsWindow")
 	GemRB.SetVar ("ActionsWindow", Window)
 
 	#continue
@@ -90,13 +93,17 @@ def OpenContinueDialogWindow ():
 
 
 def CloseContainerWindow ():
-	global OldActionsWindow, ContainerWindow
+	global OldActionsWindow, OldMessageWindow, ContainerWindow
+
+	if ContainerWindow == None:
+		return
 
 	GemRB.HideGUI ()
 
 	GemRB.UnloadWindow (ContainerWindow)
 	ContainerWindow = None
 	GemRB.SetVar ("ActionsWindow", OldActionsWindow)
+	GemRB.SetVar ("MessageWindow", OldMessageWindow)
 	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']
 	tmp = GemRB.GetTableValue (Table, row, 2)
@@ -106,6 +113,7 @@ def CloseContainerWindow ():
 
 	#it is enough to close here
 	GemRB.UnloadTable (Table)
+
 	GemRB.UnhideGUI ()
 
 
@@ -118,7 +126,7 @@ def UpdateContainerWindow ():
 	GemRB.SetVarAssoc (Window, ScrollBar, "LeftTopIndex", LeftCount/3-1)
 	
 	pc = GemRB.GameGetFirstSelectedPC ()
-	inventory_slots = GemRB.GetSlots (pc, -1)
+	inventory_slots = GemRB.GetSlots (pc, 0x8000)
 	RightCount = len(inventory_slots)
 	ScrollBar = GemRB.GetControl (Window, 53)
 	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", RightCount/2-1)
@@ -127,13 +135,14 @@ def UpdateContainerWindow ():
 
 def RedrawContainerWindow ():
 	Window = ContainerWindow
+
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	LeftIndex = GemRB.GetVar ("LeftIndex")
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
 	RightIndex = GemRB.GetVar ("RightIndex")
 	LeftCount = Container['ItemCount']
 	pc = GemRB.GameGetFirstSelectedPC ()
-	inventory_slots = GemRB.GetSlots (pc, -1)
+	inventory_slots = GemRB.GetSlots (pc, 0x8000)
 	RightCount = len(inventory_slots)
 
 	for i in range(6):
@@ -168,13 +177,13 @@ def RedrawContainerWindow ():
 			#GemRB.SetTooltip (Window, Button, Slot['ItemName'])
 		else:
 			GemRB.SetVarAssoc (Window, Button, "RightIndex", -1)
-			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
 			GemRB.SetTooltip (Window, Button, "")
 
 
 def OpenContainerWindow ():
-	global OldActionsWindow, ContainerWindow, Container
+	global OldActionsWindow, OldMessageWindow
+	global ContainerWindow, Container
 
 	if ContainerWindow:
 		return
@@ -184,7 +193,9 @@ def OpenContainerWindow ():
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindow (8)
 	OldActionsWindow = GemRB.GetVar ("ActionsWindow")
+	OldMessageWindow = GemRB.GetVar ("MessageWindow")
 	GemRB.SetVar ("ActionsWindow", Window)
+	GemRB.SetVar ("MessageWindow", -1)
 
 	pc = GemRB.GameGetFirstSelectedPC()
 	Container = GemRB.GetContainer(pc)
@@ -244,12 +255,40 @@ def OpenContainerWindow ():
 	# Done
 	Button = GemRB.GetControl (Window, 51)
 	GemRB.SetText (Window, Button, 1403)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContainerWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "LeaveContainer")
 
 	UpdateContainerWindow ()
 	GemRB.UnhideGUI ()
 
+
+#doing this way it will inform the core system too, which in turn will call
+#CloseContainerWindow ()
+def LeaveContainer ():
+	GemRB.LeaveContainer()
+
+def DropItemContainer ():
+	RightTopIndex = GemRB.GetVar ("RightTopIndex")
+	RightIndex = GemRB.GetVar ("RightIndex")
+	if RightIndex<0:
+		return
 	
+	#we need to get the right slot number
+	pc = GemRB.GameGetFirstSelectedPC ()
+	inventory_slots = GemRB.GetSlots (pc, 0x8000)
+	GemRB.ChangeContainerItem (0, inventory_slots[RightTopIndex+RightIndex], 0)
+	UpdateContainerWindow ()
+
+
+def TakeItemContainer ():
+	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
+	LeftIndex = GemRB.GetVar ("LeftIndex")
+	if LeftIndex<0:
+		return
+	
+	GemRB.ChangeContainerItem (0, LeftTopIndex+LeftIndex, 1)
+	UpdateContainerWindow ()
+
+
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
 	GemRB.HideGUI ()

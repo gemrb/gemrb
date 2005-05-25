@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.32 2005/05/19 14:56:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.33 2005/05/25 18:55:55 avenger_teambg Exp $
  *
  */
 
@@ -51,6 +51,7 @@ private:
 public:
 	TileMap(void);
 	~TileMap(void);
+
 	Door* AddDoor(const char* ID, const char* Name, unsigned int Flags,
 		int ClosedIndex, unsigned short* indexes, int count,
 		Gem_Polygon* open, Gem_Polygon* closed);
@@ -64,7 +65,11 @@ public:
 	Container* GetContainer(Point &position, int type=-1);
 	Container* GetContainer(const char* Name);
 	Container* GetContainer(unsigned int idx);
+	/* this function returns/creates a pile container at position */
+	Container *GetPile(Point &position);
+	void CleanupContainer(Container *container);
 	void AddItemToLocation(Point &position, CREItem *item);
+
 	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type,
 		Gem_Polygon* outline);
 	InfoPoint* GetInfoPoint(Point &position);
