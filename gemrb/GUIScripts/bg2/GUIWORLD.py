@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.9 2005/05/25 18:55:53 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.10 2005/05/25 19:51:47 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -118,27 +118,35 @@ def CloseContainerWindow ():
 
 
 def UpdateContainerWindow ():
+	global Container
+
 	Window = ContainerWindow
 
 	Container = GemRB.GetContainer(0) #will use first selected pc anyway
 	LeftCount = Container['ItemCount']
 	ScrollBar = GemRB.GetControl (Window, 52)
-	GemRB.SetVarAssoc (Window, ScrollBar, "LeftTopIndex", LeftCount/3-1)
+	Count = LeftCount/3
+	if Count<1:
+		Count=1
+	GemRB.SetVarAssoc (Window, ScrollBar, "LeftTopIndex", Count)
 	
 	pc = GemRB.GameGetFirstSelectedPC ()
 	inventory_slots = GemRB.GetSlots (pc, 0x8000)
 	RightCount = len(inventory_slots)
 	ScrollBar = GemRB.GetControl (Window, 53)
-	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", RightCount/2-1)
+	Count = RightCount/2
+	if Count<1:
+		Count=1
+	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", Count)
 	RedrawContainerWindow ()
 
 
 def RedrawContainerWindow ():
 	Window = ContainerWindow
 
-	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
+	LeftTopIndex = GemRB.GetVar ("LeftTopIndex") * 3
 	LeftIndex = GemRB.GetVar ("LeftIndex")
-	RightTopIndex = GemRB.GetVar ("RightTopIndex")
+	RightTopIndex = GemRB.GetVar ("RightTopIndex") * 2
 	RightIndex = GemRB.GetVar ("RightIndex")
 	LeftCount = Container['ItemCount']
 	pc = GemRB.GameGetFirstSelectedPC ()
@@ -198,7 +206,7 @@ def OpenContainerWindow ():
 	GemRB.SetVar ("MessageWindow", -1)
 
 	pc = GemRB.GameGetFirstSelectedPC()
-	Container = GemRB.GetContainer(pc)
+	Container = GemRB.GetContainer(0)
 
 	# Gears (time) when options pane is down
 	Button = GemRB.GetControl (Window, 62)
@@ -257,6 +265,8 @@ def OpenContainerWindow ():
 	GemRB.SetText (Window, Button, 1403)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "LeaveContainer")
 
+	GemRB.SetVar ("LeftTopIndex", 0)
+	GemRB.SetVar ("RightTopIndex", 0)
 	UpdateContainerWindow ()
 	GemRB.UnhideGUI ()
 
@@ -267,7 +277,6 @@ def LeaveContainer ():
 	GemRB.LeaveContainer()
 
 def DropItemContainer ():
-	RightTopIndex = GemRB.GetVar ("RightTopIndex")
 	RightIndex = GemRB.GetVar ("RightIndex")
 	if RightIndex<0:
 		return
@@ -275,17 +284,20 @@ def DropItemContainer ():
 	#we need to get the right slot number
 	pc = GemRB.GameGetFirstSelectedPC ()
 	inventory_slots = GemRB.GetSlots (pc, 0x8000)
-	GemRB.ChangeContainerItem (0, inventory_slots[RightTopIndex+RightIndex], 0)
+	if RightIndex >= len(inventory_slots):
+		return
+	GemRB.ChangeContainerItem (0, inventory_slots[RightIndex], 0)
 	UpdateContainerWindow ()
 
 
 def TakeItemContainer ():
-	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	LeftIndex = GemRB.GetVar ("LeftIndex")
 	if LeftIndex<0:
 		return
 	
-	GemRB.ChangeContainerItem (0, LeftTopIndex+LeftIndex, 1)
+	if LeftIndex >= Container['ItemCount']:
+		return
+	GemRB.ChangeContainerItem (0, LeftIndex, 1)
 	UpdateContainerWindow ()
 
 

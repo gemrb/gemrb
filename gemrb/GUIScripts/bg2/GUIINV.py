@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.21 2005/05/25 18:55:53 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.22 2005/05/25 19:51:47 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -119,7 +119,8 @@ def OpenInventoryWindow ():
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot)
 			GemRB.SetButtonFont (Window, Button, "NUMBER")
-
+	
+	GemRB.SetVar ("TopIndex", 0)
 	SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
 	GemRB.SetVisible (OptionsWindow, 1)
@@ -197,7 +198,10 @@ def UpdateInventoryWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = GemRB.GetControl (Window, 66)
-	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", Container['ItemCount'])
+	Count = Container['ItemCount']
+	if Count<1:
+		Count=1
+	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", Count)
 	RefreshInventoryWindow()
 
 #partial update without altering TopIndex

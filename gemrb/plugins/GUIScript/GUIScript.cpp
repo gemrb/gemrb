@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.310 2005/05/25 18:55:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.311 2005/05/25 19:51:48 avenger_teambg Exp $
  *
  */
 
@@ -3841,6 +3841,9 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		if (slot<0) { //actually we should return something here!
 			Py_INCREF( Py_None );
 			return Py_None;
+		}
+		if (Slot<0 || Slot>=(int) container->inventory.GetSlotCount()) {
+			return RuntimeError("Invalid Container slot!");
 		}
 		CREItem *item = container->inventory.GetItem(Slot);
 		if (!item) {
