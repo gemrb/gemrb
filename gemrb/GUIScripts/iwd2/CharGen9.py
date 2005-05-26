@@ -11,8 +11,9 @@ PortraitName = ""
 def OnLoad():
 	global CharGenWindow, TextAreaControl, AlignmentTable, PortraitName
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 800, 600)
 	CharGenWindow = GemRB.LoadWindow(0)
+	GemRB.SetWindowFrame( CharGenWindow)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	PortraitTable = GemRB.LoadTable("pictures")
@@ -23,6 +24,7 @@ def OnLoad():
 	ClassTable = GemRB.LoadTable("classes")
 	KitTable = GemRB.LoadTable("kitlist")
 	AlignmentTable = GemRB.LoadTable("aligns")
+	print "Loading alignmenttable",AlignmentTable
 	AbilityTable = GemRB.LoadTable("ability")
 
 	GenderButton = GemRB.GetControl(CharGenWindow,0)
@@ -101,6 +103,7 @@ def OnLoad():
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, GemRB.GetTableValue(KitTable, KitIndex,2) )
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1049, -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
+	print "Using alignmenttable",AlignmentTable
 	v = GemRB.FindTableValue(AlignmentTable,3,GemRB.GetVar("Alignment"))
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(AlignmentTable,v,2))
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
@@ -129,6 +132,7 @@ def OnLoad():
 	return
 	
 def NextPress():
+
 	GemRB.UnloadWindow(CharGenWindow)
 	#set my character up
 	MyChar = GemRB.GetVar("Slot") 
@@ -144,34 +148,37 @@ def NextPress():
 	t=GemRB.GetVar("Alignment")
 	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
 	TmpTable=GemRB.LoadTable("repstart")
+	AlignmentTable = GemRB.LoadTable("aligns")
 	t=GemRB.FindTableValue(AlignmentTable,3,t)
 	t=GemRB.GetTableValue(TmpTable,t,0)
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
+	GemRB.UnloadTable(TmpTable)
 	TmpTable=GemRB.LoadTable("strtgold")
 	a = GemRB.GetTableValue(TmpTable, Class, 1) #number of dice
 	b = GemRB.GetTableValue(TmpTable, Class, 0) #size
 	c = GemRB.GetTableValue(TmpTable, Class, 2) #adjustment
 	d = GemRB.GetTableValue(TmpTable, Class, 3) #external multiplier
 	e = GemRB.GetTableValue(TmpTable, Class, 4) #level bonus rate
-	t = GemRB.GetPlayerStat(IE_LEVEL) #FIXME: calculate multiclass average
+	t = GemRB.GetPlayerStat(MyChar, IE_LEVEL) 
 	if t>1:
 		e=e*(t-1)
 	else:
 		e=0
+	GemRB.UnloadTable(AlignmentTable)
 	GemRB.UnloadTable(TmpTable)
 	t = GemRB.Roll(a,b,c)*d+e
 	GemRB.SetPlayerStat(MyChar, IE_GOLD, t)
-	GemRB.UnloadTable(TmpTable)
-	#t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,0),GemRB.GetTableValue(TmpTable,Class,1),0 )*2
 	GemRB.SetPlayerStat(MyChar, IE_HATEDRACE, GemRB.GetVar("HatedRace") )
 	TmpTable=GemRB.LoadTable("ability")
 	AbilityCount = GemRB.GetTableRowCount(TmpTable)
 	for i in range(0,AbilityCount):
 		StatID=GemRB.GetTableValue(TmpTable, i,4)
 		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Ability "+str(i) ) )
+	GemRB.UnloadTable(TmpTable)
+
 #	TmpTable=GemRB.LoadTable("weapprof")
 #	ProfCount = GemRB.GetTableRowCount(TmpTable)
-#	for i in range(7,ProfCount):
+#	for i in range(ProfCount):
 #		StatID=GemRB.GetTableValue(TmpTable, i, 0)
 #		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Prof "+str(i) ) )
 	GemRB.SetPlayerStat(MyChar, IE_HAIR_COLOR, GemRB.GetVar("Color1") )

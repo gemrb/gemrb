@@ -10,8 +10,9 @@ def OnLoad():
 
 	GemRB.SetVar("Alignment",0) #alignment
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 800, 600)
 	StartOverWindow  = GemRB.LoadWindow(53)
+
 	YesButton = GemRB.GetControl(StartOverWindow,0)
 	GemRB.SetText(StartOverWindow, YesButton, 13912)
 	GemRB.SetEvent(StartOverWindow, YesButton, IE_GUI_BUTTON_ON_PRESS,"CancelPress")
@@ -24,6 +25,7 @@ def OnLoad():
 	GemRB.SetText(StartOverWindow, TextAreaControl, 40275)
 
 	CharGenWindow = GemRB.LoadWindow(0)
+	GemRB.SetWindowFrame( CharGenWindow)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	PortraitTable = GemRB.LoadTable("pictures")

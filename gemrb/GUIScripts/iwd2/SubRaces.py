@@ -11,7 +11,7 @@ def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global RaceTable, SubRacesTable
 	
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 800, 600)
 	RaceWindow = GemRB.LoadWindow(54)
 
 	RaceTable = GemRB.LoadTable("races")

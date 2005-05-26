@@ -45,7 +45,7 @@ def OnLoad():
 	global HairButton, SkinButton, MajorButton, MinorButton
 	global Color1, Color2, Color3, Color4
 	
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 800, 600)
 	ColorWindow=GemRB.LoadWindow(13)
 
 	RaceTable = GemRB.LoadTable("races")

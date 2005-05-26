@@ -29,7 +29,7 @@ def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global RaceTable, RaceCount, TopIndex
 	
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 800 ,600)
 	RaceWindow = GemRB.LoadWindow(15)
 
 	Class = GemRB.GetVar("BaseClass")-1

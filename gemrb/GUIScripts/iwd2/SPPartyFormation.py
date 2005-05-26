@@ -6,10 +6,10 @@ ExitWindow = 0
 
 def OnLoad():
 	global PartyFormationWindow
-	GemRB.LoadWindowPack("GUISP")
+	GemRB.LoadWindowPack("GUISP", 800, 600)
 	
 	PartyFormationWindow = GemRB.LoadWindow(0)
-	
+	GemRB.SetWindowFrame( PartyFormationWindow)
 	ExitButton = GemRB.GetControl(PartyFormationWindow, 30)
 	GemRB.SetText(PartyFormationWindow, ExitButton, 13906)
 	GemRB.SetEvent(PartyFormationWindow, ExitButton, IE_GUI_BUTTON_ON_PRESS, "ExitPress")

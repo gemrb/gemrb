@@ -8,7 +8,7 @@ DoneButton = 0
 def OnLoad():
 	global NameWindow, NameField, DoneButton
 	
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 800, 600)
 	NameWindow = GemRB.LoadWindow(5)
 
 	BackButton = GemRB.GetControl(NameWindow,3)

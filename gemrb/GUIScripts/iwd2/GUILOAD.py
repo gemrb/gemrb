@@ -11,8 +11,10 @@ def OnLoad():
 	global LoadWindow, TextAreaControl, GameCount, ScrollBar
 
 	GemRB.SetVar("PlayMode",2)   #iwd2 is always using 'mpsave'
-	GemRB.LoadWindowPack("GUILOAD")
+	GemRB.LoadWindowPack("GUILOAD", 800 ,600)
 	LoadWindow = GemRB.LoadWindow(0)
+	GemRB.SetWindowFrame( LoadWindow)
+
 	CancelButton=GemRB.GetControl(LoadWindow,22)
 	GemRB.SetText(LoadWindow, CancelButton, 13727)
 	GemRB.SetEvent(LoadWindow,CancelButton,IE_GUI_BUTTON_ON_PRESS, "CancelPress")

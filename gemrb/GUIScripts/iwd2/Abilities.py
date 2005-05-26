@@ -97,7 +97,7 @@ def OnLoad():
 	Abclasrq = GemRB.LoadTable("ABCLASRQ")
 	KitIndex = GemRB.GetTableRowIndex(Abclasrq, KitName)
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 800 ,600)
 	AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindow(4)
 

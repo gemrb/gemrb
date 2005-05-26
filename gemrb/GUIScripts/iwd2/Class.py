@@ -38,7 +38,7 @@ def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton, BackButton
 	global ClassTable, ClassCount
 	
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 800, 600)
 	#this replaces help02.2da for class restrictions
 	ClassTable = GemRB.LoadTable("classes")
 	ClassCount = GemRB.GetTableRowCount(ClassTable)+1

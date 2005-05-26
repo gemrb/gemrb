@@ -9,7 +9,7 @@ TopIndex = 0
 def OnLoad():
 	global SoundWindow, TextAreaControl, DoneButton, TopIndex
 	
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 800,  600)
 	#this hack will redraw the base CG window
 	SoundWindow = GemRB.LoadWindow(19)
 	GemRB.SetVar("Sound",0)  #scrapping the sound value

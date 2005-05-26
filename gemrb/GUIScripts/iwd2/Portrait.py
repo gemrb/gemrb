@@ -20,8 +20,9 @@ def OnLoad():
 	
 	Gender=GemRB.GetVar("Gender")
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 800, 600)
 	AppearanceWindow = GemRB.LoadWindow(11)
+	#GemRB.SetWindowFrame( AppearanceWindow)
 
 	#Load the Portraits Table
 	PortraitsTable = GemRB.LoadTable("PICTURES")
