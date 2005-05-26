@@ -5,7 +5,7 @@ OptionsWindow = 0
 
 def OnLoad():
 	global OptionsWindow
-	GemRB.LoadWindowPack("GUIOPT")
+	GemRB.LoadWindowPack("GUIOPT", 800, 600)
 	
 	MessageBarWindow = GemRB.LoadWindow(0)
 	GemRB.SetVisible(MessageBarWindow, 1) #This will startup the window as grayed
@@ -22,6 +22,7 @@ def OnLoad():
 	GemRB.UnloadWindow(CharactersBarWindow)
 	
 	OptionsWindow = GemRB.LoadWindow(13)
+	GemRB.SetWindowFrame (OptionsWindow)
 	
 	VersionLabel = GemRB.GetControl(OptionsWindow, 0x1000000B)
 	GemRB.SetText(OptionsWindow, VersionLabel, GEMRB_VERSION)

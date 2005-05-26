@@ -4,9 +4,11 @@ import GemRB
 def OnLoad():
 	global AutoPauseWindow, TextAreaControl
 
-	GemRB.LoadWindowPack("GUIOPT")
+	GemRB.LoadWindowPack("GUIOPT", 800, 600)
 	
 	AutoPauseWindow = GemRB.LoadWindow(10)
+	GemRB.SetWindowFrame( AutoPauseWindow)
+
 	TextAreaControl = GemRB.GetControl(AutoPauseWindow, 15)
 
 	ChHitButton = GemRB.GetControl(AutoPauseWindow, 17)

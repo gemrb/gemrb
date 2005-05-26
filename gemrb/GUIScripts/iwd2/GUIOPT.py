@@ -37,7 +37,7 @@ def OpenOptionsWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	GemRB.LoadWindowPack("GUIOPT")
+	GemRB.LoadWindowPack("GUIOPT", 800, 600)
 	OptionsWindow = GemRB.LoadWindow(2)
 	GemRB.SetVar ("OtherWindow", OptionsWindow)
 	

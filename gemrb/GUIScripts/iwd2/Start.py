@@ -7,11 +7,14 @@ QuitWindow = 0
 def OnLoad():
 	global StartWindow
 
-	GemRB.LoadWindowPack("GUICONN")
-
+	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
+	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
+	if screen_width == 1024:
+		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
+	GemRB.LoadWindowPack("GUICONN", 800, 600)
 #main window
 	StartWindow = GemRB.LoadWindow(0)
-	GemRB.SetWindowSize(StartWindow, 800, 600)
+	GemRB.SetWindowFrame (StartWindow)
 	ProtocolButton = GemRB.GetControl(StartWindow, 0x00)
 	NewGameButton = GemRB.GetControl(StartWindow, 0x02)
 	LoadGameButton = GemRB.GetControl(StartWindow, 0x07)

@@ -8,8 +8,9 @@ MoviesTable = 0
 def OnLoad():
 	global MovieWindow, TextAreaControl, MoviesTable
 
-	GemRB.LoadWindowPack("GUIMOVIE")
+	GemRB.LoadWindowPack("GUIMOVIE", 800, 600)
 	MovieWindow = GemRB.LoadWindow(2)
+	GemRB.SetWindowFrame (MovieWindow)
 	TextAreaControl = GemRB.GetControl(MovieWindow, 0)
 	GemRB.SetTextAreaFlags(MovieWindow, TextAreaControl,IE_GUI_TEXTAREA_SELECTABLE)
 	PlayButton = GemRB.GetControl(MovieWindow, 2)
