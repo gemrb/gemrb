@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.310 2005/05/25 18:55:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.311 2005/05/26 17:48:04 avenger_teambg Exp $
  *
  */
 
@@ -311,6 +311,7 @@ Interface::~Interface(void)
 	if (INIparty) {
 		FreeInterface(INIparty);
 	}
+	Map::ReleaseMemory();
 	delete( plugin );
 	// Removing all stuff from Cache, except bifs
 	DelTree((const char *) CachePath, true);

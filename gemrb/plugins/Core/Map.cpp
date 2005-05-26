@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.161 2005/05/19 14:56:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.162 2005/05/26 17:48:05 avenger_teambg Exp $
  *
  */
 
@@ -54,7 +54,7 @@ int LargeFog;
 
 #define STEP_TIME 150
 
-void ReleaseMemoryMap()
+void Map::ReleaseMemory()
 {
 	for (int i=0;i<MaxVisibility;i++) {
 		free(VisibilityMasks[i]);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.27 2005/03/07 06:26:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.28 2005/05/26 17:48:05 avenger_teambg Exp $
  *
  */
 
@@ -52,6 +52,9 @@ void TextEdit::Draw(unsigned short x, unsigned short y)
 	if (!Changed) {
 		return;
 	}
+	Changed = false;
+	if (!font)
+		return;
 	if (hasFocus) {
 		font->Print( Region( x + XPos, y + YPos, Width, Height ), Buffer,
 				palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE,
@@ -60,7 +63,6 @@ void TextEdit::Draw(unsigned short x, unsigned short y)
 		font->Print( Region( x + XPos, y + YPos, Width, Height ), Buffer,
 				palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 	}
-	Changed = false;
 }
 
 /** Set Font */
@@ -68,8 +70,10 @@ void TextEdit::SetFont(Font* f)
 {
 	if (f != NULL) {
 		font = f;
+		Changed = true;
+		return;
 	}
-	Changed = true;
+	printMessage("TextEdit","Invalid font set!\n", LIGHT_RED);
 }
 
 /** Set Cursor */
