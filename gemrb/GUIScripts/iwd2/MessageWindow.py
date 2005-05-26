@@ -32,33 +32,70 @@ from GUISTORE import *
 from GUIWORLD import *
 
 MessageWindow = 0
-MessageTA = 0
-
+PortraitWindow = 0
 def OnLoad():
-	global MessageWindow, MessageTA
+	global MessageWindow, PortraitWindow
+
 	GemRB.LoadWindowPack(GetWindowPack())
 	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
-	MessageTA = GemRB.GetControl(MessageWindow, 1)
-	GemRB.SetTextAreaFlags(MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	ActionsWindow = PortraitWindow = OpenPortraitWindow(1)
 
-	GemRB.SetVar("MessageWindow", MessageWindow)
-	GemRB.SetVar("PortraitWindow", PortraitWindow)
-	GemRB.SetVar("TopWindow", -1)
-	GemRB.SetVar("OtherWindow", -1)
-	GemRB.SetVar("FloatWindow", -1)
-	GemRB.SetVar("ActionsPosition", -1) #already handled in portraitwindow
-	GemRB.SetVar("OptionsPosition", -1) #already handled in messagewindow
-	GemRB.SetVar("MessagePosition", 4)
-	GemRB.SetVar("PortraitPosition", 4)
-	GemRB.SetVar("OtherPosition", 5) #Inactivating
-	GemRB.SetVar("TopPosition", 5) #Inactivating
+	GemRB.SetVar ("MessageWindow", MessageWindow)
+	GemRB.SetVar ("PortraitWindow", PortraitWindow)
+	GemRB.SetVar ("TopWindow", -1)
+	GemRB.SetVar ("OtherWindow", -1)
+	GemRB.SetVar ("FloatWindow", -1)
+	GemRB.SetVar ("ActionsPosition", -1) #already handled in portraitwindow
+	GemRB.SetVar ("OptionsPosition", -1) #already handled in messagewindow
+	GemRB.SetVar ("MessagePosition", 4)
+	GemRB.SetVar ("PortraitPosition", 4)
+	GemRB.SetVar ("OtherPosition", 5) #Inactivating
+	GemRB.SetVar ("TopPosition", 5) #Inactivating
 
-	GemRB.SetVar("MessageTextArea", MessageTA)
-	
 	SetupActionsWindowControls (ActionsWindow)
 	SetupMenuWindowControls (OptionsWindow)
 
 	GemRB.SetVisible(MessageWindow, 1)
 	GemRB.SetVisible(PortraitWindow, 1)
 	return
+
+def OnIncreaseSize():
+	GemRB.GameSetScreenFlags(GS_LARGEDIALOG, OP_OR)
+
+def OnDecreaseSize():
+	GemRB.GameSetScreenFlags(GS_LARGEDIALOG, OP_NAND)
+
+def UpdateControlStatus():
+	global MessageWindow
+
+	TMessageWindow = 0
+	TMessageTA = 0
+	GSFlags = GemRB.GetVar ("MessageWindowSize")
+	Expand = GSFlags&GS_DIALOGMASK
+	GSFlags = GSFlags-Expand
+
+	MessageWindow = GemRB.GetVar ("MessageWindow")
+
+	GemRB.LoadWindowPack(GetWindowPack())
+	GemRB.HideGUI()
+	if Expand == GS_LARGEDIALOG:
+		GemRB.SetVar ("PortraitWindow", -1)
+		TMessageWindow = GemRB.LoadWindow(7)
+		TMessageTA = GemRB.GetControl (TMessageWindow, 1)
+	else:
+		GemRB.SetVar ("PortraitWindow", PortraitWindow)
+		TMessageWindow = GemRB.LoadWindow(0)
+		TMessageTA = GemRB.GetControl (TMessageWindow, 1)
+
+
+	GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
+
+	MessageTA = GemRB.GetVar ("MessageTextArea")
+	if MessageWindow>0 and MessageWindow!=TMessageWindow:
+		GemRB.MoveTAText (MessageWindow, MessageTA, TMessageWindow, TMessageTA)
+		GemRB.UnloadWindow(MessageWindow)
+	GemRB.SetVar ("MessageWindow", TMessageWindow)
+	GemRB.SetVar ("MessageTextArea", TMessageTA)
+	GemRB.UnhideGUI()
+	return
+
