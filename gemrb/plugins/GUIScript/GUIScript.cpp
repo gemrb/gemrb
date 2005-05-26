@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.311 2005/05/25 19:51:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.312 2005/05/26 16:30:55 avenger_teambg Exp $
  *
  */
 
@@ -674,6 +674,7 @@ static PyObject* GemRB_UnloadTable(PyObject * /*self*/, PyObject* args)
 
 	int ind = core->DelTable( ti );
 	if (ind == -1) {
+		printMessage("GUIScript", "Table not found!", LIGHT_RED);
 		return NULL;
 	}
 
@@ -759,6 +760,7 @@ static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 
 	TableMgr* tm = core->GetTable( ti );
 	if (tm == NULL) {
+		printMessage("GUIScript", "Table not found!", LIGHT_RED);
 		return NULL;
 	}
 	for (row = 0; row < tm->GetRowCount(); row++) {
@@ -785,6 +787,7 @@ static PyObject* GemRB_GetTableRowIndex(PyObject * /*self*/, PyObject* args)
 
 	TableMgr* tm = core->GetTable( ti );
 	if (tm == NULL) {
+		printMessage("GUIScript", "Table not found!", LIGHT_RED);
 		return NULL;
 	}
 	int row = tm->GetRowIndex( rowname );
@@ -806,6 +809,7 @@ static PyObject* GemRB_GetTableRowName(PyObject * /*self*/, PyObject* args)
 
 	TableMgr* tm = core->GetTable( ti );
 	if (tm == NULL) {
+		printMessage("GUIScript", "Table not found!", LIGHT_RED);
 		return NULL;
 	}
 	const char* str = tm->GetRowName( row );
@@ -830,6 +834,7 @@ static PyObject* GemRB_GetTableRowCount(PyObject * /*self*/, PyObject* args)
 
 	TableMgr* tm = core->GetTable( ti );
 	if (tm == NULL) {
+		printMessage("GUIScript", "Table not found!", LIGHT_RED);
 		return NULL;
 	}
 
