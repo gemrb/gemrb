@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.275 2005/05/27 17:10:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.276 2005/05/27 21:55:30 avenger_teambg Exp $
  *
  */
 
@@ -75,6 +75,7 @@ static TriggerLink triggernames[] = {
 	{"areacheckobject", GameScript::AreaCheckObject,0},
 	{"areaflag", GameScript::AreaFlag,0},
 	{"areatype", GameScript::AreaType,0},
+	{"atlocation", GameScript::AtLocation,0},
 	{"bitcheck", GameScript::BitCheck,TF_MERGESTRINGS},
 	{"bitcheckexact", GameScript::BitCheckExact,TF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
@@ -122,6 +123,7 @@ static TriggerLink triggernames[] = {
 	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger,TF_MERGESTRINGS},
 	{"globalband", GameScript::BitCheck,AF_MERGESTRINGS},
 	{"globalbandglobal", GameScript::GlobalBAndGlobal_Trigger,AF_MERGESTRINGS},
+	{"globalbandglobalexact", GameScript::GlobalBAndGlobalExact,AF_MERGESTRINGS},
 	{"globalbitglobal", GameScript::GlobalBitGlobal_Trigger,TF_MERGESTRINGS},
 	{"globalequalsglobal", GameScript::GlobalsEqual,TF_MERGESTRINGS}, //this is the same
 	{"globalgt", GameScript::GlobalGT,TF_MERGESTRINGS},
@@ -169,6 +171,7 @@ static TriggerLink triggernames[] = {
 	{"internallt", GameScript::InternalLT,0},
 	{"interactingwith", GameScript::InteractingWith,0},
 	{"inventoryfull", GameScript::InventoryFull,0},
+	{"inview", GameScript::LOS,0}, //it seems the same, needs research
 	{"inweaponrange", GameScript::InWeaponRange,0},
 	{"isaclown", GameScript::IsAClown,0},
 	{"isactive", GameScript::IsActive,0},
@@ -229,6 +232,9 @@ static TriggerLink triggernames[] = {
 	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT,0},
 	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT,0},
 	{"objectactionlistempty", GameScript::ObjectActionListEmpty,0}, //same function
+	{"objitemcounteq", GameScript::NumItems,0},
+	{"objitemcountgt", GameScript::NumItemsGT,0},
+	{"objitemcountlt", GameScript::NumItemsLT,0},
 	{"oncreation", GameScript::OnCreation,0},
 	{"onscreen", GameScript::OnScreen,0},
 	{"openstate", GameScript::OpenState,0},
@@ -242,7 +248,11 @@ static TriggerLink triggernames[] = {
 	{"partygoldlt", GameScript::PartyGoldLT,0},
 	{"partyhasitem", GameScript::PartyHasItem,0},
 	{"partyhasitemidentified", GameScript::PartyHasItemIdentified,0},
+	{"partyitemcounteq", GameScript::NumItemsParty,0},
+	{"partyitemcountgt", GameScript::NumItemsPartyGT,0},
+	{"partyitemcountlt", GameScript::NumItemsPartyLT,0},
 	{"partymemberdied", GameScript::PartyMemberDied,0},
+	{"pccanseepoint", GameScript::PCCanSeePoint,0},
 	{"pcinstore", GameScript::PCInStore,0},
 	{"proficiency", GameScript::Proficiency,0},
 	{"proficiencygt", GameScript::ProficiencyGT,0},
@@ -261,6 +271,7 @@ static TriggerLink triggernames[] = {
 	{"see", GameScript::See,0},
 	{"specifics", GameScript::Specifics,0},
 	{"statecheck", GameScript::StateCheck,0},
+	{"stuffglobalrandom", GameScript::StuffGlobalRandom,0},//hm, this is a trigger
 	{"subrace", GameScript::SubRace,0},
 	{"targetunreachable", GameScript::TargetUnreachable,0},
 	{"team", GameScript::Team,0},
@@ -292,6 +303,7 @@ static ActionLink actionnames[] = {
 	{"addglobals", GameScript::AddGlobals,0},
 	{"addjournalentry", GameScript::AddJournalEntry,0},
 	{"addmapnote", GameScript::AddMapnote,0},
+	{"addpartyexperience", GameScript::AddExperienceParty,0},
 	{"addspecialability", GameScript::AddSpecialAbility,0},
 	{"addwaypoint", GameScript::AddWayPoint,AF_BLOCKING},
 	{"addxp2da", GameScript::AddXP2DA,0},
@@ -551,6 +563,8 @@ static ActionLink actionnames[] = {
 	{"setinternal", GameScript::SetInternal,0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile,0},
 	{"setmasterarea", GameScript::SetMasterArea,0},
+	{"setmazeeasier", GameScript::SetMazeEasier,0}, //pst specific crap
+	{"setmazeharder", GameScript::SetMazeHarder,0}, //pst specific crap
 	{"setmoraleai", GameScript::SetMoraleAI,0},
 	{"setmusic", GameScript::SetMusic,0},
 	{"setname", GameScript::SetApparentName,0},
@@ -603,7 +617,6 @@ static ActionLink actionnames[] = {
 	{"stickysinisterpoof", GameScript::CreateVisualEffectObject,0},
 	{"stopmoving", GameScript::StopMoving,0},
 	{"storepartylocations", GameScript::StorePartyLocation,0},
-	{"stuffglobalrandom", GameScript::SetGlobalRandom,0},
 	{"swing", GameScript::Swing,0},
 	{"swingonce", GameScript::SwingOnce,0},
 	{"takeitemlist", GameScript::TakeItemList,0},
@@ -3670,6 +3683,13 @@ int GameScript::GlobalBAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters
 	return ( value1& value2 ) != 0;
 }
 
+int GameScript::GlobalBAndGlobalExact(Scriptable* Sender, Trigger* parameters)
+{
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
+	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter );
+	return ( value1& value2 ) == value2;
+}
+
 int GameScript::GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
@@ -4212,6 +4232,16 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 	}
 	int distance = Distance(Sender, scr);
 	if (distance <= ( parameters->int0Parameter * 20 )) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::AtLocation( Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if ( (tar->Pos.x==parameters->pointParameter.x) &&
+	     (tar->Pos.y==parameters->pointParameter.y) ) {
 		return 1;
 	}
 	return 0;
@@ -5598,6 +5628,32 @@ int GameScript::IsPlayerNumber( Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	if (actor->InParty == parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::PCCanSeePoint( Scriptable* /*Sender*/, Trigger* parameters)
+{
+	Map* map = core->GetGame()->GetCurrentArea();
+	if (map->IsVisible(parameters->pointParameter, false) ) {
+		return 1;
+	}
+	return 0;
+}
+
+//i'm clueless about this trigger
+int GameScript::StuffGlobalRandom( Scriptable* Sender, Trigger* parameters)
+{
+	unsigned int max=parameters->int0Parameter+1;
+	ieDword Value;
+	if (max) {
+		Value = RandomNumValue%max;
+	} else {
+		Value = RandomNumValue;
+	}
+	SetVariable( Sender, parameters->string0Parameter, Value );
+	if (Value) {
 		return 1;
 	}
 	return 0;
@@ -9395,3 +9451,15 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 	GoNearAndRetry(Sender, gc->target);
 	Sender->CurrentAction = NULL;
 }
+
+//these are stored in the Game structure i guess
+void GameScript::SetMazeEasier(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+printf("Easier\n");
+}
+
+void GameScript::SetMazeHarder(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+printf("Harder\n");
+}
+

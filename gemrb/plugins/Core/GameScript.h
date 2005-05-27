@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.179 2005/05/27 17:10:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.180 2005/05/27 21:55:31 avenger_teambg Exp $
  *
  */
 
@@ -706,6 +706,7 @@ public: //Script Functions
 	static int AreaFlag(Scriptable* Sender, Trigger* parameter);
 	static int AreaRestDisabled(Scriptable* Sender, Trigger* parameter);
 	static int AreaType(Scriptable* Sender, Trigger* parameter);
+	static int AtLocation(Scriptable* Sender, Trigger* parameter);
 	static int BitCheck(Scriptable* Sender, Trigger* parameters);
 	static int BitCheckExact(Scriptable* Sender, Trigger* parameters);
 	static int BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
@@ -749,6 +750,7 @@ public: //Script Functions
 	static int Global(Scriptable* Sender, Trigger* parameters);
 	static int GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int GlobalBAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
+	static int GlobalBAndGlobalExact(Scriptable* Sender, Trigger* parameters);
 	static int GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int GlobalGT(Scriptable* Sender, Trigger* parameters);
 	static int GlobalGTGlobal(Scriptable* Sender, Trigger* parameters);
@@ -863,6 +865,7 @@ public: //Script Functions
 	static int PartyHasItem(Scriptable* Sender, Trigger* parameters);
 	static int PartyHasItemIdentified(Scriptable* Sender, Trigger* parameters);
 	static int PartyMemberDied(Scriptable* Sender, Trigger* parameters);
+	static int PCCanSeePoint(Scriptable* Sender, Trigger* parameters);
 	static int PCInStore(Scriptable* Sender, Trigger* parameters);
 	static int Proficiency(Scriptable* Sender, Trigger* parameters);
 	static int ProficiencyGT(Scriptable* Sender, Trigger* parameters);
@@ -881,6 +884,7 @@ public: //Script Functions
 	static int See(Scriptable* Sender, Trigger* parameters);
 	static int Specifics(Scriptable* Sender, Trigger* parameters);
 	static int StateCheck(Scriptable* Sender, Trigger* parameters);
+	static int StuffGlobalRandom(Scriptable* Sender, Trigger* parameters);
 	static int SubRace(Scriptable* Sender, Trigger* parameters);
 	static int TargetUnreachable(Scriptable* Sender, Trigger* parameters);
 	static int Team(Scriptable* Sender, Trigger* parameters);
@@ -1132,6 +1136,8 @@ public:
 	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
 	static void SetMasterArea(Scriptable* Sender, Action* parameters);
+	static void SetMazeEasier(Scriptable* Sender, Action* parameters);
+	static void SetMazeHarder(Scriptable* Sender, Action* parameters);
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
 	static void SetMusic(Scriptable* Sender, Action* parameters);
 	static void SetNamelessClass(Scriptable* Sender, Action* parameters);
