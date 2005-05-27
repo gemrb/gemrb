@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.178 2005/05/26 19:43:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.179 2005/05/27 17:10:02 avenger_teambg Exp $
  *
  */
 
@@ -881,6 +881,7 @@ public: //Script Functions
 	static int See(Scriptable* Sender, Trigger* parameters);
 	static int Specifics(Scriptable* Sender, Trigger* parameters);
 	static int StateCheck(Scriptable* Sender, Trigger* parameters);
+	static int SubRace(Scriptable* Sender, Trigger* parameters);
 	static int TargetUnreachable(Scriptable* Sender, Trigger* parameters);
 	static int Team(Scriptable* Sender, Trigger* parameters);
 	static int Time(Scriptable* Sender, Trigger* parameters);

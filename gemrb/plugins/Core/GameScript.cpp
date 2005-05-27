@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.274 2005/05/26 19:43:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.275 2005/05/27 17:10:00 avenger_teambg Exp $
  *
  */
 
@@ -261,6 +261,7 @@ static TriggerLink triggernames[] = {
 	{"see", GameScript::See,0},
 	{"specifics", GameScript::Specifics,0},
 	{"statecheck", GameScript::StateCheck,0},
+	{"subrace", GameScript::SubRace,0},
 	{"targetunreachable", GameScript::TargetUnreachable,0},
 	{"team", GameScript::Team,0},
 	{"time", GameScript::Time,0},
@@ -3416,6 +3417,16 @@ int GameScript::Team(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = (Actor*)scr;
 	return ID_Team( actor, parameters->int0Parameter);
+}
+
+int GameScript::SubRace(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr || scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = (Actor*)scr;
+	return ID_Subrace( actor, parameters->int0Parameter);
 }
 
 int GameScript::IsTeamBitOn(Scriptable* Sender, Trigger* parameters)
