@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.154 2005/05/19 14:56:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.155 2005/05/27 20:03:56 avenger_teambg Exp $
  *
  */
 
@@ -420,6 +420,9 @@ public:
 	Sprite2D* GetBAMSprite(ieResRef ResRef, int cycle, int frame);
 	/** returns a cursor sprite (not cached) */
 	Sprite2D *GetCursorSprite();
+	/** returns 0 for unmovable, -1 for movable items, otherwise it
+	    returns gold value! */
+	int CanMoveItem(CREItem *item);
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

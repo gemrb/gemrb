@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.311 2005/05/26 17:48:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.312 2005/05/27 20:03:56 avenger_teambg Exp $
  *
  */
 
@@ -3290,3 +3290,14 @@ Sprite2D *Interface::GetCursorSprite()
 	return GetBAMSprite(CursorBam, 0, 0);
 }
 
+int Interface::CanMoveItem(CREItem *item)
+{
+	if (item->Flags & IE_INV_ITEM_UNDROPPABLE)
+		return 0;
+	//not gold, we allow only one single coin ResRef, this is good
+	//for all of the original games
+	if (strnicmp(item->ItemResRef, GoldResRef, 8 ) )
+		return 1;
+	//gold, returns the gold value (stack size)
+	return item->Usages[0];
+}

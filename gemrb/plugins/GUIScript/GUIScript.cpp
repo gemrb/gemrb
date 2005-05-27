@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.313 2005/05/26 19:43:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.314 2005/05/27 20:03:56 avenger_teambg Exp $
  *
  */
 
@@ -3834,30 +3834,65 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current container!");
 	}
 
+	CREItem *item;
+	int res;
+
 	if (action) { //get stuff from container
-		int slot = actor->inventory.FindCandidateSlot( SLOT_INVENTORY, 0);
-		if (slot<0) { //actually we should return something here!
-			Py_INCREF( Py_None );
-			return Py_None;
-		}
 		if (Slot<0 || Slot>=(int) container->inventory.GetSlotCount()) {
 			return RuntimeError("Invalid Container slot!");
 		}
-		CREItem *item = container->inventory.GetItem(Slot);
+
+		res = core->CanMoveItem(container->inventory.GetSlotItem(Slot) );
+		if (!res) { //cannot move
+			printf("Cannot move item, it is undroppable!\n");
+			Py_INCREF( Py_None );
+			return Py_None;
+		}
+
+		item = container->inventory.GetItem(Slot);
 		if (!item) {
+			printf("Cannot move item, there is something weird!\n");
+			Py_INCREF( Py_None );
+			return Py_None;
+		}
+		if (res!=-1) { //it is gold!
+			goto item_is_gold;
+		}
+		
+		int slot = actor->inventory.FindCandidateSlot( SLOT_INVENTORY, 0);
+		if (slot<0) { //actually we should return something here!
+			printf("Cannot move item, inventory is full!\n");
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
 		actor->inventory.SetSlotItem(item, slot);
 	} else { //put stuff in container, simple!
-		CREItem *item = actor->inventory.RemoveItem(Slot);
-		if (!item) {
+		res = core->CanMoveItem(actor->inventory.GetSlotItem(Slot) );
+		if (!res) { //cannot move
+			printf("Cannot move item, it is undroppable!\n");
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
+
+		item = actor->inventory.RemoveItem(Slot);
+		if (!item) {
+			printf("Cannot move item, there is something weird!\n");
+			Py_INCREF( Py_None );
+			return Py_None;
+		}
+
+		if (res!=-1) { //it is gold!
+			goto item_is_gold;
+		}
+
 		container->AddItem(item);
 	}
 
+	Py_INCREF( Py_None );
+	return Py_None;
+item_is_gold: //we take gold!
+	core->GetGame()->PartyGold += res;
+	delete item;
 	Py_INCREF( Py_None );
 	return Py_None;
 }

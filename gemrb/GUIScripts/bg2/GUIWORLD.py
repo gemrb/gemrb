@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.10 2005/05/25 19:51:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.11 2005/05/27 20:03:54 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -122,6 +122,13 @@ def UpdateContainerWindow ():
 
 	Window = ContainerWindow
 
+	pc = GemRB.GameGetFirstSelectedPC ()
+	SetEncumbranceLabels( Window, 0x10000043, 0x10000044, pc)
+
+	party_gold = GemRB.GameGetPartyGold ()
+	Text = GemRB.GetControl (Window, 0x10000036)
+	GemRB.SetText (Window, Text, str (party_gold))
+
 	Container = GemRB.GetContainer(0) #will use first selected pc anyway
 	LeftCount = Container['ItemCount']
 	ScrollBar = GemRB.GetControl (Window, 52)
@@ -130,7 +137,6 @@ def UpdateContainerWindow ():
 		Count=1
 	GemRB.SetVarAssoc (Window, ScrollBar, "LeftTopIndex", Count)
 	
-	pc = GemRB.GameGetFirstSelectedPC ()
 	inventory_slots = GemRB.GetSlots (pc, 0x8000)
 	RightCount = len(inventory_slots)
 	ScrollBar = GemRB.GetControl (Window, 53)
@@ -242,12 +248,6 @@ def OpenContainerWindow ():
 
 	Label = GemRB.CreateLabel (Window, 0x10000043, 323,14,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
 	Label = GemRB.CreateLabel (Window, 0x10000044, 323,20,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
-
-	SetEncumbranceLabels( Window, 0x10000043, 0x10000044, pc)
-
-	party_gold = GemRB.GameGetPartyGold ()
-	Text = GemRB.GetControl (Window, 0x10000036)
-	GemRB.SetText (Window, Text, str (party_gold))
 
 	Button = GemRB.GetControl (Window, 50)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
